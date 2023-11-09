@@ -23,11 +23,10 @@ import Notebooks from "../views/notebooks";
 import Notes from "../views/notes";
 import Search from "../views/search";
 import Tags from "../views/tags";
-import Topics from "../views/topics";
+import Notebook from "../views/notebook";
 import { navigate } from ".";
 import Trash from "../views/trash";
 import { store as notestore } from "../stores/note-store";
-import { store as nbstore } from "../stores/notebook-store";
 import Reminders from "../views/reminders";
 import { defineRoutes } from "./types";
 import React from "react";
@@ -38,7 +37,8 @@ type RouteResult = {
   key: string;
   type: "notes" | "notebooks" | "reminders" | "trash" | "tags" | "search";
   title?: string;
-  component: React.FunctionComponent;
+  component: React.ReactNode;
+  props?: any;
   buttons?: RouteContainerButtons;
 };
 
@@ -73,19 +73,18 @@ const routes = defineRoutes({
         }
       }
     }),
-  "/notebooks/:notebookId": ({ notebookId }) => {
-    const notebook = db.notebooks.notebook(notebookId);
-    if (!notebook) return false;
-    nbstore.setSelectedNotebook(notebookId);
-    notestore.setContext({
-      type: "notebook",
-      value: { id: notebookId }
-    });
-
+  "/notebooks/:rootId/:notebookId?": ({ rootId, notebookId }) => {
     return defineRoute({
       key: "notebook",
       type: "notes",
-      component: Topics,
+      component: Notebook,
+      props: {
+        rootId,
+        notebookId
+      },
+      //  () => (
+      //   <Notebook key={rootId} rootId={rootId} notebookId={notebookId} />
+      // ),
       buttons: {
         create: CREATE_BUTTON_MAP.notes,
         back: {
@@ -93,37 +92,31 @@ const routes = defineRoutes({
           onClick: () => navigate("/notebooks")
         },
         search: {
-          title: `Search ${notebook.title} notes`
+          title: `Search notes`
         }
       }
     });
   },
-  "/notebooks/:notebookId/:topicId": ({ notebookId, topicId }) => {
-    const notebook = db.notebooks.notebook(notebookId);
-    const topic = notebook?.topics?.topic(topicId)?._topic;
-    if (!topic) return false;
-    nbstore.setSelectedNotebook(notebookId);
-    notestore.setContext({
-      type: "topic",
-      value: { id: notebookId, topic: topicId }
-    });
-    return defineRoute({
-      key: "notebook",
-      type: "notes",
-      title: topic.title,
-      component: Topics,
-      buttons: {
-        create: CREATE_BUTTON_MAP.notes,
-        back: {
-          title: `Go back to ${notebook.title}`,
-          onClick: () => navigate(`/notebooks/${notebookId}`)
-        },
-        search: {
-          title: `Search ${notebook.title} ${topic.title} notes`
-        }
-      }
-    });
-  },
+  // "/notebooks/:rootId/:notebookId": ({ notebookId, rootId }) => {
+  //   return defineRoute({
+  //     key: "notebook",
+  //     type: "notes",
+  //     // title: topic.title,
+  //     component: () => (
+  //       <Notebook key={rootId} rootId={rootId} notebookId={notebookId} />
+  //     ),
+  //     buttons: {
+  //       create: CREATE_BUTTON_MAP.notes,
+  //       back: {
+  //         title: `Go back to notebooks`, // ${notebook.title}`,
+  //         onClick: () => navigate(`/notebooks/${rootId}`)
+  //       },
+  //       search: {
+  //         title: `Search notes`
+  //       }
+  //     }
+  //   });
+  // },
   "/favorites": () => {
     notestore.setContext({ type: "favorite" });
     return defineRoute({

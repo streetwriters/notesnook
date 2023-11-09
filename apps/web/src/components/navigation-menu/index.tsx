@@ -132,7 +132,10 @@ function NavigationMenu(props: NavigationMenuProps) {
   useEffect(() => {
     if (state === "forward" || state === "neutral")
       navigationHistory.set(location, true);
-    else navigationHistory.delete(previousLocation);
+    else if (state === "same" && location !== previousLocation) {
+      navigationHistory.delete(previousLocation);
+      navigationHistory.set(location, true);
+    } else navigationHistory.delete(previousLocation);
   }, [location, previousLocation, state]);
 
   return (

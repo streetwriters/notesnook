@@ -27,7 +27,13 @@ import {
   SQLiteItem,
   isFalse
 } from ".";
-import { ExpressionOrFactory, SelectQueryBuilder, SqlBool, sql } from "kysely";
+import {
+  AnyColumnWithTable,
+  ExpressionOrFactory,
+  SelectQueryBuilder,
+  SqlBool,
+  sql
+} from "kysely";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { groupArray } from "../utils/grouping";
 
@@ -240,6 +246,8 @@ export class SQLCollection<
 }
 
 export class FilteredSelector<T extends Item> {
+  private _fields: AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>[] =
+    [];
   constructor(
     readonly type: keyof DatabaseSchema,
     readonly filter: SelectQueryBuilder<
@@ -249,6 +257,11 @@ export class FilteredSelector<T extends Item> {
     >,
     readonly batchSize: number = 500
   ) {}
+
+  fields(fields: AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>[]) {
+    this._fields = fields;
+    return this;
+  }
 
   async ids(sortOptions?: GroupOptions) {
     return (
@@ -267,7 +280,8 @@ export class FilteredSelector<T extends Item> {
       .$if(!!sortOptions, (eb) =>
         eb.$call(this.buildSortExpression(sortOptions!))
       )
-      .selectAll()
+      .$if(this._fields.length === 0, (eb) => eb.selectAll())
+      .$if(this._fields.length > 0, (eb) => eb.select(this._fields))
       .execute()) as T[];
   }
 
@@ -304,7 +318,8 @@ export class FilteredSelector<T extends Item> {
     const item = await this.filter
       .where(filter)
       .limit(1)
-      .selectAll()
+      .$if(this._fields.length === 0, (eb) => eb.selectAll())
+      .$if(this._fields.length > 0, (eb) => eb.select(this._fields))
       .executeTakeFirst();
     return item as T | undefined;
   }
@@ -344,6 +359,25 @@ export class FilteredSelector<T extends Item> {
     );
   }
 
+  async sorted(options: GroupOptions) {
+    const items = await this.filter
+      .$call(this.buildSortExpression(options))
+      .select("id")
+      .execute();
+    const ids = items.map((item) => item.id);
+    return new VirtualizedGrouping<T>(ids, this.batchSize, async (ids) => {
+      const results = await this.filter
+        .where("id", "in", ids)
+        .selectAll()
+        .execute();
+      const items: Record<string, T> = {};
+      for (const item of results) {
+        items[item.id] = item as T;
+      }
+      return items;
+    });
+  }
+
   private buildSortExpression(options: GroupOptions) {
     return <T>(
       qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, T>
@@ -370,7 +404,8 @@ export class FilteredSelector<T extends Item> {
     let index = 0;
     while (true) {
       const rows = await this.filter
-        .selectAll()
+        .$if(this._fields.length === 0, (eb) => eb.selectAll())
+        .$if(this._fields.length > 0, (eb) => eb.select(this._fields))
         .orderBy("dateCreated asc")
         .offset(index)
         .limit(this.batchSize)

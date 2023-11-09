@@ -68,9 +68,9 @@ function TrashItem(props: TrashItemProps) {
 }
 export default TrashItem;
 
-const menuItems: (item: TrashItem, items?: TrashItem[]) => MenuItem[] = (
+const menuItems: (item: TrashItem, ids?: string[]) => MenuItem[] = (
   item,
-  items = []
+  ids = []
 ) => {
   return [
     {
@@ -79,8 +79,8 @@ const menuItems: (item: TrashItem, items?: TrashItem[]) => MenuItem[] = (
       title: "Restore",
       icon: Restore.path,
       onClick: () => {
-        store.restore(items.map((i) => i.id));
-        showToast("success", `${pluralize(items.length, "item")} restored`);
+        store.restore(ids);
+        showToast("success", `${pluralize(ids.length, "item")} restored`);
       },
       multiSelect: true
     },
@@ -91,10 +91,9 @@ const menuItems: (item: TrashItem, items?: TrashItem[]) => MenuItem[] = (
       icon: DeleteForver.path,
       variant: "dangerous",
       onClick: async () => {
-        if (!(await showMultiPermanentDeleteConfirmation(items.length))) return;
-        const ids = items.map((i) => i.id);
+        if (!(await showMultiPermanentDeleteConfirmation(ids.length))) return;
         showUndoableToast(
-          `${pluralize(items.length, "item")} permanently deleted`,
+          `${pluralize(ids.length, "item")} permanently deleted`,
           () => store.delete(ids),
           () => store.delete(ids, true),
           () => store.refresh()

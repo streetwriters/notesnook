@@ -17,7 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-type IsParameter<Part> = Part extends `:${infer Parameter}` ? Parameter : never;
+type IsParameter<Part> = Part extends `:${infer Parameter}?`
+  ? Parameter
+  : Part extends `:${infer Parameter}`
+  ? Parameter
+  : never;
 
 type FilteredParts<Path> = Path extends `${infer PartA}/${infer PartB}`
   ? IsParameter<PartA> | FilteredParts<PartB>

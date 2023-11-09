@@ -130,11 +130,89 @@ export class Notebooks implements ICollection {
         eb.selectFrom("subNotebooks").select("subNotebooks.id")
       )
       .where("toId", "not in", this.db.trash.cache.notes)
-      .select((eb) => eb.fn.count<number>("id").as("totalNotes"))
+      .select((eb) => eb.fn.count<number>("relations.toId").as("totalNotes"))
       .executeTakeFirst();
 
     if (!result) return 0;
     return result.totalNotes;
+  }
+
+  async notes(id: string) {
+    const result = await this.db
+      .sql()
+      .withRecursive(`subNotebooks(id)`, (eb) =>
+        eb
+          .selectNoFrom((eb) => eb.val(id).as("id"))
+          .unionAll((eb) =>
+            eb
+              .selectFrom(["relations", "subNotebooks"])
+              .select("relations.toId as id")
+              .where("toType", "==", "notebook")
+              .where("fromType", "==", "notebook")
+              .whereRef("fromId", "==", "subNotebooks.id")
+              .where("toId", "not in", this.db.trash.cache.notebooks)
+              .$narrowType<{ id: string }>()
+          )
+      )
+      .selectFrom("relations")
+      .where("toType", "==", "note")
+      .where("fromType", "==", "notebook")
+      .where("fromId", "in", (eb) =>
+        eb.selectFrom("subNotebooks").select("subNotebooks.id")
+      )
+      .where("toId", "not in", this.db.trash.cache.notes)
+      .select("relations.toId as id")
+      .$narrowType<{ id: string }>()
+      .execute();
+
+    return result.map((i) => i.id);
+  }
+
+  get roots() {
+    return this.collection.createFilter<Notebook>(
+      (qb) =>
+        qb
+          .where("id", "not in", (eb) =>
+            eb
+              .selectFrom("relations")
+              .where("toType", "==", "notebook")
+              .where("fromType", "==", "notebook")
+              .select("relations.toId as id")
+              .$narrowType<{ id: string }>()
+          )
+          .where(isFalse("dateDeleted"))
+          .where(isFalse("deleted")),
+      this.db.options?.batchSize
+    );
+  }
+
+  async breadcrumbs(id: string) {
+    const ids = await this.db
+      .sql()
+      .withRecursive(`subNotebooks(id)`, (eb) =>
+        eb
+          .selectNoFrom((eb) => eb.val(id).as("id"))
+          .unionAll((eb) =>
+            eb
+              .selectFrom(["relations", "subNotebooks"])
+              .select("relations.fromId as id")
+              .where("toType", "==", "notebook")
+              .where("fromType", "==", "notebook")
+              .whereRef("toId", "==", "subNotebooks.id")
+              .where("fromId", "not in", this.db.trash.cache.notebooks)
+              .$narrowType<{ id: string }>()
+          )
+      )
+      .selectFrom("subNotebooks")
+      .select("id")
+      .execute();
+    const records = await this.all
+      .fields(["notebooks.id", "notebooks.title"])
+      .records(ids.map((i) => i.id));
+    return ids.reverse().map((id) => records[id.id]) as {
+      id: string;
+      title: string;
+    }[];
   }
 
   async notebook(id: string) {

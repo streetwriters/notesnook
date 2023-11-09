@@ -38,10 +38,6 @@ import DiffViewer from "../components/diff-viewer";
 import Unlock from "../components/unlock";
 import { store as editorStore } from "../stores/editor-store";
 import { isMobile } from "../utils/dimensions";
-import {
-  showEditTopicDialog,
-  showCreateTopicDialog
-} from "../common/dialog-controller";
 import { hashNavigate } from ".";
 import Editor from "../components/editor";
 import { defineRoutes } from "./types";
@@ -59,23 +55,11 @@ const hashroutes = defineRoutes({
   "/notebooks/:notebookId/edit": ({ notebookId }) => {
     showEditNotebookDialog(notebookId)?.then(afterAction);
   },
-  "/topics/create": () => {
-    showCreateTopicDialog().then(afterAction);
-  },
   "/reminders/create": () => {
     showAddReminderDialog().then(afterAction);
   },
   "/reminders/:reminderId/edit": ({ reminderId }) => {
     showEditReminderDialog(reminderId).then(afterAction);
-  },
-  "/notebooks/:notebookId/topics/:topicId/edit": ({
-    notebookId,
-    topicId
-  }: {
-    notebookId: string;
-    topicId: string;
-  }) => {
-    showEditTopicDialog(notebookId, topicId)?.then(afterAction);
   },
   "/tags/create": () => {
     showCreateTagDialog().then(afterAction);

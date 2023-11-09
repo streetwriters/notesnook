@@ -27,7 +27,7 @@ export function MenuSeparator() {
         width: "95%",
         height: "1px",
         bg: "separator",
-        my: 2,
+        my: 1,
         alignSelf: "center"
       }}
     />

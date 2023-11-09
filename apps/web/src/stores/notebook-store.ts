@@ -27,9 +27,7 @@ import { Notebook, VirtualizedGrouping } from "@notesnook/core";
 
 type ViewMode = "detailed" | "compact";
 class NotebookStore extends BaseStore<NotebookStore> {
-  notebooks: VirtualizedGrouping<Notebook> | undefined = undefined;
-  // selectedNotebook = undefined;
-  // selectedNotebookTopics = [];
+  notebooks?: VirtualizedGrouping<Notebook>;
   viewMode = Config.get<ViewMode>("notebooks:viewMode", "detailed");
 
   setViewMode = (viewMode: ViewMode) => {
@@ -38,7 +36,7 @@ class NotebookStore extends BaseStore<NotebookStore> {
   };
 
   refresh = async () => {
-    const notebooks = await db.notebooks.all.grouped(
+    const notebooks = await db.notebooks.roots.grouped(
       db.settings.getGroupOptions("notebooks")
     );
     this.set({ notebooks });
@@ -55,20 +53,6 @@ class NotebookStore extends BaseStore<NotebookStore> {
     await db.notebooks.pin(state, ...ids);
     await this.refresh();
   };
-
-  // setSelectedNotebook = (id) => {
-  //   if (!id) return;
-  //   const notebook = db.notebooks.notebook(id)?.data;
-  //   if (!notebook) return;
-
-  //   this.set((state) => {
-  //     state.selectedNotebook = notebook;
-  //     state.selectedNotebookTopics = groupArray(
-  //       notebook.topics,
-  //       db.settings.getGroupOptions("topics")
-  //     );
-  //   });
-  // };
 }
 
 const [useStore, store] = createStore(NotebookStore);

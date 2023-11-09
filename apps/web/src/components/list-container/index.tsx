@@ -163,8 +163,7 @@ function ListContainer(props: ListContainerProps) {
               }}
               itemContent={(index, item) => {
                 if (isGroupHeader(item)) {
-                  if (!group)
-                    return <div style={{ height: 28, width: "100%" }} />;
+                  if (!group) return null;
                   return (
                     <GroupHeader
                       groupingKey={group}

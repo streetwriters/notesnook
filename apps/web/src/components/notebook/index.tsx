@@ -21,8 +21,8 @@ import React from "react";
 import { Flex, Text } from "@theme-ui/components";
 import ListItem from "../list-item";
 import { useStore, store } from "../../stores/notebook-store";
+import { useStore as useNotesStore } from "../../stores/note-store";
 import { store as appStore } from "../../stores/app-store";
-import { showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common/db";
 import {
   Topic as TopicIcon,
@@ -36,13 +36,12 @@ import {
 } from "../icons";
 import { hashNavigate, navigate } from "../../navigation";
 import IconTag from "../icon-tag";
-import { showToast } from "../../utils/toast";
 import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "@notesnook/common";
 import { confirm } from "../../common/dialog-controller";
 import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
-import { Note, Notebook } from "@notesnook/core/dist/types";
+import { Notebook } from "@notesnook/core";
 
 type NotebookProps = {
   item: Notebook;
@@ -60,12 +59,15 @@ function Notebook(props: NotebookProps) {
       isCompact={isCompact}
       isSimple={simplified}
       item={notebook}
-      onClick={() => {
+      onClick={async () => {
+        await useNotesStore
+          .getState()
+          .setContext({ type: "notebook", id: notebook.id, item, totalNotes });
         navigate(`/notebooks/${notebook.id}`);
       }}
       title={notebook.title}
       body={notebook.description as string}
-      menuItems={menuItems}
+      menuItems={notebookMenuItems}
       footer={
         <>
           {isCompact ? (
@@ -128,19 +130,10 @@ export default React.memo(Notebook, (prev, next) => {
   );
 });
 
-const pin = (notebook: Notebook) => {
-  return store
-    .pin(notebook.id)
-    .then(() => {
-      if (notebook.pinned) showUnpinnedToast(notebook.id, "notebook");
-    })
-    .catch((error) => showToast("error", error.message));
-};
-
-const menuItems: (notebook: Notebook, items?: Notebook[]) => MenuItem[] = (
-  notebook,
-  items = []
-) => {
+export const notebookMenuItems: (
+  notebook: Notebook,
+  ids?: string[]
+) => MenuItem[] = (notebook, ids = []) => {
   const defaultNotebook = db.settings.getDefaultNotebook();
 
   return [
@@ -155,14 +148,13 @@ const menuItems: (notebook: Notebook, items?: Notebook[]) => MenuItem[] = (
       type: "button",
       key: "set-as-default",
       title: "Set as default",
-      isChecked: defaultNotebook?.id === notebook.id && !defaultNotebook?.topic,
+      isChecked: defaultNotebook === notebook.id,
       icon: NotebookIcon.path,
       onClick: async () => {
         const defaultNotebook = db.settings.getDefaultNotebook();
-        const isDefault =
-          defaultNotebook?.id === notebook.id && !defaultNotebook?.topic;
+        const isDefault = defaultNotebook === notebook.id;
         await db.settings.setDefaultNotebook(
-          isDefault ? undefined : { id: notebook.id }
+          isDefault ? undefined : notebook.id
         );
       }
     },
@@ -172,7 +164,8 @@ const menuItems: (notebook: Notebook, items?: Notebook[]) => MenuItem[] = (
       icon: Pin.path,
       title: "Pin",
       isChecked: notebook.pinned,
-      onClick: () => pin(notebook)
+      onClick: () => store.pin(!notebook.pinned, ...ids),
+      multiSelect: true
     },
     {
       type: "button",
@@ -194,13 +187,13 @@ const menuItems: (notebook: Notebook, items?: Notebook[]) => MenuItem[] = (
       icon: Trash.path,
       onClick: async () => {
         const result = await confirm({
-          title: `Delete ${pluralize(items.length, "notebook")}?`,
+          title: `Delete ${pluralize(ids.length, "notebook")}?`,
           positiveButtonText: `Yes`,
           negativeButtonText: "No",
           checks: {
             deleteContainingNotes: {
               text: `Move all notes in ${
-                items.length > 1 ? "these notebooks" : "this notebook"
+                ids.length > 1 ? "these notebooks" : "this notebook"
               } to trash`
             }
           }
@@ -208,18 +201,12 @@ const menuItems: (notebook: Notebook, items?: Notebook[]) => MenuItem[] = (
 
         if (result) {
           if (result.deleteContainingNotes) {
-            const notes: Note[] = [];
-            for (const item of items) {
-              notes.push(...(db.relations.from(item, "note").resolved() || []));
-              const topics = db.notebooks.topics(item.id);
-              if (!topics) return;
-              for (const topic of topics.all) {
-                notes.push(...(topics.topic(topic.id)?.all || []));
-              }
-            }
-            await Multiselect.moveNotesToTrash(notes, false);
+            await Multiselect.moveNotesToTrash(
+              await db.notebooks.notes(notebook.id),
+              false
+            );
           }
-          await Multiselect.moveNotebooksToTrash(items);
+          await Multiselect.moveNotebooksToTrash(ids);
         }
       },
       multiSelect: true

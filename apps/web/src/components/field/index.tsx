@@ -18,65 +18,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Button, Flex, Text, InputProps } from "@theme-ui/components";
 import { Input, Label } from "@theme-ui/components";
-import { PasswordVisible, PasswordInvisible, Check, Cross } from "../icons";
+import { ThemeUIStyleObject } from "@theme-ui/css";
+import { PasswordVisible, PasswordInvisible, Icon } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 
-const passwordValidationRules = [
-  {
-    title: "8 characters",
-    validate: (password) => password.length >= 8
-  }
-  // {
-  //   title: "1 lowercase letter",
-  //   validate: (password) => /[a-z]/.test(password),
-  // },
-  // {
-  //   title: "1 uppercase letter",
-  //   validate: (password) => /[A-Z]/.test(password),
-  // },
-  // {
-  //   title: "1 digit",
-  //   validate: (password) => /\d/.test(password),
-  // },
-  // {
-  //   title: "1 special character",
-  //   validate: (password) => /\W/.test(password),
-  // },
-];
+type FieldProps = InputProps & {
+  label?: string;
+  helpText?: string;
+  inputRef?: React.Ref<HTMLInputElement>;
+  ["data-test-id"]?: string;
+  styles?: {
+    input?: ThemeUIStyleObject;
+    label?: ThemeUIStyleObject;
+    helpText?: ThemeUIStyleObject;
+  };
+  action?: {
+    testId?: string;
+    onClick?: () => void;
+    disabled?: boolean;
+    icon?: Icon;
+    component?: JSX.Element;
+  };
+};
 
-function Field(props) {
-  const {
-    id,
-    label,
-    type,
-    sx,
-    styles = {},
-    name,
-    required,
-    autoFocus,
-    autoComplete,
-    helpText,
-    action,
-    onKeyUp,
-    onKeyDown,
-    onChange,
-    inputRef,
-    disabled,
-    defaultValue,
-    value,
-    placeholder,
-    validatePassword,
-    onError,
-    inputMode,
-    pattern,
-    min,
-    variant = "input",
-    as = "input"
-  } = props;
+function Field(props: FieldProps) {
+  const { label, styles, helpText, action, sx, id, type, ...inputProps } =
+    props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [rules, setRules] = useState(passwordValidationRules);
   const colorScheme = useThemeStore((state) => state.colorScheme);
 
   return (
@@ -85,7 +55,6 @@ function Field(props) {
         m: "2px",
         mr: "2px",
         ...sx,
-        ...styles.container,
         flexDirection: "column"
       }}
     >
@@ -97,7 +66,7 @@ function Field(props) {
           fontFamily: "body",
           color: "paragraph",
           flexDirection: "column",
-          ...styles.label
+          ...styles?.label
         }}
       >
         {label}{" "}
@@ -107,7 +76,7 @@ function Field(props) {
             as="span"
             sx={{
               fontWeight: "normal",
-              ...styles.helpText
+              ...styles?.helpText
             }}
           >
             {helpText}
@@ -117,55 +86,21 @@ function Field(props) {
 
       <Flex mt={1} sx={{ position: "relative" }}>
         <Input
-          as={as}
-          data-test-id={props["data-test-id"]}
-          variant={variant}
-          defaultValue={defaultValue}
-          ref={inputRef}
-          autoFocus={autoFocus}
-          required={required}
-          name={name}
+          {...inputProps}
           id={id}
-          disabled={disabled}
-          placeholder={placeholder}
-          autoComplete={autoComplete}
-          inputMode={inputMode}
-          pattern={pattern}
-          type={type || "text"}
-          min={min}
-          value={value}
+          type={isPasswordVisible ? "text" : type || "text"}
           sx={{
             flex: 1,
-            ...styles.input,
+            ...styles?.input,
             ":disabled": {
               bg: "background-disabled"
             },
             colorScheme
           }}
-          onChange={(e) => {
-            if (validatePassword) {
-              const value = e.target.value;
-              const mapped = rules.map((rule) => {
-                return { ...rule, isValid: rule.validate(value) };
-              });
-              if (onError) {
-                onError(mapped.some((m) => !m.isValid));
-              }
-              setRules(mapped);
-            }
-            if (onChange) onChange(e);
-          }}
-          onKeyUp={onKeyUp}
-          onKeyDown={onKeyDown}
         />
         {type === "password" && (
           <Flex
-            onClick={() => {
-              const input = document.getElementById(id);
-              if (!input) return;
-              input.type = isPasswordVisible ? "password" : "text";
-              setIsPasswordVisible((s) => !s);
-            }}
+            onClick={() => setIsPasswordVisible((s) => !s)}
             variant="rowCenter"
             sx={{
               position: "absolute",
@@ -205,22 +140,6 @@ function Field(props) {
           </Button>
         )}
       </Flex>
-      {validatePassword && (
-        <Flex mt={1} sx={{ flexDirection: "column" }}>
-          {rules.map((rule) => (
-            <Flex key={rule.title}>
-              {rule.isValid ? (
-                <Check color="icon-success" size={14} />
-              ) : (
-                <Cross color="icon-error" size={14} />
-              )}
-              <Text ml={1} sx={{ fontSize: "body", color: "paragraph" }}>
-                {rule.title}
-              </Text>
-            </Flex>
-          ))}
-        </Flex>
-      )}
     </Flex>
   );
 }

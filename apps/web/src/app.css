@@ -215,3 +215,12 @@ textarea,
 .ms-thumb {
   background: var(--paragraph-secondary) !important;
 }
+
+.rct-tree-items-container {
+  margin: 0px;
+  margin-block-start: 0px !important;
+  margin-block-end: 0px !important;
+  margin-inline-end: 0px !important;
+  margin-inline-start: 0px !important;
+  padding: 0px !important;
+}
