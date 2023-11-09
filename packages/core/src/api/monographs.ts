@@ -39,6 +39,7 @@ type EncryptedMonograph = BaseMonograph & {
 };
 type Monograph = UnencryptedMonograph | EncryptedMonograph;
 
+export type PublishOptions = { password?: string; selfDestruct?: boolean };
 export class Monographs {
   monographs: string[] = [];
   constructor(private readonly db: Database) {}
@@ -82,10 +83,7 @@ export class Monographs {
   /**
    * Publish a note as a monograph
    */
-  async publish(
-    noteId: string,
-    opts: { password?: string; selfDestruct?: boolean } = {}
-  ) {
+  async publish(noteId: string, opts: PublishOptions = {}) {
     if (!this.monographs.length) await this.refresh();
 
     const update = !!this.isPublished(noteId);
