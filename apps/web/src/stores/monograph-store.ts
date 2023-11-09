@@ -20,29 +20,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
-import { store as notestore } from "./note-store";
+import { store as noteStore } from "./note-store";
+import { Note, VirtualizedGrouping } from "@notesnook/core";
+import { PublishOptions } from "@notesnook/core/dist/api/monographs";
 
-/**
- * @extends {BaseStore<MonographStore>}
- */
-class MonographStore extends BaseStore {
-  monographs = [];
+class MonographStore extends BaseStore<MonographStore> {
+  monographs: VirtualizedGrouping<Note> | undefined = undefined;
 
-  refresh = () => {
-    this.set((state) => (state.monographs = db.monographs.all));
+  refresh = async () => {
+    const grouping = await db.monographs.all.grouped(
+      db.settings.getGroupOptions("notes")
+    );
+    this.set({ monographs: grouping });
   };
 
-  publish = async (noteId, opts) => {
+  publish = async (noteId: string, opts: PublishOptions) => {
     const publishId = await db.monographs.publish(noteId, opts);
-    this.get().refresh();
-    notestore.refreshContext();
+    await this.get().refresh();
+    await noteStore.refreshContext();
     return publishId;
   };
 
-  unpublish = async (noteId) => {
+  unpublish = async (noteId: string) => {
     await db.monographs.unpublish(noteId);
-    this.get().refresh();
-    notestore.refreshContext();
+    await this.get().refresh();
+    noteStore.refreshContext();
   };
 }
 
