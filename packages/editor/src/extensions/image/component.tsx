@@ -74,7 +74,6 @@ export function ImageComponent(
   const imageInfoRef = useRef<imageInfo>();
   const [error, setError] = useState<string>();
   const [source, setSource] = useState<string>();
-  const [imageInfo, setImageInfo] = useState<imageInfo>();
   const downloadOptions = useToolbarStore((store) => store.downloadOptions);
   const isReadonly = !editor.current?.isEditable;
   const hasOrSrc = hash || src;
@@ -94,7 +93,6 @@ export function ImageComponent(
             );
             setSource(url);
             imageInfoRef.current = { size, blob, type };
-            //setImageInfo({ size, blob, type });
           } else {
             setError("Failed to parse source url.");
           }
