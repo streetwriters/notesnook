@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { showMultiDeleteConfirmation } from "./dialog-controller";
+import { confirm, showMultiDeleteConfirmation } from "./dialog-controller";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as attachmentStore } from "../stores/attachment-store";
@@ -27,12 +27,7 @@ import { showToast } from "../utils/toast";
 import Vault from "./vault";
 import { TaskManager } from "./task-manager";
 import { pluralize } from "@notesnook/common";
-
-type Item = {
-  id: string;
-  locked?: boolean;
-  metadata?: Record<string, unknown>;
-};
+import { Reminder } from "@notesnook/core";
 
 async function moveNotesToTrash(ids: string[], confirm = true) {
   if (confirm && !(await showMultiDeleteConfirmation(ids.length))) return;
@@ -86,27 +81,13 @@ async function moveNotebooksToTrash(ids: string[]) {
   showToast("success", `${pluralize(ids.length, "notebook")} moved to trash`);
 }
 
-async function deleteTopics(notebookId: string, topics: Item[]) {
-  await TaskManager.startTask({
-    type: "status",
-    id: "deleteTopics",
-    action: async (report) => {
-      report({
-        text: `Deleting ${pluralize(topics.length, "topic")}...`
-      });
-      await db.notebooks.topics(notebookId).delete(...topics.map((t) => t.id));
-      notebookStore.setSelectedNotebook(notebookId);
-      noteStore.refresh();
-    }
-  });
-  showToast("success", `${pluralize(topics.length, "topic")} deleted`);
-}
-
-async function deleteAttachments(attachments: Item[]) {
+async function deleteAttachments(ids: string[]) {
   if (
-    !window.confirm(
-      "Are you sure you want to permanently delete these attachments? This action is IRREVERSIBLE."
-    )
+    !(await confirm({
+      title: "Are you sure?",
+      message:
+        "Are you sure you want to permanently delete these attachments? This action is IRREVERSIBLE."
+    }))
   )
     return;
 
@@ -114,24 +95,24 @@ async function deleteAttachments(attachments: Item[]) {
     type: "status",
     id: "deleteAttachments",
     action: async (report) => {
-      for (let i = 0; i < attachments.length; ++i) {
-        const attachment = attachments[i];
+      for (let i = 0; i < ids.length; ++i) {
+        const id = ids[i];
+        const attachment = await attachmentStore.get().attachments?.item(id);
+        if (!attachment) continue;
+
         report({
-          text: `Deleting ${pluralize(attachments.length, "attachment")}...`,
+          text: `Deleting ${pluralize(ids.length, "attachment")}...`,
           current: i,
-          total: attachments.length
+          total: ids.length
         });
-        await attachmentStore.permanentDelete(attachment.metadata?.hash);
+        await attachmentStore.permanentDelete(attachment);
       }
     }
   });
-  showToast(
-    "success",
-    `${pluralize(attachments.length, "attachment")} deleted`
-  );
+  showToast("success", `${pluralize(ids.length, "attachment")} deleted`);
 }
 
-async function moveRemindersToTrash(reminders: Item[]) {
+async function moveRemindersToTrash(reminders: Reminder[]) {
   const isMultiselect = reminders.length > 1;
   if (isMultiselect) {
     if (!(await showMultiDeleteConfirmation(reminders.length))) return;
@@ -155,6 +136,5 @@ export const Multiselect = {
   moveRemindersToTrash,
   moveNotebooksToTrash,
   moveNotesToTrash,
-  deleteTopics,
   deleteAttachments
 };
