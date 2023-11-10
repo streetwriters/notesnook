@@ -21,12 +21,14 @@ import { db } from "../../common/db";
 import { lazify } from "../lazify";
 import { makeUniqueFilename } from "./utils";
 import { ZipFile } from "./zip-stream";
+import { Attachment } from "@notesnook/core";
 
 export const METADATA_FILENAME = "metadata.json";
 const GROUP_ID = "all-attachments";
 export class AttachmentStream extends ReadableStream<ZipFile> {
   constructor(
-    attachments: Array<any>,
+    ids: string[],
+    resolve: (id: string) => Promise<Attachment | undefined> | undefined,
     signal?: AbortSignal,
     onProgress?: (current: number) => void
   ) {
@@ -46,16 +48,12 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
         }
 
         onProgress && onProgress(index);
-        const attachment = attachments[index++];
+        const attachment = await resolve(ids[index++]);
+        if (!attachment) return;
 
         await db
           .fs()
-          .downloadFile(
-            GROUP_ID,
-            attachment.metadata.hash,
-            attachment.chunkSize,
-            attachment.metadata
-          );
+          .downloadFile(GROUP_ID, attachment.hash, attachment.chunkSize);
 
         const key = await db.attachments.decryptKey(attachment.key);
         if (!key) return;
@@ -66,14 +64,14 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
             decryptFile(attachment.metadata.hash, {
               key,
               iv: attachment.iv,
-              name: attachment.metadata.filename,
-              type: attachment.metadata.type,
+              name: attachment.filename,
+              type: attachment.mimeType,
               isUploaded: !!attachment.dateUploaded
             })
         );
 
         if (file) {
-          const filePath: string = attachment.metadata.filename;
+          const filePath: string = attachment.filename;
           controller.enqueue({
             path: makeUniqueFilename(filePath, counters),
             data: new Uint8Array(await file.arrayBuffer())
@@ -82,7 +80,7 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
           controller.error(new Error("Failed to decrypt file."));
         }
 
-        if (index === attachments.length) {
+        if (index === ids.length) {
           controller.close();
         }
       }

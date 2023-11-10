@@ -26,44 +26,45 @@ import { showToast } from "../utils/toast";
 import { AttachmentStream } from "../utils/streams/attachment-stream";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
+import { Attachment, VirtualizedGrouping } from "@notesnook/core";
 
-let abortController = undefined;
-/**
- * @extends {BaseStore<AttachmentStore>}
- */
-class AttachmentStore extends BaseStore {
-  attachments = [];
-  /**
-   * @type {{current: number, total: number}}
-   */
-  status = undefined;
+let abortController: AbortController | undefined = undefined;
+class AttachmentStore extends BaseStore<AttachmentStore> {
+  attachments?: VirtualizedGrouping<Attachment>;
+  status?: { current: number; total: number };
+  processing: Record<
+    string,
+    { failed?: string; working?: "delete" | "recheck" }
+  > = {};
 
-  refresh = () => {
-    this.set((state) => (state.attachments = db.attachments.all));
+  refresh = async () => {
+    this.set({
+      attachments: await db.attachments.all.sorted({
+        sortBy: "dateCreated",
+        sortDirection: "desc"
+      })
+    });
   };
 
   init = () => {
     this.refresh();
   };
 
-  download = async (attachments) => {
+  download = async (ids: string[]) => {
     if (this.get().status)
       throw new Error(
         "Please wait for the previous download to finish or cancel it."
       );
 
-    this.set(
-      (state) => (state.status = { current: 0, total: attachments.length })
-    );
+    this.set({ status: { current: 0, total: ids.length } });
 
     abortController = new AbortController();
     const attachmentStream = new AttachmentStream(
-      attachments,
+      ids,
+      (id) => this.attachments?.item(id),
       abortController.signal,
       (current) => {
-        this.set(
-          (state) => (state.status = { current, total: attachments.length })
-        );
+        this.set({ status: { current, total: ids.length } });
       }
     );
     await attachmentStream
@@ -79,71 +80,74 @@ class AttachmentStore extends BaseStore {
 
   cancel = async () => {
     if (abortController) {
-      await abortController.abort();
+      abortController.abort();
       abortController = undefined;
       this.set((state) => (state.status = undefined));
     }
   };
 
-  recheck = async (hashes) => {
-    const attachments = this.get().attachments;
-    for (let hash of hashes) {
-      const index = attachments.findIndex((a) => a.metadata.hash === hash);
+  recheck = async (ids: string[]) => {
+    for (const id of ids) {
+      const attachment = await this.attachments?.item(id);
+      if (!attachment) continue;
       try {
-        this._changeWorkingStatus(index, "recheck", undefined);
+        this._changeWorkingStatus(attachment.hash, "recheck");
 
-        const { failed, success } = await checkAttachment(hash);
-        this._changeWorkingStatus(index, false, success ? null : failed);
+        const { failed, success } = await checkAttachment(attachment.hash);
+        this._changeWorkingStatus(
+          attachment.hash,
+          undefined,
+          success ? undefined : failed
+        );
       } catch (e) {
         console.error(e);
-        this._changeWorkingStatus(index, false, false);
-        showToast("error", `Rechecking failed: ${e.message}`);
+        this._changeWorkingStatus(attachment.hash);
+        if (e instanceof Error)
+          showToast("error", `Rechecking failed: ${e.message}`);
       }
     }
   };
 
-  rename = async (hash, newName) => {
+  rename = async (hash: string, newName: string) => {
     await db.attachments.add({
       hash,
       filename: newName
     });
-    this.get().refresh();
+    await this.get().refresh();
   };
 
-  permanentDelete = async (hash) => {
-    const index = this.get().attachments.findIndex(
-      (a) => a.metadata.hash === hash
-    );
-    if (index <= -1) return;
-    const noteIds = this.get().attachments[index].noteIds.slice();
-
+  permanentDelete = async (attachment: Attachment) => {
     try {
-      this._changeWorkingStatus(index, "delete", undefined);
-      if (await db.attachments.remove(hash, false)) {
-        this.get().refresh();
+      this._changeWorkingStatus(attachment.hash, "delete");
+      if (await db.attachments.remove(attachment.hash, false)) {
+        await this.get().refresh();
 
-        if (noteIds.includes(editorStore.get().session.id)) {
+        const sessionId = editorStore.get().session.id;
+        if (
+          sessionId &&
+          (await db.relations
+            .to({ id: attachment.id, type: "attachment" }, "note")
+            .has(sessionId))
+        ) {
           await editorStore.clearSession();
         }
       }
     } catch (e) {
       console.error(e);
-      this._changeWorkingStatus(index, false, false);
-      showToast("error", `Failed to delete: ${e.message}`);
+      this._changeWorkingStatus(attachment.hash);
+      if (e instanceof Error)
+        showToast("error", `Failed to delete: ${e.message}`);
       throw e;
     }
   };
 
-  /**
-   *
-   * @param {*} index
-   * @param {"delete"|"recheck"} workType
-   * @param {*} failed
-   */
-  _changeWorkingStatus = (index, workType, failed) => {
+  private _changeWorkingStatus = (
+    hash: string,
+    working?: "delete" | "recheck",
+    failed?: string
+  ) => {
     this.set((state) => {
-      state.attachments[index].failed = failed;
-      state.attachments[index].working = workType;
+      state.processing[hash] = { failed, working };
     });
   };
 }
