@@ -44,6 +44,10 @@ export class VirtualizedGrouping<T> {
     return item;
   }
 
+  get ungrouped() {
+    return this.ids.filter((i) => !isGroupHeader(i)) as string[];
+  }
+
   /**
    * Get item from cache or request the appropriate batch for caching
    * and load it from there.

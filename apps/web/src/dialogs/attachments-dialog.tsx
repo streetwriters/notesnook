@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState, memo, useMemo, useRef } from "react";
+import { useEffect, useState, memo, useRef } from "react";
 import {
   Box,
   Button,
@@ -28,11 +28,10 @@ import {
   Label,
   Text
 } from "@theme-ui/components";
-import { getTotalSize } from "../common/attachments";
-import { useStore, store } from "../stores/attachment-store";
+import { store, useStore } from "../stores/attachment-store";
 import { formatBytes } from "@notesnook/common";
 import Dialog from "../components/dialog";
-import { TableVirtuoso } from "react-virtuoso";
+import { ItemProps, TableVirtuoso } from "react-virtuoso";
 import {
   ChevronDown,
   ChevronUp,
@@ -52,21 +51,20 @@ import NavigationItem from "../components/navigation-menu/navigation-item";
 import { pluralize } from "@notesnook/common";
 import { db } from "../common/db";
 import { Perform } from "../common/dialog-controller";
-import { Multiselect } from "../common/multi-select";
 import { CustomScrollbarsVirtualList } from "../components/list-container";
 import { Attachment } from "../components/attachment";
-import {
-  isDocument,
-  isImage,
-  isVideo
-} from "@notesnook/core/dist/utils/filename";
-import { alpha } from "@theme-ui/color";
 import { ScopedThemeProvider } from "../components/theme-provider";
+import {
+  Attachment as AttachmentType,
+  VirtualizedGrouping
+} from "@notesnook/core";
+import usePromise from "../hooks/use-promise";
+import { Multiselect } from "../common/multi-select";
 
 type ToolbarAction = {
   title: string;
   icon: Icon;
-  onClick: ({ selected }: { selected: any[] }) => void;
+  onClick: ({ selected }: { selected: string[] }) => void;
 };
 
 const TOOLBAR_ACTIONS: ToolbarAction[] = [
@@ -80,9 +78,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
   {
     title: "Recheck",
     icon: DoubleCheckmark,
-    onClick: async ({ selected }) => {
-      await store.recheck(selected.map((a) => a.metadata.hash));
-    }
+    onClick: async ({ selected }) => await store.recheck(selected)
   },
   {
     title: "Delete",
@@ -91,53 +87,65 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
   }
 ];
 
+const COLUMNS = [
+  { id: "filename" as const, title: "Name", width: "65%" },
+  { id: "status" as const, width: "24px" },
+  { id: "size" as const, title: "Size", width: "15%" },
+  { id: "dateUploaded" as const, title: "Date uploaded", width: "20%" }
+];
+
+type SortOptions = {
+  id: "filename" | "size" | "dateUploaded";
+  direction: "asc" | "desc";
+};
 type AttachmentsDialogProps = { onClose: Perform };
 function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
   const allAttachments = useStore((store) => store.attachments);
-  const [attachments, setAttachments] = useState<any[]>(allAttachments);
+  const [attachments, setAttachments] =
+    useState<VirtualizedGrouping<AttachmentType>>();
+  const [counts, setCounts] = useState<Record<Route, number>>({
+    all: 0,
+    documents: 0,
+    images: 0,
+    orphaned: 0,
+    uploads: 0,
+    videos: 0
+  });
   const [selected, setSelected] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState({ id: "name", direction: "asc" });
+  const [sortBy, setSortBy] = useState<SortOptions>({
+    id: "filename",
+    direction: "asc"
+  });
   const currentRoute = useRef<Route>("all");
   const refresh = useStore((store) => store.refresh);
+  const download = useStore((store) => store.download);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
 
   useEffect(() => {
-    setAttachments(filterAttachments(currentRoute.current, allAttachments));
-  }, [allAttachments]);
+    (async function () {
+      setAttachments(
+        await filterAttachments(currentRoute.current).sorted({
+          sortBy: sortBy.id,
+          sortDirection: sortBy.direction
+        })
+      );
+    })();
+  }, [sortBy, allAttachments]);
 
   useEffect(() => {
-    setAttachments((a) => {
-      const attachments = a.slice();
-      if (sortBy.id === "name") {
-        attachments.sort(
-          sortBy.direction === "asc"
-            ? (a, b) => a.metadata.filename.localeCompare(b.metadata.filename)
-            : (a, b) => b.metadata.filename.localeCompare(a.metadata.filename)
-        );
-      } else if (sortBy.id === "size") {
-        attachments.sort(
-          sortBy.direction === "asc"
-            ? (a, b) => a.length - b.length
-            : (a, b) => b.length - a.length
-        );
-      } else if (sortBy.id === "dateUploaded") {
-        attachments.sort(
-          sortBy.direction === "asc"
-            ? (a, b) => a.dateUploaded - b.dateUploaded
-            : (a, b) => b.dateUploaded - a.dateUploaded
-        );
-      }
-      return attachments;
-    });
-  }, [sortBy]);
+    (async function () {
+      setCounts(await getCounts());
+    })();
+  }, [allAttachments]);
 
-  const totalSize = useMemo(
-    () => getTotalSize(allAttachments),
-    [allAttachments]
-  );
+  const totalSize = 0;
+  // useMemo(
+  //   () => getTotalSize(allAttachments),
+  //   [allAttachments]
+  // );
 
   return (
     <Dialog
@@ -154,16 +162,22 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
       >
         <Sidebar
           totalSize={totalSize}
+          onDownloadAll={() => download(allAttachments?.ungrouped || [])}
           filter={(query) => {
-            setAttachments(
-              db.lookup?.attachments(db.attachments.all || [], query) || []
-            );
+            // setAttachments(
+            //   db.lookup?.attachments(db.attachments.all || [], query) || []
+            // );
           }}
-          counts={getCounts(allAttachments)}
-          onRouteChange={(route) => {
+          counts={counts}
+          onRouteChange={async (route) => {
             currentRoute.current = route;
             setSelected([]);
-            setAttachments(filterAttachments(route, allAttachments));
+            setAttachments(
+              await filterAttachments(currentRoute.current).sorted({
+                sortBy: sortBy.id,
+                sortDirection: sortBy.direction
+              })
+            );
           }}
         />
         <Flex
@@ -192,9 +206,10 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
                   title={tool.title}
                   onClick={() =>
                     tool.onClick({
-                      selected: attachments.filter(
-                        (a) => selected.indexOf(a.id) > -1
-                      )
+                      selected
+                      // : attachments.filter(
+                      //   (a) => selected.indexOf(a.id) > -1
+                      // )
                     })
                   }
                   disabled={!selected.length}
@@ -218,123 +233,113 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
               </Text>
             </Button> */}
           </Flex>
-          <TableVirtuoso
-            components={{
-              Scroller: CustomScrollbarsVirtualList,
-              TableRow: (props) => {
-                const attachment = attachments[props["data-item-index"]];
-                return (
-                  <Attachment
-                    {...props}
-                    key={attachment.id}
-                    attachment={attachment}
-                    isSelected={selected.indexOf(attachment.id) > -1}
-                    onSelected={() => {
-                      setSelected((s) => {
-                        const copy = s.slice();
-                        const index = copy.indexOf(attachment.id);
-                        if (index > -1) copy.splice(index, 1);
-                        else copy.push(attachment.id);
-                        return copy;
-                      });
-                    }}
-                  />
-                );
-              }
-            }}
-            style={{ height: "100%" }}
-            data={attachments}
-            fixedItemHeight={30}
-            defaultItemHeight={30}
-            fixedHeaderContent={() => (
-              <Box
-                as="tr"
-                sx={{
-                  height: 40,
-                  th: { borderBottom: "1px solid var(--separator)" },
-                  bg: "background"
-                }}
-              >
-                <Text
-                  as="th"
-                  variant="body"
+          {attachments && (
+            <TableVirtuoso
+              components={{
+                Scroller: CustomScrollbarsVirtualList,
+                TableRow
+              }}
+              style={{ height: "100%" }}
+              computeItemKey={(index) => attachments.getKey(index)}
+              data={attachments.ungrouped}
+              context={{
+                isSelected: (id: string) => selected.indexOf(id) > -1,
+                select: (id: string) => {
+                  setSelected((s) => {
+                    const copy = s.slice();
+                    const index = copy.indexOf(id);
+                    if (index > -1) copy.splice(index, 1);
+                    else copy.push(id);
+                    return copy;
+                  });
+                },
+                attachments
+              }}
+              fixedItemHeight={30}
+              defaultItemHeight={30}
+              fixedHeaderContent={() => (
+                <Box
+                  as="tr"
                   sx={{
-                    width: 24,
-                    textAlign: "left",
-                    fontWeight: "normal",
-                    mb: 2
+                    height: 40,
+                    th: { borderBottom: "1px solid var(--separator)" },
+                    bg: "background"
                   }}
                 >
-                  <Label>
-                    <Checkbox
-                      sx={{ width: 18, height: 18 }}
-                      onChange={(e) => {
-                        setSelected(
-                          e.currentTarget.checked
-                            ? attachments.map((a) => a.id)
-                            : []
-                        );
-                      }}
-                    />
-                  </Label>
-                </Text>
-                {[
-                  { id: "name", title: "Name", width: "65%" },
-                  { id: "status", width: "24px" },
-                  { id: "size", title: "Size", width: "15%" },
-                  { id: "dateUploaded", title: "Date uploaded", width: "20%" }
-                ].map((column) =>
-                  !column.title ? (
-                    <th key={column.id} />
-                  ) : (
-                    <Box
-                      as="th"
-                      key={column.id}
-                      sx={{
-                        width: column.width,
-                        cursor: "pointer",
-                        px: 1,
-                        mb: 2,
-                        ":hover": { bg: "hover" }
-                      }}
-                      onClick={() => {
-                        setSortBy((sortBy) => ({
-                          direction:
-                            sortBy.id === column.id &&
-                            sortBy.direction === "asc"
-                              ? "desc"
-                              : "asc",
-                          id: column.id
-                        }));
-                      }}
-                    >
-                      <Flex
+                  <Text
+                    as="th"
+                    variant="body"
+                    sx={{
+                      width: 24,
+                      textAlign: "left",
+                      fontWeight: "normal",
+                      mb: 2
+                    }}
+                  >
+                    <Label>
+                      <Checkbox
+                        sx={{ width: 18, height: 18 }}
+                        onChange={(e) => {
+                          setSelected(
+                            e.currentTarget.checked ? attachments.ungrouped : []
+                          );
+                        }}
+                      />
+                    </Label>
+                  </Text>
+                  {COLUMNS.map((column) =>
+                    !column.title ? (
+                      <th key={column.id} />
+                    ) : (
+                      <Box
+                        as="th"
+                        key={column.id}
                         sx={{
-                          alignItems: "center",
-                          justifyContent: "space-between"
+                          width: column.width,
+                          cursor: "pointer",
+                          px: 1,
+                          mb: 2,
+                          ":hover": { bg: "hover" }
+                        }}
+                        onClick={() => {
+                          setSortBy((sortBy) => ({
+                            direction:
+                              sortBy.id === column.id &&
+                              sortBy.direction === "asc"
+                                ? "desc"
+                                : "asc",
+                            id: column.id
+                          }));
                         }}
                       >
-                        <Text
-                          variant="body"
-                          sx={{ textAlign: "left", fontWeight: "normal" }}
+                        <Flex
+                          sx={{
+                            alignItems: "center",
+                            justifyContent: "space-between"
+                          }}
                         >
-                          {column.title}
-                        </Text>
-                        {sortBy.id === column.id ? (
-                          sortBy.direction === "asc" ? (
-                            <ChevronUp size={16} />
-                          ) : (
-                            <ChevronDown size={16} />
-                          )
-                        ) : null}
-                      </Flex>
-                    </Box>
-                  )
-                )}
-              </Box>
-            )}
-            itemContent={() => <></>}
-          />
+                          <Text
+                            variant="body"
+                            sx={{ textAlign: "left", fontWeight: "normal" }}
+                          >
+                            {column.title}
+                          </Text>
+                          {sortBy.id === column.id ? (
+                            sortBy.direction === "asc" ? (
+                              <ChevronUp size={16} />
+                            ) : (
+                              <ChevronDown size={16} />
+                            )
+                          ) : null}
+                        </Flex>
+                      </Box>
+                    )
+                  )}
+                </Box>
+              )}
+              itemContent={() => <></>}
+            />
+          )}
         </Flex>
       </Flex>
     </Dialog>
@@ -379,6 +384,7 @@ const routes: { id: Route; icon: Icon; title: string }[] = [
 ];
 
 type SidebarProps = {
+  onDownloadAll: () => void;
   onRouteChange: (route: Route) => void;
   filter: (query: string) => void;
   counts: Record<Route, number>;
@@ -386,11 +392,10 @@ type SidebarProps = {
 };
 const Sidebar = memo(
   function Sidebar(props: SidebarProps) {
-    const { onRouteChange, filter, counts, totalSize } = props;
+    const { onRouteChange, filter, counts, totalSize, onDownloadAll } = props;
     const [route, setRoute] = useState("all");
     const downloadStatus = useStore((store) => store.status);
     const cancelDownload = useStore((store) => store.cancel);
-    const download = useStore((store) => store.download);
 
     return (
       <ScopedThemeProvider scope="navigationMenu" injectCssVars={false}>
@@ -446,7 +451,7 @@ const Sidebar = memo(
                   if (downloadStatus) {
                     await cancelDownload();
                   } else {
-                    await download(db.attachments.all);
+                    onDownloadAll();
                   }
                 }}
               >
@@ -482,38 +487,57 @@ const Sidebar = memo(
     prev.counts.orphaned === next.counts.orphaned
 );
 
-function getCounts(attachments: any[]): Record<Route, number> {
-  const counts: Record<Route, number> = {
-    all: 0,
-    documents: 0,
-    images: 0,
-    videos: 0,
-    uploads: 0,
-    orphaned: 0
-  };
-  for (const attachment of attachments) {
-    counts.all++;
-
-    if (isDocument(attachment.metadata.type)) counts.documents++;
-    else if (isImage(attachment.metadata.type)) counts.images++;
-    else if (isVideo(attachment.metadata.type)) counts.videos++;
-
-    if (!attachment.dateUploaded) counts.uploads++;
-    if (!attachment.noteIds.length) counts.orphaned++;
+function TableRow(
+  props: ItemProps<string> & {
+    context?: {
+      isSelected: (id: string) => boolean;
+      select: (id: string) => void;
+      attachments: VirtualizedGrouping<AttachmentType>;
+    };
   }
-  return counts;
+) {
+  const { context, item, ...restProps } = props;
+  const result = usePromise(
+    () => context?.attachments.item(item),
+    [item, context]
+  );
+
+  if (result.status !== "fulfilled" || !result.value)
+    return <div {...restProps} />;
+  return (
+    <Attachment
+      {...restProps}
+      key={item}
+      attachment={result.value}
+      isSelected={context?.isSelected(item)}
+      onSelected={() => {
+        context?.select(item);
+      }}
+    />
+  );
 }
 
-function filterAttachments(route: Route, attachments: any[]): any[] {
+async function getCounts(): Promise<Record<Route, number>> {
+  return {
+    all: await db.attachments.all.count(),
+    documents: await db.attachments.documents.count(),
+    images: await db.attachments.images.count(),
+    videos: await db.attachments.videos.count(),
+    uploads: await db.attachments.pending.count(),
+    orphaned: await db.attachments.orphaned.count()
+  };
+}
+
+function filterAttachments(route: Route) {
   return route === "all"
-    ? attachments
+    ? db.attachments.all
     : route === "images"
-    ? attachments.filter((a) => a.metadata.type.startsWith("image/"))
+    ? db.attachments.images
     : route === "videos"
-    ? attachments.filter((a) => a.metadata.type.startsWith("video/"))
+    ? db.attachments.videos
     : route === "documents"
-    ? attachments.filter((a) => isDocument(a.metadata.type))
+    ? db.attachments.documents
     : route === "orphaned"
-    ? attachments.filter((a) => !a.noteIds.length)
-    : attachments.filter((a) => !a.dateUploaded);
+    ? db.attachments.orphaned
+    : db.attachments.pending;
 }

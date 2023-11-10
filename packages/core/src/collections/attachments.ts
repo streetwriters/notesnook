@@ -24,6 +24,7 @@ import { EV, EVENTS } from "../common";
 import dataurl from "../utils/dataurl";
 import dayjs from "dayjs";
 import {
+  DocumentMimeTypes,
   getFileNameWithExtension,
   isImage,
   isWebClip
@@ -390,14 +391,47 @@ export class Attachments implements ICollection {
     );
   }
 
-  // get images() {
-  //   return this.all.filter((attachment) => isImage(attachment.metadata.type));
-  // }
+  get images() {
+    return this.collection.createFilter<Attachment>(
+      (qb) => qb.where("mimeType", "like", `image/%`),
+      this.db.options?.batchSize
+    );
+  }
 
-  // get webclips() {
-  //   return this.all.filter((attachment) => isWebClip(attachment.metadata.type));
-  // }
+  get videos() {
+    return this.collection.createFilter<Attachment>(
+      (qb) => qb.where("mimeType", "like", `video/%`),
+      this.db.options?.batchSize
+    );
+  }
 
+  get documents() {
+    return this.collection.createFilter<Attachment>(
+      (qb) => qb.where("mimeType", "in", DocumentMimeTypes),
+      this.db.options?.batchSize
+    );
+  }
+
+  get webclips() {
+    return this.collection.createFilter<Attachment>(
+      (qb) => qb.where("mimeType", "==", `application/vnd.notesnook.web-clip`),
+      this.db.options?.batchSize
+    );
+  }
+
+  get orphaned() {
+    return this.collection.createFilter<Attachment>(
+      (qb) =>
+        qb.where("id", "not in", (eb) =>
+          eb
+            .selectFrom("relations")
+            .where("toType", "==", "attachment")
+            .select("toId as id")
+            .$narrowType<{ id: string }>()
+        ),
+      this.db.options?.batchSize
+    );
+  }
   // get media() {
   //   return this.all.filter(
   //     (attachment) =>

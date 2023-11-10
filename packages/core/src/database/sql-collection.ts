@@ -18,7 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EVENTS } from "../common";
-import { GroupOptions, Item, MaybeDeletedItem, isDeleted } from "../types";
+import {
+  GroupOptions,
+  Item,
+  MaybeDeletedItem,
+  SortOptions,
+  isDeleted
+} from "../types";
 import EventManager from "../utils/event-manager";
 import {
   DatabaseAccessor,
@@ -359,7 +365,7 @@ export class FilteredSelector<T extends Item> {
     );
   }
 
-  async sorted(options: GroupOptions) {
+  async sorted(options: SortOptions) {
     const items = await this.filter
       .$call(this.buildSortExpression(options))
       .select("id")
@@ -378,7 +384,7 @@ export class FilteredSelector<T extends Item> {
     });
   }
 
-  private buildSortExpression(options: GroupOptions) {
+  private buildSortExpression(options: SortOptions) {
     return <T>(
       qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, T>
     ) => {

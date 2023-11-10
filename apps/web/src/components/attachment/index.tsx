@@ -59,6 +59,7 @@ import { useEffect, useState } from "react";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
+import { Attachment } from "@notesnook/core";
 
 const FILE_ICONS: Record<string, Icon> = {
   "image/": FileImage,
@@ -85,7 +86,7 @@ type AttachmentProgressStatus = {
 };
 
 type AttachmentProps = {
-  attachment: any;
+  attachment: Attachment;
   isSelected?: boolean;
   onSelected?: () => void;
   compact?: boolean;
