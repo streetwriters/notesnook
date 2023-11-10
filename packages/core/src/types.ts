@@ -20,10 +20,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Cipher } from "@notesnook/crypto";
 import { TimeFormat } from "./utils/date";
 
-export type GroupOptions = {
-  groupBy: "none" | "abc" | "year" | "month" | "week" | "default";
-  sortBy: "dateCreated" | "dateDeleted" | "dateEdited" | "title" | "dueDate";
+export type SortOptions = {
+  sortBy:
+    | "dateCreated"
+    | "dateDeleted"
+    | "dateEdited"
+    | "title"
+    | "filename"
+    | "size"
+    | "dateUploaded"
+    | "dueDate";
   sortDirection: "desc" | "asc";
+};
+
+export type GroupOptions = SortOptions & {
+  groupBy: "none" | "abc" | "year" | "month" | "week" | "default";
 };
 
 export type GroupedItems<T> = (T | GroupHeader)[];
