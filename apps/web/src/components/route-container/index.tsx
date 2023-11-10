@@ -23,6 +23,7 @@ import { ArrowLeft, Menu, Search, Plus } from "../icons";
 import { useStore } from "../../stores/app-store";
 import useMobile from "../../hooks/use-mobile";
 import { navigate } from "../../navigation";
+import usePromise from "../../hooks/use-promise";
 
 export type RouteContainerButtons = {
   search?: {
@@ -40,7 +41,7 @@ export type RouteContainerButtons = {
 
 export type RouteContainerProps = {
   type: string;
-  title?: string;
+  title?: string | (() => Promise<string | undefined>);
   buttons?: RouteContainerButtons;
 };
 function RouteContainer(props: PropsWithChildren<RouteContainerProps>) {
@@ -56,7 +57,11 @@ function RouteContainer(props: PropsWithChildren<RouteContainerProps>) {
 export default RouteContainer;
 
 function Header(props: RouteContainerProps) {
-  const { title, buttons, type } = props;
+  const { buttons, type } = props;
+  const titlePromise = usePromise<string | undefined>(
+    () => (typeof props.title === "string" ? props.title : props.title?.()),
+    [props.title]
+  );
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
 
@@ -84,9 +89,9 @@ function Header(props: RouteContainerProps) {
               size={30}
             />
           )}
-          {title && (
+          {titlePromise.status === "fulfilled" && titlePromise.value && (
             <Text variant="heading" data-test-id="routeHeader" color="heading">
-              {title}
+              {titlePromise.value}
             </Text>
           )}
         </Flex>
