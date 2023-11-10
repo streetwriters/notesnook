@@ -36,7 +36,7 @@ import { CREATE_BUTTON_MAP } from "../common";
 type RouteResult = {
   key: string;
   type: "notes" | "notebooks" | "reminders" | "trash" | "tags" | "search";
-  title?: string;
+  title?: string | (() => Promise<string | undefined>);
   component: React.ReactNode;
   props?: any;
   buttons?: RouteContainerButtons;
@@ -171,14 +171,15 @@ const routes = defineRoutes({
       }
     }),
   "/tags/:tagId": ({ tagId }) => {
-    const tag = db.tags.tag(tagId);
-    if (!tag) return false;
-    const { id, title } = tag;
-    notestore.setContext({ type: "tag", value: id });
+    notestore.setContext({ type: "tag", id: tagId });
     return defineRoute({
       key: "notes",
       type: "notes",
-      title: `#${title}`,
+      title: async () => {
+        const tag = await db.tags.tag(tagId);
+        if (!tag) return;
+        return `#${tag.title}`;
+      },
       component: Notes,
       buttons: {
         create: CREATE_BUTTON_MAP.notes,
@@ -187,28 +188,26 @@ const routes = defineRoutes({
           onClick: () => navigate("/tags")
         },
         search: {
-          title: `Search #${title} notes`
+          title: `Search notes`
         }
       }
     });
   },
   "/colors/:colorId": ({ colorId }) => {
-    const color = db.colors.color(colorId);
-    if (!color) {
-      navigate("/");
-      return false;
-    }
-    const { id, title } = color;
-    notestore.setContext({ type: "color", value: id });
+    notestore.setContext({ type: "color", id: colorId });
     return defineRoute({
       key: "notes",
       type: "notes",
-      title: title,
+      title: async () => {
+        const color = await db.colors.color(colorId);
+        if (!color) return;
+        return `${color.title}`;
+      },
       component: Notes,
       buttons: {
         create: CREATE_BUTTON_MAP.notes,
         search: {
-          title: `Search ${title} colored notes`
+          title: `Search notes`
         }
       }
     });

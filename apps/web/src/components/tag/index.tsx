@@ -41,7 +41,7 @@ function Tag(props: TagProps) {
       item={item}
       isCompact
       title={
-        <Text as="span">
+        <Text as="span" variant="body">
           <Text as="span" sx={{ color: "accent" }}>
             {"#"}
           </Text>
