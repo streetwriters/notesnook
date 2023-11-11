@@ -55,6 +55,7 @@
     "async-mutex": "^0.3.2",
     "dayjs": "1.11.9",
     "entities": "^4.3.1",
+    "fuzzyjs": "^5.0.1",
     "html-to-text": "^9.0.5",
     "htmlparser2": "^8.0.1",
     "katex": "0.16.2",
