@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Flex, Input, Text } from "@theme-ui/components";
 import {
+  Editor,
   findChildren,
   findParentNodeClosestToPos,
   getNodeType
@@ -31,6 +32,7 @@ import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes, TaskListNode } from "./task-list";
 import { countCheckedItems, deleteCheckedItems, sortList } from "./utils";
+import { formatDate } from "@notesnook/core/dist/utils/date";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
@@ -133,6 +135,7 @@ export function TaskListComponent(
             }}
             placeholder="Untitled"
             onChange={(e) => {
+              e.target.value = replaceDate(e.target.value, editor);
               updateAttributes(
                 { title: e.target.value },
                 { addToHistory: true, preventUpdate: false }
@@ -263,4 +266,35 @@ function areAllChecked(node: Node, pos: number, doc: Node) {
   }
 
   return true;
+}
+
+function replaceDate(value: string, editor: Editor) {
+  const timeFormat = editor.storage.timeFormat;
+  const dateFormat = editor.storage.dateFormat;
+
+  if (value.includes("/time")) {
+    const date = formatDate(Date.now(), {
+      timeFormat,
+      type: "time"
+    });
+    value = value.replaceAll("/time", date);
+  }
+
+  if (value.includes("/date")) {
+    const date = formatDate(Date.now(), {
+      dateFormat,
+      type: "date"
+    });
+    value = value.replaceAll("/date", date);
+  }
+
+  if (value.includes("/now")) {
+    const date = formatDate(Date.now(), {
+      dateFormat,
+      timeFormat,
+      type: "date-time"
+    });
+    value = value.replaceAll("/now", date);
+  }
+  return value;
 }
