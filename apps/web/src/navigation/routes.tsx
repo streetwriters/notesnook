@@ -21,7 +21,6 @@ import { db } from "../common/db";
 import AllNotes from "../views/all-notes";
 import Notebooks from "../views/notebooks";
 import Notes from "../views/notes";
-import Search from "../views/search";
 import Tags from "../views/tags";
 import Notebook from "../views/notebook";
 import { navigate } from ".";
@@ -35,7 +34,7 @@ import { CREATE_BUTTON_MAP } from "../common";
 
 type RouteResult = {
   key: string;
-  type: "notes" | "notebooks" | "reminders" | "trash" | "tags" | "search";
+  type: "notes" | "notebooks" | "reminders" | "trash" | "tags";
   title?: string | (() => Promise<string | undefined>);
   component: React.ReactNode;
   props?: any;
@@ -225,20 +224,7 @@ const routes = defineRoutes({
         }
       }
     });
-  },
-  "/search/:type": ({ type }) =>
-    defineRoute({
-      key: "general",
-      type: "search",
-      title: "Search",
-      component: () => <Search type={type} />,
-      buttons: {
-        back: {
-          title: `Go back to ${type}`,
-          onClick: () => window.history.back()
-        }
-      }
-    })
+  }
 });
 
 export default routes;
