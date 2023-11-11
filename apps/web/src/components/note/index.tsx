@@ -587,7 +587,6 @@ function colorsToMenuItems(
 }
 
 function notebooksMenuItems(ids: string[]): MenuItem[] {
-  console.log("NOTE IDS", ids);
   return [
     {
       type: "button",
@@ -601,26 +600,53 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
       key: "notebooks-lazy-loader",
       async items() {
         const notebooks: Map<string, NotebookItem> = new Map();
-        for (const id of ids) {
-          const linkedNotebooks = await db.relations
-            .to({ id, type: "note" }, "notebook")
-            .resolve();
-          linkedNotebooks.forEach((nb) => notebooks.set(nb.id, nb));
+        const notebookShortcuts: Map<string, NotebookItem> = new Map();
+
+        const linkedNotebooks = await db.relations
+          .to({ ids, type: "note" }, "notebook")
+          .resolve();
+        linkedNotebooks.forEach((nb) => notebooks.set(nb.id, nb));
+
+        for (const notebook of await db.shortcuts.resolved("notebooks")) {
+          if (notebooks.has(notebook.id)) continue;
+          notebookShortcuts.set(notebook.id, notebook);
         }
-        if (notebooks.size <= 0) return [];
-        const menuItems: MenuItem[] = [
-          {
-            type: "button",
-            key: "remove-from-all-notebooks",
-            title: "Unlink from all",
-            icon: RemoveShortcutLink.path,
-            onClick: async () => {
-              await db.notes.removeFromAllNotebooks(...ids);
-              store.refresh();
-            }
-          },
-          { key: "sep", type: "separator" }
-        ];
+
+        const menuItems: MenuItem[] = [];
+        if (notebooks.size > 0)
+          menuItems.push(
+            {
+              type: "button",
+              key: "remove-from-all-notebooks",
+              title: "Unlink from all",
+              icon: RemoveShortcutLink.path,
+              onClick: async () => {
+                await db.notes.removeFromAllNotebooks(...ids);
+                store.refresh();
+              }
+            },
+            { key: "sep", type: "separator" }
+          );
+
+        if (notebookShortcuts.size > 0) {
+          menuItems.push({ key: "sep3", type: "separator" });
+          notebookShortcuts.forEach((notebook) => {
+            menuItems.push({
+              type: "button",
+              key: notebook.id,
+              title: notebook.title,
+              icon: Notebook.path,
+              isChecked: false,
+              onClick: async () => {
+                await db.notes.addToNotebook(notebook.id, ...ids);
+                store.refresh();
+              }
+            });
+          });
+
+          if (notebooks.size > 0)
+            menuItems.push({ key: "sep2", type: "separator" });
+        }
 
         notebooks.forEach((notebook) => {
           menuItems.push({
@@ -629,7 +655,6 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
             title: notebook.title,
             icon: Notebook.path,
             isChecked: true,
-            tooltip: "Click to remove from this notebook",
             onClick: async () => {
               await db.notes.removeFromNotebook(notebook.id, ...ids);
               store.refresh();
@@ -656,30 +681,60 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
       key: "tags-lazy-loader",
       async items() {
         const tags: Map<string, Tag> = new Map();
-        for (const id of ids) {
-          const linkedTags = await db.relations
-            .to({ id, type: "note" }, "tag")
-            .resolve();
-          linkedTags.forEach((tag) => tags.set(tag.id, tag));
+        const tagShortcuts: Map<string, Tag> = new Map();
+
+        const linkedTags = await db.relations
+          .to({ ids, type: "note" }, "tag")
+          .resolve();
+        linkedTags.forEach((tag) => tags.set(tag.id, tag));
+
+        for (const tag of await db.shortcuts.resolved("tags")) {
+          if (tags.has(tag.id)) continue;
+          tagShortcuts.set(tag.id, tag);
         }
-        if (tags.size <= 0) return [];
-        const menuItems: MenuItem[] = [
-          {
-            type: "button",
-            key: "remove-from-all-tags",
-            title: "Remove from all",
-            icon: RemoveShortcutLink.path,
-            onClick: async () => {
-              for (const id of ids) {
-                await db.relations.to({ id, type: "note" }, "tag").unlink();
+
+        const menuItems: MenuItem[] = [];
+        if (tags.size > 0)
+          menuItems.push(
+            {
+              type: "button",
+              key: "remove-from-all-tags",
+              title: "Remove from all",
+              icon: RemoveShortcutLink.path,
+              onClick: async () => {
+                for (const id of ids) {
+                  await db.relations.to({ id, type: "note" }, "tag").unlink();
+                }
+                tagStore.get().refresh();
+                await editorStore.get().refreshTags();
+                await store.get().refresh();
               }
-              tagStore.get().refresh();
-              await editorStore.get().refreshTags();
-              await store.get().refresh();
-            }
-          },
-          { key: "sep", type: "separator" }
-        ];
+            },
+            { key: "sep", type: "separator" }
+          );
+
+        if (tagShortcuts.size > 0) {
+          menuItems.push({ key: "sep3", type: "separator" });
+          tagShortcuts.forEach((tag) => {
+            menuItems.push({
+              type: "button",
+              key: tag.id,
+              title: tag.title,
+              icon: TagIcon.path,
+              isChecked: false,
+              onClick: async () => {
+                for (const id of ids) {
+                  await db.relations.add(tag, { id, type: "note" });
+                }
+                await tagStore.get().refresh();
+                await editorStore.get().refreshTags();
+                await store.get().refresh();
+              }
+            });
+          });
+
+          if (tags.size > 0) menuItems.push({ key: "sep2", type: "separator" });
+        }
 
         tags.forEach((tag) => {
           menuItems.push({
@@ -688,12 +743,11 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
             title: tag.title,
             icon: TagIcon.path,
             isChecked: true,
-            tooltip: "Click to remove from this tag",
             onClick: async () => {
               for (const id of ids) {
                 await db.relations.unlink(tag, { id, type: "note" });
               }
-              tagStore.get().refresh();
+              await tagStore.get().refresh();
               await editorStore.get().refreshTags();
               await store.get().refresh();
             }
