@@ -19,8 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Database from "../api";
 import { SQLCachedCollection } from "../database/sql-cached-collection";
-import { Shortcut } from "../types";
+import { Notebook, Shortcut, Tag } from "../types";
 import { ICollection } from "./collection";
+
+type ResolveTypeToItem<T extends "notebooks" | "tags" | "all"> =
+  T extends "tags"
+    ? Tag[]
+    : T extends "notebooks"
+    ? Notebook[]
+    : (Tag | Notebook)[];
 
 const ALLOWED_SHORTCUT_TYPES = ["notebook", "topic", "tag"];
 export class Shortcuts implements ICollection {
@@ -88,19 +95,29 @@ export class Shortcuts implements ICollection {
     return this.collection.items();
   }
 
-  async resolved() {
+  async resolved<T extends "notebooks" | "tags" | "all">(
+    type: T = "all" as T
+  ): Promise<ResolveTypeToItem<T>> {
     const tagIds: string[] = [];
     const notebookIds: string[] = [];
     for (const shortcut of this.all) {
-      if (shortcut.itemType === "notebook") notebookIds.push(shortcut.itemId);
-      else if (shortcut.itemType === "tag") tagIds.push(shortcut.itemId);
+      if (
+        (type === "all" || type === "notebooks") &&
+        shortcut.itemType === "notebook"
+      )
+        notebookIds.push(shortcut.itemId);
+      else if (
+        (type === "all" || type === "tags") &&
+        shortcut.itemType === "tag"
+      )
+        tagIds.push(shortcut.itemId);
     }
     return [
       ...(notebookIds.length > 0
         ? await this.db.notebooks.all.items(notebookIds)
         : []),
       ...(tagIds.length > 0 ? await this.db.tags.all.items(tagIds) : [])
-    ];
+    ] as ResolveTypeToItem<T>;
   }
 
   exists(id: string) {
