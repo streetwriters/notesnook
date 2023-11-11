@@ -17,29 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import uFuzzy from "@leeoniya/ufuzzy";
+import { match } from "fuzzyjs";
 import Database from ".";
-import {
-  Attachment,
-  GroupedItems,
-  Note,
-  Notebook,
-  Reminder,
-  Tag,
-  TrashItem
-} from "../types";
-import { DatabaseSchemaWithFTS, isFalse } from "../database";
-import { Kysely, sql } from "kysely";
+import { Item, TrashItem } from "../types";
+import { DatabaseSchema, DatabaseSchemaWithFTS, isFalse } from "../database";
+import { AnyColumnWithTable, Kysely, sql } from "kysely";
+import { FilteredSelector } from "../database/sql-collection";
+import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 
+type FuzzySearchField<T> = {
+  weight?: number;
+  name: keyof T;
+  column: AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>;
+};
 export default class Lookup {
   constructor(private readonly db: Database) {}
 
-  async notes(
-    query: string,
-    ids?: string[]
-  ): Promise<Note & { rank: number }[]> {
+  async notes(query: string, noteIds?: string[]) {
     const db = this.db.sql() as Kysely<DatabaseSchemaWithFTS>;
-    return (await db
+    const ids = await db
       .with("matching", (eb) =>
         eb
           .selectFrom("content_fts")
@@ -54,51 +50,101 @@ export default class Lookup {
           )
       )
       .selectFrom("notes")
-      .$if(!!ids && ids.length > 0, (eb) => eb.where("id", "in", ids!))
+      .$if(!!noteIds && noteIds.length > 0, (eb) =>
+        eb.where("id", "in", noteIds!)
+      )
       .where(isFalse("notes.deleted"))
       .where(isFalse("notes.dateDeleted"))
       .innerJoin("matching", (eb) => eb.onRef("notes.id", "==", "matching.id"))
       .orderBy("matching.rank")
-      .selectAll()
-      .execute()) as unknown as Note & { rank: number }[];
+      .select(["notes.id"])
+      .execute();
+
+    return new VirtualizedGrouping(
+      ids.map((id) => id.id),
+      this.db.options.batchSize,
+      (ids) => this.db.notes.all.records(ids)
+    );
   }
 
-  notebooks(array: Notebook[], query: string) {
-    return search(array, query, (n) => `${n.title} ${n.description}}`);
+  notebooks(query: string) {
+    return this.search(this.db.notebooks.all, query, [
+      { name: "id", column: "notebooks.id", weight: -100 },
+      { name: "title", column: "notebooks.title", weight: 10 },
+      { name: "description", column: "notebooks.description" }
+    ]);
   }
 
-  tags(array: GroupedItems<Tag>, query: string) {
-    return this.byTitle(array, query);
+  tags(query: string) {
+    return this.search(this.db.tags.all, query, [
+      { name: "id", column: "tags.id", weight: -100 },
+      { name: "title", column: "tags.title" }
+    ]);
   }
 
-  reminders(array: Reminder[], query: string) {
-    return search(array, query, (n) => `${n.title} ${n.description || ""}`);
+  reminders(query: string) {
+    return this.search(this.db.reminders.all, query, [
+      { name: "id", column: "reminders.id", weight: -100 },
+      { name: "title", column: "reminders.title", weight: 10 },
+      { name: "description", column: "reminders.description" }
+    ]);
   }
 
-  trash(array: TrashItem[], query: string) {
-    return this.byTitle(array, query);
-  }
+  async trash(query: string) {
+    const items = await this.db.trash.all();
+    const records: Record<string, TrashItem> = {};
+    for (const item of items) records[item.id] = item;
 
-  attachments(array: Attachment[], query: string) {
-    return search(array, query, (n) => `${n.filename} ${n.mimeType} ${n.hash}`);
-  }
-
-  private byTitle<T extends { title: string }>(array: T[], query: string) {
-    return search(array, query, (n) => n.title);
-  }
-}
-
-const uf = new uFuzzy();
-function search<T>(items: T[], query: string, selector: (item: T) => string) {
-  try {
-    const [_idxs, _info, order] = uf.search(items.map(selector), query, true);
-    if (!order) return [];
-    const filtered: T[] = [];
-    for (const i of order) {
-      filtered.push(items[i]);
+    const results: Record<string, number> = {};
+    for (const item of items) {
+      const result = match(query, item.title);
+      if (result.match) results[item.id] = result.score;
     }
-    return filtered;
-  } catch (e) {
-    return [];
+
+    const ids = Object.keys(results).sort((a, b) => results[a] - results[b]);
+    return new VirtualizedGrouping<TrashItem>(
+      ids,
+      this.db.options.batchSize,
+      async (ids) => {
+        const items: Record<string, TrashItem> = {};
+        for (const id of ids) items[id] = records[id];
+        return items;
+      }
+    );
+  }
+
+  attachments(query: string) {
+    return this.search(this.db.attachments.all, query, [
+      { name: "id", column: "attachments.id", weight: -100 },
+      { name: "filename", column: "attachments.filename", weight: 5 },
+      { name: "mimeType", column: "attachments.mimeType" },
+      { name: "hash", column: "attachments.hash" }
+    ]);
+  }
+
+  private async search<T extends Item>(
+    selector: FilteredSelector<T>,
+    query: string,
+    fields: FuzzySearchField<T>[]
+  ) {
+    const results: Record<string, number> = {};
+    const columns = fields.map((f) => f.column);
+    for await (const item of selector.fields(columns)) {
+      for (const field of fields) {
+        const result = match(query, `${item[field.name]}`);
+        if (result.match) {
+          const oldScore = results[item.id] || 0;
+          results[item.id] = oldScore + result.score * (field.weight || 1);
+        }
+      }
+    }
+    selector.fields([]);
+
+    const ids = Object.keys(results).sort((a, b) => results[a] - results[b]);
+    return new VirtualizedGrouping<T>(
+      ids,
+      this.db.options.batchSize,
+      async (ids) => selector.records(ids)
+    );
   }
 }

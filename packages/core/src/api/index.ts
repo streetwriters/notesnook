@@ -153,7 +153,7 @@ class Database {
     );
   };
 
-  options?: Options;
+  options!: Options;
   EventSource?: EventSourceConstructor;
   eventSource?: EventSource | null;
 
@@ -226,6 +226,11 @@ class Database {
   }
 
   async init() {
+    if (!this.options)
+      throw new Error(
+        "options not specified. Did you forget to call db.setup()?"
+      );
+
     EV.subscribeMulti(
       [EVENTS.userLoggedIn, EVENTS.userFetched, EVENTS.tokenRefreshed],
       this.connectSSE,
@@ -241,8 +246,7 @@ class Database {
       this.disconnectSSE();
     });
 
-    if (this.options)
-      this._sql = await createDatabase(this.options.sqliteOptions);
+    this._sql = await createDatabase(this.options.sqliteOptions);
 
     await this._validate();
 

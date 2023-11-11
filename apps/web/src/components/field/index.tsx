@@ -126,13 +126,10 @@ function Field(props: FieldProps) {
             sx={{
               position: "absolute",
               right: "2px",
-              top: "2px",
-              cursor: "pointer",
-              bottom: "2px",
               px: 1,
               borderRadius: "default",
               ":hover": { bg: "border" },
-              height: "calc(100% - 4px)"
+              height: "100%"
             }}
             disabled={action.disabled}
           >

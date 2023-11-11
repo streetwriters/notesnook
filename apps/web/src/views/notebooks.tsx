@@ -22,11 +22,15 @@ import { useStore, store } from "../stores/notebook-store";
 import { hashNavigate } from "../navigation";
 import Placeholder from "../components/placeholders";
 import { useEffect } from "react";
+import { db } from "../common/db";
+import { useSearch } from "../hooks/use-search";
 
 function Notebooks() {
-  // useNavigate("notebooks", () => store.refresh());
   const notebooks = useStore((state) => state.notebooks);
   const refresh = useStore((state) => state.refresh);
+  const filteredItems = useSearch("notebooks", (query) =>
+    db.lookup.notebooks(query)
+  );
 
   useEffect(() => {
     store.get().refresh();
@@ -38,7 +42,7 @@ function Notebooks() {
       <ListContainer
         group="notebooks"
         refresh={refresh}
-        items={notebooks}
+        items={filteredItems || notebooks}
         placeholder={<Placeholder context="notebooks" />}
         button={{
           onClick: () => hashNavigate("/notebooks/create")

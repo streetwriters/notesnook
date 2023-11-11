@@ -347,21 +347,8 @@ export class FilteredSelector<T extends Item> {
     console.timeEnd("getting items");
     console.log(items.length);
     const ids = groupArray(items, options);
-    return new VirtualizedGrouping<T>(
-      ids,
-      this.batchSize,
-      async (ids) => {
-        const results = await this.filter
-          .where("id", "in", ids)
-          .selectAll()
-          .execute();
-        const items: Record<string, T> = {};
-        for (const item of results) {
-          items[item.id] = item as T;
-        }
-        return items;
-      }
-      //(ids, items) => groupArray(ids, items, options)
+    return new VirtualizedGrouping<T>(ids, this.batchSize, (ids) =>
+      this.records(ids)
     );
   }
 
@@ -371,17 +358,9 @@ export class FilteredSelector<T extends Item> {
       .select("id")
       .execute();
     const ids = items.map((item) => item.id);
-    return new VirtualizedGrouping<T>(ids, this.batchSize, async (ids) => {
-      const results = await this.filter
-        .where("id", "in", ids)
-        .selectAll()
-        .execute();
-      const items: Record<string, T> = {};
-      for (const item of results) {
-        items[item.id] = item as T;
-      }
-      return items;
-    });
+    return new VirtualizedGrouping<T>(ids, this.batchSize, (ids) =>
+      this.records(ids)
+    );
   }
 
   private buildSortExpression(options: SortOptions) {

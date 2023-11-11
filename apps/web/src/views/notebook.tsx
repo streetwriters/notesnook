@@ -54,6 +54,7 @@ import { NotebookContext } from "../components/list-container/types";
 import { FlexScrollContainer } from "../components/scroll-container";
 import { Menu } from "../hooks/use-menu";
 import Config from "../utils/config";
+import { useSearch } from "../hooks/use-search";
 
 type NotebookProps = {
   rootId: string;
@@ -70,6 +71,14 @@ function Notebook(props: NotebookProps) {
   const notes = useNotesStore((store) => store.contextNotes);
   const refreshContext = useNotesStore((store) => store.refreshContext);
   const isCompact = useNotesStore((store) => store.viewMode === "compact");
+  const filteredItems = useSearch(
+    "notes",
+    (query) => {
+      if (!context || !notes || context.type !== "notebook") return;
+      return db.lookup.notes(query, notes.ungrouped);
+    },
+    [context, notes]
+  );
 
   useEffect(() => {
     const { context, setContext } = useNotesStore.getState();
@@ -126,7 +135,7 @@ function Notebook(props: NotebookProps) {
               refresh={refreshContext}
               compact={isCompact}
               context={context}
-              items={notes}
+              items={filteredItems || notes}
               placeholder={<Placeholder context="notes" />}
               header={
                 <NotebookHeader

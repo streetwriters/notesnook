@@ -22,6 +22,8 @@ import ListContainer from "../components/list-container";
 import { useStore as useNotesStore } from "../stores/note-store";
 import { hashNavigate, navigate } from "../navigation";
 import Placeholder from "../components/placeholders";
+import { useSearch } from "../hooks/use-search";
+import { db } from "../common/db";
 
 function Notes() {
   const context = useNotesStore((store) => store.context);
@@ -29,6 +31,14 @@ function Notes() {
   const refreshContext = useNotesStore((store) => store.refreshContext);
   const type = context?.type === "favorite" ? "favorites" : "notes";
   const isCompact = useNotesStore((store) => store.viewMode === "compact");
+  const filteredItems = useSearch(
+    "notes",
+    (query) => {
+      if (!context || !contextNotes) return;
+      return db.lookup.notes(query, contextNotes.ungrouped);
+    },
+    [context, contextNotes]
+  );
 
   useEffect(() => {
     if (
@@ -36,7 +46,7 @@ function Notes() {
       contextNotes &&
       contextNotes.ids.length <= 0
     ) {
-      navigate("/", true);
+      navigate("/", { replace: true });
     }
   }, [context, contextNotes]);
 
@@ -47,7 +57,7 @@ function Notes() {
       refresh={refreshContext}
       compact={isCompact}
       context={context}
-      items={contextNotes}
+      items={filteredItems || contextNotes}
       placeholder={
         <Placeholder
           context={

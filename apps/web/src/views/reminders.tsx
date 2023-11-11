@@ -22,18 +22,24 @@ import { useStore, store } from "../stores/reminder-store";
 import { hashNavigate } from "../navigation";
 import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
+import { db } from "../common/db";
+import { useSearch } from "../hooks/use-search";
 
 function Reminders() {
   useNavigate("reminders", () => store.refresh());
   const reminders = useStore((state) => state.reminders);
   const refresh = useStore((state) => state.refresh);
+  const filteredItems = useSearch("reminders", (query) =>
+    db.lookup.reminders(query)
+  );
+
   if (!reminders) return <Placeholder context="reminders" />;
   return (
     <>
       <ListContainer
         group="reminders"
         refresh={refresh}
-        items={reminders}
+        items={filteredItems || reminders}
         placeholder={<Placeholder context="reminders" />}
         button={{
           onClick: () => hashNavigate("/reminders/create")

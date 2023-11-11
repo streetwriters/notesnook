@@ -18,20 +18,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import createStore from "../common/store";
-import { db } from "../common/db";
 import BaseStore from "./index";
 
-/**
- * @extends {BaseStore<SearchStore>}
- */
-class SearchStore extends BaseStore {
-  results = [];
+class SearchStore extends BaseStore<SearchStore> {
+  isSearching = false;
+  query?: string;
+  searchType?: string;
+  // startSearch = () => {
+  //   this.set({ isSearching: true });
+  // };
 
-  search = async (items, query) => {
-    const { type } = this.get();
-    const results = await db.lookup[type](items, query);
-    this.set((state) => (state.results = results));
-  };
+  // endSearch = () => {
+  //   this.set({ isSearching: false });
+  // };
+  // results = [];
+  // search = async (items, query) => {
+  //   const { type } = this.get();
+  //   const results = await db.lookup[type](items, query);
+  //   this.set((state) => (state.results = results));
+  // };
 }
 
 const [useStore, store] = createStore(SearchStore);
