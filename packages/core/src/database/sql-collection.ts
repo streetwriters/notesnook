@@ -254,15 +254,14 @@ export class SQLCollection<
 export class FilteredSelector<T extends Item> {
   private _fields: AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>[] =
     [];
+  filter: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, unknown>;
   constructor(
     readonly type: keyof DatabaseSchema,
-    readonly filter: SelectQueryBuilder<
-      DatabaseSchema,
-      keyof DatabaseSchema,
-      unknown
-    >,
+    filter: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, unknown>,
     readonly batchSize: number = 500
-  ) {}
+  ) {
+    this.filter = filter;
+  }
 
   fields(fields: AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>[]) {
     this._fields = fields;
@@ -328,6 +327,13 @@ export class FilteredSelector<T extends Item> {
       .$if(this._fields.length > 0, (eb) => eb.select(this._fields))
       .executeTakeFirst();
     return item as T | undefined;
+  }
+
+  where(
+    expr: ExpressionOrFactory<DatabaseSchema, keyof DatabaseSchema, SqlBool>
+  ) {
+    this.filter = this.filter.where(expr);
+    return this;
   }
 
   async *map<TReturnType>(
