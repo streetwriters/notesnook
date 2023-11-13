@@ -28,7 +28,7 @@ import { Reminder } from "@notesnook/core/dist/types";
 
 export function getFormattedDate(
   date: string | number | Date,
-  type: FormatDateOptions["type"]
+  type: FormatDateOptions["type"] = "date-time"
 ) {
   return formatDate(date, {
     dateFormat: database.settings?.getDateFormat() as string,
