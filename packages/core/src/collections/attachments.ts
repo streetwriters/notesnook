@@ -19,21 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ICollection } from "./collection";
 import { getId } from "../utils/id";
-import { hasItem } from "../utils/array";
 import { EV, EVENTS } from "../common";
 import dataurl from "../utils/dataurl";
 import dayjs from "dayjs";
-import {
-  DocumentMimeTypes,
-  getFileNameWithExtension,
-  isImage,
-  isWebClip
-} from "../utils/filename";
+import { DocumentMimeTypes, getFileNameWithExtension } from "../utils/filename";
 import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
 import { Output } from "../interfaces";
 import { Attachment } from "../types";
 import Database from "../api";
-import { SQLCollection } from "../database/sql-collection";
+import { FilteredSelector, SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
 
 export class Attachments implements ICollection {
@@ -234,21 +228,37 @@ export class Attachments implements ICollection {
     );
   }
 
-  async ofNote(
+  ofNote(
     noteId: string,
     ...types: ("files" | "images" | "webclips" | "all")[]
-  ): Promise<Attachment[]> {
-    const noteAttachments = await this.db.relations
-      .from({ type: "note", id: noteId }, "attachment")
-      .resolve();
-
-    if (types.includes("all")) return noteAttachments;
-
-    return noteAttachments.filter((a) => {
-      if (isImage(a.mimeType) && types.includes("images")) return true;
-      else if (isWebClip(a.mimeType) && types.includes("webclips")) return true;
-      else if (types.includes("files")) return true;
-    });
+  ) {
+    const selector = this.db.relations.from(
+      { type: "note", id: noteId },
+      "attachment"
+    ).selector;
+    return new FilteredSelector<Attachment>(
+      "attachments",
+      types.includes("all")
+        ? selector.filter
+        : selector.filter.where((eb) => {
+            const filters = [];
+            if (types.includes("images"))
+              filters.push(eb("mimeType", "like", `image/%`));
+            if (types.includes("webclips"))
+              filters.push(
+                eb("mimeType", "==", `application/vnd.notesnook.web-clip`)
+              );
+            if (types.includes("files")) {
+              filters.push(
+                eb.and([
+                  eb("mimeType", "!=", `application/vnd.notesnook.web-clip`),
+                  eb("mimeType", "not like", `image/%`)
+                ])
+              );
+            }
+            return eb.or(filters);
+          })
+    );
   }
 
   async exists(hash: string) {
@@ -337,12 +347,18 @@ export class Attachments implements ICollection {
   }
 
   async downloadMedia(noteId: string, hashesToLoad?: string[]) {
-    let attachments = await this.ofNote(noteId, "images", "webclips");
+    const attachments = this.ofNote(noteId, "images", "webclips").fields([
+      "attachments.id",
+      "attachments.hash",
+      "attachments.chunkSize"
+    ]);
     if (hashesToLoad)
-      attachments = attachments.filter((a) => hasItem(hashesToLoad, a.hash));
+      attachments.where((eb) => eb.and([eb("hash", "in", hashesToLoad)]));
 
     await this.db.fs().queueDownloads(
-      attachments.map((a) => ({
+      (
+        await attachments.items()
+      ).map((a) => ({
         filename: a.hash,
         chunkSize: a.chunkSize
       })),
