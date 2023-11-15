@@ -242,6 +242,8 @@ function SettingsSideBar(props: SettingsSideBarProps) {
           }}
         >
           <Input
+            id="search"
+            name="search"
             placeholder="Search"
             data-test-id="settings-search"
             sx={{
