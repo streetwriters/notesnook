@@ -344,31 +344,37 @@ export default class Backup {
         if ("sessionContentId" in item && item.type !== "session")
           (item as any).type = "notehistory";
 
-        await migrateItem(
-          item,
-          version,
-          CURRENT_DATABASE_VERSION,
-          item.type,
-          this.db,
-          "backup"
-        );
+        if (
+          (await migrateItem(
+            item,
+            version,
+            CURRENT_DATABASE_VERSION,
+            item.type,
+            this.db,
+            "backup"
+          )) === "skip"
+        )
+          continue;
         // since items in trash can have their own set of migrations,
         // we have to run the migration again to account for that.
         if (item.type === "trash" && item.itemType)
-          await migrateItem(
-            item as unknown as Note | Notebook,
-            version,
-            CURRENT_DATABASE_VERSION,
-            item.itemType,
-            this.db,
-            "backup"
-          );
+          if (
+            (await migrateItem(
+              item as unknown as Note | Notebook,
+              version,
+              CURRENT_DATABASE_VERSION,
+              item.itemType,
+              this.db,
+              "backup"
+            )) === "skip"
+          )
+            continue;
 
         const itemType =
           // colors are naively of type "tag" instead of "color" so we have to fix that.
           item.type === "tag" && COLORS.includes(item.title.toLowerCase())
             ? "color"
-            : "itemType" in item && item.itemType
+            : item.type === "trash" && "itemType" in item && item.itemType
             ? item.itemType
             : item.type;
 

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Database from "../api";
 import { isCipher } from "../database/crypto";
-import { SQLCollection } from "../database/sql-collection";
+import { FilteredSelector, SQLCollection } from "../database/sql-collection";
 import { HistorySession, isDeleted } from "../types";
 import { makeSessionContentId } from "../utils/id";
 import { ICollection } from "./collection";
@@ -39,25 +39,31 @@ export class NoteHistory implements ICollection {
     await this.sessionContent.init();
   }
 
-  async get(noteId: string, order: "asc" | "desc" = "desc") {
-    if (!noteId) return [];
+  // async get(noteId: string, order: "asc" | "desc" = "desc") {
+  //   if (!noteId) return [];
 
-    // const indices = this.collection.indexer.indices;
-    // const sessionIds = indices.filter((id) => id.startsWith(noteId));
-    // if (sessionIds.length === 0) return [];
-    // const history = await this.getSessions(sessionIds);
+  //   // const indices = this.collection.indexer.indices;
+  //   // const sessionIds = indices.filter((id) => id.startsWith(noteId));
+  //   // if (sessionIds.length === 0) return [];
+  //   // const history = await this.getSessions(sessionIds);
 
-    // return history.sort(function (a, b) {
-    //   return b.dateModified - a.dateModified;
-    // });
-    const history = await this.db
-      .sql()
-      .selectFrom("notehistory")
-      .where("noteId", "==", noteId)
-      .orderBy(`dateModified ${order}`)
-      .selectAll()
-      .execute();
-    return history as HistorySession[];
+  //   // return history.sort(function (a, b) {
+  //   //   return b.dateModified - a.dateModified;
+  //   // });
+  // const history = await this.db
+  //   .sql()
+  //   .selectFrom("notehistory")
+  //   .where("noteId", "==", noteId)
+  //     .orderBy(`dateModified ${order}`)
+  //     .selectAll()
+  //     .execute();
+  //   return history as HistorySession[];
+  // }
+  get(noteId: string) {
+    return new FilteredSelector<HistorySession>(
+      "notehistory",
+      this.db.sql().selectFrom("notehistory").where("noteId", "==", noteId)
+    );
   }
 
   async add(
