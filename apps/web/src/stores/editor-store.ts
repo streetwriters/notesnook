@@ -46,8 +46,8 @@ enum SESSION_STATES {
   opening = "opening"
 }
 
-type EditorSession = {
-  sessionType: "default" | "locked";
+export type EditorSession = {
+  sessionType: "default" | "locked" | "preview";
   content?: NoteContent<false>;
   isDeleted: boolean;
   attachmentsLength: number;

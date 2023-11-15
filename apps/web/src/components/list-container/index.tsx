@@ -17,15 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Flex, Button } from "@theme-ui/components";
 import { Plus } from "../icons";
-import {
-  ItemProps,
-  ScrollerProps,
-  Virtuoso,
-  VirtuosoHandle
-} from "react-virtuoso";
 import {
   useStore as useSelectionStore,
   store as selectionStore
@@ -34,31 +28,17 @@ import GroupHeader from "../group-header";
 import { DEFAULT_ITEM_HEIGHT, ListItemWrapper } from "./list-profiles";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
-import ScrollContainer from "../scroll-container";
+import { FlexScrollContainer } from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import { Context } from "./types";
 import {
   VirtualizedGrouping,
-  GroupHeader as GroupHeaderType,
   GroupingKey,
   Item,
   isGroupHeader
 } from "@notesnook/core";
-
-export const CustomScrollbarsVirtualList = forwardRef<
-  HTMLDivElement,
-  ScrollerProps
->(function CustomScrollbarsVirtualList(props, ref) {
-  return (
-    <ScrollContainer
-      {...props}
-      forwardedRef={(sRef) => {
-        if (typeof ref === "function") ref(sRef);
-        else if (ref) ref.current = sRef;
-      }}
-    />
-  );
-});
+import { VirtualizedList } from "../virtualized-list";
+import { Virtualizer } from "@tanstack/react-virtual";
 
 type ListContainerProps = {
   group?: GroupingKey;
@@ -87,8 +67,7 @@ function ListContainer(props: ListContainerProps) {
     (store) => store.toggleSelectionMode
   );
 
-  const listRef = useRef<VirtuosoHandle>(null);
-  const listContainerRef = useRef(null);
+  const listRef = useRef<Virtualizer<Element, Element>>();
 
   useEffect(() => {
     return () => {
@@ -125,7 +104,7 @@ function ListContainer(props: ListContainerProps) {
   });
 
   return (
-    <Flex variant="columnFill">
+    <Flex variant="columnFill" sx={{ overflow: "hidden" }}>
       {!props.items.ids.length && props.placeholder ? (
         <>
           {header}
@@ -139,29 +118,25 @@ function ListContainer(props: ListContainerProps) {
         </>
       ) : (
         <>
-          <Flex
-            ref={listContainerRef}
-            variant="columnFill"
+          <FlexScrollContainer
+            style={{ display: "flex", flexDirection: "column", flex: 1 }}
             data-test-id={`${group}-list`}
           >
-            <Virtuoso
-              ref={listRef}
-              data={items.ids}
-              computeItemKey={(index) => items.getKey(index)}
-              defaultItemHeight={DEFAULT_ITEM_HEIGHT}
-              totalCount={items.ids.length}
+            {header ? header : <Announcements />}
+            <VirtualizedList
+              virtualizerRef={listRef}
+              estimatedSize={DEFAULT_ITEM_HEIGHT}
+              getItemKey={(index) => items.getKey(index)}
+              items={items.ids}
+              mode="dynamic"
+              tabIndex={-1}
               onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
-              components={{
-                Scroller: CustomScrollbarsVirtualList,
-                Item: VirtuosoItem,
-                Header: () => (header ? header : <Announcements />)
-              }}
-              context={{
-                onMouseDown,
-                onFocus
-              }}
-              itemContent={(index, item) => {
+              itemWrapperProps={(_, index) => ({
+                onFocus: () => onFocus(index),
+                onMouseDown: (e) => onMouseDown(e.nativeEvent, index)
+              })}
+              renderItem={({ index, item }) => {
                 if (isGroupHeader(item)) {
                   if (!group) return null;
                   return (
@@ -197,8 +172,7 @@ function ListContainer(props: ListContainerProps) {
                           (v) => isGroupHeader(v) && v.title === title
                         );
                         if (index < 0) return;
-                        listRef.current?.scrollToIndex({
-                          index,
+                        listRef.current?.scrollToIndex(index, {
                           align: "center",
                           behavior: "auto"
                         });
@@ -220,7 +194,7 @@ function ListContainer(props: ListContainerProps) {
                 );
               }}
             />
-          </Flex>
+          </FlexScrollContainer>
         </>
       )}
       {button && (
@@ -250,29 +224,6 @@ function ListContainer(props: ListContainerProps) {
 }
 export default ListContainer;
 
-function VirtuosoItem({
-  item: _item,
-  context,
-  ...props
-}: ItemProps<string | GroupHeaderType> & {
-  context?: {
-    onMouseDown: (e: MouseEvent, itemIndex: number) => void;
-    onFocus: (itemIndex: number) => void;
-  };
-}) {
-  return (
-    <div
-      {...props}
-      onFocus={() => context?.onFocus(props["data-item-index"])}
-      onMouseDown={(e) =>
-        context?.onMouseDown(e.nativeEvent, props["data-item-index"])
-      }
-    >
-      {props.children}
-    </div>
-  );
-}
-
 /**
  * Scroll the element at the specified index into view and
  * wait until it renders into the DOM. This function keeps
@@ -281,29 +232,28 @@ function VirtuosoItem({
  * 50ms interval.
  */
 function waitForElement(
-  list: VirtuosoHandle,
+  list: Virtualizer<Element, Element>,
   index: number,
   elementId: string,
   callback: (element: HTMLElement) => void
 ) {
   let waitInterval = 0;
   let maxAttempts = 3;
-  list.scrollIntoView({
-    index,
-    done: function scrollDone() {
-      if (!maxAttempts) return;
-      clearTimeout(waitInterval);
+  list.scrollToIndex(index);
+  function scrollDone() {
+    if (!maxAttempts) return;
+    clearTimeout(waitInterval);
 
-      const element = document.getElementById(elementId);
-      if (!element) {
-        --maxAttempts;
-        waitInterval = setTimeout(() => {
-          scrollDone();
-        }, 50) as unknown as number;
-        return;
-      }
-
-      callback(element);
+    const element = document.getElementById(elementId);
+    if (!element) {
+      --maxAttempts;
+      waitInterval = setTimeout(() => {
+        scrollDone();
+      }, 50) as unknown as number;
+      return;
     }
-  });
+
+    callback(element);
+  }
+  scrollDone();
 }

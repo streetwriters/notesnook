@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ContentType } from "@notesnook/core";
 import { Attachment } from "./picker";
 
 export type NoteStatistics = {
@@ -44,3 +45,9 @@ export interface IEditor {
     progress: number
   ) => void;
 }
+
+export type PreviewSession = {
+  content: { data: string; type: ContentType };
+  dateCreated: number;
+  dateEdited: number;
+};
