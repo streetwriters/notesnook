@@ -22,7 +22,7 @@ import Database from ".";
 import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
 import { tinyToTiptap } from "../migrations";
 import { isCipher } from "../database/crypto";
-import { EncryptedContentItem, Note } from "../types";
+import { Note } from "../types";
 import {
   isEncryptedContent,
   isUnencryptedContent
@@ -110,6 +110,7 @@ export default class Vault {
         try {
           const content = await this.decryptContent(
             encryptedContent,
+            note.id,
             oldPassword
           );
           contentItems.push({
@@ -239,18 +240,18 @@ export default class Vault {
   }
 
   async decryptContent(
-    encryptedContent: EncryptedContentItem,
+    encryptedContent: NoteContent<true>,
+    noteId: string,
     password?: string
   ) {
     if (!password) password = await this.getVaultPassword();
 
     if (
-      encryptedContent.noteId &&
       typeof encryptedContent.data !== "object" &&
       !isCipher(encryptedContent.data)
     ) {
       await this.db.notes.add({
-        id: encryptedContent.noteId,
+        id: noteId,
         locked: false
       });
       return { data: encryptedContent.data, type: encryptedContent.type };
@@ -330,7 +331,11 @@ export default class Vault {
 
     const encryptedContent = await this.db.content.get(note.contentId);
     if (!encryptedContent || !isEncryptedContent(encryptedContent)) return;
-    const content = await this.decryptContent(encryptedContent, password);
+    const content = await this.decryptContent(
+      encryptedContent,
+      note.id,
+      password
+    );
 
     if (perm) {
       await this.db.notes.add({

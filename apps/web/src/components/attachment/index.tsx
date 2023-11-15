@@ -33,18 +33,16 @@ import {
   FileWebClip,
   Icon,
   Loading,
-  References,
   Rename,
   Reupload,
   Uploading
 } from "../icons";
-import { showToast } from "../../utils/toast";
 import { hashNavigate } from "../../navigation";
 import {
   closeOpenedDialog,
   showPromptDialog
 } from "../../common/dialog-controller";
-import { store } from "../../stores/attachment-store";
+import { store, useStore } from "../../stores/attachment-store";
 import { db } from "../../common/db";
 import { saveAttachment } from "../../common/attachments";
 import { reuploadAttachment } from "../editor/picker";
@@ -55,11 +53,11 @@ import {
   WebClipMimeType,
   PDFMimeType
 } from "@notesnook/core/dist/utils/filename";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
-import { Attachment } from "@notesnook/core";
+import { Attachment as AttachmentType } from "@notesnook/core";
 
 const FILE_ICONS: Record<string, Icon> = {
   "image/": FileImage,
@@ -86,24 +84,29 @@ type AttachmentProgressStatus = {
 };
 
 type AttachmentProps = {
-  attachment: Attachment;
+  item: AttachmentType;
   isSelected?: boolean;
   onSelected?: () => void;
   compact?: boolean;
+  style?: React.CSSProperties;
+  rowRef?: React.Ref<HTMLTableRowElement>;
 };
 export function Attachment({
-  attachment,
+  item,
   isSelected,
   onSelected,
-  compact
+  compact,
+  rowRef,
+  style
 }: AttachmentProps) {
   const [status, setStatus] = useState<AttachmentProgressStatus>();
+  const processing = useStore((store) => store.processing[item.hash]);
 
   useEffect(() => {
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       (progress: any) => {
-        if (progress.hash === attachment.metadata.hash) {
+        if (progress.hash === item.hash) {
           const percent = Math.round((progress.loaded / progress.total) * 100);
           setStatus(
             percent < 100
@@ -120,18 +123,20 @@ export function Attachment({
     return () => {
       event.unsubscribe();
     };
-  }, [attachment.metadata.hash]);
+  }, [item.hash]);
 
-  const FileIcon = getFileIcon(attachment.metadata.type);
+  const FileIcon = getFileIcon(item.type);
   return (
     <Box
       as="tr"
       sx={{ height: 30, ":hover": { bg: "hover" } }}
       onContextMenu={(e) => {
         e.preventDefault();
-        Menu.openMenu(AttachmentMenuItems(attachment, status));
+        Menu.openMenu(AttachmentMenuItems(item, status));
       }}
       onClick={onSelected}
+      style={style}
+      ref={rowRef}
     >
       {!compact && (
         <td>
@@ -161,7 +166,7 @@ export function Attachment({
             ) : (
               <Uploading size={16} color="accent" />
             )
-          ) : attachment.failed ? (
+          ) : processing?.failed || item.failed ? (
             <AttachmentError
               color={"icon-error"}
               size={16}
@@ -171,7 +176,7 @@ export function Attachment({
                   : attachment.failed
               }
             />
-          ) : attachment.working ? (
+          ) : processing?.working ? (
             <Loading size={16} />
           ) : (
             <FileIcon size={16} />
@@ -185,14 +190,12 @@ export function Attachment({
               textOverflow: "ellipsis"
             }}
           >
-            {attachment.metadata.filename}
+            {item.filename}
           </Text>
         </Flex>
       </td>
       <Text as="td" variant="body">
-        {attachment.isDeleting ? (
-          <Loading sx={{ flexShrink: 0 }} size={16} title={"Deleting.."} />
-        ) : attachment.dateUploaded ? (
+        {item.dateUploaded ? (
           <DoubleCheckmark
             sx={{ flexShrink: 0 }}
             color={"accent"}
@@ -217,13 +220,13 @@ export function Attachment({
             {formatBytes(status.loaded, 1)}/{formatBytes(status.total, 1)}
           </>
         ) : (
-          formatBytes(attachment.length, compact ? 1 : 2)
+          formatBytes(item.size, compact ? 1 : 2)
         )}
       </Text>
       {!compact && (
         <Text as="td" variant="body">
-          {attachment.dateUploaded
-            ? getFormattedDate(attachment.dateUploaded, "date")
+          {item.dateUploaded
+            ? getFormattedDate(item.dateUploaded, "date")
             : "-"}
         </Text>
       )}
@@ -232,37 +235,28 @@ export function Attachment({
 }
 
 const AttachmentMenuItems: (
-  attachment: any,
+  attachment: AttachmentType,
   status?: AttachmentProgressStatus
 ) => MenuItem[] = (attachment, status) => {
   return [
     {
-      type: "button",
       key: "notes",
-      title: "Notes",
-      icon: References.path,
-      menu: {
-        items: (attachment.noteIds as string[]).reduce((prev, curr) => {
-          const note = db.notes.note(curr);
-          if (!note)
-            prev.push({
-              type: "button",
-              key: curr,
-              title: `Note with id ${curr}`,
-              onClick: () => showToast("error", "This note does not exist.")
-            });
-          else
-            prev.push({
-              type: "button",
-              key: note.id,
-              title: note.title,
-              onClick: () => {
-                hashNavigate(`/notes/${curr}/edit`);
-                closeOpenedDialog();
-              }
-            });
-          return prev;
-        }, [] as MenuItem[])
+      type: "lazy-loader",
+      async items() {
+        const menuItems: MenuItem[] = [];
+        for await (const note of db.relations.from(attachment, "note")
+          .selector) {
+          menuItems.push({
+            type: "button",
+            key: note.id,
+            title: note.title,
+            onClick: () => {
+              hashNavigate(`/notes/${note.id}/edit`);
+              closeOpenedDialog();
+            }
+          });
+        }
+        return menuItems;
       }
     },
     {
@@ -272,7 +266,7 @@ const AttachmentMenuItems: (
       icon: DoubleCheckmark.path,
       isDisabled: !attachment.dateUploaded,
       onClick: async () => {
-        await store.recheck([attachment.metadata.hash]);
+        await store.recheck([attachment.id]);
       }
     },
     {
@@ -283,11 +277,11 @@ const AttachmentMenuItems: (
       onClick: async () => {
         const newName = await showPromptDialog({
           title: "Rename attachment",
-          description: attachment.metadata.filename,
-          defaultValue: attachment.metadata.filename
+          description: attachment.filename,
+          defaultValue: attachment.filename
         });
         if (!newName) return;
-        await store.rename(attachment.metadata.hash, newName);
+        await store.rename(attachment.hash, newName);
       }
     },
     {
@@ -298,8 +292,8 @@ const AttachmentMenuItems: (
       onClick: async () => {
         const isDownloading = status?.type === "download";
         if (isDownloading) {
-          await db.fs().cancel(attachment.metadata.hash, "download");
-        } else await saveAttachment(attachment.metadata.hash);
+          await db.fs().cancel(attachment.hash, "download");
+        } else await saveAttachment(attachment.hash);
       }
     },
     {
@@ -310,12 +304,8 @@ const AttachmentMenuItems: (
       onClick: async () => {
         const isDownloading = status?.type === "upload";
         if (isDownloading) {
-          await db.fs().cancel(attachment.metadata.hash, "upload");
-        } else
-          await reuploadAttachment(
-            attachment.metadata.type,
-            attachment.metadata.hash
-          );
+          await db.fs().cancel(attachment.hash, "upload");
+        } else await reuploadAttachment(attachment.type, attachment.hash);
       }
     },
     {
@@ -324,7 +314,7 @@ const AttachmentMenuItems: (
       variant: "dangerous",
       title: "Delete permanently",
       icon: DeleteForver.path,
-      onClick: () => Multiselect.deleteAttachments([attachment])
+      onClick: () => Multiselect.deleteAttachments([attachment.id])
     }
   ];
 };

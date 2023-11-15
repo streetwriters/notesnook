@@ -70,7 +70,9 @@ export class SessionContent implements ICollection {
     });
   }
 
-  async get(sessionContentId: string) {
+  async get(
+    sessionContentId: string
+  ): Promise<NoteContent<boolean> | undefined> {
     const session = await this.collection.get(sessionContentId);
     if (!session || isDeleted(session)) return;
 

@@ -66,7 +66,6 @@ export function ThemePreview(props: ThemePreviewProps) {
           theme.previewColors.background
         ].map((color) => (
           <Circle
-            key={color}
             color={color}
             size={18}
             sx={{

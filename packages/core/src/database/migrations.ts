@@ -159,7 +159,7 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("salt", "text")
             .addColumn("size", "integer")
             .addColumn("alg", "text")
-            .addColumn("encryptionKey", "text")
+            .addColumn("key", "text")
             .addColumn("chunkSize", "integer")
             .addColumn("hash", "text", (c) => c.unique())
             .addColumn("hashType", "text")

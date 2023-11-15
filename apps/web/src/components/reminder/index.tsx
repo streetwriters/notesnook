@@ -111,10 +111,10 @@ export default React.memo(Reminder, (prev, next) => {
   return prev?.item?.title === next?.item?.title;
 });
 
-const menuItems: (
-  reminder: ReminderType,
-  items?: ReminderType[]
-) => MenuItem[] = (reminder, items = []) => {
+const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
+  reminder,
+  items = []
+) => {
   return [
     {
       type: "button",

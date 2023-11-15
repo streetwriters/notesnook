@@ -46,14 +46,11 @@ export class Compressor implements ICompressor {
       return await desktop.compress.gunzip.query(data);
 
     await this.init();
+    const bytes = new Memory(Buffer.from(data, "base64"));
 
-    return gunzip(Buffer.from(data, "base64"))
-      .copyAndDispose()
-      .toString("utf-8");
-    // return new Promise<string>((resolve, reject) => {
-    //   gunzip(Buffer.from(data, "base64"), (err, data) =>
-    //     err ? reject(err) : resolve(Buffer.from(data.buffer).toString("utf-8"))
-    //   );
-    // });
+    const res = gunzip(bytes);
+    const text = Buffer.from(res.bytes).toString("utf-8");
+    res.free();
+    return text;
   }
 }

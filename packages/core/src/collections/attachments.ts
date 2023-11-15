@@ -29,6 +29,7 @@ import { Attachment } from "../types";
 import Database from "../api";
 import { FilteredSelector, SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
+import { sql } from "kysely";
 
 export class Attachments implements ICollection {
   name = "attachments";
@@ -468,6 +469,13 @@ export class Attachments implements ICollection {
       (qb) => qb.where(isFalse("deleted")),
       this.db.options?.batchSize
     );
+  }
+
+  async totalSize(selector: FilteredSelector<Attachment> = this.all) {
+    const result = await selector.filter
+      .select((eb) => eb.fn.sum<number>(sql.raw(`size + 17`)).as("totalSize"))
+      .executeTakeFirst();
+    return result?.totalSize;
   }
 
   private async encryptKey(key: SerializedKey) {

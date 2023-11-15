@@ -183,7 +183,7 @@ function Note(props: NoteProps) {
                 icon={Notebook}
               />
             ))}
-          {reminder && isReminderActive(reminder) && (
+          {reminder && isReminderActive(reminder) ? (
             <IconTag
               icon={Reminder}
               text={getFormattedReminderTime(reminder, true)}
@@ -197,7 +197,7 @@ function Note(props: NoteProps) {
                   : {}
               }
             />
-          )}
+          ) : null}
         </Flex>
       }
       footer={

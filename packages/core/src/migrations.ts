@@ -61,7 +61,7 @@ type Migration = {
       item: MigrationItemMap[P],
       db: Database,
       migrationType: MigrationType
-    ) => boolean | Promise<boolean> | void;
+    ) => "skip" | boolean | Promise<boolean | "skip"> | void;
   };
   collection?: (collection: IndexedCollection) => Promise<void> | void;
 };
@@ -196,12 +196,22 @@ const migrations: Migration[] = [
               .items()
               .find((t) => item.title === t.title && t.id !== oldTagId))
         )
-          return false;
+          return "skip";
 
         const colorCode = ColorToHexCode[item.title];
         if (colorCode) {
+          const newColor = await db.colors.all.find((eb) =>
+            eb.or([eb("title", "in", [alias, item.title])])
+          );
+          if (newColor) return "skip";
+
           (item as unknown as Color).type = "color";
           (item as unknown as Color).colorCode = colorCode;
+        } else {
+          const newTag = await db.tags.all.find((eb) =>
+            eb.or([eb("title", "in", [alias, item.title])])
+          );
+          if (newTag) return "skip";
         }
 
         item.title = alias || item.title;
@@ -305,6 +315,7 @@ const migrations: Migration[] = [
           await db.relations.add(item, { id: subNotebookId, type: "notebook" });
         }
         delete item.topics;
+        delete item.totalNotes;
         return true;
       },
       shortcut: (item) => {
@@ -409,7 +420,9 @@ export async function migrateItem<TItemType extends MigrationItemType>(
 
     const itemMigrator = migration.items[type];
     if (!itemMigrator) continue;
-    if (await itemMigrator(item, database, migrationType)) {
+    const result = await itemMigrator(item, database, migrationType);
+    if (result === "skip") return "skip";
+    if (result) {
       if (item.type && item.type !== type) type = item.type as TItemType;
       count++;
     }
