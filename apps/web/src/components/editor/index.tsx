@@ -65,14 +65,9 @@ import {
   isEncryptedContent,
   isUnencryptedContent
 } from "@notesnook/core/dist/collections/content";
+import { PreviewSession } from "./types";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
-
-type PreviewSession = {
-  content: { data: string; type: ContentType };
-  dateCreated: number;
-  dateEdited: number;
-};
 
 type DocumentPreview = {
   url?: string;

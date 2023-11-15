@@ -56,7 +56,8 @@ function CachedRouter() {
           sx={{
             display: key === RouteResult.key ? "flex" : "none",
             flexDirection: "column",
-            flex: 1
+            flex: 1,
+            overflow: "hidden"
           }}
         >
           <Component key={key} {...RouteResult.props} />

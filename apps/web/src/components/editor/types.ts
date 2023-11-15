@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Attachment } from "@notesnook/editor";
+import { ContentType } from "@notesnook/core";
 
 export type NoteStatistics = {
   words: {
@@ -37,3 +38,9 @@ export interface IEditor {
   attachFile: (file: Attachment) => void;
   sendAttachmentProgress: (hash: string, progress: number) => void;
 }
+
+export type PreviewSession = {
+  content: { data: string; type: ContentType };
+  dateCreated: number;
+  dateEdited: number;
+};
