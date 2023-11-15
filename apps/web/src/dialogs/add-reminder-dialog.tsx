@@ -120,26 +120,27 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
 
   useEffect(() => {
     if (!reminderId) return;
-    const reminder = db.reminders.reminder(reminderId);
-    if (!reminder) return;
+    db.reminders.reminder(reminderId).then((reminder) => {
+      if (!reminder) return;
 
-    setSelectedDays(reminder.selectedDays || []);
-    setRecurringMode(reminder.recurringMode || RecurringModes.DAY);
-    setMode(reminder.mode || Modes.ONCE);
-    setPriority(reminder.priority || Priorities.VIBRATE);
-    setDate(dayjs(reminder.date).format("YYYY-MM-DD"));
-    setTime(dayjs(reminder.date).format("HH:mm"));
-    setTitle(reminder.title);
-    setDescription(reminder.description);
+      setSelectedDays(reminder.selectedDays || []);
+      setRecurringMode(reminder.recurringMode || RecurringModes.DAY);
+      setMode(reminder.mode || Modes.ONCE);
+      setPriority(reminder.priority || Priorities.VIBRATE);
+      setDate(dayjs(reminder.date).format("YYYY-MM-DD"));
+      setTime(dayjs(reminder.date).format("HH:mm"));
+      setTitle(reminder.title);
+      setDescription(reminder.description);
+    });
   }, [reminderId]);
 
   useEffect(() => {
     if (!noteId) return;
-    const note = db.notes.note(noteId);
-    if (!note) return;
-
-    setTitle(note.title);
-    setDescription(note.headline);
+    db.notes.note(noteId).then((note) => {
+      if (!note) return;
+      setTitle(note.title);
+      setDescription(note.headline);
+    });
   }, [noteId]);
 
   const repeatsDaily =

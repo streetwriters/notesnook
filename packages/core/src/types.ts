@@ -25,6 +25,7 @@ export type SortOptions = {
     | "dateCreated"
     | "dateDeleted"
     | "dateEdited"
+    | "dateModified"
     | "title"
     | "filename"
     | "size"
@@ -196,6 +197,10 @@ export interface Notebook extends BaseItem<"notebook"> {
    * @deprecated only kept here for migration purposes.
    */
   topics?: Topic[];
+  /**
+   * @deprecated only kept here for migration purposes.
+   */
+  totalNotes?: number;
 }
 
 /**
