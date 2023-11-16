@@ -40,7 +40,7 @@ const prepareSearch = () => {
 };
 
 const PLACEHOLDER_DATA = {
-  heading: "Your reminders",
+  title: "Your reminders",
   paragraph: "You have not set any reminders yet.",
   button: "Set a new reminder",
   action: () => {
@@ -76,14 +76,12 @@ export const Reminders = ({
   return (
     <DelayLayout>
       <List
-        listData={reminders}
-        type="reminders"
-        headerProps={{
-          heading: "Reminders"
-        }}
+        data={reminders}
+        dataType="reminder"
+        headerTitle="Reminders"
+        renderedInRoute="Reminders"
         loading={!isFocused}
-        screen="Reminders"
-        placeholderData={PLACEHOLDER_DATA}
+        placeholder={PLACEHOLDER_DATA}
       />
 
       <FloatingButton

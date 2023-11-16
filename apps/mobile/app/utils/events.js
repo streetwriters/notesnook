@@ -35,10 +35,6 @@ export const eOpenAddNotebookDialog = "507";
 
 export const eCloseAddNotebookDialog = "508";
 
-export const eOpenAddTopicDialog = "509";
-
-export const eCloseAddTopicDialog = "510";
-
 export const eOpenLoginDialog = "511";
 
 export const eCloseLoginDialog = "512";
@@ -159,8 +155,9 @@ export const eCloseAnnouncementDialog = "604";
 export const eOpenLoading = "605";
 export const eCloseLoading = "606";
 
-export const eOnTopicSheetUpdate = "607";
+export const eOnNotebookUpdated = "607";
 
 export const eUserLoggedIn = "608";
 
 export const eLoginSessionExpired = "609";
+export const eDBItemUpdate = "610";

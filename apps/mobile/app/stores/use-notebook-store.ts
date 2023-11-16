@@ -17,38 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import create, { State } from "zustand";
 import { db } from "../common/database";
-import { GroupedItems, Notebook } from "@notesnook/core/dist/types";
+import { VirtualizedGrouping, Notebook } from "@notesnook/core";
 
 export interface NotebookStore extends State {
-  notebooks: GroupedItems<Notebook>;
+  notebooks: VirtualizedGrouping<Notebook> | undefined;
   setNotebooks: (items?: Notebook[]) => void;
   clearNotebooks: () => void;
 }
 
-export const useNotebookStore = create<NotebookStore>((set, get) => ({
-  notebooks: [],
-  setNotebooks: (items) => {
-    if (!items) {
-      set({
-        notebooks: groupArray(
-          db.notebooks.all || [],
-          db.settings.getGroupOptions("notebooks")
-        )
+export const useNotebookStore = create<NotebookStore>((set) => ({
+  notebooks: undefined,
+  setNotebooks: () => {
+    db.notebooks.roots
+      .grouped(db.settings.getGroupOptions("notebooks"))
+      .then((notebooks) => {
+        set({
+          notebooks: notebooks
+        });
       });
-      return;
-    }
-    const prev = get().notebooks;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const index = prev.findIndex((v) => v.id === item.id);
-      if (index !== -1) {
-        prev[index] = item;
-      }
-    }
-    set({ notebooks: prev });
   },
-  clearNotebooks: () => set({ notebooks: [] })
+  clearNotebooks: () => set({ notebooks: undefined })
 }));

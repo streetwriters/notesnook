@@ -35,6 +35,7 @@ import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { TagStrip, Tags } from "./tags";
+
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
   return (
@@ -151,7 +152,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   );
 };
 
-Properties.present = (item, buttons = [], isSheet) => {
+Properties.present = async (item, buttons = [], isSheet) => {
   if (!item) return;
   let type = item?.type;
   let props = [];
@@ -163,7 +164,7 @@ Properties.present = (item, buttons = [], isSheet) => {
       break;
     case "note":
       android = Platform.OS === "android" ? ["pin-to-notifications"] : [];
-      props[0] = db.notes.note(item.id).data;
+      props[0] = await db.notes.note(item.id);
       props.push([
         "notebooks",
         "add-reminder",
@@ -188,33 +189,34 @@ Properties.present = (item, buttons = [], isSheet) => {
       ]);
       break;
     case "notebook":
-      props[0] = db.notebooks.notebook(item.id).data;
+      props[0] = await db.notebooks.notebook(item.id);
       props.push([
         "edit-notebook",
         "pin",
         "add-shortcut",
         "trash",
-        "default-notebook"
+        "default-notebook",
+        "add-notebook"
       ]);
       break;
-    case "topic":
-      props[0] = db.notebooks
-        .notebook(item.notebookId)
-        .topics.topic(item.id)._topic;
-      props.push([
-        "move-notes",
-        "edit-topic",
-        "add-shortcut",
-        "trash",
-        "default-topic"
-      ]);
-      break;
+    // case "topic":
+    //   props[0] = db.notebooks
+    //     .notebook(item.notebookId)
+    //     .topics.topic(item.id)._topic;
+    //   props.push([
+    //     "move-notes",
+    //     "edit-topic",
+    //     "add-shortcut",
+    //     "trash",
+    //     "default-topic"
+    //   ]);
+    //   break;
     case "tag":
-      props[0] = db.tags.tag(item.id);
+      props[0] = await db.tags.tag(item.id);
       props.push(["add-shortcut", "trash", "rename-tag"]);
       break;
     case "reminder": {
-      props[0] = db.reminders.reminder(item.id);
+      props[0] = await db.reminders.reminder(item.id);
       props.push(["edit-reminder", "trash", "disable-reminder"]);
       break;
     }

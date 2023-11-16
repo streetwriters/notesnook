@@ -50,6 +50,7 @@ const App = () => {
     if (appLockMode && appLockMode !== "none") {
       useUserStore.getState().lockApp(true);
     }
+    //@ts-ignore
     globalThis["IS_MAIN_APP_RUNNING"] = true;
     init();
     setTimeout(async () => {
