@@ -243,6 +243,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
         : target.closest("[data-drag-handle]");
 
     if (!this.dom || this.contentDOM?.contains(target) || !dragHandle) {
+      event.preventDefault();
       return;
     }
 

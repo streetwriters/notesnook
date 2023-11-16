@@ -57,6 +57,7 @@ import { store as editorstore } from "../../stores/editor-store";
 import { ScopedThemeProvider } from "../theme-provider";
 import { writeText } from "clipboard-polyfill";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 
 type OnChangeHandler = (
   id: string | undefined,
@@ -446,7 +447,7 @@ function toIEditor(editor: Editor): IEditor {
       if (file.dataurl) {
         editor.current?.commands.insertImage({
           ...file,
-          dataurl: file.dataurl
+          bloburl: toBlobURL(file.dataurl, file.hash)
         });
       } else editor.current?.commands.insertAttachment(file);
     },
@@ -455,7 +456,7 @@ function toIEditor(editor: Editor): IEditor {
     loadImage: (hash, dataurl) =>
       editor.current?.commands.updateImage(
         { hash },
-        { hash, dataurl, preventUpdate: true }
+        { hash, bloburl: toBlobURL(dataurl, hash), preventUpdate: true }
       ),
     sendAttachmentProgress: (hash, type, progress) =>
       editor.current?.commands.setAttachmentProgress({

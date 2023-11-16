@@ -49,11 +49,11 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
           setError(undefined);
 
           try {
-            const { blob, size, type } = await downloadImage(
+            const { blob, size, mimeType } = await downloadImage(
               url,
               downloadOptions
             );
-            onInsert({ src: await toDataURL(blob), size, mime: type });
+            onInsert({ src: await toDataURL(blob), size, mime: mimeType });
           } catch (e) {
             if (e instanceof Error) setError(e.message);
           } finally {
