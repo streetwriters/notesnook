@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Button, Flex, Image, Text } from "@theme-ui/components";
+import { Box, Flex, Image } from "@theme-ui/components";
 import { ImageAlignmentOptions, ImageAttributes } from "./image";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { DesktopOnly } from "../../components/responsive";
 import { Icon } from "@notesnook/ui";
@@ -31,6 +31,7 @@ import {
 } from "../../toolbar/stores/toolbar-store";
 import { Resizer } from "../../components/resizer";
 import {
+  corsify,
   downloadImage,
   isDataUrl,
   toBlobURL,
@@ -38,14 +39,7 @@ import {
 } from "../../utils/downloader";
 import { motion } from "framer-motion";
 
-const IMAGE_SOURCE_CACHE: Record<string, string | undefined> = {};
 export const AnimatedImage = motion(Image);
-
-type imageInfo = {
-  size: number;
-  blob: Blob;
-  type: string;
-};
 
 export function ImageComponent(
   props: SelectionBasedReactNodeViewProps<
@@ -55,7 +49,7 @@ export function ImageComponent(
   const { editor, node, selected } = props;
   const isMobile = useIsMobile();
   const {
-    dataurl,
+    bloburl,
     src,
     alt,
     title,
@@ -71,42 +65,8 @@ export function ImageComponent(
   if (!align) align = textDirection ? "right" : "left";
 
   const imageRef = useRef<HTMLImageElement>(null);
-  const imageInfoRef = useRef<imageInfo>();
-  const [error, setError] = useState<string>();
-  const [source, setSource] = useState<string>();
   const downloadOptions = useToolbarStore((store) => store.downloadOptions);
   const isReadonly = !editor.current?.isEditable;
-  const hasOrSrc = hash || src;
-  useEffect(
-    () => {
-      (async () => {
-        if (!src && !dataurl && !IMAGE_SOURCE_CACHE[hasOrSrc]) return;
-        try {
-          if (IMAGE_SOURCE_CACHE[hasOrSrc])
-            setSource(IMAGE_SOURCE_CACHE[hasOrSrc]);
-          else if (dataurl) setSource(await toBlobURL(dataurl));
-          else if (isDataUrl(src)) setSource(await toBlobURL(src));
-          else if (canParse(src)) {
-            const { url, size, blob, type } = await downloadImage(
-              src,
-              downloadOptions
-            );
-            setSource(url);
-            imageInfoRef.current = { size, blob, type };
-          } else {
-            setError("Failed to parse source url.");
-          }
-        } catch (e) {
-          console.error(e);
-          if (e instanceof Error) setError(e.message);
-        }
-      })();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [src, dataurl, imageRef, downloadOptions]
-  );
-
-  if (source && hasOrSrc) IMAGE_SOURCE_CACHE[hasOrSrc] = source;
   const relativeHeight = aspectRatio
     ? editor.view.dom.clientWidth / aspectRatio
     : undefined;
@@ -131,174 +91,131 @@ export function ImageComponent(
           }
         }}
       >
-        {!source || error ? (
-          <Flex
-            sx={{
-              width: width || "100%",
-              height: height || relativeHeight || "100%",
-              maxWidth: "100%",
-              minWidth: 135,
-              bg: "background",
-              border: selected
-                ? "2px solid var(--accent)"
-                : "2px solid transparent",
-              borderRadius: "default",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              mt: 1,
-              py: 50
-            }}
-          >
-            <Icon
-              path={
-                error
-                  ? Icons.imageFailed
-                  : isDownloadable(source, src)
-                  ? Icons.imageDownload
-                  : Icons.image
-              }
-              size={width ? width * 0.2 : 72}
-              color="gray"
-            />
-
-            <Text
-              as="span"
-              variant={"subBody"}
-              sx={{
-                display: "inline-block",
-                textDecoration: "none",
-                textAlign: "center",
-                mx: 2,
-                mt: 2
-              }}
-            >
-              {error
-                ? `There was an error loading the image: ${error}`
-                : isDownloadable(source, src)
-                ? `Downloading image`
-                : ""}
-            </Text>
-            {error ? (
-              <Button
-                variant="secondary"
-                sx={{ mt: 1 }}
-                onClick={() => {
-                  setSource(src);
-                  setError(undefined);
+        <Resizer
+          style={{ marginTop: 5 }}
+          editor={editor}
+          selected={selected}
+          width={width}
+          height={height || relativeHeight}
+          onResize={(width, height) => {
+            editor.commands.setImageSize({ width, height });
+          }}
+        >
+          <DesktopOnly>
+            {selected && (
+              <Flex
+                sx={{
+                  position: "absolute",
+                  top: -40,
+                  right: 0,
+                  mb: 2,
+                  alignItems: "end"
                 }}
               >
-                Skip downloading (unsafe)
-              </Button>
-            ) : null}
-          </Flex>
-        ) : (
-          <Resizer
-            style={{ marginTop: 5 }}
-            editor={editor}
-            selected={selected}
-            width={width}
-            onResize={(width, height) => {
-              editor.commands.setImageSize({ width, height });
-            }}
-          >
-            <DesktopOnly>
-              {selected && (
-                <Flex
+                <ToolbarGroup
+                  editor={editor}
+                  tools={
+                    isReadonly
+                      ? [
+                          hash ? "previewAttachment" : "none",
+                          hash ? "downloadAttachment" : "none"
+                        ]
+                      : [
+                          hash ? "previewAttachment" : "none",
+                          hash ? "downloadAttachment" : "none",
+                          "imageAlignLeft",
+                          float ? "none" : "imageAlignCenter",
+                          "imageAlignRight",
+                          "imageProperties"
+                        ]
+                  }
                   sx={{
-                    position: "absolute",
-                    top: -40,
-                    right: 0,
-                    mb: 2,
-                    alignItems: "end"
+                    boxShadow: "menu",
+                    borderRadius: "default",
+                    bg: "background"
                   }}
-                >
-                  <ToolbarGroup
-                    editor={editor}
-                    tools={
-                      isReadonly
-                        ? [
-                            hash ? "previewAttachment" : "none",
-                            hash ? "downloadAttachment" : "none"
-                          ]
-                        : [
-                            hash ? "previewAttachment" : "none",
-                            hash ? "downloadAttachment" : "none",
-                            "imageAlignLeft",
-                            float ? "none" : "imageAlignCenter",
-                            "imageAlignRight",
-                            "imageProperties"
-                          ]
-                    }
-                    sx={{
-                      boxShadow: "menu",
-                      borderRadius: "default",
-                      bg: "background"
-                    }}
-                  />
-                </Flex>
-              )}
-            </DesktopOnly>
-            {!isReadonly && selected && (
-              <Icon
-                className="drag-handle"
-                data-drag-handle
-                draggable
-                path={Icons.dragHandle}
-                color="black"
-                sx={{
-                  cursor: "grab",
-                  position: "absolute",
-                  top: 1,
-                  left: 1,
-                  zIndex: 999
-                }}
-              />
+                />
+              </Flex>
             )}
-            <AnimatedImage
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, ease: "easeIn" }}
-              data-drag-image
-              ref={imageRef}
-              alt={alt}
-              src={source}
-              title={title}
+          </DesktopOnly>
+          {!isReadonly && selected && (
+            <Icon
+              className="drag-handle"
+              data-drag-handle
+              draggable
+              path={Icons.dragHandle}
+              color="black"
               sx={{
-                width: editor.isEditable ? "100%" : width,
-                height: editor.isEditable ? "100%" : height,
-                border: selected
-                  ? "2px solid var(--accent)"
-                  : "2px solid transparent",
-                borderRadius: "default"
-              }}
-              onDoubleClick={() =>
-                editor.current?.commands.previewAttachment(node.attrs)
-              }
-              onLoad={async (e) => {
-                const { clientHeight, clientWidth } = e.currentTarget;
-                if (!height && !width && !aspectRatio && imageInfoRef.current) {
-                  editor.current?.commands.updateImage(
-                    { src },
-                    {
-                      src: await toDataURL(imageInfoRef.current.blob),
-                      size: imageInfoRef.current.size,
-                      mime: imageInfoRef.current.type,
-                      aspectRatio: clientWidth / clientHeight
-                    }
-                  );
-                }
+                cursor: "grab",
+                position: "absolute",
+                top: 1,
+                left: 1,
+                zIndex: 999
               }}
             />
-          </Resizer>
-        )}
+          )}
+          <AnimatedImage
+            initial={{ opacity: 0 }}
+            animate={{ opacity: bloburl || src ? 1 : 0 }}
+            transition={{ duration: 0.5, ease: "easeIn" }}
+            data-drag-image
+            ref={imageRef}
+            alt={alt}
+            crossOrigin="anonymous"
+            src={
+              toBlobURL("", hash) ||
+              bloburl ||
+              corsify(src, downloadOptions?.corsHost)
+            }
+            title={title}
+            sx={{
+              width: editor.isEditable ? "100%" : width,
+              height: editor.isEditable ? "100%" : height,
+              border: selected
+                ? "2px solid var(--accent) !important"
+                : "2px solid transparent !important",
+              borderRadius: "default"
+            }}
+            onDoubleClick={() =>
+              editor.current?.commands.previewAttachment(node.attrs)
+            }
+            onLoad={async () => {
+              if (!imageRef.current) return;
+              const { clientHeight, clientWidth } = imageRef.current;
+
+              if (!isDataUrl(src) && canParse(src)) {
+                const { url, size, blob, mimeType } = await downloadImage(
+                  src,
+                  downloadOptions
+                );
+                editor.current?.commands.updateImage(
+                  { src, hash },
+                  {
+                    src: await toDataURL(blob),
+                    bloburl: url,
+                    size: size,
+                    mime: mimeType,
+                    aspectRatio:
+                      !height && !width && !aspectRatio
+                        ? clientWidth / clientHeight
+                        : undefined
+                  }
+                );
+              } else if (!height && !width && !aspectRatio) {
+                editor.current?.commands.updateImage(
+                  { src, hash },
+                  {
+                    aspectRatio: clientWidth / clientHeight
+                  }
+                );
+              }
+            }}
+          />
+        </Resizer>
+        {/* )} */}
       </Box>
     </>
   );
-}
-
-function isDownloadable(source?: string, src?: string) {
-  return !source && src && !isDataUrl(src);
 }
 
 function canParse(src: string) {

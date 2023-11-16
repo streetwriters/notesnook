@@ -61,7 +61,7 @@ export interface ImageOptions {
 export type ImageAttributes = Partial<ImageSizeOptions> &
   Attachment & {
     src: string;
-    dataurl?: string;
+    bloburl?: string;
     alt?: string;
     title?: string;
     textDirection?: TextDirections;
@@ -154,8 +154,8 @@ export const ImageNode = Node.create<ImageOptions>({
         }
       },
 
-      dataurl: {
-        ...getDataAttribute("dataurl"),
+      bloburl: {
+        ...getDataAttribute("bloburl"),
         rendered: false
       }
     };
@@ -192,11 +192,11 @@ export const ImageNode = Node.create<ImageOptions>({
             content.content.descendants((node) => {
               if (
                 node.type.name === this.name &&
-                typeof node.attrs.dataurl === "string"
+                typeof node.attrs.bloburl === "string"
               ) {
                 const attrs = node.attrs as Writeable<Attrs>;
-                attrs.src = attrs.dataurl;
-                delete attrs.dataurl;
+                attrs.src = attrs.bloburl;
+                delete attrs.bloburl;
               }
             });
             return content;
