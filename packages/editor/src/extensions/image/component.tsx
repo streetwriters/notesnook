@@ -115,6 +115,7 @@ export function ImageComponent(
           ml: float ? (align === "right" ? 2 : 0) : 0,
           mr: float ? (align === "left" ? 2 : 0) : 0,
           float: float ? (align as "left" | "right") : "none",
+          width: float ? "100%" : "unset",
           justifyContent: float
             ? "stretch"
             : align === "center"
