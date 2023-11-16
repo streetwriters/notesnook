@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Config } from "react-native-config";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
@@ -45,14 +45,6 @@ const prepareSearch = () => {
   });
 };
 
-const PLACEHOLDER_DATA = {
-  heading: "Your notebooks",
-  paragraph: "You have not added any notebooks yet.",
-  button: "Add your first notebook",
-  action: onPressFloatingButton,
-  loading: "Loading your notebooks"
-};
-
 export const Notebooks = ({
   navigation,
   route
@@ -69,12 +61,6 @@ export const Notebooks = ({
       });
       SearchService.prepareSearch = prepareSearch;
       useNavigationStore.getState().setButtonAction(onPressFloatingButton);
-      //@ts-ignore need to update typings in core to fix this
-      if (db.notebooks.all.length === 0 && !Config.isTesting) {
-        Walkthrough.present("notebooks");
-      } else {
-        Walkthrough.update("notebooks");
-      }
 
       return !prev?.current;
     },
@@ -82,20 +68,34 @@ export const Notebooks = ({
     delay: SettingsService.get().homepage === route.name ? 1 : -1
   });
 
+  useEffect(() => {
+    if (notebooks?.ids) {
+      if (notebooks?.ids?.length === 0 && !Config.isTesting) {
+        Walkthrough.present("notebooks");
+      } else {
+        Walkthrough.update("notebooks");
+      }
+    }
+  }, [notebooks]);
+
   return (
     <DelayLayout delay={1}>
       <List
-        listData={notebooks}
-        type="notebooks"
-        screen="Notebooks"
+        data={notebooks}
+        dataType="notebook"
+        renderedInRoute="Notebooks"
         loading={!isFocused}
-        placeholderData={PLACEHOLDER_DATA}
-        headerProps={{
-          heading: "Notebooks"
+        placeholder={{
+          title: "Your notebooks",
+          paragraph: "You have not added any notebooks yet.",
+          button: "Add your first notebook",
+          action: onPressFloatingButton,
+          loading: "Loading your notebooks"
         }}
+        headerTitle="Notebooks"
       />
 
-      {!notebooks || notebooks.length === 0 || !isFocused ? null : (
+      {!notebooks || notebooks.ids.length === 0 || !isFocused ? null : (
         <FloatingButton
           title="Create a new notebook"
           onPress={onPressFloatingButton}

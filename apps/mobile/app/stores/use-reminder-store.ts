@@ -17,26 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupReminders } from "@notesnook/core/dist/utils/grouping";
 import create, { State } from "zustand";
 import { db } from "../common/database";
-import { GroupedItems, Reminder } from "@notesnook/core/dist/types";
+import { Reminder, VirtualizedGrouping } from "@notesnook/core";
 
 export interface ReminderStore extends State {
-  reminders: GroupedItems<Reminder>;
+  reminders: VirtualizedGrouping<Reminder> | undefined;
   setReminders: (items?: Reminder[]) => void;
   cleareReminders: () => void;
 }
 
 export const useReminderStore = create<ReminderStore>((set) => ({
-  reminders: [],
+  reminders: undefined,
   setReminders: () => {
-    set({
-      reminders: groupReminders(
-        (db.reminders?.all as Reminder[]) || [],
-        db.settings?.getGroupOptions("reminders")
-      )
-    });
+    db.reminders.all
+      .grouped(db.settings.getGroupOptions("reminders"))
+      .then((reminders) => {
+        set({
+          reminders: reminders
+        });
+      });
   },
-  cleareReminders: () => set({ reminders: [] })
+  cleareReminders: () => set({ reminders: undefined })
 }));

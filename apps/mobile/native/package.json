@@ -62,7 +62,8 @@
     "react-native-tooltips": "^1.0.3",
     "react-native-vector-icons": "9.2.0",
     "react-native-webview": "^11.14.1",
-    "react-native-zip-archive": "6.0.9"
+    "react-native-zip-archive": "6.0.9",
+    "react-native-quick-sqlite": "^8.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

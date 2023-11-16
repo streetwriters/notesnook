@@ -26,7 +26,8 @@ import SearchService from "../services/search";
 import { useMenuStore } from "../stores/use-menu-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
-import { eClearEditor, eOnTopicSheetUpdate } from "./events";
+import { eClearEditor, eOnNotebookUpdated } from "./events";
+import { getParentNotebookId } from "./notebooks";
 
 function confirmDeleteAllNotes(items, type, context) {
   return new Promise((resolve) => {
@@ -57,6 +58,23 @@ function confirmDeleteAllNotes(items, type, context) {
   });
 }
 
+async function deleteNotebook(id, deleteNotes) {
+  const notebook = await db.notebooks.notebook(id);
+  const parentId = getParentNotebookId(id);
+  if (deleteNotes) {
+    const noteRelations = await db.relations.from(notebook, "note").get();
+    await db.notes.delete(...noteRelations.map((relation) => relation.toId));
+  }
+  const subnotebooks = await db.relations.from(notebook, "notebook").get();
+  for (const subnotebook of subnotebooks) {
+    await deleteNotebook(subnotebook.toId, deleteNotes);
+  }
+  await db.notebooks.remove(id);
+  if (parentId) {
+    eSendEvent(eOnNotebookUpdated, parentId);
+  }
+}
+
 export const deleteItems = async (item, context) => {
   if (item && db.monographs.isPublished(item.id)) {
     ToastManager.show({
@@ -68,14 +86,13 @@ export const deleteItems = async (item, context) => {
     return;
   }
 
-  const selectedItemsList = item
+  const itemsToDelete = item
     ? [item]
     : useSelectionStore.getState().selectedItemsList;
 
-  let notes = selectedItemsList.filter((i) => i.type === "note");
-  let notebooks = selectedItemsList.filter((i) => i.type === "notebook");
-  let topics = selectedItemsList.filter((i) => i.type === "topic");
-  let reminders = selectedItemsList.filter((i) => i.type === "reminder");
+  let notes = itemsToDelete.filter((i) => i.type === "note");
+  let notebooks = itemsToDelete.filter((i) => i.type === "notebook");
+  let reminders = itemsToDelete.filter((i) => i.type === "reminder");
 
   if (reminders.length > 0) {
     for (let reminder of reminders) {
@@ -100,59 +117,20 @@ export const deleteItems = async (item, context) => {
     eSendEvent(eClearEditor);
   }
 
-  if (topics?.length > 0) {
-    const result = await confirmDeleteAllNotes(topics, "topic", context);
-    if (!result.delete) return;
-    for (const topic of topics) {
-      if (result.deleteNotes) {
-        const notes = db.notebooks
-          .notebook(topic.notebookId)
-          .topics.topic(topic.id).all;
-        await db.notes.delete(...notes.map((note) => note.id));
-      }
-      await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);
-    }
-    useMenuStore.getState().setMenuPins();
-    ToastEvent.show({
-      heading: `${topics.length > 1 ? "Topics" : "Topic"} deleted`,
-      type: "success"
-    });
-  }
-
   if (notebooks?.length > 0) {
     const result = await confirmDeleteAllNotes(notebooks, "notebook", context);
     if (!result.delete) return;
-    let ids = notebooks.map((i) => i.id);
-    if (result.deleteNotes) {
-      for (let id of ids) {
-        const notebook = db.notebooks.notebook(id);
-        const topics = notebook.topics.all;
-        for (let topic of topics) {
-          const notes = db.notebooks
-            .notebook(topic.notebookId)
-            .topics.topic(topic.id).all;
-          await db.notes.delete(...notes.map((note) => note.id));
-        }
-        const notes = db.relations.from(notebook.data, "note");
-        await db.notes.delete(...notes.map((note) => note.id));
-      }
+    for (const notebook of notebooks) {
+      await deleteNotebook(notebook.id, result.deleteNotes);
     }
-    await db.notebooks.delete(...ids);
-    useMenuStore.getState().setMenuPins();
   }
 
-  Navigation.queueRoutesForUpdate();
-
-  let message = `${selectedItemsList.length} ${
-    selectedItemsList.length === 1 ? "item" : "items"
+  let message = `${itemsToDelete.length} ${
+    itemsToDelete.length === 1 ? "item" : "items"
   } moved to trash.`;
 
-  let deletedItems = [...selectedItemsList];
-  if (
-    topics.length === 0 &&
-    reminders.length === 0 &&
-    (notes.length > 0 || notebooks.length > 0)
-  ) {
+  let deletedItems = [...itemsToDelete];
+  if (reminders.length === 0 && (notes.length > 0 || notebooks.length > 0)) {
     ToastManager.show({
       heading: message,
       type: "success",
@@ -173,6 +151,7 @@ export const deleteItems = async (item, context) => {
       actionText: "Undo"
     });
   }
+
   Navigation.queueRoutesForUpdate();
   if (!item) {
     useSelectionStore.getState().clearSelection();
@@ -180,7 +159,6 @@ export const deleteItems = async (item, context) => {
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
   SearchService.updateAndSearch();
-  eSendEvent(eOnTopicSheetUpdate);
 };
 
 export const openLinkInBrowser = async (link) => {

@@ -50,23 +50,6 @@ import { encodeNonAsciiHTML } from "entities";
 import { convertNoteToText } from "../utils/note-to-text";
 import { Reminder } from "@notesnook/core/dist/types";
 
-// export type Reminder = {
-//   id: string;
-//   type: string;
-//   title: string;
-//   description?: string;
-//   priority: "silent" | "vibrate" | "urgent";
-//   date: number;
-//   mode: "repeat" | "once" | "permanent";
-//   recurringMode?: "week" | "month" | "day";
-//   selectedDays?: number[];
-//   dateCreated: number;
-//   dateModified: number;
-//   localOnly?: boolean;
-//   snoozeUntil?: number;
-//   disabled?: boolean;
-// };
-
 let pinned: DisplayedNotification[] = [];
 
 /**
@@ -124,7 +107,9 @@ const onEvent = async ({ type, detail }: Event) => {
   const { notification, pressAction, input } = detail;
   if (type === EventType.DELIVERED && Platform.OS === "android") {
     if (notification?.id) {
-      const reminder = db.reminders?.reminder(notification?.id?.split("_")[0]);
+      const reminder = await db.reminders?.reminder(
+        notification?.id?.split("_")[0]
+      );
 
       if (reminder && reminder.recurringMode === "month") {
         await initDatabase();
@@ -172,7 +157,7 @@ const onEvent = async ({ type, detail }: Event) => {
       case "REMINDER_SNOOZE": {
         await initDatabase();
         if (!notification?.id) break;
-        const reminder = db.reminders?.reminder(
+        const reminder = await db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
         if (!reminder) break;
@@ -185,7 +170,7 @@ const onEvent = async ({ type, detail }: Event) => {
           snoozeUntil: Date.now() + reminderTime * 60000
         });
         await Notifications.scheduleNotification(
-          db.reminders?.reminder(reminder?.id)
+          await db.reminders?.reminder(reminder?.id)
         );
         useRelationStore.getState().update();
         useReminderStore.getState().setReminders();
@@ -194,7 +179,7 @@ const onEvent = async ({ type, detail }: Event) => {
       case "REMINDER_DISABLE": {
         await initDatabase();
         if (!notification?.id) break;
-        const reminder = db.reminders?.reminder(
+        const reminder = await db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
         await db.reminders?.add({
@@ -203,7 +188,7 @@ const onEvent = async ({ type, detail }: Event) => {
         });
         if (!reminder?.id) break;
         await Notifications.scheduleNotification(
-          db.reminders?.reminder(reminder?.id)
+          await db.reminders?.reminder(reminder?.id)
         );
         useRelationStore.getState().update();
         useReminderStore.getState().setReminders();
@@ -253,20 +238,7 @@ const onEvent = async ({ type, detail }: Event) => {
         const defaultNotebook = db.settings?.getDefaultNotebook();
 
         if (defaultNotebook) {
-          if (!defaultNotebook.topic) {
-            await db.relations?.add(
-              { type: "notebook", id: defaultNotebook.id },
-              { type: "note", id: id }
-            );
-          } else {
-            await db.notes?.addToNotebook(
-              {
-                topic: defaultNotebook.topic,
-                id: defaultNotebook?.id
-              },
-              id
-            );
-          }
+          await db.notes?.addToNotebook(defaultNotebook, id);
         }
 
         const status = await NetInfo.fetch();
@@ -441,9 +413,9 @@ async function scheduleNotification(
   }
 }
 
-function loadNote(id: string, jump: boolean) {
+async function loadNote(id: string, jump: boolean) {
   if (!id || id === "notesnook_note_input") return;
-  const note = db.notes?.note(id)?.data;
+  const note = await db.notes?.note(id);
   if (!note) return;
   if (!DDS.isTab && jump) {
     tabBarRef.current?.goToPage(1);
@@ -871,7 +843,7 @@ async function pinQuickNote(launch: boolean) {
  * reschedules them if anything has changed.
  */
 async function setupReminders(checkNeedsScheduling = false) {
-  const reminders = (db.reminders?.all as Reminder[]) || [];
+  const reminders = ((await db.reminders?.all.items()) as Reminder[]) || [];
   const triggers = await notifee.getTriggerNotifications();
 
   for (const reminder of reminders) {

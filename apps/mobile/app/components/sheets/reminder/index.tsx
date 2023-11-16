@@ -35,7 +35,7 @@ import DatePicker from "react-native-date-picker";
 import { db } from "../../../common/database";
 import { DDS } from "../../../services/device-detection";
 import Navigation from "../../../services/navigation";
-import Notifications, { Reminder } from "../../../services/notifications";
+import Notifications from "../../../services/notifications";
 import PremiumService from "../../../services/premium";
 import SettingsService from "../../../services/settings";
 import { useRelationStore } from "../../../stores/use-relation-store";
@@ -43,7 +43,7 @@ import { Dialog } from "../../dialog";
 import { ReminderTime } from "../../ui/reminder-time";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { ItemReference } from "@notesnook/core/dist/types";
+import { ItemReference, Note, Reminder } from "@notesnook/core";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -113,7 +113,7 @@ export default function ReminderSheet({
   >(reminder?.priority || SettingsService.get().reminderNotificationMode);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [repeatFrequency, setRepeatFrequency] = useState(1);
-  const referencedItem = reference ? db.notes?.note(reference.id)?.data : null;
+  const referencedItem = reference ? (reference as Note) : null;
 
   const title = useRef<string | undefined>(
     reminder?.title || referencedItem?.title
@@ -195,7 +195,7 @@ export default function ReminderSheet({
         disabled: false
       });
       if (!reminderId) return;
-      const _reminder = db.reminders?.reminder(reminderId);
+      const _reminder = await db.reminders?.reminder(reminderId);
 
       if (!_reminder) {
         ToastManager.show({

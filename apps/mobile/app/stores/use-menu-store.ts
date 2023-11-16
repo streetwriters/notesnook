@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Color } from "@notesnook/core/dist/types";
+import { Color, Notebook, Tag } from "@notesnook/core/dist/types";
 import create, { State } from "zustand";
 import { db } from "../common/database";
 
 export interface MenuStore extends State {
-  menuPins: [];
+  menuPins: (Notebook | Tag)[];
   colorNotes: Color[];
   setMenuPins: () => void;
   setColorNotes: () => void;
@@ -33,18 +33,16 @@ export const useMenuStore = create<MenuStore>((set) => ({
   menuPins: [],
   colorNotes: [],
   setMenuPins: () => {
-    try {
-      set({ menuPins: [...(db.shortcuts?.resolved as [])] });
-    } catch (e) {
-      setTimeout(() => {
-        try {
-          set({ menuPins: [...(db.shortcuts?.resolved as [])] });
-        } catch (e) {
-          console.error(e);
-        }
-      }, 1000);
-    }
+    db.shortcuts.resolved().then((shortcuts) => {
+      set({ menuPins: [...(shortcuts as [])] });
+    });
   },
-  setColorNotes: () => set({ colorNotes: db.colors?.all || [] }),
+  setColorNotes: () => {
+    db.colors?.all.items().then((colors) => {
+      set({
+        colorNotes: colors
+      });
+    });
+  },
   clearAll: () => set({ menuPins: [], colorNotes: [] })
 }));

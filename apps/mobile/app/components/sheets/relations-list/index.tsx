@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { useThemeColors } from "@notesnook/theme";
-import React, { RefObject } from "react";
+import React, { RefObject, useEffect, useState } from "react";
 import { View } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
@@ -35,7 +35,8 @@ import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { PressableButtonProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import { ItemReference, ItemType } from "@notesnook/core/dist/types";
+import { Item, ItemReference, ItemType } from "@notesnook/core/dist/types";
+import { VirtualizedGrouping } from "@notesnook/core";
 
 type RelationsListProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -73,13 +74,24 @@ export const RelationsList = ({
   const updater = useRelationStore((state) => state.updater);
   const { colors } = useThemeColors();
 
-  const items =
+  const [items, setItems] = useState<VirtualizedGrouping<Item>>();
+
+  const hasNoRelations = !items || items?.ids?.length === 0;
+
+  useEffect(() => {
     db.relations?.[relationType]?.(
       { id: item?.id, type: item?.type } as ItemReference,
-      referenceType as ItemType
-    ) || [];
-
-  const hasNoRelations = !items || items.length === 0;
+      referenceType as any
+    )
+      .selector.sorted({
+        sortBy: "dateEdited",
+        sortDirection: "desc",
+        groupBy: "default"
+      })
+      .then((grouped) => {
+        setItems(grouped);
+      });
+  }, [relationType, referenceType]);
 
   return (
     <View
@@ -119,15 +131,11 @@ export const RelationsList = ({
         </View>
       ) : (
         <List
-          listData={items}
-          ScrollComponent={FlashList}
+          data={items}
+          CustomListComponent={FlashList}
           loading={false}
-          type={referenceType}
-          headerProps={null}
-          isSheet={true}
-          onMomentumScrollEnd={() => {
-            actionSheetRef?.current?.handleChildScrollEnd();
-          }}
+          dataType={referenceType as any}
+          isRenderedInActionSheet={true}
         />
       )}
     </View>
