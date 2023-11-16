@@ -87,25 +87,26 @@ export async function inlineStylesheets(options?: FetchOptions) {
 }
 
 async function resolveImports(options?: FetchOptions) {
-  let index = 0;
-  const problemIndices = [];
   for (const sheet of document.styleSheets) {
+    const rulesToDelete = [];
     if (skipStyleSheet(sheet)) continue;
 
-    for (const rule of sheet.cssRules) {
+    for (let i = 0; i < sheet.cssRules.length; ++i) {
+      const rule = sheet.cssRules.item(i);
+      if (!rule) continue;
+
       if (rule.type === CSSRule.IMPORT_RULE) {
         const href = (rule as CSSImportRule).href;
         const result = await downloadStylesheet(href, options);
         if (result) {
           if (sheet.ownerNode) sheet.ownerNode.before(result);
           else document.head.appendChild(result);
-          problemIndices.push(index);
+          rulesToDelete.push(i);
         }
       }
-      ++index;
     }
 
-    for (const _index of problemIndices) sheet.deleteRule(_index);
+    for (const ruleIndex of rulesToDelete) sheet.deleteRule(ruleIndex);
   }
 }
 
