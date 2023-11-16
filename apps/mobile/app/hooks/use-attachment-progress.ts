@@ -29,7 +29,10 @@ type AttachmentProgress = {
 export const useAttachmentProgress = (
   attachment: any,
   encryption?: boolean
-) => {
+): [
+  AttachmentProgress | undefined,
+  (progress?: AttachmentProgress) => void
+] => {
   const progress = useAttachmentStore((state) => state.progress);
   const [currentProgress, setCurrentProgress] = useState<
     AttachmentProgress | undefined

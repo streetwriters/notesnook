@@ -326,6 +326,19 @@ class RelationsArray<TType extends keyof RelatableTable> {
     return result.count > 0;
   }
 
+  async hasAll(...ids: string[]) {
+    const result = await this.db
+      .sql()
+      .selectFrom("relations")
+      .$call(this.buildRelationsQuery())
+      .clearSelect()
+      .where(this.direction === "from" ? "toId" : "fromId", "in", ids)
+      .select((b) => b.fn.count<number>("id").as("count"))
+      .executeTakeFirst();
+    if (!result) return false;
+    return result.count === ids.length;
+  }
+
   /**
    * Build an optimized query for obtaining relations based on the given
    * parameters. The resulting query uses a covering index (the most

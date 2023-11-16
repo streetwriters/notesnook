@@ -16,14 +16,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React, { useRef } from "react";
-import { Dimensions, Platform, View, useWindowDimensions } from "react-native";
+import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { Platform, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { presentSheet } from "../../services/event-manager";
 import SearchService from "../../services/search";
-import { useThemeColors } from "@notesnook/theme";
 import { ColorValues } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
@@ -34,7 +34,8 @@ import { DateMeta } from "./date-meta";
 import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
-import { Tags, TagStrip } from "./tags";
+import { TagStrip, Tags } from "./tags";
+
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
   return (
@@ -151,7 +152,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   );
 };
 
-Properties.present = (item, buttons = [], isSheet) => {
+Properties.present = async (item, buttons = [], isSheet) => {
   if (!item) return;
   let type = item?.type;
   let props = [];
@@ -163,7 +164,7 @@ Properties.present = (item, buttons = [], isSheet) => {
       break;
     case "note":
       android = Platform.OS === "android" ? ["pin-to-notifications"] : [];
-      props[0] = db.notes.note(item.id).data;
+      props[0] = await db.notes.note(item.id);
       props.push([
         "notebooks",
         "add-reminder",
@@ -188,33 +189,34 @@ Properties.present = (item, buttons = [], isSheet) => {
       ]);
       break;
     case "notebook":
-      props[0] = db.notebooks.notebook(item.id).data;
+      props[0] = await db.notebooks.notebook(item.id);
       props.push([
         "edit-notebook",
         "pin",
         "add-shortcut",
         "trash",
-        "default-notebook"
+        "default-notebook",
+        "add-notebook"
       ]);
       break;
-    case "topic":
-      props[0] = db.notebooks
-        .notebook(item.notebookId)
-        .topics.topic(item.id)._topic;
-      props.push([
-        "move-notes",
-        "edit-topic",
-        "add-shortcut",
-        "trash",
-        "default-topic"
-      ]);
-      break;
+    // case "topic":
+    //   props[0] = db.notebooks
+    //     .notebook(item.notebookId)
+    //     .topics.topic(item.id)._topic;
+    //   props.push([
+    //     "move-notes",
+    //     "edit-topic",
+    //     "add-shortcut",
+    //     "trash",
+    //     "default-topic"
+    //   ]);
+    //   break;
     case "tag":
-      props[0] = db.tags.tag(item.id);
+      props[0] = await db.tags.tag(item.id);
       props.push(["add-shortcut", "trash", "rename-tag"]);
       break;
     case "reminder": {
-      props[0] = db.reminders.reminder(item.id);
+      props[0] = await db.reminders.reminder(item.id);
       props.push(["edit-reminder", "trash", "disable-reminder"]);
       break;
     }

@@ -24,7 +24,6 @@ import {
   Notebook,
   Reminder,
   Tag,
-  Topic,
   TrashItem
 } from "@notesnook/core/dist/types";
 import { DisplayedNotification } from "@notifee/react-native";
@@ -39,7 +38,6 @@ import NoteHistory from "../components/note-history";
 import { AddNotebookSheet } from "../components/sheets/add-notebook";
 import MoveNoteSheet from "../components/sheets/add-to";
 import ExportNotesSheet from "../components/sheets/export-notes";
-import { MoveNotes } from "../components/sheets/move-notes/movenote";
 import PublishNoteSheet from "../components/sheets/publish-note";
 import { RelationsList } from "../components/sheets/relations-list/index";
 import ReminderSheet from "../components/sheets/reminder";
@@ -60,11 +58,7 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useUserStore } from "../stores/use-user-store";
 import Errors from "../utils/errors";
-import {
-  eOnTopicSheetUpdate,
-  eOpenAddTopicDialog,
-  eOpenLoginDialog
-} from "../utils/events";
+import { eOpenLoginDialog } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
@@ -73,7 +67,7 @@ export const useActions = ({
   close,
   item
 }: {
-  item: Note | Notebook | Topic | Reminder | Tag | Color | TrashItem;
+  item: Note | Notebook | Reminder | Tag | Color | TrashItem;
   close: () => void;
 }) => {
   const clearSelection = useSelectionStore((state) => state.clearSelection);
@@ -89,6 +83,7 @@ export const useActions = ({
   const [defaultNotebook, setDefaultNotebook] = useState(
     db.settings.getDefaultNotebook()
   );
+  const [noteInCurrentNotebook, setNoteInCurrentNotebook] = useState(false);
 
   const isPublished =
     item.type === "note" && db.monographs.isPublished(item.id);
@@ -156,63 +151,21 @@ export const useActions = ({
   }
 
   const checkItemSynced = () => {
-    if (!user) return true;
-    if (item.type !== "note" || (item as unknown as TrashItem)) return true;
-
-    let isTrash = (item as unknown as TrashItem).type === "trash";
-
-    if (!isTrash && !db.notes.note(item.id)?.synced()) {
-      ToastManager.show({
-        context: "local",
-        heading: "Note not synced",
-        message: "Please run sync before making changes",
-        type: "error"
-      });
-      return false;
-    }
-
-    if (isTrash && !db.trash.synced(item.id)) {
-      ToastManager.show({
-        context: "local",
-        heading: "Note not synced",
-        message: "Please run sync before making changes",
-        type: "error"
-      });
-      return false;
-    }
-
     return true;
   };
 
   async function createMenuShortcut() {
-    if (
-      item.type !== "notebook" &&
-      item.type !== "topic" &&
-      item.type !== "tag"
-    )
-      return;
+    if (item.type !== "notebook" && item.type !== "tag") return;
 
     close();
     try {
       if (isPinnedToMenu) {
         await db.shortcuts.remove(item.id);
       } else {
-        if (item.type === "topic") {
-          await db.shortcuts.add({
-            item: {
-              type: "topic",
-              id: item.id,
-              notebookId: item.notebookId
-            }
-          });
-        } else {
-          await db.shortcuts.add({
-            item: {
-              type: item.type,
-              id: item.id
-            }
-          });
-        }
+        await db.shortcuts.add({
+          itemId: item.id,
+          itemType: item.type
+        });
       }
       setIsPinnedToMenu(db.shortcuts.exists(item.id));
       setMenuPins();
@@ -299,23 +252,6 @@ export const useActions = ({
         console.error(e);
       }
     }
-  }
-  async function removeNoteFromTopic() {
-    if (item.type !== "note") return;
-    const currentScreen = useNavigationStore.getState().currentScreen;
-    if (currentScreen.name !== "TopicNotes" || !currentScreen.notebookId)
-      return;
-
-    await db.notes.removeFromNotebook(
-      {
-        id: currentScreen.notebookId,
-        topic: currentScreen.id
-      },
-      item.id
-    );
-    Navigation.queueRoutesForUpdate();
-    eSendEvent(eOnTopicSheetUpdate);
-    close();
   }
 
   async function deleteTrashItem() {
@@ -440,11 +376,7 @@ export const useActions = ({
     );
   }
 
-  if (
-    item.type === "tag" ||
-    item.type === "topic" ||
-    item.type === "notebook"
-  ) {
+  if (item.type === "tag" || item.type === "notebook") {
     actions.push({
       id: "add-shortcut",
       title: isPinnedToMenu ? "Remove Shortcut" : "Add Shortcut",
@@ -460,27 +392,12 @@ export const useActions = ({
   if (item.type === "notebook") {
     actions.push(
       {
-        id: "default-notebook",
-        title:
-          defaultNotebook?.id === item.id
-            ? "Remove as default"
-            : "Set as default",
-        hidden: item.type !== "notebook",
-        icon: "notebook",
+        id: "add-notebook",
+        title: "Add notebook",
+        icon: "plus",
         func: async () => {
-          if (defaultNotebook?.id === item.id) {
-            await db.settings.setDefaultNotebook(undefined);
-            setDefaultNotebook(undefined);
-          } else {
-            const notebook = {
-              id: item.id
-            };
-            await db.settings.setDefaultNotebook(notebook);
-            setDefaultNotebook(notebook);
-          }
-          close();
-        },
-        on: defaultNotebook?.topic ? false : defaultNotebook?.id === item.id
+          AddNotebookSheet.present(undefined, item);
+        }
       },
       {
         id: "edit-notebook",
@@ -489,61 +406,27 @@ export const useActions = ({
         func: async () => {
           AddNotebookSheet.present(item);
         }
-      }
-    );
-  }
-
-  if (item.type === "topic") {
-    actions.push(
-      {
-        id: "edit-topic",
-        title: "Edit topic",
-        icon: "square-edit-outline",
-        func: async () => {
-          close();
-          await sleep(300);
-          eSendEvent(eOpenAddTopicDialog, {
-            notebookId: item.notebookId,
-            toEdit: item
-          });
-        }
       },
       {
-        id: "move-notes",
-        title: "Add notes",
-        icon: "plus",
-        func: async () => {
-          const notebook = db.notebooks.notebook(
-            (item as Topic).notebookId
-          )?.data;
-          if (notebook) {
-            MoveNotes.present(notebook, item as Topic);
-          }
-        }
-      },
-      {
-        id: "default-topic",
+        id: "default-notebook",
         title:
-          defaultNotebook?.id === item.id
-            ? "Remove as default"
-            : "Set as default",
-        hidden: item.type !== "topic",
-        icon: "bookmark",
+          defaultNotebook === item.id ? "Remove as default" : "Set as default",
+        hidden: item.type !== "notebook",
+        icon: "notebook",
         func: async () => {
-          if (defaultNotebook?.topic === item.id) {
+          if (defaultNotebook === item.id) {
             await db.settings.setDefaultNotebook(undefined);
             setDefaultNotebook(undefined);
           } else {
             const notebook = {
-              id: item.notebookId,
-              topic: item.id
+              id: item.id
             };
-            await db.settings.setDefaultNotebook(notebook);
-            setDefaultNotebook(notebook);
+            await db.settings.setDefaultNotebook(notebook.id);
+            setDefaultNotebook(notebook.id);
           }
           close();
         },
-        on: defaultNotebook?.topic === item.id
+        on: defaultNotebook === item.id
       }
     );
   }
@@ -589,17 +472,17 @@ export const useActions = ({
 
     async function toggleLocalOnly() {
       if (!checkItemSynced() || !user) return;
-      db.notes.note(item.id)?.localOnly();
+      await db.notes.localOnly(!(item as Note).localOnly, item?.id);
       Navigation.queueRoutesForUpdate();
       close();
     }
 
     const toggleReadyOnlyMode = async () => {
-      await db.notes.note(item.id)?.readonly();
-      const current = db.notes.note(item.id)?.data.readonly;
+      const currentReadOnly = (item as Note).localOnly;
+      await db.notes.readonly(!currentReadOnly, item?.id);
 
       if (useEditorStore.getState().currentEditingNote === item.id) {
-        useEditorStore.getState().setReadonly(!!current);
+        useEditorStore.getState().setReadonly(!currentReadOnly);
       }
       Navigation.queueRoutesForUpdate();
       close();
@@ -623,23 +506,6 @@ export const useActions = ({
       close();
     }
 
-    const isNoteInTopic = () => {
-      const currentScreen = useNavigationStore.getState().currentScreen;
-      if (item.type !== "note" || currentScreen.name !== "TopicNotes") return;
-      return (
-        db.notes?.topicReferences?.get(currentScreen.id)?.indexOf(item.id) > -1
-      );
-    };
-
-    const isNoteInNotebook = () => {
-      const currentScreen = useNavigationStore.getState().currentScreen;
-      if (item.type !== "note" || currentScreen.name !== "Notebook") return;
-
-      return !!db.relations
-        .to(item, "notebook")
-        .find((notebook) => notebook.id === currentScreen.id);
-    };
-
     function addTo() {
       clearSelection();
       setSelectedItem(item);
@@ -647,9 +513,9 @@ export const useActions = ({
     }
 
     async function addToFavorites() {
-      if (!item.id) return;
+      if (!item.id || item.type !== "note") return;
       close();
-      await db.notes.note(item.id)?.favorite();
+      await db.notes.favorite(item.favorite, item.id);
       Navigation.queueRoutesForUpdate();
     }
 
@@ -727,7 +593,7 @@ export const useActions = ({
         });
         return;
       }
-      PublishNoteSheet.present(item);
+      PublishNoteSheet.present(item as Note);
     }
 
     async function shareNote() {
@@ -788,7 +654,7 @@ export const useActions = ({
       }
       try {
         await db.vault.add(item.id);
-        const note = db.notes.note(item.id)?.data;
+        const note = await db.notes.note(item.id);
         if (note?.locked) {
           close();
           Navigation.queueRoutesForUpdate();
@@ -872,7 +738,7 @@ export const useActions = ({
       {
         id: "remove-from-notebook",
         title: "Remove from notebook",
-        hidden: !isNoteInNotebook(),
+        hidden: noteInCurrentNotebook,
         icon: "minus-circle-outline",
         func: removeNoteFromNotebook
       },
@@ -889,13 +755,6 @@ export const useActions = ({
         func: openHistory
       },
 
-      {
-        id: "remove-from-topic",
-        title: "Remove from topic",
-        hidden: !isNoteInTopic(),
-        icon: "minus-circle-outline",
-        func: removeNoteFromTopic
-      },
       {
         id: "reminders",
         title: "Reminders",
@@ -1006,6 +865,17 @@ export const useActions = ({
       }
     );
   }
+
+  useEffect(() => {
+    const currentScreen = useNavigationStore.getState().currentScreen;
+    if (item.type !== "note" || currentScreen.name !== "Notebook") return;
+    !!db.relations
+      .to(item, "notebook")
+      .selector.find((v) => v("id", "==", currentScreen.id))
+      .then((notebook) => {
+        setNoteInCurrentNotebook(!!notebook);
+      });
+  }, []);
 
   return actions;
 };

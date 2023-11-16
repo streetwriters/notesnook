@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createContext, useContext } from "react";
 
 export const SelectionContext = createContext({
-  toggleSelection: (item) => null,
-  deselect: (item) => null,
-  select: (item) => null,
-  deselectAll: () => null
+  toggleSelection: (item) => {},
+  deselect: (item) => {},
+  select: (item) => {},
+  deselectAll: () => {}
 });
 export const SelectionProvider = SelectionContext.Provider;
 export const useSelectionContext = () => useContext(SelectionContext);
