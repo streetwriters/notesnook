@@ -174,3 +174,36 @@ function textInputRule(config: {
     }
   });
 }
+
+export function replaceDateTime(
+  value: string,
+  dateFormat = "DD-MM-YYYY",
+  timeFormat: "12-hour" | "24-hour" = "12-hour"
+) {
+  value = value.replaceAll(
+    "/time ",
+    formatDate(Date.now(), {
+      timeFormat,
+      type: "time"
+    }) + " "
+  );
+
+  value = value.replaceAll(
+    "/date ",
+    formatDate(Date.now(), {
+      dateFormat,
+      type: "date"
+    }) + " "
+  );
+
+  value = value.replaceAll(
+    "/now ",
+    formatDate(Date.now(), {
+      dateFormat,
+      timeFormat,
+      type: "date-time"
+    }) + " "
+  );
+
+  return value;
+}

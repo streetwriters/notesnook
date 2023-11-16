@@ -26,6 +26,8 @@ import useTablet from "../../hooks/use-tablet";
 import { useEditorConfig } from "./context";
 import { getFontById } from "@notesnook/editor";
 import { AppEventManager, AppEvents } from "../../common/app-events";
+import { replaceDateTime } from "@notesnook/editor/dist/extensions/date-time";
+import { useStore as useSettingsStore } from "../../stores/setting-store";
 
 type TitleBoxProps = {
   readonly: boolean;
@@ -38,6 +40,9 @@ function TitleBox(props: TitleBoxProps) {
   const isMobile = useMobile();
   const isTablet = useTablet();
   const { editorConfig } = useEditorConfig();
+  const dateFormat = useSettingsStore((store) => store.dateFormat);
+  const timeFormat = useSettingsStore((store) => store.timeFormat);
+
   const fontFamily = useMemo(
     () => getFontById(editorConfig.fontFamily)?.font || "heading",
     [editorConfig.fontFamily]
@@ -111,6 +116,11 @@ function TitleBox(props: TitleBoxProps) {
       }}
       onChange={(e) => {
         const { sessionId, id } = store.get().session;
+        e.target.value = replaceDateTime(
+          e.target.value,
+          dateFormat,
+          timeFormat
+        );
         debouncedOnTitleChange(sessionId, id, e.target.value);
         updateFontSize(e.target.value.length);
       }}

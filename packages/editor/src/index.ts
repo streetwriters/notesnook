@@ -308,6 +308,8 @@ const useTiptap = (
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.portalProviderAPI = PortalProviderAPI;
+        editor.storage.dateFormat = dateFormat;
+        editor.storage.timeFormat = timeFormat;
         if (onBeforeCreate) onBeforeCreate({ editor });
       },
       injectCSS: false,

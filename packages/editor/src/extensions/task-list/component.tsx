@@ -31,6 +31,7 @@ import { ReactNodeViewProps } from "../react";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes, TaskListNode } from "./task-list";
 import { countCheckedItems, deleteCheckedItems, sortList } from "./utils";
+import { replaceDateTime } from "../date-time";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
@@ -133,6 +134,11 @@ export function TaskListComponent(
             }}
             placeholder="Untitled"
             onChange={(e) => {
+              e.target.value = replaceDateTime(
+                e.target.value,
+                editor.current?.storage.dateFormat,
+                editor.current?.storage.timeFormat
+              );
               updateAttributes(
                 { title: e.target.value },
                 { addToHistory: true, preventUpdate: false }
