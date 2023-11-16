@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Tags } from "@notesnook/core/dist/collections/tags";
-import { GroupedItems, Note, Tag } from "@notesnook/core/dist/types";
+import { Note, Tag, isGroupHeader } from "@notesnook/core/dist/types";
 import { useThemeColors } from "@notesnook/theme";
 import React, {
   RefObject,
@@ -42,9 +42,16 @@ import Input from "../../ui/input";
 import { PressableButton } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { VirtualizedGrouping } from "@notesnook/core";
 
-function ungroup(items: GroupedItems<Tag>) {
-  return items.filter((item) => item.type !== "header") as Tag[];
+function tagHasSomeNotes(tagId: string, noteIds: string[]) {
+  return db.relations.from({ type: "tag", id: tagId }, "note").has(...noteIds);
+}
+
+function tagHasAllNotes(tagId: string, noteIds: string[]) {
+  return db.relations
+    .from({ type: "tag", id: tagId }, "note")
+    .hasAll(...noteIds);
 }
 
 const ManageTagsSheet = (props: {
@@ -53,49 +60,18 @@ const ManageTagsSheet = (props: {
 }) => {
   const { colors } = useThemeColors();
   const notes = useMemo(() => props.notes || [], [props.notes]);
-  const allTags = useTagStore((state) => ungroup(state.tags));
-  const [tags, setTags] = useState<Tag[]>([]);
+  const tags = useTagStore((state) => state.tags);
+
   const [query, setQuery] = useState<string>();
   const inputRef = useRef<TextInput>(null);
   const [focus, setFocus] = useState(false);
+  const [queryExists, setQueryExists] = useState(false);
 
-  const sortTags = useCallback(() => {
-    let _tags = db.tags.all;
-
-    _tags = _tags.sort((a, b) => a.title.localeCompare(b.title));
-    if (query) {
-      _tags = db.lookup.tags(_tags, query) as Tag[];
-    }
-    let tagsMerged = notes
-      .map((note) => db.relations.to(note, "tag").resolved())
-      .flat();
-    // Get unique tags and remove duplicates
-    tagsMerged = [
-      ...new Map(tagsMerged.map((item) => [item.id, item])).values()
-    ];
-
-    if (!tagsMerged || !tagsMerged.length) {
-      setTags(_tags);
-      return;
-    }
-
-    let noteTags = [];
-    for (const tag of tagsMerged) {
-      const index = _tags.findIndex((t) => t.id === tag.id);
-      if (index !== -1) {
-        noteTags.push(_tags[index]);
-        _tags.splice(index, 1);
-      }
-    }
-    noteTags = noteTags.sort((a, b) => a.title.localeCompare(b.title));
-    const combinedTags = [...noteTags, ..._tags];
-
-    setTags(combinedTags);
-  }, [notes, query]);
-
-  // useEffect(() => {
-  //   sortTags();
-  // }, [allTags.length]);
+  const checkQueryExists = (query: string) => {
+    db.tags.all
+      .find((v) => v.and([v(`title`, "==", query)]))
+      .then((exists) => setQueryExists(!!exists));
+  };
 
   const onSubmit = async () => {
     if (!query || query === "" || query.trimStart().length == 0) {
@@ -109,29 +85,35 @@ const ManageTagsSheet = (props: {
 
     const tag = query;
     setQuery(undefined);
-
     inputRef.current?.setNativeProps({
       text: ""
     });
+
     try {
-      const exists = db.tags.all.filter((t: Tag) => t.title === tag);
-      const id = exists.length
-        ? exists[0]?.id
+      const exists = await db.tags.all.find((v) =>
+        v.and([v(`title`, "==", tag)])
+      );
+
+      const id = exists
+        ? exists?.id
         : await db.tags.add({
             title: tag
           });
 
-      const createdTag = db.tags.tag(id);
-      if (createdTag) {
+      if (id) {
         for (const note of notes) {
-          await db.relations.add(createdTag, note);
+          await db.relations.add(
+            {
+              id: id,
+              type: "tag"
+            },
+            note
+          );
         }
       }
+
       useRelationStore.getState().update();
       useTagStore.getState().setTags();
-      setTimeout(() => {
-        sortTags();
-      });
     } catch (e) {
       ToastManager.show({
         heading: "Cannot add tag",
@@ -165,9 +147,7 @@ const ManageTagsSheet = (props: {
         autoCapitalize="none"
         onChangeText={(v) => {
           setQuery(Tags.sanitize(v));
-          setTimeout(() => {
-            sortTags();
-          });
+          checkQueryExists(Tags.sanitize(v));
         }}
         onFocusInput={() => {
           setFocus(true);
@@ -187,7 +167,7 @@ const ManageTagsSheet = (props: {
         keyboardDismissMode="none"
         keyboardShouldPersistTaps="always"
       >
-        {query && query !== tags[0]?.title ? (
+        {query && !queryExists ? (
           <PressableButton
             key={"query_item"}
             customStyle={{
@@ -205,7 +185,7 @@ const ManageTagsSheet = (props: {
             <Icon name="plus" color={colors.selected.icon} size={SIZE.lg} />
           </PressableButton>
         ) : null}
-        {!allTags || allTags.length === 0 ? (
+        {!tags || tags.ids.length === 0 ? (
           <View
             style={{
               width: "100%",
@@ -226,9 +206,16 @@ const ManageTagsSheet = (props: {
           </View>
         ) : null}
 
-        {tags.map((item) => (
-          <TagItem key={item.id} tag={item} notes={notes} />
-        ))}
+        {tags?.ids
+          .filter((id) => !isGroupHeader(id))
+          .map((item) => (
+            <TagItem
+              key={item as string}
+              tags={tags}
+              id={item as string}
+              notes={notes}
+            />
+          ))}
       </ScrollView>
     </View>
   );
@@ -244,24 +231,56 @@ ManageTagsSheet.present = (notes?: Note[]) => {
 
 export default ManageTagsSheet;
 
-const TagItem = ({ tag, notes }: { tag: Tag; notes: Note[] }) => {
+const TagItem = ({
+  id,
+  notes,
+  tags
+}: {
+  id: string;
+  notes: Note[];
+  tags: VirtualizedGrouping<Tag>;
+}) => {
   const { colors } = useThemeColors();
+  const [tag, setTag] = useState<Tag>();
+  const [selection, setSelection] = useState({
+    all: false,
+    some: false
+  });
   const update = useRelationStore((state) => state.updater);
 
-  const someNotesTagged = notes.some((note) => {
-    const relations = db.relations.from(tag, "note");
-    return relations.findIndex((relation) => relation.to.id === note.id) > -1;
-  });
+  const refresh = useCallback(() => {
+    tags.item(id).then(async (tag) => {
+      if (tag?.id) {
+        setSelection({
+          all: await tagHasAllNotes(
+            tag.id,
+            notes.map((note) => note.id)
+          ),
+          some: await tagHasSomeNotes(
+            tag.id,
+            notes.map((note) => note.id)
+          )
+        });
+      }
+      setTag(tag);
+    });
+  }, [id, tags, notes]);
 
-  const allNotesTagged = notes.every((note) => {
-    const relations = db.relations.from(tag, "note");
-    return relations.findIndex((relation) => relation.to.id === note.id) > -1;
-  });
+  if (tag?.id !== id) {
+    refresh();
+  }
+
+  useEffect(() => {
+    if (tag?.id === id) {
+      refresh();
+    }
+  }, [id, refresh, tag?.id, update]);
 
   const onPress = async () => {
     for (const note of notes) {
       try {
-        if (someNotesTagged) {
+        if (!tag?.id) return;
+        if (selection.all) {
           await db.relations.unlink(tag, note);
         } else {
           await db.relations.add(tag, note);
@@ -275,6 +294,7 @@ const TagItem = ({ tag, notes }: { tag: Tag; notes: Note[] }) => {
     setTimeout(() => {
       Navigation.queueRoutesForUpdate();
     }, 1);
+    refresh();
   };
   return (
     <PressableButton
@@ -287,34 +307,48 @@ const TagItem = ({ tag, notes }: { tag: Tag; notes: Note[] }) => {
       onPress={onPress}
       type="gray"
     >
-      <IconButton
-        size={22}
-        customStyle={{
-          marginRight: 5,
-          width: 23,
-          height: 23
-        }}
-        color={
-          someNotesTagged || allNotesTagged
-            ? colors.selected.icon
-            : colors.primary.icon
-        }
-        testID={
-          allNotesTagged
-            ? "check-circle-outline"
-            : someNotesTagged
-            ? "minus-circle-outline"
-            : "checkbox-blank-circle-outline"
-        }
-        name={
-          allNotesTagged
-            ? "check-circle-outline"
-            : someNotesTagged
-            ? "minus-circle-outline"
-            : "checkbox-blank-circle-outline"
-        }
-      />
-      <Paragraph size={SIZE.sm}>{"#" + tag.title}</Paragraph>
+      {!tag ? null : (
+        <IconButton
+          size={22}
+          customStyle={{
+            marginRight: 5,
+            width: 23,
+            height: 23
+          }}
+          onPress={onPress}
+          color={
+            selection.some || selection.all
+              ? colors.selected.icon
+              : colors.primary.icon
+          }
+          testID={
+            selection.all
+              ? "check-circle-outline"
+              : selection.some
+              ? "minus-circle-outline"
+              : "checkbox-blank-circle-outline"
+          }
+          name={
+            selection.all
+              ? "check-circle-outline"
+              : selection.some
+              ? "minus-circle-outline"
+              : "checkbox-blank-circle-outline"
+          }
+        />
+      )}
+      {tag ? (
+        <Paragraph size={SIZE.sm}>{"#" + tag?.title}</Paragraph>
+      ) : (
+        <View
+          style={{
+            width: 200,
+            height: 30,
+            backgroundColor: colors.secondary.background,
+            borderRadius: 5
+          }}
+        />
+      )}
     </PressableButton>
   );
 };

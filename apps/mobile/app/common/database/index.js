@@ -23,9 +23,10 @@ import { Platform } from "react-native";
 import * as Gzip from "react-native-gzip";
 import EventSource from "../../utils/sse/even-source-ios";
 import AndroidEventSource from "../../utils/sse/event-source";
+import { SqliteAdapter, SqliteIntrospector, SqliteQueryCompiler } from "kysely";
 import filesystem from "../filesystem";
-
 import Storage from "./storage";
+import { RNSqliteDriver } from "./sqlite.kysely";
 
 database.host(
   __DEV__
@@ -57,6 +58,21 @@ database.setup({
   compressor: {
     compress: Gzip.deflate,
     decompress: Gzip.inflate
+  },
+  batchSize: 500,
+  sqliteOptions: {
+    dialect: {
+      createDriver: () =>
+        new RNSqliteDriver({ async: true, dbName: "test.db" }),
+      createAdapter: () => new SqliteAdapter(),
+      createIntrospector: (db) => new SqliteIntrospector(db),
+      createQueryCompiler: () => new SqliteQueryCompiler()
+    }
+    // journalMode: "MEMORY",
+    // synchronous: "normal",
+    // pageSize: 8192,
+    // cacheSize: -16000,
+    // lockingMode: "exclusive"
   }
 });
 

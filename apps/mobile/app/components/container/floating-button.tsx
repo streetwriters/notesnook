@@ -119,7 +119,7 @@ const FloatingButton = ({
       <PressableButton
         testID={notesnook.buttons.add}
         type="accent"
-        accentColor={colors.static[color as keyof typeof colors.static]}
+        accentColor={color}
         customStyle={{
           ...getElevationStyle(5),
           borderRadius: 100

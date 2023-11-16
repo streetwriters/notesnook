@@ -225,7 +225,7 @@ async function run(progress, context) {
       progress && eSendEvent(eCloseSheet);
     }
 
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Backup successful",
       message: "Your backup is stored in Notesnook folder on your phone.",
       type: "success",
@@ -236,7 +236,7 @@ async function run(progress, context) {
   } catch (e) {
     await sleep(300);
     progress && eSendEvent(eCloseSheet);
-    ToastEvent.error(e, "Backup failed!");
+    ToastManager.error(e, "Backup failed!");
     return null;
   }
 }

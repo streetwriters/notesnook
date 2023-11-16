@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { DefaultColors } from "@notesnook/core/dist/collections/colors";
-import { Note } from "@notesnook/core/dist/types";
+import { Color, ItemReference, Note } from "@notesnook/core/dist/types";
 import { useThemeColors } from "@notesnook/theme";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
@@ -40,16 +40,15 @@ export const ColorTags = ({ item }: { item: Note }) => {
   const isTablet = useSettingStore((state) => state.deviceMode) !== "mobile";
   const updater = useRelationStore((state) => state.updater);
 
-  const getColorInfo = (colorCode: string) => {
-    const dbColor = db.colors.all.find((v) => v.colorCode === colorCode);
+  const getColorInfo = async (colorCode: string) => {
+    const dbColor = await db.colors.all.find((v) =>
+      v.and([v(`colorCode`, "==", colorCode)])
+    );
     let isLinked = false;
 
     if (dbColor) {
-      const note = db.relations
-        .from(dbColor, "note")
-        .find((relation) => relation.to.id === item.id);
-
-      if (note) {
+      const hasRelation = await db.relations.from(dbColor, "note").has(item.id);
+      if (hasRelation) {
         isLinked = true;
       }
     }
@@ -60,36 +59,16 @@ export const ColorTags = ({ item }: { item: Note }) => {
     };
   };
 
-  const changeColor = async (color: string) => {
-    const colorInfo = getColorInfo(DefaultColors[color]);
-
-    if (colorInfo.item) {
-      if (colorInfo.linked) {
-        await db.relations.unlink(colorInfo.item, item);
-      } else {
-        await db.relations.add(colorInfo.item, item);
-      }
-    } else {
-      const colorId = await db.colors.add({
-        title: color,
-        colorCode: DefaultColors[color]
-      });
-
-      const dbColor = db.colors.color(colorId);
-      if (dbColor) {
-        await db.relations.add(dbColor, item);
-      }
-    }
-
-    useRelationStore.getState().update();
-    setColorNotes();
-    Navigation.queueRoutesForUpdate();
-    eSendEvent(refreshNotesPage);
-  };
-
-  const _renderColor = (name: keyof typeof DefaultColors) => {
+  const ColorItem = ({ name }: { name: keyof typeof DefaultColors }) => {
     const color = DefaultColors[name];
-    const colorInfo = getColorInfo(color);
+    const [colorInfo, setColorInfo] = useState<{
+      linked: boolean;
+      item: Color | undefined;
+    }>();
+
+    useEffect(() => {
+      getColorInfo(color).then((info) => setColorInfo(info));
+    }, [color]);
 
     return (
       <PressableButton
@@ -108,11 +87,38 @@ export const ColorTags = ({ item }: { item: Note }) => {
           marginRight: isTablet ? 10 : undefined
         }}
       >
-        {colorInfo.linked ? (
+        {colorInfo?.linked ? (
           <Icon testID="icon-check" name="check" color="white" size={SIZE.lg} />
         ) : null}
       </PressableButton>
     );
+  };
+
+  const changeColor = async (color: string) => {
+    const colorInfo = await getColorInfo(DefaultColors[color]);
+
+    if (colorInfo.item) {
+      if (colorInfo.linked) {
+        await db.relations.unlink(colorInfo.item, item);
+      } else {
+        await db.relations.add(colorInfo.item, item);
+      }
+    } else {
+      const colorId = await db.colors.add({
+        title: color,
+        colorCode: DefaultColors[color]
+      });
+
+      const dbColor = await db.colors.color(colorId);
+      if (dbColor) {
+        await db.relations.add(dbColor as unknown as ItemReference, item);
+      }
+    }
+
+    useRelationStore.getState().update();
+    setColorNotes();
+    Navigation.queueRoutesForUpdate();
+    eSendEvent(refreshNotesPage);
   };
 
   return (
@@ -127,7 +133,9 @@ export const ColorTags = ({ item }: { item: Note }) => {
         justifyContent: isTablet ? "center" : "space-between"
       }}
     >
-      {Object.keys(DefaultColors).map(_renderColor)}
+      {Object.keys(DefaultColors).map((name: keyof typeof DefaultColors) => {
+        return <ColorItem key={name} name={name} />;
+      })}
     </View>
   );
 };

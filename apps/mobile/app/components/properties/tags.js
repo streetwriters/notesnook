@@ -27,6 +27,7 @@ import { sleep } from "../../utils/time";
 import ManageTagsSheet from "../sheets/manage-tags";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
+
 export const Tags = ({ item, close }) => {
   const { colors } = useThemeColors();
 

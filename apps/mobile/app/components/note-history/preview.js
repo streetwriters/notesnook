@@ -35,6 +35,11 @@ import { presentDialog } from "../dialog/functions";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
 
+/**
+ *
+ * @param {any} param0
+ * @returns
+ */
 export default function NotePreview({ session, content, note }) {
   const { colors } = useThemeColors();
   const editorId = ":noteHistory";

@@ -17,23 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import dayjs from "dayjs";
-import React, { RefObject } from "react";
+import React, { RefObject, useEffect, useState } from "react";
 import { View } from "react-native";
 import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
+import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import {
   presentSheet,
   PresentSheetOptions
 } from "../../../services/event-manager";
-import Notifications, { Reminder } from "../../../services/notifications";
+import Notifications from "../../../services/notifications";
 import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
-import { ItemReference } from "../../../utils/types";
 import List from "../../list";
 import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import {
+  Reminder,
+  ItemReference,
+  VirtualizedGrouping,
+  Note
+} from "@notesnook/core";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -48,7 +54,16 @@ export default function ReminderNotify({
   reminder
 }: ReminderSheetProps) {
   const { colors } = useThemeColors();
-  const references = db.relations?.to(reminder as ItemReference, "note") || [];
+  const [references, setReferences] = useState<VirtualizedGrouping<Note>>();
+
+  useEffect(() => {
+    db.relations
+      ?.to(reminder as ItemReference, "note")
+      .selector.grouped(db.settings.getGroupOptions("notes"))
+      .then((items) => {
+        setReferences(items);
+      });
+  }, [reminder]);
 
   const QuickActions = [
     {
@@ -76,7 +91,7 @@ export default function ReminderNotify({
       snoozeUntil: snoozeTime
     });
     await Notifications.scheduleNotification(
-      db.reminders?.reminder(reminder?.id)
+      await db.reminders?.reminder(reminder?.id as string)
     );
     close?.();
   };
@@ -135,12 +150,14 @@ export default function ReminderNotify({
         })}
       </ScrollView>
 
-      {references.length > 0 ? (
+      {references?.ids && references?.ids?.length > 0 ? (
         <View
           style={{
             width: "100%",
             height:
-              160 * references?.length < 500 ? 160 * references?.length : 500,
+              160 * references?.ids?.length < 500
+                ? 160 * references?.ids?.length
+                : 500,
             borderTopWidth: 1,
             borderTopColor: colors.secondary.background,
             marginTop: 5,
@@ -157,14 +174,11 @@ export default function ReminderNotify({
             REFERENCED IN
           </Paragraph>
           <List
-            listData={references}
+            data={references}
+            CustomListComponent={FlashList}
             loading={false}
-            type="notes"
-            headerProps={null}
-            isSheet={true}
-            onMomentumScrollEnd={() =>
-              actionSheetRef.current?.handleChildScrollEnd()
-            }
+            dataType="note"
+            isRenderedInActionSheet={true}
           />
         </View>
       ) : null}

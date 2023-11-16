@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Color, GroupedItems, Item, Topic } from "@notesnook/core/dist/types";
+import {
+  Color,
+  GroupedItems,
+  Item,
+  Note,
+  Topic
+} from "@notesnook/core/dist/types";
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
@@ -48,12 +54,14 @@ import {
   setOnFirstSave,
   toCamelCase
 } from "./common";
+import { PlaceholderData } from "../../components/list/empty";
+import { VirtualizedGrouping } from "@notesnook/core";
 export const WARNING_DATA = {
   title: "Some notes in this topic are not synced"
 };
 
 export const PLACEHOLDER_DATA = {
-  heading: "Your notes",
+  title: "Your notes",
   paragraph: "You have not added any notes yet.",
   button: "Add your first Note",
   action: openEditor,
@@ -71,8 +79,11 @@ export const MONOGRAPH_PLACEHOLDER_DATA = {
 };
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
-  get: (params: NotesScreenParams, grouped?: boolean) => GroupedItems<Item>;
-  placeholderData: unknown;
+  get: (
+    params: NotesScreenParams,
+    grouped?: boolean
+  ) => Promise<VirtualizedGrouping<Note> | Note[]>;
+  placeholder: PlaceholderData;
   onPressFloatingButton: () => void;
   focusControl?: boolean;
   canGoBack?: boolean;
@@ -91,7 +102,7 @@ const NotesPage = ({
   route,
   navigation,
   get,
-  placeholderData,
+  placeholder,
   onPressFloatingButton,
   focusControl = true,
   rightButtons
@@ -99,17 +110,19 @@ const NotesPage = ({
   "NotesPage" | "TaggedNotes" | "Monographs" | "ColoredNotes" | "TopicNotes"
 >) => {
   const params = useRef<NotesScreenParams>(route?.params);
-  const [notes, setNotes] = useState(get(route.params, true));
+
+  const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
+
   const loading = useNoteStore((state) => state.loading);
-  const [loadingNotes, setLoadingNotes] = useState(false);
+  const [loadingNotes, setLoadingNotes] = useState(true);
   const isMonograph = route.name === "Monographs";
 
-  const notebook =
-    route.name === "TopicNotes" &&
-    params.current.item.type === "topic" &&
-    params.current.item.notebookId
-      ? db.notebooks?.notebook((params.current.item as Topic).notebookId)?.data
-      : null;
+  // const notebook =
+  //   route.name === "TopicNotes" &&
+  //   params.current.item.type === "topic" &&
+  //   params.current.item.notebookId
+  //     ? db.notebooks?.notebook((params.current.item as Topic).notebookId)?.data
+  //     : null;
 
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
@@ -176,7 +189,7 @@ const NotesPage = ({
   ]);
 
   const onRequestUpdate = React.useCallback(
-    (data?: NotesScreenParams) => {
+    async (data?: NotesScreenParams) => {
       const isNew = data && data?.item?.id !== params.current?.item?.id;
       if (data) params.current = data;
       params.current.title =
@@ -185,15 +198,19 @@ const NotesPage = ({
       const { item } = params.current;
       try {
         if (isNew) setLoadingNotes(true);
-        const notes = get(params.current, true);
+        const notes = (await get(
+          params.current,
+          true
+        )) as VirtualizedGrouping<Note>;
+
         if (
           ((item.type === "tag" || item.type === "color") &&
-            (!notes || notes.length === 0)) ||
+            (!notes || notes.ids.length === 0)) ||
           (item.type === "topic" && !notes)
         ) {
           return Navigation.goBack();
         }
-        if (notes.length === 0) setLoadingNotes(false);
+        if (notes.ids.length === 0) setLoadingNotes(false);
         setNotes(notes);
         syncWithNavigation();
       } catch (e) {
@@ -204,10 +221,18 @@ const NotesPage = ({
   );
 
   useEffect(() => {
-    if (loadingNotes) {
-      setTimeout(() => setLoadingNotes(false), 50);
+    if (loadingNotes && !loading) {
+      get(params.current, true)
+        .then((items) => {
+          setNotes(items as VirtualizedGrouping<Note>);
+          setLoadingNotes(false);
+        })
+        .catch((e) => {
+          console.log("Error loading notes", params.current?.title, e, e.stack);
+          setLoadingNotes(false);
+        });
     }
-  }, [loadingNotes, notes]);
+  }, [loadingNotes, loading, get]);
 
   useEffect(() => {
     eSubscribeEvent(route.name, onRequestUpdate);
@@ -221,20 +246,18 @@ const NotesPage = ({
     <DelayLayout
       color={
         route.name === "ColoredNotes"
-          ? (params.current?.item as Color).title.toLowerCase()
+          ? (params.current?.item as Color)?.colorCode
           : undefined
       }
       wait={loading || loadingNotes}
     >
-      {route.name === "TopicNotes" ? (
+      {/* {route.name === "TopicNotes" ? (
         <View
           style={{
             width: "100%",
             paddingHorizontal: 12,
             flexDirection: "row",
             alignItems: "center"
-            // borderBottomWidth: 1,
-            // borderBottomColor: colors.secondary.background
           }}
         >
           <Paragraph
@@ -266,27 +289,33 @@ const NotesPage = ({
             </>
           ) : null}
         </View>
-      ) : null}
+      ) : null} */}
       <List
-        listData={notes}
-        type="notes"
-        refreshCallback={onRequestUpdate}
+        data={notes}
+        dataType="note"
+        onRefresh={onRequestUpdate}
         loading={loading || !isFocused}
-        screen="Notes"
-        headerProps={{
-          heading: params.current.title,
-          color:
-            route.name === "ColoredNotes"
-              ? (params.current?.item as Color).title.toLowerCase()
-              : null
-        }}
-        placeholderData={placeholderData}
+        renderedInRoute="Notes"
+        headerTitle={params.current.title}
+        customAccentColor={
+          route.name === "ColoredNotes"
+            ? (params.current?.item as Color)?.colorCode
+            : undefined
+        }
+        placeholder={placeholder}
       />
 
       {!isMonograph &&
-      route.name !== "TopicNotes" &&
-      (notes?.length > 0 || isFocused) ? (
-        <FloatingButton title="Create a note" onPress={onPressFloatingButton} />
+      ((notes?.ids && (notes?.ids?.length || 0) > 0) || isFocused) ? (
+        <FloatingButton
+          color={
+            route.name === "ColoredNotes"
+              ? (params.current?.item as Color)?.colorCode
+              : undefined
+          }
+          title="Create a note"
+          onPress={onPressFloatingButton}
+        />
       ) : null}
     </DelayLayout>
   );

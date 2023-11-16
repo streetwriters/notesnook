@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
 import { db } from "../../common/database";
@@ -34,7 +33,7 @@ export const Monographs = ({
       navigation={navigation}
       route={route}
       get={Monographs.get}
-      placeholderData={PLACEHOLDER_DATA}
+      placeholder={PLACEHOLDER_DATA}
       onPressFloatingButton={openMonographsWebpage}
       canGoBack={route.params?.canGoBack}
       focusControl={true}
@@ -42,11 +41,12 @@ export const Monographs = ({
   );
 };
 
-Monographs.get = (params?: NotesScreenParams, grouped = true) => {
-  const notes = db.monographs?.all || [];
-  return grouped
-    ? groupArray(notes, db.settings.getGroupOptions("notes"))
-    : notes;
+Monographs.get = async (params?: NotesScreenParams, grouped = true) => {
+  if (!grouped) {
+    return await db.monographs.all.items();
+  }
+
+  return await db.monographs.all.grouped(db.settings.getGroupOptions("notes"));
 };
 
 Monographs.navigate = (item?: MonographType, canGoBack?: boolean) => {

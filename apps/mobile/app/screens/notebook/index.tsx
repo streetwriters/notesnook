@@ -16,8 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Note, Notebook, Topic } from "@notesnook/core/dist/types";
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
+import { VirtualizedGrouping } from "@notesnook/core";
+import { Note, Notebook } from "@notesnook/core/dist/types";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
 import DelayLayout from "../../components/delay-layout";
@@ -38,13 +38,9 @@ import { eOnNewTopicAdded } from "../../utils/events";
 import { openEditor, setOnFirstSave } from "../notes/common";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
-  const [notes, setNotes] = useState(
-    groupArray(
-      db.relations?.from(route.params.item, "note").resolved(),
-      db.settings.getGroupOptions("notes")
-    )
-  );
+  const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
   const params = useRef<NotebookScreenParams>(route?.params);
+  const [loading, setLoading] = useState(true);
 
   useNavigationFocus(navigation, {
     onFocus: () => {
@@ -77,21 +73,23 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   }, [route.name]);
 
   const onRequestUpdate = React.useCallback(
-    (data?: NotebookScreenParams) => {
+    async (data?: NotebookScreenParams) => {
       if (data) params.current = data;
       params.current.title = params.current.item.title;
       try {
-        const notebook = db.notebooks?.notebook(
+        const notebook = await db.notebooks?.notebook(
           params?.current?.item?.id
-        )?.data;
+        );
         if (notebook) {
           params.current.item = notebook;
-          const notes = db.relations?.from(notebook, "note").resolved();
           setNotes(
-            groupArray(notes || [], db.settings.getGroupOptions("notes"))
+            await db.relations
+              .from(notebook, "note")
+              .selector.grouped(db.settings.getGroupOptions("notes"))
           );
           syncWithNavigation();
         }
+        setLoading(false);
       } catch (e) {
         console.error(e);
       }
@@ -100,6 +98,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   );
 
   useEffect(() => {
+    onRequestUpdate();
     eSubscribeEvent(eOnNewTopicAdded, onRequestUpdate);
     return () => {
       eUnSubscribeEvent(eOnNewTopicAdded, onRequestUpdate);
@@ -113,37 +112,35 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   }, []);
 
   const prepareSearch = () => {
-    SearchService.update({
-      placeholder: `Search in "${params.current.title}"`,
-      type: "notes",
-      title: params.current.title,
-      get: () => {
-        const notebook = db.notebooks?.notebook(
-          params?.current?.item?.id
-        )?.data;
-        if (!notebook) return [];
-
-        const notes = db.relations?.from(notebook, "note") || [];
-        const topicNotes = db.notebooks
-          .notebook(notebook.id)
-          ?.topics.all.map((topic: Topic) => {
-            return db.notes?.topicReferences
-              .get(topic.id)
-              .map((id: string) => db.notes?.note(id)?.data);
-          })
-          .flat()
-          .filter(
-            (topicNote) =>
-              notes.findIndex((note) => note?.id !== topicNote?.id) === -1
-          ) as Note[];
-
-        return [...notes, ...topicNotes];
-      }
-    });
+    // SearchService.update({
+    //   placeholder: `Search in "${params.current.title}"`,
+    //   type: "notes",
+    //   title: params.current.title,
+    //   get: () => {
+    //     const notebook = db.notebooks?.notebook(
+    //       params?.current?.item?.id
+    //     )?.data;
+    //     if (!notebook) return [];
+    //     const notes = db.relations?.from(notebook, "note") || [];
+    //     const topicNotes = db.notebooks
+    //       .notebook(notebook.id)
+    //       ?.topics.all.map((topic: Topic) => {
+    //         return db.notes?.topicReferences
+    //           .get(topic.id)
+    //           .map((id: string) => db.notes?.note(id)?.data);
+    //       })
+    //       .flat()
+    //       .filter(
+    //         (topicNote) =>
+    //           notes.findIndex((note) => note?.id !== topicNote?.id) === -1
+    //       ) as Note[];
+    //     return [...notes, ...topicNotes];
+    //   }
+    // });
   };
 
   const PLACEHOLDER_DATA = {
-    heading: params.current.item?.title,
+    title: params.current.item?.title,
     paragraph: "You have not added any notes yet.",
     button: "Add your first note",
     action: openEditor,
@@ -154,32 +151,33 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
     <>
       <DelayLayout>
         <List
-          listData={notes}
-          type="notes"
-          refreshCallback={() => {
+          data={notes}
+          dataType="note"
+          onRefresh={() => {
             onRequestUpdate();
           }}
-          screen="Notebook"
-          headerProps={{
-            heading: params.current.title
-          }}
-          loading={false}
-          ListHeader={
+          renderedInRoute="Notebook"
+          headerTitle={params.current.title}
+          loading={loading}
+          CustomLisHeader={
             <NotebookHeader
               onEditNotebook={() => {
                 AddNotebookSheet.present(params.current.item);
               }}
               notebook={params.current.item}
+              totalNotes={
+                notes?.ids.filter((id) => typeof id === "string")?.length || 0
+              }
             />
           }
-          placeholderData={PLACEHOLDER_DATA}
+          placeholder={PLACEHOLDER_DATA}
         />
       </DelayLayout>
     </>
   );
 };
 
-NotebookScreen.navigate = (item: Notebook, canGoBack: boolean) => {
+NotebookScreen.navigate = (item: Notebook, canGoBack?: boolean) => {
   if (!item) return;
   Navigation.navigate<"Notebook">(
     {

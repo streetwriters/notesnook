@@ -137,7 +137,6 @@ class Database {
   transaction = (
     executor: (tr: Transaction<DatabaseSchema>) => void | Promise<void>
   ) => {
-    console.time("transaction");
     return this.transactionMutex.runExclusive(() =>
       this.sql()
         .transaction()
@@ -147,7 +146,6 @@ class Database {
           this._transaction = undefined;
         })
         .finally(() => {
-          console.timeEnd("transaction");
           this._transaction = undefined;
         })
     );

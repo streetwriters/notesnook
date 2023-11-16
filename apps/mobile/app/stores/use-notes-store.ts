@@ -17,43 +17,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
+import { Note, VirtualizedGrouping } from "@notesnook/core";
 import create, { State } from "zustand";
 import { db } from "../common/database";
-import { GroupedItems, Note } from "@notesnook/core/dist/types";
 
 export interface NoteStore extends State {
-  notes: GroupedItems<Note>;
+  notes: VirtualizedGrouping<Note> | undefined;
   loading: boolean;
   setLoading: (loading: boolean) => void;
-  setNotes: (items?: Note[]) => void;
+  setNotes: () => void;
   clearNotes: () => void;
 }
 
-export const useNoteStore = create<NoteStore>((set, get) => ({
-  notes: [],
+export const useNoteStore = create<NoteStore>((set) => ({
+  notes: undefined,
   loading: true,
   setLoading: (loading) => set({ loading: loading }),
-
-  setNotes: (items) => {
-    if (!items) {
+  setNotes: () => {
+    db.notes.all.grouped(db.settings.getGroupOptions("home")).then((notes) => {
       set({
-        notes: groupArray(
-          db.notes.all || [],
-          db.settings.getGroupOptions("home")
-        )
+        notes: notes
       });
-      return;
-    }
-    const prev = get().notes;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const index = prev.findIndex((v) => v.id === item.id);
-      if (index !== -1) {
-        prev[index] = item;
-      }
-    }
-    set({ notes: prev });
+    });
   },
-  clearNotes: () => set({ notes: [] })
+  clearNotes: () => set({ notes: undefined })
 }));

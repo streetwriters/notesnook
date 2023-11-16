@@ -53,23 +53,24 @@ export const DateMeta = ({ item }) => {
     return keys.filter((key) => key.startsWith("date") && key !== "date");
   }
 
-  const renderItem = (key) => (
-    <View
-      key={key}
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        paddingVertical: 3
-      }}
-    >
-      <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
-        {getNameFromKey(key)}
-      </Paragraph>
-      <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
-        {getFormattedDate(item[key], "date-time")}
-      </Paragraph>
-    </View>
-  );
+  const renderItem = (key) =>
+    !item[key] ? null : (
+      <View
+        key={key}
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          paddingVertical: 3
+        }}
+      >
+        <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+          {getNameFromKey(key)}
+        </Paragraph>
+        <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+          {getFormattedDate(item[key], "date-time")}
+        </Paragraph>
+      </View>
+    );
 
   return (
     <View

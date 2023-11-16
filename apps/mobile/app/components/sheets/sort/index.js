@@ -33,7 +33,7 @@ const Sort = ({ type, screen }) => {
   const isTopicSheet = screen === "TopicSheet";
   const { colors } = useThemeColors();
   const [groupOptions, setGroupOptions] = useState(
-    db.settings.getGroupOptions(type)
+    db.settings.getGroupOptions(screen === "Notes" ? "home" : type + "s")
   );
   const updateGroupOptions = async (_groupOptions) => {
     await db.settings.setGroupOptions(type, _groupOptions);

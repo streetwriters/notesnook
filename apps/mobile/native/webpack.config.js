@@ -186,6 +186,7 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+@trpc[/\\]react-query/,
             /node_modules(.*[/\\])+katex/,
             /node_modules(.*[/\\])+@notesnook[/\\]core/,
+            /node_modules(.*[/\\])+kysely/,
 
           ],
           use: {
@@ -202,6 +203,14 @@ module.exports = (env) => {
                 "react-native-reanimated/plugin",
                 "@babel/plugin-transform-named-capturing-groups-regex",
               ],
+              overrides: [
+                {
+                  test: '../node_modules/kysley',
+                  plugins: [
+                    ["@babel/plugin-transform-private-methods", { "loose": true }]
+                  ]
+                }
+              ]
             },
           },
         },

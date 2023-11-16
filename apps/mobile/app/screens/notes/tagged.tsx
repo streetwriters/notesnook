@@ -17,14 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
+import { Tag } from "@notesnook/core/dist/types";
 import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
 import { db } from "../../common/database";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { openEditor } from "./common";
-import { Tag } from "@notesnook/core/dist/types";
 export const TaggedNotes = ({
   navigation,
   route
@@ -34,7 +33,7 @@ export const TaggedNotes = ({
       navigation={navigation}
       route={route}
       get={TaggedNotes.get}
-      placeholderData={PLACEHOLDER_DATA}
+      placeholder={PLACEHOLDER_DATA}
       onPressFloatingButton={openEditor}
       canGoBack={route.params?.canGoBack}
       focusControl={true}
@@ -42,11 +41,14 @@ export const TaggedNotes = ({
   );
 };
 
-TaggedNotes.get = (params: NotesScreenParams, grouped = true) => {
-  const notes = db.relations.from(params.item, "note").resolved();
-  return grouped
-    ? groupArray(notes, db.settings.getGroupOptions("notes"))
-    : notes;
+TaggedNotes.get = async (params: NotesScreenParams, grouped = true) => {
+  if (!grouped) {
+    return await db.relations.from(params.item, "note").resolve();
+  }
+
+  return await db.relations
+    .from(params.item, "note")
+    .selector.grouped(db.settings.getGroupOptions("notes"));
 };
 
 TaggedNotes.navigate = (item: Tag, canGoBack?: boolean) => {

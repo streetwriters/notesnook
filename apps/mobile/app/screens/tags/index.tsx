@@ -36,13 +36,6 @@ const prepareSearch = () => {
   });
 };
 
-const PLACEHOLDER_DATA = {
-  heading: "Your tags",
-  paragraph: "You have not created any tags for your notes yet.",
-  button: null,
-  loading: "Loading your tags."
-};
-
 export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
   const tags = useTagStore((state) => state.tags);
   const isFocused = useNavigationFocus(navigation, {
@@ -65,14 +58,16 @@ export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
   return (
     <DelayLayout>
       <List
-        listData={tags}
-        type="tags"
-        headerProps={{
-          heading: "Tags"
-        }}
+        data={tags}
+        dataType="tag"
+        headerTitle="Tags"
         loading={!isFocused}
-        screen="Tags"
-        placeholderData={PLACEHOLDER_DATA}
+        renderedInRoute="Tags"
+        placeholder={{
+          title: "Your tags",
+          paragraph: "You have not created any tags for your notes yet.",
+          loading: "Loading your tags."
+        }}
       />
     </DelayLayout>
   );

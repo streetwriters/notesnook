@@ -23,10 +23,9 @@ import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
 import { db } from "../../common/database";
 import { MoveNotes } from "../../components/sheets/move-notes/movenote";
-import { eSendEvent } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { NotesScreenParams } from "../../stores/use-navigation-store";
-import { eOpenAddTopicDialog } from "../../utils/events";
+
 import { openEditor } from "./common";
 
 const headerRightButtons = (params: NotesScreenParams) => [
@@ -35,10 +34,10 @@ const headerRightButtons = (params: NotesScreenParams) => [
     onPress: () => {
       const { item } = params;
       if (item.type !== "topic") return;
-      eSendEvent(eOpenAddTopicDialog, {
-        notebookId: item.notebookId,
-        toEdit: item
-      });
+      // eSendEvent(eOpenAddTopicDialog, {
+      //   notebookId: item.notebookId,
+      //   toEdit: item
+      // });
     }
   },
   {

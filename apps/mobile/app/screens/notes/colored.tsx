@@ -34,7 +34,7 @@ export const ColoredNotes = ({
       navigation={navigation}
       route={route}
       get={ColoredNotes.get}
-      placeholderData={PLACEHOLDER_DATA}
+      placeholder={PLACEHOLDER_DATA}
       onPressFloatingButton={openEditor}
       canGoBack={route.params?.canGoBack}
       focusControl={true}
@@ -42,11 +42,14 @@ export const ColoredNotes = ({
   );
 };
 
-ColoredNotes.get = (params: NotesScreenParams, grouped = true) => {
-  const notes = db.relations.from(params.item, "note").resolved();
-  return grouped
-    ? groupArray(notes, db.settings.getGroupOptions("notes"))
-    : notes;
+ColoredNotes.get = async (params: NotesScreenParams, grouped = true) => {
+  if (!grouped) {
+    return await db.relations.from(params.item, "note").resolve();
+  }
+
+  return await db.relations
+    .from(params.item, "note")
+    .selector.grouped(db.settings.getGroupOptions("notes"));
 };
 
 ColoredNotes.navigate = (item: Color, canGoBack: boolean) => {

@@ -18,11 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
-  AttachmentsProgressEvent,
   EV,
   EVENTS,
   SYNC_CHECK_IDS,
-  SyncProgressEvent,
   SyncStatusEvent
 } from "@notesnook/core/dist/common";
 import notifee from "@notifee/react-native";
@@ -129,19 +127,19 @@ const onFileEncryptionProgress = ({
     .setEncryptionProgress(Math.round(progress / total));
 };
 
-const onDownloadingAttachmentProgress = (data) => {
+const onDownloadingAttachmentProgress = (data: any) => {
   useAttachmentStore.getState().setDownloading(data);
 };
 
-const onUploadingAttachmentProgress = (data) => {
+const onUploadingAttachmentProgress = (data: any) => {
   useAttachmentStore.getState().setUploading(data);
 };
 
-const onDownloadedAttachmentProgress = (data) => {
+const onDownloadedAttachmentProgress = (data: any) => {
   useAttachmentStore.getState().setDownloading(data);
 };
 
-const onUploadedAttachmentProgress = (data) => {
+const onUploadedAttachmentProgress = (data: any) => {
   useAttachmentStore.getState().setUploading(data);
 };
 
@@ -234,7 +232,7 @@ async function checkForShareExtensionLaunchedInBackground() {
 
     if (notesAddedFromIntent || shareExtensionOpened) {
       const id = useEditorStore.getState().currentEditingNote;
-      const note = id && db.notes.note(id)?.data;
+      const note = id && (await db.notes.note(id));
       eSendEvent("webview_reset");
       if (note) setTimeout(() => eSendEvent("loadingNote", note), 1);
       MMKV.removeItem("shareExtensionOpened");
@@ -247,7 +245,7 @@ async function checkForShareExtensionLaunchedInBackground() {
 async function saveEditorState() {
   if (editorState().currentlyEditing) {
     const id = useEditorStore.getState().currentEditingNote;
-    const note = id ? db.notes.note(id)?.data : undefined;
+    const note = id ? await db.notes.note(id) : undefined;
 
     if (note?.locked) return;
     const state = JSON.stringify({
@@ -514,7 +512,7 @@ export const useAppEvents = () => {
         }
       } else {
         const id = useEditorStore.getState().currentEditingNote;
-        const note = id ? db.notes.note(id)?.data : undefined;
+        const note = id ? await db.notes.note(id) : undefined;
         if (
           note?.locked &&
           SettingsService.get().appLockMode === "background"

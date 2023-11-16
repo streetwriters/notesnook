@@ -41,6 +41,7 @@ export type Message = {
   onPress: () => void;
   data: object;
   icon: string;
+  type?: string;
 };
 
 export type Action = {
@@ -93,7 +94,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     actionText: null,
     onPress: () => null,
     data: {},
-    icon: "account-outline"
+    icon: "account-outline",
+    type: ""
   },
   setMessage: (message) => {
     set({ message: { ...message } });

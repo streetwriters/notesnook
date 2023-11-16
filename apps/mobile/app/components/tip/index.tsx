@@ -28,6 +28,7 @@ import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
+
 export const Tip = ({
   tip,
   style,
@@ -39,7 +40,7 @@ export const Tip = ({
   tip: TTip;
   style?: ViewStyle;
   textStyle?: TextStyle;
-  neverShowAgain: boolean;
+  neverShowAgain?: boolean;
   noImage?: boolean;
   color?: string;
 }) => {
@@ -77,9 +78,10 @@ export const Tip = ({
             alignSelf: "flex-start",
             borderRadius: 100,
             borderWidth: 1,
-            borderColor:
-              colors.static[color as never] ||
-              (colors.primary[color as never] as string)
+            borderColor: color ? color : colors.primary.accent
+          }}
+          buttonType={{
+            text: color
           }}
         />
 

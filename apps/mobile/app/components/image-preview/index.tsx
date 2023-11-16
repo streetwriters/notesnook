@@ -42,7 +42,6 @@ const ImagePreview = () => {
 
   useEffect(() => {
     eSubscribeEvent("ImagePreview", open);
-
     return () => {
       eUnSubscribeEvent("ImagePreview", open);
     };

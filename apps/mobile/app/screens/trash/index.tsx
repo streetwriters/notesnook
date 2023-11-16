@@ -61,7 +61,7 @@ const onPressFloatingButton = () => {
   });
 };
 const PLACEHOLDER_DATA = (trashCleanupInterval = 7) => ({
-  heading: "Trash",
+  title: "Trash",
   paragraph:
     trashCleanupInterval === -1
       ? "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
@@ -70,7 +70,6 @@ const PLACEHOLDER_DATA = (trashCleanupInterval = 7) => ({
             ? "daily."
             : `after ${trashCleanupInterval} days.`
         }`,
-  button: null,
   loading: "Loading trash items"
 });
 
@@ -85,7 +84,10 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
       useNavigationStore.getState().update({
         name: route.name
       });
-      if (useTrashStore.getState().trash.length === 0) {
+      if (
+        !useTrashStore.getState().trash ||
+        useTrashStore.getState().trash?.ids?.length === 0
+      ) {
         useTrashStore.getState().setTrash();
       }
       SearchService.prepareSearch = prepareSearch;
@@ -97,24 +99,15 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
   return (
     <DelayLayout>
       <List
-        listData={trash}
-        type="trash"
-        screen="Trash"
+        data={trash}
+        dataType="trash"
+        renderedInRoute="Trash"
         loading={!isFocused}
-        placeholderData={PLACEHOLDER_DATA(
-          db.settings.getTrashCleanupInterval()
-        )}
-        headerProps={{
-          heading: "Trash",
-          color: null
-        }}
-        // TODO: remove these once we have full typings everywhere
-        ListHeader={undefined}
-        refreshCallback={undefined}
-        warning={undefined}
+        placeholder={PLACEHOLDER_DATA(db.settings.getTrashCleanupInterval())}
+        headerTitle="Trash"
       />
 
-      {trash && trash.length !== 0 ? (
+      {trash && trash?.ids?.length !== 0 ? (
         <FloatingButton
           title="Clear all trash"
           onPress={onPressFloatingButton}

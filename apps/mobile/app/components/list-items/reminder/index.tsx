@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import { notesnook } from "../../../../e2e/test.ids";
-import type { Reminder } from "../../../services/notifications";
 import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
@@ -30,6 +29,7 @@ import SelectionWrapper from "../selection-wrapper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ReminderSheet from "../../sheets/reminder";
 import { ReminderTime } from "../../ui/reminder-time";
+import { Reminder } from "@notesnook/core";
 
 const ReminderItem = React.memo(
   ({
@@ -131,7 +131,11 @@ const ReminderItem = React.memo(
                   height: 30
                 }}
               >
-                <Icon name="reload" size={SIZE.md} color={colors.primary.accent} />
+                <Icon
+                  name="reload"
+                  size={SIZE.md}
+                  color={colors.primary.accent}
+                />
                 <Paragraph
                   size={SIZE.xs}
                   color={colors.secondary.paragraph}

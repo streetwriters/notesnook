@@ -39,14 +39,6 @@ const prepareSearch = () => {
   });
 };
 
-const PLACEHOLDER_DATA = {
-  heading: "Notes",
-  paragraph: "You have not added any notes yet.",
-  button: "Add your first note",
-  action: openEditor,
-  loading: "Loading your notes"
-};
-
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const notes = useNoteStore((state) => state.notes);
   const loading = useNoteStore((state) => state.loading);
@@ -66,19 +58,23 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
     onBlur: () => false,
     delay: SettingsService.get().homepage === route.name ? 1 : -1
   });
+
   return (
     <DelayLayout wait={loading} delay={500}>
       <List
-        listData={notes}
-        type="notes"
-        screen="Home"
+        data={notes}
+        dataType="note"
+        renderedInRoute="Notes"
         loading={loading || !isFocused}
-        headerProps={{
-          heading: "Notes"
+        headerTitle="Notes"
+        placeholder={{
+          title: "Notes",
+          paragraph: "You have not added any notes yet.",
+          button: "Add your first note",
+          action: openEditor,
+          loading: "Loading your notes"
         }}
-        placeholderData={PLACEHOLDER_DATA}
       />
-
       <FloatingButton title="Create a new note" onPress={openEditor} />
     </DelayLayout>
   );

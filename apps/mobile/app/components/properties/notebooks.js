@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
@@ -39,38 +39,20 @@ import { eClearEditor } from "../../utils/events";
 export default function Notebooks({ note, close, full }) {
   const { colors } = useThemeColors();
   const notebooks = useNotebookStore((state) => state.notebooks);
-  function getNotebooks(item) {
+  async function getNotebooks(item) {
     let filteredNotebooks = [];
-    const relations = db.relations.to(note, "notebook");
-    filteredNotebooks.push(
-      ...relations.map((notebook) => ({
-        ...notebook,
-        topics: []
-      }))
-    );
-    if (!item.notebooks || item.notebooks.length < 1) return filteredNotebooks;
+    const relations = await db.relations.to(note, "notebook").resolve();
 
-    for (let notebookReference of item.notebooks) {
-      let notebook = {
-        ...(notebooks.find((item) => item.id === notebookReference.id) || {})
-      };
-      if (notebook.id) {
-        notebook.topics = notebook.topics.filter((topic) => {
-          return notebookReference.topics.findIndex((t) => t === topic.id) > -1;
-        });
-        const index = filteredNotebooks.findIndex(
-          (item) => item.id === notebook.id
-        );
-        if (index > -1) {
-          filteredNotebooks[index].topics = notebook.topics;
-        } else {
-          filteredNotebooks.push(notebook);
-        }
-      }
-    }
+    filteredNotebooks.push(relations);
+
+    if (!item.notebooks || item.notebooks.length < 1) return filteredNotebooks;
     return filteredNotebooks;
   }
-  const noteNotebooks = getNotebooks(note);
+  const [noteNotebooks, setNoteNotebooks] = useState([]);
+
+  useEffect(() => {
+    getNotebooks().then((notebooks) => setNoteNotebooks(notebooks));
+  });
 
   const navigateNotebook = (id) => {
     let item = db.notebooks.notebook(id)?.data;
