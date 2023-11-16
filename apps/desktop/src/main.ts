@@ -142,7 +142,6 @@ app.once("ready", async () => {
 });
 
 app.once("window-all-closed", () => {
-  console.log("cross button is pressed");
   if (process.platform !== "darwin" || MAC_APP_STORE) {
     app.quit();
   }
