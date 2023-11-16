@@ -237,7 +237,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
     await db.backup.import(backup, password);
     await db.initCollections();
     initialize();
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Backup restored successfully.",
       type: "success",
       context: "global"
@@ -246,7 +246,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   };
 
   const backupError = (e) => {
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Restore failed",
       message:
         e.message ||
@@ -303,7 +303,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
       initialize();
       setRestoring(false);
       close();
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Backup restored successfully.",
         type: "success",
         context: "global"
