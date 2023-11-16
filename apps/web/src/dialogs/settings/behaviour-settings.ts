@@ -22,6 +22,7 @@ import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import dayjs from "dayjs";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
+import { isMac } from "../../utils/platform";
 
 export const BehaviourSettings: SettingsGroup[] = [
   {
@@ -136,10 +137,10 @@ export const BehaviourSettings: SettingsGroup[] = [
     ]
   },
   {
-    key: "updates",
+    key: "desktop-app",
     section: "behaviour",
-    header: "Updates",
-    isHidden: () => useSettingStore.getState().isFlatpak,
+    header: "Desktop app",
+    isHidden: () => !IS_DESKTOP_APP,
     settings: [
       {
         key: "auto-updates",
@@ -148,11 +149,26 @@ export const BehaviourSettings: SettingsGroup[] = [
           "Automatically download & install updates in the background without prompting first.",
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.autoUpdates, listener),
+        isHidden: () => useSettingStore.getState().isFlatpak,
         components: [
           {
             type: "toggle",
             isToggled: () => useSettingStore.getState().autoUpdates,
             toggle: () => useSettingStore.getState().toggleAutoUpdates()
+          }
+        ]
+      },
+      {
+        key: "menu-bar",
+        title: "Disable menu bar",
+        description:
+          "Disable menu bar so it remains hidden even when Alt key is pressed.",
+        isHidden: () => isMac(),
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => !useSettingStore.getState().menuBar,
+            toggle: () => useSettingStore.getState().toggleMenuBar()
           }
         ]
       }

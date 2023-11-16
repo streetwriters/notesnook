@@ -77,7 +77,7 @@ async function createWindow() {
     darkTheme: getTheme() === "dark",
     backgroundColor: getBackgroundColor(),
     opacity: 0,
-    autoHideMenuBar: true,
+    autoHideMenuBar: config.menuBar,
     icon: AssetManager.appIcon({
       size: 512,
       format: process.platform === "win32" ? "ico" : "png"
@@ -93,6 +93,7 @@ async function createWindow() {
 
   createIPCHandler({ router, windows: [mainWindow] });
   globalThis.window = mainWindow;
+  mainWindow.setMenuBarVisibility(false);
   mainWindowState.manage(mainWindow);
 
   if (cliOptions.hidden && !config.desktopSettings.minimizeToSystemTray)
