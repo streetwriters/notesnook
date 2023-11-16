@@ -79,11 +79,12 @@ export const AboutSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
-            action: () =>
-              void window.open(
-                "https://github.com/streetwriters/notesnook",
-                "_blank"
-              ),
+            action: () => {
+                window.open(
+                  "https://github.com/streetwriters/notesnook",
+                  "_blank"
+                );
+              },
             title: "View source code",
             variant: "secondary"
           }
