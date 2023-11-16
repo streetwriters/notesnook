@@ -52,7 +52,7 @@ function moveColumnLeft(editor: Editor) {
 function moveRowDown(editor: Editor) {
   const { tr } = editor.state;
   const rect = selectedRect(editor.state);
-  if (rect.top + 1 === rect.map.height) return;
+  if (rect.top + 1 === rect.map.height || rect.top === 0) return;
 
   const transaction = moveRow(tr, rect, rect.top, rect.top + 1);
   if (!transaction) return;
@@ -63,7 +63,7 @@ function moveRowDown(editor: Editor) {
 function moveRowUp(editor: Editor) {
   const { tr } = editor.state;
   const rect = selectedRect(editor.state);
-  if (rect.top === 0) return;
+  if (rect.top === 0 || rect.top === 1) return;
 
   const transaction = moveRow(tr, rect, rect.top, rect.top - 1);
   if (!transaction) return;
