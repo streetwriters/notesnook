@@ -73,6 +73,24 @@ export const AboutSettings: SettingsGroup[] = [
         }
       },
       {
+        key: "source-code",
+        title: "Source code",
+        description: "All the source code for Notesnook is available & open for everyone on GitHub.",
+        components: [
+          {
+            type: "button",
+            action: () => {
+                window.open(
+                  "https://github.com/streetwriters/notesnook",
+                  "_blank"
+                );
+              },
+            title: "View source code",
+            variant: "secondary"
+          }
+        ]
+      },
+      {
         key: "roadmap",
         title: "Roadmap",
         description:
