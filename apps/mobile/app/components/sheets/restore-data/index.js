@@ -17,17 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getFormattedDate } from "@notesnook/common";
 import { EVENTS } from "@notesnook/core/dist/common";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import RNFetchBlob from "react-native-blob-util";
-import DocumentPicker, {
-  DocumentPickerResponse
-} from "react-native-document-picker";
+import DocumentPicker from "react-native-document-picker";
 import * as ScopedStorage from "react-native-scoped-storage";
+import { unzip } from "react-native-zip-archive";
 import { db } from "../../../common/database";
 import storage from "../../../common/database/storage";
+import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
 import {
   ToastManager,
   eSubscribeEvent,
@@ -35,7 +37,6 @@ import {
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { initialize } from "../../../stores";
-import { useThemeColors } from "@notesnook/theme";
 import { eCloseRestoreDialog, eOpenRestoreDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
@@ -46,9 +47,6 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
-import { getFormattedDate } from "@notesnook/common";
-import { unzip } from "react-native-zip-archive";
-import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
 
 const RestoreDataSheet = () => {
   const [visible, setVisible] = useState(false);
@@ -239,7 +237,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
     await db.backup.import(backup, password);
     await db.initCollections();
     initialize();
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Backup restored successfully.",
       type: "success",
       context: "global"
@@ -248,7 +246,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   };
 
   const backupError = (e) => {
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Restore failed",
       message:
         e.message ||
@@ -305,7 +303,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
       initialize();
       setRestoring(false);
       close();
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Backup restored successfully.",
         type: "success",
         context: "global"

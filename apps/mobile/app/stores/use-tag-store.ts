@@ -17,36 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "@notesnook/core/dist/types";
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import create, { State } from "zustand";
 import { db } from "../common/database";
-import { GroupedItems, Tag } from "@notesnook/core/dist/types";
+import { Tag, VirtualizedGrouping } from "@notesnook/core";
 
 export interface TagStore extends State {
-  tags: GroupedItems<Tag>;
+  tags: VirtualizedGrouping<Tag> | undefined;
   setTags: (items?: Tag[]) => void;
   clearTags: () => void;
 }
 
-export const useTagStore = create<TagStore>((set, get) => ({
-  tags: [],
-  setTags: (items) => {
-    if (!items) {
+export const useTagStore = create<TagStore>((set) => ({
+  tags: undefined,
+  setTags: () => {
+    db.tags.all.grouped(db.settings.getGroupOptions("tags")).then((tags) => {
       set({
-        tags: groupArray(db.tags.all || [], db.settings.getGroupOptions("tags"))
+        tags: tags
       });
-      return;
-    }
-    const prev = get().tags;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const index = prev.findIndex((v) => v.id === item.id);
-      if (index !== -1) {
-        prev[index] = item;
-      }
-    }
-    set({ tags: prev });
+    });
   },
-  clearTags: () => set({ tags: [] })
+  clearTags: () => set({ tags: undefined })
 }));

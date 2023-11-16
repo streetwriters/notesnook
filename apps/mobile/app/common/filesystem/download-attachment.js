@@ -189,7 +189,7 @@ export default async function downloadAttachment(
 ) {
   await createCacheDir();
 
-  let attachment = db.attachments.attachment(hash);
+  let attachment = await db.attachments.attachment(hash);
   if (!attachment) {
     console.log("attachment not found");
     return;

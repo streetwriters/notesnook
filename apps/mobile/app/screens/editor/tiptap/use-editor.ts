@@ -98,7 +98,6 @@ export const useEditor = (
   const lock = useRef(false);
   const lockedSessionId = useRef<string>();
   const loadingState = useRef<string>();
-
   const postMessage = useCallback(
     async <T>(type: string, data: T, waitFor = 300) =>
       await post(editorRef, sessionIdRef.current, type, data, waitFor),
@@ -190,13 +189,13 @@ export const useEditor = (
       )
         return;
       try {
-        if (id && !db.notes?.note(id)) {
+        if (id && !(await db.notes?.note(id))) {
           isDefaultEditor &&
             useEditorStore.getState().setCurrentlyEditingNote(null);
           await reset();
           return;
         }
-        let note = id ? db.notes?.note(id)?.data : undefined;
+        let note = id ? await db.notes?.note(id) : undefined;
         const locked = note?.locked;
         if (note?.conflicted) return;
 
@@ -233,13 +232,12 @@ export const useEditor = (
         if (!locked) {
           id = await db.notes?.add(noteData);
           if (!note && id) {
-            currentNote.current = db.notes?.note(id)?.data;
+            currentNote.current = await db.notes?.note(id);
             const defaultNotebook = db.settings.getDefaultNotebook();
             if (!state.current.onNoteCreated && defaultNotebook) {
               onNoteCreated(id, {
-                type: defaultNotebook.topic ? "topic" : "notebook",
-                id: defaultNotebook.id,
-                notebook: defaultNotebook.topic
+                type: "notebook",
+                id: defaultNotebook
               });
             } else {
               state.current?.onNoteCreated && state.current.onNoteCreated(id);
@@ -274,7 +272,7 @@ export const useEditor = (
           await db.vault?.save(noteData as any);
         }
         if (id && sessionIdRef.current === currentSessionId) {
-          note = db.notes?.note(id)?.data as Note;
+          note = (await db.notes?.note(id)) as Note;
           await commands.setStatus(
             getFormattedDate(note.dateEdited, "date-time"),
             "Saved"
@@ -316,7 +314,7 @@ export const useEditor = (
           noteId: currentNote.current?.id as string
         };
       } else if (note.contentId) {
-        const rawContent = await db.content?.raw(note.contentId);
+        const rawContent = await db.content?.get(note.contentId);
         if (
           rawContent &&
           !isDeleted(rawContent) &&
@@ -396,7 +394,10 @@ export const useEditor = (
         sessionHistoryId.current = Date.now();
         await commands.setSessionId(nextSessionId);
         currentNote.current = item;
-        await commands.setStatus(getFormattedDate(item.dateEdited), "Saved");
+        await commands.setStatus(
+          getFormattedDate(item.dateEdited, "date-time"),
+          "Saved"
+        );
         await postMessage(EditorEvents.title, item.title);
         loadingState.current = currentContent.current?.data;
 
@@ -443,7 +444,7 @@ export const useEditor = (
       const isContentEncrypted =
         typeof (data as ContentItem)?.data === "object";
 
-      const note = db.notes?.note(currentNote.current?.id)?.data;
+      const note = await db.notes?.note(currentNote.current?.id);
 
       if (lastContentChangeTime.current >= (data as Note).dateEdited) return;
 
