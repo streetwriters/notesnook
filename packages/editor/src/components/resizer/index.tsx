@@ -67,7 +67,7 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
         width: width || "auto"
       }}
       className="resizer"
-      maxWidth="100%"
+      maxWidth={"100%"}
       minWidth={135}
       handleStyles={{
         bottomRight: {
