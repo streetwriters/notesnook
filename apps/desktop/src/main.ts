@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { app, BrowserWindow, Menu, nativeTheme, shell } from "electron";
+import { app, BrowserWindow, nativeTheme, shell } from "electron";
 import { isDevelopment } from "./utils";
 import { registerProtocol, PROTOCOL_URL } from "./utils/protocol";
 import { configureAutoUpdater } from "./utils/autoupdater";
@@ -66,7 +66,6 @@ app.commandLine.appendSwitch("lang", "en-US");
 async function createWindow() {
   const cliOptions = await parseArguments(process.argv);
   setTheme(getTheme());
-  if (config.disableMenuBar) Menu.setApplicationMenu(null);
 
   const mainWindowState = new WindowState({});
   const mainWindow = new BrowserWindow({
@@ -78,7 +77,7 @@ async function createWindow() {
     darkTheme: getTheme() === "dark",
     backgroundColor: getBackgroundColor(),
     opacity: 0,
-    autoHideMenuBar: true,
+    autoHideMenuBar: config.menuBar,
     icon: AssetManager.appIcon({
       size: 512,
       format: process.platform === "win32" ? "ico" : "png"
@@ -94,6 +93,7 @@ async function createWindow() {
 
   createIPCHandler({ router, windows: [mainWindow] });
   globalThis.window = mainWindow;
+  mainWindow.setMenuBarVisibility(false);
   mainWindowState.manage(mainWindow);
 
   if (cliOptions.hidden && !config.desktopSettings.minimizeToSystemTray)

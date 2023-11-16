@@ -42,7 +42,7 @@ export const config = {
   zoomFactor: 1,
   theme: nativeTheme.themeSource,
   automaticUpdates: true,
-  disableMenuBar: false
+  menuBar: true
 };
 
 type ConfigKey = keyof typeof config;

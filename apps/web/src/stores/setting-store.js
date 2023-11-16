@@ -58,7 +58,7 @@ class SettingStore extends BaseStore {
   desktopIntegrationSettings = undefined;
   autoUpdates = true;
   isFlatpak = false;
-  disableMenuBar = false;
+  menuBar = true;
 
   refresh = async () => {
     this.set({
@@ -72,7 +72,7 @@ class SettingStore extends BaseStore {
       privacyMode: await desktop?.integration.privacyMode.query(),
       zoomFactor: await desktop?.integration.zoomFactor.query(),
       autoUpdates: await desktop?.updater.autoUpdates.query(),
-      disableMenuBar: await desktop?.integration.menuBar.query()
+      menuBar: await desktop?.integration.menuBar.query()
     });
   };
 
@@ -186,10 +186,10 @@ class SettingStore extends BaseStore {
   };
 
   toggleMenuBar = async () => {
-    const disableMenuBar = this.get().disableMenuBar;
-    this.set({ disableMenuBar: !disableMenuBar });
+    const menuBar = this.get().menuBar;
+    this.set({ menuBar: !menuBar });
     await desktop?.integration.setMenuBar.mutate({
-      enabled: !disableMenuBar
+      enabled: !menuBar
     });
   };
 }

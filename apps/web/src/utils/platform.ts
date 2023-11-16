@@ -129,5 +129,5 @@ export function isMac() {
 }
 
 export function isMacStoreApp() {
-  return window.os && window.os() === "mas";
+  return window.os ? window.os() === "mas" : false;
 }

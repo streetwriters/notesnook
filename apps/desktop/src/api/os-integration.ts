@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
-import { dialog, Menu, nativeTheme, Notification, shell } from "electron";
+import { dialog, nativeTheme, Notification, shell } from "electron";
 import { AutoLaunch } from "../utils/autolaunch";
 import { config, DesktopIntegration } from "../utils/config";
 import { bringToFront } from "../utils/bring-to-front";
@@ -30,7 +30,6 @@ import { resolvePath } from "../utils/resolve-path";
 import { observable } from "@trpc/server/observable";
 import { AssetManager } from "../utils/asset-manager";
 import { isFlatpak } from "../utils";
-import { conflicts } from "yargs";
 
 const t = initTRPC.create();
 
@@ -54,12 +53,13 @@ export const osIntegrationRouter = t.router({
     config.zoomFactor = factor;
   }),
 
-  menuBar: t.procedure.query(() => config.disableMenuBar),
+  menuBar: t.procedure.query(() => config.menuBar),
   setMenuBar: t.procedure
     .input(z.object({ enabled: z.boolean() }))
     .mutation(({ input: { enabled } }) => {
-      config.disableMenuBar = enabled;
-      if (enabled) Menu.setApplicationMenu(null);
+      config.menuBar = enabled;
+      if (!enabled) globalThis.window?.setMenuBarVisibility(false);
+      globalThis.window?.setAutoHideMenuBar(enabled);
     }),
 
   privacyMode: t.procedure.query(() => config.privacyMode),
