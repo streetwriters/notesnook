@@ -37,13 +37,6 @@ const prepareSearch = () => {
   });
 };
 
-const PLACEHOLDER_DATA = {
-  heading: "Your favorites",
-  paragraph: "You have not added any notes to favorites yet.",
-  button: null,
-  loading: "Loading your favorites"
-};
-
 export const Favorites = ({
   navigation,
   route
@@ -70,17 +63,19 @@ export const Favorites = ({
   return (
     <DelayLayout wait={loading}>
       <List
-        listData={favorites}
-        type="notes"
-        refreshCallback={() => {
+        data={favorites}
+        dataType="note"
+        onRefresh={() => {
           setFavorites();
         }}
-        screen="Favorites"
+        renderedInRoute="Favorites"
         loading={loading || !isFocused}
-        placeholderData={PLACEHOLDER_DATA}
-        headerProps={{
-          heading: "Favorites"
+        placeholder={{
+          title: "Your favorites",
+          paragraph: "You have not added any notes to favorites yet.",
+          loading: "Loading your favorites"
         }}
+        headerTitle="Favorites"
       />
     </DelayLayout>
   );

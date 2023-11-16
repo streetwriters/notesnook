@@ -29,6 +29,11 @@ import { useAppState } from "../../../hooks/use-app-state";
 import SettingsService from "../../../services/settings";
 import { useUserStore } from "../../../stores/use-user-store";
 
+/**
+ *
+ * @param {any} param0
+ * @returns
+ */
 const SheetWrapper = ({
   children,
   fwdRef,

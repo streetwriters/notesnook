@@ -24,7 +24,7 @@ import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { useTagStore } from "../../stores/use-tag-store";
-import { eOnLoadNote, eOnTopicSheetUpdate } from "../../utils/events";
+import { eOnLoadNote, eOnNotebookUpdated } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
 import { editorController, editorState } from "../editor/tiptap/utils";
@@ -87,24 +87,12 @@ export async function onNoteCreated(noteId: string, data: FirstSaveData) {
       );
       editorState().onNoteCreated = null;
       useRelationStore.getState().update();
-      break;
-    }
-    case "topic": {
-      if (!data.notebook) break;
-      await db.notes?.addToNotebook(
-        {
-          topic: data.id,
-          id: data.notebook
-        },
-        noteId
-      );
-      editorState().onNoteCreated = null;
-      eSendEvent(eOnTopicSheetUpdate);
+      eSendEvent(eOnNotebookUpdated, data.id);
       break;
     }
     case "tag": {
-      const note = db.notes.note(noteId)?.data;
-      const tag = db.tags.tag(data.id);
+      const note = await db.notes.note(noteId);
+      const tag = await db.tags.tag(data.id);
 
       if (tag && note) {
         await db.relations.add(tag, note);
@@ -116,8 +104,8 @@ export async function onNoteCreated(noteId: string, data: FirstSaveData) {
       break;
     }
     case "color": {
-      const note = db.notes.note(noteId)?.data;
-      const color = db.colors.color(data.id);
+      const note = await db.notes.note(noteId);
+      const color = await db.colors.color(data.id);
       if (note && color) {
         await db.relations.add(color, note);
       }

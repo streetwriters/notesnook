@@ -116,7 +116,7 @@ export class TipManager {
 export const useTip = (
   context: Context,
   fallback: Context,
-  options: {
+  options?: {
     rotate: boolean;
     delay: number;
   }
