@@ -18,80 +18,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Flex, Input, Text } from "@theme-ui/components";
-import {
-  findChildren,
-  findParentNodeClosestToPos,
-  getNodeType
-} from "@tiptap/core";
-import { Node } from "prosemirror-model";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ToolButton } from "../../toolbar/components/tool-button";
-import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { ReactNodeViewProps } from "../react";
-import { TaskItemNode } from "../task-item";
-import { TaskListAttributes, TaskListNode } from "./task-list";
-import { countCheckedItems, deleteCheckedItems, sortList } from "./utils";
+import { type TaskListAttributes } from "./task-list";
 import { replaceDateTime } from "../date-time";
+import { deleteCheckedItems, sortList } from "./utils";
+import TaskList from "@tiptap/extension-task-list";
+import TaskItem from "@tiptap/extension-task-item";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
 ) {
-  // const isMobile = useIsMobile();
   const { editor, getPos, node, updateAttributes, forwardRef, pos } = props;
-  const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
-  const { title, textDirection, readonly } = node.attrs;
-  const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
-
-  const getParent = useCallback(() => {
-    if (pos === undefined) return;
-    return findParentNodeOfTypeClosestToPos(
-      editor.state.doc.resolve(pos),
-      taskItemType
-    );
-  }, [editor.state.doc, pos, taskItemType]);
+  const { title, textDirection, readonly, stats } = node.attrs;
 
   const isNested = useMemo(() => {
-    return !!getParent();
-  }, [getParent]);
-
-  const isReadonly = useMemo(() => {
-    console.log("HEERE!");
-    const isParentReadonly =
-      !!isNested &&
-      !!pos &&
-      !!findParentNodeClosestToPos(
-        editor.state.doc.resolve(pos),
-        (node) => node.type.name === TaskListNode.name && node.attrs.readonly
-      );
-    return readonly || isParentReadonly;
-  }, [isNested, readonly, editor.state.doc, pos]);
-
-  useEffect(() => {
-    const parent = getParent();
-    if (!parent) return;
-    const { node, pos } = parent;
-    const allChecked = areAllChecked(node, pos, editor.state.doc);
-
-    // no need to create a transaction if the check state is
-    // not changed.
-    if (node.attrs.checked === allChecked) return;
-
-    // check parent item if all child items are checked.
-    editor.commands.command(({ tr }) => {
-      tr.setNodeMarkup(pos, undefined, { checked: allChecked });
-      return true;
-    });
-  }, [editor.commands, editor.state.doc, getParent, node, node.childCount]);
-
-  useEffect(() => {
-    const { checked, total } = countCheckedItems(node);
-    const percentage = Math.round((checked / total) * 100);
-    setStats({ checked, total, percentage });
-  }, [isNested, node]);
+    if (!pos) return false;
+    return editor.state.doc.resolve(pos).parent.type.name === TaskItem.name;
+  }, [editor.state.doc, pos]);
 
   return (
     <>
-      {!isNested && (
+      {isNested ? null : (
         <Flex
           sx={{
             position: "relative",
@@ -110,7 +59,7 @@ export function TaskListComponent(
           <Box
             sx={{
               height: "100%",
-              width: `${stats.percentage}%`,
+              width: `${Math.round((stats.checked / stats.total) * 100)}%`,
               position: "absolute",
               bg: "shade",
 
@@ -156,13 +105,24 @@ export function TaskListComponent(
                   zIndex: 1
                 }}
                 onClick={() => {
-                  const pos = getPos();
-                  const node = editor.current?.state.doc.nodeAt(pos);
-                  if (!node) return;
-                  updateAttributes(
-                    { readonly: !node.attrs.readonly },
-                    { addToHistory: true, preventUpdate: false }
-                  );
+                  const parentPos = getPos();
+                  editor.current?.commands.command(({ tr }) => {
+                    const node = tr.doc.nodeAt(parentPos);
+                    if (!node) return false;
+                    const toggleState = !node.attrs.readonly;
+                    tr.setNodeMarkup(tr.mapping.map(parentPos), null, {
+                      readonly: toggleState
+                    });
+                    node.descendants((node, pos) => {
+                      if (node.type.name === TaskList.name) {
+                        const actualPos = pos + parentPos + 1;
+                        tr.setNodeMarkup(tr.mapping.map(actualPos), null, {
+                          readonly: toggleState
+                        });
+                      }
+                    });
+                    return true;
+                  });
                 }}
               />
               <ToolButton
@@ -224,7 +184,7 @@ export function TaskListComponent(
       <Box
         ref={forwardRef}
         dir={textDirection}
-        contentEditable={editor.isEditable && !isReadonly}
+        contentEditable={editor.isEditable && !readonly}
         sx={{
           ul: {
             display: "block",
@@ -254,19 +214,4 @@ export function TaskListComponent(
       />
     </>
   );
-}
-
-function areAllChecked(node: Node, pos: number, doc: Node) {
-  const children = findChildren(
-    node,
-    (node) => node.type.name === TaskItemNode.name
-  );
-
-  for (const child of children) {
-    const childPos = pos + child.pos + 1;
-    const node = doc.nodeAt(childPos);
-    if (!node?.attrs.checked) return false;
-  }
-
-  return true;
 }
