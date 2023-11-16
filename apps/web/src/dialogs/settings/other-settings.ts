@@ -74,8 +74,8 @@ export const AboutSettings: SettingsGroup[] = [
       },
       {
         key: "source-code",
-        title: "Source Code",
-        description: "Check out our source code",
+        title: "Source code",
+        description: "All the source code for Notesnook is available & open for everyone on GitHub.",
         components: [
           {
             type: "button",
@@ -84,7 +84,7 @@ export const AboutSettings: SettingsGroup[] = [
                 "https://github.com/streetwriters/notesnook",
                 "_blank"
               ),
-            title: "Check Source Code",
+            title: "View source code",
             variant: "secondary"
           }
         ]
