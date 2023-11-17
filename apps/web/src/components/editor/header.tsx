@@ -39,7 +39,7 @@ function Header(props: HeaderProps) {
 
   return (
     <>
-      {!readonly && id && (
+      {id && (
         <Flex
           sx={{ lineHeight: 2.5, alignItems: "center", flexWrap: "wrap" }}
           data-test-id="tags"
@@ -55,19 +55,21 @@ function Header(props: HeaderProps) {
               styles={{ container: { mr: 1 }, text: { fontSize: "body" } }}
             />
           ))}
-          <Autosuggest
-            sessionId={id}
-            filter={(query) =>
-              db.lookup?.tags(filterableTags, query).slice(0, 10) || []
-            }
-            onAdd={(value) => setTag(value)}
-            onSelect={(item) => setTag(item.title)}
-            onRemove={() => {
-              if (tags.length <= 0) return;
-              setTag(tags[tags.length - 1]);
-            }}
-            defaultItems={filterableTags?.slice(0, 10) || []}
-          />
+          {!readonly && (
+            <Autosuggest
+              sessionId={id}
+              filter={(query) =>
+                db.lookup?.tags(filterableTags, query).slice(0, 10) || []
+              }
+              onAdd={(value) => setTag(value)}
+              onSelect={(item) => setTag(item.title)}
+              onRemove={() => {
+                if (tags.length <= 0) return;
+                setTag(tags[tags.length - 1]);
+              }}
+              defaultItems={filterableTags?.slice(0, 10) || []}
+            />
+          )}
         </Flex>
       )}
     </>
