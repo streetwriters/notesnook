@@ -62,6 +62,7 @@ declare global {
   var readonly: boolean;
   var noToolbar: boolean;
   var noHeader: boolean;
+  function toBlobURL(dataurl: string, id?: string): string | undefined;
   /**
    * Id of current session
    */

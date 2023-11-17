@@ -230,6 +230,16 @@ const handleImageResponse = async (response, options) => {
   });
 
   let fileName = image.originalFileName || image.fileName;
+
+  editorController.current?.commands.insertImage({
+    hash: hash,
+    mime: image.type,
+    title: fileName,
+    dataurl: b64,
+    size: image.fileSize,
+    filename: fileName
+  });
+
   if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
   const isPng = /(png)/g.test(image.type);
   const isJpeg = /(jpeg|jpg)/g.test(image.type);
@@ -243,15 +253,6 @@ const handleImageResponse = async (response, options) => {
   }
 
   if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
-
-  editorController.current?.commands.insertImage({
-    hash: hash,
-    mime: image.type,
-    title: fileName,
-    dataurl: b64,
-    size: image.fileSize,
-    filename: fileName
-  });
 };
 
 export async function attachFile(uri, hash, type, filename, options) {

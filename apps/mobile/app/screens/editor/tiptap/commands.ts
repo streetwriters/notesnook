@@ -211,9 +211,20 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     );
   };
 
-  insertImage = async (image: ImageAttributes) => {
+  insertImage = async (
+    image: Omit<ImageAttributes, "bloburl"> & {
+      dataurl: string;
+    }
+  ) => {
     await this.doAsync(
-      `editor && editor.commands.insertImage(${JSON.stringify(image)})`
+      `const image = toBlobURL("${image.dataurl}", "${image.hash}");
+      editor && editor.commands.insertImage({
+        ...${JSON.stringify({
+          ...image,
+          dataurl: undefined
+        })},
+        bloburl: image
+      })`
     );
   };
 
@@ -225,11 +236,20 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     );
   };
 
-  updateImage = async ({ src, hash }: Partial<ImageAttributes>) => {
+  updateImage = async ({
+    hash,
+    dataurl
+  }: Partial<Omit<ImageAttributes, "bloburl">> & {
+    dataurl: string;
+  }) => {
     await this.doAsync(
-      `editor && editor.commands.updateImage(${JSON.stringify({
+      `const image = toBlobURL("${dataurl}", "${hash}");
+      editor && editor.commands.updateImage(${JSON.stringify({
         hash
-      })},${JSON.stringify({ dataurl: src, hash, preventUpdate: true })})`
+      })}, {
+        ...${JSON.stringify({ hash, preventUpdate: true })},
+        bloburl: image
+      })`
     );
   };
 

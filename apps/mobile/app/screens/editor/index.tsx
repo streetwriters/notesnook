@@ -115,7 +115,7 @@ const Editor = React.memo(
           } else {
             editor.commands.updateImage({
               hash: hash,
-              src: src
+              dataurl: src
             });
           }
         },
