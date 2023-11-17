@@ -477,7 +477,7 @@ PODS:
     - React-Core
   - RNGestureHandler (2.12.0):
     - React-Core
-  - RNIap (7.5.6):
+  - RNIap (12.11.0):
     - React-Core
   - RNKeychain (4.0.5):
     - React
@@ -911,7 +911,7 @@ SPEC CHECKSUMS:
   RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592
   RNFlashList: 399bf6a0db68f594ad2c86aaff3ea39564f39f8a
   RNGestureHandler: dec4645026e7401a0899f2846d864403478ff6a5
-  RNIap: d248609d1b8937e63bd904e865c318e9b1457eff
+  RNIap: fc9af04ee706894a80c9d8f979bae930b0dee191
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
   RNNotifee: 2ae3c18196e6f307fa62ae5c8e5305dea03ff147
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023

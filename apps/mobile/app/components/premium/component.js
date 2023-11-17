@@ -165,7 +165,12 @@ export const Component = ({ close, promo }) => {
             }}
             size={SIZE.md}
           >
-            ({pricing?.product?.localizedPrice} / mo)
+            (
+            {Platform.OS === "android"
+              ? pricing.product?.subscriptionOfferDetails[0].pricingPhases
+                  .pricingPhaseList?.[0].formattedPrice
+              : pricing.product?.localizedPrice}{" "}
+            / mo)
           </Paragraph>
         )}
 

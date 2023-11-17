@@ -18,13 +18,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import RNIap from "react-native-iap";
 
-export const PricingItem = ({ product, onPress, compact }) => {
+export const PricingItem = ({
+  product,
+  onPress,
+  compact
+}: {
+  product: {
+    type: "yearly" | "monthly";
+    data?: RNIap.Subscription;
+    info: string;
+    offerType?: "yearly" | "monthly";
+  };
+  onPress?: () => void;
+  compact?: boolean;
+}) => {
   return (
     <PressableButton
       onPress={onPress}
@@ -54,7 +68,13 @@ export const PricingItem = ({ product, onPress, compact }) => {
 
       <View>
         <Paragraph size={SIZE.sm}>
-          <Heading size={SIZE.lg - 2}>{product?.data?.localizedPrice}/</Heading>
+          <Heading size={SIZE.lg - 2}>
+            {Platform.OS === "android"
+              ? (product.data as RNIap.SubscriptionAndroid)
+                  ?.subscriptionOfferDetails[0].pricingPhases
+                  .pricingPhaseList?.[0].formattedPrice
+              : (product.data as RNIap.SubscriptionIOS)?.localizedPrice}
+          </Heading>
           {product?.type === "yearly" || product?.offerType === "yearly"
             ? "/year"
             : "/month"}

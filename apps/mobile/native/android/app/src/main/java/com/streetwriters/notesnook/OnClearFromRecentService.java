@@ -8,6 +8,10 @@ import com.ammarahmed.mmkv.MMKV;
 
 public class OnClearFromRecentService extends Service {
 
+    static {
+        System.loadLibrary("rnmmkv");
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -15,7 +19,6 @@ public class OnClearFromRecentService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-    
         return START_NOT_STICKY;
     }
 
@@ -31,8 +34,10 @@ public class OnClearFromRecentService extends Service {
             MMKV mmkv = MMKV.mmkvWithID("default",MMKV.SINGLE_PROCESS_MODE);
             mmkv.removeValueForKey("appState");
             stopSelf();
-        } catch (Exception e) {
+        } catch (UnsatisfiedLinkError e) {
 
+        } catch (Exception e) {
+            
         }
         //System.exit(0);
     }

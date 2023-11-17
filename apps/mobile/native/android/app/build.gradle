@@ -111,7 +111,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-        versionCode 2066
+        versionCode 2067
         versionName getNpmVersion()
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -134,10 +134,10 @@ android {
             keyPassword 'android'
         }
           release {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            storeFile file('notesnook.keystore')
+            storePassword 'notesnook123'
+            keyAlias 'notesnook'
+            keyPassword 'notesnook123'
         }
     }
     buildTypes {

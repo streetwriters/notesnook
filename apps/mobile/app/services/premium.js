@@ -39,6 +39,10 @@ import { eSendEvent, presentSheet, ToastEvent } from "./event-manager";
 
 import SettingsService from "./settings";
 let premiumStatus = 0;
+
+/**
+ * @type {RNIap.Subscription[]}
+ */
 let products = [];
 let user = null;
 
@@ -68,7 +72,9 @@ async function setPremiumStatus() {
   }
   try {
     await RNIap.initConnection();
-    products = await RNIap.getSubscriptions(itemSkus);
+    products = await RNIap.getSubscriptions({
+      skus: itemSkus
+    });
   } catch (e) {
     console.log("subscriptions: ", e);
   }
@@ -223,12 +229,21 @@ const showVerifyEmailDialog = () => {
 };
 
 const subscriptions = {
+  /**
+   *
+   * @returns {RNIap.Purchase} subscription
+   */
   get: async () => {
     if (Platform.OS === "android") return;
     let _subscriptions = MMKV.getString("subscriptionsIOS");
     if (!_subscriptions) return [];
     return JSON.parse(_subscriptions);
   },
+  /**
+   *
+   * @param {RNIap.Purchase} subscription
+   * @returns
+   */
   set: async (subscription) => {
     if (Platform.OS === "android") return;
     let _subscriptions = MMKV.getString("subscriptionsIOS");
@@ -263,6 +278,10 @@ const subscriptions = {
       MMKV.setString("subscriptionsIOS", JSON.stringify(_subscriptions));
     }
   },
+  /**
+   *
+   * @param {RNIap.Purchase} subscription
+   */
   verify: async (subscription) => {
     if (Platform.OS === "android") return;
 

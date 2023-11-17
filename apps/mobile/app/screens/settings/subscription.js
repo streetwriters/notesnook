@@ -88,6 +88,13 @@ export const Subscription = () => {
     }
   };
 
+  function getPrice() {
+    return Platform.OS === "android"
+      ? monthlyPlan?.product?.subscriptionOfferDetails[0].pricingPhases
+          .pricingPhaseList?.[0].formattedPrice
+      : monthlyPlan?.product?.localizedPrice;
+  }
+
   return (
     <View>
       {isNotPro ? (
@@ -114,12 +121,8 @@ export const Subscription = () => {
                 Config.GITHUB_RELEASE !== "true"
               ? "Resubscribe from Google Playstore"
               : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
-              ? `Resubscribe to Pro (${
-                  monthlyPlan?.product?.localizedPrice || "$4.49"
-                } / mo)`
-              : `Get Pro (${
-                  monthlyPlan?.product?.localizedPrice || "$4.49"
-                } / mo)`
+              ? `Resubscribe to Pro (${getPrice() || "$4.49"} / mo)`
+              : `Get Pro (${getPrice() || "$4.49"} / mo)`
           }
         />
       ) : null}
