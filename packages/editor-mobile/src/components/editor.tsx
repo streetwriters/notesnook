@@ -42,6 +42,9 @@ import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
+import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
+
+globalThis.toBlobURL = toBlobURL;
 
 const Tiptap = ({ settings }: { settings: Settings }) => {
   const [tick, setTick] = useState(0);
