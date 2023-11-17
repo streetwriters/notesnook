@@ -264,19 +264,6 @@ export const TaskListNode = TaskList.extend({
           const roots = new WeakSet();
 
           for (const edit of [...changedNodes, ...deletedNodes]) {
-            // sync the stats with the new changes.
-            // we add a small optimization here to avoid checking the same
-            // root task list over and over again in case of multiple
-            // node changes
-            const root = findRootTaskList(tr.doc, edit.pos) || edit;
-            if (root && !roots.has(root)) {
-              roots.add(root);
-
-              const stats = countCheckedItems(root.node);
-              tr.setNodeMarkup(root.pos, undefined, { stats });
-              changeCount++;
-            }
-
             // Case # 1
             // if the user clicks on a task item that has children, we
             // should automatically check/uncheck all its children
@@ -320,6 +307,19 @@ export const TaskListNode = TaskList.extend({
                 checked: allChecked
               });
               childPos = parentTaskItem.pos;
+            }
+
+            // sync the stats with the new changes.
+            // we add a small optimization here to avoid checking the same
+            // root task list over and over again in case of multiple
+            // node changes
+            const root = findRootTaskList(tr.doc, edit.pos) || edit;
+            if (root && !roots.has(root)) {
+              roots.add(root);
+
+              const stats = countCheckedItems(root.node);
+              tr.setNodeMarkup(root.pos, undefined, { stats });
+              changeCount++;
             }
           }
           return changeCount > 0 ? tr : null;
