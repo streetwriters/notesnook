@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useStore } from "../../stores/editor-store";
 import { Input } from "@theme-ui/components";
 import { Tag, Plus } from "../icons";
@@ -179,8 +179,13 @@ export function Autosuggest(props: AutosuggestProps) {
       data-test-id="editor-tag-input"
       onFocus={() => {
         const text = getInputValue();
-        console.log(defaultItems);
         if (!text) onOpenMenu(defaultItems.slice());
+        else onOpenMenu([]);
+      }}
+      onClick={() => {
+        const text = getInputValue();
+        if (!text) onOpenMenu(defaultItems.slice());
+        else onOpenMenu([]);
       }}
       onChange={(e) => {
         const { value } = e.target;
