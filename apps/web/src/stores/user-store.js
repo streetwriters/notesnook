@@ -112,7 +112,7 @@ class UserStore extends BaseStore {
     });
   };
 
-  login = async (form, skipInit = false) => {
+  login = async (form, skipInit = false, sessionExpired = false) => {
     this.set((state) => (state.isLoggingIn = true));
     const { email, password, code, method } = form;
 
@@ -120,7 +120,12 @@ class UserStore extends BaseStore {
       if (code) {
         return await db.user.authenticateMultiFactorCode(code, method);
       } else if (password) {
-        await db.user.authenticatePassword(email, password, null);
+        await db.user.authenticatePassword(
+          email,
+          password,
+          null,
+          sessionExpired
+        );
         Config.set("encryptBackups", true);
 
         if (skipInit) return true;

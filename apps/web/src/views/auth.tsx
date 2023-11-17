@@ -278,10 +278,14 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
         subtitle: "Please wait while you are authenticated."
       }}
       onSubmit={async (form) => {
-        await userstore.login({
-          password: form.password,
-          email: formData.email
-        });
+        await userstore.login(
+          {
+            password: form.password,
+            email: formData.email
+          },
+          false,
+          Config.get("sessionExpired", false)
+        );
         Config.set("sessionExpired", false);
         openURL("/");
       }}
