@@ -40,7 +40,7 @@
     "react-native-get-random-values": "^1.7.0",
     "react-native-gzip": "1.1.0",
     "react-native-html-to-pdf-lite": "^0.9.1",
-    "react-native-iap": "7.5.6",
+    "react-native-iap": "12.11.0",
     "react-native-image-picker": "4.1.2",
     "react-native-in-app-review": "4.3.3",
     "react-native-keychain": "4.0.5",

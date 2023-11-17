@@ -229,12 +229,25 @@ async function saveEditorState() {
     MMKV.setString("appState", state);
   }
 }
-
+/**
+ *
+ * @param {RNIap.Purchase} subscription
+ */
 const onSuccessfulSubscription = async (subscription) => {
+  console.log(
+    "Subscription success!",
+    subscription.transactionId,
+    subscription.obfuscatedAccountIdAndroid,
+    subscription.obfuscatedProfileIdAndroid
+  );
   await PremiumService.subscriptions.set(subscription);
   await PremiumService.subscriptions.verify(subscription);
 };
 
+/**
+ *
+ * @param {RNIap.PurchaseError} error
+ */
 const onSubscriptionError = async (error) => {
   ToastEvent.show({
     heading: "Failed to subscribe",
@@ -490,9 +503,9 @@ export const useAppEvents = () => {
   );
 
   const subscribeToIAPListeners = useCallback(async () => {
-    await RNIap.initConnection()
-      .catch(() => null)
-      .then(async () => {
+    RNIap.flushFailedPurchasesCachedAsPendingAndroid()
+      .catch(() => {})
+      .then(() => {
         refValues.current.subsriptionSuccessListener =
           RNIap.purchaseUpdatedListener(onSuccessfulSubscription);
         refValues.current.subsriptionErrorListener =

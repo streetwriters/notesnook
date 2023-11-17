@@ -47,11 +47,15 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { PricingItem } from "./pricing-item";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 const promoCyclesMonthly = {
   1: "first month",
   2: "first 2 months",
-  3: "first 3 months"
+  3: "first 3 months",
+  4: "first 4 months",
+  5: "first 5 months",
+  6: "first 3 months"
 };
 
 const promoCyclesYearly = {
@@ -65,10 +69,24 @@ export const PricingPlans = ({
   marginTop,
   heading = true,
   compact = false
+}: {
+  promo?: {
+    promoCode: string;
+  };
+  marginTop?: any;
+  heading?: boolean;
+  compact?: boolean;
 }) => {
   const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
-  const [product, setProduct] = useState(null);
+  const [product, setProduct] = useState<{
+    type: string;
+    offerType: "monthly" | "yearly";
+    data: RNIap.Subscription;
+    cycleText: string;
+    info: string;
+  }>();
+
   const [buying, setBuying] = useState(false);
   const [loading, setLoading] = useState(false);
   const userCanRequestTrial =
@@ -90,27 +108,40 @@ export const PricingPlans = ({
     }
   }, [promo?.promoCode]);
 
-  const getPromo = async (code) => {
+  const getPromo = async (code: string) => {
     try {
-      let productId;
+      let skuId: string;
       if (code.startsWith("com.streetwriters.notesnook")) {
-        productId = code;
+        skuId = code;
       } else {
-        productId = await db.offers.getCode(code.split(":")[0], Platform.OS);
+        skuId = await db.offers?.getCode(code.split(":")[0], Platform.OS);
       }
 
-      let products = await PremiumService.getProducts();
-      let product = products.find((p) => p.productId === productId);
+      const products = await PremiumService.getProducts();
+      const product = products.find((p) => p.productId === skuId);
       if (!product) return false;
-      let isMonthly = product.productId.indexOf(".mo") > -1;
-      let cycleText = isMonthly
+      const isMonthly = product.productId.indexOf(".mo") > -1;
+
+      const cycleText = isMonthly
         ? promoCyclesMonthly[
-            product.introductoryPriceCyclesAndroid ||
-              product.introductoryPriceNumberOfPeriodsIOS
+            (Platform.OS === "android"
+              ? (product as RNIap.SubscriptionAndroid)
+                  .subscriptionOfferDetails[0]?.pricingPhases
+                  .pricingPhaseList?.[0].billingCycleCount
+              : parseInt(
+                  (product as RNIap.SubscriptionIOS)
+                    .introductoryPriceNumberOfPeriodsIOS as string
+                )) as keyof typeof promoCyclesMonthly
           ]
         : promoCyclesYearly[
-            product.introductoryPriceCyclesAndroid ||
-              product.introductoryPriceNumberOfPeriodsIOS
+            (Platform.OS === "android"
+              ? (product as RNIap.SubscriptionAndroid)
+                  .subscriptionOfferDetails[0]?.pricingPhases
+                  .pricingPhaseList?.[0].billingCycleCount
+              : parseInt(
+                  (product as RNIap.SubscriptionIOS)
+                    .introductoryPriceNumberOfPeriodsIOS as string
+                )) as keyof typeof promoCyclesYearly
           ];
 
       setProduct({
@@ -118,7 +149,7 @@ export const PricingPlans = ({
         offerType: isMonthly ? "monthly" : "yearly",
         data: product,
         cycleText: cycleText,
-        info: "Pay monthly, cancel anytime"
+        info: `Pay ${isMonthly ? "monthly" : "yearly"}, cancel anytime`
       });
       return true;
     } catch (e) {
@@ -131,22 +162,37 @@ export const PricingPlans = ({
     getSkus();
   }, [getSkus]);
 
-  const buySubscription = async (product) => {
-    if (buying) return;
+  const buySubscription = async (product: RNIap.Subscription) => {
+    if (buying || !product) return;
     setBuying(true);
     try {
       if (!user) {
         setBuying(false);
         return;
       }
-      await RNIap.requestSubscription(
-        product?.productId,
-        false,
-        null,
-        -1,
-        user.id,
-        user.id
-      );
+      useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
+      const androidOfferToken =
+        Platform.OS === "android"
+          ? (product as RNIap.SubscriptionAndroid).subscriptionOfferDetails[0]
+              .offerToken
+          : null;
+
+      await RNIap.requestSubscription({
+        sku: product?.productId,
+        obfuscatedAccountIdAndroid: user.id,
+        obfuscatedProfileIdAndroid: user.id,
+        appAccountToken: user.id,
+        andDangerouslyFinishTransactionAutomaticallyIOS: false,
+        subscriptionOffers: androidOfferToken
+          ? [
+              {
+                offerToken: androidOfferToken,
+                sku: product?.productId
+              }
+            ]
+          : undefined
+      });
+      useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
       setBuying(false);
       eSendEvent(eCloseSheet);
       eSendEvent(eClosePremiumDialog);
@@ -198,7 +244,14 @@ export const PricingPlans = ({
             }}
             size={SIZE.lg}
           >
-            {PremiumService.getMontlySub().localizedPrice} / mo
+            {(Platform.OS === "android"
+              ? (monthlyPlan?.product as RNIap.SubscriptionAndroid)
+                  ?.subscriptionOfferDetails[0].pricingPhases
+                  .pricingPhaseList?.[0].formattedPrice
+              : (monthlyPlan?.product as RNIap.SubscriptionIOS)
+                  .localizedPrice) ||
+              (PremiumService.getMontlySub() as any).localizedPrice}
+            / mo
           </Paragraph>
           <Button
             onPress={() => {
@@ -218,7 +271,7 @@ export const PricingPlans = ({
           <Button
             onPress={async () => {
               try {
-                await db.user.activateTrial();
+                await db.user?.activateTrial();
                 eSendEvent(eClosePremiumDialog);
                 eSendEvent(eCloseSheet);
                 await sleep(300);
@@ -247,7 +300,11 @@ export const PricingPlans = ({
               }}
               size={SIZE.lg - 4}
             >
-              {product.data.introductoryPrice}
+              {Platform.OS === "android"
+                ? (product.data as RNIap.SubscriptionAndroid)
+                    ?.subscriptionOfferDetails[0].pricingPhases
+                    .pricingPhaseList?.[0].formattedPrice
+                : (product.data as RNIap.SubscriptionIOS)?.introductoryPrice}
               <Paragraph
                 style={{
                   textDecorationLine: "line-through",
@@ -255,7 +312,11 @@ export const PricingPlans = ({
                 }}
                 size={SIZE.sm}
               >
-                ({product.data.localizedPrice})
+                {Platform.OS === "android"
+                  ? (product.data as RNIap.SubscriptionAndroid)
+                      ?.subscriptionOfferDetails[1].pricingPhases
+                      .pricingPhaseList?.[1].formattedPrice
+                  : (product.data as RNIap.SubscriptionIOS)?.localizedPrice}
               </Paragraph>{" "}
               for {product.cycleText}
             </Heading>
@@ -263,9 +324,9 @@ export const PricingPlans = ({
 
           {user && !product ? (
             <>
-              {heading || monthlyPlan?.info?.discount > 0 ? (
+              {heading || (monthlyPlan?.info?.discount || 0) > 0 ? (
                 <>
-                  {monthlyPlan && monthlyPlan?.info?.discount > 0 ? (
+                  {monthlyPlan && (monthlyPlan?.info?.discount || 0) > 0 ? (
                     <View
                       style={{
                         alignSelf: "center",
@@ -300,7 +361,10 @@ export const PricingPlans = ({
                 }}
               >
                 <PricingItem
-                  onPress={() => buySubscription(monthlyPlan?.product)}
+                  onPress={() => {
+                    if (!monthlyPlan?.product) return;
+                    buySubscription(monthlyPlan?.product);
+                  }}
                   compact={compact}
                   product={{
                     type: "monthly",
@@ -319,7 +383,10 @@ export const PricingPlans = ({
                 )}
 
                 <PricingItem
-                  onPress={() => buySubscription(yearlyPlan?.product)}
+                  onPress={() => {
+                    if (!yearlyPlan?.product) return;
+                    buySubscription(yearlyPlan?.product);
+                  }}
                   compact={compact}
                   product={{
                     type: "yearly",
@@ -346,7 +413,7 @@ export const PricingPlans = ({
                         eSendEvent(eCloseSimpleDialog);
                         setBuying(true);
                         try {
-                          if (!(await getPromo(value)))
+                          if (!(await getPromo(value as string)))
                             throw new Error("Error applying promo code");
                           ToastEvent.show({
                             heading: "Discount applied!",
@@ -358,7 +425,7 @@ export const PricingPlans = ({
                           setBuying(false);
                           ToastEvent.show({
                             heading: "Promo code invalid or expired",
-                            message: e.message,
+                            message: (e as Error).message,
                             type: "error",
                             context: "local"
                           });
@@ -427,7 +494,10 @@ export const PricingPlans = ({
               ) : (
                 <>
                   <Button
-                    onPress={() => buySubscription(product.data)}
+                    onPress={() => {
+                      if (!product?.data) return;
+                      buySubscription(product.data);
+                    }}
                     height={40}
                     width="50%"
                     type="accent"
@@ -436,7 +506,7 @@ export const PricingPlans = ({
 
                   <Button
                     onPress={() => {
-                      setProduct(null);
+                      setProduct(undefined);
                     }}
                     style={{
                       marginTop: 5
@@ -523,7 +593,7 @@ export const PricingPlans = ({
               <Paragraph
                 size={SIZE.xs}
                 onPress={() => {
-                  openLinkInBrowser("https://notesnook.com/tos", colors)
+                  openLinkInBrowser("https://notesnook.com/tos")
                     .catch(() => {})
                     .then(() => {});
                 }}
@@ -538,7 +608,7 @@ export const PricingPlans = ({
               <Paragraph
                 size={SIZE.xs}
                 onPress={() => {
-                  openLinkInBrowser("https://notesnook.com/privacy", colors)
+                  openLinkInBrowser("https://notesnook.com/privacy")
                     .catch(() => {})
                     .then(() => {});
                 }}
