@@ -20,7 +20,7 @@ import { expose } from "comlink";
 
 const module = {
   async waitForInternet() {
-    let retries = 10;
+    let retries = 3;
     while (retries-- > 0) {
       try {
         const response = await fetch("https://api.notesnook.com/health");
