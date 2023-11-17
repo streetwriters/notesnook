@@ -86,11 +86,41 @@ export function ImageComponent(
             : align === "left"
             ? "start"
             : "end",
+          position: "relative",
           ":hover .drag-handle, :active .drag-handle": {
             opacity: 1
           }
         }}
       >
+        {!src && !bloburl && hash && (
+          <Flex
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: width || "100%",
+              height: height || relativeHeight || "100%",
+              maxWidth: "100%",
+              minWidth: 135,
+              bg: "background-secondary",
+              border: selected
+                ? "2px solid var(--accent)"
+                : "2px solid transparent",
+              borderRadius: "default",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              mt: 1,
+              py: 50
+            }}
+          >
+            <Icon
+              path={Icons.image}
+              size={width ? width * 0.2 : 72}
+              color="gray"
+            />
+          </Flex>
+        )}
         <Resizer
           style={{ marginTop: 5 }}
           editor={editor}
