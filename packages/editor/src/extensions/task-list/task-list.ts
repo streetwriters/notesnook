@@ -31,11 +31,11 @@ import { inputRegex } from "@tiptap/extension-task-item";
 import { dropPoint } from "prosemirror-transform";
 import {
   findChildrenByType,
-  getChangedNodes,
   getDeletedNodes,
   getParentAttributes,
   hasSameAttributes,
-  findParentNodeClosestToPos
+  findParentNodeClosestToPos,
+  getExactChangedNodes
 } from "../../utils/prosemirror";
 import { countCheckedItems, findRootTaskList } from "./utils";
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
@@ -249,9 +249,10 @@ export const TaskListNode = TaskList.extend({
         appendTransaction(transactions, _oldState, newState) {
           if (!transactions[0].docChanged) return;
 
-          const changedNodes = getChangedNodes(transactions[0], {
-            predicate: (node) => node.type.name === TaskItemNode.name
-          });
+          const changedNodes = getExactChangedNodes(
+            transactions[0],
+            (node) => node.type.name === TaskItemNode.name
+          );
           const deletedNodes = getDeletedNodes(
             transactions[0],
             (node) => node.type.name === TaskList.name
@@ -272,7 +273,6 @@ export const TaskListNode = TaskList.extend({
               roots.add(root);
 
               const stats = countCheckedItems(root.node);
-              console.log(stats);
               tr.setNodeMarkup(root.pos, undefined, { stats });
               changeCount++;
             }

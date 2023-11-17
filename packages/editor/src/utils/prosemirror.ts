@@ -312,6 +312,33 @@ export function getChangedNodes(
   // The container for the nodes which have been added..
   const nodes: NodeWithPos[] = [];
   for (const range of nodeRange) {
+    const { start, end } = range;
+
+    // Find all the nodes between the provided node range.
+    tr.doc.nodesBetween(start, end, (node, pos) => {
+      // Check wether this is a node that should be added.
+      const shouldAdd = !predicate || predicate(node, start, range);
+
+      if (shouldAdd && nodes.every((n) => n.pos !== pos)) {
+        nodes.push({ node, pos });
+      }
+
+      return descend;
+    });
+  }
+
+  return nodes;
+}
+
+export function getExactChangedNodes(
+  tr: Transaction,
+  predicate?: (node: ProsemirrorNode, pos: number, range: NodeRange) => boolean
+): NodeWithPos[] {
+  const nodeRange = getChangedNodeRanges(tr);
+
+  // The container for the nodes which have been added..
+  const nodes: NodeWithPos[] = [];
+  for (const range of nodeRange) {
     const { start } = range;
 
     if (nodeRange && nodes.every((n) => n.pos !== start)) {

@@ -5,6 +5,10 @@ exports[`delete checked items in a nested task list 1`] = `
   {
     "attrs": {
       "readonly": false,
+      "stats": {
+        "checked": 0,
+        "total": 6,
+      },
       "title": null,
     },
     "content": [
@@ -42,6 +46,10 @@ exports[`delete checked items in a nested task list 1`] = `
           {
             "attrs": {
               "readonly": false,
+              "stats": {
+                "checked": 0,
+                "total": 0,
+              },
               "title": null,
             },
             "content": [
@@ -79,6 +87,10 @@ exports[`delete checked items in a nested task list 1`] = `
                   {
                     "attrs": {
                       "readonly": false,
+                      "stats": {
+                        "checked": 0,
+                        "total": 0,
+                      },
                       "title": null,
                     },
                     "content": [
@@ -99,6 +111,10 @@ exports[`delete checked items in a nested task list 1`] = `
                           {
                             "attrs": {
                               "readonly": false,
+                              "stats": {
+                                "checked": 0,
+                                "total": 0,
+                              },
                               "title": null,
                             },
                             "content": [
@@ -148,6 +164,10 @@ exports[`delete checked items in a task list 1`] = `
   {
     "attrs": {
       "readonly": false,
+      "stats": {
+        "checked": 0,
+        "total": 1,
+      },
       "title": null,
     },
     "content": [
@@ -179,6 +199,10 @@ exports[`sort checked items to the bottom of the task list 1`] = `
   {
     "attrs": {
       "readonly": false,
+      "stats": {
+        "checked": 6,
+        "total": 12,
+      },
       "title": null,
     },
     "content": [
@@ -216,6 +240,10 @@ exports[`sort checked items to the bottom of the task list 1`] = `
           {
             "attrs": {
               "readonly": false,
+              "stats": {
+                "checked": 0,
+                "total": 0,
+              },
               "title": null,
             },
             "content": [
@@ -253,6 +281,10 @@ exports[`sort checked items to the bottom of the task list 1`] = `
                   {
                     "attrs": {
                       "readonly": false,
+                      "stats": {
+                        "checked": 0,
+                        "total": 0,
+                      },
                       "title": null,
                     },
                     "content": [
@@ -273,6 +305,10 @@ exports[`sort checked items to the bottom of the task list 1`] = `
                           {
                             "attrs": {
                               "readonly": false,
+                              "stats": {
+                                "checked": 0,
+                                "total": 0,
+                              },
                               "title": null,
                             },
                             "content": [
