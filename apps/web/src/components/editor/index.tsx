@@ -40,7 +40,7 @@ import Tiptap from "./tiptap";
 import Header from "./header";
 import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
-import { attachFile, AttachmentProgress, insertAttachment } from "./picker";
+import { attachFile, AttachmentProgress, insertAttachments } from "./picker";
 import { saveAttachment, downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core/dist/common";
 import { db } from "../../common/db";
@@ -412,12 +412,13 @@ export function Editor(props: EditorProps) {
             onPreviewDocument({ url: URL.createObjectURL(blob), hash });
           }
         }}
-        onInsertAttachment={(type) => {
+        onInsertAttachment={async (type) => {
           const mime = type === "file" ? "*/*" : "image/*";
-          insertAttachment(mime).then((file) => {
-            if (!file) return;
-            editor.current?.attachFile(file);
-          });
+          const attachments = await insertAttachments(mime);
+          if (!attachments) return;
+          for (const attachment of attachments) {
+            editor.current?.attachFile(attachment);
+          }
         }}
         onGetAttachmentData={(attachment) => {
           return downloadAttachment(

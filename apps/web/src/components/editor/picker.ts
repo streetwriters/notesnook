@@ -30,18 +30,25 @@ import { Attachment } from "@notesnook/editor";
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
-export async function insertAttachment(type = "*/*") {
+export async function insertAttachments(type = "*/*") {
   if (!isUserPremium()) {
     await showBuyDialog();
     return;
   }
 
-  const selectedFile = await showFilePicker({
-    acceptedFileTypes: type || "*/*"
+  const files = await showFilePicker({
+    acceptedFileTypes: type || "*/*",
+    multiple: true
   });
-  if (!selectedFile) return;
+  if (!files) return;
 
-  return await attachFile(selectedFile);
+  const attachments: Attachment[] = [];
+  for (const file of files) {
+    const attachment = await attachFile(file);
+    if (!attachment) continue;
+    attachments.push(attachment);
+  }
+  return attachments;
 }
 
 export async function attachFile(selectedFile: File) {
@@ -60,7 +67,7 @@ export async function reuploadAttachment(
   type: string,
   expectedFileHash: string
 ) {
-  const selectedFile = await showFilePicker({
+  const [selectedFile] = await showFilePicker({
     acceptedFileTypes: type || "*/*"
   });
   if (!selectedFile) return;
