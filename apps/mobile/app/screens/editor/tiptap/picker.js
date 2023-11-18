@@ -35,6 +35,7 @@ import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 import { eCloseSheet } from "../../../utils/events";
 import { editorController, editorState } from "./utils";
 import { useSettingStore } from "../../../stores/use-setting-store";
+import filesystem from "../../../common/filesystem";
 
 const showEncryptionSheet = (file) => {
   presentSheet({
@@ -268,6 +269,10 @@ export async function attachFile(uri, hash, type, filename, options) {
         context: "local"
       });
       return false;
+    }
+
+    if (!options.reupload && exists) {
+      options.reupload = (await filesystem.getUploadedFileSize(hash)) <= 0;
     }
 
     if (!exists || options?.reupload) {
