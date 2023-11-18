@@ -26,6 +26,7 @@ import IconTag from "../icon-tag";
 import { db } from "../../common/db";
 import { useMenuTrigger } from "../../hooks/use-menu";
 import { MenuItem } from "@notesnook/ui";
+import { navigate } from "../../navigation";
 
 type HeaderProps = { readonly: boolean };
 function Header(props: HeaderProps) {
@@ -50,8 +51,16 @@ function Header(props: HeaderProps) {
               key={tag}
               text={db.tags?.alias(tag)}
               icon={Tag}
-              title={`Click to remove`}
-              onClick={() => setTag(tag)}
+              title={tag}
+              onClick={() => {
+                const tagItem = db.tags?.tag(tag);
+                if (!tagItem) {
+                  setTag(tag);
+                  return;
+                }
+                navigate(`/tags/${tagItem.id}`);
+              }}
+              onDismiss={readonly ? undefined : () => setTag(tag)}
               styles={{ container: { mr: 1 }, text: { fontSize: "body" } }}
             />
           ))}
