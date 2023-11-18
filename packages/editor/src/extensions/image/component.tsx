@@ -79,7 +79,6 @@ export function ImageComponent(
           ml: float ? (align === "right" ? 2 : 0) : 0,
           mr: float ? (align === "left" ? 2 : 0) : 0,
           float: float ? (align as "left" | "right") : "none",
-          width: float ? "100%" : "unset",
           justifyContent: float
             ? "stretch"
             : align === "center"
@@ -124,7 +123,7 @@ export function ImageComponent(
         )}
         <Resizer
           style={{ marginTop: 5 }}
-          editor={editor}
+          enabled={editor.isEditable && !float}
           selected={selected}
           width={width}
           height={height || relativeHeight}
@@ -200,6 +199,7 @@ export function ImageComponent(
             }
             title={title}
             sx={{
+              objectFit: "contain",
               width: editor.isEditable ? "100%" : width,
               height: editor.isEditable ? "100%" : height,
               border: selected

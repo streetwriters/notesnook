@@ -22,11 +22,11 @@ import { Resizable } from "re-resizable";
 import { PropsWithChildren } from "react";
 import { Icons } from "../../toolbar";
 import { Icon } from "@notesnook/ui";
-import { Editor } from "../../types";
 import { Flex } from "@theme-ui/components";
+import { getEditorDOM } from "../../toolbar/utils/dom";
 
 type ResizerProps = {
-  editor: Editor;
+  enabled: boolean;
   selected: boolean;
   width?: number;
   height?: number;
@@ -36,7 +36,7 @@ type ResizerProps = {
 };
 export function Resizer(props: PropsWithChildren<ResizerProps>) {
   const {
-    editor,
+    enabled,
     selected,
     onResize,
     width,
@@ -46,7 +46,7 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
     style
   } = props;
 
-  if (!editor.isEditable)
+  if (!enabled)
     return <Flex sx={{ position: "relative", width }}>{children}</Flex>;
 
   return (
@@ -68,6 +68,7 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
       }}
       className="resizer"
       maxWidth={"100%"}
+      bounds={getEditorDOM()}
       minWidth={135}
       handleStyles={{
         bottomRight: {
@@ -98,6 +99,7 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
           // ignore
         }
       }}
+      onResizeStart={(e) => e.preventDefault()}
       lockAspectRatio={true}
     >
       {children}

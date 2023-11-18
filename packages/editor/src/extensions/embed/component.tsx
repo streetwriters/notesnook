@@ -50,7 +50,7 @@ export function EmbedComponent(
     >
       <Resizer
         handleColor="accent"
-        editor={editor}
+        enabled={editor.isEditable}
         selected={selected}
         width={width}
         onResize={(width, height) => {
