@@ -242,10 +242,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
         ? target.parentElement?.closest("[data-drag-handle]")
         : target.closest("[data-drag-handle]");
 
-    if (!this.dom || this.contentDOM?.contains(target) || !dragHandle) {
-      event.preventDefault();
-      return;
-    }
+    if (!this.dom || this.contentDOM?.contains(target) || !dragHandle) return;
 
     const dragImage = this.dom.querySelector("[data-drag-image]") || this.dom;
 
