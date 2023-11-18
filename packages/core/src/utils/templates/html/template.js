@@ -46,6 +46,11 @@ const template = (data) => `<!DOCTYPE html>
       color: #202124;
       font-family: "Open Sans", "Noto Sans", Frutiger, Calibri, Myriad, Arial, Ubuntu, Helvetica, -apple-system, BlinkMacSystemFont, sans-serif;
     }
+
+    .math-block {
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
     
     h1,
     h2,
