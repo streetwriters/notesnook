@@ -59,7 +59,7 @@ const UTITypes: Record<string, string> = {
 };
 
 export function corsify(url: string, host?: string) {
-  if (host && !url.startsWith("blob:") && !isDataUrl(url))
+  if (host && url && !url.startsWith("blob:") && !isDataUrl(url))
     return `${host}/${url}`;
   return url;
 }

@@ -250,6 +250,7 @@ export function ImageComponent(
 }
 
 function canParse(src: string) {
+  if (!src) return false;
   try {
     return !!new URL(src);
   } catch {
