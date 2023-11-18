@@ -211,6 +211,8 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
                 controller={controllerRef}
                 title={controller.title}
                 fontFamily={settings.fontFamily}
+                dateFormat={settings.dateFormat}
+                timeFormat={settings.timeFormat}
               />
               <StatusBar container={containerRef} />
             </>

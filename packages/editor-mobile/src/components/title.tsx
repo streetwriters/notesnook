@@ -21,18 +21,23 @@ import { getFontById } from "@notesnook/editor";
 import React, { RefObject, useCallback, useEffect, useRef } from "react";
 import { EditorController } from "../hooks/useEditorController";
 import styles from "./styles.module.css";
+import { replaceDateTime } from "@notesnook/editor/dist/extensions/date-time";
 function Title({
   controller,
   title,
   titlePlaceholder,
   readonly,
-  fontFamily
+  fontFamily,
+  dateFormat,
+  timeFormat
 }: {
   controller: RefObject<EditorController>;
   title: string;
   titlePlaceholder: string;
   readonly: boolean;
   fontFamily: string;
+  dateFormat: string;
+  timeFormat: string;
 }) {
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const titleSizeDiv = useRef<HTMLDivElement>(null);
@@ -128,6 +133,11 @@ function Title({
         onChange={(event) => {
           resizeTextarea();
           if (!emitUpdate.current) return;
+          event.target.value = replaceDateTime(
+            event.target.value,
+            dateFormat,
+            timeFormat as "12-hour" | "24-hour"
+          );
           controller.current?.titleChange(event.target.value);
         }}
         placeholder={titlePlaceholder}
