@@ -62,7 +62,6 @@ export const BackupExportSettings: SettingsGroup[] = [
         key: "restore-backup",
         title: "Restore backup",
         description: "Restore a backup file from your disk drive.",
-        isHidden: () => !useUserStore.getState().isLoggedIn && !IS_TESTING,
         components: [
           {
             type: "button",
