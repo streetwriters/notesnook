@@ -41,7 +41,6 @@ async function preprocessHTML(templateData) {
   const { content } = templateData;
 
   let html = content.replaceAll(/<p([^>]*)><\/p>/gm, "<p$1><br/></p>");
-  console.log(html);
   for (const attribute in replaceableAttributes) {
     html = html.replaceAll(attribute, replaceableAttributes[attribute]);
   }
@@ -60,7 +59,6 @@ async function preprocessHTML(templateData) {
       : await import("katex/contrib/mhchem/mhchem.js");
     for (const mathBlock of mathBlocks) {
       const text = mathBlock.textContent;
-      console.log(text);
       mathBlock.innerHTML = katex.renderToString(text, {
         displayMode: true,
         throwOnError: false
@@ -114,6 +112,9 @@ async function preprocessHTML(templateData) {
 export default { buildHTML };
 
 function hasRequire() {
-  // eslint-disable-next-line no-undef
-  return typeof require === "function" && !IS_DESKTOP_APP;
+  return (
+    typeof require === "function" &&
+    // eslint-disable-next-line no-undef
+    (typeof IS_DESKTOP_APP === "undefined" || !IS_DESKTOP_APP)
+  );
 }

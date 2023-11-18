@@ -32,7 +32,10 @@ const languagesList = await langen(
   path.join(ROOT_DIR, "src", "utils", "templates", "html", "languages")
 );
 const languageIndex = `function hasRequire() {
-  return typeof require === "function" && !IS_DESKTOP_APP;
+  return (
+    typeof require === "function" &&
+    (typeof IS_DESKTOP_APP === "undefined" || !IS_DESKTOP_APP)
+  );
 }
 
 export async function loadLanguage(language) {
