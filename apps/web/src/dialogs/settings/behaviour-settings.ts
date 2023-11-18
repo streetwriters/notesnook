@@ -22,7 +22,6 @@ import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import dayjs from "dayjs";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
-import { isMac } from "../../utils/platform";
 
 export const BehaviourSettings: SettingsGroup[] = [
   {
@@ -155,20 +154,6 @@ export const BehaviourSettings: SettingsGroup[] = [
             type: "toggle",
             isToggled: () => useSettingStore.getState().autoUpdates,
             toggle: () => useSettingStore.getState().toggleAutoUpdates()
-          }
-        ]
-      },
-      {
-        key: "menu-bar",
-        title: "Disable menu bar",
-        description:
-          "Disable menu bar so it remains hidden even when Alt key is pressed.",
-        isHidden: () => isMac(),
-        components: [
-          {
-            type: "toggle",
-            isToggled: () => !useSettingStore.getState().menuBar,
-            toggle: () => useSettingStore.getState().toggleMenuBar()
           }
         ]
       }

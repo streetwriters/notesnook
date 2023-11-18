@@ -41,8 +41,7 @@ export const config = {
   isSpellCheckerEnabled: true,
   zoomFactor: 1,
   theme: nativeTheme.themeSource,
-  automaticUpdates: true,
-  menuBar: true
+  automaticUpdates: true
 };
 
 type ConfigKey = keyof typeof config;

@@ -54,15 +54,6 @@ export const osIntegrationRouter = t.router({
     config.zoomFactor = factor;
   }),
 
-  menuBar: t.procedure.query(() => config.menuBar),
-  setMenuBar: t.procedure
-    .input(z.object({ enabled: z.boolean() }))
-    .mutation(({ input: { enabled } }) => {
-      config.menuBar = enabled;
-      if (!enabled) globalThis.window?.setMenuBarVisibility(false);
-      globalThis.window?.setAutoHideMenuBar(enabled);
-    }),
-
   privacyMode: t.procedure.query(() => config.privacyMode),
   setPrivacyMode: t.procedure
     .input(z.object({ enabled: z.boolean() }))

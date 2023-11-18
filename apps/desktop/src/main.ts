@@ -77,7 +77,7 @@ async function createWindow() {
     darkTheme: getTheme() === "dark",
     backgroundColor: getBackgroundColor(),
     opacity: 0,
-    autoHideMenuBar: config.menuBar,
+    autoHideMenuBar: false,
     icon: AssetManager.appIcon({
       size: 512,
       format: process.platform === "win32" ? "ico" : "png"
