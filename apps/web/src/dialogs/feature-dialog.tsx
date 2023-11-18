@@ -89,7 +89,17 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [],
+      : [
+          {
+            title: "Date time shortcuts in note title",
+            subtitle:
+              "You can now use date time shortcuts (/now, /date & /time) in note & task list titles."
+          },
+          {
+            title: "Restore backups without an account",
+            subtitle: "You can now restore backups without logging in."
+          }
+        ],
     cta: {
       title: "Got it",
       icon: Checkmark,
