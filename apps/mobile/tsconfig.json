@@ -15,7 +15,9 @@
       "@notesnook/theme": ["../../packages/theme"],
       "@types/react": ["./node_modules/@types/react"]
     },
-    "incremental": true
+    "incremental": true,
+    "maxNodeModuleJsDepth": 5,
+    "downlevelIteration": true
   },
   "exclude": ["native"]
 }
