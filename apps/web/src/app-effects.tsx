@@ -129,7 +129,6 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
     ) {
       const [key, status] = getProcessingStatusFromType(type);
 
-      console.log("handleDownloadUploadProgresss", key, status, current, total);
       if (current === total) {
         removeStatus(key);
       } else {
