@@ -41,12 +41,21 @@ export async function exportToPDF(
     iframe.style.width = "0";
     iframe.style.height = "0";
     iframe.style.border = "0";
+    iframe.loading = "eager";
 
-    iframe.onload = () => {
+    iframe.onload = async () => {
       if (!iframe.contentWindow) return;
       if (iframe.contentDocument) iframe.contentDocument.title = title;
       iframe.contentWindow.onbeforeunload = () => closePrint(false);
       iframe.contentWindow.onafterprint = () => closePrint(true);
+
+      if (
+        iframe.contentDocument &&
+        !!iframe.contentDocument.querySelector(".math-block,.math-inline")
+      ) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+
       iframe.contentWindow.print();
     };
 
