@@ -96,16 +96,22 @@ export async function downloadFile(filename, data, cancelToken) {
 }
 
 export async function getUploadedFileSize(hash) {
-  const url = `${hosts.API_HOST}/s3?name=${hash}`;
-  const token = await db.user.tokenManager.getAccessToken();
+  try {
+    const url = `${hosts.API_HOST}/s3?name=${hash}`;
+    const token = await db.user.tokenManager.getAccessToken();
 
-  const attachmentInfo = await fetch(url, {
-    method: "HEAD",
-    headers: { Authorization: `Bearer ${token}` }
-  });
+    const attachmentInfo = await fetch(url, {
+      method: "HEAD",
+      headers: { Authorization: `Bearer ${token}` }
+    });
 
-  const contentLength = parseInt(attachmentInfo.headers?.get("content-length"));
-  return isNaN(contentLength) ? 0 : contentLength;
+    const contentLength = parseInt(
+      attachmentInfo.headers?.get("content-length")
+    );
+    return isNaN(contentLength) ? 0 : contentLength;
+  } catch (e) {
+    return 0;
+  }
 }
 
 export async function checkAttachment(hash) {
