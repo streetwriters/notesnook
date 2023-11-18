@@ -107,7 +107,7 @@ async function createWindow() {
   }
 
   await AssetManager.loadIcons();
-  setupDesktopIntegration();
+  setupDesktopIntegration(config.desktopSettings);
 
   mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
     "http://dictionaries.notesnook.com/"

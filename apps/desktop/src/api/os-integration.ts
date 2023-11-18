@@ -83,7 +83,7 @@ export const osIntegrationRouter = t.router({
         AutoLaunch.disable();
       }
       config.desktopSettings = settings;
-      setupDesktopIntegration();
+      setupDesktopIntegration(settings);
     }),
 
   selectDirectory: t.procedure

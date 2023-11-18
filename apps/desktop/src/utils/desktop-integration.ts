@@ -17,25 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { app } from "electron";
-import { config } from "./config";
-import { setupTray } from "./tray";
+import { DesktopIntegration, config } from "./config";
+import { setupTray, destroyTray } from "./tray";
 import { AutoLaunch } from "./autolaunch";
 
-export function setupDesktopIntegration() {
-  const desktopIntegration = config.desktopSettings;
-
+export function setupDesktopIntegration(
+  desktopIntegration: DesktopIntegration
+) {
   if (
     desktopIntegration.closeToSystemTray ||
     desktopIntegration.minimizeToSystemTray
   ) {
     setupTray();
+  } else {
+    destroyTray();
   }
 
   // when close to system tray is enabled, it becomes nigh impossible
   // to "quit" the app. This is necessary in order to fix that.
-  if (desktopIntegration.closeToSystemTray) {
-    app.on("before-quit", () => app.exit(0));
-  }
+  app.on("before-quit", () =>
+    desktopIntegration.closeToSystemTray ? app.exit(0) : null
+  );
 
   globalThis.window?.on("close", (e) => {
     if (config.desktopSettings.closeToSystemTray) {
@@ -49,7 +51,9 @@ export function setupDesktopIntegration() {
         try {
           globalThis.window?.minimize();
           globalThis.window?.hide();
-        } catch (error) {}
+        } catch (error) {
+          console.error(error);
+        }
       }
     }
   });
