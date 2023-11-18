@@ -55,8 +55,16 @@ function attachMessagePort() {
           message.area === "full-page" &&
           (message.mode === "complete" || message.mode === "screenshot");
         return {
-          height: sizeable ? document.body.clientHeight : 0,
-          width: sizeable ? document.body.clientWidth : 0,
+          height: sizeable
+            ? document.body.clientHeight ||
+              document.firstElementChild?.scrollHeight ||
+              1080
+            : 0,
+          width: sizeable
+            ? document.body.clientWidth ||
+              document.firstElementChild?.scrollWidth ||
+              1920
+            : 0,
           data: await clip(request)
         };
       }

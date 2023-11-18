@@ -25,7 +25,8 @@
   "scripts": {
     "build": "tsc && yarn webpack -c webpack.config.js",
     "test": "playwright test",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "watch": "tsc --watch"
   },
   "bugs": {
     "url": "https://github.com/streetwriters/notesnook/issues"
