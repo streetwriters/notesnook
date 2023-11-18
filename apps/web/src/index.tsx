@@ -24,6 +24,7 @@ import { loadDatabase } from "./hooks/use-database";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { BaseThemeProvider } from "./components/theme-provider";
 import { register } from "./utils/stream-saver/mitm";
+import { getServiceWorkerVersion } from "./utils/version";
 
 renderApp();
 
@@ -60,7 +61,6 @@ async function initializeServiceWorker() {
     serviceWorker.register({
       onUpdate: async (registration: ServiceWorkerRegistration) => {
         if (!registration.waiting) return;
-        const { getServiceWorkerVersion } = await import("./utils/version");
         const { formatted } = await getServiceWorkerVersion(
           registration.waiting
         );

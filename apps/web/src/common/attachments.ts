@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import FS from "../interfaces/fs";
+import { lazify } from "../utils/lazify";
 import { db } from "./db";
 
 async function download(hash: string) {
@@ -42,13 +42,15 @@ export async function saveAttachment(hash: string) {
   if (!response) return;
 
   const { attachment, key } = response;
-  await FS.saveFile(attachment.metadata.hash, {
-    key,
-    iv: attachment.iv,
-    name: attachment.metadata.filename,
-    type: attachment.metadata.type,
-    isUploaded: !!attachment.dateUploaded
-  });
+  await lazify(import("../interfaces/fs"), ({ default: FS }) =>
+    FS.saveFile(attachment.metadata.hash, {
+      key,
+      iv: attachment.iv,
+      name: attachment.metadata.filename,
+      type: attachment.metadata.type,
+      isUploaded: !!attachment.dateUploaded
+    })
+  );
 }
 
 type OutputTypeToReturnType = {
@@ -67,13 +69,15 @@ export async function downloadAttachment<
   if (type === "base64" || type === "text")
     return (await db.attachments?.read(hash, type)) as TOutputType;
 
-  const blob = await FS.decryptFile(attachment.metadata.hash, {
-    key,
-    iv: attachment.iv,
-    name: attachment.metadata.filename,
-    type: attachment.metadata.type,
-    isUploaded: !!attachment.dateUploaded
-  });
+  const blob = await lazify(import("../interfaces/fs"), ({ default: FS }) =>
+    FS.decryptFile(attachment.metadata.hash, {
+      key,
+      iv: attachment.iv,
+      name: attachment.metadata.filename,
+      type: attachment.metadata.type,
+      isUploaded: !!attachment.dateUploaded
+    })
+  );
 
   if (!blob) return;
   return blob as TOutputType;
@@ -84,7 +88,9 @@ export async function checkAttachment(hash: string) {
   if (!attachment) return { failed: "Attachment not found." };
 
   try {
-    const size = await FS.getUploadedFileSize(hash);
+    const size = await lazify(import("../interfaces/fs"), ({ default: FS }) =>
+      FS.getUploadedFileSize(hash)
+    );
     if (size <= 0) return { failed: "File length is 0." };
   } catch (e) {
     return { failed: e instanceof Error ? e.message : "Unknown error." };

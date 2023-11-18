@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { AsyncZippable } from "fflate";
+import { AsyncZippable, zip as zipAsync } from "fflate";
 import { sanitizeFilename } from "@notesnook/common";
 
 const textEncoder = new TextEncoder();
@@ -34,9 +34,8 @@ async function zip(files: File[], format: string): Promise<Uint8Array> {
       { mtime: file.date }
     ];
   });
-  const { zip } = await import("fflate");
   return new Promise((resolve, reject) =>
-    zip(obj, (err, data) => (err ? reject(err) : resolve(data)))
+    zipAsync(obj, (err, data) => (err ? reject(err) : resolve(data)))
   );
 }
 export { zip };

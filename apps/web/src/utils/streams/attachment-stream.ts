@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { decryptFile } from "../../interfaces/fs";
 import { db } from "../../common/db";
+import { lazify } from "../lazify";
 import { ZipFile } from "./zip-stream";
 
 export const METADATA_FILENAME = "metadata.json";
@@ -55,13 +55,17 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
         );
 
         const key = await db.attachments?.decryptKey(attachment.key);
-        const file = await decryptFile(attachment.metadata.hash, {
-          key,
-          iv: attachment.iv,
-          name: attachment.metadata.filename,
-          type: attachment.metadata.type,
-          isUploaded: !!attachment.dateUploaded
-        });
+        const file = await lazify(
+          import("../../interfaces/fs"),
+          ({ decryptFile }) =>
+            decryptFile(attachment.metadata.hash, {
+              key,
+              iv: attachment.iv,
+              name: attachment.metadata.filename,
+              type: attachment.metadata.type,
+              isUploaded: !!attachment.dateUploaded
+            })
+        );
 
         if (file) {
           const filePath: string = attachment.metadata.filename;

@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { db } from "../common/db";
-import FS from "../interfaces/fs";
-
 import type { Note, Notebook } from "@notesnook-importer/core";
 import {
   ATTACHMENTS_DIRECTORY_NAME,
@@ -30,6 +28,7 @@ import { Reader, Entry } from "./zip-reader";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
 
 export async function* importFiles(zipFiles: File[]) {
+  const { default: FS } = await import("../interfaces/fs");
   for (const zip of zipFiles) {
     let count = 0;
     let filesRead = 0;

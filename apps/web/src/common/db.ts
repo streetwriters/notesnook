@@ -21,6 +21,7 @@ import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
 import type Database from "@notesnook/core/dist/api";
+import { showMigrationDialog } from "./dialog-controller";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -70,7 +71,6 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   logger.measure("Database initialization");
 
   if (db.migrations?.required()) {
-    const { showMigrationDialog } = await import("./dialog-controller");
     await showMigrationDialog();
   }
 

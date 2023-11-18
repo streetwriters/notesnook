@@ -23,9 +23,9 @@ import { db } from "../../common/db";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { TaskManager } from "../../common/task-manager";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
-import fs from "../../interfaces/fs";
 import { showToast } from "../../utils/toast";
 import { showFilePicker } from "../../utils/file-picker";
+import { lazify } from "../../utils/lazify";
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
@@ -154,11 +154,12 @@ async function addAttachment(
   const { expectedFileHash, forceWrite, showProgress = true } = options;
 
   const action = async () => {
-    const reader: ReadableStreamReader<Uint8Array> = (
-      file.stream() as unknown as ReadableStream<Uint8Array>
-    ).getReader();
+    const reader = file.stream().getReader();
 
-    const { hash, type: hashType } = await fs.hashStream(reader);
+    const { hash, type: hashType } = await lazify(
+      import("../../interfaces/fs"),
+      ({ default: FS }) => FS.hashStream(reader)
+    );
     reader.releaseLock();
 
     if (expectedFileHash && hash !== expectedFileHash)
@@ -169,7 +170,10 @@ async function addAttachment(
     if (forceWrite || !exists) {
       const key: SerializedKey = await getEncryptionKey();
 
-      const output = await fs.writeEncryptedFile(file, key, hash);
+      const output = await lazify(
+        import("../../interfaces/fs"),
+        ({ default: FS }) => FS.writeEncryptedFile(file, key, hash)
+      );
       if (!output) throw new Error("Could not encrypt file.");
 
       if (forceWrite && exists) await db.attachments?.reset(hash);
