@@ -63,7 +63,7 @@ function attachMessagePort() {
           width: sizeable
             ? document.body.clientWidth ||
               document.firstElementChild?.scrollWidth ||
-              1080
+              1920
             : 0,
           data: await clip(request)
         };
