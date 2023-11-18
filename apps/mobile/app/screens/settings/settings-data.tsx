@@ -88,8 +88,8 @@ export const settingsGroups: SettingSection[] = [
           return isBasic || !user.subscription?.type
             ? "Subscribe to Pro"
             : isTrial
-              ? "Your free trial has started"
-              : "Subscription details";
+            ? "Your free trial has started"
+            : "Subscription details";
         },
         type: "component",
         component: "subscription",
@@ -111,16 +111,16 @@ export const settingsGroups: SettingSection[] = [
           return user.subscription?.type === 2
             ? "You signed up on " + startDate
             : user.subscription?.type === 1
-              ? "Your free trial will end on " + expiryDate
-              : user.subscription?.type === 6
-                ? subscriptionDaysLeft.time < -3
-                  ? "Your subscription has ended"
-                  : "Your account will be downgraded to Basic in 3 days"
-                : user.subscription?.type === 7
-                  ? `Your subscription will end on ${expiryDate}.`
-                  : user.subscription?.type === 5
-                    ? `Your subscription will renew on ${expiryDate}.`
-                    : "Never hesitate to choose privacy";
+            ? "Your free trial will end on " + expiryDate
+            : user.subscription?.type === 6
+            ? subscriptionDaysLeft.time < -3
+              ? "Your subscription has ended"
+              : "Your account will be downgraded to Basic in 3 days"
+            : user.subscription?.type === 7
+            ? `Your subscription will end on ${expiryDate}.`
+            : user.subscription?.type === 5
+            ? `Your subscription will renew on ${expiryDate}.`
+            : "Never hesitate to choose privacy";
         }
       },
       {
@@ -892,16 +892,6 @@ export const settingsGroups: SettingSection[] = [
         name: "Restore backup",
         description: "Restore backup from phone storage.",
         modifer: () => {
-          const user = useUserStore.getState().user;
-          if (!user || !user?.email) {
-            ToastEvent.show({
-              heading: "Login required",
-              message: "Please log in to your account to restore backup",
-              type: "error",
-              context: "global"
-            });
-            return;
-          }
           eSendEvent(eOpenRestoreDialog);
         }
       },
