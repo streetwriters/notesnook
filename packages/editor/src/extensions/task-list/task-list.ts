@@ -238,6 +238,7 @@ export const TaskListNode = TaskList.extend({
           tr.doc.descendants((node, pos) => {
             if (node.type.name === TaskList.name) {
               tr.setNodeMarkup(pos, undefined, {
+                ...node.attrs,
                 stats: countCheckedItems(node)
               });
               return false;
@@ -304,6 +305,7 @@ export const TaskListNode = TaskList.extend({
 
               changeCount++;
               tr.setNodeMarkup(tr.mapping.map(parentTaskItem.pos), undefined, {
+                ...parentTaskItem.node.attrs,
                 checked: allChecked
               });
               childPos = parentTaskItem.pos;
@@ -318,7 +320,10 @@ export const TaskListNode = TaskList.extend({
               roots.add(root);
 
               const stats = countCheckedItems(root.node);
-              tr.setNodeMarkup(root.pos, undefined, { stats });
+              tr.setNodeMarkup(root.pos, undefined, {
+                ...root.node.attrs,
+                stats
+              });
               changeCount++;
             }
           }
