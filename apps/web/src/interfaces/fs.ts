@@ -226,8 +226,10 @@ type UploadAdditionalData = {
 
 async function uploadFile(filename: string, requestOptions: RequestOptions) {
   const fileHandle = await streamablefs.readFile(filename);
-  if (!fileHandle)
-    throw new Error(`File stream not found. (File hash: ${filename})`);
+  if (!fileHandle || !(await exists(filename)))
+    throw new Error(
+      `File is corrupt or missing data. Please upload the file again. (File hash: ${filename})`
+    );
   try {
     if (fileHandle.file.additionalData?.uploaded) {
       await checkUpload(filename);
