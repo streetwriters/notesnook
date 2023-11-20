@@ -111,12 +111,14 @@ export function TaskListComponent(
                     if (!node) return false;
                     const toggleState = !node.attrs.readonly;
                     tr.setNodeMarkup(tr.mapping.map(parentPos), null, {
+                      ...node.attrs,
                       readonly: toggleState
                     });
                     node.descendants((node, pos) => {
                       if (node.type.name === TaskList.name) {
                         const actualPos = pos + parentPos + 1;
                         tr.setNodeMarkup(tr.mapping.map(actualPos), null, {
+                          ...node.attrs,
                           readonly: toggleState
                         });
                       }
