@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import DataURL from "@notesnook/core/dist/utils/dataurl";
+
 export type DownloadOptions = {
   corsHost: string;
 };
@@ -119,8 +121,10 @@ export function toBlobURL(dataurl: string, id?: string) {
   if (id && OBJECT_URL_CACHE[id]) return OBJECT_URL_CACHE[id];
   if (!isDataUrl(dataurl)) return;
 
+  const { data, mime } = DataURL.toObject(dataurl); //.split(",");
+  if (!data || !mime) return;
   const objectURL = URL.createObjectURL(
-    new Blob([Buffer.from(dataurl.split(",")[1], "base64")])
+    new Blob([Buffer.from(data, "base64")], { type: mime })
   );
 
   if (id) OBJECT_URL_CACHE[id] = objectURL;
