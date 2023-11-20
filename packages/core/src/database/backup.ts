@@ -331,7 +331,7 @@ export default class Backup {
 
   private async migrateData(data: BackupDataItem[], version: number) {
     await this.db.transaction(async () => {
-      for (let item of data) {
+      for (const item of data) {
         // we do not want to restore deleted items
         if (
           !item ||
@@ -381,13 +381,11 @@ export default class Backup {
         if (!itemType || itemType === "topic" || itemType === "settings")
           continue;
 
-        if (
-          item.type === "attachment" &&
-          item.hash &&
-          !(await this.db.attachments.exists(item.hash))
-        ) {
-          item.dateUploaded = undefined;
-          item.failed = undefined;
+        if (item.type === "attachment" && item.hash) {
+          if (!(await this.db.attachments.exists(item.hash))) {
+            item.dateUploaded = undefined;
+            item.failed = undefined;
+          } else continue;
         }
 
         const collectionKey = itemTypeToCollectionKey[itemType];
