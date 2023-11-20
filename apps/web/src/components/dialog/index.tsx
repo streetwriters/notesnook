@@ -80,11 +80,10 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           border: 0,
           zIndex: 999,
           backgroundColor: "var(--backdrop)"
+        },
+        overlay: {
+          opacity: 1
         }
-        // overlay: {
-        //   zIndex: 999,
-        //   background: "var(--backdrop)"
-        // }
       }}
     >
       <ScopedThemeProvider
@@ -212,6 +211,7 @@ function onAfterOpen(
   e: ReactModal.OnAfterOpenCallbackOptions | undefined,
   props: DialogProps
 ) {
+  console.log("OnAfterOpen");
   if (!props.onClose || !e) return;
   // we need this work around because ReactModal content spreads over the overlay
   const child = e.contentEl.firstElementChild as HTMLElement;
