@@ -57,7 +57,8 @@ export function ImageComponent(
     height,
     textDirection,
     hash,
-    aspectRatio
+    aspectRatio,
+    mime
   } = node.attrs;
   const float = isMobile ? false : node.attrs.float;
 
@@ -67,6 +68,7 @@ export function ImageComponent(
   const imageRef = useRef<HTMLImageElement>(null);
   const downloadOptions = useToolbarStore((store) => store.downloadOptions);
   const isReadonly = !editor.current?.isEditable;
+  const isSVG = mime.includes("/svg");
   const relativeHeight = aspectRatio
     ? editor.view.dom.clientWidth / aspectRatio
     : undefined;
@@ -87,6 +89,7 @@ export function ImageComponent(
             ? "start"
             : "end",
           position: "relative",
+          mt: isSVG ? `24px` : 0,
           ":hover .drag-handle, :active .drag-handle": {
             opacity: 1
           }
@@ -139,7 +142,8 @@ export function ImageComponent(
                   top: -40,
                   right: 0,
                   mb: 2,
-                  alignItems: "end"
+                  alignItems: "end",
+                  zIndex: 999
                 }}
               >
                 <ToolbarGroup
@@ -184,7 +188,31 @@ export function ImageComponent(
               }}
             />
           )}
+          {isSVG ? (
+            <Box
+              sx={{
+                width: "100%",
+                display: editor.isEditable ? "flex" : "none",
+                position: "absolute",
+                top: -24,
+                height: 24,
+                justifyContent: "end",
+                p: "small",
+                bg: editor.isEditable
+                  ? "var(--background-secondary)"
+                  : "transparent",
+                borderTopLeftRadius: "default",
+                borderTopRightRadius: "default",
+                borderColor: selected ? "border" : "var(--border-secondary)",
+                cursor: "pointer",
+                ":hover": {
+                  borderColor: "border"
+                }
+              }}
+            ></Box>
+          ) : null}
           <AnimatedImage
+            as={isSVG ? "object" : "img"}
             initial={{ opacity: 0 }}
             animate={{ opacity: bloburl || src ? 1 : 0 }}
             transition={{ duration: 0.5, ease: "easeIn" }}
@@ -192,11 +220,20 @@ export function ImageComponent(
             ref={imageRef}
             alt={alt}
             crossOrigin="anonymous"
-            src={
-              toBlobURL("", hash) ||
-              bloburl ||
-              corsify(src, downloadOptions?.corsHost)
-            }
+            {...(isSVG
+              ? {
+                  data:
+                    toBlobURL("", hash) ||
+                    bloburl ||
+                    corsify(src, downloadOptions?.corsHost),
+                  type: mime
+                }
+              : {
+                  src:
+                    toBlobURL("", hash) ||
+                    bloburl ||
+                    corsify(src, downloadOptions?.corsHost)
+                })}
             title={title}
             sx={{
               objectFit: "contain",
