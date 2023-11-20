@@ -247,7 +247,7 @@ export const TaskListNode = TaskList.extend({
           view.dispatch(tr);
           return {};
         },
-        appendTransaction(transactions, _oldState, newState) {
+        appendTransaction(transactions, oldState, newState) {
           if (!transactions[0].docChanged) return;
 
           const changedNodes = getExactChangedNodes(
@@ -271,7 +271,9 @@ export const TaskListNode = TaskList.extend({
             if (
               // when a task item has children, the task list is always the
               // last child
-              edit.node.lastChild?.type.name === TaskList.name
+              edit.node.lastChild?.type.name === TaskList.name &&
+              oldState.doc.nodeAt(edit.pos)?.attrs.checked !==
+                newState.doc.nodeAt(edit.pos)?.attrs.checked
             ) {
               changeCount += toggleChildren(
                 tr,
@@ -393,6 +395,7 @@ function toggleChildren(
     ) {
       const actualPos = pos + parentPos + 1;
       tr.setNodeMarkup(tr.mapping.map(actualPos), undefined, {
+        ...node.attrs,
         checked: toggleState
       });
       changes++;
