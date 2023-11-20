@@ -137,6 +137,7 @@ export type Attachment = {
   mime: string;
   size: number;
   dataurl?: string;
+  bloburl?: string;
 };
 
 type AddAttachmentOptions = {

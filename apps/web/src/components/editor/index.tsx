@@ -430,13 +430,15 @@ export function Editor(props: EditorProps) {
         onContentChange={onContentChange}
         onChange={onEditorChange}
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
-        onPreviewAttachment={async ({ hash, dataurl }) => {
+        onPreviewAttachment={async (data) => {
+          const { hash } = data;
           const attachment = db.attachments?.attachment(hash);
           if (attachment && attachment.metadata.type.startsWith("image/")) {
             const container = document.getElementById("dialogContainer");
             if (!(container instanceof HTMLElement)) return;
 
-            dataurl = dataurl || (await downloadAttachment(hash, "base64"));
+            const dataurl =
+              data.bloburl || (await downloadAttachment(hash, "base64"));
             if (!dataurl)
               return showToast("error", "This image cannot be previewed.");
 
