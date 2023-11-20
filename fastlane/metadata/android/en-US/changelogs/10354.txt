@@ -1,0 +1,7 @@
+- Fixed HTML & PDF exports
+- Improved task lists in editor
+- Improved loading images
+- Allow restoring backups when logged out
+- Bug fixes and performance improvements
+
+Thank you for using Notesnook!
