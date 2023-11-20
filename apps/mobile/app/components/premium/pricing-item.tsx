@@ -70,10 +70,11 @@ export const PricingItem = ({
         <Paragraph size={SIZE.sm}>
           <Heading size={SIZE.lg - 2}>
             {Platform.OS === "android"
-              ? (product.data as RNIap.SubscriptionAndroid)
+              ? (product.data as RNIap.SubscriptionAndroid | undefined)
                   ?.subscriptionOfferDetails[0].pricingPhases
-                  .pricingPhaseList?.[0].formattedPrice
-              : (product.data as RNIap.SubscriptionIOS)?.localizedPrice}
+                  .pricingPhaseList?.[0]?.formattedPrice
+              : (product.data as RNIap.SubscriptionIOS | undefined)
+                  ?.localizedPrice}
           </Heading>
           {product?.type === "yearly" || product?.offerType === "yearly"
             ? "/year"

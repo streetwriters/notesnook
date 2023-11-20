@@ -245,12 +245,12 @@ export const PricingPlans = ({
             size={SIZE.lg}
           >
             {(Platform.OS === "android"
-              ? (monthlyPlan?.product as RNIap.SubscriptionAndroid)
-                  ?.subscriptionOfferDetails[0].pricingPhases
-                  .pricingPhaseList?.[0].formattedPrice
-              : (monthlyPlan?.product as RNIap.SubscriptionIOS)
-                  .localizedPrice) ||
-              (PremiumService.getMontlySub() as any).localizedPrice}
+              ? (monthlyPlan?.product as RNIap.SubscriptionAndroid | undefined)
+                  ?.subscriptionOfferDetails[0]?.pricingPhases
+                  .pricingPhaseList?.[0]?.formattedPrice
+              : (monthlyPlan?.product as RNIap.SubscriptionIOS | undefined)
+                  ?.localizedPrice) ||
+              (PremiumService.getMontlySub() as any)?.localizedPrice}
             / mo
           </Paragraph>
           <Button
@@ -314,8 +314,8 @@ export const PricingPlans = ({
               >
                 {Platform.OS === "android"
                   ? (product.data as RNIap.SubscriptionAndroid)
-                      ?.subscriptionOfferDetails[1].pricingPhases
-                      .pricingPhaseList?.[1].formattedPrice
+                      ?.subscriptionOfferDetails[1]?.pricingPhases
+                      .pricingPhaseList?.[1]?.formattedPrice
                   : (product.data as RNIap.SubscriptionIOS)?.localizedPrice}
               </Paragraph>{" "}
               for {product.cycleText}
