@@ -33,7 +33,7 @@ function Home() {
   const setContext = useStore((store) => store.setContext);
   const filteredItems = useSearch("notes", (query) => {
     if (useStore.getState().context) return;
-    return db.lookup.notes(query);
+    return db.lookup.notes(query).sorted();
   });
 
   useNavigate("home", setContext);

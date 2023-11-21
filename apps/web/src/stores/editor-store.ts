@@ -71,8 +71,8 @@ export const getDefaultSession = (sessionId?: string): EditorSession => {
 
 class EditorStore extends BaseStore<EditorStore> {
   session = getDefaultSession();
-  tags: Tag[] = [];
   color = undefined;
+  tags: Tag[] = [];
   arePropertiesVisible = false;
   editorMargins = Config.get("editor:margins", true);
 
@@ -93,13 +93,17 @@ class EditorStore extends BaseStore<EditorStore> {
     this.set({
       tags: await db.relations
         .to({ id: session.id, type: "note" }, "tag")
-        .resolve()
+        .selector.items(undefined, {
+          sortBy: "dateCreated",
+          sortDirection: "asc"
+        })
     });
   };
 
   async refresh() {
     const sessionId = this.get().session.id;
-    if (sessionId && !db.notes.note(sessionId)) await this.clearSession();
+    if (sessionId && !(await db.notes.exists(sessionId)))
+      await this.clearSession();
   }
 
   updateSession = async (item: Note) => {
@@ -112,7 +116,6 @@ class EditorStore extends BaseStore<EditorStore> {
       state.session.dateCreated = item.dateCreated;
       state.session.locked = item.locked;
     });
-    this.refreshTags();
   };
 
   openLockedSession = async (note: Note) => {
@@ -242,8 +245,8 @@ class EditorStore extends BaseStore<EditorStore> {
         note.headline !== currentSession.headline;
       if (shouldRefreshNotes) noteStore.refresh();
 
-      const attachments = await db.attachments.ofNote(id, "all");
-      if (attachments.length !== currentSession.attachmentsLength) {
+      const attachmentsLength = await db.attachments.ofNote(id, "all").count();
+      if (attachmentsLength !== currentSession.attachmentsLength) {
         attachmentStore.refresh();
       }
 
@@ -261,7 +264,7 @@ class EditorStore extends BaseStore<EditorStore> {
         state.session.id = note.id;
         state.session.title = note.title;
         state.session.dateEdited = note.dateEdited;
-        state.session.attachmentsLength = attachments.length;
+        state.session.attachmentsLength = attachmentsLength;
       });
       setDocumentTitle(
         settingStore.get().hideNoteTitle ? undefined : note.title
@@ -338,10 +341,6 @@ class EditorStore extends BaseStore<EditorStore> {
     return this.saveSession(noteId, { sessionId, content, dateEdited });
   };
 
-  setTag = (tag: string) => {
-    return this._setTag(tag);
-  };
-
   setSaveState = (saveState: SaveState) => {
     this.set((state) => {
       state.session.saveState = saveState;
@@ -369,26 +368,6 @@ class EditorStore extends BaseStore<EditorStore> {
   //     ? db.vault.save.bind(db.vault)
   //     : db.notes.add.bind(db.notes);
   // };
-
-  async _setTag(value: string) {
-    // const {
-    //   tags,
-    //   session: { id }
-    // } = this.get();
-    // let note = db.notes.note(id);
-    // if (!note) return;
-    // let tag = tags.find((t) => t.title === value);
-    // if (tag) {
-    //   await db.relations.unlink(tag, note._note);
-    //   appStore.refreshNavItems();
-    // } else {
-    //   const id = await db.tags.add({ title: value });
-    //   await db.relations.add({ id, type: "tag" }, note._note);
-    // }
-    // this.refreshTags();
-    // tagStore.refresh();
-    // noteStore.refresh();
-  }
 }
 
 const [useStore, store] = createStore(EditorStore);

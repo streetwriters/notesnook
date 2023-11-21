@@ -75,7 +75,7 @@ function Notebook(props: NotebookProps) {
     "notes",
     (query) => {
       if (!context || !notes || context.type !== "notebook") return;
-      return db.lookup.notes(query, notes.ungrouped);
+      return db.lookup.notes(query, notes.ungrouped).sorted();
     },
     [context, notes]
   );

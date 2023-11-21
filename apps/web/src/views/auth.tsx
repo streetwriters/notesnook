@@ -28,7 +28,7 @@ import {
   MfaRecoveryCode,
   Icon
 } from "../components/icons";
-import Field from "../components/field";
+import Field, { FieldProps } from "../components/field";
 import { getQueryParams, hardNavigate, makeURL } from "../navigation";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
@@ -932,44 +932,13 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
   );
 }
 
-type AuthFieldProps = {
-  id: string;
-  type: string;
-  autoFocus?: boolean;
-  autoComplete: string;
-  label?: string;
-  placeholder?: string;
-  helpText?: string;
-  defaultValue?: string;
-  disabled?: boolean;
-  inputMode?: string;
-  pattern?: string;
-  action?: {
-    disabled?: boolean;
-    component?: JSX.Element;
-    onClick?: () => void | Promise<void>;
-  };
-};
-export function AuthField(props: AuthFieldProps) {
+export function AuthField(props: FieldProps) {
   return (
     <Field
-      type={props.type}
-      id={props.id}
-      name={props.id}
-      data-test-id={props.id}
-      autoComplete={props.autoComplete}
-      label={props.label}
-      autoFocus={props.autoFocus}
-      defaultValue={props.defaultValue}
-      helpText={props.helpText}
-      disabled={props.disabled}
-      pattern={props.pattern}
-      inputMode={props.inputMode}
-      placeholder={props.placeholder}
+      {...props}
       required
-      action={props.action}
+      sx={{ mt: 2, width: "100%" }}
       styles={{
-        container: { mt: 2, width: "100%" },
         // label: { fontWeight: "normal" },
         input: {
           p: "12px",

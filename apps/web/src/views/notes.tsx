@@ -35,7 +35,7 @@ function Notes() {
     "notes",
     (query) => {
       if (!context || !contextNotes) return;
-      return db.lookup.notes(query, contextNotes.ungrouped);
+      return db.lookup.notes(query, contextNotes.ungrouped).sorted();
     },
     [context, contextNotes]
   );
