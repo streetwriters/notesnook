@@ -30,7 +30,7 @@ function Reminders() {
   const reminders = useStore((state) => state.reminders);
   const refresh = useStore((state) => state.refresh);
   const filteredItems = useSearch("reminders", (query) =>
-    db.lookup.reminders(query)
+    db.lookup.reminders(query).sorted()
   );
 
   if (!reminders) return <Placeholder context="reminders" />;
