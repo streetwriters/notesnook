@@ -28,7 +28,9 @@ function Tags() {
   useNavigate("tags", () => store.refresh());
   const tags = useStore((store) => store.tags);
   const refresh = useStore((store) => store.refresh);
-  const filteredItems = useSearch("tags", (query) => db.lookup.tags(query));
+  const filteredItems = useSearch("tags", (query) =>
+    db.lookup.tags(query).sorted()
+  );
 
   if (!tags) return <Placeholder context="tags" />;
   return (

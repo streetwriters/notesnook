@@ -31,7 +31,9 @@ function Trash() {
   const items = useStore((store) => store.trash);
   const refresh = useStore((store) => store.refresh);
   const clearTrash = useStore((store) => store.clear);
-  const filteredItems = useSearch("trash", (query) => db.lookup.trash(query));
+  const filteredItems = useSearch("trash", (query) =>
+    db.lookup.trash(query).sorted()
+  );
 
   if (!items) return <Placeholder context="trash" />;
   return (
