@@ -138,7 +138,7 @@ export function toBlobURL(
   }
 
   const objectURL = URL.createObjectURL(
-    new Blob([Buffer.from(data, "base64")], { type: mime })
+    new Blob([Buffer.from(data, "base64")], { type: mimeType })
   );
 
   if (id) OBJECT_URL_CACHE[id] = objectURL;
