@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor, Extension } from "@tiptap/core";
+import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { Slice } from "prosemirror-model";
 import { LIST_NODE_TYPES } from "../../utils/node-types";
