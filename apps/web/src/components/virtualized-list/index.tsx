@@ -21,18 +21,19 @@ import { Virtualizer, useVirtualizer } from "@tanstack/react-virtual";
 import { Box, BoxProps } from "@theme-ui/components";
 import React, { useRef } from "react";
 
-type VirtualizedListProps<T> = {
+export type VirtualizedListProps<T> = {
   virtualizerRef?: React.MutableRefObject<
     Virtualizer<Element, Element> | undefined
   >;
   mode?: "fixed" | "dynamic";
   items: T[];
   estimatedSize: number;
-  getItemKey: (index: number) => string;
+  getItemKey: (index: number, items: T[]) => string;
   scrollElement?: Element | null;
   itemWrapperProps?: (item: T, index: number) => BoxProps;
   renderItem: (props: { item: T; index: number }) => JSX.Element | null;
   scrollMargin?: number;
+  itemGap?: number;
 } & BoxProps;
 export function VirtualizedList<T>(props: VirtualizedListProps<T>) {
   const {
@@ -45,29 +46,37 @@ export function VirtualizedList<T>(props: VirtualizedListProps<T>) {
     mode,
     virtualizerRef,
     itemWrapperProps,
+    itemGap,
     ...containerProps
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
 
   const virtualizer = useVirtualizer({
     count: items.length,
-    estimateSize: () => estimatedSize,
-    getItemKey,
+    estimateSize: () => estimatedSize + (itemGap || 0),
+    getItemKey: (index) => getItemKey(index, items),
     getScrollElement: () =>
       scrollElement || containerRef.current?.closest(".ms-container") || null,
-    scrollMargin: scrollMargin || containerRef.current?.offsetTop || 0
+    scrollMargin: scrollMargin || containerRef.current?.offsetTop || 0,
+    overscan: 5
   });
 
   if (virtualizerRef) virtualizerRef.current = virtualizer;
 
   const virtualItems = virtualizer.getVirtualItems();
   return (
-    <Box {...containerProps} ref={containerRef} className="List">
+    <Box
+      {...containerProps}
+      ref={containerRef}
+      className="List"
+      data-top={virtualizer.options.scrollMargin}
+    >
       <Box
         sx={{
           height: virtualizer.getTotalSize(),
           width: "100%",
-          position: "relative"
+          position: "relative",
+          gap: itemGap
         }}
       >
         {virtualItems.map((row) => (

@@ -25,6 +25,12 @@ import { AnyColumnWithTable, Kysely, sql } from "kysely";
 import { FilteredSelector } from "../database/sql-collection";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 
+type SearchResults<T> = {
+  sorted: (limit?: number) => Promise<VirtualizedGrouping<T>>;
+  items: (limit?: number) => Promise<T[]>;
+  ids: () => Promise<string[]>;
+};
+
 type FuzzySearchField<T> = {
   weight?: number;
   name: keyof T;
@@ -33,38 +39,38 @@ type FuzzySearchField<T> = {
 export default class Lookup {
   constructor(private readonly db: Database) {}
 
-  async notes(query: string, noteIds?: string[]) {
-    const db = this.db.sql() as Kysely<DatabaseSchemaWithFTS>;
-    const ids = await db
-      .with("matching", (eb) =>
-        eb
-          .selectFrom("content_fts")
-          .where("data", "match", query)
-          .select(["noteId as id", "rank"])
-          .unionAll(
-            eb
-              .selectFrom("notes_fts")
-              .where("title", "match", query)
-              // add 10 weight to title
-              .select(["id", sql.raw<number>(`rank * 10`).as("rank")])
-          )
-      )
-      .selectFrom("notes")
-      .$if(!!noteIds && noteIds.length > 0, (eb) =>
-        eb.where("id", "in", noteIds!)
-      )
-      .where(isFalse("notes.deleted"))
-      .where(isFalse("notes.dateDeleted"))
-      .innerJoin("matching", (eb) => eb.onRef("notes.id", "==", "matching.id"))
-      .orderBy("matching.rank")
-      .select(["notes.id"])
-      .execute();
-
-    return new VirtualizedGrouping(
-      ids.map((id) => id.id),
-      this.db.options.batchSize,
-      (ids) => this.db.notes.all.records(ids)
-    );
+  notes(query: string, noteIds?: string[]) {
+    return this.toSearchResults(async (limit) => {
+      const db = this.db.sql() as Kysely<DatabaseSchemaWithFTS>;
+      const result = await db
+        .with("matching", (eb) =>
+          eb
+            .selectFrom("content_fts")
+            .where("data", "match", query)
+            .select(["noteId as id", "rank"])
+            .unionAll(
+              eb
+                .selectFrom("notes_fts")
+                .where("title", "match", query)
+                // add 10 weight to title
+                .select(["id", sql.raw<number>(`rank * 10`).as("rank")])
+            )
+        )
+        .selectFrom("notes")
+        .$if(!!noteIds && noteIds.length > 0, (eb) =>
+          eb.where("id", "in", noteIds!)
+        )
+        .$if(!!limit, (eb) => eb.limit(limit!))
+        .where(isFalse("notes.deleted"))
+        .where(isFalse("notes.dateDeleted"))
+        .innerJoin("matching", (eb) =>
+          eb.onRef("notes.id", "==", "matching.id")
+        )
+        .orderBy("matching.rank")
+        .select(["notes.id"])
+        .execute();
+      return result.map((id) => id.id);
+    }, this.db.notes.all);
   }
 
   notebooks(query: string) {
@@ -90,27 +96,22 @@ export default class Lookup {
     ]);
   }
 
-  async trash(query: string) {
-    const items = await this.db.trash.all();
-    const records: Record<string, TrashItem> = {};
-    for (const item of items) records[item.id] = item;
-
-    const results: Record<string, number> = {};
-    for (const item of items) {
-      const result = match(query, item.title);
-      if (result.match) results[item.id] = result.score;
-    }
-
-    const ids = Object.keys(results).sort((a, b) => results[a] - results[b]);
-    return new VirtualizedGrouping<TrashItem>(
-      ids,
-      this.db.options.batchSize,
-      async (ids) => {
-        const items: Record<string, TrashItem> = {};
-        for (const id of ids) items[id] = records[id];
-        return items;
-      }
-    );
+  trash(query: string): SearchResults<TrashItem> {
+    return {
+      sorted: async (limit?: number) => {
+        const { ids, records } = await this.filterTrash(query, limit);
+        return new VirtualizedGrouping<TrashItem>(
+          ids,
+          this.db.options.batchSize,
+          async () => records
+        );
+      },
+      items: async (limit?: number) => {
+        const { records } = await this.filterTrash(query, limit);
+        return Object.values(records);
+      },
+      ids: () => this.filterTrash(query).then(({ ids }) => ids)
+    };
   }
 
   attachments(query: string) {
@@ -122,29 +123,92 @@ export default class Lookup {
     ]);
   }
 
-  private async search<T extends Item>(
+  private search<T extends Item>(
     selector: FilteredSelector<T>,
     query: string,
     fields: FuzzySearchField<T>[]
   ) {
-    const results: Record<string, number> = {};
+    return this.toSearchResults(
+      (limit) => this.filter(selector, query, fields, limit),
+      selector
+    );
+  }
+
+  private async filter<T extends Item>(
+    selector: FilteredSelector<T>,
+    query: string,
+    fields: FuzzySearchField<T>[],
+    limit?: number
+  ) {
+    const results: Map<string, number> = new Map();
     const columns = fields.map((f) => f.column);
     for await (const item of selector.fields(columns)) {
+      if (limit && results.size >= limit) break;
+
       for (const field of fields) {
         const result = match(query, `${item[field.name]}`);
         if (result.match) {
-          const oldScore = results[item.id] || 0;
-          results[item.id] = oldScore + result.score * (field.weight || 1);
+          const oldScore = results.get(item.id) || 0;
+          results.set(item.id, oldScore + result.score * (field.weight || 1));
         }
       }
     }
     selector.fields([]);
 
-    const ids = Object.keys(results).sort((a, b) => results[a] - results[b]);
+    return Array.from(results.entries())
+      .sort((a, b) => a[1] - b[1])
+      .map((a) => a[0]);
+  }
+
+  private toSearchResults<T extends Item>(
+    ids: (limit?: number) => Promise<string[]>,
+    selector: FilteredSelector<T>
+  ): SearchResults<T> {
+    return {
+      sorted: async (limit?: number) =>
+        this.toVirtualizedGrouping(await ids(limit), selector),
+      items: async (limit?: number) => this.toItems(await ids(limit), selector),
+      ids
+    };
+  }
+
+  private async filterTrash(query: string, limit?: number) {
+    const items = await this.db.trash.all();
+
+    const records: Record<string, TrashItem> = {};
+    const results: Map<string, number> = new Map();
+    for (const item of items) {
+      if (limit && results.size >= limit) break;
+
+      const result = match(query, item.title);
+      if (result.match) {
+        records[item.id] = item;
+        results.set(item.id, result.score);
+      }
+    }
+
+    const ids = Array.from(results.entries())
+      .sort((a, b) => a[1] - b[1])
+      .map((a) => a[0]);
+    return { ids, records };
+  }
+
+  private toVirtualizedGrouping<T extends Item>(
+    ids: string[],
+    selector: FilteredSelector<T>
+  ) {
     return new VirtualizedGrouping<T>(
       ids,
       this.db.options.batchSize,
       async (ids) => selector.records(ids)
     );
+  }
+
+  private toItems<T extends Item>(
+    ids: string[],
+    selector: FilteredSelector<T>
+  ) {
+    if (!ids.length) return [];
+    return selector.items(ids);
   }
 }

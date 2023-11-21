@@ -17,7 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Color, Item, Reminder, VirtualizedGrouping } from "@notesnook/core";
+import {
+  Color,
+  Item,
+  ItemMap,
+  ItemType,
+  Reminder,
+  VirtualizedGrouping
+} from "@notesnook/core";
 import usePromise from "../../hooks/use-promise";
 import {
   NotebooksWithDateEdited,
@@ -27,17 +34,24 @@ import {
 import { db } from "../../common/db";
 import React from "react";
 
-type ResolvedItemProps = {
-  items: VirtualizedGrouping<Item>;
+type ResolvedItemProps<TItemType extends ItemType> = {
+  type: TItemType;
+  items: VirtualizedGrouping<ItemMap[TItemType]>;
   id: string;
-  children: (item: { item: Item; data: unknown }) => React.ReactNode;
+  children: (item: {
+    item: ItemMap[TItemType];
+    data: unknown;
+  }) => React.ReactNode;
 };
-export function ResolvedItem(props: ResolvedItemProps) {
-  const { id, items, children } = props;
+export function ResolvedItem<TItemType extends ItemType>(
+  props: ResolvedItemProps<TItemType>
+) {
+  const { id, items, children, type } = props;
   const result = usePromise(() => items.item(id, resolveItems), [id, items]);
 
   if (result.status !== "fulfilled" || !result.value) return null;
 
+  if (result.value.item.type !== type) return null;
   return <>{children(result.value)}</>;
 }
 

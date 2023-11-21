@@ -29,7 +29,7 @@ function Notebooks() {
   const notebooks = useStore((state) => state.notebooks);
   const refresh = useStore((state) => state.refresh);
   const filteredItems = useSearch("notebooks", (query) =>
-    db.lookup.notebooks(query)
+    db.lookup.notebooks(query).sorted()
   );
 
   useEffect(() => {

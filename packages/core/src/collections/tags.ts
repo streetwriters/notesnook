@@ -39,21 +39,24 @@ export class Tags implements ICollection {
     return this.collection.get(id);
   }
 
-  // find(idOrTitle: string) {
-  //   return this.all.find(
-  //     (tag) => tag.title === idOrTitle || tag.id === idOrTitle
-  //   );
-  // }
+  find(title: string) {
+    return this.all.find((eb) => eb.and([eb("title", "==", title)]));
+  }
 
   async add(item: Partial<Tag>) {
     if (item.remote)
       throw new Error("Please use db.tags.merge to merge remote tags.");
+    item.title = item.title ? Tags.sanitize(item.title) : item.title;
 
     const id = item.id || getId(item.dateCreated);
-    const oldTag = await this.tag(id);
+    const oldTag = item.id
+      ? await this.tag(item.id)
+      : item.title
+      ? await this.find(item.title)
+      : undefined;
 
-    item.title = item.title ? Tags.sanitize(item.title) : item.title;
     if (!item.title && !oldTag?.title) throw new Error("Title is required.");
+    if (oldTag && item.title === oldTag.title) return oldTag.id;
 
     await this.collection.upsert({
       id,

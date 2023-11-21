@@ -24,7 +24,7 @@ import { ThemeUIStyleObject } from "@theme-ui/css";
 import { PasswordVisible, PasswordInvisible, Icon } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 
-type FieldProps = InputProps & {
+export type FieldProps = InputProps & {
   label?: string;
   helpText?: string;
   inputRef?: React.Ref<HTMLInputElement>;
