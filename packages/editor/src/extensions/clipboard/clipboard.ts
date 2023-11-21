@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Extension } from "@tiptap/core";
+import { Editor, Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { Slice } from "prosemirror-model";
 import { LIST_NODE_TYPES } from "../../utils/node-types";
@@ -25,6 +25,7 @@ import { ClipboardDOMParser } from "./clipboard-dom-parser";
 import { ClipboardDOMSerializer } from "./clipboard-dom-serializer";
 import { clipboardTextParser } from "./clipboard-text-parser";
 import { clipboardTextSerializer } from "./clipboard-text-serializer";
+import { EditorView } from "prosemirror-view";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -76,7 +77,7 @@ export const Clipboard = Extension.create({
   }
 });
 
-export function transformCopied(slice: Slice): any {
+export function transformCopied(slice: Slice, view: EditorView): any {
   // when copying a single list item, we shouldn't retain the
   // list formatting but copy it as a paragraph.
   const maybeList = slice.content.firstChild;
@@ -86,7 +87,11 @@ export function transformCopied(slice: Slice): any {
     maybeList.childCount === 1 &&
     maybeList.firstChild
   ) {
-    return transformCopied(new Slice(maybeList.firstChild.content, 0, 0));
+    return transformCopied(
+      new Slice(maybeList.firstChild.content, slice.openStart, slice.openEnd),
+      view
+    );
   }
+
   return slice;
 }
