@@ -17,69 +17,41 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Field from "../field";
 import { Plus, Search } from "../icons";
-import { Button, Flex, Text } from "@theme-ui/components";
-
-// type FilterableItem = {
-//   id: string;
-//   title: string;
-// };
+import { Button, Text } from "@theme-ui/components";
+import { VirtualizedList, VirtualizedListProps } from "../virtualized-list";
 
 type FilteredListProps<T> = {
   placeholders: { filter: string; empty: string };
-  items: () => Promise<T[]>;
-  filter: (items: T[], query: string) => T[];
+  filter: (query: string) => Promise<T[]>;
   onCreateNewItem: (title: string) => Promise<void>;
-  renderItem: (
-    item: T,
-    index: number,
-    refresh: () => void,
-    isSearching: boolean
-  ) => JSX.Element;
-};
+} & VirtualizedListProps<T>;
 
 export function FilteredList<T>(props: FilteredListProps<T>) {
-  const {
-    items: _items,
-    filter,
-    onCreateNewItem,
-    placeholders,
-    renderItem
-  } = props;
+  const { items, filter, onCreateNewItem, placeholders, ...listProps } = props;
 
-  const [items, setItems] = useState<T[]>([]);
+  const [filteredItems, setFilteredItems] = useState<T[]>([]);
   const [query, setQuery] = useState<string>();
-  const noItemsFound = items.length <= 0 && query && query.length > 0;
+  const noItemsFound = filteredItems.length <= 0 && query && query.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const refresh = useCallback(async () => {
-    setItems(await _items());
-  }, [_items]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
 
   const _filter = useCallback(
     async (query) => {
-      const items = await _items();
-      if (!query) return;
-      setItems(filter(items, query));
+      setFilteredItems(query ? await filter(query) : []);
       setQuery(query);
     },
-    [_items, filter]
+    [filter]
   );
 
   const _createNewItem = useCallback(
     async (title) => {
       await onCreateNewItem(title);
-      await refresh();
       setQuery(undefined);
       if (inputRef.current) inputRef.current.value = "";
     },
-    [inputRef, refresh, onCreateNewItem]
+    [inputRef, onCreateNewItem]
   );
 
   return (
@@ -89,18 +61,16 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
         data-test-id={"filter-input"}
         autoFocus
         placeholder={
-          items.length <= 0 ? placeholders.empty : placeholders.filter
+          filteredItems.length <= 0 ? placeholders.empty : placeholders.filter
         }
-        onChange={(e: ChangeEvent) =>
-          _filter((e.target as HTMLInputElement).value)
-        }
-        onKeyUp={async (e: KeyboardEvent) => {
+        onChange={(e) => _filter((e.target as HTMLInputElement).value)}
+        onKeyUp={async (e) => {
           if (e.key === "Enter" && noItemsFound) {
             await _createNewItem(query);
           }
         }}
         action={
-          items.length <= 0
+          filteredItems.length <= 0 && !!query
             ? {
                 icon: Plus,
                 onClick: async () => await _createNewItem(query)
@@ -108,38 +78,25 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
             : { icon: Search, onClick: () => _filter(query) }
         }
       />
-      <Flex
-        as="ul"
-        mt={1}
-        sx={{
-          overflowY: "hidden",
-          listStyle: "none",
-          m: 0,
-          p: 0,
-          gap: 1,
-          display: "flex",
-          flexDirection: "column"
-        }}
-      >
-        {noItemsFound && (
-          <Button
-            variant={"secondary"}
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              py: 2
-            }}
-            onClick={async () => {
-              await _createNewItem(query);
-            }}
-          >
-            <Text variant={"body"}>{`Add "${query}"`}</Text>
-            <Plus size={16} color="accent" />
-          </Button>
-        )}
-        {items.map((item, index) => renderItem(item, index, refresh, !!query))}
-      </Flex>
+      {noItemsFound ? (
+        <Button
+          variant={"secondary"}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            py: 2
+          }}
+          onClick={async () => {
+            await _createNewItem(query);
+          }}
+        >
+          <Text variant={"body"}>{`Add "${query}"`}</Text>
+          <Plus size={16} color="accent" />
+        </Button>
+      ) : (
+        <VirtualizedList {...listProps} items={query ? filteredItems : items} />
+      )}
     </>
   );
 }

@@ -255,6 +255,7 @@ export class FilteredSelector<T extends Item> {
   private _fields: AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>[] =
     [];
   filter: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, unknown>;
+  private _limit = 0;
   constructor(
     readonly type: keyof DatabaseSchema,
     filter: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, unknown>,
@@ -268,7 +269,12 @@ export class FilteredSelector<T extends Item> {
     return this;
   }
 
-  async ids(sortOptions?: GroupOptions) {
+  limit(limit: number) {
+    this._limit = limit;
+    return this;
+  }
+
+  async ids(sortOptions?: SortOptions) {
     return (
       await this.filter
         .$if(!!sortOptions, (eb) =>
@@ -279,7 +285,7 @@ export class FilteredSelector<T extends Item> {
     ).map((i) => i.id);
   }
 
-  async items(ids?: string[], sortOptions?: GroupOptions) {
+  async items(ids?: string[], sortOptions?: SortOptions) {
     return (await this.filter
       .$if(!!ids && ids.length > 0, (eb) => eb.where("id", "in", ids!))
       .$if(!!sortOptions, (eb) =>
@@ -287,10 +293,11 @@ export class FilteredSelector<T extends Item> {
       )
       .$if(this._fields.length === 0, (eb) => eb.selectAll())
       .$if(this._fields.length > 0, (eb) => eb.select(this._fields))
+      .$if(!!this._limit, (eb) => eb.limit(this._limit))
       .execute()) as T[];
   }
 
-  async records(ids?: string[], sortOptions?: GroupOptions) {
+  async records(ids?: string[], sortOptions?: SortOptions) {
     const results = await this.items(ids, sortOptions);
     const items: Record<string, T> = {};
     for (const item of results) {
@@ -347,6 +354,7 @@ export class FilteredSelector<T extends Item> {
   async grouped(options: GroupOptions) {
     console.time("getting items");
     const items = await this.filter
+      .$if(!!this._limit, (eb) => eb.limit(this._limit))
       .$call(this.buildSortExpression(options))
       .select(["id", options.sortBy, "type"])
       .execute();
@@ -360,6 +368,7 @@ export class FilteredSelector<T extends Item> {
 
   async sorted(options: SortOptions) {
     const items = await this.filter
+      .$if(!!this._limit, (eb) => eb.limit(this._limit))
       .$call(this.buildSortExpression(options))
       .select("id")
       .execute();
