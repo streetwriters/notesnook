@@ -105,6 +105,7 @@ export default function ReminderPreviewDialog(
                 id: reminder.id,
                 snoozeUntil: Date.now() + time.interval
               });
+              props.onClose(false);
             }}
             sx={{
               borderRadius: 100,
