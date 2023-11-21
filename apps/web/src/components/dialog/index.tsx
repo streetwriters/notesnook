@@ -80,11 +80,10 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           border: 0,
           zIndex: 999,
           backgroundColor: "var(--backdrop)"
+        },
+        overlay: {
+          opacity: 1
         }
-        // overlay: {
-        //   zIndex: 999,
-        //   background: "var(--backdrop)"
-        // }
       }}
     >
       <ScopedThemeProvider
