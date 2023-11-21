@@ -306,7 +306,7 @@ export function Main() {
           </Button>
         ))}
 
-        {clipData && !isClipping && (
+        {clipData && clipData.data && !isClipping && (
           <Text
             variant="body"
             sx={{
@@ -322,7 +322,6 @@ export function Main() {
               }
             }}
             onClick={async () => {
-              if (!clipData) return;
               const winUrl = URL.createObjectURL(
                 new Blob(["\ufeff", clipData.data], { type: "text/html" })
               );
