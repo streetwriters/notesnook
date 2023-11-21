@@ -19,7 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { DependencyList, useEffect, useState } from "react";
 
-export type PromiseResult<T> = PromisePendingResult | PromiseSettledResult<T>;
+export type PromiseResult<T> =
+  | PromisePendingResult
+  | (PromiseSettledResult<T> & { refresh: () => void });
 
 export interface PromisePendingResult {
   status: "pending";
@@ -58,7 +60,7 @@ export default function usePromise<T>(
 ): PromiseResult<T> {
   const [result, setResult] = useState<PromiseResult<T>>({ status: "pending" });
 
-  useEffect(() => {
+  useEffect(function effect() {
     if (result.status !== "pending") {
       setResult({ status: "pending" });
     }
@@ -70,11 +72,10 @@ export default function usePromise<T>(
       const [promiseResult] = await Promise.allSettled([factory(signal)]);
 
       if (!signal.aborted) {
-        setResult(promiseResult);
+        setResult({ ...promiseResult, refresh: effect });
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     handlePromise();
 
     return () => controller.abort();
