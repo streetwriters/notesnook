@@ -124,10 +124,10 @@ export function toBlobURL(dataurl: string, id?: string) {
   if (id && OBJECT_URL_CACHE[id]) return OBJECT_URL_CACHE[id];
   if (!isDataUrl(dataurl)) return;
 
-  const { data, mime } = DataURL.toObject(dataurl); //.split(",");
-  if (!data || !mime) return;
+  const { data, mimeType } = DataURL.toObject(dataurl); //.split(",");
+  if (!data || !mimeType) return;
   const objectURL = URL.createObjectURL(
-    new Blob([Buffer.from(data, "base64")], { type: mime })
+    new Blob([Buffer.from(data, "base64")], { type: mimeType })
   );
 
   if (id) OBJECT_URL_CACHE[id] = objectURL;
