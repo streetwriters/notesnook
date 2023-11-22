@@ -42,16 +42,17 @@ export default class Lookup {
   notes(query: string, noteIds?: string[]) {
     return this.toSearchResults(async (limit) => {
       const db = this.db.sql() as Kysely<DatabaseSchemaWithFTS>;
+      query = query.replace(/"/, '""');
       const result = await db
         .with("matching", (eb) =>
           eb
             .selectFrom("content_fts")
-            .where("data", "match", query)
+            .where("data", "match", `"${query}"`)
             .select(["noteId as id", "rank"])
             .unionAll(
               eb
                 .selectFrom("notes_fts")
-                .where("title", "match", query)
+                .where("title", "match", `"${query}"`)
                 // add 10 weight to title
                 .select(["id", sql.raw<number>(`rank * 10`).as("rank")])
             )
