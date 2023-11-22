@@ -20,105 +20,74 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
 import { Platform } from "react-native";
-import { db } from "../../common/database";
-import NotebookScreen from "../../screens/notebook";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import useNavigationStore from "../../stores/use-navigation-store";
 import { eScrollEvent } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import Tag from "../ui/tag";
 import Heading from "../ui/typography/heading";
 
-const titleState: { [id: string]: boolean } = {};
-
-export const Title = () => {
+export const Title = ({
+  title,
+  isHiddenOnRender,
+  accentColor,
+  isBeta,
+  renderedInRoute,
+  id
+}: {
+  title: string;
+  isHiddenOnRender?: boolean;
+  accentColor?: string;
+  isBeta?: boolean;
+  renderedInRoute: string;
+  id?: string;
+}) => {
   const { colors } = useThemeColors();
-  const currentScreen = useNavigationStore((state) => state.currentScreen);
-  const isNotebook = currentScreen.name === "Notebook";
-  const isTopic = currentScreen?.name === "TopicNotes";
-  const [hide, setHide] = useState(
-    isNotebook
-      ? typeof titleState[currentScreen.id as string] === "boolean"
-        ? titleState[currentScreen.id as string]
-        : true
-      : false
-  );
-  const isHidden = titleState[currentScreen.id as string];
-  const notebook =
-    isTopic && currentScreen.notebookId
-      ? db.notebooks?.notebook(currentScreen.notebookId)?.data
-      : null;
-  const title = currentScreen.title;
-  const isTag = currentScreen?.name === "TaggedNotes";
-
+  const [visible, setVisible] = useState(isHiddenOnRender);
+  const isTag = title.startsWith("#");
   const onScroll = useCallback(
-    (data: { x: number; y: number }) => {
-      if (currentScreen.name !== "Notebook") {
-        setHide(false);
-        return;
-      }
+    (data: { x: number; y: number; id?: string; route: string }) => {
+      if (data.route !== renderedInRoute || data.id !== id) return;
       if (data.y > 150) {
-        if (!hide) return;
-        titleState[currentScreen.id as string] = false;
-        setHide(false);
+        if (!visible) return;
+        setVisible(false);
       } else {
-        if (hide) return;
-        titleState[currentScreen.id as string] = true;
-        setHide(true);
+        if (visible) return;
+        setVisible(true);
       }
     },
-    [currentScreen.id, currentScreen.name, hide]
+    [id, renderedInRoute, visible]
   );
-
-  useEffect(() => {
-    if (currentScreen.name === "Notebook") {
-      const value =
-        typeof titleState[currentScreen.id] === "boolean"
-          ? titleState[currentScreen.id]
-          : true;
-      setHide(value);
-    } else {
-      setHide(titleState[currentScreen.id as string]);
-    }
-  }, [currentScreen.id, currentScreen.name]);
 
   useEffect(() => {
     eSubscribeEvent(eScrollEvent, onScroll);
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  }, [hide, onScroll]);
+  }, [visible, onScroll]);
 
-  function navigateToNotebook() {
-    if (!isTopic) return;
-    if (notebook) {
-      NotebookScreen.navigate(notebook, true);
-    }
-  }
   return (
     <>
-      {!hide && !isHidden ? (
+      {!visible ? (
         <Heading
-          onPress={navigateToNotebook}
           numberOfLines={1}
           size={SIZE.lg}
           style={{
             flexWrap: "wrap",
             marginTop: Platform.OS === "ios" ? -1 : 0
           }}
-          color={currentScreen.color || colors.primary.heading}
+          color={accentColor || colors.primary.heading}
         >
           {isTag ? (
             <Heading size={SIZE.xl} color={colors.primary.accent}>
               #
             </Heading>
           ) : null}
-          {title}{" "}
+          {isTag ? title.slice(1) : title}{" "}
           <Tag
-            visible={currentScreen.beta}
+            visible={isBeta}
             text="BETA"
             style={{
               backgroundColor: "transparent"

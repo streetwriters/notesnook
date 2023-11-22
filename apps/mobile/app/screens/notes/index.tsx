@@ -17,21 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  Color,
-  GroupedItems,
-  Item,
-  Note,
-  Topic
-} from "@notesnook/core/dist/types";
+import { VirtualizedGrouping } from "@notesnook/core";
+import { Color, Note } from "@notesnook/core/dist/types";
 import React, { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
-import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
+import { Header } from "../../components/header";
 import List from "../../components/list";
-import { IconButton } from "../../components/ui/icon-button";
-import Paragraph from "../../components/ui/typography/paragraph";
+import { PlaceholderData } from "../../components/list/empty";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import {
   eSubscribeEvent,
@@ -45,37 +38,9 @@ import useNavigationStore, {
   RouteName
 } from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
-import { SIZE } from "../../utils/size";
-
-import NotebookScreen from "../notebook/index";
-import {
-  openEditor,
-  openMonographsWebpage,
-  setOnFirstSave,
-  toCamelCase
-} from "./common";
-import { PlaceholderData } from "../../components/list/empty";
-import { VirtualizedGrouping } from "@notesnook/core";
+import { setOnFirstSave } from "./common";
 export const WARNING_DATA = {
   title: "Some notes in this topic are not synced"
-};
-
-export const PLACEHOLDER_DATA = {
-  title: "Your notes",
-  paragraph: "You have not added any notes yet.",
-  button: "Add your first Note",
-  action: openEditor,
-  loading: "Loading your notes."
-};
-
-export const MONOGRAPH_PLACEHOLDER_DATA = {
-  heading: "Your monographs",
-  paragraph: "You have not published any notes as monographs yet.",
-  button: "Learn more about monographs",
-  action: openMonographsWebpage,
-  loading: "Loading published notes.",
-  type: "monographs",
-  buttonIcon: "information-outline"
 };
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
@@ -93,7 +58,6 @@ export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
 function getItemType(routeName: RouteName) {
   if (routeName === "TaggedNotes") return "tag";
   if (routeName === "ColoredNotes") return "color";
-  if (routeName === "TopicNotes") return "topic";
   if (routeName === "Monographs") return "monograph";
   return "note";
 }
@@ -110,24 +74,24 @@ const NotesPage = ({
   "NotesPage" | "TaggedNotes" | "Monographs" | "ColoredNotes" | "TopicNotes"
 >) => {
   const params = useRef<NotesScreenParams>(route?.params);
-
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
-
   const loading = useNoteStore((state) => state.loading);
   const [loadingNotes, setLoadingNotes] = useState(true);
   const isMonograph = route.name === "Monographs";
-
-  // const notebook =
-  //   route.name === "TopicNotes" &&
-  //   params.current.item.type === "topic" &&
-  //   params.current.item.notebookId
-  //     ? db.notebooks?.notebook((params.current.item as Topic).notebookId)?.data
-  //     : null;
+  const title =
+    params.current?.item.type === "tag"
+      ? "#" + params.current?.item.title
+      : params.current?.item.title;
+  const accentColor =
+    route.name === "ColoredNotes"
+      ? (params.current?.item as Color)?.colorCode
+      : undefined;
 
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
       syncWithNavigation();
+
       if (focusControl) return !prev.current;
       return false;
     },
@@ -143,10 +107,7 @@ const NotesPage = ({
     SearchService.update({
       placeholder: `Search in ${item.title}`,
       type: "notes",
-      title:
-        item.type === "tag"
-          ? "#" + item.title
-          : toCamelCase((item as Color).title),
+      title: item.type === "tag" ? "#" + item.title : item.title,
       get: () => {
         return get(params.current, false);
       }
@@ -154,31 +115,16 @@ const NotesPage = ({
   }, [get]);
 
   const syncWithNavigation = React.useCallback(() => {
-    const { item, title } = params.current;
-    useNavigationStore.getState().update(
-      {
-        name: route.name,
-        title:
-          route.name === "ColoredNotes" ? toCamelCase(title as string) : title,
-        id: item?.id,
-        type: "notes",
-        notebookId: item.type === "topic" ? item.notebookId : undefined,
-        color:
-          item.type === "color" && route.name === "ColoredNotes"
-            ? item.title?.toLowerCase()
-            : undefined
-      },
-      params.current.canGoBack,
-      rightButtons && rightButtons(params.current)
-    );
-    SearchService.prepareSearch = prepareSearch;
-    useNavigationStore.getState().setButtonAction(onPressFloatingButton);
+    const { item } = params.current;
+
+    useNavigationStore
+      .getState()
+      .setFocusedRouteId(params?.current?.item?.id || route.name);
 
     !isMonograph &&
       setOnFirstSave({
         type: getItemType(route.name),
-        id: item.id,
-        notebook: item.type === "topic" ? item.notebookId : undefined
+        id: item.id
       });
   }, [
     isMonograph,
@@ -192,9 +138,6 @@ const NotesPage = ({
     async (data?: NotesScreenParams) => {
       const isNew = data && data?.item?.id !== params.current?.item?.id;
       if (data) params.current = data;
-      params.current.title =
-        params.current.title ||
-        (params.current.item as Item & { title: string }).title;
       const { item } = params.current;
       try {
         if (isNew) setLoadingNotes(true);
@@ -204,9 +147,8 @@ const NotesPage = ({
         )) as VirtualizedGrouping<Note>;
 
         if (
-          ((item.type === "tag" || item.type === "color") &&
-            (!notes || notes.ids.length === 0)) ||
-          (item.type === "topic" && !notes)
+          (item.type === "tag" || item.type === "color") &&
+          (!notes || notes.ids.length === 0)
         ) {
           return Navigation.goBack();
         }
@@ -243,81 +185,51 @@ const NotesPage = ({
   }, [onRequestUpdate, route.name]);
 
   return (
-    <DelayLayout
-      color={
-        route.name === "ColoredNotes"
-          ? (params.current?.item as Color)?.colorCode
-          : undefined
-      }
-      wait={loading || loadingNotes}
-    >
-      {/* {route.name === "TopicNotes" ? (
-        <View
-          style={{
-            width: "100%",
-            paddingHorizontal: 12,
-            flexDirection: "row",
-            alignItems: "center"
-          }}
-        >
-          <Paragraph
-            onPress={() => {
-              Navigation.navigate({
-                name: "Notebooks",
-                title: "Notebooks"
-              });
-            }}
-            size={SIZE.xs}
-          >
-            Notebooks
-          </Paragraph>
-          {notebook ? (
-            <>
-              <IconButton
-                name="chevron-right"
-                size={14}
-                customStyle={{ width: 25, height: 25 }}
-              />
-              <Paragraph
-                onPress={() => {
-                  NotebookScreen.navigate(notebook, true);
-                }}
-                size={SIZE.xs}
-              >
-                {notebook.title}
-              </Paragraph>
-            </>
-          ) : null}
-        </View>
-      ) : null} */}
-      <List
-        data={notes}
-        dataType="note"
-        onRefresh={onRequestUpdate}
-        loading={loading || !isFocused}
-        renderedInRoute="Notes"
-        headerTitle={params.current.title}
-        customAccentColor={
-          route.name === "ColoredNotes"
-            ? (params.current?.item as Color)?.colorCode
-            : undefined
+    <>
+      <Header
+        renderedInRoute={route.name}
+        title={title}
+        canGoBack={params?.current?.canGoBack}
+        hasSearch={true}
+        id={
+          route.name === "Monographs" ? "Monographs" : params?.current.item?.id
         }
-        placeholder={placeholder}
+        onSearch={() => {
+          Navigation.push("Search", {
+            placeholder: `Type a keyword to search in ${title}`,
+            type: "note",
+            title: title,
+            route: route.name,
+            ids: notes?.ids?.filter((id) => typeof id === "string") as string[]
+          });
+        }}
+        accentColor={accentColor}
+        onPressDefaultRightButton={onPressFloatingButton}
+        headerRightButtons={rightButtons?.(params?.current)}
       />
 
-      {!isMonograph &&
-      ((notes?.ids && (notes?.ids?.length || 0) > 0) || isFocused) ? (
-        <FloatingButton
-          color={
-            route.name === "ColoredNotes"
-              ? (params.current?.item as Color)?.colorCode
-              : undefined
-          }
-          title="Create a note"
-          onPress={onPressFloatingButton}
+      <DelayLayout color={accentColor} wait={loading || loadingNotes}>
+        <List
+          data={notes}
+          dataType="note"
+          onRefresh={onRequestUpdate}
+          loading={loading || !isFocused}
+          renderedInRoute="Notes"
+          headerTitle={title}
+          customAccentColor={accentColor}
+          placeholder={placeholder}
         />
-      ) : null}
-    </DelayLayout>
+
+        {!isMonograph &&
+        ((notes?.ids && (notes?.ids?.length || 0) > 0) || isFocused) ? (
+          <FloatingButton
+            color={accentColor}
+            title="Create a note"
+            onPress={onPressFloatingButton}
+          />
+        ) : null}
+      </DelayLayout>
+    </>
   );
 };
 

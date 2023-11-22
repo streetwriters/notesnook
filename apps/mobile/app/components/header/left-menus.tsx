@@ -17,23 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { notesnook } from "../../../e2e/test.ids";
 import { DDS } from "../../services/device-detection";
 import Navigation from "../../services/navigation";
-import useNavigationStore from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { tabBarRef } from "../../utils/global-refs";
 import { IconButton } from "../ui/icon-button";
 
-export const LeftMenus = () => {
+export const LeftMenus = ({
+  canGoBack,
+  onLeftButtonPress
+}: {
+  canGoBack?: boolean;
+  onLeftButtonPress?: () => void;
+}) => {
   const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
-  const canGoBack = useNavigationStore((state) => state.canGoBack);
   const isTablet = deviceMode === "tablet";
 
-  const onLeftButtonPress = () => {
+  const _onLeftButtonPress = () => {
+    if (onLeftButtonPress) return onLeftButtonPress();
+
     if (!canGoBack) {
       if (tabBarRef.current?.isDrawerOpen()) {
         Navigation.closeDrawer();
@@ -60,7 +66,7 @@ export const LeftMenus = () => {
       left={40}
       top={40}
       right={DDS.isLargeTablet() ? 10 : 10}
-      onPress={onLeftButtonPress}
+      onPress={_onLeftButtonPress}
       onLongPress={() => {
         Navigation.popToTop();
       }}

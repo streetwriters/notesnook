@@ -71,7 +71,7 @@ export const useDragState = create<DragState>(
 
         presets["custom"] = _data;
         db.settings.setToolbarConfig(
-          useSettingStore.getState().deviceMode || "mobile",
+          useSettingStore.getState().deviceMode || ("mobile" as any),
           {
             preset: "custom",
             config: clone(_data)
@@ -81,7 +81,7 @@ export const useDragState = create<DragState>(
       },
       setPreset: (preset) => {
         db.settings.setToolbarConfig(
-          useSettingStore.getState().deviceMode || "mobile",
+          useSettingStore.getState().deviceMode || ("mobile" as any),
           {
             preset,
             config: preset === "custom" ? clone(get().customPresetData) : []
@@ -99,7 +99,7 @@ export const useDragState = create<DragState>(
         const user = await db.user?.getUser();
         if (!user) return;
         const toolbarConfig = db.settings.getToolbarConfig(
-          useSettingStore.getState().deviceMode || "mobile"
+          useSettingStore.getState().deviceMode || ("mobile" as any)
         );
         if (!toolbarConfig) {
           logger.info("DragState", "No user defined toolbar config was found");
@@ -110,25 +110,20 @@ export const useDragState = create<DragState>(
           preset: preset,
           data:
             preset === "custom"
-              ? clone(toolbarConfig?.config)
+              ? clone(toolbarConfig?.config as any[])
               : clone(presets[preset]),
           customPresetData:
             preset === "custom"
-              ? clone(toolbarConfig?.config)
+              ? clone(toolbarConfig?.config as any[])
               : clone(presets["custom"])
         });
       }
     }),
     {
       name: "drag-state-storage", // unique name
-      getStorage: () => MMKV as StateStorage,
+      getStorage: () => MMKV as unknown as StateStorage,
       onRehydrateStorage: () => {
         return () => {
-          logger.info(
-            "DragState",
-            "rehydrated drag state",
-            useNoteStore.getState().loading
-          );
           if (!useNoteStore.getState().loading) {
             useDragState.getState().init();
           } else {

@@ -66,7 +66,7 @@ const ColorItem = React.memo(
     const onHeaderStateChange = useCallback(
       (state: any) => {
         setTimeout(() => {
-          let id = state.currentScreen?.id;
+          let id = state.focusedRouteId;
           if (id === item.id) {
             setHeaderTextState({ id: state.currentScreen.id });
           } else {

@@ -17,19 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import { Notebook, Tag } from "@notesnook/core";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { db } from "../../common/database";
 import NotebookScreen from "../../screens/notebook";
 import { TaggedNotes } from "../../screens/notes/tagged";
-import { TopicNotes } from "../../screens/notes/topic-notes";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
-import { useThemeColors } from "@notesnook/theme";
-import { db } from "../../common/database";
-import { normalize, SIZE } from "../../utils/size";
+import { SIZE, normalize } from "../../utils/size";
 import { Properties } from "../properties";
 import { Button } from "../ui/button";
 import { Notice } from "../ui/notice";
@@ -38,8 +38,6 @@ import Seperator from "../ui/seperator";
 import SheetWrapper from "../ui/sheet";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useCallback } from "react";
-import { Notebook, Tag } from "@notesnook/core";
 
 export const TagsSection = React.memo(
   function TagsSection() {
@@ -127,7 +125,7 @@ export const PinItem = React.memo(
     const onHeaderStateChange = useCallback(
       (state: any) => {
         setTimeout(() => {
-          const id = state.currentScreen?.id;
+          const id = state.focusedRouteId;
           if (id === item.id) {
             setHeaderTextState({
               id

@@ -120,6 +120,7 @@ export const SectionHeader = React.memo<
             <>
               <Button
                 onPress={() => {
+                  console.log("Opening Sort sheet", screen, dataType);
                   presentSheet({
                     component: <Sort screen={screen} type={dataType} />
                   });
@@ -169,7 +170,7 @@ export const SectionHeader = React.memo<
                   SettingsService.set({
                     [dataType !== "notebook"
                       ? "notesListMode"
-                      : "notebooksListMode"]: isCompactModeEnabled
+                      : "notebooksListMode"]: !isCompactModeEnabled
                       ? "compact"
                       : "normal"
                   });

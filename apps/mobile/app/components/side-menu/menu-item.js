@@ -34,10 +34,9 @@ export const MenuItem = React.memo(
   function MenuItem({ item, index, testID, rightBtn }) {
     const { colors } = useThemeColors();
     const [headerTextState, setHeaderTextState] = useState(
-      useNavigationStore.getState().currentScreen
+      useNavigationStore.getState().focusedRouteId
     );
-    const screenId = item.name.toLowerCase() + "_navigation";
-    let isFocused = headerTextState?.id === screenId;
+    let isFocused = headerTextState?.id === item.name;
     const primaryColors = isFocused ? colors.selected : colors.primary;
 
     const _onPress = () => {
@@ -59,9 +58,9 @@ export const MenuItem = React.memo(
     const onHeaderStateChange = useCallback(
       (state) => {
         setTimeout(() => {
-          let id = state.currentScreen?.id;
-          if (id === screenId) {
-            setHeaderTextState({ id: state.currentScreen.id });
+          let id = state.focusedRouteId;
+          if (id === item.name) {
+            setHeaderTextState({ id: state.focusedRouteId });
           } else {
             if (headerTextState !== null) {
               setHeaderTextState(null);
@@ -69,7 +68,7 @@ export const MenuItem = React.memo(
           }
         }, 300);
       },
-      [headerTextState, screenId]
+      [headerTextState, item.name]
     );
 
     useEffect(() => {

@@ -29,6 +29,14 @@ import { openLinkInBrowser } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
 import { editorController, editorState } from "../editor/tiptap/utils";
 
+export const PLACEHOLDER_DATA = {
+  title: "Your notes",
+  paragraph: "You have not added any notes yet.",
+  button: "Add your first Note",
+  action: openEditor,
+  loading: "Loading your notes."
+};
+
 export function toCamelCase(title: string) {
   if (!title) return "";
   return title.slice(0, 1).toUpperCase() + title.slice(1);

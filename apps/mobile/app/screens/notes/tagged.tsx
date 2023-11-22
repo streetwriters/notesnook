@@ -19,11 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Tag } from "@notesnook/core/dist/types";
 import React from "react";
-import NotesPage, { PLACEHOLDER_DATA } from ".";
+import NotesPage from ".";
 import { db } from "../../common/database";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { NotesScreenParams } from "../../stores/use-navigation-store";
-import { openEditor } from "./common";
+import { PLACEHOLDER_DATA, openEditor } from "./common";
+
 export const TaggedNotes = ({
   navigation,
   route
@@ -53,17 +54,9 @@ TaggedNotes.get = async (params: NotesScreenParams, grouped = true) => {
 
 TaggedNotes.navigate = (item: Tag, canGoBack?: boolean) => {
   if (!item) return;
-  Navigation.navigate<"TaggedNotes">(
-    {
-      name: "TaggedNotes",
-      title: item.title,
-      id: item.id,
-      type: "tag"
-    },
-    {
-      item: item,
-      canGoBack,
-      title: item.title
-    }
-  );
+  Navigation.navigate<"TaggedNotes">("TaggedNotes", {
+    item: item,
+    canGoBack,
+    title: item.title
+  });
 };

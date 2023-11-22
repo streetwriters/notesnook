@@ -201,6 +201,7 @@ export default function List(props: ListProps) {
                 dataType={props.dataType}
                 color={props.customAccentColor}
                 placeholder={props.placeholder}
+                screen={props.renderedInRoute}
               />
             ) : null
           }

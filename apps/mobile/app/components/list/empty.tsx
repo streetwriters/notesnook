@@ -49,98 +49,96 @@ type EmptyListProps = {
   screen?: string;
 };
 
-export const Empty = React.memo(
-  function Empty({
-    loading = true,
-    placeholder,
-    title,
-    color,
-    dataType,
-    screen
-  }: EmptyListProps) {
-    const { colors } = useThemeColors();
-    const insets = useGlobalSafeAreaInsets();
-    const { height } = useWindowDimensions();
-    const introCompleted = useSettingStore(
-      (state) => state.settings.introCompleted
-    );
+export const Empty = React.memo(function Empty({
+  loading = true,
+  placeholder,
+  title,
+  color,
+  dataType,
+  screen
+}: EmptyListProps) {
+  const { colors } = useThemeColors();
+  const insets = useGlobalSafeAreaInsets();
+  const { height } = useWindowDimensions();
+  const introCompleted = useSettingStore(
+    (state) => state.settings.introCompleted
+  );
 
-    const tip = useTip(
-      screen === "Notes" && introCompleted
-        ? "first-note"
-        : placeholder?.type || ((dataType + "s") as any),
-      screen === "Notes" ? "notes" : "list"
-    );
+  const tip = useTip(
+    screen === "Notes" && introCompleted
+      ? "first-note"
+      : placeholder?.type || ((dataType + "s") as any),
+    screen === "Notes" ? "notes" : "list"
+  );
 
-    return (
-      <View
-        style={[
-          {
-            height: height - (140 + insets.top),
-            width: "80%",
-            justifyContent: "center",
-            alignSelf: "center"
-          }
-        ]}
-      >
-        {!loading ? (
-          <>
-            <Tip
-              color={color ? color : "accent"}
-              tip={tip || ({ text: placeholder?.paragraph } as TTip)}
+  return (
+    <View
+      style={[
+        {
+          height: height - (140 + insets.top),
+          width: "80%",
+          justifyContent: "center",
+          alignSelf: "center"
+        }
+      ]}
+    >
+      {!loading ? (
+        <>
+          <Tip
+            color={color}
+            tip={
+              screen !== "Search"
+                ? tip || ({ text: placeholder?.paragraph } as TTip)
+                : ({ text: placeholder?.paragraph } as TTip)
+            }
+            style={{
+              backgroundColor: "transparent",
+              paddingHorizontal: 0
+            }}
+          />
+          {placeholder?.button && (
+            <Button
+              testID={notesnook.buttons.add}
+              type="grayAccent"
+              title={placeholder?.button}
+              iconPosition="right"
+              icon="arrow-right"
+              onPress={placeholder?.action}
+              buttonType={{
+                text: color || colors.primary.accent
+              }}
               style={{
-                backgroundColor: "transparent",
-                paddingHorizontal: 0
+                alignSelf: "flex-start",
+                borderRadius: 5,
+                height: 40
               }}
             />
-            {placeholder?.button && (
-              <Button
-                testID={notesnook.buttons.add}
-                type="grayAccent"
-                title={placeholder?.button}
-                iconPosition="right"
-                icon="arrow-right"
-                onPress={placeholder?.action}
-                buttonType={{
-                  text: color || colors.primary.accent
-                }}
-                style={{
-                  alignSelf: "flex-start",
-                  borderRadius: 5,
-                  height: 40
-                }}
-              />
-            )}
-          </>
-        ) : (
-          <>
-            <View
-              style={{
-                alignSelf: "center",
-                alignItems: "flex-start",
-                width: "100%"
-              }}
-            >
-              <Heading>{placeholder?.title}</Heading>
-              <Paragraph size={SIZE.sm} textBreakStrategy="balanced">
-                {placeholder?.loading}
-              </Paragraph>
-              <Seperator />
-              <ActivityIndicator
-                size={SIZE.lg}
-                color={color || colors.primary.accent}
-              />
-            </View>
-          </>
-        )}
-      </View>
-    );
-  },
-  (prev, next) => {
-    if (prev.loading === next.loading) return true;
-    return false;
-  }
-);
+          )}
+        </>
+      ) : (
+        <>
+          <View
+            style={{
+              alignSelf: "center",
+              alignItems: "flex-start",
+              width: "100%"
+            }}
+          >
+            <Heading>{placeholder?.title}</Heading>
+            <Paragraph size={SIZE.sm} textBreakStrategy="balanced">
+              {placeholder?.loading}
+            </Paragraph>
+            <Seperator />
+            <ActivityIndicator
+              size={SIZE.lg}
+              color={color || colors.primary.accent}
+            />
+          </View>
+        </>
+      )}
+    </View>
+  );
+});
 
 /**
  * Make a tips manager.

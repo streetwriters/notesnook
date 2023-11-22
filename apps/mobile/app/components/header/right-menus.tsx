@@ -20,40 +20,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 //@ts-ignore
+import { useThemeColors } from "@notesnook/theme";
 import Menu from "react-native-reanimated-material-menu";
 import { notesnook } from "../../../e2e/test.ids";
 import Navigation from "../../services/navigation";
 import SearchService from "../../services/search";
-import useNavigationStore from "../../stores/use-navigation-store";
+import {
+  HeaderRightButton,
+  RouteName
+} from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 
-export const RightMenus = () => {
+export const RightMenus = ({
+  headerRightButtons,
+  renderedInRoute,
+  id,
+  onPressDefaultRightButton,
+  search,
+  onSearch
+}: {
+  headerRightButtons?: HeaderRightButton[];
+  renderedInRoute: RouteName;
+  id?: string;
+  onPressDefaultRightButton?: () => void;
+  search?: boolean;
+  onSearch?: () => void;
+}) => {
   const { colors } = useThemeColors();
   const { colors: contextMenuColors } = useThemeColors("contextMenu");
   const deviceMode = useSettingStore((state) => state.deviceMode);
-  const buttons = useNavigationStore((state) => state.headerRightButtons);
-  const currentScreen = useNavigationStore((state) => state.currentScreen.name);
-  const buttonAction = useNavigationStore((state) => state.buttonAction);
   const menuRef = useRef<Menu>(null);
 
   return (
     <View style={styles.rightBtnContainer}>
-      {!currentScreen.startsWith("Settings") ? (
+      {search ? (
         <IconButton
-          onPress={async () => {
-            SearchService.prepareSearch();
-            Navigation.navigate(
-              {
-                name: "Search"
-              },
-              {}
-            );
-          }}
+          onPress={onSearch}
           testID="icon-search"
           name="magnify"
           color={colors.primary.paragraph}
@@ -63,9 +69,9 @@ export const RightMenus = () => {
 
       {deviceMode !== "mobile" ? (
         <Button
-          onPress={buttonAction}
+          onPress={onPressDefaultRightButton}
           testID={notesnook.ids.default.addBtn}
-          icon={currentScreen === "Trash" ? "delete" : "plus"}
+          icon={renderedInRoute === "Trash" ? "delete" : "plus"}
           iconSize={SIZE.xl}
           type="shade"
           hitSlop={{
@@ -86,7 +92,7 @@ export const RightMenus = () => {
         />
       ) : null}
 
-      {buttons && buttons.length > 0 ? (
+      {headerRightButtons && headerRightButtons.length > 0 ? (
         <Menu
           ref={menuRef}
           animationDuration={200}
@@ -108,7 +114,7 @@ export const RightMenus = () => {
             />
           }
         >
-          {buttons.map((item) => (
+          {headerRightButtons.map((item) => (
             <Button
               style={{
                 width: 150,

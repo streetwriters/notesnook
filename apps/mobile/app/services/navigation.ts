@@ -21,7 +21,6 @@ import { StackActions } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFavoriteStore } from "../stores/use-favorite-store";
 import useNavigationStore, {
-  CurrentScreen,
   GenericRouteParam,
   RouteName,
   RouteParams
@@ -34,8 +33,8 @@ import { useTrashStore } from "../stores/use-trash-store";
 import { eOnNewTopicAdded } from "../utils/events";
 import { rootNavigatorRef, tabBarRef } from "../utils/global-refs";
 import { eSendEvent } from "./event-manager";
-import SettingsService from "./settings";
 import SearchService from "./search";
+import SettingsService from "./settings";
 
 /**
  * Routes that should be updated on focus
@@ -113,59 +112,35 @@ function queueRoutesForUpdate(...routesToUpdate: RouteName[]) {
     routesToUpdate?.length > 0
       ? routesToUpdate
       : (Object.keys(routeNames) as (keyof RouteParams)[]);
-  const currentScreen = useNavigationStore.getState().currentScreen;
-  if (routes.indexOf(currentScreen.name) > -1) {
-    routeUpdateFunctions[currentScreen.name]?.();
-    clearRouteFromQueue(currentScreen.name);
+  const currentRoute = useNavigationStore.getState().currentRoute;
+  if (routes.indexOf(currentRoute) > -1) {
+    routeUpdateFunctions[currentRoute]?.();
+    clearRouteFromQueue(currentRoute);
     // Remove focused screen from queue
-    routes.splice(routes.indexOf(currentScreen.name), 1);
+    routes.splice(routes.indexOf(currentRoute), 1);
   }
   routesUpdateQueue = routesUpdateQueue.concat(routes);
   routesUpdateQueue = [...new Set(routesUpdateQueue)];
 }
 
-function navigate<T extends RouteName>(
-  screen: Omit<Partial<CurrentScreen>, "name"> & {
-    name: keyof RouteParams;
-  },
-  params?: RouteParams[T]
-) {
-  useNavigationStore
-    .getState()
-    .update(screen as CurrentScreen, !!params?.canGoBack);
-  if (screen.name === "Notebook")
-    routeUpdateFunctions["Notebook"](params || {});
-  if (screen.name?.endsWith("Notes") && screen.name !== "Notes")
-    routeUpdateFunctions[screen.name]?.(params || {});
-  //@ts-ignore Not sure how to fix this for now ignore it.
-  rootNavigatorRef.current?.navigate<RouteName>(screen.name, params);
+function navigate<T extends RouteName>(screen: T, params?: RouteParams[T]) {
+  rootNavigatorRef.current?.navigate(screen as any, params);
 }
 
 function goBack() {
   rootNavigatorRef.current?.goBack();
 }
 
-function push<T extends RouteName>(
-  screen: CurrentScreen,
-  params: RouteParams[T]
-) {
-  useNavigationStore.getState().update(screen, !!params?.canGoBack);
-  rootNavigatorRef.current?.dispatch(StackActions.push(screen.name, params));
+function push<T extends RouteName>(screen: T, params: RouteParams[T]) {
+  rootNavigatorRef.current?.dispatch(StackActions.push(screen as any, params));
 }
 
-function replace<T extends RouteName>(
-  screen: CurrentScreen,
-  params: RouteParams[T]
-) {
-  useNavigationStore.getState().update(screen, !!params?.canGoBack);
-  rootNavigatorRef.current?.dispatch(StackActions.replace(screen.name, params));
+function replace<T extends RouteName>(screen: T, params: RouteParams[T]) {
+  rootNavigatorRef.current?.dispatch(StackActions.replace(screen, params));
 }
 
 function popToTop() {
   rootNavigatorRef.current?.dispatch(StackActions.popToTop());
-  useNavigationStore.getState().update({
-    name: (SettingsService.get().homepage as RouteName) || "Notes"
-  });
 }
 
 function openDrawer() {

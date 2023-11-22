@@ -17,39 +17,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import NotebookScreen from "../../screens/notebook";
-import { TopicNotes } from "../../screens/notes/topic-notes";
-import {
-  eSendEvent,
-  presentSheet,
-  ToastManager
-} from "../../services/event-manager";
-import Navigation from "../../services/navigation";
-import { useNotebookStore } from "../../stores/use-notebook-store";
-import { useThemeColors } from "@notesnook/theme";
+import { eSendEvent, presentSheet } from "../../services/event-manager";
+import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
-import { eClearEditor } from "../../utils/events";
 
 export default function Notebooks({ note, close, full }) {
   const { colors } = useThemeColors();
-  const notebooks = useNotebookStore((state) => state.notebooks);
   async function getNotebooks(item) {
     let filteredNotebooks = [];
     const relations = await db.relations.to(note, "notebook").resolve();
-
     filteredNotebooks.push(relations);
-
     if (!item.notebooks || item.notebooks.length < 1) return filteredNotebooks;
     return filteredNotebooks;
   }
   const [noteNotebooks, setNoteNotebooks] = useState([]);
-
   useEffect(() => {
     getNotebooks().then((notebooks) => setNoteNotebooks(notebooks));
   });
@@ -60,11 +49,6 @@ export default function Notebooks({ note, close, full }) {
     NotebookScreen.navigate(item, true);
   };
 
-  const navigateTopic = (id, notebookId) => {
-    let item = db.notebooks.notebook(notebookId)?.topics?.topic(id)?._topic;
-    if (!item) return;
-    TopicNotes.navigate(item, true);
-  };
   const renderItem = (item) => (
     <View
       key={item.id}
@@ -105,56 +89,6 @@ export default function Notebooks({ note, close, full }) {
       >
         {item.title}
       </Heading>
-
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        style={{
-          flexDirection: "row",
-          marginLeft: 8,
-          borderLeftColor: colors.primary.hover,
-          borderLeftWidth: 1,
-          paddingLeft: 8
-        }}
-      >
-        {item.topics.map((topic) => (
-          <Button
-            key={topic.id}
-            onPress={() => {
-              navigateTopic(topic.id, item.id);
-              eSendEvent(eClearEditor);
-              close();
-            }}
-            onLongPress={async () => {
-              await db.notes.removeFromNotebook(
-                {
-                  id: item.id,
-                  topic: topic.id
-                },
-                note
-              );
-              useNotebookStore.getState().setNotebooks();
-              Navigation.queueRoutesForUpdate();
-              ToastManager.show({
-                heading: "Note removed from topic",
-                context: "local",
-                type: "success"
-              });
-            }}
-            title={topic.title}
-            type="gray"
-            height={30}
-            fontSize={SIZE.xs}
-            icon="bookmark-outline"
-            style={{
-              marginRight: 5,
-              borderRadius: 100,
-              paddingHorizontal: 8
-            }}
-          />
-        ))}
-        <View style={{ width: 10 }} />
-      </ScrollView>
     </View>
   );
 

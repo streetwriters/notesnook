@@ -56,9 +56,12 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
     const onUpdateItem = (itemId?: string) => {
       if (typeof itemId === "string" && itemId !== id) return;
       if (!id) {
-        setItem(undefined);
+        if (item) {
+          setItem(undefined);
+        }
         return;
       }
+      console.log("onUpdateItem", id, type);
 
       if (items) {
         items.item(id).then((item) => {
@@ -82,7 +85,7 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
     return () => {
       eUnSubscribeEvent(eDBItemUpdate, onUpdateItem);
     };
-  }, [id, type]);
+  }, [id, type, items, item]);
 
   return [
     item as ItemTypeKey[T],
@@ -116,6 +119,7 @@ export const useTotalNotes = (
         }
         setTotalNotesById(totalNotesById);
       });
+    console.log("useTotalNotes.getTotalNotes");
   }, [ids, type]);
 
   useEffect(() => {

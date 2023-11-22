@@ -19,17 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   Color,
+  ItemType,
   Note,
   Notebook,
   Reminder,
   Tag,
-  Topic,
   TrashItem
 } from "@notesnook/core/dist/types";
 import create, { State } from "zustand";
 import { ColorValues } from "../utils/colors";
 
-export type GenericRouteParam = { [name: string]: unknown };
+export type GenericRouteParam = undefined;
 
 export type NotebookScreenParams = {
   item: Notebook;
@@ -38,7 +38,7 @@ export type NotebookScreenParams = {
 };
 
 export type NotesScreenParams = {
-  item: Note | Notebook | Topic | Tag | Color | TrashItem | Reminder;
+  item: Note | Notebook | Tag | Color | TrashItem | Reminder;
   title: string;
   canGoBack?: boolean;
 };
@@ -56,35 +56,32 @@ export type AuthParams = {
 
 export type RouteParams = {
   Notes: GenericRouteParam;
-  Notebooks: GenericRouteParam;
+  Notebooks: {
+    canGoBack?: boolean;
+  };
   Notebook: NotebookScreenParams;
   NotesPage: NotesScreenParams;
   Tags: GenericRouteParam;
   Favorites: GenericRouteParam;
   Trash: GenericRouteParam;
-  Search: GenericRouteParam;
+  Search: {
+    placeholder: string;
+    type: ItemType;
+    title: string;
+    route: RouteName;
+    ids?: string[];
+  };
   Settings: GenericRouteParam;
   TaggedNotes: NotesScreenParams;
   ColoredNotes: NotesScreenParams;
   TopicNotes: NotesScreenParams;
   Monographs: NotesScreenParams;
   AppLock: AppLockRouteParams;
-  Auth: AuthParams;
   Reminders: GenericRouteParam;
   SettingsGroup: GenericRouteParam;
 };
 
 export type RouteName = keyof RouteParams;
-
-export type CurrentScreen = {
-  name: RouteName;
-  id: string;
-  title?: string;
-  type?: string;
-  color?: string | null;
-  notebookId?: string;
-  beta?: boolean;
-};
 
 export type HeaderRightButton = {
   title: string;
@@ -92,54 +89,31 @@ export type HeaderRightButton = {
 };
 
 interface NavigationStore extends State {
-  currentScreen: CurrentScreen;
-  currentScreenRaw: Partial<CurrentScreen>;
+  currentRoute: RouteName;
   canGoBack?: boolean;
-  update: (
-    currentScreen: Omit<Partial<CurrentScreen>, "name"> & {
-      name: keyof RouteParams;
-    },
-    canGoBack?: boolean,
-    headerRightButtons?: HeaderRightButton[]
-  ) => void;
+  focusedRouteId?: string;
+  update: (currentScreen: RouteName) => void;
   headerRightButtons?: HeaderRightButton[];
   buttonAction: () => void;
   setButtonAction: (buttonAction: () => void) => void;
+  setFocusedRouteId: (id?: string) => void;
 }
 
 const useNavigationStore = create<NavigationStore>((set, get) => ({
-  currentScreen: {
-    name: "Notes",
-    id: "notes_navigation",
-    title: "Notes",
-    type: "notes"
-  },
-  currentScreenRaw: { name: "Notes" },
-  canGoBack: false,
-  update: (currentScreen, canGoBack, headerRightButtons) => {
-    const color =
-      ColorValues[
-        currentScreen.color?.toLowerCase() as keyof typeof ColorValues
-      ];
-    if (
-      JSON.stringify(currentScreen) === JSON.stringify(get().currentScreenRaw)
-    )
-      return;
+  focusedRouteId: "Notes",
+  setFocusedRouteId: (id) => {
     set({
-      currentScreen: {
-        name: currentScreen.name,
-        id:
-          currentScreen.id || currentScreen.name.toLowerCase() + "_navigation",
-        title: currentScreen.title || currentScreen.name,
-        type: currentScreen.type,
-        color: color,
-        notebookId: currentScreen.notebookId,
-        beta: currentScreen.beta
-      },
-      currentScreenRaw: currentScreen,
-      canGoBack,
-      headerRightButtons: headerRightButtons
+      focusedRouteId: id
     });
+    console.log("CurrentRoute ID", id);
+  },
+  currentRoute: "Notes",
+  canGoBack: false,
+  update: (currentScreen) => {
+    set({
+      currentRoute: currentScreen
+    });
+    console.log("CurrentRoute", currentScreen);
   },
   headerRightButtons: [],
   buttonAction: () => null,
