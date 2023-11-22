@@ -28,6 +28,7 @@ import SettingsService from "../../services/settings";
 import { useFavoriteStore } from "../../stores/use-favorite-store";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
+import { Header } from "../../components/header";
 const prepareSearch = () => {
   SearchService.update({
     placeholder: "Search in favorites",
@@ -50,9 +51,7 @@ export const Favorites = ({
         route.name,
         Navigation.routeUpdateFunctions[route.name]
       );
-      useNavigationStore.getState().update({
-        name: route.name
-      });
+      useNavigationStore.getState().setFocusedRouteId(route?.name);
       SearchService.prepareSearch = prepareSearch;
       return !prev?.current;
     },
@@ -61,23 +60,43 @@ export const Favorites = ({
   });
 
   return (
-    <DelayLayout wait={loading}>
-      <List
-        data={favorites}
-        dataType="note"
-        onRefresh={() => {
-          setFavorites();
+    <>
+      <Header
+        renderedInRoute={route.name}
+        title={route.name}
+        canGoBack={false}
+        hasSearch={true}
+        id={route.name}
+        onSearch={() => {
+          Navigation.push("Search", {
+            placeholder: `Type a keyword to search in ${route.name?.toLowerCase()}`,
+            type: "note",
+            title: route.name,
+            route: route.name,
+            ids: favorites?.ids.filter(
+              (id) => typeof id === "string"
+            ) as string[]
+          });
         }}
-        renderedInRoute="Favorites"
-        loading={loading || !isFocused}
-        placeholder={{
-          title: "Your favorites",
-          paragraph: "You have not added any notes to favorites yet.",
-          loading: "Loading your favorites"
-        }}
-        headerTitle="Favorites"
       />
-    </DelayLayout>
+      <DelayLayout wait={loading}>
+        <List
+          data={favorites}
+          dataType="note"
+          onRefresh={() => {
+            setFavorites();
+          }}
+          renderedInRoute="Favorites"
+          loading={loading || !isFocused}
+          placeholder={{
+            title: "Your favorites",
+            paragraph: "You have not added any notes to favorites yet.",
+            loading: "Loading your favorites"
+          }}
+          headerTitle="Favorites"
+        />
+      </DelayLayout>
+    </>
   );
 };
 

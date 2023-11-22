@@ -452,7 +452,7 @@ export const useActions = ({
     }
 
     async function showAttachments() {
-      AttachmentDialog.present(item);
+      AttachmentDialog.present(item as Note);
     }
 
     async function exportNote() {
@@ -486,12 +486,10 @@ export const useActions = ({
     };
 
     async function removeNoteFromNotebook() {
-      const currentScreen = useNavigationStore.getState().currentScreen;
-      if (currentScreen.name !== "Notebook") return;
-      await db.relations.unlink(
-        { type: "notebook", id: currentScreen.id },
-        item
-      );
+      const { currentRoute, focusedRouteId } = useNavigationStore.getState();
+      if (currentRoute !== "Notebook" || !focusedRouteId) return;
+
+      await db.relations.unlink({ type: "notebook", id: focusedRouteId }, item);
       Navigation.queueRoutesForUpdate();
       close();
     }
@@ -499,7 +497,7 @@ export const useActions = ({
     function addTo() {
       clearSelection();
       setSelectedItem(item);
-      MoveNoteSheet.present(item);
+      MoveNoteSheet.present(item as Note);
     }
 
     async function addToFavorites() {
@@ -857,11 +855,13 @@ export const useActions = ({
   }
 
   useEffect(() => {
-    const currentScreen = useNavigationStore.getState().currentScreen;
-    if (item.type !== "note" || currentScreen.name !== "Notebook") return;
+    const { currentRoute, focusedRouteId } = useNavigationStore.getState();
+    if (item.type !== "note" || currentRoute !== "Notebook" || !focusedRouteId)
+      return;
+
     !!db.relations
       .to(item, "notebook")
-      .selector.find((v) => v("id", "==", currentScreen.id))
+      .selector.find((v) => v("id", "==", focusedRouteId))
       .then((notebook) => {
         setNoteInCurrentNotebook(!!notebook);
       });

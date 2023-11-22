@@ -52,6 +52,24 @@ import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
 import Sort from "../sort";
 
+const SelectionContext = createContext<{
+  selection: Notebook[];
+  enabled: boolean;
+  setEnabled: (value: boolean) => void;
+  toggleSelection: (item: Notebook) => void;
+}>({
+  selection: [],
+  enabled: false,
+  setEnabled: (_value: boolean) => {},
+  toggleSelection: (_item: Notebook) => {}
+});
+const useSelection = () => useContext(SelectionContext);
+
+type NotebookParentProp = {
+  parent?: NotebookParentProp;
+  item?: Notebook;
+};
+
 type ConfigItem = { id: string; type: string };
 class NotebookSheetConfig {
   static storageKey: "$$sp";
@@ -88,8 +106,10 @@ const useNotebookExpandedStore = create<{
 
 export const NotebookSheet = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const currentScreen = useNavigationStore((state) => state.currentScreen);
-  const canShow = currentScreen.name === "Notebook";
+  const currentRoute = useNavigationStore((state) => state.currentRoute);
+  const focusedRouteId = useNavigationStore((state) => state.focusedRouteId);
+
+  const canShow = currentRoute === "Notebook";
   const [selection, setSelection] = useState<Notebook[]>([]);
   const [enabled, setEnabled] = useState(false);
   const { colors } = useThemeColors("sheet");
@@ -103,7 +123,7 @@ export const NotebookSheet = () => {
     nestedNotebooks: notebooks,
     nestedNotebookNotesCount: totalNotes,
     groupOptions
-  } = useNotebook(currentScreen.name === "Notebook" ? root : undefined);
+  } = useNotebook(currentRoute === "Notebook" ? root : undefined);
 
   const PLACEHOLDER_DATA = {
     heading: "Notebooks",
@@ -158,8 +178,8 @@ export const NotebookSheet = () => {
   useEffect(() => {
     if (canShow) {
       setTimeout(async () => {
-        const id = currentScreen?.id;
-        const nextRoot = await findRootNotebookId(id);
+        if (!focusedRouteId) return;
+        const nextRoot = await findRootNotebookId(focusedRouteId);
         setRoot(nextRoot);
         if (nextRoot !== currentItem.current) {
           setSelection([]);
@@ -183,7 +203,7 @@ export const NotebookSheet = () => {
       setEnabled(false);
       ref.current?.hide();
     }
-  }, [canShow, currentScreen?.id, currentScreen.name, onRequestUpdate]);
+  }, [canShow, currentRoute, onRequestUpdate, focusedRouteId]);
 
   return (
     <ActionSheet
@@ -206,7 +226,7 @@ export const NotebookSheet = () => {
         NotebookSheetConfig.set(
           {
             type: "notebook",
-            id: currentScreen.id as string
+            id: focusedRouteId as string
           },
           index
         );
@@ -392,24 +412,6 @@ export const NotebookSheet = () => {
   );
 };
 
-const SelectionContext = createContext<{
-  selection: Notebook[];
-  enabled: boolean;
-  setEnabled: (value: boolean) => void;
-  toggleSelection: (item: Notebook) => void;
-}>({
-  selection: [],
-  enabled: false,
-  setEnabled: (_value: boolean) => {},
-  toggleSelection: (_item: Notebook) => {}
-});
-const useSelection = () => useContext(SelectionContext);
-
-type NotebookParentProp = {
-  parent?: NotebookParentProp;
-  item?: Notebook;
-};
-
 const NotebookItem = ({
   id,
   totalNotes,
@@ -430,12 +432,12 @@ const NotebookItem = ({
     nestedNotebooks,
     notebook: item
   } = useNotebook(id, items);
-  const screen = useNavigationStore((state) => state.currentScreen);
+  const isFocused = useNavigationStore((state) => state.focusedRouteId === id);
   const { colors } = useThemeColors("sheet");
   const selection = useSelection();
   const isSelected =
     selection.selection.findIndex((selected) => selected.id === item?.id) > -1;
-  const isFocused = screen.id === id;
+
   const { fontScale } = useWindowDimensions();
   const expanded = useNotebookExpandedStore((state) => state.expanded[id]);
 

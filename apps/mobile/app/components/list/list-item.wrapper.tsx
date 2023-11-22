@@ -251,7 +251,7 @@ async function resolveNotes(ids: string[]) {
         group.notebooks.map((id) => resolved.notebooks[id])
       ),
       attachmentsCount:
-        (await db.attachments?.ofNote(noteId, "all"))?.length || 0
+        (await db.attachments?.ofNote(noteId, "all").ids())?.length || 0
     };
   }
   return data;

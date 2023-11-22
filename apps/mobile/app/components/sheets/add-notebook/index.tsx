@@ -38,6 +38,7 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import { MoveNotes } from "../move-notes/movenote";
 import { eOnNotebookUpdated } from "../../../utils/events";
+import { getParentNotebookId } from "../../../utils/notebooks";
 
 export const AddNotebookSheet = ({
   notebook,
@@ -84,9 +85,12 @@ export const AddNotebookSheet = ({
     useMenuStore.getState().setMenuPins();
     Navigation.queueRoutesForUpdate();
     useRelationStore.getState().update();
-    eSendEvent(eOnNotebookUpdated, parentNotebook?.id);
     if (notebook) {
-      eSendEvent(eOnNotebookUpdated, notebook.id);
+      const parent = await getParentNotebookId(notebook.id);
+      eSendEvent(eOnNotebookUpdated, parent);
+      setImmediate(() => {
+        eSendEvent(eOnNotebookUpdated, notebook.id);
+      });
     }
 
     if (!notebook) {
@@ -136,6 +140,11 @@ export const AddNotebookSheet = ({
         onChangeText={(value) => {
           title.current = value;
         }}
+        onLayout={() => {
+          setImmediate(() => {
+            titleInput?.current?.focus();
+          });
+        }}
         placeholder="Enter a title"
         onSubmit={() => {
           descriptionInput.current?.focus();
@@ -160,8 +169,13 @@ export const AddNotebookSheet = ({
   );
 };
 
-AddNotebookSheet.present = (notebook?: Notebook, parentNotebook?: Notebook) => {
+AddNotebookSheet.present = (
+  notebook?: Notebook,
+  parentNotebook?: Notebook,
+  context?: string
+) => {
   presentSheet({
+    context: context,
     component: (ref, close) => (
       <AddNotebookSheet
         notebook={notebook}
