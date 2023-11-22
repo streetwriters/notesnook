@@ -18,13 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Color } from "@notesnook/core/dist/types";
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
 import React from "react";
-import NotesPage, { PLACEHOLDER_DATA } from ".";
+import NotesPage from ".";
 import { db } from "../../common/database";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { NotesScreenParams } from "../../stores/use-navigation-store";
-import { openEditor, toCamelCase } from "./common";
+import { PLACEHOLDER_DATA, openEditor, toCamelCase } from "./common";
 export const ColoredNotes = ({
   navigation,
   route
@@ -54,18 +53,9 @@ ColoredNotes.get = async (params: NotesScreenParams, grouped = true) => {
 
 ColoredNotes.navigate = (item: Color, canGoBack: boolean) => {
   if (!item) return;
-  Navigation.navigate<"ColoredNotes">(
-    {
-      name: "ColoredNotes",
-      title: toCamelCase(item.title),
-      id: item.id,
-      type: "color",
-      color: item.title?.toLowerCase()
-    },
-    {
-      item: item,
-      canGoBack,
-      title: toCamelCase(item.title)
-    }
-  );
+  Navigation.navigate<"ColoredNotes">("ColoredNotes", {
+    item: item,
+    canGoBack,
+    title: toCamelCase(item.title)
+  });
 };

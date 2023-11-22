@@ -26,34 +26,6 @@ import Home from "./home";
 import { RouteParams } from "./types";
 const SettingsStack = createNativeStackNavigator<RouteParams>();
 
-// const Home = React.lazy(() => import(/* webpackChunkName: "settings-home" */ './home'));
-// const Group = React.lazy(() => import(/* webpackChunkName: "settings-group" */ './group'));
-
-// const Fallback = () => {
-//   return (
-//     <>
-//       <Header />
-//       <DelayLayout wait={true} type="settings" />
-//     </>
-//   );
-// };
-
-// const HomeScreen = (props: NativeStackScreenProps<RouteParams, 'SettingsHome'>) => {
-//   return (
-//     <React.Suspense fallback={<Fallback />}>
-//       <Home {...props} />
-//     </React.Suspense>
-//   );
-// };
-
-// const GroupScreen = (props: NativeStackScreenProps<RouteParams, 'SettingsGroup'>) => {
-//   return (
-//     <React.Suspense fallback={<Fallback />}>
-//       <Group {...props} />
-//     </React.Suspense>
-//   );
-// };
-
 export const Settings = () => {
   const { colors } = useThemeColors();
   return (
@@ -62,7 +34,7 @@ export const Settings = () => {
       screenListeners={{
         focus: (e) => {
           if (e.target?.startsWith("SettingsHome-")) {
-            useNavigationStore.getState().update({ name: "Settings" }, false);
+            useNavigationStore.getState().update("Settings");
           }
         }
       }}

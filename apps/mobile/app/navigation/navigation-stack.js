@@ -35,7 +35,6 @@ import Notebooks from "../screens/notebooks";
 import { ColoredNotes } from "../screens/notes/colored";
 import { Monographs } from "../screens/notes/monographs";
 import { TaggedNotes } from "../screens/notes/tagged";
-import { TopicNotes } from "../screens/notes/topic-notes";
 import Reminders from "../screens/reminders";
 import { Search } from "../screens/search";
 import Settings from "../screens/settings";
@@ -120,44 +119,14 @@ const _Tabs = () => {
       <NativeStack.Screen name="Welcome" component={IntroStackNavigator} />
       <NativeStack.Screen name="Notes" component={Home} />
       <NativeStack.Screen name="Notebooks" component={Notebooks} />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Favorites"
-        component={Favorites}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Trash"
-        component={Trash}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Tags"
-        component={Tags}
-      />
+      <NativeStack.Screen name="Favorites" component={Favorites} />
+      <NativeStack.Screen name="Trash" component={Trash} />
+      <NativeStack.Screen name="Tags" component={Tags} />
       <NativeStack.Screen name="Settings" component={Settings} />
+      <NativeStack.Screen name="TaggedNotes" component={TaggedNotes} />
+      <NativeStack.Screen name="ColoredNotes" component={ColoredNotes} />
+      <NativeStack.Screen name="Reminders" component={Reminders} />
       <NativeStack.Screen
-        options={{ lazy: true }}
-        name="TaggedNotes"
-        component={TaggedNotes}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="TopicNotes"
-        component={TopicNotes}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="ColoredNotes"
-        component={ColoredNotes}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Reminders"
-        component={Reminders}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
         name="Monographs"
         initialParams={{
           item: { type: "monograph" },
@@ -166,16 +135,8 @@ const _Tabs = () => {
         }}
         component={Monographs}
       />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Notebook"
-        component={NotebookScreen}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Search"
-        component={Search}
-      />
+      <NativeStack.Screen name="Notebook" component={NotebookScreen} />
+      <NativeStack.Screen name="Search" component={Search} />
     </NativeStack.Navigator>
   );
 };

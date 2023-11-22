@@ -20,39 +20,70 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useCallback, useEffect, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import { SearchBar } from "../../screens/search/search-bar";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useThemeColors } from "@notesnook/theme";
 import { eScrollEvent } from "../../utils/events";
 import { LeftMenus } from "./left-menus";
 import { RightMenus } from "./right-menus";
 import { Title } from "./title";
+import useNavigationStore, {
+  RouteName
+} from "../../stores/use-navigation-store";
 
-const _Header = () => {
+type HeaderRightButton = {
+  title: string;
+  onPress: () => void;
+};
+
+export const Header = ({
+  renderedInRoute,
+  onLeftMenuButtonPress,
+  title,
+  titleHiddenOnRender,
+  headerRightButtons,
+  id,
+  accentColor,
+  isBeta,
+  canGoBack,
+  onPressDefaultRightButton,
+  hasSearch,
+  onSearch
+}: {
+  onLeftMenuButtonPress?: () => void;
+  renderedInRoute: RouteName;
+  id?: string;
+  title: string;
+  headerRightButtons?: HeaderRightButton[];
+  titleHiddenOnRender?: boolean;
+  accentColor?: string;
+  isBeta?: boolean;
+  canGoBack?: boolean;
+  onPressDefaultRightButton?: () => void;
+  hasSearch?: boolean;
+  onSearch?: () => void;
+}) => {
   const { colors } = useThemeColors();
   const insets = useGlobalSafeAreaInsets();
-  const [hide, setHide] = useState(true);
+  const [borderHidden, setBorderHidden] = useState(true);
   const selectionMode = useSelectionStore((state) => state.selectionMode);
-  const currentScreen = useNavigationStore(
-    (state) => state.currentScreen?.name
-  );
+  const isFocused = useNavigationStore((state) => state.focusedRouteId === id);
 
   const onScroll = useCallback(
-    (data: { x: number; y: number }) => {
+    (data: { x: number; y: number; id?: string; route: string }) => {
+      if (data.route !== renderedInRoute || data.id !== id) return;
       if (data.y > 150) {
-        if (!hide) return;
-        setHide(false);
+        if (!borderHidden) return;
+        setBorderHidden(false);
       } else {
-        if (hide) return;
-        setHide(true);
+        if (borderHidden) return;
+        setBorderHidden(true);
       }
     },
-    [hide]
+    [borderHidden, id, renderedInRoute]
   );
 
   useEffect(() => {
@@ -60,9 +91,9 @@ const _Header = () => {
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  }, [hide, onScroll]);
+  }, [borderHidden, onScroll]);
 
-  return selectionMode ? null : (
+  return selectionMode && isFocused ? null : (
     <>
       <View
         style={[
@@ -72,29 +103,42 @@ const _Header = () => {
             backgroundColor: colors.primary.background,
             overflow: "hidden",
             borderBottomWidth: 1,
-            borderBottomColor: hide
+            borderBottomColor: borderHidden
               ? "transparent"
               : colors.secondary.background,
             justifyContent: "space-between"
           }
         ]}
       >
-        {currentScreen === "Search" ? (
-          <SearchBar />
-        ) : (
-          <>
-            <View style={styles.leftBtnContainer}>
-              <LeftMenus />
-              <Title />
-            </View>
-            <RightMenus />
-          </>
-        )}
+        <>
+          <View style={styles.leftBtnContainer}>
+            <LeftMenus
+              canGoBack={canGoBack}
+              onLeftButtonPress={onLeftMenuButtonPress}
+            />
+
+            <Title
+              isHiddenOnRender={titleHiddenOnRender}
+              renderedInRoute={renderedInRoute}
+              id={id}
+              accentColor={accentColor}
+              title={title}
+              isBeta={isBeta}
+            />
+          </View>
+          <RightMenus
+            renderedInRoute={renderedInRoute}
+            id={id}
+            headerRightButtons={headerRightButtons}
+            onPressDefaultRightButton={onPressDefaultRightButton}
+            search={hasSearch}
+            onSearch={onSearch}
+          />
+        </>
       </View>
     </>
   );
 };
-export const Header = React.memo(_Header, () => true);
 
 const styles = StyleSheet.create({
   container: {
