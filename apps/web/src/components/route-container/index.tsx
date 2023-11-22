@@ -67,6 +67,7 @@ function Header(props: RouteContainerProps) {
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
   const isSearching = useSearchStore((store) => store.isSearching);
+  const query = useSearchStore((store) => store.query);
 
   if (isSearching)
     return (
@@ -81,6 +82,7 @@ function Header(props: RouteContainerProps) {
           type="text"
           sx={{ m: 0, flex: 1 }}
           styles={{ input: { p: "7px" } }}
+          defaultValue={query}
           placeholder="Type your query here"
           onChange={debounce(
             (e) => useSearchStore.setState({ query: e.target.value }),
