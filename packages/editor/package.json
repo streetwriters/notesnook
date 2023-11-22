@@ -34,6 +34,7 @@
     "@tiptap/extension-underline": "2.1.12",
     "@tiptap/pm": "2.1.12",
     "@tiptap/starter-kit": "2.1.12",
+    "async-mutex": "^0.4.0",
     "clipboard-polyfill": "4.0.0",
     "detect-indent": "^7.0.0",
     "entities": "^4.5.0",

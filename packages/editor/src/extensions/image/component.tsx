@@ -43,7 +43,7 @@ export const AnimatedImage = motion(Image);
 
 export function ImageComponent(
   props: SelectionBasedReactNodeViewProps<
-    ImageAttributes & ImageAlignmentOptions
+    Partial<ImageAttributes & ImageAlignmentOptions>
   >
 ) {
   const { editor, node, selected } = props;
@@ -68,7 +68,7 @@ export function ImageComponent(
   const imageRef = useRef<HTMLImageElement>(null);
   const downloadOptions = useToolbarStore((store) => store.downloadOptions);
   const isReadonly = !editor.current?.isEditable;
-  const isSVG = mime.includes("/svg");
+  const isSVG = !!mime && mime.includes("/svg");
   const relativeHeight = aspectRatio
     ? editor.view.dom.clientWidth / aspectRatio
     : undefined;
@@ -244,37 +244,47 @@ export function ImageComponent(
                 : "2px solid transparent !important",
               borderRadius: "default"
             }}
-            onDoubleClick={() =>
-              editor.current?.commands.previewAttachment(node.attrs)
-            }
-            onLoad={async () => {
+            onDoubleClick={() => {
+              const { hash, filename, mime, size } = node.attrs;
+              if (!!hash && !!filename && !!mime && !!size)
+                editor.current?.commands.previewAttachment({
+                  hash,
+                  filename,
+                  mime,
+                  size
+                });
+            }}
+            onLoad={async function onLoad() {
               if (!imageRef.current) return;
               const { clientHeight, clientWidth } = imageRef.current;
-
-              if (!isDataUrl(src) && canParse(src)) {
-                const { url, size, blob, mimeType } = await downloadImage(
-                  src,
-                  downloadOptions
-                );
-                editor.current?.commands.updateImage(
-                  { src, hash },
-                  {
-                    src: await toDataURL(blob),
-                    bloburl: url,
-                    size: size,
-                    mime: mimeType,
-                    aspectRatio:
-                      !height && !width && !aspectRatio
-                        ? clientWidth / clientHeight
-                        : undefined
-                  }
+              if (src && !isDataUrl(src) && canParse(src)) {
+                const image = await downloadImage(src, downloadOptions);
+                if (!image) return;
+                const { url, size, blob, mimeType } = image;
+                const dataurl = await toDataURL(blob);
+                await editor.threadsafe((editor) =>
+                  editor.commands.updateImage(
+                    { src, hash },
+                    {
+                      src: dataurl,
+                      bloburl: url,
+                      size: size,
+                      mime: mimeType,
+                      aspectRatio:
+                        !height && !width && !aspectRatio
+                          ? clientWidth / clientHeight
+                          : undefined
+                    }
+                  )
                 );
               } else if (!height && !width && !aspectRatio) {
-                editor.current?.commands.updateImage(
-                  { src, hash },
-                  {
-                    aspectRatio: clientWidth / clientHeight
-                  }
+                await editor.threadsafe((editor) =>
+                  editor.commands.updateImage(
+                    { src, hash },
+                    {
+                      aspectRatio: clientWidth / clientHeight
+                    }
+                  )
                 );
               }
             }}

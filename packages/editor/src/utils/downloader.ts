@@ -60,14 +60,17 @@ const UTITypes: Record<string, string> = {
   "public.heifs": "image/heif-sequence"
 };
 
-export function corsify(url: string, host?: string) {
+export function corsify(url?: string, host?: string) {
   if (host && url && !url.startsWith("blob:") && !isDataUrl(url))
     return `${host}/${url}`;
   return url;
 }
 
 export async function downloadImage(url: string, options?: DownloadOptions) {
-  const response = await fetch(corsify(url, options?.corsHost), {
+  const corsifiedURL = corsify(url, options?.corsHost);
+  if (!corsifiedURL) return;
+
+  const response = await fetch(corsifiedURL, {
     mode: "cors",
     credentials: "omit",
     cache: "force-cache"
