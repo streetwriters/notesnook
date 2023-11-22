@@ -21,6 +21,7 @@ import { Note, Notebook } from "@notesnook/core/dist/types";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
 import DelayLayout from "../../components/delay-layout";
+import { Header } from "../../components/header";
 import List from "../../components/list";
 import { NotebookHeader } from "../../components/list-items/headers/notebook-header";
 import { AddNotebookSheet } from "../../components/sheets/add-notebook";
@@ -30,7 +31,6 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
-import SearchService from "../../services/search";
 import useNavigationStore, {
   NotebookScreenParams
 } from "../../stores/use-navigation-store";
@@ -46,7 +46,6 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
     onFocus: () => {
       Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
       syncWithNavigation();
-      useNavigationStore.getState().setButtonAction(openEditor);
       return false;
     },
     onBlur: () => {
@@ -56,21 +55,12 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   });
 
   const syncWithNavigation = React.useCallback(() => {
-    useNavigationStore.getState().update(
-      {
-        name: route.name,
-        title: params.current?.title,
-        id: params.current?.item?.id,
-        type: "notebook"
-      },
-      params.current?.canGoBack
-    );
+    useNavigationStore.getState().setFocusedRouteId(params?.current?.item?.id);
     setOnFirstSave({
       type: "notebook",
       id: params.current.item.id
     });
-    SearchService.prepareSearch = prepareSearch;
-  }, [route.name]);
+  }, []);
 
   const onRequestUpdate = React.useCallback(
     async (data?: NotebookScreenParams) => {
@@ -111,44 +101,25 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
     };
   }, []);
 
-  const prepareSearch = () => {
-    // SearchService.update({
-    //   placeholder: `Search in "${params.current.title}"`,
-    //   type: "notes",
-    //   title: params.current.title,
-    //   get: () => {
-    //     const notebook = db.notebooks?.notebook(
-    //       params?.current?.item?.id
-    //     )?.data;
-    //     if (!notebook) return [];
-    //     const notes = db.relations?.from(notebook, "note") || [];
-    //     const topicNotes = db.notebooks
-    //       .notebook(notebook.id)
-    //       ?.topics.all.map((topic: Topic) => {
-    //         return db.notes?.topicReferences
-    //           .get(topic.id)
-    //           .map((id: string) => db.notes?.note(id)?.data);
-    //       })
-    //       .flat()
-    //       .filter(
-    //         (topicNote) =>
-    //           notes.findIndex((note) => note?.id !== topicNote?.id) === -1
-    //       ) as Note[];
-    //     return [...notes, ...topicNotes];
-    //   }
-    // });
-  };
-
-  const PLACEHOLDER_DATA = {
-    title: params.current.item?.title,
-    paragraph: "You have not added any notes yet.",
-    button: "Add your first note",
-    action: openEditor,
-    loading: "Loading notebook notes"
-  };
-
   return (
     <>
+      <Header
+        renderedInRoute={route.name}
+        title={params.current.item?.title}
+        canGoBack={params?.current?.canGoBack}
+        hasSearch={true}
+        onSearch={() => {
+          Navigation.push("Search", {
+            placeholder: `Type a keyword to search in ${params.current.item?.title}`,
+            type: "note",
+            title: params.current.item?.title,
+            route: route.name,
+            ids: notes?.ids.filter((id) => typeof id === "string") as string[]
+          });
+        }}
+        id={params.current.item?.id}
+        onPressDefaultRightButton={openEditor}
+      />
       <DelayLayout>
         <List
           data={notes}
@@ -170,7 +141,13 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
               }
             />
           }
-          placeholder={PLACEHOLDER_DATA}
+          placeholder={{
+            title: params.current.item?.title,
+            paragraph: "You have not added any notes yet.",
+            button: "Add your first note",
+            action: openEditor,
+            loading: "Loading notebook notes"
+          }}
         />
       </DelayLayout>
     </>
@@ -179,19 +156,11 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
 
 NotebookScreen.navigate = (item: Notebook, canGoBack?: boolean) => {
   if (!item) return;
-  Navigation.navigate<"Notebook">(
-    {
-      title: item.title,
-      name: "Notebook",
-      id: item.id,
-      type: "notebook"
-    },
-    {
-      title: item.title,
-      item: item,
-      canGoBack
-    }
-  );
+  Navigation.navigate<"Notebook">("Notebook", {
+    title: item.title,
+    item: item,
+    canGoBack
+  });
 };
 
 export default NotebookScreen;

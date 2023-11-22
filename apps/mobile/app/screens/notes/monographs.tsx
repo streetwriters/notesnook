@@ -18,12 +18,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import NotesPage, { PLACEHOLDER_DATA } from ".";
+import NotesPage from ".";
 import { db } from "../../common/database";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { NotesScreenParams } from "../../stores/use-navigation-store";
-import { MonographType } from "../../utils/types";
 import { openMonographsWebpage } from "./common";
+
+export const MONOGRAPH_PLACEHOLDER_DATA = {
+  title: "Your monographs",
+  paragraph: "You have not published any notes as monographs yet.",
+  button: "Learn more about monographs",
+  action: openMonographsWebpage,
+  loading: "Loading published notes.",
+  type: "monograph",
+  buttonIcon: "information-outline"
+};
+
 export const Monographs = ({
   navigation,
   route
@@ -33,7 +43,7 @@ export const Monographs = ({
       navigation={navigation}
       route={route}
       get={Monographs.get}
-      placeholder={PLACEHOLDER_DATA}
+      placeholder={MONOGRAPH_PLACEHOLDER_DATA}
       onPressFloatingButton={openMonographsWebpage}
       canGoBack={route.params?.canGoBack}
       focusControl={true}
@@ -49,16 +59,10 @@ Monographs.get = async (params?: NotesScreenParams, grouped = true) => {
   return await db.monographs.all.grouped(db.settings.getGroupOptions("notes"));
 };
 
-Monographs.navigate = (item?: MonographType, canGoBack?: boolean) => {
-  Navigation.navigate<"Monographs">(
-    {
-      name: "Monographs",
-      type: "monograph"
-    },
-    {
-      item: { type: "monograph" } as any,
-      canGoBack: canGoBack as boolean,
-      title: "Monographs"
-    }
-  );
+Monographs.navigate = (canGoBack?: boolean) => {
+  Navigation.navigate<"Monographs">("Monographs", {
+    item: { type: "monograph" } as any,
+    canGoBack: canGoBack as boolean,
+    title: "Monographs"
+  });
 };

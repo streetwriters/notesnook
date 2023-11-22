@@ -39,17 +39,19 @@ export const useNotebook = (
 
   const onRequestUpdate = React.useCallback(() => {
     if (!item || !id) {
-      console.log("unset notebook");
-      setNotebooks(undefined);
+      if (notebooks) {
+        setNotebooks(undefined);
+      }
       return;
     }
+    console.log("useNotebook.onRequestUpdate", id);
     db.relations
       .from(item, "notebook")
       .selector.sorted(db.settings.getGroupOptions("notebooks"))
       .then((notebooks) => {
         setNotebooks(notebooks);
       });
-  }, [item, id]);
+  }, [item, id, notebooks]);
 
   useEffect(() => {
     onRequestUpdate();
@@ -75,7 +77,7 @@ export const useNotebook = (
       eUnSubscribeEvent("groupOptionsUpdate", onUpdate);
       eUnSubscribeEvent(eOnNotebookUpdated, onNotebookUpdate);
     };
-  }, [onUpdate, onRequestUpdate, id]);
+  }, [onUpdate, onRequestUpdate, id, refresh]);
 
   return {
     notebook: item,

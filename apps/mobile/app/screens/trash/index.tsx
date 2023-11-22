@@ -22,22 +22,14 @@ import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { presentDialog } from "../../components/dialog/functions";
+import { Header } from "../../components/header";
 import List from "../../components/list";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
-import SearchService from "../../services/search";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrashStore } from "../../stores/use-trash-store";
-const prepareSearch = () => {
-  SearchService.update({
-    placeholder: "Search in trash",
-    type: "trash",
-    title: "Trash",
-    get: () => db.trash?.all
-  });
-};
 
 const onPressFloatingButton = () => {
   presentDialog({
@@ -77,40 +69,53 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         route.name,
         Navigation.routeUpdateFunctions[route.name]
       );
-      useNavigationStore.getState().update({
-        name: route.name
-      });
+      useNavigationStore.getState().setFocusedRouteId(route.name);
       if (
         !useTrashStore.getState().trash ||
         useTrashStore.getState().trash?.ids?.length === 0
       ) {
         useTrashStore.getState().setTrash();
       }
-      SearchService.prepareSearch = prepareSearch;
       return false;
     },
     onBlur: () => false
   });
 
   return (
-    <DelayLayout>
-      <List
-        data={trash}
-        dataType="trash"
-        renderedInRoute="Trash"
-        loading={!isFocused}
-        placeholder={PLACEHOLDER_DATA(db.settings.getTrashCleanupInterval())}
-        headerTitle="Trash"
+    <>
+      <Header
+        renderedInRoute={route.name}
+        title={route.name}
+        canGoBack={false}
+        hasSearch={true}
+        onSearch={() => {
+          Navigation.push("Search", {
+            placeholder: `Type a keyword to search in ${route.name}`,
+            type: "trash",
+            title: route.name,
+            route: route.name
+          });
+        }}
       />
-
-      {trash && trash?.ids?.length !== 0 ? (
-        <FloatingButton
-          title="Clear all trash"
-          onPress={onPressFloatingButton}
-          alwaysVisible={true}
+      <DelayLayout>
+        <List
+          data={trash}
+          dataType="trash"
+          renderedInRoute="Trash"
+          loading={!isFocused}
+          placeholder={PLACEHOLDER_DATA(db.settings.getTrashCleanupInterval())}
+          headerTitle="Trash"
         />
-      ) : null}
-    </DelayLayout>
+
+        {trash && trash?.ids?.length !== 0 ? (
+          <FloatingButton
+            title="Clear all trash"
+            onPress={onPressFloatingButton}
+            alwaysVisible={true}
+          />
+        ) : null}
+      </DelayLayout>
+    </>
   );
 };
 
