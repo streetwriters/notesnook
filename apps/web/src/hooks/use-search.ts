@@ -31,9 +31,9 @@ export function useSearch<T>(
   const [filteredItems, setFilteredItems] = useState<VirtualizedGrouping<T>>();
 
   useEffect(() => {
-    if (searchType !== type) return;
     (async function () {
       if (!query || !isSearching) return setFilteredItems(undefined);
+      if (searchType !== type) return;
       setFilteredItems(await lookup(query));
     })();
   }, [isSearching, query, searchType, type, ...deps]);
