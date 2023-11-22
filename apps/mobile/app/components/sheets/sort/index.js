@@ -36,8 +36,9 @@ const Sort = ({ type, screen }) => {
     db.settings.getGroupOptions(screen === "Notes" ? "home" : type + "s")
   );
   const updateGroupOptions = async (_groupOptions) => {
-    await db.settings.setGroupOptions(type, _groupOptions);
-
+    const groupType = screen === "Notes" ? "home" : type + "s";
+    console.log("updateGroupOptions for group", groupType, "in", screen);
+    await db.settings.setGroupOptions(groupType, _groupOptions);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
       if (screen !== "TopicSheet") Navigation.queueRoutesForUpdate(screen);

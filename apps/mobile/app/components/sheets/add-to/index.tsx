@@ -17,12 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Note, Notebook } from "@notesnook/core";
+import { GroupHeader, Note } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
-import React, { RefObject, useCallback, useEffect, useMemo } from "react";
+import React, { RefObject, useCallback, useEffect } from "react";
 import { Keyboard, TouchableOpacity, View } from "react-native";
-import { ActionSheetRef } from "react-native-actions-sheet";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { ActionSheetRef, FlashList } from "react-native-actions-sheet";
 import { db } from "../../../common/database";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
@@ -36,24 +35,53 @@ import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import Paragraph from "../../ui/typography/paragraph";
-import { SelectionProvider } from "./context";
-import { FilteredList } from "./filtered-list";
-import { ListItem } from "./list-item";
-import { useItemSelectionStore } from "./store";
+import { NotebookItem } from "./notebook-item";
+import { useNotebookItemSelectionStore } from "./store";
+import SheetProvider from "../../sheet-provider";
+import { ItemSelection } from "../../../stores/item-selection-store";
 
-/**
- * Render all notebooks
- * Render sub notebooks
- * fix selection, remove topics stuff.
- * show already selected notebooks regardless of their level
- * show intermediate selection for nested notebooks at all levels.
- * @returns
- */
+async function updateInitialSelectionState(items: string[]) {
+  const relations = await db.relations
+    .to(
+      {
+        type: "note",
+        ids: items
+      },
+      "notebook"
+    )
+    .get();
+
+  const initialSelectionState: ItemSelection = {};
+  const notebookIds = [
+    ...new Set(relations.map((relation) => relation.fromId))
+  ];
+
+  for (const id of notebookIds) {
+    const all = items.every((noteId) => {
+      return (
+        relations.findIndex(
+          (relation) => relation.fromId === id && relation.toId === noteId
+        ) > -1
+      );
+    });
+    if (all) {
+      initialSelectionState[id] = "selected";
+    } else {
+      initialSelectionState[id] = "intermediate";
+    }
+  }
+  useNotebookItemSelectionStore.setState({
+    initialState: initialSelectionState,
+    selection: { ...initialSelectionState },
+    multiSelect: relations.length > 1
+  });
+}
+
 const MoveNoteSheet = ({
   note,
   actionSheetRef
 }: {
-  note: Note;
+  note: Note | undefined;
   actionSheetRef: RefObject<ActionSheetRef>;
 }) => {
   const { colors } = useThemeColors();
@@ -63,72 +91,42 @@ const MoveNoteSheet = ({
     (state) => state.selectedItemsList
   );
   const setNotebooks = useNotebookStore((state) => state.setNotebooks);
-
-  const multiSelect = useItemSelectionStore((state) => state.multiSelect);
+  const multiSelect = useNotebookItemSelectionStore(
+    (state) => state.multiSelect
+  );
 
   useEffect(() => {
+    const items = note
+      ? [note.id]
+      : (selectedItemsList as Note[]).map((note) => note.id);
+    updateInitialSelectionState(items);
     return () => {
-      useItemSelectionStore.getState().setMultiSelect(false);
-      useItemSelectionStore.getState().setItemState({});
+      useNotebookItemSelectionStore.setState({
+        initialState: {},
+        selection: {},
+        multiSelect: false,
+        canEnableMultiSelectMode: true
+      });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const updateItemState = useCallback(function (
-    item: Notebook,
-    state: "selected" | "intermediate" | "deselected"
-  ) {
-    const itemState = { ...useItemSelectionStore.getState().itemState };
-    const mergeState = {
-      [item.id]: state
-    };
-    useItemSelectionStore.getState().setItemState({
-      ...itemState,
-      ...mergeState
-    });
-  },
-  []);
-
-  const contextValue = useMemo(
-    () => ({
-      toggleSelection: (item: Notebook) => {
-        const itemState = useItemSelectionStore.getState().itemState;
-        if (itemState[item.id] === "selected") {
-          updateItemState(item, "deselected");
-        } else {
-          updateItemState(item, "selected");
-        }
-      },
-      deselect: (item: Notebook) => {
-        updateItemState(item, "deselected");
-      },
-      select: (item: Notebook) => {
-        updateItemState(item, "selected");
-      },
-      deselectAll: () => {
-        useItemSelectionStore.setState({
-          itemState: {}
-        });
-      }
-    }),
-    [updateItemState]
-  );
+  }, [note, selectedItemsList]);
 
   const onSave = async () => {
     const noteIds = note
       ? [note.id]
       : selectedItemsList.map((n) => (n as Note).id);
-    const itemState = useItemSelectionStore.getState().itemState;
-    for (const id in itemState) {
+
+    const changedNotebooks = useNotebookItemSelectionStore.getState().selection;
+
+    for (const id in changedNotebooks) {
       const item = await db.notebooks.notebook(id);
       if (!item) continue;
-      if (itemState[id] === "selected") {
-        for (let noteId of noteIds) {
-          await db.relations.add(item, { id: noteId, type: "note" });
+      if (changedNotebooks[id] === "selected") {
+        for (const id of noteIds) {
+          await db.relations.add(item, { id: id, type: "note" });
         }
-      } else if (itemState[id] === "deselected") {
-        for (let noteId of noteIds) {
-          await db.relations.unlink(item, { id: noteId, type: "note" });
+      } else if (changedNotebooks[id] === "deselected") {
+        for (const id of noteIds) {
+          await db.relations.unlink(item, { id: id, type: "note" });
         }
       }
     }
@@ -141,9 +139,18 @@ const MoveNoteSheet = ({
     actionSheetRef.current?.hide();
   };
 
+  const renderNotebook = useCallback(
+    ({ item, index }: { item: string | GroupHeader; index: number }) =>
+      (item as GroupHeader).type === "header" ? null : (
+        <NotebookItem items={notebooks} id={item as string} index={index} />
+      ),
+    [notebooks]
+  );
+
   return (
     <>
       <Dialog context="move_note" />
+      <SheetProvider context="link-notebooks" />
       <View>
         <TouchableOpacity
           style={{
@@ -204,127 +211,50 @@ const MoveNoteSheet = ({
             }}
             type="grayAccent"
             onPress={() => {
-              useItemSelectionStore.setState({
-                itemState: {}
-              });
+              const items = note
+                ? [note.id]
+                : (selectedItemsList as Note[]).map((note) => note.id);
+              updateInitialSelectionState(items);
             }}
           />
         </View>
 
-        <SelectionProvider value={contextValue}>
-          <View
+        <View
+          style={{
+            paddingHorizontal: 12,
+            maxHeight: dimensions.height * 0.85,
+            height: 50 * ((notebooks?.ids.length || 0) + 2)
+          }}
+        >
+          <FlashList
+            data={notebooks?.ids?.filter((id) => typeof id === "string")}
             style={{
-              paddingHorizontal: 12,
-              maxHeight: dimensions.height * 0.85,
-              height: 50 * ((notebooks?.ids.length || 0) + 2)
+              width: "100%"
             }}
-          >
-            <FilteredList
-              ListEmptyComponent={
-                notebooks?.ids.length ? null : (
-                  <View
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      justifyContent: "center",
-                      alignItems: "center"
-                    }}
-                  >
-                    <Icon
-                      name="book-outline"
-                      color={colors.primary.icon}
-                      size={100}
-                    />
-                    <Paragraph style={{ marginBottom: 10 }}>
-                      You do not have any notebooks.
-                    </Paragraph>
-                  </View>
-                )
-              }
-              estimatedItemSize={50}
-              data={notebooks?.ids.length}
-              hasHeaderSearch={true}
-              renderItem={({ item, index }) => (
-                <ListItem
-                  item={item}
-                  key={item.id}
-                  index={index}
-                  hasNotes={getSelectedNotesCountInItem(item) > 0}
-                  sheetRef={actionSheetRef}
-                  infoText={
-                    <>
-                      {item.topics.length === 1
-                        ? item.topics.length + " topic"
-                        : item.topics.length + " topics"}
-                    </>
-                  }
-                  getListItems={getItemsForItem}
-                  getSublistItemProps={(topic) => ({
-                    hasNotes: getSelectedNotesCountInItem(topic) > 0,
-                    style: {
-                      marginBottom: 0,
-                      height: 40
-                    },
-                    onPress: (item) => {
-                      const itemState =
-                        useItemSelectionStore.getState().itemState;
-                      const currentState = itemState[item.id];
-                      if (currentState !== "selected") {
-                        resetItemState("deselected");
-                        contextValue.select(item);
-                      } else {
-                        contextValue.deselect(item);
-                      }
-                    },
-                    key: item.id,
-                    type: "transparent"
-                  })}
-                  icon={(expanded) => ({
-                    name: expanded ? "chevron-up" : "chevron-down",
-                    color: expanded
-                      ? colors.primary.accent
-                      : colors.primary.paragraph
-                  })}
-                  onScrollEnd={() => {
-                    actionSheetRef.current?.handleChildScrollEnd();
-                  }}
-                  hasSubList={true}
-                  hasHeaderSearch={false}
-                  type="grayBg"
-                  sublistItemType="topic"
-                  onAddItem={(title) => {
-                    return onAddTopic(title, item);
-                  }}
-                  onAddSublistItem={(item) => {
-                    openAddTopicDialog(item);
-                  }}
-                  onPress={(item) => {
-                    const itemState =
-                      useItemSelectionStore.getState().itemState;
-                    const currentState = itemState[item.id];
-                    if (currentState !== "selected") {
-                      resetItemState("deselected");
-                      contextValue.select(item);
-                    } else {
-                      contextValue.deselect(item);
-                    }
-                  }}
-                />
-              )}
-              itemType="notebook"
-              onAddItem={async (title) => {
-                return await onAddNotebook(title);
-              }}
-              ListFooterComponent={<View style={{ height: 20 }} />}
-            />
-          </View>
-        </SelectionProvider>
+            estimatedItemSize={50}
+            keyExtractor={(item) => item as string}
+            renderItem={renderNotebook}
+            ListEmptyComponent={
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: 200
+                }}
+              >
+                <Paragraph color={colors.primary.icon}>No notebooks</Paragraph>
+              </View>
+            }
+            ListFooterComponent={<View style={{ height: 50 }} />}
+          />
+        </View>
       </View>
     </>
   );
 };
 
-MoveNoteSheet.present = (note) => {
+MoveNoteSheet.present = (note?: Note) => {
   presentSheet({
     component: (ref) => <MoveNoteSheet actionSheetRef={ref} note={note} />,
     enableGesturesInScrollView: false,

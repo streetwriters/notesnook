@@ -46,8 +46,7 @@ export const SelectionHeader = React.memo(() => {
   );
   const setSelectionMode = useSelectionStore((state) => state.setSelectionMode);
   const clearSelection = useSelectionStore((state) => state.clearSelection);
-  const currentScreen = useNavigationStore((state) => state.currentScreen);
-  const screen = currentScreen.name;
+  const currentRoute = useNavigationStore((state) => state.currentRoute);
   const insets = useGlobalSafeAreaInsets();
   SearchService.prepareSearch?.();
   const allItems = SearchService.getSearchInformation()?.get() || [];
@@ -205,9 +204,9 @@ export const SelectionHeader = React.memo(() => {
           size={SIZE.xl}
         />
 
-        {screen === "Trash" ||
-        screen === "Notebooks" ||
-        screen === "Reminders" ? null : (
+        {currentRoute === "Trash" ||
+        currentRoute === "Notebooks" ||
+        currentRoute === "Reminders" ? null : (
           <>
             <IconButton
               onPress={async () => {
@@ -256,17 +255,15 @@ export const SelectionHeader = React.memo(() => {
           </>
         )}
 
-        {screen === "TopicNotes" || screen === "Notebook" ? (
+        {currentRoute === "Notebook" ? (
           <IconButton
             onPress={async () => {
               if (selectedItemsList.length > 0) {
-                const currentScreen =
-                  useNavigationStore.getState().currentScreen;
-
-                if (screen === "Notebook") {
+                const { focusedRouteId } = useNavigationStore.getState();
+                if (currentRoute === "Notebook") {
                   for (const item of selectedItemsList) {
                     await db.relations.unlink(
-                      { type: "notebook", id: currentScreen.id },
+                      { type: "notebook", id: focusedRouteId },
                       item
                     );
                   }
@@ -287,9 +284,7 @@ export const SelectionHeader = React.memo(() => {
             customStyle={{
               marginLeft: 10
             }}
-            tooltipText={`Remove from ${
-              screen === "Notebook" ? "notebook" : "topic"
-            }`}
+            tooltipText={`Remove from Notebook`}
             tooltipPosition={4}
             testID="select-minus"
             color={colors.primary.paragraph}
@@ -298,7 +293,7 @@ export const SelectionHeader = React.memo(() => {
           />
         ) : null}
 
-        {screen === "Favorites" ? (
+        {currentRoute === "Favorites" ? (
           <IconButton
             onPress={addToFavorite}
             customStyle={{
@@ -312,7 +307,7 @@ export const SelectionHeader = React.memo(() => {
           />
         ) : null}
 
-        {screen === "Trash" ? null : (
+        {currentRoute === "Trash" ? null : (
           <IconButton
             customStyle={{
               marginLeft: 10
@@ -328,7 +323,7 @@ export const SelectionHeader = React.memo(() => {
           />
         )}
 
-        {screen === "Trash" ? (
+        {currentRoute === "Trash" ? (
           <>
             <IconButton
               customStyle={{
