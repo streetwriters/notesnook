@@ -34,6 +34,7 @@ export function LinkSettings(props: ToolProps) {
   const { editor } = props;
   const isBottom = useToolbarLocation() === "bottom";
   if (!editor.isActive("link") || !isBottom) return null;
+  if (!editor.isEditable && isBottom) return null;
 
   return (
     <MoreTools
