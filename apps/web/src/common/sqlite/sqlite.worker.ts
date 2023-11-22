@@ -74,28 +74,33 @@ async function prepare(sql: string) {
 async function run(sql: string, parameters?: SQLiteCompatibleType[]) {
   const prepared = await prepare(sql);
   if (!prepared) return [];
+  try {
+    if (parameters) sqlite.bind_collection(prepared.stmt, parameters);
 
-  if (parameters) sqlite.bind_collection(prepared.stmt, parameters);
+    const rows: Record<string, SQLiteCompatibleType>[] = [];
+    while ((await sqlite.step(prepared.stmt)) === SQLITE_ROW) {
+      const row = sqlite.row(prepared.stmt);
+      const acc: Record<string, SQLiteCompatibleType> = {};
+      row.forEach((v, i) => (acc[prepared.columns[i]] = v));
+      rows.push(acc);
+    }
 
-  const rows: Record<string, SQLiteCompatibleType>[] = [];
-  while ((await sqlite.step(prepared.stmt)) === SQLITE_ROW) {
-    const row = sqlite.row(prepared.stmt);
-    const acc: Record<string, SQLiteCompatibleType> = {};
-    row.forEach((v, i) => (acc[prepared.columns[i]] = v));
-    rows.push(acc);
+    return rows;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await sqlite
+      .reset(prepared.stmt)
+      // we must clear/destruct the prepared statement if it can't be reset
+      .catch(() =>
+        sqlite
+          .finalize(prepared.stmt)
+          // ignore error (we will just prepare a new statement)
+          .catch(() => false)
+          .finally(() => preparedStatements.delete(sql))
+      );
   }
-
-  await sqlite
-    .reset(prepared.stmt)
-    // we must clear/destruct the prepared statement if it can't be reset
-    .catch(() =>
-      sqlite
-        .finalize(prepared.stmt)
-        // ignore error (we will just prepare a new statement)
-        .catch(() => false)
-        .finally(() => preparedStatements.delete(sql))
-    );
-  return rows;
+  return [];
 }
 
 async function exec<R>(
