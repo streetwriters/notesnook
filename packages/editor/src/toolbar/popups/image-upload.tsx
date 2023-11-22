@@ -49,10 +49,9 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
           setError(undefined);
 
           try {
-            const { blob, size, mimeType } = await downloadImage(
-              url,
-              downloadOptions
-            );
+            const image = await downloadImage(url, downloadOptions);
+            if (!image) return;
+            const { blob, size, mimeType } = image;
             onInsert({ src: await toDataURL(blob), size, mime: mimeType });
           } catch (e) {
             if (e instanceof Error) setError(e.message);

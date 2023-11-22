@@ -18,10 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { UnionCommands, Editor as TiptapEditor } from "@tiptap/core";
+import { Mutex } from "async-mutex";
 
 export type PermissionRequestEvent = CustomEvent<{ id: keyof UnionCommands }>;
 
 export class Editor extends TiptapEditor {
+  private mutex: Mutex = new Mutex();
   /**
    * Use this to get the latest instance of the editor.
    * This is required to reduce unnecessary rerenders of
@@ -44,5 +46,16 @@ export class Editor extends TiptapEditor {
     if (!window.dispatchEvent(event)) return undefined;
 
     return this.current;
+  }
+
+  /**
+   * Performs editor state changes in a thread-safe manner using a mutex
+   * ensuring that all changes are applied sequentially. Use this when
+   * you are getting `RangeError: Applying a mismatched transaction` errors.
+   */
+  threadsafe(callback: (editor: TiptapEditor) => void) {
+    return this.mutex.runExclusive(() =>
+      this.current ? callback(this.current) : void 0
+    );
   }
 }
