@@ -105,7 +105,7 @@ const NoteItem = ({
             {notebooks?.items
               ?.filter(
                 (item) =>
-                  item.id !== useNavigationStore.getState().currentScreen?.id
+                  item.id !== useNavigationStore.getState().currentRoute?.id
               )
               .map((item) => (
                 <Button

@@ -18,23 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { db } from "../../common/database";
 import DelayLayout from "../../components/delay-layout";
+import { Header } from "../../components/header";
 import List from "../../components/list";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
-import SearchService from "../../services/search";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useTagStore } from "../../stores/use-tag-store";
-const prepareSearch = () => {
-  SearchService.update({
-    placeholder: "Search in tags",
-    type: "tags",
-    title: "Tags",
-    get: () => db.tags?.all
-  });
-};
+import { db } from "../../common/database";
 
 export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
   const tags = useTagStore((state) => state.tags);
@@ -44,11 +36,7 @@ export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
         route.name,
         Navigation.routeUpdateFunctions[route.name]
       );
-      useNavigationStore.getState().update({
-        name: route.name
-      });
-
-      SearchService.prepareSearch = prepareSearch;
+      useNavigationStore.getState().setFocusedRouteId(route.name);
       return !prev?.current;
     },
     onBlur: () => false,
@@ -56,20 +44,36 @@ export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
   });
 
   return (
-    <DelayLayout>
-      <List
-        data={tags}
-        dataType="tag"
-        headerTitle="Tags"
-        loading={!isFocused}
-        renderedInRoute="Tags"
-        placeholder={{
-          title: "Your tags",
-          paragraph: "You have not created any tags for your notes yet.",
-          loading: "Loading your tags."
+    <>
+      <Header
+        renderedInRoute={route.name}
+        title={route.name}
+        canGoBack={false}
+        hasSearch={true}
+        onSearch={() => {
+          Navigation.push("Search", {
+            placeholder: `Type a keyword to search in ${route.name}`,
+            type: "tag",
+            title: route.name,
+            route: route.name
+          });
         }}
       />
-    </DelayLayout>
+      <DelayLayout>
+        <List
+          data={tags}
+          dataType="tag"
+          headerTitle="Tags"
+          loading={!isFocused}
+          renderedInRoute="Tags"
+          placeholder={{
+            title: "Your tags",
+            paragraph: "You have not created any tags for your notes yet.",
+            loading: "Loading your tags."
+          }}
+        />
+      </DelayLayout>
+    </>
   );
 };
 
