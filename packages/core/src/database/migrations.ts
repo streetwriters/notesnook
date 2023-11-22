@@ -289,7 +289,9 @@ async function createFTS5Table(
   const new_indexed_cols = sql.raw(indexedColumns.join(", new."));
   const old_indexed_cols = sql.raw(indexedColumns.join(", old."));
   await sql`CREATE VIRTUAL TABLE ${ref_fts} USING fts5(
-    id UNINDEXED, ${unindexed_cols} ${indexed_cols}, content='${sql.raw(table)}'
+    id UNINDEXED, ${unindexed_cols} ${indexed_cols}, content='${sql.raw(
+    table
+  )}', tokenize='porter trigram'
   )`.execute(db);
   insertConditions = [
     "(new.deleted is null or new.deleted == 0)",
