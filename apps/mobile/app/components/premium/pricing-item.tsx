@@ -28,7 +28,8 @@ import RNIap from "react-native-iap";
 export const PricingItem = ({
   product,
   onPress,
-  compact
+  compact,
+  strikethrough
 }: {
   product: {
     type: "yearly" | "monthly";
@@ -36,6 +37,7 @@ export const PricingItem = ({
     info: string;
     offerType?: "yearly" | "monthly";
   };
+  strikethrough?: boolean;
   onPress?: () => void;
   compact?: boolean;
 }) => {
@@ -50,8 +52,10 @@ export const PricingItem = ({
         paddingHorizontal: 12,
         paddingVertical: compact ? 15 : 10,
         width: compact ? null : "100%",
-        minWidth: 150
+        minWidth: 150,
+        opacity: strikethrough ? 0.7 : 1
       }}
+      disabled={strikethrough}
     >
       {!compact && (
         <View>
@@ -67,8 +71,18 @@ export const PricingItem = ({
       )}
 
       <View>
-        <Paragraph size={SIZE.sm}>
-          <Heading size={SIZE.lg - 2}>
+        <Paragraph
+          style={{
+            textDecorationLine: strikethrough ? "line-through" : undefined
+          }}
+          size={SIZE.sm}
+        >
+          <Heading
+            style={{
+              textDecorationLine: strikethrough ? "line-through" : undefined
+            }}
+            size={SIZE.lg - 2}
+          >
             {Platform.OS === "android"
               ? (product.data as RNIap.SubscriptionAndroid | undefined)
                   ?.subscriptionOfferDetails[0].pricingPhases

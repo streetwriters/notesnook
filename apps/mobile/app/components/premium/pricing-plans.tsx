@@ -213,6 +213,35 @@ export const PricingPlans = ({
     }
   };
 
+  function getStandardPrice() {
+    if (!product) return;
+    const productType = product.offerType;
+
+    if (Platform.OS === "android") {
+      const pricingPhaseListItem = (product.data as RNIap.SubscriptionAndroid)
+        ?.subscriptionOfferDetails[0]?.pricingPhases.pricingPhaseList?.[1];
+
+      if (!pricingPhaseListItem) {
+        const product =
+          productType === "monthly"
+            ? monthlyPlan?.product
+            : yearlyPlan?.product;
+        return (product as RNIap.SubscriptionAndroid)
+          ?.subscriptionOfferDetails[0]?.pricingPhases.pricingPhaseList?.[0]
+          ?.formattedPrice;
+      }
+
+      return pricingPhaseListItem?.formattedPrice;
+    } else {
+      const productDefault =
+        productType === "monthly" ? monthlyPlan?.product : yearlyPlan?.product;
+      return (
+        (product.data as RNIap.SubscriptionIOS)?.localizedPrice ||
+        (productDefault as RNIap.SubscriptionIOS)?.localizedPrice
+      );
+    }
+  }
+
   return loading ? (
     <View
       style={{
@@ -292,34 +321,84 @@ export const PricingPlans = ({
       ) : (
         <>
           {product?.type === "promo" ? (
-            <Heading
+            <View
               style={{
                 paddingVertical: 15,
-                alignSelf: "center",
-                textAlign: "center"
+                alignItems: "center"
               }}
-              size={SIZE.lg - 4}
             >
-              {Platform.OS === "android"
-                ? (product.data as RNIap.SubscriptionAndroid)
-                    ?.subscriptionOfferDetails[0].pricingPhases
-                    .pricingPhaseList?.[0].formattedPrice
-                : (product.data as RNIap.SubscriptionIOS)?.introductoryPrice}
-              <Paragraph
+              {product?.offerType === "monthly" ? (
+                <PricingItem
+                  product={{
+                    type: "monthly",
+                    data: monthlyPlan?.product,
+                    info: "Pay once a month, cancel anytime."
+                  }}
+                  strikethrough={true}
+                />
+              ) : (
+                <PricingItem
+                  onPress={() => {
+                    if (!monthlyPlan?.product) return;
+                    buySubscription(monthlyPlan?.product);
+                  }}
+                  product={{
+                    type: "yearly",
+                    data: yearlyPlan?.product,
+                    info: "Pay once a year, cancel anytime."
+                  }}
+                  strikethrough={true}
+                />
+              )}
+
+              <Heading
                 style={{
-                  textDecorationLine: "line-through",
-                  color: colors.secondary.paragraph
+                  paddingTop: 15,
+                  fontSize: SIZE.lg
                 }}
-                size={SIZE.sm}
               >
-                {Platform.OS === "android"
-                  ? (product.data as RNIap.SubscriptionAndroid)
-                      ?.subscriptionOfferDetails[1]?.pricingPhases
-                      .pricingPhaseList?.[1]?.formattedPrice
-                  : (product.data as RNIap.SubscriptionIOS)?.localizedPrice}
-              </Paragraph>{" "}
-              for {product.cycleText}
-            </Heading>
+                Special offer for you
+              </Heading>
+
+              <View
+                style={{
+                  paddingVertical: 20,
+                  paddingBottom: 10
+                }}
+              >
+                <Heading
+                  style={{
+                    alignSelf: "center",
+                    textAlign: "center"
+                  }}
+                  size={SIZE.xxl}
+                >
+                  {Platform.OS === "android"
+                    ? (product.data as RNIap.SubscriptionAndroid)
+                        ?.subscriptionOfferDetails[0].pricingPhases
+                        .pricingPhaseList?.[0]?.formattedPrice
+                    : (product.data as RNIap.SubscriptionIOS)
+                        ?.introductoryPrice ||
+                      (product.data as RNIap.SubscriptionIOS)
+                        ?.localizedPrice}{" "}
+                  {product?.cycleText
+                    ? `for ${product.cycleText}`
+                    : product?.offerType}
+                </Heading>
+                {product?.cycleText ? (
+                  <Paragraph
+                    style={{
+                      color: colors.secondary.paragraph,
+                      alignSelf: "center",
+                      textAlign: "center"
+                    }}
+                    size={SIZE.md}
+                  >
+                    then {getStandardPrice()} {product?.offerType}.
+                  </Paragraph>
+                ) : null}
+              </View>
+            </View>
           ) : null}
 
           {user && !product ? (
@@ -334,7 +413,12 @@ export const PricingPlans = ({
                         marginBottom: 20
                       }}
                     >
-                      <Heading color={colors.primary.accent}>
+                      <Heading
+                        style={{
+                          textAlign: "center"
+                        }}
+                        color={colors.primary.accent}
+                      >
                         Get {monthlyPlan?.info?.discount}% off in{" "}
                         {monthlyPlan?.info?.country}
                       </Heading>
@@ -369,7 +453,7 @@ export const PricingPlans = ({
                   product={{
                     type: "monthly",
                     data: monthlyPlan?.product,
-                    info: "Pay monthly, cancel anytime."
+                    info: "Pay once a month, cancel anytime."
                   }}
                 />
 
@@ -391,7 +475,7 @@ export const PricingPlans = ({
                   product={{
                     type: "yearly",
                     data: yearlyPlan?.product,
-                    info: "Pay yearly"
+                    info: "Pay once a year, cancel anytime."
                   }}
                 />
               </View>
@@ -463,7 +547,7 @@ export const PricingPlans = ({
                     width={250}
                     style={{
                       paddingHorizontal: 12,
-                      marginTop: 30,
+                      marginTop: product?.type === "promo" ? 0 : 30,
                       marginBottom: 10
                     }}
                   />
