@@ -171,8 +171,10 @@ function AuthContainer(props) {
             {testimonial.text} —{" "}
             <Link
               sx={{ fontStyle: "italic", color: "paragraph-secondary" }}
-              href={testimonial.link}
-            >
+              href={testimonial.link}  
+              target="_blank"
+              rel="noopener noreferrer"
+              >
               source
             </Link>
           </Text>
