@@ -47,7 +47,7 @@ export class ReminderItemModel extends BaseItemModel {
     await this.contextMenu.open(this.locator);
     await this.contextMenu.clickOnItem("delete");
 
-    await confirmDialog(this.page);
+    await confirmDialog(this.page.locator(getTestId("confirm-dialog")));
     await this.waitFor("detached");
   }
 
