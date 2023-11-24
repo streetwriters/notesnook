@@ -129,7 +129,12 @@ export default class Vault {
       }
 
       for (const content of contentItems) {
-        await this.encryptContent(content, newPassword, content.id);
+        await this.encryptContent(
+          content,
+          content.noteId,
+          newPassword,
+          content.id
+        );
       }
 
       await this.db.storage().remove("vaultKey");
@@ -223,6 +228,7 @@ export default class Vault {
 
   private async encryptContent(
     content: NoteContent<false>,
+    noteId: string,
     password: string,
     contentId?: string,
     sessionId?: string
@@ -233,6 +239,7 @@ export default class Vault {
 
     await this.db.content.add({
       id: contentId,
+      noteId,
       sessionId,
       data: encryptedContent,
       type: content.type
@@ -312,7 +319,13 @@ export default class Vault {
     }
 
     if (data && type)
-      await this.encryptContent({ data, type }, password, contentId, sessionId);
+      await this.encryptContent(
+        { data, type },
+        id,
+        password,
+        contentId,
+        sessionId
+      );
 
     return await this.db.notes.add({
       id,
