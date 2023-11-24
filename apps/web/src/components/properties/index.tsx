@@ -204,12 +204,15 @@ function EditorProperties(props: EditorPropertiesProps) {
 export default React.memo(EditorProperties);
 
 function Colors({ noteId }: { noteId: string }) {
-  const result = usePromise(async () =>
-    (
-      await db.relations.to({ id: noteId, type: "note" }, "color").resolve(1)
-    ).at(0)
+  const color = useStore((store) => store.color);
+  const result = usePromise(
+    async () =>
+      (
+        await db.relations.to({ id: noteId, type: "note" }, "color").resolve(1)
+      ).at(0),
+    [color]
   );
-
+  console.log(result);
   return (
     <Flex
       py={2}
@@ -219,38 +222,37 @@ function Colors({ noteId }: { noteId: string }) {
         justifyContent: "center"
       }}
     >
-      {COLORS.map((label) => (
-        <Flex
-          key={label.key}
-          onClick={() => noteStore.get().setColor(label.key, noteId)}
-          sx={{
-            cursor: "pointer",
-            position: "relative",
-            alignItems: "center",
-            justifyContent: "space-between"
-          }}
-          data-test-id={`properties-${label}`}
-        >
-          <Circle
-            size={35}
-            color={DefaultColors[label.key]}
-            data-test-id={`toggle-state-${
-              result.status === "fulfilled" &&
-              label.key === result.value?.colorCode
-                ? "on"
-                : "off"
-            }`}
-          />
-          {result.status === "fulfilled" &&
-            label.key === result.value?.colorCode && (
+      {COLORS.map((label) => {
+        const isChecked =
+          result.status === "fulfilled" &&
+          DefaultColors[label.key] === result.value?.colorCode;
+        return (
+          <Flex
+            key={label.key}
+            onClick={() => noteStore.get().setColor(label, isChecked, noteId)}
+            sx={{
+              cursor: "pointer",
+              position: "relative",
+              alignItems: "center",
+              justifyContent: "space-between"
+            }}
+            data-test-id={`properties-${label.key}`}
+          >
+            <Circle
+              size={35}
+              color={DefaultColors[label.key]}
+              data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
+            />
+            {isChecked && (
               <Checkmark
                 color="white"
                 size={18}
                 sx={{ position: "absolute", left: "8px" }}
               />
             )}
-        </Flex>
-      ))}
+          </Flex>
+        );
+      })}
     </Flex>
   );
 }
@@ -271,9 +273,9 @@ function Notebooks({ noteId }: { noteId: string }) {
         mode="fixed"
         estimatedSize={50}
         getItemKey={(index) => result.value.getKey(index)}
-        items={result.value.ids}
-        renderItem={(id) => (
-          <ListItemWrapper id={id as string} items={result.value} simplified />
+        items={result.value.ungrouped}
+        renderItem={({ item: id }) => (
+          <ListItemWrapper id={id} items={result.value} simplified />
         )}
       />
     </Section>
@@ -294,9 +296,9 @@ function Reminders({ noteId }: { noteId: string }) {
         mode="fixed"
         estimatedSize={54}
         getItemKey={(index) => result.value.getKey(index)}
-        items={result.value.ids}
-        renderItem={(id) => (
-          <ListItemWrapper id={id as string} items={result.value} simplified />
+        items={result.value.ungrouped}
+        renderItem={({ item: id }) => (
+          <ListItemWrapper id={id} items={result.value} simplified />
         )}
       />
     </Section>
@@ -352,20 +354,18 @@ function SessionHistory({
         mode="fixed"
         estimatedSize={28}
         getItemKey={(index) => result.value.getKey(index)}
-        items={result.value.ids}
-        renderItem={(id) => (
-          <ResolvedItem id={id as string} items={result.value}>
-            {({ item }) =>
-              item.type === "session" ? (
-                <SessionItem
-                  noteId={noteId}
-                  session={item}
-                  dateCreated={dateCreated}
-                  isPreviewMode={isPreviewMode}
-                  onOpenPreviewSession={onOpenPreviewSession}
-                />
-              ) : null
-            }
+        items={result.value.ungrouped}
+        renderItem={({ item: id }) => (
+          <ResolvedItem type="session" id={id} items={result.value}>
+            {({ item }) => (
+              <SessionItem
+                noteId={noteId}
+                session={item}
+                dateCreated={dateCreated}
+                isPreviewMode={isPreviewMode}
+                onOpenPreviewSession={onOpenPreviewSession}
+              />
+            )}
           </ResolvedItem>
         )}
       />

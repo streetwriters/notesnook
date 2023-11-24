@@ -29,12 +29,15 @@ export class BaseViewModel {
   private readonly listPlaceholder: Locator;
   private readonly sortByButton: Locator;
 
-  constructor(page: Page, pageId: string, listType: string) {
+  constructor(page: Page, pageId: string, readonly listType: string) {
     this.page = page;
-    this.list = page.locator(`#${pageId} >> ${getTestId(`${listType}-list`)}`);
-    this.listPlaceholder = page.locator(
-      `#${pageId} >> ${getTestId("list-placeholder")}`
-    );
+    this.list = page
+      .locator(`#${pageId}`)
+      .locator(getTestId(`${listType}-list`));
+
+    this.listPlaceholder = page
+      .locator(`#${pageId}`)
+      .locator(getTestId("list-placeholder"));
 
     this.sortByButton = this.page.locator(
       // TODO:
@@ -43,9 +46,9 @@ export class BaseViewModel {
   }
 
   async findGroup(groupName: string) {
-    const locator = this.list.locator(
-      `${getTestId(`virtuoso-item-list`)} >> ${getTestId("group-header")}`
-    );
+    const locator = this.list
+      .locator(getTestId(`virtualized-list`))
+      .locator(getTestId("group-header"));
 
     for await (const item of iterateList(locator)) {
       if ((await item.locator(getTestId("title")).textContent()) === groupName)
@@ -56,13 +59,10 @@ export class BaseViewModel {
 
   protected async *iterateItems() {
     await this.waitForList();
-    const locator = this.list.locator(
-      `${getTestId(`virtuoso-item-list`)} >> ${getTestId("list-item")}`
-    );
 
-    for await (const _item of iterateList(locator)) {
+    for await (const _item of iterateList(this.items)) {
       const id = await _item.getAttribute("id");
-      if (!id) return;
+      if (!id) continue;
 
       yield this.list.locator(`#${id}`);
     }
@@ -82,11 +82,8 @@ export class BaseViewModel {
   }
 
   async focus() {
-    const items = this.list.locator(
-      `${getTestId(`virtuoso-item-list`)} >> ${getTestId("list-item")}`
-    );
-    await items.nth(0).click();
-    await items.nth(0).click();
+    await this.items.nth(0).click();
+    await this.items.nth(0).click();
   }
 
   // async selectAll() {
@@ -98,7 +95,7 @@ export class BaseViewModel {
   // }
 
   async press(key: string) {
-    const itemList = this.list.locator(getTestId(`virtuoso-item-list`));
+    const itemList = this.list.locator(getTestId(`virtualized-list`));
     await itemList.press(key);
     await this.page.waitForTimeout(300);
   }
@@ -135,11 +132,11 @@ export class BaseViewModel {
     return true;
   }
 
+  get items() {
+    return this.list.locator(getTestId("list-item"));
+  }
+
   async isEmpty() {
-    const items = this.list.locator(
-      `${getTestId(`virtuoso-item-list`)} >> ${getTestId("list-item")}`
-    );
-    const totalItems = await items.count();
-    return totalItems <= 0;
+    return (await this.items.count()) <= 0;
   }
 }
