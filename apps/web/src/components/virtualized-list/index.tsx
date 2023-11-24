@@ -78,6 +78,7 @@ export function VirtualizedList<T>(props: VirtualizedListProps<T>) {
           position: "relative",
           gap: itemGap
         }}
+        data-test-id="virtualized-list"
       >
         {virtualItems.map((row) => (
           <Box

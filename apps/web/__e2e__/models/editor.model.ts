@@ -44,7 +44,7 @@ export class EditorModel {
     this.title = page.locator(getTestId("editor-title"));
     this.content = page.locator(".ProseMirror");
     this.tagInput = page.locator(getTestId("editor-tag-input"));
-    this.tags = page.locator(`${getTestId("tags")} > ${getTestId("tag")}`);
+    this.tags = page.locator(`${getTestId("tags")} >> ${getTestId("tag")}`);
     this.focusModeButton = page.locator(getTestId("Focus mode"));
     this.normalModeButton = page.locator(getTestId("Normal mode"));
     this.darkModeButton = page.locator(getTestId("Dark mode"));

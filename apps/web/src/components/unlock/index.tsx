@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState, useCallback, useEffect, useMemo } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
 import { Lock } from "../icons";
 import { db } from "../../common/db";
@@ -26,6 +26,7 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import Field from "../field";
 import { showToast } from "../../utils/toast";
 import { ErrorText } from "../error-text";
+import usePromise from "../../hooks/use-promise";
 
 type UnlockProps = {
   noteId: string;
@@ -35,25 +36,23 @@ function Unlock(props: UnlockProps) {
 
   const [isWrong, setIsWrong] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  const passwordRef = useRef<HTMLInputElement>();
+  const passwordRef = useRef<HTMLInputElement>(null);
 
-  const note = useMemo(
-    () => (!isLoading ? db.notes.note(noteId)?.data : undefined),
-    [noteId, isLoading]
-  );
+  const note = usePromise(() => db.notes.note(noteId), [noteId]);
   const openLockedSession = useEditorStore((store) => store.openLockedSession);
   const openSession = useEditorStore((store) => store.openSession);
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
 
   const submit = useCallback(async () => {
+    console.log("HELO", passwordRef.current);
     if (!passwordRef.current) return;
     setIsUnlocking(true);
     const password = passwordRef.current.value;
     try {
       if (!password) return;
       const note = await db.vault.open(noteId, password);
+      console.log(note);
       openLockedSession(note);
     } catch (e) {
       if (
@@ -72,12 +71,8 @@ function Unlock(props: UnlockProps) {
 
   useEffect(() => {
     (async () => {
-      setIsLoading(true);
-
       await openSession(noteId);
       setIsEditorOpen(true);
-
-      setIsLoading(false);
     })();
   }, [openSession, setIsEditorOpen, noteId]);
 
@@ -106,7 +101,9 @@ function Unlock(props: UnlockProps) {
           mt={25}
           sx={{ fontSize: 36, textAlign: "center" }}
         >
-          {note?.title || "Open note"}
+          {note.status === "fulfilled" && note.value
+            ? note.value.title
+            : "Open note"}
         </Text>
       </Flex>
       <Text
@@ -129,7 +126,7 @@ function Unlock(props: UnlockProps) {
         sx={{ width: ["95%", "95%", "30%"] }}
         placeholder="Enter password"
         type="password"
-        onKeyUp={async (e: KeyboardEvent) => {
+        onKeyUp={async (e) => {
           if (e.key === "Enter") {
             await submit();
           } else if (isWrong) {

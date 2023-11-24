@@ -85,7 +85,8 @@ import {
   Color,
   Note,
   Notebook as NotebookItem,
-  Tag
+  Tag,
+  DefaultColors
 } from "@notesnook/core";
 import { MenuItem } from "@notesnook/ui";
 import {
@@ -413,6 +414,7 @@ const menuItems: (
       key: "colors",
       title: "Assign color",
       icon: Colors.path,
+      multiSelect: true,
       menu: { items: colorsToMenuItems(context?.color, ids) }
     },
     {
@@ -574,14 +576,15 @@ function colorsToMenuItems(
   ids: string[]
 ): MenuItem[] {
   return COLORS.map((color) => {
+    const isChecked = !!noteColor && noteColor.title === color.title;
     return {
       type: "button",
       key: color.key,
       title: color.title,
       icon: Circle.path,
-      styles: { icon: { color: StaticColors[color.key] } },
-      isChecked: noteColor && noteColor.title === color.title,
-      onClick: () => store.setColor(color.title, ...ids)
+      styles: { icon: { color: DefaultColors[color.key] } },
+      isChecked,
+      onClick: () => store.setColor(color, isChecked, ...ids)
     } satisfies MenuItem;
   });
 }

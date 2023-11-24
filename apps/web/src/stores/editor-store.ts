@@ -71,7 +71,7 @@ export const getDefaultSession = (sessionId?: string): EditorSession => {
 
 class EditorStore extends BaseStore<EditorStore> {
   session = getDefaultSession();
-  color = undefined;
+  color?: string;
   tags: Tag[] = [];
   arePropertiesVisible = false;
   editorMargins = Config.get("editor:margins", true);
@@ -328,6 +328,8 @@ class EditorStore extends BaseStore<EditorStore> {
     name: "favorite" | "pinned" | "readonly" | "localOnly" | "color",
     value: boolean | string
   ) => {
+    if (name === "color" && typeof value === "string")
+      return this.set({ color: value });
     return this.saveSession(noteId, { [name]: value });
   };
 

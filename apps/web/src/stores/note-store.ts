@@ -25,7 +25,7 @@ import { store as selectionStore } from "./selection-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
 import Config from "../utils/config";
-import { Note, VirtualizedGrouping } from "@notesnook/core";
+import { DefaultColors, Note, VirtualizedGrouping } from "@notesnook/core";
 import { Context } from "../components/list-container/types";
 
 type ViewMode = "detailed" | "compact";
@@ -129,23 +129,27 @@ class NoteStore extends BaseStore<NoteStore> {
     await this.refresh();
   };
 
-  setColor = async (color: string, ...ids: string[]) => {
-    // try {
-    // let note = db.notes.note(id);
-    // if (!note) return;
-    // const colorId =
-    //   db.tags.find(color)?.id || (await db.colors.add({ title: color }));
-    // const isColored =
-    //   db.relations.from({ type: "color", id: colorId }, "note").length > 0;
+  setColor = async (
+    color: { key: string; title: string },
+    isChecked: boolean,
+    ...ids: string[]
+  ) => {
+    await db.relations.to({ type: "note", ids }, "color").unlink();
+    if (!isChecked) {
+      const colorId = await db.colors.add({
+        title: color.title,
+        colorCode: DefaultColors[color.key]
+      });
 
-    // if (isColored)
-    //   await db.relations.unlink({ type: "color", id: colorId }, note._note);
-    // else
-    // await db.relations.add({ type: "color", id: colorId }, note._note);
-    // const notes = await db.notes.all.items(ids)
-    // TODO:
+      for (const id of ids) {
+        await db.relations.add(
+          { type: "color", id: colorId },
+          { type: "note", id }
+        );
+      }
+    }
     await appStore.refreshNavItems();
-    this.syncNoteWithEditor(ids, "color", color);
+    this.syncNoteWithEditor(ids, "color", color.key);
     await this.refresh();
   };
 

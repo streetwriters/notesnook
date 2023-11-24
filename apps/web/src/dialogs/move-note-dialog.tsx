@@ -42,7 +42,8 @@ import { Notebook, isGroupHeader } from "@notesnook/core/dist/types";
 import {
   UncontrolledTreeEnvironment,
   Tree,
-  TreeItemIndex
+  TreeItemIndex,
+  TreeEnvironmentRef
 } from "react-complex-tree";
 import { FlexScrollContainer } from "../components/scroll-container";
 import { pluralize } from "@notesnook/common";
@@ -74,6 +75,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
   const refreshNotebooks = useStore((store) => store.refresh);
   const notebooks = useStore((store) => store.notebooks);
   const reloadItem = useRef<(changedItemIds: TreeItemIndex[]) => void>();
+  const treeRef = useRef<TreeEnvironmentRef>(null);
 
   useEffect(() => {
     if (!notebooks) {
@@ -152,6 +154,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
 
   return (
     <Dialog
+      testId="move-note-dialog"
       isOpen={true}
       title={"Select notebooks"}
       description={`Use ${
@@ -211,9 +214,10 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
           Reset selection
         </Button>
       )}
-      {notebooks && (
+      {notebooks && notebooks.ids.length > 0 ? (
         <FlexScrollContainer>
           <UncontrolledTreeEnvironment
+            ref={treeRef}
             dataProvider={{
               onDidChangeTreeData(listener) {
                 reloadItem.current = listener;
@@ -300,7 +304,13 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
                   isExpandable={props.item.isFolder || false}
                   isExpanded={props.context.isExpanded || false}
                   toggle={props.context.toggleExpandedState}
-                  onCreateItem={() => reloadItem.current?.([props.item.index])}
+                  onCreateItem={() => {
+                    reloadItem.current?.([props.item.index]);
+                    treeRef.current?.expandItem(
+                      props.item.index,
+                      props.info.treeId
+                    );
+                  }}
                 />
 
                 {props.children}
@@ -312,6 +322,27 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
             <Tree treeId={"root"} rootItem="root" treeLabel="Tree Example" />
           </UncontrolledTreeEnvironment>
         </FlexScrollContainer>
+      ) : (
+        <Flex
+          sx={{
+            my: 2,
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <Text variant="body">
+            Please add a notebook to start linking notes.
+          </Text>
+          <Button
+            data-test-id="add-new-notebook"
+            variant="secondary"
+            sx={{ mt: 2 }}
+            onClick={() => showAddNotebookDialog()}
+          >
+            Add new notebook
+          </Button>
+        </Flex>
       )}
     </Dialog>
   );
@@ -388,9 +419,17 @@ function NotebookItem(props: {
       <Flex sx={{ alignItems: "center" }}>
         {isExpandable ? (
           isExpanded ? (
-            <ChevronDown size={20} sx={{ height: "20px" }} />
+            <ChevronDown
+              data-test-id="collapse-notebook"
+              size={20}
+              sx={{ height: "20px" }}
+            />
           ) : (
-            <ChevronRight size={20} sx={{ height: "20px" }} />
+            <ChevronRight
+              data-test-id="expand-notebook"
+              size={20}
+              sx={{ height: "20px" }}
+            />
           )
         ) : null}
         <SelectedCheck size={20} item={notebook} onClick={check} />
@@ -411,7 +450,7 @@ function NotebookItem(props: {
         <TopicSelectionIndicator notebook={notebook} />
         <Button
           variant="secondary"
-          data-test-id="create-topic"
+          data-test-id="add-sub-notebook"
           sx={{ p: "small" }}
         >
           <Plus

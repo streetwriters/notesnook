@@ -51,6 +51,7 @@ function PasswordDialog(props) {
   );
   return (
     <Dialog
+      testId="password-dialog"
       isOpen={true}
       title={props.title}
       description={props.subtitle}

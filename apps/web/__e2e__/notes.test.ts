@@ -92,12 +92,15 @@ test("add a note to notebook", async ({ page }) => {
 
   await note?.contextMenu.addToNotebook({
     title: "Notebook 1",
-    topics: ["Hello", "World", "Did", "what"]
+    subNotebooks: [
+      { title: "Hello" },
+      { title: "World", subNotebooks: [{ title: "Did" }, { title: "what" }] }
+    ]
   });
 
-  expect(
-    await app.toasts.waitForToast("1 note added to Hello and 3 others.")
-  ).toBe(true);
+  expect(await app.toasts.waitForToast("1 note added to 5 notebooks.")).toBe(
+    true
+  );
 });
 
 const actors = ["contextMenu", "properties"] as const;
@@ -165,7 +168,7 @@ for (const actor of actors) {
 
     await note?.[actor].color("red");
 
-    const coloredNotes = await app.goToColor("red");
+    const coloredNotes = await app.goToColor("Red");
     const coloredNote = await coloredNotes.findNote(NOTE);
     expect(coloredNote).toBeDefined();
     expect(await coloredNote?.contextMenu.isColored("red")).toBe(true);
@@ -307,7 +310,7 @@ test(`sort notes`, async ({ page }, info) => {
           });
           if (!sortResult) return;
 
-          expect(await notes.isEmpty()).toBeFalsy();
+          await expect(notes.items).toHaveCount(titles.length);
         });
       }
     }

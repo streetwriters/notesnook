@@ -52,7 +52,7 @@ export class SettingsViewModel {
       .locator("button");
 
     await logoutButton.click();
-    await confirmDialog(this.page);
+    await confirmDialog(this.page.locator(getTestId("confirm-dialog")));
 
     await this.page
       .locator(getTestId("not-logged-in"))
@@ -75,7 +75,9 @@ export class SettingsViewModel {
     const key = await this.page
       .locator(getTestId("recovery-key"))
       .textContent();
-    await confirmDialog(this.page);
+
+    const dialog = this.page.locator(getTestId("recovery-key-dialog"));
+    await confirmDialog(dialog);
     return key;
   }
 

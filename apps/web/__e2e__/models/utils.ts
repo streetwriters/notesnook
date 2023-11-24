@@ -30,42 +30,28 @@ export async function* iterateList(list: Locator) {
   return null;
 }
 
-export async function fillNotebookDialog(
-  page: Page,
-  notebook: Notebook,
-  editing = false
-) {
-  const titleInput = page.locator(getTestId("title-input"));
-  const descriptionInput = page.locator(getTestId("description-input"));
-  const topicInput = page.locator(getTestId(`edit-topic-input`));
-  const topicInputAction = page.locator(getTestId(`edit-topic-action`));
+export async function fillNotebookDialog(page: Page, notebook: Notebook) {
+  const dialog = page.locator(getTestId("add-notebook-dialog"));
+  const titleInput = dialog.locator(getTestId("title-input"));
+  const descriptionInput = dialog.locator(getTestId("description-input"));
 
   await titleInput.waitFor({ state: "visible" });
 
   await titleInput.fill(notebook.title);
   if (notebook.description) await descriptionInput.fill(notebook.description);
 
-  const topicItems = page.locator(getTestId("topic-item"));
-  for (let i = 0; i < notebook.topics.length; ++i) {
-    if (editing) {
-      const topicItem = topicItems.nth(i);
-      await topicItem.click();
-    }
-    await topicInput.fill(notebook.topics[i]);
-    await topicInputAction.click();
-  }
-
-  await confirmDialog(page);
+  await confirmDialog(dialog);
 }
 
 export async function fillReminderDialog(
   page: Page,
   reminder: Partial<Reminder>
 ) {
-  const titleInput = page.locator(getTestId("title-input"));
-  const descriptionInput = page.locator(getTestId("description-input"));
-  const dateInput = page.locator(getTestId("date-input"));
-  const timeInput = page.locator(getTestId("time-input"));
+  const dialog = page.locator(getTestId("reminder-dialog"));
+  const titleInput = dialog.locator(getTestId("title-input"));
+  const descriptionInput = dialog.locator(getTestId("description-input"));
+  const dateInput = dialog.locator(getTestId("date-input"));
+  const timeInput = dialog.locator(getTestId("time-input"));
 
   if (reminder.title) {
     await titleInput.waitFor({ state: "visible" });
@@ -73,10 +59,10 @@ export async function fillReminderDialog(
   }
   if (reminder.description) await descriptionInput.fill(reminder.description);
   if (reminder.mode)
-    await page.locator(getTestId(`mode-${reminder.mode}`)).click();
+    await dialog.locator(getTestId(`mode-${reminder.mode}`)).click();
 
   if (reminder.priority)
-    await page.locator(getTestId(`priority-${reminder.priority}`)).click();
+    await dialog.locator(getTestId(`priority-${reminder.priority}`)).click();
 
   if (reminder.recurringMode && reminder.mode === "repeat") {
     await page
@@ -89,7 +75,7 @@ export async function fillReminderDialog(
       reminder.recurringMode !== "day"
     ) {
       for (const day of reminder.selectedDays) {
-        await page.locator(getTestId(`day-${day}`)).click();
+        await dialog.locator(getTestId(`day-${day}`)).click();
       }
     }
   }
@@ -111,25 +97,27 @@ export async function fillReminderDialog(
     await timeInput.fill(time);
   }
 
-  await confirmDialog(page);
+  await confirmDialog(dialog);
 }
 
 export async function fillItemDialog(page: Page, item: Item) {
-  const titleInput = page.locator(getTestId("title-input"));
+  const dialog = page.locator(getTestId("item-dialog"));
+  const titleInput = dialog.locator(getTestId("title-input"));
   await titleInput.waitFor({ state: "visible" });
 
   await titleInput.fill(item.title);
 
-  await confirmDialog(page);
+  await confirmDialog(dialog);
 }
 
 export async function fillPasswordDialog(page: Page, password: string) {
-  await page.locator(getTestId("dialog-password")).fill(password);
-  await confirmDialog(page);
+  const dialog = page.locator(getTestId("password-dialog"));
+  await dialog.locator(getTestId("dialog-password")).fill(password);
+  await confirmDialog(dialog);
 }
 
-export async function confirmDialog(page: Page) {
-  const dialogConfirm = page.locator(getTestId("dialog-yes"));
+export async function confirmDialog(dialog: Locator) {
+  const dialogConfirm = dialog.locator(getTestId("dialog-yes"));
   await dialogConfirm.click();
   // await dialogConfirm.waitFor({ state: "detached" });
 }

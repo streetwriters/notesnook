@@ -70,6 +70,7 @@ function AddNotebookDialog(props: AddNotebookDialogProps) {
   }, [props.notebook?.id, props.edit, onClose, parentId]);
   return (
     <Dialog
+      testId="add-notebook-dialog"
       isOpen={true}
       title={props.edit ? "Edit Notebook" : "Create a Notebook"}
       description={

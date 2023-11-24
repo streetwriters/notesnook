@@ -36,6 +36,7 @@ import {
 import {
   AnyColumnWithTable,
   ExpressionOrFactory,
+  SelectExpression,
   SelectQueryBuilder,
   SqlBool,
   sql
@@ -353,10 +354,29 @@ export class FilteredSelector<T extends Item> {
 
   async grouped(options: GroupOptions) {
     console.time("getting items");
+
+    const fields: Array<
+      SelectExpression<DatabaseSchema, keyof DatabaseSchema>
+    > = ["id", "type", options.sortBy];
+    if (this.type === "notes") fields.push("notes.pinned", "notes.conflicted");
+    else if (this.type === "notebooks") fields.push("notebooks.pinned");
+    else if (this.type === "attachments" && options.groupBy === "abc")
+      fields.push("attachments.filename");
+    else if (this.type === "reminders") {
+      fields.push(
+        "reminders.mode",
+        "reminders.date",
+        "reminders.recurringMode",
+        "reminders.selectedDays",
+        "reminders.disabled",
+        "reminders.snoozeUntil"
+      );
+    }
+
     const items = await this.filter
       .$if(!!this._limit, (eb) => eb.limit(this._limit))
       .$call(this.buildSortExpression(options))
-      .select(["id", options.sortBy, "type"])
+      .select(fields)
       .execute();
     console.timeEnd("getting items");
     console.log(items.length);
