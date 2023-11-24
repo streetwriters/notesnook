@@ -97,7 +97,7 @@ function StatusBar() {
                   ml={1}
                   sx={{ color: "paragraph" }}
                 >
-                  {user?.isEmailConfirmed ? "" : " (Email not verified)"}
+                  {user?.isEmailConfirmed ? "" : "Email not confirmed"}
                 </Text>
               </Button>
 
