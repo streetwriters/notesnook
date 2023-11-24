@@ -22,7 +22,9 @@ import React from "react";
 import NotesPage from ".";
 import { db } from "../../common/database";
 import Navigation, { NavigationProps } from "../../services/navigation";
-import { NotesScreenParams } from "../../stores/use-navigation-store";
+import useNavigationStore, {
+  NotesScreenParams
+} from "../../stores/use-navigation-store";
 import { PLACEHOLDER_DATA, openEditor, toCamelCase } from "./common";
 export const ColoredNotes = ({
   navigation,
@@ -53,7 +55,15 @@ ColoredNotes.get = async (params: NotesScreenParams, grouped = true) => {
 
 ColoredNotes.navigate = (item: Color, canGoBack: boolean) => {
   if (!item) return;
-  Navigation.navigate<"ColoredNotes">("ColoredNotes", {
+
+  const { focusedRouteId } = useNavigationStore.getState();
+
+  if (focusedRouteId === item.id) {
+    console.log("ColoredNotes.navigate: route already focused for color");
+    return;
+  }
+
+  Navigation.push<"ColoredNotes">("ColoredNotes", {
     item: item,
     canGoBack,
     title: toCamelCase(item.title)
