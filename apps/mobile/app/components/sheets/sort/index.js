@@ -24,7 +24,7 @@ import { eSendEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useThemeColors } from "@notesnook/theme";
 import { GROUP, SORT } from "../../../utils/constants";
-import { refreshNotesPage } from "../../../utils/events";
+import { eGroupOptionsUpdated, refreshNotesPage } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
@@ -42,7 +42,7 @@ const Sort = ({ type, screen }) => {
     setGroupOptions(_groupOptions);
     setTimeout(() => {
       if (screen !== "TopicSheet") Navigation.queueRoutesForUpdate(screen);
-      eSendEvent("groupOptionsUpdate");
+      eSendEvent(eGroupOptionsUpdated, type);
       eSendEvent(refreshNotesPage);
     }, 1);
   };

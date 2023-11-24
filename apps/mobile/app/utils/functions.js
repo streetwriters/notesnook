@@ -22,7 +22,6 @@ import { db } from "../common/database";
 import { presentDialog } from "../components/dialog/functions";
 import { eSendEvent, ToastManager } from "../services/event-manager";
 import Navigation from "../services/navigation";
-import SearchService from "../services/search";
 import { useMenuStore } from "../stores/use-menu-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
@@ -75,35 +74,15 @@ async function deleteNotebook(id, deleteNotes) {
   }
 }
 
-export const deleteItems = async (item, context) => {
-  if (item && db.monographs.isPublished(item.id)) {
-    ToastManager.show({
-      heading: "Can not delete note",
-      message: "Unpublish note to delete it",
-      type: "error",
-      context: "global"
-    });
-    return;
-  }
+export const deleteItems = async (items, type, context) => {
+  const ids = items ? items : useSelectionStore.getState().selectedItemsList;
 
-  const itemsToDelete = item
-    ? [item]
-    : useSelectionStore.getState().selectedItemsList;
-
-  let notes = itemsToDelete.filter((i) => i.type === "note");
-  let notebooks = itemsToDelete.filter((i) => i.type === "notebook");
-  let reminders = itemsToDelete.filter((i) => i.type === "reminder");
-
-  if (reminders.length > 0) {
-    for (let reminder of reminders) {
-      await db.reminders.remove(reminder.id);
-    }
+  if (type === "reminder") {
+    await db.reminders.remove(...ids);
     useRelationStore.getState().update();
-  }
-
-  if (notes?.length > 0) {
-    for (const note of notes) {
-      if (db.monographs.isPublished(note.id)) {
+  } else if (type === "note") {
+    for (const id of ids) {
+      if (db.monographs.isPublished(id)) {
         ToastManager.show({
           heading: "Some notes are published",
           message: "Unpublish published notes to delete them",
@@ -112,53 +91,54 @@ export const deleteItems = async (item, context) => {
         });
         continue;
       }
-      await db.notes.delete(note.id);
+      await db.notes.moveToTrash(id);
     }
     eSendEvent(eClearEditor);
-  }
-
-  if (notebooks?.length > 0) {
-    const result = await confirmDeleteAllNotes(notebooks, "notebook", context);
+  } else if (type === "notebook") {
+    const result = await confirmDeleteAllNotes(ids, "notebook", context);
     if (!result.delete) return;
-    for (const notebook of notebooks) {
-      await deleteNotebook(notebook.id, result.deleteNotes);
+    for (const id of ids) {
+      await deleteNotebook(id, result.deleteNotes);
+      eSendEvent(eOnNotebookUpdated, await getParentNotebookId(id));
     }
   }
 
-  let message = `${itemsToDelete.length} ${
-    itemsToDelete.length === 1 ? "item" : "items"
+  let message = `${ids.length} ${
+    ids.length === 1 ? "item" : "items"
   } moved to trash.`;
 
-  let deletedItems = [...itemsToDelete];
-  if (reminders.length === 0 && (notes.length > 0 || notebooks.length > 0)) {
+  let deletedIds = [...ids];
+  if (type === "notebook" || type === "note") {
     ToastManager.show({
       heading: message,
       type: "success",
       func: async () => {
-        let trash = db.trash.all;
-        let ids = [];
-        for (var i = 0; i < deletedItems.length; i++) {
-          let it = deletedItems[i];
-          let trashItem = trash.find((item) => item.id === it.id);
-          ids.push(trashItem.id);
-        }
-        await db.trash.restore(...ids);
+        await db.trash.restore(...deletedIds);
         Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
         ToastManager.hide();
+        if (type === "notebook") {
+          deletedIds.forEach(async (id) => {
+            eSendEvent(eOnNotebookUpdated, await getParentNotebookId(id));
+          });
+        }
       },
       actionText: "Undo"
     });
   }
 
   Navigation.queueRoutesForUpdate();
-  if (!item) {
+  if (!items) {
     useSelectionStore.getState().clearSelection();
   }
-  useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
-  SearchService.updateAndSearch();
+  if (type === "notebook") {
+    ids.forEach(async (id) => {
+      eSendEvent(eOnNotebookUpdated, await getParentNotebookId(id));
+    });
+    useMenuStore.getState().setMenuPins();
+  }
 };
 
 export const openLinkInBrowser = async (link) => {

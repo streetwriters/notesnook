@@ -28,6 +28,7 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useReminderStore } from "../../stores/use-reminder-store";
+import SelectionHeader from "../../components/selection-header";
 
 export const Reminders = ({
   navigation,
@@ -50,6 +51,7 @@ export const Reminders = ({
 
   return (
     <>
+      <SelectionHeader id={route.name} items={reminders} type="reminder" />
       <Header
         renderedInRoute={route.name}
         title={route.name}
@@ -63,6 +65,7 @@ export const Reminders = ({
             route: route.name
           });
         }}
+        isBeta
         id={route.name}
         onPressDefaultRightButton={() => {
           ReminderSheet.present();

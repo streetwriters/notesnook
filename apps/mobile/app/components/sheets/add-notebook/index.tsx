@@ -85,18 +85,20 @@ export const AddNotebookSheet = ({
     useMenuStore.getState().setMenuPins();
     Navigation.queueRoutesForUpdate();
     useRelationStore.getState().update();
+
+    const parent =
+      parentNotebook?.id || (await getParentNotebookId(notebook?.id || id));
+
+    eSendEvent(eOnNotebookUpdated, parent);
     if (notebook) {
-      const parent = await getParentNotebookId(notebook.id);
-      eSendEvent(eOnNotebookUpdated, parent);
       setImmediate(() => {
+        console.log(parent, notebook.id);
         eSendEvent(eOnNotebookUpdated, notebook.id);
       });
     }
 
     if (!notebook) {
-      setTimeout(async () => {
-        MoveNotes.present(await db.notebooks.notebook(id));
-      }, 500);
+      MoveNotes.present(await db.notebooks.notebook(id));
     } else {
       close?.();
     }
