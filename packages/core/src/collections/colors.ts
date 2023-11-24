@@ -50,6 +50,10 @@ export class Colors implements ICollection {
     return this.collection.get(id);
   }
 
+  find(colorCode: string) {
+    return this.all.find((eb) => eb.and([eb("colorCode", "==", colorCode)]));
+  }
+
   // async merge(remoteColor: MaybeDeletedItem<Color>) {
   //   if (!remoteColor) return;
 
@@ -62,13 +66,21 @@ export class Colors implements ICollection {
     if (item.remote)
       throw new Error("Please use db.colors.merge to merge remote colors.");
 
-    const id = item.id || getId(item.dateCreated);
-    const oldColor = await this.color(id);
-
     item.title = item.title ? Tags.sanitize(item.title) : item.title;
+    const oldColor = item.id
+      ? await this.color(item.id)
+      : item.colorCode
+      ? await this.find(item.colorCode)
+      : undefined;
+
     if (!item.title && !oldColor?.title) throw new Error("Title is required.");
     if (!item.colorCode && !oldColor?.colorCode)
       throw new Error("Color code is required.");
+
+    const id =
+      oldColor && item.colorCode === oldColor.colorCode
+        ? oldColor.id
+        : item.id || getId(item.dateCreated);
 
     await this.collection.upsert({
       id,
