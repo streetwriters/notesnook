@@ -95,7 +95,7 @@ export class Notes implements ICollection {
         if (oldNote) note.dateEdited = Date.now();
       }
 
-      if (item.localOnly !== undefined) {
+      if (note.contentId && item.localOnly !== undefined) {
         await this.db.content.add({
           id: note.contentId,
           localOnly: !!item.localOnly

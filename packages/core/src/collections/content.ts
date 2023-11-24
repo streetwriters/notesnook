@@ -75,15 +75,11 @@ export class Content implements ICollection {
 
     const id = content.id || getId();
 
-    if (!content.noteId)
-      throw new Error("No noteId found to link the content to.");
-    if (!content.type) throw new Error("Please specify content's type.");
-
     const encryptedData = isCipher(content.data) ? content.data : undefined;
     let unencryptedData =
       typeof content.data === "string" ? content.data : undefined;
 
-    if (unencryptedData)
+    if (unencryptedData && content.type && content.noteId)
       unencryptedData = await this.extractAttachments({
         type: content.type,
         data: unencryptedData,
@@ -105,13 +101,13 @@ export class Content implements ICollection {
         ...contentData
       });
 
-      if (content.sessionId && contentData)
+      if (content.sessionId && contentData && content.type && content.noteId)
         await this.db.noteHistory.add(content.sessionId, {
           noteId: content.noteId,
           type: content.type,
           ...contentData
         });
-    } else {
+    } else if (content.noteId) {
       const contentItem: ContentItem = {
         type: "tiptap",
         noteId: content.noteId,
@@ -134,7 +130,7 @@ export class Content implements ICollection {
 
       if (content.sessionId)
         await this.db.noteHistory.add(content.sessionId, contentItem);
-    }
+    } else return;
 
     return id;
   }
