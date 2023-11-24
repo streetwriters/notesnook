@@ -45,6 +45,7 @@ function RecoveryKeyDialog(props) {
 
   return (
     <Dialog
+      testId="recovery-key-dialog"
       isOpen={true}
       title="Backup your recovery key"
       width={400}
