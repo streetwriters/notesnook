@@ -28,6 +28,7 @@ import SettingsService from "../../services/settings";
 import { useNoteStore } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
 import useNavigationStore from "../../stores/use-navigation-store";
+import SelectionHeader from "../../components/selection-header";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const notes = useNoteStore((state) => state.notes);
@@ -47,6 +48,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
 
   return (
     <>
+      <SelectionHeader id={route.name} items={notes} type="note" />
       <Header
         renderedInRoute={route.name}
         title={route.name}

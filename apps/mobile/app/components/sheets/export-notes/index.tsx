@@ -17,24 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { Fragment, useState } from "react";
-import { Platform, StyleSheet, View, ActivityIndicator } from "react-native";
+import { ActivityIndicator, Platform, StyleSheet, View } from "react-native";
 import FileViewer from "react-native-file-viewer";
 import Share from "react-native-share";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
 import { db } from "../../../common/database";
+import { requestInAppReview } from "../../../services/app-review";
 import {
-  presentSheet,
   PresentSheetOptions,
-  ToastManager
+  ToastManager,
+  eSendEvent,
+  presentSheet
 } from "../../../services/event-manager";
 import Exporter from "../../../services/exporter";
 import PremiumService from "../../../services/premium";
-import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../../stores/use-user-store";
 import { getElevationStyle } from "../../../utils/elevation";
-import { ph, pv, SIZE } from "../../../utils/size";
+import { eCloseSheet } from "../../../utils/events";
+import { SIZE, ph, pv } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import DialogHeader from "../../dialog/dialog-header";
 import { ProTag } from "../../premium/pro-tag";
@@ -44,17 +47,12 @@ import { PressableButton } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { eSendEvent } from "../../../services/event-manager";
-import { eCloseSheet } from "../../../utils/events";
-import { requestInAppReview } from "../../../services/app-review";
-import { Dialog } from "../../dialog";
-import { Note } from "@notesnook/core";
 
 const ExportNotesSheet = ({
-  notes,
+  ids,
   update
 }: {
-  notes: Note[];
+  ids: string[];
   update: ((props: PresentSheetOptions) => void) | undefined;
 }) => {
   const { colors } = useThemeColors();
@@ -79,10 +77,10 @@ const ExportNotesSheet = ({
     update?.({ disableClosing: true } as PresentSheetOptions);
     setComplete(false);
     let result;
-    if (notes.length > 1) {
-      result = await Exporter.bulkExport(notes, type, setStatus);
+    if (ids.length > 1) {
+      result = await Exporter.bulkExport(ids, type, setStatus);
     } else {
-      result = await Exporter.exportNote(notes[0], type);
+      result = await Exporter.exportNote(ids[0], type);
       await sleep(1000);
     }
     if (!result) {
@@ -161,9 +159,7 @@ const ExportNotesSheet = ({
             <DialogHeader
               icon="export"
               title={
-                notes.length > 1
-                  ? `Export ${notes.length} Notes`
-                  : "Export Note"
+                ids.length > 1 ? `Export ${ids.length} Notes` : "Export Note"
               }
               paragraph={`All exports are saved in ${
                 Platform.OS === "android"
@@ -251,7 +247,7 @@ const ExportNotesSheet = ({
               <>
                 <ActivityIndicator />
                 <Paragraph>
-                  {notes.length === 1
+                  {ids.length === 1
                     ? "Exporting note... Please wait"
                     : `Exporting notes${
                         status ? ` (${status})` : ``
@@ -276,8 +272,8 @@ const ExportNotesSheet = ({
                   }}
                   color={colors.secondary.heading}
                 >
-                  {notes.length > 1
-                    ? `${notes.length} Notes exported`
+                  {ids.length > 1
+                    ? `${ids.length} Notes exported`
                     : "Note exported"}
                 </Heading>
                 <Paragraph
@@ -285,7 +281,7 @@ const ExportNotesSheet = ({
                     textAlign: "center"
                   }}
                 >
-                  Your {notes.length > 1 ? "notes are" : "note is"} exported
+                  Your {ids.length > 1 ? "notes are" : "note is"} exported
                   successfully as {result?.fileName}
                 </Paragraph>
                 <Button
@@ -363,11 +359,11 @@ const ExportNotesSheet = ({
   );
 };
 
-ExportNotesSheet.present = async (notes?: Note[], allNotes?: boolean) => {
-  const exportNotes = allNotes ? await db.notes.all?.items() : notes || [];
+ExportNotesSheet.present = async (ids?: string[], allNotes?: boolean) => {
+  const exportNoteIds = allNotes ? await db.notes.all?.ids() : ids || [];
   presentSheet({
     component: (ref, close, update) => (
-      <ExportNotesSheet notes={exportNotes} update={update} />
+      <ExportNotesSheet ids={exportNoteIds} update={update} />
     ),
     keyboardHandlerDisabled: true
   });

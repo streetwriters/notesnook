@@ -212,7 +212,6 @@ export class VaultDialog extends Component {
 
     this.password = null;
     this.confirmPassword = null;
-    SearchService.updateAndSearch();
     this.setState({
       visible: false,
       note: {},
@@ -459,7 +458,7 @@ export class VaultDialog extends Component {
   async _deleteNote() {
     try {
       await db.vault.remove(this.state.note.id, this.password);
-      await deleteItems(this.state.note);
+      await deleteItems([this.state.note.id], "note");
       this.close();
     } catch (e) {
       this._takeErrorAction(e);

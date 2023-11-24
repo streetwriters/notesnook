@@ -221,7 +221,10 @@ async function unlockVault() {
  *
  * @param {"txt" | "pdf" | "md" | "html" | "md-frontmatter"} type
  */
-async function exportNote(note, type) {
+async function exportNote(id, type) {
+  const note = await db.notes.note(id);
+  if (!note) return;
+
   let content;
 
   if (note.locked) {
@@ -283,7 +286,7 @@ function getUniqueFileName(fileName, results) {
  *
  * @param {"txt" | "pdf" | "md" | "html" | "md-frontmatter"} type
  */
-async function bulkExport(notes, type, callback) {
+async function bulkExport(ids, type, callback) {
   let path = await getPath(FolderNames[type]);
   if (!path) return;
 
@@ -309,9 +312,11 @@ async function bulkExport(notes, type, callback) {
   };
 
   const results = {};
-  for (var i = 0; i < notes.length; i++) {
+  for (var i = 0; i < ids.length; i++) {
     try {
-      let note = notes[i];
+      let note = await db.notes.note(ids[i]);
+      if (!note) continue;
+
       let content;
       if (note.locked) {
         try {
@@ -326,6 +331,7 @@ async function bulkExport(notes, type, callback) {
           continue;
         }
       }
+
       let result = await exportAs(type, note, true, content);
       let fileName = sanitizeFilename(note.title, {
         replacement: "_"
@@ -390,12 +396,12 @@ async function bulkExport(notes, type, callback) {
           writeFile(`/${exportedNoteName}`, result);
         }
       }
-      callback(`${i + 1}/${notes.length}`);
+      callback(`${i + 1}/${ids.length}`);
     } catch (e) {
       DatabaseLogger.error(e);
     }
   }
-  const fileName = `nn-export-${notes.length}-${type}-${Date.now()}.zip`;
+  const fileName = `nn-export-${ids.length}-${type}-${Date.now()}.zip`;
 
   try {
     callback("zipping");
