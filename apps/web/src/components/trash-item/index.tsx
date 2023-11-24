@@ -24,7 +24,6 @@ import { store } from "../../stores/trash-store";
 import { Flex, Text } from "@theme-ui/components";
 import TimeAgo from "../time-ago";
 import { pluralize, toTitleCase } from "@notesnook/common";
-import { showUndoableToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 import { hashNavigate } from "../../navigation";
 import { useStore } from "../../stores/note-store";
@@ -76,8 +75,8 @@ const menuItems: (item: TrashItem, ids?: string[]) => MenuItem[] = (
       key: "restore",
       title: "Restore",
       icon: Restore.path,
-      onClick: () => {
-        store.restore(ids);
+      onClick: async () => {
+        await store.restore(...ids);
         showToast("success", `${pluralize(ids.length, "item")} restored`);
       },
       multiSelect: true
@@ -90,11 +89,10 @@ const menuItems: (item: TrashItem, ids?: string[]) => MenuItem[] = (
       variant: "dangerous",
       onClick: async () => {
         if (!(await showMultiPermanentDeleteConfirmation(ids.length))) return;
-        showUndoableToast(
-          `${pluralize(ids.length, "item")} permanently deleted`,
-          () => store.delete(ids),
-          () => store.delete(ids, true),
-          () => store.refresh()
+        await store.delete(...ids);
+        showToast(
+          "success",
+          `${pluralize(ids.length, "item")} permanently deleted`
         );
       },
       multiSelect: true

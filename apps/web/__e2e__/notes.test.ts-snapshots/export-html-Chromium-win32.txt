@@ -10,7 +10,6 @@
     <title>Test 1 - Notesnook</title>
     <meta name="created-on" content="xxx" />
     <meta name="last-edited-on" content="xxx" />
-    
     <link rel="stylesheet" href="https://app.notesnook.com/assets/editor-styles.css?d=0">
 
     <style>
@@ -24,6 +23,11 @@
       background-color: transparent !important;
       color: #202124;
       font-family: "Open Sans", "Noto Sans", Frutiger, Calibri, Myriad, Arial, Ubuntu, Helvetica, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .math-block {
+      padding-top: 20px;
+      padding-bottom: 20px;
     }
     
     h1,

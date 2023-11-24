@@ -22,7 +22,12 @@ import { downloadAndReadFile, getTestId } from "../utils";
 import { ContextMenuModel } from "./context-menu.model";
 import { ToggleModel } from "./toggle.model";
 import { Notebook } from "./types";
-import { fillPasswordDialog, iterateList } from "./utils";
+import {
+  confirmDialog,
+  fillNotebookDialog,
+  fillPasswordDialog,
+  iterateList
+} from "./utils";
 
 abstract class BaseProperties {
   protected readonly page: Page;
@@ -248,51 +253,59 @@ export class NoteContextMenuModel extends BaseProperties {
   }
 
   async addToNotebook(notebook: Notebook) {
+    async function addSubNotebooks(
+      page: Page,
+      dialog: Locator,
+      item: Locator,
+      notebook: Notebook
+    ) {
+      if (notebook.subNotebooks) {
+        const addSubNotebookButton = item.locator(
+          getTestId("add-sub-notebook")
+        );
+        for (const subNotebook of notebook.subNotebooks) {
+          await addSubNotebookButton.click();
+
+          await fillNotebookDialog(page, subNotebook);
+
+          const subNotebookItem = dialog.locator(getTestId("notebook"), {
+            hasText: subNotebook.title
+          });
+          await subNotebookItem.waitFor();
+
+          await page.keyboard.down("Control");
+          await subNotebookItem.click();
+          await page.keyboard.up("Control");
+
+          await addSubNotebooks(page, dialog, subNotebookItem, subNotebook);
+        }
+      }
+    }
+
     await this.open();
 
     await this.menu.clickOnItem("notebooks");
     await this.menu.clickOnItem("link-notebooks");
 
-    const filterInput = this.page.locator(getTestId("filter-input"));
-    await filterInput.type(notebook.title);
-    await filterInput.press("Enter");
+    const dialog = this.page.locator(getTestId("move-note-dialog"));
 
-    await this.page.waitForSelector(getTestId("notebook"), {
-      state: "visible",
-      strict: false
+    await dialog.locator(getTestId("add-new-notebook")).click();
+
+    await fillNotebookDialog(this.page, notebook);
+
+    const notebookItem = dialog.locator(getTestId("notebook"), {
+      hasText: notebook.title
     });
 
-    const notebookItems = this.page.locator(getTestId("notebook"));
-    for await (const item of iterateList(notebookItems)) {
-      await item.locator(getTestId("notebook-tools")).click();
-      const title = item.locator(getTestId("notebook-title"));
-      const createTopicButton = item.locator(getTestId("create-topic"));
-      const notebookTitle = await title.textContent();
+    await notebookItem.waitFor({ state: "visible" });
 
-      if (notebookTitle?.includes(notebook.title)) {
-        for (const topic of notebook.topics) {
-          await createTopicButton.click();
-          const newItemInput = item.locator(getTestId("new-topic-input"));
+    await this.page.keyboard.down("Control");
+    await notebookItem.click();
+    await this.page.keyboard.up("Control");
 
-          await newItemInput.waitFor({ state: "visible" });
-          await newItemInput.fill(topic);
-          await newItemInput.press("Enter");
+    await addSubNotebooks(this.page, dialog, notebookItem, notebook);
 
-          await item.locator(getTestId("topic"), { hasText: topic }).waitFor();
-        }
-
-        const topicItems = item.locator(getTestId("topic"));
-        for await (const topicItem of iterateList(topicItems)) {
-          await this.page.keyboard.down("Control");
-          await topicItem.click();
-          await this.page.keyboard.up("Control");
-        }
-      }
-    }
-
-    const dialogConfirm = this.page.locator(getTestId("dialog-yes"));
-    await dialogConfirm.click();
-    await dialogConfirm.waitFor({ state: "detached" });
+    await confirmDialog(dialog);
   }
 
   async open() {

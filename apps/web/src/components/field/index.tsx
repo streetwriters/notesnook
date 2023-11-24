@@ -44,8 +44,17 @@ export type FieldProps = InputProps & {
 };
 
 function Field(props: FieldProps) {
-  const { label, styles, helpText, action, sx, id, type, ...inputProps } =
-    props;
+  const {
+    label,
+    styles,
+    helpText,
+    action,
+    sx,
+    id,
+    type,
+    inputRef,
+    ...inputProps
+  } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const colorScheme = useThemeStore((state) => state.colorScheme);
 
@@ -87,6 +96,7 @@ function Field(props: FieldProps) {
       <Flex mt={1} sx={{ position: "relative" }}>
         <Input
           {...inputProps}
+          ref={inputRef}
           id={id}
           type={isPasswordVisible ? "text" : type || "text"}
           sx={{

@@ -92,7 +92,7 @@ export async function exportNotes(
     action: async (report) => {
       let vaultUnlocked = false;
 
-      if (noteIds.length === 1 && db.notes.note(noteIds[0])?.data.locked) {
+      if (noteIds.length === 1 && (await db.notes.locked.has(noteIds[0]))) {
         vaultUnlocked = await Vault.unlockVault();
         if (!vaultUnlocked) return false;
       } else if (noteIds.length > 1 && (await db.vault.exists())) {
@@ -105,11 +105,10 @@ export async function exportNotes(
       }
 
       const files = [];
+      const notes = await db.notes.all.items(noteIds);
       let index = 0;
-      for (const noteId of noteIds) {
-        const note = db.notes.note(noteId);
-        if (!note) continue;
-        if (!vaultUnlocked && note.data.locked) continue;
+      for (const note of notes) {
+        if (!vaultUnlocked && note.locked) continue;
 
         report({
           current: ++index,
@@ -117,25 +116,25 @@ export async function exportNotes(
           text: `Exporting "${note.title}"...`
         });
 
-        const rawContent = note.data.contentId
-          ? await db.content.raw(note.data.contentId)
+        const rawContent = note.contentId
+          ? await db.content.get(note.contentId)
           : null;
         const content =
           !rawContent || isDeleted(rawContent)
             ? undefined
             : isEncryptedContent(rawContent)
-            ? await db.vault.decryptContent(rawContent)
+            ? await db.vault.decryptContent(rawContent, note.id)
             : isUnencryptedContent(rawContent)
             ? rawContent
             : undefined;
 
         const exported = await db.notes
-          .export(noteId, {
+          .export(note.id, {
             format: format === "pdf" ? "html" : format,
             contentItem: content
           })
           .catch((e: Error) => {
-            console.error(note.data, e);
+            console.error(note, e);
             showToast(
               "error",
               `Failed to export note "${note.title}": ${e.message}`
