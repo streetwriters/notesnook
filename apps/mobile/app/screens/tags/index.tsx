@@ -27,6 +27,7 @@ import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useTagStore } from "../../stores/use-tag-store";
 import { db } from "../../common/database";
+import SelectionHeader from "../../components/selection-header";
 
 export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
   const tags = useTagStore((state) => state.tags);
@@ -45,6 +46,7 @@ export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
 
   return (
     <>
+      <SelectionHeader id={route.name} items={tags} type="tag" />
       <Header
         renderedInRoute={route.name}
         title={route.name}

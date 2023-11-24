@@ -30,6 +30,7 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrashStore } from "../../stores/use-trash-store";
+import SelectionHeader from "../../components/selection-header";
 
 const onPressFloatingButton = () => {
   presentDialog({
@@ -83,6 +84,7 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
 
   return (
     <>
+      <SelectionHeader id={route.name} items={trash} type="trash" />
       <Header
         renderedInRoute={route.name}
         title={route.name}
