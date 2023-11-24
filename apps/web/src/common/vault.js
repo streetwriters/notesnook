@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { db } from "./db";
 import { showPasswordDialog } from "./dialog-controller";
 import { showToast } from "../utils/toast";
+import { VAULT_ERRORS } from "@notesnook/core/dist/api/vault";
 
 class Vault {
   static async createVault() {
@@ -100,9 +101,9 @@ class Vault {
         .then(resolve)
         .catch(({ message }) => {
           switch (message) {
-            case db.vault.ERRORS.noVault:
+            case VAULT_ERRORS.noVault:
               return Vault.createVault();
-            case db.vault.ERRORS.vaultLocked:
+            case VAULT_ERRORS.vaultLocked:
               return Vault.unlockVault();
             default:
               showToast("error", message);
