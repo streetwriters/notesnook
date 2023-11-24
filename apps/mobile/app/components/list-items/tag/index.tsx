@@ -23,12 +23,13 @@ import React from "react";
 import { View } from "react-native";
 import { notesnook } from "../../../../e2e/test.ids";
 import { TaggedNotes } from "../../../screens/notes/tagged";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { IconButton } from "../../ui/icon-button";
-import { PressableButton } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import SelectionWrapper from "../selection-wrapper";
 
 const TagItem = React.memo(
   ({
@@ -40,30 +41,34 @@ const TagItem = React.memo(
     index: number;
     totalNotes: number;
   }) => {
-    const { colors, isDark } = useThemeColors();
+    const { colors } = useThemeColors();
     const onPress = () => {
+      const {
+        selectedItemsList,
+        setSelectedItem,
+        selectionMode,
+        clearSelection
+      } = useSelectionStore.getState();
+      if (selectedItemsList.length > 0 && selectionMode === item.type) {
+        setSelectedItem(item.id);
+        return;
+      } else {
+        clearSelection();
+      }
+
       TaggedNotes.navigate(item, true);
     };
 
     return (
-      <PressableButton
+      <SelectionWrapper
         onPress={onPress}
-        customSelectedColor={colors.secondary.background}
+        item={item}
         testID={notesnook.ids.tag.get(index)}
-        customAlpha={!isDark ? -0.02 : 0.02}
-        customOpacity={1}
-        customStyle={{
-          paddingHorizontal: 12,
-          flexDirection: "row",
-          paddingVertical: 12,
-          alignItems: "center",
-          width: "100%",
-          justifyContent: "space-between"
-        }}
       >
         <View
           style={{
-            maxWidth: "92%"
+            flexGrow: 1,
+            flexShrink: 1
           }}
         >
           <Heading size={SIZE.md}>
@@ -108,7 +113,7 @@ const TagItem = React.memo(
             alignItems: "center"
           }}
         />
-      </PressableButton>
+      </SelectionWrapper>
     );
   },
   (prev, next) => {

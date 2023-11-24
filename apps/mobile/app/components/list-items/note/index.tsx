@@ -105,7 +105,7 @@ const NoteItem = ({
             {notebooks?.items
               ?.filter(
                 (item) =>
-                  item.id !== useNavigationStore.getState().currentRoute?.id
+                  item.id !== useNavigationStore.getState().focusedRouteId
               )
               .map((item) => (
                 <Button
@@ -133,7 +133,7 @@ const NoteItem = ({
                     marginBottom: 5
                   }}
                   onPress={() => {
-                    NotebookScreen.navigate(item);
+                    NotebookScreen.navigate(item, true);
                   }}
                 />
               ))}

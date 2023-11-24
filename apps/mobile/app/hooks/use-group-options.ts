@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { db } from "../common/database";
 import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
 import Navigation from "../services/navigation";
+import { eGroupOptionsUpdated } from "../utils/events";
 
 export function useGroupOptions(type: any) {
   const [groupOptions, setGroupOptions] = useState(
@@ -27,8 +28,10 @@ export function useGroupOptions(type: any) {
   );
 
   useEffect(() => {
-    const onUpdate = () => {
+    const onUpdate = (groupType: string) => {
+      if (groupType !== type) return;
       const options = db.settings?.getGroupOptions(type) as any;
+      console.log("useGroupOptions.onUpdate", type, options);
       if (
         groupOptions?.groupBy !== options.groupBy ||
         groupOptions?.sortBy !== options.sortBy ||
@@ -39,9 +42,9 @@ export function useGroupOptions(type: any) {
       }
     };
 
-    eSubscribeEvent("groupOptionsUpdate", onUpdate);
+    eSubscribeEvent(eGroupOptionsUpdated, onUpdate);
     return () => {
-      eUnSubscribeEvent("groupOptionsUpdate", onUpdate);
+      eUnSubscribeEvent(eGroupOptionsUpdated, onUpdate);
     };
   }, [type, groupOptions]);
 

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { VirtualizedGrouping } from "@notesnook/core";
 import { Tags } from "@notesnook/core/dist/collections/tags";
-import { Note, Tag } from "@notesnook/core/dist/types";
+import { Tag } from "@notesnook/core/dist/types";
 import { useThemeColors } from "@notesnook/theme";
 import React, {
   RefObject,
@@ -30,11 +30,7 @@ import React, {
   useState
 } from "react";
 import { TextInput, View, useWindowDimensions } from "react-native";
-import {
-  ActionSheetRef,
-  FlashList,
-  FlatList
-} from "react-native-actions-sheet";
+import { ActionSheetRef, FlatList } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import { useDBItem } from "../../../hooks/use-db-item";
@@ -47,7 +43,6 @@ import {
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { SIZE } from "../../../utils/size";
-import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
 import { PressableButton } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
@@ -88,11 +83,11 @@ async function updateInitialSelectionState(items: string[]) {
 const useTagItemSelection = createItemSelectionStore(true);
 
 const ManageTagsSheet = (props: {
-  notes?: Note[];
+  ids?: string[];
   actionSheetRef: RefObject<ActionSheetRef>;
 }) => {
   const { colors } = useThemeColors();
-  const notes = useMemo(() => props.notes || [], [props.notes]);
+  const ids = useMemo(() => props.ids || [], [props.ids]);
   const [tags, setTags] = useState<VirtualizedGrouping<Tag>>();
   const [query, setQuery] = useState<string>();
   const inputRef = useRef<TextInput>(null);
@@ -100,7 +95,6 @@ const ManageTagsSheet = (props: {
   const [queryExists, setQueryExists] = useState(false);
   const dimensions = useWindowDimensions();
   const refreshSelection = useCallback(() => {
-    const ids = notes.map((item) => item.id);
     updateInitialSelectionState(ids).then((selection) => {
       useTagItemSelection.setState({
         initialState: selection,
@@ -108,14 +102,17 @@ const ManageTagsSheet = (props: {
       });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notes, tags]);
+  }, [ids, tags]);
 
   const refreshTags = useCallback(() => {
     if (query && query.trim() !== "") {
-      db.lookup.tags(query).then((items) => {
-        setTags(items);
-        console.log("searched tags");
-      });
+      db.lookup
+        .tags(query)
+        .sorted()
+        .then((items) => {
+          setTags(items);
+          console.log("searched tags");
+        });
     } else {
       db.tags.all.sorted(db.settings.getGroupOptions("tags")).then((items) => {
         console.log("items loaded tags");
@@ -149,7 +146,6 @@ const ManageTagsSheet = (props: {
     }
 
     const tag = query;
-    setQuery(undefined);
     inputRef.current?.setNativeProps({
       text: ""
     });
@@ -166,20 +162,23 @@ const ManageTagsSheet = (props: {
           });
 
       if (id) {
-        for (const note of notes) {
+        for (const noteId of ids) {
           await db.relations.add(
             {
               id: id,
               type: "tag"
             },
-            note
+            {
+              id: noteId,
+              type: "note"
+            }
           );
         }
       }
 
       useRelationStore.getState().update();
       useTagStore.getState().setTags();
-      refreshTags();
+      setQuery(undefined);
     } catch (e) {
       ToastManager.show({
         heading: "Cannot add tag",
@@ -194,7 +193,7 @@ const ManageTagsSheet = (props: {
 
   const onPress = useCallback(
     async (id: string) => {
-      for (const note of notes) {
+      for (const noteId of ids) {
         try {
           if (!id) return;
           const isSelected =
@@ -205,7 +204,10 @@ const ManageTagsSheet = (props: {
                 id: id,
                 type: "tag"
               },
-              note
+              {
+                id: noteId,
+                type: "note"
+              }
             );
           } else {
             await db.relations.add(
@@ -213,7 +215,10 @@ const ManageTagsSheet = (props: {
                 id: id,
                 type: "tag"
               },
-              note
+              {
+                id: noteId,
+                type: "note"
+              }
             );
           }
         } catch (e) {
@@ -228,7 +233,7 @@ const ManageTagsSheet = (props: {
       }, 1);
       refreshSelection();
     },
-    [notes, refreshSelection, refreshTags]
+    [ids, refreshSelection, refreshTags]
   );
 
   const renderTag = useCallback(
@@ -332,10 +337,10 @@ const ManageTagsSheet = (props: {
   );
 };
 
-ManageTagsSheet.present = (notes?: Note[]) => {
+ManageTagsSheet.present = (ids?: string[]) => {
   presentSheet({
     component: (ref) => {
-      return <ManageTagsSheet actionSheetRef={ref} notes={notes} />;
+      return <ManageTagsSheet actionSheetRef={ref} ids={ids} />;
     }
   });
 };

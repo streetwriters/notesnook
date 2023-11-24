@@ -55,13 +55,13 @@ export const NotebookItem = ({
   const { nestedNotebooks, notebook: item } = useNotebook(id, items);
   const ids = useMemo(() => (id ? [id] : []), [id]);
   const { totalNotes: totalNotes } = useTotalNotes(ids, "notebook");
-  const screen = useNavigationStore((state) => state.currentRoute);
+  const focusedRouteId = useNavigationStore((state) => state.focusedRouteId);
   const { colors } = useThemeColors("sheet");
   const selection = useNotebookItemSelectionStore((state) =>
     id ? state.selection[id] : undefined
   );
   const isSelected = selection === "selected";
-  const isFocused = screen.id === id;
+  const isFocused = focusedRouteId === id;
   const { fontScale } = useWindowDimensions();
   const expanded = useNotebookExpandedStore((state) => state.expanded[id]);
 
@@ -114,9 +114,10 @@ export const NotebookItem = ({
           width: "100%",
           alignItems: "center",
           flexDirection: "row",
-          paddingLeft: 0,
+          paddingLeft: 12,
           paddingRight: 12,
-          borderRadius: 0
+          borderRadius: 0,
+          height: 45
         }}
       >
         <View
@@ -125,8 +126,27 @@ export const NotebookItem = ({
             alignItems: "center"
           }}
         >
+          {nestedNotebooks?.ids.length ? (
+            <IconButton
+              size={SIZE.xl}
+              color={isSelected ? colors.selected.icon : colors.primary.icon}
+              onPress={() => {
+                useNotebookExpandedStore.getState().setExpanded(id);
+              }}
+              top={0}
+              left={0}
+              bottom={0}
+              right={0}
+              customStyle={{
+                width: 35,
+                height: 35
+              }}
+              name={expanded ? "chevron-down" : "chevron-right"}
+            />
+          ) : null}
+
           <IconButton
-            size={SIZE.lg}
+            size={SIZE.xl}
             color={
               isSelected
                 ? colors.selected.icon
@@ -154,34 +174,6 @@ export const NotebookItem = ({
             }
           />
 
-          {nestedNotebooks?.ids.length ? (
-            <IconButton
-              size={SIZE.lg}
-              color={isSelected ? colors.selected.icon : colors.primary.icon}
-              onPress={() => {
-                useNotebookExpandedStore.getState().setExpanded(id);
-              }}
-              top={0}
-              left={0}
-              bottom={0}
-              right={0}
-              customStyle={{
-                width: 40,
-                height: 40
-              }}
-              name={expanded ? "chevron-down" : "chevron-right"}
-            />
-          ) : (
-            <>
-              <View
-                style={{
-                  width: 40,
-                  height: 40
-                }}
-              />
-            </>
-          )}
-
           <Paragraph
             color={
               isFocused ? colors.selected.paragraph : colors.secondary.paragraph
@@ -189,31 +181,40 @@ export const NotebookItem = ({
             size={SIZE.sm}
           >
             {item?.title}{" "}
-            {totalNotes?.(id) ? (
-              <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
-                {totalNotes(id)}
-              </Paragraph>
-            ) : null}
           </Paragraph>
         </View>
-        <IconButton
-          name="plus"
-          customStyle={{
-            width: 40 * fontScale,
-            height: 40 * fontScale
+
+        <View
+          style={{
+            flexDirection: "row",
+            columnGap: 10,
+            alignItems: "center"
           }}
-          testID={notesnook.ids.notebook.menu}
-          onPress={() => {
-            if (!item) return;
-            AddNotebookSheet.present(undefined, item, "link-notebooks");
-          }}
-          left={0}
-          right={0}
-          bottom={0}
-          top={0}
-          color={colors.primary.icon}
-          size={SIZE.xl}
-        />
+        >
+          {totalNotes?.(id) ? (
+            <Paragraph size={SIZE.sm} color={colors.secondary.paragraph}>
+              {totalNotes(id)}
+            </Paragraph>
+          ) : null}
+          <IconButton
+            name="plus"
+            customStyle={{
+              width: 40 * fontScale,
+              height: 40 * fontScale
+            }}
+            testID={notesnook.ids.notebook.menu}
+            onPress={() => {
+              if (!item) return;
+              AddNotebookSheet.present(undefined, item, "link-notebooks");
+            }}
+            left={0}
+            right={0}
+            bottom={0}
+            top={0}
+            color={colors.primary.icon}
+            size={SIZE.xl}
+          />
+        </View>
       </PressableButton>
 
       {!expanded

@@ -30,6 +30,7 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotebookStore } from "../../stores/use-notebook-store";
+import SelectionHeader from "../../components/selection-header";
 
 const onButtonPress = () => {
   AddNotebookSheet.present();
@@ -65,6 +66,7 @@ export const Notebooks = ({
 
   return (
     <>
+      <SelectionHeader id={route.name} items={notebooks} type="notebook" />
       <Header
         renderedInRoute={route.name}
         title={route.name}

@@ -27,7 +27,7 @@ import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import { db } from "../../../common/database";
 import { presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
-import SearchService from "../../../services/search";
+import { updateNotebook } from "../../../utils/notebooks";
 import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
@@ -140,8 +140,8 @@ export const MoveNotes = ({
               currentNotebook.id,
               ...selectedNoteIds
             );
+            updateNotebook(currentNotebook.id);
             Navigation.queueRoutesForUpdate();
-            SearchService.updateAndSearch();
             fwdRef?.current?.hide();
           }}
           title="Move selected notes"

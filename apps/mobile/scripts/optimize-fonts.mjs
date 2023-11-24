@@ -70,7 +70,8 @@ const EXTRA_ICON_NAMES = [
   "close-circle-outline",
   "qrcode",
   "text",
-  "cloud"
+  "cloud",
+  "restore"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

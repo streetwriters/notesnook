@@ -21,6 +21,7 @@ import { BaseTrashItem, Notebook } from "@notesnook/core";
 import React from "react";
 import { NotebookItem } from ".";
 import { db } from "../../../common/database";
+import NotebookScreen from "../../../screens/notebook";
 import { ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useSelectionStore } from "../../../stores/use-selection-store";
@@ -28,30 +29,12 @@ import { useTrashStore } from "../../../stores/use-trash-store";
 import { presentDialog } from "../../dialog/functions";
 import SelectionWrapper from "../selection-wrapper";
 
-const navigateToNotebook = (item: Notebook, canGoBack?: boolean) => {
-  if (!item) return;
-
-  Navigation.navigate(
-    {
-      title: item.title,
-      name: "Notebook",
-      id: item.id,
-      type: "notebook"
-    },
-    {
-      title: item.title,
-      item: item,
-      canGoBack
-    }
-  );
-};
-
-export const openNotebookTopic = (item: Notebook | BaseTrashItem<Notebook>) => {
+export const openNotebook = (item: Notebook | BaseTrashItem<Notebook>) => {
   const isTrash = item.type === "trash";
   const { selectedItemsList, setSelectedItem, selectionMode, clearSelection } =
     useSelectionStore.getState();
-  if (selectedItemsList.length > 0 && selectionMode) {
-    setSelectedItem(item);
+  if (selectedItemsList.length > 0 && selectionMode === item.type) {
+    setSelectedItem(item.id);
     return;
   } else {
     clearSelection();
@@ -59,14 +42,14 @@ export const openNotebookTopic = (item: Notebook | BaseTrashItem<Notebook>) => {
 
   if (isTrash) {
     presentDialog({
-      title: `Restore ${item.itemType}`,
-      paragraph: `Restore or delete ${item.itemType} forever`,
+      title: `Restore notebook`,
+      paragraph: `Restore or delete notebook forever`,
       positiveText: "Restore",
       negativeText: "Delete",
       positivePress: async () => {
         await db.trash.restore(item.id);
         Navigation.queueRoutesForUpdate();
-        useSelectionStore.getState().setSelectionMode(false);
+        useSelectionStore.getState().setSelectionMode(undefined);
         ToastManager.show({
           heading: "Restore successful",
           type: "success"
@@ -75,7 +58,7 @@ export const openNotebookTopic = (item: Notebook | BaseTrashItem<Notebook>) => {
       onClose: async () => {
         await db.trash.delete(item.id);
         useTrashStore.getState().setTrash();
-        useSelectionStore.getState().setSelectionMode(false);
+        useSelectionStore.getState().setSelectionMode(undefined);
         ToastManager.show({
           heading: "Permanently deleted items",
           type: "success",
@@ -85,7 +68,7 @@ export const openNotebookTopic = (item: Notebook | BaseTrashItem<Notebook>) => {
     });
     return;
   }
-  navigateToNotebook(item, true);
+  NotebookScreen.navigate(item, true);
 };
 
 type NotebookWrapperProps = {
@@ -105,7 +88,7 @@ export const NotebookWrapper = React.memo(
     const isTrash = item.type === "trash";
 
     return (
-      <SelectionWrapper onPress={() => openNotebookTopic(item)} item={item}>
+      <SelectionWrapper onPress={() => openNotebook(item)} item={item}>
         <NotebookItem
           item={item}
           date={date}

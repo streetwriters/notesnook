@@ -60,7 +60,6 @@ export const LeftMenus = ({
         height: 40,
         width: 40,
         borderRadius: 100,
-        marginLeft: -5,
         marginRight: DDS.isLargeTablet() ? 10 : 7
       }}
       left={40}
@@ -72,9 +71,6 @@ export const LeftMenus = ({
       }}
       name={canGoBack ? "arrow-left" : "menu"}
       color={colors.primary.paragraph}
-      iconStyle={{
-        marginLeft: canGoBack ? -5 : 0
-      }}
     />
   );
 };

@@ -69,7 +69,7 @@ export const eThemeUpdated = "527";
 
 export const eScrollEvent = "528";
 
-export const eOnNewTopicAdded = "529";
+export const eUpdateNotebookRoute = "529";
 
 export const eOpenVaultDialog = "530";
 
@@ -161,3 +161,5 @@ export const eUserLoggedIn = "608";
 
 export const eLoginSessionExpired = "609";
 export const eDBItemUpdate = "610";
+export const eGroupOptionsUpdated = "611";
+export const eOnRefreshSearch = "612";

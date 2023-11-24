@@ -18,25 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { db } from "../../common/database";
 import DelayLayout from "../../components/delay-layout";
+import { Header } from "../../components/header";
 import List from "../../components/list";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
-import SearchService from "../../services/search";
 import SettingsService from "../../services/settings";
 import { useFavoriteStore } from "../../stores/use-favorite-store";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
-import { Header } from "../../components/header";
-const prepareSearch = () => {
-  SearchService.update({
-    placeholder: "Search in favorites",
-    type: "notes",
-    title: "Favorites",
-    get: () => db.notes?.favorites
-  });
-};
+import SelectionHeader from "../../components/selection-header";
 
 export const Favorites = ({
   navigation,
@@ -52,7 +43,6 @@ export const Favorites = ({
         Navigation.routeUpdateFunctions[route.name]
       );
       useNavigationStore.getState().setFocusedRouteId(route?.name);
-      SearchService.prepareSearch = prepareSearch;
       return !prev?.current;
     },
     onBlur: () => false,
@@ -61,6 +51,7 @@ export const Favorites = ({
 
   return (
     <>
+      <SelectionHeader id={route.name} items={favorites} type="note" />
       <Header
         renderedInRoute={route.name}
         title={route.name}

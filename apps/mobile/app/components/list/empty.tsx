@@ -63,7 +63,6 @@ export const Empty = React.memo(function Empty({
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
-
   const tip = useTip(
     screen === "Notes" && introCompleted
       ? "first-note"
@@ -139,37 +138,3 @@ export const Empty = React.memo(function Empty({
     </View>
   );
 });
-
-/**
- * Make a tips manager.
- * The tip manager stores many tips. Each tip has following values
- * 1. Text
- * 2. contexts: An array of context strings. // Places where the tip can be shown
- * 3. Button if any.
- * 4. Image/Gif asset.
- *
- * Tip manager adds the following methods -> get(context). Returns a random tip for the following context.
- *
- * Tips can be shown in a sheet or in a list. For sheets, GeneralSheet can be used to
- * render tips.
- *
- * Where can the tips be shown and how?
- * 1. When transitioning, show tips in a sheet. Make sure its useful
- * 2. Replace placeholders with tips.
- * 3. Show tips in editor placeholder.
- * 4. Show tips between list items?
- *
- * Tooltips.
- * Small tooltips can be shown in initial render first time.
- * Especially for items that are not shown on blank page. Should be
- * in places where it makes sense and does not interrupt the user.
- *
- * Can also be shown when first time entering a screen that
- * has something that the user might not know of. Like sorting and side menu.
- *
- * Todo:
- * 1. Make a tip manager.
- * 2. Make a list of tips.
- * 3. Add images for those tips.
- * 4. Show tips
- */

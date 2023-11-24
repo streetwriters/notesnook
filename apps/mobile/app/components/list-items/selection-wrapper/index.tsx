@@ -53,10 +53,10 @@ const SelectionWrapper = ({
   }
 
   const onLongPress = () => {
-    if (!useSelectionStore.getState().selectionMode) {
-      useSelectionStore.getState().setSelectionMode(true);
+    if (useSelectionStore.getState().selectionMode !== item.type) {
+      useSelectionStore.getState().setSelectionMode(item.type);
     }
-    useSelectionStore.getState().setSelectedItem(item);
+    useSelectionStore.getState().setSelectedItem(item.id);
   };
 
   return (

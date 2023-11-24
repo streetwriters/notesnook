@@ -181,7 +181,13 @@ export const NotebookSheet = () => {
         if (!focusedRouteId) return;
         const nextRoot = await findRootNotebookId(focusedRouteId);
         setRoot(nextRoot);
+
         if (nextRoot !== currentItem.current) {
+          console.log(
+            "NotebookSheet.useEffect.canShow",
+            "Root changed to",
+            nextRoot
+          );
           setSelection([]);
           setEnabled(false);
         }
@@ -196,6 +202,7 @@ export const NotebookSheet = () => {
         } else {
           ref.current?.show(snapPoint);
         }
+        console.log("NotebookSheet.useEffect.canShow", focusedRouteId);
         onRequestUpdate();
       }, 0);
     } else {
@@ -203,7 +210,7 @@ export const NotebookSheet = () => {
       setEnabled(false);
       ref.current?.hide();
     }
-  }, [canShow, currentRoute, onRequestUpdate, focusedRouteId]);
+  }, [canShow, onRequestUpdate, focusedRouteId]);
 
   return (
     <ActionSheet
@@ -302,11 +309,10 @@ export const NotebookSheet = () => {
                   height: 40 * fontScale
                 }}
                 onPress={async () => {
-                  //@ts-ignore
-                  useSelectionStore.setState({
-                    selectedItemsList: selection
-                  });
-                  await deleteItems();
+                  await deleteItems(
+                    selection.map((notebook) => notebook.id),
+                    "notebook"
+                  );
                   useSelectionStore.getState().clearSelection();
                   setEnabled(false);
                   setSelection([]);

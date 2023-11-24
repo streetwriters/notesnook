@@ -27,6 +27,7 @@ import { NotebookHeader } from "../../components/list-items/headers/notebook-hea
 import { AddNotebookSheet } from "../../components/sheets/add-notebook";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
@@ -34,8 +35,10 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import useNavigationStore, {
   NotebookScreenParams
 } from "../../stores/use-navigation-store";
-import { eOnNewTopicAdded } from "../../utils/events";
+import { eUpdateNotebookRoute } from "../../utils/events";
+import { findRootNotebookId } from "../../utils/notebooks";
 import { openEditor, setOnFirstSave } from "../notes/common";
+import SelectionHeader from "../../components/selection-header";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
@@ -64,8 +67,24 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
 
   const onRequestUpdate = React.useCallback(
     async (data?: NotebookScreenParams) => {
+      if (data?.item?.id && params.current.item?.id !== data?.item?.id) {
+        const nextRootNotebookId = await findRootNotebookId(data?.item?.id);
+        const currentNotebookRoot = await findRootNotebookId(
+          params.current.item.id
+        );
+
+        if (
+          nextRootNotebookId !== currentNotebookRoot ||
+          nextRootNotebookId === params.current?.item?.id
+        ) {
+          // Never update notebook in route if root is different or if the root is current notebook.
+          return;
+        }
+      }
+
       if (data) params.current = data;
       params.current.title = params.current.item.title;
+
       try {
         const notebook = await db.notebooks?.notebook(
           params?.current?.item?.id
@@ -89,9 +108,9 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
 
   useEffect(() => {
     onRequestUpdate();
-    eSubscribeEvent(eOnNewTopicAdded, onRequestUpdate);
+    eSubscribeEvent(eUpdateNotebookRoute, onRequestUpdate);
     return () => {
-      eUnSubscribeEvent(eOnNewTopicAdded, onRequestUpdate);
+      eUnSubscribeEvent(eUpdateNotebookRoute, onRequestUpdate);
     };
   }, [onRequestUpdate]);
 
@@ -103,6 +122,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
 
   return (
     <>
+      <SelectionHeader id={route.name} items={notes} type="note" />
       <Header
         renderedInRoute={route.name}
         title={params.current.item?.title}
@@ -117,6 +137,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
             ids: notes?.ids.filter((id) => typeof id === "string") as string[]
           });
         }}
+        titleHiddenOnRender
         id={params.current.item?.id}
         onPressDefaultRightButton={openEditor}
       />
@@ -154,13 +175,49 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   );
 };
 
-NotebookScreen.navigate = (item: Notebook, canGoBack?: boolean) => {
+NotebookScreen.navigate = async (item: Notebook, canGoBack?: boolean) => {
   if (!item) return;
-  Navigation.navigate<"Notebook">("Notebook", {
-    title: item.title,
-    item: item,
-    canGoBack
-  });
+  const { currentRoute, focusedRouteId } = useNavigationStore.getState();
+  if (currentRoute === "Notebooks") {
+    Navigation.push("Notebook", {
+      title: item.title,
+      item: item,
+      canGoBack
+    });
+  } else if (currentRoute === "Notebook") {
+    if (!focusedRouteId) return;
+    const rootNotebookId = await findRootNotebookId(focusedRouteId);
+    const currentNotebookRoot = await findRootNotebookId(item?.id);
+
+    if (
+      (rootNotebookId === currentNotebookRoot &&
+        focusedRouteId !== rootNotebookId) ||
+      focusedRouteId == item?.id
+    ) {
+      // Update the route in place instead
+      console.log("Updating existing route in place");
+      eSendEvent(eUpdateNotebookRoute, {
+        item: item,
+        title: item.title,
+        canGoBack: canGoBack
+      });
+    } else {
+      console.log("Pushing new notebook route");
+      // Push a new route
+      Navigation.push("Notebook", {
+        title: item.title,
+        item: item,
+        canGoBack
+      });
+    }
+  } else {
+    // Push a new route anyways
+    Navigation.push("Notebook", {
+      title: item.title,
+      item: item,
+      canGoBack
+    });
+  }
 };
 
 export default NotebookScreen;

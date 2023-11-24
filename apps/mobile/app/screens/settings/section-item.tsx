@@ -107,16 +107,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         switch (item.type) {
           case "screen":
             navigation.dispatch(StackActions.push("SettingsGroup", item));
-            useNavigationStore.getState().update(
-              {
-                name: "SettingsGroup" as never,
-                title:
-                  typeof item.name === "function"
-                    ? item.name(current)
-                    : item.name
-              },
-              true
-            );
+            useNavigationStore.getState().update("Settings");
             break;
           case "switch":
             onChangeSettings();

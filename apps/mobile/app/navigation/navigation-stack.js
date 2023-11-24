@@ -86,7 +86,7 @@ const _Tabs = () => {
   const screenHeight = height - (50 + insets.top + insets.bottom);
   React.useEffect(() => {
     setTimeout(() => {
-      useNavigationStore.getState().update({ name: homepage });
+      useNavigationStore.getState().update(homepage);
     }, 1000);
   }, [homepage]);
 

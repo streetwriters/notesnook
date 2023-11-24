@@ -23,22 +23,22 @@ import React, { RefObject, useCallback, useEffect } from "react";
 import { Keyboard, TouchableOpacity, View } from "react-native";
 import { ActionSheetRef, FlashList } from "react-native-actions-sheet";
 import { db } from "../../../common/database";
-import { eSendEvent, presentSheet } from "../../../services/event-manager";
+import { presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
-import SearchService from "../../../services/search";
+import { ItemSelection } from "../../../stores/item-selection-store";
 import { useNotebookStore } from "../../../stores/use-notebook-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { eOnNotebookUpdated } from "../../../utils/events";
+import { updateNotebook } from "../../../utils/notebooks";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
+import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
+import { IconButton } from "../../ui/icon-button";
 import Paragraph from "../../ui/typography/paragraph";
 import { NotebookItem } from "./notebook-item";
 import { useNotebookItemSelectionStore } from "./store";
-import SheetProvider from "../../sheet-provider";
-import { ItemSelection } from "../../../stores/item-selection-store";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -90,15 +90,13 @@ const MoveNoteSheet = ({
   const selectedItemsList = useSelectionStore(
     (state) => state.selectedItemsList
   );
-  const setNotebooks = useNotebookStore((state) => state.setNotebooks);
+
   const multiSelect = useNotebookItemSelectionStore(
     (state) => state.multiSelect
   );
 
   useEffect(() => {
-    const items = note
-      ? [note.id]
-      : (selectedItemsList as Note[]).map((note) => note.id);
+    const items = note ? [note.id] : selectedItemsList;
     updateInitialSelectionState(items);
     return () => {
       useNotebookItemSelectionStore.setState({
@@ -111,9 +109,7 @@ const MoveNoteSheet = ({
   }, [note, selectedItemsList]);
 
   const onSave = async () => {
-    const noteIds = note
-      ? [note.id]
-      : selectedItemsList.map((n) => (n as Note).id);
+    const noteIds = note ? [note.id] : selectedItemsList;
 
     const changedNotebooks = useNotebookItemSelectionStore.getState().selection;
 
@@ -123,18 +119,17 @@ const MoveNoteSheet = ({
       if (changedNotebooks[id] === "selected") {
         for (const id of noteIds) {
           await db.relations.add(item, { id: id, type: "note" });
+          updateNotebook(item.id);
         }
       } else if (changedNotebooks[id] === "deselected") {
         for (const id of noteIds) {
           await db.relations.unlink(item, { id: id, type: "note" });
+          updateNotebook(item.id);
         }
       }
     }
 
     Navigation.queueRoutesForUpdate();
-    setNotebooks();
-    eSendEvent(eOnNotebookUpdated);
-    SearchService.updateAndSearch();
     useRelationStore.getState().update();
     actionSheetRef.current?.hide();
   };
@@ -182,48 +177,46 @@ const MoveNoteSheet = ({
                 : "Select topics you want to add note(s) to."
             }
           />
-          <Button
-            height={35}
+
+          <View
             style={{
-              borderRadius: 100,
-              paddingHorizontal: 24,
-              alignSelf: "flex-start"
+              flexDirection: "row",
+              columnGap: 10
             }}
-            title="Save"
-            type={"accent"}
-            onPress={onSave}
-          />
+          >
+            <IconButton
+              name="restore"
+              type="grayAccent"
+              onPress={() => {
+                const items = note ? [note.id] : selectedItemsList;
+                updateInitialSelectionState(items);
+              }}
+              customStyle={{
+                width: 40,
+                height: 40
+              }}
+            />
+
+            <Button
+              height={40}
+              style={{
+                borderRadius: 100,
+                paddingHorizontal: 24,
+                alignSelf: "flex-start"
+              }}
+              title="Save"
+              type={"accent"}
+              onPress={onSave}
+            />
+          </View>
         </View>
 
         <View
           style={{
-            paddingHorizontal: 12
-          }}
-        >
-          <Button
-            title="Reset selection"
-            height={30}
-            style={{
-              alignSelf: "flex-start",
-              paddingHorizontal: 0,
-              width: "100%",
-              marginTop: 6
-            }}
-            type="grayAccent"
-            onPress={() => {
-              const items = note
-                ? [note.id]
-                : (selectedItemsList as Note[]).map((note) => note.id);
-              updateInitialSelectionState(items);
-            }}
-          />
-        </View>
-
-        <View
-          style={{
-            paddingHorizontal: 12,
+            paddingHorizontal: 0,
             maxHeight: dimensions.height * 0.85,
-            height: 50 * ((notebooks?.ids.length || 0) + 2)
+            height: dimensions.height * 0.85,
+            paddingTop: 6
           }}
         >
           <FlashList

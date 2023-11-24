@@ -31,7 +31,6 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
-import SearchService from "../../services/search";
 import useNavigationStore, {
   HeaderRightButton,
   NotesScreenParams,
@@ -102,18 +101,6 @@ const NotesPage = ({
     focusOnInit: !focusControl
   });
 
-  const prepareSearch = React.useCallback(() => {
-    const { item } = params.current;
-    SearchService.update({
-      placeholder: `Search in ${item.title}`,
-      type: "notes",
-      title: item.type === "tag" ? "#" + item.title : item.title,
-      get: () => {
-        return get(params.current, false);
-      }
-    });
-  }, [get]);
-
   const syncWithNavigation = React.useCallback(() => {
     const { item } = params.current;
 
@@ -126,13 +113,7 @@ const NotesPage = ({
         type: getItemType(route.name),
         id: item.id
       });
-  }, [
-    isMonograph,
-    onPressFloatingButton,
-    prepareSearch,
-    rightButtons,
-    route.name
-  ]);
+  }, [isMonograph, route.name]);
 
   const onRequestUpdate = React.useCallback(
     async (data?: NotesScreenParams) => {
@@ -188,7 +169,7 @@ const NotesPage = ({
     <>
       <Header
         renderedInRoute={route.name}
-        title={title}
+        title={title || route.name}
         canGoBack={params?.current?.canGoBack}
         hasSearch={true}
         id={
@@ -214,7 +195,7 @@ const NotesPage = ({
           dataType="note"
           onRefresh={onRequestUpdate}
           loading={loading || !isFocused}
-          renderedInRoute="Notes"
+          renderedInRoute={route.name}
           headerTitle={title}
           customAccentColor={accentColor}
           placeholder={placeholder}

@@ -30,11 +30,9 @@ import { useNoteStore } from "../stores/use-notes-store";
 import { useReminderStore } from "../stores/use-reminder-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useTrashStore } from "../stores/use-trash-store";
-import { eOnNewTopicAdded } from "../utils/events";
+import { eOnRefreshSearch, eUpdateNotebookRoute } from "../utils/events";
 import { rootNavigatorRef, tabBarRef } from "../utils/global-refs";
 import { eSendEvent } from "./event-manager";
-import SearchService from "./search";
-import SettingsService from "./settings";
 
 /**
  * Routes that should be updated on focus
@@ -80,14 +78,14 @@ const routeUpdateFunctions: {
   Tags: () => useTagStore.getState().setTags(),
   Favorites: () => useFavoriteStore.getState().setFavorites(),
   Trash: () => useTrashStore.getState().setTrash(),
-  Notebook: (params) => eSendEvent(eOnNewTopicAdded, params),
+  Notebook: (params) => eSendEvent(eUpdateNotebookRoute, params),
   NotesPage: (params) => eSendEvent("NotesPage", params),
   TaggedNotes: (params) => eSendEvent("TaggedNotes", params),
   ColoredNotes: (params) => eSendEvent("ColoredNotes", params),
   TopicNotes: (params) => eSendEvent("TopicNotes", params),
   Monographs: (params) => eSendEvent("Monographs", params),
   Reminders: () => useReminderStore.getState().setReminders(),
-  Search: () => SearchService.updateAndSearch()
+  Search: () => eSendEvent(eOnRefreshSearch)
 };
 
 function clearRouteFromQueue(routeName: RouteName) {
@@ -124,6 +122,7 @@ function queueRoutesForUpdate(...routesToUpdate: RouteName[]) {
 }
 
 function navigate<T extends RouteName>(screen: T, params?: RouteParams[T]) {
+  console.log(`Navigation.navigate ${screen} route`);
   rootNavigatorRef.current?.navigate(screen as any, params);
 }
 
@@ -132,14 +131,17 @@ function goBack() {
 }
 
 function push<T extends RouteName>(screen: T, params: RouteParams[T]) {
+  console.log(`Navigation.push ${screen} route`);
   rootNavigatorRef.current?.dispatch(StackActions.push(screen as any, params));
 }
 
 function replace<T extends RouteName>(screen: T, params: RouteParams[T]) {
+  console.log(`Navigation.replace ${screen} route`);
   rootNavigatorRef.current?.dispatch(StackActions.replace(screen, params));
 }
 
 function popToTop() {
+  console.log(`Navigation.popToTop`);
   rootNavigatorRef.current?.dispatch(StackActions.popToTop());
 }
 

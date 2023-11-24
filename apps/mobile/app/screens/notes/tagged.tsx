@@ -22,7 +22,9 @@ import React from "react";
 import NotesPage from ".";
 import { db } from "../../common/database";
 import Navigation, { NavigationProps } from "../../services/navigation";
-import { NotesScreenParams } from "../../stores/use-navigation-store";
+import useNavigationStore, {
+  NotesScreenParams
+} from "../../stores/use-navigation-store";
 import { PLACEHOLDER_DATA, openEditor } from "./common";
 
 export const TaggedNotes = ({
@@ -54,7 +56,15 @@ TaggedNotes.get = async (params: NotesScreenParams, grouped = true) => {
 
 TaggedNotes.navigate = (item: Tag, canGoBack?: boolean) => {
   if (!item) return;
-  Navigation.navigate<"TaggedNotes">("TaggedNotes", {
+
+  const { focusedRouteId } = useNavigationStore.getState();
+
+  if (focusedRouteId === item.id) {
+    console.log("TaggedNotes.navigate: route already focused for tag");
+    return;
+  }
+
+  Navigation.push<"TaggedNotes">("TaggedNotes", {
     item: item,
     canGoBack,
     title: item.title

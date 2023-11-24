@@ -26,6 +26,8 @@ import Navigation from "../../services/navigation";
 import { SIZE } from "../../utils/size";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../services/device-detection";
+import { useSelectionStore } from "../../stores/use-selection-store";
+import useNavigationStore from "../../stores/use-navigation-store";
 export const SearchBar = ({
   onChangeText,
   loading
@@ -33,6 +35,10 @@ export const SearchBar = ({
   onChangeText: (value: string) => void;
   loading?: boolean;
 }) => {
+  const selectionMode = useSelectionStore((state) => state.selectionMode);
+  const isFocused = useNavigationStore(
+    (state) => state.focusedRouteId === "Search"
+  );
   const insets = useGlobalSafeAreaInsets();
   const { colors } = useThemeColors();
   const inputRef = useRef<TextInput>(null);
@@ -40,7 +46,7 @@ export const SearchBar = ({
     onChangeText(value);
   };
 
-  return (
+  return selectionMode && isFocused ? null : (
     <View
       style={{
         height: 50 + insets.top,

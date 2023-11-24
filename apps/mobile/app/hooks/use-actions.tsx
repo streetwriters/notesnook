@@ -247,7 +247,7 @@ export const useActions = ({
       try {
         close();
         await sleep(300);
-        await deleteItems(item);
+        await deleteItems([item.id], item.type);
       } catch (e) {
         console.error(e);
       }
@@ -268,7 +268,7 @@ export const useActions = ({
         await db.trash.delete(item.id);
         setImmediate(() => {
           Navigation.queueRoutesForUpdate();
-          useSelectionStore.getState().setSelectionMode(false);
+          useSelectionStore.getState().setSelectionMode(undefined);
           ToastManager.show({
             heading: "Permanently deleted items",
             type: "success",
@@ -457,7 +457,7 @@ export const useActions = ({
 
     async function exportNote() {
       if (item.type !== "note") return;
-      ExportNotesSheet.present([item]);
+      ExportNotesSheet.present([item.id]);
     }
 
     async function toggleLocalOnly() {
@@ -495,8 +495,6 @@ export const useActions = ({
     }
 
     function addTo() {
-      clearSelection();
-      setSelectedItem(item);
       MoveNoteSheet.present(item as Note);
     }
 

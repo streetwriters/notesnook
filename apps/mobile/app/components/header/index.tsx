@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
@@ -24,15 +25,14 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
+import useNavigationStore, {
+  RouteName
+} from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
-import { useThemeColors } from "@notesnook/theme";
 import { eScrollEvent } from "../../utils/events";
 import { LeftMenus } from "./left-menus";
 import { RightMenus } from "./right-menus";
 import { Title } from "./title";
-import useNavigationStore, {
-  RouteName
-} from "../../stores/use-navigation-store";
 
 type HeaderRightButton = {
   title: string;
