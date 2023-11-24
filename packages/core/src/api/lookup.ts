@@ -59,7 +59,7 @@ export default class Lookup {
         )
         .selectFrom("notes")
         .$if(!!noteIds && noteIds.length > 0, (eb) =>
-          eb.where("id", "in", noteIds!)
+          eb.where("notes.id", "in", noteIds!)
         )
         .$if(!!limit, (eb) => eb.limit(limit!))
         .where(isFalse("notes.deleted"))

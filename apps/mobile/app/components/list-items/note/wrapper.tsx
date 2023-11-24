@@ -55,8 +55,8 @@ export const openNote = async (
   const { selectedItemsList, selectionMode, clearSelection, setSelectedItem } =
     useSelectionStore.getState();
 
-  if (selectedItemsList.length > 0 && selectionMode) {
-    setSelectedItem(note);
+  if (selectedItemsList.length > 0 && selectionMode === item.type) {
+    setSelectedItem(note.id);
     return;
   } else {
     clearSelection();

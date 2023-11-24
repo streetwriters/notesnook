@@ -43,10 +43,9 @@ export const MenuItem = React.memo(
       if (item.func) {
         item.func();
       } else {
-        Navigation.navigate(
-          { name: item.name, beta: item.isBeta },
-          { canGoBack: false }
-        );
+        if (useNavigationStore.getState().currentRoute !== item.name) {
+          Navigation.push(item.name, { canGoBack: false, beta: item.isBeta });
+        }
       }
       if (item.close) {
         setImmediate(() => {
