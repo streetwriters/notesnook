@@ -130,9 +130,6 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
             buttons={buttons}
             close={() => {
               close();
-              setTimeout(() => {
-                SearchService.updateAndSearch();
-              }, 1000);
             }}
           />
 

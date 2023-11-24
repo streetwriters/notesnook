@@ -20,7 +20,7 @@ import { Notebook, VirtualizedGrouping } from "@notesnook/core";
 import React, { useCallback, useEffect, useState } from "react";
 import { db } from "../common/database";
 import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
-import { eOnNotebookUpdated } from "../utils/events";
+import { eGroupOptionsUpdated, eOnNotebookUpdated } from "../utils/events";
 import { useDBItem, useTotalNotes } from "./use-db-item";
 
 export const useNotebook = (
@@ -38,29 +38,36 @@ export const useNotebook = (
   );
 
   const onRequestUpdate = React.useCallback(() => {
-    if (!item || !id) {
-      if (notebooks) {
-        setNotebooks(undefined);
-      }
-      return;
-    }
-    console.log("useNotebook.onRequestUpdate", id);
+    if (!id) return;
+    console.log("useNotebook.onRequestUpdate", id, Date.now());
     db.relations
-      .from(item, "notebook")
+      .from(
+        {
+          type: "notebook",
+          id: id
+        },
+        "notebook"
+      )
       .selector.sorted(db.settings.getGroupOptions("notebooks"))
       .then((notebooks) => {
         setNotebooks(notebooks);
       });
-  }, [item, id, notebooks]);
+  }, [id]);
 
   useEffect(() => {
-    onRequestUpdate();
-  }, [item, onRequestUpdate]);
-
-  const onUpdate = useCallback(() => {
-    setGroupOptions({ ...(db.settings.getGroupOptions("notebooks") as any) });
+    console.log("useNotebook.useEffect.onRequestUpdate");
     onRequestUpdate();
   }, [onRequestUpdate]);
+
+  const onUpdate = useCallback(
+    (type: string) => {
+      if (type !== "notebooks") return;
+      setGroupOptions({ ...(db.settings.getGroupOptions("notebooks") as any) });
+      onRequestUpdate();
+      console.log("useNotebook.onUpdate", id, Date.now());
+    },
+    [id, onRequestUpdate]
+  );
 
   useEffect(() => {
     const onNotebookUpdate = (id?: string) => {
@@ -71,10 +78,10 @@ export const useNotebook = (
       });
     };
 
-    eSubscribeEvent("groupOptionsUpdate", onUpdate);
+    eSubscribeEvent(eGroupOptionsUpdated, onUpdate);
     eSubscribeEvent(eOnNotebookUpdated, onNotebookUpdate);
     return () => {
-      eUnSubscribeEvent("groupOptionsUpdate", onUpdate);
+      eUnSubscribeEvent(eGroupOptionsUpdated, onUpdate);
       eUnSubscribeEvent(eOnNotebookUpdated, onNotebookUpdate);
     };
   }, [onUpdate, onRequestUpdate, id, refresh]);
@@ -82,7 +89,7 @@ export const useNotebook = (
   return {
     notebook: item,
     nestedNotebookNotesCount,
-    nestedNotebooks: notebooks,
+    nestedNotebooks: item ? notebooks : undefined,
     onUpdate: onRequestUpdate,
     groupOptions
   };

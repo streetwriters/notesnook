@@ -55,13 +55,8 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
   useEffect(() => {
     const onUpdateItem = (itemId?: string) => {
       if (typeof itemId === "string" && itemId !== id) return;
-      if (!id) {
-        if (item) {
-          setItem(undefined);
-        }
-        return;
-      }
-      console.log("onUpdateItem", id, type);
+      if (!id) return;
+      console.log("useDBItem.onUpdateItem", id, type);
 
       if (items) {
         items.item(id).then((item) => {
@@ -85,10 +80,10 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
     return () => {
       eUnSubscribeEvent(eDBItemUpdate, onUpdateItem);
     };
-  }, [id, type, items, item]);
+  }, [id, type, items]);
 
   return [
-    item as ItemTypeKey[T],
+    id ? (item as ItemTypeKey[T]) : undefined,
     () => {
       if (id) {
         eSendEvent(eDBItemUpdate, id);
@@ -115,7 +110,7 @@ export const useTotalNotes = (
         for (const id of ids) {
           totalNotesById[id] = relations.filter(
             (relation) => relation.fromId === id && relation.toType === "note"
-          );
+          )?.length;
         }
         setTotalNotesById(totalNotesById);
       });

@@ -79,6 +79,8 @@ export default function List(props: ListProps) {
       ? "home"
       : props.renderedInRoute === "Favorites"
       ? "favorites"
+      : props.renderedInRoute === "Trash"
+      ? "trash"
       : `${props.dataType}s`;
 
   const groupOptions = useGroupOptions(groupType);

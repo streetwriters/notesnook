@@ -21,14 +21,9 @@ import React, { PropsWithChildren } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
-import { useSettingStore } from "../../stores/use-setting-store";
-import SelectionHeader from "../selection-header";
 
 export const Container = ({ children }: PropsWithChildren) => {
   const floating = useIsFloatingKeyboard();
-  const introCompleted = useSettingStore(
-    (state) => state.settings.introCompleted
-  );
   const insets = useGlobalSafeAreaInsets();
 
   return (
@@ -42,12 +37,6 @@ export const Container = ({ children }: PropsWithChildren) => {
         paddingBottom: Platform.OS === "android" ? 0 : insets.bottom
       }}
     >
-      {!introCompleted ? null : (
-        <>
-          <SelectionHeader />
-        </>
-      )}
-
       {children}
     </KeyboardAvoidingView>
   );
