@@ -52,6 +52,7 @@ function ConfirmDialog<TCheckId extends string>(
 
   return (
     <Dialog
+      testId="confirm-dialog"
       isOpen={true}
       title={title}
       width={width}

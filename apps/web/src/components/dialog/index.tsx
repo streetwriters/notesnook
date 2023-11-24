@@ -36,6 +36,7 @@ type DialogButtonProps = ButtonProps & {
 };
 
 type DialogProps = SxProp & {
+  testId?: string;
   isOpen?: boolean;
   onClose?: (
     event?: React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>
@@ -65,6 +66,9 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
       shouldFocusAfterRender
       onAfterOpen={(e) => onAfterOpen(e, props)}
       overlayClassName={"theme-scope-dialog"}
+      data={{
+        "test-id": props.testId
+      }}
       style={{
         content: {
           top: 0,

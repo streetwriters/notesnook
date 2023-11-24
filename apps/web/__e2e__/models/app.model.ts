@@ -61,7 +61,7 @@ export class AppModel {
 
   async goToNotes() {
     await this.navigateTo("Notes");
-    return new NotesViewModel(this.page, "home");
+    return new NotesViewModel(this.page, "home", "home");
   }
 
   async goToNotebooks() {
@@ -71,7 +71,7 @@ export class AppModel {
 
   async goToFavorites() {
     await this.navigateTo("Favorites");
-    return new NotesViewModel(this.page, "notes");
+    return new NotesViewModel(this.page, "notes", "favorites");
   }
 
   async goToReminders() {
@@ -86,7 +86,7 @@ export class AppModel {
 
   async goToColor(color: string) {
     await this.navigateTo(color);
-    return new NotesViewModel(this.page, "notes");
+    return new NotesViewModel(this.page, "notes", "notes");
   }
 
   async goToTrash() {
