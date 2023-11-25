@@ -109,7 +109,7 @@ async function makeHtml(note) {
 
 /**
  *
- * @param {"txt" | "pdf" | "md" | "html"} type
+ * @param {"txt" | "pdf" | "md" | "html" | "md-frontmatter"} type
  */
 async function exportAs(type, note, bulk) {
   let data;
@@ -121,6 +121,9 @@ async function exportAs(type, note, bulk) {
       break;
     case "md":
       data = await db.notes.note(note.id).export("md");
+      break;
+    case "md-frontmatter":
+      data = await db.notes.note(note.id).export("md-frontmatter");
       break;
     case "pdf":
       {
@@ -159,7 +162,7 @@ async function exportAs(type, note, bulk) {
 
 /**
  *
- * @param {"txt" | "pdf" | "md" | "html"} type
+ * @param {"txt" | "pdf" | "md" | "html" | "md-frontmatter"} type
  */
 async function exportNote(note, type) {
   let path = await getPath(FolderNames[type]);
@@ -180,7 +183,7 @@ async function exportNote(note, type) {
     filePath: path,
     type: "text/plain",
     name: "Text",
-    fileName: fileName + `.${type}`
+    fileName: fileName + `.${type === "md-frontmatter" ? "md" : type}`
   };
 }
 
@@ -212,7 +215,7 @@ function getUniqueFileName(fileName, results) {
 
 /**
  *
- * @param {"txt" | "pdf" | "md" | "html"} type
+ * @param {"txt" | "pdf" | "md" | "html" | "md-frontmatter"} type
  */
 async function bulkExport(notes, type, callback) {
   let path = await getPath(FolderNames[type]);

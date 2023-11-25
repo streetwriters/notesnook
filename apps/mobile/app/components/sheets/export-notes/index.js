@@ -98,6 +98,16 @@ const ExportNotesSheet = ({ notes, update }) => {
       pro: premium
     },
     {
+      title: "Markdown + Frontmatter",
+      func: async () => {
+        await save("md-frontmatter");
+      },
+      icon: "language-markdown",
+      desc: "View in any text or markdown editor",
+      id: notesnook.ids.dialogs.export.md,
+      pro: premium
+    },
+    {
       title: "Plain Text",
       func: async () => {
         await save("txt");
@@ -178,7 +188,9 @@ const ExportNotesSheet = ({ notes, update }) => {
                 >
                   <Icon
                     name={item.icon}
-                    color={item.pro ? colors.primary.accent : colors.primary.icon}
+                    color={
+                      item.pro ? colors.primary.accent : colors.primary.icon
+                    }
                     size={SIZE.xxxl + 10}
                   />
                 </View>
