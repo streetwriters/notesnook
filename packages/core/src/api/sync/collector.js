@@ -136,19 +136,20 @@ function filterSyncableItems(items, lastSyncedTimestamp, isForceSync) {
     // synced is a local only property
     delete item.synced;
 
-    if (item.localOnly) {
+    if (isUnsynced && isSyncable) {
       ids.push(item.id);
       syncableItems.push(
-        JSON.stringify({
-          id: item.id,
-          deleted: true,
-          dateModified: item.dateModified,
-          deleteReason: "localOnly"
-        })
+        JSON.stringify(
+          item.localOnly
+            ? {
+                id: item.id,
+                deleted: true,
+                dateModified: item.dateModified,
+                deleteReason: "localOnly"
+              }
+            : item
+        )
       );
-    } else if (isUnsynced && isSyncable) {
-      ids.push(item.id);
-      syncableItems.push(JSON.stringify(item));
     }
   }
   return { items: syncableItems, ids };
