@@ -90,7 +90,7 @@ export class KV {
     return this.storage.removeItem(key);
   }
 
-  async removeMulti(...keys) {
+  async removeMulti(keys) {
     return this.storage.removeItems(...keys);
   }
 
@@ -149,7 +149,7 @@ export default {
   clear: () => DefaultStorage.clear(),
   getAllKeys: () => DefaultStorage.getAllKeys(),
   writeMulti: (items) => DefaultStorage.writeMulti(items),
-  removeMulti: (...keys) => DefaultStorage.removeMulti(...keys),
+  removeMulti: (keys) => DefaultStorage.removeMulti(keys),
   encrypt,
   decrypt,
   decryptMulti,
