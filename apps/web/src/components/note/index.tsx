@@ -306,6 +306,12 @@ const formats = [
     subtitle: "Can be opened in any plain-text or markdown editor."
   },
   {
+    type: "md-frontmatter",
+    title: "Markdown + Frontmatter",
+    icon: Markdown,
+    subtitle: "Can be opened in any plain-text or markdown editor."
+  },
+  {
     type: "html",
     title: "HTML",
     icon: HTML,

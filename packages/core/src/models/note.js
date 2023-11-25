@@ -88,6 +88,7 @@ export default class Note {
   async export(to = "html", contentItem, template = true, rawHTML) {
     if (to !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
       return false;
+    if (!this.data) return false;
 
     const templateData = {
       metadata: this.data,
