@@ -16,8 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { MMKVLoader } from "react-native-mmkv-storage";
 import { initalize } from "@notesnook/core/dist/logger";
+import { MMKVLoader } from "react-native-mmkv-storage";
 import { KV } from "./storage";
 
 const LoggerStorage = new MMKVLoader()
@@ -26,4 +26,4 @@ const LoggerStorage = new MMKVLoader()
 
 initalize(new KV(LoggerStorage));
 
-export {};
+export { LoggerStorage };
