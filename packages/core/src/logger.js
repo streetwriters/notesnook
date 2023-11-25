@@ -123,9 +123,9 @@ class DatabaseLogManager {
     }
 
     return Object.keys(logGroups)
-      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+      .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
       .map((key) => ({
-        key: new Date(key).toLocaleDateString(),
+        key,
         logs: logGroups[key]?.sort((a, b) => a.timestamp - b.timestamp)
       }));
   }
