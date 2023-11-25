@@ -154,6 +154,29 @@ module.exports = (env) => {
         {
           test: /\.mjs$|cjs$|js$|jsx$|ts$|tsx$/,
           include: [
+            /node_modules(.*[/\\])+kysely/,
+          ],
+          use: {
+            loader: "babel-loader",
+            options: {
+              configFile: false,
+              cacheDirectory: path.join(
+                __dirname,
+                "node_modules/.webpack-cache"
+              ),
+              babelrc: false,
+              presets: ["module:metro-react-native-babel-preset"],
+              plugins: [
+                "react-native-reanimated/plugin",
+                "@babel/plugin-transform-named-capturing-groups-regex",
+                ["@babel/plugin-transform-private-methods", { "loose": true }]
+              ]
+            },
+          },
+        },
+        {
+          test: /\.mjs$|cjs$|js$|jsx$|ts$|tsx$/,
+          include: [
             /node_modules(.*[/\\])+react/,
             /node_modules(.*[/\\])+@react-native/,
             /node_modules(.*[/\\])+@react-navigation/,
@@ -186,8 +209,6 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+@trpc[/\\]react-query/,
             /node_modules(.*[/\\])+katex/,
             /node_modules(.*[/\\])+@notesnook[/\\]core/,
-            /node_modules(.*[/\\])+kysely/,
-
           ],
           use: {
             loader: "babel-loader",
@@ -202,18 +223,11 @@ module.exports = (env) => {
               plugins: [
                 "react-native-reanimated/plugin",
                 "@babel/plugin-transform-named-capturing-groups-regex",
-              ],
-              overrides: [
-                {
-                  test: '../node_modules/kysley',
-                  plugins: [
-                    ["@babel/plugin-transform-private-methods", { "loose": true }]
-                  ]
-                }
               ]
             },
           },
         },
+      
         /**
          * Here you can adjust loader that will process your files.
          *
@@ -248,6 +262,7 @@ module.exports = (env) => {
             },
           },
         },
+
         /**
          * This loader handles all static assets (images, video, audio and others), so that you can
          * use (reference) them inside your application.
