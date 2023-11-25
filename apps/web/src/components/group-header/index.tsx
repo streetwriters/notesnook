@@ -111,7 +111,8 @@ const sortByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
       {
         key: "dateCreated",
         title: "Date created",
-        isHidden: options.groupingKey === "trash"
+        isHidden:
+          options.groupingKey === "trash" || options.groupingKey === "tags"
       },
       {
         key: "dateEdited",
