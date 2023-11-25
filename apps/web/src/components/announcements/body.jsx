@@ -291,7 +291,9 @@ function CalltoAction({ action, variant, sx, dismissAnnouncement }) {
           case "link": {
             const url = new URL(action.data);
             const target =
-              url.origin === window.location.origin ? "_self" : "_blank";
+              url.origin === window.location.origin && !IS_DESKTOP_APP
+                ? "_self"
+                : "_blank";
             window.open(action.data, target, "noopener noreferrer");
             break;
           }
