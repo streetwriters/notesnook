@@ -171,7 +171,7 @@ export class EditorModel {
       await this.tagInput.fill(tag);
       await this.tagInput.press("Enter");
       await this.tags
-        .locator(":scope", { hasText: new RegExp(`^${tag}$`) })
+        .locator("span", { hasText: new RegExp(`^${tag}$`) })
         .waitFor();
     }
   }
@@ -181,7 +181,7 @@ export class EditorModel {
     const count = await this.tags.count();
     for (let i = 0; i < count; ++i) {
       const item = this.tags.nth(i);
-      const tag = await item.textContent();
+      const tag = await item.locator("span").textContent();
       if (tag) tags.push(tag);
     }
     return tags;
