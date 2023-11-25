@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { isReminderActive } from "../collections/reminders";
-import { GroupHeader, GroupOptions, ItemType } from "../types";
+import { GroupHeader, GroupOptions, ItemType, Reminder } from "../types";
 import { getWeekGroupFromTimestamp, MONTHS_FULL } from "./date";
 
 type PartialGroupableItem = {
@@ -60,7 +60,7 @@ function getKeySelector(
 
     const date = new Date();
     if (item.type === "reminder")
-      return isReminderActive(item) ? "Active" : "Inactive";
+      return isReminderActive(item as Reminder) ? "Active" : "Inactive";
     else if (options.sortBy === "title")
       return getFirstCharacter(getTitle(item));
     else {
