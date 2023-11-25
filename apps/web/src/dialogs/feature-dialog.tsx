@@ -98,6 +98,11 @@ const features: Record<FeatureKeys, Feature> = {
           {
             title: "Restore backups without an account",
             subtitle: "You can now restore backups without logging in."
+          },
+          {
+            title: "Export notes as markdown with frontmatter",
+            subtitle:
+              "You can now preserve all metadata when exporting your notes using the Markdown + Frontmatter export format."
           }
         ],
     cta: {
