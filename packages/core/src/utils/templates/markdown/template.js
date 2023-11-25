@@ -22,15 +22,22 @@ export const template = (data) => `# ${data.title}
 ${data.content}`;
 
 export const templateWithFrontmatter = (data) => `---
-title: ${JSON.stringify(data.title || "")}
-created_at: ${data.createdOn}
-updated_at: ${data.editedOn}
-pinned: ${data.metadata.pinned}
-favorite: ${data.metadata.favorite}
-color: ${data.metadata.color}
-tags: ${data.tags}
+${buildFrontmatter(data)}
 ---
 
 # ${data.title}
 
 ${data.content}`;
+
+function buildFrontmatter(data) {
+  const lines = [
+    `title: ${JSON.stringify(data.title || "")}`,
+    `created_at: ${data.createdOn}`,
+    `updated_at: ${data.editedOn}`
+  ];
+  if (data.metadata.pinned) lines.push(`pinned: ${data.metadata.pinned}`);
+  if (data.metadata.favorite) lines.push(`favorite: ${data.metadata.favorite}`);
+  if (data.metadata.color) lines.push(`color: ${data.metadata.color}`);
+  if (data.tags) lines.push(`tags: ${data.tags}`);
+  return lines.join("\n");
+}

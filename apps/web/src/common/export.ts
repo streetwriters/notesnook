@@ -25,6 +25,14 @@ import { showToast } from "../utils/toast";
 import { sanitizeFilename } from "@notesnook/common";
 import Vault from "./vault";
 
+const FORMAT_TO_EXT = {
+  pdf: "pdf",
+  md: "md",
+  txt: "txt",
+  html: "html",
+  "md-frontmatter": "md"
+} as const;
+
 export async function exportToPDF(
   title: string,
   content: string
@@ -69,7 +77,7 @@ export async function exportToPDF(
 }
 
 export async function exportNotes(
-  format: "pdf" | "md" | "txt" | "html",
+  format: "pdf" | "md" | "txt" | "html" | "md-frontmatter",
   noteIds: string[]
 ): Promise<boolean> {
   return await TaskManager.startTask({
@@ -139,10 +147,10 @@ export async function exportNotes(
       if (files.length === 1) {
         saveAs(
           new Blob([Buffer.from(files[0].content, "utf-8")]),
-          `${sanitizeFilename(files[0].filename)}.${format}`
+          `${sanitizeFilename(files[0].filename)}.${FORMAT_TO_EXT[format]}`
         );
       } else {
-        const zipped = await zip(files, format);
+        const zipped = await zip(files, FORMAT_TO_EXT[format]);
         saveAs(new Blob([zipped.buffer]), "notes.zip");
       }
 
