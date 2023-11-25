@@ -210,7 +210,12 @@ export default class Attachments extends Collection {
     if (!localOnly && !(await this._canDetach(attachment)))
       throw new Error("This attachment is inside a locked note.");
 
-    if (await this._db.fs.deleteFile(attachment.metadata.hash, localOnly)) {
+    if (
+      await this._db.fs.deleteFile(
+        attachment.metadata.hash,
+        localOnly || !attachment.dateUploaded
+      )
+    ) {
       if (!localOnly) {
         await this.detach(attachment);
       }
