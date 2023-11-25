@@ -361,6 +361,7 @@ async function multiPartUploadFile(
     );
   };
 
+  onUploadProgress({ bytes: 0, loaded: 0 });
   for (let i = uploadedChunks.length; i < TOTAL_PARTS; ++i) {
     const blob = await fileHandle.readChunks(
       i * UPLOAD_PART_REQUIRED_CHUNKS,
@@ -372,7 +373,7 @@ async function multiPartUploadFile(
       .request({
         url,
         method: "PUT",
-        headers: { "Content-Type": "" },
+        headers: { "Content-Type": "", "X-Content-Length": data.byteLength },
         signal,
         data,
         onUploadProgress
@@ -393,6 +394,8 @@ async function multiPartUploadFile(
     });
     await fileHandle.addAdditionalData("uploadedChunks", uploadedChunks);
     await fileHandle.addAdditionalData("uploadedBytes", uploadedBytes);
+
+    onUploadProgress({ bytes: 0, loaded: blob.size });
   }
 
   await axios
