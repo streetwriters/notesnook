@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Platform, Text, View } from "react-native";
 import * as RNIap from "react-native-iap";
-import { db } from "../../common/database";
+import { DatabaseLogger, db } from "../../common/database";
 import { usePricing } from "../../hooks/use-pricing";
 import {
   eSendEvent,
@@ -48,6 +48,20 @@ import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { PricingItem } from "./pricing-item";
 import { useSettingStore } from "../../stores/use-setting-store";
+
+const UUID_PREFIX = "0bdaea";
+const UUID_VERSION = "4";
+const UUID_VARIANT = "a";
+
+function toUUID(str: string) {
+  return [
+    UUID_PREFIX + str.substring(0, 2), // 6 digit prefix + first 2 oid digits
+    str.substring(2, 6), // # next 4 oid digits
+    UUID_VERSION + str.substring(6, 9), // # 1 digit version(0x4) + next 3 oid digits
+    UUID_VARIANT + str.substring(9, 12), // # 1 digit variant(0b101) + 1 zero bit + next 3 oid digits
+    str.substring(12)
+  ].join("-");
+}
 
 const promoCyclesMonthly = {
   1: "first month",
@@ -177,11 +191,15 @@ export const PricingPlans = ({
               .offerToken
           : null;
 
+      DatabaseLogger.info(
+        `Subscription Requested initiated for user ${toUUID(user.id)}`
+      );
+
       await RNIap.requestSubscription({
         sku: product?.productId,
         obfuscatedAccountIdAndroid: user.id,
         obfuscatedProfileIdAndroid: user.id,
-        appAccountToken: user.id,
+        appAccountToken: toUUID(user.id),
         andDangerouslyFinishTransactionAutomaticallyIOS: false,
         subscriptionOffers: androidOfferToken
           ? [

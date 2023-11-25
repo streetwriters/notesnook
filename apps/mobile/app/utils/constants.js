@@ -75,7 +75,7 @@ export const SUBSCRIPTION_STATUS_STRINGS = {
   2: Platform.OS === "ios" ? "Pro" : "Beta",
   5: "Pro",
   6: "Expired",
-  7: "Pro"
+  7: "Pro (cancelled)"
 };
 
 export const SUBSCRIPTION_PROVIDER = {
