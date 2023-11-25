@@ -96,11 +96,16 @@ class DatabaseLogWriter {
 
   async rotate() {
     const logKeys = (await this.storage.getAllKeys()).sort();
+    const keysToRemove = [];
     for (let key of logKeys) {
       const keyParts = key.split(":");
       if (keyParts.length === 1 || parseInt(keyParts[1]) < Date.now() - WEEK) {
-        await this.storage.remove(key);
+        keysToRemove.push(key);
       }
+    }
+
+    if (keysToRemove.length) {
+      await this.storage.removeMulti(...keysToRemove);
     }
   }
 }
@@ -137,9 +142,7 @@ class DatabaseLogManager {
 
   async clear() {
     const logKeys = await this.storage.getAllKeys();
-    for (const key of logKeys) {
-      await this.storage.remove(key);
-    }
+    await this.storage.removeMulti(...logKeys);
   }
 
   async delete(key) {
