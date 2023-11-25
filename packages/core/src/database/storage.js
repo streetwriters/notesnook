@@ -48,8 +48,8 @@ export default class Storage {
     return this.storage.remove(key);
   }
 
-  removeMulti(...keys) {
-    return this.storage.removeMulti(...keys);
+  removeMulti(keys) {
+    return this.storage.removeMulti(keys);
   }
 
   getAllKeys() {

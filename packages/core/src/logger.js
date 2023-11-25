@@ -105,7 +105,7 @@ class DatabaseLogWriter {
     }
 
     if (keysToRemove.length) {
-      await this.storage.removeMulti(...keysToRemove);
+      await this.storage.removeMulti(keysToRemove);
     }
   }
 }
@@ -142,7 +142,7 @@ class DatabaseLogManager {
 
   async clear() {
     const logKeys = await this.storage.getAllKeys();
-    await this.storage.removeMulti(...logKeys);
+    await this.storage.removeMulti(logKeys);
   }
 
   async delete(key) {

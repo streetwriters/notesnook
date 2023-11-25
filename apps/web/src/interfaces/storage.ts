@@ -70,6 +70,10 @@ export class NNStorage {
     return this.database.delete(key);
   }
 
+  removeMulti(keys: string[]) {
+    return this.database.deleteMany(keys);
+  }
+
   clear() {
     return this.database.clear();
   }
