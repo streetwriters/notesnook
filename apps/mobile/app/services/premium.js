@@ -233,7 +233,7 @@ const subscriptions = {
    *
    * @returns {RNIap.Purchase} subscription
    */
-  get: async () => {
+  get: () => {
     if (Platform.OS === "android") return;
     let _subscriptions = MMKV.getString("subscriptionsIOS");
     if (!_subscriptions) return [];
@@ -299,12 +299,14 @@ const subscriptions = {
             "Content-Type": "application/json"
           }
         };
+
+        console.log("Subscription.verify", requestData);
         try {
           let result = await fetch(
-            "https://payments.streetwriters.co/apple/verify",
+            "http://192.168.43.5:4264/apple/verify",
             requestData
           );
-
+          console.log("Subscribed", result);
           let text = await result.text();
 
           if (!result.ok) {
@@ -312,6 +314,8 @@ const subscriptions = {
               await subscriptions.clear(subscription);
             }
             return;
+          } else {
+            await subscriptions.clear(subscription);
           }
         } catch (e) {
           console.log("subscription error", e);
@@ -321,15 +325,18 @@ const subscriptions = {
   },
   clear: async (_subscription) => {
     if (Platform.OS === "android") return;
-    let _subscriptions = await subscriptions.get();
+    let _subscriptions = subscriptions.get();
     let subscription = null;
     if (_subscription) {
       subscription = _subscription;
     } else {
       subscription = _subscriptions.length > 0 ? _subscriptions[0] : null;
     }
+
     if (subscription) {
-      await RNIap.finishTransaction(subscription.transactionId);
+      await RNIap.finishTransaction({
+        purchase: subscription
+      });
       await RNIap.clearTransactionIOS();
       await subscriptions.remove(subscription.transactionId);
     }

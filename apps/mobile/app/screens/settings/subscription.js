@@ -42,6 +42,9 @@ export const Subscription = () => {
     user?.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
     user?.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
 
+  const hasCancelledPremium =
+    SUBSCRIPTION_STATUS.PREMIUM_CANCELLED === user?.subscription?.type;
+
   const subscriptionProviderInfo =
     SUBSCRIPTION_PROVIDER[user?.subscription?.provider];
 
@@ -63,10 +66,7 @@ export const Subscription = () => {
       return;
     }
 
-    if (
-      user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
-      Platform.OS === "android"
-    ) {
+    if (hasCancelledPremium && Platform.OS === "android") {
       if (user.subscription?.provider === 3) {
         ToastEvent.show({
           heading: "Subscribed on web",
@@ -111,16 +111,14 @@ export const Subscription = () => {
           title={
             !user?.isEmailConfirmed
               ? "Confirm your email"
-              : user.subscription?.provider === 3 &&
-                user.subscription?.type ===
-                  SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
+              : user.subscription?.provider === 3 && hasCancelledPremium
               ? "Manage subscription from desktop app"
-              : user.subscription?.type ===
-                  SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
+              : hasCancelledPremium &&
                 Platform.OS === "android" &&
                 Config.GITHUB_RELEASE !== "true"
               ? "Resubscribe from Google Playstore"
-              : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
+              : user.subscription?.type ===
+                  SUBSCRIPTION_STATUS.PREMIUM_EXPIRED || hasCancelledPremium
               ? `Resubscribe to Pro (${getPrice() || "$4.49"} / mo)`
               : `Get Pro (${getPrice() || "$4.49"} / mo)`
           }

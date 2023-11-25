@@ -460,7 +460,6 @@ export const useAppEvents = () => {
         }
 
         clearMessage();
-        subscribeToIAPListeners();
         if (!login) {
           user = await db.user.fetchUser();
           setUser(user);
@@ -479,7 +478,11 @@ export const useAppEvents = () => {
             userEmailConfirmed: true
           });
         }
+
+        subscribeToIAPListeners();
       } catch (e) {
+        DatabaseLogger.error(error);
+
         ToastEvent.error(e, "An error occurred", "global");
       }
 
@@ -503,14 +506,15 @@ export const useAppEvents = () => {
   );
 
   const subscribeToIAPListeners = useCallback(async () => {
-    RNIap.flushFailedPurchasesCachedAsPendingAndroid()
-      .catch(() => {})
-      .then(() => {
-        refValues.current.subsriptionSuccessListener =
-          RNIap.purchaseUpdatedListener(onSuccessfulSubscription);
-        refValues.current.subsriptionErrorListener =
-          RNIap.purchaseErrorListener(onSubscriptionError);
-      });
+    if (Platform.OS === "android") {
+      try {
+        await RNIap.flushFailedPurchasesCachedAsPendingAndroid();
+      } catch (e) {}
+    }
+    refValues.current.subsriptionSuccessListener =
+      RNIap.purchaseUpdatedListener(onSuccessfulSubscription);
+    refValues.current.subsriptionErrorListener =
+      RNIap.purchaseErrorListener(onSubscriptionError);
   }, []);
 
   const unSubscribeFromIAPListeners = () => {
