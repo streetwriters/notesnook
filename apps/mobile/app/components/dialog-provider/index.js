@@ -24,7 +24,6 @@ import { AnnouncementDialog } from "../announcements";
 import AuthModal from "../auth/auth-modal";
 import { SessionExpired } from "../auth/session-expired";
 import { Dialog } from "../dialog";
-import { AddTopicDialog } from "../dialogs/add-topic";
 import JumpToSectionDialog from "../dialogs/jump-to-section";
 import { LoadingDialog } from "../dialogs/loading";
 import PDFPreview from "../dialogs/pdf-preview";
