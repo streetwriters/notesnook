@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text, Flex, Button, Image, Box } from "@theme-ui/components";
+import { Text, Flex, Button, Image, Box, Link } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import {
   Pro,
@@ -417,9 +417,21 @@ function CrossPlatform() {
   return (
     <Flex my={4} sx={{ alignItems: "center" }}>
       {isMacStoreApp() ? null : (
-        <Image src={GooglePlay} sx={{ flexShrink: 0, width: 135 }} />
+        <Link
+          href="https://play.google.com/store/apps/details?id=com.streetwriters.notesnook"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Image src={GooglePlay} sx={{ flexShrink: 0, width: 135 }} />
+        </Link>
       )}
-      <Image src={AppleStore} sx={{ flexShrink: 0, width: 110 }} />
+      <Link
+        href="https://apps.apple.com/us/app/notesnook-take-private-notes/id1544027013"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Image src={AppleStore} sx={{ flexShrink: 0, width: 110 }} />
+      </Link>
     </Flex>
   );
 }

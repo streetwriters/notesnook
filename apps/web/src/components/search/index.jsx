@@ -29,7 +29,7 @@ function SearchBox({ onSearch }) {
       id="search"
       name="search"
       type="text"
-      sx={{ m: 0, mx: 2, mt: 1 }}
+      sx={{ m: 0, mx: 2, mt: 1, mb: 1 }}
       placeholder="Type your query here"
       onChange={debounce((e) => onSearch(e.target.value), 250)}
       action={{

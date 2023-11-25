@@ -108,7 +108,8 @@ function PasswordDialog(props) {
               sx={{
                 fontSize: "body",
                 fontFamily: "body",
-                alignItems: "center"
+                alignItems: "center",
+                color: "paragraph"
               }}
             >
               <Checkbox id={check.key} name={check.key} />

@@ -127,6 +127,8 @@ export function Importer() {
                 <Link
                   href="https://help.notesnook.com/importing-notes/import-notes-from-evernote"
                   target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ color: "accent" }}
                 >
                   import guide
                 </Link>{" "}
