@@ -34,7 +34,7 @@ import {
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import TimeAgo from "../time-ago";
-import { hardNavigate, hashNavigate, navigate } from "../../navigation";
+import { hardNavigate, hashNavigate } from "../../navigation";
 import { useAutoUpdater, UpdateStatus } from "../../hooks/use-auto-updater";
 import {
   showIssueDialog,
@@ -67,39 +67,33 @@ function StatusBar() {
       {isFocusMode ? (
         <Flex />
       ) : (
-        <Flex>
+        <Flex sx={{ gap: 1 }}>
           {isLoggedIn ? (
             <>
-              <Button
-                onClick={() =>
-                  user?.isEmailConfirmed
-                    ? navigate("/settings")
-                    : hashNavigate("/email/verify")
-                }
-                variant="statusitem"
-                sx={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  display: "flex"
-                }}
-              >
-                <Circle
-                  size={7}
-                  color={
-                    user?.isEmailConfirmed
-                      ? "var(--icon-success)"
-                      : "var(--icon-error)"
-                  }
-                />
-                <Text
-                  className="selectable"
-                  variant="subBody"
-                  ml={1}
-                  sx={{ color: "paragraph" }}
+              {user?.isEmailConfirmed ? (
+                <Circle size={7} color={"var(--icon-success)"} />
+              ) : (
+                <Button
+                  onClick={() => hashNavigate("/email/verify")}
+                  variant="statusitem"
+                  sx={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    display: "flex",
+                    height: "100%"
+                  }}
                 >
-                  {user?.isEmailConfirmed ? "" : "Email not confirmed"}
-                </Text>
-              </Button>
+                  <Circle size={7} color={"var(--icon-error)"} />
+                  <Text
+                    className="selectable"
+                    variant="subBody"
+                    ml={1}
+                    sx={{ color: "paragraph" }}
+                  >
+                    Email not confirmed
+                  </Text>
+                </Button>
+              )}
 
               <SyncStatus />
             </>
