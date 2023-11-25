@@ -59,8 +59,7 @@ class DatabaseLogWriter {
    */
   constructor(storage) {
     this.storage = storage;
-    this.key = new Date().toLocaleDateString();
-    this.queue = {};
+    this.queue = new Map();
     this.hasCleared = false;
     setInterval(() => {
       setTimeout(() => {
@@ -74,22 +73,14 @@ class DatabaseLogWriter {
   }
 
   push(message) {
-    this.queue[`${this.key}:${message.timestamp}`] = message;
-  }
-
-  async read() {
-    const logKeys = await this.storage.getAllKeys();
-    const keys = [];
-    for (let key of logKeys) {
-      if (key.startsWith(this.key)) keys.push(key);
-    }
-    return Object.values(await this.storage.readMulti(keys));
+    const key = new Date(message.timestamp).toLocaleDateString();
+    this.queue.set(`${key}:${message.timestamp}`, message);
   }
 
   async flush() {
-    if (Object.keys(this.queue).length === 0) return;
-    const queueCopy = Object.entries(this.queue);
-    this.queue = {};
+    if (this.queue.size === 0) return;
+    const queueCopy = Array.from(this.queue.entries());
+    this.queue = new Map();
 
     await this.storage.writeMulti(queueCopy);
   }
@@ -104,9 +95,7 @@ class DatabaseLogWriter {
       }
     }
 
-    if (keysToRemove.length) {
-      await this.storage.removeMulti(keysToRemove);
-    }
+    if (keysToRemove.length) await this.storage.removeMulti(keysToRemove);
   }
 }
 
@@ -121,23 +110,24 @@ class DatabaseLogManager {
 
   async get() {
     const logKeys = await this.storage.getAllKeys();
-    const logs = {};
+    const logs = await this.storage.readMulti(logKeys);
+    const logGroups = {};
 
-    for (const logKey of logKeys) {
-      const keyParts = logKey.split(":");
+    for (const [key, log] of logs) {
+      const keyParts = key.split(":");
       if (keyParts.length === 1) continue;
-      const key = keyParts[0];
 
-      const log = await this.storage.read(logKey, true);
-
-      if (!logs[key]) logs[key] = [];
-      logs[key].push(log);
+      const groupKey = keyParts[0];
+      if (!logGroups[groupKey]) logGroups[groupKey] = [];
+      logGroups[groupKey].push(log);
     }
 
-    return Object.keys(logs).map((key) => ({
-      key: key,
-      logs: logs[key]?.sort((a, b) => a.timestamp - b.timestamp)
-    }));
+    return Object.keys(logGroups)
+      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+      .map((key) => ({
+        key: new Date(key).toLocaleDateString(),
+        logs: logGroups[key]?.sort((a, b) => a.timestamp - b.timestamp)
+      }));
   }
 
   async clear() {
@@ -147,14 +137,14 @@ class DatabaseLogManager {
 
   async delete(key) {
     const logKeys = await this.storage.getAllKeys();
+    const keysToRemove = [];
     for (const logKey of logKeys) {
       const keyParts = logKey.split(":");
       if (keyParts.length === 1) continue;
       const currKey = keyParts[0];
-      if (currKey === key) {
-        await this.storage.remove(logKey);
-      }
+      if (currKey === key) keysToRemove.push(logKey);
     }
+    if (keysToRemove.length) await this.storage.removeMulti(keysToRemove);
   }
 }
 
