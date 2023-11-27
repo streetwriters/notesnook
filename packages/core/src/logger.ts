@@ -81,7 +81,7 @@ class DatabaseLogWriter {
   async rotate() {
     const logKeys = (await this.storage.getAllKeys()).sort();
     const keysToRemove = [];
-    for (let key of logKeys) {
+    for (const key of logKeys) {
       const keyParts = key.split(":");
       if (keyParts.length === 1 || parseInt(keyParts[1]) < Date.now() - WEEK) {
         keysToRemove.push(key);
