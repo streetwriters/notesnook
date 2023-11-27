@@ -265,7 +265,6 @@ export class Notes implements ICollection {
           );
 
     const content = getContentFromData(type, data);
-
     const contentString =
       rawContent ||
       (format === "html"
@@ -274,10 +273,19 @@ export class Notes implements ICollection {
         ? content.toMD()
         : content.toTXT());
 
+    const tags = (await this.db.relations.to(note, "tag").resolve()).map(
+      (tag) => tag.title
+    );
+    const color = (await this.db.relations.to(note, "color").resolve(1)).at(
+      0
+    )?.title;
+
     return options?.disableTemplate
       ? contentString
       : buildFromTemplate(format, {
           ...note,
+          tags,
+          color,
           content: contentString
         });
   }

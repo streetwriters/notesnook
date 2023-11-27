@@ -42,6 +42,7 @@ export interface IStorage {
   readMulti<T>(keys: string[]): Promise<[string, T][]>;
   read<T>(key: string, isArray?: boolean): Promise<T | undefined>;
   remove(key: string): Promise<void>;
+  removeMulti(keys: string[]): Promise<void>;
   clear(): Promise<void>;
   getAllKeys(): Promise<string[]>;
   encrypt(key: SerializedKey, plainText: string): Promise<Cipher<"base64">>;
