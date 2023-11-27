@@ -22,7 +22,11 @@ import { buildHTML } from "./html";
 import { buildMarkdown, templateWithFrontmatter } from "./md";
 import { buildText } from "./text";
 
-export type TemplateData = Note & { content: string };
+export type TemplateData = Omit<Note, "tags" | "color"> & {
+  tags?: string[];
+  color?: string;
+  content: string;
+};
 
 export async function buildFromTemplate(
   format: "md" | "txt" | "html" | "md-frontmatter",
