@@ -105,7 +105,17 @@ export const NotebookItem = ({
           useNotebookItemSelectionStore.setState({
             multiSelect: true
           });
-          useNotebookItemSelectionStore.getState().markAs(item, "selected");
+          const state = useNotebookItemSelectionStore.getState();
+          useNotebookItemSelectionStore
+            .getState()
+            .markAs(
+              item,
+              !isSelected
+                ? "selected"
+                : !state.initialState[id]
+                ? undefined
+                : "deselected"
+            );
         }}
         testID={`add-to-notebook-item-${currentLevel}-${index}`}
         onPress={onPress}
@@ -180,7 +190,7 @@ export const NotebookItem = ({
             }
             size={SIZE.sm}
           >
-            {item?.title}{" "}
+            {item?.title}
           </Paragraph>
         </View>
 
