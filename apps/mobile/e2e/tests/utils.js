@@ -135,7 +135,6 @@ async function createNotebook(
   topic = true,
   topicCount = 1
 ) {
-  await tapByText("Add your first notebook");
   await elementById(notesnook.ids.dialogs.notebook.inputs.title).typeText(
     title
   );
@@ -144,15 +143,7 @@ async function createNotebook(
       notesnook.ids.dialogs.notebook.inputs.description
     ).typeText(`Description of ${title}`);
   }
-  if (topic) {
-    for (let i = 1; i <= topicCount; i++) {
-      await elementById(notesnook.ids.dialogs.notebook.inputs.topic).typeText(
-        i === 1 ? "Topic" : "Topic " + i
-      );
-      await tapById("topic-add-button");
-    }
-  }
-  await tapByText("Save");
+  await tapByText("Add");
   await sleep(500);
 }
 

@@ -42,7 +42,7 @@ const Sort = ({ type, screen }) => {
     setGroupOptions(_groupOptions);
     setTimeout(() => {
       if (screen !== "TopicSheet") Navigation.queueRoutesForUpdate(screen);
-      eSendEvent(eGroupOptionsUpdated, type);
+      eSendEvent(eGroupOptionsUpdated, groupType);
       eSendEvent(refreshNotesPage);
     }, 1);
   };

@@ -48,7 +48,7 @@ export const Tags = ({ item, close }) => {
     >
       <Button
         onPress={async () => {
-          ManageTagsSheet.present([item]);
+          ManageTagsSheet.present([item.id]);
         }}
         buttonType={{
           text: colors.primary.accent

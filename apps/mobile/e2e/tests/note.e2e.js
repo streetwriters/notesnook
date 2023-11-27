@@ -94,7 +94,7 @@ describe("NOTE TESTS", () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Copy");
+    await tapById("icon-copy");
     await visibleByText("Note copied to clipboard");
   });
 

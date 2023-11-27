@@ -70,8 +70,6 @@ export const useActions = ({
   item: Note | Notebook | Reminder | Tag | Color | TrashItem;
   close: () => void;
 }) => {
-  const clearSelection = useSelectionStore((state) => state.clearSelection);
-  const setSelectedItem = useSelectionStore((state) => state.setSelectedItem);
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
@@ -144,8 +142,11 @@ export const useActions = ({
   async function pinItem() {
     if (!item.id) return;
     close();
-    const type = item.type as "note" | "notebook";
-    await (db as any)[`${type}s`][type](item.id)?.pin();
+    if (item.type === "note") {
+      await db.notes.pin(!item?.pinned, item.id);
+    } else if (item.type === "notebook") {
+      await db.notebooks.pin(!item?.pinned, item.id);
+    }
 
     Navigation.queueRoutesForUpdate();
   }
@@ -501,7 +502,7 @@ export const useActions = ({
     async function addToFavorites() {
       if (!item.id || item.type !== "note") return;
       close();
-      await db.notes.favorite(item.favorite, item.id);
+      await db.notes.favorite(!item.favorite, item.id);
       Navigation.queueRoutesForUpdate();
     }
 

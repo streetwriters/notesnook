@@ -29,6 +29,12 @@ const configs = {
           plugins: [
             ["@babel/plugin-transform-private-methods", { "loose": true }]
           ]
+        },
+        {
+          test: '../node_modules/jest-runner',
+          plugins: [
+            ["@babel/plugin-transform-private-methods", { "loose": true }]
+          ]
         }
       ]
       

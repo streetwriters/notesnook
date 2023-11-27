@@ -107,23 +107,6 @@ describe("Sort & filter", () => {
     await visibleByText("Month");
   });
 
-  it("Sort notes in topic", async () => {
-    await prepare();
-    await navigate("Notebooks");
-    await sleep(500);
-    await createNotebook("Notebook 1", true, true);
-    await sleep(500);
-    await device.pressBack();
-    await sleep(500);
-    await tapByText("Topic");
-    await createNote("A", "A letter");
-    await sleep(500);
-    await createNote("B", "B letter");
-    await sortBy("Abc");
-    await sleep(300);
-    await visibleByText("N");
-  });
-
   it("Compact mode", async () => {
     await prepare();
     await createNote("Note 1", "Note 1");

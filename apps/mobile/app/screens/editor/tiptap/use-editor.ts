@@ -454,7 +454,10 @@ export const useEditor = (
         if (!currentNote.current.locked && isContentEncrypted) {
           lockNoteWithVault(note);
         } else if (currentNote.current.locked && isEncryptedContent(data)) {
-          const decryptedContent = await db.vault?.decryptContent(data);
+          const decryptedContent = await db.vault?.decryptContent(
+            data,
+            currentNote?.current?.id
+          );
           if (!decryptedContent) {
             lockNoteWithVault(note);
           } else {

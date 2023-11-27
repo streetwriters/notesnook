@@ -185,6 +185,11 @@ export const SectionHeader = React.memo<
   },
   (prev, next) => {
     if (prev.item.title !== next.item.title) return false;
+    if (prev.groupOptions?.groupBy !== next.groupOptions.groupBy) return false;
+    if (prev.groupOptions?.sortDirection !== next.groupOptions.sortDirection)
+      return false;
+    if (prev.groupOptions?.sortBy !== next.groupOptions.sortBy) return false;
+
     return true;
   }
 );
