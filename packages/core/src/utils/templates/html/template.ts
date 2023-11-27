@@ -38,7 +38,11 @@ export function template(data: TemplateData) {
       data.favorite ? `<meta name="favorite" content="${data.favorite}" />` : ""
     }
     ${data.color ? `<meta name="color" content="${data.color}" />` : ""}
-    ${data.tags ? `<meta name="tags" content="${data.tags.join(", ")}" />` : ""}
+    ${
+      data.tags && data.tags.length
+        ? `<meta name="tags" content="${data.tags.join(", ")}" />`
+        : ""
+    }
     <link rel="stylesheet" href="https://app.notesnook.com/assets/editor-styles.css?d=${
       process.env.NN_BUILD_TIMESTAMP || "1690887574068"
     }">
