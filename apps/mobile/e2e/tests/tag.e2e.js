@@ -46,7 +46,7 @@ describe("Tags", () => {
     await visibleByText(note.body);
   });
 
-  it.only("Untag a note", async () => {
+  it("Untag a note", async () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);

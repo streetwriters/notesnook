@@ -93,7 +93,7 @@ const publishNote = async (editor: useEditorType) => {
   }
   const currentNote = editor?.note?.current;
   if (currentNote?.id) {
-    const note = db.notes?.note(currentNote.id)?.data;
+    const note = await db.notes?.note(currentNote.id);
     if (note?.locked) {
       ToastManager.show({
         heading: "Locked notes cannot be published",
@@ -112,7 +112,7 @@ const publishNote = async (editor: useEditorType) => {
 const showActionsheet = async (editor: useEditorType) => {
   const currentNote = editor?.note?.current;
   if (currentNote?.id) {
-    const note = db.notes?.note(currentNote.id)?.data;
+    const note = await db.notes?.note(currentNote.id);
 
     if (editorState().isFocused || editorState().isFocused) {
       editorState().isFocused = true;
@@ -324,7 +324,7 @@ export const useEditorEvents = (
   }, [editor.editorId, onClearEditorSessionRequest, onLoadNote]);
 
   const onMessage = useCallback(
-    (event: WebViewMessageEvent) => {
+    async (event: WebViewMessageEvent) => {
       const data = event.nativeEvent.data;
       const editorMessage = JSON.parse(data) as EditorMessage;
 
@@ -387,7 +387,7 @@ export const useEditorEvents = (
             });
             return;
           }
-          ManageTagsSheet.present([editor.note.current]);
+          ManageTagsSheet.present([editor.note.current?.id]);
           break;
         case EventTypes.tag:
           if (editorMessage.value) {
@@ -439,9 +439,9 @@ export const useEditorEvents = (
 
         case EventTypes.previewAttachment: {
           const hash = (editorMessage.value as Attachment)?.hash;
-          const attachment = db.attachments?.attachment(hash);
+          const attachment = await db.attachments?.attachment(hash);
           if (!attachment) return;
-          if (attachment.metadata.type.startsWith("image/")) {
+          if (attachment.type.startsWith("image/")) {
             eSendEvent("ImagePreview", editorMessage.value);
           } else {
             eSendEvent("PDFPreview", attachment);
