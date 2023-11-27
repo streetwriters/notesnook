@@ -49,11 +49,13 @@ export const SelectionHeader = React.memo(
   ({
     items,
     type,
-    id
+    id,
+    renderedInRoute
   }: {
     items?: VirtualizedGrouping<Item>;
     id?: string;
     type?: ItemType;
+    renderedInRoute?: string;
   }) => {
     const { colors } = useThemeColors();
     const selectionMode = useSelectionStore((state) => state.selectionMode);
@@ -220,8 +222,7 @@ export const SelectionHeader = React.memo(
             size={SIZE.xl}
           />
 
-          {type === "note" ||
-          (type === "notebook" && focusedRouteId === "Notebooks") ? null : (
+          {type !== "note" ? null : (
             <>
               <IconButton
                 onPress={async () => {
@@ -268,19 +269,13 @@ export const SelectionHeader = React.memo(
             </>
           )}
 
-          {type === "notebook" && focusedRouteId !== "Notebooks" ? (
+          {renderedInRoute === "Notebook" ? (
             <IconButton
               onPress={async () => {
                 if (selectedItemsList.length > 0) {
-                  const { focusedRouteId } = useNavigationStore.getState();
-                  if (!focusedRouteId) return;
-
-                  await db.notes.removeFromNotebook(
-                    focusedRouteId,
-                    ...selectedItemsList
-                  );
-
-                  updateNotebook(focusedRouteId);
+                  if (!id) return;
+                  await db.notes.removeFromNotebook(id, ...selectedItemsList);
+                  updateNotebook(id);
                   Navigation.queueRoutesForUpdate();
                   clearSelection();
                 }

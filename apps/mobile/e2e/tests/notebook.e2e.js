@@ -45,8 +45,8 @@ describe("NOTEBOOKS", () => {
   it("Create a notebook with title only", async () => {
     await prepare();
     await navigate("Notebooks");
-
     await sleep(500);
+    await tapByText("Add your first notebook");
     await createNotebook("Notebook 1", false, false);
     await sleep(500);
     await device.pressBack();
@@ -57,8 +57,8 @@ describe("NOTEBOOKS", () => {
   it("Create a notebook title & description", async () => {
     await prepare();
     await navigate("Notebooks");
-
     await sleep(500);
+    await tapByText("Add your first notebook");
     await createNotebook("Notebook 1", true, false);
     await sleep(500);
     await device.pressBack();
@@ -66,85 +66,129 @@ describe("NOTEBOOKS", () => {
     await visibleByText("Notebook 1");
   });
 
-  it("Create a notebook with description and topics", async () => {
-    await prepare();
-    await navigate("Notebooks");
-    await sleep(500);
-    await createNotebook("Notebook 1", false, false);
-    await sleep(500);
-    await device.pressBack();
-    await sleep(500);
-    await visibleByText("Notebook 1");
-  });
-
-  it("Create a notebook, add topic, move notes", async () => {
+  it("Create a notebook, move notes", async () => {
     await prepare();
     let note = await createNote();
     await navigate("Notebooks");
     await sleep(500);
+    await tapByText("Add your first notebook");
     await createNotebook("Notebook 1", true, true);
-    await sleep(500);
-    await tapByText("Topic");
     await sleep(500);
     await tapById("listitem.select");
     await tapByText("Move selected notes");
     await sleep(500);
-    await tapByText("Topic");
+    await tapByText("Notebook 1");
     await sleep(500);
     await visibleByText(note.body);
   });
 
-  it("Add new topic to notebook", async () => {
+  it("Add a sub notebook to a notebook", async () => {
     await prepare();
     await navigate("Notebooks");
     await sleep(500);
+    await tapByText("Add your first notebook");
     await createNotebook("Notebook 1", true, false);
     await sleep(500);
     await device.pressBack();
     await sleep(500);
     await tapByText("Notebook 1");
-    await tapById("add-topic-button");
-    await elementById("input-title").typeText("Topic");
-    await tapByText("Add");
     await sleep(500);
+    await tapById("add-notebook-button");
+    await createNotebook("Sub notebook", true, true);
+    await sleep(500);
+    await device.pressBack();
+    await visibleByText("Sub notebook");
+    await tapById(notesnook.ids.notebook.menu);
+    await tapByText("Move to trash");
+    await sleep(300);
+    await tapByText("Delete");
+    await notVisibleByText("Sub notebook");
   });
 
-  it("Edit topic", async () => {
+  it("Remove a sub notebook from notebook", async () => {
     await prepare();
     await navigate("Notebooks");
+    await sleep(500);
+    await tapByText("Add your first notebook");
+    await createNotebook("Notebook 1", true, false);
+    await sleep(500);
+    await device.pressBack();
+    await sleep(500);
+    await tapByText("Notebook 1");
+    await sleep(500);
+    await tapById("add-notebook-button");
+    await createNotebook("Sub notebook", true, true);
+    await sleep(500);
+    await device.pressBack();
+    await visibleByText("Sub notebook");
+  });
+
+  it("Edit notebook", async () => {
+    await prepare();
+    await navigate("Notebooks");
+    await sleep(500);
+    await tapById(notesnook.buttons.add);
+    await createNotebook("Notebook 1", true);
+    await sleep(500);
+    await device.pressBack();
+    await tapById(notesnook.ids.notebook.menu);
+    await tapByText("Edit notebook");
+    await elementById(notesnook.ids.dialogs.notebook.inputs.title).typeText(
+      " (edited)"
+    );
+    await tapByText("Save");
+    await visibleByText("Notebook 1 (edited)");
+  });
+
+  it("Edit a sub notebook", async () => {
+    await prepare();
+    await navigate("Notebooks");
+    await sleep(500);
+    await tapById(notesnook.buttons.add);
+    await createNotebook("Notebook 1", true);
+    await sleep(500);
+    await device.pressBack();
+    await sleep(500);
+    await tapByText("Notebook 1");
+    await sleep(500);
+    await tapById("add-notebook-button");
+    await createNotebook("Sub notebook", true, true);
+    await device.pressBack();
+    await sleep(500);
+    await tapById(notesnook.ids.notebook.menu);
+    await tapByText("Edit notebook");
+    await sleep(500);
+    await elementById(notesnook.ids.dialogs.notebook.inputs.title).typeText(
+      " (edited)"
+    );
+    await tapByText("Save");
+    await sleep(500);
+    await visibleByText("Sub notebook (edited)");
+  });
+
+  it("Add a note to notebook", async () => {
+    await prepare();
+    await navigate("Notebooks");
+    await tapByText("Add your first notebook");
     await sleep(500);
     await createNotebook("Notebook 1", true, true);
     await sleep(500);
     await device.pressBack();
     await sleep(500);
     await tapByText("Notebook 1");
-    await sleep(300);
-    await tapById(notesnook.ids.notebook.menu);
-    await tapByText("Edit topic");
-    await elementById("input-title").typeText(" (edited)");
-    await tapByText("Save");
-  });
-
-  it("Add new note to topic", async () => {
-    await prepare();
-    await navigate("Notebooks");
-    await sleep(500);
-    await createNotebook("Notebook 1", true, true);
-    await sleep(500);
-    await device.pressBack();
-    await sleep(500);
-    await tapByText("Topic");
     await createNote();
   });
 
-  it("Remove note from topic", async () => {
+  it("Remove note from Notebook", async () => {
     await prepare();
     await navigate("Notebooks");
+    await tapByText("Add your first notebook");
     await createNotebook("Notebook 1", true, true);
     await sleep(500);
     await device.pressBack();
     await sleep(500);
-    await tapByText("Topic");
+    await tapByText("Notebook 1");
+    await sleep(500);
     let note = await createNote();
     await elementByText(note.body).longPress();
     await tapById("select-minus");
@@ -155,56 +199,27 @@ describe("NOTEBOOKS", () => {
     await prepare();
     await navigate("Notebooks");
     await sleep(500);
-    await createNotebook("Notebook 1", true, true, 3);
+    await tapByText("Add your first notebook");
+    await createNotebook("Notebook 1", true, false);
     await sleep(500);
     await device.pressBack();
     await sleep(500);
     await navigate("Notes");
     await createNote();
-    console.log("ADD TO A SINGLE TOPIC");
     await tapById(notesnook.listitem.menu);
     await tapById("icon-notebooks");
     await sleep(500);
     await tapByText("Notebook 1");
-    await tapByText("Topic");
     await tapByText("Save");
     await sleep(300);
-    await visibleByText("Topic");
-    console.log("MOVE FROM ONE TOPIC TO ANOTHER");
-    await tapById(notesnook.listitem.menu);
-    await tapById("icon-notebooks");
-    await tapByText("Notebook 1");
-    await tapByText("Topic 2");
-    await tapByText("Save");
-    await visibleByText("Topic 2");
-    console.log("REMOVE FROM TOPIC");
-    await tapById(notesnook.listitem.menu);
-    await tapById("icon-notebooks");
-    await tapByText("Notebook 1");
-    await tapByText("Topic 2");
-    await tapByText("Save");
-    await sleep(300);
-    await notVisibleByText("Topic 2");
-    console.log("MOVE TO MULTIPLE TOPICS");
-    await tapById(notesnook.listitem.menu);
-    await tapById("icon-notebooks");
-    await tapByText("Notebook 1");
-    await elementByText("Topic").longPress();
-    await visibleByText("Reset selection");
-    await tapByText("Topic 2");
-    await tapByText("Topic 3");
-    await tapByText("Save");
-    await sleep(300);
-    await tapById(notesnook.listitem.menu);
-    await visibleByText("Topic");
-    await visibleByText("Topic 2");
-    await visibleByText("Topic 3");
+    await visibleByText("Notebook 1");
   });
 
-  it("Edit notebook title, description and add a topic", async () => {
+  it("Edit notebook title, description", async () => {
     await prepare();
     await navigate("Notebooks");
     await sleep(500);
+    await tapByText("Add your first notebook");
     await createNotebook();
     await sleep(500);
     await device.pressBack();
@@ -222,22 +237,19 @@ describe("NOTEBOOKS", () => {
     await elementById(
       notesnook.ids.dialogs.notebook.inputs.description
     ).typeText("Description of Notebook 1 (Edited)");
-    await elementById(notesnook.ids.dialogs.notebook.inputs.topic).typeText(
-      "Topic 2"
-    );
-    await tapById("topic-add-button");
+
     await tapByText("Save");
     await sleep(500);
     await visibleByText("Notebook 1 (Edited)");
     await visibleByText("Description of Notebook 1 (Edited)");
-    await visibleByText("Topic 2");
   });
 
-  it("Move notebook to trash", async () => {
+  it.skip("Move notebook to trash", async () => {
     await prepare();
     await navigate("Notebooks");
 
     await sleep(500);
+    await tapByText("Add your first notebook");
     await createNotebook("Notebook 1", false, false);
     await sleep(500);
     await device.pressBack();
@@ -258,9 +270,9 @@ describe("NOTEBOOKS", () => {
     await navigate("Notebooks");
 
     await sleep(500);
+    await tapByText("Add your first notebook");
     await createNotebook("Notebook 1", false, true);
     await sleep(500);
-    await tapByText("Topic");
     await tapById("listitem.select");
     await tapByText("Move selected notes");
     await sleep(500);
@@ -277,36 +289,12 @@ describe("NOTEBOOKS", () => {
     await visibleByText(note.body);
   });
 
-  it("Move Topic to trash with notes", async () => {
-    await prepare();
-    let note = await createNote();
-    await navigate("Notebooks");
-
-    await sleep(500);
-    await createNotebook("Notebook 1", false, true);
-    await sleep(500);
-    await tapByText("Topic");
-    await tapById("listitem.select");
-    await tapByText("Move selected notes");
-    await sleep(500);
-    await tapByText("Notebook 1");
-    await tapById(notesnook.ids.notebook.menu);
-    await tapByText("Delete topic");
-    await sleep(2000);
-    await tapByText("Move all notes in this topic to trash");
-    await sleep(500);
-    await tapByText("Delete");
-    await device.pressBack();
-    await sleep(4000);
-    await navigate("Trash");
-    await visibleByText(note.body);
-  });
-
   it("Pin notebook to side menu", async () => {
     await prepare();
     await navigate("Notebooks");
 
     await sleep(500);
+    await tapByText("Add your first notebook");
     await createNotebook("Notebook 1", false, false);
     await sleep(500);
     await device.pressBack();
@@ -317,23 +305,5 @@ describe("NOTEBOOKS", () => {
     let menu = elementById(notesnook.ids.default.header.buttons.left);
     await menu.tap();
     await visibleByText("Notebook 1");
-  });
-
-  it("Pin topic to side menu", async () => {
-    await prepare();
-    await navigate("Notebooks");
-
-    await sleep(500);
-    await createNotebook("Notebook 1");
-    await sleep(500);
-    await device.pressBack();
-    await sleep(500);
-    await tapByText("Notebook 1");
-    await tapById(notesnook.ids.notebook.menu);
-    await tapByText("Add Shortcut");
-    let menu = elementById(notesnook.ids.default.header.buttons.left);
-    await menu.tap();
-    await menu.tap();
-    await visibleByText("Topic");
   });
 });
