@@ -122,7 +122,12 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
 
   return (
     <>
-      <SelectionHeader id={route.name} items={notes} type="note" />
+      <SelectionHeader
+        id={route.params?.item?.id}
+        items={notes}
+        type="note"
+        renderedInRoute="Notebook"
+      />
       <Header
         renderedInRoute={route.name}
         title={params.current.item?.title}

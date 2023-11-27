@@ -348,7 +348,7 @@ export const NotebookSheet = () => {
                 <IconButton
                   name="plus"
                   onPress={PLACEHOLDER_DATA.action}
-                  testID="add-topic-button"
+                  testID="add-notebook-button"
                   color={colors.primary.icon}
                   size={22}
                   customStyle={{
@@ -461,7 +461,7 @@ const NotebookItem = ({
           selection.setEnabled(true);
           selection.toggleSelection(item);
         }}
-        testID={`topic-sheet-item-${currentLevel}-${index}`}
+        testID={`notebook-sheet-item-${currentLevel}-${index}`}
         onPress={() => {
           if (!item) return;
           if (selection.enabled) {
@@ -542,31 +542,40 @@ const NotebookItem = ({
             }
             size={SIZE.sm}
           >
-            {item?.title}{" "}
-            {totalNotes(id) ? (
-              <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
-                {totalNotes(id)}
-              </Paragraph>
-            ) : null}
+            {item?.title}
           </Paragraph>
         </View>
-        <IconButton
-          name="dots-horizontal"
-          customStyle={{
-            width: 40 * fontScale,
-            height: 40 * fontScale
+
+        <View
+          style={{
+            flexDirection: "row",
+            columnGap: 10,
+            alignItems: "center"
           }}
-          testID={notesnook.ids.notebook.menu}
-          onPress={() => {
-            Properties.present(item);
-          }}
-          left={0}
-          right={0}
-          bottom={0}
-          top={0}
-          color={colors.primary.icon}
-          size={SIZE.xl}
-        />
+        >
+          {totalNotes?.(id) ? (
+            <Paragraph size={SIZE.sm} color={colors.secondary.paragraph}>
+              {totalNotes(id)}
+            </Paragraph>
+          ) : null}
+          <IconButton
+            name="dots-horizontal"
+            customStyle={{
+              width: 40 * fontScale,
+              height: 40 * fontScale
+            }}
+            testID={notesnook.ids.notebook.menu}
+            onPress={() => {
+              Properties.present(item);
+            }}
+            left={0}
+            right={0}
+            bottom={0}
+            top={0}
+            color={colors.primary.icon}
+            size={SIZE.xl}
+          />
+        </View>
       </PressableButton>
 
       {!expanded

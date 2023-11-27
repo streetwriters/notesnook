@@ -168,7 +168,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
 
   setTags = async (note: Note | null | undefined) => {
     if (!note) return;
-    const tags = db.relations.to(note, "tag").resolved();
+    const tags = await db.relations.to(note, "tag").resolve();
     await this.doAsync(`
     if (typeof editorTags !== "undefined" && editorTags.current) {
       editorTags.current.setTags(${JSON.stringify(

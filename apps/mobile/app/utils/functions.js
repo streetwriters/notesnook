@@ -62,7 +62,9 @@ async function deleteNotebook(id, deleteNotes) {
   const parentId = getParentNotebookId(id);
   if (deleteNotes) {
     const noteRelations = await db.relations.from(notebook, "note").get();
-    await db.notes.delete(...noteRelations.map((relation) => relation.toId));
+    if (noteRelations?.length) {
+      await db.notes.delete(...noteRelations.map((relation) => relation.toId));
+    }
   }
   const subnotebooks = await db.relations.from(notebook, "notebook").get();
   for (const subnotebook of subnotebooks) {
@@ -96,6 +98,7 @@ export const deleteItems = async (items, type, context) => {
     eSendEvent(eClearEditor);
   } else if (type === "notebook") {
     const result = await confirmDeleteAllNotes(ids, "notebook", context);
+    console.log(result);
     if (!result.delete) return;
     for (const id of ids) {
       await deleteNotebook(id, result.deleteNotes);
