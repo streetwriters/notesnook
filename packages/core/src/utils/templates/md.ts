@@ -41,6 +41,6 @@ function buildFrontmatter(data: TemplateData) {
   if (data.pinned) lines.push(`pinned: ${data.pinned}`);
   if (data.favorite) lines.push(`favorite: ${data.favorite}`);
   if (data.color) lines.push(`color: ${data.color}`);
-  if (data.tags) lines.push(`tags: ${data.tags}`);
+  if (data.tags) lines.push(`tags: ${data.tags.join(", ")}`);
   return lines.join("\n");
 }
