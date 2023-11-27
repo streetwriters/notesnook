@@ -246,8 +246,8 @@ export class NoteContextMenuModel extends BaseProperties {
     );
     if (format === "html") {
       return content
-        .replace(/(name="created-on" content=")(.+?)"/, '$1xxx"')
-        .replace(/(name="last-edited-on" content=")(.+?)"/, '$1xxx"');
+        .replace(/(name="created-at" content=")(.+?)"/, '$1xxx"')
+        .replace(/(name="updated-at" content=")(.+?)"/, '$1xxx"');
     }
     return content;
   }
