@@ -138,7 +138,7 @@ export default function EditorManager({
           let content: string | null = null;
           if (locked && isEncryptedContent(item)) {
             const result = await db.vault
-              .decryptContent(item)
+              .decryptContent(item, item.noteId)
               .catch(() => undefined);
             if (result) content = result.data;
             else EV.publish(EVENTS.vaultLocked);
