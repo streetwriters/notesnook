@@ -274,14 +274,9 @@ const AppLock = ({ route }) => {
                     SettingsService.set({
                       introCompleted: true
                     });
-                    Navigation.replace(
-                      {
-                        name: "Notes"
-                      },
-                      {
-                        canGoBack: false
-                      }
-                    );
+                    Navigation.replace("Notes", {
+                      canGoBack: false
+                    });
                   }, 1000);
                 }}
                 style={{

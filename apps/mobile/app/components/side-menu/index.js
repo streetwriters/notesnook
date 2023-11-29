@@ -65,10 +65,7 @@ export const SideMenu = React.memo(
         icon: "cog-outline",
         close: true,
         func: () => {
-          Navigation.navigate({
-            name: "Settings",
-            title: "Settings"
-          });
+          Navigation.navigate("Settings");
         }
       }
     ];

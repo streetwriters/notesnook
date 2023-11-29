@@ -27,14 +27,12 @@ import { editorController } from "../../../screens/editor/tiptap/utils";
 import BiometricService from "../../../services/biometrics";
 import { DDS } from "../../../services/device-detection";
 import {
+  ToastManager,
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastManager
+  eUnSubscribeEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
-import SearchService from "../../../services/search";
-import { convertNoteToText } from "../../../utils/note-to-text";
 import { getElevationStyle } from "../../../utils/elevation";
 import {
   eClearEditor,
@@ -45,6 +43,7 @@ import {
 } from "../../../utils/events";
 import { deleteItems } from "../../../utils/functions";
 import { tabBarRef } from "../../../utils/global-refs";
+import { convertNoteToText } from "../../../utils/note-to-text";
 import { sleep } from "../../../utils/time";
 import BaseDialog from "../../dialog/base-dialog";
 import DialogButtons from "../../dialog/dialog-buttons";
@@ -55,10 +54,6 @@ import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 
-let Keychain;
-const passInputRef = createRef();
-const confirmPassRef = createRef();
-const changePassInputRef = createRef();
 export class VaultDialog extends Component {
   constructor(props) {
     super(props);
@@ -88,6 +83,11 @@ export class VaultDialog extends Component {
       deleteVault: false,
       deleteAll: false
     };
+
+    this.passInputRef = createRef();
+    this.confirmPassRef = createRef();
+    this.changePassInputRef = createRef();
+
     this.password = null;
     this.confirmPassword = null;
     this.newPassword = null;
@@ -148,9 +148,6 @@ export class VaultDialog extends Component {
    * @param {import('../../../services/event-manager').vaultType} data
    */
   open = async (data) => {
-    if (!Keychain) {
-      Keychain = require("react-native-keychain");
-    }
     let biometry = await BiometricService.isBiometryAvailable();
     let available = false;
     let fingerprint = await BiometricService.hasInternetCredentials("nn_vault");
@@ -668,7 +665,8 @@ export class VaultDialog extends Component {
       <BaseDialog
         onShow={async () => {
           await sleep(100);
-          passInputRef.current?.focus();
+
+          this.passInputRef.current?.focus();
         }}
         statusBarTranslucent={false}
         onRequestClose={this.close}
@@ -703,7 +701,7 @@ export class VaultDialog extends Component {
             !this.state.revokeFingerprintAccess ? (
               <>
                 <Input
-                  fwdRef={passInputRef}
+                  fwdRef={this.passInputRef}
                   editable={!loading}
                   autoCapitalize="none"
                   testID={notesnook.ids.dialogs.vault.pwd}
@@ -720,7 +718,7 @@ export class VaultDialog extends Component {
                   }
                   onSubmit={() => {
                     changePassword
-                      ? changePassInputRef.current?.focus()
+                      ? this.confirmPassRef.current?.focus()
                       : this.onPress;
                   }}
                   autoComplete="password"
@@ -772,7 +770,7 @@ export class VaultDialog extends Component {
               <>
                 <Seperator half />
                 <Input
-                  ref={changePassInputRef}
+                  ref={this.confirmPassRef}
                   editable={!loading}
                   testID={notesnook.ids.dialogs.vault.changePwd}
                   autoCapitalize="none"
@@ -792,7 +790,7 @@ export class VaultDialog extends Component {
             {!novault ? (
               <View>
                 <Input
-                  fwdRef={passInputRef}
+                  fwdRef={this.passInputRef}
                   autoCapitalize="none"
                   testID={notesnook.ids.dialogs.vault.pwd}
                   onChangeText={(value) => {
@@ -803,13 +801,13 @@ export class VaultDialog extends Component {
                   returnKeyType="next"
                   secureTextEntry
                   onSubmit={() => {
-                    confirmPassRef.current?.focus();
+                    this.confirmPassRef.current?.focus();
                   }}
                   placeholder="Password"
                 />
 
                 <Input
-                  fwdRef={confirmPassRef}
+                  fwdRef={this.confirmPassRef}
                   autoCapitalize="none"
                   testID={notesnook.ids.dialogs.vault.pwdAlt}
                   secureTextEntry
