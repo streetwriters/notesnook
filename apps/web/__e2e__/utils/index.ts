@@ -21,7 +21,12 @@ import fs from "fs";
 import dotenv from "dotenv";
 import path from "path";
 import { Locator, Page } from "@playwright/test";
-import { GroupByOptions, OrderByOptions, SortByOptions } from "../models/types";
+import {
+  GroupByOptions,
+  Notebook,
+  OrderByOptions,
+  SortByOptions
+} from "../models/types";
 
 type Note = {
   title: string;
@@ -45,10 +50,14 @@ const USER = {
   }
 };
 
-const NOTEBOOK = {
+const NOTEBOOK: Notebook = {
   title: "Test notebook 1",
-  description: "This is test notebook 1",
-  topics: ["Topic 1", "Very long topic 2", "Topic 3"]
+  description: "This is test notebook 1"
+  // subNotebooks: [
+  //   { title: "Sub notebook 1" },
+  //   { title: "Very long sub notebook 2" },
+  //   { title: "Sub notebook 3" }
+  // ]
 };
 
 const NOTE: Note = {

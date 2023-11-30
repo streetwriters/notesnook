@@ -222,7 +222,7 @@ function SubNotebooks({
   }, [contextNotes, context]);
 
   return (
-    <Flex id="topics" variant="columnFill" sx={{ height: "100%" }}>
+    <Flex id="subnotebooks" variant="columnFill" sx={{ height: "100%" }}>
       <Flex
         sx={{
           m: 1,
@@ -251,7 +251,7 @@ function SubNotebooks({
         <Flex sx={{ alignItems: "center" }}>
           <Button
             variant="secondary"
-            data-test-id="topics-sort-button"
+            data-test-id="subnotebooks-sort-button"
             sx={{
               p: "small",
               bg: "transparent",
@@ -266,6 +266,7 @@ function SubNotebooks({
           </Button>
           <Button
             variant="secondary"
+            data-test-id="subnotebooks-action-button"
             sx={{
               p: "1px",
               bg: "transparent",
@@ -273,7 +274,7 @@ function SubNotebooks({
             }}
             onClick={async (e) => {
               e.stopPropagation();
-              await showAddNotebookDialog(notebookId);
+              await showAddNotebookDialog(rootId);
             }}
           >
             <Plus size={20} />
@@ -398,7 +399,16 @@ function SubNotebooks({
           onExpandItem={(_, id) => saveViewState(id)}
           onCollapseItem={(_, id) => saveViewState(id)}
         >
-          <Tree treeId={rootId} rootItem="root" treeLabel="Tree Example" />
+          <Tree
+            treeId={rootId}
+            renderTreeContainer={({ children, containerProps }) => (
+              <div data-test-id="subnotebooks-list" {...containerProps}>
+                {children}
+              </div>
+            )}
+            rootItem="root"
+            treeLabel="Tree Example"
+          />
         </UncontrolledTreeEnvironment>
       </FlexScrollContainer>
     </Flex>
