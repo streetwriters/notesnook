@@ -143,7 +143,6 @@ export const Button = ({
 
       {!title ? null : (
         <Component
-          animated={false}
           color={textColor as string}
           size={fontSize}
           numberOfLines={1}

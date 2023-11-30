@@ -61,9 +61,9 @@ useThemeEngineStore.getState().setTheme(currentTheme);
 export const useShareStore = create((set) => ({
   theme: currentTheme,
   appendNote: null,
-  setAppendNote: (note) => {
-    MMKV.setItem(StorageKeys.appendNote, JSON.stringify(note));
-    set({ appendNote: note });
+  setAppendNote: (noteId) => {
+    MMKV.setItem(StorageKeys.appendNote, noteId);
+    set({ appendNote: noteId });
   },
   restore: () => {
     let appendNote = MMKV.getString(StorageKeys.appendNote);
@@ -71,7 +71,7 @@ export const useShareStore = create((set) => ({
     let selectedTags = MMKV.getString(StorageKeys.selectedTag);
     appendNote = JSON.parse(appendNote);
     set({
-      appendNote: appendNote ? JSON.parse(appendNote) : null,
+      appendNote: appendNote,
       selectedNotebooks: selectedNotebooks ? JSON.parse(selectedNotebooks) : [],
       selectedTag: selectedTags ? JSON.parse(selectedTags) : []
     });

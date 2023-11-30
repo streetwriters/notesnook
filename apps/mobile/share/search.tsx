@@ -32,13 +32,13 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import create from "zustand";
 import { db } from "../app/common/database";
+import Paragraph from "../app/components/ui/typography/paragraph";
 import { useDBItem } from "../app/hooks/use-db-item";
 import { useNotebook } from "../app/hooks/use-notebook";
 import { getElevationStyle } from "../app/utils/elevation";
 import { initDatabase, useShareStore } from "./store";
-import { createItemSelectionStore } from "../app/stores/item-selection-store";
-import create from "zustand";
 
 export const useNotebookExpandedStore = create<{
   expanded: {
@@ -211,7 +211,7 @@ const NotebookItem = ({
             flexDirection: "column"
           }}
         >
-          <Text
+          <Paragraph
             numberOfLines={1}
             style={{
               color: colors.primary.paragraph,
@@ -219,7 +219,7 @@ const NotebookItem = ({
             }}
           >
             {notebook.title}
-          </Text>
+          </Paragraph>
         </View>
       </View>
 
@@ -314,7 +314,7 @@ const ListItem = ({
             flexDirection: "column"
           }}
         >
-          <Text
+          <Paragraph
             numberOfLines={1}
             style={{
               color: colors.primary.paragraph,
@@ -323,7 +323,7 @@ const ListItem = ({
           >
             {item.type === "tag" ? "#" : ""}
             {item.title}
-          </Text>
+          </Paragraph>
         </View>
       </View>
     </TouchableOpacity>
@@ -333,12 +333,10 @@ const ListItem = ({
 export const Search = ({
   close,
   getKeyboardHeight,
-  quicknote,
   mode
 }: {
   close?: () => void;
   getKeyboardHeight: () => number;
-  quicknote?: boolean;
   mode: SearchMode;
 }) => {
   const { colors } = useThemeColors();
@@ -405,12 +403,6 @@ export const Search = ({
     [close, mode, items]
   );
 
-  const customStyles = quicknote
-    ? {
-        marginTop: -(insets.top || 0),
-        paddingTop: insets.top
-      }
-    : {};
   const searchHeight = height - getKeyboardHeight();
   return (
     <View
@@ -418,14 +410,13 @@ export const Search = ({
         position: "absolute",
         top: Platform.OS === "android" ? 20 : 0,
         backgroundColor: colors.primary.background,
-        borderRadius: quicknote ? 0 : 10,
-        width: quicknote ? "100%" : "95%",
+        borderRadius: 10,
+        width: "95%",
         minHeight: 250,
         alignSelf: "center",
         overflow: "hidden",
         zIndex: 999,
-        ...getElevationStyle(quicknote ? 1 : 5),
-        ...customStyles
+        ...getElevationStyle(5)
       }}
     >
       <View
@@ -498,7 +489,7 @@ export const Search = ({
               checkQueryExists(searchKeyword);
             }}
           >
-            <Text
+            <Paragraph
               numberOfLines={1}
               style={{
                 color: colors.primary.paragraph,
@@ -506,7 +497,7 @@ export const Search = ({
               }}
             >
               Add #{searchKeyword}
-            </Text>
+            </Paragraph>
           </TouchableOpacity>
         ) : null}
 

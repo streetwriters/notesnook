@@ -53,17 +53,4 @@ const ShareProvider = () => {
   );
 };
 
-
-
 AppRegistry.registerComponent('NotesnookShare', () => ShareProvider);
-
-const QuickNoteProvider = () => {
-  QuickNoteIOS = require('../share/quick-note').default;
-  return (
-    <SafeAreaProvider>
-      <QuickNoteIOS />
-    </SafeAreaProvider>
-  );
-};
-
-AppRegistry.registerComponent('QuickNoteIOS', () => QuickNoteProvider);

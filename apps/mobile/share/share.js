@@ -47,11 +47,16 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import isURL from "validator/lib/isURL";
 import { db } from "../app/common/database";
 import Storage from "../app/common/database/storage";
+import { Button } from "../app/components/ui/button";
+import Heading from "../app/components/ui/typography/heading";
+import Paragraph from "../app/components/ui/typography/paragraph";
+import { useDBItem } from "../app/hooks/use-db-item";
 import { eSendEvent } from "../app/services/event-manager";
 import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../app/utils/constants";
 import { getElevationStyle } from "../app/utils/elevation";
 import { eOnLoadNote } from "../app/utils/events";
 import { NoteBundle } from "../app/utils/note-bundle";
+import { SIZE } from "../app/utils/size";
 import { AddNotebooks } from "./add-notebooks";
 import { AddTags } from "./add-tags";
 import { Editor } from "./editor";
@@ -110,7 +115,7 @@ const modes = {
   }
 };
 
-const ShareView = ({ quicknote = false }) => {
+const ShareView = () => {
   const { colors } = useThemeColors();
   const appendNote = useShareStore((state) => state.appendNote);
   const [note, setNote] = useState({ ...defaultNote });
@@ -251,11 +256,7 @@ const ShareView = ({ quicknote = false }) => {
   const close = async () => {
     setNote({ ...defaultNote });
     setLoadingExtension(true);
-    if (quicknote) {
-      ShareExtension.openURL("ShareMedia://MainApp");
-    } else {
-      ShareExtension.close();
-    }
+    ShareExtension.close();
   };
 
   const onPress = async () => {
@@ -368,99 +369,41 @@ const ShareView = ({ quicknote = false }) => {
     <SafeAreaView
       style={{
         width: width > 500 ? 500 : width,
-        height: quicknote ? height : height - kh,
+        height: height - kh,
         alignSelf: "center",
-        justifyContent: quicknote ? "flex-start" : "flex-end"
+        justifyContent: "flex-end"
       }}
     >
       {loadingPage ? <HtmlLoadingWebViewAgent /> : null}
 
-      {quicknote && !searchMode ? (
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => {
+          if (searchMode) {
+            setSearchMode(null);
+          } else {
+            close();
+          }
+        }}
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "absolute"
+        }}
+      >
         <View
           style={{
             width: "100%",
-            backgroundColor: colors.primary.background,
-            height: 50 + insets.top,
-            paddingTop: insets.top,
-            ...getElevationStyle(1),
-            marginTop: -insets.top,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between"
-          }}
-        >
-          <Button
-            type="action"
-            icon="close"
-            iconColor={colors.secondary.icon}
-            onPress={() => {
-              if (searchMode) {
-                setSearchMode(null);
-              } else {
-                close();
-              }
-            }}
-            style={{
-              width: 50,
-              height: 50,
-              marginBottom: 0
-            }}
-            iconSize={25}
-          />
-
-          <Text
-            style={{
-              color: colors.primary.paragraph,
-              fontSize: 17
-            }}
-          >
-            Quick note
-          </Text>
-
-          <Button
-            type="action"
-            icon="check"
-            iconColor={colors.primary.accent}
-            onPress={onPress}
-            style={{
-              width: 50,
-              height: 50,
-              marginBottom: 0
-            }}
-            iconSize={25}
-          />
-        </View>
-      ) : (
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => {
-            if (searchMode) {
-              setSearchMode(null);
-            } else {
-              close();
-            }
-          }}
-          style={{
-            width: "100%",
             height: "100%",
-            position: "absolute"
+            backgroundColor: "white",
+            opacity: 0.01
           }}
-        >
-          <View
-            style={{
-              width: "100%",
-              height: "100%",
-              backgroundColor: "white",
-              opacity: 0.01
-            }}
-          />
-          <View />
-        </TouchableOpacity>
-      )}
+        />
+        <View />
+      </TouchableOpacity>
 
       {searchMode ? (
         <Search
-          quicknote={quicknote}
           getKeyboardHeight={() => keyboardHeight.current}
           mode={searchMode}
           close={() => {
@@ -482,7 +425,6 @@ const ShareView = ({ quicknote = false }) => {
         <View
           style={{
             maxHeight: "100%"
-            //paddingHorizontal: 12
           }}
         >
           <View
@@ -508,32 +450,12 @@ const ShareView = ({ quicknote = false }) => {
                   paddingHorizontal: 12
                 }}
               >
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    color: colors.primary.heading
-                  }}
-                >
-                  Save to Notesnook
-                </Text>
-
+                <Heading size={SIZE.lg}>Save to Notesnook</Heading>
                 <Button
                   title="Done"
-                  style={{
-                    backgroundColor: colors.primary.accent,
-                    height: Platform.OS === "ios" ? 35 : 40,
-                    paddingHorizontal: 15,
-                    marginBottom: 0
-                  }}
+                  type="accent"
                   loading={loading}
-                  iconColor={colors.primary.accentForeground}
                   onPress={onPress}
-                  textColor={colors.primary.accentForeground}
-                  textStyle={{
-                    fontSize: 16,
-                    marginLeft: 0
-                  }}
                 />
               </View>
 
@@ -545,11 +467,12 @@ const ShareView = ({ quicknote = false }) => {
                     backgroundColor: colors.secondary.background
                   }}
                 >
-                  <Text
-                    style={{ color: colors.primary.paragraph, marginBottom: 6 }}
+                  <Paragraph
+                    style={{ marginBottom: 6 }}
+                    color={colors.primary.paragraph}
                   >
                     Attaching {rawFiles.length} file(s):
-                  </Text>
+                  </Paragraph>
                   <ScrollView horizontal>
                     {rawFiles.map((item) =>
                       isImage(item.type) ? (
@@ -602,30 +525,30 @@ const ShareView = ({ quicknote = false }) => {
                             name="file"
                           />
 
-                          <Text
+                          <Paragraph
+                            size={SIZE.xs}
+                            color={colors.primary.paragraph}
                             style={{
                               marginLeft: 4,
-                              color: colors.primary.paragraph,
-                              paddingRight: 8,
-                              fontSize: 12
+                              paddingRight: 8
                             }}
                           >
                             {item.name} ({formatBytes(item.size)})
-                          </Text>
+                          </Paragraph>
                         </TouchableOpacity>
                       )
                     )}
                   </ScrollView>
 
-                  <Text
+                  <Paragraph
+                    color={colors.secondary.paragraph}
+                    size={SIZE.xs}
                     style={{
-                      color: colors.secondary.paragraph,
-                      marginTop: 6,
-                      fontSize: 11
+                      marginTop: 6
                     }}
                   >
                     Tap to remove an attachment.
-                  </Text>
+                  </Paragraph>
                 </View>
               ) : null}
               <View
@@ -658,7 +581,7 @@ const ShareView = ({ quicknote = false }) => {
                       {loadingPage ? (
                         <>
                           <ActivityIndicator color={colors.primary.accent} />
-                          <Text>Preparing web clip...</Text>
+                          <Paragraph>Preparing web clip...</Paragraph>
                         </>
                       ) : null}
                     </>
@@ -666,28 +589,7 @@ const ShareView = ({ quicknote = false }) => {
                 </SafeAreaProvider>
               </View>
 
-              {appendNote ? (
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: colors.secondary.paragraph,
-                    paddingHorizontal: 12,
-                    marginBottom: 10,
-                    flexWrap: "wrap"
-                  }}
-                >
-                  Above content will append to{" "}
-                  <Text
-                    style={{
-                      color: colors.primary.accent,
-                      fontWeight: "bold"
-                    }}
-                  >
-                    {`"${appendNote.title}"`}
-                  </Text>{" "}
-                  . Click on {'"New note"'} to create a new note.
-                </Text>
-              ) : null}
+              {appendNote ? <AppendNote id={appendNote} /> : null}
 
               <View
                 style={{
@@ -697,50 +599,34 @@ const ShareView = ({ quicknote = false }) => {
                   alignItems: "center"
                 }}
               >
-                <Text
+                <Paragraph
                   style={{
-                    color: colors.primary.paragraph,
                     marginRight: 10
                   }}
                 >
                   Clip Mode:
-                </Text>
+                </Paragraph>
                 {rawData.value && isURL(rawData.value) ? (
                   <Button
-                    color="transparent"
+                    type={mode === 2 ? "inverted" : "transparent"}
                     icon={mode === 2 ? "radiobox-marked" : "radiobox-blank"}
                     onPress={() => changeMode(2)}
                     title={modes[2].title}
-                    iconSize={16}
-                    fontSize={14}
-                    iconColor={
-                      mode == 2 ? colors.primary.accent : colors.secondary.icon
-                    }
-                    textColor={
-                      mode == 2 ? colors.primary.accent : colors.secondary.icon
-                    }
+                    height={30}
                     style={{
-                      paddingHorizontal: 0,
-                      height: 30,
-                      marginRight: 12,
-                      marginBottom: 0
+                      paddingHorizontal: 6
                     }}
                   />
                 ) : null}
                 <Button
-                  color="transparent"
+                  type={mode === 1 ? "inverted" : "transparent"}
                   icon={mode === 1 ? "radiobox-marked" : "radiobox-blank"}
-                  onPress={() => changeMode(1)}
+                  onPress={() => changeMode(2)}
                   title={modes[1].title}
-                  iconSize={16}
-                  fontSize={14}
-                  iconColor={
-                    mode == 1 ? colors.primary.accent : colors.secondary.icon
-                  }
-                  textColor={
-                    mode == 1 ? colors.primary.accent : colors.secondary.icon
-                  }
-                  style={{ paddingHorizontal: 0, height: 30, marginBottom: 0 }}
+                  height={30}
+                  style={{
+                    paddingHorizontal: 6
+                  }}
                 />
               </View>
             </View>
@@ -754,27 +640,17 @@ const ShareView = ({ quicknote = false }) => {
               marginTop: 10,
               alignSelf: "center",
               alignItems: "center",
-              paddingHorizontal: 12
+              paddingHorizontal: 12,
+              gap: 10
             }}
           >
             <Button
-              color={colors.primary.background}
+              icon="plus"
               onPress={() => {
                 useShareStore.getState().setAppendNote(null);
               }}
-              icon="plus"
-              iconSize={18}
-              iconColor={
-                !appendNote ? colors.primary.accent : colors.secondary.icon
-              }
+              type={!appendNote ? "transparent" : "gray"}
               title="New note"
-              textColor={
-                !appendNote ? colors.primary.accent : colors.secondary.icon
-              }
-              type="button"
-              textStyle={{
-                fontSize: 15
-              }}
               style={{
                 paddingHorizontal: 12,
                 height: 45,
@@ -787,21 +663,12 @@ const ShareView = ({ quicknote = false }) => {
             />
 
             <Button
-              color={colors.primary.bg}
+              icon="text-short"
               onPress={() => {
                 setSearchMode("appendNote");
               }}
-              icon="text-short"
-              iconSize={18}
-              iconColor={
-                appendNote ? colors.primary.accent : colors.secondary.icon
-              }
+              type={appendNote ? "transparent" : "gray"}
               title={`Append to a note`}
-              textColor={colors.secondary.paragraph}
-              type="button"
-              textStyle={{
-                fontSize: 15
-              }}
               style={{
                 paddingHorizontal: 12,
                 height: 45,
@@ -841,98 +708,32 @@ const ShareView = ({ quicknote = false }) => {
   );
 };
 
-const Button = ({
-  title,
-  onPress,
-  color,
-  loading,
-  style,
-  textStyle,
-  icon,
-  iconSize = 22,
-  type = "button",
-  iconColor = "gray",
-  textColor = "white",
-  fontSize = 18
-}) => {
-  const types = {
-    action: {
-      style: {
-        width: 60,
-        height: 60,
-        borderRadius: 100,
-        minWidth: 0,
-        paddingHorizontal: 0
-      },
-      textStyle: {}
-    },
-    button: {
-      style: {
-        height: 50,
-        borderRadius: 5,
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "row",
+const AppendNote = ({ id }) => {
+  const { colors } = useThemeColors();
+  const [item] = useDBItem(id, "note");
+
+  return !item ? null : (
+    <Paragraph
+      size={SIZE.xs}
+      color={colors.secondary.paragraph}
+      style={{
+        paddingHorizontal: 12,
         marginBottom: 10,
-        paddingHorizontal: 20
-      },
-      textStyle: {}
-    },
-    rounded: {
-      style: {
-        marginRight: 15,
-        height: 30,
-        borderRadius: 100,
-        paddingHorizontal: 6,
-        marginTop: -2.5
-      },
-      textStyle: {
-        fontSize: 12,
-        marginLeft: 5
-      }
-    }
-  };
-
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.8}
-      style={[
-        {
-          backgroundColor: color,
-          height: 50,
-          borderRadius: 5,
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "row",
-          marginBottom: 10,
-          paddingHorizontal: 20
-        },
-        { ...types[type].style, ...style }
-      ]}
+        flexWrap: "wrap"
+      }}
     >
-      {loading ? <ActivityIndicator color={iconColor} /> : null}
-
-      {icon && !loading ? (
-        <Icon name={icon} size={iconSize} color={iconColor || "white"} />
-      ) : null}
-
-      {title ? (
-        <Text
-          style={[
-            {
-              fontSize: fontSize || 18,
-              color: textColor,
-              marginLeft: loading ? 10 : 5
-            },
-            types[type].textStyle,
-            textStyle
-          ]}
-        >
-          {title}
-        </Text>
-      ) : null}
-    </TouchableOpacity>
+      Above content will append to{" "}
+      <Paragraph
+        size={SIZE.xs}
+        style={{
+          color: colors.primary.accent,
+          fontWeight: "bold"
+        }}
+      >
+        {`"${item.title}"`}
+      </Paragraph>{" "}
+      . Click on {'"New note"'} to create a new note.
+    </Paragraph>
   );
 };
 
