@@ -34,6 +34,7 @@ export function BaseThemeProvider(
       injectCssVars?: boolean;
       addGlobalStyles?: boolean;
       scope?: keyof ThemeScopes;
+      onRender?: () => void;
     } & Omit<BoxProps, "variant">
   >
 ) {
@@ -41,6 +42,7 @@ export function BaseThemeProvider(
     children,
     addGlobalStyles = false,
     scope = "base",
+    onRender,
     ...restProps
   } = props;
 
@@ -70,6 +72,10 @@ export function BaseThemeProvider(
       );
     }
   }, [theme]);
+
+  useEffect(() => {
+    onRender?.();
+  }, [onRender]);
 
   return (
     <>

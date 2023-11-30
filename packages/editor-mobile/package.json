@@ -9,27 +9,18 @@
     "@notesnook/editor": "file:../editor",
     "@notesnook/theme": "file:../theme",
     "buffer": "^6.0.3",
-    "framer-motion": "^6.5.1",
+    "framer-motion": "^10.16.8",
     "mdi-react": "9.1.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "zustand": "^3.6.8"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",
-    "@testing-library/jest-dom": "^5.16.0",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^12.8.3",
-    "@types/ip": "^1.1.0",
-    "@types/jest": "^27.0.3",
-    "@types/node": "^16.11.11",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.2",
+    "@types/react": "^18.2.39",
+    "@types/react-dom": "^18.2.17",
     "env-cmd": "^10.1.0",
-    "ip": "^1.1.8",
-    "react-error-overlay": "6.0.9",
-    "react-scripts": "^5.0.1",
-    "web-vitals": "^1.1.2"
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
     "start": "env-cmd -e all react-scripts start",
