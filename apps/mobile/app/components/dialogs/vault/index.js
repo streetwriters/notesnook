@@ -297,6 +297,8 @@ export class VaultDialog extends Component {
               type: "error",
               context: "local"
             });
+          } else {
+            ToastManager.error(e);
           }
         });
     } else if (this.state.locked) {
