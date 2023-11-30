@@ -28,31 +28,35 @@ import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
+import { PressableButton } from "../ui/pressable";
 
 export default function Notebooks({ note, close, full }) {
   const { colors } = useThemeColors();
-  async function getNotebooks(item) {
-    let filteredNotebooks = [];
-    const relations = await db.relations.to(note, "notebook").resolve();
-    filteredNotebooks.push(relations);
-    if (!item.notebooks || item.notebooks.length < 1) return filteredNotebooks;
-    return filteredNotebooks;
+  async function getNotebooks() {
+    let filteredNotebooks = await db.relations.to(note, "notebook").resolve();
+    return filteredNotebooks || [];
   }
   const [noteNotebooks, setNoteNotebooks] = useState([]);
   useEffect(() => {
     getNotebooks().then((notebooks) => setNoteNotebooks(notebooks));
   });
 
-  const navigateNotebook = (id) => {
-    let item = db.notebooks.notebook(id)?.data;
+  const navigateNotebook = async (id) => {
+    let item = await db.notebooks.notebook(id);
     if (!item) return;
     NotebookScreen.navigate(item, true);
   };
 
   const renderItem = (item) => (
-    <View
+    <PressableButton
       key={item.id}
-      style={{
+      onPress={() => {
+        navigateNotebook(item.id);
+        eSendEvent(eClearEditor);
+        close();
+      }}
+      type={full ? "transparent" : "grayBg"}
+      customStyle={{
         justifyContent: "flex-start",
         paddingHorizontal: 12,
         flexDirection: "row",
@@ -60,10 +64,7 @@ export default function Notebooks({ note, close, full }) {
         flexShrink: 1,
         flexGrow: 1,
         padding: 6,
-        borderWidth: full ? 0 : 1,
-        borderColor: colors.primary.background,
         borderRadius: 10,
-        backgroundColor: full ? "transparent" : colors.secondary.background,
         minHeight: 42
       }}
     >
@@ -81,15 +82,10 @@ export default function Notebooks({ note, close, full }) {
           maxWidth: "50%"
         }}
         size={SIZE.sm}
-        onPress={() => {
-          navigateNotebook(item.id);
-          eSendEvent(eClearEditor);
-          close();
-        }}
       >
         {item.title}
       </Heading>
-    </View>
+    </PressableButton>
   );
 
   return noteNotebooks.length === 0 ? null : (
@@ -106,7 +102,7 @@ export default function Notebooks({ note, close, full }) {
 
       {noteNotebooks.length > 1 && !full ? (
         <Button
-          title={`See all linked notebooks`}
+          title={`View all linked notebooks`}
           fontSize={SIZE.xs}
           style={{
             alignSelf: "flex-end",
