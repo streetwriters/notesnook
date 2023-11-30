@@ -23,7 +23,6 @@ import { FlatList } from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { presentSheet } from "../../services/event-manager";
-import SearchService from "../../services/search";
 import { ColorValues } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
@@ -92,6 +91,10 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               ) : null}
               {item.title}
             </Heading>
+
+            {item.type === "notebook" && item.description ? (
+              <Paragraph>{item.description}</Paragraph>
+            ) : null}
 
             {item.type === "note" ? (
               <TagStrip close={close} item={item} />
