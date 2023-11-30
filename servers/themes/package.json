@@ -21,7 +21,7 @@
     "@notesnook/theme": "file:../../packages/theme",
     "@types/cors": "^2.8.13",
     "@vitejs/plugin-react": "^4.0.3",
-    "react": "17.0.2",
+    "react": "18.2.0",
     "vite-node": "^0.33.0"
   }
 }
