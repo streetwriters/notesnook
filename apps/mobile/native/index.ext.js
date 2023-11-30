@@ -10,10 +10,10 @@ const ShareProvider = () => {
     NotesnookShare = require('../share/index').default;
     return Platform.OS === 'ios' ? (
       <SafeAreaProvider>
-        <NotesnookShare quicknote={false} />
+        <NotesnookShare />
       </SafeAreaProvider>
     ) : (
-      <NotesnookShare quicknote={false} />
+      <NotesnookShare  />
     );
   };
 
