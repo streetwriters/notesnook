@@ -233,7 +233,7 @@ export function useEditorController(update: () => void): EditorController {
     };
   }, [onMessage]);
 
-  const openFilePicker = useCallback((type) => {
+  const openFilePicker = useCallback((type: "image" | "file" | "camera") => {
     post(EventTypes.filepicker, type);
   }, []);
 
