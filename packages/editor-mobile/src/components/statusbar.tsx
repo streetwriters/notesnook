@@ -41,8 +41,8 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   });
   globalThis.statusBar = statusBar;
 
-  const onScroll = React.useCallback((event) => {
-    const currentOffset = event.target.scrollTop;
+  const onScroll = React.useCallback((event: Event) => {
+    const currentOffset = (event.target as HTMLElement)?.scrollTop;
     if (currentOffset < 200) {
       if (stickyRef.current) {
         stickyRef.current = false;

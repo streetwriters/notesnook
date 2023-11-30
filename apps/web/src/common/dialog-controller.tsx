@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import ReactDOM from "react-dom";
 import { Dialogs } from "../dialogs";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as tagStore } from "../stores/tag-store";
@@ -39,6 +38,7 @@ import { downloadUpdate } from "../utils/updater";
 import { ThemeMetadata } from "@notesnook/themes-server";
 import { Reminder } from "@notesnook/core";
 import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
+import { createRoot } from "react-dom/client";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -58,21 +58,21 @@ function showDialog<TId extends DialogIds, TReturnType>(
 
     const container = document.createElement("div");
     container.id = id;
+    const root = createRoot(container);
 
     const perform = (result: TReturnType) => {
       openDialogs[id] = false;
-      ReactDOM.unmountComponentAtNode(container);
+      root.unmount();
       container.remove();
       resolve(result);
     };
     const PropDialog = () => render(Dialogs[id], perform);
-    ReactDOM.render(
+    root.render(
       <Suspense fallback={<div />}>
         <PropDialog />
-      </Suspense>,
-      container,
-      () => (openDialogs[id] = true)
+      </Suspense>
     );
+    openDialogs[id] = true;
   });
 }
 

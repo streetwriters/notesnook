@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 global.Buffer = require("buffer").Buffer;
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import "@notesnook/editor/styles/katex.min.css";
@@ -26,9 +26,12 @@ import "@notesnook/editor/styles/fonts.mobile.css";
 import "@notesnook/editor/styles/katex-fonts.mobile.css";
 import "@notesnook/editor/styles/styles.css";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById("root")
-);
+const rootElement = document.getElementById("root");
+if (rootElement) {
+  const root = createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+}

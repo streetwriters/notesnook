@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { render } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Routes, init } from "./bootstrap";
 import { logger } from "./utils/logger";
 import { loadDatabase } from "./hooks/use-database";
@@ -35,17 +35,18 @@ async function renderApp() {
   if (IS_DESKTOP_APP) await loadDatabase("db");
 
   const { default: Component } = await component();
-  logger.measure("app render");
-  render(
-    <BaseThemeProvider addGlobalStyles sx={{ height: "100%" }}>
-      <Component route={props?.route || "login:email"} />
-    </BaseThemeProvider>,
-    document.getElementById("root"),
-    () => {
-      logger.measure("app render");
+  const rootElement = document.getElementById("root");
+  if (!rootElement) return;
 
-      document.getElementById("splash")?.remove();
-    }
+  const root = createRoot(rootElement);
+  root.render(
+    <BaseThemeProvider
+      onRender={() => document.getElementById("splash")?.remove()}
+      addGlobalStyles
+      sx={{ height: "100%" }}
+    >
+      <Component route={props?.route || "login:email"} />
+    </BaseThemeProvider>
   );
 }
 
