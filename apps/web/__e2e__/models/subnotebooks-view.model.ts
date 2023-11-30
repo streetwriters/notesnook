@@ -20,33 +20,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { BaseViewModel } from "./base-view.model";
-import { ItemModel } from "./item.model";
-import { Item } from "./types";
-import { fillItemDialog } from "./utils";
+import { NotebookItemModel } from "./notebook-item.model";
+import { Notebook } from "./types";
+import { fillNotebookDialog } from "./utils";
 
-export class ItemsViewModel extends BaseViewModel {
+export class SubnotebooksViewModel extends BaseViewModel {
   private readonly createButton: Locator;
-  constructor(page: Page) {
-    super(page, "tags", "tags");
-    this.createButton = page.locator(getTestId(`tags-action-button`));
+
+  constructor(readonly page: Page) {
+    super(page, "subnotebooks", "subnotebooks");
+    this.createButton = page
+      .locator(getTestId("subnotebooks-action-button"))
+      .first();
   }
 
-  async createItem(item: Item) {
-    const titleToCompare = `#${item.title}`;
+  async createNotebook(notebook: Notebook) {
+    await this.createButton.click();
 
-    await this.createButton.first().click();
-    await fillItemDialog(this.page, item);
+    await fillNotebookDialog(this.page, notebook);
 
-    await this.waitForItem(titleToCompare);
-    return await this.findItem(item);
+    await this.waitForItem(notebook.title);
+    return await this.findNotebook(notebook);
   }
 
-  async findItem(item: Item) {
-    const titleToCompare = `#${item.title}`;
-    for await (const _item of this.iterateItems()) {
-      const itemModel = new ItemModel(_item, "tag");
-      const title = await itemModel.getTitle();
-      if (title === titleToCompare) return itemModel;
+  async findNotebook(notebook: Partial<Notebook>) {
+    for await (const item of this.iterateItems()) {
+      const notebookModel = new NotebookItemModel(item);
+      if ((await notebookModel.getTitle()) === notebook.title)
+        return notebookModel;
     }
     return undefined;
   }
