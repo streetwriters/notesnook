@@ -69,34 +69,26 @@ async function createNotes(bundle) {
   if (!bundle.notebooks || !bundle.notebooks.length) {
     const defaultNotebook = db.settings?.getDefaultNotebook();
     if (defaultNotebook) {
-      if (!defaultNotebook.topic) {
-        db.relations.add(
-          { type: "notebook", id: defaultNotebook.id },
-          { id, type: "note" }
-        );
-      } else {
-        db.notes.addToNotebook(
-          {
-            id: defaultNotebook?.id,
-            topic: defaultNotebook.topic
-          },
-          id
-        );
-      }
+      await db.notes.addToNotebook(defaultNotebook, id);
     }
   } else {
     for (const item of bundle.notebooks) {
-      if (item.type === "notebook") {
-        db.relations.add(item, { id, type: "note" });
-      } else {
-        db.notes.addToNotebook(
-          {
-            id: item.notebookId,
-            topic: item.id
-          },
-          id
-        );
-      }
+      await db.notes.addToNotebook(item, id);
+    }
+  }
+
+  if (bundle.tags) {
+    for (const tagId of bundle.tags) {
+      await db.relations.add(
+        {
+          type: "tag",
+          id: tagId
+        },
+        {
+          id: id,
+          type: "note"
+        }
+      );
     }
   }
 
