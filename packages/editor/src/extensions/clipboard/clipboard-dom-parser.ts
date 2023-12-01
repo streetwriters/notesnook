@@ -37,7 +37,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
   }
 
   parseSlice(dom: Node, options?: ParseOptions | undefined): Slice {
-    if (dom instanceof HTMLElement) {
+    if (dom instanceof HTMLElement || dom instanceof Document) {
       formatCodeblocks(dom);
       convertBrToSingleSpacedParagraphs(dom);
     }
@@ -47,6 +47,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
 
 export function formatCodeblocks(dom: HTMLElement | Document) {
   for (const pre of dom.querySelectorAll("pre")) {
+    pre.innerHTML = pre.innerHTML?.replaceAll(/<br.*?>/g, "\n");
     const codeAsText = pre.textContent;
     const languageElement = pre.querySelector(
       '[class*="language-"],[class*="lang-"]'
@@ -60,8 +61,8 @@ export function formatCodeblocks(dom: HTMLElement | Document) {
   }
 
   for (const div of dom.querySelectorAll(".w3-code")) {
-    div.innerHTML = div.innerHTML?.replaceAll(/<br.*?>/g, "w3-code-space");
-    const codeAsText = div.textContent?.replaceAll("w3-code-space", "\n");
+    div.innerHTML = div.innerHTML?.replaceAll(/<br.*?>/g, "\n");
+    const codeAsText = div.textContent;
     const pre = document.createElement("pre");
     const code = document.createElement("code");
     code.innerHTML = encodeNonAsciiHTML(codeAsText || "");
