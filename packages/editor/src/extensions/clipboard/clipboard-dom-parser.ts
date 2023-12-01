@@ -58,6 +58,16 @@ export function formatCodeblocks(dom: HTMLElement | Document) {
     code.innerHTML = encodeNonAsciiHTML(codeAsText || "");
     pre.replaceChildren(code);
   }
+
+  for (const div of dom.querySelectorAll(".w3-code")) {
+    div.innerHTML = div.innerHTML?.replaceAll(/<br.*?>/g, "w3-code-space");
+    const codeAsText = div.textContent?.replaceAll("w3-code-space", "\n");
+    const pre = document.createElement("pre");
+    const code = document.createElement("code");
+    code.innerHTML = encodeNonAsciiHTML(codeAsText || "");
+    pre.replaceChildren(code);
+    div.replaceChildren(pre);
+  }
 }
 
 export function convertBrToSingleSpacedParagraphs(dom: HTMLElement | Document) {
