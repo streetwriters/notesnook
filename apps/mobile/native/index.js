@@ -31,9 +31,6 @@ if (__DEV__) {
   console.warn = () => null;
   LogBox.ignoreAllLogs();
 }
-let NotesnookShare;
-
-let QuickNoteIOS;
 
 const AppProvider = () => {
   const App = require('../app/app').default;
@@ -43,7 +40,7 @@ const AppProvider = () => {
 AppRegistry.registerComponent(appName, () => AppProvider);
 
 const ShareProvider = () => {
-  NotesnookShare = require('../share/index').default;
+  let NotesnookShare = require('../share/index').default;
   return Platform.OS === 'ios' ? (
     <SafeAreaProvider>
       <NotesnookShare quicknote={false} />
