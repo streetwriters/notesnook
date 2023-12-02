@@ -375,6 +375,17 @@ export const MOBILE_STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
   [...STATIC_TOOLBAR_GROUPS[0], "previewAttachment"]
 ];
 
+export const READONLY_MOBILE_STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
+  [
+    "imageSettings",
+    "embedSettings",
+    "attachmentSettings",
+    "linkSettings",
+    "webclipSettings",
+    "previewAttachment"
+  ]
+];
+
 const defaultPresets: Record<"default" | "minimal", ToolbarDefinition> = {
   default: [
     [

@@ -21,7 +21,8 @@ import { Flex, FlexProps } from "@theme-ui/components";
 import {
   getDefaultPresets,
   STATIC_TOOLBAR_GROUPS,
-  MOBILE_STATIC_TOOLBAR_GROUPS
+  MOBILE_STATIC_TOOLBAR_GROUPS,
+  READONLY_MOBILE_STATIC_TOOLBAR_GROUPS
 } from "./tool-definitions";
 import { useEffect, useMemo } from "react";
 import { Editor } from "../types";
@@ -57,7 +58,9 @@ export function Toolbar(props: ToolbarProps) {
   const toolbarTools = useMemo(
     () =>
       isMobile
-        ? [...MOBILE_STATIC_TOOLBAR_GROUPS, ...tools]
+        ? editor?.current?.isEditable
+          ? [...MOBILE_STATIC_TOOLBAR_GROUPS, ...tools]
+          : READONLY_MOBILE_STATIC_TOOLBAR_GROUPS
         : [...STATIC_TOOLBAR_GROUPS, ...tools],
     [tools, isMobile]
   );

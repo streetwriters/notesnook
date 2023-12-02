@@ -557,7 +557,7 @@ function EditorChrome(
         <Box
           id="editorToolbar"
           sx={{
-            display: readonly ? "none" : "flex",
+            display: "flex",
             bg: "background",
             position: "sticky",
             top: 0,
