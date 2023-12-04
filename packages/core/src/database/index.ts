@@ -189,7 +189,9 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
     if (
       row.value &&
       (row.key.startsWith("groupOptions") ||
-        row.key.startsWith("toolbarConfig"))
+        row.key.startsWith("toolbarConfig") ||
+        row.key.startsWith("sideBarOrder") ||
+        row.key.startsWith("sideBarHidenItems"))
     )
       row.value = JSON.parse(row.value);
   },
