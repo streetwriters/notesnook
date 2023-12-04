@@ -89,7 +89,6 @@ export const SideMenu = React.memo(
         <>
           <ReorderableList
             onListOrderChanged={(data) => {
-              console.log(data);
               db.settings.setSideBarOrder("menu", data);
             }}
             onHiddenItemsChanged={(data) => {
