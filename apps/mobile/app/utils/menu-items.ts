@@ -20,32 +20,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Monographs } from "../screens/notes/monographs";
 export const MenuItemsList = [
   {
+    id: "notes",
     name: "Notes",
     icon: "home-variant-outline",
     close: true
   },
   {
+    id: "notebooks",
     name: "Notebooks",
     icon: "book-outline",
     close: true
   },
   {
+    id: "favorites",
     name: "Favorites",
     icon: "star-outline",
     close: true
   },
   {
+    id: "tags",
     name: "Tags",
     icon: "pound",
     close: true
   },
   {
+    id: "reminders",
     name: "Reminders",
     icon: "bell",
     close: true,
     isBeta: true
   },
   {
+    id: "monographs",
     name: "Monographs",
     icon: "text-box-multiple-outline",
     close: true,
@@ -54,6 +60,7 @@ export const MenuItemsList = [
     }
   },
   {
+    id: "trash",
     name: "Trash",
     icon: "delete-outline",
     close: true

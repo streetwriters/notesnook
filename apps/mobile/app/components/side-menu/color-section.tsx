@@ -32,6 +32,7 @@ import { presentDialog } from "../dialog/functions";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import ReorderableList from "../list/reorderable-list";
 
 export const ColorSection = React.memo(
   function ColorSection() {
@@ -48,11 +49,27 @@ export const ColorSection = React.memo(
       }
     }, [loading, setColorNotes]);
 
-    return !loadingColors
-      ? colorNotes.map((item) => {
+    return (
+      <ReorderableList
+        onListOrderChanged={(data) => {
+          db.settings.setSideBarOrder("colors", data);
+        }}
+        onHiddenItemsChanged={(data) => {
+          db.settings.setSideBarHiddenItems("colors", data);
+        }}
+        itemOrder={db.settings.getSideBarOrder("colors")}
+        hiddenItems={db.settings.getSideBarHiddenItems("colors")}
+        alwaysBounceVertical={false}
+        data={colorNotes}
+        style={{
+          width: "100%"
+        }}
+        showsVerticalScrollIndicator={false}
+        renderDraggableItem={({ item }) => {
           return <ColorItem key={item.id} item={item} />;
-        })
-      : null;
+        }}
+      />
+    );
   },
   () => true
 );
