@@ -74,6 +74,7 @@ export type Settings = {
   colorScheme: "dark" | "light";
   lighTheme: ThemeDefinition;
   darkTheme: ThemeDefinition;
+  backgroundSync?: boolean;
 };
 
 type DimensionsType = {
