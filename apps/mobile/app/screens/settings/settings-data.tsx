@@ -401,6 +401,14 @@ export const settingsGroups: SettingSection[] = [
             property: "disableSync"
           },
           {
+            id: "background-sync",
+            name: "Background sync (Experimental)",
+            description:
+              "Periodically wake up the app in background to sync your notes from other devices.",
+            type: "switch",
+            property: "backgroundSync"
+          },
+          {
             id: "sync-issues-fix",
             name: "Having problems with sync",
             description: "Try force sync to resolve issues with syncing",
