@@ -34,6 +34,8 @@ export type SortOptions = {
   sortDirection: "desc" | "asc";
 };
 
+export type SideBarSectionKey = "menu" | "colors" | "pinned";
+
 export type GroupOptions = SortOptions & {
   groupBy: "none" | "abc" | "year" | "month" | "week" | "default";
 };
@@ -431,7 +433,9 @@ export type SettingItemMap = {
   dateFormat: string;
   defaultNotebook: string | undefined;
 } & Record<`groupOptions:${GroupingKey}`, GroupOptions> &
-  Record<`toolbarConfig:${ToolbarConfigPlatforms}`, ToolbarConfig | undefined>;
+  Record<`toolbarConfig:${ToolbarConfigPlatforms}`, ToolbarConfig | undefined> &
+  Record<`sideBarOrder:${SideBarSectionKey}`, string[]> &
+  Record<`sideBarHiddenItems:${SideBarSectionKey}`, string[]>;
 
 export interface SettingItem<
   TKey extends keyof SettingItemMap = keyof SettingItemMap
