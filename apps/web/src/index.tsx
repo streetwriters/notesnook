@@ -76,3 +76,5 @@ async function initializeServiceWorker() {
     // window.addEventListener("beforeinstallprompt", () => showInstallNotice());
   }
 }
+
+if (import.meta.hot) import.meta.hot.accept();
