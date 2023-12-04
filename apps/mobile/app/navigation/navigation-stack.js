@@ -81,7 +81,6 @@ const _Tabs = () => {
     (state) => state.settings.introCompleted
   );
   const height = useSettingStore((state) => state.dimensions.height);
-  const loading = useNoteStore((state) => state.loading);
   const insets = useGlobalSafeAreaInsets();
   const screenHeight = height - (50 + insets.top + insets.bottom);
   React.useEffect(() => {
@@ -90,18 +89,7 @@ const _Tabs = () => {
     }, 1000);
   }, [homepage]);
 
-  return loading && introCompleted ? (
-    <>
-      <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: colors.primary.background
-        }}
-      >
-        <DelayLayout animated={false} wait={loading} />
-      </SafeAreaView>
-    </>
-  ) : (
+  return (
     <NativeStack.Navigator
       tabBar={() => null}
       initialRouteName={!introCompleted ? "Welcome" : homepage}

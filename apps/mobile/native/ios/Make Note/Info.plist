@@ -52,6 +52,8 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.share-services</string>
 	</dict>
+	<key>ReactNativeQuickSQLite_AppGroup</key>
+	<string>group.org.streetwriters.notesnook</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>OpenSans-Bold.ttf</string>

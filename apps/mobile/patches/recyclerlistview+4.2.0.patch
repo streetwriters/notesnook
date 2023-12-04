@@ -1,0 +1,13 @@
+diff --git a/node_modules/recyclerlistview/dist/reactnative/core/layoutmanager/LayoutManager.js b/node_modules/recyclerlistview/dist/reactnative/core/layoutmanager/LayoutManager.js
+index 9cd3c57..970421a 100644
+--- a/node_modules/recyclerlistview/dist/reactnative/core/layoutmanager/LayoutManager.js
++++ b/node_modules/recyclerlistview/dist/reactnative/core/layoutmanager/LayoutManager.js
+@@ -111,7 +111,7 @@ var WrapGridLayoutManager = /** @class */ (function (_super) {
+         var itemDim = { height: 0, width: 0 };
+         var itemRect = null;
+         var oldLayout = null;
+-        for (var i = startIndex; i < itemCount; i++) {
++        for (var i = startIndex; i < Math.min(startIndex + 5000, itemCount); i++) {
+             oldLayout = this._layouts[i];
+             var layoutType = this._layoutProvider.getLayoutTypeForIndex(i);
+             if (oldLayout && oldLayout.isOverridden && oldLayout.type === layoutType) {

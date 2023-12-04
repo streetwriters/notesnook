@@ -628,7 +628,7 @@ export const useAppEvents = () => {
         if (!db.isInitialized) {
           await db.init();
         }
-        initialize();
+        await initialize();
         useNoteStore.getState().setLoading(false);
       },
       disableClosing: true
@@ -658,7 +658,9 @@ export const useAppEvents = () => {
       }
       if (IsDatabaseMigrationRequired()) return;
       initialize();
-      useNoteStore.getState().setLoading(false);
+      setImmediate(() => {
+        useNoteStore.getState().setLoading(false);
+      });
       Walkthrough.init();
     } catch (e) {
       DatabaseLogger.error(e as Error);

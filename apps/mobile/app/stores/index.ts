@@ -38,19 +38,17 @@ export function initAfterSync() {
   useRelationStore.getState().update();
 }
 
-export function initialize() {
+export async function initialize() {
   if (!db) return;
-  setImmediate(() => {
-    useMenuStore.getState().setColorNotes();
-    useMenuStore.getState().setMenuPins();
-    useNotebookStore.getState().setNotebooks();
-    useTrashStore.getState().setTrash();
-    useTagStore.getState().setTags();
-    useFavoriteStore.getState().setFavorites();
-    useNoteStore.getState().setNotes();
-    useReminderStore.getState().setReminders();
-    Notifications.setupReminders();
-  });
+  useMenuStore.getState().setColorNotes();
+  useMenuStore.getState().setMenuPins();
+  useNotebookStore.getState().setNotebooks();
+  useTrashStore.getState().setTrash();
+  useTagStore.getState().setTags();
+  useFavoriteStore.getState().setFavorites();
+  await useNoteStore.getState().setNotes();
+  useReminderStore.getState().setReminders();
+  Notifications.setupReminders();
 }
 
 export function clearAllStores() {

@@ -95,6 +95,9 @@ target 'Make Note' do
   pod 'callstack-repack', :path => '../../node_modules/@callstack/repack'
   pod 'RNSecureRandom', :path => '../../node_modules/react-native-securerandom'
   pod "RNCClipboard", :path => '../../node_modules/@react-native-clipboard/clipboard'
+  pod "react-native-quick-sqlite", :path =>  '../../node_modules/react-native-quick-sqlite'
+  pod "RNDeviceInfo", :path =>  '../../node_modules/react-native-device-info'
+  pod "RNPrivacySnapshot", :path =>  '../../node_modules/react-native-privacy-snapshot'
 end
 
 
