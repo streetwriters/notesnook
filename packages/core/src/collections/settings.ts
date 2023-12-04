@@ -24,6 +24,7 @@ import {
   GroupingKey,
   SettingItem,
   SettingItemMap,
+  SideBarSectionKey,
   ToolbarConfig,
   ToolbarConfigPlatforms,
   TrashCleanupInterval
@@ -60,7 +61,15 @@ const defaultSettings: SettingItemMap = {
   "groupOptions:reminders": DEFAULT_GROUP_OPTIONS("reminders"),
 
   "toolbarConfig:desktop": undefined,
-  "toolbarConfig:mobile": undefined
+  "toolbarConfig:mobile": undefined,
+
+  "sideBarOrder:colors": [],
+  "sideBarOrder:menu": [],
+  "sideBarOrder:pinned": [],
+
+  "sideBarHiddenItems:colors": [],
+  "sideBarHiddenItems:menu": [],
+  "sideBarHiddenItems:pinned": []
 };
 
 export class Settings implements ICollection {
@@ -165,5 +174,21 @@ export class Settings implements ICollection {
 
   setTimeFormat(format: TimeFormat) {
     return this.set("timeFormat", format);
+  }
+
+  getSideBarOrder(section: SideBarSectionKey) {
+    return this.get(`sideBarOrder:${section}`);
+  }
+
+  setSideBarOrder(section: SideBarSectionKey, order: string[]) {
+    return this.set(`sideBarOrder:${section}`, order);
+  }
+
+  getSideBarHiddenItems(section: SideBarSectionKey) {
+    return this.get(`sideBarHiddenItems:${section}`);
+  }
+
+  setSideBarHiddenItems(section: SideBarSectionKey, order: string[]) {
+    return this.set(`sideBarHiddenItems:${section}`, order);
   }
 }
