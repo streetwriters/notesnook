@@ -33,7 +33,6 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
-  Text,
   TouchableOpacity,
   View,
   useWindowDimensions
@@ -53,7 +52,6 @@ import Paragraph from "../app/components/ui/typography/paragraph";
 import { useDBItem } from "../app/hooks/use-db-item";
 import { eSendEvent } from "../app/services/event-manager";
 import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../app/utils/constants";
-import { getElevationStyle } from "../app/utils/elevation";
 import { eOnLoadNote } from "../app/utils/events";
 import { NoteBundle } from "../app/utils/note-bundle";
 import { SIZE } from "../app/utils/size";
