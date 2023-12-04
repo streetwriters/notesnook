@@ -36,7 +36,7 @@ type RouteResult = {
   key: string;
   type: "notes" | "notebooks" | "reminders" | "trash" | "tags";
   title?: string | (() => Promise<string | undefined>);
-  component: React.ReactNode;
+  component: React.FunctionComponent;
   props?: any;
   buttons?: RouteContainerButtons;
 };
