@@ -339,6 +339,10 @@ PODS:
     - React
   - react-native-pdf (6.6.2):
     - React-Core
+  - react-native-quick-sqlite (8.0.6):
+    - React
+    - React-callinvoker
+    - React-Core
   - react-native-safe-area-context (4.6.3):
     - RCT-Folly
     - RCTRequired
@@ -591,6 +595,7 @@ DEPENDENCIES:
   - react-native-notification-sounds (from `../../node_modules/react-native-notification-sounds`)
   - react-native-orientation (from `../../node_modules/react-native-orientation`)
   - react-native-pdf (from `../../node_modules/react-native-pdf`)
+  - react-native-quick-sqlite (from `../../node_modules/react-native-quick-sqlite`)
   - react-native-safe-area-context (from `../../node_modules/react-native-safe-area-context`)
   - "react-native-share-extension (from `../../node_modules/@ammarahmed/react-native-share-extension`)"
   - "react-native-sodium (from `../../node_modules/@ammarahmed/react-native-sodium`)"
@@ -734,6 +739,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native-orientation"
   react-native-pdf:
     :path: "../../node_modules/react-native-pdf"
+  react-native-quick-sqlite:
+    :path: "../../node_modules/react-native-quick-sqlite"
   react-native-safe-area-context:
     :path: "../../node_modules/react-native-safe-area-context"
   react-native-share-extension:
@@ -880,6 +887,7 @@ SPEC CHECKSUMS:
   react-native-notification-sounds: da78c828fe1bcbb92d8b505d5261890ed315ff39
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-pdf: 33c622cbdf776a649929e8b9d1ce2d313347c4fa
+  react-native-quick-sqlite: e0e23b749382a85e4b57146f753de737a6c3a9e1
   react-native-safe-area-context: 36cc67648134e89465663b8172336a19eeda493d
   react-native-share-extension: df66a2ee48a62277d79898375e2142bde0782063
   react-native-sodium: 955bb0dc3ea05f8ea06d5e96cb89d1be7b5d7681
@@ -929,6 +937,6 @@ SPEC CHECKSUMS:
   toolbar-android: 2a73856e98b750d7e71ce4644d3f41cc98211719
   Yoga: 1d6727ed193122f6adaf435c3de1a768326ff83b
 
-PODFILE CHECKSUM: b0cadd188aa428b98d1eaa0b84b3b6208e714119
+PODFILE CHECKSUM: 21553b7e17c48c3fa8e56d4cc26e0c4bd4a74260
 
 COCOAPODS: 1.12.1
