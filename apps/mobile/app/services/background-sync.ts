@@ -21,6 +21,11 @@ import {
   beginBackgroundTask,
   endBackgroundTask
 } from "react-native-begin-background-task";
+import BackgroundFetch from "@ammarahmed/react-native-background-fetch";
+import { DatabaseLogger, db } from "../common/database";
+import { AppState, AppRegistry } from "react-native";
+import Notifications from "./notifications";
+import SettingsService from "./settings";
 
 async function doInBackground(callback: () => Promise<void>) {
   if (Platform.OS === "ios") {
@@ -45,107 +50,116 @@ async function doInBackground(callback: () => Promise<void>) {
   }
 }
 
-// import BackgroundFetch from "react-native-background-fetch";
-// import { DatabaseLogger, db } from "../common/database";
-// import { AppState, AppRegistry } from "react-native";
-// import Notifications from "./notifications";
-// import SettingsService from "./settings";
+let backgroundFetchStarted = false;
+async function start() {
+  if (backgroundFetchStarted) return;
+  backgroundFetchStarted = true;
+  if (!SettingsService.getProperty("backgroundSync")) {
+    return;
+  }
+  // BackgroundFetch event handler.
+  const onEvent = async (taskId: string) => {
+    DatabaseLogger.info(
+      `BACKGROUND FETCH ON EVENT ${taskId}, ${AppState.currentState}}`
+    );
+    // Do your background work...
+    await onBackgroundSyncStarted();
+    // IMPORTANT:  You must signal to the OS that your task is complete.
+    BackgroundFetch.finish(taskId);
+  };
 
-// let backgroundFetchStarted = false;
-// async function start() {
-//   if (backgroundFetchStarted) return;
-//   backgroundFetchStarted = true;
-//   // BackgroundFetch event handler.
-//   const onEvent = async (taskId: string) => {
-//     console.log("[BackgroundFetch] task: ", taskId, AppState.currentState);
-//     // Do your background work...
-//     await onBackgroundSyncStarted();
-//     // IMPORTANT:  You must signal to the OS that your task is complete.
-//     BackgroundFetch.finish(taskId);
-//   };
+  // Timeout callback is executed when your Task has exceeded its allowed running-time.
+  // You must stop what you're doing immediately BackgroundFetch.finish(taskId)
+  const onTimeout = async (taskId: string) => {
+    DatabaseLogger.info(`BACKGROUND FETCH TIMEOUT: ${taskId}`);
+    BackgroundFetch.finish(taskId);
+  };
 
-//   // Timeout callback is executed when your Task has exceeded its allowed running-time.
-//   // You must stop what you're doing immediately BackgroundFetch.finish(taskId)
-//   const onTimeout = async (taskId: string) => {
-//     console.warn("[BackgroundFetch] TIMEOUT: ", taskId);
-//     BackgroundFetch.finish(taskId);
-//   };
+  // Initialize BackgroundFetch only once when component mounts.
+  const status = await BackgroundFetch.configure(
+    {
+      minimumFetchInterval: 15,
+      enableHeadless: true,
+      startOnBoot: true,
+      stopOnTerminate: false,
+      requiredNetworkType: BackgroundFetch.NETWORK_TYPE_ANY
+    },
+    onEvent,
+    onTimeout
+  );
+  DatabaseLogger.info(`[BackgroundFetch] configure status: ${status}`);
+}
 
-//   // Initialize BackgroundFetch only once when component mounts.
-//   const status = await BackgroundFetch.configure(
-//     {
-//       minimumFetchInterval: 15,
-//       enableHeadless: true,
-//       startOnBoot: true,
-//       stopOnTerminate: false,
-//       requiredNetworkType: BackgroundFetch.NETWORK_TYPE_ANY
-//     },
-//     onEvent,
-//     onTimeout
-//   );
-//   DatabaseLogger.info(`[BackgroundFetch] configure status: ${status}`);
-//   console.log(`[BackgroundFetch] configure status: ${status}`);
-// }
+const task = async (event: { taskId: string; timeout: boolean }) => {
+  // Get task id from event {}:
+  const taskId = event.taskId;
+  const isTimeout = event.timeout; // <-- true when your background-time has expired.
+  if (isTimeout) {
+    console.log(`BACKGROUND FETCH TIMEOUT: ${taskId}`);
+    BackgroundFetch.finish(taskId);
+    return;
+  }
+  DatabaseLogger.info("BACKGROUND SYNC START" + taskId + AppState.currentState);
+  await onBackgroundSyncStarted();
+  BackgroundFetch.finish(taskId);
+};
 
-// const task = async (event: { taskId: string; timeout: boolean }) => {
-//   // Get task id from event {}:
-//   const taskId = event.taskId;
-//   const isTimeout = event.timeout; // <-- true when your background-time has expired.
-//   if (isTimeout) {
-//     console.log("[BackgroundFetch] Headless TIMEOUT:", taskId);
-//     BackgroundFetch.finish(taskId);
-//     return;
-//   }
-//   DatabaseLogger.info(
-//     "[BackgroundFetch HeadlessTask] start: " + taskId + AppState.currentState
-//   );
-//   await onBackgroundSyncStarted();
-//   BackgroundFetch.finish(taskId);
-// };
+BackgroundFetch.registerHeadlessTask(task);
 
-// BackgroundFetch.registerHeadlessTask(task);
+async function onBackgroundSyncStarted() {
+  try {
+    if (!db.isInitialized) {
+      await db.init();
+    } else {
+      await db.initCollections();
+    }
 
-// async function onBackgroundSyncStarted() {
-//   try {
-//     DatabaseLogger.info("Background Sync" + "start");
-//     await db.init();
-//     const user = await db.user?.getUser();
-//     if (user) {
-//       await db.sync(true, false);
-//     }
-//     await Notifications.setupReminders();
-//     DatabaseLogger.info("Background Sync" + "end");
-//   } catch (e) {
-//     DatabaseLogger.error(e as Error);
-//     console.log("Background Sync Error", (e as Error).message);
-//   }
-// }
+    const user = await db.user?.getUser();
+    if (user) {
+      await db.sync(true, false);
+    }
+    await Notifications.setupReminders();
+    DatabaseLogger.info("BACKGROUND SYNC COMPLETE");
+  } catch (e) {
+    DatabaseLogger.error(e as Error);
+    console.log("BACKGROUND SYNC ERROR", (e as Error).message);
+  }
+}
 
-// const onBoot = async () => {
-//   try {
-//     DatabaseLogger.info("BOOT TASK STARTED");
-//     await db.init();
-//     await Notifications.setupReminders();
-//     SettingsService.init();
-//     if (SettingsService.get().notifNotes) {
-//       Notifications.pinQuickNote(false);
-//     }
-//     DatabaseLogger.info("BOOT TASK COMPLETE");
-//   } catch (e) {
-//     console.log(e);
-//   }
-// };
+const onBoot = async () => {
+  try {
+    if (!SettingsService.getProperty("backgroundSync")) {
+      return;
+    }
 
-// const registerHeadlessTask = () =>
-//   AppRegistry.registerHeadlessTask(
-//     "com.streetwriters.notesnook.BOOT_TASK",
-//     () => {
-//       return onBoot;
-//     }
-//   );
+    DatabaseLogger.info("BOOT TASK STARTED");
+    if (!db.isInitialized) {
+      await db.init();
+    } else {
+      await db.initCollections();
+    }
 
-// export const BackgroundSync = {
-//   start,
-//   registerHeadlessTask
-// };
+    await Notifications.setupReminders();
+    SettingsService.init();
+    if (SettingsService.get().notifNotes) {
+      Notifications.pinQuickNote(false);
+    }
+    DatabaseLogger.info("BOOT TASK COMPLETE");
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const registerHeadlessTask = () =>
+  AppRegistry.registerHeadlessTask(
+    "com.streetwriters.notesnook.BOOT_TASK",
+    () => {
+      return onBoot;
+    }
+  );
+export const BackgroundSync = {
+  start,
+  registerHeadlessTask
+};
+
 export default { doInBackground };

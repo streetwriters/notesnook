@@ -79,6 +79,7 @@ export type Settings = {
   markdownShortcuts?: boolean;
   appLockHasPasswordSecurity?: boolean;
   biometricsAuthEnabled?: boolean;
+  backgroundSync?: boolean;
 };
 
 type DimensionsType = {

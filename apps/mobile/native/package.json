@@ -64,7 +64,8 @@
     "react-native-webview": "^11.14.1",
     "react-native-zip-archive": "6.0.9",
     "react-native-quick-sqlite": "^8.0.6",
-    "react-native-theme-switch-animation": "^0.6.0"
+    "react-native-theme-switch-animation": "^0.6.0",
+    "@ammarahmed/react-native-background-fetch": "^4.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
