@@ -78,6 +78,7 @@ export type Settings = {
   darkTheme: ThemeDefinition;
   appLockHasPasswordSecurity?: boolean;
   biometricsAuthEnabled?: boolean;
+  backgroundSync?: boolean;
 };
 
 type DimensionsType = {
