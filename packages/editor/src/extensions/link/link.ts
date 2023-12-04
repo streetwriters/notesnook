@@ -16,11 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { markInputRule } from "@tiptap/core";
+import { markInputRule, markPasteRule } from "@tiptap/core";
 import TiptapLink from "@tiptap/extension-link";
 
 const linkRegex = /(?:__|[*#])|\[(.*?)\]\(.*?\)/gm;
-const regExp = /\((.*?)\)/;
+const regExp = /\((.*?)\)/gm;
 
 export const Link = TiptapLink.extend({
   addInputRules() {
@@ -28,9 +28,24 @@ export const Link = TiptapLink.extend({
       markInputRule({
         find: linkRegex,
         type: this.type,
-        getAttributes: (match) => ({
-          href: regExp.exec(match[0])?.[1]
-        })
+        getAttributes: (match) => {
+          return {
+            href: regExp.exec(match[0])?.[1]
+          };
+        }
+      })
+    ];
+  },
+  addPasteRules() {
+    return [
+      markPasteRule({
+        find: linkRegex,
+        type: this.type,
+        getAttributes(match) {
+          return {
+            href: regExp.exec(match[0])?.[1]
+          };
+        }
       })
     ];
   }
