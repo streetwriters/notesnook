@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Notebook, Tag } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, View } from "react-native";
+import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import NotebookScreen from "../../screens/notebook";
@@ -30,6 +30,7 @@ import { useMenuStore } from "../../stores/use-menu-store";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
 import { SIZE, normalize } from "../../utils/size";
+import ReorderableList from "../list/reorderable-list";
 import { Properties } from "../properties";
 import { Button } from "../ui/button";
 import { Notice } from "../ui/notice";
@@ -39,8 +40,8 @@ import SheetWrapper from "../ui/sheet";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
-export const TagsSection = React.memo(
-  function TagsSection() {
+export const PinnedSection = React.memo(
+  function PinnedSection() {
     const menuPins = useMenuStore((state) => state.menuPins);
     const loading = useNoteStore((state) => state.loading);
     const setMenuPins = useMenuStore((state) => state.setMenuPins);
@@ -71,11 +72,27 @@ export const TagsSection = React.memo(
           flexGrow: 1
         }}
       >
-        <FlatList
+        <ReorderableList
+          onListOrderChanged={(data) => {
+            db.settings.setSideBarOrder("pinned", data);
+          }}
+          onHiddenItemsChanged={(data) => {
+            db.settings.setSideBarHiddenItems("pinned", data);
+          }}
+          itemOrder={db.settings.getSideBarOrder("pinned")}
+          hiddenItems={db.settings.getSideBarHiddenItems("pinned")}
+          alwaysBounceVertical={false}
           data={menuPins}
           style={{
+            flexGrow: 1,
+            width: "100%",
+            paddingHorizontal: 12
+          }}
+          contentContainerStyle={{
             flexGrow: 1
           }}
+          showsVerticalScrollIndicator={false}
+          renderDraggableItem={renderItem}
           ListEmptyComponent={
             <Notice
               size="small"
@@ -83,11 +100,6 @@ export const TagsSection = React.memo(
               text="Add shortcuts for notebooks, topics and tags here."
             />
           }
-          contentContainerStyle={{
-            flexGrow: 1
-          }}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
         />
       </View>
     );

@@ -33,9 +33,15 @@ import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
 import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
-import { TagsSection } from "./pinned-section";
+import { PinnedSection } from "./pinned-section";
 import { UserStatus } from "./user-status";
 import { useThemeStore } from "../../stores/use-theme-store";
+import ReorderableList from "../list/reorderable-list";
+import { db } from "../../common/database";
+import { useSideBarDraggingStore } from "./dragging-store";
+import Paragraph from "../ui/typography/paragraph";
+import { IconButton } from "../ui/icon-button";
+import { SIZE } from "../../utils/size";
 
 export const SideMenu = React.memo(
   function SideMenu() {
@@ -45,6 +51,8 @@ export const SideMenu = React.memo(
       (state) => state.user?.subscription?.type
     );
     const loading = useNoteStore((state) => state.loading);
+    const dragging = useSideBarDraggingStore((state) => state.dragging);
+
     const introCompleted = useSettingStore(
       (state) => state.settings.introCompleted
     );
@@ -77,20 +85,38 @@ export const SideMenu = React.memo(
         eSendEvent(eOpenPremiumDialog);
       }
     };
-
     const renderItem = useCallback(
       () => (
         <>
-          {MenuItemsList.map((item, index) => (
-            <MenuItem
-              key={item.name}
-              item={item}
-              testID={item.name}
-              index={index}
-            />
-          ))}
+          <ReorderableList
+            onListOrderChanged={(data) => {
+              console.log(data);
+              db.settings.setSideBarOrder("menu", data);
+            }}
+            onHiddenItemsChanged={(data) => {
+              db.settings.setSideBarHiddenItems("menu", data);
+            }}
+            itemOrder={db.settings.getSideBarOrder("menu")}
+            hiddenItems={db.settings.getSideBarHiddenItems("menu")}
+            alwaysBounceVertical={false}
+            data={MenuItemsList}
+            style={{
+              width: "100%"
+            }}
+            showsVerticalScrollIndicator={false}
+            renderDraggableItem={({ item, index }) => {
+              return (
+                <MenuItem
+                  key={item.name}
+                  item={item}
+                  testID={item.name}
+                  index={index}
+                />
+              );
+            }}
+          />
           <ColorSection noTextMode={noTextMode} />
-          <TagsSection />
+          <PinnedSection />
         </>
       ),
       [noTextMode]
@@ -109,21 +135,44 @@ export const SideMenu = React.memo(
             height: "100%",
             width: "100%",
             backgroundColor: colors.primary.background,
-            paddingTop: insets.top,
-            borderRadius: 10,
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0
+            paddingTop: insets.top
           }}
         >
+          {dragging ? (
+            <View
+              style={{
+                flexDirection: "row",
+                borderRadius: 5,
+                marginBottom: 12,
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderBottomWidth: 1,
+                borderBottomColor: colors.primary.border,
+                paddingHorizontal: 12
+              }}
+            >
+              <Paragraph size={SIZE.xs + 1}>REORDER SIDEBAR</Paragraph>
+
+              <IconButton
+                name="close"
+                size={20}
+                onPress={() => {
+                  useSideBarDraggingStore.setState({
+                    dragging: false
+                  });
+                }}
+                customStyle={{
+                  width: 35,
+                  height: 35
+                }}
+              />
+            </View>
+          ) : null}
+
           <FlatList
             alwaysBounceVertical={false}
             contentContainerStyle={{
               flexGrow: 1
-            }}
-            style={{
-              height: "100%",
-              width: "100%",
-              paddingHorizontal: 12
             }}
             showsVerticalScrollIndicator={false}
             data={[0]}
