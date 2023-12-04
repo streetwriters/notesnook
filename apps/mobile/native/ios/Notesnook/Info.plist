@@ -88,6 +88,8 @@
 	<string>Only required by library- not requested in application</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Add photos from gallery to your note.</string>
+	<key>ReactNativeQuickSQLite_AppGroup</key>
+	<string>group.org.streetwriters.notesnook</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>OpenSans-SemiBold.ttf</string>
