@@ -34,6 +34,7 @@ export type VirtualizedListProps<T> = {
   renderItem: (props: { item: T; index: number }) => JSX.Element | null;
   scrollMargin?: number;
   itemGap?: number;
+  overscan?: number;
 } & BoxProps;
 export function VirtualizedList<T>(props: VirtualizedListProps<T>) {
   const {
@@ -47,6 +48,7 @@ export function VirtualizedList<T>(props: VirtualizedListProps<T>) {
     virtualizerRef,
     itemWrapperProps,
     itemGap,
+    overscan = 5,
     ...containerProps
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -58,7 +60,7 @@ export function VirtualizedList<T>(props: VirtualizedListProps<T>) {
     getScrollElement: () =>
       scrollElement || containerRef.current?.closest(".ms-container") || null,
     scrollMargin: scrollMargin || containerRef.current?.offsetTop || 0,
-    overscan: 5
+    overscan
   });
 
   if (virtualizerRef) virtualizerRef.current = virtualizer;

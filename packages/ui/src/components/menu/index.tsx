@@ -207,7 +207,9 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
           {title}
         </Text>
       )}
-      <ScrollContainer suppressScrollX>{children}</ScrollContainer>
+      <ScrollContainer suppressScrollX style={{ maxHeight: 400 }}>
+        {children}
+      </ScrollContainer>
       {/* <FlexScrollContainer>{children}</FlexScrollContainer> */}
     </Box>
   );
@@ -264,7 +266,15 @@ function LazyLoader(props: {
     })();
   }, [item]);
 
-  return isLoading ? <></> : <>{items.map(mapper)}</>;
+  return isLoading ? (
+    item.loader ? (
+      <>{item.loader}</>
+    ) : (
+      <></>
+    )
+  ) : (
+    <>{items.map(mapper)}</>
+  );
 }
 
 export * from "./types";

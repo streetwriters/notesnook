@@ -25,7 +25,7 @@ import {
   store as selectionStore
 } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
-import { DEFAULT_ITEM_HEIGHT, ListItemWrapper } from "./list-profiles";
+import { ListItemWrapper } from "./list-profiles";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
 import { FlexScrollContainer } from "../scroll-container";
@@ -39,6 +39,7 @@ import {
 } from "@notesnook/core";
 import { VirtualizedList } from "../virtualized-list";
 import { Virtualizer } from "@tanstack/react-virtual";
+import { useResolvedItem } from "./resolved-item";
 
 type ListContainerProps = {
   group?: GroupingKey;
@@ -125,72 +126,74 @@ function ListContainer(props: ListContainerProps) {
             {header ? header : <Announcements />}
             <VirtualizedList
               virtualizerRef={listRef}
-              estimatedSize={DEFAULT_ITEM_HEIGHT}
+              estimatedSize={50}
               getItemKey={(index) => items.getKey(index)}
               items={items.ids}
               mode="dynamic"
               tabIndex={-1}
+              overscan={10}
               onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
               itemWrapperProps={(_, index) => ({
                 onFocus: () => onFocus(index),
                 onMouseDown: (e) => onMouseDown(e.nativeEvent, index)
               })}
-              renderItem={({ index, item }) => {
-                if (isGroupHeader(item)) {
-                  if (!group) return null;
-                  return (
-                    <GroupHeader
-                      groupingKey={group}
-                      refresh={refresh}
-                      title={item.title}
-                      isFocused={index === focusedGroupIndex}
-                      index={index}
-                      onSelectGroup={() => {
-                        let endIndex;
-                        for (
-                          let i = index + 1;
-                          i < props.items.ids.length;
-                          ++i
-                        ) {
-                          if (typeof props.items.ids[i] === "object") {
-                            endIndex = i;
-                            break;
-                          }
-                        }
-                        setSelectedItems([
-                          ...selectionStore.get().selectedItems,
-                          ...props.items.ids.slice(
-                            index,
-                            endIndex || props.items.ids.length
-                          )
-                        ]);
-                      }}
-                      groups={props.items.groups}
-                      onJump={(title: string) => {
-                        const index = props.items.ids.findIndex(
-                          (v) => isGroupHeader(v) && v.title === title
-                        );
-                        if (index < 0) return;
-                        listRef.current?.scrollToIndex(index, {
-                          align: "center",
-                          behavior: "auto"
-                        });
-                        setFocusedGroupIndex(index);
-                      }}
-                    />
-                  );
-                }
+              renderItem={function ItemRenderer({ index }) {
+                const resolvedItem = useResolvedItem({ index, items });
+                // console.log("Rendering:", index);
+                if (!resolvedItem)
+                  return <div style={{ height: 50, width: "100%" }}></div>;
 
                 return (
-                  <ListItemWrapper
-                    key={item}
-                    items={items}
-                    id={item}
-                    context={context}
-                    group={group}
-                    compact={compact}
-                  />
+                  <>
+                    {resolvedItem.group && group ? (
+                      <GroupHeader
+                        groupingKey={group}
+                        refresh={refresh}
+                        title={resolvedItem.group.title}
+                        isFocused={index === focusedGroupIndex}
+                        index={index}
+                        onSelectGroup={() => {
+                          let endIndex;
+                          for (
+                            let i = index + 1;
+                            i < props.items.ids.length;
+                            ++i
+                          ) {
+                            if (typeof props.items.ids[i] === "object") {
+                              endIndex = i;
+                              break;
+                            }
+                          }
+                          setSelectedItems([
+                            ...selectionStore.get().selectedItems,
+                            ...props.items.ids.slice(
+                              index,
+                              endIndex || props.items.ids.length
+                            )
+                          ]);
+                        }}
+                        groups={async () =>
+                          items.groups ? items.groups() : []
+                        }
+                        onJump={(index) => {
+                          listRef.current?.scrollToIndex(index, {
+                            align: "center",
+                            behavior: "auto"
+                          });
+                          setFocusedGroupIndex(index);
+                        }}
+                      />
+                    ) : null}
+                    <ListItemWrapper
+                      key={resolvedItem.item.id}
+                      item={resolvedItem.item}
+                      data={resolvedItem.data}
+                      context={context}
+                      group={group}
+                      compact={compact}
+                    />
+                  </>
                 );
               }}
             />
