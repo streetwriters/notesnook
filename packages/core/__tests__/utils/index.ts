@@ -48,7 +48,9 @@ function databaseTest() {
     eventsource: EventSource,
     fs: FS,
     compressor: Compressor,
-    dialect: new SqliteDialect({ database: BetterSQLite3(":memory:") })
+    sqliteOptions: {
+      dialect: new SqliteDialect({ database: BetterSQLite3("db.sql") })
+    }
   });
   return db.init().then(() => db);
 }
