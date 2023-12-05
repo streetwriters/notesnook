@@ -28,7 +28,8 @@ import {
   SortDesc,
   DetailedView,
   CompactView,
-  Icon
+  Icon,
+  Loading
 } from "../icons";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
@@ -203,8 +204,8 @@ type GroupHeaderProps = {
   groupingKey: GroupingKey;
   index: number;
 
-  groups: GroupHeaderType[];
-  onJump: (title: string) => void;
+  groups: () => Promise<{ index: number; group: GroupHeaderType }[]>;
+  onJump: (index: number) => void;
   refresh: () => void;
   onSelectGroup: () => void;
   isFocused: boolean;
@@ -261,18 +262,29 @@ function GroupHeader(props: GroupHeaderProps) {
           onSelectGroup();
           return;
         }
-        if (groups.length <= 0) return;
         e.stopPropagation();
-        const items: MenuItem[] = groups.map((group) => {
-          const groupTitle = group.title.toString();
-          return {
-            type: "button",
-            key: groupTitle,
-            title: groupTitle,
-            onClick: () => onJump(groupTitle),
-            checked: group.title === title
-          };
-        });
+
+        const items: MenuItem[] = [
+          {
+            key: "groups",
+            type: "lazy-loader",
+            loader: <Loading sx={{ my: 2 }} />,
+            async items() {
+              const items = await groups();
+              return items.map(({ group, index }) => {
+                const groupTitle = group.title.toString();
+                return {
+                  type: "button",
+                  key: groupTitle,
+                  title: groupTitle,
+                  onClick: () => onJump(index),
+                  checked: group.title === title
+                } as MenuItem;
+              });
+            }
+          }
+        ];
+
         openMenu(items, {
           title: "Jump to group",
           position: {
