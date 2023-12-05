@@ -87,6 +87,7 @@ async function start() {
     onEvent,
     onTimeout
   );
+
   DatabaseLogger.info(`[BackgroundFetch] configure status: ${status}`);
 }
 
@@ -159,7 +160,10 @@ const registerHeadlessTask = () =>
   );
 export const BackgroundSync = {
   start,
-  registerHeadlessTask
+  registerHeadlessTask,
+  stop: () => {
+    BackgroundFetch.stop();
+  }
 };
 
 export default { doInBackground };
