@@ -18,25 +18,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { View } from "react-native";
+import { View, ViewProps } from "react-native";
 import { DDS } from "../../services/device-detection";
 import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../utils/elevation";
 
-const DialogContainer = ({ width, height, ...restProps }) => {
+const DialogContainer = ({
+  width,
+  height,
+  style,
+  ...restProps
+}: ViewProps & {
+  width?: any;
+  height?: any;
+}) => {
   const { colors } = useThemeColors();
 
   return (
     <View
       {...restProps}
-      style={{
-        ...getElevationStyle(5),
-        width: width || DDS.isTab ? 500 : "85%",
-        maxHeight: height || 450,
-        borderRadius: 10,
-        backgroundColor: colors.primary.background,
-        paddingTop: 12
-      }}
+      style={[
+        {
+          ...getElevationStyle(5),
+          width: width || DDS.isTab ? 500 : "85%",
+          maxHeight: height || 450,
+          borderRadius: 10,
+          backgroundColor: colors.primary.background,
+          paddingTop: 12
+        },
+        style
+      ]}
     />
   );
 };

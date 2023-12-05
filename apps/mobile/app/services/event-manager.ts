@@ -64,6 +64,7 @@ export const eSubscribeEvent = <T = unknown>(
   eventName: string,
   action: EventHandler
 ) => {
+  if (!action) return;
   return eventManager.subscribe(eventName, action);
 };
 
@@ -71,6 +72,7 @@ export const eUnSubscribeEvent = <T = unknown>(
   eventName: string,
   action: EventHandler
 ) => {
+  if (!action) return;
   eventManager.unsubscribe(eventName, action);
 };
 
@@ -132,7 +134,7 @@ export function hideSheet() {
 export type ToastOptions = {
   heading?: string;
   message?: string;
-  context?: "global" | "local";
+  context?: any;
   type?: "error" | "success" | "info";
   duration?: number;
   func?: () => void;
@@ -160,7 +162,7 @@ export const ToastManager = {
     });
   },
   hide: () => eSendEvent(eHideToast),
-  error: (e: Error, title?: string, context?: "global" | "local") => {
+  error: (e: Error, title?: string, context?: any) => {
     ToastManager.show({
       heading: title,
       message: e?.message || "",

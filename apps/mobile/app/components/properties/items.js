@@ -218,8 +218,7 @@ export const Items = ({ item, buttons, close }) => {
       <ScrollView
         horizontal
         style={{
-          paddingHorizontal: 12,
-          paddingVertical: 12
+          paddingHorizontal: 12
         }}
       >
         {topBarItems.map(renderTopBarItem)}
