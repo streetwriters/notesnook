@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { EVENTS } from "../common";
 import {
+  GroupHeader,
   GroupOptions,
   Item,
   MaybeDeletedItem,
@@ -34,9 +35,9 @@ import {
   isFalse
 } from ".";
 import {
+  AnyColumn,
   AnyColumnWithTable,
   ExpressionOrFactory,
-  SelectExpression,
   SelectQueryBuilder,
   SqlBool,
   sql
@@ -353,10 +354,41 @@ export class FilteredSelector<T extends Item> {
   }
 
   async grouped(options: GroupOptions) {
-    console.time("getting items");
+    const count = await this.count();
+    const sortFields = this.sortFields(options, true);
+    const cursorRowValue = sql.join(sortFields.map((f) => sql.ref(f)));
+    return new VirtualizedGrouping<T>(
+      count,
+      this.batchSize,
+      async (start, end, cursor) => {
+        const items = (await this.filter
+          .$call(this.buildSortExpression(options))
+          .$if(!cursor, (qb) => qb.offset(start))
+          .$if(!!cursor, (qb) =>
+            qb.where(
+              (eb) => eb.parens(cursorRowValue),
+              ">",
+              (eb) =>
+                eb.parens(sql.join(sortFields.map((f) => (cursor as any)[f])))
+            )
+          )
+          .limit(end - start)
+          .selectAll()
+          .execute()) as T[];
+        return {
+          ids: items.map((i) => i.id),
+          items
+        };
+      },
+      (items) => groupArray(items as any, options),
+      () => this.groups(options)
+    );
+  }
 
+  async groups(options: GroupOptions) {
     const fields: Array<
-      SelectExpression<DatabaseSchema, keyof DatabaseSchema>
+      | AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>
+      | AnyColumn<DatabaseSchema, keyof DatabaseSchema>
     > = ["id", "type", options.sortBy];
     if (this.type === "notes") fields.push("notes.pinned", "notes.conflicted");
     else if (this.type === "notebooks") fields.push("notebooks.pinned");
@@ -372,33 +404,63 @@ export class FilteredSelector<T extends Item> {
         "reminders.snoozeUntil"
       );
     }
-
-    const items = await this.filter
-      .$if(!!this._limit, (eb) => eb.limit(this._limit))
-      .$call(this.buildSortExpression(options))
-      .select(fields)
-      .execute();
-    console.timeEnd("getting items");
-    console.log(items.length);
-    const ids = groupArray(items, options);
-    return new VirtualizedGrouping<T>(ids, this.batchSize, (ids) =>
-      this.records(ids)
+    return groupArray(
+      await this.filter
+        .$call(this.buildSortExpression(options))
+        .select(fields)
+        .execute(),
+      options
     );
   }
 
   async sorted(options: SortOptions) {
-    const items = await this.filter
-      .$if(!!this._limit, (eb) => eb.limit(this._limit))
-      .$call(this.buildSortExpression(options))
-      .select("id")
-      .execute();
-    const ids = items.map((item) => item.id);
-    return new VirtualizedGrouping<T>(ids, this.batchSize, (ids) =>
-      this.records(ids)
+    const count = await this.count();
+
+    return new VirtualizedGrouping<T>(
+      count,
+      this.batchSize,
+      async (start, end) => {
+        const items = (await this.filter
+          .$call(this.buildSortExpression(options))
+          .offset(start)
+          .limit(end - start)
+          .selectAll()
+          .execute()) as T[];
+        return {
+          ids: items.map((i) => i.id),
+          items
+        };
+      }
     );
   }
 
-  private buildSortExpression(options: SortOptions) {
+  async *[Symbol.asyncIterator]() {
+    let lastRow: any | null = null;
+    while (true) {
+      const rows = await this.filter
+        .orderBy("dateCreated asc")
+        .orderBy("id asc")
+        .$if(lastRow !== null, (qb) =>
+          qb.where(
+            (eb) => eb.refTuple("dateCreated", "id"),
+            ">",
+            (eb) => eb.tuple(lastRow.dateCreated, lastRow.id)
+          )
+        )
+        .limit(this.batchSize)
+        .$if(this._fields.length === 0, (eb) => eb.selectAll())
+        .$if(this._fields.length > 0, (eb) => eb.select(this._fields))
+        .execute();
+      if (rows.length === 0) break;
+      for (const row of rows) {
+        yield row as T;
+      }
+
+      lastRow = rows[rows.length - 1];
+    }
+  }
+
+  private buildSortExpression(options: SortOptions, persistent?: boolean) {
     return <T>(
       qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, T>
     ) => {
@@ -407,34 +469,21 @@ export class FilteredSelector<T extends Item> {
         .$if(this.type === "notes" || this.type === "notebooks", (eb) =>
           eb.orderBy("pinned desc")
         )
-        .$if(options.sortBy === "title", (eb) =>
-          eb.orderBy(
-            sql`${sql.raw(options.sortBy)} COLLATE NOCASE ${sql.raw(
-              options.sortDirection
-            )}`
-          )
-        )
-        .$if(options.sortBy !== "title", (eb) =>
-          eb.orderBy(options.sortBy, options.sortDirection)
-        );
+        .orderBy(options.sortBy, options.sortDirection)
+        .$if(!!persistent, (eb) => eb.orderBy("id"));
     };
   }
 
-  async *[Symbol.asyncIterator]() {
-    let index = 0;
-    while (true) {
-      const rows = await this.filter
-        .$if(this._fields.length === 0, (eb) => eb.selectAll())
-        .$if(this._fields.length > 0, (eb) => eb.select(this._fields))
-        .orderBy("dateCreated asc")
-        .offset(index)
-        .limit(this.batchSize)
-        .execute();
-      if (rows.length === 0) break;
-      index += this.batchSize;
-      for (const row of rows) {
-        yield row as T;
-      }
-    }
+  private sortFields(options: SortOptions, persistent?: boolean) {
+    const fields: Array<
+      | AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>
+      | AnyColumn<DatabaseSchema, keyof DatabaseSchema>
+    > = [];
+    if (this.type === "notes") fields.push("conflicted");
+    if (this.type === "notes" || this.type === "notebooks")
+      fields.push("pinned");
+    fields.push(options.sortBy);
+    if (persistent) fields.push("id");
+    return fields;
   }
 }

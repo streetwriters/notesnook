@@ -17,61 +17,78 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { GroupHeader, isGroupHeader } from "../types";
+import { GroupHeader } from "../types";
 
-type BatchOperator<T> = (
-  ids: string[],
-  items: Record<string, T>
-) => Promise<Record<string, unknown>>;
-type Batch<T> = { items: Record<string, T>; data?: Record<string, unknown> };
+type BatchOperator<T> = (ids: string[], items: T[]) => Promise<unknown[]>;
+type Batch<T> = {
+  items: T[];
+  groups?: { index: number; hidden?: boolean; group: GroupHeader }[];
+  data?: unknown[];
+};
 export class VirtualizedGrouping<T> {
   private cache: Map<number, Batch<T>> = new Map();
   private pending: Map<number, Promise<Batch<T>>> = new Map();
-  groups: GroupHeader[] = [];
+  public ids: number[];
+  private loadBatchTimeout?: number;
+  private cacheHits = 0;
 
   constructor(
-    public ids: (string | GroupHeader)[],
+    count: number,
     private readonly batchSize: number,
-    private readonly fetchItems: (ids: string[]) => Promise<Record<string, T>>
+    private readonly fetchItems: (
+      start: number,
+      end: number,
+      cursor?: T
+    ) => Promise<{ ids: string[]; items: T[] }>,
+    private readonly groupItems?: (
+      items: T[]
+    ) => { index: number; hidden?: boolean; group: GroupHeader }[],
+    readonly groups?: () => Promise<{ index: number; group: GroupHeader }[]>
   ) {
-    this.ids = ids;
-    this.groups = ids.filter((i) => isGroupHeader(i)) as GroupHeader[];
+    this.ids = new Array(count).fill(0);
   }
 
   getKey(index: number) {
-    const item = this.ids[index];
-    if (isGroupHeader(item)) return item.id;
-    return item;
-  }
-
-  get ungrouped() {
-    return this.ids.filter((i) => !isGroupHeader(i)) as string[];
-  }
-
-  /**
-   * Get item from cache or request the appropriate batch for caching
-   * and load it from there.
-   */
-  item(id: string): Promise<T | undefined>;
-  item(
-    id: string,
-    operate: BatchOperator<T>
-  ): Promise<{ item: T; data: unknown } | undefined>;
-  async item(id: string, operate?: BatchOperator<T>) {
-    const index = this.ids.indexOf(id);
-    if (index <= -1) return;
-
     const batchIndex = Math.floor(index / this.batchSize);
-    const { items, data } =
+    const batch = this.cache.get(batchIndex);
+    if (!batch) return `${index}`;
+
+    const { items, groups } = batch;
+    const itemIndexInBatch = index - batchIndex * this.batchSize;
+    const group = groups?.find(
+      (f) => f.index === itemIndexInBatch && !f.hidden
+    );
+    return group
+      ? group.group.id
+      : (items[itemIndexInBatch] as any)?.id || `${index}`;
+  }
+
+  item(index: number): Promise<{ item: T; group?: GroupHeader }>;
+  item(
+    index: number,
+    operate: BatchOperator<T>
+  ): Promise<{ item: T; group?: GroupHeader; data: unknown }>;
+  async item(index: number, operate?: BatchOperator<T>) {
+    const batchIndex = Math.floor(index / this.batchSize);
+    if (this.cache.has(batchIndex)) this.cacheHits++;
+    const { items, groups, data } =
       this.cache.get(batchIndex) || (await this.loadBatch(batchIndex, operate));
 
-    return operate ? { item: items[id], data: data?.[id] } : items[id];
+    const itemIndexInBatch = index - batchIndex * this.batchSize;
+    const group = groups?.find(
+      (f) => f.index === itemIndexInBatch && !f.hidden
+    );
+    return {
+      item: items[itemIndexInBatch],
+      group: group?.group,
+      data: data?.[itemIndexInBatch]
+    };
   }
 
   /**
    * Reload the cache
    */
-  refresh(ids: (string | GroupHeader)[]) {
+  refresh(ids: number[]) {
     this.ids = ids;
     this.cache.clear();
   }
@@ -80,19 +97,49 @@ export class VirtualizedGrouping<T> {
    *
    * @param index
    */
-  private async load(batchIndex: number, operate?: BatchOperator<T>) {
+  private async load(
+    batchIndex: number,
+    operate?: BatchOperator<T>
+  ): Promise<Batch<T>> {
+    const lastBatchIndex = this.last;
+    const prev = this.cache.get(lastBatchIndex);
     const start = batchIndex * this.batchSize;
     const end = start + this.batchSize;
-    const batchIds = this.ids
-      .slice(start, end)
-      .filter((id) => typeof id === "string") as string[];
-    const items = await this.fetchItems(batchIds);
-    console.time("operate");
+    // we can use a cursor instead of start/end offsets for batches that are
+    // right next to each other.
+    const cursor =
+      lastBatchIndex + 1 === batchIndex
+        ? prev?.items.at(-1)
+        : lastBatchIndex - 1 === batchIndex
+        ? prev?.items[0]
+        : undefined;
+    const { ids, items } = await this.fetchItems(start, end, cursor);
+    const groups = this.groupItems?.(items);
+
+    if (
+      prev &&
+      prev.groups &&
+      prev.groups.length > 0 &&
+      groups &&
+      groups.length > 0
+    ) {
+      // if user is moving downwards, we hide the first group from the
+      // current batch, otherwise we hide the last group from the previous
+      // batch.
+      const group =
+        lastBatchIndex < batchIndex
+          ? groups[0] //groups.length - 1]
+          : prev.groups[prev.groups.length - 1];
+      if (group.group.title === groups[0].group.title) {
+        group.hidden = true;
+      }
+    }
+
     const batch = {
       items,
-      data: operate ? await operate(batchIds, items) : undefined
+      groups,
+      data: operate ? await operate(ids, items) : undefined
     };
-    console.timeEnd("operate");
     this.cache.set(batchIndex, batch);
     this.clear();
     return batch;
@@ -100,12 +147,18 @@ export class VirtualizedGrouping<T> {
 
   private loadBatch(batch: number, operate?: BatchOperator<T>) {
     if (this.pending.has(batch)) return this.pending.get(batch)!;
-    console.time("loading batch");
-    const promise = this.load(batch, operate);
-    this.pending.set(batch, promise);
-    return promise.finally(() => {
-      console.timeEnd("loading batch");
-      this.pending.delete(batch);
+    if (!this.isLastBatch(batch)) clearTimeout(this.loadBatchTimeout);
+    return new Promise<Batch<T>>((resolve, reject) => {
+      this.loadBatchTimeout = setTimeout(() => {
+        const promise = this.load(batch, operate);
+        this.pending.set(batch, promise);
+        return promise
+          .then(resolve)
+          .catch(reject)
+          .finally(() => {
+            this.pending.delete(batch);
+          });
+      }, 16) as unknown as number;
     });
   }
 
@@ -115,5 +168,14 @@ export class VirtualizedGrouping<T> {
       this.cache.delete(key);
       if (this.cache.size === 2) break;
     }
+  }
+
+  private get last() {
+    const keys = Array.from(this.cache.keys());
+    return keys[keys.length - 1];
+  }
+
+  private isLastBatch(batch: number) {
+    return Math.floor(this.ids.length / this.batchSize) === batch;
   }
 }

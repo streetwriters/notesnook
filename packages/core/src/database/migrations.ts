@@ -18,12 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  ColumnBuilderCallback,
   CreateTableBuilder,
   Kysely,
   Migration,
   MigrationProvider,
   sql
 } from "kysely";
+
+const COLLATE_NOCASE: ColumnBuilderCallback = (col) =>
+  col.modifyEnd(sql`collate nocase`);
 
 export class NNMigrationProvider implements MigrationProvider {
   async getMigrations(): Promise<Record<string, Migration>> {
@@ -35,7 +39,7 @@ export class NNMigrationProvider implements MigrationProvider {
             // .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .$call(addTrashColumns)
-            .addColumn("title", "text")
+            .addColumn("title", "text", COLLATE_NOCASE)
             .addColumn("headline", "text")
             .addColumn("contentId", "text")
             .addColumn("pinned", "boolean")
@@ -95,7 +99,7 @@ export class NNMigrationProvider implements MigrationProvider {
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .$call(addTrashColumns)
-            .addColumn("title", "text")
+            .addColumn("title", "text", COLLATE_NOCASE)
             .addColumn("description", "text")
             .addColumn("dateEdited", "integer")
             .addColumn("pinned", "boolean")
@@ -105,14 +109,14 @@ export class NNMigrationProvider implements MigrationProvider {
             .createTable("tags")
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
-            .addColumn("title", "text")
+            .addColumn("title", "text", COLLATE_NOCASE)
             .execute();
 
           await db.schema
             .createTable("colors")
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
-            .addColumn("title", "text")
+            .addColumn("title", "text", COLLATE_NOCASE)
             .addColumn("colorCode", "text")
             .execute();
 
@@ -139,7 +143,7 @@ export class NNMigrationProvider implements MigrationProvider {
             .createTable("reminders")
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
-            .addColumn("title", "text")
+            .addColumn("title", "text", COLLATE_NOCASE)
             .addColumn("description", "text")
             .addColumn("priority", "text")
             .addColumn("date", "integer")
@@ -228,6 +232,18 @@ export class NNMigrationProvider implements MigrationProvider {
             .createIndex("note_type")
             .on("notes")
             .columns(["type"])
+            .execute();
+
+          await db.schema
+            .createIndex("note_deleted")
+            .on("notes")
+            .columns(["deleted"])
+            .execute();
+
+          await db.schema
+            .createIndex("note_date_deleted")
+            .on("notes")
+            .columns(["dateDeleted"])
             .execute();
 
           await db.schema

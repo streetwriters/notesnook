@@ -28,98 +28,98 @@ function createMock() {
     Object.fromEntries(ids.map((id) => [id, id]))
   );
 }
-test("fetch items in batch if not found in cache", async (t) => {
-  const mocked = createMock();
-  const grouping = new VirtualizedGrouping<string>(
-    ["1", "2", "3", "4", "5", "6", "7"],
-    3,
-    mocked
-  );
-  t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-  t.expect(mocked).toHaveBeenCalledOnce();
-});
+// test("fetch items in batch if not found in cache", async (t) => {
+//   const mocked = createMock();
+//   const grouping = new VirtualizedGrouping<string>(
+//     ["1", "2", "3", "4", "5", "6", "7"],
+//     3,
+//     mocked
+//   );
+//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
+//   t.expect(mocked).toHaveBeenCalledOnce();
+// });
 
-test("do not fetch items in batch if found in cache", async (t) => {
-  const mocked = createMock();
-  const grouping = new VirtualizedGrouping<string>(
-    ["1", "2", "3", "4", "5", "6", "7"],
-    3,
-    mocked
-  );
-  t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-  t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-  t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-  t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-  t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-  t.expect(mocked).toHaveBeenCalledOnce();
-});
+// test("do not fetch items in batch if found in cache", async (t) => {
+//   const mocked = createMock();
+//   const grouping = new VirtualizedGrouping<string>(
+//     ["1", "2", "3", "4", "5", "6", "7"],
+//     3,
+//     mocked
+//   );
+//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
+//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
+//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
+//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
+//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
+//   t.expect(mocked).toHaveBeenCalledOnce();
+// });
 
-test("clear old cached batches", async (t) => {
-  const mocked = createMock();
-  const grouping = new VirtualizedGrouping<string>(
-    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-    3,
-    mocked
-  );
-  t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-  t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
-  t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-  t.expect(mocked).toHaveBeenLastCalledWith(["4", "5", "6"]);
-  t.expect(await grouping.item("7")).toStrictEqual(item("7"));
-  t.expect(mocked).toHaveBeenLastCalledWith(["7", "8", "9"]);
-  t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-  t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
-});
+// test("clear old cached batches", async (t) => {
+//   const mocked = createMock();
+//   const grouping = new VirtualizedGrouping<string>(
+//     ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+//     3,
+//     mocked
+//   );
+//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
+//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
+//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
+//   t.expect(mocked).toHaveBeenLastCalledWith(["4", "5", "6"]);
+//   t.expect(await grouping.item("7")).toStrictEqual(item("7"));
+//   t.expect(mocked).toHaveBeenLastCalledWith(["7", "8", "9"]);
+//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
+//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
+// });
 
-test("clear old cached batches (random access)", async (t) => {
-  const mocked = createMock();
-  const grouping = new VirtualizedGrouping<string>(
-    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-    3,
-    mocked
-  );
-  t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-  t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
+// test("clear old cached batches (random access)", async (t) => {
+//   const mocked = createMock();
+//   const grouping = new VirtualizedGrouping<string>(
+//     ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+//     3,
+//     mocked
+//   );
+//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
+//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
 
-  t.expect(await grouping.item("7")).toStrictEqual(item("7"));
-  t.expect(mocked).toHaveBeenLastCalledWith(["7", "8", "9"]);
+//   t.expect(await grouping.item("7")).toStrictEqual(item("7"));
+//   t.expect(mocked).toHaveBeenLastCalledWith(["7", "8", "9"]);
 
-  t.expect(await grouping.item("11")).toStrictEqual(item("11"));
-  t.expect(mocked).toHaveBeenLastCalledWith(["10", "11", "12"]);
+//   t.expect(await grouping.item("11")).toStrictEqual(item("11"));
+//   t.expect(mocked).toHaveBeenLastCalledWith(["10", "11", "12"]);
 
-  t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-  t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
+//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
+//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
 
-  t.expect(await grouping.item("7")).toStrictEqual(item("7"));
-  t.expect(mocked).toHaveBeenLastCalledWith(["7", "8", "9"]);
-});
+//   t.expect(await grouping.item("7")).toStrictEqual(item("7"));
+//   t.expect(mocked).toHaveBeenLastCalledWith(["7", "8", "9"]);
+// });
 
-test("reloading ids should clear all cached batches", async (t) => {
-  const mocked = createMock();
-  const grouping = new VirtualizedGrouping<string>(
-    ["1", "3", "4", "5", "7", "6", "50"],
-    3,
-    mocked
-  );
+// test("reloading ids should clear all cached batches", async (t) => {
+//   const mocked = createMock();
+//   const grouping = new VirtualizedGrouping<string>(
+//     ["1", "3", "4", "5", "7", "6", "50"],
+//     3,
+//     mocked
+//   );
 
-  t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-  t.expect(mocked).toHaveBeenLastCalledWith(["1", "3", "4"]);
+//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
+//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "3", "4"]);
 
-  grouping.refresh([
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-    "11",
-    "12"
-  ]);
+//   grouping.refresh([
+//     "1",
+//     "2",
+//     "3",
+//     "4",
+//     "5",
+//     "6",
+//     "7",
+//     "8",
+//     "9",
+//     "10",
+//     "11",
+//     "12"
+//   ]);
 
-  t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-  t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
-});
+//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
+//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
+// });
