@@ -38,6 +38,7 @@ export type MenuPopupItem = BaseMenuItem<"popup"> & {
 };
 
 export type LazyMenuItemsLoader = BaseMenuItem<"lazy-loader"> & {
+  loader?: React.ReactNode;
   items: () => Promise<MenuItem[]>;
 };
 

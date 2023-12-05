@@ -25,9 +25,9 @@ import { db } from "../../common/db";
 import Reminder from "../reminder";
 import { Context } from "./types";
 import { getSortValue } from "@notesnook/core/dist/utils/grouping";
-import { GroupingKey, Item, VirtualizedGrouping } from "@notesnook/core";
+import { GroupingKey, Item } from "@notesnook/core";
 import { Attachment } from "../attachment";
-import { isNoteResolvedData, useResolvedItem } from "./resolved-item";
+import { isNoteResolvedData } from "./resolved-item";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
@@ -36,21 +36,16 @@ export const DEFAULT_ITEM_HEIGHT = SINGLE_LINE_HEIGHT * 4 * DEFAULT_LINE_HEIGHT;
 
 type ListItemWrapperProps = {
   group?: GroupingKey;
-  items: VirtualizedGrouping<Item>;
-  id: string;
+  item: Item;
+  data?: unknown;
   context?: Context;
   compact?: boolean;
   simplified?: boolean;
 };
 
 export function ListItemWrapper(props: ListItemWrapperProps) {
-  const { group, compact, context, simplified } = props;
+  const { group, compact, context, simplified, item, data } = props;
 
-  const resolvedItem = useResolvedItem(props);
-  if (!resolvedItem)
-    return <div style={{ height: DEFAULT_ITEM_HEIGHT, width: "100%" }} />;
-
-  const { data, item } = resolvedItem;
   switch (item.type) {
     case "note": {
       return (

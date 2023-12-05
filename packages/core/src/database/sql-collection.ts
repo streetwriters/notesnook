@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { EVENTS } from "../common";
 import {
-  GroupHeader,
   GroupOptions,
   Item,
   MaybeDeletedItem,
