@@ -100,16 +100,21 @@ export default class Lookup {
   trash(query: string): SearchResults<TrashItem> {
     return {
       sorted: async (limit?: number) => {
-        const { ids, records } = await this.filterTrash(query, limit);
+        const { ids, items } = await this.filterTrash(query, limit);
         return new VirtualizedGrouping<TrashItem>(
-          ids,
+          ids.length,
           this.db.options.batchSize,
-          async () => records
+          async (start, end) => {
+            return {
+              ids: ids.slice(start, end),
+              items: items.slice(start, end)
+            };
+          }
         );
       },
       items: async (limit?: number) => {
-        const { records } = await this.filterTrash(query, limit);
-        return Object.values(records);
+        const { items } = await this.filterTrash(query, limit);
+        return items;
       },
       ids: () => this.filterTrash(query).then(({ ids }) => ids)
     };
@@ -176,22 +181,23 @@ export default class Lookup {
   private async filterTrash(query: string, limit?: number) {
     const items = await this.db.trash.all();
 
-    const records: Record<string, TrashItem> = {};
-    const results: Map<string, number> = new Map();
+    const results: Map<string, { rank: number; item: TrashItem }> = new Map();
     for (const item of items) {
       if (limit && results.size >= limit) break;
 
       const result = match(query, item.title);
       if (result.match) {
-        records[item.id] = item;
-        results.set(item.id, result.score);
+        results.set(item.id, { rank: result.score, item });
       }
     }
 
-    const ids = Array.from(results.entries())
-      .sort((a, b) => a[1] - b[1])
-      .map((a) => a[0]);
-    return { ids, records };
+    const sorted = Array.from(results.entries()).sort(
+      (a, b) => a[1].rank - b[1].rank
+    );
+    return {
+      ids: sorted.map((a) => a[0]),
+      items: sorted.map((a) => a[1].item)
+    };
   }
 
   private toVirtualizedGrouping<T extends Item>(
@@ -199,9 +205,15 @@ export default class Lookup {
     selector: FilteredSelector<T>
   ) {
     return new VirtualizedGrouping<T>(
-      ids,
+      ids.length,
       this.db.options.batchSize,
-      async (ids) => selector.records(ids)
+      async (start, end) => {
+        const items = await selector.items(ids);
+        return {
+          ids: ids.slice(start, end),
+          items: items.slice(start, end)
+        };
+      }
     );
   }
 
