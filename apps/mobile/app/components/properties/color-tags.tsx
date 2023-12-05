@@ -17,11 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DefaultColors } from "@notesnook/core/dist/collections/colors";
-import { Color, ItemReference, Note } from "@notesnook/core/dist/types";
+import { Color, Note } from "@notesnook/core/dist/types";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
@@ -32,87 +31,29 @@ import { useRelationStore } from "../../stores/use-relation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { refreshNotesPage } from "../../utils/events";
 import { SIZE } from "../../utils/size";
+import ColorPicker from "../dialogs/color-picker";
 import { PressableButton } from "../ui/pressable";
+import { FlashList } from "react-native-actions-sheet";
+import { Button } from "../ui/button";
 
-export const ColorTags = ({ item }: { item: Note }) => {
+const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
   const { colors } = useThemeColors();
+  const [isLinked, setIsLinked] = useState<boolean>();
   const setColorNotes = useMenuStore((state) => state.setColorNotes);
-  const isTablet = useSettingStore((state) => state.deviceMode) !== "mobile";
-  const updater = useRelationStore((state) => state.updater);
-
-  const getColorInfo = async (colorCode: string) => {
-    const dbColor = await db.colors.all.find((v) =>
-      v.and([v(`colorCode`, "==", colorCode)])
-    );
-    let isLinked = false;
-
-    if (dbColor) {
-      const hasRelation = await db.relations.from(dbColor, "note").has(item.id);
-      if (hasRelation) {
-        isLinked = true;
-      }
-    }
-
-    return {
-      linked: isLinked,
-      item: dbColor
+  useEffect(() => {
+    const checkIsLinked = async (color: Color) => {
+      const hasRelation = await db.relations.from(color, "note").has(note.id);
+      return hasRelation;
     };
-  };
 
-  const ColorItem = ({ name }: { name: keyof typeof DefaultColors }) => {
-    const color = DefaultColors[name];
-    const [colorInfo, setColorInfo] = useState<{
-      linked: boolean;
-      item: Color | undefined;
-    }>();
+    checkIsLinked(item).then((info) => setIsLinked(info));
+  }, [item, note.id]);
 
-    useEffect(() => {
-      getColorInfo(color).then((info) => setColorInfo(info));
-    }, [color]);
+  const toggleColor = async () => {
+    await db.relations.unlinkOfType("color", [item.id]);
 
-    return (
-      <PressableButton
-        type="accent"
-        accentColor={color}
-        accentText={colors.static.white}
-        testID={notesnook.ids.dialogs.actionsheet.color(name)}
-        key={color}
-        onPress={() => changeColor(name)}
-        customStyle={{
-          width: 30,
-          height: 30,
-          borderRadius: 100,
-          justifyContent: "center",
-          alignItems: "center",
-          marginRight: isTablet ? 10 : undefined
-        }}
-      >
-        {colorInfo?.linked ? (
-          <Icon testID="icon-check" name="check" color="white" size={SIZE.lg} />
-        ) : null}
-      </PressableButton>
-    );
-  };
-
-  const changeColor = async (color: string) => {
-    const colorInfo = await getColorInfo(DefaultColors[color]);
-
-    if (colorInfo.item) {
-      if (colorInfo.linked) {
-        await db.relations.unlink(colorInfo.item, item);
-      } else {
-        await db.relations.add(colorInfo.item, item);
-      }
-    } else {
-      const colorId = await db.colors.add({
-        title: color,
-        colorCode: DefaultColors[color]
-      });
-
-      const dbColor = await db.colors.color(colorId);
-      if (dbColor) {
-        await db.relations.add(dbColor as unknown as ItemReference, item);
-      }
+    if (!isLinked) {
+      await db.relations.add(item, note);
     }
 
     useRelationStore.getState().update();
@@ -122,20 +63,109 @@ export const ColorTags = ({ item }: { item: Note }) => {
   };
 
   return (
-    <View
-      style={{
-        flexDirection: "row",
-        flexWrap: "wrap",
-        flexGrow: isTablet ? undefined : 1,
-        paddingHorizontal: 12,
-        paddingRight: 0,
+    <PressableButton
+      type="accent"
+      accentColor={item.colorCode}
+      accentText={colors.static.white}
+      testID={notesnook.ids.dialogs.actionsheet.color(item.colorCode)}
+      key={item.id}
+      onPress={toggleColor}
+      customStyle={{
+        width: 30,
+        height: 30,
+        borderRadius: 100,
+        justifyContent: "center",
         alignItems: "center",
-        justifyContent: isTablet ? "center" : "space-between"
+        marginRight: 5
       }}
     >
-      {Object.keys(DefaultColors).map((name: keyof typeof DefaultColors) => {
-        return <ColorItem key={name} name={name} />;
-      })}
-    </View>
+      {isLinked ? (
+        <Icon testID="icon-check" name="check" color="white" size={SIZE.lg} />
+      ) : null}
+    </PressableButton>
+  );
+};
+
+export const ColorTags = ({ item }: { item: Note }) => {
+  const { colors } = useThemeColors();
+  const colorNotes = useMenuStore((state) => state.colorNotes);
+  const isTablet = useSettingStore((state) => state.deviceMode) !== "mobile";
+  const updater = useRelationStore((state) => state.updater);
+  const [visible, setVisible] = useState(false);
+  const note = item;
+
+  const renderItem = useCallback(
+    ({ item }: { item: Color }) => (
+      <ColorItem note={note} key={item.id} item={item} />
+    ),
+    [note]
+  );
+
+  return (
+    <>
+      <ColorPicker visible={visible} setVisible={setVisible} />
+      <View
+        style={{
+          flexGrow: isTablet ? undefined : 1,
+          paddingRight: 0,
+          flexDirection: "row"
+        }}
+      >
+        {!colorNotes || !colorNotes.length ? (
+          <Button
+            onPress={async () => {
+              useSettingStore.getState().setSheetKeyboardHandler(false);
+              setVisible(true);
+            }}
+            buttonType={{
+              text: colors.primary.accent
+            }}
+            title="Add color"
+            type="grayBg"
+            icon="plus"
+            iconPosition="right"
+            height={30}
+            fontSize={SIZE.xs}
+            style={{
+              marginRight: 5,
+              borderRadius: 100,
+              paddingHorizontal: 8
+            }}
+          />
+        ) : (
+          <PressableButton
+            customStyle={{
+              width: 30,
+              height: 30,
+              borderRadius: 100,
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: 5
+            }}
+            type="grayBg"
+            onPress={() => {
+              useSettingStore.getState().setSheetKeyboardHandler(false);
+              setVisible(true);
+            }}
+          >
+            <Icon
+              testID="icon-plus"
+              name="plus"
+              color={colors.primary.icon}
+              size={SIZE.lg}
+            />
+          </PressableButton>
+        )}
+
+        <FlashList
+          data={colorNotes}
+          estimatedItemSize={30}
+          horizontal
+          extraData={updater}
+          renderItem={renderItem}
+          showsHorizontalScrollIndicator={false}
+        />
+      </View>
+    </>
   );
 };
