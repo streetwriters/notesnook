@@ -42,6 +42,23 @@ function Home() {
     useStore.getState().refresh();
   }, []);
 
+  // useEffect(() => {
+  //   (async function () {
+
+  //     // const titles =
+  //     //   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split("");
+  //     // for (let i = 0; i < 10000; ++i) {
+  //     //   await db.notes.add({
+  //     //     title: `${
+  //     //       titles[getRandom(0, titles.length)]
+  //     //     } Some other title of mine`
+  //     //   });
+  //     //   if (i % 100 === 0) console.log(i);
+  //     // }
+  //     // console.log("DONE");
+  //   })();
+  // }, []);
+
   if (!notes) return <Placeholder context="notes" />;
   return (
     <ListContainer
