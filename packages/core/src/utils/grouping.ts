@@ -96,37 +96,42 @@ export function groupArray(
     sortBy: "dateEdited",
     sortDirection: "desc"
   }
-): (string | GroupHeader)[] {
-  const groups = new Map<string, string[]>([
-    ["Conflicted", []],
-    ["Pinned", []]
-  ]);
+): { index: number; group: GroupHeader }[] {
+  const groups = new Map<string, number>();
+  // [
+  //   ["Conflicted", 0],
+  //   ["Pinned", 1]
+  // ]
 
   const keySelector = getKeySelector(options);
-  for (const item of items) {
+  for (let i = 0; i < items.length; ++i) {
+    const item = items[i];
     const groupTitle = keySelector(item);
-    const group = groups.get(groupTitle) || [];
-    group.push(item.id);
-    groups.set(groupTitle, group);
+    const group = groups.get(groupTitle);
+    if (typeof group === "undefined") groups.set(groupTitle, i);
   }
-
-  return flattenGroups(groups);
+  const groupIndices: { index: number; group: GroupHeader }[] = [];
+  groups.forEach((index, title) =>
+    groupIndices.push({ index, group: { id: title, title, type: "header" } })
+  );
+  return groupIndices;
+  // return flattenGroups(groups);
 }
 
-function flattenGroups(groups: Map<string, string[]>) {
-  const items: (string | GroupHeader)[] = [];
-  groups.forEach((groupItems, groupTitle) => {
-    if (groupItems.length <= 0) return;
-    items.push({
-      title: groupTitle,
-      id: groupTitle.toLowerCase(),
-      type: "header"
-    });
-    items.push(...groupItems);
-  });
+// function flattenGroups<T extends GroupableItem>(groups: Map<string, T[]>) {
+//   const items: GroupedItems<T> = [];
+//   groups.forEach((groupItems, groupTitle) => {
+//     if (groupItems.length <= 0) return;
+//     items.push({
+//       title: groupTitle,
+//       id: groupTitle.toLowerCase(),
+//       type: "header"
+//     });
+//     items.push(...groupItems);
+//   });
 
-  return items;
-}
+//   return items;
+// }
 
 function getFirstCharacter(str: string) {
   if (!str) return "-";
@@ -136,5 +141,5 @@ function getFirstCharacter(str: string) {
 }
 
 function getTitle(item: PartialGroupableItem): string {
-  return item.filename || item.title || "Unknown";
+  return ("filename" in item ? item.filename : item.title) || "Unknown";
 }

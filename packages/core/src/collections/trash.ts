@@ -212,18 +212,28 @@ export default class Trash {
   }
 
   async grouped(options: GroupOptions) {
-    const items = await this.all();
-    const ids = groupArray(items, options);
-    const records: Record<string, TrashItem> = {};
-    for (const item of items) records[item.id] = item;
+    // const items = await this.all();
+    // const ids = groupArray(items, options);
+    // const records: Record<string, TrashItem> = {};
+    // for (const item of items) records[item.id] = item;
+    // const ids = [...this.cache.notebooks,...this.cache.notes]
 
     return new VirtualizedGrouping<TrashItem>(
-      ids,
-      this.db.options?.batchSize || 500,
-      async (ids: string[]) => {
-        const items: Record<string, TrashItem> = {};
-        for (const id of ids) items[id] = records[id];
-        return items;
+      this.cache.notebooks.length + this.cache.notes.length,
+      this.db.options.batchSize,
+      async (start, end) => {
+        //         const notesRange = end < this.cache.notes.length ? [start, end] : [start, this.cache.notes.length - 1];
+        // const notebooksRange = start >= this.cache.notes.length ?[start, end] : [
+        //   0, end
+        // ]
+        // TODO:
+        return { ids: [], items: [] };
+        // return {
+        //   ids: ids.slice(start,end),
+        // }
+        // const items: Record<string, TrashItem> = {};
+        // for (const id of ids) items[id] = records[id];
+        // return items;
       }
     );
   }
