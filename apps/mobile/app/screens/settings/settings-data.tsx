@@ -70,6 +70,7 @@ import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
 import { AppLockPassword } from "../../components/dialogs/applock-password";
 import { validateAppLockPassword } from "../../common/database/encryption";
+import { BackgroundSync } from "../../services/background-sync";
 type User = any;
 
 export const settingsGroups: SettingSection[] = [
@@ -406,7 +407,14 @@ export const settingsGroups: SettingSection[] = [
             description:
               "Periodically wake up the app in background to sync your notes from other devices.",
             type: "switch",
-            property: "backgroundSync"
+            property: "backgroundSync",
+            onChange: (value) => {
+              if (value) {
+                BackgroundSync.start();
+              } else {
+                BackgroundSync.stop();
+              }
+            }
           },
           {
             id: "sync-issues-fix",

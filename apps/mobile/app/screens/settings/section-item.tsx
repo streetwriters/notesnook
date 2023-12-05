@@ -57,10 +57,10 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       return;
     }
     if (!item.property) return;
+    item.onChange?.(!settings[item.property]);
     SettingsService.set({
       [item.property]: !settings[item.property]
     });
-    item.onChange?.(!settings[item.property]);
   };
 
   const styles =
