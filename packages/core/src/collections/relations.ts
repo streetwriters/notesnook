@@ -34,7 +34,7 @@ export class Relations implements ICollection {
   }
 
   async init() {
-    await this.buildCache();
+    // await this.buildCache();
     // return this.collection.init();
   }
 
