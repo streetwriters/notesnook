@@ -37,7 +37,7 @@ import React from "react";
 type ResolvedItemProps<TItemType extends ItemType> = {
   type: TItemType;
   items: VirtualizedGrouping<ItemMap[TItemType]>;
-  id: string;
+  index: number;
   children: (item: {
     item: ItemMap[TItemType];
     data: unknown;
@@ -46,8 +46,11 @@ type ResolvedItemProps<TItemType extends ItemType> = {
 export function ResolvedItem<TItemType extends ItemType>(
   props: ResolvedItemProps<TItemType>
 ) {
-  const { id, items, children, type } = props;
-  const result = usePromise(() => items.item(id, resolveItems), [id, items]);
+  const { index, items, children, type } = props;
+  const result = usePromise(
+    () => items.item(index, resolveItems),
+    [index, items]
+  );
 
   if (result.status !== "fulfilled" || !result.value) return null;
 
@@ -55,9 +58,14 @@ export function ResolvedItem<TItemType extends ItemType>(
   return <>{children(result.value)}</>;
 }
 
-export function useResolvedItem(props: Omit<ResolvedItemProps, "children">) {
-  const { id, items } = props;
-  const result = usePromise(() => items.item(id, resolveItems), [id, items]);
+export function useResolvedItem(
+  props: Omit<ResolvedItemProps<ItemType>, "children" | "type">
+) {
+  const { index, items } = props;
+  const result = usePromise(
+    () => items.item(index, resolveItems),
+    [index, items]
+  );
 
   if (result.status !== "fulfilled" || !result.value) return null;
   return result.value;
@@ -74,20 +82,17 @@ function withDateEdited<
   return { dateEdited: latestDateEdited, items };
 }
 
-export async function resolveItems(ids: string[], items: Record<string, Item>) {
-  const { type } = items[ids[0]];
+export async function resolveItems(ids: string[], items: Item[]) {
+  const { type } = items[0];
   if (type === "note") return resolveNotes(ids);
   else if (type === "notebook") {
-    const data: Record<string, number> = {};
-    for (const id of ids) data[id] = await db.notebooks.totalNotes(id);
-    return data;
+    return Promise.all(ids.map((id) => db.notebooks.totalNotes(id)));
   } else if (type === "tag") {
-    const data: Record<string, number> = {};
-    for (const id of ids)
-      data[id] = await db.relations.from({ id, type: "tag" }, "note").count();
-    return data;
+    return Promise.all(
+      ids.map((id) => db.relations.from({ id, type: "tag" }, "note").count())
+    );
   }
-  return {};
+  return [];
 }
 
 type NoteResolvedData = {
@@ -161,17 +166,17 @@ async function resolveNotes(ids: string[]) {
   };
   console.timeEnd("resolve");
 
-  const data: Record<string, NoteResolvedData> = {};
+  const data: NoteResolvedData[] = [];
   for (const noteId in grouped) {
     const group = grouped[noteId];
-    data[noteId] = {
+    data.push({
       color: group.color ? resolved.colors[group.color] : undefined,
       reminder: group.reminder ? resolved.reminders[group.reminder] : undefined,
       tags: withDateEdited(group.tags.map((id) => resolved.tags[id])),
       notebooks: withDateEdited(
         group.notebooks.map((id) => resolved.notebooks[id])
       )
-    };
+    });
   }
   return data;
 }
