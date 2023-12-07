@@ -210,7 +210,7 @@ In Notesnook, one note can belong to multiple notebooks & topics. This allows fo
 
 1. Go to `Notebooks`
 2. Press the ![Three dot button](/three-dot-button.png) button.
-3. Press `Move to trash` to delete the topic.
+3. Press `Move to trash` to delete the notebook.
 4. Select whether you also want to delete the notes inside this notebook.
 
 ---
