@@ -33,7 +33,6 @@ class Merger {
   isConflicted(
     localItem: MaybeDeletedItem<Item>,
     remoteItem: MaybeDeletedItem<Item>,
-    lastSynced: number,
     conflictThreshold: number
   ) {
     const isResolved =
@@ -46,7 +45,7 @@ class Merger {
       // will be ahead of last sync. In that case, we also have to check if the
       // synced flag is false (it is only false if a user makes edits on the
       // local device).
-      localItem.dateModified > lastSynced && !localItem.synced;
+      localItem.dateModified > remoteItem.dateModified && !localItem.synced;
     if (isModified && !isResolved) {
       // If time difference between local item's edits & remote item's edits
       // is less than threshold, we shouldn't trigger a merge conflict; instead
@@ -100,15 +99,13 @@ class Merger {
 
   async mergeContent(
     remoteItem: MaybeDeletedItem<Item>,
-    localItem: MaybeDeletedItem<Item> | undefined,
-    lastSynced: number
+    localItem: MaybeDeletedItem<Item> | undefined
   ) {
     if (localItem && "localOnly" in localItem && localItem.localOnly) return;
 
     const THRESHOLD = process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
     const conflicted =
-      localItem &&
-      this.isConflicted(localItem, remoteItem, lastSynced, THRESHOLD);
+      localItem && this.isConflicted(localItem, remoteItem, THRESHOLD);
     if (!localItem || conflicted === "merge") {
       return remoteItem;
     } else if (conflicted === "conflict") {

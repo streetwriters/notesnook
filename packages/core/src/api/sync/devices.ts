@@ -1,0 +1,54 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { StorageAccessor } from "../../interfaces";
+import hosts from "../../utils/constants";
+import http from "../../utils/http";
+import { getId } from "../../utils/id";
+import TokenManager from "../token-manager";
+
+export class SyncDevices {
+  constructor(
+    private readonly storage: StorageAccessor,
+    private readonly tokenManager: TokenManager
+  ) {}
+
+  async register() {
+    const deviceId = getId();
+    const url = `${hosts.API_HOST}/devices?deviceId=${deviceId}`;
+    const token = await this.tokenManager.getAccessToken();
+    return http
+      .post(url, null, token)
+      .then(() => this.storage().write("deviceId", deviceId));
+  }
+
+  async unregister() {
+    const deviceId = await this.storage().read("deviceId");
+    if (!deviceId) return;
+    const url = `${hosts.API_HOST}/devices?deviceId=${deviceId}`;
+    const token = await this.tokenManager.getAccessToken();
+    return http
+      .delete(url, token)
+      .then(() => this.storage().remove("deviceId"));
+  }
+
+  get() {
+    return this.storage().read<string>("deviceId");
+  }
+}

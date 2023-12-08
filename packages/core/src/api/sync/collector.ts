@@ -35,7 +35,6 @@ class Collector {
 
   async *collect(
     chunkSize: number,
-    lastSyncedTimestamp: number,
     isForceSync = false
   ): AsyncGenerator<SyncTransferItem, void, unknown> {
     const key = await this.db.user.getEncryptionKey();
@@ -47,13 +46,15 @@ class Collector {
     for (const itemType of SYNC_ITEM_TYPES) {
       const collectionKey = SYNC_COLLECTIONS_MAP[itemType];
       const collection = this.db[collectionKey].collection;
-      for await (const chunk of collection.unsynced(
-        isForceSync ? 0 : lastSyncedTimestamp,
-        chunkSize
-      )) {
+      for await (const chunk of collection.unsynced(chunkSize, isForceSync)) {
         const items = await this.prepareChunk(chunk, key);
         if (!items) continue;
         yield { items, type: itemType };
+
+        await collection.update(
+          chunk.map((i) => i.id),
+          { synced: true }
+        );
       }
     }
   }
@@ -89,13 +90,20 @@ function filterSyncableItems(items: MaybeDeletedItem<Item>[]): {
   const ids = [];
   const syncableItems = [];
   for (const item of items) {
-    // const isSyncable = !item.synced || isForceSync;
-
-    // synced is a local only property. we don't want to sync it.
     delete item.synced;
 
     ids.push(item.id);
-    syncableItems.push(JSON.stringify(item));
+    syncableItems.push(
+      JSON.stringify(
+        "localOnly" in item && item.localOnly
+          ? {
+              id: item.id,
+              deleted: true,
+              dateModified: item.dateModified
+            }
+          : item
+      )
+    );
   }
   return { items: syncableItems, ids };
 }

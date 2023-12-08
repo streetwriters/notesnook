@@ -123,14 +123,14 @@ export interface DatabaseCollection<T, IsAsync extends boolean> {
     Record<string, MaybeDeletedItem<T> | undefined>
   >;
   unsynced(
-    after: number,
-    chunkSize: number
+    chunkSize: number,
+    forceSync?: boolean
   ): IsAsync extends true
     ? AsyncIterableIterator<MaybeDeletedItem<T>[]>
     : IterableIterator<MaybeDeletedItem<T>[]>;
-  stream(): IsAsync extends true
-    ? AsyncIterableIterator<T>
-    : IterableIterator<T>;
+  stream(
+    chunkSize: number
+  ): IsAsync extends true ? AsyncIterableIterator<T> : IterableIterator<T>;
 }
 
 export type DatabaseAccessor = () =>
