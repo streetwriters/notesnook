@@ -18,22 +18,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { formatBytes } from "@notesnook/common";
-import React, { useEffect, useState } from "react";
+import { Attachment, VirtualizedGrouping } from "@notesnook/core";
+import { useThemeColors } from "@notesnook/theme";
+import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
-import { useThemeColors } from "@notesnook/theme";
+import { useDBItem } from "../../hooks/use-db-item";
 import { SIZE } from "../../utils/size";
 import { IconButton } from "../ui/icon-button";
 import { ProgressCircleComponent } from "../ui/svg/lazy";
 import Paragraph from "../ui/typography/paragraph";
 import Actions from "./actions";
-import { Attachment, VirtualizedGrouping } from "@notesnook/core";
-import { useDBItem } from "../../hooks/use-db-item";
 
 function getFileExtension(filename: string) {
-  var ext = /^.+\.([^.]+)$/.exec(filename);
+  const ext = /^.+\.([^.]+)$/.exec(filename);
   return ext == null ? "" : ext[1];
 }
 
@@ -46,7 +46,7 @@ export const AttachmentItem = ({
   hideWhenNotDownloading,
   context
 }: {
-  id: string;
+  id: string | number;
   attachments?: VirtualizedGrouping<Attachment>;
   encryption?: boolean;
   setAttachments: (attachments: any) => void;
@@ -54,7 +54,7 @@ export const AttachmentItem = ({
   hideWhenNotDownloading?: boolean;
   context?: string;
 }) => {
-  const [attachment] = useDBItem(id, "attachment", attachments?.item);
+  const [attachment] = useDBItem(id, "attachment", attachments);
 
   const { colors } = useThemeColors();
   const [currentProgress, setCurrentProgress] = useAttachmentProgress(
@@ -68,7 +68,7 @@ export const AttachmentItem = ({
   };
 
   return (hideWhenNotDownloading &&
-    (!currentProgress || !(currentProgress as any).value)) ||
+    (!currentProgress || !currentProgress.value)) ||
     !attachment ? null : (
     <TouchableOpacity
       activeOpacity={0.9}
@@ -133,8 +133,8 @@ export const AttachmentItem = ({
           {!hideWhenNotDownloading ? (
             <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
               {formatBytes(attachment.size)}{" "}
-              {(currentProgress as any)?.type
-                ? "(" + (currentProgress as any).type + "ing - tap to cancel)"
+              {currentProgress?.type
+                ? "(" + currentProgress.type + "ing - tap to cancel)"
                 : ""}
             </Paragraph>
           ) : null}

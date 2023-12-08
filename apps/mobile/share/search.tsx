@@ -17,20 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Item, Note, Notebook, VirtualizedGrouping } from "@notesnook/core";
+import {
+  Item,
+  Note,
+  Notebook,
+  Tag,
+  VirtualizedGrouping
+} from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import {
   FlatList,
   Platform,
-  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
   View,
   useWindowDimensions
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import create from "zustand";
 import { db } from "../app/common/database";
@@ -121,23 +125,29 @@ const NotebookItem = ({
   items,
   level = 0
 }: {
-  id: string;
+  id: string | number;
   mode: SearchMode;
   close?: () => void;
   level?: number;
   items?: VirtualizedGrouping<Notebook>;
 }) => {
-  const isExpanded = useNotebookExpandedStore((state) => state.expanded[id]);
   const { nestedNotebooks, notebook } = useNotebook(id, items);
+  const isExpanded = useNotebookExpandedStore((state) =>
+    !notebook ? false : state.expanded[notebook.id]
+  );
   const { colors } = useThemeColors();
-  const isSelected = useShareStore(
-    (state) =>
-      state.selectedNotebooks.findIndex((selectedId) => id === selectedId) > -1
+  const isSelected = useShareStore((state) =>
+    !notebook
+      ? false
+      : state.selectedNotebooks.findIndex(
+          (selectedId) => notebook?.id === selectedId
+        ) > -1
   );
   const set = SearchSetters[mode];
 
   const onSelectItem = async () => {
-    set(id);
+    if (!notebook) return;
+    set(notebook.id);
   };
 
   return !notebook ? (
@@ -172,7 +182,8 @@ const NotebookItem = ({
               alignItems: "center"
             }}
             onPress={() => {
-              useNotebookExpandedStore.getState().setExpanded(id);
+              if (!notebook) return;
+              useNotebookExpandedStore.getState().setExpanded(notebook.id);
             }}
             activeOpacity={1}
           >
@@ -230,10 +241,10 @@ const NotebookItem = ({
             marginTop: 5
           }}
         >
-          {(nestedNotebooks.ids as string[]).map((id) => (
+          {nestedNotebooks.ids.map((item, index) => (
             <NotebookItem
-              key={id}
-              id={id}
+              key={notebook?.id + index}
+              id={index}
               mode={mode}
               close={close}
               level={level + 1}
@@ -251,7 +262,7 @@ const ListItem = ({
   close,
   items
 }: {
-  id: string;
+  id: string | number;
   mode: SearchMode;
   close?: () => void;
   items?: VirtualizedGrouping<Item>;
@@ -259,21 +270,23 @@ const ListItem = ({
   const [item] = useDBItem(
     id,
     mode === "appendNote" ? "note" : "tag",
-    items as any
+    items as VirtualizedGrouping<Note | Tag>
   );
   const { colors } = useThemeColors();
   const isSelected = useShareStore((state) =>
-    mode === "appendNote" ? false : state.selectedTags.indexOf(id as never) > -1
+    mode === "appendNote" || !item
+      ? false
+      : state.selectedTags.indexOf(item?.id as never) > -1
   );
 
   const set = SearchSetters[mode];
 
   const onSelectItem = async () => {
-    if ((item as Note)?.locked) {
+    if ((item as Note)?.locked || !item) {
       return;
     }
 
-    set(id);
+    set(item.id);
   };
 
   return !item ? null : (
@@ -356,12 +369,6 @@ export const Search = ({
       .then((exists) => setQueryExists(!!exists));
   };
 
-  const insets =
-    Platform.OS === "android"
-      ? { top: StatusBar.currentHeight }
-      : // eslint-disable-next-line react-hooks/rules-of-hooks
-        useSafeAreaInsets();
-
   const get = SearchGetters[mode];
   const lookup = SearchLookup[mode];
 
@@ -389,16 +396,16 @@ export const Search = ({
   }, [get]);
 
   const renderItem = React.useCallback(
-    ({ item }: { item: string }) =>
+    ({ index }: { item: string | number; index: number }) =>
       mode === "selectNotebooks" ? (
         <NotebookItem
-          id={item}
+          id={index}
           mode={mode}
           close={close}
-          items={items as any}
+          items={items as VirtualizedGrouping<Notebook>}
         />
       ) : (
-        <ListItem id={item} mode={mode} close={close} items={items} />
+        <ListItem id={index} mode={mode} close={close} items={items} />
       ),
     [close, mode, items]
   );
@@ -502,7 +509,7 @@ export const Search = ({
         ) : null}
 
         <FlatList
-          data={items?.ids as string[]}
+          data={items?.ids}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="none"
           renderItem={renderItem}
