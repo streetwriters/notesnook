@@ -104,6 +104,10 @@ const tools: Record<ToolId, ToolDefinition> = {
     icon: "numberedList",
     title: "Numbered list"
   },
+  checkList: {
+    icon: "checkList",
+    title: "Numbered list"
+  },
   fontFamily: {
     icon: "fontFamily",
     title: "Font family"
@@ -408,7 +412,7 @@ const defaultPresets: Record<"default" | "minimal", ToolbarDefinition> = {
     ],
     ["fontSize"],
     ["headings", "fontFamily"],
-    ["numberedList", "bulletList"],
+    ["checkList", "numberedList", "bulletList"],
     ["addLink"],
     ["alignment", "textDirection"],
     ["clearformatting"]

@@ -249,6 +249,7 @@ export const Icons = {
   readonlyOff: mdiPencil,
   selectAllUnchecked: mdiCheckboxMultipleBlankOutline,
   selectAllChecked: mdiCheckboxMultipleMarked,
+  checkList: mdiCheckboxMarkedOutline,
   none: ""
 };
 
