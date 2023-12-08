@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { GroupHeader, Note } from "@notesnook/core";
+import { Note } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useCallback, useEffect } from "react";
 import { Keyboard, TouchableOpacity, View } from "react-native";
@@ -135,10 +135,9 @@ const MoveNoteSheet = ({
   };
 
   const renderNotebook = useCallback(
-    ({ item, index }: { item: string | GroupHeader; index: number }) =>
-      (item as GroupHeader).type === "header" ? null : (
-        <NotebookItem items={notebooks} id={item as string} index={index} />
-      ),
+    ({ item, index }: { item: string | number; index: number }) => (
+      <NotebookItem items={notebooks} id={item as string} index={index} />
+    ),
     [notebooks]
   );
 
@@ -220,12 +219,11 @@ const MoveNoteSheet = ({
           }}
         >
           <FlashList
-            data={notebooks?.ids?.filter((id) => typeof id === "string")}
+            data={notebooks?.ids}
             style={{
               width: "100%"
             }}
             estimatedItemSize={50}
-            keyExtractor={(item) => item as string}
             renderItem={renderNotebook}
             ListEmptyComponent={
               <View
