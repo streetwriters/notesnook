@@ -174,6 +174,18 @@ export function BulletList(props: ToolProps) {
   );
 }
 
+export function CheckList(props: ToolProps) {
+  const { editor, ...toolProps } = props;
+
+  return (
+    <ToolButton
+      {...toolProps}
+      toggled={false}
+      onClick={() => editor.current?.chain().focus().toggleCheckList().run()}
+    />
+  );
+}
+
 export function Indent(props: ToolProps) {
   const { editor, ...toolProps } = props;
   const isBottom = useToolbarLocation() === "bottom";
