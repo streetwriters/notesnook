@@ -88,7 +88,8 @@ export class SQLCollection<
         ids.map((id) => ({
           id,
           deleted: true,
-          dateModified: Date.now()
+          dateModified: Date.now(),
+          synced: false
         }))
       )
       .execute();
@@ -160,7 +161,8 @@ export class SQLCollection<
       .where("id", "in", ids)
       .set({
         ...partial,
-        dateModified: Date.now()
+        dateModified: Date.now(),
+        synced: partial.synced || false
       })
       .execute();
   }
@@ -194,47 +196,54 @@ export class SQLCollection<
   }
 
   async *unsynced(
-    after: number,
-    chunkSize: number
+    chunkSize: number,
+    forceSync?: boolean
   ): AsyncIterableIterator<MaybeDeletedItem<T>[]> {
-    let index = 0;
+    let lastRowId: string | null = null;
     while (true) {
-      const rows = await this.db()
+      const rows = (await this.db()
         .selectFrom<keyof DatabaseSchema>(this.type)
         .selectAll()
-        .orderBy("dateModified", "asc")
-        .$if(after > 0, (eb) =>
-          eb.where("dateModified", ">", after).where(isFalse("synced"))
-        )
+        .$if(lastRowId != null, (qb) => qb.where("id", ">", lastRowId!))
+        .$if(!forceSync, (eb) => eb.where(isFalse("synced")))
         .$if(this.type === "attachments", (eb) =>
-          eb.where("dateUploaded", ">", 0)
+          eb.where((eb) =>
+            eb.or([eb("dateUploaded", ">", 0), eb("deleted", "==", true)])
+          )
         )
-        .offset(index)
+        .orderBy("id")
         .limit(chunkSize)
-        .execute();
+        .execute()) as MaybeDeletedItem<T>[];
       if (rows.length === 0) break;
-      index += chunkSize;
-      yield rows as MaybeDeletedItem<T>[];
+      yield rows;
+
+      lastRowId = rows[rows.length - 1].id;
     }
   }
 
-  async *stream(): AsyncIterableIterator<T> {
-    let index = 0;
-    const chunkSize = 50;
+  async *stream(chunkSize: number): AsyncIterableIterator<T> {
+    let lastRow: T | null = null;
     while (true) {
-      const rows = await this.db()
+      const rows = (await this.db()
         .selectFrom<keyof DatabaseSchema>(this.type)
         .where(isFalse("deleted"))
-        .orderBy("dateCreated desc")
+        .orderBy("dateCreated asc")
+        .orderBy("id asc")
+        .$if(lastRow !== null, (qb) =>
+          qb.where(
+            (eb) => eb.refTuple("dateCreated", "id"),
+            ">",
+            (eb) => eb.tuple(lastRow!.dateCreated, lastRow!.id)
+          )
+        )
         .selectAll()
-        .offset(index)
         .limit(chunkSize)
-        .execute();
+        .execute()) as T[];
       if (rows.length === 0) break;
-      index += chunkSize;
       for (const row of rows) {
-        yield row as T;
+        yield row;
       }
+      lastRow = rows[rows.length - 1];
     }
   }
 

@@ -363,8 +363,8 @@ class Database {
     return (await this.storage().read<number | undefined>("lastSynced")) || 0;
   }
 
-  sync(full = true, force = false, lastSynced?: number) {
-    return this.syncer.start(full, force, lastSynced);
+  sync(full = true, force = false) {
+    return this.syncer.start(full, force);
   }
 
   host(hosts: typeof Hosts) {
