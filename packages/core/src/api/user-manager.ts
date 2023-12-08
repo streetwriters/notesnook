@@ -178,7 +178,10 @@ class UserManager {
       password,
       salt: user.salt
     });
-    if (!sessionExpired) await this.db.storage().write("lastSynced", 0);
+    if (!sessionExpired) {
+      await this.db.storage().write("lastSynced", 0);
+      await this.db.syncer.devices.register();
+    }
 
     EV.publish(EVENTS.userLoggedIn, user);
   }
@@ -222,6 +225,7 @@ class UserManager {
       salt: user.salt
     });
     await this.db.storage().write("lastSynced", 0);
+    await this.db.syncer.devices.register();
 
     EV.publish(EVENTS.userLoggedIn, user);
   }
@@ -256,6 +260,7 @@ class UserManager {
 
   async logout(revoke = true, reason?: string) {
     try {
+      await this.db.syncer.devices.unregister();
       if (revoke) await this.tokenManager.revokeToken();
     } catch (e) {
       console.error(e);

@@ -25,7 +25,6 @@ import { Item, MaybeDeletedItem, Note, Notebook, isDeleted } from "../types.js";
 import { Cipher, SerializedKey } from "@notesnook/crypto";
 import { isCipher } from "./crypto.js";
 import { migrateItem } from "../migrations";
-import { set } from "../utils/set.js";
 import { DatabaseCollection } from "./index.js";
 
 type BackupDataItem = MaybeDeletedItem<Item> | string[];
@@ -88,7 +87,7 @@ function isLegacyBackupFile(
 }
 
 const MAX_CHUNK_SIZE = 10 * 1024 * 1024;
-const COLORS = [
+export const COLORS = [
   "red",
   "orange",
   "yellow",
@@ -207,7 +206,9 @@ export default class Backup {
     collection: DatabaseCollection<T, B>,
     state: BackupState
   ) {
-    for await (const item of collection.stream() as any) {
+    for await (const item of collection.stream(
+      this.db.options.batchSize
+    ) as any) {
       const data = JSON.stringify(item);
       state.buffer.push(data);
       state.bufferLength += data.length;
