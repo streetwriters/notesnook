@@ -16,24 +16,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React from "react";
-import { getSortValue } from "@notesnook/core/dist/utils/grouping";
 import {
+  Color,
+  GroupHeader,
+  GroupOptions,
   GroupingKey,
   Item,
-  VirtualizedGrouping,
-  Color,
-  Reminder,
+  ItemType,
+  Note,
   Notebook,
+  Reminder,
   Tag,
   TrashItem,
-  ItemType,
-  Note
+  VirtualizedGrouping
 } from "@notesnook/core";
-import { useEffect, useRef, useState } from "react";
+import { getSortValue } from "@notesnook/core/dist/utils/grouping";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import { NoteWrapper } from "../list-items/note/wrapper";
 import { db } from "../../common/database";
+import { eSendEvent } from "../../services/event-manager";
+import { RouteName } from "../../stores/use-navigation-store";
+import { eOpenJumpToDialog } from "../../utils/events";
+import { SectionHeader } from "../list-items/headers/section-header";
+import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import ReminderItem from "../list-items/reminder";
 import TagItem from "../list-items/tag";
@@ -45,13 +50,17 @@ export type TagsWithDateEdited = WithDateEdited<Tag>;
 type ListItemWrapperProps<TItem = Item> = {
   group?: GroupingKey;
   items: VirtualizedGrouping<TItem> | undefined;
-  id: string;
   isSheet: boolean;
   index: number;
+  renderedInRoute?: RouteName;
+  customAccentColor?: string;
+  dataType: string;
+  scrollRef: any;
+  groupOptions: GroupOptions;
 };
 
 export function ListItemWrapper(props: ListItemWrapperProps) {
-  const { id, items, group, isSheet, index } = props;
+  const { items, group, isSheet, index, groupOptions } = props;
   const [item, setItem] = useState<Item>();
   const tags = useRef<TagsWithDateEdited>();
   const notebooks = useRef<NotebooksWithDateEdited>();
@@ -59,25 +68,34 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
   const color = useRef<Color>();
   const totalNotes = useRef<number>(0);
   const attachmentsCount = useRef(0);
+  const [groupHeader, setGroupHeader] = useState<GroupHeader>();
+  const previousIndex = useRef<number>();
 
   useEffect(() => {
     (async function () {
-      const { item, data } = (await items?.item(id, resolveItems)) || {};
-      if (!item) return;
-      if (item.type === "note" && isNoteResolvedData(data)) {
-        tags.current = data.tags;
-        notebooks.current = data.notebooks;
-        reminder.current = data.reminder;
-        color.current = data.color;
-        attachmentsCount.current = data.attachmentsCount;
-      } else if (item.type === "notebook" && typeof data === "number") {
-        totalNotes.current = data;
-      } else if (item.type === "tag" && typeof data === "number") {
-        totalNotes.current = data;
+      try {
+        const { item, data, group } =
+          (await items?.item(index, resolveItems)) || {};
+        if (!item) return;
+        if (item.type === "note" && isNoteResolvedData(data)) {
+          tags.current = data.tags;
+          notebooks.current = data.notebooks;
+          reminder.current = data.reminder;
+          color.current = data.color;
+          attachmentsCount.current = data.attachmentsCount;
+        } else if (item.type === "notebook" && typeof data === "number") {
+          totalNotes.current = data;
+        } else if (item.type === "tag" && typeof data === "number") {
+          totalNotes.current = data;
+        }
+        previousIndex.current = index;
+        setItem(item);
+        setGroupHeader(group);
+      } catch (e) {
+        console.log("Error", e);
       }
-      setItem(item);
     })();
-  }, [id, items]);
+  }, [index, items]);
 
   if (!item) return <View style={{ height: 100, width: "100%" }} />;
 
@@ -85,40 +103,117 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
   switch (type) {
     case "note": {
       return (
-        <NoteWrapper
-          item={item as Note}
-          tags={tags.current}
-          color={color.current}
-          notebooks={notebooks.current}
-          reminder={reminder.current}
-          attachmentsCount={attachmentsCount.current}
-          date={getDate(item, group)}
-          isRenderedInActionSheet={isSheet}
-          index={index}
-        />
+        <>
+          {groupHeader && previousIndex.current === index ? (
+            <SectionHeader
+              screen={props.renderedInRoute}
+              item={groupHeader}
+              index={index}
+              dataType={item.type}
+              color={props.customAccentColor}
+              groupOptions={groupOptions}
+              onOpenJumpToDialog={() => {
+                eSendEvent(eOpenJumpToDialog, {
+                  ref: props.scrollRef,
+                  data: items
+                });
+              }}
+            />
+          ) : null}
+
+          <NoteWrapper
+            item={item as Note}
+            tags={tags.current}
+            color={color.current}
+            notebooks={notebooks.current}
+            reminder={reminder.current}
+            attachmentsCount={attachmentsCount.current}
+            date={getDate(item, group)}
+            isRenderedInActionSheet={isSheet}
+            index={index}
+          />
+        </>
       );
     }
     case "notebook":
       return (
-        <NotebookWrapper
-          item={item as Notebook}
-          totalNotes={totalNotes.current}
-          date={getDate(item, group)}
-          index={index}
-        />
+        <>
+          {groupHeader && previousIndex.current === index ? (
+            <SectionHeader
+              screen={props.renderedInRoute}
+              item={groupHeader}
+              index={index}
+              dataType={item.type}
+              color={props.customAccentColor}
+              groupOptions={groupOptions}
+              onOpenJumpToDialog={() => {
+                eSendEvent(eOpenJumpToDialog, {
+                  ref: props.scrollRef,
+                  data: items
+                });
+              }}
+            />
+          ) : null}
+          <NotebookWrapper
+            item={item as Notebook}
+            totalNotes={totalNotes.current}
+            date={getDate(item, group)}
+            index={index}
+          />
+        </>
       );
 
     case "reminder":
       return (
-        <ReminderItem item={item as Reminder} index={index} isSheet={isSheet} />
+        <>
+          {groupHeader && previousIndex.current === index ? (
+            <SectionHeader
+              screen={props.renderedInRoute}
+              item={groupHeader}
+              index={index}
+              dataType={item.type}
+              color={props.customAccentColor}
+              groupOptions={groupOptions}
+              onOpenJumpToDialog={() => {
+                eSendEvent(eOpenJumpToDialog, {
+                  ref: props.scrollRef,
+                  data: items
+                });
+              }}
+            />
+          ) : null}
+          <ReminderItem
+            item={item as Reminder}
+            index={index}
+            isSheet={isSheet}
+          />
+        </>
       );
     case "tag":
       return (
-        <TagItem
-          item={item as Tag}
-          index={index}
-          totalNotes={totalNotes.current}
-        />
+        <>
+          {groupHeader && previousIndex.current === index ? (
+            <SectionHeader
+              screen={props.renderedInRoute}
+              item={groupHeader}
+              index={index}
+              dataType={item.type}
+              color={props.customAccentColor}
+              groupOptions={groupOptions}
+              onOpenJumpToDialog={() => {
+                eSendEvent(eOpenJumpToDialog, {
+                  ref: props.scrollRef,
+                  data: items
+                });
+              }}
+            />
+          ) : null}
+          <TagItem
+            item={item as Tag}
+            index={index}
+            totalNotes={totalNotes.current}
+          />
+        </>
       );
     default:
       return null;
@@ -136,6 +231,19 @@ function withDateEdited<
   return { dateEdited: latestDateEdited, items };
 }
 
+export async function resolveItems(ids: string[], items: Item[]) {
+  const { type } = items[0];
+  if (type === "note") return resolveNotes(ids);
+  else if (type === "notebook") {
+    return Promise.all(ids.map((id) => db.notebooks.totalNotes(id)));
+  } else if (type === "tag") {
+    return Promise.all(
+      ids.map((id) => db.relations.from({ id, type: "tag" }, "note").count())
+    );
+  }
+  return [];
+}
+
 function getDate(item: Item, groupType?: GroupingKey): number {
   return (
     getSortValue(
@@ -149,22 +257,6 @@ function getDate(item: Item, groupType?: GroupingKey): number {
       item
     ) || 0
   );
-}
-
-async function resolveItems(ids: string[], items: Record<string, Item>) {
-  const { type } = items[ids[0]];
-  if (type === "note") return resolveNotes(ids);
-  else if (type === "notebook") {
-    const data: Record<string, number> = {};
-    for (const id of ids) data[id] = await db.notebooks.totalNotes(id);
-    return data;
-  } else if (type === "tag") {
-    const data: Record<string, number> = {};
-    for (const id of ids)
-      data[id] = await db.relations.from({ id, type: "tag" }, "note").count();
-    return data;
-  }
-  return {};
 }
 
 type NoteResolvedData = {
@@ -183,7 +275,6 @@ async function resolveNotes(ids: string[]) {
     ...(await db.relations.from({ type: "note", ids }, "reminder").get())
   ];
   console.timeEnd("relations");
-
   const relationIds: {
     notebooks: Set<string>;
     colors: Set<string>;
@@ -207,15 +298,15 @@ async function resolveNotes(ids: string[]) {
   > = {};
   for (const relation of relations) {
     const noteId =
-      relation.toType === "relation" ? relation.fromId : relation.toId;
+      relation.toType === "reminder" ? relation.fromId : relation.toId;
     const data = grouped[noteId] || {
       notebooks: [],
       tags: []
     };
 
-    if (relation.toType === "relation" && !data.reminder) {
-      data.reminder = relation.fromId;
-      relationIds.reminders.add(relation.fromId);
+    if (relation.toType === "reminder" && !data.reminder) {
+      data.reminder = relation.toId;
+      relationIds.reminders.add(relation.toId);
     } else if (relation.fromType === "notebook" && data.notebooks.length < 2) {
       data.notebooks.push(relation.fromId);
       relationIds.notebooks.add(relation.fromId);
@@ -226,7 +317,7 @@ async function resolveNotes(ids: string[]) {
       data.color = relation.fromId;
       relationIds.colors.add(relation.fromId);
     }
-    grouped[relation.toId] = data;
+    grouped[noteId] = data;
   }
 
   console.time("resolve");
@@ -240,10 +331,10 @@ async function resolveNotes(ids: string[]) {
   };
   console.timeEnd("resolve");
 
-  const data: Record<string, NoteResolvedData> = {};
+  const data: NoteResolvedData[] = [];
   for (const noteId in grouped) {
     const group = grouped[noteId];
-    data[noteId] = {
+    data.push({
       color: group.color ? resolved.colors[group.color] : undefined,
       reminder: group.reminder ? resolved.reminders[group.reminder] : undefined,
       tags: withDateEdited(group.tags.map((id) => resolved.tags[id])),
@@ -252,12 +343,12 @@ async function resolveNotes(ids: string[]) {
       ),
       attachmentsCount:
         (await db.attachments?.ofNote(noteId, "all").ids())?.length || 0
-    };
+    });
   }
   return data;
 }
 
-function isNoteResolvedData(data: unknown): data is NoteResolvedData {
+export function isNoteResolvedData(data: unknown): data is NoteResolvedData {
   return (
     typeof data === "object" &&
     !!data &&
