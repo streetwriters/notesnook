@@ -43,6 +43,7 @@ import {
 } from "kysely";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { groupArray } from "../utils/grouping";
+import { toChunks } from "../utils/array";
 
 export class SQLCollection<
   TCollectionType extends keyof DatabaseSchema,
@@ -149,10 +150,17 @@ export class SQLCollection<
     }, [] as SQLiteItem<T>[]);
 
     if (entries.length <= 0) return;
+
     await this.db()
-      .replaceInto<keyof DatabaseSchema>(this.type)
-      .values(entries)
-      .execute();
+      .transaction()
+      .execute(async (tx) => {
+        for (const chunk of toChunks(entries, 200)) {
+          await tx
+            .replaceInto<keyof DatabaseSchema>(this.type)
+            .values(chunk)
+            .execute();
+        }
+      });
   }
 
   async update(ids: string[], partial: Partial<SQLiteItem<T>>) {
