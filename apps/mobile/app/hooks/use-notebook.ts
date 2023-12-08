@@ -24,40 +24,47 @@ import { eGroupOptionsUpdated, eOnNotebookUpdated } from "../utils/events";
 import { useDBItem, useTotalNotes } from "./use-db-item";
 
 export const useNotebook = (
-  id?: string,
-  items?: VirtualizedGrouping<Notebook>
+  id?: string | number,
+  items?: VirtualizedGrouping<Notebook>,
+  nestedNotebooks?: boolean
 ) => {
   const [item, refresh] = useDBItem(id, "notebook", items);
   const [groupOptions, setGroupOptions] = useState(
     db.settings.getGroupOptions("notebooks")
   );
   const [notebooks, setNotebooks] = useState<VirtualizedGrouping<Notebook>>();
-  const { totalNotes: nestedNotebookNotesCount } = useTotalNotes(
-    notebooks?.ids as string[],
-    "notebook"
-  );
+  const { totalNotes: nestedNotebookNotesCount, getTotalNotes } =
+    useTotalNotes("notebook");
 
   const onRequestUpdate = React.useCallback(() => {
-    if (!id) return;
-    console.log("useNotebook.onRequestUpdate", id, Date.now());
-    db.relations
-      .from(
-        {
-          type: "notebook",
-          id: id
-        },
-        "notebook"
-      )
-      .selector.sorted(db.settings.getGroupOptions("notebooks"))
+    if (!item?.id) return;
+    console.log("useNotebook.onRequestUpdate", item?.id, Date.now());
+
+    const selector = db.relations.from(
+      {
+        type: "notebook",
+        id: item.id
+      },
+      "notebook"
+    ).selector;
+
+    selector.ids().then((notebookIds) => {
+      getTotalNotes(notebookIds);
+    });
+
+    selector
+      .sorted(db.settings.getGroupOptions("notebooks"))
       .then((notebooks) => {
         setNotebooks(notebooks);
       });
-  }, [id]);
+  }, [getTotalNotes, item?.id]);
 
   useEffect(() => {
-    console.log("useNotebook.useEffect.onRequestUpdate");
-    onRequestUpdate();
-  }, [onRequestUpdate]);
+    if (nestedNotebooks) {
+      console.log("useNotebook.useEffect.onRequestUpdate");
+      onRequestUpdate();
+    }
+  }, [item?.id, onRequestUpdate, nestedNotebooks]);
 
   const onUpdate = useCallback(
     (type: string) => {
@@ -73,7 +80,9 @@ export const useNotebook = (
     const onNotebookUpdate = (id?: string) => {
       if (typeof id === "string" && id !== id) return;
       setImmediate(() => {
-        onRequestUpdate();
+        if (nestedNotebooks) {
+          onRequestUpdate();
+        }
         refresh();
       });
     };
@@ -84,7 +93,7 @@ export const useNotebook = (
       eUnSubscribeEvent(eGroupOptionsUpdated, onUpdate);
       eUnSubscribeEvent(eOnNotebookUpdated, onNotebookUpdate);
     };
-  }, [onUpdate, onRequestUpdate, id, refresh]);
+  }, [onUpdate, onRequestUpdate, id, refresh, nestedNotebooks]);
 
   return {
     notebook: item,

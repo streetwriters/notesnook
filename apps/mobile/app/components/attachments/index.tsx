@@ -84,17 +84,15 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
     }
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(async () => {
-      let results = await db.lookup.attachments(
-        attachmentSearchValue.current as string
-      );
+      const results = await db.lookup
+        .attachments(attachmentSearchValue.current as string)
+        .sorted();
       if (results.length === 0) return;
-
-      setAttachments(filterAttachments(currentFilter));
       setAttachments(results);
     }, 300);
   };
 
-  const renderItem = ({ item }: { item: string }) => (
+  const renderItem = ({ item }: { item: string | number }) => (
     <AttachmentItem
       setAttachments={() => {
         setAttachments(filterAttachments(currentFilter));
@@ -108,15 +106,15 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
   const onCheck = async () => {
     if (!attachments) return;
     setLoading(true);
-    for (let id of attachments.ids) {
-      const attachment = await attachments.item(id as string);
+    for (const id of attachments.ids) {
+      const attachment = (await attachments.item(id))?.item;
       if (!attachment) continue;
 
-      let result = await filesystem.checkAttachment(attachment.hash);
+      const result = await filesystem.checkAttachment(attachment.hash);
       if (result.failed) {
         await db.attachments.markAsFailed(attachment.hash, result.failed);
       } else {
-        await db.attachments.markAsFailed(id as string, undefined);
+        await db.attachments.markAsFailed(attachment.id, undefined);
       }
     }
     refresh();
@@ -312,7 +310,7 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
           />
         }
         estimatedItemSize={50}
-        data={attachments?.ids as string[]}
+        data={attachments?.ids}
         renderItem={renderItem}
       />
 

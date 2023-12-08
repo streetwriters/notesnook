@@ -36,6 +36,7 @@ import { IconButton } from "../../ui/icon-button";
 import { PressableButton } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
+import { useDBItem } from "../../../hooks/use-db-item";
 
 export const MoveNotes = ({
   notebook,
@@ -45,11 +46,13 @@ export const MoveNotes = ({
   fwdRef: RefObject<ActionSheetRef>;
 }) => {
   const { colors } = useThemeColors();
-  const [currentNotebook, setCurrentNotebook] = useState(notebook);
+  const currentNotebook = notebook;
+
   const { height } = useWindowDimensions();
   const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
   const [existingNoteIds, setExistingNoteIds] = useState<string[]>([]);
+
   useEffect(() => {
     db.notes?.all.sorted(db.settings.getGroupOptions("notes")).then((notes) => {
       setNotes(notes);
@@ -85,17 +88,18 @@ export const MoveNotes = ({
   );
 
   const renderItem = React.useCallback(
-    ({ item }: { item: string }) => {
+    ({ index }: { item: string | number; index: number }) => {
       return (
         <SelectableNoteItem
-          id={item}
+          id={index}
           items={notes}
           select={select}
-          selected={selectedNoteIds?.indexOf(item) > -1}
+          selected={(id) => selectedNoteIds?.indexOf(id) > -1}
+          exists={(id) => existingNoteIds.indexOf(id) > -1}
         />
       );
     },
-    [notes, select, selectedNoteIds]
+    [existingNoteIds, notes, select, selectedNoteIds]
   );
 
   return (
@@ -128,9 +132,7 @@ export const MoveNotes = ({
             </Paragraph>
           </View>
         }
-        data={(notes?.ids as string[])?.filter(
-          (id) => existingNoteIds?.indexOf(id) === -1
-        )}
+        data={notes?.ids}
         renderItem={renderItem}
       />
       {selectedNoteIds.length > 0 ? (
@@ -157,21 +159,19 @@ const SelectableNoteItem = ({
   id,
   items,
   select,
-  selected
+  selected,
+  exists
 }: {
-  id: string;
+  id: string | number;
   items?: VirtualizedGrouping<Note>;
   select: (id: string) => void;
-  selected?: boolean;
+  selected?: (id: string) => boolean;
+  exists: (id: string) => boolean;
 }) => {
   const { colors } = useThemeColors();
-  const [item, setItem] = useState<Note>();
+  const [item] = useDBItem(id, "note", items);
 
-  useEffect(() => {
-    items?.item(id).then((item) => setItem(item));
-  }, [id, items]);
-
-  return !item ? null : (
+  return !item || exists(item.id) ? null : (
     <PressableButton
       testID="listitem.select"
       onPress={() => {
@@ -197,10 +197,14 @@ const SelectableNoteItem = ({
           select(item?.id);
         }}
         name={
-          selected ? "check-circle-outline" : "checkbox-blank-circle-outline"
+          selected?.(item?.id)
+            ? "check-circle-outline"
+            : "checkbox-blank-circle-outline"
         }
         type="selected"
-        color={selected ? colors.selected.icon : colors.primary.icon}
+        color={
+          selected?.(item?.id) ? colors.selected.icon : colors.primary.icon
+        }
       />
 
       <View

@@ -91,7 +91,7 @@ const DownloadAttachments = ({
 
   const successResults = () => {
     const results = [];
-    for (let [key, value] of result.entries()) {
+    for (const [key, value] of result.entries()) {
       if (value.status === 1) results.push(db.attachments.attachment(key));
     }
     return results;
@@ -99,7 +99,7 @@ const DownloadAttachments = ({
 
   const failedResults = () => {
     const results = [];
-    for (let [key, value] of result.entries()) {
+    for (const [key, value] of result.entries()) {
       if (value.status === 0) results.push(db.attachments.attachment(key));
     }
     return results;
@@ -207,11 +207,11 @@ const DownloadAttachments = ({
             </Paragraph>
           </View>
         }
-        keyExtractor={(item) => item as string}
-        renderItem={({ item }) => {
+        keyExtractor={(item, index) => "attachment" + index}
+        renderItem={({ index }) => {
           return (
             <AttachmentItem
-              id={item as string}
+              id={index}
               setAttachments={() => {}}
               pressable={false}
               hideWhenNotDownloading={true}

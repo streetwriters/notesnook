@@ -123,7 +123,11 @@ export const NotebookSheet = () => {
     nestedNotebooks: notebooks,
     nestedNotebookNotesCount: totalNotes,
     groupOptions
-  } = useNotebook(currentRoute === "Notebook" ? root : undefined);
+  } = useNotebook(
+    currentRoute === "Notebook" ? root : undefined,
+    undefined,
+    true
+  );
 
   const PLACEHOLDER_DATA = {
     heading: "Notebooks",
@@ -140,17 +144,16 @@ export const NotebookSheet = () => {
     item,
     index
   }: {
-    item: string | GroupHeader;
+    item: string | number;
     index: number;
-  }) =>
-    (item as GroupHeader).type === "header" ? null : (
-      <NotebookItem
-        items={notebooks}
-        id={item as string}
-        index={index}
-        totalNotes={totalNotes}
-      />
-    );
+  }) => (
+    <NotebookItem
+      items={notebooks}
+      id={item as string}
+      index={index}
+      totalNotes={totalNotes}
+    />
+  );
 
   const selectionContext = {
     selection: selection,
@@ -396,7 +399,6 @@ export const NotebookSheet = () => {
                 progressBackgroundColor={colors.primary.background}
               />
             }
-            keyExtractor={(item) => item as string}
             renderItem={renderNotebook}
             ListEmptyComponent={
               <View
@@ -426,7 +428,7 @@ const NotebookItem = ({
   parent,
   items
 }: {
-  id: string;
+  id: string | number;
   totalNotes: (id: string) => number;
   currentLevel?: number;
   index: number;
@@ -437,7 +439,7 @@ const NotebookItem = ({
     nestedNotebookNotesCount,
     nestedNotebooks,
     notebook: item
-  } = useNotebook(id, items);
+  } = useNotebook(id, items, true);
   const isFocused = useNavigationStore((state) => state.focusedRouteId === id);
   const { colors } = useThemeColors("sheet");
   const selection = useSelection();
@@ -445,7 +447,9 @@ const NotebookItem = ({
     selection.selection.findIndex((selected) => selected.id === item?.id) > -1;
 
   const { fontScale } = useWindowDimensions();
-  const expanded = useNotebookExpandedStore((state) => state.expanded[id]);
+  const expanded = useNotebookExpandedStore((state) =>
+    item?.id ? state.expanded[item?.id] : undefined
+  );
 
   return (
     <View
@@ -511,7 +515,8 @@ const NotebookItem = ({
               size={SIZE.lg}
               color={isSelected ? colors.selected.icon : colors.primary.icon}
               onPress={() => {
-                useNotebookExpandedStore.getState().setExpanded(id);
+                if (!item?.id) return;
+                useNotebookExpandedStore.getState().setExpanded(item?.id);
               }}
               top={0}
               left={0}
@@ -553,9 +558,9 @@ const NotebookItem = ({
             alignItems: "center"
           }}
         >
-          {totalNotes?.(id) ? (
+          {item?.id && totalNotes?.(item?.id) ? (
             <Paragraph size={SIZE.sm} color={colors.secondary.paragraph}>
-              {totalNotes(id)}
+              {totalNotes(item?.id)}
             </Paragraph>
           ) : null}
           <IconButton
@@ -580,10 +585,11 @@ const NotebookItem = ({
 
       {!expanded
         ? null
-        : nestedNotebooks?.ids.map((id, index) => (
+        : item &&
+          nestedNotebooks?.ids.map((id, index) => (
             <NotebookItem
-              key={id as string}
-              id={id as string}
+              key={item.id + "_" + id}
+              id={index}
               index={index}
               totalNotes={nestedNotebookNotesCount}
               currentLevel={currentLevel + 1}

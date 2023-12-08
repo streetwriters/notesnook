@@ -33,11 +33,13 @@ export const useNoteStore = create<NoteStore>((set) => ({
   notes: undefined,
   loading: true,
   setLoading: (loading) => set({ loading: loading }),
-  setNotes: () => {
-    db.notes.all.grouped(db.settings.getGroupOptions("home")).then((notes) => {
-      set({
-        notes: notes
-      });
+  setNotes: async () => {
+    const notes = await db.notes.all.grouped(
+      db.settings.getGroupOptions("home")
+    );
+    await notes.item(0);
+    set({
+      notes: notes
     });
   },
   clearNotes: () => set({ notes: undefined })

@@ -120,13 +120,15 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
           <Line bottom={0} />
           {item.type === "note" ? <Tags close={close} item={item} /> : null}
 
-          <View
-            style={{
-              paddingHorizontal: 12
-            }}
-          >
-            <Notebooks note={item} close={close} />
-          </View>
+          {item.type === "note" ? (
+            <View
+              style={{
+                paddingHorizontal: 12
+              }}
+            >
+              <Notebooks note={item} close={close} />
+            </View>
+          ) : null}
 
           <Items
             item={item}

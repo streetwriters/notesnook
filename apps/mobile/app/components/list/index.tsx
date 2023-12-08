@@ -17,13 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  GroupHeader,
-  GroupingKey,
-  Item,
-  VirtualizedGrouping,
-  isGroupHeader
-} from "@notesnook/core";
+import { GroupingKey, Item, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import { FlashList } from "@shopify/flash-list";
 import React, { useEffect, useRef } from "react";
@@ -39,11 +33,10 @@ import { eSendEvent } from "../../services/event-manager";
 import Sync from "../../services/sync";
 import { RouteName } from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { eOpenJumpToDialog, eScrollEvent } from "../../utils/events";
+import { eScrollEvent } from "../../utils/events";
 import { tabBarRef } from "../../utils/global-refs";
 import { Footer } from "../list-items/footer";
 import { Header } from "../list-items/headers/header";
-import { SectionHeader } from "../list-items/headers/section-header";
 import { Empty, PlaceholderData } from "./empty";
 import { ListItemWrapper } from "./list-item.wrapper";
 
@@ -92,35 +85,20 @@ export default function List(props: ListProps) {
   };
 
   const renderItem = React.useCallback(
-    ({ item, index }: { item: string | GroupHeader; index: number }) => {
-      if (isGroupHeader(item)) {
-        return (
-          <SectionHeader
-            screen={props.renderedInRoute}
-            item={item}
-            index={index}
-            dataType={props.dataType}
-            color={props.customAccentColor}
-            groupOptions={groupOptions}
-            onOpenJumpToDialog={() => {
-              eSendEvent(eOpenJumpToDialog, {
-                ref: scrollRef,
-                data: props.data
-              });
-            }}
-          />
-        );
-      } else {
-        return (
-          <ListItemWrapper
-            id={item}
-            index={index}
-            isSheet={props.isRenderedInActionSheet || false}
-            items={props.data}
-            group={groupType as GroupingKey}
-          />
-        );
-      }
+    ({ index }: { index: number }) => {
+      return (
+        <ListItemWrapper
+          index={index}
+          isSheet={props.isRenderedInActionSheet || false}
+          items={props.data}
+          groupOptions={groupOptions}
+          group={groupType as GroupingKey}
+          renderedInRoute={props.renderedInRoute}
+          customAccentColor={props.customAccentColor}
+          dataType={props.dataType}
+          scrollRef={scrollRef}
+        />
+      );
     },
     [
       groupOptions,
@@ -181,7 +159,6 @@ export default function List(props: ListProps) {
           onMomentumScrollEnd={() => {
             tabBarRef.current?.unlock();
           }}
-          getItemType={(item: any) => (isGroupHeader(item) ? "header" : "item")}
           estimatedItemSize={isCompactModeEnabled ? 60 : 100}
           directionalLockEnabled={true}
           keyboardShouldPersistTaps="always"

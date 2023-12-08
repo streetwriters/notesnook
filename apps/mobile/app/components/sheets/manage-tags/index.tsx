@@ -115,7 +115,7 @@ const ManageTagsSheet = (props: {
         });
     } else {
       db.tags.all.sorted(db.settings.getGroupOptions("tags")).then((items) => {
-        console.log("items loaded tags");
+        console.log("items loaded tags", items.ids);
         setTags(items);
       });
     }
@@ -237,11 +237,10 @@ const ManageTagsSheet = (props: {
   );
 
   const renderTag = useCallback(
-    ({ item }: { item: string; index: number }) => (
+    ({ item, index }: { item: string | number; index: number }) => (
       <TagItem
-        key={item as string}
         tags={tags as VirtualizedGrouping<Tag>}
-        id={item as string}
+        id={index}
         onPress={onPress}
       />
     ),
@@ -303,13 +302,13 @@ const ManageTagsSheet = (props: {
       ) : null}
 
       <FlatList
-        data={tags?.ids?.filter((id) => typeof id === "string") as string[]}
+        data={tags?.ids}
         style={{
           width: "100%"
         }}
         keyboardShouldPersistTaps
         keyboardDismissMode="interactive"
-        keyExtractor={(item) => item as string}
+        keyExtractor={(item) => item + "_tag"}
         renderItem={renderTag}
         ListEmptyComponent={
           <View
@@ -352,29 +351,38 @@ const TagItem = ({
   tags,
   onPress
 }: {
-  id: string;
+  id: string | number;
   tags: VirtualizedGrouping<Tag>;
   onPress: (id: string) => void;
 }) => {
   const { colors } = useThemeColors();
   const [tag] = useDBItem(id, "tag", tags);
-  const selection = useTagItemSelection((state) => state.selection[id]);
+  const selection = useTagItemSelection((state) =>
+    tag?.id ? state.selection[tag?.id] : false
+  );
 
-  return (
+  return !tag ? null : (
     <PressableButton
+      key={tag?.id}
       customStyle={{
         flexDirection: "row",
         marginVertical: 5,
         justifyContent: "flex-start",
         height: 40
       }}
-      onPress={() => onPress(id)}
+      onPress={() => {
+        if (!tag) return;
+        onPress(tag.id);
+      }}
       type="gray"
     >
       {!tag ? null : (
         <Icon
           size={22}
-          onPress={() => onPress(id)}
+          onPress={() => {
+            if (!tag) return;
+            onPress(tag.id);
+          }}
           color={
             selection === "selected" || selection === "intermediate"
               ? colors.selected.icon
@@ -406,7 +414,6 @@ const TagItem = ({
           style={{
             width: 200,
             height: 30,
-            // backgroundColor: colors.secondary.background,
             borderRadius: 5
           }}
         />

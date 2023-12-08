@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Notebook, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useMemo } from "react";
+import React, { useEffect } from "react";
 import { View, useWindowDimensions } from "react-native";
 import { notesnook } from "../../../../e2e/test.ids";
 import { useTotalNotes } from "../../../hooks/use-db-item";
@@ -46,31 +46,39 @@ export const NotebookItem = ({
   parent,
   items
 }: {
-  id: string;
+  id: string | number;
   currentLevel?: number;
   index: number;
   parent?: NotebookParentProp;
   items?: VirtualizedGrouping<Notebook>;
 }) => {
-  const { nestedNotebooks, notebook: item } = useNotebook(id, items);
-  const ids = useMemo(() => (id ? [id] : []), [id]);
-  const { totalNotes: totalNotes } = useTotalNotes(ids, "notebook");
+  const expanded = useNotebookExpandedStore((state) => state.expanded[id]);
+  const { nestedNotebooks, notebook: item } = useNotebook(id, items, expanded);
+  const { totalNotes: totalNotes, getTotalNotes } = useTotalNotes("notebook");
   const focusedRouteId = useNavigationStore((state) => state.focusedRouteId);
   const { colors } = useThemeColors("sheet");
   const selection = useNotebookItemSelectionStore((state) =>
-    id ? state.selection[id] : undefined
+    item?.id ? state.selection[item?.id] : undefined
   );
   const isSelected = selection === "selected";
   const isFocused = focusedRouteId === id;
   const { fontScale } = useWindowDimensions();
-  const expanded = useNotebookExpandedStore((state) => state.expanded[id]);
+
+  useEffect(() => {
+    if (item?.id) {
+      getTotalNotes([item?.id]);
+    }
+  }, [getTotalNotes, item?.id]);
 
   const onPress = () => {
     if (!item) return;
     const state = useNotebookItemSelectionStore.getState();
 
     if (isSelected) {
-      state.markAs(item, !state.initialState[id] ? undefined : "deselected");
+      state.markAs(
+        item,
+        !state.initialState[item?.id] ? undefined : "deselected"
+      );
       return;
     }
 
@@ -112,7 +120,7 @@ export const NotebookItem = ({
               item,
               !isSelected
                 ? "selected"
-                : !state.initialState[id]
+                : !state.initialState[item?.id]
                 ? undefined
                 : "deselected"
             );
@@ -141,7 +149,8 @@ export const NotebookItem = ({
               size={SIZE.xl}
               color={isSelected ? colors.selected.icon : colors.primary.icon}
               onPress={() => {
-                useNotebookExpandedStore.getState().setExpanded(id);
+                if (!item?.id) return;
+                useNotebookExpandedStore.getState().setExpanded(item?.id);
               }}
               top={0}
               left={0}
@@ -201,9 +210,9 @@ export const NotebookItem = ({
             alignItems: "center"
           }}
         >
-          {totalNotes?.(id) ? (
+          {item?.id && totalNotes?.(item?.id) ? (
             <Paragraph size={SIZE.sm} color={colors.secondary.paragraph}>
-              {totalNotes(id)}
+              {totalNotes(item?.id)}
             </Paragraph>
           ) : null}
           <IconButton
@@ -231,8 +240,8 @@ export const NotebookItem = ({
         ? null
         : nestedNotebooks?.ids.map((id, index) => (
             <NotebookItem
-              key={id as string}
-              id={id as string}
+              key={item?.id + "_" + id}
+              id={id}
               index={index}
               currentLevel={currentLevel + 1}
               items={nestedNotebooks}
