@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   databaseTest,
   TEST_NOTE,
-  delay,
   loginFakeUser
 } from "../../../../__tests__/utils";
 import Collector from "../collector";
@@ -31,14 +30,9 @@ test("newly created note should get included in collector", () =>
     await loginFakeUser(db);
     const collector = new Collector(db);
 
-    const lastSyncedTime = Date.now() - 10000;
-
     const noteId = await db.notes.add(TEST_NOTE);
 
-    const items = [];
-    for await (const item of collector.collect(100, lastSyncedTime, false)) {
-      items.push(item);
-    }
+    const items = await iteratorToArray(collector.collect(100, false));
 
     expect(items).toHaveLength(2);
     expect(items[0].type).toBe("content");
@@ -47,45 +41,38 @@ test("newly created note should get included in collector", () =>
     expect(items[1].type).toBe("note");
   }));
 
-test("edited note after last synced time should get included in collector", () =>
+test("synced property should be true after getting collected by the collector", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+    const collector = new Collector(db);
+
+    const noteId = await db.notes.add(TEST_NOTE);
+
+    const items = await iteratorToArray(collector.collect(100, false));
+    const items2 = await iteratorToArray(collector.collect(100, false));
+
+    expect(items2).toHaveLength(0);
+    expect(items).toHaveLength(2);
+    expect(items[0].type).toBe("content");
+    expect(items[0].items[0].id).toBe((await db.notes.note(noteId)).contentId);
+    expect(items[1].items[0].id).toBe(noteId);
+    expect(items[1].type).toBe("note");
+  }));
+
+test("edited note should get included in collector", () =>
   databaseTest().then(async (db) => {
     await loginFakeUser(db);
     const collector = new Collector(db);
     const noteId = await db.notes.add(TEST_NOTE);
 
-    const lastSyncedTime = Date.now();
-
-    await delay(1000);
+    await iteratorToArray(collector.collect(100, false));
 
     await db.notes.add({ id: noteId, pinned: true });
 
-    const items = [];
-    for await (const item of collector.collect(100, lastSyncedTime, false)) {
-      items.push(item);
-    }
+    const items = await iteratorToArray(collector.collect(100, false));
 
     expect(items).toHaveLength(1);
     expect(items[0].items[0].id).toBe(noteId);
-  }));
-
-test("note edited before last synced time should not get included in collector", () =>
-  databaseTest().then(async (db) => {
-    await loginFakeUser(db);
-    const collector = new Collector(db);
-    const noteId = await db.notes.add(TEST_NOTE);
-
-    await db.notes.add({ id: noteId, pinned: true });
-
-    await delay(500);
-
-    const lastSyncedTime = Date.now();
-
-    const items = [];
-    for await (const item of collector.collect(100, lastSyncedTime, false)) {
-      items.push(item);
-    }
-
-    expect(items).toHaveLength(0);
   }));
 
 test("localOnly note should get included as a deleted item in collector", () =>
@@ -94,15 +81,19 @@ test("localOnly note should get included as a deleted item in collector", () =>
     const collector = new Collector(db);
     await db.notes.add({ ...TEST_NOTE, localOnly: true });
 
-    const items = [];
-    for await (const item of collector.collect(100, 0, false)) {
-      items.push(item);
-    }
+    const items = await iteratorToArray(collector.collect(100, false));
 
     expect(items).toHaveLength(2);
-
-    expect(items[0].items[0].length).toBe(104);
-    expect(items[1].items[0].length).toBe(104);
+    expect(items[0].items[0].length).toBe(77);
+    expect(items[1].items[0].length).toBe(77);
     expect(items[0].type).toBe("content");
     expect(items[1].type).toBe("note");
   }));
+
+async function iteratorToArray(iterator) {
+  let items = [];
+  for await (const item of iterator) {
+    items.push(item);
+  }
+  return items;
+}
