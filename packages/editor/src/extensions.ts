@@ -45,3 +45,5 @@ import "./extensions/list-item";
 import "./extensions/outline-list";
 import "./extensions/outline-list-item";
 import "./extensions/table";
+import "./extensions/check-list";
+import "./extensions/check-list-item";

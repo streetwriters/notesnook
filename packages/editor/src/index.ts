@@ -79,6 +79,8 @@ import Clipboard, { ClipboardOptions } from "./extensions/clipboard";
 import Blockquote from "./extensions/blockquote";
 import { Quirks } from "./extensions/quirks";
 import { LIST_NODE_TYPES } from "./utils/node-types";
+import CheckList from "./extensions/check-list";
+import CheckListItem from "./extensions/check-list-item";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -274,6 +276,8 @@ const useTiptap = (
         DateTime.configure({ dateFormat, timeFormat }),
         KeyMap,
         WebClipNode,
+        CheckList,
+        CheckListItem,
 
         // Quirks handlers
         Quirks.configure({
@@ -289,6 +293,7 @@ const useTiptap = (
             ...LIST_NODE_TYPES
           ]
         }),
+
         ListKeymap.configure({
           listTypes: [
             {
@@ -302,6 +307,10 @@ const useTiptap = (
             {
               itemName: OutlineListItem.name,
               wrapperNames: [OutlineList.name]
+            },
+            {
+              itemName: CheckListItem.name,
+              wrapperNames: [CheckList.name]
             }
           ]
         })
