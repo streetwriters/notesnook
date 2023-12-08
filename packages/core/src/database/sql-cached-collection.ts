@@ -75,7 +75,8 @@ export class SQLCachedCollection<
       this.cache.set(id, {
         id,
         deleted: true,
-        dateModified: Date.now()
+        dateModified: Date.now(),
+        synced: false
       })
     );
     await this.collection.softDelete(ids);
@@ -141,13 +142,10 @@ export class SQLCachedCollection<
     return items;
   }
 
-  *unsynced(
-    after: number,
-    chunkSize: number
-  ): IterableIterator<MaybeDeletedItem<T>[]> {
+  *unsynced(chunkSize: number): IterableIterator<MaybeDeletedItem<T>[]> {
     let chunk: MaybeDeletedItem<T>[] = [];
     for (const [_key, value] of this.cache) {
-      if (value && value.dateModified && value.dateModified > after) {
+      if (value && !value.synced) {
         chunk.push(value);
         if (chunk.length === chunkSize) {
           yield chunk;
