@@ -51,19 +51,18 @@ const JumpToSectionDialog = () => {
   const notes = data;
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const currentScrollPosition = useRef(0);
+  const [groups, setGroups] = useState<
+    {
+      index: number;
+      group: GroupHeader;
+    }[]
+  >();
   const offsets = useRef<number[]>([]);
-  const timeout = useRef<NodeJS.Timeout>();
 
-  const onPress = (item: GroupHeader) => {
-    const index = notes?.ids?.findIndex((i) => {
-      if (typeof i === "object") {
-        return i.title === item.title && i.type === "header";
-      } else {
-        false;
-      }
-    });
+  const onPress = (item: { index: number; group: GroupHeader }) => {
     scrollRef.current?.current?.scrollToIndex({
-      index: index as number,
+      index: item.index,
       animated: true
     });
     close();
@@ -97,55 +96,44 @@ const JumpToSectionDialog = () => {
   }, [open]);
 
   const onScroll = (data: { x: number; y: number }) => {
-    const y = data.y;
-    if (timeout) {
-      clearTimeout(timeout.current);
-      timeout.current = undefined;
-    }
-    timeout.current = setTimeout(() => {
-      setCurrentIndex(
-        offsets.current?.findIndex(
-          (o, i) => o <= y && offsets.current[i + 1] > y
-        ) || 0
-      );
-    }, 200);
+    currentScrollPosition.current = data.y;
   };
 
   const close = () => {
     setVisible(false);
   };
 
-  const loadOffsets = useCallback(() => {
-    notes?.ids
-      .filter((i) => typeof i === "object" && i.type === "header")
-      .map((item, index) => {
-        if (typeof item === "string") return;
-
+  const loadGroupsAndOffsets = useCallback(() => {
+    notes?.groups?.().then((groups) => {
+      setGroups(groups);
+      offsets.current = [];
+      groups.map((item, index) => {
         let offset = 35 * index;
-        let ind = notes.ids.findIndex(
-          (i) =>
-            typeof i === "object" &&
-            i.title === item.title &&
-            i.type === "header"
-        );
+        let groupIndex = item.index;
         const messageState = useMessageStore.getState().message;
         const msgOffset = messageState?.visible ? 60 : 10;
 
-        ind = ind + 1;
-        ind = ind - (index + 1);
-        offset = offset + ind * 100 + msgOffset;
+        groupIndex = groupIndex + 1;
+        groupIndex = groupIndex - (index + 1);
+        offset = offset + groupIndex * 100 + msgOffset;
         offsets.current.push(offset);
       });
-  }, [notes]);
 
-  useEffect(() => {
-    loadOffsets();
-  }, [loadOffsets, notes]);
+      const index = offsets.current?.findIndex((o, i) => {
+        return (
+          o <= currentScrollPosition.current + 100 &&
+          offsets.current[i + 1] - 100 > currentScrollPosition.current
+        );
+      });
+
+      setCurrentIndex(index < 0 ? 0 : index);
+    });
+  }, [notes]);
 
   return !visible ? null : (
     <BaseDialog
       onShow={() => {
-        loadOffsets();
+        loadGroupsAndOffsets();
       }}
       onRequestClose={close}
       visible={true}
@@ -178,40 +166,38 @@ const JumpToSectionDialog = () => {
               paddingBottom: 20
             }}
           >
-            {notes?.ids
-              .filter((i) => typeof i === "object" && i.type === "header")
-              .map((item, index) => {
-                return typeof item === "object" && item.title ? (
-                  <PressableButton
-                    key={item.title}
-                    onPress={() => onPress(item)}
-                    type={currentIndex === index ? "selected" : "transparent"}
-                    customStyle={{
-                      minWidth: "20%",
-                      width: null,
-                      paddingHorizontal: 12,
-                      margin: 5,
-                      borderRadius: 100,
-                      height: 25,
-                      marginVertical: 10
+            {groups?.map((item, index) => {
+              return (
+                <PressableButton
+                  key={item.group.id}
+                  onPress={() => onPress(item)}
+                  type={currentIndex === index ? "selected" : "transparent"}
+                  customStyle={{
+                    minWidth: "20%",
+                    width: null,
+                    paddingHorizontal: 12,
+                    margin: 5,
+                    borderRadius: 100,
+                    height: 25,
+                    marginVertical: 10
+                  }}
+                >
+                  <Paragraph
+                    size={SIZE.sm}
+                    color={
+                      currentIndex === index
+                        ? colors.selected.accent
+                        : colors.primary.accent
+                    }
+                    style={{
+                      textAlign: "center"
                     }}
                   >
-                    <Paragraph
-                      size={SIZE.sm}
-                      color={
-                        currentIndex === index
-                          ? colors.selected.accent
-                          : colors.primary.accent
-                      }
-                      style={{
-                        textAlign: "center"
-                      }}
-                    >
-                      {item.title}
-                    </Paragraph>
-                  </PressableButton>
-                ) : null;
-              })}
+                    {item.group.title}
+                  </Paragraph>
+                </PressableButton>
+              );
+            })}
           </View>
         </ScrollView>
       </View>

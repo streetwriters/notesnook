@@ -26,7 +26,7 @@ import {
   Tag,
   VirtualizedGrouping
 } from "@notesnook/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { db } from "../common/database";
 import {
   eSendEvent,
@@ -45,22 +45,36 @@ type ItemTypeKey = {
   shortcut: Shortcut;
 };
 
+function isValidIdOrIndex(idOrIndex?: string | number) {
+  return typeof idOrIndex === "number" || typeof idOrIndex === "string";
+}
+
 export const useDBItem = <T extends keyof ItemTypeKey>(
-  id?: string,
+  idOrIndex?: string | number,
   type?: T,
   items?: VirtualizedGrouping<ItemTypeKey[T]>
 ): [ItemTypeKey[T] | undefined, () => void] => {
   const [item, setItem] = useState<ItemTypeKey[T]>();
+  const itemIdRef = useRef<string>();
+  const prevIdOrIndexRef = useRef<string | number>();
+
+  if (prevIdOrIndexRef.current !== idOrIndex) {
+    itemIdRef.current = undefined;
+    prevIdOrIndexRef.current = idOrIndex;
+  }
 
   useEffect(() => {
     const onUpdateItem = (itemId?: string) => {
-      if (typeof itemId === "string" && itemId !== id) return;
-      if (!id) return;
-      console.log("useDBItem.onUpdateItem", id, type);
+      if (typeof itemId === "string" && itemId !== itemIdRef.current) return;
 
-      if (items) {
-        items.item(id).then((item) => {
-          setItem(item);
+      if (!isValidIdOrIndex(idOrIndex)) return;
+
+      console.log("useDBItem.onUpdateItem", idOrIndex, type);
+
+      if (items && typeof idOrIndex === "number") {
+        items.item(idOrIndex).then((item) => {
+          setItem(item.item);
+          itemIdRef.current = item.item.id;
         });
       } else {
         if (!(db as any)[type + "s"][type]) {
@@ -69,9 +83,14 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
             `db.${type}s.${type}(id: string)`
           );
         } else {
+          console.log("get notebook");
+
           (db as any)[type + "s"]
-            ?.[type]?.(id)
-            .then((item: ItemTypeKey[T]) => setItem(item));
+            ?.[type]?.(idOrIndex as string)
+            .then((item: ItemTypeKey[T]) => {
+              setItem(item);
+              itemIdRef.current = item.id;
+            });
         }
       }
     };
@@ -80,46 +99,42 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
     return () => {
       eUnSubscribeEvent(eDBItemUpdate, onUpdateItem);
     };
-  }, [id, type, items]);
+  }, [idOrIndex, type, items]);
 
   return [
-    id ? (item as ItemTypeKey[T]) : undefined,
+    isValidIdOrIndex(idOrIndex) ? (item as ItemTypeKey[T]) : undefined,
     () => {
-      if (id) {
-        eSendEvent(eDBItemUpdate, id);
+      if (idOrIndex) {
+        eSendEvent(eDBItemUpdate, itemIdRef.current || idOrIndex);
       }
     }
   ];
 };
 
-export const useTotalNotes = (
-  ids: string[],
-  type: "notebook" | "tag" | "color"
-) => {
+export const useTotalNotes = (type: "notebook" | "tag" | "color") => {
   const [totalNotesById, setTotalNotesById] = useState<{
     [id: string]: number;
   }>({});
 
-  const getTotalNotes = React.useCallback(() => {
-    if (!ids || !ids.length || !type) return;
-    db.relations
-      .from({ type: "notebook", ids: ids as string[] }, ["notebook", "note"])
-      .get()
-      .then((relations) => {
-        const totalNotesById: any = {};
-        for (const id of ids) {
-          totalNotesById[id] = relations.filter(
-            (relation) => relation.fromId === id && relation.toType === "note"
-          )?.length;
-        }
-        setTotalNotesById(totalNotesById);
-      });
-    console.log("useTotalNotes.getTotalNotes");
-  }, [ids, type]);
-
-  useEffect(() => {
-    getTotalNotes();
-  }, [ids, type, getTotalNotes]);
+  const getTotalNotes = React.useCallback(
+    (ids: string[]) => {
+      if (!ids || !ids.length || !type) return;
+      db.relations
+        .from({ type: type, ids: ids as string[] }, ["note"])
+        .get()
+        .then((relations) => {
+          const totalNotesById: any = {};
+          for (const id of ids) {
+            totalNotesById[id] = relations.filter(
+              (relation) => relation.fromId === id && relation.toType === "note"
+            )?.length;
+          }
+          setTotalNotesById(totalNotesById);
+        });
+      console.log("useTotalNotes.getTotalNotes");
+    },
+    [type]
+  );
 
   return {
     totalNotes: (id: string) => {
