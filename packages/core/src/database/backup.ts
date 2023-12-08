@@ -87,7 +87,7 @@ function isLegacyBackupFile(
 }
 
 const MAX_CHUNK_SIZE = 10 * 1024 * 1024;
-const COLORS = [
+export const COLORS = [
   "red",
   "orange",
   "yellow",
@@ -206,7 +206,9 @@ export default class Backup {
     collection: DatabaseCollection<T, B>,
     state: BackupState
   ) {
-    for await (const item of collection.stream() as any) {
+    for await (const item of collection.stream(
+      this.db.options.batchSize
+    ) as any) {
       const data = JSON.stringify(item);
       state.buffer.push(data);
       state.bufferLength += data.length;
