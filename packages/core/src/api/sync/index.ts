@@ -37,18 +37,20 @@ import { Mutex } from "async-mutex";
 import Database from "..";
 import { migrateItem } from "../../migrations";
 import { SerializedKey } from "@notesnook/crypto";
-import { Item, MaybeDeletedItem } from "../../types";
+import { Item, MaybeDeletedItem, Note, Notebook } from "../../types";
 import { SYNC_COLLECTIONS_MAP, SyncTransferItem } from "./types";
 import { DownloadableFile } from "../../database/fs";
+import { SyncDevices } from "./devices";
+import { COLORS } from "../../database/backup";
 
 export type SyncOptions = {
   type: "full" | "fetch" | "send";
   force?: boolean;
-  serverLastSynced?: number;
 };
 
 export default class SyncManager {
   sync = new Sync(this.db);
+  devices = this.sync.devices;
   constructor(private readonly db: Database) {}
 
   async start(options: SyncOptions) {
@@ -106,13 +108,12 @@ class Sync {
   logger = logger.scope("Sync");
   syncConnectionMutex = new Mutex();
   connection: signalr.HubConnection;
+  devices = new SyncDevices(this.db.storage, this.db.tokenManager);
 
   constructor(private readonly db: Database) {
-    let remoteSyncTimeout = 0;
-
     const tokenManager = new TokenManager(db.storage);
     this.connection = new signalr.HubConnectionBuilder()
-      .withUrl(`${Constants.API_HOST}/hubs/sync`, {
+      .withUrl(`${Constants.API_HOST}/hubs/sync/v2`, {
         accessTokenFactory: async () => {
           const token = await tokenManager.getAccessToken();
           if (!token) throw new Error("Failed to get access token.");
@@ -144,29 +145,7 @@ class Sync {
       this.autoSync.stop();
     });
 
-    this.connection.on("PushItems", async (chunk) => {
-      if (this.connection.state !== signalr.HubConnectionState.Connected)
-        return;
-
-      clearTimeout(remoteSyncTimeout);
-      remoteSyncTimeout = setTimeout(() => {
-        this.db.eventManager.publish(EVENTS.syncAborted);
-      }, 15000) as unknown as number;
-
-      const key = await this.db.user.getEncryptionKey();
-      if (!key || !key.key || !key.salt) {
-        EV.publish(EVENTS.userSessionExpired);
-        throw new Error("User encryption key not generated. Please relogin.");
-      }
-
-      const dbLastSynced = await this.db.lastSynced();
-      await this.processChunk(chunk, key, dbLastSynced, true);
-    });
-
-    this.connection.on("PushCompleted", (lastSynced) => {
-      clearTimeout(remoteSyncTimeout);
-      this.onPushCompleted(lastSynced);
-    });
+    this.connection.on("PushCompleted", () => this.onPushCompleted());
   }
 
   async start(options: SyncOptions) {
@@ -185,30 +164,21 @@ class Sync {
       throw new Error("Connection closed.");
     });
 
-    const { lastSynced, oldLastSynced } = await this.init(options.force);
-    this.logger.info("Initialized sync", { lastSynced, oldLastSynced });
+    const { deviceId } = await this.init(options.force);
+    this.logger.info("Initialized sync", { deviceId });
 
-    const newLastSynced = Date.now();
-
-    const serverResponse =
-      options.type === "fetch" || options.type === "full"
-        ? await this.fetch(lastSynced)
-        : null;
-    this.logger.info("Data fetched", serverResponse || {});
+    if (options.type === "fetch" || options.type === "full") {
+      await this.fetch(deviceId);
+      this.logger.info("Data fetched");
+    }
 
     if (
       (options.type === "send" || options.type === "full") &&
-      (await this.send(lastSynced, newLastSynced, options.force))
-    ) {
+      (await this.send(deviceId, options.force))
+    )
       this.logger.info("New data sent");
-      await this.stop(newLastSynced);
-    } else if (serverResponse) {
-      this.logger.info("No new data to send.");
-      await this.stop(serverResponse.lastSynced);
-    } else {
-      this.logger.info("Nothing to do.");
-      await this.stop(options.serverLastSynced || oldLastSynced);
-    }
+
+    await this.stop();
 
     if (!(await checkSyncStatus(SYNC_CHECK_IDS.autoSync))) {
       await this.connection.stop();
@@ -222,14 +192,23 @@ class Sync {
       this.conflicts.throw();
     }
 
-    let lastSynced = await this.db.lastSynced();
-    if (isForceSync) lastSynced = 0;
+    if (isForceSync) {
+      await this.devices.unregister();
+      await this.devices.register();
+    }
 
-    const oldLastSynced = lastSynced;
-    return { lastSynced, oldLastSynced };
+    let deviceId = await this.devices.get();
+    if (!deviceId) {
+      await this.devices.register();
+      deviceId = await this.devices.get();
+    }
+
+    if (!deviceId) throw new Error("Sync device not registered.");
+
+    return { deviceId };
   }
 
-  async fetch(lastSynced: number) {
+  async fetch(deviceId: string) {
     await this.checkConnection();
 
     const key = await this.db.user.getEncryptionKey();
@@ -241,14 +220,13 @@ class Sync {
       return;
     }
 
-    const dbLastSynced = await this.db.lastSynced();
     let count = 0;
     this.connection.off("SendItems");
     this.connection.on("SendItems", async (chunk) => {
       if (this.connection.state !== signalr.HubConnectionState.Connected)
         return;
 
-      await this.processChunk(chunk, key, dbLastSynced);
+      await this.processChunk(chunk, key);
 
       count += chunk.items.length;
       sendSyncProgressEvent(this.db.eventManager, `download`, count);
@@ -257,7 +235,7 @@ class Sync {
     });
     const serverResponse = await this.connection.invoke(
       "RequestFetch",
-      lastSynced
+      deviceId
     );
 
     if (
@@ -275,56 +253,46 @@ class Sync {
     if (await this.conflicts.check()) {
       this.conflicts.throw();
     }
-
-    return { lastSynced: serverResponse.lastSynced };
   }
 
-  async send(oldLastSynced, isForceSync, newLastSynced) {
-    return false;
+  async send(deviceId: string, isForceSync?: boolean) {
+    await this.uploadAttachments();
 
-    // await this.uploadAttachments();
+    let isSyncInitialized = false;
+    let done = 0;
+    for await (const item of this.collector.collect(100, isForceSync)) {
+      if (!isSyncInitialized) {
+        const vaultKey = await this.db.vault.getKey();
+        await this.connection.send("InitializePush", {
+          vaultKey,
+          synced: false
+        });
+        isSyncInitialized = true;
+      }
 
-    // let isSyncInitialized = false;
-    // let done = 0;
-    // for await (const item of this.collector.collect(
-    //   100,
-    //   oldLastSynced,
-    //   isForceSync
-    // )) {
-    //   if (!isSyncInitialized) {
-    //     const vaultKey = await this.db.vault._getKey();
-    //     newLastSynced = await this.connection.invoke("InitializePush", {
-    //       vaultKey,
-    //       lastSynced: newLastSynced
-    //     });
-    //     isSyncInitialized = true;
-    //   }
+      const result = await this.pushItem(deviceId, item);
+      if (result) {
+        done += item.items.length;
+        sendSyncProgressEvent(this.db.eventManager, "upload", done);
 
-    //   const result = await this.pushItem(item, newLastSynced);
-    //   if (result) {
-    //     done += item.items.length;
-    //     sendSyncProgressEvent(this.db.eventManager, "upload", done);
-
-    //     this.logger.info(`Batch sent (${done})`);
-    //   } else {
-    //     this.logger.error(
-    //       new Error(`Failed to send batch. Server returned falsy response.`)
-    //     );
-    //   }
-    // }
-    // if (!isSyncInitialized) return;
-    // await this.connection.invoke("SyncCompleted", newLastSynced);
-    // return true;
+        this.logger.info(`Batch sent (${done})`);
+      } else {
+        this.logger.error(
+          new Error(`Failed to send batch. Server returned falsy response.`)
+        );
+      }
+    }
+    if (!isSyncInitialized) return false;
+    await this.connection.send("PushCompleted");
+    return true;
   }
 
-  async stop(lastSynced: number) {
+  async stop() {
     // refresh monographs on sync completed
     await this.db.monographs.refresh();
 
-    this.logger.info("Stopping sync", { lastSynced });
-    const storedLastSynced = await this.db.lastSynced();
-    if (lastSynced > storedLastSynced)
-      await this.db.storage().write("lastSynced", lastSynced);
+    this.logger.info("Stopping sync");
+    await this.db.storage().write("lastSynced", Date.now());
     this.db.eventManager.publish(EVENTS.syncCompleted);
   }
 
@@ -352,19 +320,13 @@ class Sync {
   /**
    * @private
    */
-  async onPushCompleted(lastSynced: number) {
-    this.db.eventManager.publish(
-      EVENTS.databaseSyncRequested,
-      false,
-      false,
-      lastSynced
-    );
+  async onPushCompleted() {
+    this.db.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
   }
 
   async processChunk(
     chunk: SyncTransferItem,
     key: SerializedKey,
-    dbLastSynced: number,
     notify = false
   ) {
     const itemType = chunk.type;
@@ -372,11 +334,13 @@ class Sync {
 
     const decrypted = await this.db.storage().decryptMulti(key, chunk.items);
 
-    const deserialized = await Promise.all(
-      decrypted.map((item, index) =>
-        deserializeItem(item, chunk.items[index].v, this.db)
+    const deserialized = (
+      await Promise.all(
+        decrypted.map((item, index) =>
+          deserializeItem(item, chunk.items[index].v, this.db)
+        )
       )
-    );
+    ).filter(Boolean);
 
     const collectionType = SYNC_COLLECTIONS_MAP[itemType];
     const collection = this.db[collectionType].collection;
@@ -385,7 +349,7 @@ class Sync {
     if (itemType === "content") {
       items = await Promise.all(
         deserialized.map((item) =>
-          this.merger.mergeContent(item, localItems[item.id], dbLastSynced)
+          this.merger.mergeContent(item, localItems[item.id])
         )
       );
     } else {
@@ -414,11 +378,9 @@ class Sync {
     await collection.put(items as any);
   }
 
-  private async pushItem(item: SyncTransferItem, newLastSynced: number) {
+  private async pushItem(deviceId: string, item: SyncTransferItem) {
     await this.checkConnection();
-    return (
-      (await this.connection.invoke("PushItems", item, newLastSynced)) === 1
-    );
+    return (await this.connection.invoke("PushItems", deviceId, item)) === 1;
   }
 
   private async checkConnection() {
@@ -463,19 +425,46 @@ async function deserializeItem(
   version: number,
   database: Database
 ) {
-  const deserialized = JSON.parse(decryptedItem);
-  deserialized.remote = true;
-  deserialized.synced = true;
+  const item = JSON.parse(decryptedItem);
+  item.remote = true;
+  item.synced = true;
 
-  if (!deserialized.alg && !deserialized.cipher) {
-    await migrateItem(
-      deserialized,
+  if (!item.cipher) {
+    let migrationResult = await migrateItem(
+      item,
       version,
       CURRENT_DATABASE_VERSION,
-      deserialized.type,
+      item.type,
       database,
       "sync"
     );
+    if (migrationResult === "skip") return;
+
+    // since items in trash can have their own set of migrations,
+    // we have to run the migration again to account for that.
+    if (item.type === "trash" && item.itemType) {
+      migrationResult = await migrateItem(
+        item as unknown as Note | Notebook,
+        version,
+        CURRENT_DATABASE_VERSION,
+        item.itemType,
+        database,
+        "backup"
+      );
+      if (migrationResult === "skip") return;
+    }
+
+    const itemType =
+      // colors are naively of type "tag" instead of "color" so we have to fix that.
+      item.type === "tag" && COLORS.includes(item.title.toLowerCase())
+        ? "color"
+        : item.type === "trash" && "itemType" in item && item.itemType
+        ? item.itemType
+        : item.type;
+
+    if (!itemType || itemType === "topic" || itemType === "settings") return;
+
+    if (migrationResult) item.synced = false;
   }
-  return deserialized;
+  return item;
 }
