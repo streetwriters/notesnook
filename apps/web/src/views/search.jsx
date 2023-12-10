@@ -85,7 +85,12 @@ function Search({ type }) {
   const [results, setResults] = useState([]);
   const context = useNoteStore((store) => store.context);
   const nonce = useNoteStore((store) => store.nonce);
-  const cachedQuery = useRef();
+
+  function escapeRegExp(query) {
+    return query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  const cachedQuery = useRef(null);
 
   const onSearch = useCallback(
     async (query) => {
@@ -103,9 +108,19 @@ function Search({ type }) {
         return;
       }
       setSearchState({ isSearching: true, totalItems: items.length });
-      const results = await db.lookup[lookupType](items, query);
-      setResults(results);
-      setSearchState({ isSearching: false, totalItems: 0 });
+
+      const sanitizedQuery = escapeRegExp(query);
+
+      try {
+        const results = await db.lookup[lookupType](items, sanitizedQuery);
+        setResults(results);
+      } catch (error) {
+        console.error("Error during search:", error);
+        showToast("error", `An error occurred during the search.`);
+        setResults([]);
+      } finally {
+        setSearchState({ isSearching: false, totalItems: 0 });
+      }
     },
     [context, type]
   );
