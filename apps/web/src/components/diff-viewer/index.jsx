@@ -73,10 +73,10 @@ function DiffViewer(props) {
         });
       }
 
-      notesStore.refresh();
+      await notesStore.refresh();
       hashNavigate(`/notes/${conflictedNote.id}/edit`, { replace: true });
 
-      const conflictsCount = db.notes.conflicted?.length;
+      const conflictsCount = await db.notes.conflicted.count();
       if (conflictsCount) {
         showToast(
           "success",
@@ -92,7 +92,7 @@ function DiffViewer(props) {
 
   useEffect(() => {
     (async function () {
-      let note = db.notes.note(noteId);
+      let note = await db.notes.note(noteId);
       if (!note) {
         hashNavigate(`/notes/create`, { replace: true });
         return;
@@ -101,22 +101,21 @@ function DiffViewer(props) {
       await openSession(noteId);
       setIsEditorOpen(true);
 
-      note = note.data;
+      setConflictedNote(note);
 
-      const content = await db.content.raw(note.contentId);
+      const content = await db.content.get(note.contentId);
       if (!content.conflicted)
         return resolveConflict({
           toKeep: content.data,
           toKeepDateEdited: content.dateEdited
         });
 
-      setConflictedNote(note);
       setLocalContent({ ...content, conflicted: false });
       setRemoteContent(content.conflicted);
 
       setHtmlDiff({ before: content.data, after: content.conflicted.data });
     })();
-  }, [noteId, openSession, setIsEditorOpen, resolveConflict]);
+  }, [noteId]);
 
   if (!conflictedNote || !localContent || !remoteContent) return null;
   return (
