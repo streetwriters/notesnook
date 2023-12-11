@@ -51,7 +51,12 @@ export class Content implements ICollection {
   name = "content";
   readonly collection: SQLCollection<"content", ContentItem>;
   constructor(private readonly db: Database) {
-    this.collection = new SQLCollection(db.sql, "content", db.eventManager);
+    this.collection = new SQLCollection(
+      db.sql,
+      db.transaction,
+      "content",
+      db.eventManager
+    );
   }
 
   async init() {

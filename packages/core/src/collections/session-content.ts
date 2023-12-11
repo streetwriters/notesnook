@@ -37,6 +37,7 @@ export class SessionContent implements ICollection {
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
+      db.transaction,
       "sessioncontent",
       db.eventManager
     );
