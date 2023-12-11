@@ -49,18 +49,7 @@ export class VirtualizedGrouping<T> {
   }
 
   getKey(index: number) {
-    const batchIndex = Math.floor(index / this.batchSize);
-    const batch = this.cache.get(batchIndex);
-    if (!batch) return `${index}`;
-
-    const { items, groups } = batch;
-    const itemIndexInBatch = index - batchIndex * this.batchSize;
-    const group = groups?.find(
-      (f) => f.index === itemIndexInBatch && !f.hidden
-    );
-    return group
-      ? group.group.id
-      : (items[itemIndexInBatch] as any)?.id || `${index}`;
+    return `${index}`;
   }
 
   item(index: number): Promise<{ item: T; group?: GroupHeader }>;
@@ -147,18 +136,10 @@ export class VirtualizedGrouping<T> {
 
   private loadBatch(batch: number, operate?: BatchOperator<T>) {
     if (this.pending.has(batch)) return this.pending.get(batch)!;
-    if (!this.isLastBatch(batch)) clearTimeout(this.loadBatchTimeout);
-    return new Promise<Batch<T>>((resolve, reject) => {
-      this.loadBatchTimeout = setTimeout(() => {
-        const promise = this.load(batch, operate);
-        this.pending.set(batch, promise);
-        return promise
-          .then(resolve)
-          .catch(reject)
-          .finally(() => {
-            this.pending.delete(batch);
-          });
-      }, 16) as unknown as number;
+    const promise = this.load(batch, operate);
+    this.pending.set(batch, promise);
+    return promise.finally(() => {
+      this.pending.delete(batch);
     });
   }
 
