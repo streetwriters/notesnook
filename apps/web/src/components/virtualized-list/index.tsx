@@ -21,7 +21,7 @@ import { Virtualizer, useVirtualizer } from "@tanstack/react-virtual";
 import { Box, BoxProps } from "@theme-ui/components";
 import React, { useRef } from "react";
 
-export type VirtualizedListProps<T> = {
+export type VirtualizedListProps<T, C> = {
   virtualizerRef?: React.MutableRefObject<
     Virtualizer<Element, Element> | undefined
   >;
@@ -30,13 +30,18 @@ export type VirtualizedListProps<T> = {
   estimatedSize: number;
   getItemKey: (index: number, items: T[]) => string;
   scrollElement?: Element | null;
+  context?: C;
   itemWrapperProps?: (item: T, index: number) => BoxProps;
-  renderItem: (props: { item: T; index: number }) => JSX.Element | null;
+  renderItem: (props: {
+    item: T;
+    index: number;
+    context: C;
+  }) => JSX.Element | null;
   scrollMargin?: number;
   itemGap?: number;
   overscan?: number;
 } & BoxProps;
-export function VirtualizedList<T>(props: VirtualizedListProps<T>) {
+export function VirtualizedList<T, C>(props: VirtualizedListProps<T, C>) {
   const {
     items,
     getItemKey,
@@ -49,6 +54,7 @@ export function VirtualizedList<T>(props: VirtualizedListProps<T>) {
     itemWrapperProps,
     itemGap,
     overscan = 5,
+    context,
     ...containerProps
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -99,7 +105,12 @@ export function VirtualizedList<T>(props: VirtualizedListProps<T>) {
               }px)`
             }}
           >
-            <Item key={row.key} item={items[row.index]} index={row.index} />
+            <Item
+              key={row.key}
+              item={items[row.index]}
+              index={row.index}
+              context={context || ({} as C)}
+            />
           </Box>
         ))}
       </Box>

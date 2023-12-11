@@ -52,7 +52,7 @@ export function ResolvedItem<TItemType extends ItemType>(
     [index, items]
   );
 
-  if (result.status !== "fulfilled" || !result.value) return null;
+  if (result.status === "rejected" || !result.value) return null;
 
   if (result.value.item.type !== type) return null;
   return <>{children(result.value)}</>;
@@ -67,7 +67,7 @@ export function useResolvedItem(
     [index, items]
   );
 
-  if (result.status !== "fulfilled" || !result.value) return null;
+  if (result.status === "rejected" || !result.value) return null;
   return result.value;
 }
 
