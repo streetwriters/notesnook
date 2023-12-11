@@ -312,13 +312,13 @@ class Sync {
 
     const decrypted = await this.db.storage().decryptMulti(key, chunk.items);
 
-    const deserialized = (
-      await Promise.all(
-        decrypted.map((item, index) =>
-          deserializeItem(item, chunk.items[index].v, this.db)
-        )
-      )
-    ).filter(Boolean);
+    const deserialized: MaybeDeletedItem<Item>[] = [];
+    for (let i = 0; i < decrypted.length; ++i) {
+      const decryptedItem = decrypted[i];
+      const version = chunk.items[i].v;
+      const item = await deserializeItem(decryptedItem, version, this.db);
+      if (item) deserialized.push(item);
+    }
 
     const collectionType = SYNC_COLLECTIONS_MAP[itemType];
     const collection = this.db[collectionType].collection;
@@ -398,7 +398,7 @@ async function deserializeItem(
   decryptedItem: string,
   version: number,
   database: Database
-) {
+): Promise<MaybeDeletedItem<Item> | undefined> {
   const item = JSON.parse(decryptedItem);
   item.remote = true;
   item.synced = true;
