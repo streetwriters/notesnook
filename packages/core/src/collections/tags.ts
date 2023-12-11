@@ -28,7 +28,12 @@ export class Tags implements ICollection {
   name = "tags";
   readonly collection: SQLCollection<"tags", Tag>;
   constructor(private readonly db: Database) {
-    this.collection = new SQLCollection(db.sql, "tags", db.eventManager);
+    this.collection = new SQLCollection(
+      db.sql,
+      db.transaction,
+      "tags",
+      db.eventManager
+    );
   }
 
   init() {
