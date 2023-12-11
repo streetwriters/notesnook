@@ -70,6 +70,7 @@ export class Notes implements ICollection {
       ...item
     };
 
+    let dateEdited = note.dateEdited || note.dateCreated || Date.now();
     if (oldNote) note.contentId = oldNote.contentId;
 
     if (!oldNote && !item.content && !item.contentId && !item.title)
@@ -77,6 +78,8 @@ export class Notes implements ICollection {
 
     await this.db.transaction(async () => {
       if (item.content && item.content.data && item.content.type) {
+        if (oldNote) dateEdited = Date.now();
+
         const { type, data } = item.content;
 
         const content = getContentFromData(type, data);
@@ -86,13 +89,13 @@ export class Notes implements ICollection {
           noteId: id,
           sessionId: note.sessionId,
           id: note.contentId,
+          dateEdited,
           type,
           data,
           localOnly: !!note.localOnly
         });
 
         note.headline = note.locked ? "" : getNoteHeadline(content);
-        if (oldNote) note.dateEdited = Date.now();
       }
 
       if (note.contentId && item.localOnly !== undefined) {
@@ -103,7 +106,7 @@ export class Notes implements ICollection {
       }
 
       const noteTitle = await this.getNoteTitle(note, oldNote, note.headline);
-      if (oldNote && oldNote.title !== noteTitle) note.dateEdited = Date.now();
+      if (oldNote && oldNote.title !== noteTitle) dateEdited = Date.now();
 
       await this.collection.upsert({
         id,
@@ -123,7 +126,7 @@ export class Notes implements ICollection {
         readonly: !!note.readonly,
 
         dateCreated: note.dateCreated || Date.now(),
-        dateEdited: note.dateEdited || note.dateCreated || Date.now(),
+        dateEdited,
         dateModified: note.dateModified || Date.now()
       });
 
