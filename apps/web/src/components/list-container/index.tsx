@@ -38,7 +38,7 @@ import {
   isGroupHeader
 } from "@notesnook/core";
 import { VirtualizedList } from "../virtualized-list";
-import { Virtualizer } from "@tanstack/react-virtual";
+import { ScrollToOptions, Virtualizer } from "@tanstack/react-virtual";
 import { useResolvedItem } from "./resolved-item";
 
 type ListContainerProps = {
@@ -138,64 +138,18 @@ function ListContainer(props: ListContainerProps) {
                 onFocus: () => onFocus(index),
                 onMouseDown: (e) => onMouseDown(e.nativeEvent, index)
               })}
-              renderItem={function ItemRenderer({ index }) {
-                const resolvedItem = useResolvedItem({ index, items });
-                // console.log("Rendering:", index);
-                if (!resolvedItem)
-                  return <div style={{ height: 50, width: "100%" }}></div>;
-
-                return (
-                  <>
-                    {resolvedItem.group && group ? (
-                      <GroupHeader
-                        groupingKey={group}
-                        refresh={refresh}
-                        title={resolvedItem.group.title}
-                        isFocused={index === focusedGroupIndex}
-                        index={index}
-                        onSelectGroup={() => {
-                          let endIndex;
-                          for (
-                            let i = index + 1;
-                            i < props.items.ids.length;
-                            ++i
-                          ) {
-                            if (typeof props.items.ids[i] === "object") {
-                              endIndex = i;
-                              break;
-                            }
-                          }
-                          setSelectedItems([
-                            ...selectionStore.get().selectedItems,
-                            ...props.items.ids.slice(
-                              index,
-                              endIndex || props.items.ids.length
-                            )
-                          ]);
-                        }}
-                        groups={async () =>
-                          items.groups ? items.groups() : []
-                        }
-                        onJump={(index) => {
-                          listRef.current?.scrollToIndex(index, {
-                            align: "center",
-                            behavior: "auto"
-                          });
-                          setFocusedGroupIndex(index);
-                        }}
-                      />
-                    ) : null}
-                    <ListItemWrapper
-                      key={resolvedItem.item.id}
-                      item={resolvedItem.item}
-                      data={resolvedItem.data}
-                      context={context}
-                      group={group}
-                      compact={compact}
-                    />
-                  </>
-                );
+              context={{
+                items,
+                group,
+                refresh,
+                focusedGroupIndex,
+                selectItems: setSelectedItems,
+                scrollToIndex: listRef.current?.scrollToIndex,
+                focusGroup: setFocusedGroupIndex,
+                context,
+                compact
               }}
+              renderItem={ItemRenderer}
             />
           </FlexScrollContainer>
         </>
@@ -226,6 +180,85 @@ function ListContainer(props: ListContainerProps) {
   );
 }
 export default ListContainer;
+
+type ListContext = {
+  items: VirtualizedGrouping<Item>;
+  group: GroupingKey | undefined;
+  refresh: () => void;
+  focusedGroupIndex: number;
+  selectItems: (items: any) => void;
+  scrollToIndex?: (
+    index: number,
+    options?: ScrollToOptions | undefined
+  ) => void;
+  focusGroup: (index: number) => void;
+  context?: Context;
+  compact?: boolean;
+};
+function ItemRenderer({
+  index,
+  context
+}: {
+  index: number;
+  context: ListContext;
+}) {
+  const {
+    items,
+    group,
+    refresh,
+    focusedGroupIndex,
+    focusGroup,
+    selectItems,
+    scrollToIndex,
+    context: itemContext,
+    compact
+  } = context;
+  const resolvedItem = useResolvedItem({ index, items });
+  if (!resolvedItem) return <div style={{ height: 50, width: "100%" }}></div>;
+
+  return (
+    <>
+      {resolvedItem.group && group ? (
+        <GroupHeader
+          groupingKey={group}
+          refresh={refresh}
+          title={resolvedItem.group.title}
+          isFocused={index === focusedGroupIndex}
+          index={index}
+          onSelectGroup={() => {
+            let endIndex;
+            for (let i = index + 1; i < items.ids.length; ++i) {
+              if (typeof items.ids[i] === "object") {
+                endIndex = i;
+                break;
+              }
+            }
+            selectItems([
+              ...selectionStore.get().selectedItems,
+              ...items.ids.slice(index, endIndex || items.ids.length)
+            ]);
+          }}
+          groups={async () => (items.groups ? items.groups() : [])}
+          onJump={(index) => {
+            scrollToIndex?.(index, {
+              align: "center",
+              behavior: "auto"
+            });
+            focusGroup(index);
+          }}
+        />
+      ) : null}
+      <ListItemWrapper
+        key={resolvedItem.item.id}
+        item={resolvedItem.item}
+        data={resolvedItem.data}
+        context={itemContext}
+        group={group}
+        compact={compact}
+      />
+    </>
+  );
+}
 
 /**
  * Scroll the element at the specified index into view and

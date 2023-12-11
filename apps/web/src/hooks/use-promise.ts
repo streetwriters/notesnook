@@ -20,11 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { DependencyList, useEffect, useState } from "react";
 
 export type PromiseResult<T> =
-  | PromisePendingResult
+  | PromisePendingResult<T>
   | (PromiseSettledResult<T> & { refresh: () => void });
 
-export interface PromisePendingResult {
+export interface PromisePendingResult<T> {
   status: "pending";
+  value?: T;
 }
 
 /**
@@ -62,7 +63,10 @@ export default function usePromise<T>(
 
   useEffect(function effect() {
     if (result.status !== "pending") {
-      setResult({ status: "pending" });
+      setResult((s) => ({
+        ...s,
+        status: "pending"
+      }));
     }
 
     const controller = new AbortController();
