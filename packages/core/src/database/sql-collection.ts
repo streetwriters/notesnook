@@ -39,6 +39,7 @@ import {
   ExpressionOrFactory,
   SelectQueryBuilder,
   SqlBool,
+  Transaction,
   sql
 } from "kysely";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
@@ -52,6 +53,9 @@ export class SQLCollection<
 {
   constructor(
     private readonly db: DatabaseAccessor,
+    private readonly startTransaction: (
+      executor: (tr: Transaction<DatabaseSchema>) => void | Promise<void>
+    ) => Promise<void>,
     private readonly type: TCollectionType,
     private readonly eventManager: EventManager
   ) {}
@@ -151,16 +155,14 @@ export class SQLCollection<
 
     if (entries.length <= 0) return;
 
-    await this.db()
-      .transaction()
-      .execute(async (tx) => {
-        for (const chunk of toChunks(entries, 200)) {
-          await tx
-            .replaceInto<keyof DatabaseSchema>(this.type)
-            .values(chunk)
-            .execute();
-        }
-      });
+    await this.startTransaction(async (tx) => {
+      for (const chunk of toChunks(entries, 200)) {
+        await tx
+          .replaceInto<keyof DatabaseSchema>(this.type)
+          .values(chunk)
+          .execute();
+      }
+    });
   }
 
   async update(ids: string[], partial: Partial<SQLiteItem<T>>) {

@@ -39,7 +39,12 @@ export class Reminders implements ICollection {
   name = "reminders";
   readonly collection: SQLCollection<"reminders", Reminder>;
   constructor(private readonly db: Database) {
-    this.collection = new SQLCollection(db.sql, "reminders", db.eventManager);
+    this.collection = new SQLCollection(
+      db.sql,
+      db.transaction,
+      "reminders",
+      db.eventManager
+    );
   }
 
   async init() {
