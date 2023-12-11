@@ -157,7 +157,6 @@ type BooleanFields = ValueOf<{
 
 const BooleanProperties: Set<BooleanFields> = new Set([
   "compressed",
-  "conflicted",
   "deleted",
   "disabled",
   "favorite",
@@ -171,6 +170,9 @@ const BooleanProperties: Set<BooleanFields> = new Set([
 ]);
 
 const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
+  note: (row) => {
+    row.conflicted = row.conflicted === 1;
+  },
   reminder: (row) => {
     if (row.selectedDays) row.selectedDays = JSON.parse(row.selectedDays);
   },
@@ -263,7 +265,7 @@ export class SqliteBooleanPlugin implements KyselyPlugin {
 
       for (const key in row) {
         if (BooleanProperties.has(key as BooleanFields)) {
-          row[key] = row[key] === 1 ? true : false;
+          row[key] = row[key] === 1;
         }
       }
 

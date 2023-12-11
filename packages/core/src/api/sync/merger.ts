@@ -22,6 +22,7 @@ import { isHTMLEqual } from "../../utils/html-diff";
 import Database from "..";
 import { ContentItem, Item, MaybeDeletedItem, isDeleted } from "../../types";
 
+const THRESHOLD = process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
 class Merger {
   logger = logger.scope("Merger");
   constructor(private readonly db: Database) {}
@@ -29,43 +30,6 @@ class Merger {
   // isSyncCollection(type: string): type is keyof typeof SYNC_COLLECTIONS_MAP {
   //   return type in SYNC_COLLECTIONS_MAP;
   // }
-
-  isConflicted(
-    localItem: MaybeDeletedItem<Item>,
-    remoteItem: MaybeDeletedItem<Item>,
-    conflictThreshold: number
-  ) {
-    const isResolved =
-      "dateResolved" in localItem &&
-      localItem.dateResolved === remoteItem.dateModified;
-    const isModified =
-      // the local item is modified if it was changed/modified after the last
-      // sync i.e. it wasn't synced yet.
-      // However, in case a sync is interrupted the local item's date modified
-      // will be ahead of last sync. In that case, we also have to check if the
-      // synced flag is false (it is only false if a user makes edits on the
-      // local device).
-      localItem.dateModified > remoteItem.dateModified && !localItem.synced;
-    if (isModified && !isResolved) {
-      // If time difference between local item's edits & remote item's edits
-      // is less than threshold, we shouldn't trigger a merge conflict; instead
-      // we will keep the most recently changed item.
-      const timeDiff =
-        Math.max(remoteItem.dateModified, localItem.dateModified) -
-        Math.min(remoteItem.dateModified, localItem.dateModified);
-
-      if (timeDiff < conflictThreshold) {
-        if (remoteItem.dateModified > localItem.dateModified) {
-          return "merge";
-        }
-        return;
-      }
-
-      return "conflict";
-    } else if (!isResolved) {
-      return "merge";
-    }
-  }
 
   mergeItemSync(
     remoteItem: MaybeDeletedItem<Item>,
@@ -103,36 +67,37 @@ class Merger {
   ) {
     if (localItem && "localOnly" in localItem && localItem.localOnly) return;
 
-    const THRESHOLD = process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
-    const conflicted =
-      localItem && this.isConflicted(localItem, remoteItem, THRESHOLD);
-    if (!localItem || conflicted === "merge") {
-      return remoteItem;
-    } else if (conflicted === "conflict") {
-      if (
-        isDeleted(localItem) ||
-        isDeleted(remoteItem) ||
-        remoteItem.type !== "tiptap" ||
-        localItem.type !== "tiptap" ||
-        localItem.locked ||
-        remoteItem.locked ||
-        !localItem.data ||
-        !remoteItem.data ||
-        isHTMLEqual(localItem.data, remoteItem.data)
-      ) {
-        if (remoteItem.dateModified > localItem.dateModified) return remoteItem;
-        return;
-      }
+    if (
+      !localItem ||
+      isDeleted(localItem) ||
+      isDeleted(remoteItem) ||
+      remoteItem.type !== "tiptap" ||
+      localItem.type !== "tiptap" ||
+      localItem.locked ||
+      remoteItem.locked ||
+      !localItem.data ||
+      !remoteItem.data
+    ) {
+      if (!localItem || remoteItem.dateModified > localItem.dateModified)
+        return remoteItem;
+      return;
+    } else {
+      // it's possible that the local item already has a conflict so
+      // we can just replace the conflicted content
+      const conflicted = localItem.conflicted
+        ? "conflict"
+        : isContentConflicted(localItem, remoteItem, THRESHOLD);
+
+      if (conflicted === "merge") return remoteItem;
+      else if (!conflicted) return;
 
       // otherwise we trigger the conflicts
       await this.db.notes.add({
         id: localItem.noteId,
         conflicted: true
       });
-      return {
-        ...localItem,
-        conflicted: remoteItem
-      } as ContentItem;
+      localItem.conflicted = remoteItem;
+      return localItem;
     }
   }
 
@@ -171,3 +136,37 @@ class Merger {
   }
 }
 export default Merger;
+
+function isContentConflicted(
+  localItem: ContentItem,
+  remoteItem: ContentItem,
+  conflictThreshold: number
+) {
+  const isResolved = localItem.dateResolved === remoteItem.dateModified;
+  const isEdited =
+    // the local item is edited if it was changed/edited after the remote
+    // note and it also wasn't synced yet.
+    localItem.dateEdited > remoteItem.dateEdited && !localItem.synced;
+  if (isEdited && !isResolved) {
+    // If time difference between local item's edits & remote item's edits
+    // is less than threshold, we shouldn't trigger a merge conflict; instead
+    // we will keep the most recently changed item.
+    const timeDiff =
+      Math.max(remoteItem.dateEdited, localItem.dateEdited) -
+      Math.min(remoteItem.dateEdited, localItem.dateEdited);
+
+    if (
+      timeDiff < conflictThreshold ||
+      isHTMLEqual(localItem.data, remoteItem.data)
+    ) {
+      if (remoteItem.dateModified > localItem.dateModified) {
+        return "merge";
+      }
+      return;
+    }
+
+    return "conflict";
+  } else if (!isResolved) {
+    return "merge";
+  }
+}
