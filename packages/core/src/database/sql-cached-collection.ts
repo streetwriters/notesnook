@@ -21,6 +21,7 @@ import { GroupOptions, MaybeDeletedItem, isDeleted } from "../types";
 import EventManager from "../utils/event-manager";
 import { DatabaseAccessor, DatabaseCollection, DatabaseSchema } from ".";
 import { SQLCollection } from "./sql-collection";
+import { Transaction } from "kysely";
 
 export class SQLCachedCollection<
   TCollectionType extends keyof DatabaseSchema,
@@ -33,10 +34,18 @@ export class SQLCachedCollection<
 
   constructor(
     sql: DatabaseAccessor,
+    startTransaction: (
+      executor: (tr: Transaction<DatabaseSchema>) => void | Promise<void>
+    ) => Promise<void>,
     type: TCollectionType,
     eventManager: EventManager
   ) {
-    this.collection = new SQLCollection(sql, type, eventManager);
+    this.collection = new SQLCollection(
+      sql,
+      startTransaction,
+      type,
+      eventManager
+    );
   }
 
   async init() {
