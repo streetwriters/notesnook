@@ -303,7 +303,9 @@ const subscriptions = {
         console.log("Subscription.verify", requestData);
         try {
           let result = await fetch(
-            "http://192.168.43.5:4264/apple/verify",
+            __DEV__
+              ? "http://192.168.43.5:4264/apple/verify"
+              : "https://payments.streetwriters.co/apple/verify",
             requestData
           );
           console.log("Subscribed", result);
