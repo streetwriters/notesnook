@@ -164,7 +164,11 @@ export function Attachment({
             <AttachmentError
               color={"icon-error"}
               size={16}
-              title={attachment.failed}
+              title={
+                typeof attachment.failed === "object"
+                  ? attachment.failed.toString()
+                  : attachment.failed
+              }
             />
           ) : attachment.working ? (
             <Loading size={16} />
