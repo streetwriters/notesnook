@@ -30,7 +30,12 @@ export class Relations implements ICollection {
   name = "relations";
   readonly collection: SQLCollection<"relations", Relation>;
   constructor(private readonly db: Database) {
-    this.collection = new SQLCollection(db.sql, "relations", db.eventManager);
+    this.collection = new SQLCollection(
+      db.sql,
+      db.transaction,
+      "relations",
+      db.eventManager
+    );
   }
 
   async init() {
