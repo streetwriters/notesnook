@@ -31,7 +31,12 @@ export class NoteHistory implements ICollection {
   sessionContent = new SessionContent(this.db);
   readonly collection: SQLCollection<"notehistory", HistorySession>;
   constructor(private readonly db: Database) {
-    this.collection = new SQLCollection(db.sql, "notehistory", db.eventManager);
+    this.collection = new SQLCollection(
+      db.sql,
+      db.transaction,
+      "notehistory",
+      db.eventManager
+    );
   }
 
   async init() {

@@ -36,7 +36,12 @@ export class Attachments implements ICollection {
   key: Cipher<"base64"> | null = null;
   readonly collection: SQLCollection<"attachments", Attachment>;
   constructor(private readonly db: Database) {
-    this.collection = new SQLCollection(db.sql, "attachments", db.eventManager);
+    this.collection = new SQLCollection(
+      db.sql,
+      db.transaction,
+      "attachments",
+      db.eventManager
+    );
     this.key = null;
 
     EV.subscribe(

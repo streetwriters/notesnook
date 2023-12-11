@@ -31,7 +31,12 @@ export class Notebooks implements ICollection {
    */
   collection: SQLCollection<"notebooks", TrashOrItem<Notebook>>;
   constructor(private readonly db: Database) {
-    this.collection = new SQLCollection(db.sql, "notebooks", db.eventManager);
+    this.collection = new SQLCollection(
+      db.sql,
+      db.transaction,
+      "notebooks",
+      db.eventManager
+    );
   }
 
   init() {

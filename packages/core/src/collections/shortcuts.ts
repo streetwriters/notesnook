@@ -36,6 +36,7 @@ export class Shortcuts implements ICollection {
   constructor(private readonly db: Database) {
     this.collection = new SQLCachedCollection(
       db.sql,
+      db.transaction,
       "shortcuts",
       db.eventManager
     );

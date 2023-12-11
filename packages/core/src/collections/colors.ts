@@ -39,7 +39,12 @@ export class Colors implements ICollection {
   name = "colors";
   readonly collection: SQLCollection<"colors", Color>;
   constructor(private readonly db: Database) {
-    this.collection = new SQLCollection(db.sql, "colors", db.eventManager);
+    this.collection = new SQLCollection(
+      db.sql,
+      db.transaction,
+      "colors",
+      db.eventManager
+    );
   }
 
   init() {

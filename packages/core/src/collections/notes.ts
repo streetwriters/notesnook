@@ -47,7 +47,12 @@ export class Notes implements ICollection {
   collection: SQLCollection<"notes", TrashOrItem<Note>>;
   totalNotes = 0;
   constructor(private readonly db: Database) {
-    this.collection = new SQLCollection(db.sql, "notes", db.eventManager);
+    this.collection = new SQLCollection(
+      db.sql,
+      db.transaction,
+      "notes",
+      db.eventManager
+    );
   }
 
   async init() {
