@@ -201,6 +201,7 @@ export type SQLiteOptions = {
   journalMode?: "WAL" | "MEMORY" | "OFF" | "PERSIST" | "TRUNCATE" | "DELETE";
   synchronous?: "normal" | "extra" | "full" | "off";
   lockingMode?: "normal" | "exclusive";
+  tempStore?: "memory" | "file" | "default";
   cacheSize?: number;
   pageSize?: number;
 };
@@ -227,6 +228,9 @@ export async function createDatabase(options: SQLiteOptions) {
     await sql`PRAGMA page_size = ${sql.raw(
       options.pageSize.toString()
     )}`.execute(db);
+
+  if (options.tempStore)
+    await sql`PRAGMA temp_store = ${sql.raw(options.tempStore)}`.execute(db);
 
   if (options.cacheSize)
     await sql`PRAGMA cache_size = ${sql.raw(
