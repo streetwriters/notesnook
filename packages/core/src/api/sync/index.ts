@@ -30,7 +30,6 @@ import TokenManager from "../token-manager";
 import Collector from "./collector";
 import * as signalr from "@microsoft/signalr";
 import Merger from "./merger";
-import Conflicts from "./conflicts";
 import { AutoSync } from "./auto-sync";
 import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
 import { logger } from "../../logger";
@@ -97,7 +96,6 @@ export default class SyncManager {
 }
 
 class Sync {
-  conflicts = new Conflicts(this.db);
   collector = new Collector(this.db);
   merger = new Merger(this.db);
   autoSync = new AutoSync(this.db, 1000);
@@ -180,10 +178,6 @@ class Sync {
   async init(isForceSync?: boolean) {
     await this.checkConnection();
 
-    if (await this.conflicts.check()) {
-      this.conflicts.throw();
-    }
-
     if (isForceSync) {
       await this.devices.unregister();
       await this.devices.register();
@@ -241,10 +235,6 @@ class Sync {
     }
 
     this.connection.off("SendItems");
-
-    if (await this.conflicts.check()) {
-      this.conflicts.throw();
-    }
   }
 
   async send(deviceId: string, isForceSync?: boolean) {
