@@ -216,7 +216,7 @@ class Sync {
     this.connection.off("SendItems");
     this.connection.on("SendItems", async (chunk) => {
       if (this.connection.state !== signalr.HubConnectionState.Connected)
-        return;
+        return false;
 
       await this.processChunk(chunk, key);
 
@@ -316,11 +316,7 @@ class Sync {
     this.db.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
   }
 
-  async processChunk(
-    chunk: SyncTransferItem,
-    key: SerializedKey,
-    notify = false
-  ) {
+  async processChunk(chunk: SyncTransferItem, key: SerializedKey) {
     const itemType = chunk.type;
     if (itemType === "settings") return;
 
@@ -357,11 +353,7 @@ class Sync {
             );
     }
 
-    if (
-      notify &&
-      (itemType === "note" || itemType === "content") &&
-      items.length > 0
-    ) {
+    if ((itemType === "note" || itemType === "content") && items.length > 0) {
       items.forEach((item) =>
         this.db.eventManager.publish(EVENTS.syncItemMerged, item)
       );
