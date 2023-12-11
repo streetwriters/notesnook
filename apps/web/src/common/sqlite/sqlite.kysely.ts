@@ -24,6 +24,7 @@ import type { SQLiteWorker } from "./sqlite.worker";
 import SQLiteSyncURI from "./wa-sqlite.wasm?url";
 import SQLiteAsyncURI from "./wa-sqlite-async.wasm?url";
 import { wrap } from "comlink";
+import { Mutex } from "async-mutex";
 
 type Config = { dbName: string; async: boolean };
 
@@ -103,6 +104,7 @@ class ConnectionMutex {
 }
 
 class WaSqliteWorkerConnection implements DatabaseConnection {
+  private readonly queryMutex = new Mutex();
   constructor(private readonly worker: SQLiteWorker) {}
 
   streamQuery<R>(): AsyncIterableIterator<QueryResult<R>> {
@@ -119,6 +121,8 @@ class WaSqliteWorkerConnection implements DatabaseConnection {
         : query.kind === "RawNode"
         ? "raw"
         : "exec";
-    return await this.worker.run(mode, sql, parameters as any);
+    return this.queryMutex.runExclusive(() =>
+      this.worker.run(mode, sql, parameters as any)
+    );
   }
 }
