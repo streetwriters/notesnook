@@ -45,15 +45,15 @@ export class RNSqliteDriver implements Driver {
   }
 
   async beginTransaction(connection: DatabaseConnection): Promise<void> {
-    await connection.executeQuery(CompiledQuery.raw("begin"));
+    await connection.executeQuery(CompiledQuery.raw("BEGIN TRANSACTION"));
   }
 
   async commitTransaction(connection: DatabaseConnection): Promise<void> {
-    await connection.executeQuery(CompiledQuery.raw("commit"));
+    await connection.executeQuery(CompiledQuery.raw("COMMIT"));
   }
 
   async rollbackTransaction(connection: DatabaseConnection): Promise<void> {
-    await connection.executeQuery(CompiledQuery.raw("rollback"));
+    await connection.executeQuery(CompiledQuery.raw("ROLLBACK"));
   }
 
   async releaseConnection(): Promise<void> {
