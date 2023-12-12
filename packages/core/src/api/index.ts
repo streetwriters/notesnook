@@ -66,7 +66,7 @@ import {
   SQLiteOptions,
   createDatabase
 } from "../database";
-import { Kysely, Transaction } from "kysely";
+import { Kysely, Transaction, sql } from "kysely";
 import { CachedCollection } from "../database/cached-collection";
 
 type EventSourceConstructor = new (
@@ -223,6 +223,22 @@ class Database {
     await this.session.set();
   }
 
+  async reset() {
+    await this.storage().clear();
+
+    for (const statement of [
+      "PRAGMA writable_schema = 1",
+      "DELETE FROM sqlite_master",
+      "PRAGMA writable_schema = 0",
+      "VACUUM",
+      "PRAGMA integrity_check"
+    ]) {
+      await sql.raw(statement).execute(this.sql());
+    }
+    await this.sql().destroy();
+    this._sql = await createDatabase("notesnook", this.options.sqliteOptions);
+  }
+
   async init() {
     if (!this.options)
       throw new Error(
@@ -244,7 +260,7 @@ class Database {
       this.disconnectSSE();
     });
 
-    this._sql = await createDatabase(this.options.sqliteOptions);
+    this._sql = await createDatabase("notesnook", this.options.sqliteOptions);
 
     await this._validate();
 
