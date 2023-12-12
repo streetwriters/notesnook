@@ -36,11 +36,11 @@ database.host(
         SSE_HOST: "https://events.streetwriters.co",
         SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
         ISSUES_HOST: "https://issues.streetwriters.co"
-        // API_HOST: "http://192.168.43.108:5264",
-        // AUTH_HOST: "http://192.168.43.108:8264",
-        // SSE_HOST: "http://192.168.43.108:7264",
-        // SUBSCRIPTIONS_HOST: "http://192.168.43.108:9264",
-        // ISSUES_HOST: "http://192.168.43.108:2624"
+        // API_HOST: "http://192.168.43.5:5264",
+        // AUTH_HOST: "http://192.168.43.5:8264",
+        // SSE_HOST: "http://192.168.43.5:7264",
+        // SUBSCRIPTIONS_HOST: "http://192.168.43.5:9264",
+        // ISSUES_HOST: "http://192.168.43.5:2624"
       }
     : {
         API_HOST: "https://api.notesnook.com",
@@ -61,18 +61,15 @@ database.setup({
   },
   batchSize: 500,
   sqliteOptions: {
-    dialect: {
-      createDriver: () =>
-        new RNSqliteDriver({ async: true, dbName: "test.db" }),
+    dialect: (name) => ({
+      createDriver: () => {
+        return new RNSqliteDriver({ async: true, dbName: name });
+      },
       createAdapter: () => new SqliteAdapter(),
       createIntrospector: (db) => new SqliteIntrospector(db),
       createQueryCompiler: () => new SqliteQueryCompiler()
-    }
-    // journalMode: "MEMORY",
-    // synchronous: "normal",
-    // pageSize: 8192,
-    // cacheSize: -16000,
-    // lockingMode: "exclusive"
+    }),
+    tempStore: "memory"
   }
 });
 

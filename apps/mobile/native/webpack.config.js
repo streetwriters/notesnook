@@ -100,6 +100,7 @@ module.exports = (env) => {
         "react-native-blob-util": path.join(__dirname, "../node_modules/react-native-blob-util"),
         "@mdi/js": path.join(__dirname, "../node_modules/@mdi/js/mdi.js"),
         "katex": path.join(__dirname, "../node_modules/katex"),
+        "tinycolor2":  path.join(__dirname, "../node_modules/tinycolor2"),
       },
     },
     /**

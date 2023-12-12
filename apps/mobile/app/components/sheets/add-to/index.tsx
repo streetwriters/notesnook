@@ -136,7 +136,7 @@ const MoveNoteSheet = ({
 
   const renderNotebook = useCallback(
     ({ item, index }: { item: string | number; index: number }) => (
-      <NotebookItem items={notebooks} id={item as string} index={index} />
+      <NotebookItem items={notebooks} id={index} index={index} />
     ),
     [notebooks]
   );

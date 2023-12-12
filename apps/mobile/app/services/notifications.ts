@@ -364,17 +364,18 @@ async function scheduleNotification(
           }
         });
       }
+
       await notifee.createTriggerNotification(
         {
           id: trigger.id,
-          title: title,
-          body: description,
+          title: !title ? undefined : title,
+          body: !description ? undefined : description,
           data: {
             type: "reminder",
             payload: payload || "",
             dateModified: reminder.dateModified + ""
           },
-          subtitle: description,
+          subtitle: !description ? undefined : description,
           android: {
             channelId: await getChannelId(priority),
             smallIcon: "ic_stat_name",
