@@ -52,8 +52,10 @@ export const NotebookItem = ({
   parent?: NotebookParentProp;
   items?: VirtualizedGrouping<Notebook>;
 }) => {
-  const expanded = useNotebookExpandedStore((state) => state.expanded[id]);
-  const { nestedNotebooks, notebook: item } = useNotebook(id, items, expanded);
+  const { nestedNotebooks, notebook: item } = useNotebook(id, items, true);
+  const expanded = useNotebookExpandedStore((state) =>
+    item?.id ? state.expanded[item?.id] : false
+  );
   const { totalNotes: totalNotes, getTotalNotes } = useTotalNotes("notebook");
   const focusedRouteId = useNavigationStore((state) => state.focusedRouteId);
   const { colors } = useThemeColors("sheet");
@@ -240,8 +242,8 @@ export const NotebookItem = ({
         ? null
         : nestedNotebooks?.ids.map((id, index) => (
             <NotebookItem
-              key={item?.id + "_" + id}
-              id={id}
+              key={item?.id + "_" + index}
+              id={index}
               index={index}
               currentLevel={currentLevel + 1}
               items={nestedNotebooks}

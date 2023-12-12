@@ -17,9 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getFormattedDate } from "@notesnook/common";
+import { useThemeColors } from "@notesnook/theme";
 import KeepAwake from "@sayem314/react-native-keep-awake";
 import React, { useEffect, useRef, useState } from "react";
-import { Modal, SafeAreaView, Text, View } from "react-native";
+import { SafeAreaView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
@@ -33,7 +35,7 @@ import {
 } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import Sync from "../../services/sync";
-import { useThemeColors } from "@notesnook/theme";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -45,8 +47,6 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { getFormattedDate } from "@notesnook/common";
 
 const MergeConflicts = () => {
   const { colors } = useThemeColors();
@@ -62,7 +62,7 @@ const MergeConflicts = () => {
 
   const applyChanges = async () => {
     let _content = keep;
-    let note = db.notes.note(_content.noteId).data;
+    let note = await db.notes.note(_content.noteId);
     await db.notes.add({
       id: note.id,
       conflicted: false,
@@ -100,7 +100,7 @@ const MergeConflicts = () => {
   };
 
   const show = async (item) => {
-    let noteContent = await db.content.raw(item.contentId);
+    let noteContent = await db.content.get(item.contentId);
     content.current = { ...noteContent };
     if (__DEV__) {
       if (!noteContent.conflicted) {
@@ -320,7 +320,7 @@ const MergeConflicts = () => {
               readonly
               editorId=":conflictPrimary"
               onLoad={async () => {
-                const note = db.notes.note(content.current?.noteId)?.data;
+                const note = await db.notes.note(content.current?.noteId);
                 if (!note) return;
                 await sleep(300);
                 eSendEvent(eOnLoadNote + ":conflictPrimary", {
@@ -357,7 +357,7 @@ const MergeConflicts = () => {
               readonly
               editorId=":conflictSecondary"
               onLoad={async () => {
-                const note = db.notes.note(content.current?.noteId)?.data;
+                const note = await db.notes.note(content.current?.noteId);
                 if (!note) return;
                 await sleep(300);
                 eSendEvent(eOnLoadNote + ":conflictSecondary", {

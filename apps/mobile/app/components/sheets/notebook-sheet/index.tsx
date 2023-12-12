@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { GroupHeader, Notebook, VirtualizedGrouping } from "@notesnook/core";
+import { Notebook, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, {
   createContext,
@@ -149,7 +149,7 @@ export const NotebookSheet = () => {
   }) => (
     <NotebookItem
       items={notebooks}
-      id={item as string}
+      id={index}
       index={index}
       totalNotes={totalNotes}
     />
@@ -588,7 +588,7 @@ const NotebookItem = ({
         : item &&
           nestedNotebooks?.ids.map((id, index) => (
             <NotebookItem
-              key={item.id + "_" + id}
+              key={item.id + "_" + index}
               id={index}
               index={index}
               totalNotes={nestedNotebookNotesCount}
