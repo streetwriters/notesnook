@@ -269,7 +269,7 @@ class UserManager {
     } catch (e) {
       console.error(e);
     } finally {
-      await this.db.storage().clear();
+      await this.db.reset();
       EV.publish(EVENTS.userLoggedOut, reason);
       EV.publish(EVENTS.appRefreshRequested);
     }

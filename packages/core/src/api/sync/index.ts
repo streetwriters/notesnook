@@ -155,10 +155,10 @@ class Sync {
 
     this.logger.info("Starting sync", options);
 
-    this.connection.onclose((error) => {
+    this.connection.onclose((error = new Error("Connection closed.")) => {
       this.db.eventManager.publish(EVENTS.syncAborted);
       console.error(error);
-      this.logger.error(error || new Error("Connection closed."));
+      this.logger.error(error);
       throw new Error("Connection closed.");
     });
 

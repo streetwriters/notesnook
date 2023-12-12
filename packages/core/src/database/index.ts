@@ -197,7 +197,7 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
 };
 
 export type SQLiteOptions = {
-  dialect: Dialect;
+  dialect: (name: string) => Dialect;
   journalMode?: "WAL" | "MEMORY" | "OFF" | "PERSIST" | "TRUNCATE" | "DELETE";
   synchronous?: "normal" | "extra" | "full" | "off";
   lockingMode?: "normal" | "exclusive";
@@ -205,9 +205,9 @@ export type SQLiteOptions = {
   cacheSize?: number;
   pageSize?: number;
 };
-export async function createDatabase(options: SQLiteOptions) {
+export async function createDatabase(name: string, options: SQLiteOptions) {
   const db = new Kysely<DatabaseSchema>({
-    dialect: options.dialect,
+    dialect: options.dialect(name),
     plugins: [new SqliteBooleanPlugin()]
   });
 
