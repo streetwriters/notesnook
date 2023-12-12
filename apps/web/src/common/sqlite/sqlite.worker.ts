@@ -34,6 +34,7 @@ type PreparedStatement = {
 
 let sqlite: SQLiteAPI;
 let db: number;
+let vfs: IDBBatchAtomicVFS | AccessHandlePoolVFS | null = null;
 const preparedStatements: Map<string, PreparedStatement> = new Map();
 
 async function init(dbName: string, async: boolean, url?: string) {
@@ -42,7 +43,7 @@ async function init(dbName: string, async: boolean, url?: string) {
     ? await SQLiteAsyncESMFactory(option)
     : await SQLiteSyncESMFactory(option);
   sqlite = Factory(SQLiteAsyncModule);
-  const vfs = async
+  vfs = async
     ? new IDBBatchAtomicVFS(dbName, { durability: "strict" })
     : new AccessHandlePoolVFS(dbName);
   if ("isReady" in vfs) await vfs.isReady;
@@ -126,6 +127,7 @@ async function close() {
     await sqlite.finalize(prepared.stmt);
   }
   await sqlite.close(db);
+  await vfs?.close();
 }
 
 const worker = {
