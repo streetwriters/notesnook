@@ -57,13 +57,13 @@ async function initializeDatabase(persistence: DatabasePersistence) {
 
   database.setup({
     sqliteOptions: {
-      dialect: {
+      dialect: (name) => ({
         createDriver: () =>
-          new WaSqliteWorkerDriver({ async: true, dbName: "test.db" }),
+          new WaSqliteWorkerDriver({ async: true, dbName: name }),
         createAdapter: () => new SqliteAdapter(),
         createIntrospector: (db) => new SqliteIntrospector(db),
         createQueryCompiler: () => new SqliteQueryCompiler()
-      },
+      }),
       journalMode: "MEMORY",
       synchronous: "normal",
       pageSize: 8192,
