@@ -52,7 +52,7 @@ export function UserProfile() {
     };
   }, [user]);
 
-  if (!user)
+  if (!user || !user.id)
     return (
       <Flex
         sx={{
