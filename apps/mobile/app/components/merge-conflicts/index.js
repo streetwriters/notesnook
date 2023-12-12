@@ -62,7 +62,7 @@ const MergeConflicts = () => {
 
   const applyChanges = async () => {
     let _content = keep;
-    let note = db.notes.note(_content.noteId).data;
+    let note = await db.notes.note(_content.noteId);
     await db.notes.add({
       id: note.id,
       conflicted: false,
@@ -100,7 +100,7 @@ const MergeConflicts = () => {
   };
 
   const show = async (item) => {
-    let noteContent = await db.content.raw(item.contentId);
+    let noteContent = await db.content.get(item.contentId);
     content.current = { ...noteContent };
     if (__DEV__) {
       if (!noteContent.conflicted) {
@@ -320,7 +320,7 @@ const MergeConflicts = () => {
               readonly
               editorId=":conflictPrimary"
               onLoad={async () => {
-                const note = db.notes.note(content.current?.noteId)?.data;
+                const note = await db.notes.note(content.current?.noteId);
                 if (!note) return;
                 await sleep(300);
                 eSendEvent(eOnLoadNote + ":conflictPrimary", {
@@ -357,7 +357,7 @@ const MergeConflicts = () => {
               readonly
               editorId=":conflictSecondary"
               onLoad={async () => {
-                const note = db.notes.note(content.current?.noteId)?.data;
+                const note = await db.notes.note(content.current?.noteId);
                 if (!note) return;
                 await sleep(300);
                 eSendEvent(eOnLoadNote + ":conflictSecondary", {
