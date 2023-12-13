@@ -83,6 +83,8 @@ function withDateEdited<
 }
 
 export async function resolveItems(ids: string[], items: Item[]) {
+  if (!ids.length || !items.length) return [];
+
   const { type } = items[0];
   if (type === "note") return resolveNotes(ids);
   else if (type === "notebook") {
@@ -172,9 +174,11 @@ async function resolveNotes(ids: string[]) {
     data.push({
       color: group.color ? resolved.colors[group.color] : undefined,
       reminder: group.reminder ? resolved.reminders[group.reminder] : undefined,
-      tags: withDateEdited(group.tags.map((id) => resolved.tags[id])),
+      tags: withDateEdited(
+        group.tags.map((id) => resolved.tags[id]).filter(Boolean)
+      ),
       notebooks: withDateEdited(
-        group.notebooks.map((id) => resolved.notebooks[id])
+        group.notebooks.map((id) => resolved.notebooks[id]).filter(Boolean)
       )
     });
   }
