@@ -17,18 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef, useState } from "react";
-import { Flex, Button } from "@theme-ui/components";
+import { forwardRef, useEffect, useRef, useState } from "react";
+import { Flex, Button, Box } from "@theme-ui/components";
 import { Plus } from "../icons";
 import {
   useStore as useSelectionStore,
   store as selectionStore
 } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
-import { ListItemWrapper } from "./list-profiles";
+import { DEFAULT_ITEM_HEIGHT, ListItemWrapper } from "./list-profiles";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
-import { FlexScrollContainer } from "../scroll-container";
+import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import { Context } from "./types";
 import {
@@ -37,9 +37,29 @@ import {
   Item,
   isGroupHeader
 } from "@notesnook/core";
-import { VirtualizedList } from "../virtualized-list";
-import { ScrollToOptions, Virtualizer } from "@tanstack/react-virtual";
 import { useResolvedItem } from "./resolved-item";
+import {
+  ItemProps,
+  ScrollerProps,
+  Virtuoso,
+  VirtuosoHandle
+} from "react-virtuoso";
+import Skeleton from "react-loading-skeleton";
+
+export const CustomScrollbarsVirtualList = forwardRef<
+  HTMLDivElement,
+  ScrollerProps
+>(function CustomScrollbarsVirtualList(props, ref) {
+  return (
+    <ScrollContainer
+      {...props}
+      forwardedRef={(sRef) => {
+        if (typeof ref === "function") ref(sRef);
+        else if (ref) ref.current = sRef;
+      }}
+    />
+  );
+});
 
 type ListContainerProps = {
   group?: GroupingKey;
@@ -68,7 +88,8 @@ function ListContainer(props: ListContainerProps) {
     (store) => store.toggleSelectionMode
   );
 
-  const listRef = useRef<Virtualizer<Element, Element>>();
+  const listRef = useRef<VirtuosoHandle>(null);
+  const listContainerRef = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -119,25 +140,24 @@ function ListContainer(props: ListContainerProps) {
         </>
       ) : (
         <>
-          <FlexScrollContainer
-            style={{ display: "flex", flexDirection: "column", flex: 1 }}
+          <Flex
+            ref={listContainerRef}
+            variant="columnFill"
             data-test-id={`${group}-list`}
           >
-            {header ? header : <Announcements />}
-            <VirtualizedList
-              virtualizerRef={listRef}
-              estimatedSize={50}
-              getItemKey={(index) => items.getKey(index)}
-              items={items.ids}
-              mode="dynamic"
-              tabIndex={-1}
-              overscan={10}
+            <Virtuoso
+              ref={listRef}
+              computeItemKey={(index) => items.getKey(index)}
+              defaultItemHeight={DEFAULT_ITEM_HEIGHT}
+              totalCount={items.ids.length}
               onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
-              itemWrapperProps={(_, index) => ({
-                onFocus: () => onFocus(index),
-                onMouseDown: (e) => onMouseDown(e.nativeEvent, index)
-              })}
+              components={{
+                Scroller: CustomScrollbarsVirtualList,
+                Item: VirtuosoItem,
+                Header: () => (header ? header : <Announcements />)
+              }}
+              increaseViewportBy={{ top: 10, bottom: 10 }}
               context={{
                 items,
                 group,
@@ -147,11 +167,15 @@ function ListContainer(props: ListContainerProps) {
                 scrollToIndex: listRef.current?.scrollToIndex,
                 focusGroup: setFocusedGroupIndex,
                 context,
-                compact
+                compact,
+                onMouseDown,
+                onFocus
               }}
-              renderItem={ItemRenderer}
+              itemContent={(index, _data, context) => (
+                <ItemRenderer context={context} index={index} />
+              )}
             />
-          </FlexScrollContainer>
+          </Flex>
         </>
       )}
       {button && (
@@ -194,6 +218,9 @@ type ListContext = {
   focusGroup: (index: number) => void;
   context?: Context;
   compact?: boolean;
+
+  onMouseDown: (e: MouseEvent, itemIndex: number) => void;
+  onFocus: (itemIndex: number) => void;
 };
 function ItemRenderer({
   index,
@@ -214,7 +241,37 @@ function ItemRenderer({
     compact
   } = context;
   const resolvedItem = useResolvedItem({ index, items });
-  if (!resolvedItem) return <div style={{ height: 50, width: "100%" }}></div>;
+  if (!resolvedItem || !resolvedItem.item)
+    return (
+      <Box key="list-item-skeleton" sx={{ py: 2, px: 1 }}>
+        <Skeleton
+          enableAnimation={false}
+          height={16}
+          width={`50%`}
+          style={{ marginBottom: 5 }}
+        />
+        <Skeleton height={12} count={2} />
+        <Flex>
+          <Skeleton enableAnimation={false} height={10} inline width={50} />
+          <Skeleton
+            enableAnimation={false}
+            height={10}
+            inline
+            width={10}
+            circle
+            style={{ marginLeft: 5 }}
+          />
+          <Skeleton
+            enableAnimation={false}
+            height={10}
+            inline
+            width={10}
+            circle
+            style={{ marginLeft: 5 }}
+          />
+        </Flex>
+      </Box>
+    );
 
   return (
     <>
@@ -241,7 +298,7 @@ function ItemRenderer({
           groups={async () => (items.groups ? items.groups() : [])}
           onJump={(index) => {
             scrollToIndex?.(index, {
-              align: "center",
+              // align: "center",
               behavior: "auto"
             });
             focusGroup(index);
@@ -260,6 +317,26 @@ function ItemRenderer({
   );
 }
 
+function VirtuosoItem({
+  item: _item,
+  context,
+  ...props
+}: ItemProps<string> & {
+  context?: ListContext;
+}) {
+  return (
+    <div
+      {...props}
+      onFocus={() => context?.onFocus(props["data-item-index"])}
+      onMouseDown={(e) =>
+        context?.onMouseDown(e.nativeEvent, props["data-item-index"])
+      }
+    >
+      {props.children}
+    </div>
+  );
+}
+
 /**
  * Scroll the element at the specified index into view and
  * wait until it renders into the DOM. This function keeps
@@ -268,28 +345,29 @@ function ItemRenderer({
  * 50ms interval.
  */
 function waitForElement(
-  list: Virtualizer<Element, Element>,
+  list: VirtuosoHandle,
   index: number,
   elementId: string,
   callback: (element: HTMLElement) => void
 ) {
   let waitInterval = 0;
   let maxAttempts = 3;
-  list.scrollToIndex(index);
-  function scrollDone() {
-    if (!maxAttempts) return;
-    clearTimeout(waitInterval);
+  list.scrollIntoView({
+    index,
+    done: function scrollDone() {
+      if (!maxAttempts) return;
+      clearTimeout(waitInterval);
 
-    const element = document.getElementById(elementId);
-    if (!element) {
-      --maxAttempts;
-      waitInterval = setTimeout(() => {
-        scrollDone();
-      }, 50) as unknown as number;
-      return;
+      const element = document.getElementById(elementId);
+      if (!element) {
+        --maxAttempts;
+        waitInterval = setTimeout(() => {
+          scrollDone();
+        }, 50) as unknown as number;
+        return;
+      }
+
+      callback(element);
     }
-
-    callback(element);
-  }
-  scrollDone();
+  });
 }
