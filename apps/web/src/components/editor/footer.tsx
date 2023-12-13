@@ -31,7 +31,7 @@ const SAVE_STATE_ICON_MAP = {
 };
 
 function EditorFooter() {
-  const { words } = useNoteStatistics();
+  const { words, lines } = useNoteStatistics();
   const dateEdited = useStore((store) => store.session.dateEdited);
   const id = useStore((store) => store.session.id);
   const saveState = useStore(
@@ -54,6 +54,15 @@ function EditorFooter() {
       >
         {words.total + " words"}
         {words.selected ? ` (${words.selected} selected)` : ""}
+      </Text>
+      <Text
+        className="selectable"
+        data-test-id="editor-line-count"
+        variant="subBody"
+        mr={2}
+        sx={{ color: "paragraph" }}
+      >
+        {lines.total + " lines"}
       </Text>
       <Text
         className="selectable"

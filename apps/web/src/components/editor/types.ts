@@ -24,6 +24,9 @@ export type NoteStatistics = {
     total: number;
     selected?: number;
   };
+  lines: {
+    total: number;
+  };
 };
 
 export interface IEditor {

@@ -99,6 +99,9 @@ function save(
       words: {
         total: countWords(content.textBetween(0, content.size, "\n", " ")),
         selected: 0
+      },
+      lines: {
+        total: content.content.length //Takes the fragment and return the fragment array length
       }
     }
   });
@@ -202,6 +205,9 @@ function TipTap(props: TipTapProps) {
             words: {
               total: getTotalWords(editor as Editor),
               selected: 0
+            },
+            lines: {
+              total: editor.state.doc.content.content.length //Takes the fragment and return the fragment array length
             }
           }
         });
