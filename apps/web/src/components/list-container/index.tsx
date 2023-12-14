@@ -147,7 +147,7 @@ function ListContainer(props: ListContainerProps) {
           >
             <Virtuoso
               ref={listRef}
-              computeItemKey={(index) => items.getKey(index)}
+              computeItemKey={(index) => items.key(index)}
               defaultItemHeight={DEFAULT_ITEM_HEIGHT}
               totalCount={items.ids.length}
               onBlur={() => setFocusedGroupIndex(-1)}
