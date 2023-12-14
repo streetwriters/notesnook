@@ -169,8 +169,13 @@ async function resolveNotes(ids: string[]) {
   console.timeEnd("resolve");
 
   const data: NoteResolvedData[] = [];
-  for (const noteId in grouped) {
+  for (const noteId of ids) {
     const group = grouped[noteId];
+    if (!group) {
+      data.push({});
+      continue;
+    }
+
     data.push({
       color: group.color ? resolved.colors[group.color] : undefined,
       reminder: group.reminder ? resolved.reminders[group.reminder] : undefined,
