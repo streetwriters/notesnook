@@ -117,7 +117,6 @@ function ListItem<TItem extends Item, TContext>(
         });
       }}
       tabIndex={-1}
-      dir="auto"
       sx={{
         pl: 1,
         pr: 2,
@@ -170,6 +169,7 @@ function ListItem<TItem extends Item, TContext>(
 
       {typeof props.title === "string" ? (
         <Text
+          dir="auto"
           data-test-id={`title`}
           variant={isSimple || isCompact ? "body" : "subtitle"}
           sx={{
@@ -194,6 +194,7 @@ function ListItem<TItem extends Item, TContext>(
         <Text
           as="p"
           variant="body"
+          dir="auto"
           data-test-id={`description`}
           sx={{
             color: selected ? "paragraph-selected" : "paragraph",
