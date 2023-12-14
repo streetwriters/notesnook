@@ -75,6 +75,7 @@ import Toolbar from "./toolbar";
 import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { DownloadOptions } from "./utils/downloader";
 import { Heading } from "./extensions/heading";
+import { EmojiSelector } from "./extensions/emoji-selector";
 import Clipboard, { ClipboardOptions } from "./extensions/clipboard";
 import Blockquote from "./extensions/blockquote";
 import { Quirks } from "./extensions/quirks";
@@ -192,6 +193,7 @@ const useTiptap = (
           horizontalRule: false
         }),
         Heading,
+        EmojiSelector,
         HorizontalRule.extend({
           addInputRules() {
             return [
