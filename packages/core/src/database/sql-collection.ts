@@ -375,23 +375,13 @@ export class FilteredSelector<T extends Item> {
 
   async grouped(options: GroupOptions) {
     const count = await this.count();
-    const sortFields = this.sortFields(options, true);
-    const cursorRowValue = sql.join(sortFields.map((f) => sql.ref(f)));
     return new VirtualizedGrouping<T>(
       count,
       this.batchSize,
-      async (start, end, cursor) => {
+      async (start, end) => {
         const items = (await this.filter
           .$call(this.buildSortExpression(options))
-          .$if(!cursor, (qb) => qb.offset(start))
-          .$if(!!cursor, (qb) =>
-            qb.where(
-              (eb) => eb.parens(cursorRowValue),
-              ">",
-              (eb) =>
-                eb.parens(sql.join(sortFields.map((f) => (cursor as any)[f])))
-            )
-          )
+          .offset(start)
           .limit(end - start)
           .selectAll()
           .execute()) as T[];
@@ -424,12 +414,14 @@ export class FilteredSelector<T extends Item> {
         "reminders.snoozeUntil"
       );
     }
-    return groupArray(
-      await this.filter
-        .$call(this.buildSortExpression(options))
-        .select(fields)
-        .execute(),
-      options
+    return Array.from(
+      groupArray(
+        await this.filter
+          .$call(this.buildSortExpression(options))
+          .select(fields)
+          .execute(),
+        options
+      ).values()
     );
   }
 
@@ -489,8 +481,19 @@ export class FilteredSelector<T extends Item> {
         .$if(this.type === "notes" || this.type === "notebooks", (eb) =>
           eb.orderBy("pinned desc")
         )
-        .orderBy(options.sortBy, options.sortDirection)
-        .$if(!!persistent, (eb) => eb.orderBy("id"));
+        .$if(options.sortBy === "title", (eb) =>
+          eb.orderBy(
+            sql`ltrim(${sql.raw(
+              options.sortBy
+            )}, ' \u00a0\r\n\t\v') COLLATE NOCASE ${sql.raw(
+              options.sortDirection
+            )}`
+          )
+        )
+        .$if(options.sortBy !== "title", (eb) =>
+          eb.orderBy(options.sortBy, options.sortDirection)
+        )
+        .$if(!!persistent, (eb) => eb.orderBy("id asc"));
     };
   }
 

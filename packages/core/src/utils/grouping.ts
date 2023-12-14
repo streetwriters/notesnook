@@ -61,7 +61,7 @@ function getKeySelector(
     const date = new Date();
     if (item.type === "reminder")
       return isReminderActive(item as Reminder) ? "Active" : "Inactive";
-    else if (options.sortBy === "title")
+    else if (options.sortBy === "title" && options.groupBy === "abc")
       return getFirstCharacter(getTitle(item));
     else {
       const value = getSortValue(options, item) || 0;
@@ -96,42 +96,28 @@ export function groupArray(
     sortBy: "dateEdited",
     sortDirection: "desc"
   }
-): { index: number; group: GroupHeader }[] {
-  const groups = new Map<string, number>();
-  // [
-  //   ["Conflicted", 0],
-  //   ["Pinned", 1]
-  // ]
+): Map<number, { index: number; group: GroupHeader }> {
+  const groups = new Map<
+    string,
+    [number, { index: number; group: GroupHeader }]
+  >();
 
   const keySelector = getKeySelector(options);
   for (let i = 0; i < items.length; ++i) {
     const item = items[i];
     const groupTitle = keySelector(item);
     const group = groups.get(groupTitle);
-    if (typeof group === "undefined") groups.set(groupTitle, i);
+    if (typeof group === "undefined")
+      groups.set(groupTitle, [
+        i,
+        {
+          index: i,
+          group: { id: groupTitle, title: groupTitle, type: "header" }
+        }
+      ]);
   }
-  const groupIndices: { index: number; group: GroupHeader }[] = [];
-  groups.forEach((index, title) =>
-    groupIndices.push({ index, group: { id: title, title, type: "header" } })
-  );
-  return groupIndices;
-  // return flattenGroups(groups);
+  return new Map(groups.values());
 }
-
-// function flattenGroups<T extends GroupableItem>(groups: Map<string, T[]>) {
-//   const items: GroupedItems<T> = [];
-//   groups.forEach((groupItems, groupTitle) => {
-//     if (groupItems.length <= 0) return;
-//     items.push({
-//       title: groupTitle,
-//       id: groupTitle.toLowerCase(),
-//       type: "header"
-//     });
-//     items.push(...groupItems);
-//   });
-
-//   return items;
-// }
 
 function getFirstCharacter(str: string) {
   if (!str) return "-";
