@@ -306,6 +306,7 @@ export class FilteredSelector<T extends Item> {
   }
 
   async items(ids?: string[], sortOptions?: SortOptions) {
+    if (ids && !ids?.length) return [];
     return (await this.filter
       .$if(!!ids && ids.length > 0, (eb) => eb.where("id", "in", ids!))
       .$if(!!sortOptions, (eb) =>
@@ -318,6 +319,7 @@ export class FilteredSelector<T extends Item> {
   }
 
   async records(ids?: string[], sortOptions?: SortOptions) {
+    if (ids && !ids?.length) return {};
     const results = await this.items(ids, sortOptions);
     const items: Record<string, T> = {};
     for (const item of results) {
