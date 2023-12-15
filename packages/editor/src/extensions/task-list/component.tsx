@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Flex, Input, Text } from "@theme-ui/components";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { ReactNodeViewProps } from "../react";
 import { type TaskListAttributes } from "./task-list";
@@ -32,11 +32,22 @@ export function TaskListComponent(
 ) {
   const { editor, getPos, node, updateAttributes, forwardRef, pos } = props;
   const { title, textDirection, readonly, stats } = node.attrs;
+  const [selectAll, setSelectAll] = useState(false);
 
   const isNested = useMemo(() => {
     if (!pos) return false;
     return editor.state.doc.resolve(pos).parent.type.name === TaskItem.name;
   }, [editor.state.doc, pos]);
+
+  useEffect(() => {
+    let checked = true;
+
+    node?.forEach((_node) => {
+      if (!_node.attrs.checked) checked = false;
+    });
+    if (checked) setSelectAll(true);
+    else setSelectAll(false);
+  }, [node]);
 
   return (
     <>
@@ -96,6 +107,36 @@ export function TaskListComponent(
           />
           {editor.isEditable && (
             <>
+              <ToolButton
+                toggled={false}
+                title={`${selectAll ? "Uncheck" : "Check"} all taskitems`}
+                icon={selectAll ? "selectAllChecked" : "selectAllUnchecked"}
+                variant="small"
+                sx={{
+                  zIndex: 1
+                }}
+                onClick={() => {
+                  const parentPos = getPos();
+                  editor.current?.commands.command(({ tr }) => {
+                    const node = tr.doc.nodeAt(parentPos);
+                    if (!node) return false;
+                    node.forEach((_node, offset) => {
+                      if (selectAll) {
+                        tr.setNodeMarkup(parentPos + offset + 1, null, {
+                          checked: false
+                        });
+                        setSelectAll(false);
+                      } else {
+                        tr.setNodeMarkup(parentPos + offset + 1, null, {
+                          checked: true
+                        });
+                        setSelectAll(true);
+                      }
+                    });
+                    return true;
+                  });
+                }}
+              />
               <ToolButton
                 toggled={false}
                 title="Make tasklist readonly"
