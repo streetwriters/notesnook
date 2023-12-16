@@ -26,7 +26,7 @@ import { ColoredNotes } from "../../screens/notes/colored";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useNoteStore } from "../../stores/use-notes-store";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { SIZE, normalize } from "../../utils/size";
 import { presentDialog } from "../dialog/functions";
 import { PressableButton } from "../ui/pressable";
@@ -35,8 +35,11 @@ import Paragraph from "../ui/typography/paragraph";
 
 export const ColorSection = React.memo(
   function ColorSection() {
-    const colorNotes = useMenuStore((state) => state.colorNotes);
-    const loading = useNoteStore((state) => state.loading);
+    const [colorNotes, loadingColors] = useMenuStore((state) => [
+      state.colorNotes,
+      state.loadingColors
+    ]);
+    const loading = useSettingStore((state) => state.isAppLoading);
     const setColorNotes = useMenuStore((state) => state.setColorNotes);
 
     useEffect(() => {
@@ -45,9 +48,11 @@ export const ColorSection = React.memo(
       }
     }, [loading, setColorNotes]);
 
-    return colorNotes.map((item) => {
-      return <ColorItem key={item.id} item={item} />;
-    });
+    return !loadingColors
+      ? colorNotes.map((item) => {
+          return <ColorItem key={item.id} item={item} />;
+        })
+      : null;
   },
   () => true
 );

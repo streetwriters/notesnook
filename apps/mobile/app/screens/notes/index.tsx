@@ -38,7 +38,7 @@ import useNavigationStore, {
 } from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
 import { setOnFirstSave } from "./common";
-import { resolveItems } from "../../components/list/list-item.wrapper";
+import { resolveItems } from "../../stores/resolve-items";
 export const WARNING_DATA = {
   title: "Some notes in this topic are not synced"
 };
@@ -75,7 +75,6 @@ const NotesPage = ({
 >) => {
   const params = useRef<NotesScreenParams>(route?.params);
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
-  const loading = useNoteStore((state) => state.loading);
   const [loadingNotes, setLoadingNotes] = useState(true);
   const isMonograph = route.name === "Monographs";
   const title =
@@ -140,7 +139,7 @@ const NotesPage = ({
   );
 
   useEffect(() => {
-    if (loadingNotes && !loading) {
+    if (loadingNotes) {
       get(params.current, true)
         .then(async (items) => {
           setNotes(items as VirtualizedGrouping<Note>);
@@ -152,7 +151,7 @@ const NotesPage = ({
           setLoadingNotes(false);
         });
     }
-  }, [loadingNotes, loading, get]);
+  }, [loadingNotes, get]);
 
   useEffect(() => {
     eSubscribeEvent(route.name, onRequestUpdate);
@@ -186,12 +185,12 @@ const NotesPage = ({
         headerRightButtons={rightButtons?.(params?.current)}
       />
 
-      <DelayLayout color={accentColor} wait={loading || loadingNotes}>
+      <DelayLayout color={accentColor} wait={loadingNotes}>
         <List
           data={notes}
           dataType="note"
           onRefresh={onRequestUpdate}
-          loading={loading || !isFocused}
+          loading={!isFocused}
           renderedInRoute={route.name}
           id={params.current.item?.id}
           headerTitle={title}
