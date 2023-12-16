@@ -180,11 +180,9 @@ export const NotebookSheet = () => {
 
   useEffect(() => {
     if (canShow) {
-      setTimeout(async () => {
+      setImmediate(async () => {
         if (!focusedRouteId) return;
         const nextRoot = await findRootNotebookId(focusedRouteId);
-        setRoot(nextRoot);
-
         if (nextRoot !== currentItem.current) {
           console.log(
             "NotebookSheet.useEffect.canShow",
@@ -206,8 +204,9 @@ export const NotebookSheet = () => {
           ref.current?.show(snapPoint);
         }
         console.log("NotebookSheet.useEffect.canShow", focusedRouteId);
+        setRoot(nextRoot);
         onRequestUpdate();
-      }, 0);
+      });
     } else {
       setSelection([]);
       setEnabled(false);
@@ -305,28 +304,48 @@ export const NotebookSheet = () => {
             }}
           >
             {enabled ? (
-              <IconButton
-                customStyle={{
-                  marginLeft: 10,
-                  width: 40 * fontScale,
-                  height: 40 * fontScale
-                }}
-                onPress={async () => {
-                  await deleteItems(
-                    selection.map((notebook) => notebook.id),
-                    "notebook"
-                  );
-                  useSelectionStore.getState().clearSelection();
-                  setEnabled(false);
-                  setSelection([]);
-                  return;
-                }}
-                color={colors.primary.icon}
-                tooltipText="Move to trash"
-                tooltipPosition={1}
-                name="delete"
-                size={22}
-              />
+              <>
+                <IconButton
+                  customStyle={{
+                    marginLeft: 10,
+                    width: 40 * fontScale,
+                    height: 40 * fontScale
+                  }}
+                  onPress={async () => {
+                    await deleteItems(
+                      selection.map((notebook) => notebook.id),
+                      "notebook"
+                    );
+                    useSelectionStore.getState().clearSelection();
+                    setEnabled(false);
+                    setSelection([]);
+                    return;
+                  }}
+                  color={colors.primary.icon}
+                  tooltipText="Move to trash"
+                  tooltipPosition={1}
+                  name="delete"
+                  size={22}
+                />
+
+                <IconButton
+                  customStyle={{
+                    marginLeft: 10,
+                    width: 40 * fontScale,
+                    height: 40 * fontScale
+                  }}
+                  onPress={() => {
+                    useSelectionStore.getState().clearSelection();
+                    setEnabled(false);
+                    setSelection([]);
+                  }}
+                  color={colors.primary.icon}
+                  tooltipText="Clear selection"
+                  tooltipPosition={1}
+                  name="close"
+                  size={22}
+                />
+              </>
             ) : (
               <>
                 <IconButton
@@ -479,8 +498,7 @@ const NotebookItem = ({
           width: "100%",
           alignItems: "center",
           flexDirection: "row",
-          paddingLeft: 0,
-          paddingRight: 12,
+          paddingHorizontal: 12,
           borderRadius: 0
         }}
       >
@@ -490,26 +508,6 @@ const NotebookItem = ({
             alignItems: "center"
           }}
         >
-          {selection.enabled ? (
-            <IconButton
-              size={SIZE.lg}
-              color={isSelected ? colors.selected.icon : colors.primary.icon}
-              top={0}
-              left={0}
-              bottom={0}
-              right={0}
-              customStyle={{
-                width: 40,
-                height: 40
-              }}
-              name={
-                isSelected
-                  ? "check-circle-outline"
-                  : "checkbox-blank-circle-outline"
-              }
-            />
-          ) : null}
-
           {nestedNotebooks?.ids.length ? (
             <IconButton
               size={SIZE.lg}
@@ -523,23 +521,40 @@ const NotebookItem = ({
               bottom={0}
               right={0}
               customStyle={{
-                width: 40,
-                height: 40
+                width: 35,
+                height: 35
               }}
               name={expanded ? "chevron-down" : "chevron-right"}
             />
           ) : (
-            <>
-              {selection?.enabled ? null : (
-                <View
-                  style={{
-                    width: 40,
-                    height: 40
-                  }}
-                />
-              )}
-            </>
+            <View
+              style={{
+                width: 35,
+                height: 35
+              }}
+            />
           )}
+
+          {selection.enabled ? (
+            <IconButton
+              size={SIZE.lg}
+              color={isSelected ? colors.selected.icon : colors.primary.icon}
+              top={0}
+              left={0}
+              bottom={0}
+              right={0}
+              customStyle={{
+                width: 35,
+                height: 35,
+                marginRight: 5
+              }}
+              name={
+                isSelected
+                  ? "check-circle-outline"
+                  : "checkbox-blank-circle-outline"
+              }
+            />
+          ) : null}
 
           <Paragraph
             color={
