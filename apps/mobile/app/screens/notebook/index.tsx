@@ -39,11 +39,23 @@ import { eUpdateNotebookRoute } from "../../utils/events";
 import { findRootNotebookId } from "../../utils/notebooks";
 import { openEditor, setOnFirstSave } from "../notes/common";
 import SelectionHeader from "../../components/selection-header";
+import { resolveItems } from "../../components/list/list-item.wrapper";
+import Paragraph from "../../components/ui/typography/paragraph";
+import { View } from "react-native";
+import { SIZE } from "../../utils/size";
+import { IconButton } from "../../components/ui/icon-button";
+import { PressableButton } from "../../components/ui/pressable";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
   const params = useRef<NotebookScreenParams>(route?.params);
   const [loading, setLoading] = useState(true);
+  const [breadcrumbs, setBreadcrumbs] = useState<
+    {
+      id: string;
+      title: string;
+    }[]
+  >([]);
 
   useNavigationFocus(navigation, {
     onFocus: () => {
@@ -89,13 +101,16 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
         const notebook = await db.notebooks?.notebook(
           params?.current?.item?.id
         );
+
         if (notebook) {
+          const breadcrumbs = await db.notebooks.breadcrumbs(notebook.id);
+          setBreadcrumbs(breadcrumbs);
           params.current.item = notebook;
-          setNotes(
-            await db.relations
-              .from(notebook, "note")
-              .selector.grouped(db.settings.getGroupOptions("notes"))
-          );
+          const notes = await db.relations
+            .from(notebook, "note")
+            .selector.grouped(db.settings.getGroupOptions("notes"));
+          setNotes(notes);
+          await notes.item(0, resolveItems);
           syncWithNavigation();
         }
         setLoading(false);
@@ -146,13 +161,66 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
         id={params.current.item?.id}
         onPressDefaultRightButton={openEditor}
       />
-      <DelayLayout>
+
+      {breadcrumbs ? (
+        <View
+          style={{
+            width: "100%",
+            paddingHorizontal: 12,
+            flexDirection: "row",
+            alignItems: "center",
+            flexWrap: "wrap"
+          }}
+        >
+          <IconButton
+            name="notebook-outline"
+            size={16}
+            customStyle={{ width: 20, height: 25 }}
+            onPress={() => {
+              Navigation.push("Notebooks", {
+                canGoBack: true
+              });
+            }}
+          />
+
+          {breadcrumbs.map((item) => (
+            <PressableButton
+              onPress={async () => {
+                const notebook = await db.notebooks.notebook(item.id);
+                if (!notebook) return;
+                NotebookScreen.navigate(notebook, true);
+              }}
+              key={item.id}
+              customStyle={{
+                width: undefined,
+                flexDirection: "row",
+                paddingHorizontal: 0,
+                alignItems: "center"
+              }}
+            >
+              <IconButton
+                name="chevron-right"
+                size={16}
+                top={0}
+                left={0}
+                right={0}
+                bottom={0}
+                customStyle={{ width: 20, height: 25 }}
+              />
+              <Paragraph size={SIZE.xs + 1}>{item.title}</Paragraph>
+            </PressableButton>
+          ))}
+        </View>
+      ) : null}
+
+      <DelayLayout wait={loading}>
         <List
           data={notes}
           dataType="note"
           onRefresh={() => {
             onRequestUpdate();
           }}
+          id={params.current.item?.id}
           renderedInRoute="Notebook"
           headerTitle={params.current.title}
           loading={loading}

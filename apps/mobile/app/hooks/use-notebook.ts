@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Notebook, VirtualizedGrouping } from "@notesnook/core";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { db } from "../common/database";
 import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
 import { eGroupOptionsUpdated, eOnNotebookUpdated } from "../utils/events";
@@ -29,9 +29,7 @@ export const useNotebook = (
   nestedNotebooks?: boolean
 ) => {
   const [item, refresh] = useDBItem(id, "notebook", items);
-  const [groupOptions, setGroupOptions] = useState(
-    db.settings.getGroupOptions("notebooks")
-  );
+  const groupOptions = db.settings.getGroupOptions("notebooks");
   const [notebooks, setNotebooks] = useState<VirtualizedGrouping<Notebook>>();
   const { totalNotes: nestedNotebookNotesCount, getTotalNotes } =
     useTotalNotes("notebook");
@@ -66,16 +64,6 @@ export const useNotebook = (
     }
   }, [item?.id, onRequestUpdate, nestedNotebooks]);
 
-  const onUpdate = useCallback(
-    (type: string) => {
-      if (type !== "notebooks") return;
-      setGroupOptions({ ...(db.settings.getGroupOptions("notebooks") as any) });
-      onRequestUpdate();
-      console.log("useNotebook.onUpdate", id, Date.now());
-    },
-    [id, onRequestUpdate]
-  );
-
   useEffect(() => {
     const onNotebookUpdate = (id?: string) => {
       if (typeof id === "string" && id !== id) return;
@@ -87,13 +75,20 @@ export const useNotebook = (
       });
     };
 
+    const onUpdate = (type: string) => {
+      console.log("event", type);
+      if (type !== "notebooks") return;
+      onRequestUpdate();
+      console.log("useNotebook.onUpdate", item?.id, Date.now());
+    };
+
     eSubscribeEvent(eGroupOptionsUpdated, onUpdate);
     eSubscribeEvent(eOnNotebookUpdated, onNotebookUpdate);
     return () => {
       eUnSubscribeEvent(eGroupOptionsUpdated, onUpdate);
       eUnSubscribeEvent(eOnNotebookUpdated, onNotebookUpdate);
     };
-  }, [onUpdate, onRequestUpdate, id, refresh, nestedNotebooks]);
+  }, [onRequestUpdate, item?.id, refresh, nestedNotebooks]);
 
   return {
     notebook: item,
