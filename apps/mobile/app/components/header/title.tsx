@@ -49,6 +49,8 @@ export const Title = ({
   const isTag = title.startsWith("#");
   const onScroll = useCallback(
     (data: { x: number; y: number; id?: string; route: string }) => {
+      if (data.route !== "Notebook") return;
+
       if (data.route !== renderedInRoute || data.id !== id) return;
       if (data.y > 150) {
         if (!visible) return;
