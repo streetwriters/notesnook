@@ -21,21 +21,18 @@ import React from "react";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import List from "../../components/list";
+import SelectionHeader from "../../components/selection-header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
-import { useFavoriteStore } from "../../stores/use-favorite-store";
+import { useFavorites } from "../../stores/use-favorite-store";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useNoteStore } from "../../stores/use-notes-store";
-import SelectionHeader from "../../components/selection-header";
 
 export const Favorites = ({
   navigation,
   route
 }: NavigationProps<"Favorites">) => {
-  const favorites = useFavoriteStore((state) => state.favorites);
-  const setFavorites = useFavoriteStore((state) => state.setFavorites);
-  const loading = useNoteStore((state) => state.loading);
+  const [favorites, loading, refresh] = useFavorites();
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       Navigation.routeNeedsUpdate(
@@ -43,7 +40,7 @@ export const Favorites = ({
         Navigation.routeUpdateFunctions[route.name]
       );
       useNavigationStore.getState().setFocusedRouteId(route?.name);
-      return !prev?.current;
+      return false;
     },
     onBlur: () => false,
     delay: SettingsService.get().homepage === route.name ? 1 : -1
@@ -75,10 +72,10 @@ export const Favorites = ({
           data={favorites}
           dataType="note"
           onRefresh={() => {
-            setFavorites();
+            refresh();
           }}
           renderedInRoute="Favorites"
-          loading={loading || !isFocused}
+          loading={loading}
           placeholder={{
             title: "Your favorites",
             paragraph: "You have not added any notes to favorites yet.",

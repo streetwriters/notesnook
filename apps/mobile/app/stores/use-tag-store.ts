@@ -17,24 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import create, { State } from "zustand";
 import { db } from "../common/database";
-import { Tag, VirtualizedGrouping } from "@notesnook/core";
+import createDBCollectionStore from "./create-db-collection-store";
 
-export interface TagStore extends State {
-  tags: VirtualizedGrouping<Tag> | undefined;
-  setTags: (items?: Tag[]) => void;
-  clearTags: () => void;
-}
+const { useStore: useTagStore, useCollection: useTags } =
+  createDBCollectionStore({
+    getCollection: () =>
+      db.tags.all.grouped(db.settings.getGroupOptions("tags")),
+    eagerlyFetchFirstBatch: true
+  });
 
-export const useTagStore = create<TagStore>((set) => ({
-  tags: undefined,
-  setTags: () => {
-    db.tags.all.grouped(db.settings.getGroupOptions("tags")).then((tags) => {
-      set({
-        tags: tags
-      });
-    });
-  },
-  clearTags: () => set({ tags: undefined })
-}));
+export { useTagStore, useTags };

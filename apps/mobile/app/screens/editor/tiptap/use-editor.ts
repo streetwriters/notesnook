@@ -48,7 +48,7 @@ import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
 import { TipManager } from "../../../services/tip-manager";
 import { useEditorStore } from "../../../stores/use-editor-store";
-import { useNoteStore } from "../../../stores/use-notes-store";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { eClearEditor, eOnLoadNote } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
@@ -90,7 +90,7 @@ export const useEditor = (
   const sessionHistoryId = useRef<number>();
   const state = useRef<Partial<EditorState>>(defaultState);
   const placeholderTip = useRef(TipManager.placeholderTip());
-  const tags = useTagStore((state) => state.tags);
+  const tags = useTagStore((state) => state.items);
   const insets = useGlobalSafeAreaInsets();
   const isDefaultEditor = editorId === "";
   const saveCount = useRef(0);
@@ -585,9 +585,9 @@ export const useEditor = (
       tabBarRef.current?.goToPage(1, false);
     }
     if (appState.note) {
-      if (useNoteStore.getState().loading) {
-        const remove = useNoteStore.subscribe((state) => {
-          if (!state.loading && appState.note) {
+      if (useSettingStore.getState().isAppLoading) {
+        const remove = useSettingStore.subscribe((state) => {
+          if (!state.isAppLoading && appState.note) {
             loadNote({
               item: appState.note
             });
