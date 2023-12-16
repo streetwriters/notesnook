@@ -27,20 +27,25 @@ export interface MenuStore extends State {
   setMenuPins: () => void;
   setColorNotes: () => void;
   clearAll: () => void;
+  loadingShortcuts: boolean;
+  loadingColors: boolean;
 }
 
 export const useMenuStore = create<MenuStore>((set) => ({
   menuPins: [],
   colorNotes: [],
+  loadingShortcuts: true,
+  loadingColors: true,
   setMenuPins: () => {
     db.shortcuts.resolved().then((shortcuts) => {
-      set({ menuPins: [...(shortcuts as [])] });
+      set({ menuPins: [...(shortcuts as [])], loadingShortcuts: false });
     });
   },
   setColorNotes: () => {
     db.colors?.all.items().then((colors) => {
       set({
-        colorNotes: colors
+        colorNotes: colors,
+        loadingColors: false
       });
     });
   },

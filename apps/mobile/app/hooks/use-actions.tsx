@@ -192,7 +192,7 @@ export const useActions = ({
         });
 
         InteractionManager.runAfterInteractions(() => {
-          useTagStore.getState().setTags();
+          useTagStore.getState().refresh();
           useMenuStore.getState().setMenuPins();
           Navigation.queueRoutesForUpdate();
           useRelationStore.getState().update();
@@ -223,7 +223,7 @@ export const useActions = ({
             await db.tags.remove(item.id);
           }
           setImmediate(() => {
-            useTagStore.getState().setTags();
+            useTagStore.getState().refresh();
             Navigation.queueRoutesForUpdate();
             useRelationStore.getState().update();
           });

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback } from "react";
 import { FlatList, View } from "react-native";
 import { notesnook } from "../../../e2e/test.ids";
@@ -24,18 +25,16 @@ import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
-import { useNoteStore } from "../../stores/use-notes-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { MenuItemsList } from "../../utils/menu-items";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
+import { MenuItemsList } from "../../utils/menu-items";
 import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { TagsSection } from "./pinned-section";
 import { UserStatus } from "./user-status";
-import { useThemeStore } from "../../stores/use-theme-store";
 
 export const SideMenu = React.memo(
   function SideMenu() {
@@ -44,7 +43,8 @@ export const SideMenu = React.memo(
     const subscriptionType = useUserStore(
       (state) => state.user?.subscription?.type
     );
-    const loading = useNoteStore((state) => state.loading);
+    const isAppLoading = useSettingStore((state) => state.isAppLoading);
+
     const introCompleted = useSettingStore(
       (state) => state.settings.introCompleted
     );
@@ -96,7 +96,7 @@ export const SideMenu = React.memo(
       [noTextMode]
     );
 
-    return !loading && introCompleted ? (
+    return !isAppLoading && introCompleted ? (
       <View
         style={{
           height: "100%",
