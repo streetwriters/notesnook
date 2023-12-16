@@ -42,7 +42,7 @@ import {
   showEditTopicDialog,
   showCreateTopicDialog
 } from "../common/dialog-controller";
-import { hashNavigate } from ".";
+import { hashNavigate, makeURL } from ".";
 import Editor from "../components/editor";
 import { defineRoutes } from "./types";
 
@@ -150,5 +150,6 @@ export default hashroutes;
 export type HashRoute = keyof typeof hashroutes;
 
 function afterAction() {
-  window.location.hash = "";
+  hashNavigate("/", { replace: true, notify: false });
+  history.back();
 }
