@@ -155,10 +155,10 @@ const NoteItem = ({
           <Paragraph
             numberOfLines={1}
             color={color?.colorCode || primaryColors.heading}
-            style={{
-              flexWrap: "wrap"
-            }}
             size={SIZE.sm}
+            style={{
+              paddingRight: 10
+            }}
           >
             {item.title}
           </Paragraph>
@@ -166,10 +166,10 @@ const NoteItem = ({
           <Heading
             numberOfLines={1}
             color={color?.colorCode || primaryColors.heading}
-            style={{
-              flexWrap: "wrap"
-            }}
             size={SIZE.md}
+            style={{
+              paddingRight: 10
+            }}
           >
             {item.title}
           </Heading>
