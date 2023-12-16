@@ -52,6 +52,7 @@ type ListProps = {
   isRenderedInActionSheet?: boolean;
   CustomListComponent?: React.JSX.ElementType;
   placeholder?: PlaceholderData;
+  id?: string;
 };
 
 export default function List(props: ListProps) {
@@ -116,16 +117,18 @@ export default function List(props: ListProps) {
       if (!event) return;
       eSendEvent(eScrollEvent, {
         y: event.nativeEvent.contentOffset.y,
-        screen: props.renderedInRoute
+        route: props.renderedInRoute,
+        id: props.id || props.renderedInRoute
       });
     },
-    [props.renderedInRoute]
+    [props.renderedInRoute, props.id]
   );
 
   useEffect(() => {
     eSendEvent(eScrollEvent, {
       y: 0,
-      screen: props.renderedInRoute
+      route: props.renderedInRoute,
+      id: props.id || props.renderedInRoute
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -159,7 +162,10 @@ export default function List(props: ListProps) {
           onMomentumScrollEnd={() => {
             tabBarRef.current?.unlock();
           }}
-          estimatedItemSize={isCompactModeEnabled ? 60 : 100}
+          getItemType={(item: number, index: number) => {
+            return props.data?.type(index);
+          }}
+          estimatedItemSize={isCompactModeEnabled ? 60 : 120}
           directionalLockEnabled={true}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="interactive"

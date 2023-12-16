@@ -156,6 +156,7 @@ export const NoteWrapper = React.memo<
     if (prev.item?.dateModified !== next.item?.dateModified) {
       return false;
     }
+    if (prev.item?.id !== next.item?.id) return false;
 
     return true;
   }

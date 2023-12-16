@@ -33,10 +33,9 @@ import Paragraph from "../ui/typography/paragraph";
 export const MenuItem = React.memo(
   function MenuItem({ item, index, testID, rightBtn }) {
     const { colors } = useThemeColors();
-    const [headerTextState, setHeaderTextState] = useState(
-      useNavigationStore.getState().focusedRouteId
+    const isFocused = useNavigationStore(
+      (state) => state.focusedRouteId === item.name
     );
-    let isFocused = headerTextState?.id === item.name;
     const primaryColors = isFocused ? colors.selected : colors.primary;
 
     const _onPress = () => {
@@ -56,29 +55,6 @@ export const MenuItem = React.memo(
         });
       }
     };
-
-    const onHeaderStateChange = useCallback(
-      (state) => {
-        setTimeout(() => {
-          let id = state.focusedRouteId;
-          if (id === item.name) {
-            setHeaderTextState({ id: state.focusedRouteId });
-          } else {
-            if (headerTextState !== null) {
-              setHeaderTextState(null);
-            }
-          }
-        }, 300);
-      },
-      [headerTextState, item.name]
-    );
-
-    useEffect(() => {
-      let unsub = useNavigationStore.subscribe(onHeaderStateChange);
-      return () => {
-        unsub();
-      };
-    }, [headerTextState, onHeaderStateChange]);
 
     return (
       <PressableButton

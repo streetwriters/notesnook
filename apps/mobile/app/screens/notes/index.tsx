@@ -38,6 +38,7 @@ import useNavigationStore, {
 } from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
 import { setOnFirstSave } from "./common";
+import { resolveItems } from "../../components/list/list-item.wrapper";
 export const WARNING_DATA = {
   title: "Some notes in this topic are not synced"
 };
@@ -119,7 +120,6 @@ const NotesPage = ({
     async (data?: NotesScreenParams) => {
       const isNew = data && data?.item?.id !== params.current?.item?.id;
       if (data) params.current = data;
-      const { item } = params.current;
       try {
         if (isNew) setLoadingNotes(true);
         const notes = (await get(
@@ -127,14 +127,10 @@ const NotesPage = ({
           true
         )) as VirtualizedGrouping<Note>;
 
-        if (
-          (item.type === "tag" || item.type === "color") &&
-          (!notes || notes.ids.length === 0)
-        ) {
-          return Navigation.goBack();
-        }
         if (notes.ids.length === 0) setLoadingNotes(false);
         setNotes(notes);
+        await notes.item(0, resolveItems);
+        setLoadingNotes(false);
         syncWithNavigation();
       } catch (e) {
         console.error(e);
@@ -146,8 +142,9 @@ const NotesPage = ({
   useEffect(() => {
     if (loadingNotes && !loading) {
       get(params.current, true)
-        .then((items) => {
+        .then(async (items) => {
           setNotes(items as VirtualizedGrouping<Note>);
+          await (items as VirtualizedGrouping<Note>).item(0, resolveItems);
           setLoadingNotes(false);
         })
         .catch((e) => {
@@ -196,6 +193,7 @@ const NotesPage = ({
           onRefresh={onRequestUpdate}
           loading={loading || !isFocused}
           renderedInRoute={route.name}
+          id={params.current.item?.id}
           headerTitle={title}
           customAccentColor={accentColor}
           placeholder={placeholder}

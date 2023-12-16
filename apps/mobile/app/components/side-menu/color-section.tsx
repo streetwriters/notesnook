@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Color } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import { ColoredNotes } from "../../screens/notes/colored";
@@ -31,7 +32,6 @@ import { presentDialog } from "../dialog/functions";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { Color } from "@notesnook/core";
 
 export const ColorSection = React.memo(
   function ColorSection() {
@@ -56,35 +56,9 @@ const ColorItem = React.memo(
   function ColorItem({ item }: { item: Color }) {
     const { colors, isDark } = useThemeColors();
     const setColorNotes = useMenuStore((state) => state.setColorNotes);
-    const [headerTextState, setHeaderTextState] = useState<{
-      id: string | undefined;
-    }>({
-      id: undefined
-    });
-    const isFocused = headerTextState?.id === item.id;
-
-    const onHeaderStateChange = useCallback(
-      (state: any) => {
-        setTimeout(() => {
-          let id = state.focusedRouteId;
-          if (id === item.id) {
-            setHeaderTextState({ id: state.currentScreen.id });
-          } else {
-            if (headerTextState !== null) {
-              setHeaderTextState({ id: undefined });
-            }
-          }
-        }, 300);
-      },
-      [headerTextState, item.id]
+    const isFocused = useNavigationStore(
+      (state) => state.focusedRouteId === item.id
     );
-
-    useEffect(() => {
-      const remove = useNavigationStore.subscribe(onHeaderStateChange);
-      return () => {
-        remove();
-      };
-    }, [headerTextState, onHeaderStateChange]);
 
     const onPress = (item: Color) => {
       ColoredNotes.navigate(item, false);

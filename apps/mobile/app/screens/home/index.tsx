@@ -65,7 +65,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
         id={route.name}
         onPressDefaultRightButton={openEditor}
       />
-      <DelayLayout wait={loading} delay={500}>
+      <DelayLayout wait={loading}>
         <List
           data={notes}
           dataType="note"

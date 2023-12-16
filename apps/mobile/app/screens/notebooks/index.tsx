@@ -83,7 +83,7 @@ export const Notebooks = ({
         }}
         onPressDefaultRightButton={onButtonPress}
       />
-      <DelayLayout delay={1}>
+      <DelayLayout>
         <List
           data={notebooks}
           dataType="notebook"

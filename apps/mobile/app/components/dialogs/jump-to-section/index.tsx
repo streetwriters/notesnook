@@ -26,7 +26,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import { FlatList, ScrollView, View } from "react-native";
+import { ActivityIndicator, FlatList, ScrollView, View } from "react-native";
 import { DDS } from "../../../services/device-detection";
 import {
   eSubscribeEvent,
@@ -52,6 +52,8 @@ const JumpToSectionDialog = () => {
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentScrollPosition = useRef(0);
+  const [loading, setLoading] = useState(false);
+
   const [groups, setGroups] = useState<
     {
       index: number;
@@ -76,6 +78,7 @@ const JumpToSectionDialog = () => {
       data: VirtualizedGrouping<Item>;
       ref: RefObject<FlatList>;
     }) => {
+      setLoading(true);
       setData(data);
       scrollRef.current = ref;
       setVisible(true);
@@ -127,6 +130,7 @@ const JumpToSectionDialog = () => {
       });
 
       setCurrentIndex(index < 0 ? 0 : index);
+      setLoading(false);
     });
   }, [notes]);
 
@@ -152,54 +156,64 @@ const JumpToSectionDialog = () => {
           paddingTop: 30
         }}
       >
-        <ScrollView
-          style={{
-            maxHeight: "100%"
-          }}
-        >
-          <View
+        {loading ? (
+          <ActivityIndicator
+            size={SIZE.lg}
+            color={colors.primary.accent}
             style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              alignSelf: "center",
-              justifyContent: "center",
-              paddingBottom: 20
+              marginBottom: 20
+            }}
+          />
+        ) : (
+          <ScrollView
+            style={{
+              maxHeight: "100%"
             }}
           >
-            {groups?.map((item, index) => {
-              return (
-                <PressableButton
-                  key={item.group.id}
-                  onPress={() => onPress(item)}
-                  type={currentIndex === index ? "selected" : "transparent"}
-                  customStyle={{
-                    minWidth: "20%",
-                    width: null,
-                    paddingHorizontal: 12,
-                    margin: 5,
-                    borderRadius: 100,
-                    height: 25,
-                    marginVertical: 10
-                  }}
-                >
-                  <Paragraph
-                    size={SIZE.sm}
-                    color={
-                      currentIndex === index
-                        ? colors.selected.accent
-                        : colors.primary.accent
-                    }
-                    style={{
-                      textAlign: "center"
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                alignSelf: "center",
+                justifyContent: "center",
+                paddingBottom: 20
+              }}
+            >
+              {groups?.map((item, index) => {
+                return (
+                  <PressableButton
+                    key={item.group.id}
+                    onPress={() => onPress(item)}
+                    type={currentIndex === index ? "accent" : "transparent"}
+                    customStyle={{
+                      minWidth: "20%",
+                      width: null,
+                      paddingHorizontal: 12,
+                      margin: 5,
+                      borderRadius: 100,
+                      height: 30,
+                      marginVertical: 10
                     }}
                   >
-                    {item.group.title}
-                  </Paragraph>
-                </PressableButton>
-              );
-            })}
-          </View>
-        </ScrollView>
+                    <Paragraph
+                      size={SIZE.sm}
+                      color={
+                        currentIndex === index
+                          ? colors.static.white
+                          : colors.primary.paragraph
+                      }
+                      style={{
+                        textAlign: "center"
+                      }}
+                    >
+                      {item.group.title}
+                    </Paragraph>
+                  </PressableButton>
+                );
+              })}
+            </View>
+          </ScrollView>
+        )}
       </View>
     </BaseDialog>
   );

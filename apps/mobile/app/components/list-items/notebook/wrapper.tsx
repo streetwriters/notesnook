@@ -103,6 +103,7 @@ export const NotebookWrapper = React.memo(
     if (prev.totalNotes !== next.totalNotes) return false;
     if (prev.date !== next.date) return false;
     if (prev.item?.dateModified !== next.item?.dateModified) return false;
+    if (prev.item?.id !== next.item?.id) return false;
 
     return true;
   }

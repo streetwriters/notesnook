@@ -31,7 +31,7 @@ import {
   VirtualizedGrouping
 } from "@notesnook/core";
 import { getSortValue } from "@notesnook/core/dist/utils/grouping";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import { eSendEvent } from "../../services/event-manager";
@@ -70,34 +70,79 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
   const attachmentsCount = useRef(0);
   const [groupHeader, setGroupHeader] = useState<GroupHeader>();
   const previousIndex = useRef<number>();
+  const refreshTimeout = useRef<NodeJS.Timeout>();
+  const currentItemId = useRef<string>();
+
+  const refreshItem = useCallback((resolvedItem: any) => {
+    if (!resolvedItem || !resolvedItem.data) {
+      tags.current = undefined;
+      notebooks.current = undefined;
+      reminder.current = undefined;
+      color.current = undefined;
+      attachmentsCount.current = 0;
+      totalNotes.current = 0;
+    }
+
+    if (resolvedItem && resolvedItem.item) {
+      const data = resolvedItem.data;
+      if (resolvedItem.item.type === "note" && isNoteResolvedData(data)) {
+        tags.current = data.tags;
+        notebooks.current = data.notebooks;
+        reminder.current = data.reminder;
+        color.current = data.color;
+        attachmentsCount.current = data.attachmentsCount || 0;
+      } else if (
+        resolvedItem.item.type === "notebook" &&
+        typeof data === "number"
+      ) {
+        totalNotes.current = data;
+      } else if (resolvedItem.item.type === "tag" && typeof data === "number") {
+        totalNotes.current = data;
+      }
+      currentItemId.current = resolvedItem.item.id;
+      setItem(resolvedItem.item);
+      setGroupHeader(resolvedItem.group);
+    }
+  }, []);
+
+  if (previousIndex.current !== index) {
+    previousIndex.current = index;
+    const resolvedItem = items?.cacheItem(index);
+    refreshItem(resolvedItem);
+  }
 
   useEffect(() => {
     (async function () {
       try {
-        const { item, data, group } =
-          (await items?.item(index, resolveItems)) || {};
-        if (!item) return;
-        if (item.type === "note" && isNoteResolvedData(data)) {
-          tags.current = data.tags;
-          notebooks.current = data.notebooks;
-          reminder.current = data.reminder;
-          color.current = data.color;
-          attachmentsCount.current = data.attachmentsCount;
-        } else if (item.type === "notebook" && typeof data === "number") {
-          totalNotes.current = data;
-        } else if (item.type === "tag" && typeof data === "number") {
-          totalNotes.current = data;
-        }
-        previousIndex.current = index;
-        setItem(item);
-        setGroupHeader(group);
+        clearTimeout(refreshTimeout.current);
+        const idx = index;
+        refreshTimeout.current = setTimeout(async () => {
+          if (idx !== previousIndex.current) {
+            return;
+          }
+          const resolvedItem = await items?.item(idx, resolveItems);
+          if (idx !== previousIndex.current) {
+            console.log("cancel", idx, previousIndex.current);
+            return;
+          }
+
+          refreshItem(resolvedItem);
+        }, 100);
       } catch (e) {
         console.log("Error", e);
       }
     })();
-  }, [index, items]);
+  }, [index, items, refreshItem]);
 
-  if (!item) return <View style={{ height: 100, width: "100%" }} />;
+  if (!item)
+    return (
+      <View
+        style={{
+          height: 120,
+          width: "100%"
+        }}
+      />
+    );
 
   const type = ((item as TrashItem).itemType || item.type) as ItemType;
   switch (type) {
@@ -220,30 +265,6 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
   }
 }
 
-function withDateEdited<
-  T extends { dateEdited: number } | { dateModified: number }
->(items: T[]): WithDateEdited<T> {
-  let latestDateEdited = 0;
-  items.forEach((item) => {
-    const date = "dateEdited" in item ? item.dateEdited : item.dateModified;
-    if (latestDateEdited < date) latestDateEdited = date;
-  });
-  return { dateEdited: latestDateEdited, items };
-}
-
-export async function resolveItems(ids: string[], items: Item[]) {
-  const { type } = items[0];
-  if (type === "note") return resolveNotes(ids);
-  else if (type === "notebook") {
-    return Promise.all(ids.map((id) => db.notebooks.totalNotes(id)));
-  } else if (type === "tag") {
-    return Promise.all(
-      ids.map((id) => db.relations.from({ id, type: "tag" }, "note").count())
-    );
-  }
-  return [];
-}
-
 function getDate(item: Item, groupType?: GroupingKey): number {
   return (
     getSortValue(
@@ -259,12 +280,38 @@ function getDate(item: Item, groupType?: GroupingKey): number {
   );
 }
 
+function withDateEdited<
+  T extends { dateEdited: number } | { dateModified: number }
+>(items: T[]): WithDateEdited<T> {
+  let latestDateEdited = 0;
+  items.forEach((item) => {
+    const date = "dateEdited" in item ? item.dateEdited : item.dateModified;
+    if (latestDateEdited < date) latestDateEdited = date;
+  });
+  return { dateEdited: latestDateEdited, items };
+}
+
+export async function resolveItems(ids: string[], items: Item[]) {
+  if (!ids.length || !items.length) return [];
+
+  const { type } = items[0];
+  if (type === "note") return resolveNotes(ids);
+  else if (type === "notebook") {
+    return Promise.all(ids.map((id) => db.notebooks.totalNotes(id)));
+  } else if (type === "tag") {
+    return Promise.all(
+      ids.map((id) => db.relations.from({ id, type: "tag" }, "note").count())
+    );
+  }
+  return [];
+}
+
 type NoteResolvedData = {
   notebooks?: NotebooksWithDateEdited;
   reminder?: Reminder;
   color?: Color;
   tags?: TagsWithDateEdited;
-  attachmentsCount: number;
+  attachmentsCount?: number;
 };
 async function resolveNotes(ids: string[]) {
   console.time("relations");
@@ -332,19 +379,27 @@ async function resolveNotes(ids: string[]) {
   console.timeEnd("resolve");
 
   const data: NoteResolvedData[] = [];
-  for (const noteId in grouped) {
+  for (const noteId of ids) {
     const group = grouped[noteId];
+    if (!group) {
+      data.push({});
+      continue;
+    }
+
     data.push({
       color: group.color ? resolved.colors[group.color] : undefined,
       reminder: group.reminder ? resolved.reminders[group.reminder] : undefined,
-      tags: withDateEdited(group.tags.map((id) => resolved.tags[id])),
+      tags: withDateEdited(
+        group.tags.map((id) => resolved.tags[id]).filter(Boolean)
+      ),
       notebooks: withDateEdited(
-        group.notebooks.map((id) => resolved.notebooks[id])
+        group.notebooks.map((id) => resolved.notebooks[id]).filter(Boolean)
       ),
       attachmentsCount:
         (await db.attachments?.ofNote(noteId, "all").ids())?.length || 0
     });
   }
+
   return data;
 }
 

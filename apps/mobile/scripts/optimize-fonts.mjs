@@ -36,6 +36,7 @@ const EXTRA_ICON_NAMES = [
   "star-outline",
   "link-variant-remove",
   "link-variant",
+  "link-variant-off",
   "bell",
   "bell-off-outline",
   "check",
