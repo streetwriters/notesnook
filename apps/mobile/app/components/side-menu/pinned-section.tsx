@@ -109,43 +109,12 @@ export const PinItem = React.memo(
     const setMenuPins = useMenuStore((state) => state.setMenuPins);
 
     const [visible, setVisible] = useState(false);
-    const [headerTextState, setHeaderTextState] = useState<{
-      id?: string;
-    }>({});
-    const primaryColors =
-      headerTextState?.id === item.id ? colors.selected : colors.primary;
-
-    const isFocused = headerTextState?.id === item.id;
-    const color =
-      headerTextState?.id === item.id
-        ? colors.selected.accent
-        : colors.primary.icon;
-    const fwdRef = useRef();
-
-    const onHeaderStateChange = useCallback(
-      (state: any) => {
-        setTimeout(() => {
-          const id = state.focusedRouteId;
-          if (id === item.id) {
-            setHeaderTextState({
-              id
-            });
-          } else {
-            if (headerTextState !== null) {
-              setHeaderTextState({});
-            }
-          }
-        }, 300);
-      },
-      [headerTextState, item.id]
+    const isFocused = useNavigationStore(
+      (state) => state.focusedRouteId === item.id
     );
-
-    useEffect(() => {
-      const remove = useNavigationStore.subscribe(onHeaderStateChange);
-      return () => {
-        remove();
-      };
-    }, [headerTextState, onHeaderStateChange]);
+    const primaryColors = isFocused ? colors.selected : colors.primary;
+    const color = isFocused ? colors.selected.accent : colors.primary.icon;
+    const fwdRef = useRef();
 
     const icons = {
       topic: "bookmark",
