@@ -22,7 +22,6 @@ import create, { State } from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
 import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
-import { useNoteStore } from "../../../stores/use-notes-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { presets } from "./toolbar-definition";
 export type ToolDefinition = string | string[];
@@ -124,7 +123,7 @@ export const useDragState = create<DragState>(
       getStorage: () => MMKV as unknown as StateStorage,
       onRehydrateStorage: () => {
         return () => {
-          if (!useNoteStore.getState().loading) {
+          if (!useSettingStore.getState().isAppLoading) {
             useDragState.getState().init();
           } else {
             setTimeout(() => {

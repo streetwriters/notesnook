@@ -17,26 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import create, { State } from "zustand";
 import { db } from "../common/database";
-import { VirtualizedGrouping, Notebook } from "@notesnook/core";
+import createDBCollectionStore from "./create-db-collection-store";
 
-export interface NotebookStore extends State {
-  notebooks: VirtualizedGrouping<Notebook> | undefined;
-  setNotebooks: (items?: Notebook[]) => void;
-  clearNotebooks: () => void;
-}
+const { useStore: useNotebookStore, useCollection: useNotebooks } =
+  createDBCollectionStore({
+    getCollection: () =>
+      db.notebooks.roots.grouped(db.settings.getGroupOptions("notebooks")),
+    eagerlyFetchFirstBatch: true
+  });
 
-export const useNotebookStore = create<NotebookStore>((set) => ({
-  notebooks: undefined,
-  setNotebooks: () => {
-    db.notebooks.roots
-      .grouped(db.settings.getGroupOptions("notebooks"))
-      .then((notebooks) => {
-        set({
-          notebooks: notebooks
-        });
-      });
-  },
-  clearNotebooks: () => set({ notebooks: undefined })
-}));
+export { useNotebookStore, useNotebooks };

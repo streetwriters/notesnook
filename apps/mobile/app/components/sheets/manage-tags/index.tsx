@@ -177,7 +177,7 @@ const ManageTagsSheet = (props: {
       }
 
       useRelationStore.getState().update();
-      useTagStore.getState().setTags();
+      useTagStore.getState().refresh();
       setQuery(undefined);
     } catch (e) {
       ToastManager.show({
@@ -225,7 +225,7 @@ const ManageTagsSheet = (props: {
           console.error(e);
         }
       }
-      useTagStore.getState().setTags();
+      useTagStore.getState().refresh();
       useRelationStore.getState().update();
       refreshTags();
       setTimeout(() => {

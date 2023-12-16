@@ -73,18 +73,18 @@ export type NavigationProps<T extends RouteName> = NativeStackScreenProps<
 const routeUpdateFunctions: {
   [name: string]: (...params: GenericRouteParam[]) => void;
 } = {
-  Notes: () => useNoteStore.getState().setNotes(),
-  Notebooks: () => useNotebookStore.getState().setNotebooks(),
-  Tags: () => useTagStore.getState().setTags(),
-  Favorites: () => useFavoriteStore.getState().setFavorites(),
-  Trash: () => useTrashStore.getState().setTrash(),
+  Notes: () => useNoteStore.getState().refresh(),
+  Notebooks: () => useNotebookStore.getState().refresh(),
+  Tags: () => useTagStore.getState().refresh(),
+  Favorites: () => useFavoriteStore.getState().refresh(),
+  Trash: () => useTrashStore.getState().refresh(),
   Notebook: (params) => eSendEvent(eUpdateNotebookRoute, params),
   NotesPage: (params) => eSendEvent("NotesPage", params),
   TaggedNotes: (params) => eSendEvent("TaggedNotes", params),
   ColoredNotes: (params) => eSendEvent("ColoredNotes", params),
   TopicNotes: (params) => eSendEvent("TopicNotes", params),
   Monographs: (params) => eSendEvent("Monographs", params),
-  Reminders: () => useReminderStore.getState().setReminders(),
+  Reminders: () => useReminderStore.getState().refresh(),
   Search: () => eSendEvent(eOnRefreshSearch)
 };
 

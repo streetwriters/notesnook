@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { useNoteStore } from "../../stores/use-notes-store";
 import { AnnouncementDialog } from "../announcements";
 import AuthModal from "../auth/auth-modal";
 import { SessionExpired } from "../auth/session-expired";
@@ -40,7 +39,6 @@ import RestoreDataSheet from "../sheets/restore-data";
 
 const DialogProvider = () => {
   const { colors } = useThemeColors();
-  const loading = useNoteStore((state) => state.loading);
 
   return (
     <>
@@ -57,7 +55,7 @@ const DialogProvider = () => {
       <VaultDialog colors={colors} />
       <RateAppSheet />
       <ImagePreview />
-      {loading ? null : <Expiring />}
+      <Expiring />
       <AnnouncementDialog />
       <SessionExpired />
       <PDFPreview />

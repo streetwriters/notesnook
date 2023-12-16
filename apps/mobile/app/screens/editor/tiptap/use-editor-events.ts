@@ -138,7 +138,7 @@ export const useEditorEvents = (
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
-  const loading = useNoteStore((state) => state.loading);
+  const loading = useSettingStore((state) => state.isAppLoading);
   const [dateFormat, timeFormat] = useSettingStore((state) => [
     state.dateFormat,
     state.timeFormat
@@ -405,7 +405,7 @@ export const useEditorEvents = (
             db.relations
               .unlink(editorMessage.value as ItemReference, editor.note.current)
               .then(async () => {
-                useTagStore.getState().setTags();
+                useTagStore.getState().refresh();
                 useRelationStore.getState().update();
                 await editor.commands.setTags(editor.note.current);
                 Navigation.queueRoutesForUpdate();
