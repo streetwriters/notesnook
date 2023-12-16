@@ -143,7 +143,9 @@ const Sort = ({ type, screen }) => {
           />
         ) : (
           Object.keys(SORT).map((item) =>
-            (item === "title" && groupOptions.groupBy !== "none") ||
+            (item === "title" &&
+              groupOptions.groupBy !== "none" &&
+              screen !== "TopicSheet") ||
             ((screen !== "Tags" || screen !== "Reminders") &&
               item === "dateModified") ||
             ((screen === "Tags" || screen === "Reminders") &&
@@ -171,7 +173,7 @@ const Sort = ({ type, screen }) => {
                     ...groupOptions,
                     sortBy: type === "trash" ? "dateDeleted" : item
                   };
-                  if (type === "topics") {
+                  if (screen === "TopicSheet") {
                     _groupOptions.groupBy = "none";
                   }
                   await updateGroupOptions(_groupOptions);
