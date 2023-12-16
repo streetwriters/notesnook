@@ -61,6 +61,19 @@ export class VirtualizedGrouping<T> {
       ? "header-item"
       : "item";
   }
+  cacheItem(index: number) {
+    const batchIndex = Math.floor(index / this.batchSize);
+    const batch = this.cache.get(batchIndex);
+    if (!batch) return;
+    const { items, groups, data } = batch;
+    const itemIndexInBatch = index - batchIndex * this.batchSize;
+    const group = groups?.get(itemIndexInBatch);
+    return {
+      item: items[itemIndexInBatch],
+      group: group && !group.hidden ? group.group : undefined,
+      data: data?.[itemIndexInBatch]
+    };
+  }
 
   item(index: number): Promise<{ item: T; group?: GroupHeader }>;
   item(
