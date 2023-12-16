@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { db } from "../common/database";
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
 import { useFavoriteStore } from "./use-favorite-store";
@@ -28,36 +27,26 @@ import { useRelationStore } from "./use-relation-store";
 import { useReminderStore } from "./use-reminder-store";
 import { useTagStore } from "./use-tag-store";
 import { useTrashStore } from "./use-trash-store";
+
 export function initAfterSync() {
-  useMenuStore.getState().setColorNotes();
-  useMenuStore.getState().setMenuPins();
   Navigation.queueRoutesForUpdate();
   // Whenever sync completes, try to reschedule
   // any new/updated reminders.
   Notifications.setupReminders(true);
   useRelationStore.getState().update();
-}
-
-export async function initialize() {
-  if (!db) return;
   useMenuStore.getState().setColorNotes();
   useMenuStore.getState().setMenuPins();
-  useNotebookStore.getState().setNotebooks();
-  useTrashStore.getState().setTrash();
-  useTagStore.getState().setTags();
-  useFavoriteStore.getState().setFavorites();
-  await useNoteStore.getState().setNotes();
-  useReminderStore.getState().setReminders();
-  Notifications.setupReminders();
 }
 
+export async function initialize() {}
+
 export function clearAllStores() {
-  useNotebookStore.getState().clearNotebooks();
-  useTagStore.getState().clearTags();
-  useFavoriteStore.getState().clearFavorites();
+  useNotebookStore.getState().clear();
+  useTagStore.getState().clear();
+  useFavoriteStore.getState().clear();
   useMenuStore.getState().clearAll();
-  useNoteStore.getState().clearNotes();
+  useNoteStore.getState().clear();
   useMenuStore.getState().clearAll();
-  useTrashStore.getState().clearTrash();
-  useReminderStore.getState().cleareReminders();
+  useTrashStore.getState().clear();
+  useReminderStore.getState().clear();
 }

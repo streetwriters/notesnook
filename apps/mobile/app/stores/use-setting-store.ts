@@ -97,8 +97,8 @@ export interface SettingStore extends State {
   setFullscreen: (fullscreen: boolean) => void;
   setDeviceMode: (mode: string) => void;
   setDimensions: (dimensions: DimensionsType) => void;
-  appLoading: boolean;
-  setAppLoading: (appLoading: boolean) => void;
+  isAppLoading: boolean;
+  setAppLoading: (isAppLoading: boolean) => void;
   setSheetKeyboardHandler: (sheetKeyboardHandler: boolean) => void;
   sheetKeyboardHandler: boolean;
   requestBiometrics: boolean;
@@ -163,12 +163,12 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   fullscreen: false,
   deviceMode: null,
   dimensions: { width, height },
-  appLoading: true,
+  isAppLoading: true,
   setSettings: (settings) => set({ settings }),
   setFullscreen: (fullscreen) => set({ fullscreen }),
   setDeviceMode: (mode) => set({ deviceMode: mode }),
   setDimensions: (dimensions) => set({ dimensions: dimensions }),
-  setAppLoading: (appLoading) => set({ appLoading }),
+  setAppLoading: (isAppLoading) => set({ isAppLoading }),
   setSheetKeyboardHandler: (sheetKeyboardHandler) =>
     set({ sheetKeyboardHandler }),
   requestBiometrics: false,
