@@ -29,7 +29,7 @@ import { ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
-import { useTrashStore } from "../../stores/use-trash-store";
+import { useTrash, useTrashStore } from "../../stores/use-trash-store";
 import SelectionHeader from "../../components/selection-header";
 
 const onPressFloatingButton = () => {
@@ -40,7 +40,7 @@ const onPressFloatingButton = () => {
     negativeText: "Cancel",
     positivePress: async () => {
       await db.trash?.clear();
-      useTrashStore.getState().setTrash();
+      useTrashStore.getState().refresh();
       useSelectionStore.getState().clearSelection();
       ToastManager.show({
         heading: "Trash cleared",
@@ -63,7 +63,7 @@ const PLACEHOLDER_DATA = (trashCleanupInterval = 7) => ({
 });
 
 export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
-  const trash = useTrashStore((state) => state.trash);
+  const [trash, loading] = useTrash();
   const isFocused = useNavigationFocus(navigation, {
     onFocus: () => {
       Navigation.routeNeedsUpdate(
@@ -71,12 +71,6 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         Navigation.routeUpdateFunctions[route.name]
       );
       useNavigationStore.getState().setFocusedRouteId(route.name);
-      if (
-        !useTrashStore.getState().trash ||
-        useTrashStore.getState().trash?.ids?.length === 0
-      ) {
-        useTrashStore.getState().setTrash();
-      }
       return false;
     },
     onBlur: () => false
@@ -99,7 +93,7 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
           });
         }}
       />
-      <DelayLayout>
+      <DelayLayout wait={loading}>
         <List
           data={trash}
           dataType="trash"

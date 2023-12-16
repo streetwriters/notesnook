@@ -107,7 +107,7 @@ export async function onNoteCreated(noteId: string, data: FirstSaveData) {
       }
 
       editorState().onNoteCreated = null;
-      useTagStore.getState().setTags();
+      useTagStore.getState().refresh();
       useRelationStore.getState().update();
       break;
     }

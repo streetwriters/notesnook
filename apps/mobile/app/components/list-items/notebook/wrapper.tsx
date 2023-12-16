@@ -57,7 +57,7 @@ export const openNotebook = (item: Notebook | BaseTrashItem<Notebook>) => {
       },
       onClose: async () => {
         await db.trash.delete(item.id);
-        useTrashStore.getState().setTrash();
+        useTrashStore.getState().refresh();
         useSelectionStore.getState().setSelectionMode(undefined);
         ToastManager.show({
           heading: "Permanently deleted items",
