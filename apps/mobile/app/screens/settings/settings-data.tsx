@@ -297,6 +297,7 @@ export const settingsGroups: SettingSection[] = [
                       await BiometicService.resetCredentials();
                       MMKV.clearStore();
                       clearAllStores();
+                      Navigation.queueRoutesForUpdate();
                       SettingsService.resetSettings();
                       useUserStore.getState().setUser(null);
                       useUserStore.getState().setSyncing(false);
@@ -304,7 +305,7 @@ export const settingsGroups: SettingSection[] = [
                       Navigation.popToTop();
                       setTimeout(() => {
                         eSendEvent("settings-loading", false);
-                      }, 2000);
+                      }, 3000);
                     }, 300);
                   } catch (e) {
                     ToastManager.error(e as Error, "Error logging out");

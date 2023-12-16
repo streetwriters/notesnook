@@ -17,38 +17,38 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Reminder } from "@notesnook/core/dist/types";
 import notifee, {
   AndroidStyle,
   AuthorizationStatus,
   DisplayedNotification,
+  Event,
   EventType,
   RepeatFrequency,
+  TimestampTrigger,
   Trigger,
-  TriggerType,
-  Event,
   TriggerNotification,
-  TimestampTrigger
+  TriggerType
 } from "@notifee/react-native";
+import NetInfo from "@react-native-community/netinfo";
 import dayjs, { Dayjs } from "dayjs";
+import { encodeNonAsciiHTML } from "entities";
 import { Platform } from "react-native";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
+import { presentDialog } from "../components/dialog/functions";
 import { editorState } from "../screens/editor/tiptap/utils";
-import { useNoteStore } from "../stores/use-notes-store";
-import { eOnLoadNote } from "../utils/events";
-import { tabBarRef } from "../utils/global-refs";
-import { DDS } from "./device-detection";
-import { eSendEvent } from "./event-manager";
-import SettingsService from "./settings";
-import { useSettingStore } from "../stores/use-setting-store";
-import { sleep } from "../utils/time";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useReminderStore } from "../stores/use-reminder-store";
-import { presentDialog } from "../components/dialog/functions";
-import NetInfo from "@react-native-community/netinfo";
-import { encodeNonAsciiHTML } from "entities";
+import { useSettingStore } from "../stores/use-setting-store";
+import { eOnLoadNote } from "../utils/events";
+import { tabBarRef } from "../utils/global-refs";
 import { convertNoteToText } from "../utils/note-to-text";
-import { Reminder } from "@notesnook/core/dist/types";
+import { sleep } from "../utils/time";
+import { DDS } from "./device-detection";
+import { eSendEvent } from "./event-manager";
+import Navigation from "./navigation";
+import SettingsService from "./settings";
 
 let pinned: DisplayedNotification[] = [];
 
@@ -136,19 +136,7 @@ const onEvent = async ({ type, detail }: Event) => {
     }
     editorState().movedAway = false;
     const noteId = notification?.id;
-    if (useNoteStore?.getState()?.loading === false) {
-      loadNote(noteId as string, false);
-      return;
-    }
-    const unsub = useNoteStore.subscribe(
-      (loading) => {
-        if (loading === false) {
-          loadNote(noteId as string, true);
-        }
-        unsub();
-      },
-      (state) => state.loading
-    );
+    loadNote(noteId as string, true);
   }
 
   if (type === EventType.ACTION_PRESS) {
@@ -173,7 +161,7 @@ const onEvent = async ({ type, detail }: Event) => {
           await db.reminders?.reminder(reminder?.id)
         );
         useRelationStore.getState().update();
-        useReminderStore.getState().setReminders();
+        useReminderStore.getState().refresh();
         break;
       }
       case "REMINDER_DISABLE": {
@@ -191,7 +179,7 @@ const onEvent = async ({ type, detail }: Event) => {
           await db.reminders?.reminder(reminder?.id)
         );
         useRelationStore.getState().update();
-        useReminderStore.getState().setReminders();
+        useReminderStore.getState().refresh();
         break;
       }
       case "UNPIN": {
@@ -207,7 +195,7 @@ const onEvent = async ({ type, detail }: Event) => {
             disabled: true
           });
           useRelationStore.getState().update();
-          useReminderStore.getState().setReminders();
+          useReminderStore.getState().refresh();
         }
         break;
       }
@@ -253,7 +241,7 @@ const onEvent = async ({ type, detail }: Event) => {
             console.log(e, (e as Error).stack);
           }
         }
-        useNoteStore.getState().setNotes();
+        Navigation.queueRoutesForUpdate();
         break;
       }
     }
@@ -422,14 +410,17 @@ async function loadNote(id: string, jump: boolean) {
     tabBarRef.current?.goToPage(1);
   }
   eSendEvent("loadingNote", note);
-  setTimeout(() => {
-    eSendEvent(eOnLoadNote, {
-      item: note
-    });
-    if (!jump && !DDS.isTab) {
-      tabBarRef.current?.goToPage(1);
-    }
-  }, 2000);
+  setTimeout(
+    () => {
+      eSendEvent(eOnLoadNote, {
+        item: note
+      });
+      if (!jump && !DDS.isTab) {
+        tabBarRef.current?.goToPage(1);
+      }
+    },
+    tabBarRef?.current ? 0 : 2000
+  );
 }
 
 async function getChannelId(id: "silent" | "vibrate" | "urgent" | "default") {

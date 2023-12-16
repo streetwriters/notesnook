@@ -17,25 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import create, { State } from "zustand";
 import { db } from "../common/database";
-import { GroupedItems, TrashItem } from "@notesnook/core/dist/types";
-import { VirtualizedGrouping } from "@notesnook/core";
+import createDBCollectionStore from "./create-db-collection-store";
 
-export interface TrashStore extends State {
-  trash: VirtualizedGrouping<TrashItem> | undefined;
-  setTrash: (items?: GroupedItems<TrashItem>) => void;
-  clearTrash: () => void;
-}
+const { useStore: useTrashStore, useCollection: useTrash } =
+  createDBCollectionStore({
+    getCollection: () => db.trash.grouped(db.settings.getGroupOptions("trash")),
+    eagerlyFetchFirstBatch: true
+  });
 
-export const useTrashStore = create<TrashStore>((set, get) => ({
-  trash: undefined,
-  setTrash: () => {
-    db.trash.grouped(db.settings.getGroupOptions("trash")).then((trash) => {
-      set({
-        trash: trash
-      });
-    });
-  },
-  clearTrash: () => set({ trash: undefined })
-}));
+export { useTrashStore, useTrash };

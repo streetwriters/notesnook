@@ -84,7 +84,7 @@ export default function NotePreview({ session, content, note }) {
       context: "local",
       positivePress: async () => {
         await db.trash.delete(note.id);
-        useTrashStore.getState().setTrash();
+        useTrashStore.getState().refresh();
         useSelectionStore.getState().setSelectionMode(false);
         ToastManager.show({
           heading: "Permanently deleted items",

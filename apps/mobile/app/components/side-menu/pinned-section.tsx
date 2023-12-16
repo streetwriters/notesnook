@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Notebook, Tag } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FlatList, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
@@ -28,7 +28,7 @@ import { TaggedNotes } from "../../screens/notes/tagged";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useNoteStore } from "../../stores/use-notes-store";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { SIZE, normalize } from "../../utils/size";
 import { Properties } from "../properties";
 import { Button } from "../ui/button";
@@ -41,8 +41,8 @@ import Paragraph from "../ui/typography/paragraph";
 
 export const TagsSection = React.memo(
   function TagsSection() {
-    const menuPins = useMenuStore((state) => state.menuPins);
-    const loading = useNoteStore((state) => state.loading);
+    const [menuPins] = useMenuStore((state) => [state.menuPins]);
+    const loading = useSettingStore((state) => state.isAppLoading);
     const setMenuPins = useMenuStore((state) => state.setMenuPins);
 
     useEffect(() => {

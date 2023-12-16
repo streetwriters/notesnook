@@ -21,16 +21,15 @@ import React from "react";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import List from "../../components/list";
+import SelectionHeader from "../../components/selection-header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useTagStore } from "../../stores/use-tag-store";
-import { db } from "../../common/database";
-import SelectionHeader from "../../components/selection-header";
+import { useTags } from "../../stores/use-tag-store";
 
 export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
-  const tags = useTagStore((state) => state.tags);
+  const [tags, loading] = useTags();
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       Navigation.routeNeedsUpdate(
@@ -61,7 +60,7 @@ export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
           });
         }}
       />
-      <DelayLayout>
+      <DelayLayout wait={loading}>
         <List
           data={tags}
           dataType="tag"

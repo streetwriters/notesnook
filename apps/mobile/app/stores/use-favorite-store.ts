@@ -17,26 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import create, { State } from "zustand";
 import { db } from "../common/database";
-import { Note, VirtualizedGrouping } from "@notesnook/core";
+import createDBCollectionStore from "./create-db-collection-store";
 
-export interface FavoriteStore extends State {
-  favorites: VirtualizedGrouping<Note> | undefined;
-  setFavorites: (items?: Note[]) => void;
-  clearFavorites: () => void;
-}
+const { useStore: useFavoriteStore, useCollection: useFavorites } =
+  createDBCollectionStore({
+    getCollection: () =>
+      db.notes.favorites.grouped(db.settings.getGroupOptions("favorites")),
+    eagerlyFetchFirstBatch: true
+  });
 
-export const useFavoriteStore = create<FavoriteStore>((set) => ({
-  favorites: undefined,
-  setFavorites: () => {
-    db.notes.favorites
-      .grouped(db.settings.getGroupOptions("favorites"))
-      .then((notes) => {
-        set({
-          favorites: notes
-        });
-      });
-  },
-  clearFavorites: () => set({ favorites: undefined })
-}));
+export { useFavoriteStore, useFavorites };

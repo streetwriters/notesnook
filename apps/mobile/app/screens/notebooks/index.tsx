@@ -23,14 +23,14 @@ import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import List from "../../components/list";
+import SelectionHeader from "../../components/selection-header";
 import { AddNotebookSheet } from "../../components/sheets/add-notebook";
 import { Walkthrough } from "../../components/walkthroughs";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useNotebookStore } from "../../stores/use-notebook-store";
-import SelectionHeader from "../../components/selection-header";
+import { useNotebooks } from "../../stores/use-notebook-store";
 
 const onButtonPress = () => {
   AddNotebookSheet.present();
@@ -40,7 +40,8 @@ export const Notebooks = ({
   navigation,
   route
 }: NavigationProps<"Notebooks">) => {
-  const notebooks = useNotebookStore((state) => state.notebooks);
+  const [notebooks, loading] = useNotebooks();
+
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       Navigation.routeNeedsUpdate(
@@ -48,7 +49,7 @@ export const Notebooks = ({
         Navigation.routeUpdateFunctions[route.name]
       );
       useNavigationStore.getState().setFocusedRouteId(route.name);
-      return !prev?.current;
+      return false;
     },
     onBlur: () => false,
     delay: SettingsService.get().homepage === route.name ? 1 : -1
@@ -83,12 +84,11 @@ export const Notebooks = ({
         }}
         onPressDefaultRightButton={onButtonPress}
       />
-      <DelayLayout>
+      <DelayLayout wait={loading}>
         <List
           data={notebooks}
           dataType="notebook"
           renderedInRoute="Notebooks"
-          loading={!isFocused}
           placeholder={{
             title: "Your notebooks",
             paragraph: "You have not added any notebooks yet.",

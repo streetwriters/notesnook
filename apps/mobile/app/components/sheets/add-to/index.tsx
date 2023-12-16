@@ -20,13 +20,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Note } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useCallback, useEffect } from "react";
-import { Keyboard, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Keyboard,
+  TouchableOpacity,
+  View
+} from "react-native";
 import { ActionSheetRef, FlashList } from "react-native-actions-sheet";
 import { db } from "../../../common/database";
 import { presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { ItemSelection } from "../../../stores/item-selection-store";
-import { useNotebookStore } from "../../../stores/use-notebook-store";
+import {
+  useNotebookStore,
+  useNotebooks
+} from "../../../stores/use-notebook-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
@@ -39,6 +47,7 @@ import { IconButton } from "../../ui/icon-button";
 import Paragraph from "../../ui/typography/paragraph";
 import { NotebookItem } from "./notebook-item";
 import { useNotebookItemSelectionStore } from "./store";
+import { SIZE } from "../../../utils/size";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -85,7 +94,7 @@ const MoveNoteSheet = ({
   actionSheetRef: RefObject<ActionSheetRef>;
 }) => {
   const { colors } = useThemeColors();
-  const notebooks = useNotebookStore((state) => state.notebooks);
+  const [notebooks, loading] = useNotebooks();
   const dimensions = useSettingStore((state) => state.dimensions);
   const selectedItemsList = useSelectionStore(
     (state) => state.selectedItemsList
@@ -234,7 +243,16 @@ const MoveNoteSheet = ({
                   height: 200
                 }}
               >
-                <Paragraph color={colors.primary.icon}>No notebooks</Paragraph>
+                {loading ? (
+                  <ActivityIndicator
+                    size={SIZE.lg}
+                    color={colors.primary.accent}
+                  />
+                ) : (
+                  <Paragraph color={colors.primary.icon}>
+                    No notebooks
+                  </Paragraph>
+                )}
               </View>
             }
             ListFooterComponent={<View style={{ height: 50 }} />}

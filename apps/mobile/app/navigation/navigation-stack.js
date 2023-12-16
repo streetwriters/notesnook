@@ -132,7 +132,7 @@ const Tabs = React.memo(_Tabs, () => true);
 
 const _NavigationStack = () => {
   const clearSelection = useSelectionStore((state) => state.clearSelection);
-  const loading = useNoteStore((state) => state.loading);
+  const loading = useSettingStore((state) => state.isAppLoading);
   const onStateChange = React.useCallback(() => {
     if (useSelectionStore.getState().selectionMode) {
       clearSelection(true);

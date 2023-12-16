@@ -22,19 +22,19 @@ import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import List from "../../components/list";
+import SelectionHeader from "../../components/selection-header";
 import ReminderSheet from "../../components/sheets/reminder";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useReminderStore } from "../../stores/use-reminder-store";
-import SelectionHeader from "../../components/selection-header";
+import { useReminders } from "../../stores/use-reminder-store";
 
 export const Reminders = ({
   navigation,
   route
 }: NavigationProps<"Reminders">) => {
-  const reminders = useReminderStore((state) => state.reminders);
+  const [reminders, loading] = useReminders();
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       Navigation.routeNeedsUpdate(
@@ -43,7 +43,7 @@ export const Reminders = ({
       );
 
       useNavigationStore.getState().setFocusedRouteId(route.name);
-      return !prev?.current;
+      return false;
     },
     onBlur: () => false,
     delay: SettingsService.get().homepage === route.name ? 1 : -1
@@ -72,13 +72,13 @@ export const Reminders = ({
         }}
       />
 
-      <DelayLayout>
+      <DelayLayout wait={loading}>
         <List
           data={reminders}
           dataType="reminder"
           headerTitle="Reminders"
           renderedInRoute="Reminders"
-          loading={!isFocused}
+          loading={loading}
           placeholder={{
             title: "Your reminders",
             paragraph: "You have not set any reminders yet.",

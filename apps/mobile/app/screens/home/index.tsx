@@ -22,17 +22,16 @@ import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import List from "../../components/list";
+import SelectionHeader from "../../components/selection-header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
-import { useNoteStore } from "../../stores/use-notes-store";
-import { openEditor } from "../notes/common";
 import useNavigationStore from "../../stores/use-navigation-store";
-import SelectionHeader from "../../components/selection-header";
+import { useNotes } from "../../stores/use-notes-store";
+import { openEditor } from "../notes/common";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
-  const notes = useNoteStore((state) => state.notes);
-  const loading = useNoteStore((state) => state.loading);
+  const [notes, loading] = useNotes();
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       Navigation.routeNeedsUpdate(

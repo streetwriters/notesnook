@@ -78,11 +78,10 @@ import {
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
 import Sync from "../services/sync";
-import { initAfterSync, initialize } from "../stores";
+import { initAfterSync } from "../stores";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useMessageStore } from "../stores/use-message-store";
-import { useNoteStore } from "../stores/use-notes-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { updateStatusBarColor } from "../utils/colors";
@@ -278,7 +277,7 @@ const onSubscriptionError = async (error: RNIap.PurchaseError) => {
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
 export const useAppEvents = () => {
-  const loading = useNoteStore((state) => state.loading);
+  const loading = useSettingStore((state) => state.isAppLoading);
   const [setLastSynced, setUser, appLocked, syncing] = useUserStore((state) => [
     state.setLastSynced,
     state.setUser,
@@ -628,8 +627,7 @@ export const useAppEvents = () => {
         if (!db.isInitialized) {
           await db.init();
         }
-        await initialize();
-        useNoteStore.getState().setLoading(false);
+        useSettingStore.getState().setAppLoading(false);
       },
       disableClosing: true
     });
@@ -657,9 +655,8 @@ export const useAppEvents = () => {
         }
       }
       if (IsDatabaseMigrationRequired()) return;
-      initialize();
       setImmediate(() => {
-        useNoteStore.getState().setLoading(false);
+        useSettingStore.getState().setAppLoading(false);
       });
       Walkthrough.init();
     } catch (e) {
@@ -675,7 +672,7 @@ export const useAppEvents = () => {
         if (
           !state.appLocked &&
           db.isInitialized &&
-          useNoteStore.getState().loading
+          useSettingStore.getState().isAppLoading
         ) {
           initializeDatabase();
           sub();
