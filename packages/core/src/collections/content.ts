@@ -103,6 +103,7 @@ export class Content implements ICollection {
         localOnly: content.localOnly,
         conflicted: content.conflicted,
         dateResolved: content.dateResolved,
+        noteId: content.noteId,
         ...contentData
       });
 

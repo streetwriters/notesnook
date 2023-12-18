@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { match } from "fuzzyjs";
 import Database from ".";
-import { Item, TrashItem } from "../types";
+import { Item, Note, TrashItem } from "../types";
 import { DatabaseSchema, DatabaseSchemaWithFTS, isFalse } from "../database";
 import { AnyColumnWithTable, Kysely, sql } from "kysely";
 import { FilteredSelector } from "../database/sql-collection";
@@ -39,8 +39,10 @@ type FuzzySearchField<T> = {
 export default class Lookup {
   constructor(private readonly db: Database) {}
 
-  notes(query: string, noteIds?: string[]) {
+  notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
     return this.toSearchResults(async (limit) => {
+      if (query.length <= 3) return [];
+
       const db = this.db.sql() as Kysely<DatabaseSchemaWithFTS>;
       query = query.replace(/"/, '""');
       const result = await db
@@ -58,8 +60,8 @@ export default class Lookup {
             )
         )
         .selectFrom("notes")
-        .$if(!!noteIds && noteIds.length > 0, (eb) =>
-          eb.where("notes.id", "in", noteIds!)
+        .$if(!!notes, (eb) =>
+          eb.where("notes.id", "in", notes!.filter.select("id"))
         )
         .$if(!!limit, (eb) => eb.limit(limit!))
         .where(isFalse("notes.deleted"))
@@ -67,11 +69,11 @@ export default class Lookup {
         .innerJoin("matching", (eb) =>
           eb.onRef("notes.id", "==", "matching.id")
         )
-        .orderBy("matching.rank")
+        .orderBy("matching.rank desc")
         .select(["notes.id"])
         .execute();
       return result.map((id) => id.id);
-    }, this.db.notes.all);
+    }, notes || this.db.notes.all);
   }
 
   notebooks(query: string) {
