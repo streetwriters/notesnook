@@ -40,6 +40,16 @@ export const KeyMap = Extension.create({
       "Shift-Tab": ({ editor }) => {
         if (isListActive(editor)) return false;
         return true;
+      },
+      "Ctrl-\\": ({ editor }) => {
+        editor
+          .chain()
+          .focus()
+          .clearNodes()
+          .unsetAllMarks()
+          .unsetMark("link")
+          .run();
+        return true;
       }
     };
   }
