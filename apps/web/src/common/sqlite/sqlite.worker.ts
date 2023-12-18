@@ -23,9 +23,10 @@ import SQLiteAsyncESMFactory from "./wa-sqlite-async";
 import SQLiteSyncESMFactory from "./wa-sqlite";
 import { IDBBatchAtomicVFS } from "./IDBBatchAtomicVFS";
 import { AccessHandlePoolVFS } from "./AccessHandlePoolVFS";
-import { expose } from "comlink";
+import { expose, transfer } from "comlink";
 import type { RunMode } from "./type";
 import { QueryResult } from "kysely";
+import { DatabaseSource } from "./sqlite-export";
 
 type PreparedStatement = {
   stmt: number;
@@ -87,8 +88,6 @@ async function run(sql: string, parameters?: SQLiteCompatibleType[]) {
     }
 
     return rows;
-  } catch (e) {
-    console.error(e);
   } finally {
     await sqlite
       .reset(prepared.stmt)
@@ -101,7 +100,6 @@ async function run(sql: string, parameters?: SQLiteCompatibleType[]) {
           .finally(() => preparedStatements.delete(sql))
       );
   }
-  return [];
 }
 
 async function exec<R>(
@@ -130,10 +128,21 @@ async function close() {
   await vfs?.close();
 }
 
+async function exportDatabase(dbName: string, async: boolean) {
+  const vfs = async
+    ? new IDBBatchAtomicVFS(dbName, { durability: "strict" })
+    : new AccessHandlePoolVFS(dbName);
+  if ("isReady" in vfs) await vfs.isReady;
+
+  const stream = new ReadableStream(new DatabaseSource(vfs, dbName));
+  return transfer(stream, [stream]);
+}
+
 const worker = {
   close,
   init,
-  run: exec
+  run: exec,
+  export: exportDatabase
 };
 
 export type SQLiteWorker = typeof worker;
