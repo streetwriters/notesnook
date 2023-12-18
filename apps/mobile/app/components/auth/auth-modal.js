@@ -17,14 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
+import { useUserStore } from "../../stores/use-user-store";
 import { eCloseLoginDialog, eOpenLoginDialog } from "../../utils/events";
 import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
@@ -34,7 +36,6 @@ import { IconButton } from "../ui/icon-button";
 import { hideAuth, initialAuthMode } from "./common";
 import { Login } from "./login";
 import { Signup } from "./signup";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export const AuthMode = {
   login: 0,
@@ -68,6 +69,9 @@ const AuthModal = () => {
   }
 
   const close = () => {
+    useUserStore.setState({
+      disableAppLockRequests: false
+    });
     actionSheetRef.current?.hide();
     setCurrentAuthMode(AuthMode.login);
     setVisible(false);
@@ -77,6 +81,11 @@ const AuthModal = () => {
     <BaseDialog
       overlayOpacity={0}
       statusBarTranslucent={false}
+      onShow={() => {
+        useUserStore.setState({
+          disableAppLockRequests: true
+        });
+      }}
       onRequestClose={currentAuthMode !== AuthMode.welcomeSignup && close}
       visible={true}
       onClose={close}
