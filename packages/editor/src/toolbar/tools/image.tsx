@@ -42,20 +42,22 @@ export function ImageSettings(props: ToolProps) {
       autoCloseOnUnmount
       popupId="imageSettings"
       tools={
-        findSelectedNode(editor, "image")?.attrs?.float
-          ? [
-              "downloadAttachment",
-              "imageAlignLeft",
-              "imageAlignRight",
-              "imageProperties"
-            ]
-          : [
-              "downloadAttachment",
-              "imageAlignLeft",
-              "imageAlignCenter",
-              "imageAlignRight",
-              "imageProperties"
-            ]
+        editor.isEditable
+          ? findSelectedNode(editor, "image")?.attrs?.float
+            ? [
+                "downloadAttachment",
+                "imageAlignLeft",
+                "imageAlignRight",
+                "imageProperties"
+              ]
+            : [
+                "downloadAttachment",
+                "imageAlignLeft",
+                "imageAlignCenter",
+                "imageAlignRight",
+                "imageProperties"
+              ]
+          : ["downloadAttachment"]
       }
     />
   );

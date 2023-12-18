@@ -34,7 +34,6 @@ export function LinkSettings(props: ToolProps) {
   const { editor } = props;
   const isBottom = useToolbarLocation() === "bottom";
   if (!editor.isActive("link") || !isBottom) return null;
-  if (!editor.isEditable && isBottom) return null;
 
   return (
     <MoreTools
@@ -42,7 +41,11 @@ export function LinkSettings(props: ToolProps) {
       autoOpen
       autoCloseOnUnmount
       popupId="linkSettings"
-      tools={["openLink", "editLink", "removeLink", "copyLink"]}
+      tools={
+        editor.isEditable
+          ? ["openLink", "editLink", "removeLink", "copyLink"]
+          : ["openLink", "copyLink"]
+      }
     />
   );
 }

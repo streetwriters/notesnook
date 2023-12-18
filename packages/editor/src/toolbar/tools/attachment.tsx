@@ -38,7 +38,11 @@ export function AttachmentSettings(props: ToolProps) {
       {...props}
       autoCloseOnUnmount
       popupId="attachmentSettings"
-      tools={["downloadAttachment", "removeAttachment"]}
+      tools={
+        editor.isEditable
+          ? ["downloadAttachment"]
+          : ["downloadAttachment", "removeAttachment"]
+      }
     />
   );
 }
