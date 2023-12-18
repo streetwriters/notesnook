@@ -119,15 +119,9 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
         clearTimeout(refreshTimeout.current);
         const idx = index;
         refreshTimeout.current = setTimeout(async () => {
-          if (idx !== previousIndex.current) {
-            return;
-          }
+          if (idx !== previousIndex.current) return;
           const resolvedItem = await items?.item(idx, resolveItems);
-          if (idx !== previousIndex.current) {
-            console.log("cancel", idx, previousIndex.current);
-            return;
-          }
-
+          if (idx !== previousIndex.current) return;
           refreshItem(resolvedItem);
         }, 100);
       } catch (e) {
