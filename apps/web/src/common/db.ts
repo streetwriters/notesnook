@@ -65,6 +65,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
         createQueryCompiler: () => new SqliteQueryCompiler()
       }),
       journalMode: "MEMORY",
+      tempStore: "memory",
       synchronous: "normal",
       pageSize: 8192,
       cacheSize: -16000,
