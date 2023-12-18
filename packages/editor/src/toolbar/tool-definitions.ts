@@ -378,7 +378,6 @@ export const MOBILE_STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
 export const READONLY_MOBILE_STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
   [
     "imageSettings",
-    "embedSettings",
     "attachmentSettings",
     "linkSettings",
     "webclipSettings",
