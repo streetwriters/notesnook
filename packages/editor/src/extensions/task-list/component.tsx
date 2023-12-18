@@ -21,17 +21,22 @@ import { Box, Flex, Input, Text } from "@theme-ui/components";
 import { useMemo } from "react";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { ReactNodeViewProps } from "../react";
-import { type TaskListAttributes } from "./task-list";
+import { toggleChildren, type TaskListAttributes } from "./task-list";
 import { replaceDateTime } from "../date-time";
 import { deleteCheckedItems, sortList } from "./utils";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
+import { Icons } from "../../toolbar/icons";
+import { Icon } from "@notesnook/ui";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
 ) {
   const { editor, getPos, node, updateAttributes, forwardRef, pos } = props;
   const { title, textDirection, readonly, stats } = node.attrs;
+  const isMobile = useIsMobile();
+  const checked = stats.total === stats.checked;
 
   const isNested = useMemo(() => {
     if (!pos) return false;
@@ -68,6 +73,41 @@ export function TaskListComponent(
               transition: "width 250ms ease-out"
             }}
           />
+          {editor.isEditable ? (
+            <Icon
+              path={checked ? Icons.check : ""}
+              stroke="1px"
+              contentEditable={false}
+              tabIndex={1}
+              sx={{
+                border: "2px solid",
+                borderColor: checked ? "accent" : "icon",
+                borderRadius: "default",
+                p: "1px",
+                zIndex: 1,
+                // mt: isMobile ? "0.20ch" : "0.36ch",
+                marginInlineStart: 1,
+                cursor: editor.isEditable ? "pointer" : "unset",
+                ":hover": isMobile
+                  ? undefined
+                  : {
+                      borderColor: "accent"
+                    },
+                fontFamily: "inherit"
+              }}
+              onClick={() => {
+                const parentPos = getPos();
+                editor.current?.commands.command(({ tr }) => {
+                  const node = tr.doc.nodeAt(parentPos);
+                  if (!node) return false;
+                  toggleChildren(tr, node, !checked, parentPos);
+                  return true;
+                });
+              }}
+              color={checked ? "accent" : "icon"}
+              size={isMobile ? "1.70ch" : "1.46ch"}
+            />
+          ) : null}
           <Input
             readOnly={!editor.isEditable || readonly}
             value={title || ""}
@@ -75,7 +115,7 @@ export function TaskListComponent(
             sx={{
               flex: 1,
               p: 0,
-              px: 2,
+              px: 1,
               zIndex: 1,
               color: "var(--paragraph-secondary)",
               fontSize: "inherit",
@@ -172,7 +212,7 @@ export function TaskListComponent(
             variant={"body"}
             sx={{
               ml: 1,
-              mr: 2,
+              mr: 1,
               color: "var(--paragraph-secondary)",
               flexShrink: 0,
               zIndex: 1,

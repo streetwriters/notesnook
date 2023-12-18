@@ -117,7 +117,9 @@ import {
   mdiUploadOutline,
   mdiWeb,
   mdiPencilOff,
-  mdiPencil
+  mdiPencil,
+  mdiCheckboxMultipleBlankOutline,
+  mdiCheckboxMultipleMarked
 } from "@mdi/js";
 
 export const Icons = {
@@ -243,6 +245,8 @@ export const Icons = {
   resize: mdiResizeBottomRight,
   readonlyOn: mdiPencilOff,
   readonlyOff: mdiPencil,
+  selectAllUnchecked: mdiCheckboxMultipleBlankOutline,
+  selectAllChecked: mdiCheckboxMultipleMarked,
   none: ""
 };
 

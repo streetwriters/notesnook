@@ -381,7 +381,7 @@ function areAllChecked(node: ProsemirrorNode) {
   return allChecked;
 }
 
-function toggleChildren(
+export function toggleChildren(
   tr: Transaction,
   node: ProsemirrorNode,
   toggleState: boolean,
