@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   ColumnBuilderCallback,
   CreateTableBuilder,
-  Kysely,
   Migration,
   MigrationProvider,
   sql
@@ -50,7 +49,12 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("readonly", "boolean")
             .addColumn("dateEdited", "integer")
             .execute();
-          await createFTS5Table(db, "notes", ["title"]);
+
+          await createFTS5Table(
+            "notes_fts",
+            [{ name: "id" }, { name: "title" }],
+            { contentTable: "notes", tokenizer: ["porter", "trigram"] }
+          ).execute(db);
 
           await db.schema
             .createTable("content")
@@ -65,13 +69,12 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("dateEdited", "integer")
             .addColumn("dateResolved", "integer")
             .execute();
+
           await createFTS5Table(
-            db,
-            "content",
-            ["data"],
-            ["noteId"],
-            ["(new.locked is null or new.locked == 0)"]
-          );
+            "content_fts",
+            [{ name: "id" }, { name: "noteId" }, { name: "data" }],
+            { contentTable: "content", tokenizer: ["porter", "trigram"] }
+          ).execute(db);
 
           await db.schema
             .createTable("notehistory")
@@ -285,50 +288,38 @@ const addTrashColumns = <T extends string, C extends string = never>(
     .addColumn("itemType", "text");
 };
 
-async function createFTS5Table(
-  db: Kysely<any>,
-  table: string,
-  indexedColumns: string[],
-  unindexedColumns: string[] = [],
-  insertConditions: string[] = []
+type Tokenizer = "porter" | "trigram" | "unicode61" | "ascii";
+function createFTS5Table(
+  name: string,
+  columns: {
+    name: string;
+    unindexed?: boolean;
+  }[],
+  options: {
+    contentTable?: string;
+    contentTableRowId?: string;
+    tokenizer?: Tokenizer[];
+    prefix?: number[];
+    columnSize?: 0 | 1;
+    detail?: "full" | "column" | "none";
+  } = {}
 ) {
-  const ref = sql.raw(table);
-  const ref_fts = sql.raw(table + "_fts");
-  const ref_ai = sql.raw(table + "_ai");
-  const ref_ad = sql.raw(table + "_ad");
-  const ref_au = sql.raw(table + "_au");
-  const indexed_cols = sql.raw(indexedColumns.join(", "));
-  const unindexed_cols =
-    unindexedColumns.length > 0
-      ? sql.raw(unindexedColumns.join(" UNINDEXED,") + " UNINDEXED,")
-      : sql.raw("");
-  const new_indexed_cols = sql.raw(indexedColumns.join(", new."));
-  const old_indexed_cols = sql.raw(indexedColumns.join(", old."));
-  await sql`CREATE VIRTUAL TABLE ${ref_fts} USING fts5(
-    id UNINDEXED, ${unindexed_cols} ${indexed_cols}, content='${sql.raw(
-    table
-  )}', tokenize='porter trigram'
-  )`.execute(db);
-  insertConditions = [
-    "(new.deleted is null or new.deleted == 0)",
-    ...insertConditions
-  ];
-  await sql`CREATE TRIGGER ${ref_ai} AFTER INSERT ON ${ref} WHEN ${sql.raw(
-    insertConditions.join(" AND ")
-  )}
-  BEGIN
-    INSERT INTO ${ref_fts}(rowid, id, ${indexed_cols}) VALUES (new.rowid, new.id, new.${new_indexed_cols});
-  END;`.execute(db);
-  await sql`CREATE TRIGGER ${ref_ad} AFTER DELETE ON ${ref}
-  BEGIN
-    INSERT INTO ${ref_fts} (${ref_fts}, rowid, id, ${indexed_cols})
-    VALUES ('delete', old.rowid, old.id, old.${old_indexed_cols});
-  END;`.execute(db);
-  await sql`CREATE TRIGGER ${ref_au} AFTER UPDATE ON ${ref}
-  BEGIN
-    INSERT INTO ${ref_fts} (${ref_fts}, rowid, id, ${indexed_cols})
-    VALUES ('delete', old.rowid, old.id, old.${old_indexed_cols});
-    INSERT INTO ${ref_fts} (rowid, id, ${indexed_cols})
-    VALUES (new.rowid, new.id, new.${new_indexed_cols});
-  END;`.execute(db);
+  const _options: string[] = [];
+  if (options.contentTable) _options.push(`content='${options.contentTable}'`);
+  if (options.contentTableRowId)
+    _options.push(`content_rowid='${options.contentTableRowId}'`);
+  if (options.tokenizer)
+    _options.push(`tokenize='${options.tokenizer.join(" ")}'`);
+  if (options.prefix) _options.push(`prefix='${options.prefix.join(" ")}'`);
+  if (options.columnSize) _options.push(`columnsize='${options.columnSize}'`);
+  if (options.detail) _options.push(`detail='${options.detail}'`);
+
+  const args = sql.join([
+    sql.join(
+      columns.map((c) => sql.ref(`${c.name}${c.unindexed ? " UNINDEXED" : ""}`))
+    ),
+    sql.join(_options.map((o) => sql.raw(o)))
+  ]);
+
+  return sql`CREATE VIRTUAL TABLE ${sql.raw(name)} USING fts5(${args})`;
 }
