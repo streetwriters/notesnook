@@ -74,23 +74,29 @@ export function formatCodeblocks(dom: HTMLElement | Document) {
 export function convertBrToSingleSpacedParagraphs(dom: HTMLElement | Document) {
   for (const br of dom.querySelectorAll("br")) {
     let paragraph = br.closest("p");
-
     // if no paragraph is found over the br, we add one.
-    if (!paragraph && br.parentElement) {
+    if (!paragraph && br.parentElement && br.parentElement.parentElement) {
       const parent = br.parentElement;
       const p = document.createElement("p");
       p.append(...parent.childNodes);
       parent.append(p);
       paragraph = p;
     }
+    //if br is directly under root element
+    if (!paragraph && !br.parentElement?.parentElement) {
+      const next = br.nextElementSibling;
+      const newParagraph = document.createElement("p");
+      br.parentElement?.insertBefore(newParagraph, next);
+      br.remove();
+    }
 
-    // if paragraph is empty, we clean out the paragraph and move on.
     if (
       paragraph &&
       (paragraph.childNodes.length === 1 ||
         !paragraph.textContent ||
         paragraph.textContent.trim().length === 0)
     ) {
+      // if paragraph is empty, we clean out the paragraph and move on.
       paragraph.innerHTML = "";
       continue;
     }
