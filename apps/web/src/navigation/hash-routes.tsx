@@ -42,7 +42,7 @@ import {
   showEditTopicDialog,
   showCreateTopicDialog
 } from "../common/dialog-controller";
-import { hashNavigate, makeURL } from ".";
+import { hashNavigate } from ".";
 import Editor from "../components/editor";
 import { defineRoutes } from "./types";
 
