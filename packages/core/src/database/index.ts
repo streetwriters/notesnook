@@ -56,6 +56,7 @@ import {
   ValueOf
 } from "../types";
 import { NNMigrationProvider } from "./migrations";
+import { createTriggers } from "./triggers";
 
 // type FilteredKeys<T, U> = {
 //   [P in keyof T]: T[P] extends U ? P : never;
@@ -69,7 +70,7 @@ export type SQLiteItem<T> = {
   [P in keyof T]?: T[P] | null;
 } & { id: string };
 
-export type SQLiteItemWithRowID<T> = SQLiteItem<T> & { rowid: number };
+export type SQLiteItemWithRowID<T> = SQLiteItem<T> & { rowid?: number };
 
 export interface DatabaseSchema {
   notes: SQLiteItem<TrashOrItem<Note>>;
@@ -206,7 +207,7 @@ export type SQLiteOptions = {
   pageSize?: number;
 };
 export async function createDatabase(name: string, options: SQLiteOptions) {
-  const db = new Kysely<DatabaseSchema>({
+  const db = new Kysely<DatabaseSchemaWithFTS>({
     dialect: options.dialect(name),
     plugins: [new SqliteBooleanPlugin()]
   });
@@ -223,6 +224,10 @@ export async function createDatabase(name: string, options: SQLiteOptions) {
   await sql`PRAGMA synchronous = ${sql.raw(
     options.synchronous || "normal"
   )}`.execute(db);
+
+  // recursive_triggers are required so that SQLite fires DELETE trigger on
+  // REPLACE INTO statements
+  await sql`PRAGMA recursive_triggers = true`.execute(db);
 
   if (options.pageSize)
     await sql`PRAGMA page_size = ${sql.raw(
@@ -242,7 +247,22 @@ export async function createDatabase(name: string, options: SQLiteOptions) {
       db
     );
 
-  await migrator.migrateToLatest();
+  const { error, results } = await migrator.migrateToLatest();
+
+  results?.forEach((it) => {
+    if (it.status === "Success") {
+      console.log(`migration "${it.migrationName}" was executed successfully`);
+    } else if (it.status === "Error") {
+      console.error(`failed to execute migration "${it.migrationName}"`);
+    }
+  });
+
+  if (error) {
+    console.error("failed to run `migrateToLatest`");
+    console.error(error);
+  }
+
+  await createTriggers(db);
 
   return db;
 }
