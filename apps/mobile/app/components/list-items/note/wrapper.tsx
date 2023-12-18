@@ -33,12 +33,13 @@ import { useEditorStore } from "../../../stores/use-editor-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
-import type {
-  NotebooksWithDateEdited,
-  TagsWithDateEdited
-} from "../../list/list-item.wrapper";
+
 import NotePreview from "../../note-history/preview";
 import SelectionWrapper from "../selection-wrapper";
+import {
+  NotebooksWithDateEdited,
+  TagsWithDateEdited
+} from "../../../stores/resolve-items";
 
 export const openNote = async (
   item: Note,
@@ -51,15 +52,20 @@ export const openNote = async (
   if (!isTrash) {
     note = (await db.notes.note(item.id)) as Note;
   }
+  if (useSelectionStore.getState().selectionMode === item.type) {
+    const {
+      selectedItemsList,
+      selectionMode,
+      clearSelection,
+      setSelectedItem
+    } = useSelectionStore.getState();
 
-  const { selectedItemsList, selectionMode, clearSelection, setSelectedItem } =
-    useSelectionStore.getState();
-
-  if (selectedItemsList.length > 0 && selectionMode === item.type) {
-    setSelectedItem(note.id);
+    if (selectedItemsList.length > 0 && selectionMode === item.type) {
+      setSelectedItem(note.id);
+    } else {
+      clearSelection();
+    }
     return;
-  } else {
-    clearSelection();
   }
 
   if (note.conflicted) {
@@ -88,7 +94,9 @@ export const openNote = async (
       )
     });
   } else {
-    useEditorStore.getState().setReadonly(note?.readonly);
+    if (note?.readonly) {
+      useEditorStore.getState().setReadonly(note?.readonly);
+    }
     eSendEvent(eOnLoadNote, {
       item: note
     });

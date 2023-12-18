@@ -37,10 +37,7 @@ import { useEditorStore } from "../../../stores/use-editor-store";
 import useNavigationStore from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { SIZE } from "../../../utils/size";
-import {
-  NotebooksWithDateEdited,
-  TagsWithDateEdited
-} from "../../list/list-item.wrapper";
+
 import { Properties } from "../../properties";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
@@ -48,6 +45,10 @@ import { ReminderTime } from "../../ui/reminder-time";
 import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import {
+  NotebooksWithDateEdited,
+  TagsWithDateEdited
+} from "../../../stores/resolve-items";
 
 type NoteItemProps = {
   item: Note | BaseTrashItem<Note>;
