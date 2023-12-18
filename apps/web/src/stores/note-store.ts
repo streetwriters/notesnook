@@ -167,7 +167,7 @@ class NoteStore extends BaseStore<NoteStore> {
 const [useStore, store] = createStore(NoteStore);
 export { useStore, store };
 
-function notesFromContext(context: Context) {
+export function notesFromContext(context: Context) {
   switch (context.type) {
     case "notebook":
     case "tag":
