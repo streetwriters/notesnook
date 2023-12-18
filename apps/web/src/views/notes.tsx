@@ -19,7 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect } from "react";
 import ListContainer from "../components/list-container";
-import { useStore as useNotesStore } from "../stores/note-store";
+import {
+  notesFromContext,
+  useStore as useNotesStore
+} from "../stores/note-store";
 import { hashNavigate, navigate } from "../navigation";
 import Placeholder from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
@@ -35,7 +38,8 @@ function Notes() {
     "notes",
     (query) => {
       if (!context || !contextNotes) return;
-      return db.lookup.notes(query, contextNotes.ungrouped).sorted();
+      const notes = notesFromContext(context);
+      return db.lookup.notes(query, notes).sorted();
     },
     [context, contextNotes]
   );
