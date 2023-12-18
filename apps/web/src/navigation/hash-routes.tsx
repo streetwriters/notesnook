@@ -151,5 +151,5 @@ export type HashRoute = keyof typeof hashroutes;
 
 function afterAction() {
   hashNavigate("/", { replace: true, notify: false });
-  history.back();
+  if (!history.state.replace) history.back();
 }

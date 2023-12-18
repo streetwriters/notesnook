@@ -65,8 +65,8 @@ export function hashNavigate<TPath extends HashRoute>(
   let url: string = path;
   if (addNonce) url += `/${++lastNonce}`;
 
-  if (replace) window.history.replaceState(null, "", `#${url}`);
-  else window.history.pushState(null, "", `#${url}`);
+  if (replace) window.history.replaceState({ replace }, "", `#${url}`);
+  else window.history.pushState({ replace }, "", `#${url}`);
 
   const event = new HashChangeEvent("hashchange");
   (event as any).notify = notify;
