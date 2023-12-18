@@ -150,5 +150,6 @@ export default hashroutes;
 export type HashRoute = keyof typeof hashroutes;
 
 function afterAction() {
-  window.location.hash = "";
+  hashNavigate("/", { replace: true, notify: false });
+  if (!history.state.replace) history.back();
 }
