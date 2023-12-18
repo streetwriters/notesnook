@@ -67,75 +67,80 @@ export class Notes implements ICollection {
       throw new Error("Please use db.notes.merge to merge remote notes.");
 
     const id = item.id || getId();
+    const isUpdating = item.id && (await this.exists(item.id));
 
-    const oldNote = await this.note(id);
-
-    const note = {
-      ...oldNote,
-      ...item
-    };
-
-    let dateEdited = note.dateEdited || note.dateCreated || Date.now();
-    if (oldNote) note.contentId = oldNote.contentId;
-
-    if (!oldNote && !item.content && !item.contentId && !item.title)
+    if (!isUpdating && !item.content && !item.contentId && !item.title)
       throw new Error("Note must have a title or content.");
 
     await this.db.transaction(async () => {
-      if (item.content && item.content.data && item.content.type) {
-        if (oldNote) dateEdited = Date.now();
+      let contentId = item.contentId;
+      let dateEdited = item.dateEdited;
+      let headline = "";
 
+      if (item.content && item.content.data && item.content.type) {
         const { type, data } = item.content;
 
         const content = getContentFromData(type, data);
         if (!content) throw new Error("Invalid content type.");
 
-        note.contentId = await this.db.content.add({
+        headline = item.locked ? "" : getNoteHeadline(content);
+        dateEdited = Date.now();
+        contentId = await this.db.content.add({
           noteId: id,
-          sessionId: note.sessionId,
-          id: note.contentId,
+          sessionId: item.sessionId,
+          id: contentId,
           dateEdited,
           type,
           data,
-          localOnly: !!note.localOnly
+          ...(item.localOnly !== undefined ? { localOnly: item.localOnly } : {})
         });
-
-        note.headline = note.locked ? "" : getNoteHeadline(content);
-      }
-
-      if (note.contentId && item.localOnly !== undefined) {
+      } else if (contentId && item.localOnly !== undefined) {
         await this.db.content.add({
-          id: note.contentId,
+          id: contentId,
           localOnly: !!item.localOnly
         });
       }
 
-      const noteTitle = await this.getNoteTitle(note, oldNote, note.headline);
-      if (oldNote && oldNote.title !== noteTitle) dateEdited = Date.now();
+      if (item.title) {
+        item.title = this.getNoteTitle(item.title, headline);
+        dateEdited = Date.now();
+      }
 
-      await this.collection.upsert({
-        id,
-        contentId: note.contentId,
-        type: "note",
+      if (isUpdating) {
+        await this.collection.update([id], {
+          title: item.title,
+          headline,
 
-        title: noteTitle,
-        headline: note.headline,
+          pinned: item.pinned,
+          locked: item.locked,
+          favorite: item.favorite,
+          localOnly: item.localOnly,
+          conflicted: item.conflicted,
+          readonly: item.readonly,
 
-        notebooks: note.notebooks || undefined,
+          dateEdited
+        });
+      } else {
+        await this.collection.upsert({
+          id,
+          type: "note",
+          contentId,
 
-        pinned: !!note.pinned,
-        locked: !!note.locked,
-        favorite: !!note.favorite,
-        localOnly: !!note.localOnly,
-        conflicted: !!note.conflicted,
-        readonly: !!note.readonly,
+          title: item.title,
+          headline: headline,
 
-        dateCreated: note.dateCreated || Date.now(),
-        dateEdited,
-        dateModified: note.dateModified || Date.now()
-      });
+          pinned: item.pinned,
+          locked: item.locked,
+          favorite: item.favorite,
+          localOnly: item.localOnly,
+          conflicted: item.conflicted,
+          readonly: item.readonly,
 
-      if (!oldNote) this.totalNotes++;
+          dateCreated: item.dateCreated || Date.now(),
+          dateEdited: dateEdited || Date.now()
+        });
+        this.totalNotes++;
+      }
     });
     return id;
   }
@@ -386,20 +391,9 @@ export class Notes implements ICollection {
     });
   }
 
-  private async getNoteTitle(
-    note: Partial<Note>,
-    oldNote?: Note,
-    headline?: string
-  ) {
-    if (note.title && note.title.trim().length > 0) {
-      return note.title.replace(NEWLINE_STRIP_REGEX, " ");
-    } else if (
-      oldNote &&
-      oldNote.title &&
-      oldNote.title.trim().length > 0 &&
-      (note.title === undefined || note.title === null)
-    ) {
-      return oldNote.title.replace(NEWLINE_STRIP_REGEX, " ");
+  private getNoteTitle(title: string, headline?: string) {
+    if (title.trim().length > 0) {
+      return title.replace(NEWLINE_STRIP_REGEX, " ");
     }
 
     return formatTitle(
