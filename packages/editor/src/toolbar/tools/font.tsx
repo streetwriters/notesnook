@@ -54,6 +54,11 @@ export function FontSize(props: ToolProps) {
           .run()
       }
       onIncrease={() => {
+        if (editor.current) {
+          const { $from, $anchor, $to } = editor.current.state.selection;
+          console.log("type", editor);
+        }
+
         editor.current
           ?.chain()
           .focus()
