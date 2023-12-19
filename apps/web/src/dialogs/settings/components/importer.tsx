@@ -75,7 +75,7 @@ export function Importer() {
         <>
           <CheckCircleOutline color="accent" sx={{ mt: 150 }} />
           <Text variant="body" my={2} sx={{ textAlign: "center" }}>
-            Import successful. {errors.length} errors occured.
+            Import completed. {errors.length} errors occured.
           </Text>
           <Button
             variant="secondary"
@@ -136,23 +136,29 @@ export function Importer() {
               </Text>
             </Flex>
             <Button
+              variant="accent"
               onClick={async () => {
                 setIsDone(false);
                 setIsImporting(true);
 
                 await db.syncer?.acquireLock(async () => {
                   try {
-                    for await (const {
-                      count,
-                      filesRead,
-                      totalFiles
-                    } of importFiles(files)) {
-                      if (notesCounter.current)
-                        notesCounter.current.innerText = `${count}`;
-                      if (importProgress.current)
-                        importProgress.current.style.width = `${
-                          (filesRead / totalFiles) * 100
-                        }%`;
+                    for await (const message of importFiles(files)) {
+                      switch (message.type) {
+                        case "error":
+                          setErrors((errors) => [...errors, message.error]);
+                          break;
+                        case "progress": {
+                          const { count, filesRead, totalFiles } = message;
+                          if (notesCounter.current)
+                            notesCounter.current.innerText = `${count}`;
+                          if (importProgress.current)
+                            importProgress.current.style.width = `${
+                              (filesRead / totalFiles) * 100
+                            }%`;
+                          break;
+                        }
+                      }
                     }
                   } catch (e) {
                     console.error(e);

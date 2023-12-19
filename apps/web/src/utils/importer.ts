@@ -18,25 +18,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { db } from "../common/db";
-import type { Note, Notebook } from "@notesnook-importer/core";
+import {
+  Note,
+  Notebook,
+  ContentType
+} from "@notesnook-importer/core/dist/src/models";
 import {
   ATTACHMENTS_DIRECTORY_NAME,
   NOTE_DATA_FILENAME
 } from "@notesnook-importer/core/dist/src/utils/note-stream";
-import { Cipher } from "@notesnook/crypto/dist/src/types";
 import { Reader, Entry } from "./zip-reader";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
 
 export async function* importFiles(zipFiles: File[]) {
-  const { default: FS } = await import("../interfaces/fs");
   for (const zip of zipFiles) {
     let count = 0;
     let filesRead = 0;
 
-    const attachments: Record<
-      string,
-      Omit<Cipher, "cipher" | "format"> & { key: any; chunkSize: number }
-    > = {};
+    const attachments: Record<string, any> = {};
     const { read, totalFiles } = await Reader(zip);
 
     for await (const entry of read()) {
@@ -47,43 +46,19 @@ export async function* importFiles(zipFiles: File[]) {
       );
       const isNote = !isAttachment && entry.name.endsWith(NOTE_DATA_FILENAME);
 
-      if (isAttachment) {
-        const name = path.basename(entry.name);
-        if (!name || attachments[name] || db.attachments?.exists(name))
-          continue;
-
-        const data = await entry.arrayBuffer();
-        const { hash } = await FS.hashBuffer(new Uint8Array(data));
-        if (hash !== name) {
-          throw new Error(`integrity check failed: ${name} !== ${hash}`);
+      try {
+        if (isAttachment) {
+          await processAttachment(entry, attachments);
+        } else if (isNote) {
+          await processNote(entry, attachments);
+          ++count;
         }
-
-        const file = new File([data], name, {
-          type: "application/octet-stream"
-        });
-        const key = await db.attachments?.generateKey();
-        const cipherData = await FS.writeEncryptedFile(file, key, name);
-        attachments[name] = { ...cipherData, key };
-      } else if (isNote) {
-        const note = await fileToJson<Note>(entry);
-        for (const attachment of note.attachments || []) {
-          const cipherData = attachments[attachment.hash];
-          if (!cipherData || db.attachments?.exists(attachment.hash)) continue;
-
-          await db.attachments?.add({
-            ...cipherData,
-            hash: attachment.hash,
-            hashType: attachment.hashType,
-            filename: attachment.filename,
-            type: attachment.mime
-          });
-        }
-        await importNote(note);
-
-        ++count;
+      } catch (e) {
+        if (e instanceof Error) yield { type: "error" as const, error: e };
       }
 
       yield {
+        type: "progress" as const,
         count,
         totalFiles,
         filesRead
@@ -92,7 +67,50 @@ export async function* importFiles(zipFiles: File[]) {
   }
 }
 
-async function importNote(note: Note) {
+async function processAttachment(
+  entry: Entry,
+  attachments: Record<string, any>
+) {
+  const name = path.basename(entry.name);
+  if (!name || attachments[name] || db.attachments?.exists(name)) return;
+
+  const { default: FS } = await import("../interfaces/fs");
+
+  const data = await entry.arrayBuffer();
+  const { hash } = await FS.hashBuffer(new Uint8Array(data));
+  if (hash !== name) {
+    throw new Error(`integrity check failed: ${name} !== ${hash}`);
+  }
+
+  const file = new File([data], name, {
+    type: "application/octet-stream"
+  });
+  const key = await db.attachments?.generateKey();
+  const cipherData = await FS.writeEncryptedFile(file, key, name);
+  attachments[name] = { ...cipherData, key };
+}
+
+async function processNote(entry: Entry, attachments: Record<string, any>) {
+  const note = await fileToJson<Note>(entry);
+  for (const attachment of note.attachments || []) {
+    const cipherData = attachments[attachment.hash];
+    if (!cipherData || db.attachments?.exists(attachment.hash)) continue;
+
+    await db.attachments?.add({
+      ...cipherData,
+      hash: attachment.hash,
+      hashType: attachment.hashType,
+      filename: attachment.filename,
+      type: attachment.mime
+    });
+  }
+
+  if (!note.content)
+    note.content = {
+      data: "<p></p>",
+      type: ContentType.HTML
+    };
+
   if (note.content?.type === "html") (note.content.type as string) = "tiptap";
   else throw new Error("Invalid content type: " + note.content?.type);
 
@@ -101,7 +119,7 @@ async function importNote(note: Note) {
   const noteId = await db.notes?.add(note);
 
   for (const nb of notebooks) {
-    const notebook = await importNotebook(nb);
+    const notebook = await importNotebook(nb).catch(() => ({ id: undefined }));
     if (!notebook.id) continue;
     await db.notes?.addToNotebook(
       { id: notebook.id, topic: notebook.topic },
@@ -126,9 +144,10 @@ async function importNotebook(
       title: notebook.notebook,
       topics: notebook.topic ? [notebook.topic] : []
     });
-    nb = db.notebooks?.notebook(nbId).data;
+    nb = db.notebooks?.notebook(nbId)?.data;
+    if (!nb) return {};
   }
-  const topic = nb?.topics.find((t: any) => t.title === notebook.topic);
 
+  const topic = nb.topics.find((t: any) => t.title === notebook.topic);
   return { id: nb ? nb.id : undefined, topic: topic ? topic.id : undefined };
 }
