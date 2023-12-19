@@ -472,7 +472,7 @@ const menuItems: (note: any, items?: any[]) => MenuItem[] = (
           {
             type: "button",
             key: "copy-as-text",
-            tooltip: `Export as Text`,
+            tooltip: `Copy as Text`,
             title: "Text",
             icon: Plaintext.path,
             onClick: () => copyNote(note.id, "txt")
@@ -480,7 +480,7 @@ const menuItems: (note: any, items?: any[]) => MenuItem[] = (
           {
             type: "button",
             key: "copy-as-markdown",
-            tooltip: `Export as Markdown`,
+            tooltip: `Copy as Markdown`,
             title: "Markdown",
             icon: Markdown.path,
             onClick: () => copyNote(note.id, "md")

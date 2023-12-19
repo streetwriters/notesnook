@@ -179,6 +179,11 @@ export const BackupExportSettings: SettingsGroup[] = [
               { value: "-", title: "Select format" },
               { value: "txt", title: "Text" },
               { value: "md", title: "Markdown", premium: true },
+              {
+                value: "md-frontmatter",
+                title: "Markdown + Frontmatter",
+                premium: true
+              },
               { value: "html", title: "HTML", premium: true }
             ],
             selectedOption: () => "-",
@@ -186,7 +191,7 @@ export const BackupExportSettings: SettingsGroup[] = [
               if (!db.notes || value === "-") return;
               if (await verifyAccount())
                 await exportNotes(
-                  value as "txt" | "md" | "html",
+                  value as "txt" | "md" | "html" | "md-frontmatter",
                   db.notes.all.map((n) => n.id)
                 );
             }
