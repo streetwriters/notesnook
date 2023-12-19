@@ -30,6 +30,9 @@ export function showFilePicker({
     input.setAttribute("type", "file");
     input.setAttribute("accept", acceptedFileTypes);
     input.dispatchEvent(new MouseEvent("click"));
+    input.oncancel = async function () {
+      resolve(undefined);
+    };
     input.onchange = async function () {
       if (!input.files) return resolve(undefined);
       const file = input.files[0];

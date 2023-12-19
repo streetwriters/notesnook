@@ -138,8 +138,9 @@ export async function selectBackupFile() {
 
 export async function importBackup() {
   const backupFile = await selectBackupFile();
-  if (!backupFile) return;
+  if (!backupFile) return false;
   await restoreBackupFile(backupFile);
+  return true;
 }
 
 export async function restoreBackupFile(backupFile: File) {
