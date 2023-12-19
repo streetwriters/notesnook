@@ -20,7 +20,7 @@ import { markInputRule, markPasteRule } from "@tiptap/core";
 import TiptapLink from "@tiptap/extension-link";
 
 const linkRegex = /(?:__|[*#])|\[(.*?)\]\(.*?\)/gm;
-const regExp = /\((.*?)\)/gm;
+const regExp = /(?:__|[*#])|\[.*?\]\((.*?)\)/gm;
 
 export const Link = TiptapLink.extend({
   addInputRules() {
