@@ -516,7 +516,7 @@ p > *::selection {
   position: relative;
 }
 
-.outline-list li > :first-child::before {
+.outline-list > li > :first-child::before {
   position: absolute;
   top: 3px;
   cursor: pointer;
