@@ -141,10 +141,16 @@ export function MenuButton(props: MenuButtonProps) {
 const platform = getPlatform();
 function translateModifier(modifier: string) {
   if (platform === "Android" || platform === "iOS") return "";
+  const isMacOS = platform === "macOS";
   const parts = modifier.split("-");
   return parts
-    .map((p) => (p === "Mod" ? (platform === "macOS" ? "Cmd" : "Ctrl") : p))
-    .join("+");
+    .map((p) => {
+      if (isMacOS) {
+        return p === "Mod" ? "⌘" : p === "Alt" ? "⌥" : p === "Shift" ? "⇧" : p;
+      }
+      return p === "Mod" ? "Ctrl" : p;
+    })
+    .join(isMacOS ? "" : "+");
 }
 
 function getPlatform() {
