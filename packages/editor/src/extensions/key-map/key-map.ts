@@ -41,7 +41,7 @@ export const KeyMap = Extension.create({
         if (isListActive(editor)) return false;
         return true;
       },
-      "Ctrl-\\": ({ editor }) => {
+      "Mod-\\": ({ editor }) => {
         editor
           .chain()
           .focus()
