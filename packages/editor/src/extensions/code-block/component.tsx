@@ -81,7 +81,6 @@ export function CodeblockComponent(
               }
             },
             fontFamily: "monospace",
-            fontSize: "code",
             whiteSpace: "pre", // TODO !important
             tabSize: 1,
             position: "relative",
@@ -166,6 +165,7 @@ export function CodeblockComponent(
               onClick={() => {
                 editor.commands.copyToClipboard(node.textContent);
                 start();
+                console.log("props", props);
               }}
               title="Copy to clipboard"
             >
