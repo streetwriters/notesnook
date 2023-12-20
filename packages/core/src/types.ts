@@ -33,8 +33,6 @@ export type SortOptions = {
   sortDirection: "desc" | "asc";
 };
 
-export type SideBarSectionKey = "menu" | "colors" | "pinned";
-
 export type GroupOptions = SortOptions & {
   groupBy: "none" | "abc" | "year" | "month" | "week" | "default";
 };
@@ -417,6 +415,8 @@ export interface LegacySettingsItem extends BaseItem<"settings"> {
 }
 
 export type ToolbarConfigPlatforms = "desktop" | "mobile";
+export type SideBarSection = "builtin" | "colors" | "shortcuts";
+export type SideBarHideableSection = "builtin" | "colors";
 export type SettingItemMap = {
   trashCleanupInterval: TrashCleanupInterval;
   titleFormat: string;
@@ -425,8 +425,8 @@ export type SettingItemMap = {
   defaultNotebook: string | undefined;
 } & Record<`groupOptions:${GroupingKey}`, GroupOptions> &
   Record<`toolbarConfig:${ToolbarConfigPlatforms}`, ToolbarConfig | undefined> &
-  Record<`sideBarOrder:${SideBarSectionKey}`, string[]> &
-  Record<`sideBarHiddenItems:${SideBarSectionKey}`, string[]>;
+  Record<`sideBarOrder:${SideBarSection}`, string[]> &
+  Record<`sideBarHiddenItems:${SideBarHideableSection}`, string[]>;
 
 export interface SettingItem<
   TKey extends keyof SettingItemMap = keyof SettingItemMap

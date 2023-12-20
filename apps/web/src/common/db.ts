@@ -20,25 +20,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
-import type Database from "@notesnook/core/dist/api";
 import { showMigrationDialog } from "./dialog-controller";
 // import { SQLocalKysely } from "sqlocal/kysely";
 import { WaSqliteWorkerDriver } from "./sqlite/sqlite.kysely";
 import { SqliteAdapter, SqliteQueryCompiler, SqliteIntrospector } from "kysely";
+import { database } from "@notesnook/common";
 // import SQLiteESMFactory from "./sqlite/wa-sqlite-async";
 // import * as SQLite from "./sqlite/sqlite-api";
 // import { IDBBatchAtomicVFS } from "./sqlite/IDBBatchAtomicVFS";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-let db: Database = {};
+const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
   logger.measure("Database initialization");
 
-  const { database } = await import("@notesnook/common");
   const { FileStorage } = await import("../interfaces/fs");
   const { Compressor } = await import("../utils/compressor");
-  db = database;
 
   // // const ss = wrap<SQLiteWorker>(new Worker());
   // // await ss.init("test.db", false, uri);

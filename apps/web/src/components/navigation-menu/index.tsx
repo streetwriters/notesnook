@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Box, Button, Flex } from "@theme-ui/components";
 import {
   Note,
@@ -38,7 +38,7 @@ import {
   Reminders
 } from "../icons";
 import { AnimatedFlex } from "../animated";
-import NavigationItem from "./navigation-item";
+import NavigationItem, { SortableNavigationItem } from "./navigation-item";
 import { hardNavigate, hashNavigate, navigate } from "../../navigation";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
@@ -49,8 +49,28 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import useLocation from "../../hooks/use-location";
 import { FlexScrollContainer } from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
+import {
+  closestCenter,
+  DndContext,
+  useSensor,
+  useSensors,
+  KeyboardSensor,
+  DragOverlay,
+  MeasuringStrategy,
+  MouseSensor
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable";
+import { isUserPremium } from "../../hooks/use-is-user-premium";
+import { showToast } from "../../utils/toast";
+import { usePersistentState } from "../../hooks/use-persistent-state";
 
 type Route = {
+  id: string;
   title: string;
   path: string;
   icon: Icon;
@@ -68,33 +88,38 @@ function shouldSelectNavItem(route: string, pin: { type: string; id: string }) {
 }
 
 const routes: Route[] = [
-  { title: "Notes", path: "/notes", icon: Note },
+  { id: "notes", title: "Notes", path: "/notes", icon: Note },
   {
+    id: "notebooks",
     title: "Notebooks",
     path: "/notebooks",
     icon: Notebook
   },
   {
+    id: "favorites",
     title: "Favorites",
     path: "/favorites",
     icon: StarOutline
   },
-  { title: "Tags", path: "/tags", icon: Tag },
+  { id: "tags", title: "Tags", path: "/tags", icon: Tag },
   {
-    title: "Monographs",
-    path: "/monographs",
-    icon: Monographs
-  },
-  {
+    id: "reminders",
     title: "Reminders",
     path: "/reminders",
     icon: Reminders,
     tag: "Beta"
   },
-  { title: "Trash", path: "/trash", icon: Trash }
+  {
+    id: "monographs",
+    title: "Monographs",
+    path: "/monographs",
+    icon: Monographs
+  },
+  { id: "trash", title: "Trash", path: "/trash", icon: Trash }
 ];
 
 const settings: Route = {
+  id: "settings",
   title: "Settings",
   path: "/settings",
   icon: Settings
@@ -180,97 +205,163 @@ function NavigationMenu(props: NavigationMenuProps) {
           suppressScrollX={true}
         >
           <Flex sx={{ flexDirection: "column" }}>
-            {routes.map((item) => (
-              <NavigationItem
-                isTablet={isTablet}
-                key={item.path}
-                title={item.title}
-                icon={item.icon}
-                tag={item.tag}
-                selected={
-                  item.path === "/"
-                    ? location === item.path
-                    : location.startsWith(item.path)
-                }
-                onClick={() => {
-                  if (!isMobile && location === item.path)
-                    return toggleNavigationContainer();
-                  _navigate(item.path);
-                }}
-              />
-            ))}
-            {colors.map((color, index) => (
-              <NavigationItem
-                animate={!IS_DESKTOP_APP}
-                index={index}
-                isTablet={isTablet}
-                key={color.id}
-                title={color.title}
-                icon={Circle}
-                selected={location === `/colors/${color.id}`}
-                color={color.title.toLowerCase()}
-                onClick={() => {
-                  _navigate(`/colors/${color.id}`);
-                }}
-                menuItems={[
-                  {
-                    type: "button",
-                    key: "rename",
-                    title: "Rename color",
-                    onClick: async () => {
-                      await showRenameColorDialog(color.id);
-                    }
+            <ReorderableList
+              items={routes}
+              orderKey={`sidebarOrder:builtin`}
+              order={() => db.settings.getSideBarOrder("builtin")}
+              onOrderChanged={(order) =>
+                db.settings.setSideBarOrder("builtin", order)
+              }
+              renderOverlay={({ item }) => (
+                <NavigationItem
+                  id={item.id}
+                  isTablet={isTablet}
+                  title={item.title}
+                  icon={item.icon}
+                  tag={item.tag}
+                  selected={
+                    item.path === "/"
+                      ? location === item.path
+                      : location.startsWith(item.path)
                   }
-                ]}
-              />
-            ))}
+                />
+              )}
+              renderItem={({ item }) => (
+                <SortableNavigationItem
+                  key={item.id}
+                  id={item.id}
+                  isTablet={isTablet}
+                  title={item.title}
+                  icon={item.icon}
+                  tag={item.tag}
+                  selected={
+                    item.path === "/"
+                      ? location === item.path
+                      : location.startsWith(item.path)
+                  }
+                  onClick={() => {
+                    if (!isMobile && location === item.path)
+                      return toggleNavigationContainer();
+                    _navigate(item.path);
+                  }}
+                />
+              )}
+            />
+
+            <ReorderableList
+              items={colors}
+              orderKey={`sidebarOrder:colors`}
+              order={() => db.settings.getSideBarOrder("colors")}
+              onOrderChanged={(order) =>
+                db.settings.setSideBarOrder("colors", order)
+              }
+              renderOverlay={({ item }) => (
+                <NavigationItem
+                  id={item.id}
+                  isTablet={isTablet}
+                  title={item.title}
+                  icon={Circle}
+                  color={item.colorCode}
+                  selected={location === `/colors/${item.id}`}
+                />
+              )}
+              renderItem={({ item: color }) => (
+                <SortableNavigationItem
+                  id={color.id}
+                  isTablet={isTablet}
+                  key={color.id}
+                  title={color.title}
+                  icon={Circle}
+                  selected={location === `/colors/${color.id}`}
+                  color={color.colorCode}
+                  onClick={() => {
+                    _navigate(`/colors/${color.id}`);
+                  }}
+                  menuItems={[
+                    {
+                      type: "button",
+                      key: "rename",
+                      title: "Rename color",
+                      onClick: async () => {
+                        await showRenameColorDialog(color.id);
+                      }
+                    }
+                  ]}
+                />
+              )}
+            />
             <Box
               bg="separator"
               my={1}
               sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
             />
-            {shortcuts.map((item, index) => (
-              <NavigationItem
-                animate={!IS_DESKTOP_APP}
-                index={colors.length - 1 + index}
-                isTablet={isTablet}
-                key={item.id}
-                title={item.title}
-                menuItems={[
-                  {
-                    type: "button",
-                    key: "removeshortcut",
-                    title: "Remove shortcut",
-                    onClick: async () => {
-                      await db.shortcuts.remove(item.id);
-                      refreshNavItems();
+            <ReorderableList
+              items={shortcuts}
+              orderKey={`sidebarOrder:shortcuts`}
+              order={() => db.settings.getSideBarOrder("shortcuts")}
+              onOrderChanged={(order) =>
+                db.settings.setSideBarOrder("shortcuts", order)
+              }
+              renderOverlay={({ item }) => (
+                <NavigationItem
+                  id={item.id}
+                  isTablet={isTablet}
+                  key={item.id}
+                  title={item.title}
+                  icon={
+                    item.type === "notebook"
+                      ? Notebook2
+                      : item.type === "tag"
+                      ? Tag2
+                      : Topic
+                  }
+                  isShortcut
+                  selected={shouldSelectNavItem(location, item)}
+                />
+              )}
+              renderItem={({ item }) => (
+                <SortableNavigationItem
+                  id={item.id}
+                  isTablet={isTablet}
+                  key={item.id}
+                  title={item.title}
+                  menuItems={[
+                    {
+                      type: "button",
+                      key: "removeshortcut",
+                      title: "Remove shortcut",
+                      onClick: async () => {
+                        await db.shortcuts.remove(item.id);
+                        refreshNavItems();
+                      }
                     }
+                  ]}
+                  icon={
+                    item.type === "notebook"
+                      ? Notebook2
+                      : item.type === "tag"
+                      ? Tag2
+                      : Topic
                   }
-                ]}
-                icon={
-                  item.type === "notebook"
-                    ? Notebook2
-                    : item.type === "tag"
-                    ? Tag2
-                    : Topic
-                }
-                isShortcut
-                selected={shouldSelectNavItem(location, item)}
-                onClick={() => {
-                  if (item.type === "notebook") {
-                    _navigate(`/notebooks/${item.id}`);
-                  } else if (item.type === "tag") {
-                    _navigate(`/tags/${item.id}`);
-                  }
-                }}
-              />
-            ))}
+                  isShortcut
+                  selected={shouldSelectNavItem(location, item)}
+                  onClick={() => {
+                    if (item.type === "notebook") {
+                      _navigate(`/notebooks/${item.id}`);
+                    } else if (item.type === "tag") {
+                      _navigate(`/tags/${item.id}`);
+                    }
+                  }}
+                />
+              )}
+            />
           </Flex>
         </FlexScrollContainer>
 
         <Flex sx={{ flexDirection: "column" }}>
           {isLoggedIn === false && (
             <NavigationItem
+              id="login"
               isTablet={isTablet}
               title="Login"
               icon={Login}
@@ -279,6 +370,7 @@ function NavigationMenu(props: NavigationMenuProps) {
           )}
           {isTablet && (
             <NavigationItem
+              id="change-theme"
               isTablet={isTablet}
               title={theme === "dark" ? "Light mode" : "Dark mode"}
               icon={theme === "dark" ? LightMode : DarkMode}
@@ -289,6 +381,7 @@ function NavigationMenu(props: NavigationMenuProps) {
             />
           )}
           <NavigationItem
+            id={settings.id}
             isTablet={isTablet}
             key={settings.path}
             title={settings.title}
@@ -340,4 +433,100 @@ function findNestedRoute(location: string) {
     }
   }
   return nestedRoute;
+}
+
+type ReorderableListProps<T> = {
+  orderKey: string;
+  items: T[];
+  renderItem: (props: { item: T }) => JSX.Element;
+  renderOverlay: (props: { item: T }) => JSX.Element;
+  onOrderChanged: (newOrder: string[]) => void;
+  order: () => string[];
+};
+
+function ReorderableList<T extends { id: string }>(
+  props: ReorderableListProps<T>
+) {
+  const {
+    orderKey,
+    items,
+    renderItem: Item,
+    renderOverlay: Overlay,
+    onOrderChanged,
+    order: _order
+  } = props;
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 10
+      }
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  );
+  const [activeItem, setActiveItem] = useState<T>();
+  const [order, setOrder] = usePersistentState<string[]>(orderKey, _order());
+  const orderedItems = orderItems(items, order);
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={(event) => {
+        if (!isUserPremium()) {
+          showToast("error", "You need to be Pro to customize the sidebar.");
+          return;
+        }
+        setActiveItem(orderedItems.find((i) => i.id === event.active.id));
+      }}
+      onDragEnd={(event) => {
+        const { active, over } = event;
+
+        const overId = over?.id as string;
+        if (overId && active.id !== overId) {
+          const transitionOrder =
+            order.length === 0 ? orderedItems.map((i) => i.id) : order;
+          const newIndex = transitionOrder.indexOf(overId);
+          const oldIndex = transitionOrder.indexOf(active.id as string);
+          const newOrder = arrayMove(transitionOrder, oldIndex, newIndex);
+          setOrder(newOrder);
+          onOrderChanged(newOrder);
+        }
+        setActiveItem(undefined);
+      }}
+      measuring={{
+        droppable: { strategy: MeasuringStrategy.Always }
+      }}
+    >
+      <SortableContext
+        items={orderedItems}
+        strategy={verticalListSortingStrategy}
+      >
+        {orderedItems.map((item) => (
+          <Item key={item.id} item={item} />
+        ))}
+
+        <DragOverlay
+          dropAnimation={{
+            duration: 500,
+            easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)"
+          }}
+        >
+          {activeItem && <Overlay item={activeItem} />}
+        </DragOverlay>
+      </SortableContext>
+    </DndContext>
+  );
+}
+
+function orderItems<T extends { id: string }>(items: T[], order: string[]) {
+  const sorted: T[] = [];
+  order.forEach((id) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    sorted.push(item);
+  });
+  sorted.push(...items.filter((i) => !order.includes(i.id)));
+  return sorted;
 }
