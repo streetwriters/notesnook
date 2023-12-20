@@ -64,11 +64,11 @@ const defaultSettings: SettingItemMap = {
   "toolbarConfig:desktop": undefined,
   "toolbarConfig:mobile": undefined,
 
-  "sideBarOrder:builtin": [],
+  "sideBarOrder:routes": [],
   "sideBarOrder:colors": [],
   "sideBarOrder:shortcuts": [],
 
-  "sideBarHiddenItems:builtin": [],
+  "sideBarHiddenItems:routes": [],
   "sideBarHiddenItems:colors": []
 };
 
@@ -189,7 +189,7 @@ export class Settings implements ICollection {
     return this.get(`sideBarHiddenItems:${section}`);
   }
 
-  setSideBarHiddenItems(section: SideBarHideableSection, order: string[]) {
-    return this.set(`sideBarHiddenItems:${section}`, order);
+  setSideBarHiddenItems(section: SideBarHideableSection, ids: string[]) {
+    return this.set(`sideBarHiddenItems:${section}`, ids);
   }
 }
