@@ -17,15 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Text } from "@theme-ui/components";
+import { Button, Flex, FlexProps, Text } from "@theme-ui/components";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { Menu } from "../../hooks/use-menu";
 import useMobile from "../../hooks/use-mobile";
 import { PropsWithChildren } from "react";
 import { Icon, Shortcut } from "../icons";
-import { AnimatedFlex } from "../animated";
 import { SchemeColors, createButtonVariant } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type NavigationItemProps = {
   icon: Icon;
@@ -43,7 +44,11 @@ type NavigationItemProps = {
   menuItems?: MenuItem[];
 };
 
-function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
+function NavigationItem(
+  props: PropsWithChildren<
+    NavigationItemProps & { containerRef?: React.Ref<HTMLElement> } & FlexProps
+  >
+) {
   const {
     icon: Icon,
     color,
@@ -57,24 +62,17 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
     onClick,
     menuItems,
     count,
-    animate = false,
-    index = 0
+    sx,
+    containerRef,
+    ...restProps
   } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
 
   return (
-    <AnimatedFlex
-      initial={{
-        opacity: animate ? 0 : 1,
-        // y: animate ? 0 : 0,
-        x: animate ? (isTablet ? 0 : 10) : 0
-      }}
-      animate={{
-        opacity: 1,
-        x: 0
-      }}
-      transition={{ duration: 0.1, delay: index * 0.05, ease: "easeIn" }}
+    <Flex
+      {...restProps}
+      ref={containerRef}
       sx={{
         ...createButtonVariant(
           selected ? "background-selected" : "transparent",
@@ -92,7 +90,8 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
         alignItems: "center",
         position: "relative",
         ":first-of-type": { mt: 1 },
-        ":last-of-type": { mb: 1 }
+        ":last-of-type": { mb: 1 },
+        ...sx
         // ":hover:not(:disabled)": {
         //   bg: "hover",
         //   filter: "brightness(100%)"
@@ -185,7 +184,29 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
           {tag}
         </Text>
       ) : null}
-    </AnimatedFlex>
+    </Flex>
   );
 }
 export default NavigationItem;
+
+export function SortableNavigationItem(
+  props: PropsWithChildren<{ id: string } & NavigationItemProps>
+) {
+  const { id, ...restProps } = props;
+  const { attributes, listeners, setNodeRef, transform, transition, active } =
+    useSortable({ id });
+
+  return (
+    <NavigationItem
+      {...restProps}
+      containerRef={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        visibility: active?.id === id ? "hidden" : "visible"
+      }}
+      {...listeners}
+      {...attributes}
+    />
+  );
+}
