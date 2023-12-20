@@ -424,8 +424,8 @@ export interface LegacySettingsItem extends BaseItem<"settings"> {
 }
 
 export type ToolbarConfigPlatforms = "desktop" | "mobile";
-export type SideBarSection = "builtin" | "colors" | "shortcuts";
-export type SideBarHideableSection = "builtin" | "colors";
+export type SideBarSection = "routes" | "colors" | "shortcuts";
+export type SideBarHideableSection = "routes" | "colors";
 export type SettingItemMap = {
   trashCleanupInterval: TrashCleanupInterval;
   titleFormat: string;
