@@ -26,6 +26,7 @@ import { Counter } from "../components/counter";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { useToolbarStore } from "../stores/toolbar-store";
 import { getFontById, getFontIds, getFonts } from "../../utils/font";
+import { CodeBlock } from "../../extensions/code-block";
 
 export function FontSize(props: ToolProps) {
   const { editor } = props;
@@ -43,6 +44,8 @@ export function FontSize(props: ToolProps) {
     return Math.min(120, fontSizeAsNumber.current + 1);
   }, [fontSizeAsNumber]);
 
+  if (editor.current?.isActive(CodeBlock.name)) return null;
+
   return (
     <Counter
       title="font size"
@@ -54,11 +57,6 @@ export function FontSize(props: ToolProps) {
           .run()
       }
       onIncrease={() => {
-        if (editor.current) {
-          const { $from, $anchor, $to } = editor.current.state.selection;
-          console.log("type", editor);
-        }
-
         editor.current
           ?.chain()
           .focus()
@@ -90,6 +88,8 @@ export function FontFamily(props: ToolProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentFontFamily]
   );
+
+  if (editor.current?.isActive(CodeBlock.name)) return null;
 
   return (
     <Dropdown
