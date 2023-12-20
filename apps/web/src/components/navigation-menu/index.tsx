@@ -68,6 +68,7 @@ import {
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { showToast } from "../../utils/toast";
 import { usePersistentState } from "../../hooks/use-persistent-state";
+import { MenuItem } from "@notesnook/ui";
 
 type Route = {
   id: string;
@@ -144,6 +145,14 @@ function NavigationMenu(props: NavigationMenuProps) {
   const setFollowSystemTheme = useThemeStore(
     (store) => store.setFollowSystemTheme
   );
+  const [hiddenRoutes, setHiddenRoutes] = usePersistentState(
+    "sidebarHiddenItems:routes",
+    db.settings.getSideBarHiddenItems("routes")
+  );
+  const [hiddenColors, setHiddenColors] = usePersistentState(
+    "sidebarHiddenItems:colors",
+    db.settings.getSideBarHiddenItems("colors")
+  );
 
   const _navigate = useCallback(
     (path) => {
@@ -162,6 +171,28 @@ function NavigationMenu(props: NavigationMenuProps) {
       navigationHistory.set(location, true);
     } else navigationHistory.delete(previousLocation);
   }, [location, previousLocation, state]);
+
+  const getSidebarItems = useCallback(async () => {
+    return [
+      ...toMenuItems(
+        orderItems(routes, db.settings.getSideBarOrder("routes")),
+        hiddenRoutes,
+        (ids) =>
+          db.settings
+            .setSideBarHiddenItems("routes", ids)
+            .then(() => setHiddenRoutes(ids))
+      ),
+      { type: "separator", key: "sep" },
+      ...toMenuItems(
+        orderItems(colors, db.settings.getSideBarOrder("colors")),
+        hiddenColors,
+        (ids) =>
+          db.settings
+            .setSideBarHiddenItems("colors", ids)
+            .then(() => setHiddenColors(ids))
+      )
+    ] as MenuItem[];
+  }, [colors, hiddenColors, hiddenRoutes]);
 
   return (
     <ScopedThemeProvider
@@ -206,11 +237,11 @@ function NavigationMenu(props: NavigationMenuProps) {
         >
           <Flex sx={{ flexDirection: "column" }}>
             <ReorderableList
-              items={routes}
-              orderKey={`sidebarOrder:builtin`}
-              order={() => db.settings.getSideBarOrder("builtin")}
+              items={routes.filter((r) => !hiddenRoutes.includes(r.id))}
+              orderKey={`sidebarOrder:routes`}
+              order={() => db.settings.getSideBarOrder("routes")}
               onOrderChanged={(order) =>
-                db.settings.setSideBarOrder("builtin", order)
+                db.settings.setSideBarOrder("routes", order)
               }
               renderOverlay={({ item }) => (
                 <NavigationItem
@@ -244,12 +275,19 @@ function NavigationMenu(props: NavigationMenuProps) {
                       return toggleNavigationContainer();
                     _navigate(item.path);
                   }}
+                  menuItems={[
+                    {
+                      type: "lazy-loader",
+                      key: "sidebar-items-loader",
+                      items: getSidebarItems
+                    }
+                  ]}
                 />
               )}
             />
 
             <ReorderableList
-              items={colors}
+              items={colors.filter((c) => !hiddenColors.includes(c.id))}
               orderKey={`sidebarOrder:colors`}
               order={() => db.settings.getSideBarOrder("colors")}
               onOrderChanged={(order) =>
@@ -285,6 +323,15 @@ function NavigationMenu(props: NavigationMenuProps) {
                       onClick: async () => {
                         await showRenameColorDialog(color.id);
                       }
+                    },
+                    {
+                      type: "separator",
+                      key: "sep"
+                    },
+                    {
+                      type: "lazy-loader",
+                      key: "sidebar-items-loader",
+                      items: getSidebarItems
                     }
                   ]}
                 />
@@ -529,4 +576,24 @@ function orderItems<T extends { id: string }>(items: T[], order: string[]) {
   });
   sorted.push(...items.filter((i) => !order.includes(i.id)));
   return sorted;
+}
+
+function toMenuItems<T extends { id: string; title: string }>(
+  items: T[],
+  hiddenIds: string[],
+  onHiddenIdsUpdated: (ids: string[]) => void
+): MenuItem[] {
+  return items.map((item) => ({
+    type: "button",
+    key: item.id,
+    title: item.title,
+    isChecked: !hiddenIds.includes(item.id),
+    onClick: async () => {
+      const copy = hiddenIds.slice();
+      const index = copy.indexOf(item.id);
+      if (index > -1) copy.splice(index, 1);
+      else copy.push(item.id);
+      onHiddenIdsUpdated(copy);
+    }
+  }));
 }
