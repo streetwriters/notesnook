@@ -24,7 +24,8 @@ import {
   GroupingKey,
   SettingItem,
   SettingItemMap,
-  SideBarSectionKey,
+  SideBarHideableSection,
+  SideBarSection,
   ToolbarConfig,
   ToolbarConfigPlatforms,
   TrashCleanupInterval
@@ -65,13 +66,12 @@ const defaultSettings: SettingItemMap = {
   "toolbarConfig:desktop": undefined,
   "toolbarConfig:mobile": undefined,
 
+  "sideBarOrder:builtin": [],
   "sideBarOrder:colors": [],
-  "sideBarOrder:menu": [],
-  "sideBarOrder:pinned": [],
+  "sideBarOrder:shortcuts": [],
 
-  "sideBarHiddenItems:colors": [],
-  "sideBarHiddenItems:menu": [],
-  "sideBarHiddenItems:pinned": []
+  "sideBarHiddenItems:builtin": [],
+  "sideBarHiddenItems:colors": []
 };
 
 export class Settings implements ICollection {
@@ -179,19 +179,19 @@ export class Settings implements ICollection {
     return this.set("timeFormat", format);
   }
 
-  getSideBarOrder(section: SideBarSectionKey) {
+  getSideBarOrder(section: SideBarSection) {
     return this.get(`sideBarOrder:${section}`);
   }
 
-  setSideBarOrder(section: SideBarSectionKey, order: string[]) {
+  setSideBarOrder(section: SideBarSection, order: string[]) {
     return this.set(`sideBarOrder:${section}`, order);
   }
 
-  getSideBarHiddenItems(section: SideBarSectionKey) {
+  getSideBarHiddenItems(section: SideBarHideableSection) {
     return this.get(`sideBarHiddenItems:${section}`);
   }
 
-  setSideBarHiddenItems(section: SideBarSectionKey, order: string[]) {
+  setSideBarHiddenItems(section: SideBarHideableSection, order: string[]) {
     return this.set(`sideBarHiddenItems:${section}`, order);
   }
 }
