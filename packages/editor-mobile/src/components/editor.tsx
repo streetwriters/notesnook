@@ -25,6 +25,7 @@ import {
   usePermissionHandler,
   useTiptap
 } from "@notesnook/editor";
+import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 import { useThemeColors } from "@notesnook/theme";
 import {
   forwardRef,
@@ -36,17 +37,19 @@ import {
 } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
+import { TabStore, useTabContext, useTabStore } from "../hooks/useTabStore";
 import { EmotionEditorToolbarTheme } from "../theme-factory";
 import { EventTypes, Settings } from "../utils";
 import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
-import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 
 globalThis.toBlobURL = toBlobURL as typeof globalThis.toBlobURL;
 
 const Tiptap = ({ settings }: { settings: Settings }) => {
+  const tab = useTabContext();
+  const isFocused = useTabStore((state) => state.currentTab === tab?.id);
   const [tick, setTick] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -56,45 +59,48 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
       premium: settings.premium
     },
     onPermissionDenied: () => {
-      post(EventTypes.pro);
+      post(EventTypes.pro, undefined, tab.id, tab.noteId);
     }
   });
+
   const _editor = useTiptap(
     {
       onUpdate: ({ editor, transaction }) => {
-        global.editorController.contentChange(
+        globalThis.editorControllers[tab.id]?.contentChange(
           editor as Editor,
           transaction.getMeta("ignoreEdit")
         );
       },
       onOpenAttachmentPicker: (editor, type) => {
-        global.editorController.openFilePicker(type);
+        globalThis.editorControllers[tab.id]?.openFilePicker(type);
         return true;
       },
       onDownloadAttachment: (editor, attachment) => {
-        global.editorController.downloadAttachment(attachment);
+        globalThis.editorControllers[tab.id]?.downloadAttachment(attachment);
         return true;
       },
       onPreviewAttachment(editor, attachment) {
-        global.editorController.previewAttachment(attachment);
+        globalThis.editorControllers[tab.id]?.previewAttachment(attachment);
         return true;
       },
       getAttachmentData(attachment) {
-        return global.editorController.getAttachmentData(attachment);
+        return globalThis.editorControllers[tab.id]?.getAttachmentData(
+          attachment
+        ) as Promise<string | undefined>;
       },
       element: !layout ? undefined : contentRef.current || undefined,
       editable: !settings.readonly,
       editorProps: {
         editable: () => !settings.readonly
       },
-      content: global.editorController?.content?.current,
+      content: globalThis.editorControllers[tab.id]?.content?.current,
       isMobile: true,
       doubleSpacedLines: settings.doubleSpacedLines,
       onOpenLink: (url) => {
-        return global.editorController.openLink(url);
+        return globalThis.editorControllers[tab.id]?.openLink(url) || true;
       },
       copyToClipboard: (text) => {
-        globalThis.editorController.copyToClipboard(text);
+        globalThis.editorControllers[tab.id]?.copyToClipboard(text);
       },
       downloadOptions: {
         corsHost: settings.corsProxy
@@ -118,17 +124,45 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
       left: 0,
       top: 0
     });
-    globalThis.editorController.setTitlePlaceholder("Note title");
-  }, []);
+    globalThis.editorControllers[tab.id]?.setTitlePlaceholder("Note title");
+  }, [tab.id]);
 
   const controller = useEditorController(update);
   const controllerRef = useRef(controller);
-  globalThis.editorController = controller;
-  globalThis.editor = _editor;
+
+  globalThis.editorControllers[tab.id] = controller;
+  globalThis.editors[tab.id] = _editor;
 
   useLayoutEffect(() => {
     setLayout(true);
-  }, []);
+
+    const updateScrollPosition = (state: TabStore) => {
+      if (state.currentTab === tab.id) {
+        const position = state.scrollPosition[tab?.id];
+        if (position) {
+          containerRef.current?.scrollTo({
+            left: 0,
+            top: position,
+            behavior: "auto"
+          });
+        }
+        post(
+          EventTypes.tabFocused,
+          !!globalThis.editorControllers[tab.id]?.content.current,
+          tab.id,
+          tab.noteId
+        );
+      }
+    };
+
+    updateScrollPosition(useTabStore.getState());
+    const unsub = useTabStore.subscribe((state) => {
+      updateScrollPosition(state);
+    });
+    return () => {
+      unsub();
+    };
+  }, [tab.id, tab.noteId]);
 
   const onClickEmptyArea: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (event) => {
@@ -149,15 +183,17 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
           return;
         }
 
-        const firstChild = globalThis.editor?.state.doc.firstChild;
+        const editor = editors[tab.id];
+
+        const firstChild = editor?.state.doc.firstChild;
         const isParagraph = firstChild?.type.name === "paragraph";
         const isFirstChildEmpty =
           !firstChild?.textContent || firstChild?.textContent?.length === 0;
         if (isParagraph && isFirstChildEmpty) {
-          globalThis.editor?.commands.focus("end");
+          editor?.commands.focus("end");
           return;
         }
-        globalThis.editor
+        editor
           ?.chain()
           .insertContentAt(0, "<p></p>", {
             updateSelection: true
@@ -166,33 +202,35 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
           .run();
       }
     },
-    []
+    [tab.id]
   );
 
   const onClickBottomArea = useCallback(() => {
-    const docSize = globalThis.editor?.state.doc.content.size;
+    const editor = editors[tab.id];
+    const docSize = editor?.state.doc.content.size;
     if (!docSize) return;
-    const lastChild = globalThis.editor?.state.doc.lastChild;
+    const lastChild = editor?.state.doc.lastChild;
     const isParagraph = lastChild?.type.name === "paragraph";
     const isLastChildEmpty =
       !lastChild?.textContent || lastChild?.textContent?.length === 0;
     if (isParagraph && isLastChildEmpty) {
-      globalThis.editor?.commands.focus("end");
+      editor?.commands.focus("end");
       return;
     }
-    globalThis.editor
+    editor
       ?.chain()
       .insertContentAt(docSize - 1, "<p></p>", {
         updateSelection: true
       })
       .focus("end")
       .run();
-  }, []);
+  }, [tab.id]);
+
   return (
     <>
       <div
         style={{
-          display: "flex",
+          display: isFocused ? "flex" : "none",
           flex: 1,
           flexDirection: "column",
           maxWidth: "100vw"

@@ -394,9 +394,10 @@ export class VaultDialog extends Component {
       return;
     } else {
       await db.vault.add(this.state.note.id);
-      if (this.state.note.id === editorController.current?.note?.id) {
-        eSendEvent(eClearEditor);
-      }
+
+      // if (this.state.note.id === editorController.current?.note?.id) {
+      //   eSendEvent(eClearEditor, );
+      // }
       this.close();
       ToastManager.show({
         message: "Note locked successfully",
@@ -501,9 +502,10 @@ export class VaultDialog extends Component {
     }
     if (this.state.note?.id) {
       await db.vault.add(this.state.note.id);
-      if (this.state.note.id === editorController.current?.note?.id) {
-        eSendEvent(eClearEditor);
-      }
+      // TODO
+      // if (this.state.note.id === editorController.current?.note?.id) {
+      //   eSendEvent(eClearEditor);
+      // }
       this.setState({
         loading: false
       });

@@ -18,14 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ArrowBackIcon from "mdi-react/ArrowBackIcon";
-import CrownIcon from "mdi-react/CrownIcon";
-import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import ArrowULeftTopIcon from "mdi-react/ArrowULeftTopIcon";
 import ArrowURightTopIcon from "mdi-react/ArrowURightTopIcon";
+import CrownIcon from "mdi-react/CrownIcon";
+import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import FullscreenIcon from "mdi-react/FullscreenIcon";
 import MagnifyIcon from "mdi-react/MagnifyIcon";
 import React from "react";
 import { useSafeArea } from "../hooks/useSafeArea";
+import { useTabContext, useTabStore } from "../hooks/useTabStore";
 import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
 
@@ -65,7 +66,11 @@ function Header({
   hasUndo: boolean;
   hasRedo: boolean;
 }): JSX.Element {
+  const tab = useTabContext();
+  const editor = editors[tab.id];
   const insets = useSafeArea();
+  const openedTabsCount = useTabStore((state) => state.tabs.length);
+
   return (
     <div
       style={{
@@ -95,7 +100,7 @@ function Header({
           ) : (
             <Button
               onPress={() => {
-                post(EventTypes.back);
+                post(EventTypes.back, undefined, tab.id, tab.noteId);
               }}
               preventDefault={false}
               style={{
@@ -113,7 +118,7 @@ function Header({
               }}
             >
               <ArrowBackIcon
-                size={27 * settings.fontScale}
+                size={28 * settings.fontScale}
                 style={{
                   position: "absolute"
                 }}
@@ -235,7 +240,7 @@ function Header({
               }}
             >
               <MagnifyIcon
-                size={25 * settings.fontScale}
+                size={28 * settings.fontScale}
                 style={{
                   position: "absolute"
                 }}
@@ -246,7 +251,7 @@ function Header({
             {settings.deviceMode !== "mobile" && !settings.fullscreen ? (
               <Button
                 onPress={() => {
-                  post(EventTypes.fullscreen);
+                  post(EventTypes.fullscreen, undefined, tab.id, tab.noteId);
                 }}
                 preventDefault={false}
                 style={{
@@ -274,7 +279,46 @@ function Header({
 
             <Button
               onPress={() => {
-                post(EventTypes.properties);
+                post(EventTypes.showTabs, undefined, tab.id, tab.noteId);
+              }}
+              preventDefault={false}
+              style={{
+                borderWidth: 0,
+                borderRadius: 100,
+                color: "var(--nn_primary_icon)",
+                marginRight: 12,
+                width: 39,
+                height: 39,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                position: "relative"
+              }}
+            >
+              <div
+                style={{
+                  border: "2.5px solid var(--nn_primary_icon)",
+                  width: 20 * settings.fontScale,
+                  height: 20 * settings.fontScale,
+                  borderRadius: 5,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 15 * settings.fontScale
+                  }}
+                >
+                  {openedTabsCount}
+                </p>
+              </div>
+            </Button>
+
+            <Button
+              onPress={() => {
+                post(EventTypes.properties, undefined, tab.id, tab.noteId);
               }}
               preventDefault={false}
               style={{

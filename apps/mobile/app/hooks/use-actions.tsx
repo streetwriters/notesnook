@@ -43,6 +43,7 @@ import PublishNoteSheet from "../components/sheets/publish-note";
 import { RelationsList } from "../components/sheets/relations-list/index";
 import ReminderSheet from "../components/sheets/reminder";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
+import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
   ToastManager,
   eSendEvent,
@@ -52,7 +53,6 @@ import {
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
-import { useEditorStore } from "../stores/use-editor-store";
 import { useMenuStore } from "../stores/use-menu-store";
 import useNavigationStore from "../stores/use-navigation-store";
 import { useRelationStore } from "../stores/use-relation-store";
@@ -528,8 +528,12 @@ export const useActions = ({
       const currentReadOnly = (item as Note).readonly;
       await db.notes.readonly(!currentReadOnly, item?.id);
 
-      if (useEditorStore.getState().currentEditingNote === item.id) {
-        useEditorStore.getState().setReadonly(!currentReadOnly);
+      if (useTabStore.getState().hasTabForNote(item.id)) {
+        const tabId = useTabStore.getState().getTabForNote(item.id);
+        if (!tabId) return;
+        useTabStore.getState().updateTab(tabId, {
+          readonly: !currentReadOnly
+        });
       }
       Navigation.queueRoutesForUpdate();
       close();

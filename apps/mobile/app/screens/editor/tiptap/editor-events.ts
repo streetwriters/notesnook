@@ -37,5 +37,8 @@ export const EventTypes = {
   reminders: "editor-event:reminders",
   previewAttachment: "editor-event:preview-attachment",
   copyToClipboard: "editor-events:copy-to-clipboard",
-  getAttachmentData: "editor-events:get-attachment-data"
+  getAttachmentData: "editor-events:get-attachment-data",
+  tabsChanged: "editor-events:tabs-changed",
+  showTabs: "editor-events:showTabs",
+  tabFocused: "editor-events:tab-focused"
 };

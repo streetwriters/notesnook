@@ -28,5 +28,5 @@ const EditorMobileSourceUrl =
  * The url should be something like this: http://192.168.100.126:3000/index.html
  */
 export const EDITOR_URI = __DEV__
-  ? EditorMobileSourceUrl
+  ? "http://192.168.43.252:3000/index.html"
   : EditorMobileSourceUrl;

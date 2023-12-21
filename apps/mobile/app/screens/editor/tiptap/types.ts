@@ -66,10 +66,12 @@ export type EditorProps = {
   onChange?: (html: string) => void;
 };
 
-export type EditorMessage = {
+export type EditorMessage<T> = {
   sessionId: string;
-  value: unknown;
+  value: T;
   type: string;
+  noteId: string;
+  tabId: number;
 };
 
 export type SavePayload = {
@@ -77,9 +79,9 @@ export type SavePayload = {
   id?: string;
   data?: string;
   type?: "tiptap";
-  sessionId?: string | null;
   sessionHistoryId?: number;
   ignoreEdit: boolean;
+  tabId: number;
 };
 
 export type AppState = {
