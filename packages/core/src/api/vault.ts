@@ -205,7 +205,7 @@ export default class Vault {
 
   async exists(vaultKey?: Cipher<"base64">) {
     if (!vaultKey) vaultKey = await this.getKey();
-    return vaultKey && isCipher(vaultKey);
+    return !!vaultKey && isCipher(vaultKey);
   }
 
   // Private & internal methods

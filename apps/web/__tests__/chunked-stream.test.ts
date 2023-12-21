@@ -35,7 +35,7 @@ test("chunked stream should create equal sized chunks", async (t) => {
           path.join(__dirname, "..", "__e2e__", "data", "importer-data.zip")
         )
       ) as ReadableStream<Uint8Array>
-    ).pipeThrough(new ChunkedStream(CHUNK_SIZE))
+    ).pipeThrough(new ChunkedStream(CHUNK_SIZE, "nocopy"))
   );
 
   t.expect(await Promise.all(chunks.map((a) => xxhash64(a)))).toMatchObject([

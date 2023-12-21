@@ -36,7 +36,7 @@ export function SpellCheckerLanguages() {
   }, [spellChecker.enabledLanguages, spellChecker.languages]);
 
   const filter = useCallback(
-    async (query) => {
+    async (query: string) => {
       if (!spellChecker.languages) return;
       setLanguages(
         spellChecker.languages.filter(

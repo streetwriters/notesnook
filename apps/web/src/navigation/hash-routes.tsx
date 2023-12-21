@@ -22,7 +22,6 @@ import {
   showBuyDialog,
   showCreateTagDialog,
   showEditReminderDialog,
-  showEditTagDialog,
   showEmailVerificationDialog,
   showFeatureDialog,
   showOnboardingDialog,
@@ -63,9 +62,6 @@ const hashroutes = defineRoutes({
   },
   "/tags/create": () => {
     showCreateTagDialog().then(afterAction);
-  },
-  "/tags/:tagId/edit": ({ tagId }) => {
-    showEditTagDialog(tagId)?.then(afterAction);
   },
   "/notes/create": () => {
     closeOpenedDialog();

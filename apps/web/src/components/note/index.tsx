@@ -91,7 +91,7 @@ import {
   NotebooksWithDateEdited,
   TagsWithDateEdited
 } from "../list-container/types";
-import { SchemeColors, StaticColors } from "@notesnook/theme";
+import { SchemeColors } from "@notesnook/theme";
 import Vault from "../../common/vault";
 
 type NoteProps = {
@@ -750,7 +750,7 @@ async function copyNote(noteId: string, format: "md" | "txt") {
     if (!rawContent) throw new Error("This note has no content.");
 
     const content = rawContent.locked
-      ? await db.vault?.decryptContent(rawContent)
+      ? await db.vault?.decryptContent(rawContent, noteId)
       : rawContent;
 
     const text = await db.notes.export(noteId, {

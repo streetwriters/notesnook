@@ -39,7 +39,8 @@ import { createWritableStream } from "./desktop-bridge";
 import { ZipStream } from "../utils/streams/zip-stream";
 import { FeatureKeys } from "../dialogs/feature-dialog";
 import { Entry, Reader } from "../utils/zip-reader";
-import { IndexedDBKVStore } from "../interfaces/key-value";
+import { User } from "@notesnook/core/dist/api/user-manager";
+import { LegacyBackupFile } from "@notesnook/core";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -50,10 +51,6 @@ export const CREATE_BUTTON_MAP = {
   notebooks: {
     title: "Create a notebook",
     onClick: () => hashNavigate("/notebooks/create", { replace: true })
-  },
-  topics: {
-    title: "Create a topic",
-    onClick: () => hashNavigate(`/topics/create`, { replace: true })
   },
   tags: {
     title: "Create a tag",
@@ -197,7 +194,7 @@ export async function restoreBackupFile(backupFile: File) {
               if (!result) break;
             } else await db.backup?.import(backup, cachedPassword);
           } else {
-            await db.backup?.import(backup, null);
+            await db.backup?.import(backup);
           }
 
           report({
@@ -217,7 +214,7 @@ export async function restoreBackupFile(backupFile: File) {
 }
 
 async function restoreWithProgress(
-  backup: Record<string, unknown>,
+  backup: LegacyBackupFile,
   password?: string
 ) {
   return await TaskManager.startTask<Error | void>({
@@ -252,8 +249,8 @@ async function restoreWithProgress(
 
 export async function verifyAccount() {
   if (!(await db.user?.getUser())) return true;
-  return showPasswordDialog("verify_account", ({ password }) => {
-    return db.user?.verifyPassword(password) || false;
+  return showPasswordDialog("verify_account", async ({ password }) => {
+    return !!password && (await db.user?.verifyPassword(password));
   });
 }
 
@@ -285,7 +282,7 @@ export async function showUpgradeReminderDialogs() {
   }
 }
 
-async function restore(backup: Record<string, unknown>, password?: string) {
+async function restore(backup: LegacyBackupFile, password?: string) {
   try {
     await db.backup?.import(backup, password);
     showToast("success", "Backup restored!");

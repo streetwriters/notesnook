@@ -60,7 +60,7 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
         const file = await lazify(
           import("../../interfaces/fs"),
           ({ decryptFile }) =>
-            decryptFile(attachment.metadata.hash, {
+            decryptFile(attachment.hash, {
               key,
               iv: attachment.iv,
               name: attachment.filename,

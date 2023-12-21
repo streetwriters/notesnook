@@ -29,7 +29,6 @@ import {
 } from "@notesnook-importer/core/dist/src/utils/note-stream";
 import { Reader, Entry } from "./zip-reader";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
-import { FileEncryptionMetadata } from "@notesnook/core/dist/interfaces";
 
 export async function* importFiles(zipFiles: File[]) {
   for (const zip of zipFiles) {
@@ -127,10 +126,7 @@ async function processNote(entry: Entry, attachments: Record<string, any>) {
   for (const nb of notebooks) {
     const notebook = await importNotebook(nb).catch(() => ({ id: undefined }));
     if (!notebook.id) continue;
-    await db.notes.addToNotebook(
-      { id: notebook.id, topic: notebook.topic },
-      noteId
-    );
+    await db.notes.addToNotebook(notebook.id, noteId);
   }
 }
 

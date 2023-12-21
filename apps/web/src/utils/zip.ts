@@ -21,7 +21,7 @@ import { AsyncZippable, zip as zipAsync } from "fflate";
 import { sanitizeFilename } from "@notesnook/common";
 
 const textEncoder = new TextEncoder();
-type File = { filename: string; content: string; date: number };
+type File = { filename: string; content: string; date?: number };
 async function zip(files: File[], format: string): Promise<Uint8Array> {
   const obj: AsyncZippable = Object.create(null);
   files.forEach((file) => {

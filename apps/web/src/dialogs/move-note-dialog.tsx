@@ -38,7 +38,7 @@ import { Perform, showAddNotebookDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
 import { isMac } from "../utils/platform";
 import { create } from "zustand";
-import { Notebook, isGroupHeader } from "@notesnook/core/dist/types";
+import { Notebook } from "@notesnook/core/dist/types";
 import {
   UncontrolledTreeEnvironment,
   Tree,
@@ -47,6 +47,7 @@ import {
 } from "react-complex-tree";
 import { FlexScrollContainer } from "../components/scroll-container";
 import { pluralize } from "@notesnook/common";
+import usePromise from "../hooks/use-promise";
 
 type MoveDialogProps = { onClose: Perform; noteIds: string[] };
 type NotebookReference = {
@@ -73,18 +74,14 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
   const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
   const isMultiselect = useSelectionStore((store) => store.isMultiselect);
   const refreshNotebooks = useStore((store) => store.refresh);
-  const notebooks = useStore((store) => store.notebooks);
+  // const notebooks = useStore((store) => store.notebooks);
   const reloadItem = useRef<(changedItemIds: TreeItemIndex[]) => void>();
   const treeRef = useRef<TreeEnvironmentRef>(null);
+  const rootNotebooks = usePromise(() =>
+    db.notebooks.roots.ids(db.settings.getGroupOptions("notebooks"))
+  );
 
   useEffect(() => {
-    if (!notebooks) {
-      (async function () {
-        await refreshNotebooks();
-      })();
-      return;
-    }
-
     // for (const notebook of notebooks.ids) {
     //   if (isGroupHeader(notebook)) continue;
     //   // for (const topic of notebook.topics) {
@@ -141,7 +138,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
     //   new: false
     // });
     // }
-  }, [noteIds, notebooks, refreshNotebooks, setSelected, setIsMultiselect]);
+  }, [noteIds, refreshNotebooks, setSelected, setIsMultiselect]);
 
   const _onClose = useCallback(
     (result: boolean) => {
@@ -214,7 +211,8 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
           Reset selection
         </Button>
       )}
-      {notebooks && notebooks.ids.length > 0 ? (
+      {rootNotebooks.status === "fulfilled" &&
+      rootNotebooks.value.length > 0 ? (
         <FlexScrollContainer>
           <UncontrolledTreeEnvironment
             ref={treeRef}
@@ -235,9 +233,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
                     isFolder: true,
                     canMove: false,
                     canRename: false,
-                    children: notebooks.ids.filter(
-                      (t) => !isGroupHeader(t)
-                    ) as string[]
+                    children: rootNotebooks.value
                   };
                 }
 
@@ -265,7 +261,6 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
                     "notebook"
                   )
                   .get();
-                console.log(itemIds, notebooks?.ids);
                 return itemIds.filter(Boolean).map((id) => {
                   if (id === "root") {
                     return {
@@ -274,9 +269,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
                       isFolder: true,
                       canMove: false,
                       canRename: false,
-                      children: notebooks.ids.filter(
-                        (t) => !isGroupHeader(t)
-                      ) as string[]
+                      children: rootNotebooks.value
                     };
                   }
 
