@@ -124,21 +124,25 @@ export const EVENTS = {
 };
 
 const separators = ["-", "/"];
+const DD = "DD";
+const MM = "MM";
+const YYYY = "YYYY";
 export const DATE_FORMATS = [
   ...separators
-    .map((sep) => {
-      const DD = "DD";
-      const MM = "MM";
-      const YYYY = "YYYY";
-
-      return [
-        [DD, MM, YYYY].join(sep),
-        [MM, DD, YYYY].join(sep),
-        [YYYY, MM, DD].join(sep)
-      ];
-    })
+    .map((sep) => [
+      [DD, MM, YYYY].join(sep),
+      [MM, DD, YYYY].join(sep),
+      [YYYY, MM, DD].join(sep)
+    ])
     .flat(),
   "MMM D, YYYY"
+];
+
+export const DATE_FORMATS_WITHOUT_YEAR = [
+  ...separators
+    .map((sep) => [[DD, MM].join(sep), [MM, DD].join(sep), [MM, DD].join(sep)])
+    .flat(),
+  "MMM D"
 ];
 
 export const TIME_FORMATS = ["12-hour", "24-hour"];
