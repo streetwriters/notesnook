@@ -33,7 +33,7 @@ import { ProgressStream } from "../utils/streams/progress-stream";
 import { consumeReadableStream } from "../utils/stream";
 import { Base64DecoderStream } from "../utils/streams/base64-decoder-stream";
 import { toBlob } from "@notesnook-importer/core/dist/src/utils/stream";
-import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
+import { DataFormat, SerializedKey } from "@notesnook/crypto";
 import { IDataType } from "hash-wasm/dist/lib/util";
 import { IndexedDBKVStore } from "./key-value";
 import FileHandle from "@notesnook/streamable-fs/dist/src/filehandle";
@@ -44,6 +44,7 @@ import {
 } from "./file-store";
 import { isFeatureSupported } from "../utils/feature-check";
 import {
+  FileEncryptionMetadataWithHash,
   FileEncryptionMetadataWithOutputType,
   IFileStorage,
   Output,
@@ -117,7 +118,7 @@ export async function writeEncryptedFile(
   return {
     chunkSize: CHUNK_SIZE,
     iv: iv,
-    length: file.size,
+    size: file.size,
     salt: key.salt!,
     alg: "xcha-stream"
   };
@@ -134,15 +135,15 @@ async function writeEncryptedBase64(
   data: string,
   key: SerializedKey,
   mimeType: string
-) {
+): Promise<FileEncryptionMetadataWithHash> {
   const bytes = new Uint8Array(Buffer.from(data, "base64"));
 
   const { hash, type: hashType } = await hashBuffer(bytes);
 
-  const attachment = db.attachments.attachment(hash);
+  const attachment = await db.attachments.attachment(hash);
 
   const file = new File([bytes.buffer], hash, {
-    type: attachment?.metadata.type || mimeType || "application/octet-stream"
+    type: attachment?.mimeType || mimeType || "application/octet-stream"
   });
 
   const result = await writeEncryptedFile(file, key, hash);
@@ -180,7 +181,7 @@ export async function hashStream(
   return { type: "xxh64", hash: hasher.digest("hex") };
 }
 
-async function readEncrypted<TOutputFormat extends OutputFormat>(
+async function readEncrypted<TOutputFormat extends DataFormat>(
   filename: string,
   key: SerializedKey,
   cipherData: FileEncryptionMetadataWithOutputType<TOutputFormat>
@@ -467,7 +468,7 @@ async function downloadFile(
     return true;
   else if (handle) await handle.delete();
 
-  const attachment = db.attachments.attachment(filename);
+  const attachment = await db.attachments.attachment(filename);
   try {
     reportProgress(
       { total: 100, loaded: 0 },
@@ -509,7 +510,7 @@ async function downloadFile(
 
     const totalChunks = Math.ceil(contentLength / chunkSize);
     const decryptedLength = contentLength - totalChunks * ABYTES;
-    if (attachment && attachment.length !== decryptedLength) {
+    if (attachment && attachment.size !== decryptedLength) {
       const error = `File length mismatch. Please upload this file again from the attachment manager. (File hash: ${filename})`;
       await db.attachments.markAsFailed(filename, error);
       throw new Error(error);
@@ -518,7 +519,7 @@ async function downloadFile(
     const fileHandle = await streamablefs.createFile(
       filename,
       decryptedLength,
-      attachment?.metadata.type || "application/octet-stream"
+      attachment?.mimeType || "application/octet-stream"
     );
 
     await response.body
@@ -553,7 +554,7 @@ async function downloadFile(
 async function exists(filename: string) {
   const handle = await streamablefs.readFile(filename);
   return (
-    handle &&
+    !!handle &&
     handle.file.size === (await handle.size()) - handle.file.chunks * ABYTES
   );
 }

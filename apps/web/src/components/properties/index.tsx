@@ -46,6 +46,7 @@ import { ResolvedItem } from "../list-container/resolved-item";
 import { SessionItem } from "../session-item";
 import { COLORS } from "../../common/constants";
 import { DefaultColors } from "@notesnook/core";
+import { VirtualizedTable } from "../virtualized-table";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Pin, label: "Pin" },
@@ -272,10 +273,14 @@ function Notebooks({ noteId }: { noteId: string }) {
       <VirtualizedList
         mode="fixed"
         estimatedSize={50}
-        getItemKey={(index) => result.value.getKey(index)}
-        items={result.value.ungrouped}
-        renderItem={({ item: id }) => (
-          <ListItemWrapper id={id} items={result.value} simplified />
+        getItemKey={(index) => result.value.key(index)}
+        items={result.value.ids}
+        renderItem={({ item: index }) => (
+          <ResolvedItem index={index} items={result.value} type="notebook">
+            {({ item, data }) => (
+              <ListItemWrapper item={item} data={data} simplified />
+            )}
+          </ResolvedItem>
         )}
       />
     </Section>
@@ -295,10 +300,14 @@ function Reminders({ noteId }: { noteId: string }) {
       <VirtualizedList
         mode="fixed"
         estimatedSize={54}
-        getItemKey={(index) => result.value.getKey(index)}
-        items={result.value.ungrouped}
-        renderItem={({ item: id }) => (
-          <ListItemWrapper id={id} items={result.value} simplified />
+        getItemKey={(index) => result.value.key(index)}
+        items={result.value.ids}
+        renderItem={({ item: index }) => (
+          <ResolvedItem index={index} items={result.value} type="reminder">
+            {({ item, data }) => (
+              <ListItemWrapper item={item} data={data} simplified />
+            )}
+          </ResolvedItem>
         )}
       />
     </Section>
@@ -315,14 +324,17 @@ function Attachments({ noteId }: { noteId: string }) {
 
   return (
     <Section title="Attachments">
-      {result.value.ids.map((id, index) => (
-        <ListItemWrapper
-          key={result.value.getKey(index)}
-          id={id as string}
-          items={result.value}
-          compact
-        />
-      ))}
+      <VirtualizedTable
+        estimatedSize={30}
+        getItemKey={(index) => result.value.key(index)}
+        items={result.value.ids}
+        header={<></>}
+        renderRow={({ item: index }) => (
+          <ResolvedItem index={index} type="attachment" items={result.value}>
+            {({ item }) => <ListItemWrapper item={item} compact />}
+          </ResolvedItem>
+        )}
+      />
     </Section>
   );
 }
@@ -353,10 +365,10 @@ function SessionHistory({
       <VirtualizedList
         mode="fixed"
         estimatedSize={28}
-        getItemKey={(index) => result.value.getKey(index)}
-        items={result.value.ungrouped}
-        renderItem={({ item: id }) => (
-          <ResolvedItem type="session" id={id} items={result.value}>
+        getItemKey={(index) => result.value.key(index)}
+        items={result.value.ids}
+        renderItem={({ item: index }) => (
+          <ResolvedItem type="session" index={index} items={result.value}>
             {({ item }) => (
               <SessionItem
                 noteId={noteId}

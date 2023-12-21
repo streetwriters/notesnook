@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Dialogs } from "../dialogs";
-import { store as notebookStore } from "../stores/notebook-store";
 import { store as tagStore } from "../stores/tag-store";
 import { store as appStore } from "../stores/app-store";
 import { store as editorStore } from "../stores/editor-store";
@@ -26,7 +25,6 @@ import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
 import { Text } from "@theme-ui/components";
-import { Topic as TopicIcon } from "../components/icons";
 import Config from "../utils/config";
 import { AppVersion, getChangelog } from "../utils/version";
 import { Period } from "../dialogs/buy-dialog/types";
@@ -36,7 +34,7 @@ import { ConfirmDialogProps } from "../dialogs/confirm";
 import { getFormattedDate } from "@notesnook/common";
 import { downloadUpdate } from "../utils/updater";
 import { ThemeMetadata } from "@notesnook/themes-server";
-import { Reminder } from "@notesnook/core";
+import { Color, Reminder, Tag } from "@notesnook/core";
 import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
 import { createRoot } from "react-dom/client";
 
@@ -405,21 +403,25 @@ export function showPasswordDialog(
     password?: string;
     oldPassword?: string;
     newPassword?: string;
+    deleteAllLockedNotes?: boolean;
   }) => boolean | Promise<boolean>
 ) {
   const { title, subtitle, positiveButtonText, checks } = getDialogData(type);
-  return showDialog("PasswordDialog", (Dialog, perform) => (
-    <Dialog
-      type={type}
-      title={title}
-      subtitle={subtitle}
-      checks={checks}
-      positiveButtonText={positiveButtonText}
-      validate={validate}
-      onClose={() => perform(false)}
-      onDone={() => perform(true)}
-    />
-  ));
+  return showDialog<"PasswordDialog", boolean>(
+    "PasswordDialog",
+    (Dialog, perform) => (
+      <Dialog
+        type={type}
+        title={title}
+        subtitle={subtitle}
+        checks={checks}
+        positiveButtonText={positiveButtonText}
+        validate={validate}
+        onClose={() => perform(false)}
+        onDone={() => perform(true)}
+      />
+    )
+  );
 }
 
 export function showBackupPasswordDialog(
@@ -462,9 +464,7 @@ export function showCreateTagDialog() {
   ));
 }
 
-export function showEditTagDialog(tagId: string) {
-  const tag = db.tags.tag(tagId);
-  if (!tag) return;
+export function showEditTagDialog(tag: Tag) {
   return showDialog("ItemDialog", (Dialog, perform) => (
     <Dialog
       title={"Edit tag"}
@@ -474,7 +474,7 @@ export function showEditTagDialog(tagId: string) {
       onClose={() => perform(false)}
       onAction={async (title: string) => {
         if (!title) return;
-        await db.tags.add({ id: tagId, title });
+        await db.tags.add({ id: tag.id, title });
         showToast("success", "Tag edited!");
         tagStore.refresh();
         editorStore.refreshTags();
@@ -486,9 +486,7 @@ export function showEditTagDialog(tagId: string) {
   ));
 }
 
-export function showRenameColorDialog(colorId: string) {
-  const color = db.colors.color(colorId);
-  if (!color) return;
+export function showRenameColorDialog(color: Color) {
   return showDialog("ItemDialog", (Dialog, perform) => (
     <Dialog
       title={"Rename color"}
@@ -498,7 +496,7 @@ export function showRenameColorDialog(colorId: string) {
       onClose={() => perform(false)}
       onAction={async (title: string) => {
         if (!title) return;
-        await db.tags.add({ id: colorId, title });
+        await db.tags.add({ id: color.id, title });
         showToast("success", "Color renamed!");
         appStore.refreshNavItems();
         perform(true);
