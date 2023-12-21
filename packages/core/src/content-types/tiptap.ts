@@ -59,11 +59,12 @@ export class Tiptap {
       preserveNewlines: true,
       selectors: [
         { selector: "table", format: "dataTable" },
-        { selector: "ul.checklist", format: "taskList" },
+        { selector: "ul.checklist", format: "checkList" },
+        { selector: "ul.simple-checklist", format: "checkList" },
         { selector: "p", format: "paragraph" }
       ],
       formatters: {
-        taskList: (elem, walk, builder, formatOptions) => {
+        checkList: (elem, walk, builder, formatOptions) => {
           return formatList(elem, walk, builder, formatOptions, (elem) => {
             return elem.attribs.class && elem.attribs.class.includes("checked")
               ? " ✅ "
