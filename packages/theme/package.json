@@ -8,7 +8,7 @@
     "url": "git://github.com/streetwriters/themeprovider.git"
   },
   "devDependencies": {
-    "zustand": "4.4.7",
+    "@emotion/react": "11.11.1",
     "@theme-ui/color": "^0.16.1",
     "@theme-ui/components": "^0.16.1",
     "@theme-ui/core": "^0.16.1",
@@ -17,17 +17,18 @@
     "@types/tinycolor2": "^1.4.3",
     "isomorphic-fetch": "^3.0.0",
     "react": "18.2.0",
+    "tinycolor2": "^1.6.0",
     "ts-json-schema-generator": "^1.2.0",
-    "@emotion/react": "11.11.1"
+    "zustand": "4.4.7"
   },
   "peerDependencies": {
     "@emotion/react": ">=11",
-    "tinycolor2": ">=1",
-    "zustand": ">=4",
     "@theme-ui/color": ">=0.16.0",
     "@theme-ui/components": ">=0.16.0",
     "@theme-ui/core": ">=0.16.0",
-    "react": ">=18"
+    "react": ">=18",
+    "tinycolor2": ">=1",
+    "zustand": ">=4"
   },
   "scripts": {
     "prebuild": "node ./scripts/prebuild.mjs",
