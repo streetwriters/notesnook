@@ -62,8 +62,10 @@ type EncryptedBackupFile = BaseBackupFile & {
   encrypted: true;
 };
 
-type BackupFile = UnencryptedBackupFile | EncryptedBackupFile;
-type LegacyBackupFile = LegacyUnencryptedBackupFile | LegacyEncryptedBackupFile;
+export type BackupFile = UnencryptedBackupFile | EncryptedBackupFile;
+export type LegacyBackupFile =
+  | LegacyUnencryptedBackupFile
+  | LegacyEncryptedBackupFile;
 
 type BackupState = {
   buffer: string[];

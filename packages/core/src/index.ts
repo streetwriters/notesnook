@@ -20,3 +20,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export * from "./types";
 export { VirtualizedGrouping } from "./utils/virtualized-grouping";
 export { DefaultColors } from "./collections/colors";
+export { type BackupFile, type LegacyBackupFile } from "./database/backup";

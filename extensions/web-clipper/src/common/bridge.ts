@@ -33,9 +33,7 @@ export type ItemReference = {
   title: string;
 };
 
-export type NotebookReference = ItemReference & {
-  topics: ItemReference[];
-};
+export type NotebookReference = ItemReference;
 
 export type ClientMetadata = {
   id: string;
@@ -76,7 +74,7 @@ export type Clip = {
 export interface Server {
   login(): Promise<User | null>;
   getNotes(): Promise<ItemReference[] | undefined>;
-  getNotebooks(): Promise<NotebookReference[] | undefined>;
+  getNotebooks(parentId?: string): Promise<NotebookReference[] | undefined>;
   getTags(): Promise<ItemReference[] | undefined>;
   saveClip(clip: Clip): Promise<void>;
 }

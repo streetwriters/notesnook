@@ -528,7 +528,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
           }
         }}
         action={{
-          disabled: error || isSending || !enabled,
+          disabled: !!error || isSending || !enabled,
           component: (
             <Text variant={"body"}>
               {isSending ? (

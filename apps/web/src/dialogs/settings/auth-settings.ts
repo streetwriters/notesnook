@@ -47,13 +47,12 @@ export const AuthenticationSettings: SettingsGroup[] = [
             action: async () => {
               const result = await showPasswordDialog(
                 "change_account_password",
-                async (data) => {
+                async ({ newPassword, oldPassword }) => {
+                  if (!newPassword || !oldPassword) return false;
                   await db.user.clearSessions();
                   return (
-                    db.user.changePassword(
-                      data.oldPassword,
-                      data.newPassword
-                    ) || false
+                    (await db.user.changePassword(oldPassword, newPassword)) ||
+                    false
                   );
                 }
               );

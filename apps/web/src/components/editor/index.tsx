@@ -55,12 +55,7 @@ import { Lightbox } from "../lightbox";
 import { Allotment } from "allotment";
 import { showToast } from "../../utils/toast";
 import { getFormattedDate } from "@notesnook/common";
-import {
-  ContentType,
-  Item,
-  MaybeDeletedItem,
-  isDeleted
-} from "@notesnook/core/dist/types";
+import { Item, MaybeDeletedItem, isDeleted } from "@notesnook/core/dist/types";
 import {
   isEncryptedContent,
   isUnencryptedContent
