@@ -49,7 +49,8 @@ import { Reminder as ReminderType } from "@notesnook/core/dist/types";
 const RECURRING_MODE_MAP = {
   week: "Weekly",
   day: "Daily",
-  month: "Monthly"
+  month: "Monthly",
+  year: "Yearly"
 } as const;
 
 const PRIORITY_ICON_MAP = {

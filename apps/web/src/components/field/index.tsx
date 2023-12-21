@@ -36,7 +36,7 @@ export type FieldProps = InputProps & {
   };
   action?: {
     testId?: string;
-    onClick?: () => void;
+    onClick?: React.MouseEventHandler<HTMLButtonElement>;
     disabled?: boolean;
     icon?: Icon;
     component?: JSX.Element;
@@ -134,12 +134,13 @@ function Field(props: FieldProps) {
             data-test-id={action.testId}
             onClick={action.onClick}
             sx={{
+              bg: "transparent",
               position: "absolute",
-              right: "2px",
+              right: "4px",
+              top: "2px",
               px: 1,
               borderRadius: "default",
-              ":hover": { bg: "border" },
-              height: "100%"
+              ":hover": { bg: "border" }
             }}
             disabled={action.disabled}
           >

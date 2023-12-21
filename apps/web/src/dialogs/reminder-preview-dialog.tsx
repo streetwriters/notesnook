@@ -35,7 +35,8 @@ export type ReminderPreviewDialogProps = {
 const RECURRING_MODE_MAP = {
   week: "Weekly",
   day: "Daily",
-  month: "Monthly"
+  month: "Monthly",
+  year: "Yearly"
 } as const;
 
 const SNOOZE_TIMES = [
