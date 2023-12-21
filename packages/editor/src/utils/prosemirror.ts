@@ -43,6 +43,8 @@ import { TaskItemNode } from "../extensions/task-item";
 import { TaskListNode } from "../extensions/task-list";
 import { LIST_NODE_TYPES } from "./node-types";
 import TextStyle from "@tiptap/extension-text-style";
+import CheckList from "../extensions/check-list";
+import CheckListItem from "../extensions/check-list-item";
 
 export type NodeWithOffset = {
   node?: ProsemirrorNode;
@@ -61,6 +63,7 @@ export function hasSameAttributes(prev: Attrs, next: Attrs) {
 
 export function findListItemType(editor: Editor): string | null {
   const isTaskList = editor.isActive(TaskListNode.name);
+  const isCheckList = editor.isActive(CheckList.name);
   const isOutlineList = editor.isActive(OutlineList.name);
   const isList =
     editor.isActive(BulletList.name) || editor.isActive(OrderedList.name);
@@ -71,6 +74,8 @@ export function findListItemType(editor: Editor): string | null {
     ? OutlineListItem.name
     : isTaskList
     ? TaskItemNode.name
+    : isCheckList
+    ? CheckListItem.name
     : null;
 }
 
