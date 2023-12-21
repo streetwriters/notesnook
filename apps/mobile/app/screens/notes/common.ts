@@ -27,7 +27,7 @@ import { useTagStore } from "../../stores/use-tag-store";
 import { eOnLoadNote, eOnNotebookUpdated } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
-import { editorController, editorState } from "../editor/tiptap/utils";
+import { editorState } from "../editor/tiptap/utils";
 
 export const PLACEHOLDER_DATA = {
   title: "Your notes",
@@ -52,11 +52,9 @@ export function openMonographsWebpage() {
 
 export function openEditor() {
   if (!DDS.isTab) {
-    if (editorController.current?.note) {
-      eSendEvent(eOnLoadNote, { newNote: true });
-      editorState().currentlyEditing = true;
-      editorState().movedAway = false;
-    }
+    eSendEvent(eOnLoadNote, { newNote: true });
+    editorState().currentlyEditing = true;
+    editorState().movedAway = false;
     tabBarRef.current?.goToPage(1);
   } else {
     eSendEvent(eOnLoadNote, { newNote: true });

@@ -22,6 +22,7 @@ import React, { RefObject, useCallback, useEffect, useRef } from "react";
 import { EditorController } from "../hooks/useEditorController";
 import styles from "./styles.module.css";
 import { replaceDateTime } from "@notesnook/editor/dist/extensions/date-time";
+import { useTabContext } from "../hooks/useTabStore";
 function Title({
   controller,
   title,
@@ -39,10 +40,10 @@ function Title({
   dateFormat: string;
   timeFormat: string;
 }) {
+  const tab = useTabContext();
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const titleSizeDiv = useRef<HTMLDivElement>(null);
   const emitUpdate = useRef(true);
-  global.editorTitle = titleRef;
 
   const resizeTextarea = useCallback(() => {
     if (!titleSizeDiv.current || !titleRef.current) return;
@@ -64,6 +65,13 @@ function Title({
       window.removeEventListener("resize", resizeTextarea);
     };
   }, [resizeTextarea, title]);
+
+  useEffect(() => {
+    globalThis.editorTitles[tab.id] = titleRef;
+    return () => {
+      globalThis.editorTitles[tab.id] = undefined;
+    };
+  }, [tab.id, titleRef]);
 
   return (
     <>
@@ -121,6 +129,7 @@ function Title({
           resizeTextarea();
         }}
         onKeyDown={(e) => {
+          const editor = editors[tab.id];
           if (e.key === "Enter") {
             e.preventDefault();
             e.stopPropagation();

@@ -17,26 +17,34 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
+import { useTabContext } from "../hooks/useTabStore";
 
 function Tags(props: { settings: Settings }): JSX.Element {
   const [tags, setTags] = useState<
     { title: string; alias: string; id: string; type: "tag" }[]
   >([]);
-  const editorTags = useRef({
+  const tagsRef = useRef({
     setTags: setTags
   });
+  const tab = useTabContext();
 
-  global.editorTags = editorTags;
+  useEffect(() => {
+    globalThis.editorTags[tab.id] = tagsRef;
+    return () => {
+      globalThis.editorTags[tab.id] = undefined;
+    };
+  }, [tab.id, tagsRef]);
 
   const openManageTagsSheet = () => {
+    const editor = editors[tab.id];
     if (editor?.isFocused) {
       editor.commands.blur();
-      editorTitle.current?.blur();
+      editorTitles[tab.id]?.current?.blur();
     }
-    post(EventTypes.newtag);
+    post(EventTypes.newtag, undefined, tab.id, tab.noteId);
   };
   const fontScale = props.settings?.fontScale || 1;
 
@@ -116,7 +124,7 @@ function Tags(props: { settings: Settings }): JSX.Element {
           }}
           onClick={(e) => {
             e.preventDefault();
-            post(EventTypes.tag, tag);
+            post(EventTypes.tag, tag, tab.id, tab.noteId);
           }}
         >
           #{tag.alias}

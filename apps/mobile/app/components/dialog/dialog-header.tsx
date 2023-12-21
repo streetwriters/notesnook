@@ -104,7 +104,7 @@ const DialogHeader = ({
                 title={button.title}
                 icon={button.icon}
                 type={button.type || "secondary"}
-                height={25}
+                height={30}
               />
             ) : null}
           </View>

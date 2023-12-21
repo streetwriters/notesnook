@@ -32,6 +32,8 @@ import {
 } from "react";
 import { EventTypes, isReactNative, post, randId, saveTheme } from "../utils";
 import { injectCss, transform } from "../utils/css";
+import { useTabContext, useTabStore } from "./useTabStore";
+
 type Attachment = {
   hash: string;
   filename: string;
@@ -105,6 +107,7 @@ export type EditorController = {
 };
 
 export function useEditorController(update: () => void): EditorController {
+  const tab = useTabContext();
   const setTheme = useThemeEngineStore((store) => store.setTheme);
   const { colors } = useThemeColors("editor");
   const [title, setTitle] = useState("");
@@ -118,20 +121,26 @@ export function useEditorController(update: () => void): EditorController {
 
   const selectionChange = useCallback((_editor: Editor) => {}, []);
 
-  const titleChange = useCallback((title: string) => {
-    post(EventTypes.contentchange);
-    post(EventTypes.title, title);
-  }, []);
+  const titleChange = useCallback(
+    (title: string) => {
+      post(EventTypes.contentchange, undefined, tab.id, tab.noteId);
+      post(EventTypes.title, title, tab.id, tab.noteId);
+    },
+    [tab.id, tab.noteId]
+  );
 
-  const countWords = useCallback((ms = 300) => {
-    if (typeof timers.current.wordCounter === "number")
-      clearTimeout(timers.current.wordCounter);
-    timers.current.wordCounter = setTimeout(() => {
-      console.time("wordCounter");
-      statusBar?.current?.updateWords();
-      console.timeEnd("wordCounter");
-    }, ms);
-  }, []);
+  const countWords = useCallback(
+    (ms = 300) => {
+      if (typeof timers.current.wordCounter === "number")
+        clearTimeout(timers.current.wordCounter);
+      timers.current.wordCounter = setTimeout(() => {
+        console.time("wordCounter");
+        statusBars[tab.id]?.current?.updateWords();
+        console.timeEnd("wordCounter");
+      }, ms);
+    },
+    [tab.id]
+  );
 
   useEffect(() => {
     injectCss(transform(colors));
@@ -145,29 +154,33 @@ export function useEditorController(update: () => void): EditorController {
       if (typeof timers.current.change === "number") {
         clearTimeout(timers.current?.change);
       }
-      timers.current.change = setTimeout(
-        () => {
-          htmlContentRef.current = editor.getHTML();
-          post(
-            EventTypes.content,
-            {
-              html: htmlContentRef.current,
-              ignoreEdit: ignoreEdit
-            },
-            currentSessionId
-          );
-        },
-        ignoreEdit ? 0 : 300
-      );
+      timers.current.change = setTimeout(() => {
+        htmlContentRef.current = editor.getHTML();
+        post(
+          EventTypes.content,
+          {
+            html: htmlContentRef.current,
+            ignoreEdit: ignoreEdit
+          },
+          tab.id,
+          tab.noteId,
+          currentSessionId
+        );
+      }, 300);
 
       countWords(5000);
     },
-    [countWords]
+    [countWords, tab.id, tab.noteId]
   );
 
   const scroll = useCallback(
-    (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {},
-    []
+    (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {
+      if (!tab) return;
+      useTabStore
+        .getState()
+        .setScrollPosition(tab.id, _event.currentTarget.scrollTop);
+    },
+    [tab]
   );
 
   const onUpdate = useCallback(() => {
@@ -177,19 +190,34 @@ export function useEditorController(update: () => void): EditorController {
   const onMessage = useCallback(
     (event: Event & { data?: string }) => {
       if (event?.data?.[0] !== "{") return;
-
       const message = JSON.parse(event.data);
       const type = message.type;
       const value = message.value;
-      global.sessionId = message.sessionId;
+
+      if (message.tabId !== tab.id) {
+        logger("info", "tab id not matched");
+        return;
+      }
+
+      logger(
+        "info",
+        "webview message for tab",
+        message.type,
+        tab.id,
+        message.tabId
+      );
+
+      const editor = editors[tab.id];
       switch (type) {
         case "native:updatehtml": {
           htmlContentRef.current = value;
           if (!editor) break;
           const { from, to } = editor.state.selection;
+
           editor?.commands.setContent(htmlContentRef.current, false, {
             preserveWhitespace: true
           });
+
           editor.commands.setTextSelection({
             from,
             to
@@ -198,6 +226,7 @@ export function useEditorController(update: () => void): EditorController {
           break;
         }
         case "native:html":
+          // logger("info", "loading html", htmlContentRef.current);
           htmlContentRef.current = value;
           update();
           countWords();
@@ -232,7 +261,7 @@ export function useEditorController(update: () => void): EditorController {
       }
       post(type); // Notify that message was delivered successfully.
     },
-    [update, countWords, setTheme]
+    [tab, update, countWords, setTheme]
   );
 
   useEffect(() => {
@@ -249,20 +278,32 @@ export function useEditorController(update: () => void): EditorController {
     };
   }, [onMessage]);
 
-  const openFilePicker = useCallback((type: "image" | "file" | "camera") => {
-    post(EventTypes.filepicker, type);
-  }, []);
+  const openFilePicker = useCallback(
+    (type: "image" | "file" | "camera") => {
+      post(EventTypes.filepicker, type, tab.id, tab.noteId);
+    },
+    [tab.id, tab.noteId]
+  );
 
-  const downloadAttachment = useCallback((attachment: Attachment) => {
-    post(EventTypes.download, attachment);
-  }, []);
-  const previewAttachment = useCallback((attachment: Attachment) => {
-    post(EventTypes.previewAttachment, attachment);
-  }, []);
-  const openLink = useCallback((url: string) => {
-    post(EventTypes.link, url);
-    return true;
-  }, []);
+  const downloadAttachment = useCallback(
+    (attachment: Attachment) => {
+      post(EventTypes.download, attachment, tab.id, tab.noteId);
+    },
+    [tab.id, tab.noteId]
+  );
+  const previewAttachment = useCallback(
+    (attachment: Attachment) => {
+      post(EventTypes.previewAttachment, attachment, tab.id, tab.noteId);
+    },
+    [tab.id, tab.noteId]
+  );
+  const openLink = useCallback(
+    (url: string) => {
+      post(EventTypes.link, url, tab.id, tab.noteId);
+      return true;
+    },
+    [tab.id, tab.noteId]
+  );
 
   const copyToClipboard = (text: string) => {
     post(EventTypes.copyToClipboard, text);

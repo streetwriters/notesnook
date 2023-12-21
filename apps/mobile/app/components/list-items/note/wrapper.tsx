@@ -29,7 +29,6 @@ import {
   openVault,
   presentSheet
 } from "../../../services/event-manager";
-import { useEditorStore } from "../../../stores/use-editor-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
@@ -91,9 +90,6 @@ export const openNote = async (
       )
     });
   } else {
-    if (note?.readonly) {
-      useEditorStore.getState().setReadonly(note?.readonly);
-    }
     eSendEvent(eOnLoadNote, {
       item: note
     });
