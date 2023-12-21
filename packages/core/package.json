@@ -38,6 +38,7 @@
     "ws": "^8.13.0"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "prebuild": "node scripts/prebuild.mjs",
     "pretest": "node scripts/prebuild.mjs",
     "pretest:e2e": "node scripts/prebuild.mjs",
