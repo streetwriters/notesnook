@@ -293,8 +293,7 @@ class AppStore extends BaseStore<AppStore> {
     try {
       const result = await db.sync({
         type: full ? "full" : "send",
-        force,
-        serverLastSynced: lastSynced
+        force
       });
 
       if (!result) return this.updateSyncStatus("failed");

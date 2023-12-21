@@ -52,7 +52,7 @@ function Unlock(props: UnlockProps) {
     try {
       if (!password) return;
       const note = await db.vault.open(noteId, password);
-      console.log(note);
+      if (!note) return;
       openLockedSession(note);
     } catch (e) {
       if (

@@ -94,7 +94,7 @@ import {
   NotebooksWithDateEdited,
   TagsWithDateEdited
 } from "../list-container/types";
-import { SchemeColors, StaticColors } from "@notesnook/theme";
+import { SchemeColors } from "@notesnook/theme";
 import Vault from "../../common/vault";
 
 type NoteProps = {

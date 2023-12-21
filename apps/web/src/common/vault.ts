@@ -26,6 +26,7 @@ class Vault {
   static async createVault() {
     if (await db.vault.exists()) return false;
     return await showPasswordDialog("create_vault", async ({ password }) => {
+      if (!password) return false;
       await db.vault.create(password);
       showToast("success", "Vault created.");
       return true;
@@ -35,6 +36,7 @@ class Vault {
   static async clearVault() {
     if (!(await db.vault.exists())) return false;
     return await showPasswordDialog("clear_vault", async ({ password }) => {
+      if (!password) return false;
       try {
         await db.vault.clear(password);
         return true;
@@ -49,6 +51,7 @@ class Vault {
     return await showPasswordDialog(
       "delete_vault",
       async ({ password, deleteAllLockedNotes }) => {
+        if (!password) return false;
         if (!(await db.user.verifyPassword(password))) return false;
         await db.vault.delete(!!deleteAllLockedNotes);
         return true;
@@ -62,6 +65,7 @@ class Vault {
    */
   static unlockVault() {
     return showPasswordDialog("ask_vault_password", ({ password }) => {
+      if (!password) return false;
       return db.vault
         .unlock(password)
         .then(() => true)
@@ -73,6 +77,7 @@ class Vault {
     return showPasswordDialog(
       "change_password",
       async ({ oldPassword, newPassword }) => {
+        if (!oldPassword || !newPassword) return false;
         await db.vault.changePassword(oldPassword, newPassword);
         showToast("success", "Vault password changed.");
         return true;
@@ -80,29 +85,28 @@ class Vault {
     );
   }
 
-  static unlockNote(id, type = "unlock_note") {
-    return new Promise((resolve) => {
-      return showPasswordDialog(type, ({ password }) => {
-        return db.vault
-          .remove(id, password)
-          .then(() => true)
-          .catch((e) => {
-            console.error(e);
-            return false;
-          });
-      }).then(resolve);
+  static unlockNote(id: string, type = "unlock_note") {
+    return showPasswordDialog(type, ({ password }) => {
+      if (!password) return false;
+      return db.vault
+        .remove(id, password)
+        .then(() => true)
+        .catch((e) => {
+          console.error(e);
+          return false;
+        });
     });
   }
 
-  static lockNote(id) {
+  static lockNote(id: string): Promise<boolean> {
     return db.vault
       .add(id)
       .then(() => true)
       .catch(({ message }) => {
         switch (message) {
-          case db.vault.ERRORS.noVault:
+          case VAULT_ERRORS.noVault:
             return Vault.createVault().then(() => Vault.lockNote(id));
-          case db.vault.ERRORS.vaultLocked:
+          case VAULT_ERRORS.vaultLocked:
             return Vault.unlockVault().then(() => Vault.lockNote(id));
           default:
             showToast("error", message);
@@ -112,8 +116,9 @@ class Vault {
       });
   }
 
-  static askPassword(action) {
+  static askPassword(action: (password: string) => Promise<boolean>) {
     return showPasswordDialog("ask_vault_password", ({ password }) => {
+      if (!password) return false;
       return action(password);
     });
   }

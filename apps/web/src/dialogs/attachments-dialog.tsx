@@ -162,7 +162,7 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
         <Sidebar
           onDownloadAll={() => download(allAttachments?.ungrouped || [])}
           filter={async (query) => {
-            setAttachments(await db.lookup.attachments(query));
+            setAttachments(await db.lookup.attachments(query).sorted());
           }}
           counts={counts}
           onRouteChange={async (route) => {

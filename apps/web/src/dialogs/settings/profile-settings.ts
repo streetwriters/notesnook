@@ -103,6 +103,7 @@ export const ProfileSettings: SettingsGroup[] = [
             title: "Delete account",
             action: async () =>
               showPasswordDialog("delete_account", async ({ password }) => {
+                if (!password) return false;
                 await db.user.deleteUser(password);
                 return true;
               })

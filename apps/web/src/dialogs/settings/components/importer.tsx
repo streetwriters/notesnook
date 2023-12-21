@@ -34,7 +34,7 @@ export function Importer() {
   const notesCounter = useRef<HTMLSpanElement>(null);
   const importProgress = useRef<HTMLDivElement>(null);
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles((files) => {
       const newFiles = [...acceptedFiles, ...files];
       return newFiles;
@@ -43,7 +43,9 @@ export function Importer() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: [".zip"]
+    accept: {
+      "application/zip": [".zip"]
+    }
   });
 
   return (

@@ -157,13 +157,15 @@ async function addAttachment(
   file: File,
   options: AddAttachmentOptions = {}
 ): Promise<string> {
-  const { default: FS } = await import("../../interfaces/fs");
+  const { getUploadedFileSize, hashStream, writeEncryptedFile } = await import(
+    "../../interfaces/fs"
+  );
   const { expectedFileHash, showProgress = true } = options;
   let forceWrite = options.forceWrite;
 
   const action = async () => {
     const reader = file.stream().getReader();
-    const { hash, type: hashType } = await FS.hashStream(reader);
+    const { hash, type: hashType } = await hashStream(reader);
     reader.releaseLock();
 
     if (expectedFileHash && hash !== expectedFileHash)
@@ -171,15 +173,15 @@ async function addAttachment(
         `Please select the same file for reuploading. Expected hash ${expectedFileHash} but got ${hash}.`
       );
 
-    const exists = db.attachments?.attachment(hash);
+    const exists = await db.attachments.attachment(hash);
     if (!forceWrite && exists) {
-      forceWrite = (await FS.getUploadedFileSize(hash)) <= 0;
+      forceWrite = (await getUploadedFileSize(hash)) <= 0;
     }
 
     if (forceWrite || !exists) {
       const key: SerializedKey = await getEncryptionKey();
 
-      const output = await FS.writeEncryptedFile(file, key, hash);
+      const output = await writeEncryptedFile(file, key, hash);
       if (!output) throw new Error("Could not encrypt file.");
 
       if (forceWrite && exists) await db.attachments.reset(hash);

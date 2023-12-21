@@ -30,7 +30,6 @@ export function useIsUserPremium() {
 }
 
 export function isUserPremium(user?: User) {
-  return true;
   if (IS_TESTING) return true;
   if (!user) user = userstore.get().user;
   if (!user) return false;

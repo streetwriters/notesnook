@@ -288,10 +288,11 @@ export function Factory(Module) {
         return sqlite3.column_blob(stmt, iCol);
       case SQLite.SQLITE_FLOAT:
         return sqlite3.column_double(stmt, iCol);
-      case SQLite.SQLITE_INTEGER:
+      case SQLite.SQLITE_INTEGER: {
         const lo32 = sqlite3.column_int(stmt, iCol);
         const hi32 = Module.getTempRet0();
         return cvt32x2AsSafe(lo32, hi32);
+      }
       case SQLite.SQLITE_NULL:
         return null;
       case SQLite.SQLITE_TEXT:
@@ -813,10 +814,11 @@ export function Factory(Module) {
         return sqlite3.value_blob(pValue);
       case SQLite.SQLITE_FLOAT:
         return sqlite3.value_double(pValue);
-      case SQLite.SQLITE_INTEGER:
+      case SQLite.SQLITE_INTEGER: {
         const lo32 = sqlite3.value_int(pValue);
         const hi32 = Module.getTempRet0();
         return cvt32x2AsSafe(lo32, hi32);
+      }
       case SQLite.SQLITE_NULL:
         return null;
       case SQLite.SQLITE_TEXT:

@@ -121,7 +121,7 @@ function NavigationMenu(props: NavigationMenuProps) {
   );
 
   const _navigate = useCallback(
-    (path) => {
+    (path: string) => {
       toggleNavigationContainer(true);
       const nestedRoute = findNestedRoute(path);
       navigate(!nestedRoute || nestedRoute === location ? path : nestedRoute);
@@ -218,7 +218,7 @@ function NavigationMenu(props: NavigationMenuProps) {
                     key: "rename",
                     title: "Rename color",
                     onClick: async () => {
-                      await showRenameColorDialog(color.id);
+                      await showRenameColorDialog(color);
                     }
                   }
                 ]}

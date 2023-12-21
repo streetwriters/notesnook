@@ -31,7 +31,7 @@ import { store as notestore } from "../stores/note-store";
 import { store as editorStore } from "../stores/editor-store";
 import { Perform } from "../common/dialog-controller";
 import { FilteredList } from "../components/filtered-list";
-import { ItemReference, Tag, isGroupHeader } from "@notesnook/core/dist/types";
+import { ItemReference, Tag } from "@notesnook/core/dist/types";
 import { ResolvedItem } from "../components/list-container/resolved-item";
 import { create } from "zustand";
 
@@ -66,23 +66,17 @@ function AddTagsDialog(props: AddTagsDialogProps) {
         await useStore.getState().refresh();
         return;
       }
-
       const selected: SelectedReference[] = [];
-      for (const tag of tags.ids) {
-        if (isGroupHeader(tag)) continue;
-        if (selected.findIndex((a) => a.id === tag) > -1) continue;
-
-        if (await tagHasNotes(tag, noteIds)) {
-          selected.push({
-            id: tag,
-            op: "add",
-            new: false
-          });
-        }
-      }
+      const selectedTags = await db.relations
+        .to({ type: "note", ids: noteIds }, "tag")
+        .get();
+      selectedTags.forEach((r) => {
+        if (selected.findIndex((a) => a.id === r.fromId) > -1) return;
+        selected.push({ id: r.fromId, op: "add", new: false });
+      });
       useSelectionStore.getState().setSelected(selected);
     })();
-  }, [tags]);
+  }, [tags, noteIds]);
 
   return (
     <Dialog
@@ -115,10 +109,10 @@ function AddTagsDialog(props: AddTagsDialogProps) {
     >
       {tags && (
         <FilteredList
-          getItemKey={(index, items) => items[index]}
+          getItemKey={(index) => tags.key(index)}
           mode="fixed"
           estimatedSize={30}
-          items={tags.ungrouped}
+          items={tags.ids}
           sx={{ mt: 2 }}
           itemGap={5}
           placeholders={{
@@ -132,10 +126,10 @@ function AddTagsDialog(props: AddTagsDialogProps) {
             const { selected, setSelected } = useSelectionStore.getState();
             setSelected([...selected, { id: tagId, new: true, op: "add" }]);
           }}
-          renderItem={({ item: tagId }) => {
+          renderItem={({ item: index }) => {
             return (
-              <ResolvedItem key={tagId} type="tag" items={tags} id={tagId}>
-                {({ item }) => <TagItem tag={item} key={tagId} />}
+              <ResolvedItem key={index} type="tag" items={tags} index={index}>
+                {({ item }) => <TagItem tag={item} />}
               </ResolvedItem>
             );
           }}

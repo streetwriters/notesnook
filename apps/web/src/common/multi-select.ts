@@ -27,7 +27,6 @@ import { showToast } from "../utils/toast";
 import Vault from "./vault";
 import { TaskManager } from "./task-manager";
 import { pluralize } from "@notesnook/common";
-import { Reminder } from "@notesnook/core";
 
 async function moveNotesToTrash(ids: string[], confirm = true) {
   if (confirm && !(await showMultiDeleteConfirmation(ids.length))) return;
@@ -103,10 +102,10 @@ async function deleteAttachments(ids: string[]) {
   showToast("success", `${pluralize(ids.length, "attachment")} deleted`);
 }
 
-async function moveRemindersToTrash(reminders: Reminder[]) {
-  const isMultiselect = reminders.length > 1;
+async function moveRemindersToTrash(ids: string[]) {
+  const isMultiselect = ids.length > 1;
   if (isMultiselect) {
-    if (!(await showMultiDeleteConfirmation(reminders.length))) return;
+    if (!(await showMultiDeleteConfirmation(ids.length))) return;
   }
 
   await TaskManager.startTask({
@@ -114,13 +113,13 @@ async function moveRemindersToTrash(reminders: Reminder[]) {
     id: "deleteReminders",
     action: async (report) => {
       report({
-        text: `Deleting ${pluralize(reminders.length, "reminder")}...`
+        text: `Deleting ${pluralize(ids.length, "reminder")}...`
       });
-      await reminderStore.delete(...reminders.map((i) => i.id));
+      await reminderStore.delete(...ids);
     }
   });
 
-  showToast("success", `${pluralize(reminders.length, "reminder")} deleted.`);
+  showToast("success", `${pluralize(ids.length, "reminder")} deleted.`);
 }
 
 export const Multiselect = {

@@ -36,7 +36,10 @@ import {
 import { pluralize } from "@notesnook/common";
 import { Allotment, AllotmentHandle } from "allotment";
 import { Plus } from "../components/icons";
-import { useStore as useNotesStore } from "../stores/note-store";
+import {
+  notesFromContext,
+  useStore as useNotesStore
+} from "../stores/note-store";
 import { useStore as useNotebookStore } from "../stores/notebook-store";
 import Placeholder from "../components/placeholders";
 import { db } from "../common/db";
@@ -74,8 +77,9 @@ function Notebook(props: NotebookProps) {
   const filteredItems = useSearch(
     "notes",
     (query) => {
-      if (!context || !notes || context.type !== "notebook") return;
-      return db.lookup.notes(query, notes.ungrouped).sorted();
+      if (!context || context.type !== "notebook") return;
+      const notes = notesFromContext(context);
+      return db.lookup.notes(query, notes).sorted();
     },
     [context, notes]
   );
@@ -95,7 +99,7 @@ function Notebook(props: NotebookProps) {
     setContext({ type: "notebook", id: notebookId || rootId });
   }, [rootId, notebookId]);
 
-  const toggleCollapse = useCallback((isCollapsed) => {
+  const toggleCollapse = useCallback((isCollapsed: boolean) => {
     if (!paneRef.current || !sizes.current) return;
 
     if (!isCollapsed) {

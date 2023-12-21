@@ -43,27 +43,32 @@ export class WebExtensionServer implements Server {
   }
 
   async getNotes(): Promise<ItemReference[] | undefined> {
-    return db.notes.all
-      .filter((n) => !n.locked)
-      .map((note) => ({ id: note.id, title: note.title }));
+    const notes = await db.notes.all
+      .where((eb) => eb("notes.locked", "==", false))
+      .fields(["notes.id", "notes.title"])
+      .items(undefined, db.settings.getGroupOptions("notes"));
+    return notes;
   }
 
-  async getNotebooks(): Promise<NotebookReference[] | undefined> {
-    return db.notebooks.all.map((nb) => ({
-      id: nb.id,
-      title: nb.title,
-      topics: nb.topics.map((topic: ItemReference) => ({
-        id: topic.id,
-        title: topic.title
-      }))
-    }));
+  async getNotebooks(
+    parentId?: string
+  ): Promise<NotebookReference[] | undefined> {
+    if (!parentId)
+      return await db.notebooks.roots
+        .fields(["notebooks.id", "notebooks.title"])
+        .items();
+
+    return await db.relations
+      .from({ type: "notebook", id: parentId as string }, "notebook")
+      .selector.fields(["notebooks.id", "notebooks.title"])
+      .items();
   }
 
   async getTags(): Promise<ItemReference[] | undefined> {
-    return db.tags.all.map((tag) => ({
-      id: tag.id,
-      title: tag.title
-    }));
+    const tags = await db.tags.all
+      .fields(["notes.id", "notes.title"])
+      .items(undefined, db.settings.getGroupOptions("tags"));
+    return tags;
   }
 
   async saveClip(clip: Clip) {
@@ -94,9 +99,10 @@ export class WebExtensionServer implements Server {
       }).outerHTML;
     }
 
-    const note = clip.note?.id ? db.notes.note(clip.note?.id) : null;
+    const note = clip.note?.id ? await db.notes.note(clip.note?.id) : null;
 
-    let content = (await note?.content()) || "";
+    let content =
+      (!!note?.contentId && (await db.content.get(note.contentId))?.data) || "";
     if (isCipher(content)) return;
 
     content += clipContent;
@@ -113,12 +119,9 @@ export class WebExtensionServer implements Server {
     });
 
     if (id && clip.tags) {
-      for (const title of clip.tags) {
-        const tagId = db.tags.tag(title)?.id || (await db.tags.add({ title }));
-        await db.relations.add(
-          { id: tagId, type: "tag" },
-          { id, type: "note" }
-        );
+      for (const id of clip.tags) {
+        if (!(await db.tags.exists(id))) continue;
+        await db.relations.add({ id: id, type: "tag" }, { id, type: "note" });
       }
     }
 
@@ -126,13 +129,7 @@ export class WebExtensionServer implements Server {
       for (const ref of clip.refs) {
         switch (ref.type) {
           case "notebook":
-            await db.notes.addToNotebook({ id: ref.id }, id);
-            break;
-          case "topic":
-            await db.notes.addToNotebook(
-              { id: ref.parentId, topic: ref.id },
-              id
-            );
+            await db.notes.addToNotebook(ref.id, id);
             break;
         }
       }

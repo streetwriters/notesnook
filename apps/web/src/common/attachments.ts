@@ -18,19 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { lazify } from "../utils/lazify";
-import { Attachment } from "@notesnook/core";
 import { db } from "./db";
 
 async function download(hash: string, groupId?: string) {
-  const attachment = db.attachments.attachment(hash);
+  const attachment = await db.attachments.attachment(hash);
   if (!attachment) return;
   const downloadResult = await db
     .fs()
     .downloadFile(
-      groupId || attachment.metadata.hash,
-      attachment.metadata.hash,
-      attachment.chunkSize,
-      attachment.metadata
+      groupId || attachment.hash,
+      attachment.hash,
+      attachment.chunkSize
     );
   if (!downloadResult) throw new Error("Failed to download file.");
 
@@ -46,7 +44,7 @@ export async function saveAttachment(hash: string) {
 
   const { attachment, key } = response;
   await lazify(import("../interfaces/fs"), ({ saveFile }) =>
-    saveFile(attachment.metadata.hash, {
+    saveFile(attachment.hash, {
       key,
       iv: attachment.iv,
       name: attachment.filename,
@@ -77,7 +75,7 @@ export async function downloadAttachment<
     return (await db.attachments.read(hash, type)) as TOutputType;
 
   const blob = await lazify(import("../interfaces/fs"), ({ decryptFile }) =>
-    decryptFile(attachment.metadata.hash, {
+    decryptFile(attachment.hash, {
       key,
       iv: attachment.iv,
       name: attachment.filename,
