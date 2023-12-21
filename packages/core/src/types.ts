@@ -342,7 +342,7 @@ export interface Reminder extends BaseItem<"reminder"> {
   priority: "silent" | "vibrate" | "urgent";
   date: number;
   mode: "repeat" | "once" | "permanent";
-  recurringMode?: "week" | "month" | "day";
+  recurringMode?: "week" | "month" | "day" | "year";
   selectedDays?: number[];
   localOnly?: boolean;
   disabled?: boolean;
