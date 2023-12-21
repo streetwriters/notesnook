@@ -35,7 +35,6 @@ import { db } from "../../common/database";
 import { IconButton } from "../../components/ui/icon-button";
 import useKeyboard from "../../hooks/use-keyboard";
 import { eSubscribeEvent } from "../../services/event-manager";
-import { useEditorStore } from "../../stores/use-editor-store";
 import { getElevationStyle } from "../../utils/elevation";
 import { openLinkInBrowser } from "../../utils/functions";
 import EditorOverlay from "./loading";
@@ -43,6 +42,7 @@ import { EDITOR_URI } from "./source";
 import { EditorProps, useEditorType } from "./tiptap/types";
 import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
+import { useTabStore } from "./tiptap/use-tab-store";
 import { editorController } from "./tiptap/utils";
 
 const style: ViewStyle = {
@@ -104,18 +104,27 @@ const Editor = React.memo(
           src: string;
           attachmentType: string;
         }) => {
-          if (groupId !== editor.note.current?.id) return;
-          editorController.current.markImageLoaded(hash);
+          const exists = editor.note.current[groupId];
+          if (!exists) return;
+          const tabId = useTabStore.getState().getTabForNote(groupId);
+          if (typeof tabId === "undefined") return;
+          editorController.current.markImageLoaded(groupId, hash);
           if (attachmentType === "webclip") {
-            editor.commands.updateWebclip({
-              hash: hash,
-              src: src
-            });
+            editor.commands.updateWebclip(
+              {
+                hash: hash,
+                src: src
+              },
+              tabId
+            );
           } else {
-            editor.commands.updateImage({
-              hash: hash,
-              dataurl: src
-            });
+            editor.commands.updateImage(
+              {
+                hash: hash,
+                dataurl: src
+              },
+              tabId
+            );
           }
         },
         [editor.commands, editor.note]
@@ -207,15 +216,23 @@ const Editor = React.memo(
 export default Editor;
 
 const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
-  const readonly = useEditorStore((state) => state.readonly);
+  const readonly = useTabStore(
+    (state) => state.tabs.find((t) => t.id === state.currentTab)?.readonly
+  );
+
   const keyboard = useKeyboard();
 
   const onPress = async () => {
-    if (editor.note.current) {
-      await db.notes.note(editor.note.current.id)?.readonly();
-      editor.note.current = db.notes?.note(editor.note.current.id)?.data;
+    const noteId = useTabStore
+      .getState()
+      .getNoteIdForTab(useTabStore.getState().currentTab);
+    if (noteId) {
+      await db.notes.readonly(!editor.note.current.readonly, noteId);
+      editor.note.current[noteId] = await db.notes?.note(noteId);
 
-      useEditorStore.getState().setReadonly(false);
+      useTabStore.getState().updateTab(useTabStore.getState().currentTab, {
+        readonly: editor.note.current[noteId as string]?.readonly
+      });
     }
   };
 

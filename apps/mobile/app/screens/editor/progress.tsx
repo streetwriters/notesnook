@@ -23,13 +23,11 @@ import { View } from "react-native";
 import { ProgressBarComponent } from "../../components/ui/svg/lazy";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { useEditorStore } from "../../stores/use-editor-store";
+import { useTabStore } from "./tiptap/use-tab-store";
 
 export const ProgressBar = () => {
   const { colors } = useThemeColors();
-  const currentlyEditingNote = useEditorStore(
-    (state) => state.currentEditingNote
-  );
+  const currentlyEditingNote = useTabStore((state) => state.getCurrentNoteId());
   const downloading = useAttachmentStore((state) => state.downloading);
 
   const loading = currentlyEditingNote

@@ -29,17 +29,16 @@ import {
   openVault,
   presentSheet
 } from "../../../services/event-manager";
-import { useEditorStore } from "../../../stores/use-editor-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 
-import NotePreview from "../../note-history/preview";
-import SelectionWrapper from "../selection-wrapper";
 import {
   NotebooksWithDateEdited,
   TagsWithDateEdited
 } from "../../../stores/resolve-items";
+import NotePreview from "../../note-history/preview";
+import SelectionWrapper from "../selection-wrapper";
 
 export const openNote = async (
   item: Note,
@@ -94,9 +93,6 @@ export const openNote = async (
       )
     });
   } else {
-    if (note?.readonly) {
-      useEditorStore.getState().setReadonly(note?.readonly);
-    }
     eSendEvent(eOnLoadNote, {
       item: note
     });

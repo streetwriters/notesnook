@@ -36,6 +36,7 @@ import { eCloseSheet } from "../../../utils/events";
 import { editorController, editorState } from "./utils";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import filesystem from "../../../common/filesystem";
+import { useTabStore } from "./use-tab-store";
 
 const showEncryptionSheet = (file) => {
   presentSheet({
@@ -51,6 +52,15 @@ const santizeUri = (uri) => {
   return uri;
 };
 
+/**
+ * @param {{
+ *  noteId: string,
+ * tabId: string,
+ * type: "image" | "camera" | "file"
+ * reupload: boolean
+ * hash?: string
+ * }} fileOptions
+ */
 const file = async (fileOptions) => {
   try {
     const options = {
@@ -103,22 +113,33 @@ const file = async (fileOptions) => {
     if (!(await attachFile(uri, hash, file.type, file.name, fileOptions)))
       return;
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
-    if (isImage(file.type)) {
-      editorController.current?.commands.insertImage({
-        hash: hash,
-        filename: file.name,
-        mime: file.type,
-        size: file.size,
-        dataurl: await db.attachments.read(hash, "base64"),
-        title: file.name
-      });
-    } else {
-      editorController.current?.commands.insertAttachment({
-        hash: hash,
-        filename: file.name,
-        mime: file.type,
-        size: file.size
-      });
+
+    if (
+      useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
+    ) {
+      if (isImage(file.type)) {
+        editorController.current?.commands.insertImage(
+          {
+            hash: hash,
+            filename: file.name,
+            mime: file.type,
+            size: file.size,
+            dataurl: await db.attachments.read(hash, "base64"),
+            title: file.name
+          },
+          fileOptions.tabId
+        );
+      } else {
+        editorController.current?.commands.insertAttachment(
+          {
+            hash: hash,
+            filename: file.name,
+            mime: file.type,
+            size: file.size
+          },
+          fileOptions.tabId
+        );
+      }
     }
 
     setTimeout(() => {
@@ -135,6 +156,15 @@ const file = async (fileOptions) => {
   }
 };
 
+/**
+ * @param {{
+ *  noteId: string,
+ * tabId: string,
+ * type: "image" | "camera" | "file"
+ * reupload: boolean
+ * hash?: string
+ * }} options
+ */
 const camera = async (options) => {
   try {
     await db.attachments.generateKey();
@@ -180,6 +210,17 @@ const gallery = async (options) => {
   }
 };
 
+/**
+ *
+ * @param {{
+ *  noteId: string,
+ * tabId: string,
+ * type: "image" | "camera" | "file"
+ * reupload: boolean
+ * hash?: string
+ * }} options
+ * @returns
+ */
 const pick = async (options) => {
   if (!PremiumService.get()) {
     let user = await db.user.getUser();
@@ -231,15 +272,21 @@ const handleImageResponse = async (response, options) => {
   });
 
   let fileName = image.originalFileName || image.fileName;
-
-  editorController.current?.commands.insertImage({
-    hash: hash,
-    mime: image.type,
-    title: fileName,
-    dataurl: b64,
-    size: image.fileSize,
-    filename: fileName
-  });
+  if (
+    useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
+  ) {
+    editorController.current?.commands.insertImage(
+      {
+        hash: hash,
+        mime: image.type,
+        title: fileName,
+        dataurl: b64,
+        size: image.fileSize,
+        filename: fileName
+      },
+      options.tabId
+    );
+  }
 
   if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
   const isPng = /(png)/g.test(image.type);
@@ -256,6 +303,22 @@ const handleImageResponse = async (response, options) => {
   if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
 };
 
+/**
+ * 
+ * @param {*} uri 
+ * @param {*} hash 
+ * @param {*} type 
+ * @param {*} filename 
+/**
+ * @param {{
+*  noteId: string,
+* tabId: string,
+* type: "image" | "camera" | "file"
+* reupload: boolean
+* hash?: string
+* }} options
+ * @returns 
+ */
 export async function attachFile(uri, hash, type, filename, options) {
   try {
     let exists = db.attachments.exists(hash);
@@ -291,10 +354,7 @@ export async function attachFile(uri, hash, type, filename, options) {
     } else {
       encryptionInfo = { hash: hash };
     }
-    await db.attachments.add(
-      encryptionInfo,
-      editorController.current?.note?.id
-    );
+    await db.attachments.add(encryptionInfo, options.noteId);
 
     return true;
   } catch (e) {

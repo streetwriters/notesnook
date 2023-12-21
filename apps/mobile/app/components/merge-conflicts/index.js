@@ -47,6 +47,7 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 
 const MergeConflicts = () => {
   const { colors } = useThemeColors();
@@ -88,10 +89,11 @@ const MergeConflicts = () => {
       });
     }
     Navigation.queueRoutesForUpdate();
-    if (editorController.current?.note?.id === note.id) {
+
+    if (useTabStore.getState().getCurrentNoteId() === note.id) {
       // reload the note in editor
       eSendEvent(eOnLoadNote, {
-        item: editorController.current?.note,
+        item: editorController.current.note.current[note.id],
         forced: true
       });
     }

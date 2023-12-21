@@ -64,14 +64,16 @@ export function makeSessionId(id?: string) {
 
 export async function isEditorLoaded(
   ref: RefObject<WebView>,
-  sessionId: string
+  sessionId: string,
+  tabId: number
 ) {
-  return await post(ref, sessionId, EditorEvents.status);
+  return await post(ref, sessionId, tabId, EditorEvents.status);
 }
 
 export async function post<T>(
   ref: RefObject<WebView>,
   sessionId: string,
+  tabId: number,
   type: string,
   value: T | null = null,
   waitFor = 300
@@ -83,7 +85,8 @@ export async function post<T>(
   const message = {
     type,
     value,
-    sessionId: sessionId
+    sessionId: sessionId,
+    tabId
   };
   setImmediate(() => ref.current?.postMessage(JSON.stringify(message)));
   const response = await getResponse(type, waitFor);

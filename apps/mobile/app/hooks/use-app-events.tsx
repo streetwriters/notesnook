@@ -54,6 +54,7 @@ import { MMKV } from "../common/database/mmkv";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
 import { Walkthrough } from "../components/walkthroughs";
+import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
   clearAppState,
   editorController,
@@ -80,7 +81,6 @@ import SettingsService from "../services/settings";
 import Sync from "../services/sync";
 import { initAfterSync } from "../stores";
 import { useAttachmentStore } from "../stores/use-attachment-store";
-import { useEditorStore } from "../stores/use-editor-store";
 import { useMessageStore } from "../stores/use-message-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
@@ -230,7 +230,7 @@ async function checkForShareExtensionLaunchedInBackground() {
     }
 
     if (notesAddedFromIntent || shareExtensionOpened) {
-      const id = useEditorStore.getState().currentEditingNote;
+      const id = useTabStore.getState().getCurrentNoteId();
       const note = id && (await db.notes.note(id));
       eSendEvent("webview_reset");
       if (note) setTimeout(() => eSendEvent("loadingNote", note), 1);
@@ -243,7 +243,7 @@ async function checkForShareExtensionLaunchedInBackground() {
 
 async function saveEditorState() {
   if (editorState().currentlyEditing) {
-    const id = useEditorStore.getState().currentEditingNote;
+    const id = useTabStore.getState().getCurrentNoteId();
     const note = id ? await db.notes.note(id) : undefined;
 
     if (note?.locked) return;
@@ -510,7 +510,7 @@ export const useAppEvents = () => {
           }
         }
       } else {
-        const id = useEditorStore.getState().currentEditingNote;
+        const id = useTabStore.getState().getCurrentNoteId();
         const note = id ? await db.notes.note(id) : undefined;
         if (
           note?.locked &&
@@ -527,7 +527,9 @@ export const useAppEvents = () => {
         ) {
           useUserStore.getState().lockApp(true);
           if (Platform.OS === "ios") {
-            editorController.current?.commands.blur();
+            editorController.current?.commands.blur(
+              useTabStore.getState().currentTab
+            );
             Keyboard.dismiss();
           }
         }

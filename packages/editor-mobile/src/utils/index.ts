@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolbarGroupDefinition } from "@notesnook/editor";
-import { Editor } from "@notesnook/editor";
-import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
-import { useEditorController } from "../hooks/useEditorController";
+import { Editor, ToolbarGroupDefinition } from "@notesnook/editor";
 import { ThemeDefinition } from "@notesnook/theme";
+import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
+import { EditorController } from "../hooks/useEditorController";
+
+globalThis.sessionId = "notesnook-editor";
 
 export type SafeAreaType = {
   top: number;
@@ -49,15 +50,19 @@ export type Settings = {
 
 /* eslint-disable no-var */
 declare global {
-  var statusBar: React.MutableRefObject<{
-    set: React.Dispatch<
-      React.SetStateAction<{
-        date: string;
-        saved: string;
+  var statusBars: Record<
+    number,
+    | React.MutableRefObject<{
+        set: React.Dispatch<
+          React.SetStateAction<{
+            date: string;
+            saved: string;
+          }>
+        >;
+        updateWords: () => void;
       }>
-    >;
-    updateWords: () => void;
-  }>;
+    | undefined
+  >;
   var __PLATFORM__: "ios" | "android";
   var readonly: boolean;
   var noToolbar: boolean;
@@ -67,14 +72,16 @@ declare global {
    * Id of current session
    */
   var sessionId: string;
+
+  var tabStore: any;
   /**
-   * Current tiptap instance
+   * Current tiptap editors
    */
-  var editor: Editor | null;
+  var editors: Record<number, Editor | null>;
   /**
-   * Current editor controller
+   * Current editor controllers
    */
-  var editorController: ReturnType<typeof useEditorController>;
+  var editorControllers: Record<number, EditorController | undefined>;
 
   var settingsController: {
     update: (settings: Settings) => void;
@@ -102,17 +109,21 @@ declare global {
     >;
   };
 
-  var editorTitle: RefObject<HTMLTextAreaElement>;
+  var editorTitles: Record<number, RefObject<HTMLTextAreaElement> | undefined>;
   /**
    * Global ref to manage tags in editor.
    */
-  var editorTags: MutableRefObject<{
-    setTags: React.Dispatch<
-      React.SetStateAction<
-        { title: string; alias: string; id: string; type: "tag" }[]
-      >
-    >;
-  }>;
+  var editorTags: Record<
+    number,
+    | MutableRefObject<{
+        setTags: React.Dispatch<
+          React.SetStateAction<
+            { title: string; alias: string; id: string; type: "tag" }[]
+          >
+        >;
+      }>
+    | undefined
+  >;
 
   function logger(type: "info" | "warn" | "error", ...logs: unknown[]): void;
   /**
@@ -123,7 +134,10 @@ declare global {
 
   function post<T extends keyof typeof EventTypes>(
     type: (typeof EventTypes)[T],
-    value?: unknown
+    value?: unknown,
+    tabId?: number,
+    noteId?: string,
+    sessionId?: string
   ): void;
   interface Window {
     /**
@@ -156,7 +170,10 @@ export const EventTypes = {
   contentchange: "editor-event:content-change",
   reminders: "editor-event:reminders",
   previewAttachment: "editor-event:preview-attachment",
-  copyToClipboard: "editor-events:copy-to-clipboard"
+  copyToClipboard: "editor-events:copy-to-clipboard",
+  tabsChanged: "editor-events:tabs-changed",
+  showTabs: "editor-events:show-tabs",
+  tabFocused: "editor-events:tab-focused"
 } as const;
 
 export function isReactNative(): boolean {
@@ -179,6 +196,8 @@ export function logger(
 export function post<T extends keyof typeof EventTypes>(
   type: (typeof EventTypes)[T],
   value?: unknown,
+  tabId?: number,
+  noteId?: string,
   sessionId?: string
 ): void {
   if (isReactNative()) {
@@ -186,7 +205,9 @@ export function post<T extends keyof typeof EventTypes>(
       JSON.stringify({
         type,
         value: value,
-        sessionId: sessionId || globalThis.sessionId
+        sessionId: sessionId || globalThis.sessionId,
+        tabId,
+        noteId
       })
     );
   } else {

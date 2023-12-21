@@ -19,9 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import Clipboard from "@react-native-clipboard/clipboard";
+import { ItemReference } from "@notesnook/core/dist/types";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
+import Clipboard from "@react-native-clipboard/clipboard";
 import { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,
@@ -33,6 +34,7 @@ import {
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
 import { db } from "../../../common/database";
+import EditorTabs from "../../../components/sheets/editor-tabs";
 import ManageTagsSheet from "../../../components/sheets/manage-tags";
 import { RelationsList } from "../../../components/sheets/relations-list";
 import ReminderSheet from "../../../components/sheets/reminder";
@@ -44,7 +46,8 @@ import {
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
-import { useEditorStore } from "../../../stores/use-editor-store";
+import SettingsService from "../../../services/settings";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { useUserStore } from "../../../stores/use-user-store";
@@ -62,13 +65,10 @@ import { tabBarRef } from "../../../utils/global-refs";
 import { useDragState } from "../../settings/editor/state";
 import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
+import { useTabStore } from "./use-tab-store";
 import { EditorEvents, editorState } from "./utils";
-import { useNoteStore } from "../../../stores/use-notes-store";
-import SettingsService from "../../../services/settings";
-import { ItemReference } from "@notesnook/core/dist/types";
-import { useRelationStore } from "../../../stores/use-relation-store";
 
-const publishNote = async (editor: useEditorType) => {
+const publishNote = async () => {
   const user = useUserStore.getState().user;
   if (!user) {
     ToastManager.show({
@@ -91,9 +91,12 @@ const publishNote = async (editor: useEditorType) => {
     });
     return;
   }
-  const currentNote = editor?.note?.current;
-  if (currentNote?.id) {
-    const note = await db.notes?.note(currentNote.id);
+  const noteId = useTabStore
+    .getState()
+    .getNoteIdForTab(useTabStore.getState().currentTab);
+
+  if (noteId) {
+    const note = await db.notes?.note(noteId);
     if (note?.locked) {
       ToastManager.show({
         heading: "Locked notes cannot be published",
@@ -109,11 +112,12 @@ const publishNote = async (editor: useEditorType) => {
   }
 };
 
-const showActionsheet = async (editor: useEditorType) => {
-  const currentNote = editor?.note?.current;
-  if (currentNote?.id) {
-    const note = await db.notes?.note(currentNote.id);
-
+const showActionsheet = async () => {
+  const noteId = useTabStore
+    .getState()
+    .getNoteIdForTab(useTabStore.getState().currentTab);
+  if (noteId) {
+    const note = await db.notes?.note(noteId);
     if (editorState().isFocused || editorState().isFocused) {
       editorState().isFocused = true;
     }
@@ -142,7 +146,6 @@ export const useEditorEvents = (
   ]);
 
   const handleBack = useRef<NativeEventSubscription>();
-  const readonly = useEditorStore((state) => state.readonly);
   const isPremium = useUserStore((state) => state.premium);
   const { fontScale } = useWindowDimensions();
 
@@ -187,7 +190,7 @@ export const useEditorEvents = (
       deviceMode: deviceMode || "mobile",
       fullscreen: fullscreen || false,
       premium: isPremium,
-      readonly: readonly || editorPropReadonly,
+      readonly: false,
       tools: tools || getDefaultPresets().default,
       noHeader: noHeader,
       noToolbar: noToolbar,
@@ -205,13 +208,11 @@ export const useEditorEvents = (
   }, [
     fullscreen,
     isPremium,
-    readonly,
     editor.loading,
     deviceMode,
     tools,
     editor.commands,
     doubleSpacedLines,
-    editorPropReadonly,
     noHeader,
     noToolbar,
     corsProxy,
@@ -230,7 +231,7 @@ export const useEditorEvents = (
       return;
     }
     editorState().currentlyEditing = false;
-    editor.reset();
+    // editor.reset(); Notes remain open.
     setTimeout(async () => {
       if (deviceMode !== "mobile" && fullscreen) {
         if (fullscreen) {
@@ -326,21 +327,7 @@ export const useEditorEvents = (
   const onMessage = useCallback(
     async (event: WebViewMessageEvent) => {
       const data = event.nativeEvent.data;
-      const editorMessage = JSON.parse(data) as EditorMessage;
-
-      if (editorMessage.type === EventTypes.content) {
-        editor.saveContent({
-          type: editorMessage.type,
-          content: editorMessage.value as string,
-          forSessionId: editorMessage.sessionId
-        });
-      } else if (editorMessage.type === EventTypes.title) {
-        editor.saveContent({
-          type: editorMessage.type,
-          title: editorMessage.value as string,
-          forSessionId: editorMessage.sessionId
-        });
-      }
+      const editorMessage = JSON.parse(data) as EditorMessage<any>;
 
       if (editorMessage.type === EventTypes.back) {
         return onBackPress();
@@ -353,7 +340,27 @@ export const useEditorEvents = (
         return;
       }
 
+      const noteId = useTabStore
+        .getState()
+        .getNoteIdForTab(editorMessage.tabId);
+
       switch (editorMessage.type) {
+        case EventTypes.content:
+          editor.saveContent({
+            type: editorMessage.type,
+            content: editorMessage.value as string,
+            noteId: noteId,
+            tabId: editorMessage.tabId
+          });
+          break;
+        case EventTypes.title:
+          editor.saveContent({
+            type: editorMessage.type,
+            title: editorMessage.value as string,
+            noteId: noteId,
+            tabId: editorMessage.tabId
+          });
+          break;
         case EventTypes.logger:
           logger.info("[WEBVIEW LOG]", editorMessage.value);
           break;
@@ -363,41 +370,45 @@ export const useEditorEvents = (
         case EventTypes.selection:
           break;
         case EventTypes.reminders:
-          if (!editor.note.current) {
+          if (!noteId) {
             ToastManager.show({
               heading: "Create a note first to add a reminder",
               type: "success"
             });
             return;
           }
+          const note = await db.notes.note(noteId);
+          if (!note) return;
           RelationsList.present({
-            reference: editor.note.current as any,
+            reference: note as any,
             referenceType: "reminder",
             relationType: "from",
             title: "Reminders",
-            onAdd: () =>
-              ReminderSheet.present(undefined, editor.note.current as any, true)
+            onAdd: () => ReminderSheet.present(undefined, note, true)
           });
           break;
         case EventTypes.newtag:
-          if (!editor.note.current) {
+          if (!noteId) {
             ToastManager.show({
               heading: "Create a note first to add a tag",
               type: "success"
             });
             return;
           }
-          ManageTagsSheet.present([editor.note.current?.id]);
+          ManageTagsSheet.present([noteId]);
           break;
         case EventTypes.tag:
           if (editorMessage.value) {
-            if (!editor.note.current) return;
+            if (!noteId) return;
+            const note = await db.notes.note(noteId);
+            if (!note) return;
+
             db.relations
-              .unlink(editorMessage.value as ItemReference, editor.note.current)
+              .unlink(editorMessage.value as ItemReference, note)
               .then(async () => {
                 useTagStore.getState().refresh();
                 useRelationStore.getState().update();
-                await editor.commands.setTags(editor.note.current);
+                await editor.commands.setTags(note);
                 Navigation.queueRoutesForUpdate();
               });
           }
@@ -405,7 +416,11 @@ export const useEditorEvents = (
         case EventTypes.filepicker:
           editorState().isAwaitingResult = true;
           const { pick } = require("./picker.js").default;
-          pick({ type: editorMessage.value });
+          pick({
+            type: editorMessage.value,
+            noteId: noteId,
+            tabId: editorMessage.tabId
+          });
           setTimeout(() => {
             editorState().isAwaitingResult = false;
           }, 1000);
@@ -424,10 +439,10 @@ export const useEditorEvents = (
           eSendEvent(eOpenPremiumDialog);
           break;
         case EventTypes.monograph:
-          publishNote(editor);
+          publishNote();
           break;
         case EventTypes.properties:
-          showActionsheet(editor);
+          showActionsheet();
           break;
         case EventTypes.fullscreen:
           editorState().isFullscreen = true;
@@ -446,11 +461,39 @@ export const useEditorEvents = (
           } else {
             eSendEvent("PDFPreview", attachment);
           }
-
           break;
         }
         case EventTypes.copyToClipboard: {
           Clipboard.setString(editorMessage.value as string);
+          break;
+        }
+        case EventTypes.tabsChanged: {
+          useTabStore.setState({
+            tabs: (editorMessage.value as any)?.tabs,
+            currentTab: (editorMessage.value as any)?.currentTab
+          });
+          console.log("tabs updated...");
+          break;
+        }
+        case EventTypes.showTabs: {
+          EditorTabs.present();
+          break;
+        }
+        case EventTypes.tabFocused: {
+          // Reload the note
+          const note = await db.notes.note(editorMessage.noteId);
+          if (note) {
+            eSendEvent(eOnLoadNote, {
+              item: note,
+              forced: true
+            });
+          }
+          // TODO
+          // Handle any updates that occured in an note while the tab was not focused.
+          //  If editor has no content, reload the note, because it might be an app reload
+          // or the tab was destroyed in background...
+          // Maybe cache changes, something like pendingUpdates list.
+          // Do proper cleanup when a tab is destroyed though.
           break;
         }
 

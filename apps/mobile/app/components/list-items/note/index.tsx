@@ -33,11 +33,15 @@ import { notesnook } from "../../../../e2e/test.ids";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 import NotebookScreen from "../../../screens/notebook";
 import { TaggedNotes } from "../../../screens/notes/tagged";
-import { useEditorStore } from "../../../stores/use-editor-store";
 import useNavigationStore from "../../../stores/use-navigation-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { SIZE } from "../../../utils/size";
 
+import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
+import {
+  NotebooksWithDateEdited,
+  TagsWithDateEdited
+} from "../../../stores/resolve-items";
 import { Properties } from "../../properties";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
@@ -45,10 +49,6 @@ import { ReminderTime } from "../../ui/reminder-time";
 import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import {
-  NotebooksWithDateEdited,
-  TagsWithDateEdited
-} from "../../../stores/resolve-items";
 
 type NoteItemProps = {
   item: Note | BaseTrashItem<Note>;
@@ -74,8 +74,9 @@ const NoteItem = ({
   attachmentsCount,
   noOpen = false
 }: NoteItemProps) => {
-  const isEditingNote = useEditorStore(
-    (state) => state.currentEditingNote === item.id
+  const isEditingNote = useTabStore(
+    (state) =>
+      state.tabs.find((t) => t.id === state.currentTab)?.noteId === item.id
   );
   const { colors } = useThemeColors();
   const compactMode = useIsCompactModeEnabled(

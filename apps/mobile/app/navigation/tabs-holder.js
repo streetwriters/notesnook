@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import {
   activateKeepAwake,
   deactivateKeepAwake
@@ -44,6 +45,7 @@ import { FluidTabs } from "../components/tabs";
 import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
 import { useShortcutManager } from "../hooks/use-shortcut-manager";
 import { hideAllTooltips } from "../hooks/use-tooltip";
+import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
   clearAppState,
   editorController,
@@ -57,9 +59,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../services/event-manager";
-import { useEditorStore } from "../stores/use-editor-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -279,7 +279,7 @@ const _TabsHolder = () => {
         case "mobile":
           if (
             !editorState().movedAway &&
-            useEditorStore.getState().currentEditingNote
+            useTabStore.getState().getCurrentNoteId()
           ) {
             tabBarRef.current?.goToIndex(2, false);
           } else {
@@ -493,6 +493,7 @@ const onChangeTab = async (obj) => {
     editorState().movedAway = false;
     editorState().isFocused = true;
     activateKeepAwake();
+    console.log(editorState().currentlyEditing, "currentlyEditing...");
     if (!editorState().currentlyEditing) {
       eSendEvent(eOnLoadNote, {
         newNote: true
@@ -504,11 +505,12 @@ const onChangeTab = async (obj) => {
       editorState().movedAway = true;
       editorState().isFocused = false;
       eSendEvent(eClearEditor, "removeHandler");
-      setTimeout(() => useEditorStore.getState().setSearchReplace(false), 1);
-      let id = useEditorStore.getState().currentEditingNote;
-      let note = db.notes.note(id);
+      let id = useTabStore.getState().getCurrentNoteId();
+      let note = await db.notes.note(id);
       if (note?.locked) {
-        eSendEvent(eClearEditor);
+        useTabStore.getState().updateTab(useTabStore.getState().currentTab, {
+          locked: true
+        });
       }
     }
   }

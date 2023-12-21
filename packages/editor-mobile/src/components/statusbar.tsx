@@ -19,12 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { RefObject, useEffect, useRef, useState } from "react";
 import { getTotalWords, Editor } from "@notesnook/editor";
+import { useTabContext } from "../hooks/useTabStore";
 
 function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   const [status, setStatus] = useState({
     date: "",
     saved: ""
   });
+  const tab = useTabContext();
   const [sticky, setSticky] = useState(false);
   const stickyRef = useRef(false);
   const prevScroll = useRef(0);
@@ -34,12 +36,19 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   const statusBar = useRef({
     set: setStatus,
     updateWords: () => {
+      const editor = editors[tab.id];
       const words = getTotalWords(editor as Editor) + " words";
       if (currentWords.current === words) return;
       setWords(words);
     }
   });
-  globalThis.statusBar = statusBar;
+
+  useEffect(() => {
+    globalThis.statusBars[tab.id] = statusBar;
+    return () => {
+      globalThis.statusBars[tab.id] = undefined;
+    };
+  }, [tab.id, statusBar]);
 
   const onScroll = React.useCallback((event: Event) => {
     const currentOffset = (event.target as HTMLElement)?.scrollTop;

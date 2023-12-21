@@ -22,10 +22,10 @@ import React from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import Editor from "../../screens/editor";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../screens/editor/tiptap/utils";
 import { eSendEvent, ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
-import { useEditorStore } from "../../stores/use-editor-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrashStore } from "../../stores/use-trash-store";
 import { eCloseSheet, eOnLoadNote } from "../../utils/events";
@@ -57,10 +57,11 @@ export default function NotePreview({ session, content, note }) {
       return;
     }
     await db.noteHistory.restore(session.id);
-    if (useEditorStore.getState()?.currentEditingNote === session?.noteId) {
-      if (editorController.current?.note) {
+    if (useTabStore.getState().hasTabForNote(session?.noteId)) {
+      const note = editorController.current.note.current[session?.noteId];
+      if (note) {
         eSendEvent(eOnLoadNote, {
-          item: editorController.current?.note,
+          item: note,
           forced: true
         });
       }

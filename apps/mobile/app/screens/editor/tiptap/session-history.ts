@@ -16,29 +16,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-import create, { State } from "zustand";
-
-export interface EditorStore extends State {
-  currentEditingNote: string | null;
-  setCurrentlyEditingNote: (note: string | null) => void;
-  sessionId: string | null;
-  setSessionId: (sessionId: string | null) => void;
-  searchSelection: string | null;
-  readonly: boolean;
-  setReadonly: (readonly: boolean) => void;
-}
-
-export const useEditorStore = create<EditorStore>((set, get) => ({
-  currentEditingNote: null,
-  setCurrentlyEditingNote: (note) => set({ currentEditingNote: note }),
-  sessionId: null,
-  setSessionId: (sessionId) => {
-    set({ sessionId });
-  },
-  searchSelection: null,
-  readonly: false,
-  setReadonly: (readonly) => {
-    set({ readonly: readonly });
+export class SessionHistory extends Map {
+  get(key: any) {
+    let value = super.get(key);
+    if (Date.now() - value > 5 * 60 * 1000) {
+      value = Date.now();
+      this.set(key, value);
+    }
+    return value;
   }
-}));
+  newSession(noteId: string) {
+    const value = Date.now();
+    this.set(noteId, value);
+    return value;
+  }
+  clearSession(noteId: string) {
+    this.delete(noteId);
+  }
+}

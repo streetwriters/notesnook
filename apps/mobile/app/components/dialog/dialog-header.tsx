@@ -86,7 +86,9 @@ const DialogHeader = ({
             >
               {title}{" "}
               {titlePart ? (
-                <Text style={{ color: colors.primary.accent }}>{titlePart}</Text>
+                <Text style={{ color: colors.primary.accent }}>
+                  {titlePart}
+                </Text>
               ) : null}
             </Heading>
 
@@ -102,7 +104,7 @@ const DialogHeader = ({
                 title={button.title}
                 icon={button.icon}
                 type={button.type || "grayBg"}
-                height={25}
+                height={30}
               />
             ) : null}
           </View>

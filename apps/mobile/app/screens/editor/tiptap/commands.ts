@@ -31,6 +31,7 @@ import { sleep } from "../../../utils/time";
 import { Settings } from "./types";
 import { getResponse, randId, textInput } from "./utils";
 import { Note } from "@notesnook/core/dist/types";
+import { useTabStore } from "./use-tab-store";
 
 type Action = { job: string; id: string };
 
@@ -44,7 +45,7 @@ async function call(webview: RefObject<WebView | undefined>, action?: Action) {
   return response ? response.value : response;
 }
 
-const fn = (fn: string) => {
+const fn = (fn: string, name?: string) => {
   const id = randId("fn_");
   return {
     job: `(async () => {
@@ -55,7 +56,7 @@ const fn = (fn: string) => {
         post("${id}",response);
       } catch(e) {
         const DEV_MODE = ${__DEV__};
-        if (DEV_MODE && typeof logger !== "undefined") logger('error', "webview: ", e.message, e.stack);
+        if (DEV_MODE && typeof logger !== "undefined") logger('error', "webview: ", e.message, e.stack, "${name}");
       }
       return true;
     })();true;`,
@@ -71,62 +72,85 @@ class Commands {
     this.previousSettings = null;
   }
 
-  async doAsync<T>(job: string) {
+  async doAsync<T>(job: string, name?: string) {
     if (!this.ref.current) return false;
-    return call(this.ref, fn(job)) as Promise<T>;
+    return call(this.ref, fn(job, name)) as Promise<T>;
   }
 
-  focus = async () => {
+  focus = async (tabId: number) => {
+    console.log("focus");
     if (!this.ref.current) return;
     if (Platform.OS === "android") {
       //this.ref.current?.requestFocus();
       setTimeout(async () => {
         if (!this.ref) return;
         textInput.current?.focus();
-        await this.doAsync("editor.commands.focus()");
+        await this.doAsync(`editors[${tabId}]?.commands.focus()`, "focus");
         this.ref?.current?.requestFocus();
       }, 1);
     } else {
       await sleep(400);
-      await this.doAsync("editor.commands.focus()");
+      await this.doAsync(`editors[${tabId}]?.commands.focus()`, "focus");
     }
   };
 
-  blur = async () =>
-    await this.doAsync(`
-  editor && editor.commands.blur();
-  typeof globalThis.editorTitle !== "undefined" && editorTitle.current && editorTitle.current.blur();
-  `);
+  blur = async (tabId: number) =>
+    await this.doAsync(
+      `
+    const editor = editors[${tabId}];
+    const editorTitle = editorTitles[${tabId}];
+    editor && editor.commands.blur();
+    typeof editorTitle !== "undefined" && editorTitle.current && editorTitle.current.blur();
+  `,
+      "blur"
+    );
 
-  clearContent = async () => {
+  clearContent = async (tabId: number) => {
+    console.log("clearContent");
     this.previousSettings = null;
     await this.doAsync(
-      `editor.commands.blur();
-typeof globalThis.editorTitle !== "undefined" && editorTitle.current && editorTitle.current?.blur();
+      `
+const editor = editors[${tabId}];
+const editorController = editorControllers[${tabId}];
+const editorTitle = editorTitles[${tabId}];
+const statusBar = statusBars[${tabId}];
+
+editor.commands.blur();
+typeof editorTitle !== "undefined" && editorTitle.current && editorTitle.current?.blur();
 if (editorController.content) editorController.content.current = null;
 editorController.onUpdate();
 editorController.setTitle(null);
 editorController.countWords(0);
-typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",saved:""});
-        `
+typeof statusBar !== "undefined" && statusBar.current.set({date:"",saved:""});
+`,
+      "clearContent"
     );
   };
 
   setSessionId = async (id: string | null) =>
     await this.doAsync(`globalThis.sessionId = "${id}";`);
 
-  setStatus = async (date: string | undefined, saved: string) =>
+  setStatus = async (
+    date: string | undefined,
+    saved: string,
+    tabId: number
+  ) => {
+    console.log("setStatus");
     await this.doAsync(
-      `typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"${date}",saved:"${saved}"})`
+      `
+      const statusBar = statusBars[${tabId}];
+      typeof statusBar !== "undefined" && statusBar.current.set({date:"${date}",saved:"${saved}"})`,
+      "setStatus"
     );
+  };
 
   setPlaceholder = async (placeholder: string) => {
-    await this.doAsync(`
-    const element = document.querySelector(".is-editor-empty");
-    if (element) {
-      element.setAttribute("data-placeholder","${placeholder}");
-    }
-    `);
+    // await this.doAsync(`
+    // const element = document.querySelector(".is-editor-empty");
+    // if (element) {
+    //   element.setAttribute("data-placeholder","${placeholder}");
+    // }
+    // `);
   };
 
   setInsets = async (insets: EdgeInsets) => {
@@ -171,10 +195,14 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
 
   setTags = async (note: Note | null | undefined) => {
     if (!note) return;
+    const tabId = useTabStore.getState().getTabForNote(note.id);
+
     const tags = await db.relations.to(note, "tag").resolve();
-    await this.doAsync(`
-    if (typeof editorTags !== "undefined" && editorTags.current) {
-      editorTags.current.setTags(${JSON.stringify(
+    await this.doAsync(
+      `
+    const tags = editorTags[${tabId}];
+    if (tags && tags.current) {
+      tags.current.setTags(${JSON.stringify(
         tags.map((tag) => ({
           title: tag.title,
           alias: tag.title,
@@ -183,28 +211,38 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
         }))
       )});
     }
-  `);
-  };
-
-  clearTags = async () => {
-    await this.doAsync(`
-    if (typeof editorTags !== "undefined" && editorTags.current) {
-      editorTags.current.setTags([]);
-    }
-  `);
-  };
-
-  insertAttachment = async (attachment: Attachment) => {
-    await this.doAsync(
-      `editor && editor.commands.insertAttachment(${JSON.stringify(
-        attachment
-      )})`
+  `,
+      "setTags"
     );
   };
 
-  setAttachmentProgress = async (attachmentProgress: AttachmentProgress) => {
+  clearTags = async (tabId: number) => {
     await this.doAsync(
-      `editor && editor.commands.setAttachmentProgress(${JSON.stringify(
+      `
+    const tags = editorTags[${tabId}];
+    logger("info", Object.keys(editorTags), typeof editorTags[0]);
+    if (tags && tags.current) {
+      tags.current.setTags([]);
+    }
+  `,
+      "clearTags"
+    );
+  };
+
+  insertAttachment = async (attachment: Attachment, tabId: number) => {
+    await this.doAsync(
+      `const editor = editors[${tabId}];
+editor && editor.commands.insertAttachment(${JSON.stringify(attachment)})`
+    );
+  };
+
+  setAttachmentProgress = async (
+    attachmentProgress: AttachmentProgress,
+    tabId: number
+  ) => {
+    await this.doAsync(
+      `const editor = editors[${tabId}];
+editor && editor.commands.setAttachmentProgress(${JSON.stringify(
         attachmentProgress
       )})`
     );
@@ -213,10 +251,13 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
   insertImage = async (
     image: Omit<ImageAttributes, "bloburl"> & {
       dataurl: string;
-    }
+    },
+    tabId: number
   ) => {
     await this.doAsync(
-      `const image = toBlobURL("${image.dataurl}", "${image.hash}");
+      `const editor = editors[${tabId}];
+
+const image = toBlobURL("${image.dataurl}", "${image.hash}");
       editor && editor.commands.insertImage({
         ...${JSON.stringify({
           ...image,
@@ -227,22 +268,30 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     );
   };
 
-  updateWebclip = async ({ src, hash }: Partial<ImageAttributes>) => {
+  updateWebclip = async (
+    { src, hash }: Partial<ImageAttributes>,
+    tabId: number
+  ) => {
     await this.doAsync(
-      `editor && editor.commands.updateWebClip(${JSON.stringify({
+      `const editor = editors[${tabId}];
+      editor && editor.commands.updateWebClip(${JSON.stringify({
         hash
       })},${JSON.stringify({ src })})`
     );
   };
 
-  updateImage = async ({
-    hash,
-    dataurl
-  }: Partial<Omit<ImageAttributes, "bloburl">> & {
-    dataurl: string;
-  }) => {
+  updateImage = async (
+    {
+      hash,
+      dataurl
+    }: Partial<Omit<ImageAttributes, "bloburl">> & {
+      dataurl: string;
+    },
+    tabId: number
+  ) => {
     await this.doAsync(
-      `const image = toBlobURL("${dataurl}", "${hash}");
+      `const editor = editors[${tabId}];
+      const image = toBlobURL("${dataurl}", "${hash}");
       editor && editor.commands.updateImage(${JSON.stringify({
         hash
       })}, {

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import create from "zustand";
 import { editorController } from "../screens/editor/tiptap/utils";
+import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 
 export type AttachmentGroupProgress = {
   total: number;
@@ -66,11 +67,14 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   remove: (hash) => {
     const progress = get().progress;
     if (!progress) return;
-    editorController.current?.commands.setAttachmentProgress({
-      hash: hash,
-      progress: 100,
-      type: progress[hash]?.type || "download"
-    });
+    editorController.current?.commands.setAttachmentProgress(
+      {
+        hash: hash,
+        progress: 100,
+        type: progress[hash]?.type || "download"
+      },
+      useTabStore.getState().currentTab
+    );
     progress[hash] = null;
     set({ progress: { ...progress } });
   },
@@ -80,11 +84,14 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     progress[hash] = { sent, total, hash, recieved, type };
     const progressPercentage =
       type === "upload" ? sent / total : recieved / total;
-    editorController.current?.commands.setAttachmentProgress({
-      hash: hash,
-      progress: Math.round(Math.max(progressPercentage * 100, 0)),
-      type: type
-    });
+    editorController.current?.commands.setAttachmentProgress(
+      {
+        hash: hash,
+        progress: Math.round(Math.max(progressPercentage * 100, 0)),
+        type: type
+      },
+      useTabStore.getState().currentTab
+    );
     set({ progress: { ...progress } });
   },
   encryptionProgress: 0,
