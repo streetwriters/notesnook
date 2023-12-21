@@ -207,7 +207,8 @@ import {
   mdiFormTextarea,
   mdiGavel,
   mdiDesktopClassic,
-  mdiBellBadgeOutline
+  mdiBellBadgeOutline,
+  mdiCalendarBlank
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -531,3 +532,4 @@ export const Documentation = createIcon(mdiFileDocumentOutline);
 export const Legal = createIcon(mdiGavel);
 export const Desktop = createIcon(mdiDesktopClassic);
 export const Notification = createIcon(mdiBellBadgeOutline);
+export const Calendar = createIcon(mdiCalendarBlank);

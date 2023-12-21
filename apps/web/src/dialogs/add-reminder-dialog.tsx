@@ -22,13 +22,19 @@ import Dialog from "../components/dialog";
 import Field from "../components/field";
 import { Box, Button, Flex, Label, Radio, Text } from "@theme-ui/components";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { db } from "../common/db";
 import { useStore } from "../stores/reminder-store";
 import { showToast } from "../utils/toast";
 import { useIsUserPremium } from "../hooks/use-is-user-premium";
-import { Pro } from "../components/icons";
+import { Calendar, Pro } from "../components/icons";
 import { usePersistentState } from "../hooks/use-persistent-state";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import { PopupPresenter } from "@notesnook/ui";
+import { useStore as useThemeStore } from "../stores/theme-store";
+import { getFormattedDate } from "@notesnook/common";
+import { MONTHS_FULL } from "@notesnook/core/dist/utils/date";
 
 export type AddReminderDialogProps = {
   onClose: Perform;
@@ -53,6 +59,7 @@ const Priorities = {
 const RecurringModes = {
   WEEK: "week",
   MONTH: "month",
+  YEAR: "year",
   DAY: "day"
 } as const;
 
@@ -97,6 +104,11 @@ const recurringModes = [
     id: RecurringModes.MONTH,
     title: "Monthly",
     options: new Array(31).fill(0).map((_, i) => i + 1)
+  },
+  {
+    id: RecurringModes.YEAR,
+    title: "Yearly",
+    options: []
   }
 ];
 
@@ -115,8 +127,11 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
   const [time, setTime] = useState(dayjs().format("HH:mm"));
   const [title, setTitle] = useState<string>();
   const [description, setDescription] = useState<string>();
+  const [showCalendar, setShowCalendar] = useState(false);
   const refresh = useStore((state) => state.refresh);
   const isUserPremium = useIsUserPremium();
+  const theme = useThemeStore((store) => store.colorScheme);
+  const dateInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!reminderId) return;
@@ -154,12 +169,14 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
       title={reminderId ? "Edit reminder" : "Add a reminder"}
       description={""}
       onClose={() => props.onClose(false)}
+      sx={{ fontFamily: "body" }}
       positiveButton={{
         text: reminderId ? "Save" : "Add",
         disabled:
           !title ||
           (mode !== Modes.ONCE &&
             recurringMode !== RecurringModes.DAY &&
+            recurringMode !== RecurringModes.YEAR &&
             !selectedDays.length),
         onClick: async () => {
           if (!("Notification" in window))
@@ -366,20 +383,102 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
 
       <Flex sx={{ gap: 2, overflowX: "auto", mt: 2 }}>
         {mode === Modes.ONCE ? (
-          <Field
-            id="date"
-            label="Date"
-            required
-            type="date"
-            data-test-id="date-input"
-            min={dayjs().format("YYYY-MM-DD")}
-            defaultValue={date}
-            value={date}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              const date = dayjs(e.target.value);
-              setDate(date.format("YYYY-MM-DD"));
-            }}
-          />
+          <>
+            <Field
+              id="date"
+              label="Date"
+              required
+              inputRef={dateInputRef}
+              data-test-id="date-input"
+              defaultValue={getFormattedDate(date, "date")}
+              readOnly
+              action={{
+                icon: Calendar,
+                onClick() {
+                  setShowCalendar(true);
+                }
+              }}
+              onClick={() => setShowCalendar(true)}
+            />
+            <PopupPresenter
+              isOpen={showCalendar}
+              onClose={() => setShowCalendar(false)}
+              position={{
+                isTargetAbsolute: true,
+                target: dateInputRef.current,
+                location: "below"
+              }}
+              sx={{
+                ".rdp": {
+                  bg: "background",
+                  p: 1,
+                  boxShadow: `0px 0px 25px 5px ${
+                    theme === "dark" ? "#000000aa" : "#0000004e"
+                  }`,
+                  borderRadius: "dialog",
+                  fontFamily: "body",
+                  "--rdp-accent-color": "var(--accent)",
+                  "--rdp-background-color": "var(--background)",
+                  "--rdp-background-color-dark": "var(--background)",
+                  "--rdp-selected-color": "var(--paragraph-selected)",
+                  color: "paragraph"
+                },
+                ".rdp-caption_label": { fontWeight: "heading" }
+              }}
+            >
+              <DayPicker
+                mode="single"
+                captionLayout="dropdown-buttons"
+                fromYear={new Date().getFullYear()}
+                toYear={new Date().getFullYear() + 99}
+                modifiers={{
+                  disabled: { before: new Date() }
+                }}
+                selected={dayjs(date).toDate()}
+                onSelect={(day) => {
+                  const date = dayjs(day).format("YYYY-MM-DD");
+                  setDate(date);
+                  if (dateInputRef.current)
+                    dateInputRef.current.value = getFormattedDate(date, "date");
+                }}
+                styles={{
+                  day: {
+                    fontFamily: "inherit",
+                    fontSize: 14
+                  }
+                }}
+              />
+            </PopupPresenter>
+          </>
+        ) : recurringMode === RecurringModes.YEAR ? (
+          <>
+            <LabeledSelect
+              id="month"
+              label="Month"
+              value={`${dayjs(date).month()}`}
+              options={MONTHS_FULL.map((month, index) => ({
+                value: `${index}`,
+                title: month
+              }))}
+              onSelectionChanged={(month) =>
+                setDate(dayjs(date).month(parseInt(month)).format("YYYY-MM-DD"))
+              }
+            />
+            <LabeledSelect
+              id="day"
+              label="Day"
+              value={`${dayjs(date).date()}`}
+              options={new Array(dayjs(date).daysInMonth())
+                .fill("0")
+                .map((_, day) => ({
+                  value: `${day + 1}`,
+                  title: `${day + 1}`
+                }))}
+              onSelectionChanged={(day) =>
+                setDate(dayjs(date).date(parseInt(day)).format("YYYY-MM-DD"))
+              }
+            />
+          </>
         ) : null}
         <Field
           id="time"
@@ -471,5 +570,56 @@ function nth(n: number) {
   return (
     ["st", "nd", "rd"][(((((n < 0 ? -n : n) + 90) % 100) - 10) % 10) - 1] ||
     "th"
+  );
+}
+
+type LabeledSelectProps = {
+  label: string;
+  id: string;
+  options: { value: string; title: string }[];
+  value: string;
+  onSelectionChanged: (value: string) => void;
+};
+function LabeledSelect(props: LabeledSelectProps) {
+  const { id, label, options, value, onSelectionChanged } = props;
+  return (
+    <Label
+      htmlFor={id}
+      variant="text.body"
+      sx={{
+        m: "2px",
+        mr: "2px",
+        fontSize: "subtitle",
+        fontWeight: "bold",
+        fontFamily: "body",
+        color: "paragraph",
+        flexDirection: "column",
+        width: "auto",
+        "& > select": {
+          mt: 1,
+          backgroundColor: "background",
+          // outline: "none",
+          border: "none",
+          outline: "1.5px solid var(--border)",
+          borderRadius: "default",
+          color: "paragraph",
+          padding: 2,
+          fontFamily: "body",
+          fontSize: "input"
+        }
+      }}
+    >
+      {label}
+      <select
+        value={value}
+        onChange={(e) => onSelectionChanged(e.target.value)}
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.title}
+          </option>
+        ))}
+      </select>
+    </Label>
   );
 }

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useRef, useEffect, PropsWithChildren } from "react";
-import { Box } from "@theme-ui/components";
+import { Box, BoxProps } from "@theme-ui/components";
 import { getPosition, PositionOptions } from "../../utils/position";
 import Modal from "react-modal";
 import { EmotionThemeProvider, ThemeScopes } from "@notesnook/theme";
@@ -32,7 +32,7 @@ export type PopupPresenterProps = {
   movable?: boolean;
   scope?: keyof ThemeScopes;
   isMobile?: boolean;
-};
+} & BoxProps;
 
 function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
   const {
@@ -43,7 +43,8 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
     focusOnRender = true,
     children,
     scope,
-    isMobile
+    isMobile,
+    ...restProps
   } = props;
 
   const contentRef = useRef<HTMLDivElement>();
@@ -215,7 +216,9 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
         }
       }}
     >
-      <EmotionThemeProvider scope={scope}>{children}</EmotionThemeProvider>
+      <EmotionThemeProvider scope={scope} {...restProps}>
+        {children}
+      </EmotionThemeProvider>
     </Modal>
   );
 }

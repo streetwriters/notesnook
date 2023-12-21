@@ -65,7 +65,6 @@ import {
 import { AppearanceSettings } from "./appearance-settings";
 import { debounce } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
-import { alpha } from "@theme-ui/color";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 
 type SettingsDialogProps = { onClose: Perform };
