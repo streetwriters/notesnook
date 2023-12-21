@@ -53,7 +53,7 @@ export const CheckList = Node.create<CheckListOptions>({
   parseHTML() {
     return [
       {
-        tag: `ul[data-type="${this.name}"]`,
+        tag: `ul.simple-checklist`,
         priority: 51
       }
     ];
@@ -63,7 +63,7 @@ export const CheckList = Node.create<CheckListOptions>({
     return [
       "ul",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        "data-type": this.name
+        class: "simple-checklist"
       }),
       0
     ];

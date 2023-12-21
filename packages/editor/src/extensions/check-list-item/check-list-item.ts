@@ -28,7 +28,6 @@ export interface CheckListItemOptions {
   onReadOnlyChecked?: (node: ProseMirrorNode, checked: boolean) => boolean;
   nested: boolean;
   HTMLAttributes: Record<string, any>;
-  checkListTypeName: string;
 }
 
 export const inputRegex = /^\s*(\[([( |x])?\])\s$/;
@@ -39,8 +38,7 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
   addOptions() {
     return {
       nested: false,
-      HTMLAttributes: {},
-      checkListTypeName: "checkList"
+      HTMLAttributes: {}
     };
   },
 
@@ -55,9 +53,9 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
       checked: {
         default: false,
         keepOnSplit: false,
-        parseHTML: (element) => element.getAttribute("data-checked") === "true",
+        parseHTML: (element) => element.classList.contains("checked"),
         renderHTML: (attributes) => ({
-          "data-checked": attributes.checked
+          class: attributes.checked ? "checked" : ""
         })
       }
     };
@@ -66,30 +64,19 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
   parseHTML() {
     return [
       {
-        tag: `li[data-type="${this.name}"]`,
+        tag: `li.simple-checklist--item`,
         priority: 51
       }
     ];
   },
 
-  renderHTML({ node, HTMLAttributes }) {
+  renderHTML({ HTMLAttributes }) {
     return [
       "li",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        "data-type": this.name
+        class: "simple-checklist--item"
       }),
-      [
-        "label",
-        [
-          "input",
-          {
-            type: "checkbox",
-            checked: node.attrs.checked ? "checked" : null
-          }
-        ],
-        ["span"]
-      ],
-      ["div", 0]
+      0
     ];
   },
 
@@ -112,16 +99,15 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
   },
 
   addNodeView() {
-    return ({ node, HTMLAttributes, getPos, editor }) => {
+    return ({ node, getPos, editor }) => {
       const listItem = document.createElement("li");
-      const checkboxWrapper = document.createElement("label");
-      const checkboxStyler = document.createElement("span");
       const checkbox = document.createElement("input");
       const content = document.createElement("div");
 
-      checkboxWrapper.contentEditable = "false";
+      checkbox.contentEditable = "false";
       checkbox.type = "checkbox";
       checkbox.addEventListener("change", (event) => {
+        event.preventDefault();
         // if the editor isn’t editable and we don't have a handler for
         // readonly checks we have to undo the latest change
         if (!editor.isEditable && !this.options.onReadOnlyChecked) {
@@ -135,7 +121,6 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
         if (editor.isEditable && typeof getPos === "function") {
           editor
             .chain()
-            .focus(undefined, { scrollIntoView: false })
             .command(({ tr }) => {
               const position = getPos();
               const currentNode = tr.doc.nodeAt(position);
@@ -157,21 +142,11 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
         }
       });
 
-      Object.entries(this.options.HTMLAttributes).forEach(([key, value]) => {
-        listItem.setAttribute(key, value);
-      });
-
-      listItem.dataset.checked = node.attrs.checked;
       if (node.attrs.checked) {
         checkbox.setAttribute("checked", "checked");
       }
 
-      checkboxWrapper.append(checkbox, checkboxStyler);
-      listItem.append(checkboxWrapper, content);
-
-      Object.entries(HTMLAttributes).forEach(([key, value]) => {
-        listItem.setAttribute(key, value);
-      });
+      listItem.append(checkbox, content);
 
       return {
         dom: listItem,

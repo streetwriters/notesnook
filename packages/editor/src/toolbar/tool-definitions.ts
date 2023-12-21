@@ -105,8 +105,8 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: "Numbered list"
   },
   checkList: {
-    icon: "checkList",
-    title: "Numbered list"
+    icon: "checklist",
+    title: "Checklist"
   },
   fontFamily: {
     icon: "fontFamily",

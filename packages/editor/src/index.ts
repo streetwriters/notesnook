@@ -277,7 +277,9 @@ const useTiptap = (
         KeyMap,
         WebClipNode,
         CheckList,
-        CheckListItem,
+        CheckListItem.configure({
+          nested: true
+        }),
 
         // Quirks handlers
         Quirks.configure({

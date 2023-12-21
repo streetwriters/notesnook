@@ -607,34 +607,23 @@ p > *::selection {
 [dir="rtl"] .taskItemTools { right: unset; left: 0 }
 
 /* Check list */
-.ProseMirror ul[data-type="checkList"] {
+.ProseMirror ul.simple-checklist {
   list-style: none;
   padding: 0;
+}
 
-  p {
-    margin: 0;
-  }
+.ProseMirror ul.simple-checklist > li {
+  display: flex;
+}
 
-  li {
-    display: flex;
+.ProseMirror ul.simple-checklist > li  > input {
+  flex: 0 0 auto;
+  margin-right: 0.5rem;
+  user-select: none;
+  height: 18px;
+  accent-color: var(--accent);
+}
 
-    > label {
-      flex: 0 0 auto;
-      margin-right: 0.5rem;
-      user-select: none;
-    }
-
-    > div {
-      flex: 1 1 auto;
-    }
-    
-    ul li,
-    ol li {
-      display: list-item;
-    }
-
-    ul[data-type="checkList"] > li {
-      display: flex;
-    }
-  }
+.ProseMirror ul.simple-checklist > li > div {
+  flex: 1 1 auto;
 }

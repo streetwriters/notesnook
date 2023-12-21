@@ -243,7 +243,6 @@ export const Icons = {
   resize: mdiResizeBottomRight,
   readonlyOn: mdiPencilOff,
   readonlyOff: mdiPencil,
-  checkList: mdiCheckboxMarkedOutline,
   none: ""
 };
 
