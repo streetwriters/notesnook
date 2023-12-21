@@ -50,7 +50,7 @@ type DialogProps = SxProp & {
   description?: string;
   positiveButton?: DialogButtonProps | null;
   negativeButton?: DialogButtonProps | null;
-  footer?: React.Component;
+  footer?: React.ReactNode;
   noScroll?: boolean;
 };
 

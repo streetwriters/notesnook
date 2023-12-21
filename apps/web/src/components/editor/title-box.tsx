@@ -49,7 +49,7 @@ function TitleBox(props: TitleBoxProps) {
   );
 
   const updateFontSize = useCallback(
-    (length) => {
+    (length: number) => {
       if (!inputRef.current) return;
       const fontSize = textLengthToFontSize(
         length,

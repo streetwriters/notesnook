@@ -89,7 +89,7 @@ export default function useSlider(
   }, [ref, slides, onSliding, onChange]);
 
   const slideToIndex = useCallback(
-    (index) => {
+    (index: number) => {
       if (!slides || !ref.current || index >= slides.length) return;
       console.log(slides[index].offset, slides[index].width);
       const slider = ref.current;

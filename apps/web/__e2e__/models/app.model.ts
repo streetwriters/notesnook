@@ -81,7 +81,7 @@ export class AppModel {
 
   async goToTags() {
     await this.navigateTo("Tags");
-    return new ItemsViewModel(this.page, "tags");
+    return new ItemsViewModel(this.page);
   }
 
   async goToColor(color: string) {

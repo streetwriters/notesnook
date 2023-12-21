@@ -27,7 +27,7 @@ type FilteredListProps<T> = {
   placeholders: { filter: string; empty: string };
   filter: (query: string) => Promise<T[]>;
   onCreateNewItem: (title: string) => Promise<void>;
-} & VirtualizedListProps<T>;
+} & VirtualizedListProps<T, unknown>;
 
 export function FilteredList<T>(props: FilteredListProps<T>) {
   const { items, filter, onCreateNewItem, placeholders, ...listProps } = props;
@@ -38,7 +38,7 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const _filter = useCallback(
-    async (query) => {
+    async (query = "") => {
       setFilteredItems(query ? await filter(query) : []);
       setQuery(query);
     },
@@ -46,7 +46,7 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
   );
 
   const _createNewItem = useCallback(
-    async (title) => {
+    async (title: string) => {
       await onCreateNewItem(title);
       setQuery(undefined);
       if (inputRef.current) inputRef.current.value = "";

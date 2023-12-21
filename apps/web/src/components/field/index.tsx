@@ -143,7 +143,11 @@ function Field(props: FieldProps) {
             }}
             disabled={action.disabled}
           >
-            {action.component ? action.component : <action.icon size={20} />}
+            {action.component ? (
+              action.component
+            ) : action.icon ? (
+              <action.icon size={20} />
+            ) : null}
           </Button>
         )}
       </Flex>

@@ -124,10 +124,7 @@ async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
   for (const nb of notebooks) {
     const notebook = await importNotebook(nb).catch(() => ({ id: undefined }));
     if (!notebook.id) continue;
-    await db.notes.addToNotebook(
-      { id: notebook.id, topic: notebook.topic },
-      noteId
-    );
+    await db.notes.addToNotebook(notebook.id, noteId);
   }
 }
 
