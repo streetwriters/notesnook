@@ -181,16 +181,32 @@ export function isReminderToday(reminder: Reminder) {
 
 export function getUpcomingReminderTime(reminder: Reminder) {
   if (reminder.mode === "once") return reminder.date;
-  // this is only the time (hour & minutes); date is not included
-  const time = dayjs(reminder.date);
-  const now = dayjs();
-  const relativeTime = now.clone().hour(time.hour()).minute(time.minute());
-
-  const isPast = relativeTime.isSameOrBefore(now);
 
   const isDay = reminder.recurringMode === "day";
   const isWeek = reminder.recurringMode === "week";
   const isMonth = reminder.recurringMode === "month";
+  const isYear = reminder.recurringMode === "year";
+
+  // this is only the time (hour & minutes) unless it is a
+  // yearly reminder
+  const time = dayjs(reminder.date);
+  const now = dayjs();
+  const relativeTime = isYear
+    ? now
+        .clone()
+        .hour(time.hour())
+        .minute(time.minute())
+        .month(time.month())
+        .date(time.date())
+    : now.clone().hour(time.hour()).minute(time.minute());
+
+  const isPast = relativeTime.isSameOrBefore(now);
+
+  if (isYear) {
+    if (isPast) return relativeTime.add(1, "year").valueOf();
+    else return relativeTime.valueOf();
+  }
+
   if (isDay) {
     if (isPast) return relativeTime.add(1, "day").valueOf();
     else return relativeTime.valueOf();
