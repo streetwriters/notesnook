@@ -30,6 +30,7 @@ import { showToast } from "../../utils/toast";
 import { pluralize } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Tag } from "@notesnook/core/dist/types";
+import { showEditTagDialog } from "../../common/dialog-controller";
 
 type TagProps = { item: Tag; totalNotes: number };
 function Tag(props: TagProps) {
@@ -70,7 +71,7 @@ const menuItems: (tag: Tag, ids?: string[]) => MenuItem[] = (tag, ids = []) => {
       title: "Rename tag",
       icon: Edit.path,
       onClick: () => {
-        hashNavigate(`/tags/${tag.id}/edit`);
+        showEditTagDialog(tag);
       }
     },
     {

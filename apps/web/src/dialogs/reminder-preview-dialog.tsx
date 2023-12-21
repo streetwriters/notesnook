@@ -26,6 +26,7 @@ import IconTag from "../components/icon-tag";
 import { Clock, Refresh } from "../components/icons";
 import Note from "../components/note";
 import { getFormattedReminderTime } from "@notesnook/common";
+import usePromise from "../hooks/use-promise";
 
 export type ReminderPreviewDialogProps = {
   onClose: Perform;
@@ -57,9 +58,11 @@ export default function ReminderPreviewDialog(
   props: ReminderPreviewDialogProps
 ) {
   const { reminder } = props;
-  const referencedNotes = db.relations
-    .to({ id: reminder.id, type: "reminder" }, "note")
-    .resolved();
+  const referencedNotes = usePromise(
+    () =>
+      db.relations.to({ id: reminder.id, type: "reminder" }, "note").resolve(),
+    [reminder.id]
+  );
 
   return (
     <Dialog
@@ -117,20 +120,16 @@ export default function ReminderPreviewDialog(
           </Button>
         ))}
       </Flex>
-      {referencedNotes && referencedNotes.length > 0 && (
-        <>
-          <Text variant="body">References:</Text>
-          {referencedNotes.map((item, index) => (
-            <Note
-              key={item.id}
-              item={item}
-              date={item.dateCreated}
-              tags={[]}
-              compact
-            />
-          ))}
-        </>
-      )}
+      {referencedNotes &&
+        referencedNotes.status === "fulfilled" &&
+        referencedNotes.value.length > 0 && (
+          <>
+            <Text variant="body">References:</Text>
+            {referencedNotes.value.map((item, index) => (
+              <Note key={item.id} item={item} date={item.dateCreated} compact />
+            ))}
+          </>
+        )}
     </Dialog>
   );
 }
