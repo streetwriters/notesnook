@@ -468,11 +468,11 @@ export const useEditorEvents = (
           break;
         }
         case EventTypes.tabsChanged: {
-          useTabStore.setState({
-            tabs: (editorMessage.value as any)?.tabs,
-            currentTab: (editorMessage.value as any)?.currentTab
-          });
-          console.log("tabs updated...");
+          // useTabStore.setState({
+          //   tabs: (editorMessage.value as any)?.tabs,
+          //   currentTab: (editorMessage.value as any)?.currentTab
+          // });
+          // console.log("Tabs updated");
           break;
         }
         case EventTypes.showTabs: {
@@ -481,13 +481,16 @@ export const useEditorEvents = (
         }
         case EventTypes.tabFocused: {
           // Reload the note
-          const note = await db.notes.note(editorMessage.noteId);
-          if (note) {
-            eSendEvent(eOnLoadNote, {
-              item: note,
-              forced: true
-            });
-          }
+          console.log("Focused tab", editorMessage.tabId);
+          eSendEvent("tabsFocused", editorMessage.tabId);
+
+          // const note = await db.notes.note(editorMessage.noteId);
+          // if (note) {
+          //   eSendEvent(eOnLoadNote, {
+          //     item: note,
+          //     forced: true
+          //   });
+          // }
           // TODO
           // Handle any updates that occured in an note while the tab was not focused.
           //  If editor has no content, reload the note, because it might be an app reload

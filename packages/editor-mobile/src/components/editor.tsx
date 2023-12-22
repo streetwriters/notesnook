@@ -121,7 +121,6 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
 
   useLayoutEffect(() => {
     setLayout(true);
-
     const updateScrollPosition = (state: TabStore) => {
       if (state.currentTab === tab.id) {
         const position = state.scrollPosition[tab?.id];
@@ -136,19 +135,20 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
           EventTypes.tabFocused,
           !!globalThis.editorControllers[tab.id]?.content.current,
           tab.id,
-          tab.noteId
+          state.getCurrentNoteId()
         );
       }
     };
 
     updateScrollPosition(useTabStore.getState());
-    const unsub = useTabStore.subscribe((state) => {
+    const unsub = useTabStore.subscribe((state, prevState) => {
+      if (state.currentTab === prevState.currentTab) return;
       updateScrollPosition(state);
     });
     return () => {
       unsub();
     };
-  }, [tab.id, tab.noteId]);
+  }, [tab.id]);
 
   const onClickEmptyArea: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (event) => {

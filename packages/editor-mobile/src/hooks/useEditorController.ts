@@ -190,8 +190,7 @@ export function useEditorController(update: () => void): EditorController {
       const type = message.type;
       const value = message.value;
 
-      if (message.tabId !== tab.id) {
-        logger("info", "tab id not matched");
+      if (message.tabId !== tab.id && type !== "native:status") {
         return;
       }
 
@@ -200,7 +199,8 @@ export function useEditorController(update: () => void): EditorController {
         "webview message for tab",
         message.type,
         tab.id,
-        message.tabId
+        message.tabId,
+        useTabStore.getState().currentTab
       );
 
       const editor = editors[tab.id];

@@ -55,7 +55,7 @@ import { onNoteCreated } from "../../notes/common";
 import Commands from "./commands";
 import { SessionHistory } from "./session-history";
 import { EditorState, SavePayload } from "./types";
-import { useTabStore } from "./use-tab-store";
+import { syncTabs, useTabStore } from "./use-tab-store";
 import {
   EditorEvents,
   clearAppState,
@@ -63,7 +63,8 @@ import {
   getAppState,
   isContentInvalid,
   isEditorLoaded,
-  post
+  post,
+  waitForEvent
 } from "./utils";
 
 // Keep a fixed session id, dont' change it when a new note is opened, session id can stay the same always I think once the app is opened. DONE
@@ -118,6 +119,7 @@ export const useEditor = (
   const loadedImages = useRef<Record<string, { [name: string]: boolean }>>({});
   const currentLoadingNoteId = useRef<string>();
   const loadingState = useRef<string>();
+  const lastTabFocused = useRef(0);
   const postMessage = useCallback(
     async <T>(type: string, data: T, tabId?: number, waitFor = 300) =>
       await post(
@@ -146,6 +148,16 @@ export const useEditor = (
       commands.setTags(currentNotes.current[id]);
     }
   }, [commands, tags]);
+
+  useEffect(() => {
+    const event = eSubscribeEvent("tabsFocused", (tabId) => {
+      lastTabFocused.current = tabId as number;
+      console.log(tabId);
+    });
+    return () => {
+      event.unsubscribe();
+    };
+  });
 
   const overlay = useCallback(
     (show: boolean, data = { type: "new" }) => {
@@ -193,10 +205,10 @@ export const useEditor = (
       lastContentChangeTime.current = 0;
       resetContent && (await commands.clearContent(tabId));
       resetContent && (await commands.clearTags(tabId));
-
-      useTabStore.getState().updateTab(tabId, {
-        noteId: undefined
-      });
+      // TODO ?
+      // useTabStore.getState().updateTab(tabId, {
+      //   noteId: undefined
+      // });
     },
     [commands, editorSessionHistory, postMessage]
   );
@@ -243,9 +255,11 @@ export const useEditor = (
         }
 
         // If note is edited, the tab becomes a persistent tab automatically.
-        useTabStore.getState().updateTab(tabId, {
-          previewTab: false
-        });
+        if (useTabStore.getState().getTab(tabId)?.previewTab) {
+          useTabStore.getState().updateTab(tabId, {
+            previewTab: false
+          });
+        }
 
         if (!locked) {
           id = await db.notes?.add(noteData);
@@ -419,8 +433,10 @@ export const useEditor = (
       }
 
       if (event.newNote) {
+        console.log("Create new note");
         useTabStore.getState().focusEmptyTab();
         const tabId = useTabStore.getState().currentTab;
+        console.log("empty tab", tabId);
         currentNotes.current && (await reset(tabId));
         setTimeout(() => {
           if (state.current?.ready) commands.focus(tabId);
@@ -429,21 +445,33 @@ export const useEditor = (
       } else {
         if (!event.item) return;
         const item = event.item;
-
-        // If note was already opened in a tab, focus that tab.
+        console.log("load note called again...", event.forced, event.item.id);
+        // If note was already opened in a tab, focus that tab and return. Once the tab is focused
+        // the note will load.
         if (useTabStore.getState().hasTabForNote(event.item.id)) {
           const tabId = useTabStore.getState().getTabForNote(event.item.id);
           if (typeof tabId === "number") {
+            useTabStore.getState().updateTab(tabId, {
+              readonly: event.item.readonly
+            });
             useTabStore.getState().focusTab(tabId);
           }
+        } else {
+          console.log("opening note in preview tab");
+          // Otherwise we focus the preview tab or create one to open the note in.
+          useTabStore.getState().focusPreviewTab(event.item.id, {
+            readonly: event.item.readonly,
+            locked: false
+          });
         }
-
-        // Otherwise we focus the preview tab or create one to open the note in.
-        useTabStore.getState().focusPreviewTab(event.item.id, {
-          readonly: event.item.readonly,
-          locked: false
-        });
         const tabId = useTabStore.getState().currentTab;
+        console.log(lastTabFocused.current, tabId);
+        if (lastTabFocused.current !== tabId) {
+          if ((await waitForEvent("tabsFocused", 1000)) !== tabId) {
+            console.log("tab id did not match after focus in 1000ms");
+            return;
+          }
+        }
 
         // If note is already loaded and forced reload is not requested, return.
         if (!event.forced && currentNotes.current[item.id]) return;
@@ -460,8 +488,8 @@ export const useEditor = (
         if (
           currentNotes.current[item.id] &&
           loadingState.current &&
-          currentContents.current?.data &&
-          loadingState.current === currentContents.current?.data
+          currentContents.current[item.id]?.data &&
+          loadingState.current === currentContents.current[item.id]?.data
         ) {
           return;
         }
@@ -487,10 +515,10 @@ export const useEditor = (
 
         await postMessage(EditorEvents.title, item.title, tabId);
         loadingState.current = currentContents.current[item.id]?.data;
-        if (currentContents.current?.data) {
+        if (currentContents.current[item.id]?.data) {
           await postMessage(
             EditorEvents.html,
-            currentContents.current?.data,
+            currentContents.current[item.id]?.data,
             tabId,
             10000
           );
@@ -625,7 +653,12 @@ export const useEditor = (
       type: string;
       tabId: number;
     }) => {
-      if (lock.current || currentLoadingNoteId.current === noteId) return;
+      if (
+        lock.current ||
+        (currentLoadingNoteId.current &&
+          currentLoadingNoteId.current === noteId)
+      )
+        return;
 
       lastContentChangeTime.current = Date.now();
 
@@ -665,6 +698,7 @@ export const useEditor = (
 
   const restoreEditorState = useCallback(async () => {
     const appState = getAppState();
+    console.log(appState, "appState");
     if (!appState) return;
     state.current.isRestoringState = true;
     state.current.currentlyEditing = true;
@@ -673,25 +707,9 @@ export const useEditor = (
     if (!DDS.isTab) {
       tabBarRef.current?.goToPage(1, false);
     }
-    if (appState.note) {
-      if (useSettingStore.getState().isAppLoading) {
-        const remove = useSettingStore.subscribe((state) => {
-          if (!state.isAppLoading && appState.note) {
-            loadNote({
-              item: appState.note
-            });
-            remove();
-          }
-        });
-      } else {
-        loadNote({
-          item: appState.note
-        });
-      }
-    }
     clearAppState();
     state.current.isRestoringState = false;
-  }, [loadNote, overlay]);
+  }, []);
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote + editorId, loadNote);
@@ -716,9 +734,16 @@ export const useEditor = (
         useTabStore.getState().currentTab
       ))
     ) {
+      console.log(
+        "ready failed....",
+        sessionIdRef.current,
+        useTabStore.getState().currentTab
+      );
       eSendEvent("webview_reset", "onReady");
       return false;
     } else {
+      console.log("onReady", "sync tabs");
+      syncTabs();
       isDefaultEditor && restoreEditorState();
       return true;
     }
@@ -740,9 +765,42 @@ export const useEditor = (
         }
         overlay(false);
 
+        // TODO: Improve handling this on app launch from a link etc.
         const noteId = useTabStore.getState().getCurrentNoteId();
-        if (noteId && currentNotes.current[noteId]) {
-          loadNote({ ...currentNotes.current[noteId], forced: true });
+
+        if (noteId) {
+          if (useSettingStore.getState().isAppLoading) {
+            const unsub = useSettingStore.subscribe(async (s) => {
+              if (!s.isAppLoading) {
+                try {
+                  const note = await db.notes.note(noteId);
+                  if (note) {
+                    loadNote({ item: note, forced: true });
+                  } else {
+                    console.log("new note after app load");
+                    loadNote({ newNote: true });
+                    if (tabBarRef.current?.page === 1) {
+                      state.current.currentlyEditing = false;
+                    }
+                  }
+                  unsub();
+                } catch (e) {
+                  console.log(e);
+                }
+              }
+            });
+          } else {
+            const note = await db.notes.note(noteId);
+            if (note) {
+              loadNote({ item: note, forced: true });
+            } else {
+              console.log("new note");
+              loadNote({ newNote: true });
+              if (tabBarRef.current?.page === 1) {
+                state.current.currentlyEditing = false;
+              }
+            }
+          }
         }
       });
     });

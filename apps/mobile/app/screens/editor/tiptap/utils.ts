@@ -111,6 +111,25 @@ export const getResponse = async (
     };
     eSubscribeEvent(type, callback);
     setTimeout(() => {
+      eUnSubscribeEvent(type, callback);
+      resolve(false);
+    }, waitFor);
+  });
+};
+
+export const waitForEvent = async (
+  type: string,
+  waitFor = 300
+): Promise<any> => {
+  return new Promise((resolve) => {
+    const callback = (data: any) => {
+      eUnSubscribeEvent(type, callback);
+      resolve(data);
+    };
+    eSubscribeEvent(type, callback);
+    setTimeout(() => {
+      console.log("return..");
+      eUnSubscribeEvent(type, callback);
       resolve(false);
     }, waitFor);
   });

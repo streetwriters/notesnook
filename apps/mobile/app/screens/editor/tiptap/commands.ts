@@ -78,7 +78,6 @@ class Commands {
   }
 
   focus = async (tabId: number) => {
-    console.log("focus");
     if (!this.ref.current) return;
     if (Platform.OS === "android") {
       //this.ref.current?.requestFocus();
@@ -106,7 +105,6 @@ class Commands {
     );
 
   clearContent = async (tabId: number) => {
-    console.log("clearContent");
     this.previousSettings = null;
     await this.doAsync(
       `
@@ -135,7 +133,6 @@ typeof statusBar !== "undefined" && statusBar.current.set({date:"",saved:""});
     saved: string,
     tabId: number
   ) => {
-    console.log("setStatus");
     await this.doAsync(
       `
       const statusBar = statusBars[${tabId}];

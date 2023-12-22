@@ -493,8 +493,8 @@ const onChangeTab = async (obj) => {
     editorState().movedAway = false;
     editorState().isFocused = true;
     activateKeepAwake();
-    console.log(editorState().currentlyEditing, "currentlyEditing...");
-    if (!editorState().currentlyEditing) {
+
+    if (!useTabStore.getState().getCurrentNoteId()) {
       eSendEvent(eOnLoadNote, {
         newNote: true
       });

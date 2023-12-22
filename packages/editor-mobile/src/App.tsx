@@ -40,15 +40,6 @@ function App(): JSX.Element {
   const tabs = useTabStore((state) => state.tabs);
   const currentTab = useTabStore((state) => state.currentTab);
 
-  useEffect(() => {
-    post(EventTypes.tabsChanged, {
-      tabs: tabs,
-      currentTab: currentTab
-    });
-  }, [tabs, currentTab]);
-
-  logger("info", "opened tabs count", tabs);
-
   return (
     <ScopedThemeProvider value="base">
       <EmotionEditorTheme>
