@@ -29,5 +29,6 @@ exports[`copying a single nested list item shouldn't copy the list metadata 1`] 
       "type": "paragraph",
     },
   ],
+  "openStart": 5,
 }
 `;
