@@ -129,7 +129,8 @@
     "build:test": "cross-env PLATFORM=web TEST=true vite build",
     "build:desktop": "cross-env PLATFORM=desktop vite build",
     "analyze": "cross-env ANALYZING=true PLATFORM=web vite build",
-    "test": "playwright test -u"
+    "test": "playwright test -u",
+    "postinstall": "patch-package"
   },
   "browserslist": {
     "production": [
