@@ -441,23 +441,6 @@ index cf166f8..37cf701 100644
  export * from './util/infer-result.js';
  export { logOnce } from './util/log-once.js';
  export { SelectExpression, SelectCallback, SelectArg, Selection, CallbackSelection, } from './parser/select-parser.js';
-diff --git a/node_modules/kysely/dist/cjs/index.js b/node_modules/kysely/dist/cjs/index.js
-index a61ec58..714cbda 100644
---- a/node_modules/kysely/dist/cjs/index.js
-+++ b/node_modules/kysely/dist/cjs/index.js
-@@ -90,6 +90,12 @@ __exportStar(require("./dialect/postgres/postgres-dialect.js"), exports);
- __exportStar(require("./dialect/sqlite/sqlite-query-compiler.js"), exports);
- __exportStar(require("./dialect/sqlite/sqlite-introspector.js"), exports);
- __exportStar(require("./dialect/sqlite/sqlite-adapter.js"), exports);
-+__exportStar(require("./dialect/mssql/mssql-adapter.js"), exports);
-+__exportStar(require("./dialect/mssql/mssql-dialect-config.js"), exports);
-+__exportStar(require("./dialect/mssql/mssql-dialect.js"), exports);
-+__exportStar(require("./dialect/mssql/mssql-driver.js"), exports);
-+__exportStar(require("./dialect/mssql/mssql-introspector.js"), exports);
-+__exportStar(require("./dialect/mssql/mssql-query-compiler.js"), exports);
- __exportStar(require("./query-compiler/default-query-compiler.js"), exports);
- __exportStar(require("./query-compiler/query-compiler.js"), exports);
- __exportStar(require("./migration/migrator.js"), exports);
 diff --git a/node_modules/kysely/dist/cjs/kysely.d.ts b/node_modules/kysely/dist/cjs/kysely.d.ts
 index 52e909a..b10152e 100644
 --- a/node_modules/kysely/dist/cjs/kysely.d.ts
@@ -6073,23 +6056,6 @@ index cf166f8..37cf701 100644
  export * from './util/infer-result.js';
  export { logOnce } from './util/log-once.js';
  export { SelectExpression, SelectCallback, SelectArg, Selection, CallbackSelection, } from './parser/select-parser.js';
-diff --git a/node_modules/kysely/dist/esm/index.js b/node_modules/kysely/dist/esm/index.js
-index 1033125..e4f5004 100644
---- a/node_modules/kysely/dist/esm/index.js
-+++ b/node_modules/kysely/dist/esm/index.js
-@@ -73,6 +73,12 @@ export * from './dialect/postgres/postgres-dialect.js';
- export * from './dialect/sqlite/sqlite-query-compiler.js';
- export * from './dialect/sqlite/sqlite-introspector.js';
- export * from './dialect/sqlite/sqlite-adapter.js';
-+export * from './dialect/mssql/mssql-adapter.js';
-+export * from './dialect/mssql/mssql-dialect-config.js';
-+export * from './dialect/mssql/mssql-dialect.js';
-+export * from './dialect/mssql/mssql-driver.js';
-+export * from './dialect/mssql/mssql-introspector.js';
-+export * from './dialect/mssql/mssql-query-compiler.js';
- export * from './query-compiler/default-query-compiler.js';
- export * from './query-compiler/query-compiler.js';
- export * from './migration/migrator.js';
 diff --git a/node_modules/kysely/dist/esm/kysely.d.ts b/node_modules/kysely/dist/esm/kysely.d.ts
 index 52e909a..8e45b8c 100644
 --- a/node_modules/kysely/dist/esm/kysely.d.ts
