@@ -96,7 +96,7 @@ async function deleteAttachments(ids: string[]) {
     action: async (report) => {
       for (let i = 0; i < ids.length; ++i) {
         const id = ids[i];
-        const attachment = await attachmentStore.get().attachments?.item(id);
+        const attachment = await db.attachments.attachment(id);
         if (!attachment) continue;
 
         report({
