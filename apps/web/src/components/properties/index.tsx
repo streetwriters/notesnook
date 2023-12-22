@@ -275,7 +275,7 @@ function Notebooks({ noteId }: { noteId: string }) {
         estimatedSize={50}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.ids}
-        renderItem={({ item: index }) => (
+        renderItem={({ index }) => (
           <ResolvedItem index={index} items={result.value} type="notebook">
             {({ item, data }) => (
               <ListItemWrapper item={item} data={data} simplified />
@@ -302,7 +302,7 @@ function Reminders({ noteId }: { noteId: string }) {
         estimatedSize={54}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.ids}
-        renderItem={({ item: index }) => (
+        renderItem={({ index }) => (
           <ResolvedItem index={index} items={result.value} type="reminder">
             {({ item, data }) => (
               <ListItemWrapper item={item} data={data} simplified />
@@ -329,7 +329,7 @@ function Attachments({ noteId }: { noteId: string }) {
         getItemKey={(index) => result.value.key(index)}
         items={result.value.ids}
         header={<></>}
-        renderRow={({ item: index }) => (
+        renderRow={({ index }) => (
           <ResolvedItem index={index} type="attachment" items={result.value}>
             {({ item }) => <ListItemWrapper item={item} compact />}
           </ResolvedItem>
@@ -367,7 +367,7 @@ function SessionHistory({
         estimatedSize={28}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.ids}
-        renderItem={({ item: index }) => (
+        renderItem={({ index }) => (
           <ResolvedItem type="session" index={index} items={result.value}>
             {({ item }) => (
               <SessionItem
