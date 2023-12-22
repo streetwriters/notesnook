@@ -26,6 +26,7 @@ import { Counter } from "../components/counter";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { useToolbarStore } from "../stores/toolbar-store";
 import { getFontById, getFontIds, getFonts } from "../../utils/font";
+import { CodeBlock } from "../../extensions/code-block";
 
 export function FontSize(props: ToolProps) {
   const { editor } = props;
@@ -45,7 +46,8 @@ export function FontSize(props: ToolProps) {
 
   return (
     <Counter
-      title="font size"
+      title="Font size"
+      disabled={editor.isActive(CodeBlock.name)}
       onDecrease={() =>
         editor.current
           ?.chain()
@@ -93,6 +95,7 @@ export function FontFamily(props: ToolProps) {
       selectedItem={getFontById(currentFontFamily)?.title || defaultFontFamily}
       items={items}
       menuWidth={130}
+      disabled={editor.isActive(CodeBlock.name)}
     />
   );
 }

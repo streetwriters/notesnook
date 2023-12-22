@@ -81,7 +81,6 @@ export function CodeblockComponent(
               }
             },
             fontFamily: "monospace",
-            fontSize: "code",
             whiteSpace: "pre", // TODO !important
             tabSize: 1,
             position: "relative",

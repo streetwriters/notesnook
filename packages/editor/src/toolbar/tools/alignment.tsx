@@ -21,6 +21,7 @@ import { ToolProps } from "../types";
 import { ToolButton } from "../components/tool-button";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { IconNames } from "../icons";
+import { CodeBlock } from "../../extensions/code-block";
 
 type Alignment = "left" | "right" | "center" | "justify";
 type AlignmentToolProps = ToolProps & {
@@ -40,6 +41,7 @@ function AlignmentTool(props: AlignmentToolProps) {
           .setTextAlign(alignmentRef.current)
           .run();
       }}
+      disabled={editor.isActive(CodeBlock.name)}
       toggled={false}
     />
   );

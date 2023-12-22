@@ -23,6 +23,7 @@ import { Dropdown } from "../components/dropdown";
 import { MenuItem } from "@notesnook/ui";
 import { ToolbarLocation, useToolbarLocation } from "../stores/toolbar-store";
 import { useMemo } from "react";
+import { CodeBlock } from "../../extensions/code-block";
 
 const defaultLevels = [1, 2, 3, 4, 5, 6] as const;
 
@@ -48,6 +49,7 @@ export function Headings(props: ToolProps) {
       }
       items={items}
       menuWidth={130}
+      disabled={editor.isActive(CodeBlock.name)}
     />
   );
 }

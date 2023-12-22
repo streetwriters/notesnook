@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ToolProps } from "../types";
 import { ToolButton } from "../components/tool-button";
 import { useToolbarLocation } from "../stores/toolbar-store";
+import { CodeBlock } from "../../extensions/code-block";
 
 export function Italic(props: ToolProps) {
   const { editor } = props;
@@ -61,6 +62,7 @@ export function Code(props: ToolProps) {
     <ToolButton
       {...props}
       toggled={editor.isActive("code")}
+      disabled={editor.isActive(CodeBlock.name)}
       onClick={() => editor.current?.chain().focus().toggleCode().run()}
     />
   );
@@ -84,6 +86,7 @@ export function Subscript(props: ToolProps) {
     <ToolButton
       {...props}
       toggled={editor.isActive("subscript")}
+      disabled={editor.isActive(CodeBlock.name)}
       onClick={() => editor.current?.chain().focus().toggleSubscript().run()}
     />
   );
@@ -95,6 +98,7 @@ export function Superscript(props: ToolProps) {
     <ToolButton
       {...props}
       toggled={editor.isActive("superscript")}
+      disabled={editor.isActive(CodeBlock.name)}
       onClick={() => editor.current?.chain().focus().toggleSuperscript().run()}
     />
   );
@@ -139,6 +143,7 @@ export function Math(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() => editor.current?.chain().focus().insertMathInline().run()}
+      disabled={editor.isActive(CodeBlock.name)}
     />
   );
 }

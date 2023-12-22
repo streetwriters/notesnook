@@ -50,7 +50,7 @@ export const createButtonVariant = (
     filter: "brightness(90%)",
     ...states?.hover
   },
-  ":active": {
+  ":active:not(:disabled)": {
     bg: background,
     filter: "brightness(85%)",
     transform: "scale(0.98) !important",
