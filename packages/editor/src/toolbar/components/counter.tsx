@@ -28,9 +28,10 @@ export type CounterProps = {
   onDecrease: () => void;
   onReset: () => void;
   value: string;
+  disabled?: boolean;
 };
 function _Counter(props: CounterProps) {
-  const { title, onDecrease, onIncrease, onReset, value } = props;
+  const { title, onDecrease, onIncrease, onReset, value, disabled } = props;
   const isMobile = useIsMobile();
 
   return (
@@ -39,24 +40,29 @@ function _Counter(props: CounterProps) {
         alignItems: "stretch",
         borderRadius: "default",
         overflow: "hidden",
-        cursor: "pointer",
+        cursor: disabled ? "not-allowed" : "pointer",
         height: "100%",
         ":hover": {
-          bg: isMobile ? "transparent" : "hover-secondary"
+          bg: isMobile || disabled ? "transparent" : "hover-secondary"
         }
       }}
-      onClick={onReset}
-      title={`Click to reset ${title}`}
+      onClick={disabled ? undefined : onReset}
+      title={disabled ? "" : `Click to reset ${title}`}
     >
       <ToolButton
         toggled={false}
         title={`Decrease ${title}`}
         icon="minus"
         variant={"small"}
-        onClick={(e) => {
-          e.stopPropagation();
-          onDecrease();
-        }}
+        disabled={disabled}
+        onClick={
+          disabled
+            ? undefined
+            : (e) => {
+                e.stopPropagation();
+                onDecrease();
+              }
+        }
       />
 
       <Text
@@ -65,7 +71,8 @@ function _Counter(props: CounterProps) {
           fontSize: "subBody",
           alignSelf: "center",
           mx: 1,
-          textAlign: "center"
+          textAlign: "center",
+          opacity: disabled ? 0.5 : 1
         }}
       >
         {value}
@@ -76,15 +83,20 @@ function _Counter(props: CounterProps) {
         title={`Increase ${title}`}
         icon="plus"
         variant={"small"}
-        onClick={(e) => {
-          e.stopPropagation();
-          onIncrease();
-        }}
+        disabled={disabled}
+        onClick={
+          disabled
+            ? undefined
+            : (e) => {
+                e.stopPropagation();
+                onIncrease();
+              }
+        }
       />
     </Flex>
   );
 }
 
 export const Counter = React.memo(_Counter, (prev, next) => {
-  return prev.value === next.value;
+  return prev.value === next.value && prev.disabled === next.disabled;
 });

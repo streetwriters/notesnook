@@ -44,11 +44,10 @@ export function FontSize(props: ToolProps) {
     return Math.min(120, fontSizeAsNumber.current + 1);
   }, [fontSizeAsNumber]);
 
-  if (editor.current?.isActive(CodeBlock.name)) return null;
-
   return (
     <Counter
-      title="font size"
+      title="Font size"
+      disabled={editor.isActive(CodeBlock.name)}
       onDecrease={() =>
         editor.current
           ?.chain()
@@ -89,8 +88,6 @@ export function FontFamily(props: ToolProps) {
     [currentFontFamily]
   );
 
-  if (editor.current?.isActive(CodeBlock.name)) return null;
-
   return (
     <Dropdown
       id="fontFamily"
@@ -98,6 +95,7 @@ export function FontFamily(props: ToolProps) {
       selectedItem={getFontById(currentFontFamily)?.title || defaultFontFamily}
       items={items}
       menuWidth={130}
+      disabled={editor.isActive(CodeBlock.name)}
     />
   );
 }

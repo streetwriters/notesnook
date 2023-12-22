@@ -33,9 +33,11 @@ type DropdownProps = {
   items: MenuItem[];
   buttonRef?: React.MutableRefObject<HTMLButtonElement | undefined>;
   menuWidth?: number;
+  disabled?: boolean;
 };
 export function Dropdown(props: DropdownProps) {
-  const { id, group, items, selectedItem, buttonRef, menuWidth } = props;
+  const { id, group, items, selectedItem, buttonRef, menuWidth, disabled } =
+    props;
   const internalRef = useRef<HTMLButtonElement>();
   const [isOpen, setIsOpen] = useState(false);
   const toolbarLocation = useToolbarLocation();
@@ -74,6 +76,7 @@ export function Dropdown(props: DropdownProps) {
                 bg: "transparent"
               }
         }}
+        disabled={disabled}
         onClick={() => setIsOpen((s) => !s)}
         onMouseDown={(e) => e.preventDefault()}
       >
