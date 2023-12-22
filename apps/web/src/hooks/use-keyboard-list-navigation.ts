@@ -128,7 +128,7 @@ export function useKeyboardListNavigation(
           focusItemAt(nextIndex);
           return true;
         },
-        "Ctrl-a": () => {
+        "Mod-a": () => {
           resetSelection();
           for (let i = 0; i < length; ++i) select(i);
           return true;
