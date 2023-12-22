@@ -8,8 +8,11 @@
       content="This is Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1"
     />
     <title>Test 1 - Notesnook</title>
-    <meta name="created-on" content="xxx" />
-    <meta name="last-edited-on" content="xxx" />
+    <meta name="created-at" content="22-12-2023 11:33 AM" />
+    <meta name="updated-at" content="22-12-2023 11:33 AM" />
+    
+    
+    
     
     <link rel="stylesheet" href="https://app.notesnook.com/assets/editor-styles.css?d=0">
 
@@ -24,6 +27,11 @@
       background-color: transparent !important;
       color: #202124;
       font-family: "Open Sans", "Noto Sans", Frutiger, Calibri, Myriad, Arial, Ubuntu, Helvetica, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .math-block {
+      padding-top: 20px;
+      padding-bottom: 20px;
     }
     
     h1,
