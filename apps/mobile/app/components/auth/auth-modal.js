@@ -95,6 +95,7 @@ const AuthModal = () => {
       transparent={false}
       animated={false}
       centered={false}
+      enableSheetKeyboardHandler
     >
       <KeyboardAwareScrollView
         style={{

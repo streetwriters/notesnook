@@ -25,13 +25,13 @@ import { useEditorStore } from "../../../stores/use-editor-store";
 
 export const Filler = ({ item }) => {
   const { colors } = useThemeColors();
-  const currentEditingNote = useEditorStore(
-    (state) => state.currentEditingNote
+  const isEditingNote = useEditorStore(
+    (state) => state.currentEditingNote === item.id
   );
 
   const [selected] = useIsSelected(item);
 
-  return currentEditingNote === item.id || selected ? (
+  return isEditingNote || selected ? (
     <View
       style={{
         position: "absolute",
@@ -39,12 +39,11 @@ export const Filler = ({ item }) => {
         height: "150%",
         backgroundColor: colors.selected.background,
         borderLeftWidth: 5,
-        borderLeftColor:
-          currentEditingNote === item.id
-            ? item.color
-              ? colors.static[item.color]
-              : colors.selected.accent
-            : "transparent"
+        borderLeftColor: isEditingNote
+          ? item.color
+            ? colors.static[item.color]
+            : colors.selected.accent
+          : "transparent"
       }}
       collapsable={false}
     />

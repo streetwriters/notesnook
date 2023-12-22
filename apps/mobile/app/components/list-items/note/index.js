@@ -99,8 +99,8 @@ const NoteItem = ({
   dateBy = "dateCreated",
   noOpen = false
 }) => {
-  const currentEditingNote = useEditorStore(
-    (state) => state.currentEditingNote
+  const isEditingNote = useEditorStore(
+    (state) => state.currentEditingNote === item.id
   );
   const { colors } = useThemeColors();
   const compactMode = useIsCompactModeEnabled(item);
@@ -112,8 +112,7 @@ const NoteItem = ({
   const reminder = getUpcomingReminder(reminders);
   const noteColor = ColorValues[item.color?.toLowerCase()];
   const tags = getTags(item);
-  const primaryColors =
-    currentEditingNote === item.id ? colors.selected : colors.primary;
+  const primaryColors = isEditingNote ? colors.selected : colors.primary;
 
   return (
     <>

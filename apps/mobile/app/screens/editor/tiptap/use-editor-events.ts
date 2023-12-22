@@ -189,7 +189,7 @@ export const useEditorEvents = (
       readonly: readonly || editorPropReadonly,
       tools: tools || getDefaultPresets().default,
       noHeader: noHeader,
-      noToolbar: readonly || editorPropReadonly || noToolbar,
+      noToolbar: noToolbar,
       doubleSpacedLines: doubleSpacedLines,
       corsProxy: corsProxy,
       fontSize:
