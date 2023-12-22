@@ -36,7 +36,7 @@ export function TaskListComponent(
   const { editor, getPos, node, updateAttributes, forwardRef, pos } = props;
   const { title, textDirection, readonly, stats } = node.attrs;
   const isMobile = useIsMobile();
-  const checked = stats.total === stats.checked;
+  const checked = stats.total > 0 && stats.total === stats.checked;
 
   const isNested = useMemo(() => {
     if (!pos) return false;
