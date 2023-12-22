@@ -165,7 +165,6 @@ export function CodeblockComponent(
               onClick={() => {
                 editor.commands.copyToClipboard(node.textContent);
                 start();
-                console.log("props", props);
               }}
               title="Copy to clipboard"
             >
