@@ -160,7 +160,14 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
         }}
       >
         <Sidebar
-          onDownloadAll={() => download(allAttachments?.ungrouped || [])}
+          onDownloadAll={async () =>
+            download(
+              await db.attachments.all.ids({
+                sortBy: "dateCreated",
+                sortDirection: "desc"
+              })
+            )
+          }
           filter={async (query) => {
             setAttachments(await db.lookup.attachments(query).sorted());
           }}
@@ -248,10 +255,12 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
                       <Label>
                         <Checkbox
                           sx={{ width: 18, height: 18 }}
-                          onChange={(e) => {
+                          onChange={async (e) => {
                             setSelected(
                               e.currentTarget.checked
-                                ? attachments.ungrouped
+                                ? await filterAttachments(
+                                    currentRoute.current
+                                  ).ids()
                                 : []
                             );
                           }}
@@ -310,8 +319,8 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
                 }
                 mode="fixed"
                 estimatedSize={30}
-                getItemKey={(index) => attachments.getKey(index)}
-                items={attachments.ungrouped}
+                getItemKey={(index) => attachments.key(index)}
+                items={attachments.ids}
                 context={{
                   isSelected: (id: string) => selected.indexOf(id) > -1,
                   select: (id: string) => {
@@ -339,7 +348,7 @@ export default AttachmentsDialog;
 
 function AttachmentRow(
   props: VirtualizedTableRowProps<
-    string,
+    boolean,
     {
       isSelected: (id: string) => boolean;
       select: (id: string) => void;
@@ -349,18 +358,20 @@ function AttachmentRow(
 ) {
   if (!props.context) return null;
   return (
-    <ResolvedItem id={props.item} items={props.context.attachments}>
-      {({ item }) =>
-        item.type === "attachment" ? (
-          <Attachment
-            rowRef={props.rowRef}
-            style={props.style}
-            item={item}
-            isSelected={props.context?.isSelected(props.item)}
-            onSelected={() => props.context?.select(props.item)}
-          />
-        ) : null
-      }
+    <ResolvedItem
+      index={props.index}
+      items={props.context.attachments}
+      type="attachment"
+    >
+      {({ item }) => (
+        <Attachment
+          rowRef={props.rowRef}
+          style={props.style}
+          item={item}
+          isSelected={props.context?.isSelected(item.id)}
+          onSelected={() => props.context?.select(item.id)}
+        />
+      )}
     </ResolvedItem>
   );
 }
