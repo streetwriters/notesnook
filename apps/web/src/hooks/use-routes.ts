@@ -22,8 +22,8 @@ import makeMatcher from "wouter/matcher";
 import { navigate, getHomeRoute } from "../navigation";
 import { Params, Routes } from "../navigation/types";
 
-export default function useRoutes<T extends string, TRouteResult>(
-  routes: Routes<T, TRouteResult>,
+export default function useRoutes<T extends string>(
+  routes: Routes<T>,
   options?: {
     hooks?: { beforeNavigate: (location: string) => void };
     fallbackRoute?: string;
