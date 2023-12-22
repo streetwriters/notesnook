@@ -91,18 +91,7 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Date time shortcuts in note title",
-            subtitle:
-              "You can now use date time shortcuts (/now, /date & /time) in note & task list titles."
-          },
-          {
-            title: "Restore backups without an account",
-            subtitle: "You can now restore backups without logging in."
-          },
-          {
-            title: "Export notes as markdown with frontmatter",
-            subtitle:
-              "You can now preserve all metadata when exporting your notes using the Markdown + Frontmatter export format."
+            title: "Check/uncheck all tasks in a task list"
           }
         ],
     cta: {
