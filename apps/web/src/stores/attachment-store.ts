@@ -61,7 +61,7 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
     abortController = new AbortController();
     const attachmentStream = new AttachmentStream(
       ids,
-      (id) => this.attachments?.item(id),
+      (id) => db.attachments.attachment(id),
       abortController.signal,
       (current) => {
         this.set({ status: { current, total: ids.length } });
@@ -88,7 +88,7 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
 
   recheck = async (ids: string[]) => {
     for (const id of ids) {
-      const attachment = await this.attachments?.item(id);
+      const attachment = await db.attachments.attachment(id);
       if (!attachment) continue;
       try {
         this._changeWorkingStatus(attachment.hash, "recheck");

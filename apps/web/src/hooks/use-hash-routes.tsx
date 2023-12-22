@@ -22,9 +22,7 @@ import useHashLocation from "./use-hash-location";
 import { Params, Routes } from "../navigation/types";
 
 let lastRoute: unknown | null = null;
-export default function useHashRoutes<T extends string, TRouteResult>(
-  routes: Routes<T, TRouteResult>
-) {
+export default function useHashRoutes<T extends string>(routes: Routes<T>) {
   const [{ location, update }] = useHashLocation();
   if (!update) return lastRoute;
 
