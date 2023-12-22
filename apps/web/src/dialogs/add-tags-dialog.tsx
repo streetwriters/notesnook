@@ -126,7 +126,7 @@ function AddTagsDialog(props: AddTagsDialogProps) {
             const { selected, setSelected } = useSelectionStore.getState();
             setSelected([...selected, { id: tagId, new: true, op: "add" }]);
           }}
-          renderItem={({ item: index }) => {
+          renderItem={({ index }) => {
             return (
               <ResolvedItem key={index} type="tag" items={tags} index={index}>
                 {({ item }) => <TagItem tag={item} />}

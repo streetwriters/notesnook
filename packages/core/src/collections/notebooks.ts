@@ -226,6 +226,10 @@ export class Notebooks implements ICollection {
     return notebook;
   }
 
+  find(title: string) {
+    return this.all.find((eb) => eb("notebooks.title", "==", title));
+  }
+
   exists(id: string) {
     return this.collection.exists(id);
   }

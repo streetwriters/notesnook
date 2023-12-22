@@ -28,8 +28,7 @@ type Batch<T> = {
 export class VirtualizedGrouping<T> {
   private cache: Map<number, Batch<T>> = new Map();
   private pending: Map<number, Promise<Batch<T>>> = new Map();
-  public ids: number[];
-  private loadBatchTimeout?: number;
+  public ids: boolean[];
 
   constructor(
     count: number,
@@ -43,7 +42,7 @@ export class VirtualizedGrouping<T> {
     ) => Map<number, { index: number; hidden?: boolean; group: GroupHeader }>,
     readonly groups?: () => Promise<{ index: number; group: GroupHeader }[]>
   ) {
-    this.ids = new Array(count).fill(0);
+    this.ids = new Array(count).fill(false);
   }
 
   key(index: number) {
@@ -93,14 +92,6 @@ export class VirtualizedGrouping<T> {
       group: group && !group.hidden ? group.group : undefined,
       data: data?.[itemIndexInBatch]
     };
-  }
-
-  /**
-   * Reload the cache
-   */
-  refresh(ids: number[]) {
-    this.ids = ids;
-    this.cache.clear();
   }
 
   /**

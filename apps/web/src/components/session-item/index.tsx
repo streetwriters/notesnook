@@ -64,7 +64,6 @@ export function SessionItem(props: SessionItemProps) {
       onClick={async () => {
         const content = await db.noteHistory.content(session.id);
         if (!content) return;
-        // toggleProperties(false);
         if (session.locked) {
           await Vault.askPassword(async (password) => {
             try {
@@ -85,7 +84,10 @@ export function SessionItem(props: SessionItemProps) {
           });
         } else {
           onOpenPreviewSession({
-            content,
+            content: {
+              data: content.data as string,
+              type: content.type
+            },
             dateCreated: session.dateCreated,
             dateEdited: session.dateModified
           });

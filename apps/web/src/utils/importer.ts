@@ -122,9 +122,9 @@ async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
   if (!noteId) return;
 
   for (const nb of notebooks) {
-    const notebook = await importNotebook(nb).catch(() => ({ id: undefined }));
-    if (!notebook.id) continue;
-    await db.notes.addToNotebook(notebook.id, noteId);
+    const notebookId = await importNotebook(nb).catch(() => undefined);
+    if (!notebookId) continue;
+    await db.notes.addToNotebook(notebookId, noteId);
   }
 }
 
@@ -135,18 +135,12 @@ async function fileToJson<T>(file: ZipEntry) {
 
 async function importNotebook(
   notebook: Notebook | undefined
-): Promise<{ id?: string; topic?: string }> {
-  if (!notebook) return {};
-
-  let nb = db.notebooks.all.find((nb) => nb.title === notebook.notebook);
-  if (!nb) {
-    const nbId = await db.notebooks.add({
-      title: notebook.notebook
-    });
-    nb = db.notebooks?.notebook(nbId)?.data;
-    if (!nb) return {};
-  }
-
-  const topic = nb.topics.find((t: any) => t.title === notebook.topic);
-  return { id: nb ? nb.id : undefined, topic: topic ? topic.id : undefined };
+): Promise<string | undefined> {
+  if (!notebook) return;
+  const nb = await db.notebooks.find(notebook.notebook);
+  return nb
+    ? nb.id
+    : await db.notebooks.add({
+        title: notebook.notebook
+      });
 }

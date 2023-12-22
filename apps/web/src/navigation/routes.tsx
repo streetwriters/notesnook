@@ -27,19 +27,8 @@ import { navigate } from ".";
 import Trash from "../views/trash";
 import { store as notestore } from "../stores/note-store";
 import Reminders from "../views/reminders";
-import { defineRoutes } from "./types";
-import React from "react";
-import { RouteContainerButtons } from "../components/route-container";
+import { RouteResult, defineRoutes } from "./types";
 import { CREATE_BUTTON_MAP } from "../common";
-
-type RouteResult = {
-  key: string;
-  type: "notes" | "notebooks" | "reminders" | "trash" | "tags";
-  title?: string | (() => Promise<string | undefined>);
-  component: React.FunctionComponent;
-  props?: any;
-  buttons?: RouteContainerButtons;
-};
 
 function defineRoute(route: RouteResult): RouteResult {
   return route;
