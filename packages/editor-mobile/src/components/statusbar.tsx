@@ -37,6 +37,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
     set: setStatus,
     updateWords: () => {
       const editor = editors[tab.id];
+      if (!editor) return;
       const words = getTotalWords(editor as Editor) + " words";
       if (currentWords.current === words) return;
       setWords(words);

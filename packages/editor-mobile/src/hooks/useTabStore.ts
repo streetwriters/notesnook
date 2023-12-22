@@ -40,7 +40,7 @@ export type TabStore = {
   updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => void;
   removeTab: (index: number) => void;
   moveTab: (index: number, toIndex: number) => void;
-  newTab: (noteId?: string) => void;
+  newTab: (noteId?: string, previewTab?: boolean) => void;
   focusTab: (id: number) => void;
   setScrollPosition: (id: number, position: number) => void;
   getNoteIdForTab: (id: number) => string | undefined;
@@ -51,6 +51,8 @@ export type TabStore = {
     noteId: string,
     options: Omit<Partial<TabItem>, "id">
   ) => void;
+  getCurrentNoteId: () => string | undefined;
+  getTab: (tabId: number) => TabItem | undefined;
 };
 
 function getId(id: number, tabs: TabItem[]): number {
@@ -85,43 +87,25 @@ export const useTabStore = create(
         });
       },
       removeTab: (index: number) => {
-        const tab = get().tabs.findIndex((t) => t.id === index);
-
-        if (tab > -1) {
-          const isFocused = get().tabs[tab].id === get().currentTab;
-
-          const nextTabs = get().tabs.slice();
-          nextTabs.splice(tab, 1);
-
-          if (nextTabs.length === 0) {
-            nextTabs.push({
-              id: 0
-            });
-          }
-
-          const scrollPosition = { ...get().scrollPosition };
-          if (scrollPosition[get().tabs[tab].id]) {
-            delete scrollPosition[get().tabs[tab].id];
-          }
-
-          globalThis.editorControllers[get().tabs[tab].id] = undefined;
-
-          set({
-            tabs: nextTabs,
-            currentTab: isFocused
-              ? nextTabs[nextTabs.length - 1].id
-              : get().currentTab,
-            scrollPosition
-          });
+        const scrollPosition = { ...get().scrollPosition };
+        if (scrollPosition[index]) {
+          delete scrollPosition[index];
         }
+        globalThis.editorControllers[index] = undefined;
+        globalThis.editors[index] = null;
+
+        set({
+          scrollPosition
+        });
       },
       focusPreviewTab: (noteId: string, options) => {
         const index = get().tabs.findIndex((t) => t.previewTab);
-        if (index == -1) return get().newTab(noteId);
+        if (index == -1) return get().newTab(noteId, true);
         const tabs = [...get().tabs];
         tabs[index] = {
           ...tabs[index],
           noteId: noteId,
+          previewTab: true,
           ...options
         };
 
@@ -140,13 +124,14 @@ export const useTabStore = create(
           currentTab: tabs[index].id
         });
       },
-      newTab: (noteId?: string) => {
+      newTab: (noteId?: string, previewTab?: boolean) => {
         const id = getId(get().tabs.length, get().tabs);
         const nextTabs = [
           ...get().tabs,
           {
             id: id,
-            noteId
+            noteId,
+            previewTab: previewTab
           }
         ];
         set({
@@ -184,6 +169,12 @@ export const useTabStore = create(
       },
       getTabForNote: (noteId: string) => {
         return get().tabs.find((t) => t.noteId === noteId)?.id;
+      },
+      getCurrentNoteId: () => {
+        return get().tabs.find((t) => t.id === get().currentTab)?.noteId;
+      },
+      getTab: (tabId) => {
+        return get().tabs.find((t) => t.id === tabId);
       }
     }),
     {

@@ -39,6 +39,6 @@ export const EventTypes = {
   copyToClipboard: "editor-events:copy-to-clipboard",
   getAttachmentData: "editor-events:get-attachment-data",
   tabsChanged: "editor-events:tabs-changed",
-  showTabs: "editor-events:showTabs",
+  showTabs: "editor-events:show-tabs",
   tabFocused: "editor-events:tab-focused"
 };
