@@ -42,8 +42,6 @@ import { PreviewSession } from "../editor/types";
 import { ListItemWrapper } from "../list-container/list-profiles";
 import { VirtualizedList } from "../virtualized-list";
 import { SessionItem } from "../session-item";
-import { COLORS } from "../../common/constants";
-import { DefaultColors } from "@notesnook/core";
 import { VirtualizedTable } from "../virtualized-table";
 
 const tools = [
@@ -204,14 +202,7 @@ export default React.memo(EditorProperties);
 
 function Colors({ noteId }: { noteId: string }) {
   const color = useStore((store) => store.color);
-  const result = usePromise(
-    async () =>
-      (
-        await db.relations.to({ id: noteId, type: "note" }, "color").resolve(1)
-      ).at(0),
-    [color]
-  );
-  console.log(result);
+  const result = usePromise(() => db.colors.all.items(), [color]);
   return (
     <Flex
       py={2}
@@ -221,37 +212,36 @@ function Colors({ noteId }: { noteId: string }) {
         justifyContent: "center"
       }}
     >
-      {COLORS.map((label) => {
-        const isChecked =
-          result.status === "fulfilled" &&
-          DefaultColors[label.key] === result.value?.colorCode;
-        return (
-          <Flex
-            key={label.key}
-            onClick={() => noteStore.get().setColor(label, isChecked, noteId)}
-            sx={{
-              cursor: "pointer",
-              position: "relative",
-              alignItems: "center",
-              justifyContent: "space-between"
-            }}
-            data-test-id={`properties-${label.key}`}
-          >
-            <Circle
-              size={35}
-              color={DefaultColors[label.key]}
-              data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
-            />
-            {isChecked && (
-              <Checkmark
-                color="white"
-                size={18}
-                sx={{ position: "absolute", left: "8px" }}
+      {result.status === "fulfilled" &&
+        result.value.map((c) => {
+          const isChecked = c.id === color;
+          return (
+            <Flex
+              key={c.id}
+              onClick={() => noteStore.get().setColor(c.id, isChecked, noteId)}
+              sx={{
+                cursor: "pointer",
+                position: "relative",
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
+              data-test-id={`properties-${c.title}`}
+            >
+              <Circle
+                size={35}
+                color={c.colorCode}
+                data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
               />
-            )}
-          </Flex>
-        );
-      })}
+              {isChecked && (
+                <Checkmark
+                  color="white"
+                  size={18}
+                  sx={{ position: "absolute", left: "8px" }}
+                />
+              )}
+            </Flex>
+          );
+        })}
     </Flex>
   );
 }
