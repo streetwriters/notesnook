@@ -57,6 +57,7 @@ import {
   confirm,
   showAddReminderDialog,
   showAddTagsDialog,
+  showCreateColorDialog,
   showMoveNoteDialog
 } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
@@ -68,7 +69,6 @@ import { showToast } from "../../utils/toast";
 import { hashNavigate, navigate } from "../../navigation";
 import { showPublishView } from "../publish-view";
 import IconTag from "../icon-tag";
-import { COLORS } from "../../common/constants";
 import { exportNote, exportNotes, exportToPDF } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
 import { store as selectionStore } from "../../stores/selection-store";
@@ -81,13 +81,7 @@ import {
   getFormattedReminderTime,
   pluralize
 } from "@notesnook/common";
-import {
-  Color,
-  Note,
-  Notebook as NotebookItem,
-  Tag,
-  DefaultColors
-} from "@notesnook/core";
+import { Color, Note, Notebook as NotebookItem, Tag } from "@notesnook/core";
 import { MenuItem } from "@notesnook/ui";
 import { Context } from "../list-container/types";
 import { SchemeColors } from "@notesnook/theme";
@@ -554,18 +548,38 @@ function colorsToMenuItems(
   noteColor: Color | undefined,
   ids: string[]
 ): MenuItem[] {
-  return COLORS.map((color) => {
-    const isChecked = !!noteColor && noteColor.title === color.title;
-    return {
+  return [
+    {
+      key: "new-color",
       type: "button",
-      key: color.key,
-      title: color.title,
-      icon: Circle.path,
-      styles: { icon: { color: DefaultColors[color.key] } },
-      isChecked,
-      onClick: () => store.setColor(color, isChecked, ...ids)
-    } satisfies MenuItem;
-  });
+      title: "Add new color",
+      icon: Plus.path,
+      onClick: async () => {
+        const id = await showCreateColorDialog();
+        if (!id) return;
+        await store.get().setColor(id, noteColor?.id === id, ...ids);
+      }
+    },
+    {
+      key: "colors",
+      type: "lazy-loader",
+      async items() {
+        const colors = await db.colors.all.items();
+        return colors.map((color) => {
+          const isChecked = !!noteColor && noteColor.id === color.id;
+          return {
+            type: "button",
+            key: color.id,
+            title: color.title,
+            icon: Circle.path,
+            styles: { icon: { color: color.colorCode } },
+            isChecked,
+            onClick: () => store.setColor(color.id, isChecked, ...ids)
+          } satisfies MenuItem;
+        });
+      }
+    }
+  ];
 }
 
 function notebooksMenuItems(ids: string[]): MenuItem[] {

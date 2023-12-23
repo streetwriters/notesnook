@@ -55,6 +55,7 @@ const ThemeDetailsDialog = React.lazy(() => import("./theme-details-dialog"));
 const BackupPasswordDialog = React.lazy(
   () => import("./backup-password-dialog")
 );
+const CreateColorDialog = React.lazy(() => import("./create-color-dialog"));
 
 export const Dialogs = {
   AddNotebookDialog,
@@ -83,5 +84,6 @@ export const Dialogs = {
   AddTagsDialog,
   SettingsDialog,
   ThemeDetailsDialog,
-  BackupPasswordDialog
+  BackupPasswordDialog,
+  CreateColorDialog
 };
