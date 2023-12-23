@@ -61,10 +61,10 @@ function TitleBox(props: TitleBoxProps) {
   );
 
   useEffect(() => {
-    const { title = "" } = useStore.getState().session;
+    const { title } = useStore.getState().session;
     if (!inputRef.current) return;
-    inputRef.current.value = title;
-    updateFontSize(title.length);
+    inputRef.current.value = title || "";
+    updateFontSize(title?.length || 0);
   }, [id, updateFontSize]);
 
   useEffect(() => {
