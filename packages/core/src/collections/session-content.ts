@@ -57,7 +57,6 @@ export class SessionContent implements ICollection {
     //   locked || isCipher(content.data)
     //     ? content.data
     //     :  await this.db.compressor().compress(content.data);
-
     await this.collection.upsert({
       type: "sessioncontent",
       id: makeSessionContentId(sessionId),
