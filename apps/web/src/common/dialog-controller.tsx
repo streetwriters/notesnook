@@ -88,6 +88,15 @@ export function showAddTagsDialog(noteIds: string[]) {
   ));
 }
 
+export function showCreateColorDialog() {
+  return showDialog<"CreateColorDialog", string | undefined>(
+    "CreateColorDialog",
+    (Dialog, perform) => (
+      <Dialog onClose={() => perform(undefined)} onDone={(id) => perform(id)} />
+    )
+  );
+}
+
 export function showAddNotebookDialog(parentId?: string) {
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog

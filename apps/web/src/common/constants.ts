@@ -17,16 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export const COLORS = [
-  { key: "red", title: "Red" },
-  { key: "orange", title: "Orange" },
-  { key: "yellow", title: "Yellow" },
-  { key: "green", title: "Green" },
-  { key: "blue", title: "Blue" },
-  { key: "purple", title: "Purple" },
-  { key: "gray", title: "Gray" }
-] as const;
-
 export const SUBSCRIPTION_STATUS = {
   BASIC: 0,
   TRIAL: 1,

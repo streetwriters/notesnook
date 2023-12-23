@@ -208,7 +208,7 @@ function NavigationMenu(props: NavigationMenuProps) {
                 title={color.title}
                 icon={Circle}
                 selected={location === `/colors/${color.id}`}
-                color={color.title.toLowerCase()}
+                color={color.colorCode}
                 onClick={() => {
                   _navigate(`/colors/${color.id}`);
                 }}
