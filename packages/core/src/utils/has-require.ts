@@ -17,25 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { hasRequire } from "./has-require";
-
-export function randomBytes(size: number): Buffer {
-  const crypto =
-    globalThis.crypto || (hasRequire() ? require("node:crypto") : null);
-  if (!crypto) throw new Error("Crypto is not supported on this platform.");
-  if ("randomBytes" in crypto && typeof crypto.randomBytes === "function")
-    return crypto.randomBytes(size);
-
-  if (!crypto.getRandomValues)
-    throw new Error(
-      "Crypto.getRandomValues is not available on this platform."
-    );
-
-  const buffer = Buffer.allocUnsafe(size);
-  crypto.getRandomValues(buffer);
-  return buffer;
-}
-
-export function randomInt() {
-  return randomBytes(4).readInt32BE();
+export function hasRequire() {
+  return (
+    typeof require === "function" &&
+    // eslint-disable-next-line no-undef, @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    (typeof IS_DESKTOP_APP === "undefined" || !IS_DESKTOP_APP)
+  );
 }
