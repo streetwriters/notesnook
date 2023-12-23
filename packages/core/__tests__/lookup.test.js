@@ -31,7 +31,7 @@ test("search notes", () =>
     content: content
   }).then(async ({ db }) => {
     await db.notes.add(TEST_NOTE);
-    let filtered = await db.lookup.notes("note the world");
+    let filtered = await db.lookup.notes("note of the world").ids();
     expect(filtered).toHaveLength(1);
   }));
 
@@ -42,8 +42,8 @@ test("search notes with a locked note", () =>
     const noteId = await db.notes.add(TEST_NOTE);
     await db.vault.create("password");
     await db.vault.add(noteId);
-    expect(await db.lookup.notes("note the world")).toHaveLength(1);
-    expect(await db.lookup.notes("format")).toHaveLength(0);
+    expect(await db.lookup.notes("note of the world").ids()).toHaveLength(1);
+    expect(await db.lookup.notes("format").ids()).toHaveLength(0);
   }));
 
 test("search notes with an empty note", () =>
@@ -54,16 +54,13 @@ test("search notes with an empty note", () =>
       title: "world is a heavy tune",
       content: { type: "tiptap", data: "<p><br></p>" }
     });
-    let filtered = await db.lookup.notes("heavy tune");
+    let filtered = await db.lookup.notes("heavy tune").ids();
     expect(filtered).toHaveLength(1);
   }));
 
 test("search notebooks", () =>
   notebookTest().then(async ({ db }) => {
     await db.notebooks.add(TEST_NOTEBOOK2);
-    let filtered = db.lookup.notebooks(
-      await db.notebooks.all.items(),
-      "Description"
-    );
+    let filtered = await db.lookup.notebooks("Description").ids();
     expect(filtered.length).toBeGreaterThan(0);
   }));

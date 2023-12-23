@@ -53,7 +53,6 @@ export async function createTriggers(db: Kysely<DatabaseSchemaWithFTS>) {
       c.insertInto("content_fts").values({
         content_fts: sql.lit("delete"),
         id: sql.ref("old.id"),
-        rowid: sql.ref("old.rowid"),
         data: sql.ref("old.data"),
         noteId: sql.ref("old.noteId")
       })
@@ -70,7 +69,6 @@ export async function createTriggers(db: Kysely<DatabaseSchemaWithFTS>) {
       c.insertInto("content_fts").values({
         content_fts: sql.lit("delete"),
         id: sql.ref("old.id"),
-        rowid: sql.ref("old.rowid"),
         data: sql.ref("old.data"),
         noteId: sql.ref("old.noteId")
       })
@@ -78,7 +76,7 @@ export async function createTriggers(db: Kysely<DatabaseSchemaWithFTS>) {
     .addQuery((c) =>
       c.insertInto("content_fts").values({
         id: sql`new.id`,
-        data: sql`IIF(new.locked == 1, "", new.data)`,
+        data: sql`IIF(new.locked == 1, '', new.data)`,
         noteId: sql`new.noteId`
       })
     )
@@ -114,7 +112,6 @@ export async function createTriggers(db: Kysely<DatabaseSchemaWithFTS>) {
       c.insertInto("notes_fts").values({
         notes_fts: sql.lit("delete"),
         id: sql.ref("old.id"),
-        rowid: sql.ref("old.rowid"),
         title: sql.ref("old.title")
       })
     )
@@ -130,7 +127,6 @@ export async function createTriggers(db: Kysely<DatabaseSchemaWithFTS>) {
       c.insertInto("notes_fts").values({
         notes_fts: sql.lit("delete"),
         id: sql.ref("old.id"),
-        rowid: sql.ref("old.rowid"),
         title: sql.ref("old.title")
       })
     )
