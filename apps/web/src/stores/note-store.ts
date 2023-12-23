@@ -25,7 +25,7 @@ import { store as selectionStore } from "./selection-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
 import Config from "../utils/config";
-import { DefaultColors, Note, VirtualizedGrouping } from "@notesnook/core";
+import { Note, VirtualizedGrouping } from "@notesnook/core";
 import { Context } from "../components/list-container/types";
 
 type ViewMode = "detailed" | "compact";
@@ -128,18 +128,9 @@ class NoteStore extends BaseStore<NoteStore> {
     await this.refresh();
   };
 
-  setColor = async (
-    color: { key: string; title: string },
-    isChecked: boolean,
-    ...ids: string[]
-  ) => {
+  setColor = async (colorId: string, isChecked: boolean, ...ids: string[]) => {
     await db.relations.to({ type: "note", ids }, "color").unlink();
     if (!isChecked) {
-      const colorId = await db.colors.add({
-        title: color.title,
-        colorCode: DefaultColors[color.key]
-      });
-
       for (const id of ids) {
         await db.relations.add(
           { type: "color", id: colorId },
@@ -148,7 +139,7 @@ class NoteStore extends BaseStore<NoteStore> {
       }
     }
     await appStore.refreshNavItems();
-    this.syncNoteWithEditor(ids, "color", color.key);
+    this.syncNoteWithEditor(ids, "color", colorId);
     await this.refresh();
   };
 
