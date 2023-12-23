@@ -28,6 +28,7 @@ function createMock() {
     Object.fromEntries(ids.map((id) => [id, id]))
   );
 }
+test.todo("renable virtualized grouping tests");
 // test("fetch items in batch if not found in cache", async (t) => {
 //   const mocked = createMock();
 //   const grouping = new VirtualizedGrouping<string>(

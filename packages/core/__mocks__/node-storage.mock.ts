@@ -24,6 +24,12 @@ export class NodeStorageInterface implements IStorage {
   storage = {};
   crypto = new NNCrypto();
 
+  async removeMulti(keys: string[]): Promise<void> {
+    for (const key of keys) {
+      this.remove(key);
+    }
+  }
+
   async write<T>(key: string, data: T): Promise<void> {
     this.storage[key] = data;
   }

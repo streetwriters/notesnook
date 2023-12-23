@@ -9,7 +9,7 @@ hello
 `;
 
 exports[`convert HTML to markdown with codeblocks > html-to-md-codeblocks.md 1`] = `
-"Typescript is one of those languages that appear to be very simple. It's often described as \\"Javascript with types\\" and it fits that name very well. However, what many don't realize starting out with Typescript is that Typescript*is *a language and like all other languages it has it's own \\"secrets\\", it's own set of quirks.
+"Typescript is one of those languages that appear to be very simple. It's often described as "Javascript with types" and it fits that name very well. However, what many don't realize starting out with Typescript is that Typescript*is *a language and like all other languages it has it's own "secrets", it's own set of quirks.
 
 When I started out with Typescript a few years back, I absolutely hated it. It was unnecessary, a box of clutter, making me write code that would never actually run. I hated defining interfaces, typing out all my functions, and thinking in terms I was not used to as a Javascript developer. Before Javascript, I had coded in C# and I had never really liked C# (I still don't) mostly for the huge amounts of boilerplate and magic involved. Typescript is heavily inspired by C# and seeing that contaminate the Javascript ecosystem irked me no end.
 
@@ -26,12 +26,12 @@ Think of a container that can take any type of item as long as it is not a circl
 \`\`\`javascript
 var container = [];
 function putIntoContainer(item) {
-    if (item.type === \\"round\\") throw new Error(\\"Rounded items not supported.\\")
+    if (item.type === "round") throw new Error("Rounded items not supported.")
     container.push(item);
 }
 
-var square = {type: \\"square\\"}
-var circle = {type: \\"round\\"}
+var square = {type: "square"}
+var circle = {type: "round"}
 putIntoContainer(square)
 putIntoContainer(circle) // ERROR! Rounded items not supported!
 \`\`\`
@@ -46,11 +46,11 @@ In Typescript, this will be solved much more succinctly:
 // than square or round.
 // This gives us nice auto completion and safety
 // against typos.
-type ItemTypes = \\"square\\" | \\"round\\";
+type ItemTypes = "square" | "round";
 
 // Define a generic item that can be of any type
 // defined in ItemTypes.
-// i.e. Item<\\"triangle\\"> will give an error.
+// i.e. Item<"triangle"> will give an error.
 type Item<TItemType extends ItemTypes> = {
  type?: TItemType;
  width: number;
@@ -58,15 +58,15 @@ type Item<TItemType extends ItemTypes> = {
 };
 
 // This is just syntax sugar to increase readability.
-type Square = Item<\\"square\\">;
-type Circle = Item<\\"round\\">;
+type Square = Item<"square">;
+type Circle = Item<"round">;
 
 // Our container is just a simple wrapper around an array
 // that accepts items of only a specific type.
 type Container<TItemType extends ItemTypes> = Array<Item<TItemType>>;
 
-var squareContainer: Container<\\"square\\"> = [];
-var roundContainer: Container<\\"round\\"> = [];
+var squareContainer: Container<"square"> = [];
+var roundContainer: Container<"round"> = [];
 
 // This wrapper is unnecessary, of course, because array.push
 // already does this. Only for demonstration purposes.
@@ -82,8 +82,8 @@ var circle: Circle = { width: 200, height: 500 };
 
 putIntoContainer(squareContainer, square);
 putIntoContainer(roundContainer, circle);
-putIntoContainer(roundContainer, square); // Error: Argument of type 'Square' is not assignable to parameter of type 'Item<\\"round\\">'.
-putIntoContainer(squareContainer, circle); // Error: Argument of type 'Circle' is not assignable to parameter of type 'Item<\\"square\\">'.
+putIntoContainer(roundContainer, square); // Error: Argument of type 'Square' is not assignable to parameter of type 'Item<"round">'.
+putIntoContainer(squareContainer, circle); // Error: Argument of type 'Circle' is not assignable to parameter of type 'Item<"square">'.
 \`\`\`
 
 A lot more code, I know, and if you don't know how generics work that blob of code is utter nonsense. One of the main reasons I avoided Typescript for a long time. But look at the benefits:
@@ -113,15 +113,15 @@ putIntoContainer(roundContainer, circle);
 
 This is the power of generics. More specifically, this is Typescript generics at a glance.
 
-But this post was supposed to be about the \\"Secrets\\" of Typescript Generics, right? Well, let's get into that.
+But this post was supposed to be about the "Secrets" of Typescript Generics, right? Well, let's get into that.
 
-## 1\\\\. Type filters using ternary operators
+## 1\\. Type filters using ternary operators
 
-## 2\\\\. Deeply recursive types
+## 2\\. Deeply recursive types
 
-## 3\\\\. Type functions
+## 3\\. Type functions
 
-## 4\\\\. Type inference using interface properties
+## 4\\. Type inference using interface properties
 
 "
 `;
@@ -224,7 +224,7 @@ Nene
 
 - dasvsadv
 
-- adsva\\\\\`sd
+- adsva\\\`sd
 
 - vasd
 
@@ -240,9 +240,9 @@ exports[`convert HTML to text with codeblock2 > html-to-txt-codeblock2.txt 1`] =
 
 exports[`convert HTML to text with codeblocks > html-to-txt-codeblocks.txt 1`] = `
 "Typescript is one of those languages that appear to be very simple. It's often
-described as \\"Javascript with types\\" and it fits that name very well. However,
+described as "Javascript with types" and it fits that name very well. However,
 what many don't realize starting out with Typescript is that Typescript is a
-language and like all other languages it has it's own \\"secrets\\", it's own set of
+language and like all other languages it has it's own "secrets", it's own set of
 quirks.
 
 When I started out with Typescript a few years back, I absolutely hated it. It
@@ -276,12 +276,12 @@ checks & conditions:
 
 var container = [];
 function putIntoContainer(item) {
-    if (item.type === \\"round\\") throw new Error(\\"Rounded items not supported.\\")
+    if (item.type === "round") throw new Error("Rounded items not supported.")
     container.push(item);
 }
 
-var square = {type: \\"square\\"}
-var circle = {type: \\"round\\"}
+var square = {type: "square"}
+var circle = {type: "round"}
 putIntoContainer(square)
 putIntoContainer(circle) // ERROR! Rounded items not supported!
 
@@ -298,11 +298,11 @@ In Typescript, this will be solved much more succinctly:
 // than square or round.
 // This gives us nice auto completion and safety
 // against typos.
-type ItemTypes = \\"square\\" | \\"round\\";
+type ItemTypes = "square" | "round";
 
 // Define a generic item that can be of any type
 // defined in ItemTypes.
-// i.e. Item<\\"triangle\\"> will give an error.
+// i.e. Item<"triangle"> will give an error.
 type Item<TItemType extends ItemTypes> = {
  type?: TItemType;
  width: number;
@@ -310,15 +310,15 @@ type Item<TItemType extends ItemTypes> = {
 };
 
 // This is just syntax sugar to increase readability.
-type Square = Item<\\"square\\">;
-type Circle = Item<\\"round\\">;
+type Square = Item<"square">;
+type Circle = Item<"round">;
 
 // Our container is just a simple wrapper around an array
 // that accepts items of only a specific type.
 type Container<TItemType extends ItemTypes> = Array<Item<TItemType>>;
 
-var squareContainer: Container<\\"square\\"> = [];
-var roundContainer: Container<\\"round\\"> = [];
+var squareContainer: Container<"square"> = [];
+var roundContainer: Container<"round"> = [];
 
 // This wrapper is unnecessary, of course, because array.push
 // already does this. Only for demonstration purposes.
@@ -334,8 +334,8 @@ var circle: Circle = { width: 200, height: 500 };
 
 putIntoContainer(squareContainer, square);
 putIntoContainer(roundContainer, circle);
-putIntoContainer(roundContainer, square); // Error: Argument of type 'Square' is not assignable to parameter of type 'Item<\\"round\\">'.
-putIntoContainer(squareContainer, circle); // Error: Argument of type 'Circle' is not assignable to parameter of type 'Item<\\"square\\">'.
+putIntoContainer(roundContainer, square); // Error: Argument of type 'Square' is not assignable to parameter of type 'Item<"round">'.
+putIntoContainer(squareContainer, circle); // Error: Argument of type 'Circle' is not assignable to parameter of type 'Item<"square">'.
 
 
 A lot more code, I know, and if you don't know how generics work that blob of
@@ -366,7 +366,7 @@ putIntoContainer(roundContainer, circle);
 This is the power of generics. More specifically, this is Typescript generics at
 a glance.
 
-But this post was supposed to be about the \\"Secrets\\" of Typescript Generics,
+But this post was supposed to be about the "Secrets" of Typescript Generics,
 right? Well, let's get into that.
 
 
