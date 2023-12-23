@@ -102,8 +102,16 @@ export class Notes implements ICollection {
       }
 
       if (item.title) {
-        item.title = this.getNoteTitle(item.title, headline);
+        item.title = item.title.replace(NEWLINE_STRIP_REGEX, " ");
         dateEdited = Date.now();
+      } else if (!isUpdating) {
+        item.title = formatTitle(
+          this.db.settings.getTitleFormat(),
+          this.db.settings.getDateFormat(),
+          this.db.settings.getTimeFormat(),
+          headline.split(" ").splice(0, 10).join(" "),
+          this.totalNotes
+        );
       }
 
       if (isUpdating) {
@@ -389,20 +397,6 @@ export class Notes implements ICollection {
           .unlink();
       }
     });
-  }
-
-  private getNoteTitle(title: string, headline?: string) {
-    if (title.trim().length > 0) {
-      return title.replace(NEWLINE_STRIP_REGEX, " ");
-    }
-
-    return formatTitle(
-      this.db.settings.getTitleFormat(),
-      this.db.settings.getDateFormat(),
-      this.db.settings.getTimeFormat(),
-      headline?.split(" ").splice(0, 10).join(" "),
-      this.totalNotes
-    );
   }
 }
 
