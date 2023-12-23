@@ -399,15 +399,12 @@ test("get grouped notes by abc", () =>
       sortBy: "title"
     });
 
-    expect((await grouping.item(grouping.ids[0]))?.group?.title).toBe(
-      "Conflicted"
-    );
-    expect((await grouping.item(grouping.ids[1]))?.group?.title).toBe("Pinned");
+    expect((await grouping.item(0))?.group?.title).toBe("Conflicted");
+    expect((await grouping.item(1))?.group?.title).toBe("Pinned");
     for (let i = 0; i < alphabet.length; ++i) {
-      expect(
-        (await grouping.item(grouping.ids[i * alphabet.length + 2]))?.group
-          ?.title
-      ).toBe(alphabet[i]);
+      expect((await grouping.item(i * alphabet.length + 2))?.group?.title).toBe(
+        alphabet[i]
+      );
     }
   }));
 
@@ -430,9 +427,9 @@ test("get grouped notes by month", () =>
     });
 
     for (let month = 11; month >= 0; --month) {
-      expect(
-        (await grouping.item(grouping.ids[(11 - month) * 5]))?.group?.title
-      ).toBe(MONTHS_FULL[month]);
+      expect((await grouping.item((11 - month) * 5))?.group?.title).toContain(
+        MONTHS_FULL[month]
+      );
     }
   }));
 
@@ -455,9 +452,9 @@ test("get grouped notes by year", () =>
     });
 
     for (let year = 2020; year <= 2025; ++year) {
-      expect(
-        (await grouping.item(grouping.ids[(2025 - year) * 5]))?.group?.title
-      ).toBe(year.toString());
+      expect((await grouping.item((2025 - year) * 5))?.group?.title).toBe(
+        year.toString()
+      );
     }
   }));
 
@@ -493,9 +490,7 @@ test("get grouped notes by week", () =>
       "20 - 26 Feb, 2023"
     ];
     for (let i = 1; i <= 5; ++i) {
-      expect((await grouping.item(grouping.ids[i * 4]))?.group?.title).toBe(
-        weeks[i - 1]
-      );
+      expect((await grouping.item(i * 4))?.group?.title).toBe(weeks[i - 1]);
     }
   }));
 
@@ -526,9 +521,7 @@ test("get grouped notes default", () =>
 
     let i = 0;
     for (const key in ranges) {
-      expect((await grouping.item(grouping.ids[i * 7]))?.group?.title).toBe(
-        key
-      );
+      expect((await grouping.item(i * 7))?.group?.title).toBe(key);
       ++i;
     }
   }));
