@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { TemplateData } from "..";
+import { hasRequire } from "../../has-require";
 import { parseHTML } from "../../html-parser";
 import { template } from "./template";
 
@@ -111,13 +112,4 @@ async function preprocessHTML(templateData: TemplateData) {
 
   templateData.content = doc.body.innerHTML;
   return templateData;
-}
-
-function hasRequire() {
-  return (
-    typeof require === "function" &&
-    // eslint-disable-next-line no-undef, @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    (typeof IS_DESKTOP_APP === "undefined" || !IS_DESKTOP_APP)
-  );
 }
