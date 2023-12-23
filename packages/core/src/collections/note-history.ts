@@ -103,7 +103,7 @@ export class NoteHistory implements ICollection {
       .sql()
       .selectFrom("notehistory")
       .where("noteId", "==", noteId)
-      .orderBy(`dateModified asc`)
+      .orderBy(`dateModified desc`)
       .select(["id", "sessionContentId"])
       .offset(limit)
       .limit(10)

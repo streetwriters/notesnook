@@ -49,8 +49,10 @@ function databaseTest() {
     fs: FS,
     compressor: Compressor,
     sqliteOptions: {
-      dialect: new SqliteDialect({ database: BetterSQLite3("db.sql") })
-    }
+      dialect: (name) =>
+        new SqliteDialect({ database: BetterSQLite3(":memory:") })
+    },
+    batchSize: 500
   });
   return db.init().then(() => db);
 }

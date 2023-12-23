@@ -97,7 +97,7 @@ test("unlock a note permanently", () =>
     expect(note.headline).not.toBe("");
     const content = await db.content.get(note.contentId);
     expect(content.data).toBeDefined();
-    expect(typeof content.data).toBe("object");
+    expect(typeof content.data).toBe("string");
   }));
 
 test("save a locked note", () =>

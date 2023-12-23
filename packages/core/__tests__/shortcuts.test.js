@@ -30,8 +30,8 @@ test("create a shortcut of an invalid item should throw", () =>
 test("create a shortcut of notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     await db.shortcuts.add({ itemType: "notebook", itemId: id });
-    expect(await db.shortcuts.exists(id)).toBe(true);
-    expect(await db.shortcuts.all.has(id)).toBe(true);
+    expect(db.shortcuts.exists(id)).toBe(true);
+    expect(db.shortcuts.all.find((s) => s.id === id)).toBeDefined();
   }));
 
 test("create a duplicate shortcut of notebook", () =>
@@ -39,8 +39,8 @@ test("create a duplicate shortcut of notebook", () =>
     await db.shortcuts.add({ itemType: "notebook", itemId: id });
     await db.shortcuts.add({ itemType: "notebook", itemId: id });
 
-    expect(await db.shortcuts.all.count()).toBe(1);
-    expect(await db.shortcuts.all.has(id)).toBe(true);
+    expect(db.shortcuts.all).toHaveLength(1);
+    expect(db.shortcuts.all.find((s) => s.id === id)).toBeDefined();
   }));
 
 test("pin a tag", () =>
@@ -48,8 +48,8 @@ test("pin a tag", () =>
     const tagId = await db.tags.add({ title: "HELLO!" });
     await db.shortcuts.add({ itemType: "tag", itemId: tagId });
 
-    expect(await db.shortcuts.all.count()).toBe(1);
-    expect(await db.shortcuts.all.has(tagId)).toBe(true);
+    expect(db.shortcuts.all).toHaveLength(1);
+    expect(db.shortcuts.all.find((s) => s.id === tagId)).toBeDefined();
   }));
 
 test("remove shortcut", () =>
@@ -60,8 +60,8 @@ test("remove shortcut", () =>
       itemId: tagId
     });
 
-    expect(await db.shortcuts.all.count()).toBe(1);
+    expect(db.shortcuts.all).toHaveLength(1);
 
     await db.shortcuts.remove(shortcutId);
-    expect(await db.shortcuts.all.count()).toBe(0);
+    expect(db.shortcuts.all).toHaveLength(0);
   }));

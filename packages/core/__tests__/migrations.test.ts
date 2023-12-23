@@ -171,7 +171,7 @@ test("[5.6] move pins to shortcuts", () =>
     expect(await migrateItem(item, 5.6, 5.7, "settings", db, "local")).toBe(
       true
     );
-    const shortcuts = await db.shortcuts.all.items();
+    const shortcuts = db.shortcuts.all;
     expect(item.pins).toBeUndefined();
     expect(
       shortcuts.find((s) => s.itemType === "notebook" && s.itemId === "hello")
@@ -546,7 +546,7 @@ test("[5.9] move attachments.noteIds to relations", () =>
       .get();
     expect(attachment.noteIds).toBeUndefined();
     expect(linkedNotes).toHaveLength(1);
-    expect(linkedNotes[0]).toBe("HELLO_NOTE_ID");
+    expect(linkedNotes[0].toId).toBe("HELLO_NOTE_ID");
   }));
 
 test.todo("[5.9] flatten attachment object", () =>
@@ -584,8 +584,8 @@ describe("[5.9] move topics out of notebooks & use relations", () => {
         .get();
       expect(notebook.topics).toBeUndefined();
       expect(linkedNotebooks).toHaveLength(2);
-      expect(linkedNotebooks.some((a) => a === "topics1")).toBeTruthy();
-      expect(linkedNotebooks.some((a) => a === "topics2")).toBeTruthy();
+      expect(linkedNotebooks.some((a) => a.toId === "topics1")).toBeTruthy();
+      expect(linkedNotebooks.some((a) => a.toId === "topics2")).toBeTruthy();
       expect(await db.notebooks.all.count()).toBe(2);
       expect(await db.notebooks.notebook("topics1")).toBeDefined();
       expect(await db.notebooks.notebook("topics2")).toBeDefined();
@@ -621,8 +621,8 @@ describe("[5.9] move topics out of notebooks & use relations", () => {
         .get();
       expect(note.notebooks).toBeUndefined();
       expect(linkedNotebooks).toHaveLength(2);
-      expect(linkedNotebooks.some((a) => a === "topic1")).toBeTruthy();
-      expect(linkedNotebooks.some((a) => a === "topic2")).toBeTruthy();
+      expect(linkedNotebooks.some((a) => a.fromId === "topic1")).toBeTruthy();
+      expect(linkedNotebooks.some((a) => a.fromId === "topic2")).toBeTruthy();
     }));
 });
 

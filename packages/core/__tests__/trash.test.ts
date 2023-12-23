@@ -41,19 +41,17 @@ test("permanently delete a note", () =>
     const note = await db.notes.note(noteId);
     if (!note) throw new Error("Could not find note.");
 
-    let sessions = await db.noteHistory.get(noteId);
-    expect(sessions).toHaveLength(1);
+    expect(await db.noteHistory.get(noteId).count()).toBe(1);
 
     await db.notes.moveToTrash(noteId);
 
     expect(await db.trash.all()).toHaveLength(1);
     expect(await db.content.get(note.contentId)).toBeDefined();
-    await db.trash.delete({ id: noteId, type: "note" });
+    await db.trash.delete(noteId);
     expect(await db.trash.all()).toHaveLength(0);
     expect(await db.content.get(note.contentId)).toBeUndefined();
 
-    sessions = await db.noteHistory.get(noteId);
-    expect(sessions).toHaveLength(0);
+    expect(await db.noteHistory.get(noteId).count()).toBe(0);
   }));
 
 test("restore a deleted note that was in a notebook", () =>
@@ -68,7 +66,7 @@ test("restore a deleted note that was in a notebook", () =>
     await db.notes.addToNotebook(subNotebookId, id);
 
     await db.notes.moveToTrash(id);
-    await db.trash.restore({ type: "note", id });
+    await db.trash.restore(id);
     expect(await db.trash.all()).toHaveLength(0);
 
     const note = await db.notes.note(id);
@@ -102,7 +100,7 @@ test("restore a deleted locked note", () =>
     await db.notes.moveToTrash(id);
     expect(await db.trash.all()).toHaveLength(1);
     expect(await db.content.get(note.contentId)).toBeDefined();
-    await db.trash.restore({ type: "note", id });
+    await db.trash.restore(id);
 
     note = await db.notes.note(id);
     expect(await db.trash.all()).toHaveLength(0);
@@ -117,7 +115,7 @@ test("restore a deleted note that's in a deleted notebook", () =>
     await db.notes.moveToTrash(id);
     await db.notebooks.moveToTrash(notebookId);
 
-    await db.trash.restore({ type: "note", id });
+    await db.trash.restore(id);
     const note = await db.notes.note(id);
     expect(note).toBeDefined();
     expect(
@@ -144,7 +142,7 @@ test("restore a deleted notebook", () =>
     await db.notes.addToNotebook(id, noteId);
 
     await db.notebooks.moveToTrash(id);
-    await db.trash.restore({ type: "notebook", id });
+    await db.trash.restore(id);
 
     const notebook = db.notebooks.notebook(id);
     expect(notebook).toBeDefined();
@@ -164,7 +162,7 @@ test("restore a notebook that has deleted notes", () =>
 
     await db.notebooks.moveToTrash(id);
     await db.notes.moveToTrash(noteId);
-    await db.trash.restore({ type: "notebook", id });
+    await db.trash.restore(id);
 
     const notebook = db.notebooks.notebook(id);
     expect(notebook).toBeDefined();
@@ -227,8 +225,7 @@ test("clear trash should delete note content", () =>
 
     const notebookId = await db.notebooks.add(TEST_NOTEBOOK);
 
-    let sessions = await db.noteHistory.get(noteId);
-    expect(sessions).toHaveLength(1);
+    expect(await db.noteHistory.get(noteId).count()).toBe(1);
 
     const note = { ...(await db.notes.note(noteId)) };
 
@@ -244,6 +241,5 @@ test("clear trash should delete note content", () =>
     const content = note.contentId && (await db.content.get(note.contentId));
     expect(content).toBeUndefined();
 
-    sessions = await db.noteHistory.get(noteId);
-    expect(sessions).toHaveLength(0);
+    expect(await db.noteHistory.get(noteId).count()).toBe(0);
   }));

@@ -78,6 +78,18 @@ export class Content implements ICollection {
         "Please use db.content.merge for merging remote content."
       );
 
+    if (content.noteId && !content.id) {
+      // find content from noteId
+      content.id = (
+        await this.db
+          .sql()
+          .selectFrom("content")
+          .where("noteId", "==", content.noteId)
+          .select("id")
+          .executeTakeFirst()
+      )?.id;
+    }
+
     const id = content.id || getId();
 
     const encryptedData = isCipher(content.data) ? content.data : undefined;
@@ -107,12 +119,13 @@ export class Content implements ICollection {
         ...contentData
       });
 
-      if (content.sessionId && contentData && content.type && content.noteId)
+      if (content.sessionId && contentData && content.type && content.noteId) {
         await this.db.noteHistory.add(content.sessionId, {
           noteId: content.noteId,
           type: content.type,
           ...contentData
         });
+      }
     } else if (content.noteId) {
       const contentItem: ContentItem = {
         type: "tiptap",
@@ -186,6 +199,14 @@ export class Content implements ICollection {
       })
       .execute();
   }
+
+  // async findByNoteId(noteId: string) {
+  //   await this.db
+  //     .sql()
+  //     .selectFrom("content")
+  //     .where("noteId", "==", noteId)
+  //     .execute();
+  // }
   // multi(ids: string[]) {
   //   return this.collection.getItems(ids);
   // }
