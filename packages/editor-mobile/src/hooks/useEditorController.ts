@@ -149,7 +149,7 @@ export function useEditorController(update: () => void): EditorController {
   const contentChange = useCallback(
     (editor: Editor, ignoreEdit?: boolean) => {
       const currentSessionId = globalThis.sessionId;
-      post(EventTypes.contentchange);
+      post(EventTypes.contentchange, undefined, tab.id, tab.noteId);
       if (!editor) return;
       if (typeof timers.current.change === "number") {
         clearTimeout(timers.current?.change);
@@ -198,14 +198,15 @@ export function useEditorController(update: () => void): EditorController {
         return;
       }
 
-      logger(
-        "info",
-        "webview message for tab",
-        message.type,
-        tab.id,
-        message.tabId,
-        useTabStore.getState().currentTab
-      );
+      if (tab.id === message.tabId) {
+        logger(
+          "info",
+          message.type,
+          tab.noteId,
+          "Focused:",
+          tab.id === useTabStore.getState().currentTab
+        );
+      }
 
       const editor = editors[tab.id];
       switch (type) {
