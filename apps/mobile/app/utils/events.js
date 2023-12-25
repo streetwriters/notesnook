@@ -166,3 +166,4 @@ export const eOnRefreshSearch = "612";
 
 export const eOpenAppLockPasswordDialog = "613";
 export const eCloseAppLocKPasswordDailog = "614";
+export const eEditorTabFocused = "613";
