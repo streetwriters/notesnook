@@ -24,7 +24,14 @@ let index = ~~(randomInt() * 0xffffff);
 export function createObjectId(date = Date.now()): string {
   index++;
   const time = Math.floor(date / 1000);
-  return time.toString(16) + PROCESS_UNIQUE + swap16(index).toString(16);
+
+  let timeHex = time.toString(16);
+  if (timeHex.length !== 8) timeHex = timeHex.padStart(2, "0").padEnd(8, "0");
+
+  let incHex = swap16(index).toString(16);
+  if (incHex.length !== 6) incHex = incHex.padStart(6, "0");
+
+  return timeHex + PROCESS_UNIQUE + incHex;
 }
 
 function swap16(val: number) {
