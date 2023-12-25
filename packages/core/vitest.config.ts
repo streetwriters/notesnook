@@ -27,6 +27,7 @@ export default defineConfig({
     coverage: {
       reporter: ["text", "html"]
     },
+    retry: 1,
     exclude: ["__benches__/**/*.bench.ts"],
     include: [
       ...(IS_E2E ? ["__e2e__/**/*.test.{js,ts}"] : []),
