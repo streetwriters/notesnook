@@ -25,7 +25,7 @@ import { CHECK_IDS, EV, EVENTS } from "../src/common";
 import { EventSource } from "event-source-polyfill";
 import { test, expect, vitest } from "vitest";
 import { login } from "./utils";
-import { SqliteDriver } from "kysely";
+import { SqliteDialect } from "kysely";
 import BetterSQLite3 from "better-sqlite3";
 
 const TEST_TIMEOUT = 30 * 1000;
@@ -321,10 +321,14 @@ async function initializeDevice(id, capabilities = []) {
   const device = new Database();
   device.setup({
     storage: new NodeStorageInterface(),
-    sqlite: new SqliteDriver({ database: BetterSQLite3(":memory:") }),
     eventsource: EventSource,
     fs: FS,
-    compressor: Compressor
+    compressor: Compressor,
+    sqliteOptions: {
+      dialect: (name) =>
+        new SqliteDialect({ database: BetterSQLite3(":memory:") })
+    },
+    batchSize: 500
   });
 
   await device.init();
