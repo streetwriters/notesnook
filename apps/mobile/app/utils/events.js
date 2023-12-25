@@ -163,3 +163,4 @@ export const eLoginSessionExpired = "609";
 export const eDBItemUpdate = "610";
 export const eGroupOptionsUpdated = "611";
 export const eOnRefreshSearch = "612";
+export const eEditorTabFocused = "613";

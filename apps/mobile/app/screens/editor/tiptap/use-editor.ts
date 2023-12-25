@@ -49,7 +49,11 @@ import SettingsService from "../../../services/settings";
 import { TipManager } from "../../../services/tip-manager";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
-import { eClearEditor, eOnLoadNote } from "../../../utils/events";
+import {
+  eClearEditor,
+  eEditorTabFocused,
+  eOnLoadNote
+} from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 import { onNoteCreated } from "../../notes/common";
 import Commands from "./commands";
@@ -109,12 +113,11 @@ export const useEditor = (
   const commands = useMemo(() => new Commands(editorRef), [editorRef]);
   const editorSessionHistory = useMemo(() => new SessionHistory(), []);
   const state = useRef<Partial<EditorState>>(defaultState);
-  const placeholderTip = useRef(TipManager.placeholderTip());
   const tags = useTagStore((state) => state.items);
   const insets = useGlobalSafeAreaInsets();
   const isDefaultEditor = editorId === "";
   const saveCount = useRef(0);
-  const lastContentChangeTime = useRef<number>(0);
+  const lastContentChangeTime = useRef<Record<string, number>>({});
   const lock = useRef(false);
   const loadedImages = useRef<Record<string, { [name: string]: boolean }>>({});
   const currentLoadingNoteId = useRef<string>();
@@ -150,7 +153,7 @@ export const useEditor = (
   }, [commands, tags]);
 
   useEffect(() => {
-    const event = eSubscribeEvent("tabsFocused", (tabId) => {
+    const event = eSubscribeEvent(eEditorTabFocused, (tabId) => {
       lastTabFocused.current = tabId as number;
       console.log(tabId);
     });
@@ -194,6 +197,7 @@ export const useEditor = (
         loadedImages.current[noteId] = {};
         currentContents.current[noteId] = null;
         editorSessionHistory.clearSession(noteId);
+        lastContentChangeTime.current[noteId] = 0;
       }
 
       clearTimeout(timers.current["loading-images" + noteId]);
@@ -202,13 +206,12 @@ export const useEditor = (
       loadingState.current = undefined;
       lock.current = false;
       resetContent && postMessage(EditorEvents.title, "", tabId);
-      lastContentChangeTime.current = 0;
+
       resetContent && (await commands.clearContent(tabId));
       resetContent && (await commands.clearTags(tabId));
-      // TODO ?
-      // useTabStore.getState().updateTab(tabId, {
-      //   noteId: undefined
-      // });
+      useTabStore.getState().updateTab(tabId, {
+        noteId: undefined
+      });
     },
     [commands, editorSessionHistory, postMessage]
   );
@@ -264,15 +267,14 @@ export const useEditor = (
         if (!locked) {
           id = await db.notes?.add(noteData);
           if (!note && id) {
-            useTabStore.getState().updateTab(tabId, {
-              noteId: id
-            });
-
             editorSessionHistory.newSession(id);
-
             if (id) {
               currentNotes.current[id] = await db.notes?.note(id);
             }
+
+            useTabStore.getState().updateTab(tabId, {
+              noteId: id
+            });
 
             const defaultNotebook = db.settings.getDefaultNotebook();
             if (!state.current.onNoteCreated && defaultNotebook) {
@@ -285,9 +287,10 @@ export const useEditor = (
             }
 
             if (!noteData.title) {
+              console.log("posting title to tab", tabId);
               postMessage(
                 EditorEvents.title,
-                currentNotes.current?.title,
+                currentNotes.current[id]?.title,
                 tabId
               );
             }
@@ -310,7 +313,7 @@ export const useEditor = (
             tabId
           );
 
-          lastContentChangeTime.current = note.dateEdited;
+          lastContentChangeTime.current[id] = note.dateEdited;
 
           if (
             saveCount.current < 2 ||
@@ -419,7 +422,12 @@ export const useEditor = (
   }, []);
 
   const loadNote = useCallback(
-    async (event: { item?: Note; forced?: boolean; newNote?: boolean }) => {
+    async (event: {
+      item?: Note;
+      forced?: boolean;
+      newNote?: boolean;
+      tabId?: number;
+    }) => {
       state.current.currentlyEditing = true;
       if (
         !state.current.ready &&
@@ -433,56 +441,54 @@ export const useEditor = (
       }
 
       if (event.newNote) {
-        console.log("Create new note");
         useTabStore.getState().focusEmptyTab();
         const tabId = useTabStore.getState().currentTab;
-        console.log("empty tab", tabId);
         currentNotes.current && (await reset(tabId));
         setTimeout(() => {
           if (state.current?.ready) commands.focus(tabId);
-          lastContentChangeTime.current = 0;
         });
       } else {
         if (!event.item) return;
         const item = event.item;
-        console.log("load note called again...", event.forced, event.item.id);
-        // If note was already opened in a tab, focus that tab and return. Once the tab is focused
-        // the note will load.
-        if (useTabStore.getState().hasTabForNote(event.item.id)) {
-          const tabId = useTabStore.getState().getTabForNote(event.item.id);
-          if (typeof tabId === "number") {
-            useTabStore.getState().updateTab(tabId, {
-              readonly: event.item.readonly
+        // If note was already opened in a tab, focus that tab.
+        if (typeof event.tabId !== "number") {
+          if (useTabStore.getState().hasTabForNote(event.item.id)) {
+            const tabId = useTabStore.getState().getTabForNote(event.item.id);
+            if (typeof tabId === "number") {
+              useTabStore.getState().updateTab(tabId, {
+                readonly: event.item.readonly
+              });
+              useTabStore.getState().focusTab(tabId);
+            }
+            console.log("Note already loaded, focusing the tab");
+          } else {
+            console.log("Opening note in preview tab");
+            // Otherwise we focus the preview tab or create one to open the note in.
+            useTabStore.getState().focusPreviewTab(event.item.id, {
+              readonly: event.item.readonly,
+              locked: false
             });
-            useTabStore.getState().focusTab(tabId);
           }
         } else {
-          console.log("opening note in preview tab");
-          // Otherwise we focus the preview tab or create one to open the note in.
-          useTabStore.getState().focusPreviewTab(event.item.id, {
-            readonly: event.item.readonly,
-            locked: false
-          });
-        }
-        const tabId = useTabStore.getState().currentTab;
-        console.log(lastTabFocused.current, tabId);
-        if (lastTabFocused.current !== tabId) {
-          if ((await waitForEvent("tabsFocused", 1000)) !== tabId) {
-            console.log("tab id did not match after focus in 1000ms");
-            return;
+          if (lastTabFocused.current !== event.tabId) {
+            console.log("Focused tab");
+            useTabStore.getState().focusTab(event.tabId);
           }
         }
 
-        // If note is already loaded and forced reload is not requested, return.
-        if (!event.forced && currentNotes.current[item.id]) return;
+        const tabId = event.tabId || useTabStore.getState().currentTab;
+        if (lastTabFocused.current !== tabId) {
+          // if ((await waitForEvent(eEditorTabFocused, 1000)) !== tabId) {
+          //   console.log("tab id did not match after focus in 1000ms");
+          //   return;
+          // }
+          console.log("Waiting for tab to focus");
+          return;
+        }
 
         state.current.movedAway = false;
         state.current.currentlyEditing = true;
 
-        if (!currentNotes.current[item.id]) {
-          // Reset current tab if note isn't already loaded.
-          currentNotes.current && (await reset(tabId, false, false));
-        }
         await loadContent(item);
 
         if (
@@ -491,6 +497,7 @@ export const useEditor = (
           currentContents.current[item.id]?.data &&
           loadingState.current === currentContents.current[item.id]?.data
         ) {
+          // If note is already loading, return.
           return;
         }
 
@@ -499,7 +506,7 @@ export const useEditor = (
           return;
         }
 
-        lastContentChangeTime.current = item.dateEdited;
+        lastContentChangeTime.current[item.id] = item.dateEdited;
         currentLoadingNoteId.current = item.id;
         currentNotes.current[item.id] = item;
 
@@ -516,6 +523,7 @@ export const useEditor = (
         await postMessage(EditorEvents.title, item.title, tabId);
         loadingState.current = currentContents.current[item.id]?.data;
         if (currentContents.current[item.id]?.data) {
+          console.log("loading content for note...");
           await postMessage(
             EditorEvents.html,
             currentContents.current[item.id]?.data,
@@ -570,7 +578,8 @@ export const useEditor = (
 
       const note = await db.notes?.note(noteId);
 
-      if (lastContentChangeTime.current >= (data as Note).dateEdited) return;
+      if (lastContentChangeTime.current[noteId] >= (data as Note).dateEdited)
+        return;
 
       lock.current = true;
 
@@ -595,7 +604,7 @@ export const useEditor = (
         } else {
           const _nextContent = data.data;
           if (_nextContent === currentContents.current?.data) return;
-          lastContentChangeTime.current = note.dateEdited;
+          lastContentChangeTime.current[note.id] = note.dateEdited;
           await postMessage(EditorEvents.updatehtml, _nextContent, tabId);
           if (!isEncryptedContent(data)) {
             currentContents.current[note.id] = data as UnencryptedContentItem;
@@ -660,7 +669,9 @@ export const useEditor = (
       )
         return;
 
-      lastContentChangeTime.current = Date.now();
+      if (noteId) {
+        lastContentChangeTime.current[noteId] = Date.now();
+      }
 
       if (type === EditorEvents.content && noteId) {
         currentContents.current[noteId as string] = {
@@ -718,13 +729,11 @@ export const useEditor = (
     };
   }, [editorId, loadNote, restoreEditorState, isDefaultEditor]);
 
-  const onContentChanged = () => {
-    lastContentChangeTime.current = Date.now();
+  const onContentChanged = (noteId?: string) => {
+    if (noteId) {
+      lastContentChangeTime.current[noteId] = Date.now();
+    }
   };
-
-  useEffect(() => {
-    state.current.saveCount = 0;
-  }, [loading]);
 
   const onReady = useCallback(async () => {
     if (
@@ -734,15 +743,9 @@ export const useEditor = (
         useTabStore.getState().currentTab
       ))
     ) {
-      console.log(
-        "ready failed....",
-        sessionIdRef.current,
-        useTabStore.getState().currentTab
-      );
       eSendEvent("webview_reset", "onReady");
       return false;
     } else {
-      console.log("onReady", "sync tabs");
       syncTabs();
       isDefaultEditor && restoreEditorState();
       return true;
@@ -754,55 +757,43 @@ export const useEditor = (
     clearTimeout(timers.current["editor:loaded"]);
     timers.current["editor:loaded"] = setTimeout(async () => {
       postMessage(EditorEvents.theme, theme);
-
       commands.setInsets(
         isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
       );
       await commands.setSettings();
-      timers.current["editor:loaded"] = setTimeout(async () => {
-        if (!state.current.ready && (await onReady())) {
-          state.current.ready = true;
-        }
-        overlay(false);
 
-        // TODO: Improve handling this on app launch from a link etc.
-        const noteId = useTabStore.getState().getCurrentNoteId();
+      if (!state.current.ready && (await onReady())) {
+        state.current.ready = true;
+      }
+      overlay(false);
 
-        if (noteId) {
-          if (useSettingStore.getState().isAppLoading) {
-            const unsub = useSettingStore.subscribe(async (s) => {
-              if (!s.isAppLoading) {
-                try {
-                  const note = await db.notes.note(noteId);
-                  if (note) {
-                    loadNote({ item: note, forced: true });
-                  } else {
-                    console.log("new note after app load");
-                    loadNote({ newNote: true });
-                    if (tabBarRef.current?.page === 1) {
-                      state.current.currentlyEditing = false;
-                    }
-                  }
-                  unsub();
-                } catch (e) {
-                  console.log(e);
-                }
-              }
-            });
-          } else {
-            const note = await db.notes.note(noteId);
-            if (note) {
-              loadNote({ item: note, forced: true });
-            } else {
-              console.log("new note");
-              loadNote({ newNote: true });
-              if (tabBarRef.current?.page === 1) {
-                state.current.currentlyEditing = false;
-              }
-            }
+      const noteId = useTabStore.getState().getCurrentNoteId();
+      async function restoreTabNote() {
+        if (!noteId) return;
+        const note = await db.notes.note(noteId);
+        if (note) {
+          loadNote({ item: note, forced: true });
+        } else {
+          console.log("Editor loaded with blank note");
+          loadNote({ newNote: true });
+          if (tabBarRef.current?.page === 1) {
+            state.current.currentlyEditing = false;
           }
         }
-      });
+      }
+
+      if (noteId) {
+        if (useSettingStore.getState().isAppLoading) {
+          const unsub = useSettingStore.subscribe(async (state) => {
+            if (!state.isAppLoading) {
+              restoreTabNote();
+              unsub();
+            }
+          });
+        } else {
+          restoreTabNote();
+        }
+      }
     });
   }, [
     onReady,

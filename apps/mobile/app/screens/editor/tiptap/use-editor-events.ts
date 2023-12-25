@@ -54,6 +54,7 @@ import { useUserStore } from "../../../stores/use-user-store";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
+  eEditorTabFocused,
   eOnLoadNote,
   eOpenFullscreenEditor,
   eOpenLoginDialog,
@@ -365,7 +366,7 @@ export const useEditorEvents = (
           logger.info("[WEBVIEW LOG]", editorMessage.value);
           break;
         case EventTypes.contentchange:
-          editor.onContentChanged();
+          editor.onContentChanged(editorMessage.noteId);
           break;
         case EventTypes.selection:
           break;
@@ -481,22 +482,25 @@ export const useEditorEvents = (
         }
         case EventTypes.tabFocused: {
           // Reload the note
-          console.log("Focused tab", editorMessage.tabId);
-          eSendEvent("tabsFocused", editorMessage.tabId);
+          console.log(
+            "Focused tab",
+            editorMessage.tabId,
+            editorMessage.noteId,
+            "Content:",
+            editorMessage.value
+          );
 
-          // const note = await db.notes.note(editorMessage.noteId);
-          // if (note) {
-          //   eSendEvent(eOnLoadNote, {
-          //     item: note,
-          //     forced: true
-          //   });
-          // }
-          // TODO
-          // Handle any updates that occured in an note while the tab was not focused.
-          //  If editor has no content, reload the note, because it might be an app reload
-          // or the tab was destroyed in background...
-          // Maybe cache changes, something like pendingUpdates list.
-          // Do proper cleanup when a tab is destroyed though.
+          eSendEvent(eEditorTabFocused, editorMessage.tabId);
+          if (!editorMessage.value && editorMessage.noteId) {
+            const note = await db.notes.note(editorMessage.noteId);
+            if (note) {
+              eSendEvent(eOnLoadNote, {
+                item: note,
+                forced: true,
+                tabId: editorMessage.tabId
+              });
+            }
+          }
           break;
         }
 
