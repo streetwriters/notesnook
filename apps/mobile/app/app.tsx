@@ -17,14 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import "@azure/core-asynciterator-polyfill";
-import "react-native-gesture-handler";
-import SettingsService from "./services/settings";
 import {
   THEME_COMPATIBILITY_VERSION,
   useThemeEngineStore
 } from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { View } from "react-native";
+import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AppLockedOverlay from "./components/app-lock-overlay";
@@ -32,12 +31,12 @@ import { withErrorBoundry } from "./components/exception-handler";
 import GlobalSafeAreaProvider from "./components/globalsafearea";
 import { useAppEvents } from "./hooks/use-app-events";
 import { ApplicationHolder } from "./navigation";
+import { themeTrpcClient } from "./screens/settings/theme-selector";
 import Notifications from "./services/notifications";
+import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
 import { useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
-import { themeTrpcClient } from "./screens/settings/theme-selector";
-
 const App = () => {
   const init = useAppEvents();
   useEffect(() => {

@@ -46,7 +46,6 @@ import {
 import Navigation from "../../../services/navigation";
 import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
-import { TipManager } from "../../../services/tip-manager";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import {
@@ -67,8 +66,7 @@ import {
   getAppState,
   isContentInvalid,
   isEditorLoaded,
-  post,
-  waitForEvent
+  post
 } from "./utils";
 
 // Keep a fixed session id, dont' change it when a new note is opened, session id can stay the same always I think once the app is opened. DONE
@@ -78,9 +76,20 @@ import {
 // the useEditor hook can recieve save messages for different notes at a time. DONE
 // When a note is created, the useEditor hook must immediately notify the editor with the note id and set the note id in the editor tabs store
 // so further changes will go into that note. DONE
-// Events sent to editor have the tab id value added to ensure the correct tab will recieve and return events only.
+// Events sent to editor have the tab id value added to ensure the correct tab will recieve and return events only. DONE
 // The useEditorEvents hook can manage events from different tabs at the same time as long as the attached session id matches. DONE
 // useEditor hook will keep historySessionId for different notes instead of a single note. DONE
+//
+// LIST OF CASES TO VERIFY WITH TABS OPENING & CLOSING
+// 1. SWITCHING TAB CLOSES THE SHEET. DONE
+// 2. Closing the tab does proper cleanup if it's the last tab and is not empty. DONE
+// 3. Swiping left only focuses editor if current tab is empty. DONE
+// 4. Pressing + button will open a new tab for new note if an empty tab does not exist.
+// 5. Notes will always open in the preview tab.
+// 6. If a note is edited, the tab will become persisted.
+// 7. If note is already opened in a tab, we focus that tab.
+// 8. If app is killed, restore the note in  background.
+// 9. During realtimes sync, tabs not focused will be updated so if focused, they have the latest and updated content loaded.
 
 export const useEditor = (
   editorId = "",
@@ -189,18 +198,17 @@ export const useEditor = (
 
   const reset = useCallback(
     async (tabId: number, resetState = true, resetContent = true) => {
+      console.log("Resetting tab:", tabId);
       const noteId = useTabStore.getState().getNoteIdForTab(tabId);
       if (noteId) {
         currentNotes.current?.id && db.fs().cancel(noteId, "download");
-
         currentNotes.current[noteId] = null;
         loadedImages.current[noteId] = {};
         currentContents.current[noteId] = null;
         editorSessionHistory.clearSession(noteId);
         lastContentChangeTime.current[noteId] = 0;
+        clearTimeout(timers.current["loading-images" + noteId]);
       }
-
-      clearTimeout(timers.current["loading-images" + noteId]);
 
       saveCount.current = 0;
       loadingState.current = undefined;
@@ -225,7 +233,7 @@ export const useEditor = (
       sessionHistoryId: currentSessionHistoryId,
       tabId
     }: SavePayload) => {
-      if (currentNotes.current[id as string]?.readonly) return;
+      if (currentNotes.current[id as string]?.readonly || readonly) return;
       try {
         if (id && !(await db.notes?.note(id))) {
           await reset(tabId);
@@ -332,7 +340,7 @@ export const useEditor = (
         DatabaseLogger.error(e as Error);
       }
     },
-    [commands, editorSessionHistory, postMessage, reset]
+    [commands, editorSessionHistory, postMessage, readonly, reset]
   );
 
   const loadContent = useCallback(
@@ -456,7 +464,7 @@ export const useEditor = (
             const tabId = useTabStore.getState().getTabForNote(event.item.id);
             if (typeof tabId === "number") {
               useTabStore.getState().updateTab(tabId, {
-                readonly: event.item.readonly
+                readonly: event.item.readonly || readonly
               });
               useTabStore.getState().focusTab(tabId);
             }
@@ -465,7 +473,7 @@ export const useEditor = (
             console.log("Opening note in preview tab");
             // Otherwise we focus the preview tab or create one to open the note in.
             useTabStore.getState().focusPreviewTab(event.item.id, {
-              readonly: event.item.readonly,
+              readonly: event.item.readonly || readonly,
               locked: false
             });
           }
@@ -522,15 +530,14 @@ export const useEditor = (
 
         await postMessage(EditorEvents.title, item.title, tabId);
         loadingState.current = currentContents.current[item.id]?.data;
-        if (currentContents.current[item.id]?.data) {
-          console.log("loading content for note...");
-          await postMessage(
-            EditorEvents.html,
-            currentContents.current[item.id]?.data,
-            tabId,
-            10000
-          );
-        }
+
+        await postMessage(
+          EditorEvents.html,
+          currentContents.current[item.id]?.data || "",
+          tabId,
+          10000
+        );
+
         loadingState.current = undefined;
         await commands.setTags(item);
         commands.setSettings();
@@ -548,6 +555,7 @@ export const useEditor = (
       loadContent,
       loadImages,
       postMessage,
+      readonly,
       reset
     ]
   );
@@ -765,15 +773,13 @@ export const useEditor = (
       if (!state.current.ready && (await onReady())) {
         state.current.ready = true;
       }
-      overlay(false);
+      setTimeout(() => overlay(false), 300);
 
       const noteId = useTabStore.getState().getCurrentNoteId();
       async function restoreTabNote() {
         if (!noteId) return;
         const note = await db.notes.note(noteId);
-        if (note) {
-          loadNote({ item: note, forced: true });
-        } else {
+        if (!note) {
           console.log("Editor loaded with blank note");
           loadNote({ newNote: true });
           if (tabBarRef.current?.page === 1) {

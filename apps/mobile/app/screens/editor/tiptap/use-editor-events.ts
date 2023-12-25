@@ -481,7 +481,6 @@ export const useEditorEvents = (
           break;
         }
         case EventTypes.tabFocused: {
-          // Reload the note
           console.log(
             "Focused tab",
             editorMessage.tabId,
@@ -492,15 +491,32 @@ export const useEditorEvents = (
 
           eSendEvent(eEditorTabFocused, editorMessage.tabId);
           if (!editorMessage.value && editorMessage.noteId) {
-            const note = await db.notes.note(editorMessage.noteId);
-            if (note) {
-              eSendEvent(eOnLoadNote, {
-                item: note,
-                forced: true,
-                tabId: editorMessage.tabId
+            if (!useSettingStore.getState().isAppLoading) {
+              const note = await db.notes.note(editorMessage.noteId);
+              if (note) {
+                eSendEvent(eOnLoadNote, {
+                  item: note,
+                  forced: true,
+                  tabId: editorMessage.tabId
+                });
+              }
+            } else {
+              const unsub = useSettingStore.subscribe(async (state) => {
+                if (!state.isAppLoading) {
+                  unsub();
+                  const note = await db.notes.note(editorMessage.noteId);
+                  if (note) {
+                    eSendEvent(eOnLoadNote, {
+                      item: note,
+                      forced: true,
+                      tabId: editorMessage.tabId
+                    });
+                  }
+                }
               });
             }
           }
+
           break;
         }
 

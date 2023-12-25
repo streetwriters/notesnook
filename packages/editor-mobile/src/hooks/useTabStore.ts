@@ -33,10 +33,17 @@ export type TabItem = {
   readonly?: boolean;
 };
 
+type NoteState = {
+  top: number;
+  to: number;
+  from: number;
+};
+
 export type TabStore = {
   tabs: TabItem[];
   currentTab: number;
   scrollPosition: Record<number, number>;
+  noteState: Record<string, NoteState>;
   updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => void;
   removeTab: (index: number) => void;
   moveTab: (index: number, toIndex: number) => void;
@@ -53,6 +60,7 @@ export type TabStore = {
   ) => void;
   getCurrentNoteId: () => string | undefined;
   getTab: (tabId: number) => TabItem | undefined;
+  setNoteState: (noteId: string, state: Partial<NoteState>) => void;
 };
 
 function getId(id: number, tabs: TabItem[]): number {
@@ -66,6 +74,7 @@ function getId(id: number, tabs: TabItem[]): number {
 export const useTabStore = create(
   persist<TabStore>(
     (set, get) => ({
+      noteState: {},
       tabs: [
         {
           id: 0,
@@ -74,6 +83,18 @@ export const useTabStore = create(
       ],
       currentTab: 0,
       scrollPosition: {},
+      setNoteState: (noteId: string, state: Partial<NoteState>) => {
+        const noteState = {
+          ...get().noteState
+        };
+        noteState[noteId] = {
+          ...get().noteState[noteId],
+          ...state
+        };
+        set({
+          noteState
+        });
+      },
       updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => {
         const index = get().tabs.findIndex((t) => t.id === id);
         if (index == -1) return;

@@ -146,16 +146,22 @@ export function isContentInvalid(content: string | undefined) {
   );
 }
 
+const canRestoreAppState = (appState: AppState) => {
+  return (
+    appState.editing &&
+    !appState.note?.locked &&
+    appState.note?.id &&
+    Date.now() < appState.timestamp + 3600000
+  );
+};
+
+let appState: AppState | undefined;
 export function getAppState() {
+  if (appState && canRestoreAppState(appState)) return appState as AppState;
   const json = MMKV.getString("appState");
   if (json) {
-    const appState = JSON.parse(json) as AppState;
-    if (
-      appState.editing &&
-      !appState.note?.locked &&
-      appState.note?.id &&
-      Date.now() < appState.timestamp + 3600000
-    ) {
+    appState = JSON.parse(json) as AppState;
+    if (canRestoreAppState(appState)) {
       return appState;
     } else {
       return null;
@@ -165,5 +171,6 @@ export function getAppState() {
 }
 
 export function clearAppState() {
+  appState = undefined;
   MMKV.removeItem("appState");
 }

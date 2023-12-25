@@ -31,14 +31,18 @@ import {
   forwardRef,
   memo,
   useCallback,
-  useEffect,
   useLayoutEffect,
   useRef,
   useState
 } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
-import { TabStore, useTabContext, useTabStore } from "../hooks/useTabStore";
+import {
+  TabItem,
+  TabStore,
+  useTabContext,
+  useTabStore
+} from "../hooks/useTabStore";
 import { EmotionEditorToolbarTheme } from "../theme-factory";
 import { EventTypes, Settings } from "../utils";
 import Header from "./header";
@@ -49,12 +53,18 @@ import Title from "./title";
 globalThis.toBlobURL = toBlobURL;
 
 const Tiptap = ({ settings }: { settings: Settings }) => {
+  const { colors } = useThemeColors();
   const tab = useTabContext();
   const isFocused = useTabStore((state) => state.currentTab === tab?.id);
   const [tick, setTick] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState(false);
+  const noteStateUpdateTimer = useRef<NodeJS.Timeout>();
+  const tabRef = useRef<TabItem>(tab);
+  const isFocusedRef = useRef<boolean>(false);
+  tabRef.current = tab;
+
   usePermissionHandler({
     claims: {
       premium: settings.premium
@@ -95,6 +105,21 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
       copyToClipboard: (text) => {
         globalThis.editorControllers[tab.id]?.copyToClipboard(text);
       },
+      onSelectionUpdate: () => {
+        if (tab.noteId) {
+          const noteId = tab.noteId;
+          clearTimeout(noteStateUpdateTimer.current);
+          noteStateUpdateTimer.current = setTimeout(() => {
+            if (tab.noteId !== noteId) return;
+            const { to, from } =
+              editors[tabRef.current?.id]?.state.selection || {};
+            useTabStore.getState().setNoteState(noteId, {
+              to,
+              from
+            });
+          }, 500);
+        }
+      },
       downloadOptions: {
         corsHost: settings.corsProxy
       },
@@ -106,12 +131,33 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
 
   const update = useCallback(() => {
     setTick((tick) => tick + 1);
-    containerRef.current?.scrollTo?.({
-      left: 0,
-      top: 0
+    setTimeout(() => {
+      const noteState = tabRef.current.noteId
+        ? useTabStore.getState().noteState[tabRef.current.noteId]
+        : undefined;
+      const top = noteState?.top;
+
+      if (noteState?.to || noteState?.from) {
+        editors[tabRef.current.id]?.chain().setTextSelection({
+          to: noteState.to,
+          from: noteState.from
+        });
+      }
+
+      containerRef.current?.scrollTo({
+        left: 0,
+        top: top || 0,
+        behavior: "auto"
+      });
+    }, 32);
+
+    globalThis.editorControllers[tabRef.current.id]?.setTitlePlaceholder(
+      "Note title"
+    );
+    setTimeout(() => {
+      editorControllers[tabRef.current.id]?.setLoading(false);
     });
-    globalThis.editorControllers[tab.id]?.setTitlePlaceholder("Note title");
-  }, [tab.id]);
+  }, []);
 
   const controller = useEditorController(update);
   const controllerRef = useRef(controller);
@@ -122,33 +168,57 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
   useLayoutEffect(() => {
     setLayout(true);
     const updateScrollPosition = (state: TabStore) => {
-      if (state.currentTab === tab.id) {
-        const position = state.scrollPosition[tab?.id];
-        if (position) {
+      if (isFocusedRef.current) return;
+      if (state.currentTab === tabRef.current.id) {
+        isFocusedRef.current = true;
+        const noteState = tabRef.current.noteId
+          ? state.noteState[tabRef.current.noteId]
+          : undefined;
+        if (noteState) {
           containerRef.current?.scrollTo({
             left: 0,
-            top: position,
+            top: noteState.top,
             behavior: "auto"
           });
+          if (noteState.to || noteState.from) {
+            editors[tabRef.current.id]?.chain().setTextSelection({
+              to: noteState.to,
+              from: noteState.from
+            });
+          }
         }
+
+        if (
+          !globalThis.editorControllers[tabRef.current.id]?.content.current &&
+          tabRef.current.noteId
+        ) {
+          editorControllers[tabRef.current.id]?.setLoading(true);
+        }
+
         post(
           EventTypes.tabFocused,
-          !!globalThis.editorControllers[tab.id]?.content.current,
-          tab.id,
+          !!globalThis.editorControllers[tabRef.current.id]?.content.current,
+          tabRef.current.id,
           state.getCurrentNoteId()
         );
+        editorControllers[tabRef.current.id]?.updateTab();
+      } else {
+        isFocusedRef.current = false;
       }
     };
 
     updateScrollPosition(useTabStore.getState());
     const unsub = useTabStore.subscribe((state, prevState) => {
+      if (state.currentTab !== tabRef.current.id) {
+        isFocusedRef.current = false;
+      }
       if (state.currentTab === prevState.currentTab) return;
       updateScrollPosition(state);
     });
     return () => {
       unsub();
     };
-  }, [tab.id]);
+  }, []);
 
   const onClickEmptyArea: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (event) => {
@@ -230,6 +300,7 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
           settings={settings}
           noHeader={settings.noHeader || false}
         />
+
         <div
           onScroll={controller.scroll}
           ref={containerRef}
@@ -254,6 +325,52 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
               <StatusBar container={containerRef} />
             </>
           )}
+
+          {controller.loading ? (
+            <div
+              style={{
+                height: "100%",
+                width: "100%",
+                position: "absolute",
+                zIndex: 999,
+                backgroundColor: "white",
+                paddingRight: 12,
+                paddingLeft: 12,
+                display: "flex",
+                flexDirection: "column"
+              }}
+            >
+              <div
+                style={{
+                  height: 16,
+                  width: "94%",
+                  backgroundColor: colors.secondary.background,
+                  borderRadius: 5,
+                  marginTop: 10
+                }}
+              />
+
+              <div
+                style={{
+                  height: 16,
+                  width: "94%",
+                  backgroundColor: colors.secondary.background,
+                  borderRadius: 5,
+                  marginTop: 10
+                }}
+              />
+
+              <div
+                style={{
+                  height: 16,
+                  width: 200,
+                  backgroundColor: colors.secondary.background,
+                  borderRadius: 5,
+                  marginTop: 10
+                }}
+              />
+            </div>
+          ) : null}
 
           <ContentDiv
             padding={settings.doubleSpacedLines ? 0 : 6}

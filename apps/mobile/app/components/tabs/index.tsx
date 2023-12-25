@@ -22,6 +22,7 @@ import React, {
   RefObject,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState
 } from "react";
@@ -36,7 +37,7 @@ import Animated, {
   WithSpringConfig,
   withTiming
 } from "react-native-reanimated";
-import { editorState } from "../../screens/editor/tiptap/utils";
+import { getAppState } from "../../screens/editor/tiptap/utils";
 import { eSendEvent } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eClearEditor } from "../../utils/events";
@@ -75,12 +76,19 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
   }: TabProps,
   ref
 ) {
+  const appState = useMemo(() => getAppState(), []);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
-  const translateX = useSharedValue(widths ? widths.a : 0);
+  const translateX = useSharedValue(
+    widths
+      ? appState && !appState?.movedAway
+        ? widths.a + widths.b
+        : widths.a
+      : 0
+  );
   const startX = useSharedValue(0);
   const currentTab = useSharedValue(1);
   const previousTab = useSharedValue(1);
@@ -111,9 +119,8 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
         translateX.value = 0;
       } else {
         if (prevWidths.current?.a !== widths.a) {
-          translateX.value = editorState().movedAway
-            ? widths.a
-            : editorPosition;
+          translateX.value =
+            !appState || appState?.movedAway ? widths.a : editorPosition;
         }
       }
       isLoaded.current = true;
@@ -141,7 +148,8 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
     isDrawerOpen,
     homePosition,
     onDrawerStateChange,
-    editorPosition
+    editorPosition,
+    appState
   ]);
 
   useImperativeHandle(

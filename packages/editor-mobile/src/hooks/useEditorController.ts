@@ -103,20 +103,29 @@ export type EditorController = {
   setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
   countWords: (ms: number) => void;
   copyToClipboard: (text: string) => void;
+  updateTab: () => void;
+  loading: boolean;
+  setLoading: (value: boolean) => void;
 };
 
 export function useEditorController(update: () => void): EditorController {
   const tab = useTabContext();
+  const [loading, setLoading] = useState(true);
   const setTheme = useThemeEngineStore((store) => store.setTheme);
   const { colors } = useThemeColors("editor");
   const [title, setTitle] = useState("");
   const [titlePlaceholder, setTitlePlaceholder] = useState("Note title");
   const htmlContentRef = useRef<string | null>(null);
+  const updateTabOnFocus = useRef(false);
   const timers = useRef<Timers>({
     selectionChange: null,
     change: null,
     wordCounter: null
   });
+
+  if (!tab.noteId && loading) {
+    setLoading(false);
+  }
 
   const selectionChange = useCallback((_editor: Editor) => {}, []);
 
@@ -172,9 +181,11 @@ export function useEditorController(update: () => void): EditorController {
   const scroll = useCallback(
     (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {
       if (!tab) return;
-      useTabStore
-        .getState()
-        .setScrollPosition(tab.id, _event.currentTarget.scrollTop);
+      if (tab.noteId) {
+        useTabStore.getState().setNoteState(tab.noteId, {
+          top: _event.currentTarget.scrollTop
+        });
+      }
     },
     [tab]
   );
@@ -208,25 +219,30 @@ export function useEditorController(update: () => void): EditorController {
       switch (type) {
         case "native:updatehtml": {
           htmlContentRef.current = value;
-          if (!editor) break;
-          const { from, to } = editor.state.selection;
+          if (tab.id !== useTabStore.getState().currentTab) {
+            updateTabOnFocus.current = true;
+          } else {
+            if (!editor) break;
+            const { from, to } = editor.state.selection;
+            editor?.commands.setContent(htmlContentRef.current, false, {
+              preserveWhitespace: true
+            });
 
-          editor?.commands.setContent(htmlContentRef.current, false, {
-            preserveWhitespace: true
-          });
+            editor.commands.setTextSelection({
+              from,
+              to
+            });
+            countWords(0);
+          }
 
-          editor.commands.setTextSelection({
-            from,
-            to
-          });
-          countWords();
           break;
         }
         case "native:html":
           // logger("info", "loading html", htmlContentRef.current);
           htmlContentRef.current = value;
+          if (!editor) break;
           update();
-          countWords();
+          countWords(0);
           break;
         case "native:theme":
           setTheme(message.value);
@@ -305,6 +321,8 @@ export function useEditorController(update: () => void): EditorController {
     selectionChange,
     titleChange,
     scroll,
+    loading,
+    setLoading,
     title,
     setTitle,
     titlePlaceholder,
@@ -316,6 +334,26 @@ export function useEditorController(update: () => void): EditorController {
     openLink,
     onUpdate: onUpdate,
     countWords,
-    copyToClipboard
+    copyToClipboard,
+    updateTab: () => {
+      // When the tab is focused, we apply any updates to content that were recieved when
+      // the tab was not focused.
+      updateTabOnFocus.current = false;
+      setTimeout(() => {
+        if (!updateTabOnFocus.current) return;
+        const editor = editors[tab.id];
+        if (!editor) return;
+        const { from, to } = editor.state.selection;
+        editor?.commands.setContent(htmlContentRef.current, false, {
+          preserveWhitespace: true
+        });
+        editor.commands.setTextSelection({
+          from,
+          to
+        });
+        countWords();
+        logger("info", `Tab ${tab.id} updated.`);
+      }, 1);
+    }
   };
 }
