@@ -59,7 +59,8 @@ export class AutoSync {
       item &&
       (item.remote ||
         ("localOnly" in item && item.localOnly) ||
-        ("failed" in item && item.failed) || ("dateUploaded" in item && item.dateUploaded))
+        ("failed" in item && item.failed) ||
+        ("dateUploaded" in item && item.dateUploaded))
     )
       return;
 
