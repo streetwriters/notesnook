@@ -95,7 +95,7 @@ class Commands {
       `
     const editor = editors[${tabId}];
     const editorTitle = editorTitles[${tabId}];
-    editor && editor.commands.blur();
+    typeof editor !== "undefined" && editor.commands.blur();
     typeof editorTitle !== "undefined" && editorTitle.current && editorTitle.current.blur();
   `,
       "blur"
@@ -110,7 +110,10 @@ const editorController = editorControllers[${tabId}];
 const editorTitle = editorTitles[${tabId}];
 const statusBar = statusBars[${tabId}];
 
-editor.commands.blur();
+if (typeof editor !== "undefined") {
+  editor.commands.blur();
+}
+
 typeof editorTitle !== "undefined" && editorTitle.current && editorTitle.current?.blur();
 if (editorController.content) editorController.content.current = null;
 editorController.onUpdate();

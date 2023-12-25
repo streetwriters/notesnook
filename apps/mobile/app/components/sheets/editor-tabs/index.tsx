@@ -20,14 +20,15 @@ import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
 import { useDBItem } from "../../../hooks/use-db-item";
+import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
+import { editorController } from "../../../screens/editor/tiptap/utils";
 import { presentSheet } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { PressableButton } from "../../ui/pressable";
-import Paragraph from "../../ui/typography/paragraph";
 import Heading from "../../ui/typography/heading";
-import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
+import Paragraph from "../../ui/typography/paragraph";
 
 type TabItem = {
   id: number;
@@ -55,6 +56,7 @@ const TabItemComponent = (props: {
       onPress={() => {
         if (!props.isFocused) {
           useTabStore.getState().focusTab(props.tab.id);
+          props.close?.();
         }
       }}
     >
@@ -82,7 +84,13 @@ const TabItemComponent = (props: {
         size={SIZE.lg}
         color={colors.primary.icon}
         onPress={() => {
+          const isLastTab = useTabStore.getState().tabs.length === 1;
           useTabStore.getState().removeTab(props.tab.id);
+          // The last tab is not actually removed, it is just cleaned up.
+          if (isLastTab) {
+            editorController.current?.reset(props.tab.id, true, true);
+            props.close?.();
+          }
         }}
         top={0}
         left={0}
@@ -121,7 +129,10 @@ export default function EditorTabs({
         <Heading size={SIZE.lg}>Tabs</Heading>
         <Button
           onPress={() => {
-            useTabStore.getState().newTab();
+            close?.();
+            setTimeout(() => {
+              useTabStore.getState().newTab();
+            }, 300);
           }}
           title="New tab"
           icon="plus"
