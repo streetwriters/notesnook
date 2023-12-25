@@ -75,16 +75,17 @@ export const AboutSettings: SettingsGroup[] = [
       {
         key: "source-code",
         title: "Source code",
-        description: "All the source code for Notesnook is available & open for everyone on GitHub.",
+        description:
+          "All the source code for Notesnook is available & open for everyone on GitHub.",
         components: [
           {
             type: "button",
             action: () => {
-                window.open(
-                  "https://github.com/streetwriters/notesnook",
-                  "_blank"
-                );
-              },
+              window.open(
+                "https://github.com/streetwriters/notesnook",
+                "_blank"
+              );
+            },
             title: "View source code",
             variant: "secondary"
           }
@@ -231,6 +232,23 @@ export const LegalSettings: SettingsGroup[] = [
             action: () =>
               void window.open("https://notesnook.com/terms", "_blank"),
             title: "Read terms",
+            variant: "secondary"
+          }
+        ]
+      },
+      {
+        key: "liscense",
+        title: "License",
+        description: "GNU GENERAL PUBLIC LICENSE Version 3",
+        components: [
+          {
+            type: "button",
+            action: () =>
+              void window.open(
+                "https://github.com/streetwriters/notesnook/blob/master/LICENSE",
+                "_blank"
+              ),
+            title: "Read License",
             variant: "secondary"
           }
         ]
