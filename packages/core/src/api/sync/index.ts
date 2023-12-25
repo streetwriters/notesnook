@@ -54,7 +54,8 @@ export default class SyncManager {
 
   async start(options: SyncOptions) {
     try {
-      await this.sync.autoSync.start();
+      if (await checkSyncStatus(SYNC_CHECK_IDS.autoSync))
+        await this.sync.autoSync.start();
       await this.sync.start(options);
       return true;
     } catch (e) {
@@ -157,7 +158,6 @@ class Sync {
 
     this.connection.onclose((error = new Error("Connection closed.")) => {
       this.db.eventManager.publish(EVENTS.syncAborted);
-      console.error(error);
       this.logger.error(error);
       throw new Error("Connection closed.");
     });
@@ -180,6 +180,7 @@ class Sync {
 
     if (!(await checkSyncStatus(SYNC_CHECK_IDS.autoSync))) {
       await this.connection.stop();
+      this.autoSync.stop();
     }
   }
 
