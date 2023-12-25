@@ -53,9 +53,7 @@ test(
 
       const monographId = await db.monographs.publish(id);
 
-      expect(
-        (await db.monographs.all()).find((m) => m.id === id)
-      ).toBeDefined();
+      expect(await db.monographs.all.has(id)).toBeTruthy();
 
       const monograph = await db.monographs.get(monographId);
       const note = await db.notes.note(id);
@@ -98,14 +96,10 @@ test(
       await db.monographs.refresh();
 
       await db.monographs.publish(id);
-      expect(
-        (await db.monographs.all()).find((m) => m.id === id)
-      ).toBeDefined();
+      expect(await db.monographs.all.has(id)).toBeTruthy();
 
       await db.monographs.unpublish(id);
-      expect(
-        (await db.monographs.all()).find((m) => m.id === id)
-      ).toBeUndefined();
+      expect(await db.monographs.all.has(id)).toBeFalsy();
 
       await logout(db);
     }),

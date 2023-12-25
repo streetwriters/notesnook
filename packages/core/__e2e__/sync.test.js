@@ -48,7 +48,10 @@ test(
     deviceB.eventManager.subscribe(EVENTS.syncProgress, onSyncProgress);
 
     await deviceC.notes.add({ title: "new note 1" });
-    await syncAndWait(deviceC, deviceC);
+
+    await deviceC.sync(true);
+    await deviceA.sync(true);
+    await deviceB.sync(true);
 
     expect(types.every((t) => t === "download")).toBe(true);
 
@@ -74,6 +77,7 @@ test(
     });
 
     await syncAndWait(deviceA, deviceB);
+    await deviceA.sync(true);
 
     expect(await deviceA.notes.note(note2Id)).toBeTruthy();
     expect(await deviceB.notes.note(note1Id)).toBeTruthy();
@@ -326,7 +330,9 @@ async function initializeDevice(id, capabilities = []) {
     compressor: Compressor,
     sqliteOptions: {
       dialect: (name) =>
-        new SqliteDialect({ database: BetterSQLite3(":memory:") })
+        new SqliteDialect({
+          database: BetterSQLite3(":memory:").unsafeMode(true)
+        })
     },
     batchSize: 500
   });
@@ -367,24 +373,18 @@ function syncAndWait(deviceA, deviceB, force = false) {
   return new Promise((resolve, reject) => {
     const ref2 = deviceB.eventManager.subscribe(
       EVENTS.databaseSyncRequested,
-      (full, force, lastSynced) => {
-        console.log("sync requested by device A", full, force, lastSynced);
+      (full, force) => {
+        if (!full) return;
+        console.log("sync requested by device A", full, force);
         ref2.unsubscribe();
         deviceB
           .sync({
             type: full ? "full" : "send",
-            force,
-            serverLastSynced: lastSynced
+            force
           })
           .catch(reject);
       }
     );
-
-    const ref = deviceB.eventManager.subscribe(EVENTS.syncCompleted, () => {
-      ref.unsubscribe();
-      console.log("sync completed.");
-      resolve();
-    });
 
     console.log(
       "waiting for sync...",

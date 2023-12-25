@@ -50,7 +50,9 @@ function databaseTest() {
     compressor: Compressor,
     sqliteOptions: {
       dialect: (name) =>
-        new SqliteDialect({ database: BetterSQLite3(":memory:") })
+        new SqliteDialect({
+          database: BetterSQLite3(":memory:").unsafeMode(true)
+        })
     },
     batchSize: 500
   });
