@@ -32,7 +32,10 @@ export const useReminderStore = create<ReminderStore>((set) => ({
   reminders: [],
   setReminders: () => {
     set({
-      reminders: groupReminders((db.reminders?.all as Reminder[]) || [])
+      reminders: groupReminders(
+        (db.reminders?.all as Reminder[]) || [],
+        db.settings?.getGroupOptions("reminders")
+      )
     });
   },
   cleareReminders: () => set({ reminders: [] })

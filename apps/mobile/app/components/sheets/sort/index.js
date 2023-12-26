@@ -88,10 +88,14 @@ const Sort = ({ type, screen }) => {
               ? groupOptions.groupBy === "abc" ||
                 groupOptions.sortBy === "title"
                 ? "A - Z"
+                : groupOptions.sortBy === "dueDate"
+                ? "Earliest first"
                 : "Old - New"
               : groupOptions.groupBy === "abc" ||
                 groupOptions.sortBy === "title"
               ? "Z - A"
+              : groupOptions.sortBy === "dueDate"
+              ? "Latest first"
               : "New - Old"
           }
           icon={
@@ -142,6 +146,7 @@ const Sort = ({ type, screen }) => {
           />
         ) : (
           Object.keys(SORT).map((item) =>
+            (item === "dueDate" && screen !== "Reminders") ||
             (item === "title" && groupOptions.groupBy !== "none") ||
             ((screen !== "Tags" || screen !== "Reminders") &&
               item === "dateModified") ||
