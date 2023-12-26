@@ -20,15 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import BaseStore from "./index";
 
-/**
- * @extends {BaseStore<SelectionStore>}
- */
-class SelectionStore extends BaseStore {
-  selectedItems = [];
+class SelectionStore extends BaseStore<SelectionStore> {
+  selectedItems: string[] = [];
   shouldSelectAll = false;
   isSelectionMode = false;
 
-  toggleSelectionMode = (toggleState) => {
+  toggleSelectionMode = (toggleState?: boolean) => {
     this.set((state) => {
       const isSelectionMode =
         toggleState !== undefined ? toggleState : !state.isSelectionMode;
@@ -38,21 +35,19 @@ class SelectionStore extends BaseStore {
     });
   };
 
-  selectItem = (item) => {
-    console.log(this.get().selectedItems, item);
-    const index = this.get().selectedItems.findIndex((v) => item === v);
+  selectItem = (id: string) => {
     this.set((state) => {
-      if (index <= -1) {
-        state.selectedItems.push(item);
+      if (!state.selectedItems.includes(id)) {
+        state.selectedItems.push(id);
       }
     });
   };
 
-  deselectItem = (item) => {
+  deselectItem = (id: string) => {
     this.set((state) => {
-      const index = state.selectedItems.findIndex((v) => item === v);
-      if (index >= 0) {
-        state.selectedItems.splice(index, 1);
+      const itemAt = state.selectedItems.indexOf(id);
+      if (itemAt >= 0) {
+        state.selectedItems.splice(itemAt, 1);
       }
     });
 
@@ -61,12 +56,12 @@ class SelectionStore extends BaseStore {
     }
   };
 
-  isSelected = (item) => {
-    return this.get().selectedItems.indexOf(item) > -1;
+  isSelected = (id: string) => {
+    return this.get().selectedItems.indexOf(id) > -1;
   };
 
-  setSelectedItems = (items) => {
-    this.set((state) => (state.selectedItems = items));
+  setSelectedItems = (ids: string[]) => {
+    this.set((state) => (state.selectedItems = ids));
   };
 
   selectAll = () => {

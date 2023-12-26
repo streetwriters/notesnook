@@ -98,28 +98,42 @@ function ListContainer(props: ListContainerProps) {
   }, []);
 
   const { onFocus, onMouseDown, onKeyDown } = useKeyboardListNavigation({
-    length: items.ids.length,
+    length: items.length,
     reset: () => toggleSelection(false),
-    deselect: (index) => deselectItem(items.ids[index]),
-    select: (index, toggleable) =>
-      toggleable && isSelected(items.ids[index])
-        ? deselectItem(items.ids[index])
-        : selectItem(items.ids[index]),
-    bulkSelect: (indices) => setSelectedItems(indices.map((i) => items.ids[i])),
+    deselect: (index) => {
+      const id = items.cacheItem(index)?.item.id;
+      if (!id) return;
+      deselectItem(id);
+    },
+    select: (index, toggleable) => {
+      const id = items.cacheItem(index)?.item.id;
+      if (!id) return;
+      if (toggleable && isSelected(id)) deselectItem(id);
+      else selectItem(id);
+    },
+    bulkSelect: async (indices) => {
+      const ids =
+        indices.length === items.length
+          ? await items.ids()
+          : (indices
+              .map((i) => items.cacheItem(i)?.item.id)
+              .filter(Boolean) as string[]);
+      setSelectedItems(ids);
+    },
     focusItemAt: (index) => {
-      const item = items.ids[index];
-      if (!item || !listRef.current) return;
+      const id = items.cacheItem(index)?.item.id;
+      if (!id || !listRef.current) return;
 
-      waitForElement(listRef.current, index, `id_${item}`, (element) =>
+      waitForElement(listRef.current, index, `id_${id}`, (element) =>
         element.focus()
       );
     },
-    skip: (index) => !items.ids[index] || isGroupHeader(items.ids[index]),
+    skip: () => false,
     open: (index) => {
-      const item = items.ids[index];
-      if (!item || !listRef.current) return;
+      const id = items.cacheItem(index)?.item.id;
+      if (!id || !listRef.current) return;
 
-      waitForElement(listRef.current, index, `id_${item}`, (element) =>
+      waitForElement(listRef.current, index, `id_${id}`, (element) =>
         element.click()
       );
     }
@@ -127,7 +141,7 @@ function ListContainer(props: ListContainerProps) {
 
   return (
     <Flex variant="columnFill" sx={{ overflow: "hidden" }}>
-      {!props.items.ids.length && props.placeholder ? (
+      {!props.items.length && props.placeholder ? (
         <>
           {header}
           {props.isLoading ? (
@@ -149,7 +163,7 @@ function ListContainer(props: ListContainerProps) {
               ref={listRef}
               computeItemKey={(index) => items.key(index)}
               defaultItemHeight={DEFAULT_ITEM_HEIGHT}
-              totalCount={items.ids.length}
+              totalCount={items.length}
               onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
               components={{
@@ -210,7 +224,7 @@ type ListContext = {
   group: GroupingKey | undefined;
   refresh: () => void;
   focusedGroupIndex: number;
-  selectItems: (items: any) => void;
+  selectItems: (items: string[]) => void;
   scrollToIndex?: (
     index: number,
     options?: ScrollToOptions | undefined
@@ -282,17 +296,21 @@ function ItemRenderer({
           title={resolvedItem.group.title}
           isFocused={index === focusedGroupIndex}
           index={index}
-          onSelectGroup={() => {
-            let endIndex;
-            for (let i = index + 1; i < items.ids.length; ++i) {
-              if (typeof items.ids[i] === "object") {
-                endIndex = i;
-                break;
-              }
-            }
+          onSelectGroup={async () => {
+            if (!items.groups) return;
+
+            const groups = await items.groups();
+            const groupIndex = groups.findIndex((g) => g.index === index);
+            if (groupIndex < 0) return;
+
+            const nextGroupIndex =
+              groups[groupIndex + 1]?.index || items.length;
+
+            const ids = await items.ids();
+
             selectItems([
               ...selectionStore.get().selectedItems,
-              ...items.ids.slice(index, endIndex || items.ids.length)
+              ...ids.slice(index, nextGroupIndex)
             ]);
           }}
           groups={async () => (items.groups ? items.groups() : [])}
