@@ -96,14 +96,12 @@ function encodeLine(line: string) {
 
 async function initDatabase(notes = true) {
   if (!db.isInitialized) {
-    await db.initCollections();
-  }
-  if (notes) {
-    await db.notes?.init();
+    await db.init();
   }
 }
 
 const onEvent = async ({ type, detail }: Event) => {
+  await initDatabase();
   const { notification, pressAction, input } = detail;
   if (type === EventType.DELIVERED && Platform.OS === "android") {
     if (notification?.id) {
@@ -111,8 +109,11 @@ const onEvent = async ({ type, detail }: Event) => {
         notification?.id?.split("_")[0]
       );
 
-      if (reminder && reminder.recurringMode === "month") {
-        await initDatabase();
+      if (
+        reminder &&
+        (reminder.recurringMode === "month" ||
+          reminder?.recurringMode === "year")
+      ) {
         await scheduleNotification(reminder);
       }
     }
@@ -123,7 +124,6 @@ const onEvent = async ({ type, detail }: Event) => {
     notifee.decrementBadgeCount();
     if (notification?.data?.type === "quickNote") return;
     MMKV.removeItem("appState");
-    await initDatabase();
     if (notification?.data?.type === "reminder" && notification?.id) {
       const reminder = db.reminders?.reminder(notification.id?.split("_")[0]);
       if (!reminder) return;
@@ -143,7 +143,6 @@ const onEvent = async ({ type, detail }: Event) => {
     notifee.decrementBadgeCount();
     switch (pressAction?.id) {
       case "REMINDER_SNOOZE": {
-        await initDatabase();
         if (!notification?.id) break;
         const reminder = await db.reminders?.reminder(
           notification?.id?.split("_")[0]
@@ -165,7 +164,6 @@ const onEvent = async ({ type, detail }: Event) => {
         break;
       }
       case "REMINDER_DISABLE": {
-        await initDatabase();
         if (!notification?.id) break;
         const reminder = await db.reminders?.reminder(
           notification?.id?.split("_")[0]
@@ -183,7 +181,6 @@ const onEvent = async ({ type, detail }: Event) => {
         break;
       }
       case "UNPIN": {
-        await initDatabase();
         if (!notification?.id) break;
         remove(notification?.id as string);
         const reminder = db.reminders?.reminder(
@@ -213,8 +210,6 @@ const onEvent = async ({ type, detail }: Event) => {
           reply_button_text: "Take note",
           reply_placeholder_text: "Write something..."
         });
-        if (!db.isInitialized) await db.init();
-        await db.notes?.init();
 
         const id = await db.notes?.add({
           content: {
@@ -398,7 +393,7 @@ async function scheduleNotification(
       );
     }
   } catch (e) {
-    console.log(e);
+    console.log("Schedule notification", e);
   }
 }
 
@@ -741,6 +736,41 @@ async function getTriggers(
           }
 
           break;
+        case "year":
+          let timestamp = dayjs()
+            .month(relativeTime.month())
+            .date(relativeTime.date())
+            .hour(relativeTime.hour())
+            .minute(relativeTime.minute());
+
+          // Timestamp must always be in future.
+          if (timestamp.isBefore(dayjs())) {
+            do {
+              timestamp = timestamp.add(1, "year");
+            } while (timestamp.isBefore(dayjs()));
+          }
+
+          if (Platform.OS === "ios") {
+            triggers.push({
+              timestamp: timestamp.toDate().getTime() as number,
+              type: TriggerType.TIMESTAMP,
+              repeatFrequency: RepeatFrequency.YEARLY,
+              id: `${reminder.id}`,
+              alarmManager: {
+                allowWhileIdle: true
+              }
+            });
+          } else {
+            triggers.push({
+              timestamp: timestamp.toDate().getTime() as number,
+              type: TriggerType.TIMESTAMP,
+              id: reminder.id,
+              alarmManager: {
+                allowWhileIdle: true
+              }
+            });
+          }
+          break;
       }
     }
   }
@@ -837,11 +867,14 @@ async function pinQuickNote(launch: boolean) {
 async function setupReminders(checkNeedsScheduling = false) {
   const reminders = ((await db.reminders?.all.items()) as Reminder[]) || [];
   const triggers = await notifee.getTriggerNotifications();
-
   for (const reminder of reminders) {
     if (reminder.mode === "permanent") {
       await scheduleNotification(reminder);
     }
+
+    // Skip reminders that are not repeating and their trigger date is in past.
+    if (reminder.mode === "once" && dayjs().isAfter(reminder.date)) continue;
+
     const pending = triggers.filter((t) =>
       t.notification.id?.startsWith(reminder.id)
     );
@@ -853,6 +886,7 @@ async function setupReminders(checkNeedsScheduling = false) {
           reminder.dateModified
         : true;
     }
+
     if (!needsReschedule && checkNeedsScheduling) continue;
 
     await scheduleNotification(reminder);

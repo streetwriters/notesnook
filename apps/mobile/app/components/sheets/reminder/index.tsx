@@ -68,8 +68,10 @@ const ReminderModes =
 const RecurringModes = {
   Daily: "day",
   Week: "week",
-  Month: "month"
+  Month: "month",
+  Year: "year"
 };
+
 const WeekDays = new Array(7).fill(true);
 const MonthDays = new Array(31).fill(true);
 const WeekDayNames = {
@@ -168,6 +170,7 @@ export default function ReminderSheet({
       if (
         reminderMode === ReminderModes.Repeat &&
         recurringMode !== "day" &&
+        recurringMode !== "year" &&
         selectedDays.length === 0
       )
         throw new Error("Please select the day to repeat the reminder on");
@@ -233,7 +236,9 @@ export default function ReminderSheet({
           alignItems: "center"
         }}
       >
-        <Heading size={SIZE.lg}>Set reminder</Heading>
+        <Heading size={SIZE.lg}>
+          {reminder ? "Edit reminder" : "New reminder"}
+        </Heading>
         <Button
           title="Save"
           type="accent"
@@ -256,11 +261,7 @@ export default function ReminderSheet({
           <ScrollView
             style={{
               flexDirection: "row",
-              borderWidth: 1,
               marginTop: 12,
-              borderRadius: 5,
-              borderColor: colors.primary.border,
-              paddingLeft: 12,
               height: 50
             }}
             horizontal
@@ -338,11 +339,7 @@ export default function ReminderSheet({
           style={{
             flexDirection: "row",
             marginBottom: 12,
-            height: 50,
-            borderWidth: 1,
-            borderRadius: 5,
-            borderColor: colors.primary.border,
-            paddingLeft: 12
+            height: 50
           }}
           horizontal
         >
@@ -397,7 +394,8 @@ export default function ReminderSheet({
             <View
               style={{
                 flexDirection: "row",
-                marginBottom: recurringMode === "day" ? 0 : 12,
+                marginBottom:
+                  recurringMode === "day" || recurringMode === "year" ? 0 : 12,
                 alignItems: "center"
               }}
             >
@@ -415,7 +413,7 @@ export default function ReminderSheet({
                   type={
                     recurringMode ===
                     RecurringModes[mode as keyof typeof RecurringModes]
-                      ? "grayAccent"
+                      ? "selected"
                       : "gray"
                   }
                   onPress={() => {
@@ -432,7 +430,8 @@ export default function ReminderSheet({
             </View>
 
             <ScrollView showsHorizontalScrollIndicator={false} horizontal>
-              {recurringMode === RecurringModes.Daily
+              {recurringMode === RecurringModes.Daily ||
+              recurringMode === RecurringModes.Year
                 ? null
                 : recurringMode === RecurringModes.Week
                 ? WeekDays.map((item, index) => (
@@ -532,7 +531,12 @@ export default function ReminderSheet({
               locale={
                 db.settings?.getTimeFormat() === "24-hour" ? "en_GB" : "en_US"
               }
-              mode={reminderMode === ReminderModes.Repeat ? "time" : "datetime"}
+              mode={
+                reminderMode === ReminderModes.Repeat &&
+                recurringMode !== "year"
+                  ? "time"
+                  : "datetime"
+              }
             />
 
             {reminderMode === ReminderModes.Repeat ? null : (
@@ -570,6 +574,10 @@ export default function ReminderSheet({
               <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
                 {recurringMode === RecurringModes.Daily
                   ? "Repeats daily " + `at ${dayjs(date).format("hh:mm A")}.`
+                  : recurringMode === RecurringModes.Year
+                  ? `The reminder will repeat every year on ${dayjs(
+                      date
+                    ).format("dddd, MMMM D, h:mm A")}.`
                   : selectedDays.length === 7 &&
                     recurringMode === RecurringModes.Week
                   ? `The reminder will repeat daily at ${dayjs(date).format(
