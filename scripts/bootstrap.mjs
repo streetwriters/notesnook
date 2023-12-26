@@ -24,12 +24,11 @@ import os from "os";
 import parser from "yargs-parser";
 import { fdir } from "fdir";
 import Listr from "listr";
+import { existsSync } from "fs";
 
 const args = parser(process.argv, { alias: { scope: ["s"], offline: ["o"] } });
 const IS_CI = process.env.CI;
-const THREADS = IS_CI
-  ? 1
-  : Math.max(4, process.env.THREADS || os.cpus().length / 2);
+const THREADS = Math.max(4, process.env.THREADS || os.cpus().length / 2);
 const scopes = {
   mobile: "apps/mobile",
   web: "apps/web",
@@ -98,11 +97,14 @@ async function bootstrapPackages(dependencies) {
 }
 
 function bootstrapPackage(cwd, outputs) {
+  const cmd = `npm ${
+    IS_CI ? "ci" : "i"
+  } --legacy-peer-deps --no-audit --no-fund ${
+    args.offline ? "--offline" : "--prefer-offline"
+  } --progress=false --ignore-scripts`;
   return new Promise((resolve, reject) =>
     exec(
-      `npm ${IS_CI ? "ci" : "i"} --legacy-peer-deps --no-audit --no-fund ${
-        args.offline ? "--offline" : "--prefer-offline"
-      } --progress=false`,
+      cmd,
       {
         cwd,
         env: process.env,
@@ -115,7 +117,24 @@ function bootstrapPackage(cwd, outputs) {
         outputs.stdout.push(stdout);
         outputs.stderr.push(stderr);
 
-        resolve();
+        if (!existsSync(path.join(cwd, "patches"))) return resolve();
+
+        exec(
+          `npx patch-package`,
+          {
+            cwd,
+            env: process.env,
+            stdio: "inherit"
+          },
+          (err, stdout, stderr) => {
+            if (err) return reject(err);
+
+            outputs.stdout.push(stdout);
+            outputs.stderr.push(stderr);
+
+            resolve();
+          }
+        );
       }
     )
   );
