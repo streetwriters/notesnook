@@ -118,6 +118,7 @@ export class Notes implements ICollection {
         await this.collection.update([id], {
           title: item.title,
           headline,
+          contentId,
 
           pinned: item.pinned,
           locked: item.locked,
