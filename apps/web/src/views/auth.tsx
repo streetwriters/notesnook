@@ -937,6 +937,7 @@ export function AuthField(props: FieldProps) {
     <Field
       {...props}
       name={props.name || props.id}
+      data-test-id={props["data-test-id"] || props.id}
       required
       sx={{ mt: 2, width: "100%" }}
       styles={{
