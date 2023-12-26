@@ -96,12 +96,7 @@ async function bootstrapPackages(dependencies) {
   console.timeEnd("Took");
 }
 
-function bootstrapPackage(cwd, outputs) {
-  const cmd = `npm ${
-    IS_CI ? "ci" : "i"
-  } --legacy-peer-deps --no-audit --no-fund ${
-    args.offline ? "--offline" : "--prefer-offline"
-  } --progress=false --ignore-scripts`;
+function execute(cmd, cwd, outputs) {
   return new Promise((resolve, reject) =>
     exec(
       cmd,
@@ -113,31 +108,35 @@ function bootstrapPackage(cwd, outputs) {
       (err, stdout, stderr) => {
         if (err) return reject(err);
 
-        outputs.stdout.push("> " + cwd);
         outputs.stdout.push(stdout);
         outputs.stderr.push(stderr);
 
-        if (!existsSync(path.join(cwd, "patches"))) return resolve();
-
-        exec(
-          `npx patch-package`,
-          {
-            cwd,
-            env: process.env,
-            stdio: "inherit"
-          },
-          (err, stdout, stderr) => {
-            if (err) return reject(err);
-
-            outputs.stdout.push(stdout);
-            outputs.stderr.push(stderr);
-
-            resolve();
-          }
-        );
+        resolve();
       }
     )
   );
+}
+
+async function bootstrapPackage(cwd, outputs) {
+  const cmd = `npm ${
+    IS_CI ? "ci" : "i"
+  } --legacy-peer-deps --no-audit --no-fund ${
+    args.offline ? "--offline" : "--prefer-offline"
+  } --progress=false --ignore-scripts`;
+
+  outputs.stdout.push("> " + cwd);
+
+  await execute(cmd, cwd, outputs);
+
+  const postCommands = ["npm rebuild"];
+
+  if (!existsSync(path.join(cwd, "patches"))) {
+    postCommands.push(`npx patch-package`);
+  }
+
+  for (const cmd of postCommands) {
+    await execute(cmd, cwd, outputs);
+  }
 }
 
 async function findDependencies(scope) {
