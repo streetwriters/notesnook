@@ -146,7 +146,8 @@ class EditorStore extends BaseStore<EditorStore> {
       return;
     }
 
-    const note = await db.notes.note(noteId); // TODO: || db.notes.trashed(noteId);
+    const note =
+      (await db.notes.note(noteId)) || (await db.notes.trashed(noteId));
     if (!note) return;
 
     noteStore.setSelectedNote(note.id);
@@ -173,11 +174,11 @@ class EditorStore extends BaseStore<EditorStore> {
         attachmentsLength: 0 // TODO: db.attachments.ofNote(note.id, "all")?.length || 0
       };
 
-      // TODO: const isDeleted = note.type === "trash";
-      // if (isDeleted) {
-      //   state.session.isDeleted = true;
-      //   state.session.readonly = true;
-      // }
+      const isDeleted = note.type === "trash";
+      if (isDeleted) {
+        state.session.isDeleted = true;
+        state.session.readonly = true;
+      }
     });
     appStore.setIsEditorOpen(true);
     this.toggleProperties(false);
