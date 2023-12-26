@@ -79,8 +79,7 @@ function ListItem<TItem extends Item, TContext>(
   const isMenuTarget = target && target === listItemRef.current;
 
   const isSelected = useSelectionStore((store) => {
-    const isInSelection =
-      store.selectedItems.findIndex((item) => item === props.item.id) > -1;
+    const isInSelection = store.selectedItems.includes(props.item.id);
     return isFocused
       ? store.selectedItems.length > 1 && isInSelection
       : isInSelection;

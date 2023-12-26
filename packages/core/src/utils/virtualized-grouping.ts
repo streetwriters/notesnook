@@ -28,11 +28,11 @@ type Batch<T> = {
 export class VirtualizedGrouping<T> {
   private cache: Map<number, Batch<T>> = new Map();
   private pending: Map<number, Promise<Batch<T>>> = new Map();
-  public ids: boolean[];
 
   constructor(
-    count: number,
+    readonly length: number,
     private readonly batchSize: number,
+    readonly ids: () => Promise<string[]>,
     private readonly fetchItems: (
       start: number,
       end: number
@@ -41,9 +41,7 @@ export class VirtualizedGrouping<T> {
       items: T[]
     ) => Map<number, { index: number; hidden?: boolean; group: GroupHeader }>,
     readonly groups?: () => Promise<{ index: number; group: GroupHeader }[]>
-  ) {
-    this.ids = new Array(count).fill(false);
-  }
+  ) {}
 
   key(index: number) {
     return `${index}`;
@@ -60,6 +58,7 @@ export class VirtualizedGrouping<T> {
       ? "header-item"
       : "item";
   }
+
   cacheItem(index: number) {
     const batchIndex = Math.floor(index / this.batchSize);
     const batch = this.cache.get(batchIndex);

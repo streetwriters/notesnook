@@ -221,6 +221,7 @@ export default class Trash {
     return new VirtualizedGrouping<TrashItem>(
       this.cache.notebooks.length + this.cache.notes.length,
       this.db.options.batchSize,
+      () => Promise.resolve([...this.cache.notebooks, ...this.cache.notes]),
       async (start, end) => {
         //         const notesRange = end < this.cache.notes.length ? [start, end] : [start, this.cache.notes.length - 1];
         // const notebooksRange = start >= this.cache.notes.length ?[start, end] : [
