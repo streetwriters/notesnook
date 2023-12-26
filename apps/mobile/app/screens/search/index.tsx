@@ -17,20 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Item, VirtualizedGrouping } from "@notesnook/core";
+import { Item, Note, VirtualizedGrouping } from "@notesnook/core";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
 import List from "../../components/list";
-import { NavigationProps } from "../../services/navigation";
-import { SearchBar } from "./search-bar";
+import SelectionHeader from "../../components/selection-header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import useNavigationStore from "../../stores/use-navigation-store";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
+import { NavigationProps } from "../../services/navigation";
+import useNavigationStore from "../../stores/use-navigation-store";
 import { eOnRefreshSearch } from "../../utils/events";
-import SelectionHeader from "../../components/selection-header";
+import { SearchBar } from "./search-bar";
+import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
 export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
   const [results, setResults] = useState<VirtualizedGrouping<Item>>();
   const [loading, setLoading] = useState(false);
@@ -59,13 +60,10 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
           route.params.type === "trash"
             ? "trash"
             : ((route.params?.type + "s") as keyof typeof db.lookup);
-        console.log(
-          `Searching in ${type} for ${query}`,
-          route.params?.ids?.length
-        );
+        console.log(`Searching in ${type} for ${query}`);
         const results = await db.lookup[type](
           query,
-          route.params?.type === "note" ? route.params?.ids : undefined
+          route.params.items as FilteredSelector<Note>
         ).sorted();
         console.log(`Found ${results.ids?.length} results for ${query}`);
         setResults(results);
@@ -79,7 +77,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         console.log(e);
       }
     },
-    [route.params?.ids, route.params.type]
+    [route.params?.items, route.params.type]
   );
 
   useEffect(() => {

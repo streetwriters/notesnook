@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   Color,
+  Item,
   ItemType,
   Note,
   Notebook,
@@ -28,6 +29,8 @@ import {
 } from "@notesnook/core/dist/types";
 import create, { State } from "zustand";
 import { ColorValues } from "../utils/colors";
+import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
+import { VirtualizedGrouping } from "@notesnook/core";
 
 export type GenericRouteParam = undefined;
 
@@ -69,7 +72,7 @@ export type RouteParams = {
     type: ItemType;
     title: string;
     route: RouteName;
-    ids?: string[];
+    items?: FilteredSelector<Item>;
   };
   Settings: GenericRouteParam;
   TaggedNotes: NotesScreenParams;
