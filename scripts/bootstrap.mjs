@@ -128,13 +128,19 @@ async function bootstrapPackage(cwd, outputs) {
 
   await execute(cmd, cwd, outputs);
 
-  const postCommands = ["npm rebuild"];
+  const postInstallCommands = [];
 
-  if (!existsSync(path.join(cwd, "patches"))) {
-    postCommands.push(`npx patch-package`);
+  const packages = await needsRebuild(cwd);
+  if (packages.length > 0) {
+    postInstallCommands.push("npm --verbose rebuild");
+    outputs.stdout.push(`Rebuilding ${packages.join(", ")} in ${cwd}...\n`);
   }
 
-  for (const cmd of postCommands) {
+  if (!existsSync(path.join(cwd, "patches"))) {
+    postInstallCommands.push(`npx patch-package`);
+  }
+
+  for (const cmd of postInstallCommands) {
     await execute(cmd, cwd, outputs);
   }
 }
@@ -170,4 +176,36 @@ function filterDependencies(basePath, dependencies) {
     .map(([_, value]) =>
       path.resolve(path.join(basePath, value.replace("file:", "")))
     );
+}
+
+async function needsRebuild(cwd) {
+  const parent = path.dirname(cwd);
+  const packages = await new fdir()
+    .glob("**/package.json")
+    .withFullPaths()
+    .withSymlinks()
+    .exclude((_, dir) => {
+      return !dir.startsWith(cwd) && dir.startsWith(parent);
+    })
+    .crawl(path.join(cwd, "node_modules"))
+    .withPromise();
+
+  return (
+    await Promise.all(
+      packages.map(async (path) => {
+        const pkg = await readFile(path, "utf-8")
+          .then(JSON.parse)
+          .catch(Object);
+
+        if (!pkg || !pkg.scripts) return;
+        if (
+          pkg.scripts.postinstall ||
+          pkg.scripts.install ||
+          pkg.scripts.preinstall
+        ) {
+          return pkg.name;
+        }
+      })
+    )
+  ).filter(Boolean);
 }
