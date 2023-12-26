@@ -69,7 +69,8 @@ test(`edits in a note opened on 2 devices should sync in real-time`, async ({
   const noteA = await notesA.findNote(NOTE);
   await Promise.all([noteA, noteB].map((note) => note?.openNote()));
 
-  await actAndSync([deviceA, deviceB], notesB.editor.clear());
+  if ((await notesB.editor.getContent("text")) !== "")
+    await actAndSync([deviceA, deviceB], notesB.editor.clear());
   expect(await notesA.editor.getContent("text")).toBe("");
   expect(await notesB.editor.getContent("text")).toBe("");
   await actAndSync([deviceA, deviceB], notesB.editor.setContent(newContent));
