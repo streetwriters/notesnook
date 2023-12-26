@@ -265,8 +265,7 @@ function Notebooks({ noteId }: { noteId: string }) {
       .selector.sorted(db.settings.getGroupOptions("notebooks"))
   );
 
-  if (result.status !== "fulfilled" || result.value.ids.length <= 0)
-    return null;
+  if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
     <Section title="Notebooks">
@@ -274,7 +273,7 @@ function Notebooks({ noteId }: { noteId: string }) {
         mode="fixed"
         estimatedSize={50}
         getItemKey={(index) => result.value.key(index)}
-        items={result.value.ids}
+        items={result.value.placeholders}
         renderItem={({ index }) => (
           <ResolvedItem index={index} items={result.value} type="notebook">
             {({ item, data }) => (
@@ -292,8 +291,7 @@ function Reminders({ noteId }: { noteId: string }) {
       .from({ id: noteId, type: "note" }, "reminder")
       .selector.sorted(db.settings.getGroupOptions("reminders"))
   );
-  if (result.status !== "fulfilled" || result.value.ids.length <= 0)
-    return null;
+  if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
     <Section title="Reminders">
@@ -301,7 +299,7 @@ function Reminders({ noteId }: { noteId: string }) {
         mode="fixed"
         estimatedSize={54}
         getItemKey={(index) => result.value.key(index)}
-        items={result.value.ids}
+        items={result.value.placeholders}
         renderItem={({ index }) => (
           <ResolvedItem index={index} items={result.value} type="reminder">
             {({ item, data }) => (
@@ -319,15 +317,14 @@ function Attachments({ noteId }: { noteId: string }) {
       .ofNote(noteId, "all")
       .sorted({ sortBy: "dateCreated", sortDirection: "desc" })
   );
-  if (result.status !== "fulfilled" || result.value.ids.length <= 0)
-    return null;
+  if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
     <Section title="Attachments">
       <VirtualizedTable
         estimatedSize={30}
         getItemKey={(index) => result.value.key(index)}
-        items={result.value.ids}
+        items={result.value.placeholders}
         header={<></>}
         renderRow={({ index }) => (
           <ResolvedItem index={index} type="attachment" items={result.value}>
@@ -354,8 +351,7 @@ function SessionHistory({
       .get(noteId)
       .sorted({ sortBy: "dateModified", sortDirection: "desc" })
   );
-  if (result.status !== "fulfilled" || result.value.ids.length <= 0)
-    return null;
+  if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
     <Section
@@ -366,7 +362,7 @@ function SessionHistory({
         mode="fixed"
         estimatedSize={28}
         getItemKey={(index) => result.value.key(index)}
-        items={result.value.ids}
+        items={result.value.placeholders}
         renderItem={({ index }) => (
           <ResolvedItem type="session" index={index} items={result.value}>
             {({ item }) => (

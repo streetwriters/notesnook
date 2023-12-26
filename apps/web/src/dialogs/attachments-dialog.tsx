@@ -320,7 +320,7 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
                 mode="fixed"
                 estimatedSize={30}
                 getItemKey={(index) => attachments.key(index)}
-                items={attachments.ids}
+                items={attachments.placeholders}
                 context={{
                   isSelected: (id: string) => selected.indexOf(id) > -1,
                   select: (id: string) => {
