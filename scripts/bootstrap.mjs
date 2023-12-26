@@ -25,9 +25,11 @@ import parser from "yargs-parser";
 import { fdir } from "fdir";
 import Listr from "listr";
 
-const THREADS = Math.max(4, process.env.THREADS || os.cpus().length / 2);
 const args = parser(process.argv, { alias: { scope: ["s"], offline: ["o"] } });
 const IS_CI = process.env.CI;
+const THREADS = IS_CI
+  ? 1
+  : Math.max(4, process.env.THREADS || os.cpus().length / 2);
 const scopes = {
   mobile: "apps/mobile",
   web: "apps/web",
