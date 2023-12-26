@@ -342,7 +342,6 @@ export default class Backup {
   }
 
   private async migrateData(data: BackupDataItem[], version: number) {
-    console.log(data);
     await this.db.transaction(async () => {
       for (let item of data) {
         // we do not want to restore deleted items
