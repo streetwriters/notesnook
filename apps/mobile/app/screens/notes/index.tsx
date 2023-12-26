@@ -31,14 +31,14 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
+import { resolveItems } from "../../stores/resolve-items";
 import useNavigationStore, {
   HeaderRightButton,
   NotesScreenParams,
   RouteName
 } from "../../stores/use-navigation-store";
-import { useNoteStore } from "../../stores/use-notes-store";
 import { setOnFirstSave } from "./common";
-import { resolveItems } from "../../stores/resolve-items";
+import { db } from "../../common/database";
 export const WARNING_DATA = {
   title: "Some notes in this topic are not synced"
 };
@@ -172,12 +172,17 @@ const NotesPage = ({
           route.name === "Monographs" ? "Monographs" : params?.current.item?.id
         }
         onSearch={() => {
+          const selector =
+            route.name === "Monographs"
+              ? db.monographs.all
+              : db.relations.from(params.current.item, "note").selector;
+
           Navigation.push("Search", {
             placeholder: `Type a keyword to search in ${title}`,
             type: "note",
             title: title,
             route: route.name,
-            ids: notes?.ids?.filter((id) => typeof id === "string") as string[]
+            items: selector
           });
         }}
         accentColor={accentColor}
