@@ -24,7 +24,6 @@ import os from "os";
 import parser from "yargs-parser";
 import { fdir } from "fdir";
 import Listr from "listr";
-import { existsSync } from "fs";
 
 const args = parser(process.argv, { alias: { scope: ["s"], offline: ["o"] } });
 const IS_CI = process.env.CI;
@@ -39,6 +38,14 @@ const scopes = {
   themes: "servers/themes",
   themebuilder: "apps/theme-builder"
 };
+// packages that we shouldn't run npm rebuild for
+const IGNORED_NATIVE_PACKAGES = [
+  // optional dependency of pdfjs-dist, we can ignore
+  // it because it's only needed in non-browser environments
+  "canvas",
+  // optional dependency only used on Node.js platform
+  "@azure/msal-node-runtime"
+];
 
 if (args.scope && !scopes[args.scope])
   throw new Error(`Scope must be one of ${Object.keys(scopes).join(", ")}`);
@@ -132,13 +139,11 @@ async function bootstrapPackage(cwd, outputs) {
 
   const packages = await needsRebuild(cwd);
   if (packages.length > 0) {
-    postInstallCommands.push("npm --verbose rebuild");
-    outputs.stdout.push(`Rebuilding ${packages.join(", ")} in ${cwd}...\n`);
+    postInstallCommands.push(`npm rebuild ${packages.join(" ")}`);
   }
 
-  if (!existsSync(path.join(cwd, "patches"))) {
-    postInstallCommands.push(`npx patch-package`);
-  }
+  if (await hasScript(cwd, "postinstall"))
+    postInstallCommands.push(`npm run postinstall `);
 
   for (const cmd of postInstallCommands) {
     await execute(cmd, cwd, outputs);
@@ -179,14 +184,10 @@ function filterDependencies(basePath, dependencies) {
 }
 
 async function needsRebuild(cwd) {
-  const parent = path.dirname(cwd);
+  const scripts = ["preinstall", "install", "postinstall"];
   const packages = await new fdir()
     .glob("**/package.json")
     .withFullPaths()
-    .withSymlinks()
-    .exclude((_, dir) => {
-      return !dir.startsWith(cwd) && dir.startsWith(parent);
-    })
     .crawl(path.join(cwd, "node_modules"))
     .withPromise();
 
@@ -197,15 +198,23 @@ async function needsRebuild(cwd) {
           .then(JSON.parse)
           .catch(Object);
 
-        if (!pkg || !pkg.scripts) return;
         if (
-          pkg.scripts.postinstall ||
-          pkg.scripts.install ||
-          pkg.scripts.preinstall
-        ) {
-          return pkg.name;
-        }
+          !pkg ||
+          !pkg.scripts ||
+          IGNORED_NATIVE_PACKAGES.includes(pkg.name) ||
+          !scripts.some((s) => pkg.scripts[s])
+        )
+          return;
+
+        return pkg.name;
       })
     )
   ).filter(Boolean);
+}
+
+async function hasScript(cwd, scriptName) {
+  const pkg = await readFile(path.join(cwd, "package.json"), "utf-8")
+    .then(JSON.parse)
+    .catch(Object);
+  return pkg && pkg.scripts && pkg.scripts[scriptName];
 }
