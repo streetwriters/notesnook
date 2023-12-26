@@ -47,7 +47,7 @@ export class BaseViewModel {
 
   async findGroup(groupName: string) {
     const locator = this.list
-      .locator(getTestId(`virtualized-list`))
+      .locator(getTestId(`virtuoso-item-list`))
       .locator(getTestId("group-header"));
 
     for await (const item of iterateList(locator)) {
@@ -95,7 +95,7 @@ export class BaseViewModel {
   // }
 
   async press(key: string) {
-    const itemList = this.list.locator(getTestId(`virtualized-list`));
+    const itemList = this.list.locator(getTestId(`virtuoso-item-list`));
     await itemList.press(key);
     await this.page.waitForTimeout(300);
   }
