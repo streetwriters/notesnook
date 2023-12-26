@@ -106,48 +106,20 @@ class Sync {
   autoSync = new AutoSync(this.db, 1000);
   logger = logger.scope("Sync");
   syncConnectionMutex = new Mutex();
-  connection: signalr.HubConnection;
+  connection?: signalr.HubConnection;
   devices = new SyncDevices(this.db.storage, this.db.tokenManager);
 
   constructor(private readonly db: Database) {
-    const tokenManager = new TokenManager(db.storage);
-    this.connection = new signalr.HubConnectionBuilder()
-      .withUrl(`${Constants.API_HOST}/hubs/sync/v2`, {
-        accessTokenFactory: async () => {
-          const token = await tokenManager.getAccessToken();
-          if (!token) throw new Error("Failed to get access token.");
-          return token;
-        },
-        skipNegotiation: true,
-        transport: signalr.HttpTransportType.WebSockets,
-        logger: {
-          log(level, message) {
-            const scopedLogger = logger.scope("SignalR::SyncHub");
-            switch (level) {
-              case signalr.LogLevel.Critical:
-                return scopedLogger.fatal(new Error(message));
-              case signalr.LogLevel.Error: {
-                db.eventManager.publish(EVENTS.syncAborted, message);
-                return scopedLogger.error(new Error(message));
-              }
-              case signalr.LogLevel.Warning:
-                return scopedLogger.warn(message);
-            }
-          }
-        }
-      })
-      .withHubProtocol(new signalr.JsonHubProtocol())
-      .build();
-    this.connection.serverTimeoutInMilliseconds = 60 * 1000 * 5;
     EV.subscribe(EVENTS.userLoggedOut, async () => {
-      await this.connection.stop();
+      await this.connection?.stop();
       this.autoSync.stop();
     });
-
-    this.connection.on("PushCompleted", () => this.onPushCompleted());
   }
 
   async start(options: SyncOptions) {
+    this.createConnection();
+    if (!this.connection) return;
+
     if (!(await checkSyncStatus(SYNC_CHECK_IDS.sync))) {
       await this.connection.stop();
       return;
@@ -216,9 +188,9 @@ class Sync {
     }
 
     let count = 0;
-    this.connection.off("SendItems");
-    this.connection.on("SendItems", async (chunk) => {
-      if (this.connection.state !== signalr.HubConnectionState.Connected)
+    this.connection?.off("SendItems");
+    this.connection?.on("SendItems", async (chunk) => {
+      if (this.connection?.state !== signalr.HubConnectionState.Connected)
         return false;
 
       await this.processChunk(chunk, key);
@@ -228,7 +200,7 @@ class Sync {
 
       return true;
     });
-    const serverResponse = await this.connection.invoke(
+    const serverResponse = await this.connection?.invoke(
       "RequestFetch",
       deviceId
     );
@@ -243,7 +215,7 @@ class Sync {
       await this.db.vault.setKey(serverResponse.vaultKey);
     }
 
-    this.connection.off("SendItems");
+    this.connection?.off("SendItems");
   }
 
   async send(deviceId: string, isForceSync?: boolean) {
@@ -254,7 +226,7 @@ class Sync {
     for await (const item of this.collector.collect(100, isForceSync)) {
       if (!isSyncInitialized) {
         const vaultKey = await this.db.vault.getKey();
-        await this.connection.send("InitializePush", {
+        await this.connection?.send("InitializePush", {
           vaultKey,
           synced: false
         });
@@ -274,7 +246,7 @@ class Sync {
       }
     }
     if (!isSyncInitialized) return false;
-    await this.connection.send("PushCompleted");
+    await this.connection?.send("PushCompleted");
     return true;
   }
 
@@ -289,7 +261,7 @@ class Sync {
 
   async cancel() {
     this.logger.info("Sync canceled");
-    await this.connection.stop();
+    await this.connection?.stop();
   }
 
   /**
@@ -363,13 +335,51 @@ class Sync {
 
   private async pushItem(deviceId: string, item: SyncTransferItem) {
     await this.checkConnection();
-    return (await this.connection.invoke("PushItems", deviceId, item)) === 1;
+    return (await this.connection?.invoke("PushItems", deviceId, item)) === 1;
+  }
+
+  private createConnection() {
+    if (this.connection) return;
+
+    const tokenManager = new TokenManager(this.db.storage);
+    this.connection = new signalr.HubConnectionBuilder()
+      .withUrl(`${Constants.API_HOST}/hubs/sync/v2`, {
+        accessTokenFactory: async () => {
+          const token = await tokenManager.getAccessToken();
+          if (!token) throw new Error("Failed to get access token.");
+          return token;
+        },
+        skipNegotiation: true,
+        transport: signalr.HttpTransportType.WebSockets,
+        logger: {
+          log: (level, message) => {
+            const scopedLogger = logger.scope("SignalR::SyncHub");
+            switch (level) {
+              case signalr.LogLevel.Critical:
+                return scopedLogger.fatal(new Error(message));
+              case signalr.LogLevel.Error: {
+                this.db.eventManager.publish(EVENTS.syncAborted, message);
+                return scopedLogger.error(new Error(message));
+              }
+              case signalr.LogLevel.Warning:
+                return scopedLogger.warn(message);
+            }
+          }
+        }
+      })
+      .withHubProtocol(new signalr.JsonHubProtocol())
+      .build();
+    this.connection.serverTimeoutInMilliseconds = 60 * 1000 * 5;
+    this.connection.on("PushCompleted", () => this.onPushCompleted());
   }
 
   private async checkConnection() {
     await this.syncConnectionMutex.runExclusive(async () => {
       try {
-        if (this.connection.state !== signalr.HubConnectionState.Connected) {
+        if (
+          this.connection &&
+          this.connection.state !== signalr.HubConnectionState.Connected
+        ) {
           if (
             this.connection.state !== signalr.HubConnectionState.Disconnected
           ) {

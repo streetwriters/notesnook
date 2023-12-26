@@ -69,7 +69,6 @@ export class SQLCollection<
   async upsert(item: SQLiteItem<T>) {
     if (!item.id) throw new Error("The item must contain the id field.");
     if (!item.deleted) item.dateCreated = item.dateCreated || Date.now();
-    this.eventManager.publish(EVENTS.databaseUpdated, item.id, item);
 
     // if item is newly synced, remote will be true.
     if (!item.remote) {
@@ -83,10 +82,11 @@ export class SQLCollection<
       .replaceInto<keyof DatabaseSchema>(this.type)
       .values(item)
       .execute();
+
+    this.eventManager.publish(EVENTS.databaseUpdated, item.id, item);
   }
 
   async softDelete(ids: string[]) {
-    this.eventManager.publish(EVENTS.databaseUpdated, ids);
     await this.db()
       .replaceInto<keyof DatabaseSchema>(this.type)
       .values(
@@ -98,14 +98,15 @@ export class SQLCollection<
         }))
       )
       .execute();
+    this.eventManager.publish(EVENTS.databaseUpdated, ids);
   }
 
   async delete(ids: string[]) {
-    this.eventManager.publish(EVENTS.databaseUpdated, ids);
     await this.db()
       .deleteFrom<keyof DatabaseSchema>(this.type)
       .where("id", "in", ids)
       .execute();
+    this.eventManager.publish(EVENTS.databaseUpdated, ids);
   }
 
   async exists(id: string) {
@@ -175,6 +176,7 @@ export class SQLCollection<
         synced: partial.synced || false
       })
       .execute();
+    this.eventManager.publish(EVENTS.databaseUpdated, ids);
   }
 
   async ids(sortOptions: GroupOptions): Promise<string[]> {
