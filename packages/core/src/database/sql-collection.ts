@@ -166,7 +166,11 @@ export class SQLCollection<
     });
   }
 
-  async update(ids: string[], partial: Partial<SQLiteItem<T>>) {
+  async update(
+    ids: string[],
+    partial: Partial<SQLiteItem<T>>,
+    options: { sendEvent: boolean } = { sendEvent: true }
+  ) {
     await this.db()
       .updateTable<keyof DatabaseSchema>(this.type)
       .where("id", "in", ids)
@@ -176,7 +180,9 @@ export class SQLCollection<
         synced: partial.synced || false
       })
       .execute();
-    this.eventManager.publish(EVENTS.databaseUpdated, ids);
+    if (options.sendEvent) {
+      this.eventManager.publish(EVENTS.databaseUpdated, ids);
+    }
   }
 
   async ids(sortOptions: GroupOptions): Promise<string[]> {
