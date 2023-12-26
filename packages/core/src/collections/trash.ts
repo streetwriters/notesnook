@@ -22,7 +22,8 @@ import Database from "../api";
 import { deleteItems } from "../utils/array";
 import { GroupOptions, TrashItem } from "../types";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
-import { groupArray } from "../utils/grouping";
+import { getSortSelectors, groupArray } from "../utils/grouping";
+import { sql } from "kysely";
 
 export default class Trash {
   collections = ["notes", "notebooks"] as const;
@@ -39,23 +40,20 @@ export default class Trash {
     await this.cleanup();
     const result = await this.db
       .sql()
-      .selectNoFrom((eb) => [
-        eb
-          .selectFrom("notes")
-          .where("type", "==", "trash")
-          .select("id")
-          .as("noteId"),
+      .selectFrom("notes")
+      .where("type", "==", "trash")
+      .select(["id", sql`'note'`.as("itemType")])
+      .unionAll((eb) =>
         eb
           .selectFrom("notebooks")
           .where("type", "==", "trash")
-          .select("id")
-          .as("notebookId")
-      ])
+          .select(["id", sql`'notebook'`.as("itemType")])
+      )
       .execute();
 
-    for (const { noteId, notebookId } of result) {
-      if (noteId) this.cache.notes.push(noteId);
-      else if (notebookId) this.cache.notebooks.push(notebookId);
+    for (const { id, itemType } of result) {
+      if (itemType === "note") this.cache.notes.push(id);
+      else if (itemType === "notebook") this.cache.notebooks.push(id);
     }
   }
 
@@ -192,49 +190,69 @@ export default class Trash {
   // }
 
   async all() {
-    const trashedNotes = await this.db
+    return [
+      ...(await this.trashedNotes(this.cache.notes)),
+      ...(await this.trashedNotebooks(this.cache.notebooks))
+    ] as TrashItem[];
+  }
+
+  private async trashedNotes(ids: string[]) {
+    return (await this.db
       .sql()
       .selectFrom("notes")
       .where("type", "==", "trash")
-      .where("id", "in", this.cache.notes)
+      .where("id", "in", ids)
       .selectAll()
-      .execute();
+      .execute()) as TrashItem[];
+  }
 
-    const trashedNotebooks = await this.db
+  private async trashedNotebooks(ids: string[]) {
+    return (await this.db
       .sql()
       .selectFrom("notebooks")
       .where("type", "==", "trash")
-      .where("id", "in", this.cache.notebooks)
+      .where("id", "in", ids)
       .selectAll()
-      .execute();
-
-    return [...trashedNotes, ...trashedNotebooks] as TrashItem[];
+      .execute()) as TrashItem[];
   }
 
   async grouped(options: GroupOptions) {
-    // const items = await this.all();
-    // const ids = groupArray(items, options);
-    // const records: Record<string, TrashItem> = {};
-    // for (const item of items) records[item.id] = item;
-    // const ids = [...this.cache.notebooks,...this.cache.notes]
-
+    const ids = [...this.cache.notes, ...this.cache.notebooks];
+    const selector = getSortSelectors(options)[options.sortDirection];
     return new VirtualizedGrouping<TrashItem>(
-      this.cache.notebooks.length + this.cache.notes.length,
+      ids.length,
       this.db.options.batchSize,
-      () => Promise.resolve([...this.cache.notebooks, ...this.cache.notes]),
+      () => Promise.resolve(ids),
       async (start, end) => {
-        //         const notesRange = end < this.cache.notes.length ? [start, end] : [start, this.cache.notes.length - 1];
-        // const notebooksRange = start >= this.cache.notes.length ?[start, end] : [
-        //   0, end
-        // ]
-        // TODO:
-        return { ids: [], items: [] };
-        // return {
-        //   ids: ids.slice(start,end),
-        // }
-        // const items: Record<string, TrashItem> = {};
-        // for (const id of ids) items[id] = records[id];
-        // return items;
+        const notesRange =
+          end < this.cache.notes.length
+            ? [start, end]
+            : [start, this.cache.notes.length];
+        const notebooksRange =
+          start >= this.cache.notes.length
+            ? [start, end]
+            : [0, Math.min(this.cache.notebooks.length, end)];
+
+        const items = [
+          ...(await this.trashedNotes(
+            this.cache.notes.slice(notesRange[0], notesRange[1])
+          )),
+          ...(await this.trashedNotebooks(
+            this.cache.notebooks.slice(notebooksRange[0], notebooksRange[1])
+          ))
+        ];
+        items.sort(selector);
+
+        return {
+          ids: ids.slice(start, end),
+          items
+        };
+      },
+      (items) => groupArray(items, options),
+      async () => {
+        const items = await this.all();
+        items.sort(selector);
+        return Array.from(groupArray(items, options).values());
       }
     );
   }

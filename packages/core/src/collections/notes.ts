@@ -154,9 +154,15 @@ export class Notes implements ICollection {
     return id;
   }
 
-  async note(idOrNote: string) {
-    const note = await this.collection.get(idOrNote);
+  async note(id: string) {
+    const note = await this.collection.get(id);
     if (!note || isTrashItem(note) || isDeleted(note)) return;
+    return note;
+  }
+
+  async trashed(id: string) {
+    const note = await this.collection.get(id);
+    if (note && (!isTrashItem(note) || isDeleted(note))) return;
     return note;
   }
 

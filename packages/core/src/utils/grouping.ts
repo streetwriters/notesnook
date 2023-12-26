@@ -42,11 +42,32 @@ export const getSortValue = (
     item.dateDeleted
   )
     return item.dateDeleted;
-  else if (options.sortBy === "dateEdited" && "dateEdited" in item)
+  else if (
+    options.sortBy === "dateEdited" &&
+    "dateEdited" in item &&
+    item.dateEdited
+  )
     return item.dateEdited;
 
-  return item.dateCreated;
+  return item.dateCreated || 0;
 };
+
+export function getSortSelectors<T extends PartialGroupableItem>(
+  options: GroupOptions
+) {
+  if (options.sortBy === "title")
+    return {
+      asc: (a: T, b: T) =>
+        getTitle(a).localeCompare(getTitle(b), undefined, { numeric: true }),
+      desc: (a: T, b: T) =>
+        getTitle(b).localeCompare(getTitle(a), undefined, { numeric: true })
+    };
+
+  return {
+    asc: (a: T, b: T) => getSortValue(options, a) - getSortValue(options, b),
+    desc: (a: T, b: T) => getSortValue(options, b) - getSortValue(options, a)
+  };
+}
 
 const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
 const MILLISECONDS_IN_WEEK = MILLISECONDS_IN_DAY * 7;
