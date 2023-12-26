@@ -50,7 +50,7 @@ type SyncState =
 type SyncStatus = {
   key: SyncState;
   progress: number | null;
-  type: "download" | "upload" | null;
+  type?: "download" | "upload" | "sync";
 };
 const networkCheck = new NetworkCheck();
 let syncStatusTimeout = 0;
@@ -72,7 +72,7 @@ class AppStore extends BaseStore<AppStore> {
         : "disabled"
       : "offline",
     progress: null,
-    type: null
+    type: undefined
   };
   colors: Color[] = [];
   notices: Notice[] = [];
@@ -120,12 +120,6 @@ class AppStore extends BaseStore<AppStore> {
 
     db.eventManager.subscribe(EVENTS.syncAborted, () => {
       this.updateSyncStatus("failed");
-    });
-
-    db.eventManager.subscribe(EVENTS.syncCompleted, async () => {
-      await this.updateLastSynced();
-      this.updateSyncStatus("completed", true);
-      this.refresh();
     });
 
     onPageVisibilityChanged(async (type, documentHidden) => {
@@ -343,7 +337,7 @@ class AppStore extends BaseStore<AppStore> {
   updateSyncStatus = (key: SyncState, reset = false) => {
     logger.info(`Sync status updated: ${key}`);
     this.set((state) => {
-      state.syncStatus = { key, progress: null, type: null };
+      state.syncStatus = { key, progress: null, type: undefined };
     });
 
     if (reset) {

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import { TDate, format, register } from "timeago.js";
+import { Opts, TDate, format, register } from "timeago.js";
 const shortLocale: [string, string][] = [
   ["now", "now"],
   ["%ss", "in %ss"],
@@ -55,8 +55,8 @@ const enShortLocale: [string, string][] = [
 register("short", (_n, index) => shortLocale[index]);
 register("en_short", (_n, index) => enShortLocale[index]);
 
-export function getTimeAgo(datetime: TDate, locale = "short") {
-  return format(datetime, locale);
+export function getTimeAgo(datetime: TDate, locale = "short", opts?: Opts) {
+  return format(datetime, locale, opts);
 }
 
 type TimeAgoOptions = {
