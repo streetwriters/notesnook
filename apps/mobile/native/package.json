@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@ammarahmed/notifee-react-native": "7.4.4",
+    "@ammarahmed/notifee-react-native": "7.4.6",
     "@ammarahmed/react-native-share-extension": "^2.5.5",
     "@ammarahmed/react-native-sodium": "1.5.4",
     "@bam.tech/react-native-image-resizer": "3.0.5",

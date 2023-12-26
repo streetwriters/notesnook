@@ -97,6 +97,7 @@ import {
 import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
+import Notifications from "../services/notifications";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -660,6 +661,7 @@ export const useAppEvents = () => {
         try {
           await setupDatabase(password);
           await db.init();
+          Notifications.setupReminders(true);
         } catch (e) {
           DatabaseLogger.error(e as Error);
           ToastManager.error(
