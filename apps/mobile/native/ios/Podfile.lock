@@ -485,10 +485,10 @@ PODS:
     - React-Core
   - RNKeychain (4.0.5):
     - React
-  - RNNotifee (7.4.4):
+  - RNNotifee (7.4.5):
     - React-Core
-    - RNNotifee/NotifeeCore (= 7.4.4)
-  - RNNotifee/NotifeeCore (7.4.4):
+    - RNNotifee/NotifeeCore (= 7.4.5)
+  - RNNotifee/NotifeeCore (7.4.5):
     - React-Core
   - RNPrivacySnapshot (1.0.0):
     - React-Core
@@ -921,7 +921,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: dec4645026e7401a0899f2846d864403478ff6a5
   RNIap: fc9af04ee706894a80c9d8f979bae930b0dee191
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
-  RNNotifee: 2ae3c18196e6f307fa62ae5c8e5305dea03ff147
+  RNNotifee: 81e7afee13c8674ce1eefe429e767c67fd6f912f
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
   RNReanimated: d347d84b665039d88dbcb1feddb2aa59156c9bd2
   RNScreens: d3675ab2878704de70c9dae57fa5d024802404cc
