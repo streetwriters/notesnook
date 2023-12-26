@@ -149,12 +149,17 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
         canGoBack={params?.current?.canGoBack}
         hasSearch={true}
         onSearch={() => {
+          const selector = db.relations.from(
+            params.current.item,
+            "note"
+          ).selector;
+
           Navigation.push("Search", {
             placeholder: `Type a keyword to search in ${params.current.item?.title}`,
             type: "note",
             title: params.current.item?.title,
             route: route.name,
-            ids: notes?.ids.filter((id) => typeof id === "string") as string[]
+            items: selector
           });
         }}
         titleHiddenOnRender
@@ -230,9 +235,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
                 AddNotebookSheet.present(params.current.item);
               }}
               notebook={params.current.item}
-              totalNotes={
-                notes?.ids.filter((id) => typeof id === "string")?.length || 0
-              }
+              totalNotes={notes?.ids.length || 0}
             />
           }
           placeholder={{

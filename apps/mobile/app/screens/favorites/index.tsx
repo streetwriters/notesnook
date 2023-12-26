@@ -27,6 +27,7 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import { useFavorites } from "../../stores/use-favorite-store";
 import useNavigationStore from "../../stores/use-navigation-store";
+import { db } from "../../common/database";
 
 export const Favorites = ({
   navigation,
@@ -61,9 +62,7 @@ export const Favorites = ({
             type: "note",
             title: route.name,
             route: route.name,
-            ids: favorites?.ids.filter(
-              (id) => typeof id === "string"
-            ) as string[]
+            items: db.notes.favorites
           });
         }}
       />
