@@ -144,10 +144,9 @@ function Note(props: NoteProps) {
       body={note.headline as string}
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
-          const selectedItems = selectionStore
-            .get()
-            .selectedItems.filter((i) => i.type === item.type && i !== item);
-          await Multiselect.moveNotesToTrash([item, ...selectedItems]);
+          // @ts-expect-error write tests for this
+          const selectedItems = selectionStore.get().selectedItems;
+          await Multiselect.moveNotesToTrash([item.id, ...selectedItems]);
         }
       }}
       colors={{

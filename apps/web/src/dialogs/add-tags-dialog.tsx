@@ -112,7 +112,7 @@ function AddTagsDialog(props: AddTagsDialogProps) {
           getItemKey={(index) => tags.key(index)}
           mode="fixed"
           estimatedSize={30}
-          items={tags.ids}
+          items={tags.placeholders}
           sx={{ mt: 2 }}
           itemGap={5}
           placeholders={{

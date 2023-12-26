@@ -348,6 +348,7 @@ class SessionHistoryItemModel {
       await fillPasswordDialog(this.page, password);
     }
     await this.previewNotice.waitFor();
+    await this.properties.close();
   }
 
   async isLocked() {

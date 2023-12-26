@@ -72,7 +72,8 @@ async function processAttachment(
   attachments: Record<string, any>
 ) {
   const name = path.basename(entry.name);
-  if (!name || attachments[name] || db.attachments?.exists(name)) return;
+  if (!name || attachments[name] || (await db.attachments?.exists(name)))
+    return;
 
   const { hashBuffer, writeEncryptedFile } = await import("../interfaces/fs");
 
@@ -94,7 +95,8 @@ async function processNote(entry: Entry, attachments: Record<string, any>) {
   const note = await fileToJson<Note>(entry);
   for (const attachment of note.attachments || []) {
     const cipherData = attachments[attachment.hash];
-    if (!cipherData || db.attachments?.exists(attachment.hash)) continue;
+    if (!cipherData || (await db.attachments?.exists(attachment.hash)))
+      continue;
 
     await db.attachments?.add({
       ...cipherData,

@@ -170,11 +170,7 @@ export function Attachment({
             <AttachmentError
               color={"icon-error"}
               size={16}
-              title={
-                typeof attachment.failed === "object"
-                  ? attachment.failed.toString()
-                  : attachment.failed
-              }
+              title={processing?.failed || item.failed}
             />
           ) : processing?.working ? (
             <Loading size={16} />
