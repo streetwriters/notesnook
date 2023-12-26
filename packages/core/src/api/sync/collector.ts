@@ -53,7 +53,8 @@ class Collector {
 
         await collection.update(
           chunk.map((i) => i.id),
-          { synced: true }
+          { synced: true },
+          { sendEvent: false }
         );
       }
     }
