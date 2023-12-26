@@ -300,10 +300,19 @@ export default class Backup {
     if ("compressed" in backup && typeof decryptedData === "string")
       decryptedData = await this.db.compressor().decompress(decryptedData);
 
-    await this.migrateData(
+    const data =
       typeof decryptedData === "string"
-        ? (JSON.parse(decryptedData) as BackupDataItem[])
-        : Object.values(decryptedData),
+        ? (JSON.parse(decryptedData) as unknown)
+        : Object.values(decryptedData);
+
+    if (!data) throw new Error("No data found.");
+
+    await this.migrateData(
+      Array.isArray(data)
+        ? (data as BackupDataItem[])
+        : typeof data === "object"
+        ? Object.values(data)
+        : [],
       backup.version
     );
   }
@@ -335,6 +344,7 @@ export default class Backup {
   }
 
   private async migrateData(data: BackupDataItem[], version: number) {
+    console.log(data);
     await this.db.transaction(async () => {
       for (let item of data) {
         // we do not want to restore deleted items
