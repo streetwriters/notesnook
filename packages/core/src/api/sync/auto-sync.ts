@@ -54,7 +54,7 @@ export class AutoSync {
     this.logger.info(`Auto sync stopped`);
   }
 
-  private schedule(id: string, item?: Item) {
+  private schedule(id: string | string[], item?: Item) {
     if (
       item &&
       (item.remote ||
@@ -73,7 +73,9 @@ export class AutoSync {
     // are equal causing the item to not be synced.
     const interval = item && item.type === "tiptap" ? 100 : this.interval;
     this.timeout = setTimeout(() => {
-      this.logger.info(`Sync requested by: ${id}`);
+      this.logger.info(
+        `Sync requested by: ${Array.isArray(id) ? id.join(", ") : id}`
+      );
       this.db.eventManager.publish(EVENTS.databaseSyncRequested, false, false);
     }, interval) as unknown as number;
   }
