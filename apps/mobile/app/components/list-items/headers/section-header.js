@@ -101,7 +101,7 @@ export const SectionHeader = React.memo(
             alignItems: "center"
           }}
         >
-          {index === 0 && (
+          {index === 0 ? (
             <>
               <Button
                 onPress={() => {
@@ -109,7 +109,6 @@ export const SectionHeader = React.memo(
                     component: <Sort screen={screen} type={type} />
                   });
                 }}
-                hidden={screen === "Reminders"}
                 tooltipText="Change sorting of items in list"
                 fwdRef={sortRef}
                 title={groupBy}
@@ -160,7 +159,7 @@ export const SectionHeader = React.memo(
                 size={SIZE.lg - 2}
               />
             </>
-          )}
+          ) : null}
         </View>
       </View>
     );
