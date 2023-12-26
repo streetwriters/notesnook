@@ -378,6 +378,7 @@ export class FilteredSelector<T extends Item> {
     return new VirtualizedGrouping<T>(
       count,
       this.batchSize,
+      () => this.ids(options),
       async (start, end) => {
         const items = (await this.filter
           .$call(this.buildSortExpression(options))
@@ -431,6 +432,7 @@ export class FilteredSelector<T extends Item> {
     return new VirtualizedGrouping<T>(
       count,
       this.batchSize,
+      () => this.ids(options),
       async (start, end) => {
         const items = (await this.filter
           .$call(this.buildSortExpression(options))

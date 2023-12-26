@@ -106,6 +106,7 @@ export default class Lookup {
         return new VirtualizedGrouping<TrashItem>(
           ids.length,
           this.db.options.batchSize,
+          () => Promise.resolve(ids),
           async (start, end) => {
             return {
               ids: ids.slice(start, end),
@@ -209,6 +210,7 @@ export default class Lookup {
     return new VirtualizedGrouping<T>(
       ids.length,
       this.db.options.batchSize,
+      () => Promise.resolve(ids),
       async (start, end) => {
         const items = await selector.items(ids);
         return {
