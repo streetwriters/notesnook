@@ -200,7 +200,10 @@ async function changeGroupOptions(
 
   if (options.parentKey === "groupBy") {
     if (item.key === "abc") groupOptions.sortBy = "title";
-    else groupOptions.sortBy = "dateEdited";
+    else
+      options.groupingKey === "tags" || options.groupingKey === "trash"
+        ? "dateModified"
+        : "dateEdited";
   }
   await db.settings.setGroupOptions(options.groupingKey, groupOptions);
   options.refresh();
