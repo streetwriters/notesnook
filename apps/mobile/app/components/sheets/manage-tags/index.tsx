@@ -115,7 +115,7 @@ const ManageTagsSheet = (props: {
         });
     } else {
       db.tags.all.sorted(db.settings.getGroupOptions("tags")).then((items) => {
-        console.log("items loaded tags", items.ids);
+        console.log("items loaded tags", items.placeholders.length);
         setTags(items);
       });
     }
@@ -237,7 +237,7 @@ const ManageTagsSheet = (props: {
   );
 
   const renderTag = useCallback(
-    ({ item, index }: { item: string | number; index: number }) => (
+    ({ index }: { item: boolean; index: number }) => (
       <TagItem
         tags={tags as VirtualizedGrouping<Tag>}
         id={index}
@@ -302,7 +302,7 @@ const ManageTagsSheet = (props: {
       ) : null}
 
       <FlatList
-        data={tags?.ids}
+        data={tags?.placeholders}
         style={{
           width: "100%"
         }}

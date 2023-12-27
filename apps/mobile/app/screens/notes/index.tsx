@@ -126,7 +126,7 @@ const NotesPage = ({
           true
         )) as VirtualizedGrouping<Note>;
 
-        if (notes.ids.length === 0) setLoadingNotes(false);
+        if (notes.placeholders.length === 0) setLoadingNotes(false);
         setNotes(notes);
         await notes.item(0, resolveItems);
         setLoadingNotes(false);
@@ -204,7 +204,8 @@ const NotesPage = ({
         />
 
         {!isMonograph &&
-        ((notes?.ids && (notes?.ids?.length || 0) > 0) || isFocused) ? (
+        ((notes?.placeholders && (notes?.placeholders?.length || 0) > 0) ||
+          isFocused) ? (
           <FloatingButton
             color={accentColor}
             title="Create a note"

@@ -63,7 +63,7 @@ const DownloadAttachments = ({
     canceled.current = false;
     groupId.current = Date.now().toString();
     const result = await downloadAttachments(
-      attachments,
+      await attachments.ids(),
       (progress: number, statusText: string) =>
         setProgress({ value: progress, statusText }),
       canceled,
@@ -89,29 +89,21 @@ const DownloadAttachments = ({
     groupId.current = undefined;
   };
 
-  const successResults = () => {
-    const results = [];
-    for (const [key, value] of result.entries()) {
-      if (value.status === 1) results.push(db.attachments.attachment(key));
-    }
-    return results;
-  };
-
   const failedResults = () => {
     const results = [];
-    for (const [key, value] of result.entries()) {
-      if (value.status === 0) results.push(db.attachments.attachment(key));
+    for (const value of result.values()) {
+      if (value.status === 0) results.push(value.attachment);
     }
     return results;
   };
 
   function getResultText() {
     const downloadedAttachmentsCount =
-      attachments?.ids?.length - failedResults().length;
+      attachments?.placeholders?.length - failedResults().length;
     if (downloadedAttachmentsCount === 0)
       return "Failed to download all attachments";
     return `Successfully downloaded ${downloadedAttachmentsCount}/${
-      attachments?.ids.length
+      attachments?.placeholders.length
     } attachments as a zip file at ${
       Platform.OS === "android" ? "the selected folder" : "Notesnook/downloads"
     }`;
@@ -174,7 +166,9 @@ const DownloadAttachments = ({
             animated={true}
             useNativeDriver
             progress={
-              progress.value ? progress.value / attachments.ids?.length : 0
+              progress.value
+                ? progress.value / attachments.placeholders?.length
+                : 0
             }
             unfilledColor={colors.secondary.background}
             color={colors.primary.accent}
@@ -192,7 +186,7 @@ const DownloadAttachments = ({
           borderRadius: 5,
           marginVertical: 12
         }}
-        data={downloading ? attachments.ids : undefined}
+        data={downloading ? attachments.placeholders : undefined}
         ListEmptyComponent={
           <View
             style={{
@@ -207,7 +201,7 @@ const DownloadAttachments = ({
             </Paragraph>
           </View>
         }
-        keyExtractor={(item, index) => "attachment" + index}
+        keyExtractor={(index) => "attachment" + index}
         renderItem={({ index }) => {
           return (
             <AttachmentItem

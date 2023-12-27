@@ -88,7 +88,7 @@ export const MoveNotes = ({
   );
 
   const renderItem = React.useCallback(
-    ({ index }: { item: string | number; index: number }) => {
+    ({ index }: { item: boolean; index: number }) => {
       return (
         <SelectableNoteItem
           id={index}
@@ -132,7 +132,7 @@ export const MoveNotes = ({
             </Paragraph>
           </View>
         }
-        data={notes?.ids}
+        data={notes?.placeholders}
         renderItem={renderItem}
       />
       {selectedNoteIds.length > 0 ? (

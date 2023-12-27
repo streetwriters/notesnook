@@ -146,7 +146,7 @@ export const NotebookItem = ({
             alignItems: "center"
           }}
         >
-          {nestedNotebooks?.ids.length ? (
+          {nestedNotebooks?.placeholders.length ? (
             <IconButton
               size={SIZE.xl}
               color={isSelected ? colors.selected.icon : colors.primary.icon}
@@ -240,7 +240,7 @@ export const NotebookItem = ({
 
       {!expanded
         ? null
-        : nestedNotebooks?.ids.map((id, index) => (
+        : nestedNotebooks?.placeholders.map((id, index) => (
             <NotebookItem
               key={item?.id + "_" + index}
               id={index}

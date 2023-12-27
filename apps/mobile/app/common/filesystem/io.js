@@ -35,14 +35,10 @@ export async function readEncrypted(filename, key, cipherData) {
       return false;
     }
 
-    const attachment = db.attachments.attachment(filename);
-    const isPng = !attachment.metadata.type
-      ? false
-      : /(png)/g.test(attachment?.metadata.type);
-    const isJpeg = !attachment.metadata.type
-      ? false
-      : /(jpeg|jpg)/g.test(attachment?.metadata.type);
-
+    const attachment = await db.attachments.attachment(filename);
+    const isPng = /(png)/g.test(attachment?.mimeType || "");
+    const isJpeg = /(jpeg|jpg)/g.test(attachment?.mimeType || "");
+    console.log("decrypting....");
     let output = await Sodium.decryptFile(
       key,
       {
@@ -194,10 +190,10 @@ export async function exists(filename) {
   }
 
   if (exists || existsInAppGroup) {
-    const attachment = db.attachments.attachment(filename);
-    const totalChunks = Math.ceil(attachment.length / attachment.chunkSize);
+    const attachment = await db.attachments.attachment(filename);
+    const totalChunks = Math.ceil(attachment.size / attachment.chunkSize);
     const totalAbytes = totalChunks * ABYTES;
-    const expectedFileSize = attachment.length + totalAbytes;
+    const expectedFileSize = attachment.size + totalAbytes;
 
     const stat = await RNFetchBlob.fs.stat(
       existsInAppGroup ? appGroupPath : path

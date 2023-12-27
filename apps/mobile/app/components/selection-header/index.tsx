@@ -19,13 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Item, ItemType, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   BackHandler,
   NativeEventSubscription,
   Platform,
   View
 } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { ToastManager } from "../../services/event-manager";
@@ -43,7 +44,6 @@ import ExportNotesSheet from "../sheets/export-notes";
 import ManageTagsSheet from "../sheets/manage-tags";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
-import Animated, { FadeInUp } from "react-native-reanimated";
 
 export const SelectionHeader = React.memo(
   ({
@@ -65,8 +65,7 @@ export const SelectionHeader = React.memo(
     const clearSelection = useSelectionStore((state) => state.clearSelection);
     const insets = useGlobalSafeAreaInsets();
     const allSelected =
-      items?.ids?.filter((id) => typeof id === "string").length ===
-      selectedItemsList.length;
+      items?.placeholders?.length === selectedItemsList.length;
     const focusedRouteId = useNavigationStore((state) => state.focusedRouteId);
 
     useEffect(() => {
@@ -200,15 +199,7 @@ export const SelectionHeader = React.memo(
             onPress={async () => {
               useSelectionStore
                 .getState()
-                .setAll(
-                  allSelected
-                    ? []
-                    : [
-                        ...((items?.ids.filter(
-                          (id) => typeof id !== "object"
-                        ) as string[]) || [])
-                      ]
-                );
+                .setAll(allSelected ? [] : [...((await items?.ids()) || [])]);
             }}
             tooltipText="Select all"
             tooltipPosition={4}

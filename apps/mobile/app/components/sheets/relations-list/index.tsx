@@ -76,7 +76,7 @@ export const RelationsList = ({
 
   const [items, setItems] = useState<VirtualizedGrouping<Item>>();
 
-  const hasNoRelations = !items || items?.ids?.length === 0;
+  const hasNoRelations = !items || items?.placeholders?.length === 0;
 
   useEffect(() => {
     db.relations?.[relationType]?.(
@@ -85,13 +85,12 @@ export const RelationsList = ({
     )
       .selector.sorted({
         sortBy: "dateEdited",
-        sortDirection: "desc",
-        groupBy: "default"
+        sortDirection: "desc"
       })
       .then((grouped) => {
         setItems(grouped);
       });
-  }, [relationType, referenceType]);
+  }, [relationType, referenceType, item?.id, item?.type]);
 
   return (
     <View

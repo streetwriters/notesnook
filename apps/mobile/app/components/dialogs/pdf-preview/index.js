@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Dimensions, TextInput, View } from "react-native";
 import {
   addOrientationListener,
@@ -85,7 +85,7 @@ const PDFPreview = () => {
     return () => {
       eUnSubscribeEvent("PDFPreview", open);
     };
-  }, []);
+  }, [open]);
 
   const onOrientationChange = (o) => {
     if (o.includes("LANDSCAPE")) {
@@ -102,23 +102,26 @@ const PDFPreview = () => {
     };
   }, []);
 
-  const open = async (attachment) => {
-    setVisible(true);
-    setLoading(true);
-    setTimeout(async () => {
-      setAttachment(attachment);
-      let hash = attachment.metadata.hash;
-      if (!hash) return;
-      const uri = await downloadAttachment(hash, false, {
-        silent: true,
-        cache: true
-      });
-      const path = `${cacheDir}/${uri}`;
-      snapshotValue.current = snapshot.current;
-      setPDFSource("file://" + path);
-      setLoading(false);
-    }, 100);
-  };
+  const open = useCallback(
+    async (attachment) => {
+      setVisible(true);
+      setLoading(true);
+      setTimeout(async () => {
+        setAttachment(attachment);
+        let hash = attachment.hash;
+        if (!hash) return;
+        const uri = await downloadAttachment(hash, false, {
+          silent: true,
+          cache: true
+        });
+        const path = `${cacheDir}/${uri}`;
+        snapshotValue.current = snapshot.current;
+        setPDFSource("file://" + path);
+        setLoading(false);
+      }, 100);
+    },
+    [snapshot]
+  );
 
   const close = () => {
     setPDFSource(null);
@@ -130,7 +133,7 @@ const PDFPreview = () => {
     if (error?.message === "Password required or incorrect password.") {
       await sleep(300);
       presentDialog({
-        context: attachment?.metadata?.hash,
+        context: attachment?.hash,
         input: true,
         inputPlaceholder: "Enter password",
         positiveText: "Unlock",
@@ -151,8 +154,8 @@ const PDFPreview = () => {
   return (
     visible && (
       <BaseDialog animation="fade" visible={true} onRequestClose={close}>
-        <SheetProvider context={attachment?.metadata?.hash} />
-        <Dialog context={attachment?.metadata?.hash} />
+        <SheetProvider context={attachment?.hash} />
+        <Dialog context={attachment?.hash} />
 
         <View
           style={{
@@ -261,7 +264,7 @@ const PDFPreview = () => {
                     color={colors.static.white}
                     name="download"
                     onPress={() => {
-                      downloadAttachment(attachment.metadata.hash, false);
+                      downloadAttachment(attachment.hash, false);
                     }}
                   />
                 </View>
