@@ -26,8 +26,7 @@ import {
   ChevronDown,
   ChevronRight,
   Edit,
-  Home,
-  MoreVertical,
+  MoreHorizontal,
   Notebook2,
   RemoveShortcutLink,
   ShortcutLink,
@@ -225,6 +224,8 @@ function SubNotebooks({
     reloadItem.current?.([context.id]);
   }, [contextNotes, context]);
 
+  if (!rootId) return null;
+
   return (
     <Flex id="subnotebooks" variant="columnFill" sx={{ height: "100%" }}>
       <Flex
@@ -419,14 +420,6 @@ function SubNotebooks({
   );
 }
 
-function navigateCrumb(crumb: { id: string; title: string }, rootId: string) {
-  if (crumb.id === "notebooks") navigate("/notebooks");
-  else if (crumb.id === rootId) {
-    navigate(`/notebooks/${rootId}`);
-  } else {
-    navigate(`/notebooks/${rootId}/${crumb.id}`);
-  }
-}
 function NotebookHeader({
   rootId,
   context
@@ -460,10 +453,7 @@ function NotebookHeader({
 
   useEffect(() => {
     (async function () {
-      setCrumbs([
-        { title: "Notebooks", id: "notebooks" },
-        ...(await db.notebooks.breadcrumbs(context.id))
-      ]);
+      setCrumbs(await db.notebooks.breadcrumbs(context.id));
     })();
   }, [context.id]);
 
@@ -473,38 +463,51 @@ function NotebookHeader({
   return (
     <Flex mx={2} my={2} sx={{ flexDirection: "column", minWidth: 200 }}>
       <Flex sx={{ alignItems: "center", mb: 1 }}>
+        <Button
+          ref={moreCrumbsRef}
+          variant="icon"
+          sx={{ p: 0, flexShrink: 0 }}
+          onClick={() => navigateCrumb("notebooks")}
+          title="Notebooks"
+        >
+          <Notebook2 size={14} />
+        </Button>
+        <ChevronRight as="span" size={14} />
         {crumbs.length > 2 ? (
-          <Button
-            ref={moreCrumbsRef}
-            variant="icon"
-            sx={{ p: 0, flexShrink: 0 }}
-            onClick={() => {
-              if (!moreCrumbsRef.current) return;
-              Menu.openMenu(
-                crumbs
-                  .slice(0, -2)
-                  .reverse()
-                  .map((c) => ({
-                    type: "button",
-                    title: c.title,
-                    key: c.id,
-                    icon: c.id === "notebooks" ? Home.path : Notebook2.path,
-                    onClick: () => navigateCrumb(c, rootId)
-                  })),
-                {
-                  position: {
-                    target: moreCrumbsRef.current,
-                    location: "below",
-                    isTargetAbsolute: true,
-                    align: "start",
-                    yOffset: 10
+          <>
+            <Button
+              ref={moreCrumbsRef}
+              variant="icon"
+              sx={{ p: 0, flexShrink: 0 }}
+              onClick={() => {
+                if (!moreCrumbsRef.current) return;
+                Menu.openMenu(
+                  crumbs
+                    .slice(0, -2)
+                    .reverse()
+                    .map((c) => ({
+                      type: "button",
+                      title: c.title,
+                      key: c.id,
+                      icon: Notebook2.path,
+                      onClick: () => navigateCrumb(c.id, rootId)
+                    })),
+                  {
+                    position: {
+                      target: moreCrumbsRef.current,
+                      location: "below",
+                      isTargetAbsolute: true,
+                      align: "start",
+                      yOffset: 10
+                    }
                   }
-                }
-              );
-            }}
-          >
-            <MoreVertical size={14} />
-          </Button>
+                );
+              }}
+            >
+              <MoreHorizontal size={14} />
+            </Button>
+            <ChevronRight as="span" size={14} />
+          </>
         ) : null}
         <Text
           as="p"
@@ -529,7 +532,7 @@ function NotebookHeader({
                   cursor: "pointer",
                   ":hover": { color: "paragraph-hover" }
                 }}
-                onClick={() => navigateCrumb(crumb, rootId)}
+                onClick={() => navigateCrumb(crumb.id, rootId)}
               >
                 {crumb.title}
               </Text>
@@ -587,4 +590,13 @@ function NotebookHeader({
       </Text>
     </Flex>
   );
+}
+
+function navigateCrumb(notebookId: string, rootId?: string) {
+  if (notebookId === "notebooks") navigate("/notebooks");
+  else if (rootId && notebookId === rootId) {
+    navigate(`/notebooks/${rootId}`);
+  } else if (rootId && notebookId) {
+    navigate(`/notebooks/${rootId}/${notebookId}`);
+  }
 }

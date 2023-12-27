@@ -207,7 +207,8 @@ import {
   mdiFormTextarea,
   mdiGavel,
   mdiDesktopClassic,
-  mdiBellBadgeOutline
+  mdiBellBadgeOutline,
+  mdiDotsHorizontal
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -326,6 +327,7 @@ export const Update = createIcon(mdiUpdate);
 export const Check = createIcon(mdiCheck);
 export const Cross = createIcon(mdiClose);
 export const MoreVertical = createIcon(mdiDotsVertical);
+export const MoreHorizontal = createIcon(mdiDotsHorizontal);
 export const Trash = createIcon(mdiTrashCanOutline);
 export const TopicRemove = createIcon(mdiBookmarkRemoveOutline);
 export const NotebookRemove = createIcon(mdiBookRemoveOutline);
