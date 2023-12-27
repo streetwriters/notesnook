@@ -45,11 +45,7 @@ function Notes() {
   );
 
   useEffect(() => {
-    if (
-      context?.type === "color" &&
-      contextNotes &&
-      contextNotes.ids.length <= 0
-    ) {
+    if (context?.type === "color" && contextNotes && contextNotes.length <= 0) {
       navigate("/", { replace: true });
     }
   }, [context, contextNotes]);
