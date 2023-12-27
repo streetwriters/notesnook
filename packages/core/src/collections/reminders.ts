@@ -57,7 +57,7 @@ export class Reminders implements ICollection {
       throw new Error("Please use db.reminders.merge to merge reminders.");
 
     const id = reminder.id || getId();
-    const oldReminder = this.collection.get(id);
+    const oldReminder = await this.collection.get(id);
 
     reminder = {
       ...oldReminder,
