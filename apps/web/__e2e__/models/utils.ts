@@ -47,7 +47,7 @@ export async function fillReminderDialog(
   page: Page,
   reminder: Partial<Reminder>
 ) {
-  const dialog = page.locator(getTestId("reminder-dialog"));
+  const dialog = page.locator(getTestId("add-reminder-dialog"));
   const titleInput = dialog.locator(getTestId("title-input"));
   const descriptionInput = dialog.locator(getTestId("description-input"));
   const dateInput = dialog.locator(getTestId("date-input"));
