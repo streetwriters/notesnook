@@ -152,7 +152,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
     <Dialog
       isOpen={true}
       title={reminderId ? "Edit reminder" : "Add a reminder"}
-      description={""}
+      testId="add-reminder-dialog"
       onClose={() => props.onClose(false)}
       positiveButton={{
         text: reminderId ? "Save" : "Add",

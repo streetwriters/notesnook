@@ -108,7 +108,7 @@ function Reminder(props: ReminderProps) {
 }
 
 export default React.memo(Reminder, (prev, next) => {
-  return prev?.item?.title === next?.item?.title;
+  return prev.item.dateModified === next.item.dateModified;
 });
 
 const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
@@ -133,7 +133,7 @@ const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
           id: reminder.id,
           disabled: !reminder.disabled
         });
-        store.refresh();
+        await store.refresh();
       }
     },
     { key: "sep", type: "separator" },
