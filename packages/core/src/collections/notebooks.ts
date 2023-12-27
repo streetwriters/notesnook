@@ -214,7 +214,11 @@ export class Notebooks implements ICollection {
     const records = await this.all
       .fields(["notebooks.id", "notebooks.title"])
       .records(ids.map((i) => i.id));
-    return ids.reverse().map((id) => records[id.id]) as {
+
+    return ids
+      .reverse()
+      .map((id) => records[id.id])
+      .filter(Boolean) as {
       id: string;
       title: string;
     }[];
