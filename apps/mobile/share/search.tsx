@@ -173,7 +173,7 @@ const NotebookItem = ({
           alignItems: "center"
         }}
       >
-        {nestedNotebooks?.ids.length ? (
+        {nestedNotebooks?.placeholders.length ? (
           <TouchableOpacity
             style={{
               width: 35,
@@ -234,14 +234,14 @@ const NotebookItem = ({
         </View>
       </View>
 
-      {nestedNotebooks?.ids?.length && isExpanded ? (
+      {nestedNotebooks?.placeholders?.length && isExpanded ? (
         <View
           style={{
             paddingLeft: level + 1 > 0 && level + 1 < 5 ? 15 : 0,
             marginTop: 5
           }}
         >
-          {nestedNotebooks.ids.map((item, index) => (
+          {nestedNotebooks.placeholders.map((item, index) => (
             <NotebookItem
               key={notebook?.id + index}
               id={index}
@@ -396,7 +396,7 @@ export const Search = ({
   }, [get]);
 
   const renderItem = React.useCallback(
-    ({ index }: { item: string | number; index: number }) =>
+    ({ index }: { item: boolean; index: number }) =>
       mode === "selectNotebooks" ? (
         <NotebookItem
           id={index}
@@ -509,7 +509,7 @@ export const Search = ({
         ) : null}
 
         <FlatList
-          data={items?.ids}
+          data={items?.placeholders}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="none"
           renderItem={renderItem}

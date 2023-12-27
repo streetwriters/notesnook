@@ -65,9 +65,11 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
           query,
           route.params.items as FilteredSelector<Note>
         ).sorted();
-        console.log(`Found ${results.ids?.length} results for ${query}`);
+        console.log(
+          `Found ${results.placeholders?.length} results for ${query}`
+        );
         setResults(results);
-        if (results.ids?.length === 0) {
+        if (results.placeholders?.length === 0) {
           setSearchStatus(`No results found for ${query}`);
         } else {
           setSearchStatus(undefined);

@@ -56,8 +56,8 @@ export const Notebooks = ({
   });
 
   useEffect(() => {
-    if (notebooks?.ids) {
-      if (notebooks?.ids?.length === 0 && !Config.isTesting) {
+    if (notebooks?.placeholders) {
+      if (notebooks?.placeholders?.length === 0 && !Config.isTesting) {
         Walkthrough.present("notebooks");
       } else {
         Walkthrough.update("notebooks");
@@ -99,7 +99,9 @@ export const Notebooks = ({
           headerTitle="Notebooks"
         />
 
-        {!notebooks || notebooks.ids.length === 0 || !isFocused ? null : (
+        {!notebooks ||
+        notebooks.placeholders.length === 0 ||
+        !isFocused ? null : (
           <FloatingButton
             title="Create a new notebook"
             onPress={onButtonPress}
