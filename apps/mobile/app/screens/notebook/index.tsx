@@ -235,7 +235,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
                 AddNotebookSheet.present(params.current.item);
               }}
               notebook={params.current.item}
-              totalNotes={notes?.ids.length || 0}
+              totalNotes={notes?.placeholders.length || 0}
             />
           }
           placeholder={{

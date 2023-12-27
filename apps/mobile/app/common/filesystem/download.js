@@ -119,7 +119,7 @@ export async function checkAttachment(hash) {
   const isInternetReachable =
     internetState.isConnected && internetState.isInternetReachable;
   if (!isInternetReachable) return { success: true };
-  const attachment = db.attachments.attachment(hash);
+  const attachment = await db.attachments.attachment(hash);
   if (!attachment) return { failed: "Attachment not found." };
 
   try {

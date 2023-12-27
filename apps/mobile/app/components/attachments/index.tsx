@@ -92,13 +92,13 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
     }, 300);
   };
 
-  const renderItem = ({ item }: { item: string | number }) => (
+  const renderItem = ({ index }: { item: boolean; index: number }) => (
     <AttachmentItem
       setAttachments={() => {
         setAttachments(filterAttachments(currentFilter));
       }}
       attachments={attachments}
-      id={item}
+      id={index}
       context="attachments-list"
     />
   );
@@ -106,10 +106,10 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
   const onCheck = async () => {
     if (!attachments) return;
     setLoading(true);
-    for (const id of attachments.ids) {
-      const attachment = (await attachments.item(id))?.item;
-      if (!attachment) continue;
 
+    for (let i = 0; i < attachments.placeholders.length; i++) {
+      const attachment = (await attachments.item(i))?.item;
+      if (!attachment) continue;
       const result = await filesystem.checkAttachment(attachment.hash);
       if (result.failed) {
         await db.attachments.markAsFailed(attachment.hash, result.failed);
@@ -310,7 +310,7 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
           />
         }
         estimatedItemSize={50}
-        data={attachments?.ids}
+        data={attachments?.placeholders}
         renderItem={renderItem}
       />
 

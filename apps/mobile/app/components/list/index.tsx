@@ -155,7 +155,7 @@ export default function List(props: ListProps) {
           style={styles}
           ref={scrollRef}
           testID={notesnook.list.id}
-          data={props.data?.ids || []}
+          data={props.data?.placeholders || []}
           renderItem={renderItem}
           onScroll={onListScroll}
           nestedScrollEnabled={true}
