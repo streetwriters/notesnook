@@ -331,7 +331,13 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
             data-test-id="add-new-notebook"
             variant="secondary"
             sx={{ mt: 2 }}
-            onClick={() => showAddNotebookDialog()}
+            onClick={() =>
+              showAddNotebookDialog().then(() =>
+                rootNotebooks.status === "fulfilled"
+                  ? rootNotebooks.refresh()
+                  : null
+              )
+            }
           >
             Add new notebook
           </Button>
