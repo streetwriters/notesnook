@@ -8,6 +8,7 @@
       }
     }
   },
+  "parallel": 4,
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],
