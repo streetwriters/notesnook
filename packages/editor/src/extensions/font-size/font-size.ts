@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Extension } from "@tiptap/core";
-import "@tiptap/extension-text-style";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store";
+import { Editor, Extension } from "@tiptap/core";
 
 type FontSizeOptions = {
   types: string[];
@@ -83,5 +83,33 @@ export const FontSize = Extension.create<FontSizeOptions>({
             .run();
         }
     };
+  },
+  addKeyboardShortcuts() {
+    return {
+      "ctrl-]": ({ editor }) => {
+        editor
+          .chain()
+          .focus()
+          .setFontSize(`${Math.min(120, getFontSize(editor) + 1)}px`)
+          .run();
+        return true;
+      },
+      "Ctrl-[": ({ editor }) => {
+        editor
+          .chain()
+          .focus()
+          .setFontSize(`${Math.max(8, getFontSize(editor) - 1)}px`)
+          .run();
+        return true;
+      }
+    };
   }
 });
+
+function getFontSize(editor: Editor) {
+  const defaultFontSize = useToolbarStore.getState().fontSize;
+  const { fontSize } = editor.getAttributes("textStyle");
+  return fontSize
+    ? parseInt(fontSize.replace("px", "")) || 16
+    : defaultFontSize;
+}
