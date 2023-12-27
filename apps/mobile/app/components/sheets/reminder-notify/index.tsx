@@ -150,13 +150,13 @@ export default function ReminderNotify({
         })}
       </ScrollView>
 
-      {references?.ids && references?.ids?.length > 0 ? (
+      {references?.placeholders && references?.placeholders?.length > 0 ? (
         <View
           style={{
             width: "100%",
             height:
-              160 * references?.ids?.length < 500
-                ? 160 * references?.ids?.length
+              160 * references?.placeholders?.length < 500
+                ? 160 * references?.placeholders?.length
                 : 500,
             borderTopWidth: 1,
             borderTopColor: colors.secondary.background,
