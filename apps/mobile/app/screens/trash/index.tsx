@@ -103,7 +103,7 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
           headerTitle="Trash"
         />
 
-        {trash && trash?.ids?.length !== 0 ? (
+        {trash && trash?.placeholders?.length !== 0 ? (
           <FloatingButton
             title="Clear all trash"
             onPress={onPressFloatingButton}

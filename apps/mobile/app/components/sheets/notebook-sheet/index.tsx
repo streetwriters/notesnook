@@ -140,13 +140,7 @@ export const NotebookSheet = () => {
     loading: "Loading notebook topics"
   };
 
-  const renderNotebook = ({
-    item,
-    index
-  }: {
-    item: string | number;
-    index: number;
-  }) => (
+  const renderNotebook = ({ index }: { item: boolean; index: number }) => (
     <NotebookItem
       items={notebooks}
       id={index}
@@ -403,7 +397,7 @@ export const NotebookSheet = () => {
         </View>
         <SelectionContext.Provider value={selectionContext}>
           <FlashList
-            data={notebooks?.ids}
+            data={notebooks?.placeholders}
             style={{
               width: "100%"
             }}
@@ -508,7 +502,7 @@ const NotebookItem = ({
             alignItems: "center"
           }}
         >
-          {nestedNotebooks?.ids.length ? (
+          {nestedNotebooks?.placeholders.length ? (
             <IconButton
               size={SIZE.lg}
               color={isSelected ? colors.selected.icon : colors.primary.icon}
@@ -601,7 +595,7 @@ const NotebookItem = ({
       {!expanded
         ? null
         : item &&
-          nestedNotebooks?.ids.map((id, index) => (
+          nestedNotebooks?.placeholders.map((id, index) => (
             <NotebookItem
               key={item.id + "_" + index}
               id={index}

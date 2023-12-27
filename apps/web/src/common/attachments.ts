@@ -81,7 +81,7 @@ export async function downloadAttachment<
 }
 
 export async function checkAttachment(hash: string) {
-  const attachment = db.attachments.attachment(hash);
+  const attachment = await db.attachments.attachment(hash);
   if (!attachment) return { failed: "Attachment not found." };
 
   try {

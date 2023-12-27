@@ -31,14 +31,12 @@ import { db } from "../../../common/database";
 import { presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { ItemSelection } from "../../../stores/item-selection-store";
-import {
-  useNotebookStore,
-  useNotebooks
-} from "../../../stores/use-notebook-store";
+import { useNotebooks } from "../../../stores/use-notebook-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { updateNotebook } from "../../../utils/notebooks";
+import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import SheetProvider from "../../sheet-provider";
@@ -47,7 +45,6 @@ import { IconButton } from "../../ui/icon-button";
 import Paragraph from "../../ui/typography/paragraph";
 import { NotebookItem } from "./notebook-item";
 import { useNotebookItemSelectionStore } from "./store";
-import { SIZE } from "../../../utils/size";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -144,7 +141,7 @@ const MoveNoteSheet = ({
   };
 
   const renderNotebook = useCallback(
-    ({ item, index }: { item: string | number; index: number }) => (
+    ({ index }: { item: boolean; index: number }) => (
       <NotebookItem items={notebooks} id={index} index={index} />
     ),
     [notebooks]
@@ -228,7 +225,7 @@ const MoveNoteSheet = ({
           }}
         >
           <FlashList
-            data={notebooks?.ids}
+            data={notebooks?.placeholders}
             style={{
               width: "100%"
             }}
