@@ -27,6 +27,7 @@ import { SqliteAdapter, SqliteIntrospector, SqliteQueryCompiler } from "kysely";
 import filesystem from "../filesystem";
 import Storage from "./storage";
 import { RNSqliteDriver } from "./sqlite.kysely";
+import { getDatabaseKey } from "./encryption";
 
 database.host(
   __DEV__
@@ -51,27 +52,35 @@ database.host(
       }
 );
 
-database.setup({
-  storage: Storage,
-  eventsource: Platform.OS === "ios" ? EventSource : AndroidEventSource,
-  fs: filesystem,
-  compressor: {
-    compress: Gzip.deflate,
-    decompress: Gzip.inflate
-  },
-  batchSize: 100,
-  sqliteOptions: {
-    dialect: (name) => ({
-      createDriver: () => {
-        return new RNSqliteDriver({ async: true, dbName: name });
-      },
-      createAdapter: () => new SqliteAdapter(),
-      createIntrospector: (db) => new SqliteIntrospector(db),
-      createQueryCompiler: () => new SqliteQueryCompiler()
-    }),
-    tempStore: "memory"
-  }
-});
+export async function setupDatabase(password) {
+  const key = await getDatabaseKey(password);
+  if (!key)
+    throw new Error("Database setup failed, could not get database key");
+
+  console.log("Opening database with key:", key);
+  database.setup({
+    storage: Storage,
+    eventsource: Platform.OS === "ios" ? EventSource : AndroidEventSource,
+    fs: filesystem,
+    compressor: {
+      compress: Gzip.deflate,
+      decompress: Gzip.inflate
+    },
+    batchSize: 100,
+    sqliteOptions: {
+      dialect: (name) => ({
+        createDriver: () => {
+          return new RNSqliteDriver({ async: true, dbName: name });
+        },
+        createAdapter: () => new SqliteAdapter(),
+        createIntrospector: (db) => new SqliteIntrospector(db),
+        createQueryCompiler: () => new SqliteQueryCompiler()
+      }),
+      tempStore: "memory",
+      password: key
+    }
+  });
+}
 
 export const db = database;
 export const DatabaseLogger = dbLogger;

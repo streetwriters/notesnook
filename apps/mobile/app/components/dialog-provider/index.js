@@ -36,6 +36,7 @@ import SheetProvider from "../sheet-provider";
 import RateAppSheet from "../sheets/rate-app";
 import RecoveryKeySheet from "../sheets/recovery-key";
 import RestoreDataSheet from "../sheets/restore-data";
+import { AppLockPassword } from "../dialogs/applock-password";
 
 const DialogProvider = () => {
   const { colors } = useThemeColors();
@@ -60,6 +61,7 @@ const DialogProvider = () => {
       <SessionExpired />
       <PDFPreview />
       <JumpToSectionDialog />
+      <AppLockPassword />
     </>
   );
 };

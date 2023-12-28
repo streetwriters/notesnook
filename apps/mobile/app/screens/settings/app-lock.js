@@ -210,7 +210,8 @@ const AppLock = ({ route }) => {
                   if (
                     !(await BiometicService.isBiometryAvailable()) &&
                     !useUserStore.getState().user &&
-                    item.value !== modes[0].value
+                    item.value !== modes[0].value &&
+                    !SettingsService.getProperty("appLockHasPasswordSecurity")
                   ) {
                     ToastManager.show({
                       heading: "Biometrics not enrolled",
@@ -220,6 +221,26 @@ const AppLock = ({ route }) => {
                     });
                     return;
                   }
+
+                  if (
+                    !SettingsService.getProperty(
+                      "appLockHasPasswordSecurity"
+                    ) &&
+                    item.value !== modes[0].value
+                  ) {
+                    const verified = await BiometicService.validateUser(
+                      "Verify it's you"
+                    );
+                    if (verified) {
+                      SettingsService.setProperty(
+                        "biometricsAuthEnabled",
+                        true
+                      );
+                    } else {
+                      return;
+                    }
+                  }
+
                   SettingsService.set({ appLockMode: item.value });
                 }}
                 customStyle={{
