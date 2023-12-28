@@ -22,7 +22,7 @@ import {
   deactivateKeepAwake
 } from "@sayem314/react-native-keep-awake";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Platform, StatusBar, View } from "react-native";
+import { Dimensions, Platform, StatusBar, View } from "react-native";
 import changeNavigationBarColor from "react-native-navigation-bar-color";
 import {
   addOrientationListener,
@@ -210,6 +210,11 @@ const _TabsHolder = () => {
 
     checkDeviceType(size);
   };
+
+  if (!deviceMode) {
+    const size = Dimensions.get("window");
+    checkDeviceType(size);
+  }
 
   function checkDeviceType(size) {
     setDimensions({

@@ -35,6 +35,7 @@ import Input from "../ui/input";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { validateAppLockPassword } from "../../common/database/encryption";
 
 const AppLockedOverlay = () => {
   const { colors } = useThemeColors();
@@ -45,11 +46,24 @@ const AppLockedOverlay = () => {
   const passwordInputRef = useRef<TextInput>(null);
   const password = useRef<string>();
   const appState = useAppState();
-
   const biometricUnlockAwaitingUserInput = useRef(false);
+  const appLockHasPasswordSecurity = useSettingStore(
+    (state) => state.settings.appLockHasPasswordSecurity
+  );
+  const biometricsAuthEnabled = useSettingStore(
+    (state) =>
+      state.settings.biometricsAuthEnabled === true ||
+      (state.settings.biometricsAuthEnabled === undefined &&
+        !state.settings.appLockHasPasswordSecurity)
+  );
 
   const onUnlockAppRequested = useCallback(async () => {
-    if (!(await BiometricService.isBiometryAvailable())) return;
+    if (
+      !biometricsAuthEnabled ||
+      !(await BiometricService.isBiometryAvailable())
+    )
+      return;
+
     if (Platform.OS === "android") {
       const activityName = await NotesnookModule.getActivityName();
       if (activityName !== "MainActivity") return;
@@ -69,12 +83,15 @@ const AppLockedOverlay = () => {
       biometricUnlockAwaitingUserInput.current = false;
       useSettingStore.getState().setRequestBiometrics(false);
     }, 1);
-  }, [lockApp]);
+  }, [biometricsAuthEnabled, lockApp]);
 
   const onSubmit = async () => {
     if (!password.current) return;
     try {
-      const unlocked = await db.user.verifyPassword(password.current);
+      const unlocked = appLockHasPasswordSecurity
+        ? validateAppLockPassword(password.current)
+        : await db.user.verifyPassword(password.current);
+
       if (unlocked) {
         lockApp(false);
         enabled(false);
@@ -97,109 +114,116 @@ const AppLockedOverlay = () => {
     }
   }, [appState, onUnlockAppRequested, appLocked]);
 
-  return (
-    appLocked && (
+  return appLocked ? (
+    <View
+      style={{
+        backgroundColor: colors.primary.background,
+        width: "100%",
+        height: "100%",
+        position: "absolute",
+        zIndex: 999,
+        justifyContent: "center"
+      }}
+    >
       <View
         style={{
-          backgroundColor: colors.primary.background,
-          width: "100%",
-          height: "100%",
-          position: "absolute",
-          zIndex: 999,
-          justifyContent: "center"
+          flex: 1,
+          justifyContent: "center",
+          width:
+            deviceMode !== "mobile"
+              ? "50%"
+              : Platform.OS == "ios"
+              ? "95%"
+              : "100%",
+          paddingHorizontal: 12,
+          marginBottom: 30,
+          marginTop: 15,
+          alignSelf: "center"
         }}
       >
-        <View
+        <IconButton
+          name="fingerprint"
+          size={100}
+          customStyle={{
+            width: 100,
+            height: 100,
+            marginBottom: 20,
+            marginTop: user ? 0 : 50
+          }}
+          onPress={onUnlockAppRequested}
+          color={colors.primary.border}
+        />
+        <Heading
+          color={colors.primary.heading}
           style={{
-            flex: 1,
-            justifyContent: "center",
-            width:
-              deviceMode !== "mobile"
-                ? "50%"
-                : Platform.OS == "ios"
-                ? "95%"
-                : "100%",
-            paddingHorizontal: 12,
-            marginBottom: 30,
-            marginTop: 15,
-            alignSelf: "center"
+            alignSelf: "center",
+            textAlign: "center"
           }}
         >
-          <IconButton
-            name="fingerprint"
-            size={100}
-            customStyle={{
-              width: 100,
-              height: 100,
-              marginBottom: 20,
-              marginTop: user ? 0 : 50
-            }}
-            onPress={onUnlockAppRequested}
-            color={colors.primary.border}
-          />
-          <Heading
-            color={colors.primary.heading}
-            style={{
-              alignSelf: "center",
-              textAlign: "center"
-            }}
-          >
-            Unlock your notes
-          </Heading>
+          Unlock your notes
+        </Heading>
 
-          <Paragraph
-            style={{
-              alignSelf: "center",
-              textAlign: "center",
-              maxWidth: "90%"
-            }}
-          >
-            {"Please verify it's you"}
-          </Paragraph>
-          <Seperator />
+        <Paragraph
+          style={{
+            alignSelf: "center",
+            textAlign: "center",
+            maxWidth: "90%"
+          }}
+        >
+          {"Please verify it's you"}
+        </Paragraph>
+        <Seperator />
+        <View
+          style={{
+            width: "100%",
+            padding: 12,
+            backgroundColor: colors.primary.background
+          }}
+        >
+          {user || appLockHasPasswordSecurity ? (
+            <>
+              <Input
+                fwdRef={passwordInputRef}
+                secureTextEntry
+                keyboardType={
+                  appLockHasPasswordSecurity ? "number-pad" : "default"
+                }
+                placeholder={`Enter ${
+                  appLockHasPasswordSecurity
+                    ? `app lock pin`
+                    : "account password"
+                }`}
+                onChangeText={(v) => (password.current = v)}
+                onSubmit={() => {
+                  onSubmit();
+                }}
+              />
+            </>
+          ) : null}
+
           <View
             style={{
-              width: "100%",
-              padding: 12,
-              backgroundColor: colors.primary.background
+              marginTop: user ? 25 : 25
             }}
           >
-            {user ? (
+            {user || appLockHasPasswordSecurity ? (
               <>
-                <Input
-                  fwdRef={passwordInputRef}
-                  secureTextEntry
-                  placeholder="Enter account password"
-                  onChangeText={(v) => (password.current = v)}
-                  onSubmit={() => {
-                    onSubmit();
+                <Button
+                  title="Continue"
+                  type="accent"
+                  onPress={onSubmit}
+                  width={250}
+                  height={45}
+                  style={{
+                    borderRadius: 150,
+                    marginBottom: 10
                   }}
+                  fontSize={SIZE.md}
                 />
               </>
             ) : null}
 
-            <View
-              style={{
-                marginTop: user ? 25 : 25
-              }}
-            >
-              {user ? (
-                <>
-                  <Button
-                    title="Continue"
-                    type="accent"
-                    onPress={onSubmit}
-                    width={250}
-                    height={45}
-                    style={{
-                      borderRadius: 150,
-                      marginBottom: 10
-                    }}
-                    fontSize={SIZE.md}
-                  />
-                </>
-              ) : null}
-
+            {biometricsAuthEnabled ? (
               <Button
                 title="Unlock with Biometrics"
                 width={250}
@@ -207,12 +231,12 @@ const AppLockedOverlay = () => {
                 icon={"fingerprint"}
                 type="transparent"
               />
-            </View>
+            ) : null}
           </View>
         </View>
       </View>
-    )
-  );
+    </View>
+  ) : null;
 };
 
 export default AppLockedOverlay;

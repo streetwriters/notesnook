@@ -43,6 +43,18 @@ I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
 
+// How app lock works
+// 1. User goes to settings and setup app lock with a Pin/Password.
+// 2. The Pin/Password is used to encrypt a random value or user's encryption key.
+// 3. The encrypted value is stored in MMKV
+// 4. When the app launches, the same value is decrypted with user provided key, if it works, we launch the app otherwise it remains locked.
+// 5. If Biometrics are enabled, the app lock pin/password is stored in keychain. the value can be accessed if fingerprint auth works ONLY.
+// 6. User can  manually enter the pin if biometrics fails.
+// 7. There is no way to enter the app if user forgets the PIN. The only way is to reset app data and start fresh again.
+
+// How to handle app lock for existing users...
+// 1.
+
 const App = () => {
   const init = useAppEvents();
   useEffect(() => {

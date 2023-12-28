@@ -216,12 +216,17 @@ export type SQLiteOptions = {
   tempStore?: "memory" | "file" | "default";
   cacheSize?: number;
   pageSize?: number;
+  password?: string;
 };
 export async function createDatabase(name: string, options: SQLiteOptions) {
   const db = new Kysely<RawDatabaseSchema>({
     dialect: options.dialect(name),
     plugins: [new SqliteBooleanPlugin()]
   });
+  if (options.password)
+    await sql`PRAGMA key = ${sql.ref(options.password)}`
+      .execute(db)
+      .then((r) => console.log(r));
 
   const migrator = new Migrator({
     db,
@@ -273,6 +278,13 @@ export async function createDatabase(name: string, options: SQLiteOptions) {
   await createTriggers(db);
 
   return db;
+}
+
+export async function changeDatabasePassword(
+  db: Kysely<DatabaseSchema>,
+  password?: string
+) {
+  await sql`PRAGMA rekey = "${password ? password : ""}"`.execute(db);
 }
 
 export function isFalse<TB extends keyof DatabaseSchema>(
