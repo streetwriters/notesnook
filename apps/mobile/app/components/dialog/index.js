@@ -62,16 +62,6 @@ export const Dialog = ({ context = "global" }) => {
     }
   });
 
-  useEffect(() => {
-    eSubscribeEvent(eOpenSimpleDialog, show);
-    eSubscribeEvent(eCloseSimpleDialog, hide);
-
-    return () => {
-      eUnSubscribeEvent(eOpenSimpleDialog, show);
-      eUnSubscribeEvent(eCloseSimpleDialog, hide);
-    };
-  }, [show]);
-
   const onPressPositive = async () => {
     if (dialogInfo.positivePress) {
       inputRef.current?.blur();
@@ -96,6 +86,16 @@ export const Dialog = ({ context = "global" }) => {
     },
     [context]
   );
+
+  useEffect(() => {
+    eSubscribeEvent(eOpenSimpleDialog, show);
+    eSubscribeEvent(eCloseSimpleDialog, hide);
+
+    return () => {
+      eUnSubscribeEvent(eOpenSimpleDialog, show);
+      eUnSubscribeEvent(eCloseSimpleDialog, hide);
+    };
+  }, [show]);
 
   const hide = () => {
     setInputValue(null);
