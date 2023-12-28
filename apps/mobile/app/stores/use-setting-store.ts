@@ -74,6 +74,8 @@ export type Settings = {
   colorScheme: "dark" | "light";
   lighTheme: ThemeDefinition;
   darkTheme: ThemeDefinition;
+  appLockHasPasswordSecurity?: boolean;
+  biometricsAuthEnabled?: boolean;
 };
 
 type DimensionsType = {
@@ -109,6 +111,8 @@ export interface SettingStore extends State {
   setInsets: (insets: Insets) => void;
   timeFormat: string;
   dateFormat: string;
+  dbPassword?: string;
+  isOldAppLock: () => boolean;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -154,10 +158,13 @@ export const defaultSettings: SettingStore["settings"] = {
   defaultFontSize: 16,
   colorScheme: "light",
   lighTheme: ThemeLight,
-  darkTheme: ThemeDark
+  darkTheme: ThemeDark,
+  biometricsAuthEnabled: false,
+  appLockHasPasswordSecurity: false
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
+  dbPassword: undefined,
   settings: { ...defaultSettings },
   sheetKeyboardHandler: true,
   fullscreen: false,
@@ -182,6 +189,13 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     });
   },
   appDidEnterBackgroundForAction: false,
+  isOldAppLock: () => {
+    return (
+      get().settings.appLockHasPasswordSecurity === undefined &&
+      get().settings.biometricsAuthEnabled === undefined &&
+      get().settings.appLockMode !== "none"
+    );
+  },
   insets: initialWindowMetrics?.insets
     ? initialWindowMetrics.insets
     : { top: 0, right: 0, left: 0, bottom: 0 }

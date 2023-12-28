@@ -68,6 +68,7 @@ import { useDragState } from "./editor/state";
 import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import { AppLockPassword } from "../../components/dialogs/applock-password";
 type User = any;
 
 export const settingsGroups: SettingSection[] = [
@@ -760,11 +761,84 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "app-lock",
         name: "App lock",
-        description: "Change app lock mode to suit your needs",
-        icon: "fingerprint",
-        modifer: () => {
-          AppLock.present();
-        }
+        type: "screen",
+        description: "Enhanced at rest encryption with app lock",
+        icon: "lock",
+        sections: [
+          {
+            id: "app-lock-mode",
+            name: "App lock mode",
+            description:
+              "Select the mode for the desired level of app lock security.",
+            icon: "fingerprint",
+            modifer: () => {
+              AppLock.present();
+            }
+          },
+          {
+            id: "app-lock-pin",
+            name: "Setup app lock pin",
+            description: "Set up a new pin for app lock",
+            hidden: () => {
+              return !!SettingsService.getProperty(
+                "appLockHasPasswordSecurity"
+              );
+            },
+            property: "appLockHasPasswordSecurity",
+            modifer: () => {
+              AppLockPassword.present("create");
+            }
+          },
+          {
+            id: "app-lock-pin-change",
+            name: "Change app lock pin",
+            description: "Set up a new pin for the app lock",
+            hidden: () => {
+              return !SettingsService.getProperty("appLockHasPasswordSecurity");
+            },
+            property: "appLockHasPasswordSecurity",
+            modifer: () => {
+              AppLockPassword.present("change");
+            }
+          },
+          {
+            id: "app-lock-pin-remove",
+            name: "Remove app lock pin",
+            description:
+              "Remove app lock pin, app lock will fallback to using account password to unlock the app",
+            hidden: () => {
+              return !SettingsService.getProperty("appLockHasPasswordSecurity");
+            },
+            property: "appLockHasPasswordSecurity",
+            modifer: () => {
+              AppLockPassword.present("remove");
+            }
+          },
+          {
+            id: "app-lock-fingerprint",
+            name: "Unlock with biometrics",
+            description: "Allow biometric authentication to unlock the app",
+            type: "switch",
+            property: "biometricsAuthEnabled",
+            onChange: async () => {
+              if (await BiometicService.isBiometryAvailable()) {
+                const verified = await BiometicService.validateUser(
+                  "Verify it's you"
+                );
+                if (!verified) {
+                  SettingsService.setProperty("biometricsAuthEnabled", false);
+                }
+              } else {
+                ToastManager.error(
+                  new Error(
+                    "Biometric authentication is unavailable on this device."
+                  )
+                );
+                SettingsService.setProperty("biometricsAuthEnabled", false);
+              }
+            }
+          }
+        ]
       }
     ]
   },

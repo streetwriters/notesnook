@@ -49,7 +49,7 @@ import { User } from "@notesnook/core/dist/api/user-manager";
 import { EventManagerSubscription } from "@notesnook/core/dist/utils/event-manager";
 //@ts-ignore
 import { enabled } from "react-native-privacy-snapshot";
-import { DatabaseLogger, db } from "../common/database";
+import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
@@ -643,31 +643,39 @@ export const useAppEvents = () => {
     }
   }, [loading, onUserUpdated]);
 
-  const initializeDatabase = useCallback(async () => {
-    if (!db.isInitialized) {
-      RNBootSplash.hide({ fade: true });
-      DatabaseLogger.info("Initializing database");
-      try {
-        await db.init();
-      } catch (e) {
-        console.log(e);
+  const initializeDatabase = useCallback(
+    async (password?: string) => {
+      if (useUserStore.getState().appLocked) return;
+      if (!db.isInitialized) {
+        RNBootSplash.hide({ fade: true });
+        DatabaseLogger.info("Initializing database");
+        try {
+          await setupDatabase(password);
+          await db.init();
+        } catch (e) {
+          DatabaseLogger.error(e as Error);
+        }
       }
-    }
-    if (IsDatabaseMigrationRequired()) return;
-    useSettingStore.getState().setAppLoading(false);
-    Walkthrough.init();
-  }, [IsDatabaseMigrationRequired]);
+
+      if (db.isInitialized) {
+        useSettingStore.getState().setAppLoading(false);
+      }
+      if (IsDatabaseMigrationRequired()) return;
+      Walkthrough.init();
+    },
+    [IsDatabaseMigrationRequired]
+  );
 
   useEffect(() => {
     let sub: () => void;
     if (appLocked) {
       const sub = useUserStore.subscribe((state) => {
-        if (
-          !state.appLocked &&
-          db.isInitialized &&
-          useSettingStore.getState().isAppLoading
-        ) {
-          initializeDatabase();
+        if (!state.appLocked && useSettingStore.getState().isAppLoading) {
+          initializeDatabase(useSettingStore.getState().dbPassword);
+          useSettingStore.setState({
+            dbPassword: undefined
+          });
+
           sub();
         }
       });

@@ -64,6 +64,7 @@ import {
   DatabaseAccessor,
   DatabaseSchema,
   SQLiteOptions,
+  changeDatabasePassword,
   createDatabase
 } from "../database";
 import { Kysely, Transaction, sql } from "kysely";
@@ -231,12 +232,18 @@ class Database {
       "DELETE FROM sqlite_master",
       "PRAGMA writable_schema = 0",
       "VACUUM",
-      "PRAGMA integrity_check"
+      "PRAGMA integrity_check",
+      "PRAGMA rekey = ''"
     ]) {
       await sql.raw(statement).execute(this.sql());
     }
     await this.sql().destroy();
     this._sql = await createDatabase("notesnook", this.options.sqliteOptions);
+  }
+
+  async changePassword(password?: string) {
+    if (!this._sql) return;
+    await changeDatabasePassword(this._sql, password);
   }
 
   async init() {

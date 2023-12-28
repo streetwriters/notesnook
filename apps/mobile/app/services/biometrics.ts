@@ -74,13 +74,13 @@ async function getCredentials(title?: string, description?: string) {
 
     const options = Platform.select({
       ios: {
-        fallbackEnabled: true,
+        fallbackEnabled: false,
         description: description
       },
       android: {
         title: title,
         description: description,
-        deviceCredentialAllowed: true
+        deviceCredentialAllowed: false
       }
     });
     await FingerprintScanner.authenticate(options as AuthenticateIOS);
@@ -125,13 +125,13 @@ async function validateUser(title: string, description?: string) {
     await FingerprintScanner.authenticate(
       Platform.select({
         ios: {
-          fallbackEnabled: true,
+          fallbackEnabled: false,
           description: title
         },
         android: {
           title: title,
           description: description,
-          deviceCredentialAllowed: true
+          deviceCredentialAllowed: false
         }
       }) as AuthenticateIOS
     );
