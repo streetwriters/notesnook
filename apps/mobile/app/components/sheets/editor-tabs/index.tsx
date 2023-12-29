@@ -33,6 +33,7 @@ import Paragraph from "../../ui/typography/paragraph";
 type TabItem = {
   id: number;
   noteId?: string;
+  previewTab?: boolean;
 };
 
 const TabItemComponent = (props: {
@@ -59,6 +60,11 @@ const TabItemComponent = (props: {
           props.close?.();
         }
       }}
+      onLongPress={() => {
+        useTabStore.getState().updateTab(props.tab.id, {
+          previewTab: false
+        });
+      }}
     >
       <View
         style={{
@@ -73,6 +79,9 @@ const TabItemComponent = (props: {
               ? colors.selected.paragraph
               : colors.primary.paragraph
           }
+          style={{
+            fontStyle: props.tab.previewTab ? "italic" : "normal"
+          }}
           size={SIZE.md}
         >
           {item?.title || "New note"}

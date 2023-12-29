@@ -273,7 +273,7 @@ export const useEditor = (
         }
 
         if (!locked) {
-          id = await db.notes?.add(noteData);
+          id = await db.notes?.add({ ...noteData });
           if (!note && id) {
             editorSessionHistory.newSession(id);
             if (id) {
@@ -295,7 +295,6 @@ export const useEditor = (
             }
 
             if (!noteData.title) {
-              console.log("posting title to tab", tabId);
               postMessage(
                 EditorEvents.title,
                 currentNotes.current[id]?.title,
