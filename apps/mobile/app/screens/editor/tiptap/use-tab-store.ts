@@ -21,6 +21,54 @@ import { persist, StateStorage } from "zustand/middleware";
 import { editorController } from "./utils";
 import { MMKV } from "../../../common/database/mmkv";
 
+class History {
+  history: number[];
+  constructor() {
+    this.history = [0];
+  }
+
+  add(item: number) {
+    const index = this.history.findIndex((id) => item === id);
+    if (index !== -1) {
+      // Item already exists, move it to the top
+      this.history.splice(index, 1);
+    }
+    this.history.unshift(item); // Add item to the beginning of the array
+
+    useTabStore.setState({
+      tabHistory: this.history.slice()
+    });
+    return true; // Item added successfully
+  }
+
+  remove(id: number) {
+    const index = this.history.findIndex((item) => item === id);
+    if (index >= -1 && index < this.history.length) {
+      const removedItem = this.history.splice(index, 1)[0];
+      return removedItem;
+    }
+    useTabStore.setState({
+      tabHistory: this.history.slice()
+    });
+    return null; // Invalid index
+  }
+
+  restoreLast() {
+    if (this.history.length > 0) {
+      const restoredItem = this.history.shift(); // Remove and return the first item
+      return restoredItem;
+    }
+    useTabStore.setState({
+      tabHistory: this.history.slice()
+    });
+    return null; // History is empty
+  }
+
+  getHistory() {
+    return this.history.slice(); // Return a copy to prevent external modification
+  }
+}
+
 export type TabItem = {
   id: number;
   noteId?: string;
@@ -28,6 +76,8 @@ export type TabItem = {
   readonly?: boolean;
   locked?: boolean;
 };
+
+const history = new History();
 
 export type TabStore = {
   tabs: TabItem[];
@@ -47,6 +97,7 @@ export type TabStore = {
   focusEmptyTab: () => void;
   getCurrentNoteId: () => string | undefined;
   getTab: (tabId: number) => TabItem | undefined;
+  tabHistory: number[];
 };
 
 function getId(id: number, tabs: TabItem[]): number {
@@ -74,6 +125,8 @@ export const useTabStore = create<TabStore>(
           id: 0
         }
       ],
+      tabHistory: [0],
+      history: new History(),
       currentTab: 0,
       updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => {
         if (!options) return;
@@ -105,11 +158,9 @@ export const useTabStore = create<TabStore>(
         };
         console.log("focus preview", noteId);
         set({
-          tabs: tabs,
-          currentTab: tabs[index].id
+          tabs: tabs
         });
-
-        syncTabs();
+        get().focusTab(tabs[index].id);
       },
       removeTab: (id: number) => {
         const index = get().tabs.findIndex((t) => t.id === id);
@@ -118,20 +169,18 @@ export const useTabStore = create<TabStore>(
           const isFocused = id === get().currentTab;
           const nextTabs = get().tabs.slice();
           nextTabs.splice(index, 1);
-
+          history.remove(id);
           if (nextTabs.length === 0) {
             nextTabs.push({
               id: 0
             });
           }
-
           set({
-            tabs: nextTabs,
-            currentTab: isFocused
-              ? nextTabs[nextTabs.length - 1].id
-              : get().currentTab
+            tabs: nextTabs
           });
-          syncTabs();
+          get().focusTab(
+            isFocused ? history.restoreLast() || 0 : get().currentTab
+          );
         }
       },
       newTab: (noteId?: string, previewTab?: boolean) => {
@@ -145,21 +194,16 @@ export const useTabStore = create<TabStore>(
           }
         ];
         set({
-          tabs: nextTabs,
-          currentTab: id
+          tabs: nextTabs
         });
-        console.log("new tab");
-        syncTabs();
+        get().focusTab(id);
       },
       focusEmptyTab: () => {
         const index = get().tabs.findIndex((t) => !t.noteId);
         if (index === -1) return get().newTab();
         console.log("focus empty tab", get().tabs[index]);
-        set({
-          currentTab: get().tabs[index].id
-        });
 
-        syncTabs();
+        get().focusTab(get().tabs[index].id);
       },
       moveTab: (index: number, toIndex: number) => {
         const tabs = get().tabs.slice();
@@ -169,7 +213,10 @@ export const useTabStore = create<TabStore>(
         });
         syncTabs();
       },
+
       focusTab: (id: number) => {
+        console.log(history.getHistory(), id);
+        history.add(id);
         set({
           currentTab: id
         });
@@ -195,7 +242,12 @@ export const useTabStore = create<TabStore>(
     }),
     {
       name: "tabs-storage",
-      getStorage: () => MMKV as unknown as StateStorage
+      getStorage: () => MMKV as unknown as StateStorage,
+      onRehydrateStorage: () => {
+        return (state) => {
+          history.history = state?.tabHistory.slice() || [];
+        };
+      }
     }
   )
 );
