@@ -51,6 +51,7 @@ function Toolbar() {
   const sessionId = useStore((store) => store.session.id);
   const isDeleted = useStore((store) => store.session.isDeleted);
   const isLocked = useStore((store) => store.session.locked);
+  const readonly = useStore((store) => store.session.readonly);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const toggleFocusMode = useAppStore((store) => store.toggleFocusMode);
@@ -227,6 +228,7 @@ function Toolbar() {
           }}
           transition={{ duration: 0.5 }}
           defaultValue={title}
+          readOnly={readonly}
           onChange={(e) => {
             AppEventManager.publish(AppEvents.changeNoteTitle, {
               title: e.target.value,
