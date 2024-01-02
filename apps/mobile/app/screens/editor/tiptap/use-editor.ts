@@ -91,6 +91,10 @@ import {
 // 8. If app is killed, restore the note in  background.
 // 9. During realtimes sync, tabs not focused will be updated so if focused, they have the latest and updated content loaded.
 
+type NoteWithContent = Note & {
+  content?: NoteContent<false>;
+};
+
 export const useEditor = (
   editorId = "",
   readonly?: boolean,
@@ -218,7 +222,8 @@ export const useEditor = (
       resetContent && (await commands.clearContent(tabId));
       resetContent && (await commands.clearTags(tabId));
       useTabStore.getState().updateTab(tabId, {
-        noteId: undefined
+        noteId: undefined,
+        locked: false
       });
     },
     [commands, editorSessionHistory, postMessage]
@@ -457,14 +462,21 @@ export const useEditor = (
       } else {
         if (!event.item) return;
         const item = event.item;
+        const noteIsLocked =
+          event.item.locked && !(event.item as NoteWithContent).content;
+
+        console.log("noteIsLocked", noteIsLocked);
+
         // If note was already opened in a tab, focus that tab.
         if (typeof event.tabId !== "number") {
           if (useTabStore.getState().hasTabForNote(event.item.id)) {
             const tabId = useTabStore.getState().getTabForNote(event.item.id);
             if (typeof tabId === "number") {
               useTabStore.getState().updateTab(tabId, {
-                readonly: event.item.readonly || readonly
+                readonly: event.item.readonly || readonly,
+                locked: noteIsLocked
               });
+              console.log(noteIsLocked, "focused tab...");
               useTabStore.getState().focusTab(tabId);
             }
             console.log("Note already loaded, focusing the tab");
@@ -473,7 +485,8 @@ export const useEditor = (
             // Otherwise we focus the preview tab or create one to open the note in.
             useTabStore.getState().focusPreviewTab(event.item.id, {
               readonly: event.item.readonly || readonly,
-              locked: false
+              locked:
+                event.item.locked && !(event.item as NoteWithContent).content
             });
           }
         } else {
@@ -496,7 +509,9 @@ export const useEditor = (
         state.current.movedAway = false;
         state.current.currentlyEditing = true;
 
-        await loadContent(item);
+        if (!noteIsLocked) {
+          await loadContent(item);
+        }
 
         if (
           currentNotes.current[item.id] &&

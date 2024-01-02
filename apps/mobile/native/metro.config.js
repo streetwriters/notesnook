@@ -32,6 +32,11 @@ mergedConfig.resolver = {
 
   },
   resolveRequest: (context, moduleName, platform) => {
+    if (moduleName === "node:crypto") {
+      return {
+        type:"empty"
+      }
+    }
     if (moduleName ==='react') {
       // Resolve react package from mobile app's node_modules folder always.
       return {

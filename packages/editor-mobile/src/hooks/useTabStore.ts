@@ -22,15 +22,16 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 globalThis.editorControllers = {};
 globalThis.editors = {};
-global.editorTags = {};
-global.editorTitles = {};
-global.statusBars = {};
+globalThis.editorTags = {};
+globalThis.editorTitles = {};
+globalThis.statusBars = {};
 
 export type TabItem = {
   id: number;
   noteId?: string;
   previewTab?: boolean;
   readonly?: boolean;
+  locked?: boolean;
 };
 
 type NoteState = {

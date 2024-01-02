@@ -34,6 +34,7 @@ import {
   eUnSubscribeEvent
 } from "../services/event-manager";
 import { eDBItemUpdate } from "../utils/events";
+import { useSettingStore } from "../stores/use-setting-store";
 
 type ItemTypeKey = {
   note: Note;
@@ -94,7 +95,15 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
         }
       }
     };
-    onUpdateItem();
+    if (useSettingStore.getState().isAppLoading) {
+      useSettingStore.subscribe((state) => {
+        if (!state.isAppLoading) {
+          onUpdateItem();
+        }
+      });
+    } else {
+      onUpdateItem();
+    }
     eSubscribeEvent(eDBItemUpdate, onUpdateItem);
     return () => {
       eUnSubscribeEvent(eDBItemUpdate, onUpdateItem);

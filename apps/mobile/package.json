@@ -37,6 +37,7 @@
     "@notesnook/editor-mobile": "file:../../packages/editor-mobile",
     "@notesnook/logger": "file:../../packages/logger",
     "@notesnook/themes-server": "file:../../servers/themes",
+    "@notesnook/theme": "file:../../packages/theme",
     "@tanstack/react-query": "^4.29.19",
     "@trpc/client": "10.38.3",
     "@trpc/react-query": "10.38.3",

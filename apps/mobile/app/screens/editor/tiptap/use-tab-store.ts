@@ -89,7 +89,7 @@ export type TabStore = {
   ) => void;
   removeTab: (index: number) => void;
   moveTab: (index: number, toIndex: number) => void;
-  newTab: (noteId?: string, previewTab?: boolean) => void;
+  newTab: (options?: Omit<Partial<TabItem>, "id">) => void;
   focusTab: (id: number) => void;
   getNoteIdForTab: (id: number) => string | undefined;
   getTabForNote: (noteId: string) => number | undefined;
@@ -148,12 +148,17 @@ export const useTabStore = create<TabStore>(
         options: Omit<Partial<TabItem>, "id" | "noteId">
       ) => {
         const index = get().tabs.findIndex((t) => t.previewTab);
-        if (index === -1) return get().newTab(noteId, true);
+        if (index === -1)
+          return get().newTab({
+            noteId,
+            previewTab: true,
+            ...options
+          });
         const tabs = [...get().tabs];
         tabs[index] = {
           ...tabs[index],
-          previewTab: true,
           ...options,
+          previewTab: true,
           noteId: noteId
         };
         console.log("focus preview", noteId);
@@ -183,14 +188,13 @@ export const useTabStore = create<TabStore>(
           );
         }
       },
-      newTab: (noteId?: string, previewTab?: boolean) => {
+      newTab: (options) => {
         const id = getId(get().tabs.length, get().tabs);
         const nextTabs = [
           ...get().tabs,
           {
             id: id,
-            noteId,
-            previewTab: previewTab
+            ...options
           }
         ];
         set({

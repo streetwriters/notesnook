@@ -164,3 +164,4 @@ export const eDBItemUpdate = "610";
 export const eGroupOptionsUpdated = "611";
 export const eOnRefreshSearch = "612";
 export const eEditorTabFocused = "613";
+export const eUnlockNote = "614";

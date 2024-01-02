@@ -49,6 +49,7 @@ import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
+import FingerprintIcon from "mdi-react/FingerprintIcon";
 
 globalThis.toBlobURL = toBlobURL;
 
@@ -307,7 +308,8 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
           style={{
             overflowY: "scroll",
             height: "100%",
-            display: "block"
+            display: "block",
+            position: "relative"
           }}
         >
           {settings.noHeader ? null : (
@@ -326,14 +328,14 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
             </>
           )}
 
-          {controller.loading ? (
+          {controller.loading || tab.locked ? (
             <div
               style={{
-                height: "100%",
                 width: "100%",
+                height: "95%",
                 position: "absolute",
                 zIndex: 999,
-                backgroundColor: "white",
+                backgroundColor: colors.primary.background,
                 paddingRight: 12,
                 paddingLeft: 12,
                 display: "flex",
@@ -389,7 +391,7 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
           />
         </div>
 
-        {!layout ? null : (
+        {!layout || tab.locked ? null : (
           <EmotionEditorToolbarTheme>
             <Toolbar
               className="theme-scope-editorToolbar"

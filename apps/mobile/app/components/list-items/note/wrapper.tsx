@@ -72,17 +72,6 @@ export const openNote = async (
     return;
   }
 
-  if (note.locked) {
-    openVault({
-      item: note,
-      novault: true,
-      locked: true,
-      goToEditor: true,
-      title: "Open note",
-      description: "Unlock note to open it in editor."
-    });
-    return;
-  }
   if (isTrash) {
     if (!note.contentId) return;
 
