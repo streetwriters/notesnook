@@ -22,18 +22,21 @@ import { View } from "react-native";
 import { useDBItem } from "../../../hooks/use-db-item";
 import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../../screens/editor/tiptap/utils";
-import { presentSheet } from "../../../services/event-manager";
+import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { PressableButton } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { eUnlockNote } from "../../../utils/events";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 type TabItem = {
   id: number;
   noteId?: string;
   previewTab?: boolean;
+  locked?: boolean;
 };
 
 const TabItemComponent = (props: {
@@ -58,6 +61,9 @@ const TabItemComponent = (props: {
         if (!props.isFocused) {
           useTabStore.getState().focusTab(props.tab.id);
           props.close?.();
+          if (props.tab.locked) {
+            eSendEvent(eUnlockNote);
+          }
         }
       }}
       onLongPress={() => {
@@ -70,9 +76,11 @@ const TabItemComponent = (props: {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          justifyContent: "flex-start"
+          justifyContent: "flex-start",
+          gap: 10
         }}
       >
+        {props.tab.locked ? <Icon size={SIZE.md} name="lock" /> : null}
         <Paragraph
           color={
             props.isFocused

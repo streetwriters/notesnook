@@ -34,7 +34,7 @@ mergedConfig.resolver = {
   resolveRequest: (context, moduleName, platform) => {
     if (moduleName === "node:crypto") {
       return {
-        type: 'empty'
+        type:"empty"
       }
     }
     if (moduleName ==='react') {

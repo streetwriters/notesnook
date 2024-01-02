@@ -23,7 +23,6 @@ import { InteractionManager, View } from "react-native";
 import Share from "react-native-share";
 import { notesnook } from "../../../../e2e/test.ids";
 import { db } from "../../../common/database";
-import { editorController } from "../../../screens/editor/tiptap/utils";
 import BiometricService from "../../../services/biometrics";
 import { DDS } from "../../../services/device-detection";
 import {
@@ -35,7 +34,6 @@ import {
 import Navigation from "../../../services/navigation";
 import { getElevationStyle } from "../../../utils/elevation";
 import {
-  eClearEditor,
   eCloseActionSheet,
   eCloseVaultDialog,
   eOnLoadNote,
