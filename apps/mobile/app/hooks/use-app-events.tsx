@@ -90,6 +90,7 @@ import {
   eLoginSessionExpired,
   eOnLoadNote,
   eOpenAnnouncementDialog,
+  eUnlockNote,
   eUserLoggedIn,
   refreshNotesPage
 } from "../utils/events";
@@ -463,6 +464,27 @@ export const useAppEvents = () => {
       }),
       EV.subscribe(EVENTS.uploadCanceled, (data) => {
         useAttachmentStore.getState().setUploading(data);
+      }),
+      EV.subscribe(EVENTS.vaultLocked, async () => {
+        // Lock all notes in all tabs...
+        for (const tab of useTabStore.getState().tabs) {
+          const noteId = useTabStore.getState().getTab(tab.id)?.noteId;
+          if (!noteId) continue;
+          const note = await db.notes.note(noteId);
+          if (note?.locked) {
+            useTabStore.getState().updateTab(tab.id, {
+              locked: true
+            });
+            if (
+              tab.id === useTabStore.getState().currentTab &&
+              note.locked &&
+              !editorState().movedAway
+            ) {
+              // Show unlock note screen.
+              eSendEvent(eUnlockNote);
+            }
+          }
+        }
       }),
       eSubscribeEvent(eUserLoggedIn, onUserUpdated)
     ];

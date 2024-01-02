@@ -65,7 +65,8 @@ import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
-  eOpenFullscreenEditor
+  eOpenFullscreenEditor,
+  eUnlockNote
 } from "../utils/events";
 import { editorRef, tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
@@ -516,6 +517,12 @@ const onChangeTab = async (obj) => {
       eSendEvent(eOnLoadNote, {
         newNote: true
       });
+    } else {
+      if (
+        useTabStore.getState().getTab(useTabStore.getState().currentTab).locked
+      ) {
+        eSendEvent(eUnlockNote);
+      }
     }
   } else {
     if (obj.from === 2) {
