@@ -70,6 +70,7 @@ import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { EditorEvents, editorState } from "./utils";
+import TableOfContents from "../../../components/sheets/toc";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -495,6 +496,9 @@ export const useEditorEvents = (
         case EventTypes.properties:
           showActionsheet();
           break;
+        case EventTypes.scroll:
+          editorState().scrollPosition = editorMessage.value;
+          break;
         case EventTypes.fullscreen:
           editorState().isFullscreen = true;
           eSendEvent(eOpenFullscreenEditor);
@@ -526,6 +530,9 @@ export const useEditorEvents = (
           // console.log("Tabs updated");
           break;
         }
+        case EventTypes.toc:
+          TableOfContents.present(editorMessage.value);
+          break;
         case EventTypes.showTabs: {
           EditorTabs.present();
           break;

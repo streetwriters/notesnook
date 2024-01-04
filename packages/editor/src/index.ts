@@ -86,6 +86,7 @@ import { LIST_NODE_TYPES } from "./utils/node-types";
 import CheckList from "./extensions/check-list";
 import CheckListItem from "./extensions/check-list-item";
 import { Callout } from "./extensions/callout";
+import BlockId from "./extensions/block-id";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -219,6 +220,7 @@ const useTiptap = (
             ];
           }
         }),
+        BlockId,
         Blockquote,
         CharacterCount,
         Underline,
@@ -371,6 +373,7 @@ export * from "./toolbar";
 export * from "./types";
 export * from "./utils/word-counter";
 export * from "./utils/font";
+export * from "./utils/toc";
 export {
   useTiptap,
   Toolbar,

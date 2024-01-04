@@ -17,32 +17,73 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import {
+  ControlledMenu,
+  // applyStatics
+  MenuItem as MenuItemInner,
+  SubMenu as SubMenuInner,
+  MenuDivider
+} from "@szhsin/react-menu";
 import ArrowBackIcon from "mdi-react/ArrowBackIcon";
 import ArrowULeftTopIcon from "mdi-react/ArrowULeftTopIcon";
 import ArrowURightTopIcon from "mdi-react/ArrowURightTopIcon";
 import CrownIcon from "mdi-react/CrownIcon";
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
+import DotsVerticalIcon from "mdi-react/DotsVerticalIcon";
 import FullscreenIcon from "mdi-react/FullscreenIcon";
 import MagnifyIcon from "mdi-react/MagnifyIcon";
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useSafeArea } from "../hooks/useSafeArea";
 import { useTabContext, useTabStore } from "../hooks/useTabStore";
 import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
+import TableOfContentsIcon from "mdi-react/TableOfContentsIcon";
+const menuClassName = ({ state }: any) =>
+  state === "opening"
+    ? styles.menuOpening
+    : state === "closing"
+    ? styles.menuClosing
+    : styles.menu;
+
+const menuItemClassName = ({ hover, disabled }: any) =>
+  disabled
+    ? styles.menuItemDisabled
+    : hover
+    ? styles.menuItemHover
+    : styles.menuItem;
+
+const submenuItemClassName = (modifiers: any) =>
+  `${styles.submenuItem} ${menuItemClassName(modifiers)}`;
+
+const MenuItem = (props: any) => (
+  <MenuItemInner {...props} className={menuItemClassName} />
+);
+
+const SubMenu = (props: any) => (
+  <SubMenuInner
+    {...props}
+    menuClassName={menuClassName}
+    itemProps={{ className: submenuItemClassName }}
+    offsetY={-7}
+  />
+);
 
 const Button = ({
   onPress,
   children,
   style,
-  preventDefault = true
+  preventDefault = true,
+  fwdRef
 }: {
   onPress: () => void;
   children: React.ReactNode;
   style: React.CSSProperties;
   preventDefault?: boolean;
+  fwdRef?: any;
 }) => {
   return (
     <button
+      ref={fwdRef}
       className={styles.btn_header}
       style={style}
       onMouseDown={(e) => {
@@ -70,6 +111,8 @@ function Header({
   const editor = editors[tab.id];
   const insets = useSafeArea();
   const openedTabsCount = useTabStore((state) => state.tabs.length);
+  const [isOpen, setOpen] = useState(false);
+  const btnRef = useRef(null);
 
   return (
     <div
@@ -79,7 +122,8 @@ function Header({
         height: noHeader ? `${insets.top}px` : `${50 + insets.top}px`,
         backgroundColor: "var(--nn_primary_background)",
         position: "sticky",
-        width: "100vw"
+        width: "100vw",
+        zIndex: 99999
       }}
     >
       {noHeader ? null : (
@@ -318,8 +362,9 @@ function Header({
 
             <Button
               onPress={() => {
-                post(EventTypes.properties, undefined, tab.id, tab.noteId);
+                setOpen(!isOpen);
               }}
+              fwdRef={btnRef}
               preventDefault={false}
               style={{
                 borderWidth: 0,
@@ -334,7 +379,7 @@ function Header({
                 position: "relative"
               }}
             >
-              <DotsHorizontalIcon
+              <DotsVerticalIcon
                 size={25 * settings.fontScale}
                 style={{
                   position: "absolute"
@@ -342,6 +387,63 @@ function Header({
                 color="var(--nn_primary_paragraph)"
               />
             </Button>
+
+            <ControlledMenu
+              align="end"
+              anchorRef={btnRef}
+              transition
+              state={isOpen ? "open" : "closed"}
+              menuClassName={menuClassName}
+              onClose={() => {
+                setOpen(false);
+              }}
+              autoFocus={false}
+              onItemClick={(e) => {
+                switch (e.value) {
+                  case "toc":
+                    post(
+                      EventTypes.toc,
+                      editorControllers[tab.id]?.getTableOfContents(),
+                      tab.id,
+                      tab.noteId
+                    );
+                    break;
+                  case "properties":
+                    logger("info", "post properties...");
+                    post(EventTypes.properties, undefined, tab.id, tab.noteId);
+                    break;
+                  default:
+                    break;
+                }
+              }}
+            >
+              <MenuItem
+                value="toc"
+                style={{
+                  display: "flex",
+                  gap: 10
+                }}
+              >
+                <TableOfContentsIcon
+                  size={22 * settings.fontScale}
+                  color="var(--nn_primary_paragraph)"
+                />
+                Table of contents
+              </MenuItem>
+              <MenuItem
+                value="properties"
+                style={{
+                  display: "flex",
+                  gap: 10
+                }}
+              >
+                <DotsHorizontalIcon
+                  size={22 * settings.fontScale}
+                  color="var(--nn_primary_paragraph)"
+                />
+                Note Properties
+              </MenuItem>
+            </ControlledMenu>
           </div>
         </div>
       )}

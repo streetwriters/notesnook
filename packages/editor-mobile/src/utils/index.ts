@@ -186,7 +186,8 @@ export const EventTypes = {
   getAttachmentData: "editor-events:get-attachment-data",
   tabsChanged: "editor-events:tabs-changed",
   showTabs: "editor-events:show-tabs",
-  tabFocused: "editor-events:tab-focused"
+  tabFocused: "editor-events:tab-focused",
+  toc: "editor-events:toc"
 } as const;
 
 export function isReactNative(): boolean {
