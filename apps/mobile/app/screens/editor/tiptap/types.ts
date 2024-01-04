@@ -35,6 +35,7 @@ export type EditorState = {
   ready: boolean;
   saveCount: 0;
   isAwaitingResult: boolean;
+  scrollPosition: number;
 };
 
 export type Settings = {
