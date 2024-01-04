@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor } from "@notesnook/editor";
+import { Editor, scrollIntoViewById } from "@notesnook/editor";
 import {
   ThemeDefinition,
   useThemeColors,
@@ -106,9 +106,17 @@ export type EditorController = {
   updateTab: () => void;
   loading: boolean;
   setLoading: (value: boolean) => void;
+  getTableOfContents: () => any[];
+  scrollIntoView: (id: string) => void;
 };
 
-export function useEditorController(update: () => void): EditorController {
+export function useEditorController({
+  update,
+  getTableOfContents
+}: {
+  update: () => void;
+  getTableOfContents: () => any[];
+}): EditorController {
   const tab = useTabContext();
   const [loading, setLoading] = useState(true);
   const setTheme = useThemeEngineStore((store) => store.setTheme);
@@ -317,6 +325,8 @@ export function useEditorController(update: () => void): EditorController {
   };
 
   return {
+    getTableOfContents: getTableOfContents,
+    scrollIntoView: (id: string) => scrollIntoViewById(id),
     contentChange,
     selectionChange,
     titleChange,

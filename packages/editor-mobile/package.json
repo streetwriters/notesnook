@@ -8,6 +8,7 @@
     "@mdi/react": "^1.6.0",
     "@notesnook/editor": "file:../editor",
     "@notesnook/theme": "file:../theme",
+    "@szhsin/react-menu": "^4.1.0",
     "buffer": "^6.0.3",
     "framer-motion": "^10.16.8",
     "mdi-react": "9.1.0",

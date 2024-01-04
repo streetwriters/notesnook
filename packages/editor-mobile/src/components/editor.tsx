@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   Editor,
   getFontById,
+  getTableOfContents,
   PortalProvider,
   Toolbar,
   usePermissionHandler,
@@ -49,7 +50,6 @@ import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
-import FingerprintIcon from "mdi-react/FingerprintIcon";
 
 globalThis.toBlobURL = toBlobURL;
 
@@ -160,7 +160,14 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
     });
   }, []);
 
-  const controller = useEditorController(update);
+  const controller = useEditorController({
+    update,
+    getTableOfContents: () => {
+      return !containerRef.current
+        ? []
+        : getTableOfContents(containerRef.current);
+    }
+  });
   const controllerRef = useRef(controller);
 
   globalThis.editorControllers[tab.id] = controller;

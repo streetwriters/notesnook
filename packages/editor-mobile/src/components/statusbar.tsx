@@ -53,6 +53,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
 
   const onScroll = React.useCallback((event: Event) => {
     const currentOffset = (event.target as HTMLElement)?.scrollTop;
+    post("editor-event:scroll", currentOffset);
     if (currentOffset < 200) {
       if (stickyRef.current) {
         stickyRef.current = false;

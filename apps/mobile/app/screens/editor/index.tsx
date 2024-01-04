@@ -34,6 +34,7 @@ import {
   Platform,
   ScrollView,
   TextInput,
+  TouchableOpacity,
   View,
   ViewStyle,
   useWindowDimensions
@@ -61,7 +62,6 @@ import { useTabStore } from "./tiptap/use-tab-store";
 import { editorController, editorState } from "./tiptap/utils";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useThemeColors } from "@notesnook/theme";
-import { VaultDialog } from "../../components/dialogs/vault";
 import { Button } from "../../components/ui/button";
 import Heading from "../../components/ui/typography/heading";
 import Seperator from "../../components/ui/seperator";
@@ -70,6 +70,10 @@ import { useDBItem } from "../../hooks/use-db-item";
 import Input from "../../components/ui/input";
 import BiometicService from "../../services/biometrics";
 import { eOnLoadNote, eUnlockNote } from "../../utils/events";
+import Menu, {
+  MenuItem,
+  MenuDivider
+} from "react-native-reanimated-material-menu";
 
 const style: ViewStyle = {
   height: "100%",

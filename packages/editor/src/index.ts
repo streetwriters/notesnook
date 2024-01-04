@@ -79,6 +79,7 @@ import Clipboard, { ClipboardOptions } from "./extensions/clipboard";
 import Blockquote from "./extensions/blockquote";
 import { Quirks } from "./extensions/quirks";
 import { LIST_NODE_TYPES } from "./utils/node-types";
+import BlockId from "./extensions/block-id";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -210,6 +211,7 @@ const useTiptap = (
             ];
           }
         }),
+        BlockId,
         Blockquote,
         CharacterCount,
         Underline,
@@ -347,6 +349,7 @@ export * from "./toolbar";
 export * from "./types";
 export * from "./utils/word-counter";
 export * from "./utils/font";
+export * from "./utils/toc";
 export {
   useTiptap,
   Toolbar,

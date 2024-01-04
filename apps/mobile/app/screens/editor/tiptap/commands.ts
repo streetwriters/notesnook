@@ -310,6 +310,20 @@ const image = toBlobURL("${image.dataurl}", "${image.hash}");
   keyboardShown = async (keyboardShown: boolean) => {
     return this.doAsync(`globalThis['keyboardShown']=${keyboardShown};`);
   };
+
+  getTableOfContents = async () => {
+    const tabId = useTabStore.getState().currentTab;
+    return this.doAsync(`
+      response = editorControllers[${tabId}]?.getTableOfContents() || [];
+    `);
+  };
+
+  scrollIntoViewById = async (id: string) => {
+    const tabId = useTabStore.getState().currentTab;
+    return this.doAsync(`
+      response = editorControllers[${tabId}]?.scrollIntoView("${id}") || [];
+    `);
+  };
   //todo add replace image function
 }
 
