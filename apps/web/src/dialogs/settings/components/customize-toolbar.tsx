@@ -49,7 +49,7 @@ import { createPortal } from "react-dom";
 import { getId } from "@notesnook/core/dist/utils/id";
 import { Label } from "@theme-ui/components";
 import { db } from "../../../common/db";
-import { useToolbarConfig } from "../../../components/editor/context";
+import { useToolbarConfig } from "../../../components/editor/manager";
 import {
   getAllPresets,
   getCurrentPreset,

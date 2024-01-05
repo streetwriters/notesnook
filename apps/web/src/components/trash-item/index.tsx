@@ -25,16 +25,15 @@ import { Flex, Text } from "@theme-ui/components";
 import TimeAgo from "../time-ago";
 import { pluralize, toTitleCase } from "@notesnook/common";
 import { showToast } from "../../utils/toast";
-import { hashNavigate } from "../../navigation";
-import { useStore } from "../../stores/note-store";
 import { MenuItem } from "@notesnook/ui";
 import { TrashItem } from "@notesnook/core/dist/types";
 import { db } from "../../common/db";
+import { useEditorStore } from "../../stores/editor-store";
 
 type TrashItemProps = { item: TrashItem; date: number };
 function TrashItem(props: TrashItemProps) {
   const { item, date } = props;
-  const isOpened = useStore((store) => store.selectedNote === item.id);
+  const isOpened = useEditorStore((store) => store.activeSessionId === item.id);
 
   return (
     <ListItem
@@ -59,9 +58,7 @@ function TrashItem(props: TrashItemProps) {
       menuItems={menuItems}
       onClick={async () => {
         if (item.itemType === "note")
-          (await db.vaults.itemExists({ id: item.id, type: "note" }))
-            ? showToast("error", "Locked notes cannot be previewed in trash.")
-            : hashNavigate(`/notes/${item.id}/edit`, { replace: true });
+          useEditorStore.getState().openSession(item);
       }}
     />
   );

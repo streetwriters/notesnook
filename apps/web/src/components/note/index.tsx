@@ -62,12 +62,12 @@ import {
 } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
 import { store as userstore } from "../../stores/user-store";
-import { store as editorStore } from "../../stores/editor-store";
+import { useEditorStore } from "../../stores/editor-store";
 import { store as tagStore } from "../../stores/tag-store";
 import { useStore as useMonographStore } from "../../stores/monograph-store";
 import { db } from "../../common/db";
 import { showToast } from "../../utils/toast";
-import { hashNavigate, navigate } from "../../navigation";
+import { navigate } from "../../navigation";
 import { showPublishView } from "../publish-view";
 import IconTag from "../icon-tag";
 import { exportNote, exportNotes, exportToPDF } from "../../common/export";
@@ -112,7 +112,7 @@ function Note(props: NoteProps) {
   } = props;
   const note = item;
 
-  const isOpened = useStore((store) => store.selectedNote === note.id);
+  const isOpened = useEditorStore((store) => store.activeSessionId === item.id);
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";
 
   return (
@@ -138,15 +138,7 @@ function Note(props: NoteProps) {
       }}
       context={{ color, locked }}
       menuItems={menuItems}
-      onClick={async () => {
-        if (note.conflicted) {
-          hashNavigate(`/notes/${note.id}/conflict`, { replace: true });
-        } else if (locked) {
-          hashNavigate(`/notes/${note.id}/unlock`, { replace: true });
-        } else {
-          hashNavigate(`/notes/${note.id}/edit`, { replace: true });
-        }
-      }}
+      onClick={() => useEditorStore.getState().openSession(note)}
       header={
         <Flex
           sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mt: "small" }}
@@ -716,7 +708,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
                   await db.relations.to({ id, type: "note" }, "tag").unlink();
                 }
                 tagStore.get().refresh();
-                await editorStore.get().refreshTags();
+                await useEditorStore.getState().refreshTags();
                 await store.get().refresh();
               }
             },
@@ -737,7 +729,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
                   await db.relations.add(tag, { id, type: "note" });
                 }
                 await tagStore.get().refresh();
-                await editorStore.get().refreshTags();
+                await useEditorStore.getState().refreshTags();
                 await store.get().refresh();
               }
             });
@@ -758,7 +750,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
                 await db.relations.unlink(tag, { id, type: "note" });
               }
               await tagStore.get().refresh();
-              await editorStore.get().refreshTags();
+              await useEditorStore.getState().refreshTags();
               await store.get().refresh();
             }
           });
