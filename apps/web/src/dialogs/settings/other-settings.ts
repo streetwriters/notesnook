@@ -237,7 +237,7 @@ export const LegalSettings: SettingsGroup[] = [
         ]
       },
       {
-        key: "liscense",
+        key: "license",
         title: "License",
         description: "GNU GENERAL PUBLIC LICENSE Version 3",
         components: [
