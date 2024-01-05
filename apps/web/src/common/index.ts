@@ -36,9 +36,9 @@ import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core/dist/common";
 import { getFormattedDate } from "@notesnook/common";
 import { createWritableStream } from "./desktop-bridge";
-import { ZipStream } from "../utils/streams/zip-stream";
+import { createZipStream } from "../utils/streams/zip-stream";
 import { FeatureKeys } from "../dialogs/feature-dialog";
-import { Entry, Reader } from "../utils/zip-reader";
+import { ZipEntry, createUnzipIterator } from "../utils/streams/unzip-stream";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -113,7 +113,7 @@ export async function createBackup() {
           controller.close();
         }
       })
-        .pipeThrough(new ZipStream())
+        .pipeThrough(createZipStream())
         .pipeTo(writeStream);
     }
   });
@@ -166,12 +166,12 @@ export async function restoreBackupFile(backupFile: File) {
       type: "modal",
       action: async (report) => {
         let cachedPassword: string | undefined = undefined;
-        const { read, totalFiles } = await Reader(backupFile);
-        const entries: Entry[] = [];
+        // const { read, totalFiles } = await Reader(backupFile);
+        const entries: ZipEntry[] = [];
         let filesProcessed = 0;
 
         let isValid = false;
-        for await (const entry of read()) {
+        for await (const entry of createUnzipIterator(backupFile)) {
           if (entry.name === ".nnbackup") {
             isValid = true;
             continue;
@@ -200,7 +200,6 @@ export async function restoreBackupFile(backupFile: File) {
           }
 
           report({
-            total: totalFiles,
             text: `Processed ${entry.name}`,
             current: filesProcessed++
           });

@@ -24,7 +24,7 @@ import { store as editorStore } from "./editor-store";
 import { checkAttachment } from "../common/attachments";
 import { showToast } from "../utils/toast";
 import { AttachmentStream } from "../utils/streams/attachment-stream";
-import { ZipStream } from "../utils/streams/zip-stream";
+import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
 
 let abortController = undefined;
@@ -67,7 +67,7 @@ class AttachmentStore extends BaseStore {
       }
     );
     await attachmentStream
-      .pipeThrough(new ZipStream())
+      .pipeThrough(createZipStream(abortController.signal))
       .pipeTo(
         await createWriteStream("attachments.zip", {
           signal: abortController.signal

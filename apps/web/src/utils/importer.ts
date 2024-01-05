@@ -27,8 +27,8 @@ import {
   ATTACHMENTS_DIRECTORY_NAME,
   NOTE_DATA_FILENAME
 } from "@notesnook-importer/core/dist/src/utils/note-stream";
-import { Reader, Entry } from "./zip-reader";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
+import { ZipEntry, createUnzipIterator } from "./streams/unzip-stream";
 
 export async function* importFiles(zipFiles: File[]) {
   for (const zip of zipFiles) {
@@ -36,9 +36,8 @@ export async function* importFiles(zipFiles: File[]) {
     let filesRead = 0;
 
     const attachments: Record<string, any> = {};
-    const { read, totalFiles } = await Reader(zip);
 
-    for await (const entry of read()) {
+    for await (const entry of createUnzipIterator(zip)) {
       ++filesRead;
 
       const isAttachment = entry.name.includes(
@@ -60,7 +59,6 @@ export async function* importFiles(zipFiles: File[]) {
       yield {
         type: "progress" as const,
         count,
-        totalFiles,
         filesRead
       };
     }
@@ -68,7 +66,7 @@ export async function* importFiles(zipFiles: File[]) {
 }
 
 async function processAttachment(
-  entry: Entry,
+  entry: ZipEntry,
   attachments: Record<string, any>
 ) {
   const name = path.basename(entry.name);
@@ -90,7 +88,7 @@ async function processAttachment(
   attachments[name] = { ...cipherData, key };
 }
 
-async function processNote(entry: Entry, attachments: Record<string, any>) {
+async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
   const note = await fileToJson<Note>(entry);
   for (const attachment of note.attachments || []) {
     const cipherData = attachments[attachment.hash];
@@ -128,7 +126,7 @@ async function processNote(entry: Entry, attachments: Record<string, any>) {
   }
 }
 
-async function fileToJson<T>(file: Entry) {
+async function fileToJson<T>(file: ZipEntry) {
   const text = await file.text();
   return JSON.parse(text) as T;
 }

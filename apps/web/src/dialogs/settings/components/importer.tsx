@@ -149,13 +149,9 @@ export function Importer() {
                           setErrors((errors) => [...errors, message.error]);
                           break;
                         case "progress": {
-                          const { count, filesRead, totalFiles } = message;
+                          const { count } = message;
                           if (notesCounter.current)
                             notesCounter.current.innerText = `${count}`;
-                          if (importProgress.current)
-                            importProgress.current.style.width = `${
-                              (filesRead / totalFiles) * 100
-                            }%`;
                           break;
                         }
                       }

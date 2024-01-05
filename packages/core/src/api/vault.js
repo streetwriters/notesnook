@@ -210,7 +210,7 @@ export default class Vault {
     return await this._lockNote(note, this._password);
   }
 
-  async exists(vaultKey) {
+  async exists(vaultKey = undefined) {
     if (!vaultKey) vaultKey = await this._getKey();
     return vaultKey && vaultKey.cipher && vaultKey.iv;
   }

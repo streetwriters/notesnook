@@ -17,32 +17,51 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Zip, ZipDeflate } from "fflate";
+import { Deflate, Inflate } from "./fflate-shim";
+import { Uint8ArrayReader, ZipWriter, configure } from "@zip.js/zip.js";
 
-export type ZipFile = { path: string; data: Uint8Array };
-export class ZipStream extends TransformStream<ZipFile, Uint8Array> {
-  constructor() {
-    const zipper = new Zip();
-    super({
-      start(controller) {
-        zipper.ondata = (err, data) => {
-          if (err) {
-            controller.error(err);
-          } else controller.enqueue(data);
-        };
-      },
-      transform(chunk) {
-        const fileStream = new ZipDeflate(chunk.path, {
-          level: 5,
-          mem: 8
+configure({ Deflate, Inflate });
+
+export type ZipFile = {
+  path: string;
+  data: Uint8Array;
+  mtime?: Date;
+  ctime?: Date;
+};
+
+export function createZipStream(signal?: AbortSignal) {
+  const written = new Set<string>();
+  const ts = new TransformStream<Uint8Array, Uint8Array>();
+  const writer = new ZipWriter<Uint8Array>(ts.writable, {
+    zip64: true,
+    signal
+  });
+  const entryWriter = new WritableStream<ZipFile>({
+    start() {},
+    async write(chunk, c) {
+      // zip.js doesn't support overwriting files.
+      if (written.has(chunk.path)) return;
+
+      await writer
+        .add(chunk.path, new Uint8ArrayReader(chunk.data), {
+          creationDate: chunk.ctime,
+          lastModDate: chunk.mtime
+        })
+        .catch(async (e) => {
+          await ts.writable.abort(e);
+          await ts.readable.cancel(e);
+          c.error(e);
         });
-        zipper.add(fileStream);
-        fileStream.push(chunk.data, true);
-      },
-      flush() {
-        zipper.end();
-        zipper.terminate();
-      }
-    });
-  }
+      written.add(chunk.path);
+    },
+    async close() {
+      await writer.close();
+      await ts.writable.close();
+    },
+    async abort(reason) {
+      await ts.writable.abort(reason);
+      await ts.readable.cancel(reason);
+    }
+  });
+  return { writable: entryWriter, readable: ts.readable };
 }
