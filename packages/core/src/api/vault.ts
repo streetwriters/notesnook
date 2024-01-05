@@ -292,8 +292,8 @@ export default class Vault {
 
     // Case: when note is being newly locked
     if (!locked && (!data || !type)) {
-      const content = await this.db.content.findByNoteId(id);
-      if (!content || content.locked) {
+      const rawContent = await this.db.content.findByNoteId(id);
+      if (!rawContent || rawContent.locked) {
         await this.db.relations.add(vault, {
           id,
           type: "note"
@@ -303,8 +303,8 @@ export default class Vault {
       // NOTE:
       // At this point, the note already has all the attachments extracted
       // so we should just encrypt it as normal.
-      data = content.data;
-      type = content.type;
+      data = rawContent.data;
+      type = rawContent.type;
     } else if (data && type) {
       data = await this.db.content.extractAttachments({
         data,

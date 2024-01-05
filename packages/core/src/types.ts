@@ -374,7 +374,7 @@ export interface BaseContentItem extends BaseItem<ContentType> {
   localOnly: boolean;
   dateResolved?: number;
   sessionId?: string;
-  conflicted?: UnencryptedContentItem;
+  conflicted?: ContentItem;
 
   /**
    * @deprecated only kept here for migration purposes
