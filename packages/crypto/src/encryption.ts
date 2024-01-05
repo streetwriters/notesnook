@@ -73,6 +73,7 @@ export default class Encryption {
     let output: string | Uint8Array = cipher;
     if (outputFormat === "base64") {
       output = to_base64(cipher, base64_variants.URLSAFE_NO_PADDING);
+      verifyBase64(output);
     }
 
     const iv = to_base64(nonce);
@@ -118,31 +119,19 @@ export default class Encryption {
   }
 }
 
-// class EncryptionStream {
-//   state: StateAddress;
-//   header: string;
-//   constructor(key: EncryptionKey) {
-//     const { state, header } = crypto_secretstream_xchacha20poly1305_init_push(
-//       key.key,
-//       "base64"
-//     );
-//     this.state = state;
-//     this.header = header;
-//   }
-
-//   write(chunk: Uint8Array, final?: boolean): Uint8Array {
-//     return crypto_secretstream_xchacha20poly1305_push(
-//       this.state,
-//       chunk,
-//       null,
-//       final
-//         ? crypto_secretstream_xchacha20poly1305_TAG_FINAL
-//         : crypto_secretstream_xchacha20poly1305_TAG_MESSAGE
-//     );
-//   }
-// }
-
 function getAlgorithm(base64Variant: base64_variants) {
   //Template: encryptionAlgorithm-kdfAlgorithm-base64variant
   return `xcha-argon2i13-${base64Variant}`;
+}
+
+function verifyBase64(output: string) {
+  try {
+    from_base64(output, base64_variants.URLSAFE_NO_PADDING);
+  } catch (error) {
+    throw new Error(
+      `Base64 validation failed: ${
+        error && error instanceof Error ? error.message : error
+      }`
+    );
+  }
 }
