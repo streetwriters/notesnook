@@ -196,40 +196,27 @@ export function SubscriptionStatus() {
                 Request a refund
               </Button>
             </>
-          ) : isBasic ? (
-            <>
-              <Button
-                variant="accent"
-                onClick={async () => {
-                  showBuyDialog();
-                }}
-              >
-                Upgrade to Pro
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={activateTrial}
-                sx={{ bg: "background" }}
-              >
-                {isActivatingTrial ? (
-                  <Loading size={16} />
-                ) : (
-                  "Try free for 14 days"
-                )}
-              </Button>
-            </>
-          ) : isTrial ? (
-            <>
-              <Button
-                variant="accent"
-                onClick={async () => {
-                  showBuyDialog();
-                }}
-              >
-                Upgrade to Pro
-              </Button>
-            </>
           ) : null}
+          {!isPro && (
+            <>
+              <Button variant="accent" onClick={() => showBuyDialog()}>
+                {isProCancelled ? "Resubscribe" : "Upgrade to Pro"}
+              </Button>
+              {isBasic && (
+                <Button
+                  variant="secondary"
+                  onClick={activateTrial}
+                  sx={{ bg: "background" }}
+                >
+                  {isActivatingTrial ? (
+                    <Loading size={16} />
+                  ) : (
+                    "Try free for 14 days"
+                  )}
+                </Button>
+              )}
+            </>
+          )}
         </Flex>
       </Flex>
       {isBasic ? <Features /> : null}
