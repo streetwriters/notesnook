@@ -24,7 +24,7 @@ import {
 } from "@notesnook/core/dist/utils/date";
 import { database } from "../database";
 import { formatReminderTime } from "@notesnook/core/dist/collections/reminders";
-import { Reminder } from "@notesnook/core/dist/types";
+import { HistorySession, Reminder } from "@notesnook/core/dist/types";
 
 export function getFormattedDate(
   date: string | number | Date,
@@ -42,4 +42,14 @@ export function getFormattedReminderTime(reminder: Reminder, short = false) {
     dateFormat: database.settings?.getDateFormat() as string,
     timeFormat: database.settings?.getTimeFormat() as TimeFormat
   });
+}
+
+export function getFormattedHistorySessionDate(session: HistorySession) {
+  const fromDate = getFormattedDate(session.dateCreated, "date");
+  const toDate = getFormattedDate(session.dateModified, "date");
+  const fromTime = getFormattedDate(session.dateCreated, "time");
+  const toTime = getFormattedDate(session.dateModified, "time");
+  return `${fromDate}, ${fromTime} — ${
+    fromDate !== toDate ? `${toDate}, ` : ""
+  }${toTime}`;
 }
