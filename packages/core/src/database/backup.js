@@ -195,6 +195,8 @@ export default class Backup {
       if (!key)
         throw new Error("Could not generate encryption key for backup.");
 
+      console.info("Using backup encryption key:", key);
+
       try {
         backup.data = await this._db.storage.decrypt(key, db);
       } catch (e) {
