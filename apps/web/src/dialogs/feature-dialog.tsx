@@ -89,11 +89,7 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [
-          {
-            title: "Check/uncheck all tasks in a task list"
-          }
-        ],
+      : [],
     cta: {
       title: "Got it",
       icon: Checkmark,
