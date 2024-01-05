@@ -18,10 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getFormattedDate } from "@notesnook/common";
-import {
-  isEncryptedContent,
-  isUnencryptedContent
-} from "@notesnook/core/dist/collections/content";
+import { isEncryptedContent } from "@notesnook/core/dist/collections/content";
 import { NoteContent } from "@notesnook/core/dist/collections/session-content";
 import { EVENTS } from "@notesnook/core/dist/common";
 import {
@@ -363,11 +360,7 @@ export const useEditor = (
         };
       } else if (note.contentId) {
         const rawContent = await db.content?.get(note.contentId);
-        if (
-          rawContent &&
-          !isDeleted(rawContent) &&
-          isUnencryptedContent(rawContent)
-        ) {
+        if (rawContent && !isDeleted(rawContent) && !rawContent.locked) {
           currentContents.current[note.id] = {
             data: rawContent.data,
             type: rawContent.type
