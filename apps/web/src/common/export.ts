@@ -17,21 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { db } from "./db";
 import { TaskManager } from "./task-manager";
-import { zip } from "../utils/zip";
-import { saveAs } from "file-saver";
-import { showToast } from "../utils/toast";
-import { sanitizeFilename } from "@notesnook/common";
-import Vault from "./vault";
-
-const FORMAT_TO_EXT = {
-  pdf: "pdf",
-  md: "md",
-  txt: "txt",
-  html: "html",
-  "md-frontmatter": "md"
-} as const;
+import { ExportStream } from "../utils/streams/export-stream";
+import { createZipStream } from "../utils/streams/zip-stream";
+import { createWriteStream } from "../utils/stream-saver";
 
 export async function exportToPDF(
   title: string,
@@ -85,75 +74,11 @@ export async function exportNotes(
     title: "Exporting notes",
     subtitle: "Please wait while your notes are exported.",
     action: async (report) => {
-      let vaultUnlocked = false;
-
-      if (noteIds.length === 1 && db.notes?.note(noteIds[0])?.data.locked) {
-        vaultUnlocked = await Vault.unlockVault();
-        if (!vaultUnlocked) return false;
-      } else if (noteIds.length > 1 && (await db.vault?.exists())) {
-        vaultUnlocked = await Vault.unlockVault();
-        if (!vaultUnlocked)
-          showToast(
-            "error",
-            "Failed to unlock vault. Locked notes will be skipped."
-          );
-      }
-
-      const files = [];
-      let index = 0;
-      for (const noteId of noteIds) {
-        const note = db.notes?.note(noteId);
-        if (!note) continue;
-        if (!vaultUnlocked && note.data.locked) continue;
-
-        report({
-          current: ++index,
-          total: noteIds.length,
-          text: `Exporting "${note.title}"...`
-        });
-
-        const rawContent = await db.content?.raw(note.data.contentId);
-        const content = note.data.locked
-          ? await db.vault?.decryptContent(rawContent)
-          : rawContent;
-
-        const exported = await note
-          .export(format === "pdf" ? "html" : format, content)
-          .catch((e: Error) => {
-            console.error(note.data, e);
-            showToast(
-              "error",
-              `Failed to export note "${note.title}": ${e.message}`
-            );
-          });
-
-        if (typeof exported !== "string") {
-          showToast("error", `Failed to export note "${note.title}"`);
-          continue;
-        }
-
-        if (format === "pdf") {
-          return await exportToPDF(note.title, exported);
-        }
-
-        files.push({
-          filename: note.title,
-          content: exported,
-          date: note.dateEdited
-        });
-      }
-
-      if (!files.length) return false;
-      if (files.length === 1) {
-        saveAs(
-          new Blob([Buffer.from(files[0].content, "utf-8")]),
-          `${sanitizeFilename(files[0].filename)}.${FORMAT_TO_EXT[format]}`
-        );
-      } else {
-        const zipped = await zip(files, FORMAT_TO_EXT[format]);
-        saveAs(new Blob([zipped.buffer]), "notes.zip");
-      }
-
+      await new ExportStream(noteIds, format, undefined, (c, text) =>
+        report({ total: noteIds.length, current: c, text })
+      )
+        .pipeThrough(createZipStream())
+        .pipeTo(await createWriteStream("notes.zip"));
       return true;
     }
   });

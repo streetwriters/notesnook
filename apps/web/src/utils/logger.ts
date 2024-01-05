@@ -23,27 +23,36 @@ import {
   logManager
 } from "@notesnook/core/dist/logger";
 import { LogMessage } from "@notesnook/logger";
-import FileSaver from "file-saver";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
-import { zip } from "./zip";
+import { ZipFile, createZipStream } from "./streams/zip-stream";
+import { createWriteStream } from "./stream-saver";
 
 let logger: typeof _logger;
 async function initalizeLogger(persistence: DatabasePersistence = "db") {
-  initalize(await NNStorage.createInstance("Logs", persistence));
+  initalize(await NNStorage.createInstance("Logs", persistence), false);
   logger = _logger.scope("notesnook-web");
 }
 
 async function downloadLogs() {
   if (!logManager) return;
   const allLogs = await logManager.get();
-  const files = allLogs.map((log) => ({
-    filename: log.key,
-    content: (log.logs as LogMessage[])
-      .map((line) => JSON.stringify(line))
-      .join("\n")
-  }));
-  const archive = await zip(files, "log");
-  FileSaver.saveAs(new Blob([archive.buffer]), "notesnook-logs.zip");
+  const textEncoder = new TextEncoder();
+  await new ReadableStream<ZipFile>({
+    pull(controller) {
+      for (const log of allLogs) {
+        controller.enqueue({
+          path: log.key,
+          data: textEncoder.encode(
+            (log.logs as LogMessage[])
+              .map((line) => JSON.stringify(line))
+              .join("\n")
+          )
+        });
+      }
+    }
+  })
+    .pipeThrough(createZipStream())
+    .pipeTo(await createWriteStream("notesnook-logs.zip"));
 }
 
 async function clearLogs() {

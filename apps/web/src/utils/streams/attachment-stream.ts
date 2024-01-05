@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { db } from "../../common/db";
 import { lazify } from "../lazify";
+import { makeUniqueFilename } from "./utils";
 import { ZipFile } from "./zip-stream";
 
 export const METADATA_FILENAME = "metadata.json";
@@ -83,18 +84,4 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
       }
     });
   }
-}
-
-function makeUniqueFilename(
-  filePath: string,
-  counters: Record<string, number>
-) {
-  filePath = filePath.toLowerCase();
-  counters[filePath] = (counters[filePath] || 0) + 1;
-  if (counters[filePath] === 1) return filePath;
-
-  const parts = filePath.split(".");
-  return `${parts.slice(0, -1).join(".")}-${counters[filePath]}.${
-    parts[parts.length - 1]
-  }`;
 }
