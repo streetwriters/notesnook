@@ -36,7 +36,7 @@ import {
 import { ToolbarDefinition } from "./types";
 
 type ToolbarProps = FlexProps & {
-  editor: Editor | null;
+  editor: Editor;
   location: ToolbarLocation;
   tools?: ToolbarDefinition;
   defaultFontFamily: string;
@@ -85,7 +85,6 @@ export function Toolbar(props: ToolbarProps) {
     setDefaultFontSize
   ]);
 
-  if (!editor) return null;
   return (
     <>
       <Flex
