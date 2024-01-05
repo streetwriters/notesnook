@@ -23,7 +23,7 @@ import { Text } from "@theme-ui/components";
 import { store as appStore } from "../../stores/app-store";
 import { store as tagStore } from "../../stores/tag-store";
 import { store as noteStore } from "../../stores/note-store";
-import { store as editorStore } from "../../stores/editor-store";
+import { useEditorStore } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { Edit, Shortcut, DeleteForver } from "../icons";
 import { showToast } from "../../utils/toast";
@@ -99,7 +99,7 @@ const menuItems: (tag: Tag, ids?: string[]) => MenuItem[] = (tag, ids = []) => {
         await db.tags.remove(...ids);
         showToast("success", `${pluralize(ids.length, "tag")} deleted`);
         await appStore.refreshNavItems();
-        await editorStore.refreshTags();
+        await useEditorStore.getState().refreshTags();
         await tagStore.refresh();
         await noteStore.refresh();
       },

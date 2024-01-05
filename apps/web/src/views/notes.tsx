@@ -28,6 +28,7 @@ import Placeholder from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { handleDrop } from "../common/drop-handler";
+import { useEditorStore } from "../stores/editor-store";
 
 type NotesProps = { header?: JSX.Element };
 function Notes(props: NotesProps) {
@@ -74,8 +75,7 @@ function Notes(props: NotesProps) {
         />
       }
       button={{
-        onClick: () =>
-          hashNavigate("/notes/create", { addNonce: true, replace: true })
+        onClick: () => useEditorStore.getState().newSession()
       }}
       header={header}
     />

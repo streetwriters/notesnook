@@ -31,19 +31,12 @@ import {
   showAddNotebookDialog,
   showEditNotebookDialog
 } from "../common/dialog-controller";
-import { closeOpenedDialog } from "../common/dialog-controller";
-import RouteContainer from "../components/route-container";
-import DiffViewer from "../components/diff-viewer";
-import Unlock from "../components/unlock";
-import { store as editorStore } from "../stores/editor-store";
-import { isMobile } from "../utils/dimensions";
 import { hashNavigate } from ".";
-import Editor from "../components/editor";
 import { defineRoutes } from "./types";
 
 const hashroutes = defineRoutes({
   "/": () => {
-    return !editorStore.get().session.state && <Editor nonce={"-1"} />;
+    // return <Editor nonce={"-1"} />;
   },
   "/email/verify": () => {
     showEmailVerificationDialog().then(afterAction);
@@ -63,45 +56,47 @@ const hashroutes = defineRoutes({
   "/tags/create": () => {
     showCreateTagDialog().then(afterAction);
   },
-  "/notes/create": () => {
-    closeOpenedDialog();
-    hashNavigate("/notes/create", { addNonce: true, replace: true });
-  },
-  "/notes/create/:nonce": ({ nonce }) => {
-    closeOpenedDialog();
-    return <Editor nonce={nonce} />;
-  },
-  "/notes/:noteId/edit": ({ noteId }) => {
-    closeOpenedDialog();
-
-    return <Editor noteId={noteId} />;
-  },
-  "/notes/:noteId/unlock": ({ noteId }) => {
-    closeOpenedDialog();
-    return (
-      <RouteContainer
-        type="unlock"
-        buttons={{
-          back: isMobile()
-            ? {
-                title: "Go back",
-                onClick: () =>
-                  hashNavigate("/notes/create", {
-                    addNonce: true,
-                    replace: true
-                  })
-              }
-            : undefined
-        }}
-      >
-        <Unlock noteId={noteId} />
-      </RouteContainer>
-    );
-  },
-  "/notes/:noteId/conflict": ({ noteId }) => {
-    closeOpenedDialog();
-    return <DiffViewer noteId={noteId} />;
-  },
+  // "/notes/create": () => {
+  //   closeOpenedDialog();
+  //   editorStore.get().newSession();
+  //   //  hashNavigate("/notes/create", { addNonce: true, replace: true });
+  // },
+  // "/notes/create/:nonce": ({ nonce }) => {
+  //   closeOpenedDialog();
+  //   //  return <Editor nonce={nonce} />;
+  // },
+  // "/notes/:noteId/edit": ({ noteId }) => {
+  //   closeOpenedDialog();
+  //   editorStore.get().openSession(noteId);
+  //   // return <Editor noteId={noteId} />;
+  // },
+  // "/notes/:noteId/unlock": ({ noteId }) => {
+  //   closeOpenedDialog();
+  //   editorStore.get().openSession(noteId);
+  //   // return (
+  //   //   <RouteContainer
+  //   //     type="unlock"
+  //   //     buttons={{
+  //   //       back: isMobile()
+  //   //         ? {
+  //   //             title: "Go back",
+  //   //             onClick: () =>
+  //   //               hashNavigate("/notes/create", {
+  //   //                 addNonce: true,
+  //   //                 replace: true
+  //   //               })
+  //   //           }
+  //   //         : undefined
+  //   //     }}
+  //   //   >
+  //   //     <Unlock noteId={noteId} />
+  //   //   </RouteContainer>
+  //   // );
+  // },
+  // "/notes/:noteId/conflict": ({ noteId }) => {
+  //   closeOpenedDialog();
+  //   return <DiffViewer noteId={noteId} />;
+  // },
   "/buy": () => {
     showBuyDialog().then(afterAction);
   },

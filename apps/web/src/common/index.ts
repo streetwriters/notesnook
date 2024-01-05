@@ -43,12 +43,12 @@ import { FeatureKeys } from "../dialogs/feature-dialog";
 import { ZipEntry, createUnzipIterator } from "../utils/streams/unzip-stream";
 import { User } from "@notesnook/core/dist/api/user-manager";
 import { LegacyBackupFile } from "@notesnook/core";
+import { useEditorStore } from "../stores/editor-store";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
     title: "Add a note",
-    onClick: () =>
-      hashNavigate("/notes/create", { addNonce: true, replace: true })
+    onClick: () => useEditorStore.getState().newSession()
   },
   notebooks: {
     title: "Create a notebook",

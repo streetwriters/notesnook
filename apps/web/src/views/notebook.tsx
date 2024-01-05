@@ -51,7 +51,6 @@ import { FlexScrollContainer } from "../components/scroll-container";
 import { Menu } from "../hooks/use-menu";
 import Config from "../utils/config";
 import Notes from "./notes";
-// import { showSortMenu } from "../components/group-header";
 
 type NotebookProps = {
   rootId: string;
