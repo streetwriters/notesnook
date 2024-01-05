@@ -481,6 +481,10 @@ span:focus .fake-cursor {
   overflow-y: hidden;
 }
 
+.math-block .katex-html {
+  padding-top: 10px;
+}
+
 /* -- Selection Plugin ---------------------------------- */
 
 /* p::selection,
