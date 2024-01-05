@@ -160,7 +160,6 @@ class Database {
     this.notes = await Notes.new(this, "notes");
 
     await this.trash.init();
-    await this.relations.cleanup();
 
     this.monographs.init().catch(console.error);
   }

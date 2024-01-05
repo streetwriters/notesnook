@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { logger } from "../logger";
 import { makeId } from "../utils/id";
 import Collection from "./collection";
 
@@ -188,39 +187,6 @@ export default class Relations extends Collection {
       if (item) items.push(item);
     }
     return items;
-  }
-
-  async cleanup() {
-    const relationsLogger = logger.scope("Relations");
-    const relations = this._collection.getItems();
-    for (const relation of relations) {
-      const references = [relation.to, relation.from];
-      for (let reference of references) {
-        let exists = false;
-        switch (reference.type) {
-          case "reminder":
-            exists = this._db.reminders.exists(reference.id);
-            break;
-          case "note":
-            exists =
-              this._db.notes.exists(reference.id) ||
-              this._db.trash.exists(reference.id);
-            break;
-          case "notebook":
-            exists =
-              this._db.notebooks.exists(reference.id) ||
-              this._db.trash.exists(reference.id);
-            break;
-        }
-        if (!exists) {
-          relationsLogger.debug(
-            `Removing relation during cleanup`,
-            relation.id
-          );
-          await this.remove(relation.id);
-        }
-      }
-    }
   }
 }
 
