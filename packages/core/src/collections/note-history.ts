@@ -129,6 +129,12 @@ export class NoteHistory implements ICollection {
     return await this.sessionContent.get(session.sessionContentId);
   }
 
+  async session(sessionId: string) {
+    const session = await this.collection.get(sessionId);
+    if (!session || isDeleted(session)) return;
+    return session;
+  }
+
   async remove(sessionId: string) {
     const session = await this.collection.get(sessionId);
     if (!session || isDeleted(session)) return;
@@ -175,12 +181,15 @@ export class NoteHistory implements ICollection {
     if (session.locked && isCipher(content.data)) {
       await this.db.content.add({
         id: note.contentId,
+        noteId: session.noteId,
+        sessionId: `${Date.now()}`,
         data: content.data,
         type: content.type
       });
     } else if (content.data && !isCipher(content.data)) {
       await this.db.notes.add({
         id: session.noteId,
+        sessionId: `${Date.now()}`,
         content: {
           data: content.data,
           type: content.type
