@@ -22,7 +22,7 @@ import { getContentFromData } from "../content-types";
 import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format";
 import { clone } from "../utils/clone";
 import { Tiptap } from "../content-types/tiptap";
-import { EMPTY_CONTENT, isUnencryptedContent } from "./content";
+import { EMPTY_CONTENT } from "./content";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { buildFromTemplate } from "../utils/templates";
 import { Note, TrashOrItem, isTrashItem, isDeleted } from "../types";
@@ -279,7 +279,7 @@ export class Notes implements ICollection {
       const rawContent = note.contentId
         ? await this.db.content.get(note.contentId)
         : undefined;
-      if (rawContent && !isUnencryptedContent(rawContent)) return false;
+      if (rawContent && rawContent.locked) return false;
       options.contentItem = rawContent || EMPTY_CONTENT(note.id);
     }
 
@@ -326,7 +326,7 @@ export class Notes implements ICollection {
       const content = note.contentId
         ? await this.db.content.get(note.contentId)
         : undefined;
-      if (content && (isDeleted(content) || !isUnencryptedContent(content)))
+      if (content && (isDeleted(content) || content.locked))
         throw new Error("Cannot duplicate a locked or deleted note.");
       const duplicateId = await this.db.notes.add({
         ...clone(note),

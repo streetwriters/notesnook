@@ -23,10 +23,7 @@ import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
 import { tinyToTiptap } from "../migrations";
 import { isCipher } from "../database/crypto";
 import { Note } from "../types";
-import {
-  isEncryptedContent,
-  isUnencryptedContent
-} from "../collections/content";
+import { isEncryptedContent } from "../collections/content";
 import { NoteContent } from "../collections/session-content";
 
 export const VAULT_ERRORS = {
@@ -296,7 +293,7 @@ export default class Vault {
     // Case: when note is being newly locked
     if (!note.locked && (!data || !type) && !!contentId) {
       const rawContent = await this.db.content.get(contentId);
-      if (!rawContent || !isUnencryptedContent(rawContent))
+      if (!rawContent || rawContent.locked)
         return await this.db.notes.add({
           id,
           locked: true

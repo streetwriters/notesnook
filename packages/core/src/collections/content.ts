@@ -26,7 +26,6 @@ import {
   Attachment,
   ContentItem,
   ContentType,
-  EncryptedContentItem,
   UnencryptedContentItem,
   isDeleted
 } from "../types";
@@ -113,7 +112,7 @@ export class Content implements ICollection {
       await this.collection.update([content.id], {
         dateEdited: content.dateEdited,
         localOnly: content.localOnly,
-        conflicted: content.conflicted,
+        conflicted: content.dateResolved ? null : content.conflicted,
         dateResolved: content.dateResolved,
         noteId: content.noteId,
         ...contentData
@@ -370,14 +369,14 @@ export class Content implements ICollection {
   // }
 }
 
-export function isUnencryptedContent(
-  content: ContentItem
-): content is UnencryptedContentItem {
-  return content.locked === false;
+export function isDecryptedContent(
+  content: NoteContent<boolean>
+): content is NoteContent<false> {
+  return !isCipher(content.data);
 }
 
 export function isEncryptedContent(
-  content: ContentItem
-): content is EncryptedContentItem {
-  return content.locked === true;
+  content: NoteContent<boolean>
+): content is NoteContent<true> {
+  return isCipher(content.data);
 }

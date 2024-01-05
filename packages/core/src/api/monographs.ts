@@ -21,7 +21,6 @@ import http from "../utils/http";
 import Constants from "../utils/constants";
 import Database from ".";
 import { Note, isDeleted } from "../types";
-import { isUnencryptedContent } from "../collections/content";
 import { Cipher } from "@notesnook/crypto";
 import { isFalse } from "../database";
 
@@ -101,8 +100,7 @@ export class Monographs {
     if (!contentItem || isDeleted(contentItem))
       throw new Error("Could not find content for this note.");
 
-    if (!isUnencryptedContent(contentItem))
-      throw new Error("Cannot published locked notes.");
+    if (contentItem.locked) throw new Error("Cannot published locked notes.");
 
     const content = await this.db.content.downloadMedia(
       `monograph-${noteId}`,
