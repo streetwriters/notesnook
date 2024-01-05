@@ -1,0 +1,28 @@
+diff --git a/node_modules/@tiptap/core/dist/index.js b/node_modules/@tiptap/core/dist/index.js
+index 38c9884..2dad7fe 100644
+--- a/node_modules/@tiptap/core/dist/index.js
++++ b/node_modules/@tiptap/core/dist/index.js
+@@ -1876,8 +1876,21 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
+     return lift$1(state, dispatch);
+ };
+ 
+-const liftEmptyBlock = () => ({ state, dispatch }) => {
+-    return liftEmptyBlock$1(state, dispatch);
++const liftEmptyBlock = () => ({ state, dispatch, editor }) => {
++    return liftEmptyBlock$1(state, (tr) => {
++        if (!dispatch) return true;
++
++        const { selection, storedMarks } = state;
++        const marks = storedMarks || (selection.$to.parentOffset && selection.$from.marks());
++
++        const { splittableMarks } = editor.extensionManager;
++        const filteredMarks = marks.filter((mark) =>
++            splittableMarks.includes(mark.type.name)
++        );
++        tr.ensureMarks(filteredMarks)
++
++        return dispatch(tr);
++    });
+ };
+ 
+ const liftListItem = typeOrName => ({ state, dispatch }) => {
