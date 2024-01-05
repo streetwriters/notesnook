@@ -18,7 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { immerable, setAutoFreeze } from "immer";
 import { create } from "zustand";
-import { subscribeWithSelector } from "zustand/middleware";
+import {
+  subscribeWithSelector,
+  persist,
+  PersistOptions
+} from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { IStore } from "../stores";
 setAutoFreeze(false);
@@ -36,9 +40,33 @@ export function createStore<T extends object>(Store: IStore<T>) {
       })
     )
   );
-  // return Object.defineProperty(store as CustomStore<T>, "get", {
-  //   get: () => store.getState()
-  // });
+  return [store, store.getState()] as const;
+}
+
+export function createPersistedStore<T extends object>(
+  Store: IStore<T>,
+  options: PersistOptions<T, Partial<T>>
+) {
+  const store = create<
+    T,
+    [
+      ["zustand/persist", Partial<T>],
+      ["zustand/subscribeWithSelector", never],
+      ["zustand/immer", never]
+    ]
+  >(
+    persist(
+      subscribeWithSelector(
+        immer((set, get) => {
+          const store = new Store(set, get);
+          (store as any)[immerable] = true;
+          return store;
+        })
+      ),
+      options
+    )
+  );
+
   return [store, store.getState()] as const;
 }
 

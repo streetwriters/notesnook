@@ -57,6 +57,7 @@ import { FlexScrollContainer } from "../components/scroll-container";
 import { Menu } from "../hooks/use-menu";
 import Config from "../utils/config";
 import { useSearch } from "../hooks/use-search";
+import { useEditorStore } from "../stores/editor-store";
 
 type NotebookProps = {
   rootId: string;
@@ -148,11 +149,7 @@ function Notebook(props: NotebookProps) {
                 />
               }
               button={{
-                onClick: () =>
-                  hashNavigate("/notes/create", {
-                    addNonce: true,
-                    replace: true
-                  })
+                onClick: () => useEditorStore.getState().newSession()
               }}
             />
           </Flex>

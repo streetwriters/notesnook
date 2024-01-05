@@ -20,9 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import useHashRoutes from "../../hooks/use-hash-routes";
 import hashroutes from "../../navigation/hash-routes";
+import TabsView from "../editor";
 
 function HashRouter() {
-  const routeResult = useHashRoutes(hashroutes);
-  return React.isValidElement(routeResult) ? routeResult : null;
+  useHashRoutes(hashroutes);
+  return <TabsView />; // React.isValidElement(routeResult) ? routeResult : null;
 }
 export default React.memo(HashRouter, () => true);

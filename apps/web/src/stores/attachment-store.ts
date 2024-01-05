@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
-import { store as editorStore } from "./editor-store";
+import { useEditorStore } from "./editor-store";
 import { checkAttachment } from "../common/attachments";
 import { showToast } from "../utils/toast";
 import { AttachmentStream } from "../utils/streams/attachment-stream";
@@ -120,14 +120,14 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
       if (await db.attachments.remove(attachment.hash, false)) {
         await this.get().refresh();
 
-        const sessionId = editorStore.get().session.id;
+        const sessionId = useEditorStore.getState().session.id;
         if (
           sessionId &&
           (await db.relations
             .to({ id: attachment.id, type: "attachment" }, "note")
             .has(sessionId))
         ) {
-          await editorStore.clearSession();
+          await useEditorStore.getState().clearSession();
         }
       }
     } catch (e) {

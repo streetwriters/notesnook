@@ -17,49 +17,62 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Button, Text } from "@theme-ui/components";
+import { Flex, Button, Text, FlexProps } from "@theme-ui/components";
 import { getFormattedDate } from "@notesnook/common";
 
-function ContentToggle(props) {
+type ContentToggle = {
+  isSelected: boolean;
+  isOtherSelected: boolean;
+  onToggle: () => void;
+  label: string;
+  dateEdited: number;
+  resolveConflict: (options: { saveCopy: boolean }) => void;
+  readonly: boolean;
+  sx: FlexProps["sx"];
+};
+function ContentToggle(props: ContentToggle) {
   const {
     isSelected,
     isOtherSelected,
     onToggle,
-    sx,
     label,
     dateEdited,
-    resolveConflict
+    resolveConflict,
+    readonly,
+    sx
   } = props;
 
   return (
     <Flex sx={{ ...sx, flexDirection: "column" }}>
-      <Flex>
-        {isOtherSelected && (
+      {!readonly && (
+        <Flex>
+          {isOtherSelected && (
+            <Button
+              variant="accent"
+              mr={2}
+              onClick={() => resolveConflict({ saveCopy: true })}
+              p={1}
+              px={2}
+            >
+              Save copy
+            </Button>
+          )}
           <Button
-            variant="accent"
-            mr={2}
-            onClick={() => resolveConflict({ saveCopy: true })}
+            variant={isOtherSelected ? "error" : "accent"}
+            onClick={() => {
+              if (isOtherSelected) {
+                resolveConflict({ saveCopy: false });
+              } else {
+                onToggle();
+              }
+            }}
             p={1}
             px={2}
           >
-            Save copy
+            {isSelected ? "Undo" : isOtherSelected ? "Discard" : "Keep"}
           </Button>
-        )}
-        <Button
-          variant={isOtherSelected ? "error" : "accent"}
-          onClick={() => {
-            if (isOtherSelected) {
-              resolveConflict({ saveCopy: false });
-            } else {
-              onToggle();
-            }
-          }}
-          p={1}
-          px={2}
-        >
-          {isSelected ? "Undo" : isOtherSelected ? "Discard" : "Keep"}
-        </Button>
-      </Flex>
+        </Flex>
+      )}
       <Text variant="subBody" mt={1}>
         {label} | {getFormattedDate(dateEdited)}
       </Text>

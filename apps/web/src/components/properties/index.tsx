@@ -29,7 +29,11 @@ import {
   Checkmark
 } from "../icons";
 import { Flex, Text } from "@theme-ui/components";
-import { useStore, store, EditorSession } from "../../stores/editor-store";
+import {
+  useEditorStore,
+  ReadonlyEditorSession,
+  DefaultEditorSession
+} from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { store as noteStore } from "../../stores/note-store";
@@ -38,7 +42,6 @@ import Toggle from "./toggle";
 import ScrollContainer from "../scroll-container";
 import { getFormattedDate } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
-import { PreviewSession } from "../editor/types";
 import usePromise from "../../hooks/use-promise";
 import { ListItemWrapper } from "../list-container/list-profiles";
 import { VirtualizedList } from "../virtualized-list";
@@ -71,10 +74,10 @@ const tools = [
   }
 ] as const;
 
-type MetadataItem<T extends keyof EditorSession = keyof EditorSession> = {
+type MetadataItem<T extends "dateCreated" | "dateEdited"> = {
   key: T;
   label: string;
-  value: (value: EditorSession[T]) => string;
+  value: (value: number) => string;
 };
 
 const metadataItems = [
@@ -91,19 +94,18 @@ const metadataItems = [
 ];
 
 type EditorPropertiesProps = {
-  onOpenPreviewSession: (session: PreviewSession) => void;
+  id: string;
 };
 function EditorProperties(props: EditorPropertiesProps) {
-  const { onOpenPreviewSession } = props;
+  const { id } = props;
 
-  const toggleProperties = useStore((store) => store.toggleProperties);
+  const toggleProperties = useEditorStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const session = useStore((store) => store.session);
+  const session = useEditorStore((store) =>
+    store.getSession(id, ["default", "unlocked", "readonly"])
+  );
 
-  const { id: sessionId, sessionType, dateCreated } = session;
-  const isPreviewMode = sessionType === "preview";
-
-  if (isFocusMode || !sessionId) return null;
+  if (isFocusMode || !session) return null;
   return (
     <AnimatedFlex
       animate={{
@@ -120,7 +122,7 @@ function EditorProperties(props: EditorPropertiesProps) {
         display: "flex",
         position: "absolute",
         right: 0,
-        zIndex: 3,
+        zIndex: 1,
         height: "100%",
         width: "300px",
         borderLeft: "1px solid",
@@ -150,19 +152,18 @@ function EditorProperties(props: EditorPropertiesProps) {
               />
             }
           >
-            {!isPreviewMode && (
-              <>
-                {tools.map((tool) => (
-                  <Toggle
-                    {...tool}
-                    key={tool.key}
-                    toggleKey={tool.property}
-                    onToggle={() => changeToggleState(tool.key)}
-                    testId={`properties-${tool.key}`}
-                  />
-                ))}
-              </>
-            )}
+            <>
+              {tools.map((tool) => (
+                <Toggle
+                  {...tool}
+                  key={tool.key}
+                  isOn={!!session.note[tool.property]}
+                  onToggle={() => changeToggleState(tool.key, session)}
+                  testId={`properties-${tool.key}`}
+                />
+              ))}
+            </>
+
             {metadataItems.map((item) => (
               <Flex
                 key={item.key}
@@ -182,21 +183,16 @@ function EditorProperties(props: EditorPropertiesProps) {
                   variant="subBody"
                   sx={{ fontSize: "body" }}
                 >
-                  {item.value(session[item.key])}
+                  {item.value(session.note[item.key])}
                 </Text>
               </Flex>
             ))}
-            {!isPreviewMode && <Colors noteId={sessionId} />}
+            <Colors noteId={id} color={session.color} />
           </Section>
-          <Notebooks noteId={sessionId} />
-          <Reminders noteId={sessionId} />
-          <Attachments noteId={sessionId} />
-          <SessionHistory
-            noteId={sessionId}
-            dateCreated={dateCreated || 0}
-            isPreviewMode={isPreviewMode}
-            onOpenPreviewSession={onOpenPreviewSession}
-          />
+          <Notebooks noteId={id} />
+          <Reminders noteId={id} />
+          <Attachments noteId={id} />
+          <SessionHistory noteId={id} />
         </ScrollContainer>
       </ScopedThemeProvider>
     </AnimatedFlex>
@@ -204,8 +200,7 @@ function EditorProperties(props: EditorPropertiesProps) {
 }
 export default React.memo(EditorProperties);
 
-function Colors({ noteId }: { noteId: string }) {
-  const color = useStore((store) => store.color);
+function Colors({ noteId, color }: { noteId: string; color?: string }) {
   const result = usePromise(
     async () =>
       (
@@ -213,7 +208,7 @@ function Colors({ noteId }: { noteId: string }) {
       ).at(0),
     [color]
   );
-  console.log(result);
+
   return (
     <Flex
       py={2}
@@ -335,17 +330,7 @@ function Attachments({ noteId }: { noteId: string }) {
     </Section>
   );
 }
-function SessionHistory({
-  noteId,
-  dateCreated,
-  isPreviewMode,
-  onOpenPreviewSession
-}: {
-  noteId: string;
-  dateCreated: number;
-  isPreviewMode: boolean;
-  onOpenPreviewSession: (session: PreviewSession) => void;
-}) {
+function SessionHistory({ noteId }: { noteId: string }) {
   const result = usePromise(() =>
     db.noteHistory
       .get(noteId)
@@ -365,15 +350,7 @@ function SessionHistory({
         items={result.value.placeholders}
         renderItem={({ index }) => (
           <ResolvedItem type="session" index={index} items={result.value}>
-            {({ item }) => (
-              <SessionItem
-                noteId={noteId}
-                session={item}
-                dateCreated={dateCreated}
-                isPreviewMode={isPreviewMode}
-                onOpenPreviewSession={onOpenPreviewSession}
-              />
-            )}
+            {({ item }) => <SessionItem noteId={noteId} session={item} />}
           </ResolvedItem>
         )}
       />
@@ -410,7 +387,8 @@ function Section({
 }
 
 function changeToggleState(
-  prop: "lock" | "readonly" | "local-only" | "pin" | "favorite"
+  prop: "lock" | "readonly" | "local-only" | "pin" | "favorite",
+  session: ReadonlyEditorSession | DefaultEditorSession
 ) {
   const {
     id: sessionId,
@@ -419,7 +397,7 @@ function changeToggleState(
     localOnly,
     pinned,
     favorite
-  } = store.get().session;
+  } = session.note;
   if (!sessionId) return;
   switch (prop) {
     case "lock":

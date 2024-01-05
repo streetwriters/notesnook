@@ -22,7 +22,7 @@ import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useThemeStore } from "./stores/theme-store";
 import { useStore as useAttachmentStore } from "./stores/attachment-store";
-import { useStore as useEditorStore } from "./stores/editor-store";
+import { useEditorStore } from "./stores/editor-store";
 import { useStore as useAnnouncementStore } from "./stores/announcement-store";
 import { resetNotices, scheduleBackups } from "./common/notices";
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
@@ -244,7 +244,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
         onData(itemType) {
           switch (itemType) {
             case "note":
-              hashNavigate("/notes/create", { addNonce: true, replace: true });
+              useEditorStore.getState().newSession();
               break;
             case "notebook":
               hashNavigate("/notebooks/create", { replace: true });

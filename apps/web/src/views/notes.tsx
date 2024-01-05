@@ -27,6 +27,7 @@ import { hashNavigate, navigate } from "../navigation";
 import Placeholder from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
+import { useEditorStore } from "../stores/editor-store";
 
 function Notes() {
   const context = useNotesStore((store) => store.context);
@@ -70,8 +71,7 @@ function Notes() {
         />
       }
       button={{
-        onClick: () =>
-          hashNavigate("/notes/create", { addNonce: true, replace: true })
+        onClick: () => useEditorStore.getState().newSession()
       }}
     />
   );

@@ -19,24 +19,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { Input } from "@theme-ui/components";
-import { useStore, store } from "../../stores/editor-store";
+import { useEditorStore } from "../../stores/editor-store";
 import { debounceWithId } from "@notesnook/common";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
-import { useEditorConfig } from "./context";
+import { useEditorConfig } from "./manager";
 import { getFontById } from "@notesnook/editor";
-import { AppEventManager, AppEvents } from "../../common/app-events";
 import { replaceDateTime } from "@notesnook/editor/dist/extensions/date-time";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 
 type TitleBoxProps = {
+  id: string;
   readonly: boolean;
 };
 
 function TitleBox(props: TitleBoxProps) {
-  const { readonly } = props;
+  const { readonly, id } = props;
   const inputRef = useRef<HTMLInputElement>(null);
-  const id = useStore((store) => store.session.id);
+  // const id = useStore((store) => store.session.id);
   const isMobile = useMobile();
   const isTablet = useTablet();
   const { editorConfig } = useEditorConfig();
@@ -61,7 +61,10 @@ function TitleBox(props: TitleBoxProps) {
   );
 
   useEffect(() => {
-    const { title } = useStore.getState().session;
+    const session = useEditorStore.getState().getSession(id);
+    if (!session || !session.note) return;
+
+    const { title } = session.note;
     if (!inputRef.current) return;
     inputRef.current.value = title || "";
     updateFontSize(title?.length || 0);
@@ -72,27 +75,27 @@ function TitleBox(props: TitleBoxProps) {
     updateFontSize(inputRef.current.value.length);
   }, [isTablet, isMobile, updateFontSize]);
 
-  useEffect(() => {
-    const { unsubscribe } = AppEventManager.subscribe(
-      AppEvents.changeNoteTitle,
-      ({ preventSave, title }: { title: string; preventSave: boolean }) => {
-        if (!inputRef.current) return;
-        withSelectionPersist(
-          inputRef.current,
-          (input) => (input.value = title)
-        );
-        updateFontSize(title.length);
-        if (!preventSave) {
-          const { sessionId, id } = store.get().session;
-          debouncedOnTitleChange(sessionId, id, title);
-        }
-      }
-    );
+  // useEffect(() => {
+  //   const { unsubscribe } = AppEventManager.subscribe(
+  //     AppEvents.changeNoteTitle,
+  //     ({ preventSave, title }: { title: string; preventSave: boolean }) => {
+  //       if (!inputRef.current) return;
+  //       withSelectionPersist(
+  //         inputRef.current,
+  //         (input) => (input.value = title)
+  //       );
+  //       updateFontSize(title.length);
+  //       if (!preventSave) {
+  //         const { sessionId, id } = store.get().session;
+  //         debouncedOnTitleChange(sessionId, id, title);
+  //       }
+  //     }
+  //   );
 
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, []);
 
   return (
     <Input
@@ -115,13 +118,12 @@ function TitleBox(props: TitleBoxProps) {
         }
       }}
       onChange={(e) => {
-        const { sessionId, id } = store.get().session;
         e.target.value = replaceDateTime(
           e.target.value,
           dateFormat,
           timeFormat
         );
-        debouncedOnTitleChange(sessionId, id, e.target.value);
+        debouncedOnTitleChange(id, id, e.target.value);
         updateFontSize(e.target.value.length);
       }}
     />
@@ -132,8 +134,8 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
   return prevProps.readonly === nextProps.readonly;
 });
 
-function onTitleChange(noteId: string | undefined, title: string) {
-  store.get().setTitle(noteId, title);
+function onTitleChange(noteId: string, title: string) {
+  useEditorStore.getState().setTitle(noteId, title);
 }
 
 const debouncedOnTitleChange = debounceWithId(onTitleChange, 100);

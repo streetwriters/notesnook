@@ -17,212 +17,463 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import createStore from "../common/store";
-import { store as noteStore } from "./note-store";
-import { store as attachmentStore } from "./attachment-store";
+import { createPersistedStore } from "../common/store";
+import { useStore as useNoteStore } from "./note-store";
 import { store as appStore } from "./app-store";
 import { store as settingStore } from "./setting-store";
 import { db } from "../common/db";
 import BaseStore from ".";
 import { EV, EVENTS } from "@notesnook/core/dist/common";
-import { hashNavigate } from "../navigation";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
 import { setDocumentTitle } from "../utils/dom";
-import { Note, Tag } from "@notesnook/core";
+import { BaseTrashItem, ContentItem, Note, Tag } from "@notesnook/core";
 import { NoteContent } from "@notesnook/core/dist/collections/session-content";
 import { Context } from "../components/list-container/types";
+import { getId } from "@notesnook/core/dist/utils/id";
+import { createJSONStorage } from "zustand/middleware";
+import { getFormattedHistorySessionDate } from "@notesnook/common";
+import { isCipher } from "@notesnook/core/dist/database/crypto";
 
-enum SaveState {
+export enum SaveState {
   NotSaved = -1,
   Saving = 0,
   Saved = 1
 }
 enum SESSION_STATES {
-  stale = "stale",
-  new = "new",
-  locked = "locked",
-  unlocked = "unlocked",
-  opening = "opening"
+  new,
+  old,
+  locked,
+  unlocked,
+  conflicted
 }
 
-export type EditorSession = {
-  sessionType: "default" | "locked" | "preview";
-  content?: NoteContent<false>;
-  isDeleted: boolean;
-  attachmentsLength: number;
-  saveState: SaveState;
-  sessionId: string;
-  state: SESSION_STATES;
-  context?: Context;
-  nonce?: string;
-} & Partial<Note>;
+// type ConflictedContentItem = Omit<ContentItem, "conflicted"> & {
+//   conflicted: ContentItem;
+// };
 
-export const getDefaultSession = (sessionId?: string): EditorSession => {
-  return {
-    sessionType: "default",
-    state: SESSION_STATES.new,
-    saveState: SaveState.Saved, // -1 = not saved, 0 = saving, 1 = saved
-    sessionId: sessionId || Date.now().toString(),
-    attachmentsLength: 0,
-    isDeleted: false
-  };
+export type BaseEditorSession = {
+  id: string;
+  needsHydration?: boolean;
+  pinned?: boolean;
+  preview?: boolean;
+  title?: string;
 };
 
-class EditorStore extends BaseStore<EditorStore> {
-  session = getDefaultSession();
+export type LockedEditorSession = BaseEditorSession & {
+  type: "locked";
+  note: Note;
+};
+
+export type ReadonlyEditorSession = BaseEditorSession & {
+  type: "readonly";
+  note: Note;
+  content?: NoteContent<false>;
   color?: string;
-  tags: Tag[] = [];
+  tags?: Tag[];
+};
+
+export type DeletedEditorSession = BaseEditorSession & {
+  type: "deleted";
+  note: BaseTrashItem<Note>;
+  content?: NoteContent<false>;
+};
+
+export type DefaultEditorSession = BaseEditorSession & {
+  type: "default";
+  note: Note;
+  content?: NoteContent<false>;
+  sessionId: string;
+  color?: string;
+  tags?: Tag[];
+  attachmentsLength?: number;
+  saveState: SaveState;
+};
+
+export type NewEditorSession = BaseEditorSession & {
+  type: "new";
+  context?: Context;
+  saveState: SaveState;
+};
+
+export type ConflictedEditorSession = BaseEditorSession & {
+  type: "conflicted" | "diff";
+  note: Note;
+  content: ContentItem;
+};
+
+export type EditorSession =
+  | DefaultEditorSession
+  | LockedEditorSession
+  | NewEditorSession
+  | ConflictedEditorSession
+  | ReadonlyEditorSession
+  | DeletedEditorSession;
+
+export type SessionType = keyof SessionTypeMap;
+type SessionTypeMap = {
+  unlocked: DefaultEditorSession;
+  default: DefaultEditorSession;
+  locked: LockedEditorSession;
+  new: NewEditorSession;
+  conflicted: ConflictedEditorSession;
+  diff: ConflictedEditorSession;
+  readonly: ReadonlyEditorSession;
+  deleted: DeletedEditorSession;
+};
+
+export function isLockedSession(
+  session: EditorSession
+): session is
+  | LockedEditorSession
+  | DefaultEditorSession
+  | DeletedEditorSession
+  | ConflictedEditorSession {
+  return (
+    session.type === "locked" || ("note" in session && session.note.locked)
+  );
+}
+
+class EditorStore extends BaseStore<EditorStore> {
+  sessions: EditorSession[] = [];
+  activeSessionId?: string;
+
   arePropertiesVisible = false;
   editorMargins = Config.get("editor:margins", true);
+  history: string[] = [];
+
+  getSession = <T extends SessionType[]>(id: string, types?: T) => {
+    return this.get().sessions.find(
+      (s): s is SessionTypeMap[T[number]] =>
+        s.id === id && (!types || types.includes(s.type))
+    );
+  };
+
+  getActiveSession = <T extends SessionType[]>(types?: T) => {
+    const { activeSessionId, sessions } = this.get();
+    return sessions.find(
+      (s): s is SessionTypeMap[T[number]] =>
+        s.id === activeSessionId && (!types || types.includes(s.type))
+    );
+  };
 
   init = () => {
     EV.subscribe(EVENTS.userLoggedOut, () => {
-      hashNavigate("/notes/create", { replace: true, addNonce: true });
+      const { closeSessions, sessions } = this.get();
+      closeSessions(...sessions.map((s) => s.id));
     });
 
     EV.subscribe(EVENTS.vaultLocked, () => {
-      const { id, locked } = this.get().session;
-      if (locked) hashNavigate(`/notes/${id}/unlock`, { replace: true });
+      this.set((state) => {
+        state.sessions = state.sessions.map((session) => {
+          console.log("REFRESHIGN", session);
+          if (isLockedSession(session)) {
+            if (session.type === "diff" || session.type === "deleted")
+              return session;
+
+            return {
+              type: "locked",
+              id: session.id,
+              note: session.note,
+              pinned: session.pinned,
+              preview: session.preview
+            };
+          }
+          return session;
+        });
+      });
     });
+
+    const {
+      openSession,
+      openDiffSession,
+      activateSession,
+      activeSessionId,
+      getSession
+    } = this.get();
+    if (activeSessionId) {
+      const session = getSession(activeSessionId);
+      if (!session) return;
+
+      console.log("OPENING", session);
+      if (session.type === "diff") openDiffSession(session.note.id, session.id);
+      else if (session.type === "new") activateSession(session.id);
+      else openSession(activeSessionId);
+    }
   };
 
   refreshTags = async () => {
-    const { session } = this.get();
-    if (!session.id) return;
-    this.set({
-      tags: await db.relations
-        .to({ id: session.id, type: "note" }, "tag")
-        .selector.items(undefined, {
-          sortBy: "dateCreated",
-          sortDirection: "asc"
-        })
-    });
+    // const { session } = this.get();
+    // if (!session.id) return;
+    // this.set({
+    //   tags: await db.relations
+    //     .to({ id: session.id, type: "note" }, "tag")
+    //     .selector.items(undefined, {
+    //       sortBy: "dateCreated",
+    //       sortDirection: "asc"
+    //     })
+    // });
   };
 
   async refresh() {
-    const sessionId = this.get().session.id;
-    if (sessionId && !(await db.notes.exists(sessionId)))
-      await this.clearSession();
+    // const sessionId = this.get().session.id;
+    // if (sessionId && !(await db.notes.exists(sessionId)))
+    //   await this.clearSession();
   }
 
-  updateSession = async (item: Note) => {
+  updateSession = <T extends SessionType[]>(
+    id: string,
+    types: T,
+    partial:
+      | Partial<SessionTypeMap[T[number]]>
+      | ((session: SessionTypeMap[T[number]]) => void)
+  ) => {
     this.set((state) => {
-      state.session.title = item.title;
-      state.session.pinned = item.pinned;
-      state.session.favorite = item.favorite;
-      state.session.readonly = item.readonly;
-      state.session.dateEdited = item.dateEdited;
-      state.session.dateCreated = item.dateCreated;
-      state.session.locked = item.locked;
+      const index = state.sessions.findIndex(
+        (s) => s.id === id && types.includes(s.type)
+      );
+      if (index === -1) return;
+      const session = state.sessions[index] as SessionTypeMap[T[number]];
+      if (typeof partial === "function") partial(session);
+      else state.sessions[index] = { ...session, ...partial };
     });
   };
 
-  openLockedSession = async (note: Note) => {
-    this.set((state) => {
-      state.session = {
-        ...getDefaultSession(note.dateEdited.toString()),
-        ...note,
-        sessionType: "locked",
-        id: undefined, // NOTE: we give a session id only after the note is opened.
-        state: SESSION_STATES.unlocked
-      };
-    });
-    appStore.setIsEditorOpen(true);
-    hashNavigate(`/notes/${note.id}/edit`, { replace: true });
-  };
+  activateSession = (id?: string) => {
+    const session = this.get().sessions.find((s) => s.id === id);
+    if (!session) id = undefined;
 
-  openSession = async (noteId: string, force = false) => {
-    const session = this.get().session;
+    if (
+      id &&
+      !settingStore.get().hideNoteTitle &&
+      session &&
+      "note" in session
+    ) {
+      setDocumentTitle(session.note.title);
+    } else setDocumentTitle();
 
-    if (session.id) await db.fs().cancel(session.id, "download");
-    if (session.id === noteId && !force) return;
+    this.set({ activeSessionId: id });
+    appStore.setIsEditorOpen(!!id);
+    this.toggleProperties(false);
 
-    if (session.state === SESSION_STATES.unlocked) {
-      this.set((state) => {
-        state.session.id = noteId;
-        state.session.state = SESSION_STATES.new;
-      });
-      return;
+    if (id) {
+      const { history } = this.get();
+      if (history.includes(id)) history.splice(history.indexOf(id), 1);
+      history.push(id);
     }
+  };
 
-    const note =
-      (await db.notes.note(noteId)) || (await db.notes.trashed(noteId));
-    if (!note) return;
+  openDiffSession = async (noteId: string, sessionId: string) => {
+    const session = await db.noteHistory.session(sessionId);
+    const note = await db.notes.note(noteId);
+    if (!session || !note || !note.contentId) return;
 
-    noteStore.setSelectedNote(note.id);
-    setDocumentTitle(settingStore.get().hideNoteTitle ? undefined : note.title);
+    const currentContent = await db.content.get(note.contentId);
+    const oldContent = await db.noteHistory.content(session.id);
 
-    if (note.locked)
-      return hashNavigate(`/notes/${noteId}/unlock`, { replace: true });
-    if (note.conflicted)
-      return hashNavigate(`/notes/${noteId}/conflict`, { replace: true });
+    if (!oldContent || !currentContent) return;
 
-    const content = note.contentId
-      ? await db.content.get(note.contentId)
-      : undefined;
-    if (content && content.locked)
-      return hashNavigate(`/notes/${noteId}/unlock`, { replace: true });
-
-    this.set((state) => {
-      const defaultSession = getDefaultSession(note.dateEdited.toString());
-      state.session = {
-        ...defaultSession,
-        ...note,
-        content,
-        state: SESSION_STATES.new,
-        attachmentsLength: 0 // TODO: db.attachments.ofNote(note.id, "all")?.length || 0
-      };
-
-      const isDeleted = note.type === "trash";
-      if (isDeleted) {
-        state.session.isDeleted = true;
-        state.session.readonly = true;
+    const label = getFormattedHistorySessionDate(session);
+    useEditorStore.getState().addSession({
+      type: "diff",
+      id: session.id,
+      note,
+      title: label,
+      content: {
+        type: oldContent.type,
+        dateCreated: session.dateCreated,
+        dateEdited: session.dateModified,
+        dateModified: session.dateModified,
+        id: session.id,
+        localOnly: false,
+        noteId,
+        conflicted: currentContent,
+        ...(isCipher(oldContent.data)
+          ? { locked: true, data: oldContent.data }
+          : { locked: false, data: oldContent.data })
       }
     });
-    appStore.setIsEditorOpen(true);
-    this.toggleProperties(false);
+  };
+
+  openSession = async (
+    noteOrId: string | Note | BaseTrashItem<Note>,
+    force = false
+  ): Promise<void> => {
+    const { getSession } = this.get();
+    const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
+    const session = getSession(noteId);
+
+    if (session && !force && !session.needsHydration) {
+      return this.activateSession(noteId);
+    }
+
+    if (session && session.id) await db.fs().cancel(session.id, "download");
+
+    const note =
+      typeof noteOrId === "object"
+        ? noteOrId
+        : (await db.notes.note(noteId)) || (await db.notes.trashed(noteId));
+    if (!note) return;
+    const isPreview = session ? session.preview : true;
+
+    if (note.locked && note.type !== "trash") {
+      this.addSession({
+        type: "locked",
+        id: note.id,
+        note,
+        preview: isPreview
+      });
+    } else if (note.conflicted) {
+      const content = note.contentId
+        ? await db.content.get(note.contentId)
+        : undefined;
+
+      if (
+        !content ||
+        content.locked ||
+        !content.conflicted ||
+        note.type === "trash"
+      ) {
+        note.conflicted = false;
+        await db.notes.add({ id: note.id, conflicted: false });
+        if (content?.locked) {
+          await db.content.add({
+            id: note.contentId,
+            dateResolved: Date.now()
+          });
+        }
+        return this.openSession(note, true);
+      }
+
+      this.addSession({
+        type: "conflicted",
+        content: content,
+        id: note.id,
+        note,
+        preview: isPreview
+      });
+    } else {
+      const content = note.contentId
+        ? await db.content.get(note.contentId)
+        : undefined;
+
+      if (content?.locked) {
+        note.locked = true;
+        await db.notes.add({ id: note.id, locked: true });
+        return this.openSession(note, true);
+      }
+
+      if (note.type === "trash") {
+        this.addSession({
+          type: "deleted",
+          note,
+          id: note.id,
+          content
+        });
+      } else if (note.readonly) {
+        this.addSession({
+          type: "readonly",
+          note,
+          id: note.id,
+          content
+        });
+      } else {
+        const attachmentsLength = await db.attachments
+          .ofNote(note.id, "all")
+          .count();
+
+        this.addSession({
+          type: "default",
+          id: note.id,
+          note,
+          saveState: SaveState.Saved,
+          sessionId: `${Date.now()}`,
+          attachmentsLength,
+          content,
+          preview: isPreview
+        });
+      }
+    }
+  };
+
+  addSession = (session: EditorSession, activate = true) => {
+    let oldSessionId: string | null = null;
+
+    this.set((state) => {
+      const { activeSessionIndex, duplicateSessionIndex, previewSessionIndex } =
+        findSessionIndices(state.sessions, session, state.activeSessionId);
+
+      if (duplicateSessionIndex > -1) {
+        oldSessionId = state.sessions[duplicateSessionIndex].id;
+        state.sessions[duplicateSessionIndex] = session;
+      } else if (previewSessionIndex > -1) {
+        oldSessionId = state.sessions[previewSessionIndex].id;
+        state.sessions[previewSessionIndex] = session;
+      } else if (activeSessionIndex > -1)
+        state.sessions.splice(activeSessionIndex + 1, 0, session);
+      else state.sessions.push(session);
+    });
+
+    const { history } = this.get();
+    if (
+      oldSessionId &&
+      oldSessionId !== session.id &&
+      history.includes(oldSessionId)
+    )
+      history.splice(history.indexOf(oldSessionId), 1);
+
+    if (activate) this.activateSession(session.id);
   };
 
   saveSession = async (
-    sessionId: string | undefined,
-    session: Partial<EditorSession>
-  ) => {
-    if (!session) {
-      logger.warn("Session cannot be undefined", { sessionId, session });
-      return;
+    id: string,
+    partial: Partial<Omit<DefaultEditorSession, "note">> & {
+      note?: Partial<Note>;
     }
+  ) => {
+    const currentSession = this.getSession(id, ["new", "default"]);
+    if (!currentSession) return;
 
-    const currentSession = this.get().session;
-    if (currentSession.readonly && session.readonly !== false) return; // do not allow saving of readonly session
-    if (currentSession.saveState === 0 || currentSession.id !== sessionId)
+    // do not allow saving of readonly session
+    if (partial.note?.readonly) return;
+    if (
+      currentSession.saveState === SaveState.Saving ||
+      currentSession.id !== id
+    )
       return;
 
-    this.setSaveState(0);
+    this.setSaveState(id, 0);
     try {
-      if (session.content) this.get().session.content = session.content;
-
-      const id =
-        currentSession.locked && sessionId
-          ? await db.vault.save({ ...session, id: sessionId })
-          : await db.notes.add({ ...session, id: sessionId });
-
-      if (currentSession && currentSession.id !== sessionId) {
-        noteStore.refresh();
-        throw new Error("Aborting save operation: old session.");
+      //   if (partial.content) currentSession.content = partial.content;
+      if (isLockedSession(currentSession)) {
+        await db.vault.save({
+          ...partial.note,
+          content: partial.content,
+          sessionId: partial.sessionId,
+          id
+        });
+      } else {
+        await db.notes.add({
+          ...partial.note,
+          content: partial.content,
+          sessionId: partial.sessionId,
+          id
+        });
       }
-      if (!id) throw new Error("Note not saved.");
+
+      // if (currentSession && currentSession.id !== id) {
+      //   noteStore.refresh();
+      //   throw new Error("Aborting save operation: old session.");
+      // }
+      // if (!id) throw new Error("Note not saved.");
 
       // let note = await db.notes.note(id);
       // if (!note) throw new Error("Note not saved.");
 
-      if (!sessionId) {
-        noteStore.setSelectedNote(id);
-        hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
-      }
+      // hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
 
       const defaultNotebook = db.settings.getDefaultNotebook();
-      if (currentSession.context) {
+      if (currentSession.type === "new" && currentSession.context) {
         const { type } = currentSession.context;
         if (type === "notebook")
           await db.notes.addToNotebook(currentSession.context.id, id);
@@ -231,122 +482,112 @@ class EditorStore extends BaseStore<EditorStore> {
             { type, id: currentSession.context.id },
             { id, type: "note" }
           );
-      } else if (!sessionId && defaultNotebook) {
+      } else if (!id && defaultNotebook) {
         await db.notes.addToNotebook(defaultNotebook, id);
       }
 
-      console.log("getting note");
       const note = await db.notes.note(id);
       if (!note) throw new Error("Note not saved.");
 
-      const shouldRefreshNotes =
-        currentSession.context ||
-        !sessionId ||
-        note.title !== currentSession.title ||
-        note.headline !== currentSession.headline;
-      if (shouldRefreshNotes) noteStore.refresh();
-
       const attachmentsLength = await db.attachments.ofNote(id, "all").count();
-      if (attachmentsLength !== currentSession.attachmentsLength) {
-        attachmentStore.refresh();
+      const shouldRefreshNotes =
+        currentSession.type === "new" ||
+        !id ||
+        note.title !== currentSession.note?.title ||
+        note.headline !== currentSession.note?.headline ||
+        attachmentsLength !== currentSession.attachmentsLength;
+      if (shouldRefreshNotes) useNoteStore.getState().refresh();
+
+      if (currentSession.type === "new") {
+        this.addSession({
+          type: "default",
+          id,
+          note,
+          saveState: SaveState.Saved,
+          sessionId: partial.sessionId || `${Date.now()}`,
+          attachmentsLength,
+          pinned: currentSession.pinned,
+          content: partial.content
+        });
+      } else {
+        this.updateSession(id, ["unlocked", "default"], {
+          preview: false,
+          attachmentsLength: attachmentsLength,
+          note
+        });
       }
 
-      this.set((state) => {
-        if (!!state.session.id && state.session.id !== note.id) return;
-
-        for (const key in session) {
-          if (key === "content") continue;
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          state.session[key] = session[key as keyof EditorSession];
-        }
-
-        state.session.context = undefined;
-        state.session.id = note.id;
-        state.session.title = note.title;
-        state.session.dateEdited = note.dateEdited;
-        state.session.attachmentsLength = attachmentsLength;
-      });
       setDocumentTitle(
         settingStore.get().hideNoteTitle ? undefined : note.title
       );
-
-      this.setSaveState(1);
     } catch (err) {
-      this.setSaveState(-1);
+      this.setSaveState(id, -1);
       console.error(err);
       if (err instanceof Error) logger.error(err);
-      if (currentSession.locked) {
-        hashNavigate(`/notes/${session.id}/unlock`, { replace: true });
+      if (isLockedSession(currentSession)) {
+        // TODO:
+        // hashNavigate(`/notes/${id}/unlock`, { replace: true });
       }
     }
   };
 
-  newSession = async (nonce?: string) => {
-    const context = noteStore.get().context;
-    const session = this.get().session;
-    if (session.id) await db.fs().cancel(session.id, "download");
-
-    this.set((state) => {
-      state.session = {
-        ...getDefaultSession(),
-        context,
-        nonce,
-        state: SESSION_STATES.new
-      };
+  newSession = () => {
+    this.addSession({
+      type: "new",
+      id: getId(),
+      context: useNoteStore.getState().context,
+      saveState: SaveState.NotSaved
     });
-    noteStore.setSelectedNote();
-    appStore.setIsEditorOpen(true);
-    setDocumentTitle();
   };
 
-  clearSession = async (shouldNavigate = true) => {
-    const session = this.get().session;
-    if (session.id) await db.fs().cancel(session.id, "download");
-
+  closeSessions = (...ids: string[]) => {
     this.set((state) => {
-      state.session = {
-        ...getDefaultSession(),
-        state: SESSION_STATES.new
-      };
+      const sessions: EditorSession[] = [];
+      for (let i = 0; i < state.sessions.length; ++i) {
+        const session = state.sessions[i];
+        if (!ids.includes(session.id)) {
+          sessions.push(session);
+          continue;
+        }
+
+        db.fs().cancel(session.id, "download").catch(console.error);
+        if (state.history.includes(session.id))
+          state.history.splice(state.history.indexOf(session.id), 1);
+      }
+      state.sessions = sessions;
     });
-    noteStore.setSelectedNote();
-    this.toggleProperties(false);
-    if (shouldNavigate)
-      hashNavigate(`/notes/create`, { replace: true, addNonce: true });
-    setTimeout(() => appStore.setIsEditorOpen(false), 100);
-    setDocumentTitle();
+
+    const { history } = this.get();
+    this.activateSession(history.pop());
   };
 
-  setTitle = (noteId: string | undefined, title: string) => {
-    return this.saveSession(noteId, { title });
+  setTitle = (id: string, title: string) => {
+    return this.saveSession(id, { note: { title } });
   };
 
   toggle = (
-    noteId: string,
+    id: string,
     name: "favorite" | "pinned" | "readonly" | "localOnly" | "color",
     value: boolean | string
   ) => {
     if (name === "color" && typeof value === "string")
-      return this.set({ color: value });
-    return this.saveSession(noteId, { [name]: value });
+      return this.updateSession(id, ["readonly", "default"], { color: value });
+    return this.saveSession(id, { note: { [name]: value } });
   };
 
   saveSessionContent = (
-    noteId: string | undefined,
+    id: string,
     sessionId: string,
     content: NoteContent<false>
   ) => {
-    return this.saveSession(noteId, { sessionId, content });
+    return this.saveSession(id, { sessionId, content });
   };
 
-  setSaveState = (saveState: SaveState) => {
-    this.set((state) => {
-      state.session.saveState = saveState;
-    });
+  setSaveState = (id: string, saveState: SaveState) => {
+    this.updateSession(id, ["default", "new"], { saveState: saveState });
   };
 
-  toggleProperties = (toggleState: boolean) => {
+  toggleProperties = (toggleState?: boolean) => {
     this.set(
       (state) =>
         (state.arePropertiesVisible =
@@ -354,20 +595,62 @@ class EditorStore extends BaseStore<EditorStore> {
     );
   };
 
-  toggleEditorMargins = (toggleState: boolean) => {
+  toggleEditorMargins = (toggleState?: boolean) => {
     this.set((state) => {
       state.editorMargins =
         toggleState !== undefined ? toggleState : !state.editorMargins;
       Config.set("editor:margins", state.editorMargins);
     });
   };
-
-  // _getSaveFn = () => {
-  //   return this.get().session.locked
-  //     ? db.vault.save.bind(db.vault)
-  //     : db.notes.add.bind(db.notes);
-  // };
 }
 
-const [useStore, store] = createStore(EditorStore);
-export { useStore, store, SESSION_STATES };
+const [useEditorStore] = createPersistedStore(EditorStore, {
+  name: "editor-sessions",
+  partialize: (state) => ({
+    history: state.history,
+    activeSessionId: state.activeSessionId,
+    arePropertiesVisible: state.arePropertiesVisible,
+    editorMargins: state.editorMargins,
+    sessions: state.sessions.reduce((sessions, session) => {
+      sessions.push({
+        id: session.id,
+        type: isLockedSession(session) ? "locked" : session.type,
+        needsHydration: true,
+        preview: session.preview,
+        pinned: session.pinned,
+        note:
+          "note" in session
+            ? {
+                title: session.note.title
+              }
+            : undefined
+      } as EditorSession);
+
+      return sessions;
+    }, [] as EditorSession[])
+  }),
+  storage: createJSONStorage(() => localStorage)
+});
+export { useEditorStore, SESSION_STATES };
+
+function findSessionIndices(
+  sessions: EditorSession[],
+  session: EditorSession,
+  activeSessionId?: string
+) {
+  let activeSessionIndex = -1;
+  let previewSessionIndex = -1;
+  let duplicateSessionIndex = -1;
+  for (let i = 0; i < sessions.length; ++i) {
+    const { id, preview } = sessions[i];
+    if (id === session.id) duplicateSessionIndex = i;
+    else if (preview && session.preview) previewSessionIndex = i;
+    else if (id === activeSessionId) activeSessionIndex = i;
+  }
+
+  return {
+    activeSessionIndex,
+    previewSessionIndex,
+    duplicateSessionIndex
+  };
+}

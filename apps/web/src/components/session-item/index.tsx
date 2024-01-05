@@ -17,33 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getFormattedDate } from "@notesnook/common";
+import { getFormattedHistorySessionDate } from "@notesnook/common";
 import { HistorySession } from "@notesnook/core";
 import { Flex, Text } from "@theme-ui/components";
 import TimeAgo from "../time-ago";
 import { Lock } from "../icons";
-import Vault from "../../common/vault";
-import { db } from "../../common/db";
-import { PreviewSession } from "../editor/types";
+import { useEditorStore } from "../../stores/editor-store";
 
 type SessionItemProps = {
   session: HistorySession;
-  isPreviewMode: boolean;
   noteId: string;
-  dateCreated: number;
-  onOpenPreviewSession: (session: PreviewSession) => void;
 };
 export function SessionItem(props: SessionItemProps) {
-  const { session, isPreviewMode, dateCreated, noteId, onOpenPreviewSession } =
-    props;
-  const fromDate = getFormattedDate(session.dateCreated, "date");
-  const toDate = getFormattedDate(session.dateModified, "date");
-  const fromTime = getFormattedDate(session.dateCreated, "time");
-  const toTime = getFormattedDate(session.dateModified, "time");
-  const label = `${fromDate}, ${fromTime} — ${
-    fromDate !== toDate ? `${toDate}, ` : ""
-  }${toTime}`;
-  const isSelected = isPreviewMode && session.dateCreated === dateCreated;
+  const { session, noteId } = props;
+  const label = getFormattedHistorySessionDate(session);
 
   return (
     <Flex
@@ -53,46 +40,17 @@ export function SessionItem(props: SessionItemProps) {
       px={2}
       sx={{
         cursor: "pointer",
-        bg: isSelected ? "background-selected" : "transparent",
+        bg: "transparent",
         ":hover": {
-          bg: isSelected ? "hover-selected" : "hover"
+          bg: "hover"
         },
         alignItems: "center",
         justifyContent: "space-between"
       }}
       title="Click to preview"
-      onClick={async () => {
-        const content = await db.noteHistory.content(session.id);
-        if (!content) return;
-        if (session.locked) {
-          await Vault.askPassword(async (password) => {
-            try {
-              const decryptedContent = await db.vault.decryptContent(
-                content,
-                noteId,
-                password
-              );
-              onOpenPreviewSession({
-                content: decryptedContent,
-                dateCreated: session.dateCreated,
-                dateEdited: session.dateModified
-              });
-              return true;
-            } catch (e) {
-              return false;
-            }
-          });
-        } else {
-          onOpenPreviewSession({
-            content: {
-              data: content.data as string,
-              type: content.type
-            },
-            dateCreated: session.dateCreated,
-            dateEdited: session.dateModified
-          });
-        }
-      }}
+      onClick={() =>
+        useEditorStore.getState().openDiffSession(noteId, session.id)
+      }
     >
       <Text variant={"body"} data-test-id="title">
         {label}

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Dialogs } from "../dialogs";
 import { store as tagStore } from "../stores/tag-store";
 import { store as appStore } from "../stores/app-store";
-import { store as editorStore } from "../stores/editor-store";
+import { useEditorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
@@ -473,7 +473,7 @@ export function showEditTagDialog(tag: Tag) {
         await db.tags.add({ id: tag.id, title });
         showToast("success", "Tag edited!");
         tagStore.refresh();
-        editorStore.refreshTags();
+        useEditorStore.getState().refreshTags();
         noteStore.refresh();
         appStore.refreshNavItems();
         perform(true);

@@ -28,7 +28,7 @@ import { db } from "../common/db";
 import Dialog from "../components/dialog";
 import { useStore, store } from "../stores/tag-store";
 import { store as notestore } from "../stores/note-store";
-import { store as editorStore } from "../stores/editor-store";
+import { useEditorStore } from "../stores/editor-store";
 import { Perform } from "../common/dialog-controller";
 import { FilteredList } from "../components/filtered-list";
 import { ItemReference, Tag } from "@notesnook/core/dist/types";
@@ -96,7 +96,7 @@ function AddTagsDialog(props: AddTagsDialogProps) {
               else await db.relations.unlink(tagRef, noteRef);
             }
           }
-          await editorStore.get().refreshTags();
+          await useEditorStore.getState().refreshTags();
           await store.get().refresh();
           await notestore.get().refresh();
           onClose(true);

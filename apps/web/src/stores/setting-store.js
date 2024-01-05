@@ -23,7 +23,7 @@ import { desktop } from "../common/desktop-bridge";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
-import { store as editorStore } from "./editor-store";
+import { useEditorStore } from "./editor-store";
 import { isTelemetryEnabled, setTelemetry } from "../utils/telemetry";
 import { setDocumentTitle } from "../utils/dom";
 
@@ -173,7 +173,7 @@ class SettingStore extends BaseStore {
     this.set({ hideNoteTitle: !hideNoteTitle });
     Config.set("hideNoteTitle", !hideNoteTitle);
     setDocumentTitle(
-      !hideNoteTitle ? undefined : editorStore.get().session.title
+      !hideNoteTitle ? undefined : useEditorStore.getState().session.title
     );
   };
 

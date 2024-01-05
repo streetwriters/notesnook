@@ -25,10 +25,6 @@ import { showToast } from "../utils/toast";
 import { sanitizeFilename } from "@notesnook/common";
 import Vault from "./vault";
 import { isDeleted } from "@notesnook/core/dist/types";
-import {
-  isEncryptedContent,
-  isUnencryptedContent
-} from "@notesnook/core/dist/collections/content";
 
 const FORMAT_TO_EXT = {
   pdf: "pdf",
@@ -122,11 +118,9 @@ export async function exportNotes(
         const content =
           !rawContent || isDeleted(rawContent)
             ? undefined
-            : isEncryptedContent(rawContent)
+            : rawContent.locked
             ? await db.vault.decryptContent(rawContent, note.id)
-            : isUnencryptedContent(rawContent)
-            ? rawContent
-            : undefined;
+            : rawContent;
 
         const exported = await db.notes
           .export(note.id, {

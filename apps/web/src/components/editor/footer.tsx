@@ -18,11 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, Text } from "@theme-ui/components";
-import { useMemo } from "react";
-import { useStore } from "../../stores/editor-store";
+import { SaveState, useEditorStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
-import { useNoteStatistics } from "./context";
-import { getFormattedDate } from "@notesnook/common";
+import { useNoteStatistics } from "./manager";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -31,18 +29,14 @@ const SAVE_STATE_ICON_MAP = {
 };
 
 function EditorFooter() {
-  const { words } = useNoteStatistics();
-  const dateEdited = useStore((store) => store.session.dateEdited);
-  const id = useStore((store) => store.session.id);
-  const saveState = useStore(
-    (store) => store.session.saveState
-  ) as keyof typeof SAVE_STATE_ICON_MAP;
-  const SaveStateIcon = useMemo(
-    () => SAVE_STATE_ICON_MAP[saveState],
-    [saveState]
+  const activeSessionId = useEditorStore((store) => store.activeSessionId);
+  const { words } = useNoteStatistics(activeSessionId || "unknown");
+  const saveState = useEditorStore(
+    (store) => store.getActiveSession(["default", "unlocked"])?.saveState
   );
+  const SaveStateIcon = saveState ? SAVE_STATE_ICON_MAP[saveState] : null;
 
-  if (!id) return null;
+  if (!activeSessionId) return null;
   return (
     <Flex sx={{ alignItems: "center" }}>
       <Text
@@ -55,23 +49,13 @@ function EditorFooter() {
         {words.total + " words"}
         {words.selected ? ` (${words.selected} selected)` : ""}
       </Text>
-      <Text
-        className="selectable"
-        variant="subBody"
-        mr={2}
-        sx={{ color: "paragraph" }}
-        data-test-id="editor-date-edited"
-        title={dateEdited?.toString()}
-      >
-        {getFormattedDate(dateEdited || Date.now())}
-      </Text>
       {SaveStateIcon && (
         <SaveStateIcon
           size={13}
           color={
-            saveState === 1
+            saveState === SaveState.Saved
               ? "accent"
-              : saveState === "-1"
+              : saveState === SaveState.NotSaved
               ? "red"
               : "paragraph"
           }

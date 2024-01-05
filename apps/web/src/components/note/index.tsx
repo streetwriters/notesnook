@@ -61,11 +61,11 @@ import {
 } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
 import { store as userstore } from "../../stores/user-store";
-import { store as editorStore } from "../../stores/editor-store";
+import { useEditorStore } from "../../stores/editor-store";
 import { store as tagStore } from "../../stores/tag-store";
 import { db } from "../../common/db";
 import { showToast } from "../../utils/toast";
-import { hashNavigate, navigate } from "../../navigation";
+import { navigate } from "../../navigation";
 import { showPublishView } from "../publish-view";
 import IconTag from "../icon-tag";
 import { COLORS } from "../../common/constants";
@@ -120,7 +120,7 @@ function Note(props: NoteProps) {
   } = props;
   const note = item;
 
-  const isOpened = useStore((store) => store.selectedNote === note.id);
+  const isOpened = useEditorStore((store) => store.activeSessionId === item.id);
   const attachments = [];
 
   // useAttachmentStore((store) =>
@@ -157,13 +157,15 @@ function Note(props: NoteProps) {
       context={{ color }}
       menuItems={menuItems}
       onClick={() => {
-        if (note.conflicted) {
-          hashNavigate(`/notes/${note.id}/conflict`, { replace: true });
-        } else if (note.locked) {
-          hashNavigate(`/notes/${note.id}/unlock`, { replace: true });
-        } else {
-          hashNavigate(`/notes/${note.id}/edit`, { replace: true });
-        }
+        // if (note.conflicted) {
+        //   hashNavigate(`/notes/${note.id}/conflict`, { replace: true });
+        // } else if (note.locked) {
+        //  openLockedSession(note)
+        //   // hashNavigate(`/notes/${note.id}/unlock`, { replace: true });
+        // } else {
+        useEditorStore.getState().openSession(note);
+        // hashNavigate(`/notes/${note.id}/edit`, { replace: true });
+        //  }
       }}
       header={
         <Flex
@@ -685,7 +687,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
                   await db.relations.to({ id, type: "note" }, "tag").unlink();
                 }
                 tagStore.get().refresh();
-                await editorStore.get().refreshTags();
+                await useEditorStore.getState().refreshTags();
                 await store.get().refresh();
               }
             },
@@ -706,7 +708,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
                   await db.relations.add(tag, { id, type: "note" });
                 }
                 await tagStore.get().refresh();
-                await editorStore.get().refreshTags();
+                await useEditorStore.getState().refreshTags();
                 await store.get().refresh();
               }
             });
@@ -727,7 +729,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
                 await db.relations.unlink(tag, { id, type: "note" });
               }
               await tagStore.get().refresh();
-              await editorStore.get().refreshTags();
+              await useEditorStore.getState().refreshTags();
               await store.get().refresh();
             }
           });

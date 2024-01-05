@@ -37,7 +37,6 @@ import {
   Reupload,
   Uploading
 } from "../icons";
-import { hashNavigate } from "../../navigation";
 import {
   closeOpenedDialog,
   showPromptDialog
@@ -58,6 +57,7 @@ import { AppEventManager, AppEvents } from "../../common/app-events";
 import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Attachment as AttachmentType } from "@notesnook/core";
+import { useEditorStore } from "../../stores/editor-store";
 
 const FILE_ICONS: Record<string, Icon> = {
   "image/": FileImage,
@@ -247,7 +247,7 @@ const AttachmentMenuItems: (
             key: note.id,
             title: note.title,
             onClick: () => {
-              hashNavigate(`/notes/${note.id}/edit`);
+              useEditorStore.getState().openSession(note);
               closeOpenedDialog();
             }
           });

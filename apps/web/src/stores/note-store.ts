@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { db } from "../common/db";
 import createStore from "../common/store";
-import { store as editorStore } from "./editor-store";
+import { useEditorStore } from "./editor-store";
 import { store as appStore } from "./app-store";
 import { store as selectionStore } from "./selection-store";
 import Vault from "../common/vault";
@@ -33,18 +33,12 @@ class NoteStore extends BaseStore<NoteStore> {
   notes: VirtualizedGrouping<Note> | undefined = undefined;
   contextNotes: VirtualizedGrouping<Note> | undefined = undefined;
   context: Context | undefined = undefined;
-  selectedNote?: string;
   // nonce = 0;
   viewMode: ViewMode = Config.get("notes:viewMode", "detailed");
 
   setViewMode = (viewMode: ViewMode) => {
     this.set((state) => (state.viewMode = viewMode));
     Config.set("notes:viewMode", viewMode);
-  };
-
-  setSelectedNote = (id?: string) => {
-    if (!id) selectionStore.get().toggleSelectionMode(false);
-    this.set({ selectedNote: id });
   };
 
   refresh = async () => {
@@ -77,7 +71,7 @@ class NoteStore extends BaseStore<NoteStore> {
   };
 
   delete = async (...ids: string[]) => {
-    const { session, clearSession } = editorStore.get();
+    const { session, clearSession } = useEditorStore.getState();
     if (session.id && ids.indexOf(session.id) > -1) await clearSession();
     await db.notes.moveToTrash(...ids);
     await this.refresh();
@@ -97,8 +91,8 @@ class NoteStore extends BaseStore<NoteStore> {
 
   unlock = async (id: string) => {
     return await Vault.unlockNote(id).then(async (res) => {
-      if (editorStore.get().session.id === id)
-        await editorStore.openSession(id);
+      if (useEditorStore.getState().session.id === id)
+        await useEditorStore.getState().openSession(id);
       await this.refresh();
       return res;
     });
@@ -107,8 +101,8 @@ class NoteStore extends BaseStore<NoteStore> {
   lock = async (id: string) => {
     await Vault.lockNote(id);
     await this.refresh();
-    if (editorStore.get().session.id === id)
-      await editorStore.openSession(id, true);
+    if (useEditorStore.getState().session.id === id)
+      await useEditorStore.getState().openSession(id, true);
   };
 
   readonly = async (state: boolean, ...ids: string[]) => {
@@ -157,7 +151,7 @@ class NoteStore extends BaseStore<NoteStore> {
     action: "favorite" | "pinned" | "readonly" | "localOnly" | "color",
     value: boolean | string
   ) => {
-    const { session, toggle } = editorStore.get();
+    const { session, toggle } = useEditorStore.getState();
     if (!session.id || !noteIds.includes(session.id)) return false;
     toggle(session.id, action, value);
     return true;

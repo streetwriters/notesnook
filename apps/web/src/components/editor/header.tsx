@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useRef } from "react";
-import { useStore } from "../../stores/editor-store";
+import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useTagStore } from "../../stores/tag-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { Input } from "@theme-ui/components";
@@ -30,25 +30,16 @@ import { useMenuTrigger } from "../../hooks/use-menu";
 import { MenuItem } from "@notesnook/ui";
 import { navigate } from "../../navigation";
 import { Tag } from "@notesnook/core";
-import usePromise from "../../hooks/use-promise";
 
-type HeaderProps = { readonly: boolean };
+type HeaderProps = { readonly: boolean; id: string };
 function Header(props: HeaderProps) {
-  const { readonly } = props;
-  const id = useStore((store) => store.session.id);
-  const tags = useStore((store) => store.tags);
-  const refreshTags = useStore((store) => store.refreshTags);
+  const { readonly, id } = props;
+  const tags = useEditorStore((store) => store.getSession(id)?.tags || []);
+  const refreshTags = useEditorStore((store) => store.refreshTags);
 
   useEffect(() => {
-    if (!id) return;
     refreshTags();
   }, [id, refreshTags]);
-
-  const defaultTags = usePromise(() =>
-    db.tags.all
-      .limit(10)
-      .items(undefined, { sortBy: "dateCreated", sortDirection: "desc" })
-  );
 
   const setTag = useCallback(
     async function (noteId: string, tags: Tag[], value: string) {
@@ -62,76 +53,76 @@ function Header(props: HeaderProps) {
           { type: "note", id: noteId }
         );
         await useTagStore.getState().refresh();
-        if (defaultTags.status === "fulfilled") defaultTags.refresh();
       }
       await refreshTags();
       await useNoteStore.getState().refresh();
     },
-    [refreshTags, defaultTags]
+    [refreshTags]
   );
 
   return (
     <>
-      {id && (
-        <Flex
-          sx={{ lineHeight: 2.5, alignItems: "center", flexWrap: "wrap" }}
-          data-test-id="tags"
-        >
-          {tags?.map((tag) => (
-            <IconTag
-              testId={`tag`}
-              key={tag.id}
-              text={tag.title}
-              icon={TagIcon}
-              onClick={() => navigate(`/tags/${tag.id}`)}
-              onDismiss={
-                readonly ? undefined : () => setTag(id, tags, tag.title)
+      <Flex
+        sx={{ lineHeight: 2.5, alignItems: "center", flexWrap: "wrap" }}
+        data-test-id="tags"
+      >
+        {tags?.map((tag) => (
+          <IconTag
+            testId={`tag`}
+            key={tag.id}
+            text={tag.title}
+            icon={TagIcon}
+            onClick={() => navigate(`/tags/${tag.id}`)}
+            onDismiss={readonly ? undefined : () => setTag(id, tags, tag.title)}
+            styles={{ container: { mr: 1 }, text: { fontSize: "body" } }}
+          />
+        ))}
+        {!readonly && tags ? (
+          <Autosuggest
+            sessionId={id}
+            filter={(query) => db.lookup.tags(query).items(10)}
+            toMenuItems={(filtered, reset, query) => {
+              const items: MenuItem[] = [];
+              const isExactMatch =
+                !!query && filtered.some((item) => item.title === query);
+              if (query && !isExactMatch) {
+                items.push({
+                  type: "button",
+                  key: "new",
+                  title: `Create "${query}" tag`,
+                  icon: Plus.path,
+                  onClick: () => setTag(id, tags, query).finally(reset)
+                });
               }
-              styles={{ container: { mr: 1 }, text: { fontSize: "body" } }}
-            />
-          ))}
-          {!readonly && tags && defaultTags.status === "fulfilled" ? (
-            <Autosuggest
-              sessionId={id}
-              filter={(query) => db.lookup.tags(query).items(10)}
-              toMenuItems={(filtered, reset, query) => {
-                const items: MenuItem[] = [];
-                const isExactMatch =
-                  !!query && filtered.some((item) => item.title === query);
-                if (query && !isExactMatch) {
-                  items.push({
-                    type: "button",
-                    key: "new",
-                    title: `Create "${query}" tag`,
-                    icon: Plus.path,
-                    onClick: () => setTag(id, tags, query).finally(reset)
-                  });
-                }
 
-                if (filtered.length > 0) {
-                  items.push(
-                    ...filtered.map((item) => ({
-                      type: "button" as const,
-                      key: item.id,
-                      title: item.title,
-                      icon: TagIcon.path,
-                      onClick: () => setTag(id, tags, item.title).finally(reset)
-                    }))
-                  );
-                }
+              if (filtered.length > 0) {
+                items.push(
+                  ...filtered.map((item) => ({
+                    type: "button" as const,
+                    key: item.id,
+                    title: item.title,
+                    icon: TagIcon.path,
+                    onClick: () => setTag(id, tags, item.title).finally(reset)
+                  }))
+                );
+              }
 
-                return items;
-              }}
-              onAdd={(value) => setTag(id, tags, value)}
-              onRemove={() => {
-                if (tags.length <= 0) return;
-                setTag(id, tags, tags[tags.length - 1].title);
-              }}
-              defaultItems={defaultTags.value}
-            />
-          ) : null}
-        </Flex>
-      )}
+              return items;
+            }}
+            onAdd={(value) => setTag(id, tags, value)}
+            onRemove={() => {
+              if (tags.length <= 0) return;
+              setTag(id, tags, tags[tags.length - 1].title);
+            }}
+            defaultItems={() =>
+              db.tags.all.limit(10).items(undefined, {
+                sortBy: "dateCreated",
+                sortDirection: "desc"
+              })
+            }
+          />
+        ) : null}
+      </Flex>
     </>
   );
 }
@@ -143,7 +134,7 @@ type AutosuggestProps<T> = {
   onRemove: () => void;
   onAdd: (text: string) => void;
   toMenuItems: (filtered: T[], reset: () => void, query?: string) => MenuItem[];
-  defaultItems: T[];
+  defaultItems: () => Promise<T[]>;
 };
 export function Autosuggest<T>(props: AutosuggestProps<T>) {
   const { sessionId, filter, onRemove, onAdd, defaultItems, toMenuItems } =
@@ -207,14 +198,14 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
       }}
       placeholder="Add a tag..."
       data-test-id="editor-tag-input"
-      onFocus={() => {
+      onFocus={async () => {
         const text = getInputValue();
-        if (!text) onOpenMenu(defaultItems);
+        if (!text) onOpenMenu(await defaultItems());
         else closeMenu();
       }}
-      onClick={() => {
+      onClick={async () => {
         const text = getInputValue();
-        if (!text) onOpenMenu(defaultItems);
+        if (!text) onOpenMenu(await defaultItems());
         else closeMenu();
       }}
       onChange={async (e) => {
@@ -225,7 +216,7 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
         }
         onOpenMenu(await filter(value));
       }}
-      onKeyDown={(e) => {
+      onKeyDown={async (e) => {
         const text = getInputValue();
         if (e.key === "Enter" && !!text && isOpen && !arrowDown.current) {
           onAdd(text);
@@ -239,7 +230,7 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
           e.stopPropagation();
         } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
           arrowDown.current = true;
-          if (e.key === "ArrowDown" && !text) onOpenMenu(defaultItems);
+          if (e.key === "ArrowDown" && !text) onOpenMenu(await defaultItems());
 
           e.preventDefault();
         } else if (e.key === "Tab") {

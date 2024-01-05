@@ -18,11 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, Switch, Text } from "@theme-ui/components";
-import { useStore } from "../../stores/editor-store";
+import { Icon } from "../icons";
 
-function Toggle(props) {
-  const { icon: ToggleIcon, label, onToggle, toggleKey } = props;
-  const isOn = useStore((store) => store.session[toggleKey]);
+type ToggleProps = {
+  icon: Icon;
+  label: string;
+  onToggle: (toggleState: boolean) => void;
+  isOn: boolean;
+  testId?: string;
+};
+function Toggle(props: ToggleProps) {
+  const { icon: ToggleIcon, label, onToggle, isOn } = props;
+
   return (
     <Flex
       py={2}

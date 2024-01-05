@@ -21,8 +21,8 @@ import { SettingsGroup } from "./types";
 import {
   editorConfig,
   onEditorConfigChange,
-  setEditorConfig
-} from "../../components/editor/context";
+  useEditorManager
+} from "../../components/editor/manager";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { getFonts } from "@notesnook/editor";
 import { useSpellChecker } from "../../hooks/use-spell-checker";
@@ -73,7 +73,9 @@ symbols (e.g. 202305261253)`,
             })),
             selectedOption: () => editorConfig().fontFamily,
             onSelectionChanged: (value) => {
-              setEditorConfig({ fontFamily: value });
+              useEditorManager
+                .getState()
+                .setEditorConfig({ fontFamily: value });
             }
           }
         ]
@@ -92,7 +94,8 @@ symbols (e.g. 202305261253)`,
             max: 120,
             min: 8,
             defaultValue: () => editorConfig().fontSize,
-            onChange: (value) => setEditorConfig({ fontSize: value })
+            onChange: (value) =>
+              useEditorManager.getState().setEditorConfig({ fontSize: value })
           }
         ]
       },

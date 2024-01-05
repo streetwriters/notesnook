@@ -25,10 +25,10 @@ import { Flex, Text } from "@theme-ui/components";
 import TimeAgo from "../time-ago";
 import { pluralize, toTitleCase } from "@notesnook/common";
 import { showToast } from "../../utils/toast";
-import { hashNavigate } from "../../navigation";
 import { useStore } from "../../stores/note-store";
 import { MenuItem } from "@notesnook/ui";
 import { TrashItem } from "@notesnook/core/dist/types";
+import { useEditorStore } from "../../stores/editor-store";
 
 type TrashItemProps = { item: TrashItem; date: number };
 function TrashItem(props: TrashItemProps) {
@@ -58,7 +58,7 @@ function TrashItem(props: TrashItemProps) {
       menuItems={menuItems}
       onClick={() => {
         if (item.itemType === "note")
-          hashNavigate(`/notes/${item.id}/edit`, { replace: true });
+          useEditorStore.getState().openSession(item);
       }}
     />
   );

@@ -54,6 +54,7 @@ type FlexScrollContainerProps = {
   id?: string;
   className?: string;
   style?: React.CSSProperties;
+  scrollRef?: React.Ref<HTMLElement>;
 } & MacScrollbarProps;
 
 export function FlexScrollContainer({
@@ -61,11 +62,13 @@ export function FlexScrollContainer({
   children,
   style,
   className,
+  scrollRef,
   ...restProps
 }: PropsWithChildren<FlexScrollContainerProps>) {
   return (
     <MacScrollbar
       {...restProps}
+      ref={scrollRef}
       id={id}
       className={className}
       style={style}
