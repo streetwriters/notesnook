@@ -60,9 +60,12 @@ export default class Decryption {
     outputFormat: TOutputFormat = "text" as TOutputFormat
   ): Output<TOutputFormat> {
     if (!key.salt && cipherData.salt) key.salt = cipherData.salt;
+    console.info("1. transforming key");
     const encryptionKey = KeyUtils.transform(key);
 
+    console.info("2. transforming input");
     const input = this.transformInput(cipherData);
+    console.info("3. decrypting");
     const plaintext = crypto_aead_xchacha20poly1305_ietf_decrypt(
       null,
       input,
@@ -70,6 +73,7 @@ export default class Decryption {
       from_base64(cipherData.iv),
       encryptionKey.key
     );
+    console.info("4. decryption done");
 
     return (
       outputFormat === "base64"

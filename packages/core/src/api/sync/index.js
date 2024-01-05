@@ -371,6 +371,11 @@ class Sync {
   }
 
   async processChunk(chunk, key, dbLastSynced, notify = false) {
+    this.logger.info(
+      "processing chunk",
+      chunk.type,
+      chunk.items.map((i) => i.id)
+    );
     const decrypted = await this.db.storage.decryptMulti(key, chunk.items);
 
     const deserialized = await Promise.all(
