@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EditorOptions } from "@tiptap/core";
+import { EditorOptions, Editor as TiptapEditor } from "@tiptap/core";
 import { DependencyList, useEffect, useRef, useState } from "react";
 import { Editor } from "../types";
 
@@ -31,22 +31,27 @@ export const useEditor = (
   options: Partial<EditorOptions> = {},
   deps: DependencyList = []
 ) => {
-  const [editor, setEditor] = useState<Editor | null>(null);
+  const [editor] = useState<Editor>(() => {
+    const instance = new Editor(options);
+    if (instance && !Object.hasOwn(instance, "current")) {
+      Object.defineProperty(instance, "current", {
+        get: () => editorRef.current
+      });
+    }
+    return instance;
+  });
   const forceUpdate = useForceUpdate();
-  const editorRef = useRef<Editor | null>(editor);
-  const updateTimeout = useRef<number>();
+  const editorRef = useRef<TiptapEditor>(editor);
 
   useEffect(
     () => {
       let isMounted = true;
-
-      const instance = new Editor(options);
-
-      setEditor(instance);
-
-      instance.on("transaction", () => {
-        clearTimeout(updateTimeout.current);
-        updateTimeout.current = setTimeout(() => {
+      let updateTimeout: number;
+      editor.setOptions(options);
+      editor.on("transaction", ({ editor }) => {
+        editorRef.current = editor;
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(() => {
           if (isMounted) {
             forceUpdate();
           }
@@ -54,8 +59,10 @@ export const useEditor = (
       });
 
       return () => {
-        instance.destroy();
         isMounted = false;
+
+        clearTimeout(updateTimeout);
+        editor.destroy();
       };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,40 +70,20 @@ export const useEditor = (
   );
 
   useEffect(() => {
-    editorRef.current = editor;
-
-    if (!editor) return;
-
-    if (!editor.current) {
-      Object.defineProperty(editor, "current", {
-        get: () => editorRef.current
-      });
-    }
-    // if (!editor.executor) {
-    //   Object.defineProperty(editor, "executor", {
-    //     get: () => (id?: string) => {
-    //       console.log(id);
-    //       return editorRef.current;
-    //     },
-    //   });
-    // }
-  }, [editor]);
-
-  useEffect(() => {
     // this is required for the drag/drop to work properly
     // in the editor.
     function onDragEnter(event: DragEvent) {
-      if (editor?.view.dragging) {
+      if (editor.view.dragging) {
         event.preventDefault();
         return true;
       }
     }
 
-    editor?.view.dom.addEventListener("dragenter", onDragEnter);
+    editor.view.dom.addEventListener("dragenter", onDragEnter);
     return () => {
-      editor?.view.dom.removeEventListener("dragenter", onDragEnter);
+      editor.view.dom.removeEventListener("dragenter", onDragEnter);
     };
-  }, [editor?.view.dom, editor?.view.dragging]);
+  }, [editor.view.dom, editor.view.dragging]);
 
   return editor;
 };
