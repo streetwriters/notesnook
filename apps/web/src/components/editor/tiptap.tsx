@@ -34,7 +34,8 @@ import {
   getTotalWords,
   countWords,
   getFontById,
-  TiptapOptions
+  TiptapOptions,
+  getTableOfContents
 } from "@notesnook/editor";
 import { Flex } from "@theme-ui/components";
 import {
@@ -52,7 +53,6 @@ import {
   useToolbarConfig,
   useEditorManager
 } from "./manager";
-import { createPortal } from "react-dom";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
@@ -61,6 +61,7 @@ import { ScopedThemeProvider } from "../theme-provider";
 import { writeText } from "clipboard-polyfill";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
+import { getChangedNodes } from "@notesnook/editor/dist/utils/prosemirror";
 
 export type OnChangeHandler = (content: () => string) => void;
 type TipTapProps = {
@@ -191,13 +192,24 @@ function TipTap(props: TipTapProps) {
               total: getTotalWords(editor as Editor),
               selected: 0
             }
-          }
+          },
+          tableOfContents: getTableOfContents(editor.view.dom)
         });
         editor.commands.refreshSearch();
 
         if (onLoad) onLoad();
       },
       onUpdate: ({ editor, transaction }) => {
+        const changedHeadings = getChangedNodes(transaction, {
+          descend: false,
+          predicate: (n) => n.isBlock && n.type.name === "heading"
+        });
+        if (changedHeadings.length > 0) {
+          useEditorManager.getState().updateEditor(id, {
+            tableOfContents: getTableOfContents(editor.view.dom)
+          });
+        }
+
         onContentChange?.();
 
         deferredUpdateWordCount(id, () => editor.state.doc.content);
@@ -205,7 +217,6 @@ function TipTap(props: TipTapProps) {
         const preventSave = transaction?.getMeta("preventSave") as boolean;
         if (preventSave || !editor.isEditable || !onChange) return;
 
-        console.log("CHANGING", onChange);
         onChange(() =>
           getHTMLFromFragment(editor.state.doc.content, editor.schema)
         );
@@ -396,16 +407,6 @@ function TiptapWrapper(
   );
 }
 export default TiptapWrapper;
-
-function Portal(props: PropsWithChildren<{ containerId?: string }>) {
-  const { containerId, children } = props;
-  const container = containerId && document.getElementById(containerId);
-  return container ? (
-    <>{createPortal(children, container, containerId)}</>
-  ) : (
-    <>{children}</>
-  );
-}
 
 function toIEditor(editor: Editor): IEditor {
   return {

@@ -208,7 +208,8 @@ import {
   mdiGavel,
   mdiDesktopClassic,
   mdiBellBadgeOutline,
-  mdiDotsHorizontal
+  mdiDotsHorizontal,
+  mdiFormatListBulleted
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -332,6 +333,7 @@ export const Trash = createIcon(mdiTrashCanOutline);
 export const TopicRemove = createIcon(mdiBookmarkRemoveOutline);
 export const NotebookRemove = createIcon(mdiBookRemoveOutline);
 export const Search = createIcon(mdiMagnify);
+export const TableOfContents = createIcon(mdiFormatListBulleted);
 export const Menu = createIcon(mdiMenu);
 export const Login = createIcon(mdiLoginVariant);
 export const Email = createIcon(mdiEmailAlertOutline);

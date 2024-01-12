@@ -58,6 +58,7 @@ import { Freeze } from "react-freeze";
 import { EditorActionBar } from "./action-bar";
 import { UnlockView } from "../unlock";
 import DiffViewer from "../diff-viewer";
+import TableOfContents from "./table-of-contents";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -67,7 +68,7 @@ type DocumentPreview = {
 };
 
 function saveContent(noteId: string, sessionId: string, content: () => string) {
-  console.log("SAVE to note");
+  console.log("SAVE to note", noteId, sessionId);
   useEditorStore.getState().saveSessionContent(noteId, sessionId, {
     type: "tiptap",
     data: content()
@@ -138,6 +139,7 @@ function EditorView({ id }: { id: string }) {
   const arePropertiesVisible = useEditorStore(
     (store) => store.arePropertiesVisible
   );
+  const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
   const isReadonly = useEditorStore(
     (store) => store.getSession(id, ["default"])?.note?.readonly
@@ -306,8 +308,6 @@ function EditorView({ id }: { id: string }) {
                 isMobile: isMobile || isTablet
               }}
             />
-
-            {arePropertiesVisible && <Properties id={id} />}
             <DropZone id={id} overlayRef={overlayRef} />
           </Flex>
         </Allotment.Pane>
@@ -347,6 +347,8 @@ function EditorView({ id }: { id: string }) {
           </Allotment.Pane>
         )}
       </Allotment>
+      {arePropertiesVisible && <Properties id={id} />}
+      {isTOCVisible && <TableOfContents id={id} />}
     </ScopedThemeProvider>
   );
 }
@@ -483,6 +485,7 @@ export function Editor(props: EditorProps) {
         onLoad={() => {
           if (onLoadMedia) onLoadMedia();
           restoreSelection(id);
+          restoreScrollPosition(id);
           setIsLoading(false);
         }}
         onSelectionChange={({ from, to }) =>
@@ -582,9 +585,6 @@ function EditorChrome(
       {/* <Toolbar /> */}
       <FlexScrollContainer
         id={`${id}_editorScroll`}
-        scrollRef={() => {
-          restoreScrollPosition(id);
-        }}
         style={{
           display: "flex",
           flexDirection: "column",

@@ -21,20 +21,17 @@ import { useCallback } from "react";
 import { IEditor, NoteStatistics } from "./types";
 import createStore from "../../common/store";
 import BaseStore from "../../stores";
-import type { ToolbarDefinition } from "@notesnook/editor";
+import type { TOCItem, ToolbarDefinition } from "@notesnook/editor";
 import Config from "../../utils/config";
 import { getCurrentPreset } from "../../common/toolbar-config";
 
 type EditorConfig = { fontFamily: string; fontSize: number };
-type EditorState = {
-  selection?: { from: number; to: number };
-  scrollPosition?: number;
-};
 type EditorContext = {
   editor?: IEditor;
   canUndo?: boolean;
   canRedo?: boolean;
   statistics?: NoteStatistics;
+  tableOfContents?: TOCItem[];
 };
 
 class EditorManager extends BaseStore<EditorManager> {

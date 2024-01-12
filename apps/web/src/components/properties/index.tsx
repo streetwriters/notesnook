@@ -359,7 +359,7 @@ function SessionHistory({ noteId }: { noteId: string }) {
 }
 
 type SectionProps = { title: string; subtitle?: string; button?: JSX.Element };
-function Section({
+export function Section({
   title,
   subtitle,
   button,

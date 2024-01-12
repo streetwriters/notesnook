@@ -30,6 +30,7 @@ import {
   Pin,
   Properties,
   Search,
+  TableOfContents,
   Unlock
 } from "../icons";
 import { ScrollContainer } from "@notesnook/ui";
@@ -85,6 +86,15 @@ export function EditorActionBar() {
         }
         setIsFullscreen((s) => !s);
       }
+    },
+    {
+      title: "Table of contents",
+      icon: TableOfContents,
+      enabled:
+        activeSession &&
+        activeSession.type !== "new" &&
+        activeSession.type !== "locked",
+      onClick: () => useEditorStore.getState().toggleTableOfContents()
     },
     {
       title: "Search",
