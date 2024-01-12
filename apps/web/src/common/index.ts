@@ -261,8 +261,18 @@ async function restoreWithProgress(
 
 export async function verifyAccount() {
   if (!(await db.user?.getUser())) return true;
-  return showPasswordDialog("verify_account", async ({ password }) => {
-    return !!password && (await db.user?.verifyPassword(password));
+  return await showPasswordDialog({
+    title: "Verify it's you",
+    subtitle: "Enter your account password to proceed.",
+    inputs: {
+      password: {
+        label: "Password",
+        autoComplete: "current-password"
+      }
+    },
+    validate: async ({ password }) => {
+      return !!password && (await db.user?.verifyPassword(password));
+    }
   });
 }
 

@@ -24,7 +24,6 @@ import { store as editorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
-import { Text } from "@theme-ui/components";
 import Config from "../utils/config";
 import { AppVersion, getChangelog } from "../utils/version";
 import { Period } from "../dialogs/buy-dialog/types";
@@ -37,6 +36,7 @@ import { ThemeMetadata } from "@notesnook/themes-server";
 import { Color, Reminder, Tag } from "@notesnook/core";
 import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
 import { createRoot } from "react-dom/client";
+import { PasswordDialogProps } from "../dialogs/password-dialog";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -290,138 +290,25 @@ export function showMoveNoteDialog(noteIds: string[]) {
   ));
 }
 
-function getDialogData(type: string) {
-  switch (type) {
-    case "create_vault":
-      return {
-        title: "Create your vault",
-        subtitle: "A vault stores your notes in a password-encrypted storage.",
-        positiveButtonText: "Create vault"
-      };
-    case "clear_vault":
-      return {
-        title: "Clear your vault",
-        subtitle:
-          "Enter vault password to unlock and remove all notes from the vault.",
-        positiveButtonText: "Clear vault"
-      };
-    case "delete_vault":
-      return {
-        title: "Delete your vault",
-        subtitle: "Enter your account password to delete your vault.",
-        positiveButtonText: "Delete vault",
-        checks: [
-          { key: "deleteAllLockedNotes", title: "Delete all locked notes?" }
-        ]
-      };
-    case "lock_note":
-      return {
-        title: "Lock note",
-        subtitle: "Please open your vault to encrypt & lock this note.",
-        positiveButtonText: "Lock note"
-      };
-    case "unlock_note":
-      return {
-        title: "Unlock note",
-        subtitle: "Your note will be unencrypted and removed from the vault.",
-        positiveButtonText: "Unlock note"
-      };
-    case "unlock_and_delete_note":
-      return {
-        title: "Delete note",
-        subtitle: "Please unlock this note to move it to trash.",
-        positiveButtonText: "Unlock & delete"
-      };
-    case "change_password":
-      return {
-        title: "Change vault password",
-        subtitle:
-          "All locked notes will be re-encrypted with the new password.",
-        positiveButtonText: "Change password"
-      };
-    case "ask_vault_password":
-      return {
-        title: "Unlock vault",
-        subtitle: "Please enter your vault password to continue.",
-        positiveButtonText: "Unlock"
-      };
-    case "change_account_password":
-      return {
-        title: "Change account password",
-        subtitle: (
-          <>
-            All your data will be re-encrypted and synced with the new password.
-            <Text
-              as="div"
-              mt={1}
-              p={1}
-              bg="var(--background-error)"
-              sx={{ color: "var(--paragraph-error)" }}
-            >
-              <Text as="p" my={0} sx={{ color: "inherit" }}>
-                It is recommended that you <b>log out from all other devices</b>{" "}
-                before continuing.
-              </Text>
-              <Text as="p" my={0} mt={1} sx={{ color: "inherit" }}>
-                If this process is interrupted, there is a high chance of data
-                corruption so{" "}
-                <b>please do NOT shut down your device or close your browser</b>{" "}
-                until this process completes.
-              </Text>
-            </Text>
-          </>
-        ),
-        positiveButtonText: "Change password"
-      };
-    case "verify_account":
-      return {
-        title: "Verify it's you",
-        subtitle: "Enter your account password to proceed.",
-        positiveButtonText: "Verify"
-      };
-    case "delete_account":
-      return {
-        title: "Delete your account",
-        subtitle: (
-          <Text as="span" sx={{ color: "var(--paragraph-error)" }}>
-            All your data will be permanently deleted with{" "}
-            <b>no way of recovery</b>. Proceed with caution.
-          </Text>
-        ),
-        positiveButtonText: "Delete Account"
-      };
-    default:
-      return {};
-  }
-}
-
-export function showPasswordDialog(
-  type: string,
-  validate: ({
-    password
-  }: {
-    password?: string;
-    oldPassword?: string;
-    newPassword?: string;
-    deleteAllLockedNotes?: boolean;
-  }) => boolean | Promise<boolean>
-) {
-  const { title, subtitle, positiveButtonText, checks } = getDialogData(type);
-  return showDialog<"PasswordDialog", boolean>(
+export function showPasswordDialog<
+  TInputId extends string,
+  TCheckId extends string
+>(props: Omit<PasswordDialogProps<TInputId, TCheckId>, "onClose">) {
+  return showDialog<
     "PasswordDialog",
-    (Dialog, perform) => (
-      <Dialog
-        type={type}
-        title={title}
-        subtitle={subtitle}
-        checks={checks}
-        positiveButtonText={positiveButtonText}
-        validate={validate}
-        onClose={() => perform(false)}
-        onDone={() => perform(true)}
-      />
-    )
-  );
+    string extends TCheckId ? boolean : false | Record<TCheckId, boolean>
+  >("PasswordDialog", (Dialog, perform) => (
+    <Dialog
+      {...props}
+      onClose={(result) =>
+        perform(
+          result as string extends TCheckId
+            ? boolean
+            : false | Record<TCheckId, boolean>
+        )
+      }
+    />
+  ));
 }
 
 export function showBackupPasswordDialog(
