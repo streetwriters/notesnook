@@ -55,9 +55,9 @@ export interface IStorage {
     key: SerializedKey,
     items: Cipher<"base64">[]
   ): Promise<string[]>;
-  deriveCryptoKey(name: string, credentials: SerializedKey): Promise<void>;
+  deriveCryptoKey(credentials: SerializedKey): Promise<void>;
   hash(password: string, email: string): Promise<string>;
-  getCryptoKey(name: string): Promise<string | undefined>;
+  getCryptoKey(): Promise<string | undefined>;
   generateCryptoKey(password: string, salt?: string): Promise<SerializedKey>;
 
   //   async generateRandomKey() {

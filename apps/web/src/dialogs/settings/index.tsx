@@ -25,6 +25,7 @@ import {
   Appearance,
   Backup,
   Behaviour,
+  CellphoneLock,
   Desktop,
   Documentation,
   Editor,
@@ -65,8 +66,8 @@ import {
 import { AppearanceSettings } from "./appearance-settings";
 import { debounce } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
-import { alpha } from "@theme-ui/color";
 import { ScopedThemeProvider } from "../../components/theme-provider";
+import { AppLockSettings } from "./app-lock-settings";
 
 type SettingsDialogProps = { onClose: Perform };
 
@@ -124,6 +125,7 @@ const sectionGroups: SectionGroup[] = [
     key: "security",
     title: "Security & privacy",
     sections: [
+      { key: "app-lock", title: "App lock", icon: CellphoneLock },
       { key: "vault", title: "Vault", icon: ShieldLock },
       { key: "privacy", title: "Privacy", icon: Privacy }
     ]
@@ -149,6 +151,7 @@ const SettingsGroups = [
   ...NotificationsSettings,
   ...BackupExportSettings,
   ...ImporterSettings,
+  ...AppLockSettings,
   ...VaultSettings,
   ...PrivacySettings,
   ...EditorSettings,

@@ -174,17 +174,6 @@ export type UseStore = <T>(
 export class IndexedDBKVStore implements IKVStore {
   store: UseStore;
 
-  static async isIndexedDBSupported(): Promise<boolean> {
-    if (!("indexedDB" in window)) return false;
-    try {
-      await promisifyIDBRequest(indexedDB.open("checkIDBSupport"));
-      return true;
-    } catch {
-      console.error("IndexedDB is not supported in this browser.");
-      return false;
-    }
-  }
-
   constructor(databaseName: string, storeName: string) {
     this.store = this.createStore(databaseName, storeName);
   }

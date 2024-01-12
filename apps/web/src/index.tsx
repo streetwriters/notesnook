@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createRoot } from "react-dom/client";
 import { Routes, init } from "./bootstrap";
 import { logger } from "./utils/logger";
-import { loadDatabase } from "./hooks/use-database";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { BaseThemeProvider } from "./components/theme-provider";
 import { register } from "./utils/stream-saver/mitm";
@@ -32,12 +31,16 @@ async function renderApp() {
   const { component, props, path } = await init();
 
   if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
-  if (IS_DESKTOP_APP) await loadDatabase("db");
+  if (IS_DESKTOP_APP) {
+    const { loadDatabase } = await import("./hooks/use-database");
+    await loadDatabase("db");
+  }
 
   const { default: Component } = await component();
   const rootElement = document.getElementById("root");
   if (!rootElement) return;
 
+  const { default: AppLock } = await import("./views/app-lock");
   const root = createRoot(rootElement);
   root.render(
     <BaseThemeProvider
@@ -45,7 +48,9 @@ async function renderApp() {
       addGlobalStyles
       sx={{ height: "100%" }}
     >
-      <Component route={props?.route || "login:email"} />
+      <AppLock>
+        <Component route={props?.route || "login:email"} />
+      </AppLock>
     </BaseThemeProvider>
   );
 }
