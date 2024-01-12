@@ -142,6 +142,7 @@ class EditorStore extends BaseStore<EditorStore> {
   activeSessionId?: string;
 
   arePropertiesVisible = false;
+  isTOCVisible = false;
   editorMargins = Config.get("editor:margins", true);
   history: string[] = [];
 
@@ -440,6 +441,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
     // do not allow saving of readonly session
     if (partial.note?.readonly) return;
+    console.log(currentSession);
     if (
       currentSession.saveState === SaveState.Saving ||
       currentSession.id !== id
@@ -527,12 +529,13 @@ class EditorStore extends BaseStore<EditorStore> {
       setDocumentTitle(
         settingStore.get().hideNoteTitle ? undefined : note.title
       );
+      this.setSaveState(id, SaveState.Saved);
     } catch (err) {
       showToast(
         "error",
         err instanceof Error ? err.stack || err.message : JSON.stringify(err)
       );
-      this.setSaveState(id, -1);
+      this.setSaveState(id, SaveState.NotSaved);
       console.error(err);
       if (err instanceof Error) logger.error(err);
       if (isLockedSession(currentSession)) {
@@ -605,6 +608,14 @@ class EditorStore extends BaseStore<EditorStore> {
       (state) =>
         (state.arePropertiesVisible =
           toggleState !== undefined ? toggleState : !state.arePropertiesVisible)
+    );
+  };
+
+  toggleTableOfContents = (toggleState?: boolean) => {
+    this.set(
+      (state) =>
+        (state.isTOCVisible =
+          toggleState !== undefined ? toggleState : !state.isTOCVisible)
     );
   };
 
