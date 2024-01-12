@@ -33,19 +33,17 @@ import { SqliteAdapter, SqliteQueryCompiler, SqliteIntrospector } from "kysely";
 // @ts-ignore
 let db: Database = {};
 async function initializeDatabase(persistence: DatabasePersistence) {
+  console.log("initi");
   logger.measure("Database initialization");
 
   const { database } = await import("@notesnook/common");
   const { FileStorage } = await import("../interfaces/fs");
   const { Compressor } = await import("../utils/compressor");
+  const { KeyChain } = await import("../interfaces/key-store");
+
   db = database;
 
-  // // const ss = wrap<SQLiteWorker>(new Worker());
-  // // await ss.init("test.db", false, uri);
-
-  // const res = await ss.run("query", `.table`);
-  // console.log(res);
-  // await ss.close();
+  const databaseKey = await KeyChain.extractKey();
 
   db.host({
     API_HOST: "https://api.notesnook.com",
@@ -55,6 +53,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co"
   });
 
+  const storage = new NNStorage("Notesnook", KeyChain, persistence);
   database.setup({
     sqliteOptions: {
       dialect: (name) => ({
@@ -69,14 +68,16 @@ async function initializeDatabase(persistence: DatabasePersistence) {
       synchronous: "normal",
       pageSize: 8192,
       cacheSize: -16000,
-      lockingMode: "exclusive"
+      lockingMode: "exclusive",
+      password: databaseKey
     },
-    storage: await NNStorage.createInstance("Notesnook", persistence),
+    storage: storage,
     eventsource: EventSource,
     fs: FileStorage,
     compressor: new Compressor(),
     batchSize: 500
   });
+
   // if (IS_TESTING) {
 
   // } else {

@@ -179,7 +179,7 @@ class UserManager {
         await this.db.syncer.devices.register();
       }
 
-      await this.db.storage().deriveCryptoKey(`_uk_@${user.email}`, {
+      await this.db.storage().deriveCryptoKey({
         password,
         salt: user.salt
       });
@@ -224,7 +224,7 @@ class UserManager {
     const user = await this.fetchUser();
     if (!user) return;
 
-    await this.db.storage().deriveCryptoKey(`_uk_@${user.email}`, {
+    await this.db.storage().deriveCryptoKey({
       password,
       salt: user.salt
     });
@@ -370,7 +370,7 @@ class UserManager {
   async getEncryptionKey(): Promise<SerializedKey | undefined> {
     const user = await this.getUser();
     if (!user) return;
-    const key = await this.db.storage().getCryptoKey(`_uk_@${user.email}`);
+    const key = await this.db.storage().getCryptoKey();
     if (!key) return;
     return { key, salt: user.salt };
   }
@@ -443,7 +443,7 @@ class UserManager {
       token
     );
 
-    await this.db.storage().deriveCryptoKey(`_uk_@${newEmail}`, {
+    await this.db.storage().deriveCryptoKey({
       password,
       salt: user.salt
     });
@@ -497,7 +497,7 @@ class UserManager {
 
     if (data.encryptionKey) await this.db.sync({ type: "fetch", force: true });
 
-    await this.db.storage().deriveCryptoKey(`_uk_@${email}`, {
+    await this.db.storage().deriveCryptoKey({
       password: new_password,
       salt
     });

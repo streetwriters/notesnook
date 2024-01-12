@@ -101,11 +101,20 @@ export const ProfileSettings: SettingsGroup[] = [
             type: "button",
             variant: "error",
             title: "Delete account",
-            action: async () =>
-              showPasswordDialog("delete_account", async ({ password }) => {
-                if (!password) return false;
-                await db.user.deleteUser(password);
-                return true;
+            action: () =>
+              showPasswordDialog({
+                title: "Delete your account",
+                message: ` All your data will be permanently deleted with **no way of recovery**. Proceed with caution.`,
+                inputs: {
+                  password: {
+                    label: "Password",
+                    autoComplete: "current-password"
+                  }
+                },
+                validate: async ({ password }) => {
+                  await db.user.deleteUser(password);
+                  return true;
+                }
               })
           }
         ]

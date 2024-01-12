@@ -49,8 +49,8 @@ async function init(dbName: string, async: boolean, url?: string) {
     : new AccessHandlePoolVFS(dbName);
   if ("isReady" in vfs) await vfs.isReady;
 
-  sqlite.vfs_register(vfs, true);
-  db = await sqlite.open_v2(dbName); //, undefined, dbName);
+  sqlite.vfs_register(vfs, false);
+  db = await sqlite.open_v2(dbName, undefined, `multipleciphers-${vfs.name}`);
 }
 
 /**

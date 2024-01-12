@@ -108,7 +108,7 @@ function ConfirmDialog<TCheckId extends string>(
                           e.currentTarget.checked)
                       }
                     />
-                    {check.text}{" "}
+                    {check.text}
                   </Label>
                 )
             )

@@ -31,18 +31,14 @@ import { hashNavigate } from "../navigation";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
+import { User } from "@notesnook/core/dist/api/user-manager";
 
-/**
- * @extends {BaseStore<UserStore>}
- */
-class UserStore extends BaseStore {
-  isLoggedIn = undefined;
+class UserStore extends BaseStore<UserStore> {
+  isLoggedIn?: boolean;
   isLoggingIn = false;
   isSigningIn = false;
-  /**
-   * @type {import("@notesnook/core/dist/api/user-manager").User | undefined}
-   */
-  user = undefined;
+
+  user?: User = undefined;
   counter = 0;
 
   init = () => {
@@ -79,7 +75,10 @@ class UserStore extends BaseStore {
 
       EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
         const wasUserPremium = isUserPremium();
-        this.set((state) => (state.user.subscription = subscription));
+        this.set((state) => {
+          if (!state.user) return;
+          state.user.subscription = subscription;
+        });
         if (!wasUserPremium && isUserPremium())
           showOnboardingDialog(
             subscription.type === SUBSCRIPTION_STATUS.TRIAL ? "trial" : "pro"
@@ -92,7 +91,7 @@ class UserStore extends BaseStore {
 
       EV.subscribe(EVENTS.userLoggedOut, async (reason) => {
         this.set((state) => {
-          state.user = {};
+          state.user = undefined;
           state.isLoggedIn = false;
         });
         config.clear();

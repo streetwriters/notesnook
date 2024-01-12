@@ -142,8 +142,8 @@ function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
 }
 
 export async function init() {
-  await initializeLogger();
   await initializeFeatureChecks();
+  await initializeLogger();
 
   const { path, route } = getRoute();
   return { ...route, path };

@@ -33,6 +33,7 @@ export type SectionKeys =
   | "export"
   | "importer"
   | "vault"
+  | "app-lock"
   | "privacy"
   | "support"
   | "legal"
