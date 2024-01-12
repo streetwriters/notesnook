@@ -148,10 +148,20 @@ export async function restoreBackupFile(backupFile: File) {
     const backup = JSON.parse(await readFile(backupFile));
 
     if (backup.data.iv && backup.data.salt) {
-      await showPasswordDialog("ask_backup_password", async ({ password }) => {
-        if (!password) return false;
-        const error = await restoreWithProgress(backup, password);
-        return !error;
+      await showPasswordDialog({
+        title: "Encrypted backup",
+        subtitle:
+          "Please enter the password to decrypt and restore this backup.",
+        inputs: {
+          password: {
+            label: "Password",
+            autoComplete: "current-password"
+          }
+        },
+        validate: async ({ password }) => {
+          const error = await restoreWithProgress(backup, password);
+          return !error;
+        }
       });
     } else {
       await restoreWithProgress(backup);
@@ -182,15 +192,22 @@ export async function restoreBackupFile(backupFile: File) {
           const backup = JSON.parse(await entry.text());
           if (backup.encrypted) {
             if (!cachedPassword) {
-              const result = await showPasswordDialog(
-                "ask_backup_password",
-                async ({ password }) => {
-                  if (!password) return false;
+              const result = await showPasswordDialog({
+                title: "Encrypted backup",
+                subtitle:
+                  "Please enter the password to decrypt and restore this backup.",
+                inputs: {
+                  password: {
+                    label: "Password",
+                    autoComplete: "current-password"
+                  }
+                },
+                validate: async ({ password }) => {
                   await db.backup?.import(backup, password);
                   cachedPassword = password;
                   return true;
                 }
-              );
+              });
               if (!result) break;
             } else await db.backup?.import(backup, cachedPassword);
           } else {
@@ -248,8 +265,18 @@ async function restoreWithProgress(
 
 export async function verifyAccount() {
   if (!(await db.user?.getUser())) return true;
-  return showPasswordDialog("verify_account", async ({ password }) => {
-    return !!password && (await db.user?.verifyPassword(password));
+  return await showPasswordDialog({
+    title: "Verify it's you",
+    subtitle: "Enter your account password to proceed.",
+    inputs: {
+      password: {
+        label: "Password",
+        autoComplete: "current-password"
+      }
+    },
+    validate: async ({ password }) => {
+      return !!password && (await db.user?.verifyPassword(password));
+    }
   });
 }
 

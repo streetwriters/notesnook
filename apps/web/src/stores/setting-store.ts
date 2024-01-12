@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { PATHS } from "@notesnook/desktop";
+import { DesktopIntegration, PATHS } from "@notesnook/desktop";
 import { db } from "../common/db";
 import { desktop } from "../common/desktop-bridge";
 import createStore from "../common/store";
@@ -26,11 +26,17 @@ import BaseStore from "./index";
 import { store as editorStore } from "./editor-store";
 import { isTelemetryEnabled, setTelemetry } from "../utils/telemetry";
 import { setDocumentTitle } from "../utils/dom";
+import { TimeFormat } from "@notesnook/core/dist/utils/date";
+import { TrashCleanupInterval } from "@notesnook/core";
+import { SecurityKeyConfig } from "../utils/webauthn";
 
-/**
- * @extends {BaseStore<SettingStore>}
- */
-class SettingStore extends BaseStore {
+type AppLockSettings = {
+  enabled: boolean;
+  lockAfter: number;
+  securityKey?: SecurityKeyConfig;
+};
+
+class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
   backupReminderOffset = Config.get("backupReminderOffset", 0);
   backupStorageLocation = Config.get(
@@ -44,20 +50,20 @@ class SettingStore extends BaseStore {
   privacyMode = false;
   hideNoteTitle = Config.get("hideNoteTitle", false);
   telemetry = isTelemetryEnabled();
-  /** @type {string} */
-  dateFormat = null;
-  /** @type {"12-hour" | "24-hour"} */
-  timeFormat = null;
-  titleFormat = null;
-  /** @type {number} */
-  trashCleanupInterval = 7;
+  dateFormat = "DD-MM-YYYY";
+  timeFormat: TimeFormat = "12-hour";
+  titleFormat = "Note $date$ $time$";
+
+  trashCleanupInterval: TrashCleanupInterval = 7;
   homepage = Config.get("homepage", 0);
-  /**
-   * @type {DesktopIntegrationSettings | undefined}
-   */
-  desktopIntegrationSettings = undefined;
+  desktopIntegrationSettings?: DesktopIntegration;
   autoUpdates = true;
   isFlatpak = false;
+
+  appLockSettings: AppLockSettings = Config.get("appLockSettings", {
+    enabled: false,
+    lockAfter: 0
+  });
 
   refresh = async () => {
     this.set({
@@ -74,49 +80,47 @@ class SettingStore extends BaseStore {
     });
   };
 
-  setDateFormat = async (dateFormat) => {
+  setDateFormat = async (dateFormat: string) => {
     await db.settings.setDateFormat(dateFormat);
     this.set({ dateFormat });
   };
 
-  setTimeFormat = async (timeFormat) => {
+  setTimeFormat = async (timeFormat: TimeFormat) => {
     await db.settings.setTimeFormat(timeFormat);
     this.set({ timeFormat });
   };
 
-  setTitleFormat = async (titleFormat) => {
+  setTitleFormat = async (titleFormat: string) => {
     await db.settings.setTitleFormat(titleFormat);
     this.set({ titleFormat });
   };
 
-  setTrashCleanupInterval = async (trashCleanupInterval) => {
+  setTrashCleanupInterval = async (
+    trashCleanupInterval: TrashCleanupInterval
+  ) => {
     await db.settings.setTrashCleanupInterval(trashCleanupInterval);
     this.set({ trashCleanupInterval });
   };
 
-  setZoomFactor = async (zoomFactor) => {
+  setZoomFactor = async (zoomFactor: number) => {
     await desktop?.integration.setZoomFactor.mutate(zoomFactor);
     this.set({ zoomFactor });
   };
 
-  setEncryptBackups = (encryptBackups) => {
+  setEncryptBackups = (encryptBackups: boolean) => {
     this.set({ encryptBackups });
     Config.set("encryptBackups", encryptBackups);
   };
 
-  setHomepage = (homepage) => {
+  setHomepage = (homepage: number) => {
     this.set({ homepage });
     Config.set("homepage", homepage);
   };
 
-  /**
-   *
-   * @param {Partial<DesktopIntegrationSettings>} settings
-   */
-  setDesktopIntegration = async (settings) => {
+  setDesktopIntegration = async (settings: DesktopIntegration) => {
     const { desktopIntegrationSettings } = this.get();
 
-    await desktop.integration.setDesktopIntegration.mutate({
+    await desktop?.integration.setDesktopIntegration.mutate({
       ...desktopIntegrationSettings,
       ...settings
     });
@@ -126,11 +130,17 @@ class SettingStore extends BaseStore {
     });
   };
 
-  setNotificationSettings = (settings) => {
+  setNotificationSettings = (settings: { reminder: boolean }) => {
     const { notificationsSettings } = this.get();
     Config.set("notifications", { ...notificationsSettings, ...settings });
 
     this.set({ notificationsSettings: Config.get("notifications") });
+  };
+
+  setAppLockSettings = (settings: Partial<AppLockSettings>) => {
+    const { appLockSettings } = this.get();
+    Config.set("appLockSettings", { ...appLockSettings, ...settings });
+    this.set({ appLockSettings: Config.get("appLockSettings") });
   };
 
   toggleEncryptBackups = () => {
@@ -138,12 +148,12 @@ class SettingStore extends BaseStore {
     this.setEncryptBackups(!encryptBackups);
   };
 
-  setBackupReminderOffset = (offset) => {
+  setBackupReminderOffset = (offset: number) => {
     Config.set("backupReminderOffset", offset);
     this.set({ backupReminderOffset: offset });
   };
 
-  setBackupStorageLocation = (location) => {
+  setBackupStorageLocation = (location: string) => {
     Config.set("backupStorageLocation", location);
     this.set({ backupStorageLocation: location });
   };

@@ -45,17 +45,31 @@ export const AuthenticationSettings: SettingsGroup[] = [
             title: "Change password",
             variant: "secondary",
             action: async () => {
-              const result = await showPasswordDialog(
-                "change_account_password",
-                async ({ newPassword, oldPassword }) => {
-                  if (!newPassword || !oldPassword) return false;
+              const result = await showPasswordDialog({
+                title: "Change account password",
+                message: `All your data will be re-encrypted and synced with the new password.
+                  
+It is recommended that you **log out from all other devices** before continuing.
+
+If this process is interrupted, there is a high chance of data corruption so **please do NOT shut down your device or close your browser** until this process completes.`,
+                inputs: {
+                  oldPassword: {
+                    label: "Old password",
+                    autoComplete: "current-password"
+                  },
+                  newPassword: {
+                    label: "New password",
+                    autoComplete: "new-password"
+                  }
+                },
+                validate: async ({ oldPassword, newPassword }) => {
                   await db.user.clearSessions();
                   return (
                     (await db.user.changePassword(oldPassword, newPassword)) ||
                     false
                   );
                 }
-              );
+              });
               if (result) showToast("success", "Account password changed!");
             }
           }

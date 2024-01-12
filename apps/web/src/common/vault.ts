@@ -25,76 +25,108 @@ import { VAULT_ERRORS } from "@notesnook/core/dist/api/vault";
 class Vault {
   static async createVault() {
     if (await db.vault.exists()) return false;
-    return await showPasswordDialog("create_vault", async ({ password }) => {
-      if (!password) return false;
-      await db.vault.create(password);
-      showToast("success", "Vault created.");
-      return true;
+    return showPasswordDialog({
+      title: "Create your vault",
+      subtitle: "A vault stores your notes in a password-encrypted storage.",
+      inputs: {
+        password: { label: "Password", autoComplete: "new-password" }
+      },
+      validate: async ({ password }) => {
+        await db.vault.create(password);
+        showToast("success", "Vault created.");
+        return true;
+      }
     });
   }
 
   static async clearVault() {
     if (!(await db.vault.exists())) return false;
-    return await showPasswordDialog("clear_vault", async ({ password }) => {
-      if (!password) return false;
-      try {
+
+    return showPasswordDialog({
+      title: "Clear your vault",
+      subtitle:
+        "Enter vault password to unlock and remove all notes from the vault.",
+      inputs: {
+        password: { label: "Password", autoComplete: "current-password" }
+      },
+      validate: async ({ password }) => {
         await db.vault.clear(password);
         return true;
-      } catch {
-        return false;
       }
     });
   }
 
   static async deleteVault() {
     if (!(await db.vault.exists())) return false;
-    return await showPasswordDialog(
-      "delete_vault",
-      async ({ password, deleteAllLockedNotes }) => {
-        if (!password) return false;
-        if (!(await db.user.verifyPassword(password))) return false;
-        await db.vault.delete(!!deleteAllLockedNotes);
-        return true;
+    const result = await showPasswordDialog({
+      title: "Delete your vault",
+      subtitle: "Enter your account password to delete your vault.",
+      inputs: {
+        password: { label: "Password", autoComplete: "current-password" }
+      },
+      checks: {
+        deleteAllLockedNotes: {
+          text: "Delete all locked notes?",
+          default: false
+        }
+      },
+      validate: ({ password }) => {
+        return db.user.verifyPassword(password);
       }
-    );
+    });
+    if (result) {
+      await db.vault.delete(result.deleteAllLockedNotes);
+    }
   }
 
-  /**
-   *
-   * @returns {Promise<boolean>}
-   */
   static unlockVault() {
-    return showPasswordDialog("ask_vault_password", ({ password }) => {
-      if (!password) return false;
-      return db.vault
-        .unlock(password)
-        .then(() => true)
-        .catch(() => false);
+    return showPasswordDialog({
+      title: "Unlock vault",
+      subtitle: "Please enter your vault password to continue.",
+      inputs: {
+        password: { label: "Password", autoComplete: "current-password" }
+      },
+      validate: ({ password }) => {
+        return db.vault.unlock(password).catch(() => false);
+      }
     });
   }
 
   static changeVaultPassword() {
-    return showPasswordDialog(
-      "change_password",
-      async ({ oldPassword, newPassword }) => {
-        if (!oldPassword || !newPassword) return false;
+    return showPasswordDialog({
+      title: "Change vault password",
+      subtitle: "All locked notes will be re-encrypted with the new password.",
+      inputs: {
+        oldPassword: {
+          label: "Old password",
+          autoComplete: "current-password"
+        },
+        newPassword: { label: "New password", autoComplete: "new-password" }
+      },
+      validate: async ({ oldPassword, newPassword }) => {
         await db.vault.changePassword(oldPassword, newPassword);
         showToast("success", "Vault password changed.");
         return true;
       }
-    );
+    });
   }
 
-  static unlockNote(id: string, type = "unlock_note") {
-    return showPasswordDialog(type, ({ password }) => {
-      if (!password) return false;
-      return db.vault
-        .remove(id, password)
-        .then(() => true)
-        .catch((e) => {
-          console.error(e);
-          return false;
-        });
+  static unlockNote(id: string) {
+    return showPasswordDialog({
+      title: "Unlock note",
+      subtitle: "Your note will be unencrypted and removed from the vault.",
+      inputs: {
+        password: { label: "Password", autoComplete: "current-password" }
+      },
+      validate: async ({ password }) => {
+        return db.vault
+          .remove(id, password)
+          .then(() => true)
+          .catch((e) => {
+            console.error(e);
+            return false;
+          });
+      }
     });
   }
 
@@ -102,7 +134,7 @@ class Vault {
     return db.vault
       .add(id)
       .then(() => false)
-      .catch<boolean>(({ message }) => {
+      .catch(({ message }) => {
         switch (message) {
           case VAULT_ERRORS.noVault:
             return Vault.createVault();
@@ -118,9 +150,15 @@ class Vault {
   }
 
   static askPassword(action: (password: string) => Promise<boolean>) {
-    return showPasswordDialog("ask_vault_password", ({ password }) => {
-      if (!password) return false;
-      return action(password);
+    return showPasswordDialog({
+      title: "Unlock vault",
+      subtitle: "Please enter your vault password to continue.",
+      inputs: {
+        password: { label: "Password", autoComplete: "current-password" }
+      },
+      validate: async ({ password }) => {
+        return action(password);
+      }
     });
   }
 }

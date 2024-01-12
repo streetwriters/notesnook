@@ -35,7 +35,10 @@ import { Notice, resetNotices } from "../common/notices";
 import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/dist/common";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
-import { onPageVisibilityChanged } from "../utils/page-visibility";
+import {
+  onNetworkStatusChanged,
+  onPageVisibilityChanged
+} from "../utils/page-visibility";
 import { NetworkCheck } from "../utils/network-check";
 import { Color, Notebook, Tag } from "@notesnook/core";
 
@@ -122,18 +125,22 @@ class AppStore extends BaseStore<AppStore> {
       this.updateSyncStatus("failed");
     });
 
-    onPageVisibilityChanged(async (type, documentHidden) => {
-      if (!documentHidden && type !== "offline") {
-        logger.info("Page visibility changed. Reconnecting SSE...");
-        if (type === "online") {
-          // a slight delay to make sure sockets are open and can be connected
-          // to. Otherwise, this fails miserably.
-          await networkCheck.waitForInternet();
-        }
-        await db.connectSSE({ force: type === "online" }).catch(logger.error);
-      } else if (type === "offline") {
+    onNetworkStatusChanged(async (status) => {
+      if (status === "offline") {
         await this.abortSync("offline");
+      } else {
+        // a slight delay to make sure sockets are open and can be connected
+        // to. Otherwise, this fails miserably.
+        await networkCheck.waitForInternet();
+        await db.connectSSE({ force: true }).catch(logger.error);
       }
+    });
+
+    onPageVisibilityChanged(async (_, documentHidden) => {
+      if (!documentHidden) return;
+
+      logger.info("Page visibility changed. Reconnecting SSE...");
+      await db.connectSSE({ force: false }).catch(logger.error);
     });
   };
 

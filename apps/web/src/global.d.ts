@@ -36,4 +36,28 @@ declare global {
     os?: () => NodeJS.Platform | "mas";
     NativeNNCrypto?: new () => import("@notesnook/crypto").NNCrypto;
   }
+
+  interface AuthenticationExtensionsClientInputs {
+    prf?: {
+      eval: {
+        first: BufferSource;
+      };
+    };
+  }
+
+  interface AuthenticationExtensionsClientOutputs {
+    prf?: {
+      enabled?: boolean;
+      results?: {
+        first: ArrayBuffer;
+      };
+    };
+  }
+
+  interface PublicKeyCredentialRequestOptions {
+    hints?: ("security-key" | "client-device" | "hybrid")[];
+  }
+  interface PublicKeyCredentialCreationOptions {
+    hints?: ("security-key" | "client-device" | "hybrid")[];
+  }
 }

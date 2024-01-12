@@ -17,7 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./constants";
-export type { AppRouter } from "./api";
-export { type UpdateInfo } from "builder-util-runtime";
-export { type DesktopIntegration } from "./utils/config";
+export function generatePassword() {
+  return window.crypto
+    .getRandomValues(new BigUint64Array(4))
+    .reduce((prev, curr, index) => {
+      const char =
+        index % 2 ? curr.toString(36).toUpperCase() : curr.toString(36);
+      return prev + char;
+    }, "")
+    .split("")
+    .sort(() => 128 - window.crypto.getRandomValues(new Uint8Array(1))[0])
+    .join("");
+}

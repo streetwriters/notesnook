@@ -29,7 +29,7 @@ import { createWriteStream } from "./stream-saver";
 
 let logger: typeof _logger;
 async function initializeLogger(persistence: DatabasePersistence = "db") {
-  initialize(await NNStorage.createInstance("Logs", persistence), false);
+  initialize(new NNStorage("Logs", null, persistence), false);
   logger = _logger.scope("notesnook-web");
 }
 
