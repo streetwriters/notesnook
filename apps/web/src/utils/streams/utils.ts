@@ -19,9 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export function makeUniqueFilename(
   filePath: string,
-  counters: Record<string, number>
+  counters: Record<string, number>,
+  notebook?: string,
+  topic?: string
 ) {
-  filePath = filePath.toLowerCase();
+  if (notebook && topic)
+    filePath = `/${notebook}/${topic}/${filePath.toLowerCase()}`;
+  else if (notebook) filePath = `/${notebook}/${filePath.toLowerCase()}`;
+  else filePath = filePath.toLowerCase();
+
   counters[filePath] = (counters[filePath] || 0) + 1;
   if (counters[filePath] === 1) return filePath;
 
