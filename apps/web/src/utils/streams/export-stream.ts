@@ -99,11 +99,69 @@ export class ExportStream extends ReadableStream<ZipFile> {
 
         const filename = sanitizeFilename(note.title, { replacement: "-" });
         const ext = FORMAT_TO_EXT[format];
-        controller.enqueue({
-          path: makeUniqueFilename([filename, ext].join("."), counters),
-          data: textEncoder.encode(exported),
-          mtime: new Date(note.data.dateEdited),
-          ctime: new Date(note.data.dateCreated)
+        const notebooksWithoutTopics = db.relations?.to(
+          { id: note.id, type: "note" },
+          "notebook"
+        );
+        const notebooksWithTopics = note?.notebooks;
+        const notebooks: Array<{ title: string; topics: Array<string> }> = [];
+
+        notebooksWithoutTopics?.forEach((notebook) => {
+          notebooks.push({ title: notebook.title, topics: [] });
+        });
+
+        notebooksWithTopics?.forEach((notebook: any) => {
+          const _topics = db.notebooks?.notebook(notebook.id).topics.all;
+          const topics: Array<string> = [];
+
+          notebook?.topics?.forEach((topicId: string) => {
+            _topics?.forEach((topic) => {
+              if (topic.id === topicId) {
+                topics.push(topic.title);
+              }
+            });
+          });
+
+          notebooks.push({
+            title: db.notebooks?.notebook(notebook.id).title,
+            topics: topics
+          });
+        });
+
+        const paths: Array<string> = [];
+        if (notebooks?.length > 0) {
+          notebooks.forEach((notebook) => {
+            if (notebook.topics.length > 0)
+              notebook.topics.forEach((topic) => {
+                paths.push(
+                  makeUniqueFilename(
+                    [filename, ext].join("."),
+                    counters,
+                    notebook.title,
+                    topic
+                  )
+                );
+              });
+            else
+              paths.push(
+                makeUniqueFilename(
+                  [filename, ext].join("."),
+                  counters,
+                  notebook.title
+                )
+              );
+          });
+        } else {
+          paths.push(makeUniqueFilename([filename, ext].join("."), counters));
+        }
+
+        paths.forEach((path) => {
+          controller.enqueue({
+            path,
+            data: textEncoder.encode(exported),
+            mtime: new Date(note.data.dateEdited),
+            ctime: new Date(note.data.dateCreated)
+          });
         });
 
         if (index === noteIds.length) {
