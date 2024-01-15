@@ -40,6 +40,7 @@ jobs:
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
+          BUILD_TOOLS_VERSION: "33.0.0"
 
       - name: Publish to Playstore
         id: deploy
@@ -64,6 +65,7 @@ jobs:
           alias: ${{ secrets.PUBLIC_ALIAS }}
           keyStorePassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
           keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
+          BUILD_TOOLS_VERSION: "33.0.0"
 
       - name: Rename apk files
         run: |
