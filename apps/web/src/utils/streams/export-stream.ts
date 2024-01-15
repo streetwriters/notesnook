@@ -99,65 +99,56 @@ export class ExportStream extends ReadableStream<ZipFile> {
 
         const filename = sanitizeFilename(note.title, { replacement: "-" });
         const ext = FORMAT_TO_EXT[format];
-        const notebooksWithoutTopics = db.relations?.to(
-          { id: note.id, type: "note" },
-          "notebook"
-        );
-        const notebooksWithTopics = note?.notebooks;
-        const notebooks: Array<{ title: string; topics: Array<string> }> = [];
-
-        notebooksWithoutTopics?.forEach((notebook) => {
-          notebooks.push({ title: notebook.title, topics: [] });
-        });
-
-        notebooksWithTopics?.forEach((notebook: any) => {
-          const _topics = db.notebooks?.notebook(notebook.id).topics.all;
-          const topics: Array<string> = [];
-
-          notebook?.topics?.forEach((topicId: string) => {
-            _topics?.forEach((topic) => {
-              if (topic.id === topicId) {
-                topics.push(topic.title);
-              }
-            });
+        const notebooks = db.relations
+          ?.to({ id: note.id, type: "note" }, "notebook")
+          .map((notebook) => {
+            return { title: notebook.title, topics: Array<string> };
           });
+        const notebooksWithTopics: Array<{
+          id: string;
+          topics: Array<string>;
+        }> = note?.notebooks;
 
-          notebooks.push({
-            title: db.notebooks?.notebook(notebook.id).title,
-            topics: topics
-          });
-        });
+        if (notebooksWithTopics)
+          notebooks?.push(
+            ...notebooksWithTopics.map((_notebook) => {
+              const notebook = db.notebooks?.notebook(_notebook.id);
+              const _topics = notebook?.topics.all;
+              let topics: any;
 
-        const paths: Array<string> = [];
-        if (notebooks?.length > 0) {
+              _notebook.topics.map((topicId: string) => {
+                topics = _topics?.filter((topic) => {
+                  return topic.id === topicId;
+                });
+              });
+
+              return {
+                title: notebook?.title,
+                topics: topics?.map((topic) => topic.title)
+              };
+            })
+          );
+
+        const filenameWithExtension = [filename, ext].join(".").toLowerCase();
+        const filePaths: Array<string> = [];
+
+        if (notebooks && notebooks.length > 0) {
           notebooks.forEach((notebook) => {
             if (notebook.topics.length > 0)
               notebook.topics.forEach((topic) => {
-                paths.push(
-                  makeUniqueFilename(
-                    [filename, ext].join("."),
-                    counters,
-                    notebook.title,
-                    topic
-                  )
+                filePaths.push(
+                  `/${notebook.title}/${topic}/${filenameWithExtension}`
                 );
               });
-            else
-              paths.push(
-                makeUniqueFilename(
-                  [filename, ext].join("."),
-                  counters,
-                  notebook.title
-                )
-              );
+            else filePaths.push(`/${notebook.title}/${filenameWithExtension}`);
           });
         } else {
-          paths.push(makeUniqueFilename([filename, ext].join("."), counters));
+          filePaths.push(filenameWithExtension);
         }
 
-        paths.forEach((path) => {
+        filePaths.forEach((filePath) => {
           controller.enqueue({
-            path,
+            path: makeUniqueFilename(filePath, counters),
             data: textEncoder.encode(exported),
             mtime: new Date(note.data.dateEdited),
             ctime: new Date(note.data.dateCreated)
