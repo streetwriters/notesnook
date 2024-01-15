@@ -314,7 +314,9 @@ export const ALPHA_COLORS: readonly (keyof Colors)[] = [
   "hover",
   "backdrop",
   "background",
-  "placeholder"
+  "placeholder",
+  "textSelection",
+  "shade"
 ];
 
 export const Variants: readonly (keyof Variants)[] = [
