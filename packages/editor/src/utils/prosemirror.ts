@@ -366,8 +366,8 @@ export function getDeletedNodes(
       typeof step.from === "number" &&
       step.slice === Slice.empty
     ) {
-      if (step.from > tr.doc.nodeSize) {
-        const $from = tr.doc.resolve(step.from - 1);
+      if (step.from < tr.doc.nodeSize - 1) {
+        const $from = tr.doc.resolve(step.from);
         const node = findParentNodeClosestToPos($from, predicate);
         if (node) nodes.push(node);
       }
