@@ -272,6 +272,7 @@ export const TaskListNode = TaskList.extend({
               // when a task item has children, the task list is always the
               // last child
               edit.node.lastChild?.type.name === TaskList.name &&
+              oldState.doc.nodeAt(edit.pos) &&
               oldState.doc.nodeAt(edit.pos)?.attrs.checked !==
                 newState.doc.nodeAt(edit.pos)?.attrs.checked
             ) {
