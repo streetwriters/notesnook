@@ -92,6 +92,10 @@ function Toolbar() {
     };
   }, [isTitleVisible]);
 
+  useEffect(() => {
+    document.querySelector("#onScrollTitle").defaultValue = title;
+  }, [title]);
+
   const tools = useMemo(
     () => [
       {
@@ -216,6 +220,7 @@ function Toolbar() {
           }}
         />
         <AnimatedInput
+          id="onScrollTitle"
           variant="clean"
           ml={[2, 2, 0]}
           initial={{
