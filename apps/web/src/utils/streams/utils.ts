@@ -17,15 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { path } from "@notesnook-importer/core/dist/src/utils/path";
+
 export function makeUniqueFilename(
   filePath: string,
   counters: Record<string, number>
 ) {
-  counters[filePath] = (counters[filePath] || 0) + 1;
-  if (counters[filePath] === 1) return filePath;
+  const matchablePath = filePath.toLowerCase();
+  const count = (counters[matchablePath] = (counters[matchablePath] || 0) + 1);
+  if (count === 1) return filePath;
 
-  const parts = filePath.split(".");
-  return `${parts.slice(0, -1).join(".")}-${counters[filePath]}.${
-    parts[parts.length - 1]
-  }`;
+  const ext = path.extname(filePath);
+  const basename = ext
+    ? `${path.basename(filePath, ext)}-${count}${ext}`
+    : `${path.basename(filePath)}-${count}`;
+  return path.join(path.dirname(filePath), basename);
 }

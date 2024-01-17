@@ -18,13 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Deflate, Inflate } from "./fflate-shim";
-import { Uint8ArrayReader, ZipWriter, configure } from "@zip.js/zip.js";
+import {
+  Uint8ArrayReader,
+  TextReader,
+  ZipWriter,
+  configure
+} from "@zip.js/zip.js";
 
 configure({ Deflate, Inflate });
 
 export type ZipFile = {
   path: string;
-  data: Uint8Array;
+  data: string | Uint8Array;
   mtime?: Date;
   ctime?: Date;
 };
@@ -43,10 +48,16 @@ export function createZipStream(signal?: AbortSignal) {
       if (written.has(chunk.path)) return;
 
       await writer
-        .add(chunk.path, new Uint8ArrayReader(chunk.data), {
-          creationDate: chunk.ctime,
-          lastModDate: chunk.mtime
-        })
+        .add(
+          chunk.path,
+          typeof chunk.data === "string"
+            ? new TextReader(chunk.data)
+            : new Uint8ArrayReader(chunk.data),
+          {
+            creationDate: chunk.ctime,
+            lastModDate: chunk.mtime
+          }
+        )
         .catch(async (e) => {
           await ts.writable.abort(e);
           await ts.readable.cancel(e);

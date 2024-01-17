@@ -75,7 +75,7 @@ function sanitize(input: string, replacement: string) {
     .replace(windowsReservedRe, replacement)
     .replace(windowsTrailingRe, replacement);
 
-  return sanitized.slice(0, 254).toLowerCase();
+  return sanitized.slice(0, 254);
 }
 
 export function sanitizeFilename(
