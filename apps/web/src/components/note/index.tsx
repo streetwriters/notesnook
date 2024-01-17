@@ -539,7 +539,7 @@ const menuItems: (note: any, items?: any[]) => MenuItem[] = (
       icon: Trash.path,
       isDisabled:
         items.length === 1
-          ? db.monographs?.isPublished(note.id) || note.locked
+          ? db.monographs?.isPublished(note.id)
           : items.some((item) => !db.notes?.note(item.id).synced()),
       onClick: () => Multiselect.moveNotesToTrash(items, items.length > 1),
       multiSelect: true

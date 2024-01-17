@@ -35,20 +35,19 @@ type Item = {
 };
 
 async function moveNotesToTrash(notes: Item[], confirm = true) {
-  const item = notes[0];
   if (confirm && !(await showMultiDeleteConfirmation(notes.length))) return;
 
-  if (notes.length === 1) {
-    if (
-      item.locked &&
-      !(await Vault.unlockNote(item.id, "unlock_and_delete_note"))
-    )
-      return;
-    item.locked = false;
-  }
+  let locked = false;
+  for (const item of notes)
+    if (item.locked) {
+      locked = true;
+      break;
+    }
+
+  if (locked && !(await Vault.unlockVault())) return;
 
   const items = notes.map((item) => {
-    if (item.locked || db.monographs?.isPublished(item.id)) return 0;
+    if (db.monographs?.isPublished(item.id)) return 0;
     return item.id;
   });
 
