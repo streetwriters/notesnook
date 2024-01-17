@@ -32,7 +32,7 @@ import { NoteContent } from "./session-content";
 import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
 
-type ExportOptions = {
+export type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
   contentItem?: NoteContent<false>;
   rawContent?: string;

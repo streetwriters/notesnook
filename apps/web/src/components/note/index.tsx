@@ -95,7 +95,7 @@ import {
   TagsWithDateEdited
 } from "../list-container/types";
 import { SchemeColors } from "@notesnook/theme";
-import Vault from "../../common/vault";
+import FileSaver from "file-saver";
 
 type NoteProps = {
   tags?: TagsWithDateEdited;
@@ -432,10 +432,7 @@ const menuItems: (
       //isDisabled: !isSynced,
       icon: Print.path,
       onClick: async () => {
-        const item = db.notes?.note(note);
-        if (!item) return;
-
-        const result = await exportNote(item, "pdf");
+        const result = await exportNote(note, { format: "pdf" });
         if (!result) return;
         await exportToPDF(note.title, result.content);
       }
@@ -474,10 +471,7 @@ const menuItems: (
           isPro: format.type !== "txt",
           onClick: async () => {
             if (ids.length === 1) {
-              const item = db.notes?.note(note);
-              if (!item) return;
-
-              const result = await exportNote(item, format.type);
+              const result = await exportNote(note, { format: format.type });
               if (!result) return;
               if (format.type === "pdf")
                 return exportToPDF(note.title, result.content);
@@ -488,7 +482,10 @@ const menuItems: (
               );
             }
 
-            await exportNotes(format.type, ids);
+            await exportNotes(
+              format.type,
+              db.notes.all.where((eb) => eb("id", "in", ids))
+            );
           }
         }))
       },
@@ -766,8 +763,8 @@ async function copyNote(noteId: string, format: "md" | "txt") {
     const note = await db.notes?.note(noteId);
     if (!note) throw new Error("No note with this id exists.");
 
-    const result = await exportNote(note, format, true);
-    if (!result) return;
+    const result = await exportNote(note, { format, disableTemplate: true });
+    if (!result) throw new Error(`Could not convert note to ${format}.`);
 
     await navigator.clipboard.writeText(result.content);
     showToast("success", "Copied!");

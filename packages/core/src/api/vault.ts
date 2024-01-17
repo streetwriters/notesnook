@@ -37,9 +37,9 @@ export const VAULT_ERRORS = {
 
 const ERASE_TIME = 1000 * 60 * 30;
 export default class Vault {
-  vaultPassword?: string;
-  erasureTimeout = 0;
-  key = "svvaads1212#2123";
+  private vaultPassword?: string;
+  private erasureTimeout = 0;
+  private key = "svvaads1212#2123";
 
   private get password() {
     return this.vaultPassword;
@@ -210,6 +210,10 @@ export default class Vault {
   async exists(vaultKey?: Cipher<"base64">) {
     if (!vaultKey) vaultKey = await this.getKey();
     return !!vaultKey && isCipher(vaultKey);
+  }
+
+  get unlocked() {
+    return !!this.vaultPassword;
   }
 
   // Private & internal methods
