@@ -86,13 +86,24 @@ export async function exportNotes(
     title: "Exporting notes",
     subtitle: "Please wait while your notes are exported.",
     action: async (report) => {
+      const total = await notes.count();
+      let progress = 0;
+
       const noteStream = fromAsyncIterator(notes[Symbol.asyncIterator]());
       await noteStream
         .pipeThrough(
-          new ExportStream(format, undefined, (c, text) =>
-            report({ current: c, text })
-          )
+          new TransformStream<Note, Note>({
+            transform(note, controller) {
+              controller.enqueue(note);
+              report({
+                total,
+                current: progress++,
+                text: `Exporting "${note?.title}"`
+              });
+            }
+          })
         )
+        .pipeThrough(new ExportStream(format, undefined))
         .pipeThrough(createZipStream())
         .pipeTo(await createWriteStream("notes.zip"));
       return true;
