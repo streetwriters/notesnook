@@ -87,7 +87,8 @@ const BaseDialog = ({
 
   useEffect(() => {
     if (useUserStore.getState().disableAppLockRequests) return;
-    if (SettingsService.get().appLockMode === "background") {
+
+    if (SettingsService.canLockAppInBackground()) {
       if (appState === "background") {
         setIntervalVisible(false);
         if (useUserStore.getState().appLocked) {

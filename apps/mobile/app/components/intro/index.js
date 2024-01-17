@@ -36,6 +36,10 @@ import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import Navigation from "../../services/navigation";
+import { eOpenLoginDialog } from "../../utils/events";
+import { AuthMode } from "../auth";
+import { eSendEvent } from "../../services/event-manager";
 
 const Intro = ({ navigation }) => {
   const { colors } = useThemeColors();
@@ -193,9 +197,15 @@ const Intro = ({ navigation }) => {
         <Button
           width={250}
           onPress={async () => {
-            navigation.navigate("AppLock", {
-              welcome: true
-            });
+            eSendEvent(eOpenLoginDialog, AuthMode.welcomeSignup);
+            setTimeout(() => {
+              SettingsService.set({
+                introCompleted: true
+              });
+              Navigation.replace("Notes", {
+                canGoBack: false
+              });
+            }, 1000);
           }}
           style={{
             paddingHorizontal: 24,

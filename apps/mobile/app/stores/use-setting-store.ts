@@ -39,7 +39,9 @@ export type Settings = {
   sortOrder?: string;
   screenshotMode?: boolean;
   privacyScreen?: boolean;
-  appLockMode?: string;
+  appLockTimer: number;
+  appLockEnabled?: boolean;
+  appLockMode?: "none" | "background" | "launch";
   telemetry?: boolean;
   notebooksListMode?: "normal" | "compact";
   notesListMode?: "normal" | "compact";
@@ -119,6 +121,7 @@ export interface SettingStore extends State {
 const { width, height } = Dimensions.get("window");
 
 export const defaultSettings: SettingStore["settings"] = {
+  appLockTimer: 0,
   showToolbarOnTop: false,
   showKeyboardOnOpen: false,
   fontScale: 1,
