@@ -193,7 +193,7 @@ export const BackupExportSettings: SettingsGroup[] = [
               if (await verifyAccount())
                 await exportNotes(
                   value as "txt" | "md" | "html" | "md-frontmatter",
-                  await db.notes.all.ids()
+                  db.notes.all
                 );
             }
           }
