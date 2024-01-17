@@ -83,6 +83,8 @@ export default class Content extends Collection {
   }
 
   async raw(id) {
+    if (!id) return;
+
     const content = await this._collection.getItem(id);
     if (!content) return;
     return content;
@@ -118,6 +120,7 @@ export default class Content extends Collection {
   async downloadMedia(groupId, contentItem, notify = true) {
     if (!contentItem) return contentItem;
     const content = getContentFromData(contentItem.type, contentItem.data);
+    if (!content) console.log(contentItem);
     contentItem.data = await content.insertMedia(async (hashes) => {
       const attachments = hashes.map((h) => this._db.attachments.attachment(h));
       await this._db.fs.queueDownloads(

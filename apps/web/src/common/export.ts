@@ -21,6 +21,7 @@ import { TaskManager } from "./task-manager";
 import { ExportStream } from "../utils/streams/export-stream";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
+import { showToast } from "../utils/toast";
 
 export async function exportToPDF(
   title: string,
@@ -74,12 +75,17 @@ export async function exportNotes(
     title: "Exporting notes",
     subtitle: "Please wait while your notes are exported.",
     action: async (report) => {
-      await new ExportStream(noteIds, format, undefined, (c, text) =>
-        report({ total: noteIds.length, current: c, text })
-      )
-        .pipeThrough(createZipStream())
-        .pipeTo(await createWriteStream("notes.zip"));
-      return true;
+      try {
+        await new ExportStream(noteIds, format, undefined, (c, text) =>
+          report({ total: noteIds.length, current: c, text })
+        )
+          .pipeThrough(createZipStream())
+          .pipeTo(await createWriteStream("notes.zip"));
+        return true;
+      } catch (e) {
+        if (e instanceof Error) showToast("error", e.message);
+      }
+      return false;
     }
   });
 }
