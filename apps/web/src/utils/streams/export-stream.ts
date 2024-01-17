@@ -37,9 +37,9 @@ export class ExportStream extends TransformStream<Note, ZipFile> {
             return;
           }
 
-          if (!note || format === "pdf") return;
+          if (format === "pdf") return;
 
-          const result = await exportNote(note, format);
+          const result = await exportNote(note, { format });
           if (!result) return;
 
           const { filename, content } = result;
