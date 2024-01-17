@@ -69,7 +69,6 @@ const IntroStackNavigator = () => {
       initialRouteName={"Intro"}
     >
       <NativeStack.Screen name="Intro" component={Intro} />
-      <NativeStack.Screen name="AppLock" component={AppLock} />
     </IntroStack.Navigator>
   );
 };

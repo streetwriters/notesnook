@@ -480,15 +480,20 @@ export const useAppEvents = () => {
 
     const onAppStateChanged = async (state: AppStateStatus) => {
       if (state === "active") {
+        if (SettingsService.shouldLockAppOnEnterForeground()) {
+          console.log("Locked app on enter foreground");
+          useUserStore.getState().lockApp(true);
+        }
+
         notifee.setBadgeCount(0);
         updateStatusBarColor();
         if (
-          SettingsService.get().appLockMode !== "background" &&
+          !SettingsService.canLockAppInBackground() &&
           !SettingsService.get().privacyScreen
         ) {
           enabled(false);
         }
-        if (SettingsService.get().appLockMode === "background") {
+        if (SettingsService.canLockAppInBackground()) {
           if (useSettingStore.getState().requestBiometrics) {
             useSettingStore.getState().setRequestBiometrics(false);
             return;
@@ -510,22 +515,23 @@ export const useAppEvents = () => {
           }
         }
       } else {
+        SettingsService.appEnteredBackground();
         const id = useEditorStore.getState().currentEditingNote;
         const note = id ? await db.notes.note(id) : undefined;
-        if (
-          note?.locked &&
-          SettingsService.get().appLockMode === "background"
-        ) {
+        if (note?.locked && SettingsService.canLockAppInBackground()) {
           eSendEvent(eClearEditor);
         }
         await saveEditorState();
         if (
-          SettingsService.get().appLockMode === "background" &&
+          SettingsService.canLockAppInBackground() &&
           !useSettingStore.getState().requestBiometrics &&
           !useUserStore.getState().appLocked &&
           !useUserStore.getState().disableAppLockRequests
         ) {
-          useUserStore.getState().lockApp(true);
+          if (SettingsService.getProperty("appLockTimer") === 0) {
+            useUserStore.getState().lockApp(true);
+          }
+
           if (Platform.OS === "ios") {
             editorController.current?.commands.blur();
             Keyboard.dismiss();
@@ -533,7 +539,7 @@ export const useAppEvents = () => {
         }
         if (
           SettingsService.get().privacyScreen ||
-          SettingsService.get().appLockMode === "background"
+          SettingsService.canLockAppInBackground()
         ) {
           !useSettingStore.getState().requestBiometrics ? enabled(true) : null;
         }

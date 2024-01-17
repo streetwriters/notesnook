@@ -42,6 +42,7 @@ type DialogInfo = {
   inputPlaceholder: string;
   defaultValue: string;
   context: "global" | "local";
+  secureTextEntry?: boolean;
 };
 
 export function presentDialog(data: Partial<DialogInfo>): void {
