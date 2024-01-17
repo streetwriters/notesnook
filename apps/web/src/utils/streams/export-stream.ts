@@ -17,11 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Note } from "@notesnook/core/dist/types";
-import { db } from "../../common/db";
 import { exportNote } from "../../common/export";
 import { makeUniqueFilename } from "./utils";
 import { ZipFile } from "./zip-stream";
+import { Note } from "@notesnook/core";
 
 export class ExportStream extends TransformStream<Note, ZipFile> {
   constructor(
