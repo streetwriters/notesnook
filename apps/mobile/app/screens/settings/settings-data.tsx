@@ -69,6 +69,7 @@ import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
 import { AppLockPassword } from "../../components/dialogs/applock-password";
+import { validateAppLockPassword } from "../../common/database/encryption";
 type User = any;
 
 export const settingsGroups: SettingSection[] = [
@@ -774,13 +775,104 @@ export const settingsGroups: SettingSection[] = [
         sections: [
           {
             id: "app-lock-mode",
-            name: "App lock mode",
+            name: "Enable app lock",
             description:
               "Select the mode for the desired level of app lock security.",
-            icon: "fingerprint",
-            modifer: () => {
-              AppLock.present();
+            icon: "lock",
+            type: "switch",
+            property: "appLockEnabled",
+            onChange: async () => {
+              if (!SettingsService.getProperty("appLockEnabled")) {
+                if (SettingsService.getProperty("appLockHasPasswordSecurity")) {
+                  presentDialog({
+                    title: "Verify it's you",
+                    input: true,
+                    inputPlaceholder: "Enter app lock pin",
+                    paragraph:
+                      "Please enter your app lock pin to disable app lock",
+                    positiveText: "Disable",
+                    secureTextEntry: true,
+                    negativeText: "Cancel",
+                    positivePress: async (value) => {
+                      try {
+                        let verified = await validateAppLockPassword(value);
+                        if (!verified) {
+                          SettingsService.setProperty("appLockEnabled", true);
+                          return false;
+                        } else {
+                          SettingsService.setProperty("appLockEnabled", false);
+                        }
+                      } catch (e) {
+                        SettingsService.setProperty("appLockEnabled", true);
+                        return false;
+                      }
+                    }
+                  });
+                } else {
+                  if (await BiometicService.isBiometryAvailable()) {
+                    const verified = await BiometicService.validateUser(
+                      "Verify it's you"
+                    );
+                    if (!verified) {
+                      SettingsService.setProperty("appLockEnabled", true);
+                      return;
+                    } else {
+                      SettingsService.setProperty("appLockEnabled", false);
+                    }
+                  } else if (useUserStore.getState().user) {
+                    let verified = false;
+                    verifyUser(
+                      null,
+                      () => {
+                        SettingsService.setProperty("appLockEnabled", false);
+                        verified = true;
+                      },
+                      false,
+                      () => {
+                        if (!verified)
+                          SettingsService.setProperty("appLockEnabled", true);
+                      }
+                    );
+                  }
+                }
+                return;
+              }
+
+              if (
+                !(await BiometicService.isBiometryAvailable()) &&
+                !useUserStore.getState().user &&
+                !SettingsService.getProperty("appLockHasPasswordSecurity")
+              ) {
+                ToastManager.show({
+                  heading: "Biometrics not enrolled",
+                  type: "error",
+                  message:
+                    "To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone or create an account."
+                });
+                SettingsService.setProperty("appLockEnabled", false);
+                return;
+              }
+
+              if (!SettingsService.getProperty("appLockHasPasswordSecurity")) {
+                const verified = await BiometicService.validateUser(
+                  "Verify it's you"
+                );
+                if (verified) {
+                  SettingsService.setProperty("biometricsAuthEnabled", true);
+                } else {
+                  SettingsService.setProperty("appLockEnabled", false);
+                  return;
+                }
+              }
             }
+          },
+          {
+            id: "app-lock-timer",
+            name: "App lock timeout",
+            description:
+              "Set the time after which the app should lock in background",
+            type: "component",
+            component: "applock-timer"
           },
           {
             id: "app-lock-pin",
@@ -843,7 +935,8 @@ export const settingsGroups: SettingSection[] = [
                 );
                 SettingsService.setProperty("biometricsAuthEnabled", false);
               }
-            }
+            },
+            icon: "fingerprint"
           }
         ]
       }

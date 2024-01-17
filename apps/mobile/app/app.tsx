@@ -58,10 +58,11 @@ I18nManager.swapLeftAndRightInRTL(false);
 const App = () => {
   const init = useAppEvents();
   useEffect(() => {
-    const { appLockMode } = SettingsService.get();
-    if (appLockMode && appLockMode !== "none") {
+    const { appLockEnabled, appLockMode } = SettingsService.get();
+    if (appLockEnabled || appLockMode !== "none") {
       useUserStore.getState().lockApp(true);
     }
+
     //@ts-ignore
     globalThis["IS_MAIN_APP_RUNNING"] = true;
     init();

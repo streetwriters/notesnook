@@ -138,3 +138,23 @@ export const BackupReminderPicker = createSettingsPicker({
     return item !== "useroff";
   }
 });
+
+export const ApplockTimerPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.appLockTimer,
+  updateValue: (item) => {
+    SettingsService.set({ appLockTimer: item });
+  },
+  formatValue: (item) => {
+    return item === -1
+      ? "Never"
+      : item === 0 || item === undefined
+      ? "Immediately"
+      : item === 1
+      ? "1 minute"
+      : item + " minutes";
+  },
+  getItemKey: (item) => item.toString(),
+  options: [-1, 0, 1, 5, 15, 30],
+  compareValue: (current, item) => current === item,
+  premium: true
+});

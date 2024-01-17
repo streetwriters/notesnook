@@ -91,7 +91,7 @@ const SheetWrapper = ({
 
   useEffect(() => {
     if (useUserStore.getState().disableAppLockRequests) return;
-    if (SettingsService.get().appLockMode === "background") {
+    if (SettingsService.canLockAppInBackground()) {
       if (appState === "background") {
         const ref = fwdRef || localRef;
         ref?.current?.hide();
