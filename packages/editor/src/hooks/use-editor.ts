@@ -17,9 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EditorOptions, Editor as TiptapEditor } from "@tiptap/core";
-import { DependencyList, useEffect, useRef, useState } from "react";
+import {
+  EditorOptions,
+  Editor as TiptapEditor,
+  createDocument,
+  resolveFocusPosition
+} from "@tiptap/core";
+import { DependencyList, useEffect, useMemo, useRef, useState } from "react";
 import { Editor } from "../types";
+import { EditorState } from "@tiptap/pm/state";
 
 function useForceUpdate() {
   const [, setValue] = useState(0);
@@ -31,7 +37,7 @@ export const useEditor = (
   options: Partial<EditorOptions> = {},
   deps: DependencyList = []
 ) => {
-  const [editor] = useState<Editor>(() => {
+  const editor = useMemo<Editor>(() => {
     const instance = new Editor(options);
     if (instance && !Object.hasOwn(instance, "current")) {
       Object.defineProperty(instance, "current", {
@@ -39,7 +45,7 @@ export const useEditor = (
       });
     }
     return instance;
-  });
+  }, []);
   const forceUpdate = useForceUpdate();
   const editorRef = useRef<TiptapEditor>(editor);
 
@@ -47,8 +53,30 @@ export const useEditor = (
     () => {
       let isMounted = true;
       let updateTimeout: number;
-      editor.setOptions(options);
-      editor.on("transaction", ({ editor }) => {
+
+      // we try very hard not to create a new editor, instead
+      // we just update the props & other things. This is dangerous but faster
+      // than creating a new editor
+      // This part below is copied from @tiptap/core
+      if (options.editorProps) editor.view.setProps(options.editorProps);
+      if (options.content && options.content !== editor.options.content) {
+        const doc = createDocument(
+          options.content,
+          editor.schema,
+          options.parseOptions
+        );
+        const selection = resolveFocusPosition(doc, options.autofocus);
+        editor.view.updateState(
+          EditorState.create({
+            doc,
+            plugins: editor.extensionManager.plugins,
+            selection: selection || undefined
+          })
+        );
+      }
+      editor.options = { ...editor.options, ...options };
+
+      function onTransaction({ editor }: { editor: TiptapEditor }) {
         editorRef.current = editor;
         clearTimeout(updateTimeout);
         updateTimeout = setTimeout(() => {
@@ -56,18 +84,25 @@ export const useEditor = (
             forceUpdate();
           }
         }, 200) as unknown as number;
-      });
+      }
+      editor.on("transaction", onTransaction);
 
       return () => {
         isMounted = false;
-
+        editor.off("transaction", onTransaction);
         clearTimeout(updateTimeout);
-        editor.destroy();
       };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     deps
   );
+
+  useEffect(() => {
+    return () => {
+      editor.view.destroy();
+      editor.destroy();
+    };
+  }, []);
 
   useEffect(() => {
     // this is required for the drag/drop to work properly
