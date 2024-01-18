@@ -184,7 +184,7 @@ class AppStore extends BaseStore {
 
   toggleRealtimeSync = () => {
     const { isRealtimeSyncEnabled } = this.get();
-    Config.set("realtimeSyncEnabled", !isRealtimeSyncEnabled);
+    Config.set("isRealtimeSyncEnabled", !isRealtimeSyncEnabled);
     this.set(
       (state) => (state.isRealtimeSyncEnabled = !state.isRealtimeSyncEnabled)
     );
