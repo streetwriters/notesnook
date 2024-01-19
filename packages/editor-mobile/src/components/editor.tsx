@@ -22,20 +22,14 @@ import {
   getFontById,
   getTableOfContents,
   PortalProvider,
+  TiptapOptions,
   Toolbar,
   usePermissionHandler,
   useTiptap
 } from "@notesnook/editor";
 import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 import { useThemeColors } from "@notesnook/theme";
-import {
-  forwardRef,
-  memo,
-  useCallback,
-  useLayoutEffect,
-  useRef,
-  useState
-} from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
 import {
@@ -53,14 +47,19 @@ import Title from "./title";
 
 globalThis.toBlobURL = toBlobURL;
 
-const Tiptap = ({ settings }: { settings: Settings }) => {
+const Tiptap = ({
+  settings,
+  getContentDiv
+}: {
+  settings: Settings;
+  getContentDiv: () => HTMLElement;
+}) => {
+  const contentPlaceholderRef = useRef<HTMLDivElement>(null);
   const { colors } = useThemeColors();
   const tab = useTabContext();
   const isFocused = useTabStore((state) => state.currentTab === tab?.id);
   const [tick, setTick] = useState(0);
-  const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [layout, setLayout] = useState(false);
   const noteStateUpdateTimer = useRef<NodeJS.Timeout>();
   const tabRef = useRef<TabItem>(tab);
   const isFocusedRef = useRef<boolean>(false);
@@ -75,8 +74,8 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
     }
   });
 
-  const _editor = useTiptap(
-    {
+  const tiptapOptions = useMemo<Partial<TiptapOptions>>(() => {
+    return {
       onUpdate: ({ editor }) => {
         globalThis.editorControllers[tab.id]?.contentChange(editor as Editor);
       },
@@ -92,7 +91,7 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
         globalThis.editorControllers[tab.id]?.previewAttachment(attachment);
         return true;
       },
-      element: !layout ? undefined : contentRef.current || undefined,
+      element: getContentDiv(),
       editable: !settings.readonly,
       editorProps: {
         editable: () => !settings.readonly
@@ -126,11 +125,13 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
       },
       dateFormat: settings.dateFormat,
       timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined
-    },
-    [layout, settings.readonly, tick, settings.doubleSpacedLines]
-  );
+    };
+  }, [settings.readonly, tick, settings.doubleSpacedLines]);
+
+  const _editor = useTiptap(tiptapOptions, [tiptapOptions]);
 
   const update = useCallback(() => {
+    logger("info", "update content");
     setTick((tick) => tick + 1);
     setTimeout(() => {
       const noteState = tabRef.current.noteId
@@ -174,7 +175,10 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
   globalThis.editors[tab.id] = _editor;
 
   useLayoutEffect(() => {
-    setLayout(true);
+    if (!getContentDiv().parentElement) {
+      contentPlaceholderRef.current?.appendChild(getContentDiv());
+    }
+
     const updateScrollPosition = (state: TabStore) => {
       if (isFocusedRef.current) return;
       if (state.currentTab === tabRef.current.id) {
@@ -381,12 +385,7 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
             </div>
           ) : null}
 
-          <ContentDiv
-            padding={settings.doubleSpacedLines ? 0 : 6}
-            fontSize={settings.fontSize}
-            fontFamily={settings.fontFamily}
-            ref={contentRef}
-          />
+          <div ref={contentPlaceholderRef} className="theme-scope-editor" />
 
           <div
             onClick={onClickBottomArea}
@@ -398,14 +397,15 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
           />
         </div>
 
-        {!layout || tab.locked ? null : (
+        {tab.locked ? null : (
           <EmotionEditorToolbarTheme>
             <Toolbar
               className="theme-scope-editorToolbar"
               sx={{
                 display: settings.noToolbar ? "none" : "flex",
                 overflowY: "hidden",
-                minHeight: "50px"
+                minHeight: "50px",
+                backgroundColor: "red"
               }}
               editor={_editor}
               location="bottom"
@@ -420,41 +420,35 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
   );
 };
 
-const ContentDiv = memo(
-  forwardRef<
-    HTMLDivElement,
-    { padding: number; fontSize: number; fontFamily: string }
-  >((props, ref) => {
-    const { colors } = useThemeColors("editor");
-    return (
-      <div
-        ref={ref}
-        className="theme-scope-editor"
-        style={{
-          padding: 12,
-          paddingTop: props.padding,
-          color: colors.primary.paragraph,
-          marginTop: -12,
-          caretColor: colors.primary.accent,
-          fontSize: props.fontSize,
-          fontFamily: getFontById(props.fontFamily)?.font
-        }}
-      />
-    );
-  }),
-  (prev, next) => {
-    if (prev.fontSize !== next.fontSize || prev.fontFamily !== next.fontFamily)
-      return false;
-    return true;
-  }
-);
-
 const TiptapProvider = (): JSX.Element => {
   const settings = useSettings();
-
+  const { colors } = useThemeColors("editor");
+  const contentRef = useRef<HTMLElement>();
   return (
     <PortalProvider>
-      <Tiptap settings={settings} />
+      <Tiptap
+        settings={settings}
+        getContentDiv={() => {
+          if (contentRef.current) {
+            logger("info", "return content");
+            return contentRef.current;
+          }
+          logger("info", "new content");
+          const editorContainer = document.createElement("div");
+          editorContainer.classList.add("selectable");
+          editorContainer.style.flex = "1";
+          editorContainer.style.cursor = "text";
+          editorContainer.style.padding = "0px 12px";
+          editorContainer.style.color =
+            colors?.primary?.paragraph || colors.primary.paragraph;
+          editorContainer.style.paddingBottom = `150px`;
+          editorContainer.style.fontSize = `${settings.fontSize}px`;
+          editorContainer.style.fontFamily =
+            getFontById(settings.fontFamily)?.font || "sans-serif";
+          contentRef.current = editorContainer;
+          return editorContainer;
+        }}
+      />
     </PortalProvider>
   );
 };

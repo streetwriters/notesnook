@@ -405,6 +405,18 @@ export class Notes implements ICollection {
       }
     });
   }
+
+  async getBlocks(id: string) {
+    const note = await this.collection.get(id);
+    if (note?.locked || !note?.contentId) return [];
+    const rawContent = await this.db.content.get(note.contentId);
+    if (!rawContent || rawContent.locked) return [];
+
+    return getContentFromData(
+      rawContent.type,
+      rawContent?.data
+    ).extractBlocks();
+  }
 }
 
 function getNoteHeadline(content: Tiptap) {

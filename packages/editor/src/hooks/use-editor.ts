@@ -39,7 +39,7 @@ export const useEditor = (
 ) => {
   const editor = useMemo<Editor>(() => {
     const instance = new Editor(options);
-    if (instance && !Object.hasOwn(instance, "current")) {
+    if (instance && typeof instance.current === "undefined") {
       Object.defineProperty(instance, "current", {
         get: () => editorRef.current
       });
@@ -59,7 +59,10 @@ export const useEditor = (
       // than creating a new editor
       // This part below is copied from @tiptap/core
       if (options.editorProps) editor.view.setProps(options.editorProps);
-      if (options.content && options.content !== editor.options.content) {
+      if (
+        options.content !== undefined &&
+        options.content !== editor.options.content
+      ) {
         const doc = createDocument(
           options.content,
           editor.schema,

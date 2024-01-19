@@ -1,0 +1,307 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+import { ContentBlock, Note, VirtualizedGrouping } from "@notesnook/core";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useEffect, useRef, useState } from "react";
+import { TextInput, View } from "react-native";
+import { FlatList } from "react-native-actions-sheet";
+import { db } from "../../../common/database";
+import { useDBItem } from "../../../hooks/use-db-item";
+import { presentSheet } from "../../../services/event-manager";
+import { SIZE } from "../../../utils/size";
+import Input from "../../ui/input";
+import { PressableButton } from "../../ui/pressable";
+import Paragraph from "../../ui/typography/paragraph";
+import { Button } from "../../ui/button";
+
+const ListNoteItem = ({
+  id,
+  items,
+  onSelectNote
+}: {
+  id: any;
+  items: VirtualizedGrouping<Note> | undefined;
+  onSelectNote: any;
+}) => {
+  const [item] = useDBItem(id, "note", items);
+  return (
+    <PressableButton
+      onPress={() => {
+        if (!item) return;
+        onSelectNote(item as Note);
+      }}
+      type={"transparent"}
+      customStyle={{
+        paddingVertical: 12,
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "flex-start",
+        height: 50
+      }}
+    >
+      <View
+        style={{
+          flexShrink: 1
+        }}
+      >
+        <Paragraph numberOfLines={1}>{item?.title}</Paragraph>
+      </View>
+    </PressableButton>
+  );
+};
+
+const ListBlockItem = ({
+  item,
+  onSelectBlock
+}: {
+  item: ContentBlock;
+  onSelectBlock: any;
+}) => {
+  const { colors } = useThemeColors();
+  return (
+    <PressableButton
+      onPress={() => {
+        onSelectBlock(item);
+      }}
+      type={"transparent"}
+      customStyle={{
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "flex-start",
+        minHeight: 45
+      }}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
+        <Paragraph
+          style={{
+            flexShrink: 1
+          }}
+        >
+          {item?.content.length > 200
+            ? item?.content.slice(0, 200) + "..."
+            : item.content}
+        </Paragraph>
+
+        <View
+          style={{
+            borderRadius: 5,
+            backgroundColor: colors.secondary.background,
+            width: 30,
+            height: 30,
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+            {item.type.toUpperCase()}
+          </Paragraph>
+        </View>
+      </View>
+    </PressableButton>
+  );
+};
+
+export default function LinkNote() {
+  const { colors } = useThemeColors();
+  const query = useRef<string>();
+  const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
+  const nodesRef = useRef<ContentBlock[]>([]);
+  const [nodes, setNodes] = useState<ContentBlock[]>([]);
+
+  const inputRef = useRef<TextInput>();
+
+  const [selectedNote, setSelectedNote] = useState<Note>();
+  const [selectedNodeId, setSelectedNodeId] = useState<string>();
+
+  useEffect(() => {
+    db.notes.all.sorted(db.settings.getGroupOptions("notes")).then((notes) => {
+      setNotes(notes);
+    });
+  }, []);
+
+  const onChange = async (value: string) => {
+    query.current = value;
+    if (!selectedNote) {
+      const notes = await db.lookup.notes(value).sorted();
+      setNotes(notes);
+    } else {
+      if (value.startsWith("#")) {
+        const headingNodes = nodesRef.current.filter((n) =>
+          n.type.match(/(h1|h2|h3|h4|h5|h6)/g)
+        );
+        setNodes(
+          headingNodes.filter((n) => n.content.includes(value.slice(1)))
+        );
+      } else {
+        setNodes(nodesRef.current.filter((n) => n.content.includes(value)));
+      }
+    }
+  };
+
+  const onSelectNote = async (note: Note) => {
+    setSelectedNote(note);
+    inputRef.current?.clear();
+    setTimeout(async () => {
+      nodesRef.current = await db.notes.getBlocks(note.id);
+      setNodes(nodesRef.current);
+    });
+    // Fetch and set note's nodes.
+  };
+
+  const onSelectBlock = (block: ContentBlock) => {
+    setSelectedNodeId(block.id);
+  };
+
+  return (
+    <View
+      style={{
+        paddingHorizontal: 12,
+        height: "100%",
+        flexShrink: 1,
+        borderWidth: 2,
+        borderColor: "red"
+      }}
+    >
+      <View
+        style={{
+          flexDirection: "column",
+          width: "100%",
+          alignItems: "flex-start",
+          gap: 10
+        }}
+      >
+        <Input
+          placeholder={
+            selectedNote
+              ? "Search a section of a note to link to"
+              : "Search a note to link to"
+          }
+          containerStyle={{
+            width: "100%"
+          }}
+          marginBottom={0}
+          onChangeText={(value) => {
+            onChange(value);
+          }}
+        />
+
+        {selectedNote ? (
+          <View
+            style={{
+              gap: 10
+            }}
+          >
+            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+              SELECTED NOTE
+            </Paragraph>
+            <PressableButton
+              onPress={() => {
+                setSelectedNote(undefined);
+                setSelectedNodeId(undefined);
+                setNodes([]);
+              }}
+              customStyle={{
+                flexDirection: "row",
+                width: "100%",
+                justifyContent: "flex-start",
+                height: 45,
+                borderWidth: 1,
+                borderColor: colors.primary.accent,
+                paddingHorizontal: 12
+              }}
+              type="grayAccent"
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Paragraph numberOfLines={1}>{selectedNote?.title}</Paragraph>
+
+                <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+                  Tap to deselect
+                </Paragraph>
+              </View>
+            </PressableButton>
+
+            {nodes?.length > 0 ? (
+              <Paragraph
+                style={{
+                  marginBottom: 12
+                }}
+                color={colors.secondary.paragraph}
+                size={SIZE.xs}
+              >
+                LINK TO A SECTION
+              </Paragraph>
+            ) : null}
+          </View>
+        ) : null}
+      </View>
+
+      {selectedNote ? (
+        <FlatList
+          renderItem={({ item, index }) => (
+            <ListBlockItem item={item} onSelectBlock={onSelectBlock} />
+          )}
+          keyExtractor={(item) => item.id}
+          data={nodes}
+        />
+      ) : (
+        <FlatList
+          renderItem={({ item, index }: any) => (
+            <ListNoteItem
+              id={index}
+              items={notes}
+              onSelectNote={onSelectNote}
+            />
+          )}
+          data={notes?.placeholders}
+        />
+      )}
+
+      {selectedNote ? (
+        <Button
+          style={{
+            marginTop: 10
+          }}
+          title="Create link"
+          type="accent"
+          width="100%"
+        />
+      ) : null}
+    </View>
+  );
+}
+
+LinkNote.present = () => {
+  presentSheet({
+    component: () => <LinkNote />
+  });
+};

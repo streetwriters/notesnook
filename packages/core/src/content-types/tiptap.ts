@@ -18,10 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import showdown from "@streetwriters/showdown";
-import dataurl from "../utils/dataurl";
-import { extractFirstParagraph, getDummyDocument } from "../utils/html-parser";
-import { HTMLRewriter } from "../utils/html-rewriter";
-import { HTMLParser } from "../utils/html-parser";
+import render from "dom-serializer";
+import { find, isTag } from "domutils";
 import {
   DomNode,
   FormatOptions,
@@ -29,6 +27,15 @@ import {
   convert
 } from "html-to-text";
 import { BlockTextBuilder } from "html-to-text/lib/block-text-builder";
+import { parseDocument } from "htmlparser2";
+import dataurl from "../utils/dataurl";
+import {
+  HTMLParser,
+  extractFirstParagraph,
+  getDummyDocument
+} from "../utils/html-parser";
+import { HTMLRewriter } from "../utils/html-rewriter";
+import { ContentBlock } from "../types";
 
 export type ResolveHashes = (
   hashes: string[]
@@ -38,7 +45,8 @@ const ATTRIBUTES = {
   hash: "data-hash",
   mime: "data-mime",
   filename: "data-filename",
-  src: "src"
+  src: "src",
+  blockId: "data-block-id"
 };
 
 (showdown.helper as any).document = getDummyDocument();
@@ -54,38 +62,7 @@ export class Tiptap {
   }
 
   toTXT() {
-    return convert(this.data, {
-      wordwrap: 80,
-      preserveNewlines: true,
-      selectors: [
-        { selector: "table", format: "dataTable" },
-        { selector: "ul.checklist", format: "taskList" },
-        { selector: "p", format: "paragraph" }
-      ],
-      formatters: {
-        taskList: (elem, walk, builder, formatOptions) => {
-          return formatList(elem, walk, builder, formatOptions, (elem) => {
-            return elem.attribs.class && elem.attribs.class.includes("checked")
-              ? " ✅ "
-              : " ☐ ";
-          });
-        },
-        paragraph: (elem, walk, builder) => {
-          const { "data-spacing": dataSpacing } = elem.attribs;
-          if (elem.parent && elem.parent.name === "li") {
-            walk(elem.children, builder);
-          } else {
-            builder.openBlock({
-              leadingLineBreaks: dataSpacing == "single" ? 1 : 2
-            });
-            walk(elem.children, builder);
-            builder.closeBlock({
-              trailingLineBreaks: 1
-            });
-          }
-        }
-      }
-    });
+    return convertHtmlToTxt(this.data);
   }
 
   toMD() {
@@ -127,6 +104,30 @@ export class Tiptap {
         }
       }
     }).transform(this.data);
+  }
+
+  async extractBlocks() {
+    const nodes: ContentBlock[] = [];
+    const document = parseDocument(this.data);
+
+    const elements = find(
+      (element) => {
+        return isTag(element) && !!element.attribs[ATTRIBUTES.blockId];
+      },
+      document.childNodes,
+      false,
+      Infinity
+    );
+
+    for (const node of elements) {
+      if (!isTag(node)) continue;
+      nodes.push({
+        id: node.attribs[ATTRIBUTES.blockId],
+        type: node.tagName.toLowerCase(),
+        content: convertHtmlToTxt(render(node))
+      });
+    }
+    return nodes;
   }
 
   /**
@@ -230,6 +231,41 @@ export class Tiptap {
       hashes
     };
   }
+}
+
+function convertHtmlToTxt(html: string) {
+  return convert(html, {
+    wordwrap: 80,
+    preserveNewlines: true,
+    selectors: [
+      { selector: "table", format: "dataTable" },
+      { selector: "ul.checklist", format: "taskList" },
+      { selector: "p", format: "paragraph" }
+    ],
+    formatters: {
+      taskList: (elem, walk, builder, formatOptions) => {
+        return formatList(elem, walk, builder, formatOptions, (elem) => {
+          return elem.attribs.class && elem.attribs.class.includes("checked")
+            ? " ✅ "
+            : " ☐ ";
+        });
+      },
+      paragraph: (elem, walk, builder) => {
+        const { "data-spacing": dataSpacing } = elem.attribs;
+        if (elem.parent && elem.parent.name === "li") {
+          walk(elem.children, builder);
+        } else {
+          builder.openBlock({
+            leadingLineBreaks: dataSpacing == "single" ? 1 : 2
+          });
+          walk(elem.children, builder);
+          builder.closeBlock({
+            trailingLineBreaks: 1
+          });
+        }
+      }
+    }
+  });
 }
 
 function formatList(

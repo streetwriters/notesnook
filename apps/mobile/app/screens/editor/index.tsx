@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { EV, EVENTS } from "@notesnook/core/dist/common";
+import { useThemeColors } from "@notesnook/theme";
 import React, {
   forwardRef,
   useCallback,
@@ -29,13 +30,9 @@ import React, {
   useState
 } from "react";
 import {
-  Dimensions,
-  Keyboard,
   Platform,
   ScrollView,
   TextInput,
-  TouchableOpacity,
-  View,
   ViewStyle,
   useWindowDimensions
 } from "react-native";
@@ -43,15 +40,23 @@ import WebView from "react-native-webview";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
+import { Button } from "../../components/ui/button";
 import { IconButton } from "../../components/ui/icon-button";
+import Input from "../../components/ui/input";
+import Seperator from "../../components/ui/seperator";
+import Heading from "../../components/ui/typography/heading";
+import Paragraph from "../../components/ui/typography/paragraph";
+import { useDBItem } from "../../hooks/use-db-item";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useKeyboard from "../../hooks/use-keyboard";
+import BiometicService from "../../services/biometrics";
 import {
   ToastManager,
   eSendEvent,
-  eSubscribeEvent,
-  openVault
+  eSubscribeEvent
 } from "../../services/event-manager";
 import { getElevationStyle } from "../../utils/elevation";
+import { eOnLoadNote, eUnlockNote } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
 import EditorOverlay from "./loading";
 import { EDITOR_URI } from "./source";
@@ -60,20 +65,6 @@ import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { useTabStore } from "./tiptap/use-tab-store";
 import { editorController, editorState } from "./tiptap/utils";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import { useThemeColors } from "@notesnook/theme";
-import { Button } from "../../components/ui/button";
-import Heading from "../../components/ui/typography/heading";
-import Seperator from "../../components/ui/seperator";
-import Paragraph from "../../components/ui/typography/paragraph";
-import { useDBItem } from "../../hooks/use-db-item";
-import Input from "../../components/ui/input";
-import BiometicService from "../../services/biometrics";
-import { eOnLoadNote, eUnlockNote } from "../../utils/events";
-import Menu, {
-  MenuItem,
-  MenuDivider
-} from "react-native-reanimated-material-menu";
 
 const style: ViewStyle = {
   height: "100%",

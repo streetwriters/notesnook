@@ -23,13 +23,13 @@ import {
   themeToCSS,
   useThemeEngineStore
 } from "@notesnook/theme";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Freeze } from "react-freeze";
 import "./App.css";
 import Tiptap from "./components/editor";
 import { TabContext, useTabStore } from "./hooks/useTabStore";
 import { EmotionEditorTheme } from "./theme-factory";
-import { EventTypes, getTheme } from "./utils";
+import { getTheme } from "./utils";
 
 const currentTheme = getTheme();
 if (currentTheme) {
@@ -39,7 +39,6 @@ if (currentTheme) {
 function App(): JSX.Element {
   const tabs = useTabStore((state) => state.tabs);
   const currentTab = useTabStore((state) => state.currentTab);
-
   return (
     <ScopedThemeProvider value="base">
       <EmotionEditorTheme>
