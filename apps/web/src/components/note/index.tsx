@@ -42,6 +42,7 @@ import {
   Publish,
   Export,
   Duplicate,
+  InternalLink,
   Sync,
   Trash,
   Circle,
@@ -59,7 +60,7 @@ import {
   showAddTagsDialog,
   showMoveNoteDialog
 } from "../../common/dialog-controller";
-import { store, useStore } from "../../stores/note-store";
+import { store } from "../../stores/note-store";
 import { store as userstore } from "../../stores/user-store";
 import { useEditorStore } from "../../stores/editor-store";
 import { store as tagStore } from "../../stores/tag-store";
@@ -83,7 +84,8 @@ import {
   Note,
   Notebook as NotebookItem,
   Tag,
-  DefaultColors
+  DefaultColors,
+  createInternalLink
 } from "@notesnook/core";
 import { MenuItem } from "@notesnook/ui";
 import {
@@ -93,6 +95,7 @@ import {
 } from "../list-container/types";
 import { SchemeColors } from "@notesnook/theme";
 import Vault from "../../common/vault";
+import { writeToClipboard } from "../../utils/clipboard";
 
 type NoteProps = {
   tags?: TagsWithDateEdited;
@@ -497,6 +500,20 @@ const menuItems: (
             onClick: () => copyNote(note.id, "md")
           }
         ]
+      }
+    },
+    {
+      type: "button",
+      key: "copy-link",
+      title: "Copy internal link",
+      icon: InternalLink.path,
+      onClick: () => {
+        const link = createInternalLink("note", note.id);
+        writeToClipboard({
+          "text/plain": link,
+          "text/html": `<a href="${link}">${note.title}</a>`,
+          "text/markdown": `[${note.title}](${link})`
+        });
       }
     },
     {

@@ -37,6 +37,7 @@ import { ThemeMetadata } from "@notesnook/themes-server";
 import { Color, Reminder, Tag } from "@notesnook/core";
 import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
 import { createRoot } from "react-dom/client";
+import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -97,6 +98,19 @@ export function showAddNotebookDialog(parentId?: string) {
       }}
     />
   ));
+}
+
+export function showNoteLinkingDialog(attr?: LinkAttributes) {
+  return showDialog<"NoteLinkingDialog", LinkAttributes | undefined>(
+    "NoteLinkingDialog",
+    (Dialog, perform) => (
+      <Dialog
+        attributes={attr}
+        onDone={(link) => perform(link)}
+        onClose={() => perform(undefined)}
+      />
+    )
+  );
 }
 
 export async function showEditNotebookDialog(notebookId: string) {

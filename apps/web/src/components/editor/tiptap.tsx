@@ -58,10 +58,13 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
-import { writeText } from "clipboard-polyfill";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 import { getChangedNodes } from "@notesnook/editor/dist/utils/prosemirror";
+import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
+import { writeToClipboard } from "../../utils/clipboard";
+import { useEditorStore } from "../../stores/editor-store";
+import { parseInternalLink } from "@notesnook/core";
 
 export type OnChangeHandler = (content: () => string) => void;
 type TipTapProps = {
@@ -74,6 +77,9 @@ type TipTapProps = {
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
   onPreviewAttachment?: (attachment: Attachment) => void;
+  onInsertInternalLink?: (
+    attributes?: LinkAttributes
+  ) => Promise<LinkAttributes | undefined>;
   onAttachFile?: (file: File) => void;
   onFocus?: () => void;
   content?: () => string | undefined;
@@ -108,6 +114,7 @@ function TipTap(props: TipTapProps) {
     onInsertAttachment,
     onDownloadAttachment,
     onPreviewAttachment,
+    onInsertInternalLink,
     onAttachFile,
     onContentChange,
     onFocus = () => {},
@@ -217,9 +224,14 @@ function TipTap(props: TipTapProps) {
         const preventSave = transaction?.getMeta("preventSave") as boolean;
         if (preventSave || !editor.isEditable || !onChange) return;
 
-        onChange(() =>
-          getHTMLFromFragment(editor.state.doc.content, editor.schema)
-        );
+        onChange(() => {
+          const html = getHTMLFromFragment(
+            editor.state.doc.content,
+            editor.schema
+          );
+          console.log(html);
+          return html;
+        });
       },
       onDestroy: () => {
         useEditorManager.getState().setEditor(id);
@@ -230,8 +242,8 @@ function TipTap(props: TipTapProps) {
           canUndo: editor.can().undo()
         });
       },
-      copyToClipboard(text) {
-        writeText(text);
+      copyToClipboard(text, html) {
+        writeToClipboard({ "text/plain": text, "text/html": html });
       },
       onSelectionUpdate: debounce(({ editor, transaction }) => {
         const isEmptySelection = transaction.selection.empty;
@@ -260,21 +272,17 @@ function TipTap(props: TipTapProps) {
           };
         });
       }, 500),
-      onOpenAttachmentPicker: (_editor, type) => {
-        onInsertAttachment?.(type);
-        return true;
-      },
-      onDownloadAttachment: (_editor, attachment) => {
-        onDownloadAttachment?.(attachment);
-        return true;
-      },
-      onPreviewAttachment(_editor, attachment) {
-        onPreviewAttachment?.(attachment);
-        return true;
-      },
-      onOpenLink: (url) => {
-        window.open(url, "_blank");
-        return true;
+      openAttachmentPicker: onInsertAttachment,
+      downloadAttachment: onDownloadAttachment,
+      previewAttachment: onPreviewAttachment,
+      createInternalLink: onInsertInternalLink,
+      openLink: (url) => {
+        const link = parseInternalLink(url);
+        if (link && link.type === "note") {
+          useEditorStore.getState().openSession(link.id, {
+            activeBlockId: link.params?.blockId || undefined
+          });
+        } else window.open(url, "_blank");
       }
     };
   }, [readonly, nonce, doubleSpacedLines, dateFormat, timeFormat]);
@@ -412,25 +420,25 @@ function toIEditor(editor: Editor): IEditor {
   return {
     focus: ({ position, scrollIntoView } = {}) => {
       if (typeof position === "object")
-        editor.current?.chain().focus().setTextSelection(position).run();
+        editor.chain().focus().setTextSelection(position).run();
       else
-        editor.current?.commands.focus(position, {
+        editor.commands.focus(position, {
           scrollIntoView
         });
     },
-    undo: () => editor.current?.commands.undo(),
-    redo: () => editor.current?.commands.redo(),
+    undo: () => editor.commands.undo(),
+    redo: () => editor.commands.redo(),
     getMediaHashes: () => {
-      if (!editor.current) return [];
+      if (!editor) return [];
       const hashes: string[] = [];
-      editor.current.state.doc.descendants((n) => {
+      editor.state.doc.descendants((n) => {
         if (typeof n.attrs.hash === "string") hashes.push(n.attrs.hash);
       });
       return hashes;
     },
     updateContent: (content) => {
       const { from, to } = editor.state.selection;
-      editor.current
+      editor
         ?.chain()
         .command(({ tr }) => {
           tr.setMeta("preventSave", true);
@@ -445,21 +453,21 @@ function toIEditor(editor: Editor): IEditor {
     },
     attachFile: (file: Attachment) => {
       if (file.dataurl) {
-        editor.current?.commands.insertImage({
+        editor.commands.insertImage({
           ...file,
           bloburl: toBlobURL(file.dataurl, file.hash)
         });
-      } else editor.current?.commands.insertAttachment(file);
+      } else editor.commands.insertAttachment(file);
     },
     loadWebClip: (hash, src) =>
-      editor.current?.commands.updateWebClip({ hash }, { src }),
+      editor.commands.updateWebClip({ hash }, { src }),
     loadImage: (hash, dataurl) =>
-      editor.current?.commands.updateImage(
+      editor.commands.updateImage(
         { hash },
         { hash, bloburl: toBlobURL(dataurl, hash), preventUpdate: true }
       ),
     sendAttachmentProgress: (hash, type, progress) =>
-      editor.current?.commands.setAttachmentProgress({
+      editor.commands.setAttachmentProgress({
         hash,
         type,
         progress

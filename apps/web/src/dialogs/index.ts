@@ -52,6 +52,7 @@ const MigrationDialog = React.lazy(() => import("./migration-dialog"));
 const EmailChangeDialog = React.lazy(() => import("./email-change-dialog"));
 const AddTagsDialog = React.lazy(() => import("./add-tags-dialog"));
 const ThemeDetailsDialog = React.lazy(() => import("./theme-details-dialog"));
+const NoteLinkingDialog = React.lazy(() => import("./note-linking-dialog"));
 
 export const Dialogs = {
   AddNotebookDialog,
@@ -79,5 +80,6 @@ export const Dialogs = {
   EmailChangeDialog,
   AddTagsDialog,
   SettingsDialog,
-  ThemeDetailsDialog
+  ThemeDetailsDialog,
+  NoteLinkingDialog
 };

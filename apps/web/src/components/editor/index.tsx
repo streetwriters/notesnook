@@ -59,6 +59,8 @@ import { EditorActionBar } from "./action-bar";
 import { UnlockView } from "../unlock";
 import DiffViewer from "../diff-viewer";
 import TableOfContents from "./table-of-contents";
+import { showNoteLinkingDialog } from "../../common/dialog-controller";
+import { scrollIntoViewById } from "@notesnook/editor";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -428,6 +430,7 @@ export function Editor(props: EditorProps) {
     isMobile: false
   };
   const [isLoading, setIsLoading] = useState(true);
+  useScrollToBlock(id);
 
   useEffect(() => {
     const event = AppEventManager.subscribe(
@@ -528,13 +531,18 @@ export function Editor(props: EditorProps) {
           const mime = type === "file" ? "*/*" : "image/*";
           insertAttachment(mime).then((file) => {
             if (!file) return;
-            // editor.current?.attachFile(file);
+            // editor.attachFile(file);
           });
         }}
         onAttachFile={async (file) => {
           const result = await attachFile(file);
           if (!result) return;
-          // editor.current?.attachFile(result);
+          // editor.attachFile(result);
+        }}
+        onInsertInternalLink={async (attributes) => {
+          const link = await showNoteLinkingDialog(attributes);
+          console.log(link);
+          return link;
         }}
       >
         {headless ? null : (
@@ -806,6 +814,16 @@ function useDragOverlay() {
   return [dropElementRef, overlayRef] as const;
 }
 
+function useScrollToBlock(id: string) {
+  const blockId = useEditorStore(
+    (store) => store.getSession(id)?.activeBlockId
+  );
+  useEffect(() => {
+    if (!blockId) return;
+    scrollIntoViewById(blockId);
+  }, [blockId]);
+}
+
 function isFile(e: DragEvent) {
   return (
     e.dataTransfer &&
@@ -815,6 +833,9 @@ function isFile(e: DragEvent) {
 }
 
 function restoreScrollPosition(id: string) {
+  const session = useEditorStore.getState().getActiveSession();
+  if (session?.activeBlockId) return scrollIntoViewById(session.activeBlockId);
+
   const scrollContainer = document.getElementById(`${id}_editorScroll`);
   const scrollPosition = Config.get(`${id}:scroll-position`, 0);
   if (scrollContainer) {

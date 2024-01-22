@@ -209,7 +209,8 @@ import {
   mdiDesktopClassic,
   mdiBellBadgeOutline,
   mdiDotsHorizontal,
-  mdiFormatListBulleted
+  mdiFormatListBulleted,
+  mdiLink
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -405,6 +406,7 @@ export const Copy = createIcon(mdiContentCopy);
 export const Refresh = createIcon(mdiRefresh);
 export const Clock = createIcon(mdiClockTimeFiveOutline);
 export const Duplicate = createIcon(mdiContentDuplicate);
+export const InternalLink = createIcon(mdiLink);
 export const Select = createIcon(mdiCheckboxMultipleMarkedCircleOutline);
 export const NotebookEdit = createIcon(mdiBookEditOutline);
 export const DeleteForver = createIcon(mdiDeleteForeverOutline);
