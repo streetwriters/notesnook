@@ -59,6 +59,11 @@ export type BaseEditorSession = {
   pinned?: boolean;
   preview?: boolean;
   title?: string;
+
+  /**
+   * The id of block to scroll to after opening the session successfully.
+   */
+  activeBlockId?: string;
 };
 
 export type LockedEditorSession = BaseEditorSession & {
@@ -199,7 +204,6 @@ class EditorStore extends BaseStore<EditorStore> {
       const session = getSession(activeSessionId);
       if (!session) return;
 
-      console.log("OPENING", session);
       if (session.type === "diff") openDiffSession(session.note.id, session.id);
       else if (session.type === "new") activateSession(session.id);
       else openSession(activeSessionId);
@@ -243,7 +247,7 @@ class EditorStore extends BaseStore<EditorStore> {
     });
   };
 
-  activateSession = (id?: string) => {
+  activateSession = (id?: string, activeBlockId?: string) => {
     const session = this.get().sessions.find((s) => s.id === id);
     if (!session) id = undefined;
 
@@ -265,6 +269,11 @@ class EditorStore extends BaseStore<EditorStore> {
       if (history.includes(id)) history.splice(history.indexOf(id), 1);
       history.push(id);
     }
+
+    if (activeBlockId && session)
+      this.updateSession(session.id, [session.type], {
+        activeBlockId: activeBlockId
+      });
   };
 
   openDiffSession = async (noteId: string, sessionId: string) => {
@@ -301,14 +310,14 @@ class EditorStore extends BaseStore<EditorStore> {
 
   openSession = async (
     noteOrId: string | Note | BaseTrashItem<Note>,
-    force = false
+    options: { force?: boolean; activeBlockId?: string } = {}
   ): Promise<void> => {
     const { getSession } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
     const session = getSession(noteId);
 
-    if (session && !force && !session.needsHydration) {
-      return this.activateSession(noteId);
+    if (session && !options.force && !session.needsHydration) {
+      return this.activateSession(noteId, options.activeBlockId);
     }
 
     if (session && session.id) await db.fs().cancel(session.id);
@@ -325,7 +334,8 @@ class EditorStore extends BaseStore<EditorStore> {
         type: "locked",
         id: note.id,
         note,
-        preview: isPreview
+        preview: isPreview,
+        activeBlockId: options.activeBlockId
       });
     } else if (note.conflicted) {
       const content = note.contentId
@@ -346,7 +356,7 @@ class EditorStore extends BaseStore<EditorStore> {
             dateResolved: Date.now()
           });
         }
-        return this.openSession(note, true);
+        return this.openSession(note, { ...options, force: true });
       }
 
       this.addSession({
@@ -354,7 +364,8 @@ class EditorStore extends BaseStore<EditorStore> {
         content: content,
         id: note.id,
         note,
-        preview: isPreview
+        preview: isPreview,
+        activeBlockId: options.activeBlockId
       });
     } else {
       const content = note.contentId
@@ -364,7 +375,7 @@ class EditorStore extends BaseStore<EditorStore> {
       if (content?.locked) {
         note.locked = true;
         await db.notes.add({ id: note.id, locked: true });
-        return this.openSession(note, true);
+        return this.openSession(note, { ...options, force: true });
       }
 
       if (note.type === "trash") {
@@ -372,14 +383,16 @@ class EditorStore extends BaseStore<EditorStore> {
           type: "deleted",
           note,
           id: note.id,
-          content
+          content,
+          activeBlockId: options.activeBlockId
         });
       } else if (note.readonly) {
         this.addSession({
           type: "readonly",
           note,
           id: note.id,
-          content
+          content,
+          activeBlockId: options.activeBlockId
         });
       } else {
         const attachmentsLength = await db.attachments
@@ -394,7 +407,8 @@ class EditorStore extends BaseStore<EditorStore> {
           sessionId: `${Date.now()}`,
           attachmentsLength,
           content,
-          preview: isPreview
+          preview: isPreview,
+          activeBlockId: options.activeBlockId
         });
       }
     }
