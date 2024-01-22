@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Node, mergeAttributes, findChildren, Editor } from "@tiptap/core";
+import { Node, mergeAttributes, findChildren } from "@tiptap/core";
 import { Attribute } from "@tiptap/core";
 import { createSelectionBasedNodeView } from "../react";
 import { AttachmentComponent } from "./component";
@@ -25,9 +25,6 @@ import { AttachmentComponent } from "./component";
 export type AttachmentType = "image" | "file" | "camera";
 export interface AttachmentOptions {
   HTMLAttributes: Record<string, unknown>;
-  onDownloadAttachment: (editor: Editor, attachment: Attachment) => boolean;
-  onOpenAttachmentPicker: (editor: Editor, type: AttachmentType) => boolean;
-  onPreviewAttachment: (editor: Editor, attachment: Attachment) => boolean;
 }
 
 export type AttachmentWithProgress = AttachmentProgress & Attachment;
@@ -48,12 +45,9 @@ export type AttachmentProgress = {
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     attachment: {
-      openAttachmentPicker: (type: AttachmentType) => ReturnType;
       insertAttachment: (attachment: Attachment) => ReturnType;
       removeAttachment: () => ReturnType;
-      downloadAttachment: (attachment: Attachment) => ReturnType;
       setAttachmentProgress: (progress: AttachmentProgress) => ReturnType;
-      previewAttachment: (options: Attachment) => ReturnType;
     };
   }
 }
@@ -67,10 +61,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
 
   addOptions() {
     return {
-      HTMLAttributes: {},
-      onDownloadAttachment: () => false,
-      onOpenAttachmentPicker: () => false,
-      onPreviewAttachment: () => false
+      HTMLAttributes: {}
     };
   },
 
@@ -143,16 +134,6 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
         ({ commands }) => {
           return commands.deleteSelection();
         },
-      downloadAttachment:
-        (attachment) =>
-        ({ editor }) => {
-          return this.options.onDownloadAttachment(editor, attachment);
-        },
-      openAttachmentPicker:
-        (type: AttachmentType) =>
-        ({ editor }) => {
-          return this.options.onOpenAttachmentPicker(editor, type);
-        },
       setAttachmentProgress:
         (options) =>
         ({ state, tr, dispatch }) => {
@@ -173,20 +154,14 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
           tr.setMeta("addToHistory", false);
           if (dispatch) dispatch(tr);
           return true;
-        },
-
-      previewAttachment:
-        (attachment) =>
-        ({ editor }) => {
-          if (!this.options.onPreviewAttachment) return false;
-          return this.options.onPreviewAttachment(editor, attachment);
         }
     };
   },
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Shift-A": () => this.editor.commands.openAttachmentPicker("file")
+      "Mod-Shift-A": () =>
+        this.editor.storage.openAttachmentPicker?.("file") || true
     };
   }
 

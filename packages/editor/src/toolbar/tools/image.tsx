@@ -70,11 +70,7 @@ export function ImageAlignLeft(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setImageAlignment({ align: "left" })
-          .run()
+        editor?.chain().focus().setImageAlignment({ align: "left" }).run()
       }
     />
   );
@@ -87,11 +83,7 @@ export function ImageAlignRight(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setImageAlignment({ align: "right" })
-          .run()
+        editor?.chain().focus().setImageAlignment({ align: "right" }).run()
       }
     />
   );
@@ -104,11 +96,7 @@ export function ImageAlignCenter(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setImageAlignment({ align: "center" })
-          .run()
+        editor?.chain().focus().setImageAlignment({ align: "center" }).run()
       }
     />
   );

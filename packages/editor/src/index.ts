@@ -26,7 +26,7 @@ import CharacterCount from "@tiptap/extension-character-count";
 import { Code } from "@tiptap/extension-code";
 import Color from "@tiptap/extension-color";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
-import { Link } from "./extensions/link";
+import { Link, LinkAttributes } from "./extensions/link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
@@ -39,7 +39,11 @@ import StarterKit from "@tiptap/starter-kit";
 import ListKeymap from "@tiptap/extension-list-keymap";
 import { useEffect, useMemo } from "react";
 import "./extensions";
-import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
+import {
+  Attachment,
+  AttachmentNode,
+  AttachmentType
+} from "./extensions/attachment";
 import BulletList from "./extensions/bullet-list";
 import { CodeBlock } from "./extensions/code-block";
 import { Codemark } from "./extensions/code-mark";
@@ -53,13 +57,13 @@ import { KeepInView } from "./extensions/keep-in-view";
 import { KeyMap } from "./extensions/key-map";
 import { ListItem } from "./extensions/list-item";
 import { MathBlock, MathInline } from "./extensions/math";
-import { OpenLink, OpenLinkOptions } from "./extensions/open-link";
 import OrderedList from "./extensions/ordered-list";
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Paragraph } from "./extensions/paragraph";
 import {
   NodeViewSelectionNotifier,
+  PortalProviderAPI,
   usePortalProvider
 } from "./extensions/react";
 import { SearchReplace } from "./extensions/search-replace";
@@ -75,11 +79,29 @@ import Toolbar from "./toolbar";
 import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { DownloadOptions } from "./utils/downloader";
 import { Heading } from "./extensions/heading";
-import Clipboard, { ClipboardOptions } from "./extensions/clipboard";
+import Clipboard from "./extensions/clipboard";
 import Blockquote from "./extensions/blockquote";
 import { Quirks } from "./extensions/quirks";
 import { LIST_NODE_TYPES } from "./utils/node-types";
 import BlockId from "./extensions/block-id";
+
+interface TiptapStorage {
+  portalProviderAPI?: PortalProviderAPI;
+  dateFormat?: DateTimeOptions["dateFormat"];
+  timeFormat?: DateTimeOptions["timeFormat"];
+  openLink?: (url: string) => void;
+  downloadAttachment?: (attachment: Attachment) => void;
+  openAttachmentPicker?: (type: AttachmentType) => void;
+  previewAttachment?: (attachment: Attachment) => void;
+  copyToClipboard?: (text: string, html?: string) => void;
+  createInternalLink?: (
+    attributes?: LinkAttributes
+  ) => Promise<LinkAttributes | undefined>;
+}
+
+declare module "@tiptap/core" {
+  interface EditorStorage extends TiptapStorage {}
+}
 
 declare global {
   // eslint-disable-next-line no-var
@@ -99,12 +121,10 @@ const CoreExtensions = Object.entries(TiptapCoreExtensions)
   .map(([, extension]) => extension);
 
 export type TiptapOptions = EditorOptions &
-  Omit<AttachmentOptions, "HTMLAttributes"> &
   Omit<WebClipOptions, "HTMLAttributes"> &
   Omit<ImageOptions, "HTMLAttributes"> &
   DateTimeOptions &
-  ClipboardOptions &
-  OpenLinkOptions & {
+  Omit<TiptapStorage, "portalProviderAPI"> & {
     downloadOptions?: DownloadOptions;
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
@@ -115,17 +135,19 @@ const useTiptap = (
   deps: React.DependencyList = []
 ) => {
   const {
-    doubleSpacedLines = true,
-    isMobile,
-    onDownloadAttachment,
-    onOpenAttachmentPicker,
-    onPreviewAttachment,
-    onOpenLink,
+    downloadAttachment,
+    openAttachmentPicker,
+    previewAttachment,
+    openLink,
     onBeforeCreate,
-    downloadOptions,
     dateFormat,
     timeFormat,
     copyToClipboard,
+    createInternalLink,
+
+    doubleSpacedLines = true,
+    isMobile,
+    downloadOptions,
     editorProps,
     ...restOptions
   } = options;
@@ -236,9 +258,7 @@ const useTiptap = (
           allowTableNodeSelection: true,
           cellMinWidth: 50
         }),
-        Clipboard.configure({
-          copyToClipboard
-        }),
+        Clipboard,
         TableRow,
         TableCell,
         TableHeader,
@@ -253,16 +273,9 @@ const useTiptap = (
         Placeholder.configure({
           placeholder: "Start writing your note..."
         }),
-        OpenLink.configure({
-          onOpenLink
-        }),
         ImageNode.configure({ allowBase64: true }),
         EmbedNode,
-        AttachmentNode.configure({
-          onDownloadAttachment,
-          onOpenAttachmentPicker,
-          onPreviewAttachment
-        }),
+        AttachmentNode,
         OutlineListItem,
         OutlineList.configure({ keepAttributes: true, keepMarks: true }),
         ListItem,
@@ -312,22 +325,31 @@ const useTiptap = (
         editor.storage.portalProviderAPI = PortalProviderAPI;
         editor.storage.dateFormat = dateFormat;
         editor.storage.timeFormat = timeFormat;
+
+        editor.storage.openLink = openLink;
+        editor.storage.downloadAttachment = downloadAttachment;
+        editor.storage.openAttachmentPicker = openAttachmentPicker;
+        editor.storage.previewAttachment = previewAttachment;
+        editor.storage.copyToClipboard = copyToClipboard;
+        editor.storage.createInternalLink = createInternalLink;
+
         if (onBeforeCreate) onBeforeCreate({ editor });
       },
       injectCSS: false,
       parseOptions: { preserveWhitespace: true }
     }),
     [
-      onPreviewAttachment,
-      onDownloadAttachment,
-      onOpenAttachmentPicker,
+      previewAttachment,
+      downloadAttachment,
+      openAttachmentPicker,
       PortalProviderAPI,
       onBeforeCreate,
-      onOpenLink,
+      openLink,
       dateFormat,
       timeFormat,
       editorProps,
-      copyToClipboard
+      copyToClipboard,
+      createInternalLink
     ]
   );
 

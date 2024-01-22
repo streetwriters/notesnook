@@ -83,6 +83,7 @@ import {
 } from "./embed";
 import {
   AddLink,
+  AddInternalLink,
   EditLink,
   RemoveLink,
   LinkSettings,
@@ -107,6 +108,7 @@ const tools = {
   subscript: Subscript,
   superscript: Superscript,
   clearformatting: ClearFormatting,
+  addInternalLink: AddInternalLink,
   addLink: AddLink,
   editLink: EditLink,
   removeLink: RemoveLink,

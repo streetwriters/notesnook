@@ -34,6 +34,7 @@ import {
 import { ReactNodeView } from "./react-node-view";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
 import { EmotionThemeProvider } from "@notesnook/theme";
+import { PortalProviderAPI } from "./react-portal-provider";
 
 /**
  * A ReactNodeView that handles React components sensitive
@@ -72,9 +73,10 @@ export class SelectionBasedNodeView<
     node: PMNode,
     editor: Editor,
     getPos: GetPosNode,
+    portalProviderAPI: PortalProviderAPI,
     options: ReactNodeViewOptions<P>
   ) {
-    super(node, editor, getPos, options);
+    super(node, editor, getPos, portalProviderAPI, options);
 
     this.updatePos();
 
@@ -277,9 +279,16 @@ export function createSelectionBasedNodeView<
 ) {
   return ({ node, getPos, editor }: NodeViewRendererProps) => {
     const _getPos = () => (typeof getPos === "boolean" ? -1 : getPos());
-    return new SelectionBasedNodeView(node, editor as Editor, _getPos, {
-      ...options,
-      component
-    }).init();
+    if (!editor.storage.portalProviderAPI) return {};
+    return new SelectionBasedNodeView(
+      node,
+      editor as Editor,
+      _getPos,
+      editor.storage.portalProviderAPI,
+      {
+        ...options,
+        component
+      }
+    ).init();
   };
 }

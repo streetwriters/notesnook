@@ -90,10 +90,10 @@ function _ListTool<TListStyleTypes extends string>(
               variant={"menuitem"}
               sx={{ width: 80 }}
               onClick={() => {
-                let chain = editor.current?.chain().focus();
-                if (!chain || !editor.current) return;
+                let chain = editor.chain().focus();
+                if (!chain || !editor) return;
 
-                if (!isListActive(editor.current)) {
+                if (!isListActive(editor)) {
                   if (type === "bulletList") chain = chain.toggleBulletList();
                   else chain = chain.toggleOrderedList();
                 }
@@ -120,7 +120,7 @@ export function NumberedList(props: ToolProps) {
   const { editor } = props;
 
   const onClick = useCallback(
-    () => editor.current?.chain().focus().toggleOrderedList().run(),
+    () => editor.chain().focus().toggleOrderedList().run(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -154,7 +154,7 @@ export function NumberedList(props: ToolProps) {
 export function BulletList(props: ToolProps) {
   const { editor } = props;
   const onClick = useCallback(
-    () => editor.current?.chain().focus().toggleBulletList().run(),
+    () => editor.chain().focus().toggleBulletList().run(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -185,9 +185,7 @@ export function Indent(props: ToolProps) {
     <ToolButton
       {...toolProps}
       toggled={false}
-      onClick={() =>
-        editor.current?.chain().focus().sinkListItem(listItemType).run()
-      }
+      onClick={() => editor.chain().focus().sinkListItem(listItemType).run()}
     />
   );
 }
@@ -203,9 +201,7 @@ export function Outdent(props: ToolProps) {
     <ToolButton
       {...toolProps}
       toggled={false}
-      onClick={() =>
-        editor.current?.chain().focus().liftListItem(listItemType).run()
-      }
+      onClick={() => editor.chain().focus().liftListItem(listItemType).run()}
     />
   );
 }

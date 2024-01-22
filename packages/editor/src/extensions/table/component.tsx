@@ -82,6 +82,8 @@ export function TableComponent(props: ReactNodeViewProps) {
 }
 
 export function TableNodeView(editor: TiptapEditor) {
+  if (!editor.storage.portalProviderAPI) return;
+  const api = editor.storage.portalProviderAPI;
   class TableNode
     extends ReactNodeView<ReactNodeViewProps<unknown>>
     implements NodeView
@@ -91,6 +93,7 @@ export function TableNodeView(editor: TiptapEditor) {
         node,
         editor,
         () => 0, // todo
+        api,
         {
           component: TableComponent,
           shouldUpdate: (prev, next) => {
@@ -161,9 +164,9 @@ function TableRowToolbar(props: TableToolbarProps) {
       }
     }
 
-    editor.current?.on("selectionUpdate", onSelectionUpdate);
+    editor.on("selectionUpdate", onSelectionUpdate);
     return () => {
-      editor.current?.off("selectionUpdate", onSelectionUpdate);
+      editor.off("selectionUpdate", onSelectionUpdate);
     };
   }, [textDirection]);
 
@@ -234,9 +237,9 @@ function TableColumnToolbar(props: TableToolbarProps) {
       columnToolsRef.current.style.top = `${pos.top}px`;
     }
 
-    editor.current?.on("selectionUpdate", onSelectionUpdate);
+    editor.on("selectionUpdate", onSelectionUpdate);
     return () => {
-      editor.current?.off("selectionUpdate", onSelectionUpdate);
+      editor.off("selectionUpdate", onSelectionUpdate);
     };
   }, []);
 

@@ -68,12 +68,11 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
         hoverTimeoutId.current = setTimeout(
           () => {
             const PopupHandler = handlers.find((h) => h.isActive(element));
-            if (!PopupHandler || !editor.current) return;
+            if (!PopupHandler || !editor) return;
 
             const { popup: Popup } = PopupHandler;
-            const pos = editor.current.view.posAtDOM(element, 0);
-            const node = editor.current.view.state.doc.nodeAt(pos);
-
+            const pos = editor.view.posAtDOM(element, 0);
+            const node = editor.view.state.doc.nodeAt(pos);
             if (!node) return;
 
             const hidePopup = showPopup({
@@ -93,7 +92,8 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
                 target: element,
                 align: "center",
                 location: "top",
-                isTargetAbsolute: true
+                isTargetAbsolute: true,
+                yOffset: -30
               }
             });
             activePopup.current = { element, hide: hidePopup };

@@ -67,7 +67,7 @@ export function ImageComponent(
 
   const imageRef = useRef<HTMLImageElement>(null);
   const downloadOptions = useToolbarStore((store) => store.downloadOptions);
-  const isReadonly = !editor.current?.isEditable;
+  const isReadonly = !editor.isEditable;
   const isSVG = !!mime && mime.includes("/svg");
   const relativeHeight = aspectRatio
     ? editor.view.dom.clientWidth / aspectRatio
@@ -247,7 +247,7 @@ export function ImageComponent(
             onDoubleClick={() => {
               const { hash, filename, mime, size } = node.attrs;
               if (!!hash && !!filename && !!mime && !!size)
-                editor.current?.commands.previewAttachment({
+                editor.storage.previewAttachment?.({
                   hash,
                   filename,
                   mime,

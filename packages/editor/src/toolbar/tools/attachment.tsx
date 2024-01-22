@@ -60,7 +60,7 @@ export function DownloadAttachment(props: ToolProps) {
           findSelectedNode(editor, "image");
 
         const attachment = (attachmentNode?.attrs || {}) as Attachment;
-        editor.current?.chain().focus().downloadAttachment(attachment).run();
+        editor.storage.downloadAttachment?.(attachment);
       }}
     />
   );
@@ -85,7 +85,7 @@ export function PreviewAttachment(props: ToolProps) {
           findSelectedNode(editor, "image");
 
         const attachment = (attachmentNode?.attrs || {}) as Attachment;
-        editor.current?.commands.previewAttachment(attachment);
+        editor.storage.previewAttachment?.(attachment);
       }}
     />
   );
@@ -97,7 +97,7 @@ export function RemoveAttachment(props: ToolProps) {
     <ToolButton
       {...props}
       toggled={false}
-      onClick={() => editor.current?.chain().focus().removeAttachment().run()}
+      onClick={() => editor.chain().focus().removeAttachment().run()}
     />
   );
 }

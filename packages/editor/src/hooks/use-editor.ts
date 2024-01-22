@@ -37,15 +37,7 @@ export const useEditor = (
   options: Partial<EditorOptions> = {},
   deps: DependencyList = []
 ) => {
-  const editor = useMemo<Editor>(() => {
-    const instance = new Editor(options);
-    if (instance && typeof instance.current === "undefined") {
-      Object.defineProperty(instance, "current", {
-        get: () => editorRef.current
-      });
-    }
-    return instance;
-  }, []);
+  const editor = useMemo<Editor>(() => new Editor(options), []);
   const forceUpdate = useForceUpdate();
   const editorRef = useRef<TiptapEditor>(editor);
 

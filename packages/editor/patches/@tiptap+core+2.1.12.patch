@@ -1,0 +1,49 @@
+diff --git a/node_modules/@tiptap/core/dist/index.js b/node_modules/@tiptap/core/dist/index.js
+index 38c9884..2dad7fe 100644
+--- a/node_modules/@tiptap/core/dist/index.js
++++ b/node_modules/@tiptap/core/dist/index.js
+@@ -1876,8 +1876,21 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
+     return lift$1(state, dispatch);
+ };
+ 
+-const liftEmptyBlock = () => ({ state, dispatch }) => {
+-    return liftEmptyBlock$1(state, dispatch);
++const liftEmptyBlock = () => ({ state, dispatch, editor }) => {
++    return liftEmptyBlock$1(state, (tr) => {
++        if (!dispatch) return true;
++
++        const { selection, storedMarks } = state;
++        const marks = storedMarks || (selection.$to.parentOffset && selection.$from.marks());
++
++        const { splittableMarks } = editor.extensionManager;
++        const filteredMarks = marks.filter((mark) =>
++            splittableMarks.includes(mark.type.name)
++        );
++        tr.ensureMarks(filteredMarks)
++
++        return dispatch(tr);
++    });
+ };
+ 
+ const liftListItem = typeOrName => ({ state, dispatch }) => {
+diff --git a/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts b/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
+index cb0ede6..8a19ff2 100644
+--- a/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
++++ b/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
+@@ -6,6 +6,7 @@ import { ExtensionManager } from './ExtensionManager.js';
+ import * as extensions from './extensions/index.js';
+ import { CanCommands, ChainedCommands, EditorEvents, EditorOptions, JSONContent, SingleCommands, TextSerializer } from './types.js';
+ export { extensions };
++export interface EditorStorage extends Record<string, any> { }
+ export interface HTMLElement {
+     editor?: Editor;
+ }
+@@ -22,7 +23,7 @@ export declare class Editor extends EventEmitter<EditorEvents> {
+     /**
+      * Returns the editor storage.
+      */
+-    get storage(): Record<string, any>;
++    get storage(): EditorStorage;
+     /**
+      * An object of all registered commands.
+      */

@@ -51,7 +51,7 @@ export function ImageProperties(props: ImagePropertiesProps) {
             height: 0
           };
 
-      editor.current?.chain().setImageSize(size).run();
+      editor.chain().setImageSize(size).run();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [width, height]

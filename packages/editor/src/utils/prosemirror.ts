@@ -124,14 +124,12 @@ export function findMark(
 export function selectionToOffset(
   state: EditorState
 ): NodeWithOffset | undefined {
-  const { from, $from } = state.selection;
+  const { from, $from, to, $to } = state.selection;
   const node = state.doc.nodeAt(from);
-  if (!node) return;
-
   return {
-    node,
+    node: node || undefined,
     from: from - $from.textOffset,
-    to: from - $from.textOffset + node.nodeSize
+    to: node ? from - $from.textOffset + node.nodeSize : to - $to.textOffset
   };
 }
 

@@ -40,7 +40,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
 
   const search = useCallback(
     (term: string) => {
-      editor.current?.commands.search(term, {
+      editor.commands.search(term, {
         matchCase,
         enableRegex,
         matchWholeWord
@@ -121,7 +121,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  editor.current?.commands.moveToNextResult();
+                  editor.commands.moveToNextResult();
                 }
               }}
             />
@@ -219,7 +219,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               title="Previous match"
               id="previousMatch"
               icon="previousMatch"
-              onClick={() => editor.current?.commands.moveToPreviousResult()}
+              onClick={() => editor.commands.moveToPreviousResult()}
               sx={{ mr: 0 }}
               iconSize={"big"}
             />
@@ -228,7 +228,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               title="Next match"
               id="nextMatch"
               icon="nextMatch"
-              onClick={() => editor.current?.commands.moveToNextResult()}
+              onClick={() => editor.commands.moveToNextResult()}
               sx={{ mr: 0 }}
               iconSize={"big"}
             />
@@ -237,7 +237,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               title="Close"
               id="close"
               icon="close"
-              onClick={() => editor.current?.chain().focus().endSearch().run()}
+              onClick={() => editor.chain().focus().endSearch().run()}
               sx={{ mr: 0 }}
               iconSize={"big"}
             />
@@ -249,9 +249,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 title="Replace"
                 id="replace"
                 icon="replaceOne"
-                onClick={() =>
-                  editor.current?.commands.replace(replaceText.current)
-                }
+                onClick={() => editor.commands.replace(replaceText.current)}
                 sx={{ mr: 0 }}
                 iconSize={18}
               />
@@ -260,9 +258,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 title="Replace all"
                 id="replaceAll"
                 icon="replaceAll"
-                onClick={() =>
-                  editor.current?.commands.replaceAll(replaceText.current)
-                }
+                onClick={() => editor.commands.replaceAll(replaceText.current)}
                 sx={{ mr: 0 }}
                 iconSize={18}
               />

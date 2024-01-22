@@ -49,25 +49,13 @@ export function FontSize(props: ToolProps) {
       title="Font size"
       disabled={editor.isActive(CodeBlock.name)}
       onDecrease={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setFontSize(`${decreaseFontSize()}px`)
-          .run()
+        editor?.chain().focus().setFontSize(`${decreaseFontSize()}px`).run()
       }
       onIncrease={() => {
-        editor.current
-          ?.chain()
-          .focus()
-          .setFontSize(`${increaseFontSize()}px`)
-          .run();
+        editor?.chain().focus().setFontSize(`${increaseFontSize()}px`).run();
       }}
       onReset={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setFontSize(`${defaultFontSize}px`)
-          .run()
+        editor?.chain().focus().setFontSize(`${defaultFontSize}px`).run()
       }
       value={fontSize || `${defaultFontSize}px`}
     />
@@ -108,8 +96,7 @@ function toMenuItems(editor: Editor, currentFontFamily: string): MenuItem[] {
       type: "button",
       title: font.title,
       isChecked: font.id === currentFontFamily,
-      onClick: () =>
-        editor.current?.chain().focus().setFontFamily(font.id).run(),
+      onClick: () => editor.chain().focus().setFontFamily(font.id).run(),
       styles: {
         title: {
           fontFamily: font.font
