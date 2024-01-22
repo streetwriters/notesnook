@@ -19,16 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ToolProps } from "../types";
 import { ToolButton } from "../components/tool-button";
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
 import { LinkPopup } from "../popups/link-popup";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { MoreTools } from "../components/more-tools";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { findMark, selectionToOffset } from "../../utils/prosemirror";
-import { TextSelection } from "prosemirror-state";
 import { Flex, Link } from "@theme-ui/components";
 import { ImageNode } from "../../extensions/image";
+import { Link as LinkNode } from "../../extensions/link";
+import { getMarkAttributes } from "@tiptap/core";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
@@ -53,49 +54,42 @@ export function LinkSettings(props: ToolProps) {
 export function AddLink(props: ToolProps) {
   const { editor } = props;
 
-  const isActive = props.editor.isActive("link");
-
-  const onDone = useCallback(
-    (link: LinkDefinition) => {
-      const { href, text, isImage } = link;
-      if (!href) return;
-
-      let commandChain = editor.current?.chain().focus();
-      if (!commandChain) return;
-
-      const isSelection = !editor.current?.state.selection.empty;
-
-      commandChain = commandChain
-        .extendMarkRange("link")
-        .toggleLink({ href, target: "_blank" });
-      if (!isImage) commandChain = commandChain.insertContent(text || href);
-
-      commandChain = commandChain.focus();
-
-      if (!isSelection && !isImage)
-        commandChain = commandChain.unsetMark("link").insertContent(" ");
-
-      commandChain.run();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  const isActive = editor.isActive("link");
 
   if (isActive) return <EditLink {...props} icon={"linkEdit"} />;
   return (
     <LinkTool
       {...props}
-      onDone={onDone}
+      onDone={(attributes) => editor.commands.toggleLink(attributes)}
       onClick={() => {
-        if (!editor.current) return;
-        const { state } = editor.current;
-        const { from, to } = state.selection;
+        if (!editor) return;
+        const selectedText = editor.state.doc.textBetween(
+          editor.state.selection.from,
+          editor.state.selection.to
+        );
+        return { title: selectedText, href: "" };
+      }}
+    />
+  );
+}
 
-        const isImage = state.doc.nodeAt(from)?.type.name === ImageNode.name;
-        if (isImage) return { isImage };
+export function AddInternalLink(props: ToolProps) {
+  const { editor } = props;
+  const isActive = editor.isActive(LinkNode.name);
 
-        const selectedText = state.doc.textBetween(from, to);
-        return { text: selectedText };
+  if (isActive) return null;
+  return (
+    <ToolButton
+      {...props}
+      onClick={async () => {
+        const link = await editor.storage.createInternalLink?.();
+        if (!link) return;
+
+        const selectedText = editor.state.doc.textBetween(
+          editor.state.selection.from,
+          editor.state.selection.to
+        );
+        editor.commands.setLink({ ...link, title: selectedText || link.title });
       }}
     />
   );
@@ -106,66 +100,32 @@ export function EditLink(props: ToolProps) {
   const selectedNode = useRefValue(
     _selectedNode || selectionToOffset(editor.state)
   );
+  const { node } = _selectedNode || {};
+  const link = node ? findMark(node, LinkNode.name) : null;
+  const attrs = link?.attrs || getMarkAttributes(editor.state, LinkNode.name);
 
-  const onDone = useCallback(
-    (link: LinkDefinition) => {
-      if (!selectedNode.current) return;
+  if (attrs && isInternalLink(attrs.href))
+    return (
+      <ToolButton
+        {...props}
+        onClick={async () => {
+          const link = await editor.storage.createInternalLink?.();
+          if (!link) return;
+          const { from, to } = editor.state.selection;
+          if (selectedNode.current)
+            editor.commands.setTextSelection(selectedNode.current);
+          editor.commands.setLink(link);
+          if (selectedNode.current)
+            editor.commands.setTextSelection({ from, to });
+        }}
+      />
+    );
 
-      const { href, text, isImage } = link;
-      const { from, node, to } = selectedNode.current;
-      if (!href || !editor.current || !node) return;
-
-      const mark = findMark(node, "link");
-      if (!mark) return;
-
-      const selection = editor.current.state.selection;
-
-      let commandChain = editor.current.chain();
-
-      if (!isImage) {
-        commandChain = commandChain.command(({ tr }) => {
-          tr.removeMark(from, to, mark.type);
-          tr.insertText(
-            text || node.textContent,
-            tr.mapping.map(from),
-            tr.mapping.map(to)
-          );
-          tr.setSelection(
-            TextSelection.create(
-              tr.doc,
-              tr.mapping.map(from),
-              tr.mapping.map(to)
-            )
-          );
-          return true;
-        });
-      }
-
-      commandChain
-        .extendMarkRange("link")
-        .toggleLink({ href, target: "_blank" })
-        .command(({ tr }) => {
-          tr.setSelection(
-            TextSelection.create(
-              tr.doc,
-              tr.mapping.map(selection.from),
-              tr.mapping.map(selection.to)
-            )
-          );
-          return true;
-        })
-        .focus(undefined, { scrollIntoView: true })
-        .run();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-  if (!editor.current?.isEditable) return null;
   return (
     <LinkTool
       {...props}
       isEditing
-      onDone={onDone}
+      onDone={(attributes) => editor.commands.setLink(attributes)}
       onClick={() => {
         if (!selectedNode.current) return;
 
@@ -177,9 +137,8 @@ export function EditLink(props: ToolProps) {
 
         if (!mark) return;
         return {
-          text: selectedText,
-          href: mark.attrs.href,
-          isImage: node.type.name === ImageNode.name
+          title: selectedText,
+          href: mark.attrs.href
         };
       }}
     />
@@ -188,18 +147,18 @@ export function EditLink(props: ToolProps) {
 
 export function RemoveLink(props: ToolProps) {
   const { editor, selectedNode } = props;
-  if (!editor.current?.isEditable) return null;
+  if (!editor.isEditable) return null;
   return (
     <ToolButton
       {...props}
       toggled={false}
       onClick={() => {
         if (selectedNode)
-          editor.current?.commands.setTextSelection({
+          editor.commands.setTextSelection({
             from: selectedNode.from,
             to: selectedNode.to
           });
-        editor.current?.chain().focus().unsetLink().run();
+        editor.chain().focus().unsetLink().run();
       }}
     />
   );
@@ -221,7 +180,7 @@ export function OpenLink(props: ToolProps) {
         href={href}
         onClick={(e) => {
           e.preventDefault();
-          editor.commands.openLink(href);
+          editor.storage.openLink?.(href);
         }}
         target="_blank"
         variant="body"
@@ -244,7 +203,7 @@ export function OpenLink(props: ToolProps) {
         {...props}
         toggled={false}
         onClick={() => {
-          editor.commands.openLink(href);
+          editor.storage.openLink?.(href);
         }}
       />
     </Flex>
@@ -266,16 +225,20 @@ export function CopyLink(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() => {
-        editor.commands.copyToClipboard(href);
+        editor.storage.copyToClipboard?.(
+          href,
+          `<a href="${href}">${
+            selectedNode.current?.node?.textContent || link?.attrs.title
+          }</a>`
+        );
       }}
     />
   );
 }
 
 export type LinkDefinition = {
-  href?: string;
-  text?: string;
-  isImage?: boolean;
+  href: string;
+  title?: string;
 };
 type LinkToolProps = ToolProps & {
   isEditing?: boolean;
@@ -288,6 +251,7 @@ function LinkTool(props: LinkToolProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const [linkDefinition, setLinkDefinition] = useState<LinkDefinition>();
+  const isImageActive = editor.isActive(ImageNode.name);
 
   return (
     <>
@@ -317,13 +281,14 @@ function LinkTool(props: LinkToolProps) {
         items={[]}
         onClose={() => {
           setIsOpen(false);
-          editor.current?.commands.focus();
+          editor.commands.focus();
         }}
         focusOnRender={false}
       >
         <LinkPopup
           link={linkDefinition}
           isEditing={isEditing}
+          isImageActive={isImageActive}
           onClose={() => setIsOpen(false)}
           onDone={(link) => {
             onDone(link);
@@ -333,4 +298,8 @@ function LinkTool(props: LinkToolProps) {
       </ResponsivePresenter>
     </>
   );
+}
+
+function isInternalLink(href: string) {
+  return href.startsWith("nn://");
 }

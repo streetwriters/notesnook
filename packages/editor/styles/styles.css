@@ -87,6 +87,22 @@
   cursor: pointer;
 }
 
+.ProseMirror a[href^="nn://"]::before {
+  display: inline-block;
+  cursor: pointer;
+  content: "";
+  background-size: 14px;
+  width: 14px;
+  height: 14px;
+
+  background-color: var(--accent);
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTMgMWMtMS4xMSAwLTIgLjg5LTIgMnYxMWMwIDEuMTEuODkgMiAyIDJoMTFjMS4xMSAwIDItLjg5IDItMnYtM2gtMnYzSDNWM2gxMXYyaDJWM2MwLTEuMTEtLjg5LTItMi0yTTkgN2MtMS4xMSAwLTIgLjg5LTIgMnYzaDJWOWgxMXYxMUg5di0ySDd2MmMwIDEuMTEuODkgMiAyIDJoMTFjMS4xMSAwIDItLjg5IDItMlY5YzAtMS4xMS0uODktMi0yLTJ6Ii8+PC9zdmc+)
+    no-repeat 50% 50%;
+  mask-size: cover;
+
+  margin-right: 2px;
+}
+
 .ProseMirror a:hover {
   filter: brightness(70%);
 }

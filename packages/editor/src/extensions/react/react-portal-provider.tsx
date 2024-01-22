@@ -18,12 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { PropsWithChildren, useContext } from "react";
-import {
-  createPortal,
-  unstable_renderSubtreeIntoContainer,
-  unmountComponentAtNode
-} from "react-dom";
+import { createPortal } from "react-dom";
 import { EventDispatcher } from "./event-dispatcher";
+import { Root, createRoot } from "react-dom/client";
 
 export type BasePortalProviderProps = PropsWithChildren<unknown>;
 
@@ -33,12 +30,8 @@ export type PortalRendererState = {
   portals: Portals;
 };
 
-type MountedPortal = {
-  children: () => React.ReactChild | null;
-};
-
 export class PortalProviderAPI extends EventDispatcher {
-  portals: Map<HTMLElement, MountedPortal> = new Map();
+  portals: Map<HTMLElement, Root> = new Map();
   context?: PortalRenderer;
 
   constructor() {
@@ -56,17 +49,17 @@ export class PortalProviderAPI extends EventDispatcher {
   ) {
     if (!this.context) return;
 
-    this.portals.set(container, {
-      children
-    });
-    const wrappedChildren = children() as JSX.Element;
+    //  const wrappedChildren = children() as JSX.Element;
 
-    unstable_renderSubtreeIntoContainer(
-      this.context,
-      wrappedChildren,
-      container,
-      callback
-    );
+    // unstable_renderSubtreeIntoContainer(
+    //   this.context,
+    //   wrappedChildren,
+    //   container,
+    //   callback
+    // );
+    const root = this.portals.get(container) || createRoot(container);
+    root.render(children());
+    this.portals.set(container, root);
   }
 
   // TODO: until https://product-fabric.atlassian.net/browse/ED-5013
@@ -75,6 +68,7 @@ export class PortalProviderAPI extends EventDispatcher {
   forceUpdate() {}
 
   remove(container: HTMLElement) {
+    const root = this.portals.get(container);
     this.portals.delete(container);
 
     // There is a race condition that can happen caused by Prosemirror vs React,
@@ -84,7 +78,8 @@ export class PortalProviderAPI extends EventDispatcher {
     // Both Prosemirror and React remove the elements asynchronously, and in edge
     // cases Prosemirror beats React
     try {
-      unmountComponentAtNode(container);
+      root?.unmount();
+      // unmountComponentAtNode(container);
     } catch (error) {
       // IGNORE console.error(error);
     }

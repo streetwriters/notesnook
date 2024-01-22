@@ -107,7 +107,7 @@ const horizontalRule = (editor: Editor): MenuItem => ({
   title: "Horizontal rule",
   icon: Icons.horizontalRule,
   isChecked: editor?.isActive("horizontalRule"),
-  onClick: () => editor.current?.chain().focus().setHorizontalRule().run()
+  onClick: () => editor.chain().focus().setHorizontalRule().run()
 });
 
 const codeblock = (editor: Editor): MenuItem => ({
@@ -116,7 +116,7 @@ const codeblock = (editor: Editor): MenuItem => ({
   title: "Code block",
   icon: Icons.codeblock,
   isChecked: editor?.isActive("codeBlock"),
-  onClick: () => editor.current?.chain().focus().toggleCodeBlock().run(),
+  onClick: () => editor.chain().focus().toggleCodeBlock().run(),
   modifier: "Mod-Shift-C"
 });
 
@@ -126,7 +126,7 @@ const blockquote = (editor: Editor): MenuItem => ({
   title: "Quote",
   icon: Icons.blockquote,
   isChecked: editor?.isActive("blockQuote"),
-  onClick: () => editor.current?.chain().focus().toggleBlockquote().run(),
+  onClick: () => editor.chain().focus().toggleBlockquote().run(),
   modifier: "Mod-Shift-B"
 });
 
@@ -136,7 +136,7 @@ const mathblock = (editor: Editor): MenuItem => ({
   title: "Math & formulas",
   icon: Icons.mathBlock,
   isChecked: editor?.isActive("mathBlock"),
-  onClick: () => editor.current?.chain().focus().insertMathBlock().run(),
+  onClick: () => editor.chain().focus().insertMathBlock().run(),
   modifier: "Mod-Shift-M"
 });
 
@@ -183,8 +183,7 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         type: "button",
         title: "Upload from disk",
         icon: Icons.upload,
-        onClick: () =>
-          editor.current?.chain().focus().openAttachmentPicker("image").run(),
+        onClick: () => editor.storage.openAttachmentPicker?.("image"),
         modifier: "Mod-Shift-I"
       },
       {
@@ -193,8 +192,7 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         title: "Take a photo using camera",
         icon: Icons.camera,
         isHidden: !isMobile,
-        onClick: () =>
-          editor.current?.chain().focus().openAttachmentPicker("camera").run()
+        onClick: () => editor.storage.openAttachmentPicker?.("camera")
       },
       isMobile ? uploadImageFromURLMobile(editor) : uploadImageFromURL(editor)
     ]
@@ -215,7 +213,7 @@ const table = (editor: Editor): MenuItem => ({
         component: (props) => (
           <TablePopup
             onInsertTable={(size) => {
-              editor.current
+              editor
                 ?.chain()
                 .focus()
                 .insertTable({
@@ -249,7 +247,7 @@ const embedMobile = (editor: Editor): MenuItem => ({
               title="Insert embed"
               onClose={(embed) => {
                 if (!embed) return onClick?.();
-                editor.current?.chain().insertEmbed(embed).run();
+                editor.chain().insertEmbed(embed).run();
                 onClick?.();
               }}
             />
@@ -273,7 +271,7 @@ const embedDesktop = (editor: Editor): MenuItem => ({
           title="Insert embed"
           onClose={(embed) => {
             if (!embed) return hide();
-            editor.current?.chain().insertEmbed(embed).run();
+            editor.chain().insertEmbed(embed).run();
             hide();
           }}
         />
@@ -288,8 +286,7 @@ const attachment = (editor: Editor): MenuItem => ({
   title: "Attachment",
   icon: Icons.attachment,
   isChecked: editor?.isActive("attachment"),
-  onClick: () =>
-    editor.current?.chain().focus().openAttachmentPicker("file").run(),
+  onClick: () => editor.storage.openAttachmentPicker?.("file"),
   modifier: "Mod-Shift-A"
 });
 
@@ -299,7 +296,7 @@ const tasklist = (editor: Editor): MenuItem => ({
   title: "Task list",
   icon: Icons.checkbox,
   isChecked: editor?.isActive("taskList"),
-  onClick: () => editor.current?.chain().focus().toggleTaskList().run(),
+  onClick: () => editor.chain().focus().toggleTaskList().run(),
   modifier: "Mod-Shift-T"
 });
 
@@ -309,7 +306,7 @@ const outlinelist = (editor: Editor): MenuItem => ({
   title: "Outline list",
   icon: Icons.outlineList,
   isChecked: editor?.isActive("outlineList"),
-  onClick: () => editor.current?.chain().focus().toggleOutlineList().run(),
+  onClick: () => editor.chain().focus().toggleOutlineList().run(),
   modifier: "Mod-Shift-O"
 });
 

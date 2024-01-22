@@ -58,11 +58,11 @@ export function Toolbar(props: ToolbarProps) {
   const toolbarTools = useMemo(
     () =>
       isMobile
-        ? editor?.current?.isEditable
+        ? editor.isEditable
           ? [...MOBILE_STATIC_TOOLBAR_GROUPS, ...tools]
           : READONLY_MOBILE_STATIC_TOOLBAR_GROUPS
         : [...STATIC_TOOLBAR_GROUPS, ...tools],
-    [tools, isMobile]
+    [tools, editor.isEditable, isMobile]
   );
 
   const setToolbarLocation = useToolbarStore(

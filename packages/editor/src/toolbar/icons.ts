@@ -121,7 +121,8 @@ import {
   mdiCheckboxMultipleBlankOutline,
   mdiCheckboxMultipleMarked,
   mdiFormatFloatLeft,
-  mdiMessageOutline
+  mdiMessageOutline,
+  mdiVectorLink
 } from "@mdi/js";
 
 export const Icons = {
@@ -148,6 +149,7 @@ export const Icons = {
   bulletList: mdiFormatListBulleted,
   highlight: mdiFormatColorHighlight,
   textColor: mdiFormatColorText,
+  noteLink: mdiVectorLink,
   link: mdiLinkPlus,
   linkRemove: mdiLinkOff,
   openLink: mdiOpenInNew,

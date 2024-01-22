@@ -54,11 +54,7 @@ export function EmbedAlignLeft(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setEmbedAlignment({ align: "left" })
-          .run()
+        editor?.chain().focus().setEmbedAlignment({ align: "left" }).run()
       }
     />
   );
@@ -71,11 +67,7 @@ export function EmbedAlignRight(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setEmbedAlignment({ align: "right" })
-          .run()
+        editor?.chain().focus().setEmbedAlignment({ align: "right" }).run()
       }
     />
   );
@@ -88,11 +80,7 @@ export function EmbedAlignCenter(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setEmbedAlignment({ align: "center" })
-          .run()
+        editor?.chain().focus().setEmbedAlignment({ align: "center" }).run()
       }
     />
   );
@@ -136,14 +124,14 @@ export function EmbedProperties(props: ToolProps) {
           title="Embed properties"
           onClose={(newEmbed) => {
             if (!newEmbed) {
-              editor.current?.commands.setEmbedSize(embed);
+              editor.commands.setEmbedSize(embed);
             } else if (newEmbed.src !== embed.src)
-              editor.current?.commands.setEmbedSource(newEmbed.src);
+              editor.commands.setEmbedSource(newEmbed.src);
 
             setIsOpen(false);
           }}
           embed={embed}
-          onSizeChanged={(size) => editor.current?.commands.setEmbedSize(size)}
+          onSizeChanged={(size) => editor.commands.setEmbedSize(size)}
         />
       </ResponsivePresenter>
     </>

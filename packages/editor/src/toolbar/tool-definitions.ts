@@ -41,6 +41,10 @@ const tools: Record<ToolId, ToolDefinition> = {
     icon: "strikethrough",
     title: "Strikethrough"
   },
+  addInternalLink: {
+    icon: "noteLink",
+    title: "Add bi-directional note link"
+  },
   addLink: {
     icon: "link",
     title: "Link"
@@ -413,7 +417,7 @@ const defaultPresets: Record<"default" | "minimal", ToolbarDefinition> = {
     ["fontSize"],
     ["headings", "fontFamily"],
     ["checkList", "numberedList", "bulletList"],
-    ["addLink"],
+    ["addLink", "addInternalLink"],
     ["alignment", "textDirection"],
     ["clearformatting"]
   ],

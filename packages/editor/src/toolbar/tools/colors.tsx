@@ -135,8 +135,8 @@ export function Highlight(props: ToolProps) {
       title={"Background color"}
       onColorChange={(color) =>
         color
-          ? editor.current?.chain().setHighlight(color).run()
-          : editor.current?.chain().unsetHighlight().run()
+          ? editor.chain().focus().setHighlight(color).run()
+          : editor.chain().focus().unsetHighlight().run()
       }
     />
   );
@@ -152,8 +152,8 @@ export function TextColor(props: ToolProps) {
       title="Text color"
       onColorChange={(color) =>
         color
-          ? editor.current?.chain().setColor(color).run()
-          : editor.current?.chain().unsetColor().run()
+          ? editor.chain().focus().setColor(color).run()
+          : editor.chain().focus().unsetColor().run()
       }
     />
   );
