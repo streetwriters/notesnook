@@ -60,6 +60,7 @@ const EditProfilePictureDialog = React.lazy(
   () => import("./edit-profile-picture-dialog")
 );
 const ImagePickerDialog = React.lazy(() => import("./image-picker-dialog"));
+const NoteLinkingDialog = React.lazy(() => import("./note-linking-dialog"));
 
 export const Dialogs = {
   AddNotebookDialog,
@@ -91,5 +92,6 @@ export const Dialogs = {
   BackupPasswordDialog,
   CreateColorDialog,
   EditProfilePictureDialog,
-  ImagePickerDialog
+  ImagePickerDialog,
+  NoteLinkingDialog
 };

@@ -42,6 +42,7 @@ import {
 } from "@notesnook/core";
 import { createRoot } from "react-dom/client";
 import { PasswordDialogProps } from "../dialogs/password-dialog";
+import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -111,6 +112,19 @@ export function showAddNotebookDialog(parentId?: string) {
       }}
     />
   ));
+}
+
+export function showNoteLinkingDialog(attr?: LinkAttributes) {
+  return showDialog<"NoteLinkingDialog", LinkAttributes | undefined>(
+    "NoteLinkingDialog",
+    (Dialog, perform) => (
+      <Dialog
+        attributes={attr}
+        onDone={(link) => perform(link)}
+        onClose={() => perform(undefined)}
+      />
+    )
+  );
 }
 
 export async function showEditNotebookDialog(notebookId: string) {

@@ -59,10 +59,13 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
-import { writeText } from "clipboard-polyfill";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 import { getChangedNodes } from "@notesnook/editor/dist/utils/prosemirror";
+import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
+import { writeToClipboard } from "../../utils/clipboard";
+import { useEditorStore } from "../../stores/editor-store";
+import { parseInternalLink } from "@notesnook/core";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -80,6 +83,10 @@ type TipTapProps = {
   onPreviewAttachment?: (attachment: Attachment) => void;
   onGetAttachmentData?: (attachment: Attachment) => Promise<string | undefined>;
   onAttachFiles?: (files: File[]) => void;
+  onInsertInternalLink?: (
+    attributes?: LinkAttributes
+  ) => Promise<LinkAttributes | undefined>;
+  onAttachFile?: (file: File) => void;
   onFocus?: () => void;
   content?: () => string | undefined;
   readonly?: boolean;
@@ -115,6 +122,7 @@ function TipTap(props: TipTapProps) {
     onPreviewAttachment,
     onGetAttachmentData,
     onAttachFiles,
+    onInsertInternalLink,
     onContentChange,
     onFocus = () => {},
     content,
@@ -239,8 +247,8 @@ function TipTap(props: TipTapProps) {
           canUndo: editor.can().undo()
         });
       },
-      copyToClipboard(text) {
-        writeText(text);
+      copyToClipboard(text, html) {
+        writeToClipboard({ "text/plain": text, "text/html": html });
       },
       onSelectionUpdate: debounce(({ editor, transaction }) => {
         const isEmptySelection = transaction.selection.empty;
@@ -269,23 +277,19 @@ function TipTap(props: TipTapProps) {
           };
         });
       }, 500),
-      onOpenAttachmentPicker: (_editor, type) => {
-        onInsertAttachment?.(type);
-        return true;
-      },
-      onDownloadAttachment: (_editor, attachment) => {
-        onDownloadAttachment?.(attachment);
-        return true;
-      },
-      onPreviewAttachment(_editor, attachment) {
-        onPreviewAttachment?.(attachment);
-        return true;
-      },
-      onOpenLink: (url) => {
-        window.open(url, "_blank");
-        return true;
-      },
-      getAttachmentData: onGetAttachmentData
+      openAttachmentPicker: onInsertAttachment,
+      downloadAttachment: onDownloadAttachment,
+      previewAttachment: onPreviewAttachment,
+      createInternalLink: onInsertInternalLink,
+      getAttachmentData: onGetAttachmentData,
+      openLink: (url) => {
+        const link = parseInternalLink(url);
+        if (link && link.type === "note") {
+          useEditorStore.getState().openSession(link.id, {
+            activeBlockId: link.params?.blockId || undefined
+          });
+        } else window.open(url, "_blank");
+      }
     };
   }, [
     readonly,
@@ -429,17 +433,17 @@ function toIEditor(editor: Editor): IEditor {
   return {
     focus: ({ position, scrollIntoView } = {}) => {
       if (typeof position === "object")
-        editor.current?.chain().focus().setTextSelection(position).run();
+        editor.chain().focus().setTextSelection(position).run();
       else
-        editor.current?.commands.focus(position, {
+        editor.commands.focus(position, {
           scrollIntoView
         });
     },
-    undo: () => editor.current?.commands.undo(),
-    redo: () => editor.current?.commands.redo(),
+    undo: () => editor.commands.undo(),
+    redo: () => editor.commands.redo(),
     updateContent: (content) => {
       const { from, to } = editor.state.selection;
-      editor.current
+      editor
         ?.chain()
         .command(({ tr }) => {
           tr.setMeta("preventSave", true);
@@ -454,10 +458,10 @@ function toIEditor(editor: Editor): IEditor {
     },
     attachFile: (file: Attachment) =>
       file.type === "image"
-        ? editor.current?.commands.insertImage(file)
-        : editor.current?.commands.insertAttachment(file),
+        ? editor.commands.insertImage(file)
+        : editor.commands.insertAttachment(file),
     sendAttachmentProgress: (hash, progress) =>
-      editor.current?.commands.updateAttachment(
+      editor.commands.updateAttachment(
         {
           progress
         },
