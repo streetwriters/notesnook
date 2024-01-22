@@ -163,7 +163,7 @@ export function CodeblockComponent(
                 bg: "transparent"
               }}
               onClick={() => {
-                editor.commands.copyToClipboard(node.textContent);
+                editor.storage.copyToClipboard?.(node.textContent);
                 start();
               }}
               title="Copy to clipboard"

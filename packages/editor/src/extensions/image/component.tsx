@@ -66,7 +66,7 @@ export function ImageComponent(
   if (!align) align = textDirection ? "right" : "left";
 
   const downloadOptions = useToolbarStore((store) => store.downloadOptions);
-  const isReadonly = !editor.current?.isEditable;
+  const isReadonly = !editor.isEditable;
   const isSVG = !!mime && mime.includes("/svg");
 
   const { height, width } = clampSize(
@@ -79,7 +79,7 @@ export function ImageComponent(
     if (!inView) return;
     if (src || !hash || bloburl) return;
     (async function () {
-      const data = await editor.current?.storage
+      const data = await editor.storage
         .getAttachmentData?.(node.attrs)
         .catch(() => null);
       if (typeof data !== "string" || !data) return; // TODO: show error
@@ -271,7 +271,7 @@ export function ImageComponent(
             onDoubleClick={() => {
               const { hash, filename, mime, size } = node.attrs;
               if (!!hash && !!filename && !!mime && !!size)
-                editor.current?.commands.previewAttachment({
+                editor.storage.previewAttachment?.({
                   type: "image",
                   hash,
                   filename,

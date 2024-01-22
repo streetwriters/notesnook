@@ -36,16 +36,16 @@ export function TaskItemComponent(
   const isMobile = useIsMobile();
 
   const toggle = useCallback(() => {
-    if (!editor.isEditable || !editor.current) return false;
+    if (!editor.isEditable || !editor) return false;
 
-    const { empty, from, to } = editor.current.state.selection;
+    const { empty, from, to } = editor.state.selection;
     const selectedTaskItems = findChildrenInRange(
-      editor.current.state.doc,
+      editor.state.doc,
       { from, to },
       (node) => node.type.name === TaskItemNode.name
     );
     if (!empty && selectedTaskItems.findIndex((a) => a.node === node) > -1) {
-      editor.current.commands.command(({ tr }) => {
+      editor.commands.command(({ tr }) => {
         for (const { pos } of selectedTaskItems) {
           tr.setNodeMarkup(pos, null, { checked: !checked });
         }
@@ -152,12 +152,12 @@ export function TaskItemComponent(
                 cursor: "pointer"
               }}
               onClick={() => {
-                if (!editor.current) return;
+                if (!editor) return;
                 const pos = getPos();
 
                 // we need to get a fresh instance of the task list instead
                 // of using the one we got via props.
-                const node = editor.current.state.doc.nodeAt(pos);
+                const node = editor.state.doc.nodeAt(pos);
                 if (!node) return;
 
                 editor.commands.command(({ tr }) => {

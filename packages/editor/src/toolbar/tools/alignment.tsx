@@ -35,11 +35,7 @@ function AlignmentTool(props: AlignmentToolProps) {
     <ToolButton
       {...toolProps}
       onClick={() => {
-        editor.current
-          ?.chain()
-          .focus()
-          .setTextAlign(alignmentRef.current)
-          .run();
+        editor?.chain().focus().setTextAlign(alignmentRef.current).run();
       }}
       disabled={editor.isActive(CodeBlock.name)}
       toggled={false}

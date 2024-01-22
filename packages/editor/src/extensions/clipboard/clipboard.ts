@@ -27,35 +27,8 @@ import { clipboardTextParser } from "./clipboard-text-parser";
 import { clipboardTextSerializer } from "./clipboard-text-serializer";
 import { EditorView } from "prosemirror-view";
 
-declare module "@tiptap/core" {
-  interface Commands<ReturnType> {
-    clipboard: {
-      copyToClipboard: (text: string) => ReturnType;
-    };
-  }
-}
-
-export type ClipboardOptions = {
-  copyToClipboard: (text: string) => void;
-};
-
 export const Clipboard = Extension.create({
   name: "clipboard",
-
-  addOptions() {
-    return {
-      copyToClipboard: () => {}
-    };
-  },
-
-  addCommands() {
-    return {
-      copyToClipboard: (text: string) => (props) => {
-        this.options.copyToClipboard(text);
-        return true;
-      }
-    };
-  },
 
   addProseMirrorPlugins() {
     return [

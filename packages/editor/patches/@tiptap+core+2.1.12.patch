@@ -28,3 +28,24 @@ index 38c9884..4a9e10c 100644
  };
  
  const liftListItem = typeOrName => ({ state, dispatch }) => {
+diff --git a/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts b/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
+index cb0ede6..8a19ff2 100644
+--- a/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
++++ b/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
+@@ -6,6 +6,7 @@ import { ExtensionManager } from './ExtensionManager.js';
+ import * as extensions from './extensions/index.js';
+ import { CanCommands, ChainedCommands, EditorEvents, EditorOptions, JSONContent, SingleCommands, TextSerializer } from './types.js';
+ export { extensions };
++export interface EditorStorage extends Record<string, any> { }
+ export interface HTMLElement {
+     editor?: Editor;
+ }
+@@ -22,7 +23,7 @@ export declare class Editor extends EventEmitter<EditorEvents> {
+     /**
+      * Returns the editor storage.
+      */
+-    get storage(): Record<string, any>;
++    get storage(): EditorStorage;
+     /**
+      * An object of all registered commands.
+      */

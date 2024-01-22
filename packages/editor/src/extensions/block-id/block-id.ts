@@ -17,23 +17,35 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Node, NodeWithPos } from "@tiptap/core";
+import { Extension, NodeWithPos } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
 import { nanoid } from "nanoid";
 import { getChangedNodes } from "../../utils/prosemirror";
 
-const types: { [name: string]: boolean } = {
-  heading: true,
-  paragraph: true
-};
+const BLOCK_ID_TYPES = [
+  "paragraph",
+  "heading",
+  "blockquote",
+  "bulletList",
+  "orderedList",
+  "taskItem",
+  "taskList",
+  "table",
+  "codeblock",
+  "image",
+  "outlineList",
+  "mathBlock",
+  "webclip",
+  "embed"
+];
 
-export const BlockId = Node.create({
+export const BlockId = Extension.create({
   name: "blockId",
 
   addGlobalAttributes() {
     return [
       {
-        types: Object.keys(types),
+        types: BLOCK_ID_TYPES,
         attributes: {
           blockId: {
             default: null,
@@ -52,44 +64,37 @@ export const BlockId = Node.create({
       }
     ];
   },
+
   addProseMirrorPlugins() {
     return [
       new Plugin({
         appendTransaction: (transactions, oldState, newState) => {
-          // no changes
-          if (newState.doc === oldState.doc) {
-            return;
-          }
-          const tr = newState.tr;
+          const isDocChanged = transactions.some((tr) => tr.docChanged);
+          if (!isDocChanged) return null;
 
-          const blockIds = new Set<string>();
           const blocksWithoutBlockId: NodeWithPos[] = [];
-
-          for (const tr of transactions) {
-            blocksWithoutBlockId.push(
-              ...getChangedNodes(tr, {
-                descend: false,
-                predicate: (n) => {
-                  const shouldInclude =
-                    n.isBlock &&
-                    (!n.attrs.blockId || blockIds.has(n.attrs.blockId));
-
-                  if (n.attrs.blockId) blockIds.add(n.attrs.blockId);
-                  return shouldInclude;
-                }
-              })
-            );
+          newState.tr.doc.forEach((n, offset) => {
+            if (
+              n.isBlock &&
+              BLOCK_ID_TYPES.includes(n.type.name) &&
+              !n.attrs.blockId
+            )
+              blocksWithoutBlockId.push({ node: n, pos: offset });
+          });
+          if (blocksWithoutBlockId.length > 0) {
+            console.log(blocksWithoutBlockId);
+            const { tr } = newState;
+            for (const { node, pos } of blocksWithoutBlockId) {
+              const id = nanoid(8);
+              tr.setNodeMarkup(pos, undefined, {
+                ...node.attrs,
+                blockId: id
+              });
+            }
+            return tr;
           }
 
-          console.log(blocksWithoutBlockId);
-          for (const { node, pos } of blocksWithoutBlockId) {
-            const id = nanoid(8);
-            tr.setNodeMarkup(pos, undefined, {
-              ...node.attrs,
-              blockId: id
-            });
-          }
-          return tr;
+          return null;
         }
       })
     ];
