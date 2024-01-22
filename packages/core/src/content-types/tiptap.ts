@@ -36,6 +36,7 @@ import {
 } from "../utils/html-parser";
 import { HTMLRewriter } from "../utils/html-rewriter";
 import { ContentBlock } from "../types";
+import { InternalLink, parseInternalLink } from "../utils/internal-link";
 
 export type ResolveHashes = (
   hashes: string[]
@@ -46,6 +47,7 @@ const ATTRIBUTES = {
   mime: "data-mime",
   filename: "data-filename",
   src: "src",
+  href: "href",
   blockId: "data-block-id"
 };
 
@@ -142,8 +144,8 @@ export class Tiptap {
     }).transform(this.data);
   }
 
-  async extractAttachments(
-    store: (
+  async postProcess(
+    saveAttachment: (
       data: string,
       mime: string,
       filename?: string
@@ -151,13 +153,17 @@ export class Tiptap {
   ) {
     if (
       !this.data.includes(ATTRIBUTES.src) &&
-      !this.data.includes(ATTRIBUTES.hash)
+      !this.data.includes(ATTRIBUTES.hash) &&
+      // check for internal links
+      !this.data.includes("nn://")
     )
       return {
         data: this.data,
-        hashes: []
+        hashes: [],
+        internalLinks: []
       };
 
+    const internalLinks: InternalLink[] = [];
     const sources: {
       src: string;
       filename?: string;
@@ -168,6 +174,7 @@ export class Tiptap {
       ontag: (name, attr, pos) => {
         const hash = attr[ATTRIBUTES.hash];
         const src = attr[ATTRIBUTES.src];
+        const href = attr[ATTRIBUTES.href];
         if (name === "img" && !hash && src) {
           sources.push({
             src,
@@ -175,6 +182,10 @@ export class Tiptap {
             mime: attr[ATTRIBUTES.mime],
             id: `${pos.start}${pos.end}`
           });
+        } else if (name === "a" && href && href.startsWith("nn://")) {
+          const internalLink = parseInternalLink(href);
+          if (!internalLink) return;
+          internalLinks.push(internalLink);
         }
       }
     }).parse(this.data);
@@ -184,7 +195,7 @@ export class Tiptap {
       try {
         const { data, mimeType } = dataurl.toObject(image.src);
         if (!data) continue;
-        const hash = await store(data, mimeType, image.filename);
+        const hash = await saveAttachment(data, mimeType, image.filename);
         if (!hash) continue;
 
         images[image.id] = hash;
@@ -228,7 +239,8 @@ export class Tiptap {
 
     return {
       data: html,
-      hashes
+      hashes,
+      internalLinks
     };
   }
 }

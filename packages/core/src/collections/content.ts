@@ -33,6 +33,7 @@ import Database from "../api";
 import { getOutputType } from "./attachments";
 import { SQLCollection } from "../database/sql-collection";
 import { NoteContent } from "./session-content";
+import { InternalLink } from "../utils/internal-link";
 
 export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
   noteId,
@@ -96,7 +97,7 @@ export class Content implements ICollection {
       typeof content.data === "string" ? content.data : undefined;
 
     if (unencryptedData && content.type && content.noteId)
-      unencryptedData = await this.extractAttachments({
+      unencryptedData = await this.postProcess({
         type: content.type,
         data: unencryptedData,
         noteId: content.noteId
@@ -295,19 +296,22 @@ export class Content implements ICollection {
     await this.add(contentItem);
   }
 
-  async extractAttachments(
-    contentItem: NoteContent<false> & { noteId: string }
-  ) {
-    // if (contentItem.localOnly) return contentItem;
-
+  async postProcess(contentItem: NoteContent<false> & { noteId: string }) {
     const content = getContentFromData(contentItem.type, contentItem.data);
     if (!content) return contentItem.data;
-    const { data, hashes } = await content.extractAttachments(
+    const { data, hashes, internalLinks } = await content.postProcess(
       this.db.attachments.save
     );
 
+    await this.processInternalLinks(contentItem.noteId, internalLinks);
+    await this.processLinkedAttachments(contentItem.noteId, hashes);
+
+    return data;
+  }
+
+  private async processLinkedAttachments(noteId: string, hashes: string[]) {
     const noteAttachments = await this.db.relations
-      .from({ type: "note", id: contentItem.noteId }, "attachment")
+      .from({ type: "note", id: noteId }, "attachment")
       .selector.filter.select(["id", "hash"])
       .execute();
 
@@ -322,7 +326,7 @@ export class Content implements ICollection {
     for (const attachment of toDelete) {
       await this.db.relations.unlink(
         {
-          id: contentItem.noteId,
+          id: noteId,
           type: "note"
         },
         { id: attachment.id, type: "attachment" }
@@ -330,23 +334,57 @@ export class Content implements ICollection {
     }
 
     for (const hash of toAdd) {
-      // TODO: only get id instead of the whole object
-      const attachment = await this.db.attachments.attachment(hash);
+      const attachment = await this.db.attachments.all
+        .fields(["attachments.id"])
+        .find((eb) => eb("attachments.hash", "==", hash));
       if (!attachment) continue;
       await this.db.relations.add(
         {
-          id: contentItem.noteId,
+          id: noteId,
           type: "note"
         },
-        attachment
+        { id: attachment.id, type: "attachment" }
+      );
+    }
+  }
+
+  private async processInternalLinks(
+    noteId: string,
+    internalLinks: InternalLink[]
+  ) {
+    const links = await this.db.relations
+      .from({ type: "note", id: noteId }, "note")
+      .get();
+
+    const toDelete = links.filter((link) => {
+      return internalLinks.every((l) => l.id !== link.toId);
+    });
+
+    const toAdd = internalLinks.filter((link) => {
+      return links.every((l) => link.id !== l.toId);
+    });
+
+    for (const link of toDelete) {
+      await this.db.relations.unlink(
+        {
+          id: noteId,
+          type: "note"
+        },
+        { id: link.toId, type: link.toType }
       );
     }
 
-    // if (toAdd.length > 0) {
-    //   contentItem.dateModified = Date.now();
-    // }
-    // contentItem.data = data;
-    return data;
+    for (const link of toAdd) {
+      const note = await this.db.notes.exists(link.id);
+      if (!note) continue;
+      await this.db.relations.add(
+        {
+          id: noteId,
+          type: "note"
+        },
+        link
+      );
+    }
   }
 
   // async cleanup() {

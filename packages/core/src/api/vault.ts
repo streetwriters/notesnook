@@ -304,7 +304,7 @@ export default class Vault {
       data = rawContent.data;
       type = rawContent.type;
     } else if (data && type) {
-      data = await this.db.content.extractAttachments({
+      data = await this.db.content.postProcess({
         data,
         type,
         noteId: id

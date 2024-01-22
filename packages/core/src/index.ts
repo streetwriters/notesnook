@@ -21,3 +21,8 @@ export * from "./types";
 export { VirtualizedGrouping } from "./utils/virtualized-grouping";
 export { DefaultColors } from "./collections/colors";
 export { type BackupFile, type LegacyBackupFile } from "./database/backup";
+export {
+  createInternalLink,
+  parseInternalLink,
+  type InternalLink
+} from "./utils/internal-link";
