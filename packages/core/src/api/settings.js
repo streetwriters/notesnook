@@ -136,7 +136,7 @@ class Settings {
   }
   /**
    * Setting to -1 means never clear trash.
-   * @param {7 | 30 | 365 | -1} time
+   * @param {1 | 7 | 30 | 365 | -1} time
    */
   async setTrashCleanupInterval(time) {
     this._settings.trashCleanupInterval = time;
