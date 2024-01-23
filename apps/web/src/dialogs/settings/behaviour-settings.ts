@@ -125,6 +125,7 @@ export const BehaviourSettings: SettingsGroup[] = [
             selectedOption: () =>
               useSettingStore.getState().trashCleanupInterval.toString(),
             options: [
+              { value: "1", title: "Daily" },
               { value: "7", title: "Weekly" },
               { value: "30", title: "Monthly" },
               { value: "365", title: "Yearly" },
