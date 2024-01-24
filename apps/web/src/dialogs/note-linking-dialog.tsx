@@ -162,7 +162,7 @@ export default function NoteLinkingDialog(props: NoteLinkingDialogProps) {
                           sx={{ p: 1, width: "100%", textAlign: "left" }}
                           onClick={async () => {
                             setSelectedNote(note);
-                            setBlocks(await db.notes.getBlocks(note.id));
+                            setBlocks(await db.notes.contentBlocks(note.id));
                           }}
                         >
                           <Text variant="body">{note.title}</Text>
