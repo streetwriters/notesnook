@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { PropsWithChildren, useRef, useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
 import {
   Pin,
   StarOutline,
@@ -54,8 +54,10 @@ import { VirtualizedList } from "../virtualized-list";
 import { SessionItem } from "../session-item";
 import {
   ContentBlock,
+  DefaultColors,
   Note,
   VirtualizedGrouping,
+  createInternalLink,
   highlightInternalLinks
 } from "@notesnook/core";
 import { VirtualizedTable } from "../virtualized-table";
@@ -454,7 +456,9 @@ function ReferencedIn({
             const blocks = await db.notes.contentBlocks(item.id);
             setBlocks(
               blocks
-                .filter((b) => b.content.includes(`nn://note/${noteId}`))
+                .filter((b) =>
+                  b.content.includes(createInternalLink("note", noteId))
+                )
                 .map((block) => ({
                   id: block.id,
                   links: highlightInternalLinks(block, noteId)
