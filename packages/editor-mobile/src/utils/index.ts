@@ -23,6 +23,7 @@ import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import { EditorController } from "../hooks/useEditorController";
 
 globalThis.sessionId = "notesnook-editor";
+globalThis.pendingResolvers = {};
 
 globalThis.pendingResolvers = {};
 export function randId(prefix: string) {
@@ -80,6 +81,7 @@ declare global {
   var noToolbar: boolean;
   var noHeader: boolean;
   function toBlobURL(dataurl: string, id?: string): string | undefined;
+  var pendingResolvers: { [name: string]: (value: any) => void };
   /**
    * Id of current session
    */
@@ -187,8 +189,15 @@ export const EventTypes = {
   tabsChanged: "editor-events:tabs-changed",
   showTabs: "editor-events:show-tabs",
   tabFocused: "editor-events:tab-focused",
-  toc: "editor-events:toc"
+  toc: "editor-events:toc",
+  createInternalLink: "editor-events:create-internal-link"
 } as const;
+
+export function randId(prefix: string) {
+  return Math.random()
+    .toString(36)
+    .replace("0.", prefix || "");
+}
 
 export function isReactNative(): boolean {
   return !!window.ReactNativeWebView;

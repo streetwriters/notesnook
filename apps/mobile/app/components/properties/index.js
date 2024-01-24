@@ -74,6 +74,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
         maxHeight: "100%"
       }}
       nestedScrollEnabled
+      bounces={false}
       data={[0]}
       keyExtractor={() => "properties-scroll-item"}
       renderItem={() => (
@@ -215,6 +216,8 @@ Properties.present = async (item, buttons = [], isSheet) => {
         "reminders",
         "local-only",
         "duplicate",
+        "copy-link",
+        "references",
         ...android,
         ...buttons
       ]);
