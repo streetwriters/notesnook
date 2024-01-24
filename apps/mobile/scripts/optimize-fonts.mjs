@@ -74,7 +74,8 @@ const EXTRA_ICON_NAMES = [
   "cloud",
   "restore",
   "keyboard",
-  "numeric"
+  "numeric",
+  "vector-link"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

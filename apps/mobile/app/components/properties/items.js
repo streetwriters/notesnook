@@ -45,7 +45,6 @@ export const Items = ({ item, buttons, close }) => {
 
   const _renderRowItem = ({ item }) => (
     <View
-      onPress={item.func}
       key={item.id}
       testID={"icon-" + item.id}
       style={{
@@ -117,7 +116,6 @@ export const Items = ({ item, buttons, close }) => {
   );
 
   const renderTopBarItem = (item, index) => {
-    const isLast = index === topBarItems.length;
     return (
       <Pressable
         onPress={item.func}
@@ -126,7 +124,6 @@ export const Items = ({ item, buttons, close }) => {
         activeOpacity={1}
         style={{
           alignSelf: "flex-start",
-          marginRight: isLast ? 0 : 10,
           paddingHorizontal: 0,
           width: topBarItemWidth
         }}
@@ -194,6 +191,8 @@ export const Items = ({ item, buttons, close }) => {
     "history",
     "reminders",
     "attachments",
+    "references",
+    "copy-link",
     "trash"
   ];
 
@@ -226,6 +225,9 @@ export const Items = ({ item, buttons, close }) => {
         style={{
           paddingHorizontal: 12,
           marginTop: 6
+        }}
+        contentContainerStyle={{
+          gap: 10
         }}
       >
         {topBarItems.map(renderTopBarItem)}

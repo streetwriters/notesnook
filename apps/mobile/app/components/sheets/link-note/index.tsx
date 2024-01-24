@@ -16,7 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { ContentBlock, Note, VirtualizedGrouping } from "@notesnook/core";
+import {
+  ContentBlock,
+  Note,
+  VirtualizedGrouping,
+  createInternalLink
+} from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
@@ -25,10 +30,12 @@ import { db } from "../../../common/database";
 import { useDBItem } from "../../../hooks/use-db-item";
 import { presentSheet } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
+import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { PressableButton } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import { Button } from "../../ui/button";
+import type { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
+import { editorController } from "../../../screens/editor/tiptap/utils";
 
 const ListNoteItem = ({
   id,
@@ -91,10 +98,25 @@ const ListBlockItem = ({
         style={{
           flexDirection: "row",
           width: "100%",
-          justifyContent: "space-between",
+          columnGap: 10,
           alignItems: "center"
         }}
       >
+        <View
+          style={{
+            borderRadius: 5,
+            backgroundColor: colors.secondary.background,
+            width: 25,
+            height: 25,
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+            {item.type.toUpperCase()}
+          </Paragraph>
+        </View>
+
         <Paragraph
           style={{
             flexShrink: 1
@@ -104,27 +126,17 @@ const ListBlockItem = ({
             ? item?.content.slice(0, 200) + "..."
             : item.content}
         </Paragraph>
-
-        <View
-          style={{
-            borderRadius: 5,
-            backgroundColor: colors.secondary.background,
-            width: 30,
-            height: 30,
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-            {item.type.toUpperCase()}
-          </Paragraph>
-        </View>
       </View>
     </PressableButton>
   );
 };
 
-export default function LinkNote() {
+export default function LinkNote(props: {
+  attributes: LinkAttributes;
+  resolverId: string;
+  onLinkCreated: () => void;
+  close?: (ctx?: string) => void;
+}) {
   const { colors } = useThemeColors();
   const query = useRef<string>();
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
@@ -141,6 +153,7 @@ export default function LinkNote() {
       setNotes(notes);
     });
   }, []);
+  console.log(new URL("https://google.com").protocol);
 
   const onChange = async (value: string) => {
     query.current = value;
@@ -161,6 +174,26 @@ export default function LinkNote() {
     }
   };
 
+  const onCreateLink = (blockId?: string) => {
+    if (!selectedNote) return;
+    const link = createInternalLink(
+      "note",
+      selectedNote.id,
+      blockId
+        ? {
+            blockId: blockId
+          }
+        : undefined
+    );
+    editorController.current.commands.createInternalLink(
+      {
+        href: link,
+        title: selectedNote.title
+      },
+      props.resolverId
+    );
+  };
+
   const onSelectNote = async (note: Note) => {
     setSelectedNote(note);
     inputRef.current?.clear();
@@ -172,17 +205,16 @@ export default function LinkNote() {
   };
 
   const onSelectBlock = (block: ContentBlock) => {
-    setSelectedNodeId(block.id);
+    onCreateLink(block.id);
+    props.onLinkCreated();
+    props.close?.();
   };
 
   return (
     <View
       style={{
         paddingHorizontal: 12,
-        height: "100%",
-        flexShrink: 1,
-        borderWidth: 2,
-        borderColor: "red"
+        minHeight: 400
       }}
     >
       <View
@@ -270,6 +302,9 @@ export default function LinkNote() {
           renderItem={({ item, index }) => (
             <ListBlockItem item={item} onSelectBlock={onSelectBlock} />
           )}
+          style={{
+            marginTop: 10
+          }}
           keyExtractor={(item) => item.id}
           data={nodes}
         />
@@ -282,6 +317,9 @@ export default function LinkNote() {
               onSelectNote={onSelectNote}
             />
           )}
+          style={{
+            marginTop: 10
+          }}
           data={notes?.placeholders}
         />
       )}
@@ -294,14 +332,36 @@ export default function LinkNote() {
           title="Create link"
           type="accent"
           width="100%"
+          onPress={() => {
+            onCreateLink();
+            props.onLinkCreated();
+            props.close?.();
+          }}
         />
       ) : null}
     </View>
   );
 }
 
-LinkNote.present = () => {
+LinkNote.present = (attributes: LinkAttributes, resolverId: string) => {
+  let didCreateLink = false;
   presentSheet({
-    component: () => <LinkNote />
+    component: (ref, close) => (
+      <LinkNote
+        attributes={attributes}
+        resolverId={resolverId}
+        onLinkCreated={() => {
+          didCreateLink = true;
+        }}
+        close={close}
+      />
+    ),
+    onClose: () => {
+      if (!didCreateLink) {
+        editorController?.current.commands.dismissCreateInternalLinkRequest(
+          resolverId
+        );
+      }
+    }
   });
 };
