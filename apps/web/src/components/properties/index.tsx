@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { PropsWithChildren, useRef, useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
 import {
   Pin,
   StarOutline,
@@ -42,7 +42,7 @@ import { store as noteStore } from "../../stores/note-store";
 import { AnimatedFlex } from "../animated";
 import Toggle from "./toggle";
 import ScrollContainer from "../scroll-container";
-import { ellipsize, getFormattedDate } from "@notesnook/common";
+import { getFormattedDate } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import usePromise from "../../hooks/use-promise";
 import { ListItemWrapper } from "../list-container/list-profiles";
@@ -53,14 +53,12 @@ import { COLORS } from "../../common/constants";
 import {
   ContentBlock,
   DefaultColors,
-  InternalLink,
   Note,
   VirtualizedGrouping,
-  highlightInternalLinks,
-  parseInternalLink
+  createInternalLink,
+  highlightInternalLinks
 } from "@notesnook/core";
 import { VirtualizedTable } from "../virtualized-table";
-import { toChunks } from "@notesnook/core/dist/utils/array";
 import { TextSlice } from "@notesnook/core/dist/utils/content-block";
 
 const tools = [
@@ -456,7 +454,9 @@ function ReferencedIn({
             const blocks = await db.notes.contentBlocks(item.id);
             setBlocks(
               blocks
-                .filter((b) => b.content.includes(`nn://note/${noteId}`))
+                .filter((b) =>
+                  b.content.includes(createInternalLink("note", noteId))
+                )
                 .map((block) => ({
                   id: block.id,
                   links: highlightInternalLinks(block, noteId)

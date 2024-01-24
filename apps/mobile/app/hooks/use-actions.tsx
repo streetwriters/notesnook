@@ -64,6 +64,7 @@ import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
 import { ReferencesList } from "../components/sheets/references";
+import { createInternalLink } from "@notesnook/core";
 
 export const useActions = ({
   close,
@@ -762,10 +763,10 @@ export const useActions = ({
         title: "Copy link",
         icon: "link",
         func: () => {
-          Clipboard.setString(`nn://note/${item.id}`);
+          Clipboard.setString(createInternalLink("note", item.id));
           ToastManager.show({
             heading: "Note link copied",
-            message: `nn://note/${item.id}`,
+            message: createInternalLink("note", item.id),
             context: "local",
             type: "success"
           });
