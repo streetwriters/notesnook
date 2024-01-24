@@ -821,6 +821,11 @@ function useScrollToBlock(id: string) {
   useEffect(() => {
     if (!blockId) return;
     scrollIntoViewById(blockId);
+    useEditorStore
+      .getState()
+      .updateSession(id, ["default", "unlocked", "deleted"], {
+        activeBlockId: undefined
+      });
   }, [blockId]);
 }
 
