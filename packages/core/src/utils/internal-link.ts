@@ -53,8 +53,9 @@ export function createInternalLink<T extends InternalLinkType>(
 
 export function parseInternalLink(link: string): InternalLink | undefined {
   const url = new URL(link);
+
   if (url.protocol !== "nn:") return;
-  const [type, id] = url.pathname.split("/").slice(2);
+  const [type, id] = url.href.split("?")[0].split("/").slice(2);
   if (!type || !id || !isValidInternalType(type)) return;
 
   return {
