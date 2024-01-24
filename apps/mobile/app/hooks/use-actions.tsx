@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { VAULT_ERRORS } from "@notesnook/core/dist/api/vault";
 import {
   Color,
+  ItemReference,
   Note,
   Notebook,
   Reminder,
@@ -62,6 +63,7 @@ import { eOpenLoginDialog } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
+import { ReferencesList } from "../components/sheets/references";
 
 export const useActions = ({
   close,
@@ -755,7 +757,20 @@ export const useActions = ({
         icon: "history",
         func: openHistory
       },
-
+      {
+        id: "copy-link",
+        title: "Copy link",
+        icon: "link",
+        func: () => {
+          Clipboard.setString(`nn://note/${item.id}`);
+          ToastManager.show({
+            heading: "Note link copied",
+            message: `nn://note/${item.id}`,
+            context: "local",
+            type: "success"
+          });
+        }
+      },
       {
         id: "reminders",
         title: "Reminders",
@@ -863,6 +878,16 @@ export const useActions = ({
         title: "Add tags",
         icon: "pound",
         func: addTo
+      },
+      {
+        id: "references",
+        title: "References",
+        icon: "vector-link",
+        func: () => {
+          ReferencesList.present({
+            reference: item as ItemReference
+          });
+        }
       }
     );
   }

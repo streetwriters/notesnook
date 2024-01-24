@@ -17,13 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  ControlledMenu,
-  // applyStatics
-  MenuItem as MenuItemInner,
-  SubMenu as SubMenuInner,
-  MenuDivider
-} from "@szhsin/react-menu";
+import { ControlledMenu, MenuItem as MenuItemInner } from "@szhsin/react-menu";
 import ArrowBackIcon from "mdi-react/ArrowBackIcon";
 import ArrowULeftTopIcon from "mdi-react/ArrowULeftTopIcon";
 import ArrowURightTopIcon from "mdi-react/ArrowURightTopIcon";
@@ -32,12 +26,13 @@ import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import DotsVerticalIcon from "mdi-react/DotsVerticalIcon";
 import FullscreenIcon from "mdi-react/FullscreenIcon";
 import MagnifyIcon from "mdi-react/MagnifyIcon";
+import TableOfContentsIcon from "mdi-react/TableOfContentsIcon";
 import React, { useRef, useState } from "react";
 import { useSafeArea } from "../hooks/useSafeArea";
 import { useTabContext, useTabStore } from "../hooks/useTabStore";
 import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
-import TableOfContentsIcon from "mdi-react/TableOfContentsIcon";
+
 const menuClassName = ({ state }: any) =>
   state === "opening"
     ? styles.menuOpening
@@ -52,20 +47,8 @@ const menuItemClassName = ({ hover, disabled }: any) =>
     ? styles.menuItemHover
     : styles.menuItem;
 
-const submenuItemClassName = (modifiers: any) =>
-  `${styles.submenuItem} ${menuItemClassName(modifiers)}`;
-
 const MenuItem = (props: any) => (
   <MenuItemInner {...props} className={menuItemClassName} />
-);
-
-const SubMenu = (props: any) => (
-  <SubMenuInner
-    {...props}
-    menuClassName={menuClassName}
-    itemProps={{ className: submenuItemClassName }}
-    offsetY={-7}
-  />
 );
 
 const Button = ({
@@ -178,65 +161,6 @@ function Header({
               flexDirection: "row"
             }}
           >
-            <Button
-              onPress={() => {
-                editor?.commands.undo();
-              }}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_primary_icon)",
-                marginRight: 10,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
-            >
-              <ArrowULeftTopIcon
-                color={
-                  !hasUndo
-                    ? "var(--nn_secondary_background)"
-                    : "var(--nn_primary_paragraph)"
-                }
-                size={25 * settings.fontScale}
-                style={{
-                  position: "absolute"
-                }}
-              />
-            </Button>
-
-            <Button
-              onPress={() => {
-                editor?.commands.redo();
-              }}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_primary_icon)",
-                marginRight: 10,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
-            >
-              <ArrowURightTopIcon
-                color={
-                  !hasRedo
-                    ? "var(--nn_secondary_background)"
-                    : "var(--nn_primary_paragraph)"
-                }
-                size={25 * settings.fontScale}
-                style={{
-                  position: "absolute"
-                }}
-              />
-            </Button>
             {!settings.premium && (
               <Button
                 onPress={() => {
@@ -265,32 +189,6 @@ function Header({
                 />
               </Button>
             )}
-
-            <Button
-              onPress={() => {
-                editor?.commands.startSearch();
-              }}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_primary_icon)",
-                marginRight: 10,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
-            >
-              <MagnifyIcon
-                size={28 * settings.fontScale}
-                style={{
-                  position: "absolute"
-                }}
-                color="var(--nn_primary_paragraph)"
-              />
-            </Button>
 
             {settings.deviceMode !== "mobile" && !settings.fullscreen ? (
               <Button
@@ -342,8 +240,9 @@ function Header({
               <div
                 style={{
                   border: "2.5px solid var(--nn_primary_icon)",
-                  width: 20 * settings.fontScale,
-                  height: 20 * settings.fontScale,
+                  width: 19 * settings.fontScale,
+                  height: 19 * settings.fontScale,
+                  minWidth: 19 * settings.fontScale,
                   borderRadius: 5,
                   display: "flex",
                   justifyContent: "center",
@@ -417,6 +316,102 @@ function Header({
                 }
               }}
             >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%"
+                }}
+              >
+                <Button
+                  onPress={() => {
+                    editor?.commands.undo();
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    marginRight: 10,
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
+                  }}
+                >
+                  <ArrowULeftTopIcon
+                    color={
+                      !hasUndo
+                        ? "var(--nn_secondary_border)"
+                        : "var(--nn_primary_paragraph)"
+                    }
+                    size={25 * settings.fontScale}
+                    style={{
+                      position: "absolute"
+                    }}
+                  />
+                </Button>
+
+                <Button
+                  onPress={() => {
+                    editor?.commands.redo();
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    marginRight: 10,
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
+                  }}
+                >
+                  <ArrowURightTopIcon
+                    color={
+                      !hasRedo
+                        ? "var(--nn_secondary_border)"
+                        : "var(--nn_primary_paragraph)"
+                    }
+                    size={25 * settings.fontScale}
+                    style={{
+                      position: "absolute"
+                    }}
+                  />
+                </Button>
+
+                <Button
+                  onPress={() => {
+                    editor?.commands.startSearch();
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    marginRight: 10,
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
+                  }}
+                >
+                  <MagnifyIcon
+                    size={28 * settings.fontScale}
+                    style={{
+                      position: "absolute"
+                    }}
+                    color="var(--nn_primary_paragraph)"
+                  />
+                </Button>
+              </div>
+
               <MenuItem
                 value="toc"
                 style={{

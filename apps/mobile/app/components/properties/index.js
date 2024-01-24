@@ -71,6 +71,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
         maxHeight: "100%"
       }}
+      bounces={false}
       data={[0]}
       keyExtractor={() => "properties-scroll-item"}
       renderItem={() => (
@@ -186,6 +187,8 @@ Properties.present = async (item, buttons = [], isSheet) => {
         "reminders",
         "local-only",
         "duplicate",
+        "copy-link",
+        "references",
         ...android,
         ...buttons
       ]);

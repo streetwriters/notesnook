@@ -32,6 +32,7 @@ import { Settings } from "./types";
 import { getResponse, randId, textInput } from "./utils";
 import { Note } from "@notesnook/core/dist/types";
 import { useTabStore } from "./use-tab-store";
+import type { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
 
 type Action = { job: string; id: string };
 
@@ -315,6 +316,28 @@ const image = toBlobURL("${image.dataurl}", "${image.hash}");
     const tabId = useTabStore.getState().currentTab;
     return this.doAsync(`
       response = editorControllers[${tabId}]?.getTableOfContents() || [];
+    `);
+  };
+
+  createInternalLink = async (
+    attributes: LinkAttributes,
+    resolverId: string
+  ) => {
+    if (!resolverId) return;
+    return this.doAsync(`
+    if (globalThis.pendingResolvers["${resolverId}"]) {
+      globalThis.pendingResolvers["${resolverId}"](${JSON.stringify(
+      attributes
+    )});
+    }`);
+  };
+
+  dismissCreateInternalLinkRequest = async (resolverId: string) => {
+    if (!resolverId) return;
+    return this.doAsync(`
+    if (globalThis.pendingResolvers["${resolverId}"]) {
+      globalThis.pendingResolvers["${resolverId}"](undefined);
+    }
     `);
   };
 

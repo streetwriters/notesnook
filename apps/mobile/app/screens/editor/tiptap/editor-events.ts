@@ -40,5 +40,6 @@ export const EventTypes = {
   tabsChanged: "editor-events:tabs-changed",
   showTabs: "editor-events:show-tabs",
   tabFocused: "editor-events:tab-focused",
-  toc: "editor-events:toc"
+  toc: "editor-events:toc",
+  createInternalLink: "editor-events:create-internal-link"
 };

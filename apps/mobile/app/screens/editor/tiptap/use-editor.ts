@@ -133,6 +133,7 @@ export const useEditor = (
   const currentLoadingNoteId = useRef<string>();
   const loadingState = useRef<string>();
   const lastTabFocused = useRef(0);
+  const blockIdRef = useRef<string>();
   const postMessage = useCallback(
     async <T>(type: string, data: T, tabId?: number, waitFor = 300) =>
       await post(
@@ -432,7 +433,9 @@ export const useEditor = (
       forced?: boolean;
       newNote?: boolean;
       tabId?: number;
+      blockId?: string;
     }) => {
+      blockIdRef.current = event.blockId;
       state.current.currentlyEditing = true;
       if (
         !state.current.ready &&
@@ -544,6 +547,13 @@ export const useEditor = (
           tabId,
           10000
         );
+
+        setTimeout(() => {
+          if (blockIdRef.current) {
+            commands.scrollIntoViewById(blockIdRef.current);
+            blockIdRef.current = undefined;
+          }
+        }, 300);
 
         loadingState.current = undefined;
         await commands.setTags(item);
@@ -807,7 +817,7 @@ export const useEditor = (
           restoreTabNote();
         }
       }
-    });
+    }, 500);
   }, [
     onReady,
     postMessage,

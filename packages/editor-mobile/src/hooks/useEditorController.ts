@@ -267,8 +267,8 @@ export function useEditorController({
         case "native:status":
           break;
         case "native:keyboardShown":
-          if (editor?.current) {
-            scrollIntoView(editor?.current as any);
+          if (editor) {
+            scrollIntoView(editor as any);
           }
           break;
         default:

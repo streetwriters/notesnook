@@ -39,7 +39,7 @@ import {
   useTabStore
 } from "../hooks/useTabStore";
 import { EmotionEditorToolbarTheme } from "../theme-factory";
-import { EventTypes, Settings } from "../utils";
+import { EventTypes, randId, Settings } from "../utils";
 import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
@@ -79,17 +79,34 @@ const Tiptap = ({
       onUpdate: ({ editor }) => {
         globalThis.editorControllers[tab.id]?.contentChange(editor as Editor);
       },
-      onOpenAttachmentPicker: (editor, type) => {
+      openAttachmentPicker: (type) => {
         globalThis.editorControllers[tab.id]?.openFilePicker(type);
         return true;
       },
-      onDownloadAttachment: (editor, attachment) => {
+      downloadAttachment: (attachment) => {
         globalThis.editorControllers[tab.id]?.downloadAttachment(attachment);
         return true;
       },
-      onPreviewAttachment(editor, attachment) {
+      previewAttachment(attachment) {
         globalThis.editorControllers[tab.id]?.previewAttachment(attachment);
         return true;
+      },
+      createInternalLink(attributes) {
+        logger("info", "create internal link");
+        return new Promise((resolve) => {
+          const id = randId("createInternalLink");
+
+          globalThis.pendingResolvers[id] = (value) => {
+            delete globalThis.pendingResolvers[id];
+            resolve(value);
+            logger("info", "resolved create link request:", id);
+          };
+
+          post("editor-events:create-internal-link", {
+            attributes: attributes,
+            resolverId: id
+          });
+        });
       },
       element: getContentDiv(),
       editable: !settings.readonly,
@@ -99,7 +116,7 @@ const Tiptap = ({
       content: globalThis.editorControllers[tab.id]?.content?.current,
       isMobile: true,
       doubleSpacedLines: settings.doubleSpacedLines,
-      onOpenLink: (url) => {
+      openLink: (url) => {
         return globalThis.editorControllers[tab.id]?.openLink(url) || true;
       },
       copyToClipboard: (text) => {

@@ -16,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { VirtualizedGrouping } from "@notesnook/core";
+import { Item, ItemReference } from "@notesnook/core/dist/types";
 import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useEffect, useState } from "react";
 import { View } from "react-native";
@@ -35,8 +37,6 @@ import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { PressableButtonProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import { Item, ItemReference, ItemType } from "@notesnook/core/dist/types";
-import { VirtualizedGrouping } from "@notesnook/core";
 
 type RelationsListProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
