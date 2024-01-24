@@ -272,7 +272,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
     if (activeBlockId && session)
       this.updateSession(session.id, [session.type], {
-        activeBlockId: activeBlockId
+        activeBlockId
       });
   };
 
