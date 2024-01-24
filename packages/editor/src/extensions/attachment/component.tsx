@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Text } from "@theme-ui/components";
-import { AttachmentWithProgress } from "./attachment";
+import { Attachment, AttachmentWithProgress } from "./attachment";
 import { useRef, useState } from "react";
 import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons";
@@ -61,6 +61,10 @@ export function AttachmentComponent(
       onDragStart={() => setIsDragging(true)}
       onDragEnd={() => setIsDragging(false)}
       data-drag-handle
+      onDoubleClick={() => {
+        const attachment = (node?.attrs || {}) as Attachment;
+        editor.current?.commands.previewAttachment(attachment);
+      }}
     >
       <Icon path={Icons.attachment} size={14} />
       <Text
