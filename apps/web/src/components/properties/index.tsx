@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, useRef, useState } from "react";
 import {
   Pin,
   StarOutline,
@@ -26,9 +26,11 @@ import {
   SyncOff,
   ArrowLeft,
   Circle,
-  Checkmark
+  Checkmark,
+  ChevronDown,
+  ChevronRight
 } from "../icons";
-import { Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import {
   useEditorStore,
   ReadonlyEditorSession,
@@ -40,16 +42,26 @@ import { store as noteStore } from "../../stores/note-store";
 import { AnimatedFlex } from "../animated";
 import Toggle from "./toggle";
 import ScrollContainer from "../scroll-container";
-import { getFormattedDate } from "@notesnook/common";
+import { ellipsize, getFormattedDate } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import usePromise from "../../hooks/use-promise";
 import { ListItemWrapper } from "../list-container/list-profiles";
 import { VirtualizedList } from "../virtualized-list";
-import { ResolvedItem } from "../list-container/resolved-item";
+import { ResolvedItem, useResolvedItem } from "../list-container/resolved-item";
 import { SessionItem } from "../session-item";
 import { COLORS } from "../../common/constants";
-import { DefaultColors } from "@notesnook/core";
+import {
+  ContentBlock,
+  DefaultColors,
+  InternalLink,
+  Note,
+  VirtualizedGrouping,
+  highlightInternalLinks,
+  parseInternalLink
+} from "@notesnook/core";
 import { VirtualizedTable } from "../virtualized-table";
+import { toChunks } from "@notesnook/core/dist/utils/array";
+import { TextSlice } from "@notesnook/core/dist/utils/content-block";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Pin, label: "Pin" },
@@ -121,6 +133,7 @@ function EditorProperties(props: EditorPropertiesProps) {
       sx={{
         display: "flex",
         position: "absolute",
+        top: 0,
         right: 0,
         zIndex: 1,
         height: "100%",
@@ -189,6 +202,7 @@ function EditorProperties(props: EditorPropertiesProps) {
             ))}
             <Colors noteId={id} color={session.color} />
           </Section>
+          <InternalLinks noteId={id} />
           <Notebooks noteId={id} />
           <Reminders noteId={id} />
           <Attachments noteId={id} />
@@ -199,6 +213,308 @@ function EditorProperties(props: EditorPropertiesProps) {
   );
 }
 export default React.memo(EditorProperties);
+
+enum InternalLinksTabs {
+  LINKED_NOTES = 0,
+  REFERENCED_IN = 1
+}
+function InternalLinks({ noteId }: { noteId: string }) {
+  const [tabIndex, setTabIndex] = useState(InternalLinksTabs.LINKED_NOTES);
+  const [expandedId, setExpandedId] = useState<string>();
+
+  const result = usePromise(() => {
+    const links =
+      tabIndex === InternalLinksTabs.LINKED_NOTES
+        ? db.relations.from({ id: noteId, type: "note" }, "note")
+        : db.relations.to({ id: noteId, type: "note" }, "note");
+    return links.selector.sorted(db.settings.getGroupOptions("notes"));
+  }, [tabIndex]);
+
+  return (
+    <Flex sx={{ flexDirection: "column", mt: 2 }}>
+      <Flex
+        sx={{
+          justifyContent: "stretch",
+          borderRadius: "default",
+          overflow: "hidden",
+          mx: 2,
+          mb: 1
+        }}
+      >
+        {["Linked notes", "Referenced in"].map((title, index) => (
+          <Button
+            key={title}
+            variant="secondary"
+            sx={{
+              flex: 1,
+              borderRadius: 0,
+              color: tabIndex === index ? "accent-selected" : "paragraph",
+              bg:
+                tabIndex === index
+                  ? "background-selected"
+                  : "background-secondary"
+            }}
+            onClick={() => {
+              setTabIndex(index);
+              setExpandedId(undefined);
+            }}
+          >
+            {title}
+          </Button>
+        ))}
+      </Flex>
+
+      {result.status === "fulfilled" && (
+        <VirtualizedList
+          mode="dynamic"
+          estimatedSize={25}
+          getItemKey={(index) => result.value.key(index)}
+          items={result.value.placeholders}
+          context={{
+            items: result.value,
+            tabIndex,
+            noteId,
+            isExpanded: (id) => expandedId === id,
+            toggleExpand: (id) =>
+              setExpandedId((s) => (s === id ? undefined : id))
+          }}
+          renderItem={InternalLinkItem}
+        />
+      )}
+    </Flex>
+  );
+}
+
+function InternalLinkItem({
+  index,
+  context
+}: {
+  item: boolean;
+  index: number;
+  context: {
+    items: VirtualizedGrouping<Note>;
+    tabIndex: InternalLinksTabs;
+    noteId: string;
+    isExpanded: (id: string) => boolean;
+    toggleExpand: (id: string) => void;
+  };
+}) {
+  const { items, tabIndex, noteId, isExpanded, toggleExpand } = context;
+  const item = useResolvedItem({ items, index });
+
+  if (!item || item.item.type !== "note") return null;
+
+  if (tabIndex === InternalLinksTabs.LINKED_NOTES)
+    return (
+      <LinkedNote
+        item={item.item}
+        noteId={noteId}
+        isExpanded={isExpanded(item.item.id)}
+        toggleExpand={() => toggleExpand(item.item.id)}
+      />
+    );
+  return (
+    <ReferencedIn
+      item={item.item}
+      noteId={noteId}
+      isExpanded={isExpanded(item.item.id)}
+      toggleExpand={() => toggleExpand(item.item.id)}
+    />
+  );
+}
+function LinkedNote({
+  item,
+  noteId,
+  isExpanded,
+  toggleExpand
+}: {
+  item: Note;
+  noteId: string;
+  toggleExpand: () => void;
+  isExpanded: boolean;
+}) {
+  const [blocks, setBlocks] = useState<ContentBlock[]>([]);
+
+  return (
+    <>
+      <Button
+        variant="menuitem"
+        sx={{
+          p: 1,
+          width: "100%",
+          textAlign: "left",
+          display: "flex",
+          justifyContent: "start",
+          alignItems: "center"
+        }}
+        onClick={() => useEditorStore.getState().openSession(item)}
+      >
+        <Box
+          onClick={async (e) => {
+            e.stopPropagation();
+            if (isExpanded) return toggleExpand();
+
+            const blocks = await db.notes.contentBlocks(item.id);
+            const linkedBlocks = (await db.notes.internalLinks(noteId)).filter(
+              (l) => l.id === item.id
+            );
+            setBlocks(
+              linkedBlocks.length > 0
+                ? blocks.filter((a) =>
+                    linkedBlocks.some((l) => l.params?.blockId === a.id)
+                  )
+                : []
+            );
+            toggleExpand();
+          }}
+        >
+          {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        </Box>
+        <Text>{item.title}</Text>
+      </Button>
+      {isExpanded
+        ? blocks.map((block) => (
+            <Button
+              key={block.id}
+              variant="menuitem"
+              sx={{
+                p: 1,
+                pl: 4,
+                gap: 1,
+                width: "100%",
+                textAlign: "left",
+                display: "flex",
+                alignItems: "center"
+              }}
+              onClick={() =>
+                useEditorStore
+                  .getState()
+                  .openSession(item, { activeBlockId: block.id })
+              }
+            >
+              <Text
+                variant="subBody"
+                sx={{
+                  bg: "background-secondary",
+                  p: "small",
+                  px: 1,
+                  borderRadius: "default",
+                  alignSelf: "flex-start"
+                }}
+              >
+                {block.type.toUpperCase()}
+              </Text>
+              <Text
+                variant="body"
+                sx={{
+                  fontFamily: "monospace",
+                  whiteSpace: "pre-wrap"
+                }}
+              >
+                {block.content}
+              </Text>
+            </Button>
+          ))
+        : null}
+    </>
+  );
+}
+
+function ReferencedIn({
+  item,
+  noteId,
+  isExpanded,
+  toggleExpand
+}: {
+  item: Note;
+  noteId: string;
+  toggleExpand: () => void;
+  isExpanded: boolean;
+}) {
+  const [blocks, setBlocks] = useState<
+    { id: string; links: [TextSlice, TextSlice, TextSlice][] }[]
+  >([]);
+
+  return (
+    <>
+      <Button
+        variant="menuitem"
+        sx={{
+          p: 1,
+          width: "100%",
+          textAlign: "left",
+          display: "flex",
+          justifyContent: "start",
+          alignItems: "center"
+        }}
+        onClick={() => useEditorStore.getState().openSession(item)}
+      >
+        <Box
+          onClick={async (e) => {
+            e.stopPropagation();
+            if (isExpanded) return toggleExpand();
+            const blocks = await db.notes.contentBlocks(item.id);
+            setBlocks(
+              blocks
+                .filter((b) => b.content.includes(`nn://note/${noteId}`))
+                .map((block) => ({
+                  id: block.id,
+                  links: highlightInternalLinks(block, noteId)
+                }))
+            );
+            toggleExpand();
+          }}
+        >
+          {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        </Box>
+        <Text>{item.title}</Text>
+      </Button>
+      {isExpanded
+        ? blocks.map((block) => (
+            <>
+              {block.links.map((link, index) => (
+                <Button
+                  key={index.toString()}
+                  variant="menuitem"
+                  sx={{
+                    p: 1,
+                    pl: 4,
+                    pr: 2,
+                    gap: 1,
+                    width: "100%",
+                    textAlign: "left",
+                    borderBottom: "1px solid var(--border)"
+                  }}
+                  onClick={() =>
+                    useEditorStore
+                      .getState()
+                      .openSession(item, { activeBlockId: block.id })
+                  }
+                >
+                  {link.map((slice) => (
+                    <Text
+                      key={slice.text}
+                      sx={{
+                        color: slice.highlighted
+                          ? "accent-selected"
+                          : "paragraph",
+                        fontWeight: slice.highlighted ? "bold" : "normal",
+                        textDecoration: slice.highlighted
+                          ? "underline solid var(--accent-selected)"
+                          : "none"
+                      }}
+                    >
+                      {slice.text}
+                    </Text>
+                  ))}
+                </Button>
+              ))}
+            </>
+          ))
+        : null}
+    </>
+  );
+}
 
 function Colors({ noteId, color }: { noteId: string; color?: string }) {
   const result = usePromise(
@@ -280,6 +596,7 @@ function Notebooks({ noteId }: { noteId: string }) {
     </Section>
   );
 }
+
 function Reminders({ noteId }: { noteId: string }) {
   const result = usePromise(() =>
     db.relations
