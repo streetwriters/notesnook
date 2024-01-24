@@ -333,6 +333,12 @@ export const useEditorEvents = (
       const data = event.nativeEvent.data;
       const editorMessage = JSON.parse(data) as EditorMessage<any>;
 
+      if (editorMessage.type === EventTypes.load) {
+        console.log("Editor loaded");
+        editor.onLoad();
+        return;
+      }
+
       if (editorMessage.type === EventTypes.back) {
         return onBackPress();
       }

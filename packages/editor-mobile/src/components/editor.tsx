@@ -29,7 +29,14 @@ import {
 } from "@notesnook/editor";
 import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 import { useThemeColors } from "@notesnook/theme";
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
 import {
@@ -46,6 +53,8 @@ import Tags from "./tags";
 import Title from "./title";
 
 globalThis.toBlobURL = toBlobURL;
+
+let didCallOnLoad = false;
 
 const Tiptap = ({
   settings,
@@ -196,6 +205,11 @@ const Tiptap = ({
       contentPlaceholderRef.current?.appendChild(getContentDiv());
     }
 
+    if (!didCallOnLoad) {
+      didCallOnLoad = true;
+      post("editor-events:load");
+    }
+
     const updateScrollPosition = (state: TabStore) => {
       if (isFocusedRef.current) return;
       if (state.currentTab === tabRef.current.id) {
@@ -247,7 +261,7 @@ const Tiptap = ({
     return () => {
       unsub();
     };
-  }, []);
+  }, [getContentDiv]);
 
   const onClickEmptyArea: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (event) => {
@@ -441,31 +455,43 @@ const TiptapProvider = (): JSX.Element => {
   const settings = useSettings();
   const { colors } = useThemeColors("editor");
   const contentRef = useRef<HTMLElement>();
+
+  const getContentDiv = useCallback(() => {
+    if (contentRef.current) {
+      return contentRef.current;
+    }
+    const editorContainer = document.createElement("div");
+    editorContainer.classList.add("selectable");
+    editorContainer.style.flex = "1";
+    editorContainer.style.cursor = "text";
+    editorContainer.style.padding = "0px 12px";
+    editorContainer.style.color = colors.primary.paragraph;
+    editorContainer.style.paddingBottom = `150px`;
+    editorContainer.style.fontSize = `${settings.fontSize}px`;
+    editorContainer.style.fontFamily =
+      getFontById(settings.fontFamily)?.font || "sans-serif";
+    contentRef.current = editorContainer;
+    return editorContainer;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.style.color = colors.primary.paragraph;
+    }
+  }, [colors]);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.style.fontSize = `${settings.fontSize}px`;
+      contentRef.current.style.fontFamily =
+        getFontById(settings.fontFamily)?.font || "sans-serif";
+    }
+  }, [settings.fontSize, settings.fontFamily]);
+
   return (
     <PortalProvider>
-      <Tiptap
-        settings={settings}
-        getContentDiv={() => {
-          if (contentRef.current) {
-            logger("info", "return content");
-            return contentRef.current;
-          }
-          logger("info", "new content");
-          const editorContainer = document.createElement("div");
-          editorContainer.classList.add("selectable");
-          editorContainer.style.flex = "1";
-          editorContainer.style.cursor = "text";
-          editorContainer.style.padding = "0px 12px";
-          editorContainer.style.color =
-            colors?.primary?.paragraph || colors.primary.paragraph;
-          editorContainer.style.paddingBottom = `150px`;
-          editorContainer.style.fontSize = `${settings.fontSize}px`;
-          editorContainer.style.fontFamily =
-            getFontById(settings.fontFamily)?.font || "sans-serif";
-          contentRef.current = editorContainer;
-          return editorContainer;
-        }}
-      />
+      <Tiptap settings={settings} getContentDiv={getContentDiv} />
     </PortalProvider>
   );
 };

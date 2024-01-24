@@ -177,7 +177,8 @@ export const EventTypes = {
   showTabs: "editor-events:show-tabs",
   tabFocused: "editor-events:tab-focused",
   toc: "editor-events:toc",
-  createInternalLink: "editor-events:create-internal-link"
+  createInternalLink: "editor-events:create-internal-link",
+  load: "editor-events:load"
 } as const;
 
 export function randId(prefix: string) {

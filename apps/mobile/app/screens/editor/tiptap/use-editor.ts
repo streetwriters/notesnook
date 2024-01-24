@@ -461,8 +461,6 @@ export const useEditor = (
         const noteIsLocked =
           event.item.locked && !(event.item as NoteWithContent).content;
 
-        console.log("noteIsLocked", noteIsLocked);
-
         // If note was already opened in a tab, focus that tab.
         if (typeof event.tabId !== "number") {
           if (useTabStore.getState().hasTabForNote(event.item.id)) {
@@ -472,7 +470,6 @@ export const useEditor = (
                 readonly: event.item.readonly || readonly,
                 locked: noteIsLocked
               });
-              console.log(noteIsLocked, "focused tab...");
               useTabStore.getState().focusTab(tabId);
             }
             console.log("Note already loaded, focusing the tab");
@@ -487,7 +484,6 @@ export const useEditor = (
           }
         } else {
           if (lastTabFocused.current !== event.tabId) {
-            console.log("Focused tab");
             useTabStore.getState().focusTab(event.tabId);
           }
         }
@@ -539,6 +535,7 @@ export const useEditor = (
         );
 
         await postMessage(EditorEvents.title, item.title, tabId);
+        overlay(false);
         loadingState.current = currentContents.current[item.id]?.data;
 
         await postMessage(
@@ -779,45 +776,24 @@ export const useEditor = (
 
   const onLoad = useCallback(async () => {
     if (currentNotes.current) overlay(true);
-    clearTimeout(timers.current["editor:loaded"]);
-    timers.current["editor:loaded"] = setTimeout(async () => {
-      postMessage(EditorEvents.theme, theme);
-      commands.setInsets(
-        isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
-      );
-      await commands.setSettings();
+    postMessage(EditorEvents.theme, theme);
+    commands.setInsets(
+      isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
+    );
+    await commands.setSettings();
 
-      if (!state.current.ready && (await onReady())) {
-        state.current.ready = true;
-      }
-      setTimeout(() => overlay(false), 300);
+    if (!state.current.ready && (await onReady())) {
+      state.current.ready = true;
+    }
 
-      const noteId = useTabStore.getState().getCurrentNoteId();
-      async function restoreTabNote() {
-        if (!noteId) return;
-        const note = await db.notes.note(noteId);
-        if (!note) {
-          console.log("Editor loaded with blank note");
-          loadNote({ newNote: true });
-          if (tabBarRef.current?.page === 1) {
-            state.current.currentlyEditing = false;
-          }
-        }
+    const noteId = useTabStore.getState().getCurrentNoteId();
+    if (!noteId) {
+      overlay(false);
+      loadNote({ newNote: true });
+      if (tabBarRef.current?.page === 1) {
+        state.current.currentlyEditing = false;
       }
-
-      if (noteId) {
-        if (useSettingStore.getState().isAppLoading) {
-          const unsub = useSettingStore.subscribe(async (state) => {
-            if (!state.isAppLoading) {
-              restoreTabNote();
-              unsub();
-            }
-          });
-        } else {
-          restoreTabNote();
-        }
-      }
-    }, 500);
+    }
   }, [
     onReady,
     postMessage,

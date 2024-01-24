@@ -213,16 +213,6 @@ export function useEditorController({
         return;
       }
 
-      if (tab.id === message.tabId) {
-        logger(
-          "info",
-          message.type,
-          tab.noteId,
-          "Focused:",
-          tab.id === useTabStore.getState().currentTab
-        );
-      }
-
       const editor = editors[tab.id];
       switch (type) {
         case "native:updatehtml": {
