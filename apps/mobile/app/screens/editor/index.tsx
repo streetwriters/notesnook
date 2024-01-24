@@ -143,7 +143,6 @@ const Editor = React.memo(
           <WebView
             testID={notesnook.editor.id}
             ref={editor.ref}
-            onLoad={editor.onLoad}
             key={renderKey.current}
             onRenderProcessGone={onError}
             nestedScrollEnabled

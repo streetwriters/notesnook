@@ -39,7 +39,7 @@ export const ProgressBar = () => {
   const [visible, setVisible] = useState(false);
   const timer = useRef<NodeJS.Timeout>();
   const insets = useGlobalSafeAreaInsets();
-  const [width, setWidth] = useState(400);
+  const [width, setWidth] = useState(0);
 
   const groupProgressInfo = useRef<{
     [name: string]: {
@@ -54,7 +54,6 @@ export const ProgressBar = () => {
 
   useEffect(() => {
     if (loading) {
-      console.log(loading);
       if (
         loading.current === loading.total &&
         typeof loading.success === "boolean"
@@ -116,6 +115,7 @@ export const ProgressBar = () => {
         justifyContent: "center",
         position: "absolute",
         zIndex: visible ? 1 : -1,
+        opacity: visible ? 1 : 0,
         marginTop: insets.top + 45,
         width: "100%"
       }}
