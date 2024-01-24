@@ -24,6 +24,14 @@ export type InternalLink<T extends InternalLinkType = InternalLinkType> = {
   id: string;
   params?: Partial<InternalLinkParams[T]>;
 };
+export type InternalLinkWithOffset<
+  T extends InternalLinkType = InternalLinkType
+> = InternalLink<T> & {
+  start: number;
+  end: number;
+  text: string;
+};
+
 type InternalLinkParams = {
   note: { blockId: string };
 };

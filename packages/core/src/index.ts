@@ -26,3 +26,8 @@ export {
   parseInternalLink,
   type InternalLink
 } from "./utils/internal-link";
+export {
+  extractInternalLinks,
+  highlightInternalLinks,
+  type TextSlice
+} from "./utils/content-block";

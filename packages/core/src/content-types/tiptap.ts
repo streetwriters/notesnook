@@ -18,8 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import showdown from "@streetwriters/showdown";
-import render from "dom-serializer";
-import { find, isTag } from "domutils";
+import { findAll, isTag } from "domutils";
 import {
   DomNode,
   FormatOptions,
@@ -37,10 +36,18 @@ import {
 import { HTMLRewriter } from "../utils/html-rewriter";
 import { ContentBlock } from "../types";
 import { InternalLink, parseInternalLink } from "../utils/internal-link";
+import { Element } from "domhandler";
 
 export type ResolveHashes = (
   hashes: string[]
 ) => Promise<Record<string, string>>;
+
+const ExtractableTypes = ["blocks", "internalLinks"] as const;
+type ExtractableType = (typeof ExtractableTypes)[number];
+type ExtractionResult = {
+  blocks: ContentBlock[];
+  internalLinks: InternalLink[];
+};
 
 const ATTRIBUTES = {
   hash: "data-hash",
@@ -108,28 +115,41 @@ export class Tiptap {
     }).transform(this.data);
   }
 
-  async extractBlocks() {
-    const nodes: ContentBlock[] = [];
-    const document = parseDocument(this.data);
+  extract(...types: ExtractableType[]): ExtractionResult {
+    const result: ExtractionResult = { blocks: [], internalLinks: [] };
+    const document = parseDocument(this.data, {
+      withEndIndices: true,
+      withStartIndices: true
+    });
 
-    const elements = find(
-      (element) => {
-        return isTag(element) && !!element.attribs[ATTRIBUTES.blockId];
-      },
-      document.childNodes,
-      false,
-      Infinity
-    );
-
-    for (const node of elements) {
-      if (!isTag(node)) continue;
-      nodes.push({
-        id: node.attribs[ATTRIBUTES.blockId],
-        type: node.tagName.toLowerCase(),
-        content: convertHtmlToTxt(render(node))
-      });
+    if (types.includes("blocks")) {
+      result.blocks.push(
+        ...document.childNodes
+          .filter((element): element is Element => {
+            return isTag(element) && !!element.attribs[ATTRIBUTES.blockId];
+          })
+          .map((node) => ({
+            id: node.attribs[ATTRIBUTES.blockId],
+            type: node.tagName.toLowerCase(),
+            content: convertHtmlToTxt(
+              this.data.slice(node.startIndex || 0, node.endIndex || 0)
+            )
+          }))
+      );
     }
-    return nodes;
+
+    if (types.includes("internalLinks")) {
+      result.internalLinks.push(
+        ...findAll(
+          (e) => e.tagName === "a" && e.attribs.href.startsWith("nn://"),
+          document.childNodes
+        )
+          .map((e) => parseInternalLink(e.attribs.href))
+          .filter((v): v is InternalLink => !!v)
+      );
+    }
+
+    return result;
   }
 
   /**
@@ -252,9 +272,15 @@ function convertHtmlToTxt(html: string) {
     selectors: [
       { selector: "table", format: "dataTable" },
       { selector: "ul.checklist", format: "taskList" },
-      { selector: "p", format: "paragraph" }
+      { selector: "p", format: "paragraph" },
+      { selector: `a[href^="nn://"]`, format: "internalLink" }
     ],
     formatters: {
+      internalLink: (elem, walk, builder) => {
+        builder.addInline(`[[${elem.attribs.href}|`);
+        walk(elem.children, builder);
+        builder.addInline("]]");
+      },
       taskList: (elem, walk, builder, formatOptions) => {
         return formatList(elem, walk, builder, formatOptions, (elem) => {
           return elem.attribs.class && elem.attribs.class.includes("checked")
