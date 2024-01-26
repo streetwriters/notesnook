@@ -408,13 +408,13 @@ export const useEditor = (
         await commands.setStatus(getFormattedDate(item.dateEdited), "Saved");
         await postMessage(EditorEvents.title, item.title);
         loadingState.current = currentContent.current?.data;
-        if (currentContent.current?.data) {
-          await postMessage(
-            EditorEvents.html,
-            currentContent.current?.data,
-            10000
-          );
-        }
+
+        await postMessage(
+          EditorEvents.html,
+          currentContent.current?.data || "",
+          10000
+        );
+
         loadingState.current = undefined;
         useEditorStore.getState().setReadonly(item.readonly);
         await commands.setTags(currentNote.current);
