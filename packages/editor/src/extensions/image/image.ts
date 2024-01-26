@@ -17,21 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  Node,
-  nodeInputRule,
-  mergeAttributes,
-  findChildren
-} from "@tiptap/core";
-import { Attrs } from "@tiptap/pm/model";
-import { Plugin } from "@tiptap/pm/state";
+import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
 import { hasSameAttributes } from "../../utils/prosemirror";
-import { Attachment, getDataAttribute } from "../attachment";
+import {
+  ImageAlignmentOptions,
+  ImageAttachment,
+  getDataAttribute
+} from "../attachment";
 import { createSelectionBasedNodeView } from "../react";
 import { TextDirections } from "../text-direction";
 import { ImageComponent } from "./component";
-
-type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 export interface ImageOptions {
   inline: boolean;
@@ -39,41 +34,11 @@ export interface ImageOptions {
   HTMLAttributes: Record<string, unknown>;
 }
 
-/**
- * We have two attributes that store the source of an image:
- *
- * 1. `src`
- * 2. `dataurl`
- *
- * `src` is the image's inherent source. This can contain a URL, a base64-dataurl,
- * a blob...etc. We should never touch this attribute. This is also where we store
- * the data that we want to upload so after we download a pasted image, its base64
- * dataurl goes in this attribute.
- *
- * `dataurl` should never get added to the final HTML. This attribute is where we
- * restore an image's data after loading a note.
- *
- * The reason we have 2 instead of a single attribute is to avoid unnecessary processing.
- * Keeping everything in the `src` attribute requires us to always send the rendered image
- * along with everything else. This is pointless because we already have the image's rendered
- * data.
- */
-export type ImageAttributes = Partial<ImageSizeOptions> &
-  Attachment & {
-    src: string;
-    bloburl?: string;
-    alt?: string;
-    title?: string;
-    textDirection?: TextDirections;
-    aspectRatio?: number;
-  };
-
-export type ImageAlignmentOptions = {
-  float?: boolean;
-  align?: "center" | "left" | "right";
+export type ImageAttributes = ImageAttachment & {
+  textDirection?: TextDirections;
 };
 
-export type ImageSizeOptions = {
+export type ImageSize = {
   width: number;
   height: number;
 };
@@ -85,12 +50,8 @@ declare module "@tiptap/core" {
        * Add an image
        */
       insertImage: (options: Partial<ImageAttributes>) => ReturnType;
-      updateImage: (
-        query: { src?: string; hash?: string },
-        options: Partial<ImageAttributes> & { preventUpdate?: boolean }
-      ) => ReturnType;
       setImageAlignment: (options: ImageAlignmentOptions) => ReturnType;
-      setImageSize: (options: ImageSizeOptions) => ReturnType;
+      setImageSize: (size: ImageSize) => ReturnType;
     };
   }
 }
@@ -120,13 +81,13 @@ export const ImageNode = Node.create<ImageOptions>({
 
   addAttributes() {
     return {
+      type: { default: "image", rendered: false },
+      progress: {
+        default: 0,
+        rendered: false
+      },
+
       src: {
-        default: null
-      },
-      alt: {
-        default: null
-      },
-      title: {
         default: null
       },
       width: { default: null },
@@ -142,7 +103,10 @@ export const ImageNode = Node.create<ImageOptions>({
       size: getDataAttribute("size"),
       aspectRatio: {
         default: undefined,
-        parseHTML: (element) => element.dataset.aspectRatio,
+        parseHTML: (element) =>
+          element.dataset.aspectRatio
+            ? parseFloat(element.dataset.aspectRatio)
+            : 1,
         renderHTML: (attributes) => {
           if (!attributes.aspectRatio) {
             return {};
@@ -152,11 +116,6 @@ export const ImageNode = Node.create<ImageOptions>({
             [`data-aspect-ratio`]: attributes.aspectRatio
           };
         }
-      },
-
-      bloburl: {
-        ...getDataAttribute("bloburl"),
-        rendered: false
       }
     };
   },
@@ -182,28 +141,6 @@ export const ImageNode = Node.create<ImageOptions>({
       shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs),
       forceEnableSelection: true
     });
-  },
-
-  addProseMirrorPlugins() {
-    return [
-      new Plugin({
-        props: {
-          transformCopied: (content) => {
-            content.content.descendants((node) => {
-              if (
-                node.type.name === this.name &&
-                typeof node.attrs.bloburl === "string"
-              ) {
-                const attrs = node.attrs as Writeable<Attrs>;
-                attrs.src = attrs.bloburl;
-                delete attrs.bloburl;
-              }
-            });
-            return content;
-          }
-        }
-      })
-    ];
   },
 
   addCommands() {
@@ -242,32 +179,6 @@ export const ImageNode = Node.create<ImageOptions>({
             .updateAttributes(this.name, { ...options })
             .setNodeSelection(from)
             .run();
-        },
-      updateImage:
-        (query, options) =>
-        ({ state, tr }) => {
-          const keyedQuery = query.hash
-            ? { key: "hash", value: query.hash }
-            : query.src
-            ? { key: "src", value: query.src }
-            : null;
-          if (!keyedQuery) return false;
-
-          const images = findChildren(
-            state.doc,
-            (node) =>
-              node.type.name === this.name &&
-              node.attrs[keyedQuery.key] === keyedQuery.value
-          );
-          for (const image of images) {
-            tr.setNodeMarkup(image.pos, image.node.type, {
-              ...image.node.attrs,
-              ...options
-            });
-          }
-          tr.setMeta("preventUpdate", options.preventUpdate || false);
-          tr.setMeta("addToHistory", false);
-          return true;
         }
     };
   },

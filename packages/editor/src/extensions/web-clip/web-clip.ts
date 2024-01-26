@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Node, mergeAttributes, findChildren } from "@tiptap/core";
+import { Node, mergeAttributes } from "@tiptap/core";
 import { hasSameAttributes } from "../../utils/prosemirror";
-import { getDataAttribute } from "../attachment";
+import { WebClipAttachment, getDataAttribute } from "../attachment";
 import { createSelectionBasedNodeView } from "../react";
 import { WebClipComponent } from "./component";
 
@@ -27,27 +27,9 @@ export interface WebClipOptions {
   HTMLAttributes: Record<string, unknown>;
 }
 
-export type WebClipAttributes = {
+export type WebClipAttributes = WebClipAttachment & {
   fullscreen: boolean;
-  src: string;
-  html: string;
-  title: string;
-  hash: string;
-  type: string;
-  width?: string;
-  height?: string;
 };
-
-declare module "@tiptap/core" {
-  interface Commands<ReturnType> {
-    webclip: {
-      updateWebClip: (
-        query: { hash?: string },
-        options: { src: string }
-      ) => ReturnType;
-    };
-  }
-}
 
 export const WebClipNode = Node.create<WebClipOptions>({
   name: "webclip",
@@ -68,13 +50,14 @@ export const WebClipNode = Node.create<WebClipOptions>({
 
   addAttributes() {
     return {
+      type: { default: "web-clip", rendered: false },
+      progress: {
+        default: 0,
+        rendered: false
+      },
       fullscreen: {
         rendered: false,
         default: false
-      },
-      html: {
-        rendered: false,
-        default: null
       },
       src: {
         default: null
@@ -89,7 +72,7 @@ export const WebClipNode = Node.create<WebClipOptions>({
         default: null
       },
       hash: getDataAttribute("hash"),
-      type: getDataAttribute("mime")
+      mime: getDataAttribute("mime")
     };
   },
 
@@ -113,30 +96,5 @@ export const WebClipNode = Node.create<WebClipOptions>({
       shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs),
       forceEnableSelection: true
     });
-  },
-
-  addCommands() {
-    return {
-      updateWebClip:
-        (query, options) =>
-        ({ state, tr, dispatch }) => {
-          const clips = findChildren(
-            state.doc,
-            (node) =>
-              node.type.name === this.name && node.attrs["hash"] === query.hash
-          );
-
-          for (const clip of clips) {
-            tr.setNodeMarkup(clip.pos, clip.node.type, {
-              ...clip.node.attrs,
-              html: options.src
-            });
-          }
-          tr.setMeta("preventUpdate", true);
-          tr.setMeta("addToHistory", false);
-          if (dispatch) dispatch(tr);
-          return true;
-        }
-    };
   }
 });
