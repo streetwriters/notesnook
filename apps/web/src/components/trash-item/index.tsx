@@ -59,7 +59,9 @@ function TrashItem(props: TrashItemProps) {
       menuItems={menuItems}
       onClick={() => {
         if (item.itemType === "note")
-          hashNavigate(`/notes/${item.id}/edit`, { replace: true });
+          !item.locked
+            ? hashNavigate(`/notes/${item.id}/edit`, { replace: true })
+            : showToast("error", "Locked notes cannot be previewed in trash.");
       }}
     />
   );
