@@ -296,7 +296,7 @@ export default class Attachments extends Collection {
     if (!data) return;
 
     return outputType === "base64"
-      ? dataurl.fromObject({ type: attachment.metadata.type, data })
+      ? dataurl.fromObject({ type: "application/octet-stream", data })
       : data;
   }
 

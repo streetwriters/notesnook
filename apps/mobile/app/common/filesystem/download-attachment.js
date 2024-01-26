@@ -181,7 +181,8 @@ export default async function downloadAttachment(
     silent: false,
     cache: false,
     throwError: false,
-    groupId: undefined
+    groupId: undefined,
+    base64: false
   }
 ) {
   await createCacheDir();
@@ -212,10 +213,15 @@ export default async function downloadAttachment(
       options.groupId || attachment.metadata.hash,
       attachment.metadata.hash
     );
+
     if (
       !(await RNFetchBlob.fs.exists(`${cacheDir}/${attachment.metadata.hash}`))
     )
       return;
+
+    if (options.base64) {
+      return await db.attachments.read(attachment.metadata.hash, "base64");
+    }
 
     let filename = getFileNameWithExtension(
       attachment.metadata.filename,

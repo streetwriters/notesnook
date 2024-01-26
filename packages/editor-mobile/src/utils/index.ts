@@ -23,6 +23,13 @@ import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { ThemeDefinition } from "@notesnook/theme";
 
+globalThis.pendingResolvers = {};
+export function randId(prefix: string) {
+  return Math.random()
+    .toString(36)
+    .replace("0.", prefix || "");
+}
+
 export type SafeAreaType = {
   top: number;
   left: number;
@@ -49,6 +56,9 @@ export type Settings = {
 
 /* eslint-disable no-var */
 declare global {
+  var pendingResolvers: {
+    [key: string]: (value: any) => void;
+  };
   var statusBar: React.MutableRefObject<{
     set: React.Dispatch<
       React.SetStateAction<{
@@ -154,7 +164,8 @@ export const EventTypes = {
   contentchange: "editor-event:content-change",
   reminders: "editor-event:reminders",
   previewAttachment: "editor-event:preview-attachment",
-  copyToClipboard: "editor-events:copy-to-clipboard"
+  copyToClipboard: "editor-events:copy-to-clipboard",
+  getAttachmentData: "editor-events:get-attachment-data"
 } as const;
 
 export function isReactNative(): boolean {

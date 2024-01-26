@@ -30,7 +30,7 @@ import {
   useRef,
   useState
 } from "react";
-import { EventTypes, isReactNative, post, saveTheme } from "../utils";
+import { EventTypes, isReactNative, post, randId, saveTheme } from "../utils";
 import { injectCss, transform } from "../utils/css";
 
 type Attachment = {
@@ -102,6 +102,7 @@ export type EditorController = {
   setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
   countWords: (ms: number) => void;
   copyToClipboard: (text: string) => void;
+  getAttachmentData: (attachment: Attachment) => Promise<string>;
 };
 
 export function useEditorController(update: () => void): EditorController {
@@ -211,6 +212,12 @@ export function useEditorController(update: () => void): EditorController {
             scrollIntoView(editor?.current as any);
           }
           break;
+        case "native:attachment-data":
+          if (pendingResolvers[value.resolverId]) {
+            logger("info", "resolved data for attachment", value.resolverId);
+            pendingResolvers[value.resolverId](value.data);
+          }
+          break;
         default:
           break;
       }
@@ -252,6 +259,20 @@ export function useEditorController(update: () => void): EditorController {
     post(EventTypes.copyToClipboard, text);
   };
 
+  const getAttachmentData = (attachment: Attachment) => {
+    return new Promise<string>((resolve, reject) => {
+      const resolverId = randId("get_attachment_data");
+      pendingResolvers[resolverId] = (data) => {
+        delete pendingResolvers[resolverId];
+        resolve(data);
+      };
+      post(EventTypes.getAttachmentData, {
+        attachment,
+        resolverId: resolverId
+      });
+    });
+  };
+
   return {
     contentChange,
     selectionChange,
@@ -268,6 +289,7 @@ export function useEditorController(update: () => void): EditorController {
     openLink,
     onUpdate: onUpdate,
     countWords,
-    copyToClipboard
+    copyToClipboard,
+    getAttachmentData
   };
 }

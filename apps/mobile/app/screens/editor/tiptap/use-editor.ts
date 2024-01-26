@@ -78,7 +78,6 @@ export const useEditor = (
   const saveCount = useRef(0);
   const lastContentChangeTime = useRef<number>(0);
   const lock = useRef(false);
-  const loadedImages = useRef<{ [name: string]: boolean }>({});
   const lockedSessionId = useRef<string>();
   const loadingState = useRef<string>();
 
@@ -129,12 +128,9 @@ export const useEditor = (
 
   const reset = useCallback(
     async (resetState = true, resetContent = true) => {
-      currentNote.current?.id &&
-        db.fs?.cancel(currentNote.current.id, "download");
+      currentNote.current?.id && db.fs?.cancel(currentNote.current.id);
       currentNote.current = null;
-      loadedImages.current = {};
       currentContent.current = null;
-      clearTimeout(timers.current["loading-images"]);
       sessionHistoryId.current = undefined;
       saveCount.current = 0;
       loadingState.current = undefined;
@@ -287,58 +283,6 @@ export const useEditor = (
     }
   }, []);
 
-  const getMediaToLoad = (previousContent?: string) => {
-    if (!currentNote.current?.id) return [];
-
-    const previousAttachments =
-      previousContent?.matchAll(/data-hash="(.+?)"/gm) || [];
-    const attachments =
-      currentContent.current?.data?.matchAll(/data-hash="(.+?)"/gm) || [];
-
-    const media: string[] = [];
-
-    const oldMatches = Array.from(previousAttachments).map((match) => match[1]);
-    const matches = Array.from(attachments).map((match) => match[1]);
-
-    for (let i = 0; i < matches.length; i++) {
-      const currentHash = matches[i];
-      const oldHash = oldMatches[i];
-      if (currentHash !== oldHash) {
-        media.push(currentHash);
-        loadedImages.current[currentHash] = false;
-      }
-    }
-    return media;
-  };
-
-  const markImageLoaded = (hash: string) => {
-    const attachment = loadedImages.current[hash];
-    if (typeof attachment === "boolean") {
-      loadedImages.current[hash] = true;
-    }
-  };
-
-  const loadImages = useCallback((previousContent?: string) => {
-    if (!currentNote.current?.id) return;
-    const timerId = "loading-images";
-    clearTimeout(timers.current[timerId]);
-    timers.current[timerId] = setTimeout(() => {
-      if (!currentNote.current?.id) return;
-      if (currentNote.current?.content?.isPreview) {
-        db.content?.downloadMedia(
-          currentNote.current?.id,
-          currentNote.current.content,
-          true
-        );
-      } else {
-        const media = getMediaToLoad(previousContent);
-        if (media.length > 0) {
-          db.attachments?.downloadMedia(currentNote.current?.id, media);
-        }
-      }
-    }, 1000);
-  }, []);
-
   const loadNote = useCallback(
     async (
       item: Omit<NoteType, "type"> & {
@@ -425,18 +369,9 @@ export const useEditor = (
           }
         }, 300);
         overlay(false);
-        loadImages();
       }
     },
-    [
-      commands,
-      isDefaultEditor,
-      loadContent,
-      loadImages,
-      overlay,
-      postMessage,
-      reset
-    ]
+    [commands, isDefaultEditor, loadContent, overlay, postMessage, reset]
   );
 
   const lockNoteWithVault = useCallback((note: NoteType) => {
@@ -465,8 +400,6 @@ export const useEditor = (
         return;
 
       lock.current = true;
-
-      const previousContent = currentContent.current?.data;
 
       if (data.type === "tiptap") {
         if (!currentNote.current.locked && isContentEncrypted) {
@@ -500,18 +433,8 @@ export const useEditor = (
       }
 
       lock.current = false;
-      if (data.type === "tiptap") {
-        loadImages(previousContent);
-        db.eventManager.subscribe(
-          EVENTS.syncCompleted,
-          () => {
-            loadImages(previousContent);
-          },
-          true
-        );
-      }
     },
-    [loadImages, lockNoteWithVault, postMessage, commands]
+    [lockNoteWithVault, postMessage, commands]
   );
 
   useEffect(() => {
@@ -689,7 +612,6 @@ export const useEditor = (
     saveContent,
     onContentChanged,
     editorId: editorId,
-    markImageLoaded,
     overlay,
     postMessage
   };

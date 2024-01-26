@@ -17,10 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type {
-  Attachment,
-  AttachmentProgress
-} from "@notesnook/editor/dist/extensions/attachment/index";
+import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import type { ImageAttributes } from "@notesnook/editor/dist/extensions/image/index";
 import { createRef, RefObject } from "react";
 import { Platform } from "react-native";
@@ -203,11 +200,16 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     );
   };
 
-  setAttachmentProgress = async (attachmentProgress: AttachmentProgress) => {
+  setAttachmentProgress = async (attachmentProgress: Partial<Attachment>) => {
     await this.doAsync(
-      `editor && editor.commands.setAttachmentProgress(${JSON.stringify(
+      `editor && editor.commands.updateAttachment(${JSON.stringify(
         attachmentProgress
-      )})`
+      )}, {
+        preventUpdate: true,
+        query: (attachment) => {
+          return attachment.hash === "${attachmentProgress.hash}";
+        }
+      })`
     );
   };
 

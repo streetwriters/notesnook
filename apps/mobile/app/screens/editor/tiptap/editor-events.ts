@@ -36,5 +36,6 @@ export const EventTypes = {
   contentchange: "editor-event:content-change",
   reminders: "editor-event:reminders",
   previewAttachment: "editor-event:preview-attachment",
-  copyToClipboard: "editor-events:copy-to-clipboard"
+  copyToClipboard: "editor-events:copy-to-clipboard",
+  getAttachmentData: "editor-events:get-attachment-data"
 };

@@ -36,9 +36,13 @@ export async function readEncrypted(filename, key, cipherData) {
     }
 
     const attachment = db.attachments.attachment(filename);
-    const isPng = /(png)/g.test(attachment?.metadata.type);
-    const isJpeg = /(jpeg|jpg)/g.test(attachment?.metadata.type);
-    console.log("decrypting....");
+    const isPng = !attachment.metadata.type
+      ? false
+      : /(png)/g.test(attachment?.metadata.type);
+    const isJpeg = !attachment.metadata.type
+      ? false
+      : /(jpeg|jpg)/g.test(attachment?.metadata.type);
+
     let output = await Sodium.decryptFile(
       key,
       {
