@@ -25,6 +25,7 @@ const regExp = /(?:__|[*#])|\[.*?\]\((.*?)\)/gm;
 export const Link = TiptapLink.extend({
   addInputRules() {
     return [
+      ...(this.parent?.() || []),
       markInputRule({
         find: linkRegex,
         type: this.type,
@@ -38,6 +39,7 @@ export const Link = TiptapLink.extend({
   },
   addPasteRules() {
     return [
+      ...(this.parent?.() || []),
       markPasteRule({
         find: linkRegex,
         type: this.type,

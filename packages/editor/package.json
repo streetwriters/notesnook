@@ -18,7 +18,7 @@
     "@tiptap/extension-font-family": "2.1.12",
     "@tiptap/extension-history": "2.1.12",
     "@tiptap/extension-horizontal-rule": "2.1.12",
-    "@tiptap/extension-link": "2.1.12",
+    "@tiptap/extension-link": "^2.1.16",
     "@tiptap/extension-list-keymap": "2.1.12",
     "@tiptap/extension-placeholder": "2.1.12",
     "@tiptap/extension-subscript": "2.1.12",
