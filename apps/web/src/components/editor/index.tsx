@@ -135,26 +135,7 @@ export default function EditorManager({
             if (result) item.data = result.data;
             else EV.publish(EVENTS.vaultLocked);
           }
-          const oldHashes = editorInstance.current.getMediaHashes();
-
           editorInstance.current.updateContent(item.data as string);
-
-          const newHashes = editorInstance.current.getMediaHashes();
-          const hashesToLoad = newHashes.filter(
-            (hash, index) => hash !== oldHashes[index]
-          );
-
-          if (appstore.get().isSyncing()) {
-            db.eventManager.subscribe(
-              EVENTS.syncCompleted,
-              async () => {
-                await db.attachments?.downloadMedia(id, hashesToLoad);
-              },
-              true
-            );
-          } else {
-            await db.attachments?.downloadMedia(id, hashesToLoad);
-          }
         } else if (isNote) {
           if (!locked && item.locked) return EV.publish(EVENTS.vaultLocked);
 
@@ -179,18 +160,6 @@ export default function EditorManager({
     lastSavedTime.current = Date.now();
     setTimestamp(Date.now());
   }, []);
-
-  const loadMedia = useCallback(async () => {
-    if (previewSession.current) {
-      await db.content?.downloadMedia(
-        noteId,
-        previewSession.current.content,
-        true
-      );
-    } else if (noteId && editorstore.get().session.content) {
-      await db.attachments?.downloadMedia(noteId);
-    }
-  }, [noteId]);
 
   useEffect(() => {
     if (!isNewSession) return;
@@ -237,6 +206,7 @@ export default function EditorManager({
               />
             )}
             <Editor
+              id={noteId}
               nonce={timestamp}
               content={() =>
                 previewSession.current?.content?.data ||
@@ -247,7 +217,6 @@ export default function EditorManager({
               options={{
                 readonly: isReadonly || isPreviewSession,
                 onRequestFocus: () => toggleProperties(false),
-                onLoadMedia: loadMedia,
                 focusMode: isFocusMode,
                 isMobile: isMobile || isTablet
               }}
@@ -351,9 +320,9 @@ type EditorOptions = {
   readonly?: boolean;
   focusMode?: boolean;
   onRequestFocus?: () => void;
-  onLoadMedia?: () => void;
 };
 type EditorProps = {
+  id: string | number;
   content: () => string | undefined;
   nonce?: number;
   options?: EditorOptions;
@@ -361,8 +330,9 @@ type EditorProps = {
   onPreviewDocument?: (preview: DocumentPreview) => void;
 };
 export function Editor(props: EditorProps) {
-  const { content, nonce, options, onContentChange, onPreviewDocument } = props;
-  const { readonly, headless, onLoadMedia, isMobile } = options || {
+  const { id, content, nonce, options, onContentChange, onPreviewDocument } =
+    props;
+  const { readonly, headless, isMobile } = options || {
     headless: false,
     readonly: false,
     focusMode: false,
@@ -375,40 +345,16 @@ export function Editor(props: EditorProps) {
   useEffect(() => {
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
-      ({ hash, loaded, total, type }: AttachmentProgress) => {
+      ({ hash, loaded, total }: AttachmentProgress) => {
         editor.current?.sendAttachmentProgress(
           hash,
-          type,
           Math.round((loaded / total) * 100)
         );
       }
     );
 
-    const mediaAttachmentDownloadedEvent = EV.subscribe(
-      EVENTS.mediaAttachmentDownloaded,
-      ({
-        groupId,
-        hash,
-        attachmentType,
-        src
-      }: {
-        groupId?: string;
-        attachmentType: "image" | "webclip" | "generic";
-        hash: string;
-        src: string;
-      }) => {
-        if (groupId?.startsWith("monograph")) return;
-        if (attachmentType === "image") {
-          editor.current?.loadImage(hash, src);
-        } else if (attachmentType === "webclip") {
-          editor.current?.loadWebClip(hash, src);
-        }
-      }
-    );
-
     return () => {
       event.unsubscribe();
-      mediaAttachmentDownloadedEvent.unsubscribe();
     };
   }, [editor]);
 
@@ -424,7 +370,6 @@ export function Editor(props: EditorProps) {
           corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
         }}
         onLoad={() => {
-          if (onLoadMedia) onLoadMedia();
           if (nonce && nonce > 0) setIsLoading(false);
         }}
         onContentChange={onContentChange}
@@ -437,8 +382,11 @@ export function Editor(props: EditorProps) {
             const container = document.getElementById("dialogContainer");
             if (!(container instanceof HTMLElement)) return;
 
-            const dataurl =
-              data.bloburl || (await downloadAttachment(hash, "base64"));
+            const dataurl = await downloadAttachment(
+              hash,
+              "base64",
+              id.toString()
+            );
             if (!dataurl)
               return showToast("error", "This image cannot be previewed.");
 
@@ -455,7 +403,7 @@ export function Editor(props: EditorProps) {
             );
           } else if (attachment && onPreviewDocument) {
             onPreviewDocument({ hash });
-            const blob = await downloadAttachment(hash, "blob");
+            const blob = await downloadAttachment(hash, "blob", id.toString());
             if (!blob) return;
             onPreviewDocument({ url: URL.createObjectURL(blob), hash });
           }
@@ -466,6 +414,14 @@ export function Editor(props: EditorProps) {
             if (!file) return;
             editor.current?.attachFile(file);
           });
+        }}
+        onGetAttachmentData={(attachment) => {
+          console.log("ID", id);
+          return downloadAttachment(
+            attachment.hash,
+            attachment.type === "web-clip" ? "text" : "base64",
+            id.toString()
+          );
         }}
         onAttachFile={async (file) => {
           const result = await attachFile(file);

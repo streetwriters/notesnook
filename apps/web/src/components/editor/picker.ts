@@ -25,6 +25,7 @@ import { TaskManager } from "../../common/task-manager";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { showToast } from "../../utils/toast";
 import { showFilePicker } from "../../utils/file-picker";
+import { Attachment } from "@notesnook/editor";
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
@@ -80,33 +81,54 @@ export async function reuploadAttachment(
 }
 
 /**
- * @param {File} selectedFile
+ * @param {File} file
  * @returns
  */
-async function pickFile(selectedFile: File, options?: AddAttachmentOptions) {
+async function pickFile(
+  file: File,
+  options?: AddAttachmentOptions
+): Promise<Attachment | undefined> {
   try {
-    if (selectedFile.size > FILE_SIZE_LIMIT)
+    if (file.size > FILE_SIZE_LIMIT)
       throw new Error("File too big. You cannot add files over 500 MB.");
-    if (!selectedFile) return;
+    if (!file) return;
 
-    return await addAttachment(selectedFile, undefined, options);
+    const hash = await addAttachment(file, options);
+    return {
+      type: "file",
+      filename: file.name,
+      hash,
+      mime: file.type,
+      size: file.size
+    };
   } catch (e) {
     showToast("error", `${(e as Error).message}`);
   }
 }
 
 /**
- * @param {File} selectedImage
+ * @param {File} file
  * @returns
  */
-async function pickImage(selectedImage: File, options?: AddAttachmentOptions) {
+async function pickImage(
+  file: File,
+  options?: AddAttachmentOptions
+): Promise<Attachment | undefined> {
   try {
-    if (selectedImage.size > IMAGE_SIZE_LIMIT)
+    if (file.size > IMAGE_SIZE_LIMIT)
       throw new Error("Image too big. You cannot add images over 50 MB.");
-    if (!selectedImage) return;
+    if (!file) return;
 
-    const dataurl = await toDataURL(selectedImage);
-    return await addAttachment(selectedImage, dataurl, options);
+    const hash = await addAttachment(file, options);
+    const dimensions = await getImageDimensions(file);
+    return {
+      type: "image",
+      filename: file.name,
+      hash,
+      mime: file.type,
+      size: file.size,
+      ...dimensions
+    };
   } catch (e) {
     showToast("error", (e as Error).message);
   }
@@ -118,26 +140,11 @@ async function getEncryptionKey(): Promise<SerializedKey> {
   return key;
 }
 
-async function toDataURL(file: File): Promise<string> {
-  const buffer = await file.arrayBuffer();
-  const base64 = Buffer.from(buffer).toString("base64");
-  return `data:${file.type};base64,${base64}`;
-}
-
 export type AttachmentProgress = {
   hash: string;
   type: "encrypt" | "download" | "upload";
   total: number;
   loaded: number;
-};
-
-export type Attachment = {
-  hash: string;
-  filename: string;
-  mime: string;
-  size: number;
-  dataurl?: string;
-  bloburl?: string;
 };
 
 type AddAttachmentOptions = {
@@ -148,9 +155,8 @@ type AddAttachmentOptions = {
 
 async function addAttachment(
   file: File,
-  dataurl: string | undefined,
   options: AddAttachmentOptions = {}
-): Promise<Attachment> {
+): Promise<string> {
   const { default: FS } = await import("../../interfaces/fs");
   const { expectedFileHash, showProgress = true } = options;
   let forceWrite = options.forceWrite;
@@ -187,13 +193,7 @@ async function addAttachment(
       });
     }
 
-    return {
-      hash: hash,
-      filename: file.name,
-      mime: file.type,
-      size: file.size,
-      dataurl
-    };
+    return hash;
   };
 
   const result = showProgress
@@ -204,7 +204,10 @@ async function addAttachment(
   return result;
 }
 
-function withProgress<T>(file: File, action: () => Promise<T>): Promise<T> {
+function withProgress<T>(
+  file: File,
+  action: () => Promise<T>
+): Promise<T | Error> {
   return TaskManager.startTask({
     type: "modal",
     title: "Encrypting attachment",
@@ -225,4 +228,20 @@ function withProgress<T>(file: File, action: () => Promise<T>): Promise<T> {
       return action();
     }
   });
+}
+
+function getImageDimensions(file: File) {
+  return new Promise<{ width: number; height: number } | undefined>(
+    (resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const { naturalWidth: width, naturalHeight: height } = img;
+        resolve({ width, height });
+      };
+      img.onerror = () => {
+        resolve(undefined);
+      };
+      img.src = URL.createObjectURL(file);
+    }
+  );
 }

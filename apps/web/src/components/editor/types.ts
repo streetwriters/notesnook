@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Attachment } from "./picker";
+import { Attachment } from "@notesnook/editor";
 
 export type NoteStatistics = {
   words: {
@@ -33,14 +33,7 @@ export interface IEditor {
   }) => void;
   undo: () => void;
   redo: () => void;
-  getMediaHashes: () => string[];
   updateContent: (content: string) => void;
   attachFile: (file: Attachment) => void;
-  loadWebClip: (hash: string, html: string) => void;
-  loadImage: (hash: string, src: string) => void;
-  sendAttachmentProgress: (
-    hash: string,
-    type: "download" | "upload" | "encrypt",
-    progress: number
-  ) => void;
+  sendAttachmentProgress: (hash: string, progress: number) => void;
 }
