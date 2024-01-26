@@ -246,7 +246,7 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
               }}
               editor={_editor}
               location="bottom"
-              tools={[...settings.tools]}
+              tools={settings.tools}
               defaultFontFamily={settings.fontFamily}
               defaultFontSize={settings.fontSize}
             />
