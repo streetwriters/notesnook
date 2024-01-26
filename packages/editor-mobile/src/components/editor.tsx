@@ -76,6 +76,9 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
         global.editorController.previewAttachment(attachment);
         return true;
       },
+      getAttachmentData(attachment) {
+        return global.editorController.getAttachmentData(attachment);
+      },
       element: !layout ? undefined : contentRef.current || undefined,
       editable: !settings.readonly,
       editorProps: {
@@ -226,7 +229,10 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
           />
 
           <div
-            onClick={onClickBottomArea}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              onClickBottomArea();
+            }}
             style={{
               flexGrow: 1,
               width: "100%",

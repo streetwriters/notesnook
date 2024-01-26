@@ -577,6 +577,16 @@ p > *::selection {
   pointer-events: none;
 }
 
+.ProseMirror > p[data-spacing="double"] .resizer {
+  margin-bottom: 1em;
+}
+
+.ProseMirror > p[data-spacing="single"] .resizer {
+  margin-top: 1em !important;
+  margin-bottom: 1em;
+}
+
+
 /* RTL */
 
 [dir="rtl"] * {

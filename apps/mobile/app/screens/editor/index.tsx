@@ -93,35 +93,6 @@ const Editor = React.memo(
         get: () => editor
       }));
 
-      const onMediaDownloaded = useCallback(
-        ({
-          hash,
-          groupId,
-          src,
-          attachmentType
-        }: {
-          hash: string;
-          groupId: string;
-          src: string;
-          attachmentType: string;
-        }) => {
-          if (groupId !== editor.note.current?.id) return;
-          editorController.current.markImageLoaded(hash);
-          if (attachmentType === "webclip") {
-            editor.commands.updateWebclip({
-              hash: hash,
-              src: src
-            });
-          } else {
-            editor.commands.updateImage({
-              hash: hash,
-              dataurl: src
-            });
-          }
-        },
-        [editor.commands, editor.note]
-      );
-
       const onError = useCallback(() => {
         renderKey.current =
           renderKey.current === `editor-0` ? `editor-1` : `editor-0`;
@@ -130,16 +101,11 @@ const Editor = React.memo(
       }, [editor]);
 
       useEffect(() => {
-        const sub = [
-          eSubscribeEvent("webview_reset", onError),
-          EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded)
-        ];
-
+        const sub = [eSubscribeEvent("webview_reset", onError)];
         return () => {
           sub.forEach((s) => s.unsubscribe());
-          EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
         };
-      }, [onError, onMediaDownloaded]);
+      }, [onError]);
 
       useLayoutEffect(() => {
         setImmediate(() => {

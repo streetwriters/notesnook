@@ -68,8 +68,7 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     if (!progress) return;
     editorController.current?.commands.setAttachmentProgress({
       hash: hash,
-      progress: 100,
-      type: progress[hash]?.type || "download"
+      progress: 100
     });
     progress[hash] = null;
     set({ progress: { ...progress } });
@@ -80,10 +79,11 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     progress[hash] = { sent, total, hash, recieved, type };
     const progressPercentage =
       type === "upload" ? sent / total : recieved / total;
+
     editorController.current?.commands.setAttachmentProgress({
       hash: hash,
-      progress: Math.round(Math.max(progressPercentage * 100, 0)),
-      type: type
+      //@ts-ignore
+      progress: Math.round(Math.max(progressPercentage * 100, 0))
     });
     set({ progress: { ...progress } });
   },

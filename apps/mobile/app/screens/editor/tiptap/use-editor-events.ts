@@ -66,6 +66,7 @@ import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
 import { useNoteStore } from "../../../stores/use-notes-store";
 import SettingsService from "../../../services/settings";
+import downloadAttachment from "../../../common/filesystem/download-attachment";
 
 const publishNote = async (editor: useEditorType) => {
   const user = useUserStore.getState().user;
@@ -413,6 +414,43 @@ export const useEditorEvents = (
           const downloadAttachment =
             require("../../../common/filesystem/download-attachment").default;
           downloadAttachment((editorMessage.value as Attachment)?.hash, true);
+          break;
+        }
+
+        case EventTypes.getAttachmentData: {
+          const attachment = (editorMessage.value as any)
+            .attachment as Attachment;
+
+          console.log(
+            "Getting attachment data:",
+            attachment.hash,
+            attachment.type
+          );
+          downloadAttachment(attachment.hash, true, {
+            base64: true,
+            silent: true,
+            groupId: editor.note.current?.id,
+            cache: true
+          } as any)
+            .then((data: any) => {
+              console.log(
+                "Got attachment data:",
+                !!data,
+                (editorMessage.value as any).resolverId
+              );
+              editor.postMessage(EditorEvents.attachmentData, {
+                resolverId: (editorMessage.value as any).resolverId,
+                data
+              });
+            })
+            .catch(() => {
+              console.log("Error downloading attachment data");
+              editor.postMessage(EditorEvents.attachmentData, {
+                resolverId: (editorMessage.value as any).resolverId,
+                data: undefined
+              });
+            });
+
           break;
         }
 

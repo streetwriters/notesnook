@@ -50,7 +50,8 @@ export const EditorEvents: { [name: string]: string } = {
   titleplaceholder: "native:titleplaceholder",
   logger: "native:logger",
   status: "native:status",
-  keyboardShown: "native:keyboardShown"
+  keyboardShown: "native:keyboardShown",
+  attachmentData: "native:attachment-data"
 };
 
 export function randId(prefix: string) {
