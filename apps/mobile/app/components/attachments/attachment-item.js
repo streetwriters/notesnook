@@ -132,7 +132,7 @@ export const AttachmentItem = ({
           activeOpacity={0.9}
           onPress={() => {
             if (encryption || !pressable) return;
-            db.fs.cancel(attachment.metadata.hash, currentProgress.type);
+            db.fs.cancel(attachment.metadata.hash);
             setCurrentProgress(null);
           }}
           style={{
