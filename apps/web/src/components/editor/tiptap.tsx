@@ -34,11 +34,11 @@ import {
   getTotalWords,
   countWords,
   getFontById,
-  TiptapOptions
+  TiptapOptions,
+  Attachment
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
-import { Attachment } from "./picker";
 import { IEditor } from "./types";
 import {
   useConfigureEditor,
@@ -57,7 +57,6 @@ import { store as editorstore } from "../../stores/editor-store";
 import { ScopedThemeProvider } from "../theme-provider";
 import { writeText } from "clipboard-polyfill";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 
 type OnChangeHandler = (
   id: string | undefined,
@@ -72,6 +71,7 @@ type TipTapProps = {
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
   onPreviewAttachment?: (attachment: Attachment) => void;
+  onGetAttachmentData?: (attachment: Attachment) => Promise<string | undefined>;
   onAttachFile?: (file: File) => void;
   onFocus?: () => void;
   content?: () => string | undefined;
@@ -117,6 +117,7 @@ function TipTap(props: TipTapProps) {
     onInsertAttachment,
     onDownloadAttachment,
     onPreviewAttachment,
+    onGetAttachmentData,
     onAttachFile,
     onContentChange,
     onFocus = () => {},
@@ -282,7 +283,8 @@ function TipTap(props: TipTapProps) {
       onOpenLink: (url) => {
         window.open(url, "_blank");
         return true;
-      }
+      },
+      getAttachmentData: onGetAttachmentData
     };
   }, [readonly, nonce, doubleSpacedLines, dateFormat, timeFormat]);
 
@@ -420,14 +422,6 @@ function toIEditor(editor: Editor): IEditor {
       }),
     undo: () => editor.current?.commands.undo(),
     redo: () => editor.current?.commands.redo(),
-    getMediaHashes: () => {
-      if (!editor.current) return [];
-      const hashes: string[] = [];
-      editor.current.state.doc.descendants((n) => {
-        if (typeof n.attrs.hash === "string") hashes.push(n.attrs.hash);
-      });
-      return hashes;
-    },
     updateContent: (content) => {
       const { from, to } = editor.state.selection;
       editor.current
@@ -443,27 +437,18 @@ function toIEditor(editor: Editor): IEditor {
         })
         .run();
     },
-    attachFile: (file: Attachment) => {
-      if (file.dataurl) {
-        editor.current?.commands.insertImage({
-          ...file,
-          bloburl: toBlobURL(file.dataurl, file.hash)
-        });
-      } else editor.current?.commands.insertAttachment(file);
-    },
-    loadWebClip: (hash, src) =>
-      editor.current?.commands.updateWebClip({ hash }, { src }),
-    loadImage: (hash, dataurl) =>
-      editor.current?.commands.updateImage(
-        { hash },
-        { hash, bloburl: toBlobURL(dataurl, hash), preventUpdate: true }
-      ),
-    sendAttachmentProgress: (hash, type, progress) =>
-      editor.current?.commands.setAttachmentProgress({
-        hash,
-        type,
-        progress
-      })
+    attachFile: (file: Attachment) =>
+      file.type === "image"
+        ? editor.current?.commands.insertImage(file)
+        : editor.current?.commands.insertAttachment(file),
+    sendAttachmentProgress: (hash, progress) =>
+      editor.current?.commands.updateAttachment(
+        {
+          hash,
+          progress
+        },
+        { query: (a) => a.hash === hash, preventUpdate: true }
+      )
   };
 }
 

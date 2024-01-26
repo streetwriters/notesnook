@@ -20,11 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { lazify } from "../utils/lazify";
 import { db } from "./db";
 
-async function download(hash: string) {
+async function download(hash: string, groupId?: string) {
   const attachment = db.attachments?.attachment(hash);
   if (!attachment) return;
   const downloadResult = await db.fs?.downloadFile(
-    attachment.metadata.hash,
+    groupId || attachment.metadata.hash,
     attachment.metadata.hash,
     attachment.chunkSize,
     attachment.metadata
@@ -61,8 +61,12 @@ type OutputTypeToReturnType = {
 export async function downloadAttachment<
   TType extends "blob" | "base64" | "text",
   TOutputType = OutputTypeToReturnType[TType]
->(hash: string, type: TType): Promise<TOutputType | undefined> {
-  const response = await download(hash);
+>(
+  hash: string,
+  type: TType,
+  groupId?: string
+): Promise<TOutputType | undefined> {
+  const response = await download(hash, groupId);
   if (!response) return;
   const { attachment, key } = response;
 
