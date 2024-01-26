@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import {
   Published,
@@ -63,6 +63,7 @@ function Toolbar() {
   const theme = useThemeStore((store) => store.colorScheme);
   const toggleNightMode = useThemeStore((store) => store.toggleColorScheme);
   const [isTitleVisible, setIsTitleVisible] = useState(false);
+  const onScrollTitleRef = useRef(null);
 
   const monographs = useMonographStore((store) => store.monographs);
   const { canRedo, canUndo, redo, undo } = useHistory();
@@ -93,7 +94,7 @@ function Toolbar() {
   }, [isTitleVisible]);
 
   useEffect(() => {
-    document.querySelector("#onScrollTitle").defaultValue = title;
+    onScrollTitleRef.current.defaultValue = title;
   }, [title]);
 
   const tools = useMemo(
@@ -220,7 +221,7 @@ function Toolbar() {
           }}
         />
         <AnimatedInput
-          id="onScrollTitle"
+          ref={onScrollTitleRef}
           variant="clean"
           ml={[2, 2, 0]}
           initial={{
