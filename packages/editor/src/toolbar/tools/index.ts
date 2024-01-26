@@ -66,6 +66,7 @@ import {
   ImageAlignCenter,
   ImageAlignLeft,
   ImageAlignRight,
+  ImageFloat,
   ImageProperties
 } from "./image";
 import {
@@ -130,6 +131,7 @@ const tools = {
   imageAlignLeft: ImageAlignLeft,
   imageAlignRight: ImageAlignRight,
   imageProperties: ImageProperties,
+  imageFloat: ImageFloat,
 
   embedAlignCenter: EmbedAlignCenter,
   embedAlignLeft: EmbedAlignLeft,

@@ -262,6 +262,11 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: "Align right",
     conditional: true
   },
+  imageFloat: {
+    icon: "imageFloat",
+    title: "Float image",
+    conditional: true
+  },
   imageProperties: {
     icon: "more",
     title: "Image properties",

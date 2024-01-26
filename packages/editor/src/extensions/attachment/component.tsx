@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Text } from "@theme-ui/components";
-import { AttachmentWithProgress } from "./attachment";
+import { FileAttachment } from "./types";
 import { useRef, useState } from "react";
 import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons";
@@ -27,7 +27,7 @@ import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 import { DesktopOnly } from "../../components/responsive";
 
 export function AttachmentComponent(
-  props: SelectionBasedReactNodeViewProps<AttachmentWithProgress>
+  props: SelectionBasedReactNodeViewProps<FileAttachment>
 ) {
   const { editor, node, selected } = props;
   const { filename, size, progress } = node.attrs;

@@ -39,7 +39,11 @@ import StarterKit from "@tiptap/starter-kit";
 import ListKeymap from "@tiptap/extension-list-keymap";
 import { useEffect, useMemo } from "react";
 import "./extensions";
-import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
+import {
+  Attachment,
+  AttachmentNode,
+  AttachmentOptions
+} from "./extensions/attachment";
 import BulletList from "./extensions/bullet-list";
 import { CodeBlock } from "./extensions/code-block";
 import { Codemark } from "./extensions/code-mark";
@@ -107,6 +111,7 @@ export type TiptapOptions = EditorOptions &
     downloadOptions?: DownloadOptions;
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
+    getAttachmentData: (attachment: Attachment) => Promise<string | undefined>;
   };
 
 const useTiptap = (
@@ -120,6 +125,7 @@ const useTiptap = (
     onOpenAttachmentPicker,
     onPreviewAttachment,
     onOpenLink,
+    getAttachmentData,
     onBeforeCreate,
     downloadOptions,
     dateFormat,
@@ -259,7 +265,8 @@ const useTiptap = (
         AttachmentNode.configure({
           onDownloadAttachment,
           onOpenAttachmentPicker,
-          onPreviewAttachment
+          onPreviewAttachment,
+          types: [AttachmentNode.name, ImageNode.name, WebClipNode.name]
         }),
         OutlineListItem,
         OutlineList.configure({ keepAttributes: true, keepMarks: true }),
@@ -310,6 +317,7 @@ const useTiptap = (
         editor.storage.portalProviderAPI = PortalProviderAPI;
         editor.storage.dateFormat = dateFormat;
         editor.storage.timeFormat = timeFormat;
+        editor.storage.getAttachmentData = getAttachmentData;
         if (onBeforeCreate) onBeforeCreate({ editor });
       },
       injectCSS: false,
@@ -319,6 +327,7 @@ const useTiptap = (
       onPreviewAttachment,
       onDownloadAttachment,
       onOpenAttachmentPicker,
+      getAttachmentData,
       PortalProviderAPI,
       onBeforeCreate,
       onOpenLink,
@@ -342,6 +351,7 @@ const useTiptap = (
 
 export { type Fragment } from "prosemirror-model";
 export { type Attachment, type AttachmentType } from "./extensions/attachment";
+export { type ImageAttributes } from "./extensions/image";
 export * from "./extensions/react";
 export * from "./toolbar";
 export * from "./types";

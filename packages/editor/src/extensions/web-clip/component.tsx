@@ -41,18 +41,25 @@ export function WebClipComponent(
   const [isLoading, setIsLoading] = useState(true);
   const embedRef = useRef<HTMLIFrameElement>(null);
   const resizeObserverRef = useRef<ResizeObserver>();
-  const { src, title, fullscreen, html } = node.attrs;
+  const { src, title, fullscreen, progress } = node.attrs;
 
   useEffect(() => {
-    const iframe = embedRef.current;
-    if (!iframe || !iframe.contentDocument || !isLoading || !html) return;
-    iframe.contentDocument.open();
-    iframe.contentDocument.write(html || FAILED_CONTENT);
-    iframe.contentDocument.close();
-    iframe.contentDocument.head.innerHTML += `<base target="_blank">`;
+    (async function () {
+      const iframe = embedRef.current;
+      if (!iframe || !iframe.contentDocument || !isLoading) return;
 
-    setIsLoading(false);
-  }, [html]);
+      const html = await editor.current?.storage
+        .getAttachmentData?.(node.attrs)
+        .catch(() => null);
+      iframe.contentDocument.open();
+      iframe.contentDocument.write(
+        typeof html !== "string" || !html ? FAILED_CONTENT : html
+      );
+      iframe.contentDocument.close();
+      iframe.contentDocument.head.innerHTML += `<base target="_blank">`;
+      setIsLoading(false);
+    })();
+  }, []);
 
   useEffect(() => {
     function fullscreenchanged() {
@@ -193,10 +200,14 @@ export function WebClipComponent(
               width: "100%",
               height: "calc(100% - 20px)",
               alignItems: "center",
-              justifyContent: "center"
+              justifyContent: "center",
+              flexDirection: "column"
             }}
           >
             <Icon path={Icons.loading} rotate size={32} />
+            {progress ? (
+              <Text sx={{ mt: 2 }}>Loading web clip ({progress}%)</Text>
+            ) : null}
           </Flex>
         )}
       </Box>
