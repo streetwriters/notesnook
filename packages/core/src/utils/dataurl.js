@@ -17,19 +17,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const REGEX = /^data:(image\/.+);base64,(.+)/;
+import { parse, validate } from "@readme/data-urls";
 
+/**
+ *
+ * @param {string} dataurl
+ * @returns {{mime?: string; data?: string}}
+ */
 function toObject(dataurl) {
-  const regexResult = REGEX.exec(dataurl);
-  if (!regexResult || regexResult.length < 3) return {};
-  const [, mime, data] = regexResult;
-  return { mime, data };
+  const result = parse(dataurl);
+  if (!result) return {};
+  return {
+    mime: result.contentType,
+    data: result.data
+  };
 }
 
 function fromObject({ type, data }) {
-  if (REGEX.test(data)) return data;
+  if (validate(data)) return data;
   return `data:${type};base64,${data}`;
 }
 
-const dataurl = { toObject, fromObject };
+function isValid(url) {
+  return validate(url);
+}
+
+const dataurl = { toObject, fromObject, isValid };
 export default dataurl;

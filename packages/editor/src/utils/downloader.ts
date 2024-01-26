@@ -61,7 +61,7 @@ const UTITypes: Record<string, string> = {
 };
 
 export function corsify(url?: string, host?: string) {
-  if (host && url && !url.startsWith("blob:") && !isDataUrl(url))
+  if (host && url && !url.startsWith("blob:") && !DataURL.isValid(url))
     return `${host}/${url}`;
   return url;
 }
@@ -115,17 +115,28 @@ export function toDataURL(blob: Blob): Promise<string> {
   });
 }
 
-export function isDataUrl(url?: string): boolean {
-  return url?.startsWith("data:") || false;
-}
-
 const OBJECT_URL_CACHE: Record<string, string | undefined> = {};
-export function toBlobURL(dataurl: string, id?: string) {
+export function toBlobURL(
+  dataurl: string,
+  type: "image" | "other" = "other",
+  mimeType?: string,
+  id?: string
+) {
   if (id && OBJECT_URL_CACHE[id]) return OBJECT_URL_CACHE[id];
-  if (!isDataUrl(dataurl)) return;
+  if (!DataURL.isValid(dataurl)) return;
 
-  const { data, mime } = DataURL.toObject(dataurl); //.split(",");
-  if (!data || !mime) return;
+  const dataurlObject = DataURL.toObject(dataurl);
+  let mime = dataurlObject.mime || "";
+  const data = dataurlObject.data;
+
+  if (!data) return;
+
+  // sometimes the provided mime type in the dataurl can be wrong so we
+  // fallback and make sure the browser loads the image properly.
+  if (type === "image" && !mime.startsWith("image/")) {
+    mime = mimeType && mimeType.startsWith("image/") ? mimeType : "image/*";
+  }
+
   const objectURL = URL.createObjectURL(
     new Blob([Buffer.from(data, "base64")], { type: mime })
   );
