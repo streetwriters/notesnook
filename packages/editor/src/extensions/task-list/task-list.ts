@@ -268,13 +268,14 @@ export const TaskListNode = TaskList.extend({
             // Case # 1
             // if the user clicks on a task item that has children, we
             // should automatically check/uncheck all its children
+            // const oldTaskList = oldState.doc.nodeAt(edit.pos);
+            // const newTaskList = newState.doc.nodeAt(edit.pos);
             if (
               // when a task item has children, the task list is always the
               // last child
               edit.node.lastChild?.type.name === TaskList.name &&
-              oldState.doc.nodeAt(edit.pos) &&
-              oldState.doc.nodeAt(edit.pos)?.attrs.checked !==
-                newState.doc.nodeAt(edit.pos)?.attrs.checked
+              !!oldState.doc.nodeAt(edit.pos)?.attrs.checked !==
+                !!newState.doc.nodeAt(edit.pos)?.attrs.checked
             ) {
               changeCount += toggleChildren(
                 tr,
