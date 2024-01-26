@@ -34,13 +34,13 @@ import { Resizer } from "../../components/resizer";
 import {
   corsify,
   downloadImage,
-  isDataUrl,
   toBlobURL,
   toDataURL
 } from "../../utils/downloader";
 import { motion } from "framer-motion";
 import { useObserver } from "../../hooks/use-observer";
 import { Attachment, ImageAlignmentOptions } from "../attachment";
+import DataURL from "@notesnook/core/dist/utils/dataurl";
 
 export const AnimatedImage = motion(Image);
 
@@ -51,7 +51,7 @@ export function ImageComponent(
   const { src, alt, title, textDirection, hash, aspectRatio, mime } =
     node.attrs;
   const [bloburl, setBloburl] = useState<string | undefined>(
-    toBlobURL("", hash)
+    toBlobURL("", "image", mime, hash)
   );
 
   const isMobile = useIsMobile();
@@ -82,11 +82,10 @@ export function ImageComponent(
         .catch(() => null);
       if (typeof data !== "string" || !data) return; // TODO: show error
 
-      setBloburl(toBlobURL(data, hash));
+      setBloburl(toBlobURL(data, "image", node.attrs.mime, hash));
     })();
   }, [inView]);
 
-  console.log({ width, height, aspectRatio });
   return (
     <>
       <Box
@@ -263,7 +262,7 @@ export function ImageComponent(
               const naturalAspectRatio = orignalWidth / orignalHeight;
               const fixedDimensions = fixAspectRatio(width, naturalAspectRatio);
 
-              if (src && !isDataUrl(src) && canParse(src)) {
+              if (src && !DataURL.isValid(src) && canParse(src)) {
                 const image = await downloadImage(src, downloadOptions);
                 if (!image) return;
                 const { url, size, blob, mimeType } = image;
@@ -292,7 +291,6 @@ export function ImageComponent(
                   )
                 );
               } else if (height !== fixedDimensions.height) {
-                console.log("RESETTING HEIGHT");
                 await editor.threadsafe((editor) =>
                   editor.commands.updateAttachment(fixedDimensions, {
                     query: makeImageQuery(src, hash)

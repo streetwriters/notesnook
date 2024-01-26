@@ -416,7 +416,6 @@ export function Editor(props: EditorProps) {
           });
         }}
         onGetAttachmentData={(attachment) => {
-          console.log("ID", id);
           return downloadAttachment(
             attachment.hash,
             attachment.type === "web-clip" ? "text" : "base64",
