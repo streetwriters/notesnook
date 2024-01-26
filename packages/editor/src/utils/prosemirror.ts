@@ -364,13 +364,12 @@ export function getDeletedNodes(
       typeof step.to === "number" &&
       "from" in step &&
       typeof step.from === "number" &&
+      step.from < tr.doc.nodeSize - 1 &&
       step.slice === Slice.empty
     ) {
-      if (step.from < tr.doc.nodeSize - 1) {
-        const $from = tr.doc.resolve(step.from);
-        const node = findParentNodeClosestToPos($from, predicate);
-        if (node) nodes.push(node);
-      }
+      const $from = tr.doc.resolve(step.from);
+      const node = findParentNodeClosestToPos($from, predicate);
+      if (node) nodes.push(node);
     }
   }
   return nodes;
