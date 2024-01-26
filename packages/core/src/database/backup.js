@@ -24,6 +24,7 @@ import { toChunks } from "../utils/array.js";
 import { migrateItem } from "../migrations.js";
 import Indexer from "./indexer.js";
 import setManipulator from "../utils/set.js";
+import { logger } from "../logger.js";
 
 const COLORS = [
   "red",
@@ -87,6 +88,7 @@ export default class Backup {
   constructor(db) {
     this._db = db;
     this._migrator = new Migrator();
+    this.logger = logger.scope("Backup");
   }
 
   lastBackupTime() {
@@ -278,6 +280,21 @@ export default class Backup {
             item.metadata.type === "application/octet-stream";
           const isOldGeneric =
             attachment.metadata.type === "application/octet-stream";
+          console.log(
+            "[before restore] attachment hash:",
+            item.metadata.hash,
+            "incoming mime type:",
+            item.metadata.type,
+            "current mime type:",
+            attachment.metadata.type
+          );
+          this.logger.debug("[before restore]", {
+            hash: item.metadata.hash,
+            incomingType: item.metadata.type,
+            currentType: attachment.metadata.type,
+            isOldGeneric,
+            isNewGeneric
+          });
           item = {
             ...attachment,
             metadata: {
@@ -295,6 +312,16 @@ export default class Backup {
             },
             noteIds: setManipulator.union(attachment.noteIds, item.noteIds)
           };
+          console.log(
+            "[after restore] attachment hash:",
+            item.metadata.hash,
+            "mime type:",
+            item.metadata.type
+          );
+          this.logger.debug("[after restore]", {
+            hash: item.metadata.hash,
+            type: item.metadata.type
+          });
         } else {
           item.dateUploaded = undefined;
           item.failed = undefined;
