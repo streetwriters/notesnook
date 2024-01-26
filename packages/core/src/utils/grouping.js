@@ -163,7 +163,9 @@ function addToGroup(groups, groupTitle, item) {
 const REGEX = /\S/;
 function getFirstCharacter(str) {
   if (!str) return "-";
-  return REGEX.exec(str)[0].toUpperCase();
+  const matches = REGEX.exec(str);
+  if (!matches || !matches.length) return "-";
+  return matches[0].toUpperCase();
 }
 
 function flattenGroups(groups) {
