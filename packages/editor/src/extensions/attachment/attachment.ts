@@ -160,9 +160,12 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
           if (!attachments.length) return false;
 
           for (const { node, pos } of attachments) {
+            const progress = attachment.progress || node.attrs.progress;
             tr.setNodeMarkup(pos, node.type, {
               ...node.attrs,
-              ...attachment
+              ...attachment,
+              progress:
+                progress !== undefined && progress < 100 ? progress : undefined
             });
           }
           tr.setMeta("preventUpdate", options.preventUpdate || false);
