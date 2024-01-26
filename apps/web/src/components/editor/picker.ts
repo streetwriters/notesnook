@@ -171,7 +171,7 @@ async function addAttachment(
         `Please select the same file for reuploading. Expected hash ${expectedFileHash} but got ${hash}.`
       );
 
-    const exists = db.attachments?.exists(hash);
+    const exists = db.attachments?.attachment(hash);
     if (!forceWrite && exists) {
       forceWrite = (await FS.getUploadedFileSize(hash)) <= 0;
     }
@@ -187,8 +187,8 @@ async function addAttachment(
         ...output,
         hash,
         hashType,
-        filename: file.name,
-        type: file.type,
+        filename: exists?.metadata.filename || file.name,
+        type: exists?.metadata.type || file.type,
         key
       });
     }
