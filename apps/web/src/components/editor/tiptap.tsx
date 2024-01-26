@@ -444,7 +444,6 @@ function toIEditor(editor: Editor): IEditor {
     sendAttachmentProgress: (hash, progress) =>
       editor.current?.commands.updateAttachment(
         {
-          hash,
           progress
         },
         { query: (a) => a.hash === hash, preventUpdate: true }
