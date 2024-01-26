@@ -36,15 +36,7 @@ type Item = {
 
 async function moveNotesToTrash(notes: Item[], confirm = true) {
   if (confirm && !(await showMultiDeleteConfirmation(notes.length))) return;
-
-  let locked = false;
-  for (const item of notes)
-    if (item.locked) {
-      locked = true;
-      break;
-    }
-
-  if (locked && !(await Vault.unlockVault())) return;
+  if (notes.some((n) => n.locked) && !(await Vault.unlockVault())) return;
 
   const items = notes.map((item) => {
     if (db.monographs?.isPublished(item.id)) return 0;
