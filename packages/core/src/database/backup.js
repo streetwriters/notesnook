@@ -269,10 +269,6 @@ export default class Backup {
           ? "color"
           : item.itemType || item.type;
 
-      // items should sync immediately after getting restored
-      item.dateModified = Date.now();
-      item.synced = false;
-
       if (itemType === "attachment" && item.metadata && item.metadata.hash) {
         const attachment = this._db.attachments.attachment(item.metadata.hash);
         if (attachment) {
@@ -280,21 +276,6 @@ export default class Backup {
             item.metadata.type === "application/octet-stream";
           const isOldGeneric =
             attachment.metadata.type === "application/octet-stream";
-          console.log(
-            "[before restore] attachment hash:",
-            item.metadata.hash,
-            "incoming mime type:",
-            item.metadata.type,
-            "current mime type:",
-            attachment.metadata.type
-          );
-          this.logger.debug("[before restore]", {
-            hash: item.metadata.hash,
-            incomingType: item.metadata.type,
-            currentType: attachment.metadata.type,
-            isOldGeneric,
-            isNewGeneric
-          });
           item = {
             ...attachment,
             metadata: {
@@ -312,21 +293,15 @@ export default class Backup {
             },
             noteIds: setManipulator.union(attachment.noteIds, item.noteIds)
           };
-          console.log(
-            "[after restore] attachment hash:",
-            item.metadata.hash,
-            "mime type:",
-            item.metadata.type
-          );
-          this.logger.debug("[after restore]", {
-            hash: item.metadata.hash,
-            type: item.metadata.type
-          });
         } else {
           item.dateUploaded = undefined;
           item.failed = undefined;
         }
       }
+
+      // items should sync immediately after getting restored
+      item.dateModified = Date.now();
+      item.synced = false;
 
       const collectionKey = itemTypeToCollectionKey[itemType];
       if (collectionKey) {
