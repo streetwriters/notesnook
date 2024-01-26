@@ -364,6 +364,7 @@ export function getDeletedNodes(
       typeof step.to === "number" &&
       "from" in step &&
       typeof step.from === "number" &&
+      step.from < tr.doc.nodeSize - 1 &&
       step.slice === Slice.empty
     ) {
       const $from = tr.doc.resolve(step.from);
