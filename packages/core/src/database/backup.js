@@ -274,11 +274,24 @@ export default class Backup {
       if (itemType === "attachment" && item.metadata && item.metadata.hash) {
         const attachment = this._db.attachments.attachment(item.metadata.hash);
         if (attachment) {
+          const isNewGeneric =
+            item.metadata.type === "application/octet-stream";
+          const isOldGeneric =
+            attachment.metadata.type === "application/octet-stream";
           item = {
             ...attachment,
             metadata: {
               ...attachment.metadata,
-              type: item.metadata.type || attachment.metadata.type
+              type:
+                // we keep whichever mime type is more specific
+                isNewGeneric && !isOldGeneric
+                  ? attachment.metadata.type
+                  : item.metadata.type,
+              filename:
+                // we keep the filename based on which item's mime type we kept
+                isNewGeneric && !isOldGeneric
+                  ? attachment.metadata.filename
+                  : item.metadata.filename
             },
             noteIds: setManipulator.union(attachment.noteIds, item.noteIds)
           };
