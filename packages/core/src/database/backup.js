@@ -276,6 +276,10 @@ export default class Backup {
         if (attachment) {
           item = {
             ...attachment,
+            metadata: {
+              ...attachment.metadata,
+              type: item.metadata.type || attachment.metadata.type
+            },
             noteIds: setManipulator.union(attachment.noteIds, item.noteIds)
           };
         } else {
