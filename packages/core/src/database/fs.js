@@ -133,23 +133,26 @@ export default class FileStorage {
     return result;
   }
 
-  async cancel(groupId, type) {
-    const queue =
-      type === "download"
-        ? this.downloads.get(groupId)
-        : this.uploads.get(groupId);
-    if (!queue) return;
-    for (let i = 0; i < queue.length; ++i) {
-      const file = queue[i];
-      if (file.cancel) await file.cancel("Operation canceled.");
-      queue.splice(i, 1);
-    }
-    if (type === "download") {
-      this.downloads.delete(groupId);
-      EV.publish(EVENTS.downloadCanceled, { groupId, canceled: true });
-    } else if (type === "upload") {
-      this.uploads.delete(groupId);
-      EV.publish(EVENTS.uploadCanceled, { groupId, canceled: true });
+  async cancel(groupId) {
+    const queues = [
+      { type: "download", files: this.downloads.get(groupId) },
+      { type: "upload", files: this.uploads.get(groupId) }
+    ].filter((a) => !!a.files);
+
+    for (const queue of queues) {
+      for (let i = 0; i < queue.files.length; ++i) {
+        const file = queue.files[i];
+        if (file.cancel) await file.cancel("Operation canceled.");
+        queue.files.splice(i, 1);
+      }
+
+      if (queue.type === "download") {
+        this.downloads.delete(groupId);
+        EV.publish(EVENTS.downloadCanceled, { groupId, canceled: true });
+      } else if (queue.type === "upload") {
+        this.uploads.delete(groupId);
+        EV.publish(EVENTS.uploadCanceled, { groupId, canceled: true });
+      }
     }
   }
 
