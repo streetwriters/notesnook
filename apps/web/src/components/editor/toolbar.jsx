@@ -94,7 +94,8 @@ function Toolbar() {
   }, [isTitleVisible]);
 
   useEffect(() => {
-    onScrollTitleRef.current.defaultValue = title;
+    if (onScrollTitleRef.current)
+        onScrollTitleRef.current.defaultValue = title;
   }, [title]);
 
   const tools = useMemo(
