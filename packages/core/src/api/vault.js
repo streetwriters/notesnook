@@ -61,6 +61,10 @@ export default class Vault {
     });
   }
 
+  get unlocked() {
+    return !!this._vaultPassword;
+  }
+
   /**
    * Creates a new vault
    * @param {string} password The password

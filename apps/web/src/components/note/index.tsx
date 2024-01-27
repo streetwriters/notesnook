@@ -70,7 +70,7 @@ import { hashNavigate, navigate } from "../../navigation";
 import { showPublishView } from "../publish-view";
 import IconTag from "../icon-tag";
 import { COLORS } from "../../common/constants";
-import { exportNotes } from "../../common/export";
+import { exportNote, exportNotes, exportToPDF } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
 import { store as selectionStore } from "../../stores/selection-store";
 import {
@@ -86,7 +86,7 @@ import {
   ReferencesWithDateEdited
 } from "../list-container/types";
 import { SchemeColors } from "@notesnook/theme";
-import Vault from "../../common/vault";
+import FileSaver from "file-saver";
 
 type NoteProps = {
   tags: Item[];
@@ -422,7 +422,12 @@ const menuItems: (note: any, items?: any[]) => MenuItem[] = (
       isDisabled: !isSynced,
       icon: Print.path,
       onClick: async () => {
-        await exportNotes("pdf", [note.id]);
+        const item = db.notes?.note(note);
+        if (!item) return;
+
+        const result = await exportNote(item, "pdf");
+        if (!result) return;
+        await exportToPDF(note.title, result.content);
       }
     },
     {
@@ -456,7 +461,24 @@ const menuItems: (note: any, items?: any[]) => MenuItem[] = (
           // ? "Multiple notes cannot be exported as PDF."
           // : false,
           isPro: format.type !== "txt",
-          onClick: () => exportNotes(format.type, ids)
+          onClick: async () => {
+            if (ids.length === 1) {
+              const item = db.notes?.note(note);
+              if (!item) return;
+
+              const result = await exportNote(item, format.type);
+              if (!result) return;
+              if (format.type === "pdf")
+                return exportToPDF(note.title, result.content);
+
+              return FileSaver.saveAs(
+                new Blob([new TextEncoder().encode(result.content)]),
+                result.filename
+              );
+            }
+
+            await exportNotes(format.type, ids);
+          }
         }))
       },
       multiSelect: true,
@@ -706,17 +728,11 @@ async function copyNote(noteId: string, format: "md" | "txt") {
   try {
     const note = db.notes?.note(noteId);
     if (!note) throw new Error("No note with this id exists.");
-    if (note?.data.locked && !(await Vault.unlockVault()))
-      throw new Error("Please unlock this note to copy it.");
 
-    const rawContent = await db.content?.raw(note.data.contentId);
-    const content = note?.data.locked
-      ? await db.vault?.decryptContent(rawContent)
-      : rawContent;
+    const result = await exportNote(note, format, true);
+    if (!result) return;
 
-    const text = await note.export(format, content, false);
-    if (!text) throw new Error(`Could not convert note to ${format}.`);
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(result.content);
     showToast("success", "Copied!");
   } catch (e) {
     if (e instanceof Error)
