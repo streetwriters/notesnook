@@ -148,6 +148,12 @@ exports[`convert HTML to markdown with outlinelists > html-to-md-outlinelists.md
 "
 `;
 
+exports[`convert HTML to markdown with singleSpacedParagraphs > html-to-md-singleSpacedParagraphs.md 1`] = `
+"hello world
+hello world 2
+"
+`;
+
 exports[`convert HTML to markdown with tables > html-to-md-tables.md 1`] = `
 "| Goal                                                                                                          | To introduce various features of the app to the user and to convert a user on trial or basic plan to upgrade. |
 | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -392,6 +398,11 @@ exports[`convert HTML to text with outlinelists > html-to-txt-outlinelists.txt 1
    * I need to do something!
  * Makes no sense!
  * Yes it doesn't!"
+`;
+
+exports[`convert HTML to text with singleSpacedParagraphs > html-to-txt-singleSpacedParagraphs.txt 1`] = `
+"hello world
+hello world 2"
 `;
 
 exports[`convert HTML to text with tables > html-to-txt-tables.txt 1`] = `
