@@ -17,93 +17,38 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { sanitizeFilename } from "@notesnook/common";
+import Note from "@notesnook/core/dist/models/note";
 import { db } from "../../common/db";
-import { exportToPDF } from "../../common/export";
-import Vault from "../../common/vault";
-import { showToast } from "../toast";
+import { exportNote } from "../../common/export";
 import { makeUniqueFilename } from "./utils";
 import { ZipFile } from "./zip-stream";
 
-const FORMAT_TO_EXT = {
-  pdf: "pdf",
-  md: "md",
-  txt: "txt",
-  html: "html",
-  "md-frontmatter": "md"
-} as const;
-
-export class ExportStream extends ReadableStream<ZipFile> {
+export class ExportStream extends TransformStream<Note, ZipFile> {
   constructor(
-    noteIds: string[],
     format: "pdf" | "md" | "txt" | "html" | "md-frontmatter",
-    signal?: AbortSignal,
-    onProgress?: (current: number, text: string) => void
+    signal?: AbortSignal
   ) {
-    let index = 0;
     const counters: Record<string, number> = {};
-    let vaultUnlocked = false;
 
     super({
-      async start() {
-        if (noteIds.length === 1 && db.notes?.note(noteIds[0])?.data.locked) {
-          vaultUnlocked = await Vault.unlockVault();
-          if (!vaultUnlocked) return false;
-        } else if (noteIds.length > 1 && (await db.vault?.exists())) {
-          vaultUnlocked = await Vault.unlockVault();
-          if (!vaultUnlocked)
-            showToast(
-              "error",
-              "Failed to unlock vault. Locked notes will be skipped."
-            );
-        }
-      },
-      async pull(controller) {
+      async transform(note, controller) {
         try {
           if (signal?.aborted) {
-            controller.close();
+            controller.terminate();
             return;
           }
 
-          const note = db.notes?.note(noteIds[index++]);
-          if (!note) return;
-          if (!vaultUnlocked && note.data.locked) return;
+          if (!note || format === "pdf") return;
 
-          onProgress && onProgress(index, `Exporting "${note.title}"...`);
+          const result = await exportNote(note, format);
+          if (!result) return;
 
-          const rawContent = await db.content?.raw(note.data.contentId);
-          const content = note.data.locked
-            ? await db.vault?.decryptContent(rawContent)
-            : rawContent;
-
-          const exported = await note
-            .export(format === "pdf" ? "html" : format, content)
-            .catch((e: Error) => {
-              console.error(note.data, e);
-              showToast(
-                "error",
-                `Failed to export note "${note.title}": ${e.message}`
-              );
-            });
-
-          if (typeof exported !== "string") {
-            showToast("error", `Failed to export note "${note.title}"`);
-            return;
-          }
-
-          if (format === "pdf") {
-            await exportToPDF(note.title, exported);
-            controller.error("PDF export.");
-            return;
-          }
-
-          const filename = sanitizeFilename(note.title, { replacement: "-" });
-          const ext = FORMAT_TO_EXT[format];
-          const filenameWithExtension = [filename, ext].join(".");
+          const { filename, content } = result;
 
           const notebooks = [
-            ...(db.relations?.to({ id: note.id, type: "note" }, "notebook") ||
-              []),
+            ...(
+              db.relations?.to({ id: note.id, type: "note" }, "notebook") || []
+            ).map((n) => ({ title: n.title, topics: [] })),
             ...(note.notebooks || []).map(
               (ref: { id: string; topics: string[] }) => {
                 const notebook = db.notebooks?.notebook(ref.id);
@@ -127,31 +72,23 @@ export class ExportStream extends ReadableStream<ZipFile> {
                   .map((notebook) => {
                     if (notebook.topics.length > 0)
                       return notebook.topics.map((topic: { title: string }) =>
-                        [
-                          notebook.title,
-                          topic.title,
-                          filenameWithExtension
-                        ].join("/")
+                        [notebook.title, topic.title, filename].join("/")
                       );
-                    return [notebook.title, filenameWithExtension].join("/");
+                    return [notebook.title, filename].join("/");
                   })
                   .flat()
-              : [filenameWithExtension];
+              : [filename];
 
           filePaths.forEach((filePath) => {
             controller.enqueue({
               path: makeUniqueFilename(filePath, counters),
-              data: exported,
+              data: content,
               mtime: new Date(note.data.dateEdited),
               ctime: new Date(note.data.dateCreated)
             });
           });
         } catch (e) {
           controller.error(e);
-        } finally {
-          if (index === noteIds.length) {
-            controller.close();
-          }
         }
       }
     });
