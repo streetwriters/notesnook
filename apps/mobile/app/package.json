@@ -31,7 +31,8 @@
     "url": "^0.11.0",
     "validator": "^13.5.2",
     "zustand": "^3.6.0",
-    "katex": "0.16.2"
+    "katex": "0.16.2",
+    "@readme/data-urls": "3.0.0"
   },
   "sideEffects": false
 }
