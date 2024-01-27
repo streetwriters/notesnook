@@ -21,7 +21,7 @@ import Sodium from "@ammarahmed/react-native-sodium";
 import { isImage } from "@notesnook/core/dist/utils/filename";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
-import { db } from "../common/database";
+import { DatabaseLogger, db } from "../common/database";
 import { IOS_APPGROUPID } from "./constants";
 
 const santizeUri = (uri) => {
@@ -57,6 +57,7 @@ export async function attachFile(uri, hash, type, filename, options) {
     return true;
   } catch (e) {
     if (Platform.OS === "ios") RNFetchBlob.fs.unlink(uri).catch(console.log);
+    DatabaseLogger.error(e, "Attach file error");
     console.log("attach file error: ", e);
     return false;
   }
@@ -107,26 +108,31 @@ async function createNotes(bundle) {
       uri: uri,
       type: "cache"
     });
-    await attachFile(uri, hash, file.type, file.name, {
+    const attached = await attachFile(uri, hash, file.type, file.name, {
       type: "cache",
       id: id,
       appGroupId: IOS_APPGROUPID
     });
     let content = ``;
-    if (isImage(file.type)) {
-      content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" />`;
-    } else {
-      content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" /></p>`;
+
+    if (attached) {
+      if (isImage(file.type)) {
+        content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" />`;
+      } else {
+        content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" /></p>`;
+      }
+      const rawContent = await db.content.raw(
+        db.notes.note(id).data?.contentId
+      );
+      await db.notes.add({
+        id: id,
+        content: {
+          type: "tiptap",
+          data: rawContent?.data ? rawContent?.data + content : content
+        },
+        sessionId: sessionId
+      });
     }
-    const rawContent = await db.content.raw(db.notes.note(id).data?.contentId);
-    await db.notes.add({
-      id: id,
-      content: {
-        type: "tiptap",
-        data: rawContent?.data ? rawContent?.data + content : content
-      },
-      sessionId: sessionId
-    });
   }
 }
 

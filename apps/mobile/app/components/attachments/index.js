@@ -68,7 +68,7 @@ export const AttachmentDialog = ({ note }) => {
       !attachmentSearchValue.current ||
       attachmentSearchValue.current === ""
     ) {
-      setAttachments([...attachments]);
+      setAttachments(filterAttachments(currentFilter));
     }
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(() => {
@@ -77,13 +77,16 @@ export const AttachmentDialog = ({ note }) => {
         attachmentSearchValue.current
       );
       if (results.length === 0) return;
-      setAttachments(results);
+
+      setAttachments(filterAttachments(currentFilter, results));
     }, 300);
   };
 
   const renderItem = ({ item }) => (
     <AttachmentItem
-      setAttachments={setAttachments}
+      setAttachments={() => {
+        setAttachments(filterAttachments(currentFilter));
+      }}
       attachment={item}
       context="attachments-list"
     />
@@ -133,11 +136,12 @@ export const AttachmentDialog = ({ note }) => {
     }
   ];
 
-  const filterAttachments = (type) => {
-    const attachments = note
-      ? db.attachments.ofNote(note.id, "all")
-      : [...(db.attachments.all || [])];
-    isDocument;
+  const filterAttachments = (type, _attachments) => {
+    const attachments =
+      _attachments || note
+        ? db.attachments.ofNote(note.id, "all")
+        : [...(db.attachments.all || [])];
+
     switch (type) {
       case "all":
         return attachments;
