@@ -34,7 +34,8 @@ import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import Storage from "../database/storage";
 import { cacheDir, copyFileAsync, releasePermissions } from "./utils";
-import { createCacheDir } from "./io";
+import { createCacheDir, exists } from "./io";
+import { IOS_APPGROUPID } from "../../utils/constants";
 
 export const FileDownloadStatus = {
   Success: 1,
@@ -214,10 +215,9 @@ export default async function downloadAttachment(
       attachment.metadata.hash
     );
 
-    if (
-      !(await RNFetchBlob.fs.exists(`${cacheDir}/${attachment.metadata.hash}`))
-    )
+    if (!(await exists(attachment.metadata.hash))) {
       return;
+    }
 
     if (options.base64) {
       return await db.attachments.read(attachment.metadata.hash, "base64");
@@ -239,7 +239,8 @@ export default async function downloadAttachment(
       mime: attachment.metadata.type,
       fileName: options.cache ? undefined : filename,
       uri: options.cache ? undefined : folder.uri,
-      chunkSize: attachment.chunkSize
+      chunkSize: attachment.chunkSize,
+      appGroupId: IOS_APPGROUPID
     };
 
     let fileUri = await Sodium.decryptFile(

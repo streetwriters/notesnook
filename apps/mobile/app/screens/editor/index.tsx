@@ -45,6 +45,7 @@ import { EditorProps, useEditorType } from "./tiptap/types";
 import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { editorController } from "./tiptap/utils";
+import { useThemeColors } from "@notesnook/theme";
 
 const style: ViewStyle = {
   height: "100%",
@@ -176,6 +177,7 @@ export default Editor;
 const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
   const readonly = useEditorStore((state) => state.readonly);
   const keyboard = useKeyboard();
+  const { colors } = useThemeColors();
 
   const onPress = async () => {
     if (editor.note.current) {
@@ -191,7 +193,7 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
       name="pencil-lock"
       type="grayBg"
       onPress={onPress}
-      color="accent"
+      color={colors.primary.accent}
       customStyle={{
         position: "absolute",
         bottom: 60,

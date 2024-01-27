@@ -48,7 +48,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { formatBytes } from "@notesnook/common";
 
-const Actions = ({ attachment, setAttachments, fwdRef }) => {
+const Actions = ({ attachment, setAttachments, fwdRef, close }) => {
   const { colors } = useThemeColors();
   const contextId = attachment.metadata.hash;
   const [filename, setFilename] = useState(attachment.metadata.filename);
@@ -117,7 +117,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
           });
         }
 
-        setAttachments([...db.attachments.all]);
+        setAttachments();
         setLoading({
           name: null
         });
@@ -140,7 +140,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
                 filename: value
               });
               setFilename(value);
-              setAttachments([...db.attachments.all]);
+              setAttachments();
             }
           },
           positiveText: "Rename"
@@ -152,8 +152,8 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
       name: "Delete",
       onPress: async () => {
         await db.attachments.remove(attachment.metadata.hash, false);
-        setAttachments([...db.attachments.all]);
-        eSendEvent(eCloseSheet, contextId);
+        setAttachments();
+        close();
       },
       icon: "delete-outline"
     }
@@ -362,8 +362,13 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
 Actions.present = (attachment, set, context) => {
   presentSheet({
     context: context,
-    component: (ref) => (
-      <Actions fwdRef={ref} setAttachments={set} attachment={attachment} />
+    component: (ref, close) => (
+      <Actions
+        fwdRef={ref}
+        setAttachments={set}
+        close={close}
+        attachment={attachment}
+      />
     )
   });
 };
