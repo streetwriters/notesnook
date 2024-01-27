@@ -65,7 +65,11 @@ const PLACEHOLDER_DATA = (trashCleanupInterval = 7) => ({
   paragraph:
     trashCleanupInterval === -1
       ? "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
-      : `Items in the trash will be permanently deleted after after ${trashCleanupInterval} days.`,
+      : `Trash gets automatically cleaned up ${
+          trashCleanupInterval === 1
+            ? "daily."
+            : `after ${trashCleanupInterval} days.`
+        }`,
   button: null,
   loading: "Loading trash items"
 });
