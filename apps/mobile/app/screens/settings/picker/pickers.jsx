@@ -69,10 +69,10 @@ export const TrashIntervalPicker = createSettingsPicker({
     db.settings.setTrashCleanupInterval(item);
   },
   formatValue: (item) => {
-    return item === -1 ? "Never" : item + " days";
+    return item === -1 ? "Never" : item === 1 ? "Daily" : item + " days";
   },
   getItemKey: (item) => item.toString(),
-  options: [-1, 7, 30, 365],
+  options: [-1, 1, 7, 30, 365],
   compareValue: (current, item) => current === item,
   premium: true
 });
