@@ -308,7 +308,9 @@ export function ImageComponent(
 
 function makeImageQuery(src?: string, hash?: string) {
   return (a: Attachment) =>
-    (a.type === "image" && a.src === src) || a.hash === hash;
+    a.type === "image" &&
+    ((!!a.src && !!src && a.src === src) ||
+      (!!a.hash && !!hash && a.hash === hash));
 }
 function canParse(src: string) {
   if (!src) return false;
