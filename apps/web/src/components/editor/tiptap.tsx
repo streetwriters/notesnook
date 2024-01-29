@@ -61,7 +61,8 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 type OnChangeHandler = (
   id: string | undefined,
   sessionId: number,
-  content: string
+  content: string,
+  ignoreEdit: boolean
 ) => void;
 type TipTapProps = {
   editorContainer: HTMLElement;
@@ -92,6 +93,7 @@ function save(
   editor: Editor,
   content: Fragment,
   preventSave: boolean,
+  ignoreEdit: boolean,
   onChange?: OnChangeHandler
 ) {
   configureEditor({
@@ -105,7 +107,7 @@ function save(
 
   if (preventSave) return;
   const html = getHTMLFromFragment(content, editor.schema);
-  onChange?.(noteId, sessionId, html);
+  onChange?.(noteId, sessionId, html, ignoreEdit);
 }
 
 const deferredSave = debounceWithId(save, SAVE_INTERVAL);
@@ -211,7 +213,8 @@ function TipTap(props: TipTapProps) {
       onUpdate: ({ editor, transaction }) => {
         onContentChange?.();
 
-        const preventSave = transaction?.getMeta("preventSave") as boolean;
+        const preventSave = transaction.getMeta("preventSave") as boolean;
+        const ignoreEdit = transaction.getMeta("ignoreEdit") as boolean;
         const { id, sessionId } = editorstore.get().session;
         const content = editor.state.doc.content;
         deferredSave(
@@ -221,6 +224,7 @@ function TipTap(props: TipTapProps) {
           editor as Editor,
           content,
           preventSave || !editor.isEditable,
+          ignoreEdit,
           onChange
         );
       },

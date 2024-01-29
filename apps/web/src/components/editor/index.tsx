@@ -72,11 +72,12 @@ type DocumentPreview = {
 function onEditorChange(
   noteId: string | undefined,
   sessionId: number,
-  content: string
+  content: string,
+  ignoreEdit: boolean
 ) {
   if (!content) return;
 
-  editorstore.get().saveSessionContent(noteId, sessionId, {
+  editorstore.get().saveSessionContent(noteId, sessionId, ignoreEdit, {
     type: "tiptap",
     data: content
   });
@@ -535,7 +536,7 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
     async (cancelled: boolean) => {
       const { id, sessionId } = editorstore.get().session;
       if (!cancelled) {
-        await editorstore.saveSessionContent(id, sessionId, content);
+        await editorstore.saveSessionContent(id, sessionId, false, content);
       }
       onDiscard();
     },
