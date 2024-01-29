@@ -232,6 +232,10 @@ jobs:
         with:
           dotnet-version: 6.0.x
 
+      - name: Install AzureCodeSigning
+        run: Install-Module -Name AzureCodeSigning -RequiredVersion 0.3.0 -Force -Repository PSGallery
+        shell: pwsh
+
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
