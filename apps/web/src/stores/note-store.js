@@ -123,10 +123,11 @@ class NoteStore extends BaseStore {
   };
 
   lock = async (id) => {
-    await Vault.lockNote(id);
+    if (!(await Vault.lockNote(id))) return false;
     this.refreshItem(id);
     if (editorStore.get().session.id === id)
       await editorStore.openSession(id, true);
+    return true;
   };
 
   readonly = async (id) => {

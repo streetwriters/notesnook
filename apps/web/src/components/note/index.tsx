@@ -369,10 +369,9 @@ const menuItems: (note: any, items?: any[]) => MenuItem[] = (
       onClick: async () => {
         const { unlock, lock } = store.get();
         if (!note.locked) {
-          await lock(note.id);
-          showToast("success", "Note locked successfully!");
-        } else {
-          await unlock(note.id);
+          if (await lock(note.id))
+            showToast("success", "Note locked successfully!");
+        } else if (await unlock(note.id)) {
           showToast("success", "Note unlocked successfully!");
         }
       },
