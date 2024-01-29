@@ -24,9 +24,9 @@ module.exports = async function (configuration) {
   const Endpoint = "https://weu.codesigning.azure.net";
   const CodeSigningAccountName = "Notesnook";
   const CertificateProfileName = "Notesnook";
-  const FileDigest = "SHA256";
+  const FileDigest = configuration.hash.toUpperCase();
   const TimestampRfc3161 = "http://timestamp.acs.microsoft.com";
-  const TimestampDigest = "SHA256";
+  const TimestampDigest = configuration.hash.toUpperCase();
   const Description = "The Notesnook app";
   const DescriptionUrl = "https://notesnook.com/";
   const FilesCatalog = createCatalog(configuration.path);
@@ -34,8 +34,6 @@ module.exports = async function (configuration) {
   const command = `Invoke-AzureCodeSigning -Endpoint "${Endpoint}" -CodeSigningAccountName "${CodeSigningAccountName}" -CertificateProfileName "${CertificateProfileName}" -FileDigest "${FileDigest}" -TimestampRfc3161 "${TimestampRfc3161}" -TimestampDigest "${TimestampDigest}" -Description "${Description}" -DescriptionUrl "${DescriptionUrl}" -FilesCatalog "${FilesCatalog}"`;
 
   console.debug("Signing", configuration.path, "using command", command);
-
-  console.debug("Catalog", readFileSync(FilesCatalog, "utf-8"));
 
   psexec(command);
 
