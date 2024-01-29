@@ -52,7 +52,15 @@ jobs:
             ${{ secrets.APPLE_MOBILE_PROVISION_SHARE }}
             ${{ secrets.APPLE_MOBILE_PROVISION_WIDGET }}
 
-      - name: Upload Artifact
+      - name: 'Upload app to TestFlight'
+        uses: apple-actions/upload-testflight-build@v1
+        with: 
+          app-path: Notesnook.ipa
+          issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
+          api-key-id: ${{ secrets.API_KEY_ID }}
+          api-private-key: ${{ secrets.API_KEY }}
+
+      - name: Upload to Github
         uses: actions/upload-artifact@v2
         with:
           name: Notesnook.ipa
