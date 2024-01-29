@@ -89,7 +89,23 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [],
+      : [
+          {
+            title: "Daily trash cleanup interval",
+            subtitle:
+              "You can now set the trash cleanup interval to Daily in addition to Weekly, Monthly & Yearly."
+          },
+          {
+            title: "Organized bulk exports",
+            subtitle:
+              "Bulk exports are now automatically sorted/organized into folders based on your Notebook/Topic organization."
+          },
+          {
+            title: "New domain for Monographs",
+            subtitle:
+              "Monographs will now be published to monogr.ph instead of monograph.notesnook.com. Don't worry, all your published notes will automatically redirect."
+          }
+        ],
     cta: {
       title: "Got it",
       icon: Checkmark,
