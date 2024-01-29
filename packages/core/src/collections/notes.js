@@ -129,7 +129,8 @@ export default class Notes extends Collection {
       readonly: !!note.readonly,
 
       dateCreated: note.dateCreated,
-      dateEdited: note.dateEdited || note.dateCreated || Date.now(),
+      dateEdited:
+        noteArg.dateEdited || note.dateEdited || note.dateCreated || Date.now(),
       dateModified: note.dateModified
     };
 
