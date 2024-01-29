@@ -296,13 +296,14 @@ export function ImageComponent(
                       ...fixedDimensions,
                       aspectRatio: naturalAspectRatio
                     },
-                    { query: makeImageQuery(src, hash) }
+                    { query: makeImageQuery(src, hash), ignoreEdit: true }
                   )
                 );
               } else if (height !== fixedDimensions.height) {
                 await editor.threadsafe((editor) =>
                   editor.commands.updateAttachment(fixedDimensions, {
-                    query: makeImageQuery(src, hash)
+                    query: makeImageQuery(src, hash),
+                    ignoreEdit: true
                   })
                 );
               }
