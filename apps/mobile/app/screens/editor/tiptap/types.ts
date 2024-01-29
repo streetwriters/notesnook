@@ -97,6 +97,7 @@ export type SavePayload = {
   type?: Content["type"];
   sessionId?: string | null;
   sessionHistoryId?: number;
+  ignoreEdit: boolean;
 };
 
 export type AppState = {

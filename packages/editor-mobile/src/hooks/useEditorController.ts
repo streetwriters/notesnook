@@ -32,7 +32,6 @@ import {
 } from "react";
 import { EventTypes, isReactNative, post, randId, saveTheme } from "../utils";
 import { injectCss, transform } from "../utils/css";
-
 type Attachment = {
   hash: string;
   filename: string;
@@ -88,7 +87,7 @@ function scrollIntoView(editor: Editor) {
 export type EditorController = {
   selectionChange: (editor: Editor) => void;
   titleChange: (title: string) => void;
-  contentChange: (editor: Editor) => void;
+  contentChange: (editor: Editor, ignoreEdit?: boolean) => void;
   scroll: (event: React.UIEvent<HTMLDivElement, UIEvent>) => void;
   title: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
@@ -139,17 +138,27 @@ export function useEditorController(update: () => void): EditorController {
   }, [colors]);
 
   const contentChange = useCallback(
-    (editor: Editor) => {
+    (editor: Editor, ignoreEdit) => {
       const currentSessionId = globalThis.sessionId;
       post(EventTypes.contentchange);
       if (!editor) return;
       if (typeof timers.current.change === "number") {
         clearTimeout(timers.current?.change);
       }
-      timers.current.change = setTimeout(() => {
-        htmlContentRef.current = editor.getHTML();
-        post(EventTypes.content, htmlContentRef.current, currentSessionId);
-      }, 300);
+      timers.current.change = setTimeout(
+        () => {
+          htmlContentRef.current = editor.getHTML();
+          post(
+            EventTypes.content,
+            {
+              html: htmlContentRef.current,
+              ignoreEdit: ignoreEdit
+            },
+            currentSessionId
+          );
+        },
+        ignoreEdit ? 0 : 300
+      );
 
       countWords(5000);
     },

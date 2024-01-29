@@ -128,6 +128,8 @@ const showActionsheet = async (editor: useEditorType) => {
   }
 };
 
+type ContentMessage = { html: string; ignoreEdit: boolean };
+
 export const useEditorEvents = (
   editor: useEditorType,
   { readonly: editorPropReadonly, noHeader, noToolbar }: Partial<EditorProps>
@@ -331,14 +333,16 @@ export const useEditorEvents = (
       if (editorMessage.type === EventTypes.content) {
         editor.saveContent({
           type: editorMessage.type,
-          content: editorMessage.value as string,
+          content: (editorMessage.value as ContentMessage).html,
+          ignoreEdit: (editorMessage.value as ContentMessage).ignoreEdit,
           forSessionId: editorMessage.sessionId
         });
       } else if (editorMessage.type === EventTypes.title) {
         editor.saveContent({
           type: editorMessage.type,
           title: editorMessage.value as string,
-          forSessionId: editorMessage.sessionId
+          forSessionId: editorMessage.sessionId,
+          ignoreEdit: false
         });
       }
 
