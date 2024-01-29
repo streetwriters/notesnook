@@ -144,3 +144,11 @@ export function toBlobURL(
   if (id) OBJECT_URL_CACHE[id] = objectURL;
   return objectURL;
 }
+
+export function revokeBloburl(id: string) {
+  const url = OBJECT_URL_CACHE[id];
+  if (!url) return;
+
+  URL.revokeObjectURL(url);
+  OBJECT_URL_CACHE[id] = undefined;
+}

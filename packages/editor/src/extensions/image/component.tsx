@@ -34,6 +34,7 @@ import { Resizer } from "../../components/resizer";
 import {
   corsify,
   downloadImage,
+  revokeBloburl,
   toBlobURL,
   toDataURL
 } from "../../utils/downloader";
@@ -85,6 +86,13 @@ export function ImageComponent(
       setBloburl(toBlobURL(data, "image", node.attrs.mime, hash));
     })();
   }, [inView]);
+
+  useEffect(() => {
+    return () => {
+      if (!hash) return;
+      revokeBloburl(hash);
+    };
+  }, []);
 
   return (
     <>
