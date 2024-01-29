@@ -16,9 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-const { writeFileSync, rmSync } = require("fs");
+const { writeFileSync, rmSync, readFileSync } = require("fs");
 const { execSync } = require("child_process");
-const { relative } = require("path");
+const { relative, join } = require("path");
 
 module.exports = async function (configuration) {
   const Endpoint = "https://weu.codesigning.azure.net";
@@ -33,18 +33,20 @@ module.exports = async function (configuration) {
 
   const command = `Invoke-AzureCodeSigning -Endpoint "${Endpoint}" -CodeSigningAccountName "${CodeSigningAccountName}" -CertificateProfileName "${CertificateProfileName}" -FileDigest "${FileDigest}" -TimestampRfc3161 "${TimestampRfc3161}" -TimestampDigest "${TimestampDigest}" -Description "${Description}" -DescriptionUrl "${DescriptionUrl}" -FilesCatalog "${FilesCatalog}"`;
 
-  console.log("Signing", configuration.path, "using command", command);
+  console.debug("Signing", configuration.path, "using command", command);
+
+  console.debug("Catalog", readFileSync(FilesCatalog, "utf-8"));
 
   psexec(command);
 
-  console.log("Signed", configuration.path);
+  console.debug("Signed", configuration.path);
 
   deleteCatalog();
 };
 
 function createCatalog(path) {
   writeFileSync("_catalog", relative(__dirname, path));
-  return "_catalog";
+  return join(__dirname, "_catalog");
 }
 
 function deleteCatalog() {
