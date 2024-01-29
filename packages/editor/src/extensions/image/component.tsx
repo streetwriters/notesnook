@@ -57,7 +57,8 @@ export function ImageComponent(
 
   const isMobile = useIsMobile();
   const { inView, ref: imageRef } = useObserver<HTMLImageElement>({
-    threshold: 0.2
+    threshold: 0.2,
+    once: true
   });
   const float = isMobile ? false : node.attrs.float;
 
