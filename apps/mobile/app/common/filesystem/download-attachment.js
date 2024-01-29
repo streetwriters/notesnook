@@ -183,7 +183,8 @@ export default async function downloadAttachment(
     cache: false,
     throwError: false,
     groupId: undefined,
-    base64: false
+    base64: false,
+    text: false
   }
 ) {
   await createCacheDir();
@@ -219,8 +220,11 @@ export default async function downloadAttachment(
       return;
     }
 
-    if (options.base64) {
-      return await db.attachments.read(attachment.metadata.hash, "base64");
+    if (options.base64 || options.text) {
+      return await db.attachments.read(
+        attachment.metadata.hash,
+        options.base64 ? "base64" : "text"
+      );
     }
 
     let filename = getFileNameWithExtension(

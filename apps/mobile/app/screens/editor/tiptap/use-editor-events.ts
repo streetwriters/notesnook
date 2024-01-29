@@ -427,7 +427,8 @@ export const useEditorEvents = (
             attachment.type
           );
           downloadAttachment(attachment.hash, true, {
-            base64: true,
+            base64: attachment.type === "image",
+            text: attachment.type === "web-clip",
             silent: true,
             groupId: editor.note.current?.id,
             cache: true
