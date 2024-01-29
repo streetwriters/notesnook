@@ -1,0 +1,10 @@
+- Support for exporting locked notes
+- Maintain directory structure in exports based on Notebooks/Topics
+- Match color of navigation bar in sheets with app theme
+- Improved image loading and show progress when loading images
+- Support for setting trash interval to daily
+- Fix android app UI issues with RTL languages
+- Fix pasting links in editor
+- Other Bug fixes and performance improvements
+
+Thank you for using Notesnook!
