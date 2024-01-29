@@ -18,11 +18,27 @@ on:
         required: true
         default: true
         description: "Publish on GitHub releases?"
+      build-windows:
+        type: boolean
+        required: true
+        default: true
+        description: "Build for Windows?"
+      build-linux:
+        type: boolean
+        required: true
+        default: true
+        description: "Build for Linux?"
+      build-mac:
+        type: boolean
+        required: true
+        default: true
+        description: "Build for macOS?"
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    if: inputs.build-linux
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -71,6 +87,7 @@ jobs:
   build-macos:
     name: Build for macOS
     needs: build
+    if: inputs.build-mac
     runs-on: macos-12
 
     steps:
@@ -163,6 +180,7 @@ jobs:
   build-linux:
     name: Build for Linux
     needs: build
+    if: inputs.build-linux
     runs-on: ubuntu-22.04
 
     steps:
@@ -221,6 +239,7 @@ jobs:
   build-windows:
     name: Build for Windows
     needs: build
+    if: inputs.build-windows
     runs-on: windows-latest
 
     steps:
