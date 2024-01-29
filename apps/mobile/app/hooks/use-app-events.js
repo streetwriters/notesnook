@@ -623,15 +623,20 @@ export const useAppEvents = () => {
   }, [loading, onUserUpdated]);
 
   const initializeDatabase = useCallback(async () => {
-    if (!db.isInitialized) {
-      RNBootSplash.hide({ fade: true });
-      DatabaseLogger.info("Initializing database");
-      await db.init();
+    try {
+      if (!db.isInitialized) {
+        RNBootSplash.hide({ fade: true });
+        DatabaseLogger.info("Initializing database");
+        await db.init();
+      }
+      if (IsDatabaseMigrationRequired()) return;
+      initialize();
+      setLoading(false);
+      Walkthrough.init();
+    } catch (e) {
+      DatabaseLogger.error(e);
+      ToastEvent.error(e, "Error initializing database", "global");
     }
-    if (IsDatabaseMigrationRequired()) return;
-    initialize();
-    setLoading(false);
-    Walkthrough.init();
   }, [IsDatabaseMigrationRequired]);
 
   useEffect(() => {

@@ -44,7 +44,7 @@ import Tags from "./tags";
 import Title from "./title";
 import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 
-globalThis.toBlobURL = toBlobURL;
+globalThis.toBlobURL = toBlobURL as typeof globalThis.toBlobURL;
 
 const Tiptap = ({ settings }: { settings: Settings }) => {
   const [tick, setTick] = useState(0);
@@ -61,8 +61,11 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
   });
   const _editor = useTiptap(
     {
-      onUpdate: ({ editor }) => {
-        global.editorController.contentChange(editor as Editor);
+      onUpdate: ({ editor, transaction }) => {
+        global.editorController.contentChange(
+          editor as Editor,
+          transaction.getMeta("ignoreEdit")
+        );
       },
       onOpenAttachmentPicker: (editor, type) => {
         global.editorController.openFilePicker(type);

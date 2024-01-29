@@ -162,7 +162,8 @@ export const useEditor = (
       data,
       type,
       sessionId: currentSessionId,
-      sessionHistoryId: currentSessionHistoryId
+      sessionHistoryId: currentSessionHistoryId,
+      ignoreEdit
     }: SavePayload) => {
       if (
         readonly ||
@@ -194,6 +195,12 @@ export const useEditor = (
         };
 
         noteData.title = title;
+
+        if (ignoreEdit) {
+          console.log("Ignoring edits...");
+          noteData.dateEdited = note?.dateEdited;
+        }
+
         if (data) {
           noteData.content = {
             data: data,
@@ -454,12 +461,14 @@ export const useEditor = (
       title,
       content,
       type,
-      forSessionId
+      forSessionId,
+      ignoreEdit
     }: {
       title?: string;
       content?: string;
       type: string;
       forSessionId: string;
+      ignoreEdit: boolean;
     }) => {
       if (lock.current || lockedSessionId.current === forSessionId) return;
       lastContentChangeTime.current = Date.now();
@@ -490,7 +499,8 @@ export const useEditor = (
         type: "tiptap",
         sessionId: forSessionId,
         id: noteId,
-        sessionHistoryId: sessionHistoryId.current
+        sessionHistoryId: sessionHistoryId.current,
+        ignoreEdit
       };
       withTimer(
         noteId || "newnote",
@@ -508,7 +518,7 @@ export const useEditor = (
           }
           saveNote(params);
         },
-        150
+        ignoreEdit ? 0 : 150
       );
     },
     [withTimer, onChange, saveNote]

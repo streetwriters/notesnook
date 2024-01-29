@@ -5,7 +5,7 @@
      <!-- Customize your theme here. -->
         <item name="android:windowDisablePreview">true</item>
         <item name="android:editTextBackground">@drawable/edit_text</item>
-        
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:datePickerDialogTheme">@style/DialogDatePicker.Theme</item>
     </style>
@@ -20,6 +20,7 @@
     <style name="BootTheme" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/bootsplash_background</item>
         <item name="windowSplashScreenAnimatedIcon">@mipmap/bootsplash_logo_dark</item>
+        <item name="android:navigationBarColor">@color/bootsplash_background</item>
         <item name="postSplashScreenTheme">@style/AppTheme</item>
     </style>
 
@@ -31,6 +32,7 @@
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:editTextBackground">@drawable/edit_text</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <style name="DialogDatePicker.Theme" parent="Theme.AppCompat.Light.Dialog">
