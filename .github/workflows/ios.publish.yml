@@ -19,6 +19,9 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=mobile
 
+      - name: Build packages
+        run: npm run build
+
       - name: Install Pods
         run: npm run prepare:ios
 
