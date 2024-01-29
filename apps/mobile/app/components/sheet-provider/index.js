@@ -101,6 +101,7 @@ const SheetProvider = ({ context = "global" }) => {
         setVisible(false);
         setData(null);
       }}
+      keyboardHandlerDisabled={data?.keyboardHandlerDisabled}
       bottomPadding={!data.noBottomPadding}
       enableGesturesInScrollView={
         typeof data.enableGesturesInScrollView === "undefined"

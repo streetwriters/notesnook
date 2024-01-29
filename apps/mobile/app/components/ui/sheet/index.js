@@ -37,11 +37,11 @@ const SheetWrapper = ({
   onOpen,
   closeOnTouchBackdrop = true,
   onHasReachedTop,
-  keyboardMode,
   overlay,
   overlayOpacity = 0.3,
   enableGesturesInScrollView = false,
-  bottomPadding = true
+  bottomPadding = true,
+  keyboardHandlerDisabled
 }) => {
   const localRef = useRef(null);
   const { colors } = useThemeColors("sheet");
@@ -121,8 +121,9 @@ const SheetWrapper = ({
         initialOffsetFromBottom={1}
         onPositionChanged={onHasReachedTop}
         closeOnTouchBackdrop={closeOnTouchBackdrop}
-        keyboardMode={keyboardMode}
-        keyboardHandlerEnabled={sheetKeyboardHandler}
+        keyboardHandlerEnabled={
+          keyboardHandlerDisabled ? false : sheetKeyboardHandler
+        }
         closeOnPressBack={closeOnTouchBackdrop}
         indicatorColor={colors.secondary.background}
         onOpen={_onOpen}

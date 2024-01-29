@@ -25,9 +25,12 @@ import * as ScopedStorage from "react-native-scoped-storage";
 import { zip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../common/database/index";
 import Storage from "../common/database/storage";
-import { convertNoteToText } from "../utils/note-to-text";
 
 import { sanitizeFilename } from "@notesnook/common";
+import { presentDialog } from "../components/dialog/functions";
+import { useSettingStore } from "../stores/use-setting-store";
+import BiometicService from "./biometrics";
+import { ToastEvent } from "./event-manager";
 
 const MIMETypes = {
   txt: "text/plain",
@@ -98,8 +101,8 @@ async function save(path, data, fileName, extension) {
   return uri || path;
 }
 
-async function makeHtml(note) {
-  let html = await db.notes.note(note.id).export("html");
+async function makeHtml(note, content) {
+  let html = await db.notes.note(note.id).export("html", content);
   html = decode(html, {
     level: EntityLevel.HTML
   });
@@ -110,23 +113,25 @@ async function makeHtml(note) {
  *
  * @param {"txt" | "pdf" | "md" | "html" | "md-frontmatter"} type
  */
-async function exportAs(type, note, bulk) {
+async function exportAs(type, note, bulk, content) {
   let data;
   switch (type) {
     case "html":
       {
-        data = await makeHtml(note);
+        data = await makeHtml(note, content);
       }
       break;
     case "md":
-      data = await db.notes.note(note.id).export("md");
+      data = await db.notes.note(note.id).export("md", content);
       break;
     case "md-frontmatter":
-      data = await db.notes.note(note.id).export("md-frontmatter");
+      data = await db.notes
+        .note(note.id)
+        .export("md-frontmatter", content?.data);
       break;
     case "pdf":
       {
-        let html = await makeHtml(note);
+        let html = await makeHtml(note, content);
         let fileName = sanitizeFilename(note.title + Date.now(), {
           replacement: "_"
         });
@@ -152,11 +157,60 @@ async function exportAs(type, note, bulk) {
       }
       break;
     case "txt":
-      data = await convertNoteToText(note);
+      {
+        data = await db.notes?.note(note.id).export("txt", content);
+      }
       break;
   }
 
   return data;
+}
+
+async function unlockVault() {
+  let biometry = await BiometicService.isBiometryAvailable();
+  let fingerprint = await BiometicService.hasInternetCredentials("nn_vault");
+  if (biometry && fingerprint) {
+    let credentials = await BiometicService.getCredentials(
+      "Unlock vault",
+      "Unlock vault to export locked notes"
+    );
+    if (credentials) {
+      return db.vault.unlock(credentials.password);
+    }
+  }
+  useSettingStore.getState().setSheetKeyboardHandler(false);
+  return new Promise((resolve) => {
+    setImmediate(() => {
+      presentDialog({
+        context: "export-notes",
+        input: true,
+        secureTextEntry: true,
+        positiveText: "Unlock",
+        title: "Unlock vault",
+        paragraph: "Some exported notes are locked, Unlock to export them",
+        inputPlaceholder: "Enter password",
+        positivePress: async (value) => {
+          const unlocked = await db.vault.unlock(value);
+          if (!unlocked) {
+            ToastEvent.show({
+              heading: "Invalid password",
+              message: "Please enter a valid password",
+              type: "error",
+              context: "local"
+            });
+            return false;
+          }
+          resolve(unlocked);
+          useSettingStore.getState().setSheetKeyboardHandler(true);
+          return true;
+        },
+        onClose: () => {
+          resolve(false);
+          useSettingStore.getState().setSheetKeyboardHandler(true);
+        }
+      });
+    });
+  });
 }
 
 /**
@@ -164,9 +218,23 @@ async function exportAs(type, note, bulk) {
  * @param {"txt" | "pdf" | "md" | "html" | "md-frontmatter"} type
  */
 async function exportNote(note, type) {
+  let content;
+
+  if (note.locked) {
+    try {
+      let unlocked = await unlockVault();
+      if (!unlocked) return null;
+      const unlockedNote = await db.vault.open(note.id);
+      content = unlockedNote.content;
+    } catch (e) {
+      DatabaseLogger.error(e);
+    }
+  }
+
   let path = await getPath(FolderNames[type]);
   if (!path) return;
-  let result = await exportAs(type, note);
+
+  let result = await exportAs(type, note, false, content);
   if (!result) return null;
   let fileName = sanitizeFilename(note.title + Date.now(), {
     replacement: "_"
@@ -240,8 +308,21 @@ async function bulkExport(notes, type, callback) {
   for (var i = 0; i < notes.length; i++) {
     try {
       let note = notes[i];
-      if (note.locked) continue;
-      let result = await exportAs(type, note, true);
+      let content;
+      if (note.locked) {
+        try {
+          let unlocked = !db.vault.unlocked ? await unlockVault() : true;
+          if (!unlocked) {
+            continue;
+          }
+          const unlockedNote = await db.vault.open(note.id);
+          content = unlockedNote.content;
+        } catch (e) {
+          DatabaseLogger.error(e);
+          continue;
+        }
+      }
+      let result = await exportAs(type, note, true, content);
       let fileName = sanitizeFilename(note.title, {
         replacement: "_"
       });

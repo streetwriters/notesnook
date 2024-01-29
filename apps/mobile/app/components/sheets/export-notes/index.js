@@ -43,6 +43,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import { eSendEvent } from "../../../services/event-manager";
 import { eCloseSheet } from "../../../utils/events";
 import { requestInAppReview } from "../../../services/app-review";
+import { Dialog } from "../../dialog";
 
 const ExportNotesSheet = ({ notes, update }) => {
   const { colors } = useThemeColors();
@@ -156,6 +157,8 @@ const ExportNotesSheet = ({ notes, update }) => {
           <Seperator half />
         </>
       ) : null}
+
+      <Dialog context="export-notes" />
 
       <View style={styles.buttonContainer}>
         {!exporting && !complete ? (
@@ -346,7 +349,8 @@ ExportNotesSheet.present = (notes, allNotes) => {
         notes={allNotes ? db.notes.all : notes}
         update={update}
       />
-    )
+    ),
+    keyboardHandlerDisabled: true
   });
 };
 

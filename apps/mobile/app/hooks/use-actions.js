@@ -550,15 +550,6 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   async function exportNote() {
-    if (item.locked) {
-      ToastEvent.show({
-        heading: "Note is locked",
-        type: "error",
-        message: "Locked notes cannot be exported",
-        context: "local"
-      });
-      return;
-    }
     ExportNotesSheet.present([item]);
   }
 
