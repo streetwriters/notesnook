@@ -34,7 +34,7 @@ jobs:
           export-options: apps/mobile/native/ios/ExportOptions.plist
           project-path: apps/mobile/native/ios/Notesnook.xcodeproj
           workspace-path: apps/mobile/native/ios/Notesnook.xcworkspace
-          update-targets: Notesnook, Make Note, NotesWidgetExtension
+          update-targets: Notesnook,Make Note,NotesWidgetExtension
           disable-targets: Notesnook-tvOS,Notesnook-tvOSTests,NotesnookTests
           code-signing-identity: Apple Distribution
           team-id: ${{ secrets.APPLE_TEAM_ID }}
