@@ -115,7 +115,7 @@ export const EditorWrapper = ({ width }) => {
             style={{ height: 1, padding: 0, width: 1, position: "absolute" }}
             blurOnSubmit={false}
           />
-          <ProgressBar />
+          {/* <ProgressBar /> */}
           <Editor key="editor" withController={true} />
         </KeyboardAvoidingViewIOS>
       )}
