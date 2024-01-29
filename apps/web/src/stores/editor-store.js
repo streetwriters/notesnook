@@ -306,8 +306,17 @@ class EditorStore extends BaseStore {
     return this.saveSession(noteId, { [name]: value });
   };
 
-  saveSessionContent = (noteId, sessionId, content) => {
-    return this.saveSession(noteId, { sessionId, content });
+  /**
+   *
+   * @param {*} noteId
+   * @param {*} sessionId
+   * @param {boolean} ignoreEdit if this is set to true, we save the content but do not update the dateEdited. Useful for metadata only changes in content.
+   * @param {*} content
+   * @returns
+   */
+  saveSessionContent = (noteId, sessionId, ignoreEdit, content) => {
+    const dateEdited = ignoreEdit ? this.get().session.dateEdited : undefined;
+    return this.saveSession(noteId, { sessionId, content, dateEdited });
   };
 
   setTag = (tag) => {
