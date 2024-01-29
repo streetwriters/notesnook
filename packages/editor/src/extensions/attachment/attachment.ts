@@ -44,6 +44,7 @@ declare module "@tiptap/core" {
         attachment: Partial<Attachment>,
         options: {
           preventUpdate?: boolean;
+          ignoreEdit?: boolean;
           query: (attachment: Attachment) => boolean;
         }
       ) => ReturnType;
@@ -169,6 +170,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
             });
           }
           tr.setMeta("preventUpdate", options.preventUpdate || false);
+          tr.setMeta("ignoreEdit", options.ignoreEdit || false);
           tr.setMeta("addToHistory", false);
           if (dispatch) dispatch(tr);
           return true;
