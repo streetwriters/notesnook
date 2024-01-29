@@ -37,7 +37,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { requestInAppReview } from "../../../services/app-review";
 
-const PublishNoteSheet = ({ note: item, update }) => {
+const PublishNoteSheet = ({ note: item }) => {
   const { colors } = useThemeColors();
   const actionSheetRef = useRef();
 
@@ -48,8 +48,7 @@ const PublishNoteSheet = ({ note: item, update }) => {
   const [note, setNote] = useState(item);
   const [publishing, setPublishing] = useState(false);
   const publishUrl =
-    note &&
-    `https://monograph.notesnook.com/${db?.monographs.monograph(note?.id)}`;
+    note && `https://monogr.ph/${db?.monographs.monograph(note?.id)}`;
   const isPublished = note && db?.monographs.isPublished(note?.id);
   const pwdInput = useRef();
   const passwordValue = useRef();

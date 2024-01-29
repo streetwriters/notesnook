@@ -125,7 +125,7 @@ function PublishView(props) {
                     variant="body"
                     as="a"
                     target="_blank"
-                    href={`https://monograph.notesnook.com/${publishId}`}
+                    href={`https://monogr.ph/${publishId}`}
                     sx={{
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -134,13 +134,13 @@ function PublishView(props) {
                       mr: 2
                     }}
                   >
-                    {`https://monograph.notesnook.com/${publishId}`}
+                    {`https://monogr.ph/${publishId}`}
                   </Text>
                   <Button
                     variant="anchor"
                     className="copyPublishLink"
                     onClick={() => {
-                      writeText(`https://monograph.notesnook.com/${publishId}`);
+                      writeText(`https://monogr.ph/${publishId}`);
                     }}
                   >
                     <Copy size={20} color="accent" />
