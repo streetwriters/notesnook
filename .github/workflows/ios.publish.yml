@@ -20,7 +20,7 @@ jobs:
           npm run bootstrap -- --scope=mobile
 
       - name: Build packages
-        run: npm run build
+        run: npx nx run @notesnook/mobile:build
 
       - name: Install Pods
         run: npm run prepare:ios
