@@ -135,7 +135,9 @@
           ]
         }
       ],
-      "signingHashAlgorithms": "sha256",
+      "signingHashAlgorithms": [
+        "sha256"
+      ],
       "sign": "./sign.js",
       "icon": "assets/icons/app.ico"
     },
