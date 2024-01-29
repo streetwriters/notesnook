@@ -158,7 +158,7 @@ export async function exportNote(
       return false as const;
     });
 
-  if (!exported) return false;
+  if (typeof exported === "boolean" && !exported) return false;
 
   const filename = sanitizeFilename(note.title, { replacement: "-" });
   const ext = FORMAT_TO_EXT[format];
