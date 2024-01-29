@@ -156,7 +156,7 @@ export function ImageComponent(
               </Flex>
             )}
           </DesktopOnly>
-          {progress && (
+          {progress ? (
             <Flex
               sx={{
                 position: "absolute",
@@ -169,9 +169,9 @@ export function ImageComponent(
               }}
             >
               <Icon path={Icons.loading} rotate size={14} sx={{ mr: 1 }} />
-              <Text variant="body">Loading ({progress}%)</Text>
+              <Text variant="body">{progress}%</Text>
             </Flex>
-          )}
+          ) : null}
           {!isReadonly && selected && (
             <Icon
               className="drag-handle"
