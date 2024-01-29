@@ -227,6 +227,11 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
 
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
@@ -247,6 +252,9 @@ jobs:
       - name: Publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
         run: |
           if ($${{ inputs.publish-github }} -eq $true) {
             yarn electron-builder --win --publish always
