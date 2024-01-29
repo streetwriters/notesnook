@@ -1,0 +1,53 @@
+name: Publish @notesnook/ios
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: macos-13
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install node modules
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=mobile
+
+      - name: Install Pods
+        run: npm run prepare:ios
+
+      - name: Build iOS App
+        uses: yukiarrr/ios-build-action@v1.11.2
+        with:
+          bundle-identifier: org.streetwriters.notesnook
+          scheme: Notesnook
+          configuration: "Release"
+          export-options: apps/mobile/native/ios/ExportOptions.plist
+          project-path: apps/mobile/native/ios/Notesnook.xcodeproj
+          workspace-path: apps/mobile/native/ios/Notesnook.xcworkspace
+          update-targets: Notesnook, Make Note, NotesWidgetExtension
+          disable-targets: Notesnook-tvOS,Notesnook-tvOSTests,NotesnookTests
+          code-signing-identity: Apple Distribution
+          team-id: ${{ secrets.APPLE_TEAM_ID }}
+          p12-base64: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          certificate-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
+          app-store-connect-api-key-issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
+          app-store-connect-api-key-id: ${{ secrets.API_KEY_ID }}
+          app-store-connect-api-key: ${{ secrets.APPSTORE_CONNECT_API_KEY_BASE64 }}
+          output-path: Notesnook.ipa
+          mobileprovision-base64: |
+            ${{ secrets.APPLE_MOBILE_PROVISION_APP }}
+            ${{ secrets.APPLE_MOBILE_PROVISION_SHARE }}
+            ${{ secrets.APPLE_MOBILE_PROVISION_WIDGET }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Notesnook.ipa
+          path: Notesnook.ipa
