@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ThemeUIStyleObject } from "@theme-ui/core";
-import { Box, Flex, Image } from "@theme-ui/components";
+import { Box, Flex, Image, Text } from "@theme-ui/components";
 import { ImageAttributes } from "./image";
 import { useEffect, useState } from "react";
 import { SelectionBasedReactNodeViewProps } from "../react";
@@ -49,7 +49,7 @@ export function ImageComponent(
   props: SelectionBasedReactNodeViewProps<Partial<ImageAttributes>>
 ) {
   const { editor, node, selected } = props;
-  const { src, alt, title, textDirection, hash, aspectRatio, mime } =
+  const { src, alt, title, textDirection, hash, aspectRatio, mime, progress } =
     node.attrs;
   const [bloburl, setBloburl] = useState<string | undefined>(
     toBlobURL("", "image", mime, hash)
@@ -156,6 +156,22 @@ export function ImageComponent(
               </Flex>
             )}
           </DesktopOnly>
+          {progress && (
+            <Flex
+              sx={{
+                position: "absolute",
+                bottom: 2,
+                right: 2,
+                bg: "background",
+                borderRadius: 100,
+                p: 1,
+                border: "1px solid var(--border)"
+              }}
+            >
+              <Icon path={Icons.loading} rotate size={14} sx={{ mr: 1 }} />
+              <Text variant="body">Loading ({progress}%)</Text>
+            </Flex>
+          )}
           {!isReadonly && selected && (
             <Icon
               className="drag-handle"
