@@ -165,7 +165,9 @@ export function ImageComponent(
                 bg: "background",
                 borderRadius: 100,
                 p: 1,
-                border: "1px solid var(--border)"
+                px: 2,
+                border: "1px solid var(--border)",
+                zIndex: 2
               }}
             >
               <Icon path={Icons.loading} rotate size={14} sx={{ mr: 1 }} />
