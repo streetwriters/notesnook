@@ -42,7 +42,7 @@ jobs:
           certificate-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
           app-store-connect-api-key-issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
           app-store-connect-api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
-          app-store-connect-api-key: ${{ secrets.APPSTORE_CONNECT_API_KEY_BASE64 }}
+          app-store-connect-api-key-base64: ${{ secrets.APPSTORE_CONNECT_API_KEY_BASE64 }}
           output-path: Notesnook.ipa
           mobileprovision-base64: |
             ${{ secrets.APPLE_MOBILE_PROVISION_APP }}
