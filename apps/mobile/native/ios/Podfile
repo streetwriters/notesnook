@@ -116,6 +116,15 @@ post_install do |installer|
       # necessary for Mac Catalyst builds
       :mac_catalyst_enabled => false
     )
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+        # Using the un-qualified names means you can swap in different implementations, for example ccache
+      config.build_settings["CC"] = "clang"
+      config.build_settings["LD"] = "clang"
+      config.build_settings["CXX"] = "clang++"
+      config.build_settings["LDPLUSPLUS"] = "clang++"
+      end
+    end  
   __apply_Xcode_12_5_M1_post_install_workaround(installer)
   installer.pods_project.targets.each do |target|
   target.build_configurations.each do |config|
