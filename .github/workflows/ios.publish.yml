@@ -21,7 +21,7 @@ jobs:
 
       # - name: Build packages
       #   run: npx nx run @notesnook/mobile:build
-
+      
       - name: Setup ccache
         run: |
           brew install ccache
@@ -36,12 +36,14 @@ jobs:
           export CCACHE_DEPEND=true
           export CCACHE_INODECACHE=true
           export CCACHE_COMPILERCHECK=content
+          mkdir .ccache
+          export CCACHE_DIR=.ccache
 
       - name: Cache ccache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.ccache
+            .ccache
           key: ${{ runner.os }}-library-ccache-${{ hashFiles(format('apps/mobile/native/ios/Podfile.lock')) }}
           restore-keys: |
             ${{ runner.os }}-library-ccache-
