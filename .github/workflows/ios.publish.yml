@@ -14,12 +14,6 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
-      - uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
-
-
       - name: Install node modules
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
