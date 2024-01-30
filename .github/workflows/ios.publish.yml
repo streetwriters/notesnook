@@ -51,7 +51,7 @@ jobs:
         run: npm run prepare:ios
 
       - name: Build iOS App
-        uses: yukiarrr/ios-build-action@v1.11.2
+        uses: ammarahm-ed/ios-build-action@master
         with:
           bundle-identifier: org.streetwriters.notesnook
           scheme: Notesnook
