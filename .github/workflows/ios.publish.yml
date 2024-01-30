@@ -26,18 +26,22 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: ${{ runner.os }}-ccache-${{ hashFiles(format('apps/mobile/native/ios/Podfile.lock')) }}
-          max-size: 1500M
           restore-keys: |
             ${{ runner.os }}-ccache- 
       
       - name: Setup ccache
         run: |
+          ln -s $(which ccache) /usr/local/bin/gcc
+          ln -s $(which ccache) /usr/local/bin/g++
+          ln -s $(which ccache) /usr/local/bin/cc
+          ln -s $(which ccache) /usr/local/bin/c++
+          ln -s $(which ccache) /usr/local/bin/clang
+          ln -s $(which ccache) /usr/local/bin/clang++
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           export CCACHE_SLOPPINESS=clang_index_store,file_stat_matches,include_file_ctime,include_file_mtime,ivfsoverlay,pch_defines,modules,system_headers,time_macros
           export CCACHE_FILECLONE=true
           export CCACHE_DEPEND=true
           export CCACHE_INODECACHE=true
-          export CCACHE_LIMIT_MULTIPLE=0.95
           ccache -s
 
       - name: Cache Pods
@@ -76,7 +80,10 @@ jobs:
             ${{ secrets.APPLE_MOBILE_PROVISION_APP }}
             ${{ secrets.APPLE_MOBILE_PROVISION_SHARE }}
             ${{ secrets.APPLE_MOBILE_PROVISION_WIDGET }}
-
+      
+      - name: Ccache stats
+        run: ccache -s
+        
       # - name: 'Upload app to TestFlight'
       #   uses: apple-actions/upload-testflight-build@v1
       #   with: 
