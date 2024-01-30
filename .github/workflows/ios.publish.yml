@@ -14,6 +14,12 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+
+
       - name: Install node modules
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
@@ -36,20 +42,16 @@ jobs:
           export CCACHE_DEPEND=true
           export CCACHE_INODECACHE=true
           export CCACHE_COMPILERCHECK=content
-          mkdir .ccache
-          export CCACHE_DIR=.ccache
 
-      - name: Cache ccache
-        uses: actions/cache@v3
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.11
         with:
-          path: |
-            .ccache
-          key: ${{ runner.os }}-library-ccache-${{ hashFiles(format('apps/mobile/native/ios/Podfile.lock')) }}
+          key: ${{ runner.os }}-ccache-${{ hashFiles(format('apps/mobile/native/ios/Podfile.lock')) }}
           restore-keys: |
-            ${{ runner.os }}-library-ccache-
+            ${{ runner.os }}-ccache-
 
       - name: Cache Pods
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         id: pods-cache
         with:
          path: apps/mobile/native/ios/Pods
