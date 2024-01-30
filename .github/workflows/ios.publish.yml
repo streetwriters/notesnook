@@ -21,33 +21,28 @@ jobs:
 
       - name: Build packages
         run: npx nx run @notesnook/mobile:build
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.11
+        with:
+          key: ${{ runner.os }}-ccache-${{ hashFiles(format('apps/mobile/native/ios/Podfile.lock')) }}
+          max-size: 1500M
+          restore-keys: |
+            ${{ runner.os }}-ccache- 
       
       - name: Setup ccache
         run: |
-          brew install ccache
-          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          export CCACHE_SLOPPINESS=clang_index_store,file_stat_matches,include_file_ctime,include_file_mtime,ivfsoverlay,pch_defines,modules,system_headers,time_macros
+          export CCACHE_FILECLONE=true
+          export CCACHE_DEPEND=true
+          export CCACHE_INODECACHE=true
           ln -s $(which ccache) /usr/local/bin/gcc
           ln -s $(which ccache) /usr/local/bin/g++
           ln -s $(which ccache) /usr/local/bin/cc
           ln -s $(which ccache) /usr/local/bin/c++
           ln -s $(which ccache) /usr/local/bin/clang
           ln -s $(which ccache) /usr/local/bin/clang++
-          export CCACHE_SLOPPINESS=clang_index_store,file_stat_matches,include_file_ctime,include_file_mtime,ivfsoverlay,pch_defines,modules,system_headers,time_macros
-          export CCACHE_FILECLONE=true
-          export CCACHE_DEPEND=true
-          export CCACHE_INODECACHE=true
-          export CCACHE_DIR=.ccache
           ccache -s
-          mkdir -p .ccache
-
-      - name: Cache ccache
-        uses: actions/cache@v3
-        with:
-          path: |
-            .ccache
-          key: ${{ runner.os }}-ccache-${{ hashFiles(format('apps/mobile/native/ios/Podfile.lock')) }}
-          restore-keys: |
-            ${{ runner.os }}-ccache-
             
       - name: Cache Pods
         uses: actions/cache@v2
