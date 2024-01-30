@@ -15,6 +15,8 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+          working-directory: apps/mobile/native
+          ruby-version: .ruby-version
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
