@@ -33,13 +33,14 @@ jobs:
 
       - name: Sign app bundle for Playstore release
         id: sign_app
-        uses: r0adkll/sign-android-release@v1
+        uses: r0adkll/sign-android-release@master
         with:
           releaseDirectory: apps/mobile/native/android/app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
+        env:
           BUILD_TOOLS_VERSION: "33.0.0"
 
       - name: Publish to Playstore
@@ -65,6 +66,7 @@ jobs:
           alias: ${{ secrets.PUBLIC_ALIAS }}
           keyStorePassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
           keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
+        env:
           BUILD_TOOLS_VERSION: "33.0.0"
 
       - name: Rename apk files
