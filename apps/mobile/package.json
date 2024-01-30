@@ -10,6 +10,7 @@
   "scripts": {
     "postinstall": "patch-package && node ./scripts/optimize-fonts.mjs",
     "run-android": "cd native && react-native run-android --active-arch-only",
+    "build": "echo 'No build script defined'",
     "run-ios": "cd native && react-native run-ios",
     "start": "cd native && react-native start",
     "repack": "cd native && react-native webpack-start",

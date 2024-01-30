@@ -19,6 +19,9 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=mobile
 
+      - name: Build packages
+        run: npx nx run @notesnook/mobile:build
+
       - name: Install Pods
         run: npm run prepare:ios
 
@@ -31,22 +34,33 @@ jobs:
           export-options: apps/mobile/native/ios/ExportOptions.plist
           project-path: apps/mobile/native/ios/Notesnook.xcodeproj
           workspace-path: apps/mobile/native/ios/Notesnook.xcworkspace
-          update-targets: Notesnook, Make Note, NotesWidgetExtension
+          update-targets: |
+            Notesnook
+            Make Note
+            NotesWidgetExtension
           disable-targets: Notesnook-tvOS,Notesnook-tvOSTests,NotesnookTests
           code-signing-identity: Apple Distribution
           team-id: ${{ secrets.APPLE_TEAM_ID }}
           p12-base64: ${{ secrets.APPLE_CERTIFICATE_P12 }}
           certificate-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
           app-store-connect-api-key-issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
-          app-store-connect-api-key-id: ${{ secrets.API_KEY_ID }}
-          app-store-connect-api-key: ${{ secrets.APPSTORE_CONNECT_API_KEY_BASE64 }}
+          app-store-connect-api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+          app-store-connect-api-key-base64: ${{ secrets.APPSTORE_CONNECT_API_KEY_BASE64 }}
           output-path: Notesnook.ipa
           mobileprovision-base64: |
             ${{ secrets.APPLE_MOBILE_PROVISION_APP }}
             ${{ secrets.APPLE_MOBILE_PROVISION_SHARE }}
             ${{ secrets.APPLE_MOBILE_PROVISION_WIDGET }}
 
-      - name: Upload Artifact
+      - name: 'Upload app to TestFlight'
+        uses: apple-actions/upload-testflight-build@v1
+        with: 
+          app-path: Notesnook.ipa
+          issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
+          api-key-id: ${{ secrets.API_KEY_ID }}
+          api-private-key: ${{ secrets.API_KEY }}
+
+      - name: Upload to Github
         uses: actions/upload-artifact@v2
         with:
           name: Notesnook.ipa
