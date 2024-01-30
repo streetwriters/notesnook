@@ -58,6 +58,10 @@ class SettingStore extends BaseStore {
   desktopIntegrationSettings = undefined;
   autoUpdates = true;
   isFlatpak = false;
+  /**
+   * @type {string|undefined}
+   */
+  proxyRules = undefined;
 
   refresh = async () => {
     this.set({
@@ -70,7 +74,8 @@ class SettingStore extends BaseStore {
         await desktop?.integration.desktopIntegration.query(),
       privacyMode: await desktop?.integration.privacyMode.query(),
       zoomFactor: await desktop?.integration.zoomFactor.query(),
-      autoUpdates: await desktop?.updater.autoUpdates.query()
+      autoUpdates: await desktop?.updater.autoUpdates.query(),
+      proxyRules: await desktop.integration.proxyConfig.query()
     });
   };
 
@@ -97,6 +102,11 @@ class SettingStore extends BaseStore {
   setZoomFactor = async (zoomFactor) => {
     await desktop?.integration.setZoomFactor.mutate(zoomFactor);
     this.set({ zoomFactor });
+  };
+
+  setProxyRules = async (proxyRules) => {
+    await desktop?.integration.setProxyConfig.mutate(proxyRules);
+    this.set({ proxyRules: proxyRules });
   };
 
   setEncryptBackups = (encryptBackups) => {

@@ -36,7 +36,8 @@ import {
   Privacy,
   Pro,
   ShieldLock,
-  Sync
+  Sync,
+  Proxy
 } from "../../components/icons";
 import { Perform } from "../../common/dialog-controller";
 import NavigationItem from "../../components/navigation-menu/navigation-item";
@@ -57,6 +58,7 @@ import { ImporterSettings } from "./importer-settings";
 import { VaultSettings } from "./vault-settings";
 import { PrivacySettings } from "./privacy-settings";
 import { EditorSettings } from "./editor-settings";
+import { ProxySettings } from "./proxy-settings";
 import {
   AboutSettings,
   LegalSettings,
@@ -65,7 +67,6 @@ import {
 import { AppearanceSettings } from "./appearance-settings";
 import { debounce } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
-import { alpha } from "@theme-ui/color";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 
 type SettingsDialogProps = { onClose: Perform };
@@ -109,7 +110,13 @@ const sectionGroups: SectionGroup[] = [
         icon: Desktop,
         isHidden: () => !IS_DESKTOP_APP
       },
-      { key: "notifications", title: "Notifications", icon: Notification }
+      { key: "notifications", title: "Notifications", icon: Notification },
+      {
+        key: "proxy",
+        title: "Proxy",
+        icon: Proxy,
+        isHidden: () => !IS_DESKTOP_APP
+      }
     ]
   },
   {
@@ -155,7 +162,8 @@ const SettingsGroups = [
   ...LegalSettings,
   ...SupportSettings,
   ...AboutSettings,
-  ...SubscriptionSettings
+  ...SubscriptionSettings,
+  ...ProxySettings
 ];
 
 // Thoughts:

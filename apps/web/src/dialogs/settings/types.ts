@@ -37,7 +37,8 @@ export type SectionKeys =
   | "support"
   | "legal"
   | "developer"
-  | "about";
+  | "about"
+  | "proxy";
 
 export type SectionGroupKeys =
   | "account"
