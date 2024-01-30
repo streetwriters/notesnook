@@ -47,6 +47,7 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: ${{ runner.os }}-ccache-${{ hashFiles(format('apps/mobile/native/ios/Podfile.lock')) }}
+          create-symlink: true
           restore-keys: |
             ${{ runner.os }}-ccache-
 
