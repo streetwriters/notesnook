@@ -11,16 +11,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup Node
-        uses: ./.github/actions/setup-node-with-cache
+      # - name: Setup Node
+      #   uses: ./.github/actions/setup-node-with-cache
 
-      - name: Install node modules
-        run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=mobile
+      # - name: Install node modules
+      #   run: |
+      #     npm ci --ignore-scripts --prefer-offline --no-audit
+      #     npm run bootstrap -- --scope=mobile
 
-      - name: Build packages
-        run: npx nx run @notesnook/mobile:build
+      # - name: Build packages
+      #   run: npx nx run @notesnook/mobile:build
 
       - name: Setup ccache
         run: |
@@ -41,47 +41,47 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /Users/$USER/Library/Caches/ccache
-          key: ${{ runner.os }}-library-ccache-${{ hashFiles(format('apps/mobile/native/ios/Podfile.lock', env.WORK_DIR)) }}
+            ~/.ccache
+          key: ${{ runner.os }}-library-ccache-${{ hashFiles(format('apps/mobile/native/ios/Podfile.lock')) }}
           restore-keys: |
             ${{ runner.os }}-library-ccache-
 
-      - name: Cache Pods
-        uses: actions/cache@v3
-        id: pods-cache
-        with:
-         path: apps/mobile/native/ios/Pods
-         key: ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/native/ios/Podfile.lock') }}
+      # - name: Cache Pods
+      #   uses: actions/cache@v3
+      #   id: pods-cache
+      #   with:
+      #    path: apps/mobile/native/ios/Pods
+      #    key: ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/native/ios/Podfile.lock') }}
 
-      - name: Install Pods
-        run: npm run prepare:ios
+      # - name: Install Pods
+      #   run: npm run prepare:ios
 
-      - name: Build iOS App
-        uses: yukiarrr/ios-build-action@v1.11.2
-        with:
-          bundle-identifier: org.streetwriters.notesnook
-          scheme: Notesnook
-          configuration: "Release"
-          export-options: apps/mobile/native/ios/ExportOptions.plist
-          project-path: apps/mobile/native/ios/Notesnook.xcodeproj
-          workspace-path: apps/mobile/native/ios/Notesnook.xcworkspace
-          update-targets: |
-            Notesnook
-            Make Note
-            NotesWidgetExtension
-          disable-targets: Notesnook-tvOS,Notesnook-tvOSTests,NotesnookTests
-          code-signing-identity: Apple Distribution
-          team-id: ${{ secrets.APPLE_TEAM_ID }}
-          p12-base64: ${{ secrets.APPLE_CERTIFICATE_P12 }}
-          certificate-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
-          app-store-connect-api-key-issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
-          app-store-connect-api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
-          app-store-connect-api-key-base64: ${{ secrets.APPSTORE_CONNECT_API_KEY_BASE64 }}
-          output-path: Notesnook.ipa
-          mobileprovision-base64: |
-            ${{ secrets.APPLE_MOBILE_PROVISION_APP }}
-            ${{ secrets.APPLE_MOBILE_PROVISION_SHARE }}
-            ${{ secrets.APPLE_MOBILE_PROVISION_WIDGET }}
+      # - name: Build iOS App
+      #   uses: yukiarrr/ios-build-action@v1.11.2
+      #   with:
+      #     bundle-identifier: org.streetwriters.notesnook
+      #     scheme: Notesnook
+      #     configuration: "Release"
+      #     export-options: apps/mobile/native/ios/ExportOptions.plist
+      #     project-path: apps/mobile/native/ios/Notesnook.xcodeproj
+      #     workspace-path: apps/mobile/native/ios/Notesnook.xcworkspace
+      #     update-targets: |
+      #       Notesnook
+      #       Make Note
+      #       NotesWidgetExtension
+      #     disable-targets: Notesnook-tvOS,Notesnook-tvOSTests,NotesnookTests
+      #     code-signing-identity: Apple Distribution
+      #     team-id: ${{ secrets.APPLE_TEAM_ID }}
+      #     p12-base64: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+      #     certificate-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
+      #     app-store-connect-api-key-issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
+      #     app-store-connect-api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+      #     app-store-connect-api-key-base64: ${{ secrets.APPSTORE_CONNECT_API_KEY_BASE64 }}
+      #     output-path: Notesnook.ipa
+      #     mobileprovision-base64: |
+      #       ${{ secrets.APPLE_MOBILE_PROVISION_APP }}
+      #       ${{ secrets.APPLE_MOBILE_PROVISION_SHARE }}
+      #       ${{ secrets.APPLE_MOBILE_PROVISION_WIDGET }}
 
       # - name: 'Upload app to TestFlight'
       #   uses: apple-actions/upload-testflight-build@v1
