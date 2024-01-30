@@ -28,32 +28,6 @@ jobs:
       - name: Make Gradlew Executable
         run: cd apps/mobile/native/android && chmod +x ./gradlew
 
-      - name: Build unsigned app bundle
-        run: yarn release:android:bundle
-
-      - name: Sign app bundle for Playstore release
-        id: sign_app
-        uses: r0adkll/sign-android-release@master
-        with:
-          releaseDirectory: apps/mobile/native/android/app/build/outputs/bundle/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "33.0.0"
-
-      - name: Publish to Playstore
-        id: deploy
-        uses: r0adkll/upload-google-play@v1.1.1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: com.streetwriters.notesnook
-          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
-          track: production
-          status: completed
-          whatsNewDirectory: apps/mobile/native/android/releasenotes/
-
       - name: Build apks for Github release
         run: yarn release:android
 
