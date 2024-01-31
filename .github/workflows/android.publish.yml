@@ -47,6 +47,9 @@ jobs:
           export CCACHE_COMPILERCHECK=content
           ccache --set-config=base_dir=$PWD
           ccache --set-config=compiler_check=content
+          ccache --set-config=debug=true
+          ccache --set-config=debug_dir=$PWD/ccache_debug
+          mkdir -p $PWD/ccache_debug
           ccache -p
           
       - name: Cache gradle
@@ -76,8 +79,8 @@ jobs:
         with:
           name: CCache_logs
           path: |
-            .ccache
-
+            $PWD/ccache_debug
+            
       # - name: Build unsigned app bundle
       #   run: |
       #     cd apps/mobile/native/android
