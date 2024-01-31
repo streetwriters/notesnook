@@ -27,7 +27,6 @@
     "chokidar": "^3.5.3",
     "electron": "25.9.8",
     "electron-builder": "^24.9.1",
-    "electron-builder-notarize": "^1.5.1",
     "esbuild": "^0.17.19",
     "tree-kill": "^1.2.2",
     "undici": "^5.23.0"
@@ -67,7 +66,6 @@
       "!build/*.png",
       "!node_modules${/*}"
     ],
-    "afterSign": "electron-builder-notarize",
     "afterPack": "./scripts/removeLocales.js",
     "mac": {
       "bundleVersion": "240",
@@ -111,13 +109,19 @@
         }
       ],
       "icon": "assets/icons/app.icns",
-      "title": "Install Notesnook"
+      "title": "Install Notesnook",
+      "notarize": {
+        "teamId": "53CWBG3QUC"
+      }
     },
     "mas": {
       "entitlements": "assets/entitlements.mas.plist",
       "entitlementsInherit": "assets/entitlements.mas.inherit.plist",
       "entitlementsLoginHelper": "assets/entitlements.mas.loginhelper.plist",
-      "hardenedRuntime": true
+      "hardenedRuntime": true,
+      "notarize": {
+        "teamId": "53CWBG3QUC"
+      }
     },
     "win": {
       "target": [
