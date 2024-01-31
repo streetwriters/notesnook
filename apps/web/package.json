@@ -1,7 +1,7 @@
 {
   "name": "@notesnook/web",
   "description": "Your private note taking space",
-  "version": "2.6.16",
+  "version": "3.0.0-beta",
   "private": true,
   "main": "./src/app.js",
   "homepage": "https://notesnook.com/",
@@ -130,7 +130,6 @@
     "start:test": "serve -s build/ -p 3000",
     "build": "cross-env PLATFORM=web vite build",
     "build:test": "cross-env PLATFORM=web TEST=true vite build",
-    "build:beta": "cross-env PLATFORM=web BETA=true vite build",
     "build:desktop": "cross-env PLATFORM=desktop vite build",
     "analyze": "cross-env ANALYZING=true PLATFORM=web vite build",
     "test": "playwright test -u"
