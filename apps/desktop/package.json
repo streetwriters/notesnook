@@ -93,7 +93,10 @@
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
       "gatekeeperAssess": false,
-      "icon": "assets/icons/app.icns"
+      "icon": "assets/icons/app.icns",
+      "notarize": {
+        "teamId": "53CWBG3QUC"
+      }
     },
     "dmg": {
       "contents": [
@@ -109,19 +112,13 @@
         }
       ],
       "icon": "assets/icons/app.icns",
-      "title": "Install Notesnook",
-      "notarize": {
-        "teamId": "53CWBG3QUC"
-      }
+      "title": "Install Notesnook"
     },
     "mas": {
       "entitlements": "assets/entitlements.mas.plist",
       "entitlementsInherit": "assets/entitlements.mas.inherit.plist",
       "entitlementsLoginHelper": "assets/entitlements.mas.loginhelper.plist",
-      "hardenedRuntime": true,
-      "notarize": {
-        "teamId": "53CWBG3QUC"
-      }
+      "hardenedRuntime": true
     },
     "win": {
       "target": [
