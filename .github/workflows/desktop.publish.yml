@@ -82,6 +82,7 @@ jobs:
           name: Notesnook Desktop v${{ steps.app_metadata.outputs.app_version }}
           tag_name: v${{ steps.app_metadata.outputs.app_version }}
           files: ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip
+          prerelease: ${{ endsWith(steps.app_metadata.outputs.app_version, '-beta') }}
 
   build-macos:
     name: Build for macOS

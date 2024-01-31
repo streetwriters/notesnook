@@ -19,16 +19,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { autoUpdater } from "electron-updater";
 import { config } from "./config";
+import { version } from "../../package.json";
 
+const CHANNEL = version.endsWith("-beta") ? "beta" : "latest";
 async function configureAutoUpdater() {
   autoUpdater.setFeedURL({
     provider: "generic",
     url: `https://notesnook.com/releases/${process.platform}/`,
-    useMultipleRangeRequest: false
+    useMultipleRangeRequest: false,
+    channel: CHANNEL,
+    requestHeaders: {
+      RELEASE_CHANNEL: CHANNEL
+    }
   });
 
   autoUpdater.autoDownload = config.automaticUpdates;
-  autoUpdater.allowDowngrade = false;
+  autoUpdater.allowDowngrade = CHANNEL === "beta";
   autoUpdater.allowPrerelease = false;
   autoUpdater.autoInstallOnAppQuit = true;
 }

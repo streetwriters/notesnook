@@ -2,7 +2,7 @@
   "name": "@notesnook/desktop",
   "productName": "Notesnook",
   "description": "Your private note taking space",
-  "version": "2.6.15",
+  "version": "3.0.0-beta",
   "appAppleId": "1544027013",
   "private": true,
   "main": "./dist/index.js",
@@ -56,6 +56,7 @@
     "artifactName": "notesnook_${os}_${arch}.${ext}",
     "npmRebuild": false,
     "asar": false,
+    "generateUpdatesFilesForAllChannels": true,
     "files": [
       "!*.chunk.js.map",
       "!*.chunk.js.LICENSE.txt",
