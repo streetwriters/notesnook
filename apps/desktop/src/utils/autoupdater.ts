@@ -19,9 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { autoUpdater } from "electron-updater";
 import { config } from "./config";
-import { version } from "../../package.json";
 
-const CHANNEL = version.endsWith("-beta") ? "beta" : "latest";
+const CHANNEL = autoUpdater.currentVersion.raw.endsWith("-beta")
+  ? "beta"
+  : "latest";
 async function configureAutoUpdater() {
   autoUpdater.setFeedURL({
     provider: "generic",
