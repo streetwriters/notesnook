@@ -29,12 +29,4 @@ jobs:
         run: npm run build:web
 
       - name: Publish to Cloudflare Pages
-        uses: unlike-ltd/github-actions-cloudflare-pages@v1.1.2
-        id: pages
-        with:
-          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          cloudflare-account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          cloudflare-project-name: notesnook-v3-beta
-          directory: ./apps/web/build
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          github-environment: "v3"
+        run: npx --yes wrangler pages deploy --project-name=notesnook-v3-beta ./apps/web/build/
