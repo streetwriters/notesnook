@@ -10,6 +10,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        env:
+          CMAKE_C_COMPILER_LAUNCHER: ccache
+          CMAKE_CXX_COMPILER_LAUNCHER: ccache
+          NDK_CCACHE: ccache
+          USE_CCACHE: 1
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
