@@ -293,39 +293,41 @@ class Sync {
   }
 
   async send(oldLastSynced, isForceSync, newLastSynced) {
-    await this.uploadAttachments();
+    return false;
 
-    let isSyncInitialized = false;
-    let done = 0;
-    for await (const item of this.collector.collect(
-      100,
-      oldLastSynced,
-      isForceSync
-    )) {
-      if (!isSyncInitialized) {
-        const vaultKey = await this.db.vault._getKey();
-        newLastSynced = await this.connection.invoke("InitializePush", {
-          vaultKey,
-          lastSynced: newLastSynced
-        });
-        isSyncInitialized = true;
-      }
+    // await this.uploadAttachments();
 
-      const result = await this.pushItem(item, newLastSynced);
-      if (result) {
-        done += item.items.length;
-        sendSyncProgressEvent(this.db.eventManager, "upload", done);
+    // let isSyncInitialized = false;
+    // let done = 0;
+    // for await (const item of this.collector.collect(
+    //   100,
+    //   oldLastSynced,
+    //   isForceSync
+    // )) {
+    //   if (!isSyncInitialized) {
+    //     const vaultKey = await this.db.vault._getKey();
+    //     newLastSynced = await this.connection.invoke("InitializePush", {
+    //       vaultKey,
+    //       lastSynced: newLastSynced
+    //     });
+    //     isSyncInitialized = true;
+    //   }
 
-        this.logger.info(`Batch sent (${done})`);
-      } else {
-        this.logger.error(
-          new Error(`Failed to send batch. Server returned falsy response.`)
-        );
-      }
-    }
-    if (!isSyncInitialized) return;
-    await this.connection.invoke("SyncCompleted", newLastSynced);
-    return true;
+    //   const result = await this.pushItem(item, newLastSynced);
+    //   if (result) {
+    //     done += item.items.length;
+    //     sendSyncProgressEvent(this.db.eventManager, "upload", done);
+
+    //     this.logger.info(`Batch sent (${done})`);
+    //   } else {
+    //     this.logger.error(
+    //       new Error(`Failed to send batch. Server returned falsy response.`)
+    //     );
+    //   }
+    // }
+    // if (!isSyncInitialized) return;
+    // await this.connection.invoke("SyncCompleted", newLastSynced);
+    // return true;
   }
 
   async stop(lastSynced) {
