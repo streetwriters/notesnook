@@ -68,9 +68,6 @@ jobs:
           ln -s $(which ccache) /usr/local/bin/clang++
           ccache --set-config=base_dir=$PWD
           ccache --set-config=compiler_check=content
-          ccache --set-config=debug=true
-          ccache --set-config=debug_dir=$PWD/ccache_debug
-          mkdir -p $PWD/ccache_debug
           ccache -p
           
       - name: Cache gradle
@@ -94,13 +91,6 @@ jobs:
 
       - name: CCache Stats after build
         run: ccache -sv
-
-      - name: Upload to Github
-        uses: actions/upload-artifact@v2
-        with:
-          name: CCache_logs
-          path: |
-            $PWD/ccache_debug
             
       # - name: Build unsigned app bundle
       #   run: |
