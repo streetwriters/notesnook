@@ -65,14 +65,15 @@ jobs:
       - name: Build unsigned app bundle
         run: yarn release:android:bundle
 
-      - name: CCache Stats after build 1
+      - name: CCache Stats after build
         run: ccache -sv
 
       - name: Upload to Github
         uses: actions/upload-artifact@v2
         with:
           name: CCache_logs
-          path: .ccachedebug
+          path: |
+            .ccache
 
       # - name: Build unsigned app bundle
       #   run: |
