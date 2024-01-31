@@ -44,12 +44,8 @@ jobs:
           ln -s $(which ccache) /usr/local/bin/clang
           ln -s $(which ccache) /usr/local/bin/clang++
           export CCACHE_COMPILERCHECK=content
-          export CCACHE_DEBUG=true
-          mkdir .ccachedebug
-          export CCACHE_DEBUG=true
-          export CCACHE_DEBUGDIR=.ccachedebug
-          export CCACHE_DEBUGLEVEL=1
-
+          export CCACHE_HASHDIR=false
+          
       - name: Cache gradle
         uses: actions/cache@v2
         with:
