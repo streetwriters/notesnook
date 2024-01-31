@@ -94,9 +94,7 @@
       "entitlementsInherit": "assets/entitlements.mac.plist",
       "gatekeeperAssess": false,
       "icon": "assets/icons/app.icns",
-      "notarize": {
-        "teamId": "53CWBG3QUC"
-      }
+      "notarize": true
     },
     "dmg": {
       "contents": [
