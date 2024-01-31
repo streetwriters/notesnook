@@ -28,45 +28,79 @@ jobs:
       - name: Make Gradlew Executable
         run: cd apps/mobile/native/android && chmod +x ./gradlew
 
+      - name: Cache gradle
+        uses: actions/cache@v2
+        with:
+         path: |
+           ~/.gradle/caches
+           ~/.gradle/wrapper
+         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      - name: Build unsigned app bundle
+        run: yarn release:android:bundle
+
+      # - name: Sign app bundle for Playstore release
+      #   id: sign_app
+      #   uses: r0adkll/sign-android-release@master
+      #   with:
+      #     releaseDirectory: apps/mobile/native/android/app/build/outputs/bundle/release
+      #     signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+      #     alias: ${{ secrets.ALIAS }}
+      #     keyStorePassword: ${{ secrets.KEY_PASSWORD }}
+      #     keyPassword: ${{ secrets.KEY_PASSWORD }}
+      #   env:
+      #     BUILD_TOOLS_VERSION: "33.0.0"
+
+      # - name: Publish to Playstore
+      #   id: deploy
+      #   uses: r0adkll/upload-google-play@v1.1.1
+      #   with:
+      #     serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+      #     packageName: com.streetwriters.notesnook
+      #     releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
+      #     track: production
+      #     status: completed
+      #     whatsNewDirectory: apps/mobile/native/android/releasenotes/
+         
       - name: Build apks for Github release
         run: yarn release:android
 
-      - name: Sign apk files
-        id: sign_apk
-        uses: r0adkll/sign-android-release@master
-        with:
-          releaseDirectory: apps/mobile/native/android/app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.PUBLIC_SIGNING_KEY }}
-          alias: ${{ secrets.PUBLIC_ALIAS }}
-          keyStorePassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
-          keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "33.0.0"
+      # - name: Sign apk files
+      #   id: sign_apk
+      #   uses: r0adkll/sign-android-release@master
+      #   with:
+      #     releaseDirectory: apps/mobile/native/android/app/build/outputs/apk/release
+      #     signingKeyBase64: ${{ secrets.PUBLIC_SIGNING_KEY }}
+      #     alias: ${{ secrets.PUBLIC_ALIAS }}
+      #     keyStorePassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
+      #     keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
+      #   env:
+      #     BUILD_TOOLS_VERSION: "33.0.0"
 
-      - name: Rename apk files
-        run: |
-          cd apps/mobile/native/android/app/build/outputs/apk/release/
-          mv app-arm64-v8a-release-unsigned-signed.apk notesnook-arm64-v8a.apk
-          mv app-armeabi-v7a-release-unsigned-signed.apk notesnook-armeabi-v7a.apk
-          mv app-x86-release-unsigned-signed.apk notesnook-x86.apk
-          mv app-x86_64-release-unsigned-signed.apk notesnook-x86_64.apk
+      # - name: Rename apk files
+      #   run: |
+      #     cd apps/mobile/native/android/app/build/outputs/apk/release/
+      #     mv app-arm64-v8a-release-unsigned-signed.apk notesnook-arm64-v8a.apk
+      #     mv app-armeabi-v7a-release-unsigned-signed.apk notesnook-armeabi-v7a.apk
+      #     mv app-x86-release-unsigned-signed.apk notesnook-x86.apk
+      #     mv app-x86_64-release-unsigned-signed.apk notesnook-x86_64.apk
 
-      - name: Get app version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@master
-        with:
-          path: apps/mobile
+      # - name: Get app version
+      #   id: package-version
+      #   uses: martinbeentjes/npm-get-version-action@master
+      #   with:
+      #     path: apps/mobile
 
-      - name: Create release draft on Github
-        uses: softprops/action-gh-release@v1
-        with:
-          draft: true
-          tag_name: ${{ steps.package-version.outputs.current-version}}-android
-          name: Notesnook Android v${{ steps.package-version.outputs.current-version}}
-          repository: streetwriters/notesnook
-          token: ${{ secrets.GITHUB_TOKEN }}
-          files: |
-            apps/mobile/native/android/app/build/outputs/apk/release/notesnook-arm64-v8a.apk
-            apps/mobile/native/android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
-            apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86.apk
-            apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86_64.apk
+      # - name: Create release draft on Github
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     draft: true
+      #     tag_name: ${{ steps.package-version.outputs.current-version}}-android
+      #     name: Notesnook Android v${{ steps.package-version.outputs.current-version}}
+      #     repository: streetwriters/notesnook
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     files: |
+      #       apps/mobile/native/android/app/build/outputs/apk/release/notesnook-arm64-v8a.apk
+      #       apps/mobile/native/android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
+      #       apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86.apk
+      #       apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86_64.apk
