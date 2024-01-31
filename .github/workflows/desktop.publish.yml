@@ -154,7 +154,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
           APPLE_API_KEY: ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
           APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
-          APPLE_API_KEY_ISSUER: ${{ secrets.api_key_issuer_id }}
+          APPLE_API_ISSUER: ${{ secrets.api_key_issuer_id }}
         run: |
           npx nx run release --project @notesnook/desktop
           if [ ${{ inputs.publish-github }} == true ]; then
