@@ -37,7 +37,8 @@ const gitHash = (() => {
     return process.env.GIT_HASH || "gitless";
   }
 })();
-const appVersion = version.replaceAll(".", "");
+const appVersion = version.replaceAll(".", "").replace("-beta", "");
+const isBeta = version.endsWith("-beta");
 const isTesting =
   process.env.TEST === "true" || process.env.NODE_ENV === "development";
 const isDesktop = process.env.PLATFORM === "desktop";
@@ -71,7 +72,7 @@ export default defineConfig({
     IS_DESKTOP_APP: isDesktop,
     PLATFORM: `"${process.env.PLATFORM}"`,
     IS_TESTING: process.env.TEST === "true",
-    IS_BETA: process.env.BETA === "true",
+    IS_BETA: isBeta,
     IS_THEME_BUILDER: isThemeBuilder
   },
   logLevel: process.env.NODE_ENV === "production" ? "warn" : "info",
