@@ -29,7 +29,7 @@ jobs:
         run: npm run build:web
 
       - name: Publish to Cloudflare Pages
-        uses: unlike-ltd/github-actions-cloudflare-pages@v0.1.1
+        uses: unlike-ltd/github-actions-cloudflare-pages@v1.1.2
         id: pages
         with:
           cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
