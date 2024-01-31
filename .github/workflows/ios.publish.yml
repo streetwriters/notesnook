@@ -84,16 +84,16 @@ jobs:
       - name: Ccache stats
         run: ccache -s
         
-      # - name: 'Upload app to TestFlight'
-      #   uses: apple-actions/upload-testflight-build@v1
-      #   with: 
-      #     app-path: Notesnook.ipa
-      #     issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
-      #     api-key-id: ${{ secrets.API_KEY_ID }}
-      #     api-private-key: ${{ secrets.API_KEY }}
+      - name: 'Upload app to TestFlight'
+        uses: apple-actions/upload-testflight-build@v1
+        with: 
+          app-path: Notesnook.ipa
+          issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
+          api-key-id: ${{ secrets.API_KEY_ID }}
+          api-private-key: ${{ secrets.API_KEY }}
 
-      # - name: Upload to Github
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: Notesnook.ipa
-      #     path: Notesnook.ipa
+      - name: Upload to Github
+        uses: actions/upload-artifact@v2
+        with:
+          name: Notesnook.ipa
+          path: Notesnook.ipa
