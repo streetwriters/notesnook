@@ -51,7 +51,7 @@ jobs:
           ln -s $(which ccache) /usr/local/bin/c++
           ln -s $(which ccache) /usr/local/bin/clang
           ln -s $(which ccache) /usr/local/bin/clang++
-          export NDK_CCACHE=/usr/local/bin/ccache
+          export NDK_CCACHE=/usr/bin/ccache
 
       - name: CCache Stats
         run: ccache -s -v
