@@ -28,22 +28,14 @@ jobs:
       - name: Make Gradlew Executable
         run: cd apps/mobile/native/android && chmod +x ./gradlew
 
-      - name: Cache gradle
-        uses: actions/cache@v2
-        with:
-         path: |
-           ~/.gradle/caches
-           ~/.gradle/wrapper
-         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-
-      - name: ccache
+      - name: Install CCache
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: ${{ runner.os }}-ccache-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-ccache- 
             
-      - name: Setup ccache
+      - name: Setup CCache
         run: |
           ln -s $(which ccache) /usr/local/bin/gcc
           ln -s $(which ccache) /usr/local/bin/g++
@@ -51,29 +43,40 @@ jobs:
           ln -s $(which ccache) /usr/local/bin/c++
           ln -s $(which ccache) /usr/local/bin/clang
           ln -s $(which ccache) /usr/local/bin/clang++
-          export NDK_CCACHE=/usr/bin/ccache
-          export CMAKE_CXX_COMPILER_LAUNCHER=ccache
-          export CMAKE_C_COMPILER_LAUNCHER=ccache
           export CCACHE_COMPILERCHECK=content
-          export CCACHE_SLOPPINESS=clang_index_store,file_stat_matches,include_file_ctime,include_file_mtime,ivfsoverlay,pch_defines,modules,system_headers,time_macros
-          export CCACHE_FILECLONE=true
-          export CCACHE_DEPEND=true
-          export CCACHE_INODECACHE=true
-          ccache --get-config compiler_check
+          export CCACHE_DEBUG=true
+
+      - name: Cache gradle
+        uses: actions/cache@v2
+        with:
+         path: |
+           ~/.gradle/caches
+           ~/.gradle/wrapper
+         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         
       - name: Patch CPP Projects to use CCache
         run: |
           sed -i -e 's/arguments/arguments "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache",/g' apps/mobile/node_modules/react-native-mmkv-storage/android/build.gradle
           sed -i -e 's/arguments/arguments "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache",/g' apps/mobile/node_modules/react-native-reanimated/android/build.gradle
 
-      - name: CCache Stats
-        run: ccache -s -v
+      - name: CCache Stats Before Build
+        run: ccache -sv
 
       - name: Build unsigned app bundle
         run: yarn release:android:bundle
 
-      - name: CCache Stats after build
-        run: ccache -s -v
+      - name: CCache Stats after build 1
+        run: ccache -sv
+
+      - name: Build unsigned app bundle
+        run: |
+          cd apps/mobile/native/android
+          ./gradlew clean
+          cd ../../../../
+          yarn release:android:bundle
+      
+      - name: CCache Stats after build 2
+        run: ccache -sv
 
       # - name: Sign app bundle for Playstore release
       #   id: sign_app
