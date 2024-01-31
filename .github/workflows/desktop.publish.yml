@@ -88,7 +88,7 @@ jobs:
     name: Build for macOS
     needs: build
     if: inputs.build-mac
-    runs-on: macos-12
+    runs-on: macos-14
 
     steps:
       - name: Check out Git repository
