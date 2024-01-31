@@ -54,6 +54,7 @@ jobs:
           export NDK_CCACHE=/usr/bin/ccache
           export CMAKE_CXX_COMPILER_LAUNCHER=ccache
           export CMAKE_C_COMPILER_LAUNCHER=ccache
+          export CCACHE_COMPILERCHECK=content
 
       - name: Patch CPP Projects to use CCache
         run: |
