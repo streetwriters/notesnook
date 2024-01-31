@@ -12,7 +12,7 @@ buildscript {
         androidXCoreVersion = "1.7.0"
         androidXCore = "1.7.0"
         androidXBrowser = "1.0.0"
-        ndkVersion = "23.1.7779620"
+        ndkVersion = "25.2.9519653"
     }
     
     repositories {
