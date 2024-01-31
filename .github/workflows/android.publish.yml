@@ -44,7 +44,6 @@ jobs:
           ln -s $(which ccache) /usr/local/bin/c++
           ln -s $(which ccache) /usr/local/bin/clang
           ln -s $(which ccache) /usr/local/bin/clang++
-          export CCACHE_COMPILERCHECK=content
           ccache --set-config=base_dir=$PWD
           ccache --set-config=compiler_check=content
           ccache --set-config=debug=true
