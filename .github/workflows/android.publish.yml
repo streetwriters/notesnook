@@ -13,22 +13,6 @@ jobs:
       USE_CCACHE: 1
 
     steps:
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
-          tool-cache: false
-          
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
-          android: false
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
-          
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -59,7 +43,6 @@ jobs:
             
       - name: Setup CCache
         run: |
-          sudo rm -rf /usr/local/lib/android/sdk/ndk
           ln -s $(which ccache) /usr/local/bin/gcc
           ln -s $(which ccache) /usr/local/bin/g++
           ln -s $(which ccache) /usr/local/bin/cc
