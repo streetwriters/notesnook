@@ -60,7 +60,7 @@ jobs:
         run: yarn release:android:bundle
 
       - name: CCache Stats after build
-        run: cache -s -v
+        run: ccache -s -v
 
       # - name: Sign app bundle for Playstore release
       #   id: sign_app
