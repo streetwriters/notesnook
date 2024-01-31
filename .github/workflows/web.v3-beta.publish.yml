@@ -34,7 +34,7 @@ jobs:
         with:
           cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           cloudflare-account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          cloudflare-project-name: notesnook-v3-app
+          cloudflare-project-name: notesnook-v3-beta
           directory: ./apps/web/build
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          github-environment: ${{ (github.ref == 'refs/heads/master' && 'beta') || 'preview' }}
+          github-environment: 'v3'
