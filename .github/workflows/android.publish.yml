@@ -32,6 +32,7 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: ${{ runner.os }}-ccache-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          max-size: 1.5G
           restore-keys: |
             ${{ runner.os }}-ccache- 
             
@@ -46,7 +47,6 @@ jobs:
           export CCACHE_COMPILERCHECK=content
           ccache --set-config=base_dir=$PWD
           ccache --set-config=compiler_check=content
-          ccache --set-config=hash_dir=false
           ccache -p
           
       - name: Cache gradle
