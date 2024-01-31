@@ -33,7 +33,7 @@ jobs:
       - name: Setup ccache
         run: |
           ccache --set-config=base_dir=$PWD
-          ccache --set-config=inode_cache=content
+          ccache --set-config=inode_cache=true
           ccache --set-config=compiler_check=content
           ccache --set-config=depend_mode=true
           ccache --set-config=file_clone=true
