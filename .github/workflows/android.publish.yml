@@ -32,7 +32,7 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: ${{ runner.os }}-ccache-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          max-size: 1.5G
+          max-size: 1500M
           restore-keys: |
             ${{ runner.os }}-ccache- 
             
