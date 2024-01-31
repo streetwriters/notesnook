@@ -32,17 +32,19 @@ jobs:
       
       - name: Setup ccache
         run: |
-          export CCACHE_SLOPPINESS=clang_index_store,file_stat_matches,include_file_ctime,include_file_mtime,ivfsoverlay,pch_defines,modules,system_headers,time_macros
-          export CCACHE_FILECLONE=true
-          export CCACHE_DEPEND=true
-          export CCACHE_INODECACHE=true
+          ccache --set-config=base_dir=$PWD
+          ccache --set-config=inode_cache=content
+          ccache --set-config=compiler_check=content
+          ccache --set-config=depend_mode=true
+          ccache --set-config=file_clone=true
+          ccache --set-config=sloppiness=clang_index_store,file_stat_matches,include_file_ctime,include_file_mtime,ivfsoverlay,pch_defines,modules,system_headers,time_macros
           ln -s $(which ccache) /usr/local/bin/gcc
           ln -s $(which ccache) /usr/local/bin/g++
           ln -s $(which ccache) /usr/local/bin/cc
           ln -s $(which ccache) /usr/local/bin/c++
           ln -s $(which ccache) /usr/local/bin/clang
           ln -s $(which ccache) /usr/local/bin/clang++
-          ccache -s
+          ccache -p
             
       - name: Cache Pods
         uses: actions/cache@v2
@@ -53,6 +55,9 @@ jobs:
 
       - name: Install Pods
         run: npm run prepare:ios
+
+      - name: CCache Stats Before Build
+        run: ccache -sv
 
       - name: Build iOS App
         uses: ammarahm-ed/ios-build-action@master
@@ -81,19 +86,19 @@ jobs:
             ${{ secrets.APPLE_MOBILE_PROVISION_SHARE }}
             ${{ secrets.APPLE_MOBILE_PROVISION_WIDGET }}
       
-      - name: Ccache stats
-        run: ccache -s
+      - name: CCache Stats After Build
+        run: ccache -sv
         
-      - name: 'Upload app to TestFlight'
-        uses: apple-actions/upload-testflight-build@v1
-        with: 
-          app-path: Notesnook.ipa
-          issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
-          api-key-id: ${{ secrets.API_KEY_ID }}
-          api-private-key: ${{ secrets.API_KEY }}
+      # - name: 'Upload app to TestFlight'
+      #   uses: apple-actions/upload-testflight-build@v1
+      #   with: 
+      #     app-path: Notesnook.ipa
+      #     issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
+      #     api-key-id: ${{ secrets.API_KEY_ID }}
+      #     api-private-key: ${{ secrets.API_KEY }}
 
-      - name: Upload to Github
-        uses: actions/upload-artifact@v2
-        with:
-          name: Notesnook.ipa
-          path: Notesnook.ipa
+      # - name: Upload to Github
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: Notesnook.ipa
+      #     path: Notesnook.ipa
