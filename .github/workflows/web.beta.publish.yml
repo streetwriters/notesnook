@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - master
-      - '!v3-beta'
+      - "!v3-beta"
     paths-ignore:
       - "apps/mobile/**"
       - "packages/editor-mobile/**"
@@ -23,7 +23,7 @@ on:
       - synchronize
     branches:
       - master
-      - '!v3-beta'
+      - "!v3-beta"
     paths-ignore:
       - "apps/mobile/**"
       - "packages/editor-mobile/**"
