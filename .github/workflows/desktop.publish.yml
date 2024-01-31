@@ -58,7 +58,7 @@ jobs:
         run: npx nx build:desktop @notesnook/web
 
       - name: Archive build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: apps/web/build/**/*
@@ -123,7 +123,7 @@ jobs:
           platform: "MAC_OS"
 
       - name: Download build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: ./apps/web/build
@@ -199,7 +199,7 @@ jobs:
         if: inputs.publish-snap
 
       - name: Download build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: ./apps/web/build
@@ -259,7 +259,7 @@ jobs:
         uses: ./.github/actions/setup-node-with-cache
 
       - name: Download build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: ./apps/web/build
