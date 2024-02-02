@@ -209,7 +209,8 @@
       {
         "provider": "github",
         "repo": "notesnook",
-        "owner": "streetwriters"
+        "owner": "streetwriters",
+        "channel": "beta"
       }
     ]
   }
