@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef } from "react";
 import {
   AppState,
@@ -32,9 +33,7 @@ import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { editorRef } from "../../utils/global-refs";
-import { ProgressBar } from "./progress";
 import { editorController, textInput } from "./tiptap/utils";
 
 export const EditorWrapper = ({ width }) => {
@@ -115,7 +114,6 @@ export const EditorWrapper = ({ width }) => {
             style={{ height: 1, padding: 0, width: 1, position: "absolute" }}
             blurOnSubmit={false}
           />
-          {/* <ProgressBar /> */}
           <Editor key="editor" withController={true} />
         </KeyboardAvoidingViewIOS>
       )}

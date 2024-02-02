@@ -16,14 +16,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React, { useRef } from "react";
-import { Dimensions, Platform, View, useWindowDimensions } from "react-native";
+import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { Platform, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { presentSheet } from "../../services/event-manager";
 import SearchService from "../../services/search";
-import { useThemeColors } from "@notesnook/theme";
 import { ColorValues } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
@@ -34,7 +34,7 @@ import { DateMeta } from "./date-meta";
 import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
-import { Tags, TagStrip } from "./tags";
+import { TagStrip, Tags } from "./tags";
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
   return (

@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { FlatList, View } from "react-native";
-import { useSelectionStore } from "../../stores/use-selection-store";
-import { useMessageStore } from "../../stores/use-message-store";
 import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { View } from "react-native";
+import { useMessageStore } from "../../stores/use-message-store";
+import { useSelectionStore } from "../../stores/use-selection-store";
 import { allowedOnPlatform, renderItem } from "./functions";
 
 export const Announcement = ({ color }) => {
