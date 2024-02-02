@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-14
     timeout-minutes: 60
 
     steps:
@@ -22,11 +22,45 @@ jobs:
       - name: Build packages
         run: npx nx run @notesnook/mobile:build
 
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.11
+        with:
+          key: ${{ runner.os }}-ccache-${{ hashFiles(format('apps/mobile/native/ios/Podfile.lock')) }}
+          max-size: 1500M
+          restore-keys: |
+            ${{ runner.os }}-ccache-
+
+      - name: Setup ccache
+        run: |
+          ccache --set-config=base_dir=$PWD
+          ccache --set-config=inode_cache=true
+          ccache --set-config=compiler_check=content
+          ccache --set-config=depend_mode=true
+          ccache --set-config=file_clone=true
+          ccache --set-config=sloppiness=clang_index_store,file_stat_matches,include_file_ctime,include_file_mtime,ivfsoverlay,pch_defines,modules,system_headers,time_macros
+          ln -s $(which ccache) /usr/local/bin/gcc
+          ln -s $(which ccache) /usr/local/bin/g++
+          ln -s $(which ccache) /usr/local/bin/cc
+          ln -s $(which ccache) /usr/local/bin/c++
+          ln -s $(which ccache) /usr/local/bin/clang
+          ln -s $(which ccache) /usr/local/bin/clang++
+          ccache -p
+
+      - name: Cache Pods
+        uses: actions/cache@v2
+        id: pods-cache
+        with:
+          path: apps/mobile/native/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/native/ios/Podfile.lock') }}
+
       - name: Install Pods
         run: npm run prepare:ios
 
+      - name: CCache Stats Before Build
+        run: ccache -sv
+
       - name: Build iOS App
-        uses: yukiarrr/ios-build-action@v1.11.2
+        uses: ammarahm-ed/ios-build-action@master
         with:
           bundle-identifier: org.streetwriters.notesnook
           scheme: Notesnook
@@ -52,15 +86,18 @@ jobs:
             ${{ secrets.APPLE_MOBILE_PROVISION_SHARE }}
             ${{ secrets.APPLE_MOBILE_PROVISION_WIDGET }}
 
-      - name: 'Upload app to TestFlight'
+      - name: CCache Stats After Build
+        run: ccache -sv
+
+      - name: "Upload app to TestFlight"
         uses: apple-actions/upload-testflight-build@v1
-        with: 
+        with:
           app-path: Notesnook.ipa
           issuer-id: ${{ secrets.API_KEY_ISSUER_ID }}
           api-key-id: ${{ secrets.API_KEY_ID }}
           api-private-key: ${{ secrets.API_KEY }}
 
-      - name: Upload to Github
+      - name: Upload Notesnook.ipa to Github
         uses: actions/upload-artifact@v2
         with:
           name: Notesnook.ipa
