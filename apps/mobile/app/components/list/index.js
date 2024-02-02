@@ -17,15 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getTotalNotes } from "@notesnook/common";
+import { useThemeColors } from "@notesnook/theme";
+import { FlashList } from "@shopify/flash-list";
 import React, { useEffect, useRef } from "react";
 import { RefreshControl, View } from "react-native";
-import { FlashList } from "@shopify/flash-list";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { notesnook } from "../../../e2e/test.ids";
+import { useGroupOptions } from "../../hooks/use-group-options";
 import { eSendEvent } from "../../services/event-manager";
 import Sync from "../../services/sync";
-import { useThemeColors } from "@notesnook/theme";
-import { db } from "../../common/database";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { eScrollEvent } from "../../utils/events";
 import { tabBarRef } from "../../utils/global-refs";
 import JumpToSectionDialog from "../dialogs/jump-to-section";
@@ -34,12 +36,9 @@ import { Header } from "../list-items/headers/header";
 import { SectionHeader } from "../list-items/headers/section-header";
 import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
+import ReminderItem from "../list-items/reminder";
 import TagItem from "../list-items/tag";
 import { Empty } from "./empty";
-import { getTotalNotes } from "@notesnook/common";
-import { useSettingStore } from "../../stores/use-setting-store";
-import ReminderItem from "../list-items/reminder";
-import { useGroupOptions } from "../../hooks/use-group-options";
 
 const renderItems = {
   note: NoteWrapper,

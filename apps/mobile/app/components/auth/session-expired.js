@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
-import { Modal, View } from "react-native";
+import { View } from "react-native";
 import { db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
 import BiometricService from "../../services/biometrics";
@@ -37,6 +37,7 @@ import { eLoginSessionExpired, eUserLoggedIn } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
+import BaseDialog from "../dialog/base-dialog";
 import { presentDialog } from "../dialog/functions";
 import SheetProvider from "../sheet-provider";
 import { Toast } from "../toast";
@@ -46,7 +47,6 @@ import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { LoginSteps, useLogin } from "./use-login";
-import BaseDialog from "../dialog/base-dialog";
 
 function getObfuscatedEmail(email) {
   if (!email) return "";
