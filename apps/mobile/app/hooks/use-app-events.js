@@ -481,7 +481,7 @@ export const useAppEvents = () => {
 
         subscribeToIAPListeners();
       } catch (e) {
-        DatabaseLogger.error(error);
+        DatabaseLogger.error(e);
 
         ToastEvent.error(e, "An error occurred", "global");
       }
@@ -509,7 +509,9 @@ export const useAppEvents = () => {
     if (Platform.OS === "android") {
       try {
         await RNIap.flushFailedPurchasesCachedAsPendingAndroid();
-      } catch (e) {}
+      } catch (e) {
+        e;
+      }
     }
     refValues.current.subsriptionSuccessListener =
       RNIap.purchaseUpdatedListener(onSuccessfulSubscription);
@@ -631,7 +633,7 @@ export const useAppEvents = () => {
       }
       if (IsDatabaseMigrationRequired()) return;
       initialize();
-      setLoading(false);
+      useNoteStore.getState().setLoading(false);
       Walkthrough.init();
     } catch (e) {
       DatabaseLogger.error(e);

@@ -17,20 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import Editor from "../../screens/editor";
-import EditorOverlay from "../../screens/editor/loading";
 import { editorController } from "../../screens/editor/tiptap/utils";
 import { eSendEvent, ToastEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useEditorStore } from "../../stores/use-editor-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
-import { useThemeColors } from "@notesnook/theme";
 import { useTrashStore } from "../../stores/use-trash-store";
 import { eCloseSheet, eOnLoadNote } from "../../utils/events";
-import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
 import DialogHeader from "../dialog/dialog-header";
 import { presentDialog } from "../dialog/functions";
