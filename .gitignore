@@ -10,3 +10,4 @@ nx-cloud.env
 .nyc_output
 site
 node_modules.backup
+.nx/cache
