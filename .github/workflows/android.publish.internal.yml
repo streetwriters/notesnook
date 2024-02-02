@@ -1,4 +1,4 @@
-name: Publish @notesnook/android
+name: Publish @notesnook/android-internal
 
 on: workflow_dispatch
 
