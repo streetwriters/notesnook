@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import EventManager from "@notesnook/core/dist/utils/event-manager";
+import EventManager, {
+  EventHandler
+} from "@notesnook/core/dist/utils/event-manager";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { RefObject } from "react";
 import { ActionSheetRef } from "react-native-actions-sheet";
@@ -60,14 +62,14 @@ const eventManager = new EventManager();
 
 export const eSubscribeEvent = <T = unknown>(
   eventName: string,
-  action?: (data: T) => void
+  action: EventHandler
 ) => {
   return eventManager.subscribe(eventName, action);
 };
 
 export const eUnSubscribeEvent = <T = unknown>(
   eventName: string,
-  action?: (data: T) => void
+  action: EventHandler
 ) => {
   eventManager.unsubscribe(eventName, action);
 };
@@ -116,6 +118,7 @@ export type PresentSheetOptions = {
   learnMorePress: () => void;
   enableGesturesInScrollView?: boolean;
   noBottomPadding?: boolean;
+  keyboardHandlerDisabled?: boolean;
 };
 
 export function presentSheet(data: Partial<PresentSheetOptions>) {

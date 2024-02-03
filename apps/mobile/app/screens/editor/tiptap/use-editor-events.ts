@@ -19,9 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import Clipboard from "@react-native-clipboard/clipboard";
+import { ItemReference } from "@notesnook/core/dist/types";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
+import Clipboard from "@react-native-clipboard/clipboard";
 import { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,
@@ -33,6 +34,7 @@ import {
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
 import { db } from "../../../common/database";
+import downloadAttachment from "../../../common/filesystem/download-attachment";
 import ManageTagsSheet from "../../../components/sheets/manage-tags";
 import { RelationsList } from "../../../components/sheets/relations-list";
 import ReminderSheet from "../../../components/sheets/reminder";
@@ -44,7 +46,9 @@ import {
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
+import SettingsService from "../../../services/settings";
 import { useEditorStore } from "../../../stores/use-editor-store";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { useUserStore } from "../../../stores/use-user-store";
@@ -63,11 +67,6 @@ import { useDragState } from "../../settings/editor/state";
 import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
-import { useNoteStore } from "../../../stores/use-notes-store";
-import SettingsService from "../../../services/settings";
-import downloadAttachment from "../../../common/filesystem/download-attachment";
-import { ItemReference } from "@notesnook/core/dist/types";
-import { useRelationStore } from "../../../stores/use-relation-store";
 
 const publishNote = async (editor: useEditorType) => {
   const user = useUserStore.getState().user;

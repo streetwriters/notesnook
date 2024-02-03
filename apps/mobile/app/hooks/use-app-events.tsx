@@ -329,7 +329,9 @@ export const useAppEvents = () => {
     if (Platform.OS === "android") {
       try {
         await RNIap.flushFailedPurchasesCachedAsPendingAndroid();
-      } catch (e) {}
+      } catch (e) {
+        e;
+      }
     }
     refValues.current.subsriptionSuccessListener =
       RNIap.purchaseUpdatedListener(onSuccessfulSubscription);
@@ -648,11 +650,7 @@ export const useAppEvents = () => {
       if (!db.isInitialized) {
         RNBootSplash.hide({ fade: true });
         DatabaseLogger.info("Initializing database");
-        try {
-          await db.init();
-        } catch (e) {
-          console.log(e);
-        }
+        await db.init();
       }
       if (IsDatabaseMigrationRequired()) return;
       setImmediate(() => {

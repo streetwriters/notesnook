@@ -89,6 +89,7 @@ export const Notebooks = ({
           data={notebooks}
           dataType="notebook"
           renderedInRoute="Notebooks"
+          loading={loading}
           placeholder={{
             title: "Your notebooks",
             paragraph: "You have not added any notebooks yet.",
