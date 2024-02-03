@@ -149,8 +149,9 @@ exports[`convert HTML to markdown with outlinelists > html-to-md-outlinelists.md
 `;
 
 exports[`convert HTML to markdown with singleSpacedParagraphs > html-to-md-singleSpacedParagraphs.md 1`] = `
-"hello world
+"hello world  
 hello world 2
+
 "
 `;
 
