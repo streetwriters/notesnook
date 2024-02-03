@@ -126,7 +126,7 @@ export function toBlobURL(
   if (!DataURL.isValid(dataurl)) return;
 
   const dataurlObject = DataURL.toObject(dataurl);
-  let mime = dataurlObject.mime || "";
+  let mime = dataurlObject.mimeType || "";
   const data = dataurlObject.data;
 
   if (!data) return;
