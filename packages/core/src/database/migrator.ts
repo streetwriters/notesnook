@@ -17,13 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Cipher } from "@notesnook/crypto";
 import { DatabaseSchema } from ".";
 import Database from "../api";
 import {
   CURRENT_DATABASE_VERSION,
   sendMigrationProgressEvent
 } from "../common";
-import { migrateCollection, migrateItem } from "../migrations";
+import { migrateCollection, migrateItem, migrateVaultKey } from "../migrations";
 import {
   CollectionType,
   Collections,
@@ -50,6 +51,9 @@ class Migrator {
     collections: MigratableCollections,
     version: number
   ) {
+    const vaultKey = await db.storage().read<Cipher<"base64">>("vaultKey");
+    if (vaultKey) await migrateVaultKey(db, vaultKey, version);
+
     for (const collection of collections) {
       sendMigrationProgressEvent(db.eventManager, collection.name, 0, 0);
 
@@ -79,6 +83,7 @@ class Migrator {
         );
       }
     }
+
     await db.initCollections();
     return true;
   }
