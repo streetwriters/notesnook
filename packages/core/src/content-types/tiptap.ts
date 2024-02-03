@@ -182,7 +182,7 @@ export class Tiptap {
     for (const image of sources) {
       try {
         const { data, mimeType } = dataurl.toObject(image.src);
-        if (!data) continue;
+        if (!data || !mimeType) continue;
         const hash = await store(data, mimeType, image.filename);
         if (!hash) continue;
 

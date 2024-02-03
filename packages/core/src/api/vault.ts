@@ -212,10 +212,6 @@ export default class Vault {
     return !!vaultKey && isCipher(vaultKey);
   }
 
-  get unlocked() {
-    return !!this.vaultPassword;
-  }
-
   // Private & internal methods
 
   private async getVaultPassword() {

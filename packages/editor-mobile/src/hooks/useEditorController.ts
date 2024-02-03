@@ -138,7 +138,7 @@ export function useEditorController(update: () => void): EditorController {
   }, [colors]);
 
   const contentChange = useCallback(
-    (editor: Editor, ignoreEdit) => {
+    (editor: Editor, ignoreEdit?: boolean) => {
       const currentSessionId = globalThis.sessionId;
       post(EventTypes.contentchange);
       if (!editor) return;
