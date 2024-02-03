@@ -236,7 +236,10 @@ class Database {
       await sql.raw(statement).execute(this.sql());
     }
     await this.sql().destroy();
-    this._sql = await createDatabase("notesnook", this.options.sqliteOptions);
+    this._sql = (await createDatabase(
+      "notesnook",
+      this.options.sqliteOptions
+    )) as unknown as Kysely<DatabaseSchema>;
   }
 
   async init() {
@@ -251,8 +254,8 @@ class Database {
       this
     );
     EV.subscribe(EVENTS.attachmentDeleted, async (attachment: Attachment) => {
-      await this.fs().cancel(attachment.hash, "upload");
-      await this.fs().cancel(attachment.hash, "download");
+      await this.fs().cancel(attachment.hash);
+      await this.fs().cancel(attachment.hash);
     });
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.clear();
@@ -260,7 +263,10 @@ class Database {
       this.disconnectSSE();
     });
 
-    this._sql = await createDatabase("notesnook", this.options.sqliteOptions);
+    this._sql = (await createDatabase(
+      "notesnook",
+      this.options.sqliteOptions
+    )) as unknown as Kysely<DatabaseSchema>;
 
     await this._validate();
 
