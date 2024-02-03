@@ -183,13 +183,16 @@ export default class Vault {
   /**
    * Temporarily unlock (open) a note
    */
-  async open(noteId: string, password: string) {
+  async open(noteId: string, password?: string) {
     const note = await this.db.notes.note(noteId);
     if (!note) return;
 
     const unlockedNote = await this.unlockNote(note, password, false);
-    this.password = password;
-    if (!(await this.exists())) await this.create(password);
+    if (password) {
+      this.password = password;
+      if (!(await this.exists())) await this.create(password);
+    }
+
     return unlockedNote;
   }
 
@@ -339,7 +342,7 @@ export default class Vault {
     });
   }
 
-  private async unlockNote(note: Note, password: string, perm = false) {
+  private async unlockNote(note: Note, password?: string, perm = false) {
     if (!note.contentId) return;
 
     const encryptedContent = await this.db.content.get(note.contentId);

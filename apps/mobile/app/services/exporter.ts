@@ -27,62 +27,57 @@ import { DatabaseLogger, db } from "../common/database/index";
 import Storage from "../common/database/storage";
 
 import { sanitizeFilename } from "@notesnook/common";
+import { Note } from "@notesnook/core";
+import { NoteContent } from "@notesnook/core/dist/collections/session-content";
 import { presentDialog } from "../components/dialog/functions";
 import { useSettingStore } from "../stores/use-setting-store";
 import BiometicService from "./biometrics";
-import { ToastEvent } from "./event-manager";
+import { ToastManager } from "./event-manager";
 
 const MIMETypes = {
   txt: "text/plain",
   pdf: "application/pdf",
   md: "text/markdown",
+  "md-frontmatter": "text/markdown",
   html: "text/html"
 };
 
-const FolderNames = {
+const FolderNames: { [name: string]: string } = {
   txt: "Text",
   pdf: "PDF",
   md: "Markdown",
   html: "Html"
 };
 
-async function releasePermissions(path) {
+async function releasePermissions(path: string) {
   if (Platform.OS === "ios") return;
   const uris = await ScopedStorage.getPersistedUriPermissions();
-  for (let uri of uris) {
+  for (const uri of uris) {
     if (path.startsWith(uri)) {
       await ScopedStorage.releasePersistableUriPermission(uri);
     }
   }
 }
 
-/**
- *
- * @param {"Text" | "PDF" | "Markdown" | "Html" } type
- * @returns
- */
-async function getPath(type) {
+async function getPath(type: string) {
   let path =
     Platform.OS === "ios" &&
     (await Storage.checkAndCreateDir(`/exported/${type}/`));
 
   if (Platform.OS === "android") {
-    let file = await ScopedStorage.openDocumentTree(true);
+    const file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
     path = file.uri;
   }
   return path;
 }
 
-/**
- *
- * @param {string} path
- * @param {string} data
- * @param {string} title
- * @param {"txt" | "pdf" | "md" | "html"} extension
- * @returns
- */
-async function save(path, data, fileName, extension) {
+async function save(
+  path: string,
+  data: string,
+  fileName: string,
+  extension: "txt" | "pdf" | "md" | "html" | "md-frontmatter"
+) {
   let uri;
   if (Platform.OS === "android") {
     uri = await ScopedStorage.writeFile(
@@ -101,21 +96,25 @@ async function save(path, data, fileName, extension) {
   return uri || path;
 }
 
-async function makeHtml(note) {
+async function makeHtml(note: Note, content?: NoteContent<false>) {
   let html = await db.notes.export(note.id, {
-    format: "html"
+    format: "html",
+    contentItem: content
   });
+  if (!html) return "";
+
   html = decode(html, {
     level: EntityLevel.HTML
   });
   return html;
 }
 
-/**
- *
- * @param {"txt" | "pdf" | "md" | "html" | "md-frontmatter"} type
- */
-async function exportAs(type, note, bulk, content) {
+async function exportAs(
+  type: string,
+  note: Note,
+  bulk?: boolean,
+  content?: NoteContent<false>
+) {
   let data;
   switch (type) {
     case "html":
@@ -125,22 +124,24 @@ async function exportAs(type, note, bulk, content) {
       break;
     case "md":
       data = await db.notes.export(note.id, {
-        format: "md"
+        format: "md",
+        contentItem: content
       });
       break;
     case "md-frontmatter":
-      data = await db.notes
-        .note(note.id)
-        .export("md-frontmatter", content?.data);
+      data = await db.notes.export(note.id, {
+        format: "md-frontmatter",
+        contentItem: content
+      });
       break;
     case "pdf":
       {
-        let html = await makeHtml(note, content);
-        let fileName = sanitizeFilename(note.title + Date.now(), {
+        const html = await makeHtml(note, content);
+        const fileName = sanitizeFilename(note.title + Date.now(), {
           replacement: "_"
         });
 
-        let options = {
+        const options = {
           html: html,
           fileName:
             Platform.OS === "ios" ? "/exported/PDF/" + fileName : fileName,
@@ -149,11 +150,12 @@ async function exportAs(type, note, bulk, content) {
           bgColor: "#FFFFFF",
           padding: 30,
           base64: bulk || Platform.OS === "android"
-        };
+        } as { [name: string]: any };
+
         if (Platform.OS === "ios") {
           options.directory = "Documents";
         }
-        let res = await RNHTMLtoPDF.convert(options);
+        const res = await RNHTMLtoPDF.convert(options);
         data = !bulk && Platform.OS === "ios" ? res.filePath : res.base64;
         if (bulk && res.filePath) {
           RNFetchBlob.fs.unlink(res.filePath);
@@ -162,7 +164,10 @@ async function exportAs(type, note, bulk, content) {
       break;
     case "txt":
       {
-        data = await db.notes?.note(note.id).export("txt", content);
+        data = await db.notes.export(note.id, {
+          format: "txt",
+          contentItem: content
+        });
       }
       break;
   }
@@ -171,10 +176,10 @@ async function exportAs(type, note, bulk, content) {
 }
 
 async function unlockVault() {
-  let biometry = await BiometicService.isBiometryAvailable();
-  let fingerprint = await BiometicService.hasInternetCredentials("nn_vault");
+  const biometry = await BiometicService.isBiometryAvailable();
+  const fingerprint = await BiometicService.hasInternetCredentials();
   if (biometry && fingerprint) {
-    let credentials = await BiometicService.getCredentials(
+    const credentials = await BiometicService.getCredentials(
       "Unlock vault",
       "Unlock vault to export locked notes"
     );
@@ -196,7 +201,7 @@ async function unlockVault() {
         positivePress: async (value) => {
           const unlocked = await db.vault.unlock(value);
           if (!unlocked) {
-            ToastEvent.show({
+            ToastManager.show({
               heading: "Invalid password",
               message: "Please enter a valid password",
               type: "error",
@@ -217,11 +222,10 @@ async function unlockVault() {
   });
 }
 
-/**
- *
- * @param {"txt" | "pdf" | "md" | "html" | "md-frontmatter"} type
- */
-async function exportNote(id, type) {
+async function exportNote(
+  id: string,
+  type: "txt" | "pdf" | "md" | "html" | "md-frontmatter"
+) {
   const note = await db.notes.note(id);
   if (!note) return;
 
@@ -229,21 +233,21 @@ async function exportNote(id, type) {
 
   if (note.locked) {
     try {
-      let unlocked = await unlockVault();
+      const unlocked = await unlockVault();
       if (!unlocked) return null;
       const unlockedNote = await db.vault.open(note.id);
-      content = unlockedNote.content;
+      content = unlockedNote?.content;
     } catch (e) {
-      DatabaseLogger.error(e);
+      DatabaseLogger.error(e as Error);
     }
   }
 
   let path = await getPath(FolderNames[type]);
   if (!path) return;
 
-  let result = await exportAs(type, note, false, content);
+  const result = await exportAs(type, note, false, content);
   if (!result) return null;
-  let fileName = sanitizeFilename(note.title + Date.now(), {
+  const fileName = sanitizeFilename(note.title + Date.now(), {
     replacement: "_"
   });
 
@@ -261,32 +265,36 @@ async function exportNote(id, type) {
   };
 }
 
-function copyFileAsync(source, dest) {
+function copyFileAsync(source: string, dest: string) {
   return new Promise((resolve) => {
     ScopedStorage.copyFile(source, dest, () => {
-      resolve();
+      resolve(true);
     });
   });
 }
 
-function getUniqueFileName(fileName, results) {
+function getUniqueFileName(
+  fileName: string,
+  notebookPath: string,
+  results: { [name: string]: boolean }
+) {
   const chunks = fileName.split(".");
   const ext = chunks.pop();
   const name = chunks.join(".");
   let resolvedName = fileName;
   let count = 0;
-  while (results[resolvedName]) {
+  while (results[`${notebookPath}${resolvedName}`]) {
     resolvedName = `${name}${++count}.${ext}`;
   }
 
   return resolvedName;
 }
 
-/**
- *
- * @param {"txt" | "pdf" | "md" | "html" | "md-frontmatter"} type
- */
-async function bulkExport(ids, type, callback) {
+async function bulkExport(
+  ids: string[],
+  type: "txt" | "pdf" | "md" | "html" | "md-frontmatter",
+  callback: (progress?: string) => void
+) {
   let path = await getPath(FolderNames[type]);
   if (!path) return;
 
@@ -295,14 +303,14 @@ async function bulkExport(ids, type, callback) {
 
   await RNFetchBlob.fs.mkdir(exportCacheFolder).catch((e) => console.log(e));
 
-  const mkdir = async (dir) => {
+  const mkdir = async (dir: string) => {
     const folder = `${exportCacheFolder}/${dir}`;
     if (!(await RNFetchBlob.fs.exists(folder))) {
       await RNFetchBlob.fs.mkdir(folder);
     }
   };
 
-  const writeFile = async (path, result) => {
+  const writeFile = async (path: string, result: string) => {
     const cacheFilePath = exportCacheFolder + path;
     await RNFetchBlob.fs.writeFile(
       cacheFilePath,
@@ -311,94 +319,69 @@ async function bulkExport(ids, type, callback) {
     );
   };
 
-  const results = {};
-  for (var i = 0; i < ids.length; i++) {
+  const results: { [name: string]: boolean } = {};
+  for (let i = 0; i < ids.length; i++) {
     try {
-      let note = await db.notes.note(ids[i]);
+      const note = await db.notes.note(ids[i]);
       if (!note) continue;
 
       let content;
       if (note.locked) {
         try {
-          let unlocked = !db.vault.unlocked ? await unlockVault() : true;
+          const unlocked = !db.vault.unlocked ? await unlockVault() : true;
           if (!unlocked) {
             continue;
           }
           const unlockedNote = await db.vault.open(note.id);
-          content = unlockedNote.content;
+          content = unlockedNote?.content;
         } catch (e) {
-          DatabaseLogger.error(e);
+          DatabaseLogger.error(e as Error);
           continue;
         }
       }
 
-      let result = await exportAs(type, note, true, content);
-      let fileName = sanitizeFilename(note.title, {
+      const result = await exportAs(type, note, true, content);
+      const fileName = sanitizeFilename(note.title, {
         replacement: "_"
       });
       if (result) {
-        const notebooks = [
-          ...(db.relations
-            ?.to({ id: note.id, type: "note" }, "notebook")
-            .map((notebook) => ({
-              title: notebook.title
-            })) || []),
-          ...(note.notebooks || []).map((ref) => {
-            const notebook = db.notebooks?.notebook(ref.id);
-            const topics = notebook?.topics.all || [];
-
-            return {
-              title: notebook?.title,
-              topics: ref.topics
-                .map((topicId) => topics.find((topic) => topic.id === topicId))
-                .filter(Boolean)
-            };
-          })
-        ];
+        const notebooks = await db.relations
+          ?.to({ id: note.id, type: "note" }, "notebook")
+          .resolve();
 
         for (const notebook of notebooks) {
-          results[notebook.title] = results[notebook.title] || {};
-          await mkdir(notebook.title);
+          const notebookPath = (await db.notebooks.breadcrumbs(notebook.id))
+            .map((notebook) => {
+              return notebook.title + "/";
+            })
+            .join("");
 
-          if (notebook.topics && notebook.topics.length) {
-            for (const topic of notebook.topics) {
-              results[notebook.title][topic.title] =
-                results[notebook.title][topic.title] || {};
+          await mkdir(notebookPath);
 
-              await mkdir(`${notebook.title}/${topic.title}`);
-              const exportedNoteName = getUniqueFileName(
-                fileName + `.${type}`,
-                results[notebook.title][topic.title]
-              );
-              results[notebook.title][topic.title][exportedNoteName] = true;
+          console.log("Dir created", notebookPath);
 
-              writeFile(
-                `/${notebook.title}/${topic.title}/${exportedNoteName}`,
-                result
-              );
-            }
-          } else {
-            const exportedNoteName = getUniqueFileName(
-              fileName + `.${type}`,
-              results[notebook.title]
-            );
-            results[notebook.title][exportedNoteName] = true;
-            writeFile(`/${notebook.title}/${exportedNoteName}`, result);
-          }
+          const exportedNoteName = getUniqueFileName(
+            fileName + `.${type}`,
+            notebookPath,
+            results
+          );
+          results[`${notebookPath}${exportedNoteName}`] = true;
+          await writeFile(`/${notebookPath}${exportedNoteName}`, result);
         }
 
         if (!notebooks.length) {
           const exportedNoteName = getUniqueFileName(
             fileName + `.${type}`,
+            "",
             results
           );
           results[exportedNoteName] = true;
-          writeFile(`/${exportedNoteName}`, result);
+          await writeFile(`/${exportedNoteName}`, result);
         }
       }
       callback(`${i + 1}/${ids.length}`);
     } catch (e) {
-      DatabaseLogger.error(e);
+      DatabaseLogger.error(e as Error);
     }
   }
   const fileName = `nn-export-${ids.length}-${type}-${Date.now()}.zip`;
@@ -424,7 +407,7 @@ async function bulkExport(ids, type, callback) {
     }
     RNFetchBlob.fs.unlink(exportCacheFolder);
   } catch (e) {
-    DatabaseLogger.error(e);
+    DatabaseLogger.error(e as Error);
   }
 
   return {
