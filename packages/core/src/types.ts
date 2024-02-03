@@ -73,6 +73,7 @@ export type Collections = {
   notehistory: "session";
   sessioncontent: "sessioncontent";
   settingsv2: "settingitem";
+  vaults: "vault";
 
   /**
    * @deprecated only kept here for migration purposes
@@ -102,6 +103,7 @@ export type GroupableItem = ValueOf<
     | "sessioncontent"
     | "settings"
     | "settingitem"
+    | "vault"
   >
 >;
 
@@ -121,6 +123,7 @@ export type ItemMap = {
   session: HistorySession;
   sessioncontent: SessionContentItem;
   settingitem: SettingItem;
+  vault: Vault;
 
   /**
    * @deprecated only kept here for migration purposes
@@ -171,9 +174,12 @@ export interface Note extends BaseItem<"note"> {
    * @deprecated only kept here for migration purposes.
    */
   notebooks?: NotebookReference[];
+  /**
+   * @deprecated
+   */
+  locked?: boolean;
 
   pinned: boolean;
-  locked: boolean;
   favorite: boolean;
   localOnly: boolean;
   conflicted: boolean;
@@ -430,6 +436,11 @@ export interface SettingItem<
 > extends BaseItem<"settingitem"> {
   key: TKey;
   value: SettingItemMap[TKey];
+}
+
+export interface Vault extends BaseItem<"vault"> {
+  title: string;
+  key: Cipher<"base64">;
 }
 
 export interface DeletedItem {

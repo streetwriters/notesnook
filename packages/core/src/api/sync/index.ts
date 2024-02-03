@@ -34,7 +34,7 @@ import { AutoSync } from "./auto-sync";
 import { logger } from "../../logger";
 import { Mutex } from "async-mutex";
 import Database from "..";
-import { migrateItem } from "../../migrations";
+import { migrateItem, migrateVaultKey } from "../../migrations";
 import { SerializedKey } from "@notesnook/crypto";
 import { Item, MaybeDeletedItem, Note, Notebook } from "../../types";
 import { SYNC_COLLECTIONS_MAP, SyncTransferItem } from "./types";
@@ -189,6 +189,26 @@ class Sync {
 
     let count = 0;
     this.connection?.off("SendItems");
+    this.connection?.off("SendVaultKey");
+
+    this.connection?.on("SendVaultKey", async (vaultKey) => {
+      if (this.connection?.state !== signalr.HubConnectionState.Connected)
+        return false;
+
+      if (
+        vaultKey &&
+        vaultKey.cipher !== null &&
+        vaultKey.iv !== null &&
+        vaultKey.salt !== null &&
+        vaultKey.length > 0
+      ) {
+        const vault = await this.db.vaults.default();
+        if (!vault) await migrateVaultKey(this.db, vaultKey, 5.9);
+      }
+
+      return true;
+    });
+
     this.connection?.on("SendItems", async (chunk) => {
       if (this.connection?.state !== signalr.HubConnectionState.Connected)
         return false;
@@ -200,39 +220,17 @@ class Sync {
 
       return true;
     });
-    const serverResponse = await this.connection?.invoke(
-      "RequestFetch",
-      deviceId
-    );
-
-    if (
-      serverResponse.vaultKey &&
-      serverResponse.vaultKey.cipher !== null &&
-      serverResponse.vaultKey.iv !== null &&
-      serverResponse.vaultKey.salt !== null &&
-      serverResponse.vaultKey.length > 0
-    ) {
-      await this.db.vault.setKey(serverResponse.vaultKey);
-    }
+    await this.connection?.invoke("RequestFetch", deviceId);
 
     this.connection?.off("SendItems");
+    this.connection?.off("SendVaultKey");
   }
 
   async send(deviceId: string, isForceSync?: boolean) {
     await this.uploadAttachments();
 
-    let isSyncInitialized = false;
     let done = 0;
     for await (const item of this.collector.collect(100, isForceSync)) {
-      if (!isSyncInitialized) {
-        const vaultKey = await this.db.vault.getKey();
-        await this.connection?.send("InitializePush", {
-          vaultKey,
-          synced: false
-        });
-        isSyncInitialized = true;
-      }
-
       const result = await this.pushItem(deviceId, item);
       if (result) {
         done += item.items.length;
@@ -245,7 +243,6 @@ class Sync {
         );
       }
     }
-    if (!isSyncInitialized) return false;
     await this.connection?.send("PushCompleted");
     return true;
   }

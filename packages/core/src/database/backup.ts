@@ -142,6 +142,7 @@ const itemTypeToCollectionKey = {
   shortcut: "shortcuts",
   settingitem: "settings",
   settings: "settings",
+  vault: "vaults",
 
   // to make ts happy
   topic: "topics"
@@ -198,6 +199,7 @@ export default class Backup {
     yield* this.backupCollection(this.db.reminders.collection, backupState);
     yield* this.backupCollection(this.db.relations.collection, backupState);
     yield* this.backupCollection(this.db.attachments.collection, backupState);
+    yield* this.backupCollection(this.db.vaults.collection, backupState);
 
     if (backupState.buffer.length > 0) yield* this.bufferToFile(backupState);
 
