@@ -19,18 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { parse, validate } from "@readme/data-urls";
 
-function toObject(dataurl: string): { mime?: string; data?: string } {
+function toObject(dataurl: string): { mimeType?: string; data?: string } {
   const result = parse(dataurl);
   if (!result) return {};
   return {
-    mime: result.contentType,
+    mimeType: result.contentType,
     data: result.data
   };
 }
 
-function fromObject({ type, data }: { type: string; data: string }) {
+function fromObject({ mimeType, data }: { mimeType: string; data: string }) {
   if (validate(data)) return data;
-  return `data:${type};base64,${data}`;
+  return `data:${mimeType};base64,${data}`;
 }
 
 function isValid(url: string) {
