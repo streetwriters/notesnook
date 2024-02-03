@@ -215,13 +215,13 @@ export default async function downloadAttachment(
     await db
       .fs()
       .downloadFile(options.groupId || attachment.hash, attachment.hash);
-    if (!(await exists(attachment.metadata.hash))) {
+    if (!(await exists(attachment.hash))) {
       return;
     }
 
     if (options.base64 || options.text) {
       return await db.attachments.read(
-        attachment.metadata.hash,
+        attachment.hash,
         options.base64 ? "base64" : "text"
       );
     }
