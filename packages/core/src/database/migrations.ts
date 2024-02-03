@@ -124,6 +124,14 @@ export class NNMigrationProvider implements MigrationProvider {
             .execute();
 
           await db.schema
+            .createTable("vaults")
+            .modifyEnd(sql`without rowid`)
+            .$call(addBaseColumns)
+            .addColumn("title", "text", COLLATE_NOCASE)
+            .addColumn("key", "text")
+            .execute();
+
+          await db.schema
             .createTable("relations")
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)

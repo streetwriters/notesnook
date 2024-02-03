@@ -200,13 +200,17 @@ export class Content implements ICollection {
       .execute();
   }
 
-  // async findByNoteId(noteId: string) {
-  //   await this.db
-  //     .sql()
-  //     .selectFrom("content")
-  //     .where("noteId", "==", noteId)
-  //     .execute();
-  // }
+  async findByNoteId(noteId: string) {
+    const content = (await this.db
+      .sql()
+      .selectFrom("content")
+      .where("noteId", "==", noteId)
+      .selectAll()
+      .executeTakeFirst()) as ContentItem;
+    if (!content || isDeleted(content)) return;
+    return content;
+  }
+
   // multi(ids: string[]) {
   //   return this.collection.getItems(ids);
   // }

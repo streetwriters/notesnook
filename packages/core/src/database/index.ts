@@ -53,7 +53,8 @@ import {
   Shortcut,
   Tag,
   TrashOrItem,
-  ValueOf
+  ValueOf,
+  Vault
 } from "../types";
 import { NNMigrationProvider } from "./migrations";
 import { createTriggers } from "./triggers";
@@ -85,6 +86,7 @@ export interface DatabaseSchema {
   notehistory: SQLiteItem<HistorySession>;
   sessioncontent: SQLiteItem<SessionContentItem>;
   shortcuts: SQLiteItem<Shortcut>;
+  vaults: SQLiteItem<Vault>;
 }
 
 export type DatabaseSchemaWithFTS = DatabaseSchema & {
@@ -193,6 +195,9 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
     if (row.locked && row.data) row.data = JSON.parse(row.data);
   },
   attachment: (row) => {
+    if (row.key) row.key = JSON.parse(row.key);
+  },
+  vault: (row) => {
     if (row.key) row.key = JSON.parse(row.key);
   }
 };

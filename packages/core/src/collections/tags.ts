@@ -49,8 +49,6 @@ export class Tags implements ICollection {
   }
 
   async add(item: Partial<Tag>) {
-    if (item.remote)
-      throw new Error("Please use db.tags.merge to merge remote tags.");
     item.title = item.title ? Tags.sanitize(item.title) : item.title;
 
     const id = item.id || getId(item.dateCreated);
@@ -68,8 +66,7 @@ export class Tags implements ICollection {
       dateCreated: item.dateCreated || oldTag?.dateCreated || Date.now(),
       dateModified: item.dateModified || oldTag?.dateModified || Date.now(),
       title: item.title || oldTag?.title || "",
-      type: "tag",
-      remote: false
+      type: "tag"
     });
     return id;
   }
