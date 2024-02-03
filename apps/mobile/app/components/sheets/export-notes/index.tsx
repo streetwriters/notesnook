@@ -47,6 +47,7 @@ import { PressableButton } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { Dialog } from "../../dialog";
 
 const ExportNotesSheet = ({
   ids,
@@ -67,10 +68,12 @@ const ExportNotesSheet = ({
       }
     | undefined
   >();
-  const [status, setStatus] = useState(null);
+  const [status, setStatus] = useState<string>();
   const premium = useUserStore((state) => state.premium);
 
-  const save = async (type: "pdf" | "txt" | "md" | "html") => {
+  const save = async (
+    type: "pdf" | "txt" | "md" | "html" | "md-frontmatter"
+  ) => {
     if (exporting) return;
     if (!PremiumService.get() && type !== "txt") return;
     setExporting(true);
