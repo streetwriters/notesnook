@@ -25,7 +25,9 @@ export default defineConfig({
   test: {
     setupFiles: ["./globals.setup.js"],
     coverage: {
-      reporter: ["text", "html"]
+      reporter: ["text", "html"],
+      exclude: ["src/utils/templates/html/languages/*.js"],
+      include: ["src/**/*.ts"]
     },
     retry: 1,
     exclude: ["__benches__/**/*.bench.ts"],

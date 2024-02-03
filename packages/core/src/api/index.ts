@@ -68,6 +68,7 @@ import {
 } from "../database";
 import { Kysely, Transaction, sql } from "kysely";
 import { CachedCollection } from "../database/cached-collection";
+import { Vaults } from "../collections/vaults";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -183,6 +184,7 @@ class Database {
   reminders = new Reminders(this);
   relations = new Relations(this);
   notes = new Notes(this);
+  vaults = new Vaults(this);
 
   /**
    * @deprecated only kept here for migration purposes
@@ -254,7 +256,6 @@ class Database {
       this
     );
     EV.subscribe(EVENTS.attachmentDeleted, async (attachment: Attachment) => {
-      await this.fs().cancel(attachment.hash);
       await this.fs().cancel(attachment.hash);
     });
     EV.subscribe(EVENTS.userLoggedOut, async () => {

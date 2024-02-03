@@ -72,6 +72,15 @@ exports[`get web pricing tier > get yearly web tier > yearly-web-pricing 1`] = `
 }
 `;
 
+exports[`get yearly price > monthly-pricing 1`] = `
+{
+  "country": Any<String>,
+  "countryCode": Any<String>,
+  "discount": Any<Number>,
+  "price": Any<Number>,
+}
+`;
+
 exports[`get yearly price > yearly-pricing 1`] = `
 {
   "country": Any<String>,

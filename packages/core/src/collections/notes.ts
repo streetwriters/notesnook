@@ -121,7 +121,6 @@ export class Notes implements ICollection {
           contentId,
 
           pinned: item.pinned,
-          locked: item.locked,
           favorite: item.favorite,
           localOnly: item.localOnly,
           conflicted: item.conflicted,
@@ -224,17 +223,6 @@ export class Notes implements ICollection {
           .where(isFalse("dateDeleted"))
           .where(isFalse("deleted"))
           .where("favorite", "==", true),
-      this.db.options?.batchSize
-    );
-  }
-
-  get locked() {
-    return this.collection.createFilter<Note>(
-      (qb) =>
-        qb
-          .where(isFalse("dateDeleted"))
-          .where(isFalse("deleted"))
-          .where("locked", "==", true),
       this.db.options?.batchSize
     );
   }

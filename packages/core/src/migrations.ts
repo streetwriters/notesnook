@@ -34,18 +34,8 @@ import {
 } from "./types";
 import { isCipher } from "./database/crypto";
 import { IndexedCollection } from "./database/indexed-collection";
-
-const ColorToHexCode: Record<string, string> = {
-  red: "#f44336",
-  orange: "#FF9800",
-  yellow: "#FFD600",
-  green: "#4CAF50",
-  blue: "#2196F3",
-  purple: "#673AB7",
-  gray: "#9E9E9E",
-  black: "#000000",
-  white: "#ffffff"
-};
+import { DefaultColors } from "./collections/colors";
+import { Cipher } from "@notesnook/crypto";
 
 type MigrationType = "local" | "sync" | "backup";
 type MigrationItemType = ItemType | "notehistory" | "content" | "all";
@@ -64,6 +54,7 @@ type Migration = {
     ) => "skip" | boolean | Promise<boolean | "skip"> | void;
   };
   collection?: (collection: IndexedCollection) => Promise<void> | void;
+  vaultKey?: (db: Database, key: Cipher<"base64">) => Promise<void> | void;
 };
 
 const migrations: Migration[] = [
@@ -198,7 +189,7 @@ const migrations: Migration[] = [
         )
           return "skip";
 
-        const colorCode = ColorToHexCode[item.title];
+        const colorCode = DefaultColors[item.title];
         if (colorCode) {
           const newColor = await db.colors.all.find((eb) =>
             eb.or([eb("title", "in", [alias, item.title])])
@@ -258,7 +249,7 @@ const migrations: Migration[] = [
               dateCreated: oldColor?.dateCreated,
               dateModified: oldColor?.dateModified,
               title: alias || item.color,
-              colorCode: ColorToHexCode[item.color],
+              colorCode: DefaultColors[item.color],
               type: "color"
             }));
           if (newColorId) {
@@ -275,6 +266,13 @@ const migrations: Migration[] = [
           }
         }
 
+        if (item.locked) {
+          const vault = await db.vaults.default();
+          if (vault)
+            await db.relations.add({ type: "vault", id: vault.id }, item);
+        }
+
+        delete item.locked;
         delete item.notebooks;
         delete item.tags;
         delete item.color;
@@ -380,6 +378,10 @@ const migrations: Migration[] = [
         return true;
       },
       all: () => true
+    },
+    async vaultKey(db, key) {
+      await db.vaults.add({ title: "Default", key });
+      await db.storage().remove("vaultKey");
     }
   },
   {
@@ -450,6 +452,29 @@ export async function migrateCollection(
 
     if (!migration.collection) continue;
     await migration.collection(collection);
+  }
+}
+
+export async function migrateVaultKey(
+  db: Database,
+  vaultKey: Cipher<"base64">,
+  version: number
+) {
+  let migrationStartIndex = migrations.findIndex((m) => m.version === version);
+  if (migrationStartIndex <= -1) {
+    throw new Error(
+      version > CURRENT_DATABASE_VERSION
+        ? `Please update the app to the latest version.`
+        : `You seem to be on a very outdated version. Please update the app to the latest version.`
+    );
+  }
+
+  for (; migrationStartIndex < migrations.length; ++migrationStartIndex) {
+    const migration = migrations[migrationStartIndex];
+    if (migration.version === CURRENT_DATABASE_VERSION) break;
+
+    if (!migration.vaultKey) continue;
+    await migration.vaultKey(db, vaultKey);
   }
 }
 

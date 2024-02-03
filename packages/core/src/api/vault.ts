@@ -22,11 +22,6 @@ import Database from ".";
 import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
 import { tinyToTiptap } from "../migrations";
 import { isCipher } from "../database/crypto";
-import { Note } from "../types";
-import {
-  isEncryptedContent,
-  isUnencryptedContent
-} from "../collections/content";
 import { NoteContent } from "../collections/session-content";
 
 export const VAULT_ERRORS = {
@@ -35,8 +30,8 @@ export const VAULT_ERRORS = {
   wrongPassword: "ERR_WRONG_PASSWORD"
 };
 
-const ERASE_TIME = 1000 * 60 * 30;
 export default class Vault {
+  eraseTime = 1000 * 60 * 30;
   private vaultPassword?: string;
   private erasureTimeout = 0;
   private key = "svvaads1212#2123";
@@ -57,7 +52,7 @@ export default class Vault {
     this.erasureTimeout = setTimeout(() => {
       this.password = undefined;
       EV.publish(EVENTS.vaultLocked);
-    }, ERASE_TIME) as unknown as number;
+    }, this.eraseTime) as unknown as number;
   }
 
   constructor(private readonly db: Database) {
@@ -99,63 +94,73 @@ export default class Vault {
   }
 
   async changePassword(oldPassword: string, newPassword: string) {
+    const vault = await this.db.vaults.default();
+    if (!vault) throw new Error(VAULT_ERRORS.noVault);
+
     if (await this.unlock(oldPassword)) {
-      const contentItems = [];
-      for await (const note of this.db.notes.locked) {
-        if (!note.contentId) continue;
-        const encryptedContent = await this.db.content.get(note.contentId);
-        if (!encryptedContent || !isEncryptedContent(encryptedContent))
+      const relations = await this.db.relations.from(vault, "note").get();
+      for (const { toId: noteId } of relations) {
+        const content = await this.db.content.findByNoteId(noteId);
+        if (!content || !content.locked) {
+          await this.db.relations.unlink(vault, { id: noteId, type: "note" });
           continue;
+        }
 
         try {
-          const content = await this.decryptContent(
-            encryptedContent,
-            note.id,
+          const decryptedContent = await this.decryptContent(
+            content,
             oldPassword
           );
-          contentItems.push({
-            ...content,
-            id: note.contentId,
-            noteId: note.id
-          });
+
+          await this.encryptContent(
+            decryptedContent,
+            noteId,
+            newPassword,
+            `${Date.now()}`
+          );
         } catch (e) {
           console.error(e);
           throw new Error(
-            `Could not decrypt content of note ${note.id}. Error: ${
+            `Could not decrypt content of note ${noteId}. Error: ${
               (e as Error).message
             }`
           );
         }
       }
 
-      for (const content of contentItems) {
-        await this.encryptContent(
-          content,
-          content.noteId,
-          newPassword,
-          content.id
-        );
-      }
-
-      await this.db.storage().remove("vaultKey");
-      await this.create(newPassword);
+      await this.db.vaults.add({
+        id: vault.id,
+        key: await this.db
+          .storage()
+          .encrypt({ password: newPassword }, this.key)
+      });
     }
   }
 
   async clear(password: string) {
+    const vault = await this.db.vaults.default();
+    if (!vault) return;
+
     if (await this.unlock(password)) {
-      for await (const note of this.db.notes.locked) {
-        await this.unlockNote(note, password, true);
+      const relations = await this.db.relations.from(vault, "note").get();
+      for (const { toId: noteId } of relations) {
+        await this.unlockNote(noteId, password, true);
+        await this.db.relations.unlink(vault, { id: noteId, type: "note" });
       }
     }
   }
 
   async delete(deleteAllLockedNotes = false) {
+    const vault = await this.db.vaults.default();
+    if (!vault) return;
+
     if (deleteAllLockedNotes) {
-      const lockedIds = await this.db.notes.locked.ids();
+      const relations = await this.db.relations.from(vault, "note").get();
+      const lockedIds = relations.map((r) => r.toId);
       await this.db.notes.remove(...lockedIds);
     }
-    await this.db.storage().remove("vaultKey");
+
+    await this.db.vaults.remove(vault.id);
     this.password = undefined;
   }
 
@@ -173,11 +178,11 @@ export default class Vault {
    * Permanently unlocks (remove from vault) a note
    */
   async remove(noteId: string, password: string) {
-    const note = await this.db.notes.note(noteId);
-    if (!note) return;
-    await this.unlockNote(note, password, true);
+    await this.unlockNote(noteId, password, true);
 
-    if (!(await this.exists())) await this.create(password);
+    const vault = await this.db.vaults.default();
+    if (!vault) await this.create(password);
+    else await this.db.relations.unlink(vault, { id: noteId, type: "note" });
   }
 
   /**
@@ -187,23 +192,22 @@ export default class Vault {
     const note = await this.db.notes.note(noteId);
     if (!note) return;
 
-    const unlockedNote = await this.unlockNote(note, password, false);
+    const content = await this.unlockNote(noteId, password, false);
     if (password) {
       this.password = password;
       if (!(await this.exists())) await this.create(password);
     }
-
-    return unlockedNote;
+    return { ...note, ...content };
   }
 
   /**
    * Saves a note in the vault
    */
-  async save(
-    note: Partial<Note & { content: NoteContent<false>; sessionId: string }> & {
-      id: string;
-    }
-  ) {
+  async save(note: {
+    content?: NoteContent<false>;
+    sessionId?: string;
+    id: string;
+  }) {
     if (!note) return;
     // roll over erase timer
     this.startEraser();
@@ -233,7 +237,6 @@ export default class Vault {
     content: NoteContent<false>,
     noteId: string,
     password: string,
-    contentId?: string,
     sessionId?: string
   ) {
     const encryptedContent = await this.db
@@ -241,7 +244,6 @@ export default class Vault {
       .encrypt({ password }, JSON.stringify(content.data));
 
     await this.db.content.add({
-      id: contentId,
       noteId,
       sessionId,
       data: encryptedContent,
@@ -249,23 +251,11 @@ export default class Vault {
     });
   }
 
-  async decryptContent(
-    encryptedContent: NoteContent<true>,
-    noteId: string,
-    password?: string
-  ) {
+  async decryptContent(encryptedContent: NoteContent<true>, password?: string) {
     if (!password) password = await this.getVaultPassword();
 
-    if (
-      typeof encryptedContent.data !== "object" &&
-      !isCipher(encryptedContent.data)
-    ) {
-      await this.db.notes.add({
-        id: noteId,
-        locked: false
-      });
-      return { data: encryptedContent.data, type: encryptedContent.type };
-    }
+    if (!isCipher(encryptedContent.data))
+      return encryptedContent as unknown as NoteContent<false>;
 
     const decryptedContent = await this.db
       .storage()
@@ -286,33 +276,30 @@ export default class Vault {
   }
 
   private async lockNote(
-    item: Partial<Note & { content: NoteContent<false>; sessionId: string }> & {
-      id: string;
-    },
+    item: { content?: NoteContent<false>; sessionId?: string; id: string },
     password: string
   ) {
-    const { id, content, sessionId, title } = item;
+    const vault = await this.db.vaults.default();
+    if (!vault) throw new Error(VAULT_ERRORS.noVault);
+
+    const { id, content, sessionId } = item;
     let { type, data } = content || {};
 
-    const note = await this.db.notes.note(id);
-    if (!note) return;
-
-    const contentId = note.contentId;
-    //    if (!contentId) throw new Error("Cannot lock note because it is empty.");
+    const locked = await this.db.relations.from(vault, "note").has(id);
 
     // Case: when note is being newly locked
-    if (!note.locked && (!data || !type) && !!contentId) {
-      const rawContent = await this.db.content.get(contentId);
-      if (!rawContent || !isUnencryptedContent(rawContent))
-        return await this.db.notes.add({
+    if (!locked && (!data || !type)) {
+      const content = await this.db.content.findByNoteId(id);
+      if (!content || content.locked)
+        return await this.db.relations.add(vault, {
           id,
-          locked: true
+          type: "note"
         });
       // NOTE:
       // At this point, the note already has all the attachments extracted
       // so we should just encrypt it as normal.
-      data = rawContent.data;
-      type = rawContent.type;
+      data = content.data;
+      type = content.type;
     } else if (data && type) {
       data = await this.db.content.extractAttachments({
         data,
@@ -322,60 +309,47 @@ export default class Vault {
     }
 
     if (data && type)
-      await this.encryptContent(
-        { data, type },
-        id,
-        password,
-        contentId,
-        sessionId
-      );
+      await this.encryptContent({ data, type }, id, password, sessionId);
 
-    return await this.db.notes.add({
+    await this.db.notes.add({
       id,
-      locked: true,
-      headline: "",
-      title: title || note.title,
-      favorite: note.favorite,
-      localOnly: note.localOnly,
-      readonly: note.readonly,
-      dateEdited: Date.now()
+      headline: ""
+    });
+
+    await this.db.relations.add(vault, {
+      id,
+      type: "note"
     });
   }
 
-  private async unlockNote(note: Note, password?: string, perm = false) {
-    if (!note.contentId) return;
-
-    const encryptedContent = await this.db.content.get(note.contentId);
-    if (!encryptedContent || !isEncryptedContent(encryptedContent)) return;
-    const content = await this.decryptContent(
-      encryptedContent,
-      note.id,
-      password
-    );
+  private async unlockNote(noteId: string, password?: string, perm = false) {
+    const content = await this.db.content.findByNoteId(noteId);
+    if (!content || !content.locked) return;
+    const decryptedContent = await this.decryptContent(content, password);
 
     if (perm) {
       await this.db.notes.add({
-        id: note.id,
-        locked: false,
-        headline: note.headline,
-        contentId: note.contentId,
-        content
+        id: noteId,
+        contentId: content.id,
+        content: decryptedContent
       });
       // await this.db.content.add({ id: note.contentId, data: content });
       return;
     }
 
     return {
-      ...note,
       content
     };
   }
 
   async getKey() {
-    return await this.db.storage().read<Cipher<"base64">>("vaultKey");
+    const vault = await this.db.vaults.default();
+    return vault?.key;
   }
 
   async setKey(vaultKey: Cipher<"base64">) {
-    await this.db.storage().write("vaultKey", vaultKey);
+    const vault = await this.db.vaults.default();
+    if (vault) return;
+    await this.db.vaults.add({ title: "Default", key: vaultKey });
   }
 }
