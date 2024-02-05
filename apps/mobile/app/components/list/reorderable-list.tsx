@@ -28,9 +28,8 @@ import {
 } from "react-native-drax";
 import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
-import { IconButton } from "../ui/icon-button";
-import Paragraph from "../ui/typography/paragraph";
 import { useSideBarDraggingStore } from "../side-menu/dragging-store";
+import { IconButton } from "../ui/icon-button";
 
 interface ReorderableListProps<T extends { id: string }>
   extends Omit<DraxListProps<T>, "renderItem" | "data" | "renderItemContent"> {
@@ -39,7 +38,8 @@ interface ReorderableListProps<T extends { id: string }>
   data: T[];
   itemOrder: string[];
   hiddenItems: string[];
-  onHiddenItemsChanged: (data: string[]) => void;
+  onHiddenItemsChanged?: (data: string[]) => void;
+  canHideItems?: boolean;
 }
 
 function ReorderableList<T extends { id: string }>({
@@ -49,6 +49,7 @@ function ReorderableList<T extends { id: string }>({
   hiddenItems = [],
   itemOrder = [],
   onHiddenItemsChanged,
+  canHideItems = true,
   ...restProps
 }: ReorderableListProps<T>) {
   const { colors } = useThemeColors();
@@ -86,7 +87,7 @@ function ReorderableList<T extends { id: string }>({
           >
             {renderDraggableItem(info, props)}
           </View>
-          {dragging ? (
+          {dragging && canHideItems ? (
             <IconButton
               name={!isHidden ? "minus" : "plus"}
               color={colors.primary.icon}
@@ -101,7 +102,7 @@ function ReorderableList<T extends { id: string }>({
                 } else {
                   _hiddenItems.splice(index, 1);
                 }
-                onHiddenItemsChanged(_hiddenItems);
+                onHiddenItemsChanged?.(_hiddenItems);
                 setHiddenItems(_hiddenItems);
               }}
             />
@@ -114,7 +115,8 @@ function ReorderableList<T extends { id: string }>({
       dragging,
       hiddenItemsState,
       onHiddenItemsChanged,
-      renderDraggableItem
+      renderDraggableItem,
+      canHideItems
     ]
   );
 
@@ -128,7 +130,6 @@ function ReorderableList<T extends { id: string }>({
         items.splice(index, 0, item);
       }
     });
-    console.log(items.map((item) => item.id));
     return items;
   }
 
@@ -166,7 +167,6 @@ function ReorderableList<T extends { id: string }>({
             } else {
               newOrder.splice(toIndex, 0, element);
             }
-            console.log(newOrder);
             setItemsOrder(newOrder);
             onListOrderChanged?.(newOrder);
           }}

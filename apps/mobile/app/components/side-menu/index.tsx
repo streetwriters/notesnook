@@ -21,6 +21,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback } from "react";
 import { FlatList, View } from "react-native";
 import { notesnook } from "../../../e2e/test.ids";
+import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
@@ -31,16 +32,15 @@ import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
 import { MenuItemsList } from "../../utils/menu-items";
+import { SIZE } from "../../utils/size";
+import ReorderableList from "../list/reorderable-list";
+import { IconButton } from "../ui/icon-button";
+import Paragraph from "../ui/typography/paragraph";
 import { ColorSection } from "./color-section";
+import { useSideBarDraggingStore } from "./dragging-store";
 import { MenuItem } from "./menu-item";
 import { PinnedSection } from "./pinned-section";
 import { UserStatus } from "./user-status";
-import ReorderableList from "../list/reorderable-list";
-import { db } from "../../common/database";
-import { useSideBarDraggingStore } from "./dragging-store";
-import Paragraph from "../ui/typography/paragraph";
-import { IconButton } from "../ui/icon-button";
-import { SIZE } from "../../utils/size";
 
 export const SideMenu = React.memo(
   function SideMenu() {
@@ -55,7 +55,6 @@ export const SideMenu = React.memo(
     const introCompleted = useSettingStore(
       (state) => state.settings.introCompleted
     );
-    const noTextMode = false;
     const BottomItemsList = [
       {
         name: isDark ? "Day" : "Night",
@@ -89,13 +88,13 @@ export const SideMenu = React.memo(
         <>
           <ReorderableList
             onListOrderChanged={(data) => {
-              db.settings.setSideBarOrder("menu", data);
+              db.settings.setSideBarOrder("routes", data);
             }}
             onHiddenItemsChanged={(data) => {
-              db.settings.setSideBarHiddenItems("menu", data);
+              db.settings.setSideBarHiddenItems("routes", data);
             }}
-            itemOrder={db.settings.getSideBarOrder("menu")}
-            hiddenItems={db.settings.getSideBarHiddenItems("menu")}
+            itemOrder={db.settings.getSideBarOrder("routes")}
+            hiddenItems={db.settings.getSideBarHiddenItems("routes")}
             alwaysBounceVertical={false}
             data={MenuItemsList}
             style={{
@@ -113,11 +112,11 @@ export const SideMenu = React.memo(
               );
             }}
           />
-          <ColorSection noTextMode={noTextMode} />
+          <ColorSection />
           <PinnedSection />
         </>
       ),
-      [noTextMode]
+      []
     );
 
     return !isAppLoading && introCompleted ? (
@@ -144,12 +143,14 @@ export const SideMenu = React.memo(
                 marginBottom: 12,
                 justifyContent: "space-between",
                 alignItems: "center",
-                borderBottomWidth: 1,
-                borderBottomColor: colors.primary.border,
-                paddingHorizontal: 12
+                paddingHorizontal: 12,
+                backgroundColor: colors.secondary.background,
+                marginHorizontal: 12,
+                marginTop: 5,
+                paddingVertical: 6
               }}
             >
-              <Paragraph size={SIZE.xs + 1}>REORDER SIDEBAR</Paragraph>
+              <Paragraph size={SIZE.sm}>REORDERING</Paragraph>
 
               <IconButton
                 name="close"
@@ -184,13 +185,7 @@ export const SideMenu = React.memo(
           >
             {subscriptionType === SUBSCRIPTION_STATUS.TRIAL ||
             subscriptionType === SUBSCRIPTION_STATUS.BASIC ? (
-              <MenuItem
-                testID={pro.name}
-                key={pro.name}
-                item={pro}
-                index={0}
-                ignore={true}
-              />
+              <MenuItem testID={pro.name} key={pro.name} item={pro} index={0} />
             ) : null}
 
             {BottomItemsList.slice(DDS.isLargeTablet() ? 0 : 1, 3).map(
@@ -204,10 +199,9 @@ export const SideMenu = React.memo(
                   key={item.name}
                   item={item}
                   index={index}
-                  ignore={true}
                   rightBtn={
                     DDS.isLargeTablet() || item.name === "Notesnook Pro"
-                      ? null
+                      ? undefined
                       : BottomItemsList[0]
                   }
                 />
@@ -221,7 +215,7 @@ export const SideMenu = React.memo(
               paddingHorizontal: 0
             }}
           >
-            <UserStatus noTextMode={noTextMode} />
+            <UserStatus />
           </View>
         </View>
       </View>
