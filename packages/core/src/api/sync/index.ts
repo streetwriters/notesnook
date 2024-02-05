@@ -36,7 +36,13 @@ import { Mutex } from "async-mutex";
 import Database from "..";
 import { migrateItem, migrateVaultKey } from "../../migrations";
 import { SerializedKey } from "@notesnook/crypto";
-import { Item, MaybeDeletedItem, Note, Notebook } from "../../types";
+import {
+  Attachment,
+  Item,
+  MaybeDeletedItem,
+  Note,
+  Notebook
+} from "../../types";
 import { SYNC_COLLECTIONS_MAP, SyncTransferItem } from "./types";
 import { DownloadableFile } from "../../database/fs";
 import { SyncDevices } from "./devices";
@@ -311,7 +317,10 @@ class Sync {
         itemType === "attachment"
           ? await Promise.all(
               deserialized.map((item) =>
-                this.merger.mergeAttachment(item, localItems[item.id])
+                this.merger.mergeAttachment(
+                  item as MaybeDeletedItem<Attachment>,
+                  localItems[item.id] as MaybeDeletedItem<Attachment>
+                )
               )
             )
           : deserialized.map((item) =>
