@@ -25,21 +25,20 @@ import { VirtualizedList, VirtualizedListProps } from "../virtualized-list";
 
 type FilteredListProps<T> = {
   placeholders: { filter: string; empty: string };
-  filter: (query: string) => Promise<T[]>;
+  filter: (query: string) => Promise<void>;
   onCreateNewItem: (title: string) => Promise<void>;
 } & VirtualizedListProps<T, unknown>;
 
 export function FilteredList<T>(props: FilteredListProps<T>) {
   const { items, filter, onCreateNewItem, placeholders, ...listProps } = props;
 
-  const [filteredItems, setFilteredItems] = useState<T[]>([]);
   const [query, setQuery] = useState<string>();
-  const noItemsFound = filteredItems.length <= 0 && query && query.length > 0;
+  const noItemsFound = items.length <= 0 && query && query.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
 
   const _filter = useCallback(
     async (query = "") => {
-      setFilteredItems(query ? await filter(query) : []);
+      await filter(query);
       setQuery(query);
     },
     [filter]
@@ -61,7 +60,7 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
         data-test-id={"filter-input"}
         autoFocus
         placeholder={
-          filteredItems.length <= 0 ? placeholders.empty : placeholders.filter
+          items.length <= 0 ? placeholders.empty : placeholders.filter
         }
         onChange={(e) => _filter((e.target as HTMLInputElement).value)}
         onKeyUp={async (e) => {
@@ -70,7 +69,7 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
           }
         }}
         action={
-          filteredItems.length <= 0 && !!query
+          items.length <= 0 && !!query
             ? {
                 icon: Plus,
                 onClick: async () => await _createNewItem(query)
@@ -95,7 +94,7 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
           <Plus size={16} color="accent" />
         </Button>
       ) : (
-        <VirtualizedList {...listProps} items={query ? filteredItems : items} />
+        <VirtualizedList {...listProps} items={items} />
       )}
     </>
   );

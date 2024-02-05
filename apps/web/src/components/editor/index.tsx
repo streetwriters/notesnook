@@ -56,10 +56,6 @@ import { Allotment } from "allotment";
 import { showToast } from "../../utils/toast";
 import { getFormattedDate } from "@notesnook/common";
 import { Item, MaybeDeletedItem, isDeleted } from "@notesnook/core/dist/types";
-import {
-  isEncryptedContent,
-  isUnencryptedContent
-} from "@notesnook/core/dist/collections/content";
 import { PreviewSession } from "./types";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
@@ -87,7 +83,7 @@ export default function EditorManager({
   noteId,
   nonce
 }: {
-  noteId?: string;
+  noteId?: string | number;
   nonce?: string;
 }) {
   const isNewSession = !!nonce && !noteId;
@@ -134,7 +130,7 @@ export default function EditorManager({
 
         if (id && isContent && editorInstance.current) {
           let content: string | null = null;
-          if (locked && isEncryptedContent(item)) {
+          if (locked && item.locked) {
             const result = await db.vault
               .decryptContent(item, item.noteId)
               .catch(() => undefined);
@@ -179,7 +175,7 @@ export default function EditorManager({
   }, [isNewSession, nonce]);
 
   useEffect(() => {
-    if (!isOldSession) return;
+    if (!isOldSession || typeof noteId === "number") return;
 
     openSession(noteId);
   }, [noteId]);
@@ -208,7 +204,9 @@ export default function EditorManager({
             {previewSession.current && noteId && (
               <PreviewModeNotice
                 {...previewSession.current}
-                onDiscard={() => openSession(noteId)}
+                onDiscard={() =>
+                  typeof noteId === "string" && openSession(noteId)
+                }
               />
             )}
             <Editor
@@ -328,7 +326,7 @@ type EditorOptions = {
   onRequestFocus?: () => void;
 };
 type EditorProps = {
-  id: string | number;
+  id?: string | number;
   content: () => string | undefined;
   nonce?: number;
   options?: EditorOptions;
@@ -391,7 +389,7 @@ export function Editor(props: EditorProps) {
             const dataurl = await downloadAttachment(
               hash,
               "base64",
-              id.toString()
+              id?.toString()
             );
             if (!dataurl)
               return showToast("error", "This image cannot be previewed.");
@@ -409,7 +407,7 @@ export function Editor(props: EditorProps) {
             );
           } else if (attachment && onPreviewDocument) {
             onPreviewDocument({ hash });
-            const blob = await downloadAttachment(hash, "blob", id.toString());
+            const blob = await downloadAttachment(hash, "blob", id?.toString());
             if (!blob) return;
             onPreviewDocument({ url: URL.createObjectURL(blob), hash });
           }
@@ -425,7 +423,7 @@ export function Editor(props: EditorProps) {
           return downloadAttachment(
             attachment.hash,
             attachment.type === "web-clip" ? "text" : "base64",
-            id.toString()
+            id?.toString()
           );
         }}
         onAttachFile={async (file) => {
