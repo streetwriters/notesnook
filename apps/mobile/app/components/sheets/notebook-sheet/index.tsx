@@ -26,10 +26,8 @@ import React, {
   useState
 } from "react";
 import { RefreshControl, View, useWindowDimensions } from "react-native";
-import ActionSheet, {
-  ActionSheetRef,
-  FlashList
-} from "react-native-actions-sheet";
+import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
+import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Config from "react-native-config";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import create from "zustand";
