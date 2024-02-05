@@ -36,6 +36,7 @@ import { isCipher } from "./database/crypto";
 import { IndexedCollection } from "./database/indexed-collection";
 import { DefaultColors } from "./collections/colors";
 import { Cipher } from "@notesnook/crypto";
+import { KEYS } from "./database/kv";
 
 type MigrationType = "local" | "sync" | "backup";
 type MigrationItemType = ItemType | "notehistory" | "content" | "all";
@@ -55,6 +56,7 @@ type Migration = {
   };
   collection?: (collection: IndexedCollection) => Promise<void> | void;
   vaultKey?: (db: Database, key: Cipher<"base64">) => Promise<void> | void;
+  kv?: (db: Database) => Promise<void> | void;
 };
 
 const migrations: Migration[] = [
@@ -317,7 +319,7 @@ const migrations: Migration[] = [
           await db.relations.add(item, { id: subNotebookId, type: "notebook" });
           // if the parent notebook is deleted, we should delete the newly
           // created notebooks too
-          if (item.dateDeleted !== null) {
+          if (item.dateDeleted) {
             await db.trash.add("notebook", [subNotebookId], "app");
           }
         }
@@ -391,6 +393,14 @@ const migrations: Migration[] = [
     async vaultKey(db, key) {
       await db.vaults.add({ title: "Default", key });
       await db.storage().remove("vaultKey");
+    },
+    async kv(db) {
+      for (const key of KEYS) {
+        const value = await db.storage().read(key);
+        if (value === undefined || value === null) continue;
+        await db.kv().write(key, value as any);
+        await db.storage().remove(key);
+      }
     }
   },
   {
@@ -467,12 +477,13 @@ export async function migrateCollection(
 export async function migrateVaultKey(
   db: Database,
   vaultKey: Cipher<"base64">,
-  version: number
+  version: number,
+  databaseVersion: number
 ) {
   let migrationStartIndex = migrations.findIndex((m) => m.version === version);
   if (migrationStartIndex <= -1) {
     throw new Error(
-      version > CURRENT_DATABASE_VERSION
+      version > databaseVersion
         ? `Please update the app to the latest version.`
         : `You seem to be on a very outdated version. Please update the app to the latest version.`
     );
@@ -480,10 +491,33 @@ export async function migrateVaultKey(
 
   for (; migrationStartIndex < migrations.length; ++migrationStartIndex) {
     const migration = migrations[migrationStartIndex];
-    if (migration.version === CURRENT_DATABASE_VERSION) break;
+    if (migration.version === databaseVersion) break;
 
     if (!migration.vaultKey) continue;
     await migration.vaultKey(db, vaultKey);
+  }
+}
+
+export async function migrateKV(
+  db: Database,
+  version: number,
+  databaseVersion: number
+) {
+  let migrationStartIndex = migrations.findIndex((m) => m.version === version);
+  if (migrationStartIndex <= -1) {
+    throw new Error(
+      version > databaseVersion
+        ? `Please update the app to the latest version.`
+        : `You seem to be on a very outdated version. Please update the app to the latest version.`
+    );
+  }
+
+  for (; migrationStartIndex < migrations.length; ++migrationStartIndex) {
+    const migration = migrations[migrationStartIndex];
+    if (migration.version === databaseVersion) break;
+
+    if (!migration.kv) continue;
+    await migration.kv(db);
   }
 }
 

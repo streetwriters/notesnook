@@ -29,7 +29,6 @@ import Vault from "./vault";
 import Lookup from "./lookup";
 import { Content } from "../collections/content";
 import Backup from "../database/backup";
-import Session from "./session";
 import Hosts from "../utils/constants";
 import { EV, EVENTS } from "../common";
 import { LegacySettings } from "../collections/legacy-settings";
@@ -55,6 +54,7 @@ import {
   ICompressor,
   IFileStorage,
   IStorage,
+  KVStorageAccessor,
   StorageAccessor
 } from "../interfaces";
 import TokenManager from "./token-manager";
@@ -69,6 +69,7 @@ import {
 import { Kysely, Transaction, sql } from "kysely";
 import { CachedCollection } from "../database/cached-collection";
 import { Vaults } from "../collections/vaults";
+import { KVStorage } from "../database/kv";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -103,7 +104,7 @@ class Database {
       throw new Error(
         "Database not initialized. Did you forget to call db.setup()?"
       );
-    return new FileStorage(this.options.fs, this.storage);
+    return new FileStorage(this.options.fs, this.tokenManager);
   };
 
   crypto: CryptoAccessor = () => {
@@ -133,6 +134,9 @@ class Database {
     return this._sql;
   };
 
+  private _kv?: KVStorage;
+  kv: KVStorageAccessor = () => this._kv || new KVStorage(this.sql);
+
   private _transaction?: Transaction<DatabaseSchema>;
   private transactionMutex = new Mutex();
   transaction = (
@@ -156,9 +160,8 @@ class Database {
   EventSource?: EventSourceConstructor;
   eventSource?: EventSource | null;
 
-  session = new Session(this.storage);
-  mfa = new MFAManager(this.storage);
-  tokenManager = new TokenManager(this.storage);
+  tokenManager = new TokenManager(this.kv);
+  mfa = new MFAManager(this.tokenManager);
   subscriptions = new Subscriptions(this.tokenManager);
   offers = new Offers();
   debug = new Debug();
@@ -189,19 +192,15 @@ class Database {
   /**
    * @deprecated only kept here for migration purposes
    */
-  legacyTags = new CachedCollection(this.storage, "tags", this.eventManager);
+  legacyTags = new CachedCollection(this.storage, "tags");
   /**
    * @deprecated only kept here for migration purposes
    */
-  legacyColors = new CachedCollection(
-    this.storage,
-    "colors",
-    this.eventManager
-  );
+  legacyColors = new CachedCollection(this.storage, "colors");
   /**
    * @deprecated only kept here for migration purposes
    */
-  legacyNotes = new CachedCollection(this.storage, "notes", this.eventManager);
+  legacyNotes = new CachedCollection(this.storage, "notes");
   /**
    * @deprecated only kept here for migration purposes
    */
@@ -214,15 +213,6 @@ class Database {
 
   setup(options: Options) {
     this.options = options;
-  }
-
-  async _validate() {
-    if (!(await this.session.valid())) {
-      throw new Error(
-        "Your system clock is not setup correctly. Please adjust your date and time and then retry."
-      );
-    }
-    await this.session.set();
   }
 
   async reset() {
@@ -268,8 +258,6 @@ class Database {
       "notesnook",
       this.options.sqliteOptions
     )) as unknown as Kysely<DatabaseSchema>;
-
-    await this._validate();
 
     await this.initCollections();
 
@@ -383,7 +371,11 @@ class Database {
   }
 
   async lastSynced() {
-    return (await this.storage().read<number | undefined>("lastSynced")) || 0;
+    return (await this.kv().read("lastSynced")) || 0;
+  }
+
+  setLastSynced(lastSynced: number) {
+    return this.kv().write("lastSynced", lastSynced);
   }
 
   sync(full = true, force = false) {

@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import http from "../utils/http";
 import constants from "../utils/constants";
 import TokenManager from "./token-manager";
-import { StorageAccessor } from "../interfaces";
 
 const ENDPOINTS = {
   setup: "/mfa",
@@ -31,10 +30,7 @@ const ENDPOINTS = {
 };
 
 class MFAManager {
-  tokenManager: TokenManager;
-  constructor(private readonly storage: StorageAccessor) {
-    this.tokenManager = new TokenManager(storage);
-  }
+  constructor(private readonly tokenManager: TokenManager) {}
 
   async setup(type: "app" | "sms" | "email", phoneNumber?: string) {
     const token = await this.tokenManager.getAccessToken();

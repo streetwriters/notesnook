@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { match } from "fuzzyjs";
 import Database from ".";
 import { Item, Note, TrashItem } from "../types";
-import { DatabaseSchema, DatabaseSchemaWithFTS, isFalse } from "../database";
+import { DatabaseSchema, RawDatabaseSchema, isFalse } from "../database";
 import { AnyColumnWithTable, Kysely, sql } from "kysely";
 import { FilteredSelector } from "../database/sql-collection";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
@@ -43,7 +43,7 @@ export default class Lookup {
     return this.toSearchResults(async (limit) => {
       if (query.length <= 3) return [];
 
-      const db = this.db.sql() as Kysely<DatabaseSchemaWithFTS>;
+      const db = this.db.sql() as Kysely<RawDatabaseSchema>;
       query = query.replace(/"/, '""');
       const result = await db
         .with("matching", (eb) =>

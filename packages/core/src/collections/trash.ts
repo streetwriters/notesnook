@@ -201,31 +201,37 @@ export default class Trash {
   //   } else return true;
   // }
 
-  async all() {
+  async all(deletedBy?: TrashItem["deletedBy"]) {
     return [
-      ...(await this.trashedNotes(this.cache.notes)),
-      ...(await this.trashedNotebooks(this.cache.notebooks))
+      ...(await this.trashedNotes(this.cache.notes, deletedBy)),
+      ...(await this.trashedNotebooks(this.cache.notebooks, deletedBy))
     ] as TrashItem[];
   }
 
-  private async trashedNotes(ids: string[]) {
+  private async trashedNotes(
+    ids: string[],
+    deletedBy?: TrashItem["deletedBy"]
+  ) {
     return (await this.db
       .sql()
       .selectFrom("notes")
       .where("type", "==", "trash")
       .where("id", "in", ids)
-      .where("deletedBy", "==", "user")
+      .$if(!!deletedBy, (eb) => eb.where("deletedBy", "==", deletedBy))
       .selectAll()
       .execute()) as TrashItem[];
   }
 
-  private async trashedNotebooks(ids: string[]) {
+  private async trashedNotebooks(
+    ids: string[],
+    deletedBy?: TrashItem["deletedBy"]
+  ) {
     return (await this.db
       .sql()
       .selectFrom("notebooks")
       .where("type", "==", "trash")
       .where("id", "in", ids)
-      .where("deletedBy", "==", "user")
+      .$if(!!deletedBy, (eb) => eb.where("deletedBy", "==", deletedBy))
       .selectAll()
       .execute()) as TrashItem[];
   }
@@ -249,10 +255,12 @@ export default class Trash {
 
         const items = [
           ...(await this.trashedNotes(
-            this.cache.notes.slice(notesRange[0], notesRange[1])
+            this.cache.notes.slice(notesRange[0], notesRange[1]),
+            "user"
           )),
           ...(await this.trashedNotebooks(
-            this.cache.notebooks.slice(notebooksRange[0], notebooksRange[1])
+            this.cache.notebooks.slice(notebooksRange[0], notebooksRange[1]),
+            "user"
           ))
         ];
         items.sort(selector);
@@ -314,6 +322,10 @@ export default class Trash {
       .selectFrom("subNotebooks")
       .select("id")
       .execute();
-    return ids.map((ref) => ref.id);
+
+    return deleteItems(
+      ids.map((ref) => ref.id),
+      ...notebookIds
+    );
   }
 }

@@ -24,6 +24,7 @@ import { ICollection } from "./collection";
 import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
 import { sql } from "kysely";
+import { deleteItems } from "../utils/array";
 
 export class Notebooks implements ICollection {
   name = "notebooks";
@@ -240,7 +241,7 @@ export class Notebooks implements ICollection {
   }
 
   async moveToTrash(...ids: string[]) {
-    this.db.transaction(async (tr) => {
+    await this.db.transaction(async (tr) => {
       const query = tr
         .withRecursive(`subNotebooks(id)`, (eb) =>
           eb
@@ -265,7 +266,9 @@ export class Notebooks implements ICollection {
         .select("id");
 
       const subNotebookIds = (await query.execute()).map((ref) => ref.id);
-      await this.db.trash.add("notebook", subNotebookIds, "app");
+      deleteItems(subNotebookIds, ...ids);
+      if (subNotebookIds.length > 0)
+        await this.db.trash.add("notebook", subNotebookIds, "app");
       await this.db.trash.add("notebook", ids, "user");
     });
   }
