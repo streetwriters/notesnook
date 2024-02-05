@@ -32,8 +32,9 @@ const sleep = (duration) =>
   );
 
 async function LaunchApp() {
-  await expect(element(by.id(notesnook.ids.default.root))).toBeVisible();
-  await sleep(500);
+  await waitFor(element(by.id(notesnook.ids.default.root)))
+    .toBeVisible()
+    .withTimeout(500);
 }
 
 function elementById(id) {
@@ -78,7 +79,6 @@ async function createNote(_title, _body) {
   let body =
     _body ||
     "Test note description that is very long and should not fit in text.";
-
   await tapById(notesnook.buttons.add);
   let webview = web(by.id(notesnook.editor.id));
   await expect(webview.element(by.web.className("ProseMirror"))).toExist();
@@ -93,14 +93,14 @@ async function createNote(_title, _body) {
 async function openSideMenu() {
   let menu = elementById(notesnook.ids.default.header.buttons.left);
   await menu.tap();
-  await sleep(100);
 }
 
 async function navigate(screen) {
-  await sleep(500);
   let menu = elementById(notesnook.ids.default.header.buttons.left);
+  await waitFor(menu).toBeVisible().withTimeout(300);
   await menu.tap();
-  await sleep(500);
+
+  await waitFor(elementByText(screen)).toBeVisible().withTimeout(300);
   await elementByText(screen).tap();
 }
 
@@ -109,6 +109,7 @@ const testvars = {
 };
 
 async function prepare() {
+  await device.disableSynchronization();
   if (testvars.isFirstTest) {
     testvars.isFirstTest = false;
     return await LaunchApp();
@@ -129,12 +130,7 @@ async function matchSnapshot(element, name) {
   });
 }
 
-async function createNotebook(
-  title = "Notebook 1",
-  description = true,
-  topic = true,
-  topicCount = 1
-) {
+async function createNotebook(title = "Notebook 1", description = true) {
   await elementById(notesnook.ids.dialogs.notebook.inputs.title).typeText(
     title
   );
@@ -144,7 +140,7 @@ async function createNotebook(
     ).typeText(`Description of ${title}`);
   }
   await tapByText("Add");
-  await sleep(500);
+  await sleep(300);
 }
 
 export {
