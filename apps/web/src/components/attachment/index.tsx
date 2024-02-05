@@ -288,7 +288,7 @@ const AttachmentMenuItems: (
       onClick: async () => {
         const isDownloading = status?.type === "download";
         if (isDownloading) {
-          await db.fs().cancel(attachment.hash, "download");
+          await db.fs().cancel(attachment.hash);
         } else await saveAttachment(attachment.hash);
       }
     },
@@ -300,7 +300,7 @@ const AttachmentMenuItems: (
       onClick: async () => {
         const isDownloading = status?.type === "upload";
         if (isDownloading) {
-          await db.fs().cancel(attachment.hash, "upload");
+          await db.fs().cancel(attachment.hash);
         } else await reuploadAttachment(attachment.type, attachment.hash);
       }
     },
