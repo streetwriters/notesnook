@@ -26,7 +26,8 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { ActionSheetRef, FlashList } from "react-native-actions-sheet";
+import { ActionSheetRef } from "react-native-actions-sheet";
+import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import { db } from "../../../common/database";
 import { presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
