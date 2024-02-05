@@ -188,6 +188,7 @@ export interface Note extends BaseItem<"note"> {
 
   dateDeleted: null;
   itemType: null;
+  deletedBy: null;
 }
 
 export interface Notebook extends BaseItem<"notebook"> {
@@ -195,9 +196,6 @@ export interface Notebook extends BaseItem<"notebook"> {
   description?: string;
   dateEdited: number;
   pinned: boolean;
-
-  dateDeleted: null;
-  itemType: null;
 
   /**
    * @deprecated only kept here for migration purposes.
@@ -207,6 +205,10 @@ export interface Notebook extends BaseItem<"notebook"> {
    * @deprecated only kept here for migration purposes.
    */
   totalNotes?: number;
+
+  dateDeleted: null;
+  itemType: null;
+  deletedBy: null;
 }
 
 /**
@@ -459,7 +461,11 @@ export type BaseTrashItem<TItem extends BaseItem<"note" | "notebook">> =
   BaseItem<"trash"> & {
     itemType: TItem["type"];
     dateDeleted: number;
-  } & Omit<TItem, "id" | "type" | "dateDeleted" | "itemType">;
+    /**
+     * deletedBy tells who deleted this specific item.
+     */
+    deletedBy: "user" | "app";
+  } & Omit<TItem, "id" | "type" | "dateDeleted" | "itemType" | "deletedBy">;
 
 export type TrashItem = BaseTrashItem<Note> | BaseTrashItem<Notebook>;
 
