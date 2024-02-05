@@ -36,7 +36,7 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
     const counters: Record<string, number> = {};
     if (signal)
       signal.onabort = async () => {
-        await db.fs().cancel(GROUP_ID, "download");
+        await db.fs().cancel(GROUP_ID);
       };
 
     super({

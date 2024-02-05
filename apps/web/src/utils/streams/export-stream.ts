@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { db } from "../../common/db";
 import { exportNote } from "../../common/export";
 import { makeUniqueFilename } from "./utils";
 import { ZipFile } from "./zip-stream";
@@ -44,41 +45,18 @@ export class ExportStream extends TransformStream<Note, ZipFile> {
 
           const { filename, content } = result;
 
-          const notebooks = [
-            ...(
-              db.relations
-                ?.to({ id: note.id, type: "note" }, "notebook")
-                .resolved() || []
-            ).map((n) => ({ title: n.title, topics: [] })),
-            ...(note.notebooks || []).map(
-              (ref: { id: string; topics: string[] }) => {
-                const notebook = db.notebooks?.notebook(ref.id);
-                const topics: any[] = notebook?.topics.all || [];
+          const notebooks = await db.relations
+            .to({ id: note.id, type: "note" }, "notebook")
+            .get();
 
-                return {
-                  title: notebook?.title,
-                  topics: ref.topics
-                    .map((topicId: string) =>
-                      topics.find((topic) => topic.id === topicId)
-                    )
-                    .filter(Boolean)
-                };
-              }
-            )
-          ];
-
-          const filePaths: Array<string> =
-            notebooks.length > 0
-              ? notebooks
-                  .map((notebook) => {
-                    if (notebook.topics.length > 0)
-                      return notebook.topics.map((topic: { title: string }) =>
-                        [notebook.title, topic.title, filename].join("/")
-                      );
-                    return [notebook.title, filename].join("/");
-                  })
-                  .flat()
-              : [filename];
+          const filePaths: string[] = [];
+          for (const { fromId: notebookId } of notebooks) {
+            const crumbs = (await db.notebooks.breadcrumbs(notebookId)).map(
+              (n) => n.title
+            );
+            filePaths.push([...crumbs, filename].join("/"));
+          }
+          if (filePaths.length <= 0) filePaths.push(filename);
 
           filePaths.forEach((filePath) => {
             controller.enqueue({
