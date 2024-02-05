@@ -209,6 +209,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
         onDrawerStateChange(true);
       },
       closeDrawer: (animated = true) => {
+        if (forcedLock.value) return;
         if (deviceMode === "tablet") {
           translateX.value = animated ? withTiming(0) : 0;
           return;

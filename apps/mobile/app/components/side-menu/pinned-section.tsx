@@ -74,13 +74,12 @@ export const PinnedSection = React.memo(
       >
         <ReorderableList
           onListOrderChanged={(data) => {
-            db.settings.setSideBarOrder("pinned", data);
+            db.settings.setSideBarOrder("shortcuts", data);
           }}
-          onHiddenItemsChanged={(data) => {
-            db.settings.setSideBarHiddenItems("pinned", data);
-          }}
-          itemOrder={db.settings.getSideBarOrder("pinned")}
-          hiddenItems={db.settings.getSideBarHiddenItems("pinned")}
+          onHiddenItemsChanged={(data) => {}}
+          canHideItems={false}
+          itemOrder={db.settings.getSideBarOrder("shortcuts")}
+          hiddenItems={[]}
           alwaysBounceVertical={false}
           data={menuPins}
           style={{
