@@ -65,7 +65,8 @@
     "react-native-zip-archive": "6.0.9",
     "react-native-quick-sqlite": "^8.0.6",
     "react-native-theme-switch-animation": "^0.6.0",
-    "@ammarahmed/react-native-background-fetch": "^4.2.2"
+    "@ammarahmed/react-native-background-fetch": "^4.2.2",
+    "react-native-image-crop-picker": "^0.40.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

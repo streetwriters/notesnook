@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { LICENSES } from "./license-data";
 import { FlatList, Linking, Platform } from "react-native";
-import { PressableButton } from "../../components/ui/pressable";
+import { Pressable } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
 import { SIZE } from "../../utils/size";
 import { useThemeColors } from "@notesnook/theme";
@@ -41,9 +41,9 @@ export const Licenses = () => {
 
   const renderItem = React.useCallback(
     ({ item }: { item: LicenseEntry }) => (
-      <PressableButton
+      <Pressable
         key={item.name}
-        customStyle={{
+        style={{
           alignItems: "flex-start",
           justifyContent: "flex-start",
           alignSelf: "flex-start",
@@ -61,7 +61,7 @@ export const Licenses = () => {
         <Paragraph>
           {item.licenseType} | {item.author?.split("<")[0]}
         </Paragraph>
-      </PressableButton>
+      </Pressable>
     ),
     [colors.secondary.background]
   );

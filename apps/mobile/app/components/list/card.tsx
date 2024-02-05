@@ -24,7 +24,7 @@ import { useMessageStore } from "../../stores/use-message-store";
 import { useThemeColors } from "@notesnook/theme";
 import { hexToRGBA } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 
 export const Card = ({ color }: { color?: string }) => {
@@ -41,10 +41,10 @@ export const Card = ({ color }: { color?: string }) => {
         width: "95%"
       }}
     >
-      <PressableButton
+      <Pressable
         onPress={messageBoardState.onPress}
-        type="gray"
-        customStyle={{
+        type="plain"
+        style={{
           paddingVertical: 12,
           flexDirection: "row",
           alignItems: "center",
@@ -122,7 +122,7 @@ export const Card = ({ color }: { color?: string }) => {
             />
           </View>
         )}
-      </PressableButton>
+      </Pressable>
     </View>
   );
 };

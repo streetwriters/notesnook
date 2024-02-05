@@ -145,12 +145,12 @@ export const SectionHeader = React.memo<
                       ? 10
                       : 0
                 }}
-                type="gray"
+                type="plain"
                 iconPosition="right"
               />
 
               <IconButton
-                customStyle={{
+                style={{
                   width: 25,
                   height: 25
                 }}

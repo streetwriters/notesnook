@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { PressableButton } from "../../components/ui/pressable";
+import { Pressable } from "../../components/ui/pressable";
 import { DDS } from "../../services/device-detection";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
@@ -61,7 +61,7 @@ export const AccentColorPicker = () => {
         "#FF1744",
         "#B71C1C"
       ].map((item) => (
-        <PressableButton
+        <Pressable
           key={item}
           customColor={
             colors.primary.accent === item
@@ -82,7 +82,7 @@ export const AccentColorPicker = () => {
               });
             });
           }}
-          customStyle={{
+          style={{
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
@@ -100,7 +100,7 @@ export const AccentColorPicker = () => {
               name="check"
             />
           ) : null}
-        </PressableButton>
+        </Pressable>
       ))}
       <View style={{ width: 50 }} />
     </View>

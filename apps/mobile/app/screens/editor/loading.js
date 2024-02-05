@@ -216,7 +216,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
               </Paragraph>
               <IconButton
                 size={20}
-                customStyle={{
+                style={{
                   width: 26,
                   height: 26
                 }}

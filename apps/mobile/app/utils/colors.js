@@ -29,6 +29,25 @@ export const ColorValues = {
   gray: "#9E9E9E"
 };
 
+export function getContainerBorder(
+  color,
+  borderWidth = 0.8,
+  colorDepth = 0.05
+) {
+  return {
+    borderWidth: borderWidth,
+    borderColor: getColorLinearShade(
+      color,
+      colorDepth,
+      useThemeStore.getState().colorScheme === "dark"
+    )
+  };
+}
+
+export function getColorLinearShade(color, alpha, isDark) {
+  return RGB_Linear_Shade(!isDark ? alpha * -1 : alpha, hexToRGBA(color));
+}
+
 export function updateStatusBarColor() {
   StatusBar.setBarStyle(
     useThemeStore.getState().colorScheme === "dark"

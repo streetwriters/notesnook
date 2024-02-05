@@ -33,7 +33,7 @@ import DialogHeader from "../../dialog/dialog-header";
 import List from "../../list";
 import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
-import { PressableButtonProps } from "../../ui/pressable";
+import { PressableProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import { Item, ItemReference, ItemType } from "@notesnook/core/dist/types";
 import { VirtualizedGrouping } from "@notesnook/core";
@@ -54,7 +54,7 @@ type Button = {
   onPress?: (() => void) | undefined;
   loading?: boolean | undefined;
   title?: string | undefined;
-  type?: PressableButtonProps["type"];
+  type?: PressableProps["type"];
   icon?: string;
 };
 

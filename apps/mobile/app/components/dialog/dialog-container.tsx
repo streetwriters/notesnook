@@ -22,6 +22,7 @@ import { View, ViewProps } from "react-native";
 import { DDS } from "../../services/device-detection";
 import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../utils/elevation";
+import { getContainerBorder } from "../../utils/colors";
 
 const DialogContainer = ({
   width,
@@ -37,17 +38,15 @@ const DialogContainer = ({
   return (
     <View
       {...restProps}
-      style={[
-        {
-          ...getElevationStyle(5),
-          width: width || DDS.isTab ? 500 : "85%",
-          maxHeight: height || 450,
-          borderRadius: 10,
-          backgroundColor: colors.primary.background,
-          paddingTop: 12
-        },
-        style
-      ]}
+      style={{
+        ...getElevationStyle(5),
+        width: width || DDS.isTab ? 500 : "85%",
+        maxHeight: height || 450,
+        borderRadius: 10,
+        backgroundColor: colors.primary.background,
+        paddingTop: 12,
+        ...getContainerBorder(colors.secondary.background, 0.8, 0.05)
+      }}
     />
   );
 };

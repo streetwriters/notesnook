@@ -177,7 +177,7 @@ const SheetProvider = ({ context = "global" }) => {
           data.valueArray.map((v) => (
             <Button
               title={v}
-              type="gray"
+              type="plain"
               key={v}
               textStyle={{ fontWeight: "normal" }}
               fontSize={SIZE.sm}

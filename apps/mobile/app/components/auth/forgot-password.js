@@ -113,7 +113,7 @@ export const ForgotPassword = () => {
             }}
           >
             <IconButton
-              customStyle={{
+              style={{
                 width: null,
                 height: null
               }}

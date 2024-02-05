@@ -109,12 +109,12 @@ export const NotebookHeader = ({
             name={isPinnedToMenu ? "link-variant-off" : "link-variant"}
             onPress={onPinNotebook}
             tooltipText={"Create shortcut in side menu"}
-            customStyle={{
+            style={{
               marginRight: 15,
               width: 40,
               height: 40
             }}
-            type={isPinnedToMenu ? "grayBg" : "grayBg"}
+            type={isPinnedToMenu ? "secondary" : "secondary"}
             color={isPinnedToMenu ? colors.primary.accent : colors.primary.icon}
             size={SIZE.lg}
           />
@@ -123,9 +123,9 @@ export const NotebookHeader = ({
             onPress={onEditNotebook}
             tooltipText="Edit this notebook"
             name="pencil"
-            type="grayBg"
+            type="secondary"
             color={colors.primary.icon}
-            customStyle={{
+            style={{
               width: 40,
               height: 40
             }}
