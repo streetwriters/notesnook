@@ -16,10 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Color, Item, Notebook, Reminder, Tag } from "@notesnook/core";
-import { db } from "../common/database";
 
-export type WithDateEdited<T> = { items: T[]; dateEdited: number };
+import { Color, Item, Reminder, Notebook, Tag } from "@notesnook/core";
+import { database as db } from "../database";
+
+type WithDateEdited<T> = { items: T[]; dateEdited: number };
 export type NotebooksWithDateEdited = WithDateEdited<Notebook>;
 export type TagsWithDateEdited = WithDateEdited<Tag>;
 
@@ -49,22 +50,25 @@ export async function resolveItems(ids: string[], items: Item[]) {
   return [];
 }
 
-type NoteResolvedData = {
+export type NoteResolvedData = {
   notebooks?: NotebooksWithDateEdited;
   reminder?: Reminder;
   color?: Color;
   tags?: TagsWithDateEdited;
-  attachmentsCount?: number;
+  attachments?: {
+    failed: number;
+    total: number;
+  };
 };
+
 async function resolveNotes(ids: string[]) {
-  console.time("relations");
   const relations = [
     ...(await db.relations
       .to({ type: "note", ids }, ["notebook", "tag", "color"])
       .get()),
     ...(await db.relations.from({ type: "note", ids }, "reminder").get())
   ];
-  console.timeEnd("relations");
+
   const relationIds: {
     notebooks: Set<string>;
     colors: Set<string>;
@@ -86,6 +90,7 @@ async function resolveNotes(ids: string[]) {
       reminder?: string;
     }
   > = {};
+
   for (const relation of relations) {
     const noteId =
       relation.toType === "reminder" ? relation.fromId : relation.toId;
@@ -110,7 +115,6 @@ async function resolveNotes(ids: string[]) {
     grouped[noteId] = data;
   }
 
-  console.time("resolve");
   const resolved = {
     notebooks: await db.notebooks.all.records(
       Array.from(relationIds.notebooks)
@@ -119,7 +123,6 @@ async function resolveNotes(ids: string[]) {
     colors: await db.colors.all.records(Array.from(relationIds.colors)),
     reminders: await db.reminders.all.records(Array.from(relationIds.reminders))
   };
-  console.timeEnd("resolve");
 
   const data: NoteResolvedData[] = [];
   for (const noteId of ids) {
@@ -129,6 +132,7 @@ async function resolveNotes(ids: string[]) {
       continue;
     }
 
+    const attachments = db.attachments?.ofNote(noteId, "all");
     data.push({
       color: group.color ? resolved.colors[group.color] : undefined,
       reminder: group.reminder ? resolved.reminders[group.reminder] : undefined,
@@ -138,11 +142,14 @@ async function resolveNotes(ids: string[]) {
       notebooks: withDateEdited(
         group.notebooks.map((id) => resolved.notebooks[id]).filter(Boolean)
       ),
-      attachmentsCount:
-        (await db.attachments?.ofNote(noteId, "all").ids())?.length || 0
+      attachments: {
+        total: await attachments.count(),
+        failed: await attachments
+          .where((eb) => eb("attachments.failed", "is not", eb.lit(null)))
+          .count()
+      }
     });
   }
-
   return data;
 }
 

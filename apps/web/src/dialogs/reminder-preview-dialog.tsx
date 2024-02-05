@@ -25,8 +25,7 @@ import { Reminder } from "@notesnook/core/dist/types";
 import IconTag from "../components/icon-tag";
 import { Clock, Refresh } from "../components/icons";
 import Note from "../components/note";
-import { getFormattedReminderTime } from "@notesnook/common";
-import usePromise from "../hooks/use-promise";
+import { getFormattedReminderTime, usePromise } from "@notesnook/common";
 
 export type ReminderPreviewDialogProps = {
   onClose: Perform;
