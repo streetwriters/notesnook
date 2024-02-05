@@ -43,7 +43,7 @@ import DialogHeader from "../../dialog/dialog-header";
 import { ProTag } from "../../premium/pro-tag";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
-import { PressableButton } from "../../ui/pressable";
+import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
@@ -183,9 +183,9 @@ const ExportNotesSheet = ({
           actions.map((item) => (
             <Fragment key={item.title}>
               <Seperator half />
-              <PressableButton
+              <Pressable
                 onPress={item.func}
-                customStyle={{
+                style={{
                   width: "100%",
                   alignItems: "center",
                   flexDirection: "row",
@@ -232,7 +232,7 @@ const ExportNotesSheet = ({
                     {item.desc}
                   </Paragraph>
                 </View>
-              </PressableButton>
+              </Pressable>
             </Fragment>
           ))
         ) : (
@@ -263,7 +263,7 @@ const ExportNotesSheet = ({
                   name="export"
                   color={colors.primary.icon}
                   size={50}
-                  customStyle={{
+                  style={{
                     width: 70,
                     height: 70
                   }}
@@ -316,7 +316,7 @@ const ExportNotesSheet = ({
                 />
                 <Button
                   title="Share"
-                  type="grayAccent"
+                  type="secondaryAccented"
                   width={250}
                   fontSize={SIZE.md}
                   style={{
@@ -340,7 +340,7 @@ const ExportNotesSheet = ({
                 />
                 <Button
                   title="Export in another format"
-                  type="grayAccent"
+                  type="secondaryAccented"
                   width={250}
                   fontSize={SIZE.md}
                   style={{

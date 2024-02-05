@@ -54,7 +54,7 @@ export const Title = ({ text, style = {}, inline }) => {
       </Heading>
 
       <Button
-        type="gray"
+        type="plain"
         icon="close"
         height={null}
         onPress={() => {

@@ -88,7 +88,7 @@ export const Tip = ({
         {neverShowAgain && (
           <Button
             title="Never show again"
-            type="grayBg"
+            type="secondary"
             icon="close"
             fontSize={SIZE.xs}
             iconSize={SIZE.xs}

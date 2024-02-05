@@ -98,7 +98,7 @@ export const Component = ({ close, promo }) => {
         onPress={() => {
           close();
         }}
-        customStyle={{
+        style={{
           position: "absolute",
           right: DDS.isTab ? 30 : 15,
           top: Platform.OS === "ios" ? 0 : 30,
@@ -219,7 +219,7 @@ export const Component = ({ close, promo }) => {
           title={
             promo ? promo.text : user ? "See all plans" : "Sign up for free"
           }
-          type={userCanRequestTrial ? "grayAccent" : "accent"}
+          type={userCanRequestTrial ? "secondaryAccented" : "accent"}
           width={250}
           style={{
             paddingHorizontal: 12,

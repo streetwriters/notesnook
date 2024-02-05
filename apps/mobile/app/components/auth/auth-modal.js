@@ -158,7 +158,7 @@ const AuthModal = () => {
                 hideAuth();
               }}
               iconSize={16}
-              type="gray"
+              type="plain"
               iconPosition="right"
               icon="chevron-right"
               height={25}

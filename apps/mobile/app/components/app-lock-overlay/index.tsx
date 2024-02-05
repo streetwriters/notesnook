@@ -199,7 +199,7 @@ const AppLockedOverlay = () => {
         <IconButton
           name="fingerprint"
           size={100}
-          customStyle={{
+          style={{
             width: 100,
             height: 100,
             marginBottom: 20,

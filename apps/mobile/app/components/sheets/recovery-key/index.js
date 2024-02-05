@@ -292,7 +292,7 @@ class RecoveryKeySheet extends React.Component {
             icon="content-copy"
             title="Copy to clipboard"
             width="100%"
-            type="grayAccent"
+            type="secondaryAccented"
             fontSize={SIZE.md}
           />
           <Seperator />
@@ -300,7 +300,7 @@ class RecoveryKeySheet extends React.Component {
             title="Save QR-Code to gallery"
             onPress={this.saveQRCODE}
             width="100%"
-            type="grayAccent"
+            type="secondaryAccented"
             fontSize={SIZE.md}
             icon="qrcode"
           />
@@ -309,7 +309,7 @@ class RecoveryKeySheet extends React.Component {
             onPress={this.saveToTextFile}
             title="Save to text file"
             width="100%"
-            type="grayAccent"
+            type="secondaryAccented"
             icon="text"
             fontSize={SIZE.md}
           />
@@ -319,7 +319,7 @@ class RecoveryKeySheet extends React.Component {
             onPress={this.shareFile}
             title="Share to Cloud"
             width="100%"
-            type="grayAccent"
+            type="secondaryAccented"
             icon="cloud"
             fontSize={SIZE.md}
           />

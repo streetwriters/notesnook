@@ -103,7 +103,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 key={item.title}
                 title={item.title}
                 fontSize={SIZE.sm}
-                type="gray"
+                type="plain"
                 onPress={() => onPress(item)}
                 width={null}
                 height={30}
@@ -149,7 +149,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 key={item.title}
                 title={item.title}
                 fontSize={SIZE.xs}
-                type="gray"
+                type="plain"
                 onPress={() => onPress(item)}
                 width={null}
                 height={30}

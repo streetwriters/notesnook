@@ -102,7 +102,7 @@ export const Synced = ({ item, close }) => {
         title="Learn more"
         fontSize={SIZE.xs}
         height={30}
-        type="grayAccent"
+        type="secondaryAccented"
       />
     </View>
   ) : null;

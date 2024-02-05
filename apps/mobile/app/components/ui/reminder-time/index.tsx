@@ -55,7 +55,7 @@ export const ReminderTime = ({
       icon="bell"
       fontSize={SIZE.xs}
       iconSize={SIZE.sm}
-      type="grayBg"
+      type="secondary"
       buttonType={
         isTodayOrTomorrow
           ? {

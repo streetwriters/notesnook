@@ -50,7 +50,7 @@ import { openNote } from "../list-items/note/wrapper";
 import { DateMeta } from "../properties/date-meta";
 import { Button } from "../ui/button";
 import { Notice } from "../ui/notice";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
@@ -291,7 +291,7 @@ const Actions = ({
             </Heading>
 
             {notes.map((item) => (
-              <PressableButton
+              <Pressable
                 onPress={async () => {
                   eSendEvent(eCloseSheet, contextId);
                   await sleep(150);
@@ -299,7 +299,7 @@ const Actions = ({
                   await sleep(300);
                   openNote(item, (item as any).type === "trash");
                 }}
-                customStyle={{
+                style={{
                   paddingVertical: 12,
                   alignItems: "flex-start",
 
@@ -308,7 +308,7 @@ const Actions = ({
                 key={item.id}
               >
                 <Paragraph size={SIZE.xs}>{item.title}</Paragraph>
-              </PressableButton>
+              </Pressable>
             ))}
           </>
         </View>
@@ -319,7 +319,7 @@ const Actions = ({
           key={item.name}
           buttonType={{
             text:
-              item.name === "Delete" || item.name === "PermDelete"
+              item.name === "Delete"
                 ? colors.error.paragraph
                 : colors.primary.paragraph
           }}
@@ -327,7 +327,7 @@ const Actions = ({
           title={item.name}
           icon={item.icon}
           loading={loading?.name === item.name}
-          type="gray"
+          type="plain"
           fontSize={SIZE.sm}
           style={{
             borderRadius: 0,

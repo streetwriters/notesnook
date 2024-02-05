@@ -22,7 +22,7 @@ import React from "react";
 import { Platform, ScrollView, View } from "react-native";
 import Animated from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { PressableButton } from "../../components/ui/pressable";
+import { Pressable } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
@@ -114,9 +114,9 @@ const AppLock = () => {
             }}
           >
             {modes.map((item) => (
-              <PressableButton
+              <Pressable
                 key={item.title}
-                type={appLockMode === item.value ? "grayBg" : "transparent"}
+                type={appLockMode === item.value ? "secondary" : "transparent"}
                 onPress={async () => {
                   if (
                     !(await BiometicService.isBiometryAvailable()) &&
@@ -154,7 +154,7 @@ const AppLock = () => {
 
                   SettingsService.set({ appLockMode: item.value });
                 }}
-                customStyle={{
+                style={{
                   justifyContent: "flex-start",
                   alignItems: "flex-start",
                   paddingHorizontal: 12,
@@ -166,9 +166,6 @@ const AppLock = () => {
                     appLockMode === item.value
                       ? item.activeColor
                       : colors.secondary.background
-                }}
-                style={{
-                  marginBottom: 10
                 }}
               >
                 <Heading
@@ -193,7 +190,7 @@ const AppLock = () => {
                 >
                   {item.desc}
                 </Paragraph>
-              </PressableButton>
+              </Pressable>
             ))}
           </ScrollView>
         </>

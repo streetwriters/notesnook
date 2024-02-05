@@ -287,8 +287,8 @@ export default function ReminderSheet({
                   ReminderNotificationModes[
                     mode as keyof typeof ReminderNotificationModes
                   ]
-                    ? "grayAccent"
-                    : "gray"
+                    ? "secondaryAccented"
+                    : "plain"
                 }
                 onPress={() => {
                   const _mode = ReminderNotificationModes[
@@ -358,7 +358,7 @@ export default function ReminderSheet({
                 reminderMode ===
                 ReminderModes[mode as keyof typeof ReminderModes]
                   ? "selected"
-                  : "gray"
+                  : "plain"
               }
               onPress={() => {
                 if (mode === "Repeat" && !PremiumService.get()) return;
@@ -413,8 +413,8 @@ export default function ReminderSheet({
                   type={
                     recurringMode ===
                     RecurringModes[mode as keyof typeof RecurringModes]
-                      ? "selected"
-                      : "gray"
+                      ? "secondaryAccented"
+                      : "plain"
                   }
                   onPress={() => {
                     setRecurringMode(
@@ -441,7 +441,7 @@ export default function ReminderSheet({
                         index as keyof typeof WeekDayNames
                       ].slice(0, 1)}
                       type={
-                        selectedDays.indexOf(index) > -1 ? "accent" : "gray"
+                        selectedDays.indexOf(index) > -1 ? "accent" : "plain"
                       }
                       fontSize={SIZE.sm - 1}
                       style={{
@@ -471,7 +471,9 @@ export default function ReminderSheet({
                       key={index + "monthday"}
                       title={index + 1 + ""}
                       type={
-                        selectedDays.indexOf(index + 1) > -1 ? "accent" : "gray"
+                        selectedDays.indexOf(index + 1) > -1
+                          ? "accent"
+                          : "plain"
                       }
                       fontSize={SIZE.sm - 1}
                       style={{
@@ -545,7 +547,7 @@ export default function ReminderSheet({
                   width: "100%"
                 }}
                 title={date ? date.toLocaleDateString() : "Select date"}
-                type={date ? "grayAccent" : "grayBg"}
+                type={date ? "secondaryAccented" : "secondary"}
                 icon="calendar"
                 fontSize={SIZE.md}
                 onPress={() => {

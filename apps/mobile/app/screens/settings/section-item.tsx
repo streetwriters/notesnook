@@ -29,7 +29,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
 import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
-import { PressableButton } from "../../components/ui/pressable";
+import { Pressable } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
 import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
@@ -92,9 +92,9 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   };
 
   return isHidden ? null : (
-    <PressableButton
+    <Pressable
       disabled={item.type === "component"}
-      customStyle={{
+      style={{
         width: "100%",
         alignItems: "center",
         padding: 12,
@@ -330,7 +330,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       {loading ? (
         <ActivityIndicator size={SIZE.xxl} color={colors.primary.accent} />
       ) : null}
-    </PressableButton>
+    </Pressable>
   );
 };
 export const SectionItem = React.memo(_SectionItem, () => true);

@@ -111,7 +111,7 @@ export const Signup = ({ changeMode, trial }) => {
             paddingHorizontal: 20,
             backgroundColor: colors.secondary.background,
             marginBottom: 20,
-            borderBottomWidth: 1,
+            borderBottomWidth: 0.8,
             borderBottomColor: colors.primary.border,
             alignSelf: deviceMode !== "mobile" ? "center" : undefined,
             borderWidth: deviceMode !== "mobile" ? 1 : null,

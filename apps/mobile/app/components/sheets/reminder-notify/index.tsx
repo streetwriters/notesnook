@@ -138,7 +138,7 @@ export default function ReminderNotify({
         {QuickActions.map((item) => {
           return (
             <Button
-              type="grayAccent"
+              type="secondaryAccented"
               key={item.title}
               title={item.title}
               height={30}

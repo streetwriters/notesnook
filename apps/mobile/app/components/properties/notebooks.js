@@ -28,7 +28,7 @@ import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 
 export default function Notebooks({ note, close, full }) {
   const { colors } = useThemeColors();
@@ -48,15 +48,15 @@ export default function Notebooks({ note, close, full }) {
   };
 
   const renderItem = (item) => (
-    <PressableButton
+    <Pressable
       key={item.id}
       onPress={() => {
         navigateNotebook(item.id);
         eSendEvent(eClearEditor);
         close();
       }}
-      type={full ? "transparent" : "grayBg"}
-      customStyle={{
+      type={full ? "transparent" : "secondary"}
+      style={{
         justifyContent: "flex-start",
         paddingHorizontal: 12,
         flexDirection: "row",
@@ -85,7 +85,7 @@ export default function Notebooks({ note, close, full }) {
       >
         {item.title}
       </Heading>
-    </PressableButton>
+    </Pressable>
   );
 
   return noteNotebooks.length === 0 ? null : (
@@ -110,7 +110,7 @@ export default function Notebooks({ note, close, full }) {
             paddingHorizontal: 0,
             backgroundColor: "transparent"
           }}
-          type="gray"
+          type="plain"
           textStyle={{
             textDecorationLine: "underline"
           }}

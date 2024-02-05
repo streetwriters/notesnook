@@ -651,7 +651,7 @@ const ShareView = () => {
               onPress={() => {
                 useShareStore.getState().setAppendNote(null);
               }}
-              type={!appendNote ? "transparent" : "gray"}
+              type={!appendNote ? "transparent" : "plain"}
               title="New note"
               style={{
                 paddingHorizontal: 12,
@@ -669,7 +669,7 @@ const ShareView = () => {
               onPress={() => {
                 setSearchMode("appendNote");
               }}
-              type={appendNote ? "transparent" : "gray"}
+              type={appendNote ? "transparent" : "plain"}
               title={`Append to a note`}
               style={{
                 paddingHorizontal: 12,

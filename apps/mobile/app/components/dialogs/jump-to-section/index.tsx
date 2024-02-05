@@ -41,7 +41,7 @@ import {
 } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import BaseDialog from "../../dialog/base-dialog";
-import { PressableButton } from "../../ui/pressable";
+import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 
 const JumpToSectionDialog = () => {
@@ -181,11 +181,11 @@ const JumpToSectionDialog = () => {
             >
               {groups?.map((item, index) => {
                 return (
-                  <PressableButton
+                  <Pressable
                     key={item.group.id}
                     onPress={() => onPress(item)}
                     type={currentIndex === index ? "accent" : "transparent"}
-                    customStyle={{
+                    style={{
                       minWidth: "20%",
                       width: null,
                       paddingHorizontal: 12,
@@ -208,7 +208,7 @@ const JumpToSectionDialog = () => {
                     >
                       {item.group.title}
                     </Paragraph>
-                  </PressableButton>
+                  </Pressable>
                 );
               })}
             </View>

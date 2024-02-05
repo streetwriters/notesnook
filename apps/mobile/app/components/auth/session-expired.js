@@ -166,7 +166,7 @@ export const SessionExpired = () => {
             }}
           >
             <IconButton
-              customStyle={{
+              style={{
                 width: 60,
                 height: 60
               }}

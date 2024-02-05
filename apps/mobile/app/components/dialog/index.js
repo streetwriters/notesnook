@@ -189,7 +189,7 @@ export const Dialog = ({ context = "global" }) => {
               height={35}
               width="100%"
               title={dialogInfo.check.info}
-              type={inputValue ? dialogInfo.check.type : "gray"}
+              type={inputValue ? dialogInfo.check.type : "plain"}
             />
           </>
         ) : null}

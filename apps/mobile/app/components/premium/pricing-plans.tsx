@@ -328,7 +328,7 @@ export const PricingPlans = ({
               }
             }}
             title={"Try free for 14 days"}
-            type="grayAccent"
+            type="secondaryAccented"
             width={250}
             style={{
               paddingHorizontal: 12,
