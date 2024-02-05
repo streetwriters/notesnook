@@ -23,6 +23,7 @@ import { Notebook, TrashOrItem, isTrashItem } from "../types";
 import { ICollection } from "./collection";
 import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
+import { sql } from "kysely";
 
 export class Notebooks implements ICollection {
   name = "notebooks";
@@ -239,7 +240,34 @@ export class Notebooks implements ICollection {
   }
 
   async moveToTrash(...ids: string[]) {
-    await this.db.trash.add("notebook", ids);
+    this.db.transaction(async (tr) => {
+      const query = tr
+        .withRecursive(`subNotebooks(id)`, (eb) =>
+          eb
+            .selectFrom((eb) =>
+              sql<{ id: string }>`(VALUES ${sql.join(
+                ids.map((id) => eb.parens(sql`${id}`))
+              )})`.as("notebookIds")
+            )
+            .selectAll()
+            .unionAll((eb) =>
+              eb
+                .selectFrom(["relations", "subNotebooks"])
+                .select("relations.toId as id")
+                .where("toType", "==", "notebook")
+                .where("fromType", "==", "notebook")
+                .whereRef("fromId", "==", "subNotebooks.id")
+                .where("toId", "not in", this.db.trash.cache.notebooks)
+                .$narrowType<{ id: string }>()
+            )
+        )
+        .selectFrom("subNotebooks")
+        .select("id");
+
+      const subNotebookIds = (await query.execute()).map((ref) => ref.id);
+      await this.db.trash.add("notebook", subNotebookIds, "app");
+      await this.db.trash.add("notebook", ids, "user");
+    });
   }
 
   async remove(...ids: string[]) {
