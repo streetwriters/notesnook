@@ -46,10 +46,10 @@ test("permanently delete a note", () =>
     await db.notes.moveToTrash(noteId);
 
     expect(await db.trash.all()).toHaveLength(1);
-    expect(await db.content.get(note.contentId)).toBeDefined();
+    expect(await db.content.get(note?.contentId)).toBeDefined();
     await db.trash.delete(noteId);
     expect(await db.trash.all()).toHaveLength(0);
-    expect(await db.content.get(note.contentId)).toBeUndefined();
+    expect(await db.content.get(note?.contentId)).toBeUndefined();
 
     expect(await db.noteHistory.get(noteId).count()).toBe(0);
   }));
@@ -70,10 +70,10 @@ test("restore a deleted note that was in a notebook", () =>
     expect(await db.trash.all()).toHaveLength(0);
 
     const note = await db.notes.note(id);
-    const content = await db.content.get(note.contentId);
+    const content = await db.content.get(note?.contentId);
 
     expect(note).toBeDefined();
-    expect(content.data).toBe(TEST_NOTE.content.data);
+    expect(content?.data).toBe(TEST_NOTE.content.data);
 
     expect(
       await db.relations
@@ -89,7 +89,7 @@ test("delete a locked note", () =>
     await db.vault.add(id);
     await db.notes.moveToTrash(id);
     expect(await db.trash.all()).toHaveLength(1);
-    expect(await db.content.get(note.contentId)).toBeDefined();
+    expect(await db.content.get(note?.contentId)).toBeDefined();
   }));
 
 test("restore a deleted locked note", () =>
@@ -99,7 +99,7 @@ test("restore a deleted locked note", () =>
     await db.vault.add(id);
     await db.notes.moveToTrash(id);
     expect(await db.trash.all()).toHaveLength(1);
-    expect(await db.content.get(note.contentId)).toBeDefined();
+    expect(await db.content.get(note?.contentId)).toBeDefined();
     await db.trash.restore(id);
 
     note = await db.notes.note(id);
@@ -134,41 +134,6 @@ test("delete a notebook", () =>
     expect(
       await db.relations.to({ type: "note", id: noteId }, "notebook").count()
     ).toBe(0);
-  }));
-
-test("restore a deleted notebook", () =>
-  notebookTest().then(async ({ db, id }) => {
-    const noteId = await db.notes.add(TEST_NOTE);
-    await db.notes.addToNotebook(id, noteId);
-
-    await db.notebooks.moveToTrash(id);
-    await db.trash.restore(id);
-
-    const notebook = db.notebooks.notebook(id);
-    expect(notebook).toBeDefined();
-
-    expect(
-      await db.relations.to({ type: "note", id: noteId }, "notebook").count()
-    ).toBe(1);
-    expect(
-      await db.relations.to({ type: "note", id: noteId }, "notebook").has(id)
-    ).toBe(true);
-  }));
-
-test("restore a notebook that has deleted notes", () =>
-  notebookTest().then(async ({ db, id }) => {
-    const noteId = await db.notes.add(TEST_NOTE);
-    await db.notes.addToNotebook(id, noteId);
-
-    await db.notebooks.moveToTrash(id);
-    await db.notes.moveToTrash(noteId);
-    await db.trash.restore(id);
-
-    const notebook = db.notebooks.notebook(id);
-    expect(notebook).toBeDefined();
-    expect(
-      await db.relations.from({ type: "notebook", id: id }, "note").has(noteId)
-    ).toBe(false);
   }));
 
 test("permanently delete items older than 7 days", () =>
@@ -242,4 +207,156 @@ test("clear trash should delete note content", () =>
     expect(content).toBeUndefined();
 
     expect(await db.noteHistory.get(noteId).count()).toBe(0);
+  }));
+
+test("deleting a notebook should delete all its subnotebooks", () =>
+  databaseTest().then(async (db) => {
+    const parent = await db.notebooks.add({ title: "Parent" });
+    const child = await db.notebooks.add({ title: "Child" });
+    await db.relations.add(
+      { id: parent, type: "notebook" },
+      { id: child, type: "notebook" }
+    );
+
+    await db.notebooks.moveToTrash(parent);
+
+    expect(await db.notebooks.notebook(child)).toBeUndefined();
+  }));
+
+test("deleting a notebook should not re-delete already deleted subnotebooks", () =>
+  databaseTest().then(async (db) => {
+    const parent = await db.notebooks.add({ title: "Parent" });
+    const child = await db.notebooks.add({ title: "Child" });
+    const child2 = await db.notebooks.add({ title: "Child" });
+    const child3 = await db.notebooks.add({ title: "Child" });
+    await db.relations.add(
+      { id: parent, type: "notebook" },
+      { id: child, type: "notebook" }
+    );
+    await db.relations.add(
+      { id: parent, type: "notebook" },
+      { id: child2, type: "notebook" }
+    );
+    await db.relations.add(
+      { id: parent, type: "notebook" },
+      { id: child3, type: "notebook" }
+    );
+
+    await db.notebooks.moveToTrash(child3);
+    await db.notebooks.moveToTrash(parent);
+
+    expect((await db.trash.all()).some((a) => a.id === child3)).toBe(true);
+    expect((await db.trash.all()).some((a) => a.id === parent)).toBe(true);
+    expect((await db.trash.all()).some((a) => a.id === child2)).toBe(false);
+    expect((await db.trash.all()).some((a) => a.id === child)).toBe(false);
+  }));
+
+test("restoring a deleted notebook should also restore all its subnotebooks", () =>
+  databaseTest().then(async (db) => {
+    const parent = await db.notebooks.add({ title: "Parent" });
+    const child = await db.notebooks.add({ title: "Child" });
+    await db.relations.add(
+      { id: parent, type: "notebook" },
+      { id: child, type: "notebook" }
+    );
+    await db.notebooks.moveToTrash(parent);
+
+    await db.trash.restore(parent);
+
+    expect(await db.notebooks.notebook(child)).toBeDefined();
+    expect(
+      await db.relations
+        .from({ id: parent, type: "notebook" }, "notebook")
+        .has(child)
+    ).toBe(true);
+  }));
+
+test("restoring a deleted notebook should link it back to its notes", () =>
+  notebookTest().then(async ({ db, id }) => {
+    const noteId = await db.notes.add(TEST_NOTE);
+    await db.notes.addToNotebook(id, noteId);
+
+    await db.notebooks.moveToTrash(id);
+    await db.trash.restore(id);
+
+    const notebook = db.notebooks.notebook(id);
+    expect(notebook).toBeDefined();
+
+    expect(
+      await db.relations.to({ type: "note", id: noteId }, "notebook").count()
+    ).toBe(1);
+    expect(
+      await db.relations.to({ type: "note", id: noteId }, "notebook").has(id)
+    ).toBe(true);
+  }));
+
+test("restoring a notebook should not restore its deleted notes", () =>
+  notebookTest().then(async ({ db, id }) => {
+    const noteId = await db.notes.add(TEST_NOTE);
+    await db.notes.addToNotebook(id, noteId);
+
+    await db.notebooks.moveToTrash(id);
+    await db.notes.moveToTrash(noteId);
+    await db.trash.restore(id);
+
+    const notebook = db.notebooks.notebook(id);
+    expect(notebook).toBeDefined();
+    expect(
+      await db.relations.from({ type: "notebook", id: id }, "note").has(noteId)
+    ).toBe(false);
+  }));
+
+test("restoring a notebook should not restore independently deleted subnotebooks", () =>
+  databaseTest().then(async (db) => {
+    const parent = await db.notebooks.add({ title: "Parent" });
+    const child = await db.notebooks.add({ title: "Child" });
+    const child2 = await db.notebooks.add({ title: "Child" });
+    const child3 = await db.notebooks.add({ title: "Child" });
+    await db.relations.add(
+      { id: parent, type: "notebook" },
+      { id: child, type: "notebook" }
+    );
+    await db.relations.add(
+      { id: parent, type: "notebook" },
+      { id: child2, type: "notebook" }
+    );
+    await db.relations.add(
+      { id: parent, type: "notebook" },
+      { id: child3, type: "notebook" }
+    );
+    await db.notebooks.moveToTrash(child3);
+    await db.notebooks.moveToTrash(parent);
+
+    await db.trash.restore(parent);
+
+    expect(await db.notebooks.notebook(child3)).toBeUndefined();
+  }));
+
+test("permanently deleting a notebook should not delete independently deleted subnotebooks", () =>
+  databaseTest().then(async (db) => {
+    const parent = await db.notebooks.add({ title: "Parent" });
+    const child = await db.notebooks.add({ title: "Child" });
+    const child2 = await db.notebooks.add({ title: "Child" });
+    const child3 = await db.notebooks.add({ title: "Child" });
+    await db.relations.add(
+      { id: parent, type: "notebook" },
+      { id: child, type: "notebook" }
+    );
+    await db.relations.add(
+      { id: parent, type: "notebook" },
+      { id: child2, type: "notebook" }
+    );
+    await db.relations.add(
+      { id: parent, type: "notebook" },
+      { id: child3, type: "notebook" }
+    );
+    await db.notebooks.moveToTrash(child3);
+    await db.notebooks.moveToTrash(parent);
+
+    await db.trash.delete(parent);
+
+    expect((await db.trash.all()).some((a) => a.id === child3)).toBe(true);
+    expect((await db.trash.all()).some((a) => a.id === parent)).toBe(false);
+    expect((await db.trash.all()).some((a) => a.id === child2)).toBe(false);
+    expect((await db.trash.all()).some((a) => a.id === child)).toBe(false);
   }));

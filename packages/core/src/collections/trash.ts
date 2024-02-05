@@ -91,19 +91,25 @@ export default class Trash {
     await this._delete(noteIds, notebookIds);
   }
 
-  async add(type: "note" | "notebook", ids: string[]) {
+  async add(
+    type: "note" | "notebook",
+    ids: string[],
+    deletedBy: TrashItem["deletedBy"] = "user"
+  ) {
     if (type === "note") {
       await this.db.notes.collection.update(ids, {
         type: "trash",
         itemType: "note",
-        dateDeleted: Date.now()
+        dateDeleted: Date.now(),
+        deletedBy
       });
       this.cache.notes.push(...ids);
     } else if (type === "notebook") {
       await this.db.notebooks.collection.update(ids, {
         type: "trash",
         itemType: "notebook",
-        dateDeleted: Date.now()
+        dateDeleted: Date.now(),
+        deletedBy
       });
       this.cache.notebooks.push(...ids);
     }
@@ -137,9 +143,10 @@ export default class Trash {
     }
 
     if (notebookIds.length > 0) {
-      await this.db.relations.unlinkOfType("notebook", notebookIds);
-      await this.db.notebooks.remove(...notebookIds);
-      deleteItems(this.cache.notebooks, ...notebookIds);
+      const ids = [...notebookIds, ...(await this.subNotebooks(notebookIds))];
+      await this.db.notebooks.remove(...ids);
+      await this.db.relations.unlinkOfType("notebook", ids);
+      deleteItems(this.cache.notebooks, ...ids);
     }
   }
 
@@ -152,10 +159,10 @@ export default class Trash {
       const isNote = this.cache.notes.includes(id);
       if (isNote) {
         noteIds.push(id);
-        this.cache.notes.splice(this.cache.notes.indexOf(id), 1);
+        //  this.cache.notes.splice(this.cache.notes.indexOf(id), 1);
       } else if (!isNote) {
         notebookIds.push(id);
-        this.cache.notebooks.splice(this.cache.notebooks.indexOf(id), 1);
+        // this.cache.notebooks.splice(this.cache.notebooks.indexOf(id), 1);
       }
     }
 
@@ -163,16 +170,21 @@ export default class Trash {
       await this.db.notes.collection.update(noteIds, {
         type: "note",
         dateDeleted: null,
-        itemType: null
+        itemType: null,
+        deletedBy: null
       });
+      deleteItems(this.cache.notes, ...noteIds);
     }
 
     if (notebookIds.length > 0) {
-      await this.db.notebooks.collection.update(notebookIds, {
+      const ids = [...notebookIds, ...(await this.subNotebooks(notebookIds))];
+      await this.db.notebooks.collection.update(ids, {
         type: "notebook",
         dateDeleted: null,
-        itemType: null
+        itemType: null,
+        deletedBy: null
       });
+      deleteItems(this.cache.notebooks, ...ids);
     }
   }
 
@@ -202,6 +214,7 @@ export default class Trash {
       .selectFrom("notes")
       .where("type", "==", "trash")
       .where("id", "in", ids)
+      .where("deletedBy", "==", "user")
       .selectAll()
       .execute()) as TrashItem[];
   }
@@ -212,6 +225,7 @@ export default class Trash {
       .selectFrom("notebooks")
       .where("type", "==", "trash")
       .where("id", "in", ids)
+      .where("deletedBy", "==", "user")
       .selectAll()
       .execute()) as TrashItem[];
   }
@@ -263,5 +277,43 @@ export default class Trash {
    */
   exists(id: string) {
     return this.cache.notebooks.includes(id) || this.cache.notes.includes(id);
+  }
+
+  private async subNotebooks(notebookIds: string[]) {
+    const ids = await this.db
+      .sql()
+      .withRecursive(`subNotebooks(id)`, (eb) =>
+        eb
+          .selectFrom((eb) =>
+            sql<{ id: string }>`(VALUES ${sql.join(
+              notebookIds.map((id) => eb.parens(sql`${id}`))
+            )})`.as("notebookIds")
+          )
+          .selectAll()
+          .unionAll((eb) =>
+            eb
+              .selectFrom(["relations", "subNotebooks", "notebooks"])
+              .select("relations.toId as id")
+              .where("toType", "==", "notebook")
+              .where("fromType", "==", "notebook")
+              .whereRef("fromId", "==", "subNotebooks.id")
+              .where(
+                (eb) =>
+                  eb
+                    .selectFrom("notebooks")
+                    .whereRef("notebooks.id", "==", "relations.toId")
+                    .where("notebooks.type", "==", "trash")
+                    .limit(1)
+                    .select("deletedBy"),
+                "!=",
+                "user"
+              )
+              .$narrowType<{ id: string }>()
+          )
+      )
+      .selectFrom("subNotebooks")
+      .select("id")
+      .execute();
+    return ids.map((ref) => ref.id);
   }
 }

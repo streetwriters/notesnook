@@ -293,7 +293,8 @@ const addTrashColumns = <T extends string, C extends string = never>(
   return builder
 
     .addColumn("dateDeleted", "integer")
-    .addColumn("itemType", "text");
+    .addColumn("itemType", "text")
+    .addColumn("deletedBy", "text");
 };
 
 type Tokenizer = "porter" | "trigram" | "unicode61" | "ascii";

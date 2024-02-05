@@ -175,6 +175,10 @@ const migrations: Migration[] = [
   {
     version: 5.9,
     items: {
+      trash: (item) => {
+        if (!item.deletedBy) item.deletedBy = "user";
+        return true;
+      },
       tag: async (item, db) => {
         const oldTagId = makeId(item.title);
         const alias = db.legacySettings.getAlias(item.id);
@@ -311,6 +315,11 @@ const migrations: Migration[] = [
           });
           if (!subNotebookId) continue;
           await db.relations.add(item, { id: subNotebookId, type: "notebook" });
+          // if the parent notebook is deleted, we should delete the newly
+          // created notebooks too
+          if (item.dateDeleted !== null) {
+            await db.trash.add("notebook", [subNotebookId], "app");
+          }
         }
         delete item.topics;
         delete item.totalNotes;
