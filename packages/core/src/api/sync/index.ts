@@ -286,8 +286,6 @@ class Sync {
 
   async processChunk(chunk: SyncTransferItem, key: SerializedKey) {
     const itemType = chunk.type;
-    if (itemType === "settings") return;
-
     const decrypted = await this.db.storage().decryptMulti(key, chunk.items);
 
     const deserialized: MaybeDeletedItem<Item>[] = [];
@@ -313,11 +311,11 @@ class Sync {
         itemType === "attachment"
           ? await Promise.all(
               deserialized.map((item) =>
-                this.merger.mergeItemAsync(item, localItems[item.id], itemType)
+                this.merger.mergeAttachment(item, localItems[item.id])
               )
             )
           : deserialized.map((item) =>
-              this.merger.mergeItemSync(item, localItems[item.id], itemType)
+              this.merger.mergeItem(item, localItems[item.id])
             );
     }
 

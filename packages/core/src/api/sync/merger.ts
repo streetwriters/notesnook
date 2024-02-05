@@ -20,7 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { logger } from "../../logger";
 import { isHTMLEqual } from "../../utils/html-diff";
 import Database from "..";
-import { ContentItem, Item, MaybeDeletedItem, isDeleted } from "../../types";
+import {
+  Attachment,
+  ContentItem,
+  Item,
+  MaybeDeletedItem,
+  isDeleted
+} from "../../types";
 
 const THRESHOLD = process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
 class Merger {
@@ -31,33 +37,12 @@ class Merger {
   //   return type in SYNC_COLLECTIONS_MAP;
   // }
 
-  mergeItemSync(
+  mergeItem(
     remoteItem: MaybeDeletedItem<Item>,
-    localItem: MaybeDeletedItem<Item> | undefined,
-    type:
-      | "shortcut"
-      | "reminder"
-      | "tag"
-      | "color"
-      | "note"
-      | "relation"
-      | "notebook"
-      | "settingitem"
+    localItem: MaybeDeletedItem<Item> | undefined
   ) {
-    switch (type) {
-      case "shortcut":
-      case "reminder":
-      case "tag":
-      case "color":
-      case "note":
-      case "relation":
-      case "notebook":
-      case "settingitem": {
-        if (!localItem || remoteItem.dateModified > localItem.dateModified) {
-          return remoteItem;
-        }
-        break;
-      }
+    if (!localItem || remoteItem.dateModified > localItem.dateModified) {
+      return remoteItem;
     }
   }
 
@@ -78,9 +63,7 @@ class Merger {
       !localItem.data ||
       !remoteItem.data
     ) {
-      if (!localItem || remoteItem.dateModified > localItem.dateModified)
-        return remoteItem;
-      return;
+      return this.mergeItem(remoteItem, localItem);
     } else {
       // it's possible that the local item already has a conflict so
       // we can just replace the conflicted content
@@ -101,48 +84,41 @@ class Merger {
     }
   }
 
-  async mergeItemAsync(
-    remoteItem: MaybeDeletedItem<Item>,
-    localItem: MaybeDeletedItem<Item> | undefined,
-    type: "attachment"
+  async mergeAttachment(
+    remoteItem: MaybeDeletedItem<Attachment>,
+    localItem: MaybeDeletedItem<Attachment> | undefined
   ) {
-    switch (type) {
-      case "attachment": {
-        if (!localItem) return remoteItem;
-        if (
-          isDeleted(localItem) ||
-          isDeleted(remoteItem) ||
-          remoteItem.type !== "attachment" ||
-          localItem.type !== "attachment"
-        ) {
-          if (remoteItem.dateModified > localItem.dateModified)
-            return remoteItem;
-          return;
-        }
-
-        if (localItem.dateUploaded !== remoteItem.dateUploaded) {
-          const isRemoved = await this.db.attachments.remove(
-            localItem.hash,
-            true
-          );
-          if (!isRemoved)
-            throw new Error(
-              "Conflict could not be resolved in one of the attachments."
-            );
-        }
-        return remoteItem;
-      }
+    if (
+      !localItem ||
+      isDeleted(localItem) ||
+      isDeleted(remoteItem) ||
+      !localItem.dateUploaded ||
+      !remoteItem.dateUploaded
+    ) {
+      return this.mergeItem(remoteItem, localItem);
     }
+
+    if (localItem.dateUploaded > remoteItem.dateUploaded) return;
+
+    const isRemoved = await this.db.attachments.remove(localItem.hash, true);
+    if (!isRemoved)
+      throw new Error(
+        "Conflict could not be resolved in one of the attachments."
+      );
+    return remoteItem;
   }
 }
 export default Merger;
 
-function isContentConflicted(
+export function isContentConflicted(
   localItem: ContentItem,
   remoteItem: ContentItem,
   conflictThreshold: number
 ) {
-  const isResolved = localItem.dateResolved === remoteItem.dateModified;
+  const isResolved =
+    localItem.dateResolved &&
+    remoteItem.dateModified &&
+    localItem.dateResolved === remoteItem.dateModified;
   const isEdited =
     // the local item is edited if it was changed/edited after the remote
     // note and it also wasn't synced yet.

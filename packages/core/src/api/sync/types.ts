@@ -19,38 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Cipher } from "@notesnook/crypto";
 
-export type SyncableItemType =
-  | "note"
-  | "shortcut"
-  | "notebook"
-  | "content"
-  | "attachment"
-  | "reminder"
-  | "relation"
-  | "color"
-  | "tag"
-  | "settings"
-  | "settingitem";
-
 export type SyncItem = {
   id: string;
   v: number;
 } & Cipher<"base64">;
 
-// export const SYNC_COLLECTIONS_MAP = {
-//   note: "notes",
-//   notebook: "notebooks",
-//   shortcut: "shortcuts",
-//   reminder: "reminders",
-//   relation: "relations",
-//   tag: "tags",
-//   color: "colors",
-//   settingitem: "settings"
-// } as const;
-
-// export const ASYNC_COLLECTIONS_MAP = {
-//   content: "content"
-// } as const;
+export type SyncableItemType = keyof typeof SYNC_COLLECTIONS_MAP;
 
 export const SYNC_COLLECTIONS_MAP = {
   settingitem: "settings",
@@ -62,21 +36,13 @@ export const SYNC_COLLECTIONS_MAP = {
   relation: "relations",
   tag: "tags",
   color: "colors",
-  note: "notes"
+  note: "notes",
+  vault: "vaults"
 } as const;
 
-export const SYNC_ITEM_TYPES = [
-  "settingitem",
-  "attachment",
-  "content",
-  "notebook",
-  "shortcut",
-  "reminder",
-  "relation",
-  "tag",
-  "color",
-  "note"
-] as const;
+export const SYNC_ITEM_TYPES = Object.keys(
+  SYNC_COLLECTIONS_MAP
+) as SyncableItemType[];
 
 export type SyncTransferItem = {
   items: SyncItem[];
