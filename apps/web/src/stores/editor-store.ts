@@ -135,7 +135,7 @@ class EditorStore extends BaseStore<EditorStore> {
   openSession = async (noteId: string, force = false) => {
     const session = this.get().session;
 
-    if (session.id) await db.fs().cancel(session.id, "download");
+    if (session.id) await db.fs().cancel(session.id);
     if (session.id === noteId && !force) return;
 
     if (session.state === SESSION_STATES.unlocked) {
@@ -285,7 +285,7 @@ class EditorStore extends BaseStore<EditorStore> {
   newSession = async (nonce?: string) => {
     const context = noteStore.get().context;
     const session = this.get().session;
-    if (session.id) await db.fs().cancel(session.id, "download");
+    if (session.id) await db.fs().cancel(session.id);
 
     this.set((state) => {
       state.session = {
@@ -302,7 +302,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
   clearSession = async (shouldNavigate = true) => {
     const session = this.get().session;
-    if (session.id) await db.fs().cancel(session.id, "download");
+    if (session.id) await db.fs().cancel(session.id);
 
     this.set((state) => {
       state.session = {

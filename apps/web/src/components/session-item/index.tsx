@@ -69,7 +69,6 @@ export function SessionItem(props: SessionItemProps) {
             try {
               const decryptedContent = await db.vault.decryptContent(
                 content,
-                noteId,
                 password
               );
               onOpenPreviewSession({

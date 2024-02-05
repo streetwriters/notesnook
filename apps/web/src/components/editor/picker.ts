@@ -190,8 +190,8 @@ async function addAttachment(
         metadata: {
           hash,
           hashType,
-          filename: exists?.metadata.filename || file.name,
-          type: exists?.metadata.type || file.type
+          filename: exists?.filename || file.name,
+          type: exists?.type || file.type
         },
         key
       });

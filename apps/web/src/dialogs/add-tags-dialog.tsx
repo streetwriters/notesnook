@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Flex, Text } from "@theme-ui/components";
 import {
   CheckCircleOutline,
@@ -34,6 +34,7 @@ import { FilteredList } from "../components/filtered-list";
 import { ItemReference, Tag } from "@notesnook/core/dist/types";
 import { ResolvedItem } from "../components/list-container/resolved-item";
 import { create } from "zustand";
+import { VirtualizedGrouping } from "@notesnook/core";
 
 type SelectedReference = {
   id: string;
@@ -58,14 +59,18 @@ export type AddTagsDialogProps = {
 function AddTagsDialog(props: AddTagsDialogProps) {
   const { onClose, noteIds } = props;
 
-  const tags = useStore((store) => store.tags);
+  const [tags, setTags] = useState<VirtualizedGrouping<Tag> | undefined>(
+    () => useStore.getState().tags
+  );
 
   useEffect(() => {
     (async function () {
       if (!tags) {
         await useStore.getState().refresh();
+        setTags(useStore.getState().tags);
         return;
       }
+
       const selected: SelectedReference[] = [];
       const selectedTags = await db.relations
         .to({ type: "note", ids: noteIds }, "tag")
@@ -76,7 +81,7 @@ function AddTagsDialog(props: AddTagsDialogProps) {
       });
       useSelectionStore.getState().setSelected(selected);
     })();
-  }, [tags, noteIds]);
+  }, []);
 
   return (
     <Dialog
@@ -119,7 +124,13 @@ function AddTagsDialog(props: AddTagsDialogProps) {
             empty: "Add a new tag",
             filter: "Search or add a new tag"
           }}
-          filter={(query) => db.lookup.tags(query).ids()}
+          filter={async (query) => {
+            setTags(
+              query
+                ? await db.lookup.tags(query).sorted()
+                : useStore.getState().tags
+            );
+          }}
           onCreateNewItem={async (title) => {
             const tagId = await db.tags.add({ title });
             if (!tagId) return;
@@ -201,8 +212,4 @@ function SelectedCheck({ id, size = 20 }: { id: string; size?: number }) {
   ) : (
     <CircleEmpty size={size} sx={{ mr: 1, opacity: 0.4 }} />
   );
-}
-
-function tagHasNotes(tagId: string, noteIds: string[]) {
-  return db.relations.from({ type: "tag", id: tagId }, "note").has(...noteIds);
 }
