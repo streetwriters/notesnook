@@ -31,9 +31,15 @@ import { pluralize } from "@notesnook/common";
 async function moveNotesToTrash(ids: string[], confirm = true) {
   if (confirm && !(await showMultiDeleteConfirmation(ids.length))) return;
 
-  const lockedIds = await db.notes.locked.ids();
-  if (ids.some((id) => lockedIds.includes(id)) && !(await Vault.unlockVault()))
-    return;
+  const vault = await db.vaults.default();
+  if (vault) {
+    const lockedIds = await db.relations.from(vault, "note").get();
+    if (
+      ids.some((id) => lockedIds.findIndex((s) => s.toId === id) > -1) &&
+      !(await Vault.unlockVault())
+    )
+      return;
+  }
 
   const items = ids.filter((id) => !db.monographs.isPublished(id));
 
