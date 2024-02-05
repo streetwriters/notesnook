@@ -26,8 +26,6 @@ import {
   isDeleted
 } from "../types";
 import { StorageAccessor } from "../interfaces";
-import EventManager from "../utils/event-manager";
-import { chunkedIterate } from "../utils/array";
 
 /**
  * @deprecated only kept here for migration purposes
@@ -40,12 +38,8 @@ export class CachedCollection<
   private cache = new Map<string, MaybeDeletedItem<T>>();
   private cachedItems?: T[];
 
-  constructor(
-    storage: StorageAccessor,
-    type: TCollectionType,
-    eventManager: EventManager
-  ) {
-    this.collection = new IndexedCollection(storage, type, eventManager);
+  constructor(storage: StorageAccessor, type: TCollectionType) {
+    this.collection = new IndexedCollection(storage, type);
   }
 
   async init() {
@@ -68,28 +62,6 @@ export class CachedCollection<
     this.invalidateCache();
   }
 
-  async update(item: T) {
-    await this.collection.updateItem(item);
-    this.cache.set(item.id, item);
-    this.invalidateCache();
-  }
-
-  async delete(id: string) {
-    this.cache.delete(id);
-    await this.collection.deleteItem(id);
-    this.invalidateCache();
-  }
-
-  async remove(id: string) {
-    this.cache.set(id, {
-      id,
-      deleted: true,
-      dateModified: Date.now()
-    });
-    await this.collection.removeItem(id);
-    this.invalidateCache();
-  }
-
   exists(id: string) {
     const item = this.cache.get(id);
     return this.collection.exists(id) && !!item && !isDeleted(item);
@@ -103,19 +75,10 @@ export class CachedCollection<
     return this.cache.size;
   }
 
-  get(id: string) {
-    const item = this.cache.get(id);
-    if (!item || isDeleted(item)) return;
-    return item;
-  }
-
-  getRaw(id: string) {
-    const item = this.cache.get(id);
-    return item;
-  }
-
-  raw() {
-    return Array.from(this.cache.values());
+  async delete(id: string) {
+    this.cache.delete(id);
+    await this.collection.deleteItem(id);
+    this.invalidateCache();
   }
 
   items(map?: (item: T) => T | undefined) {
@@ -133,19 +96,10 @@ export class CachedCollection<
     return this.cachedItems;
   }
 
-  async setItems(items: (MaybeDeletedItem<T> | undefined)[]) {
-    await this.collection.setItems(items);
-    for (const item of items) {
-      if (item) {
-        this.cache.set(item.id, item);
-      }
-    }
-
-    this.invalidateCache();
-  }
-
-  *iterateSync(chunkSize: number) {
-    yield* chunkedIterate(Array.from(this.cache.values()), chunkSize);
+  get(id: string) {
+    const item = this.cache.get(id);
+    if (!item || isDeleted(item)) return;
+    return item;
   }
 
   invalidateCache() {

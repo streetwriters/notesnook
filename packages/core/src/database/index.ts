@@ -89,7 +89,13 @@ export interface DatabaseSchema {
   vaults: SQLiteItem<Vault>;
 }
 
-export type DatabaseSchemaWithFTS = DatabaseSchema & {
+export type RawDatabaseSchema = DatabaseSchema & {
+  kv: {
+    key: string;
+    value?: string | null;
+    dateModified?: number | null;
+  };
+
   notes_fts: SQLiteItemWithRowID<{
     notes_fts: string;
     title: string;
@@ -136,9 +142,9 @@ export interface DatabaseCollection<T, IsAsync extends boolean> {
   ): IsAsync extends true ? AsyncIterableIterator<T> : IterableIterator<T>;
 }
 
-export type DatabaseAccessor = () =>
-  | Kysely<DatabaseSchema>
-  | Transaction<DatabaseSchema>;
+export type DatabaseAccessor<TSchema = DatabaseSchema> = () =>
+  | Kysely<TSchema>
+  | Transaction<TSchema>;
 
 type FilterBooleanProperties<T, Type> = keyof {
   [K in keyof T as T[K] extends Type ? K : never]: T[K];
@@ -212,7 +218,7 @@ export type SQLiteOptions = {
   pageSize?: number;
 };
 export async function createDatabase(name: string, options: SQLiteOptions) {
-  const db = new Kysely<DatabaseSchemaWithFTS>({
+  const db = new Kysely<RawDatabaseSchema>({
     dialect: options.dialect(name),
     plugins: [new SqliteBooleanPlugin()]
   });

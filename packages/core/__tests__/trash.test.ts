@@ -245,10 +245,11 @@ test("deleting a notebook should not re-delete already deleted subnotebooks", ()
     await db.notebooks.moveToTrash(child3);
     await db.notebooks.moveToTrash(parent);
 
-    expect((await db.trash.all()).some((a) => a.id === child3)).toBe(true);
-    expect((await db.trash.all()).some((a) => a.id === parent)).toBe(true);
-    expect((await db.trash.all()).some((a) => a.id === child2)).toBe(false);
-    expect((await db.trash.all()).some((a) => a.id === child)).toBe(false);
+    const trash = await db.trash.all("user");
+    expect(trash.some((a) => a.id === child3)).toBe(true);
+    expect(trash.some((a) => a.id === parent)).toBe(true);
+    expect(trash.some((a) => a.id === child2)).toBe(false);
+    expect(trash.some((a) => a.id === child)).toBe(false);
   }));
 
 test("restoring a deleted notebook should also restore all its subnotebooks", () =>
@@ -355,8 +356,9 @@ test("permanently deleting a notebook should not delete independently deleted su
 
     await db.trash.delete(parent);
 
-    expect((await db.trash.all()).some((a) => a.id === child3)).toBe(true);
-    expect((await db.trash.all()).some((a) => a.id === parent)).toBe(false);
-    expect((await db.trash.all()).some((a) => a.id === child2)).toBe(false);
-    expect((await db.trash.all()).some((a) => a.id === child)).toBe(false);
+    const trash = await db.trash.all("user");
+    expect(trash.some((a) => a.id === child3)).toBe(true);
+    expect(trash.some((a) => a.id === parent)).toBe(false);
+    expect(trash.some((a) => a.id === child2)).toBe(false);
+    expect(trash.some((a) => a.id === child)).toBe(false);
   }));
