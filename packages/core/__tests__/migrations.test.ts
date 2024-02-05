@@ -18,12 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { test, expect, describe } from "vitest";
-import { migrateItem } from "../src/migrations";
+import { migrateItem, migrateKV, migrateVaultKey } from "../src/migrations";
 import { databaseTest } from "./utils";
 import { getId, makeId } from "../src/utils/id";
 import { LegacySettingsItem } from "../src/types";
+import { KEYS } from "../src/database/kv";
 
-describe("[5.2] replace date edited with date modified", () => {
+describe.concurrent("[5.2] replace date edited with date modified", () => {
   const itemsWithDateEdited = ["note", "notebook", "trash", "tiny"] as const;
   const itemsWithoutDateEdited = ["tag", "attachment", "settings"] as const;
   for (const type of itemsWithDateEdited) {
@@ -88,7 +89,7 @@ test("[5.3] decode wrapped table html entities", () =>
     );
   }));
 
-describe("[5.4] convert tiny to tiptap", () => {
+describe.concurrent("[5.4] convert tiny to tiptap", () => {
   const cases = [
     {
       name: "preserve newlines in code blocks",
@@ -268,7 +269,7 @@ test("[5.8] do nothing if backup type is not local", () =>
     expect(await migrateItem(item, 5.8, 5.9, "note", db, "sync")).toBe(false);
   }));
 
-describe("[5.9] make tags syncable", () => {
+describe.concurrent("[5.9] make tags syncable", () => {
   test("create tags inside notes & link to them using relations", () =>
     databaseTest().then(async (db) => {
       const noteId = getId();
@@ -403,7 +404,7 @@ describe("[5.9] make tags syncable", () => {
     }));
 });
 
-describe("[5.9] make colors syncable", () => {
+describe.concurrent("[5.9] make colors syncable", () => {
   test("create colors from notes & link to them using relations", () =>
     databaseTest().then(async (db) => {
       const noteId = getId();
@@ -566,65 +567,90 @@ test.todo("[5.9] flatten attachment object", () =>
   })
 );
 
-describe("[5.9] move topics out of notebooks & use relations", () => {
-  test("convert topics to subnotebooks", () =>
-    databaseTest().then(async (db) => {
-      const notebook = {
-        id: "parent_notebook",
-        type: "notebook",
-        topics: [
-          { id: "topics1", title: "Topic 1" },
-          { id: "topics2", title: "Topic 2" }
-        ]
-      };
-      await migrateItem(notebook, 5.9, 6.0, "notebook", db, "backup");
+describe.concurrent(
+  "[5.9] move topics out of notebooks & use relations",
+  () => {
+    test("move topics of deleted notebook to trash after migration", () =>
+      databaseTest().then(async (db) => {
+        const notebook = {
+          id: "parent_notebook",
+          type: "trash",
+          itemType: "notebook",
+          dateDeleted: Date.now(),
+          topics: [
+            { id: "topics1", title: "Topic 1" },
+            { id: "topics2", title: "Topic 2" }
+          ]
+        };
 
-      const linkedNotebooks = await db.relations
-        .from({ type: "notebook", id: "parent_notebook" }, "notebook")
-        .get();
-      expect(notebook.topics).toBeUndefined();
-      expect(linkedNotebooks).toHaveLength(2);
-      expect(linkedNotebooks.some((a) => a.toId === "topics1")).toBeTruthy();
-      expect(linkedNotebooks.some((a) => a.toId === "topics2")).toBeTruthy();
-      expect(await db.notebooks.all.count()).toBe(2);
-      expect(await db.notebooks.notebook("topics1")).toBeDefined();
-      expect(await db.notebooks.notebook("topics2")).toBeDefined();
-    }));
+        await migrateItem(notebook, 5.9, 6.0, "notebook", db, "backup");
 
-  test("convert topic shortcuts to notebook shortcuts", () =>
-    databaseTest().then(async (db) => {
-      const shortcut = {
-        id: "shortcut1",
-        type: "shortcut",
-        item: {
-          type: "topic",
-          id: "topics1"
-        }
-      };
-      await migrateItem(shortcut, 5.9, 6.0, "shortcut", db, "backup");
+        const trash = await db.trash.all();
+        expect(await db.notebooks.notebook("topics1")).toBeUndefined();
+        expect(await db.notebooks.notebook("topics2")).toBeUndefined();
+        expect(trash.find((t) => t.title === "Topic 1")).toBeDefined();
+        expect(trash.find((t) => t.title === "Topic 2")).toBeDefined();
+      }));
 
-      expect(shortcut.itemType).toBe("notebook");
-      expect(shortcut.itemId).toBe("topics1");
-    }));
+    test("convert topics to subnotebooks", () =>
+      databaseTest().then(async (db) => {
+        const notebook = {
+          id: "parent_notebook",
+          type: "notebook",
+          topics: [
+            { id: "topics1", title: "Topic 1" },
+            { id: "topics2", title: "Topic 2" }
+          ]
+        };
+        await migrateItem(notebook, 5.9, 6.0, "notebook", db, "backup");
 
-  test("convert topic links in note to relations", () =>
-    databaseTest().then(async (db) => {
-      const note = {
-        id: "note1",
-        type: "note",
-        notebooks: [{ id: "notebook1", topics: ["topic1", "topic2"] }]
-      };
-      await migrateItem(note, 5.9, 6.0, "note", db, "backup");
+        const linkedNotebooks = await db.relations
+          .from({ type: "notebook", id: "parent_notebook" }, "notebook")
+          .get();
+        expect(notebook.topics).toBeUndefined();
+        expect(linkedNotebooks).toHaveLength(2);
+        expect(linkedNotebooks.some((a) => a.toId === "topics1")).toBeTruthy();
+        expect(linkedNotebooks.some((a) => a.toId === "topics2")).toBeTruthy();
+        expect(await db.notebooks.all.count()).toBe(2);
+        expect(await db.notebooks.notebook("topics1")).toBeDefined();
+        expect(await db.notebooks.notebook("topics2")).toBeDefined();
+      }));
 
-      const linkedNotebooks = await db.relations
-        .to({ type: "note", id: "note1" }, "notebook")
-        .get();
-      expect(note.notebooks).toBeUndefined();
-      expect(linkedNotebooks).toHaveLength(2);
-      expect(linkedNotebooks.some((a) => a.fromId === "topic1")).toBeTruthy();
-      expect(linkedNotebooks.some((a) => a.fromId === "topic2")).toBeTruthy();
-    }));
-});
+    test("convert topic shortcuts to notebook shortcuts", () =>
+      databaseTest().then(async (db) => {
+        const shortcut = {
+          id: "shortcut1",
+          type: "shortcut",
+          item: {
+            type: "topic",
+            id: "topics1"
+          }
+        };
+        await migrateItem(shortcut, 5.9, 6.0, "shortcut", db, "backup");
+
+        expect(shortcut.itemType).toBe("notebook");
+        expect(shortcut.itemId).toBe("topics1");
+      }));
+
+    test("convert topic links in note to relations", () =>
+      databaseTest().then(async (db) => {
+        const note = {
+          id: "note1",
+          type: "note",
+          notebooks: [{ id: "notebook1", topics: ["topic1", "topic2"] }]
+        };
+        await migrateItem(note, 5.9, 6.0, "note", db, "backup");
+
+        const linkedNotebooks = await db.relations
+          .to({ type: "note", id: "note1" }, "notebook")
+          .get();
+        expect(note.notebooks).toBeUndefined();
+        expect(linkedNotebooks).toHaveLength(2);
+        expect(linkedNotebooks.some((a) => a.fromId === "topic1")).toBeTruthy();
+        expect(linkedNotebooks.some((a) => a.fromId === "topic2")).toBeTruthy();
+      }));
+  }
+);
 
 test("[5.9] migrate settings to its own collection", () =>
   databaseTest().then(async (db) => {
@@ -664,4 +690,41 @@ test("[5.9] migrate settings to its own collection", () =>
     expect(db.settings.getTrashCleanupInterval()).toBe(
       settings.trashCleanupInterval
     );
+  }));
+
+describe.concurrent("[5.9] migrate kv", () => {
+  for (const key of KEYS) {
+    test(`${key} (defined)`, () =>
+      databaseTest().then(async (db) => {
+        await db.storage().write(key, "test");
+
+        await migrateKV(db, 5.9, 6.0);
+
+        expect(await db.kv().read(key)).toBeDefined();
+        expect(await db.storage().read(key)).toBeUndefined();
+      }));
+
+    test(`${key} (undefined)`, () =>
+      databaseTest().then(async (db) => {
+        await db.storage().write(key, null);
+
+        await migrateKV(db, 5.9, 6.0);
+
+        expect(await db.kv().read(key)).toBe(key === "v" ? 6 : undefined);
+        expect(await db.storage().read(key)).toBe(null);
+      }));
+  }
+});
+
+test("[5.9] migrate vaultKey", () =>
+  databaseTest().then(async (db) => {
+    const key = await db.storage().encrypt({ password: "hello" }, "world");
+    await db.storage().write("vaultKey", key);
+
+    await migrateVaultKey(db, key, 5.9, 6.0);
+
+    expect(await db.storage().read("vaultKey")).toBeUndefined();
+    expect(await db.vaults.default()).toBeDefined();
+    expect((await db.vaults.default())?.key).toStrictEqual(key);
+    expect((await db.vaults.default())?.key).toStrictEqual(key);
   }));

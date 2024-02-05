@@ -68,7 +68,7 @@ const ENDPOINTS = {
 class UserManager {
   private tokenManager: TokenManager;
   constructor(private readonly db: Database) {
-    this.tokenManager = new TokenManager(this.db.storage);
+    this.tokenManager = new TokenManager(this.db.kv);
 
     EV.subscribe(EVENTS.userUnauthorized, async (url: string) => {
       if (url.includes("/connect/token") || !(await HealthCheck.auth())) return;
@@ -175,7 +175,7 @@ class UserManager {
       if (!user) throw new Error("Unauthorized.");
 
       if (!sessionExpired) {
-        await this.db.storage().write("lastSynced", 0);
+        await this.db.setLastSynced(0);
         await this.db.syncer.devices.register();
       }
 
@@ -228,7 +228,7 @@ class UserManager {
       password,
       salt: user.salt
     });
-    await this.db.storage().write("lastSynced", 0);
+    await this.db.setLastSynced(0);
     await this.db.syncer.devices.register();
 
     EV.publish(EVENTS.userLoggedIn, user);
@@ -276,11 +276,11 @@ class UserManager {
   }
 
   setUser(user: User) {
-    return this.db.storage().write("user", user);
+    return this.db.kv().write("user", user);
   }
 
   getUser() {
-    return this.db.storage().read<User>("user");
+    return this.db.kv().read("user");
   }
 
   async resetUser(removeAttachments = true) {

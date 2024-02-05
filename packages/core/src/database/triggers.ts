@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Kysely, sql } from "kysely";
-import { DatabaseSchemaWithFTS } from ".";
+import { RawDatabaseSchema } from ".";
 
-export async function createTriggers(db: Kysely<DatabaseSchemaWithFTS>) {
+export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
   // content triggers
   await db.schema
     .createTrigger("content_after_insert_content_fts")

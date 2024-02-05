@@ -113,7 +113,7 @@ class Sync {
   logger = logger.scope("Sync");
   syncConnectionMutex = new Mutex();
   connection?: signalr.HubConnection;
-  devices = new SyncDevices(this.db.storage, this.db.tokenManager);
+  devices = new SyncDevices(this.db.kv, this.db.tokenManager);
 
   constructor(private readonly db: Database) {
     EV.subscribe(EVENTS.userLoggedOut, async () => {
@@ -209,7 +209,13 @@ class Sync {
         vaultKey.length > 0
       ) {
         const vault = await this.db.vaults.default();
-        if (!vault) await migrateVaultKey(this.db, vaultKey, 5.9);
+        if (!vault)
+          await migrateVaultKey(
+            this.db,
+            vaultKey,
+            5.9,
+            CURRENT_DATABASE_VERSION
+          );
       }
 
       return true;
@@ -258,7 +264,7 @@ class Sync {
     await this.db.monographs.refresh();
 
     this.logger.info("Stopping sync");
-    await this.db.storage().write("lastSynced", Date.now());
+    await this.db.setLastSynced(Date.now());
     this.db.eventManager.publish(EVENTS.syncCompleted);
   }
 
@@ -345,7 +351,7 @@ class Sync {
   private createConnection() {
     if (this.connection) return;
 
-    const tokenManager = new TokenManager(this.db.storage);
+    const tokenManager = new TokenManager(this.db.kv);
     this.connection = new signalr.HubConnectionBuilder()
       .withUrl(`${Constants.API_HOST}/hubs/sync/v2`, {
         accessTokenFactory: async () => {

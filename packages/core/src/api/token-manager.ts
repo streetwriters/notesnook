@@ -22,9 +22,9 @@ import constants from "../utils/constants";
 import { EV, EVENTS } from "../common";
 import { withTimeout, Mutex } from "async-mutex";
 import { logger } from "../logger";
-import { StorageAccessor } from "../interfaces";
+import { KVStorageAccessor } from "../interfaces";
 
-type Token = {
+export type Token = {
   access_token: string;
   t: number;
   expires_in: number;
@@ -42,10 +42,10 @@ const ENDPOINTS = {
 class TokenManager {
   mutex = withTimeout(new Mutex(), 10 * 1000);
   logger = logger.scope("TokenManager");
-  constructor(private readonly storage: StorageAccessor) {}
+  constructor(private readonly storage: KVStorageAccessor) {}
 
   async getToken(renew = true, forceRenew = false): Promise<Token | undefined> {
-    const token = await this.storage().read<Token>("token");
+    const token = await this.storage().read("token");
     if (!token || !token.access_token) return;
 
     this.logger.info("Access token requested", {
@@ -119,7 +119,7 @@ class TokenManager {
     if (!token) return;
     const { access_token } = token;
 
-    await this.storage().remove("token");
+    await this.storage().delete("token");
     await http.post(
       `${constants.AUTH_HOST}${ENDPOINTS.logout}`,
       null,

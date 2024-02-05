@@ -24,7 +24,12 @@ import {
   CURRENT_DATABASE_VERSION,
   sendMigrationProgressEvent
 } from "../common";
-import { migrateCollection, migrateItem, migrateVaultKey } from "../migrations";
+import {
+  migrateCollection,
+  migrateItem,
+  migrateKV,
+  migrateVaultKey
+} from "../migrations";
 import {
   CollectionType,
   Collections,
@@ -52,15 +57,16 @@ class Migrator {
     version: number
   ) {
     const vaultKey = await db.storage().read<Cipher<"base64">>("vaultKey");
-    if (vaultKey) await migrateVaultKey(db, vaultKey, version);
+    if (vaultKey)
+      await migrateVaultKey(db, vaultKey, version, CURRENT_DATABASE_VERSION);
+    await migrateKV(db, version, CURRENT_DATABASE_VERSION);
 
     for (const collection of collections) {
       sendMigrationProgressEvent(db.eventManager, collection.name, 0, 0);
 
       const indexedCollection = new IndexedCollection(
         db.storage,
-        collection.name,
-        db.eventManager
+        collection.name
       );
       const table = new SQLCollection(
         db.sql,

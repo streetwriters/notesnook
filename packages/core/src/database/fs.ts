@@ -21,8 +21,7 @@ import hosts from "../utils/constants";
 import TokenManager from "../api/token-manager";
 import {
   FileEncryptionMetadataWithOutputType,
-  IFileStorage,
-  StorageAccessor
+  IFileStorage
 } from "../interfaces";
 import { DataFormat, SerializedKey } from "@notesnook/crypto/dist/src/types";
 import { EV, EVENTS } from "../common";
@@ -38,12 +37,12 @@ export type QueueItem = DownloadableFile & {
 };
 
 export class FileStorage {
-  private readonly tokenManager: TokenManager;
   downloads = new Map<string, QueueItem[]>();
   uploads = new Map<string, QueueItem[]>();
-  constructor(private readonly fs: IFileStorage, storage: StorageAccessor) {
-    this.tokenManager = new TokenManager(storage);
-  }
+  constructor(
+    private readonly fs: IFileStorage,
+    private readonly tokenManager: TokenManager
+  ) {}
 
   async queueDownloads(
     files: DownloadableFile[],

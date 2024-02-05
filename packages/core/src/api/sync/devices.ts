@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { StorageAccessor } from "../../interfaces";
+import { KVStorageAccessor } from "../../interfaces";
 import hosts from "../../utils/constants";
 import http from "../../utils/http";
 import { getId } from "../../utils/id";
@@ -25,7 +25,7 @@ import TokenManager from "../token-manager";
 
 export class SyncDevices {
   constructor(
-    private readonly storage: StorageAccessor,
+    private readonly kv: KVStorageAccessor,
     private readonly tokenManager: TokenManager
   ) {}
 
@@ -35,20 +35,18 @@ export class SyncDevices {
     const token = await this.tokenManager.getAccessToken();
     return http
       .post(url, null, token)
-      .then(() => this.storage().write("deviceId", deviceId));
+      .then(() => this.kv().write("deviceId", deviceId));
   }
 
   async unregister() {
-    const deviceId = await this.storage().read("deviceId");
+    const deviceId = await this.kv().read("deviceId");
     if (!deviceId) return;
     const url = `${hosts.API_HOST}/devices?deviceId=${deviceId}`;
     const token = await this.tokenManager.getAccessToken();
-    return http
-      .delete(url, token)
-      .then(() => this.storage().remove("deviceId"));
+    return http.delete(url, token).then(() => this.kv().delete("deviceId"));
   }
 
   get() {
-    return this.storage().read<string>("deviceId");
+    return this.kv().read("deviceId");
   }
 }

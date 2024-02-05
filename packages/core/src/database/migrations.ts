@@ -34,6 +34,14 @@ export class NNMigrationProvider implements MigrationProvider {
       "1": {
         async up(db) {
           await db.schema
+            .createTable("kv")
+            .modifyEnd(sql`without rowid`)
+            .addColumn("key", "text", (c) => c.primaryKey().unique().notNull())
+            .addColumn("value", "text")
+            .addColumn("dateModified", "integer")
+            .execute();
+
+          await db.schema
             .createTable("notes")
             // .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)

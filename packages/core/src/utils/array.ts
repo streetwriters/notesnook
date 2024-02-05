@@ -39,6 +39,7 @@ export function deleteItems<T>(array: T[], ...items: T[]) {
   for (const item of items) {
     deleteItem(array, item);
   }
+  return array;
 }
 
 export function findById<T extends { id: string }>(array: T[], id: string) {

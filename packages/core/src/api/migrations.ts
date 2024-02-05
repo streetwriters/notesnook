@@ -85,7 +85,7 @@ class Migrations {
   async init() {
     this.version =
       (await this.db.storage().read("v")) || CURRENT_DATABASE_VERSION;
-    this.db.storage().write("v", this.version);
+    this.db.kv().write("v", this.version);
   }
 
   required() {
@@ -100,7 +100,7 @@ class Migrations {
       await this.db.notes.init();
 
       await this.migrator.migrate(this.db, collections, this.version);
-      await this.db.storage().write("v", CURRENT_DATABASE_VERSION);
+      await this.db.kv().write("v", CURRENT_DATABASE_VERSION);
       this.version = CURRENT_DATABASE_VERSION;
     } finally {
       this.migrating = false;

@@ -46,7 +46,7 @@ export class Monographs {
 
   async clear() {
     this.monographs = [];
-    await this.db.storage().write("monographs", this.monographs);
+    await this.db.kv().write("monographs", this.monographs);
   }
 
   async refresh() {
@@ -59,7 +59,7 @@ export class Monographs {
         `${Constants.API_HOST}/monographs`,
         token
       );
-      await this.db.storage().write("monographs", monographs);
+      await this.db.kv().write("monographs", monographs);
       if (monographs) this.monographs = monographs;
     } catch (e) {
       console.error(e);

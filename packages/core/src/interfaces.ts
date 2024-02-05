@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
+import { KVStorage } from "./database/kv";
 
 export type Output<TOutputFormat extends DataFormat> =
   TOutputFormat extends Omit<DataFormat, "uint8array"> ? string : Uint8Array;
@@ -111,4 +112,5 @@ export interface IFileStorage {
 }
 
 export type StorageAccessor = () => IStorage;
+export type KVStorageAccessor = () => KVStorage;
 export type CompressorAccessor = () => ICompressor;
