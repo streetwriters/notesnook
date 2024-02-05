@@ -73,13 +73,13 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
     refresh();
   }, [note, refresh]);
 
-  const onChangeText = (text: string) => {
+  const onChangeText = async (text: string) => {
     attachmentSearchValue.current = text;
     if (
       !attachmentSearchValue.current ||
       attachmentSearchValue.current === ""
     ) {
-      setAttachments(filterAttachments(currentFilter));
+      setAttachments(await filterAttachments(currentFilter));
       refresh();
     }
     clearTimeout(searchTimer.current);
@@ -94,8 +94,8 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
 
   const renderItem = ({ index }: { item: boolean; index: number }) => (
     <AttachmentItem
-      setAttachments={() => {
-        setAttachments(filterAttachments(currentFilter));
+      setAttachments={async () => {
+        setAttachments(await filterAttachments(currentFilter));
       }}
       attachments={attachments}
       id={index}
