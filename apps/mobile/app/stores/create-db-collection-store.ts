@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Item, VirtualizedGrouping } from "@notesnook/core";
 import create, { State, StoreApi, UseBoundStore } from "zustand";
-import { resolveItems } from "./resolve-items";
+import { resolveItems } from "@notesnook/common";
 import { useSettingStore } from "./use-setting-store";
 
 export interface DBCollectionStore<Type extends Item> extends State {

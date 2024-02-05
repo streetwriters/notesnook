@@ -26,7 +26,7 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import Field from "../field";
 import { showToast } from "../../utils/toast";
 import { ErrorText } from "../error-text";
-import usePromise from "../../hooks/use-promise";
+import { usePromise } from "@notesnook/common";
 
 type UnlockProps = {
   noteId: string;

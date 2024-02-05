@@ -35,12 +35,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import { eSendEvent } from "../../services/event-manager";
-import {
-  NotebooksWithDateEdited,
-  TagsWithDateEdited,
-  isNoteResolvedData,
-  resolveItems
-} from "../../stores/resolve-items";
 import { RouteName } from "../../stores/use-navigation-store";
 import { eOpenJumpToDialog } from "../../utils/events";
 import { SectionHeader } from "../list-items/headers/section-header";
@@ -48,6 +42,12 @@ import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import ReminderItem from "../list-items/reminder";
 import TagItem from "../list-items/tag";
+import {
+  NotebooksWithDateEdited,
+  TagsWithDateEdited,
+  isNoteResolvedData,
+  resolveItems
+} from "@notesnook/common";
 
 type ListItemWrapperProps<TItem = Item> = {
   group?: GroupingKey;
@@ -92,7 +92,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
         notebooks.current = data.notebooks;
         reminder.current = data.reminder;
         color.current = data.color;
-        attachmentsCount.current = data.attachmentsCount || 0;
+        attachmentsCount.current = data.attachments?.total || 0;
       } else if (
         resolvedItem.item.type === "notebook" &&
         typeof data === "number"

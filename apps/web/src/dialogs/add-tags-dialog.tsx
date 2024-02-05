@@ -32,9 +32,9 @@ import { store as editorStore } from "../stores/editor-store";
 import { Perform } from "../common/dialog-controller";
 import { FilteredList } from "../components/filtered-list";
 import { ItemReference, Tag } from "@notesnook/core/dist/types";
-import { ResolvedItem } from "../components/list-container/resolved-item";
 import { create } from "zustand";
 import { VirtualizedGrouping } from "@notesnook/core";
+import { ResolvedItem } from "@notesnook/common";
 
 type SelectedReference = {
   id: string;
@@ -134,6 +134,8 @@ function AddTagsDialog(props: AddTagsDialogProps) {
           onCreateNewItem={async (title) => {
             const tagId = await db.tags.add({ title });
             if (!tagId) return;
+            await useStore.getState().refresh();
+            setTags(useStore.getState().tags);
             const { selected, setSelected } = useSelectionStore.getState();
             setSelected([...selected, { id: tagId, new: true, op: "add" }]);
           }}

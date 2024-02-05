@@ -46,8 +46,7 @@ import {
   TreeEnvironmentRef
 } from "react-complex-tree";
 import { FlexScrollContainer } from "../components/scroll-container";
-import { pluralize } from "@notesnook/common";
-import usePromise from "../hooks/use-promise";
+import { pluralize, usePromise } from "@notesnook/common";
 
 type MoveDialogProps = { onClose: Perform; noteIds: string[] };
 type NotebookReference = {

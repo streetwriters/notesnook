@@ -26,8 +26,8 @@ import Reminder from "../reminder";
 import { Context } from "./types";
 import { getSortValue } from "@notesnook/core/dist/utils/grouping";
 import { GroupingKey, Item } from "@notesnook/core";
+import { isNoteResolvedData } from "@notesnook/common";
 import { Attachment } from "../attachment";
-import { isNoteResolvedData } from "./resolved-item";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =

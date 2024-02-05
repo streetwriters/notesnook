@@ -55,7 +55,7 @@ export type PromiseFactoryFn<T> = (signal: AbortSignal) => T | Promise<T>;
  * @param factory Function that creates the promise.
  * @param deps If present, promise will be recreated if the values in the list change.
  */
-export default function usePromise<T>(
+export function usePromise<T>(
   factory: PromiseFactoryFn<T>,
   deps: DependencyList = []
 ): PromiseResult<T> {
