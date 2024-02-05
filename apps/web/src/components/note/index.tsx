@@ -76,9 +76,12 @@ import {
   isReminderActive,
   isReminderToday
 } from "@notesnook/core/dist/collections/reminders";
-import { getFormattedReminderTime, pluralize } from "@notesnook/common";
 import {
-  Reminder as ReminderType,
+  NoteResolvedData,
+  getFormattedReminderTime,
+  pluralize
+} from "@notesnook/common";
+import {
   Color,
   Note,
   Notebook as NotebookItem,
@@ -86,22 +89,14 @@ import {
   DefaultColors
 } from "@notesnook/core";
 import { MenuItem } from "@notesnook/ui";
-import {
-  Context,
-  NotebooksWithDateEdited,
-  TagsWithDateEdited
-} from "../list-container/types";
+import { Context } from "../list-container/types";
 import { SchemeColors } from "@notesnook/theme";
 import FileSaver from "file-saver";
 
-type NoteProps = {
-  tags?: TagsWithDateEdited;
-  color?: Color;
-  notebooks?: NotebooksWithDateEdited;
+type NoteProps = NoteResolvedData & {
   item: Note;
   context?: Context;
   date: number;
-  reminder?: ReminderType;
   simplified?: boolean;
   compact?: boolean;
 };
@@ -111,6 +106,7 @@ function Note(props: NoteProps) {
     tags,
     color,
     notebooks,
+    attachments,
     item,
     date,
     reminder,
@@ -121,17 +117,6 @@ function Note(props: NoteProps) {
   const note = item;
 
   const isOpened = useStore((store) => store.selectedNote === note.id);
-  const attachments = [];
-
-  // useAttachmentStore((store) =>
-  //   store.attachments.filter((a) => a.noteIds.includes(note.id))
-  // );
-  const failed = [];
-
-  // useMemo(
-  //   () => attachments.filter((a) => a.failed),
-  //   [attachments]
-  // );
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";
 
   return (
@@ -226,21 +211,21 @@ function Note(props: NoteProps) {
                 datetime={date}
               />
 
-              {attachments.length > 0 && (
+              {attachments?.total ? (
                 <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
                   <Attachment size={13} />
                   <Text variant="subBody" ml={"2px"}>
-                    {attachments.length}
+                    {attachments.total}
                   </Text>
                 </Flex>
-              )}
+              ) : null}
 
-              {failed.length > 0 && (
-                <Flex title={`Errors in ${failed.length} attachments.`}>
+              {attachments?.failed ? (
+                <Flex title={`Errors in ${attachments.failed} attachments.`}>
                   <AttachmentError size={13} color="var(--icon-error)" />
-                  <Text ml={"2px"}>{failed.length}</Text>
+                  <Text ml={"2px"}>{attachments.failed}</Text>
                 </Flex>
-              )}
+              ) : null}
 
               {note.pinned && !props.context && (
                 <Pin size={13} color={primary} />
@@ -289,7 +274,8 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.dateModified === nextItem.dateModified &&
     prevProps.notebooks?.dateEdited === nextProps.notebooks?.dateEdited &&
     prevProps.tags?.dateEdited === nextProps.tags?.dateEdited &&
-    prevProps.reminder?.dateModified === nextProps.reminder?.dateModified
+    prevProps.reminder?.dateModified === nextProps.reminder?.dateModified &&
+    prevProps.attachments === nextProps.attachments
   );
 });
 

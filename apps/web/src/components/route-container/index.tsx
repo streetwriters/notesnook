@@ -23,8 +23,7 @@ import { ArrowLeft, Menu, Search, Plus, Close } from "../icons";
 import { useStore } from "../../stores/app-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import useMobile from "../../hooks/use-mobile";
-import usePromise from "../../hooks/use-promise";
-import { debounce } from "@notesnook/common";
+import { debounce, usePromise } from "@notesnook/common";
 import Field from "../field";
 
 export type RouteContainerButtons = {

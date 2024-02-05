@@ -44,7 +44,7 @@ import { View } from "react-native";
 import { SIZE } from "../../utils/size";
 import { IconButton } from "../../components/ui/icon-button";
 import { PressableButton } from "../../components/ui/pressable";
-import { resolveItems } from "../../stores/resolve-items";
+import { resolveItems } from "@notesnook/common";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();

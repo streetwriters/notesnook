@@ -17,10 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./file";
-export * from "./number";
-export * from "./time";
-export * from "./debounce";
-export * from "./random";
-export * from "./string";
-export * from "./resolve-items";
+import { ItemMap, ItemType } from "@notesnook/core";
+import {
+  ResolvedItemOptions,
+  useResolvedItem
+} from "../hooks/use-resolved-item";
+
+type ResolvedItemProps<TItemType extends ItemType> =
+  ResolvedItemOptions<TItemType> & {
+    children: (item: {
+      item: ItemMap[TItemType];
+      data: unknown;
+    }) => React.ReactNode;
+  };
+export function ResolvedItem<TItemType extends ItemType>(
+  props: ResolvedItemProps<TItemType>
+) {
+  const { children } = props;
+  const result = useResolvedItem(props);
+  return result ? <>{children(result)}</> : null;
+}

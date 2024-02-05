@@ -29,7 +29,7 @@ import {
   Text
 } from "@theme-ui/components";
 import { store, useStore } from "../stores/attachment-store";
-import { formatBytes } from "@notesnook/common";
+import { ResolvedItem, formatBytes, usePromise } from "@notesnook/common";
 import Dialog from "../components/dialog";
 import {
   ChevronDown,
@@ -57,13 +57,11 @@ import {
   VirtualizedGrouping
 } from "@notesnook/core";
 import { Multiselect } from "../common/multi-select";
-import { ResolvedItem } from "../components/list-container/resolved-item";
 import {
   VirtualizedTable,
   VirtualizedTableRowProps
 } from "../components/virtualized-table";
 import { FlexScrollContainer } from "../components/scroll-container";
-import usePromise from "../hooks/use-promise";
 
 type ToolbarAction = {
   title: string;

@@ -30,7 +30,7 @@ import { useMenuTrigger } from "../../hooks/use-menu";
 import { MenuItem } from "@notesnook/ui";
 import { navigate } from "../../navigation";
 import { Tag } from "@notesnook/core";
-import usePromise from "../../hooks/use-promise";
+import { usePromise } from "@notesnook/common";
 
 type HeaderProps = { readonly: boolean };
 function Header(props: HeaderProps) {

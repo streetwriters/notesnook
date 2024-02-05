@@ -59,6 +59,7 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
         inputRef={inputRef}
         data-test-id={"filter-input"}
         autoFocus
+        sx={{ m: 0 }}
         placeholder={
           items.length <= 0 ? placeholders.empty : placeholders.filter
         }
@@ -84,7 +85,9 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            py: 2
+            py: 2,
+            width: "100%",
+            mt: 1
           }}
           onClick={async () => {
             await _createNewItem(query);

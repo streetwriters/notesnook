@@ -31,13 +31,7 @@ import { ListLoader } from "../loaders/list-loader";
 import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import { Context } from "./types";
-import {
-  VirtualizedGrouping,
-  GroupingKey,
-  Item,
-  isGroupHeader
-} from "@notesnook/core";
-import { useResolvedItem } from "./resolved-item";
+import { VirtualizedGrouping, GroupingKey, Item } from "@notesnook/core";
 import {
   ItemProps,
   ScrollerProps,
@@ -45,6 +39,7 @@ import {
   VirtuosoHandle
 } from "react-virtuoso";
 import Skeleton from "react-loading-skeleton";
+import { useResolvedItem } from "@notesnook/common";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
