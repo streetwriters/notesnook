@@ -142,7 +142,7 @@ export const Subscription = () => {
           }}
           fontSize={SIZE.sm}
           height={30}
-          type="grayAccent"
+          type="secondaryAccented"
         />
       ) : null}
     </View>

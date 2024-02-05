@@ -21,7 +21,7 @@ import React, { useRef, useState } from "react";
 import { TouchableHighlight, View } from "react-native";
 import Menu, { MenuItem } from "react-native-reanimated-material-menu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { PressableButton } from "../../../components/ui/pressable";
+import { Pressable } from "../../../components/ui/pressable";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
 import { useThemeColors } from "@notesnook/theme";
@@ -29,6 +29,7 @@ import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import { verifyUser } from "../functions";
 import { Dialog } from "../../../components/dialog";
+import { getColorLinearShade } from "../../../utils/colors";
 
 interface PickerOptions<T> {
   getValue: () => T;
@@ -55,7 +56,7 @@ export function SettingsPicker<T>({
   requiresVerification = () => false,
   onVerify
 }: PickerOptions<T>) {
-  const { colors } = useThemeColors("contextMenu");
+  const { colors, isDark } = useThemeColors("contextMenu");
   const menuRef = useRef<any>();
   const [width, setWidth] = useState(0);
   const [currentValue, setCurrentValue] = useState(getValue());
@@ -99,19 +100,25 @@ export function SettingsPicker<T>({
           backgroundColor: colors.primary.background,
           width: width,
           marginTop: 60,
-          overflow: "hidden"
+          overflow: "hidden",
+          borderWidth: 0.7,
+          borderColor: getColorLinearShade(
+            colors.primary.background,
+            0.07,
+            isDark
+          )
         }}
         onRequestClose={() => {
           menuRef.current?.hide();
         }}
         anchor={
-          <PressableButton
+          <Pressable
             onPress={async () => {
               if (onVerify && !(await onVerify())) return;
               menuRef.current?.show();
             }}
-            type="grayBg"
-            customStyle={{
+            type="secondary"
+            style={{
               flexDirection: "row",
               alignItems: "center",
               marginTop: 10,
@@ -122,7 +129,7 @@ export function SettingsPicker<T>({
           >
             <Paragraph>{formatValue(currentValue)}</Paragraph>
             <Icon color={colors.primary.icon} name="menu-down" size={SIZE.md} />
-          </PressableButton>
+          </Pressable>
         }
       >
         <Dialog context="local" />

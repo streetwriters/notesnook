@@ -29,8 +29,8 @@ type DialogInfo = {
   onClose?: () => void;
   positiveType?:
     | "transparent"
-    | "gray"
-    | "grayBg"
+    | "plain"
+    | "secondary"
     | "accent"
     | "inverted"
     | "shade"

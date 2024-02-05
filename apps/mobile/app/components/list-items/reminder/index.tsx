@@ -176,7 +176,7 @@ const ReminderItem = React.memo(
           name="dots-horizontal"
           size={SIZE.xl}
           onPress={() => Properties.present(item, [], isSheet)}
-          customStyle={{
+          style={{
             justifyContent: "center",
             height: 35,
             width: 35,

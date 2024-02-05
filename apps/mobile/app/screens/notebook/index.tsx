@@ -43,7 +43,7 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import { View } from "react-native";
 import { SIZE } from "../../utils/size";
 import { IconButton } from "../../components/ui/icon-button";
-import { PressableButton } from "../../components/ui/pressable";
+import { Pressable } from "../../components/ui/pressable";
 import { resolveItems } from "@notesnook/common";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
@@ -180,7 +180,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           <IconButton
             name="notebook-outline"
             size={16}
-            customStyle={{ width: 20, height: 25 }}
+            style={{ width: 20, height: 25 }}
             onPress={() => {
               Navigation.push("Notebooks", {
                 canGoBack: true
@@ -189,14 +189,14 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           />
 
           {breadcrumbs.map((item) => (
-            <PressableButton
+            <Pressable
               onPress={async () => {
                 const notebook = await db.notebooks.notebook(item.id);
                 if (!notebook) return;
                 NotebookScreen.navigate(notebook, true);
               }}
               key={item.id}
-              customStyle={{
+              style={{
                 width: undefined,
                 flexDirection: "row",
                 paddingHorizontal: 0,
@@ -210,10 +210,10 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
                 left={0}
                 right={0}
                 bottom={0}
-                customStyle={{ width: 20, height: 25 }}
+                style={{ width: 20, height: 25 }}
               />
               <Paragraph size={SIZE.xs + 1}>{item.title}</Paragraph>
-            </PressableButton>
+            </Pressable>
           ))}
         </View>
       ) : null}

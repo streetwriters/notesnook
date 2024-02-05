@@ -35,7 +35,7 @@ import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
-import { PressableButton } from "../../ui/pressable";
+import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 
@@ -166,7 +166,7 @@ const SelectableNoteItem = React.memo(
     );
 
     return exists ? null : (
-      <PressableButton
+      <Pressable
         testID="listitem.select"
         onPress={() => {
           if (!item) return;
@@ -175,7 +175,7 @@ const SelectableNoteItem = React.memo(
             .markAs(item, selected ? "deselected" : "selected");
         }}
         type={"transparent"}
-        customStyle={{
+        style={{
           paddingVertical: 12,
           flexDirection: "row",
           width: "100%",
@@ -186,7 +186,7 @@ const SelectableNoteItem = React.memo(
         {!item ? null : (
           <>
             <IconButton
-              customStyle={{
+              style={{
                 backgroundColor: "transparent",
                 marginRight: 5
               }}
@@ -227,7 +227,7 @@ const SelectableNoteItem = React.memo(
             </View>
           </>
         )}
-      </PressableButton>
+      </Pressable>
     );
   }
 );

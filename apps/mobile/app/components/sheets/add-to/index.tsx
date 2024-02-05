@@ -192,12 +192,12 @@ const MoveNoteSheet = ({
           >
             <IconButton
               name="restore"
-              type="grayAccent"
+              type="secondaryAccented"
               onPress={() => {
                 const items = note ? [note.id] : selectedItemsList;
                 updateInitialSelectionState(items);
               }}
-              customStyle={{
+              style={{
                 width: 40,
                 height: 40
               }}

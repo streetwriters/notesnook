@@ -198,7 +198,7 @@ export const NotebookItem = ({
           testID={notesnook.ids.notebook.menu}
           size={SIZE.xl}
           onPress={() => Properties.present(item)}
-          customStyle={{
+          style={{
             justifyContent: "center",
             height: 35,
             width: 35,

@@ -26,7 +26,7 @@ import { useNotebook } from "../../../hooks/use-notebook";
 import useNavigationStore from "../../../stores/use-navigation-store";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../../ui/icon-button";
-import { PressableButton } from "../../ui/pressable";
+import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
 import {
@@ -108,7 +108,7 @@ export const NotebookItem = ({
         width: "100%"
       }}
     >
-      <PressableButton
+      <Pressable
         type={"transparent"}
         onLongPress={() => {
           if (!item) return;
@@ -129,7 +129,7 @@ export const NotebookItem = ({
         }}
         testID={`add-to-notebook-item-${currentLevel}-${index}`}
         onPress={onPress}
-        customStyle={{
+        style={{
           justifyContent: "space-between",
           width: "100%",
           alignItems: "center",
@@ -158,7 +158,7 @@ export const NotebookItem = ({
               left={0}
               bottom={0}
               right={0}
-              customStyle={{
+              style={{
                 width: 35,
                 height: 35
               }}
@@ -180,7 +180,7 @@ export const NotebookItem = ({
             left={0}
             bottom={0}
             right={0}
-            customStyle={{
+            style={{
               width: 40,
               height: 40
             }}
@@ -219,7 +219,7 @@ export const NotebookItem = ({
           ) : null}
           <IconButton
             name="plus"
-            customStyle={{
+            style={{
               width: 40 * fontScale,
               height: 40 * fontScale
             }}
@@ -236,7 +236,7 @@ export const NotebookItem = ({
             size={SIZE.xl}
           />
         </View>
-      </PressableButton>
+      </Pressable>
 
       {!expanded
         ? null
