@@ -31,7 +31,7 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
-import { resolveItems } from "../../stores/resolve-items";
+import { resolveItems } from "@notesnook/common";
 import useNavigationStore, {
   HeaderRightButton,
   NotesScreenParams,

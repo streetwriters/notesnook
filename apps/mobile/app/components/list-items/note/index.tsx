@@ -45,10 +45,7 @@ import { ReminderTime } from "../../ui/reminder-time";
 import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import {
-  NotebooksWithDateEdited,
-  TagsWithDateEdited
-} from "../../../stores/resolve-items";
+import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
 
 type NoteItemProps = {
   item: Note | BaseTrashItem<Note>;

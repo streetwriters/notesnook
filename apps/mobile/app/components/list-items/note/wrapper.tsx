@@ -36,10 +36,7 @@ import { tabBarRef } from "../../../utils/global-refs";
 
 import NotePreview from "../../note-history/preview";
 import SelectionWrapper from "../selection-wrapper";
-import {
-  NotebooksWithDateEdited,
-  TagsWithDateEdited
-} from "../../../stores/resolve-items";
+import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
 
 export const openNote = async (
   item: Note,
