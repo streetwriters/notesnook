@@ -77,9 +77,6 @@ import {
   isReminderToday
 } from "@notesnook/core/dist/collections/reminders";
 import { getFormattedReminderTime, pluralize } from "@notesnook/common";
-import { Context, ReferencesWithDateEdited } from "../list-container/types";
-import { SchemeColors, StaticColors } from "@notesnook/theme";
-import FileSaver from "file-saver";
 import {
   Reminder as ReminderType,
   Color,
