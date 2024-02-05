@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { Platform, View } from "react-native";
 import { SIZE } from "../../utils/size";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import RNIap from "react-native-iap";
@@ -42,10 +42,10 @@ export const PricingItem = ({
   compact?: boolean;
 }) => {
   return (
-    <PressableButton
+    <Pressable
       onPress={onPress}
-      type="grayBg"
-      customStyle={{
+      type="secondary"
+      style={{
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
@@ -95,6 +95,6 @@ export const PricingItem = ({
             : "/month"}
         </Paragraph>
       </View>
-    </PressableButton>
+    </Pressable>
   );
 };

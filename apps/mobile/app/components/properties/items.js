@@ -26,7 +26,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 
 export const Items = ({ item, buttons, close }) => {
@@ -54,10 +54,10 @@ export const Items = ({ item, buttons, close }) => {
         marginBottom: 10
       }}
     >
-      <PressableButton
+      <Pressable
         onPress={item.func}
-        type={item.on ? "shade" : "grayBg"}
-        customStyle={{
+        type={item.on ? "shade" : "secondary"}
+        style={{
           height: columnItemWidth - 12,
           width: columnItemWidth - 12,
           borderRadius: 10,
@@ -80,7 +80,7 @@ export const Items = ({ item, buttons, close }) => {
               : colors.secondary.icon
           }
         />
-      </PressableButton>
+      </Pressable>
 
       <Paragraph
         size={SIZE.xs}
@@ -105,7 +105,7 @@ export const Items = ({ item, buttons, close }) => {
       onPress={item.func}
       title={item.title}
       icon={item.icon}
-      type={item.on ? "shade" : "gray"}
+      type={item.on ? "shade" : "plain"}
       fontSize={SIZE.sm}
       style={{
         borderRadius: 0,
@@ -119,22 +119,22 @@ export const Items = ({ item, buttons, close }) => {
   const renderTopBarItem = (item, index) => {
     const isLast = index === topBarItems.length;
     return (
-      <PressableButton
+      <Pressable
         onPress={item.func}
         key={item.id}
         testID={"icon-" + item.id}
         activeOpacity={1}
-        customStyle={{
+        style={{
           alignSelf: "flex-start",
           marginRight: isLast ? 0 : 10,
           paddingHorizontal: 0,
           width: topBarItemWidth
         }}
       >
-        <PressableButton
+        <Pressable
           onPress={item.func}
-          type={item.on ? "shade" : "gray"}
-          customStyle={{
+          type={item.on ? "shade" : "plain"}
+          style={{
             height: topBarItemWidth,
             width: topBarItemWidth,
             justifyContent: "center",
@@ -157,7 +157,7 @@ export const Items = ({ item, buttons, close }) => {
                 : colors.secondary.icon
             }
           />
-        </PressableButton>
+        </Pressable>
 
         <Paragraph
           textBreakStrategy="simple"
@@ -166,7 +166,7 @@ export const Items = ({ item, buttons, close }) => {
         >
           {item.title}
         </Paragraph>
-      </PressableButton>
+      </Pressable>
     );
   };
 

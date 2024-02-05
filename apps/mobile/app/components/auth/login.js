@@ -103,7 +103,7 @@ export const Login = ({ changeMode }) => {
             justifyContent: "flex-end",
             paddingHorizontal: 20,
             backgroundColor: colors.secondary.background,
-            borderBottomWidth: 1,
+            borderBottomWidth: 0.8,
             marginBottom: 12,
             borderBottomColor: colors.primary.border,
             alignSelf: deviceMode !== "mobile" ? "center" : undefined,
@@ -222,7 +222,7 @@ export const Login = ({ changeMode }) => {
                   textDecorationLine: "underline"
                 }}
                 fontSize={SIZE.xs}
-                type="gray"
+                type="plain"
               />
             </>
           )}

@@ -108,7 +108,7 @@ export const WelcomeNotice = () => {
           eSendEvent(eCloseLoading);
         }}
         iconSize={20}
-        type="gray"
+        type="plain"
         iconPosition="right"
         icon="chevron-right"
         height={25}

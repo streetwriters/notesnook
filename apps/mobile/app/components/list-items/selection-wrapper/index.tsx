@@ -21,7 +21,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { PropsWithChildren, useRef } from "react";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 import { useSelectionStore } from "../../../stores/use-selection-store";
-import { PressableButton } from "../../ui/pressable";
+import { Pressable } from "../../ui/pressable";
 import { Filler } from "./back-fill";
 import { SelectionIcon } from "./selection";
 import { Item, TrashItem } from "@notesnook/core";
@@ -60,7 +60,7 @@ const SelectionWrapper = ({
   };
 
   return (
-    <PressableButton
+    <Pressable
       customColor={isSheet ? colors.primary.hover : "transparent"}
       testID={testID}
       onLongPress={onLongPress}
@@ -68,7 +68,7 @@ const SelectionWrapper = ({
       customSelectedColor={colors.primary.hover}
       customAlpha={!isDark ? -0.02 : 0.02}
       customOpacity={1}
-      customStyle={{
+      style={{
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
@@ -83,7 +83,7 @@ const SelectionWrapper = ({
       {item.type === "note" ? <Filler item={item} color={color} /> : null}
       <SelectionIcon item={item} />
       {children}
-    </PressableButton>
+    </Pressable>
   );
 };
 

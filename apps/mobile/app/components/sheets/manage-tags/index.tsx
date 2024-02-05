@@ -44,7 +44,7 @@ import { useRelationStore } from "../../../stores/use-relation-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { SIZE } from "../../../utils/size";
 import Input from "../../ui/input";
-import { PressableButton } from "../../ui/pressable";
+import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
@@ -283,9 +283,9 @@ const ManageTagsSheet = (props: {
       />
 
       {query && !queryExists ? (
-        <PressableButton
+        <Pressable
           key={"query_item"}
-          customStyle={{
+          style={{
             flexDirection: "row",
             marginVertical: 5,
             justifyContent: "space-between",
@@ -298,7 +298,7 @@ const ManageTagsSheet = (props: {
             Add {'"' + "#" + query + '"'}
           </Heading>
           <Icon name="plus" color={colors.selected.icon} size={SIZE.lg} />
-        </PressableButton>
+        </Pressable>
       ) : null}
 
       <FlatList
@@ -362,9 +362,9 @@ const TagItem = ({
   );
 
   return !tag ? null : (
-    <PressableButton
+    <Pressable
       key={tag?.id}
-      customStyle={{
+      style={{
         flexDirection: "row",
         marginVertical: 5,
         justifyContent: "flex-start",
@@ -374,7 +374,7 @@ const TagItem = ({
         if (!tag) return;
         onPress(tag.id);
       }}
-      type="gray"
+      type="plain"
     >
       {!tag ? null : (
         <Icon
@@ -418,6 +418,6 @@ const TagItem = ({
           }}
         />
       )}
-    </PressableButton>
+    </Pressable>
   );
 };

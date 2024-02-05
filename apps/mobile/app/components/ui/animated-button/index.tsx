@@ -29,7 +29,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { SIZE } from "../../../utils/size";
 import NativeTooltip from "../../../utils/tooltip";
 import { ButtonProps } from "../button";
-import { PressableButton, useButton } from "../pressable";
+import { Pressable, useButton } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
@@ -71,7 +71,7 @@ export const AnimatedButton = ({
       exiting={FadeOut}
       layout={Layout.springify()}
     >
-      <PressableButton
+      <Pressable
         {...restProps}
         fwdRef={fwdRef}
         onPress={onPress}
@@ -92,7 +92,7 @@ export const AnimatedButton = ({
         customSelectedColor={buttonType?.selected}
         customOpacity={buttonType?.opacity}
         customAlpha={buttonType?.alpha}
-        customStyle={{
+        style={{
           height: height,
           width: (width as DimensionValue) || undefined,
           paddingHorizontal: 12,
@@ -152,7 +152,7 @@ export const AnimatedButton = ({
             size={iconSize}
           />
         ) : null}
-      </PressableButton>
+      </Pressable>
     </Animated.View>
   );
 };

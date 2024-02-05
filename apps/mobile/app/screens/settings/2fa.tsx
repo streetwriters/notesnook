@@ -35,7 +35,7 @@ import DialogHeader from "../../components/dialog/dialog-header";
 import { Button } from "../../components/ui/button";
 import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
-import { PressableButton } from "../../components/ui/pressable";
+import { Pressable } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
 import { SvgView } from "../../components/ui/svg";
 import Heading from "../../components/ui/typography/heading";
@@ -111,12 +111,12 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
       />
       <Seperator />
       {getMethods().map((item) => (
-        <PressableButton
+        <Pressable
           key={item.title}
           onPress={() => {
             onSuccess && onSuccess(item);
           }}
-          customStyle={{
+          style={{
             paddingHorizontal: 12,
             paddingVertical: 12,
             marginTop: 0,
@@ -128,8 +128,8 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
         >
           {item.icon && (
             <IconButton
-              type="grayBg"
-              customStyle={{
+              type="secondary"
+              style={{
                 width: 50,
                 height: 50,
                 marginRight: 10
@@ -149,7 +149,7 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
             <Heading size={SIZE.md}>{item.title}</Heading>
             <Paragraph size={SIZE.sm}>{item.body}</Paragraph>
           </View>
-        </PressableButton>
+        </Pressable>
       ))}
     </>
   );
@@ -377,7 +377,7 @@ export const MFASetup = ({
 
             <Button
               title="Select a different 2FA method"
-              type="gray"
+              type="plain"
               height={25}
               onPress={() => {
                 setStep &&
@@ -617,7 +617,7 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
       {!recovery ? (
         <Button
           title="Setup secondary 2FA method"
-          type="gray"
+          type="plain"
           height={25}
           onPress={() => {
             MFASheet.present(true);

@@ -136,7 +136,7 @@ async function presentBackupCompleteSheet(backupFilePath) {
           });
         },
         actionText: "Never ask again",
-        type: "grayBg"
+        type: "secondary"
       }
     ]
   });

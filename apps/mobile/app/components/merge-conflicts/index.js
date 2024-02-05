@@ -190,7 +190,7 @@ const MergeConflicts = () => {
                 setDialogVisible(true);
               }}
               title="Save a copy"
-              type="grayBg"
+              type="secondary"
               height={30}
               style={{
                 borderRadius: 100,

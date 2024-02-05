@@ -211,7 +211,7 @@ const PDFPreview = () => {
                     color={colors.static.white}
                     name="arrow-left"
                     onPress={close}
-                    customStyle={{
+                    style={{
                       marginRight: 12
                     }}
                     size={SIZE.xxl}

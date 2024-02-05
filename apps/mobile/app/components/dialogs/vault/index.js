@@ -53,6 +53,7 @@ import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
+import { getColorLinearShade } from "../../../utils/colors";
 
 export class VaultDialog extends Component {
   constructor(props) {
@@ -858,10 +859,10 @@ export class VaultDialog extends Component {
                 title="Biometric unlocking"
                 iconColor={
                   this.state.biometricUnlock
-                    ? colors.selected.icon
+                    ? colors.selected.accent
                     : colors.primary.icon
                 }
-                type={this.state.biometricUnlock ? "transparent" : "selected"}
+                type={this.state.biometricUnlock ? "transparent" : "plain"}
               />
             ) : null}
           </View>

@@ -34,7 +34,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { getElevationStyle } from "../../utils/elevation";
 import { SIZE, normalize } from "../../utils/size";
 import NativeTooltip from "../../utils/tooltip";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 
 interface FloatingButtonProps {
   title: string;
@@ -116,11 +116,11 @@ const FloatingButton = ({
         animatedStyle
       ]}
     >
-      <PressableButton
+      <Pressable
         testID={notesnook.buttons.add}
         type="accent"
         accentColor={color}
-        customStyle={{
+        style={{
           ...getElevationStyle(5),
           borderRadius: 100
         }}
@@ -145,7 +145,7 @@ const FloatingButton = ({
             size={SIZE.xxl}
           />
         </View>
-      </PressableButton>
+      </Pressable>
     </Animated.View>
   );
 };

@@ -32,7 +32,7 @@ import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Input from "../ui/input";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
@@ -151,7 +151,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
         }}
       >
         <IconButton
-          customStyle={{
+          style={{
             width: 70,
             height: 70
           }}
@@ -183,7 +183,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
         {currentMethod.method === "sms" || currentMethod.method === "email" ? (
           <Button
             onPress={onSendCode}
-            type={seconds ? "gray" : "transparent"}
+            type={seconds ? "plain" : "transparent"}
             title={
               sending
                 ? ""
@@ -247,7 +247,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
 
             <Button
               title={secondaryMethodsText[currentMethod.method]}
-              type="gray"
+              type="plain"
               onPress={onRequestSecondaryMethod}
               height={30}
             />
@@ -255,7 +255,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
         ) : (
           <>
             {getMethods().map((item) => (
-              <PressableButton
+              <Pressable
                 key={item.title}
                 onPress={() => {
                   setCurrentMethod({
@@ -263,7 +263,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                     isPrimary: false
                   });
                 }}
-                customStyle={{
+                style={{
                   paddingHorizontal: 12,
                   paddingVertical: 12,
                   marginTop: 0,
@@ -275,8 +275,8 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                 }}
               >
                 <IconButton
-                  type="grayAccent"
-                  customStyle={{
+                  type="secondaryAccented"
+                  style={{
                     width: 40,
                     height: 40,
                     marginRight: 10
@@ -292,7 +292,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                 >
                   <Paragraph size={SIZE.md}>{item.title}</Paragraph>
                 </View>
-              </PressableButton>
+              </Pressable>
             ))}
           </>
         )}

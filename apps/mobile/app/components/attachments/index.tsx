@@ -209,7 +209,7 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
           ) : (
             <IconButton
               name="check-all"
-              customStyle={{
+              style={{
                 height: 40,
                 width: 40,
                 marginRight: 10
@@ -222,7 +222,7 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
 
           <IconButton
             name="download"
-            customStyle={{
+            style={{
               height: 40,
               width: 40
             }}
@@ -265,7 +265,9 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
         >
           {attachmentTypes.map((item) => (
             <Button
-              type={currentFilter === item.filterBy ? "grayAccent" : "gray"}
+              type={
+                currentFilter === item.filterBy ? "secondaryAccented" : "plain"
+              }
               key={item.title}
               title={item.title}
               style={{

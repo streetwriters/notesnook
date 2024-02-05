@@ -54,7 +54,7 @@ export const LeftMenus = ({
   return isTablet && !canGoBack ? null : (
     <IconButton
       testID={notesnook.ids.default.header.buttons.left}
-      customStyle={{
+      style={{
         justifyContent: "center",
         alignItems: "center",
         height: 40,

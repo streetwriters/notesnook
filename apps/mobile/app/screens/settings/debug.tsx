@@ -241,7 +241,7 @@ export default function DebugLogs() {
                 <Paragraph>{currentLog.key}</Paragraph>
 
                 <IconButton
-                  customStyle={{
+                  style={{
                     width: 30,
                     height: 30,
                     marginHorizontal: 5
@@ -259,7 +259,7 @@ export default function DebugLogs() {
                 />
 
                 <IconButton
-                  customStyle={{
+                  style={{
                     width: 30,
                     height: 30
                   }}
@@ -284,7 +284,7 @@ export default function DebugLogs() {
                 <IconButton
                   onPress={copyLogs}
                   size={20}
-                  customStyle={{
+                  style={{
                     width: 30,
                     height: 30,
                     marginRight: 5
@@ -294,7 +294,7 @@ export default function DebugLogs() {
                 />
                 <IconButton
                   onPress={downloadLogs}
-                  customStyle={{
+                  style={{
                     width: 30,
                     height: 30,
                     marginRight: 5
@@ -306,7 +306,7 @@ export default function DebugLogs() {
 
                 <IconButton
                   onPress={clearLogs}
-                  customStyle={{
+                  style={{
                     width: 30,
                     height: 30,
                     marginRight: 5

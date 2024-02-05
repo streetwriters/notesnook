@@ -245,7 +245,7 @@ const DownloadAttachments = ({
             onPress={() => {
               close?.();
             }}
-            type="grayBg"
+            type="secondary"
             title="No"
           />
           <Button

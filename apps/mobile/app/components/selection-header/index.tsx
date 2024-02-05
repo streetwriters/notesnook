@@ -155,7 +155,7 @@ export const SelectionHeader = React.memo(
           }}
         >
           <IconButton
-            customStyle={{
+            style={{
               justifyContent: "center",
               alignItems: "center",
               height: 40,
@@ -163,7 +163,7 @@ export const SelectionHeader = React.memo(
               borderRadius: 100,
               marginRight: 10
             }}
-            type="grayBg"
+            type="secondary"
             onPress={() => {
               clearSelection();
             }}
@@ -203,7 +203,7 @@ export const SelectionHeader = React.memo(
             }}
             tooltipText="Select all"
             tooltipPosition={4}
-            customStyle={{
+            style={{
               marginLeft: 10
             }}
             color={
@@ -220,7 +220,7 @@ export const SelectionHeader = React.memo(
                   await sleep(100);
                   ManageTagsSheet.present(selectedItemsList);
                 }}
-                customStyle={{
+                style={{
                   marginLeft: 10
                 }}
                 color={colors.primary.icon}
@@ -236,7 +236,7 @@ export const SelectionHeader = React.memo(
                 }}
                 tooltipText="Export"
                 tooltipPosition={4}
-                customStyle={{
+                style={{
                   marginLeft: 10
                 }}
                 color={colors.primary.paragraph}
@@ -248,7 +248,7 @@ export const SelectionHeader = React.memo(
                 onPress={async () => {
                   MoveNoteSheet.present();
                 }}
-                customStyle={{
+                style={{
                   marginLeft: 10
                 }}
                 tooltipText="Add to notebooks"
@@ -271,7 +271,7 @@ export const SelectionHeader = React.memo(
                   clearSelection();
                 }
               }}
-              customStyle={{
+              style={{
                 marginLeft: 10
               }}
               tooltipText={`Remove from Notebook`}
@@ -286,7 +286,7 @@ export const SelectionHeader = React.memo(
           {focusedRouteId === "Favorites" ? (
             <IconButton
               onPress={addToFavorite}
-              customStyle={{
+              style={{
                 marginLeft: 10
               }}
               tooltipText="Remove from favorites"
@@ -299,7 +299,7 @@ export const SelectionHeader = React.memo(
 
           {type === "trash" ? null : (
             <IconButton
-              customStyle={{
+              style={{
                 marginLeft: 10
               }}
               onPress={() => {
@@ -322,7 +322,7 @@ export const SelectionHeader = React.memo(
           {type === "trash" ? (
             <>
               <IconButton
-                customStyle={{
+                style={{
                   marginLeft: 10
                 }}
                 color={colors.primary.paragraph}
@@ -334,7 +334,7 @@ export const SelectionHeader = React.memo(
               />
 
               <IconButton
-                customStyle={{
+                style={{
                   marginLeft: 10
                 }}
                 color={colors.primary.paragraph}

@@ -118,7 +118,7 @@ const NoteItem = ({
                   key={item.id}
                   height={25}
                   icon={item.type === "notebook" ? "bookmark" : "book-outline"}
-                  type="grayBg"
+                  type="secondary"
                   fontSize={SIZE.xs}
                   iconSize={SIZE.sm}
                   textStyle={{
@@ -287,7 +287,7 @@ const NoteItem = ({
                           title={"#" + item.title}
                           key={item.id}
                           height={23}
-                          type="gray"
+                          type="plain"
                           textStyle={{
                             textDecorationLine: "underline"
                           }}
@@ -397,7 +397,7 @@ const NoteItem = ({
           name="dots-horizontal"
           size={SIZE.xl}
           onPress={() => !noOpen && Properties.present(item)}
-          customStyle={{
+          style={{
             justifyContent: "center",
             height: 35,
             width: 35,

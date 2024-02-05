@@ -70,6 +70,8 @@ import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import ImagePicker from "react-native-image-crop-picker";
+
 type User = any;
 
 export const settingsGroups: SettingSection[] = [
@@ -132,6 +134,54 @@ export const settingsGroups: SettingSection[] = [
         icon: "account-cog",
         description: "Manage account",
         sections: [
+          {
+            id: "change-profile-picture",
+            name: "Change profile picture",
+            description: "Change your profile picture",
+            icon: "account-outline",
+            modifer: () => {
+              const theme =
+                useThemeStore.getState().colorScheme === "dark"
+                  ? useThemeStore.getState().darkTheme
+                  : useThemeStore.getState().lightTheme;
+              ImagePicker.openPicker({
+                compressImageMaxWidth: 512,
+                compressImageMaxHeight: 512,
+                compressImageQuality: 0.8,
+                avoidEmptySpaceAroundImage: true,
+                cropping: true,
+                cropperCircleOverlay: true,
+                mediaType: "photo",
+                forceJpg: true,
+                includeBase64: true,
+                writeTempFile: false,
+                cropperToolbarColor: theme.scopes.base.primary.background,
+                cropperToolbarTitle: "Edit profile picture",
+                cropperActiveWidgetColor: theme.scopes.base.primary.accent,
+                cropperToolbarWidgetColor: theme.scopes.base.primary.icon
+              }).then((image) => {
+                console.log(image);
+              });
+            }
+          },
+          {
+            id: "change-name",
+            name: "Change name",
+            description: "Change your name",
+            modifer: () => {
+              presentDialog({
+                title: "Change name",
+                paragraph: "Change your name",
+                positiveText: "Save",
+                input: true,
+                inputPlaceholder: "Enter new name",
+                defaultValue: "Ammar Ahmed",
+                positivePress(value) {
+                  console.log(value);
+                }
+              });
+            }
+          },
           {
             id: "recovery-key",
             name: "Save data recovery key",

@@ -17,23 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
+import { useNetInfo } from "@react-native-community/netinfo";
 import React from "react";
-import { ActivityIndicator, Platform, View } from "react-native";
+import { ActivityIndicator, Image, Platform, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useSyncProgress from "../../hooks/use-sync-progress";
 import { eSendEvent } from "../../services/event-manager";
 import Sync from "../../services/sync";
-import { useThemeColors } from "@notesnook/theme";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { eOpenLoginDialog } from "../../utils/events";
 import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 import { TimeSince } from "../ui/time-since";
-import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useNetInfo } from "@react-native-community/netinfo";
+
+const PROFILE_PIC_URL = `https://picsum.photos/id/177/367/267`;
+
 export const UserStatus = () => {
   const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
@@ -61,7 +63,7 @@ export const UserStatus = () => {
           alignItems: "center"
         }}
       >
-        <PressableButton
+        <Pressable
           onPress={async () => {
             if (user) {
               Sync.run();
@@ -70,22 +72,55 @@ export const UserStatus = () => {
               eSendEvent(eOpenLoginDialog);
             }
           }}
-          type="gray"
-          customStyle={{
+          type="plain"
+          style={{
             flexDirection: "row",
             justifyContent: "flex-start",
             padding: 12,
-            paddingHorizontal: 20,
-            borderRadius: 0
+            borderRadius: 0,
+            alignItems: "center"
           }}
         >
+          {user ? (
+            <Image
+              source={{
+                uri: PROFILE_PIC_URL
+              }}
+              style={{
+                width: 35,
+                height: 35,
+                borderRadius: 100,
+                backgroundColor: "red",
+                marginRight: 10
+              }}
+            />
+          ) : null}
+
           <View
             style={{
               flexShrink: 1,
               flexGrow: 1
             }}
           >
-            <Heading
+            <Paragraph
+              style={{
+                flexWrap: "wrap"
+              }}
+              size={SIZE.sm}
+              color={colors.primary.heading}
+            >
+              {!user
+                ? "Login to sync your notes."
+                : lastSyncStatus === SyncStatus.Failed
+                ? "Sync failed, tap to retry"
+                : syncing
+                ? `Syncing your notes${
+                    progress ? ` (${progress.current})` : ""
+                  }`
+                : "Ammar Ahmed"}
+            </Paragraph>
+
+            <Paragraph
               style={{
                 flexWrap: "wrap"
               }}
@@ -93,17 +128,18 @@ export const UserStatus = () => {
               color={colors.secondary.heading}
             >
               {!user ? (
-                "You are not logged in"
+                "Not logged in"
               ) : lastSynced && lastSynced !== "Never" ? (
                 <>
-                  Synced{" "}
+                  {lastSyncStatus === SyncStatus.Failed
+                    ? "Sync failed"
+                    : "Synced"}{" "}
                   <TimeSince
                     style={{
                       fontSize: SIZE.xs,
                       color: colors.secondary.paragraph
                     }}
                     time={lastSynced}
-                    bold={true}
                   />
                   {isOffline ? " (offline)" : ""}
                 </>
@@ -122,23 +158,6 @@ export const UserStatus = () => {
                     : colors.success.icon
                 }
               />
-            </Heading>
-
-            <Paragraph
-              style={{
-                flexWrap: "wrap"
-              }}
-              color={colors.primary.heading}
-            >
-              {!user
-                ? "Login to sync your notes."
-                : lastSyncStatus === SyncStatus.Failed
-                ? "Last sync failed, tap to try again"
-                : syncing
-                ? `Syncing your notes${
-                    progress ? ` (${progress.current})` : ""
-                  }`
-                : "Tap here to sync your notes."}
             </Paragraph>
           </View>
 
@@ -161,7 +180,7 @@ export const UserStatus = () => {
               />
             )
           ) : null}
-        </PressableButton>
+        </Pressable>
       </View>
     </View>
   );

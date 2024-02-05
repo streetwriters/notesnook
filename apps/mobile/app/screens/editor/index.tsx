@@ -188,10 +188,10 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
   return readonly && !keyboard.keyboardShown ? (
     <IconButton
       name="pencil-lock"
-      type="grayBg"
+      type="secondary"
       onPress={onPress}
       color={colors.primary.accent}
-      customStyle={{
+      style={{
         position: "absolute",
         bottom: 60,
         width: 60,

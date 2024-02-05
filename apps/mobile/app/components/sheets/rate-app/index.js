@@ -126,7 +126,7 @@ const RateAppSheet = () => {
             onPress={onClose}
             fontSize={SIZE.md}
             width="48%"
-            type="grayBg"
+            type="secondary"
             title="Later"
           />
         </View>

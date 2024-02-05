@@ -30,7 +30,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { SIZE, normalize } from "../../utils/size";
 import ReorderableList from "../list/reorderable-list";
 import { Properties } from "../properties";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { useSideBarDraggingStore } from "./dragging-store";
@@ -97,14 +97,14 @@ const ColorItem = React.memo(
     };
 
     return (
-      <PressableButton
+      <Pressable
         customColor={isFocused ? "rgba(0,0,0,0.04)" : "transparent"}
         onLongPress={onLongPress}
         customSelectedColor={item.colorCode}
         customAlpha={!isDark ? -0.02 : 0.02}
         customOpacity={0.12}
         onPress={() => onPress(item)}
-        customStyle={{
+        style={{
           width: "100%",
           alignSelf: "center",
           borderRadius: 5,
@@ -150,7 +150,7 @@ const ColorItem = React.memo(
             </Paragraph>
           )}
         </View>
-      </PressableButton>
+      </Pressable>
     );
   },
   (prev, next) => {

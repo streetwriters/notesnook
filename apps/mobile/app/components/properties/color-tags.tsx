@@ -34,8 +34,8 @@ import { refreshNotesPage } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import ColorPicker from "../dialogs/color-picker";
 import { Button } from "../ui/button";
-import { PressableButton } from "../ui/pressable";
 import NativeTooltip from "../../utils/tooltip";
+import { Pressable } from "../ui/pressable";
 
 const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
   const { colors } = useThemeColors();
@@ -64,7 +64,7 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
   };
 
   return (
-    <PressableButton
+    <Pressable
       type="accent"
       accentColor={item.colorCode}
       accentText={colors.static.white}
@@ -74,7 +74,7 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
       onLongPress={(event) => {
         NativeTooltip.show(event, item.title, NativeTooltip.POSITIONS.TOP);
       }}
-      customStyle={{
+      style={{
         width: 35,
         height: 35,
         borderRadius: 100,
@@ -86,7 +86,7 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
       {isLinked ? (
         <Icon testID="icon-check" name="check" color="white" size={SIZE.lg} />
       ) : null}
-    </PressableButton>
+    </Pressable>
   );
 };
 
@@ -143,7 +143,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
                   text: colors.primary.accent
                 }}
                 title="Add color"
-                type="grayBg"
+                type="secondary"
                 icon="plus"
                 iconPosition="right"
                 height={30}
@@ -155,8 +155,8 @@ export const ColorTags = ({ item }: { item: Note }) => {
                 }}
               />
             ) : (
-              <PressableButton
-                customStyle={{
+              <Pressable
+                style={{
                   width: 35,
                   height: 35,
                   borderRadius: 100,
@@ -164,7 +164,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
                   alignItems: "center",
                   marginRight: 5
                 }}
-                type="grayBg"
+                type="secondary"
                 onPress={() => {
                   useSettingStore.getState().setSheetKeyboardHandler(false);
                   setVisible(true);
@@ -176,7 +176,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
                   color={colors.primary.icon}
                   size={SIZE.lg}
                 />
-              </PressableButton>
+              </Pressable>
             )
           }
         />

@@ -67,8 +67,8 @@ export const SearchBar = ({
           Navigation.goBack();
         }}
         color={colors.primary.paragraph}
-        type="gray"
-        customStyle={{
+        type="plain"
+        style={{
           paddingLeft: 0,
           marginLeft: -5,
           marginRight: DDS.isLargeTablet() ? 10 : 7

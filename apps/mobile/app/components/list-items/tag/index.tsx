@@ -105,7 +105,7 @@ const TagItem = React.memo(
             Properties.present(item);
           }}
           testID={notesnook.ids.tag.menu}
-          customStyle={{
+          style={{
             justifyContent: "center",
             height: 35,
             width: 35,

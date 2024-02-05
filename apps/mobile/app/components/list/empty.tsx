@@ -98,13 +98,13 @@ export const Empty = React.memo(function Empty({
           {placeholder?.button && (
             <Button
               testID={notesnook.buttons.add}
-              type="grayAccent"
+              type="accent"
               title={placeholder?.button}
               iconPosition="right"
               icon="arrow-right"
               onPress={placeholder?.action}
               buttonType={{
-                text: color || colors.primary.accent
+                text: "white"
               }}
               style={{
                 alignSelf: "flex-start",

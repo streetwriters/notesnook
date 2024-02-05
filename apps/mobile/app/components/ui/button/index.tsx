@@ -32,10 +32,10 @@ import { useUserStore } from "../../../stores/use-user-store";
 import { SIZE } from "../../../utils/size";
 import NativeTooltip from "../../../utils/tooltip";
 import { ProTag } from "../../premium/pro-tag";
-import { PressableButton, PressableButtonProps, useButton } from "../pressable";
+import { Pressable, PressableProps, useButton } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
-export interface ButtonProps extends PressableButtonProps {
+export interface ButtonProps extends PressableProps {
   height?: number;
   icon?: string;
   fontSize?: number;
@@ -95,7 +95,7 @@ export const Button = ({
   const Component = bold ? Heading : Paragraph;
 
   return (
-    <PressableButton
+    <Pressable
       {...restProps}
       fwdRef={fwdRef}
       onPress={onPress}
@@ -116,7 +116,7 @@ export const Button = ({
       customSelectedColor={buttonType?.selected}
       customOpacity={buttonType?.opacity}
       customAlpha={buttonType?.alpha}
-      customStyle={{
+      style={{
         height: height,
         width: (width as DimensionValue) || undefined,
         paddingHorizontal: 12,
@@ -176,6 +176,6 @@ export const Button = ({
           size={iconSize}
         />
       ) : null}
-    </PressableButton>
+    </Pressable>
   );
 };
