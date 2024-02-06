@@ -32,16 +32,16 @@ import { getDatabaseKey } from "./encryption";
 database.host(
   __DEV__
     ? {
-        // API_HOST: "https://api.notesnook.com",
-        // AUTH_HOST: "https://auth.streetwriters.co",
-        // SSE_HOST: "https://events.streetwriters.co",
-        // SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
-        // ISSUES_HOST: "https://issues.streetwriters.co"
-        API_HOST: "http://192.168.43.5:5264",
-        AUTH_HOST: "http://192.168.43.5:8264",
-        SSE_HOST: "http://192.168.43.5:7264",
-        SUBSCRIPTIONS_HOST: "http://192.168.43.5:9264",
-        ISSUES_HOST: "http://192.168.43.5:2624"
+        API_HOST: "https://api.notesnook.com",
+        AUTH_HOST: "https://auth.streetwriters.co",
+        SSE_HOST: "https://events.streetwriters.co",
+        SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
+        ISSUES_HOST: "https://issues.streetwriters.co"
+        // API_HOST: "http://192.168.43.5:5264",
+        // AUTH_HOST: "http://192.168.43.5:8264",
+        // SSE_HOST: "http://192.168.43.5:7264",
+        // SUBSCRIPTIONS_HOST: "http://192.168.43.5:9264",
+        // ISSUES_HOST: "http://192.168.43.5:2624"
       }
     : {
         API_HOST: "https://api.notesnook.com",
@@ -57,7 +57,8 @@ export async function setupDatabase(password) {
   if (!key)
     throw new Error("Database setup failed, could not get database key");
 
-  console.log("Opening database with key:", key);
+  console.log("Opening database with key:", !!key);
+
   database.setup({
     storage: Storage,
     eventsource: Platform.OS === "ios" ? EventSource : AndroidEventSource,
