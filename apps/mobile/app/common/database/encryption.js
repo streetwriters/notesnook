@@ -21,9 +21,10 @@ import Sodium from "@ammarahmed/react-native-sodium";
 import { Platform } from "react-native";
 import "react-native-get-random-values";
 import * as Keychain from "react-native-keychain";
+import { MMKVLoader, ProcessingModes } from "react-native-mmkv-storage";
 import { generateSecureRandom } from "react-native-securerandom";
+import { DatabaseLogger } from ".";
 import { MMKV } from "./mmkv";
-import { ProcessingModes, MMKVLoader } from "react-native-mmkv-storage";
 
 // Database key cipher is persisted across different user sessions hence it has
 // it's independent storage which we will never clear. This is only used when application has
@@ -41,6 +42,11 @@ export const CipherStorage = new MMKVLoader()
 const IOS_KEYCHAIN_ACCESS_GROUP = "group.org.streetwriters.notesnook";
 const IOS_KEYCHAIN_SERVICE_NAME = "org.streetwriters.notesnook";
 const KEYCHAIN_SERVER_DBKEY = "notesnook:db";
+const NOTESNOOK_APPLOCK_KEY_SALT = "notesnook_applock_key_salt";
+const NOTESNOOK_DB_KEY_SALT = "notesnook_database_key";
+const DB_KEY_CIPHER = "databaseKeyCipher";
+const USER_KEY_CIPHER = "userKeyCipher";
+const APPLOCK_CIPHER = "applockCipher";
 
 const KEYSTORE_CONFIG = Platform.select({
   ios: {
@@ -73,17 +79,17 @@ export async function encryptDatabaseKeyWithPassword(appLockPassword) {
   const key = getDatabaseKey();
   const appLockCredentials = await Sodium.deriveKey(
     appLockPassword,
-    "notesnook_applock_key"
+    NOTESNOOK_APPLOCK_KEY_SALT
   );
   const databaseKeyCipher = await encrypt(appLockCredentials, key);
-  MMKV.setMap("databaseKeyCipher", databaseKeyCipher);
+  MMKV.setMap(DB_KEY_CIPHER, databaseKeyCipher);
   // We reset the database key from keychain once app lock password is set.
-  await Keychain.resetInternetCredentials("notesnook:db");
+  await Keychain.resetInternetCredentials(KEYCHAIN_SERVER_DBKEY);
   return true;
 }
 
 export async function restoreDatabaseKeyToKeyChain(appLockPassword) {
-  const databaseKeyCipher = CipherStorage.getMap("databaseKeyCipher");
+  const databaseKeyCipher = CipherStorage.getMap(DB_KEY_CIPHER);
   const databaseKey = await decrypt(
     {
       password: appLockPassword
@@ -97,32 +103,34 @@ export async function restoreDatabaseKeyToKeyChain(appLockPassword) {
     databaseKey,
     KEYSTORE_CONFIG
   );
-  MMKV.removeItem("databaseKeyCipher");
+  MMKV.removeItem(DB_KEY_CIPHER);
   return true;
 }
 
 export async function setAppLockVerificationCipher(appLockPassword) {
   try {
-    console.log("key", appLockPassword);
     const appLockCredentials = await Sodium.deriveKey(
       appLockPassword,
-      "notesnook_applock_key_salt"
+      NOTESNOOK_APPLOCK_KEY_SALT
     );
-    const encrypted = await encrypt(appLockCredentials, "applock_password");
+    const encrypted = await encrypt(appLockCredentials, generatePassword());
 
-    CipherStorage.setMap("appLockCipher", encrypted);
+    CipherStorage.setMap(APPLOCK_CIPHER, encrypted);
+
+    DatabaseLogger.info("setAppLockVerificationCipher");
   } catch (e) {
+    DatabaseLogger.error(e);
     console.log(e);
   }
 }
 
 export async function clearAppLockVerificationCipher() {
-  CipherStorage.removeItem("appLockCipher");
+  CipherStorage.removeItem(APPLOCK_CIPHER);
 }
 
 export async function validateAppLockPassword(appLockPassword) {
   try {
-    const appLockCipher = CipherStorage.getMap("appLockCipher");
+    const appLockCipher = CipherStorage.getMap(APPLOCK_CIPHER);
     if (!appLockCipher) return true;
     const decrypted = await decrypt(
       {
@@ -130,9 +138,12 @@ export async function validateAppLockPassword(appLockPassword) {
       },
       appLockCipher
     );
-    return decrypted === "applock_password";
+    DatabaseLogger.info(
+      `validateAppLockPassword: ${typeof decrypted === "string"}`
+    );
+    return typeof decrypted === "string";
   } catch (e) {
-    console.error(e);
+    DatabaseLogger.error(e);
     return false;
   }
 }
@@ -140,6 +151,7 @@ export async function validateAppLockPassword(appLockPassword) {
 let DB_KEY;
 export function clearDatabaseKey() {
   DB_KEY = undefined;
+  DatabaseLogger.info("Cleared database key");
 }
 
 export async function getDatabaseKey(appLockPassword) {
@@ -153,7 +165,7 @@ export async function getDatabaseKey(appLockPassword) {
         },
         databaseKeyCipher
       );
-      console.log("Getting database key from cipher");
+      DatabaseLogger.info("Getting database key from cipher");
       DB_KEY = databaseKey;
       return databaseKey;
     }
@@ -164,15 +176,15 @@ export async function getDatabaseKey(appLockPassword) {
         KEYCHAIN_SERVER_DBKEY,
         KEYSTORE_CONFIG
       );
-      console.log("Getting database key from Keychain");
+      DatabaseLogger.info("Getting database key from Keychain");
       DB_KEY = credentials.password;
       return credentials.password;
     }
-    console.log("Generating new database key");
+    DatabaseLogger.info("Generating new database key");
     const password = generatePassword();
     const derivedDatabaseKey = await Sodium.deriveKey(
       password,
-      "notesnook_database_key"
+      NOTESNOOK_DB_KEY_SALT
     );
     await Keychain.setInternetCredentials(
       KEYCHAIN_SERVER_DBKEY,
@@ -194,16 +206,16 @@ export async function getDatabaseKey(appLockPassword) {
         userKeyCredentials.password
       );
       // Store encrypted user key in MMKV
-      MMKV.setMap("userKeyCipher", userKeyCipher);
+      MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
       await Keychain.resetInternetCredentials("notesnook");
-      console.log("Migrated user credentials to cipher");
+      DatabaseLogger.info("Migrated user credentials to cipher storage");
     }
 
     DB_KEY = derivedDatabaseKey.key;
 
     return derivedDatabaseKey.key;
   } catch (e) {
-    console.log(e);
+    DatabaseLogger.error(e);
     return null;
   }
 }
@@ -219,16 +231,16 @@ export async function deriveCryptoKey(name, data) {
       credentials.key
     );
     // Store encrypted user key in MMKV
-    MMKV.setMap("userKeyCipher", userKeyCipher);
+    MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
     return credentials.key;
   } catch (e) {
-    console.error(e);
+    DatabaseLogger.error(e);
   }
 }
 
 export async function getCryptoKey(_name) {
   try {
-    const keyCipher = MMKV.getMap("userKeyCipher");
+    const keyCipher = MMKV.getMap(USER_KEY_CIPHER);
     if (!key) return null;
 
     const key = decrypt(
@@ -240,17 +252,17 @@ export async function getCryptoKey(_name) {
 
     return key;
   } catch (e) {
-    console.error(e);
+    DatabaseLogger.error(e);
   }
 }
 
 export async function removeCryptoKey(_name) {
   try {
-    MMKV.removeItem("userKeyCipher");
+    MMKV.removeItem(USER_KEY_CIPHER);
     await Keychain.resetInternetCredentials("notesnook");
     return true;
   } catch (e) {
-    console.error(e);
+    DatabaseLogger.error(e);
   }
 }
 
@@ -268,7 +280,7 @@ export async function generateCryptoKey(password, salt) {
     let credentials = await Sodium.deriveKey(password, salt || null);
     return credentials;
   } catch (e) {
-    console.log("generateCryptoKey: ", e);
+    DatabaseLogger.error(e);
   }
 }
 
