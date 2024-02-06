@@ -10,7 +10,7 @@ require Pod::Executable.execute_command('node', ['-p',
     "@react-native-community/cli-platform-ios/native_modules.rb",
     {paths: [process.argv[1]]},
   )', __dir__]).strip
-  
+
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
@@ -36,11 +36,11 @@ pod 'SexyTooltip',:git => 'https://github.com/ammarahm-ed/SexyTooltip.git'
 pod 'MMKV'
 
 target 'Notesnook' do
-    
+
   config = use_native_modules!
   # Flags change depending on the env values.
   flags = get_default_flags()
-  
+
   use_react_native!(
     :path => config[:reactNativePath],
     # Hermes is now enabled by default. Disable by setting this flag to false.
@@ -58,7 +58,7 @@ target 'Notesnook' do
   )
 
   target 'NotesnookTests' do
-   
+
     # Pods for testing
   end
 end
@@ -129,7 +129,7 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     if target.name == "react-native-quick-sqlite" then
       target.build_configurations.each do |config|
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'SQLITE_ENABLE_FTS5=1'
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'SQLITE_ENABLE_FTS5=1 SQLITE3MC_OMIT_AES_HARDWARE_SUPPORT HAVE_CIPHER_AES_128_CBC=0 HAVE_CIPHER_AES_256_CBC=0 HAVE_CIPHER_SQLCIPHER=0 HAVE_CIPHER_RC4=0 HAVE_CIPHER_CHACHA20=1 SQLITE_ENABLE_FTS5 SQLITE_OMIT_PROGRESS_CALLBACK=1 SQLITE_MAX_EXPR_DEPTH=0 SQLITE_OMIT_DEPRECATED=1 SQLITE_DEFAULT_WAL_SYNCHRONOUS=1 SQLITE_LIKE_DOESNT_MATCH_BLOBS=1 SQLITE_DQS=0 SQLITE_DEFAULT_MEMSTATUS=0 SQLITE_USE_ALLOCA=1'
       end
     end
   end

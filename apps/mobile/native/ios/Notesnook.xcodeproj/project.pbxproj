@@ -20,9 +20,9 @@
 		6517B7C22B6838EB0079FF37 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7BF2B6838EB0079FF37 /* OpenSans-SemiBold.ttf */; };
 		6517B7C32B6838EB0079FF37 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7C02B6838EB0079FF37 /* OpenSans-Bold.ttf */; };
 		6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */; };
-		656DD2AB2B1891DF00A362EA /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6552012F27019F7700A43C51 /* OpenSans-Regular.ttf */; };
-		656DD2AC2B1891DF00A362EA /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659670B12A2754FD00C5D2AF /* OpenSans-Bold.ttf */; };
-		656DD2AD2B1891DF00A362EA /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6552012E27019F6E00A43C51 /* OpenSans-SemiBold.ttf */; };
+		656DD2AB2B1891DF00A362EA /* BuildFile in Resources */ = {isa = PBXBuildFile; };
+		656DD2AC2B1891DF00A362EA /* BuildFile in Resources */ = {isa = PBXBuildFile; };
+		656DD2AD2B1891DF00A362EA /* BuildFile in Resources */ = {isa = PBXBuildFile; };
 		6593E4A3281C345400492C50 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6593E4A2281C345400492C50 /* AppDelegate.mm */; };
 		659BE46725E11A5100E05671 /* notesnook-text.png in Resources */ = {isa = PBXBuildFile; fileRef = 659BE46625E11A5100E05671 /* notesnook-text.png */; };
 		65AA857925E6DDEC00772A01 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65AA857825E6DDEC00772A01 /* WidgetKit.framework */; };
@@ -582,9 +582,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				656DD2AB2B1891DF00A362EA /* OpenSans-Regular.ttf in Resources */,
-				656DD2AC2B1891DF00A362EA /* OpenSans-Bold.ttf in Resources */,
-				656DD2AD2B1891DF00A362EA /* OpenSans-SemiBold.ttf in Resources */,
+				656DD2AB2B1891DF00A362EA /* BuildFile in Resources */,
+				656DD2AC2B1891DF00A362EA /* BuildFile in Resources */,
+				656DD2AD2B1891DF00A362EA /* BuildFile in Resources */,
 				65C400DF2A80B6B600AA3DF5 /* MaterialCommunityIcons.ttf in Resources */,
 				65C149872A61151B005C40F1 /* extension.bundle in Resources */,
 				65B5014725A672B200E2D264 /* MainInterface.storyboard in Resources */,

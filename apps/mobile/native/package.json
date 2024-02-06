@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@ammarahmed/notifee-react-native": "7.4.6",
+    "@ammarahmed/notifee-react-native": "7.4.7",
     "@ammarahmed/react-native-share-extension": "^2.5.5",
     "@ammarahmed/react-native-sodium": "1.5.4",
     "@bam.tech/react-native-image-resizer": "3.0.5",
@@ -44,7 +44,7 @@
     "react-native-image-picker": "4.1.2",
     "react-native-in-app-review": "4.3.3",
     "react-native-keychain": "4.0.5",
-    "react-native-mmkv-storage": "^0.10.0-alpha.11",
+    "react-native-mmkv-storage": "^0.10.0-alpha.12",
     "react-native-modal-datetime-picker": "14.0.0",
     "react-native-navigation-bar-color": "2.0.2",
     "react-native-notification-sounds": "0.5.5",
