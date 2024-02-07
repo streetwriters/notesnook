@@ -113,10 +113,7 @@ class KeyStore {
     );
 
     await this.metadataStore.delete(this.keyId);
-    await this.metadataStore.set<SerializableCredential[]>("credentials", [
-      ...(await this.getCredentials()),
-      { id: credential.id, type: credential.type }
-    ]);
+    await this.setCredential({ id: credential.id, type: credential.type });
 
     this.key = originalKey;
     return this;
@@ -128,7 +125,7 @@ class KeyStore {
       permanent?: boolean;
     }
   ) {
-    if (!(await this.isLocked())) return this;
+    if (!(await this.hasCredential(credential))) return;
 
     const encryptedKey = await this.metadataStore.get<
       Cipher<"base64"> | EncryptedData
@@ -147,9 +144,7 @@ class KeyStore {
     );
 
     if (options?.permanent) {
-      for (const credential of await this.getCredentials()) {
-        await this.metadataStore.delete(this.getCredentialKey(credential));
-      }
+      await this.resetCredentials();
       await this.storeKey(key);
       this.key = undefined;
     } else this.key = key;
@@ -226,6 +221,31 @@ class KeyStore {
       (await this.metadataStore.get<SerializableCredential[]>("credentials")) ||
       []
     );
+  }
+
+  public async hasCredential(credential: SerializableCredential) {
+    const credentials = await this.getCredentials();
+    const index = credentials.findIndex(
+      (c) => c.type === credential.type && c.id === credential.id
+    );
+    return index > -1;
+  }
+
+  public async resetCredentials() {
+    for (const credential of await this.getCredentials()) {
+      await this.metadataStore.delete(this.getCredentialKey(credential));
+    }
+    await this.metadataStore.delete("credentials");
+  }
+
+  public async setCredential(credential: SerializableCredential) {
+    const credentials = await this.getCredentials();
+    const index = credentials.findIndex(
+      (c) => c.type === credential.type && c.id === credential.id
+    );
+    if (index > -1) return;
+    credentials.push(credential);
+    await this.metadataStore.set("credentials", credentials);
   }
 
   public async set(name: string, value: string) {
