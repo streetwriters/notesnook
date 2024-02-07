@@ -31,22 +31,30 @@ import {
   eSubscribeEvent
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { getElevationStyle } from "../../../utils/elevation";
 import {
   eCloseAppLocKPasswordDailog,
   eOpenAppLockPasswordDialog
 } from "../../../utils/events";
+import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import BaseDialog from "../../dialog/base-dialog";
 import DialogButtons from "../../dialog/dialog-buttons";
 import DialogHeader from "../../dialog/dialog-header";
 import { Toast } from "../../toast";
+import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 
 export const AppLockPassword = () => {
   const { colors } = useThemeColors();
   const [mode, setMode] = useState<"create" | "change" | "remove">("create");
+  const [keyboardType, setKeyboardType] = useState<"pin" | "password">(
+    useSettingStore.getState().settings.applockKeyboardType === "default"
+      ? "password"
+      : "pin"
+  );
   const [visible, setVisible] = useState(false);
   const currentPasswordInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
@@ -56,6 +64,7 @@ export const AppLockPassword = () => {
     password?: string;
     confirmPassword?: string;
   }>({});
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   useEffect(() => {
     const subs = [
@@ -72,7 +81,7 @@ export const AppLockPassword = () => {
       })
     ];
     return () => {
-      subs.forEach((sub) => sub.unsubscribe());
+      subs.forEach((sub) => sub?.unsubscribe());
     };
   }, []);
 
@@ -85,7 +94,11 @@ export const AppLockPassword = () => {
     <BaseDialog
       onShow={async () => {
         await sleep(100);
-        passwordInputRef.current?.focus();
+        if (mode !== "change") {
+          passwordInputRef.current?.focus();
+        } else {
+          currentPasswordInputRef.current?.focus();
+        }
       }}
       statusBarTranslucent={false}
       onRequestClose={close}
@@ -103,17 +116,17 @@ export const AppLockPassword = () => {
         <DialogHeader
           title={
             mode === "change"
-              ? "Change app lock pin"
+              ? `Change app lock ${keyboardType}`
               : mode === "remove"
-              ? "Remove app lock pin"
-              : "Set up app lock pin"
+              ? `Remove app lock ${keyboardType}`
+              : `Set up app lock ${keyboardType}`
           }
           paragraph={
             mode === "change"
-              ? "Change app lock pin"
+              ? `Change app lock ${keyboardType}`
               : mode === "remove"
-              ? "Remove app lock pin"
-              : "Set up a custom app lock pin to unlock the app"
+              ? `Remove app lock ${keyboardType}`
+              : `Set up a custom app lock ${keyboardType} to unlock the app`
           }
           icon="shield"
           padding={12}
@@ -135,12 +148,13 @@ export const AppLockPassword = () => {
               onSubmit={() => {
                 passwordInputRef.current?.focus();
               }}
+              defaultValue={values.current.currentPassword}
               autoComplete="password"
               returnKeyLabel="Next"
-              keyboardType="number-pad"
+              keyboardType={keyboardType === "pin" ? "number-pad" : "default"}
               returnKeyType="next"
-              secureTextEntry
-              placeholder={"Current pin"}
+              secureTextEntry={secureTextEntry}
+              placeholder={`Current ${keyboardType}`}
             />
           ) : null}
 
@@ -153,12 +167,37 @@ export const AppLockPassword = () => {
             onSubmit={() => {
               confirmPasswordInputRef.current?.focus();
             }}
-            keyboardType="number-pad"
+            defaultValue={values.current.password}
+            keyboardType={keyboardType === "pin" ? "number-pad" : "default"}
             autoComplete="password"
             returnKeyLabel={mode !== "remove" ? "Next" : "Remove"}
             returnKeyType={mode !== "remove" ? "next" : "done"}
-            secureTextEntry
-            placeholder={mode === "change" ? "New pin" : "Pin"}
+            secureTextEntry={secureTextEntry}
+            buttonLeft={
+              <IconButton
+                name={keyboardType === "password" ? "numeric" : "keyboard"}
+                onPress={() => {
+                  setKeyboardType(
+                    keyboardType === "password" ? "pin" : "password"
+                  );
+                  setSecureTextEntry(false);
+                  setImmediate(() => {
+                    setSecureTextEntry(true);
+                  });
+                }}
+                customStyle={{
+                  width: 25,
+                  height: 25,
+                  marginRight: 5
+                }}
+                size={SIZE.lg}
+              />
+            }
+            placeholder={
+              mode === "change"
+                ? `New ${keyboardType}`
+                : `${keyboardType === "pin" ? "Pin" : "Password"}`
+            }
           />
 
           {mode !== "remove" ? (
@@ -171,14 +210,15 @@ export const AppLockPassword = () => {
               onSubmit={() => {
                 confirmPasswordInputRef.current?.focus();
               }}
-              keyboardType="number-pad"
+              defaultValue={values.current.confirmPassword}
+              keyboardType={keyboardType === "pin" ? "number-pad" : "default"}
               customValidator={() => values.current.password || ""}
               validationType="confirmPassword"
               autoComplete="password"
               returnKeyLabel="Done"
               returnKeyType="done"
-              secureTextEntry
-              placeholder={"Confirm pin"}
+              secureTextEntry={secureTextEntry}
+              placeholder={`Confirm ${keyboardType}`}
             />
           ) : null}
         </View>
@@ -198,7 +238,11 @@ export const AppLockPassword = () => {
 
               if (values.current.password !== values.current.confirmPassword) {
                 ToastManager.error(
-                  new Error("Pin does not match"),
+                  new Error(
+                    `${
+                      keyboardType === "pin" ? "Pin" : "Password"
+                    } does not match`
+                  ),
                   undefined,
                   "local"
                 );
@@ -222,7 +266,11 @@ export const AppLockPassword = () => {
 
               if (values.current.password !== values.current.confirmPassword) {
                 ToastManager.error(
-                  new Error("Pin does not match"),
+                  new Error(
+                    `${
+                      keyboardType === "pin" ? "Pin" : "Password"
+                    } does not match`
+                  ),
                   undefined,
                   "local"
                 );
@@ -235,7 +283,9 @@ export const AppLockPassword = () => {
 
               if (!isCurrentPasswordCorrect) {
                 ToastManager.error(
-                  new Error("Pin incorrect"),
+                  new Error(
+                    `${keyboardType === "pin" ? "Pin" : "Password"} incorrect`
+                  ),
                   undefined,
                   "local"
                 );
@@ -259,12 +309,22 @@ export const AppLockPassword = () => {
               );
 
               if (!isCurrentPasswordCorrect) {
-                ToastManager.error(new Error("Pin incorrect"), "local");
+                ToastManager.error(
+                  new Error(
+                    `${keyboardType === "pin" ? "Pin" : "Password"} incorrect`
+                  ),
+                  "local"
+                );
                 return;
               }
               clearAppLockVerificationCipher();
               SettingsService.setProperty("appLockHasPasswordSecurity", false);
             }
+
+            SettingsService.setProperty(
+              "applockKeyboardType",
+              keyboardType === "password" ? "default" : "numeric"
+            );
 
             close();
           }}
