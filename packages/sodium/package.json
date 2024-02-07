@@ -18,11 +18,13 @@
     "url": "https://github.com/streetwriters/notesnook.git",
     "directory": "packages/sodium"
   },
-  "dependencies": {
-    "libsodium-wrappers-sumo": "^0.7.11",
-    "sodium-native": "^4.0.1"
+  "peerDependencies": {
+    "libsodium-wrappers-sumo": ">=0.7",
+    "sodium-native": ">=4"
   },
   "devDependencies": {
+    "libsodium-wrappers-sumo": "^0.7.11",
+    "sodium-native": "^4.0.1",
     "@types/libsodium-wrappers-sumo": "0.7.5",
     "benny": "^3.7.1",
     "ts-node": "^10.9.1",
