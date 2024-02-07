@@ -44,7 +44,7 @@ export class WebExtensionServer implements Server {
 
   async getNotes(): Promise<ItemReference[] | undefined> {
     const notes = await db.notes.all
-      .where((eb) => eb("notes.locked", "==", false))
+      // TODO: .where((eb) => eb("notes.locked", "==", false))
       .fields(["notes.id", "notes.title"])
       .items(undefined, db.settings.getGroupOptions("notes"));
     return notes;

@@ -102,7 +102,7 @@ export async function shouldAddLoginNotice() {
 
 export async function shouldAddConfirmEmailNotice() {
   const user = await db.user.getUser();
-  return !user || user.isEmailConfirmed;
+  return !user?.isEmailConfirmed;
 }
 
 type NoticeData = {

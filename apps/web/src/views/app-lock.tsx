@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { PropsWithChildren, useEffect, useState } from "react";
 import { useStore as useSettingStore } from "../stores/setting-store";
-import usePromise from "../hooks/use-promise";
+import { usePromise } from "@notesnook/common";
 import { KeyChain } from "../interfaces/key-store";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Loading, Lock } from "../components/icons";
