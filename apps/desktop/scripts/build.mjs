@@ -28,19 +28,7 @@ import { fileURLToPath } from "url";
 const args = yargs(process.argv);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const sodiumNativePrebuildPath = (arch) =>
-  path.join(
-    `node_modules`,
-    `@notesnook`,
-    `crypto`,
-    `node_modules`,
-    `@notesnook`,
-    `sodium`,
-    `node_modules`,
-    `sodium-native`,
-    `prebuilds`,
-    `${os.platform()}-${arch}`
-  );
+
 const webAppPath = path.resolve(path.join(__dirname, "..", "..", "web"));
 
 await fs.rm("./build/", { force: true, recursive: true });
@@ -48,6 +36,12 @@ await fs.rm("./build/", { force: true, recursive: true });
 if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   await exec(`cd ${webAppPath} && npm run build:desktop`);
 }
+
+if (os.platform() === "win32")
+  await exec(
+    "npx prebuildify --arch=arm64 --strip",
+    path.join(__dirname, "..", "node_modules", "sodium-native")
+  );
 
 await fs.cp(path.join(webAppPath, "build"), "build", {
   recursive: true,
@@ -62,42 +56,6 @@ if (args.variant === "mas") {
 
 await exec(`npx tsc`);
 
-if (existsSync(sodiumNativePrebuildPath("x64"))) {
-  console.log("copying sodium-native-x64");
-  await fs.cp(
-    sodiumNativePrebuildPath("x64"),
-    path.join("build", "prebuilds", `${process.platform}-x64`),
-    {
-      recursive: true,
-      force: true
-    }
-  );
-}
-
-if (existsSync(sodiumNativePrebuildPath("ia32"))) {
-  console.log("copying sodium-native-ia32");
-  await fs.cp(
-    sodiumNativePrebuildPath("ia32"),
-    path.join("build", "prebuilds", `${process.platform}-ia32`),
-    {
-      recursive: true,
-      force: true
-    }
-  );
-}
-
-if (existsSync(sodiumNativePrebuildPath("arm64"))) {
-  console.log("copying sodium-native-arm64");
-  await fs.cp(
-    sodiumNativePrebuildPath("arm64"),
-    path.join("build", "prebuilds", `${process.platform}-arm64`),
-    {
-      recursive: true,
-      force: true
-    }
-  );
-}
-
 if (args.run) {
   await exec(`npx electron-builder --dir --x64`);
   if (process.platform === "win32") {
@@ -109,9 +67,10 @@ if (args.run) {
   }
 }
 
-async function exec(cmd) {
+async function exec(cmd, cwd) {
   return childProcess.execSync(cmd, {
-    env: process.env,
-    stdio: "inherit"
+    env: { ...process.env, NOTESNOOK_STAGING: true },
+    stdio: "inherit",
+    cwd: cwd || process.cwd()
   });
 }
