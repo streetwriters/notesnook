@@ -40,11 +40,5 @@ process.once("loaded", async () => {
   globalThis.electronTRPC = electronTRPC;
 });
 
-globalThis.NativeNNCrypto =
-  process.platform === "win32" &&
-  process.arch !== "x64" &&
-  process.arch !== "ia32"
-    ? undefined
-    : require("@notesnook/crypto").NNCrypto;
-
+globalThis.NativeNNCrypto = require("@notesnook/crypto").NNCrypto;
 globalThis.os = () => (MAC_APP_STORE ? "mas" : platform());

@@ -16,11 +16,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-const { writeFileSync, rmSync, readFileSync } = require("fs");
+const { writeFileSync, rmSync } = require("fs");
 const { execSync } = require("child_process");
 const { relative, join } = require("path");
 
 module.exports = async function (configuration) {
+  if (process.env.NOTESNOOK_STAGING) return;
+
   const Endpoint = "https://weu.codesigning.azure.net";
   const CodeSigningAccountName = "Notesnook";
   const CertificateProfileName = "Notesnook";
@@ -39,16 +41,13 @@ module.exports = async function (configuration) {
 
   console.debug("Signed", configuration.path);
 
-  deleteCatalog();
+  rmSync(FilesCatalog);
 };
 
 function createCatalog(path) {
-  writeFileSync("_catalog", relative(__dirname, path));
-  return join(__dirname, "_catalog");
-}
-
-function deleteCatalog() {
-  rmSync("_catalog");
+  const catalogPath = join(__dirname, "_catalog");
+  writeFileSync(catalogPath, relative(__dirname, path));
+  return catalogPath;
 }
 
 function psexec(cmd) {

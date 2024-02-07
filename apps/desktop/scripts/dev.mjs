@@ -27,21 +27,15 @@ import crypto from "crypto";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const sodiumNativePrebuildPath = path.join(
-  `node_modules`,
-  `@notesnook`,
-  `crypto`,
-  `node_modules`,
-  `@notesnook`,
-  `sodium`,
-  `node_modules`,
-  `sodium-native`,
-  `prebuilds`
-);
 const RUNNING_PROCESSES = [];
 const RESTARTABLE_PROCESSES = [];
 let lastBundleHash = null;
-
+const ENV = {
+  ...process.env,
+  NO_COLOR: "true",
+  FORCE_COLOR: "false",
+  COLOR: "0"
+};
 await onChange(true);
 
 console.log("Watching...");
@@ -58,6 +52,8 @@ process.on("SIGINT", async (s) => {
 async function onChange(first) {
   if (first) {
     await fs.rm("./build/", { force: true, recursive: true });
+
+    await exec("npx electron-rebuild");
   }
 
   await exec(`npm run bundle`);
@@ -66,13 +62,6 @@ async function onChange(first) {
   if (await isBundleSame()) {
     console.log("Bundle is same. Doing nothing.");
     return;
-  }
-
-  if (first) {
-    await fs.cp(sodiumNativePrebuildPath, "build/prebuilds", {
-      recursive: true,
-      force: true
-    });
   }
 
   if (first) {
@@ -102,7 +91,7 @@ function spawnAndWaitUntil(cmd, cwd, predicate) {
 
     const s = spawn(cmd[0], cmd.slice(1), {
       cwd,
-      env: { ...process.env, NO_COLOR: "true" },
+      env: ENV,
       shell: false
     });
 
@@ -116,14 +105,15 @@ function spawnAndWaitUntil(cmd, cwd, predicate) {
   });
 }
 
-async function exec(cmd) {
+async function exec(cmd, cwd) {
   try {
     console.log(">", cmd);
 
     return execSync(cmd, {
-      env: process.env,
+      env: ENV,
       stdio: "inherit",
-      shell: false
+      shell: false,
+      cwd: cwd || process.cwd()
     });
   } catch {
     //ignore
@@ -136,7 +126,7 @@ function execAsync(cmd, args, restartable, onExit) {
 
     const proc = spawn(cmd, args, {
       stdio: "inherit",
-      env: process.env,
+      env: ENV,
       shell: false
     });
 

@@ -14,9 +14,11 @@
     "@notesnook/crypto": "file:../../packages/crypto",
     "@trpc/client": "10.38.3",
     "@trpc/server": "10.38.3",
+    "better-sqlite3-multiple-ciphers": "^9.4.0",
     "electron-trpc": "0.5.2",
     "electron-updater": "6.1.4",
     "icojs": "^0.17.1",
+    "sodium-native": "^4.0.6",
     "typed-emitter": "^2.1.0",
     "yargs": "^17.6.2",
     "zod": "^3.21.4"
@@ -25,11 +27,11 @@
     "@types/node": "18.16.1",
     "@types/yargs": "^17.0.24",
     "chokidar": "^3.5.3",
-    "electron": "25.9.8",
+    "electron": "^28.2.1",
     "electron-builder": "^24.9.1",
-    "esbuild": "^0.17.19",
+    "esbuild": "^0.20.0",
     "tree-kill": "^1.2.2",
-    "undici": "^5.23.0"
+    "undici": "^6.6.1"
   },
   "optionalDependencies": {
     "dmg-license": "^1.0.11"
@@ -39,7 +41,7 @@
     "staging": "node scripts/build.mjs --run",
     "release": "node scripts/build.mjs",
     "build": "tsc",
-    "bundle": "esbuild electron=./src/main.ts ./src/preload.ts --external:electron --external:fsevents --minify --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false --define:RELEASE=true",
+    "bundle": "esbuild electron=./src/main.ts ./src/preload.ts --external:electron --external:fsevents --external:better-sqlite3-multiple-ciphers --external:sodium-native --minify --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false --define:RELEASE=true",
     "bundle:mas": "esbuild electron=./src/main.ts ./src/preload.ts --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=true --define:RELEASE=true",
     "postinstall": "patch-package"
   },
@@ -53,7 +55,6 @@
     "productName": "Notesnook",
     "copyright": "Copyright © 2023 Streetwriters (Private) Limited",
     "artifactName": "notesnook_${os}_${arch}.${ext}",
-    "npmRebuild": false,
     "asar": false,
     "generateUpdatesFilesForAllChannels": true,
     "files": [
@@ -64,7 +65,16 @@
       "!build/banner.jpg",
       "!build/*.ico",
       "!build/*.png",
-      "!node_modules${/*}"
+      "!node_modules${/*}",
+      "node_modules/better-sqlite3-multiple-ciphers/build/Release/better_sqlite3.node",
+      "node_modules/better-sqlite3-multiple-ciphers/lib",
+      "node_modules/better-sqlite3-multiple-ciphers/package.json",
+      "node_modules/file-uri-to-path",
+      "node_modules/bindings",
+      "node_modules/node-gyp-build",
+      "node_modules/sodium-native/prebuilds/${platform}-${arch}",
+      "node_modules/sodium-native/index.js",
+      "node_modules/sodium-native/package.json"
     ],
     "afterPack": "./scripts/removeLocales.js",
     "mac": {
@@ -138,7 +148,7 @@
       "signingHashAlgorithms": [
         "sha256"
       ],
-      "sign": "./sign.js",
+      "sign": "./scripts/sign.js",
       "icon": "assets/icons/app.ico"
     },
     "portable": {
