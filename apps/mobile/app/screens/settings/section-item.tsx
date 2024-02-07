@@ -17,15 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import {
   NavigationProp,
   StackActions,
   useNavigation
 } from "@react-navigation/native";
 import React, { useRef, useState } from "react";
-import { View, TextInput, ActivityIndicator } from "react-native";
+import { ActivityIndicator, TextInput, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
+import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
 import { PressableButton } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
@@ -33,11 +35,9 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
-import { IconButton } from "../../components/ui/icon-button";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
