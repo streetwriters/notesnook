@@ -16,23 +16,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { isThemeColor, useThemeColors } from "@notesnook/theme";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { TextInput, View } from "react-native";
-import { FlashList } from "react-native-actions-sheet";
+import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { db } from "../../../common/database";
+import { ToastManager } from "../../../services/event-manager";
+import { useMenuStore } from "../../../stores/use-menu-store";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { SIZE } from "../../../utils/size";
 import BaseDialog from "../../dialog/base-dialog";
 import DialogContainer from "../../dialog/dialog-container";
+import { Toast } from "../../toast";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { PressableButton } from "../../ui/pressable";
-import { ToastManager } from "../../../services/event-manager";
-import { Toast } from "../../toast";
-import { db } from "../../../common/database";
-import { useRelationStore } from "../../../stores/use-relation-store";
-import { useMenuStore } from "../../../stores/use-menu-store";
+import { Color } from "@notesnook/core";
 const arrayOfColors = [
   "#FF5733",
   "#33FF57",
@@ -142,10 +143,12 @@ const convertToColorObjects = (colors: string[]) => {
 
 const ColorPicker = ({
   visible,
-  setVisible
+  setVisible,
+  onColorAdded
 }: {
   visible: boolean;
   setVisible: (value: boolean) => void;
+  onColorAdded: (color: Color) => void;
 }) => {
   const [selectedColor, setSelectedColor] = useState<string>();
   const { colors } = useThemeColors();
@@ -282,13 +285,17 @@ const ColorPicker = ({
                   new Error(`Color #${selectedColor} already exists`)
                 );
 
-              await db.colors.add({
+              const id = await db.colors.add({
                 title: title.current,
                 colorCode: selectedColor
               });
               useRelationStore.getState().update();
               useMenuStore.getState().setColorNotes();
               setVisible(false);
+              const color = await db.colors.color(id);
+              if (color) {
+                onColorAdded?.(color);
+              }
             }}
             type={selectedColor ? "grayAccent" : "grayBg"}
             width="100%"

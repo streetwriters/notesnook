@@ -218,7 +218,8 @@ export const Items = ({ item, buttons, close }) => {
       <ScrollView
         horizontal
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: 12,
+          marginTop: 6
         }}
       >
         {topBarItems.map(renderTopBarItem)}
@@ -229,7 +230,6 @@ export const Items = ({ item, buttons, close }) => {
         keyExtractor={(item) => item.title}
         key={columnItemsCount + "key"}
         numColumns={columnItemsCount}
-        disableVirtualization={true}
         style={{
           marginTop: item.type !== "note" ? 10 : 0,
           paddingTop: 10,

@@ -34,6 +34,7 @@ import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { TagStrip, Tags } from "./tags";
+import { PressableButton } from "../ui/pressable";
 
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
@@ -80,17 +81,38 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               paddingHorizontal: 12,
               marginTop: 5,
               zIndex: 10,
-              marginBottom: 6
+              marginBottom: 5
             }}
           >
-            <Heading size={SIZE.lg}>
-              {item.type === "tag" && !isColor ? (
-                <Heading size={SIZE.xl} color={colors.primary.accent}>
-                  #
-                </Heading>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center"
+              }}
+            >
+              {item.type === "color" ? (
+                <PressableButton
+                  type="accent"
+                  accentColor={item.colorCode}
+                  accentText={colors.static.white}
+                  customStyle={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 100,
+                    marginRight: 10
+                  }}
+                />
               ) : null}
-              {item.title}
-            </Heading>
+
+              <Heading size={SIZE.lg}>
+                {item.type === "tag" && !isColor ? (
+                  <Heading size={SIZE.xl} color={colors.primary.accent}>
+                    #
+                  </Heading>
+                ) : null}
+                {item.title}
+              </Heading>
+            </View>
 
             {item.type === "notebook" && item.description ? (
               <Paragraph>{item.description}</Paragraph>
@@ -118,8 +140,13 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
 
           <DateMeta item={item} />
           <Line bottom={0} />
-          {item.type === "note" ? <Tags close={close} item={item} /> : null}
 
+          {item.type === "note" ? (
+            <>
+              <Tags close={close} item={item} />
+              <Line bottom={0} />
+            </>
+          ) : null}
           {item.type === "note" ? (
             <View
               style={{
@@ -201,21 +228,13 @@ Properties.present = async (item, buttons = [], isSheet) => {
         "add-notebook"
       ]);
       break;
-    // case "topic":
-    //   props[0] = db.notebooks
-    //     .notebook(item.notebookId)
-    //     .topics.topic(item.id)._topic;
-    //   props.push([
-    //     "move-notes",
-    //     "edit-topic",
-    //     "add-shortcut",
-    //     "trash",
-    //     "default-topic"
-    //   ]);
-    //   break;
     case "tag":
       props[0] = await db.tags.tag(item.id);
       props.push(["add-shortcut", "trash", "rename-tag"]);
+      break;
+    case "color":
+      props[0] = await db.colors.color(item.id);
+      props.push(["trash", "rename-color", "reorder"]);
       break;
     case "reminder": {
       props[0] = await db.reminders.reminder(item.id);

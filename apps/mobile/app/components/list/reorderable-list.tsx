@@ -40,6 +40,7 @@ interface ReorderableListProps<T extends { id: string }>
   hiddenItems: string[];
   onHiddenItemsChanged?: (data: string[]) => void;
   canHideItems?: boolean;
+  disableDefaultDrag?: boolean;
 }
 
 function ReorderableList<T extends { id: string }>({
@@ -50,6 +51,7 @@ function ReorderableList<T extends { id: string }>({
   itemOrder = [],
   onHiddenItemsChanged,
   canHideItems = true,
+  disableDefaultDrag,
   ...restProps
 }: ReorderableListProps<T>) {
   const { colors } = useThemeColors();
@@ -158,6 +160,7 @@ function ReorderableList<T extends { id: string }>({
               dragging: true
             })
           }
+          itemsDraggable={disableDefaultDrag ? dragging : true}
           lockItemDragsToMainAxis
           onItemReorder={({ fromIndex, fromItem, toIndex, toItem }) => {
             const newOrder = getOrderedItems().map((item) => item.id);

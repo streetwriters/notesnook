@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Color, Note } from "@notesnook/core/dist/types";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
+import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
@@ -32,9 +33,9 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { refreshNotesPage } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import ColorPicker from "../dialogs/color-picker";
-import { PressableButton } from "../ui/pressable";
-import { FlashList } from "react-native-actions-sheet";
 import { Button } from "../ui/button";
+import { PressableButton } from "../ui/pressable";
+import NativeTooltip from "../../utils/tooltip";
 
 const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
   const { colors } = useThemeColors();
@@ -70,9 +71,12 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
       testID={notesnook.ids.dialogs.actionsheet.color(item.colorCode)}
       key={item.id}
       onPress={toggleColor}
+      onLongPress={(event) => {
+        NativeTooltip.show(event, item.title, NativeTooltip.POSITIONS.TOP);
+      }}
       customStyle={{
-        width: 30,
-        height: 30,
+        width: 35,
+        height: 35,
         borderRadius: 100,
         justifyContent: "center",
         alignItems: "center",
@@ -103,60 +107,24 @@ export const ColorTags = ({ item }: { item: Note }) => {
 
   return (
     <>
-      <ColorPicker visible={visible} setVisible={setVisible} />
+      <ColorPicker
+        visible={visible}
+        setVisible={setVisible}
+        onColorAdded={async (color) => {
+          await db.relations.add(color, note);
+          useRelationStore.getState().update();
+          useMenuStore.getState().setColorNotes();
+          Navigation.queueRoutesForUpdate();
+          eSendEvent(refreshNotesPage);
+        }}
+      />
       <View
         style={{
           flexGrow: isTablet ? undefined : 1,
-          paddingRight: 0,
-          flexDirection: "row"
+          flexDirection: "row",
+          marginLeft: 5
         }}
       >
-        {!colorNotes || !colorNotes.length ? (
-          <Button
-            onPress={async () => {
-              useSettingStore.getState().setSheetKeyboardHandler(false);
-              setVisible(true);
-            }}
-            buttonType={{
-              text: colors.primary.accent
-            }}
-            title="Add color"
-            type="grayBg"
-            icon="plus"
-            iconPosition="right"
-            height={30}
-            fontSize={SIZE.xs}
-            style={{
-              marginRight: 5,
-              borderRadius: 100,
-              paddingHorizontal: 8
-            }}
-          />
-        ) : (
-          <PressableButton
-            customStyle={{
-              width: 30,
-              height: 30,
-              borderRadius: 100,
-              justifyContent: "center",
-              alignItems: "center",
-              marginRight: 5
-            }}
-            type="grayBg"
-            onPress={() => {
-              useSettingStore.getState().setSheetKeyboardHandler(false);
-              setVisible(true);
-            }}
-          >
-            <Icon
-              testID="icon-plus"
-              name="plus"
-              color={colors.primary.icon}
-              size={SIZE.lg}
-            />
-          </PressableButton>
-        )}
-
         <FlashList
           data={colorNotes}
           estimatedItemSize={30}
@@ -164,6 +132,53 @@ export const ColorTags = ({ item }: { item: Note }) => {
           extraData={updater}
           renderItem={renderItem}
           showsHorizontalScrollIndicator={false}
+          ListFooterComponent={
+            !colorNotes || !colorNotes.length ? (
+              <Button
+                onPress={async () => {
+                  useSettingStore.getState().setSheetKeyboardHandler(false);
+                  setVisible(true);
+                }}
+                buttonType={{
+                  text: colors.primary.accent
+                }}
+                title="Add color"
+                type="grayBg"
+                icon="plus"
+                iconPosition="right"
+                height={30}
+                fontSize={SIZE.xs}
+                style={{
+                  marginRight: 5,
+                  borderRadius: 100,
+                  paddingHorizontal: 8
+                }}
+              />
+            ) : (
+              <PressableButton
+                customStyle={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 100,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginRight: 5
+                }}
+                type="grayBg"
+                onPress={() => {
+                  useSettingStore.getState().setSheetKeyboardHandler(false);
+                  setVisible(true);
+                }}
+              >
+                <Icon
+                  testID="icon-plus"
+                  name="plus"
+                  color={colors.primary.icon}
+                  size={SIZE.lg}
+                />
+              </PressableButton>
+            )
+          }
         />
       </View>
     </>

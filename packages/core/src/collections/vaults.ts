@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Database from "../api";
-import { Vault } from "../types";
+import { ItemReference, Vault } from "../types";
 import { ICollection } from "./collection";
 import { SQLCollection } from "../database/sql-collection";
 import { getId } from "../utils/id";
@@ -79,5 +79,9 @@ export class Vaults implements ICollection {
       (qb) => qb.where(isFalse("deleted")),
       this.db.options?.batchSize
     );
+  }
+
+  async itemExists(reference: ItemReference) {
+    return (await this.db.relations.to(reference, "vault").count()) > 0;
   }
 }
