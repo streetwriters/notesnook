@@ -61,6 +61,9 @@ export class AccessHandlePoolVFS extends VFS.Base {
   // The OPFS files all have randomly-generated names that do not match
   // the SQLite files whose data they contain. This map links those names
   // with their respective OPFS access handles.
+  /**
+   * @type {Map<FileSystemSyncAccessHandle, string>}
+   */
   #mapAccessHandleToName = new Map();
 
   // When a SQLite file is associated with an OPFS file, that association
@@ -207,6 +210,16 @@ export class AccessHandlePoolVFS extends VFS.Base {
 
   async close() {
     await this.#releaseAccessHandles();
+  }
+
+  async delete() {
+    console.log("CLSOGING");
+    await this.close();
+    console.log("CLSOGING", this.#directoryHandle);
+    for await (const [name] of this.#directoryHandle) {
+      console.log("DELETING", name);
+      await this.#directoryHandle.removeEntry(name, { recursive: true });
+    }
   }
 
   /**

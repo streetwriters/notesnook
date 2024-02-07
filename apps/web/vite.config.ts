@@ -88,10 +88,14 @@ export default defineConfig({
 
     alias: [
       {
-        find: /desktop-bridge/gm,
+        find: /\/desktop-bridge$/gm,
         replacement: isDesktop
-          ? "desktop-bridge/index.desktop"
-          : "desktop-bridge/index"
+          ? "/desktop-bridge/index.desktop"
+          : "/desktop-bridge/index"
+      },
+      {
+        find: /\/sqlite$/gm,
+        replacement: isDesktop ? "/sqlite/index.desktop" : "/sqlite/index"
       }
     ]
   },

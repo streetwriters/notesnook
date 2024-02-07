@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, FlexProps, Text } from "@theme-ui/components";
 
-import { Error } from "../icons";
+import { Error as ErrorIcon } from "../icons";
 
-type ErrorTextProps = { error?: string | null | false } & FlexProps;
+type ErrorTextProps = { error?: string | Error | null | false } & FlexProps;
 export function ErrorText(props: ErrorTextProps) {
   const { error, sx, ...restProps } = props;
 
@@ -34,9 +34,14 @@ export function ErrorText(props: ErrorTextProps) {
       sx={{ borderRadius: "default", ...sx }}
       {...restProps}
     >
-      <Error size={15} color="var(--icon-error)" />
-      <Text variant={"error"} ml={1}>
-        {error}
+      <ErrorIcon size={15} color="var(--icon-error)" />
+      <Text
+        className="selectable"
+        variant={"error"}
+        ml={1}
+        sx={{ whiteSpace: "pre-wrap" }}
+      >
+        {error instanceof Error ? <>{error.stack}</> : error}
       </Text>
     </Flex>
   );

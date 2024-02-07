@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// import type { SQLiteAPI, SQLiteCompatibleType } from "./index.d.ts";
+import type { SQLiteAPI, SQLiteCompatibleType } from "./sqlite-types";
 import { Factory, SQLITE_ROW } from "./sqlite-api";
 import SQLiteAsyncESMFactory from "./wa-sqlite-async";
 import SQLiteSyncESMFactory from "./wa-sqlite";
@@ -48,7 +48,7 @@ async function init(dbName: string, async: boolean, url?: string) {
     ? new IDBBatchAtomicVFS(dbName, { durability: "strict" })
     : new AccessHandlePoolVFS(dbName);
   if ("isReady" in vfs) await vfs.isReady;
-
+  console.log(vfs, SQLiteAsyncModule);
   sqlite.vfs_register(vfs, false);
   db = await sqlite.open_v2(dbName, undefined, `multipleciphers-${vfs.name}`);
 }
@@ -138,11 +138,16 @@ async function exportDatabase(dbName: string, async: boolean) {
   return transfer(stream, [stream]);
 }
 
+async function deleteDatabase() {
+  await vfs?.delete();
+}
+
 const worker = {
   close,
   init,
   run: exec,
-  export: exportDatabase
+  export: exportDatabase,
+  delete: deleteDatabase
 };
 
 export type SQLiteWorker = typeof worker;

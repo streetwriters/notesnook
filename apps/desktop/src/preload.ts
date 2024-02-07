@@ -23,11 +23,13 @@ import { type RendererGlobalElectronTRPC } from "electron-trpc/src/types";
 import type { NNCrypto } from "@notesnook/crypto";
 import { ipcRenderer } from "electron";
 import { platform } from "os";
+import sqlite3, { Database } from "better-sqlite3-multiple-ciphers";
 
 declare global {
   var os: () => "mas" | ReturnType<typeof platform>;
   var electronTRPC: RendererGlobalElectronTRPC;
   var NativeNNCrypto: (new () => NNCrypto) | undefined;
+  var createSQLite3Database: (filename: string) => Database;
 }
 
 process.once("loaded", async () => {
@@ -41,4 +43,5 @@ process.once("loaded", async () => {
 });
 
 globalThis.NativeNNCrypto = require("@notesnook/crypto").NNCrypto;
+globalThis.createSQLite3Database = (filename) => sqlite3(filename);
 globalThis.os = () => (MAC_APP_STORE ? "mas" : platform());
