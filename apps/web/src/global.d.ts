@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "vite/client";
 import "vite-plugin-svgr/client";
+import "@notesnook/desktop/dist/preload";
 
 declare global {
   var PUBLIC_URL: string;
@@ -31,11 +32,6 @@ declare global {
   var IS_BETA: boolean;
   var APP_TITLE: string;
   var IS_THEME_BUILDER: boolean;
-
-  interface Window {
-    os?: () => NodeJS.Platform | "mas";
-    NativeNNCrypto?: new () => import("@notesnook/crypto").NNCrypto;
-  }
 
   interface AuthenticationExtensionsClientInputs {
     prf?: {
