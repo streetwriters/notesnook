@@ -239,6 +239,7 @@ class Sync {
   }
 
   async send(deviceId: string, isForceSync?: boolean) {
+    return false;
     await this.uploadAttachments();
 
     let done = 0;
