@@ -67,6 +67,6 @@
   },
   "license": "GPL-3.0-or-later",
   "volta": {
-    "node": "18.15.0"
+    "node": "20.11.0"
   }
 }
