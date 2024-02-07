@@ -104,7 +104,7 @@ function Toolbar() {
         icon: isNotePublished ? Published : Publish,
         hidden: !sessionId || isDeleted,
         enabled: !isLocked,
-        onClick: () => showPublishView(store.get().session.id, "top")
+        onClick: () => showPublishView(store.get().session, "top")
       }
     ],
     [sessionId, isLocked, isNotePublished, isDeleted]

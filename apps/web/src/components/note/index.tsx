@@ -427,7 +427,7 @@ const menuItems: (
       onClick: async () => {
         const isPublished = db.monographs.isPublished(note.id);
         if (isPublished) await db.monographs.unpublish(note.id);
-        else await showPublishView(note.id, "bottom");
+        else await showPublishView(note, "bottom");
       }
     },
     {

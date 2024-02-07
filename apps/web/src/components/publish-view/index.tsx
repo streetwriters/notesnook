@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import { Flex, Text, Button } from "@theme-ui/components";
+import { Flex, Text, Button, Link } from "@theme-ui/components";
 import { Copy } from "../icons";
 import Toggle from "../toggle";
 import Field from "../field";
@@ -31,29 +31,34 @@ import { EV, EVENTS } from "@notesnook/core/dist/common";
 import { useStore } from "../../stores/monograph-store";
 import ReactModal from "react-modal";
 import { DialogButton } from "../dialog";
+import { Note } from "@notesnook/core";
 
-function PublishView(props) {
-  const { noteId, onClose } = props;
-  const [publishId, setPublishId] = useState();
+type PublishViewProps = {
+  note: Note;
+  onClose: (result: boolean) => void;
+};
+function PublishView(props: PublishViewProps) {
+  const { note, onClose } = props;
+  const [publishId, setPublishId] = useState<string | undefined>(
+    db.monographs.monograph(note.id)
+  );
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [selfDestruct, setSelfDestruct] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
-  const [processingStatus, setProcessingStatus] = useState();
+  const [processingStatus, setProcessingStatus] = useState<{
+    total?: number;
+    current: number;
+  }>();
+  const passwordInput = useRef<HTMLInputElement>(null);
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
-
-  const noteTitle = useMemo(() => db.notes.note(noteId)?.title, [noteId]);
-
-  useEffect(() => {
-    setPublishId(db.monographs.monograph(noteId));
-  }, [noteId]);
 
   useEffect(() => {
     const fileDownloadedEvent = EV.subscribe(
       EVENTS.fileDownloaded,
       ({ total, current, groupId }) => {
-        if (!groupId || !groupId.includes(noteId)) return;
-        if (current === total) setProcessingStatus();
+        if (!groupId || !groupId.includes(note.id)) return;
+        if (current === total) setProcessingStatus(undefined);
         else setProcessingStatus({ total, current });
       }
     );
@@ -61,7 +66,7 @@ function PublishView(props) {
     return () => {
       fileDownloadedEvent.unsubscribe();
     };
-  }, [noteId]);
+  }, [note.id]);
 
   return (
     <ScopedThemeProvider
@@ -82,7 +87,7 @@ function PublishView(props) {
           variant="body"
           sx={{ fontSize: "title", fontWeight: "bold", color: "accent" }}
         >
-          {noteTitle}
+          {note.title}
         </Text>
         {isPublishing ? (
           <Flex
@@ -121,8 +126,8 @@ function PublishView(props) {
                     justifyContent: "center"
                   }}
                 >
-                  <Text
-                    variant="body"
+                  <Link
+                    variant="text.body"
                     as="a"
                     target="_blank"
                     href={`https://monogr.ph/${publishId}`}
@@ -135,7 +140,7 @@ function PublishView(props) {
                     }}
                   >
                     {`https://monogr.ph/${publishId}`}
-                  </Text>
+                  </Link>
                   <Button
                     variant="anchor"
                     className="copyPublishLink"
@@ -168,6 +173,7 @@ function PublishView(props) {
             />
             {isPasswordProtected && (
               <Field
+                inputRef={passwordInput}
                 autoFocus
                 type="password"
                 id="publishPassword"
@@ -191,10 +197,9 @@ function PublishView(props) {
           onClick={async () => {
             try {
               setIsPublishing(true);
-              const password =
-                document.getElementById("publishPassword")?.value;
+              const password = passwordInput.current?.value;
 
-              const publishId = await publishNote(noteId, {
+              const publishId = await publishNote(note.id, {
                 selfDestruct,
                 password
               });
@@ -202,7 +207,10 @@ function PublishView(props) {
               showToast("success", "Note published.");
             } catch (e) {
               console.error(e);
-              showToast("error", "Note could not be published: " + e.message);
+              showToast(
+                "error",
+                "Note could not be published: " + (e as Error).message
+              );
             } finally {
               setIsPublishing(false);
             }
@@ -216,15 +224,15 @@ function PublishView(props) {
             onClick={async () => {
               try {
                 setIsPublishing(true);
-                await unpublishNote(noteId);
-                setPublishId();
+                await unpublishNote(note.id);
+                setPublishId(undefined);
                 onClose(true);
                 showToast("success", "Note unpublished.");
               } catch (e) {
                 console.error(e);
                 showToast(
                   "error",
-                  "Note could not be unpublished: " + e.message
+                  "Note could not be unpublished: " + (e as Error).message
                 );
               } finally {
                 setIsPublishing(false);
@@ -249,12 +257,12 @@ function PublishView(props) {
 
 export default PublishView;
 
-export function showPublishView(noteId, location = "top") {
+export function showPublishView(note: Note, location = "top") {
   const root = document.getElementById("dialogContainer");
 
   if (root) {
     return new Promise((resolve) => {
-      const perform = (result) => {
+      const perform = (result: boolean) => {
         ReactDOM.unmountComponentAtNode(root);
         closePublishView();
         resolve(result);
@@ -262,7 +270,7 @@ export function showPublishView(noteId, location = "top") {
       ReactDOM.render(
         <ReactModal
           isOpen
-          onRequestClose={perform}
+          onRequestClose={() => perform(false)}
           preventScroll={false}
           shouldCloseOnOverlayClick
           shouldCloseOnEsc
@@ -283,7 +291,7 @@ export function showPublishView(noteId, location = "top") {
             }
           }}
         >
-          <PublishView noteId={noteId} onClose={perform} />
+          <PublishView note={note} onClose={perform} />
         </ReactModal>,
         root
       );
