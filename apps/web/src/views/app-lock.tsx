@@ -83,7 +83,8 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
           alignItems: "center",
           justifyContent: "center",
           height: "100%",
-          flexDirection: "column"
+          flexDirection: "column",
+          overflowY: "auto"
         }}
         onSubmit={async (e) => {
           e.preventDefault();
