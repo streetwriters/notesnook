@@ -33,6 +33,7 @@ import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import ReorderableList from "../list/reorderable-list";
+import { Properties } from "../properties";
 
 export const ColorSection = React.memo(
   function ColorSection() {
@@ -57,6 +58,7 @@ export const ColorSection = React.memo(
         onHiddenItemsChanged={(data) => {
           db.settings.setSideBarHiddenItems("colors", data);
         }}
+        disableDefaultDrag={true}
         itemOrder={db.settings.getSideBarOrder("colors")}
         hiddenItems={db.settings.getSideBarHiddenItems("colors")}
         alwaysBounceVertical={false}
@@ -91,22 +93,7 @@ const ColorItem = React.memo(
     };
 
     const onLongPress = () => {
-      presentDialog({
-        title: "Rename color",
-        input: true,
-        inputPlaceholder: "Enter name for this color",
-        defaultValue: item.title,
-        paragraph: "You are renaming the color " + item.title,
-        positivePress: async (value) => {
-          if (!value || value.trim().length === 0) return;
-          await db.colors.add({
-            id: item.id,
-            title: value
-          });
-          setColorNotes();
-        },
-        positiveText: "Rename"
-      });
+      Properties.present(item);
     };
 
     return (

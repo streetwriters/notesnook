@@ -35,8 +35,6 @@ export const Tags = ({ item, close }) => {
     <View
       style={{
         marginTop: 5,
-        paddingTop: 6,
-        paddingBottom: 6,
         flexDirection: "row",
         flexWrap: "wrap",
         alignItems: "center",
@@ -53,16 +51,15 @@ export const Tags = ({ item, close }) => {
         buttonType={{
           text: colors.primary.accent
         }}
-        title="Add tags"
+        title="Add tag"
         type="grayBg"
         icon="plus"
         iconPosition="right"
         height={30}
-        fontSize={SIZE.xs}
+        fontSize={SIZE.sm - 1}
         style={{
-          marginRight: 5,
-          borderRadius: 100,
-          paddingHorizontal: 8
+          height: 35,
+          borderRadius: 100
         }}
       />
       <ColorTags item={item} />
