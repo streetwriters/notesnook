@@ -64,7 +64,7 @@ const collections: MigratableCollections = [
   },
   {
     name: "notehistory",
-    table: "relations"
+    table: "notehistory"
   },
   {
     name: "sessioncontent",
@@ -84,8 +84,11 @@ class Migrations {
 
   async init() {
     this.version =
-      (await this.db.storage().read("v")) || CURRENT_DATABASE_VERSION;
-    this.db.kv().write("v", this.version);
+      (await this.db.kv().read("v")) ||
+      (await this.db.storage().read("v")) ||
+      CURRENT_DATABASE_VERSION;
+
+    await this.db.kv().write("v", this.version);
   }
 
   required() {

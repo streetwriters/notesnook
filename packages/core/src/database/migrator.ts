@@ -104,10 +104,12 @@ class Migrator {
     const toAdd = [];
     for (let i = 0; i < items.length; ++i) {
       const item = items[i];
+      // can be true due to corrupted data.
+      if (Array.isArray(item)) continue;
       if (!item) continue;
 
       // check if item is permanently deleted or just a soft delete
-      if (isDeleted(item) && !isTrashItem(item)) {
+      if (isDeleted(item)) {
         toAdd.push(item);
         continue;
       }
@@ -134,8 +136,8 @@ class Migrator {
         );
       }
 
-      if (migrated) {
-        if (item.type !== "settings") {
+      if (migrated === true) {
+        if (item.type === "settings") {
           // we are removing the old settings.
           await db.storage().remove("settings");
         } else toAdd.push(item);

@@ -287,8 +287,8 @@ const migrations: Migration[] = [
       attachment: async (item, db) => {
         for (const noteId of item.noteIds || []) {
           await db.relations.add(
-            { type: "attachment", id: item.id },
-            { type: "note", id: noteId }
+            { type: "note", id: noteId },
+            { type: "attachment", id: item.id }
           );
         }
 
@@ -399,7 +399,7 @@ const migrations: Migration[] = [
         const value = await db.storage().read(key);
         if (value === undefined || value === null) continue;
         await db.kv().write(key, value as any);
-        await db.storage().remove(key);
+        // await db.storage().remove(key);
       }
     }
   },

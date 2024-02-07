@@ -473,8 +473,8 @@ export type BaseTrashItem<TItem extends BaseItem<"note" | "notebook">> =
 
 export type TrashItem = BaseTrashItem<Note> | BaseTrashItem<Notebook>;
 
-export function isDeleted(item: object): item is DeletedItem {
-  return "deleted" in item && !!item.deleted;
+export function isDeleted(item: any): item is DeletedItem {
+  return !!item.deleted && !item.type;
 }
 
 export function isTrashItem(item: MaybeDeletedItem<Item>): item is TrashItem {
