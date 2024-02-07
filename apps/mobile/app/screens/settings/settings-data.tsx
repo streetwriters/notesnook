@@ -792,19 +792,25 @@ export const settingsGroups: SettingSection[] = [
             property: "appLockEnabled",
             onChange: async () => {
               if (!SettingsService.getProperty("appLockEnabled")) {
+                const keyboardType = SettingsService.getProperty(
+                  "applockKeyboardType"
+                );
                 if (SettingsService.getProperty("appLockHasPasswordSecurity")) {
                   presentDialog({
                     title: "Verify it's you",
                     input: true,
-                    inputPlaceholder: "Enter app lock pin",
-                    paragraph:
-                      "Please enter your app lock pin to disable app lock",
+                    inputPlaceholder: `Enter app lock ${
+                      keyboardType === "numeric" ? "pin" : "password"
+                    }`,
+                    paragraph: `Please enter your app lock ${
+                      keyboardType === "numeric" ? "pin" : "password"
+                    } to disable app lock`,
                     positiveText: "Disable",
                     secureTextEntry: true,
                     negativeText: "Cancel",
                     positivePress: async (value) => {
                       try {
-                        let verified = await validateAppLockPassword(value);
+                        const verified = await validateAppLockPassword(value);
                         if (!verified) {
                           SettingsService.setProperty("appLockEnabled", true);
                           return false;
@@ -885,8 +891,8 @@ export const settingsGroups: SettingSection[] = [
           },
           {
             id: "app-lock-pin",
-            name: "Setup app lock pin",
-            description: "Set up a new pin for app lock",
+            name: "Setup app lock password",
+            description: "Setup a new app lock password for app lock",
             hidden: () => {
               return !!SettingsService.getProperty(
                 "appLockHasPasswordSecurity"
