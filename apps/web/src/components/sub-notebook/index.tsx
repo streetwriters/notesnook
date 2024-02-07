@@ -129,11 +129,7 @@ function SubNotebook(props: SubNotebookProps) {
       menuItems={subNotebookMenuItems}
       context={{ refresh }}
       sx={{
-        paddingLeft: isExpandable
-          ? `${depth * 5}px`
-          : depth === 0
-          ? 2
-          : `${depth * 10}px`
+        paddingLeft: depth === 0 ? 0 : `${16 * depth}px`
       }}
     />
   );
