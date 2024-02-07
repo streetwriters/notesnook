@@ -209,7 +209,7 @@ function Colors({ noteId }: { noteId: string }) {
       px={2}
       sx={{
         cursor: "pointer",
-        justifyContent: "center"
+        justifyContent: "start"
       }}
     >
       {result.status === "fulfilled" &&
