@@ -207,7 +207,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
           {title}
         </Text>
       )}
-      <ScrollContainer suppressScrollX style={{ maxHeight: 400 }}>
+      <ScrollContainer suppressScrollX style={{ maxHeight: "80%" }}>
         {children}
       </ScrollContainer>
       {/* <FlexScrollContainer>{children}</FlexScrollContainer> */}

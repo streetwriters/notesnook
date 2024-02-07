@@ -24,7 +24,8 @@ export function MenuSeparator() {
     <Box
       as="li"
       sx={{
-        width: "95%",
+        width: "94%",
+        marginLeft: "3%",
         height: "1px",
         bg: "separator",
         my: 1,

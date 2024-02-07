@@ -566,18 +566,24 @@ function colorsToMenuItems(
       type: "lazy-loader",
       async items() {
         const colors = await db.colors.all.items();
-        return colors.map((color) => {
-          const isChecked = !!noteColor && noteColor.id === color.id;
-          return {
-            type: "button",
-            key: color.id,
-            title: color.title,
-            icon: Circle.path,
-            styles: { icon: { color: color.colorCode } },
-            isChecked,
-            onClick: () => store.setColor(color.id, isChecked, ...ids)
-          } satisfies MenuItem;
-        });
+        const menuItems: MenuItem[] = [];
+        if (colors.length > 0)
+          menuItems.push({ type: "separator", key: "sep" });
+        menuItems.push(
+          ...colors.map((color) => {
+            const isChecked = !!noteColor && noteColor.id === color.id;
+            return {
+              type: "button",
+              key: color.id,
+              title: color.title,
+              icon: Circle.path,
+              styles: { icon: { color: color.colorCode } },
+              isChecked,
+              onClick: () => store.setColor(color.id, isChecked, ...ids)
+            } satisfies MenuItem;
+          })
+        );
+        return menuItems;
       }
     }
   ];
@@ -611,22 +617,20 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
 
         const menuItems: MenuItem[] = [];
         if (notebooks.size > 0)
-          menuItems.push(
-            {
-              type: "button",
-              key: "remove-from-all-notebooks",
-              title: "Unlink from all",
-              icon: RemoveShortcutLink.path,
-              onClick: async () => {
-                await db.notes.removeFromAllNotebooks(...ids);
-                store.refresh();
-              }
-            },
-            { key: "sep", type: "separator" }
-          );
+          menuItems.push({
+            type: "button",
+            key: "remove-from-all-notebooks",
+            title: "Unlink from all",
+            icon: RemoveShortcutLink.path,
+            onClick: async () => {
+              await db.notes.removeFromAllNotebooks(...ids);
+              store.refresh();
+            }
+          });
+
+        menuItems.push({ key: "sep3", type: "separator" });
 
         if (notebookShortcuts.size > 0) {
-          menuItems.push({ key: "sep3", type: "separator" });
           notebookShortcuts.forEach((notebook) => {
             menuItems.push({
               type: "button",
