@@ -220,16 +220,17 @@ export async function getDatabaseKey(appLockPassword) {
   }
 }
 
-export async function deriveCryptoKey(name, data) {
+export async function deriveCryptoKey(data) {
   try {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
-
     const userKeyCipher = await encrypt(
       {
         key: await getDatabaseKey()
       },
       credentials.key
     );
+    DatabaseLogger.info("User key stored: ", !!userKeyCipher, credentials);
+
     // Store encrypted user key in MMKV
     MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
     return credentials.key;
@@ -241,14 +242,20 @@ export async function deriveCryptoKey(name, data) {
 export async function getCryptoKey(_name) {
   try {
     const keyCipher = MMKV.getMap(USER_KEY_CIPHER);
-    if (!key) return null;
 
-    const key = decrypt(
+    if (!keyCipher) {
+      DatabaseLogger.info("User key cipher is null");
+      return null;
+    }
+
+    const key = await decrypt(
       {
         key: await getDatabaseKey()
       },
       keyCipher
     );
+
+    DatabaseLogger.info("User key decrypted: ", !!key);
 
     return key;
   } catch (e) {
