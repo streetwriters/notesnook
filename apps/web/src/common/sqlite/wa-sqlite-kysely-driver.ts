@@ -78,6 +78,11 @@ export class WaSqliteWorkerDriver implements Driver {
     return await this.worker.close();
   }
 
+  async delete() {
+    console.log("DELETING");
+    return this.worker.delete();
+  }
+
   async export() {
     return this.worker.export(this.config.dbName, this.config.async);
   }

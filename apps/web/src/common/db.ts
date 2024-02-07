@@ -21,17 +21,12 @@ import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
 import { showMigrationDialog } from "./dialog-controller";
-// import { SQLocalKysely } from "sqlocal/kysely";
-import { WaSqliteWorkerDriver } from "./sqlite/sqlite.kysely";
-import { SqliteAdapter, SqliteQueryCompiler, SqliteIntrospector } from "kysely";
 import { database } from "@notesnook/common";
-// import SQLiteESMFactory from "./sqlite/wa-sqlite-async";
-// import * as SQLite from "./sqlite/sqlite-api";
-// import { IDBBatchAtomicVFS } from "./sqlite/IDBBatchAtomicVFS";
+import { createDialect } from "./sqlite";
+import { isFeatureSupported } from "../utils/feature-check";
 
 const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
-  console.log("initi");
   logger.measure("Database initialization");
 
   const { FileStorage } = await import("../interfaces/fs");
@@ -49,21 +44,21 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   });
 
   const storage = new NNStorage("Notesnook", KeyChain, persistence);
+  await storage.migrate();
+
   database.setup({
     sqliteOptions: {
-      dialect: (name) => ({
-        createDriver: () =>
-          new WaSqliteWorkerDriver({ async: true, dbName: name }),
-        createAdapter: () => new SqliteAdapter(),
-        createIntrospector: (db) => new SqliteIntrospector(db),
-        createQueryCompiler: () => new SqliteQueryCompiler()
-      }),
-      journalMode: "MEMORY",
+      dialect: createDialect,
+      ...(isFeatureSupported("opfs")
+        ? { journalMode: "WAL" }
+        : {
+            journalMode: "MEMORY",
+            lockingMode: "exclusive"
+          }),
       tempStore: "memory",
       synchronous: "normal",
       pageSize: 8192,
       cacheSize: -16000,
-      lockingMode: "exclusive",
       password: databaseKey
     },
     storage: storage,

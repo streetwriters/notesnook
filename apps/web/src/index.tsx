@@ -24,35 +24,41 @@ import { AppEventManager, AppEvents } from "./common/app-events";
 import { BaseThemeProvider } from "./components/theme-provider";
 import { register } from "./utils/stream-saver/mitm";
 import { getServiceWorkerVersion } from "./utils/version";
+import { ErrorBoundary, ErrorComponent } from "./components/error-boundary";
 
 renderApp();
 
 async function renderApp() {
-  const { component, props, path } = await init();
-
-  if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
-  if (IS_DESKTOP_APP) {
-    const { loadDatabase } = await import("./hooks/use-database");
-    await loadDatabase("db");
-  }
-
-  const { default: Component } = await component();
   const rootElement = document.getElementById("root");
   if (!rootElement) return;
-
-  const { default: AppLock } = await import("./views/app-lock");
   const root = createRoot(rootElement);
-  root.render(
-    <BaseThemeProvider
-      onRender={() => document.getElementById("splash")?.remove()}
-      addGlobalStyles
-      sx={{ height: "100%" }}
-    >
-      <AppLock>
-        <Component route={props?.route || "login:email"} />
-      </AppLock>
-    </BaseThemeProvider>
-  );
+
+  try {
+    const { component, props, path } = await init();
+
+    if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
+
+    const { default: Component } = await component();
+
+    const { default: AppLock } = await import("./views/app-lock");
+    root.render(
+      <ErrorBoundary>
+        <BaseThemeProvider
+          onRender={() => document.getElementById("splash")?.remove()}
+          addGlobalStyles
+          sx={{ height: "100%", bg: "background" }}
+        >
+          <AppLock>
+            <Component route={props?.route || "login:email"} />
+          </AppLock>
+        </BaseThemeProvider>
+      </ErrorBoundary>
+    );
+  } catch (e) {
+    root.render(
+      <ErrorComponent error={e} resetErrorBoundary={() => renderApp()} />
+    );
+  }
 }
 
 const serviceWorkerWhitelist: Routes[] = ["default"];

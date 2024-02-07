@@ -1,22 +1,4 @@
-/*
-This file is part of the Notesnook project (https://notesnook.com/)
-
-Copyright (C) 2023 Streetwriters (Private) Limited
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+/* eslint-disable header/header */
 // Copyright 2022 Roy T. Hashimoto. All Rights Reserved.
 import * as VFS from "./VFS.js";
 import { WebLocksExclusive as WebLocks } from "./WebLocks.js";
@@ -77,6 +59,12 @@ export class IDBBatchAtomicVFS extends VFS.Base {
   #taskTimestamp = performance.now();
   #pendingAsync = new Set();
 
+  // Asyncify can grow WebAssembly memory during an asynchronous call.
+  // If this happens, then any array buffer arguments will be detached.
+  // The workaround is when finding a detached buffer, set this handler
+  // function to process the new buffer outside handlerAsync().
+  #growthHandler = null;
+
   constructor(idbDatabaseName = "wa-sqlite", options = DEFAULT_OPTIONS) {
     super();
     this.name = idbDatabaseName;
@@ -84,6 +72,11 @@ export class IDBBatchAtomicVFS extends VFS.Base {
     this.#idb = new IDBContext(openDatabase(idbDatabaseName), {
       durability: this.#options.durability
     });
+  }
+
+  async delete() {
+    await this.close();
+    await deleteDatabase(this.name);
   }
 
   async close() {
@@ -103,7 +96,7 @@ export class IDBBatchAtomicVFS extends VFS.Base {
    * @returns {number}
    */
   xOpen(name, fileId, flags, pOutFlags) {
-    return this.handleAsync(async () => {
+    const result = this.handleAsync(async () => {
       if (name === null) name = `null_${fileId}`;
       log(`xOpen ${name} 0x${fileId.toString(16)} 0x${flags.toString(16)}`);
 
@@ -137,6 +130,14 @@ export class IDBBatchAtomicVFS extends VFS.Base {
             }
           }
         });
+
+        // @ts-ignore
+        if (pOutFlags.buffer.detached || !pOutFlags.buffer.byteLength) {
+          pOutFlags = new DataView(new ArrayBuffer(4));
+          this.#growthHandler = (pOutFlagsNew) => {
+            pOutFlagsNew.setInt32(0, pOutFlags.getInt32(0, true), true);
+          };
+        }
         pOutFlags.setInt32(0, flags & VFS.SQLITE_OPEN_READONLY, true);
         return VFS.SQLITE_OK;
       } catch (e) {
@@ -144,6 +145,10 @@ export class IDBBatchAtomicVFS extends VFS.Base {
         return VFS.SQLITE_CANTOPEN;
       }
     });
+
+    this.#growthHandler?.(pOutFlags);
+    this.#growthHandler = null;
+    return result;
   }
 
   /**
@@ -179,7 +184,8 @@ export class IDBBatchAtomicVFS extends VFS.Base {
    * @returns {number}
    */
   xRead(fileId, pData, iOffset) {
-    return this.handleAsync(async () => {
+    const byteLength = pData.byteLength;
+    const result = this.handleAsync(async () => {
       const file = this.#mapIdToFile.get(fileId);
       log(`xRead ${file.path} ${pData.byteLength} ${iOffset}`);
 
@@ -189,6 +195,15 @@ export class IDBBatchAtomicVFS extends VFS.Base {
         // one case - rollback after journal spill - where reads cross
         // write boundaries so we have to allow for that.
         const result = await this.#idb.run("readonly", async ({ blocks }) => {
+          // @ts-ignore
+          if (pData.buffer.detached || !pData.buffer.byteLength) {
+            // WebAssembly memory has grown, invalidating our buffer. Use
+            // a temporary buffer and copy after this asynchronous call
+            // completes.
+            pData = new Uint8Array(byteLength);
+            this.#growthHandler = (pDataNew) => pDataNew.set(pData);
+          }
+
           let pDataOffset = 0;
           while (pDataOffset < pData.byteLength) {
             // Fetch the IndexedDB block for this file location.
@@ -223,6 +238,10 @@ export class IDBBatchAtomicVFS extends VFS.Base {
         return VFS.SQLITE_IOERR;
       }
     });
+
+    this.#growthHandler?.(pData);
+    this.#growthHandler = null;
+    return result;
   }
 
   /**
@@ -244,7 +263,7 @@ export class IDBBatchAtomicVFS extends VFS.Base {
         }
         await new Promise((resolve) => setTimeout(resolve));
 
-        const result = this.#xWriteHelper(fileId, pData, iOffset);
+        const result = this.#xWriteHelper(fileId, pData.slice(), iOffset);
         this.#taskTimestamp = performance.now();
         return result;
       });
@@ -452,6 +471,7 @@ export class IDBBatchAtomicVFS extends VFS.Base {
     return this.handleAsync(async () => {
       const file = this.#mapIdToFile.get(fileId);
       log(`xUnlock ${file.path} ${flags}`);
+
       try {
         return file.locks.unlock(flags);
       } catch (e) {
@@ -467,14 +487,26 @@ export class IDBBatchAtomicVFS extends VFS.Base {
    * @returns {number}
    */
   xCheckReservedLock(fileId, pResOut) {
-    return this.handleAsync(async () => {
+    const result = this.handleAsync(async () => {
       const file = this.#mapIdToFile.get(fileId);
       log(`xCheckReservedLock ${file.path}`);
 
       const isReserved = await file.locks.isSomewhereReserved();
+
+      // @ts-ignore
+      if (pResOut.buffer.detached || !pResOut.buffer.byteLength) {
+        pResOut = new DataView(new ArrayBuffer(4));
+        this.#growthHandler = (pResOutNew) => {
+          pResOutNew.setInt32(0, pResOut.getInt32(0, true), true);
+        };
+      }
       pResOut.setInt32(0, isReserved ? 1 : 0, true);
       return VFS.SQLITE_OK;
     });
+
+    this.#growthHandler?.(pResOut);
+    this.#growthHandler = null;
+    return result;
   }
 
   /**
@@ -649,7 +681,7 @@ export class IDBBatchAtomicVFS extends VFS.Base {
    * @returns {number}
    */
   xAccess(name, flags, pResOut) {
-    return this.handleAsync(async () => {
+    const result = this.handleAsync(async () => {
       try {
         if (name.includes("-journal") || name.includes("-wal")) {
           pResOut.setInt32(0, 0, true);
@@ -663,6 +695,14 @@ export class IDBBatchAtomicVFS extends VFS.Base {
         const key = await this.#idb.run("readonly", ({ blocks }) => {
           return blocks.getKey(this.#bound({ path }, 0));
         });
+
+        // @ts-ignore
+        if (pResOut.buffer.detached || !pResOut.buffer.byteLength) {
+          pResOut = new DataView(new ArrayBuffer(4));
+          this.#growthHandler = (pResOutNew) => {
+            pResOutNew.setInt32(0, pResOut.getInt32(0, true), true);
+          };
+        }
         pResOut.setInt32(0, key ? 1 : 0, true);
         return VFS.SQLITE_OK;
       } catch (e) {
@@ -670,6 +710,10 @@ export class IDBBatchAtomicVFS extends VFS.Base {
         return VFS.SQLITE_IOERR;
       }
     });
+
+    this.#growthHandler?.(pResOut);
+    this.#growthHandler = null;
+    return result;
   }
 
   /**
@@ -865,6 +909,18 @@ export class IDBBatchAtomicVFS extends VFS.Base {
       }
     });
   }
+}
+
+function deleteDatabase(idbDatabaseName) {
+  return new Promise((resolve, reject) => {
+    const request = globalThis.indexedDB.deleteDatabase(idbDatabaseName);
+    request.addEventListener("success", () => {
+      resolve();
+    });
+    request.addEventListener("error", () => {
+      reject(request.error);
+    });
+  });
 }
 
 function openDatabase(idbDatabaseName) {
