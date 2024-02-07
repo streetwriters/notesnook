@@ -338,7 +338,7 @@ export default class Vault {
     }
 
     return {
-      content
+      content: decryptedContent
     };
   }
 
