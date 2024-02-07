@@ -72,7 +72,9 @@ const EXTRA_ICON_NAMES = [
   "qrcode",
   "text",
   "cloud",
-  "restore"
+  "restore",
+  "keyboard",
+  "numeric"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

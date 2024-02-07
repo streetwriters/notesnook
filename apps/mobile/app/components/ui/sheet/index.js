@@ -120,7 +120,8 @@ const SheetWrapper = ({
           width: 100,
           backgroundColor: colors.secondary.background
         }}
-        drawUnderStatusBar={false}
+        statusBarTranslucent
+        drawUnderStatusBar={true}
         containerStyle={style}
         gestureEnabled={gestureEnabled}
         initialOffsetFromBottom={1}

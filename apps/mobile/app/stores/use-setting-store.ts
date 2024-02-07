@@ -80,6 +80,7 @@ export type Settings = {
   appLockHasPasswordSecurity?: boolean;
   biometricsAuthEnabled?: boolean;
   backgroundSync?: boolean;
+  applockKeyboardType: "numeric" | "default";
 };
 
 type DimensionsType = {
@@ -122,6 +123,7 @@ export interface SettingStore extends State {
 const { width, height } = Dimensions.get("window");
 
 export const defaultSettings: SettingStore["settings"] = {
+  applockKeyboardType: "numeric",
   appLockTimer: 0,
   showToolbarOnTop: false,
   showKeyboardOnOpen: false,

@@ -47,6 +47,9 @@ const AppLockedOverlay = () => {
   const password = useRef<string>();
   const appState = useAppState();
   const biometricUnlockAwaitingUserInput = useRef(false);
+  const keyboardType = useSettingStore(
+    (state) => state.settings.applockKeyboardType
+  );
   const appLockHasPasswordSecurity = useSettingStore(
     (state) => state.settings.appLockHasPasswordSecurity
   );
@@ -186,11 +189,13 @@ const AppLockedOverlay = () => {
                 fwdRef={passwordInputRef}
                 secureTextEntry
                 keyboardType={
-                  appLockHasPasswordSecurity ? "number-pad" : "default"
+                  appLockHasPasswordSecurity ? keyboardType : "default"
                 }
                 placeholder={`Enter ${
                   appLockHasPasswordSecurity
-                    ? `app lock pin`
+                    ? `app lock ${
+                        keyboardType === "numeric" ? "pin" : "password"
+                      }`
                     : "account password"
                 }`}
                 onChangeText={(v) => (password.current = v)}
