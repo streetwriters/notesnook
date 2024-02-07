@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react";
 import { initializeDatabase } from "../common/db";
+import { useErrorBoundary } from "react-error-boundary";
 import "allotment/dist/style.css";
 import "../utils/analytics";
 import "../app.css";
@@ -32,9 +33,28 @@ const memory = {
 };
 export default function useDatabase(persistence: "db" | "memory" = "db") {
   const [isAppLoaded, setIsAppLoaded] = useState(memory.isDatabaseLoaded);
+  const { showBoundary } = useErrorBoundary();
 
   useEffect(() => {
-    loadDatabase(persistence).then(() => setIsAppLoaded(true));
+    loadDatabase(persistence)
+      .then(() => setIsAppLoaded(true))
+      .catch((e) => showBoundary(e));
+
+    function handleError(e: ErrorEvent) {
+      showBoundary(e.error);
+    }
+    function handleUnhandledRejection(e: PromiseRejectionEvent) {
+      showBoundary(e.reason);
+    }
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+    window.addEventListener("error", handleError);
+    return () => {
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection
+      );
+      window.removeEventListener("error", handleError);
+    };
   }, [persistence]);
 
   return [isAppLoaded];
