@@ -227,7 +227,14 @@ function SubNotebooks({
   if (!rootId) return null;
 
   return (
-    <Flex id="subnotebooks" variant="columnFill" sx={{ height: "100%" }}>
+    <Flex
+      id="subnotebooks"
+      variant="columnFill"
+      sx={{
+        height: "100%",
+        borderTop: "1px solid var(--border)"
+      }}
+    >
       <Flex
         sx={{
           m: 1,
@@ -512,7 +519,6 @@ function NotebookHeader({
         <Text
           as="p"
           sx={{
-            lineHeight: 0.7,
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
             overflow: "hidden"
