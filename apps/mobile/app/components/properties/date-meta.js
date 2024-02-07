@@ -78,7 +78,7 @@ export const DateMeta = ({ item }) => {
         paddingVertical: 5,
         marginTop: 5,
         borderTopWidth: 1,
-        borderTopColor: colors.secondary.background,
+        borderTopColor: colors.primary.border,
         paddingHorizontal: 12
       }}
     >

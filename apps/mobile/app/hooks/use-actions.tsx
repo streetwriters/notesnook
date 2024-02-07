@@ -62,6 +62,7 @@ import { eOpenLoginDialog } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
+import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 
 export const useActions = ({
   close,
@@ -120,7 +121,7 @@ export const useActions = ({
   useEffect(() => {
     const sub = eSubscribeEvent(Notifications.Events.onUpdate, onUpdate);
     return () => {
-      sub.unsubscribe();
+      sub?.unsubscribe();
     };
   }, [item, onUpdate]);
 
@@ -205,23 +206,50 @@ export const useActions = ({
     });
   }
 
-  async function deleteItem() {
-    if (!checkItemSynced()) return;
+  async function renameColor() {
+    if (item.type !== "color") return;
     close();
-    if (item.type === "tag" || item.type === "reminder") {
-      await sleep(300);
+    await sleep(300);
+    presentDialog({
+      title: "Rename color",
+      input: true,
+      inputPlaceholder: "Enter name for this color",
+      defaultValue: item.title,
+      paragraph: "You are renaming the color " + item.title,
+      positivePress: async (value) => {
+        if (!value || value.trim().length === 0) return;
+        await db.colors.add({
+          id: item.id,
+          title: value
+        });
+        useMenuStore.getState().setColorNotes();
+      },
+      positiveText: "Rename"
+    });
+  }
+
+  const deleteItem = async () => {
+    close();
+    await sleep(300);
+
+    if (
+      item.type === "tag" ||
+      item.type === "reminder" ||
+      item.type === "color"
+    ) {
       presentDialog({
         title: `Delete ${item.type}`,
-        paragraph:
-          item.type === "reminder"
-            ? "This reminder will be removed"
-            : "This tag will be removed from all notes.",
+        paragraph: `Are you sure you want to delete this ${item.type}?`,
         positivePress: async () => {
           if (item.type === "reminder") {
             await db.reminders.remove(item.id);
+          } else if (item.type === "color") {
+            await db.colors.remove(item.id);
+            useMenuStore.getState().setColorNotes();
           } else {
             await db.tags.remove(item.id);
           }
+
           setImmediate(() => {
             useTagStore.getState().refresh();
             Navigation.queueRoutesForUpdate();
@@ -234,8 +262,7 @@ export const useActions = ({
       return;
     }
 
-    if (item.type === "note" && item.locked) {
-      await sleep(300);
+    if (item.type === "note" && (await db.vaults.itemExists(item))) {
       openVault({
         deleteNote: true,
         novault: true,
@@ -246,14 +273,12 @@ export const useActions = ({
       });
     } else {
       try {
-        close();
-        await sleep(300);
         await deleteItems([item.id], item.type);
       } catch (e) {
         console.error(e);
       }
     }
-  }
+  };
 
   async function deleteTrashItem() {
     if (item.type !== "trash") return;
@@ -295,17 +320,6 @@ export const useActions = ({
     type?: string;
     color?: string;
   }[] = [
-    {
-      id: "trash",
-      title:
-        item.type !== "notebook" && item.type !== "note"
-          ? "Delete " + item.type
-          : "Move to trash",
-      icon: "delete-outline",
-      type: "error",
-      func: deleteItem
-    }
-
     // {
     //   id: "ReferencedIn",
     //   title: "References",
@@ -325,9 +339,29 @@ export const useActions = ({
   if (item.type === "tag") {
     actions.push({
       id: "rename-tag",
-      title: "Rename tag",
+      title: "Rename",
       icon: "square-edit-outline",
       func: renameTag
+    });
+  }
+
+  if (item.type === "color") {
+    actions.push({
+      id: "rename-color",
+      title: "Rename",
+      icon: "square-edit-outline",
+      func: renameColor
+    });
+
+    actions.push({
+      id: "reorder",
+      title: "Reorder",
+      icon: "sort-ascending",
+      func: () => {
+        useSideBarDraggingStore.setState({
+          dragging: true
+        });
+      }
     });
   }
 
@@ -864,7 +898,18 @@ export const useActions = ({
       .then((notebook) => {
         setNoteInCurrentNotebook(!!notebook);
       });
-  }, []);
+  }, [item]);
+
+  actions.push({
+    id: "trash",
+    title:
+      item.type !== "notebook" && item.type !== "note"
+        ? "Delete " + item.type
+        : "Move to trash",
+    icon: "delete-outline",
+    type: "error",
+    func: deleteItem
+  });
 
   return actions;
 };
