@@ -26,12 +26,9 @@ const CHANNEL = autoUpdater.currentVersion.raw.endsWith("-beta")
 async function configureAutoUpdater() {
   autoUpdater.setFeedURL({
     provider: "generic",
-    url: `https://notesnook.com/releases/${process.platform}/`,
+    url: `https://notesnook.com/api/v1/releases/${process.platform}/${CHANNEL}`,
     useMultipleRangeRequest: false,
-    channel: CHANNEL,
-    requestHeaders: {
-      RELEASE_CHANNEL: CHANNEL
-    }
+    channel: CHANNEL
   });
 
   autoUpdater.autoDownload = config.automaticUpdates;
