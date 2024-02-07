@@ -225,61 +225,64 @@ export async function createDatabase(name: string, options: SQLiteOptions) {
     dialect: options.dialect(name),
     plugins: [new SqliteBooleanPlugin()]
   });
-  if (options.password)
-    await sql`PRAGMA key = ${sql.ref(options.password)}`
-      .execute(db)
-      .then((r) => console.log(r));
+  try {
+    if (options.password)
+      await sql`PRAGMA key = ${sql.ref(options.password)}`.execute(db);
 
-  const migrator = new Migrator({
-    db,
-    provider: new NNMigrationProvider()
-  });
+    const migrator = new Migrator({
+      db,
+      provider: new NNMigrationProvider()
+    });
 
-  await sql`PRAGMA journal_mode = ${sql.raw(
-    options.journalMode || "WAL"
-  )}`.execute(db);
-
-  await sql`PRAGMA synchronous = ${sql.raw(
-    options.synchronous || "normal"
-  )}`.execute(db);
-
-  // recursive_triggers are required so that SQLite fires DELETE trigger on
-  // REPLACE INTO statements
-  await sql`PRAGMA recursive_triggers = true`.execute(db);
-
-  if (options.pageSize)
-    await sql`PRAGMA page_size = ${sql.raw(
-      options.pageSize.toString()
+    await sql`PRAGMA journal_mode = ${sql.raw(
+      options.journalMode || "WAL"
     )}`.execute(db);
 
-  if (options.tempStore)
-    await sql`PRAGMA temp_store = ${sql.raw(options.tempStore)}`.execute(db);
-
-  if (options.cacheSize)
-    await sql`PRAGMA cache_size = ${sql.raw(
-      options.cacheSize.toString()
+    await sql`PRAGMA synchronous = ${sql.raw(
+      options.synchronous || "normal"
     )}`.execute(db);
 
-  if (options.lockingMode)
-    await sql`PRAGMA locking_mode = ${sql.raw(options.lockingMode)}`.execute(
-      db
-    );
+    // recursive_triggers are required so that SQLite fires DELETE trigger on
+    // REPLACE INTO statements
+    await sql`PRAGMA recursive_triggers = true`.execute(db);
 
-  const { error, results } = await migrator.migrateToLatest();
+    if (options.pageSize)
+      await sql`PRAGMA page_size = ${sql.raw(
+        options.pageSize.toString()
+      )}`.execute(db);
 
-  results?.forEach((it) => {
-    if (it.status === "Error")
-      console.error(`failed to execute migration "${it.migrationName}"`);
-  });
+    if (options.tempStore)
+      await sql`PRAGMA temp_store = ${sql.raw(options.tempStore)}`.execute(db);
 
-  if (error) {
-    console.error("failed to run `migrateToLatest`");
-    console.error(error);
+    if (options.cacheSize)
+      await sql`PRAGMA cache_size = ${sql.raw(
+        options.cacheSize.toString()
+      )}`.execute(db);
+
+    if (options.lockingMode)
+      await sql`PRAGMA locking_mode = ${sql.raw(options.lockingMode)}`.execute(
+        db
+      );
+
+    const { error, results } = await migrator.migrateToLatest();
+
+    results?.forEach((it) => {
+      if (it.status === "Error")
+        console.error(`failed to execute migration "${it.migrationName}"`);
+    });
+
+    if (error) {
+      console.error("failed to run `migrateToLatest`");
+      console.error(error);
+    }
+
+    await createTriggers(db);
+
+    return db;
+  } catch (e) {
+    await db.destroy();
+    throw e;
   }
-
-  await createTriggers(db);
-
-  return db;
 }
 
 export async function changeDatabasePassword(
