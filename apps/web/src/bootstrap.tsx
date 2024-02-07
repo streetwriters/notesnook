@@ -23,7 +23,7 @@ import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";
 import Config from "./utils/config";
 
 import { initializeLogger, logger } from "./utils/logger";
-import { AuthProps } from "./views/auth";
+import type { AuthProps } from "./views/auth";
 import { initializeFeatureChecks } from "./utils/feature-check";
 
 type Route<TProps = null> = {

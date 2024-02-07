@@ -51,13 +51,15 @@ async function isCacheSupported() {
 }
 
 async function isIndexedDBSupported() {
-  console.log("IS indexed db supported");
   const hasIndexedDB = "indexedDB" in window;
   return (
     hasIndexedDB &&
     (await new Promise((resolve, reject) => {
       const request = indexedDB.open("checkIDBSupport");
-      request.onsuccess = resolve;
+      request.onsuccess = () => {
+        request.result.close();
+        resolve(undefined);
+      };
       request.onerror = reject;
     })
       .then(() => (FEATURE_CHECKS.indexedDB = true))

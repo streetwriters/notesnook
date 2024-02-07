@@ -29,7 +29,6 @@ import Logo from "../../assets/logo.svg";
 import LogoDark from "../../assets/logo-dark.svg";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { createDialect } from "../../common/sqlite";
-import { getDeviceInfo } from "../../dialogs/issue-dialog";
 
 export function ErrorBoundary(props: PropsWithChildren) {
   return (
@@ -96,7 +95,10 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
               <Button
                 variant="secondary"
                 sx={{ alignSelf: "start", px: 30, mt: 1 }}
-                onClick={() => {
+                onClick={async () => {
+                  const { getDeviceInfo } = await import(
+                    "../../dialogs/issue-dialog"
+                  );
                   const mailto = new URL("mailto:support@streetwriters.co");
                   mailto.searchParams.set(
                     "body",
