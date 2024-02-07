@@ -161,7 +161,7 @@ function showIssueReportedDialog({ url }: { url: string }) {
   });
 }
 
-function getDeviceInfo() {
+export function getDeviceInfo() {
   const version = appVersion.formatted;
   const os = platform.os;
   const browser = `${platform.name} ${platform.version}`;

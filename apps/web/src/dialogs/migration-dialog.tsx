@@ -68,6 +68,7 @@ export default function MigrationDialog(props: MigrationDialogProps) {
 
           props.onClose(true);
         } catch (e) {
+          console.error(e);
           if (e instanceof Error) setError(e);
         }
       }
@@ -94,7 +95,7 @@ export default function MigrationDialog(props: MigrationDialogProps) {
         }}
       >
         <ErrorText
-          error={error.stack}
+          error={error}
           as="p"
           sx={{
             borderRadius: "default",

@@ -81,9 +81,9 @@ class EditorStore extends BaseStore<EditorStore> {
       hashNavigate("/notes/create", { replace: true, addNonce: true });
     });
 
-    EV.subscribe(EVENTS.vaultLocked, () => {
+    EV.subscribe(EVENTS.vaultLocked, async () => {
       const { id, locked } = this.get().session;
-      if (locked) hashNavigate(`/notes/${id}/unlock`, { replace: true });
+      if (id && locked) hashNavigate(`/notes/${id}/unlock`, { replace: true });
     });
   };
 
@@ -153,7 +153,7 @@ class EditorStore extends BaseStore<EditorStore> {
     noteStore.setSelectedNote(note.id);
     setDocumentTitle(settingStore.get().hideNoteTitle ? undefined : note.title);
 
-    if (note.locked)
+    if (await db.vaults.itemExists(note))
       return hashNavigate(`/notes/${noteId}/unlock`, { replace: true });
     if (note.conflicted)
       return hashNavigate(`/notes/${noteId}/conflict`, { replace: true });

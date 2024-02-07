@@ -21,10 +21,6 @@ import { TaskManager } from "./task-manager";
 import { ExportStream } from "../utils/streams/export-stream";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
-import {
-  isEncryptedContent,
-  isUnencryptedContent
-} from "@notesnook/core/dist/collections/content";
 import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
 import { Note, isDeleted } from "@notesnook/core";
 import { fromAsyncIterator } from "../utils/stream";
@@ -125,7 +121,11 @@ export async function exportNote(
     format: keyof typeof FORMAT_TO_EXT;
   }
 ) {
-  if (!db.vault.unlocked && note.locked && !(await Vault.unlockVault())) {
+  if (
+    !db.vault.unlocked &&
+    (await db.vaults.itemExists(note)) &&
+    !(await Vault.unlockVault())
+  ) {
     showToast("error", `Skipping note "${note.title}" as it is locked.`);
     return false;
   }

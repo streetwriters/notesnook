@@ -29,6 +29,7 @@ import { hashNavigate } from "../../navigation";
 import { useStore } from "../../stores/note-store";
 import { MenuItem } from "@notesnook/ui";
 import { TrashItem } from "@notesnook/core/dist/types";
+import { db } from "../../common/db";
 
 type TrashItemProps = { item: TrashItem; date: number };
 function TrashItem(props: TrashItemProps) {
@@ -56,11 +57,11 @@ function TrashItem(props: TrashItemProps) {
         </Flex>
       }
       menuItems={menuItems}
-      onClick={() => {
+      onClick={async () => {
         if (item.itemType === "note")
-          !item.locked
-            ? hashNavigate(`/notes/${item.id}/edit`, { replace: true })
-            : showToast("error", "Locked notes cannot be previewed in trash.");
+          (await db.vaults.itemExists({ id: item.id, type: "note" }))
+            ? showToast("error", "Locked notes cannot be previewed in trash.")
+            : hashNavigate(`/notes/${item.id}/edit`, { replace: true });
       }}
     />
   );
