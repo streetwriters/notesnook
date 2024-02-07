@@ -81,7 +81,8 @@ export class VaultDialog extends Component {
       description: null,
       clearVault: false,
       deleteVault: false,
-      deleteAll: false
+      deleteAll: false,
+      noteLocked: false
     };
 
     this.passInputRef = createRef();
@@ -99,7 +100,7 @@ export class VaultDialog extends Component {
       ? "Revoke Vault Fingerprint Unlock"
       : this.state.changePassword
       ? "Change Vault Password"
-      : this.state.note.locked
+      : this.state.noteLocked
       ? this.state.deleteNote
         ? "Delete note"
         : this.state.share
@@ -120,7 +121,7 @@ export class VaultDialog extends Component {
         ? "Setup a new password for the vault."
         : this.state.permanant
         ? "Enter password to remove note from vault."
-        : this.state.note.locked
+        : this.state.noteLocked
         ? this.state.deleteNote
           ? "Unlock note to delete it. If biometrics are not working, you can enter device pin to unlock vault."
           : this.state.share
@@ -174,7 +175,8 @@ export class VaultDialog extends Component {
       title: data.title,
       description: data.description,
       clearVault: data.clearVault,
-      deleteVault: data.deleteVault
+      deleteVault: data.deleteVault,
+      noteLocked: data.item && (await db.vaults.itemExists(data.item))
     });
 
     if (
@@ -314,7 +316,7 @@ export class VaultDialog extends Component {
         });
         return;
       }
-      if (this.state.note.locked) {
+      if (this.state.noteLocked) {
         await this._unlockNote();
       } else {
         db.vault
@@ -892,7 +894,7 @@ export class VaultDialog extends Component {
                 ? "Revoke"
                 : changePassword
                 ? "Change"
-                : note.locked
+                : this.state.noteLocked
                 ? deleteNote
                   ? "Delete"
                   : share

@@ -21,7 +21,8 @@ import { Note } from "@notesnook/core/dist/types";
 import { db } from "../common/database";
 
 export async function convertNoteToText(note: Note, disableTemplate?: boolean) {
-  if (note.locked) {
+  const locked = await db.vaults.itemExists(note);
+  if (locked) {
     return await db.notes.export(note.id, {
       contentItem: (note as Note & { content: NoteContent<false> }).content,
       disableTemplate,

@@ -512,7 +512,8 @@ const onChangeTab = async (obj) => {
       setTimeout(() => useEditorStore.getState().setSearchReplace(false), 1);
       let id = useEditorStore.getState().currentEditingNote;
       let note = db.notes.note(id);
-      if (note?.locked) {
+      const locked = note && (await db.vaults.itemExists(note));
+      if (locked) {
         eSendEvent(eClearEditor);
       }
     }

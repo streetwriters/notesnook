@@ -70,7 +70,7 @@ export const openNote = async (
     return;
   }
 
-  if (note.locked) {
+  if (await db.vaults.itemExists(note)) {
     openVault({
       item: note,
       novault: true,
@@ -113,6 +113,7 @@ type NoteWrapperProps = {
   attachmentsCount: number;
   date: number;
   isRenderedInActionSheet: boolean;
+  locked?: boolean;
 };
 
 export const NoteWrapper = React.memo<

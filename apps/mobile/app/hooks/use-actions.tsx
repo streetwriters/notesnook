@@ -86,6 +86,13 @@ export const useActions = ({
 
   const isPublished =
     item.type === "note" && db.monographs.isPublished(item.id);
+  const [locked, setLocked] = useState(false);
+
+  useEffect(() => {
+    if (item.type === "note") {
+      db.vaults.itemExists(item).then((locked) => setLocked(locked));
+    }
+  }, [item]);
 
   const checkNotifPinned = useCallback(() => {
     const pinned = Notifications.getPinnedNotes();
@@ -550,7 +557,7 @@ export const useActions = ({
         checkNotifPinned();
         return;
       }
-      if ((item as Note).locked) {
+      if (locked) {
         ToastManager.show({
           heading: "Note is locked",
           type: "error",
@@ -606,7 +613,7 @@ export const useActions = ({
         });
         return;
       }
-      if ((item as Note).locked) {
+      if (locked) {
         ToastManager.show({
           heading: "Locked notes cannot be published",
           type: "error",
@@ -629,7 +636,7 @@ export const useActions = ({
         return;
       }
       if (!checkItemSynced()) return;
-      if (item.locked) {
+      if (locked) {
         close();
         await sleep(300);
         openVault({
@@ -660,7 +667,7 @@ export const useActions = ({
       if (item.type !== "note") return;
 
       if (!checkItemSynced()) return;
-      if (item.locked) {
+      if (locked) {
         close();
         await sleep(300);
         openVault({
@@ -676,7 +683,7 @@ export const useActions = ({
       try {
         await db.vault.add(item.id);
         const note = await db.notes.note(item.id);
-        if (note?.locked) {
+        if (locked) {
           close();
           Navigation.queueRoutesForUpdate();
         }
@@ -715,7 +722,7 @@ export const useActions = ({
         return;
       }
       if (!checkItemSynced()) return;
-      if ((item as Note).locked) {
+      if (locked) {
         close();
         await sleep(300);
         openVault({
@@ -842,10 +849,10 @@ export const useActions = ({
       },
       {
         id: "lock-unlock",
-        title: (item as Note).locked ? "Unlock" : "Lock",
-        icon: (item as Note).locked ? "lock-open-outline" : "key-outline",
+        title: locked ? "Unlock" : "Lock",
+        icon: locked ? "lock-open-outline" : "key-outline",
         func: addToVault,
-        on: (item as Note).locked
+        on: locked
       },
       {
         id: "publish",
