@@ -56,7 +56,7 @@ export class NNStorage implements IStorage {
     const user = await this.read<User>("user");
     if (!user) return;
 
-    const key = await this._getCryptoKey(user.email);
+    const key = await this._getCryptoKey(`_uk_@${user.email}`);
     if (!key) return;
 
     await this.database.deleteMany([

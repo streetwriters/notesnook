@@ -101,6 +101,7 @@ function Note(props: NoteProps) {
     color,
     notebooks,
     attachments,
+    locked,
     item,
     date,
     reminder,
@@ -133,12 +134,12 @@ function Note(props: NoteProps) {
         heading: color ? primary : "heading",
         background: "background"
       }}
-      context={{ color }}
+      context={{ color, locked }}
       menuItems={menuItems}
-      onClick={() => {
+      onClick={async () => {
         if (note.conflicted) {
           hashNavigate(`/notes/${note.id}/conflict`, { replace: true });
-        } else if (note.locked) {
+        } else if (locked) {
           hashNavigate(`/notes/${note.id}/unlock`, { replace: true });
         } else {
           hashNavigate(`/notes/${note.id}/edit`, { replace: true });
@@ -188,7 +189,7 @@ function Note(props: NoteProps) {
           {compact ? (
             <>
               {note.conflicted && <Alert size={15} color="var(--icon-error)" />}
-              {note.locked && <Lock size={11} data-test-id={`locked`} />}
+              {locked && <Lock size={11} data-test-id={`locked`} />}
               {note.favorite && <Star color={primary} size={15} />}
               <TimeAgo live={true} datetime={date} locale="short" />
             </>
@@ -225,7 +226,7 @@ function Note(props: NoteProps) {
                 <Pin size={13} color={primary} />
               )}
 
-              {note.locked && <Lock size={13} data-test-id={`locked`} />}
+              {locked && <Lock size={13} data-test-id={`locked`} />}
 
               {note.favorite && <Star color={primary} size={15} />}
 
@@ -317,7 +318,7 @@ const notFullySyncedText =
 const menuItems: (
   note: Note,
   ids?: string[],
-  context?: { color?: Color }
+  context?: { color?: Color; locked?: boolean }
 ) => MenuItem[] = (note, ids = [], context) => {
   // const isSynced = db.notes.note(note.id)?.synced();
 
@@ -354,11 +355,11 @@ const menuItems: (
       key: "lock",
       //isDisabled: !isSynced,
       title: "Lock",
-      isChecked: note.locked,
+      isChecked: context?.locked,
       icon: Lock.path,
       onClick: async () => {
         const { unlock, lock } = store.get();
-        if (!note.locked) {
+        if (!context?.locked) {
           if (await lock(note.id))
             showToast("success", "Note locked successfully!");
         } else if (await unlock(note.id)) {
@@ -419,7 +420,7 @@ const menuItems: (
       key: "publish",
       isDisabled:
         //!isSynced ||
-        !db.monographs.isPublished(note.id) && note.locked,
+        !db.monographs.isPublished(note.id) && context?.locked,
       icon: Publish.path,
       title: "Publish",
       isChecked: db.monographs.isPublished(note.id),
@@ -500,7 +501,7 @@ const menuItems: (
       key: "duplicate",
       title: "Duplicate",
       //!isSynced ||
-      isDisabled: note.locked,
+      isDisabled: context?.locked,
       icon: Duplicate.path,
       onClick: () => store.get().duplicate(...ids),
       multiSelect: true
