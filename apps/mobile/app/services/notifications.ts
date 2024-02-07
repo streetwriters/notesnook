@@ -94,7 +94,7 @@ function encodeLine(line: string) {
   return line;
 }
 
-async function initDatabase(notes = true) {
+async function initDatabase() {
   if (!db.isInitialized) {
     await db.init();
   }
@@ -399,7 +399,7 @@ async function scheduleNotification(
 
 async function loadNote(id: string, jump: boolean) {
   if (!id || id === "notesnook_note_input") return;
-  const note = await db.notes?.note(id);
+  const note = await db.notes.note(id);
   if (!note) return;
   if (!DDS.isTab && jump) {
     tabBarRef.current?.goToPage(1);
@@ -521,7 +521,7 @@ async function displayNotification({
   }
 }
 
-function openSettingsDialog(context: any) {
+function openSettingsDialog(context: string) {
   return new Promise((resolve) => {
     presentDialog({
       title: "Notifications disabled",
@@ -737,38 +737,39 @@ async function getTriggers(
 
           break;
         case "year":
-          let timestamp = dayjs()
-            .month(relativeTime.month())
-            .date(relativeTime.date())
-            .hour(relativeTime.hour())
-            .minute(relativeTime.minute());
+          {
+            let timestamp = dayjs()
+              .month(relativeTime.month())
+              .date(relativeTime.date())
+              .hour(relativeTime.hour())
+              .minute(relativeTime.minute());
+            // Timestamp must always be in future.
+            if (timestamp.isBefore(dayjs())) {
+              do {
+                timestamp = timestamp.add(1, "year");
+              } while (timestamp.isBefore(dayjs()));
+            }
 
-          // Timestamp must always be in future.
-          if (timestamp.isBefore(dayjs())) {
-            do {
-              timestamp = timestamp.add(1, "year");
-            } while (timestamp.isBefore(dayjs()));
-          }
-
-          if (Platform.OS === "ios") {
-            triggers.push({
-              timestamp: timestamp.toDate().getTime() as number,
-              type: TriggerType.TIMESTAMP,
-              repeatFrequency: RepeatFrequency.YEARLY,
-              id: `${reminder.id}`,
-              alarmManager: {
-                allowWhileIdle: true
-              }
-            });
-          } else {
-            triggers.push({
-              timestamp: timestamp.toDate().getTime() as number,
-              type: TriggerType.TIMESTAMP,
-              id: reminder.id,
-              alarmManager: {
-                allowWhileIdle: true
-              }
-            });
+            if (Platform.OS === "ios") {
+              triggers.push({
+                timestamp: timestamp.toDate().getTime() as number,
+                type: TriggerType.TIMESTAMP,
+                repeatFrequency: RepeatFrequency.YEARLY,
+                id: `${reminder.id}`,
+                alarmManager: {
+                  allowWhileIdle: true
+                }
+              });
+            } else {
+              triggers.push({
+                timestamp: timestamp.toDate().getTime() as number,
+                type: TriggerType.TIMESTAMP,
+                id: reminder.id,
+                alarmManager: {
+                  allowWhileIdle: true
+                }
+              });
+            }
           }
           break;
       }
@@ -912,8 +913,10 @@ async function setupReminders(checkNeedsScheduling = false) {
 
 async function pinNote(id: string) {
   try {
-    const note = db.notes?.note(id as string) as any;
-    let text = await convertNoteToText(note as any, false);
+    const note = await db.notes.note(id as string);
+    if (!note) return;
+
+    let text = await convertNoteToText(note, false);
     if (!text) text = "";
     const html = text.replace(/\n/g, "<br />");
     Notifications.displayNotification({
