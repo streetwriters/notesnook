@@ -16,28 +16,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+import { safeStorage } from "electron";
 import { initTRPC } from "@trpc/server";
-import { compressionRouter } from "./compression";
-import { osIntegrationRouter } from "./os-integration";
-import { spellCheckerRouter } from "./spell-checker";
-import { updaterRouter } from "./updater";
-import { bridgeRouter } from "./bridge";
-import { safeStorageRouter } from "./safe-storage";
+import { z } from "zod";
 
 const t = initTRPC.create();
 
-export const router = t.router({
-  compress: compressionRouter,
-  integration: osIntegrationRouter,
-  spellChecker: spellCheckerRouter,
-  updater: updaterRouter,
-  bridge: bridgeRouter,
-  safeStorage: safeStorageRouter
+export const safeStorageRouter = t.router({
+  /**
+   * Takes a string and returns an encrypted base64 string
+   */
+  encryptString: t.procedure.input(z.string()).query(async ({ input }) => {
+    return safeStorage.encryptString(input).toString("base64");
+  }),
+  /**
+   * Takes an encrypted base64 string and returns a string
+   */
+  decryptString: t.procedure.input(z.string()).query(async ({ input }) => {
+    return safeStorage.decryptString(Buffer.from(input, "base64"));
+  })
 });
-
-export const api = router.createCaller({});
-
-// Export type router type signature,
-// NOT the router itself.
-export type AppRouter = typeof router;
