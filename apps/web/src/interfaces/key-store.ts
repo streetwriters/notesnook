@@ -22,6 +22,7 @@ import { IKVStore, IndexedDBKVStore, MemoryKVStore } from "./key-value";
 import { NNCrypto } from "./nncrypto";
 import { isFeatureSupported } from "../utils/feature-check";
 import { isCipher } from "@notesnook/core/dist/database/crypto";
+import { desktop } from "../common/desktop-bridge";
 
 type BaseCredential = { id: string };
 type PasswordCredential = BaseCredential & {
@@ -92,12 +93,11 @@ class KeyStore {
   private key?: CryptoKey;
 
   constructor(dbName: string) {
-    console.log("key store", dbName);
     this.metadataStore = isFeatureSupported("indexedDB")
-      ? new IndexedDBKVStore(dbName, "metadata")
+      ? new IndexedDBKVStore(`${dbName}-metadata`, "metadata")
       : new MemoryKVStore();
     this.secretStore = isFeatureSupported("indexedDB")
-      ? new IndexedDBKVStore(dbName, "secrets")
+      ? new IndexedDBKVStore(`${dbName}-secrets`, "secrets")
       : new MemoryKVStore();
   }
 
@@ -150,7 +150,7 @@ class KeyStore {
       for (const credential of await this.getCredentials()) {
         await this.metadataStore.delete(this.getCredentialKey(credential));
       }
-      await this.metadataStore.set(this.keyId, key);
+      await this.storeKey(key);
       this.key = undefined;
     } else this.key = key;
 
@@ -241,7 +241,7 @@ class KeyStore {
   public async get(name: string): Promise<string | undefined> {
     if (await this.isLocked())
       throw new Error("Please unlock the key store to get values.");
-
+    console.log("GETTING", name);
     const blob = await this.secretStore.get<EncryptedData>(name);
     if (!blob) return;
     return this.decrypt(blob, await this.getKey());
@@ -301,18 +301,54 @@ class KeyStore {
     if ((await this.getCredentials()).length > 0)
       throw new Error("Key store is locked.");
 
-    let key = await this.metadataStore.get<CryptoKey>(this.keyId);
-    if (!key) {
-      key = await window.crypto.subtle.generateKey(
+    const key = await this.metadataStore.get<Uint8Array | CryptoKey>(
+      this.keyId
+    );
+
+    if (key instanceof Uint8Array) {
+      if (!desktop)
+        throw new Error("Cannot decrypt key: no safe storage found.");
+      const decrypted = Buffer.from(
+        await desktop.safeStorage.decryptString.query(
+          Buffer.from(key).toString("base64")
+        ),
+        "base64"
+      );
+      return window.crypto.subtle.importKey(
+        "raw",
+        decrypted,
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+      );
+    } else if (key instanceof CryptoKey) return key;
+    else return this.storeKey();
+  }
+
+  private async storeKey(key?: CryptoKey) {
+    key =
+      key ||
+      (await window.crypto.subtle.generateKey(
         {
           name: "AES-GCM",
           length: 256
         },
         true,
         ["encrypt", "decrypt"]
+      ));
+
+    if (IS_DESKTOP_APP && desktop) {
+      const encrypted = Buffer.from(
+        await desktop.safeStorage.encryptString.query(
+          Buffer.from(
+            await window.crypto.subtle.exportKey("raw", key)
+          ).toString("base64")
+        ),
+        "base64"
       );
-      await this.metadataStore.set(this.keyId, key);
-    }
+      await this.metadataStore.set(this.keyId, encrypted);
+    } else await this.metadataStore.set(this.keyId, key);
+
     return key;
   }
 
@@ -350,6 +386,5 @@ class KeyStore {
   }
 }
 
-console.trace("key store!");
 export const KeyChain = new KeyStore("KeyChain");
 export type IKeyStore = typeof KeyStore.prototype;
