@@ -59,14 +59,17 @@ export type NoteResolvedData = {
     failed: number;
     total: number;
   };
+  locked?: boolean;
 };
 
 async function resolveNotes(ids: string[]) {
   const relations = [
     ...(await db.relations
-      .to({ type: "note", ids }, ["notebook", "tag", "color"])
+      .to({ type: "note", ids }, ["notebook", "tag", "color", "vault"])
       .get()),
-    ...(await db.relations.from({ type: "note", ids }, "reminder").get())
+    ...(await db.relations
+      .from({ type: "note", ids }, ["reminder", "attachment"])
+      .get())
   ];
 
   const relationIds: {
@@ -74,32 +77,43 @@ async function resolveNotes(ids: string[]) {
     colors: Set<string>;
     tags: Set<string>;
     reminders: Set<string>;
+    attachments: Set<string>;
   } = {
     colors: new Set(),
     notebooks: new Set(),
     tags: new Set(),
-    reminders: new Set()
+    reminders: new Set(),
+    attachments: new Set()
   };
 
   const grouped: Record<
     string,
     {
       notebooks: string[];
-      color?: string;
+      color: string;
       tags: string[];
       reminder?: string;
+      attachments: string[];
+      locked: boolean;
     }
   > = {};
 
   for (const relation of relations) {
     const noteId =
-      relation.toType === "reminder" ? relation.fromId : relation.toId;
+      relation.toType === "reminder" || relation.toType === "attachment"
+        ? relation.fromId
+        : relation.toId;
     const data = grouped[noteId] || {
       notebooks: [],
-      tags: []
+      tags: [],
+      attachments: []
     };
 
-    if (relation.toType === "reminder" && !data.reminder) {
+    if (relation.toType === "attachment") {
+      data.attachments.push(relation.toId);
+      relationIds.attachments.add(relation.toId);
+      console.log("adding attachments", relationIds);
+    } else if (relation.toType === "reminder" && !data.reminder) {
       data.reminder = relation.toId;
       relationIds.reminders.add(relation.toId);
     } else if (relation.fromType === "notebook" && data.notebooks.length < 2) {
@@ -111,6 +125,8 @@ async function resolveNotes(ids: string[]) {
     } else if (relation.fromType === "color" && !data.color) {
       data.color = relation.fromId;
       relationIds.colors.add(relation.fromId);
+    } else if (relation.fromType === "vault") {
+      data.locked = true;
     }
     grouped[noteId] = data;
   }
@@ -121,7 +137,12 @@ async function resolveNotes(ids: string[]) {
     ),
     tags: await db.tags.all.records(Array.from(relationIds.tags)),
     colors: await db.colors.all.records(Array.from(relationIds.colors)),
-    reminders: await db.reminders.all.records(Array.from(relationIds.reminders))
+    reminders: await db.reminders.all.records(
+      Array.from(relationIds.reminders)
+    ),
+    attachments: await db.attachments.all.records(
+      Array.from(relationIds.attachments)
+    )
   };
 
   const data: NoteResolvedData[] = [];
@@ -132,7 +153,6 @@ async function resolveNotes(ids: string[]) {
       continue;
     }
 
-    const attachments = db.attachments?.ofNote(noteId, "all");
     data.push({
       color: group.color ? resolved.colors[group.color] : undefined,
       reminder: group.reminder ? resolved.reminders[group.reminder] : undefined,
@@ -142,11 +162,12 @@ async function resolveNotes(ids: string[]) {
       notebooks: withDateEdited(
         group.notebooks.map((id) => resolved.notebooks[id]).filter(Boolean)
       ),
+      locked: group.locked,
       attachments: {
-        total: await attachments.count(),
-        failed: await attachments
-          .where((eb) => eb("attachments.failed", "is not", eb.lit(null)))
-          .count()
+        total: group.attachments.length,
+        failed: group.attachments.filter(
+          (id) => !!resolved.attachments[id]?.failed
+        ).length
       }
     });
   }
