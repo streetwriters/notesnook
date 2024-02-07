@@ -58,6 +58,7 @@ type NoteItemProps = {
   date: number;
   isTrash?: boolean;
   noOpen?: boolean;
+  locked?: boolean;
 };
 
 const NoteItem = ({
@@ -69,6 +70,7 @@ const NoteItem = ({
   reminder,
   tags,
   attachmentsCount,
+  locked,
   noOpen = false
 }: NoteItemProps) => {
   const isEditingNote = useEditorStore(
@@ -254,7 +256,7 @@ const NoteItem = ({
                   />
                 ) : null}
 
-                {item.locked ? (
+                {locked ? (
                   <Icon
                     name="lock"
                     testID="note-locked-icon"
@@ -353,7 +355,7 @@ const NoteItem = ({
               />
             ) : null}
 
-            {item.locked ? (
+            {locked ? (
               <Icon
                 name="lock"
                 testID="note-locked-icon"

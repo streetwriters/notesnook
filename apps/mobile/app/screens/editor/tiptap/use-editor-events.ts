@@ -94,7 +94,8 @@ const publishNote = async (editor: useEditorType) => {
   const currentNote = editor?.note?.current;
   if (currentNote?.id) {
     const note = await db.notes?.note(currentNote.id);
-    if (note?.locked) {
+    const locked = note && (await db.vaults.itemExists(note));
+    if (locked) {
       ToastManager.show({
         heading: "Locked notes cannot be published",
         type: "error",

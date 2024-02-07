@@ -246,8 +246,8 @@ async function saveEditorState() {
   if (editorState().currentlyEditing) {
     const id = useEditorStore.getState().currentEditingNote;
     const note = id ? await db.notes.note(id) : undefined;
-
-    if (note?.locked) return;
+    const locked = note && (await db.vaults.itemExists(note));
+    if (locked) return;
     const state = JSON.stringify({
       editing: editorState().currentlyEditing,
       note: note,
@@ -521,7 +521,8 @@ export const useAppEvents = () => {
         SettingsService.appEnteredBackground();
         const id = useEditorStore.getState().currentEditingNote;
         const note = id ? await db.notes.note(id) : undefined;
-        if (note?.locked && SettingsService.canLockAppInBackground()) {
+        const locked = note && (await db.vaults.itemExists(note));
+        if (locked && SettingsService.canLockAppInBackground()) {
           eSendEvent(eClearEditor);
         }
         await saveEditorState();

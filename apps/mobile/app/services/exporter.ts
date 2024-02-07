@@ -230,8 +230,8 @@ async function exportNote(
   if (!note) return;
 
   let content;
-
-  if (note.locked) {
+  const locked = note && (await db.vaults.itemExists(note));
+  if (locked) {
     try {
       const unlocked = await unlockVault();
       if (!unlocked) return null;
@@ -326,7 +326,8 @@ async function bulkExport(
       if (!note) continue;
 
       let content;
-      if (note.locked) {
+      const locked = note && (await db.vaults.itemExists(note));
+      if (locked) {
         try {
           const unlocked = !db.vault.unlocked ? await unlockVault() : true;
           if (!unlocked) {

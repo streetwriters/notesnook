@@ -25,16 +25,19 @@ import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import { db } from "../../common/database";
+import { validateAppLockPassword } from "../../common/database/encryption";
 import { MMKV } from "../../common/database/mmkv";
 import { AttachmentDialog } from "../../components/attachments";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
+import { AppLockPassword } from "../../components/dialogs/applock-password";
 import { ChangeEmail } from "../../components/sheets/change-email";
 import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
 import { Progress } from "../../components/sheets/progress";
 import { Update } from "../../components/sheets/update";
 import { VaultStatusType, useVaultStatus } from "../../hooks/use-vault-status";
+import { BackgroundSync } from "../../services/background-sync";
 import BackupService from "../../services/backup";
 import BiometicService from "../../services/biometrics";
 import {
@@ -63,14 +66,10 @@ import {
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
-import AppLock from "./app-lock";
 import { useDragState } from "./editor/state";
 import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import { AppLockPassword } from "../../components/dialogs/applock-password";
-import { validateAppLockPassword } from "../../common/database/encryption";
-import { BackgroundSync } from "../../services/background-sync";
 type User = any;
 
 export const settingsGroups: SettingSection[] = [

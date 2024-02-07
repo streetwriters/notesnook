@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useThemeColors } from "@notesnook/theme";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import Editor from "../../screens/editor";
@@ -43,6 +43,7 @@ import Paragraph from "../ui/typography/paragraph";
 export default function NotePreview({ session, content, note }) {
   const { colors } = useThemeColors();
   const editorId = ":noteHistory";
+  const [locked, setLocked] = useState(false);
 
   async function restore() {
     if (note && note.type === "trash") {
@@ -75,6 +76,10 @@ export default function NotePreview({ session, content, note }) {
     });
   }
 
+  useEffect(() => {
+    db.vaults.itemExists(note).then((locked) => setLocked(locked));
+  }, [note]);
+
   const deleteNote = async () => {
     presentDialog({
       title: `Delete note permanently`,
@@ -100,13 +105,13 @@ export default function NotePreview({ session, content, note }) {
   return (
     <View
       style={{
-        height: note?.locked || session?.locked ? null : 600,
+        height: locked || session?.locked ? null : 600,
         width: "100%"
       }}
     >
       <Dialog context="local" />
       <DialogHeader padding={12} title={note?.title || session?.session} />
-      {!session?.locked && !note?.locked ? (
+      {!session?.locked && !locked ? (
         <View
           style={{
             flex: 1

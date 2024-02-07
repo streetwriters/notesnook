@@ -17,6 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import {
+  NotebooksWithDateEdited,
+  TagsWithDateEdited,
+  isNoteResolvedData,
+  resolveItems
+} from "@notesnook/common";
+import {
   Color,
   GroupHeader,
   GroupOptions,
@@ -42,12 +48,6 @@ import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import ReminderItem from "../list-items/reminder";
 import TagItem from "../list-items/tag";
-import {
-  NotebooksWithDateEdited,
-  TagsWithDateEdited,
-  isNoteResolvedData,
-  resolveItems
-} from "@notesnook/common";
 
 type ListItemWrapperProps<TItem = Item> = {
   group?: GroupingKey;
@@ -74,6 +74,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
   const previousIndex = useRef<number>();
   const refreshTimeout = useRef<NodeJS.Timeout>();
   const currentItemId = useRef<string>();
+  const locked = useRef(false);
 
   const refreshItem = useCallback((resolvedItem: any) => {
     if (!resolvedItem || !resolvedItem.data) {
@@ -83,6 +84,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
       color.current = undefined;
       attachmentsCount.current = 0;
       totalNotes.current = 0;
+      locked.current = false;
     }
 
     if (resolvedItem && resolvedItem.item) {
@@ -93,6 +95,18 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
         reminder.current = data.reminder;
         color.current = data.color;
         attachmentsCount.current = data.attachments?.total || 0;
+        locked.current = data.locked || false;
+      } else if (
+        resolvedItem.item.type === "note" &&
+        !isNoteResolvedData(data)
+      ) {
+        tags.current = undefined;
+        notebooks.current = undefined;
+        reminder.current = undefined;
+        color.current = undefined;
+        attachmentsCount.current = 0;
+        totalNotes.current = 0;
+        locked.current = false;
       } else if (
         resolvedItem.item.type === "notebook" &&
         typeof data === "number"
@@ -172,6 +186,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
             date={getDate(item, group)}
             isRenderedInActionSheet={isSheet}
             index={index}
+            locked={locked.current}
           />
         </>
       );

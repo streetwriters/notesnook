@@ -196,7 +196,7 @@ export const useEditor = (
           return;
         }
         let note = id ? await db.notes?.note(id) : undefined;
-        const locked = note?.locked;
+        const locked = note && (await db.vaults.itemExists(note));
         if (note?.conflicted) return;
 
         if (isContentInvalid(data)) {
@@ -307,7 +307,8 @@ export const useEditor = (
       }
     ) => {
       currentNote.current = note;
-      if ((note.locked || note.content) && note.content?.data) {
+      const locked = note && (await db.vaults.itemExists(note));
+      if ((locked || note.content) && note.content?.data) {
         currentContent.current = {
           data: note.content?.data,
           type: note.content?.type || "tiptap",
@@ -451,9 +452,10 @@ export const useEditor = (
       lock.current = true;
 
       if (data.type === "tiptap" && note) {
-        if (!currentNote.current.locked && isContentEncrypted) {
+        const locked = await db.vaults.itemExists(currentNote.current);
+        if (!locked && isContentEncrypted) {
           lockNoteWithVault(note);
-        } else if (currentNote.current.locked && isEncryptedContent(data)) {
+        } else if (locked && isEncryptedContent(data)) {
           const decryptedContent = await db.vault?.decryptContent(
             data,
             currentNote?.current?.id
