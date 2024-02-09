@@ -397,7 +397,10 @@ const migrations: Migration[] = [
         delete item.resolved;
         return true;
       },
-
+      tiny: (item) => {
+        delete item.resolved;
+        return true;
+      },
       all: () => true
     },
     async vaultKey(db, key) {

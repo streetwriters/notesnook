@@ -205,6 +205,10 @@ export interface Notebook extends BaseItem<"notebook"> {
    * @deprecated only kept here for migration purposes.
    */
   totalNotes?: number;
+  /**
+   * @deprecated only kept here for migration purposes.
+   */
+  topic?: never;
 
   dateDeleted: null;
   itemType: null;
@@ -365,6 +369,11 @@ export interface BaseContentItem extends BaseItem<ContentType> {
   dateResolved?: number;
   sessionId?: string;
   conflicted?: UnencryptedContentItem;
+
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  resolved?: never;
 }
 
 export type UnencryptedContentItem = BaseContentItem & {
