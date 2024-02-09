@@ -2,6 +2,9 @@
 const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 const Repack = require("@callstack/repack");
+const { webpack, NormalModuleReplacementPlugin } = require("webpack");
+
+
 
 /**
  * More documentation, installation, usage, motivation and differences with Metro is available at:
@@ -102,6 +105,9 @@ module.exports = (env) => {
         "katex": path.join(__dirname, "../node_modules/katex"),
         "tinycolor2":  path.join(__dirname, "../node_modules/tinycolor2"),
       },
+      fallback: {
+        "crypto": false,
+      }
     },
     /**
      * Configures output.
@@ -307,6 +313,12 @@ module.exports = (env) => {
       ],
     },
     plugins: [
+      new NormalModuleReplacementPlugin(
+        /node:crypto/,
+        (resource) => {
+          resource.request = resource.request.replace(/^node:/, '');
+        }
+      ),
       /**
        * Configure other required and additional plugins to make the bundle
        * work in React Native and provide good development experience with
