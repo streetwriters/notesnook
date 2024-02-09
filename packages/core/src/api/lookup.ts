@@ -43,7 +43,7 @@ export default class Lookup {
     return this.toSearchResults(async (limit) => {
       if (query.length <= 3) return [];
 
-      const db = this.db.sql() as Kysely<RawDatabaseSchema>;
+      const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       query = query.replace(/"/, '""');
       const result = await db
         .with("matching", (eb) =>

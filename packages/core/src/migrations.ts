@@ -181,6 +181,13 @@ const migrations: Migration[] = [
         if (!item.deletedBy) item.deletedBy = "user";
         return true;
       },
+      color: async (item, db, migrationType) => {
+        return (
+          (await migrations
+            .find((migration) => migration.version === 5.9)
+            ?.items.tag?.(item as any, db, migrationType)) || false
+        );
+      },
       tag: async (item, db) => {
         const oldTagId = makeId(item.title);
         const alias = db.legacySettings.getAlias(item.id);
@@ -325,6 +332,7 @@ const migrations: Migration[] = [
         }
         delete item.topics;
         delete item.totalNotes;
+        delete item.topic;
         return true;
       },
       shortcut: (item) => {
@@ -386,8 +394,10 @@ const migrations: Migration[] = [
       },
       tiptap: (item) => {
         item.locked = isCipher(item.data);
+        delete item.resolved;
         return true;
       },
+
       all: () => true
     },
     async vaultKey(db, key) {
@@ -444,7 +454,8 @@ export async function migrateItem<TItemType extends MigrationItemType>(
     const result = await itemMigrator(item, database, migrationType);
     if (result === "skip") return "skip";
     if (result) {
-      if (item.type && item.type !== type) type = item.type as TItemType;
+      if (item.type && item.type !== "trash" && item.type !== type)
+        type = item.type as TItemType;
       count++;
     }
   }
