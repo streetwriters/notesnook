@@ -28,12 +28,11 @@ import { useMenuStore } from "../../stores/use-menu-store";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { SIZE, normalize } from "../../utils/size";
-import { presentDialog } from "../dialog/functions";
+import ReorderableList from "../list/reorderable-list";
+import { Properties } from "../properties";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import ReorderableList from "../list/reorderable-list";
-import { Properties } from "../properties";
 
 export const ColorSection = React.memo(
   function ColorSection() {
@@ -142,11 +141,11 @@ const ColorItem = React.memo(
           </View>
           {isFocused ? (
             <Heading color={colors.selected.heading} size={SIZE.md}>
-              {item.title?.slice(0, 1).toUpperCase() + item.title.slice(1)}
+              {item.title}
             </Heading>
           ) : (
             <Paragraph color={colors.primary.paragraph} size={SIZE.md}>
-              {item.title?.slice(0, 1).toUpperCase() + item.title.slice(1)}
+              {item.title}
             </Paragraph>
           )}
         </View>

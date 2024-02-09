@@ -47,6 +47,7 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
+import Navigation from "../../../services/navigation";
 
 const RestoreDataSheet = () => {
   const [visible, setVisible] = useState(false);
@@ -235,6 +236,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
 
   const restoreBackup = async (backup, password) => {
     await db.backup.import(backup, password);
+
     await db.initCollections();
     initialize();
     ToastManager.show({
@@ -242,10 +244,12 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
       type: "success",
       context: "global"
     });
+    Navigation.queueRoutesForUpdate();
     return true;
   };
 
   const backupError = (e) => {
+    console.log(e.stack);
     ToastManager.show({
       heading: "Restore failed",
       message:
@@ -300,7 +304,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
       }
 
       await db.initCollections();
-      initialize();
+      Navigation.queueRoutesForUpdate();
       setRestoring(false);
       close();
       ToastManager.show({
