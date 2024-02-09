@@ -434,6 +434,9 @@ export default class Backup {
         }
 
         const collectionKey = itemTypeToCollectionKey[itemType];
+
+        if (!collectionKey) continue;
+
         const collection =
           collectionKey === "sessioncontent"
             ? this.db.noteHistory.sessionContent.collection
