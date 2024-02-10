@@ -18,13 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Notebook, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { RefreshControl, View, useWindowDimensions } from "react-native";
 import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
@@ -37,6 +31,7 @@ import { useNotebook } from "../../../hooks/use-notebook";
 import NotebookScreen from "../../../screens/notebook";
 import { openEditor } from "../../../screens/notes/common";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
+import { createItemSelectionStore } from "../../../stores/item-selection-store";
 import useNavigationStore from "../../../stores/use-navigation-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { eOnNotebookUpdated } from "../../../utils/events";
@@ -50,18 +45,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
 import Sort from "../sort";
 
-const SelectionContext = createContext<{
-  selection: Notebook[];
-  enabled: boolean;
-  setEnabled: (value: boolean) => void;
-  toggleSelection: (item: Notebook) => void;
-}>({
-  selection: [],
-  enabled: false,
-  setEnabled: (_value: boolean) => {},
-  toggleSelection: (_item: Notebook) => {}
-});
-const useSelection = () => useContext(SelectionContext);
+const useItemSelectionStore = createItemSelectionStore(true, false);
 
 type NotebookParentProp = {
   parent?: NotebookParentProp;
@@ -106,10 +90,8 @@ export const NotebookSheet = () => {
   const [collapsed, setCollapsed] = useState(false);
   const currentRoute = useNavigationStore((state) => state.currentRoute);
   const focusedRouteId = useNavigationStore((state) => state.focusedRouteId);
-
+  const enabled = useItemSelectionStore((state) => state.enabled);
   const canShow = currentRoute === "Notebook";
-  const [selection, setSelection] = useState<Notebook[]>([]);
-  const [enabled, setEnabled] = useState(false);
   const { colors } = useThemeColors("sheet");
   const ref = useRef<ActionSheetRef>(null);
   const currentItem = useRef<string>();
@@ -147,29 +129,6 @@ export const NotebookSheet = () => {
     />
   );
 
-  const selectionContext = {
-    selection: selection,
-    enabled,
-    setEnabled,
-    toggleSelection: (item: Notebook) => {
-      setSelection((state) => {
-        const selection = [...state];
-        const index = selection.findIndex(
-          (selected) => selected.id === item.id
-        );
-        if (index > -1) {
-          selection.splice(index, 1);
-          if (selection.length === 0) {
-            setEnabled(false);
-          }
-          return selection;
-        }
-        selection.push(item);
-        return selection;
-      });
-    }
-  };
-
   useEffect(() => {
     if (canShow) {
       setImmediate(async () => {
@@ -181,8 +140,10 @@ export const NotebookSheet = () => {
             "Root changed to",
             nextRoot
           );
-          setSelection([]);
-          setEnabled(false);
+          useItemSelectionStore.setState({
+            enabled: false,
+            selection: {}
+          });
         }
         currentItem.current = nextRoot;
         const snapPoint = NotebookSheetConfig.get({
@@ -200,8 +161,10 @@ export const NotebookSheet = () => {
         onRequestUpdate();
       });
     } else {
-      setSelection([]);
-      setEnabled(false);
+      useItemSelectionStore.setState({
+        enabled: false,
+        selection: {}
+      });
       ref.current?.hide();
     }
   }, [canShow, onRequestUpdate, focusedRouteId]);
@@ -305,12 +268,14 @@ export const NotebookSheet = () => {
                   }}
                   onPress={async () => {
                     await deleteItems(
-                      selection.map((notebook) => notebook.id),
+                      useItemSelectionStore.getState().getSelectedItemIds(),
                       "notebook"
                     );
                     useSelectionStore.getState().clearSelection();
-                    setEnabled(false);
-                    setSelection([]);
+                    useItemSelectionStore.setState({
+                      enabled: false,
+                      selection: {}
+                    });
                     return;
                   }}
                   color={colors.primary.icon}
@@ -328,8 +293,10 @@ export const NotebookSheet = () => {
                   }}
                   onPress={() => {
                     useSelectionStore.getState().clearSelection();
-                    setEnabled(false);
-                    setSelection([]);
+                    useItemSelectionStore.setState({
+                      enabled: false,
+                      selection: {}
+                    });
                   }}
                   color={colors.primary.icon}
                   tooltipText="Clear selection"
@@ -361,7 +328,10 @@ export const NotebookSheet = () => {
                 />
                 <IconButton
                   name="plus"
-                  onPress={PLACEHOLDER_DATA.action}
+                  onPress={() => {
+                    if (!notebook) return;
+                    AddNotebookSheet.present(undefined, notebook, undefined);
+                  }}
                   testID="add-notebook-button"
                   color={colors.primary.icon}
                   size={22}
@@ -393,39 +363,36 @@ export const NotebookSheet = () => {
             )}
           </View>
         </View>
-        <SelectionContext.Provider value={selectionContext}>
-          <FlashList
-            data={notebooks?.placeholders}
-            style={{
-              width: "100%"
-            }}
-            estimatedItemSize={50}
-            refreshControl={
-              <RefreshControl
-                refreshing={false}
-                onRefresh={() => {
-                  eSendEvent(eOnNotebookUpdated);
-                }}
-                colors={[colors.primary.accent]}
-                progressBackgroundColor={colors.primary.background}
-              />
-            }
-            renderItem={renderNotebook}
-            ListEmptyComponent={
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: 200
-                }}
-              >
-                <Paragraph color={colors.primary.icon}>No notebooks</Paragraph>
-              </View>
-            }
-            ListFooterComponent={<View style={{ height: 50 }} />}
-          />
-        </SelectionContext.Provider>
+        <FlashList
+          data={notebooks?.placeholders}
+          style={{
+            width: "100%"
+          }}
+          estimatedItemSize={50}
+          refreshControl={
+            <RefreshControl
+              refreshing={false}
+              onRefresh={() => {
+                eSendEvent(eOnNotebookUpdated);
+              }}
+              colors={[colors.primary.accent]}
+              progressBackgroundColor={colors.primary.background}
+            />
+          }
+          renderItem={renderNotebook}
+          ListEmptyComponent={
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                height: 200
+              }}
+            >
+              <Paragraph color={colors.primary.icon}>No notebooks</Paragraph>
+            </View>
+          }
+        />
       </View>
     </ActionSheet>
   );
@@ -453,9 +420,10 @@ const NotebookItem = ({
   } = useNotebook(id, items, true);
   const isFocused = useNavigationStore((state) => state.focusedRouteId === id);
   const { colors } = useThemeColors("sheet");
-  const selection = useSelection();
-  const isSelected =
-    selection.selection.findIndex((selected) => selected.id === item?.id) > -1;
+  const isSelected = useItemSelectionStore((state) =>
+    item?.id ? state.selection[item.id] === "selected" : false
+  );
+  const enabled = useItemSelectionStore((state) => state.enabled);
 
   const { fontScale } = useWindowDimensions();
   const expanded = useNotebookExpandedStore((state) =>
@@ -472,15 +440,22 @@ const NotebookItem = ({
       <PressableButton
         type={isSelected || isFocused ? "selected" : "transparent"}
         onLongPress={() => {
-          if (selection.enabled || !item) return;
-          selection.setEnabled(true);
-          selection.toggleSelection(item);
+          if (enabled || !item) return;
+          useItemSelectionStore.setState({
+            enabled: true,
+            selection: {}
+          });
+          useItemSelectionStore
+            .getState()
+            .markAs(item, isSelected ? "deselected" : "selected");
         }}
         testID={`notebook-sheet-item-${currentLevel}-${index}`}
         onPress={() => {
           if (!item) return;
-          if (selection.enabled) {
-            selection.toggleSelection(item);
+          if (enabled) {
+            useItemSelectionStore
+              .getState()
+              .markAs(item, isSelected ? "deselected" : "selected");
             return;
           }
           NotebookScreen.navigate(item, true);
@@ -527,7 +502,7 @@ const NotebookItem = ({
             />
           )}
 
-          {selection.enabled ? (
+          {enabled ? (
             <IconButton
               size={SIZE.lg}
               color={isSelected ? colors.selected.icon : colors.primary.icon}

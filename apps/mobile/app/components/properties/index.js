@@ -26,6 +26,7 @@ import { presentSheet } from "../../services/event-manager";
 import { ColorValues } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
+import { PressableButton } from "../ui/pressable";
 import { ReminderTime } from "../ui/reminder-time";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
@@ -34,7 +35,6 @@ import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { TagStrip, Tags } from "./tags";
-import { PressableButton } from "../ui/pressable";
 
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
@@ -225,7 +225,8 @@ Properties.present = async (item, buttons = [], isSheet) => {
         "add-shortcut",
         "trash",
         "default-notebook",
-        "add-notebook"
+        "add-notebook",
+        "move-notes"
       ]);
       break;
     case "tag":

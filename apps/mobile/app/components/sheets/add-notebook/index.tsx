@@ -174,7 +174,8 @@ export const AddNotebookSheet = ({
 AddNotebookSheet.present = (
   notebook?: Notebook,
   parentNotebook?: Notebook,
-  context?: string
+  context?: string,
+  onClose?: () => void
 ) => {
   presentSheet({
     context: context,
@@ -184,6 +185,7 @@ AddNotebookSheet.present = (
         parentNotebook={parentNotebook}
         close={close}
       />
-    )
+    ),
+    onClose: onClose
   });
 };

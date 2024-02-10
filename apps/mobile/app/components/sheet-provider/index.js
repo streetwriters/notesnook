@@ -55,7 +55,10 @@ const SheetProvider = ({ context = "global" }) => {
     async (payload) => {
       if (!payload.context) payload.context = "global";
       if (payload.context !== context) return;
-      setData(payload);
+      setData((state) => {
+        if (state?.onClose) state.onClose();
+        return payload;
+      });
       setVisible(true);
       if (payload.editor) {
         editor.current.refocus = false;

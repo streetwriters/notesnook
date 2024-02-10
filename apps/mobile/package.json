@@ -30,21 +30,13 @@
     "react-refresh": "0.14.0"
   },
   "dependencies": {
-    "@azure/core-asynciterator-polyfill": "^1.0.2",
-    "@babel/plugin-transform-private-methods": "^7.22.5",
     "@notesnook/common": "file:../../packages/common",
     "@notesnook/core": "file:../../packages/core",
     "@notesnook/editor": "file:../../packages/editor",
     "@notesnook/editor-mobile": "file:../../packages/editor-mobile",
     "@notesnook/logger": "file:../../packages/logger",
     "@notesnook/themes-server": "file:../../servers/themes",
-    "@tanstack/react-query": "^4.29.19",
-    "@trpc/client": "10.38.3",
-    "@trpc/react-query": "10.38.3",
-    "@trpc/server": "10.38.3",
-    "kysely": "^0.26.3",
     "react": "18.2.0",
-    "react-native": "0.72.0",
-    "tinycolor2": "1.6.0"
+    "react-native": "0.72.0"
   }
 }
