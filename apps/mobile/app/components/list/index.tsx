@@ -170,13 +170,15 @@ export default function List(props: ListProps) {
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="interactive"
           refreshControl={
-            <RefreshControl
-              tintColor={colors.primary.accent}
-              colors={[colors.primary.accent]}
-              progressBackgroundColor={colors.secondary.background}
-              onRefresh={_onRefresh}
-              refreshing={false}
-            />
+            props.isRenderedInActionSheet ? null : (
+              <RefreshControl
+                tintColor={colors.primary.accent}
+                colors={[colors.primary.accent]}
+                progressBackgroundColor={colors.secondary.background}
+                onRefresh={_onRefresh}
+                refreshing={false}
+              />
+            )
           }
           ListEmptyComponent={
             props.placeholder ? (

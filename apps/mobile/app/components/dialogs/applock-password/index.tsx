@@ -46,6 +46,8 @@ import { Toast } from "../../toast";
 import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
+import { useUserStore } from "../../../stores/use-user-store";
+import BiometicService from "../../../services/biometrics";
 
 export const AppLockPassword = () => {
   const { colors } = useThemeColors();
@@ -319,6 +321,15 @@ export const AppLockPassword = () => {
               }
               clearAppLockVerificationCipher();
               SettingsService.setProperty("appLockHasPasswordSecurity", false);
+
+              if (!useUserStore.getState().user) {
+                if (
+                  !(await BiometicService.isBiometryAvailable()) ||
+                  !SettingsService.getProperty("biometricsAuthEnabled")
+                ) {
+                  SettingsService.setProperty("appLockEnabled", false);
+                }
+              }
             }
 
             SettingsService.setProperty(
