@@ -229,8 +229,7 @@ class Database {
       "DELETE FROM sqlite_master",
       "PRAGMA writable_schema = 0",
       "VACUUM",
-      "PRAGMA integrity_check",
-      "PRAGMA rekey = ''"
+      "PRAGMA integrity_check"
     ]) {
       await sql.raw(statement).execute(this.sql());
     }
