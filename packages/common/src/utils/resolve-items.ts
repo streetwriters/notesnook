@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Color, Item, Reminder, Notebook, Tag } from "@notesnook/core";
 import { database as db } from "../database";
+import { getUpcomingReminder } from "@notesnook/core/dist/collections/reminders";
 
 type WithDateEdited<T> = { items: T[]; dateEdited: number };
 export type NotebooksWithDateEdited = WithDateEdited<Notebook>;
@@ -92,7 +93,7 @@ async function resolveNotes(ids: string[]) {
       notebooks: string[];
       color: string;
       tags: string[];
-      reminder?: string;
+      reminders: string[];
       attachments: string[];
       locked: boolean;
     }
@@ -106,15 +107,15 @@ async function resolveNotes(ids: string[]) {
     const data = grouped[noteId] || {
       notebooks: [],
       tags: [],
-      attachments: []
+      attachments: [],
+      reminders: []
     };
 
     if (relation.toType === "attachment") {
       data.attachments.push(relation.toId);
       relationIds.attachments.add(relation.toId);
-      console.log("adding attachments", relationIds);
-    } else if (relation.toType === "reminder" && !data.reminder) {
-      data.reminder = relation.toId;
+    } else if (relation.toType === "reminder") {
+      data.reminders.push(relation.toId);
       relationIds.reminders.add(relation.toId);
     } else if (relation.fromType === "notebook" && data.notebooks.length < 2) {
       data.notebooks.push(relation.fromId);
@@ -155,7 +156,9 @@ async function resolveNotes(ids: string[]) {
 
     data.push({
       color: group.color ? resolved.colors[group.color] : undefined,
-      reminder: group.reminder ? resolved.reminders[group.reminder] : undefined,
+      reminder: getUpcomingReminder(
+        group.reminders.map((id) => resolved.reminders[id]).filter(Boolean)
+      ),
       tags: withDateEdited(
         group.tags.map((id) => resolved.tags[id]).filter(Boolean)
       ),
