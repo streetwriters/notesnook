@@ -34,7 +34,7 @@ import NetInfo from "@react-native-community/netinfo";
 import dayjs, { Dayjs } from "dayjs";
 import { encodeNonAsciiHTML } from "entities";
 import { Platform } from "react-native";
-import { db } from "../common/database";
+import { db, setupDatabase } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import { presentDialog } from "../components/dialog/functions";
 import { editorState } from "../screens/editor/tiptap/utils";
@@ -96,6 +96,7 @@ function encodeLine(line: string) {
 
 async function initDatabase() {
   if (!db.isInitialized) {
+    await setupDatabase();
     await db.init();
   }
 }

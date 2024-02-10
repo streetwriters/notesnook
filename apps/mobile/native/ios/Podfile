@@ -98,6 +98,7 @@ target 'Make Note' do
   pod "react-native-quick-sqlite", :path =>  '../../node_modules/react-native-quick-sqlite'
   pod "RNDeviceInfo", :path =>  '../../node_modules/react-native-device-info'
   pod "RNPrivacySnapshot", :path =>  '../../node_modules/react-native-privacy-snapshot'
+  pod "react-native-theme-switch-animation", :path => '../../node_modules/react-native-theme-switch-animation'
 end
 
 
