@@ -133,20 +133,19 @@ class Vault {
   static lockNote(id: string): Promise<boolean> {
     return db.vault
       .add(id)
-      .then(() => false)
+      .then(() => true)
       .catch(({ message }) => {
         switch (message) {
           case VAULT_ERRORS.noVault:
-            return Vault.createVault();
+            return Vault.createVault().then(() => Vault.lockNote(id));
           case VAULT_ERRORS.vaultLocked:
-            return Vault.unlockVault();
+            return Vault.unlockVault().then(() => Vault.lockNote(id));
           default:
             showToast("error", message);
             console.error(message);
             return false;
         }
-      })
-      .then((result) => (result ? this.lockNote(id) : result));
+      });
   }
 
   static askPassword(action: (password: string) => Promise<boolean>) {
