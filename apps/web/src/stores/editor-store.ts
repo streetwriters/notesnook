@@ -123,6 +123,7 @@ class EditorStore extends BaseStore<EditorStore> {
       state.session = {
         ...getDefaultSession(note.dateEdited.toString()),
         ...note,
+        locked: true,
         sessionType: "locked",
         id: undefined, // NOTE: we give a session id only after the note is opened.
         state: SESSION_STATES.unlocked
@@ -203,8 +204,12 @@ class EditorStore extends BaseStore<EditorStore> {
       if (session.content) this.get().session.content = session.content;
 
       const id =
-        currentSession.locked && sessionId
-          ? await db.vault.save({ ...session, id: sessionId })
+        currentSession.locked && sessionId && session.content
+          ? await db.vault.save({
+              content: session.content,
+              sessionId: session.sessionId,
+              id: sessionId
+            })
           : await db.notes.add({ ...session, id: sessionId });
 
       if (currentSession && currentSession.id !== sessionId) {
@@ -235,7 +240,6 @@ class EditorStore extends BaseStore<EditorStore> {
         await db.notes.addToNotebook(defaultNotebook, id);
       }
 
-      console.log("getting note");
       const note = await db.notes.note(id);
       if (!note) throw new Error("Note not saved.");
 
@@ -266,6 +270,7 @@ class EditorStore extends BaseStore<EditorStore> {
         state.session.title = note.title;
         state.session.dateEdited = note.dateEdited;
         state.session.attachmentsLength = attachmentsLength;
+        console.log("NOTE", note.dateEdited);
       });
       setDocumentTitle(
         settingStore.get().hideNoteTitle ? undefined : note.title
@@ -276,8 +281,8 @@ class EditorStore extends BaseStore<EditorStore> {
       this.setSaveState(-1);
       console.error(err);
       if (err instanceof Error) logger.error(err);
-      if (currentSession.locked) {
-        hashNavigate(`/notes/${session.id}/unlock`, { replace: true });
+      if (currentSession.locked && currentSession.id) {
+        await this.get().openSession(currentSession.id, true);
       }
     }
   };
