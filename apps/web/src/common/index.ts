@@ -190,30 +190,33 @@ export async function restoreBackupFile(backupFile: File) {
         }
         if (!isValid) throw new Error("Invalid backup.");
 
-        for (const entry of entries) {
-          const backup = JSON.parse(await entry.text());
-          if (backup.encrypted) {
-            if (!cachedPassword && !cachedKey) {
-              const result = await showBackupPasswordDialog(
-                async ({ password, key }) => {
-                  if (!password && !key) return false;
-                  await db.backup?.import(backup, password, key);
-                  cachedPassword = password;
-                  cachedKey = key;
-                  return true;
-                }
-              );
-              if (!result) break;
-            } else await db.backup?.import(backup, cachedPassword, cachedKey);
-          } else {
-            await db.backup?.import(backup);
-          }
+        await db.transaction(async () => {
+          for (const entry of entries) {
+            const backup = JSON.parse(await entry.text());
+            if (backup.encrypted) {
+              if (!cachedPassword && !cachedKey) {
+                const result = await showBackupPasswordDialog(
+                  async ({ password, key }) => {
+                    if (!password && !key) return false;
+                    await db.backup?.import(backup, password, key);
+                    cachedPassword = password;
+                    cachedKey = key;
+                    return true;
+                  }
+                );
+                if (!result) break;
+              } else await db.backup?.import(backup, cachedPassword, cachedKey);
+            } else {
+              await db.backup?.import(backup);
+            }
 
-          report({
-            text: `Processed ${entry.name}`,
-            current: filesProcessed++
-          });
-        }
+            report({
+              text: `Processed ${entry.name}`,
+              current: filesProcessed++,
+              total: entries.length
+            });
+          }
+        });
         await db.initCollections();
       }
     });
