@@ -133,6 +133,7 @@ async function close() {
   for (const [_, prepared] of preparedStatements) {
     await sqlite.finalize(prepared.stmt);
   }
+  preparedStatements.clear();
   await sqlite.close(db);
   await vfs?.close();
 }
@@ -148,6 +149,7 @@ async function exportDatabase(dbName: string, async: boolean) {
 }
 
 async function deleteDatabase() {
+  await close();
   await vfs?.delete();
 }
 
