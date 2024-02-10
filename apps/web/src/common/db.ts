@@ -49,8 +49,8 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   database.setup({
     sqliteOptions: {
       dialect: createDialect,
-      ...(isFeatureSupported("opfs")
-        ? { journalMode: "WAL" }
+      ...(IS_DESKTOP_APP || isFeatureSupported("opfs")
+        ? { journalMode: "WAL", lockingMode: "exclusive" }
         : {
             journalMode: "MEMORY",
             lockingMode: "exclusive"
@@ -58,7 +58,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
       tempStore: "memory",
       synchronous: "normal",
       pageSize: 8192,
-      cacheSize: -16000,
+      cacheSize: -32000,
       password: databaseKey
     },
     storage: storage,
