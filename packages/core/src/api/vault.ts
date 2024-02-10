@@ -276,7 +276,11 @@ export default class Vault {
   }
 
   private async lockNote(
-    item: { content?: NoteContent<false>; sessionId?: string; id: string },
+    item: {
+      content?: NoteContent<false>;
+      sessionId?: string;
+      id: string;
+    },
     password: string
   ) {
     const vault = await this.db.vaults.default();
@@ -290,11 +294,13 @@ export default class Vault {
     // Case: when note is being newly locked
     if (!locked && (!data || !type)) {
       const content = await this.db.content.findByNoteId(id);
-      if (!content || content.locked)
-        return await this.db.relations.add(vault, {
+      if (!content || content.locked) {
+        await this.db.relations.add(vault, {
           id,
           type: "note"
         });
+        return id;
+      }
       // NOTE:
       // At this point, the note already has all the attachments extracted
       // so we should just encrypt it as normal.
@@ -313,13 +319,16 @@ export default class Vault {
 
     await this.db.notes.add({
       id,
-      headline: ""
+      headline: "",
+      dateEdited: Date.now()
     });
 
     await this.db.relations.add(vault, {
       id,
       type: "note"
     });
+
+    return id;
   }
 
   private async unlockNote(noteId: string, password?: string, perm = false) {
