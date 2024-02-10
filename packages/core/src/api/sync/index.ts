@@ -231,7 +231,8 @@ class Sync {
   }
 
   async send(deviceId: string, isForceSync?: boolean) {
-    return false;
+    // TODO: remove this.
+    if (process.env.NODE_ENV !== "test") return false;
     await this.uploadAttachments();
 
     let done = 0;
