@@ -20,10 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ThemeDark, ThemeLight, useThemeEngineStore } from "@notesnook/theme";
 import { Appearance } from "react-native";
 import create from "zustand";
-import { db } from "../app/common/database";
+import { db, setupDatabase } from "../app/common/database";
 import { MMKV } from "../app/common/database/mmkv";
+
 export async function initDatabase() {
   if (!db.isInitialized) {
+    await setupDatabase();
     await db.init();
   }
 }

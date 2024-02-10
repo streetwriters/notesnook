@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ScopedThemeProvider } from "@notesnook/theme";
 import React, { Fragment, useEffect, useState } from "react";
 import { Modal, Platform } from "react-native";
 import ShareView from "./share";
-import { ScopedThemeProvider } from "@notesnook/theme";
 import "./store";
+
 const Wrapper = Platform.OS === "android" ? Modal : Fragment;
 const outerProps =
   Platform.OS === "android"
