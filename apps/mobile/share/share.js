@@ -44,7 +44,7 @@ import {
 } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import isURL from "validator/lib/isURL";
-import { db } from "../app/common/database";
+import { DatabaseLogger, db } from "../app/common/database";
 import Storage from "../app/common/database/storage";
 import { Button } from "../app/components/ui/button";
 import Heading from "../app/components/ui/typography/heading";
@@ -244,10 +244,14 @@ const ShareView = () => {
 
   useEffect(() => {
     (async () => {
-      await initDatabase();
-      setLoadingExtension(false);
-      loadData();
-      useShareStore.getState().restore();
+      try {
+        await initDatabase();
+        setLoadingExtension(false);
+        loadData();
+        useShareStore.getState().restore();
+      } catch (e) {
+        DatabaseLogger.error(e);
+      }
     })();
   }, [loadData]);
 
