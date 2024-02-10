@@ -701,7 +701,7 @@ describe.concurrent("[5.9] migrate kv", (test) => {
         await migrateKV(db, 5.9, 6.0);
 
         expect(await db.kv().read(key)).toBeDefined();
-        // TODO: expect(await db.storage().read(key)).toBeUndefined();
+        expect(await db.storage().read(key)).toBeUndefined();
       }));
 
     test(`${key} (undefined)`, () =>
@@ -711,7 +711,7 @@ describe.concurrent("[5.9] migrate kv", (test) => {
         await migrateKV(db, 5.9, 6.0);
 
         expect(await db.kv().read(key)).toBe(key === "v" ? 6 : undefined);
-        // TODO: expect(await db.storage().read(key)).toBe(null);
+        expect(await db.storage().read(key)).toBe(null);
       }));
   }
 });
