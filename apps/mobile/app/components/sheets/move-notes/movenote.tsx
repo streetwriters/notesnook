@@ -25,8 +25,10 @@ import { Platform, View, useWindowDimensions } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import { db } from "../../../common/database";
+import { useDBItem } from "../../../hooks/use-db-item";
 import { presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
+import { createItemSelectionStore } from "../../../stores/item-selection-store";
 import { updateNotebook } from "../../../utils/notebooks";
 import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
@@ -36,7 +38,8 @@ import { IconButton } from "../../ui/icon-button";
 import { PressableButton } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
-import { useDBItem } from "../../../hooks/use-db-item";
+
+const useItemSelectionStore = createItemSelectionStore(true);
 
 export const MoveNotes = ({
   notebook,
@@ -47,11 +50,11 @@ export const MoveNotes = ({
 }) => {
   const { colors } = useThemeColors();
   const currentNotebook = notebook;
-
+  const selectionCount = useItemSelectionStore(
+    (state) => Object.keys(state.selection)?.length > 0
+  );
   const { height } = useWindowDimensions();
-  const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
-  const [existingNoteIds, setExistingNoteIds] = useState<string[]>([]);
 
   useEffect(() => {
     db.notes?.all.sorted(db.settings.getGroupOptions("notes")).then((notes) => {
@@ -61,45 +64,26 @@ export const MoveNotes = ({
       .from(currentNotebook, "note")
       .get()
       .then((existingNotes) => {
-        setExistingNoteIds(
-          existingNotes.map((existingNote) => existingNote.toId)
-        );
+        const selection: { [name: string]: any } = {};
+        existingNotes.forEach((rel) => {
+          selection[rel.toId] = "selected";
+        });
+        useItemSelectionStore.setState({
+          selection: selection,
+          initialState: selection
+        });
       });
-  }, [currentNotebook]);
 
-  const select = React.useCallback(
-    (id: string) => {
-      const index = selectedNoteIds.indexOf(id);
-      if (index > -1) {
-        setSelectedNoteIds((selectedNoteIds) => {
-          const next = [...selectedNoteIds];
-          next.splice(index, 1);
-          return next;
-        });
-      } else {
-        setSelectedNoteIds((selectedNoteIds) => {
-          const next = [...selectedNoteIds];
-          next.push(id);
-          return next;
-        });
-      }
-    },
-    [selectedNoteIds]
-  );
+    return () => {
+      useItemSelectionStore.getState().reset();
+    };
+  }, [currentNotebook]);
 
   const renderItem = React.useCallback(
     ({ index }: { item: boolean; index: number }) => {
-      return (
-        <SelectableNoteItem
-          id={index}
-          items={notes}
-          select={select}
-          selected={(id) => selectedNoteIds?.indexOf(id) > -1}
-          exists={(id) => existingNoteIds.indexOf(id) > -1}
-        />
-      );
+      return <SelectableNoteItem id={index} items={notes} />;
     },
-    [existingNoteIds, notes, select, selectedNoteIds]
+    [notes]
   );
 
   return (
@@ -135,12 +119,12 @@ export const MoveNotes = ({
         data={notes?.placeholders}
         renderItem={renderItem}
       />
-      {selectedNoteIds.length > 0 ? (
+      {selectionCount ? (
         <Button
           onPress={async () => {
             await db.notes?.addToNotebook(
               currentNotebook.id,
-              ...selectedNoteIds
+              ...useItemSelectionStore.getState().getSelectedItemIds()
             );
             updateNotebook(currentNotebook.id);
             Navigation.queueRoutesForUpdate();
@@ -157,26 +141,28 @@ export const MoveNotes = ({
 
 const SelectableNoteItem = ({
   id,
-  items,
-  select,
-  selected,
-  exists
+  items
 }: {
   id: string | number;
   items?: VirtualizedGrouping<Note>;
-  select: (id: string) => void;
-  selected?: (id: string) => boolean;
-  exists: (id: string) => boolean;
 }) => {
   const { colors } = useThemeColors();
   const [item] = useDBItem(id, "note", items);
+  const selected = useItemSelectionStore((state) =>
+    item?.id ? state.selection[item.id] === "selected" : false
+  );
+  const exists = useItemSelectionStore((state) =>
+    item?.id ? state.initialState[item.id] === "selected" : false
+  );
 
-  return !item || exists(item.id) ? null : (
+  return !item || exists ? null : (
     <PressableButton
       testID="listitem.select"
       onPress={() => {
         if (!item) return;
-        select(item?.id);
+        useItemSelectionStore
+          .getState()
+          .markAs(item, selected ? "deselected" : "selected");
       }}
       type={"transparent"}
       customStyle={{
@@ -194,17 +180,15 @@ const SelectableNoteItem = ({
         }}
         onPress={() => {
           if (!item) return;
-          select(item?.id);
+          useItemSelectionStore
+            .getState()
+            .markAs(item, selected ? "deselected" : "selected");
         }}
         name={
-          selected?.(item?.id)
-            ? "check-circle-outline"
-            : "checkbox-blank-circle-outline"
+          selected ? "check-circle-outline" : "checkbox-blank-circle-outline"
         }
         type="selected"
-        color={
-          selected?.(item?.id) ? colors.selected.icon : colors.primary.icon
-        }
+        color={selected ? colors.selected.icon : colors.primary.icon}
       />
 
       <View

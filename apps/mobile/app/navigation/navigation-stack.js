@@ -36,7 +36,6 @@ import { TaggedNotes } from "../screens/notes/tagged";
 import Reminders from "../screens/reminders";
 import { Search } from "../screens/search";
 import Settings from "../screens/settings";
-import AppLock from "../screens/settings/app-lock";
 import Tags from "../screens/tags";
 import Trash from "../screens/trash";
 import { eSendEvent } from "../services/event-manager";

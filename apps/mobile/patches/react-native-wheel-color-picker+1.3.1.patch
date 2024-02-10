@@ -1,0 +1,18 @@
+diff --git a/node_modules/react-native-wheel-color-picker/ColorPicker.js b/node_modules/react-native-wheel-color-picker/ColorPicker.js
+index 5804b4f..fe2d3f0 100644
+--- a/node_modules/react-native-wheel-color-picker/ColorPicker.js
++++ b/node_modules/react-native-wheel-color-picker/ColorPicker.js
+@@ -706,8 +706,11 @@ module.exports = class ColorPicker extends Component {
+ 				</View>}
+ 				{!swatchesOnly && !sliderHidden && (discrete
+ 					? <View style={[ss.swatches, swatchStyle]} key={'$2'}>{this.disc}</View>
+-					: <View style={[ss.slider, sliderStyle]} key={'$2'}>
+-						<View style={[ss.grad, { backgroundColor: hex }]} key={'$2$1'}>
++					: <View style={[ss.slider, sliderStyle, {
++						marginBottom: 12,
++						paddingHorizontal: 12,
++					}]} key={'$2'}>
++						<View style={[ss.grad, { backgroundColor: hex, borderRadius: 10 }]} key={'$2$1'}>
+ 							<Image style={[ss.sliderImg, { opacity: !this.props.sliderLoadingIndicator || this.state.sliderImageLoaded ? 1 : 0 }]} source={row ? srcSliderRotated : srcSlider} onLoad={this.onSliderImageLoad} resizeMode="stretch" />
+ 						</View>
+ 						{(this.props.sliderLoadingIndicator ? this.state.sliderImageLoaded : true) && <Animated.View style={[ss.sliderThumb, sliderThumbStyle, Elevations[4], { pointerEvents: 'none' }]} key={'$2$2'} />}
