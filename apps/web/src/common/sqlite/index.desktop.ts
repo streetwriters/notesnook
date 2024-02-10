@@ -36,6 +36,7 @@ class SqliteDriver extends KSqliteDriver {
       filePath: `userData/${this.config.name}.sql`
     });
     await desktop?.integration.deleteFile.query(path);
+    await this.destroy();
   }
 }
 

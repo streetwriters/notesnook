@@ -21,6 +21,7 @@ import { Reminder } from "@notesnook/core/dist/types";
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { Item, Notebook } from "./types";
+import dayjs from "dayjs";
 
 export async function* iterateList(list: Locator) {
   const count = await list.count();
@@ -83,18 +84,10 @@ export async function fillReminderDialog(
   if (reminder.date) {
     const date = new Date(Date.now() + reminder.date);
     if (reminder.mode === "once") {
-      await dateInput.fill(
-        `${date.getFullYear()}-${(date.getMonth() + 1)
-          .toString()
-          .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`
-      );
+      await dateInput.fill(dayjs(date).format("DD-MM-YYYY"));
     }
 
-    const time = `${date.getHours().toString().padStart(2, "0")}:${date
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
-    await timeInput.fill(time);
+    await timeInput.fill(dayjs(date).format("hh:mm A"));
   }
 
   await confirmDialog(dialog);
@@ -112,7 +105,7 @@ export async function fillItemDialog(page: Page, item: Item) {
 
 export async function fillPasswordDialog(page: Page, password: string) {
   const dialog = page.locator(getTestId("password-dialog"));
-  await dialog.locator(getTestId("dialog-password")).fill(password);
+  await dialog.locator(getTestId("password")).fill(password);
   await confirmDialog(dialog);
 }
 

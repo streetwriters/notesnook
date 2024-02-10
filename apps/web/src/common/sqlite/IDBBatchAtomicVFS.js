@@ -75,7 +75,6 @@ export class IDBBatchAtomicVFS extends VFS.Base {
   }
 
   async delete() {
-    await this.close();
     await deleteDatabase(this.name);
   }
 
