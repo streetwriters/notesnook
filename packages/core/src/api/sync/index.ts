@@ -446,7 +446,7 @@ async function deserializeItem(
         CURRENT_DATABASE_VERSION,
         item.itemType,
         database,
-        "backup"
+        "sync"
       );
       if (migrationResult === "skip") return;
     }
