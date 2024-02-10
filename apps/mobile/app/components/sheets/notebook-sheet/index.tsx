@@ -109,17 +109,6 @@ export const NotebookSheet = () => {
     true
   );
 
-  const PLACEHOLDER_DATA = {
-    heading: "Notebooks",
-    paragraph: "You have not added any notebooks yet.",
-    button: "Add a notebook",
-    action: () => {
-      if (!notebook) return;
-      AddNotebookSheet.present(undefined, notebook);
-    },
-    loading: "Loading notebook topics"
-  };
-
   const renderNotebook = ({ index }: { item: boolean; index: number }) => (
     <NotebookItem
       items={notebooks}
@@ -154,9 +143,11 @@ export const NotebookSheet = () => {
         if (ref.current?.isOpen()) {
           ref.current?.snapToIndex(snapPoint);
         } else {
-          ref.current?.show(snapPoint);
+          setTimeout(() => {
+            ref.current?.show(snapPoint);
+          }, 150);
         }
-        console.log("NotebookSheet.useEffect.canShow", focusedRouteId);
+        console.log("NotebookSheet.useEffect.didShow", focusedRouteId);
         setRoot(nextRoot);
         onRequestUpdate();
       });
