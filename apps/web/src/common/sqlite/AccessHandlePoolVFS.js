@@ -213,11 +213,7 @@ export class AccessHandlePoolVFS extends VFS.Base {
   }
 
   async delete() {
-    console.log("CLSOGING");
-    await this.close();
-    console.log("CLSOGING", this.#directoryHandle);
     for await (const [name] of this.#directoryHandle) {
-      console.log("DELETING", name);
       await this.#directoryHandle.removeEntry(name, { recursive: true });
     }
   }
