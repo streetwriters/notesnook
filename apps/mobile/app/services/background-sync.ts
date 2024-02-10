@@ -111,10 +111,7 @@ async function onBackgroundSyncStarted() {
   try {
     if (!db.isInitialized) {
       await db.init();
-    } else {
-      await db.initCollections();
     }
-
     const user = await db.user?.getUser();
     if (user) {
       await db.sync(true, false);
@@ -130,14 +127,13 @@ async function onBackgroundSyncStarted() {
 const onBoot = async () => {
   try {
     if (!SettingsService.getProperty("backgroundSync")) {
+      DatabaseLogger.info("BACKGROUND SYNC ON BOOT DISABLED");
       return;
     }
 
     DatabaseLogger.info("BOOT TASK STARTED");
     if (!db.isInitialized) {
       await db.init();
-    } else {
-      await db.initCollections();
     }
 
     await Notifications.setupReminders();
@@ -147,6 +143,7 @@ const onBoot = async () => {
     }
     DatabaseLogger.info("BOOT TASK COMPLETE");
   } catch (e) {
+    DatabaseLogger.error(e as Error);
     console.log(e);
   }
 };
