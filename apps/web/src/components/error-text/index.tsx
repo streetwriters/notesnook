@@ -31,7 +31,7 @@ export function ErrorText(props: ErrorTextProps) {
       bg="var(--background-error)"
       p={1}
       mt={2}
-      sx={{ borderRadius: "default", ...sx }}
+      sx={{ borderRadius: "default", ...sx, maxHeight: 300, overflowY: "auto" }}
       {...restProps}
     >
       <ErrorIcon size={15} color="var(--icon-error)" />
@@ -41,7 +41,15 @@ export function ErrorText(props: ErrorTextProps) {
         ml={1}
         sx={{ whiteSpace: "pre-wrap" }}
       >
-        {error instanceof Error ? <>{error.stack}</> : error}
+        {error instanceof Error ? (
+          <>
+            {error.name}: {error.message}
+            <br />
+            {error.stack}
+          </>
+        ) : (
+          error
+        )}
       </Text>
     </Flex>
   );

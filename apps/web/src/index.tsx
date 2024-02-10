@@ -56,7 +56,10 @@ async function renderApp() {
     );
   } catch (e) {
     root.render(
-      <ErrorComponent error={e} resetErrorBoundary={() => renderApp()} />
+      <ErrorComponent
+        error={e}
+        resetErrorBoundary={() => window.location.reload()}
+      />
     );
   }
 }
