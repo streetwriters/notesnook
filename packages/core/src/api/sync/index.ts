@@ -46,7 +46,7 @@ import {
 import { SYNC_COLLECTIONS_MAP, SyncTransferItem } from "./types";
 import { DownloadableFile } from "../../database/fs";
 import { SyncDevices } from "./devices";
-import { COLORS } from "../../database/backup";
+import { DefaultColors } from "../../collections/colors";
 
 export type SyncOptions = {
   type: "full" | "fetch" | "send";
@@ -460,7 +460,7 @@ async function deserializeItem(
 
     const itemType =
       // colors are naively of type "tag" instead of "color" so we have to fix that.
-      item.type === "tag" && COLORS.includes(item.title.toLowerCase())
+      item.type === "tag" && DefaultColors[item.title.toLowerCase()]
         ? "color"
         : item.type === "trash" && "itemType" in item && item.itemType
         ? item.itemType

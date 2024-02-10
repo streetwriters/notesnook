@@ -179,6 +179,7 @@ const migrations: Migration[] = [
     items: {
       trash: (item) => {
         if (!item.deletedBy) item.deletedBy = "user";
+        delete item.itemId;
         return true;
       },
       color: async (item, db, migrationType) => {

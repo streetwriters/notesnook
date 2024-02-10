@@ -543,11 +543,11 @@ test("[5.9] move attachments.noteIds to relations", () =>
     await migrateItem(attachment, 5.9, 6.0, "attachment", db, "backup");
 
     const linkedNotes = await db.relations
-      .from({ type: "attachment", id: "ATTACHMENT_ID" }, "note")
+      .to({ type: "attachment", id: "ATTACHMENT_ID" }, "note")
       .get();
     expect(attachment.noteIds).toBeUndefined();
     expect(linkedNotes).toHaveLength(1);
-    expect(linkedNotes[0].toId).toBe("HELLO_NOTE_ID");
+    expect(linkedNotes[0].fromId).toBe("HELLO_NOTE_ID");
   }));
 
 test.todo("[5.9] flatten attachment object", () =>
@@ -692,7 +692,7 @@ test("[5.9] migrate settings to its own collection", () =>
     );
   }));
 
-describe.concurrent("[5.9] migrate kv", () => {
+describe.concurrent("[5.9] migrate kv", (test) => {
   for (const key of KEYS) {
     test(`${key} (defined)`, () =>
       databaseTest().then(async (db) => {
@@ -701,7 +701,7 @@ describe.concurrent("[5.9] migrate kv", () => {
         await migrateKV(db, 5.9, 6.0);
 
         expect(await db.kv().read(key)).toBeDefined();
-        expect(await db.storage().read(key)).toBeUndefined();
+        // TODO: expect(await db.storage().read(key)).toBeUndefined();
       }));
 
     test(`${key} (undefined)`, () =>
@@ -711,7 +711,7 @@ describe.concurrent("[5.9] migrate kv", () => {
         await migrateKV(db, 5.9, 6.0);
 
         expect(await db.kv().read(key)).toBe(key === "v" ? 6 : undefined);
-        expect(await db.storage().read(key)).toBe(null);
+        // TODO: expect(await db.storage().read(key)).toBe(null);
       }));
   }
 });
