@@ -188,37 +188,40 @@ export async function restoreBackupFile(backupFile: File) {
         }
         if (!isValid) throw new Error("Invalid backup.");
 
-        for (const entry of entries) {
-          const backup = JSON.parse(await entry.text());
-          if (backup.encrypted) {
-            if (!cachedPassword) {
-              const result = await showPasswordDialog({
-                title: "Encrypted backup",
-                subtitle:
-                  "Please enter the password to decrypt and restore this backup.",
-                inputs: {
-                  password: {
-                    label: "Password",
-                    autoComplete: "current-password"
+        await db.transaction(async () => {
+          for (const entry of entries) {
+            const backup = JSON.parse(await entry.text());
+            if (backup.encrypted) {
+              if (!cachedPassword) {
+                const result = await showPasswordDialog({
+                  title: "Encrypted backup",
+                  subtitle:
+                    "Please enter the password to decrypt and restore this backup.",
+                  inputs: {
+                    password: {
+                      label: "Password",
+                      autoComplete: "current-password"
+                    }
+                  },
+                  validate: async ({ password }) => {
+                    await db.backup?.import(backup, password);
+                    cachedPassword = password;
+                    return true;
                   }
-                },
-                validate: async ({ password }) => {
-                  await db.backup?.import(backup, password);
-                  cachedPassword = password;
-                  return true;
-                }
-              });
-              if (!result) break;
-            } else await db.backup?.import(backup, cachedPassword);
-          } else {
-            await db.backup?.import(backup);
-          }
+                });
+                if (!result) break;
+              } else await db.backup?.import(backup, cachedPassword);
+            } else {
+              await db.backup?.import(backup);
+            }
 
-          report({
-            text: `Processed ${entry.name}`,
-            current: filesProcessed++
-          });
-        }
+            report({
+              text: `Processed ${entry.name}`,
+              current: filesProcessed++,
+              total: entries.length
+            });
+          }
+        });
         await db.initCollections();
       }
     });
