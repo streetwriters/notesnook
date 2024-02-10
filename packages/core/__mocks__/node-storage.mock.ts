@@ -85,14 +85,11 @@ export class NodeStorageInterface implements IStorage {
     return this.crypto.decryptMulti(key, items, "text");
   }
 
-  async deriveCryptoKey(
-    name: string,
-    credentials: SerializedKey
-  ): Promise<void> {
+  async deriveCryptoKey(credentials: SerializedKey): Promise<void> {
     const { password, salt } = credentials;
     if (!password || !salt) return;
     const keyData = await this.crypto.exportKey(password, salt);
-    await this.write(`${name}@_k`, keyData.key);
+    await this.write(`userEncryptionKey`, keyData.key);
   }
 
   async hash(password: string, email: string): Promise<string> {
@@ -100,8 +97,8 @@ export class NodeStorageInterface implements IStorage {
     return await this.crypto.hash(password, `${APP_SALT}${email}`);
   }
 
-  async getCryptoKey(name: string): Promise<string | undefined> {
-    const key = await this.read<string>(`${name}@_k`);
+  async getCryptoKey(): Promise<string | undefined> {
+    const key = await this.read<string>(`userEncryptionKey`);
     if (!key) return;
     return key;
   }

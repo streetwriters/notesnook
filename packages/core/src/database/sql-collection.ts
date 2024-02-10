@@ -54,7 +54,7 @@ export class SQLCollection<
   constructor(
     private readonly db: DatabaseAccessor,
     private readonly startTransaction: (
-      executor: (tr: Transaction<DatabaseSchema>) => void | Promise<void>
+      executor: (tr: Transaction<DatabaseSchema>) => Promise<void>
     ) => Promise<void>,
     private readonly type: TCollectionType,
     private readonly eventManager: EventManager
