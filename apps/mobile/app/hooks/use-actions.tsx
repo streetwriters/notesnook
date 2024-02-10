@@ -38,9 +38,11 @@ import NoteHistory from "../components/note-history";
 import { AddNotebookSheet } from "../components/sheets/add-notebook";
 import MoveNoteSheet from "../components/sheets/add-to";
 import ExportNotesSheet from "../components/sheets/export-notes";
+import { MoveNotes } from "../components/sheets/move-notes/movenote";
 import PublishNoteSheet from "../components/sheets/publish-note";
 import { RelationsList } from "../components/sheets/relations-list/index";
 import ReminderSheet from "../components/sheets/reminder";
+import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import {
   ToastManager,
   eSendEvent,
@@ -62,7 +64,6 @@ import { eOpenLoginDialog } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
-import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 
 export const useActions = ({
   close,
@@ -469,6 +470,15 @@ export const useActions = ({
           close();
         },
         on: defaultNotebook === item.id
+      },
+      {
+        id: "move-notes",
+        title: "Move notes",
+        hidden: item.type !== "notebook",
+        icon: "text",
+        func: () => {
+          MoveNotes.present(item);
+        }
       }
     );
   }

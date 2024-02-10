@@ -16,130 +16,26 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Color } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { TextInput, View } from "react-native";
-import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import ColorPickerWheel from "react-native-wheel-color-picker";
 import { db } from "../../../common/database";
+import { useStoredRef } from "../../../hooks/use-stored-ref";
 import { ToastManager } from "../../../services/event-manager";
 import { useMenuStore } from "../../../stores/use-menu-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { SIZE } from "../../../utils/size";
 import BaseDialog from "../../dialog/base-dialog";
 import DialogContainer from "../../dialog/dialog-container";
 import { Toast } from "../../toast";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { PressableButton } from "../../ui/pressable";
-import { Color } from "@notesnook/core";
-const arrayOfColors = [
-  "#FF5733",
-  "#33FF57",
-  "#339DFF",
-  "#FF33E9",
-  "#E9FF33",
-  "#FF3395",
-  "#95FF33",
-  "#FF3369",
-  "#6933FF",
-  "#33FFC7",
-  "#FF5733",
-  "#33FF57",
-  "#339DFF",
-  "#FF33E9",
-  "#E9FF33",
-  "#FF3395",
-  "#95FF33",
-  "#FF3369",
-  "#6933FF",
-  "#33FFC7",
-  "#FF5733",
-  "#33FF57",
-  "#339DFF",
-  "#FF33E9",
-  "#E9FF33",
-  "#FF3395",
-  "#95FF33",
-  "#FF3369",
-  "#6933FF",
-  "#33FFC7",
-  "#FF5733",
-  "#33FF57",
-  "#339DFF",
-  "#FF33E9",
-  "#E9FF33",
-  "#FF3395",
-  "#95FF33",
-  "#FF3369",
-  "#6933FF",
-  "#33FFC7",
-  "#FF5733",
-  "#33FF57",
-  "#339DFF",
-  "#FF33E9",
-  "#E9FF33",
-  "#FF3395",
-  "#95FF33",
-  "#FF3369",
-  "#6933FF",
-  "#33FFC7",
-  "#FF5733",
-  "#33FF57",
-  "#339DFF",
-  "#FF33E9",
-  "#E9FF33",
-  "#FF3395",
-  "#95FF33",
-  "#FF3369",
-  "#6933FF",
-  "#33FFC7",
-  "#FF5733",
-  "#33FF57",
-  "#339DFF",
-  "#FF33E9",
-  "#E9FF33",
-  "#FF3395",
-  "#95FF33",
-  "#FF3369",
-  "#6933FF",
-  "#33FFC7",
-  "#FF5733",
-  "#33FF57",
-  "#339DFF",
-  "#FF33E9",
-  "#E9FF33",
-  "#FF3395",
-  "#95FF33",
-  "#FF3369",
-  "#6933FF",
-  "#33FFC7",
-  "#FF5733",
-  "#33FF57",
-  "#339DFF",
-  "#FF33E9",
-  "#E9FF33",
-  "#FF3395",
-  "#95FF33",
-  "#FF3369",
-  "#6933FF",
-  "#33FFC7"
-];
+
 const HEX_COLOR_REGEX_ALPHA =
   /^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$/;
-
-const convertToColorObjects = (colors: string[]) => {
-  const colorObjects = [];
-  for (let i = 0; i < colors.length; i += 3) {
-    colorObjects.push({
-      colorOne: colors[i],
-      colorTwo: colors[i + 1],
-      colorThree: colors[i + 2]
-    });
-  }
-  return colorObjects;
-};
 
 const ColorPicker = ({
   visible,
@@ -154,43 +50,7 @@ const ColorPicker = ({
   const { colors } = useThemeColors();
   const inputRef = useRef<TextInput>(null);
   const title = useRef<string>();
-
-  const renderItem = ({
-    item
-  }: {
-    item: { colorOne: string; colorTwo: string; colorThree: string };
-  }) => (
-    <View>
-      {Object.keys(item).map((key) => (
-        <PressableButton
-          key={item[key as keyof typeof item]}
-          type="accent"
-          accentColor={item[key as keyof typeof item]}
-          customStyle={{
-            width: 40,
-            height: 40,
-            borderRadius: 100,
-            justifyContent: "center",
-            alignItems: "center",
-            marginRight: 10,
-            marginBottom: 10
-          }}
-          onPress={() => {
-            const color = item[key as keyof typeof item];
-            setSelectedColor(color);
-            inputRef.current?.setNativeProps({
-              placeholder: color,
-              text: color
-            });
-          }}
-        >
-          {selectedColor === item[key as keyof typeof item] ? (
-            <Icon name="check" color="white" size={SIZE.lg} />
-          ) : null}
-        </PressableButton>
-      ))}
-    </View>
-  );
+  const colorRef = useStoredRef("color-ref", "#f0f0f0");
 
   return (
     <BaseDialog
@@ -205,101 +65,127 @@ const ColorPicker = ({
       <Toast context="color-picker" />
       <DialogContainer
         style={{
-          paddingTop: 0
+          paddingTop: 0,
+          maxHeight: 600
         }}
       >
-        <View
-          style={{
-            padding: 20
-          }}
-        >
-          <FlashList
-            extraData={selectedColor}
-            horizontal
-            data={convertToColorObjects(arrayOfColors)}
-            renderItem={renderItem}
-          />
-
+        <View>
           <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              paddingTop: 10,
-              columnGap: 10,
-              marginBottom: 10
+              width: "100%",
+              height: 250,
+              backgroundColor: selectedColor,
+              borderRadius: 10
             }}
           >
-            <Input
-              fwdRef={inputRef}
-              placeholder="#f0f0f0"
-              marginBottom={0}
-              onChangeText={(value) => {
-                if (HEX_COLOR_REGEX_ALPHA.test(value)) {
-                  setSelectedColor(value);
-                  inputRef.current?.setNativeProps({
-                    placeholder: value,
-                    text: value
-                  });
-                }
+            <ColorPickerWheel
+              onColorChangeComplete={(color) => {
+                if (color === selectedColor) return;
+                colorRef.current = color;
+                setSelectedColor(color);
+                inputRef.current?.setNativeProps({
+                  placeholder: color,
+                  text: color
+                });
               }}
-            />
-            <PressableButton
-              type="accent"
-              accentColor={selectedColor || colors.secondary.background}
-              customStyle={{
-                width: 45,
-                height: 45,
-                borderRadius: 100,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
+              useNativeLayout={true}
+              autoResetSlider={true}
+              color={colorRef.current}
+              sliderSize={30}
+              thumbSize={25}
+              shadeWheelThumb
+              shadeSliderThumb={true}
+              swatchesOnly={false}
+              swatches={false}
+              useNativeDriver={true}
             />
           </View>
 
-          <Input
-            marginBottom={10}
-            onChangeText={(value) => {
-              title.current = value;
+          <View
+            style={{
+              paddingHorizontal: 12
             }}
-            placeholder={title.current || "Color title"}
-          />
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingTop: 10,
+                columnGap: 10,
+                marginBottom: 10
+              }}
+            >
+              <Input
+                fwdRef={inputRef}
+                placeholder="#f0f0f0"
+                marginBottom={0}
+                onChangeText={(value) => {
+                  if (HEX_COLOR_REGEX_ALPHA.test(value)) {
+                    colorRef.current = value;
+                    setSelectedColor(value);
+                  }
+                }}
+                defaultValue={colorRef.current}
+              />
+              <PressableButton
+                type="accent"
+                accentColor={selectedColor || colors.secondary.background}
+                customStyle={{
+                  width: 45,
+                  height: 45,
+                  borderRadius: 100,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              />
+            </View>
 
-          <Button
-            title="Add color"
-            onPress={async () => {
-              if (!selectedColor)
-                return ToastManager.error(
-                  new Error("Select a color"),
-                  undefined,
-                  "color-picker"
-                );
-              if (!title.current)
-                return ToastManager.error(
-                  new Error("Enter a title for the color")
-                );
-              const exists = await db.colors.all.find((v) =>
-                v.and([v(`colorCode`, "==", selectedColor)])
-              );
-              if (exists)
-                return ToastManager.error(
-                  new Error(`Color #${selectedColor} already exists`)
-                );
+            <Input
+              marginBottom={10}
+              onChangeText={(value) => {
+                title.current = value;
+              }}
+              defaultValue={title.current}
+              placeholder={title.current || "Color title"}
+            />
 
-              const id = await db.colors.add({
-                title: title.current,
-                colorCode: selectedColor
-              });
-              useRelationStore.getState().update();
-              useMenuStore.getState().setColorNotes();
-              setVisible(false);
-              const color = await db.colors.color(id);
-              if (color) {
-                onColorAdded?.(color);
-              }
-            }}
-            type={selectedColor ? "grayAccent" : "grayBg"}
-            width="100%"
-          />
+            <Button
+              title="Add color"
+              onPress={async () => {
+                if (!selectedColor)
+                  return ToastManager.error(
+                    new Error("Select a color"),
+                    undefined,
+                    "color-picker"
+                  );
+                if (!title.current)
+                  return ToastManager.error(
+                    new Error("Enter a title for the color")
+                  );
+                const exists = await db.colors.all.find((v) =>
+                  v.and([v(`colorCode`, "==", selectedColor)])
+                );
+                if (exists)
+                  return ToastManager.error(
+                    new Error(`Color #${selectedColor} already exists`)
+                  );
+
+                const id = await db.colors.add({
+                  title: title.current,
+                  colorCode: selectedColor
+                });
+                useRelationStore.getState().update();
+                useMenuStore.getState().setColorNotes();
+                setVisible(false);
+                const color = await db.colors.color(id);
+                if (color) {
+                  onColorAdded?.(color);
+                }
+              }}
+              type={selectedColor ? "grayAccent" : "grayBg"}
+              width="100%"
+            />
+          </View>
         </View>
       </DialogContainer>
     </BaseDialog>

@@ -30,9 +30,14 @@ export interface SelectionStore extends State {
   canEnableMultiSelectMode: boolean;
   markAs: (item: Item, state: SelectionState | undefined) => void;
   reset: () => void;
+  enabled?: boolean;
+  getSelectedItemIds: () => string[];
 }
 
-export function createItemSelectionStore(multiSelectMode = false) {
+export function createItemSelectionStore(
+  multiSelectMode = false,
+  enabled = true
+) {
   return create<SelectionStore>((set, get) => ({
     selection: {},
     setSelection: (state) => {
@@ -45,6 +50,7 @@ export function createItemSelectionStore(multiSelectMode = false) {
         selection: { ...get().initialState }
       });
     },
+    enabled: enabled,
     canEnableMultiSelectMode: multiSelectMode,
     initialState: {},
     markAs: (item, state) => {
@@ -66,6 +72,18 @@ export function createItemSelectionStore(multiSelectMode = false) {
       set({
         multiSelect: !get().multiSelect
       });
+    },
+    getSelectedItemIds: () => {
+      const selected: string[] = [];
+
+      if (!get().selection) return selected;
+
+      for (const item in get().selection) {
+        if (get().selection[item] === "selected") {
+          selected.push(item);
+        }
+      }
+      return selected;
     }
   }));
 }

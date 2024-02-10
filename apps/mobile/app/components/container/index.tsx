@@ -18,27 +18,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { PropsWithChildren } from "react";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import { Platform, View, useWindowDimensions } from "react-native";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 
 export const Container = ({ children }: PropsWithChildren) => {
-  const floating = useIsFloatingKeyboard();
   const insets = useGlobalSafeAreaInsets();
+  const dimensions = useWindowDimensions();
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      enabled={Platform.OS === "ios" && !floating}
+    <View
       style={{
-        flex: 1,
         overflow: "hidden",
         paddingTop: Platform.OS === "android" ? 0 : insets.top,
-        paddingBottom: Platform.OS === "android" ? 0 : insets.bottom
+        paddingBottom: Platform.OS === "android" ? 0 : insets.bottom,
+        height: dimensions.height,
+        width: "100%"
       }}
     >
       {children}
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
