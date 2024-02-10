@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import path from "path";
-import fs from "fs/promises";
+import fs, { readFile, writeFile } from "fs/promises";
 import { existsSync } from "fs";
 import yargs from "yargs-parser";
 import os from "os";
@@ -36,6 +36,9 @@ await fs.rm("./build/", { force: true, recursive: true });
 if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   await exec(`cd ${webAppPath} && npm run build:desktop`);
 }
+
+// temporary until there's support for prebuilt binaries for windows ARM & linux ARM
+await patchBetterSQLite3();
 
 if (os.platform() === "win32")
   await exec(
@@ -73,4 +76,22 @@ async function exec(cmd, cwd) {
     stdio: "inherit",
     cwd: cwd || process.cwd()
   });
+}
+
+async function patchBetterSQLite3() {
+  const jsonPath = path.join(
+    __dirname,
+    "..",
+    "node_modules",
+    "better-sqlite3-multiple-ciphers",
+    "package.json"
+  );
+  const json = JSON.parse(await readFile(jsonPath, "utf-8"));
+
+  json.version = "9.4.1";
+  json.homepage = "https://github.com/thecodrr/better-sqlite3-multiple-ciphers";
+  json.repository.url =
+    "git://github.com/thecodrr/better-sqlite3-multiple-ciphers.git";
+
+  await writeFile(jsonPath, JSON.stringify(json));
 }
