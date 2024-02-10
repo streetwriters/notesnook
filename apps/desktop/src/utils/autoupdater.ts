@@ -32,7 +32,7 @@ async function configureAutoUpdater() {
   });
 
   autoUpdater.autoDownload = config.automaticUpdates;
-  autoUpdater.allowDowngrade = CHANNEL === "beta";
+  autoUpdater.allowDowngrade = false;
   autoUpdater.allowPrerelease = false;
   autoUpdater.autoInstallOnAppQuit = true;
 }
