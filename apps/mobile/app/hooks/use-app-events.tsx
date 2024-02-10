@@ -98,6 +98,7 @@ import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import Notifications from "../services/notifications";
+import { BETA } from "../utils/constants";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -646,10 +647,8 @@ export const useAppEvents = () => {
 
   useEffect(() => {
     if (!loading) {
-      (async () => {
-        onUserUpdated();
-        doAppLoadActions();
-      })();
+      onUserUpdated();
+      doAppLoadActions();
     }
   }, [loading, onUserUpdated]);
 
@@ -710,14 +709,15 @@ const doAppLoadActions = async () => {
     return;
   }
   notifee.setBadgeCount(0);
-  await useMessageStore.getState().setAnnouncement();
-  if (NewFeature.present()) return;
-  if (await checkAppUpdateAvailable()) return;
 
   if (!(await db.user.getUser())) {
     setLoginMessage();
     return;
   }
+
+  await useMessageStore.getState().setAnnouncement();
+  if (NewFeature.present()) return;
+  if (await checkAppUpdateAvailable()) return;
   if (await checkForRateAppRequest()) return;
   if (await PremiumService.getRemainingTrialDaysStatus()) return;
   if (SettingsService.get().introCompleted) {
@@ -731,7 +731,8 @@ const doAppLoadActions = async () => {
 };
 
 const checkAppUpdateAvailable = async () => {
-  if (__DEV__ || Config.isTesting === "true" || Config.FDROID_BUILD) return;
+  if (__DEV__ || Config.isTesting === "true" || Config.FDROID_BUILD || BETA)
+    return;
   try {
     const version =
       Config.GITHUB_RELEASE === "true"
