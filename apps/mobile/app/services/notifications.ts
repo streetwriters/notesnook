@@ -125,7 +125,9 @@ const onEvent = async ({ type, detail }: Event) => {
     if (notification?.data?.type === "quickNote") return;
     MMKV.removeItem("appState");
     if (notification?.data?.type === "reminder" && notification?.id) {
-      const reminder = db.reminders?.reminder(notification.id?.split("_")[0]);
+      const reminder = await db.reminders?.reminder(
+        notification.id?.split("_")[0]
+      );
       if (!reminder) return;
       await sleep(1000);
       const ReminderNotify =
@@ -183,7 +185,7 @@ const onEvent = async ({ type, detail }: Event) => {
       case "UNPIN": {
         if (!notification?.id) break;
         remove(notification?.id as string);
-        const reminder = db.reminders?.reminder(
+        const reminder = await db.reminders?.reminder(
           notification?.id?.split("_")[0]
         );
         if (reminder) {
