@@ -71,6 +71,7 @@ import { Kysely, Transaction, sql } from "kysely";
 import { CachedCollection } from "../database/cached-collection";
 import { Vaults } from "../collections/vaults";
 import { KVStorage } from "../database/kv";
+import { QueueValue } from "../utils/queue-value";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -126,7 +127,7 @@ class Database {
 
   private _sql?: Kysely<DatabaseSchema>;
   sql: DatabaseAccessor = () => {
-    if (this._transaction) return this._transaction;
+    if (this._transaction) return this._transaction.value;
 
     if (!this._sql)
       throw new Error(
@@ -138,23 +139,27 @@ class Database {
   private _kv?: KVStorage;
   kv: KVStorageAccessor = () => this._kv || new KVStorage(this.sql);
 
-  private _transaction?: Transaction<DatabaseSchema>;
-  private transactionMutex = new Mutex();
-  transaction = (
-    executor: (tr: Transaction<DatabaseSchema>) => void | Promise<void>
+  private _transaction?: QueueValue<Transaction<DatabaseSchema>>;
+  transaction = async (
+    executor: (tr: Transaction<DatabaseSchema>) => Promise<void>
   ) => {
-    return this.transactionMutex.runExclusive(() =>
-      this.sql()
-        .transaction()
-        .execute(async (tr) => {
-          this._transaction = tr;
-          await executor(tr);
-          this._transaction = undefined;
-        })
-        .finally(() => {
-          this._transaction = undefined;
-        })
-    );
+    if (this._transaction) {
+      await executor(this._transaction.use()).finally(() =>
+        this._transaction?.discard()
+      );
+      return;
+    }
+
+    return this.sql()
+      .transaction()
+      .execute(async (tr) => {
+        this._transaction = new QueueValue(
+          tr,
+          () => (this._transaction = undefined)
+        );
+        await executor(this._transaction.use());
+      })
+      .finally(() => this._transaction?.discard());
   };
 
   options!: Options;
