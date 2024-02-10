@@ -148,7 +148,10 @@ function getErrorHelp(props: FallbackProps) {
       : error instanceof Error
       ? error.toString()
       : JSON.stringify(error);
-  if (errorText.includes("file is not a database")) {
+  if (
+    errorText.includes("file is not a database") ||
+    errorText.includes("unsupported file format")
+  ) {
     return {
       explanation: `This error usually means the database file is either corrupt or it could not be decrypted.`,
       action:
