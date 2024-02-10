@@ -118,7 +118,7 @@ function delay(ms: number) {
 async function loginFakeUser(db) {
   const email = "johndoe@example.com";
   const userSalt = randomBytes(16).toString("base64");
-  await db.storage().deriveCryptoKey(`_uk_@${email}`, {
+  await db.storage().deriveCryptoKey({
     password: "password",
     salt: userSalt
   });

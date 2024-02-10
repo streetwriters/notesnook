@@ -21,11 +21,19 @@ import SparkMD5 from "spark-md5";
 import { CURRENT_DATABASE_VERSION } from "../common.js";
 import Migrator from "./migrator.js";
 import Database from "../api/index.js";
-import { Item, MaybeDeletedItem, Note, Notebook, isDeleted } from "../types.js";
+import {
+  Item,
+  MaybeDeletedItem,
+  Note,
+  Notebook,
+  ValueOf,
+  isDeleted
+} from "../types.js";
 import { Cipher, SerializedKey } from "@notesnook/crypto";
 import { isCipher } from "./crypto.js";
 import { migrateItem } from "../migrations";
 import { DatabaseCollection } from "./index.js";
+import { DefaultColors } from "../collections/colors.js";
 
 type BackupDataItem = MaybeDeletedItem<Item> | string[];
 type BackupPlatform = "web" | "mobile" | "node";
@@ -89,17 +97,6 @@ function isLegacyBackupFile(
 }
 
 const MAX_CHUNK_SIZE = 10 * 1024 * 1024;
-export const COLORS = [
-  "red",
-  "orange",
-  "yellow",
-  "green",
-  "blue",
-  "purple",
-  "gray",
-  "black",
-  "white"
-];
 
 const invalidKeys = [
   "user",
@@ -137,16 +134,15 @@ const itemTypeToCollectionKey = {
   reminder: "reminders",
   sessioncontent: "sessioncontent",
   session: "noteHistory",
-  notehistory: "notehistory",
+  notehistory: "noteHistory",
   content: "content",
   shortcut: "shortcuts",
   settingitem: "settings",
   settings: "settings",
-  vault: "vaults",
-
-  // to make ts happy
-  topic: "topics"
+  vault: "vaults"
 } as const;
+
+type CollectionName = ValueOf<typeof itemTypeToCollectionKey>;
 
 const validTypes = ["mobile", "web", "node"];
 export default class Backup {
@@ -344,111 +340,114 @@ export default class Backup {
   }
 
   private async migrateData(data: BackupDataItem[], version: number) {
-    await this.db.transaction(async () => {
-      for (let item of data) {
-        // we do not want to restore deleted items
-        if (
-          !item ||
-          typeof item !== "object" ||
-          Array.isArray(item) ||
-          isDeleted(item)
-        )
-          continue;
-        // in v5.6 of the database, we did not set note history session's type
-        if ("sessionContentId" in item && item.type !== "session")
-          (item as any).type = "notehistory";
+    const queue: Partial<Record<CollectionName, MaybeDeletedItem<Item>[]>> = {};
+    for (let item of data) {
+      // we do not want to restore deleted items
+      if (
+        !item ||
+        typeof item !== "object" ||
+        Array.isArray(item) ||
+        isDeleted(item)
+      )
+        continue;
+      // in v5.6 of the database, we did not set note history session's type
+      if ("sessionContentId" in item && item.type !== "session")
+        (item as any).type = "notehistory";
 
+      if (
+        (await migrateItem(
+          item,
+          version,
+          CURRENT_DATABASE_VERSION,
+          item.type,
+          this.db,
+          "backup"
+        )) === "skip"
+      )
+        continue;
+      // since items in trash can have their own set of migrations,
+      // we have to run the migration again to account for that.
+      if (item.type === "trash" && item.itemType)
         if (
           (await migrateItem(
-            item,
+            item as unknown as Note | Notebook,
             version,
             CURRENT_DATABASE_VERSION,
-            item.type,
+            item.itemType,
             this.db,
             "backup"
           )) === "skip"
         )
           continue;
-        // since items in trash can have their own set of migrations,
-        // we have to run the migration again to account for that.
-        if (item.type === "trash" && item.itemType)
-          if (
-            (await migrateItem(
-              item as unknown as Note | Notebook,
-              version,
-              CURRENT_DATABASE_VERSION,
-              item.itemType,
-              this.db,
-              "backup"
-            )) === "skip"
-          )
-            continue;
 
-        const itemType =
-          // colors are naively of type "tag" instead of "color" so we have to fix that.
-          item.type === "tag" && COLORS.includes(item.title.toLowerCase())
-            ? "color"
-            : item.type === "trash" && "itemType" in item && item.itemType
-            ? item.itemType
-            : item.type;
+      const itemType =
+        // colors are naively of type "tag" instead of "color" so we have to fix that.
+        item.type === "tag" && DefaultColors[item.title.toLowerCase()]
+          ? "color"
+          : item.type === "trash" && "itemType" in item && item.itemType
+          ? item.itemType
+          : item.type;
 
-        if (!itemType || itemType === "topic" || itemType === "settings")
-          continue;
+      if (!itemType || itemType === "topic" || itemType === "settings")
+        continue;
 
-        if (item.type === "attachment" && (item.hash || item.metadata?.hash)) {
-          const attachment = await this.db.attachments.attachment(
-            item.metadata?.hash || item.hash
-          );
-          if (attachment) {
-            const isNewGeneric =
-              item.metadata?.type === "application/octet-stream" ||
-              item.mimeType === "application/octet-stream";
-            const isOldGeneric =
-              attachment.mimeType === "application/octet-stream";
-            item = {
-              ...attachment,
-              mimeType:
-                // we keep whichever mime type is more specific
-                isNewGeneric && !isOldGeneric
-                  ? attachment.mimeType
-                  : item.metadata?.type || item.mimeType,
-              filename:
-                // we keep the filename based on which item's mime type we kept
-                isNewGeneric && !isOldGeneric
-                  ? attachment.filename
-                  : item.metadata?.filename || item.filename
-            };
-            for (const noteId of item.noteIds || []) {
-              await this.db.relations.add(
-                {
-                  id: noteId,
-                  type: "note"
-                },
-                attachment
-              );
-            }
-          } else {
-            delete item.dateUploaded;
-            delete item.failed;
+      if (item.type === "attachment" && (item.hash || item.metadata?.hash)) {
+        const attachment = await this.db.attachments.attachment(
+          item.metadata?.hash || item.hash
+        );
+        if (attachment) {
+          const isNewGeneric =
+            item.metadata?.type === "application/octet-stream" ||
+            item.mimeType === "application/octet-stream";
+          const isOldGeneric =
+            attachment.mimeType === "application/octet-stream";
+          item = {
+            ...attachment,
+            mimeType:
+              // we keep whichever mime type is more specific
+              isNewGeneric && !isOldGeneric
+                ? attachment.mimeType
+                : item.metadata?.type || item.mimeType,
+            filename:
+              // we keep the filename based on which item's mime type we kept
+              isNewGeneric && !isOldGeneric
+                ? attachment.filename
+                : item.metadata?.filename || item.filename
+          };
+          for (const noteId of item.noteIds || []) {
+            await this.db.relations.add(
+              {
+                id: noteId,
+                type: "note"
+              },
+              attachment
+            );
           }
+        } else {
+          delete item.dateUploaded;
+          delete item.failed;
         }
-
-        const collectionKey = itemTypeToCollectionKey[itemType];
-
-        if (!collectionKey) continue;
-
-        const collection =
-          collectionKey === "sessioncontent"
-            ? this.db.noteHistory.sessionContent.collection
-            : this.db[collectionKey].collection;
-
-        // items should sync immediately after getting restored
-        item.dateModified = Date.now();
-        item.synced = false;
-
-        await collection.upsert(item as any);
       }
-    });
+
+      const collectionKey: CollectionName = itemTypeToCollectionKey[itemType];
+      if (!collectionKey) continue;
+
+      queue[collectionKey] = queue[collectionKey] || [];
+      queue[collectionKey]?.push(item);
+    }
+
+    for (const key in queue) {
+      const collectionKey = key as CollectionName;
+      const collection =
+        collectionKey === "sessioncontent"
+          ? this.db.noteHistory.sessionContent.collection
+          : this.db[collectionKey].collection;
+      if (!collection) continue;
+      const items = queue[collectionKey];
+      if (!items) continue;
+
+      await collection.put(items as any[]);
+    }
   }
 
   private validate(backup: LegacyBackupFile | BackupFile) {

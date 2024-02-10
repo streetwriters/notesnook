@@ -35,7 +35,7 @@ export class SQLCachedCollection<
   constructor(
     sql: DatabaseAccessor,
     startTransaction: (
-      executor: (tr: Transaction<DatabaseSchema>) => void | Promise<void>
+      executor: (tr: Transaction<DatabaseSchema>) => Promise<void>
     ) => Promise<void>,
     type: TCollectionType,
     eventManager: EventManager

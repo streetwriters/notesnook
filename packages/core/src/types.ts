@@ -478,6 +478,10 @@ export type BaseTrashItem<TItem extends BaseItem<"note" | "notebook">> =
      * deletedBy tells who deleted this specific item.
      */
     deletedBy: "user" | "app";
+    /**
+     * @deprecated
+     */
+    itemId?: never;
   } & Omit<TItem, "id" | "type" | "dateDeleted" | "itemType" | "deletedBy">;
 
 export type TrashItem = BaseTrashItem<Note> | BaseTrashItem<Notebook>;
