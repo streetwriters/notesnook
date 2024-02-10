@@ -48,7 +48,7 @@ async function init(dbName: string, async: boolean, url?: string) {
     ? new IDBBatchAtomicVFS(dbName, { durability: "strict" })
     : new AccessHandlePoolVFS(dbName);
   if ("isReady" in vfs) await vfs.isReady;
-  console.log(vfs, SQLiteAsyncModule);
+
   sqlite.vfs_register(vfs, false);
   db = await sqlite.open_v2(dbName, undefined, `multipleciphers-${vfs.name}`);
 }
@@ -70,14 +70,26 @@ async function prepare(sql: string) {
     columns: sqlite.column_names(prepared.stmt)
   };
   preparedStatements.set(sql, statement);
+
+  sqlite.str_finish(str);
   return statement;
 }
 
-async function run(sql: string, parameters?: SQLiteCompatibleType[]) {
+async function run(
+  sql: string,
+  mode: RunMode,
+  parameters?: SQLiteCompatibleType[]
+) {
   const prepared = await prepare(sql);
   if (!prepared) return [];
   try {
     if (parameters) sqlite.bind_collection(prepared.stmt, parameters);
+
+    // fast path for exec statements
+    if (mode === "exec") {
+      while ((await sqlite.step(prepared.stmt)) === SQLITE_ROW);
+      return [];
+    }
 
     const rows: Record<string, SQLiteCompatibleType>[] = [];
     while ((await sqlite.step(prepared.stmt)) === SQLITE_ROW) {
@@ -96,7 +108,7 @@ async function run(sql: string, parameters?: SQLiteCompatibleType[]) {
         sqlite
           .finalize(prepared.stmt)
           // ignore error (we will just prepare a new statement)
-          .catch(() => false)
+          .catch(console.error)
           .finally(() => preparedStatements.delete(sql))
       );
   }
@@ -107,14 +119,11 @@ async function exec<R>(
   sql: string,
   parameters?: SQLiteCompatibleType[]
 ): Promise<QueryResult<R>> {
-  console.time(sql);
-  const rows = (await run(sql, parameters)) as R[];
-  console.timeEnd(sql);
+  const rows = (await run(sql, mode, parameters)) as R[];
   if (mode === "query") return { rows };
 
-  const v = await run("SELECT last_insert_rowid() as id");
   return {
-    insertId: BigInt(v[0].id as number),
+    insertId: BigInt(sqlite.last_insert_rowid(db)),
     numAffectedRows: BigInt(sqlite.changes(db)),
     rows: mode === "raw" ? rows : []
   };

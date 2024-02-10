@@ -939,6 +939,13 @@ export interface SQLiteAPI {
   step(stmt: number): Promise<number>;
 
   /**
+   * @see https://www.sqlite.org/c3ref/last_insert_rowid.html
+   * @param db database pointer
+   * @returns last rowid
+   */
+  last_insert_rowid(db: number): number;
+
+  /**
    * Create a new `sqlite3_str` dynamic string instance
    *
    * The purpose for `sqlite3_str` is to transfer a SQL string in

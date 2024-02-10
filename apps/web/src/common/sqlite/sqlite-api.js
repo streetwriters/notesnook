@@ -121,7 +121,7 @@ export function Factory(Module) {
   };
 
   sqlite3.bind = function (stmt, i, value) {
-    verifyStatement(stmt);
+    // verifyStatement(stmt);
     switch (typeof value) {
       case "number":
         if (value === (value | 0)) {
@@ -152,14 +152,14 @@ export function Factory(Module) {
     const fname = "sqlite3_bind_blob";
     const f = Module.cwrap(fname, ...decl("nnnnn:n"));
     return function (stmt, i, value) {
-      verifyStatement(stmt);
+      //  verifyStatement(stmt);
       // @ts-ignore
       const byteLength = value.byteLength ?? value.length;
       const ptr = Module._sqlite3_malloc(byteLength);
       Module.HEAPU8.subarray(ptr).set(value);
       const result = f(stmt, i, ptr, byteLength, sqliteFreeAddress);
       // trace(fname, result);
-      return check(fname, result, mapStmtToDB.get(stmt));
+      return check(fname, result, null, stmt);
     };
   })();
 
@@ -167,7 +167,7 @@ export function Factory(Module) {
     const fname = "sqlite3_bind_parameter_count";
     const f = Module.cwrap(fname, ...decl("n:n"));
     return function (stmt) {
-      verifyStatement(stmt);
+      // verifyStatement(stmt);
       const result = f(stmt);
       // trace(fname, result);
       return result;
@@ -178,7 +178,7 @@ export function Factory(Module) {
     const fname = "sqlite3_clear_bindings";
     const f = Module.cwrap(fname, ...decl("n:n"));
     return function (stmt) {
-      verifyStatement(stmt);
+      // verifyStatement(stmt);
       const result = f(stmt);
       // trace(fname, result);
       return result;
@@ -189,10 +189,10 @@ export function Factory(Module) {
     const fname = "sqlite3_bind_double";
     const f = Module.cwrap(fname, ...decl("nnn:n"));
     return function (stmt, i, value) {
-      verifyStatement(stmt);
+      // verifyStatement(stmt);
       const result = f(stmt, i, value);
       // trace(fname, result);
-      return check(fname, result, mapStmtToDB.get(stmt));
+      return check(fname, result, null, stmt);
     };
   })();
 
@@ -200,12 +200,12 @@ export function Factory(Module) {
     const fname = "sqlite3_bind_int";
     const f = Module.cwrap(fname, ...decl("nnn:n"));
     return function (stmt, i, value) {
-      verifyStatement(stmt);
+      // verifyStatement(stmt);
       if (value > 0x7fffffff || value < -0x80000000) return SQLite.SQLITE_RANGE;
 
       const result = f(stmt, i, value);
       // trace(fname, result);
-      return check(fname, result, mapStmtToDB.get(stmt));
+      return check(fname, result, null, stmt);
     };
   })();
 
@@ -213,14 +213,14 @@ export function Factory(Module) {
     const fname = "sqlite3_bind_int64";
     const f = Module.cwrap(fname, ...decl("nnnn:n"));
     return function (stmt, i, value) {
-      verifyStatement(stmt);
+      // verifyStatement(stmt);
       if (value > MAX_INT64 || value < MIN_INT64) return SQLite.SQLITE_RANGE;
 
       const lo32 = value & 0xffffffffn;
       const hi32 = value >> 32n;
       const result = f(stmt, i, Number(lo32), Number(hi32));
       // trace(fname, result);
-      return check(fname, result, mapStmtToDB.get(stmt));
+      return check(fname, result, null, stmt);
     };
   })();
 
@@ -228,10 +228,10 @@ export function Factory(Module) {
     const fname = "sqlite3_bind_null";
     const f = Module.cwrap(fname, ...decl("nn:n"));
     return function (stmt, i) {
-      verifyStatement(stmt);
+      // verifyStatement(stmt);
       const result = f(stmt, i);
       // trace(fname, result);
-      return check(fname, result, mapStmtToDB.get(stmt));
+      return check(fname, result, null, stmt);
     };
   })();
 
@@ -239,7 +239,7 @@ export function Factory(Module) {
     const fname = "sqlite3_bind_parameter_name";
     const f = Module.cwrap(fname, ...decl("n:s"));
     return function (stmt, i) {
-      verifyStatement(stmt);
+      // verifyStatement(stmt);
       const result = f(stmt, i);
       // trace(fname, result);
       return result;
@@ -250,11 +250,11 @@ export function Factory(Module) {
     const fname = "sqlite3_bind_text";
     const f = Module.cwrap(fname, ...decl("nnnnn:n"));
     return function (stmt, i, value) {
-      verifyStatement(stmt);
+      // verifyStatement(stmt);
       const ptr = createUTF8(value);
       const result = f(stmt, i, ptr, -1, sqliteFreeAddress);
       // trace(fname, result);
-      return check(fname, result, mapStmtToDB.get(stmt));
+      return check(fname, result, null, stmt);
     };
   })();
 
@@ -504,7 +504,7 @@ export function Factory(Module) {
       }
       const result = await f(stmt);
 
-      const db = mapStmtToDB.get(stmt);
+      // const db = mapStmtToDB.get(stmt);
       mapStmtToDB.delete(stmt);
 
       // Don't throw on error here. Typically the error has already been
@@ -594,7 +594,7 @@ export function Factory(Module) {
     return async function (stmt) {
       verifyStatement(stmt);
       const result = await f(stmt);
-      return check(fname, result, mapStmtToDB.get(stmt));
+      return check(fname, result, null, stmt);
     };
   })();
 
@@ -737,12 +737,22 @@ export function Factory(Module) {
     const fname = "sqlite3_step";
     const f = Module.cwrap(fname, ...decl("n:n"), { async });
     return async function (stmt) {
-      verifyStatement(stmt);
+      // verifyStatement(stmt);
       const result = await f(stmt);
-      return check(fname, result, mapStmtToDB.get(stmt), [
+      return check(fname, result, null, stmt, [
         SQLite.SQLITE_ROW,
         SQLite.SQLITE_DONE
       ]);
+    };
+  })();
+
+  sqlite3.last_insert_rowid = (function () {
+    const fname = "sqlite3_last_insert_rowid";
+    const f = Module.cwrap(fname, ...decl("n:n"));
+    return function (db) {
+      verifyDatabase(db);
+      const result = f(db);
+      return result;
     };
   })();
 
@@ -907,9 +917,16 @@ export function Factory(Module) {
     return check("sqlite3_vfs_register", result);
   };
 
-  function check(fname, result, db = null, allowed = [SQLite.SQLITE_OK]) {
+  function check(
+    fname,
+    result,
+    db = null,
+    stmt = null,
+    allowed = [SQLite.SQLITE_OK]
+  ) {
     // trace(fname, result);
     if (allowed.includes(result)) return result;
+    db = db || (stmt !== null ? mapStmtToDB.get(stmt) : null);
     const message = db
       ? Module.ccall("sqlite3_errmsg", "string", ["number"], [db])
       : fname;

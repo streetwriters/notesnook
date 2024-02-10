@@ -36,7 +36,7 @@ export const createDialect = (name: string): Dialect => {
   return {
     createDriver: () =>
       new WaSqliteWorkerDriver({
-        async: isFeatureSupported("opfs") ? false : true,
+        async: !isFeatureSupported("opfs"),
         dbName: name
       }),
     createAdapter: () => new SqliteAdapter(),
