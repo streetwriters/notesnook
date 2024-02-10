@@ -783,9 +783,8 @@ export const settingsGroups: SettingSection[] = [
         sections: [
           {
             id: "app-lock-mode",
-            name: "Enable app lock",
-            description:
-              "Select the mode for the desired level of app lock security.",
+            name: "App lock",
+            description: "Keep intruders away with app lock security.",
             icon: "lock",
             type: "switch",
             property: "appLockEnabled",
@@ -884,14 +883,14 @@ export const settingsGroups: SettingSection[] = [
             id: "app-lock-timer",
             name: "App lock timeout",
             description:
-              "Set the time after which the app should lock in background",
+              "Set the time after which the app should lock when in background",
             type: "component",
             component: "applock-timer"
           },
           {
             id: "app-lock-pin",
             name: "Setup app lock password",
-            description: "Setup a new app lock password for app lock",
+            description: "Set up a password or pin for app lock",
             hidden: () => {
               return !!SettingsService.getProperty(
                 "appLockHasPasswordSecurity"
@@ -905,7 +904,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "app-lock-pin-change",
             name: "Change app lock pin",
-            description: "Set up a new pin for the app lock",
+            description: "Set up a password or pin for app lock",
             hidden: () => {
               return !SettingsService.getProperty("appLockHasPasswordSecurity");
             },
@@ -916,9 +915,16 @@ export const settingsGroups: SettingSection[] = [
           },
           {
             id: "app-lock-pin-remove",
-            name: "Remove app lock pin",
-            description:
-              "Remove app lock pin, app lock will fallback to using account password to unlock the app",
+            name: `Remove app lock ${
+              SettingsService.getProperty("applockKeyboardType") === "numeric"
+                ? "pin"
+                : "password"
+            }`,
+            description: `Remove app lock ${
+              SettingsService.getProperty("applockKeyboardType") === "numeric"
+                ? "pin"
+                : "password"
+            }, app lock will fallback to using account password to unlock the app`,
             hidden: () => {
               return !SettingsService.getProperty("appLockHasPasswordSecurity");
             },

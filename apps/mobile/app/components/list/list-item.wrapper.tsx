@@ -159,7 +159,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
     case "note": {
       return (
         <>
-          {groupHeader && previousIndex.current === index ? (
+          {groupHeader && previousIndex.current === index && !isSheet ? (
             <SectionHeader
               screen={props.renderedInRoute}
               item={groupHeader}
@@ -194,7 +194,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
     case "notebook":
       return (
         <>
-          {groupHeader && previousIndex.current === index ? (
+          {groupHeader && previousIndex.current === index && !isSheet ? (
             <SectionHeader
               screen={props.renderedInRoute}
               item={groupHeader}
@@ -222,7 +222,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
     case "reminder":
       return (
         <>
-          {groupHeader && previousIndex.current === index ? (
+          {groupHeader && previousIndex.current === index && !isSheet ? (
             <SectionHeader
               screen={props.renderedInRoute}
               item={groupHeader}
@@ -248,7 +248,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
     case "tag":
       return (
         <>
-          {groupHeader && previousIndex.current === index ? (
+          {groupHeader && previousIndex.current === index && !isSheet ? (
             <SectionHeader
               screen={props.renderedInRoute}
               item={groupHeader}
