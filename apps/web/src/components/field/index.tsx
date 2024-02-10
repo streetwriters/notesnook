@@ -29,6 +29,7 @@ export type FieldProps = InputProps & {
   helpText?: string;
   inputRef?: React.Ref<HTMLInputElement>;
   ["data-test-id"]?: string;
+  validate?: (text: string) => boolean;
   styles?: {
     input?: ThemeUIStyleObject;
     label?: ThemeUIStyleObject;
@@ -53,10 +54,12 @@ function Field(props: FieldProps) {
     id,
     type,
     inputRef,
+    validate,
     ...inputProps
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const colorScheme = useThemeStore((state) => state.colorScheme);
+  const [isValid, setIsValid] = useState(true);
 
   return (
     <Flex
@@ -96,6 +99,7 @@ function Field(props: FieldProps) {
       <Flex mt={1} sx={{ position: "relative" }}>
         <Input
           {...inputProps}
+          variant={isValid ? inputProps.variant || "input" : "error"}
           ref={inputRef}
           id={id}
           type={isPasswordVisible ? "text" : type || "text"}
@@ -106,6 +110,11 @@ function Field(props: FieldProps) {
               bg: "background-disabled"
             },
             colorScheme
+          }}
+          onChange={(e) => {
+            const isValid = !validate || validate(e.target.value);
+            setIsValid(isValid);
+            if (isValid && inputProps.onChange) inputProps.onChange(e);
           }}
         />
         {type === "password" && (

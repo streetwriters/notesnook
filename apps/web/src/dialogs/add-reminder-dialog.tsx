@@ -22,6 +22,7 @@ import Dialog from "../components/dialog";
 import Field from "../components/field";
 import { Box, Button, Flex, Label, Radio, Text } from "@theme-ui/components";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useEffect, useRef, useState } from "react";
 import { db } from "../common/db";
 import { useStore } from "../stores/reminder-store";
@@ -34,7 +35,9 @@ import "react-day-picker/dist/style.css";
 import { PopupPresenter } from "@notesnook/ui";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { getFormattedDate } from "@notesnook/common";
-import { MONTHS_FULL } from "@notesnook/core/dist/utils/date";
+import { MONTHS_FULL, getTimeFormat } from "@notesnook/core/dist/utils/date";
+
+dayjs.extend(customParseFormat);
 
 export type AddReminderDialogProps = {
   onClose: Perform;
@@ -123,8 +126,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
   const [priority, setPriority] = usePersistentState<
     ValueOf<typeof Priorities>
   >("reminders:default_priority", Priorities.VIBRATE);
-  const [date, setDate] = useState(dayjs().format("YYYY-MM-DD"));
-  const [time, setTime] = useState(dayjs().format("HH:mm"));
+  const [date, setDate] = useState(dayjs());
   const [title, setTitle] = useState<string>();
   const [description, setDescription] = useState<string>();
   const [showCalendar, setShowCalendar] = useState(false);
@@ -142,8 +144,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
       setRecurringMode(reminder.recurringMode || RecurringModes.DAY);
       setMode(reminder.mode || Modes.ONCE);
       setPriority(reminder.priority || Priorities.VIBRATE);
-      setDate(dayjs(reminder.date).format("YYYY-MM-DD"));
-      setTime(dayjs(reminder.date).format("HH:mm"));
+      setDate(dayjs(reminder.date));
       setTitle(reminder.title);
       setDescription(reminder.description);
     });
@@ -194,9 +195,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             return;
           }
 
-          const dateTime = dayjs(getDateTime(date, time));
-
-          if (mode !== Modes.REPEAT && dateTime.isBefore(dayjs())) {
+          if (mode !== Modes.REPEAT && date.isBefore(dayjs())) {
             showToast(
               "error",
               "Reminder time cannot be earlier than the current time."
@@ -210,11 +209,11 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             mode,
             priority,
             selectedDays,
-            date: dateTime.valueOf(),
+            date: date.valueOf(),
             title,
             description,
             disabled: false,
-            ...(dateTime.isAfter(dayjs()) ? { snoozeUntil: 0 } : {})
+            ...(date.isAfter(dayjs()) ? { snoozeUntil: 0 } : {})
           });
 
           if (id && noteId) {
@@ -390,15 +389,18 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
               required
               inputRef={dateInputRef}
               data-test-id="date-input"
-              defaultValue={getFormattedDate(date, "date")}
-              readOnly
+              helpText={`${db.settings.getDateFormat()}`}
               action={{
                 icon: Calendar,
                 onClick() {
                   setShowCalendar(true);
                 }
               }}
-              onClick={() => setShowCalendar(true)}
+              validate={(t) =>
+                dayjs(t, db.settings.getDateFormat(), true).isValid()
+              }
+              defaultValue={date.format(db.settings.getDateFormat())}
+              onChange={(e) => setDate((d) => setDateOnly(e.target.value, d))}
             />
             <PopupPresenter
               isOpen={showCalendar}
@@ -406,7 +408,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
               position={{
                 isTargetAbsolute: true,
                 target: dateInputRef.current,
-                location: "below"
+                location: "top"
               }}
               sx={{
                 ".rdp": {
@@ -436,10 +438,10 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                 }}
                 selected={dayjs(date).toDate()}
                 onSelect={(day) => {
-                  const date = dayjs(day).format("YYYY-MM-DD");
-                  setDate(date);
-                  if (dateInputRef.current)
-                    dateInputRef.current.value = getFormattedDate(date, "date");
+                  if (!day) return;
+                  const date = getFormattedDate(day, "date");
+                  setDate((d) => setDateOnly(date, d));
+                  if (dateInputRef.current) dateInputRef.current.value = date;
                 }}
                 styles={{
                   day: {
@@ -460,9 +462,9 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                 value: `${index}`,
                 title: month
               }))}
-              onSelectionChanged={(month) =>
-                setDate(dayjs(date).month(parseInt(month)).format("YYYY-MM-DD"))
-              }
+              onSelectionChanged={(month) => {
+                setDate((d) => d.month(parseInt(month)));
+              }}
             />
             <LabeledSelect
               id="day"
@@ -474,9 +476,9 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
                   value: `${day + 1}`,
                   title: `${day + 1}`
                 }))}
-              onSelectionChanged={(day) =>
-                setDate(dayjs(date).date(parseInt(day)).format("YYYY-MM-DD"))
-              }
+              onSelectionChanged={(day) => {
+                setDate((d) => d.date(parseInt(day)));
+              }}
             />
           </>
         ) : null}
@@ -484,13 +486,17 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
           id="time"
           label="Time"
           required
-          type="time"
           data-test-id="time-input"
-          defaultValue={time}
-          value={time}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setTime(e.target.value);
+          helpText={`${
+            db.settings.getTimeFormat() === "12-hour" ? "hh:mm AM/PM" : "hh:mm"
+          }`}
+          validate={(t) => {
+            const format =
+              db.settings.getTimeFormat() === "12-hour" ? "hh:mm a" : "HH:mm";
+            return dayjs(t.toLowerCase(), format, true).isValid();
           }}
+          defaultValue={date.format(getTimeFormat(db.settings.getTimeFormat()))}
+          onChange={(e) => setDate((d) => setTimeOnly(e.target.value, d))}
         />
       </Flex>
       <Flex sx={{ gap: 2, mt: 2 }}>
@@ -525,27 +531,35 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
               ? "Select day of the week to repeat the reminder."
               : "Select nth day(s) of the month to repeat the reminder."
             : repeatsDaily
-            ? `Repeats daily at ${dayjs(getDateTime(date, time)).format(
-                "hh:mm A"
-              )}.`
+            ? `Repeats daily at ${date.format(timeFormat())}.`
             : `Repeats every ${recurringMode} on ${getSelectedDaysText(
                 selectedDays,
                 recurringMode
-              )} at ${dayjs(getDateTime(date, time)).format("hh:mm A")}.`}
+              )} at ${date.format(timeFormat())}.`}
         </Text>
       ) : (
         <Text variant="subBody" sx={{ mt: 1 }}>
-          {`The reminder will start on ${date} at ${dayjs(
-            getDateTime(date, time)
-          ).format("hh:mm A")}.`}
+          {`The reminder will start on ${date} at ${date.format(
+            timeFormat()
+          )}.`}
         </Text>
       )}
     </Dialog>
   );
 }
 
-function getDateTime(date: string, time: string) {
-  return `${date} ${time}`;
+function setTimeOnly(str: string, date: dayjs.Dayjs) {
+  const value = dayjs(str, timeFormat(), true);
+  return date.hour(value.hour()).minute(value.minute());
+}
+
+function timeFormat() {
+  return getTimeFormat(db.settings.getTimeFormat());
+}
+
+function setDateOnly(str: string, date: dayjs.Dayjs) {
+  const value = dayjs(str, db.settings.getDateFormat(), true);
+  return date.year(value.year()).month(value.month()).date(value.date());
 }
 
 function getSelectedDaysText(
