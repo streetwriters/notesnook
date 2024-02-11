@@ -96,12 +96,12 @@ function ListContainer(props: ListContainerProps) {
     length: items.length,
     reset: () => toggleSelection(false),
     deselect: (index) => {
-      const id = items.cacheItem(index)?.item.id;
+      const id = items.cacheItem(index)?.item?.id;
       if (!id) return;
       deselectItem(id);
     },
     select: (index, toggleable) => {
-      const id = items.cacheItem(index)?.item.id;
+      const id = items.cacheItem(index)?.item?.id;
       if (!id) return;
       if (toggleable && isSelected(id)) deselectItem(id);
       else selectItem(id);
@@ -111,12 +111,12 @@ function ListContainer(props: ListContainerProps) {
         indices.length === items.length
           ? await items.ids()
           : (indices
-              .map((i) => items.cacheItem(i)?.item.id)
+              .map((i) => items.cacheItem(i)?.item?.id)
               .filter(Boolean) as string[]);
       setSelectedItems(ids);
     },
     focusItemAt: (index) => {
-      const id = items.cacheItem(index)?.item.id;
+      const id = items.cacheItem(index)?.item?.id;
       if (!id || !listRef.current) return;
 
       waitForElement(listRef.current, index, `id_${id}`, (element) =>
@@ -125,7 +125,7 @@ function ListContainer(props: ListContainerProps) {
     },
     skip: () => false,
     open: (index) => {
-      const id = items.cacheItem(index)?.item.id;
+      const id = items.cacheItem(index)?.item?.id;
       if (!id || !listRef.current) return;
 
       waitForElement(listRef.current, index, `id_${id}`, (element) =>
