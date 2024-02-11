@@ -402,7 +402,10 @@ const migrations: Migration[] = [
         delete item.resolved;
         return true;
       },
-      all: () => true
+      all: (item) => {
+        delete item.deleteReason;
+        return true;
+      }
     },
     async vaultKey(db, key) {
       await db.vaults.add({ title: "Default", key });
