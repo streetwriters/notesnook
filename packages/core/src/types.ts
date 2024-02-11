@@ -149,6 +149,11 @@ export interface BaseItem<TType extends ItemType> {
   remote?: boolean;
   synced?: boolean;
   deleted?: boolean;
+
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  deleteReason?: never;
 }
 
 export type NotebookReference = {
