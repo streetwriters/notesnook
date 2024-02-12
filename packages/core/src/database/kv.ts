@@ -72,4 +72,8 @@ export class KVStorage {
   async delete<T extends keyof KV>(key: T) {
     await this.db().deleteFrom("kv").where("key", "==", key).execute();
   }
+
+  async clear() {
+    await this.db().deleteFrom("kv").execute();
+  }
 }

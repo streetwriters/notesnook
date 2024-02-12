@@ -172,7 +172,7 @@ class UserManager {
       );
 
       const user = await this.fetchUser();
-      if (!user) throw new Error("Unauthorized.");
+      if (!user) throw new Error("Failed to fetch user.");
 
       if (!sessionExpired) {
         await this.db.setLastSynced(0);
