@@ -34,6 +34,7 @@ import { isCipher } from "./crypto.js";
 import { migrateItem } from "../migrations";
 import { DatabaseCollection } from "./index.js";
 import { DefaultColors } from "../collections/colors.js";
+import { toChunks } from "../utils/array.js";
 
 type BackupDataItem = MaybeDeletedItem<Item> | string[];
 type BackupPlatform = "web" | "mobile" | "node";
@@ -157,7 +158,94 @@ export default class Backup {
     await this.db.kv().write("lastBackupTime", Date.now());
   }
 
+  /**
+   * @deprecated
+   */
+  async *exportLegacy(type: BackupPlatform, encrypt = false) {
+    if (!validTypes.some((t) => t === type))
+      throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
+    if (encrypt && !(await this.db.user.getLegacyUser()))
+      throw new Error("Please login to create encrypted backups.");
+
+    const key = await this.db.user.getLegacyEncryptionKey();
+    if (encrypt && !key) throw new Error("No encryption key found.");
+
+    const keys = await this.db.storage().getAllKeys();
+    const chunks = toChunks(keys, 20);
+    let buffer: string[] = [];
+    let bufferLength = 0;
+    const MAX_CHUNK_SIZE = 10 * 1024 * 1024;
+    let chunkIndex = 0;
+
+    while (chunks.length > 0) {
+      const chunk = chunks.pop();
+      if (!chunk) break;
+
+      const items = await this.db.storage().readMulti(chunk);
+      items.forEach(([id, item]) => {
+        const isDeleted =
+          item &&
+          typeof item === "object" &&
+          "deleted" in item &&
+          !("type" in item);
+
+        if (
+          !item ||
+          invalidKeys.includes(id) ||
+          isDeleted ||
+          id.startsWith("_uk_")
+        )
+          return;
+
+        const data = JSON.stringify(item);
+        buffer.push(data);
+        bufferLength += data.length;
+      });
+
+      if (bufferLength >= MAX_CHUNK_SIZE || chunks.length === 0) {
+        let itemsJSON = `[${buffer.join(",")}]`;
+
+        buffer = [];
+        bufferLength = 0;
+
+        itemsJSON = await this.db.compressor().compress(itemsJSON);
+
+        const hash = SparkMD5.hash(itemsJSON);
+
+        if (encrypt && key)
+          itemsJSON = JSON.stringify(
+            await this.db.storage().encrypt(key, itemsJSON)
+          );
+        else itemsJSON = JSON.stringify(itemsJSON);
+
+        yield {
+          path: `${chunkIndex++}-${encrypt ? "encrypted" : "plain"}-${hash}`,
+          data: `{
+"version": ${CURRENT_DATABASE_VERSION},
+"type": "${type}",
+"date": ${Date.now()},
+"data": ${itemsJSON},
+"hash": "${hash}",
+"hash_type": "md5",
+"compressed": true,
+"encrypted": ${encrypt ? "true" : "false"}
+}`
+        };
+      }
+    }
+
+    if (bufferLength > 0 || buffer.length > 0)
+      throw new Error("Buffer not empty.");
+
+    await this.updateBackupTime();
+  }
+
   async *export(type: BackupPlatform, encrypt = false) {
+    if (this.db.migrations.version === 5.9) {
+      yield* this.exportLegacy(type, encrypt);
+      return;
+    }
+
     if (!validTypes.some((t) => t === type))
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
     if (encrypt && !(await this.db.user.getUser()))
