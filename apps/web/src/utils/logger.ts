@@ -26,6 +26,7 @@ import { LogMessage } from "@notesnook/logger";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { ZipFile, createZipStream } from "./streams/zip-stream";
 import { createWriteStream } from "./stream-saver";
+import { sanitizeFilename } from "@notesnook/common";
 
 let logger: typeof _logger;
 async function initalizeLogger(persistence: DatabasePersistence = "db") {
@@ -36,19 +37,23 @@ async function initalizeLogger(persistence: DatabasePersistence = "db") {
 async function downloadLogs() {
   if (!logManager) return;
   const allLogs = await logManager.get();
+  let i = 0;
   const textEncoder = new TextEncoder();
   await new ReadableStream<ZipFile>({
     pull(controller) {
-      for (const log of allLogs) {
-        controller.enqueue({
-          path: log.key,
-          data: textEncoder.encode(
-            (log.logs as LogMessage[])
-              .map((line) => JSON.stringify(line))
-              .join("\n")
-          )
-        });
+      const log = allLogs[i++];
+      if (!log) {
+        controller.close();
+        return;
       }
+      controller.enqueue({
+        path: sanitizeFilename(log.key, { replacement: "-" }),
+        data: textEncoder.encode(
+          (log.logs as LogMessage[])
+            .map((line) => JSON.stringify(line))
+            .join("\n")
+        )
+      });
     }
   })
     .pipeThrough(createZipStream())
