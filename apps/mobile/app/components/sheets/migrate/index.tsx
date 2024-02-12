@@ -30,6 +30,7 @@ import {
   presentSheet
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
+import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
@@ -90,21 +91,27 @@ export default function Migrate() {
 
   const startMigration = useCallback(async () => {
     try {
+      useUserStore.setState({
+        disableAppLockRequests: true
+      });
       setLoading(true);
-      await sleep(1000);
+      await sleep(1);
       const backupSaved = await BackupService.run(false, "local");
       if (!backupSaved) {
         ToastManager.show({
           heading: "Migration failed",
           message: "You must download a backup of your data before migrating.",
-          context: "local"
+          context: "local",
+          type: "error"
         });
         setLoading(false);
         return;
       }
       await db.migrations?.migrate();
+      useUserStore.setState({
+        disableAppLockRequests: false
+      });
       eSendEvent(eCloseSheet);
-      await sleep(500);
       setLoading(false);
     } catch (e) {
       setLoading(false);

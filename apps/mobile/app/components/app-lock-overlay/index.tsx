@@ -20,12 +20,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useCallback, useEffect, useRef } from "react";
 import { Platform, TextInput, View } from "react-native";
 //@ts-ignore
+import { useThemeColors } from "@notesnook/theme";
 import { enabled } from "react-native-privacy-snapshot";
-import { db } from "../../common/database";
+import { DatabaseLogger } from "../../common/database";
+import {
+  decrypt,
+  encrypt,
+  getCryptoKey,
+  getDatabaseKey,
+  setAppLockVerificationCipher,
+  validateAppLockPassword
+} from "../../common/database/encryption";
+import { MMKV } from "../../common/database/mmkv";
 import { useAppState } from "../../hooks/use-app-state";
 import BiometricService from "../../services/biometrics";
+import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { SIZE } from "../../utils/size";
@@ -35,11 +45,37 @@ import Input from "../ui/input";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { validateAppLockPassword } from "../../common/database/encryption";
+
+const getUser = () => {
+  const user = MMKV.getString("user");
+  if (user) {
+    return JSON.parse(user);
+  }
+};
+
+const verifyUserPassword = async (password: string) => {
+  try {
+    await getDatabaseKey();
+    const key = await getCryptoKey();
+    const user = getUser();
+    const cipher = await encrypt(
+      {
+        key: key,
+        salt: user.salt
+      },
+      "notesnook"
+    );
+    const plainText = await decrypt({ password }, cipher);
+    return plainText === "notesnook";
+  } catch (e) {
+    DatabaseLogger.error(e as Error);
+    return false;
+  }
+};
 
 const AppLockedOverlay = () => {
   const { colors } = useThemeColors();
-  const user = useUserStore((state) => state.user);
+  const user = getUser();
   const appLocked = useUserStore((state) => state.appLocked);
   const lockApp = useUserStore((state) => state.lockApp);
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -93,9 +129,18 @@ const AppLockedOverlay = () => {
     try {
       const unlocked = appLockHasPasswordSecurity
         ? validateAppLockPassword(password.current)
-        : await db.user.verifyPassword(password.current);
+        : await verifyUserPassword(password.current);
 
       if (unlocked) {
+        if (!appLockHasPasswordSecurity) {
+          await setAppLockVerificationCipher(password.current);
+          SettingsService.set({
+            appLockHasPasswordSecurity: true,
+            applockKeyboardType: "default"
+          });
+          DatabaseLogger.info("App lock migrated to password security");
+        }
+
         lockApp(false);
         enabled(false);
         password.current = undefined;
