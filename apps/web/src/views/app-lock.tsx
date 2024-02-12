@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { PropsWithChildren, useEffect, useState } from "react";
+import {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 import { useStore as useSettingStore } from "../stores/setting-store";
 import { usePromise } from "@notesnook/common";
 import { KeyChain } from "../interfaces/key-store";
@@ -29,6 +35,7 @@ import { startIdleDetection } from "../utils/idle-detection";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
 import { closeOpenedDialog } from "../common/dialog-controller";
 import { WebAuthn } from "../utils/webauthn";
+import { setDocumentTitle } from "../utils/dom";
 
 export default function AppLock(props: PropsWithChildren<unknown>) {
   const keychain = usePromise(async () => ({
@@ -38,6 +45,17 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
   const [error, setError] = useState<string>();
   const [isUnlocking, setIsUnlocking] = useState(false);
   const appLockSettings = useSettingStore((store) => store.appLockSettings);
+  const windowTitle = useRef(document.title);
+
+  const lockApp = useCallback(() => {
+    if (keychain.status !== "fulfilled" || keychain.value.isLocked) return;
+
+    windowTitle.current = document.title;
+    KeyChain.relock();
+    closeOpenedDialog();
+    setDocumentTitle();
+    keychain.refresh();
+  }, [keychain]);
 
   useEffect(() => {
     const { lockAfter, enabled } = appLockSettings;
@@ -52,25 +70,17 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
     if (lockAfter > 0) {
       const stop = startIdleDetection(
         appLockSettings.lockAfter * 60 * 1000,
-        () => {
-          KeyChain.relock();
-          closeOpenedDialog();
-          keychain.refresh();
-        }
+        lockApp
       );
       return () => stop();
     } else if (lockAfter === 0) {
       const stop = onPageVisibilityChanged((_, hidden) => {
-        if (hidden) {
-          KeyChain.relock();
-          closeOpenedDialog();
-          keychain.refresh();
-        }
+        if (hidden) lockApp();
       });
 
       return () => stop();
     }
-  }, [appLockSettings, keychain]);
+  }, [appLockSettings, lockApp, keychain]);
 
   if (keychain.status === "fulfilled" && !keychain.value.isLocked)
     return <>{props.children}</>;
@@ -101,7 +111,10 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
           }
 
           await KeyChain.unlock({ type: "password", id: "primary", password })
-            .then(() => keychain.refresh())
+            .then(() => {
+              setDocumentTitle(windowTitle.current);
+              keychain.refresh();
+            })
             .catch((e) => {
               setError(
                 typeof e === "string"
