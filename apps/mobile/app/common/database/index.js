@@ -78,6 +78,7 @@ export async function setupDatabase(password) {
         createQueryCompiler: () => new SqliteQueryCompiler()
       }),
       tempStore: "memory",
+      journalMode: Platform.OS === "ios" ? "DELETE" : "WAL",
       password: key
     }
   });

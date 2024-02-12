@@ -629,22 +629,6 @@ export const useAppEvents = () => {
     }
   }
 
-  const IsDatabaseMigrationRequired = useCallback(() => {
-    if (!db.migrations.required() || appLocked) return false;
-
-    presentSheet({
-      component: <Migrate />,
-      onClose: async () => {
-        if (!db.isInitialized) {
-          await db.init();
-        }
-        useSettingStore.getState().setAppLoading(false);
-      },
-      disableClosing: true
-    });
-    return true;
-  }, [appLocked]);
-
   useEffect(() => {
     if (!loading) {
       onUserUpdated();
@@ -652,45 +636,53 @@ export const useAppEvents = () => {
     }
   }, [loading, onUserUpdated]);
 
-  const initializeDatabase = useCallback(
-    async (password?: string) => {
-      if (useUserStore.getState().appLocked) return;
-      if (!db.isInitialized) {
-        RNBootSplash.hide({ fade: true });
-        DatabaseLogger.info("Initializing database");
-        try {
-          await setupDatabase(password);
-          await db.init();
-          Notifications.setupReminders(true);
-        } catch (e) {
-          DatabaseLogger.error(e as Error);
-          ToastManager.error(
-            e as Error,
-            "Error initializing database",
-            "global"
-          );
-        }
-      }
+  const initializeDatabase = useCallback(async (password?: string) => {
+    const IsDatabaseMigrationRequired = () => {
+      if (!db.migrations.required() || useUserStore.getState().appLocked)
+        return false;
 
-      if (db.isInitialized) {
-        useSettingStore.getState().setAppLoading(false);
+      presentSheet({
+        component: <Migrate />,
+        onClose: () => {
+          if (!db.migrations.required()) {
+            initializeDatabase();
+          }
+        },
+        disableClosing: true
+      });
+      return true;
+    };
+
+    if (useUserStore.getState().appLocked) return;
+    if (!db.isInitialized) {
+      RNBootSplash.hide({ fade: true });
+      DatabaseLogger.info("Initializing database");
+      try {
+        await setupDatabase(password);
+        await db.init();
+      } catch (e) {
+        DatabaseLogger.error(e as Error);
+        ToastManager.error(e as Error, "Error initializing database", "global");
       }
-      if (IsDatabaseMigrationRequired()) return;
-      Walkthrough.init();
-    },
-    [IsDatabaseMigrationRequired]
-  );
+    }
+
+    if (IsDatabaseMigrationRequired()) return;
+
+    if (db.isInitialized) {
+      Notifications.setupReminders(true);
+      useSettingStore.getState().setAppLoading(false);
+      DatabaseLogger.info("Database initialized");
+    }
+    Walkthrough.init();
+  }, []);
 
   useEffect(() => {
     let sub: () => void;
     if (appLocked) {
       const sub = useUserStore.subscribe((state) => {
         if (!state.appLocked && useSettingStore.getState().isAppLoading) {
-          initializeDatabase(useSettingStore.getState().dbPassword);
-          useSettingStore.setState({
-            dbPassword: undefined
-          });
-
+          console.log("DB initialized");
+          initializeDatabase();
           sub();
         }
       });

@@ -47,18 +47,29 @@ function resetSettings() {
 
 function migrateAppLock() {
   const appLockMode = get().appLockMode;
-  if (appLockMode === "none") return;
+  if (appLockMode === "none") {
+    if (
+      get().appLockEnabled &&
+      !get().appLockHasPasswordSecurity &&
+      !get().biometricsAuthEnabled
+    ) {
+      setProperty("biometricsAuthEnabled", true);
+    }
+    return;
+  }
   if (appLockMode === "background") {
     set({
       appLockEnabled: true,
       appLockTimer: 0,
-      appLockMode: "none"
+      appLockMode: "none",
+      biometricsAuthEnabled: true
     });
   } else if (appLockMode === "launch") {
     set({
       appLockEnabled: true,
       appLockTimer: -1,
-      appLockMode: "none"
+      appLockMode: "none",
+      biometricsAuthEnabled: true
     });
   }
   DatabaseLogger.debug("App lock Migrated");

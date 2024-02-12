@@ -123,7 +123,7 @@ export default function NotePreview({ session, content, note }) {
             readonly
             editorId={editorId}
             onLoad={async () => {
-              const _note = note || db.notes.note(session?.noteId)?.data;
+              const _note = note || (await db.notes.note(session?.noteId));
               eSendEvent(eOnLoadNote + editorId, {
                 item: {
                   ..._note,
