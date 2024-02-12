@@ -38,6 +38,7 @@ navigation:
       - path: importing-notes/import-notes-from-simplenote.md
       - path: importing-notes/import-notes-from-standardnotes.md
       - path: importing-notes/import-notes-from-zoho-notebook.md
+      - path: importing-notes/import-notes-from-skiff-pages.md
       - path: importing-notes/import-notes-from-obsidian.md
       - path: importing-notes/import-notes-from-html-files.md
       - path: importing-notes/import-notes-from-markdown-files.md
