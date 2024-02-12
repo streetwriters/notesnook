@@ -208,7 +208,7 @@ const migrations: Migration[] = [
         const colorCode = DefaultColors[item.title];
         if (colorCode) {
           const newColor = await db.colors.all.find((eb) =>
-            eb.or([eb("title", "in", [alias, item.title])])
+            eb("title", "in", [alias, item.title])
           );
           if (newColor) return "skip";
 
@@ -216,7 +216,7 @@ const migrations: Migration[] = [
           (item as unknown as Color).colorCode = colorCode;
         } else {
           const newTag = await db.tags.all.find((eb) =>
-            eb.or([eb("title", "in", [alias, item.title])])
+            eb("title", "in", [alias, item.title])
           );
           if (newTag) return "skip";
         }
@@ -235,7 +235,7 @@ const migrations: Migration[] = [
           const oldTag = db.legacyTags.get(oldTagId);
           const alias = db.legacySettings.getAlias(oldTagId);
           const newTag = await db.tags.all.find((eb) =>
-            eb.or([eb("title", "in", [alias, tag])])
+            eb("title", "in", [alias, tag])
           );
 
           const newTagId =
@@ -256,7 +256,7 @@ const migrations: Migration[] = [
           const oldColor = db.legacyColors.get(oldColorId);
           const alias = db.legacySettings.getAlias(oldColorId);
           const newColor = await db.colors.all.find((eb) =>
-            eb.or([eb("title", "in", [alias, item.color])])
+            eb("title", "in", [alias, item.color])
           );
 
           const newColorId =
@@ -470,10 +470,9 @@ export async function migrateItem<TItemType extends MigrationItemType>(
       count++;
     }
 
-    if (isDeleted(item)) continue;
-
     const itemMigrator = migration.items[type];
-    if (!itemMigrator) continue;
+    if (isDeleted(item) || !itemMigrator) continue;
+
     result = await itemMigrator(item, database, migrationType);
     if (result === "skip") return "skip";
     if (result) {
