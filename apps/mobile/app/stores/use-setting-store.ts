@@ -165,7 +165,6 @@ export const defaultSettings: SettingStore["settings"] = {
   colorScheme: "light",
   lighTheme: ThemeLight,
   darkTheme: ThemeDark,
-  biometricsAuthEnabled: false,
   appLockHasPasswordSecurity: false
 };
 

@@ -24,7 +24,8 @@ import {
   Reminder,
   Shortcut,
   Tag,
-  VirtualizedGrouping
+  VirtualizedGrouping,
+  HistorySession
 } from "@notesnook/core";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../common/database";
@@ -43,6 +44,7 @@ type ItemTypeKey = {
   reminder: Reminder;
   attachment: Attachment;
   shortcut: Shortcut;
+  noteHistory: HistorySession;
 };
 
 function isValidIdOrIndex(idOrIndex?: string | number) {
@@ -83,8 +85,6 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
             `db.${type}s.${type}(id: string)`
           );
         } else {
-          console.log("get notebook");
-
           (db as any)[type + "s"]
             ?.[type]?.(idOrIndex as string)
             .then((item: ItemTypeKey[T]) => {

@@ -70,6 +70,7 @@ import { useDragState } from "./editor/state";
 import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import { refreshAllStores } from "../../stores/create-db-collection-store";
 type User = any;
 
 export const settingsGroups: SettingSection[] = [
@@ -299,6 +300,7 @@ export const settingsGroups: SettingSection[] = [
                       await BiometicService.resetCredentials();
                       MMKV.clearStore();
                       clearAllStores();
+                      refreshAllStores();
                       Navigation.queueRoutesForUpdate();
                       SettingsService.resetSettings();
                       useUserStore.getState().setUser(null);
@@ -853,14 +855,13 @@ export const settingsGroups: SettingSection[] = [
 
               if (
                 !(await BiometicService.isBiometryAvailable()) &&
-                !useUserStore.getState().user &&
                 !SettingsService.getProperty("appLockHasPasswordSecurity")
               ) {
                 ToastManager.show({
                   heading: "Biometrics not enrolled",
                   type: "error",
                   message:
-                    "To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone or create an account."
+                    "To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone."
                 });
                 SettingsService.setProperty("appLockEnabled", false);
                 return;
@@ -889,8 +890,18 @@ export const settingsGroups: SettingSection[] = [
           },
           {
             id: "app-lock-pin",
-            name: "Setup app lock password",
-            description: "Set up a password or pin for app lock",
+            name: () =>
+              `Setup app lock ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              }`,
+            description: () =>
+              `Set up a ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              } for app lock`,
             hidden: () => {
               return !!SettingsService.getProperty(
                 "appLockHasPasswordSecurity"
@@ -903,8 +914,18 @@ export const settingsGroups: SettingSection[] = [
           },
           {
             id: "app-lock-pin-change",
-            name: "Change app lock pin",
-            description: "Set up a password or pin for app lock",
+            name: () =>
+              `Change app lock ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              }`,
+            description: () =>
+              `Set up a ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              } for app lock`,
             hidden: () => {
               return !SettingsService.getProperty("appLockHasPasswordSecurity");
             },
@@ -915,16 +936,18 @@ export const settingsGroups: SettingSection[] = [
           },
           {
             id: "app-lock-pin-remove",
-            name: `Remove app lock ${
-              SettingsService.getProperty("applockKeyboardType") === "numeric"
-                ? "pin"
-                : "password"
-            }`,
-            description: `Remove app lock ${
-              SettingsService.getProperty("applockKeyboardType") === "numeric"
-                ? "pin"
-                : "password"
-            }, app lock will fallback to using account password to unlock the app`,
+            name: () =>
+              `Remove app lock ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              }`,
+            description: () =>
+              `Remove app lock ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              }, app lock will fallback to using account password to unlock the app`,
             hidden: () => {
               return !SettingsService.getProperty("appLockHasPasswordSecurity");
             },
@@ -954,6 +977,16 @@ export const settingsGroups: SettingSection[] = [
                   )
                 );
                 SettingsService.setProperty("biometricsAuthEnabled", false);
+              }
+              if (
+                !SettingsService.getProperty("biometricsAuthEnabled") &&
+                !SettingsService.getProperty("appLockHasPasswordSecurity")
+              ) {
+                SettingsService.setProperty("appLockEnabled", false);
+                ToastManager.show({
+                  heading: "App lock disabled",
+                  type: "success"
+                });
               }
             },
             icon: "fingerprint"
