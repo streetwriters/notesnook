@@ -150,40 +150,44 @@ class UserManager {
   ) {
     if (!email || !password) throw new Error("email & password are required.");
 
-    const token = await this.tokenManager.getAccessToken();
-    if (!token) throw new Error("Unauthorized.");
+    const token = await this.tokenManager.getToken();
+    if (!token) throw new Error("No token found.");
 
     email = email.toLowerCase();
     if (!hashedPassword) {
       hashedPassword = await this.db.storage().hash(password, email);
     }
+    try {
+      await this.tokenManager.saveToken(
+        await http.post(
+          `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+          {
+            grant_type: "mfa_password",
+            client_id: "notesnook",
+            scope: "notesnook.sync offline_access IdentityServerApi",
+            password: hashedPassword
+          },
+          token.access_token
+        )
+      );
 
-    await this.tokenManager.saveToken(
-      await http.post(
-        `${constants.AUTH_HOST}${ENDPOINTS.token}`,
-        {
-          grant_type: "mfa_password",
-          client_id: "notesnook",
-          scope: "notesnook.sync offline_access IdentityServerApi",
-          password: hashedPassword
-        },
-        token
-      )
-    );
+      const user = await this.fetchUser();
+      if (!user) throw new Error("Failed to fetch user.");
 
-    const user = await this.fetchUser();
-    if (!user) throw new Error("Unauthorized.");
+      if (!sessionExpired) {
+        await this.db.setLastSynced(0);
+        await this.db.syncer.devices.register();
+      }
 
-    await this.db.storage().deriveCryptoKey({
-      password,
-      salt: user.salt
-    });
-    if (!sessionExpired) {
-      await this.db.setLastSynced(0);
-      await this.db.syncer.devices.register();
+      await this.db.storage().deriveCryptoKey({
+        password,
+        salt: user.salt
+      });
+      EV.publish(EVENTS.userLoggedIn, user);
+    } catch (e) {
+      await this.tokenManager.saveToken(token);
+      throw e;
     }
-
-    EV.publish(EVENTS.userLoggedIn, user);
   }
 
   async _login({
