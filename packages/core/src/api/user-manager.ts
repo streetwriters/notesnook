@@ -279,6 +279,13 @@ class UserManager {
     return this.db.kv().read("user");
   }
 
+  /**
+   * @deprecated
+   */
+  getLegacyUser() {
+    return this.db.storage().read<User>("user");
+  }
+
   async resetUser(removeAttachments = true) {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
@@ -365,6 +372,17 @@ class UserManager {
 
   async getEncryptionKey(): Promise<SerializedKey | undefined> {
     const user = await this.getUser();
+    if (!user) return;
+    const key = await this.db.storage().getCryptoKey();
+    if (!key) return;
+    return { key, salt: user.salt };
+  }
+
+  /**
+   * @deprecated
+   */
+  async getLegacyEncryptionKey(): Promise<SerializedKey | undefined> {
+    const user = await this.getLegacyUser();
     if (!user) return;
     const key = await this.db.storage().getCryptoKey();
     if (!key) return;
