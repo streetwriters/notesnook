@@ -89,6 +89,7 @@ class AppStore extends BaseStore<AppStore> {
     announcementStore.refresh();
 
     EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
+    db.eventManager.subscribe(EVENTS.syncCompleted, () => this.refresh());
 
     db.eventManager.subscribe(EVENTS.syncProgress, ({ type, current }) => {
       this.set((state) => {
@@ -150,13 +151,13 @@ class AppStore extends BaseStore<AppStore> {
     await this.updateLastSynced();
     await resetNotices();
     await noteStore.refresh();
-    notebookStore.refresh();
-    reminderStore.refresh();
-    trashStore.refresh();
-    tagStore.refresh();
-    attachmentStore.refresh();
-    monographStore.refresh();
-    settingStore.refresh();
+    await notebookStore.refresh();
+    await reminderStore.refresh();
+    await trashStore.refresh();
+    await tagStore.refresh();
+    await attachmentStore.refresh();
+    await monographStore.refresh();
+    await settingStore.refresh();
     await editorstore.refresh();
 
     await this.refreshNavItems();
