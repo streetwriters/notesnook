@@ -30,7 +30,9 @@ import {
   Item,
   ItemMap,
   ItemType,
-  ToolbarConfigPlatforms
+  MaybeDeletedItem,
+  ToolbarConfigPlatforms,
+  isDeleted
 } from "./types";
 import { isCipher } from "./database/crypto";
 import { IndexedCollection } from "./database/indexed-collection";
@@ -43,7 +45,7 @@ type MigrationItemType = ItemType | "notehistory" | "content" | "all";
 type MigrationItemMap = ItemMap & {
   notehistory: HistorySession;
   content: ContentItem;
-  all: Item;
+  all: MaybeDeletedItem<Item>;
 };
 type Migration = {
   version: number;
@@ -430,7 +432,7 @@ const migrations: Migration[] = [
 ];
 
 export async function migrateItem<TItemType extends MigrationItemType>(
-  item: MigrationItemMap[TItemType],
+  item: MaybeDeletedItem<MigrationItemMap[TItemType]>,
   itemVersion: number,
   databaseVersion: number,
   type: TItemType,
@@ -453,15 +455,26 @@ export async function migrateItem<TItemType extends MigrationItemType>(
     const migration = migrations[migrationStartIndex];
     if (migration.version === databaseVersion) break;
 
-    if (
-      migration.items.all &&
-      (await migration.items.all(item, database, migrationType))
-    )
+    let result =
+      !!migration.items.all &&
+      (await migration.items.all(item, database, migrationType));
+    if (result === "skip") return "skip";
+    if (result) {
+      if (
+        !isDeleted(item) &&
+        item.type &&
+        item.type !== "trash" &&
+        item.type !== type
+      )
+        type = item.type as TItemType;
       count++;
+    }
+
+    if (isDeleted(item)) continue;
 
     const itemMigrator = migration.items[type];
     if (!itemMigrator) continue;
-    const result = await itemMigrator(item, database, migrationType);
+    result = await itemMigrator(item, database, migrationType);
     if (result === "skip") return "skip";
     if (result) {
       if (item.type && item.type !== "trash" && item.type !== type)

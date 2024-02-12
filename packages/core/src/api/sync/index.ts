@@ -39,12 +39,18 @@ import { migrateItem, migrateVaultKey } from "../../migrations";
 import { SerializedKey } from "@notesnook/crypto";
 import {
   Attachment,
+  isDeleted,
+  isTrashItem,
   Item,
   MaybeDeletedItem,
   Note,
   Notebook
 } from "../../types";
-import { SYNC_COLLECTIONS_MAP, SyncTransferItem } from "./types";
+import {
+  SYNC_COLLECTIONS_MAP,
+  SyncableItemType,
+  SyncTransferItem
+} from "./types";
 import { DownloadableFile } from "../../database/fs";
 import { SyncDevices } from "./devices";
 import { DefaultColors } from "../../collections/colors";
@@ -298,7 +304,12 @@ class Sync {
     for (let i = 0; i < decrypted.length; ++i) {
       const decryptedItem = decrypted[i];
       const version = chunk.items[i].v;
-      const item = await deserializeItem(decryptedItem, version, this.db);
+      const item = await deserializeItem(
+        decryptedItem,
+        itemType,
+        version,
+        this.db
+      );
       if (item) deserialized.push(item);
     }
 
@@ -419,49 +430,50 @@ function promiseTimeout(ms: number, promise: Promise<unknown>) {
 
 async function deserializeItem(
   decryptedItem: string,
+  type: SyncableItemType,
   version: number,
   database: Database
 ): Promise<MaybeDeletedItem<Item> | undefined> {
-  const item = JSON.parse(decryptedItem);
+  const item = JSON.parse(decryptedItem) as MaybeDeletedItem<Item>;
   item.remote = true;
   item.synced = true;
 
-  if (!item.cipher) {
-    let migrationResult = await migrateItem(
-      item,
+  let migrationResult = await migrateItem(
+    item,
+    version,
+    CURRENT_DATABASE_VERSION,
+    isDeleted(item) ? type : item.type,
+    database,
+    "sync"
+  );
+  if (migrationResult === "skip") return;
+
+  // since items in trash can have their own set of migrations,
+  // we have to run the migration again to account for that.
+  if (isTrashItem(item)) {
+    migrationResult = await migrateItem(
+      item as unknown as Note | Notebook,
       version,
       CURRENT_DATABASE_VERSION,
-      item.type,
+      item.itemType,
       database,
       "sync"
     );
     if (migrationResult === "skip") return;
-
-    // since items in trash can have their own set of migrations,
-    // we have to run the migration again to account for that.
-    if (item.type === "trash" && item.itemType) {
-      migrationResult = await migrateItem(
-        item as unknown as Note | Notebook,
-        version,
-        CURRENT_DATABASE_VERSION,
-        item.itemType,
-        database,
-        "sync"
-      );
-      if (migrationResult === "skip") return;
-    }
-
-    const itemType =
-      // colors are naively of type "tag" instead of "color" so we have to fix that.
-      item.type === "tag" && DefaultColors[item.title.toLowerCase()]
-        ? "color"
-        : item.type === "trash" && "itemType" in item && item.itemType
-        ? item.itemType
-        : item.type;
-
-    if (!itemType || itemType === "topic" || itemType === "settings") return;
-
-    if (migrationResult) item.synced = false;
   }
+
+  const itemType = isDeleted(item)
+    ? type
+    : // colors are naively of type "tag" instead of "color" so we have to fix that.
+    item.type === "tag" && DefaultColors[item.title.toLowerCase()]
+    ? "color"
+    : item.type === "trash" && "itemType" in item && item.itemType
+    ? item.itemType
+    : item.type;
+
+  if (!itemType || itemType === "topic" || itemType === "settings") return;
+
+  if (migrationResult) item.synced = false;
+
   return item;
 }

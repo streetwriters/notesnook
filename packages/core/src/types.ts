@@ -468,6 +468,11 @@ export interface DeletedItem {
   dateModified: number;
   remote?: boolean;
   synced?: boolean;
+
+  /**
+   * @deprecated only kept here for migration purposes
+   */
+  deleteReason?: never;
 }
 
 export type MaybeDeletedItem<T> = T | DeletedItem;

@@ -108,18 +108,12 @@ class Migrator {
       if (Array.isArray(item)) continue;
       if (!item) continue;
 
-      // check if item is permanently deleted or just a soft delete
-      if (isDeleted(item)) {
-        toAdd.push(item);
-        continue;
-      }
-
       const itemId = item.id;
       let migrated = await migrateItem(
         item,
         version,
         CURRENT_DATABASE_VERSION,
-        item.type || type,
+        isDeleted(item) ? "all" : item.type,
         db,
         "local"
       );
@@ -137,9 +131,10 @@ class Migrator {
       }
 
       if (migrated === true) {
-        if (item.type === "settings") {
+        if (!isDeleted(item) && item.type === "settings") {
           // we are removing the old settings.
-          await db.storage().remove("settings");
+          if (process.env.NODE_ENV === "test")
+            await db.storage().remove("settings");
         } else toAdd.push(item);
 
         // if id changed after migration, we need to delete the old one.
@@ -151,7 +146,6 @@ class Migrator {
 
     if (toAdd.length > 0) {
       await table.put(toAdd as any);
-      // await collection.setItems(toAdd);
       sendMigrationProgressEvent(
         db.eventManager,
         type,
