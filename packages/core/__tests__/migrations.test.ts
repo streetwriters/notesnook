@@ -21,7 +21,7 @@ import { test, expect, describe } from "vitest";
 import { migrateItem, migrateKV, migrateVaultKey } from "../src/migrations";
 import { databaseTest } from "./utils";
 import { getId, makeId } from "../src/utils/id";
-import { LegacySettingsItem } from "../src/types";
+import { DeletedItem, LegacySettingsItem } from "../src/types";
 import { KEYS } from "../src/database/kv";
 
 describe.concurrent("[5.2] replace date edited with date modified", () => {
@@ -727,4 +727,19 @@ test("[5.9] migrate vaultKey", () =>
     expect(await db.vaults.default()).toBeDefined();
     expect((await db.vaults.default())?.key).toStrictEqual(key);
     expect((await db.vaults.default())?.key).toStrictEqual(key);
+  }));
+
+test("[5.9] remove deleteReason from deleted items", () =>
+  databaseTest().then(async (db) => {
+    const item: DeletedItem = {
+      dateModified: Date.now(),
+      deleted: true,
+      id: "hello",
+      remote: false,
+      synced: true,
+      deleteReason: true as any
+    };
+    await migrateItem(item, 5.9, 6.0, "all", db, "backup");
+
+    expect(item.deleteReason).toBeUndefined();
   }));
