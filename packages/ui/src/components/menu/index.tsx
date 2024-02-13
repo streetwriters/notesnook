@@ -238,6 +238,23 @@ export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
     ...restProps
   } = props;
 
+  useEffect(() => {
+    if (!isOpen) return;
+    console.log(isOpen);
+    function onContextMenu(e: MouseEvent) {
+      console.log("CONTEXT", e);
+      if (
+        e.target instanceof HTMLElement &&
+        !!e.target.closest(".ReactModal__Overlay")
+      )
+        onClose();
+    }
+    window.addEventListener("contextmenu", onContextMenu);
+    return () => {
+      window.removeEventListener("contextmenu", onContextMenu);
+    };
+  }, [isOpen, onClose]);
+
   return (
     <PopupPresenter
       scope="contextMenu"
