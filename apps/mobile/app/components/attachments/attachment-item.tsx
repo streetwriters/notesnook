@@ -67,9 +67,8 @@ export const AttachmentItem = ({
     Actions.present(attachment, setAttachments, context);
   };
 
-  return (hideWhenNotDownloading &&
-    (!currentProgress || !currentProgress.value)) ||
-    !attachment ? null : (
+  return hideWhenNotDownloading &&
+    (!currentProgress || !currentProgress.value) ? null : (
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={onPress}
@@ -80,104 +79,111 @@ export const AttachmentItem = ({
         padding: 12,
         paddingVertical: 6,
         borderRadius: 5,
-        backgroundColor: colors.secondary.background
+        backgroundColor: colors.secondary.background,
+        minHeight: 45
       }}
     >
-      <View
-        style={{
-          flexShrink: 1,
-          flexDirection: "row",
-          alignItems: "center"
-        }}
-      >
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            marginLeft: -5
-          }}
-        >
-          <Icon name="file" size={SIZE.xxxl} color={colors.primary.icon} />
-
-          <Paragraph
-            adjustsFontSizeToFit
-            size={6}
-            color={colors.static.white}
-            style={{
-              position: "absolute"
-            }}
-          >
-            {getFileExtension(attachment.filename).toUpperCase()}
-          </Paragraph>
-        </View>
-
-        <View
-          style={{
-            flexShrink: 1,
-            marginLeft: 10
-          }}
-        >
-          <Paragraph
-            size={SIZE.sm - 1}
-            style={{
-              flexWrap: "wrap",
-              marginBottom: 2.5
-            }}
-            numberOfLines={1}
-            lineBreakMode="middle"
-            color={colors.primary.paragraph}
-          >
-            {attachment.filename}
-          </Paragraph>
-
-          {!hideWhenNotDownloading ? (
-            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-              {formatBytes(attachment.size)}{" "}
-              {currentProgress?.type
-                ? "(" + currentProgress.type + "ing - tap to cancel)"
-                : ""}
-            </Paragraph>
-          ) : null}
-        </View>
-      </View>
-
-      {currentProgress ? (
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => {
-            if (encryption || !pressable) return;
-            db.fs().cancel(attachment.metadata.hash);
-            setCurrentProgress(undefined);
-          }}
-          style={{
-            justifyContent: "center",
-            marginLeft: 5,
-            marginTop: 5,
-            marginRight: -5
-          }}
-        >
-          <ProgressCircleComponent
-            size={SIZE.xxl}
-            progress={currentProgress?.value ? currentProgress?.value / 100 : 0}
-            showsText
-            textStyle={{
-              fontSize: 10
-            }}
-            color={colors.primary.accent}
-            formatText={(progress) => (progress * 100).toFixed(0)}
-            borderWidth={0}
-            thickness={2}
-          />
-        </TouchableOpacity>
-      ) : (
+      {!attachment ? null : (
         <>
-          {attachment.failed ? (
-            <IconButton
-              onPress={onPress}
-              name="alert-circle-outline"
-              color={colors.error.paragraph}
-            />
-          ) : null}
+          <View
+            style={{
+              flexShrink: 1,
+              flexDirection: "row",
+              alignItems: "center"
+            }}
+          >
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginLeft: -5
+              }}
+            >
+              <Icon name="file" size={SIZE.xxxl} color={colors.primary.icon} />
+
+              <Paragraph
+                adjustsFontSizeToFit
+                size={6}
+                color={colors.static.white}
+                style={{
+                  position: "absolute"
+                }}
+              >
+                {getFileExtension(attachment.filename).toUpperCase()}
+              </Paragraph>
+            </View>
+
+            <View
+              style={{
+                flexShrink: 1,
+                marginLeft: 10
+              }}
+            >
+              <Paragraph
+                size={SIZE.sm - 1}
+                style={{
+                  flexWrap: "wrap",
+                  marginBottom: 2.5
+                }}
+                numberOfLines={1}
+                lineBreakMode="middle"
+                color={colors.primary.paragraph}
+              >
+                {attachment.filename}
+              </Paragraph>
+
+              {!hideWhenNotDownloading ? (
+                <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+                  {formatBytes(attachment.size)}{" "}
+                  {currentProgress?.type
+                    ? "(" + currentProgress.type + "ing - tap to cancel)"
+                    : ""}
+                </Paragraph>
+              ) : null}
+            </View>
+          </View>
+
+          {currentProgress ? (
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => {
+                if (encryption || !pressable) return;
+                db.fs().cancel(attachment.hash);
+                setCurrentProgress(undefined);
+              }}
+              style={{
+                justifyContent: "center",
+                marginLeft: 5,
+                marginTop: 5,
+                marginRight: -5
+              }}
+            >
+              <ProgressCircleComponent
+                size={SIZE.xxl}
+                progress={
+                  currentProgress?.value ? currentProgress?.value / 100 : 0
+                }
+                showsText
+                textStyle={{
+                  fontSize: 10
+                }}
+                color={colors.primary.accent}
+                formatText={(progress) => (progress * 100).toFixed(0)}
+                borderWidth={0}
+                thickness={2}
+              />
+            </TouchableOpacity>
+          ) : (
+            <>
+              {attachment.failed ? (
+                <IconButton
+                  onPress={onPress}
+                  name="alert-circle-outline"
+                  color={colors.error.paragraph}
+                />
+              ) : null}
+            </>
+          )}
         </>
       )}
     </TouchableOpacity>
