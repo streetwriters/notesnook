@@ -72,6 +72,8 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
 
             const { popup: Popup } = PopupHandler;
             const pos = editor.current.view.posAtDOM(element, 0);
+            if (pos < 0) return;
+
             const node = editor.current.view.state.doc.nodeAt(pos);
 
             if (!node) return;
