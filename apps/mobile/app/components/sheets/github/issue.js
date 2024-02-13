@@ -17,14 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Debug } from "@notesnook/core/dist/api/debug";
+import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useRef, useState } from "react";
 import { Linking, Platform, Text, TextInput, View } from "react-native";
 import { getVersion } from "react-native-device-info";
-import { db } from "../../../common/database";
-import { eSendEvent, ToastManager } from "../../../services/event-manager";
+import { useStoredRef } from "../../../hooks/use-stored-ref";
+import { ToastManager, eSendEvent } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
-import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
@@ -35,7 +36,6 @@ import { presentDialog } from "../../dialog/functions";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
-import { useStoredRef } from "../../../hooks/use-stored-ref";
 
 export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
   const { colors } = useThemeColors();
@@ -56,8 +56,7 @@ export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
 
     try {
       setLoading(true);
-
-      let issue_url = await db.debug.report({
+      let issue_url = await Debug.report({
         title: title.current,
         body:
           body.current +
