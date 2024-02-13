@@ -21,7 +21,7 @@ import { VirtualizedGrouping } from "@notesnook/core";
 import { Note, Notebook } from "@notesnook/core/dist/types";
 import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useEffect, useState } from "react";
-import { Platform, View, useWindowDimensions } from "react-native";
+import { View } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import { db } from "../../../common/database";
@@ -51,9 +51,14 @@ export const MoveNotes = ({
   const { colors } = useThemeColors();
   const currentNotebook = notebook;
   const selectionCount = useItemSelectionStore(
-    (state) => Object.keys(state.selection)?.length > 0
+    (state) =>
+      Object.keys(state.selection).filter(
+        (k) =>
+          state.initialState?.[k] !== "selected" &&
+          state.selection[k] !== "deselected"
+      )?.length > 0
   );
-  const { height } = useWindowDimensions();
+
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
 
   useEffect(() => {
@@ -90,8 +95,10 @@ export const MoveNotes = ({
     <View
       style={{
         paddingHorizontal: 12,
-        maxHeight: Platform.OS === "ios" ? "96%" : "97%",
-        height: height * 0.9
+        maxHeight: "100%",
+        height: notes?.placeholders.length
+          ? 50 * (notes?.placeholders.length + 2)
+          : 300
       }}
     >
       <Dialog context="local" />
@@ -116,9 +123,11 @@ export const MoveNotes = ({
             </Paragraph>
           </View>
         }
+        estimatedItemSize={50}
         data={notes?.placeholders}
         renderItem={renderItem}
       />
+
       {selectionCount ? (
         <Button
           onPress={async () => {
@@ -139,77 +148,91 @@ export const MoveNotes = ({
   );
 };
 
-const SelectableNoteItem = ({
-  id,
-  items
-}: {
-  id: string | number;
-  items?: VirtualizedGrouping<Note>;
-}) => {
-  const { colors } = useThemeColors();
-  const [item] = useDBItem(id, "note", items);
-  const selected = useItemSelectionStore((state) =>
-    item?.id ? state.selection[item.id] === "selected" : false
-  );
-  const exists = useItemSelectionStore((state) =>
-    item?.id ? state.initialState[item.id] === "selected" : false
-  );
+const SelectableNoteItem = React.memo(
+  ({
+    id,
+    items
+  }: {
+    id: string | number;
+    items?: VirtualizedGrouping<Note>;
+  }) => {
+    const { colors } = useThemeColors();
+    const [item] = useDBItem(id, "note", items);
+    const selected = useItemSelectionStore((state) =>
+      item?.id ? state.selection[item.id] === "selected" : false
+    );
+    const exists = useItemSelectionStore((state) =>
+      item?.id ? state.initialState[item.id] === "selected" : false
+    );
 
-  return !item || exists ? null : (
-    <PressableButton
-      testID="listitem.select"
-      onPress={() => {
-        if (!item) return;
-        useItemSelectionStore
-          .getState()
-          .markAs(item, selected ? "deselected" : "selected");
-      }}
-      type={"transparent"}
-      customStyle={{
-        paddingVertical: 12,
-        flexDirection: "row",
-        width: "100%",
-        justifyContent: "flex-start",
-        height: 50
-      }}
-    >
-      <IconButton
-        customStyle={{
-          backgroundColor: "transparent",
-          marginRight: 5
-        }}
+    return exists ? null : (
+      <PressableButton
+        testID="listitem.select"
         onPress={() => {
           if (!item) return;
           useItemSelectionStore
             .getState()
             .markAs(item, selected ? "deselected" : "selected");
         }}
-        name={
-          selected ? "check-circle-outline" : "checkbox-blank-circle-outline"
-        }
-        type="selected"
-        color={selected ? colors.selected.icon : colors.primary.icon}
-      />
-
-      <View
-        style={{
-          flexShrink: 1
+        type={"transparent"}
+        customStyle={{
+          paddingVertical: 12,
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "flex-start",
+          height: 50
         }}
       >
-        <Paragraph numberOfLines={1}>{item?.title}</Paragraph>
-        {item.type == "note" && item.headline ? (
-          <Paragraph
-            numberOfLines={1}
-            color={colors?.secondary.paragraph}
-            size={SIZE.xs}
-          >
-            {item.headline}
-          </Paragraph>
-        ) : null}
-      </View>
-    </PressableButton>
-  );
-};
+        {!item ? null : (
+          <>
+            <IconButton
+              customStyle={{
+                backgroundColor: "transparent",
+                marginRight: 5
+              }}
+              onPress={() => {
+                if (!item) return;
+                useItemSelectionStore
+                  .getState()
+                  .markAs(item, selected ? "deselected" : "selected");
+              }}
+              top={0}
+              left={0}
+              right={0}
+              bottom={0}
+              name={
+                selected
+                  ? "check-circle-outline"
+                  : "checkbox-blank-circle-outline"
+              }
+              type="selected"
+              color={selected ? colors.selected.icon : colors.primary.icon}
+            />
+
+            <View
+              style={{
+                flexShrink: 1
+              }}
+            >
+              <Paragraph numberOfLines={1}>{item?.title}</Paragraph>
+              {item.type == "note" && item.headline ? (
+                <Paragraph
+                  numberOfLines={1}
+                  color={colors?.secondary.paragraph}
+                  size={SIZE.xs}
+                >
+                  {item.headline}
+                </Paragraph>
+              ) : null}
+            </View>
+          </>
+        )}
+      </PressableButton>
+    );
+  }
+);
+
+SelectableNoteItem.displayName = "SelectableNoteItem";
 
 MoveNotes.present = (notebook?: Notebook) => {
   if (!notebook) return;

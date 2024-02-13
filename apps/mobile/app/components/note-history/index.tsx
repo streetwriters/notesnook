@@ -78,28 +78,30 @@ const HistoryItem = ({
   }, []);
 
   return (
-    item && (
-      <PressableButton
-        type="grayBg"
-        onPress={() => {
-          if (!item) return;
-          preview(item);
-        }}
-        customStyle={{
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingHorizontal: 12,
-          height: 45,
-          marginBottom: 10,
-          flexDirection: "row"
-        }}
-      >
-        <Paragraph>{getDate(item.dateCreated, item.dateModified)}</Paragraph>
-        <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-          {getTimeAgo(item.dateModified)}
-        </Paragraph>
-      </PressableButton>
-    )
+    <PressableButton
+      type="grayBg"
+      onPress={() => {
+        if (!item) return;
+        preview(item);
+      }}
+      customStyle={{
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: 12,
+        height: 45,
+        marginBottom: 10,
+        flexDirection: "row"
+      }}
+    >
+      {!item ? null : (
+        <>
+          <Paragraph>{getDate(item.dateCreated, item.dateModified)}</Paragraph>
+          <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+            {getTimeAgo(item.dateModified)}
+          </Paragraph>
+        </>
+      )}
+    </PressableButton>
   );
 };
 
