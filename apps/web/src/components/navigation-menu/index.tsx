@@ -318,10 +318,17 @@ function NavigationMenu(props: NavigationMenuProps) {
                   menuItems={[
                     {
                       type: "button",
-                      key: "rename",
+                      key: "rename-color",
                       title: "Rename color",
+                      onClick: () => showRenameColorDialog(color)
+                    },
+                    {
+                      type: "button",
+                      key: "remove-color",
+                      title: "Remove color",
                       onClick: async () => {
-                        await showRenameColorDialog(color.id);
+                        await db.colors.remove(color.id);
+                        await refreshNavItems();
                       }
                     },
                     {
