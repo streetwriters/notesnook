@@ -265,6 +265,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
   const prevItem = prevProps.item;
   const nextItem = nextProps.item;
   return (
+    prevProps.compact === nextProps.compact &&
     prevProps.date === nextProps.date &&
     prevItem.dateModified === nextItem.dateModified &&
     prevProps.notebooks?.dateEdited === nextProps.notebooks?.dateEdited &&
