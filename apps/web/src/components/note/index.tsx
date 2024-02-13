@@ -191,6 +191,7 @@ function Note(props: NoteProps) {
               {note.conflicted && <Alert size={15} color="var(--icon-error)" />}
               {locked && <Lock size={11} data-test-id={`locked`} />}
               {note.favorite && <Star color={primary} size={15} />}
+              {note.readonly && <Readonly size={15} />}
               <TimeAgo live={true} datetime={date} locale="short" />
             </>
           ) : (
@@ -227,6 +228,8 @@ function Note(props: NoteProps) {
               )}
 
               {locked && <Lock size={13} data-test-id={`locked`} />}
+
+              {note.readonly && <Readonly size={15} />}
 
               {note.favorite && <Star color={primary} size={15} />}
 
