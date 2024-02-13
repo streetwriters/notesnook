@@ -96,7 +96,13 @@ export function Menu(props: MenuProps) {
 
           switch (item.type) {
             case "lazy-loader":
-              return <LazyLoader key={item.key} item={item} mapper={mapper} />;
+              return (
+                <LazyLoader
+                  key={item.key}
+                  item={item}
+                  mapper={(item, itemIndex) => mapper(item, itemIndex + index)}
+                />
+              );
             case "separator":
               return <MenuSeparator key={item.key} />;
             case "button":
