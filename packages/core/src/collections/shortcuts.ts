@@ -101,6 +101,7 @@ export class Shortcuts implements ICollection {
   ): Promise<ResolveTypeToItem<T>> {
     const tagIds: string[] = [];
     const notebookIds: string[] = [];
+
     for (const shortcut of this.all) {
       if (
         (type === "all" || type === "notebooks") &&
@@ -113,12 +114,29 @@ export class Shortcuts implements ICollection {
       )
         tagIds.push(shortcut.itemId);
     }
-    return [
-      ...(notebookIds.length > 0
+
+    const notebooks =
+      notebookIds.length > 0
         ? await this.db.notebooks.all.items(notebookIds)
-        : []),
-      ...(tagIds.length > 0 ? await this.db.tags.all.items(tagIds) : [])
-    ] as ResolveTypeToItem<T>;
+        : [];
+    const tags = tagIds.length > 0 ? await this.db.tags.all.items(tagIds) : [];
+
+    const sortedItems: (Notebook | Tag)[] = [];
+
+    this.all
+      .sort((a, b) => a.dateCreated - b.dateCreated)
+      .forEach((shortcut) => {
+        if (type === "all" || type === "notebooks") {
+          const notebook = notebooks.find((n) => n.id === shortcut.itemId);
+          if (notebook) sortedItems.push(notebook);
+        }
+        if (type === "all" || type === "tags") {
+          const tag = tags.find((t) => t.id === shortcut.itemId);
+          if (tag) sortedItems.push(tag);
+        }
+      });
+
+    return sortedItems as ResolveTypeToItem<T>;
   }
 
   exists(id: string) {
