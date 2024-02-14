@@ -39,12 +39,5 @@ function swap16(val: number) {
 }
 
 export function getObjectIdTimestamp(id: string) {
-  const timestamp = new Date();
-  const time =
-    id.charCodeAt(3) |
-    (id.charCodeAt(2) << 8) |
-    (id.charCodeAt(1) << 16) |
-    (id.charCodeAt(0) << 24);
-  timestamp.setTime(Math.floor(time) * 1000);
-  return timestamp;
+  return new Date(parseInt(id.substring(0, 8), 16) * 1000);
 }
