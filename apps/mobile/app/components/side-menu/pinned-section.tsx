@@ -84,8 +84,7 @@ export const PinnedSection = React.memo(
           data={menuPins}
           style={{
             flexGrow: 1,
-            width: "100%",
-            paddingHorizontal: 12
+            width: "100%"
           }}
           contentContainerStyle={{
             flexGrow: 1

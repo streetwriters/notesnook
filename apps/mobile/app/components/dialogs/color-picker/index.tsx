@@ -56,6 +56,7 @@ const ColorPicker = ({
     <BaseDialog
       visible={visible}
       onRequestClose={() => {
+        title.current = undefined;
         setVisible(false);
         useSettingStore.getState().setSheetKeyboardHandler(true);
       }}

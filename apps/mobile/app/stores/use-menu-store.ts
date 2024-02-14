@@ -42,12 +42,17 @@ export const useMenuStore = create<MenuStore>((set) => ({
     });
   },
   setColorNotes: () => {
-    db.colors?.all.items().then((colors) => {
-      set({
-        colorNotes: colors,
-        loadingColors: false
+    db.colors?.all
+      .items(undefined, {
+        sortBy: "dateCreated",
+        sortDirection: "asc"
+      })
+      .then((colors) => {
+        set({
+          colorNotes: colors,
+          loadingColors: false
+        });
       });
-    });
   },
   clearAll: () => set({ menuPins: [], colorNotes: [] })
 }));
