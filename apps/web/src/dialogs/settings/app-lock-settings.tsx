@@ -77,9 +77,14 @@ export const AppLockSettings: SettingsGroup[] = [
                 }
               });
               if (result)
-                useSettingStore.getState().setAppLockSettings({
-                  enabled: !isEnabled
-                });
+                useSettingStore.getState().setAppLockSettings(
+                  isEnabled
+                    ? {
+                        enabled: false,
+                        securityKey: undefined
+                      }
+                    : { enabled: true }
+                );
             },
             isToggled: () => useSettingStore.getState().appLockSettings.enabled
           }
