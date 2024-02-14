@@ -71,7 +71,7 @@ export async function writeEncryptedFile(
   key: SerializedKey,
   hash: string
 ) {
-  if (!IndexedDBKVStore.isIndexedDBSupported())
+  if (!isFeatureSupported("indexedDB"))
     throw new Error("This browser does not support IndexedDB.");
 
   if (await streamablefs.exists(hash)) await streamablefs.deleteFile(hash);
