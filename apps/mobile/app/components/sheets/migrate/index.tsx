@@ -96,17 +96,13 @@ export default function Migrate() {
       });
       setLoading(true);
       await sleep(1);
-      const backupSaved = await BackupService.run(false, "local");
-      if (!backupSaved) {
-        ToastManager.show({
-          heading: "Migration failed",
-          message: "You must download a backup of your data before migrating.",
-          context: "local",
-          type: "error"
-        });
+      const { error } = await BackupService.run(false, "local");
+      if (error) {
+        ToastManager.error(error, "Backup failed");
         setLoading(false);
         return;
       }
+
       await db.migrations?.migrate();
       useUserStore.setState({
         disableAppLockRequests: false

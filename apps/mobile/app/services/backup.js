@@ -148,10 +148,18 @@ async function updateNextBackupTime() {
     lastBackupDate: Date.now()
   });
 }
-
+/**
+ *
+ * @param {boolean} progress
+ * @param {string} context
+ * @returns {Promise<{path?: string, error?: Error}}>
+ */
 async function run(progress, context) {
   let androidBackupDirectory = await checkBackupDirExists(false, context);
-  if (!androidBackupDirectory) return;
+  if (!androidBackupDirectory)
+    return {
+      error: new Error("Backup directory not selected")
+    };
 
   if (progress) {
     presentSheet({
@@ -216,7 +224,11 @@ async function run(progress, context) {
     let showBackupCompleteSheet =
       progress && SettingsService.get().showBackupCompleteSheet;
 
-    if (context) return path;
+    if (context)
+      return {
+        path: path
+      };
+
     await sleep(300);
     if (showBackupCompleteSheet) {
       presentBackupCompleteSheet(backupFilePath);
@@ -231,12 +243,17 @@ async function run(progress, context) {
       context: "global"
     });
 
-    return path;
+    return {
+      path: path
+    };
   } catch (e) {
+    ToastManager.error(e, "Backup failed", context || "global");
+    DatabaseLogger.error("Backup failed", e);
     await sleep(300);
     progress && eSendEvent(eCloseSheet);
-    ToastManager.error(e, "Backup failed!");
-    return null;
+    return {
+      error: e
+    };
   }
 }
 

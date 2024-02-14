@@ -160,6 +160,7 @@ export const SideMenu = React.memo(
                     dragging: false
                   });
                 }}
+                color={colors.primary.icon}
                 customStyle={{
                   width: 35,
                   height: 35

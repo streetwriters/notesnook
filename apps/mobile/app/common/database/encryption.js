@@ -42,8 +42,11 @@ export const CipherStorage = new MMKVLoader()
 const IOS_KEYCHAIN_ACCESS_GROUP = "group.org.streetwriters.notesnook";
 const IOS_KEYCHAIN_SERVICE_NAME = "org.streetwriters.notesnook";
 const KEYCHAIN_SERVER_DBKEY = "notesnook:db";
-const NOTESNOOK_APPLOCK_KEY_SALT = "notesnook_applock_key_salt";
-const NOTESNOOK_DB_KEY_SALT = "notesnook_database_key";
+
+const NOTESNOOK_APPLOCK_KEY_SALT = "3dqclWbOYllfk9kk";
+const NOTESNOOK_DB_KEY_SALT = "2rcgSprDmRvZ1AAa";
+const NOTESNOOK_USER_KEY_SALT = "7qO4qeoM6PbsAJ0Q";
+
 const DB_KEY_CIPHER = "databaseKeyCipher";
 const USER_KEY_CIPHER = "userKeyCipher";
 const APPLOCK_CIPHER = "applockCipher";
@@ -167,54 +170,65 @@ export async function getDatabaseKey(appLockPassword) {
       );
       DatabaseLogger.info("Getting database key from cipher");
       DB_KEY = databaseKey;
-      return databaseKey;
     }
 
-    const hasKey = await Keychain.hasInternetCredentials(KEYCHAIN_SERVER_DBKEY);
-    if (hasKey) {
-      let credentials = await Keychain.getInternetCredentials(
+    if (!DB_KEY) {
+      const hasKey = await Keychain.hasInternetCredentials(
+        KEYCHAIN_SERVER_DBKEY
+      );
+      if (hasKey) {
+        let credentials = await Keychain.getInternetCredentials(
+          KEYCHAIN_SERVER_DBKEY,
+          KEYSTORE_CONFIG
+        );
+
+        DatabaseLogger.info("Getting database key from Keychain");
+        DB_KEY = credentials.password;
+      }
+    }
+
+    if (!DB_KEY) {
+      DatabaseLogger.info("Generating new database key");
+      const password = generatePassword();
+      const derivedDatabaseKey = await Sodium.deriveKey(
+        password,
+        NOTESNOOK_DB_KEY_SALT
+      );
+
+      DB_KEY = derivedDatabaseKey.key;
+
+      await Keychain.setInternetCredentials(
         KEYCHAIN_SERVER_DBKEY,
+        "notesnook",
+        DB_KEY,
         KEYSTORE_CONFIG
       );
-      DatabaseLogger.info("Getting database key from Keychain");
-      DB_KEY = credentials.password;
-      return credentials.password;
     }
-    DatabaseLogger.info("Generating new database key");
-    const password = generatePassword();
-    const derivedDatabaseKey = await Sodium.deriveKey(
-      password,
-      NOTESNOOK_DB_KEY_SALT
-    );
-    await Keychain.setInternetCredentials(
-      KEYCHAIN_SERVER_DBKEY,
-      "notesnook",
-      derivedDatabaseKey.key,
-      KEYSTORE_CONFIG
-    );
 
-    const userKeyCredentials = await Keychain.getInternetCredentials(
-      "notesnook",
-      KEYSTORE_CONFIG
-    );
-
-    if (userKeyCredentials) {
-      const userKeyCipher = await encrypt(
-        {
-          key: derivedDatabaseKey.key
-        },
-        userKeyCredentials.password
+    if (await Keychain.hasInternetCredentials("notesnook")) {
+      const userKeyCredentials = await Keychain.getInternetCredentials(
+        "notesnook",
+        KEYSTORE_CONFIG
       );
-      // Store encrypted user key in MMKV
-      MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
-      await Keychain.resetInternetCredentials("notesnook");
+
+      if (userKeyCredentials) {
+        const userKeyCipher = await encrypt(
+          {
+            key: DB_KEY,
+            salt: NOTESNOOK_USER_KEY_SALT
+          },
+          userKeyCredentials.password
+        );
+        // Store encrypted user key in MMKV
+        MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
+        await Keychain.resetInternetCredentials("notesnook");
+      }
       DatabaseLogger.info("Migrated user credentials to cipher storage");
     }
 
-    DB_KEY = derivedDatabaseKey.key;
-
-    return derivedDatabaseKey.key;
+    return DB_KEY;
   } catch (e) {
+    console.log(e, "error");
     DatabaseLogger.error(e);
     return null;
   }
@@ -225,11 +239,12 @@ export async function deriveCryptoKey(data) {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
     const userKeyCipher = await encrypt(
       {
-        key: await getDatabaseKey()
+        key: await getDatabaseKey(),
+        salt: NOTESNOOK_USER_KEY_SALT
       },
       credentials.key
     );
-    DatabaseLogger.info("User key stored: ", !!userKeyCipher, credentials);
+    DatabaseLogger.info("User key stored: ", !!userKeyCipher);
 
     // Store encrypted user key in MMKV
     MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
@@ -259,6 +274,7 @@ export async function getCryptoKey(_name) {
 
     return key;
   } catch (e) {
+    console.log("getCryptoKey", e);
     DatabaseLogger.error(e);
   }
 }
@@ -301,6 +317,9 @@ export async function decrypt(password, data) {
     return undefined;
   let _data = { ...data };
   _data.output = "plain";
+
+  if (!password.salt) password.salt = data.salt;
+
   return await Sodium.decrypt(password, _data);
 }
 
@@ -313,6 +332,11 @@ export async function decryptMulti(password, data) {
     d.output = "plain";
     return d;
   });
+
+  if (data.length && !password.salt) {
+    password.salt = data[0].salt;
+  }
+
   return await Sodium.decryptMulti(password, data);
 }
 
