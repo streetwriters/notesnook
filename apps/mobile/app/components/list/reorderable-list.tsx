@@ -99,6 +99,7 @@ function ReorderableList<T extends { id: string }>({
               onPress={() => {
                 const _hiddenItems = hiddenItemsState.slice();
                 const index = _hiddenItems.indexOf(info.item.id);
+
                 if (index === -1) {
                   _hiddenItems.push(info.item?.id);
                 } else {
