@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { RefObject, useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
 import { getFormattedDate, getTimeAgo } from "@notesnook/common";
@@ -109,7 +109,7 @@ export default function NoteHistory({
   note
 }: {
   note: Note;
-  fwdRef: ActionSheetRef;
+  fwdRef: RefObject<ActionSheetRef>;
 }) {
   const [history, setHistory] = useState<VirtualizedGrouping<HistorySession>>();
   const [_loading, setLoading] = useState(true);

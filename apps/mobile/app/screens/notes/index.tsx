@@ -39,6 +39,7 @@ import useNavigationStore, {
 } from "../../stores/use-navigation-store";
 import { setOnFirstSave } from "./common";
 import { db } from "../../common/database";
+import SelectionHeader from "../../components/selection-header";
 export const WARNING_DATA = {
   title: "Some notes in this topic are not synced"
 };
@@ -119,12 +120,27 @@ const NotesPage = ({
     async (data?: NotesScreenParams) => {
       const isNew = data && data?.item?.id !== params.current?.item?.id;
       if (data) params.current = data;
+
       try {
         if (isNew) setLoadingNotes(true);
         const notes = (await get(
           params.current,
           true
         )) as VirtualizedGrouping<Note>;
+
+        if (route.name === "TaggedNotes" || route.name === "ColoredNotes") {
+          const item = await (db as any)[params.current.item.type + "s"][
+            params.current.item.type
+          ](params.current.item.id);
+
+          if (!item) {
+            Navigation.goBack();
+            return;
+          }
+
+          params.current.item = item;
+          params.current.title = item.title;
+        }
 
         if (notes.placeholders.length === 0) setLoadingNotes(false);
         setNotes(notes);
@@ -135,7 +151,7 @@ const NotesPage = ({
         console.error(e);
       }
     },
-    [get, syncWithNavigation]
+    [get, route.name, syncWithNavigation]
   );
 
   useEffect(() => {
@@ -163,6 +179,12 @@ const NotesPage = ({
 
   return (
     <>
+      <SelectionHeader
+        id={route.params?.item?.id}
+        items={notes}
+        type="note"
+        renderedInRoute={route.name}
+      />
       <Header
         renderedInRoute={route.name}
         title={title || route.name}
