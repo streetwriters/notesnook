@@ -33,6 +33,7 @@ import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
 import { MenuItemsList } from "../../utils/menu-items";
 import ReorderableList from "../list/reorderable-list";
+import { Button } from "../ui/button";
 import { ColorSection } from "./color-section";
 import { useSideBarDraggingStore } from "./dragging-store";
 import { MenuItem } from "./menu-item";
@@ -80,6 +81,7 @@ export const SideMenu = React.memo(
         eSendEvent(eOpenPremiumDialog);
       }
     };
+
     const renderItem = useCallback(
       () => (
         <>
@@ -173,14 +175,44 @@ export const SideMenu = React.memo(
             )}
           </View>
 
-          <View
-            style={{
-              width: "100%",
-              paddingHorizontal: 0
-            }}
-          >
-            <UserStatus />
-          </View>
+          {dragging ? (
+            <View
+              style={{
+                paddingHorizontal: 12
+              }}
+            >
+              <Button
+                type="grayAccent"
+                style={{
+                  flexDirection: "row",
+                  borderRadius: 5,
+                  marginBottom: 12,
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  paddingHorizontal: 12,
+                  marginTop: 5,
+                  paddingVertical: 6,
+                  width: "100%"
+                }}
+                icon="close"
+                title="Tap to stop reordering"
+                onPress={() => {
+                  useSideBarDraggingStore.setState({
+                    dragging: false
+                  });
+                }}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                width: "100%",
+                paddingHorizontal: 0
+              }}
+            >
+              <UserStatus />
+            </View>
+          )}
         </View>
       </View>
     ) : null;

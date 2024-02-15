@@ -31,7 +31,6 @@ import useNavigationStore from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { SIZE, normalize } from "../../utils/size";
 import ReorderableList from "../list/reorderable-list";
-import { Properties } from "../properties";
 import { Button } from "../ui/button";
 import { Notice } from "../ui/notice";
 import { PressableButton } from "../ui/pressable";
@@ -161,10 +160,6 @@ export const PinItem = React.memo(
         )}
         <PressableButton
           type={isFocused ? "selected" : "gray"}
-          onLongPress={() => {
-            if (isPlaceholder) return;
-            Properties.present(item);
-          }}
           onPress={() => onPress(item)}
           customStyle={{
             width: "100%",

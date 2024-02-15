@@ -33,10 +33,11 @@ import { Properties } from "../properties";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useSideBarDraggingStore } from "./dragging-store";
 
 export const ColorSection = React.memo(
   function ColorSection() {
-    const [colorNotes, loadingColors] = useMenuStore((state) => [
+    const [colorNotes] = useMenuStore((state) => [
       state.colorNotes,
       state.loadingColors
     ]);
@@ -78,7 +79,6 @@ export const ColorSection = React.memo(
 const ColorItem = React.memo(
   function ColorItem({ item }: { item: Color }) {
     const { colors, isDark } = useThemeColors();
-    const setColorNotes = useMenuStore((state) => state.setColorNotes);
     const isFocused = useNavigationStore(
       (state) => state.focusedRouteId === item.id
     );
@@ -92,6 +92,7 @@ const ColorItem = React.memo(
     };
 
     const onLongPress = () => {
+      if (useSideBarDraggingStore.getState().dragging) return;
       Properties.present(item);
     };
 
