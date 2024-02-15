@@ -372,6 +372,7 @@ export const useActions = ({
         useSideBarDraggingStore.setState({
           dragging: true
         });
+        close();
       }
     });
   }

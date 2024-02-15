@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import {
   activateKeepAwake,
   deactivateKeepAwake
@@ -40,6 +41,7 @@ import Animated, {
 import { notesnook } from "../../e2e/test.ids";
 import { db } from "../common/database";
 import { SideMenu } from "../components/side-menu";
+import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import { FluidTabs } from "../components/tabs";
 import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
 import { useShortcutManager } from "../hooks/use-shortcut-manager";
@@ -59,7 +61,6 @@ import {
 } from "../services/event-manager";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -69,7 +70,6 @@ import {
 import { editorRef, tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
-import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 
 const _TabsHolder = () => {
   const { colors, isDark } = useThemeColors();
