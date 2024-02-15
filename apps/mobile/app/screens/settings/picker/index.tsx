@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useRef, useState } from "react";
-import { View } from "react-native";
+import { TouchableHighlight, View } from "react-native";
 import Menu, { MenuItem } from "react-native-reanimated-material-menu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { PressableButton } from "../../../components/ui/pressable";
@@ -126,6 +126,7 @@ export function SettingsPicker<T>({
         }
       >
         <Dialog context="local" />
+
         {options.map((item) => (
           <MenuItem
             key={getItemKey(item)}
@@ -138,9 +139,10 @@ export function SettingsPicker<T>({
                 onChange(item);
               }
             }}
+            underlayColor={colors.primary.hover}
             style={{
               backgroundColor: compareValue(currentValue, item)
-                ? colors.secondary.background
+                ? colors.selected.background
                 : "transparent",
               width: "100%",
               maxWidth: width

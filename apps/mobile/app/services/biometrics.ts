@@ -26,6 +26,7 @@ import { MMKV } from "../common/database/mmkv";
 import Storage from "../common/database/storage";
 import { useSettingStore } from "../stores/use-setting-store";
 import { ToastOptions, ToastManager } from "./event-manager";
+import { useUserStore } from "../stores/use-user-store";
 
 const KeychainConfig = Platform.select({
   ios: {
@@ -122,6 +123,10 @@ async function getCredentials(title?: string, description?: string) {
 
 async function validateUser(title: string, description?: string) {
   try {
+    useUserStore.setState({
+      disableAppLockRequests: true
+    });
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
     await FingerprintScanner.authenticate(
       Platform.select({
         ios: {
@@ -135,10 +140,18 @@ async function validateUser(title: string, description?: string) {
         }
       }) as AuthenticateIOS
     );
+    useUserStore.setState({
+      disableAppLockRequests: false
+    });
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
     FingerprintScanner.release();
     return true;
   } catch (error) {
     const e = error as { name: string };
+    useUserStore.setState({
+      disableAppLockRequests: false
+    });
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
     FingerprintScanner.release();
     if (e.name === "DeviceLocked") {
       ToastManager.show({
