@@ -74,7 +74,11 @@ export const ToolButton = React.memo(
               },
           ...sx
         }}
-        onMouseDown={(e) => e.preventDefault()}
+        onMouseDown={(e) => {
+          if (globalThis.keyboardShown) {
+            e.preventDefault();
+          }
+        }}
         {...buttonProps}
       >
         <Icon
