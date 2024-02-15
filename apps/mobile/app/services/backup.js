@@ -154,7 +154,7 @@ async function updateNextBackupTime() {
  * @param {string} context
  * @returns {Promise<{path?: string, error?: Error}}>
  */
-async function run(progress, context) {
+async function run(progress, context = "global") {
   let androidBackupDirectory = await checkBackupDirExists(false, context);
   if (!androidBackupDirectory)
     return {

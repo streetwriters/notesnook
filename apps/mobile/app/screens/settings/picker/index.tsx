@@ -40,6 +40,7 @@ interface PickerOptions<T> {
   premium?: boolean;
   onCheckOptionIsPremium?: (item: T) => boolean;
   requiresVerification?: () => boolean;
+  onVerify?: () => Promise<boolean>;
 }
 
 export function SettingsPicker<T>({
@@ -51,7 +52,8 @@ export function SettingsPicker<T>({
   getItemKey,
   premium,
   onCheckOptionIsPremium = () => true,
-  requiresVerification = () => false
+  requiresVerification = () => false,
+  onVerify
 }: PickerOptions<T>) {
   const { colors } = useThemeColors("contextMenu");
   const menuRef = useRef<any>();
@@ -105,6 +107,7 @@ export function SettingsPicker<T>({
         anchor={
           <PressableButton
             onPress={async () => {
+              if (onVerify && !(await onVerify())) return;
               menuRef.current?.show();
             }}
             type="grayBg"

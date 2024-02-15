@@ -43,6 +43,7 @@ const DialogProvider = () => {
 
   return (
     <>
+      <AppLockPassword />
       <LoadingDialog />
       <Dialog context="global" />
       <PremiumDialog colors={colors} />
@@ -61,7 +62,6 @@ const DialogProvider = () => {
       <SessionExpired />
       <PDFPreview />
       <JumpToSectionDialog />
-      <AppLockPassword />
     </>
   );
 };

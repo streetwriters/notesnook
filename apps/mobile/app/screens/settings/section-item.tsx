@@ -104,17 +104,26 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         borderRadius: 0,
         ...styles
       }}
-      onPress={() => {
+      onPress={async () => {
         switch (item.type) {
           case "screen":
-            navigation.dispatch(StackActions.push("SettingsGroup", item));
-            useNavigationStore.getState().update("Settings");
+            {
+              if (item.onVerify && !(await item.onVerify())) return;
+              navigation.dispatch(StackActions.push("SettingsGroup", item));
+              useNavigationStore.getState().update("Settings");
+            }
             break;
           case "switch":
-            onChangeSettings();
+            {
+              if (item.onVerify && !(await item.onVerify())) return;
+              onChangeSettings();
+            }
             break;
           default:
-            item.modifer && item.modifer(current);
+            {
+              if (item.onVerify && !(await item.onVerify())) return;
+              item.modifer && item.modifer(current);
+            }
             break;
         }
       }}
