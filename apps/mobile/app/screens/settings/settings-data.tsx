@@ -25,7 +25,6 @@ import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import { db } from "../../common/database";
-import { validateAppLockPassword } from "../../common/database/encryption";
 import { MMKV } from "../../common/database/mmkv";
 import { AttachmentDialog } from "../../components/attachments";
 import { ChangePassword } from "../../components/auth/change-password";
@@ -53,6 +52,7 @@ import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
 import { clearAllStores } from "../../stores";
+import { refreshAllStores } from "../../stores/create-db-collection-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
@@ -67,10 +67,9 @@ import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
 import { useDragState } from "./editor/state";
-import { verifyUser } from "./functions";
+import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import { refreshAllStores } from "../../stores/create-db-collection-store";
 type User = any;
 
 export const settingsGroups: SettingSection[] = [
@@ -790,94 +789,33 @@ export const settingsGroups: SettingSection[] = [
             icon: "lock",
             type: "switch",
             property: "appLockEnabled",
-            onChange: async () => {
+            onVerify: async () => {
+              const verified = await verifyUserWithApplock();
+              if (!verified) return false;
+
               if (!SettingsService.getProperty("appLockEnabled")) {
-                const keyboardType = SettingsService.getProperty(
-                  "applockKeyboardType"
-                );
-                if (SettingsService.getProperty("appLockHasPasswordSecurity")) {
-                  presentDialog({
-                    title: "Verify it's you",
-                    input: true,
-                    inputPlaceholder: `Enter app lock ${
-                      keyboardType === "numeric" ? "pin" : "password"
-                    }`,
-                    paragraph: `Please enter your app lock ${
-                      keyboardType === "numeric" ? "pin" : "password"
-                    } to disable app lock`,
-                    positiveText: "Disable",
-                    secureTextEntry: true,
-                    negativeText: "Cancel",
-                    positivePress: async (value) => {
-                      try {
-                        const verified = await validateAppLockPassword(value);
-                        if (!verified) {
-                          SettingsService.setProperty("appLockEnabled", true);
-                          return false;
-                        } else {
-                          SettingsService.setProperty("appLockEnabled", false);
-                        }
-                      } catch (e) {
-                        SettingsService.setProperty("appLockEnabled", true);
-                        return false;
-                      }
-                    }
-                  });
-                } else {
-                  if (await BiometicService.isBiometryAvailable()) {
-                    const verified = await BiometicService.validateUser(
-                      "Verify it's you"
-                    );
-                    if (!verified) {
-                      SettingsService.setProperty("appLockEnabled", true);
-                      return;
-                    } else {
-                      SettingsService.setProperty("appLockEnabled", false);
-                    }
-                  } else if (useUserStore.getState().user) {
-                    let verified = false;
-                    verifyUser(
-                      null,
-                      () => {
-                        SettingsService.setProperty("appLockEnabled", false);
-                        verified = true;
-                      },
-                      false,
-                      () => {
-                        if (!verified)
-                          SettingsService.setProperty("appLockEnabled", true);
-                      }
-                    );
-                  }
-                }
-                return;
-              }
-
-              if (
-                !(await BiometicService.isBiometryAvailable()) &&
-                !SettingsService.getProperty("appLockHasPasswordSecurity")
-              ) {
-                ToastManager.show({
-                  heading: "Biometrics not enrolled",
-                  type: "error",
-                  message:
-                    "To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone."
-                });
-                SettingsService.setProperty("appLockEnabled", false);
-                return;
-              }
-
-              if (!SettingsService.getProperty("appLockHasPasswordSecurity")) {
-                const verified = await BiometicService.validateUser(
-                  "Verify it's you"
-                );
-                if (verified) {
+                if (
+                  !SettingsService.getProperty("appLockHasPasswordSecurity") &&
+                  (await BiometicService.isBiometryAvailable())
+                ) {
                   SettingsService.setProperty("biometricsAuthEnabled", true);
-                } else {
-                  SettingsService.setProperty("appLockEnabled", false);
-                  return;
+                }
+
+                if (
+                  !(await BiometicService.isBiometryAvailable()) &&
+                  !SettingsService.getProperty("appLockHasPasswordSecurity")
+                ) {
+                  ToastManager.show({
+                    heading: "Biometrics not enrolled",
+                    type: "error",
+                    message:
+                      "To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone."
+                  });
+                  return false;
                 }
               }
+
+              return verified;
             }
           },
           {
@@ -907,8 +845,12 @@ export const settingsGroups: SettingSection[] = [
                 "appLockHasPasswordSecurity"
               );
             },
+            onVerify: () => {
+              return verifyUserWithApplock();
+            },
             property: "appLockHasPasswordSecurity",
             modifer: () => {
+              console.log("called modifier..");
               AppLockPassword.present("create");
             }
           },
@@ -962,32 +904,23 @@ export const settingsGroups: SettingSection[] = [
             description: "Allow biometric authentication to unlock the app",
             type: "switch",
             property: "biometricsAuthEnabled",
-            onChange: async () => {
-              if (await BiometicService.isBiometryAvailable()) {
-                const verified = await BiometicService.validateUser(
-                  "Verify it's you"
-                );
-                if (!verified) {
-                  SettingsService.setProperty("biometricsAuthEnabled", false);
+            onVerify: async () => {
+              const verified = await verifyUserWithApplock();
+              if (!verified) return false;
+
+              if (SettingsService.getProperty("biometricsAuthEnabled")) {
+                if (
+                  !SettingsService.getProperty("appLockHasPasswordSecurity")
+                ) {
+                  SettingsService.setProperty("appLockEnabled", false);
+                  ToastManager.show({
+                    heading: "App lock disabled",
+                    type: "success"
+                  });
                 }
-              } else {
-                ToastManager.error(
-                  new Error(
-                    "Biometric authentication is unavailable on this device."
-                  )
-                );
-                SettingsService.setProperty("biometricsAuthEnabled", false);
               }
-              if (
-                !SettingsService.getProperty("biometricsAuthEnabled") &&
-                !SettingsService.getProperty("appLockHasPasswordSecurity")
-              ) {
-                SettingsService.setProperty("appLockEnabled", false);
-                ToastManager.show({
-                  heading: "App lock disabled",
-                  type: "success"
-                });
-              }
+
+              return verified;
             },
             icon: "fingerprint"
           }

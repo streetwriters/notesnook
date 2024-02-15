@@ -27,6 +27,7 @@ import { getFontById, getFonts } from "@notesnook/editor/dist/utils/font";
 import { DATE_FORMATS, TIME_FORMATS } from "@notesnook/core/dist/common";
 import dayjs from "dayjs";
 import { useUserStore } from "../../../stores/use-user-store";
+import { verifyUserWithApplock } from "../functions";
 
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
@@ -156,5 +157,7 @@ export const ApplockTimerPicker = createSettingsPicker({
   getItemKey: (item) => item.toString(),
   options: [-1, 0, 1, 5, 15, 30],
   compareValue: (current, item) => current === item,
-  premium: true
+  onVerify: () => {
+    return verifyUserWithApplock();
+  }
 });
