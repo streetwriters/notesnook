@@ -32,10 +32,7 @@ import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
 import { MenuItemsList } from "../../utils/menu-items";
-import { SIZE } from "../../utils/size";
 import ReorderableList from "../list/reorderable-list";
-import { IconButton } from "../ui/icon-button";
-import Paragraph from "../ui/typography/paragraph";
 import { ColorSection } from "./color-section";
 import { useSideBarDraggingStore } from "./dragging-store";
 import { MenuItem } from "./menu-item";
@@ -135,40 +132,6 @@ export const SideMenu = React.memo(
             paddingTop: insets.top
           }}
         >
-          {dragging ? (
-            <View
-              style={{
-                flexDirection: "row",
-                borderRadius: 5,
-                marginBottom: 12,
-                justifyContent: "space-between",
-                alignItems: "center",
-                paddingHorizontal: 12,
-                backgroundColor: colors.secondary.background,
-                marginHorizontal: 12,
-                marginTop: 5,
-                paddingVertical: 6
-              }}
-            >
-              <Paragraph size={SIZE.sm}>REORDERING</Paragraph>
-
-              <IconButton
-                name="close"
-                size={20}
-                onPress={() => {
-                  useSideBarDraggingStore.setState({
-                    dragging: false
-                  });
-                }}
-                color={colors.primary.icon}
-                customStyle={{
-                  width: 35,
-                  height: 35
-                }}
-              />
-            </View>
-          ) : null}
-
           <FlatList
             alwaysBounceVertical={false}
             contentContainerStyle={{

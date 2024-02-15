@@ -82,10 +82,16 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
 
   return (
     <>
-      <SelectionHeader id={route.name} items={trash} type="trash" />
+      <SelectionHeader
+        id={route.name}
+        items={trash}
+        type="trash"
+        renderedInRoute={route.name}
+      />
       <Header
         renderedInRoute={route.name}
         title={route.name}
+        id={route.name}
         canGoBack={false}
         hasSearch={true}
         onSearch={() => {

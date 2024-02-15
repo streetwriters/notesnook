@@ -23,8 +23,6 @@ import { Platform, StyleSheet, View } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import Menu from "react-native-reanimated-material-menu";
 import { notesnook } from "../../../e2e/test.ids";
-import Navigation from "../../services/navigation";
-import SearchService from "../../services/search";
 import {
   HeaderRightButton,
   RouteName
