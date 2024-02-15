@@ -44,6 +44,7 @@ export function CellProperties(props: CellPropertiesProps) {
         >
           <Box mt={2} />
           <ColorPicker
+            editor={editor}
             expanded={true}
             color={attributes.backgroundColor}
             onChange={(color) =>
@@ -67,6 +68,7 @@ export function CellProperties(props: CellPropertiesProps) {
         >
           <Box mt={2} />
           <ColorPicker
+            editor={editor}
             expanded={true}
             color={attributes.color}
             onChange={(color) =>
@@ -88,6 +90,7 @@ export function CellProperties(props: CellPropertiesProps) {
         >
           <Box mt={2} />
           <ColorPicker
+            editor={editor}
             expanded={true}
             color={attributes.borderColor}
             onChange={(color) =>
