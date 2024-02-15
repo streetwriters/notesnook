@@ -64,9 +64,14 @@ export function keepLastLineInView(
 ) {
   if (!editor.state.selection.empty) return;
 
+  const isPopupVisible = document.getElementsByClassName(
+    "editor-mobile-toolbar-popup"
+  );
+
   const node = editor.state.selection.$from;
   const { top } = posToDOMRect(editor.view, node.pos, node.pos + 1);
-  const isBelowThreshold = window.innerHeight - top < THRESHOLD;
+  const isBelowThreshold =
+    window.innerHeight - top < (isPopupVisible ? THRESHOLD + 60 : THRESHOLD);
   const isAboveThreshold = top < THRESHOLD;
   const DIFF_BOTTOM = THRESHOLD - (window.innerHeight - top);
 
@@ -83,7 +88,9 @@ export function keepLastLineInView(
       const container = findScrollContainer(domNode);
       if (container) {
         container.scrollBy({
-          top: isAboveThreshold ? DIFF_TOP + 10 : DIFF_BOTTOM,
+          top: isAboveThreshold
+            ? DIFF_TOP + 10
+            : DIFF_BOTTOM + (isPopupVisible ? 60 : 0),
           behavior: "smooth"
         });
       } else domNode.scrollIntoView({ behavior: "smooth", block: "center" });

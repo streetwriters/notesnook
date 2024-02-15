@@ -28,6 +28,7 @@ import { Button } from "../../components/button";
 import { debounce } from "../../utils/debounce";
 import { Popup } from "../components/popup";
 import { SchemeColors } from "@notesnook/theme";
+import { Editor } from "../../types";
 
 export const DEFAULT_COLORS = [
   "#e91e63",
@@ -47,6 +48,7 @@ export const DEFAULT_COLORS = [
 ];
 
 type ColorPickerProps = {
+  editor: Editor;
   colors?: string[];
   color?: string;
   onClear: () => void;
@@ -69,7 +71,8 @@ export function ColorPicker(props: ColorPickerProps) {
     expanded,
     onSave,
     colors = [],
-    onDelete
+    onDelete,
+    editor
   } = props;
   const ref = useRef<HTMLDivElement>(null);
   const [isPickerOpen, setIsPickerOpen] = useState(expanded || false);
@@ -205,7 +208,23 @@ export function ColorPicker(props: ColorPickerProps) {
               <PaletteButton
                 icon={Icons.palette}
                 iconColor={tColor.isDark() ? "white" : "icon"}
-                onClick={() => setIsPickerOpen((s) => !s)}
+                onClick={() => {
+                  setIsPickerOpen((s) => {
+                    if (s) {
+                      editor.current?.commands.focus();
+                    } else {
+                      const onSelectionChange = () => {
+                        setIsPickerOpen(false);
+                        editor.current?.off(
+                          "selectionUpdate",
+                          onSelectionChange
+                        );
+                      };
+                      editor.current?.on("selectionUpdate", onSelectionChange);
+                    }
+                    return !s;
+                  });
+                }}
                 title="Choose custom color"
                 iconSize={18}
                 bg={currentColor}
