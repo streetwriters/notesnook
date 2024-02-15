@@ -103,6 +103,8 @@ const AppLockedOverlay = () => {
     )
       return;
 
+    biometricUnlockAwaitingUserInput.current = true;
+
     if (Platform.OS === "android") {
       const activityName = await NotesnookModule.getActivityName();
       if (activityName !== "MainActivity") return;
@@ -118,10 +120,11 @@ const AppLockedOverlay = () => {
       enabled(false);
       password.current = undefined;
     }
+    biometricUnlockAwaitingUserInput.current = false;
     setTimeout(() => {
-      biometricUnlockAwaitingUserInput.current = false;
+      if (biometricUnlockAwaitingUserInput.current) return;
       useSettingStore.getState().setRequestBiometrics(false);
-    }, 1);
+    }, 500);
   }, [biometricsAuthEnabled, lockApp]);
 
   const onSubmit = async () => {
@@ -156,7 +159,11 @@ const AppLockedOverlay = () => {
       useUserStore.getState().disableAppLockRequests
     )
       return;
-    if (appLocked && appState === "active") {
+    if (
+      appLocked &&
+      appState === "active" &&
+      !useSettingStore.getState().requestBiometrics
+    ) {
       biometricUnlockAwaitingUserInput.current = true;
       onUnlockAppRequested();
     }
