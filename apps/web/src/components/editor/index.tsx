@@ -55,6 +55,7 @@ import { Lightbox } from "../lightbox";
 import { Allotment } from "allotment";
 import { showToast } from "../../utils/toast";
 import { getFormattedDate } from "@notesnook/common";
+import { useWindowSize } from "../../hooks/use-window-size";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -445,6 +446,18 @@ function EditorChrome(
       isMobile: false
     };
   const editorMargins = useStore((store) => store.editorMargins);
+  const [width] = useWindowSize();
+  const [xSpace, setXSpace] = useState(0);
+
+  useEffect(() => {
+    const parent = document
+      .getElementsByClassName("editorScroll")[0]
+      .getBoundingClientRect();
+    const child = document
+      .getElementsByClassName("editor")[0]
+      .getBoundingClientRect();
+    setXSpace(Math.abs(parent.left - child.left));
+  }, [width]);
 
   if (headless) return <>{children}</>;
 
@@ -478,7 +491,11 @@ function EditorChrome(
           sx={{
             alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
             maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
-            width: "100%"
+            width: "100%",
+            "& .ProseMirror": {
+              marginX: -xSpace,
+              paddingX: xSpace
+            }
           }}
           pl={6}
           pr={2}
