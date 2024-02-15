@@ -91,7 +91,7 @@ export const AppLockPassword = () => {
     setVisible(false);
   };
 
-  return (
+  return !visible ? null : (
     <BaseDialog
       onShow={async () => {
         await sleep(100);

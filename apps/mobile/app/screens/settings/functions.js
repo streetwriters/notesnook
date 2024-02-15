@@ -17,9 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { presentDialog } from "../../components/dialog/functions";
-import { ToastManager } from "../../services/event-manager";
 import { db } from "../../common/database";
+import { validateAppLockPassword } from "../../common/database/encryption";
+import { presentDialog } from "../../components/dialog/functions";
+import BiometicService from "../../services/biometrics";
+import { ToastManager } from "../../services/event-manager";
+import SettingsService from "../../services/settings";
+import { useUserStore } from "../../stores/use-user-store";
 import { sleep } from "../../utils/time";
 
 export async function verifyUser(
@@ -66,6 +70,57 @@ export async function verifyUser(
         });
         return false;
       }
+    }
+  });
+}
+
+export async function verifyUserWithApplock() {
+  const keyboardType = SettingsService.getProperty("applockKeyboardType");
+  return new Promise((resolve) => {
+    if (SettingsService.getProperty("appLockHasPasswordSecurity")) {
+      presentDialog({
+        title: "Verify it's you",
+        input: true,
+        inputPlaceholder: `Enter app lock ${
+          keyboardType === "numeric" ? "pin" : "password"
+        }`,
+        paragraph: `Please enter your app lock ${
+          keyboardType === "numeric" ? "pin" : "password"
+        }`,
+        positiveText: "Disable",
+        secureTextEntry: true,
+        negativeText: "Cancel",
+        positivePress: async (value) => {
+          try {
+            const verified = await validateAppLockPassword(value);
+            resolve(verified);
+          } catch (e) {
+            resolve(false);
+          }
+        }
+      });
+    } else {
+      BiometicService.isBiometryAvailable().then((available) => {
+        if (available) {
+          BiometicService.validateUser("Verify it's you").then((verified) => {
+            resolve(verified);
+          });
+        } else if (useUserStore.getState().user) {
+          let verified = false;
+          verifyUser(
+            null,
+            () => {
+              resolve(true);
+            },
+            false,
+            () => {
+              resolve(verified);
+            }
+          );
+        } else {
+          resolve(true);
+        }
+      });
     }
   });
 }
