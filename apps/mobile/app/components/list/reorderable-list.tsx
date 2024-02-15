@@ -125,14 +125,13 @@ function ReorderableList<T extends { id: string }>({
 
   function getOrderedItems() {
     const items: T[] = [];
-    data.forEach((item) => {
-      const index = itemOrderState.indexOf(item?.id);
-      if (index === -1) {
-        items.push(item);
-      } else {
-        items.splice(index, 0, item);
-      }
+    itemOrderState.forEach((id) => {
+      const item = data.find((i) => i.id === id);
+      if (!item) return;
+      items.push(item);
     });
+
+    items.push(...data.filter((i) => !itemOrderState.includes(i.id)));
     return items;
   }
 
@@ -147,6 +146,9 @@ function ReorderableList<T extends { id: string }>({
           itemStyles={{
             hoverDragReleasedStyle: {
               display: "none"
+            },
+            hoverDraggingWithoutReceiverStyle: {
+              opacity: 0.5
             },
             dragReleasedStyle: {
               opacity: 1
@@ -173,6 +175,9 @@ function ReorderableList<T extends { id: string }>({
             }
             setItemsOrder(newOrder);
             onListOrderChanged?.(newOrder);
+          }}
+          onItemDragEnd={(e) => {
+            console.log(e.receiver?.receiveOffset);
           }}
           keyExtractor={(item) => (item as any).id}
         />

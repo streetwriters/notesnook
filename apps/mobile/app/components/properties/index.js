@@ -35,6 +35,7 @@ import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { TagStrip, Tags } from "./tags";
+import { useSideBarDraggingStore } from "../side-menu/dragging-store";
 
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
@@ -235,7 +236,12 @@ Properties.present = async (item, buttons = [], isSheet) => {
       break;
     case "color":
       props[0] = await db.colors.color(item.id);
-      props.push(["trash", "rename-color", "reorder"]);
+
+      props.push([
+        "trash",
+        "rename-color",
+        ...(useSideBarDraggingStore.getState().dragging ? [] : ["reorder"])
+      ]);
       break;
     case "reminder": {
       props[0] = await db.reminders.reminder(item.id);
