@@ -28,6 +28,7 @@ import {
 import { NotesnookModule } from "../utils/notesnook-module";
 import { scale, updateSize } from "../utils/size";
 import { DatabaseLogger } from "../common/database";
+import { useUserStore } from "../stores/use-user-store";
 function reset() {
   const settings = get();
   if (settings.reminder !== "off" && settings.reminder !== "useroff") {
@@ -195,6 +196,12 @@ function appEnteredBackground() {
 }
 
 function shouldLockAppOnEnterForeground() {
+  if (
+    useUserStore.getState().disableAppLockRequests ||
+    useSettingStore.getState().requestBiometrics
+  )
+    return false;
+
   const settings = get();
   if (!settings.appLockEnabled) return false;
   if (settings.appLockTimer === -1) return false;

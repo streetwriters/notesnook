@@ -485,7 +485,6 @@ export const useAppEvents = () => {
     const onAppStateChanged = async (state: AppStateStatus) => {
       if (state === "active") {
         if (SettingsService.shouldLockAppOnEnterForeground()) {
-          console.log("Locked app on enter foreground");
           useUserStore.getState().lockApp(true);
         }
 
@@ -497,12 +496,7 @@ export const useAppEvents = () => {
         ) {
           enabled(false);
         }
-        if (SettingsService.canLockAppInBackground()) {
-          if (useSettingStore.getState().requestBiometrics) {
-            useSettingStore.getState().setRequestBiometrics(false);
-            return;
-          }
-        }
+
         checkAutoBackup();
         await reconnectSSE();
         await checkForShareExtensionLaunchedInBackground();
@@ -543,10 +537,11 @@ export const useAppEvents = () => {
           }
         }
         if (
-          SettingsService.get().privacyScreen ||
-          SettingsService.canLockAppInBackground()
+          (SettingsService.get().privacyScreen ||
+            SettingsService.canLockAppInBackground()) &&
+          !useSettingStore.getState().requestBiometrics
         ) {
-          !useSettingStore.getState().requestBiometrics ? enabled(true) : null;
+          enabled(true);
         }
       }
     };
