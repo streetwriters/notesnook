@@ -69,6 +69,7 @@ import {
 import { editorRef, tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
+import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 
 const _TabsHolder = () => {
   const { colors, isDark } = useThemeColors();
@@ -434,7 +435,13 @@ const _TabsHolder = () => {
               enabled={deviceMode !== "tablet" && !fullscreen}
               onScroll={onScroll}
               onChangeTab={onChangeTab}
-              onDrawerStateChange={() => true}
+              onDrawerStateChange={(state) => {
+                if (!state) {
+                  useSideBarDraggingStore.setState({
+                    dragging: false
+                  });
+                }
+              }}
             >
               <View
                 key="1"
@@ -459,6 +466,12 @@ const _TabsHolder = () => {
                   {deviceMode === "mobile" ? (
                     <Animated.View
                       onTouchEnd={() => {
+                        if (useSideBarDraggingStore.getState().dragging) {
+                          useSideBarDraggingStore.setState({
+                            dragging: false
+                          });
+                          return;
+                        }
                         tabBarRef.current?.closeDrawer();
                         animatedOpacity.value = withTiming(0);
                         animatedTranslateY.value = withTiming(-9999);

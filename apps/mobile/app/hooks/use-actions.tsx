@@ -200,6 +200,7 @@ export const useActions = ({
           title: value
         });
 
+        eSendEvent(Navigation.routeNames.TaggedNotes);
         InteractionManager.runAfterInteractions(() => {
           useTagStore.getState().refresh();
           useMenuStore.getState().setMenuPins();
@@ -230,6 +231,8 @@ export const useActions = ({
           id: item.id,
           title: value
         });
+
+        eSendEvent(Navigation.routeNames.ColoredNotes);
         useMenuStore.getState().setColorNotes();
       },
       positiveText: "Rename"
@@ -499,7 +502,7 @@ export const useActions = ({
   if (item.type === "note") {
     async function openHistory() {
       presentSheet({
-        component: (ref) => <NoteHistory fwdRef={ref} note={item} />
+        component: (ref) => <NoteHistory fwdRef={ref} note={item as Note} />
       });
     }
 
@@ -520,7 +523,7 @@ export const useActions = ({
     }
 
     const toggleReadyOnlyMode = async () => {
-      const currentReadOnly = (item as Note).localOnly;
+      const currentReadOnly = (item as Note).readonly;
       await db.notes.readonly(!currentReadOnly, item?.id);
 
       if (useEditorStore.getState().currentEditingNote === item.id) {

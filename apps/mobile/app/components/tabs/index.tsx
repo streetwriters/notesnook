@@ -40,6 +40,7 @@ import { editorState } from "../../screens/editor/tiptap/utils";
 import { eSendEvent } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eClearEditor } from "../../utils/events";
+import { useSideBarDraggingStore } from "../side-menu/dragging-store";
 
 interface TabProps extends ViewProps {
   dimensions: { width: number; height: number };
@@ -219,6 +220,9 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
           translateX.value = 299;
           translateX.value = 300;
         }
+        useSideBarDraggingStore.setState({
+          dragging: false
+        });
         onDrawerStateChange(false);
         isDrawerOpen.value = false;
       },
@@ -340,6 +344,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
           isDrawerOpen.value = false;
           currentTab.value = 1;
           runOnJS(onDrawerStateChange)(false);
+
           return;
         } else if (!isSwipeLeft && finalValue < 100) {
           translateX.value = withSpring(0, animationConfig);

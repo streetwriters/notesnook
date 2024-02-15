@@ -45,9 +45,15 @@ export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
 
   return (
     <>
-      <SelectionHeader id={route.name} items={tags} type="tag" />
+      <SelectionHeader
+        id={route.name}
+        items={tags}
+        type="tag"
+        renderedInRoute={route.name}
+      />
       <Header
         renderedInRoute={route.name}
+        id={route.name}
         title={route.name}
         canGoBack={false}
         hasSearch={true}

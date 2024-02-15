@@ -152,11 +152,13 @@ export const NotebookSheet = () => {
         onRequestUpdate();
       });
     } else {
-      useItemSelectionStore.setState({
-        enabled: false,
-        selection: {}
-      });
-      ref.current?.hide();
+      if (ref.current?.isOpen()) {
+        useItemSelectionStore.setState({
+          enabled: false,
+          selection: {}
+        });
+        ref.current?.hide();
+      }
     }
   }, [canShow, onRequestUpdate, focusedRouteId]);
 

@@ -98,13 +98,18 @@ class Commands {
   clearContent = async () => {
     this.previousSettings = null;
     await this.doAsync(
-      `editor.commands.blur();
+      `
+      if (typeof globalThis.statusBar !== "undefined") {
+        globalThis.statusBar.current.resetWords();
+        globalThis.statusBar.current.set({date:"",saved:""});
+      }
+      
+      editor.commands.blur();
 typeof globalThis.editorTitle !== "undefined" && editorTitle.current && editorTitle.current?.blur();
 if (editorController.content) editorController.content.current = null;
 editorController.onUpdate();
 editorController.setTitle(null);
-editorController.countWords(0);
-typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",saved:""});
+
         `
     );
   };

@@ -37,6 +37,10 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
       const words = getTotalWords(editor as Editor) + " words";
       if (currentWords.current === words) return;
       setWords(words);
+    },
+    resetWords: () => {
+      currentWords.current = `0 words`;
+      setWords(`0 words`);
     }
   });
   globalThis.statusBar = statusBar;

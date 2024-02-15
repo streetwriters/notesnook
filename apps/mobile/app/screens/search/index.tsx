@@ -101,6 +101,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         id={route.name}
         items={results}
         type={route.params?.type}
+        renderedInRoute={route.name}
       />
       <SearchBar onChangeText={onSearch} loading={loading} />
       <List
