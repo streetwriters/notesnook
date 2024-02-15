@@ -72,7 +72,11 @@ export function InsertBlock(props: ToolProps) {
             mr: 0
           }
         }}
-        onMouseDown={(e) => e.preventDefault()}
+        onMouseDown={(e) => {
+          if (globalThis.keyboardShown) {
+            e.preventDefault();
+          }
+        }}
         onClick={() => setIsOpen((s) => !s)}
       >
         <Icon path={Icons.plus} size="medium" color={"accent"} />

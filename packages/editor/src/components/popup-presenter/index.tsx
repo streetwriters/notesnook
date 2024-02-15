@@ -56,6 +56,7 @@ export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
       position={position}
       blocking
       focusOnRender
+      className={isMobile ? "editor-mobile-toolbar-popup" : undefined}
       isMobile={isMobile}
       {...presenterProps}
       isOpen={isPopupOpen}

@@ -89,6 +89,7 @@ export function ColorTool(props: ColorToolProps) {
       >
         <ColorPicker
           color={activeColor}
+          editor={props.editor}
           colors={colors}
           onDelete={(color) => {
             if (DEFAULT_COLORS.includes(color)) return;
@@ -108,7 +109,9 @@ export function ColorTool(props: ColorToolProps) {
             onColorChange(color);
             config.set(cacheKey, color);
           }}
-          onClose={() => setIsOpen(false)}
+          onClose={() => {
+            setIsOpen(false);
+          }}
           title={title}
         />
       </PopupWrapper>
@@ -126,8 +129,8 @@ export function Highlight(props: ToolProps) {
       title={"Background color"}
       onColorChange={(color) =>
         color
-          ? editor.current?.chain().focus().setHighlight(color).run()
-          : editor.current?.chain().focus().unsetHighlight().run()
+          ? editor.current?.chain().setHighlight(color).run()
+          : editor.current?.chain().unsetHighlight().run()
       }
     />
   );
@@ -143,8 +146,8 @@ export function TextColor(props: ToolProps) {
       title="Text color"
       onColorChange={(color) =>
         color
-          ? editor.current?.chain().focus().setColor(color).run()
-          : editor.current?.chain().focus().unsetColor().run()
+          ? editor.current?.chain().setColor(color).run()
+          : editor.current?.chain().unsetColor().run()
       }
     />
   );

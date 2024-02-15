@@ -103,7 +103,7 @@ export function TaskItemComponent(
           fontFamily: "inherit"
         }}
         onMouseDown={(e) => {
-          if (globalThis["keyboardShown"]) {
+          if (globalThis.keyboardShown) {
             e.preventDefault();
           }
           toggle();

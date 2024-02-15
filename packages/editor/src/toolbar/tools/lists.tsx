@@ -223,7 +223,11 @@ function ListThumbnail(props: ListThumbnailProps) {
         listStyleType,
         gap: 1
       }}
-      onMouseDown={(e) => e.preventDefault()}
+      onMouseDown={(e) => {
+        if (globalThis.keyboardShown) {
+          e.preventDefault();
+        }
+      }}
     >
       {[0, 1, 2].map((i) => (
         <Box
