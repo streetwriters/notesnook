@@ -54,5 +54,7 @@ class TrashStore extends BaseStore<TrashStore> {
   };
 }
 
-const [useStore, store] = createStore(TrashStore);
+const [useStore, store] = createStore<TrashStore>(
+  (set, get) => new TrashStore(set, get)
+);
 export { useStore, store };

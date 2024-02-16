@@ -28,13 +28,6 @@ import { isTelemetryEnabled, setTelemetry } from "../utils/telemetry";
 import { setDocumentTitle } from "../utils/dom";
 import { TimeFormat } from "@notesnook/core/dist/utils/date";
 import { TrashCleanupInterval } from "@notesnook/core";
-import { SecurityKeyConfig } from "../utils/webauthn";
-
-type AppLockSettings = {
-  enabled: boolean;
-  lockAfter: number;
-  securityKey?: SecurityKeyConfig;
-};
 
 class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
@@ -61,11 +54,6 @@ class SettingStore extends BaseStore<SettingStore> {
   autoUpdates = true;
   isFlatpak = false;
   proxyRules?: string;
-
-  appLockSettings: AppLockSettings = Config.get("appLockSettings", {
-    enabled: false,
-    lockAfter: 0
-  });
 
   refresh = async () => {
     this.set({
@@ -145,12 +133,6 @@ class SettingStore extends BaseStore<SettingStore> {
     this.set({ notificationsSettings: Config.get("notifications") });
   };
 
-  setAppLockSettings = (settings: Partial<AppLockSettings>) => {
-    const { appLockSettings } = this.get();
-    Config.set("appLockSettings", { ...appLockSettings, ...settings });
-    this.set({ appLockSettings: Config.get("appLockSettings") });
-  };
-
   toggleEncryptBackups = () => {
     const encryptBackups = this.get().encryptBackups;
     this.setEncryptBackups(!encryptBackups);
@@ -210,5 +192,7 @@ class SettingStore extends BaseStore<SettingStore> {
   };
 }
 
-const [useStore, store] = createStore(SettingStore);
+const [useStore, store] = createStore<SettingStore>(
+  (set, get) => new SettingStore(set, get)
+);
 export { useStore, store };

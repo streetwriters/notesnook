@@ -20,9 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { getFormattedDate } from "@notesnook/common";
 
 export type SecurityKeyConfig = {
-  firstSalt: string;
+  firstSalt: Uint8Array;
   label: string;
-  rawId: string;
+  rawId: ArrayBuffer;
   transports: AuthenticatorTransport[];
 };
 
@@ -71,6 +71,7 @@ async function registerSecurityKey(userId: BufferSource, username: string) {
     );
 
   return {
+    id: result.id,
     firstSalt,
     transports: (
       result.response as AuthenticatorAttestationResponse
@@ -137,9 +138,9 @@ async function getEncryptionKey(config: {
   const encryptionKey = await crypto.subtle.deriveKey(
     { name: "HKDF", info, salt, hash: "SHA-256" },
     keyDerivationKey,
-    { name: "AES-GCM", length: 256 },
+    { name: "AES-KW", length: 256 },
     false,
-    ["encrypt", "decrypt"]
+    ["wrapKey", "unwrapKey"]
   );
 
   return { encryptionKey };

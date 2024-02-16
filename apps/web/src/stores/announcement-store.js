@@ -71,7 +71,9 @@ class AnnouncementStore extends BaseStore {
   };
 }
 
-const [useStore, store] = createStore(AnnouncementStore);
+const [useStore, store] = createStore(
+  (set, get) => new AnnouncementStore(set, get)
+);
 export { useStore, store };
 
 export const allowedPlatforms = [

@@ -33,5 +33,7 @@ class TagStore extends BaseStore<TagStore> {
   };
 }
 
-const [useStore, store] = createStore(TagStore);
+const [useStore, store] = createStore<TagStore>(
+  (set, get) => new TagStore(set, get)
+);
 export { useStore, store };
