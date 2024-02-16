@@ -57,6 +57,7 @@ import { FlexScrollContainer } from "../components/scroll-container";
 import { Menu } from "../hooks/use-menu";
 import Config from "../utils/config";
 import { useSearch } from "../hooks/use-search";
+// import { showSortMenu } from "../components/group-header";
 
 type NotebookProps = {
   rootId: string;
@@ -261,7 +262,7 @@ function SubNotebooks({
           </Text>
         </Flex>
         <Flex sx={{ alignItems: "center" }}>
-          <Button
+          {/* <Button
             variant="secondary"
             data-test-id="subnotebooks-sort-button"
             sx={{
@@ -271,11 +272,11 @@ function SubNotebooks({
             }}
             onClick={(e) => {
               e.stopPropagation();
-              // showSortMenu("topics", () => refresh(selectedNotebook.id));
+              // showSortMenu("notebooks", () => refresh(selectedNotebook.id));
             }}
           >
             <SortAsc size={15} />
-          </Button>
+          </Button> */}
           <Button
             variant="secondary"
             data-test-id="subnotebooks-action-button"
