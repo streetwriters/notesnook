@@ -288,7 +288,9 @@ function SubNotebooks({
             }}
             onClick={async (e) => {
               e.stopPropagation();
-              await showAddNotebookDialog(rootId);
+              await showAddNotebookDialog(
+                context?.type === "notebook" ? context.id : rootId
+              );
             }}
           >
             <Plus size={20} />
@@ -345,7 +347,6 @@ function SubNotebooks({
               };
             },
             async getTreeItems(itemIds) {
-              console.log("get tree items:", itemIds);
               const notebooks = await db.notebooks.all.records(
                 itemIds as string[],
                 db.settings.getGroupOptions("notebooks")
