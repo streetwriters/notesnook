@@ -88,9 +88,23 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
               <Button
                 variant="error"
                 sx={{ alignSelf: "start", px: 30, mt: 1 }}
-                onClick={() => help.fix().catch((e) => alert(e))}
+                onClick={() =>
+                  help.fix().catch((e) => {
+                    console.error(e);
+                    alert(errorToString(e));
+                  })
+                }
               >
                 Fix it
+              </Button>
+              <Button
+                variant="secondary"
+                sx={{ alignSelf: "start", px: 30, mt: 1 }}
+                onClick={async () => {
+                  navigator.clipboard.writeText(errorToString(error));
+                }}
+              >
+                Copy
               </Button>
               <Button
                 variant="secondary"
@@ -102,13 +116,7 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
                   const mailto = new URL("mailto:support@streetwriters.co");
                   mailto.searchParams.set(
                     "body",
-                    `${
-                      error instanceof Error
-                        ? error.stack
-                        : -typeof error
-                        ? error
-                        : JSON.stringify(error)
-                    }
+                    `${errorToString(error)}
 
 ---
 Device information:
@@ -142,12 +150,7 @@ ${getDeviceInfo()}`
 
 function getErrorHelp(props: FallbackProps) {
   const { error, resetErrorBoundary } = props;
-  const errorText =
-    typeof error === "string"
-      ? error
-      : error instanceof Error
-      ? error.toString()
-      : JSON.stringify(error);
+  const errorText = errorToString(error);
   if (
     errorText.includes("file is not a database") ||
     errorText.includes("unsupported file format")
@@ -157,13 +160,39 @@ function getErrorHelp(props: FallbackProps) {
       action:
         "This error can only be fixed by wiping & reseting the database. Beware that this will wipe all your data inside the database with no way to recover it later on.",
       fix: async () => {
+        const { useKeyStore } = await import("../../interfaces/key-store");
+
+        await useKeyStore.getState().clear();
         const dialect = createDialect("notesnook");
         const driver = dialect.createDriver();
         if (!IS_DESKTOP_APP) await driver.init();
         await driver.delete();
-        await driver.destroy();
+        resetErrorBoundary();
+      }
+    };
+  } else if (errorText.includes("Could not decrypt key.")) {
+    return {
+      explanation: `This error means the at rest encryption key could not be decrypted. This can be due to data corruption or implementation change.`,
+      action:
+        "This error can only be fixed by wiping & reseting the Key Store and the database.",
+      fix: async () => {
+        const { useKeyStore } = await import("../../interfaces/key-store");
+
+        await useKeyStore.getState().clear();
+        const dialect = createDialect("notesnook");
+        const driver = dialect.createDriver();
+        if (!IS_DESKTOP_APP) await driver.init();
+        await driver.delete();
         resetErrorBoundary();
       }
     };
   }
+}
+
+function errorToString(error: unknown) {
+  return error instanceof Error
+    ? [error.message, error.stack || ""].join("\n")
+    : typeof error === "string"
+    ? error
+    : JSON.stringify(error);
 }
