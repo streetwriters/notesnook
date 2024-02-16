@@ -44,7 +44,7 @@ class MonographStore extends BaseStore<MonographStore> {
   unpublish = async (noteId: string) => {
     await db.monographs.unpublish(noteId);
     await this.get().refresh();
-    noteStore.refreshContext();
+    await noteStore.refreshContext();
   };
 }
 
