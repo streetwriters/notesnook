@@ -392,7 +392,7 @@ export function showRenameColorDialog(color: Color) {
       onClose={() => perform(false)}
       onAction={async (title: string) => {
         if (!title) return;
-        await db.tags.add({ id: color.id, title });
+        await db.colors.add({ id: color.id, title });
         showToast("success", "Color renamed!");
         appStore.refreshNavItems();
         perform(true);
