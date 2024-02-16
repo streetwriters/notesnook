@@ -164,6 +164,7 @@ function Notebook(props: NotebookProps) {
           maxSize={isCollapsed ? 30 : Infinity}
         >
           <SubNotebooks
+            key={rootId}
             notebookId={notebookId}
             isCollapsed={isCollapsed}
             rootId={rootId}
