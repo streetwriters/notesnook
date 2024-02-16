@@ -21,10 +21,10 @@ import { useCallback, useEffect, useState } from "react";
 import { Box, Button, Flex } from "@theme-ui/components";
 import {
   Note,
-  Notebook,
+  Notebook as NotebookIcon,
   StarOutline,
   Monographs,
-  Tag,
+  Tag as TagIcon,
   Trash,
   Settings,
   Notebook2,
@@ -69,6 +69,7 @@ import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { showToast } from "../../utils/toast";
 import { usePersistentState } from "../../hooks/use-persistent-state";
 import { MenuItem } from "@notesnook/ui";
+import { Notebook, Tag } from "@notesnook/core";
 
 type Route = {
   id: string;
@@ -79,13 +80,8 @@ type Route = {
 };
 
 const navigationHistory = new Map();
-function shouldSelectNavItem(route: string, pin: { type: string; id: string }) {
-  if (pin.type === "notebook") {
-    return route === `/notebooks/${pin.id}`;
-  } else if (pin.type === "tag") {
-    return route === `/tags/${pin.id}`;
-  }
-  return false;
+function shouldSelectNavItem(route: string, pin: Notebook | Tag) {
+  return route.endsWith(pin.id);
 }
 
 const routes: Route[] = [
@@ -94,7 +90,7 @@ const routes: Route[] = [
     id: "notebooks",
     title: "Notebooks",
     path: "/notebooks",
-    icon: Notebook
+    icon: NotebookIcon
   },
   {
     id: "favorites",
@@ -102,7 +98,7 @@ const routes: Route[] = [
     path: "/favorites",
     icon: StarOutline
   },
-  { id: "tags", title: "Tags", path: "/tags", icon: Tag },
+  { id: "tags", title: "Tags", path: "/tags", icon: TagIcon },
   {
     id: "reminders",
     title: "Reminders",
@@ -399,9 +395,14 @@ function NavigationMenu(props: NavigationMenuProps) {
                   }
                   isShortcut
                   selected={shouldSelectNavItem(location, item)}
-                  onClick={() => {
+                  onClick={async () => {
                     if (item.type === "notebook") {
-                      _navigate(`/notebooks/${item.id}`);
+                      const root = (await db.notebooks.breadcrumbs(item.id)).at(
+                        0
+                      );
+                      if (root && root.id !== item.id)
+                        _navigate(`/notebooks/${root.id}/${item.id}`);
+                      else _navigate(`/notebooks/${item.id}`);
                     } else if (item.type === "tag") {
                       _navigate(`/tags/${item.id}`);
                     }
