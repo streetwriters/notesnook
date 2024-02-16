@@ -57,7 +57,9 @@ class EditorContext extends BaseStore<EditorContext> {
   };
 }
 
-const [useEditorContext] = createStore(EditorContext);
+const [useEditorContext] = createStore<EditorContext>(
+  (set, get) => new EditorContext(set, get)
+);
 
 export function useEditorInstance() {
   const editor = useEditorContext((store) => store.subState.editor);

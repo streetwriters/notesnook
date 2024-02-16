@@ -30,7 +30,7 @@ import { sanitizeFilename } from "@notesnook/common";
 
 let logger: typeof _logger;
 async function initializeLogger(persistence: DatabasePersistence = "db") {
-  initialize(new NNStorage("Logs", null, persistence), false);
+  initialize(new NNStorage("Logs", () => null, persistence), false);
   logger = _logger.scope("notesnook-web");
 }
 

@@ -17,35 +17,70 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Cipher } from "@notesnook/crypto";
 import { IKVStore, IndexedDBKVStore, MemoryKVStore } from "./key-value";
-import { NNCrypto } from "./nncrypto";
 import { isFeatureSupported } from "../utils/feature-check";
-import { isCipher } from "@notesnook/core/dist/database/crypto";
 import { desktop } from "../common/desktop-bridge";
+import { SecurityKeyConfig } from "../utils/webauthn";
+import BaseStore, { GetState, SetState } from "../stores";
+import createStore from "../common/store";
 
-type BaseCredential = { id: string };
-type PasswordCredential = BaseCredential & {
-  type: "password";
+// Key chain credentials:
+/**
+ * 1. Security key
+ *    - changeable: false
+ * 2. Password/pin
+ *    - changeable: true
+ * 3. Private/public key pair
+ *    - changeable: true
+ * 4. QR Code Scan from another app
+ *    - changeable: true
+ */
+
+export type CredentialType = "password" | "securityKey";
+type BaseCredential<T extends CredentialType> = { type: T; id: string };
+type PasswordCredential = BaseCredential<"password"> & {
   password: string;
+  salt: Uint8Array;
 };
 
-type KeyCredential = BaseCredential & {
-  type: "key";
+type SecurityKeyCredential = BaseCredential<"securityKey"> & {
   key: CryptoKey;
+  config: SecurityKeyConfig;
 };
 
-type Credential = PasswordCredential | KeyCredential;
-export type SerializableCredential = Omit<Credential, "key" | "password">;
+type Credential = PasswordCredential | SecurityKeyCredential;
+
+export type CredentialWithoutSecret =
+  | Omit<PasswordCredential, "password">
+  | Omit<SecurityKeyCredential, "key">;
+
+export type SerializableCredential = CredentialWithoutSecret & {
+  active: boolean;
+};
+export type CredentialWithSecret =
+  | Omit<PasswordCredential, "salt">
+  | Omit<SecurityKeyCredential, "config">;
+export type CredentialQuery = BaseCredential<CredentialType> & {
+  active?: boolean;
+};
 
 type EncryptedData = {
   iv: Uint8Array;
   cipher: ArrayBuffer;
 };
 
-function isEncryptedData(data: any): data is EncryptedData {
-  return data.iv instanceof Uint8Array && typeof data.cipher !== "string";
+function isCredentialWithSecret(
+  c: CredentialWithSecret | CredentialWithoutSecret
+): c is CredentialWithSecret {
+  return "key" in c || "password" in c;
 }
+
+const defaultSecrets = {
+  databaseKey: new ArrayBuffer(0),
+  lockAfter: 0,
+  userEncryptionKey: ""
+};
+type Secrets = typeof defaultSecrets;
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -86,254 +121,278 @@ const decoder = new TextDecoder();
  *    system level keystore. The compromise here is that the database won't be
  *    encrypted if the user doesn't turn on app lock.
  */
-class KeyStore {
-  private secretStore: IKVStore;
-  private metadataStore: IKVStore;
-  private keyId = "key";
-  private key?: CryptoKey;
 
-  constructor(dbName: string) {
-    this.metadataStore = isFeatureSupported("indexedDB")
+class KeyStore extends BaseStore<KeyStore> {
+  #secretStore: IKVStore;
+  #metadataStore: IKVStore;
+  #keyId = "key";
+  #wrappingKeyId = "wrappingKey";
+  #key?: CryptoKey;
+
+  credentials: SerializableCredential[] = [];
+  secrets: Record<string, EncryptedData> = {};
+  isLocked = false;
+
+  constructor(
+    dbName: string,
+    setState: SetState<KeyStore>,
+    get: GetState<KeyStore>
+  ) {
+    super(setState, get);
+
+    this.#metadataStore = isFeatureSupported("indexedDB")
       ? new IndexedDBKVStore(`${dbName}-metadata`, "metadata")
       : new MemoryKVStore();
-    this.secretStore = isFeatureSupported("indexedDB")
+    this.#secretStore = isFeatureSupported("indexedDB")
       ? new IndexedDBKVStore(`${dbName}-secrets`, "secrets")
       : new MemoryKVStore();
   }
 
-  public async lock(credential: Credential) {
-    const originalKey = await this.getKey();
-    const key = new Uint8Array(
-      await window.crypto.subtle.exportKey("raw", originalKey)
-    );
+  activeCredentials = () => this.get().credentials.filter((c) => c.active);
 
-    await this.metadataStore.set(
-      this.getCredentialKey(credential),
-      await this.encryptKey(credential, key)
-    );
-
-    await this.metadataStore.delete(this.keyId);
-    await this.setCredential({ id: credential.id, type: credential.type });
-
-    this.key = originalKey;
-    return this;
-  }
-
-  public async unlock(
-    credential: Credential,
-    options?: {
-      permanent?: boolean;
-    }
-  ) {
-    if (!(await this.hasCredential(credential))) return;
-
-    const encryptedKey = await this.metadataStore.get<
-      Cipher<"base64"> | EncryptedData
-    >(this.getCredentialKey(credential));
-    if (!encryptedKey) return this;
-
-    const decryptedKey = await this.decryptKey(encryptedKey, credential);
-    if (!decryptedKey) throw new Error("Could not decrypt key.");
-
-    const key = await window.crypto.subtle.importKey(
-      "raw",
-      decryptedKey,
-      { name: "AES-GCM", length: 256 },
-      true,
-      ["encrypt", "decrypt"]
-    );
-
-    if (options?.permanent) {
-      await this.resetCredentials();
-      await this.storeKey(key);
-      this.key = undefined;
-    } else this.key = key;
-
-    return this;
-  }
-
-  public relock() {
-    this.key = undefined;
-  }
-
-  public async changeCredential(
-    oldCredential: Credential,
-    newCredential: Credential
-  ) {
-    const encryptedKey = await this.metadataStore.get<Cipher<"base64">>(
-      this.getCredentialKey(oldCredential)
-    );
-    if (!encryptedKey) return this;
-
-    const decryptedKey = await this.decryptKey(encryptedKey, oldCredential);
-    if (!decryptedKey) throw new Error("Could not decrypt key.");
-
-    const reencryptedKey = await this.encryptKey(newCredential, decryptedKey);
-    if (!reencryptedKey) throw new Error("Could not reencrypt key.");
-
-    await this.metadataStore.set(
-      this.getCredentialKey(newCredential),
-      reencryptedKey
-    );
-  }
-
-  public async verifyCredential(credential: Credential) {
-    try {
-      const encryptedKey = await this.metadataStore.get<Cipher<"base64">>(
-        this.getCredentialKey(credential)
-      );
-      if (!encryptedKey) return false;
-
-      const decryptedKey = await this.decryptKey(encryptedKey, credential);
-      return !!decryptedKey;
-    } catch {
-      return false;
-    }
-  }
-
-  public async removeCredential(credential: SerializableCredential) {
-    await this.metadataStore.delete(this.getCredentialKey(credential));
+  init = async () => {
     const credentials = await this.getCredentials();
-    const index = credentials.findIndex(
-      (c) => c.type === credential.type && c.id === credential.id
+    const secrets = Object.fromEntries(
+      await this.#secretStore.entries<EncryptedData>()
     );
-    credentials.splice(index, 1);
-    this.metadataStore.set("credentials", credentials);
-  }
+    this.set({
+      credentials,
+      secrets,
+      isLocked: credentials.some((c) => c.active)
+    });
+  };
 
-  public async extractKey() {
-    if (await this.isLocked())
-      throw new Error("Please unlock the key store to extract its key.");
-
-    const key = await window.crypto.subtle.exportKey(
-      "raw",
-      await this.getKey()
-    );
-    return Buffer.from(key).toString("base64");
-  }
-
-  async isLocked() {
-    return (await this.getCredentials()).length > 0 && !this.key;
-  }
-
-  public async getCredentials() {
-    return (
-      (await this.metadataStore.get<SerializableCredential[]>("credentials")) ||
-      []
-    );
-  }
-
-  public async hasCredential(credential: SerializableCredential) {
-    const credentials = await this.getCredentials();
-    const index = credentials.findIndex(
-      (c) => c.type === credential.type && c.id === credential.id
-    );
-    return index > -1;
-  }
-
-  public async resetCredentials() {
-    for (const credential of await this.getCredentials()) {
-      await this.metadataStore.delete(this.getCredentialKey(credential));
-    }
-    await this.metadataStore.delete("credentials");
-  }
-
-  public async setCredential(credential: SerializableCredential) {
-    const credentials = await this.getCredentials();
+  register = async (credential: CredentialWithoutSecret) => {
+    const { credentials } = this.get();
     const index = credentials.findIndex(
       (c) => c.type === credential.type && c.id === credential.id
     );
     if (index > -1) return;
-    credentials.push(credential);
-    await this.metadataStore.set("credentials", credentials);
-  }
 
-  public async set(name: string, value: string) {
-    if (await this.isLocked())
+    this.set((store) =>
+      store.credentials.push(serializeCredential(credential, false))
+    );
+    await this.#metadataStore.set("credentials", this.get().credentials);
+  };
+
+  unregister = async (
+    credential: CredentialWithSecret | CredentialWithoutSecret
+  ) => {
+    const { credentials } = this.get();
+    const index = credentials.findIndex((c) => matchCredential(c, credential));
+    if (index <= -1) throw new Error("No such credential.");
+
+    if (
+      isCredentialWithSecret(credential) &&
+      (await this.credentialHasKey(credential)) &&
+      !(await this.verifyCredential(credential))
+    )
+      throw new Error(wrongCredentialError(credential));
+
+    this.set((store) => store.credentials.splice(index, 1));
+
+    await this.#metadataStore.delete(this.getCredentialKey(credential));
+    await this.#metadataStore.set("credentials", this.get().credentials);
+  };
+
+  activate = async (
+    credential: CredentialWithSecret | CredentialWithoutSecret
+  ) => {
+    const cred = this.findCredential(credential);
+    if (!cred)
+      throw new Error(`No credential with id "${credential.id}" registered.`);
+
+    if (await this.credentialHasKey(credential)) {
+      await this.update(credential, (c) => (c.active = true));
+      return;
+    }
+
+    if (!isCredentialWithSecret(credential))
+      throw new Error("Invalid credential.");
+
+    const originalKey = await this.getKey();
+    await this.#metadataStore.set(
+      this.getCredentialKey(credential),
+      await wrapKey(
+        originalKey,
+        await getWrappingKey(deserializeCredential(cred, credential))
+      )
+    );
+    await this.#metadataStore.deleteMany([this.#keyId, this.#wrappingKeyId]);
+    this.#key = originalKey;
+    this.set({ isLocked: false });
+    await this.update(credential, (c) => (c.active = true));
+  };
+
+  credentialHasKey = async (credential: CredentialQuery) => {
+    return !!(await this.#metadataStore.get(this.getCredentialKey(credential)));
+  };
+
+  deactivate = async (credential: CredentialWithSecret) => {
+    if (!(await this.verifyCredential(credential)))
+      throw new Error(wrongCredentialError(credential));
+
+    const cred = this.findCredential(credential);
+    if (!cred)
+      throw new Error(`No credential with id "${credential.id}" registered.`);
+
+    await this.update(credential, (c) => (c.active = false));
+    this.set({ isLocked: false });
+  };
+
+  unlock = async (
+    credential: CredentialWithSecret,
+    options?: {
+      permanent?: boolean;
+    }
+  ) => {
+    const cred = this.findCredential(credential);
+    if (!cred) throw new Error("Could not find a valid credential.");
+
+    const encryptedKey = await this.#metadataStore.get<ArrayBuffer>(
+      this.getCredentialKey(credential)
+    );
+    if (!encryptedKey)
+      throw new Error("Could not find credential's encrypted key.");
+
+    const key = await unwrapKey(
+      encryptedKey,
+      await getWrappingKey(deserializeCredential(cred, credential))
+    );
+    if (options?.permanent) {
+      await this.resetCredentials();
+      await this.storeKey(key);
+      this.#key = undefined;
+    } else this.#key = key;
+
+    this.set({ isLocked: false });
+  };
+
+  relock = () => {
+    this.#key = undefined;
+    this.set({ isLocked: true });
+  };
+
+  findCredential = (credential: CredentialQuery) => {
+    return this.get().credentials.find((c) => matchCredential(c, credential));
+  };
+
+  hasCredential = (credential: CredentialQuery) => {
+    return !!this.findCredential(credential);
+  };
+
+  changeCredential = async (
+    oldCredential: CredentialWithSecret,
+    newCredential: CredentialWithSecret
+  ) => {
+    const cred = this.findCredential(oldCredential);
+    if (!cred) throw new Error("Could not find a valid credential.");
+
+    const encryptedKey = await this.#metadataStore.get<ArrayBuffer>(
+      this.getCredentialKey(oldCredential)
+    );
+    if (!encryptedKey) return;
+
+    const decryptedKey = await unwrapKey(
+      encryptedKey,
+      await getWrappingKey(deserializeCredential(cred, oldCredential))
+    );
+
+    const reencryptedKey = await wrapKey(
+      decryptedKey,
+      await getWrappingKey(deserializeCredential(cred, newCredential))
+    );
+    if (!reencryptedKey) throw new Error(wrongCredentialError(newCredential));
+
+    await this.#metadataStore.set(
+      this.getCredentialKey(newCredential),
+      reencryptedKey
+    );
+  };
+
+  verifyCredential = async (credential: CredentialWithSecret) => {
+    try {
+      const cred = this.findCredential(credential);
+      if (!cred) return false;
+
+      const encryptedKey = await this.#metadataStore.get<ArrayBuffer>(
+        this.getCredentialKey(credential)
+      );
+      if (!encryptedKey) return false;
+
+      const decryptedKey = await unwrapKey(
+        encryptedKey,
+        await getWrappingKey(deserializeCredential(cred, credential))
+      );
+      return !!decryptedKey;
+    } catch {
+      return false;
+    }
+  };
+
+  setValue = async <T extends keyof Secrets>(name: T, value: Secrets[T]) => {
+    if (this.get().isLocked)
       throw new Error("Please unlock the key store to set values.");
 
-    return this.secretStore.set(
-      name,
-      await this.encrypt(value, await this.getKey())
+    const encryptedValue = await encrypt(value, await this.getKey());
+    await this.#secretStore.set(name, encryptedValue).then(() =>
+      this.set((store) => {
+        store.secrets = { ...store.secrets, [name]: encryptedValue };
+      })
     );
-  }
+  };
 
-  public async get(name: string): Promise<string | undefined> {
-    if (await this.isLocked())
-      throw new Error("Please unlock the key store to get values.");
-    console.log("GETTING", name);
-    const blob = await this.secretStore.get<EncryptedData>(name);
+  getValue = async <T extends keyof Secrets>(
+    name: T
+  ): Promise<Secrets[T] | undefined> => {
+    const { isLocked, secrets } = this.get();
+    if (isLocked) throw new Error("Please unlock the key store to get values.");
+    const blob = secrets[name];
     if (!blob) return;
-    return this.decrypt(blob, await this.getKey());
-  }
+    const decryptedBlob = await decrypt(blob, await this.getKey());
+    if (defaultSecrets[name] instanceof ArrayBuffer)
+      return decryptedBlob as Secrets[T];
+    else return JSON.parse(decoder.decode(decryptedBlob)).value as Secrets[T];
+  };
 
-  public async clear(): Promise<void> {
-    await this.secretStore.clear();
-    await this.metadataStore.clear();
-    this.key = undefined;
-  }
+  private update = async (
+    query: CredentialQuery,
+    patch: (c: SerializableCredential) => void
+  ) => {
+    const { credentials } = this.get();
+    const index = credentials.findIndex((c) => matchCredential(c, query));
+    if (index <= -1) return;
+    this.set((s) => patch(s.credentials[index]));
+    await this.#metadataStore.set("credentials", this.get().credentials);
+  };
 
-  private async decryptKey(
-    encryptedKey: Cipher<"base64"> | EncryptedData,
-    credential: PasswordCredential | KeyCredential
-  ): Promise<Uint8Array | undefined> {
-    if (credential.type === "password" && isCipher(encryptedKey)) {
-      return await NNCrypto.decrypt(
-        { password: credential.password },
-        encryptedKey,
-        "uint8array"
-      );
-    } else if (credential.type === "key" && isEncryptedData(encryptedKey)) {
-      return new Uint8Array(
-        await window.crypto.subtle.decrypt(
-          {
-            name: "AES-GCM",
-            iv: encryptedKey.iv
-          },
-          credential.key,
-          encryptedKey.cipher
-        )
-      );
+  private resetCredentials = async () => {
+    for (const credential of this.get().credentials) {
+      await this.#metadataStore.delete(this.getCredentialKey(credential));
     }
-  }
+    await this.#metadataStore.delete("credentials");
+    this.set({ credentials: [] });
+  };
 
-  private async encryptKey(
-    credential: PasswordCredential | KeyCredential,
-    key: Uint8Array
-  ) {
-    if (credential.type === "password") {
-      return await NNCrypto.encrypt(
-        { password: credential.password },
-        key,
-        "uint8array",
-        "base64"
-      );
-    } else if (credential.type === "key") {
-      if (!credential.key?.usages.includes("encrypt"))
-        throw new Error("Cannot use this key to encrypt.");
+  private getKey = async () => {
+    if (this.#key) return this.#key;
+    if (this.get().isLocked) throw new Error("Key store is locked.");
 
-      return await this.encrypt(key, credential.key);
-    }
-  }
+    const wrappedKey = await this.#metadataStore.get<ArrayBuffer>(this.#keyId);
+    if (!wrappedKey) return this.storeKey();
 
-  private async getKey() {
-    if (this.key) return this.key;
-    if ((await this.getCredentials()).length > 0)
-      throw new Error("Key store is locked.");
-
-    const key = await this.metadataStore.get<Uint8Array | CryptoKey>(
-      this.keyId
+    const wrappingKey = await this.#metadataStore.get<CryptoKey>(
+      this.#wrappingKeyId
     );
 
-    if (key instanceof Uint8Array) {
-      if (!desktop)
-        throw new Error("Cannot decrypt key: no safe storage found.");
+    if (desktop && !wrappingKey) {
       const decrypted = Buffer.from(
         await desktop.safeStorage.decryptString.query(
-          Buffer.from(key).toString("base64")
+          Buffer.from(wrappedKey).toString("base64")
         ),
         "base64"
       );
+
       return window.crypto.subtle.importKey(
         "raw",
         decrypted,
@@ -341,11 +400,12 @@ class KeyStore {
         true,
         ["encrypt", "decrypt"]
       );
-    } else if (key instanceof CryptoKey) return key;
-    else return this.storeKey();
-  }
+    } else if (wrappingKey) {
+      return unwrapKey(wrappedKey, wrappingKey);
+    } else throw new Error("Could not decrypt key.");
+  };
 
-  private async storeKey(key?: CryptoKey) {
+  private storeKey = async (key?: CryptoKey) => {
     key =
       key ||
       (await window.crypto.subtle.generateKey(
@@ -366,45 +426,212 @@ class KeyStore {
         ),
         "base64"
       );
-      await this.metadataStore.set(this.keyId, encrypted);
-    } else await this.metadataStore.set(this.keyId, key);
+      await this.#metadataStore.set(this.#keyId, encrypted.buffer);
+    } else {
+      const wrappingKey = await getWrappingKey();
+      const wrappedKey = await wrapKey(key, wrappingKey);
+      await this.#metadataStore.setMany([
+        [this.#wrappingKeyId, wrappingKey],
+        [this.#keyId, wrappedKey]
+      ]);
+    }
 
     return key;
-  }
+  };
 
-  private async encrypt(data: string | ArrayBuffer, key: CryptoKey) {
-    const iv = window.crypto.getRandomValues(new Uint8Array(12));
-    const cipher = await window.crypto.subtle.encrypt(
-      {
-        name: "AES-GCM",
-        iv: iv
-      },
-      key,
-      typeof data === "string" ? encoder.encode(data) : data
+  private getCredentials = async () => {
+    return (
+      (await this.#metadataStore.get<SerializableCredential[]>(
+        "credentials"
+      )) || []
     );
+  };
 
-    return <EncryptedData>{
-      iv,
-      cipher
-    };
-  }
+  private getCredentialKey = (credential: CredentialQuery) => {
+    return `${this.#keyId}-${credential.type}-${credential.id}`;
+  };
+}
 
-  private async decrypt(data: EncryptedData, key: CryptoKey) {
-    const plainText = await window.crypto.subtle.decrypt(
-      {
-        name: "AES-GCM",
-        iv: data.iv
-      },
-      key,
-      data.cipher
-    );
-    return decoder.decode(plainText);
-  }
-
-  private getCredentialKey(credential: SerializableCredential) {
-    return `${this.keyId}-${credential.type}-${credential.id}`;
+function serializeCredential(
+  credential: Credential | CredentialWithoutSecret,
+  active: boolean
+): SerializableCredential {
+  switch (credential.type) {
+    case "password":
+      return {
+        type: "password",
+        id: credential.id,
+        active,
+        salt: credential.salt
+      };
+    case "securityKey":
+      return {
+        type: "securityKey",
+        id: credential.id,
+        config: credential.config,
+        active
+      };
   }
 }
 
-export const KeyChain = new KeyStore("KeyChain");
+function deserializeCredential(
+  credential: SerializableCredential,
+  secret: CredentialWithSecret
+): Credential {
+  if (secret.type === "password" && credential.type === "password") {
+    return {
+      type: "password",
+      id: credential.id,
+      salt: credential.salt,
+      password: secret.password
+    };
+  } else if (secret.type === "securityKey" && credential.type === "securityKey")
+    return {
+      type: "securityKey",
+      id: credential.id,
+      config: credential.config,
+      key: secret.key
+    };
+
+  throw new Error("Credentials are of different types.");
+}
+
+function wrongCredentialError(query: CredentialQuery): string {
+  switch (query.type) {
+    case "password":
+      return "Wrong password";
+    case "securityKey":
+      return "Wrong security key.";
+  }
+}
+
+async function unwrapKey(
+  wrappedKey: ArrayBuffer,
+  wrappingKey: CryptoKey
+): Promise<CryptoKey> {
+  return await window.crypto.subtle.unwrapKey(
+    "raw",
+    wrappedKey,
+    wrappingKey,
+    "AES-KW",
+    { name: "AES-GCM", length: 256 },
+    true,
+    ["encrypt", "decrypt"]
+  );
+}
+
+async function wrapKey(key: CryptoKey, wrappingKey: CryptoKey) {
+  return await window.crypto.subtle.wrapKey("raw", key, wrappingKey, "AES-KW");
+}
+
+async function getWrappingKey(credential?: Credential): Promise<CryptoKey> {
+  let wrappingKey: CryptoKey | undefined;
+
+  if (!credential)
+    wrappingKey = await window.crypto.subtle.generateKey(
+      { name: "AES-KW", length: 256 },
+      false,
+      ["wrapKey", "unwrapKey"]
+    );
+  else if (credential.type === "password") {
+    wrappingKey = await window.crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: credential.salt,
+        iterations: 650000,
+        hash: "SHA-512"
+      },
+      await window.crypto.subtle.importKey(
+        "raw",
+        encoder.encode(credential.password),
+        { name: "PBKDF2" },
+        false,
+        ["deriveKey"]
+      ),
+      { name: "AES-KW", length: 256 },
+      false,
+      ["wrapKey", "unwrapKey"]
+    );
+  } else if (credential.type === "securityKey") wrappingKey = credential.key;
+  if (
+    !wrappingKey ||
+    !wrappingKey.usages.includes("wrapKey") ||
+    !wrappingKey.usages.includes("unwrapKey")
+  )
+    throw new Error("Could not generate a valid wrapping key.");
+  return wrappingKey;
+}
+
+async function encrypt(
+  data: string | number | boolean | ArrayBuffer,
+  key: CryptoKey
+) {
+  const iv = window.crypto.getRandomValues(new Uint8Array(12));
+  const cipher = await window.crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv: iv
+    },
+    key,
+    data instanceof ArrayBuffer
+      ? data
+      : encoder.encode(
+          JSON.stringify({
+            value: data
+          })
+        )
+  );
+
+  return <EncryptedData>{
+    iv,
+    cipher
+  };
+}
+
+async function decrypt(encrypted: EncryptedData, key: CryptoKey) {
+  return await window.crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv: encrypted.iv
+    },
+    key,
+    encrypted.cipher
+  );
+}
+
+function matchCredential(cred: SerializableCredential, query: CredentialQuery) {
+  return (
+    cred.type === query.type &&
+    cred.id === query.id &&
+    (query.active === undefined || cred.active === query.active)
+  );
+}
+
+export async function deriveKey(password: string) {
+  const passwordBuffer = encoder.encode(password);
+  const importedKey = await crypto.subtle.importKey(
+    "raw",
+    passwordBuffer,
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+  const salt = window.crypto.getRandomValues(new Uint8Array(16));
+  return await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      hash: "SHA-512",
+      salt,
+      iterations: 650000
+    },
+    importedKey,
+    32 * 8
+  );
+}
+
+const createKeyStore = (name: string) =>
+  createStore<KeyStore>((set, get) => new KeyStore(name, set, get));
+
+const [useKeyStore] = createKeyStore("KeyChain");
+export { useKeyStore };
 export type IKeyStore = typeof KeyStore.prototype;

@@ -48,5 +48,7 @@ class MonographStore extends BaseStore<MonographStore> {
   };
 }
 
-const [useStore, store] = createStore(MonographStore);
+const [useStore, store] = createStore<MonographStore>(
+  (set, get) => new MonographStore(set, get)
+);
 export { useStore, store };

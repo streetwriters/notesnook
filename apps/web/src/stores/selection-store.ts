@@ -70,5 +70,7 @@ class SelectionStore extends BaseStore<SelectionStore> {
   };
 }
 
-const [useStore, store] = createStore(SelectionStore);
+const [useStore, store] = createStore<SelectionStore>(
+  (set, get) => new SelectionStore(set, get)
+);
 export { useStore, store };

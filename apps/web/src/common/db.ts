@@ -24,6 +24,8 @@ import { showMigrationDialog } from "./dialog-controller";
 import { database } from "@notesnook/common";
 import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
+import { generatePassword } from "../utils/password-generator";
+import { deriveKey } from "../interfaces/key-store";
 
 const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
@@ -31,9 +33,13 @@ async function initializeDatabase(persistence: DatabasePersistence) {
 
   const { FileStorage } = await import("../interfaces/fs");
   const { Compressor } = await import("../utils/compressor");
-  const { KeyChain } = await import("../interfaces/key-store");
+  const { useKeyStore } = await import("../interfaces/key-store");
 
-  const databaseKey = await KeyChain.extractKey();
+  let databaseKey = await useKeyStore.getState().getValue("databaseKey");
+  if (!databaseKey) {
+    databaseKey = await deriveKey(generatePassword());
+    await useKeyStore.getState().setValue("databaseKey", databaseKey);
+  }
 
   db.host({
     API_HOST: "https://api.notesnook.com",
@@ -43,7 +49,11 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co"
   });
 
-  const storage = new NNStorage("Notesnook", KeyChain, persistence);
+  const storage = new NNStorage(
+    "Notesnook",
+    () => useKeyStore.getState(),
+    persistence
+  );
   await storage.migrate();
 
   database.setup({
@@ -59,7 +69,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
       synchronous: "normal",
       pageSize: 8192,
       cacheSize: -32000,
-      password: databaseKey
+      password: Buffer.from(databaseKey).toString("hex")
     },
     storage: storage,
     eventsource: EventSource,

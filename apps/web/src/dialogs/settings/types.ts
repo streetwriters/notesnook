@@ -66,6 +66,9 @@ export type SettingsGroup = {
   settings: Setting[];
   header: string | ((props: any) => JSX.Element | null);
   isHidden?: () => boolean;
+  onStateChange?: (
+    listener: (state: unknown, prevState: unknown) => void
+  ) => () => void;
   onRender?: () => void | Promise<void>;
 };
 
@@ -78,7 +81,7 @@ export type Setting = {
   isHidden?: (state?: unknown) => boolean;
   onStateChange?: (
     listener: (state: unknown, prevState: unknown) => void
-  ) => void;
+  ) => () => void;
 };
 
 export type SettingComponentType =
@@ -86,11 +89,13 @@ export type SettingComponentType =
   | "dropdown"
   | "button"
   | "input"
+  | "icon"
   | "custom";
 
 export type SettingComponent =
   | ButtonSettingComponent
   | ToggleSettingComponent
+  | IconSettingComponent
   | DropdownSettingComponent
   | InputSettingComponent
   | CustomSettingComponent;
@@ -105,14 +110,20 @@ export type ButtonSettingComponent = BaseSettingComponent<"button"> & {
   variant: "primary" | "secondary" | "error" | "errorSecondary";
 };
 
+export type IconSettingComponent = BaseSettingComponent<"icon"> & {
+  icon: Icon;
+  size: number;
+  color: string;
+};
+
 export type ToggleSettingComponent = BaseSettingComponent<"toggle"> & {
   isToggled: () => boolean;
   toggle: () => void | Promise<unknown>;
 };
 
 export type DropdownSettingComponent = BaseSettingComponent<"dropdown"> & {
-  options: { value: string; title: string; premium?: boolean }[];
-  selectedOption: () => string;
+  options: { value: string | number; title: string; premium?: boolean }[];
+  selectedOption: () => string | number | Promise<string | number>;
   onSelectionChanged: (value: string) => void | Promise<void>;
 };
 

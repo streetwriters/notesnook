@@ -40,7 +40,7 @@ export class NNStorage implements IStorage {
 
   constructor(
     name: string,
-    private readonly keyStore: IKeyStore | null,
+    private readonly keyStore: () => IKeyStore | null = () => null,
     persistence: DatabasePersistence = "db"
   ) {
     this.database =
@@ -63,7 +63,7 @@ export class NNStorage implements IStorage {
       `_uk_@${user.email}`,
       `_uk_@${user.email}@_k`
     ]);
-    await this.keyStore.set("userEncryptionKey", key);
+    await this.keyStore()?.setValue("userEncryptionKey", key);
   }
 
   read<T>(key: string): Promise<T | undefined> {
@@ -109,13 +109,13 @@ export class NNStorage implements IStorage {
     const keyData = await NNCrypto.exportKey(password, salt);
     if (!keyData.key) throw new Error("Invalid key.");
 
-    await this.keyStore.set("userEncryptionKey", keyData.key);
+    await this.keyStore()?.setValue("userEncryptionKey", keyData.key);
   }
 
   async getCryptoKey(): Promise<string | undefined> {
     if (!this.keyStore) throw new Error("No key store found!");
 
-    return this.keyStore.get("userEncryptionKey");
+    return this.keyStore()?.getValue("userEncryptionKey");
   }
 
   async generateCryptoKey(

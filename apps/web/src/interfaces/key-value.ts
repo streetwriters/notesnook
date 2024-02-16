@@ -41,7 +41,7 @@ export interface IKVStore {
    *
    * @param entries Array of entries, where each entry is an array of `[key, value]`.
    */
-  setMany<T>(entries: [string, T][]): Promise<void>;
+  setMany(entries: [string, unknown][]): Promise<void>;
 
   /**
    * Get multiple values by their keys

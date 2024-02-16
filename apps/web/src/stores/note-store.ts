@@ -156,7 +156,9 @@ class NoteStore extends BaseStore<NoteStore> {
   };
 }
 
-const [useStore, store] = createStore(NoteStore);
+const [useStore, store] = createStore<NoteStore>(
+  (set, get) => new NoteStore(set, get)
+);
 export { useStore, store };
 
 export function notesFromContext(context: Context) {

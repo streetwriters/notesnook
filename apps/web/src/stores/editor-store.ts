@@ -378,5 +378,7 @@ class EditorStore extends BaseStore<EditorStore> {
   // };
 }
 
-const [useStore, store] = createStore(EditorStore);
+const [useStore, store] = createStore<EditorStore>(
+  (set, get) => new EditorStore(set, get)
+);
 export { useStore, store, SESSION_STATES };

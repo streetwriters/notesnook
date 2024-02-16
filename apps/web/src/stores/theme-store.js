@@ -99,7 +99,7 @@ class ThemeStore extends BaseStore {
   };
 }
 
-const [useStore, store] = createStore(ThemeStore);
+const [useStore, store] = createStore((set, get) => new ThemeStore(set, get));
 export { useStore, store };
 
 function getKey(theme) {

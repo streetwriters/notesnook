@@ -151,5 +151,7 @@ class UserStore extends BaseStore<UserStore> {
   };
 }
 
-const [useStore, store] = createStore(UserStore);
+const [useStore, store] = createStore<UserStore>(
+  (set, get) => new UserStore(set, get)
+);
 export { useStore, store };
