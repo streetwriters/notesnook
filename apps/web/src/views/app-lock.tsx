@@ -24,9 +24,8 @@ import {
   useRef,
   useState
 } from "react";
-import { useStore as useSettingStore } from "../stores/setting-store";
 import { usePromise } from "@notesnook/common";
-import { KeyChain } from "../interfaces/key-store";
+// import { KeyChain } from "../interfaces/key-store";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Loading, Lock } from "../components/icons";
 import { ErrorText } from "../components/error-text";
@@ -35,101 +34,103 @@ import { startIdleDetection } from "../utils/idle-detection";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
 import { closeOpenedDialog } from "../common/dialog-controller";
 import { WebAuthn } from "../utils/webauthn";
-import { setDocumentTitle } from "../utils/dom";
+import { getDocumentTitle, setDocumentTitle } from "../utils/dom";
+import { CredentialWithoutSecret, useKeyStore } from "../interfaces/key-store";
 
 export default function AppLock(props: PropsWithChildren<unknown>) {
-  const keychain = usePromise(async () => ({
-    isLocked: await KeyChain.isLocked(),
-    credentials: await KeyChain.getCredentials()
-  }));
+  const init = usePromise(() => useKeyStore.getState().init());
+  const credentials = useKeyStore((store) => store.activeCredentials());
+  const isLocked = useKeyStore((store) => store.isLocked);
+  const _lockAfter = useKeyStore((store) => store.secrets.lockAfter);
+  const lockAfter = usePromise(async () => {
+    if (isLocked) return null;
+    return (await useKeyStore.getState().getValue("lockAfter")) || 0;
+  }, [isLocked, _lockAfter]);
+
   const [error, setError] = useState<string>();
   const [isUnlocking, setIsUnlocking] = useState(false);
-  const appLockSettings = useSettingStore((store) => store.appLockSettings);
-  const windowTitle = useRef(document.title);
 
-  const lockApp = useCallback(() => {
-    if (keychain.status !== "fulfilled" || keychain.value.isLocked) return;
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const windowTitle = useRef(getDocumentTitle());
 
-    windowTitle.current = document.title;
-    KeyChain.relock();
-    closeOpenedDialog();
-    setDocumentTitle();
-    keychain.refresh();
-  }, [keychain]);
+  const unlockWithPassword = useCallback(
+    async (credential: CredentialWithoutSecret) => {
+      if (credential.type !== "password") return;
+
+      setError(undefined);
+      setIsUnlocking(true);
+
+      const password = passwordRef.current?.value;
+      if (!password || typeof password !== "string") {
+        setIsUnlocking(false);
+        setError("Password is required.");
+        return;
+      }
+
+      await useKeyStore
+        .getState()
+        .unlock({ ...credential, password })
+        .catch((e) => {
+          setError(
+            typeof e === "string"
+              ? e
+              : "message" in e && typeof e.message === "string"
+              ? e.message === "ciphertext cannot be decrypted using that key"
+                ? "Wrong password."
+                : e.message || "Wrong password."
+              : JSON.stringify(e)
+          );
+        })
+        .finally(() => {
+          setIsUnlocking(false);
+        });
+    },
+    []
+  );
 
   useEffect(() => {
-    const { lockAfter, enabled } = appLockSettings;
+    if (isLocked) {
+      windowTitle.current = getDocumentTitle();
+      closeOpenedDialog();
+      document.title = `Notesnook 🔒`;
+    } else {
+      setDocumentTitle(windowTitle.current);
+    }
+  }, [isLocked]);
+
+  useEffect(() => {
     if (
-      !enabled ||
-      lockAfter === -1 ||
-      keychain.status !== "fulfilled" ||
-      keychain.value.isLocked
+      lockAfter.status !== "fulfilled" ||
+      lockAfter.value === null ||
+      credentials.length <= 0
     )
       return;
 
-    if (lockAfter > 0) {
-      const stop = startIdleDetection(
-        appLockSettings.lockAfter * 60 * 1000,
-        lockApp
+    if (lockAfter.value > 0) {
+      const stop = startIdleDetection(lockAfter.value * 60 * 1000, () =>
+        useKeyStore.getState().relock()
       );
       return () => stop();
-    } else if (lockAfter === 0) {
+    } else if (lockAfter.value === 0) {
       const stop = onPageVisibilityChanged((_, hidden) => {
-        if (hidden) lockApp();
+        if (hidden) useKeyStore.getState().relock();
       });
 
       return () => stop();
     }
-  }, [appLockSettings, lockApp, keychain]);
+  }, [lockAfter, credentials]);
 
-  if (keychain.status === "fulfilled" && !keychain.value.isLocked)
-    return <>{props.children}</>;
+  if (init.status !== "fulfilled") return null;
 
-  if (keychain.status === "fulfilled" && keychain.value.isLocked)
+  if (isLocked)
     return (
       <Flex
-        as="form"
         sx={{
           alignItems: "center",
           justifyContent: "center",
           height: "100%",
           flexDirection: "column",
           overflowY: "auto"
-        }}
-        onSubmit={async (e) => {
-          e.preventDefault();
-
-          setError(undefined);
-          setIsUnlocking(true);
-
-          const data = new FormData(e.target as HTMLFormElement);
-          const password = data.get("password");
-          if (!password || typeof password !== "string") {
-            setIsUnlocking(false);
-            setError("Password is required.");
-            return;
-          }
-
-          await KeyChain.unlock({ type: "password", id: "primary", password })
-            .then(() => {
-              setDocumentTitle(windowTitle.current);
-              keychain.refresh();
-            })
-            .catch((e) => {
-              setError(
-                typeof e === "string"
-                  ? e
-                  : "message" in e && typeof e.message === "string"
-                  ? e.message ===
-                    "ciphertext cannot be decrypted using that key"
-                    ? "Wrong password."
-                    : e.message
-                  : JSON.stringify(e)
-              );
-            })
-            .finally(() => {
-              setIsUnlocking(false);
-            });
         }}
       >
         <Flex
@@ -175,12 +176,13 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
               gap: 2
             }}
           >
-            {keychain.value.credentials.map((credential) => {
+            {credentials.map((credential) => {
               switch (credential.type) {
                 case "password":
                   return (
                     <>
                       <Field
+                        inputRef={passwordRef}
                         id="password"
                         name="password"
                         data-test-id="app-lock-password"
@@ -189,50 +191,36 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
                         sx={{ width: ["95%", "95%", "25%"] }}
                         placeholder="Enter password"
                         type="password"
+                        onKeyUp={async (e) => {
+                          if (e.key === "Enter")
+                            await unlockWithPassword(credential);
+                        }}
                       />
                       <Button
-                        type="submit"
                         variant="accent"
-                        data-test-id="unlock-note-submit"
                         disabled={isUnlocking}
                         sx={{ borderRadius: 100, px: 30 }}
+                        onClick={() => unlockWithPassword(credential)}
                       >
                         Continue
                       </Button>
                     </>
                   );
-                case "key":
+                case "securityKey":
                   return (
                     <Button
                       key={credential.id}
                       variant="secondary"
                       type="button"
                       onClick={async () => {
-                        const { securityKey } =
-                          useSettingStore.getState().appLockSettings;
-                        if (!securityKey) return;
-
                         setError(undefined);
                         setIsUnlocking(true);
-
                         try {
                           const { encryptionKey } =
-                            await WebAuthn.getEncryptionKey({
-                              firstSalt: Buffer.from(
-                                securityKey.firstSalt,
-                                "base64"
-                              ),
-                              label: securityKey.label,
-                              rawId: Buffer.from(securityKey.rawId, "base64"),
-                              transports: securityKey.transports
-                            });
-
-                          await KeyChain.unlock({
-                            type: "key",
-                            id: credential.id,
-                            key: encryptionKey
-                          });
-                          keychain.refresh();
+                            await WebAuthn.getEncryptionKey(credential.config);
+                          await useKeyStore
+                            .getState()
+                            .unlock({ ...credential, key: encryptionKey });
                         } catch (e) {
                           setError((e as Error).message);
                         } finally {
@@ -240,11 +228,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
                         }
                       }}
                     >
-                      Unlock with{" "}
-                      {credential.type === "key" &&
-                      credential.id === "securityKey"
-                        ? "security key"
-                        : "key"}
+                      Unlock with security key
                     </Button>
                   );
               }
@@ -255,5 +239,5 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
       </Flex>
     );
 
-  return null;
+  return <>{props.children}</>;
 }

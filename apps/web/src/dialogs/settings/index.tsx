@@ -43,7 +43,13 @@ import { Perform } from "../../common/dialog-controller";
 import NavigationItem from "../../components/navigation-menu/navigation-item";
 import { FlexScrollContainer } from "../../components/scroll-container";
 import { useCallback, useEffect, useState } from "react";
-import { SectionGroup, SectionKeys, Setting, SettingsGroup } from "./types";
+import {
+  DropdownSettingComponent,
+  SectionGroup,
+  SectionKeys,
+  Setting,
+  SettingsGroup
+} from "./types";
 import { ProfileSettings } from "./profile-settings";
 import { AuthenticationSettings } from "./auth-settings";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
@@ -64,7 +70,7 @@ import {
   SupportSettings
 } from "./other-settings";
 import { AppearanceSettings } from "./appearance-settings";
-import { debounce } from "@notesnook/common";
+import { debounce, usePromise } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 import { AppLockSettings } from "./app-lock-settings";
@@ -338,11 +344,20 @@ function SettingsSideBar(props: SettingsSideBarProps) {
 
 function SettingsGroupComponent(props: { item: SettingsGroup }) {
   const { item } = props;
-  const { onRender } = item;
+  const { onRender, onStateChange } = item;
+
+  const [_, setState] = useState<unknown>();
 
   useEffect(() => {
     onRender?.();
   }, [onRender]);
+
+  useEffect(() => {
+    const unsubscribe = onStateChange?.(setState);
+    return () => {
+      unsubscribe?.();
+    };
+  }, [onStateChange]);
 
   if (item.isHidden?.()) return null;
   return (
@@ -384,7 +399,10 @@ function SettingItem(props: { item: Setting }) {
 
   useEffect(() => {
     if (!item.onStateChange) return;
-    item.onStateChange(setState);
+    const unsubscribe = item.onStateChange(setState);
+    return () => {
+      unsubscribe?.();
+    };
   }, [item]);
 
   const workWithLoading = useCallback(
@@ -481,32 +499,10 @@ function SettingItem(props: { item: Setting }) {
                 );
               case "dropdown":
                 return (
-                  <select
-                    style={{
-                      backgroundColor: "var(--background-secondary)",
-                      outline: "none",
-                      border: "1px solid var(--border-secondary)",
-                      borderRadius: "5px",
-                      color: "var(--paragraph)",
-                      padding: "5px"
-                    }}
-                    value={component.selectedOption()}
-                    onChange={(e) =>
-                      component.onSelectionChanged(
-                        (e.target as HTMLSelectElement).value
-                      )
-                    }
-                  >
-                    {component.options.map((option) => (
-                      <option
-                        disabled={option.premium && !isUserPremium}
-                        key={option.value}
-                        value={option.value}
-                      >
-                        {option.title}
-                      </option>
-                    ))}
-                  </select>
+                  <SelectComponent
+                    {...component}
+                    isUserPremium={isUserPremium}
+                  />
                 );
               case "input":
                 return component.inputType === "number" ? (
@@ -538,6 +534,15 @@ function SettingItem(props: { item: Setting }) {
                     )}
                   />
                 );
+              case "icon":
+                return (
+                  <component.icon
+                    size={component.size}
+                    color={component.color}
+                  />
+                );
+              default:
+                return null;
             }
           })}
         </Flex>
@@ -548,5 +553,41 @@ function SettingItem(props: { item: Setting }) {
         ) : null
       )}
     </Flex>
+  );
+}
+
+function SelectComponent(
+  props: DropdownSettingComponent & { isUserPremium: boolean }
+) {
+  const { onSelectionChanged, options, isUserPremium } = props;
+  const selectedOption = usePromise(() => props.selectedOption(), [props]);
+
+  return (
+    <select
+      style={{
+        backgroundColor: "var(--background-secondary)",
+        outline: "none",
+        border: "1px solid var(--border-secondary)",
+        borderRadius: "5px",
+        color: "var(--paragraph)",
+        padding: "5px"
+      }}
+      value={
+        selectedOption.status === "fulfilled" ? selectedOption.value : undefined
+      }
+      onChange={(e) =>
+        onSelectionChanged((e.target as HTMLSelectElement).value)
+      }
+    >
+      {options.map((option) => (
+        <option
+          disabled={option.premium && !isUserPremium}
+          key={option.value}
+          value={option.value}
+        >
+          {option.title}
+        </option>
+      ))}
+    </select>
   );
 }

@@ -20,17 +20,19 @@ import { immerable, setAutoFreeze } from "immer";
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { IStore } from "../stores";
+import { GetState, SetState } from "../stores";
 setAutoFreeze(false);
 
-export function createStore<T extends object>(Store: IStore<T>) {
+export function createStore<T>(
+  getStore: (set: SetState<T>, get: GetState<T>) => T
+) {
   const store = create<
     T,
     [["zustand/subscribeWithSelector", never], ["zustand/immer", never]]
   >(
     subscribeWithSelector(
       immer((set, get) => {
-        const store = new Store(set, get);
+        const store = getStore(set, get);
         (store as any)[immerable] = true;
         return store;
       })

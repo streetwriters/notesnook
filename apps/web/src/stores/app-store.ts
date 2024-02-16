@@ -359,5 +359,7 @@ class AppStore extends BaseStore<AppStore> {
   };
 }
 
-const [useStore, store] = createStore(AppStore);
+const [useStore, store] = createStore<AppStore>(
+  (set, get) => new AppStore(set, get)
+);
 export { useStore, store };

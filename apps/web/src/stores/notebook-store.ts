@@ -55,5 +55,7 @@ class NotebookStore extends BaseStore<NotebookStore> {
   };
 }
 
-const [useStore, store] = createStore(NotebookStore);
+const [useStore, store] = createStore<NotebookStore>(
+  (set, get) => new NotebookStore(set, get)
+);
 export { useStore, store };

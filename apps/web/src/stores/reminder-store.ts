@@ -51,7 +51,9 @@ class ReminderStore extends BaseStore<ReminderStore> {
   };
 }
 
-const [useStore, store] = createStore(ReminderStore);
+const [useStore, store] = createStore<ReminderStore>(
+  (set, get) => new ReminderStore(set, get)
+);
 export { useStore, store };
 
 async function resetReminders(reminders: FilteredSelector<Reminder>) {

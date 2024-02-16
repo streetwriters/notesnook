@@ -152,5 +152,7 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
   };
 }
 
-const [useStore, store] = createStore(AttachmentStore);
+const [useStore, store] = createStore<AttachmentStore>(
+  (set, get) => new AttachmentStore(set, get)
+);
 export { useStore, store };

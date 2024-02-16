@@ -39,5 +39,7 @@ class SearchStore extends BaseStore<SearchStore> {
   // };
 }
 
-const [useStore, store] = createStore(SearchStore);
+const [useStore, store] = createStore<SearchStore>(
+  (set, get) => new SearchStore(set, get)
+);
 export { useStore, store };
