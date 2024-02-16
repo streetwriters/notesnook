@@ -64,6 +64,7 @@ import { store, useStore } from "../../stores/note-store";
 import { store as userstore } from "../../stores/user-store";
 import { store as editorStore } from "../../stores/editor-store";
 import { store as tagStore } from "../../stores/tag-store";
+import { useStore as useMonographStore } from "../../stores/monograph-store";
 import { db } from "../../common/db";
 import { showToast } from "../../utils/toast";
 import { hashNavigate, navigate } from "../../navigation";
@@ -431,7 +432,7 @@ const menuItems: (
       isChecked: db.monographs.isPublished(note.id),
       onClick: async () => {
         const isPublished = db.monographs.isPublished(note.id);
-        if (isPublished) await db.monographs.unpublish(note.id);
+        if (isPublished) await useMonographStore.getState().unpublish(note.id);
         else await showPublishView(note, "bottom");
       }
     },
