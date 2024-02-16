@@ -527,11 +527,14 @@ function ReorderableList<T extends { id: string }>(
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      cancelDrop={() => {
+        // if (!isUserPremium()) {
+        //   showToast("error", "You need to be Pro to customize the sidebar.");
+        //   return true;
+        // }
+        return false;
+      }}
       onDragStart={(event) => {
-        if (!isUserPremium()) {
-          showToast("error", "You need to be Pro to customize the sidebar.");
-          return;
-        }
         setActiveItem(orderedItems.find((i) => i.id === event.active.id));
       }}
       onDragEnd={(event) => {

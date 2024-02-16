@@ -162,12 +162,14 @@ export function CustomizeToolbar() {
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
-        onDragStart={(event) => {
+        cancelDrop={() => {
           if (!isUserPremium()) {
-            showToast("info", "You need to be Pro to customize the toolbar.");
-            return;
+            showToast("error", "You need to be Pro to customize the toolbar.");
+            return true;
           }
-
+          return false;
+        }}
+        onDragStart={(event) => {
           if (currentPreset.id !== "custom") {
             setCurrentPreset((c) => ({
               ...getPreset("custom"),
