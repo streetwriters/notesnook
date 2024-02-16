@@ -355,6 +355,13 @@ class KeyStore extends BaseStore<KeyStore> {
     else return JSON.parse(decoder.decode(decryptedBlob)).value as Secrets[T];
   };
 
+  clear = async () => {
+    await this.#metadataStore.clear();
+    await this.#secretStore.clear();
+    this.#key = undefined;
+    this.set({ credentials: [], secrets: {}, isLocked: false });
+  };
+
   private update = async (
     query: CredentialQuery,
     patch: (c: SerializableCredential) => void
