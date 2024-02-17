@@ -82,7 +82,7 @@ function getKeySelector(
     const date = new Date();
     if (item.type === "reminder")
       return isReminderActive(item as Reminder) ? "Active" : "Inactive";
-    else if (options.sortBy === "title" && options.groupBy === "abc")
+    else if (options.groupBy === "abc")
       return getFirstCharacter(getTitle(item));
     else {
       const value = getSortValue(options, item) || 0;
