@@ -59,7 +59,6 @@ type GroupingMenuOptions = {
   parentKey: keyof GroupOptions;
   groupingKey: GroupingKey;
   refresh: () => void;
-  isUngrouped: boolean;
 };
 
 const groupByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
@@ -117,8 +116,7 @@ const sortByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
       {
         key: "dateCreated",
         title: "Date created",
-        isHidden:
-          options.groupingKey === "trash" || options.groupingKey === "tags"
+        isHidden: options.groupingKey === "trash"
       },
       {
         key: "dateEdited",
@@ -138,12 +136,7 @@ const sortByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
       },
       {
         key: "title",
-        title: "Title",
-        isHidden:
-          !options.isUngrouped &&
-          options.parentKey === "sortBy" &&
-          options.groupOptions.groupBy !== "abc" &&
-          options.groupOptions.groupBy !== "none"
+        title: "Title"
       }
     ])
   }
@@ -156,7 +149,6 @@ export function showSortMenu(groupingKey: GroupingKey, refresh: () => void) {
   const menuOptions: Omit<GroupingMenuOptions, "parentKey"> = {
     groupingKey,
     groupOptions,
-    isUngrouped: true,
     refresh
   };
 
@@ -181,11 +173,10 @@ async function changeGroupOptions(
   (groupOptions as any)[options.parentKey] = item.key;
 
   if (options.parentKey === "groupBy") {
-    if (item.key === "abc") groupOptions.sortBy = "title";
-    else
+    groupOptions.sortBy =
       options.groupingKey === "tags" || options.groupingKey === "trash"
         ? "dateModified"
-        : "dateEdited";
+        : groupOptions.sortBy;
   }
   await db.settings.setGroupOptions(options.groupingKey, groupOptions);
   options.refresh();
@@ -348,7 +339,6 @@ function GroupHeader(props: GroupHeaderProps) {
                 const menuOptions: Omit<GroupingMenuOptions, "parentKey"> = {
                   groupingKey,
                   groupOptions,
-                  isUngrouped: false,
                   refresh
                 };
 
