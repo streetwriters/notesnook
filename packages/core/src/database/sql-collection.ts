@@ -51,7 +51,7 @@ const formats = {
   year: "%Y",
   week: "%Y-%W",
   abc: null,
-  default: null,
+  default: "%Y-%W",
   none: null
 } satisfies Record<GroupOptions["groupBy"], string | null>;
 
@@ -505,9 +505,10 @@ export class FilteredSelector<T extends Item> {
     return <T>(
       qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, T>
     ) => {
-      if (this.type === "notes") qb = qb.orderBy("conflicted desc");
+      if (this.type === "notes")
+        qb = qb.orderBy(sql`IFNULL(conflicted, 0) desc`);
       if (this.type === "notes" || this.type === "notebooks")
-        qb = qb.orderBy("pinned desc");
+        qb = qb.orderBy(sql`IFNULL(pinned, 0) desc`);
 
       for (const item of sortBy) {
         if (item === "title") {
@@ -521,7 +522,7 @@ export class FilteredSelector<T extends Item> {
           const timeFormat = isGroupOptions(options)
             ? formats[options.groupBy]
             : null;
-          if (!timeFormat) {
+          if (!timeFormat || isSortByDate(options)) {
             qb = qb.orderBy(item, options.sortDirection);
             continue;
           }
@@ -558,4 +559,14 @@ function isGroupOptions(
   options: SortOptions | GroupOptions
 ): options is GroupOptions {
   return "groupBy" in options;
+}
+
+function isSortByDate(options: SortOptions | GroupOptions) {
+  return (
+    options.sortBy === "dateCreated" ||
+    options.sortBy === "dateEdited" ||
+    options.sortBy === "dateDeleted" ||
+    options.sortBy === "dateModified" ||
+    options.sortBy === "dateUploaded"
+  );
 }
