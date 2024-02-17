@@ -46,6 +46,15 @@ import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { groupArray } from "../utils/grouping";
 import { toChunks } from "../utils/array";
 
+const formats = {
+  month: "%Y-%m",
+  year: "%Y",
+  week: "%Y-%W",
+  abc: null,
+  default: null,
+  none: null
+} satisfies Record<GroupOptions["groupBy"], string | null>;
+
 export class SQLCollection<
   TCollectionType extends keyof DatabaseSchema,
   T extends DatabaseSchema[TCollectionType] = DatabaseSchema[TCollectionType]
@@ -482,28 +491,52 @@ export class FilteredSelector<T extends Item> {
     }
   }
 
-  private buildSortExpression(options: SortOptions, persistent?: boolean) {
+  private buildSortExpression(
+    options: GroupOptions | SortOptions,
+    persistent?: boolean
+  ) {
+    const sortBy: Set<SortOptions["sortBy"]> = new Set();
+    if (isGroupOptions(options)) {
+      if (options.groupBy === "abc") sortBy.add("title");
+      else if (options.sortBy === "title") sortBy.add("dateCreated");
+    }
+    sortBy.add(options.sortBy);
+
     return <T>(
       qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, T>
     ) => {
-      return qb
-        .$if(this.type === "notes", (eb) => eb.orderBy("conflicted desc"))
-        .$if(this.type === "notes" || this.type === "notebooks", (eb) =>
-          eb.orderBy("pinned desc")
-        )
-        .$if(options.sortBy === "title", (eb) =>
-          eb.orderBy(
-            sql`ltrim(${sql.raw(
-              options.sortBy
-            )}, ' \u00a0\r\n\t\v') COLLATE NOCASE ${sql.raw(
-              options.sortDirection
-            )}`
-          )
-        )
-        .$if(options.sortBy !== "title", (eb) =>
-          eb.orderBy(options.sortBy, options.sortDirection)
-        )
-        .$if(!!persistent, (eb) => eb.orderBy("id asc"));
+      if (this.type === "notes") qb = qb.orderBy("conflicted desc");
+      if (this.type === "notes" || this.type === "notebooks")
+        qb = qb.orderBy("pinned desc");
+
+      for (const item of sortBy) {
+        if (item === "title") {
+          qb = qb.orderBy(
+            options.sortBy !== "title"
+              ? sql`substring(ltrim(title, ' \u00a0\r\n\t\v'), 1, 1) COLLATE NOCASE`
+              : sql`ltrim(title, ' \u00a0\r\n\t\v') COLLATE NOCASE`,
+            options.sortDirection
+          );
+        } else {
+          const timeFormat = isGroupOptions(options)
+            ? formats[options.groupBy]
+            : null;
+          if (!timeFormat) {
+            qb = qb.orderBy(item, options.sortDirection);
+            continue;
+          }
+
+          qb = qb.orderBy(
+            sql`strftime('${sql.raw(timeFormat)}', ${sql.raw(
+              item
+            )} / 1000, 'unixepoch')`,
+            options.sortDirection
+          );
+        }
+      }
+
+      if (persistent) qb = qb.orderBy("id asc");
+      return qb;
     };
   }
 
@@ -519,4 +552,10 @@ export class FilteredSelector<T extends Item> {
     if (persistent) fields.push("id");
     return fields;
   }
+}
+
+function isGroupOptions(
+  options: SortOptions | GroupOptions
+): options is GroupOptions {
+  return "groupBy" in options;
 }
