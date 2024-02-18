@@ -75,7 +75,7 @@ export class Notes implements ICollection {
     await this.db.transaction(async () => {
       let contentId = item.contentId;
       let dateEdited = item.dateEdited;
-      let headline = "";
+      let headline = item.headline;
 
       if (item.content && item.content.data && item.content.type) {
         const { type, data } = item.content;
@@ -83,7 +83,7 @@ export class Notes implements ICollection {
         const content = getContentFromData(type, data);
         if (!content) throw new Error("Invalid content type.");
 
-        headline = item.locked ? "" : getNoteHeadline(content);
+        headline = getNoteHeadline(content);
         dateEdited = Date.now();
         contentId = await this.db.content.add({
           noteId: id,
@@ -109,7 +109,7 @@ export class Notes implements ICollection {
           this.db.settings.getTitleFormat(),
           this.db.settings.getDateFormat(),
           this.db.settings.getTimeFormat(),
-          headline.split(" ").splice(0, 10).join(" "),
+          headline?.split(" ").splice(0, 10).join(" ") || "",
           this.totalNotes
         );
       }
@@ -117,7 +117,7 @@ export class Notes implements ICollection {
       if (isUpdating) {
         await this.collection.update([id], {
           title: item.title,
-          headline,
+          headline: headline,
           contentId,
 
           pinned: item.pinned,
