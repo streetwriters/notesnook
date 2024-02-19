@@ -32,6 +32,7 @@ import { setDocumentTitle } from "../utils/dom";
 import { Note, Tag } from "@notesnook/core";
 import { NoteContent } from "@notesnook/core/dist/collections/session-content";
 import { Context } from "../components/list-container/types";
+import { showToast } from "../utils/toast";
 
 enum SaveState {
   NotSaved = -1,
@@ -278,6 +279,10 @@ class EditorStore extends BaseStore<EditorStore> {
 
       this.setSaveState(1);
     } catch (err) {
+      showToast(
+        "error",
+        err instanceof Error ? err.stack || err.message : JSON.stringify(err)
+      );
       this.setSaveState(-1);
       console.error(err);
       if (err instanceof Error) logger.error(err);
