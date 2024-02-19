@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { noteTest, TEST_NOTE, notebookTest, TEST_NOTEBOOK2 } from "./utils";
+import {
+  noteTest,
+  TEST_NOTE,
+  notebookTest,
+  TEST_NOTEBOOK2,
+  databaseTest
+} from "./utils";
 import { test, expect } from "vitest";
 
 const content = {
@@ -63,4 +69,29 @@ test("search notebooks", () =>
     await db.notebooks.add(TEST_NOTEBOOK2);
     let filtered = await db.lookup.notebooks("Description").ids();
     expect(filtered.length).toBeGreaterThan(0);
+  }));
+
+test("search should not return trashed notes", () =>
+  databaseTest().then(async (db) => {
+    const id = await db.notes.add({
+      title: "world is a heavy tune"
+    });
+    await db.notes.moveToTrash(id);
+
+    const filtered = await db.lookup.notes("heavy tune").ids();
+
+    expect(filtered).toHaveLength(0);
+  }));
+
+test("search should return restored notes", () =>
+  databaseTest().then(async (db) => {
+    const id = await db.notes.add({
+      title: "world is a heavy tune"
+    });
+    await db.notes.moveToTrash(id);
+    await db.trash.restore(id);
+
+    const filtered = await db.lookup.notes("heavy tune").ids();
+
+    expect(filtered).toHaveLength(1);
   }));
