@@ -36,6 +36,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     )
     .addQuery((c) =>
       c.insertInto("content_fts").values({
+        rowid: sql`new.rowid`,
         id: sql`new.id`,
         data: sql`new.data`,
         noteId: sql`new.noteId`
@@ -52,6 +53,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addQuery((c) =>
       c.insertInto("content_fts").values({
         content_fts: sql.lit("delete"),
+        rowid: sql.ref("old.rowid"),
         id: sql.ref("old.id"),
         data: sql.ref("old.data"),
         noteId: sql.ref("old.noteId")
@@ -68,6 +70,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addQuery((c) =>
       c.insertInto("content_fts").values({
         content_fts: sql.lit("delete"),
+        rowid: sql.ref("old.rowid"),
         id: sql.ref("old.id"),
         data: sql.ref("old.data"),
         noteId: sql.ref("old.noteId")
@@ -75,6 +78,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     )
     .addQuery((c) =>
       c.insertInto("content_fts").values({
+        rowid: sql`new.rowid`,
         id: sql`new.id`,
         data: sql`IIF(new.locked == 1, '', new.data)`,
         noteId: sql`new.noteId`
@@ -96,6 +100,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     )
     .addQuery((c) =>
       c.insertInto("notes_fts").values({
+        rowid: sql`new.rowid`,
         id: sql.ref("new.id"),
         title: sql.ref("new.title")
       })
@@ -111,6 +116,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addQuery((c) =>
       c.insertInto("notes_fts").values({
         notes_fts: sql.lit("delete"),
+        rowid: sql.ref("old.rowid"),
         id: sql.ref("old.id"),
         title: sql.ref("old.title")
       })
@@ -126,12 +132,14 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addQuery((c) =>
       c.insertInto("notes_fts").values({
         notes_fts: sql.lit("delete"),
+        rowid: sql.ref("old.rowid"),
         id: sql.ref("old.id"),
         title: sql.ref("old.title")
       })
     )
     .addQuery((c) =>
       c.insertInto("notes_fts").values({
+        rowid: sql`new.rowid`,
         id: sql.ref("new.id"),
         title: sql.ref("new.title")
       })
