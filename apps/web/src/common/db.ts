@@ -98,6 +98,10 @@ async function initializeDatabase(persistence: DatabasePersistence) {
 
   await db.init();
 
+  window.addEventListener("beforeunload", () => {
+    db.sql().destroy();
+  });
+
   logger.measure("Database initialization");
 
   if (db.migrations?.required()) {
