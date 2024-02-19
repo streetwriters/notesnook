@@ -20,7 +20,7 @@
     "@types/ws": "^8.5.5",
     "@vitest/coverage-v8": "^1.0.1",
     "abortcontroller-polyfill": "^1.7.3",
-    "better-sqlite3": "^8.6.0",
+    "better-sqlite3-multiple-ciphers": "^9.4.0",
     "bson-objectid": "^2.0.4",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.1",
