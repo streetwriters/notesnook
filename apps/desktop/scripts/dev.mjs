@@ -169,9 +169,10 @@ async function cleanup() {
 }
 
 async function isBundleSame() {
-  const bundle = await fs.readFile(
-    path.join(__dirname, "..", "build", "electron.js")
-  );
+  const bundle = Buffer.concat([
+    await fs.readFile(path.join(__dirname, "..", "build", "electron.js")),
+    await fs.readFile(path.join(__dirname, "..", "build", "preload.js"))
+  ]);
 
   const hashSum = crypto.createHash("sha256");
   hashSum.update(bundle);
