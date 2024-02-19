@@ -19,17 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import DB from "../../src/api";
 import { NodeStorageInterface } from "../../__mocks__/node-storage.mock";
-import dayjs from "dayjs";
-import { groupArray } from "../../src/utils/grouping";
 import { FS } from "../../__mocks__/fs.mock";
 import Compressor from "../../__mocks__/compressor.mock";
-import { expect } from "vitest";
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { randomBytes } from "../../src/utils/random";
-import { GroupOptions, Note, Notebook } from "../../src/types";
+import { Note, Notebook } from "../../src/types";
 import { NoteContent } from "../../src/collections/session-content";
 import { SqliteDialect } from "kysely";
-import BetterSQLite3 from "better-sqlite3";
+import BetterSQLite3 from "better-sqlite3-multiple-ciphers";
+import path from "path";
+import { tmpdir } from "os";
+import { getId } from "../../src/utils/id";
+import { existsSync, mkdirSync } from "fs";
 
 const TEST_NOTEBOOK: Partial<Notebook> = {
   title: "Test Notebook",
@@ -41,7 +42,10 @@ const TEST_NOTEBOOK2: Partial<Notebook> = {
   description: "Test Description 2"
 };
 
-function databaseTest() {
+function databaseTest(type: "memory" | "persistent" = "memory") {
+  const dir = path.join(tmpdir(), "notesnook-tests-tmp");
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+  const dbPath = path.join(dir, `notesnook-${getId()}.sql`);
   const db = new DB();
   db.setup({
     storage: new NodeStorageInterface(),
@@ -51,8 +55,11 @@ function databaseTest() {
     sqliteOptions: {
       dialect: (name) =>
         new SqliteDialect({
-          database: BetterSQLite3(":memory:").unsafeMode(true)
-        })
+          database: BetterSQLite3(
+            type === "persistent" ? dbPath : ":memory:"
+          ).unsafeMode(true)
+        }),
+      password: type === "persistent" ? "iamalongpassword" : undefined
     },
     batchSize: 500
   });
@@ -89,28 +96,6 @@ const noteTest = (
     return { db, id };
   });
 
-const groupedTest = (type: GroupOptions["groupBy"]) =>
-  noteTest().then(async ({ db }) => {
-    await db.notes.add({ ...TEST_NOTE, title: "HELLO WHAT!" });
-    await db.notes.add({
-      ...TEST_NOTE,
-      title: "Some title",
-      dateCreated: dayjs().startOf("week").subtract(1, "day").unix()
-    });
-    await db.notes.add({
-      ...TEST_NOTE,
-      title: "Some title and title title",
-      dateCreated: dayjs().subtract(2, "weeks").unix()
-    });
-    const grouped = groupArray(db.notes.all, {
-      groupBy: type,
-      sortDirection: "desc",
-      sortBy: "dateCreated"
-    });
-    expect(grouped.length).toBeGreaterThan(1);
-    expect(grouped.some((i) => i.type === "header")).toBe(true);
-  });
-
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -141,7 +126,6 @@ export {
   databaseTest,
   notebookTest,
   noteTest,
-  groupedTest,
   IMG_CONTENT,
   IMG_CONTENT_WITHOUT_HASH,
   TEST_NOTEBOOK,
