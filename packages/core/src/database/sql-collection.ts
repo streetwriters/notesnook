@@ -342,6 +342,8 @@ export class FilteredSelector<T extends Item> {
     for (const item of results) {
       items[item.id] = item as T;
     }
+
+    if (ids) return Object.fromEntries(ids.map((id) => [id, items[id]]));
     return items;
   }
 
