@@ -17,28 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { defineConfig } from "vitest/config";
+import { rmSync } from "fs";
+import path from "path";
+import { tmpdir } from "os";
 
-const IS_E2E = process.env.IS_E2E === "true";
-
-export default defineConfig({
-  test: {
-    globalSetup: ["./__tests__/setup/global.setup.ts"],
-    setupFiles: ["./__tests__/setup/test.setup.ts"],
-    coverage: {
-      reporter: ["text", "html"],
-      exclude: ["src/utils/templates/html/languages/*.js"],
-      include: ["src/**/*.ts"]
-    },
-    retry: 1,
-    exclude: ["__benches__/**/*.bench.ts"],
-    include: [
-      ...(IS_E2E ? ["__e2e__/**/*.test.{js,ts}"] : []),
-      "__tests__/**/*.test.{js,ts}",
-      "src/**/*.test.{js,ts}"
-    ],
-    benchmark: {
-      include: ["__benches__/**/*.bench.ts"]
-    }
-  }
-});
+export default async function () {
+  return async () => {
+    rmSync(path.join(tmpdir(), "notesnook-tests-tmp"), {
+      force: true,
+      recursive: true
+    });
+  };
+}
