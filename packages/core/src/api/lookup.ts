@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { match } from "fuzzyjs";
 import Database from ".";
 import { Item, Note, TrashItem } from "../types";
-import { DatabaseSchema, RawDatabaseSchema, isFalse } from "../database";
+import { DatabaseSchema, RawDatabaseSchema } from "../database";
 import { AnyColumnWithTable, Kysely, sql } from "kysely";
 import { FilteredSelector } from "../database/sql-collection";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
@@ -45,34 +45,41 @@ export default class Lookup {
 
       const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       query = query.replace(/"/, '""');
-      const result = await db
-        .with("matching", (eb) =>
+
+      const excludedIds = this.db.trash.cache.notes;
+      const results = await db
+        .selectFrom((eb) =>
           eb
-            .selectFrom("content_fts")
-            .where("data", "match", `"${query}"`)
-            .select(["noteId as id", "rank"])
-            .unionAll(
-              eb
-                .selectFrom("notes_fts")
-                .where("title", "match", `"${query}"`)
-                // add 10 weight to title
-                .select(["id", sql.raw<number>(`rank * 10`).as("rank")])
+            .selectFrom("notes_fts")
+            .$if(!!notes, (eb) =>
+              eb.where("id", "in", notes!.filter.select("id"))
             )
+            .$if(excludedIds.length > 0, (eb) =>
+              eb.where("id", "not in", excludedIds)
+            )
+            .where("title", "match", `"${query}"`)
+            .select(["id", sql<number>`rank * 10`.as("rank")])
+            .unionAll((eb) =>
+              eb
+                .selectFrom("content_fts")
+                .$if(!!notes, (eb) =>
+                  eb.where("id", "in", notes!.filter.select("id"))
+                )
+                .$if(excludedIds.length > 0, (eb) =>
+                  eb.where("id", "not in", excludedIds)
+                )
+                .where("data", "match", `"${query}"`)
+                .select(["noteId as id", "rank"])
+                .$castTo<{ id: string; rank: number }>()
+            )
+            .as("results")
         )
-        .selectFrom("notes")
-        .$if(!!notes, (eb) =>
-          eb.where("notes.id", "in", notes!.filter.select("id"))
-        )
+        .select(["results.id"])
+        .groupBy("results.id")
+        .orderBy(sql`SUM(results.rank)`, "asc")
         .$if(!!limit, (eb) => eb.limit(limit!))
-        .where(isFalse("notes.deleted"))
-        .where(isFalse("notes.dateDeleted"))
-        .innerJoin("matching", (eb) =>
-          eb.onRef("notes.id", "==", "matching.id")
-        )
-        .orderBy("matching.rank desc")
-        .select(["notes.id"])
         .execute();
-      return result.map((id) => id.id);
+      return results.map((r) => r.id);
     }, notes || this.db.notes.all);
   }
 
@@ -212,10 +219,10 @@ export default class Lookup {
       this.db.options.batchSize,
       () => Promise.resolve(ids),
       async (start, end) => {
-        const items = await selector.items(ids);
+        const items = await selector.records(ids);
         return {
           ids: ids.slice(start, end),
-          items: items.slice(start, end)
+          items: Object.values(items).slice(start, end)
         };
       }
     );
