@@ -45,6 +45,7 @@ export function InsertBlock(props: ToolProps) {
         horizontalRule(editor),
         codeblock(editor),
         mathblock(editor),
+        callout(editor),
         blockquote(editor),
         image(editor, isMobile),
         attachment(editor),
@@ -137,6 +138,36 @@ const mathblock = (editor: Editor): MenuItem => ({
   isChecked: editor?.isActive("mathBlock"),
   onClick: () => editor.current?.chain().focus().insertMathBlock().run(),
   modifier: "Mod-Shift-M"
+});
+
+const callout = (editor: Editor): MenuItem => ({
+  key: "callout",
+  type: "button",
+  title: "Callout",
+  icon: Icons.callout,
+  menu: {
+    items: [
+      "Abstract",
+      "Hint",
+      "Info",
+      "Success",
+      "Warn",
+      "Error",
+      "Example",
+      "Quote"
+    ].map((type) => ({
+      title: type,
+      key: type,
+      type: "button",
+      isChecked: editor?.isActive("callout", { type: type.toLowerCase() }),
+      onClick: () =>
+        editor.current
+          ?.chain()
+          .focus()
+          .setCallout({ type: type.toLowerCase() as any })
+          .run()
+    }))
+  }
 });
 
 const image = (editor: Editor, isMobile: boolean): MenuItem => ({
