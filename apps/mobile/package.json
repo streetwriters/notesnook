@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "private": true,
   "license": "GPL-3.0-or-later",
   "workspaces": [
