@@ -85,6 +85,7 @@ import { Quirks } from "./extensions/quirks";
 import { LIST_NODE_TYPES } from "./utils/node-types";
 import CheckList from "./extensions/check-list";
 import CheckListItem from "./extensions/check-list-item";
+import { Callout } from "./extensions/callout";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -287,6 +288,8 @@ const useTiptap = (
         CheckListItem.configure({
           nested: true
         }),
+
+        Callout,
 
         // Quirks handlers
         Quirks.configure({

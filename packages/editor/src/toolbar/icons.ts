@@ -120,7 +120,8 @@ import {
   mdiPencil,
   mdiCheckboxMultipleBlankOutline,
   mdiCheckboxMultipleMarked,
-  mdiFormatFloatLeft
+  mdiFormatFloatLeft,
+  mdiMessageOutline
 } from "@mdi/js";
 
 export const Icons = {
@@ -226,6 +227,7 @@ export const Icons = {
   tableSettings: mdiTableCog,
   math: mdiFunctionVariant,
   mathBlock: mdiMathIntegral,
+  callout: mdiMessageOutline,
   outlineList: mdiFileTreeOutline,
   fontFamily: mdiFormatFont,
   fontSize: mdiFormatFontSizeIncrease,

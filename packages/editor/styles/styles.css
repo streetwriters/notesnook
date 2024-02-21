@@ -653,3 +653,101 @@ p > *::selection {
     margin-top: 2px;
   }
 }
+
+/* Callout */
+.ProseMirror div.callout {
+  padding: 15px;
+  border-radius: 10px;
+  background-color: rgba(var(--callout-color), 0.1);
+}
+
+.ProseMirror div.callout > :first-child {
+  margin: 0px;
+  color: rgb(var(--callout-color));
+  position: relative;
+}
+
+.ProseMirror div.callout > :first-child::after {
+  position: absolute;
+  top: 3px;
+  right: 0px;
+  cursor: pointer;
+  content: "";
+  background-size: 18px;
+  width: 18px;
+  height: 18px;
+
+  background-color: rgb(var(--callout-color));
+  mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
+    no-repeat 50% 50%;
+  mask-size: cover;
+  border: 1px solid var(--background);
+
+  transform: rotate(0);
+  transition: transform 250ms ease;
+}
+
+.ProseMirror div.callout > :first-child[dir="rtl"]::after {
+  right: unset;
+  left: 0px;
+}
+
+.ProseMirror div.callout.collapsed > :first-child::after  {
+  transform: rotate(-90deg);
+}
+
+.ProseMirror div.callout.collapsed :not(:first-child)  {
+  display: none;
+}
+
+.ProseMirror div.callout[data-callout-type="abstract"],
+.ProseMirror div.callout[data-callout-type="tldr"],
+.ProseMirror div.callout[data-callout-type="summary"],
+
+.ProseMirror div.callout[data-callout-type="tip"],
+.ProseMirror div.callout[data-callout-type="hint"],
+.ProseMirror div.callout[data-callout-type="important"] {
+  --callout-color: 0, 191, 188;
+}
+
+.ProseMirror div.callout[data-callout-type="info"],
+.ProseMirror div.callout[data-callout-type="todo"] {
+  --callout-color: 8, 109, 221;
+}
+
+.ProseMirror div.callout[data-callout-type="success"],
+.ProseMirror div.callout[data-callout-type="check"],
+.ProseMirror div.callout[data-callout-type="done"] {
+  --callout-color: 8, 185, 78;
+}
+
+.ProseMirror div.callout[data-callout-type="help"],
+.ProseMirror div.callout[data-callout-type="faq"],
+.ProseMirror div.callout[data-callout-type="question"],
+
+.ProseMirror div.callout[data-callout-type="warn"],
+.ProseMirror div.callout[data-callout-type="warning"],
+.ProseMirror div.callout[data-callout-type="caution"],
+.ProseMirror div.callout[data-callout-type="attention"] {
+  --callout-color: 236, 117, 0;
+}
+
+.ProseMirror div.callout[data-callout-type="failure"],
+.ProseMirror div.callout[data-callout-type="fail"],
+.ProseMirror div.callout[data-callout-type="missing"],
+
+.ProseMirror div.callout[data-callout-type="danger"],
+.ProseMirror div.callout[data-callout-type="error"],
+
+.ProseMirror div.callout[data-callout-type="bug"] {
+  --callout-color: 233, 49, 71;
+}
+
+.ProseMirror div.callout[data-callout-type="example"] {
+  --callout-color: 120, 82, 238;
+}
+
+.ProseMirror div.callout[data-callout-type="quote"],
+.ProseMirror div.callout[data-callout-type="cite"] {
+  --callout-color: 158, 158, 158;
+}
