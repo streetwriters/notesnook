@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
 import create, { State } from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
-import { db } from "../../../common/database";
+import { DatabaseLogger, db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { presets } from "./toolbar-definition";
+import { ToolbarConfig } from "@notesnook/core";
 export type ToolDefinition = string | string[];
 
 export type DraggedItem = {
@@ -53,6 +54,25 @@ export interface DragState extends State {
 
 function clone<T>(value: T[]) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function migrateToolbar(tools: ToolbarConfig) {
+  const version = MMKV.getInt("editor:tools_version") || 0;
+
+  switch (version) {
+    case 0: {
+      tools.config?.push(["checkList"]);
+      DatabaseLogger.info(`Toolbar migrated to version ${version + 1}`);
+      MMKV.setInt("editor:tools_version", version + 1);
+      db.settings.setToolbarConfig("mobile", tools);
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+  console.log(tools);
+  return tools;
 }
 
 export const useDragState = create<DragState>(
@@ -97,13 +117,15 @@ export const useDragState = create<DragState>(
       init: async () => {
         const user = await db.user?.getUser();
         if (!user) return;
-        const toolbarConfig = db.settings.getToolbarConfig(
+        let toolbarConfig = db.settings.getToolbarConfig(
           useSettingStore.getState().deviceMode || ("mobile" as any)
         );
         if (!toolbarConfig) {
           logger.info("DragState", "No user defined toolbar config was found");
           return;
         }
+
+        toolbarConfig = migrateToolbar(toolbarConfig);
         const preset = toolbarConfig?.preset as DragState["preset"];
         set({
           preset: preset,
