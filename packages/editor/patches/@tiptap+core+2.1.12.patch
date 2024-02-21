@@ -1,8 +1,8 @@
 diff --git a/node_modules/@tiptap/core/dist/index.js b/node_modules/@tiptap/core/dist/index.js
-index 38c9884..2dad7fe 100644
+index 38c9884..4a9e10c 100644
 --- a/node_modules/@tiptap/core/dist/index.js
 +++ b/node_modules/@tiptap/core/dist/index.js
-@@ -1876,8 +1876,21 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
+@@ -1876,8 +1876,23 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
      return lift$1(state, dispatch);
  };
  
@@ -15,6 +15,8 @@ index 38c9884..2dad7fe 100644
 +        const { selection, storedMarks } = state;
 +        const marks = storedMarks || (selection.$to.parentOffset && selection.$from.marks());
 +
++        if (!marks) return dispatch(tr);
++        
 +        const { splittableMarks } = editor.extensionManager;
 +        const filteredMarks = marks.filter((mark) =>
 +            splittableMarks.includes(mark.type.name)
