@@ -159,6 +159,7 @@ function setProperty<K extends keyof SettingStore["settings"]>(
 function onFirstLaunch() {
   const introCompleted = get().introCompleted;
   if (!introCompleted) {
+    MMKV.setInt("editor:tools_version", 1);
     set({
       rateApp: Date.now() + 86400000 * 2,
       nextBackupRequestTime: Date.now() + 86400000 * 3

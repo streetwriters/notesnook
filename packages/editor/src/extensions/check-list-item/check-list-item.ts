@@ -106,6 +106,13 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
 
       checkbox.contentEditable = "false";
       checkbox.type = "checkbox";
+
+      checkbox.addEventListener("mousedown", (event) => {
+        if (globalThis.keyboardShown) {
+          event.preventDefault();
+        }
+      });
+
       checkbox.addEventListener("change", (event) => {
         event.preventDefault();
         // if the editor isn’t editable and we don't have a handler for

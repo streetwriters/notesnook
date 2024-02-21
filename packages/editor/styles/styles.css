@@ -635,9 +635,21 @@ p > *::selection {
   margin-right: 0.5rem;
   user-select: none;
   height: 18px;
+  width: 18px;
   accent-color: var(--accent);
 }
 
 .ProseMirror ul.simple-checklist > li > div {
   flex: 1 1 auto;
+}
+
+@media screen and (max-width: 480px) {
+  .ProseMirror ul.simple-checklist > li  > input {
+    height: 21px;
+    width: 21px;
+  }
+  
+  .ProseMirror ul.simple-checklist > li > div {
+    margin-top: 2px;
+  }
 }
