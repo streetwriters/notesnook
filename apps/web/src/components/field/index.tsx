@@ -145,8 +145,10 @@ function Field(props: FieldProps) {
             sx={{
               bg: "transparent",
               position: "absolute",
-              right: "4px",
-              top: "2px",
+              margin: 0,
+              top: 0,
+              right: "2px",
+              height: "100%",
               px: 1,
               borderRadius: "default",
               ":hover": { bg: "border" }
