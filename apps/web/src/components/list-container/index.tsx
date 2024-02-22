@@ -170,10 +170,11 @@ function ListContainer(props: ListContainerProps) {
               components={{
                 Scroller: CustomScrollbarsVirtualList,
                 Item: VirtuosoItem,
-                Header: () => (header ? header : <Announcements />)
+                Header: ListHeader
               }}
               increaseViewportBy={{ top: 10, bottom: 10 }}
               context={{
+                header,
                 items,
                 group,
                 refresh,
@@ -221,6 +222,7 @@ function ListContainer(props: ListContainerProps) {
 export default ListContainer;
 
 type ListContext = {
+  header?: JSX.Element;
   items: VirtualizedGrouping<Item>;
   group: GroupingKey | undefined;
   refresh: () => void;
@@ -354,6 +356,10 @@ function VirtuosoItem({
       {props.children}
     </div>
   );
+}
+
+function ListHeader({ context }: { context?: ListContext }) {
+  return context?.header ? context.header : <Announcements />;
 }
 
 /**
