@@ -124,6 +124,11 @@ export function Dropdown(props: DropdownProps) {
         }}
         blocking={!isMobile}
         focusOnRender={!isMobile}
+        onMouseDown={(e) => {
+          if (globalThis.keyboardShown) {
+            e.preventDefault();
+          }
+        }}
         sx={{
           minWidth: menuWidth,
           maxWidth: isBottom ? "95vw" : "auto",
