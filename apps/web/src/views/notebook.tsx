@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import ListContainer from "../components/list-container";
 import { useStore as useAppStore } from "../stores/app-store";
 import { hashNavigate, navigate } from "../navigation";
 import { Button, Flex, Text } from "@theme-ui/components";
@@ -29,18 +28,13 @@ import {
   MoreHorizontal,
   Notebook2,
   RemoveShortcutLink,
-  ShortcutLink,
-  SortAsc
+  ShortcutLink
 } from "../components/icons";
 import { pluralize } from "@notesnook/common";
 import { Allotment, AllotmentHandle } from "allotment";
 import { Plus } from "../components/icons";
-import {
-  notesFromContext,
-  useStore as useNotesStore
-} from "../stores/note-store";
+import { useStore as useNotesStore } from "../stores/note-store";
 import { useStore as useNotebookStore } from "../stores/notebook-store";
-import Placeholder from "../components/placeholders";
 import { db } from "../common/db";
 import { getFormattedDate } from "@notesnook/common";
 import { showAddNotebookDialog } from "../common/dialog-controller";
@@ -56,7 +50,7 @@ import { NotebookContext } from "../components/list-container/types";
 import { FlexScrollContainer } from "../components/scroll-container";
 import { Menu } from "../hooks/use-menu";
 import Config from "../utils/config";
-import { useSearch } from "../hooks/use-search";
+import Notes from "./notes";
 // import { showSortMenu } from "../components/group-header";
 
 type NotebookProps = {
@@ -72,17 +66,6 @@ function Notebook(props: NotebookProps) {
 
   const context = useNotesStore((store) => store.context);
   const notes = useNotesStore((store) => store.contextNotes);
-  const refreshContext = useNotesStore((store) => store.refreshContext);
-  const isCompact = useNotesStore((store) => store.viewMode === "compact");
-  const filteredItems = useSearch(
-    "notes",
-    (query) => {
-      if (!context || context.type !== "notebook") return;
-      const notes = notesFromContext(context);
-      return db.lookup.notes(query, notes).sorted();
-    },
-    [context, notes]
-  );
 
   useEffect(() => {
     const { context, setContext } = useNotesStore.getState();
@@ -134,13 +117,7 @@ function Notebook(props: NotebookProps) {
       >
         <Allotment.Pane>
           <Flex variant="columnFill" sx={{ height: "100%" }}>
-            <ListContainer
-              group="notes"
-              refresh={refreshContext}
-              compact={isCompact}
-              context={context}
-              items={filteredItems || notes}
-              placeholder={<Placeholder context="notes" />}
+            <Notes
               header={
                 <NotebookHeader
                   key={context.id}
@@ -148,13 +125,6 @@ function Notebook(props: NotebookProps) {
                   context={context}
                 />
               }
-              button={{
-                onClick: () =>
-                  hashNavigate("/notes/create", {
-                    addNonce: true,
-                    replace: true
-                  })
-              }}
             />
           </Flex>
         </Allotment.Pane>
