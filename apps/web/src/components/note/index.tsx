@@ -233,7 +233,9 @@ function Note(props: NoteProps) {
 
               {note.readonly && <Readonly size={15} />}
 
-              {note.favorite && <Star color={primary} size={15} />}
+              {note.favorite && (
+                <Star data-test-id="favorite" color={primary} size={15} />
+              )}
 
               {tags?.items.map((tag) => {
                 return (

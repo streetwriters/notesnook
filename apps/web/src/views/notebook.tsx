@@ -442,7 +442,12 @@ function NotebookHeader({
   const { title, description, dateEdited } = notebook;
 
   return (
-    <Flex mx={2} my={2} sx={{ flexDirection: "column", minWidth: 200 }}>
+    <Flex
+      data-test-id="notebook-header"
+      mx={2}
+      my={2}
+      sx={{ flexDirection: "column", minWidth: 200 }}
+    >
       <Flex sx={{ alignItems: "center", mb: 1 }}>
         <Button
           ref={moreCrumbsRef}
@@ -529,7 +534,11 @@ function NotebookHeader({
       </Flex>
       <Text variant="subBody">{getFormattedDate(dateEdited, "date")}</Text>
       <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
-        <Text variant="heading" sx={{ fontSize: "subheading" }}>
+        <Text
+          data-test-id="notebook-title"
+          variant="heading"
+          sx={{ fontSize: "subheading" }}
+        >
           {title}
         </Text>
         <Flex>

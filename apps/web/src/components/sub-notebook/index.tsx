@@ -27,8 +27,8 @@ import { MenuItem } from "@notesnook/ui";
 import { showAddNotebookDialog } from "../../common/dialog-controller";
 import { navigate } from "../../navigation";
 import { useCallback, useRef } from "react";
-import { getDragData } from "../../utils/data-transfer";
 import { handleDrop } from "../../common/drop-handler";
+import { useDragHandler } from "../../hooks/use-drag-handler";
 
 type SubNotebookProps = {
   item: Notebook;
@@ -60,6 +60,7 @@ function SubNotebook(props: SubNotebookProps) {
       store.context?.type === "notebook" && store.context.id === item.id
   );
   const dragTimeout = useRef(0);
+  const { isDragEntering, isDragLeaving } = useDragHandler(`id_${item.id}`);
 
   const openNotebook = useCallback(async () => {
     if (isOpened) return;
@@ -82,17 +83,18 @@ function SubNotebook(props: SubNotebookProps) {
       item={item}
       onClick={() => openNotebook()}
       onDragEnter={(e) => {
+        if (!isDragEntering(e)) return;
         e.currentTarget.focus();
         focus();
 
-        const noteIds = getDragData(e.dataTransfer, "note");
-        const notebookIds = getDragData(e.dataTransfer, "notebook");
         dragTimeout.current = setTimeout(() => {
-          if (notebookIds.length > 0) expand();
-          else if (noteIds.length > 0) openNotebook();
+          openNotebook();
         }, 1000) as unknown as number;
       }}
-      onDragLeave={() => clearTimeout(dragTimeout.current)}
+      onDragLeave={(e) => {
+        if (!isDragLeaving(e)) return;
+        clearTimeout(dragTimeout.current);
+      }}
       onDrop={async (e) => {
         clearTimeout(dragTimeout.current);
         handleDrop(e.dataTransfer, item);
