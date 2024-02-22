@@ -55,9 +55,9 @@ export class Vaults implements ICollection {
     return id;
   }
 
-  async remove(id: string) {
+  async remove(id: string, unlinkAllNotes = false) {
     await this.db.transaction(async () => {
-      await this.db.relations.unlinkOfType("vault", [id]);
+      if (unlinkAllNotes) await this.db.relations.unlinkOfType("vault", [id]);
       await this.collection.softDelete([id]);
     });
   }
