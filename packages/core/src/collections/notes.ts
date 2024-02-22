@@ -351,6 +351,8 @@ export class Notes implements ICollection {
   }
 
   private async _delete(moveToTrash = true, ...ids: string[]) {
+    if (ids.length <= 0) return;
+
     if (moveToTrash) {
       await this.db.trash.add("note", ids);
     } else {
