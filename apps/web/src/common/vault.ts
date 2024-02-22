@@ -76,7 +76,9 @@ class Vault {
     });
     if (result) {
       await db.vault.delete(result.deleteAllLockedNotes);
+      return true;
     }
+    return false;
   }
 
   static unlockVault() {
