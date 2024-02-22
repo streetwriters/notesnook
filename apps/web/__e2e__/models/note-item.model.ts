@@ -54,6 +54,13 @@ export class NoteItemModel extends BaseItemModel {
     await this.editor.waitForLoading(title);
   }
 
+  async isFavorite() {
+    await this.locator
+      .locator(getTestId("favorite"))
+      .waitFor({ state: "visible" });
+    return true;
+  }
+
   async getTags() {
     const tags: string[] = [];
     for await (const item of iterateList(
