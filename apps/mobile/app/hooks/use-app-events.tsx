@@ -202,11 +202,14 @@ const onRequestPartialSync = async (
   DatabaseLogger.info(
     `onRequestPartialSync full:${full}, force:${force}, lastSyncTime:${lastSyncTime}`
   );
-  if (full || force) {
-    await Sync.run("global", force, full, undefined, lastSyncTime);
-  } else {
-    await Sync.run("global", false, false, undefined, lastSyncTime);
-  }
+
+  DatabaseLogger.info("Auto sync is disabled");
+
+  // if (full || force) {
+  //   await Sync.run("global", force, full, undefined, lastSyncTime);
+  // } else {
+  //   await Sync.run("global", false, false, undefined, lastSyncTime);
+  // }
 };
 
 const onLogout = async (reason: string) => {
