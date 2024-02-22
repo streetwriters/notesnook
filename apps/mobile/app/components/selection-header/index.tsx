@@ -306,7 +306,10 @@ export const SelectionHeader = React.memo(
                 deleteItems(
                   undefined,
                   useSelectionStore.getState().selectionMode
-                );
+                ).then(() => {
+                  useSelectionStore.getState().clearSelection();
+                  useSelectionStore.getState().setSelectionMode(undefined);
+                });
               }}
               tooltipText="Move to trash"
               tooltipPosition={1}
