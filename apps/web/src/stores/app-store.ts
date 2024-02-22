@@ -118,7 +118,7 @@ class AppStore extends BaseStore<AppStore> {
       async (full, force, lastSynced) => {
         if (!this.get().isAutoSyncEnabled) return;
 
-        await this.get().sync(full, force, lastSynced);
+        // await this.get().sync(full, force, lastSynced);
       }
     );
 
