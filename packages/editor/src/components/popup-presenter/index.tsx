@@ -24,7 +24,11 @@ import {
   PopupPresenterProps,
   PopupPresenter
 } from "@notesnook/ui";
-import { getPopupRoot, getToolbarElement } from "../../toolbar/utils/dom";
+import {
+  getPopupRoot,
+  getToolbarElement,
+  unmountPopupRoot
+} from "../../toolbar/utils/dom";
 import {
   useIsMobile,
   useToolbarStore
@@ -117,7 +121,7 @@ export function showPopup(options: ShowPopupOptions) {
   const { popup, ...props } = options;
 
   function hide() {
-    getPopupRoot().unmount();
+    unmountPopupRoot();
   }
 
   getPopupRoot().render(
