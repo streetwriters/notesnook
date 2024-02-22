@@ -63,8 +63,9 @@ const ReminderItem = React.memo(
       <SelectionWrapper onPress={openReminder} item={item} isSheet={isSheet}>
         <View
           style={{
-            flexShrink: 1,
-            opacity: item.disabled ? 0.5 : 1
+            opacity: item.disabled ? 0.5 : 1,
+            maxWidth: "80%",
+            flexGrow: 1
           }}
         >
           <Heading
@@ -74,7 +75,7 @@ const ReminderItem = React.memo(
             }}
             size={SIZE.md}
           >
-            {item.title}
+            {item.title} lasdk alkaskd aklskd sadl alksd kalskd aslkd laskldk sa
           </Heading>
 
           {item.description ? (
