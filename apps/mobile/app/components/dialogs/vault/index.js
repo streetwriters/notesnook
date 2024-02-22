@@ -242,16 +242,6 @@ export class VaultDialog extends Component {
       });
       return;
     }
-    if (this.password && this.password.length < 3) {
-      ToastManager.show({
-        heading: "Password too short",
-        message: "Password must be longer than 3 characters.",
-        type: "error",
-        context: "local"
-      });
-
-      return;
-    }
 
     if (!this.state.novault) {
       if (this.password !== this.confirmPassword) {
