@@ -160,7 +160,7 @@ export default class Vault {
       await this.db.notes.remove(...lockedIds);
     }
 
-    await this.db.vaults.remove(vault.id);
+    await this.db.vaults.remove(vault.id, deleteAllLockedNotes);
     this.password = undefined;
   }
 
