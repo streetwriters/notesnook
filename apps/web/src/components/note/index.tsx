@@ -117,6 +117,7 @@ function Note(props: NoteProps) {
 
   return (
     <ListItem
+      draggable={true}
       isFocused={isOpened}
       isCompact={compact}
       isSimple={simplified}

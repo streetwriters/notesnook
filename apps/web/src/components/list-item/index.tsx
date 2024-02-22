@@ -29,6 +29,7 @@ import { SchemeColors } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
 import { alpha } from "@theme-ui/color";
 import { Item } from "@notesnook/core/dist/types";
+import { setDragData } from "../../utils/data-transfer";
 
 type ListItemProps<TItem extends Item, TContext> = {
   colors?: {
@@ -41,10 +42,16 @@ type ListItemProps<TItem extends Item, TContext> = {
   isDisabled?: boolean;
   isSimple?: boolean;
   item: TItem;
+  draggable?: boolean;
 
   onKeyPress?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   onClick?: () => void;
   onSelect?: () => void;
+
+  onDragEnter?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDragLeave?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
+
   title: string | JSX.Element;
   header?: JSX.Element;
   body?: JSX.Element | string;
@@ -71,7 +78,11 @@ function ListItem<TItem extends Item, TContext>(
     isSimple,
     item,
     sx,
-    context
+    context,
+    onDragEnter,
+    onDragLeave,
+    onDrop,
+    draggable
   } = props;
 
   const listItemRef = useRef<HTMLDivElement>(null);
@@ -91,6 +102,21 @@ function ListItem<TItem extends Item, TContext>(
       id={`id_${item.id}`}
       className={isSelected ? "selected" : ""}
       ref={listItemRef}
+      draggable={draggable}
+      onDragEnter={onDragEnter}
+      onDrop={onDrop}
+      onDragOver={(e) => e.preventDefault()}
+      onDragLeave={onDragLeave}
+      onDragEnd={onDragLeave}
+      onDragStart={(e) => {
+        if (!draggable) return;
+        let selectedItems = selectionStore.get().selectedItems;
+        if (selectedItems.findIndex((i) => i === item.id) === -1) {
+          selectedItems = [];
+          selectedItems.push(item.id);
+        }
+        setDragData(e.dataTransfer, item.type, selectedItems);
+      }}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();

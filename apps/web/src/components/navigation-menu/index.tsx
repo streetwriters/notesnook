@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Box, Button, Flex } from "@theme-ui/components";
 import {
   Note,
@@ -65,11 +65,10 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy
 } from "@dnd-kit/sortable";
-import { isUserPremium } from "../../hooks/use-is-user-premium";
-import { showToast } from "../../utils/toast";
 import { usePersistentState } from "../../hooks/use-persistent-state";
 import { MenuItem } from "@notesnook/ui";
 import { Notebook, Tag } from "@notesnook/core";
+import { handleDrop } from "../../common/drop-handler";
 
 type Route = {
   id: string;
@@ -149,6 +148,7 @@ function NavigationMenu(props: NavigationMenuProps) {
     "sidebarHiddenItems:colors",
     db.settings.getSideBarHiddenItems("colors")
   );
+  const dragTimeout = useRef(0);
 
   const _navigate = useCallback(
     (path: string) => {
@@ -261,6 +261,28 @@ function NavigationMenu(props: NavigationMenuProps) {
                   title={item.title}
                   icon={item.icon}
                   tag={item.tag}
+                  onDragEnter={() => {
+                    if (["/notebooks", "/tags"].includes(item.path))
+                      dragTimeout.current = setTimeout(
+                        () => _navigate(item.path),
+                        1000
+                      ) as unknown as number;
+                  }}
+                  onDragLeave={() => clearTimeout(dragTimeout.current)}
+                  onDrop={async (e) => {
+                    clearTimeout(dragTimeout.current);
+
+                    await handleDrop(e.dataTransfer, {
+                      type:
+                        item.path === "/trash"
+                          ? "trash"
+                          : item.path === "/favorites"
+                          ? "favorites"
+                          : item.path === "/notebooks"
+                          ? "notebooks"
+                          : undefined
+                    });
+                  }}
                   selected={
                     item.path === "/"
                       ? location === item.path
@@ -311,6 +333,7 @@ function NavigationMenu(props: NavigationMenuProps) {
                   onClick={() => {
                     _navigate(`/colors/${color.id}`);
                   }}
+                  onDrop={(e) => handleDrop(e.dataTransfer, color)}
                   menuItems={[
                     {
                       type: "button",
@@ -395,6 +418,7 @@ function NavigationMenu(props: NavigationMenuProps) {
                   }
                   isShortcut
                   selected={shouldSelectNavItem(location, item)}
+                  onDrop={(e) => handleDrop(e.dataTransfer, item)}
                   onClick={async () => {
                     if (item.type === "notebook") {
                       const root = (await db.notebooks.breadcrumbs(item.id)).at(

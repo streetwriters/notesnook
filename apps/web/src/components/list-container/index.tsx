@@ -30,7 +30,6 @@ import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
 import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
-import { Context } from "./types";
 import { VirtualizedGrouping, GroupingKey, Item } from "@notesnook/core";
 import {
   ItemProps,
@@ -40,6 +39,7 @@ import {
 } from "react-virtuoso";
 import Skeleton from "react-loading-skeleton";
 import { useResolvedItem } from "@notesnook/common";
+import { Context } from "./types";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
@@ -65,6 +65,7 @@ type ListContainerProps = {
   header?: JSX.Element;
   placeholder: JSX.Element;
   isLoading?: boolean;
+  onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
   button?: {
     onClick: () => void;
   };
@@ -135,7 +136,12 @@ function ListContainer(props: ListContainerProps) {
   });
 
   return (
-    <Flex variant="columnFill" sx={{ overflow: "hidden" }}>
+    <Flex
+      variant="columnFill"
+      sx={{ overflow: "hidden" }}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={props.onDrop}
+    >
       {!props.items.length && props.placeholder ? (
         <>
           {header}

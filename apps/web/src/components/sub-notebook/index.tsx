@@ -26,6 +26,9 @@ import { ChevronDown, ChevronRight, Plus } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { showAddNotebookDialog } from "../../common/dialog-controller";
 import { navigate } from "../../navigation";
+import { useCallback, useRef } from "react";
+import { getDragData } from "../../utils/data-transfer";
+import { handleDrop } from "../../common/drop-handler";
 
 type SubNotebookProps = {
   item: Notebook;
@@ -56,23 +59,43 @@ function SubNotebook(props: SubNotebookProps) {
     (store) =>
       store.context?.type === "notebook" && store.context.id === item.id
   );
+  const dragTimeout = useRef(0);
+
+  const openNotebook = useCallback(async () => {
+    if (isOpened) return;
+    focus();
+    expand();
+    await useNotesStore.getState().setContext({
+      type: "notebook",
+      id: item.id,
+      item,
+      totalNotes
+    });
+    navigate(`/notebooks/${rootId}/${item.id}`);
+  }, [expand, focus, isOpened, item, rootId, totalNotes]);
 
   return (
     <ListItem
+      draggable
       isFocused={isOpened}
       isCompact
       item={item}
-      onClick={async () => {
-        if (isOpened) return;
+      onClick={() => openNotebook()}
+      onDragEnter={(e) => {
+        e.currentTarget.focus();
         focus();
-        expand();
-        await useNotesStore.getState().setContext({
-          type: "notebook",
-          id: item.id,
-          item,
-          totalNotes
-        });
-        navigate(`/notebooks/${rootId}/${item.id}`);
+
+        const noteIds = getDragData(e.dataTransfer, "note");
+        const notebookIds = getDragData(e.dataTransfer, "notebook");
+        dragTimeout.current = setTimeout(() => {
+          if (notebookIds.length > 0) expand();
+          else if (noteIds.length > 0) openNotebook();
+        }, 1000) as unknown as number;
+      }}
+      onDragLeave={() => clearTimeout(dragTimeout.current)}
+      onDrop={async (e) => {
+        clearTimeout(dragTimeout.current);
+        handleDrop(e.dataTransfer, item);
       }}
       onKeyPress={async (e) => {
         if (e.code === "Space") {
