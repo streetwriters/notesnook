@@ -131,9 +131,6 @@ function Note(props: NoteProps) {
           await Multiselect.moveNotesToTrash([item.id, ...selectedItems]);
         }
       }}
-      onDragStart={(e) => {
-        e?.dataTransfer.setData("note-id", note.id);
-      }}
       colors={{
         accent: primary,
         heading: color ? primary : "heading",

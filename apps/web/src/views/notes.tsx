@@ -27,8 +27,11 @@ import { hashNavigate, navigate } from "../navigation";
 import Placeholder from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
+import { handleDrop } from "../common/drop-handler";
 
-function Notes() {
+type NotesProps = { header?: JSX.Element };
+function Notes(props: NotesProps) {
+  const { header } = props;
   const context = useNotesStore((store) => store.context);
   const contextNotes = useNotesStore((store) => store.contextNotes);
   const refreshContext = useNotesStore((store) => store.refreshContext);
@@ -58,6 +61,7 @@ function Notes() {
       compact={isCompact}
       context={context}
       items={filteredItems || contextNotes}
+      onDrop={(e) => handleDrop(e.dataTransfer, context)}
       placeholder={
         <Placeholder
           context={
@@ -73,6 +77,7 @@ function Notes() {
         onClick: () =>
           hashNavigate("/notes/create", { addNonce: true, replace: true })
       }}
+      header={header}
     />
   );
 }

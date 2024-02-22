@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import { Flex, Text } from "@theme-ui/components";
 import ListItem from "../list-item";
 import { useStore, store } from "../../stores/notebook-store";
@@ -42,6 +42,45 @@ import { confirm } from "../../common/dialog-controller";
 import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Notebook } from "@notesnook/core";
+import { handleDrop } from "../../common/drop-handler";
+
+function useDragHandler(id: string) {
+  const isDraggingOver = useRef(false);
+  const bounds = useRef<DOMRect>();
+
+  const isDragLeaving = useCallback((e: React.DragEvent) => {
+    if (
+      !isDraggingOver.current ||
+      !bounds.current ||
+      (e.clientX >= bounds.current.x &&
+        e.clientX <= bounds.current.right &&
+        e.clientY >= bounds.current.y &&
+        e.clientY <= bounds.current.bottom)
+    )
+      return false;
+
+    isDraggingOver.current = false;
+    bounds.current = undefined;
+    return true;
+  }, []);
+
+  const isDragEntering = useCallback(
+    (e: React.DragEvent) => {
+      if (
+        isDraggingOver.current ||
+        !(e.target instanceof HTMLElement) ||
+        (e.target.id !== id && !e.target.closest(`#${id}`))
+      )
+        return false;
+      isDraggingOver.current = true;
+      bounds.current = e.target.closest(`#${id}`)!.getBoundingClientRect();
+      return true;
+    },
+    [id]
+  );
+
+  return { isDragEntering, isDragLeaving };
+}
 
 type NotebookProps = {
   item: Notebook;
@@ -53,26 +92,32 @@ function Notebook(props: NotebookProps) {
   const { item, totalNotes, date, simplified } = props;
   const notebook = item;
   const isCompact = useStore((store) => store.viewMode === "compact");
+  const dragTimeout = useRef(0);
+  const { isDragEntering, isDragLeaving } = useDragHandler(`id_${notebook.id}`);
 
   return (
     <ListItem
+      draggable
       isCompact={isCompact}
       isSimple={simplified}
       item={notebook}
-      onClick={async () => {
-        await useNotesStore
-          .getState()
-          .setContext({ type: "notebook", id: notebook.id, item, totalNotes });
-        navigate(`/notebooks/${notebook.id}`);
-      }}
+      onClick={() => openNotebook(notebook, totalNotes)}
       onDragEnter={(e) => {
-        e?.currentTarget.focus();
+        if (!isDragEntering(e)) return;
+        e.currentTarget.focus();
+        dragTimeout.current = setTimeout(
+          () => openNotebook(notebook, totalNotes),
+          1000
+        ) as unknown as number;
+      }}
+      onDragLeave={(e) => {
+        if (!isDragLeaving(e)) return;
+        clearTimeout(dragTimeout.current);
       }}
       onDrop={async (e) => {
-        const noteId = e?.dataTransfer.getData("note-id");
-        if (!noteId) return;
-        await db.notes?.addToNotebook(notebook, noteId);
-        navigate(`/notebooks/${notebook.id}`);
+        clearTimeout(dragTimeout.current);
+
+        handleDrop(e.dataTransfer, notebook);
       }}
       title={notebook.title}
       body={notebook.description as string}
@@ -222,3 +267,13 @@ export const notebookMenuItems: (
     }
   ];
 };
+
+async function openNotebook(notebook: Notebook, totalNotes?: number) {
+  await useNotesStore.getState().setContext({
+    type: "notebook",
+    id: notebook.id,
+    item: notebook,
+    totalNotes: totalNotes
+  });
+  navigate(`/notebooks/${notebook.id}`);
+}

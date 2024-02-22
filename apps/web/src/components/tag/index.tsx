@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ListItem from "../list-item";
-import { hashNavigate, navigate } from "../../navigation";
+import { navigate } from "../../navigation";
 import { Text } from "@theme-ui/components";
 import { store as appStore } from "../../stores/app-store";
 import { store as tagStore } from "../../stores/tag-store";
@@ -31,6 +31,7 @@ import { pluralize } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Tag } from "@notesnook/core/dist/types";
 import { showEditTagDialog } from "../../common/dialog-controller";
+import { handleDrop } from "../../common/drop-handler";
 
 type TagProps = { item: Tag; totalNotes: number };
 function Tag(props: TagProps) {
@@ -61,12 +62,7 @@ function Tag(props: TagProps) {
       onDragEnter={(e) => {
         e?.currentTarget.focus();
       }}
-      onDrop={async (e) => {
-        const noteId = e?.dataTransfer.getData("note-id");
-        if (!noteId) return;
-        await db.notes?.note(noteId).tag(id);
-        navigate(`/tags/${id}`);
-      }}
+      onDrop={(e) => handleDrop(e.dataTransfer, item)}
     />
   );
 }

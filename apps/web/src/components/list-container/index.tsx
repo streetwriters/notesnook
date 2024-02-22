@@ -24,7 +24,6 @@ import {
   useStore as useSelectionStore,
   store as selectionStore
 } from "../../stores/selection-store";
-import { useStore as useNoteStore } from "../../stores/note-store";
 import GroupHeader from "../group-header";
 import { DEFAULT_ITEM_HEIGHT, ListItemWrapper } from "./list-profiles";
 import Announcements from "../announcements";
@@ -66,6 +65,7 @@ type ListContainerProps = {
   header?: JSX.Element;
   placeholder: JSX.Element;
   isLoading?: boolean;
+  onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
   button?: {
     onClick: () => void;
   };
@@ -140,18 +140,7 @@ function ListContainer(props: ListContainerProps) {
       variant="columnFill"
       sx={{ overflow: "hidden" }}
       onDragOver={(e) => e.preventDefault()}
-      onDrop={async (e) => {
-        const noteId = e?.dataTransfer.getData("note-id");
-        if (!noteId) return;
-
-        const { favorite, delete: deleteNote } = useNoteStore.getState();
-
-        if (group === "favorites") {
-          await favorite(true, noteId);
-        } else if (group === "trash") {
-          await deleteNote(noteId);
-        }
-      }}
+      onDrop={props.onDrop}
     >
       {!props.items.length && props.placeholder ? (
         <>
