@@ -659,7 +659,13 @@ p > *::selection {
   padding: 15px;
   border-radius: 10px;
   background-color: rgba(var(--callout-color), 0.1);
+  margin-top: 1em;
 }
+
+.ProseMirror div.callout:not(div.callout > p[data-spacing="single"]){
+  margin-bottom: 1em;
+}
+
 
 .ProseMirror div.callout > :first-child {
   margin: 0px;
