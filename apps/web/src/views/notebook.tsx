@@ -367,9 +367,10 @@ function SubNotebooks({
                 expand={props.context.expandItem}
                 focus={props.context.focusItem}
                 rootId={rootId}
-                refresh={() =>
-                  reloadItem.current && reloadItem.current([props.item.index])
-                }
+                refresh={() => {
+                  reloadItem.current && reloadItem.current([props.item.index]);
+                  setTimeout(() => props.context.expandItem());
+                }}
               />
               {props.children}
             </>
