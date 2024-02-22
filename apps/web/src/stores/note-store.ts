@@ -98,7 +98,7 @@ class NoteStore extends BaseStore<NoteStore> {
   unlock = async (id: string) => {
     return await Vault.unlockNote(id).then(async (res) => {
       if (editorStore.get().session.id === id)
-        await editorStore.openSession(id);
+        await editorStore.clearSession(true);
       await this.refresh();
       return res;
     });

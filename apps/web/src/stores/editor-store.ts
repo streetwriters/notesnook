@@ -322,10 +322,12 @@ class EditorStore extends BaseStore<EditorStore> {
     });
     noteStore.setSelectedNote();
     this.toggleProperties(false);
-    if (shouldNavigate)
-      hashNavigate(`/notes/create`, { replace: true, addNonce: true });
-    setTimeout(() => appStore.setIsEditorOpen(false), 100);
-    setDocumentTitle();
+    setTimeout(() => {
+      if (shouldNavigate)
+        hashNavigate(`/notes/create`, { replace: true, addNonce: true });
+      appStore.setIsEditorOpen(false);
+      setDocumentTitle();
+    }, 100);
   };
 
   setTitle = (noteId: string | undefined, title: string) => {
