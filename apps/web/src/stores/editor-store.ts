@@ -320,9 +320,9 @@ class EditorStore extends BaseStore<EditorStore> {
         state: SESSION_STATES.new
       };
     });
+    noteStore.setSelectedNote();
+    this.toggleProperties(false);
     setTimeout(() => {
-      noteStore.setSelectedNote();
-      this.toggleProperties(false);
       if (shouldNavigate)
         hashNavigate(`/notes/create`, { replace: true, addNonce: true });
       appStore.setIsEditorOpen(false);
