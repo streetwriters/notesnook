@@ -46,3 +46,8 @@ export function getPopupRoot() {
   if (!popupRoot) popupRoot = createRoot(getPopupContainer());
   return popupRoot;
 }
+
+export function unmountPopupRoot() {
+  if (popupRoot) popupRoot.unmount();
+  popupRoot = undefined;
+}
