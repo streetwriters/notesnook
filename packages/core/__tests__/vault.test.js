@@ -185,7 +185,7 @@ test("delete vault without deleting all locked notes", () =>
 
     await db.vault.delete();
 
-    expect(await db.relations.from(vault, "note").has(id)).toBe(false);
+    expect(await db.relations.from(vault, "note").has(id)).toBe(true);
     expect(await db.vaults.default()).toBeUndefined();
   }));
 

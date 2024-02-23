@@ -56,7 +56,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
         content_fts: sql.lit("delete"),
         rowid: sql.ref("old.rowid"),
         id: sql.ref("old.id"),
-        data: sql.ref("old.data"),
+        data: sql`IIF(old.locked == 1, '', old.data)`,
         noteId: sql.ref("old.noteId")
       })
     )
