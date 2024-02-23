@@ -78,13 +78,13 @@ function ReorderableList<T extends { id: string }>({
         <View
           style={{
             flexDirection: "row",
-            opacity: isHidden ? 0.4 : 1,
             paddingHorizontal: 12
           }}
         >
           <View
             style={{
-              flexGrow: 1
+              flexGrow: 1,
+              opacity: isHidden ? 0.4 : 1
             }}
           >
             {renderDraggableItem(info, props)}
