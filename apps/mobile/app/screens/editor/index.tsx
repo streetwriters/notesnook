@@ -102,7 +102,7 @@ const Editor = React.memo(
       useEffect(() => {
         const sub = [eSubscribeEvent("webview_reset", onError)];
         return () => {
-          sub.forEach((s) => s.unsubscribe());
+          sub.forEach((s) => s?.unsubscribe());
         };
       }, [onError]);
 
@@ -179,9 +179,8 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
 
   const onPress = async () => {
     if (editor.note.current) {
-      await db.notes.note(editor.note.current.id)?.readonly();
-      editor.note.current = db.notes?.note(editor.note.current.id)?.data;
-
+      await db.notes.readonly(false, editor.note.current.id);
+      editor.note.current = await db.notes?.note(editor.note.current.id);
       useEditorStore.getState().setReadonly(false);
     }
   };
