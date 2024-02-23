@@ -67,19 +67,13 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .temporary()
     .onTable("content", "main")
     .after()
-    .addEvent("update", ["data"])
-    .when((eb) =>
-      eb.and([
-        eb.or([eb("new.deleted", "is", null), eb("new.deleted", "==", false)]),
-        eb.or([eb("new.locked", "is", null), eb("new.locked", "==", false)])
-      ])
-    )
+    .addEvent("update")
     .addQuery((c) =>
       c.insertInto("content_fts").values({
         content_fts: sql.lit("delete"),
         rowid: sql.ref("old.rowid"),
         id: sql.ref("old.id"),
-        data: sql.ref("old.data"),
+        data: sql`IIF(old.locked == 1, '', old.data)`,
         noteId: sql.ref("old.noteId")
       })
     )
@@ -87,28 +81,8 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
       c.insertInto("content_fts").values({
         rowid: sql`new.rowid`,
         id: sql`new.id`,
-        data: sql`new.data`,
+        data: sql`IIF(new.locked == 1, '', new.data)`,
         noteId: sql`new.noteId`
-      })
-    )
-    .execute();
-
-  await db.schema
-    .createTrigger("content_after_update_locked_or_deleted_content_fts")
-    .temporary()
-    .onTable("content", "main")
-    .after()
-    .addEvent("update", ["deleted", "locked"])
-    .when((eb) =>
-      eb.or([eb("new.deleted", "is", true), eb("new.locked", "is", true)])
-    )
-    .addQuery((c) =>
-      c.insertInto("content_fts").values({
-        content_fts: sql.lit("delete"),
-        rowid: sql.ref("old.rowid"),
-        id: sql.ref("old.id"),
-        data: sql.ref("old.data"),
-        noteId: sql.ref("old.noteId")
       })
     )
     .execute();
