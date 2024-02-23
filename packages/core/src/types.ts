@@ -497,11 +497,11 @@ export type BaseTrashItem<TItem extends BaseItem<"note" | "notebook">> =
 export type TrashItem = BaseTrashItem<Note> | BaseTrashItem<Notebook>;
 
 export function isDeleted(item: any): item is DeletedItem {
-  return !!item.deleted && !item.type;
+  return !!item.deleted && item.type !== "trash";
 }
 
-export function isTrashItem(item: MaybeDeletedItem<Item>): item is TrashItem {
-  return !isDeleted(item) && item.type === "trash";
+export function isTrashItem(item: any): item is TrashItem {
+  return item.type === "trash";
 }
 
 export function isGroupHeader(item: any): item is GroupHeader {
