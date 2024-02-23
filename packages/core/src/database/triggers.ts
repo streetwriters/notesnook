@@ -31,7 +31,8 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .when((eb) =>
       eb.and([
         eb.or([eb("new.deleted", "is", null), eb("new.deleted", "==", false)]),
-        eb.or([eb("new.locked", "is", null), eb("new.locked", "==", false)])
+        eb.or([eb("new.locked", "is", null), eb("new.locked", "==", false)]),
+        eb("new.data", "is not", null)
       ])
     )
     .addQuery((c) =>
@@ -53,6 +54,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addQuery((c) =>
       c.insertInto("content_fts").values({
         content_fts: sql.lit("delete"),
+        rowid: sql.ref("old.rowid"),
         id: sql.ref("old.id"),
         data: sql.ref("old.data"),
         noteId: sql.ref("old.noteId")
@@ -75,6 +77,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addQuery((c) =>
       c.insertInto("content_fts").values({
         content_fts: sql.lit("delete"),
+        rowid: sql.ref("old.rowid"),
         id: sql.ref("old.id"),
         data: sql.ref("old.data"),
         noteId: sql.ref("old.noteId")
@@ -102,6 +105,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addQuery((c) =>
       c.insertInto("content_fts").values({
         content_fts: sql.lit("delete"),
+        rowid: sql.ref("old.rowid"),
         id: sql.ref("old.id"),
         data: sql.ref("old.data"),
         noteId: sql.ref("old.noteId")
@@ -139,6 +143,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addQuery((c) =>
       c.insertInto("notes_fts").values({
         notes_fts: sql.lit("delete"),
+        rowid: sql.ref("old.rowid"),
         id: sql.ref("old.id"),
         title: sql.ref("old.title")
       })
@@ -154,6 +159,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addQuery((c) =>
       c.insertInto("notes_fts").values({
         notes_fts: sql.lit("delete"),
+        rowid: sql.ref("old.rowid"),
         id: sql.ref("old.id"),
         title: sql.ref("old.title")
       })
