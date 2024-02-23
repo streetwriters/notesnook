@@ -122,7 +122,7 @@ class UserStore extends BaseStore<UserStore> {
         await db.user.authenticatePassword(
           email,
           password,
-          null,
+          undefined,
           sessionExpired
         );
         Config.set("encryptBackups", true);
