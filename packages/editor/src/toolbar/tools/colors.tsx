@@ -105,8 +105,14 @@ export function ColorTool(props: ColorToolProps) {
           }}
           cacheKey={`custom_${cacheKey}`}
           onChange={(color) => {
-            onColorChange(color);
-            config.set(cacheKey, color);
+            const currentColor = config.get(cacheKey);
+            if (currentColor && currentColor === color) {
+              onColorChange();
+              config.set(cacheKey, null);
+            } else {
+              onColorChange(color);
+              config.set(cacheKey, color);
+            }
           }}
           onClose={() => setIsOpen(false)}
           title={title}
