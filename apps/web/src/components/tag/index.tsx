@@ -98,6 +98,7 @@ const menuItems: (tag: Tag, ids?: string[]) => MenuItem[] = (tag, ids = []) => {
       onClick: async () => {
         await db.tags.remove(...ids);
         showToast("success", `${pluralize(ids.length, "tag")} deleted`);
+        await appStore.refreshNavItems();
         await editorStore.refreshTags();
         await tagStore.refresh();
         await noteStore.refresh();
