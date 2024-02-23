@@ -232,9 +232,13 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
           />
 
           <div
-            onTouchEnd={(e) => {
-              e.preventDefault();
+            onClick={(e) => {
               onClickBottomArea();
+            }}
+            onMouseDown={(e) => {
+              if (globalThis.keyboardShown) {
+                e.preventDefault();
+              }
             }}
             style={{
               flexGrow: 1,
