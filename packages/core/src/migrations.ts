@@ -39,6 +39,7 @@ import { IndexedCollection } from "./database/indexed-collection";
 import { DefaultColors } from "./collections/colors";
 import { Cipher } from "@notesnook/crypto";
 import { KEYS } from "./database/kv";
+import { logger } from "./logger";
 
 type MigrationType = "local" | "sync" | "backup";
 type MigrationItemType = ItemType | "notehistory" | "content" | "all";
@@ -185,6 +186,7 @@ const migrations: Migration[] = [
         return true;
       },
       color: async (item, db, migrationType) => {
+        logger.info("Processing color:", { item });
         return (
           (await migrations
             .find((migration) => migration.version === 5.9)
@@ -192,6 +194,7 @@ const migrations: Migration[] = [
         );
       },
       tag: async (item, db) => {
+        logger.info("Processing tag:", { item });
         const oldTagId = makeId(item.title);
         const alias = db.legacySettings.getAlias(item.id);
         if (
@@ -202,15 +205,20 @@ const migrations: Migration[] = [
             db.legacyColors
               .items()
               .find((t) => item.title === t.title && t.id !== oldTagId))
-        )
+        ) {
+          logger.info("Skipping tag/color", { item });
           return "skip";
+        }
 
         const colorCode = DefaultColors[item.title];
         if (colorCode) {
           const newColor = await db.colors.all.find((eb) =>
             eb("title", "in", [alias, item.title])
           );
-          if (newColor) return "skip";
+          if (newColor) {
+            logger.info("Found new color skipping:", { item, alias });
+            return "skip";
+          }
 
           (item as unknown as Color).type = "color";
           (item as unknown as Color).colorCode = colorCode;
@@ -218,7 +226,10 @@ const migrations: Migration[] = [
           const newTag = await db.tags.all.find((eb) =>
             eb("title", "in", [alias, item.title])
           );
-          if (newTag) return "skip";
+          if (newTag) {
+            logger.info("Found new tag skipping:", { item, alias });
+            return "skip";
+          }
         }
 
         item.title = alias || item.title;
@@ -227,6 +238,7 @@ const migrations: Migration[] = [
         delete item.localOnly;
         delete item.noteIds;
         delete item.alias;
+        logger.info("Keeping color/tag:", { item });
         return true;
       },
       note: async (item, db) => {
@@ -237,6 +249,12 @@ const migrations: Migration[] = [
           const newTag = await db.tags.all.find((eb) =>
             eb("title", "in", [alias, tag])
           );
+          logger.info("Processing tag in note:", {
+            tag,
+            alias,
+            tagExists: !!newTag,
+            tags: await db.tags.all.fields(["tags.title"]).items()
+          });
 
           const newTagId =
             newTag?.id ||
@@ -247,6 +265,12 @@ const migrations: Migration[] = [
               type: "tag"
             }));
           if (!newTagId) continue;
+          logger.info("Assigning note to tag:", {
+            id: newTag?.id,
+            newTagId,
+            alias,
+            tag
+          });
           await db.relations.add({ type: "tag", id: newTagId }, item);
           await db.legacyTags.delete(oldTagId);
         }
@@ -258,6 +282,12 @@ const migrations: Migration[] = [
           const newColor = await db.colors.all.find((eb) =>
             eb("title", "in", [alias, item.color])
           );
+          logger.info("Processing color in note:", {
+            color: item.color,
+            alias,
+            colorExists: !!newColor,
+            colors: await db.colors.all.fields(["colors.title"]).items()
+          });
 
           const newColorId =
             newColor?.id ||
@@ -269,6 +299,12 @@ const migrations: Migration[] = [
               type: "color"
             }));
           if (newColorId) {
+            logger.info("Assigning note to color:", {
+              id: newColor?.id,
+              newColorId,
+              alias,
+              color: item.color
+            });
             await db.relations.add({ type: "color", id: newColorId }, item);
             await db.legacyColors.delete(oldColorId);
           }
