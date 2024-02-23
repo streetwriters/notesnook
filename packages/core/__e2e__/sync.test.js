@@ -26,7 +26,7 @@ import { EventSource } from "event-source-polyfill";
 import { test, expect, vitest } from "vitest";
 import { login } from "./utils";
 import { SqliteDialect } from "kysely";
-import BetterSQLite3 from "better-sqlite3";
+import BetterSQLite3 from "better-sqlite3-multiple-ciphers";
 
 const TEST_TIMEOUT = 30 * 1000;
 
