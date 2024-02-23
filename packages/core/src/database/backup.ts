@@ -428,6 +428,7 @@ export default class Backup {
   }
 
   private async migrateData(data: BackupDataItem[], version: number) {
+    const queue: Partial<Record<CollectionName, MaybeDeletedItem<Item>[]>> = {};
     for (let item of data) {
       // we do not want to restore deleted items
       if (
@@ -519,16 +520,31 @@ export default class Backup {
       const collectionKey: CollectionName = itemTypeToCollectionKey[itemType];
       if (!collectionKey) continue;
 
+      if (itemType === "color") {
+        item.dateModified = Date.now();
+        item.synced = false;
+        await this.db.colors.collection.upsert(item as any);
+      } else if (itemType === "tag") {
+        item.dateModified = Date.now();
+        item.synced = false;
+        await this.db.tags.collection.upsert(item as any);
+      } else {
+        queue[collectionKey] = queue[collectionKey] || [];
+        queue[collectionKey]?.push(item);
+      }
+    }
+
+    for (const key in queue) {
+      const collectionKey = key as CollectionName;
       const collection =
         collectionKey === "sessioncontent"
           ? this.db.noteHistory.sessionContent.collection
           : this.db[collectionKey].collection;
+      if (!collection) continue;
+      const items = queue[collectionKey];
+      if (!items) continue;
 
-      // items should sync immediately after getting restored
-      item.dateModified = Date.now();
-      item.synced = false;
-
-      await collection.upsert(item as any);
+      await collection.put(items as any[]);
     }
   }
 
