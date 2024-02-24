@@ -66,12 +66,18 @@ export type NoteResolvedData = {
 async function resolveNotes(ids: string[]) {
   const relations = [
     ...(await db.relations
-      .to({ type: "note", ids }, ["notebook", "tag", "color", "vault"])
+      .to({ type: "note", ids }, ["notebook", "tag", "color"])
       .get()),
     ...(await db.relations
       .from({ type: "note", ids }, ["reminder", "attachment"])
       .get())
   ];
+  const lockedReference = await db
+    .sql()
+    .selectFrom("content")
+    .where("noteId", "in", ids)
+    .select(["noteId", "locked"])
+    .execute();
 
   const relationIds: {
     notebooks: Set<string>;
@@ -91,11 +97,11 @@ async function resolveNotes(ids: string[]) {
     string,
     {
       notebooks: string[];
-      color: string;
+      color?: string;
       tags: string[];
       reminders: string[];
       attachments: string[];
-      locked: boolean;
+      locked?: boolean;
     }
   > = {};
 
@@ -126,10 +132,19 @@ async function resolveNotes(ids: string[]) {
     } else if (relation.fromType === "color" && !data.color) {
       data.color = relation.fromId;
       relationIds.colors.add(relation.fromId);
-    } else if (relation.fromType === "vault") {
-      data.locked = true;
     }
     grouped[noteId] = data;
+  }
+
+  for (const ref of lockedReference) {
+    if (!ref.noteId) continue;
+    grouped[ref.noteId] = grouped[ref.noteId] || {
+      attachments: [],
+      notebooks: [],
+      reminders: [],
+      tags: []
+    };
+    grouped[ref.noteId].locked = !!ref.locked;
   }
 
   const resolved = {
