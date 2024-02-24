@@ -24,3 +24,4 @@ export * from "./debounce";
 export * from "./random";
 export * from "./string";
 export * from "./resolve-items";
+export * from "./migrate-toolbar";

@@ -409,7 +409,11 @@ export interface SessionContentItem extends BaseItem<"sessioncontent"> {
 }
 
 export type TrashCleanupInterval = 1 | 7 | 30 | 365 | -1;
-export type ToolbarConfig = { preset: string; config?: any[] };
+export type ToolbarConfig = {
+  version: number | undefined;
+  preset: string;
+  config?: any[];
+};
 export type DefaultNotebook = { id: string; topic?: string };
 /**
  * @deprecated only kept here for migration purposes
