@@ -50,7 +50,6 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("headline", "text")
             .addColumn("contentId", "text")
             .addColumn("pinned", "boolean")
-            .addColumn("locked", "boolean")
             .addColumn("favorite", "boolean")
             .addColumn("localOnly", "boolean")
             .addColumn("conflicted", "boolean")

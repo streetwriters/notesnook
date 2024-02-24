@@ -138,7 +138,6 @@ export class Notes implements ICollection {
           headline: headline,
 
           pinned: item.pinned,
-          locked: item.locked,
           favorite: item.favorite,
           localOnly: item.localOnly,
           conflicted: item.conflicted,
