@@ -190,7 +190,7 @@ function TipTap(props: TipTapProps) {
       content: content?.(),
       autofocus: "start",
       onFocus,
-      onCreate: ({ editor }) => {
+      onCreate: async ({ editor }) => {
         if (onLoad) onLoad();
         if (oldNonce.current !== nonce)
           editor.commands.focus("start", { scrollIntoView: true });
@@ -200,7 +200,7 @@ function TipTap(props: TipTapProps) {
           editor: toIEditor(editor as Editor),
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
-          toolbarConfig: getCurrentPreset().tools,
+          toolbarConfig: (await getCurrentPreset()).tools,
           statistics: {
             words: {
               total: getTotalWords(editor as Editor),
