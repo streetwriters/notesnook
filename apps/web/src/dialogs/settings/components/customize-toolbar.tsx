@@ -63,6 +63,7 @@ import { isUserPremium } from "../../../hooks/use-is-user-premium";
 import { Pro } from "../../../components/icons";
 
 import { Icon } from "@notesnook/ui";
+import { CURRENT_TOOLBAR_VERSION } from "@notesnook/common";
 
 export function CustomizeToolbar() {
   const sensors = useSensors(
@@ -73,12 +74,11 @@ export function CustomizeToolbar() {
   );
   const [items, setItems] = useState<TreeNode[]>([]);
   const [activeItem, setActiveItem] = useState<TreeNode>();
-  const [currentPreset, setCurrentPreset] = useState<Preset>(
-    getCurrentPreset()
-  );
+  const [currentPreset, setCurrentPreset] = useState<Preset>();
   const { setToolbarConfig } = useToolbarConfig();
 
   useEffect(() => {
+    if (!currentPreset) return;
     const items = flatten(getPresetTools(currentPreset));
     items.push(createTrash());
     items.push(...flatten([getDisabledTools(items)]).slice(1));
@@ -87,9 +87,18 @@ export function CustomizeToolbar() {
 
   useEffect(() => {
     (async () => {
+      const preset = await getCurrentPreset();
+      setCurrentPreset(preset);
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (!currentPreset) return;
       const tools = unflatten(items).slice(0, -1);
 
       await db.settings.setToolbarConfig("desktop", {
+        version: CURRENT_TOOLBAR_VERSION,
         preset: currentPreset.id,
         config: currentPreset.id === "custom" ? tools : undefined
       });
@@ -98,6 +107,7 @@ export function CustomizeToolbar() {
     })();
   }, [items]);
 
+  if (!currentPreset) return null;
   return (
     <Flex sx={{ flexDirection: "column" }}>
       <Flex
@@ -128,7 +138,7 @@ export function CustomizeToolbar() {
                     );
                     return;
                   }
-
+                  console.log("CHANGE PRESET", value);
                   setCurrentPreset(getPreset(value as PresetId));
                 }}
               />
@@ -171,10 +181,10 @@ export function CustomizeToolbar() {
         }}
         onDragStart={(event) => {
           if (currentPreset.id !== "custom") {
-            setCurrentPreset((c) => ({
+            setCurrentPreset({
               ...getPreset("custom"),
-              tools: getPresetTools(c)
-            }));
+              tools: getPresetTools(currentPreset)
+            });
           }
 
           const { active } = event;
