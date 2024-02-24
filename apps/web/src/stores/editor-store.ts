@@ -138,7 +138,13 @@ class EditorStore extends BaseStore<EditorStore> {
     const session = this.get().session;
 
     if (session.id) await db.fs().cancel(session.id);
-    if (session.id === noteId && !force) return;
+    if (session.id === noteId && !force) {
+      noteStore.get().setSelectedNote(noteId);
+      setDocumentTitle(
+        settingStore.get().hideNoteTitle ? undefined : session.title
+      );
+      return;
+    }
 
     if (session.state === SESSION_STATES.unlocked) {
       this.set((state) => {
@@ -152,7 +158,7 @@ class EditorStore extends BaseStore<EditorStore> {
       (await db.notes.note(noteId)) || (await db.notes.trashed(noteId));
     if (!note) return;
 
-    noteStore.setSelectedNote(note.id);
+    noteStore.get().setSelectedNote(note.id);
     setDocumentTitle(settingStore.get().hideNoteTitle ? undefined : note.title);
 
     if (await db.vaults.itemExists(note))
