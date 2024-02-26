@@ -73,7 +73,7 @@ type TipTapProps = {
   onDownloadAttachment?: (attachment: Attachment) => void;
   onPreviewAttachment?: (attachment: Attachment) => void;
   onGetAttachmentData?: (attachment: Attachment) => Promise<string | undefined>;
-  onAttachFile?: (file: File) => void;
+  onAttachFiles?: (files: File[]) => void;
   onFocus?: () => void;
   content?: () => string | undefined;
   toolbarContainerId?: string;
@@ -120,7 +120,7 @@ function TipTap(props: TipTapProps) {
     onDownloadAttachment,
     onPreviewAttachment,
     onGetAttachmentData,
-    onAttachFile,
+    onAttachFiles,
     onContentChange,
     onFocus = () => {},
     content,
@@ -170,12 +170,10 @@ function TipTap(props: TipTapProps) {
           // files if there is text.
           // TODO: give user an actionable hint to allow them to select what they
           // want to do in such cases.
-          if (!hasText && event.clipboardData?.files?.length && onAttachFile) {
+          if (!hasText && event.clipboardData?.files?.length && onAttachFiles) {
             event.preventDefault();
             event.stopPropagation();
-            for (const file of event.clipboardData.files) {
-              onAttachFile(file);
-            }
+            onAttachFiles(Array.from(event.clipboardData.files));
             return true;
           }
         }

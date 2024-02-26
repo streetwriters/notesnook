@@ -40,7 +40,7 @@ import Tiptap from "./tiptap";
 import Header from "./header";
 import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
-import { attachFile, AttachmentProgress, insertAttachments } from "./picker";
+import { attachFiles, AttachmentProgress, insertAttachments } from "./picker";
 import { saveAttachment, downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core/dist/common";
 import { db } from "../../common/db";
@@ -427,10 +427,12 @@ export function Editor(props: EditorProps) {
             id?.toString()
           );
         }}
-        onAttachFile={async (file) => {
-          const result = await attachFile(file);
+        onAttachFiles={async (files) => {
+          const result = await attachFiles(files);
           if (!result) return;
-          editor.current?.attachFile(result);
+          result.forEach((attachment) =>
+            editor.current?.attachFile(attachment)
+          );
         }}
       />
     </EditorChrome>
@@ -612,11 +614,9 @@ function DropZone(props: DropZoneProps) {
         if (!editor || !e.dataTransfer.files?.length) return;
         e.preventDefault();
 
-        for (const file of e.dataTransfer.files) {
-          const result = await attachFile(file);
-          if (!result) continue;
-          editor.current?.attachFile(result);
-        }
+        (await attachFiles(Array.from(e.dataTransfer.files)))?.forEach(
+          (attachment) => editor.current?.attachFile(attachment)
+        );
       }}
     >
       <Flex
