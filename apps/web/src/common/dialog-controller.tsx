@@ -476,6 +476,12 @@ export function showEditProfilePictureDialog(profile?: Profile) {
   ));
 }
 
+export function showImagePickerDialog(images: File[]): Promise<false | File[]> {
+  return showDialog("ImagePickerDialog", (Dialog, perform) => (
+    <Dialog onClose={(res) => perform(res)} images={images} />
+  ));
+}
+
 export function showSettings() {
   return showDialog("SettingsDialog", (Dialog, perform) => (
     <Dialog onClose={(res: boolean) => perform(res)} />

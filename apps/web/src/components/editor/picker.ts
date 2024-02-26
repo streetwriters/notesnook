@@ -20,7 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SerializedKey } from "@notesnook/crypto/dist/src/types";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { db } from "../../common/db";
-import { showBuyDialog } from "../../common/dialog-controller";
+import {
+  showBuyDialog,
+  showImagePickerDialog
+} from "../../common/dialog-controller";
 import { TaskManager } from "../../common/task-manager";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { showToast } from "../../utils/toast";
@@ -41,26 +44,29 @@ export async function insertAttachments(type = "*/*") {
     multiple: true
   });
   if (!files) return;
-
-  const attachments: Attachment[] = [];
-  for (const file of files) {
-    const attachment = await attachFile(file);
-    if (!attachment) continue;
-    attachments.push(attachment);
-  }
-  return attachments;
+  return await attachFiles(files);
 }
 
-export async function attachFile(selectedFile: File) {
+export async function attachFiles(files: File[]) {
   if (!isUserPremium()) {
     await showBuyDialog();
     return;
   }
-  if (selectedFile.type.startsWith("image/")) {
-    return await pickImage(selectedFile);
-  } else {
-    return await pickFile(selectedFile);
+
+  const images =
+    (await showImagePickerDialog(
+      files.filter((f) => f.type.startsWith("image/"))
+    )) || [];
+  const documents = files.filter((f) => !f.type.startsWith("image/"));
+  const attachments: Attachment[] = [];
+  for (const file of [...images, ...documents]) {
+    const attachment = file.type.startsWith("image/")
+      ? await pickImage(file)
+      : await pickFile(file);
+    if (!attachment) continue;
+    attachments.push(attachment);
   }
+  return attachments;
 }
 
 export async function reuploadAttachment(
@@ -109,6 +115,7 @@ async function pickFile(
       size: file.size
     };
   } catch (e) {
+    console.error(e);
     showToast("error", `${(e as Error).message}`);
   }
 }
@@ -192,14 +199,13 @@ async function addAttachment(
       if (!output) throw new Error("Could not encrypt file.");
 
       if (forceWrite && exists) await db.attachments.reset(hash);
+
       await db.attachments.add({
         ...output,
-        metadata: {
-          hash,
-          hashType,
-          filename: exists?.filename || file.name,
-          type: exists?.type || file.type
-        },
+        hash,
+        hashType,
+        filename: exists?.filename || file.name,
+        mimeType: exists?.type || file.type,
         key
       });
     }
