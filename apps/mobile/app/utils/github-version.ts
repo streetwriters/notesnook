@@ -61,7 +61,10 @@ export const getGithubVersion = async () => {
   if (!res?.ok) return null;
   const data = (await res?.json()) as GithubRelease[];
 
-  const versions = data?.filter((tag) => tag.tag_name.endsWith("android"));
+  const versions = data?.filter(
+    (tag) =>
+      tag.tag_name.endsWith("android") && !tag.tag_name.endsWith("beta-android")
+  );
   const latestVersion = versions[0];
   const version = latestVersion.tag_name.replace("-android", "");
   return {
