@@ -56,7 +56,10 @@ const BackupPasswordDialog = React.lazy(
   () => import("./backup-password-dialog")
 );
 const CreateColorDialog = React.lazy(() => import("./create-color-dialog"));
-const EditProfilePictureDialog = React.lazy(() => import("./edit-profile-picture-dialog"));
+const EditProfilePictureDialog = React.lazy(
+  () => import("./edit-profile-picture-dialog")
+);
+const ImagePickerDialog = React.lazy(() => import("./image-picker-dialog"));
 
 export const Dialogs = {
   AddNotebookDialog,
@@ -87,5 +90,6 @@ export const Dialogs = {
   ThemeDetailsDialog,
   BackupPasswordDialog,
   CreateColorDialog,
-  EditProfilePictureDialog
+  EditProfilePictureDialog,
+  ImagePickerDialog
 };
