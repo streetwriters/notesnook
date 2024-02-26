@@ -481,7 +481,7 @@ export const useAppEvents = () => {
 
         subscribeToIAPListeners();
       } catch (e) {
-        DatabaseLogger.error(error);
+        DatabaseLogger.error(e);
 
         ToastEvent.error(e, "An error occurred", "global");
       }
