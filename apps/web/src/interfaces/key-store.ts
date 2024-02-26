@@ -392,7 +392,11 @@ class KeyStore extends BaseStore<KeyStore> {
       this.#wrappingKeyId
     );
 
-    if (desktop && !wrappingKey) {
+    if (
+      desktop &&
+      !wrappingKey &&
+      (await desktop.safeStorage.isEncryptionAvailable.query())
+    ) {
       const decrypted = Buffer.from(
         await desktop.safeStorage.decryptString.query(
           Buffer.from(wrappedKey).toString("base64")
@@ -424,7 +428,11 @@ class KeyStore extends BaseStore<KeyStore> {
         ["encrypt", "decrypt"]
       ));
 
-    if (IS_DESKTOP_APP && desktop) {
+    if (
+      IS_DESKTOP_APP &&
+      desktop &&
+      (await desktop.safeStorage.isEncryptionAvailable.query())
+    ) {
       const encrypted = Buffer.from(
         await desktop.safeStorage.encryptString.query(
           Buffer.from(
