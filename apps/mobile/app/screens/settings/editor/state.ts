@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { CURRENT_TOOLBAR_VERSION, migrateToolbar } from "@notesnook/common";
 import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
 import create, { State } from "zustand";
-import { persist, StateStorage } from "zustand/middleware";
-import { DatabaseLogger, db } from "../../../common/database";
+import { StateStorage, persist } from "zustand/middleware";
+import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { presets } from "./toolbar-definition";
-import { ToolbarConfig } from "@notesnook/core";
 export type ToolDefinition = string | string[];
 
 export type DraggedItem = {
@@ -56,25 +56,6 @@ function clone<T>(value: T[]) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function migrateToolbar(tools: ToolbarConfig) {
-  const version = MMKV.getInt("editor:tools_version") || 0;
-
-  switch (version) {
-    case 0: {
-      tools.config?.push(["checkList"]);
-      DatabaseLogger.info(`Toolbar migrated to version ${version + 1}`);
-      MMKV.setInt("editor:tools_version", version + 1);
-      db.settings.setToolbarConfig("mobile", tools);
-      break;
-    }
-    default: {
-      break;
-    }
-  }
-  console.log(tools);
-  return tools;
-}
-
 export const useDragState = create<DragState>(
   persist(
     (set, get) => ({
@@ -93,7 +74,8 @@ export const useDragState = create<DragState>(
           useSettingStore.getState().deviceMode || ("mobile" as any),
           {
             preset: "custom",
-            config: clone(_data)
+            config: clone(_data),
+            version: CURRENT_TOOLBAR_VERSION
           }
         );
         set({ data: _data, preset: "custom", customPresetData: _data });
@@ -103,7 +85,8 @@ export const useDragState = create<DragState>(
           useSettingStore.getState().deviceMode || ("mobile" as any),
           {
             preset,
-            config: preset === "custom" ? clone(get().customPresetData) : []
+            config: preset === "custom" ? clone(get().customPresetData) : [],
+            version: CURRENT_TOOLBAR_VERSION
           }
         );
         set({
@@ -125,7 +108,11 @@ export const useDragState = create<DragState>(
           return;
         }
 
-        toolbarConfig = migrateToolbar(toolbarConfig);
+        toolbarConfig = await migrateToolbar(
+          useSettingStore.getState().deviceMode || ("mobile" as any),
+          toolbarConfig
+        );
+
         const preset = toolbarConfig?.preset as DragState["preset"];
         set({
           preset: preset,
