@@ -381,13 +381,6 @@ function getDialogData(type: string) {
         subtitle: "Please enter your vault password to continue.",
         positiveButtonText: "Unlock"
       };
-    case "ask_backup_password":
-      return {
-        title: "Encrypted backup",
-        subtitle:
-          "Please enter the password to decrypt and restore this backup.",
-        positiveButtonText: "Restore"
-      };
     case "change_account_password":
       return {
         title: "Change account password",
@@ -460,6 +453,17 @@ export function showPasswordDialog(
       onClose={() => perform(false)}
       onDone={() => perform(true)}
     />
+  ));
+}
+
+export function showBackupPasswordDialog(
+  validate: (outputs: {
+    password?: string;
+    key?: string;
+  }) => boolean | Promise<boolean>
+) {
+  return showDialog("BackupPasswordDialog", (Dialog, perform) => (
+    <Dialog onClose={() => perform(false)} validate={validate} />
   ));
 }
 
