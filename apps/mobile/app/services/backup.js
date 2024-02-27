@@ -22,15 +22,15 @@ import RNFetchBlob from "react-native-blob-util";
 import FileViewer from "react-native-file-viewer";
 import * as ScopedStorage from "react-native-scoped-storage";
 import Share from "react-native-share";
+import { zip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../common/database";
 import storage from "../common/database/storage";
+import { cacheDir, copyFileAsync } from "../common/filesystem/utils";
 import { presentDialog } from "../components/dialog/functions";
 import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
-import { cacheDir, copyFileAsync } from "../common/filesystem/utils";
-import { zip } from "react-native-zip-archive";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -154,7 +154,7 @@ async function updateNextBackupTime() {
  * @param {string} context
  * @returns {Promise<{path?: string, error?: Error}}>
  */
-async function run(progress = false, context = "global") {
+async function run(progress = false, context) {
   let androidBackupDirectory = await checkBackupDirExists(false, context);
   if (!androidBackupDirectory)
     return {
@@ -213,7 +213,9 @@ async function run(progress = false, context = "global") {
         `${backupFileName}.nnbackupz`,
         "application/nnbackupz"
       );
+      console.log("Copying zip file...");
       await copyFileAsync(`file://${zipOutputFile}`, file.uri);
+      console.log("Copyied zip file...");
       path = file.uri;
     } else {
       path = zipOutputFile;
@@ -224,10 +226,11 @@ async function run(progress = false, context = "global") {
     let showBackupCompleteSheet =
       progress && SettingsService.get().showBackupCompleteSheet;
 
-    if (context)
+    if (context) {
       return {
         path: path
       };
+    }
 
     await sleep(300);
     if (showBackupCompleteSheet) {
