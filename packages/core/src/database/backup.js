@@ -177,8 +177,10 @@ export default class Backup {
   /**
    *
    * @param {any} backup the backup data
+   * @param {string} [password]
+   * @param {string} [key]
    */
-  async import(backup, password) {
+  async import(backup, password, key) {
     if (!backup) return;
 
     if (!this._validate(backup)) throw new Error("Invalid backup.");
@@ -188,12 +190,14 @@ export default class Backup {
     let db = backup.data;
     const isEncrypted = db.salt && db.iv && db.cipher;
     if (backup.encrypted || isEncrypted) {
-      if (!password)
+      if (!password && !key)
         throw new Error(
-          "Please provide a password to decrypt this backup & restore it."
+          "Please provide a password or an encryption key to decrypt this backup & restore it."
         );
 
-      const key = await this._db.storage.generateCryptoKey(password, db.salt);
+      key = key
+        ? { key, salt: db.salt }
+        : await this._db.storage.generateCryptoKey(password, db.salt);
       if (!key)
         throw new Error("Could not generate encryption key for backup.");
 
