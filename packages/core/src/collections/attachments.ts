@@ -389,7 +389,7 @@ export class Attachments implements ICollection {
 
   get pending() {
     return this.collection.createFilter<Attachment>(
-      (qb) => qb.where(isFalse("dateUploaded")),
+      (qb) => qb.where(isFalse("dateUploaded")).where(isFalse("deleted")),
       this.db.options?.batchSize
     );
   }
