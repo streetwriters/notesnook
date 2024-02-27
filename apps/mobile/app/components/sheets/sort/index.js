@@ -143,9 +143,6 @@ const Sort = ({ type, screen }) => {
           />
         ) : (
           Object.keys(SORT).map((item) =>
-            (item === "title" &&
-              groupOptions.groupBy !== "none" &&
-              screen !== "TopicSheet") ||
             ((screen !== "Tags" || screen !== "Reminders") &&
               item === "dateModified") ||
             ((screen === "Tags" || screen === "Reminders") &&
@@ -228,12 +225,8 @@ const Sort = ({ type, screen }) => {
                   if (item === "abc") {
                     _groupOptions.sortBy = "title";
                     _groupOptions.sortDirection = "asc";
-                  } else {
-                    if (groupOptions.sortBy === "title") {
-                      _groupOptions.sortBy = "dateEdited";
-                      _groupOptions.sortDirection = "desc";
-                    }
                   }
+
                   updateGroupOptions(_groupOptions);
                 }}
                 height={40}
