@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  showBackupPasswordDialog,
   showFeatureDialog,
   showPasswordDialog,
   showReminderDialog
@@ -150,9 +151,9 @@ export async function restoreBackupFile(backupFile: File) {
     const backup = JSON.parse(await readFile(backupFile));
 
     if (backup.data.iv && backup.data.salt) {
-      await showPasswordDialog("ask_backup_password", async ({ password }) => {
-        if (!password) return false;
-        const error = await restoreWithProgress(backup, password);
+      await showBackupPasswordDialog(async ({ password, key }) => {
+        if (!password && !key) return false;
+        const error = await restoreWithProgress(backup, password, key);
         return !error;
       });
     } else {
@@ -166,6 +167,7 @@ export async function restoreBackupFile(backupFile: File) {
       type: "modal",
       action: async (report) => {
         let cachedPassword: string | undefined = undefined;
+        let cachedKey: string | undefined = undefined;
         // const { read, totalFiles } = await Reader(backupFile);
         const entries: ZipEntry[] = [];
         let filesProcessed = 0;
@@ -183,20 +185,20 @@ export async function restoreBackupFile(backupFile: File) {
         for (const entry of entries) {
           const backup = JSON.parse(await entry.text());
           if (backup.encrypted) {
-            if (!cachedPassword) {
-              const result = await showPasswordDialog(
-                "ask_backup_password",
-                async ({ password }) => {
-                  if (!password) return false;
-                  await db.backup?.import(backup, password);
+            if (!cachedPassword && !cachedKey) {
+              const result = await showBackupPasswordDialog(
+                async ({ password, key }) => {
+                  if (!password && !key) return false;
+                  await db.backup?.import(backup, password, key);
                   cachedPassword = password;
+                  cachedKey = key;
                   return true;
                 }
               );
               if (!result) break;
-            } else await db.backup?.import(backup, cachedPassword);
+            } else await db.backup?.import(backup, cachedPassword, cachedKey);
           } else {
-            await db.backup?.import(backup, null);
+            await db.backup?.import(backup);
           }
 
           report({
@@ -216,7 +218,8 @@ export async function restoreBackupFile(backupFile: File) {
 
 async function restoreWithProgress(
   backup: Record<string, unknown>,
-  password?: string
+  password?: string,
+  key?: string
 ) {
   return await TaskManager.startTask<Error | void>({
     title: "Restoring backup",
@@ -243,7 +246,7 @@ async function restoreWithProgress(
       );
 
       report({ text: `Restoring...` });
-      return restore(backup, password);
+      return restore(backup, password, key);
     }
   });
 }
@@ -283,9 +286,13 @@ export async function showUpgradeReminderDialogs() {
   }
 }
 
-async function restore(backup: Record<string, unknown>, password?: string) {
+async function restore(
+  backup: Record<string, unknown>,
+  password?: string,
+  key?: string
+) {
   try {
-    await db.backup?.import(backup, password);
+    await db.backup?.import(backup, password, key);
     showToast("success", "Backup restored!");
   } catch (e) {
     logger.error(e as Error, "Could not restore the backup");
