@@ -182,7 +182,7 @@ export const SideMenu = React.memo(
               }}
             >
               <Button
-                type="grayAccent"
+                type="secondaryAccented"
                 style={{
                   flexDirection: "row",
                   borderRadius: 5,

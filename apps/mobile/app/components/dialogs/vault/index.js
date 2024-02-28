@@ -53,7 +53,6 @@ import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
-import { getColorLinearShade } from "../../../utils/colors";
 
 export class VaultDialog extends Component {
   constructor(props) {

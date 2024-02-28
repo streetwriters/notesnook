@@ -26,7 +26,7 @@ import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SIZE, normalize } from "../../utils/size";
 import { Button } from "../ui/button";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
@@ -70,12 +70,12 @@ function _MenuItem({
   };
 
   return (
-    <PressableButton
+    <Pressable
       testID={testID}
       key={item.name + index}
       onPress={_onPress}
-      type={isFocused ? "selected" : "gray"}
-      customStyle={{
+      type={isFocused ? "selected" : "plain"}
+      style={{
         width: "100%",
         alignSelf: "center",
         borderRadius: 5,
@@ -159,7 +159,7 @@ function _MenuItem({
           onPress={rightBtn.func}
         />
       ) : null}
-    </PressableButton>
+    </Pressable>
   );
 }
 

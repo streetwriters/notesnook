@@ -114,7 +114,7 @@ const Actions = ({
         setLoading({
           name: "Run file check"
         });
-        let res = await filesystem.checkAttachment(attachment.hash);
+        const res = await filesystem.checkAttachment(attachment.hash);
         if (res.failed) {
           db.attachments.markAsFailed(attachment.id, res.failed);
           setFailed(res.failed);
