@@ -398,6 +398,11 @@ export interface HistorySession extends BaseItem<"session"> {
   noteId: string;
   localOnly: boolean;
   locked?: boolean;
+
+  /**
+   * @deprecated
+   */
+  data?: never;
 }
 
 export interface SessionContentItem extends BaseItem<"sessioncontent"> {

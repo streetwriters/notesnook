@@ -127,7 +127,7 @@ export class NNMigrationProvider implements MigrationProvider {
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("title", "text", COLLATE_NOCASE)
-            .addColumn("colorCode", "text")
+            .addColumn("colorCode", "text", (c) => c.unique())
             .execute();
 
           await db.schema
@@ -196,7 +196,7 @@ export class NNMigrationProvider implements MigrationProvider {
             .createTable("settings")
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
-            .addColumn("key", "text")
+            .addColumn("key", "text", (c) => c.unique())
             .addColumn("value", "text")
             .execute();
 

@@ -113,7 +113,7 @@ class Migrator {
         item,
         version,
         CURRENT_DATABASE_VERSION,
-        isDeleted(item) ? "all" : item.type,
+        isDeleted(item) ? "never" : item.type,
         db,
         "local"
       );

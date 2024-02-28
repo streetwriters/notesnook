@@ -97,7 +97,7 @@ export class Settings implements ICollection {
     value: SettingItemMap[TKey]
   ) {
     const id = makeId(key);
-    const oldItem = await this.collection.get(id);
+    const oldItem = this.collection.get(id);
     if (oldItem && oldItem.key !== key) throw new Error("Key conflict.");
 
     await this.collection.upsert({
