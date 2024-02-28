@@ -33,7 +33,7 @@ import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
 import DialogHeader from "../dialog/dialog-header";
 import SheetProvider from "../sheet-provider";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import NotePreview from "./preview";
@@ -78,13 +78,13 @@ const HistoryItem = ({
   }, []);
 
   return (
-    <PressableButton
-      type="grayBg"
+    <Pressable
+      type="secondary"
       onPress={() => {
         if (!item) return;
         preview(item);
       }}
-      customStyle={{
+      style={{
         justifyContent: "space-between",
         alignItems: "center",
         paddingHorizontal: 12,
@@ -101,7 +101,7 @@ const HistoryItem = ({
           </Paragraph>
         </>
       )}
-    </PressableButton>
+    </Pressable>
   );
 };
 

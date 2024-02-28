@@ -26,7 +26,8 @@ import { presentSheet } from "../../services/event-manager";
 import { ColorValues } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
-import { PressableButton } from "../ui/pressable";
+import { useSideBarDraggingStore } from "../side-menu/dragging-store";
+import { Pressable } from "../ui/pressable";
 import { ReminderTime } from "../ui/reminder-time";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
@@ -35,7 +36,6 @@ import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { TagStrip, Tags } from "./tags";
-import { useSideBarDraggingStore } from "../side-menu/dragging-store";
 
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
@@ -92,7 +92,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               }}
             >
               {item.type === "color" ? (
-                <PressableButton
+                <Pressable
                   type="accent"
                   accentColor={item.colorCode}
                   accentText={colors.static.white}
