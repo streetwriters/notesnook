@@ -51,15 +51,7 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
   }, [item, note.id]);
 
   const toggleColor = async () => {
-    await db.relations
-      .to(
-        {
-          type: "note",
-          id: note.id
-        },
-        "color"
-      )
-      .unlink();
+    await db.relations.to(note, "color").unlink();
 
     if (!isLinked) {
       await db.relations.add(item, note);
