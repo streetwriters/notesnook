@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { DatabaseAccessor, RawDatabaseSchema } from ".";
 import { Token } from "../api/token-manager";
-import { User } from "../api/user-manager";
+import { User } from "../types";
 
 interface KV {
   v: number;
