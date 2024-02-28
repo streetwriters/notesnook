@@ -35,7 +35,8 @@ import {
   Login,
   Circle,
   Icon,
-  Reminders
+  Reminders,
+  User
 } from "../icons";
 import { AnimatedFlex } from "../animated";
 import NavigationItem, { SortableNavigationItem } from "./navigation-item";
@@ -134,6 +135,7 @@ function NavigationMenu(props: NavigationMenuProps) {
   const shortcuts = useAppStore((store) => store.shortcuts);
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
+  const profile = useUserStore((store) => store.profile);
   const isMobile = useMobile();
   const theme = useThemeStore((store) => store.colorScheme);
   const toggleNightMode = useThemeStore((store) => store.toggleColorScheme);
@@ -463,8 +465,9 @@ function NavigationMenu(props: NavigationMenuProps) {
             id={settings.id}
             isTablet={isTablet}
             key={settings.path}
-            title={settings.title}
-            icon={settings.icon}
+            title={profile?.fullName || settings.title}
+            icon={profile?.fullName ? User : settings.icon}
+            image={profile?.fullName ? profile?.profilePicture : undefined}
             onClick={() => {
               if (!isMobile && location === settings.path)
                 return toggleNavigationContainer();
