@@ -117,7 +117,7 @@ const NoteItem = ({
                   tooltipText={item.title}
                   key={item.id}
                   height={25}
-                  icon={item.type === "notebook" ? "bookmark" : "book-outline"}
+                  icon="book-outline"
                   type="secondary"
                   fontSize={SIZE.xs}
                   iconSize={SIZE.sm}
@@ -127,8 +127,6 @@ const NoteItem = ({
                   style={{
                     borderRadius: 5,
                     marginRight: 5,
-                    borderWidth: 0.5,
-                    borderColor: primaryColors.border,
                     paddingHorizontal: 6,
                     marginBottom: 5
                   }}

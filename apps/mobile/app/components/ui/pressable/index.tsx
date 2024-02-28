@@ -142,8 +142,16 @@ const buttonTypes = (
     text: text || colors.primary.accentForeground,
     selected: accent || colors.primary.accent,
     borderWidth: 0.8,
-    borderColor: getColorLinearShade(colors.primary.accent, 0.3, false),
-    borderSelectedColor: getColorLinearShade(colors.primary.accent, 0.3, false)
+    borderColor: getColorLinearShade(
+      accent || colors.primary.accent,
+      0.3,
+      false
+    ),
+    borderSelectedColor: getColorLinearShade(
+      accent || colors.primary.accent,
+      0.3,
+      false
+    )
   },
   inverted: {
     primary: colors.primary.background,

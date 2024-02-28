@@ -25,7 +25,7 @@ import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enab
 import { presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { RouteName } from "../../../stores/use-navigation-store";
-import { ColorValues } from "../../../utils/colors";
+import { ColorValues, getContainerBorder } from "../../../utils/colors";
 import { GROUP } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
 import Sort from "../../sheets/sort";
@@ -80,7 +80,8 @@ export const SectionHeader = React.memo<
           backgroundColor: colors.secondary.background,
           alignSelf: "center",
           borderRadius: 5,
-          marginVertical: 5
+          marginVertical: 5,
+          ...getContainerBorder(colors.secondary.background, 0.8)
         }}
       >
         <TouchableOpacity
