@@ -41,11 +41,11 @@ import { Cipher } from "@notesnook/crypto";
 import { KEYS } from "./database/kv";
 
 type MigrationType = "local" | "sync" | "backup";
-type MigrationItemType = ItemType | "notehistory" | "content" | "all";
+type MigrationItemType = ItemType | "notehistory" | "content" | "never";
 type MigrationItemMap = ItemMap & {
   notehistory: HistorySession;
   content: ContentItem;
-  all: MaybeDeletedItem<Item>;
+  never: never;
 };
 type Migration = {
   version: number;
@@ -56,6 +56,12 @@ type Migration = {
       migrationType: MigrationType
     ) => "skip" | boolean | Promise<boolean | "skip"> | void;
   };
+  all?: (
+    item: MaybeDeletedItem<Item>,
+    db: Database,
+    migrationType: MigrationType,
+    itemType: MigrationItemType
+  ) => "skip" | boolean | Promise<boolean | "skip"> | void;
   collection?: (collection: IndexedCollection) => Promise<void> | void;
   vaultKey?: (db: Database, key: Cipher<"base64">) => Promise<void> | void;
   kv?: (db: Database) => Promise<void> | void;
@@ -167,12 +173,11 @@ const migrations: Migration[] = [
   },
   {
     version: 5.8,
-    items: {
-      all: (item, _db, migrationType) => {
-        if (migrationType === "local") {
-          delete item.remote;
-          return true;
-        }
+    items: {},
+    all: (item, _db, migrationType) => {
+      if (migrationType === "local") {
+        delete item.remote;
+        return true;
       }
     }
   },
@@ -404,10 +409,14 @@ const migrations: Migration[] = [
         delete item.resolved;
         return true;
       },
-      all: (item) => {
-        delete item.deleteReason;
+      notehistory: (item) => {
+        delete item.data;
         return true;
       }
+    },
+    all: (item) => {
+      delete item.deleteReason;
+      return true;
     },
     async vaultKey(db, key) {
       await db.vaults.add({ title: "Default", key });
@@ -427,8 +436,30 @@ const migrations: Migration[] = [
   },
   {
     version: 6.0,
-    items: {}
-  }
+    items: {
+      note: (item) => {
+        delete item.locked;
+        return true;
+      }
+    },
+    all: (item) => {
+      if (isDeleted(item)) {
+        const allowedKeys = [
+          "deleted",
+          "dateModified",
+          "id",
+          "synced",
+          "remote"
+        ];
+        for (const key in item) {
+          if (allowedKeys.includes(key)) continue;
+          delete (item as any)[key];
+        }
+        return true;
+      }
+    }
+  },
+  { version: 6.1, items: {} }
 ];
 
 export async function migrateItem<TItemType extends MigrationItemType>(
@@ -456,8 +487,8 @@ export async function migrateItem<TItemType extends MigrationItemType>(
     if (migration.version === databaseVersion) break;
 
     let result =
-      !!migration.items.all &&
-      (await migration.items.all(item, database, migrationType));
+      !!migration.all &&
+      (await migration.all(item, database, migrationType, type));
     if (result === "skip") return "skip";
     if (result) {
       if (

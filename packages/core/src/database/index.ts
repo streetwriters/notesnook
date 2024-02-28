@@ -54,7 +54,8 @@ import {
   Tag,
   TrashOrItem,
   ValueOf,
-  Vault
+  Vault,
+  isDeleted
 } from "../types";
 import { NNMigrationProvider } from "./migrations";
 import { createTriggers } from "./triggers";
@@ -309,8 +310,19 @@ export class SqliteBooleanPlugin implements KyselyPlugin {
   transformResult(
     args: PluginTransformResultArgs
   ): Promise<QueryResult<UnknownRow>> {
-    for (const row of args.result.rows) {
+    for (let i = 0; i < args.result.rows.length; ++i) {
+      const row = args.result.rows[i];
       if (typeof row !== "object") continue;
+
+      if (isDeleted(row)) {
+        args.result.rows[i] = {
+          deleted: true,
+          synced: row.synced,
+          dateModified: row.dateModified,
+          id: row.id
+        };
+        continue;
+      }
 
       for (const key in row) {
         if (BooleanProperties.has(key as BooleanFields)) {
@@ -318,8 +330,8 @@ export class SqliteBooleanPlugin implements KyselyPlugin {
         }
       }
 
-      const mapper = DataMappers[row.type as ItemType];
-      if (row.type && mapper) {
+      const mapper = !!row.type && DataMappers[row.type as ItemType];
+      if (mapper) {
         mapper(row);
       }
     }

@@ -147,4 +147,4 @@ export const DATE_FORMATS_WITHOUT_YEAR = [
 
 export const TIME_FORMATS = ["12-hour", "24-hour"];
 
-export const CURRENT_DATABASE_VERSION = 6.0;
+export const CURRENT_DATABASE_VERSION = 6.1;
