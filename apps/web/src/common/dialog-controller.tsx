@@ -33,8 +33,13 @@ import { ConfirmDialogProps } from "../dialogs/confirm";
 import { getFormattedDate } from "@notesnook/common";
 import { downloadUpdate } from "../utils/updater";
 import { ThemeMetadata } from "@notesnook/themes-server";
-import { Color, Reminder, Tag } from "@notesnook/core";
-import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
+import {
+  Color,
+  Profile,
+  Reminder,
+  Tag,
+  AuthenticatorType
+} from "@notesnook/core";
 import { createRoot } from "react-dom/client";
 import { PasswordDialogProps } from "../dialogs/password-dialog";
 
@@ -462,6 +467,12 @@ export function show2FARecoveryCodesDialog(primaryMethod: AuthenticatorType) {
 export function showAttachmentsDialog() {
   return showDialog("AttachmentsDialog", (Dialog, perform) => (
     <Dialog onClose={(res: boolean) => perform(res)} />
+  ));
+}
+
+export function showEditProfileDialog(profile?: Profile) {
+  return showDialog("EditProfileDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} profile={profile} />
   ));
 }
 

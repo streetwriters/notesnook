@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, FlexProps, Text } from "@theme-ui/components";
+import { Button, Flex, FlexProps, Image, Text } from "@theme-ui/components";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { Menu } from "../../hooks/use-menu";
 import useMobile from "../../hooks/use-mobile";
@@ -29,7 +29,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 type NavigationItemProps = {
-  icon: Icon;
+  icon?: Icon;
+  image?: string;
   color?: SchemeColors;
   title: string;
   isTablet?: boolean;
@@ -49,6 +50,7 @@ function NavigationItem(
 ) {
   const {
     icon: Icon,
+    image,
     color,
     title,
     isLoading,
@@ -121,11 +123,15 @@ function NavigationItem(
           if (onClick) onClick();
         }}
       >
-        <Icon
-          size={isTablet ? 16 : 15}
-          color={color || (selected ? "icon-selected" : "icon")}
-          rotate={isLoading}
-        />
+        {image ? (
+          <Image src={image} sx={{ borderRadius: 50, size: 20 }} />
+        ) : Icon ? (
+          <Icon
+            size={isTablet ? 16 : 15}
+            color={color || (selected ? "icon-selected" : "icon")}
+            rotate={isLoading}
+          />
+        ) : null}
         {isShortcut && (
           <Shortcut
             size={8}
