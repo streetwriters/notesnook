@@ -22,7 +22,7 @@ import { ReactNodeView, ReactNodeViewProps } from "../react";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types";
 import { Editor as TiptapEditor } from "@tiptap/core";
-import { MutableRefObject, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { updateColumnsOnResize } from "@tiptap/pm/tables";
 import { EditorView, NodeView } from "prosemirror-view";
 import {
@@ -274,31 +274,4 @@ function TableColumnToolbar(props: TableToolbarProps) {
       />
     </Flex>
   );
-}
-
-function checkInView(
-  container: HTMLTableElement | undefined,
-  element: HTMLElement,
-  partial: false
-) {
-  //Get container properties
-  if (container) {
-    const cTop = container.scrollLeft;
-    const cBottom = cTop + container.clientWidth;
-
-    //Get element properties
-    const eTop = element.offsetLeft;
-    const eBottom = eTop + element.clientWidth;
-
-    console.log(cTop, eTop, cBottom, eBottom);
-    //Check if in view
-    const isTotal = eTop >= cTop && eBottom <= cBottom;
-    const isPartial =
-      false &&
-      ((eTop < cTop && eBottom > cTop) ||
-        (eBottom > cBottom && eTop < cBottom));
-
-    //Return outcome
-    return isTotal || isPartial;
-  }
 }
