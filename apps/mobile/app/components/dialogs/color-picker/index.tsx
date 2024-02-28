@@ -32,7 +32,7 @@ import DialogContainer from "../../dialog/dialog-container";
 import { Toast } from "../../toast";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
-import { PressableButton } from "../../ui/pressable";
+import { Pressable } from "../../ui/pressable";
 
 const HEX_COLOR_REGEX_ALPHA =
   /^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$/;
@@ -128,10 +128,10 @@ const ColorPicker = ({
                 }}
                 defaultValue={colorRef.current}
               />
-              <PressableButton
+              <Pressable
                 type="accent"
                 accentColor={selectedColor || colors.secondary.background}
-                customStyle={{
+                style={{
                   width: 45,
                   height: 45,
                   borderRadius: 100,
@@ -183,7 +183,7 @@ const ColorPicker = ({
                   onColorAdded?.(color);
                 }
               }}
-              type={selectedColor ? "grayAccent" : "grayBg"}
+              type={selectedColor ? "secondaryAccented" : "secondary"}
               width="100%"
             />
           </View>

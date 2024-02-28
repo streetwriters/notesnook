@@ -17,19 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
-import { TouchableHighlight, View } from "react-native";
+import { View } from "react-native";
 import Menu, { MenuItem } from "react-native-reanimated-material-menu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Dialog } from "../../../components/dialog";
 import { Pressable } from "../../../components/ui/pressable";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
-import { useThemeColors } from "@notesnook/theme";
+import { getColorLinearShade } from "../../../utils/colors";
 import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import { verifyUser } from "../functions";
-import { Dialog } from "../../../components/dialog";
-import { getColorLinearShade } from "../../../utils/colors";
 
 interface PickerOptions<T> {
   getValue: () => T;
