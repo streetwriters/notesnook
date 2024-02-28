@@ -31,7 +31,7 @@ import { hashNavigate } from "../navigation";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
-import { User } from "@notesnook/core/dist/api/user-manager";
+import { AuthenticatorType, Profile, User } from "@notesnook/core";
 
 class UserStore extends BaseStore<UserStore> {
   isLoggedIn?: boolean;
@@ -39,6 +39,7 @@ class UserStore extends BaseStore<UserStore> {
   isSigningIn = false;
 
   user?: User = undefined;
+  profile?: Profile;
   counter = 0;
 
   init = () => {
@@ -47,31 +48,34 @@ class UserStore extends BaseStore<UserStore> {
       window.location.replace("/sessionexpired");
     });
 
-    db.user.getUser().then(async (user) => {
+    db.user.getUser().then((user) => {
       if (!user) {
-        this.set((state) => {
-          state.isLoggedIn = false;
-        });
+        this.set({ isLoggedIn: false });
         return;
       }
-      this.set((state) => {
-        state.user = user;
-        state.isLoggedIn = true;
+      this.set({
+        user,
+        isLoggedIn: true
       });
       if (Config.get("sessionExpired")) EV.publish(EVENTS.userSessionExpired);
     });
+
+    db.user.getProfile().then((profile) => this.set({ profile }));
 
     if (Config.get("sessionExpired")) return;
 
     return db.user.fetchUser().then(async (user) => {
       if (!user) return false;
 
-      EV.remove(EVENTS.userSubscriptionUpdated, EVENTS.userEmailConfirmed);
+      const profile = await db.user.getProfile();
 
-      this.set((state) => {
-        state.user = user;
-        state.isLoggedIn = true;
+      this.set({
+        profile,
+        user,
+        isLoggedIn: true
       });
+
+      EV.remove(EVENTS.userSubscriptionUpdated, EVENTS.userEmailConfirmed);
 
       EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
         const wasUserPremium = isUserPremium();
@@ -107,18 +111,29 @@ class UserStore extends BaseStore<UserStore> {
 
   refreshUser = async () => {
     return db.user.fetchUser().then(async (user) => {
-      this.set((state) => (state.user = user));
+      const profile = await db.user.getProfile();
+      this.set({ user, profile });
     });
   };
 
-  login = async (form, skipInit = false, sessionExpired = false) => {
+  login = async (
+    form:
+      | { email: string }
+      | { email: string; password: string }
+      | { code: string; method: AuthenticatorType },
+    skipInit = false,
+    sessionExpired = false
+  ) => {
     this.set((state) => (state.isLoggingIn = true));
-    const { email, password, code, method } = form;
 
     try {
-      if (code) {
+      if ("email" in form && !("password" in form)) {
+        return await db.user.authenticateEmail(form.email);
+      } else if ("code" in form) {
+        const { code, method } = form;
         return await db.user.authenticateMultiFactorCode(code, method);
-      } else if (password) {
+      } else if ("password" in form) {
+        const { email, password } = form;
         await db.user.authenticatePassword(
           email,
           password,
@@ -129,15 +144,13 @@ class UserStore extends BaseStore<UserStore> {
 
         if (skipInit) return true;
         return this.init();
-      } else if (email) {
-        return await db.user.authenticateEmail(email);
       }
     } finally {
       this.set((state) => (state.isLoggingIn = false));
     }
   };
 
-  signup = (form) => {
+  signup = (form: { email: string; password: string }) => {
     this.set((state) => (state.isSigningIn = true));
     return db.user
       .signup(form.email.toLowerCase(), form.password)
