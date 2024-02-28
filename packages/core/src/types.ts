@@ -500,6 +500,39 @@ export type BaseTrashItem<TItem extends BaseItem<"note" | "notebook">> =
 
 export type TrashItem = BaseTrashItem<Note> | BaseTrashItem<Notebook>;
 
+export type AuthenticatorType = "app" | "sms" | "email";
+
+export type User = {
+  id: string;
+  email: string;
+  isEmailConfirmed: boolean;
+  salt: string;
+  attachmentsKey?: Cipher<"base64">;
+  profile?: Cipher<"base64">;
+  marketingConsent?: boolean;
+  mfa: {
+    isEnabled: boolean;
+    primaryMethod: AuthenticatorType;
+    secondaryMethod?: AuthenticatorType;
+    remainingValidCodes: number;
+  };
+  subscription: {
+    appId: 0;
+    cancelURL: string | null;
+    expiry: number;
+    productId: string;
+    provider: 0 | 1 | 2 | 3;
+    start: number;
+    type: 0 | 1 | 2 | 5 | 6 | 7;
+    updateURL: string | null;
+  };
+};
+
+export type Profile = {
+  fullName?: string;
+  profilePicture?: string;
+};
+
 export function isDeleted(item: any): item is DeletedItem {
   return !!item.deleted && item.type !== "trash";
 }

@@ -17,40 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "../types";
+import { User, Profile } from "../types";
 import http from "../utils/http";
 import constants from "../utils/constants";
 import TokenManager from "./token-manager";
 import { EV, EVENTS } from "../common";
 import { HealthCheck } from "./healthcheck";
 import Database from ".";
-import { Cipher, SerializedKey } from "@notesnook/crypto";
-
-export type AuthenticatorType = "app" | "sms" | "email";
-export type User = {
-  id: string;
-  email: string;
-  isEmailConfirmed: boolean;
-  salt: string;
-  attachmentsKey?: Cipher<"base64">;
-  marketingConsent?: boolean;
-  mfa: {
-    isEnabled: boolean;
-    primaryMethod: AuthenticatorType;
-    secondaryMethod?: AuthenticatorType;
-    remainingValidCodes: number;
-  };
-  subscription: {
-    appId: 0;
-    cancelURL: string | null;
-    expiry: number;
-    productId: string;
-    provider: 0 | 1 | 2 | 3;
-    start: number;
-    type: 0 | 1 | 2 | 5 | 6 | 7;
-    updateURL: string | null;
-  };
-};
+import { SerializedKey } from "@notesnook/crypto";
 
 const ENDPOINTS = {
   signup: "/users",
@@ -301,7 +275,7 @@ class UserManager {
     return true;
   }
 
-  async updateUser(user: User) {
+  private async updateUser(user: User) {
     const token = await this.tokenManager.getAccessToken();
     await http.patch.json(
       `${constants.API_HOST}${ENDPOINTS.user}`,
@@ -310,6 +284,28 @@ class UserManager {
     );
 
     await this.setUser(user);
+  }
+
+  async setProfile(profile: Partial<Profile>) {
+    const user = await this.getUser();
+    const key = await this.getEncryptionKey();
+    if (!user || !key) return;
+
+    user.profile = await this.db
+      .storage()
+      .encrypt(key, JSON.stringify({ ...user.profile, ...profile }));
+    await this.updateUser(user);
+  }
+
+  async getProfile() {
+    const user = await this.getUser();
+    const key = await this.getEncryptionKey();
+    if (!user || !key || !user.profile) return;
+
+    const profile = JSON.parse(
+      await this.db.storage().decrypt(key, user.profile)
+    );
+    return profile as Profile;
   }
 
   async deleteUser(password: string) {
