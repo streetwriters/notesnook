@@ -22,7 +22,7 @@ import { Dimensions, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useMessageStore } from "../../stores/use-message-store";
 import { useThemeColors } from "@notesnook/theme";
-import { hexToRGBA } from "../../utils/colors";
+import { getContainerBorder, hexToRGBA } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
@@ -64,12 +64,18 @@ export const Card = ({ color }: { color?: string }) => {
               width: 40 * fontScale,
               backgroundColor:
                 messageBoardState.type === "error"
-                  ? hexToRGBA(colors.static.red, 0.15)
+                  ? hexToRGBA(colors.error.accent, 0.15)
                   : hexToRGBA(color, 0.15),
               height: 40 * fontScale,
               borderRadius: 100,
               alignItems: "center",
-              justifyContent: "center"
+              justifyContent: "center",
+              ...getContainerBorder(
+                messageBoardState.type === "error"
+                  ? colors.error.accent
+                  : color || colors.primary.accent,
+                0.4
+              )
             }}
           >
             <Icon
