@@ -58,6 +58,7 @@ class SettingStore extends BaseStore {
   desktopIntegrationSettings = undefined;
   autoUpdates = true;
   isFlatpak = false;
+  dictionaryWords = [];
 
   refresh = async () => {
     this.set({
@@ -70,7 +71,8 @@ class SettingStore extends BaseStore {
         await desktop?.integration.desktopIntegration.query(),
       privacyMode: await desktop?.integration.privacyMode.query(),
       zoomFactor: await desktop?.integration.zoomFactor.query(),
-      autoUpdates: await desktop?.updater.autoUpdates.query()
+      autoUpdates: await desktop?.updater.autoUpdates.query(),
+      dictionaryWords: await desktop?.integration.dictionarywords.query()
     });
   };
 
@@ -131,6 +133,10 @@ class SettingStore extends BaseStore {
     Config.set("notifications", { ...notificationsSettings, ...settings });
 
     this.set({ notificationsSettings: Config.get("notifications") });
+  };
+
+  deleteDictionaryWords = async (word) => {
+    await desktop.integration.deleteDictionaryWord.mutate(word);
   };
 
   toggleEncryptBackups = () => {

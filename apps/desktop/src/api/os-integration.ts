@@ -169,5 +169,16 @@ export const osIntegrationRouter = t.router({
         }
       });
     })
-  )
+  ),
+
+  dictionarywords: t.procedure.query(() =>
+    globalThis.window?.webContents.session.listWordsInSpellCheckerDictionary()
+  ),
+  deleteDictionaryWord: t.procedure
+    .input(z.string())
+    .mutation(({ input: word }) => {
+      globalThis.window?.webContents.session.removeWordFromSpellCheckerDictionary(
+        word
+      );
+    })
 });

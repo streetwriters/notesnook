@@ -29,6 +29,7 @@ import { useSpellChecker } from "../../hooks/use-spell-checker";
 import { SpellCheckerLanguages } from "./components/spell-checker-languages";
 
 import { CustomizeToolbar } from "./components/customize-toolbar";
+import { DictionaryWords } from "./components/dictionary-words";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -133,6 +134,16 @@ symbols (e.g. 202305261253)`,
             type: "toggle",
             isToggled: () => useSpellChecker.getState().enabled,
             toggle: () => useSpellChecker.getState().toggleSpellChecker()
+          }
+        ]
+      },
+      {
+        key: "dictionay-words",
+        title: "Dictionary Words",
+        components: [
+          {
+            type: "custom",
+            component: DictionaryWords
           }
         ]
       },
