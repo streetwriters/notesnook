@@ -362,3 +362,25 @@ test("permanently deleting a notebook should not delete independently deleted su
     expect(trash.some((a) => a.id === child2)).toBe(false);
     expect(trash.some((a) => a.id === child)).toBe(false);
   }));
+
+test.only("permanently deleted note should not have note fields", () =>
+  databaseTest().then(async (db) => {
+    const noteId = await db.notes.add(TEST_NOTE);
+    await db.notes.moveToTrash(noteId);
+
+    await db.trash.delete(noteId);
+
+    const rawItem = await db
+      .sql()
+      .selectFrom("notes")
+      .selectAll()
+      .where("id", "==", noteId)
+      .executeTakeFirst();
+    const keys = Object.keys(rawItem!);
+    expect(keys.sort()).toStrictEqual([
+      "dateModified",
+      "deleted",
+      "id",
+      "synced"
+    ]);
+  }));
