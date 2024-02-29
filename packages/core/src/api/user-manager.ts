@@ -289,11 +289,12 @@ class UserManager {
   async setProfile(profile: Partial<Profile>) {
     const user = await this.getUser();
     const key = await this.getEncryptionKey();
+    const userProfile = await this.getProfile();
     if (!user || !key) return;
 
     user.profile = await this.db
       .storage()
-      .encrypt(key, JSON.stringify({ ...user.profile, ...profile }));
+      .encrypt(key, JSON.stringify({ ...userProfile, ...profile }));
     await this.updateUser(user);
   }
 
