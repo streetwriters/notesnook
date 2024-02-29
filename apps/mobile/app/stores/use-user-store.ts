@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User } from "@notesnook/core/dist/api/user-manager";
+import { Profile } from "@notesnook/core";
+import { User } from "@notesnook/core";
 import create, { State } from "zustand";
 
 export enum SyncStatus {
@@ -40,6 +41,7 @@ export interface UserStore extends State {
   lockApp: (verified: boolean) => void;
   disableAppLockRequests: boolean;
   setDisableAppLockRequests: (shouldBlockVerifyUser: boolean) => void;
+  profile?: Partial<Profile>;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -62,5 +64,6 @@ export const useUserStore = create<UserStore>((set) => ({
     setTimeout(() => {
       set({ disableAppLockRequests: false });
     }, 1000);
-  }
+  },
+  profile: undefined
 }));
