@@ -52,7 +52,7 @@ const ImagePreview = () => {
     setLoading(true);
     setTimeout(async () => {
       let hash = image.hash;
-      if (!hash && dataurl.toObject(image.src)) {
+      if (!hash && image.src && dataurl.toObject(image.src)) {
         const data = dataurl.toObject(image.src);
         if (!data) return;
         hash = await Sodium.hashFile({
