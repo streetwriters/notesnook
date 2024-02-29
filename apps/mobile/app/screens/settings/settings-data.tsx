@@ -70,7 +70,6 @@ import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import ImagePicker from "react-native-image-crop-picker";
 
 type User = any;
 
@@ -135,49 +134,53 @@ export const settingsGroups: SettingSection[] = [
         description: "Manage account",
         sections: [
           {
-            id: "change-profile-picture",
-            name: "Change profile picture",
-            description: "Change your profile picture",
-            icon: "account-outline",
+            id: "remove-profile-picture",
+            name: "Remove profile picture",
+            description: "Remove your picture from profile",
+            useHook: () =>
+              useUserStore((state) => state.profile?.profilePicture),
+            hidden: () => !useUserStore.getState().profile?.profilePicture,
             modifer: () => {
-              const theme =
-                useThemeStore.getState().colorScheme === "dark"
-                  ? useThemeStore.getState().darkTheme
-                  : useThemeStore.getState().lightTheme;
-              ImagePicker.openPicker({
-                compressImageMaxWidth: 512,
-                compressImageMaxHeight: 512,
-                compressImageQuality: 0.8,
-                avoidEmptySpaceAroundImage: true,
-                cropping: true,
-                cropperCircleOverlay: true,
-                mediaType: "photo",
-                forceJpg: true,
-                includeBase64: true,
-                writeTempFile: false,
-                cropperToolbarColor: theme.scopes.base.primary.background,
-                cropperToolbarTitle: "Edit profile picture",
-                cropperActiveWidgetColor: theme.scopes.base.primary.accent,
-                cropperToolbarWidgetColor: theme.scopes.base.primary.icon
-              }).then((image) => {
-                console.log(image);
+              presentDialog({
+                title: "Remove profile picture",
+                paragraph:
+                  "Are you sure you want to remove your profile picture?",
+                positiveText: "Remove",
+                positivePress: async () => {
+                  db.user
+                    .setProfile({
+                      profilePicture: undefined
+                    })
+                    .then(async () => {
+                      useUserStore.setState({
+                        profile: await db.user.getProfile()
+                      });
+                    });
+                }
               });
             }
           },
           {
-            id: "change-name",
-            name: "Change name",
-            description: "Change your name",
+            id: "remove-name",
+            name: "Remove full name",
+            description: "Remove your name from profile",
+            useHook: () => useUserStore((state) => state.profile?.fullName),
+            hidden: () => !useUserStore.getState().profile?.fullName,
             modifer: () => {
               presentDialog({
-                title: "Change name",
-                paragraph: "Change your name",
-                positiveText: "Save",
-                input: true,
-                inputPlaceholder: "Enter new name",
-                defaultValue: "Ammar Ahmed",
-                positivePress(value) {
-                  console.log(value);
+                title: "Remove name",
+                paragraph: "Are you sure you want to remove your name?",
+                positiveText: "Remove",
+                positivePress: async () => {
+                  db.user
+                    .setProfile({
+                      fullName: undefined
+                    })
+                    .then(async () => {
+                      useUserStore.setState({
+                        profile: await db.user.getProfile()
+                      });
+                    });
                 }
               });
             }

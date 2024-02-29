@@ -389,6 +389,11 @@ export const useAppEvents = () => {
 
         const isUserEmailConfirmed = SettingsService.get().userEmailConfirmed;
         setUser(user);
+
+        useUserStore.setState({
+          profile: await db.user.getProfile()
+        });
+
         if (SettingsService.get().sessionExpired) {
           syncedOnLaunch.current = true;
           return;

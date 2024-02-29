@@ -46,6 +46,8 @@ export const UserStatus = () => {
   const { isInternetReachable } = useNetInfo();
   const isOffline = !isInternetReachable;
   const { progress } = useSyncProgress();
+  const userProfile = useUserStore((state) => state.profile);
+
   return (
     <View
       style={{
@@ -81,16 +83,15 @@ export const UserStatus = () => {
             alignItems: "center"
           }}
         >
-          {user ? (
+          {userProfile?.profilePicture ? (
             <Image
               source={{
-                uri: PROFILE_PIC_URL
+                uri: userProfile?.profilePicture
               }}
               style={{
                 width: 35,
                 height: 35,
                 borderRadius: 100,
-                backgroundColor: "red",
                 marginRight: 10
               }}
             />
@@ -117,7 +118,9 @@ export const UserStatus = () => {
                 ? `Syncing your notes${
                     progress ? ` (${progress.current})` : ""
                   }`
-                : "Ammar Ahmed"}
+                : !userProfile?.fullName
+                ? "Tap to sync"
+                : userProfile.fullName}
             </Paragraph>
 
             <Paragraph
