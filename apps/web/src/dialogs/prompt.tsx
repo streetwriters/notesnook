@@ -44,7 +44,14 @@ export default function Prompt(props: PromptDialogProps) {
       }}
       negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
-      <Field inputRef={inputRef} defaultValue={props.defaultValue} autoFocus />
+      <Field
+        inputRef={inputRef}
+        defaultValue={props.defaultValue}
+        autoFocus
+        onKeyUp={(e) => {
+          if (e.key == "Enter") props.onSave(inputRef.current?.value || "");
+        }}
+      />
     </Dialog>
   );
 }

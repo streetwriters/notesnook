@@ -25,7 +25,13 @@ import { getFormattedDate } from "@notesnook/common";
 import { SUBSCRIPTION_STATUS } from "../../../common/constants";
 import dayjs from "dayjs";
 import { useMemo } from "react";
-import { showEditProfileDialog } from "../../../common/dialog-controller";
+import {
+  showEditProfileDialog,
+  showEditProfilePictureDialog,
+  showPromptDialog
+} from "../../../common/dialog-controller";
+import { db } from "../../../common/db";
+import { showToast } from "../../../utils/toast";
 
 export function UserProfile() {
   const user = useUserStore((store) => store.user);
@@ -104,7 +110,11 @@ export function UserProfile() {
             mr: 2,
             size: 60,
             borderRadius: 80,
-            overflow: "hidden"
+            overflow: "hidden",
+            position: "relative",
+            ":hover #profile-picture-edit": {
+              visibility: "visible"
+            }
           }}
         >
           {profile?.profilePicture ? (
@@ -115,6 +125,30 @@ export function UserProfile() {
           ) : (
             <User size={30} />
           )}
+          <Flex
+            id="profile-picture-edit"
+            sx={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              bg: "#000000aa",
+              top: 0,
+              left: 0,
+              alignItems: "center",
+              alignContent: "center",
+              justifyContent: "center",
+              visibility: "collapse",
+              cursor: "pointer"
+            }}
+            title="Edit profile picture"
+            onClick={async () => {
+              await showEditProfilePictureDialog(profile);
+            }}
+          >
+            <Text variant="body" sx={{ color: "white" }}>
+              Edit
+            </Text>
+          </Flex>
         </Flex>
         <Flex sx={{ flexDirection: "column" }}>
           <Text
@@ -126,32 +160,40 @@ export function UserProfile() {
             {remainingDays > 0 && (isPro || isProCancelled)
               ? `PRO`
               : remainingDays > 0 && isTrial
-              ? "TRIAL"
-              : isBeta
-              ? "BETA TESTER"
-              : "BASIC"}
+                ? "TRIAL"
+                : isBeta
+                  ? "BETA TESTER"
+                  : "BASIC"}
           </Text>
 
-          {profile?.fullName ? (
-            <>
-              <Text variant={"title"}>{profile?.fullName}</Text>
-              <Text variant={"subBody"}>
-                {user.email} • Member since{" "}
-                {getFormattedDate(getObjectIdTimestamp(user.id), "date")}
-              </Text>
-            </>
-          ) : (
-            <>
-              <Text variant={"title"}>{user.email}</Text>
-              <Text variant={"subBody"}>
-                Member since
-                {getFormattedDate(getObjectIdTimestamp(user.id), "date")}
-              </Text>
-            </>
-          )}
+          <Text variant={"title"}>
+            {profile?.fullName || "Your full name"}{" "}
+            <Edit
+              sx={{ display: "inline-block", cursor: "pointer" }}
+              size={12}
+              title="Edit full name"
+              onClick={async () => {
+                const fullName = await showPromptDialog({
+                  title: "Edit your full name",
+                  description:
+                    "Your profile data is 100% end-to-end encrypted.",
+                  defaultValue: profile?.fullName
+                });
+                useUserStore.setState({
+                  profile: { ...profile, fullName: fullName || undefined }
+                });
+                await db.user.setProfile({ fullName: fullName || undefined });
+                showToast("success", "Full name updated!");
+              }}
+            />
+          </Text>
+          <Text variant={"subBody"}>
+            {user.email} • Member since{" "}
+            {getFormattedDate(getObjectIdTimestamp(user.id), "date")}
+          </Text>
         </Flex>
       </Flex>
-      <Button
+      {/* <Button
         variant="icon"
         sx={{
           borderRadius: 50,
@@ -165,7 +207,7 @@ export function UserProfile() {
         onClick={() => showEditProfileDialog(profile)}
       >
         <Edit size={18} />
-      </Button>
+      </Button> */}
     </Flex>
   );
 }
