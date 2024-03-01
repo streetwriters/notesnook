@@ -470,8 +470,8 @@ export function showAttachmentsDialog() {
   ));
 }
 
-export function showEditProfileDialog(profile?: Profile) {
-  return showDialog("EditProfileDialog", (Dialog, perform) => (
+export function showEditProfilePictureDialog(profile?: Profile) {
+  return showDialog("EditProfilePictureDialog", (Dialog, perform) => (
     <Dialog onClose={(res: boolean) => perform(res)} profile={profile} />
   ));
 }

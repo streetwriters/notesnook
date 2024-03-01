@@ -53,7 +53,7 @@ const EmailChangeDialog = React.lazy(() => import("./email-change-dialog"));
 const AddTagsDialog = React.lazy(() => import("./add-tags-dialog"));
 const ThemeDetailsDialog = React.lazy(() => import("./theme-details-dialog"));
 const CreateColorDialog = React.lazy(() => import("./create-color-dialog"));
-const EditProfileDialog = React.lazy(() => import("./edit-profile-dialog"));
+const EditProfilePictureDialog = React.lazy(() => import("./edit-profile-picture-dialog"));
 
 export const Dialogs = {
   AddNotebookDialog,
@@ -83,5 +83,5 @@ export const Dialogs = {
   SettingsDialog,
   ThemeDetailsDialog,
   CreateColorDialog,
-  EditProfileDialog
+  EditProfilePictureDialog
 };
