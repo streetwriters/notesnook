@@ -214,7 +214,6 @@ import {
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
 import { Flex, FlexProps } from "@theme-ui/components";
-import { MotionProps } from "framer-motion";
 import { isThemeColor, SchemeColors } from "@notesnook/theme";
 
 type MDIIconWrapperProps = {
@@ -223,13 +222,15 @@ type MDIIconWrapperProps = {
   size?: keyof Theme["iconSizes"] | number;
   color?: SchemeColors;
   rotate?: boolean;
+  rotateDirection?: "clockwise" | "counterclockwise";
 };
 function _MDIIconWrapper({
   title,
   path,
   size = 24,
   color = "icon",
-  rotate
+  rotate,
+  rotateDirection
 }: MDIIconWrapperProps) {
   const theme = useTheme() as Theme;
 
@@ -253,7 +254,7 @@ function _MDIIconWrapper({
         stroke: themedColor
       }}
       color={themedColor}
-      spin={rotate}
+      spin={rotate ? (rotateDirection === "clockwise" ? 2 : -2) : false}
     />
   );
 }
@@ -265,9 +266,7 @@ const MDIIconWrapper = memo(
     prev.title === next.title
 );
 
-export type IconProps = FlexProps &
-  MotionProps &
-  Omit<MDIIconWrapperProps, "path">;
+export type IconProps = FlexProps & Omit<MDIIconWrapperProps, "path">;
 
 export type Icon = {
   (props: IconProps): JSX.Element;
