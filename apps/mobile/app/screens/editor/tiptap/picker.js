@@ -24,10 +24,8 @@ import RNFetchBlob from "react-native-blob-util";
 import DocumentPicker from "react-native-document-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { db } from "../../../common/database";
-import {
-  compressToBase64,
-  compressToFile
-} from "../../../common/filesystem/compress";
+import filesystem from "../../../common/filesystem";
+import { compressToFile } from "../../../common/filesystem/compress";
 import AttachImage from "../../../components/dialogs/attach-image-dialog";
 import {
   ToastManager,
@@ -35,11 +33,10 @@ import {
   presentSheet
 } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 import { eCloseSheet } from "../../../utils/events";
 import { editorController, editorState } from "./utils";
-import { useSettingStore } from "../../../stores/use-setting-store";
-import filesystem from "../../../common/filesystem";
 
 const showEncryptionSheet = (file) => {
   presentSheet({
@@ -237,7 +234,7 @@ const handleImageResponse = async (response, options) => {
     }
 
     if (image.fileSize > IMAGE_SIZE_LIMIT) {
-      ToastEvent.show({
+      ToastManager.show({
         title: "File too large",
         message: "The maximum allowed size per image is 50 MB",
         type: "error"
@@ -253,15 +250,6 @@ const handleImageResponse = async (response, options) => {
 
     let fileName = image.originalFileName || image.fileName;
     if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
-
-    if (isPng || isJpeg) {
-      b64 =
-        `data:${image.type};base64, ` +
-        (await compressToBase64(
-          Platform.OS === "ios" ? "file://" + image.uri : image.uri,
-          isPng ? "PNG" : "JPEG"
-        ));
-    }
 
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
 
@@ -302,7 +290,7 @@ export async function attachFile(uri, hash, type, filename, options) {
         type: options.type || "url",
         hash: hash
       });
-      encryptionInfo.type = type;
+      encryptionInfo.mimeType = type;
       encryptionInfo.filename = filename;
       encryptionInfo.alg = "xcha-stream";
       encryptionInfo.size = encryptionInfo.length;
