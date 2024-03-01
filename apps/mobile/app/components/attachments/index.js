@@ -49,7 +49,7 @@ export const AttachmentDialog = ({ note }) => {
   const { height } = useSettingStore((state) => state.dimensions);
   const [attachments, setAttachments] = useState(
     note
-      ? db.attachments.ofNote(note.id, "all")
+      ? db.attachments.ofNote(note?.id, "all")
       : [...(db.attachments.all || [])]
   );
 
@@ -59,8 +59,8 @@ export const AttachmentDialog = ({ note }) => {
   const [currentFilter, setCurrentFilter] = useState("all");
 
   const onChangeText = (text) => {
-    const attachments = note
-      ? db.attachments.ofNote(note.id, "all")
+    const attachments = note?.id
+      ? db.attachments.ofNote(note?.id, "all")
       : [...(db.attachments.all || [])];
 
     attachmentSearchValue.current = text;
@@ -137,10 +137,11 @@ export const AttachmentDialog = ({ note }) => {
   ];
 
   const filterAttachments = (type, _attachments) => {
-    const attachments =
-      _attachments || note
-        ? db.attachments.ofNote(note.id, "all")
-        : [...(db.attachments.all || [])];
+    const attachments = _attachments
+      ? _attachments
+      : note
+      ? db.attachments.ofNote(note?.id, "all")
+      : [...(db.attachments.all || [])];
 
     switch (type) {
       case "all":
