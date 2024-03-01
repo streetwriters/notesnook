@@ -117,10 +117,7 @@ class AppStore extends BaseStore<AppStore> {
       EVENTS.databaseSyncRequested,
       async (full, force, lastSynced) => {
         if (!this.get().isAutoSyncEnabled) return;
-
-        // TODO: remove this
-        if ((await db.lastSynced()) === 0)
-          await this.get().sync(full, force, lastSynced);
+        await this.get().sync(full, force, lastSynced);
       }
     );
 
