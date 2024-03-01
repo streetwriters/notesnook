@@ -114,7 +114,7 @@ export default function AttachImage({
           }}
           size={SIZE.sm}
         >
-          Compress image (recommended)
+          Compress (recommended)
         </Paragraph>
       </TouchableOpacity>
 
@@ -131,7 +131,7 @@ export default function AttachImage({
       ) : (
         <Notice
           type="information"
-          text="Compressed images are uploaded in FULL HD resolution and are good enough for most use cases."
+          text="Compressed images are uploaded in Full HD resolution and usually are good enough for most use cases."
           size="small"
           style={{
             width: "100%",
@@ -141,7 +141,9 @@ export default function AttachImage({
       )}
 
       <Button
-        title="Add images to note"
+        title={`${
+          (response.assets?.length || 0) > 1 ? "Attach Images" : "Attach Image"
+        }`}
         type="accent"
         width="100%"
         onPress={() => {

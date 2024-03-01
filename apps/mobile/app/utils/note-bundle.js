@@ -45,7 +45,7 @@ export async function attachFile(uri, hash, type, filename, options) {
         hash: hash,
         appGroupId: options.appGroupId
       });
-      encryptionInfo.type = type;
+      encryptionInfo.mimeType = type;
       encryptionInfo.filename = filename;
       encryptionInfo.alg = "xcha-stream";
       encryptionInfo.size = encryptionInfo.length;
