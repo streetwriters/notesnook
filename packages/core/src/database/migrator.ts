@@ -56,37 +56,45 @@ class Migrator {
     collections: MigratableCollections,
     version: number
   ) {
-    const vaultKey = await db.storage().read<Cipher<"base64">>("vaultKey");
-    if (vaultKey)
-      await migrateVaultKey(db, vaultKey, version, CURRENT_DATABASE_VERSION);
-    await migrateKV(db, version, CURRENT_DATABASE_VERSION);
+    if (version <= 5.9) {
+      const vaultKey = await db.storage().read<Cipher<"base64">>("vaultKey");
+      if (vaultKey)
+        await migrateVaultKey(db, vaultKey, version, CURRENT_DATABASE_VERSION);
+      await migrateKV(db, version, CURRENT_DATABASE_VERSION);
+    }
 
     for (const collection of collections) {
       sendMigrationProgressEvent(db.eventManager, collection.name, 0, 0);
 
-      const indexedCollection = new IndexedCollection(
-        db.storage,
-        collection.name
-      );
       const table = new SQLCollection(
         db.sql,
         db.transaction,
         collection.table,
         db.eventManager
       );
-
-      await migrateCollection(indexedCollection, version);
-
-      await indexedCollection.init();
-      await table.init();
-      for await (const entries of indexedCollection.iterate(100)) {
-        await this.migrateItems(
-          db,
-          table,
-          collection.name,
-          entries.map((i) => i[1]),
-          version
+      if (version <= 5.9) {
+        const indexedCollection = new IndexedCollection(
+          db.storage,
+          collection.name
         );
+
+        await migrateCollection(indexedCollection, version);
+
+        await indexedCollection.init();
+        await table.init();
+        for await (const entries of indexedCollection.iterate(100)) {
+          await this.migrateToSQLite(
+            db,
+            table,
+            collection.name,
+            entries.map((i) => i[1]),
+            version
+          );
+        }
+        await indexedCollection.clear();
+      } else {
+        await table.init();
+        await this.migrateItems(db, table, collection.name, version);
       }
     }
 
@@ -94,7 +102,7 @@ class Migrator {
     return true;
   }
 
-  async migrateItems(
+  private async migrateToSQLite(
     db: Database,
     table: SQLCollection<keyof DatabaseSchema>,
     type: keyof Collections,
@@ -133,8 +141,7 @@ class Migrator {
       if (migrated === true) {
         if (!isDeleted(item) && item.type === "settings") {
           // we are removing the old settings.
-          if (process.env.NODE_ENV === "test")
-            await db.storage().remove("settings");
+          await db.storage().remove("settings");
         } else toAdd.push(item);
 
         // if id changed after migration, we need to delete the old one.
@@ -153,6 +160,65 @@ class Migrator {
         toAdd.length
       );
     }
+  }
+
+  private async migrateItems(
+    db: Database,
+    table: SQLCollection<keyof DatabaseSchema>,
+    type: keyof Collections,
+    version: number
+  ) {
+    let progress = 0;
+    let toAdd = [];
+    let toDelete = [];
+    for await (const item of table.stream(100)) {
+      if (toAdd.length >= 500) {
+        await table.put(toAdd as any);
+        await table.delete(toDelete);
+        progress += toAdd.length;
+        sendMigrationProgressEvent(db.eventManager, type, progress, progress);
+        toAdd = [];
+        toDelete = [];
+      }
+
+      const itemId = item.id;
+      let migrated = await migrateItem(
+        item as any,
+        version,
+        CURRENT_DATABASE_VERSION,
+        isDeleted(item) ? "never" : item.type || "never",
+        db,
+        "local"
+      );
+
+      // trash item is also a notebook or a note so we have to migrate it separately.
+      if (isTrashItem(item)) {
+        migrated = await migrateItem(
+          item as any,
+          version,
+          CURRENT_DATABASE_VERSION,
+          item.itemType,
+          db,
+          "local"
+        );
+      }
+
+      if (!migrated) continue;
+
+      toAdd.push(item);
+
+      // if id changed after migration, we need to delete the old one.
+      if (item.id !== itemId) {
+        toDelete.push(itemId);
+      }
+    }
+
+    await table.put(toAdd as any);
+    await table.delete(toDelete);
+    progress += toAdd.length;
+    sendMigrationProgressEvent(db.eventManager, type, progress, progress);
+    toAdd = [];
+    toDelete = [];
   }
 }
 export default Migrator;

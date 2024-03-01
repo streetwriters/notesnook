@@ -253,7 +253,7 @@ class Sync {
         );
       }
     }
-    await this.connection?.send("PushCompleted");
+    if (done > 0) await this.connection?.send("PushCompleted");
     return true;
   }
 
@@ -291,6 +291,7 @@ class Sync {
    * @private
    */
   async onPushCompleted() {
+    console.log("PUSH COMPLETED!");
     this.db.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
   }
 

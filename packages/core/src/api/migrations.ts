@@ -73,6 +73,10 @@ const collections: MigratableCollections = [
   {
     name: "notes",
     table: "notes"
+  },
+  {
+    name: "vaults",
+    table: "vaults"
   }
 ];
 

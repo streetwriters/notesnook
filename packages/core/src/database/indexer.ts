@@ -52,8 +52,11 @@ export default class Indexer<T> {
   }
 
   async clear() {
+    await this.storage().removeMulti(
+      this._indices.map((key) => this.makeId(key))
+    );
     this._indices = [];
-    await this.storage().clear();
+    await this.storage().write(this.type, this._indices);
   }
 
   async read(

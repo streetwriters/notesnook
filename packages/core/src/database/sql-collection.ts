@@ -111,6 +111,7 @@ export class SQLCollection<
   }
 
   async delete(ids: string[]) {
+    if (ids.length <= 0) return;
     await this.db()
       .deleteFrom<keyof DatabaseSchema>(this.type)
       .where("id", "in", ids)
@@ -152,6 +153,7 @@ export class SQLCollection<
   }
 
   async put(items: (SQLiteItem<T> | undefined)[]) {
+    if (items.length <= 0) return;
     const entries = items.reduce((array, item) => {
       if (!item) return array;
       if (!item.remote) {
