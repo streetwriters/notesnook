@@ -52,7 +52,6 @@ export class Notebooks implements ICollection {
         "Please use db.notebooks.merge to merge remote notebooks"
       );
 
-    //TODO reliably and efficiently check for duplicates.
     const id = notebookArg.id || getId();
     const oldNotebook = await this.notebook(id);
 
