@@ -320,10 +320,6 @@ export class Content implements ICollection {
       return hashes.every((hash) => hash !== attachment.hash);
     });
 
-    const toAdd = hashes.filter((hash) => {
-      return hash && noteAttachments.every((a) => hash !== a.hash);
-    });
-
     for (const attachment of toDelete) {
       await this.db.relations.unlink(
         {
@@ -334,44 +330,26 @@ export class Content implements ICollection {
       );
     }
 
-    for (const hash of toAdd) {
-      // TODO: only get id instead of the whole object
-      const attachment = await this.db.attachments.attachment(hash);
-      if (!attachment) continue;
+    const toAdd = hashes.filter((hash) => {
+      return hash && noteAttachments.every((a) => hash !== a.hash);
+    });
+
+    const attachments = await this.db.attachments.all
+      .fields(["attachments.id"])
+      .where((eb) => eb("hash", "in", toAdd))
+      .items();
+    for (const attachment of attachments) {
       await this.db.relations.add(
         {
           id: contentItem.noteId,
           type: "note"
         },
-        attachment
+        { id: attachment.id, type: "attachment" }
       );
     }
 
-    // if (toAdd.length > 0) {
-    //   contentItem.dateModified = Date.now();
-    // }
-    // contentItem.data = data;
     return data;
   }
-
-  // async cleanup() {
-  //   const indices = this.collection.indexer.indices;
-  //   await this.db.notes.init();
-  //   const notes = this.db.notes.all;
-  //   if (!notes.length && indices.length > 0) return [];
-  //   const ids = [];
-  //   for (const contentId of indices) {
-  //     const noteIndex = notes.findIndex((note) => note.contentId === contentId);
-  //     const isOrphaned = noteIndex === -1;
-  //     if (isOrphaned) {
-  //       ids.push(contentId);
-  //       await this.collection.deleteItem(contentId);
-  //     } else if (notes[noteIndex].localOnly) {
-  //       ids.push(contentId);
-  //     }
-  //   }
-  //   return ids;
-  // }
 }
 
 export function isUnencryptedContent(
