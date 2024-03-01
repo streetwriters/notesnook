@@ -114,8 +114,7 @@ async function onBackgroundSyncStarted() {
     }
     const user = await db.user?.getUser();
     if (user) {
-      // await db.sync(true, false);
-      DatabaseLogger.info("BACKGROUND SYNC DISABLED");
+      await db.sync(true, false);
     }
     await Notifications.setupReminders();
     DatabaseLogger.info("BACKGROUND SYNC COMPLETE");
