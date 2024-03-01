@@ -17,13 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Platform } from "react-native";
 import Sodium from "@ammarahmed/react-native-sodium";
+import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
-import { cacheDir, cacheDirOld, getRandomId } from "./utils";
-import { db } from "../database";
-import { compressToBase64 } from "./compress";
 import { IOS_APPGROUPID } from "../../utils/constants";
+import { db } from "../database";
+import { cacheDir, cacheDirOld, getRandomId } from "./utils";
 
 export async function readEncrypted(filename, key, cipherData) {
   await migrateFilesFromCache();
@@ -36,8 +35,6 @@ export async function readEncrypted(filename, key, cipherData) {
     }
 
     const attachment = await db.attachments.attachment(filename);
-    const isPng = /(png)/g.test(attachment?.mimeType || "");
-    const isJpeg = /(jpeg|jpg)/g.test(attachment?.mimeType || "");
     console.log("decrypting....");
     let output = await Sodium.decryptFile(
       key,
@@ -46,20 +43,9 @@ export async function readEncrypted(filename, key, cipherData) {
         hash: filename,
         appGroupId: IOS_APPGROUPID
       },
-      cipherData.outputType === "base64"
-        ? isPng || isJpeg
-          ? "cache"
-          : "base64"
-        : "text"
+      cipherData.outputType === "base64" ? "base64" : "text"
     );
-    console.log("file decrypted...");
-    if (cipherData.outputType === "base64" && (isPng || isJpeg)) {
-      const dCachePath = `${cacheDir}/${output}`;
-      output = await compressToBase64(
-        `file://${dCachePath}`,
-        isPng ? "PNG" : "JPEG"
-      );
-    }
+    console.log("file decrypted...", attachment?.mimeType);
 
     return output;
   } catch (e) {
