@@ -230,7 +230,12 @@ function SyncStatus() {
       }
       data-test-id={`sync-status-${status.key}`}
     >
-      <status.icon size={12} rotate={status.loading} color={status.iconColor} />
+      <status.icon
+        size={12}
+        rotate={status.loading}
+        rotateDirection="counterclockwise"
+        color={status.iconColor}
+      />
     </Button>
   );
 }
