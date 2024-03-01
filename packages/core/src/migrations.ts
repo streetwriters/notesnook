@@ -62,8 +62,17 @@ type Migration = {
     migrationType: MigrationType,
     itemType: MigrationItemType
   ) => "skip" | boolean | Promise<boolean | "skip"> | void;
+  /**
+   * @deprecated
+   */
   collection?: (collection: IndexedCollection) => Promise<void> | void;
+  /**
+   * @deprecated
+   */
   vaultKey?: (db: Database, key: Cipher<"base64">) => Promise<void> | void;
+  /**
+   * @deprecated
+   */
   kv?: (db: Database) => Promise<void> | void;
 };
 
@@ -420,17 +429,14 @@ const migrations: Migration[] = [
     },
     async vaultKey(db, key) {
       await db.vaults.add({ title: "Default", key });
-      // TODO: remove this
-      if (process.env.NODE_ENV === "test")
-        await db.storage().remove("vaultKey");
+      await db.storage().remove("vaultKey");
     },
     async kv(db) {
       for (const key of KEYS) {
         const value = await db.storage().read(key);
         if (value === undefined || value === null) continue;
         await db.kv().write(key, value as any);
-        // TODO: remove this
-        if (process.env.NODE_ENV === "test") await db.storage().remove(key);
+        await db.storage().remove(key);
       }
     }
   },
@@ -516,6 +522,9 @@ export async function migrateItem<TItemType extends MigrationItemType>(
   return count > 0;
 }
 
+/**
+ * @deprecated
+ */
 export async function migrateCollection(
   collection: IndexedCollection,
   version: number
@@ -538,6 +547,9 @@ export async function migrateCollection(
   }
 }
 
+/**
+ * @deprecated
+ */
 export async function migrateVaultKey(
   db: Database,
   vaultKey: Cipher<"base64">,
@@ -562,6 +574,9 @@ export async function migrateVaultKey(
   }
 }
 
+/**
+ * @deprecated
+ */
 export async function migrateKV(
   db: Database,
   version: number,
