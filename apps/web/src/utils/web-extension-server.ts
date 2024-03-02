@@ -28,10 +28,10 @@ import { isUserPremium } from "../hooks/use-is-user-premium";
 import { store as appstore } from "../stores/app-store";
 import { h } from "./html";
 import { sanitizeFilename } from "@notesnook/common";
-import { attachFile } from "../components/editor/picker";
 import { getFormattedDate } from "@notesnook/common";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { isCipher } from "@notesnook/core/dist/database/crypto";
+import { attachFiles } from "../components/editor/picker";
 
 export class WebExtensionServer implements Server {
   async login() {
@@ -85,7 +85,7 @@ export class WebExtensionServer implements Server {
         }
       );
 
-      const attachment = await attachFile(clippedFile);
+      const attachment = (await attachFiles([clippedFile]))?.at(0);
       if (!attachment) return;
 
       clipContent += h("iframe", [], {
