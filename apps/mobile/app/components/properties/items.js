@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { Dimensions, FlatList, ScrollView, View } from "react-native";
+import { Dimensions, ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useActions } from "../../hooks/use-actions";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { Pressable } from "../ui/pressable";
@@ -131,9 +131,8 @@ export const Items = ({ item, buttons, close }) => {
           width: topBarItemWidth
         }}
       >
-        <Pressable
+        <View
           onPress={item.func}
-          type={item.on ? "shade" : "plain"}
           style={{
             height: topBarItemWidth,
             width: topBarItemWidth,
@@ -157,7 +156,7 @@ export const Items = ({ item, buttons, close }) => {
                 : colors.secondary.icon
             }
           />
-        </Pressable>
+        </View>
 
         <Paragraph
           textBreakStrategy="simple"
@@ -179,10 +178,6 @@ export const Items = ({ item, buttons, close }) => {
     "lock-unlock"
   ];
 
-  if (!shouldShrink) {
-    topBarItemsList.push("publish");
-  }
-
   const topBarItems = data
     .filter((item) => topBarItemsList.indexOf(item.id) > -1)
     .sort((a, b) =>
@@ -202,6 +197,12 @@ export const Items = ({ item, buttons, close }) => {
     "trash"
   ];
 
+  if (!shouldShrink) {
+    topBarItemsList.push("publish");
+  } else {
+    bottomBarItemsList.splice(4, 0, "publish");
+  }
+
   const bottomGridItems = data
     .filter((item) => bottomBarItemsList.indexOf(item.id) > -1)
     .sort((a, b) =>
@@ -210,8 +211,13 @@ export const Items = ({ item, buttons, close }) => {
         : -1
     );
 
-  const topBarItemWidth =
+  let topBarItemWidth =
     (width - (topBarItems.length * 10 + 14)) / topBarItems.length;
+  topBarItemWidth;
+
+  if (topBarItemWidth < 55) {
+    topBarItemWidth = 55;
+  }
 
   return item.type === "note" ? (
     <>
@@ -225,23 +231,18 @@ export const Items = ({ item, buttons, close }) => {
         {topBarItems.map(renderTopBarItem)}
       </ScrollView>
 
-      <FlatList
-        data={bottomGridItems}
-        keyExtractor={(item) => item.title}
-        key={columnItemsCount + "key"}
-        numColumns={columnItemsCount}
+      <View
         style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          alignContent: "flex-start",
           marginTop: item.type !== "note" ? 10 : 0,
           paddingTop: 10,
           marginLeft: 6
         }}
-        contentContainerStyle={{
-          alignSelf: "center",
-          width: buttons.length < 5 ? "100%" : null,
-          paddingLeft: buttons.length < 5 ? 10 : 0
-        }}
-        renderItem={_renderRowItem}
-      />
+      >
+        {bottomGridItems.map((item) => _renderRowItem({ item }))}
+      </View>
     </>
   ) : (
     <View data={data}>{data.map(renderColumnItem)}</View>

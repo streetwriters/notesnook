@@ -21,7 +21,7 @@ import { Color, Note } from "@notesnook/core/dist/types";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
-import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
+import { FlashList } from "@shopify/flash-list";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
@@ -122,7 +122,8 @@ export const ColorTags = ({ item }: { item: Note }) => {
         style={{
           flexGrow: isTablet ? undefined : 1,
           flexDirection: "row",
-          marginLeft: 5
+          marginLeft: 5,
+          flexShrink: 2
         }}
       >
         <FlashList
@@ -130,6 +131,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
           estimatedItemSize={30}
           horizontal
           extraData={updater}
+          bounces={false}
           renderItem={renderItem}
           showsHorizontalScrollIndicator={false}
           ListFooterComponent={

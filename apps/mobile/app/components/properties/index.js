@@ -73,6 +73,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
         maxHeight: "100%"
       }}
+      nestedScrollEnabled
       data={[0]}
       keyExtractor={() => "properties-scroll-item"}
       renderItem={() => (
