@@ -127,7 +127,7 @@ export async function createBackup() {
 }
 
 export async function selectBackupFile() {
-  const file = await showFilePicker({
+  const [file] = await showFilePicker({
     acceptedFileTypes: ".nnbackup,.nnbackupz"
   });
   if (!file) return;
