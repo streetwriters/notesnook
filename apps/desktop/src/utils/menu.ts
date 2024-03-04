@@ -131,16 +131,6 @@ function setupMenu() {
       );
     }
 
-    if (params.isEditable)
-      menu.append(
-        new MenuItem({
-          label: "Paste",
-          role: "pasteAndMatchStyle",
-          enabled: clipboard.readText("clipboard").length > 0,
-          accelerator: "CommandOrControl+V"
-        })
-      );
-
     if (params.mediaType === "image")
       menu.append(
         new MenuItem({
@@ -149,6 +139,16 @@ function setupMenu() {
           click() {
             globalThis.window?.webContents.copyImageAt(params.x, params.y);
           }
+        })
+      );
+
+    if (params.isEditable)
+      menu.append(
+        new MenuItem({
+          label: "Paste",
+          role: "pasteAndMatchStyle",
+          enabled: clipboard.readText("clipboard").length > 0,
+          accelerator: "CommandOrControl+V"
         })
       );
 
