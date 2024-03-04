@@ -29,6 +29,7 @@ import { useSpellChecker } from "../../hooks/use-spell-checker";
 import { SpellCheckerLanguages } from "./components/spell-checker-languages";
 
 import { CustomizeToolbar } from "./components/customize-toolbar";
+import { DictionaryWords } from "./components/dictionary-words";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -147,6 +148,16 @@ symbols (e.g. 202305261253)`,
           {
             type: "custom",
             component: SpellCheckerLanguages
+          }
+        ]
+      },
+      {
+        key: "custom-dictionay-words",
+        title: "Custom dictionary words",
+        components: [
+          {
+            type: "custom",
+            component: DictionaryWords
           }
         ]
       }

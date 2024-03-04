@@ -27,6 +27,7 @@ class SpellCheckerStore extends BaseStore<SpellCheckerStore> {
   languages: Language[] = [];
   enabled = true;
   enabledLanguages: Language[] = [];
+  words: string[] = [];
 
   toggleSpellChecker = async () => {
     const enabled = this.get().enabled;
@@ -44,13 +45,18 @@ class SpellCheckerStore extends BaseStore<SpellCheckerStore> {
   };
 
   refresh = async () => {
-    console.log("SPELL CHECK", await desktop?.spellChecker.isEnabled.query());
     this.set({
       enabledLanguages:
         (await desktop?.spellChecker.enabledLanguages.query()) || [],
       languages: (await desktop?.spellChecker.languages.query()) || [],
-      enabled: await desktop?.spellChecker.isEnabled.query()
+      enabled: await desktop?.spellChecker.isEnabled.query(),
+      words: (await desktop?.spellChecker.words.query()) || []
     });
+  };
+
+  deleteWord = async (word: string) => {
+    await desktop?.spellChecker.deleteWord.mutate(word);
+    await this.get().refresh();
   };
 }
 
