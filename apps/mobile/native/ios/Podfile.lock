@@ -484,6 +484,15 @@ PODS:
     - React-Core
   - RNIap (12.11.0):
     - React-Core
+  - RNImageCropPicker (0.40.2):
+    - React-Core
+    - React-RCTImage
+    - RNImageCropPicker/QBImagePickerController (= 0.40.2)
+    - TOCropViewController
+  - RNImageCropPicker/QBImagePickerController (0.40.2):
+    - React-Core
+    - React-RCTImage
+    - TOCropViewController
   - RNKeychain (4.0.5):
     - React
   - RNNotifee (7.4.7):
@@ -547,6 +556,7 @@ PODS:
   - SwiftyRSA (1.7.0):
     - SwiftyRSA/ObjC (= 1.7.0)
   - SwiftyRSA/ObjC (1.7.0)
+  - TOCropViewController (2.6.1)
   - toolbar-android (0.2.1):
     - React
   - Yoga (1.14.0)
@@ -631,6 +641,7 @@ DEPENDENCIES:
   - "RNFlashList (from `../../node_modules/@shopify/flash-list`)"
   - RNGestureHandler (from `../../node_modules/react-native-gesture-handler`)
   - RNIap (from `../../node_modules/react-native-iap`)
+  - RNImageCropPicker (from `../../node_modules/react-native-image-crop-picker`)
   - RNKeychain (from `../../node_modules/react-native-keychain`)
   - "RNNotifee (from `../../node_modules/@ammarahmed/notifee-react-native`)"
   - RNPrivacySnapshot (from `../../node_modules/react-native-privacy-snapshot`)
@@ -658,6 +669,7 @@ SPEC REPOS:
     - SocketRocket
     - SSZipArchive
     - SwiftyRSA
+    - TOCropViewController
 
 EXTERNAL SOURCES:
   boost:
@@ -812,6 +824,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native-gesture-handler"
   RNIap:
     :path: "../../node_modules/react-native-iap"
+  RNImageCropPicker:
+    :path: "../../node_modules/react-native-image-crop-picker"
   RNKeychain:
     :path: "../../node_modules/react-native-keychain"
   RNNotifee:
@@ -929,6 +943,7 @@ SPEC CHECKSUMS:
   RNFlashList: 399bf6a0db68f594ad2c86aaff3ea39564f39f8a
   RNGestureHandler: dec4645026e7401a0899f2846d864403478ff6a5
   RNIap: fc9af04ee706894a80c9d8f979bae930b0dee191
+  RNImageCropPicker: d9616a0cb9b72e8551ff94a7a5021fbd29050aa5
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
   RNNotifee: 1448fd16c2a6f3e8abbc219801bf5be2435183e5
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
@@ -943,9 +958,10 @@ SPEC CHECKSUMS:
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SwiftyRSA: 8c6dd1ea7db1b8dc4fb517a202f88bb1354bc2c6
+  TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   toolbar-android: 2a73856e98b750d7e71ce4644d3f41cc98211719
   Yoga: 1d6727ed193122f6adaf435c3de1a768326ff83b
 
 PODFILE CHECKSUM: 2b8b28a341b202bf3ca5f231b75bb05893486ed8
 
-COCOAPODS: 1.14.2
+COCOAPODS: 1.12.1
