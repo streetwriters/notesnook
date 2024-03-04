@@ -157,6 +157,9 @@ export const useEditorEvents = (
   const defaultFontFamily = useSettingStore(
     (state) => state.settings.defaultFontFamily
   );
+  const markdownShortcuts = useSettingStore(
+    (state) => state.settings.markdownShortcuts
+  );
 
   const tools = useDragState((state) => state.data);
 
@@ -202,7 +205,8 @@ export const useEditorEvents = (
       fontFamily: SettingsService.get().defaultFontFamily,
       dateFormat: db.settings?.getDateFormat(),
       timeFormat: db.settings?.getTimeFormat(),
-      fontScale
+      fontScale,
+      markdownShortcuts
     });
   }, [
     fullscreen,
@@ -222,7 +226,8 @@ export const useEditorEvents = (
     dateFormat,
     timeFormat,
     loading,
-    fontScale
+    fontScale,
+    markdownShortcuts
   ]);
 
   const onBackPress = useCallback(async () => {

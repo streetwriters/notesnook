@@ -584,6 +584,13 @@ export const settingsGroups: SettingSection[] = [
             component: "title-format",
             description: "Customize the formatting for new note title",
             type: "component"
+          },
+          {
+            id: "toggle-markdown",
+            name: "Markdown shortcuts",
+            property: "markdownShortcuts",
+            description: "Toggle markdown in the editor",
+            type: "switch"
           }
         ]
       }

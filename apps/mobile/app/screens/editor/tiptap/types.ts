@@ -53,6 +53,7 @@ export type Settings = {
   dateFormat: string;
   timeFormat: string;
   fontScale: number;
+  markdownShortcuts: boolean;
 };
 
 export type EditorProps = {
