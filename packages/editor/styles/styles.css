@@ -1,6 +1,6 @@
 
 
-.ProseMirror span *:not(.katex) {
+.ProseMirror p span {
   font-family: inherit;
 }
 
