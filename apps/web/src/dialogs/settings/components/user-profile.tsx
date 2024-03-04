@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Image, Text } from "@theme-ui/components";
+import { Flex, Image, Text } from "@theme-ui/components";
 import { Edit, User } from "../../../components/icons";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { getObjectIdTimestamp } from "@notesnook/core/dist/utils/object-id";
@@ -26,7 +26,6 @@ import { SUBSCRIPTION_STATUS } from "../../../common/constants";
 import dayjs from "dayjs";
 import { useMemo } from "react";
 import {
-  showEditProfileDialog,
   showEditProfilePictureDialog,
   showPromptDialog
 } from "../../../common/dialog-controller";
@@ -160,10 +159,10 @@ export function UserProfile() {
             {remainingDays > 0 && (isPro || isProCancelled)
               ? `PRO`
               : remainingDays > 0 && isTrial
-                ? "TRIAL"
-                : isBeta
-                  ? "BETA TESTER"
-                  : "BASIC"}
+              ? "TRIAL"
+              : isBeta
+              ? "BETA TESTER"
+              : "BASIC"}
           </Text>
 
           <Text variant={"title"}>
@@ -179,11 +178,15 @@ export function UserProfile() {
                     "Your profile data is 100% end-to-end encrypted.",
                   defaultValue: profile?.fullName
                 });
-                useUserStore.setState({
-                  profile: { ...profile, fullName: fullName || undefined }
-                });
-                await db.user.setProfile({ fullName: fullName || undefined });
-                showToast("success", "Full name updated!");
+                try {
+                  await db.user.setProfile({ fullName: fullName || undefined });
+                  useUserStore.setState({
+                    profile: { ...profile, fullName: fullName || undefined }
+                  });
+                  showToast("success", "Full name updated!");
+                } catch (e) {
+                  showToast("error", (e as Error).message);
+                }
               }}
             />
           </Text>
