@@ -138,16 +138,6 @@ symbols (e.g. 202305261253)`,
         ]
       },
       {
-        key: "dictionay-words",
-        title: "Dictionary Words",
-        components: [
-          {
-            type: "custom",
-            component: DictionaryWords
-          }
-        ]
-      },
-      {
         key: "spell-checker-languages",
         title: "Languages",
         description: "Select the languages the spell checker should check in.",
@@ -158,6 +148,16 @@ symbols (e.g. 202305261253)`,
           {
             type: "custom",
             component: SpellCheckerLanguages
+          }
+        ]
+      },
+      {
+        key: "custom-dictionay-words",
+        title: "Custom dictionary words",
+        components: [
+          {
+            type: "custom",
+            component: DictionaryWords
           }
         ]
       }

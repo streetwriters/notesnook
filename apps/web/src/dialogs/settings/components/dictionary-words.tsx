@@ -17,35 +17,35 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Label } from "@theme-ui/components";
-import { useEffect } from "react";
+import { Button, Text } from "@theme-ui/components";
 import { FlexScrollContainer } from "../../../components/scroll-container";
-import { useStore as useSettingStore } from "../../../stores/setting-store";
+import { useSpellChecker } from "../../../hooks/use-spell-checker";
 
 export function DictionaryWords() {
-  const words = useSettingStore((store) => store.dictionaryWords);
-  const deleteWord = useSettingStore((store) => store.deleteDictionaryWords);
-  const refresh = useSettingStore((store) => store.refresh);
-
-  useEffect(() => {
-    async () => await refresh();
-  });
+  const words = useSpellChecker((store) => store.words);
+  const deleteWord = useSpellChecker((store) => store.deleteWord);
 
   return (
     <>
-      <FlexScrollContainer suppressAutoHide style={{ maxHeight: 400 }}>
-        {words?.map((word) => (
-          <Label key={word} variant="text.body" sx={{ mb: 1 }}>
-            <Button
-              variant="menuitem"
-              onClick={async () => {
-                await deleteWord(word);
-                await refresh();
-              }}
-            >
-              {word}
-            </Button>
-          </Label>
+      <FlexScrollContainer
+        suppressAutoHide
+        style={{
+          maxHeight: 400,
+          display: "flex",
+          flexDirection: "column"
+        }}
+      >
+        <Text variant="body" sx={{ my: 1 }}>
+          You have {words.length} custom dictionary words.
+        </Text>
+        {words.map((word) => (
+          <Button
+            variant="menuitem"
+            sx={{ textAlign: "left", p: 1 }}
+            onClick={() => deleteWord(word)}
+          >
+            {word}
+          </Button>
         ))}
       </FlexScrollContainer>
     </>

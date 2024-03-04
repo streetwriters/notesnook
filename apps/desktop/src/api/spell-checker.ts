@@ -118,5 +118,13 @@ export const spellCheckerRouter = t.router({
     .mutation(({ input: { enabled } }) => {
       globalThis.window?.webContents.session.setSpellCheckerEnabled(enabled);
       config.isSpellCheckerEnabled = enabled;
-    })
+    }),
+  words: t.procedure.query(() =>
+    globalThis.window?.webContents.session.listWordsInSpellCheckerDictionary()
+  ),
+  deleteWord: t.procedure.input(z.string()).mutation(({ input: word }) => {
+    globalThis.window?.webContents.session.removeWordFromSpellCheckerDictionary(
+      word
+    );
+  })
 });
