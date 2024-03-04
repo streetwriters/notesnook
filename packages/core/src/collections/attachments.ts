@@ -415,28 +415,32 @@ export class Attachments implements ICollection {
 
   get images() {
     return this.collection.createFilter<Attachment>(
-      (qb) => qb.where("mimeType", "like", `image/%`),
+      (qb) => qb.where(isFalse("deleted")).where("mimeType", "like", `image/%`),
       this.db.options?.batchSize
     );
   }
 
   get videos() {
     return this.collection.createFilter<Attachment>(
-      (qb) => qb.where("mimeType", "like", `video/%`),
+      (qb) => qb.where(isFalse("deleted")).where("mimeType", "like", `video/%`),
       this.db.options?.batchSize
     );
   }
 
   get documents() {
     return this.collection.createFilter<Attachment>(
-      (qb) => qb.where("mimeType", "in", DocumentMimeTypes),
+      (qb) =>
+        qb.where(isFalse("deleted")).where("mimeType", "in", DocumentMimeTypes),
       this.db.options?.batchSize
     );
   }
 
   get webclips() {
     return this.collection.createFilter<Attachment>(
-      (qb) => qb.where("mimeType", "==", `application/vnd.notesnook.web-clip`),
+      (qb) =>
+        qb
+          .where(isFalse("deleted"))
+          .where("mimeType", "==", `application/vnd.notesnook.web-clip`),
       this.db.options?.batchSize
     );
   }
@@ -444,13 +448,15 @@ export class Attachments implements ICollection {
   get orphaned() {
     return this.collection.createFilter<Attachment>(
       (qb) =>
-        qb.where("id", "not in", (eb) =>
-          eb
-            .selectFrom("relations")
-            .where("toType", "==", "attachment")
-            .select("toId as id")
-            .$narrowType<{ id: string }>()
-        ),
+        qb
+          .where(isFalse("deleted"))
+          .where("id", "not in", (eb) =>
+            eb
+              .selectFrom("relations")
+              .where("toType", "==", "attachment")
+              .select("toId as id")
+              .$narrowType<{ id: string }>()
+          ),
       this.db.options?.batchSize
     );
   }
