@@ -66,7 +66,9 @@ export const ChangePassword = () => {
     }
     setLoading(true);
     try {
-      await BackupService.run(false, "change-password-dialog");
+      const result = await BackupService.run(false, "change-password-dialog");
+      if (!result) throw new Error("Failed to create backup");
+
       await db.user.clearSessions();
       await db.user.changePassword(oldPassword.current, password.current);
       ToastEvent.show({
