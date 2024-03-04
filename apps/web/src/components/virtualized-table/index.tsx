@@ -36,6 +36,7 @@ type VirtualizedTableProps<T, C> = {
   mode?: "fixed" | "dynamic";
   items: T[];
   estimatedSize: number;
+  headerSize: number;
   getItemKey: (index: number) => string;
   scrollElement?: Element | null;
   context?: C;
@@ -50,6 +51,7 @@ export function VirtualizedTable<T, C>(props: VirtualizedTableProps<T, C>) {
     getItemKey,
     scrollElement,
     scrollMargin,
+    headerSize,
     renderRow: Row,
     estimatedSize,
     mode,
@@ -76,7 +78,7 @@ export function VirtualizedTable<T, C>(props: VirtualizedTableProps<T, C>) {
     <Box
       ref={containerRef}
       sx={{
-        height: virtualizer.getTotalSize()
+        height: virtualizer.getTotalSize() + headerSize
       }}
     >
       <table style={style}>

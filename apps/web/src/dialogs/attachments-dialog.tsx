@@ -317,6 +317,7 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
                 }
                 mode="fixed"
                 estimatedSize={30}
+                headerSize={40}
                 getItemKey={(index) => attachments.key(index)}
                 items={attachments.placeholders}
                 context={{
