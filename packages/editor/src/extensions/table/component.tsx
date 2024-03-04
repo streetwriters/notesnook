@@ -230,7 +230,9 @@ function TableColumnToolbar(props: TableToolbarProps) {
         yOffset: 2
       });
 
-      columnToolsRef.current.style.left = `${pos.left}px`;
+      columnToolsRef.current.style.left = `${
+        pos.left - (table.current.parentElement?.scrollLeft || 0)
+      }px`;
       columnToolsRef.current.style.top = `${pos.top}px`;
     }
 
