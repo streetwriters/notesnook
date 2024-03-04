@@ -153,7 +153,8 @@ function getErrorHelp(props: FallbackProps) {
   const errorText = errorToString(error);
   if (
     errorText.includes("file is not a database") ||
-    errorText.includes("unsupported file format")
+    errorText.includes("unsupported file format") ||
+    errorText.includes("database disk image is malformed")
   ) {
     return {
       explanation: `This error usually means the database file is either corrupt or it could not be decrypted.`,
