@@ -2,7 +2,7 @@
   "name": "@notesnook/desktop",
   "productName": "Notesnook",
   "description": "Your private note taking space",
-  "version": "3.0.4-beta",
+  "version": "3.0.5-beta",
   "appAppleId": "1544027013",
   "private": true,
   "main": "./dist/index.js",
