@@ -32,6 +32,8 @@ import { Button } from "../ui/button";
 import Input from "../ui/input";
 import { Notice } from "../ui/notice";
 import Seperator from "../ui/seperator";
+import { Dialog } from "../dialog";
+import BackupService from "../../services/backup";
 
 export const ChangePassword = () => {
   const passwordInputRef = useRef();
@@ -64,6 +66,7 @@ export const ChangePassword = () => {
     }
     setLoading(true);
     try {
+      await BackupService.run(false, "change-password-dialog");
       await db.user.clearSessions();
       await db.user.changePassword(oldPassword.current, password.current);
       ToastEvent.show({
@@ -92,6 +95,7 @@ export const ChangePassword = () => {
         padding: 12
       }}
     >
+      <Dialog context="change-password-dialog" />
       <DialogHeader
         title="Change password"
         paragraph="Enter your old and new passwords"
