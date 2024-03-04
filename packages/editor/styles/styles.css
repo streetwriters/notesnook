@@ -1,6 +1,6 @@
 
 
-.ProseMirror span * {
+.ProseMirror p span {
   font-family: inherit;
 }
 
