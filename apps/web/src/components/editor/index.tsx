@@ -54,8 +54,7 @@ import { ScopedThemeProvider } from "../theme-provider";
 import { Lightbox } from "../lightbox";
 import { Allotment } from "allotment";
 import { showToast } from "../../utils/toast";
-import { getFormattedDate } from "@notesnook/common";
-import { useWindowSize } from "../../hooks/use-window-size";
+import { debounce, getFormattedDate } from "@notesnook/common";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -446,18 +445,38 @@ function EditorChrome(
       isMobile: false
     };
   const editorMargins = useStore((store) => store.editorMargins);
-  const [width] = useWindowSize();
-  const [xSpace, setXSpace] = useState(0);
+  const editorContainerRef = useRef<HTMLElement>(null);
+  const editorScrollRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const parent = document
-      .getElementsByClassName("editorScroll")[0]
-      .getBoundingClientRect();
-    const child = document
-      .getElementsByClassName("editor")[0]
-      .getBoundingClientRect();
-    setXSpace(Math.abs(parent.left - child.left));
-  }, [width]);
+    if (!editorScrollRef.current) return;
+    function onResize(
+      entries: ResizeObserverEntry[],
+      _observer: ResizeObserver
+    ) {
+      const editor = editorContainerRef.current?.querySelector(
+        ".ProseMirror"
+      ) as HTMLElement | undefined;
+      const parent = editorScrollRef.current?.getBoundingClientRect();
+      const child = editorContainerRef.current?.getBoundingClientRect();
+      if (!parent || !child || !editor || entries.length <= 0) return;
+
+      const CONTAINER_MARGIN = 30;
+      const negativeSpace = Math.abs(
+        parent.left - child.left - CONTAINER_MARGIN
+      );
+
+      editor.style.marginLeft = `-${negativeSpace}px`;
+      editor.style.marginRight = `-${negativeSpace}px`;
+      editor.style.paddingLeft = `${negativeSpace}px`;
+      editor.style.paddingRight = `${negativeSpace}px`;
+    }
+    const observer = new ResizeObserver(debounce(onResize, 500));
+    observer.observe(editorScrollRef.current);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   if (headless) return <>{children}</>;
 
@@ -482,23 +501,21 @@ function EditorChrome(
 
       <Toolbar />
       <FlexScrollContainer
+        scrollRef={editorScrollRef}
         className="editorScroll"
         style={{ display: "flex", flexDirection: "column", flex: 1 }}
       >
         <Flex
+          ref={editorContainerRef}
           variant="columnFill"
           className="editor"
           sx={{
             alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
             maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
-            width: "100%",
-            "& .ProseMirror": {
-              marginX: -xSpace,
-              paddingX: xSpace
-            }
+            width: "100%"
           }}
           pl={6}
-          pr={2}
+          pr={6}
           onClick={onRequestFocus}
         >
           {!isMobile && (
