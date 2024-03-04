@@ -115,7 +115,7 @@ What data is collected & when?`,
         key: "custom-cors",
         title: "Custom CORS proxy",
         description:
-          "CORS proxy is required to directly download images from within the Notesnook app. It allows Notesnook to bypass browser restrictions by using a proxy. You can set a custom self-hosted proxy URL to increase your privacy",
+          "CORS proxy is required to directly download images from within the Notesnook app. It allows Notesnook to bypass browser restrictions by using a proxy. You can set a custom self-hosted proxy URL to increase your privacy.",
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.telemetry, listener),
         components: [
@@ -142,6 +142,30 @@ What data is collected & when?`,
               }
             },
             variant: "secondary"
+          }
+        ]
+      },
+      {
+        key: "proxy-config",
+        title: "Proxy",
+        description: `Setup an HTTP/HTTPS/SOCKS proxy.
+        
+For example:
+http://foobar:80
+socks4://proxy.example.com
+http://username:password@foobar:80
+
+To remove the proxy, simply erase everything in the input.`,
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((c) => c.proxyRules, listener),
+        components: [
+          {
+            type: "input",
+            inputType: "text",
+            defaultValue: () => useSettingStore.getState().proxyRules || "",
+            onChange: (value) => {
+              useSettingStore.getState().setProxyRules(value);
+            }
           }
         ]
       }

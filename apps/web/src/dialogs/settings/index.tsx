@@ -36,7 +36,8 @@ import {
   Privacy,
   Pro,
   ShieldLock,
-  Sync
+  Sync,
+  Proxy
 } from "../../components/icons";
 import { Perform } from "../../common/dialog-controller";
 import NavigationItem from "../../components/navigation-menu/navigation-item";
@@ -65,7 +66,6 @@ import {
 import { AppearanceSettings } from "./appearance-settings";
 import { debounce } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
-import { alpha } from "@theme-ui/color";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 
 type SettingsDialogProps = { onClose: Perform };
