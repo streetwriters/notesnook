@@ -27,7 +27,7 @@ Name=${app.getName()}
 Comment=${app.getName()} startup script
 Exec=${
   process.env.APPIMAGE
-    ? process.env.APPIMAGE
+    ? `${process.env.APPIMAGE}${hidden ? " --hidden" : ""}`
     : `${process.execPath}${hidden ? " --hidden" : ""}`
 }
 StartupNotify=false
