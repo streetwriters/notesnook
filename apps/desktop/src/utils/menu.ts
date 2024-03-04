@@ -131,6 +131,17 @@ function setupMenu() {
       );
     }
 
+    if (params.mediaType === "image")
+      menu.append(
+        new MenuItem({
+          id: "copy-image",
+          label: "Copy Image",
+          click() {
+            globalThis.window?.webContents.copyImageAt(params.x, params.y);
+          }
+        })
+      );
+
     if (params.isEditable)
       menu.append(
         new MenuItem({
