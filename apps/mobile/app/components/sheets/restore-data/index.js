@@ -17,17 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getFormattedDate } from "@notesnook/common";
 import { EVENTS } from "@notesnook/core/dist/common";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import RNFetchBlob from "react-native-blob-util";
-import DocumentPicker, {
-  DocumentPickerResponse
-} from "react-native-document-picker";
+import DocumentPicker from "react-native-document-picker";
 import * as ScopedStorage from "react-native-scoped-storage";
+import { unzip } from "react-native-zip-archive";
 import { db } from "../../../common/database";
 import storage from "../../../common/database/storage";
+import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
 import {
   ToastEvent,
   eSubscribeEvent,
@@ -35,7 +37,6 @@ import {
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { initialize } from "../../../stores";
-import { useThemeColors } from "@notesnook/theme";
 import { eCloseRestoreDialog, eOpenRestoreDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
@@ -46,9 +47,6 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
-import { getFormattedDate } from "@notesnook/common";
-import { unzip } from "react-native-zip-archive";
-import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
 
 const RestoreDataSheet = () => {
   const [visible, setVisible] = useState(false);
@@ -184,7 +182,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         title: "Encrypted backup",
         input: true,
         inputPlaceholder: "Password",
-        paragraph: "Please enter password of this backup file to restore it",
+        paragraph: "Please enter password of this backup file",
         positiveText: "Restore",
         secureTextEntry: true,
         onClose: () => {
@@ -192,10 +190,17 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
           resolve(undefined);
         },
         negativeText: "Cancel",
-        positivePress: async (password) => {
-          resolve(password);
+        positivePress: async (password, isEncryptionKey) => {
+          resolve({
+            value: password,
+            isEncryptionKey
+          });
           resolved = true;
           return true;
+        },
+        check: {
+          info: "Use encryption key",
+          type: "transparent"
         }
       });
     });
@@ -235,8 +240,8 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
     }
   };
 
-  const restoreBackup = async (backup, password) => {
-    await db.backup.import(backup, password);
+  const restoreBackup = async (backup, password, key) => {
+    await db.backup.import(backup, password, key);
     await db.initCollections();
     initialize();
     ToastEvent.show({
@@ -279,6 +284,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
       }
 
       let password;
+      let key;
 
       console.log(`Found ${backupFiles?.length} files to restore from backup`);
       for (const path of backupFiles) {
@@ -289,10 +295,16 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
 
         if (parsed.encrypted && !password) {
           console.log("Backup is encrypted...", "requesting password");
-          password = await withPassword();
-          if (!password) throw new Error("Failed to decrypt backup");
+          const { value, isEncryptionKey } = await withPassword();
+
+          if (isEncryptionKey) {
+            key = value;
+          } else {
+            password = value;
+          }
+          if (!password && !key) throw new Error("Failed to decrypt backup");
         }
-        await db.backup.import(parsed, password);
+        await db.backup.import(parsed, password, key);
         console.log("Imported", path);
       }
       // Remove files from cache
@@ -323,10 +335,19 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   async function restoreFromNNBackup(backup) {
     try {
       if (backup.data.iv && backup.data.salt) {
-        const password = await withPassword();
-        if (password) {
+        const { value, isEncryptionKey } = await withPassword();
+
+        let key;
+        let password;
+        if (isEncryptionKey) {
+          key = value;
+        } else {
+          password = value;
+        }
+
+        if (key || password) {
           try {
-            await restoreBackup(backup, password);
+            await restoreBackup(backup, password, key);
             close();
             setRestoring(false);
           } catch (e) {

@@ -36,7 +36,7 @@ function confirmDeleteAllNotes(items, type, context) {
       }?`,
       positiveText: "Delete",
       negativeText: "Cancel",
-      positivePress: (value) => {
+      positivePress: (_inputValue, value) => {
         setTimeout(() => {
           resolve({ delete: true, deleteNotes: value });
         });
