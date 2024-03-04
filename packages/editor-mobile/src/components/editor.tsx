@@ -100,9 +100,16 @@ const Tiptap = ({ settings }: { settings: Settings }) => {
         corsHost: settings.corsProxy
       },
       dateFormat: settings.dateFormat,
-      timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined
+      timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined,
+      enableInputRules: settings.markdownShortcuts
     },
-    [layout, settings.readonly, tick, settings.doubleSpacedLines]
+    [
+      layout,
+      settings.readonly,
+      tick,
+      settings.doubleSpacedLines,
+      settings.markdownShortcuts
+    ]
   );
 
   const update = useCallback(() => {

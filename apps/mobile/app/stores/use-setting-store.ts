@@ -74,6 +74,7 @@ export type Settings = {
   colorScheme: "dark" | "light";
   lighTheme: ThemeDefinition;
   darkTheme: ThemeDefinition;
+  markdownShortcuts?: boolean;
 };
 
 type DimensionsType = {
@@ -154,7 +155,8 @@ export const defaultSettings: SettingStore["settings"] = {
   defaultFontSize: 16,
   colorScheme: "light",
   lighTheme: ThemeLight,
-  darkTheme: ThemeDark
+  darkTheme: ThemeDark,
+  markdownShortcuts: true
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
