@@ -25,7 +25,11 @@ Type=Application
 Version=${app.getVersion()}
 Name=${app.getName()}
 Comment=${app.getName()} startup script
-Exec=${process.execPath}${hidden ? " --hidden" : ""}
+Exec=${
+  process.env.APPIMAGE
+    ? `${process.env.APPIMAGE}${hidden ? " --hidden" : ""}`
+    : `${process.execPath}${hidden ? " --hidden" : ""}`
+}
 StartupNotify=false
 Terminal=false`;
 
