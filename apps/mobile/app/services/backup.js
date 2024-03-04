@@ -213,10 +213,12 @@ async function run(progress, context) {
     RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
     updateNextBackupTime();
 
-    let showBackupCompleteSheet = SettingsService.get().showBackupCompleteSheet;
+    let showBackupCompleteSheet =
+      progress && SettingsService.get().showBackupCompleteSheet;
 
     if (context) return path;
     await sleep(300);
+
     if (showBackupCompleteSheet) {
       presentBackupCompleteSheet(backupFilePath);
     } else {
@@ -233,7 +235,7 @@ async function run(progress, context) {
     return path;
   } catch (e) {
     await sleep(300);
-    eSendEvent(eCloseSheet);
+    progress && eSendEvent(eCloseSheet);
     ToastEvent.error(e, "Backup failed!");
     return null;
   }
