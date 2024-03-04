@@ -75,7 +75,7 @@ class SettingStore extends BaseStore {
       privacyMode: await desktop?.integration.privacyMode.query(),
       zoomFactor: await desktop?.integration.zoomFactor.query(),
       autoUpdates: await desktop?.updater.autoUpdates.query(),
-      proxyRules: await desktop.integration.proxyConfig.query()
+      proxyRules: await desktop.integration.proxyRules.query()
     });
   };
 
@@ -105,8 +105,8 @@ class SettingStore extends BaseStore {
   };
 
   setProxyRules = async (proxyRules) => {
-    await desktop?.integration.setProxyConfig.mutate(proxyRules);
-    this.set({ proxyRules: proxyRules });
+    await desktop?.integration.setProxyRules.mutate(proxyRules);
+    this.set({ proxyRules });
   };
 
   setEncryptBackups = (encryptBackups) => {

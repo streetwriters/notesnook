@@ -54,8 +54,8 @@ export const osIntegrationRouter = t.router({
     config.zoomFactor = factor;
   }),
 
-  proxyConfig: t.procedure.query(() => config.proxyRules),
-  setProxyConfig: t.procedure
+  proxyRules: t.procedure.query(() => config.proxyRules),
+  setProxyRules: t.procedure
     .input(z.string().optional())
     .mutation(({ input: proxyRules }) => {
       globalThis.window?.webContents.session.setProxy({ proxyRules });

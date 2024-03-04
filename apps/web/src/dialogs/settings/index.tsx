@@ -58,7 +58,6 @@ import { ImporterSettings } from "./importer-settings";
 import { VaultSettings } from "./vault-settings";
 import { PrivacySettings } from "./privacy-settings";
 import { EditorSettings } from "./editor-settings";
-import { ProxySettings } from "./proxy-settings";
 import {
   AboutSettings,
   LegalSettings,
@@ -110,13 +109,7 @@ const sectionGroups: SectionGroup[] = [
         icon: Desktop,
         isHidden: () => !IS_DESKTOP_APP
       },
-      { key: "notifications", title: "Notifications", icon: Notification },
-      {
-        key: "proxy",
-        title: "Proxy",
-        icon: Proxy,
-        isHidden: () => !IS_DESKTOP_APP
-      }
+      { key: "notifications", title: "Notifications", icon: Notification }
     ]
   },
   {
@@ -162,8 +155,7 @@ const SettingsGroups = [
   ...LegalSettings,
   ...SupportSettings,
   ...AboutSettings,
-  ...SubscriptionSettings,
-  ...ProxySettings
+  ...SubscriptionSettings
 ];
 
 // Thoughts:
