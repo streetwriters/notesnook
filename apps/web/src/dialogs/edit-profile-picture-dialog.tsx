@@ -64,8 +64,8 @@ export default function EditProfilePictureDialog(
                   .getImageScaledToCanvas()
                   .toDataURL("image/jpeg", 0.8)
               : clearProfilePicture
-                ? undefined
-                : profile?.profilePicture;
+              ? undefined
+              : profile?.profilePicture;
             await db.user.setProfile({
               profilePicture: pic
             });
@@ -124,7 +124,7 @@ export default function EditProfilePictureDialog(
             sx={{ flex: 1 }}
             variant="secondary"
             onClick={async () => {
-              const file = await showFilePicker({
+              const [file] = await showFilePicker({
                 acceptedFileTypes: "image/*"
               });
               if (!file) return;
