@@ -61,10 +61,16 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
 
   const refresh = React.useCallback(() => {
     if (note) {
-      db.attachments.ofNote(note.id, "all").sorted(DEFAULT_SORTING);
+      db.attachments.ofNote(note.id, "all").sorted({
+        ...DEFAULT_SORTING,
+        sortBy: "dateModified"
+      });
     } else {
       db.attachments.all
-        .sorted(DEFAULT_SORTING)
+        .sorted({
+          ...DEFAULT_SORTING,
+          sortBy: "dateModified"
+        })
         .then((attachments) => setAttachments(attachments));
     }
   }, [note]);
@@ -170,7 +176,10 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
           : db.attachments.documents;
     }
 
-    return await items.sorted(DEFAULT_SORTING);
+    return await items.sorted({
+      ...DEFAULT_SORTING,
+      sortBy: "dateModified"
+    });
   };
 
   return (
