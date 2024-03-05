@@ -31,7 +31,6 @@ import * as signalr from "@microsoft/signalr";
 import Merger from "./merger";
 import Conflicts from "./conflicts";
 import { AutoSync } from "./auto-sync";
-import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
 import { logger } from "../../logger";
 import { Mutex } from "async-mutex";
 import { migrateItem } from "../../migrations";
@@ -144,7 +143,7 @@ class Sync {
           }
         }
       })
-      .withHubProtocol(new MessagePackHubProtocol({ ignoreUndefined: true }))
+      .withHubProtocol(new signalr.JsonHubProtocol())
       .build();
     this.connection.serverTimeoutInMilliseconds = 60 * 1000 * 5;
     EV.subscribe(EVENTS.userLoggedOut, async () => {

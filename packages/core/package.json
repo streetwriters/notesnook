@@ -38,8 +38,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@microsoft/signalr": "^7.0.10",
-    "@microsoft/signalr-protocol-msgpack": "^7.0.10",
+    "@microsoft/signalr": "^8.0.0",
     "@notesnook/logger": "file:../logger",
     "@readme/data-urls": "^3.0.0",
     "@streetwriters/showdown": "^3.0.5-alpha",
