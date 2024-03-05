@@ -94,24 +94,21 @@ class Vault {
   }
 
   static lockNote(id) {
-    return new Promise(function lock(resolve) {
-      db.vault
-        .add(id)
-        .then(resolve)
-        .catch(({ message }) => {
-          switch (message) {
-            case db.vault.ERRORS.noVault:
-              return Vault.createVault();
-            case db.vault.ERRORS.vaultLocked:
-              return Vault.unlockVault();
-            default:
-              showToast("error", message);
-              console.error(message);
-              return false;
-          }
-        })
-        .then((result) => result && lock(resolve));
-    });
+    return db.vault
+      .add(id)
+      .then(() => true)
+      .catch(({ message }) => {
+        switch (message) {
+          case db.vault.ERRORS.noVault:
+            return Vault.createVault().then(() => Vault.lockNote(id));
+          case db.vault.ERRORS.vaultLocked:
+            return Vault.unlockVault().then(() => Vault.lockNote(id));
+          default:
+            showToast("error", message);
+            console.error(message);
+            return false;
+        }
+      });
   }
 
   static askPassword(action) {
