@@ -290,12 +290,14 @@ class EditorStore extends BaseStore {
         state: SESSION_STATES.new
       };
     });
-    noteStore.setSelectedNote(0);
-    this.toggleProperties(false);
-    if (shouldNavigate)
-      hashNavigate(`/notes/create`, { replace: true, addNonce: true });
-    setTimeout(() => appStore.setIsEditorOpen(false), 100);
-    setDocumentTitle();
+    setTimeout(() => {
+      noteStore.setSelectedNote(0);
+      this.toggleProperties(false);
+      if (shouldNavigate)
+        hashNavigate(`/notes/create`, { replace: true, addNonce: true });
+      appStore.setIsEditorOpen(false);
+      setDocumentTitle();
+    }, 100);
   };
 
   setTitle = (noteId, title) => {
