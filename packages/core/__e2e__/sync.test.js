@@ -223,7 +223,7 @@ test(
     const handler = vitest.fn();
     deviceB.eventManager.subscribe(EVENTS.syncProgress, handler);
 
-    await deviceB.sync(true);
+    await deviceB.sync({ type: "full" });
 
     expect(handler).not.toHaveBeenCalled();
 
@@ -415,7 +415,7 @@ async function initializeDevice(id, capabilities = []) {
 
   await device.user.resetUser(false);
 
-  await device.sync(true, false);
+  await device.sync({ type: "full" });
 
   console.timeEnd(`Init ${id}`);
   return device;
@@ -448,7 +448,13 @@ function syncAndWait(deviceA, deviceB, force = false) {
       (full, force, lastSynced) => {
         console.log("sync requested by device A", full, force, lastSynced);
         ref2.unsubscribe();
-        deviceB.sync(full, force, lastSynced).catch(reject);
+        deviceB
+          .sync({
+            type: full ? "full" : "send",
+            force,
+            serverLastSynced: lastSynced
+          })
+          .catch(reject);
       }
     );
 
@@ -466,6 +472,6 @@ function syncAndWait(deviceA, deviceB, force = false) {
       deviceB.syncer.sync.syncing
     );
 
-    deviceA.sync(true, force).catch(reject);
+    deviceA.sync({ type: "full", force }).catch(reject);
   });
 }
