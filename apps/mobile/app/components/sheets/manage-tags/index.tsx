@@ -30,7 +30,8 @@ import React, {
   useState
 } from "react";
 import { TextInput, View, useWindowDimensions } from "react-native";
-import { ActionSheetRef, FlatList } from "react-native-actions-sheet";
+import { ActionSheetRef } from "react-native-actions-sheet";
+import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import { useDBItem } from "../../../hooks/use-db-item";
@@ -301,37 +302,42 @@ const ManageTagsSheet = (props: {
         </Pressable>
       ) : null}
 
-      <FlatList
-        data={tags?.placeholders}
+      <View
         style={{
-          width: "100%"
+          width: "100%",
+          flexGrow: 1,
+          height: "100%"
         }}
-        keyboardShouldPersistTaps
-        keyboardDismissMode="interactive"
-        keyExtractor={(item) => item + "_tag"}
-        renderItem={renderTag}
-        ListEmptyComponent={
-          <View
-            style={{
-              width: "100%",
-              height: 200,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Heading size={50} color={colors.secondary.heading}>
-              #
-            </Heading>
-            <Paragraph
-              textBreakStrategy="balanced"
-              color={colors.secondary.paragraph}
+      >
+        <FlashList
+          data={tags?.placeholders}
+          keyboardShouldPersistTaps
+          keyboardDismissMode="interactive"
+          estimatedItemSize={50}
+          renderItem={renderTag}
+          ListEmptyComponent={
+            <View
+              style={{
+                width: "100%",
+                height: 200,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
             >
-              You do not have any tags.
-            </Paragraph>
-          </View>
-        }
-        ListFooterComponent={<View style={{ height: 50 }} />}
-      />
+              <Heading size={50} color={colors.secondary.heading}>
+                #
+              </Heading>
+              <Paragraph
+                textBreakStrategy="balanced"
+                color={colors.secondary.paragraph}
+              >
+                You do not have any tags.
+              </Paragraph>
+            </View>
+          }
+          ListFooterComponent={<View style={{ height: 50 }} />}
+        />
+      </View>
     </View>
   );
 };
