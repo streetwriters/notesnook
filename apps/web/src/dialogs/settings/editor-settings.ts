@@ -114,24 +114,23 @@ symbols (e.g. 202305261253)`,
         ]
       },
       {
-        key: "input-rules",
-        title: "Input rules",
-        description: `Input rules are triggered whenever you input a specific character combination.
+        key: "markdown-shortcuts",
+        title: "Markdown shortcuts",
+        description: `Markdown shortcuts are triggered whenever you input a specific character combination.
         
-A few examples of this:
+For example:
 
 1. Typing '/date' adds the current Date
 2. Wrapping something in '**' turns it into bold text
 3. Typing '1.' automatically creates a numbered list.
-
-This behavior can be disabled via this setting.`,
+4. etc.`,
         onStateChange: (listener) =>
-          useSettingStore.subscribe((c) => c.inputRules, listener),
+          useSettingStore.subscribe((c) => c.markdownShortcuts, listener),
         components: [
           {
             type: "toggle",
-            isToggled: () => useSettingStore.getState().inputRules,
-            toggle: () => useSettingStore.getState().toggleInputRules()
+            isToggled: () => useSettingStore.getState().markdownShortcuts,
+            toggle: () => useSettingStore.getState().toggleMarkdownShortcuts()
           }
         ]
       }
