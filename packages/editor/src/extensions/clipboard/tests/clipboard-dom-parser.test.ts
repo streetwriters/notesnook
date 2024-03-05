@@ -77,6 +77,26 @@ and yet, we somehow manage to get by.<br>
   you</p>
   
   </div>`
+  ],
+  [
+    `<div>
+  <p style="line-height: 100%; margin-bottom: 0in">
+  I am not talking to you</p>
+  <br/>
+  <p>I am talking to you</p>
+  </div>`
+  ],
+  [
+    `<div>
+    <!--StartFragment--><p><span>Hello</span></p><br><br><br><br><br><p><span >world</span></p><!--EndFragment-->
+    
+    </div>`
+  ],
+  [
+    `<div>
+    <!--StartFragment--><meta charset="utf-8"><h1><span >Write notes</span></h1><br><p dir="ltr" ><span >Welcome of </span><a><span >Notesnook</span></a><span >, an syncing.</span></p><br><p dir="ltr" ><span >Enjoy the read!</span></p><br><p dir="ltr" ><span ><span ><img></span></span></p><br><p dir="ltr" ><span >vision?</span></p><br><p dir="ltr" ><span >everyone means</span></p><!--EndFragment-->
+    
+    </div>`
   ]
 ];
 
