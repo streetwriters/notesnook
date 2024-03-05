@@ -75,7 +75,7 @@ const ReminderItem = React.memo(
             }}
             size={SIZE.md}
           >
-            {item.title} lasdk alkaskd aklskd sadl alksd kalskd aslkd laskldk sa
+            {item.title}
           </Heading>
 
           {item.description ? (
