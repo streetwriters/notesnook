@@ -74,20 +74,28 @@ export function formatCodeblocks(dom: HTMLElement | Document) {
 export function convertBrToSingleSpacedParagraphs(dom: HTMLElement | Document) {
   for (const br of dom.querySelectorAll("br")) {
     let paragraph = br.closest("p");
-    // if no paragraph is found over the br, we add one.
-    if (!paragraph && br.parentElement && br.parentElement.parentElement) {
-      const parent = br.parentElement;
-      const p = document.createElement("p");
-      p.append(...parent.childNodes);
-      parent.append(p);
-      paragraph = p;
-    }
-    //if br is directly under root element
-    if (!paragraph && !br.parentElement?.parentElement) {
-      const next = br.nextElementSibling;
+
+    if (!paragraph) {
+      // we split and wrap all text nodes into their own single spaced
+      // paragraphs
+      const nodes = getSiblingTextNodes(br);
+      if (nodes.length > 0) {
+        paragraph = document.createElement("p");
+        paragraph.dataset.spacing = "single";
+        paragraph.append(...nodes);
+        br.replaceWith(paragraph);
+        continue;
+      }
+
+      // we convert the next pargraph into a single spaced paragraph
+      if (br.nextElementSibling instanceof HTMLParagraphElement) {
+        br.nextElementSibling.dataset.spacing = "single";
+      }
+
+      // just convert all br tags into single spaced paragraphs
       const newParagraph = document.createElement("p");
-      br.parentElement?.insertBefore(newParagraph, next);
-      br.remove();
+      newParagraph.dataset.spacing = "single";
+      br.replaceWith(newParagraph);
     }
 
     if (
@@ -103,7 +111,7 @@ export function convertBrToSingleSpacedParagraphs(dom: HTMLElement | Document) {
 
     if (paragraph) {
       splitOn(paragraph, br);
-      const children = Array.from(paragraph.childNodes.values());
+      const children = Array.from(paragraph.childNodes);
       const newParagraph = document.createElement("p");
       newParagraph.dataset.spacing = "single";
       newParagraph.append(...children.slice(children.indexOf(br) + 1));
@@ -128,4 +136,14 @@ function splitOn(bound: Element, cutElement: Element) {
       grandparent?.insertBefore(cutElement, right);
     }
   }
+}
+
+function getSiblingTextNodes(element: ChildNode) {
+  const siblings = [];
+  let sibling: ChildNode | null = element;
+  while ((sibling = sibling.previousSibling)) {
+    if (sibling.nodeType === Node.ELEMENT_NODE) break;
+    else if (sibling.nodeType === Node.TEXT_NODE) siblings.push(sibling);
+  }
+  return siblings;
 }

@@ -11,14 +11,12 @@ exports[`convert br tags to paragraphs 4`] = `"<p>line <span><em>1</em></span></
 exports[`convert br tags to paragraphs 5`] = `"<p></p>"`;
 
 exports[`convert br tags to paragraphs 6`] = `
-"<p>
-<!--StartFragment-->A troll, they call me, but I have no wish</p><p data-spacing=\\"single\\">
+"<!--StartFragment--><p data-spacing=\\"single\\">A troll, they call me, but I have no wish
+</p><p data-spacing=\\"single\\">
 to be associated with those dolls</p><p data-spacing=\\"single\\">
 </p><p data-spacing=\\"single\\">
 We lack religion, purpose, politics,</p><p data-spacing=\\"single\\">
-and yet, we somehow manage to get by.</p><p data-spacing=\\"single\\">
-
-  </p>"
+and yet, we somehow manage to get by.</p>"
 `;
 
 exports[`convert br tags to paragraphs 7`] = `
@@ -52,6 +50,29 @@ exports[`convert br tags to paragraphs 9`] = `
   you</p>
   
   </div>"
+`;
+
+exports[`convert br tags to paragraphs 10`] = `
+"<div>
+  <p style=\\"line-height: 100%; margin-bottom: 0in\\">
+  I am not talking to you</p><p data-spacing=\\"single\\">
+  </p>
+  <p>I am talking to you</p>
+  </div>"
+`;
+
+exports[`convert br tags to paragraphs 11`] = `
+"<div>
+    <!--StartFragment--><p><span>Hello</span></p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\"><span>world</span></p><!--EndFragment-->
+    
+    </div>"
+`;
+
+exports[`convert br tags to paragraphs 12`] = `
+"<div>
+    <!--StartFragment--><meta charset=\\"utf-8\\"><h1><span>Write notes</span></h1><p data-spacing=\\"single\\"></p><p dir=\\"ltr\\" data-spacing=\\"single\\"><span>Welcome of </span><a><span>Notesnook</span></a><span>, an syncing.</span></p><p data-spacing=\\"single\\"></p><p dir=\\"ltr\\" data-spacing=\\"single\\"><span>Enjoy the read!</span></p><p data-spacing=\\"single\\"></p><p dir=\\"ltr\\" data-spacing=\\"single\\"><span><span><img></span></span></p><p data-spacing=\\"single\\"></p><p dir=\\"ltr\\" data-spacing=\\"single\\"><span>vision?</span></p><p data-spacing=\\"single\\"></p><p dir=\\"ltr\\" data-spacing=\\"single\\"><span>everyone means</span></p><!--EndFragment-->
+    
+    </div>"
 `;
 
 exports[`properly format codeblocks 1`] = `
