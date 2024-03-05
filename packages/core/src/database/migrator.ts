@@ -34,6 +34,7 @@ import {
   CollectionType,
   Collections,
   Item,
+  LegacySettingsItem,
   MaybeDeletedItem,
   isDeleted,
   isTrashItem
@@ -73,25 +74,41 @@ class Migrator {
         db.eventManager
       );
       if (version <= 5.9) {
-        const indexedCollection = new IndexedCollection(
-          db.storage,
-          collection.name
-        );
-
-        await migrateCollection(indexedCollection, version);
-
-        await indexedCollection.init();
-        await table.init();
-        for await (const entries of indexedCollection.iterate(100)) {
-          await this.migrateToSQLite(
+        if (collection.name === "settings") {
+          const settings = await db
+            .storage()
+            .read<LegacySettingsItem>("settings");
+          if (!settings) continue;
+          await migrateItem(
+            settings,
+            version,
+            CURRENT_DATABASE_VERSION,
+            "settings",
             db,
-            table,
-            collection.name,
-            entries.map((i) => i[1]),
-            version
+            "local"
           );
+          await db.storage().remove("settings");
+        } else {
+          const indexedCollection = new IndexedCollection(
+            db.storage,
+            collection.name
+          );
+
+          await migrateCollection(indexedCollection, version);
+
+          await indexedCollection.init();
+          await table.init();
+          for await (const entries of indexedCollection.iterate(100)) {
+            await this.migrateToSQLite(
+              db,
+              table,
+              collection.name,
+              entries.map((i) => i[1]),
+              version
+            );
+          }
+          await indexedCollection.clear();
         }
-        await indexedCollection.clear();
       } else {
         await table.init();
         await this.migrateItems(db, table, collection.name, version);
@@ -139,10 +156,7 @@ class Migrator {
       }
 
       if (migrated === true) {
-        if (!isDeleted(item) && item.type === "settings") {
-          // we are removing the old settings.
-          await db.storage().remove("settings");
-        } else toAdd.push(item);
+        toAdd.push(item);
 
         // if id changed after migration, we need to delete the old one.
         if (item.id !== itemId) {
