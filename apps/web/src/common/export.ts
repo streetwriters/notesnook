@@ -151,7 +151,7 @@ export async function exportNote(
       : rawContent);
 
   const exported = await note
-    .export(format === "pdf" ? "html" : format, content, disableTemplate)
+    .export(format === "pdf" ? "html" : format, content, !disableTemplate)
     .catch((e: Error) => {
       console.error(note.data, e);
       showToast("error", `Failed to export note "${note.title}": ${e.message}`);
