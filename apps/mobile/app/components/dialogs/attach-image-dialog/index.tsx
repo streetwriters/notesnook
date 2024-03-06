@@ -98,7 +98,7 @@ export default function AttachImage({
           size={SIZE.lg}
           name={compress ? "checkbox-marked" : "checkbox-blank-outline"}
           color={compress ? colors.primary.accent : colors.primary.icon}
-          customStyle={{
+          style={{
             width: 25,
             height: 25
           }}

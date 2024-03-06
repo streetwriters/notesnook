@@ -97,7 +97,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                   type="accent"
                   accentColor={item.colorCode}
                   accentText={colors.static.white}
-                  customStyle={{
+                  style={{
                     width: 30,
                     height: 30,
                     borderRadius: 100,
