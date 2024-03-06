@@ -225,31 +225,13 @@ export default function ReminderSheet({
     <View
       style={{
         paddingHorizontal: 12,
-        maxHeight: DDS.isTab ? "99.99%" : "99.99%"
+        maxHeight: "100%"
       }}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          width: "100%",
-          justifyContent: "space-between",
-          alignItems: "center"
-        }}
-      >
-        <Heading size={SIZE.lg}>
-          {reminder ? "Edit reminder" : "New reminder"}
-        </Heading>
-        <Button
-          title="Save"
-          type="accent"
-          height={40}
-          style={{
-            borderRadius: 100,
-            paddingHorizontal: 24
-          }}
-          onPress={saveReminder}
-        />
-      </View>
+      <Heading size={SIZE.lg}>
+        {reminder ? "Edit reminder" : "New reminder"}
+      </Heading>
+
       <Dialog context="local" />
       <ScrollView
         bounces={false}
@@ -257,53 +239,6 @@ export default function ReminderSheet({
           marginBottom: DDS.isTab ? 25 : undefined
         }}
       >
-        {reminderMode === ReminderModes.Permanent ? null : (
-          <ScrollView
-            style={{
-              flexDirection: "row",
-              marginTop: 12,
-              height: 50
-            }}
-            horizontal
-          >
-            {Object.keys(ReminderNotificationModes).map((mode) => (
-              <Button
-                key={mode}
-                title={mode}
-                style={{
-                  marginRight: 12,
-                  borderRadius: 100
-                }}
-                icon={
-                  mode === "Silent"
-                    ? "minus-circle"
-                    : mode === "Vibrate"
-                    ? "vibrate"
-                    : "volume-high"
-                }
-                height={35}
-                type={
-                  reminderNotificationMode ===
-                  ReminderNotificationModes[
-                    mode as keyof typeof ReminderNotificationModes
-                  ]
-                    ? "secondaryAccented"
-                    : "plain"
-                }
-                onPress={() => {
-                  const _mode = ReminderNotificationModes[
-                    mode as keyof typeof ReminderNotificationModes
-                  ] as Reminder["priority"];
-                  SettingsService.set({
-                    reminderNotificationMode: _mode
-                  });
-                  setReminderNotificatioMode(_mode);
-                }}
-              />
-            ))}
-          </ScrollView>
-        )}
-
         <Input
           fwdRef={titleRef}
           defaultValue={reminder?.title || referencedItem?.title}
@@ -413,7 +348,7 @@ export default function ReminderSheet({
                   type={
                     recurringMode ===
                     RecurringModes[mode as keyof typeof RecurringModes]
-                      ? "secondaryAccented"
+                      ? "selected"
                       : "plain"
                   }
                   onPress={() => {
@@ -441,18 +376,14 @@ export default function ReminderSheet({
                         index as keyof typeof WeekDayNames
                       ].slice(0, 1)}
                       type={
-                        selectedDays.indexOf(index) > -1 ? "accent" : "plain"
+                        selectedDays.indexOf(index) > -1 ? "selected" : "plain"
                       }
                       fontSize={SIZE.sm - 1}
                       style={{
                         width: 40,
                         height: 40,
                         borderRadius: 100,
-                        marginRight: 10,
-                        backgroundColor:
-                          selectedDays.indexOf(index) > -1
-                            ? colors.primary.accent
-                            : colors.primary.background
+                        marginRight: 10
                       }}
                       onPress={() => {
                         setSelectedDays((days) => {
@@ -472,7 +403,7 @@ export default function ReminderSheet({
                       title={index + 1 + ""}
                       type={
                         selectedDays.indexOf(index + 1) > -1
-                          ? "accent"
+                          ? "selected"
                           : "plain"
                       }
                       fontSize={SIZE.sm - 1}
@@ -480,11 +411,7 @@ export default function ReminderSheet({
                         width: 40,
                         height: 40,
                         borderRadius: 100,
-                        marginRight: 10,
-                        backgroundColor:
-                          selectedDays.indexOf(index + 1) > -1
-                            ? colors.primary.accent
-                            : colors.primary.background
+                        marginRight: 10
                       }}
                       onPress={() => {
                         setSelectedDays((days) => {
@@ -611,11 +538,65 @@ export default function ReminderSheet({
             alignSelf: "flex-start"
           }}
         />
+
+        {reminderMode === ReminderModes.Permanent ? null : (
+          <ScrollView
+            style={{
+              flexDirection: "row",
+              marginTop: 12,
+              height: 50
+            }}
+            horizontal
+          >
+            {Object.keys(ReminderNotificationModes).map((mode) => (
+              <Button
+                key={mode}
+                title={mode}
+                style={{
+                  marginRight: 12,
+                  borderRadius: 100
+                }}
+                icon={
+                  mode === "Silent"
+                    ? "minus-circle"
+                    : mode === "Vibrate"
+                    ? "vibrate"
+                    : "volume-high"
+                }
+                height={35}
+                type={
+                  reminderNotificationMode ===
+                  ReminderNotificationModes[
+                    mode as keyof typeof ReminderNotificationModes
+                  ]
+                    ? "selected"
+                    : "plain"
+                }
+                onPress={() => {
+                  const _mode = ReminderNotificationModes[
+                    mode as keyof typeof ReminderNotificationModes
+                  ] as Reminder["priority"];
+                  SettingsService.set({
+                    reminderNotificationMode: _mode
+                  });
+                  setReminderNotificatioMode(_mode);
+                }}
+              />
+            ))}
+          </ScrollView>
+        )}
       </ScrollView>
-      <View
+
+      <Button
+        title="Save"
+        type="accent"
+        height={45}
         style={{
-          height: 10
+          paddingHorizontal: 24,
+          marginTop: 10,
+          width: "100%"
         }}
+        onPress={saveReminder}
       />
     </View>
   );
@@ -628,8 +609,6 @@ ReminderSheet.present = (
 ) => {
   presentSheet({
     context: isSheet ? "local" : undefined,
-    enableGesturesInScrollView: false,
-    noBottomPadding: true,
     component: (ref, close, update) => (
       <ReminderSheet
         actionSheetRef={ref}
