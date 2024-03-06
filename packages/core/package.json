@@ -35,7 +35,8 @@
     "build": "tsc",
     "watch": "tsc --watch",
     "test:e2e": "cross-env IS_E2E=true vitest run",
-    "test": "vitest run"
+    "test": "vitest run",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@microsoft/signalr": "^8.0.0",
