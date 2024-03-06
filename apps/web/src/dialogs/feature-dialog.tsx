@@ -91,20 +91,34 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Daily trash cleanup interval",
+            title: "Sort reminders by due date",
             subtitle:
-              "You can now set the trash cleanup interval to Daily in addition to Weekly, Monthly & Yearly."
+              "You can now sort your reminders by due date to quickly see which reminders are upcoming."
           },
           {
-            title: "Organized bulk exports",
+            title: "Restore backups using encryption key",
             subtitle:
-              "Bulk exports are now automatically sorted/organized into folders based on your Notebook/Topic organization."
+              "If you forget your password but still have your recovery key, you can now use that to restore your backups."
           },
           {
-            title: "New domain for Monographs",
+            title: "Disable markdown in editor",
             subtitle:
-              "Monographs will now be published to monogr.ph instead of monograph.notesnook.com. Don't worry, all your published notes will automatically redirect."
-          }
+              "If you find automatic markdown shortcuts annoying, you can now turn those off from Settings > Editor > Disable markdown shortcuts."
+          },
+          {
+            title: "Improved password reset",
+            subtitle:
+              "Resetting password should now be much more reliable and safer."
+          },
+          ...(IS_DESKTOP_APP
+            ? [
+                {
+                  title: "Proxy settings",
+                  subtitle:
+                    "Desktop app now support setting a custom proxy url to route all network through it. Useful if you are behind a firewall and would like to bypass it."
+                }
+              ]
+            : [])
         ],
     cta: {
       title: "Got it",
