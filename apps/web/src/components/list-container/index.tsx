@@ -258,7 +258,13 @@ function ItemRenderer({
     compact
   } = context;
   const resolvedItem = useResolvedItem({ index, items });
-  if (!resolvedItem || !resolvedItem.item)
+  if (!resolvedItem || !resolvedItem.item) {
+    if (compact)
+      return (
+        <Box key="list-item-skeleton" sx={{ py: 1, px: 1 }}>
+          <Skeleton enableAnimation={false} height={12} width={`50%`} />
+        </Box>
+      );
     return (
       <Box key="list-item-skeleton" sx={{ py: 2, px: 1 }}>
         <Skeleton
@@ -289,6 +295,7 @@ function ItemRenderer({
         </Flex>
       </Box>
     );
+  }
 
   return (
     <>
