@@ -112,27 +112,9 @@ export const AddNotebookSheet = ({
         paddingHorizontal: 12
       }}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          width: "100%",
-          justifyContent: "space-between",
-          alignItems: "center"
-        }}
-      >
-        <Heading size={SIZE.lg}>
-          {notebook ? "Edit Notebook" : "New Notebook"}
-        </Heading>
-        <Button
-          title={notebook ? "Save" : "Add"}
-          type="accent"
-          height={40}
-          style={{
-            paddingHorizontal: 24
-          }}
-          onPress={onSaveChanges}
-        />
-      </View>
+      <Heading size={SIZE.lg}>
+        {notebook ? "Edit Notebook" : "New Notebook"}
+      </Heading>
 
       <Seperator />
 
@@ -166,6 +148,18 @@ export const AddNotebookSheet = ({
         returnKeyLabel="Next"
         returnKeyType="next"
         defaultValue={notebook ? notebook.description : ""}
+      />
+
+      <Button
+        title={notebook ? "Save" : "Add"}
+        type="accent"
+        height={45}
+        fontSize={SIZE.md}
+        style={{
+          paddingHorizontal: 24,
+          width: "100%"
+        }}
+        onPress={onSaveChanges}
       />
     </View>
   );

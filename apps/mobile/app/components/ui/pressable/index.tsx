@@ -269,7 +269,9 @@ export const Pressable = ({
         alignItems: "center",
         marginBottom: 0,
         borderColor: pressed
-          ? borderSelectedColor || borderColor
+          ? customSelectedColor
+            ? getColorLinearShade(customSelectedColor, 0.3, false)
+            : borderSelectedColor || borderColor
           : borderColor || "transparent",
         borderWidth: borderWidth
       },
@@ -281,6 +283,7 @@ export const Pressable = ({
       opacity,
       primaryColor,
       noborder,
+      customSelectedColor,
       borderSelectedColor,
       borderColor,
       borderWidth,
