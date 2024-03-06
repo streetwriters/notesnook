@@ -591,6 +591,7 @@ export default function ReminderSheet({
         title="Save"
         type="accent"
         height={45}
+        fontSize={SIZE.md}
         style={{
           paddingHorizontal: 24,
           marginTop: 10,
