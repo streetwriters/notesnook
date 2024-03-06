@@ -55,7 +55,7 @@ export const TaskItemNode = TaskItem.extend({
   parseHTML() {
     return [
       {
-        tag: "li.checklist--item",
+        tag: ".checklist > li",
         priority: 51
       }
     ];
