@@ -212,6 +212,7 @@ const onRequestPartialSync = async (
 
 const onLogout = async (reason: string) => {
   DatabaseLogger.log("User Logged Out" + reason);
+  Notifications.setupReminders(true);
   SettingsService.set({
     introCompleted: true
   });

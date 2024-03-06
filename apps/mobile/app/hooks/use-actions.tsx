@@ -254,6 +254,7 @@ export const useActions = ({
         positivePress: async () => {
           if (item.type === "reminder") {
             await db.reminders.remove(item.id);
+            Notifications.setupReminders(true);
           } else if (item.type === "color") {
             await db.colors.remove(item.id);
             useMenuStore.getState().setColorNotes();
