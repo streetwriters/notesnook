@@ -149,9 +149,8 @@ async function updateNextBackupTime() {
   });
 }
 /**
- *
- * @param {boolean} progress
- * @param {string} context
+ * @param {boolean=} progress
+ * @param {string=} context
  * @returns {Promise<{path?: string, error?: Error}}>
  */
 async function run(progress = false, context) {

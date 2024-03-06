@@ -44,8 +44,7 @@ import RNBootSplash from "react-native-bootsplash";
 import { checkVersion } from "react-native-check-version";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
-
-import { User } from "@notesnook/core/dist/api/user-manager";
+import { User } from "@notesnook/core";
 import { EventManagerSubscription } from "@notesnook/core/dist/utils/event-manager";
 //@ts-ignore
 import { enabled } from "react-native-privacy-snapshot";
