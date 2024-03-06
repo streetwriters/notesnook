@@ -1,0 +1,7 @@
+- Restore backups using encryption key in addition to password
+- Toggle markdown shortcuts in the editor
+- Improved user experience and reliability when changing account password
+- Fixed doing a search in attachment manager causes a crash
+- Bug fixes and minor improvements
+
+Thank you for using Notesnook!
