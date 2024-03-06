@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User } from "@notesnook/core/dist/api/user-manager";
+import { User } from "@notesnook/core";
 import { Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 import create, { State } from "zustand";
