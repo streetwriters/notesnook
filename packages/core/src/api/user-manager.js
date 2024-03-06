@@ -129,39 +129,43 @@ class UserManager {
   ) {
     if (!email || !password) throw new Error("email & password are required.");
 
-    const token = await this.tokenManager.getAccessToken();
-    if (!token) throw new Error("Unauthorized.");
+    const token = await this.tokenManager.getToken();
+    if (!token) throw new Error("No token found.");
 
     email = email.toLowerCase();
     if (!hashedPassword) {
       hashedPassword = await this._storage.hash(password, email);
     }
+    try {
+      await this.tokenManager.saveToken(
+        await http.post(
+          `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+          {
+            grant_type: "mfa_password",
+            client_id: "notesnook",
+            scope: "notesnook.sync offline_access IdentityServerApi",
+            password: hashedPassword
+          },
+          token.access_token
+        )
+      );
 
-    await this.tokenManager.saveToken(
-      await http.post(
-        `${constants.AUTH_HOST}${ENDPOINTS.token}`,
-        {
-          grant_type: "mfa_password",
-          client_id: "notesnook",
-          scope: "notesnook.sync offline_access IdentityServerApi",
-          password: hashedPassword
-        },
-        token
-      )
-    );
+      const user = await this.fetchUser();
+      if (!user) throw new Error("Unauthorized.");
 
-    const user = await this.fetchUser();
-    if (!user) throw new Error("Unauthorized.");
+      if (!sessionExpired) {
+        await this._storage.write("lastSynced", 0);
+      }
 
-    await this._storage.deriveCryptoKey(`_uk_@${user.email}`, {
-      password,
-      salt: user.salt
-    });
-    if (!sessionExpired) {
-      await this._storage.write("lastSynced", 0);
+      await this._storage.deriveCryptoKey(`_uk_@${user.email}`, {
+        password,
+        salt: user.salt
+      });
+      EV.publish(EVENTS.userLoggedIn, user);
+    } catch (e) {
+      await this.tokenManager.saveToken(token);
+      throw e;
     }
-
-    EV.publish(EVENTS.userLoggedIn, user);
   }
 
   /**
