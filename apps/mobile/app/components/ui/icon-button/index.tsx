@@ -43,7 +43,7 @@ export const IconButton = ({
   onPress,
   name,
   color,
-  style: customStyle,
+  style,
   size = SIZE.xxl,
   iconStyle = {},
   left = 10,
@@ -83,7 +83,7 @@ export const IconButton = ({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 100,
-        ...customStyle
+        ...style
       }}
     >
       <Icon
