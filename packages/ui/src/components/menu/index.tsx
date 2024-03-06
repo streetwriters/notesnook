@@ -192,6 +192,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
         boxShadow: "menu",
         border: "1px solid var(--border)",
         minWidth: 220,
+        maxHeight: "80vh",
         ...sx
       }}
       {...flexProps}
@@ -213,9 +214,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
           {title}
         </Text>
       )}
-      <ScrollContainer suppressScrollX style={{ maxHeight: "80%" }}>
-        {children}
-      </ScrollContainer>
+      <ScrollContainer suppressScrollX>{children}</ScrollContainer>
       {/* <FlexScrollContainer>{children}</FlexScrollContainer> */}
     </Box>
   );
