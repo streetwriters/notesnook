@@ -112,6 +112,7 @@ async function createWindow() {
   mainWindow.webContents.session.setSpellCheckerDictionaryDownloadURL(
     "http://dictionaries.notesnook.com/"
   );
+  mainWindow.webContents.session.setProxy({ proxyRules: config.proxyRules });
 
   mainWindow.once("closed", () => {
     globalThis.window = null;
