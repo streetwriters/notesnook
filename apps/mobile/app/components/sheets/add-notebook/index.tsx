@@ -129,7 +129,7 @@ export const AddNotebookSheet = ({
             titleInput?.current?.focus();
           });
         }}
-        placeholder="Enter a title"
+        placeholder="Enter notebook title"
         onSubmit={() => {
           descriptionInput.current?.focus();
         }}
@@ -144,7 +144,7 @@ export const AddNotebookSheet = ({
         onChangeText={(value) => {
           description.current = value;
         }}
-        placeholder="Describe your notebook."
+        placeholder="Enter notebook description"
         returnKeyLabel="Next"
         returnKeyType="next"
         defaultValue={notebook ? notebook.description : ""}
