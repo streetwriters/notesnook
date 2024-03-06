@@ -26,7 +26,7 @@ import {
   ToastEvent
 } from "../../services/event-manager";
 import { useUserStore } from "../../stores/use-user-store";
-import { eCloseSheet } from "../../utils/events";
+import { eCloseSheet, eOpenRecoveryKeyDialog } from "../../utils/events";
 import DialogHeader from "../dialog/dialog-header";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
@@ -34,6 +34,7 @@ import { Notice } from "../ui/notice";
 import Seperator from "../ui/seperator";
 import { Dialog } from "../dialog";
 import BackupService from "../../services/backup";
+import { sleep } from "../../utils/time";
 
 export const ChangePassword = () => {
   const passwordInputRef = useRef();
@@ -78,6 +79,8 @@ export const ChangePassword = () => {
       });
       setLoading(false);
       eSendEvent(eCloseSheet);
+      await sleep(300);
+      eSendEvent(eOpenRecoveryKeyDialog);
     } catch (e) {
       setLoading(false);
       ToastEvent.show({
@@ -135,7 +138,14 @@ export const ChangePassword = () => {
       />
 
       <Notice
-        text="Changing password is a non-undoable process. You will be logged out from all your devices. Please make sure you do not close the app while your password is changing and have good internet connection."
+        text={`Changing password is an irreversible process. You will be logged out from all your devices. Please make sure you do not close the app while your password is changing and have good internet connection.`}
+        type="alert"
+      />
+
+      <View style={{ height: 10 }} />
+
+      <Notice
+        text={`Once your password is changed, please make sure to save the new account recovery key.`}
         type="alert"
       />
 
