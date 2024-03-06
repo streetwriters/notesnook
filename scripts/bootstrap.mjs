@@ -44,7 +44,9 @@ const IGNORED_NATIVE_PACKAGES = [
   // it because it's only needed in non-browser environments
   "canvas",
   // optional dependency only used on Node.js platform
-  "@azure/msal-node-runtime"
+  "@azure/msal-node-runtime",
+  // temporary
+  "esbuild"
 ];
 
 if (args.scope && !scopes[args.scope])
