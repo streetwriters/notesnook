@@ -165,6 +165,9 @@ class Merger {
         if (remoteItem.deleted)
           return this._db.attachments.merge(null, remoteItem);
 
+        // rare case but if remote attachment doesn't have metadata it's probably broken so we should just skip it in this case.
+        if (!remoteItem.metadata) break;
+
         const localItem = this._db.attachments.attachment(
           remoteItem.metadata.hash
         );
