@@ -20,8 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Search } from "../icons";
 import Field from "../field";
 import { debounce } from "@notesnook/common";
-
-function SearchBox({ onSearch }) {
+type SearchBoxProps = {
+  onSearch: (value: string) => void;
+};
+function SearchBox({ onSearch }: SearchBoxProps) {
   return (
     <Field
       data-test-id="search-input"
@@ -36,7 +38,9 @@ function SearchBox({ onSearch }) {
         icon: Search,
         testId: "search-button",
         onClick: () => {
-          const searchField = document.getElementById("search");
+          const searchField: HTMLFormElement = document.getElementById(
+            "search"
+          ) as HTMLFormElement;
           if (searchField && searchField.value && searchField.value.length) {
             onSearch(searchField.value);
           }
