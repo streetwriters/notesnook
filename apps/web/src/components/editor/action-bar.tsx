@@ -210,7 +210,7 @@ function TabStrip() {
                 .updateSession(
                   session.id,
                   [session.type],
-                  (s) => (s.preview = true)
+                  (s) => (s.preview = false)
                 )
             }
             onFocus={() => {
