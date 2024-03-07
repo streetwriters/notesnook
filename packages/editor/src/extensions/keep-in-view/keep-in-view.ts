@@ -24,27 +24,40 @@ type KeepInViewOptions = {
   scrollIntoViewOnWindowResize: boolean;
 };
 
-let onWindowResize: ((this: Window, ev: UIEvent) => void) | undefined =
-  undefined;
-export const KeepInView = Extension.create<KeepInViewOptions>({
+export const KeepInView = Extension.create<
+  KeepInViewOptions,
+  {
+    onWindowResize?: ((this: Window, ev: UIEvent) => void) | undefined;
+  }
+>({
   name: "keepinview",
   addOptions() {
     return {
       scrollIntoViewOnWindowResize: true
     };
   },
+
+  addStorage() {
+    return {
+      onWindowResize: undefined
+    };
+  },
+
   onCreate() {
     if (!this.options.scrollIntoViewOnWindowResize) return;
-    onWindowResize = () => {
+    if (this.storage.onWindowResize) return;
+
+    this.storage.onWindowResize = () => {
       keepLastLineInView(this.editor);
     };
-    window.addEventListener("resize", onWindowResize);
+    window.addEventListener("resize", this.storage.onWindowResize);
   },
 
   onDestroy() {
-    if (!onWindowResize) return;
-    window.removeEventListener("resize", onWindowResize);
-    onWindowResize = undefined;
+    console.log("DESTROYING!");
+    if (!this.storage.onWindowResize) return;
+    window.removeEventListener("resize", this.storage.onWindowResize);
+    this.storage.onWindowResize = undefined;
   },
   onSelectionUpdate() {
     inlineDebounce(
