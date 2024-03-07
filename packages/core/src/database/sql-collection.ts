@@ -153,11 +153,13 @@ export class SQLCollection<
   }
 
   async put(items: (SQLiteItem<T> | undefined)[]) {
-    if (items.length <= 0) return;
+    if (items.length <= 0) return [];
     const entries = items.reduce((array, item) => {
       if (!item) return array;
       if (!item.remote) {
-        item.dateModified = Date.now();
+        // NOTE: this is intentional
+        // When we are bulk adding items, we shouldn't touch the dateModified
+        // item.dateModified = Date.now();
         item.synced = false;
       }
       delete item.remote;
@@ -165,7 +167,7 @@ export class SQLCollection<
       return array;
     }, [] as SQLiteItem<T>[]);
 
-    if (entries.length <= 0) return;
+    if (entries.length <= 0) return [];
 
     await this.startTransaction(async (tx) => {
       for (const chunk of toChunks(entries, 200)) {
@@ -175,6 +177,7 @@ export class SQLCollection<
           .execute();
       }
     });
+    return entries;
   }
 
   async update(

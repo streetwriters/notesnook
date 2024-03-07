@@ -123,7 +123,7 @@ export interface DatabaseCollection<T, IsAsync extends boolean> {
   exists(id: string): AsyncOrSyncResult<IsAsync, boolean>;
   count(): AsyncOrSyncResult<IsAsync, number>;
   get(id: string): AsyncOrSyncResult<IsAsync, T | undefined>;
-  put(items: (T | undefined)[]): Promise<void>;
+  put(items: (T | undefined)[]): Promise<SQLiteItem<T>[]>;
   update(ids: string[], partial: Partial<T>): Promise<void>;
   ids(options: GroupOptions): AsyncOrSyncResult<IsAsync, string[]>;
   records(
