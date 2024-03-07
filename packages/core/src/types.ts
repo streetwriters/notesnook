@@ -550,3 +550,9 @@ export function isTrashItem(item: any): item is TrashItem {
 export function isGroupHeader(item: any): item is GroupHeader {
   return item.type === "header";
 }
+
+export type ContentBlock = {
+  content: string;
+  type: string;
+  id: string;
+};
