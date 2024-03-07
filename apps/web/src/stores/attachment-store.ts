@@ -121,14 +121,14 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
       if (await db.attachments.remove(attachment.hash, false)) {
         await this.get().refresh();
 
-        const sessionId = useEditorStore.getState().session.id;
+        const session = useEditorStore.getState().getActiveSession(); //.id;
         if (
-          sessionId &&
+          session &&
           (await db.relations
             .to({ id: attachment.id, type: "attachment" }, "note")
-            .has(sessionId))
+            .has(session.id))
         ) {
-          await useEditorStore.getState().clearSession();
+          useEditorStore.getState().closeSessions(session.id);
         }
       }
     } catch (e) {

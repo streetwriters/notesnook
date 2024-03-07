@@ -22,6 +22,8 @@ import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import dayjs from "dayjs";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
+import { TimeFormat } from "@notesnook/core/dist/utils/date";
+import { TrashCleanupInterval } from "@notesnook/core";
 
 export const BehaviourSettings: SettingsGroup[] = [
   {
@@ -91,7 +93,7 @@ export const BehaviourSettings: SettingsGroup[] = [
           {
             type: "dropdown",
             onSelectionChanged: (value) =>
-              useSettingStore.getState().setTimeFormat(value),
+              useSettingStore.getState().setTimeFormat(value as TimeFormat),
             selectedOption: () => useSettingStore.getState().timeFormat,
             options: [
               { value: "12-hour", title: "12h" },
@@ -121,7 +123,9 @@ export const BehaviourSettings: SettingsGroup[] = [
             onSelectionChanged: (value) =>
               useSettingStore
                 .getState()
-                .setTrashCleanupInterval(parseInt(value)),
+                .setTrashCleanupInterval(
+                  parseInt(value) as TrashCleanupInterval
+                ),
             selectedOption: () =>
               useSettingStore.getState().trashCleanupInterval.toString(),
             options: [

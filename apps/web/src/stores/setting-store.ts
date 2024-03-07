@@ -181,7 +181,9 @@ class SettingStore extends BaseStore<SettingStore> {
     this.set({ hideNoteTitle: !hideNoteTitle });
     Config.set("hideNoteTitle", !hideNoteTitle);
     setDocumentTitle(
-      !hideNoteTitle ? undefined : useEditorStore.getState().session.title
+      !hideNoteTitle
+        ? undefined
+        : useEditorStore.getState().getActiveSession()?.title
     );
   };
 

@@ -22,7 +22,7 @@ import { Perform } from "../../common/dialog-controller";
 import Dialog from "../../components/dialog";
 import { steps } from "./steps";
 import { ErrorText } from "../../components/error-text";
-import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
+import { AuthenticatorType } from "@notesnook/core";
 
 type RecoveryCodesDialogProps = {
   onClose: Perform;

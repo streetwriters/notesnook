@@ -42,7 +42,7 @@ import useStatus, { statusToString } from "../../hooks/use-status";
 import { ScopedThemeProvider } from "../theme-provider";
 import { checkForUpdate, installUpdate } from "../../utils/updater";
 import { getTimeAgo, toTitleCase } from "@notesnook/common";
-import { User } from "@notesnook/core/dist/api/user-manager";
+import { User } from "@notesnook/core";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);

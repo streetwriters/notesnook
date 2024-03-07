@@ -316,8 +316,9 @@ class AppStore extends BaseStore<AppStore> {
 
       logger.error(err);
       if (err.cause === "MERGE_CONFLICT") {
-        const sessionId = editorstore.get().session.id;
-        if (sessionId) await editorstore.openSession(sessionId, true);
+        // TODO: reopen conflicted note
+        // const sessionId = editorstore.get().session.id;
+        // if (sessionId) await editorstore.openSession(sessionId, true);
         await this.refresh();
         this.updateSyncStatus("conflicts");
       } else {

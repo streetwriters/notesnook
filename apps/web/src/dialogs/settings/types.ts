@@ -145,5 +145,5 @@ export type TextInputSettingComponent = BaseSettingComponent<"input"> & {
 };
 
 export type CustomSettingComponent = BaseSettingComponent<"custom"> & {
-  component: () => JSX.Element;
+  component: () => JSX.Element | null;
 };

@@ -44,7 +44,7 @@ import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
 import BaseDialog from "../../components/dialog";
 import { ScopedThemeProvider } from "../../components/theme-provider";
-import { User } from "@notesnook/core/dist/api/user-manager";
+import { User } from "@notesnook/core";
 
 type BuyDialogProps = {
   couponCode?: string;

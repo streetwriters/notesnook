@@ -57,7 +57,7 @@ import {
 } from "./types";
 import { showMultifactorDialog } from "../../common/dialog-controller";
 import { ErrorText } from "../../components/error-text";
-import { AuthenticatorType } from "@notesnook/core/dist/api/user-manager";
+import { AuthenticatorType } from "@notesnook/core";
 
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 

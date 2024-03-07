@@ -187,7 +187,6 @@ function DiffViewer(props: DiffViewerProps) {
                 unlock={async (password) => {
                   const decryptedContent = await db.vault.decryptContent(
                     content,
-                    session.note.id,
                     password
                   );
                   setContent({
@@ -271,7 +270,6 @@ function DiffViewer(props: DiffViewerProps) {
                 unlock={async (password) => {
                   const decryptedContent = await db.vault.decryptContent(
                     conflictedContent,
-                    session.note.id,
                     password
                   );
                   setConflictedContent({
