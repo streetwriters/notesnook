@@ -58,7 +58,8 @@ export function SessionItem(props: SessionItemProps) {
       <Flex
         sx={{
           fontSize: "subBody",
-          color: "paragraph-secondary"
+          color: "paragraph-secondary",
+          flexShrink: 0
         }}
       >
         {session.locked && <Lock size={14} data-test-id="locked" />}

@@ -656,7 +656,7 @@ function SessionHistory({ noteId }: { noteId: string }) {
       subtitle={"Your session history is local only."}
     >
       <VirtualizedList
-        mode="fixed"
+        mode="dynamic"
         estimatedSize={28}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.placeholders}
