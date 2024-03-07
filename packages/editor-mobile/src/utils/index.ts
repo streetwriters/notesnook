@@ -26,11 +26,6 @@ globalThis.sessionId = "notesnook-editor";
 globalThis.pendingResolvers = {};
 
 globalThis.pendingResolvers = {};
-export function randId(prefix: string) {
-  return Math.random()
-    .toString(36)
-    .replace("0.", prefix || "");
-}
 
 export type SafeAreaType = {
   top: number;
