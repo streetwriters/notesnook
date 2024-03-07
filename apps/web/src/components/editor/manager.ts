@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { IEditor, NoteStatistics } from "./types";
 import createStore from "../../common/store";
 import BaseStore from "../../stores";
@@ -119,14 +119,18 @@ export function useSearch() {
 }
 
 export function useToolbarConfig() {
-  const toolbarConfig =
-    useEditorManager((store) => store.toolbarConfig) ||
-    getCurrentPreset().tools;
+  const toolbarConfig = useEditorManager((store) => store.toolbarConfig);
   const setToolbarConfig = useCallback(
     (config: ToolbarDefinition) =>
       useEditorManager.setState({ toolbarConfig: config }),
     []
   );
+  useEffect(() => {
+    getCurrentPreset().then((preset) =>
+      useEditorManager.setState({ toolbarConfig: preset.tools })
+    );
+  }, []);
+
   return { toolbarConfig, setToolbarConfig };
 }
 

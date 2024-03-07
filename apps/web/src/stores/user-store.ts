@@ -120,7 +120,7 @@ class UserStore extends BaseStore<UserStore> {
     form:
       | { email: string }
       | { email: string; password: string }
-      | { code: string; method: AuthenticatorType },
+      | { code: string; method: AuthenticatorType | "recoveryCode" },
     skipInit = false,
     sessionExpired = false
   ) => {

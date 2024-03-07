@@ -104,7 +104,7 @@ class NoteStore extends BaseStore<NoteStore> {
     if (!(await Vault.lockNote(id))) return false;
     await this.refresh();
     if (useEditorStore.getState().getActiveSession()?.id === id)
-      await useEditorStore.getState().openSession(id, true);
+      await useEditorStore.getState().openSession(id, { force: true });
   };
 
   readonly = async (state: boolean, ...ids: string[]) => {
