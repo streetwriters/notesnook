@@ -45,12 +45,14 @@ export function WebClipComponent(
 
   useEffect(() => {
     (async function () {
-      const iframe = embedRef.current;
-      if (!iframe || !iframe.contentDocument || !isLoading) return;
+      if (!isLoading) return;
 
       const html = await editor.storage
         .getAttachmentData?.(node.attrs)
         .catch(() => null);
+
+      const iframe = embedRef.current;
+      if (!iframe || !iframe.contentDocument) return;
       iframe.contentDocument.open();
       iframe.contentDocument.write(
         typeof html !== "string" || !html ? FAILED_CONTENT : html
@@ -87,12 +89,15 @@ export function WebClipComponent(
   useEffect(() => {
     if (embedRef.current?.contentDocument) {
       resizeObserverRef.current = new ResizeObserver(() => {
-        resizeIframe(node.attrs, embedRef.current);
+        setTimeout(() => resizeIframe(node.attrs, embedRef.current), 100);
       });
       resizeObserverRef.current.observe(
         embedRef.current?.contentDocument?.body
       );
     }
+    return () => {
+      resizeObserverRef.current?.disconnect();
+    };
   }, []);
 
   return (
