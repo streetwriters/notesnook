@@ -220,21 +220,18 @@ function TabStrip() {
             }}
             onMove={(from, to) => {
               if (from === to) return;
-
               useEditorStore.setState((state) => {
-                const direction =
-                  to === 0 ? "start" : from > to ? "left" : "right";
+                // if the tab where this tab is being dropped is pinned,
+                // let's pin our tab too.
+                if (state.sessions[to].pinned)
+                  state.sessions[from].pinned = true;
+
                 const [fromTab] = state.sessions.splice(from, 1);
-                const newIndex =
-                  direction === "start" || direction === "right" ? to : to - 1;
 
                 // unpin the tab if it is moved.
                 if (fromTab.pinned) fromTab.pinned = false;
-                // if the tab where this tab is being dropped is pinned,
-                // let's pin our tab too.
-                if (state.sessions[to].pinned) fromTab.pinned = true;
 
-                state.sessions.splice(newIndex, 0, fromTab);
+                state.sessions.splice(to, 0, fromTab);
               });
             }}
             onClose={() => useEditorStore.getState().closeSessions(session.id)}
