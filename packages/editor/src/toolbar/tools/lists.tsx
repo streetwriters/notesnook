@@ -181,7 +181,7 @@ export function CheckList(props: ToolProps) {
     <ToolButton
       {...toolProps}
       toggled={false}
-      onClick={() => editor.current?.chain().focus().toggleCheckList().run()}
+      onClick={() => editor.chain().focus().toggleCheckList().run()}
     />
   );
 }

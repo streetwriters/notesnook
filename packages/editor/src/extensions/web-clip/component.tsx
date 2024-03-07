@@ -48,7 +48,7 @@ export function WebClipComponent(
       const iframe = embedRef.current;
       if (!iframe || !iframe.contentDocument || !isLoading) return;
 
-      const html = await editor.current?.storage
+      const html = await editor.storage
         .getAttachmentData?.(node.attrs)
         .catch(() => null);
       iframe.contentDocument.open();
