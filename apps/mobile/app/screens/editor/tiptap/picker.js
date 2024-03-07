@@ -36,10 +36,8 @@ import PremiumService from "../../../services/premium";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 import { eCloseSheet } from "../../../utils/events";
-import { editorController, editorState } from "./utils";
-import { useSettingStore } from "../../../stores/use-setting-store";
-import filesystem from "../../../common/filesystem";
 import { useTabStore } from "./use-tab-store";
+import { editorController, editorState } from "./utils";
 
 const showEncryptionSheet = (file) => {
   presentSheet({
