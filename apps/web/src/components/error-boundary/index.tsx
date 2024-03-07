@@ -84,19 +84,25 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
               How to fix it?
             </Text>
             <Text variant="body">{help.action}</Text>
-            <Flex sx={{ gap: 1 }}>
-              <Button
-                variant="error"
-                sx={{ alignSelf: "start", px: 30, mt: 1 }}
-                onClick={() =>
-                  help.fix().catch((e) => {
-                    console.error(e);
-                    alert(errorToString(e));
-                  })
-                }
-              >
-                Fix it
-              </Button>
+          </>
+        ) : null}
+        <Flex sx={{ gap: 1 }}>
+          {help ? (
+            <Button
+              variant="error"
+              sx={{ alignSelf: "start", px: 30, mt: 1 }}
+              onClick={() =>
+                help.fix().catch((e) => {
+                  console.error(e);
+                  alert(errorToString(e));
+                })
+              }
+            >
+              Fix it
+            </Button>
+          ) : (
+            <>
+              {" "}
               <Button
                 variant="secondary"
                 sx={{ alignSelf: "start", px: 30, mt: 1 }}
@@ -128,21 +134,9 @@ ${getDeviceInfo()}`
               >
                 Contact support
               </Button>
-            </Flex>
-          </>
-        ) : (
-          <>
-            <Button
-              variant="secondary"
-              sx={{ alignSelf: "start", px: 30, mt: 1 }}
-              onClick={() =>
-                window.open("mailto:support@streetwriters.co", "_blank")
-              }
-            >
-              Contact support
-            </Button>
-          </>
-        )}
+            </>
+          )}
+        </Flex>
       </Flex>
     </BaseThemeProvider>
   );
