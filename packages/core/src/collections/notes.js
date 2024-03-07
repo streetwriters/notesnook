@@ -88,6 +88,7 @@ export default class Notes extends Collection {
 
       note.contentId = await this._db.content.add({
         noteId: id,
+        title: note.title,
         sessionId: note.sessionId,
         id: note.contentId,
         type,

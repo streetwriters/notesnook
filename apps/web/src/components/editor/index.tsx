@@ -59,7 +59,7 @@ import { getFormattedDate } from "@notesnook/common";
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
 type PreviewSession = {
-  content: { data: string; type: string };
+  content: { data: string; type: string; title: string };
   dateCreated: number;
   dateEdited: number;
 };
@@ -108,6 +108,7 @@ export default function EditorManager({
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isReadonly = useStore((store) => store.session.readonly);
+  const setPreviewTitle = useStore((store) => store.setPreviewTitle);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isPreviewSession = !!previewSession.current;
 
@@ -157,6 +158,7 @@ export default function EditorManager({
   const openSession = useCallback(async (noteId: string | number) => {
     await editorstore.get().openSession(noteId);
     previewSession.current = undefined;
+    setPreviewTitle(undefined);
 
     lastSavedTime.current = Date.now();
     setTimestamp(Date.now());
@@ -228,6 +230,7 @@ export default function EditorManager({
                 onOpenPreviewSession={async (session: PreviewSession) => {
                   previewSession.current = session;
                   setTimestamp(Date.now());
+                  setPreviewTitle(previewSession.current.content.title);
                 }}
               />
             )}

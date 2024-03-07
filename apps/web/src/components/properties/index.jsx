@@ -352,7 +352,7 @@ function Properties(props) {
                   title="Click to preview"
                   onClick={async () => {
                     toggleProperties(false);
-                    const content = await db.noteHistory.content(session.id);
+                    const content = await db.noteHistory.content(session.id);  
 
                     if (session.locked) {
                       await Vault.askPassword(async (password) => {

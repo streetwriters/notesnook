@@ -84,6 +84,7 @@ class EditorStore extends BaseStore {
   session = getDefaultSession();
   arePropertiesVisible = false;
   editorMargins = Config.get("editor:margins", true);
+  previewTitle = undefined;
 
   init = () => {
     EV.subscribe(EVENTS.userLoggedOut, () => {
@@ -316,7 +317,12 @@ class EditorStore extends BaseStore {
    */
   saveSessionContent = (noteId, sessionId, ignoreEdit, content) => {
     const dateEdited = ignoreEdit ? this.get().session.dateEdited : undefined;
-    return this.saveSession(noteId, { sessionId, content, dateEdited });
+    return this.saveSession(noteId, {
+      sessionId,
+      content,
+      dateEdited,
+      title: content.title
+    });
   };
 
   setTag = (tag) => {
@@ -326,6 +332,12 @@ class EditorStore extends BaseStore {
   setSaveState = (saveState) => {
     this.set((state) => {
       state.session.saveState = saveState;
+    });
+  };
+
+  setPreviewTitle = (previewTitle) => {
+    this.set((state) => {
+      state.previewTitle = previewTitle;
     });
   };
 

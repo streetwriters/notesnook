@@ -32,6 +32,7 @@ import SessionContent from "./session-content";
 
 /**
  * @typedef Content
+ * @property {string} title
  * @property {string} data
  * @property {string} type
  */
@@ -91,6 +92,7 @@ export default class NoteHistory extends Collection {
       id: sessionId,
       sessionContentId: makeSessionContentId(sessionId),
       noteId,
+      title: content.title,
       dateCreated: oldSession ? oldSession.dateCreated : Date.now(),
       localOnly: true
     };
