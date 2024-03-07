@@ -124,7 +124,7 @@ function DiffViewer(props: DiffViewerProps) {
                 closeSessions(session.id, session.note.id);
 
                 await notesStore.refresh();
-                await openSession(session.note.id, true);
+                await openSession(session.note.id, { force: true });
               }}
               mr={2}
               sx={{
@@ -365,7 +365,7 @@ async function resolveConflict({
   }
 
   await notesStore.refresh();
-  useEditorStore.getState().openSession(note.id, true);
+  useEditorStore.getState().openSession(note.id, { force: true });
 }
 
 async function createCopy(note: Note, content: ContentItem) {

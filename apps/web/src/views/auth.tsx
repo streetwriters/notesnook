@@ -54,8 +54,8 @@ type PasswordFormData = EmailFormData & {
 };
 
 type MFALoginFormData = {
-  code?: string;
-  method?: MFAMethodType;
+  code: string;
+  method: MFAMethodType;
 };
 
 type SignupFormData = EmailFormData &
@@ -652,6 +652,8 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         subtitle: "Please wait while you are authenticated."
       }}
       onSubmit={async (form) => {
+        if (!form.code) throw new Error("2FA code is required.");
+
         const loginForm: MFALoginFormData = {
           code: form.code,
           method: formData.selectedMethod

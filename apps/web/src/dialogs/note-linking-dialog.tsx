@@ -29,10 +29,10 @@ import {
   createInternalLink
 } from "@notesnook/core";
 import { VirtualizedList } from "../components/virtualized-list";
-import { ResolvedItem } from "../components/list-container/resolved-item";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { ScrollContainer } from "@notesnook/ui";
 import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
+import { ResolvedItem } from "@notesnook/common";
 
 export type NoteLinkingDialogProps = {
   attributes?: LinkAttributes;
