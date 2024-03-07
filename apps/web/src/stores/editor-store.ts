@@ -653,7 +653,7 @@ const [useEditorStore] = createPersistedStore(EditorStore, {
       sessions.push({
         id: session.id,
         type: isLockedSession(session) ? "locked" : session.type,
-        needsHydration: true,
+        needsHydration: session.type === "new" ? false : true,
         preview: session.preview,
         pinned: session.pinned,
         note:
