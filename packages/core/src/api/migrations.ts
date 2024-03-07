@@ -104,8 +104,6 @@ class Migrations {
       if (!this.required() || this.migrating) return;
       this.migrating = true;
 
-      await this.db.notes.init();
-
       await this.migrator.migrate(this.db, collections, this.version);
       await this.db.kv().write("v", CURRENT_DATABASE_VERSION);
       this.version = CURRENT_DATABASE_VERSION;
