@@ -47,16 +47,6 @@ export class PortalProviderAPI extends EventDispatcher {
     container: HTMLElement,
     callback?: () => void
   ) {
-    if (!this.context) return;
-
-    //  const wrappedChildren = children() as JSX.Element;
-
-    // unstable_renderSubtreeIntoContainer(
-    //   this.context,
-    //   wrappedChildren,
-    //   container,
-    //   callback
-    // );
     const root = this.portals.get(container) || createRoot(container);
     root.render(children());
     this.portals.set(container, root);
