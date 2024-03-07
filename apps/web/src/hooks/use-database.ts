@@ -41,7 +41,9 @@ export default function useDatabase(persistence: "db" | "memory" = "db") {
       .catch((e) => showBoundary(e));
 
     function handleError(e: ErrorEvent) {
-      showBoundary(e.error);
+      const error = new Error(e.message);
+      error.stack = `${e.filename}:${e.lineno}:${e.colno}`;
+      showBoundary(e.error || error);
     }
     function handleUnhandledRejection(e: PromiseRejectionEvent) {
       showBoundary(e.reason);
