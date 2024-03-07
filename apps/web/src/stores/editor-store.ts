@@ -223,11 +223,15 @@ class EditorStore extends BaseStore<EditorStore> {
     // });
   };
 
-  async refresh() {
-    // const sessionId = this.get().session.id;
-    // if (sessionId && !(await db.notes.exists(sessionId)))
-    //   await this.clearSession();
-  }
+  refresh = async () => {
+    const { sessions, closeSessions } = this.get();
+    const clearIds = [];
+    for (const session of sessions) {
+      if ("note" in session && !(await db.notes.exists(session.note.id)))
+        clearIds.push(session.id);
+    }
+    if (clearIds.length > 0) closeSessions(...clearIds);
+  };
 
   updateSession = <T extends SessionType[]>(
     id: string,
