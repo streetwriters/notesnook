@@ -100,6 +100,7 @@ export function ImageComponent(
       <Box
         sx={{
           ...getAlignmentStyles(node.attrs),
+          height: float ? height : "unset",
           position: "relative",
           mt: isSVG ? `24px` : 0,
           ":hover .drag-handle, :active .drag-handle": {
@@ -220,8 +221,8 @@ export function ImageComponent(
                 position: "absolute",
                 top: 0,
                 left: 0,
-                width: editor.isEditable ? "100%" : width,
-                height: editor.isEditable ? "100%" : height,
+                width: editor.isEditable && !float ? "100%" : width,
+                height: editor.isEditable && !float ? "100%" : height,
                 bg: "background-secondary",
                 border: selected
                   ? "2px solid var(--accent)"
