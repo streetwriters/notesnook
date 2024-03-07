@@ -120,11 +120,7 @@ export function ImageFloat(props: ToolProps) {
       {...props}
       toggled={!!float}
       onClick={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setImageAlignment({ float: !float })
-          .run()
+        editor.chain().focus().setImageAlignment({ float: !float }).run()
       }
     />
   );

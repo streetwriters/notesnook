@@ -211,16 +211,13 @@ export function ColorPicker(props: ColorPickerProps) {
                 onClick={() => {
                   setIsPickerOpen((s) => {
                     if (s) {
-                      editor.current?.commands.focus();
+                      editor.commands.focus();
                     } else {
                       const onSelectionChange = () => {
                         setIsPickerOpen(false);
-                        editor.current?.off(
-                          "selectionUpdate",
-                          onSelectionChange
-                        );
+                        editor.off("selectionUpdate", onSelectionChange);
                       };
-                      editor.current?.on("selectionUpdate", onSelectionChange);
+                      editor.on("selectionUpdate", onSelectionChange);
                     }
                     return !s;
                   });

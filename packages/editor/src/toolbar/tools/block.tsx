@@ -159,10 +159,10 @@ const callout = (editor: Editor): MenuItem => ({
       title: type,
       key: type,
       type: "button",
-      isChecked: editor?.isActive("callout", { type: type.toLowerCase() }),
+      isChecked: editor.isActive("callout", { type: type.toLowerCase() }),
       onClick: () =>
-        editor.current
-          ?.chain()
+        editor
+          .chain()
           .focus()
           .setCallout({ type: type.toLowerCase() as any })
           .run()
