@@ -271,13 +271,15 @@ function TabStrip() {
             }
             onPin={() => {
               useEditorStore.setState((state) => {
-                let to = state.sessions.findLastIndex((a) => a.pinned);
-                if (to === -1) to = 0;
+                let to = state.sessions.findLastIndex(
+                  (a) => a.pinned && a.id !== session.id
+                );
+                to = to === -1 ? 0 : to + 1;
                 const [fromTab] = state.sessions.splice(i, 1);
                 fromTab.pinned = !fromTab.pinned;
                 // preview tabs can never be pinned.
                 if (fromTab.pinned) fromTab.preview = false;
-                state.sessions.splice(to + 1, 0, fromTab);
+                state.sessions.splice(to, 0, fromTab);
               });
             }}
           />
