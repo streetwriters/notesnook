@@ -211,16 +211,16 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   refreshTags = async () => {
-    // const { session } = this.get();
-    // if (!session.id) return;
-    // this.set({
-    //   tags: await db.relations
-    //     .to({ id: session.id, type: "note" }, "tag")
-    //     .selector.items(undefined, {
-    //       sortBy: "dateCreated",
-    //       sortDirection: "asc"
-    //     })
-    // });
+    const { updateSession, getActiveSession } = this.get();
+    const session = getActiveSession();
+    if (!session || !("note" in session)) return;
+    const tags = await db.relations
+      .to({ id: session.note.id, type: "note" }, "tag")
+      .selector.items(undefined, {
+        sortBy: "dateCreated",
+        sortDirection: "asc"
+      });
+    updateSession(session.id, ["readonly", "default"], { tags });
   };
 
   refresh = async () => {
