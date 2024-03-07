@@ -114,6 +114,7 @@ export function EditorActionBar() {
         activeSession.type !== "new" &&
         activeSession.type !== "readonly" &&
         activeSession.type !== "locked" &&
+        activeSession.type !== "diff" &&
         !isFocusMode,
       onClick: () => useEditorStore.getState().toggleProperties()
     }
