@@ -61,9 +61,11 @@ class EditorManager extends BaseStore<EditorManager> {
       | ((oldState: EditorContext) => Partial<EditorContext>)
   ) => {
     this.set((state) => {
+      const oldState = state.editors[id];
+      if (!oldState) return;
       const newPartialState =
-        typeof partial === "function" ? partial(state.editors[id]) : partial;
-      state.editors[id] = { ...state.editors[id], ...newPartialState };
+        typeof partial === "function" ? partial(oldState) : partial;
+      state.editors[id] = { ...oldState, ...newPartialState };
     });
   };
 
