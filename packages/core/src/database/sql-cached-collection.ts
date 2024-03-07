@@ -106,11 +106,12 @@ export class SQLCachedCollection<
     return item;
   }
 
-  async put(items: (T | undefined)[]): Promise<void> {
-    await this.collection.put(items);
-    for (const item of items) {
-      if (item) this.cache.set(item.id, item);
+  async put(items: (T | undefined)[]) {
+    const entries = await this.collection.put(items);
+    for (const item of entries) {
+      this.cache.set(item.id, item as T);
     }
+    return entries;
   }
 
   async update(ids: string[], partial: Partial<T>): Promise<void> {
