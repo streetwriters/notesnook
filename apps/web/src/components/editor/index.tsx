@@ -151,7 +151,7 @@ function EditorView({ id }: { id: string }) {
   const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
   const isReadonly = useEditorStore(
-    (store) => store.getSession(id, ["default"])?.note?.readonly
+    (store) => store.getSession(id, ["default", "readonly"])?.note?.readonly
   );
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isPreviewSession = !!previewSession.current;

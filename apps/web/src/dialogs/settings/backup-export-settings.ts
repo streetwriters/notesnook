@@ -103,8 +103,11 @@ export const BackupExportSettings: SettingsGroup[] = [
         description: "Encrypt all backup files using your master key.",
         isHidden: () => !useUserStore.getState().isLoggedIn,
         onStateChange: (listener) => {
-          useUserStore.subscribe((s) => s.isLoggedIn, listener);
-          useSettingStore.subscribe((s) => s.encryptBackups, listener);
+          const subscriptions = [
+            useUserStore.subscribe((s) => s.isLoggedIn, listener),
+            useSettingStore.subscribe((s) => s.encryptBackups, listener)
+          ];
+          return () => subscriptions.forEach((s) => s());
         },
         components: [
           {

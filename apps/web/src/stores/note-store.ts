@@ -71,8 +71,10 @@ class NoteStore extends BaseStore<NoteStore> {
   };
 
   delete = async (...ids: string[]) => {
-    const { session, clearSession } = useEditorStore.getState();
-    if (session.id && ids.indexOf(session.id) > -1) await clearSession();
+    const { closeSessions, getActiveSession } = useEditorStore.getState();
+    const session = getActiveSession();
+    if (session && session.id && ids.indexOf(session.id) > -1)
+      closeSessions(session.id);
     await db.notes.moveToTrash(...ids);
     await this.refresh();
   };
@@ -91,7 +93,7 @@ class NoteStore extends BaseStore<NoteStore> {
 
   unlock = async (id: string) => {
     return await Vault.unlockNote(id).then(async (res) => {
-      if (useEditorStore.getState().session.id === id)
+      if (useEditorStore.getState().getActiveSession()?.id === id)
         await useEditorStore.getState().openSession(id);
       await this.refresh();
       return res;
@@ -101,7 +103,7 @@ class NoteStore extends BaseStore<NoteStore> {
   lock = async (id: string) => {
     if (!(await Vault.lockNote(id))) return false;
     await this.refresh();
-    if (useEditorStore.getState().session.id === id)
+    if (useEditorStore.getState().getActiveSession()?.id === id)
       await useEditorStore.getState().openSession(id, true);
   };
 
@@ -142,8 +144,9 @@ class NoteStore extends BaseStore<NoteStore> {
     action: "favorite" | "pinned" | "readonly" | "localOnly" | "color",
     value: boolean | string
   ) => {
-    const { session, toggle } = useEditorStore.getState();
-    if (!session.id || !noteIds.includes(session.id)) return false;
+    const { getActiveSession, toggle } = useEditorStore.getState();
+    const session = getActiveSession();
+    if (!session || !session.id || !noteIds.includes(session.id)) return false;
     toggle(session.id, action, value);
     return true;
   };

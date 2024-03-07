@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User } from "@notesnook/core/dist/api/user-manager";
+import { User } from "@notesnook/core";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import {
   useStore as useUserStore,
@@ -30,7 +30,6 @@ export function useIsUserPremium() {
 }
 
 export function isUserPremium(user?: User) {
-  return true;
   if (IS_TESTING) return true;
   if (!user) user = userstore.get().user;
   if (!user) return false;

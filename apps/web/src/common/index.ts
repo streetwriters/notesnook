@@ -41,7 +41,7 @@ import { createWritableStream } from "./desktop-bridge";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { FeatureKeys } from "../dialogs/feature-dialog";
 import { ZipEntry, createUnzipIterator } from "../utils/streams/unzip-stream";
-import { User } from "@notesnook/core/dist/api/user-manager";
+import { User } from "@notesnook/core";
 import { LegacyBackupFile } from "@notesnook/core";
 import { useEditorStore } from "../stores/editor-store";
 

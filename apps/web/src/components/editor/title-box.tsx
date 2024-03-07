@@ -62,7 +62,7 @@ function TitleBox(props: TitleBoxProps) {
 
   useEffect(() => {
     const session = useEditorStore.getState().getSession(id);
-    if (!session || !session.note) return;
+    if (!session || !("note" in session) || !session.note) return;
 
     const { title } = session.note;
     if (!inputRef.current) return;

@@ -31,7 +31,7 @@ import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { EVENTS } from "@notesnook/core/dist/common";
 import { ErrorText } from "../components/error-text";
-import { User } from "@notesnook/core/dist/api/user-manager";
+import { User } from "@notesnook/core";
 
 type RecoveryMethodType = "key" | "backup" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;

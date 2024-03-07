@@ -28,7 +28,7 @@ import { NNCrypto } from "./nncrypto";
 import type { Cipher, SerializedKey } from "@notesnook/crypto/dist/src/types";
 import { isFeatureSupported } from "../utils/feature-check";
 import { IKeyStore } from "./key-store";
-import { User } from "@notesnook/core/dist/api/user-manager";
+import { User } from "@notesnook/core";
 
 type EncryptedKey = { iv: Uint8Array; cipher: BufferSource };
 export type DatabasePersistence = "memory" | "db";

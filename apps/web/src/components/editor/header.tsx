@@ -34,7 +34,9 @@ import { Tag } from "@notesnook/core";
 type HeaderProps = { readonly: boolean; id: string };
 function Header(props: HeaderProps) {
   const { readonly, id } = props;
-  const tags = useEditorStore((store) => store.getSession(id)?.tags || []);
+  const tags = useEditorStore(
+    (store) => store.getSession(id, ["default", "readonly"])?.tags || []
+  );
   const refreshTags = useEditorStore((store) => store.refreshTags);
 
   useEffect(() => {

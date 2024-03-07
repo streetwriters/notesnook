@@ -43,7 +43,7 @@ import {
   showLogoutConfirmation
 } from "../common/dialog-controller";
 import { ErrorText } from "../components/error-text";
-import { AuthenticatorType, User } from "@notesnook/core/dist/api/user-manager";
+import { AuthenticatorType, User } from "@notesnook/core";
 
 type EmailFormData = {
   email: string;
