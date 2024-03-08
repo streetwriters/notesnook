@@ -24,6 +24,7 @@ import { EVENTS } from "@notesnook/core/dist/common";
 import {
   ContentItem,
   ContentType,
+  ItemReference,
   Note,
   UnencryptedContentItem,
   isDeleted
@@ -43,7 +44,6 @@ import {
 import Navigation from "../../../services/navigation";
 import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
-import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import {
   eClearEditor,
@@ -168,7 +168,7 @@ export const useEditor = (
       console.log(tabId);
     });
     return () => {
-      event.unsubscribe();
+      event?.unsubscribe();
     };
   });
 
@@ -202,7 +202,7 @@ export const useEditor = (
       console.log("Resetting tab:", tabId);
       const noteId = useTabStore.getState().getNoteIdForTab(tabId);
       if (noteId) {
-        currentNotes.current?.id && db.fs().cancel(noteId, "download");
+        currentNotes.current?.id && db.fs().cancel(noteId);
         currentNotes.current[noteId] = null;
         currentContents.current[noteId] = null;
         editorSessionHistory.clearSession(noteId);
@@ -403,13 +403,16 @@ export const useEditor = (
         const tabId = useTabStore.getState().currentTab;
         currentNotes.current && (await reset(tabId));
         setTimeout(() => {
-          if (state.current?.ready) commands.focus(tabId);
+          if (state.current?.ready && !state.current.movedAway)
+            commands.focus(tabId);
         });
       } else {
         if (!event.item) return;
         const item = event.item;
+
         const noteIsLocked =
-          event.item.locked && !(event.item as NoteWithContent).content;
+          (await db.vaults.itemExists(event.item as ItemReference)) &&
+          !(event.item as NoteWithContent).content;
 
         // If note was already opened in a tab, focus that tab.
         if (typeof event.tabId !== "number") {
@@ -428,8 +431,7 @@ export const useEditor = (
             // Otherwise we focus the preview tab or create one to open the note in.
             useTabStore.getState().focusPreviewTab(event.item.id, {
               readonly: event.item.readonly || readonly,
-              locked:
-                event.item.locked && !(event.item as NoteWithContent).content
+              locked: noteIsLocked
             });
           }
         } else {
@@ -512,7 +514,15 @@ export const useEditor = (
         }, 300);
       }
     },
-    [commands, editorSessionHistory, loadContent, postMessage, readonly, reset]
+    [
+      commands,
+      editorSessionHistory,
+      loadContent,
+      overlay,
+      postMessage,
+      readonly,
+      reset
+    ]
   );
 
   const lockNoteWithVault = useCallback((note: Note) => {
@@ -549,7 +559,7 @@ export const useEditor = (
       if (data.type === "tiptap" && note) {
         // Handle this case where note was locked on another device and synced.
         const locked = await db.vaults.itemExists(
-          currentNotes.current[note.id]
+          currentNotes.current[note.id] as ItemReference
         );
         if (!locked && isContentEncrypted) {
           lockNoteWithVault(note);
@@ -606,7 +616,6 @@ export const useEditor = (
       title,
       content,
       type,
-      forSessionId,
       ignoreEdit,
       noteId,
       tabId
@@ -615,7 +624,6 @@ export const useEditor = (
       title?: string;
       content?: string;
       type: string;
-      forSessionId: string;
       ignoreEdit: boolean;
       tabId: number;
     }) => {
@@ -667,7 +675,6 @@ export const useEditor = (
 
   const restoreEditorState = useCallback(async () => {
     const appState = getAppState();
-    console.log(appState, "appState");
     if (!appState) return;
     state.current.isRestoringState = true;
     state.current.currentlyEditing = true;

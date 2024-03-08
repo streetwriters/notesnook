@@ -23,7 +23,7 @@ import {
   deactivateKeepAwake
 } from "@sayem314/react-native-keep-awake";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Dimensions, Platform, StatusBar, View } from "react-native";
+import { Dimensions, Keyboard, Platform, StatusBar, View } from "react-native";
 import changeNavigationBarColor from "react-native-navigation-bar-color";
 import {
   addOrientationListener,
@@ -64,11 +64,12 @@ import { useSettingStore } from "../stores/use-setting-store";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
+  eOnChangeFluidTab,
   eOnLoadNote,
   eOpenFullscreenEditor,
   eUnlockNote
 } from "../utils/events";
-import { editorRef, tabBarRef } from "../utils/global-refs";
+import { editorRef, inputRef, tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
 
@@ -512,7 +513,6 @@ const onChangeTab = async (obj) => {
     editorState().movedAway = false;
     editorState().isFocused = true;
     activateKeepAwake();
-
     if (!useTabStore.getState().getCurrentNoteId()) {
       eSendEvent(eOnLoadNote, {
         newNote: true
@@ -521,6 +521,7 @@ const onChangeTab = async (obj) => {
       if (
         useTabStore.getState().getTab(useTabStore.getState().currentTab).locked
       ) {
+        console.log("Unlocking note....");
         eSendEvent(eUnlockNote);
       }
     }
@@ -530,13 +531,18 @@ const onChangeTab = async (obj) => {
       editorState().movedAway = true;
       editorState().isFocused = false;
       eSendEvent(eClearEditor, "removeHandler");
-      let id = useTabStore.getState().getCurrentNoteId();
-      let note = await db.notes.note(id);
-      const locked = note && (await db.vaults.itemExists(note));
-      if (locked) {
-        useTabStore.getState().updateTab(useTabStore.getState().currentTab, {
-          locked: true
-        });
+
+      // Lock all tabs with locked notes...
+      for (const tab of useTabStore.getState().tabs) {
+        const noteId = useTabStore.getState().getTab(tab.id)?.noteId;
+        if (!noteId) continue;
+        const note = await db.notes.note(noteId);
+        const locked = note && (await db.vaults.itemExists(note));
+        if (locked) {
+          useTabStore.getState().updateTab(tab.id, {
+            locked: true
+          });
+        }
       }
     }
   }

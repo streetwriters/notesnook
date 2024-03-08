@@ -471,13 +471,14 @@ export const useAppEvents = () => {
           const noteId = useTabStore.getState().getTab(tab.id)?.noteId;
           if (!noteId) continue;
           const note = await db.notes.note(noteId);
-          if (note?.locked) {
+          const locked = note && (await db.vaults.itemExists(note));
+          if (locked) {
             useTabStore.getState().updateTab(tab.id, {
               locked: true
             });
             if (
               tab.id === useTabStore.getState().currentTab &&
-              note.locked &&
+              locked &&
               !editorState().movedAway
             ) {
               // Show unlock note screen.

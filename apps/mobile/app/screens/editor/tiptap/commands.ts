@@ -17,8 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Note } from "@notesnook/core/dist/types";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import type { ImageAttributes } from "@notesnook/editor/dist/extensions/image/index";
+import type { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
 import { createRef, RefObject } from "react";
 import { Platform } from "react-native";
 import { EdgeInsets } from "react-native-safe-area-context";
@@ -26,10 +28,8 @@ import WebView from "react-native-webview";
 import { db } from "../../../common/database";
 import { sleep } from "../../../utils/time";
 import { Settings } from "./types";
-import { getResponse, randId, textInput } from "./utils";
-import { Note } from "@notesnook/core/dist/types";
 import { useTabStore } from "./use-tab-store";
-import type { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
+import { getResponse, randId, textInput } from "./utils";
 
 type Action = { job: string; id: string };
 
@@ -82,7 +82,15 @@ class Commands {
       setTimeout(async () => {
         if (!this.ref) return;
         textInput.current?.focus();
-        await this.doAsync(`editors[${tabId}]?.commands.focus()`, "focus");
+
+        const locked = useTabStore.getState().getTab(tabId)?.locked;
+        await this.doAsync(
+          locked
+            ? `editorControllers[${tabId}]?.focusPassInput();`
+            : `editors[${tabId}]?.commands.focus()`,
+          "focus"
+        );
+
         this.ref?.current?.requestFocus();
       }, 1);
     } else {
@@ -98,6 +106,9 @@ class Commands {
     const editorTitle = editorTitles[${tabId}];
     typeof editor !== "undefined" && editor.commands.blur();
     typeof editorTitle !== "undefined" && editorTitle.current && editorTitle.current.blur();
+    
+    editorControllers[${tabId}]?.blurPassInput();
+
   `,
       "blur"
     );
@@ -119,7 +130,6 @@ typeof editorTitle !== "undefined" && editorTitle.current && editorTitle.current
 if (editorController.content) editorController.content.current = null;
 editorController.onUpdate();
 editorController.setTitle(null);
-editorController.countWords(0);
 if (typeof statusBar !== "undefined") {
   statusBar.current.resetWords();
   statusBar.current.set({date:"",saved:""});
@@ -237,7 +247,7 @@ editor && editor.commands.insertAttachment(${JSON.stringify(attachment)})`
   };
 
   setAttachmentProgress = async (
-    attachmentProgress: AttachmentProgress,
+    attachmentProgress: Partial<Attachment>,
     tabId: number
   ) => {
     await this.doAsync(
@@ -320,6 +330,20 @@ const image = toBlobURL("${image.dataurl}", "${image.hash}");
     const tabId = useTabStore.getState().currentTab;
     return this.doAsync(`
       response = editorControllers[${tabId}]?.getTableOfContents() || [];
+    `);
+  };
+
+  focusPassInput = async () => {
+    const tabId = useTabStore.getState().currentTab;
+    return this.doAsync(`
+      response = editorControllers[${tabId}]?.focusPassInput() || [];
+    `);
+  };
+
+  blurPassInput = async () => {
+    const tabId = useTabStore.getState().currentTab;
+    return this.doAsync(`
+      response = editorControllers[${tabId}]?.blurPassInput() || [];
     `);
   };
 
