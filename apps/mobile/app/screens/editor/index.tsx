@@ -192,6 +192,9 @@ const LockOverlay = () => {
   );
   const isAppLoading = useSettingStore((state) => state.isAppLoading);
   const [item] = useDBItem(isAppLoading ? undefined : tab?.noteId, "note");
+  const tabRef = useRef(tab);
+
+  tabRef.current = tab;
 
   useEffect(() => {
     if (!isAppLoading && !LOADED) {
@@ -227,7 +230,7 @@ const LockOverlay = () => {
   useEffect(() => {
     const unlockWithBiometrics = async () => {
       try {
-        if (!item || !tab) return;
+        if (!item || !tabRef.current) return;
         console.log("Trying to unlock with biometrics...");
         const credentials = await BiometicService.getCredentials(
           "Unlock note",
@@ -239,7 +242,8 @@ const LockOverlay = () => {
           eSendEvent(eOnLoadNote, {
             item: note
           });
-          useTabStore.getState().updateTab(tab.id, {
+
+          useTabStore.getState().updateTab(tabRef.current.id, {
             locked: false
           });
         }
@@ -255,7 +259,7 @@ const LockOverlay = () => {
       password: string;
       biometrics?: boolean;
     }) => {
-      if (!item || !tab) return;
+      if (!item || !tabRef.current) return;
       if (!password || password.trim().length === 0) {
         ToastManager.show({
           heading: "Password not entered",
@@ -299,7 +303,7 @@ const LockOverlay = () => {
         eSendEvent(eOnLoadNote, {
           item: note
         });
-        useTabStore.getState().updateTab(tab.id, {
+        useTabStore.getState().updateTab(tabRef.current.id, {
           locked: false
         });
       } catch (e) {
@@ -314,7 +318,7 @@ const LockOverlay = () => {
 
     const unlock = () => {
       if (
-        (tab?.locked,
+        (tabRef.current?.locked,
         useTabStore.getState().biometryAvailable &&
           useTabStore.getState().biometryEnrolled &&
           !editorState().movedAway)
@@ -324,8 +328,8 @@ const LockOverlay = () => {
         console.log("Biometrics unavailable.", editorState().movedAway);
         if (!editorState().movedAway) {
           setTimeout(() => {
-            if (tab && tab?.locked) {
-              editorController.current?.commands.focus(tab?.id);
+            if (tabRef.current && tabRef.current?.locked) {
+              editorController.current?.commands.focus(tabRef.current?.id);
             }
           }, 100);
         }
@@ -339,13 +343,13 @@ const LockOverlay = () => {
       }),
       eSubscribeEvent(eUnlockWithPassword, onSubmit)
     ];
-    if (tab?.locked) {
+    if (tabRef.current?.locked) {
       unlock();
     }
     return () => {
       subs.map((s) => s?.unsubscribe());
     };
-  }, [item, tab]);
+  }, [item]);
 
   return null;
 };
