@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { parseInternalLink } from "@notesnook/core";
 import { ItemReference } from "@notesnook/core/dist/types";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
@@ -36,9 +37,11 @@ import { WebViewMessageEvent } from "react-native-webview";
 import { db } from "../../../common/database";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
 import EditorTabs from "../../../components/sheets/editor-tabs";
+import LinkNote from "../../../components/sheets/link-note";
 import ManageTagsSheet from "../../../components/sheets/manage-tags";
 import { RelationsList } from "../../../components/sheets/relations-list";
 import ReminderSheet from "../../../components/sheets/reminder";
+import TableOfContents from "../../../components/sheets/toc";
 import { DDS } from "../../../services/device-detection";
 import {
   ToastManager,
@@ -48,7 +51,6 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SettingsService from "../../../services/settings";
-import { useEditorStore } from "../../../stores/use-editor-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
@@ -61,7 +63,9 @@ import {
   eOpenFullscreenEditor,
   eOpenLoginDialog,
   eOpenPremiumDialog,
-  eOpenPublishNoteDialog
+  eOpenPublishNoteDialog,
+  eUnlockWithBiometrics,
+  eUnlockWithPassword
 } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { tabBarRef } from "../../../utils/global-refs";
@@ -70,9 +74,6 @@ import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { EditorEvents, editorState } from "./utils";
-import TableOfContents from "../../../components/sheets/toc";
-import LinkNote from "../../../components/sheets/link-note";
-import { parseInternalLink } from "@notesnook/core";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -368,7 +369,7 @@ export const useEditorEvents = (
         case EventTypes.content:
           editor.saveContent({
             type: editorMessage.type,
-            content: editorMessage.value as string,
+            content: editorMessage.value.html as string,
             noteId: noteId,
             tabId: editorMessage.tabId,
             ignoreEdit: (editorMessage.value as ContentMessage).ignoreEdit
@@ -617,6 +618,16 @@ export const useEditorEvents = (
             editorMessage.value.attributes,
             editorMessage.value.resolverId
           );
+          break;
+        }
+
+        case EventTypes.unlock: {
+          eSendEvent(eUnlockWithPassword, editorMessage.value);
+          break;
+        }
+
+        case EventTypes.unlockWithBiometrics: {
+          eSendEvent(eUnlockWithBiometrics);
           break;
         }
 

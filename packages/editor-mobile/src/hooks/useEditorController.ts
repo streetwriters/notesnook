@@ -109,8 +109,10 @@ export type EditorController = {
   setLoading: (value: boolean) => void;
   getTableOfContents: () => any[];
   scrollIntoView: (id: string) => void;
+  passwordInputRef: MutableRefObject<HTMLInputElement | null>;
+  focusPassInput: () => void;
+  blurPassInput: () => void;
 };
-
 export function useEditorController({
   update,
   getTableOfContents
@@ -118,6 +120,7 @@ export function useEditorController({
   update: () => void;
   getTableOfContents: () => any[];
 }): EditorController {
+  const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const tab = useTabContext();
   const [loading, setLoading] = useState(true);
   const setTheme = useThemeEngineStore((store) => store.setTheme);
@@ -240,8 +243,8 @@ export function useEditorController({
           break;
         }
         case "native:html":
-          // logger("info", "loading html", htmlContentRef.current);
           htmlContentRef.current = value;
+          logger("info", "loading html");
           if (!editor) break;
           update();
           countWords(0);
@@ -379,6 +382,14 @@ export function useEditorController({
         countWords();
         logger("info", `Tab ${tab.id} updated.`);
       }, 1);
+    },
+    passwordInputRef,
+    focusPassInput: () => {
+      logger("info", "focus pass input...");
+      passwordInputRef.current?.focus();
+    },
+    blurPassInput: () => {
+      passwordInputRef.current?.blur();
     }
   };
 }

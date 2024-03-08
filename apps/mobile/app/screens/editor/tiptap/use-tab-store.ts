@@ -20,6 +20,7 @@ import create from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
 import { editorController } from "./utils";
 import { MMKV } from "../../../common/database/mmkv";
+import { db } from "../../../common/database";
 
 class History {
   history: number[];
@@ -98,6 +99,8 @@ export type TabStore = {
   getCurrentNoteId: () => string | undefined;
   getTab: (tabId: number) => TabItem | undefined;
   tabHistory: number[];
+  biometryAvailable?: boolean;
+  biometryEnrolled?: boolean;
 };
 
 function getId(id: number, tabs: TabItem[]): number {
@@ -112,7 +115,9 @@ export function syncTabs() {
   editorController.current?.commands.doAsync(`
     globalThis.tabStore?.setState({
       tabs: ${JSON.stringify(useTabStore.getState().tabs)},
-      currentTab: ${useTabStore.getState().currentTab}
+      currentTab: ${useTabStore.getState().currentTab},
+      biometryAvailable: ${useTabStore.getState().biometryAvailable},
+      biometryEnrolled: ${useTabStore.getState().biometryEnrolled}
     });
 `);
 }

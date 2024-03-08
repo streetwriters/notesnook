@@ -62,6 +62,8 @@ export type TabStore = {
   getCurrentNoteId: () => string | undefined;
   getTab: (tabId: number) => TabItem | undefined;
   setNoteState: (noteId: string, state: Partial<NoteState>) => void;
+  biometryAvailable?: boolean;
+  biometryEnrolled?: boolean;
 };
 
 function getId(id: number, tabs: TabItem[]): number {

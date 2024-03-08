@@ -186,7 +186,9 @@ export const EventTypes = {
   tabFocused: "editor-events:tab-focused",
   toc: "editor-events:toc",
   createInternalLink: "editor-events:create-internal-link",
-  load: "editor-events:load"
+  load: "editor-events:load",
+  unlock: "editor-events:unlock",
+  unlockWithBiometrics: "editor-events:unlock-biometrics"
 } as const;
 
 export function randId(prefix: string) {

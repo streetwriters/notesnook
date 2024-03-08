@@ -32,7 +32,7 @@ import { presentSheet } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
-import { PressableButton } from "../../ui/pressable";
+import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import type { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
 import { editorController } from "../../../screens/editor/tiptap/utils";
@@ -48,13 +48,13 @@ const ListNoteItem = ({
 }) => {
   const [item] = useDBItem(id, "note", items);
   return (
-    <PressableButton
+    <Pressable
       onPress={() => {
         if (!item) return;
         onSelectNote(item as Note);
       }}
       type={"transparent"}
-      customStyle={{
+      style={{
         paddingVertical: 12,
         flexDirection: "row",
         width: "100%",
@@ -69,7 +69,7 @@ const ListNoteItem = ({
       >
         <Paragraph numberOfLines={1}>{item?.title}</Paragraph>
       </View>
-    </PressableButton>
+    </Pressable>
   );
 };
 
@@ -82,12 +82,12 @@ const ListBlockItem = ({
 }) => {
   const { colors } = useThemeColors();
   return (
-    <PressableButton
+    <Pressable
       onPress={() => {
         onSelectBlock(item);
       }}
       type={"transparent"}
-      customStyle={{
+      style={{
         flexDirection: "row",
         width: "100%",
         justifyContent: "flex-start",
@@ -127,7 +127,7 @@ const ListBlockItem = ({
             : item.content}
         </Paragraph>
       </View>
-    </PressableButton>
+    </Pressable>
   );
 };
 
@@ -198,7 +198,7 @@ export default function LinkNote(props: {
     setSelectedNote(note);
     inputRef.current?.clear();
     setTimeout(async () => {
-      nodesRef.current = await db.notes.getBlocks(note.id);
+      nodesRef.current = await db.notes.contentBlocks(note.id);
       setNodes(nodesRef.current);
     });
     // Fetch and set note's nodes.
@@ -249,13 +249,13 @@ export default function LinkNote(props: {
             <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
               SELECTED NOTE
             </Paragraph>
-            <PressableButton
+            <Pressable
               onPress={() => {
                 setSelectedNote(undefined);
                 setSelectedNodeId(undefined);
                 setNodes([]);
               }}
-              customStyle={{
+              style={{
                 flexDirection: "row",
                 width: "100%",
                 justifyContent: "flex-start",
@@ -264,7 +264,7 @@ export default function LinkNote(props: {
                 borderColor: colors.primary.accent,
                 paddingHorizontal: 12
               }}
-              type="grayAccent"
+              type="secondaryAccented"
             >
               <View
                 style={{
@@ -280,7 +280,7 @@ export default function LinkNote(props: {
                   Tap to deselect
                 </Paragraph>
               </View>
-            </PressableButton>
+            </Pressable>
 
             {nodes?.length > 0 ? (
               <Paragraph

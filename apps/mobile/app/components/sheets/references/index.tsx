@@ -39,7 +39,7 @@ import { SIZE } from "../../../utils/size";
 import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
-import { PressableButton } from "../../ui/pressable";
+import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 
 export const useExpandedStore = create<{
@@ -68,12 +68,12 @@ const ListBlockItem = ({
 }) => {
   const { colors } = useThemeColors();
   return (
-    <PressableButton
+    <Pressable
       onPress={() => {
         onSelectBlock();
       }}
       type={"transparent"}
-      customStyle={{
+      style={{
         flexDirection: "row",
         width: "100%",
         paddingLeft: 35,
@@ -114,7 +114,7 @@ const ListBlockItem = ({
             : item.content}
         </Paragraph>
       </View>
-    </PressableButton>
+    </Pressable>
   );
 };
 
@@ -130,12 +130,12 @@ const ListNoteInternalLink = ({
 }) => {
   const { colors } = useThemeColors();
   return (
-    <PressableButton
+    <Pressable
       onPress={() => {
         onSelect();
       }}
       type={"transparent"}
-      customStyle={{
+      style={{
         flexDirection: "row",
         width: "100%",
         paddingLeft: 35,
@@ -177,7 +177,7 @@ const ListNoteInternalLink = ({
           </Paragraph>
         ))}
       </View>
-    </PressableButton>
+    </Pressable>
   );
 };
 
@@ -306,13 +306,13 @@ const ListNoteItem = ({
         alignItems: "center"
       }}
     >
-      <PressableButton
-        type={"gray"}
+      <Pressable
+        type={"plain"}
         onPress={() => {
           if (!item) return;
           onSelect(item as Note);
         }}
-        customStyle={{
+        style={{
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "flex-start",
@@ -330,14 +330,14 @@ const ListNoteItem = ({
           left={0}
           bottom={0}
           right={0}
-          customStyle={{
+          style={{
             width: 35,
             height: 35
           }}
           name={expanded ? "chevron-down" : "chevron-right"}
         />
         <Paragraph numberOfLines={1}>{item?.title}</Paragraph>
-      </PressableButton>
+      </Pressable>
 
       {expanded && !item?.locked ? (
         <View
@@ -441,7 +441,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
         }}
       >
         <Button
-          type={"gray"}
+          type={"plain"}
           title="Linked notes"
           style={{
             borderRadius: 0,
@@ -455,7 +455,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
           }}
         />
         <Button
-          type={"gray"}
+          type={"plain"}
           title="Referenced in"
           style={{
             width: "50%",

@@ -51,6 +51,7 @@ import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
+import FingerprintIcon from "mdi-react/FingerprintIcon";
 
 globalThis.toBlobURL = toBlobURL as typeof globalThis.toBlobURL;
 
@@ -71,6 +72,9 @@ const Tiptap = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const noteStateUpdateTimer = useRef<NodeJS.Timeout>();
   const tabRef = useRef<TabItem>(tab);
+  const biometryAvailable = useTabStore((state) => state.biometryAvailable);
+  const biometryEnrolled = useTabStore((state) => state.biometryEnrolled);
+
   const isFocusedRef = useRef<boolean>(false);
   tabRef.current = tab;
 
@@ -161,6 +165,7 @@ const Tiptap = ({
       timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined,
       enableInputRules: settings.markdownShortcuts
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     getContentDiv,
     settings.readonly,
@@ -169,6 +174,7 @@ const Tiptap = ({
     settings.dateFormat,
     settings.timeFormat,
     settings.markdownShortcuts,
+    tick,
     tab.id
   ]);
 
@@ -372,7 +378,7 @@ const Tiptap = ({
             position: "relative"
           }}
         >
-          {settings.noHeader ? null : (
+          {settings.noHeader || tab.locked ? null : (
             <>
               <Tags settings={settings} />
               <Title
@@ -392,45 +398,219 @@ const Tiptap = ({
             <div
               style={{
                 width: "100%",
-                height: "95%",
+                height: "90%",
                 position: "absolute",
                 zIndex: 999,
                 backgroundColor: colors.primary.background,
                 paddingRight: 12,
                 paddingLeft: 12,
                 display: "flex",
-                flexDirection: "column"
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                boxSizing: "border-box",
+                rowGap: 10
               }}
             >
-              <div
-                style={{
-                  height: 16,
-                  width: "94%",
-                  backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
-                  marginTop: 10
-                }}
-              />
+              {tab.locked ? (
+                <>
+                  <p
+                    style={{
+                      color: colors.primary.paragraph,
+                      fontSize: 20,
+                      fontWeight: "600",
+                      textAlign: "center",
+                      padding: "0px 20px",
+                      marginBottom: 0,
+                      userSelect: "none"
+                    }}
+                  >
+                    {controller.title} ajklsdksa jdlksaj dksljk jdalkjskldj
+                  </p>
+                  <p
+                    style={{
+                      color: colors.primary.paragraph,
+                      marginTop: 0,
+                      marginBottom: 0,
+                      userSelect: "none"
+                    }}
+                  >
+                    This note is locked.
+                  </p>
 
-              <div
-                style={{
-                  height: 16,
-                  width: "94%",
-                  backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
-                  marginTop: 10
-                }}
-              />
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const data = new FormData(e.currentTarget);
+                      const password = data.get("password");
+                      const biometrics = data.get("enrollBiometrics");
+                      post("editor-events:unlock", {
+                        password,
+                        biometrics: biometrics === "on" ? true : false
+                      });
+                    }}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      rowGap: 10
+                    }}
+                  >
+                    <input
+                      placeholder="Enter password"
+                      ref={controller.passwordInputRef}
+                      name="password"
+                      type="password"
+                      required
+                      style={{
+                        boxSizing: "border-box",
+                        width: 300,
+                        height: 45,
+                        borderRadius: 5,
+                        border: `1px solid ${colors.primary.border}`,
+                        paddingLeft: 12,
+                        paddingRight: 12,
+                        fontSize: "1em",
+                        backgroundColor: "transparent",
+                        caretColor: colors.primary.accent,
+                        color: colors.primary.paragraph
+                      }}
+                    />
 
-              <div
-                style={{
-                  height: 16,
-                  width: 200,
-                  backgroundColor: colors.secondary.background,
-                  borderRadius: 5,
-                  marginTop: 10
-                }}
-              />
+                    <button
+                      style={{
+                        backgroundColor: colors.primary.accent,
+                        borderRadius: 5,
+                        boxSizing: "border-box",
+                        border: "none",
+                        color: colors.static.white,
+                        width: 300,
+                        fontSize: "0.9em",
+                        height: 45,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}
+                      onMouseDown={(e) => {
+                        if (globalThis.keyboardShown) {
+                          e.preventDefault();
+                        }
+                      }}
+                    >
+                      <p
+                        style={{
+                          userSelect: "none"
+                        }}
+                      >
+                        Unlock note
+                      </p>
+                    </button>
+
+                    {biometryAvailable && !biometryEnrolled ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 5
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          name="enrollBiometrics"
+                          style={{
+                            accentColor: colors.primary.accent
+                          }}
+                          onMouseDown={(e) => {
+                            if (globalThis.keyboardShown) {
+                              e.preventDefault();
+                            }
+                          }}
+                        />
+
+                        <p
+                          style={{
+                            color: colors.primary.paragraph,
+                            marginTop: 0,
+                            marginBottom: 0,
+                            userSelect: "none"
+                          }}
+                        >
+                          Enable biometric unlocking
+                        </p>
+                      </div>
+                    ) : null}
+                  </form>
+
+                  {biometryEnrolled && biometryAvailable ? (
+                    <button
+                      style={{
+                        backgroundColor: "transparent",
+                        borderRadius: 5,
+                        boxSizing: "border-box",
+                        border: "none",
+                        color: colors.primary.accent,
+                        width: 300,
+                        fontSize: "0.9em",
+                        height: 45,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        columnGap: 5,
+                        userSelect: "none"
+                      }}
+                      onMouseDown={(e) => {
+                        if (globalThis.keyboardShown) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onClick={() => {
+                        post("editor-events:unlock-biometrics");
+                      }}
+                    >
+                      <FingerprintIcon />
+                      <p
+                        style={{
+                          userSelect: "none"
+                        }}
+                      >
+                        Unlock with biometrics
+                      </p>
+                    </button>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  <div
+                    style={{
+                      height: 16,
+                      width: "94%",
+                      backgroundColor: colors.secondary.background,
+                      borderRadius: 5,
+                      marginTop: 10
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      height: 16,
+                      width: "94%",
+                      backgroundColor: colors.secondary.background,
+                      borderRadius: 5,
+                      marginTop: 10
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      height: 16,
+                      width: 200,
+                      backgroundColor: colors.secondary.background,
+                      borderRadius: 5,
+                      marginTop: 10
+                    }}
+                  />
+                </>
+              )}
             </div>
           ) : null}
 

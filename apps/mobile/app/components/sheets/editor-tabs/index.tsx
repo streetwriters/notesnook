@@ -26,7 +26,7 @@ import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
-import { PressableButton } from "../../ui/pressable";
+import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { eUnlockNote } from "../../../utils/events";
@@ -48,8 +48,8 @@ const TabItemComponent = (props: {
   const [item] = useDBItem(props.tab.noteId, "note");
 
   return (
-    <PressableButton
-      customStyle={{
+    <Pressable
+      style={{
         alignItems: "center",
         justifyContent: "space-between",
         flexDirection: "row",
@@ -114,7 +114,7 @@ const TabItemComponent = (props: {
         right={20}
         bottom={0}
       />
-    </PressableButton>
+    </Pressable>
   );
 };
 

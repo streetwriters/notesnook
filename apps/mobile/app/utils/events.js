@@ -166,5 +166,8 @@ export const eOnRefreshSearch = "612";
 
 export const eOpenAppLockPasswordDialog = "613";
 export const eCloseAppLocKPasswordDailog = "614";
-export const eEditorTabFocused = "613";
-export const eUnlockNote = "614";
+export const eEditorTabFocused = "615";
+export const eUnlockNote = "616";
+export const eOnChangeFluidTab = "617";
+export const eUnlockWithBiometrics = "618";
+export const eUnlockWithPassword = "619";
