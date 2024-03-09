@@ -90,7 +90,11 @@ export function highlightInternalLinks(
   return highlighted;
 }
 
-function ellipsize(text: string, maxLength: number, from: "start" | "end") {
+export function ellipsize(
+  text: string,
+  maxLength: number,
+  from: "start" | "end"
+) {
   const needsTruncation = text.length > maxLength;
   const offsets = needsTruncation
     ? from === "start"

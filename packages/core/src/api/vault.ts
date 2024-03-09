@@ -191,7 +191,12 @@ export default class Vault {
     const note = await this.db.notes.note(noteId);
     if (!note) return;
 
-    const content = await this.unlockNote(noteId, password, false);
+    const content = await this.unlockNote(
+      noteId,
+      password || this.password,
+      false
+    );
+
     if (password) {
       this.password = password;
       if (!(await this.exists())) await this.create(password);
@@ -260,18 +265,10 @@ export default class Vault {
       .storage()
       .decrypt({ password }, encryptedContent.data);
 
-    const content: NoteContent<false> = {
+    return <NoteContent<false>>{
       type: encryptedContent.type,
       data: JSON.parse(decryptedContent)
     };
-
-    // #MIGRATION: convert tiny to tiptap
-    if (content.type === "tiny") {
-      content.type = "tiptap";
-      content.data = tinyToTiptap(content.data);
-    }
-
-    return content;
   }
 
   private async lockNote(
@@ -334,6 +331,16 @@ export default class Vault {
     const content = await this.db.content.findByNoteId(noteId);
     if (!content || !content.locked) return;
     const decryptedContent = await this.decryptContent(content, password);
+
+    if (this.db.content.preProcess(decryptedContent)) {
+      if (!password) password = await this.getVaultPassword();
+      await this.encryptContent(
+        decryptedContent,
+        noteId,
+        password,
+        `${Date.now}`
+      );
+    }
 
     if (perm) {
       await this.db.notes.add({
