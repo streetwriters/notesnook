@@ -37,12 +37,11 @@ import TextStyle from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import ListKeymap from "@tiptap/extension-list-keymap";
-import { useEffect, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo } from "react";
 import "./extensions";
 import {
   Attachment,
   AttachmentNode,
-  AttachmentOptions,
   AttachmentType
 } from "./extensions/attachment";
 import BulletList from "./extensions/bullet-list";
@@ -157,6 +156,7 @@ const useTiptap = (
     editorProps,
     ...restOptions
   } = options;
+
   const PortalProviderAPI = usePortalProvider();
   const setIsMobile = useToolbarStore((store) => store.setIsMobile);
   const closeAllPopups = useToolbarStore((store) => store.closeAllPopups);
@@ -172,6 +172,12 @@ const useTiptap = (
   useEffect(() => {
     closeAllPopups();
   }, deps);
+
+  useLayoutEffect(() => {
+    return () => {
+      closeAllPopups();
+    };
+  }, [closeAllPopups]);
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({

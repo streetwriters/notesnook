@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { PopupWrapper } from "../../components/popup-presenter";
 import { ToolButton } from "../components/tool-button";
 import { useToolbarLocation } from "../stores/toolbar-store";
@@ -41,6 +41,7 @@ export function MoreTools(props: MoreToolsProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(autoOpen || false);
   const onClosed = useCallback(() => setIsOpen(false), [setIsOpen]);
+  useLayoutEffect(() => () => setIsOpen(false), []);
 
   return (
     <>

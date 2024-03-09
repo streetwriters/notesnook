@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState } from "react";
+import { useRef, useState, useLayoutEffect } from "react";
 import { Text } from "@theme-ui/components";
 import { Icon, MenuItem, MenuPresenter } from "@notesnook/ui";
 import { Icons } from "../icons";
@@ -43,6 +43,8 @@ export function Dropdown(props: DropdownProps) {
   const toolbarLocation = useToolbarLocation();
   const isMobile = useIsMobile();
   const isBottom = toolbarLocation === "bottom";
+
+  useLayoutEffect(() => () => setIsOpen(false), []);
 
   const { isPopupOpen } = usePopupHandler({
     group,
