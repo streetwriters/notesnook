@@ -92,6 +92,34 @@ export class Tiptap {
     return tokens.some((token) => lowercase.indexOf(token) > -1);
   }
 
+  insertBlockIds() {
+    let index = 0;
+    return new HTMLRewriter({
+      ontag(name, attr) {
+        switch (name) {
+          case "p":
+          case "h1":
+          case "h2":
+          case "h3":
+          case "h4":
+          case "h5":
+          case "h6":
+          case "blockquote":
+          case "ul":
+          case "ol":
+          case "pre":
+          case "img":
+          case "iframe":
+          case "div":
+            return {
+              name,
+              attr: { ...attr, [ATTRIBUTES.blockId]: `${name}${++index}` }
+            };
+        }
+      }
+    }).transform(this.data);
+  }
+
   async insertMedia(resolve: ResolveHashes) {
     const hashes: string[] = [];
     new HTMLParser({
@@ -124,17 +152,15 @@ export class Tiptap {
 
     if (types.includes("blocks")) {
       result.blocks.push(
-        ...document.childNodes
-          .filter((element): element is Element => {
-            return isTag(element) && !!element.attribs[ATTRIBUTES.blockId];
-          })
-          .map((node) => ({
-            id: node.attribs[ATTRIBUTES.blockId],
-            type: node.tagName.toLowerCase(),
-            content: convertHtmlToTxt(
-              this.data.slice(node.startIndex || 0, node.endIndex || 0)
-            )
-          }))
+        ...findAll((element): element is Element => {
+          return isTag(element) && !!element.attribs[ATTRIBUTES.blockId];
+        }, document.childNodes).map((node) => ({
+          id: node.attribs[ATTRIBUTES.blockId],
+          type: node.tagName.toLowerCase(),
+          content: convertHtmlToTxt(
+            this.data.slice(node.startIndex || 0, node.endIndex || 0)
+          )
+        }))
       );
     }
 

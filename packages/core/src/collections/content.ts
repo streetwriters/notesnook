@@ -34,6 +34,7 @@ import { getOutputType } from "./attachments";
 import { SQLCollection } from "../database/sql-collection";
 import { NoteContent } from "./session-content";
 import { InternalLink } from "../utils/internal-link";
+import { tinyToTiptap } from "../migrations";
 
 export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
   noteId,
@@ -157,6 +158,12 @@ export class Content implements ICollection {
   async get(id: string) {
     const content = await this.collection.get(id);
     if (!content || isDeleted(content)) return;
+    if (!content.locked && this.preProcess(content)) {
+      await this.db.content.add({
+        ...content,
+        sessionId: `${Date.now()}`
+      });
+    }
     return content;
   }
 
@@ -208,6 +215,12 @@ export class Content implements ICollection {
       .selectAll()
       .executeTakeFirst()) as ContentItem;
     if (!content || isDeleted(content)) return;
+    if (!content.locked && this.preProcess(content)) {
+      await this.db.content.add({
+        ...content,
+        sessionId: `${Date.now()}`
+      });
+    }
     return content;
   }
 
@@ -298,6 +311,28 @@ export class Content implements ICollection {
     if (!content) return;
     contentItem.data = content.removeAttachments(hashes);
     await this.add(contentItem);
+  }
+
+  preProcess(content: NoteContent<false>) {
+    let changed = false;
+
+    // #MIGRATION: convert tiny to tiptap
+    if (content.type === "tiny") {
+      content.type = "tiptap";
+      content.data = tinyToTiptap(content.data);
+      changed = true;
+    }
+
+    // add block id on all appropriate nodes
+    if (!content.data.includes("data-block-id")) {
+      content.data = getContentFromData(
+        content.type,
+        content.data
+      ).insertBlockIds();
+      changed = true;
+    }
+
+    return changed;
   }
 
   async postProcess(contentItem: NoteContent<false> & { noteId: string }) {
