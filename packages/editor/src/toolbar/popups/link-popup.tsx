@@ -40,19 +40,30 @@ export function LinkPopup(props: LinkPopupProps) {
   } = props;
   const link = useRefValue(_link);
 
+  // const executeLinkOperation = (e?: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e?.key === "Enter" || e?.type === "click") {
+  //     if (!link.current) return;
+  //     onDone(link.current);
+  //   }
+  // };
+
   return (
     <Popup
       title={isEditing ? "Edit link" : "Insert link"}
       onClose={onClose}
       action={{
         title: isEditing ? "Save edits" : "Insert link",
-        onClick: () => {
-          if (!link.current) return;
-          onDone(link.current);
-        }
+        onClick: () => onDone(link.current)
       }}
     >
-      <Flex sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}>
+      <Flex
+        sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}
+        onKeyUp={(e) => {
+          if (e.key === "Enter") {
+            onDone(link.current);
+          }
+        }}
+      >
         {!isImageActive && (
           <Input
             type="text"
