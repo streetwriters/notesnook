@@ -25,6 +25,7 @@ import {
   PopupPresenter
 } from "@notesnook/ui";
 import {
+  getPopupContainer,
   getPopupRoot,
   getToolbarElement,
   unmountPopupRoot
@@ -62,6 +63,7 @@ export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
       focusOnRender
       className={isMobile ? "editor-mobile-toolbar-popup" : undefined}
       isMobile={isMobile}
+      container={getPopupContainer()}
       {...presenterProps}
       isOpen={isPopupOpen}
     >
@@ -136,6 +138,7 @@ export function showPopup(options: ShowPopupOptions) {
       }}
       blocking
       focusOnRender
+      container={getPopupContainer()}
       {...props}
       onClose={() => {
         hide();
