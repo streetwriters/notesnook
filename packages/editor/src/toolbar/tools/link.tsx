@@ -268,7 +268,7 @@ function LinkTool(props: LinkToolProps) {
       />
       <ResponsivePresenter
         mobile="sheet"
-        desktop="menu"
+        desktop="popup"
         position={{
           target: buttonRef.current || undefined,
           isTargetAbsolute: true,
