@@ -224,7 +224,7 @@ export type MenuPresenterProps = Omit<
   PopupPresenterProps,
   "movable" | "scope"
 > &
-  MenuProps;
+  MenuProps & { container?: HTMLElement };
 export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
   const {
     items = [],
@@ -234,6 +234,7 @@ export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
     blocking,
     focusOnRender,
     isMobile,
+    container,
     ...restProps
   } = props;
 
@@ -261,6 +262,7 @@ export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
       isOpen={isOpen}
       onClose={onClose}
       blocking={blocking}
+      container={container}
       focusOnRender={focusOnRender}
       isMobile={isMobile}
     >
