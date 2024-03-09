@@ -54,7 +54,6 @@ export const KeepInView = Extension.create<
   },
 
   onDestroy() {
-    console.log("DESTROYING!");
     if (!this.storage.onWindowResize) return;
     window.removeEventListener("resize", this.storage.onWindowResize);
     this.storage.onWindowResize = undefined;
@@ -82,6 +81,8 @@ export function keepLastLineInView(
   );
 
   const node = editor.state.selection.$from;
+  if (node.pos > editor.state.doc.nodeSize) return;
+
   const { top } = posToDOMRect(editor.view, node.pos, node.pos + 1);
   const isBelowThreshold =
     window.innerHeight - top < (isPopupVisible ? THRESHOLD + 60 : THRESHOLD);
