@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ToolProps } from "../types";
 import { Box, Button, Flex } from "@theme-ui/components";
 import { IconNames } from "../icons";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useLayoutEffect } from "react";
 import { SplitButton } from "../components/split-button";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { getToolbarElement } from "../utils/dom";
@@ -51,6 +51,8 @@ function _ListTool<TListStyleTypes extends string>(
   const isBottom = toolbarLocation === "bottom";
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useLayoutEffect(() => () => setIsOpen(false), []);
 
   return (
     <SplitButton
