@@ -38,6 +38,16 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
   const hoverTimeoutId = useRef<number>();
   const activePopup = useRef<{ element: HTMLElement; hide: () => void }>();
 
+  useEffect(() => {
+    function onDestroy() {
+      activePopup.current?.hide();
+    }
+    editor.on("destroy", onDestroy);
+    return () => {
+      editor.off("destroy", onDestroy);
+    };
+  }, []);
+
   useEffect(
     () => {
       function onMouseOver(e: MouseEvent) {
