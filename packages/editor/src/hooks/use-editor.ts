@@ -43,6 +43,8 @@ export const useEditor = (
 
   useEffect(
     () => {
+      if (editor.view.isDestroyed) return;
+
       let isMounted = true;
       let updateTimeout: number;
 
