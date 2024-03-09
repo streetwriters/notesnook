@@ -46,13 +46,20 @@ export function getTableOfContents(content: HTMLElement) {
   return tableOfContents;
 }
 
-export function scrollIntoViewById(id: string) {
-  const element = document.querySelector(`[data-block-id="${id}"]`);
+export function scrollIntoViewById(blockId: string) {
+  const element = document.querySelector(
+    `.active [data-block-id=${JSON.stringify(blockId)}]`
+  );
+
   if (element) {
-    element.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-      inline: "nearest"
-    });
+    setTimeout(
+      () =>
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "nearest"
+        }),
+      100
+    );
   }
 }
