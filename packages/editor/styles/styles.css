@@ -21,7 +21,7 @@
 }
 
 .ProseMirror:first-child {
-  margin-top: 10px;
+  padding-top: 10px;
 }
 
 .ProseMirror hr {
