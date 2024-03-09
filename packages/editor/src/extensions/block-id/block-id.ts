@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Extension, NodeWithPos } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
 import { nanoid } from "nanoid";
-import { getChangedNodes } from "../../utils/prosemirror";
 
 const BLOCK_ID_TYPES = [
   "paragraph",
@@ -28,7 +27,6 @@ const BLOCK_ID_TYPES = [
   "blockquote",
   "bulletList",
   "orderedList",
-  "taskItem",
   "taskList",
   "table",
   "codeblock",
@@ -82,7 +80,6 @@ export const BlockId = Extension.create({
               blocksWithoutBlockId.push({ node: n, pos: offset });
           });
           if (blocksWithoutBlockId.length > 0) {
-            console.log(blocksWithoutBlockId);
             const { tr } = newState;
             for (const { node, pos } of blocksWithoutBlockId) {
               const id = nanoid(8);
