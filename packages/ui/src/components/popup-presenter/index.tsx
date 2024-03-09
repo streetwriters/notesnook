@@ -32,6 +32,7 @@ export type PopupPresenterProps = {
   movable?: boolean;
   scope?: keyof ThemeScopes;
   isMobile?: boolean;
+  container?: HTMLElement;
 } & BoxProps;
 
 function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
@@ -44,6 +45,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
     children,
     scope,
     isMobile,
+    container,
     ...restProps
   } = props;
 
@@ -140,7 +142,8 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
       className={"popup-presenter"}
       role="menu"
       isOpen={isOpen}
-      appElement={document.body}
+      appElement={container || document.body}
+      parentSelector={() => container || document.body}
       shouldCloseOnEsc
       shouldReturnFocusAfterClose
       shouldCloseOnOverlayClick
@@ -150,6 +153,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
       onRequestClose={onClose}
       portalClassName={"popup-presenter-portal"}
       onAfterOpen={(obj) => {
+        Modal.setAppElement(container || document.body);
         if (!obj || !position) return;
         repositionPopup(position);
 
