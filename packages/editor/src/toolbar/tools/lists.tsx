@@ -83,6 +83,7 @@ function _ListTool<TListStyleTypes extends string>(
             bg: "background",
             display: "grid",
             gridTemplateColumns: "1fr 1fr 1fr",
+            gap: 1,
             p: 1
           }}
         >
@@ -90,7 +91,7 @@ function _ListTool<TListStyleTypes extends string>(
             <Button
               key={item.title}
               variant={"menuitem"}
-              sx={{ width: 80 }}
+              sx={{ width: 80, p: 0 }}
               onClick={() => {
                 let chain = editor.chain().focus();
                 if (!chain || !editor) return;
@@ -231,7 +232,10 @@ function ListThumbnail(props: ListThumbnailProps) {
         flex: 1,
         p: 0,
         listStyleType,
-        gap: 1
+        ml: 4,
+        mr: 1,
+        my: 1,
+        gap: `7px`
       }}
       onMouseDown={(e) => {
         if (globalThis.keyboardShown) {
@@ -246,25 +250,12 @@ function ListThumbnail(props: ListThumbnailProps) {
           sx={{
             display: "list-item",
             color: "paragraph",
-            fontSize: 8
+            fontSize: 8,
+            bg: "border",
+            height: `7px`,
+            borderRadius: "small"
           }}
-        >
-          <Flex
-            sx={{
-              alignItems: "center"
-            }}
-          >
-            <Box
-              sx={{
-                width: "100%",
-                flexShrink: 0,
-                height: 5,
-                bg: "border",
-                borderRadius: "small"
-              }}
-            />
-          </Flex>
-        </Box>
+        />
       ))}
     </Flex>
   );
