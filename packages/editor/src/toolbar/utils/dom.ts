@@ -21,23 +21,25 @@ import { createRoot, Root } from "react-dom/client";
 
 export function getToolbarElement() {
   return (
-    (document.querySelector(".editor-toolbar") as HTMLElement) || undefined
+    (document.querySelector(".active .editor-toolbar") as HTMLElement) ||
+    undefined
   );
 }
 
 export function getPopupContainer() {
   return (
-    (document.getElementById("dialogContainer") as HTMLElement) || undefined
+    (document.querySelector(".active #dialogContainer") as HTMLElement) ||
+    undefined
   );
 }
 
 export function getEditorContainer() {
-  return (document.querySelector(".editor") ||
+  return (document.querySelector(".active .editor") ||
     getPopupContainer()) as HTMLElement;
 }
 
 export function getEditorDOM() {
-  return (document.querySelector(".ProseMirror") ||
+  return (document.querySelector(".active .ProseMirror") ||
     getEditorContainer()) as HTMLElement; // ProseMirror
 }
 
