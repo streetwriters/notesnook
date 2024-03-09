@@ -60,7 +60,10 @@ export const useEditor = (
           editor.schema,
           options.parseOptions
         );
-        const selection = resolveFocusPosition(doc, options.autofocus);
+        const selection =
+          editor.state.selection ||
+          resolveFocusPosition(doc, options.autofocus);
+        const oldIsFocused = editor.isFocused;
         editor.view.updateState(
           EditorState.create({
             doc,
@@ -68,6 +71,7 @@ export const useEditor = (
             selection: selection || undefined
           })
         );
+        if (oldIsFocused && !editor.isFocused) editor.commands.focus();
       }
       editor.options = { ...editor.options, ...options };
 
