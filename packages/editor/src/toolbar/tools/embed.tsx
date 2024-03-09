@@ -107,7 +107,7 @@ export function EmbedProperties(props: ToolProps) {
 
       <ResponsivePresenter
         isOpen={isOpen}
-        desktop="menu"
+        desktop="popup"
         mobile="sheet"
         onClose={() => setIsOpen(false)}
         blocking

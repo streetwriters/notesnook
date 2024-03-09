@@ -193,7 +193,7 @@ export function CodeblockComponent(
         }}
         focusOnRender={false}
         mobile="sheet"
-        desktop="menu"
+        desktop="popup"
         position={{
           target: toolbarRef.current || undefined,
           align: "end",
