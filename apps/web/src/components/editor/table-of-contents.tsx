@@ -156,6 +156,7 @@ function TableOfContents(props: TableOfContentsProps) {
                       textAlign: "left",
                       paddingLeft: `${t.level * 5}px`,
                       py: 1,
+                      px: 1,
                       borderLeft: "5px solid transparent",
                       borderColor: active.includes(t.id)
                         ? "accent-selected"

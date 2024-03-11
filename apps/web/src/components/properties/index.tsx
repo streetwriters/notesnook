@@ -180,7 +180,7 @@ function EditorProperties(props: EditorPropertiesProps) {
               <Flex
                 key={item.key}
                 py={2}
-                px={2}
+                px={1}
                 sx={{
                   borderBottom: "1px solid var(--separator)",
                   alignItems: "center",
@@ -238,7 +238,7 @@ function InternalLinks({ noteId }: { noteId: string }) {
           justifyContent: "stretch",
           borderRadius: "default",
           overflow: "hidden",
-          mx: 2,
+          mx: 1,
           mb: 1
         }}
       >
@@ -265,23 +265,30 @@ function InternalLinks({ noteId }: { noteId: string }) {
         ))}
       </Flex>
 
-      {result.status === "fulfilled" && (
-        <VirtualizedList
-          mode="dynamic"
-          estimatedSize={25}
-          getItemKey={(index) => result.value.key(index)}
-          items={result.value.placeholders}
-          context={{
-            items: result.value,
-            tabIndex,
-            noteId,
-            isExpanded: (id) => expandedId === id,
-            toggleExpand: (id) =>
-              setExpandedId((s) => (s === id ? undefined : id))
-          }}
-          renderItem={InternalLinkItem}
-        />
-      )}
+      {result.status === "fulfilled" &&
+        (result.value.length === 0 ? (
+          <Text variant="body" mx={1}>
+            {tabIndex === InternalLinksTabs.LINKED_NOTES
+              ? "This note does not link to other notes."
+              : "This note is not referenced in other notes."}
+          </Text>
+        ) : (
+          <VirtualizedList
+            mode="dynamic"
+            estimatedSize={25}
+            getItemKey={(index) => result.value.key(index)}
+            items={result.value.placeholders}
+            context={{
+              items: result.value,
+              tabIndex,
+              noteId,
+              isExpanded: (id) => expandedId === id,
+              toggleExpand: (id) =>
+                setExpandedId((s) => (s === id ? undefined : id))
+            }}
+            renderItem={InternalLinkItem}
+          />
+        ))}
     </Flex>
   );
 }
@@ -524,7 +531,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
   return (
     <Flex
       py={2}
-      px={2}
+      px={1}
       sx={{
         cursor: "pointer",
         justifyContent: "start"

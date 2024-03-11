@@ -37,7 +37,7 @@ export function SessionItem(props: SessionItemProps) {
       key={session.id}
       data-test-id={`session-item`}
       py={1}
-      px={2}
+      px={1}
       sx={{
         cursor: "pointer",
         bg: "transparent",
