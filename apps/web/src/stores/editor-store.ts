@@ -128,11 +128,7 @@ type SessionTypeMap = {
   deleted: DeletedEditorSession;
 };
 
-export function isLockedSession(session: EditorSession): session is
-  | LockedEditorSession
-  // TODO: | DefaultEditorSession
-  | DeletedEditorSession
-  | ConflictedEditorSession {
+export function isLockedSession(session: EditorSession): boolean {
   return (
     session.type === "locked" ||
     ("content" in session &&
@@ -175,12 +171,16 @@ class EditorStore extends BaseStore<EditorStore> {
     EV.subscribe(EVENTS.vaultLocked, () => {
       this.set((state) => {
         state.sessions = state.sessions.map((session) => {
-          console.log("REFRESHIGN", session);
           if (isLockedSession(session)) {
-            if (session.type === "diff" || session.type === "deleted")
+            if (
+              session.type === "diff" ||
+              session.type === "deleted" ||
+              // TODO: what's this?
+              !("note" in session)
+            )
               return session;
 
-            return {
+            return <LockedEditorSession>{
               type: "locked",
               id: session.id,
               note: session.note,
