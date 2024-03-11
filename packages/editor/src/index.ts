@@ -112,12 +112,6 @@ declare global {
   var keyboardShown: boolean;
 }
 
-function hasStyle(element: HTMLElement | string) {
-  const style = (element as HTMLElement).getAttribute("style");
-  if (!style || style === "font-family: inherit;") return false;
-  return true;
-}
-
 globalThis["keyboardShown"] = true;
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
@@ -407,3 +401,9 @@ export {
   getHTMLFromFragment,
   type DownloadOptions
 };
+
+function hasStyle(element: HTMLElement | string) {
+  const style = (element as HTMLElement).getAttribute("style");
+  if (!style || style === "font-family: inherit;") return false;
+  return true;
+}
