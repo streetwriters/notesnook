@@ -27,7 +27,15 @@ import React, {
 import ReactDOM from "react-dom";
 import { Box, Flex, Progress, Text } from "@theme-ui/components";
 import Properties from "../properties";
-import { useEditorStore, SaveState } from "../../stores/editor-store";
+import {
+  useEditorStore,
+  SaveState,
+  DefaultEditorSession,
+  DeletedEditorSession,
+  NewEditorSession,
+  ReadonlyEditorSession,
+  EditorSession
+} from "../../stores/editor-store";
 import {
   useStore as useAppStore,
   store as appstore
@@ -65,6 +73,7 @@ import DiffViewer from "../diff-viewer";
 import TableOfContents from "./table-of-contents";
 import { showNoteLinkingDialog } from "../../common/dialog-controller";
 import { scrollIntoViewById } from "@notesnook/editor";
+import { IEditor } from "./types";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -122,7 +131,7 @@ export default function TabsView() {
           ) : session.type === "conflicted" || session.type === "diff" ? (
             <DiffViewer session={session} />
           ) : (
-            <MemoizedEditorView id={session.id} />
+            <MemoizedEditorView session={session} />
           )}
         </Freeze>
       ))}
@@ -132,10 +141,20 @@ export default function TabsView() {
 
 const MemoizedEditorView = React.memo(
   EditorView,
-  (prev, next) => prev.id === next.id
+  (prev, next) =>
+    prev.session.id === next.session.id &&
+    prev.session.type === next.session.type
 );
-function EditorView({ id }: { id: string }) {
-  const lastSavedTime = useRef<number>(Date.now());
+function EditorView({
+  session
+}: {
+  session:
+    | DefaultEditorSession
+    | NewEditorSession
+    | ReadonlyEditorSession
+    | DeletedEditorSession;
+}) {
+  const lastChangedTime = useRef<number>(Date.now());
   const [docPreview, setDocPreview] = useState<DocumentPreview>();
 
   const previewSession = useRef<PreviewSession>();
@@ -150,7 +169,7 @@ function EditorView({ id }: { id: string }) {
     (store) => store.getSession(id, ["default", "readonly"])?.note?.readonly
   );
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const isPreviewSession = !!previewSession.current;
+  const editor = useEditorManager((store) => store.editors[session.id]?.editor);
 
   const isMobile = useMobile();
   const isTablet = useTablet();
@@ -159,25 +178,21 @@ function EditorView({ id }: { id: string }) {
     const event = db.eventManager.subscribe(
       EVENTS.syncItemMerged,
       async (item?: MaybeDeletedItem<Item>) => {
-        const session = useEditorStore
-          .getState()
-          .getSession(id, ["unlocked", "default"]);
-        const editor = useEditorManager.getState().getEditor(id)?.editor;
         if (
+          session.type === "new" ||
           !editor ||
-          !session?.note ||
+          !session.note ||
           !item ||
           isDeleted(item) ||
           (item.type !== "tiptap" && item.type !== "note") ||
-          lastSavedTime.current >= (item.dateEdited as number) ||
-          isPreviewSession ||
+          lastChangedTime.current >= (item.dateEdited as number) ||
           !appstore.get().isRealtimeSyncEnabled
         )
           return;
 
         const { contentId, locked } = session.note;
         const isContent = item.type === "tiptap" && item.id === contentId;
-        const isNote = item.type === "note" && item.id === id;
+        const isNote = item.type === "note" && item.id === session.note.id;
 
         if (id && isContent) {
           let content: string | null = null;
@@ -194,7 +209,7 @@ function EditorView({ id }: { id: string }) {
 
           useEditorStore
             .getState()
-            .updateSession(id, ["default"], { note: item });
+            .updateSession(session.id, [session.type], { note: item });
           if (item.title)
             AppEventManager.publish(AppEvents.changeNoteTitle, {
               title: item.title,
@@ -206,30 +221,7 @@ function EditorView({ id }: { id: string }) {
     return () => {
       event.unsubscribe();
     };
-  }, [id, isPreviewSession]);
-
-  // const openSession = useCallback(async (noteId: string) => {
-  //   await useEditorStore.getState().openSession(noteId);
-  //   previewSession.current = undefined;
-
-  //   lastSavedTime.current = Date.now();
-  //   setTimestamp(Date.now());
-  // }, []);
-
-  // useEffect(() => {
-  //   if (!isNewSession) return;
-
-  //   editorstore.newSession();
-
-  //   lastSavedTime.current = 0;
-  //   setTimestamp(Date.now());
-  // }, [isNewSession, nonce]);
-
-  // useEffect(() => {
-  //   if (!isOldSession || typeof noteId === "number") return;
-
-  //   openSession(noteId);
-  // }, [noteId]);
+  }, [editor, session]);
 
   return (
     <ScopedThemeProvider scope="editor" sx={{ flex: 1 }}>
@@ -261,26 +253,24 @@ function EditorView({ id }: { id: string }) {
               />
             )} */}
             <Editor
-              id={id}
+              id={session.id}
               nonce={1}
-              content={() =>
-                previewSession.current?.content.data ||
-                useEditorStore.getState().getSession(id, ["default"])?.content
-                  ?.data
-              }
+              content={() => session.content?.data}
+              editor={editor}
+              session={session}
               onPreviewDocument={(url) => setDocPreview(url)}
-              onContentChange={() => (lastSavedTime.current = Date.now())}
+              onContentChange={() => (lastChangedTime.current = Date.now())}
               onSave={(content, ignoreEdit) => {
                 deferredSave(session.id, session.id, ignoreEdit, data);
               }}
               options={{
-                readonly: isReadonly || isPreviewSession,
+                readonly: session?.type === "readonly",
                 onRequestFocus: () => toggleProperties(false),
                 focusMode: isFocusMode,
                 isMobile: isMobile || isTablet
               }}
             />
-            <DropZone id={id} overlayRef={overlayRef} />
+            {editor && <DropZone editor={editor} overlayRef={overlayRef} />}
           </Flex>
         </Allotment.Pane>
         {docPreview && (
@@ -319,8 +309,12 @@ function EditorView({ id }: { id: string }) {
           </Allotment.Pane>
         )}
       </Allotment>
-      {arePropertiesVisible && <Properties id={id} />}
-      {isTOCVisible && <TableOfContents id={id} />}
+      {session.type !== "new" && (
+        <>
+          {arePropertiesVisible && <Properties session={session} />}
+          {isTOCVisible && <TableOfContents session={session} />}
+        </>
+      )}
     </ScopedThemeProvider>
   );
 }
@@ -375,7 +369,9 @@ type EditorOptions = {
 };
 type EditorProps = {
   id: string;
+  session: EditorSession;
   content: () => string | undefined;
+  editor?: IEditor;
   nonce?: number;
   options?: EditorOptions;
   onContentChange?: () => void;
@@ -385,6 +381,8 @@ type EditorProps = {
 export function Editor(props: EditorProps) {
   const {
     id,
+    editor,
+    session,
     content,
     onSave,
     nonce,
@@ -399,13 +397,12 @@ export function Editor(props: EditorProps) {
     isMobile: false
   };
   const [isLoading, setIsLoading] = useState(true);
-  useScrollToBlock(id);
+  useScrollToBlock(session);
 
   useEffect(() => {
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ hash, loaded, total }: AttachmentProgress) => {
-        const editor = useEditorManager.getState().getEditor(id)?.editor;
         editor?.sendAttachmentProgress(
           hash,
           Math.round((loaded / total) * 100)
@@ -416,7 +413,7 @@ export function Editor(props: EditorProps) {
     return () => {
       event.unsubscribe();
     };
-  }, []);
+  }, [editor]);
 
   return (
     <EditorChrome isLoading={isLoading} {...props}>
@@ -430,8 +427,8 @@ export function Editor(props: EditorProps) {
           corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
         }}
         onLoad={() => {
-          restoreSelection(id);
-          restoreScrollPosition(id);
+          if (editor) restoreSelection(editor, id);
+          restoreScrollPosition(session);
           setIsLoading(false);
         }}
         onSelectionChange={({ from, to }) =>
@@ -474,7 +471,6 @@ export function Editor(props: EditorProps) {
           }
         }}
         onInsertAttachment={async (type) => {
-          const editor = useEditorManager.getState().getEditor(id)?.editor;
           const mime = type === "file" ? "*/*" : "image/*";
           const attachments = await insertAttachments(mime);
           if (!attachments) return;
@@ -490,7 +486,6 @@ export function Editor(props: EditorProps) {
           );
         }}
         onAttachFiles={async (files) => {
-          const editor = useEditorManager.getState().getEditor(id)?.editor;
           const result = await attachFiles(files);
           if (!result) return;
           result.forEach((attachment) => editor?.attachFile(attachment));
@@ -707,11 +702,11 @@ function EditorChrome(
 // }
 
 type DropZoneProps = {
-  id: string;
   overlayRef: React.MutableRefObject<HTMLElement | undefined>;
+  editor: IEditor;
 };
 function DropZone(props: DropZoneProps) {
-  const { overlayRef, id } = props;
+  const { overlayRef, editor } = props;
 
   return (
     <Box
@@ -728,8 +723,7 @@ function DropZone(props: DropZoneProps) {
         display: "none"
       }}
       onDrop={async (e) => {
-        const editor = useEditorManager.getState().getEditor(id)?.editor;
-        if (!editor || !e.dataTransfer.files?.length) return;
+        if (!e.dataTransfer.files?.length) return;
         e.preventDefault();
 
         const attachments = await attachFiles(Array.from(e.dataTransfer.files));
@@ -801,19 +795,17 @@ function useDragOverlay() {
   return [dropElementRef, overlayRef] as const;
 }
 
-function useScrollToBlock(id: string) {
+function useScrollToBlock(session: EditorSession) {
   const blockId = useEditorStore(
-    (store) => store.getSession(id)?.activeBlockId
+    (store) => store.getSession(session.id)?.activeBlockId
   );
   useEffect(() => {
     if (!blockId) return;
     scrollIntoViewById(blockId);
-    useEditorStore
-      .getState()
-      .updateSession(id, ["default", "unlocked", "deleted"], {
-        activeBlockId: undefined
-      });
-  }, [blockId]);
+    useEditorStore.getState().updateSession(session.id, [session.type], {
+      activeBlockId: undefined
+    });
+  }, [session.id, session.type, blockId]);
 }
 
 function isFile(e: DragEvent) {
@@ -824,12 +816,11 @@ function isFile(e: DragEvent) {
   );
 }
 
-function restoreScrollPosition(id: string) {
-  const session = useEditorStore.getState().getActiveSession();
+function restoreScrollPosition(session: EditorSession) {
   if (session?.activeBlockId) return scrollIntoViewById(session.activeBlockId);
 
   const scrollContainer = document.getElementById(`${id}_editorScroll`);
-  const scrollPosition = Config.get(`${id}:scroll-position`, 0);
+  const scrollPosition = Config.get(`${session.id}:scroll-position`, 0);
   if (scrollContainer) {
     requestAnimationFrame(() => {
       if (scrollContainer.scrollHeight < scrollPosition)
@@ -839,9 +830,8 @@ function restoreScrollPosition(id: string) {
   }
 }
 
-function restoreSelection(id: string) {
-  const editor = useEditorManager.getState().getEditor(id)?.editor;
-  editor?.focus({
+function restoreSelection(editor: IEditor, id: string) {
+  editor.focus({
     position: Config.get(`${id}:selection`, { from: 0, to: 0 })
   });
 }
