@@ -73,16 +73,10 @@ type DocumentPreview = {
   hash: string;
 };
 
-function saveContent(
-  noteId: string,
-  sessionId: string,
-  ignoreEdit: boolean,
-  content: () => string
-) {
-  console.log("SAVE to note");
-  useEditorStore.getState().saveSessionContent(noteId, sessionId, ignoreEdit, {
+function saveContent(noteId: string, ignoreEdit: boolean, content: string) {
+  useEditorStore.getState().saveSessionContent(noteId, ignoreEdit, {
     type: "tiptap",
-    data: content()
+    data: content
   });
 }
 const deferredSave = debounceWithId(saveContent, 100);
@@ -277,12 +271,7 @@ function EditorView({ id }: { id: string }) {
               onPreviewDocument={(url) => setDocPreview(url)}
               onContentChange={() => (lastSavedTime.current = Date.now())}
               onSave={(content, ignoreEdit) => {
-                const session = useEditorStore
-                  .getState()
-                  .getSession(id, ["default"]);
-                console.log("ON SAVE", session);
-                if (!session) return;
-                deferredSave(id, id, session.sessionId, ignoreEdit, content);
+                deferredSave(session.id, session.id, ignoreEdit, data);
               }}
               options={{
                 readonly: isReadonly || isPreviewSession,
