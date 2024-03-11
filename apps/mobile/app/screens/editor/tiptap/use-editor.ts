@@ -385,7 +385,9 @@ export const useEditor = (
       tabId?: number;
       blockId?: string;
     }) => {
-      blockIdRef.current = event.blockId;
+      if (event.blockId) {
+        blockIdRef.current = event.blockId;
+      }
       state.current.currentlyEditing = true;
       if (
         !state.current.ready &&
@@ -424,6 +426,13 @@ export const useEditor = (
                 locked: noteIsLocked
               });
               useTabStore.getState().focusTab(tabId);
+              setTimeout(() => {
+                if (blockIdRef.current) {
+                  console.log("scrolling to block", blockIdRef.current);
+                  commands.scrollIntoViewById(blockIdRef.current);
+                  blockIdRef.current = undefined;
+                }
+              }, 150);
             }
             console.log("Note already loaded, focusing the tab");
           } else {
@@ -497,8 +506,11 @@ export const useEditor = (
           10000
         );
 
+        console.log("blockId", blockIdRef.current);
+
         setTimeout(() => {
           if (blockIdRef.current) {
+            console.log("scrolling to block", blockIdRef.current);
             commands.scrollIntoViewById(blockIdRef.current);
             blockIdRef.current = undefined;
           }
