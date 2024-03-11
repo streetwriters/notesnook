@@ -446,6 +446,9 @@ class EditorStore extends BaseStore<EditorStore> {
       } else if (activeSessionIndex > -1)
         state.sessions.splice(activeSessionIndex + 1, 0, session);
       else state.sessions.push(session);
+      state.sessions.sort((a, b) =>
+        a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
+      );
     });
 
     const { history } = this.get();
