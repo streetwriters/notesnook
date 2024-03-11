@@ -100,6 +100,7 @@ export type NewEditorSession = BaseEditorSession & {
   type: "new";
   context?: Context;
   saveState: SaveState;
+  content?: NoteContent<false>;
 };
 
 export type ConflictedEditorSession = BaseEditorSession & {
