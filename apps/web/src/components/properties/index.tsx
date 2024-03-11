@@ -690,7 +690,7 @@ export function Section({
         <Text variant="subtitle">{title}</Text>
       </Flex>
       {subtitle && (
-        <Text variant="subBody" mb={1} mx={2}>
+        <Text variant="subBody" mb={1} mx={1}>
           {subtitle}
         </Text>
       )}
