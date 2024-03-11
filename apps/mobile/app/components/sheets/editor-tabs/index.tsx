@@ -19,18 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useDBItem } from "../../../hooks/use-db-item";
 import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../../screens/editor/tiptap/utils";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
+import { eUnlockNote } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { eUnlockNote } from "../../../utils/events";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 type TabItem = {
   id: number;
@@ -64,6 +64,12 @@ const TabItemComponent = (props: {
           if (props.tab.locked) {
             eSendEvent(eUnlockNote);
           }
+
+          if (!props.tab.noteId) {
+            setTimeout(() => {
+              editorController?.current?.commands?.focus(props.tab.id);
+            }, 300);
+          }
         }
       }}
       onLongPress={() => {
@@ -92,7 +98,7 @@ const TabItemComponent = (props: {
           }}
           size={SIZE.md}
         >
-          {item?.title || "New note"}
+          {props.tab.noteId ? item?.title || "Untitled note" : "New note"}
         </Paragraph>
       </View>
 
@@ -146,10 +152,13 @@ export default function EditorTabs({
         <Heading size={SIZE.lg}>Tabs</Heading>
         <Button
           onPress={() => {
-            close?.();
+            useTabStore.getState().newTab();
             setTimeout(() => {
-              useTabStore.getState().newTab();
+              editorController?.current?.commands?.focus(
+                useTabStore.getState().currentTab
+              );
             }, 300);
+            close?.();
           }}
           title="New tab"
           icon="plus"
