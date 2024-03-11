@@ -204,7 +204,8 @@ class EditorStore extends BaseStore<EditorStore> {
       const session = getSession(activeSessionId);
       if (!session) return;
 
-      if (session.type === "diff") openDiffSession(session.note.id, session.id);
+      if (session.type === "diff" || session.type === "conflicted")
+        openDiffSession(session.note.id, session.id);
       else if (session.type === "new") activateSession(session.id);
       else openSession(activeSessionId);
     }
@@ -316,12 +317,16 @@ class EditorStore extends BaseStore<EditorStore> {
     noteOrId: string | Note | BaseTrashItem<Note>,
     options: { force?: boolean; activeBlockId?: string } = {}
   ): Promise<void> => {
-    const { getSession } = this.get();
+    const { getSession, openDiffSession } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
     const session = getSession(noteId);
 
     if (session && !options.force && !session.needsHydration) {
       return this.activateSession(noteId, options.activeBlockId);
+    }
+
+    if (session && (session.type === "diff" || session.type === "conflicted")) {
+      return openDiffSession(session.note.id, session.id);
     }
 
     if (session && session.id) await db.fs().cancel(session.id);
@@ -459,7 +464,6 @@ class EditorStore extends BaseStore<EditorStore> {
 
     // do not allow saving of readonly session
     if (partial.note?.readonly) return;
-    console.log(currentSession);
     if (
       currentSession.saveState === SaveState.Saving ||
       currentSession.id !== id
