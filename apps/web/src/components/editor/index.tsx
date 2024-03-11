@@ -247,6 +247,10 @@ function EditorView({
               onPreviewDocument={(url) => setDocPreview(url)}
               onContentChange={() => (lastChangedTime.current = Date.now())}
               onSave={(content, ignoreEdit) => {
+                const data = content();
+                if (!session.content)
+                  session.content = { type: "tiptap", data };
+                else session.content.data = data;
                 deferredSave(session.id, session.id, ignoreEdit, data);
               }}
               options={{
