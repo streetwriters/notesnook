@@ -93,8 +93,11 @@ export default function TabsView() {
     <>
       <EditorActionBar />
       {sessions.map((session) => (
-        <Freeze key={session.id} freeze={session.id !== activeSessionId}>
-          {session.needsHydration ? null : session.type === "locked" ? (
+        <Freeze
+          key={session.id}
+          freeze={session.needsHydration || session.id !== activeSessionId}
+        >
+          {session.type === "locked" ? (
             <UnlockView
               buttonTitle="Open note"
               subtitle="Please enter the password to unlock this note."
