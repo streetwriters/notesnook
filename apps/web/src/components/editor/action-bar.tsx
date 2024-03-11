@@ -21,6 +21,8 @@ import { Button, Flex, Text } from "@theme-ui/components";
 import { useState } from "react";
 import {
   Cross,
+  EditorFullWidth,
+  EditorNormalWidth,
   ExitFullscreen,
   FocusMode,
   Fullscreen,
@@ -44,7 +46,7 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useEditorManager } from "./manager";
 
 export function EditorActionBar() {
-  // const editorMargins = useEditorStore((store) => store.editorMargins);
+  const editorMargins = useEditorStore((store) => store.editorMargins);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const activeSession = useEditorStore((store) =>
@@ -55,12 +57,12 @@ export function EditorActionBar() {
   );
 
   const tools = [
-    // {
-    //   title: editorMargins ? "Disable editor margins" : "Enable editor margins",
-    //   icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
-    //   enabled: true,
-    //   onClick: () => useEditorStore.getState().toggleEditorMargins()
-    // },
+    {
+      title: editorMargins ? "Disable editor margins" : "Enable editor margins",
+      icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
+      enabled: true,
+      onClick: () => useEditorStore.getState().toggleEditorMargins()
+    },
     {
       title: isFocusMode ? "Normal mode" : "Focus mode",
       icon: isFocusMode ? FocusMode : NormalMode,
