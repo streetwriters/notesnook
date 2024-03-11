@@ -118,7 +118,6 @@ export type EditorSession =
 
 export type SessionType = keyof SessionTypeMap;
 type SessionTypeMap = {
-  unlocked: DefaultEditorSession;
   default: DefaultEditorSession;
   locked: LockedEditorSession;
   new: NewEditorSession;
@@ -530,7 +529,7 @@ class EditorStore extends BaseStore<EditorStore> {
           content: partial.content
         });
       } else {
-        this.updateSession(id, ["unlocked", "default"], {
+        this.updateSession(id, ["default"], {
           preview: false,
           attachmentsLength: attachmentsLength,
           note
