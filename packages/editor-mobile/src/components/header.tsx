@@ -149,7 +149,7 @@ function Header({
                 style={{
                   position: "absolute"
                 }}
-                color="var(--nn_primary_paragraph)"
+                color="var(--nn_primary_icon)"
               />
             </Button>
           )}
@@ -214,7 +214,7 @@ function Header({
                   style={{
                     position: "absolute"
                   }}
-                  color="var(--nn_primary_paragraph)"
+                  color="var(--nn_primary_icon)"
                 />
               </Button>
             ) : null}
@@ -239,7 +239,7 @@ function Header({
             >
               <div
                 style={{
-                  border: "2.5px solid var(--nn_primary_icon)",
+                  border: "2px solid var(--nn_primary_icon)",
                   width: 19 * settings.fontScale,
                   height: 19 * settings.fontScale,
                   minWidth: 19 * settings.fontScale,
@@ -251,7 +251,10 @@ function Header({
               >
                 <p
                   style={{
-                    fontSize: 15 * settings.fontScale
+                    fontSize:
+                      openedTabsCount > 100
+                        ? 10 * settings.fontScale
+                        : 12 * settings.fontScale
                   }}
                 >
                   {openedTabsCount}
@@ -283,7 +286,7 @@ function Header({
                 style={{
                   position: "absolute"
                 }}
-                color="var(--nn_primary_paragraph)"
+                color="var(--nn_primary_icon)"
               />
             </Button>
 
@@ -346,7 +349,7 @@ function Header({
                     color={
                       !hasUndo
                         ? "var(--nn_secondary_border)"
-                        : "var(--nn_primary_paragraph)"
+                        : "var(--nn_primary_icon)"
                     }
                     size={25 * settings.fontScale}
                     style={{
@@ -376,7 +379,7 @@ function Header({
                     color={
                       !hasRedo
                         ? "var(--nn_secondary_border)"
-                        : "var(--nn_primary_paragraph)"
+                        : "var(--nn_primary_icon)"
                     }
                     size={25 * settings.fontScale}
                     style={{
@@ -407,7 +410,7 @@ function Header({
                     style={{
                       position: "absolute"
                     }}
-                    color="var(--nn_primary_paragraph)"
+                    color="var(--nn_primary_icon)"
                   />
                 </Button>
               </div>
@@ -421,7 +424,7 @@ function Header({
               >
                 <TableOfContentsIcon
                   size={22 * settings.fontScale}
-                  color="var(--nn_primary_paragraph)"
+                  color="var(--nn_primary_icon)"
                 />
                 Table of contents
               </MenuItem>
@@ -434,7 +437,7 @@ function Header({
               >
                 <DotsHorizontalIcon
                   size={22 * settings.fontScale}
-                  color="var(--nn_primary_paragraph)"
+                  color="var(--nn_primary_icon)"
                 />
                 Note Properties
               </MenuItem>
