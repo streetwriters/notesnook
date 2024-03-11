@@ -384,6 +384,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
               tr.getMeta("selectedIndex") ?? value.selectedIndex;
             const shouldResearch =
               docChanged ||
+              (isSearching !== value.isSearching && isSearching) ||
               searchTerm !== value.searchTerm ||
               matchCase !== value.matchCase ||
               matchWholeWord !== value.matchWholeWord ||
