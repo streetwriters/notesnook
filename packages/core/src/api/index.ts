@@ -72,6 +72,7 @@ import { CachedCollection } from "../database/cached-collection";
 import { Vaults } from "../collections/vaults";
 import { KVStorage } from "../database/kv";
 import { QueueValue } from "../utils/queue-value";
+import { Sanitizer } from "../database/sanitizer";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -178,10 +179,10 @@ class Database {
   vault = new Vault(this);
   lookup = new Lookup(this);
   backup = new Backup(this);
-  settings = new Settings(this);
   migrations = new Migrations(this);
   monographs = new Monographs(this);
   trash = new Trash(this);
+  sanitizer = new Sanitizer(this.sql);
 
   notebooks = new Notebooks(this);
   tags = new Tags(this);
@@ -194,6 +195,7 @@ class Database {
   relations = new Relations(this);
   notes = new Notes(this);
   vaults = new Vaults(this);
+  settings = new Settings(this);
 
   /**
    * @deprecated only kept here for migration purposes
@@ -270,6 +272,8 @@ class Database {
       this.options.sqliteOptions
     )) as unknown as Kysely<DatabaseSchema>;
 
+    await this.sanitizer.init();
+
     await this.initCollections();
 
     await this.migrations.init();
@@ -294,6 +298,7 @@ class Database {
     await this.reminders.init();
     await this.relations.init();
     await this.notes.init();
+    await this.vaults.init();
 
     await this.trash.init();
 

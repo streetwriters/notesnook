@@ -43,7 +43,8 @@ export class Colors implements ICollection {
       db.sql,
       db.transaction,
       "colors",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 

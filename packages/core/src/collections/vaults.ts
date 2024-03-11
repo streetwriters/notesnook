@@ -32,11 +32,14 @@ export class Vaults implements ICollection {
       db.sql,
       db.transaction,
       "vaults",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 
-  async init() {}
+  async init() {
+    await this.collection.init();
+  }
 
   async add(item: Partial<Vault>) {
     const id = item.id || getId();

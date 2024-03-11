@@ -22,6 +22,7 @@ import EventManager from "../utils/event-manager";
 import { DatabaseAccessor, DatabaseCollection, DatabaseSchema } from ".";
 import { SQLCollection } from "./sql-collection";
 import { Transaction } from "kysely";
+import { Sanitizer } from "./sanitizer";
 
 export class SQLCachedCollection<
   TCollectionType extends keyof DatabaseSchema,
@@ -38,13 +39,15 @@ export class SQLCachedCollection<
       executor: (tr: Transaction<DatabaseSchema>) => Promise<void>
     ) => Promise<void>,
     type: TCollectionType,
-    eventManager: EventManager
+    eventManager: EventManager,
+    sanitizer: Sanitizer
   ) {
     this.collection = new SQLCollection(
       sql,
       startTransaction,
       type,
-      eventManager
+      eventManager,
+      sanitizer
     );
   }
 

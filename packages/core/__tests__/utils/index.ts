@@ -75,7 +75,7 @@ const notebookTest = (notebook = TEST_NOTEBOOK) =>
 const TEST_NOTE: { content: NoteContent<false> } = {
   content: {
     type: "tiptap",
-    data: `<p>Hello <span style="color:#f00">This is colorful</span></p>`
+    data: `<p data-block-id="p1">Hello <span style="color:#f00">This is colorful</span></p>`
   }
 };
 

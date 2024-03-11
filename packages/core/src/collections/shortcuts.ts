@@ -38,7 +38,8 @@ export class Shortcuts implements ICollection {
       db.sql,
       db.transaction,
       "shortcuts",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 

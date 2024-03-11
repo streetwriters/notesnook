@@ -32,7 +32,8 @@ export class Tags implements ICollection {
       db.sql,
       db.transaction,
       "tags",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 

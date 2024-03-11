@@ -39,7 +39,8 @@ export class SessionContent implements ICollection {
       db.sql,
       db.transaction,
       "sessioncontent",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 
