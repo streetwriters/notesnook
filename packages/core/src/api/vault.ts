@@ -20,9 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Cipher } from "@notesnook/crypto";
 import Database from ".";
 import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
-import { tinyToTiptap } from "../migrations";
 import { isCipher } from "../database/crypto";
 import { NoteContent } from "../collections/session-content";
+import { Note } from "../types";
 
 export const VAULT_ERRORS = {
   noVault: "ERR_NO_VAULT",
@@ -187,7 +187,10 @@ export default class Vault {
   /**
    * Temporarily unlock (open) a note
    */
-  async open(noteId: string, password?: string) {
+  async open(
+    noteId: string,
+    password?: string
+  ): Promise<(Note & { content?: NoteContent<false> }) | undefined> {
     const note = await this.db.notes.note(noteId);
     if (!note) return;
 
@@ -201,7 +204,7 @@ export default class Vault {
       this.password = password;
       if (!(await this.exists())) await this.create(password);
     }
-    return { ...note, ...content };
+    return { ...note, content };
   }
 
   /**
@@ -327,9 +330,18 @@ export default class Vault {
     return id;
   }
 
-  private async unlockNote(noteId: string, password?: string, perm = false) {
+  private async unlockNote(
+    noteId: string,
+    password?: string,
+    perm = false
+  ): Promise<NoteContent<false> | undefined> {
     const content = await this.db.content.findByNoteId(noteId);
-    if (!content || !content.locked) return;
+    if (!content || !content.locked) {
+      await this.db.relations
+        .to({ id: noteId, type: "note" }, "vault")
+        .unlink();
+      return content ? { data: content.data, type: content.type } : undefined;
+    }
     const decryptedContent = await this.decryptContent(content, password);
 
     if (this.db.content.preProcess(decryptedContent)) {
@@ -352,9 +364,7 @@ export default class Vault {
       return;
     }
 
-    return {
-      content: decryptedContent
-    };
+    return decryptedContent;
   }
 
   async getKey() {
