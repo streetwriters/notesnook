@@ -32,19 +32,26 @@ import { VirtualizedList } from "../components/virtualized-list";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { ScrollContainer } from "@notesnook/ui";
 import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
-import { ResolvedItem } from "@notesnook/common";
+import { NoteResolvedData, ResolvedItem } from "@notesnook/common";
+import { Lock } from "../components/icons";
+import { ellipsize } from "@notesnook/core/dist/utils/content-block";
 
 export type NoteLinkingDialogProps = {
   attributes?: LinkAttributes;
   onClose: Perform;
   onDone: Perform<LinkAttributes>;
 };
+const HEADING_TYPES = ["h1", "h2", "h3", "h4", "h5", "h6"];
 
 export default function NoteLinkingDialog(props: NoteLinkingDialogProps) {
   const { attributes } = props;
   const [notes, setNotes] = useState<VirtualizedGrouping<NoteType>>();
   const [selectedNote, setSelectedNote] = useState<NoteType>();
+  const [isNoteLocked, setIsNoteLocked] = useState(false);
   const [blocks, setBlocks] = useState<ContentBlock[]>([]);
+  const [filteredBlocks, setFilteredBlocks] = useState<
+    ContentBlock[] | undefined
+  >();
 
   return (
     <Dialog
@@ -58,7 +65,7 @@ export default function NoteLinkingDialog(props: NoteLinkingDialogProps) {
         );
       }}
       positiveButton={{
-        text: "Save",
+        text: "Insert link",
         disabled: !selectedNote,
         onClick: () =>
           selectedNote
@@ -78,16 +85,49 @@ export default function NoteLinkingDialog(props: NoteLinkingDialogProps) {
               autoFocus
               placeholder="Type # to only search headings"
               sx={{ mx: 0 }}
-              onChange={async (e) =>
-                setNotes(await db.lookup.notes(e.target.value).sorted())
-              }
+              onChange={async (e) => {
+                const query = e.target.value.trim().toLowerCase();
+                if (!query) {
+                  setFilteredBlocks(undefined);
+                } else {
+                  setFilteredBlocks(
+                    query.startsWith("#")
+                      ? blocks.filter(
+                          (v) =>
+                            HEADING_TYPES.includes(v.type) &&
+                            v.content.toLowerCase().includes(query)
+                        )
+                      : blocks.filter((v) =>
+                          v.content.toLowerCase().includes(query)
+                        )
+                  );
+                }
+              }}
             />
-            <Button variant="accentSecondary" sx={{ mt: 1, textAlign: "left" }}>
-              Selected note: {selectedNote.title}
+            <Button
+              variant="accentSecondary"
+              sx={{ mt: 1, textAlign: "left" }}
+              onClick={() => {
+                setSelectedNote(undefined);
+                setIsNoteLocked(false);
+                setFilteredBlocks(undefined);
+                setBlocks([]);
+              }}
+            >
+              Selected note: {selectedNote.title} (click to deselect)
             </Button>
+            {isNoteLocked ? (
+              <Text variant="body" sx={{ mt: 1 }}>
+                Linking to a specific block is not available for locked notes.
+              </Text>
+            ) : blocks.length <= 0 ? (
+              <Text variant="body" sx={{ mt: 1 }}>
+                There are no blocks in this note.
+              </Text>
+            ) : null}
             <ScrollContainer>
               <VirtualizedList
-                items={blocks}
+                items={filteredBlocks || blocks}
                 estimatedSize={34}
                 mode="dynamic"
                 itemGap={5}
@@ -117,12 +157,14 @@ export default function NoteLinkingDialog(props: NoteLinkingDialogProps) {
                       variant="body"
                       sx={{ fontFamily: "monospace", whiteSpace: "pre-wrap" }}
                     >
-                      {item.content}
+                      {ellipsize(item.content, 200, "end").trim() ||
+                        "(empty block)"}
                     </Text>
                     <Text
                       variant="subBody"
                       sx={{
                         bg: "background-secondary",
+                        flexShrink: 0,
                         p: "small",
                         px: 1,
                         borderRadius: "default",
@@ -156,16 +198,29 @@ export default function NoteLinkingDialog(props: NoteLinkingDialogProps) {
                   mt={1}
                   renderItem={({ index }) => (
                     <ResolvedItem items={notes} index={index} type="note">
-                      {({ item: note }) => (
+                      {({ item: note, data }) => (
                         <Button
                           variant="menuitem"
-                          sx={{ p: 1, width: "100%", textAlign: "left" }}
+                          sx={{
+                            p: 1,
+                            width: "100%",
+                            textAlign: "left",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1
+                          }}
                           onClick={async () => {
                             setSelectedNote(note);
+                            setIsNoteLocked(
+                              !!(data as NoteResolvedData).locked
+                            );
                             setBlocks(await db.notes.contentBlocks(note.id));
                           }}
                         >
                           <Text variant="body">{note.title}</Text>
+                          {(data as NoteResolvedData).locked ? (
+                            <Lock size={14} />
+                          ) : null}
                         </Button>
                       )}
                     </ResolvedItem>
