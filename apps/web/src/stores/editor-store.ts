@@ -468,11 +468,15 @@ class EditorStore extends BaseStore<EditorStore> {
 
     this.setSaveState(id, 0);
     try {
-      //   if (partial.content) currentSession.content = partial.content;
+      const sessionId =
+        "sessionId" in currentSession
+          ? currentSession.sessionId
+          : `${Date.now()}`;
+
       if (isLockedSession(currentSession)) {
         await db.vault.save({
           content: partial.content,
-          sessionId: partial.sessionId,
+          sessionId,
           id
         });
       } else {
@@ -483,21 +487,10 @@ class EditorStore extends BaseStore<EditorStore> {
               ? currentSession.note.dateEdited
               : undefined,
           content: partial.content,
-          sessionId: partial.sessionId,
+          sessionId,
           id
         });
       }
-
-      // if (currentSession && currentSession.id !== id) {
-      //   noteStore.refresh();
-      //   throw new Error("Aborting save operation: old session.");
-      // }
-      // if (!id) throw new Error("Note not saved.");
-
-      // let note = await db.notes.note(id);
-      // if (!note) throw new Error("Note not saved.");
-
-      // hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
 
       const defaultNotebook = db.settings.getDefaultNotebook();
       if (currentSession.type === "new" && currentSession.context) {
@@ -531,7 +524,7 @@ class EditorStore extends BaseStore<EditorStore> {
           id,
           note,
           saveState: SaveState.Saved,
-          sessionId: partial.sessionId || `${Date.now()}`,
+          sessionId,
           attachmentsLength,
           pinned: currentSession.pinned,
           content: partial.content
@@ -609,12 +602,10 @@ class EditorStore extends BaseStore<EditorStore> {
 
   saveSessionContent = (
     id: string,
-    sessionId: string,
     ignoreEdit: boolean,
     content: NoteContent<false>
   ) => {
-    // const dateEdited = ignoreEdit ? this.get().session.dateEdited : undefined;
-    return this.saveSession(id, { sessionId, content, ignoreEdit });
+    return this.saveSession(id, { content, ignoreEdit });
   };
 
   setSaveState = (id: string, saveState: SaveState) => {
