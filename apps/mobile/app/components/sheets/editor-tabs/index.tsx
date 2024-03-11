@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
+import { FlatList } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useDBItem } from "../../../hooks/use-db-item";
 import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
@@ -134,11 +135,26 @@ export default function EditorTabs({
     state.currentTab
   ]);
 
+  const renderTabItem = React.useCallback(
+    ({ item }: { item: TabItem }) => {
+      return (
+        <TabItemComponent
+          key={item.id}
+          tab={item}
+          isFocused={item.id === currentTab}
+          close={close}
+        />
+      );
+    },
+    [close, currentTab]
+  );
+
   return (
     <View
       style={{
         paddingHorizontal: 12,
-        gap: 12
+        gap: 12,
+        maxHeight: "100%"
       }}
     >
       <View
@@ -157,7 +173,7 @@ export default function EditorTabs({
               editorController?.current?.commands?.focus(
                 useTabStore.getState().currentTab
               );
-            }, 300);
+            }, 500);
             close?.();
           }}
           title="New tab"
@@ -172,14 +188,7 @@ export default function EditorTabs({
         />
       </View>
 
-      {tabs.map((tab) => (
-        <TabItemComponent
-          key={tab.id}
-          tab={tab}
-          isFocused={tab.id === currentTab}
-          close={close}
-        />
-      ))}
+      <FlatList windowSize={3} data={tabs} renderItem={renderTabItem} />
     </View>
   );
 }
