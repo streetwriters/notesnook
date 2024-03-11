@@ -345,6 +345,7 @@ class EditorStore extends BaseStore<EditorStore> {
       this.addSession({
         type: "locked",
         id: note.id,
+        pinned: session?.pinned,
         note,
         preview: isPreview,
         activeBlockId: options.activeBlockId
@@ -375,6 +376,7 @@ class EditorStore extends BaseStore<EditorStore> {
         type: "conflicted",
         content: content,
         id: note.id,
+        pinned: session?.pinned,
         note,
         preview: isPreview,
         activeBlockId: options.activeBlockId
@@ -394,6 +396,7 @@ class EditorStore extends BaseStore<EditorStore> {
           type: "deleted",
           note,
           id: note.id,
+          pinned: session?.pinned,
           content,
           activeBlockId: options.activeBlockId
         });
@@ -402,6 +405,7 @@ class EditorStore extends BaseStore<EditorStore> {
           type: "readonly",
           note,
           id: note.id,
+          pinned: session?.pinned,
           content,
           activeBlockId: options.activeBlockId
         });
@@ -417,6 +421,7 @@ class EditorStore extends BaseStore<EditorStore> {
           saveState: SaveState.Saved,
           sessionId: `${Date.now()}`,
           attachmentsLength,
+          pinned: session?.pinned,
           content,
           preview: isPreview,
           activeBlockId: options.activeBlockId
