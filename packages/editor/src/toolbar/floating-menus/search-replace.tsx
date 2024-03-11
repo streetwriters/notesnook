@@ -30,7 +30,8 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
 
   useLayoutEffect(() => {
     const { searchTerm, ...options } = useEditorSearchStore.getState();
-    editor.commands.search(searchTerm, options);
+    if (!options.isSearching) editor.commands.endSearch();
+    else editor.commands.search(searchTerm, options);
   }, []);
 
   return (
@@ -38,7 +39,6 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
       mobile="sheet"
       desktop="popup"
       isOpen={isSearching}
-      container={document.body}
       onClose={() => editor.commands.endSearch()}
       position={{
         target: editor.isEditable ? getToolbarElement() : getEditorContainer(),
