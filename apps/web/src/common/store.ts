@@ -69,7 +69,7 @@ export function createPersistedStore<T extends object>(
     )
   );
 
-  return [store, store.getState()] as const;
+  return store;
 }
 
 export default createStore;
