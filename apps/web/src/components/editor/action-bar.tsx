@@ -44,6 +44,23 @@ import {
 import { Menu } from "../../hooks/use-menu";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useEditorManager } from "./manager";
+import {
+  closestCenter,
+  DndContext,
+  useSensor,
+  useSensors,
+  KeyboardSensor,
+  DragOverlay,
+  MeasuringStrategy,
+  MouseSensor
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  horizontalListSortingStrategy,
+  useSortable
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export function EditorActionBar() {
   const editorMargins = useEditorStore((store) => store.editorMargins);
@@ -196,112 +213,111 @@ function TabStrip() {
           useEditorStore.getState().newSession();
         }}
       >
-        {sessions.map((session, i) => (
-          <Tab
-            key={session.id}
-            title={
-              session.title ||
-              ("note" in session ? session.note.title : "Untitled")
-            }
-            isTemporary={!!session.preview}
-            isActive={session.id === activeSessionId}
-            isPinned={!!session.pinned}
-            isLocked={isLockedSession(session)}
-            type={session.type}
-            index={i}
-            onKeepOpen={() =>
-              useEditorStore
-                .getState()
-                .updateSession(
-                  session.id,
-                  [session.type],
-                  (s) => (s.preview = false)
-                )
-            }
-            onFocus={() => {
-              if (session.id !== activeSessionId) {
-                useEditorStore.getState().openSession(session.id);
+        <ReorderableList
+          items={sessions}
+          moveItem={(from, to) => {
+            if (from === to) return;
+            useEditorStore.setState((state) => {
+              const isToPinned = state.sessions[to].pinned;
+              const [fromTab] = state.sessions.splice(from, 1);
+
+              // if the tab where this tab is being dropped is pinned,
+              // let's pin our tab too.
+              if (isToPinned) {
+                fromTab.pinned = true;
+                fromTab.preview = false;
               }
-            }}
-            onMove={(from, to) => {
-              if (from === to) return;
-              useEditorStore.setState((state) => {
-                // if the tab where this tab is being dropped is pinned,
-                // let's pin our tab too.
-                if (state.sessions[to].pinned)
-                  state.sessions[from].pinned = true;
+              // unpin the tab if it is moved.
+              else if (fromTab.pinned) fromTab.pinned = false;
 
-                const [fromTab] = state.sessions.splice(from, 1);
-
-                // unpin the tab if it is moved.
-                if (fromTab.pinned) fromTab.pinned = false;
-
-                state.sessions.splice(to, 0, fromTab);
-              });
-            }}
-            onClose={() => useEditorStore.getState().closeSessions(session.id)}
-            onCloseAll={() =>
-              useEditorStore
-                .getState()
-                .closeSessions(
-                  ...sessions.filter((s) => !s.pinned).map((s) => s.id)
-                )
-            }
-            onCloseOthers={() =>
-              useEditorStore
-                .getState()
-                .closeSessions(
-                  ...sessions
-                    .filter((s) => s.id !== session.id && !s.pinned)
-                    .map((s) => s.id)
-                )
-            }
-            onCloseToTheRight={() =>
-              useEditorStore
-                .getState()
-                .closeSessions(
-                  ...sessions
-                    .filter((s, index) => index > i && !s.pinned)
-                    .map((s) => s.id)
-                )
-            }
-            onCloseToTheLeft={() =>
-              useEditorStore
-                .getState()
-                .closeSessions(
-                  ...sessions
-                    .filter((s, index) => index < i && !s.pinned)
-                    .map((s) => s.id)
-                )
-            }
-            onPin={() => {
-              useEditorStore.setState((state) => {
-                let to = state.sessions.findLastIndex(
-                  (a) => a.pinned && a.id !== session.id
-                );
-                to = to === -1 ? 0 : to + 1;
-                const [fromTab] = state.sessions.splice(i, 1);
-                fromTab.pinned = !fromTab.pinned;
-                // preview tabs can never be pinned.
-                if (fromTab.pinned) fromTab.preview = false;
-                state.sessions.splice(to, 0, fromTab);
-              });
-            }}
-          />
-        ))}
+              state.sessions.splice(to, 0, fromTab);
+            });
+          }}
+          renderItem={({ item: session, index: i }) => (
+            <Tab
+              id={session.id}
+              key={session.id}
+              title={
+                session.title ||
+                ("note" in session ? session.note.title : "Untitled")
+              }
+              isTemporary={!!session.preview}
+              isActive={session.id === activeSessionId}
+              isPinned={!!session.pinned}
+              isLocked={isLockedSession(session)}
+              type={session.type}
+              onKeepOpen={() =>
+                useEditorStore
+                  .getState()
+                  .updateSession(
+                    session.id,
+                    [session.type],
+                    (s) => (s.preview = false)
+                  )
+              }
+              onFocus={() => {
+                if (session.id !== activeSessionId) {
+                  useEditorStore.getState().openSession(session.id);
+                }
+              }}
+              onClose={() =>
+                useEditorStore.getState().closeSessions(session.id)
+              }
+              onCloseAll={() =>
+                useEditorStore
+                  .getState()
+                  .closeSessions(
+                    ...sessions.filter((s) => !s.pinned).map((s) => s.id)
+                  )
+              }
+              onCloseOthers={() =>
+                useEditorStore
+                  .getState()
+                  .closeSessions(
+                    ...sessions
+                      .filter((s) => s.id !== session.id && !s.pinned)
+                      .map((s) => s.id)
+                  )
+              }
+              onCloseToTheRight={() =>
+                useEditorStore
+                  .getState()
+                  .closeSessions(
+                    ...sessions
+                      .filter((s, index) => index > i && !s.pinned)
+                      .map((s) => s.id)
+                  )
+              }
+              onCloseToTheLeft={() =>
+                useEditorStore
+                  .getState()
+                  .closeSessions(
+                    ...sessions
+                      .filter((s, index) => index < i && !s.pinned)
+                      .map((s) => s.id)
+                  )
+              }
+              onPin={() => {
+                useEditorStore.setState((state) => {
+                  // preview tabs can never be pinned.
+                  if (!session.pinned) state.sessions[i].preview = false;
+                  state.sessions[i].pinned = !session.pinned;
+                  state.sessions.sort((a, b) =>
+                    a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
+                  );
+                });
+              }}
+            />
+          )}
+        />
       </Flex>
     </ScrollContainer>
   );
 }
 
-const dragState: { element?: HTMLElement | null; index: number } = {
-  element: undefined,
-  index: -1
-};
-
 type TabProps = {
+  id: string;
   title: string;
-  index: number;
   isActive: boolean;
   isTemporary: boolean;
   isPinned: boolean;
@@ -315,12 +331,11 @@ type TabProps = {
   onCloseToTheLeft: () => void;
   onCloseAll: () => void;
   onPin: () => void;
-  onMove: (from: number, to: number) => void;
 };
 function Tab(props: TabProps) {
   const {
+    id,
     title,
-    index,
     isActive,
     isTemporary,
     isPinned,
@@ -333,25 +348,27 @@ function Tab(props: TabProps) {
     onCloseOthers,
     onCloseToTheRight,
     onCloseToTheLeft,
-    onMove,
     onPin
   } = props;
-  const [isDragOver, setIsDragOver] = useState(false);
   const Icon = isLocked ? (type === "locked" ? Lock : Unlock) : Note;
+  const { attributes, listeners, setNodeRef, transform, transition, active } =
+    useSortable({ id });
 
   return (
     <Flex
+      ref={setNodeRef}
       className="tab"
       sx={{
         borderRadius: "default",
         cursor: "pointer",
         px: 2,
         py: "7px",
-        bg: isDragOver
-          ? "shade"
-          : isActive
-          ? "background"
-          : "background-secondary",
+
+        transform: CSS.Transform.toString(transform),
+        transition,
+        visibility: active?.id === id ? "hidden" : "visible",
+
+        bg: isActive ? "background" : "background-secondary",
         // borderTopLeftRadius: "default",
         // borderTopRightRadius: "default",
         // borderBottom: isActive ? "none" : "1px solid var(--border)",
@@ -421,38 +438,8 @@ function Tab(props: TabProps) {
         e.stopPropagation();
         onFocus();
       }}
-      draggable
-      onDragStart={(e) => {
-        if (!(e.target instanceof HTMLElement)) return;
-        onFocus();
-        e.target.style.cursor = "grabbing";
-        dragState.element = e.target;
-        dragState.index = index;
-      }}
-      onDragEnd={(e) => {
-        if (!(e.target instanceof HTMLElement)) return;
-        e.target.style.cursor = "pointer";
-        dragState.element = null;
-        dragState.index = -1;
-      }}
-      onDragOver={(e) => {
-        if (e.target === dragState.element) return;
-        e.preventDefault();
-        setIsDragOver(true);
-      }}
-      onDragEnter={(e) => {
-        if (e.target === dragState.element) return;
-        e.preventDefault();
-        setIsDragOver(true);
-      }}
-      onDragLeave={(e) => {
-        if (e.target === dragState.element) return;
-        setIsDragOver(false);
-      }}
-      onDrop={(e) => {
-        setIsDragOver(false);
-        onMove(dragState.index, index);
-      }}
+      {...listeners}
+      {...attributes}
     >
       <Flex mr={1}>
         <Icon size={16} color={isActive ? "accent" : "icon"} />
@@ -487,7 +474,7 @@ function Tab(props: TabProps) {
       ) : (
         <Cross
           sx={{
-            visibility: isActive ? "visible" : "hidden",
+            visibility: isActive && active?.id !== id ? "visible" : "hidden",
             ":hover": { bg: "border" },
             borderRadius: "default",
             flexShrink: 0
@@ -504,176 +491,69 @@ function Tab(props: TabProps) {
   );
 }
 
-// import { useEffect, useMemo, useState } from "react";
-// import { Button, Flex, Text } from "@theme-ui/components";
-// import {
-//   Published,
-//   Publish,
-//   EditorNormalWidth,
-//   EditorFullWidth,
-//   ThemeIcon,
-//   FocusMode,
-//   NormalMode,
-//   ExitFullscreen,
-//   Fullscreen,
-//   Search,
-//   Undo,
-//   Redo,
-//   Properties,
-//   ArrowLeft
-// } from "../icons";
-// import { useStore as useThemeStore } from "../../stores/theme-store";
-// import { useStore as useMonographStore } from "../../stores/monograph-store";
-// import { useStore, store } from "../../stores/editor-store";
-// import { showToast } from "../../utils/toast";
-// import { AnimatedInput } from "../animated";
-// import { showPublishView } from "../publish-view";
-// import { db } from "../../common/db";
-// import { useEditorInstance, useHistory, useSearch } from "./manager";
-// import { AppEventManager, AppEvents } from "../../common/app-events";
+type ReorderableListProps<T> = {
+  items: T[];
+  renderItem: (props: { item: T; index: number }) => JSX.Element;
+  moveItem: (from: number, to: number) => void;
+};
 
-// // TODO: this needs to be cleaned up!
-// function Toolbar() {
-//   const sessionId = useStore((store) => store.session.id);
-//   const isDeleted = useStore((store) => store.session.isDeleted);
-//   const isLocked = useStore((store) => store.session.locked);
-//   const [isFullscreen, setIsFullscreen] = useState(false);
-//   const isFocusMode = useAppStore((store) => store.isFocusMode);
-//   const toggleFocusMode = useAppStore((store) => store.toggleFocusMode);
-//   const toggleProperties = useStore((store) => store.toggleProperties);
-//   const toggleEditorMargins = useStore((store) => store.toggleEditorMargins);
-//   const clearSession = useStore((store) => store.clearSession);
-//   const title = useStore((store) => store.session.title);
-//   const theme = useThemeStore((store) => store.colorScheme);
-//   const toggleNightMode = useThemeStore((store) => store.toggleColorScheme);
-//   const [isTitleVisible, setIsTitleVisible] = useState(false);
+function ReorderableList<T extends { id: string }>(
+  props: ReorderableListProps<T>
+) {
+  const { items, renderItem: Item, moveItem } = props;
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 10
+      }
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  );
+  const [activeItem, setActiveItem] = useState<T>();
 
-//   const monographs = useMonographStore((store) => store.monographs);
-//   const { canRedo, canUndo, redo, undo } = useHistory();
-//   const { toggleSearch } = useSearch();
-//   const editor = useEditorInstance();
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      // onDragCancel={(event) => {}}
+      onDragStart={(event) => {
+        setActiveItem(items.find((i) => i.id === event.active.id));
+      }}
+      onDragEnd={(event) => {
+        const { active, over } = event;
 
-//   const isNotePublished = useMemo(
-//     () => sessionId && db.monographs.isPublished(sessionId),
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//     [sessionId, monographs]
-//   );
+        const overId = over?.id as string;
+        if (overId && active.id !== overId) {
+          const transitionItems = items.slice();
+          const newIndex = transitionItems.findIndex((i) => i.id === overId);
+          const oldIndex = transitionItems.findIndex((i) => i.id === active.id);
+          moveItem(oldIndex, newIndex);
+        }
+        setActiveItem(undefined);
+      }}
+      measuring={{
+        droppable: { strategy: MeasuringStrategy.Always }
+      }}
+    >
+      <SortableContext items={items} strategy={horizontalListSortingStrategy}>
+        {items.map((item, index) => (
+          <Item key={item.id} item={item} index={index} />
+        ))}
 
-//   useEffect(() => {
-//     const editorScroll = document.querySelector(".editorScroll");
-//     if (!editorScroll) return;
-
-//     function onScroll(e) {
-//       const hideOffset = document.querySelector(".editorTitle").scrollHeight;
-//       if (e.target.scrollTop > hideOffset && !isTitleVisible)
-//         setIsTitleVisible(e.target.scrollTop > hideOffset && !isTitleVisible);
-//       else if (e.target.scrollTop <= hideOffset && isTitleVisible)
-//         setIsTitleVisible(false);
-//     }
-//     editorScroll.addEventListener("scroll", onScroll);
-//     return () => {
-//       editorScroll.removeEventListener("scroll", onScroll);
-//     };
-//   }, [isTitleVisible]);
-
-//   const tools = useMemo(
-//     () => [
-//       {
-//         title: isNotePublished ? "Published" : "Publish",
-//         icon: isNotePublished ? Published : Publish,
-//         hidden: !sessionId || isDeleted,
-//         enabled: !isLocked,
-//         onClick: () => showPublishView(store.get().session.id, "top")
-//       }
-//     ],
-//     [sessionId, isLocked, isNotePublished, isDeleted]
-//   );
-
-//   return (
-// <Flex mx={2} my={1} sx={{ justifyContent: "space-between" }}>
-//       <Flex sx={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-//         <ArrowLeft
-//           sx={{
-//             display: ["block", "none", "none"],
-//             flexShrink: 0
-//           }}
-//           size={24}
-//           onClick={() => {
-//             if (store.get().session.id) showToast("success", "Note saved!");
-//             if (isFocusMode) toggleFocusMode();
-//             clearSession();
-//           }}
-//         />
-//         <AnimatedInput
-//           variant="clean"
-//           ml={[2, 2, 0]}
-//           initial={{
-//             opacity: isTitleVisible ? 1 : 0,
-//             zIndex: isTitleVisible ? 1 : -1
-//           }}
-//           animate={{
-//             opacity: isTitleVisible ? 1 : 0,
-//             zIndex: isTitleVisible ? 1 : -1
-//           }}
-//           transition={{ duration: 0.5 }}
-//           defaultValue={title}
-//           onChange={(e) => {
-//             AppEventManager.publish(AppEvents.changeNoteTitle, {
-//               title: e.target.value,
-//               preventSave: false
-//             });
-//           }}
-//           sx={{
-//             flex: 1,
-//             fontWeight: "heading",
-//             fontSize: "heading",
-//             color: "paragraph",
-//             p: 0,
-//             pl: 4,
-//             borderWidth: 0,
-//             borderRadius: "default",
-//             textOverflow: "ellipsis",
-//             whiteSpace: "nowrap",
-//             overflow: "hidden"
-//           }}
-//         />
-//       </Flex>
-
-//       <Flex sx={{ gap: 1 }}>
-//         {tools.map((tool) => (
-//           <Button
-//             key={tool.title}
-//             variant="secondary"
-//             data-test-id={tool.title}
-//             disabled={!tool.enabled}
-//             title={tool.title}
-//             sx={{
-//               display: [
-//                 tool.hideOnMobile ? "none" : "flex",
-//                 tool.hidden ? "none" : "flex"
-//               ],
-//               color: "paragraph",
-//               flexDirection: "row",
-//               flexShrink: 0,
-//               alignItems: "center"
-//             }}
-//             onClick={tool.onClick}
-//           >
-//             <tool.icon size={18} />
-//             <Text
-//               variant="body"
-//               ml={1}
-//               sx={{ display: ["none", "none", "block"] }}
-//             >
-//               {tool.title}
-//             </Text>
-//           </Button>
-//         ))}
-//       </Flex>
-//     </Flex>
-//   );
-// }
-// export default Toolbar;
+        <DragOverlay
+          dropAnimation={{
+            duration: 500,
+            easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)"
+          }}
+        >
+          {activeItem && <Item item={activeItem} index={0} />}
+        </DragOverlay>
+      </SortableContext>
+    </DndContext>
+  );
+}
 
 function enterFullscreen(elem: HTMLElement) {
   elem.requestFullscreen();
