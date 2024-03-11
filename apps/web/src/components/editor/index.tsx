@@ -218,6 +218,7 @@ function EditorView({
 
   return (
     <ScopedThemeProvider ref={root} scope="editor" sx={{ flex: 1 }}>
+      <div id="dialogContainer" />
       <Allotment
         proportionalLayout={true}
         onDragEnd={(sizes) => {
