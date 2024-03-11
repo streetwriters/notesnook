@@ -74,7 +74,7 @@ const Tiptap = ({
   const tabRef = useRef<TabItem>(tab);
   const biometryAvailable = useTabStore((state) => state.biometryAvailable);
   const biometryEnrolled = useTabStore((state) => state.biometryEnrolled);
-
+  const editorRoot = useRef<HTMLDivElement>(null);
   const isFocusedRef = useRef<boolean>(false);
   tabRef.current = tab;
 
@@ -228,6 +228,8 @@ const Tiptap = ({
     if (!getContentDiv().parentElement) {
       contentPlaceholderRef.current?.appendChild(getContentDiv());
     }
+    const editorRootElement = editorRoot.current;
+    editorRootElement?.classList.add("active");
 
     if (!didCallOnLoad) {
       didCallOnLoad = true;
@@ -282,7 +284,10 @@ const Tiptap = ({
       if (state.currentTab === prevState.currentTab) return;
       updateScrollPosition(state);
     });
+    logger("info", tabRef.current.id, "active");
     return () => {
+      editorRootElement?.classList.remove("active");
+      logger("info", tabRef.current.id, "inactive");
       unsub();
     };
   }, [getContentDiv]);
@@ -358,7 +363,7 @@ const Tiptap = ({
           flexDirection: "column",
           maxWidth: "100vw"
         }}
-        id="editorroot"
+        ref={editorRoot}
         onDoubleClick={onClickEmptyArea}
       >
         <Header
