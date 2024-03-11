@@ -22,7 +22,8 @@ import React, {
   useState,
   useRef,
   PropsWithChildren,
-  Suspense
+  Suspense,
+  useLayoutEffect
 } from "react";
 import ReactDOM from "react-dom";
 import { Box, Flex, Progress, Text } from "@theme-ui/components";
@@ -94,14 +95,6 @@ export default function TabsView() {
   const sessions = useEditorStore((store) => store.sessions);
   const activeSessionId = useEditorStore((store) => store.activeSessionId);
 
-  useEffect(() => {
-    if (!activeSessionId) return;
-    // if the session isn't yet rendered, do nothing.
-    const activeSession = useEditorStore.getState().getSession(activeSessionId);
-    if (!activeSession?.needsHydration)
-      useEditorManager.getState().editors[activeSessionId]?.editor?.focus();
-  }, [activeSessionId]);
-  console.log("TabsView", sessions, activeSessionId);
   return (
     <>
       <EditorActionBar />
@@ -159,6 +152,7 @@ function EditorView({
 
   const previewSession = useRef<PreviewSession>();
   const [dropRef, overlayRef] = useDragOverlay();
+  const root = useRef<HTMLDivElement>(null);
 
   const arePropertiesVisible = useEditorStore(
     (store) => store.arePropertiesVisible
@@ -223,8 +217,18 @@ function EditorView({
     };
   }, [editor, session]);
 
+  useLayoutEffect(() => {
+    editor?.focus();
+
+    const element = root.current;
+    element?.classList.add("active");
+    return () => {
+      element?.classList.remove("active");
+    };
+  }, [editor]);
+
   return (
-    <ScopedThemeProvider scope="editor" sx={{ flex: 1 }}>
+    <ScopedThemeProvider ref={root} scope="editor" sx={{ flex: 1 }}>
       <Allotment
         proportionalLayout={true}
         onDragEnd={(sizes) => {
