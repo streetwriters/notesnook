@@ -33,7 +33,7 @@ function Toggle(props: ToggleProps) {
   return (
     <Flex
       py={2}
-      px={2}
+      px={1}
       sx={{
         borderBottom: "1px solid var(--separator)",
         cursor: "pointer",
