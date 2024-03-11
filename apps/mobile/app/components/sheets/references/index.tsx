@@ -30,7 +30,7 @@ import { ActivityIndicator, View } from "react-native";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import create from "zustand";
 import { db } from "../../../common/database";
-import { useDBItem } from "../../../hooks/use-db-item";
+import { useDBItem, useNoteLocked } from "../../../hooks/use-db-item";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { eOnLoadNote } from "../../../utils/events";
@@ -86,9 +86,23 @@ const ListBlockItem = ({
         style={{
           flexDirection: "row",
           width: "100%",
-          columnGap: 10
+          columnGap: 10,
+          justifyContent: "space-between"
         }}
       >
+        <Paragraph
+          style={{
+            flexShrink: 1,
+            marginTop: 2
+          }}
+        >
+          {item?.content.length > 200
+            ? item?.content.slice(0, 200) + "..."
+            : !item.content || item.content.trim() === ""
+            ? "(Empty block)"
+            : item.content}
+        </Paragraph>
+
         <View
           style={{
             borderRadius: 5,
@@ -103,16 +117,6 @@ const ListBlockItem = ({
             {item.type.toUpperCase()}
           </Paragraph>
         </View>
-        <Paragraph
-          style={{
-            flexShrink: 1,
-            marginTop: 2
-          }}
-        >
-          {item?.content.length > 200
-            ? item?.content.slice(0, 200) + "..."
-            : item.content}
-        </Paragraph>
       </View>
     </Pressable>
   );
@@ -201,6 +205,7 @@ const ListNoteItem = ({
   const expanded = useExpandedStore((state) =>
     !item ? false : state.expanded[item.id]
   );
+  const locked = useNoteLocked(item?.id);
   const [linkedBlocks, setLinkedBlocks] = useState<ContentBlock[]>([]);
   const [noteInternalLinks, setNoteInternalLinks] = useState<
     {
@@ -339,7 +344,7 @@ const ListNoteItem = ({
         <Paragraph numberOfLines={1}>{item?.title}</Paragraph>
       </Pressable>
 
-      {expanded && !item?.locked ? (
+      {expanded && !locked ? (
         <View
           style={{
             justifyContent: "center",
@@ -445,6 +450,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
           title="Linked notes"
           style={{
             borderRadius: 0,
+            borderWidth: 0,
             borderBottomWidth: 3,
             borderColor: tab === 0 ? colors.primary.accent : "transparent",
             height: 40,
@@ -459,6 +465,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
           title="Referenced in"
           style={{
             width: "50%",
+            borderWidth: 0,
             borderRadius: 0,
             borderBottomWidth: 3,
             borderColor: tab === 1 ? colors.primary.accent : "transparent",
