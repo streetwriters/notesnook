@@ -41,7 +41,7 @@ import {
 } from "../../stores/editor-store";
 import { Menu } from "../../hooks/use-menu";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { useEditorManager, useSearch } from "./manager";
+import { useEditorManager } from "./manager";
 
 export function EditorActionBar() {
   // const editorMargins = useEditorStore((store) => store.editorMargins);
@@ -50,7 +50,9 @@ export function EditorActionBar() {
   const activeSession = useEditorStore((store) =>
     store.activeSessionId ? store.getSession(store.activeSessionId) : undefined
   );
-  const { toggleSearch } = useSearch();
+  const editor = useEditorManager((store) =>
+    activeSession?.id ? store.editors[activeSession?.id]?.editor : undefined
+  );
 
   const tools = [
     // {
@@ -104,7 +106,7 @@ export function EditorActionBar() {
         activeSession.type !== "new" &&
         activeSession.type !== "locked" &&
         activeSession.type !== "readonly",
-      onClick: toggleSearch
+      onClick: editor?.startSearch
     },
     {
       title: "Properties",

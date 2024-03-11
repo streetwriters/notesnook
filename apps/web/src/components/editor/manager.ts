@@ -40,7 +40,6 @@ class EditorManager extends BaseStore<EditorManager> {
     fontFamily: "sans-serif",
     fontSize: 16
   });
-  searching?: boolean;
   editors: Record<string, EditorContext> = {};
 
   getEditor = (id: string): EditorContext | undefined => {
@@ -86,38 +85,8 @@ const [useEditorManager] = createStore<EditorManager>(
 
 export { useEditorManager };
 
-// export function useEditorInstance(id: string) {
-//   const editor = useEditorContext((store) => store.subState.editors[id]);
-//   const editorRef = useRef(editor);
-//   useEffect(() => {
-//     editorRef.current = editor;
-//   }, [editor]);
-//   return editorRef;
-// }
-// export const editorInstance = (id: string) =>
-//   useEditorManager.getState().editors[id];
-
-// export function useConfigureEditor() {
-//   return useEditorContext((store) => store.configure);
-// }
-
-// export const configureEditor = (
-//   partial:
-//     | Partial<EditorSubState>
-//     | ((oldState: EditorSubState) => Partial<EditorSubState>)
-// ) => useEditorContext.getState().configure(partial);
-
 export function useEditor(id: string) {
   return useEditorManager((store) => store.editors[id]);
-}
-
-export function useSearch() {
-  const isSearching = useEditorManager((store) => store.searching);
-  const toggleSearch = useCallback(
-    () => useEditorManager.setState({ searching: !isSearching }),
-    [isSearching]
-  );
-  return { isSearching, toggleSearch };
 }
 
 export function useToolbarConfig() {
