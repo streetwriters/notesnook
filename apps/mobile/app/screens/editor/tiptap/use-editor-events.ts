@@ -247,6 +247,7 @@ export const useEditorEvents = (
     }
     editorState().currentlyEditing = false;
     // editor.reset(); Notes remain open.
+    editor.commands?.blur(useTabStore.getState().currentTab);
     setTimeout(async () => {
       if (deviceMode !== "mobile" && fullscreen) {
         if (fullscreen) {
