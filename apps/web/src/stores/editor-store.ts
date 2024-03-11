@@ -92,6 +92,7 @@ export type DefaultEditorSession = BaseEditorSession & {
   sessionId: string;
   color?: string;
   tags?: Tag[];
+  locked?: boolean;
   attachmentsLength?: number;
   saveState: SaveState;
 };
@@ -131,6 +132,7 @@ type SessionTypeMap = {
 export function isLockedSession(session: EditorSession): boolean {
   return (
     session.type === "locked" ||
+    (session.type === "default" && !!session.locked) ||
     ("content" in session &&
       !!session.content &&
       "locked" in session.content &&
@@ -337,8 +339,9 @@ class EditorStore extends BaseStore<EditorStore> {
         : (await db.notes.note(noteId)) || (await db.notes.trashed(noteId));
     if (!note) return;
     const isPreview = session ? session.preview : true;
+    const isLocked = await db.vaults.itemExists(note);
 
-    if (note.locked && note.type !== "trash") {
+    if (isLocked && note.type !== "trash") {
       this.addSession({
         type: "locked",
         id: note.id,
@@ -382,8 +385,7 @@ class EditorStore extends BaseStore<EditorStore> {
         : undefined;
 
       if (content?.locked) {
-        note.locked = true;
-        await db.notes.add({ id: note.id, locked: true });
+        await db.vault.add(noteId);
         return this.openSession(note, { ...options, force: true });
       }
 
@@ -534,6 +536,23 @@ class EditorStore extends BaseStore<EditorStore> {
           content: partial.content
         });
       } else {
+        // update any conflicted session that has the same content opened
+        if (partial.content) {
+          this.set((state) => {
+            const session = state.sessions.find(
+              (s): s is ConflictedEditorSession =>
+                (s.type === "diff" || s.type === "conflicted") &&
+                !!s.content.conflicted &&
+                s.content.conflicted.id === currentSession.note.contentId &&
+                s.content.conflicted.dateEdited ===
+                  currentSession.note.dateEdited
+            );
+            if (!session || !session.content.conflicted) return;
+            session.content.conflicted.data = partial.content!.data;
+            session.content.conflicted.dateEdited = note.dateEdited;
+          });
+        }
+
         this.updateSession(id, ["default"], {
           preview: false,
           attachmentsLength: attachmentsLength,
@@ -641,7 +660,7 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 }
 
-const [useEditorStore] = createPersistedStore(EditorStore, {
+const useEditorStore = createPersistedStore(EditorStore, {
   name: "editor-sessions",
   partialize: (state) => ({
     history: state.history,
@@ -655,9 +674,11 @@ const [useEditorStore] = createPersistedStore(EditorStore, {
         needsHydration: session.type === "new" ? false : true,
         preview: session.preview,
         pinned: session.pinned,
+        title: session.title,
         note:
           "note" in session
             ? {
+                id: session.note.id,
                 title: session.note.title
               }
             : undefined

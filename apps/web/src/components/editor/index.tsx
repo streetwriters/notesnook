@@ -104,10 +104,12 @@ export default function TabsView() {
               title={session.note.title}
               unlock={async (password) => {
                 const note = await db.vault.open(session.id, password);
-                if (!note) throw new Error("note with this id does not exist.");
+                if (!note || !note.content)
+                  throw new Error("note with this id does not exist.");
 
                 useEditorStore.getState().addSession({
                   type: "default",
+                  locked: true,
                   id: session.id,
                   note: session.note,
                   saveState: SaveState.Saved,
