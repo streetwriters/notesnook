@@ -37,6 +37,7 @@ function TitleBox(props: TitleBoxProps) {
   const { readonly, id } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   // const id = useStore((store) => store.session.id);
+  const sessionType = useEditorStore((store) => store.getActiveSession()?.type);
   const isMobile = useMobile();
   const isTablet = useTablet();
   const { editorConfig } = useEditorConfig();
@@ -62,13 +63,16 @@ function TitleBox(props: TitleBoxProps) {
 
   useEffect(() => {
     const session = useEditorStore.getState().getSession(id);
-    if (!session || !("note" in session) || !session.note) return;
+    if (!session || !("note" in session) || !session.note || !inputRef.current)
+      return;
 
     const { title } = session.note;
-    if (!inputRef.current) return;
-    inputRef.current.value = title || "";
+    withSelectionPersist(
+      inputRef.current,
+      (input) => (input.value = title || "")
+    );
     updateFontSize(title?.length || 0);
-  }, [id, updateFontSize]);
+  }, [sessionType, id, updateFontSize]);
 
   useEffect(() => {
     if (!inputRef.current) return;
