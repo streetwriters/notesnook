@@ -49,7 +49,7 @@ import ScrollContainer from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
 import { Section } from "../properties";
 import { scrollIntoViewById } from "@notesnook/editor";
-import { Button, Flex } from "@theme-ui/components";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { useEditorManager } from "./manager";
 
 type TableOfContentsProps = {
@@ -138,27 +138,38 @@ function TableOfContents(props: TableOfContentsProps) {
             }
           >
             <Flex sx={{ mt: 2, flexDirection: "column" }}>
-              {tableOfContents.map((t) => (
-                <Button
-                  variant="menuitem"
-                  key={t.id}
+              {tableOfContents.length <= 0 ? (
+                <Text
+                  variant="body"
                   sx={{
-                    textAlign: "left",
-                    paddingLeft: `${t.level * 5}px`,
-                    py: 1,
-                    borderLeft: "5px solid transparent",
-                    borderColor: active.includes(t.id)
-                      ? "accent-selected"
-                      : "transparent",
-                    color: active.includes(t.id)
-                      ? "accent-selected"
-                      : "paragraph"
+                    pl: 1
                   }}
-                  onClick={() => scrollIntoViewById(t.id)}
                 >
-                  {t.title}
-                </Button>
-              ))}
+                  No headings found.
+                </Text>
+              ) : (
+                tableOfContents.map((t) => (
+                  <Button
+                    variant="menuitem"
+                    key={t.id}
+                    sx={{
+                      textAlign: "left",
+                      paddingLeft: `${t.level * 5}px`,
+                      py: 1,
+                      borderLeft: "5px solid transparent",
+                      borderColor: active.includes(t.id)
+                        ? "accent-selected"
+                        : "transparent",
+                      color: active.includes(t.id)
+                        ? "accent-selected"
+                        : "paragraph"
+                    }}
+                    onClick={() => scrollIntoViewById(t.id)}
+                  >
+                    {t.title}
+                  </Button>
+                ))
+              )}
             </Flex>
           </Section>
         </ScrollContainer>
