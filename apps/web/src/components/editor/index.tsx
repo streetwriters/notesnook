@@ -177,23 +177,19 @@ function EditorView({
         )
           return;
 
-        const { contentId, locked } = session.note;
+        const { contentId } = session.note;
         const isContent = item.type === "tiptap" && item.id === contentId;
         const isNote = item.type === "note" && item.id === session.note.id;
 
-        if (id && isContent) {
-          let content: string | null = null;
-          if (locked && item.locked) {
-            const result = await db.vault
-              .decryptContent(item, item.noteId)
-              .catch(() => undefined);
-            if (result) content = result.data;
-            else EV.publish(EVENTS.vaultLocked);
-          }
-          editor.updateContent(item.data as string);
-        } else if (isNote) {
-          if (!locked && item.locked) return EV.publish(EVENTS.vaultLocked);
+        if (isContent) {
+          if (!item.locked) return editor.updateContent(item.data);
 
+          const result = await db.vault
+            .decryptContent(item, item.noteId)
+            .catch(() => EV.publish(EVENTS.vaultLocked));
+          if (!result) return;
+          editor.updateContent(result.data);
+        } else if (isNote) {
           useEditorStore
             .getState()
             .updateSession(session.id, [session.type], { note: item });
