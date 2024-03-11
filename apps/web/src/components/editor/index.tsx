@@ -59,14 +59,8 @@ import { ScopedThemeProvider } from "../theme-provider";
 import { Lightbox } from "../lightbox";
 import { Allotment } from "allotment";
 import { showToast } from "../../utils/toast";
-import {
-  ContentType,
-  Item,
-  MaybeDeletedItem,
-  isDeleted
-} from "@notesnook/core/dist/types";
+import { Item, MaybeDeletedItem, isDeleted } from "@notesnook/core/dist/types";
 import { debounce, debounceWithId } from "@notesnook/common";
-import { PreviewSession } from "./types";
 import { Freeze } from "react-freeze";
 import { EditorActionBar } from "./action-bar";
 import { UnlockView } from "../unlock";
@@ -150,7 +144,6 @@ function EditorView({
   const lastChangedTime = useRef<number>(Date.now());
   const [docPreview, setDocPreview] = useState<DocumentPreview>();
 
-  const previewSession = useRef<PreviewSession>();
   const [dropRef, overlayRef] = useDragOverlay();
   const root = useRef<HTMLDivElement>(null);
 
@@ -159,9 +152,6 @@ function EditorView({
   );
   const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
-  const isReadonly = useEditorStore(
-    (store) => store.getSession(id, ["default", "readonly"])?.note?.readonly
-  );
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const editor = useEditorManager((store) => store.editors[session.id]?.editor);
 
@@ -248,14 +238,6 @@ function EditorView({
               background: "background"
             }}
           >
-            {/* {previewSession.current && (
-              <PreviewModeNotice
-                {...previewSession.current}
-                onDiscard={() =>
-                  typeof noteId === "string" && openSession(noteId)
-                }
-              />
-            )} */}
             <Editor
               id={session.id}
               nonce={1}
@@ -648,62 +630,6 @@ function EditorChrome(
     </>
   );
 }
-
-// type PreviewModeNoticeProps = PreviewSession & {
-//   onDiscard: () => void;
-// };
-// function PreviewModeNotice(props: PreviewModeNoticeProps) {
-//   const { dateCreated, dateEdited, content, onDiscard } = props;
-//   const disablePreviewMode = useCallback(
-//     async (cancelled: boolean) => {
-//       const { id, sessionId } = useEditorStore.getState().session;
-//       if (!cancelled) {
-//         await editorstore.saveSessionContent(id, sessionId, content);
-//       }
-//       onDiscard();
-//     },
-//     [onDiscard, content]
-//   );
-
-//   return (
-//     <Flex
-//       bg="var(--background-secondary)"
-//       p={2}
-//       sx={{ alignItems: "center", justifyContent: "space-between" }}
-//       data-test-id="preview-notice"
-//     >
-//       <Flex mr={4} sx={{ flexDirection: "column" }}>
-//         <Text variant={"subtitle"}>Preview</Text>
-//         <Text variant={"body"}>
-//           You are previewing note version edited from{" "}
-//           {getFormattedDate(dateCreated, "date-time")} to{" "}
-//           {getFormattedDate(dateEdited, "date-time")}.
-//         </Text>
-//       </Flex>
-//       <Flex>
-//         <Button
-//           data-test-id="preview-notice-cancel"
-//           variant={"secondary"}
-//           mr={1}
-//           px={4}
-//           onClick={() => disablePreviewMode(true)}
-//         >
-//           Cancel
-//         </Button>
-//         <Button
-//           variant="accent"
-//           data-test-id="preview-notice-restore"
-//           px={4}
-//           onClick={async () => {
-//             await disablePreviewMode(false);
-//           }}
-//         >
-//           Restore
-//         </Button>
-//       </Flex>
-//     </Flex>
-//   );
-// }
 
 type DropZoneProps = {
   overlayRef: React.MutableRefObject<HTMLElement | undefined>;
