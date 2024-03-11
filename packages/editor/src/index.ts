@@ -87,6 +87,7 @@ import CheckList from "./extensions/check-list";
 import CheckListItem from "./extensions/check-list-item";
 import { Callout } from "./extensions/callout";
 import BlockId from "./extensions/block-id";
+import { useEditorSearchStore } from "./toolbar/stores/search-store";
 
 interface TiptapStorage {
   portalProviderAPI?: PortalProviderAPI;
@@ -182,7 +183,20 @@ const useTiptap = (
       extensions: [
         ...CoreExtensions,
         NodeViewSelectionNotifier,
-        SearchReplace,
+        SearchReplace.configure({
+          onStartSearch: (term) => {
+            useEditorSearchStore.setState({
+              isSearching: true,
+              searchTerm: term,
+              focusNonce: Math.random()
+            });
+            return true;
+          },
+          onEndSearch: () => {
+            useEditorSearchStore.setState({ isSearching: false });
+            return true;
+          }
+        }),
         TextStyle.extend({
           parseHTML() {
             return [

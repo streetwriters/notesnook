@@ -26,6 +26,7 @@ import {
   TextSelection,
   Transaction
 } from "prosemirror-state";
+import { SearchSettings } from "../../toolbar/stores/search-store";
 
 type DispatchFn = (tr: Transaction) => void;
 declare module "@tiptap/core" {
@@ -33,7 +34,6 @@ declare module "@tiptap/core" {
     searchreplace: {
       startSearch: () => ReturnType;
       endSearch: () => ReturnType;
-      refreshSearch: () => ReturnType;
       search: (term: string, options?: SearchSettings) => ReturnType;
       moveToNextResult: () => ReturnType;
       moveToPreviousResult: () => ReturnType;
@@ -50,19 +50,12 @@ interface Result {
 
 interface SearchOptions {
   searchResultClass: string;
+  onStartSearch: (term?: string) => boolean;
+  onEndSearch: () => boolean;
 }
 
-interface SearchSettings {
-  matchCase: boolean;
-  enableRegex: boolean;
-  matchWholeWord: boolean;
-}
-
-export type SearchStorage = SearchSettings & {
-  searchTerm: string;
+export type SearchStorage = {
   selectedIndex: number;
-  isSearching: boolean;
-  focusNonce: number;
   selectedText?: string;
   results?: Result[];
 };
@@ -75,7 +68,6 @@ interface TextNodesWithPosition {
 const updateView = (state: EditorState, dispatch: DispatchFn) => {
   if (!state.tr) return;
 
-  state.tr.setMeta("forceUpdate", true);
   dispatch(state.tr);
 };
 
@@ -104,7 +96,6 @@ function searchDocument(
     };
 
   const doc = tr.doc;
-  const decorations: Decoration[] = [];
   const results: Result[] = [];
 
   let index = 0;
@@ -158,18 +149,29 @@ function searchDocument(
     }
   }
 
+  return {
+    startIndex: selectedIndex || 0,
+    decorationSet: DecorationSet.create(
+      doc,
+      resultsToDecorations(results, searchResultClass, selectedIndex)
+    ),
+    results
+  };
+}
+
+function resultsToDecorations(
+  results: Result[],
+  searchResultClass: string,
+  selectedIndex?: number
+) {
+  const decorations: Decoration[] = [];
   for (let i = 0; i < results.length; i++) {
     const { from, to } = results[i];
     const resultClass =
       i === selectedIndex ? `${searchResultClass} selected` : searchResultClass;
     decorations.push(Decoration.inline(from, to, { class: resultClass }));
   }
-
-  return {
-    startIndex: selectedIndex || 0,
-    decorationSet: DecorationSet.create(doc, decorations),
-    results
-  };
+  return decorations;
 }
 
 const replaceAll = (
@@ -201,7 +203,17 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
 
   addOptions() {
     return {
-      searchResultClass: "search-result"
+      searchResultClass: "search-result",
+      onStartSearch: () => false,
+      onEndSearch: () => false
+    };
+  },
+
+  addStorage() {
+    return {
+      selectedIndex: 0,
+      results: [],
+      selectedText: undefined
     };
   },
 
@@ -209,41 +221,33 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
     return {
       startSearch:
         () =>
-        ({ state }) => {
-          this.storage.focusNonce = Math.random();
-          this.storage.isSearching = true;
-          if (!state.selection.empty) {
-            this.storage.selectedText = state.doc.textBetween(
-              state.selection.$from.pos,
-              state.selection.$to.pos
-            );
-          }
-          return true;
+        ({ state, commands }) => {
+          const term = !state.selection.empty
+            ? state.doc.textBetween(
+                state.selection.$from.pos,
+                state.selection.$to.pos
+              )
+            : undefined;
+          if (term) commands.search(term);
+
+          return this.options.onStartSearch(term);
         },
       endSearch:
         () =>
         ({ state, dispatch, editor }) => {
-          this.storage.isSearching = false;
-          this.storage.selectedText = undefined;
-          this.storage.searchTerm = "";
           editor.commands.focus();
+          state.tr.setMeta("isSearching", false);
           if (dispatch) updateView(state, dispatch);
-          return true;
-        },
-      refreshSearch:
-        () =>
-        ({ commands }) => {
-          return commands.search(this.storage.searchTerm, this.storage);
+          return this.options.onEndSearch();
         },
       search:
         (term, options?: SearchSettings) =>
         ({ state, dispatch }) => {
-          this.storage.selectedIndex = 0;
-          this.storage.searchTerm = term;
-          this.storage.enableRegex = options?.enableRegex || false;
-          this.storage.matchCase = options?.matchCase || false;
-          this.storage.matchWholeWord = options?.matchWholeWord || false;
-          this.storage.results = [];
+          state.tr.setMeta("isSearching", true);
+          state.tr.setMeta("searchTerm", term);
+          if (options?.enableRegex) state.tr.setMeta("enableRegex", true);
+          if (options?.matchCase) state.tr.setMeta("matchCase", true);
+          if (options?.matchWholeWord) state.tr.setMeta("matchWholeWord", true);
 
           if (dispatch) updateView(state, dispatch);
           return true;
@@ -262,6 +266,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           scrollIntoView();
 
           this.storage.selectedIndex = nextIndex;
+          state.tr.setMeta("selectedIndex", nextIndex);
           if (dispatch) updateView(state, dispatch);
           return true;
         },
@@ -279,6 +284,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           scrollIntoView();
 
           this.storage.selectedIndex = prevIndex;
+          state.tr.setMeta("selectedIndex", prevIndex);
           if (dispatch) updateView(state, dispatch);
 
           return true;
@@ -338,24 +344,71 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
     const key = new PluginKey("searchreplace");
 
     return [
-      new Plugin({
+      new Plugin<
+        SearchSettings & {
+          searchTerm: string;
+          results: DecorationSet;
+          isSearching: boolean;
+          selectedIndex: number;
+        }
+      >({
         key,
         state: {
           init() {
-            return DecorationSet.empty;
+            return {
+              results: DecorationSet.empty,
+              searchTerm: "",
+              isSearching: false,
+              enableRegex: false,
+              matchCase: false,
+              matchWholeWord: false,
+              selectedIndex: 0
+            };
           },
           apply: (tr, value) => {
             const { docChanged } = tr;
-            const forceUpdate = tr.getMeta("forceUpdate");
-            const {
-              searchTerm,
-              enableRegex,
-              matchCase,
-              matchWholeWord,
-              selectedIndex,
-              isSearching
-            } = this.storage;
-            if (docChanged || forceUpdate) {
+            const isSearching = tr.getMeta("isSearching") ?? value.isSearching;
+            if (!isSearching)
+              return {
+                ...value,
+                isSearching: false,
+                results: DecorationSet.empty
+              };
+
+            const searchTerm = tr.getMeta("searchTerm") ?? value.searchTerm;
+            const enableRegex = tr.getMeta("enableRegex") ?? value.enableRegex;
+            const matchCase = tr.getMeta("matchCase") ?? value.matchCase;
+            const matchWholeWord =
+              tr.getMeta("matchWholeWord") ?? value.matchWholeWord;
+            const selectedIndex =
+              tr.getMeta("selectedIndex") ?? value.selectedIndex;
+            const shouldResearch =
+              docChanged ||
+              searchTerm !== value.searchTerm ||
+              matchCase !== value.matchCase ||
+              matchWholeWord !== value.matchWholeWord ||
+              enableRegex !== value.enableRegex;
+
+            if (
+              selectedIndex !== value.selectedIndex &&
+              this.storage.results &&
+              !shouldResearch
+            ) {
+              return {
+                ...value,
+                selectedIndex,
+                results: DecorationSet.create(
+                  tr.doc,
+                  resultsToDecorations(
+                    this.storage.results,
+                    this.options.searchResultClass,
+                    selectedIndex
+                  )
+                )
+              };
+            }
+
+            if (shouldResearch) {
               const { searchResultClass } = this.options;
 
               const searchRegex = searchTerm
@@ -365,21 +418,29 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
                 tr,
                 searchResultClass,
                 searchRegex,
-                selectedIndex
+                0 // TODO: first index should be relative to cursor position
               );
               const { decorationSet, results, startIndex } = result;
               this.storage.results = results;
               this.storage.selectedIndex = startIndex;
 
-              return decorationSet;
+              return {
+                selectedIndex,
+                searchTerm,
+                isSearching,
+                results: decorationSet,
+                enableRegex,
+                matchCase,
+                matchWholeWord
+              };
             }
 
-            return isSearching ? value : DecorationSet.empty;
+            return value;
           }
         },
         props: {
           decorations(state) {
-            return key.getState(state);
+            return key.getState(state).results;
           }
         }
       })
@@ -393,7 +454,7 @@ function scrollIntoView() {
     if (!(domNode instanceof HTMLElement)) return;
 
     domNode.scrollIntoView({
-      behavior: "smooth",
+      behavior: "instant",
       block: "center"
     });
   });
