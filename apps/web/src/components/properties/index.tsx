@@ -685,7 +685,7 @@ export function Section({
         flexDirection: "column"
       }}
     >
-      <Flex mx={2} mt={2} sx={{ alignItems: "center" }}>
+      <Flex mx={1} mt={2} sx={{ alignItems: "center" }}>
         {button}
         <Text variant="subtitle">{title}</Text>
       </Flex>
