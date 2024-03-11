@@ -38,8 +38,7 @@ import {
   Attachment,
   getTableOfContents
 } from "@notesnook/editor";
-import { Box, Flex } from "@theme-ui/components";
-import { useState } from "react";
+import { Flex } from "@theme-ui/components";
 import {
   PropsWithChildren,
   useEffect,
@@ -48,19 +47,13 @@ import {
   useRef
 } from "react";
 import { IEditor } from "./types";
-import {
-  useSearch,
-  useEditorConfig,
-  useToolbarConfig,
-  useEditorManager
-} from "./manager";
+import { useEditorConfig, useToolbarConfig, useEditorManager } from "./manager";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 import { getChangedNodes } from "@notesnook/editor/dist/utils/prosemirror";
 import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
 import { writeToClipboard } from "../../utils/clipboard";
@@ -146,7 +139,6 @@ function TipTap(props: TipTapProps) {
     (store) => store.markdownShortcuts
   );
   const { toolbarConfig } = useToolbarConfig();
-  const { isSearching, toggleSearch } = useSearch();
 
   usePermissionHandler({
     claims: {
@@ -199,7 +191,6 @@ function TipTap(props: TipTapProps) {
           editor.commands.focus("start", { scrollIntoView: true });
         oldNonce.current = nonce;
 
-        console.log("on create new editor");
         useEditorManager.getState().setEditor(id, {
           editor: toIEditor(editor as Editor),
           canRedo: editor.can().redo(),
@@ -212,7 +203,7 @@ function TipTap(props: TipTapProps) {
           },
           tableOfContents: getTableOfContents(editor.view.dom)
         });
-        editor.commands.refreshSearch();
+        // editor.commands.refreshSearch();
       },
       onUpdate: ({ editor, transaction }) => {
         const changedHeadings = getChangedNodes(transaction, {
@@ -306,25 +297,6 @@ function TipTap(props: TipTapProps) {
     [tiptapOptions]
   );
 
-  useEffect(
-    () => {
-      const isEditorSearching = editor?.storage.searchreplace?.isSearching;
-      if (isSearching) editor?.commands.startSearch();
-      else if (isEditorSearching) editor?.commands.endSearch();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isSearching]
-  );
-
-  useEffect(
-    () => {
-      const isEditorSearching = editor?.storage.searchreplace?.isSearching;
-      if (isSearching && !isEditorSearching) toggleSearch();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [toggleSearch, editor?.storage.searchreplace?.isSearching]
-  );
-
   // useEffect(() => {
   //   if (!editorContainer) return;
   //   const currentEditor = editor;
@@ -349,8 +321,6 @@ function TipTap(props: TipTapProps) {
   //     editorContainer.removeEventListener("click", onClick);
   //   };
   // }, [editor, editorContainer]);
-
-  console.log("RENDERING TIPTAP");
 
   if (readonly) return null;
   return (
@@ -466,7 +436,8 @@ function toIEditor(editor: Editor): IEditor {
           progress
         },
         { query: (a) => a.hash === hash, preventUpdate: true }
-      )
+      ),
+    startSearch: () => editor.commands.startSearch()
   };
 }
 

@@ -36,4 +36,5 @@ export interface IEditor {
   updateContent: (content: string) => void;
   attachFile: (file: Attachment) => void;
   sendAttachmentProgress: (hash: string, progress: number) => void;
+  startSearch: () => void;
 }
