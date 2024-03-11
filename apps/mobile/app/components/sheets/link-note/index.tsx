@@ -99,15 +99,31 @@ const ListBlockItem = ({
           flexDirection: "row",
           width: "100%",
           columnGap: 10,
-          alignItems: "center"
+          alignItems: "flex-start",
+          borderBottomWidth: 1,
+          borderBottomColor: colors.primary.border,
+          paddingVertical: 5,
+          justifyContent: "space-between"
         }}
       >
+        <Paragraph
+          style={{
+            flexShrink: 1
+          }}
+        >
+          {item?.content.length > 200
+            ? item?.content.slice(0, 200) + "..."
+            : !item.content || item.content.trim() === ""
+            ? "(Empty block)"
+            : item.content}
+        </Paragraph>
+
         <View
           style={{
             borderRadius: 5,
             backgroundColor: colors.secondary.background,
-            width: 25,
             height: 25,
+            minWidth: 25,
             alignItems: "center",
             justifyContent: "center"
           }}
@@ -116,16 +132,6 @@ const ListBlockItem = ({
             {item.type.toUpperCase()}
           </Paragraph>
         </View>
-
-        <Paragraph
-          style={{
-            flexShrink: 1
-          }}
-        >
-          {item?.content.length > 200
-            ? item?.content.slice(0, 200) + "..."
-            : item.content}
-        </Paragraph>
       </View>
     </Pressable>
   );
@@ -214,7 +220,8 @@ export default function LinkNote(props: {
     <View
       style={{
         paddingHorizontal: 12,
-        minHeight: 400
+        minHeight: 400,
+        maxHeight: "100%"
       }}
     >
       <View
@@ -305,6 +312,7 @@ export default function LinkNote(props: {
           style={{
             marginTop: 10
           }}
+          windowSize={3}
           keyExtractor={(item) => item.id}
           data={nodes}
         />
@@ -320,6 +328,7 @@ export default function LinkNote(props: {
           style={{
             marginTop: 10
           }}
+          windowSize={3}
           data={notes?.placeholders}
         />
       )}
