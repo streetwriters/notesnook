@@ -411,8 +411,8 @@ const Tiptap = ({
                 paddingLeft: 12,
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: tab.locked ? "center" : "flex-start",
+                justifyContent: tab.locked ? "center" : "flex-start",
                 boxSizing: "border-box",
                 rowGap: 10
               }}
