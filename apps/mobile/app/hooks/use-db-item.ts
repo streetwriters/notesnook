@@ -120,6 +120,40 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
   ];
 };
 
+export const useNoteLocked = (noteId: string | undefined) => {
+  const [locked, setLocked] = useState(false);
+
+  useEffect(() => {
+    if (!noteId) return;
+    db.vaults
+      .itemExists({
+        type: "note",
+        id: noteId
+      })
+      .then((exists) => {
+        setLocked(exists);
+      });
+
+    const sub = eSubscribeEvent(eDBItemUpdate, (id: string) => {
+      if (id === noteId) {
+        db.vaults
+          .itemExists({
+            type: "note",
+            id: noteId
+          })
+          .then((exists) => {
+            setLocked(exists);
+          });
+      }
+    });
+    return () => {
+      sub?.unsubscribe();
+    };
+  }, [noteId]);
+
+  return locked;
+};
+
 export const useTotalNotes = (type: "notebook" | "tag" | "color") => {
   const [totalNotesById, setTotalNotesById] = useState<{
     [id: string]: number;
