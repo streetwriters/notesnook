@@ -563,7 +563,7 @@ function EditorChrome(
 
       {/* <Toolbar /> */}
       <FlexScrollContainer
-        id={`${id}_editorScroll`}
+        id={`editorScroll_${id}`}
         scrollRef={editorScrollRef}
         style={{
           display: "flex",
@@ -753,7 +753,7 @@ function isFile(e: DragEvent) {
 function restoreScrollPosition(session: EditorSession) {
   if (session?.activeBlockId) return scrollIntoViewById(session.activeBlockId);
 
-  const scrollContainer = document.getElementById(`${id}_editorScroll`);
+  const scrollContainer = document.getElementById(`editorScroll_${session.id}`);
   const scrollPosition = Config.get(`${session.id}:scroll-position`, 0);
   if (scrollContainer) {
     requestAnimationFrame(() => {
