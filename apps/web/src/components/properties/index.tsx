@@ -34,7 +34,8 @@ import { Box, Button, Flex, Text } from "@theme-ui/components";
 import {
   useEditorStore,
   ReadonlyEditorSession,
-  DefaultEditorSession
+  DefaultEditorSession,
+  DeletedEditorSession
 } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -54,7 +55,6 @@ import { VirtualizedList } from "../virtualized-list";
 import { SessionItem } from "../session-item";
 import {
   ContentBlock,
-  DefaultColors,
   Note,
   VirtualizedGrouping,
   createInternalLink,
@@ -106,18 +106,15 @@ const metadataItems = [
 ];
 
 type EditorPropertiesProps = {
-  id: string;
+  session: DefaultEditorSession | ReadonlyEditorSession | DeletedEditorSession;
 };
 function EditorProperties(props: EditorPropertiesProps) {
-  const { id } = props;
+  const { session } = props;
 
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const session = useEditorStore((store) =>
-    store.getSession(id, ["default", "unlocked", "readonly"])
-  );
 
-  if (isFocusMode || !session) return null;
+  if (isFocusMode) return null;
   return (
     <AnimatedFlex
       animate={{
@@ -165,17 +162,19 @@ function EditorProperties(props: EditorPropertiesProps) {
               />
             }
           >
-            <>
-              {tools.map((tool) => (
-                <Toggle
-                  {...tool}
-                  key={tool.key}
-                  isOn={!!session.note[tool.property]}
-                  onToggle={() => changeToggleState(tool.key, session)}
-                  testId={`properties-${tool.key}`}
-                />
-              ))}
-            </>
+            {session.type === "deleted" ? null : (
+              <>
+                {tools.map((tool) => (
+                  <Toggle
+                    {...tool}
+                    key={tool.key}
+                    isOn={!!session.note[tool.property]}
+                    onToggle={() => changeToggleState(tool.key, session)}
+                    testId={`properties-${tool.key}`}
+                  />
+                ))}
+              </>
+            )}
 
             {metadataItems.map((item) => (
               <Flex
@@ -200,13 +199,15 @@ function EditorProperties(props: EditorPropertiesProps) {
                 </Text>
               </Flex>
             ))}
-            <Colors noteId={id} color={session.color} />
+            {session.type === "deleted" ? null : (
+              <Colors noteId={session.note.id} color={session.color} />
+            )}
           </Section>
-          <InternalLinks noteId={id} />
-          <Notebooks noteId={id} />
-          <Reminders noteId={id} />
-          <Attachments noteId={id} />
-          <SessionHistory noteId={id} />
+          <InternalLinks noteId={session.note.id} />
+          <Notebooks noteId={session.note.id} />
+          <Reminders noteId={session.note.id} />
+          <Attachments noteId={session.note.id} />
+          <SessionHistory noteId={session.note.id} />
         </ScrollContainer>
       </ScopedThemeProvider>
     </AnimatedFlex>

@@ -38,7 +38,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from "react";
 import { ArrowLeft } from "../icons";
-import { useEditorStore } from "../../stores/editor-store";
+import {
+  DefaultEditorSession,
+  DeletedEditorSession,
+  ReadonlyEditorSession,
+  useEditorStore
+} from "../../stores/editor-store";
 import { AnimatedFlex } from "../animated";
 import ScrollContainer from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
@@ -48,24 +53,21 @@ import { Button, Flex } from "@theme-ui/components";
 import { useEditorManager } from "./manager";
 
 type TableOfContentsProps = {
-  id: string;
+  session: DefaultEditorSession | ReadonlyEditorSession | DeletedEditorSession;
 };
 function TableOfContents(props: TableOfContentsProps) {
-  const { id } = props;
+  const { session } = props;
 
   const [active, setActive] = useState<string[]>([]);
   const toggleTableOfContents = useEditorStore(
     (store) => store.toggleTableOfContents
   );
-  const session = useEditorStore((store) =>
-    store.getSession(id, ["default", "unlocked", "readonly"])
-  );
   const tableOfContents = useEditorManager(
-    (store) => store.editors[id].tableOfContents || []
+    (store) => store.editors[session.id]?.tableOfContents || []
   );
 
   useEffect(() => {
-    const editorScroll = document.getElementById(`${id}_editorScroll`);
+    const editorScroll = document.getElementById(`${session.id}_editorScroll`);
     if (!editorScroll) return;
     function onScroll() {
       const scrollTop = editorScroll?.scrollTop || 0;
@@ -85,7 +87,7 @@ function TableOfContents(props: TableOfContentsProps) {
     return () => {
       editorScroll.removeEventListener("scroll", onScroll);
     };
-  }, [id]);
+  }, [session.id, tableOfContents]);
 
   if (!session) return null;
   return (
