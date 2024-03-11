@@ -56,7 +56,8 @@ export class Content implements ICollection {
       db.sql,
       db.transaction,
       "content",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 

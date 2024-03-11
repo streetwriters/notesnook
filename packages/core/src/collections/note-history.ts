@@ -35,7 +35,8 @@ export class NoteHistory implements ICollection {
       db.sql,
       db.transaction,
       "notehistory",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 

@@ -43,7 +43,8 @@ export class Reminders implements ICollection {
       db.sql,
       db.transaction,
       "reminders",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 

@@ -82,7 +82,8 @@ export class Settings implements ICollection {
       db.sql,
       db.transaction,
       "settings",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 

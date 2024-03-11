@@ -161,7 +161,7 @@ test("update note", () =>
       title: "I am a new title",
       content: {
         type: TEST_NOTE.content.type,
-        data: "<p><br/></p>"
+        data: '<p data-block-id="p1"><br/></p>'
       },
       pinned: true,
       favorite: true

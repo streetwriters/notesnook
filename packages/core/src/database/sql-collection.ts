@@ -45,6 +45,7 @@ import {
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { groupArray } from "../utils/grouping";
 import { toChunks } from "../utils/array";
+import { Sanitizer } from "./sanitizer";
 
 const formats = {
   month: "%Y-%m",
@@ -66,7 +67,8 @@ export class SQLCollection<
       executor: (tr: Transaction<DatabaseSchema>) => Promise<void>
     ) => Promise<void>,
     private readonly type: TCollectionType,
-    private readonly eventManager: EventManager
+    private readonly eventManager: EventManager,
+    private readonly sanitizer: Sanitizer
   ) {}
 
   async clear() {
@@ -86,6 +88,8 @@ export class SQLCollection<
     }
     // the item has become local now, so remove the flags
     delete item.remote;
+
+    if (!this.sanitizer.sanitize(this.type, item)) return;
 
     await this.db()
       .replaceInto<keyof DatabaseSchema>(this.type)
@@ -163,6 +167,9 @@ export class SQLCollection<
         item.synced = false;
       }
       delete item.remote;
+
+      if (!this.sanitizer.sanitize(this.type, item)) return array;
+
       array.push(item);
       return array;
     }, [] as SQLiteItem<T>[]);
@@ -185,6 +192,7 @@ export class SQLCollection<
     partial: Partial<SQLiteItem<T>>,
     options: { sendEvent: boolean } = { sendEvent: true }
   ) {
+    if (!this.sanitizer.sanitize(this.type, partial)) return;
     await this.db()
       .updateTable<keyof DatabaseSchema>(this.type)
       .where("id", "in", ids)

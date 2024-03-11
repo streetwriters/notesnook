@@ -34,13 +34,14 @@ export class Relations implements ICollection {
       db.sql,
       db.transaction,
       "relations",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 
   async init() {
     // await this.buildCache();
-    // return this.collection.init();
+    await this.collection.init();
   }
 
   async add(from: ItemReference, to: ItemReference) {

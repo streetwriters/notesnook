@@ -37,7 +37,8 @@ export class Notebooks implements ICollection {
       db.sql,
       db.transaction,
       "notebooks",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 

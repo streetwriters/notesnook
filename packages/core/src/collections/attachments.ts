@@ -40,7 +40,8 @@ export class Attachments implements ICollection {
       db.sql,
       db.transaction,
       "attachments",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
     this.key = null;
 

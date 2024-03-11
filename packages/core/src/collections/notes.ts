@@ -51,7 +51,8 @@ export class Notes implements ICollection {
       db.sql,
       db.transaction,
       "notes",
-      db.eventManager
+      db.eventManager,
+      db.sanitizer
     );
   }
 

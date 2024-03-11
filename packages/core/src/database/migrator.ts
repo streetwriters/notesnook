@@ -71,7 +71,8 @@ class Migrator {
         db.sql,
         db.transaction,
         collection.table,
-        db.eventManager
+        db.eventManager,
+        db.sanitizer
       );
       if (version <= 5.9) {
         if (collection.name === "settings") {
