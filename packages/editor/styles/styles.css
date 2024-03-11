@@ -286,10 +286,11 @@ img.ProseMirror-separator {
 
 .search-result.selected {
   background-color: var(--accent-secondary) !important;
+  color: var(--accentForeground-secondary);
 }
 
 .search-result {
-  background-color: var(--background-secondary);
+  background-color: var(--shade-secondary);
 }
 
 /* .line-number-widget,
