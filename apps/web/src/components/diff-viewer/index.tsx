@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
 import { Loading, ImageDownload, Copy, Restore } from "../icons";
 import ContentToggle from "./content-toggle";
@@ -44,6 +44,13 @@ function DiffViewer(props: DiffViewerProps) {
   const [conflictedContent, setConflictedContent] = useState(
     content.conflicted
   );
+
+  useLayoutEffect(() => {
+    setConflictedContent((c) => {
+      if (c?.dateEdited === session.content.conflicted?.dateEdited) return c;
+      return session.content.conflicted;
+    });
+  }, [session]);
 
   if (!conflictedContent) return null;
 
@@ -242,7 +249,8 @@ function DiffViewer(props: DiffViewerProps) {
                     <Editor
                       id={content.id}
                       content={() => content.data}
-                      nonce={0}
+                      session={session}
+                      nonce={content.dateEdited}
                       options={{ readonly: true, headless: true }}
                     />
                   </Flex>
@@ -316,8 +324,9 @@ function DiffViewer(props: DiffViewerProps) {
                   <Flex sx={{ px: 2, overflow: "auto" }}>
                     <Editor
                       id={`${conflictedContent.id}-conflicted`}
+                      session={session}
                       content={() => conflictedContent.data}
-                      nonce={0}
+                      nonce={conflictedContent.dateEdited}
                       options={{ readonly: true, headless: true }}
                     />
                   </Flex>
