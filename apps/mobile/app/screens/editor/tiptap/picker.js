@@ -23,7 +23,7 @@ import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import DocumentPicker from "react-native-document-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-import { db } from "../../../common/database";
+import { DatabaseLogger, db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
 import { compressToFile } from "../../../common/filesystem/compress";
 import AttachImage from "../../../components/dialogs/attach-image-dialog";
@@ -290,13 +290,15 @@ const handleImageResponse = async (response, options) => {
     });
 
     let fileName = image.originalFileName || image.fileName;
+    console.log("attaching file...");
     if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
 
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
-
+    console.log("attaching image to note...");
     if (
       useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
     ) {
+      console.log("attaching image to note...");
       editorController.current?.commands.insertImage(
         {
           hash: hash,
@@ -330,9 +332,8 @@ const handleImageResponse = async (response, options) => {
  */
 export async function attachFile(uri, hash, type, filename, options) {
   try {
-    let exists = db.attachments.exists(hash);
+    let exists = await db.attachments.exists(hash);
     let encryptionInfo;
-
     if (options?.hash && options.hash !== hash) {
       ToastManager.show({
         heading: "Please select the same file for reuploading",
@@ -364,10 +365,9 @@ export async function attachFile(uri, hash, type, filename, options) {
       encryptionInfo = { hash: hash };
     }
     await db.attachments.add(encryptionInfo, options.noteId);
-
     return true;
   } catch (e) {
-    console.log("attach file error: ", e);
+    DatabaseLogger.error(e);
     if (Platform.OS === "ios") {
       await RNFetchBlob.fs.unlink(uri);
     }
