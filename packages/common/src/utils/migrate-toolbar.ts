@@ -47,5 +47,6 @@ function runMigration(
     default:
       break;
   }
+  tools.version = CURRENT_TOOLBAR_VERSION;
   return tools;
 }
