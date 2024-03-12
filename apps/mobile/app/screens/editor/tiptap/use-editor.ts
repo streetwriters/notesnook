@@ -389,6 +389,7 @@ export const useEditor = (
         blockIdRef.current = event.blockId;
       }
       state.current.currentlyEditing = true;
+
       if (
         !state.current.ready &&
         (await isEditorLoaded(
@@ -411,6 +412,13 @@ export const useEditor = (
       } else {
         if (!event.item) return;
         const item = event.item;
+
+        const currentTab = useTabStore
+          .getState()
+          .getTab(useTabStore.getState().currentTab);
+        if (currentTab?.previewTab && item.id !== currentTab.noteId) {
+          await commands.setLoading(true, useTabStore.getState().currentTab);
+        }
 
         const noteIsLocked =
           (await db.vaults.itemExists(event.item as ItemReference)) &&
@@ -455,6 +463,7 @@ export const useEditor = (
           //   console.log("tab id did not match after focus in 1000ms");
           //   return;
           // }
+          currentLoadingNoteId.current = item.id;
           console.log("Waiting for tab to focus");
           return;
         }
@@ -775,6 +784,7 @@ export const useEditor = (
     onContentChanged,
     editorId: editorId,
     overlay,
-    postMessage
+    postMessage,
+    currentLoadingNoteId
   };
 };

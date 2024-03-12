@@ -549,7 +549,7 @@ export const useEditorEvents = (
           const hash = (editorMessage.value as Attachment)?.hash;
           const attachment = await db.attachments?.attachment(hash);
           if (!attachment) return;
-          if (attachment.type.startsWith("image/")) {
+          if (attachment.mimeType.startsWith("image/")) {
             eSendEvent("ImagePreview", editorMessage.value);
           } else {
             eSendEvent("PDFPreview", attachment);
@@ -585,7 +585,11 @@ export const useEditorEvents = (
           );
 
           eSendEvent(eEditorTabFocused, editorMessage.tabId);
-          if (!editorMessage.value && editorMessage.noteId) {
+
+          if (
+            (!editorMessage.value || editor.currentLoadingNoteId.current) &&
+            editorMessage.noteId
+          ) {
             if (!useSettingStore.getState().isAppLoading) {
               const note = await db.notes.note(editorMessage.noteId);
               if (note) {

@@ -244,7 +244,7 @@ export function useEditorController({
         }
         case "native:html":
           htmlContentRef.current = value;
-          logger("info", "loading html");
+          logger("info", "LOADING NOTE HTML");
           if (!editor) break;
           update();
           countWords(0);
