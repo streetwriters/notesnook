@@ -181,7 +181,8 @@ const Tiptap = ({
   const _editor = useTiptap(tiptapOptions, [tiptapOptions]);
 
   const update = useCallback(() => {
-    logger("info", "update content");
+    logger("info", "LOADING NOTE...");
+    _editor.commands.setTextSelection(0);
     setTick((tick) => tick + 1);
     setTimeout(() => {
       const noteState = tabRef.current.noteId
@@ -208,7 +209,7 @@ const Tiptap = ({
     );
     setTimeout(() => {
       editorControllers[tabRef.current.id]?.setLoading(false);
-    });
+    }, 300);
   }, []);
 
   const controller = useEditorController({
@@ -263,10 +264,10 @@ const Tiptap = ({
         ) {
           editorControllers[tabRef.current.id]?.setLoading(true);
         }
-
         post(
           EventTypes.tabFocused,
-          !!globalThis.editorControllers[tabRef.current.id]?.content.current,
+          !!globalThis.editorControllers[tabRef.current.id]?.content.current &&
+            !editorControllers[tabRef.current.id]?.loading,
           tabRef.current.id,
           state.getCurrentNoteId()
         );
@@ -377,7 +378,7 @@ const Tiptap = ({
           onScroll={controller.scroll}
           ref={containerRef}
           style={{
-            overflowY: "scroll",
+            overflowY: controller.loading ? "hidden" : "scroll",
             height: "100%",
             display: "block",
             position: "relative"
@@ -386,16 +387,21 @@ const Tiptap = ({
           {settings.noHeader || tab.locked ? null : (
             <>
               <Tags settings={settings} />
-              <Title
-                titlePlaceholder={controller.titlePlaceholder}
-                readonly={settings.readonly}
-                controller={controllerRef}
-                title={controller.title}
-                fontFamily={settings.fontFamily}
-                dateFormat={settings.dateFormat}
-                timeFormat={settings.timeFormat}
-              />
-              <StatusBar container={containerRef} />
+
+              {controller.loading ? null : (
+                <>
+                  <Title
+                    titlePlaceholder={controller.titlePlaceholder}
+                    readonly={settings.readonly}
+                    controller={controllerRef}
+                    title={controller.title}
+                    fontFamily={settings.fontFamily}
+                    dateFormat={settings.dateFormat}
+                    timeFormat={settings.timeFormat}
+                  />
+                  <StatusBar container={containerRef} />
+                </>
+              )}
             </>
           )}
 
@@ -585,6 +591,54 @@ const Tiptap = ({
                 </>
               ) : (
                 <>
+                  <div
+                    style={{
+                      height: 25,
+                      width: "94%",
+                      backgroundColor: colors.secondary.background,
+                      borderRadius: 5,
+                      marginTop: 10
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      flexDirection: "row",
+                      display: "flex",
+                      gap: 10
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: 12,
+                        width: 40,
+                        backgroundColor: colors.secondary.background,
+                        borderRadius: 5,
+                        marginTop: 10
+                      }}
+                    />
+
+                    <div
+                      style={{
+                        height: 12,
+                        width: 50,
+                        backgroundColor: colors.secondary.background,
+                        borderRadius: 5,
+                        marginTop: 10
+                      }}
+                    />
+
+                    <div
+                      style={{
+                        height: 12,
+                        width: 100,
+                        backgroundColor: colors.secondary.background,
+                        borderRadius: 5,
+                        marginTop: 10
+                      }}
+                    />
+                  </div>
+
                   <div
                     style={{
                       height: 16,

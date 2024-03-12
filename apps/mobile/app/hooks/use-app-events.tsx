@@ -541,6 +541,8 @@ export const useAppEvents = () => {
             console.error(e);
           }
         }
+        //@ts-ignore
+        globalThis["IS_SHARE_EXTENSION"] = false;
       } else {
         SettingsService.appEnteredBackground();
         const id = useTabStore.getState().getCurrentNoteId();
