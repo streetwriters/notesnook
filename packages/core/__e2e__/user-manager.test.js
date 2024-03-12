@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { authenticator } from "otplib";
 import { databaseTest } from "../__tests__/utils";
-import { login, user } from "./utils";
+import { login, USER } from "./utils";
 import { test, expect } from "vitest";
 
 // test("signup user and check for token", async () => {
@@ -50,7 +51,55 @@ test(
       await login(db);
 
       const userData = await db.user.getUser();
-      expect(userData.email).toBe(user.email);
+      expect(userData.email).toBe(USER.email);
+    }),
+  30000
+);
+
+test(
+  "login user after entering invalid mfa once",
+  () =>
+    databaseTest().then(async (db) => {
+      await db.user.authenticateEmail(USER.email);
+
+      await expect(
+        db.user.authenticateMultiFactorCode(201022, "app")
+      ).rejects.toThrowError(
+        /Please provide a valid multi-factor authentication/
+      );
+
+      const token = authenticator.generate(USER.totpSecret);
+      await db.user.authenticateMultiFactorCode(token, "app");
+
+      await expect(
+        db.user.authenticatePassword(USER.email, USER.password, USER.hashed)
+      ).resolves.toBeFalsy();
+
+      await expect(db.user.tokenManager.getToken()).resolves.toBeDefined();
+    }),
+  30000
+);
+
+test(
+  "login user after entering incorrect password once",
+  () =>
+    databaseTest().then(async (db) => {
+      await db.user.authenticateEmail(USER.email);
+
+      const token = authenticator.generate(USER.totpSecret);
+      await db.user.authenticateMultiFactorCode(token, "app");
+
+      await expect(
+        db.user.authenticatePassword(USER.email, "wrong_password")
+      ).rejects.toThrowError(/Password is incorrect./);
+
+      await db.user.authenticatePassword(
+        USER.email,
+        USER.password,
+        USER.hashed
+      );
+
+      await expect(db.user.tokenManager.getToken()).resolves.toBeDefined();
     }),
   30000
 );

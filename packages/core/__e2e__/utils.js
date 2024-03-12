@@ -19,14 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { authenticator } from "otplib";
 
-export const user = {
+export const USER = {
   email: process.env.USER_EMAIL,
   password: process.env.USER_PASSWORD,
   hashed: process.env.USER_HASHED_PASSWORD,
   totpSecret: process.env.USER_TOTP_SECRET
 };
 
-export async function login(db) {
+export async function login(db, user = USER) {
   await db.user.authenticateEmail(user.email);
 
   const token = authenticator.generate(user.totpSecret);
