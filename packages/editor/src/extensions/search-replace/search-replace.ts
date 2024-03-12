@@ -235,7 +235,6 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
       endSearch:
         () =>
         ({ state, dispatch, editor }) => {
-          editor.commands.focus();
           state.tr.setMeta("isSearching", false);
           if (dispatch) updateView(state, dispatch);
           return this.options.onEndSearch();
