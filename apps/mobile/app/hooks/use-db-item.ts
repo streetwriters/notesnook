@@ -69,7 +69,6 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
   useEffect(() => {
     const onUpdateItem = (itemId?: string) => {
       if (typeof itemId === "string" && itemId !== itemIdRef.current) return;
-
       if (!isValidIdOrIndex(idOrIndex)) return;
 
       console.log("useDBItem.onUpdateItem", idOrIndex, type);
@@ -95,7 +94,12 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
         }
       }
     };
-    if (useSettingStore.getState().isAppLoading) {
+
+    if (
+      useSettingStore.getState().isAppLoading &&
+      //@ts-ignore
+      !globalThis["IS_SHARE_EXTENSION"]
+    ) {
       useSettingStore.subscribe((state) => {
         if (!state.isAppLoading) {
           onUpdateItem();
@@ -125,14 +129,34 @@ export const useNoteLocked = (noteId: string | undefined) => {
 
   useEffect(() => {
     if (!noteId) return;
-    db.vaults
-      .itemExists({
-        type: "note",
-        id: noteId
-      })
-      .then((exists) => {
-        setLocked(exists);
+
+    if (
+      useSettingStore.getState().isAppLoading &&
+      //@ts-ignore
+      !globalThis["IS_SHARE_EXTENSION"]
+    ) {
+      useSettingStore.subscribe((state) => {
+        if (!state.isAppLoading) {
+          db.vaults
+            .itemExists({
+              type: "note",
+              id: noteId
+            })
+            .then((exists) => {
+              setLocked(exists);
+            });
+        }
       });
+    } else {
+      db.vaults
+        .itemExists({
+          type: "note",
+          id: noteId
+        })
+        .then((exists) => {
+          setLocked(exists);
+        });
+    }
 
     const sub = eSubscribeEvent(eDBItemUpdate, (id: string) => {
       if (id === noteId) {
