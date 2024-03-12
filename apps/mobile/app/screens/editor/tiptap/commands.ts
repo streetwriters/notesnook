@@ -163,6 +163,15 @@ if (typeof statusBar !== "undefined") {
     // `);
   };
 
+  setLoading = async (loading?: boolean, tabId?: number) => {
+    await this.doAsync(`
+    const editorController = editorControllers[${
+      tabId || useTabStore.getState().currentTab
+    }];
+    editorController.setLoading(${loading})
+    `);
+  };
+
   setInsets = async (insets: EdgeInsets) => {
     await this.doAsync(`
       if (typeof safeAreaController !== "undefined") {
@@ -252,7 +261,7 @@ editor && editor.commands.insertAttachment(${JSON.stringify(attachment)})`
   ) => {
     await this.doAsync(
       `const editor = editors[${tabId}];
-editor && editor.commands.setAttachmentProgress(${JSON.stringify(
+editor && editor.commands.updateAttachment(${JSON.stringify(
         attachmentProgress
       )}, {
         preventUpdate: true,
@@ -273,44 +282,12 @@ editor && editor.commands.setAttachmentProgress(${JSON.stringify(
       `const editor = editors[${tabId}];
 
 const image = toBlobURL("${image.dataurl}", "${image.hash}");
-      editor && editor.commands.insertImage({
+
+editor && editor.commands.insertImage({
         ...${JSON.stringify({
           ...image,
           dataurl: undefined
         })},
-        bloburl: image
-      })`
-    );
-  };
-
-  updateWebclip = async (
-    { src, hash }: Partial<ImageAttributes>,
-    tabId: number
-  ) => {
-    await this.doAsync(
-      `const editor = editors[${tabId}];
-      editor && editor.commands.updateWebClip(${JSON.stringify({
-        hash
-      })},${JSON.stringify({ src })})`
-    );
-  };
-
-  updateImage = async (
-    {
-      hash,
-      dataurl
-    }: Partial<Omit<ImageAttributes, "bloburl">> & {
-      dataurl: string;
-    },
-    tabId: number
-  ) => {
-    await this.doAsync(
-      `const editor = editors[${tabId}];
-      const image = toBlobURL("${dataurl}", "${hash}");
-      editor && editor.commands.updateImage(${JSON.stringify({
-        hash
-      })}, {
-        ...${JSON.stringify({ hash, preventUpdate: true })},
         bloburl: image
       })`
     );
