@@ -39,7 +39,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import create from "zustand";
 import { db } from "../app/common/database";
 import Paragraph from "../app/components/ui/typography/paragraph";
-import { useDBItem } from "../app/hooks/use-db-item";
+import { useDBItem, useNoteLocked } from "../app/hooks/use-db-item";
 import { useNotebook } from "../app/hooks/use-notebook";
 import { getElevationStyle } from "../app/utils/elevation";
 import { initDatabase, useShareStore } from "./store";
@@ -272,6 +272,7 @@ const ListItem = ({
     mode === "appendNote" ? "note" : "tag",
     items as VirtualizedGrouping<Note | Tag>
   );
+  const locked = useNoteLocked(mode === "appendNote" ? item?.id : undefined);
   const { colors } = useThemeColors();
   const isSelected = useShareStore((state) =>
     mode === "appendNote" || !item
@@ -282,14 +283,15 @@ const ListItem = ({
   const set = SearchSetters[mode];
 
   const onSelectItem = async () => {
-    if ((item as Note)?.locked || !item) {
+    if (!item) {
       return;
     }
 
+    if (mode === "appendNote") close?.();
     set(item.id);
   };
 
-  return !item ? null : (
+  return locked ? null : (
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={() => onSelectItem()}
@@ -298,47 +300,50 @@ const ListItem = ({
         borderBottomWidth: 1,
         borderBottomColor: colors.primary.border,
         justifyContent: "center",
-        paddingVertical: 12
+        paddingVertical: 12,
+        minHeight: 45
       }}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          paddingHorizontal: 12
-        }}
-      >
-        {item.type !== "note" ? (
-          <Icon
-            name={
-              !isSelected
-                ? "checkbox-blank-circle-outline"
-                : "check-circle-outline"
-            }
-            style={{
-              marginRight: 10
-            }}
-            size={20}
-            color={isSelected ? colors.primary.accent : colors.secondary.icon}
-          />
-        ) : null}
-
+      {!item ? null : (
         <View
           style={{
-            flexDirection: "column"
+            flexDirection: "row",
+            paddingHorizontal: 12
           }}
         >
-          <Paragraph
-            numberOfLines={1}
+          {item.type !== "note" ? (
+            <Icon
+              name={
+                !isSelected
+                  ? "checkbox-blank-circle-outline"
+                  : "check-circle-outline"
+              }
+              style={{
+                marginRight: 10
+              }}
+              size={20}
+              color={isSelected ? colors.primary.accent : colors.secondary.icon}
+            />
+          ) : null}
+
+          <View
             style={{
-              color: colors.primary.paragraph,
-              fontSize: 15
+              flexDirection: "column"
             }}
           >
-            {item.type === "tag" ? "#" : ""}
-            {item.title}
-          </Paragraph>
+            <Paragraph
+              numberOfLines={1}
+              style={{
+                color: colors.primary.paragraph,
+                fontSize: 15
+              }}
+            >
+              {item.type === "tag" ? "#" : ""}
+              {item.title}
+            </Paragraph>
+          </View>
         </View>
-      </View>
+      )}
     </TouchableOpacity>
   );
 };
