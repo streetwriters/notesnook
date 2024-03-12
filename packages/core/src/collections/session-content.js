@@ -44,14 +44,15 @@ export default class SessionContent extends Collection {
       contentType: content.type,
       compressed: !locked,
       localOnly: true,
-      locked
+      locked,
+      title: content.title
     });
   }
 
   /**
    *
    * @param {string} sessionId
-   * @returns {Promise<{content:string;data:string}>}
+   * @returns {Promise<{content:string;data:string;title:string}>}
    */
   async get(sessionContentId) {
     if (!sessionContentId) return;
@@ -69,7 +70,8 @@ export default class SessionContent extends Collection {
       data: session.compressed
         ? await this._db.compressor.decompress(session.data)
         : session.data,
-      type: session.contentType
+      type: session.contentType,
+      title: session.title
     };
   }
 

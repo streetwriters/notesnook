@@ -70,7 +70,8 @@ export default class Content extends Collection {
     if (content.sessionId) {
       await this._db.noteHistory.add(contentItem.noteId, content.sessionId, {
         data: contentItem.data,
-        type: contentItem.type
+        type: contentItem.type,
+        title: content.title
       });
     }
     return id;

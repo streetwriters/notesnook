@@ -37,6 +37,7 @@ function TitleBox(props: TitleBoxProps) {
   const { readonly } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const id = useStore((store) => store.session.id);
+  const previewTitle = useStore((store) => store.previewTitle);
   const isMobile = useMobile();
   const isTablet = useTablet();
   const { editorConfig } = useEditorConfig();
@@ -63,9 +64,9 @@ function TitleBox(props: TitleBoxProps) {
   useEffect(() => {
     if (!inputRef.current) return;
     const { title } = useStore.getState().session;
-    inputRef.current.value = title;
+    inputRef.current.value = previewTitle || title;
     updateFontSize(title.length);
-  }, [id, updateFontSize]);
+  }, [id, updateFontSize, previewTitle]);
 
   useEffect(() => {
     if (!inputRef.current) return;
