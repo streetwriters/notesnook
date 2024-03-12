@@ -16,7 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import "@azure/core-asynciterator-polyfill";
 import "react-native-gesture-handler";
 import {
   THEME_COMPATIBILITY_VERSION,
@@ -24,7 +23,6 @@ import {
 } from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { I18nManager, View } from "react-native";
-import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AppLockedOverlay from "./components/app-lock-overlay";

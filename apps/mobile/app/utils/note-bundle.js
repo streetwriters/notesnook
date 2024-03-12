@@ -33,7 +33,7 @@ const santizeUri = (uri) => {
 
 export async function attachFile(uri, hash, type, filename, options) {
   try {
-    let exists = db.attachments.exists(hash);
+    let exists = await db.attachments.exists(hash);
     let encryptionInfo;
     if (options?.hash && options.hash !== hash) return false;
 
@@ -50,6 +50,7 @@ export async function attachFile(uri, hash, type, filename, options) {
       encryptionInfo.alg = "xcha-stream";
       encryptionInfo.size = encryptionInfo.length;
       encryptionInfo.key = key;
+      console.log(encryptionInfo);
       if (options?.reupload && exists) await db.attachments.reset(hash);
     } else {
       encryptionInfo = { hash: hash };
@@ -126,9 +127,8 @@ async function createNotes(bundle) {
       } else {
         content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" /></p>`;
       }
-      const rawContent = await db.content.raw(
-        db.notes.note(id).data?.contentId
-      );
+      const note = await db.notes.note(id);
+      const rawContent = await db.content.get(note?.contentId);
       await db.notes.add({
         id: id,
         content: {
