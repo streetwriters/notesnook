@@ -116,7 +116,7 @@ const modes = {
 
 const ShareView = () => {
   const { colors } = useThemeColors();
-  const appendNote = useShareStore((state) => state.appendNote);
+  const appendNoteId = useShareStore((state) => state.appendNote);
   const [note, setNote] = useState({ ...defaultNote });
   const noteContent = useRef("");
   const [loading, setLoading] = useState(false);
@@ -269,45 +269,49 @@ const ShareView = () => {
       setLoading(false);
       return;
     }
-    if (appendNote && !db.notes.note(appendNote.id)) {
-      useShareStore.getState().setAppendNote(null);
-      Alert.alert("The note you are trying to append to has been deleted.");
-      return;
-    }
 
-    let _note;
-    if (appendNote && db.notes.note(appendNote.id)) {
-      let raw = await db.content.raw(appendNote.contentId);
-      _note = {
+    let noteData;
+    if (appendNoteId) {
+      if (!(await db.notes.exists(appendNoteId))) {
+        useShareStore.getState().setAppendNote(null);
+        Alert.alert("The note you are trying to append to has been deleted.");
+        setLoading(false);
+        return;
+      }
+
+      const note = await db.notes.note(appendNoteId);
+      let rawContent = await db.content.get(note.contentId);
+
+      noteData = {
         content: {
-          data: (raw?.data || "") + noteContent.current,
+          data: (rawContent?.data || "") + noteContent.current,
           type: "tiptap"
         },
-        id: appendNote.id,
+        id: note.id,
         sessionId: Date.now()
       };
     } else {
-      _note = { ...note };
-      _note.content.data = noteContent.current;
-      _note.sessionId = Date.now();
+      noteData = { ...note };
+      noteData.content.data = noteContent.current;
+      noteData.sessionId = Date.now();
     }
 
-    await NoteBundle.createNotes({
-      files: rawFiles,
-      note: _note,
-      notebooks: useShareStore.getState().selectedNotebooks,
-      tags: useShareStore.getState().selectedTags,
-      compress
-    });
-
     try {
+      await NoteBundle.createNotes({
+        files: rawFiles,
+        note: noteData,
+        notebooks: useShareStore.getState().selectedNotebooks,
+        tags: useShareStore.getState().selectedTags,
+        compress
+      });
+
       if (!globalThis["IS_MAIN_APP_RUNNING"]) {
         await db.sync({ type: "send", force: false });
       } else {
         console.log("main app running, skipping sync");
       }
     } catch (e) {
-      console.log(e, e.stack);
+      DatabaseLogger.error(e, "Error adding notes from share extension");
     }
 
     await Storage.write("notesAddedFromIntent", "added");
@@ -627,7 +631,7 @@ const ShareView = () => {
                 </SafeAreaProvider>
               </View>
 
-              {appendNote ? <AppendNote id={appendNote} /> : null}
+              {appendNoteId ? <AppendNote id={appendNoteId} /> : null}
 
               <View
                 style={{
@@ -687,7 +691,7 @@ const ShareView = () => {
               onPress={() => {
                 useShareStore.getState().setAppendNote(null);
               }}
-              type={!appendNote ? "transparent" : "plain"}
+              type={!appendNoteId ? "transparent" : "plain"}
               title="New note"
               style={{
                 paddingHorizontal: 12,
@@ -705,7 +709,7 @@ const ShareView = () => {
               onPress={() => {
                 setSearchMode("appendNote");
               }}
-              type={appendNote ? "transparent" : "plain"}
+              type={appendNoteId ? "transparent" : "plain"}
               title={`Append to a note`}
               style={{
                 paddingHorizontal: 12,
@@ -718,7 +722,7 @@ const ShareView = () => {
               }}
             />
 
-            {!appendNote ? (
+            {!appendNoteId ? (
               <AddTags
                 onPress={() => {
                   setSearchMode("selectTags");
@@ -726,7 +730,7 @@ const ShareView = () => {
               />
             ) : null}
 
-            {!appendNote ? (
+            {!appendNoteId ? (
               <AddNotebooks
                 onPress={() => {
                   setSearchMode("selectNotebooks");
