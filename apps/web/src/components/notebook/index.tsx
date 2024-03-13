@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useCallback, useRef } from "react";
+import React, { useRef } from "react";
 import { Flex, Text } from "@theme-ui/components";
 import ListItem from "../list-item";
 import { useStore, store } from "../../stores/notebook-store";
@@ -41,12 +41,12 @@ import { pluralize } from "@notesnook/common";
 import { confirm } from "../../common/dialog-controller";
 import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
-import { Notebook } from "@notesnook/core";
+import { Notebook as NotebookType } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { useDragHandler } from "../../hooks/use-drag-handler";
 
 type NotebookProps = {
-  item: Notebook;
+  item: NotebookType;
   totalNotes: number;
   date: number;
   simplified?: boolean;
@@ -148,7 +148,7 @@ export default React.memo(Notebook, (prev, next) => {
 });
 
 export const notebookMenuItems: (
-  notebook: Notebook,
+  notebook: NotebookType,
   ids?: string[]
 ) => MenuItem[] = (notebook, ids = []) => {
   const defaultNotebook = db.settings.getDefaultNotebook();
@@ -231,7 +231,7 @@ export const notebookMenuItems: (
   ];
 };
 
-async function openNotebook(notebook: Notebook, totalNotes?: number) {
+async function openNotebook(notebook: NotebookType, totalNotes?: number) {
   await useNotesStore.getState().setContext({
     type: "notebook",
     id: notebook.id,

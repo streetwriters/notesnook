@@ -37,8 +37,7 @@ import {
   Privacy,
   Pro,
   ShieldLock,
-  Sync,
-  Proxy
+  Sync
 } from "../../components/icons";
 import { Perform } from "../../common/dialog-controller";
 import NavigationItem from "../../components/navigation-menu/navigation-item";

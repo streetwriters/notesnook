@@ -120,10 +120,10 @@ function scheduleReminder(id: string, reminder: Reminder, cron: string) {
     } else {
       const notification = new Notification(reminder.title, {
         body: reminder.description,
-        vibrate: reminder.priority === "vibrate" ? 200 : undefined,
+        // vibrate: reminder.priority === "vibrate" ? 200 : undefined,
         silent: reminder.priority === "silent",
         tag: id,
-        renotify: true,
+        // renotify: true,
         requireInteraction: true
       });
 

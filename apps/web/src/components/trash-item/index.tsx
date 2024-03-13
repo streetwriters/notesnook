@@ -26,11 +26,10 @@ import TimeAgo from "../time-ago";
 import { pluralize, toTitleCase } from "@notesnook/common";
 import { showToast } from "../../utils/toast";
 import { MenuItem } from "@notesnook/ui";
-import { TrashItem } from "@notesnook/core/dist/types";
-import { db } from "../../common/db";
+import { TrashItem as TrashItemType } from "@notesnook/core/dist/types";
 import { useEditorStore } from "../../stores/editor-store";
 
-type TrashItemProps = { item: TrashItem; date: number };
+type TrashItemProps = { item: TrashItemType; date: number };
 function TrashItem(props: TrashItemProps) {
   const { item, date } = props;
   const isOpened = useEditorStore((store) => store.activeSessionId === item.id);
@@ -65,7 +64,7 @@ function TrashItem(props: TrashItemProps) {
 }
 export default TrashItem;
 
-const menuItems: (item: TrashItem, ids?: string[]) => MenuItem[] = (
+const menuItems: (item: TrashItemType, ids?: string[]) => MenuItem[] = (
   item,
   ids = []
 ) => {
