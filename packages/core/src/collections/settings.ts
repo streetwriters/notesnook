@@ -40,7 +40,7 @@ const DEFAULT_GROUP_OPTIONS = (key: GroupingKey) =>
     sortBy:
       key === "trash"
         ? "dateDeleted"
-        : key === "tags" || key === "reminders"
+        : key === "tags"
         ? "dateCreated"
         : key === "reminders"
         ? "dueDate"

@@ -34,6 +34,7 @@ import {
   isFalse
 } from ".";
 import {
+  AliasedRawBuilder,
   AnyColumn,
   AnyColumnWithTable,
   ExpressionOrFactory,
@@ -46,6 +47,10 @@ import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { groupArray } from "../utils/grouping";
 import { toChunks } from "../utils/array";
 import { Sanitizer } from "./sanitizer";
+import {
+  createIsReminderActiveQuery,
+  createUpcomingReminderTimeQuery
+} from "../collections/reminders";
 
 const formats = {
   month: "%Y-%m",
@@ -205,19 +210,6 @@ export class SQLCollection<
     if (options.sendEvent) {
       this.eventManager.publish(EVENTS.databaseUpdated, ids);
     }
-  }
-
-  async ids(sortOptions: GroupOptions): Promise<string[]> {
-    const ids = await this.db()
-      .selectFrom<keyof DatabaseSchema>(this.type)
-      .select("id")
-      .where(isFalse("deleted"))
-      .$if(this.type === "notes" || this.type === "notebooks", (eb) =>
-        eb.where(isFalse("dateDeleted"))
-      )
-      .orderBy(sortOptions.sortBy, sortOptions.sortDirection)
-      .execute();
-    return ids.map((id) => id.id);
   }
 
   async records(
@@ -432,26 +424,26 @@ export class FilteredSelector<T extends Item> {
     const fields: Array<
       | AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>
       | AnyColumn<DatabaseSchema, keyof DatabaseSchema>
-    > = ["id", "type", options.sortBy];
+      | AliasedRawBuilder<number, "dueDate">
+    > = ["id", "type"];
     if (this.type === "notes") fields.push("notes.pinned", "notes.conflicted");
     else if (this.type === "notebooks") fields.push("notebooks.pinned");
     else if (this.type === "attachments" && options.groupBy === "abc")
       fields.push("attachments.filename");
-    else if (this.type === "reminders") {
+    else if (this.type === "reminders" || options.sortBy === "dueDate") {
       fields.push(
         "reminders.mode",
-        "reminders.date",
-        "reminders.recurringMode",
-        "reminders.selectedDays",
+        "reminders.snoozeUntil",
         "reminders.disabled",
-        "reminders.snoozeUntil"
+        "reminders.date",
+        createUpcomingReminderTimeQuery().as("dueDate")
       );
-    }
+    } else fields.push(options.sortBy);
     return Array.from(
       groupArray(
         await this.filter
-          .$call(this.buildSortExpression(options))
           .select(fields)
+          .$call(this.buildSortExpression(options, true))
           .execute(),
         options
       ).values()
@@ -508,7 +500,7 @@ export class FilteredSelector<T extends Item> {
 
   private buildSortExpression(
     options: GroupOptions | SortOptions,
-    persistent?: boolean
+    hasDueDate?: boolean
   ) {
     const sortBy: Set<SortOptions["sortBy"]> = new Set();
     if (isGroupOptions(options)) {
@@ -524,6 +516,11 @@ export class FilteredSelector<T extends Item> {
         qb = qb.orderBy(sql`IFNULL(conflicted, 0) desc`);
       if (this.type === "notes" || this.type === "notebooks")
         qb = qb.orderBy(sql`IFNULL(pinned, 0) desc`);
+      if (this.type === "reminders")
+        qb = qb.orderBy(
+          (qb) => qb.parens(createIsReminderActiveQuery()),
+          "desc"
+        );
 
       for (const item of sortBy) {
         if (item === "title") {
@@ -538,35 +535,29 @@ export class FilteredSelector<T extends Item> {
             ? formats[options.groupBy]
             : null;
           if (!timeFormat || isSortByDate(options)) {
-            qb = qb.orderBy(item, options.sortDirection);
+            if (item === "dueDate") {
+              if (hasDueDate)
+                qb = qb.orderBy(item as any, options.sortDirection);
+              else
+                qb = qb.orderBy(
+                  (qb) => qb.parens(createUpcomingReminderTimeQuery()),
+                  options.sortDirection
+                );
+            } else qb = qb.orderBy(item, options.sortDirection);
             continue;
           }
 
           qb = qb.orderBy(
             sql`strftime('${sql.raw(timeFormat)}', ${sql.raw(
               item
-            )} / 1000, 'unixepoch')`,
+            )} / 1000, 'unixepoch', 'localtime')`,
             options.sortDirection
           );
         }
       }
 
-      if (persistent) qb = qb.orderBy("id asc");
       return qb;
     };
-  }
-
-  private sortFields(options: SortOptions, persistent?: boolean) {
-    const fields: Array<
-      | AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>
-      | AnyColumn<DatabaseSchema, keyof DatabaseSchema>
-    > = [];
-    if (this.type === "notes") fields.push("conflicted");
-    if (this.type === "notes" || this.type === "notebooks")
-      fields.push("pinned");
-    fields.push(options.sortBy);
-    if (persistent) fields.push("id");
-    return fields;
   }
 }
 
@@ -582,6 +573,7 @@ function isSortByDate(options: SortOptions | GroupOptions) {
     options.sortBy === "dateEdited" ||
     options.sortBy === "dateDeleted" ||
     options.sortBy === "dateModified" ||
-    options.sortBy === "dateUploaded"
+    options.sortBy === "dateUploaded" ||
+    options.sortBy === "dueDate"
   );
 }

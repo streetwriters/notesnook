@@ -29,6 +29,7 @@ import { Reminder } from "../types";
 import Database from "../api";
 import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
+import { sql } from "kysely";
 
 dayjs.extend(isTomorrow);
 dayjs.extend(isSameOrBefore);
@@ -66,7 +67,7 @@ export class Reminders implements ICollection {
     };
 
     if (!reminder.date || !reminder.title)
-      throw new Error("date and title are required in a reminder.");
+      throw new Error(`date and title are required in a reminder.`);
 
     await this.collection.upsert({
       id,
@@ -247,15 +248,57 @@ export function getUpcomingReminder(reminders: Reminder[]) {
 }
 
 export function isReminderActive(reminder: Reminder) {
-  const time =
-    reminder.mode === "once"
-      ? reminder.date
-      : getUpcomingReminderTime(reminder);
-
   return (
     !reminder.disabled &&
     (reminder.mode !== "once" ||
-      time > Date.now() ||
-      (reminder.snoozeUntil && reminder.snoozeUntil > Date.now()))
+      reminder.date > Date.now() ||
+      (!!reminder.snoozeUntil && reminder.snoozeUntil > Date.now()))
   );
+}
+
+export function createUpcomingReminderTimeQuery(now = "now") {
+  return sql`CASE 
+        WHEN mode = 'once' THEN date / 1000
+        WHEN recurringMode = 'year' THEN
+            strftime('%s',
+                strftime('%Y-', date(${now})) || strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime'), 
+                IIF(datetime(strftime('%Y-', date(${now})) || strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime')) <= datetime(${now}), '+1 year', '+0 year'),
+                'utc'
+            )
+        WHEN recurringMode = 'day' THEN
+            strftime('%s',
+                date(${now}) || time(date / 1000, 'unixepoch', 'localtime'), 
+                IIF(datetime(date(${now}) || time(date / 1000, 'unixepoch', 'localtime')) <= datetime(${now}), '+1 day', '+0 day'),
+                'utc'
+            )
+        WHEN recurringMode = 'week' AND selectedDays IS NOT NULL AND json_array_length(selectedDays) > 0 THEN 
+            CASE
+                WHEN CAST(strftime('%w', date(${now})) AS INTEGER) > (SELECT MAX(value) FROM json_each(selectedDays))
+                OR datetime(date(${now}) || time(date / 1000, 'unixepoch', 'localtime')) <= datetime(${now})
+                THEN
+                    strftime('%s', datetime(date(${now}), time(date / 1000, 'unixepoch', 'localtime'), '+1 day', 'weekday ' || json_extract(selectedDays, '$[0]'), 'utc'))
+                ELSE
+                    strftime('%s', datetime(date(${now}), time(date / 1000, 'unixepoch', 'localtime'), 'weekday ' || (SELECT value FROM json_each(selectedDays) WHERE CAST(strftime('%w', date(${now})) AS INTEGER) <= value), 'utc'))
+            END
+        WHEN recurringMode = 'month' AND selectedDays IS NOT NULL AND json_array_length(selectedDays) > 0 THEN
+            CASE
+                WHEN CAST(strftime('%d', date(${now})) AS INTEGER) > (SELECT MAX(value) FROM json_each(selectedDays))
+                OR datetime(date(${now}) || time(date / 1000, 'unixepoch', 'localtime')) <= datetime(${now})
+                THEN
+                    strftime('%s', strftime('%Y-%m-', date(${now})) || printf('%02d', json_extract(selectedDays, '$[0]')) || time(date / 1000, 'unixepoch', 'localtime'), '+1 month', 'utc')
+                ELSE strftime('%s', strftime('%Y-%m-', date(${now})) || (SELECT printf('%02d', value) FROM json_each(selectedDays) WHERE value <= strftime('%d', date(${now}))) || time(date / 1000, 'unixepoch', 'localtime'), 'utc')
+            END
+        ELSE strftime('%s', date(${now}) || time(date / 1000, 'unixepoch', 'localtime'), 'utc')
+    END * 1000
+`.$castTo<number>();
+}
+
+export function createIsReminderActiveQuery(now = "now") {
+  return sql`IIF(
+    (disabled IS NULL OR disabled = 0)
+    AND (mode != 'once'
+      OR datetime(date / 1000, 'unixepoch', 'localtime') > datetime(${now}) 
+      OR (snoozeUntil IS NOT NULL
+        AND datetime(snoozeUntil / 1000, 'unixepoch', 'localtime') > datetime(${now}))
+    ), 1, 0)`.$castTo<boolean>();
 }

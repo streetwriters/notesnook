@@ -45,7 +45,6 @@ export type GroupingKey =
   | "notes"
   | "notebooks"
   | "tags"
-  //| "topics"
   | "trash"
   | "favorites"
   | "reminders";
