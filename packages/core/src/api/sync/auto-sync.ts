@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Database from "..";
 import { EVENTS } from "../../common";
 import { logger } from "../../logger";
-import { Item } from "../../types";
+import { DatabaseUpdatedEvent } from "../../types";
 
 export class AutoSync {
   timeout = 0;
@@ -54,13 +54,13 @@ export class AutoSync {
     this.logger.info(`Auto sync stopped`);
   }
 
-  private schedule(id: string | string[], item?: Item) {
+  private schedule(event: DatabaseUpdatedEvent) {
     if (
-      item &&
-      (item.remote ||
-        ("localOnly" in item && item.localOnly) ||
-        ("failed" in item && item.failed) ||
-        ("dateUploaded" in item && item.dateUploaded))
+      (event.type === "upsert" || event.type === "update") &&
+      (event.item.remote ||
+        ("localOnly" in event.item && event.item.localOnly) ||
+        ("failed" in event.item && event.item.failed) ||
+        ("dateUploaded" in event.item && event.item.dateUploaded))
     )
       return;
 
@@ -71,10 +71,14 @@ export class AutoSync {
     // be a few milliseconds less than Date.now(). Setting sync
     // interval to 0 causes a conflict where Date.now() & dateModified
     // are equal causing the item to not be synced.
-    const interval = item && item.type === "tiptap" ? 100 : this.interval;
+    const interval =
+      (event.type === "update" || event.type === "upsert") &&
+      event.collection === "content"
+        ? 100
+        : this.interval;
     this.timeout = setTimeout(() => {
       this.logger.info(
-        `Sync requested by: ${Array.isArray(id) ? id.join(", ") : id}`
+        `Sync requested (type=${event.type} collection=${event.collection})`
       );
       this.db.eventManager.publish(EVENTS.databaseSyncRequested, false, false);
     }, interval) as unknown as number;

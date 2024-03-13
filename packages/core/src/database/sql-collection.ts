@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { EVENTS } from "../common";
 import {
+  DatabaseUpdatedEvent,
   GroupOptions,
   Item,
   MaybeDeletedItem,
@@ -101,7 +102,11 @@ export class SQLCollection<
       .values(item)
       .execute();
 
-    this.eventManager.publish(EVENTS.databaseUpdated, item.id, item);
+    this.eventManager.publish(EVENTS.databaseUpdated, <DatabaseUpdatedEvent>{
+      collection: this.type,
+      type: "upsert",
+      item
+    });
   }
 
   async softDelete(ids: string[]) {
@@ -116,7 +121,11 @@ export class SQLCollection<
         }))
       )
       .execute();
-    this.eventManager.publish(EVENTS.databaseUpdated, ids);
+    this.eventManager.publish(EVENTS.databaseUpdated, <DatabaseUpdatedEvent>{
+      collection: this.type,
+      type: "softDelete",
+      ids
+    });
   }
 
   async delete(ids: string[]) {
@@ -125,7 +134,12 @@ export class SQLCollection<
       .deleteFrom<keyof DatabaseSchema>(this.type)
       .where("id", "in", ids)
       .execute();
-    this.eventManager.publish(EVENTS.databaseUpdated, ids);
+
+    this.eventManager.publish(EVENTS.databaseUpdated, <DatabaseUpdatedEvent>{
+      collection: this.type,
+      type: "delete",
+      ids
+    });
   }
 
   async exists(id: string) {
@@ -208,7 +222,12 @@ export class SQLCollection<
       })
       .execute();
     if (options.sendEvent) {
-      this.eventManager.publish(EVENTS.databaseUpdated, ids);
+      this.eventManager.publish(EVENTS.databaseUpdated, <DatabaseUpdatedEvent>{
+        collection: this.type,
+        ids,
+        item: partial,
+        type: "update"
+      });
     }
   }
 
