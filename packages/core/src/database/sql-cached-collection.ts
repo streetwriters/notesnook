@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { GroupOptions, MaybeDeletedItem, isDeleted } from "../types";
+import { MaybeDeletedItem, isDeleted } from "../types";
 import EventManager from "../utils/event-manager";
 import { DatabaseAccessor, DatabaseCollection, DatabaseSchema } from ".";
 import { SQLCollection } from "./sql-collection";
@@ -124,10 +124,6 @@ export class SQLCachedCollection<
       if (!item) continue;
       this.cache.set(id, { ...item, ...partial, dateModified: Date.now() });
     }
-  }
-
-  ids(_options: GroupOptions): string[] {
-    return Array.from(this.cache.keys());
   }
 
   records(ids: string[]): Record<string, MaybeDeletedItem<T> | undefined> {

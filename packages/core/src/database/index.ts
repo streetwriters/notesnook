@@ -40,7 +40,6 @@ import {
   Attachment,
   Color,
   ContentItem,
-  GroupOptions,
   HistorySession,
   ItemType,
   MaybeDeletedItem,
@@ -125,7 +124,6 @@ export interface DatabaseCollection<T, IsAsync extends boolean> {
   get(id: string): AsyncOrSyncResult<IsAsync, T | undefined>;
   put(items: (T | undefined)[]): Promise<SQLiteItem<T>[]>;
   update(ids: string[], partial: Partial<T>): Promise<void>;
-  ids(options: GroupOptions): AsyncOrSyncResult<IsAsync, string[]>;
   records(
     ids: string[]
   ): AsyncOrSyncResult<
