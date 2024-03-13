@@ -33,6 +33,7 @@ import {
   FileWebClip,
   Icon,
   Loading,
+  PasswordInvisible,
   References,
   Rename,
   Reupload,
@@ -42,11 +43,12 @@ import { showToast } from "../../utils/toast";
 import { hashNavigate } from "../../navigation";
 import {
   closeOpenedDialog,
+  showPdfViewDialog,
   showPromptDialog
 } from "../../common/dialog-controller";
 import { store } from "../../stores/attachment-store";
 import { db } from "../../common/db";
-import { saveAttachment } from "../../common/attachments";
+import { downloadAttachment, saveAttachment } from "../../common/attachments";
 import { reuploadAttachment } from "../editor/picker";
 import { Multiselect } from "../../common/multi-select";
 import { Menu } from "../../hooks/use-menu";
@@ -59,6 +61,9 @@ import { useEffect, useState } from "react";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
+import { ScopedThemeProvider } from "../theme-provider";
+import { Lightbox } from "../lightbox";
+import ReactDOM from "react-dom";
 
 const FILE_ICONS: Record<string, Icon> = {
   "image/": FileImage,
@@ -235,6 +240,56 @@ const AttachmentMenuItems: (
   status?: AttachmentProgressStatus
 ) => MenuItem[] = (attachment, status) => {
   return [
+    {
+      type: "button",
+      key: "preview-doc",
+      title: "Preview Document",
+      icon: PasswordInvisible.path,
+      isHidden: !(attachment.metadata.type === "application/pdf"),
+      onClick: async () => {
+        const blob = await downloadAttachment(
+          attachment.metadata.hash,
+          "blob",
+          attachment.id.toString()
+        );
+        if (!blob) return;
+        await showPdfViewDialog({
+          url: URL.createObjectURL(blob),
+          hash: attachment.metadata.hash
+        });
+      }
+    },
+    {
+      type: "button",
+      key: "preview-image",
+      title: "Preview Image",
+      icon: PasswordInvisible.path,
+      isHidden: !attachment.metadata.type.startsWith("image/"),
+      onClick: async () => {
+        const container = document.getElementById("dialogContainer");
+        if (!(container instanceof HTMLElement)) return;
+
+        const dataurl = await downloadAttachment(
+          attachment.metadata.hash,
+          "base64",
+          attachment.id.toString()
+        );
+        if (!dataurl)
+          return showToast("error", "This image cannot be previewed.");
+
+        ReactDOM.render(
+          <ScopedThemeProvider>
+            <Lightbox
+              image={dataurl}
+              onClose={() => {
+                ReactDOM.unmountComponentAtNode(container);
+              }}
+            />
+          </ScopedThemeProvider>,
+          container
+        );
+      }
+    },
     {
       type: "button",
       key: "notes",

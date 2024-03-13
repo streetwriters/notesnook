@@ -186,6 +186,12 @@ export function showPromptDialog(props: {
   ));
 }
 
+export function showPdfViewDialog(props: { url: string; hash: string }) {
+  return showDialog("PdfViewDialog", (Dialog, perform) => (
+    <Dialog {...props} onClose={() => perform(null)} />
+  ));
+}
+
 export function showEmailChangeDialog() {
   return showDialog("EmailChangeDialog", (Dialog, perform) => (
     <Dialog onClose={() => perform(null)} />
