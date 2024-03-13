@@ -28,7 +28,7 @@ import React, {
   useLayoutEffect,
   useRef
 } from "react";
-import { Platform, TextInput, ViewStyle } from "react-native";
+import { Platform, ViewStyle } from "react-native";
 import WebView from "react-native-webview";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { notesnook } from "../../../e2e/test.ids";
