@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import Animated, {
@@ -34,11 +35,18 @@ import {
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
+import { useEditor } from "./tiptap/use-editor";
 import { editorState } from "./tiptap/utils";
-const EditorOverlay = ({ editorId = "", editor }) => {
+
+const EditorOverlay = ({
+  editorId = "",
+  editor
+}: {
+  editorId: string;
+  editor: ReturnType<typeof useEditor>;
+}) => {
   const { colors } = useThemeColors();
   const [error, setError] = useState(false);
   const opacity = useSharedValue(1);
@@ -47,11 +55,11 @@ const EditorOverlay = ({ editorId = "", editor }) => {
   const isTablet = deviceMode !== "mobile";
   const insets = useGlobalSafeAreaInsets();
   const isDefaultEditor = editorId === "";
-  const timers = useRef({
-    loading: 0,
-    error: 0,
-    closing: 0
-  });
+  const timers = useRef<{
+    loading?: NodeJS.Timeout;
+    error?: NodeJS.Timeout;
+    closing?: NodeJS.Timeout;
+  }>({});
   const loadingState = useRef({
     startTime: 0
   });
@@ -63,10 +71,10 @@ const EditorOverlay = ({ editorId = "", editor }) => {
   };
 
   const load = useCallback(
-    async (_loading) => {
+    async (isLoading: boolean) => {
       editorState().overlay = true;
       clearTimers();
-      if (_loading) {
+      if (isLoading) {
         loadingState.current.startTime = Date.now();
         opacity.value = 1;
         translateValue.value = 0;

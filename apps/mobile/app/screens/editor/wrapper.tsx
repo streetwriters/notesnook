@@ -21,6 +21,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef } from "react";
 import {
   AppState,
+  AppStateStatus,
   KeyboardAvoidingView,
   Platform,
   TextInput,
@@ -35,8 +36,9 @@ import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { editorRef } from "../../utils/global-refs";
 import { editorController, textInput } from "./tiptap/utils";
+import deviceInfo from "react-native-device-info";
 
-export const EditorWrapper = ({ width }) => {
+export const EditorWrapper = ({ widths }: { widths: any }) => {
   const { colors } = useThemeColors();
   const { colors: toolBarColors } = useThemeColors("editorToolbar");
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -47,9 +49,9 @@ export const EditorWrapper = ({ width }) => {
     (state) => state.settings.introCompleted
   );
   const keyboard = useKeyboard();
-  const prevState = useRef();
+  const prevState = useRef<AppStateStatus>();
 
-  const onAppStateChanged = async (state) => {
+  const onAppStateChanged = async (state: AppStateStatus) => {
     if (!prevState.current) {
       prevState.current = state;
       return;
@@ -65,7 +67,7 @@ export const EditorWrapper = ({ width }) => {
 
   useEffect(() => {
     if (loading) return;
-    let sub = AppState.addEventListener("change", onAppStateChanged);
+    const sub = AppState.addEventListener("change", onAppStateChanged);
     return () => {
       sub?.remove();
     };
@@ -75,7 +77,8 @@ export const EditorWrapper = ({ width }) => {
     const bottomInsets =
       Platform.OS === "android" ? 12 : insets.bottom + 16 || 14;
     if (!keyboard.keyboardShown) return bottomInsets / 1.5;
-    if (Platform.isPad && !floating) return bottomInsets;
+    if (deviceInfo.isTablet() && Platform.OS === "ios" && !floating)
+      return bottomInsets;
     if (Platform.OS === "ios") return bottomInsets / 1.5;
     return 0;
   };
@@ -88,7 +91,7 @@ export const EditorWrapper = ({ width }) => {
       testID="editor-wrapper"
       ref={editorRef}
       style={{
-        width: width[!introCompleted ? "mobile" : deviceMode]?.c,
+        width: widths[!introCompleted ? "mobile" : (deviceMode as any)]?.editor,
         height: "100%",
         minHeight: "100%",
         backgroundColor: toolBarColors.primary.background,

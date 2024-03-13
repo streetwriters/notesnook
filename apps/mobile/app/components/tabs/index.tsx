@@ -45,7 +45,7 @@ import { useSideBarDraggingStore } from "../side-menu/dragging-store";
 
 interface TabProps extends ViewProps {
   dimensions: { width: number; height: number };
-  widths: { a: number; b: number; c: number };
+  widths: { sidebar: number; list: number; editor: number };
   onChangeTab: (data: { i: number; from: number }) => void;
   onScroll: (offset: number) => void;
   enabled: boolean;
@@ -86,8 +86,8 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
   const translateX = useSharedValue(
     widths
       ? appState && !appState?.movedAway
-        ? widths.a + widths.b
-        : widths.a
+        ? widths.sidebar + widths.list
+        : widths.sidebar
       : 0
   );
   const startX = useSharedValue(0);
@@ -103,12 +103,12 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
   const [disabled, setDisabled] = useState(false);
   const node = useRef<Animated.View>(null);
   const containerWidth = widths
-    ? widths.a + widths.b + widths.c
+    ? widths.sidebar + widths.list + widths.editor
     : dimensions.width;
 
   const drawerPosition = 0;
-  const homePosition = widths.a;
-  const editorPosition = widths.a + widths.b;
+  const homePosition = widths.sidebar;
+  const editorPosition = widths.sidebar + widths.list;
   const isSmallTab = deviceMode === "smallTablet";
   const isLoaded = useRef(false);
   const prevWidths = useRef(widths);
@@ -119,9 +119,9 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       if (deviceMode === "tablet" || fullscreen) {
         translateX.value = 0;
       } else {
-        if (prevWidths.current?.a !== widths.a) {
+        if (prevWidths.current?.sidebar !== widths.sidebar) {
           translateX.value =
-            !appState || appState?.movedAway ? widths.a : editorPosition;
+            !appState || appState?.movedAway ? widths.sidebar : editorPosition;
         }
       }
       isLoaded.current = true;

@@ -23,7 +23,7 @@ import {
   deactivateKeepAwake
 } from "@sayem314/react-native-keep-awake";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Dimensions, Keyboard, Platform, StatusBar, View } from "react-native";
+import { Dimensions, Platform, StatusBar, View } from "react-native";
 import changeNavigationBarColor from "react-native-navigation-bar-color";
 import {
   addOrientationListener,
@@ -64,12 +64,11 @@ import { useSettingStore } from "../stores/use-setting-store";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
-  eOnChangeFluidTab,
   eOnLoadNote,
   eOpenFullscreenEditor,
   eUnlockNote
 } from "../utils/events";
-import { editorRef, inputRef, tabBarRef } from "../utils/global-refs";
+import { editorRef, tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
 
@@ -300,7 +299,7 @@ const _TabsHolder = () => {
 
   const onScroll = (scrollOffset) => {
     hideAllTooltips();
-    if (scrollOffset > offsets[deviceMode].a - 10) {
+    if (scrollOffset > offsets[deviceMode].sidebar - 10) {
       animatedOpacity.value = 0;
       toggleView(false);
     } else {
@@ -337,43 +336,43 @@ const _TabsHolder = () => {
 
   const offsets = {
     mobile: {
-      a: dimensions.width * 0.75,
-      b: dimensions.width + dimensions.width * 0.75,
-      c: dimensions.width * 2 + dimensions.width * 0.75
+      sidebar: dimensions.width * 0.75,
+      list: dimensions.width + dimensions.width * 0.75,
+      editor: dimensions.width * 2 + dimensions.width * 0.75
     },
     smallTablet: {
-      a: fullscreen ? 0 : valueLimiter(dimensions.width * 0.3, 300, 350),
-      b: fullscreen
+      sidebar: fullscreen ? 0 : valueLimiter(dimensions.width * 0.3, 300, 350),
+      list: fullscreen
         ? 0
         : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350),
-      c: fullscreen
+      editor: fullscreen
         ? 0
         : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350)
     },
     tablet: {
-      a: 0,
-      b: 0,
-      c: 0
+      sidebar: 0,
+      list: 0,
+      editor: 0
     }
   };
   const widths = {
     mobile: {
-      a: dimensions.width * 0.75,
-      b: dimensions.width,
-      c: dimensions.width
+      sidebar: dimensions.width * 0.75,
+      list: dimensions.width,
+      editor: dimensions.width
     },
     smallTablet: {
-      a: valueLimiter(dimensions.width * 0.3, 300, 350),
-      b: valueLimiter(dimensions.width * 0.4, 300, 450),
-      c: dimensions.width - valueLimiter(dimensions.width * 0.4, 300, 450)
+      sidebar: valueLimiter(dimensions.width * 0.3, 300, 350),
+      list: valueLimiter(dimensions.width * 0.4, 300, 450),
+      editor: dimensions.width - valueLimiter(dimensions.width * 0.4, 300, 450)
     },
     tablet: {
-      a:
+      sidebar:
         dimensions.width > 1100
           ? dimensions.width * 0.15
           : dimensions.width * 0.2,
-      b: dimensions.width * 0.3,
-      c:
+      list: dimensions.width * 0.3,
+      editor:
         dimensions.width > 1100
           ? dimensions.width * 0.55
           : dimensions.width * 0.5
@@ -449,7 +448,7 @@ const _TabsHolder = () => {
                 key="1"
                 style={{
                   height: "100%",
-                  width: fullscreen ? 0 : widths[deviceMode]?.a
+                  width: fullscreen ? 0 : widths[deviceMode]?.sidebar
                 }}
               >
                 <ScopedThemeProvider value="navigationMenu">
@@ -461,7 +460,7 @@ const _TabsHolder = () => {
                 key="2"
                 style={{
                   height: "100%",
-                  width: fullscreen ? 0 : widths[deviceMode]?.b
+                  width: fullscreen ? 0 : widths[deviceMode]?.list
                 }}
               >
                 <ScopedThemeProvider value="list">

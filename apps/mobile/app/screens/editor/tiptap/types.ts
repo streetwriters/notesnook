@@ -36,6 +36,7 @@ export type EditorState = {
   saveCount: 0;
   isAwaitingResult: boolean;
   scrollPosition: number;
+  overlay?: boolean;
 };
 
 export type Settings = {
@@ -58,10 +59,10 @@ export type Settings = {
 };
 
 export type EditorProps = {
-  readonly: boolean;
-  noToolbar: boolean;
-  noHeader: boolean;
-  withController: boolean;
+  readonly?: boolean;
+  noToolbar?: boolean;
+  noHeader?: boolean;
+  withController?: boolean;
   editorId?: string;
   onLoad?: () => void;
   onChange?: (html: string) => void;
