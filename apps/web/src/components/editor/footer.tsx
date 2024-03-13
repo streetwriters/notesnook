@@ -32,7 +32,7 @@ function EditorFooter() {
   const activeSessionId = useEditorStore((store) => store.activeSessionId);
   const { words } = useNoteStatistics(activeSessionId || "unknown");
   const saveState = useEditorStore(
-    (store) => store.getActiveSession(["default", "unlocked"])?.saveState
+    (store) => store.getActiveSession(["default"])?.saveState
   );
   const SaveStateIcon = saveState ? SAVE_STATE_ICON_MAP[saveState] : null;
 

@@ -85,7 +85,7 @@ import {
 } from "@notesnook/common";
 import {
   Color,
-  Note,
+  Note as NoteType,
   Notebook as NotebookItem,
   Tag,
   createInternalLink
@@ -94,11 +94,10 @@ import { MenuItem } from "@notesnook/ui";
 import { Context } from "../list-container/types";
 import { SchemeColors } from "@notesnook/theme";
 import FileSaver from "file-saver";
-import Vault from "../../common/vault";
 import { writeToClipboard } from "../../utils/clipboard";
 
 type NoteProps = NoteResolvedData & {
-  item: Note;
+  item: NoteType;
   context?: Context;
   date: number;
   simplified?: boolean;
@@ -326,7 +325,7 @@ const formats = [
 const notFullySyncedText =
   "Cannot perform this action because note is not fully synced.";
 const menuItems: (
-  note: Note,
+  note: NoteType,
   ids?: string[],
   context?: { color?: Color; locked?: boolean }
 ) => MenuItem[] = (note, ids = [], context) => {

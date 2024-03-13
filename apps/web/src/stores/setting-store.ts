@@ -156,10 +156,9 @@ class SettingStore extends BaseStore<SettingStore> {
     Config.set("doubleSpacedLines", !doubleSpacedParagraphs);
   };
 
-  toggleMarkdownShortcuts = (toggleState) => {
+  toggleMarkdownShortcuts = (toggleState?: boolean) => {
     this.set((state) => {
-      state.markdownShortcuts =
-        toggleState !== undefined ? toggleState : !state.markdownShortcuts;
+      state.markdownShortcuts = toggleState ?? !state.markdownShortcuts;
       Config.set("markdownShortcuts", state.markdownShortcuts);
     });
   };

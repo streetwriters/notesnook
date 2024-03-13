@@ -29,11 +29,11 @@ import { Edit, Shortcut, DeleteForver } from "../icons";
 import { showToast } from "../../utils/toast";
 import { pluralize } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
-import { Tag } from "@notesnook/core/dist/types";
+import { Tag as TagType } from "@notesnook/core";
 import { showEditTagDialog } from "../../common/dialog-controller";
 import { handleDrop } from "../../common/drop-handler";
 
-type TagProps = { item: Tag; totalNotes: number };
+type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
   const { item, totalNotes } = props;
   const { id, title } = item;
@@ -68,7 +68,10 @@ function Tag(props: TagProps) {
 }
 export default Tag;
 
-const menuItems: (tag: Tag, ids?: string[]) => MenuItem[] = (tag, ids = []) => {
+const menuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
+  tag,
+  ids = []
+) => {
   return [
     {
       type: "button",
