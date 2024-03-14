@@ -176,13 +176,14 @@ function EditorView({
           (item.type !== "tiptap" && item.type !== "note") ||
           lastChangedTime.current >= (item.dateEdited as number) ||
           !appstore.get().isRealtimeSyncEnabled
-        )
+        ) {
+          console.log("ignoring real time sync");
           return;
+        }
 
-        const { contentId } = session.note;
-        const isContent = item.type === "tiptap" && item.id === contentId;
+        const isContent =
+          item.type === "tiptap" && item.noteId === session.note.id;
         const isNote = item.type === "note" && item.id === session.note.id;
-
         if (isContent) {
           if (!item.locked) return editor.updateContent(item.data);
 
