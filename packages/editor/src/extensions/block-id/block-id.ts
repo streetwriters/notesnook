@@ -53,6 +53,7 @@ export const BlockId = Extension.create({
               return id || null;
             },
             renderHTML: (attributes) => {
+              if (!attributes?.blockId) return {};
               return {
                 "data-block-id": attributes?.blockId
               };
