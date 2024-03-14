@@ -256,7 +256,8 @@ function EditorView({
                 deferredSave(session.id, session.id, ignoreEdit, data);
               }}
               options={{
-                readonly: session?.type === "readonly",
+                readonly:
+                  session?.type === "readonly" || session?.type === "deleted",
                 onRequestFocus: () => toggleProperties(false),
                 focusMode: isFocusMode,
                 isMobile: isMobile || isTablet
