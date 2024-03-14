@@ -29,14 +29,12 @@ const SAVE_STATE_ICON_MAP = {
 };
 
 function EditorFooter() {
-  const activeSessionId = useEditorStore((store) => store.activeSessionId);
-  const { words } = useNoteStatistics(activeSessionId || "unknown");
+  const { words } = useNoteStatistics();
   const saveState = useEditorStore(
     (store) => store.getActiveSession(["default"])?.saveState
   );
   const SaveStateIcon = saveState ? SAVE_STATE_ICON_MAP[saveState] : null;
 
-  if (!activeSessionId) return null;
   return (
     <Flex sx={{ alignItems: "center" }}>
       <Text

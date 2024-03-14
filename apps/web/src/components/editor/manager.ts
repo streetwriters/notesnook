@@ -35,6 +35,7 @@ type EditorContext = {
 };
 
 class EditorManager extends BaseStore<EditorManager> {
+  activeEditorId?: string;
   toolbarConfig?: ToolbarDefinition;
   editorConfig: EditorConfig = Config.get("editorConfig", {
     fontFamily: "sans-serif",
@@ -50,6 +51,11 @@ class EditorManager extends BaseStore<EditorManager> {
     this.set((state) => {
       if (!editor) delete state.editors[id];
       else state.editors[id] = editor;
+      state.activeEditorId = editor
+        ? id
+        : id === state.activeEditorId
+        ? undefined
+        : state.activeEditorId;
     });
   };
 
@@ -62,6 +68,7 @@ class EditorManager extends BaseStore<EditorManager> {
     this.set((state) => {
       const oldState = state.editors[id];
       if (!oldState) return;
+      state.activeEditorId = id;
       const newPartialState =
         typeof partial === "function" ? partial(oldState) : partial;
       state.editors[id] = { ...oldState, ...newPartialState };
@@ -105,10 +112,11 @@ export function useToolbarConfig() {
   return { toolbarConfig, setToolbarConfig };
 }
 
-export function useNoteStatistics(id: string): NoteStatistics {
+export function useNoteStatistics(): NoteStatistics {
   return useEditorManager(
     (store) =>
-      store.editors[id]?.statistics || {
+      (store.activeEditorId &&
+        store.editors[store.activeEditorId]?.statistics) || {
         words: { total: 0 }
       }
   );
