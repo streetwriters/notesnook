@@ -34,9 +34,10 @@ import { Tag } from "@notesnook/core";
 type HeaderProps = { readonly: boolean; id: string };
 function Header(props: HeaderProps) {
   const { readonly, id } = props;
-  const tags = useEditorStore(
-    (store) => store.getSession(id, ["default", "readonly"])?.tags || []
+  const session = useEditorStore((store) =>
+    store.getActiveSession(["default", "readonly"])
   );
+  const tags = session?.tags || [];
   const refreshTags = useEditorStore((store) => store.refreshTags);
 
   useEffect(() => {
@@ -79,7 +80,7 @@ function Header(props: HeaderProps) {
             styles={{ container: { mr: 1 }, text: { fontSize: "body" } }}
           />
         ))}
-        {!readonly && tags ? (
+        {!!session && !readonly && tags ? (
           <Autosuggest
             sessionId={id}
             filter={(query) => db.lookup.tags(query).items(10)}
