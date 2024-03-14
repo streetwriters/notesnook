@@ -109,12 +109,13 @@ type EditorPropertiesProps = {
   session: DefaultEditorSession | ReadonlyEditorSession | DeletedEditorSession;
 };
 function EditorProperties(props: EditorPropertiesProps) {
-  const { session } = props;
-
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-
-  if (isFocusMode) return null;
+  const session = useEditorStore((store) =>
+    store.getSession(props.session.id, [props.session.type])
+  );
+  console.log(session);
+  if (isFocusMode || !session) return null;
   return (
     <AnimatedFlex
       animate={{
