@@ -47,11 +47,21 @@ export function getTableOfContents(content: HTMLElement) {
 }
 
 export function scrollIntoViewById(blockId: string) {
-  const element = document.querySelector(
+  const element = document.querySelector<HTMLElement>(
     `.active [data-block-id=${JSON.stringify(blockId)}]`
   );
 
   if (element) {
+    const css = `.active [data-block-id=${JSON.stringify(blockId)}] {
+    background-color: var(--shade) !important;
+}`;
+    const stylesheet = document.createElement("style");
+    stylesheet.innerText = css;
+    document.head.appendChild(stylesheet);
+    setTimeout(() => {
+      stylesheet.remove();
+    }, 5000);
+
     setTimeout(
       () =>
         element.scrollIntoView({
