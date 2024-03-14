@@ -41,6 +41,8 @@ import {
   Color,
   ContentItem,
   HistorySession,
+  ItemReference,
+  ItemReferences,
   ItemType,
   MaybeDeletedItem,
   Note,
@@ -108,6 +110,49 @@ export type RawDatabaseSchema = DatabaseSchema & {
     noteId: string;
   }>;
 };
+
+export type DatabaseUpdatedEvent<
+  TCollectionType extends keyof DatabaseSchema = keyof DatabaseSchema
+> =
+  | UpsertEvent<TCollectionType>
+  | DeleteEvent
+  | UpdateEvent<TCollectionType>
+  | UnlinkEvent;
+
+export type UpsertEvent<
+  TCollectionType extends keyof DatabaseSchema = keyof DatabaseSchema
+> = TCollectionType extends keyof DatabaseSchema
+  ? {
+      type: "upsert";
+      collection: TCollectionType;
+      item: DatabaseSchema[TCollectionType];
+    }
+  : never;
+
+export type UnlinkEvent = {
+  collection: "relations";
+  type: "unlink";
+  reference: ItemReference | ItemReferences;
+  types: ItemType[];
+  direction: "from" | "to";
+};
+
+export type DeleteEvent = {
+  collection: keyof DatabaseSchema;
+  type: "softDelete" | "delete";
+  ids: string[];
+};
+
+export type UpdateEvent<
+  TCollectionType extends keyof DatabaseSchema = keyof DatabaseSchema
+> = TCollectionType extends keyof DatabaseSchema
+  ? {
+      type: "update";
+      ids: string[];
+      collection: TCollectionType;
+      item: Partial<DatabaseSchema[TCollectionType]>;
+    }
+  : never;
 
 type AsyncOrSyncResult<Async extends boolean, Response> = Async extends true
   ? Promise<Response>

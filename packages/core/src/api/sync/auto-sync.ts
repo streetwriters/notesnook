@@ -36,9 +36,10 @@ export class AutoSync {
   async start() {
     this.logger.info(`Auto sync requested`);
     if (this.isAutoSyncing) return;
+    if (this.databaseUpdatedEvent) this.databaseUpdatedEvent.unsubscribe();
 
     this.isAutoSyncing = true;
-    this.databaseUpdatedEvent = this.db.eventManager.subscribeSingle(
+    this.databaseUpdatedEvent = this.db.eventManager.subscribe(
       EVENTS.databaseUpdated,
       this.schedule.bind(this)
     );

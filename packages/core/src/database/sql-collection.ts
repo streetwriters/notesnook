@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { EVENTS } from "../common";
 import {
-  DatabaseUpdatedEvent,
   GroupOptions,
   Item,
   MaybeDeletedItem,
@@ -31,7 +30,10 @@ import {
   DatabaseAccessor,
   DatabaseCollection,
   DatabaseSchema,
+  DeleteEvent,
   SQLiteItem,
+  UpdateEvent,
+  UpsertEvent,
   isFalse
 } from ".";
 import {
@@ -102,9 +104,9 @@ export class SQLCollection<
       .values(item)
       .execute();
 
-    this.eventManager.publish(EVENTS.databaseUpdated, <DatabaseUpdatedEvent>{
-      collection: this.type,
+    this.eventManager.publish(EVENTS.databaseUpdated, <UpsertEvent>{
       type: "upsert",
+      collection: this.type,
       item
     });
   }
@@ -121,9 +123,10 @@ export class SQLCollection<
         }))
       )
       .execute();
-    this.eventManager.publish(EVENTS.databaseUpdated, <DatabaseUpdatedEvent>{
-      collection: this.type,
+
+    this.eventManager.publish(EVENTS.databaseUpdated, <DeleteEvent>{
       type: "softDelete",
+      collection: this.type,
       ids
     });
   }
@@ -135,9 +138,9 @@ export class SQLCollection<
       .where("id", "in", ids)
       .execute();
 
-    this.eventManager.publish(EVENTS.databaseUpdated, <DatabaseUpdatedEvent>{
-      collection: this.type,
+    this.eventManager.publish(EVENTS.databaseUpdated, <DeleteEvent>{
       type: "delete",
+      collection: this.type,
       ids
     });
   }
@@ -222,11 +225,11 @@ export class SQLCollection<
       })
       .execute();
     if (options.sendEvent) {
-      this.eventManager.publish(EVENTS.databaseUpdated, <DatabaseUpdatedEvent>{
+      this.eventManager.publish(EVENTS.databaseUpdated, <UpdateEvent>{
+        type: "update",
         collection: this.type,
         ids,
-        item: partial,
-        type: "update"
+        item: partial
       });
     }
   }
