@@ -24,6 +24,7 @@ import { expose, transfer } from "comlink";
 
 class OriginPrivateFileStore implements IFileStorage {
   private storage: IndexedDBKVStore;
+  private locks: Map<string, Promise<Uint8Array | undefined>> = new Map();
   constructor(
     name: string,
     private readonly directory: FileSystemDirectoryHandle
@@ -62,16 +63,23 @@ class OriginPrivateFileStore implements IFileStorage {
     }
   }
   async readChunk(chunkName: string): Promise<Uint8Array | undefined> {
+    const lock = this.locks.get(chunkName);
+    if (lock) await lock;
+
+    const promise = this.directory
+      .getFileHandle(chunkName)
+      .then((file) => file.createSyncAccessHandle())
+      .then((handle) => {
+        const buffer = new Uint8Array(handle.getSize());
+        handle.read(buffer);
+        handle.close();
+        return buffer;
+      });
+    this.locks.set(chunkName, promise);
     try {
-      const file = await this.directory.getFileHandle(chunkName);
-      const syncHandle = await file.createSyncAccessHandle();
-      const buffer = new Uint8Array(syncHandle.getSize());
-      syncHandle.read(buffer);
-      syncHandle.close();
-      return buffer;
+      return promise.finally(() => this.locks.delete(chunkName));
     } catch (e) {
       console.error("Failed to read chunk", e);
-      return;
     }
   }
 }
