@@ -142,7 +142,8 @@ export default function NoteLinkingDialog(props: NoteLinkingDialogProps) {
                       textAlign: "left",
                       display: "flex",
                       justifyContent: "space-between",
-                      alignItems: "center"
+                      alignItems: "center",
+                      borderBottom: "1px solid var(--border)"
                     }}
                     onClick={() => {
                       props.onDone({
@@ -207,7 +208,8 @@ export default function NoteLinkingDialog(props: NoteLinkingDialogProps) {
                             textAlign: "left",
                             display: "flex",
                             alignItems: "center",
-                            gap: 1
+                            gap: 1,
+                            borderBottom: "1px solid var(--border)"
                           }}
                           onClick={async () => {
                             setSelectedNote(note);
