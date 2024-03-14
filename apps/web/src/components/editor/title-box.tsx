@@ -37,6 +37,7 @@ type TitleBoxProps = {
 function TitleBox(props: TitleBoxProps) {
   const { readonly, id } = props;
   const inputRef = useRef<HTMLInputElement>(null);
+  const pendingChanges = useRef(false);
   // const id = useStore((store) => store.session.id);
   const sessionType = useEditorStore((store) => store.getActiveSession()?.type);
   const isMobile = useMobile();
@@ -66,6 +67,7 @@ function TitleBox(props: TitleBoxProps) {
     const session = useEditorStore.getState().getSession(id);
     if (!session || !("note" in session) || !session.note || !inputRef.current)
       return;
+    if (pendingChanges.current) return;
 
     const { title } = session.note;
     withSelectionPersist(
@@ -93,7 +95,13 @@ function TitleBox(props: TitleBoxProps) {
         if (!preventSave) {
           const { activeSessionId } = useEditorStore.getState();
           if (!activeSessionId) return;
-          debouncedOnTitleChange(activeSessionId, activeSessionId, title);
+          pendingChanges.current = true;
+          debouncedOnTitleChange(
+            activeSessionId,
+            activeSessionId,
+            title,
+            pendingChanges
+          );
         }
       }
     );
@@ -124,12 +132,13 @@ function TitleBox(props: TitleBoxProps) {
         }
       }}
       onChange={(e) => {
+        pendingChanges.current = true;
         e.target.value = replaceDateTime(
           e.target.value,
           dateFormat,
           timeFormat
         );
-        debouncedOnTitleChange(id, id, e.target.value);
+        debouncedOnTitleChange(id, id, e.target.value, pendingChanges);
         updateFontSize(e.target.value.length);
       }}
     />
@@ -140,8 +149,13 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
   return prevProps.readonly === nextProps.readonly;
 });
 
-function onTitleChange(noteId: string, title: string) {
+function onTitleChange(
+  noteId: string,
+  title: string,
+  pendingChanges: React.MutableRefObject<boolean>
+) {
   useEditorStore.getState().setTitle(noteId, title);
+  pendingChanges.current = false;
 }
 
 const debouncedOnTitleChange = debounceWithId(onTitleChange, 100);
