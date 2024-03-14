@@ -158,7 +158,8 @@ export class Tiptap {
           id: node.attribs[ATTRIBUTES.blockId],
           type: node.tagName.toLowerCase(),
           content: convertHtmlToTxt(
-            this.data.slice(node.startIndex || 0, node.endIndex || 0)
+            this.data.slice(node.startIndex || 0, node.endIndex || 0),
+            false
           )
         }))
       );
@@ -291,9 +292,9 @@ export class Tiptap {
   }
 }
 
-function convertHtmlToTxt(html: string) {
+function convertHtmlToTxt(html: string, wrap = true) {
   return convert(html, {
-    wordwrap: 80,
+    wordwrap: wrap ? 80 : false,
     preserveNewlines: true,
     selectors: [
       { selector: "table", format: "dataTable" },
