@@ -27,6 +27,7 @@ import { useEditorConfig } from "./manager";
 import { getFontById } from "@notesnook/editor";
 import { replaceDateTime } from "@notesnook/editor/dist/extensions/date-time";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 type TitleBoxProps = {
   id: string;
@@ -79,27 +80,28 @@ function TitleBox(props: TitleBoxProps) {
     updateFontSize(inputRef.current.value.length);
   }, [isTablet, isMobile, updateFontSize]);
 
-  // useEffect(() => {
-  //   const { unsubscribe } = AppEventManager.subscribe(
-  //     AppEvents.changeNoteTitle,
-  //     ({ preventSave, title }: { title: string; preventSave: boolean }) => {
-  //       if (!inputRef.current) return;
-  //       withSelectionPersist(
-  //         inputRef.current,
-  //         (input) => (input.value = title)
-  //       );
-  //       updateFontSize(title.length);
-  //       if (!preventSave) {
-  //         const { sessionId, id } = store.get().session;
-  //         debouncedOnTitleChange(sessionId, id, title);
-  //       }
-  //     }
-  //   );
+  useEffect(() => {
+    const { unsubscribe } = AppEventManager.subscribe(
+      AppEvents.changeNoteTitle,
+      ({ preventSave, title }: { title: string; preventSave: boolean }) => {
+        if (!inputRef.current) return;
+        withSelectionPersist(
+          inputRef.current,
+          (input) => (input.value = title)
+        );
+        updateFontSize(title.length);
+        if (!preventSave) {
+          const { activeSessionId } = useEditorStore.getState();
+          if (!activeSessionId) return;
+          debouncedOnTitleChange(activeSessionId, activeSessionId, title);
+        }
+      }
+    );
 
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, []);
+    return () => {
+      unsubscribe();
+    };
+  }, [updateFontSize]);
 
   return (
     <Input
