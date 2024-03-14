@@ -31,8 +31,10 @@ import {
   Note,
   Pin,
   Properties,
+  Readonly,
   Search,
   TableOfContents,
+  Trash,
   Unlock
 } from "../icons";
 import { ScrollContainer } from "@notesnook/ui";
@@ -350,7 +352,15 @@ function Tab(props: TabProps) {
     onCloseToTheLeft,
     onPin
   } = props;
-  const Icon = isLocked ? (type === "locked" ? Lock : Unlock) : Note;
+  const Icon = isLocked
+    ? type === "locked"
+      ? Lock
+      : Unlock
+    : type === "readonly"
+    ? Readonly
+    : type === "deleted"
+    ? Trash
+    : Note;
   const { attributes, listeners, setNodeRef, transform, transition, active } =
     useSortable({ id });
 
