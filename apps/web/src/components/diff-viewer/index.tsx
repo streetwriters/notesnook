@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useLayoutEffect, useState } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
-import { Loading, ImageDownload, Copy, Restore } from "../icons";
+import { Copy, Restore } from "../icons";
 import ContentToggle from "./content-toggle";
 import { store as notesStore } from "../../stores/note-store";
 import { db } from "../../common/db";
@@ -32,17 +32,23 @@ import { Editor } from "../editor";
 import { ContentItem, Note } from "@notesnook/core";
 import { UnlockView } from "../unlock";
 import { getFormattedDate } from "@notesnook/common";
+import { useEditorManager } from "../editor/manager";
 
 type DiffViewerProps = { session: ConflictedEditorSession };
 function DiffViewer(props: DiffViewerProps) {
   const { session } = props;
 
-  const [isDownloadingImages, setIsDownloadingImages] = useState(false);
   const [selectedContent, setSelectedContent] = useState(-1);
 
   const [content, setContent] = useState(session.content);
   const [conflictedContent, setConflictedContent] = useState(
     content.conflicted
+  );
+  const editor = useEditorManager((store) => store.editors[content.id]?.editor);
+  const conflictedEditor = useEditorManager((store) =>
+    conflictedContent
+      ? store.editors[`${conflictedContent.id}-conflicted`]?.editor
+      : undefined
   );
 
   useLayoutEffect(() => {
@@ -77,47 +83,6 @@ function DiffViewer(props: DiffViewerProps) {
         {session.note.title}
       </Text>
       <Flex mt={1} sx={{ alignSelf: "center", justifySelf: "center" }}>
-        {!content.locked && !conflictedContent.locked && (
-          <Button
-            variant="secondary"
-            onClick={async () => {
-              setIsDownloadingImages(true);
-              try {
-                await Promise.all([
-                  db.content.downloadMedia(session.id, {
-                    data: content.data,
-                    type: content.type
-                  }),
-                  db.content.downloadMedia(session.id, {
-                    data: conflictedContent.data,
-                    type: conflictedContent.type
-                  })
-                ]);
-              } finally {
-                setIsDownloadingImages(false);
-              }
-            }}
-            disabled={isDownloadingImages}
-            mr={2}
-            sx={{
-              alignItems: "center",
-              justifyContent: "center",
-              display: "flex"
-            }}
-          >
-            {isDownloadingImages ? (
-              <Loading size={18} />
-            ) : (
-              <ImageDownload size={18} />
-            )}
-            <Text
-              ml={1}
-              sx={{ fontSize: "body", display: ["none", "block", "block"] }}
-            >
-              {isDownloadingImages ? "Downloading..." : "Load images"}
-            </Text>
-          </Button>
-        )}
         {session.type === "diff" ? (
           <>
             <Button
@@ -249,6 +214,7 @@ function DiffViewer(props: DiffViewerProps) {
                     <Editor
                       id={content.id}
                       content={() => content.data}
+                      editor={editor}
                       session={session}
                       nonce={content.dateEdited}
                       options={{ readonly: true, headless: true }}
@@ -325,6 +291,7 @@ function DiffViewer(props: DiffViewerProps) {
                     <Editor
                       id={`${conflictedContent.id}-conflicted`}
                       session={session}
+                      editor={conflictedEditor}
                       content={() => conflictedContent.data}
                       nonce={conflictedContent.dateEdited}
                       options={{ readonly: true, headless: true }}
