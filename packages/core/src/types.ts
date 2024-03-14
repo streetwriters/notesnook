@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Cipher } from "@notesnook/crypto";
 import { TimeFormat } from "./utils/date";
-import { SQLiteItem } from "./database";
 
 export type SortOptions = {
   sortBy:
@@ -304,6 +303,8 @@ export type ItemReference = {
   type: keyof ItemMap;
 };
 
+export type ItemReferences = { type: ItemType; ids: string[] };
+
 export interface Relation extends BaseItem<"relation"> {
   fromId: string;
   fromType: keyof ItemMap;
@@ -555,22 +556,4 @@ export type ContentBlock = {
   content: string;
   type: string;
   id: string;
-};
-
-export type DatabaseUpdatedEvent = UpsertEvent | DeleteEvent | UpdateEvent;
-type BaseEvent = {
-  collection: CollectionType;
-};
-type UpsertEvent = BaseEvent & {
-  type: "upsert";
-  item: SQLiteItem<Item>;
-};
-type DeleteEvent = BaseEvent & {
-  type: "softDelete" | "delete";
-  ids: string[];
-};
-type UpdateEvent = BaseEvent & {
-  type: "update";
-  ids: string[];
-  item: Partial<SQLiteItem<Item>>;
 };

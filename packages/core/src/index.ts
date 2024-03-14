@@ -31,3 +31,4 @@ export {
   highlightInternalLinks,
   type TextSlice
 } from "./utils/content-block";
+export { type DatabaseUpdatedEvent } from "./database";
