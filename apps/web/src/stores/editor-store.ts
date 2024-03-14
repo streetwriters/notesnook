@@ -251,7 +251,7 @@ class EditorStore extends BaseStore<EditorStore> {
           else if (item.type === "note") {
             updateSession(
               session.id,
-              ["default", "readonly", "deleted", "locked"],
+              [session.type],
               (session) => (session.note = item)
             );
           }
@@ -263,7 +263,8 @@ class EditorStore extends BaseStore<EditorStore> {
     db.eventManager.subscribe(
       EVENTS.databaseUpdated,
       (event: DatabaseUpdatedEvent) => {
-        const { sessions, openSession, closeSessions } = this.get();
+        const { sessions, openSession, closeSessions, updateSession } =
+          this.get();
         const clearIds: string[] = [];
         if (event.collection === "notes") {
           // when a note is permanently deleted from trash
@@ -279,15 +280,15 @@ class EditorStore extends BaseStore<EditorStore> {
           } else if (event.type === "update") {
             for (const session of sessions) {
               if (
-                !event.ids.includes(session.id) &&
-                !("note" in session && event.ids.includes(session.note.id))
+                session.type === "new" ||
+                (!event.ids.includes(session.id) &&
+                  !event.ids.includes(session.note.id))
               )
                 continue;
 
               if (
                 // when a note's readonly property is toggled
-                (session.type === "readonly") !==
-                  !!(event.item as Note).readonly ||
+                (session.type === "readonly") !== !!event.item.readonly ||
                 // when a note is restored from trash
                 (session.type === "deleted") === (event.item.type !== "trash")
               ) {
@@ -298,6 +299,18 @@ class EditorStore extends BaseStore<EditorStore> {
                 (event.item.type === "trash")
               )
                 clearIds.push(session.id);
+              else {
+                updateSession(session.id, [session.type], (session) => {
+                  session.note.pinned =
+                    event.item.pinned ?? session.note.pinned;
+                  session.note.localOnly =
+                    event.item.localOnly ?? session.note.localOnly;
+                  session.note.favorite =
+                    event.item.favorite ?? session.note.favorite;
+                  session.note.dateEdited =
+                    event.item.dateEdited ?? session.note.dateEdited;
+                });
+              }
             }
           }
         } else if (event.collection === "content") {
@@ -310,10 +323,38 @@ class EditorStore extends BaseStore<EditorStore> {
               if (
                 // when a note is locked or unlocked
                 (session.type === "locked") !==
-                !!(event.item as ContentItem).locked
+                !!event.item.locked
               ) {
                 openSession(session.id, { force: true, silent: true });
               }
+            }
+          }
+        } else if (event.collection === "relations") {
+          if (
+            event.type === "upsert" &&
+            event.item.toId &&
+            event.item.fromId &&
+            event.item.fromType === "color" &&
+            event.item.toType === "note"
+          ) {
+            updateSession(event.item.toId, undefined, {
+              color: event.item.fromId
+            });
+          } else if (
+            event.type === "unlink" &&
+            event.reference.type === "color" &&
+            event.types.includes("note")
+          ) {
+            for (const session of sessions) {
+              if (!("color" in session) || !session.color) continue;
+              const hasSameColor =
+                "id" in event.reference
+                  ? session.color === event.reference.id
+                  : event.reference.ids.includes(session.color);
+              if (!hasSameColor) continue;
+              updateSession(session.id, undefined, {
+                color: undefined
+              });
             }
           }
         }
@@ -354,16 +395,16 @@ class EditorStore extends BaseStore<EditorStore> {
 
   refresh = async () => {};
 
-  updateSession = <T extends SessionType[]>(
+  updateSession = <T extends SessionType[] = SessionType[]>(
     id: string,
-    types: T,
+    types: T | undefined,
     partial:
       | Partial<SessionTypeMap[T[number]]>
       | ((session: SessionTypeMap[T[number]]) => void)
   ) => {
     this.set((state) => {
       const index = state.sessions.findIndex(
-        (s) => s.id === id && types.includes(s.type)
+        (s) => s.id === id && (!types || types.includes(s.type))
       );
       if (index === -1) return;
       const session = state.sessions[index] as SessionTypeMap[T[number]];

@@ -19,9 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { db } from "../common/db";
 import createStore from "../common/store";
-import { useEditorStore } from "./editor-store";
 import { store as appStore } from "./app-store";
-import { store as selectionStore } from "./selection-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
 import Config from "../utils/config";
@@ -71,30 +69,22 @@ class NoteStore extends BaseStore<NoteStore> {
   };
 
   delete = async (...ids: string[]) => {
-    const { closeSessions, getActiveSession } = useEditorStore.getState();
-    const session = getActiveSession();
-    if (session && session.id && ids.indexOf(session.id) > -1)
-      closeSessions(session.id);
     await db.notes.moveToTrash(...ids);
     await this.refresh();
   };
 
   pin = async (state: boolean, ...ids: string[]) => {
     await db.notes.pin(state, ...ids);
-    this.syncNoteWithEditor(ids, "pinned", state);
     await this.refresh();
   };
 
   favorite = async (state: boolean, ...ids: string[]) => {
     await db.notes.favorite(state, ...ids);
-    this.syncNoteWithEditor(ids, "favorite", state);
     await this.refresh();
   };
 
   unlock = async (id: string) => {
     return await Vault.unlockNote(id).then(async (res) => {
-      if (useEditorStore.getState().getActiveSession()?.id === id)
-        await useEditorStore.getState().openSession(id);
       await this.refresh();
       return res;
     });
@@ -103,13 +93,10 @@ class NoteStore extends BaseStore<NoteStore> {
   lock = async (id: string) => {
     if (!(await Vault.lockNote(id))) return false;
     await this.refresh();
-    if (useEditorStore.getState().getActiveSession()?.id === id)
-      await useEditorStore.getState().openSession(id, { force: true });
   };
 
   readonly = async (state: boolean, ...ids: string[]) => {
     await db.notes.readonly(state, ...ids);
-    this.syncNoteWithEditor(ids, "readonly", state);
     await this.refresh();
   };
 
@@ -120,12 +107,11 @@ class NoteStore extends BaseStore<NoteStore> {
 
   localOnly = async (state: boolean, ...ids: string[]) => {
     await db.notes.localOnly(state, ...ids);
-    this.syncNoteWithEditor(ids, "localOnly", state);
     await this.refresh();
   };
 
   setColor = async (colorId: string, isChecked: boolean, ...ids: string[]) => {
-    await db.relations.to({ type: "note", ids }, "color").unlink();
+    await db.relations.from({ type: "color", id: colorId }, "note").unlink();
     if (!isChecked) {
       for (const id of ids) {
         await db.relations.add(
@@ -135,20 +121,7 @@ class NoteStore extends BaseStore<NoteStore> {
       }
     }
     await appStore.refreshNavItems();
-    this.syncNoteWithEditor(ids, "color", colorId);
     await this.refresh();
-  };
-
-  private syncNoteWithEditor = (
-    noteIds: string[],
-    action: "favorite" | "pinned" | "readonly" | "localOnly" | "color",
-    value: boolean | string
-  ) => {
-    const { getActiveSession, toggle } = useEditorStore.getState();
-    const session = getActiveSession();
-    if (!session || !session.id || !noteIds.includes(session.id)) return false;
-    toggle(session.id, action, value);
-    return true;
   };
 }
 
