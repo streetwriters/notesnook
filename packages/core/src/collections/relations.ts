@@ -19,13 +19,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { makeId } from "../utils/id";
 import { ICollection } from "./collection";
-import { Relation, ItemMap, ItemReference, ValueOf, ItemType } from "../types";
+import {
+  Relation,
+  ItemMap,
+  ItemReference,
+  ItemReferences,
+  ValueOf,
+  UnlinkEvent
+} from "../types";
 import Database from "../api";
 import { FilteredSelector, SQLCollection } from "../database/sql-collection";
 import { DatabaseSchema, isFalse } from "../database";
 import { SelectQueryBuilder } from "kysely";
+import { EVENTS } from "../common";
 
-type ItemReferences = { type: ItemType; ids: string[] };
 export class Relations implements ICollection {
   name = "relations";
   readonly collection: SQLCollection<"relations", Relation>;
@@ -167,6 +174,21 @@ export class Relations implements ICollection {
           ])
       )
       .execute();
+
+    this.db.eventManager.publish(EVENTS.databaseUpdated, <UnlinkEvent>{
+      collection: "relations",
+      type: "unlink",
+      reference: { type: type, ids: ids || [] },
+      direction: "from",
+      types: Object.keys(TABLE_MAP)
+    });
+    this.db.eventManager.publish(EVENTS.databaseUpdated, <UnlinkEvent>{
+      collection: "relations",
+      type: "unlink",
+      reference: { type: type, ids: ids || [] },
+      direction: "to",
+      types: Object.keys(TABLE_MAP)
+    });
   }
 }
 
@@ -257,6 +279,14 @@ class RelationsArray<TType extends keyof RelatableTable> {
           ])
       )
       .execute();
+
+    this.db.eventManager.publish(EVENTS.databaseUpdated, <UnlinkEvent>{
+      collection: "relations",
+      type: "unlink",
+      reference: this.reference,
+      direction: this.direction,
+      types: this.types
+    });
   }
 
   async get() {
