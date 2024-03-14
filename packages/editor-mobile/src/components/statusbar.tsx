@@ -21,7 +21,13 @@ import React, { RefObject, useEffect, useRef, useState } from "react";
 import { getTotalWords, Editor } from "@notesnook/editor";
 import { useTabContext } from "../hooks/useTabStore";
 
-function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
+function StatusBar({
+  container,
+  loading
+}: {
+  container: RefObject<HTMLDivElement>;
+  loading?: boolean;
+}) {
   const [status, setStatus] = useState({
     date: "",
     saved: ""
@@ -106,7 +112,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
     <div
       style={{
         flexDirection: "row",
-        display: "flex",
+        display: loading ? "none" : "flex",
         paddingRight: 12,
         paddingLeft: 12,
         position: sticky ? "sticky" : "relative",
@@ -126,4 +132,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   );
 }
 
-export default React.memo(StatusBar, () => true);
+export default React.memo(
+  StatusBar,
+  (prev, next) => prev.loading === next.loading
+);

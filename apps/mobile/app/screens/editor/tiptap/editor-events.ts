@@ -45,5 +45,6 @@ export const EventTypes = {
   createInternalLink: "editor-events:create-internal-link",
   load: "editor-events:load",
   unlock: "editor-events:unlock",
-  unlockWithBiometrics: "editor-events:unlock-biometrics"
+  unlockWithBiometrics: "editor-events:unlock-biometrics",
+  disableReadonlyMode: "editor-events:disable-readonly-mode"
 };

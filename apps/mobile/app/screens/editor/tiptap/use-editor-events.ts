@@ -154,7 +154,6 @@ export const useEditorEvents = (
     state.dateFormat,
     state.timeFormat
   ]);
-
   const handleBack = useRef<NativeEventSubscription>();
   const isPremium = useUserStore((state) => state.premium);
   const { fontScale } = useWindowDimensions();
@@ -633,6 +632,25 @@ export const useEditorEvents = (
 
         case EventTypes.unlockWithBiometrics: {
           eSendEvent(eUnlockWithBiometrics);
+          break;
+        }
+
+        case EventTypes.disableReadonlyMode: {
+          const noteId = editorMessage.value;
+          if (noteId) {
+            await db.notes.readonly(false, noteId);
+            editor.note.current[noteId] = await db.notes?.note(noteId);
+            useTabStore
+              .getState()
+              .updateTab(useTabStore.getState().currentTab, {
+                readonly: false
+              });
+            Navigation.queueRoutesForUpdate();
+            ToastManager.show({
+              heading: "Readonly mode disabled.",
+              type: "success"
+            });
+          }
           break;
         }
 

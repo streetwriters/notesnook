@@ -37,7 +37,8 @@ import {
   eCloseActionSheet,
   eCloseVaultDialog,
   eOnLoadNote,
-  eOpenVaultDialog
+  eOpenVaultDialog,
+  eUpdateNoteInEditor
 } from "../../../utils/events";
 import { deleteItems } from "../../../utils/functions";
 import { tabBarRef } from "../../../utils/global-refs";
@@ -336,7 +337,26 @@ export class VaultDialog extends Component {
       let verified = await db.user.verifyPassword(this.password);
       if (!(await db.user.getUser())) verified = true;
       if (verified) {
+        let noteIds = [];
+        if (this.state.deleteAll) {
+          const vault = await db.vaults.default();
+          const relations = await db.relations.from(vault, "note").get();
+          noteIds = relations.map((item) => item.toId);
+        }
+
         await db.vault.delete(this.state.deleteAll);
+
+        noteIds.forEach((id) => {
+          eSendEvent(
+            eUpdateNoteInEditor,
+            {
+              id: id,
+              deleted: true
+            },
+            true
+          );
+        });
+
         eSendEvent("vaultUpdated");
         this.setState({
           loading: false
@@ -363,7 +383,22 @@ export class VaultDialog extends Component {
       loading: true
     });
     try {
+      const vault = await db.vaults.default();
+      const relations = await db.relations.from(vault, "note").get();
+      const noteIds = relations.map((item) => item.toId);
+
       await db.vault.clear(this.password);
+
+      noteIds.forEach((id) => {
+        eSendEvent(
+          eUpdateNoteInEditor,
+          {
+            id: id,
+            deleted: true
+          },
+          true
+        );
+      });
       this.setState({
         loading: false
       });
@@ -393,9 +428,9 @@ export class VaultDialog extends Component {
     } else {
       await db.vault.add(this.state.note.id);
 
-      // if (this.state.note.id === editorController.current?.note?.id) {
-      //   eSendEvent(eClearEditor, );
-      // }
+      console.log("update note event...");
+      eSendEvent(eUpdateNoteInEditor, this.state.note, true);
+
       this.close();
       ToastManager.show({
         message: "Note locked successfully",
@@ -500,10 +535,7 @@ export class VaultDialog extends Component {
     }
     if (this.state.note?.id) {
       await db.vault.add(this.state.note.id);
-      // TODO
-      // if (this.state.note.id === editorController.current?.note?.id) {
-      //   eSendEvent(eClearEditor);
-      // }
+      eSendEvent(eUpdateNoteInEditor, this.state.note, true);
       this.setState({
         loading: false
       });
@@ -533,6 +565,7 @@ export class VaultDialog extends Component {
           type: "success",
           context: "global"
         });
+        eSendEvent(eUpdateNoteInEditor, this.state.note, true);
         this.close();
       })
       .catch((e) => {

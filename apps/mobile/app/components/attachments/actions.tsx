@@ -40,7 +40,8 @@ import { useAttachmentStore } from "../../stores/use-attachment-store";
 import {
   eCloseAttachmentDialog,
   eCloseSheet,
-  eDBItemUpdate
+  eDBItemUpdate,
+  eOnLoadNote
 } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -53,6 +54,8 @@ import { Notice } from "../ui/notice";
 import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
+import { editorController } from "../../screens/editor/tiptap/utils";
 
 const Actions = ({
   attachment,
@@ -62,7 +65,7 @@ const Actions = ({
 }: {
   attachment: Attachment;
   setAttachments: (attachments?: VirtualizedGrouping<Attachment>) => void;
-  close: () => void;
+  close?: () => void;
   fwdRef: RefObject<ActionSheetRef>;
 }) => {
   const { colors } = useThemeColors();
@@ -103,7 +106,7 @@ const Actions = ({
           reupload: true,
           hash: attachment.hash,
           context: contextId,
-          type: attachment.type
+          type: attachment.mimeType.startsWith("image") ? "image" : "file"
         });
       },
       icon: "upload"
@@ -169,10 +172,27 @@ const Actions = ({
     {
       name: "Delete",
       onPress: async () => {
+        const relations = await db.relations.to(attachment, "note").get();
         await db.attachments.remove(attachment.hash, false);
         setAttachments();
         eSendEvent(eDBItemUpdate, attachment.id);
-        close();
+        relations
+          .map((relation) => relation.fromId)
+          .forEach(async (id) => {
+            const tab = useTabStore.getState().getTabForNote(id);
+            if (tab !== undefined) {
+              const isFocused = useTabStore.getState().currentTab === tab;
+              if (isFocused) {
+                eSendEvent(eOnLoadNote, {
+                  item: await db.notes.note(id),
+                  forced: true
+                });
+              } else {
+                editorController.current.commands.setLoading(true, tab);
+              }
+            }
+          });
+        close?.();
       },
       icon: "delete-outline"
     }

@@ -32,6 +32,7 @@ export type TabItem = {
   previewTab?: boolean;
   readonly?: boolean;
   locked?: boolean;
+  noteLocked?: boolean;
 };
 
 type NoteState = {

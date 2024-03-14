@@ -30,7 +30,8 @@ function Title({
   readonly,
   fontFamily,
   dateFormat,
-  timeFormat
+  timeFormat,
+  loading
 }: {
   controller: RefObject<EditorController>;
   title: string;
@@ -39,6 +40,7 @@ function Title({
   fontFamily: string;
   dateFormat: string;
   timeFormat: string;
+  loading?: boolean;
 }) {
   const tab = useTabContext();
   const titleRef = useRef<HTMLTextAreaElement>(null);
@@ -95,7 +97,8 @@ function Title({
           pointerEvents: "none",
           overflowWrap: "anywhere",
           paddingTop: 3,
-          whiteSpace: "break-spaces"
+          whiteSpace: "break-spaces",
+          display: loading ? "none" : undefined
         }}
       />
       <textarea
@@ -122,7 +125,8 @@ function Title({
           borderRadius: 0,
           overflow: "hidden",
           overflowX: "hidden",
-          overflowY: "hidden"
+          overflowY: "hidden",
+          display: loading ? "none" : undefined
         }}
         maxLength={1000}
         onInput={() => {
@@ -160,7 +164,8 @@ export default React.memo(Title, (prev, next) => {
     prev.title !== next.title ||
     prev.titlePlaceholder !== next.titlePlaceholder ||
     prev.readonly !== next.readonly ||
-    prev.fontFamily !== next.fontFamily
+    prev.fontFamily !== next.fontFamily ||
+    prev.loading !== next.loading
   )
     return false;
 

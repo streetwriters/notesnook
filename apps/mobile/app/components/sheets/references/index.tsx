@@ -242,7 +242,6 @@ const ListNoteItem = ({
           if (noteInternalLinks.length) return;
           setLoading(true);
           const blocks = await db.notes.contentBlocks(item.id);
-
           setNoteInternalLinks(
             blocks
               .filter((block) =>
@@ -272,7 +271,7 @@ const ListNoteItem = ({
     listType,
     noteInternalLinks.length
   ]);
-
+  console.log(noteInternalLinks);
   const renderBlock = React.useCallback(
     (block: ContentBlock) => (
       <ListBlockItem

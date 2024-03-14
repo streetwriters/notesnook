@@ -57,6 +57,7 @@ import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { syncTabs, useTabStore } from "./tiptap/use-tab-store";
 import { editorController, editorState } from "./tiptap/utils";
+import EditorOverlay from "./loading";
 
 const style: ViewStyle = {
   height: "100%",
@@ -173,8 +174,6 @@ const Editor = React.memo(
             autoManageStatusBarEnabled={false}
             onMessage={onMessage || undefined}
           />
-          {/* <EditorOverlay editorId={editorId || ""} editor={editor} /> */}
-          <ReadonlyButton editor={editor} />
           <LockOverlay />
         </>
       );
@@ -185,7 +184,6 @@ const Editor = React.memo(
 
 export default Editor;
 
-let LOADED = false;
 const LockOverlay = () => {
   const tab = useTabStore((state) =>
     state.tabs.find((t) => t.id === state.currentTab)
@@ -193,27 +191,19 @@ const LockOverlay = () => {
   const isAppLoading = useSettingStore((state) => state.isAppLoading);
   const [item] = useDBItem(isAppLoading ? undefined : tab?.noteId, "note");
   const tabRef = useRef(tab);
-
   tabRef.current = tab;
 
   useEffect(() => {
-    if (!isAppLoading && !LOADED) {
-      LOADED = true;
-      (async () => {
-        for (const tab of useTabStore.getState().tabs) {
-          const noteId = useTabStore.getState().getTab(tab.id)?.noteId;
-          if (!noteId) continue;
-          const note = await db.notes.note(noteId);
-          const locked = note && (await db.vaults.itemExists(note));
-          if (locked) {
-            useTabStore.getState().updateTab(tab.id, {
-              locked: true
-            });
-          }
-        }
-      })();
+    for (const tab of useTabStore.getState().tabs) {
+      const noteId = useTabStore.getState().getTab(tab.id)?.noteId;
+      if (!noteId) continue;
+      if (tab.noteLocked) {
+        useTabStore.getState().updateTab(tab.id, {
+          locked: true
+        });
+      }
     }
-  }, [isAppLoading]);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -352,44 +342,4 @@ const LockOverlay = () => {
   }, [item]);
 
   return null;
-};
-
-const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
-  const readonly = useTabStore(
-    (state) => state.tabs.find((t) => t.id === state.currentTab)?.readonly
-  );
-
-  const keyboard = useKeyboard();
-  const { colors } = useThemeColors();
-
-  const onPress = async () => {
-    const noteId = useTabStore
-      .getState()
-      .getNoteIdForTab(useTabStore.getState().currentTab);
-    if (noteId) {
-      await db.notes.readonly(!editor.note.current.readonly, noteId);
-      editor.note.current[noteId] = await db.notes?.note(noteId);
-
-      useTabStore.getState().updateTab(useTabStore.getState().currentTab, {
-        readonly: editor.note.current[noteId as string]?.readonly
-      });
-    }
-  };
-
-  return readonly && !keyboard.keyboardShown ? (
-    <IconButton
-      name="pencil-lock"
-      type="secondary"
-      onPress={onPress}
-      color={colors.primary.accent}
-      style={{
-        position: "absolute",
-        bottom: 60,
-        width: 60,
-        height: 60,
-        right: 12,
-        ...getElevationStyle(5)
-      }}
-    />
-  ) : null;
 };

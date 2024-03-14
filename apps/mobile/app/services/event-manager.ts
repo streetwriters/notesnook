@@ -76,8 +76,8 @@ export const eUnSubscribeEvent = <T = unknown>(
   eventManager.unsubscribe(eventName, action);
 };
 
-export const eSendEvent = (eventName: string, data?: unknown) => {
-  eventManager.publish(eventName, data);
+export const eSendEvent = (eventName: string, ...args: any[]) => {
+  eventManager.publish(eventName, ...args);
 };
 
 export const openVault = (data: Partial<Vault>) => {

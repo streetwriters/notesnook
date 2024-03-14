@@ -130,9 +130,9 @@ const Tiptap = ({
         });
       },
       element: getContentDiv(),
-      editable: !settings.readonly,
+      editable: !tab.readonly,
       editorProps: {
-        editable: () => !settings.readonly
+        editable: () => !tab.readonly
       },
       content: globalThis.editorControllers[tab.id]?.content?.current,
       isMobile: true,
@@ -168,7 +168,7 @@ const Tiptap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     getContentDiv,
-    settings.readonly,
+    tab.readonly,
     settings.doubleSpacedLines,
     settings.corsProxy,
     settings.dateFormat,
@@ -386,22 +386,22 @@ const Tiptap = ({
         >
           {settings.noHeader || tab.locked ? null : (
             <>
-              <Tags settings={settings} />
+              <Tags settings={settings} loading={controller.loading} />
+              <Title
+                titlePlaceholder={controller.titlePlaceholder}
+                readonly={settings.readonly}
+                controller={controllerRef}
+                title={controller.title}
+                fontFamily={settings.fontFamily}
+                dateFormat={settings.dateFormat}
+                timeFormat={settings.timeFormat}
+                loading={controller.loading}
+              />
 
-              {controller.loading ? null : (
-                <>
-                  <Title
-                    titlePlaceholder={controller.titlePlaceholder}
-                    readonly={settings.readonly}
-                    controller={controllerRef}
-                    title={controller.title}
-                    fontFamily={settings.fontFamily}
-                    dateFormat={settings.dateFormat}
-                    timeFormat={settings.timeFormat}
-                  />
-                  <StatusBar container={containerRef} />
-                </>
-              )}
+              <StatusBar
+                container={containerRef}
+                loading={controller.loading}
+              />
             </>
           )}
 

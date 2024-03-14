@@ -61,7 +61,7 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useUserStore } from "../stores/use-user-store";
 import Errors from "../utils/errors";
-import { eOpenLoginDialog } from "../utils/events";
+import { eOpenLoginDialog, eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
@@ -704,10 +704,11 @@ export const useActions = ({
       }
       try {
         await db.vault.add(item.id);
-        const note = await db.notes.note(item.id);
+        const locked = await db.vaults.itemExists(item);
         if (locked) {
           close();
           Navigation.queueRoutesForUpdate();
+          eSendEvent(eUpdateNoteInEditor, item, true);
         }
       } catch (e: any) {
         close();

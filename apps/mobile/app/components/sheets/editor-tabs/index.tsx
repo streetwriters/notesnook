@@ -16,11 +16,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Note } from "@notesnook/core";
+import { EVENTS } from "@notesnook/core/dist/common";
 import { useThemeColors } from "@notesnook/theme";
-import React from "react";
+import React, { useEffect } from "react";
 import { View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { db } from "../../../common/database";
 import { useDBItem } from "../../../hooks/use-db-item";
 import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../../screens/editor/tiptap/utils";
@@ -38,6 +41,8 @@ type TabItem = {
   noteId?: string;
   previewTab?: boolean;
   locked?: boolean;
+  noteLocked?: boolean;
+  readonly?: boolean;
 };
 
 const TabItemComponent = (props: {
@@ -46,7 +51,24 @@ const TabItemComponent = (props: {
   close?: (ctx?: string | undefined) => void;
 }) => {
   const { colors } = useThemeColors();
-  const [item] = useDBItem(props.tab.noteId, "note");
+  const [item, update] = useDBItem(props.tab.noteId, "note");
+
+  useEffect(() => {
+    const syncCompletedSubscription = db.eventManager?.subscribe(
+      EVENTS.syncItemMerged,
+      (data: Note) => {
+        if (data.type === "note") {
+          const tabId = useTabStore.getState().getTabForNote(data.id);
+          if (tabId !== undefined && item?.title !== data.title) {
+            update();
+          }
+        }
+      }
+    );
+    return () => {
+      syncCompletedSubscription?.unsubscribe();
+    };
+  }, [update, item]);
 
   return (
     <Pressable
@@ -87,7 +109,18 @@ const TabItemComponent = (props: {
           gap: 10
         }}
       >
-        {props.tab.locked ? <Icon size={SIZE.md} name="lock" /> : null}
+        {props.tab.noteLocked ? (
+          <>
+            {props.tab.locked ? (
+              <Icon size={SIZE.md} name="lock" />
+            ) : (
+              <Icon size={SIZE.md} name="lock-open-outline" />
+            )}
+          </>
+        ) : null}
+
+        {props.tab.readonly ? <Icon size={SIZE.md} name="pencil-lock" /> : null}
+
         <Paragraph
           color={
             props.isFocused
