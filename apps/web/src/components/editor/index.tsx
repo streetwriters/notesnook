@@ -174,7 +174,6 @@ function EditorView({
           !item ||
           isDeleted(item) ||
           (item.type !== "tiptap" && item.type !== "note") ||
-          lastChangedTime.current >= (item.dateEdited as number) ||
           !appstore.get().isRealtimeSyncEnabled
         ) {
           console.log("ignoring real time sync");
@@ -184,7 +183,7 @@ function EditorView({
         const isContent =
           item.type === "tiptap" && item.noteId === session.note.id;
         const isNote = item.type === "note" && item.id === session.note.id;
-        if (isContent) {
+        if (isContent && lastChangedTime.current < item.dateEdited) {
           if (!item.locked) return editor.updateContent(item.data);
 
           const result = await db.vault
@@ -192,15 +191,11 @@ function EditorView({
             .catch(() => EV.publish(EVENTS.vaultLocked));
           if (!result) return;
           editor.updateContent(result.data);
-        } else if (isNote) {
-          useEditorStore
-            .getState()
-            .updateSession(session.id, [session.type], { note: item });
-          if (item.title)
-            AppEventManager.publish(AppEvents.changeNoteTitle, {
-              title: item.title,
-              preventSave: true
-            });
+        } else if (isNote && session.note.title !== item.title) {
+          AppEventManager.publish(AppEvents.changeNoteTitle, {
+            title: item.title,
+            preventSave: true
+          });
         }
       }
     );
