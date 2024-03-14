@@ -22,7 +22,11 @@ import { isImage } from "@notesnook/core/dist/utils/filename";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import DocumentPicker from "react-native-document-picker";
-import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import {
+  ImagePickerResponse,
+  launchCamera,
+  launchImageLibrary
+} from "react-native-image-picker";
 import { DatabaseLogger, db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
 import { compressToFile } from "../../../common/filesystem/compress";
@@ -213,12 +217,22 @@ const gallery = async (options) => {
 
 /**
  *
- * @param {{
- *  noteId: string,
- * tabId: string,
+ * @typedef {{
+ *  noteId?: string,
+ * tabId?: string,
  * type: "image" | "camera" | "file"
  * reupload: boolean
  * hash?: string
+ * context?: string
+ * }} ImagePickerOptions
+ *
+ * @param {{
+ *  noteId?: string,
+ * tabId?: string,
+ * type: "image" | "camera" | "file"
+ * reupload: boolean
+ * hash?: string
+ * context?: string
  * }} options
  * @returns
  */
@@ -245,7 +259,12 @@ const pick = async (options) => {
     file(options);
   }
 };
-
+/**
+ *
+ * @param {ImagePickerResponse} response
+ * @param {ImagePickerOptions} options
+ * @returns
+ */
 const handleImageResponse = async (response, options) => {
   if (
     response.didCancel ||
@@ -296,6 +315,7 @@ const handleImageResponse = async (response, options) => {
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
     console.log("attaching image to note...");
     if (
+      options.tabId !== undefined &&
       useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
     ) {
       console.log("attaching image to note...");
@@ -315,20 +335,13 @@ const handleImageResponse = async (response, options) => {
 };
 
 /**
- * 
- * @param {*} uri 
- * @param {*} hash 
- * @param {*} type 
- * @param {*} filename 
-/**
- * @param {{
-*  noteId: string,
-* tabId: string,
-* type: "image" | "camera" | "file"
-* reupload: boolean
-* hash?: string
-* }} options
- * @returns 
+ *
+ * @param {string} uri
+ * @param {string} hash
+ * @param {string} type
+ * @param {string} filename
+ * @param {ImagePickerOptions} options
+ * @returns
  */
 export async function attachFile(uri, hash, type, filename, options) {
   try {

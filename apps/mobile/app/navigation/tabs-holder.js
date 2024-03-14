@@ -496,7 +496,11 @@ const _TabsHolder = () => {
               </View>
 
               <ScopedThemeProvider value="editor">
-                <EditorWrapper key="3" width={widths} dimensions={dimensions} />
+                <EditorWrapper
+                  key="3"
+                  widths={widths}
+                  dimensions={dimensions}
+                />
               </ScopedThemeProvider>
             </FluidTabs>
           ) : null}

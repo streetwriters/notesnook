@@ -18,9 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import create from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
-import { editorController } from "./utils";
 import { MMKV } from "../../../common/database/mmkv";
-import { db } from "../../../common/database";
+import { editorController } from "./utils";
 
 class History {
   history: number[];
@@ -76,6 +75,7 @@ export type TabItem = {
   previewTab?: boolean;
   readonly?: boolean;
   locked?: boolean;
+  noteLocked?: boolean;
 };
 
 const history = new History();

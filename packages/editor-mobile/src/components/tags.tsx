@@ -22,7 +22,7 @@ import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
 import { useTabContext } from "../hooks/useTabStore";
 
-function Tags(props: { settings: Settings }): JSX.Element {
+function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
   const [tags, setTags] = useState<
     { title: string; alias: string; id: string; type: "tag" }[]
   >([]);
@@ -56,7 +56,8 @@ function Tags(props: { settings: Settings }): JSX.Element {
         display: "flex",
         alignItems: "center",
         overflowX: "scroll",
-        minHeight: "40px"
+        minHeight: "40px",
+        opacity: props.loading ? 0 : 1
       }}
     >
       <button
@@ -135,6 +136,10 @@ function Tags(props: { settings: Settings }): JSX.Element {
 }
 
 export default React.memo(Tags, (prev, next) => {
-  if (prev.settings.fontScale !== next.settings.fontScale) return false;
+  if (
+    prev.settings.fontScale !== next.settings.fontScale ||
+    prev.loading !== next.loading
+  )
+    return false;
   return true;
 });

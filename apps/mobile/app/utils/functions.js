@@ -25,7 +25,7 @@ import Navigation from "../services/navigation";
 import { useMenuStore } from "../stores/use-menu-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
-import { eClearEditor, eOnNotebookUpdated } from "./events";
+import { eOnNotebookUpdated, eUpdateNoteInEditor } from "./events";
 import { getParentNotebookId } from "./notebooks";
 
 function confirmDeleteAllNotes(items, type, context) {
@@ -92,8 +92,17 @@ export const deleteItems = async (items, type, context) => {
         continue;
       }
       await db.notes.moveToTrash(id);
+
+      eSendEvent(
+        eUpdateNoteInEditor,
+        {
+          type: "trash",
+          id: id,
+          itemType: "note"
+        },
+        true
+      );
     }
-    eSendEvent(eClearEditor);
   } else if (type === "notebook") {
     const result = await confirmDeleteAllNotes(ids, "notebook", context);
     if (!result.delete) return;

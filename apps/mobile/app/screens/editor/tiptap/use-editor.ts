@@ -24,10 +24,13 @@ import { EVENTS } from "@notesnook/core/dist/common";
 import {
   ContentItem,
   ContentType,
+  DeletedItem,
   ItemReference,
   Note,
+  TrashItem,
   UnencryptedContentItem,
-  isDeleted
+  isDeleted,
+  isTrashItem
 } from "@notesnook/core/dist/types";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -38,17 +41,16 @@ import { DDS } from "../../../services/device-detection";
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
-  openVault
+  eUnSubscribeEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
 import { useTagStore } from "../../../stores/use-tag-store";
 import {
-  eClearEditor,
   eEditorTabFocused,
-  eOnLoadNote
+  eOnLoadNote,
+  eUpdateNoteInEditor
 } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 import { onNoteCreated } from "../../notes/common";
@@ -65,28 +67,6 @@ import {
   isEditorLoaded,
   post
 } from "./utils";
-
-// Keep a fixed session id, dont' change it when a new note is opened, session id can stay the same always I think once the app is opened. DONE
-// Editor will save any note content & title is recieved. and dispatch update to relavant tab always.
-
-// Editor keeps track of what tab is opened and which note is currently focused by keeping a synced zustand store with editor. DONE
-// the useEditor hook can recieve save messages for different notes at a time. DONE
-// When a note is created, the useEditor hook must immediately notify the editor with the note id and set the note id in the editor tabs store
-// so further changes will go into that note. DONE
-// Events sent to editor have the tab id value added to ensure the correct tab will recieve and return events only. DONE
-// The useEditorEvents hook can manage events from different tabs at the same time as long as the attached session id matches. DONE
-// useEditor hook will keep historySessionId for different notes instead of a single note. DONE
-//
-// LIST OF CASES TO VERIFY WITH TABS OPENING & CLOSING
-// 1. SWITCHING TAB CLOSES THE SHEET. DONE
-// 2. Closing the tab does proper cleanup if it's the last tab and is not empty. DONE
-// 3. Swiping left only focuses editor if current tab is empty. DONE
-// 4. Pressing + button will open a new tab for new note if an empty tab does not exist.
-// 5. Notes will always open in the preview tab.
-// 6. If a note is edited, the tab will become persisted.
-// 7. If note is already opened in a tab, we focus that tab.
-// 8. If app is killed, restore the note in  background.
-// 9. During realtimes sync, tabs not focused will be updated so if focused, they have the latest and updated content loaded.
 
 type NoteWithContent = Note & {
   content?: NoteContent<false>;
@@ -219,7 +199,8 @@ export const useEditor = (
       resetContent && (await commands.clearTags(tabId));
       useTabStore.getState().updateTab(tabId, {
         noteId: undefined,
-        locked: false
+        locked: false,
+        noteLocked: false
       });
     },
     [commands, editorSessionHistory, postMessage]
@@ -431,7 +412,8 @@ export const useEditor = (
             if (typeof tabId === "number") {
               useTabStore.getState().updateTab(tabId, {
                 readonly: event.item.readonly || readonly,
-                locked: noteIsLocked
+                locked: noteIsLocked,
+                noteLocked: noteIsLocked
               });
               useTabStore.getState().focusTab(tabId);
               setTimeout(() => {
@@ -448,7 +430,8 @@ export const useEditor = (
             // Otherwise we focus the preview tab or create one to open the note in.
             useTabStore.getState().focusPreviewTab(event.item.id, {
               readonly: event.item.readonly || readonly,
-              locked: noteIsLocked
+              locked: noteIsLocked,
+              noteLocked: noteIsLocked
             });
           }
         } else {
@@ -546,48 +529,103 @@ export const useEditor = (
     ]
   );
 
-  const lockNoteWithVault = useCallback((note: Note) => {
-    eSendEvent(eClearEditor);
-    openVault({
-      item: note,
-      novault: true,
-      locked: true,
-      goToEditor: true,
-      title: "Open note",
-      description: "Unlock note to open it in editor."
-    });
-  }, []);
-
   const onSyncComplete = useCallback(
-    async (data: Note | ContentItem) => {
-      if (SettingsService.get().disableRealtimeSync) return;
+    async (
+      data: Note | ContentItem | TrashItem | DeletedItem,
+      isLocal?: boolean
+    ) => {
+      console.log("Local changes in editor", isLocal, data?.id);
+      if (SettingsService.get().disableRealtimeSync && !isLocal) return;
       if (!data) return;
-      const noteId = data.type === "tiptap" ? data.noteId : data.id;
+
+      if (isDeleted(data) || isTrashItem(data)) {
+        const tabId = useTabStore.getState().getTabForNote(data.id);
+        if (tabId !== undefined) {
+          useTabStore.getState().removeTab(tabId);
+        }
+        return;
+      }
+
+      const noteId =
+        (data as ContentItem).type === "tiptap"
+          ? (data as ContentItem).noteId
+          : data.id;
 
       if (!useTabStore.getState().hasTabForNote(noteId)) return;
+      const tabId = useTabStore.getState().getTabForNote(noteId) as number;
 
-      const tabId = useTabStore.getState().getTabForNote(noteId);
-      const isContentEncrypted =
-        typeof (data as ContentItem)?.data === "object";
+      const tab = useTabStore.getState().getTab(tabId);
 
-      const note = await db.notes?.note(noteId);
-
-      if (lastContentChangeTime.current[noteId] >= (data as Note).dateEdited)
-        return;
+      const note = data.type === "note" ? data : await db.notes?.note(noteId);
 
       lock.current = true;
 
-      if (data.type === "tiptap" && note) {
-        // Handle this case where note was locked on another device and synced.
-        const locked = await db.vaults.itemExists(
-          currentNotes.current[note.id] as ItemReference
-        );
-        if (!locked && isContentEncrypted) {
-          lockNoteWithVault(note);
-        } else if (locked && isEncryptedContent(data)) {
+      // Handle this case where note was locked on another device and synced.
+      const locked = await db.vaults.itemExists(
+        currentNotes.current[noteId] as ItemReference
+      );
+
+      if (note) {
+        if (!locked && tab?.noteLocked) {
+          // Note lock removed.
+          if (tab.locked) {
+            if (useTabStore.getState().currentTab === tabId) {
+              eSendEvent(eOnLoadNote, {
+                item: note,
+                forced: true
+              });
+            } else {
+              useTabStore.getState().updateTab(tabId, {
+                locked: false,
+                noteLocked: false
+              });
+              commands.setLoading(true, tabId);
+            }
+          }
+        } else if (!tab?.noteLocked && locked) {
+          // Note lock added.
+          useTabStore.getState().updateTab(tabId, {
+            locked: true,
+            noteLocked: true
+          });
+          if (useTabStore.getState().currentTab !== tabId) {
+            commands.clearContent(tabId);
+            commands.setLoading(true, tabId);
+          }
+        }
+
+        if (currentNotes.current[noteId]?.title !== note.title) {
+          postMessage(EditorEvents.title, note.title, tabId);
+        }
+        commands.setTags(note);
+        if (currentNotes.current[noteId]?.dateEdited !== note.dateEdited) {
+          commands.setStatus(
+            getFormattedDate(note.dateEdited, "date-time"),
+            "Saved",
+            tabId as number
+          );
+        }
+
+        console.log("readonly state changed...", note.readonly);
+        useTabStore.getState().updateTab(tabId, {
+          readonly: note.readonly
+        });
+      }
+
+      if (data.type === "tiptap" && note && !isLocal) {
+        if (lastContentChangeTime.current[noteId] >= data.dateEdited) return;
+
+        if (locked && isEncryptedContent(data)) {
           const decryptedContent = await db.vault?.decryptContent(data, noteId);
           if (!decryptedContent) {
-            lockNoteWithVault(note);
+            useTabStore.getState().updateTab(tabId, {
+              locked: true,
+              noteLocked: true
+            });
+            if (useTabStore.getState().currentTab !== tabId) {
+              commands.clearContent(tabId);
+              commands.setLoading(true, tabId);
+            }
           } else {
             await postMessage(
               EditorEvents.updatehtml,
@@ -605,30 +643,20 @@ export const useEditor = (
             currentContents.current[note.id] = data as UnencryptedContentItem;
           }
         }
-      } else {
-        if (!note) return;
-        postMessage(EditorEvents.title, note.title, tabId);
-        commands.setTags(note);
-        commands.setStatus(
-          getFormattedDate(note.dateEdited, "date-time"),
-          "Saved",
-          tabId as number
-        );
       }
       lock.current = false;
     },
-    [lockNoteWithVault, postMessage, commands]
+    [postMessage, commands]
   );
 
   useEffect(() => {
-    const syncCompletedSubscription = db.eventManager?.subscribe(
-      EVENTS.syncItemMerged,
-      onSyncComplete
-    );
-    eSubscribeEvent(eOnLoadNote + editorId, loadNote);
+    const subs = [
+      db.eventManager.subscribe(EVENTS.syncItemMerged, onSyncComplete),
+      eSubscribeEvent(eOnLoadNote + editorId, loadNote),
+      eSubscribeEvent(eUpdateNoteInEditor, onSyncComplete)
+    ];
     return () => {
-      syncCompletedSubscription?.unsubscribe();
-      eUnSubscribeEvent(eOnLoadNote + editorId, loadNote);
+      subs.forEach((sub) => sub?.unsubscribe());
     };
   }, [editorId, loadNote, onSyncComplete]);
 

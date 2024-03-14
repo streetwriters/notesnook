@@ -171,3 +171,4 @@ export const eUnlockNote = "616";
 export const eOnChangeFluidTab = "617";
 export const eUnlockWithBiometrics = "618";
 export const eUnlockWithPassword = "619";
+export const eUpdateNoteInEditor = "620";

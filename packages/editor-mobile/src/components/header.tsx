@@ -26,6 +26,7 @@ import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import DotsVerticalIcon from "mdi-react/DotsVerticalIcon";
 import FullscreenIcon from "mdi-react/FullscreenIcon";
 import MagnifyIcon from "mdi-react/MagnifyIcon";
+import PencilLockIcon from "mdi-react/PencilLockIcon";
 import TableOfContentsIcon from "mdi-react/TableOfContentsIcon";
 import React, { useRef, useState } from "react";
 import { useSafeArea } from "../hooks/useSafeArea";
@@ -56,9 +57,11 @@ const Button = ({
   children,
   style,
   preventDefault = true,
-  fwdRef
+  fwdRef,
+  onClick
 }: {
-  onPress: () => void;
+  onPress?: () => void;
+  onClick?: (event: any) => void;
   children: React.ReactNode;
   style: React.CSSProperties;
   preventDefault?: boolean;
@@ -71,7 +74,8 @@ const Button = ({
       style={style}
       onMouseDown={(e) => {
         if (preventDefault) e.preventDefault();
-        onPress();
+        onPress?.();
+        onClick?.(e);
       }}
     >
       {children}
@@ -219,6 +223,41 @@ function Header({
               </Button>
             ) : null}
 
+            {tab.readonly ? (
+              <Button
+                onPress={() => {
+                  post(
+                    "editor-events:disable-readonly-mode",
+                    useTabStore
+                      .getState()
+                      .getNoteIdForTab(useTabStore.getState().currentTab)
+                  );
+                }}
+                fwdRef={btnRef}
+                preventDefault={false}
+                style={{
+                  borderWidth: 0,
+                  borderRadius: 100,
+                  color: "var(--nn_primary_accent)",
+                  marginRight: 12,
+                  width: 39,
+                  height: 39,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "relative"
+                }}
+              >
+                <PencilLockIcon
+                  size={25 * settings.fontScale}
+                  style={{
+                    position: "absolute"
+                  }}
+                  color="var(--nn_primary_accent)"
+                />
+              </Button>
+            ) : null}
+
             <Button
               onPress={() => {
                 post(EventTypes.showTabs, undefined, tab.id, tab.noteId);
@@ -263,10 +302,10 @@ function Header({
             </Button>
 
             <Button
+              fwdRef={btnRef}
               onPress={() => {
                 setOpen(!isOpen);
               }}
-              fwdRef={btnRef}
               preventDefault={false}
               style={{
                 borderWidth: 0,
@@ -293,7 +332,6 @@ function Header({
             <ControlledMenu
               align="end"
               anchorRef={btnRef}
-              transition
               state={isOpen ? "open" : "closed"}
               menuClassName={menuClassName}
               onClose={() => {
