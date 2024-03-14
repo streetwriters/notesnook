@@ -27,7 +27,17 @@ import { EV, EVENTS } from "@notesnook/core/dist/common";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
 import { setDocumentTitle } from "../utils/dom";
-import { BaseTrashItem, ContentItem, Note, Tag } from "@notesnook/core";
+import {
+  BaseTrashItem,
+  ContentItem,
+  DatabaseUpdatedEvent,
+  Item,
+  MaybeDeletedItem,
+  Note,
+  Tag,
+  isDeleted,
+  isTrashItem
+} from "@notesnook/core";
 import { NoteContent } from "@notesnook/core/dist/collections/session-content";
 import { Context } from "../components/list-container/types";
 import { showToast } from "../utils/toast";
@@ -195,6 +205,122 @@ class EditorStore extends BaseStore<EditorStore> {
       });
     });
 
+    db.eventManager.subscribe(
+      EVENTS.syncItemMerged,
+      (item?: MaybeDeletedItem<Item>) => {
+        if (!item) return;
+        const { sessions, closeSessions, updateSession, openSession } =
+          this.get();
+        const clearIds: string[] = [];
+        for (const session of sessions) {
+          if (session.type === "new") continue;
+          if (session.id !== item.id && session.note.id !== item.id) continue;
+
+          if (isDeleted(item) || isTrashItem(item)) clearIds.push(session.id);
+          // if a note is locked, reopen the session
+          else if (
+            session.type === "default" &&
+            !session.locked &&
+            item.type === "tiptap" &&
+            item.locked
+          ) {
+            openSession(item.id, { force: true, silent: true });
+          }
+          // if locked note is unlocked, reopen the session
+          else if (
+            session.type === "locked" ||
+            (session.type === "default" &&
+              session.locked &&
+              item.type === "tiptap" &&
+              !item.locked)
+          ) {
+            openSession(item.id, { force: true, silent: true });
+          }
+          // if a deleted note is restored, reopen the session
+          else if (session.type === "deleted" && item.type === "note") {
+            openSession(item.id, { force: true, silent: true });
+          }
+          // if a readonly note is made editable, reopen the session
+          else if (
+            session.type === "readonly" &&
+            item.type === "note" &&
+            !item.readonly
+          )
+            openSession(item.id, { force: true, silent: true });
+          // update the note in all sessions
+          else if (item.type === "note") {
+            updateSession(
+              session.id,
+              ["default", "readonly", "deleted", "locked"],
+              (session) => (session.note = item)
+            );
+          }
+        }
+        if (clearIds.length > 0) closeSessions(...clearIds);
+      }
+    );
+
+    db.eventManager.subscribe(
+      EVENTS.databaseUpdated,
+      (event: DatabaseUpdatedEvent) => {
+        const { sessions, openSession, closeSessions } = this.get();
+        const clearIds: string[] = [];
+        if (event.collection === "notes") {
+          // when a note is permanently deleted from trash
+          if (event.type === "softDelete" || event.type === "delete") {
+            clearIds.push(
+              ...event.ids.filter(
+                (id) =>
+                  sessions.findIndex(
+                    (s) => s.id === id || ("note" in s && s.note.id === id)
+                  ) > -1
+              )
+            );
+          } else if (event.type === "update") {
+            for (const session of sessions) {
+              if (
+                !event.ids.includes(session.id) &&
+                !("note" in session && event.ids.includes(session.note.id))
+              )
+                continue;
+
+              if (
+                // when a note's readonly property is toggled
+                (session.type === "readonly") !==
+                  !!(event.item as Note).readonly ||
+                // when a note is restored from trash
+                (session.type === "deleted") === (event.item.type !== "trash")
+              ) {
+                openSession(session.id, { force: true, silent: true });
+              } else if (
+                // when a note is moved to trash
+                (session.type !== "deleted") ===
+                (event.item.type === "trash")
+              )
+                clearIds.push(session.id);
+            }
+          }
+        } else if (event.collection === "content") {
+          if (event.type === "update") {
+            for (const session of sessions) {
+              const contentId =
+                session.type !== "new" && session.note.contentId;
+              if (!contentId || !event.ids.includes(contentId)) continue;
+
+              if (
+                // when a note is locked or unlocked
+                (session.type === "locked") !==
+                !!(event.item as ContentItem).locked
+              ) {
+                openSession(session.id, { force: true, silent: true });
+              }
+            }
+          }
+        }
+        if (clearIds.length > 0) closeSessions(...clearIds);
+      }
+    );
+
     const {
       openSession,
       openDiffSession,
@@ -226,15 +352,7 @@ class EditorStore extends BaseStore<EditorStore> {
     updateSession(session.id, ["readonly", "default"], { tags });
   };
 
-  refresh = async () => {
-    const { sessions, closeSessions } = this.get();
-    const clearIds = [];
-    for (const session of sessions) {
-      if ("note" in session && !(await db.notes.exists(session.note.id)))
-        clearIds.push(session.id);
-    }
-    if (clearIds.length > 0) closeSessions(...clearIds);
-  };
+  refresh = async () => {};
 
   updateSession = <T extends SessionType[]>(
     id: string,
@@ -317,7 +435,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
   openSession = async (
     noteOrId: string | Note | BaseTrashItem<Note>,
-    options: { force?: boolean; activeBlockId?: string } = {}
+    options: { force?: boolean; activeBlockId?: string; silent?: boolean } = {}
   ): Promise<void> => {
     const { getSession, openDiffSession } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
@@ -342,14 +460,17 @@ class EditorStore extends BaseStore<EditorStore> {
     const isLocked = await db.vaults.itemExists(note);
 
     if (isLocked && note.type !== "trash") {
-      this.addSession({
-        type: "locked",
-        id: note.id,
-        pinned: session?.pinned,
-        note,
-        preview: isPreview,
-        activeBlockId: options.activeBlockId
-      });
+      this.addSession(
+        {
+          type: "locked",
+          id: note.id,
+          pinned: session?.pinned,
+          note,
+          preview: isPreview,
+          activeBlockId: options.activeBlockId
+        },
+        !options.silent
+      );
     } else if (note.conflicted) {
       const content = note.contentId
         ? await db.content.get(note.contentId)
@@ -372,15 +493,18 @@ class EditorStore extends BaseStore<EditorStore> {
         return this.openSession(note, { ...options, force: true });
       }
 
-      this.addSession({
-        type: "conflicted",
-        content: content,
-        id: note.id,
-        pinned: session?.pinned,
-        note,
-        preview: isPreview,
-        activeBlockId: options.activeBlockId
-      });
+      this.addSession(
+        {
+          type: "conflicted",
+          content: content,
+          id: note.id,
+          pinned: session?.pinned,
+          note,
+          preview: isPreview,
+          activeBlockId: options.activeBlockId
+        },
+        !options.silent
+      );
     } else {
       const content = note.contentId
         ? await db.content.get(note.contentId)
@@ -392,40 +516,49 @@ class EditorStore extends BaseStore<EditorStore> {
       }
 
       if (note.type === "trash") {
-        this.addSession({
-          type: "deleted",
-          note,
-          id: note.id,
-          pinned: session?.pinned,
-          content,
-          activeBlockId: options.activeBlockId
-        });
+        this.addSession(
+          {
+            type: "deleted",
+            note,
+            id: note.id,
+            pinned: session?.pinned,
+            content,
+            activeBlockId: options.activeBlockId
+          },
+          !options.silent
+        );
       } else if (note.readonly) {
-        this.addSession({
-          type: "readonly",
-          note,
-          id: note.id,
-          pinned: session?.pinned,
-          content,
-          activeBlockId: options.activeBlockId
-        });
+        this.addSession(
+          {
+            type: "readonly",
+            note,
+            id: note.id,
+            pinned: session?.pinned,
+            content,
+            activeBlockId: options.activeBlockId
+          },
+          !options.silent
+        );
       } else {
         const attachmentsLength = await db.attachments
           .ofNote(note.id, "all")
           .count();
 
-        this.addSession({
-          type: "default",
-          id: note.id,
-          note,
-          saveState: SaveState.Saved,
-          sessionId: `${Date.now()}`,
-          attachmentsLength,
-          pinned: session?.pinned,
-          content,
-          preview: isPreview,
-          activeBlockId: options.activeBlockId
-        });
+        this.addSession(
+          {
+            type: "default",
+            id: note.id,
+            note,
+            saveState: SaveState.Saved,
+            sessionId: `${Date.now()}`,
+            attachmentsLength,
+            pinned: session?.pinned,
+            content,
+            preview: isPreview,
+            activeBlockId: options.activeBlockId
+          },
+          !options.silent
+        );
       }
     }
   };
