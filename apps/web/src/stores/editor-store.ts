@@ -667,7 +667,7 @@ class EditorStore extends BaseStore<EditorStore> {
           ? currentSession.sessionId
           : `${Date.now()}`;
 
-      if (isLockedSession(currentSession)) {
+      if (isLockedSession(currentSession) && partial.content) {
         await db.vault.save({
           content: partial.content,
           sessionId,
