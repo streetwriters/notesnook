@@ -358,7 +358,8 @@ function LinkedNote({
           textAlign: "left",
           display: "flex",
           justifyContent: "start",
-          alignItems: "center"
+          alignItems: "center",
+          borderBottom: isExpanded ? "none" : "1px solid var(--border)"
         }}
         onClick={() => useEditorStore.getState().openSession(item)}
       >
@@ -397,7 +398,8 @@ function LinkedNote({
                 width: "100%",
                 textAlign: "left",
                 display: "flex",
-                alignItems: "center"
+                alignItems: "center",
+                borderBottom: "1px solid var(--border)"
               }}
               onClick={() =>
                 useEditorStore
@@ -420,6 +422,7 @@ function LinkedNote({
               <Text
                 variant="body"
                 sx={{
+                  fontSize: "subBody",
                   fontFamily: "monospace",
                   whiteSpace: "pre-wrap"
                 }}
@@ -458,7 +461,8 @@ function ReferencedIn({
           textAlign: "left",
           display: "flex",
           justifyContent: "start",
-          alignItems: "center"
+          alignItems: "center",
+          borderBottom: isExpanded ? "none" : "1px solid var(--border)"
         }}
         onClick={() => useEditorStore.getState().openSession(item)}
       >
@@ -482,7 +486,7 @@ function ReferencedIn({
         >
           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </Box>
-        <Text>{item.title}</Text>
+        <Text variant="body">{item.title}</Text>
       </Button>
       {isExpanded
         ? blocks.map((block) => (
@@ -509,6 +513,7 @@ function ReferencedIn({
                   {link.map((slice) => (
                     <Text
                       key={slice.text}
+                      variant="body"
                       sx={{
                         color: slice.highlighted
                           ? "accent-selected"
