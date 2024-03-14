@@ -355,6 +355,9 @@ export default class Vault {
     }
 
     if (perm) {
+      await this.db.relations
+        .to({ id: noteId, type: "note" }, "vault")
+        .unlink();
       await this.db.notes.add({
         id: noteId,
         contentId: content.id,
