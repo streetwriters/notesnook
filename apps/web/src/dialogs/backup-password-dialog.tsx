@@ -21,7 +21,7 @@ import { useState } from "react";
 import { Perform } from "../common/dialog-controller";
 import Field from "../components/field";
 import Dialog from "../components/dialog";
-import { Box, Button } from "@theme-ui/components";
+import { Box, Button, Text } from "@theme-ui/components";
 
 export type PromptDialogProps = {
   onClose: Perform;
@@ -110,6 +110,12 @@ export default function BackupPasswordDialog(props: PromptDialogProps) {
           ? "Don't have encryption key? Use password."
           : "Forgot password? Use encryption key."}
       </Button>
+
+      {error && (
+        <Text as="div" mt={1} variant={"error"}>
+          {error}
+        </Text>
+      )}
     </Dialog>
   );
 }
