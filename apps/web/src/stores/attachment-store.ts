@@ -119,17 +119,22 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
   permanentDelete = async (attachment: Attachment) => {
     try {
       this._changeWorkingStatus(attachment.hash, "delete");
+      const linkedNotes = (
+        await db.relations
+          .to({ id: attachment.id, type: "attachment" }, "note")
+          .get()
+      ).map((l) => l.toId);
       if (await db.attachments.remove(attachment.hash, false)) {
         await this.get().refresh();
 
-        const session = useEditorStore.getState().getActiveSession(); //.id;
-        if (
-          session &&
-          (await db.relations
-            .to({ id: attachment.id, type: "attachment" }, "note")
-            .has(session.id))
-        ) {
-          useEditorStore.getState().closeSessions(session.id);
+        const { sessions, openSession } = useEditorStore.getState();
+        for (const session of sessions) {
+          if (
+            linkedNotes.includes(session.id) ||
+            ("note" in session && linkedNotes.includes(session.note.id))
+          )
+            continue;
+          await openSession(session.id, { force: true, silent: true });
         }
       }
     } catch (e) {
