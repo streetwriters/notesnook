@@ -102,7 +102,9 @@ interface TiptapStorage {
     attributes?: LinkAttributes
   ) => Promise<LinkAttributes | undefined>;
   getAttachmentData:
-    | ((attachment: Attachment) => Promise<string | undefined>)
+    | ((
+        attachment: Pick<Attachment, "hash" | "type">
+      ) => Promise<string | undefined>)
     | undefined;
 }
 
