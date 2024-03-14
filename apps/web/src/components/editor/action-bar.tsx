@@ -83,19 +83,6 @@ export function EditorActionBar() {
       onClick: () => useEditorStore.getState().toggleEditorMargins()
     },
     {
-      title: isFocusMode ? "Normal mode" : "Focus mode",
-      icon: isFocusMode ? FocusMode : NormalMode,
-      enabled: true,
-      hideOnMobile: true,
-      onClick: () => {
-        useAppStore.getState().toggleFocusMode();
-        if (document.fullscreenElement) exitFullscreen();
-        const id = useEditorStore.getState().activeSessionId;
-        const editor = id && useEditorManager.getState().getEditor(id);
-        if (editor) editor.editor?.focus();
-      }
-    },
-    {
       title: isFullscreen ? "Exit fullscreen" : "Enter fullscreen",
       icon: isFullscreen ? ExitFullscreen : Fullscreen,
       enabled: true,
@@ -111,12 +98,27 @@ export function EditorActionBar() {
       }
     },
     {
+      title: isFocusMode ? "Normal mode" : "Focus mode",
+      icon: isFocusMode ? FocusMode : NormalMode,
+      enabled: true,
+      hideOnMobile: true,
+      onClick: () => {
+        useAppStore.getState().toggleFocusMode();
+        if (document.fullscreenElement) exitFullscreen();
+        const id = useEditorStore.getState().activeSessionId;
+        const editor = id && useEditorManager.getState().getEditor(id);
+        if (editor) editor.editor?.focus();
+      }
+    },
+    {
       title: "Table of contents",
       icon: TableOfContents,
       enabled:
         activeSession &&
         activeSession.type !== "new" &&
-        activeSession.type !== "locked",
+        activeSession.type !== "locked" &&
+        activeSession.type !== "diff" &&
+        activeSession.type !== "conflicted",
       onClick: () => useEditorStore.getState().toggleTableOfContents()
     },
     {
@@ -126,7 +128,9 @@ export function EditorActionBar() {
         activeSession &&
         activeSession.type !== "new" &&
         activeSession.type !== "locked" &&
-        activeSession.type !== "readonly",
+        activeSession.type !== "readonly" &&
+        activeSession.type !== "diff" &&
+        activeSession.type !== "conflicted",
       onClick: editor?.startSearch
     },
     {
@@ -135,9 +139,9 @@ export function EditorActionBar() {
       enabled:
         activeSession &&
         activeSession.type !== "new" &&
-        activeSession.type !== "readonly" &&
         activeSession.type !== "locked" &&
         activeSession.type !== "diff" &&
+        activeSession.type !== "conflicted" &&
         !isFocusMode,
       onClick: () => useEditorStore.getState().toggleProperties()
     }
