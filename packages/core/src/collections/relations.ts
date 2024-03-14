@@ -24,12 +24,11 @@ import {
   ItemMap,
   ItemReference,
   ItemReferences,
-  ValueOf,
-  UnlinkEvent
+  ValueOf
 } from "../types";
 import Database from "../api";
 import { FilteredSelector, SQLCollection } from "../database/sql-collection";
-import { DatabaseSchema, isFalse } from "../database";
+import { DatabaseSchema, UnlinkEvent, isFalse } from "../database";
 import { SelectQueryBuilder } from "kysely";
 import { EVENTS } from "../common";
 

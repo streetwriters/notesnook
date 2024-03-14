@@ -26,9 +26,7 @@ import {
   Attachment,
   ContentItem,
   ContentType,
-  DeleteEvent,
   UnencryptedContentItem,
-  UpdateEvent,
   isDeleted
 } from "../types";
 import Database from "../api";
@@ -38,6 +36,7 @@ import { NoteContent } from "./session-content";
 import { InternalLink } from "../utils/internal-link";
 import { tinyToTiptap } from "../migrations";
 import { EVENTS } from "../common";
+import { DeleteEvent, UpdateEvent } from "../database";
 
 export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
   noteId,

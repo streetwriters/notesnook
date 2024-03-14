@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Database from "..";
 import { EVENTS } from "../../common";
+import { DatabaseUpdatedEvent } from "../../database";
 import { logger } from "../../logger";
-import { DatabaseUpdatedEvent } from "../../types";
 
 export class AutoSync {
   timeout = 0;
