@@ -97,12 +97,21 @@ export function ImageComponent(
     if (!inView) return;
     if (src || !hash || bloburl) return;
     (async function () {
-      const data = await editor.storage
-        .getAttachmentData?.(node.attrs)
-        .catch(() => null);
-      if (typeof data !== "string" || !data) return; // TODO: show error
+      const { hash, filename, mime, size } = node.attrs;
+      if (!!hash && !!filename && !!mime && !!size) {
+        const data = await editor.storage
+          .getAttachmentData?.({
+            type: "image",
+            hash,
+            filename,
+            mime,
+            size
+          })
+          .catch(() => null);
+        if (typeof data !== "string" || !data) return; // TODO: show error
 
-      setBloburl(toBlobURL(data, "image", node.attrs.mime, hash));
+        setBloburl(toBlobURL(data, "image", node.attrs.mime, hash));
+      }
     })();
   }, [inView]);
 

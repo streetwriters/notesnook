@@ -101,7 +101,9 @@ interface TiptapStorage {
   createInternalLink?: (
     attributes?: LinkAttributes
   ) => Promise<LinkAttributes | undefined>;
-  getAttachmentData: (attachment: Attachment) => Promise<string | undefined>;
+  getAttachmentData:
+    | ((attachment: Attachment) => Promise<string | undefined>)
+    | undefined;
 }
 
 declare module "@tiptap/core" {
