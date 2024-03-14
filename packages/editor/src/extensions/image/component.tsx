@@ -97,15 +97,12 @@ export function ImageComponent(
     if (!inView) return;
     if (src || !hash || bloburl) return;
     (async function () {
-      const { hash, filename, mime, size } = node.attrs;
-      if (!!hash && !!filename && !!mime && !!size) {
+      const { hash } = node.attrs;
+      if (hash) {
         const data = await editor.storage
           .getAttachmentData?.({
             type: "image",
-            hash,
-            filename,
-            mime,
-            size
+            hash
           })
           .catch(() => null);
         if (typeof data !== "string" || !data) return; // TODO: show error
