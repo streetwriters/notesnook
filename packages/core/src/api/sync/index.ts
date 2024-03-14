@@ -266,8 +266,10 @@ class Sync {
   }
 
   async stop() {
-    // refresh monographs on sync completed
+    // refresh monographs
     await this.db.monographs.refresh();
+    // update trash cache
+    await this.db.trash.buildCache();
 
     this.logger.info("Stopping sync");
     await this.db.setLastSynced(Date.now());
@@ -299,7 +301,6 @@ class Sync {
    * @private
    */
   async onPushCompleted() {
-    console.log("PUSH COMPLETED!");
     this.db.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
   }
 
