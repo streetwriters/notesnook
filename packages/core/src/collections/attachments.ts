@@ -213,6 +213,7 @@ export class Attachments implements ICollection {
         await this.detach(attachment);
       }
       await this.collection.softDelete([attachment.id]);
+      await this.db.relations.from(attachment, "note").unlink();
       return true;
     }
     return false;
@@ -221,8 +222,9 @@ export class Attachments implements ICollection {
   async detach(attachment: Attachment) {
     for (const note of await this.db.relations
       .from(attachment, "note")
-      .resolve()) {
-      if (!note || !note.contentId) continue;
+      .selector.fields(["notes.contentId"])
+      .items()) {
+      if (!note.contentId) continue;
       await this.db.content.removeAttachments(note.contentId, [
         attachment.hash
       ]);
@@ -230,8 +232,11 @@ export class Attachments implements ICollection {
   }
 
   private async canDetach(attachment: Attachment) {
-    return (await this.db.relations.from(attachment, "note").resolve()).every(
-      (note) => !note.locked
+    const linkedNotes = await this.db.relations.from(attachment, "note").get();
+    return (
+      (await this.db.relations
+        .to({ ids: linkedNotes.map((n) => n.toId), type: "note" }, "vault")
+        .count()) > 0
     );
   }
 
