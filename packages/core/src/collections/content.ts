@@ -26,7 +26,9 @@ import {
   Attachment,
   ContentItem,
   ContentType,
+  DeleteEvent,
   UnencryptedContentItem,
+  UpdateEvent,
   isDeleted
 } from "../types";
 import Database from "../api";
@@ -35,6 +37,7 @@ import { SQLCollection } from "../database/sql-collection";
 import { NoteContent } from "./session-content";
 import { InternalLink } from "../utils/internal-link";
 import { tinyToTiptap } from "../migrations";
+import { EVENTS } from "../common";
 
 export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
   noteId,
@@ -178,8 +181,8 @@ export class Content implements ICollection {
     return this.collection.softDelete(ids);
   }
 
-  removeByNoteId(...ids: string[]) {
-    return this.db
+  async removeByNoteId(...ids: string[]) {
+    await this.db
       .sql()
       .replaceInto("content")
       .columns(["id", "dateModified", "deleted"])
@@ -194,6 +197,12 @@ export class Content implements ICollection {
           ])
       )
       .execute();
+
+    this.db.eventManager.publish(EVENTS.databaseUpdated, <DeleteEvent>{
+      collection: "content",
+      type: "softDelete",
+      ids
+    });
   }
 
   async updateByNoteId(partial: Partial<ContentItem>, ...ids: string[]) {
@@ -206,6 +215,13 @@ export class Content implements ICollection {
         dateModified: Date.now()
       })
       .execute();
+
+    this.db.eventManager.publish(EVENTS.databaseUpdated, <UpdateEvent>{
+      collection: "content",
+      type: "update",
+      ids,
+      item: partial
+    });
   }
 
   async findByNoteId(noteId: string) {
