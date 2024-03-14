@@ -203,11 +203,15 @@ function EditorProperties(props: EditorPropertiesProps) {
               <Colors noteId={session.note.id} color={session.color} />
             )}
           </Section>
-          <InternalLinks noteId={session.note.id} />
-          <Notebooks noteId={session.note.id} />
-          <Reminders noteId={session.note.id} />
-          <Attachments noteId={session.note.id} />
-          <SessionHistory noteId={session.note.id} />
+          {session.type === "deleted" ? null : (
+            <>
+              <InternalLinks noteId={session.note.id} />
+              <Notebooks noteId={session.note.id} />
+              <Reminders noteId={session.note.id} />
+              <Attachments noteId={session.note.id} />
+              <SessionHistory noteId={session.note.id} />
+            </>
+          )}
         </ScrollContainer>
       </ScopedThemeProvider>
     </AnimatedFlex>
