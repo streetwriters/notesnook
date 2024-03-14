@@ -114,7 +114,6 @@ function EditorProperties(props: EditorPropertiesProps) {
   const session = useEditorStore((store) =>
     store.getSession(props.session.id, [props.session.type])
   );
-  console.log(session);
   if (isFocusMode || !session) return null;
   return (
     <AnimatedFlex
@@ -169,7 +168,11 @@ function EditorProperties(props: EditorPropertiesProps) {
                   <Toggle
                     {...tool}
                     key={tool.key}
-                    isOn={!!session.note[tool.property]}
+                    isOn={
+                      tool.property === "locked"
+                        ? "locked" in session && !!session.locked
+                        : !!session.note[tool.property]
+                    }
                     onToggle={() => changeToggleState(tool.key, session)}
                     testId={`properties-${tool.key}`}
                   />
@@ -720,18 +723,13 @@ function changeToggleState(
   prop: "lock" | "readonly" | "local-only" | "pin" | "favorite",
   session: ReadonlyEditorSession | DefaultEditorSession
 ) {
-  const {
-    id: sessionId,
-    locked,
-    readonly,
-    localOnly,
-    pinned,
-    favorite
-  } = session.note;
+  const { id: sessionId, readonly, localOnly, pinned, favorite } = session.note;
   if (!sessionId) return;
   switch (prop) {
     case "lock":
-      return locked ? noteStore.unlock(sessionId) : noteStore.lock(sessionId);
+      return "locked" in session && session.locked
+        ? noteStore.unlock(sessionId)
+        : noteStore.lock(sessionId);
     case "readonly":
       return noteStore.readonly(!readonly, sessionId);
     case "local-only":
