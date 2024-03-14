@@ -57,6 +57,9 @@ const hashroutes = defineRoutes({
   "/tags/create": () => {
     showCreateTagDialog().then(afterAction);
   },
+  "/notes/:noteId/create": ({ noteId }) => {
+    useEditorStore.getState().openSession(noteId);
+  },
   "/notes/:noteId/edit": ({ noteId }) => {
     useEditorStore.getState().openSession(noteId);
   },

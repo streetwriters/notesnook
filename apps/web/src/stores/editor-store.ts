@@ -45,6 +45,7 @@ import { getId } from "@notesnook/core/dist/utils/id";
 import { createJSONStorage } from "zustand/middleware";
 import { getFormattedHistorySessionDate } from "@notesnook/common";
 import { isCipher } from "@notesnook/core/dist/database/crypto";
+import { hashNavigate } from "../navigation";
 
 export enum SaveState {
   NotSaved = -1,
@@ -414,6 +415,8 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   activateSession = (id?: string, activeBlockId?: string) => {
+    if (!id) hashNavigate(`/`, { replace: true, notify: false });
+
     const session = this.get().sessions.find((s) => s.id === id);
     if (!session) id = undefined;
 
@@ -434,6 +437,9 @@ class EditorStore extends BaseStore<EditorStore> {
       const { history } = this.get();
       if (history.includes(id)) history.splice(history.indexOf(id), 1);
       history.push(id);
+      if (session?.type === "new")
+        hashNavigate(`/notes/${id}/create`, { replace: true, notify: false });
+      else hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
     }
 
     if (activeBlockId && session)
@@ -755,8 +761,7 @@ class EditorStore extends BaseStore<EditorStore> {
       console.error(err);
       if (err instanceof Error) logger.error(err);
       if (isLockedSession(currentSession)) {
-        // TODO:
-        // hashNavigate(`/notes/${id}/unlock`, { replace: true });
+        this.get().openSession(id, { force: true });
       }
     }
   };
