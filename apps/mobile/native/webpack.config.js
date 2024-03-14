@@ -216,6 +216,9 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+@trpc[/\\]react-query/,
             /node_modules(.*[/\\])+katex/,
             /node_modules(.*[/\\])+@notesnook[/\\]core/,
+            /node_modules(.*[/\\])+whatwg-url-without-unicode/,
+            /node_modules(.*[/\\])+whatwg-url/,
+            /node_modules(.*[/\\])+react-native-url-polyfill/,
           ],
           use: {
             loader: "babel-loader",
