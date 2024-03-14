@@ -41,6 +41,7 @@ export default function BackupPasswordDialog(props: PromptDialogProps) {
   return (
     <Dialog
       isOpen={true}
+      testId="password-dialog"
       title={"Encrypted backup"}
       description={
         "Please enter the password to decrypt and restore this backup."
@@ -86,7 +87,7 @@ export default function BackupPasswordDialog(props: PromptDialogProps) {
           <Field
             required
             autoFocus
-            data-test-id="dialog-key"
+            data-test-id="encryption-key"
             label="Encryption key"
             type="password"
             id="key"
@@ -96,7 +97,7 @@ export default function BackupPasswordDialog(props: PromptDialogProps) {
           <Field
             required
             autoFocus
-            data-test-id="dialog-password"
+            data-test-id="password"
             label="Password"
             type="password"
             autoComplete="current-password"

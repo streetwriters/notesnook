@@ -28,8 +28,6 @@ export class EditorModel {
   private readonly tagInput: Locator;
   private readonly focusModeButton: Locator;
   private readonly normalModeButton: Locator;
-  private readonly darkModeButton: Locator;
-  private readonly lightModeButton: Locator;
   private readonly enterFullscreenButton: Locator;
   private readonly exitFullscreenButton: Locator;
   private readonly wordCountText: Locator;
@@ -41,14 +39,16 @@ export class EditorModel {
 
   constructor(page: Page) {
     this.page = page;
-    this.title = page.locator(getTestId("editor-title"));
-    this.content = page.locator(".ProseMirror");
-    this.tagInput = page.locator(getTestId("editor-tag-input"));
-    this.tags = page.locator(`${getTestId("tags")} >> ${getTestId("tag")}`);
+    this.title = page.locator(".active").locator(getTestId("editor-title"));
+    this.content = page.locator(".active").locator(".ProseMirror");
+    this.tagInput = page
+      .locator(".active")
+      .locator(getTestId("editor-tag-input"));
+    this.tags = page
+      .locator(".active")
+      .locator(`${getTestId("tags")} >> ${getTestId("tag")}`);
     this.focusModeButton = page.locator(getTestId("Focus mode"));
     this.normalModeButton = page.locator(getTestId("Normal mode"));
-    this.darkModeButton = page.locator(getTestId("Dark mode"));
-    this.lightModeButton = page.locator(getTestId("Light mode"));
     this.enterFullscreenButton = page.locator(getTestId("Enter fullscreen"));
     this.exitFullscreenButton = page.locator(getTestId("Exit fullscreen"));
     this.wordCountText = page.locator(getTestId("editor-word-count"));
@@ -67,7 +67,7 @@ export class EditorModel {
     await this.page.waitForFunction(
       ({ expected }) => {
         const titleInput = document.querySelector(
-          `[data-test-id="editor-title"]`
+          `.active [data-test-id="editor-title"]`
         ) as HTMLInputElement | null;
         if (titleInput)
           return expected !== undefined
@@ -83,16 +83,20 @@ export class EditorModel {
   }
 
   async waitForUnloading() {
-    await this.page.waitForURL(/#\/notes\/create\/\d+/gm);
-    await this.searchButton.waitFor({ state: "hidden" });
-    await this.page.locator(getTestId("tags")).waitFor({ state: "hidden" });
-    await this.wordCountText.waitFor({ state: "hidden" });
+    await this.page.waitForURL(/#\/notes\/?.+\/create/gm);
+    await this.searchButton.isDisabled();
+    await this.page
+      .locator(".active")
+      .locator(getTestId("tags"))
+      .waitFor({ state: "hidden" });
+    await this.dateEditedText.waitFor({ state: "hidden" });
+    await this.wordCountText.waitFor();
     await this.waitForLoading("", "");
   }
 
   async waitForSaving() {
     await this.page.waitForURL(/#\/notes\/?.+\/edit/gm);
-    await this.page.locator(getTestId("tags")).waitFor();
+    await this.page.locator(".active").locator(getTestId("tags")).waitFor();
     await this.searchButton.waitFor();
     await this.wordCountText.waitFor();
   }
@@ -100,9 +104,8 @@ export class EditorModel {
   async isUnloaded() {
     return (
       (await this.tagInput.isHidden()) &&
-      (await this.darkModeButton.isHidden()) &&
       (await this.enterFullscreenButton.isHidden()) &&
-      (await this.wordCountText.isHidden())
+      (await this.dateEditedText.isHidden())
     );
   }
 
@@ -209,20 +212,6 @@ export class EditorModel {
 
   async isFocusMode() {
     return await this.normalModeButton.isVisible();
-  }
-
-  async enterDarkMode() {
-    await this.darkModeButton.click();
-    await this.lightModeButton.waitFor();
-  }
-
-  async exitDarkMode() {
-    await this.lightModeButton.click();
-    await this.darkModeButton.waitFor();
-  }
-
-  async isDarkMode() {
-    return await this.lightModeButton.isVisible();
   }
 
   async enterFullscreen() {
