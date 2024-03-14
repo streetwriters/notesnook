@@ -391,10 +391,10 @@ export function showEditTagDialog(tag: Tag) {
         if (!title) return;
         await db.tags.add({ id: tag.id, title });
         showToast("success", "Tag edited!");
-        tagStore.refresh();
-        useEditorStore.getState().refreshTags();
-        noteStore.refresh();
-        appStore.refreshNavItems();
+        await tagStore.refresh();
+        await useEditorStore.getState().refreshTags();
+        await noteStore.refresh();
+        await appStore.refreshNavItems();
         perform(true);
       }}
     />
