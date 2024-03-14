@@ -174,6 +174,7 @@ const Editor = React.memo(
             autoManageStatusBarEnabled={false}
             onMessage={onMessage || undefined}
           />
+          <EditorOverlay editor={editor} editorId={editorId} />
           <LockOverlay />
         </>
       );
