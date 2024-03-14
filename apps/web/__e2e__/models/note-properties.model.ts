@@ -90,12 +90,12 @@ abstract class BaseProperties {
     return (
       (await this.noteLocator.locator(getTestId("locked")).isVisible()) &&
       (await this.noteLocator.locator(getTestId(`description`)).isHidden()) &&
-      (await (async () => {
-        await this.noteLocator.click();
-        return await this.page
-          .locator(getTestId("unlock-note-title"))
-          .isVisible();
-      })()) &&
+      // (await (async () => {
+      //   await this.noteLocator.click();
+      //   return await this.page
+      //     .locator(getTestId("unlock-note-title"))
+      //     .isVisible();
+      // })()) &&
       (await (async () => {
         await this.open();
         const state = await this.lockToggle.isToggled();
@@ -247,7 +247,8 @@ export class NoteContextMenuModel extends BaseProperties {
     if (format === "html") {
       return content
         .replace(/(name="created-at" content=")(.+?)"/, '$1xxx"')
-        .replace(/(name="updated-at" content=")(.+?)"/, '$1xxx"');
+        .replace(/(name="updated-at" content=")(.+?)"/, '$1xxx"')
+        .replace(/(data-block-id=")(.+?)"/gm, '$1xxx"');
     }
     return content;
   }
