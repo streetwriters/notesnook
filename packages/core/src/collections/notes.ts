@@ -387,13 +387,9 @@ export class Notes implements ICollection {
   }
 
   async removeFromAllNotebooks(...noteIds: string[]) {
-    await this.db.transaction(async () => {
-      for (const noteId of noteIds) {
-        await this.db.relations
-          .to({ type: "note", id: noteId }, "notebook")
-          .unlink();
-      }
-    });
+    await this.db.relations
+      .to({ type: "note", ids: noteIds }, "notebook")
+      .unlink();
   }
 
   async contentBlocks(id: string) {
