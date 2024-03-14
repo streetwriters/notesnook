@@ -21,6 +21,7 @@ import { Flex, Text } from "@theme-ui/components";
 import { SaveState, useEditorStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
 import { useNoteStatistics } from "./manager";
+import { getFormattedDate } from "@notesnook/common";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -30,23 +31,35 @@ const SAVE_STATE_ICON_MAP = {
 
 function EditorFooter() {
   const { words } = useNoteStatistics();
-  const saveState = useEditorStore(
-    (store) => store.getActiveSession(["default"])?.saveState
-  );
+  const session = useEditorStore((store) => store.getActiveSession());
+  if (!session) return null;
+
+  const saveState = session.type === "default" ? session.saveState : null;
+  const dateEdited = "note" in session ? session.note.dateEdited : 0;
   const SaveStateIcon = saveState ? SAVE_STATE_ICON_MAP[saveState] : null;
 
   return (
-    <Flex sx={{ alignItems: "center" }}>
+    <Flex sx={{ alignItems: "center", gap: 2 }}>
       <Text
         className="selectable"
         data-test-id="editor-word-count"
         variant="subBody"
-        mr={2}
         sx={{ color: "paragraph" }}
       >
         {words.total + " words"}
         {words.selected ? ` (${words.selected} selected)` : ""}
       </Text>
+      {dateEdited > 0 ? (
+        <Text
+          className="selectable"
+          variant="subBody"
+          sx={{ color: "paragraph" }}
+          data-test-id="editor-date-edited"
+          title={dateEdited.toString()}
+        >
+          {getFormattedDate(dateEdited)}
+        </Text>
+      ) : null}
       {SaveStateIcon && (
         <SaveStateIcon
           size={13}
