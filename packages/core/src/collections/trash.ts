@@ -38,6 +38,13 @@ export default class Trash {
 
   async init() {
     await this.cleanup();
+    await this.buildCache();
+  }
+
+  async buildCache() {
+    this.cache.notes = [];
+    this.cache.notebooks = [];
+
     const result = await this.db
       .sql()
       .selectFrom("notes")
