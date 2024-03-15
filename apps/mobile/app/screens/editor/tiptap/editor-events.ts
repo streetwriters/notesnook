@@ -46,5 +46,6 @@ export const EventTypes = {
   load: "editor-events:load",
   unlock: "editor-events:unlock",
   unlockWithBiometrics: "editor-events:unlock-biometrics",
-  disableReadonlyMode: "editor-events:disable-readonly-mode"
+  disableReadonlyMode: "editor-events:disable-readonly-mode",
+  readonlyEditorLoaded: "readonlyEditorLoaded"
 };

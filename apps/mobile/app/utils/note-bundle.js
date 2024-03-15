@@ -123,7 +123,7 @@ async function createNotes(bundle) {
 
     if (attached) {
       if (isImage(file.type)) {
-        content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" />`;
+        content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" />`;
       } else {
         content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" /></p>`;
       }

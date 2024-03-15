@@ -26,16 +26,14 @@ import { DDS } from "../../../services/device-detection";
 import {
   eSendEvent,
   hideSheet,
-  openVault,
   presentSheet
 } from "../../../services/event-manager";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
-
+import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
 import NotePreview from "../../note-history/preview";
 import SelectionWrapper from "../selection-wrapper";
-import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
 
 export const openNote = async (
   item: Note,
@@ -64,7 +62,7 @@ export const openNote = async (
     return;
   }
 
-  if (note.conflicted) {
+  if (!note.conflicted) {
     eSendEvent(eShowMergeDialog, note);
     return;
   }
@@ -74,9 +72,7 @@ export const openNote = async (
 
     const content = await db.content.get(note.contentId as string);
     presentSheet({
-      component: (
-        <NotePreview note={item} content={{ type: "tiptap", data: content }} />
-      )
+      component: <NotePreview note={item} content={content} />
     });
   } else {
     eSendEvent(eOnLoadNote, {
