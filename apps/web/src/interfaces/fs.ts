@@ -446,18 +446,19 @@ function reportProgress(
 }
 
 async function downloadFile(filename: string, requestOptions: RequestOptions) {
-  const { url, headers, chunkSize, signal } = requestOptions;
-  const handle = await streamablefs.readFile(filename);
-
-  if (
-    handle &&
-    handle.file.size === (await handle.size()) - handle.file.chunks * ABYTES
-  )
-    return true;
-  else if (handle) await handle.delete();
-
-  const attachment = db.attachments?.attachment(filename);
   try {
+    const { url, headers, chunkSize, signal } = requestOptions;
+    const handle = await streamablefs.readFile(filename);
+
+    if (
+      handle &&
+      handle.file.size === (await handle.size()) - handle.file.chunks * ABYTES
+    )
+      return true;
+    else if (handle) await handle.delete();
+
+    const attachment = db.attachments?.attachment(filename);
+
     reportProgress(
       { total: 100, loaded: 0 },
       { type: "download", hash: filename }

@@ -40,46 +40,51 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
     super({
       start() {},
       async pull(controller) {
-        if (signal?.aborted) {
-          controller.close();
-          return;
-        }
+        try {
+          if (signal?.aborted) {
+            controller.close();
+            return;
+          }
 
-        onProgress && onProgress(index);
-        const attachment = attachments[index++];
+          onProgress && onProgress(index);
+          const attachment = attachments[index++];
 
-        await db.fs?.downloadFile(
-          GROUP_ID,
-          attachment.metadata.hash,
-          attachment.chunkSize,
-          attachment.metadata
-        );
+          await db.fs?.downloadFile(
+            GROUP_ID,
+            attachment.metadata.hash,
+            attachment.chunkSize,
+            attachment.metadata
+          );
 
-        const key = await db.attachments?.decryptKey(attachment.key);
-        const file = await lazify(
-          import("../../interfaces/fs"),
-          ({ decryptFile }) =>
-            decryptFile(attachment.metadata.hash, {
-              key,
-              iv: attachment.iv,
-              name: attachment.metadata.filename,
-              type: attachment.metadata.type,
-              isUploaded: !!attachment.dateUploaded
-            })
-        );
+          const key = await db.attachments?.decryptKey(attachment.key);
+          const file = await lazify(
+            import("../../interfaces/fs"),
+            ({ decryptFile }) =>
+              decryptFile(attachment.metadata.hash, {
+                key,
+                iv: attachment.iv,
+                name: attachment.metadata.filename,
+                type: attachment.metadata.type,
+                isUploaded: !!attachment.dateUploaded
+              })
+          );
 
-        if (file) {
-          const filePath: string = attachment.metadata.filename;
-          controller.enqueue({
-            path: makeUniqueFilename(filePath, counters),
-            data: new Uint8Array(await file.arrayBuffer())
-          });
-        } else {
-          controller.error(new Error("Failed to decrypt file."));
-        }
-
-        if (index === attachments.length) {
-          controller.close();
+          if (file) {
+            const filePath: string = attachment.metadata.filename;
+            controller.enqueue({
+              path: makeUniqueFilename(filePath, counters),
+              data: new Uint8Array(await file.arrayBuffer())
+            });
+          } else {
+            controller.error(new Error("Failed to decrypt file."));
+          }
+        } catch (e) {
+          console.error(e);
+          controller.error(e);
+        } finally {
+          if (index === attachments.length) {
+            controller.close();
+          }
         }
       }
     });

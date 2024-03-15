@@ -85,7 +85,9 @@ class OriginPrivateFileStore implements IFileStorage {
       // on all browsers so we wait for the file handle to be released before
       // continuing. This is temporary until all browsers start supporting
       // the read-only mode.
-      return this.safeOp(chunkName, () => readFile(this.directory, chunkName));
+      return await this.safeOp(chunkName, () =>
+        readFile(this.directory, chunkName)
+      );
     } catch (e) {
       console.error("Failed to read chunk", e);
       return;
@@ -99,7 +101,7 @@ class OriginPrivateFileStore implements IFileStorage {
     const promise = createPromise();
     this.locks.set(chunkName, promise);
 
-    return promise.finally(() => this.locks.delete(chunkName));
+    return await promise.finally(() => this.locks.delete(chunkName));
   }
 }
 
@@ -145,14 +147,11 @@ expose(workerModule);
 
 export type OriginPrivateFileStoreWorkerType = typeof workerModule;
 
-function readFile(directory: FileSystemDirectoryHandle, name: string) {
-  return directory
-    .getFileHandle(name)
-    .then((file) => file.createSyncAccessHandle({ mode: "read-only" }))
-    .then((handle) => {
-      const buffer = new Uint8Array(handle.getSize());
-      handle.read(buffer);
-      handle.close();
-      return buffer;
-    });
+async function readFile(directory: FileSystemDirectoryHandle, name: string) {
+  const file = await directory.getFileHandle(name);
+  const handle = await file.createSyncAccessHandle({ mode: "read-only" });
+  const buffer = new Uint8Array(handle.getSize());
+  handle.read(buffer);
+  handle.close();
+  return buffer;
 }

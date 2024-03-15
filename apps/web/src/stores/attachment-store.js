@@ -72,9 +72,8 @@ class AttachmentStore extends BaseStore {
         await createWriteStream("attachments.zip", {
           signal: abortController.signal
         })
-      );
-
-    this.set((state) => (state.status = undefined));
+      )
+      .finally(() => this.set((state) => (state.status = undefined)));
   };
 
   cancel = async () => {
