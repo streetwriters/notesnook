@@ -75,7 +75,7 @@ function Title({
     };
   }, [tab.id, titleRef]);
 
-  return (
+  return loading ? null : (
     <>
       <div
         ref={titleSizeDiv}
@@ -107,6 +107,7 @@ function Title({
         rows={1}
         contentEditable={!readonly}
         disabled={readonly}
+        defaultValue={title}
         style={{
           height: 40,
           minHeight: 40,
