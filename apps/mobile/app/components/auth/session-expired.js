@@ -62,13 +62,16 @@ function getObfuscatedEmail(email) {
 
 export const SessionExpired = () => {
   const { colors } = useThemeColors();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [focused, setFocused] = useState(false);
   const { step, password, email, passwordInputRef, loading, login } = useLogin(
     () => {
       eSendEvent(eUserLoggedIn, true);
       setVisible(false);
       setFocused(false);
+      useUserStore.setState({
+        disableAppLockRequests: false
+      });
     },
     true
   );
@@ -127,6 +130,9 @@ export const SessionExpired = () => {
       email.current = user.email;
       setFocused(false);
       setVisible(true);
+      useUserStore.setState({
+        disableAppLockRequests: true
+      });
     }
   }, [email]);
 
@@ -139,6 +145,9 @@ export const SessionExpired = () => {
         animated={false}
         centered={false}
         onShow={async () => {
+          useUserStore.setState({
+            disableAppLockRequests: true
+          });
           await sleep(300);
           passwordInputRef.current?.focus();
           setFocused(true);
