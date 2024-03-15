@@ -31,6 +31,7 @@ import {
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
+
 import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
 import NotePreview from "../../note-history/preview";
 import SelectionWrapper from "../selection-wrapper";
@@ -62,7 +63,7 @@ export const openNote = async (
     return;
   }
 
-  if (!note.conflicted) {
+  if (note.conflicted) {
     eSendEvent(eShowMergeDialog, note);
     return;
   }
