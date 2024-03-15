@@ -127,7 +127,7 @@ if (typeof editor !== "undefined") {
 }
 
 typeof editorTitle !== "undefined" && editorTitle.current && editorTitle.current?.blur();
-if (editorController.content) editorController.content.current = null;
+if (typeof editorController.content !== undefined) editorController.content.current = null;
 editorController.onUpdate();
 editorController.setTitle(null);
 if (typeof statusBar !== "undefined") {
