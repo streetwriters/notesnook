@@ -56,4 +56,9 @@ declare global {
   interface PublicKeyCredentialCreationOptions {
     hints?: ("security-key" | "client-device" | "hybrid")[];
   }
+  interface FileSystemFileHandle {
+    createSyncAccessHandle(options?: {
+      mode: "read-only" | "readwrite" | "readwrite-unsafe";
+    }): Promise<FileSystemSyncAccessHandle>;
+  }
 }

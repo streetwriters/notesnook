@@ -24,7 +24,7 @@ import { expose, transfer } from "comlink";
 
 class OriginPrivateFileStore implements IFileStorage {
   private storage: IndexedDBKVStore;
-  private locks: Map<string, Promise<Uint8Array | undefined>> = new Map();
+  private locks: Map<string, Promise<any>> = new Map();
   constructor(
     name: string,
     private readonly directory: FileSystemDirectoryHandle
@@ -34,7 +34,9 @@ class OriginPrivateFileStore implements IFileStorage {
 
   async clear(): Promise<void> {
     for await (const [name] of this.directory) {
-      await this.directory.removeEntry(name, { recursive: true });
+      await this.safeOp(name, () =>
+        this.directory.removeEntry(name, { recursive: true })
+      );
     }
     await this.storage.clear();
   }
@@ -48,39 +50,55 @@ class OriginPrivateFileStore implements IFileStorage {
     return this.storage.delete(filename);
   }
   async writeChunk(chunkName: string, data: Uint8Array): Promise<void> {
-    const file = await this.directory.getFileHandle(chunkName, {
-      create: true
-    });
-    const syncHandle = await file.createSyncAccessHandle();
-    syncHandle.write(data);
-    syncHandle.close();
+    try {
+      await this.safeOp(chunkName, () =>
+        this.directory
+          .getFileHandle(chunkName, {
+            create: true
+          })
+          .then((file) => file.createSyncAccessHandle())
+          .then((handle) => {
+            handle.write(data);
+            handle.close();
+          })
+      );
+    } catch (e) {
+      console.error("Failed to write chunk", e);
+    }
   }
+
   async deleteChunk(chunkName: string) {
     try {
-      await this.directory.removeEntry(chunkName);
+      await this.safeOp(chunkName, () => this.directory.removeEntry(chunkName));
     } catch (e) {
       console.error("Failed to delete chunk", e);
     }
   }
-  async readChunk(chunkName: string): Promise<Uint8Array | undefined> {
-    const lock = this.locks.get(chunkName);
-    if (lock) await lock;
 
-    const promise = this.directory
-      .getFileHandle(chunkName)
-      .then((file) => file.createSyncAccessHandle())
-      .then((handle) => {
-        const buffer = new Uint8Array(handle.getSize());
-        handle.read(buffer);
-        handle.close();
-        return buffer;
-      });
-    this.locks.set(chunkName, promise);
+  async readChunk(chunkName: string): Promise<Uint8Array | undefined> {
     try {
-      return promise.finally(() => this.locks.delete(chunkName));
+      if (Object.hasOwn(FileSystemSyncAccessHandle.prototype, "mode")) {
+        return readFile(this.directory, chunkName);
+      }
+
+      // OPFS currently does not support multiple readers on a single file
+      // on all browsers so we wait for the file handle to be released before
+      // continuing. This is temporary until all browsers start supporting
+      // the read-only mode.
+      return this.safeOp(chunkName, () => readFile(this.directory, chunkName));
     } catch (e) {
       console.error("Failed to read chunk", e);
     }
+  }
+
+  private async safeOp<T>(chunkName: string, createPromise: () => Promise<T>) {
+    const lock = this.locks.get(chunkName);
+    if (lock) await lock;
+
+    const promise = createPromise();
+    this.locks.set(chunkName, promise);
+
+    return promise.finally(() => this.locks.delete(chunkName));
   }
 }
 
@@ -125,3 +143,15 @@ const workerModule = {
 expose(workerModule);
 
 export type OriginPrivateFileStoreWorkerType = typeof workerModule;
+
+function readFile(directory: FileSystemDirectoryHandle, name: string) {
+  return directory
+    .getFileHandle(name)
+    .then((file) => file.createSyncAccessHandle({ mode: "read-only" }))
+    .then((handle) => {
+      const buffer = new Uint8Array(handle.getSize());
+      handle.read(buffer);
+      handle.close();
+      return buffer;
+    });
+}
