@@ -97,8 +97,7 @@ function Title({
           pointerEvents: "none",
           overflowWrap: "anywhere",
           paddingTop: 3,
-          whiteSpace: "break-spaces",
-          display: loading ? "none" : undefined
+          whiteSpace: "break-spaces"
         }}
       />
       <textarea
@@ -126,8 +125,7 @@ function Title({
           borderRadius: 0,
           overflow: "hidden",
           overflowX: "hidden",
-          overflowY: "hidden",
-          display: loading ? "none" : undefined
+          overflowY: "hidden"
         }}
         maxLength={1000}
         onInput={() => {
