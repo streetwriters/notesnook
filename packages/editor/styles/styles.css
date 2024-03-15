@@ -774,3 +774,17 @@ p > *::selection {
 .ProseMirror div.callout[data-callout-type="cite"] {
   --callout-color: 158, 158, 158;
 }
+
+
+/* Highlight Diff */
+
+ins.diffmod,
+ins.mod,
+ins.diffins {
+  background-color: rgba(46, 160, 67, 0.4);
+}
+
+del.diffmod,
+del.diffdel {
+  background-color: rgba(248, 81, 73, 0.4);
+}
