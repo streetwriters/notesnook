@@ -36,4 +36,9 @@ declare global {
     os?: () => NodeJS.Platform | "mas";
     NativeNNCrypto?: new () => import("@notesnook/crypto").NNCrypto;
   }
+  interface FileSystemFileHandle {
+    createSyncAccessHandle(options?: {
+      mode: "read-only" | "readwrite" | "readwrite-unsafe";
+    }): Promise<FileSystemSyncAccessHandle>;
+  }
 }
