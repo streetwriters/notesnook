@@ -175,12 +175,6 @@ export const Items = ({ item, buttons, close }) => {
     "lock-unlock"
   ];
 
-  const topBarItems = data
-    .filter((item) => topBarItemsList.indexOf(item.id) > -1)
-    .sort((a, b) =>
-      topBarItemsList.indexOf(a.id) > topBarItemsList.indexOf(b.id) ? 1 : -1
-    );
-
   const bottomBarItemsList = [
     "notebooks",
     "add-reminder",
@@ -201,6 +195,12 @@ export const Items = ({ item, buttons, close }) => {
   } else {
     bottomBarItemsList.splice(4, 0, "publish");
   }
+
+  const topBarItems = data
+    .filter((item) => topBarItemsList.indexOf(item.id) > -1)
+    .sort((a, b) =>
+      topBarItemsList.indexOf(a.id) > topBarItemsList.indexOf(b.id) ? 1 : -1
+    );
 
   const bottomGridItems = data
     .filter((item) => bottomBarItemsList.indexOf(item.id) > -1)
