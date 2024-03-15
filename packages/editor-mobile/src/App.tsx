@@ -30,6 +30,7 @@ import Tiptap from "./components/editor";
 import { TabContext, useTabStore } from "./hooks/useTabStore";
 import { EmotionEditorTheme } from "./theme-factory";
 import { getTheme } from "./utils";
+import { ReadonlyEditorProvider } from "./components/readonly-editor";
 
 const currentTheme = getTheme();
 if (currentTheme) {
@@ -43,13 +44,18 @@ function App(): JSX.Element {
     <ScopedThemeProvider value="base">
       <EmotionEditorTheme>
         <GlobalStyles />
-        {tabs.map((tab) => (
-          <TabContext.Provider key={tab.id} value={tab}>
-            <Freeze freeze={currentTab !== tab.id}>
-              <Tiptap />
-            </Freeze>
-          </TabContext.Provider>
-        ))}
+
+        {globalThis["readonlyEditor"] ? (
+          <ReadonlyEditorProvider />
+        ) : (
+          tabs.map((tab) => (
+            <TabContext.Provider key={tab.id} value={tab}>
+              <Freeze freeze={currentTab !== tab.id}>
+                <Tiptap />
+              </Freeze>
+            </TabContext.Provider>
+          ))
+        )}
       </EmotionEditorTheme>
     </ScopedThemeProvider>
   );

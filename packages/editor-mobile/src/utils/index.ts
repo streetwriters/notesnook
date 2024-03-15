@@ -57,6 +57,7 @@ declare global {
   var pendingResolvers: {
     [key: string]: (value: any) => void;
   };
+  var readonlyEditor: boolean;
   var statusBars: Record<
     number,
     | React.MutableRefObject<{
@@ -189,7 +190,8 @@ export const EventTypes = {
   load: "editor-events:load",
   unlock: "editor-events:unlock",
   unlockWithBiometrics: "editor-events:unlock-biometrics",
-  disableReadonlyMode: "editor-events:disable-readonly-mode"
+  disableReadonlyMode: "editor-events:disable-readonly-mode",
+  readonlyEditorLoaded: "readonlyEditorLoaded"
 } as const;
 
 export function randId(prefix: string) {

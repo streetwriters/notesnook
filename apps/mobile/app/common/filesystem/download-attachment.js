@@ -31,7 +31,7 @@ import RNFetchBlob from "react-native-blob-util";
 import { ShareComponent } from "../../components/sheets/export-notes/share";
 import { ToastManager, presentSheet } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { db } from "../database";
+import { DatabaseLogger, db } from "../database";
 import Storage from "../database/storage";
 import { cacheDir, copyFileAsync, releasePermissions } from "./utils";
 import { createCacheDir, exists } from "./io";
@@ -192,7 +192,7 @@ export default async function downloadAttachment(
 
   let attachment = await db.attachments.attachment(hash);
   if (!attachment) {
-    console.log("attachment not found");
+    DatabaseLogger.log("Attachment not found");
     return;
   }
 
@@ -207,19 +207,21 @@ export default async function downloadAttachment(
   }
 
   try {
-    console.log(
-      "starting download attachment",
-      attachment.hash,
-      options.groupId
-    );
     await db
       .fs()
       .downloadFile(options.groupId || attachment.hash, attachment.hash);
     if (!(await exists(attachment.hash))) {
+      DatabaseLogger.log("Attachment does not exist after download.");
       return;
     }
 
     if (options.base64 || options.text) {
+      console.log(
+        "starting decrypt base64 file...",
+        options.base64,
+        options.text,
+        attachment.hash
+      );
       return await db.attachments.read(
         attachment.hash,
         options.base64 ? "base64" : "text"
@@ -232,6 +234,7 @@ export default async function downloadAttachment(
     );
 
     let key = await db.attachments.decryptKey(attachment.key);
+
     let info = {
       iv: attachment.iv,
       salt: attachment.salt,
@@ -245,7 +248,6 @@ export default async function downloadAttachment(
       chunkSize: attachment.chunkSize,
       appGroupId: IOS_APPGROUPID
     };
-
     let fileUri = await Sodium.decryptFile(
       key,
       info,

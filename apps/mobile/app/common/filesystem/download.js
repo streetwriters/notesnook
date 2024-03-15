@@ -29,13 +29,14 @@ import { createCacheDir, exists } from "./io";
 export async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;
 
+  console.log("Downloading", filename);
   await createCacheDir();
-
   let { url, headers } = data;
   let path = `${cacheDir}/${filename}`;
 
   try {
     if (await exists(filename)) {
+      console.log("Exists already", filename);
       return true;
     }
 

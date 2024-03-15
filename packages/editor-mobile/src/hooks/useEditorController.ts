@@ -103,7 +103,7 @@ export type EditorController = {
   setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
   countWords: (ms: number) => void;
   copyToClipboard: (text: string) => void;
-  getAttachmentData: (attachment: Attachment) => Promise<string>;
+  getAttachmentData: (attachment: Partial<Attachment>) => Promise<string>;
   updateTab: () => void;
   loading: boolean;
   setLoading: (value: boolean) => void;
@@ -327,7 +327,7 @@ export function useEditorController({
     post(EventTypes.copyToClipboard, text);
   };
 
-  const getAttachmentData = (attachment: Attachment) => {
+  const getAttachmentData = (attachment: Partial<Attachment>) => {
     return new Promise<string>((resolve, reject) => {
       const resolverId = randId("get_attachment_data");
       pendingResolvers[resolverId] = (data) => {

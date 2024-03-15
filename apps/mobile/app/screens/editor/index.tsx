@@ -101,17 +101,20 @@ const Editor = React.memo(
         noToolbar,
         noHeader
       });
-      const renderKey = useRef(`editor-0`);
+      const renderKey = useRef(`editor-0` + editorId);
       useImperativeHandle(ref, () => ({
         get: () => editor
       }));
 
       const onError = useCallback(() => {
         renderKey.current =
-          renderKey.current === `editor-0` ? `editor-1` : `editor-0`;
+          renderKey.current === `editor-0`
+            ? `editor-1` + editorId
+            : `editor-0` + editorId;
+
         editor.state.current.ready = false;
         editor.setLoading(true);
-      }, [editor]);
+      }, [editor, editorId]);
 
       useEffect(() => {
         const sub = [eSubscribeEvent("webview_reset", onError)];

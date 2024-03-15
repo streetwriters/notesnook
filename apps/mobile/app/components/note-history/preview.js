@@ -34,6 +34,7 @@ import DialogHeader from "../dialog/dialog-header";
 import { presentDialog } from "../dialog/functions";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
+import { ReadonlyEditor } from "../../screens/editor/readonly-editor";
 
 /**
  *
@@ -42,7 +43,6 @@ import Paragraph from "../ui/typography/paragraph";
  */
 export default function NotePreview({ session, content, note }) {
   const { colors } = useThemeColors();
-  const editorId = ":noteHistory";
   const [locked, setLocked] = useState(false);
 
   async function restore() {
@@ -118,22 +118,16 @@ export default function NotePreview({ session, content, note }) {
             flex: 1
           }}
         >
-          <Editor
-            noHeader
-            noToolbar
-            readonly
-            editorId={editorId}
-            onLoad={async () => {
-              const _note = note || (await db.notes.note(session?.noteId));
-              eSendEvent(eOnLoadNote + editorId, {
-                item: {
-                  ..._note,
-                  content: {
-                    ...content,
-                    isPreview: true
-                  }
-                }
-              });
+          <ReadonlyEditor
+            editorId="historyPreview"
+            onLoad={async (loadContent) => {
+              if (content.data) {
+                const _note = note || (await db.notes.note(session?.noteId));
+                loadContent({
+                  data: content.data,
+                  id: _note.id
+                });
+              }
             }}
           />
         </View>

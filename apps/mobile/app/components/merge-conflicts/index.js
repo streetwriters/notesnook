@@ -25,7 +25,8 @@ import { SafeAreaView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import Editor from "../../screens/editor";
+import { ReadonlyEditor } from "../../screens/editor/readonly-editor";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../screens/editor/tiptap/utils";
 import { DDS } from "../../services/device-detection";
 import {
@@ -38,7 +39,6 @@ import Sync from "../../services/sync";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
-import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
 import DialogButtons from "../dialog/dialog-buttons";
 import DialogContainer from "../dialog/dialog-container";
@@ -47,7 +47,6 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
-import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 
 const MergeConflicts = () => {
   const { colors } = useThemeColors();
@@ -316,23 +315,14 @@ const MergeConflicts = () => {
               borderBottomColor: colors.secondary.background
             }}
           >
-            <Editor
-              noHeader
-              noToolbar
-              readonly
-              editorId=":conflictPrimary"
-              onLoad={async () => {
+            <ReadonlyEditor
+              editorId="conflictPrimary"
+              onLoad={async (loadContent) => {
                 const note = await db.notes.note(content.current?.noteId);
                 if (!note) return;
-                await sleep(300);
-                eSendEvent(eOnLoadNote + ":conflictPrimary", {
-                  item: {
-                    ...note,
-                    content: {
-                      ...content.current,
-                      isPreview: true
-                    }
-                  }
+                loadContent({
+                  id: note.id,
+                  data: content.current.data
                 });
               }}
             />
@@ -353,20 +343,14 @@ const MergeConflicts = () => {
               borderRadius: 10
             }}
           >
-            <Editor
-              noHeader
-              noToolbar
-              readonly
-              editorId=":conflictSecondary"
-              onLoad={async () => {
+            <ReadonlyEditor
+              editorId="conflictSecondary"
+              onLoad={async (loadContent) => {
                 const note = await db.notes.note(content.current?.noteId);
                 if (!note) return;
-                await sleep(300);
-                eSendEvent(eOnLoadNote + ":conflictSecondary", {
-                  item: {
-                    ...note,
-                    content: { ...content.current.conflicted, isPreview: true }
-                  }
+                loadContent({
+                  id: note.id,
+                  data: content.current.conflicted.data
                 });
               }}
             />
