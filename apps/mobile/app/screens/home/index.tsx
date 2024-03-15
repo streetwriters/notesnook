@@ -80,12 +80,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
             loading: "Loading your notes"
           }}
         />
-        <FloatingButton
-          title="Create a new note"
-          onPress={() => {
-            LinkNote.present();
-          }}
-        />
+        <FloatingButton title="Create a new note" onPress={openEditor} />
       </DelayLayout>
     </>
   );
