@@ -134,7 +134,7 @@ const Tiptap = ({
       editorProps: {
         editable: () => !tab.readonly
       },
-      content: globalThis.editorControllers[tab.id]?.content?.current,
+      content: "<p>hello world<ins class='diffins'>[diffed text]</ins></p>",
       isMobile: true,
       doubleSpacedLines: settings.doubleSpacedLines,
       openLink: (url) => {
