@@ -47,6 +47,7 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
+import { diff } from "diffblazer";
 
 const MergeConflicts = () => {
   const { colors } = useThemeColors();
@@ -322,7 +323,10 @@ const MergeConflicts = () => {
                 if (!note) return;
                 loadContent({
                   id: note.id,
-                  data: content.current.data
+                  data: diff(
+                    content.current.conflicted.data,
+                    content.current.data
+                  )
                 });
               }}
             />
