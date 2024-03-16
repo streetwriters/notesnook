@@ -44,6 +44,7 @@ const EXTRA_ICON_NAMES = [
   "plus",
   "view-list-outline",
   "view-list",
+  "tab-plus",
   "play",
   "pause",
   "notebook-outline",

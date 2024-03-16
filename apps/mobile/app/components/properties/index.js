@@ -22,11 +22,13 @@ import { Platform, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
-import { presentSheet } from "../../services/event-manager";
+import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { ColorValues } from "../../utils/colors";
+import { eOnLoadNote } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
 import { useSideBarDraggingStore } from "../side-menu/dragging-store";
+import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
 import { ReminderTime } from "../ui/reminder-time";
 import Heading from "../ui/typography/heading";
@@ -36,6 +38,7 @@ import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { TagStrip, Tags } from "./tags";
+import { tabBarRef } from "../../utils/global-refs";
 
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
@@ -90,31 +93,61 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
             <View
               style={{
                 flexDirection: "row",
-                alignItems: "center"
+                justifyContent: "space-between"
               }}
             >
-              {item.type === "color" ? (
-                <Pressable
-                  type="accent"
-                  accentColor={item.colorCode}
-                  accentText={colors.static.white}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  flexShrink: 1
+                }}
+              >
+                {item.type === "color" ? (
+                  <Pressable
+                    type="accent"
+                    accentColor={item.colorCode}
+                    accentText={colors.static.white}
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 100,
+                      marginRight: 10
+                    }}
+                  />
+                ) : null}
+
+                <Heading size={SIZE.lg}>
+                  {item.type === "tag" && !isColor ? (
+                    <Heading size={SIZE.xl} color={colors.primary.accent}>
+                      #
+                    </Heading>
+                  ) : null}
+                  {item.title}
+                </Heading>
+              </View>
+
+              {item.type === "note" ? (
+                <IconButton
+                  name="open-in-new"
+                  type="plain"
+                  color={colors.primary.icon}
+                  size={SIZE.lg}
                   style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 100,
-                    marginRight: 10
+                    alignSelf: "flex-start"
+                  }}
+                  onPress={() => {
+                    close();
+                    eSendEvent(eOnLoadNote, {
+                      item: item,
+                      presistTab: true
+                    });
+                    if (!DDS.isTab) {
+                      tabBarRef.current?.goToPage(1);
+                    }
                   }}
                 />
               ) : null}
-
-              <Heading size={SIZE.lg}>
-                {item.type === "tag" && !isColor ? (
-                  <Heading size={SIZE.xl} color={colors.primary.accent}>
-                    #
-                  </Heading>
-                ) : null}
-                {item.title}
-              </Heading>
             </View>
 
             {item.type === "notebook" && item.description ? (

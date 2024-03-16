@@ -22,6 +22,7 @@ import React from "react";
 import { Dimensions, ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useActions } from "../../hooks/use-actions";
+import { useStoredRef } from "../../hooks/use-stored-ref";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { SIZE } from "../../utils/size";
@@ -31,6 +32,8 @@ import Paragraph from "../ui/typography/paragraph";
 
 export const Items = ({ item, buttons, close }) => {
   const { colors } = useThemeColors();
+  const topBarSorting = useStoredRef("topbar-sorting-ref", {});
+
   const dimensions = useSettingStore((state) => state.dimensions);
   const actions = useActions({ item, close });
   const data = actions.filter((i) => buttons.indexOf(i.id) > -1 && !i.hidden);
@@ -118,7 +121,16 @@ export const Items = ({ item, buttons, close }) => {
   const renderTopBarItem = (item, index) => {
     return (
       <Pressable
-        onPress={item.func}
+        onPress={() => {
+          item.func();
+          setImmediate(() => {
+            const currentValue = topBarSorting.current[item.id] || 0;
+            topBarSorting.current = {
+              ...topBarSorting.current,
+              [item.id]: currentValue + 1
+            };
+          });
+        }}
         key={item.id}
         testID={"icon-" + item.id}
         activeOpacity={1}
@@ -171,36 +183,36 @@ export const Items = ({ item, buttons, close }) => {
     "favorite",
     "copy",
     "share",
+    "lock-unlock",
+    "publish",
     "export",
-    "lock-unlock"
+    "copy-link",
+    "duplicate",
+    "local-only",
+    "read-only"
   ];
 
   const bottomBarItemsList = [
     "notebooks",
     "add-reminder",
     "pin-to-notifications",
-    "duplicate",
-    "read-only",
-    "local-only",
     "history",
     "reminders",
     "attachments",
     "references",
-    "copy-link",
     "trash"
   ];
-
-  if (!shouldShrink) {
-    topBarItemsList.push("publish");
-  } else {
-    bottomBarItemsList.splice(4, 0, "publish");
-  }
 
   const topBarItems = data
     .filter((item) => topBarItemsList.indexOf(item.id) > -1)
     .sort((a, b) =>
       topBarItemsList.indexOf(a.id) > topBarItemsList.indexOf(b.id) ? 1 : -1
-    );
+    )
+    .sort((a, b) => {
+      return (
+        (topBarSorting.current[b.id] || 0) - (topBarSorting.current[a.id] || 0)
+      );
+    });
 
   const bottomGridItems = data
     .filter((item) => bottomBarItemsList.indexOf(item.id) > -1)
@@ -214,8 +226,8 @@ export const Items = ({ item, buttons, close }) => {
     (width - (topBarItems.length * 10 + 14)) / topBarItems.length;
   topBarItemWidth;
 
-  if (topBarItemWidth < 55) {
-    topBarItemWidth = 55;
+  if (topBarItemWidth < 60) {
+    topBarItemWidth = 60;
   }
 
   return item.type === "note" ? (
@@ -224,10 +236,13 @@ export const Items = ({ item, buttons, close }) => {
         horizontal
         style={{
           paddingHorizontal: 12,
-          marginTop: 6
+          marginTop: 6,
+          marginBottom: 6
         }}
+        showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          gap: 10
+          gap: 10,
+          paddingRight: 25
         }}
       >
         {topBarItems.map(renderTopBarItem)}
