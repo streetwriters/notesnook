@@ -195,7 +195,7 @@ export const Dialog = ({ context = "global" }) => {
               iconSize={20}
               width="100%"
               title={dialogInfo.check.info}
-              type={checked ? dialogInfo.check.type : "gray"}
+              type={checked ? dialogInfo.check.type || "selected" : "plain"}
             />
           </>
         ) : null}
