@@ -212,7 +212,8 @@ export const useButton = ({
   type: ButtonTypes;
 }): ButtonVariant => {
   const { colors, isDark } = useThemeColors();
-  return buttonTypes(colors, accent, text, isDark)[type];
+  const types = buttonTypes(colors, accent, text, isDark);
+  return types[type] || types["plain"];
 };
 
 export const Pressable = ({
