@@ -862,7 +862,7 @@ export const useActions = ({
       },
       {
         id: "local-only",
-        title: "Local only",
+        title: "Sync off",
         icon: "sync-off",
         func: toggleLocalOnly,
         on: item.localOnly

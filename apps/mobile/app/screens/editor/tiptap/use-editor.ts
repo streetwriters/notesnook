@@ -365,6 +365,7 @@ export const useEditor = (
       newNote?: boolean;
       tabId?: number;
       blockId?: string;
+      presistTab?: boolean;
     }) => {
       if (event.blockId) {
         blockIdRef.current = event.blockId;
@@ -426,13 +427,25 @@ export const useEditor = (
             }
             console.log("Note already loaded, focusing the tab");
           } else {
-            console.log("Opening note in preview tab");
-            // Otherwise we focus the preview tab or create one to open the note in.
-            useTabStore.getState().focusPreviewTab(event.item.id, {
-              readonly: event.item.readonly || readonly,
-              locked: noteIsLocked,
-              noteLocked: noteIsLocked
-            });
+            if (event.presistTab) {
+              // Open note in new tab.
+              useTabStore.getState().newTab({
+                readonly: event.item.readonly || readonly,
+                locked: noteIsLocked,
+                noteLocked: noteIsLocked,
+                noteId: event.item.id,
+                previewTab: false
+              });
+              console.log("Opening note in new tab");
+            } else {
+              console.log("Opening note in preview tab");
+              // Otherwise we focus the preview tab or create one to open the note in.
+              useTabStore.getState().focusPreviewTab(event.item.id, {
+                readonly: event.item.readonly || readonly,
+                locked: noteIsLocked,
+                noteLocked: noteIsLocked
+              });
+            }
           }
         } else {
           if (lastTabFocused.current !== event.tabId) {
