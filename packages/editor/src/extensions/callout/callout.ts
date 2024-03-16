@@ -263,6 +263,7 @@ export const Callout = Node.create({
 
         if (xStart && xEnd && yStart && yEnd) {
           e.preventDefault();
+          e.stopImmediatePropagation();
 
           editor.commands.command(({ tr }) => {
             tr.setNodeAttribute(
