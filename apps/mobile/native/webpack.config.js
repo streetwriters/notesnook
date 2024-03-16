@@ -219,6 +219,7 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+whatwg-url-without-unicode/,
             /node_modules(.*[/\\])+whatwg-url/,
             /node_modules(.*[/\\])+react-native-url-polyfill/,
+            /node_modules(.*[/\\])+diffblazer/,
           ],
           use: {
             loader: "babel-loader",
