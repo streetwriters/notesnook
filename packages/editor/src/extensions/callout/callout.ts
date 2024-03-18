@@ -204,7 +204,7 @@ export const Callout = Node.create({
           );
 
           tr.setSelection(
-            TextSelection.create(tr.doc, tr.selection.anchor - 2)
+            TextSelection.create(tr.doc, tr.selection.anchor - 3)
           );
 
           tr.scrollIntoView();
