@@ -300,6 +300,6 @@ function LinkTool(props: LinkToolProps) {
   );
 }
 
-function isInternalLink(href: string) {
-  return href.startsWith("nn://");
+function isInternalLink(href?: string | null) {
+  return !!href?.startsWith("nn://");
 }
