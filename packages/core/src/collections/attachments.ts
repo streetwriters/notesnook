@@ -297,7 +297,7 @@ export class Attachments implements ICollection {
     if (!data) return;
 
     return (
-      outputType === "base64"
+      outputType === "base64" && typeof data === "string"
         ? dataurl.fromObject({
             mimeType: attachment.mimeType,
             data
