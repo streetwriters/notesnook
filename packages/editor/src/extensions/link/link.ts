@@ -273,7 +273,8 @@ export const Link = Mark.create<LinkOptions>({
     if (this.options.openOnClick) {
       plugins.push(
         clickHandler({
-          type: this.type
+          type: this.type,
+          editor: this.editor
         })
       );
     }
