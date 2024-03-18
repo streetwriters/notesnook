@@ -23,7 +23,6 @@ import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format";
 import { clone } from "../utils/clone";
 import { Tiptap } from "../content-types/tiptap";
 import { EMPTY_CONTENT } from "./content";
-import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { buildFromTemplate } from "../utils/templates";
 import { Note, TrashOrItem, isTrashItem, isDeleted } from "../types";
 import Database from "../api";
@@ -37,6 +36,7 @@ export type ExportOptions = {
   contentItem?: NoteContent<false>;
   rawContent?: string;
   disableTemplate?: boolean;
+  embedMedia?: boolean;
 };
 
 export class Notes implements ICollection {
@@ -255,39 +255,41 @@ export class Notes implements ICollection {
     });
   }
 
-  async export(id: string, options: ExportOptions) {
-    const { format, rawContent } = options;
-    if (format !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
-      return false;
-
-    const note = await this.note(id);
+  async export(id: string, options: ExportOptions): Promise<false | string>;
+  async export(note: Note, options: ExportOptions): Promise<false | string>;
+  async export(noteOrId: Note | string, options: ExportOptions) {
+    const note =
+      typeof noteOrId === "string" ? await this.note(noteOrId) : noteOrId;
     if (!note) return false;
 
-    if (!options.contentItem) {
-      const rawContent = note.contentId
-        ? await this.db.content.get(note.contentId)
-        : undefined;
-      if (rawContent && rawContent.locked) return false;
-      options.contentItem = rawContent || EMPTY_CONTENT(note.id);
-    }
+    const { format, rawContent } = options;
 
-    const { data, type } =
-      format === "txt"
-        ? options.contentItem
-        : await this.db.content.downloadMedia(
-            `export-${note.id}`,
-            options.contentItem,
-            false
-          );
-
-    const content = getContentFromData(type, data);
     const contentString =
       rawContent ||
-      (format === "html"
-        ? content.toHTML()
-        : format === "md"
-        ? content.toMD()
-        : content.toTXT());
+      (await (async () => {
+        let contentItem = options.contentItem;
+        if (!contentItem) {
+          const rawContent = await this.db.content.findByNoteId(note.id);
+          if (rawContent && rawContent.locked) return false;
+          contentItem = rawContent || EMPTY_CONTENT(note.id);
+        }
+
+        const { data, type } =
+          options?.embedMedia && format !== "txt"
+            ? await this.db.content.downloadMedia(
+                `export-${note.id}`,
+                contentItem,
+                false
+              )
+            : contentItem;
+        const content = getContentFromData(type, data);
+        return format === "html"
+          ? content.toHTML()
+          : format === "md"
+          ? content.toMD()
+          : content.toTXT();
+      })());
+    if (!contentString) return false;
 
     const tags = (await this.db.relations.to(note, "tag").resolve()).map(
       (tag) => tag.title
