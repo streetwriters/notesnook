@@ -241,7 +241,8 @@ const ListNoteItem = ({
         } else {
           if (noteInternalLinks.length) return;
           setLoading(true);
-          const blocks = await db.notes.contentBlocks(item.id);
+
+          const blocks = await db.notes.contentBlocksWithLinks(item.id);
           setNoteInternalLinks(
             blocks
               .filter((block) =>
