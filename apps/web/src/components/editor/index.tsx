@@ -51,9 +51,7 @@ import { useEditorManager } from "./manager";
 import { saveAttachment, downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core/dist/common";
 import { db } from "../../common/db";
-import useMobile from "../../hooks/use-mobile";
 import Titlebox from "./title-box";
-import useTablet from "../../hooks/use-tablet";
 import Config from "../../utils/config";
 import { ScopedThemeProvider } from "../theme-provider";
 import { Lightbox } from "../lightbox";
@@ -160,9 +158,6 @@ function EditorView({
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const editor = useEditorManager((store) => store.editors[session.id]?.editor);
 
-  const isMobile = useMobile();
-  const isTablet = useTablet();
-
   useEffect(() => {
     const event = db.eventManager.subscribe(
       EVENTS.syncItemMerged,
@@ -255,8 +250,7 @@ function EditorView({
                 readonly:
                   session?.type === "readonly" || session?.type === "deleted",
                 onRequestFocus: () => toggleProperties(false),
-                focusMode: isFocusMode,
-                isMobile: isMobile || isTablet
+                focusMode: isFocusMode
               }}
             />
             {editor && <DropZone editor={editor} overlayRef={overlayRef} />}
@@ -350,7 +344,6 @@ function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
 }
 
 type EditorOptions = {
-  isMobile?: boolean;
   headless?: boolean;
   readonly?: boolean;
   focusMode?: boolean;
@@ -379,11 +372,10 @@ export function Editor(props: EditorProps) {
     onContentChange,
     onPreviewDocument
   } = props;
-  const { readonly, headless, isMobile } = options || {
+  const { readonly, headless } = options || {
     headless: false,
     readonly: false,
-    focusMode: false,
-    isMobile: false
+    focusMode: false
   };
   const [isLoading, setIsLoading] = useState(true);
   useScrollToBlock(session);
@@ -408,7 +400,6 @@ export function Editor(props: EditorProps) {
     <EditorChrome isLoading={isLoading} {...props}>
       <Tiptap
         id={id}
-        isMobile={isMobile}
         nonce={nonce}
         readonly={readonly}
         content={content}
@@ -499,11 +490,10 @@ function EditorChrome(
   props: PropsWithChildren<EditorProps & { isLoading: boolean }>
 ) {
   const { id, options, children } = props;
-  const { focusMode, headless, onRequestFocus, isMobile } = options || {
+  const { focusMode, headless, onRequestFocus } = options || {
     headless: false,
     readonly: false,
-    focusMode: false,
-    isMobile: false
+    focusMode: false
   };
   const editorMargins = useEditorStore((store) => store.editorMargins);
   const editorContainerRef = useRef<HTMLElement>(null);
@@ -543,24 +533,6 @@ function EditorChrome(
 
   return (
     <>
-      {/* {isLoading ? (
-        <AnimatedFlex
-          sx={{
-            position: "absolute",
-            overflow: "hidden",
-            flex: 1,
-            flexDirection: "column",
-            width: "100%",
-            height: "100%",
-            zIndex: 999,
-            bg: "background"
-          }}
-        >
-          <EditorLoader />
-        </AnimatedFlex>
-      ) : null} */}
-
-      {/* <Toolbar /> */}
       <FlexScrollContainer
         id={`editorScroll_${id}`}
         scrollRef={editorScrollRef}
@@ -590,46 +562,9 @@ function EditorChrome(
           pr={6}
           onClick={onRequestFocus}
         >
-          {/* {!isMobile && (
-          
-          )} */}
-          {/* <Box
-            id={`${id}_toolbar`}
-            sx={{
-              minHeight: 34,
-              display: readonly ? "none" : "flex",
-              bg: "background",
-              position: "sticky",
-              top: 0,
-              mb: 1,
-              zIndex: 2
-            }}
-          /> */}
-
-          {/* <AnimatedFlex
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isLoading ? 0 : 1 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            sx={{ flex: 1 }}
-          > */}
           {children}
-          {/* </AnimatedFlex> */}
         </Flex>
       </FlexScrollContainer>
-      {isMobile && (
-        <Box
-          id={`${id}_toolbar`}
-          sx={{
-            display: "flex",
-            bg: "background",
-            position: "sticky",
-            top: 0,
-            mb: 1,
-            zIndex: 2,
-            px: [2, 2, 35]
-          }}
-        />
-      )}
     </>
   );
 }
