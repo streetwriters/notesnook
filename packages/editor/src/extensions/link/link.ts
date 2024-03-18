@@ -24,7 +24,8 @@ import {
   isMarkActive,
   markInputRule,
   markPasteRule,
-  mergeAttributes
+  mergeAttributes,
+  PasteRuleMatch
 } from "@tiptap/core";
 import { Plugin, TextSelection } from "@tiptap/pm/state";
 import { find, registerCustomProtocol, reset } from "linkifyjs";
@@ -163,6 +164,18 @@ export const Link = Mark.create<LinkOptions>({
   },
 
   renderHTML({ HTMLAttributes }) {
+    // False positive; we're explicitly checking for javascript: links to ignore them
+    if (HTMLAttributes.href?.startsWith("javascript:")) {
+      // strip out the href
+      return [
+        "a",
+        mergeAttributes(this.options.HTMLAttributes, {
+          ...HTMLAttributes,
+          href: ""
+        }),
+        0
+      ];
+    }
     return [
       "a",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
@@ -204,7 +217,6 @@ export const Link = Mark.create<LinkOptions>({
 
   addPasteRules() {
     return [
-      ...(this.parent?.() || []),
       markPasteRule({
         find: linkRegex,
         type: this.type,
@@ -215,34 +227,29 @@ export const Link = Mark.create<LinkOptions>({
         }
       }),
       markPasteRule({
-        find: (text) =>
-          find(text)
-            .filter((link) => {
-              if (this.options.validate) {
-                return this.options.validate(link.value);
-              }
+        find: (text) => {
+          const foundLinks: PasteRuleMatch[] = [];
 
-              return true;
-            })
-            .filter((link) => link.isLink)
-            .map((link) => ({
-              text: link.value,
-              index: link.start,
-              data: link
-            })),
-        type: this.type,
-        getAttributes: (match, pasteEvent) => {
-          const html = pasteEvent?.clipboardData?.getData("text/html");
-          const hrefRegex = /href="([^"]*)"/;
+          if (text) {
+            const links = find(text).filter((item) => item.isLink);
 
-          const existingLink = html?.match(hrefRegex);
-
-          if (existingLink) {
-            return {
-              href: existingLink[1]
-            };
+            if (links.length) {
+              links.forEach((link) =>
+                foundLinks.push({
+                  text: link.value,
+                  data: {
+                    href: link.href
+                  },
+                  index: link.start
+                })
+              );
+            }
           }
 
+          return foundLinks;
+        },
+        type: this.type,
+        getAttributes: (match) => {
           return {
             href: match.data?.href
           };

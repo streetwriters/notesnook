@@ -1,15 +1,16 @@
 diff --git a/node_modules/@tiptap/core/dist/index.cjs b/node_modules/@tiptap/core/dist/index.cjs
-index d61da68..31ceb87 100644
+index 1ea30e0..b6f4899 100644
 --- a/node_modules/@tiptap/core/dist/index.cjs
 +++ b/node_modules/@tiptap/core/dist/index.cjs
-@@ -1880,8 +1880,23 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
+@@ -1901,9 +1901,24 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
      return commands$1.lift(state, dispatch);
  };
  
 -const liftEmptyBlock = () => ({ state, dispatch }) => {
 -    return commands$1.liftEmptyBlock(state, dispatch);
+-};
 +const liftEmptyBlock = () => ({ state, dispatch, editor }) => {
-+    return commands$1.liftEmptyBlock$1(state, (tr) => {
++    return commands$1.liftEmptyBlock(state, (tr) => {
 +        if (!dispatch) return true;
 +
 +        const { selection, storedMarks } = state;
@@ -25,19 +26,21 @@ index d61da68..31ceb87 100644
 +
 +        return dispatch(tr);
 +    });
- };
++}
  
  const liftListItem = typeOrName => ({ state, dispatch }) => {
+     const type = getNodeType(typeOrName, state.schema);
 diff --git a/node_modules/@tiptap/core/dist/index.js b/node_modules/@tiptap/core/dist/index.js
-index 38c9884..4a9e10c 100644
+index 554e919..23a99fd 100644
 --- a/node_modules/@tiptap/core/dist/index.js
 +++ b/node_modules/@tiptap/core/dist/index.js
-@@ -1876,8 +1876,23 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
+@@ -1897,9 +1897,24 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
      return lift$1(state, dispatch);
  };
  
 -const liftEmptyBlock = () => ({ state, dispatch }) => {
 -    return liftEmptyBlock$1(state, dispatch);
+-};
 +const liftEmptyBlock = () => ({ state, dispatch, editor }) => {
 +    return liftEmptyBlock$1(state, (tr) => {
 +        if (!dispatch) return true;
@@ -55,22 +58,23 @@ index 38c9884..4a9e10c 100644
 +
 +        return dispatch(tr);
 +    });
- };
++}
  
  const liftListItem = typeOrName => ({ state, dispatch }) => {
+     const type = getNodeType(typeOrName, state.schema);
 diff --git a/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts b/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
-index cb0ede6..8a19ff2 100644
+index 55d710f..e9698f5 100644
 --- a/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
 +++ b/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
-@@ -6,6 +6,7 @@ import { ExtensionManager } from './ExtensionManager.js';
- import * as extensions from './extensions/index.js';
+@@ -7,6 +7,7 @@ import * as extensions from './extensions/index.js';
+ import { NodePos } from './NodePos.js';
  import { CanCommands, ChainedCommands, EditorEvents, EditorOptions, JSONContent, SingleCommands, TextSerializer } from './types.js';
  export { extensions };
 +export interface EditorStorage extends Record<string, any> { }
  export interface HTMLElement {
      editor?: Editor;
  }
-@@ -22,7 +23,7 @@ export declare class Editor extends EventEmitter<EditorEvents> {
+@@ -23,7 +24,7 @@ export declare class Editor extends EventEmitter<EditorEvents> {
      /**
       * Returns the editor storage.
       */
