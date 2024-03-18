@@ -214,7 +214,6 @@ function DiffViewer(props: DiffViewerProps) {
                     <Editor
                       id={content.id}
                       content={() => content.data}
-                      editor={editor}
                       session={session}
                       nonce={content.dateEdited}
                       options={{ readonly: true, headless: true }}
@@ -291,7 +290,6 @@ function DiffViewer(props: DiffViewerProps) {
                     <Editor
                       id={`${conflictedContent.id}-conflicted`}
                       session={session}
-                      editor={conflictedEditor}
                       content={() => conflictedContent.data}
                       nonce={conflictedContent.dateEdited}
                       options={{ readonly: true, headless: true }}

@@ -289,7 +289,6 @@ function EditorView({
         id={session.id}
         nonce={1}
         content={() => session.content?.data}
-        editor={editor}
         session={session}
         onPreviewDocument={(preview) =>
           useEditorStore.setState({ documentPreview: preview })
@@ -362,7 +361,6 @@ type EditorProps = {
   id: string;
   session: EditorSession;
   content: () => string | undefined;
-  editor?: IEditor;
   nonce?: number;
   options?: EditorOptions;
   onContentChange?: () => void;
@@ -372,7 +370,6 @@ type EditorProps = {
 export function Editor(props: EditorProps) {
   const {
     id,
-    editor,
     session,
     content,
     onSave,
@@ -393,6 +390,7 @@ export function Editor(props: EditorProps) {
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ hash, loaded, total }: AttachmentProgress) => {
+        const editor = useEditorManager.getState().getEditor(id)?.editor;
         editor?.sendAttachmentProgress(
           hash,
           Math.round((loaded / total) * 100)
@@ -403,7 +401,7 @@ export function Editor(props: EditorProps) {
     return () => {
       event.unsubscribe();
     };
-  }, [editor]);
+  }, [id]);
 
   return (
     <EditorChrome isLoading={isLoading} {...props}>
@@ -462,6 +460,8 @@ export function Editor(props: EditorProps) {
         onInsertAttachment={async (type) => {
           const mime = type === "file" ? "*/*" : "image/*";
           const attachments = await insertAttachments(mime);
+          const editor = useEditorManager.getState().getEditor(id)?.editor;
+
           if (!attachments) return;
           for (const attachment of attachments) {
             editor?.attachFile(attachment);
@@ -475,6 +475,7 @@ export function Editor(props: EditorProps) {
           );
         }}
         onAttachFiles={async (files) => {
+          const editor = useEditorManager.getState().getEditor(id)?.editor;
           const result = await attachFiles(files);
           if (!result) return;
           result.forEach((attachment) => editor?.attachFile(attachment));
