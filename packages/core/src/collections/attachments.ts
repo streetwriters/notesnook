@@ -242,7 +242,15 @@ export class Attachments implements ICollection {
 
   ofNote(
     noteId: string,
-    ...types: ("files" | "images" | "webclips" | "all")[]
+    ...types: (
+      | "files"
+      | "images"
+      | "videos"
+      | "audio"
+      | "documents"
+      | "webclips"
+      | "all"
+    )[]
   ) {
     const selector = this.db.relations.from(
       { type: "note", id: noteId },
@@ -256,6 +264,16 @@ export class Attachments implements ICollection {
             const filters = [];
             if (types.includes("images"))
               filters.push(eb("mimeType", "like", `image/%`));
+
+            if (types.includes("videos"))
+              filters.push(eb("mimeType", "like", `video/%`));
+
+            if (types.includes("audio"))
+              filters.push(eb("mimeType", "like", `audio/%`));
+
+            if (types.includes("documents"))
+              filters.push(eb("mimeType", "in", DocumentMimeTypes));
+
             if (types.includes("webclips"))
               filters.push(
                 eb("mimeType", "==", `application/vnd.notesnook.web-clip`)
