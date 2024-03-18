@@ -74,7 +74,11 @@ type TipTapProps = {
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
   onPreviewAttachment?: (attachment: Attachment) => void;
-  onGetAttachmentData?: (attachment: Attachment) => Promise<string | undefined>;
+  onGetAttachmentData?:
+    | ((
+        attachment: Pick<Attachment, "hash" | "type">
+      ) => Promise<string | undefined>)
+    | undefined;
   onAttachFiles?: (files: File[]) => void;
   onInsertInternalLink?: (
     attributes?: LinkAttributes
@@ -179,7 +183,6 @@ function TipTap(props: TipTapProps) {
       doubleSpacedLines,
       dateFormat,
       timeFormat,
-      isMobile: isMobile || false,
       element: editorContainer(),
       editable: !readonly,
       content: content?.(),
@@ -297,35 +300,45 @@ function TipTap(props: TipTapProps) {
     [tiptapOptions]
   );
 
-  // useEffect(() => {
-  //   if (!editorContainer) return;
-  //   const currentEditor = editor;
-  //   function onClick(e: MouseEvent) {
-  //     if (e.target !== editorContainer || !currentEditor?.state.selection.empty)
-  //       return;
+  useEffect(() => {
+    const container = editorContainer();
+    if (!container) return;
+    const currentEditor = editor;
+    function onClick(e: MouseEvent) {
+      if (e.target !== container || !currentEditor?.state.selection.empty)
+        return;
 
-  //     const lastNode = currentEditor?.state.doc.lastChild;
-  //     const isLastNodeParagraph = lastNode?.type.name === "paragraph";
-  //     const isEmpty = lastNode?.nodeSize === 2;
-  //     if (isLastNodeParagraph && isEmpty) currentEditor?.commands.focus("end");
-  //     else {
-  //       currentEditor
-  //         ?.chain()
-  //         .insertContentAt(currentEditor?.state.doc.nodeSize - 2, "<p></p>")
-  //         .focus("end")
-  //         .run();
-  //     }
-  //   }
-  //   editorContainer.addEventListener("click", onClick);
-  //   return () => {
-  //     editorContainer.removeEventListener("click", onClick);
-  //   };
-  // }, [editor, editorContainer]);
+      const lastNode = currentEditor?.state.doc.lastChild;
+      const isLastNodeParagraph = lastNode?.type.name === "paragraph";
+      const isEmpty = lastNode?.nodeSize === 2;
+      if (isLastNodeParagraph && isEmpty) currentEditor?.commands.focus("end");
+      else {
+        currentEditor
+          ?.chain()
+          .insertContentAt(currentEditor?.state.doc.nodeSize - 2, "<p></p>")
+          .focus("end")
+          .run();
+      }
+    }
+    container.addEventListener("click", onClick);
+    return () => {
+      container.removeEventListener("click", onClick);
+    };
+  }, [editor, editorContainer]);
 
   if (readonly) return null;
   return (
     <>
-      <ScopedThemeProvider scope="editorToolbar" sx={{ width: "100%" }}>
+      <ScopedThemeProvider
+        scope="editorToolbar"
+        sx={{
+          width: "100%",
+          position: "sticky",
+          top: 0,
+          bg: "background",
+          zIndex: 2
+        }}
+      >
         <Toolbar
           editor={editor}
           location={isMobile ? "bottom" : "top"}
