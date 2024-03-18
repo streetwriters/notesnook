@@ -140,6 +140,11 @@ type SessionTypeMap = {
   deleted: DeletedEditorSession;
 };
 
+export type DocumentPreview = {
+  url?: string;
+  hash: string;
+};
+
 export function isLockedSession(session: EditorSession): boolean {
   return (
     session.type === "locked" ||
@@ -156,6 +161,7 @@ class EditorStore extends BaseStore<EditorStore> {
   activeSessionId?: string;
 
   arePropertiesVisible = false;
+  documentPreview?: DocumentPreview;
   isTOCVisible = false;
   editorMargins = Config.get("editor:margins", true);
   history: string[] = [];
@@ -431,7 +437,6 @@ class EditorStore extends BaseStore<EditorStore> {
 
     this.set({ activeSessionId: id });
     appStore.setIsEditorOpen(!!id);
-    this.toggleProperties(false);
 
     if (id) {
       const { history } = this.get();

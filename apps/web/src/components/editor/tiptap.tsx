@@ -67,7 +67,7 @@ export type OnChangeHandler = (
 type TipTapProps = {
   id: string;
   editorContainer: () => HTMLElement | undefined;
-  onLoad?: () => void;
+  onLoad?: (editor: IEditor) => void;
   onChange?: OnChangeHandler;
   onContentChange?: () => void;
   onSelectionChange?: (range: { from: number; to: number }) => void;
@@ -189,13 +189,14 @@ function TipTap(props: TipTapProps) {
       autofocus: "start",
       onFocus,
       onCreate: async ({ editor }) => {
-        if (onLoad) onLoad();
         if (oldNonce.current !== nonce)
           editor.commands.focus("start", { scrollIntoView: true });
         oldNonce.current = nonce;
 
+        const instance = toIEditor(editor as Editor);
+        if (onLoad) onLoad(instance);
         useEditorManager.getState().setEditor(id, {
-          editor: toIEditor(editor as Editor),
+          editor: instance,
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
           statistics: {
@@ -206,7 +207,6 @@ function TipTap(props: TipTapProps) {
           },
           tableOfContents: getTableOfContents(editor.view.dom)
         });
-        // editor.commands.refreshSearch();
       },
       onUpdate: ({ editor, transaction }) => {
         const changedHeadings = getChangedNodes(transaction, {
@@ -336,7 +336,7 @@ function TipTap(props: TipTapProps) {
           position: "sticky",
           top: 0,
           bg: "background",
-          zIndex: 2
+          zIndex: 1
         }}
       >
         <Toolbar

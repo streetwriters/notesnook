@@ -148,7 +148,7 @@ export function EditorActionBar() {
   ];
 
   return (
-    <Flex sx={{ mb: 2, gap: 2 }}>
+    <Flex sx={{ mb: 1, gap: 2 }}>
       <TabStrip />
       <Flex
         bg="background"

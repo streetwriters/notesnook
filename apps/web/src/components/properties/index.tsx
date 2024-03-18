@@ -34,8 +34,7 @@ import { Box, Button, Flex, Text } from "@theme-ui/components";
 import {
   useEditorStore,
   ReadonlyEditorSession,
-  DefaultEditorSession,
-  DeletedEditorSession
+  DefaultEditorSession
 } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -106,13 +105,13 @@ const metadataItems = [
 ];
 
 type EditorPropertiesProps = {
-  session: DefaultEditorSession | ReadonlyEditorSession | DeletedEditorSession;
+  sessionId: string;
 };
 function EditorProperties(props: EditorPropertiesProps) {
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const session = useEditorStore((store) =>
-    store.getSession(props.session.id, [props.session.type])
+    store.getSession(props.sessionId, ["default", "readonly", "deleted"])
   );
   if (isFocusMode || !session) return null;
   return (
@@ -132,7 +131,7 @@ function EditorProperties(props: EditorPropertiesProps) {
         position: "absolute",
         top: 0,
         right: 0,
-        zIndex: 1,
+        zIndex: 999,
         height: "100%",
         width: "300px",
         borderLeft: "1px solid",
@@ -237,7 +236,7 @@ function InternalLinks({ noteId }: { noteId: string }) {
         ? db.relations.from({ id: noteId, type: "note" }, "note")
         : db.relations.to({ id: noteId, type: "note" }, "note");
     return links.selector.sorted(db.settings.getGroupOptions("notes"));
-  }, [tabIndex]);
+  }, [tabIndex, noteId]);
 
   return (
     <Flex sx={{ flexDirection: "column", mt: 2 }}>
@@ -585,10 +584,12 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
 }
 
 function Notebooks({ noteId }: { noteId: string }) {
-  const result = usePromise(() =>
-    db.relations
-      .to({ id: noteId, type: "note" }, "notebook")
-      .selector.sorted(db.settings.getGroupOptions("notebooks"))
+  const result = usePromise(
+    () =>
+      db.relations
+        .to({ id: noteId, type: "note" }, "notebook")
+        .selector.sorted(db.settings.getGroupOptions("notebooks")),
+    [noteId]
   );
 
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
@@ -613,10 +614,12 @@ function Notebooks({ noteId }: { noteId: string }) {
 }
 
 function Reminders({ noteId }: { noteId: string }) {
-  const result = usePromise(() =>
-    db.relations
-      .from({ id: noteId, type: "note" }, "reminder")
-      .selector.sorted(db.settings.getGroupOptions("reminders"))
+  const result = usePromise(
+    () =>
+      db.relations
+        .from({ id: noteId, type: "note" }, "reminder")
+        .selector.sorted(db.settings.getGroupOptions("reminders")),
+    [noteId]
   );
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
@@ -639,10 +642,12 @@ function Reminders({ noteId }: { noteId: string }) {
   );
 }
 function Attachments({ noteId }: { noteId: string }) {
-  const result = usePromise(() =>
-    db.attachments
-      .ofNote(noteId, "all")
-      .sorted({ sortBy: "dateCreated", sortDirection: "desc" })
+  const result = usePromise(
+    () =>
+      db.attachments
+        .ofNote(noteId, "all")
+        .sorted({ sortBy: "dateCreated", sortDirection: "desc" }),
+    [noteId]
   );
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
@@ -664,10 +669,12 @@ function Attachments({ noteId }: { noteId: string }) {
   );
 }
 function SessionHistory({ noteId }: { noteId: string }) {
-  const result = usePromise(() =>
-    db.noteHistory
-      .get(noteId)
-      .sorted({ sortBy: "dateModified", sortDirection: "desc" })
+  const result = usePromise(
+    () =>
+      db.noteHistory
+        .get(noteId)
+        .sorted({ sortBy: "dateModified", sortDirection: "desc" }),
+    [noteId]
   );
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
