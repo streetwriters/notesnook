@@ -236,7 +236,7 @@ export class Attachments implements ICollection {
     return (
       (await this.db.relations
         .to({ ids: linkedNotes.map((n) => n.toId), type: "note" }, "vault")
-        .count()) > 0
+        .count()) <= 0
     );
   }
 
