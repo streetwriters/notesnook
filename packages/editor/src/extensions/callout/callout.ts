@@ -75,7 +75,7 @@ export type CalloutAttributes = {
   type: CalloutType;
 };
 
-const CALLOUT_REGEX = />(.+?)(?:\n| (.+)\n$)/g;
+const CALLOUT_REGEX = /^>(.+?)(?:\n| (.+)\n$)/g;
 export const Callout = Node.create({
   name: "callout",
   content: "heading block*",
