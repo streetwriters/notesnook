@@ -21,7 +21,7 @@ import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
 import { KVStorage } from "./database/kv";
 
 export type Output<TOutputFormat extends DataFormat> =
-  TOutputFormat extends Omit<DataFormat, "uint8array"> ? string : Uint8Array;
+  TOutputFormat extends "uint8array" ? Uint8Array : string;
 export type FileEncryptionMetadata = {
   chunkSize: number;
   iv: string;
