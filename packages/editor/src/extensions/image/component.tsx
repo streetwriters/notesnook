@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ThemeUIStyleObject } from "@theme-ui/core";
 import { Box, Flex, Image, Text } from "@theme-ui/components";
 import { ImageAttributes } from "./image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { DesktopOnly } from "../../components/responsive";
 import { Icon } from "@notesnook/ui";
@@ -42,7 +42,6 @@ import { motion } from "framer-motion";
 import { useObserver } from "../../hooks/use-observer";
 import { Attachment, ImageAlignmentOptions } from "../attachment";
 import DataURL from "@notesnook/core/dist/utils/dataurl";
-import { debounce } from "../../utils/debounce";
 
 export const AnimatedImage = motion(Image);
 
@@ -61,10 +60,7 @@ export function ImageComponent(
     threshold: 0.2,
     once: true
   });
-  const sizeRef = useRef(
-    clampSize(node.attrs, editor.view.dom.clientWidth, aspectRatio)
-  );
-  const editorObserverRef = useRef<ResizeObserver>();
+  const size = clampSize(node.attrs, editor.view.dom.clientWidth, aspectRatio);
 
   const float = isMobile ? false : node.attrs.float;
 
@@ -74,24 +70,6 @@ export function ImageComponent(
   const downloadOptions = useToolbarStore((store) => store.downloadOptions);
   const isReadonly = !editor.isEditable;
   const isSVG = !!mime && mime.includes("/svg");
-
-  useEffect(() => {
-    function onResize(
-      _entries: ResizeObserverEntry[],
-      _observer: ResizeObserver
-    ) {
-      sizeRef.current = clampSize(
-        node.attrs,
-        editor.view.dom.clientWidth,
-        aspectRatio
-      );
-    }
-    editorObserverRef.current = new ResizeObserver(debounce(onResize, 1000));
-    editorObserverRef.current?.observe(editor.view.dom);
-    return () => {
-      editorObserverRef.current?.disconnect();
-    };
-  });
 
   useEffect(() => {
     if (!inView) return;
@@ -124,7 +102,7 @@ export function ImageComponent(
       <Box
         sx={{
           ...getAlignmentStyles(node.attrs),
-          height: float ? sizeRef.current.height : "unset",
+          height: float ? size.height : "unset",
           position: "relative",
           mt: isSVG ? `24px` : 0,
           ":hover .drag-handle, :active .drag-handle": {
@@ -136,8 +114,8 @@ export function ImageComponent(
           style={{ marginTop: 5 }}
           enabled={editor.isEditable && !float}
           selected={selected}
-          width={sizeRef.current.width}
-          height={sizeRef.current.height}
+          width={size.width}
+          height={size.height}
           onResize={(width, height) => {
             editor.commands.setImageSize({ width, height });
           }}
@@ -245,10 +223,8 @@ export function ImageComponent(
                 position: "absolute",
                 top: 0,
                 left: 0,
-                width:
-                  editor.isEditable && !float ? "100%" : sizeRef.current.width,
-                height:
-                  editor.isEditable && !float ? "100%" : sizeRef.current.height,
+                width: editor.isEditable && !float ? "100%" : size.width,
+                height: editor.isEditable && !float ? "100%" : size.height,
                 bg: "background-secondary",
                 border: selected
                   ? "2px solid var(--accent)"
@@ -263,7 +239,7 @@ export function ImageComponent(
             >
               <Icon
                 path={Icons.image}
-                size={sizeRef.current.width ? sizeRef.current.width * 0.2 : 72}
+                size={size.width ? size.width * 0.2 : 72}
                 color="gray"
               />
             </Flex>
@@ -288,8 +264,8 @@ export function ImageComponent(
             title={title}
             sx={{
               objectFit: "contain",
-              width: editor.isEditable ? "100%" : sizeRef.current.width,
-              height: editor.isEditable ? "100%" : sizeRef.current.height,
+              width: editor.isEditable ? "100%" : size.width,
+              height: editor.isEditable ? "100%" : size.height,
               border: selected
                 ? "2px solid var(--accent) !important"
                 : "2px solid transparent !important",
@@ -315,7 +291,7 @@ export function ImageComponent(
               const orignalHeight = naturalHeight || clientHeight;
               const naturalAspectRatio = orignalWidth / orignalHeight;
               const fixedDimensions = fixAspectRatio(
-                sizeRef.current.width,
+                size.width,
                 naturalAspectRatio
               );
 
@@ -347,7 +323,7 @@ export function ImageComponent(
                     { query: makeImageQuery(src, hash), ignoreEdit: true }
                   )
                 );
-              } else if (sizeRef.current.height !== fixedDimensions.height) {
+              } else if (size.height !== fixedDimensions.height) {
                 await editor.threadsafe((editor) =>
                   editor.commands.updateAttachment(fixedDimensions, {
                     query: makeImageQuery(src, hash),
