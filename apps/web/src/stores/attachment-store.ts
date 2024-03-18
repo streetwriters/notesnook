@@ -141,7 +141,6 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
       this._changeWorkingStatus(attachment.hash);
       if (e instanceof Error)
         showToast("error", `Failed to delete: ${e.message}`);
-      throw e;
     }
   };
 
