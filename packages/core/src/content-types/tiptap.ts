@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import showdown from "@streetwriters/showdown";
-import { findAll, isTag } from "domutils";
+import { findAll, isTag, removeElement, replaceElement } from "domutils";
 import {
   DomNode,
   FormatOptions,
@@ -37,10 +37,15 @@ import { HTMLRewriter } from "../utils/html-rewriter";
 import { ContentBlock } from "../types";
 import { InternalLink, parseInternalLink } from "../utils/internal-link";
 import { Element } from "domhandler";
+import { render } from "dom-serializer";
 
 export type ResolveHashes = (
   hashes: string[]
 ) => Promise<Record<string, string>>;
+export type ResolveAttachments = (
+  attachments: Record<string, Record<string, string>>
+) => Promise<Record<string, string | false | undefined>>;
+export type ResolveInternalLink = (link: string) => string;
 
 const ExtractableTypes = ["blocks", "internalLinks"] as const;
 type ExtractableType = (typeof ExtractableTypes)[number];
@@ -64,7 +69,7 @@ converter.setFlavor("original");
 
 const splitter = /\W+/gm;
 export class Tiptap {
-  constructor(private readonly data: string) {}
+  constructor(private data: string) {}
 
   toHTML() {
     return this.data;
@@ -141,6 +146,47 @@ export class Tiptap {
         }
       }
     }).transform(this.data);
+  }
+
+  async resolveAttachments(resolve: ResolveAttachments) {
+    const attachments: Record<string, Record<string, string>> = {};
+    const document = parseDocument(this.data);
+    const elements = findAll(
+      (e) => !!e.attribs[ATTRIBUTES.hash],
+      document.childNodes
+    );
+    elements.forEach(
+      (element) =>
+        (attachments[element.attribs[ATTRIBUTES.hash]] = element.attribs)
+    );
+
+    const resolved = await resolve(attachments);
+    for (const element of elements) {
+      const hash = element.attribs[ATTRIBUTES.hash];
+      const html = resolved[hash];
+      if (html === undefined) continue;
+      if (html === false) {
+        removeElement(element);
+        continue;
+      }
+      replaceElement(element, parseDocument(html));
+    }
+    this.data = render(document);
+    return this;
+  }
+
+  resolveInternalLinks(resolve: ResolveInternalLink) {
+    this.data = new HTMLRewriter({
+      ontag: (name, attr) => {
+        const href = attr[ATTRIBUTES.href];
+        if (name === "a" && href.startsWith("nn://")) {
+          const link = resolve(href);
+          if (!link) return;
+          attr[ATTRIBUTES.href] = link;
+        }
+      }
+    }).transform(this.data);
+    return this;
   }
 
   extract(...types: ExtractableType[]): ExtractionResult {
