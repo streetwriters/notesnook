@@ -56,7 +56,7 @@ export function PdfPreview(props: PdfPreviewProps) {
 
   return (
     <Worker workerUrl="/pdf.worker.min.js">
-      <Flex sx={{ p: 1, justifyContent: "space-between" }}>
+      <Flex sx={{ p: 1, pt: 0, justifyContent: "space-between" }}>
         <Toolbar>
           {(props: ToolbarSlot) => {
             const {

@@ -38,12 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from "react";
 import { ArrowLeft } from "../icons";
-import {
-  DefaultEditorSession,
-  DeletedEditorSession,
-  ReadonlyEditorSession,
-  useEditorStore
-} from "../../stores/editor-store";
+import { useEditorStore } from "../../stores/editor-store";
 import { AnimatedFlex } from "../animated";
 import ScrollContainer from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
@@ -53,21 +48,21 @@ import { Button, Flex, Text } from "@theme-ui/components";
 import { useEditorManager } from "./manager";
 
 type TableOfContentsProps = {
-  session: DefaultEditorSession | ReadonlyEditorSession | DeletedEditorSession;
+  sessionId: string;
 };
 function TableOfContents(props: TableOfContentsProps) {
-  const { session } = props;
+  const { sessionId } = props;
 
   const [active, setActive] = useState<string[]>([]);
   const toggleTableOfContents = useEditorStore(
     (store) => store.toggleTableOfContents
   );
   const tableOfContents = useEditorManager(
-    (store) => store.editors[session.id]?.tableOfContents || []
+    (store) => store.editors[sessionId]?.tableOfContents || []
   );
 
   useEffect(() => {
-    const editorScroll = document.getElementById(`${session.id}_editorScroll`);
+    const editorScroll = document.getElementById(`editorScroll_${sessionId}`);
     if (!editorScroll) return;
     function onScroll() {
       const scrollTop = editorScroll?.scrollTop || 0;
@@ -87,9 +82,8 @@ function TableOfContents(props: TableOfContentsProps) {
     return () => {
       editorScroll.removeEventListener("scroll", onScroll);
     };
-  }, [session.id, tableOfContents]);
+  }, [sessionId, tableOfContents]);
 
-  if (!session) return null;
   return (
     <AnimatedFlex
       animate={{
