@@ -82,7 +82,9 @@ async function deleteAttachments(ids: string[]) {
     !(await confirm({
       title: "Are you sure?",
       message:
-        "Are you sure you want to permanently delete these attachments? This action is IRREVERSIBLE."
+        "Are you sure you want to permanently delete these attachments? This action is IRREVERSIBLE.",
+      negativeButtonText: "No",
+      positiveButtonText: "Yes"
     }))
   )
     return;
