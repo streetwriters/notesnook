@@ -400,6 +400,15 @@ export class Notes implements ICollection {
       .blocks;
   }
 
+  async contentBlocksWithLinks(id: string) {
+    const content = await this.db.content.findByNoteId(id);
+    if (!content || content.locked) return [];
+
+    return getContentFromData(content.type, content.data).extract(
+      "linked-blocks"
+    ).blocks;
+  }
+
   async internalLinks(id: string) {
     const content = await this.db.content.findByNoteId(id);
     if (!content || content.locked) return [];

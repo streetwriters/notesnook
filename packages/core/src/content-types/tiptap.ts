@@ -42,7 +42,7 @@ export type ResolveHashes = (
   hashes: string[]
 ) => Promise<Record<string, string>>;
 
-const ExtractableTypes = ["blocks", "internalLinks"] as const;
+const ExtractableTypes = ["blocks", "internalLinks", "linked-blocks"] as const;
 type ExtractableType = (typeof ExtractableTypes)[number];
 type ExtractionResult = {
   blocks: ContentBlock[];
@@ -149,6 +149,27 @@ export class Tiptap {
       withEndIndices: true,
       withStartIndices: true
     });
+
+    if (types.includes("linked-blocks")) {
+      result.blocks.push(
+        ...findAll((element): element is Element => {
+          return isTag(element) && element.tagName === "a";
+        }, document.childNodes).map((node) => {
+          let parent = node.parent as Element;
+          while (!(parent as Element).attribs[ATTRIBUTES.blockId]) {
+            parent = parent?.parent as Element;
+          }
+          return {
+            id: parent.attribs[ATTRIBUTES.blockId],
+            type: parent.tagName.toLowerCase(),
+            content: convertHtmlToTxt(
+              this.data.slice(parent.startIndex || 0, parent.endIndex || 0),
+              false
+            )
+          };
+        })
+      );
+    }
 
     if (types.includes("blocks")) {
       result.blocks.push(
