@@ -84,8 +84,9 @@ const DownloadAttachments = ({
     canceled.current = true;
     if (!groupId.current) return;
     console.log(groupId.current, "canceling groupId downloads");
-    await db.fs().cancel(groupId.current, "download");
+    await db.fs().cancel(groupId.current);
     setDownloading(false);
+    setResult(new Map());
     groupId.current = undefined;
   };
 
@@ -201,7 +202,7 @@ const DownloadAttachments = ({
             </Paragraph>
           </View>
         }
-        keyExtractor={(index) => "attachment" + index}
+        keyExtractor={(index) => "attachment_download" + index}
         renderItem={({ index }) => {
           return (
             <AttachmentItem

@@ -84,8 +84,10 @@ export async function downloadAttachments(
     Platform.OS === "ios"
       ? `${outputFolder}/notesnook-attachments-${Date.now()}.zip`
       : `${cacheDir}/notesnook-attachments.zip`;
-  if (await RNFetchBlob.fs.exists(zipSourceFolder))
+  if (await RNFetchBlob.fs.exists(zipSourceFolder)) {
     await RNFetchBlob.fs.unlink(zipSourceFolder);
+  }
+
   await RNFetchBlob.fs.mkdir(zipSourceFolder);
 
   for (let i = 0; i < attachments.length; i++) {
@@ -127,7 +129,7 @@ export async function downloadAttachments(
         status: FileDownloadStatus.Fail,
         reason: e
       });
-      console.log("Error downloading attachment", e);
+      ToastManager.error(e, "Error downloading attachment");
     }
   }
   if (canceled.current) {
@@ -164,7 +166,7 @@ export async function downloadAttachments(
     } catch (e) {
       releasePermissions(outputFolder);
       sub?.remove();
-      console.log("Error zipping attachments", e);
+      ToastManager.error(e, "Error zipping attachments");
     }
     // Remove source & zip file from cache.
     RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
