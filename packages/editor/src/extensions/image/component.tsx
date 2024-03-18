@@ -413,7 +413,6 @@ function getAlignmentStyles(
   const { align, float } = options;
   if (float && align !== "center") {
     return {
-      display: "inline",
       ml: align === "right" ? 2 : 0,
       mr: align === "left" ? 2 : 0,
       float: align,
