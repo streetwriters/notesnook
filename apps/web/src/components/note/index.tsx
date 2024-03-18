@@ -71,7 +71,7 @@ import { showToast } from "../../utils/toast";
 import { navigate } from "../../navigation";
 import { showPublishView } from "../publish-view";
 import IconTag from "../icon-tag";
-import { exportNote, exportNotes, exportToPDF } from "../../common/export";
+import { exportNote, exportNotes } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
 import { store as selectionStore } from "../../stores/selection-store";
 import {
@@ -80,6 +80,7 @@ import {
 } from "@notesnook/core/dist/collections/reminders";
 import {
   NoteResolvedData,
+  exportContent,
   getFormattedReminderTime,
   pluralize
 } from "@notesnook/common";
@@ -93,8 +94,8 @@ import {
 import { MenuItem } from "@notesnook/ui";
 import { Context } from "../list-container/types";
 import { SchemeColors } from "@notesnook/theme";
-import FileSaver from "file-saver";
 import { writeToClipboard } from "../../utils/clipboard";
+import Vault from "../../common/vault";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -422,9 +423,9 @@ const menuItems: (
       //isDisabled: !isSynced,
       icon: Print.path,
       onClick: async () => {
-        const result = await exportNote(note, { format: "pdf" });
-        if (!result) return;
-        await exportToPDF(note.title, result.content);
+        await exportNote(note, {
+          format: "pdf"
+        });
       }
     },
     {
@@ -458,18 +459,13 @@ const menuItems: (
           isDisabled: format.type === "pdf" && ids.length > 1,
           // ? "Multiple notes cannot be exported as PDF."
           // : false,
+          multiSelect: true,
           isPro: format.type !== "txt",
           onClick: async () => {
             if (ids.length === 1) {
-              const result = await exportNote(note, { format: format.type });
-              if (!result) return;
-              if (format.type === "pdf")
-                return exportToPDF(note.title, result.content);
-
-              return FileSaver.saveAs(
-                new Blob([new TextEncoder().encode(result.content)]),
-                result.filename
-              );
+              return await exportNote(note, {
+                format: format.type
+              });
             }
 
             await exportNotes(
@@ -791,10 +787,14 @@ async function copyNote(noteId: string, format: "md" | "txt") {
     const note = await db.notes?.note(noteId);
     if (!note) throw new Error("No note with this id exists.");
 
-    const result = await exportNote(note, { format, disableTemplate: true });
+    const result = await exportContent(note, {
+      format,
+      disableTemplate: true,
+      unlockVault: Vault.unlockVault
+    });
     if (!result) throw new Error(`Could not convert note to ${format}.`);
 
-    await navigator.clipboard.writeText(result.content);
+    await navigator.clipboard.writeText(result);
     showToast("success", "Copied!");
   } catch (e) {
     if (e instanceof Error)
