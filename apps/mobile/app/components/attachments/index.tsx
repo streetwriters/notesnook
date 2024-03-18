@@ -61,10 +61,15 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
 
   const refresh = React.useCallback(() => {
     if (note) {
-      db.attachments.ofNote(note.id, "all").sorted({
-        ...DEFAULT_SORTING,
-        sortBy: "dateModified"
-      });
+      db.attachments
+        .ofNote(note.id, "all")
+        .sorted({
+          ...DEFAULT_SORTING,
+          sortBy: "dateModified"
+        })
+        .then((attachments) => {
+          setAttachments(attachments);
+        });
     } else {
       db.attachments.all
         .sorted({
@@ -155,7 +160,9 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
 
     switch (type) {
       case "all":
-        items = db.attachments.all;
+        items = note
+          ? db.attachments.ofNote(note.id, "all")
+          : db.attachments.all;
         break;
       case "images":
         items = note
@@ -164,15 +171,17 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
         break;
       case "video":
         items = items = note
-          ? db.attachments.ofNote(note.id, "all")
+          ? db.attachments.ofNote(note.id, "videos")
           : db.attachments.videos;
         break;
       case "audio":
-        items = db.attachments.all;
+        items = note
+          ? db.attachments.ofNote(note.id, "audio")
+          : db.attachments.all;
         break;
       case "documents":
         items = note
-          ? db.attachments.ofNote(note.id, "all")
+          ? db.attachments.ofNote(note.id, "documents")
           : db.attachments.documents;
     }
 
