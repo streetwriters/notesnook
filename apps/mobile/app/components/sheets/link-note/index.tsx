@@ -159,7 +159,6 @@ export default function LinkNote(props: {
       setNotes(notes);
     });
   }, []);
-  console.log(new URL("https://google.com").protocol);
 
   const onChange = async (value: string) => {
     query.current = value;
