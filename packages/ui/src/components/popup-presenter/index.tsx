@@ -206,6 +206,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
             padding: 0,
             zIndex: 999,
             outline: 0,
+            opacity: `1 !important`,
             isolation: "isolate"
           }}
         >
@@ -216,7 +217,8 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
         content: {},
         overlay: {
           zIndex: 999,
-          background: "transparent"
+          background: "transparent",
+          opacity: 1
         }
       }}
     >
