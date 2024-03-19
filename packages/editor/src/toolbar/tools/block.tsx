@@ -37,25 +37,21 @@ export function InsertBlock(props: ToolProps) {
   const toolbarLocation = useToolbarLocation();
   const isMobile = useIsMobile();
 
-  const menuItems = useMemo(
-    () => {
-      return [
-        tasklist(editor),
-        outlinelist(editor),
-        horizontalRule(editor),
-        codeblock(editor),
-        mathblock(editor),
-        callout(editor),
-        blockquote(editor),
-        image(editor, isMobile),
-        attachment(editor),
-        isMobile ? embedMobile(editor) : embedDesktop(editor),
-        table(editor)
-      ];
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isMobile]
-  );
+  const menuItems = useMemo(() => {
+    return [
+      tasklist(editor),
+      outlinelist(editor),
+      horizontalRule(editor),
+      codeblock(editor),
+      mathblock(editor),
+      callout(editor),
+      blockquote(editor),
+      image(editor, isMobile),
+      attachment(editor),
+      isMobile ? embedMobile(editor) : embedDesktop(editor),
+      table(editor)
+    ];
+  }, [editor, isMobile]);
 
   return (
     <>
@@ -106,7 +102,7 @@ const horizontalRule = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Horizontal rule",
   icon: Icons.horizontalRule,
-  isChecked: editor?.isActive("horizontalRule"),
+  isChecked: editor.isActive("horizontalRule"),
   onClick: () => editor.chain().focus().setHorizontalRule().run()
 });
 
@@ -115,7 +111,7 @@ const codeblock = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Code block",
   icon: Icons.codeblock,
-  isChecked: editor?.isActive("codeBlock"),
+  isChecked: editor.isActive("codeBlock"),
   onClick: () => editor.chain().focus().toggleCodeBlock().run(),
   modifier: "Mod-Shift-C"
 });
@@ -125,7 +121,7 @@ const blockquote = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Quote",
   icon: Icons.blockquote,
-  isChecked: editor?.isActive("blockQuote"),
+  isChecked: editor.isActive("blockQuote"),
   onClick: () => editor.chain().focus().toggleBlockquote().run(),
   modifier: "Mod-Shift-B"
 });
@@ -135,7 +131,7 @@ const mathblock = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Math & formulas",
   icon: Icons.mathBlock,
-  isChecked: editor?.isActive("mathBlock"),
+  isChecked: editor.isActive("mathBlock"),
   onClick: () => editor.chain().focus().insertMathBlock().run(),
   modifier: "Mod-Shift-M"
 });
@@ -285,7 +281,7 @@ const attachment = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Attachment",
   icon: Icons.attachment,
-  isChecked: editor?.isActive("attachment"),
+  isChecked: editor.isActive("attachment"),
   onClick: () => editor.storage.openAttachmentPicker?.("file"),
   modifier: "Mod-Shift-A"
 });
@@ -295,7 +291,7 @@ const tasklist = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Task list",
   icon: Icons.checkbox,
-  isChecked: editor?.isActive("taskList"),
+  isChecked: editor.isActive("taskList"),
   onClick: () => editor.chain().focus().toggleTaskList().run(),
   modifier: "Mod-Shift-T"
 });
@@ -305,7 +301,7 @@ const outlinelist = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Outline list",
   icon: Icons.outlineList,
-  isChecked: editor?.isActive("outlineList"),
+  isChecked: editor.isActive("outlineList"),
   onClick: () => editor.chain().focus().toggleOutlineList().run(),
   modifier: "Mod-Shift-O"
 });

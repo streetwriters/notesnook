@@ -263,7 +263,7 @@ export function CellBorderColor(props: ToolProps) {
       activeColor={editor.getAttributes("tableCell").borderColor}
       title={"Cell border color"}
       onColorChange={(color) =>
-        editor?.chain().focus().setCellAttribute("borderColor", color).run()
+        editor.chain().focus().setCellAttribute("borderColor", color).run()
       }
     />
   );

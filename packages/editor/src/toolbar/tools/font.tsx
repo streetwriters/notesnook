@@ -49,13 +49,13 @@ export function FontSize(props: ToolProps) {
       title="Font size"
       disabled={editor.isActive(CodeBlock.name)}
       onDecrease={() =>
-        editor?.chain().focus().setFontSize(`${decreaseFontSize()}px`).run()
+        editor.chain().focus().setFontSize(`${decreaseFontSize()}px`).run()
       }
       onIncrease={() => {
-        editor?.chain().focus().setFontSize(`${increaseFontSize()}px`).run();
+        editor.chain().focus().setFontSize(`${increaseFontSize()}px`).run();
       }}
       onReset={() =>
-        editor?.chain().focus().setFontSize(`${defaultFontSize}px`).run()
+        editor.chain().focus().setFontSize(`${defaultFontSize}px`).run()
       }
       value={fontSize || `${defaultFontSize}px`}
     />
