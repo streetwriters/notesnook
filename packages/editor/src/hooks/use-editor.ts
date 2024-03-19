@@ -103,7 +103,7 @@ export const useEditor = (
       editor.view.destroy();
       editor.destroy();
     };
-  }, []);
+  }, [editor]);
 
   useEffect(() => {
     // this is required for the drag/drop to work properly

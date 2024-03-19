@@ -21,7 +21,7 @@ import { ThemeUIStyleObject } from "@theme-ui/core";
 import { Box, Flex, Image, Text } from "@theme-ui/components";
 import { ImageAttributes } from "./image";
 import { useEffect, useState } from "react";
-import { SelectionBasedReactNodeViewProps } from "../react";
+import { ReactNodeViewProps } from "../react";
 import { DesktopOnly } from "../../components/responsive";
 import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons";
@@ -46,7 +46,7 @@ import DataURL from "@notesnook/core/dist/utils/dataurl";
 export const AnimatedImage = motion(Image);
 
 export function ImageComponent(
-  props: SelectionBasedReactNodeViewProps<Partial<ImageAttributes>>
+  props: ReactNodeViewProps<Partial<ImageAttributes>>
 ) {
   const { editor, node, selected } = props;
   const { src, alt, title, textDirection, hash, aspectRatio, mime, progress } =

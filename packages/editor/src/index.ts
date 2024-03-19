@@ -61,11 +61,7 @@ import OrderedList from "./extensions/ordered-list";
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Paragraph } from "./extensions/paragraph";
-import {
-  NodeViewSelectionNotifier,
-  PortalProviderAPI,
-  usePortalProvider
-} from "./extensions/react";
+import { PortalProviderAPI, usePortalProvider } from "./extensions/react";
 import { SearchReplace } from "./extensions/search-replace";
 import { Table } from "./extensions/table";
 import TableCell from "./extensions/table-cell";
@@ -187,7 +183,6 @@ const useTiptap = (
       },
       extensions: [
         ...CoreExtensions,
-        NodeViewSelectionNotifier,
         SearchReplace.configure({
           onStartSearch: (term) => {
             useEditorSearchStore.setState({
