@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Flex, Text } from "@theme-ui/components";
 import { useEffect, useRef, useState } from "react";
-import { SelectionBasedReactNodeViewProps } from "../react";
+import { ReactNodeViewProps } from "../react";
 import { Icons } from "../../toolbar";
 import { Icon } from "@notesnook/ui";
 import { WebClipAttributes } from "./web-clip";
@@ -34,9 +34,7 @@ const FAILED_CONTENT = `<html><head>
 </body>
 </html>`;
 
-export function WebClipComponent(
-  props: SelectionBasedReactNodeViewProps<WebClipAttributes>
-) {
+export function WebClipComponent(props: ReactNodeViewProps<WebClipAttributes>) {
   const { editor, selected, node, updateAttributes } = props;
   const [isLoading, setIsLoading] = useState(true);
   const embedRef = useRef<HTMLIFrameElement>(null);

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Node, mergeAttributes, findChildren } from "@tiptap/core";
 import { Attribute } from "@tiptap/core";
-import { createSelectionBasedNodeView } from "../react";
+import { createNodeView } from "../react";
 import { AttachmentComponent } from "./component";
 import { Attachment } from "./types";
 
@@ -96,7 +96,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
   },
 
   addNodeView() {
-    return createSelectionBasedNodeView(AttachmentComponent, {
+    return createNodeView(AttachmentComponent, {
       shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
         return prev.progress !== next.progress;
       },

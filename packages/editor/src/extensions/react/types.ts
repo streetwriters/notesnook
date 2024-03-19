@@ -50,12 +50,8 @@ export type ReactNodeViewProps<TAttributes = Attrs> = {
   editor: Editor;
   updateAttributes: UpdateAttributes<TAttributes>;
   forwardRef?: ForwardRef;
+  selected: boolean;
 };
-
-export type SelectionBasedReactNodeViewProps<TAttributes = Attrs> =
-  ReactNodeViewProps<TAttributes> & {
-    selected: boolean;
-  };
 
 export type ReactNodeViewOptions<P> = {
   props?: P;
