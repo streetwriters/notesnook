@@ -1,0 +1,30 @@
+diff --git a/node_modules/@tiptap/extension-list-keymap/dist/index.cjs b/node_modules/@tiptap/extension-list-keymap/dist/index.cjs
+index 9cd822f..1539b13 100644
+--- a/node_modules/@tiptap/extension-list-keymap/dist/index.cjs
++++ b/node_modules/@tiptap/extension-list-keymap/dist/index.cjs
+@@ -82,7 +82,9 @@ const handleBackspace = (editor, name, parentListTypes) => {
+     // the previous item is a list (orderedList or bulletList)
+     // move the cursor into the list and delete the current item
+     if (!core.isNodeActive(editor.state, name) && hasListBefore(editor.state, name, parentListTypes)) {
+-        const { $anchor } = editor.state.selection;
++        const { $anchor, empty } = editor.state.selection;
++        if (!empty) return false;
++
+         const $listPos = editor.state.doc.resolve($anchor.before() - 1);
+         const listDescendants = [];
+         $listPos.node().descendants((node, pos) => {
+diff --git a/node_modules/@tiptap/extension-list-keymap/dist/index.js b/node_modules/@tiptap/extension-list-keymap/dist/index.js
+index e759826..11a385f 100644
+--- a/node_modules/@tiptap/extension-list-keymap/dist/index.js
++++ b/node_modules/@tiptap/extension-list-keymap/dist/index.js
+@@ -78,7 +78,9 @@ const handleBackspace = (editor, name, parentListTypes) => {
+     // the previous item is a list (orderedList or bulletList)
+     // move the cursor into the list and delete the current item
+     if (!isNodeActive(editor.state, name) && hasListBefore(editor.state, name, parentListTypes)) {
+-        const { $anchor } = editor.state.selection;
++        const { $anchor, empty } = editor.state.selection;
++        if (!empty) return false;
++        
+         const $listPos = editor.state.doc.resolve($anchor.before() - 1);
+         const listDescendants = [];
+         $listPos.node().descendants((node, pos) => {
