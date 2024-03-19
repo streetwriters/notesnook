@@ -35,14 +35,18 @@ import {
 } from "../utils/html-parser";
 import { HTMLRewriter } from "../utils/html-rewriter";
 import { ContentBlock } from "../types";
-import { InternalLink, parseInternalLink } from "../utils/internal-link";
+import {
+  InternalLink,
+  isInternalLink,
+  parseInternalLink
+} from "../utils/internal-link";
 import { Element } from "domhandler";
 
 export type ResolveHashes = (
   hashes: string[]
 ) => Promise<Record<string, string>>;
 
-const ExtractableTypes = ["blocks", "internalLinks", "linked-blocks"] as const;
+const ExtractableTypes = ["blocks", "internalLinks", "blocksWithLink"] as const;
 type ExtractableType = (typeof ExtractableTypes)[number];
 type ExtractionResult = {
   blocks: ContentBlock[];
@@ -150,20 +154,24 @@ export class Tiptap {
       withStartIndices: true
     });
 
-    if (types.includes("linked-blocks")) {
+    if (types.includes("blocksWithLink")) {
       result.blocks.push(
-        ...findAll((element): element is Element => {
-          return isTag(element) && element.tagName === "a";
-        }, document.childNodes).map((node) => {
-          let parent = node.parent as Element;
-          while (!(parent as Element).attribs[ATTRIBUTES.blockId]) {
-            parent = parent?.parent as Element;
-          }
+        ...findAll((element) => {
+          return (
+            !!element.attribs[ATTRIBUTES.blockId] &&
+            element.childNodes.some(
+              (node) =>
+                isTag(node) &&
+                node.tagName === "a" &&
+                isInternalLink(node.attribs.href)
+            )
+          );
+        }, document.childNodes).map((element) => {
           return {
-            id: parent.attribs[ATTRIBUTES.blockId],
-            type: parent.tagName.toLowerCase(),
+            id: element.attribs[ATTRIBUTES.blockId],
+            type: element.tagName.toLowerCase(),
             content: convertHtmlToTxt(
-              this.data.slice(parent.startIndex || 0, parent.endIndex || 0),
+              this.data.slice(element.startIndex || 0, element.endIndex || 0),
               false
             )
           };
