@@ -162,7 +162,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
       content.style.minWidth = "20px";
       return { dom: content };
     }
-    return this.options.contentDOMFactory?.();
+    return this.options.contentDOMFactory?.(this.node);
   }
 
   #updatePos() {

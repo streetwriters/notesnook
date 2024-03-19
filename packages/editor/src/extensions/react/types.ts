@@ -58,7 +58,7 @@ export type ReactNodeViewOptions<P> = {
   component?: React.ComponentType<P>;
   componentKey?: (node: PMNode) => string;
   shouldUpdate?: ShouldUpdate;
-  contentDOMFactory?: (() => ContentDOM) | boolean;
+  contentDOMFactory?: ((node: PMNode) => ContentDOM) | boolean;
   wrapperFactory?: () => HTMLElement;
   forceEnableSelection?: boolean;
 };
