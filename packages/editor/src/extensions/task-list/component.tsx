@@ -39,7 +39,7 @@ export function TaskListComponent(
   const checked = stats.total > 0 && stats.total === stats.checked;
 
   const isNested = useMemo(() => {
-    if (!pos) return false;
+    if (!pos || editor.state.doc.nodeSize < pos) return false;
     return editor.state.doc.resolve(pos).parent.type.name === TaskItem.name;
   }, [editor.state.doc, pos]);
 
