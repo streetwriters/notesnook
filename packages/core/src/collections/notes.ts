@@ -405,7 +405,7 @@ export class Notes implements ICollection {
     if (!content || content.locked) return [];
 
     return getContentFromData(content.type, content.data).extract(
-      "linked-blocks"
+      "blocksWithLink"
     ).blocks;
   }
 
