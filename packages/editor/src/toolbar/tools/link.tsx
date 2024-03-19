@@ -77,10 +77,10 @@ export function AddInternalLink(props: ToolProps) {
   const { editor } = props;
   const isActive = editor.isActive(LinkNode.name);
 
-  if (isActive) return null;
   return (
     <ToolButton
       {...props}
+      disabled={isActive}
       onClick={async () => {
         const link = await editor.storage.createInternalLink?.();
         if (!link) return;
