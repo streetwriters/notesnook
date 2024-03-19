@@ -38,7 +38,7 @@ function TextDirectionTool(props: TextDirectionToolProps) {
     <ToolButton
       {...toolProps}
       onClick={() =>
-        editor?.chain().focus().setTextDirection(directionRef.current).run()
+        editor.chain().focus().setTextDirection(directionRef.current).run()
       }
       disabled={editor.isActive(CodeBlock.name)}
       toggled={false}

@@ -54,7 +54,7 @@ export function EmbedAlignLeft(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor?.chain().focus().setEmbedAlignment({ align: "left" }).run()
+        editor.chain().focus().setEmbedAlignment({ align: "left" }).run()
       }
     />
   );
@@ -67,7 +67,7 @@ export function EmbedAlignRight(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor?.chain().focus().setEmbedAlignment({ align: "right" }).run()
+        editor.chain().focus().setEmbedAlignment({ align: "right" }).run()
       }
     />
   );
@@ -80,7 +80,7 @@ export function EmbedAlignCenter(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor?.chain().focus().setEmbedAlignment({ align: "center" }).run()
+        editor.chain().focus().setEmbedAlignment({ align: "center" }).run()
       }
     />
   );
