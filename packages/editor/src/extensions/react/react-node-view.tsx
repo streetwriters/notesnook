@@ -46,12 +46,32 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private domRef!: HTMLElement;
   private contentDOMWrapper?: Node;
 
-  contentDOM: HTMLElement | undefined;
+  contentDOM?: HTMLElement;
   node: PMNode;
   isDragging = false;
   selected = false;
   pos = -1;
   posEnd: number | undefined;
+
+  // in order to cleanly unmount a React Portal, we have to preserve the
+  // dom structure for the full node. However, Prosemirror/browser can,
+  // sometimes, detach the node before React is able to call "unmount".
+  // Unmounting a React child whose DOM counterpart is already removed
+  // results in a DOMException.
+  // To fix that, we observe and store all the detached subnodes and later add
+  // them back when we are ready to destroy our node view once & for all.
+  // This wouldn't be necessary if React allowed for a way to "sync" the DOM
+  // changes to its Virtual DOM.
+  detached: Set<Node> = new Set();
+  detachObserver = new MutationObserver((mutations) => {
+    const filtered = mutations.filter(
+      (m) => m.target === this.domRef && m.removedNodes.length > 0
+    );
+    for (const mutation of filtered) {
+      for (const node of mutation.removedNodes) this.detached.add(node);
+    }
+  });
+
   constructor(
     node: PMNode,
     protected readonly editor: Editor,
@@ -85,6 +105,10 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   init() {
     this.domRef = this.createDomRef();
     this.domRef.ondragstart = (ev) => this.onDragStart(ev);
+    this.detachObserver.observe(this.domRef, {
+      childList: true,
+      subtree: true
+    });
     // this.setDomAttrs(this.node, this.domRef);
 
     const { dom: contentDOMWrapper, contentDOM } = this.getContentDOM() ?? {};
@@ -471,8 +495,15 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   }
 
   destroy() {
-    if (!this.portalProviderAPI) return;
+    this.detachObserver.disconnect();
+    // add back the detached nodes because React expects an untouched
+    // DOM representation (and there's no way to reconcile the DOM later).
+    for (const node of this.detached) {
+      this.domRef.appendChild(node);
+    }
     this.portalProviderAPI.remove(this.domRef);
+    this.detached.clear();
+    this.domRef.remove();
   }
 }
 
