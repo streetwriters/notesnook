@@ -472,7 +472,7 @@ function ReferencedIn({
           onClick={async (e) => {
             e.stopPropagation();
             if (isExpanded) return toggleExpand();
-            const blocks = await db.notes.contentBlocks(item.id);
+            const blocks = await db.notes.contentBlocksWithLinks(item.id);
             setBlocks(
               blocks
                 .filter((b) =>
