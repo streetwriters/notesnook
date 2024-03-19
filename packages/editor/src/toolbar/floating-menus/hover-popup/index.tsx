@@ -31,7 +31,7 @@ export type HoverPopupProps = {
 
 const handlers = [LinkHoverPopupHandler];
 
-const HOVER_TIMEOUT = 500;
+const HOVER_TIMEOUT = 1000;
 
 export function HoverPopupHandler(props: FloatingMenuProps) {
   const { editor } = props;
@@ -102,11 +102,12 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
               blocking: false,
               focusOnRender: false,
               position: {
-                target: element,
-                align: "center",
+                target: "mouse",
+                align: "start",
                 location: "top",
                 isTargetAbsolute: true,
-                yOffset: -30
+                yOffset: 10,
+                xOffset: -30
               }
             });
             activePopup.current = { element, hide: hidePopup };
