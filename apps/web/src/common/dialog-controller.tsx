@@ -502,6 +502,8 @@ export function showEditProfilePictureDialog(profile?: Profile) {
 }
 
 export function showImagePickerDialog(images: File[]): Promise<false | File[]> {
+  if (images.length <= 0) return Promise.resolve(false);
+
   return showDialog("ImagePickerDialog", (Dialog, perform) => (
     <Dialog onClose={(res) => perform(res)} images={images} />
   ));
