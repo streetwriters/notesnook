@@ -210,7 +210,7 @@ function TipTap(props: TipTapProps) {
       },
       onUpdate: ({ editor, transaction }) => {
         const changedHeadings = getChangedNodes(transaction, {
-          descend: false,
+          descend: true,
           predicate: (n) => n.isBlock && n.type.name === "heading"
         });
         if (changedHeadings.length > 0) {
