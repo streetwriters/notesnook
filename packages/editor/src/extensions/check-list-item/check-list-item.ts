@@ -16,12 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import {
-  KeyboardShortcutCommand,
-  mergeAttributes,
-  Node,
-  wrappingInputRule
-} from "@tiptap/core";
+import { KeyboardShortcutCommand, mergeAttributes, Node } from "@tiptap/core";
 import { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
 export interface CheckListItemOptions {
@@ -30,7 +25,7 @@ export interface CheckListItemOptions {
   HTMLAttributes: Record<string, any>;
 }
 
-export const inputRegex = /^\s*(\[([( |x])?\])\s$/;
+// export const inputRegex = /^\s*(\[([( |x])?\])\s$/;
 
 export const CheckListItem = Node.create<CheckListItemOptions>({
   name: "checkListItem",
@@ -174,17 +169,17 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
         }
       };
     };
-  },
-
-  addInputRules() {
-    return [
-      wrappingInputRule({
-        find: inputRegex,
-        type: this.type,
-        getAttributes: (match) => ({
-          checked: match[match.length - 1] === "x"
-        })
-      })
-    ];
   }
+
+  // addInputRules() {
+  //   return [
+  //     wrappingInputRule({
+  //       find: inputRegex,
+  //       type: this.type,
+  //       getAttributes: (match) => ({
+  //         checked: match[match.length - 1] === "x"
+  //       })
+  //     })
+  //   ];
+  // }
 });
