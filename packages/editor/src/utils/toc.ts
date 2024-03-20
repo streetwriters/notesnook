@@ -25,14 +25,14 @@ export type TOCItem = {
 };
 
 export function getTableOfContents(content: HTMLElement) {
-  const headings = content.querySelectorAll("h1, h2, h3, h4, h5, h6");
   const tableOfContents: TOCItem[] = [];
 
-  for (let i = 0; i < headings.length; i++) {
-    const heading = headings[i];
+  for (const heading of content.querySelectorAll<HTMLHeadingElement>(
+    "h1, h2, h3, h4, h5, h6"
+  )) {
     const level = parseInt(heading.tagName[1]);
     const title = heading.textContent;
-    const id = heading.getAttribute("data-block-id");
+    const id = heading.dataset.blockId;
     if (!id || !title) continue;
 
     tableOfContents.push({
