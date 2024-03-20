@@ -111,7 +111,7 @@ class NoteStore extends BaseStore<NoteStore> {
   };
 
   setColor = async (colorId: string, isChecked: boolean, ...ids: string[]) => {
-    await db.relations.from({ type: "color", id: colorId }, "note").unlink();
+    await db.relations.to({ type: "note", ids }, "color").unlink();
     if (!isChecked) {
       for (const id of ids) {
         await db.relations.add(
