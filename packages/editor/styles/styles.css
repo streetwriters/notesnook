@@ -68,12 +68,38 @@
   margin: 0px;
 }
 
-.ProseMirror li {
+.ProseMirror li + li {
   margin-bottom: 5px;
+  margin-top: 5px;
 }
 
-.ProseMirror ul.tasklist-content-wrapper {
+.ProseMirror .taskList ul {
+  margin-block-start: 5px;
+  margin-block-end: 0px;
   padding-left: 0px;
+  list-style-type: none;
+}
+
+.ProseMirror[contenteditable="false"] .taskList ul ul {
+  margin-left: -10px;
+}
+.ProseMirror .taskList ul ul {
+  margin-left: -35px;
+}
+
+.ProseMirror .taskList ul li {
+  position: relative;
+  display: flex;
+  background: var(--background);
+  border-radius: 5px,
+}
+
+.ProseMirror .taskList ul li:hover > .dragHandle {
+  opacity: 1
+}
+
+.ProseMirror .taskList ul li:hover > .taskItemTools {
+  opacity: 1
 }
 
 .ProseMirror ul ul,

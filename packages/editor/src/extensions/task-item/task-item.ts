@@ -21,6 +21,7 @@ import { mergeAttributes } from "@tiptap/core";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskItemComponent } from "./component";
 import { createNodeView } from "../react";
+import { TaskListItems } from "../task-list";
 
 export type TaskItemAttributes = {
   checked: boolean;
@@ -55,8 +56,9 @@ export const TaskItemNode = TaskItem.extend({
   parseHTML() {
     return [
       {
-        tag: ".checklist > li",
-        priority: 51
+        tag: "li",
+        priority: 51,
+        context: `${TaskListItems.name}/`
       }
     ];
   },

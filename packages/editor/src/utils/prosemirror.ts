@@ -40,7 +40,7 @@ import { OrderedList } from "../extensions/ordered-list";
 import { OutlineList } from "../extensions/outline-list";
 import { OutlineListItem } from "../extensions/outline-list-item";
 import { TaskItemNode } from "../extensions/task-item";
-import { TaskListNode } from "../extensions/task-list";
+import { TaskListItems } from "../extensions/task-list";
 import { LIST_NODE_TYPES } from "./node-types";
 import TextStyle from "@tiptap/extension-text-style";
 import CheckList from "../extensions/check-list";
@@ -62,7 +62,7 @@ export function hasSameAttributes(prev: Attrs, next: Attrs) {
 }
 
 export function findListItemType(editor: Editor): string | null {
-  const isTaskList = editor.isActive(TaskListNode.name);
+  const isTaskList = editor.isActive(TaskListItems.name);
   const isCheckList = editor.isActive(CheckList.name);
   const isOutlineList = editor.isActive(OutlineList.name);
   const isList =

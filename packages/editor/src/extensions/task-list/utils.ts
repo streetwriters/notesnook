@@ -17,18 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import TaskList from "@tiptap/extension-task-list";
 import { Transaction } from "@tiptap/pm/state";
 import { Fragment, Node as ProsemirrorNode } from "prosemirror-model";
 import { NodeWithPos } from "@tiptap/core";
 import { findParentNodeClosestToPos } from "../../utils/prosemirror";
-import TaskItem from "@tiptap/extension-task-item";
+import { TaskItemNode } from "../task-item";
+import { TaskListItems } from "./task-list-items";
+// import { TaskList } from "./task-list";
+// import TaskItem from "@tiptap/extension-task-item";
+// import TaskList from "@tiptap/extension-task-list";
 
 export function countCheckedItems(node: ProsemirrorNode) {
   let checked = 0;
   let total = 0;
   node.descendants((node) => {
-    if (node.type.name === TaskItem.name) {
+    if (node.type.name === TaskItemNode.name) {
       if (node.attrs.checked) checked++;
       total++;
     }
@@ -40,11 +43,11 @@ export function deleteCheckedItems(tr: Transaction, pos: number) {
   const node = tr.doc.nodeAt(pos);
 
   const parent = node ? { node, pos } : null;
-  if (!parent || parent.node.type.name !== TaskList.name) return;
+  if (!parent || parent.node.type.name !== TaskListItems.name) return;
 
   const sublists: NodeWithPos[] = [];
   parent.node.descendants((node, nodePos) => {
-    if (node.type.name === TaskList.name)
+    if (node.type.name === TaskListItems.name)
       sublists.push({ node, pos: pos + nodePos + 1 });
   });
   if (sublists.length > 1) sublists.reverse();
@@ -76,11 +79,11 @@ export function sortList(tr: Transaction, pos: number) {
   const node = tr.doc.nodeAt(pos);
 
   const parent = node ? { node, pos } : null;
-  if (!parent || parent.node.type.name !== TaskList.name) return;
+  if (!parent || parent.node.type.name !== TaskListItems.name) return;
 
   const sublists: NodeWithPos[] = [];
   parent.node.descendants((node, nodePos) => {
-    if (node.type.name === TaskList.name)
+    if (node.type.name === TaskListItems.name)
       sublists.push({ node, pos: pos + nodePos + 1 });
   });
   if (sublists.length > 1) sublists.reverse();
@@ -123,13 +126,10 @@ export function sortList(tr: Transaction, pos: number) {
   return tr;
 }
 
-const invalidTaskListParents = [TaskList.name, TaskItem.name];
 export function findRootTaskList(doc: ProsemirrorNode, pos?: number) {
   if (!pos) return;
   return findParentNodeClosestToPos(
     doc.resolve(pos),
-    (node, parent) =>
-      node.type.name === TaskList.name &&
-      (!parent || !invalidTaskListParents.includes(parent.type.name))
+    (node) => node.type.name === "taskList"
   );
 }

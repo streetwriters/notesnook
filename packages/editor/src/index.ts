@@ -66,7 +66,11 @@ import { SearchReplace } from "./extensions/search-replace";
 import { Table } from "./extensions/table";
 import TableCell from "./extensions/table-cell";
 import { TaskItemNode } from "./extensions/task-item";
-import { TaskListNode } from "./extensions/task-list";
+import {
+  TaskListHeader,
+  TaskListItems,
+  TaskList
+} from "./extensions/task-list";
 import TextDirection from "./extensions/text-direction";
 import { WebClipNode, WebClipOptions } from "./extensions/web-clip";
 import { useEditor } from "./hooks/use-editor";
@@ -269,8 +273,12 @@ const useTiptap = (
         FontFamily,
         BulletList.configure({ keepMarks: true, keepAttributes: true }),
         OrderedList.configure({ keepMarks: true, keepAttributes: true }),
+
+        TaskListHeader,
         TaskItemNode.configure({ nested: true }),
-        TaskListNode,
+        TaskListItems,
+        TaskList,
+
         Link.extend({
           inclusive: true
         }).configure({
@@ -327,7 +335,7 @@ const useTiptap = (
         Quirks.configure({
           irremovableNodesOnBackspace: [
             CodeBlock.name,
-            TaskListNode.name,
+            TaskListItems.name,
             Table.name
           ],
           escapableNodesIfAtDocumentStart: [
@@ -346,7 +354,7 @@ const useTiptap = (
             },
             {
               itemName: TaskItemNode.name,
-              wrapperNames: [TaskListNode.name]
+              wrapperNames: [TaskListItems.name]
             },
             {
               itemName: OutlineListItem.name,

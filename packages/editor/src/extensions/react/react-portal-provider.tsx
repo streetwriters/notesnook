@@ -116,9 +116,10 @@ function PortalRenderer(props: { portalProviderAPI: PortalProviderAPI }) {
       // throws an error.
       if (!mounted.current) return;
 
+      const portals = Array.from(portalMap.entries());
       // flushSync is necessary here, otherwise we get into a loop where
       // ProseMirror destroys and recreates the node view over and over again.
-      flushSync(() => setPortals(Array.from(portalMap.entries())));
+      flushSync(() => setPortals(portals));
     }
     portalProviderAPI.on("update", onUpdate);
     return () => {
