@@ -35,7 +35,6 @@ import { Base64DecoderStream } from "../utils/streams/base64-decoder-stream";
 import { toBlob } from "@notesnook-importer/core/dist/src/utils/stream";
 import { DataFormat, SerializedKey } from "@notesnook/crypto";
 import { IDataType } from "hash-wasm/dist/lib/util";
-import { IndexedDBKVStore } from "./key-value";
 import FileHandle from "@notesnook/streamable-fs/dist/src/filehandle";
 import {
   CacheStorageFileStore,
@@ -570,6 +569,15 @@ export async function decryptFile(
   filename: string,
   fileMetadata: FileMetadata
 ) {
+  const stream = await streamingDecryptFile(filename, fileMetadata);
+  if (!stream) return false;
+  return await toBlob(stream);
+}
+
+export async function streamingDecryptFile(
+  filename: string,
+  fileMetadata: FileMetadata
+) {
   if (!fileMetadata) return false;
 
   const fileHandle = await streamablefs.readFile(filename);
@@ -578,7 +586,7 @@ export async function decryptFile(
   const { key, iv } = fileMetadata;
 
   const decryptionStream = await NNCrypto.createDecryptionStream(key, iv);
-  return await toBlob(fileHandle.readable.pipeThrough(decryptionStream));
+  return fileHandle.readable.pipeThrough(decryptionStream);
 }
 
 export async function saveFile(filename: string, fileMetadata: FileMetadata) {

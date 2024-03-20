@@ -20,10 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ICollection } from "./collection";
 import { getId } from "../utils/id";
 import { getContentFromData } from "../content-types";
-import { ResolveHashes } from "../content-types/tiptap";
 import { isCipher } from "../database/crypto";
 import {
-  Attachment,
   ContentItem,
   ContentType,
   UnencryptedContentItem,
@@ -254,24 +252,6 @@ export class Content implements ICollection {
   //   );
   // }
 
-  insertMedia(contentItem: UnencryptedContentItem) {
-    return this.insert(contentItem, async (hashes) => {
-      const sources: Record<string, string> = {};
-      for (const hash of hashes) {
-        const src = await this.db.attachments.read(hash, "base64");
-        if (!src) continue;
-        sources[hash] = src;
-      }
-      return sources;
-    });
-  }
-
-  insertPlaceholders(contentItem: UnencryptedContentItem, placeholder: string) {
-    return this.insert(contentItem, async (hashes) => {
-      return Object.fromEntries(hashes.map((h) => [h, placeholder]));
-    });
-  }
-
   async downloadMedia(
     groupId: string,
     contentItem: { type: ContentType; data: string },
@@ -280,12 +260,9 @@ export class Content implements ICollection {
     const content = getContentFromData(contentItem.type, contentItem.data);
     if (!content) return contentItem;
     contentItem.data = await content.insertMedia(async (hashes) => {
-      const attachments: Attachment[] = [];
-      for (const hash of hashes) {
-        const attachment = await this.db.attachments.attachment(hash);
-        if (!attachment) continue;
-        attachments.push(attachment);
-      }
+      const attachments = await this.db.attachments.all
+        .where((eb) => eb("attachments.hash", "in", hashes))
+        .items();
 
       await this.db.fs().queueDownloads(
         attachments.map((a) => ({
@@ -302,21 +279,11 @@ export class Content implements ICollection {
           attachment.hash,
           getOutputType(attachment)
         );
-        if (!src) continue;
+        if (!src || typeof src !== "string") continue;
         sources[attachment.hash] = src;
       }
       return sources;
     });
-    return contentItem;
-  }
-
-  private async insert(
-    contentItem: UnencryptedContentItem,
-    getData: ResolveHashes
-  ) {
-    const content = getContentFromData(contentItem.type, contentItem.data);
-    if (!content) return contentItem;
-    contentItem.data = await content.insertMedia(getData);
     return contentItem;
   }
 

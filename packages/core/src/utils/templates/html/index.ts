@@ -51,6 +51,23 @@ async function preprocessHTML(templateData: TemplateData) {
 
   const doc = parseHTML(html);
 
+  const images = doc.querySelectorAll("img");
+  for (const image of images) {
+    const container = doc.createElement("span");
+    container.append(image.cloneNode());
+    for (const attr of image.attributes) {
+      if (
+        attr.name === "src" ||
+        attr.name === "height" ||
+        attr.name === "width"
+      )
+        continue;
+      container.setAttribute(attr.name, attr.value);
+    }
+    container.classList.add("image-container");
+    image.replaceWith(container);
+  }
+
   const mathBlocks = doc.querySelectorAll(".math-block.math-node");
   const mathInlines = doc.querySelectorAll(".math-inline.math-node");
 

@@ -48,12 +48,25 @@ export function template(data: TemplateData) {
     }">
 
     <style>
-    img {
-      max-width: 100% !important;
-      height: auto !important;
-      border-radius: 5px;
+
+    .image-container {
+      display: block;
     }
-    
+    .image-container.align-right {
+      display: flex;
+      justify-content: end;
+    }
+    .image-container.align-center {
+      display: flex;
+      justify-content: center;
+    }
+    .image-container.float {
+      float: left;
+    }
+    .image-container.float.align-right {
+      float: right;
+    }
+
     body {
       background-color: transparent !important;
       color: #202124;

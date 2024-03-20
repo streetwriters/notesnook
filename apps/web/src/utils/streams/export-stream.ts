@@ -17,57 +17,54 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ExportableItem } from "@notesnook/common";
 import { db } from "../../common/db";
-import { exportNote } from "../../common/export";
-import { makeUniqueFilename } from "./utils";
+import { showToast } from "../toast";
 import { ZipFile } from "./zip-stream";
-import { Note } from "@notesnook/core";
+import { lazify } from "../lazify";
 
-export class ExportStream extends TransformStream<Note, ZipFile> {
-  constructor(
-    format: "pdf" | "md" | "txt" | "html" | "md-frontmatter",
-    signal?: AbortSignal
-  ) {
-    const counters: Record<string, number> = {};
-
+export class ExportStream extends TransformStream<
+  ExportableItem | Error,
+  ZipFile
+> {
+  constructor(report: (progress: { text: string; current?: number }) => void) {
+    let progress = 0;
     super({
-      async transform(note, controller) {
-        try {
-          if (signal?.aborted) {
-            controller.terminate();
-            return;
-          }
-
-          if (format === "pdf") return;
-
-          const result = await exportNote(note, { format });
-          if (!result) return;
-
-          const { filename, content } = result;
-
-          const notebooks = await db.relations
-            .to({ id: note.id, type: "note" }, "notebook")
-            .get();
-
-          const filePaths: string[] = [];
-          for (const { fromId: notebookId } of notebooks) {
-            const crumbs = (await db.notebooks.breadcrumbs(notebookId)).map(
-              (n) => n.title
-            );
-            filePaths.push([...crumbs, filename].join("/"));
-          }
-          if (filePaths.length <= 0) filePaths.push(filename);
-
-          filePaths.forEach((filePath) => {
-            controller.enqueue({
-              path: makeUniqueFilename(filePath, counters),
-              data: content,
-              mtime: new Date(note.dateEdited),
-              ctime: new Date(note.dateCreated)
-            });
+      async transform(item, controller) {
+        if (item instanceof Error) {
+          showToast("error", item.message);
+          return;
+        }
+        if (item.type === "attachment") {
+          report({ text: `Downloading attachment: ${item.path}` });
+          await db
+            .fs()
+            .downloadFile("exports", item.data.hash, item.data.chunkSize);
+          const key = await db.attachments.decryptKey(item.data.key);
+          if (!key) return;
+          const stream = await lazify(
+            import("../../interfaces/fs"),
+            ({ streamingDecryptFile }) =>
+              streamingDecryptFile(item.data.hash, {
+                key,
+                iv: item.data.iv,
+                name: item.data.filename,
+                type: item.data.mimeType,
+                isUploaded: !!item.data.dateUploaded
+              })
+          );
+          if (!stream) return;
+          controller.enqueue({ ...item, data: stream });
+          report({
+            current: progress++,
+            text: `Saving attachment: ${item.path}`
           });
-        } catch (e) {
-          controller.error(e);
+        } else {
+          controller.enqueue(item);
+          report({
+            current: progress++,
+            text: `Exporting note: ${item.path}`
+          });
         }
       }
     });

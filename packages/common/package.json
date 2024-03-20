@@ -30,15 +30,17 @@
   },
   "devDependencies": {
     "@notesnook/core": "file:../core",
+    "@types/react": "^18.2.39",
     "react": "18.2.0",
-    "@types/react": "^18.2.39"
+    "vitest": "^1.4.0"
   },
   "peerDependencies": {
-    "timeago.js": "4.0.2",
-    "react": ">=18"
+    "react": ">=18",
+    "timeago.js": "4.0.2"
   },
   "dependencies": {
-    "timeago.js": "4.0.2",
-    "@notesnook/core": "file:../core"
+    "@notesnook/core": "file:../core",
+    "pathe": "^1.1.2",
+    "timeago.js": "4.0.2"
   }
 }

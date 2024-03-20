@@ -18,17 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { TaskManager } from "./task-manager";
-import { ExportStream } from "../utils/streams/export-stream";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
 import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
-import { Note, isDeleted } from "@notesnook/core";
+import { Note } from "@notesnook/core";
 import { fromAsyncIterator } from "../utils/stream";
-import { db } from "./db";
-import { ExportOptions } from "@notesnook/core/dist/collections/notes";
-import { showToast } from "../utils/toast";
-import { sanitizeFilename } from "@notesnook/common";
+import {
+  sanitizeFilename,
+  exportNotes as _exportNotes,
+  exportNote as _exportNote,
+  exportContent
+} from "@notesnook/common";
 import Vault from "./vault";
+import { ExportStream } from "../utils/streams/export-stream";
 
 export async function exportToPDF(
   title: string,
@@ -82,24 +84,10 @@ export async function exportNotes(
     title: "Exporting notes",
     subtitle: "Please wait while your notes are exported.",
     action: async (report) => {
-      const total = await notes.count();
-      let progress = 0;
-
-      const noteStream = fromAsyncIterator(notes[Symbol.asyncIterator]());
-      await noteStream
-        .pipeThrough(
-          new TransformStream<Note, Note>({
-            transform(note, controller) {
-              controller.enqueue(note);
-              report({
-                total,
-                current: progress++,
-                text: `Exporting "${note?.title}"`
-              });
-            }
-          })
-        )
-        .pipeThrough(new ExportStream(format, undefined))
+      await fromAsyncIterator(
+        _exportNotes(notes, { format, unlockVault: Vault.unlockVault })
+      )
+        .pipeThrough(new ExportStream(report))
         .pipeThrough(createZipStream())
         .pipeTo(await createWriteStream("notes.zip"));
       return true;
@@ -117,46 +105,39 @@ const FORMAT_TO_EXT = {
 
 export async function exportNote(
   note: Note,
-  options: Omit<ExportOptions, "contentItem" | "format"> & {
+  options: {
     format: keyof typeof FORMAT_TO_EXT;
   }
 ) {
-  if (
-    !db.vault.unlocked &&
-    (await db.vaults.itemExists(note)) &&
-    !(await Vault.unlockVault())
-  ) {
-    showToast("error", `Skipping note "${note.title}" as it is locked.`);
-    return false;
-  }
-  const rawContent = note.contentId
-    ? await db.content.get(note.contentId)
-    : undefined;
-
-  const content =
-    rawContent &&
-    !isDeleted(rawContent) &&
-    (rawContent.locked
-      ? await db.vault.decryptContent(rawContent, note.id)
-      : rawContent);
-
-  const exported = await db.notes
-    .export(note.id, {
-      ...options,
-      format: options.format === "pdf" ? "html" : options.format,
-      contentItem: content || undefined
-    })
-    .catch((e: Error) => {
-      showToast("error", `Failed to export note "${note.title}": ${e.message}`);
-      return false as const;
+  if (options.format === "pdf") {
+    const content = await exportContent(note, {
+      format: "pdf",
+      unlockVault: Vault.unlockVault
     });
+    if (!content) return false;
+    console.log(content);
+    return await exportToPDF(note.title, content);
+  }
 
-  if (typeof exported === "boolean" && !exported) return false;
-
-  const filename = sanitizeFilename(note.title, { replacement: "-" });
-  const ext = FORMAT_TO_EXT[options.format];
-  return {
-    filename: [filename, ext].join("."),
-    content: exported
-  };
+  return await TaskManager.startTask({
+    type: "modal",
+    title: `Exporting "${note.title}"`,
+    subtitle: "Please wait while your note is exported.",
+    action: async (report) => {
+      await fromAsyncIterator(
+        _exportNote(note, {
+          format: options.format,
+          unlockVault: Vault.unlockVault
+        })
+      )
+        .pipeThrough(new ExportStream(report))
+        .pipeThrough(createZipStream())
+        .pipeTo(
+          await createWriteStream(
+            `${sanitizeFilename(note.title, { replacement: "-" })}.zip`
+          )
+        );
+      return true;
+    }
+  });
 }
