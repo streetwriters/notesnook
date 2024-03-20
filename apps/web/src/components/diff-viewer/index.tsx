@@ -32,7 +32,7 @@ import { Editor } from "../editor";
 import { ContentItem, Note } from "@notesnook/core";
 import { UnlockView } from "../unlock";
 import { getFormattedDate } from "@notesnook/common";
-import { useEditorManager } from "../editor/manager";
+import { diff } from "diffblazer";
 
 type DiffViewerProps = { session: ConflictedEditorSession };
 function DiffViewer(props: DiffViewerProps) {
@@ -43,12 +43,6 @@ function DiffViewer(props: DiffViewerProps) {
   const [content, setContent] = useState(session.content);
   const [conflictedContent, setConflictedContent] = useState(
     content.conflicted
-  );
-  const editor = useEditorManager((store) => store.editors[content.id]?.editor);
-  const conflictedEditor = useEditorManager((store) =>
-    conflictedContent
-      ? store.editors[`${conflictedContent.id}-conflicted`]?.editor
-      : undefined
   );
 
   useLayoutEffect(() => {
@@ -290,7 +284,11 @@ function DiffViewer(props: DiffViewerProps) {
                     <Editor
                       id={`${conflictedContent.id}-conflicted`}
                       session={session}
-                      content={() => conflictedContent.data}
+                      content={() =>
+                        content.locked
+                          ? conflictedContent.data
+                          : diff(content.data, conflictedContent.data)
+                      }
                       nonce={conflictedContent.dateEdited}
                       options={{ readonly: true, headless: true }}
                     />
