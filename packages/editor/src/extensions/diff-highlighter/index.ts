@@ -17,8 +17,4 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { HighlightDiff } from "./highlight-diff";
-
-export * from "./highlight-diff";
-
-export default HighlightDiff;
+export * from "./diff-highlighter";
