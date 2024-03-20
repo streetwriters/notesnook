@@ -84,7 +84,7 @@ import CheckListItem from "./extensions/check-list-item";
 import { Callout } from "./extensions/callout";
 import BlockId from "./extensions/block-id";
 import { useEditorSearchStore } from "./toolbar/stores/search-store";
-import HighlightDiff from "./extensions/highlight-diff";
+import { DiffHighlighter } from "./extensions/diff-highlighter";
 
 interface TiptapStorage {
   portalProviderAPI?: PortalProviderAPI;
@@ -212,11 +212,7 @@ const useTiptap = (
             ];
           }
         }),
-        HighlightDiff.Insert,
-        HighlightDiff.Mod,
-        HighlightDiff.DiffMod,
-        HighlightDiff.Del,
-        HighlightDiff.DelMod,
+        DiffHighlighter,
         Paragraph.configure({
           doubleSpaced: doubleSpacedLines
         }),

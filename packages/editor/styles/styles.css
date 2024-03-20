@@ -782,9 +782,14 @@ ins.diffmod,
 ins.mod,
 ins.diffins {
   background-color: rgba(46, 160, 67, 0.4);
+  text-decoration: none;
 }
 
 del.diffmod,
 del.diffdel {
   background-color: rgba(248, 81, 73, 0.4);
+}
+
+del.diffdel {
+  text-decoration: none;
 }
