@@ -42,7 +42,7 @@ function Header(props: HeaderProps) {
 
   useEffect(() => {
     refreshTags();
-  }, [id, refreshTags]);
+  }, [id, refreshTags, session?.type]);
 
   const setTag = useCallback(
     async function (noteId: string, tags: Tag[], value: string) {
