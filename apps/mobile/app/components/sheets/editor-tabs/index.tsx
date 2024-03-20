@@ -77,7 +77,7 @@ const TabItemComponent = (props: {
         justifyContent: "space-between",
         flexDirection: "row",
         paddingLeft: 12,
-        height: 45
+        minHeight: 45
       }}
       type={props.isFocused ? "selected" : "transparent"}
       onPress={() => {
@@ -106,7 +106,8 @@ const TabItemComponent = (props: {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "flex-start",
-          gap: 10
+          gap: 10,
+          flexShrink: 1
         }}
       >
         {props.tab.noteLocked ? (
@@ -130,6 +131,7 @@ const TabItemComponent = (props: {
           style={{
             fontStyle: props.tab.previewTab ? "italic" : "normal"
           }}
+          numberOfLines={1}
           size={SIZE.md}
         >
           {props.tab.noteId ? item?.title || "Untitled note" : "New note"}
