@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Extension, NodeWithPos } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
 import { nanoid } from "nanoid";
+import { Callout } from "../callout";
 
 const BLOCK_ID_TYPES = [
   "paragraph",
@@ -74,13 +75,16 @@ export const BlockId = Extension.create({
           if (!isDocChanged) return null;
 
           const blocksWithoutBlockId: NodeWithPos[] = [];
-          newState.tr.doc.forEach((n, offset) => {
+          newState.tr.doc.forEach(function addBlocks(n, offset) {
             if (
               n.isBlock &&
               BLOCK_ID_TYPES.includes(n.type.name) &&
               !n.attrs.blockId
             )
               blocksWithoutBlockId.push({ node: n, pos: offset });
+
+            if (n.type.name === Callout.name)
+              n.forEach((n, pos) => addBlocks(n, offset + pos + 1));
           });
           if (blocksWithoutBlockId.length > 0) {
             const { tr } = newState;
