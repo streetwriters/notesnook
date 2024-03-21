@@ -222,6 +222,18 @@ type SettingsSideBarProps = { onNavigate: (settings: SettingsGroup[]) => void };
 function SettingsSideBar(props: SettingsSideBarProps) {
   const { onNavigate } = props;
   const [route, setRoute] = useState<SectionKeys>("profile");
+  const [extraHeight, setExtraHeight] = useState(0);
+
+  useEffect(() => {
+    if (
+      document.getElementById("settings-side-menu")?.scrollHeight !==
+      document.getElementById("settings-nav-menu")?.scrollHeight
+    )
+      setExtraHeight(
+        (document.getElementById("settings-side-menu")?.scrollHeight || 0) -
+          (document.getElementById("settings-nav-menu")?.scrollHeight || 0)
+      );
+  }, []);
 
   return (
     <FlexScrollContainer
@@ -234,6 +246,7 @@ function SettingsSideBar(props: SettingsSideBarProps) {
     >
       <ScopedThemeProvider scope="navigationMenu">
         <Flex
+          id="settings-nav-menu"
           sx={{
             flexDirection: "column",
             display: "flex",
@@ -325,6 +338,14 @@ function SettingsSideBar(props: SettingsSideBarProps) {
               )}
             </Flex>
           ))}
+          <Flex
+            id="test-settings"
+            sx={{
+              display: "flex",
+              flex: 1,
+              minHeight: extraHeight
+            }}
+          ></Flex>
         </Flex>
       </ScopedThemeProvider>
     </FlexScrollContainer>
