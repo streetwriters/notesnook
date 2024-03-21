@@ -101,41 +101,47 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
               Fix it
             </Button>
           ) : (
-            <>
-              {" "}
-              <Button
-                variant="secondary"
-                sx={{ alignSelf: "start", px: 30, mt: 1 }}
-                onClick={async () => {
-                  navigator.clipboard.writeText(errorToString(error));
-                }}
-              >
-                Copy
-              </Button>
-              <Button
-                variant="secondary"
-                sx={{ alignSelf: "start", px: 30, mt: 1 }}
-                onClick={async () => {
-                  const { getDeviceInfo } = await import(
-                    "../../dialogs/issue-dialog"
-                  );
-                  const mailto = new URL("mailto:support@streetwriters.co");
-                  mailto.searchParams.set(
-                    "body",
-                    `${errorToString(error)}
+            <Button
+              variant="error"
+              sx={{ alignSelf: "start", px: 30, mt: 1 }}
+              onClick={() => window.location.reload()}
+            >
+              Reload app
+            </Button>
+          )}
+          <>
+            <Button
+              variant="secondary"
+              sx={{ alignSelf: "start", px: 30, mt: 1 }}
+              onClick={async () => {
+                navigator.clipboard.writeText(errorToString(error));
+              }}
+            >
+              Copy
+            </Button>
+            <Button
+              variant="secondary"
+              sx={{ alignSelf: "start", px: 30, mt: 1 }}
+              onClick={async () => {
+                const { getDeviceInfo } = await import(
+                  "../../dialogs/issue-dialog"
+                );
+                const mailto = new URL("mailto:support@streetwriters.co");
+                mailto.searchParams.set(
+                  "body",
+                  `${errorToString(error)}
 
 ---
 Device information:
 
 ${getDeviceInfo()}`
-                  );
-                  window.open(mailto.toString(), "_blank");
-                }}
-              >
-                Contact support
-              </Button>
-            </>
-          )}
+                );
+                window.open(mailto.toString(), "_blank");
+              }}
+            >
+              Contact support
+            </Button>
+          </>
         </Flex>
       </Flex>
     </BaseThemeProvider>
