@@ -54,8 +54,9 @@ export function clickHandler(options: ClickHandlerOptions): Plugin {
         // const target = link?.target ?? attrs.target;
 
         if (link && href) {
-          if (view.editable) {
-            options.editor.storage.openLink?.(href);
+          if (options.editor.storage.openLink) {
+            event.preventDefault();
+            setTimeout(() => options.editor.storage.openLink?.(href));
           }
 
           return true;
