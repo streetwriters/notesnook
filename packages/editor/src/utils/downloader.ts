@@ -78,19 +78,11 @@ export async function downloadImage(url: string, options?: DownloadOptions) {
   if (!response.ok) throw new Error(`invalid status code ${response.status}`);
 
   let contentType = response.headers.get("Content-Type");
-  const contentLength = response.headers.get("Content-Length");
 
   if (contentType && UTITypes[contentType]) contentType = UTITypes[contentType];
 
-  if (
-    !contentType ||
-    !contentLength ||
-    contentLength === "0" ||
-    !contentType.startsWith("image/")
-  )
-    throw new Error("not an image");
+  if (!contentType || !contentType.startsWith("image/")) return;
 
-  const size = parseInt(contentLength);
   let blob = await response.blob();
   if (UTITypes[blob.type])
     blob = new Blob([blob], {
@@ -101,7 +93,7 @@ export async function downloadImage(url: string, options?: DownloadOptions) {
     blob,
     url: URL.createObjectURL(blob),
     mimeType: contentType,
-    size
+    size: blob.size
   };
 }
 
