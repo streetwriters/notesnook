@@ -81,11 +81,11 @@ export class VirtualizedGrouping<T> {
     };
   }
 
-  item(index: number): Promise<{ item: T; group?: GroupHeader }>;
+  item(index: number): Promise<{ item?: T; group?: GroupHeader }>;
   item(
     index: number,
     operate: BatchOperator<T>
-  ): Promise<{ item: T; group?: GroupHeader; data: unknown }>;
+  ): Promise<{ item?: T; group?: GroupHeader; data: unknown }>;
   async item(index: number, operate?: BatchOperator<T>) {
     const batchIndex = Math.floor(index / this.batchSize);
     const { items, groups, data } =

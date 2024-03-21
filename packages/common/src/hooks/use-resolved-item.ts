@@ -39,7 +39,8 @@ export function useResolvedItem<TItemType extends ItemType>(
     [index, items]
   );
 
-  if (result.status === "rejected" || !result.value) return null;
+  if (result.status === "rejected" || !result.value || !result.value.item)
+    return null;
   if (type && result.value.item.type !== type) return null;
   return result.value;
 }
@@ -53,7 +54,8 @@ export function useUnresolvedItem<TItemType extends ItemType>(
   const { index, items, type } = options;
   const result = usePromise(() => items.item(index), [index, items]);
 
-  if (result.status === "rejected" || !result.value) return null;
+  if (result.status === "rejected" || !result.value || !result.value.item)
+    return null;
   if (type && result.value.item.type !== type) return null;
   return result.value;
 }
