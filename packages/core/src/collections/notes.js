@@ -251,6 +251,7 @@ export default class Notes extends Collection {
 
       const attachments = this._db.attachments.ofNote(itemData.id, "all");
       for (let attachment of attachments) {
+        if (!attachment || !attachment.metadata) continue;
         await this._db.attachments.delete(
           attachment.metadata.hash,
           itemData.id

@@ -67,10 +67,10 @@ export default class Lookup {
   }
 
   attachments(array, query) {
-    return search(
-      array,
-      query,
-      (n) => `${n.metadata.filename} ${n.metadata.type} ${n.metadata.hash}`
+    return search(array, query, (n) =>
+      n.metadata
+        ? `${n.metadata.filename} ${n.metadata.type} ${n.metadata.hash}`
+        : ""
     );
   }
 

@@ -113,7 +113,7 @@ class Database {
       this
     );
     EV.subscribe(EVENTS.attachmentDeleted, async (attachment) => {
-      await this.fs.cancel(attachment.metadata.hash);
+      await this.fs.cancel(attachment.metadata?.hash);
     });
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.deinit();

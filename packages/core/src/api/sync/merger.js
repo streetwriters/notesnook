@@ -169,9 +169,13 @@ class Merger {
         if (!remoteItem.metadata) break;
 
         const localItem = this._db.attachments.attachment(
-          remoteItem.metadata.hash
+          remoteItem.metadata?.hash
         );
-        if (localItem && localItem.dateUploaded !== remoteItem.dateUploaded) {
+        if (
+          localItem &&
+          localItem.metadata &&
+          localItem.dateUploaded !== remoteItem.dateUploaded
+        ) {
           const noteIds = localItem.noteIds.slice();
           const isRemoved = await this._db.attachments.remove(
             localItem.metadata.hash,

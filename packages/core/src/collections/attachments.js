@@ -43,7 +43,7 @@ export default class Attachments extends Collection {
         if (!attachment) return;
 
         const src = await this.read(filename, getOutputType(attachment));
-        if (!src) return;
+        if (!src || !attachment.metadata) return;
 
         EV.publish(EVENTS.mediaAttachmentDownloaded, {
           groupId,
@@ -108,7 +108,7 @@ export default class Attachments extends Collection {
     if (!attachmentArg.hash) throw new Error("Please provide attachment hash.");
 
     const oldAttachment =
-      this.all.find((a) => a.metadata.hash === attachmentArg.hash) || {};
+      this.all.find((a) => a.metadata?.hash === attachmentArg.hash) || {};
     let id = oldAttachment.id || getId();
 
     const noteIds = oldAttachment.noteIds || [];
@@ -205,7 +205,7 @@ export default class Attachments extends Collection {
 
   async remove(hashOrId, localOnly) {
     const attachment = this.attachment(hashOrId);
-    if (!attachment) return false;
+    if (!attachment || !attachment.metadata) return false;
 
     if (!localOnly && !(await this._canDetach(attachment)))
       throw new Error("This attachment is inside a locked note.");
@@ -267,7 +267,7 @@ export default class Attachments extends Collection {
   }
 
   exists(hash) {
-    const attachment = this.all.find((a) => a.metadata.hash === hash);
+    const attachment = this.all.find((a) => a.metadata?.hash === hash);
     return !!attachment;
   }
 
@@ -277,7 +277,7 @@ export default class Attachments extends Collection {
    * @returns {Promise<string>} dataurl formatted string
    */
   async read(hash, outputType) {
-    const attachment = this.all.find((a) => a.metadata.hash === hash);
+    const attachment = this.all.find((a) => a.metadata?.hash === hash);
     if (!attachment) return;
 
     const key = await this.decryptKey(attachment.key);
@@ -302,7 +302,7 @@ export default class Attachments extends Collection {
 
   attachment(hashOrId) {
     return this.all.find(
-      (a) => a.id === hashOrId || a.metadata.hash === hashOrId
+      (a) => a.id === hashOrId || a.metadata?.hash === hashOrId
     );
   }
 
@@ -349,7 +349,7 @@ export default class Attachments extends Collection {
     const attachments = this.media.filter(
       (attachment) =>
         hasItem(attachment.noteIds, noteId) &&
-        (!hashesToLoad || hasItem(hashesToLoad, attachment.metadata.hash))
+        (!hashesToLoad || hasItem(hashesToLoad, attachment.metadata?.hash))
     );
 
     await this._db.fs.queueDownloads(
@@ -366,7 +366,11 @@ export default class Attachments extends Collection {
   async cleanup() {
     const now = dayjs().unix();
     for (const attachment of this.deleted) {
-      if (dayjs(attachment.dateDeleted).add(7, "days").unix() < now) continue;
+      if (
+        !attachment.metadata ||
+        dayjs(attachment.dateDeleted).add(7, "days").unix() < now
+      )
+        continue;
 
       const isDeleted = await this._db.fs.deleteFile(attachment.metadata.hash);
       if (!isDeleted) continue;
@@ -377,7 +381,9 @@ export default class Attachments extends Collection {
 
   get pending() {
     return this.all.filter(
-      (attachment) => attachment.dateUploaded <= 0 || !attachment.dateUploaded
+      (attachment) =>
+        attachment.metadata &&
+        (attachment.dateUploaded <= 0 || !attachment.dateUploaded)
     );
   }
 

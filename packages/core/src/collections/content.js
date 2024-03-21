@@ -122,7 +122,9 @@ export default class Content extends Collection {
     const content = getContentFromData(contentItem.type, contentItem.data);
     if (!content) console.log(contentItem);
     contentItem.data = await content.insertMedia(async (hashes) => {
-      const attachments = hashes.map((h) => this._db.attachments.attachment(h));
+      const attachments = hashes
+        .map((h) => this._db.attachments.attachment(h))
+        .filter((a) => !!a && !!a.metadata);
       await this._db.fs.queueDownloads(
         attachments.map((a) => ({
           filename: a.metadata.hash,
@@ -134,6 +136,8 @@ export default class Content extends Collection {
       );
       const sources = {};
       for (const attachment of attachments) {
+        if (!attachment.metadata) continue;
+
         const src = await this._db.attachments.read(
           attachment.metadata.hash,
           getOutputType(attachment)
@@ -188,20 +192,23 @@ export default class Content extends Collection {
 
     const toDelete = noteAttachments.filter((attachment) => {
       return attachments.every(
-        (a) => a.hash && a.hash !== attachment.metadata.hash
+        (a) => a && a.hash && a.hash !== attachment.metadata?.hash
       );
     });
 
     const toAdd = attachments.filter((attachment) => {
       return (
+        attachment &&
         attachment.hash &&
-        noteAttachments.every((a) => attachment.hash !== a.metadata.hash)
+        noteAttachments.every((a) => attachment.hash !== a.metadata?.hash)
       );
     });
 
     for (let attachment of toDelete) {
+      if (!attachment.metadata) continue;
+
       await this._db.attachments.delete(
-        attachment.metadata.hash,
+        attachment.metadata?.hash,
         contentItem.noteId
       );
     }
