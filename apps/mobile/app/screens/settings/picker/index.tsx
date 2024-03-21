@@ -17,18 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import Menu, { MenuItem } from "react-native-reanimated-material-menu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { PressableButton } from "../../../components/ui/pressable";
+import { Dialog } from "../../../components/dialog";
+import { Pressable } from "../../../components/ui/pressable";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import PremiumService from "../../../services/premium";
-import { useThemeColors } from "@notesnook/theme";
+import { getColorLinearShade } from "../../../utils/colors";
 import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import { verifyUser } from "../functions";
-import { Dialog } from "../../../components/dialog";
 
 interface PickerOptions<T> {
   getValue: () => T;
@@ -40,6 +41,7 @@ interface PickerOptions<T> {
   premium?: boolean;
   onCheckOptionIsPremium?: (item: T) => boolean;
   requiresVerification?: () => boolean;
+  onVerify?: () => Promise<boolean>;
 }
 
 export function SettingsPicker<T>({
@@ -51,9 +53,10 @@ export function SettingsPicker<T>({
   getItemKey,
   premium,
   onCheckOptionIsPremium = () => true,
-  requiresVerification = () => false
+  requiresVerification = () => false,
+  onVerify
 }: PickerOptions<T>) {
-  const { colors } = useThemeColors("contextMenu");
+  const { colors, isDark } = useThemeColors("contextMenu");
   const menuRef = useRef<any>();
   const [width, setWidth] = useState(0);
   const [currentValue, setCurrentValue] = useState(getValue());
@@ -97,18 +100,25 @@ export function SettingsPicker<T>({
           backgroundColor: colors.primary.background,
           width: width,
           marginTop: 60,
-          overflow: "hidden"
+          overflow: "hidden",
+          borderWidth: 0.7,
+          borderColor: getColorLinearShade(
+            colors.primary.background,
+            0.07,
+            isDark
+          )
         }}
         onRequestClose={() => {
           menuRef.current?.hide();
         }}
         anchor={
-          <PressableButton
+          <Pressable
             onPress={async () => {
+              if (onVerify && !(await onVerify())) return;
               menuRef.current?.show();
             }}
-            type="grayBg"
-            customStyle={{
+            type="secondary"
+            style={{
               flexDirection: "row",
               alignItems: "center",
               marginTop: 10,
@@ -119,10 +129,11 @@ export function SettingsPicker<T>({
           >
             <Paragraph>{formatValue(currentValue)}</Paragraph>
             <Icon color={colors.primary.icon} name="menu-down" size={SIZE.md} />
-          </PressableButton>
+          </Pressable>
         }
       >
         <Dialog context="local" />
+
         {options.map((item) => (
           <MenuItem
             key={getItemKey(item)}
@@ -135,9 +146,10 @@ export function SettingsPicker<T>({
                 onChange(item);
               }
             }}
+            underlayColor={colors.primary.hover}
             style={{
               backgroundColor: compareValue(currentValue, item)
-                ? colors.secondary.background
+                ? colors.selected.background
                 : "transparent",
               width: "100%",
               maxWidth: width

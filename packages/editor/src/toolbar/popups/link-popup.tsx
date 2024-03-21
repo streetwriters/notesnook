@@ -28,9 +28,16 @@ export type LinkPopupProps = {
   isEditing?: boolean;
   onDone: (link: LinkDefinition) => void;
   onClose: () => void;
+  isImageActive?: boolean;
 };
 export function LinkPopup(props: LinkPopupProps) {
-  const { link: _link, isEditing = false, onDone, onClose } = props;
+  const {
+    link: _link = { title: "", href: "" },
+    isEditing = false,
+    onDone,
+    onClose,
+    isImageActive
+  } = props;
   const link = useRefValue(_link);
 
   return (
@@ -46,14 +53,17 @@ export function LinkPopup(props: LinkPopupProps) {
       }}
     >
       <Flex sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}>
-        {!link.current?.isImage && (
+        {!isImageActive && (
           <Input
             type="text"
             placeholder="Link text"
-            defaultValue={link.current?.text}
+            defaultValue={link.current?.title}
             sx={{ mb: 1 }}
             onChange={(e) =>
-              (link.current = { ...link.current, text: e.target.value })
+              (link.current = {
+                ...link.current,
+                title: e.target.value
+              })
             }
           />
         )}

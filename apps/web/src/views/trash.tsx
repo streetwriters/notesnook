@@ -23,20 +23,25 @@ import { useStore, store } from "../stores/trash-store";
 import { showToast } from "../utils/toast";
 import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
+import { useSearch } from "../hooks/use-search";
+import { db } from "../common/db";
 
 function Trash() {
   useNavigate("trash", store.refresh);
   const items = useStore((store) => store.trash);
   const refresh = useStore((store) => store.refresh);
   const clearTrash = useStore((store) => store.clear);
+  const filteredItems = useSearch("trash", (query) =>
+    db.lookup.trash(query).sorted()
+  );
 
+  if (!items) return <Placeholder context="trash" />;
   return (
     <ListContainer
-      type="trash"
-      groupingKey="trash"
+      group="trash"
       refresh={refresh}
       placeholder={<Placeholder context="trash" />}
-      items={items}
+      items={filteredItems || items}
       button={{
         onClick: function () {
           confirm({

@@ -17,50 +17,36 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
-import { SafeAreaView } from "react-native";
 import Container from "../components/container";
-import DelayLayout from "../components/delay-layout";
 import Intro from "../components/intro";
-import { TopicsSheet } from "../components/sheets/topic-sheet";
+import { NotebookSheet } from "../components/sheets/notebook-sheet";
 import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import Favorites from "../screens/favorites";
 import Home from "../screens/home";
-import Notebook from "../screens/notebook";
+import NotebookScreen from "../screens/notebook";
 import Notebooks from "../screens/notebooks";
 import { ColoredNotes } from "../screens/notes/colored";
 import { Monographs } from "../screens/notes/monographs";
 import { TaggedNotes } from "../screens/notes/tagged";
-import { TopicNotes } from "../screens/notes/topic-notes";
 import Reminders from "../screens/reminders";
 import { Search } from "../screens/search";
 import Settings from "../screens/settings";
-import AppLock from "../screens/settings/app-lock";
 import Tags from "../screens/tags";
 import Trash from "../screens/trash";
 import { eSendEvent } from "../services/event-manager";
 import SettingsService from "../services/settings";
 import useNavigationStore from "../stores/use-navigation-store";
-import { useNoteStore } from "../stores/use-notes-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { rootNavigatorRef } from "../utils/global-refs";
-import Auth from "../components/auth";
+
 const NativeStack = createNativeStackNavigator();
 const IntroStack = createNativeStackNavigator();
-
-/**
- * Intro Stack:
- *
- * Welcome Page
- * Select Privacy Mode Page
- * Login/Signup Page
- *
- */
 
 const IntroStackNavigator = () => {
   const { colors } = useThemeColors();
@@ -79,8 +65,6 @@ const IntroStackNavigator = () => {
       initialRouteName={"Intro"}
     >
       <NativeStack.Screen name="Intro" component={Intro} />
-      <NativeStack.Screen name="Auth" component={Auth} />
-      <NativeStack.Screen name="AppLock" component={AppLock} />
     </IntroStack.Navigator>
   );
 };
@@ -92,27 +76,15 @@ const _Tabs = () => {
     (state) => state.settings.introCompleted
   );
   const height = useSettingStore((state) => state.dimensions.height);
-  const loading = useNoteStore((state) => state.loading);
   const insets = useGlobalSafeAreaInsets();
   const screenHeight = height - (50 + insets.top + insets.bottom);
   React.useEffect(() => {
     setTimeout(() => {
-      useNavigationStore.getState().update({ name: homepage });
+      useNavigationStore.getState().update(homepage);
     }, 1000);
   }, [homepage]);
 
-  return loading && introCompleted ? (
-    <>
-      <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: colors.primary.background
-        }}
-      >
-        <DelayLayout animated={false} wait={loading} />
-      </SafeAreaView>
-    </>
-  ) : (
+  return (
     <NativeStack.Navigator
       tabBar={() => null}
       initialRouteName={!introCompleted ? "Welcome" : homepage}
@@ -130,44 +102,14 @@ const _Tabs = () => {
       <NativeStack.Screen name="Welcome" component={IntroStackNavigator} />
       <NativeStack.Screen name="Notes" component={Home} />
       <NativeStack.Screen name="Notebooks" component={Notebooks} />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Favorites"
-        component={Favorites}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Trash"
-        component={Trash}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Tags"
-        component={Tags}
-      />
+      <NativeStack.Screen name="Favorites" component={Favorites} />
+      <NativeStack.Screen name="Trash" component={Trash} />
+      <NativeStack.Screen name="Tags" component={Tags} />
       <NativeStack.Screen name="Settings" component={Settings} />
+      <NativeStack.Screen name="TaggedNotes" component={TaggedNotes} />
+      <NativeStack.Screen name="ColoredNotes" component={ColoredNotes} />
+      <NativeStack.Screen name="Reminders" component={Reminders} />
       <NativeStack.Screen
-        options={{ lazy: true }}
-        name="TaggedNotes"
-        component={TaggedNotes}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="TopicNotes"
-        component={TopicNotes}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="ColoredNotes"
-        component={ColoredNotes}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Reminders"
-        component={Reminders}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
         name="Monographs"
         initialParams={{
           item: { type: "monograph" },
@@ -176,16 +118,8 @@ const _Tabs = () => {
         }}
         component={Monographs}
       />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Notebook"
-        component={Notebook}
-      />
-      <NativeStack.Screen
-        options={{ lazy: true }}
-        name="Search"
-        component={Search}
-      />
+      <NativeStack.Screen name="Notebook" component={NotebookScreen} />
+      <NativeStack.Screen name="Search" component={Search} />
     </NativeStack.Navigator>
   );
 };
@@ -193,7 +127,7 @@ const Tabs = React.memo(_Tabs, () => true);
 
 const _NavigationStack = () => {
   const clearSelection = useSelectionStore((state) => state.clearSelection);
-  const loading = useNoteStore((state) => state.loading);
+  const loading = useSettingStore((state) => state.isAppLoading);
   const onStateChange = React.useCallback(() => {
     if (useSelectionStore.getState().selectionMode) {
       clearSelection(true);
@@ -207,7 +141,7 @@ const _NavigationStack = () => {
       <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
         <Tabs />
       </NavigationContainer>
-      {loading ? null : <TopicsSheet />}
+      {loading ? null : <NotebookSheet />}
     </Container>
   );
 };

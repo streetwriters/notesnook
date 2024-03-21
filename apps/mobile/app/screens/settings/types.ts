@@ -45,6 +45,7 @@ export type SettingSection = {
   options?: any[];
   minInputValue?: number;
   maxInputValue?: number;
+  onVerify?: () => Promise<boolean>;
 };
 
 export type SettingsGroup = {

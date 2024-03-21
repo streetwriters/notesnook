@@ -20,7 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SerializedKey } from "@notesnook/crypto/dist/src/types";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { db } from "../../common/db";
-import { showBuyDialog } from "../../common/dialog-controller";
+import {
+  showBuyDialog,
+  showImagePickerDialog
+} from "../../common/dialog-controller";
 import { TaskManager } from "../../common/task-manager";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { showToast } from "../../utils/toast";
@@ -30,37 +33,47 @@ import { Attachment } from "@notesnook/editor";
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
-export async function insertAttachment(type = "*/*") {
+export async function insertAttachments(type = "*/*") {
   if (!isUserPremium()) {
     await showBuyDialog();
     return;
   }
 
-  const selectedFile = await showFilePicker({
-    acceptedFileTypes: type || "*/*"
+  const files = await showFilePicker({
+    acceptedFileTypes: type || "*/*",
+    multiple: true
   });
-  if (!selectedFile) return;
-
-  return await attachFile(selectedFile);
+  if (!files) return;
+  return await attachFiles(files);
 }
 
-export async function attachFile(selectedFile: File) {
+export async function attachFiles(files: File[]) {
   if (!isUserPremium()) {
     await showBuyDialog();
     return;
   }
-  if (selectedFile.type.startsWith("image/")) {
-    return await pickImage(selectedFile);
-  } else {
-    return await pickFile(selectedFile);
+
+  const images =
+    (await showImagePickerDialog(
+      files.filter((f) => f.type.startsWith("image/"))
+    )) || [];
+  const documents = files.filter((f) => !f.type.startsWith("image/"));
+  const attachments: Attachment[] = [];
+  for (const file of [...images, ...documents]) {
+    const attachment = file.type.startsWith("image/")
+      ? await pickImage(file)
+      : await pickFile(file);
+    if (!attachment) continue;
+    attachments.push(attachment);
   }
+  return attachments;
 }
 
 export async function reuploadAttachment(
   type: string,
   expectedFileHash: string
 ) {
-  const selectedFile = await showFilePicker({
+  const [selectedFile] = await showFilePicker({
     acceptedFileTypes: type || "*/*"
   });
   if (!selectedFile) return;
@@ -102,6 +115,7 @@ async function pickFile(
       size: file.size
     };
   } catch (e) {
+    console.error(e);
     showToast("error", `${(e as Error).message}`);
   }
 }
@@ -135,7 +149,7 @@ async function pickImage(
 }
 
 async function getEncryptionKey(): Promise<SerializedKey> {
-  const key = await db.attachments?.generateKey();
+  const key = await db.attachments.generateKey();
   if (!key) throw new Error("Could not generate a new encryption key.");
   return key;
 }
@@ -157,13 +171,15 @@ async function addAttachment(
   file: File,
   options: AddAttachmentOptions = {}
 ): Promise<string> {
-  const { default: FS } = await import("../../interfaces/fs");
+  const { getUploadedFileSize, hashStream, writeEncryptedFile } = await import(
+    "../../interfaces/fs"
+  );
   const { expectedFileHash, showProgress = true } = options;
   let forceWrite = options.forceWrite;
 
   const action = async () => {
     const reader = file.stream().getReader();
-    const { hash, type: hashType } = await FS.hashStream(reader);
+    const { hash, type: hashType } = await hashStream(reader);
     reader.releaseLock();
 
     if (expectedFileHash && hash !== expectedFileHash)
@@ -171,24 +187,25 @@ async function addAttachment(
         `Please select the same file for reuploading. Expected hash ${expectedFileHash} but got ${hash}.`
       );
 
-    const exists = db.attachments?.attachment(hash);
+    const exists = await db.attachments.attachment(hash);
     if (!forceWrite && exists) {
-      forceWrite = (await FS.getUploadedFileSize(hash)) <= 0;
+      forceWrite = (await getUploadedFileSize(hash)) <= 0;
     }
 
     if (forceWrite || !exists) {
       const key: SerializedKey = await getEncryptionKey();
 
-      const output = await FS.writeEncryptedFile(file, key, hash);
+      const output = await writeEncryptedFile(file, key, hash);
       if (!output) throw new Error("Could not encrypt file.");
 
-      if (forceWrite && exists) await db.attachments?.reset(hash);
-      await db.attachments?.add({
+      if (forceWrite && exists) await db.attachments.reset(hash);
+
+      await db.attachments.add({
         ...output,
         hash,
         hashType,
-        filename: exists?.metadata.filename || file.name,
-        type: exists?.metadata.type || file.type,
+        filename: exists?.filename || file.name,
+        mimeType: exists?.type || file.type,
         key
       });
     }

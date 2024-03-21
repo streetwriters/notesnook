@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export type Notebook = {
   title: string;
-  topics: string[];
   description?: string;
+  subNotebooks?: Notebook[];
 };
 
 export type Item = {

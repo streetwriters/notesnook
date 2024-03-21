@@ -19,25 +19,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { PAGE_VISIBILITY_CHANGE } from "./page-visibility";
 
-type FilePickerOptions = { acceptedFileTypes: string };
+type FilePickerOptions = { acceptedFileTypes: string; multiple?: boolean };
 
 export function showFilePicker({
-  acceptedFileTypes
-}: FilePickerOptions): Promise<File | undefined> {
+  acceptedFileTypes,
+  multiple
+}: FilePickerOptions): Promise<File[]> {
   return new Promise((resolve) => {
     PAGE_VISIBILITY_CHANGE.ignore = true;
     const input = document.createElement("input");
     input.setAttribute("type", "file");
+    input.setAttribute("multiple", `${multiple || false}`);
     input.setAttribute("accept", acceptedFileTypes);
     input.dispatchEvent(new MouseEvent("click"));
     input.oncancel = async function () {
-      resolve(undefined);
+      resolve([]);
     };
     input.onchange = async function () {
-      if (!input.files) return resolve(undefined);
-      const file = input.files[0];
-      if (!file) return resolve(undefined);
-      resolve(file);
+      if (!input.files) return resolve([]);
+      resolve(Array.from(input.files));
     };
   });
 }

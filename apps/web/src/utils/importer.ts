@@ -70,12 +70,13 @@ async function processAttachment(
   attachments: Record<string, any>
 ) {
   const name = path.basename(entry.name);
-  if (!name || attachments[name] || db.attachments?.exists(name)) return;
+  if (!name || attachments[name] || (await db.attachments?.exists(name)))
+    return;
 
-  const { default: FS } = await import("../interfaces/fs");
+  const { hashBuffer, writeEncryptedFile } = await import("../interfaces/fs");
 
   const data = await entry.arrayBuffer();
-  const { hash } = await FS.hashBuffer(new Uint8Array(data));
+  const { hash } = await hashBuffer(new Uint8Array(data));
   if (hash !== name) {
     throw new Error(`integrity check failed: ${name} !== ${hash}`);
   }
@@ -84,7 +85,7 @@ async function processAttachment(
     type: "application/octet-stream"
   });
   const key = await db.attachments?.generateKey();
-  const cipherData = await FS.writeEncryptedFile(file, key, name);
+  const cipherData = await writeEncryptedFile(file, key, name);
   attachments[name] = { ...cipherData, key };
 }
 
@@ -92,7 +93,8 @@ async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
   const note = await fileToJson<Note>(entry);
   for (const attachment of note.attachments || []) {
     const cipherData = attachments[attachment.hash];
-    if (!cipherData || db.attachments?.exists(attachment.hash)) continue;
+    if (!cipherData || (await db.attachments?.exists(attachment.hash)))
+      continue;
 
     await db.attachments?.add({
       ...cipherData,
@@ -114,15 +116,17 @@ async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
 
   const notebooks = note.notebooks?.slice() || [];
   note.notebooks = [];
-  const noteId = await db.notes?.add(note);
+  const noteId = await db.notes.add({
+    ...note,
+    content: { type: "tiptap", data: note.content?.data },
+    notebooks: []
+  });
+  if (!noteId) return;
 
   for (const nb of notebooks) {
-    const notebook = await importNotebook(nb).catch(() => ({ id: undefined }));
-    if (!notebook.id) continue;
-    await db.notes?.addToNotebook(
-      { id: notebook.id, topic: notebook.topic },
-      noteId
-    );
+    const notebookId = await importNotebook(nb).catch(() => undefined);
+    if (!notebookId) continue;
+    await db.notes.addToNotebook(notebookId, noteId);
   }
 }
 
@@ -133,19 +137,12 @@ async function fileToJson<T>(file: ZipEntry) {
 
 async function importNotebook(
   notebook: Notebook | undefined
-): Promise<{ id?: string; topic?: string }> {
-  if (!notebook) return {};
-
-  let nb = db.notebooks?.all.find((nb) => nb.title === notebook.notebook);
-  if (!nb) {
-    const nbId = await db.notebooks?.add({
-      title: notebook.notebook,
-      topics: notebook.topic ? [notebook.topic] : []
-    });
-    nb = db.notebooks?.notebook(nbId)?.data;
-    if (!nb) return {};
-  }
-
-  const topic = nb.topics.find((t: any) => t.title === notebook.topic);
-  return { id: nb ? nb.id : undefined, topic: topic ? topic.id : undefined };
+): Promise<string | undefined> {
+  if (!notebook) return;
+  const nb = await db.notebooks.find(notebook.notebook);
+  return nb
+    ? nb.id
+    : await db.notebooks.add({
+        title: notebook.notebook
+      });
 }

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import hosts from "@notesnook/core/dist/utils/constants";
 import NetInfo from "@react-native-community/netinfo";
 import RNFetchBlob from "react-native-blob-util";
-import { ToastEvent } from "../../services/event-manager";
+import { ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import { cacheDir, fileCheck } from "./utils";
@@ -29,13 +29,14 @@ import { createCacheDir, exists } from "./io";
 export async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;
 
+  console.log("Downloading", filename);
   await createCacheDir();
-
   let { url, headers } = data;
   let path = `${cacheDir}/${filename}`;
 
   try {
     if (await exists(filename)) {
+      console.log("Exists already", filename);
       return true;
     }
 
@@ -74,13 +75,13 @@ export async function downloadFile(filename, data, cancelToken) {
     return status >= 200 && status < 300;
   } catch (e) {
     if (e.message !== "canceled") {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Error downloading file",
         message: e.message,
         type: "error",
         context: "global"
       });
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Error downloading file",
         message: e.message,
         type: "error",
@@ -98,7 +99,7 @@ export async function downloadFile(filename, data, cancelToken) {
 export async function getUploadedFileSize(hash) {
   try {
     const url = `${hosts.API_HOST}/s3?name=${hash}`;
-    const token = await db.user.tokenManager.getAccessToken();
+    const token = await db.tokenManager.getAccessToken();
 
     const attachmentInfo = await fetch(url, {
       method: "HEAD",
@@ -119,7 +120,7 @@ export async function checkAttachment(hash) {
   const isInternetReachable =
     internetState.isConnected && internetState.isInternetReachable;
   if (!isInternetReachable) return { success: true };
-  const attachment = db.attachments.attachment(hash);
+  const attachment = await db.attachments.attachment(hash);
   if (!attachment) return { failed: "Attachment not found." };
 
   try {

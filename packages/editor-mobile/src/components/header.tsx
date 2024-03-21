@@ -17,36 +17,65 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ControlledMenu, MenuItem as MenuItemInner } from "@szhsin/react-menu";
 import ArrowBackIcon from "mdi-react/ArrowBackIcon";
-import CrownIcon from "mdi-react/CrownIcon";
-import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import ArrowULeftTopIcon from "mdi-react/ArrowULeftTopIcon";
 import ArrowURightTopIcon from "mdi-react/ArrowURightTopIcon";
+import CrownIcon from "mdi-react/CrownIcon";
+import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
+import DotsVerticalIcon from "mdi-react/DotsVerticalIcon";
 import FullscreenIcon from "mdi-react/FullscreenIcon";
 import MagnifyIcon from "mdi-react/MagnifyIcon";
-import React from "react";
+import PencilLockIcon from "mdi-react/PencilLockIcon";
+import TableOfContentsIcon from "mdi-react/TableOfContentsIcon";
+import React, { useRef, useState } from "react";
 import { useSafeArea } from "../hooks/useSafeArea";
+import { useTabContext, useTabStore } from "../hooks/useTabStore";
 import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
+
+const menuClassName = ({ state }: any) =>
+  state === "opening"
+    ? styles.menuOpening
+    : state === "closing"
+    ? styles.menuClosing
+    : styles.menu;
+
+const menuItemClassName = ({ hover, disabled }: any) =>
+  disabled
+    ? styles.menuItemDisabled
+    : hover
+    ? styles.menuItemHover
+    : styles.menuItem;
+
+const MenuItem = (props: any) => (
+  <MenuItemInner {...props} className={menuItemClassName} />
+);
 
 const Button = ({
   onPress,
   children,
   style,
-  preventDefault = true
+  preventDefault = true,
+  fwdRef,
+  onClick
 }: {
-  onPress: () => void;
+  onPress?: () => void;
+  onClick?: (event: any) => void;
   children: React.ReactNode;
   style: React.CSSProperties;
   preventDefault?: boolean;
+  fwdRef?: any;
 }) => {
   return (
     <button
+      ref={fwdRef}
       className={styles.btn_header}
       style={style}
       onMouseDown={(e) => {
         if (preventDefault) e.preventDefault();
-        onPress();
+        onPress?.();
+        onClick?.(e);
       }}
     >
       {children}
@@ -65,7 +94,13 @@ function Header({
   hasUndo: boolean;
   hasRedo: boolean;
 }): JSX.Element {
+  const tab = useTabContext();
+  const editor = editors[tab.id];
   const insets = useSafeArea();
+  const openedTabsCount = useTabStore((state) => state.tabs.length);
+  const [isOpen, setOpen] = useState(false);
+  const btnRef = useRef(null);
+
   return (
     <div
       style={{
@@ -74,7 +109,8 @@ function Header({
         height: noHeader ? `${insets.top}px` : `${50 + insets.top}px`,
         backgroundColor: "var(--nn_primary_background)",
         position: "sticky",
-        width: "100vw"
+        width: "100vw",
+        zIndex: 99999
       }}
     >
       {noHeader ? null : (
@@ -95,7 +131,7 @@ function Header({
           ) : (
             <Button
               onPress={() => {
-                post(EventTypes.back);
+                post(EventTypes.back, undefined, tab.id, tab.noteId);
               }}
               preventDefault={false}
               style={{
@@ -113,11 +149,11 @@ function Header({
               }}
             >
               <ArrowBackIcon
-                size={27 * settings.fontScale}
+                size={28 * settings.fontScale}
                 style={{
                   position: "absolute"
                 }}
-                color="var(--nn_primary_paragraph)"
+                color="var(--nn_primary_icon)"
               />
             </Button>
           )}
@@ -129,65 +165,6 @@ function Header({
               flexDirection: "row"
             }}
           >
-            <Button
-              onPress={() => {
-                editor?.commands.undo();
-              }}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_primary_icon)",
-                marginRight: 10,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
-            >
-              <ArrowULeftTopIcon
-                color={
-                  !hasUndo
-                    ? "var(--nn_secondary_background)"
-                    : "var(--nn_primary_paragraph)"
-                }
-                size={25 * settings.fontScale}
-                style={{
-                  position: "absolute"
-                }}
-              />
-            </Button>
-
-            <Button
-              onPress={() => {
-                editor?.commands.redo();
-              }}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_primary_icon)",
-                marginRight: 10,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
-            >
-              <ArrowURightTopIcon
-                color={
-                  !hasRedo
-                    ? "var(--nn_secondary_background)"
-                    : "var(--nn_primary_paragraph)"
-                }
-                size={25 * settings.fontScale}
-                style={{
-                  position: "absolute"
-                }}
-              />
-            </Button>
             {!settings.premium && (
               <Button
                 onPress={() => {
@@ -217,36 +194,10 @@ function Header({
               </Button>
             )}
 
-            <Button
-              onPress={() => {
-                editor?.commands.startSearch();
-              }}
-              style={{
-                borderWidth: 0,
-                borderRadius: 100,
-                color: "var(--nn_primary_icon)",
-                marginRight: 10,
-                width: 39,
-                height: 39,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative"
-              }}
-            >
-              <MagnifyIcon
-                size={25 * settings.fontScale}
-                style={{
-                  position: "absolute"
-                }}
-                color="var(--nn_primary_paragraph)"
-              />
-            </Button>
-
             {settings.deviceMode !== "mobile" && !settings.fullscreen ? (
               <Button
                 onPress={() => {
-                  post(EventTypes.fullscreen);
+                  post(EventTypes.fullscreen, undefined, tab.id, tab.noteId);
                 }}
                 preventDefault={false}
                 style={{
@@ -267,14 +218,49 @@ function Header({
                   style={{
                     position: "absolute"
                   }}
-                  color="var(--nn_primary_paragraph)"
+                  color="var(--nn_primary_icon)"
+                />
+              </Button>
+            ) : null}
+
+            {tab.readonly ? (
+              <Button
+                onPress={() => {
+                  post(
+                    "editor-events:disable-readonly-mode",
+                    useTabStore
+                      .getState()
+                      .getNoteIdForTab(useTabStore.getState().currentTab)
+                  );
+                }}
+                fwdRef={btnRef}
+                preventDefault={false}
+                style={{
+                  borderWidth: 0,
+                  borderRadius: 100,
+                  color: "var(--nn_primary_accent)",
+                  marginRight: 12,
+                  width: 39,
+                  height: 39,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "relative"
+                }}
+              >
+                <PencilLockIcon
+                  size={25 * settings.fontScale}
+                  style={{
+                    position: "absolute"
+                  }}
+                  color="var(--nn_primary_accent)"
                 />
               </Button>
             ) : null}
 
             <Button
               onPress={() => {
-                post(EventTypes.properties);
+                post(EventTypes.showTabs, undefined, tab.id, tab.noteId);
               }}
               preventDefault={false}
               style={{
@@ -290,14 +276,210 @@ function Header({
                 position: "relative"
               }}
             >
-              <DotsHorizontalIcon
+              <div
+                style={{
+                  border: "2px solid var(--nn_primary_icon)",
+                  width: 19 * settings.fontScale,
+                  height: 19 * settings.fontScale,
+                  minWidth: 19 * settings.fontScale,
+                  borderRadius: 5,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <p
+                  style={{
+                    fontSize:
+                      openedTabsCount > 100
+                        ? 10 * settings.fontScale
+                        : 12 * settings.fontScale
+                  }}
+                >
+                  {openedTabsCount}
+                </p>
+              </div>
+            </Button>
+
+            <Button
+              fwdRef={btnRef}
+              onPress={() => {
+                setOpen(!isOpen);
+              }}
+              preventDefault={false}
+              style={{
+                borderWidth: 0,
+                borderRadius: 100,
+                color: "var(--nn_primary_icon)",
+                marginRight: 12,
+                width: 39,
+                height: 39,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                position: "relative"
+              }}
+            >
+              <DotsVerticalIcon
                 size={25 * settings.fontScale}
                 style={{
                   position: "absolute"
                 }}
-                color="var(--nn_primary_paragraph)"
+                color="var(--nn_primary_icon)"
               />
             </Button>
+
+            <ControlledMenu
+              align="end"
+              anchorRef={btnRef}
+              state={isOpen ? "open" : "closed"}
+              menuClassName={menuClassName}
+              onClose={() => {
+                setOpen(false);
+              }}
+              autoFocus={false}
+              onItemClick={(e) => {
+                switch (e.value) {
+                  case "toc":
+                    post(
+                      EventTypes.toc,
+                      editorControllers[tab.id]?.getTableOfContents(),
+                      tab.id,
+                      tab.noteId
+                    );
+                    break;
+                  case "properties":
+                    logger("info", "post properties...");
+                    post(EventTypes.properties, undefined, tab.id, tab.noteId);
+                    break;
+                  default:
+                    break;
+                }
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%"
+                }}
+              >
+                <Button
+                  onPress={() => {
+                    editor?.commands.undo();
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    marginRight: 10,
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
+                  }}
+                >
+                  <ArrowULeftTopIcon
+                    color={
+                      !hasUndo
+                        ? "var(--nn_secondary_border)"
+                        : "var(--nn_primary_icon)"
+                    }
+                    size={25 * settings.fontScale}
+                    style={{
+                      position: "absolute"
+                    }}
+                  />
+                </Button>
+
+                <Button
+                  onPress={() => {
+                    editor?.commands.redo();
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    marginRight: 10,
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
+                  }}
+                >
+                  <ArrowURightTopIcon
+                    color={
+                      !hasRedo
+                        ? "var(--nn_secondary_border)"
+                        : "var(--nn_primary_icon)"
+                    }
+                    size={25 * settings.fontScale}
+                    style={{
+                      position: "absolute"
+                    }}
+                  />
+                </Button>
+
+                <Button
+                  onPress={() => {
+                    editor?.commands.startSearch();
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    marginRight: 10,
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
+                  }}
+                >
+                  <MagnifyIcon
+                    size={28 * settings.fontScale}
+                    style={{
+                      position: "absolute"
+                    }}
+                    color="var(--nn_primary_icon)"
+                  />
+                </Button>
+              </div>
+
+              <MenuItem
+                value="toc"
+                style={{
+                  display: "flex",
+                  gap: 10
+                }}
+              >
+                <TableOfContentsIcon
+                  size={22 * settings.fontScale}
+                  color="var(--nn_primary_icon)"
+                />
+                Table of contents
+              </MenuItem>
+              <MenuItem
+                value="properties"
+                style={{
+                  display: "flex",
+                  gap: 10
+                }}
+              >
+                <DotsHorizontalIcon
+                  size={22 * settings.fontScale}
+                  color="var(--nn_primary_icon)"
+                />
+                Note Properties
+              </MenuItem>
+            </ControlledMenu>
           </div>
         </div>
       )}

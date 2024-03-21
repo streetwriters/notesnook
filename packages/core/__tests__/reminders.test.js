@@ -17,9 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatReminderTime } from "../src/collections/reminders";
+import {
+  createIsReminderActiveQuery,
+  createUpcomingReminderTimeQuery,
+  formatReminderTime,
+  getUpcomingReminderTime,
+  isReminderActive
+} from "../src/collections/reminders";
 import MockDate from "mockdate";
 import { describe, afterAll, beforeAll, test, expect } from "vitest";
+import { databaseTest } from "./utils";
+import dayjs from "dayjs";
+import assert from "assert";
 
 describe("format reminder time", () => {
   afterAll(() => {
@@ -27,185 +36,297 @@ describe("format reminder time", () => {
   });
 
   beforeAll(() => {
-    MockDate.set(new Date(2022, 5, 6, 5, 5));
+    MockDate.set(new Date(2022, 5, 6, 5, 5, 0, 0));
   });
 
-  test("daily reminder [today]", () => {
+  test("daily reminder [today]", async () => {
     const reminder = {
       recurringMode: "day",
       date: new Date(0).setHours(14),
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 02:00 PM");
   });
 
-  test("daily reminder [tomorrow]", () => {
+  test("daily reminder [tomorrow]", async () => {
     const reminder = {
       recurringMode: "day",
       date: new Date(0).setHours(3),
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Upcoming: Tomorrow, 03:00 AM");
   });
 
-  test("weekly reminder [current week]", () => {
+  test("weekly reminder [current week]", async () => {
     const reminder = {
       recurringMode: "week",
       date: new Date(0).setHours(8),
       selectedDays: [3, 5],
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe(
       "Upcoming: Wed, 08-06-2022 08:00 AM"
     );
   });
 
-  test("weekly reminder [next week]", () => {
+  test("weekly reminder [next week]", async () => {
     const reminder = {
       recurringMode: "week",
-      date: new Date(0).setHours(3),
+      date: dayjs().hour(3).valueOf(),
       selectedDays: [0],
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe(
-      "Upcoming: Sun, 12-06-2022 03:00 AM"
+      "Upcoming: Sun, 12-06-2022 03:05 AM"
     );
   });
 
-  test("weekly reminder [current week, multiple days]", () => {
+  test("weekly reminder [current week, multiple days]", async () => {
     const reminder = {
       recurringMode: "week",
       date: new Date(0).setHours(8),
       selectedDays: [0, 5, 6],
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe(
       "Upcoming: Fri, 10-06-2022 08:00 AM"
     );
   });
 
-  test("weekly reminder [current week, today]", () => {
+  test("weekly reminder [current week, today]", async () => {
     const reminder = {
       recurringMode: "week",
       date: new Date(0).setHours(21),
       selectedDays: [0, 1],
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
   });
 
-  test("weekly reminder [current week, today with multiple days]", () => {
+  test("weekly reminder [current week, today with multiple days]", async () => {
     const reminder = {
       recurringMode: "week",
       date: new Date(5).setHours(21),
       selectedDays: [1, 2, 5, 6],
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
   });
 
-  test("monthly reminder [current month]", () => {
+  test("monthly reminder [current month]", async () => {
     const reminder = {
       recurringMode: "month",
       date: new Date(0).setHours(8),
       selectedDays: [12, 18],
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe(
       "Upcoming: Sun, 12-06-2022 08:00 AM"
     );
   });
 
-  test("monthly reminder [next month]", () => {
+  test("monthly reminder [next month]", async () => {
     const reminder = {
       recurringMode: "month",
       date: new Date(0).setHours(3),
       selectedDays: [1, 2, 3],
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe(
       "Upcoming: Fri, 01-07-2022 03:00 AM"
     );
   });
 
-  test("monthly reminder [current month, today]", () => {
+  test("monthly reminder [current month, today]", async () => {
     const reminder = {
       recurringMode: "month",
       date: new Date(0).setHours(21),
       selectedDays: [6],
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
   });
 
-  test("monthly reminder [current month, today with multiple days]", () => {
+  test("monthly reminder [current month, today with multiple days]", async () => {
     const reminder = {
       recurringMode: "month",
       date: new Date(0).setHours(21),
       selectedDays: [6, 7, 8],
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
   });
 
-  test("today", () => {
+  test("today", async () => {
     const reminder = {
       date: new Date(2022, 5, 6, 8, 5).getTime(),
-      mode: "once"
+      mode: "once",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 08:05 AM");
   });
 
-  test("tomorrow", () => {
+  test("tomorrow", async () => {
     const reminder = {
       date: new Date(2022, 5, 7, 8, 5).getTime(),
-      mode: "once"
+      mode: "once",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Upcoming: Tomorrow, 08:05 AM");
   });
 
-  test("yesterday", () => {
+  test("yesterday", async () => {
     const reminder = {
       date: new Date(2022, 5, 5, 8, 5).getTime(),
-      mode: "once"
+      mode: "once",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Last: Yesterday, 08:05 AM");
   });
 
-  test("exactly on time", () => {
+  test("exactly on time", async () => {
     const reminder = {
       date: new Date(2022, 5, 6, 5, 5).getTime(),
-      mode: "once"
+      mode: "once",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Last: Today, 05:05 AM");
   });
 
-  test("past but still on the same day", () => {
+  test("past but still on the same day", async () => {
     const reminder = {
       date: new Date(2022, 5, 6, 3, 5).getTime(),
-      mode: "once"
+      mode: "once",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Last: Today, 03:05 AM");
   });
 
-  test("the exact current time tomorrow", () => {
+  test("the exact current time tomorrow", async () => {
     const reminder = {
       date: new Date(2022, 5, 6, 5, 5).getTime(),
       mode: "repeat",
-      recurringMode: "day"
+      recurringMode: "day",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe("Upcoming: Tomorrow, 05:05 AM");
   });
 
-  test("same day next week because time has passed today", () => {
+  test("same day next week because time has passed today", async () => {
     const reminder = {
       recurringMode: "week",
       date: new Date(0).setHours(3),
       selectedDays: [1],
-      mode: "repeat"
+      mode: "repeat",
+      title: "Random reminder"
     };
+
+    expect(await compareReminder(reminder)).toBe(true);
     expect(formatReminderTime(reminder)).toBe(
       "Upcoming: Mon, 13-06-2022 03:00 AM"
     );
   });
+
+  test("yearly reminder [this year]", async () => {
+    const reminder = {
+      recurringMode: "year",
+      date: dayjs().month(7).date(20).hour(5).minute(5).valueOf(),
+      selectedDays: [],
+      mode: "repeat",
+      title: "Random reminder"
+    };
+
+    expect(await compareReminder(reminder)).toBe(true);
+    expect(formatReminderTime(reminder)).toBe(
+      "Upcoming: Sat, 20-08-2022 05:05 AM"
+    );
+  });
+
+  test("yearly reminder [next year]", async () => {
+    const reminder = {
+      recurringMode: "year",
+      date: dayjs().month(2).date(20).hour(5).minute(5).valueOf(),
+      selectedDays: [],
+      mode: "repeat",
+      title: "Random reminder"
+    };
+
+    expect(await compareReminder(reminder)).toBe(true);
+    expect(formatReminderTime(reminder)).toBe(
+      "Upcoming: Mon, 20-03-2023 05:05 AM"
+    );
+  });
 });
+
+async function compareReminder(reminder) {
+  const db = await databaseTest();
+  const id = await db.reminders.add(reminder);
+  const result = await db
+    .sql()
+    .selectFrom("reminders")
+    .select([
+      createUpcomingReminderTimeQuery(dayjs().format("YYYY-MM-DDTHH:mm")).as(
+        "dueDate"
+      ),
+      createIsReminderActiveQuery(dayjs().format("YYYY-MM-DDTHH:mm")).as(
+        "isActive"
+      ),
+      "id"
+    ])
+    .where("id", "=", id)
+    .executeTakeFirst();
+
+  assert(
+    result.isActive === Number(isReminderActive(reminder)),
+    "is active value is not equal"
+  );
+  return (
+    result.dueDate ===
+    dayjs(getUpcomingReminderTime(reminder)).second(0).millisecond(0).valueOf()
+  );
+}

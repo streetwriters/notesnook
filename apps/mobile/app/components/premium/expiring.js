@@ -186,7 +186,7 @@ export const Expiring = () => {
 
               {status.extend && (
                 <Button
-                  type="gray"
+                  type="plain"
                   title="Not sure yet? Extend trial for 7 days"
                   textStyle={{
                     textDecorationLine: "underline"

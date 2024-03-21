@@ -33,7 +33,9 @@ const _Button = (
     if (!buttonRef.current) return;
 
     function onMouseDown(e: MouseEvent) {
-      e.preventDefault();
+      if (globalThis.keyboardShown) {
+        e.preventDefault();
+      }
     }
 
     buttonRef.current.addEventListener("mousedown", onMouseDown, {

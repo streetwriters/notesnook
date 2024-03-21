@@ -16,27 +16,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import create, { State } from "zustand";
+import create from "zustand";
+import { createItemSelectionStore } from "../../../stores/item-selection-store";
 
-type SelectionItemState = Record<
-  string,
-  "intermediate" | "selected" | "deselected"
->;
-
-export interface SelectionStore extends State {
-  itemState: SelectionItemState;
-  setItemState: (state: SelectionItemState) => void;
-  multiSelect: boolean;
-  setMultiSelect: (multiSelect: boolean) => void;
-}
-
-export const useItemSelectionStore = create<SelectionStore>((set) => ({
-  itemState: {},
-  setItemState: (itemState) => {
+export const useNotebookExpandedStore = create<{
+  expanded: {
+    [id: string]: boolean;
+  };
+  setExpanded: (id: string) => void;
+}>((set, get) => ({
+  expanded: {},
+  setExpanded(id: string) {
     set({
-      itemState
+      expanded: {
+        ...get().expanded,
+        [id]: !get().expanded[id]
+      }
     });
-  },
-  multiSelect: false,
-  setMultiSelect: (multiSelect) => set({ multiSelect })
+  }
 }));
+
+export const useNotebookItemSelectionStore = createItemSelectionStore(true);

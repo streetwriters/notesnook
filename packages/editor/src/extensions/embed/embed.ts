@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Node, mergeAttributes } from "@tiptap/core";
 import { hasSameAttributes } from "../../utils/prosemirror";
-import { createSelectionBasedNodeView } from "../react";
+import { createNodeView } from "../react";
 import { TextDirections } from "../text-direction";
 import { EmbedComponent } from "./component";
 
@@ -101,7 +101,7 @@ export const EmbedNode = Node.create<EmbedOptions>({
   },
 
   addNodeView() {
-    return createSelectionBasedNodeView(EmbedComponent, {
+    return createNodeView(EmbedComponent, {
       shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs)
     });
   },

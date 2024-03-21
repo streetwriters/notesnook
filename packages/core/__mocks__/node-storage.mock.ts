@@ -18,10 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Cipher, NNCrypto, SerializedKey } from "@notesnook/crypto";
+import { IStorage } from "../src/interfaces";
 
-export class NodeStorageInterface {
+export class NodeStorageInterface implements IStorage {
   storage = {};
   crypto = new NNCrypto();
+
+  async removeMulti(keys: string[]): Promise<void> {
+    for (const key of keys) {
+      this.remove(key);
+    }
+  }
 
   async write<T>(key: string, data: T): Promise<void> {
     this.storage[key] = data;
@@ -78,14 +85,11 @@ export class NodeStorageInterface {
     return this.crypto.decryptMulti(key, items, "text");
   }
 
-  async deriveCryptoKey(
-    name: string,
-    credentials: SerializedKey
-  ): Promise<void> {
+  async deriveCryptoKey(credentials: SerializedKey): Promise<void> {
     const { password, salt } = credentials;
     if (!password || !salt) return;
     const keyData = await this.crypto.exportKey(password, salt);
-    await this.write(`${name}@_k`, keyData.key);
+    await this.write(`userEncryptionKey`, keyData.key);
   }
 
   async hash(password: string, email: string): Promise<string> {
@@ -93,8 +97,8 @@ export class NodeStorageInterface {
     return await this.crypto.hash(password, `${APP_SALT}${email}`);
   }
 
-  async getCryptoKey(name: string): Promise<string | undefined> {
-    const key = await this.read<string>(`${name}@_k`);
+  async getCryptoKey(): Promise<string | undefined> {
+    const key = await this.read<string>(`userEncryptionKey`);
     if (!key) return;
     return key;
   }

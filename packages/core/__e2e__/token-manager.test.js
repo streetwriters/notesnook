@@ -27,15 +27,15 @@ test(
     databaseTest().then(async (db) => {
       await expect(login(db)).resolves.not.toThrow();
 
-      const token = await db.user.tokenManager.getToken();
+      const token = await db.tokenManager.getToken();
       expect(token).toBeDefined();
 
       expect(
         await Promise.all([
-          db.user.tokenManager._refreshToken(true),
-          db.user.tokenManager._refreshToken(true),
-          db.user.tokenManager._refreshToken(true),
-          db.user.tokenManager._refreshToken(true)
+          db.tokenManager._refreshToken(true),
+          db.tokenManager._refreshToken(true),
+          db.tokenManager._refreshToken(true),
+          db.tokenManager._refreshToken(true)
         ])
       ).toHaveLength(4);
     }),
@@ -48,11 +48,11 @@ test(
     databaseTest().then(async (db) => {
       await expect(login(db)).resolves.not.toThrow();
 
-      const token = await db.user.tokenManager.getToken();
+      const token = await db.tokenManager.getToken();
       expect(token).toBeDefined();
       for (let i = 0; i <= 5; ++i) {
-        await db.user.tokenManager._refreshToken(true);
-        await db.user.tokenManager.saveToken(token);
+        await db.tokenManager._refreshToken(true);
+        await db.tokenManager.saveToken(token);
       }
     }),
   30000

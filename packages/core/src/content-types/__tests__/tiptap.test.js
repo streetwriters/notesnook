@@ -26,10 +26,10 @@ import { test, expect } from "vitest";
 
 test("img src is empty after extract attachments", async () => {
   const tiptap = new Tiptap(IMG_CONTENT_WITHOUT_HASH);
-  const result = await tiptap.extractAttachments(async () => {
-    return { key: "hello", metadata: { hash: "helloworld" } };
+  const result = await tiptap.postProcess(async () => {
+    return "helloworld";
   });
-  expect(result.attachments).toHaveLength(1);
+  expect(result.hashes).toHaveLength(1);
   expect(result.data).not.toContain(`src="data:image/png;`);
   expect(result.data).not.toContain(`src=""`);
   expect(result.data).toContain(`data-hash="helloworld"`);
@@ -37,7 +37,7 @@ test("img src is empty after extract attachments", async () => {
 
 test("img src is present after insert attachments", async () => {
   const tiptap = new Tiptap(IMG_CONTENT);
-  const result = await tiptap.extractAttachments(async () => {
+  const result = await tiptap.postProcess(async () => {
     return { key: "hello", metadata: {} };
   });
   const tiptap2 = new Tiptap(result.data);

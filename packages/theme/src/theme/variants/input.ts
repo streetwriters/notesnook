@@ -59,12 +59,12 @@ const clean: ThemeUIStyleObject = {
 
 const error: ThemeUIStyleObject = {
   variant: "forms.input",
-  outline: "1.5px solid var(--error)",
+  outline: "1.5px solid var(--accent-error)",
   ":focus": {
-    outline: "2px solid var(--error)"
+    outline: "2px solid var(--accent-error)"
   },
   ":hover:not(:focus)": {
-    outline: "1.5px solid var(--error)"
+    outline: "1.5px solid var(--accent-error)"
   }
 };
 

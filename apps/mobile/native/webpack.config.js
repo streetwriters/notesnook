@@ -2,6 +2,9 @@
 const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 const Repack = require("@callstack/repack");
+const { webpack, NormalModuleReplacementPlugin } = require("webpack");
+
+
 
 /**
  * More documentation, installation, usage, motivation and differences with Metro is available at:
@@ -100,7 +103,11 @@ module.exports = (env) => {
         "react-native-blob-util": path.join(__dirname, "../node_modules/react-native-blob-util"),
         "@mdi/js": path.join(__dirname, "../node_modules/@mdi/js/mdi.js"),
         "katex": path.join(__dirname, "../node_modules/katex"),
+        "tinycolor2":  path.join(__dirname, "../node_modules/tinycolor2"),
       },
+      fallback: {
+        "crypto": false,
+      }
     },
     /**
      * Configures output.
@@ -154,6 +161,29 @@ module.exports = (env) => {
         {
           test: /\.mjs$|cjs$|js$|jsx$|ts$|tsx$/,
           include: [
+            /node_modules(.*[/\\])+kysely/,
+          ],
+          use: {
+            loader: "babel-loader",
+            options: {
+              configFile: false,
+              cacheDirectory: path.join(
+                __dirname,
+                "node_modules/.webpack-cache"
+              ),
+              babelrc: false,
+              presets: ["module:metro-react-native-babel-preset"],
+              plugins: [
+                "react-native-reanimated/plugin",
+                "@babel/plugin-transform-named-capturing-groups-regex",
+                ["@babel/plugin-transform-private-methods", { "loose": true }]
+              ]
+            },
+          },
+        },
+        {
+          test: /\.mjs$|cjs$|js$|jsx$|ts$|tsx$/,
+          include: [
             /node_modules(.*[/\\])+react/,
             /node_modules(.*[/\\])+@react-native/,
             /node_modules(.*[/\\])+@react-navigation/,
@@ -186,7 +216,10 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+@trpc[/\\]react-query/,
             /node_modules(.*[/\\])+katex/,
             /node_modules(.*[/\\])+@notesnook[/\\]core/,
-
+            /node_modules(.*[/\\])+whatwg-url-without-unicode/,
+            /node_modules(.*[/\\])+whatwg-url/,
+            /node_modules(.*[/\\])+react-native-url-polyfill/,
+            /node_modules(.*[/\\])+diffblazer/,
           ],
           use: {
             loader: "babel-loader",
@@ -201,10 +234,11 @@ module.exports = (env) => {
               plugins: [
                 "react-native-reanimated/plugin",
                 "@babel/plugin-transform-named-capturing-groups-regex",
-              ],
+              ]
             },
           },
         },
+      
         /**
          * Here you can adjust loader that will process your files.
          *
@@ -239,6 +273,7 @@ module.exports = (env) => {
             },
           },
         },
+
         /**
          * This loader handles all static assets (images, video, audio and others), so that you can
          * use (reference) them inside your application.
@@ -282,6 +317,12 @@ module.exports = (env) => {
       ],
     },
     plugins: [
+      new NormalModuleReplacementPlugin(
+        /node:crypto/,
+        (resource) => {
+          resource.request = resource.request.replace(/^node:/, '');
+        }
+      ),
       /**
        * Configure other required and additional plugins to make the bundle
        * work in React Native and provide good development experience with

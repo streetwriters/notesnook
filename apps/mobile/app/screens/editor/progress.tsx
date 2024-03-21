@@ -23,13 +23,11 @@ import { View } from "react-native";
 import { ProgressBarComponent } from "../../components/ui/svg/lazy";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { useEditorStore } from "../../stores/use-editor-store";
+import { useTabStore } from "./tiptap/use-tab-store";
 
 export const ProgressBar = () => {
   const { colors } = useThemeColors();
-  const currentlyEditingNote = useEditorStore(
-    (state) => state.currentEditingNote
-  );
+  const currentlyEditingNote = useTabStore((state) => state.getCurrentNoteId());
   const downloading = useAttachmentStore((state) => state.downloading);
 
   const loading = currentlyEditingNote
@@ -41,7 +39,7 @@ export const ProgressBar = () => {
   const [visible, setVisible] = useState(false);
   const timer = useRef<NodeJS.Timeout>();
   const insets = useGlobalSafeAreaInsets();
-  const [width, setWidth] = useState(400);
+  const [width, setWidth] = useState(0);
 
   const groupProgressInfo = useRef<{
     [name: string]: {
@@ -56,7 +54,6 @@ export const ProgressBar = () => {
 
   useEffect(() => {
     if (loading) {
-      console.log(loading);
       if (
         loading.current === loading.total &&
         typeof loading.success === "boolean"
@@ -118,6 +115,7 @@ export const ProgressBar = () => {
         justifyContent: "center",
         position: "absolute",
         zIndex: visible ? 1 : -1,
+        opacity: visible ? 1 : 0,
         marginTop: insets.top + 45,
         width: "100%"
       }}

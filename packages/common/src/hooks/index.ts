@@ -18,3 +18,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export * from "./use-time-ago";
+export * from "./use-promise";
+export * from "./use-resolved-item";

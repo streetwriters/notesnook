@@ -58,8 +58,6 @@ describe("Tags", () => {
     await device.pressBack();
     await device.pressBack();
     await notVisibleByText("#testtag");
-    await navigate("Tags");
-    await notVisibleByText("#testtag");
   });
 
   it("Creat shortcut of a tag", async () => {

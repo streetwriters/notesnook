@@ -39,7 +39,7 @@ export function TaskListComponent(
   const checked = stats.total > 0 && stats.total === stats.checked;
 
   const isNested = useMemo(() => {
-    if (!pos) return false;
+    if (!pos || editor.state.doc.nodeSize < pos) return false;
     return editor.state.doc.resolve(pos).parent.type.name === TaskItem.name;
   }, [editor.state.doc, pos]);
 
@@ -97,7 +97,7 @@ export function TaskListComponent(
               }}
               onClick={() => {
                 const parentPos = getPos();
-                editor.current?.commands.command(({ tr }) => {
+                editor.commands.command(({ tr }) => {
                   const node = tr.doc.nodeAt(parentPos);
                   if (!node) return false;
                   toggleChildren(tr, node, !checked, parentPos);
@@ -125,8 +125,8 @@ export function TaskListComponent(
             onChange={(e) => {
               e.target.value = replaceDateTime(
                 e.target.value,
-                editor.current?.storage.dateFormat,
-                editor.current?.storage.timeFormat
+                editor.storage.dateFormat,
+                editor.storage.timeFormat
               );
               updateAttributes(
                 { title: e.target.value },
@@ -146,7 +146,7 @@ export function TaskListComponent(
                 }}
                 onClick={() => {
                   const parentPos = getPos();
-                  editor.current?.commands.command(({ tr }) => {
+                  editor.commands.command(({ tr }) => {
                     const node = tr.doc.nodeAt(parentPos);
                     if (!node) return false;
                     const toggleState = !node.attrs.readonly;
@@ -177,7 +177,7 @@ export function TaskListComponent(
                 }}
                 onClick={() => {
                   const pos = getPos();
-                  editor.current
+                  editor
                     ?.chain()
                     .focus()
                     .command(({ tr }) => {
@@ -197,7 +197,7 @@ export function TaskListComponent(
                 onClick={() => {
                   const pos = getPos();
 
-                  editor.current
+                  editor
                     ?.chain()
                     .focus()
                     .command(({ tr }) => {

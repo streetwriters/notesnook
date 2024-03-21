@@ -17,13 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getFormattedDate } from "@notesnook/common";
+import { useThemeColors } from "@notesnook/theme";
 import KeepAwake from "@sayem314/react-native-keep-awake";
 import React, { useEffect, useRef, useState } from "react";
-import { Modal, SafeAreaView, Text, View } from "react-native";
+import { SafeAreaView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import Editor from "../../screens/editor";
+import { ReadonlyEditor } from "../../screens/editor/readonly-editor";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../screens/editor/tiptap/utils";
 import { DDS } from "../../services/device-detection";
 import {
@@ -33,10 +36,9 @@ import {
 } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import Sync from "../../services/sync";
-import { useThemeColors } from "@notesnook/theme";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
-import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
 import DialogButtons from "../dialog/dialog-buttons";
 import DialogContainer from "../dialog/dialog-container";
@@ -45,8 +47,7 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { getFormattedDate } from "@notesnook/common";
+import { diff } from "diffblazer";
 
 const MergeConflicts = () => {
   const { colors } = useThemeColors();
@@ -62,7 +63,7 @@ const MergeConflicts = () => {
 
   const applyChanges = async () => {
     let _content = keep;
-    let note = db.notes.note(_content.noteId).data;
+    let note = await db.notes.note(_content.noteId);
     await db.notes.add({
       id: note.id,
       conflicted: false,
@@ -88,10 +89,11 @@ const MergeConflicts = () => {
       });
     }
     Navigation.queueRoutesForUpdate();
-    if (editorController.current?.note?.id === note.id) {
+
+    if (useTabStore.getState().getCurrentNoteId() === note.id) {
       // reload the note in editor
       eSendEvent(eOnLoadNote, {
-        ...editorController.current?.note,
+        item: editorController.current.note.current[note.id],
         forced: true
       });
     }
@@ -100,7 +102,7 @@ const MergeConflicts = () => {
   };
 
   const show = async (item) => {
-    let noteContent = await db.content.raw(item.contentId);
+    let noteContent = await db.content.get(item.contentId);
     content.current = { ...noteContent };
     if (__DEV__) {
       if (!noteContent.conflicted) {
@@ -190,7 +192,7 @@ const MergeConflicts = () => {
                 setDialogVisible(true);
               }}
               title="Save a copy"
-              type="grayBg"
+              type="secondary"
               height={30}
               style={{
                 borderRadius: 100,
@@ -314,21 +316,17 @@ const MergeConflicts = () => {
               borderBottomColor: colors.secondary.background
             }}
           >
-            <Editor
-              noHeader
-              noToolbar
-              readonly
-              editorId=":conflictPrimary"
-              onLoad={async () => {
-                const note = db.notes.note(content.current?.noteId)?.data;
+            <ReadonlyEditor
+              editorId="conflictPrimary"
+              onLoad={async (loadContent) => {
+                const note = await db.notes.note(content.current?.noteId);
                 if (!note) return;
-                await sleep(300);
-                eSendEvent(eOnLoadNote + ":conflictPrimary", {
-                  ...note,
-                  content: {
-                    ...content.current,
-                    isPreview: true
-                  }
+                loadContent({
+                  id: note.id,
+                  data: diff(
+                    content.current.conflicted.data,
+                    content.current.data
+                  )
                 });
               }}
             />
@@ -349,18 +347,14 @@ const MergeConflicts = () => {
               borderRadius: 10
             }}
           >
-            <Editor
-              noHeader
-              noToolbar
-              readonly
-              editorId=":conflictSecondary"
-              onLoad={async () => {
-                const note = db.notes.note(content.current?.noteId)?.data;
+            <ReadonlyEditor
+              editorId="conflictSecondary"
+              onLoad={async (loadContent) => {
+                const note = await db.notes.note(content.current?.noteId);
                 if (!note) return;
-                await sleep(300);
-                eSendEvent(eOnLoadNote + ":conflictSecondary", {
-                  ...note,
-                  content: { ...content.current.conflicted, isPreview: true }
+                loadContent({
+                  id: note.id,
+                  data: content.current.conflicted.data
                 });
               }}
             />

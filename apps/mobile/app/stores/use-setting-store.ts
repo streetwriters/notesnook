@@ -23,8 +23,8 @@ import { Sound } from "react-native-notification-sounds";
 import { initialWindowMetrics } from "react-native-safe-area-context";
 import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
-import { Reminder } from "../services/notifications";
 import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
+import { Reminder } from "@notesnook/core/dist/types";
 
 export type Settings = {
   showToolbarOnTop?: boolean;
@@ -39,7 +39,9 @@ export type Settings = {
   sortOrder?: string;
   screenshotMode?: boolean;
   privacyScreen?: boolean;
-  appLockMode?: string;
+  appLockTimer: number;
+  appLockEnabled?: boolean;
+  appLockMode?: "none" | "background" | "launch";
   telemetry?: boolean;
   notebooksListMode?: "normal" | "compact";
   notesListMode?: "normal" | "compact";
@@ -75,6 +77,10 @@ export type Settings = {
   lighTheme: ThemeDefinition;
   darkTheme: ThemeDefinition;
   markdownShortcuts?: boolean;
+  appLockHasPasswordSecurity?: boolean;
+  biometricsAuthEnabled?: boolean;
+  backgroundSync?: boolean;
+  applockKeyboardType: "numeric" | "default";
 };
 
 type DimensionsType = {
@@ -98,8 +104,8 @@ export interface SettingStore extends State {
   setFullscreen: (fullscreen: boolean) => void;
   setDeviceMode: (mode: string) => void;
   setDimensions: (dimensions: DimensionsType) => void;
-  appLoading: boolean;
-  setAppLoading: (appLoading: boolean) => void;
+  isAppLoading: boolean;
+  setAppLoading: (isAppLoading: boolean) => void;
   setSheetKeyboardHandler: (sheetKeyboardHandler: boolean) => void;
   sheetKeyboardHandler: boolean;
   requestBiometrics: boolean;
@@ -110,11 +116,15 @@ export interface SettingStore extends State {
   setInsets: (insets: Insets) => void;
   timeFormat: string;
   dateFormat: string;
+  dbPassword?: string;
+  isOldAppLock: () => boolean;
 }
 
 const { width, height } = Dimensions.get("window");
 
 export const defaultSettings: SettingStore["settings"] = {
+  applockKeyboardType: "numeric",
+  appLockTimer: 0,
   showToolbarOnTop: false,
   showKeyboardOnOpen: false,
   fontScale: 1,
@@ -156,21 +166,24 @@ export const defaultSettings: SettingStore["settings"] = {
   colorScheme: "light",
   lighTheme: ThemeLight,
   darkTheme: ThemeDark,
-  markdownShortcuts: true
+  markdownShortcuts: true,
+  biometricsAuthEnabled: false,
+  appLockHasPasswordSecurity: false
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
+  dbPassword: undefined,
   settings: { ...defaultSettings },
   sheetKeyboardHandler: true,
   fullscreen: false,
   deviceMode: null,
   dimensions: { width, height },
-  appLoading: true,
+  isAppLoading: true,
   setSettings: (settings) => set({ settings }),
   setFullscreen: (fullscreen) => set({ fullscreen }),
   setDeviceMode: (mode) => set({ deviceMode: mode }),
   setDimensions: (dimensions) => set({ dimensions: dimensions }),
-  setAppLoading: (appLoading) => set({ appLoading }),
+  setAppLoading: (isAppLoading) => set({ isAppLoading }),
   setSheetKeyboardHandler: (sheetKeyboardHandler) =>
     set({ sheetKeyboardHandler }),
   requestBiometrics: false,
@@ -184,6 +197,13 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     });
   },
   appDidEnterBackgroundForAction: false,
+  isOldAppLock: () => {
+    return (
+      get().settings.appLockHasPasswordSecurity === undefined &&
+      get().settings.biometricsAuthEnabled === undefined &&
+      get().settings.appLockMode !== "none"
+    );
+  },
   insets: initialWindowMetrics?.insets
     ? initialWindowMetrics.insets
     : { top: 0, right: 0, left: 0, bottom: 0 }

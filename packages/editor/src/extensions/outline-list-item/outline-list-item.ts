@@ -20,24 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   Node,
   mergeAttributes,
-  findChildren,
-  Editor,
-  findParentNode
+  findParentNodeClosestToPos
 } from "@tiptap/core";
-import { NodeType } from "prosemirror-model";
 import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
 import { OutlineList } from "../outline-list/outline-list";
 
 export interface ListItemOptions {
   HTMLAttributes: Record<string, unknown>;
-}
-
-declare module "@tiptap/core" {
-  interface Commands<ReturnType> {
-    outlineListItem: {
-      toggleOutlineCollapse: (subListPos: number, state: boolean) => ReturnType;
-    };
-  }
 }
 
 export const OutlineListItem = Node.create<ListItemOptions>({
@@ -87,14 +76,20 @@ export const OutlineListItem = Node.create<ListItemOptions>({
   addKeyboardShortcuts() {
     return {
       "Mod-Space": ({ editor }) => {
-        const subList = findSublist(editor, this.type);
-        if (!subList) return false;
-        const { isCollapsed, subListPos } = subList;
+        const { selection } = editor.state;
+        const { $from, empty } = selection;
 
-        return this.editor.commands.toggleOutlineCollapse(
-          subListPos,
-          !isCollapsed
-        );
+        if (!empty) return false;
+
+        const listItem = findParentNodeOfTypeClosestToPos($from, this.type);
+        if (!listItem) return false;
+
+        const isCollapsed = listItem.node.attrs.collapsed;
+
+        return editor.commands.command(({ tr }) => {
+          tr.setNodeAttribute(listItem.pos, "collapsed", !isCollapsed);
+          return true;
+        });
       },
       Enter: () => {
         // const subList = findSublist(editor, this.type);
@@ -110,19 +105,6 @@ export const OutlineListItem = Node.create<ListItemOptions>({
       },
       Tab: () => this.editor.commands.sinkListItem(this.name),
       "Shift-Tab": () => this.editor.commands.liftListItem(this.name)
-    };
-  },
-
-  addCommands() {
-    return {
-      toggleOutlineCollapse:
-        (pos, state) =>
-        ({ tr }) => {
-          tr.setNodeMarkup(pos, undefined, {
-            collapsed: state
-          });
-          return true;
-        }
     };
   },
 
@@ -143,6 +125,10 @@ export const OutlineListItem = Node.create<ListItemOptions>({
         if (!(e.target instanceof HTMLParagraphElement)) return;
         if (!li.classList.contains("nested")) return;
 
+        const pos = typeof getPos === "function" ? getPos() : 0;
+        if (typeof pos !== "number") return;
+        const resolvedPos = editor.state.doc.resolve(pos);
+
         const { x, y, right } = li.getBoundingClientRect();
 
         const clientX =
@@ -153,30 +139,33 @@ export const OutlineListItem = Node.create<ListItemOptions>({
 
         const hitArea = { width: 40, height: 40 };
 
-        const selection = editor.state.selection;
-        const parent = findParentNode((node) => !!node.attrs.textDirection)(
-          selection
-        );
+        const isRtl =
+          e.target.dir === "rtl" ||
+          findParentNodeClosestToPos(
+            resolvedPos,
+            (node) => !!node.attrs.textDirection
+          )?.node.attrs.textDirection === "rtl";
 
         let xStart = clientX >= x - hitArea.width;
         let xEnd = clientX <= x;
         const yStart = clientY >= y;
         const yEnd = clientY <= y + hitArea.height;
 
-        if (parent && parent.node.attrs.textDirection === "rtl") {
+        if (isRtl) {
           xEnd = clientX <= right + hitArea.width;
           xStart = clientX >= right;
         }
 
         if (xStart && xEnd && yStart && yEnd) {
-          const pos = typeof getPos === "function" ? getPos() : 0;
-          if (!pos) return;
-
           e.preventDefault();
-          editor.commands.toggleOutlineCollapse(
-            pos,
-            !li.classList.contains("collapsed")
-          );
+          editor.commands.command(({ tr }) => {
+            tr.setNodeAttribute(
+              pos,
+              "collapsed",
+              !li.classList.contains("collapsed")
+            );
+            return true;
+          });
         }
       }
 
@@ -205,23 +194,3 @@ export const OutlineListItem = Node.create<ListItemOptions>({
     };
   }
 });
-
-function findSublist(editor: Editor, type: NodeType) {
-  const { selection } = editor.state;
-  const { $from } = selection;
-
-  const listItem = findParentNodeOfTypeClosestToPos($from, type);
-  if (!listItem) return false;
-
-  const [subList] = findChildren(
-    listItem.node,
-    (node) => node.type.name === OutlineList.name
-  );
-  if (!subList) return false;
-
-  const isNested = subList?.node?.type.name === OutlineList.name;
-  const isCollapsed = subList?.node?.attrs.collapsed;
-  const subListPos = listItem.pos + subList.pos + 1;
-
-  return { isCollapsed, isNested, subListPos };
-}

@@ -35,10 +35,6 @@ export const eOpenAddNotebookDialog = "507";
 
 export const eCloseAddNotebookDialog = "508";
 
-export const eOpenAddTopicDialog = "509";
-
-export const eCloseAddTopicDialog = "510";
-
 export const eOpenLoginDialog = "511";
 
 export const eCloseLoginDialog = "512";
@@ -73,7 +69,7 @@ export const eThemeUpdated = "527";
 
 export const eScrollEvent = "528";
 
-export const eOnNewTopicAdded = "529";
+export const eUpdateNotebookRoute = "529";
 
 export const eOpenVaultDialog = "530";
 
@@ -159,8 +155,20 @@ export const eCloseAnnouncementDialog = "604";
 export const eOpenLoading = "605";
 export const eCloseLoading = "606";
 
-export const eOnTopicSheetUpdate = "607";
+export const eOnNotebookUpdated = "607";
 
 export const eUserLoggedIn = "608";
 
 export const eLoginSessionExpired = "609";
+export const eDBItemUpdate = "610";
+export const eGroupOptionsUpdated = "611";
+export const eOnRefreshSearch = "612";
+
+export const eOpenAppLockPasswordDialog = "613";
+export const eCloseAppLocKPasswordDailog = "614";
+export const eEditorTabFocused = "615";
+export const eUnlockNote = "616";
+export const eOnChangeFluidTab = "617";
+export const eUnlockWithBiometrics = "618";
+export const eUnlockWithPassword = "619";
+export const eUpdateNoteInEditor = "620";

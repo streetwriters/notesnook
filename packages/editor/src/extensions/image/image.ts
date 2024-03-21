@@ -24,7 +24,7 @@ import {
   ImageAttachment,
   getDataAttribute
 } from "../attachment";
-import { createSelectionBasedNodeView } from "../react";
+import { createNodeView } from "../react";
 import { TextDirections } from "../text-direction";
 import { ImageComponent } from "./component";
 
@@ -136,7 +136,7 @@ export const ImageNode = Node.create<ImageOptions>({
   },
 
   addNodeView() {
-    return createSelectionBasedNodeView(ImageComponent, {
+    return createNodeView(ImageComponent, {
       componentKey: (node) => node.attrs.hash,
       shouldUpdate: (prev, next) => !hasSameAttributes(prev.attrs, next.attrs),
       forceEnableSelection: true
@@ -199,7 +199,8 @@ export const ImageNode = Node.create<ImageOptions>({
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Shift-I": () => this.editor.commands.openAttachmentPicker("image")
+      "Mod-Shift-I": () =>
+        this.editor.storage.openAttachmentPicker?.("image") || true
     };
   }
 });

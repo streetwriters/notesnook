@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react";
 import { useAttachmentStore } from "../stores/use-attachment-store";
+import { Attachment } from "@notesnook/core";
 
 type AttachmentProgress = {
   type: string;
@@ -27,9 +28,12 @@ type AttachmentProgress = {
 };
 
 export const useAttachmentProgress = (
-  attachment: any,
+  attachment?: Attachment,
   encryption?: boolean
-) => {
+): [
+  AttachmentProgress | undefined,
+  (progress?: AttachmentProgress) => void
+] => {
   const progress = useAttachmentStore((state) => state.progress);
   const [currentProgress, setCurrentProgress] = useState<
     AttachmentProgress | undefined
@@ -42,7 +46,9 @@ export const useAttachmentProgress = (
   );
 
   useEffect(() => {
-    const attachmentProgress = progress?.[attachment?.metadata?.hash];
+    const attachmentProgress = !attachment
+      ? null
+      : progress?.[attachment?.hash];
     if (attachmentProgress) {
       const type = attachmentProgress.type;
       const loaded =

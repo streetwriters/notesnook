@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { View } from "react-native";
 import FileViewer from "react-native-file-viewer";
-import { ToastEvent } from "../../../services/event-manager";
+import { ToastManager } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 export const ShareComponent = ({ uri, name, padding }) => {
@@ -40,7 +40,7 @@ export const ShareComponent = ({ uri, name, padding }) => {
             showOpenWithDialog: true,
             showAppsSuggestions: true
           }).catch(() => {
-            ToastEvent.show({
+            ToastManager.show({
               heading: "Cannot open",
               message: `No application found to open ${name} file.`,
               type: "success",

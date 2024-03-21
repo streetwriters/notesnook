@@ -21,17 +21,23 @@ import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/tag-store";
 import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
+import { useSearch } from "../hooks/use-search";
+import { db } from "../common/db";
 
 function Tags() {
   useNavigate("tags", () => store.refresh());
   const tags = useStore((store) => store.tags);
   const refresh = useStore((store) => store.refresh);
+  const filteredItems = useSearch("tags", (query) =>
+    db.lookup.tags(query).sorted()
+  );
+
+  if (!tags) return <Placeholder context="tags" />;
   return (
     <ListContainer
-      type="tags"
-      groupingKey="tags"
+      group="tags"
       refresh={refresh}
-      items={tags}
+      items={filteredItems || tags}
       placeholder={<Placeholder context="tags" />}
     />
   );

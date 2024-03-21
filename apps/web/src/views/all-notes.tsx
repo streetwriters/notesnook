@@ -23,40 +23,53 @@ import ListContainer from "../components/list-container";
 import { hashNavigate } from "../navigation";
 import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
+import { useSearch } from "../hooks/use-search";
+import { db } from "../common/db";
+import { useEditorStore } from "../stores/editor-store";
 
 function Home() {
-  useStore((store) => store.nonce);
   const notes = useStore((store) => store.notes);
   const isCompact = useStore((store) => store.viewMode === "compact");
   const refresh = useStore((store) => store.refresh);
-  const clearContext = useStore((store) => store.clearContext);
+  const setContext = useStore((store) => store.setContext);
+  const filteredItems = useSearch("notes", (query) => {
+    if (useStore.getState().context) return;
+    return db.lookup.notes(query).sorted();
+  });
 
-  useNavigate("home", clearContext);
+  useNavigate("home", setContext);
 
   useEffect(() => {
-    (async function () {
-      // const note = db.notes.note("62bc3f28a1a1a10000707077").data;
-      // const data = await db.content.raw(note.contentId);
-      // const note2 = db.notes.note("62bc3f1ca1a1a10000707075").data;
-      // const data2 = await db.content.raw(note2.contentId);
-      // const data3 = { ...data, conflicted: data2 };
-      // await db.content.add(data3);
-      // await db.notes.add({ id: note.id, conflicted: true, resolved: false });
-      // console.log(data3);
-    })();
+    useStore.getState().refresh();
   }, []);
 
+  // useEffect(() => {
+  //   (async function () {
+
+  //     // const titles =
+  //     //   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split("");
+  //     // for (let i = 0; i < 10000; ++i) {
+  //     //   await db.notes.add({
+  //     //     title: `${
+  //     //       titles[getRandom(0, titles.length)]
+  //     //     } Some other title of mine`
+  //     //   });
+  //     //   if (i % 100 === 0) console.log(i);
+  //     // }
+  //     // console.log("DONE");
+  //   })();
+  // }, []);
+
+  if (!notes) return <Placeholder context="notes" />;
   return (
     <ListContainer
-      type="home"
-      groupingKey="home"
+      group="home"
       compact={isCompact}
       refresh={refresh}
-      items={notes}
+      items={filteredItems || notes}
       placeholder={<Placeholder context="notes" />}
       button={{
-        onClick: () =>
-          hashNavigate("/notes/create", { replace: true, addNonce: true })
+        onClick: () => useEditorStore.getState().newSession()
       }}
     />
   );

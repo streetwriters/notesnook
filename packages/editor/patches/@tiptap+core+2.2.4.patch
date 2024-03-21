@@ -1,0 +1,103 @@
+diff --git a/node_modules/@tiptap/core/dist/index.cjs b/node_modules/@tiptap/core/dist/index.cjs
+index 1ea30e0..b5d15e3 100644
+--- a/node_modules/@tiptap/core/dist/index.cjs
++++ b/node_modules/@tiptap/core/dist/index.cjs
+@@ -1327,7 +1327,7 @@ const cut = (originRange, targetPos) => ({ editor, tr }) => {
+     tr.deleteRange(originRange.from, originRange.to);
+     const newPos = tr.mapping.map(targetPos);
+     tr.insert(newPos, contentSlice.content);
+-    tr.setSelection(new state.TextSelection(tr.doc.resolve(newPos - 1)));
++    tr.setSelection(new state.TextSelection(tr.doc.resolve(Math.max(0, newPos - 1))));
+     return true;
+ };
+ 
+@@ -1901,9 +1901,24 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
+     return commands$1.lift(state, dispatch);
+ };
+ 
+-const liftEmptyBlock = () => ({ state, dispatch }) => {
+-    return commands$1.liftEmptyBlock(state, dispatch);
+-};
++const liftEmptyBlock = () => ({ state, dispatch, editor }) => {
++    return commands$1.liftEmptyBlock(state, (tr) => {
++        if (!dispatch) return true;
++
++        const { selection, storedMarks } = state;
++        const marks = storedMarks || (selection.$to.parentOffset && selection.$from.marks());
++
++        if (!marks) return dispatch(tr);
++        
++        const { splittableMarks } = editor.extensionManager;
++        const filteredMarks = marks.filter((mark) =>
++            splittableMarks.includes(mark.type.name)
++        );
++        tr.ensureMarks(filteredMarks)
++
++        return dispatch(tr);
++    });
++}
+ 
+ const liftListItem = typeOrName => ({ state, dispatch }) => {
+     const type = getNodeType(typeOrName, state.schema);
+diff --git a/node_modules/@tiptap/core/dist/index.js b/node_modules/@tiptap/core/dist/index.js
+index 554e919..cdd21be 100644
+--- a/node_modules/@tiptap/core/dist/index.js
++++ b/node_modules/@tiptap/core/dist/index.js
+@@ -1323,7 +1323,7 @@ const cut = (originRange, targetPos) => ({ editor, tr }) => {
+     tr.deleteRange(originRange.from, originRange.to);
+     const newPos = tr.mapping.map(targetPos);
+     tr.insert(newPos, contentSlice.content);
+-    tr.setSelection(new TextSelection(tr.doc.resolve(newPos - 1)));
++    tr.setSelection(new TextSelection(tr.doc.resolve(Math.max(0, newPos - 1))));
+     return true;
+ };
+ 
+@@ -1897,9 +1897,24 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
+     return lift$1(state, dispatch);
+ };
+ 
+-const liftEmptyBlock = () => ({ state, dispatch }) => {
+-    return liftEmptyBlock$1(state, dispatch);
+-};
++const liftEmptyBlock = () => ({ state, dispatch, editor }) => {
++    return liftEmptyBlock$1(state, (tr) => {
++        if (!dispatch) return true;
++
++        const { selection, storedMarks } = state;
++        const marks = storedMarks || (selection.$to.parentOffset && selection.$from.marks());
++
++        if (!marks) return dispatch(tr);
++        
++        const { splittableMarks } = editor.extensionManager;
++        const filteredMarks = marks.filter((mark) =>
++            splittableMarks.includes(mark.type.name)
++        );
++        tr.ensureMarks(filteredMarks)
++
++        return dispatch(tr);
++    });
++}
+ 
+ const liftListItem = typeOrName => ({ state, dispatch }) => {
+     const type = getNodeType(typeOrName, state.schema);
+diff --git a/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts b/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
+index 55d710f..e9698f5 100644
+--- a/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
++++ b/node_modules/@tiptap/core/dist/packages/core/src/Editor.d.ts
+@@ -7,6 +7,7 @@ import * as extensions from './extensions/index.js';
+ import { NodePos } from './NodePos.js';
+ import { CanCommands, ChainedCommands, EditorEvents, EditorOptions, JSONContent, SingleCommands, TextSerializer } from './types.js';
+ export { extensions };
++export interface EditorStorage extends Record<string, any> { }
+ export interface HTMLElement {
+     editor?: Editor;
+ }
+@@ -23,7 +24,7 @@ export declare class Editor extends EventEmitter<EditorEvents> {
+     /**
+      * Returns the editor storage.
+      */
+-    get storage(): Record<string, any>;
++    get storage(): EditorStorage;
+     /**
+      * An object of all registered commands.
+      */

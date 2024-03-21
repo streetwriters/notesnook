@@ -71,7 +71,9 @@ class AnnouncementStore extends BaseStore {
   };
 }
 
-const [useStore, store] = createStore(AnnouncementStore);
+const [useStore, store] = createStore(
+  (set, get) => new AnnouncementStore(set, get)
+);
 export { useStore, store };
 
 export const allowedPlatforms = [
@@ -95,7 +97,7 @@ async function shouldShowAnnouncement(announcement) {
   if (!show) return false;
 
   const user = await db.user.getUser();
-  const subStatus = user?.subscription?.type;
+  const subStatus = user.subscription?.type;
   show = announcement.userTypes.some((userType) => {
     switch (userType) {
       case "pro":

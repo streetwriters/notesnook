@@ -102,7 +102,7 @@ export const VaultSettings: SettingsGroup[] = [
             type: "button",
             title: "Delete",
             action: async () => {
-              if ((await Vault.deleteVault()) && !(await db.vault?.exists())) {
+              if ((await Vault.deleteVault()) && !(await db.vault.exists())) {
                 useAppStore.getState().setIsVaultCreated(false);
                 await useAppStore.getState().refresh();
                 showToast("success", "Vault deleted.");

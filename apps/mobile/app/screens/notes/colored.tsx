@@ -17,14 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
+import { Color } from "@notesnook/core/dist/types";
 import React from "react";
-import NotesPage, { PLACEHOLDER_DATA } from ".";
+import NotesPage from ".";
 import { db } from "../../common/database";
 import Navigation, { NavigationProps } from "../../services/navigation";
-import { NotesScreenParams } from "../../stores/use-navigation-store";
-import { ColorType } from "../../utils/types";
-import { getAlias, openEditor, toCamelCase } from "./common";
+import useNavigationStore, {
+  NotesScreenParams
+} from "../../stores/use-navigation-store";
+import { PLACEHOLDER_DATA, openEditor, toCamelCase } from "./common";
 export const ColoredNotes = ({
   navigation,
   route
@@ -34,7 +35,7 @@ export const ColoredNotes = ({
       navigation={navigation}
       route={route}
       get={ColoredNotes.get}
-      placeholderData={PLACEHOLDER_DATA}
+      placeholder={PLACEHOLDER_DATA}
       onPressFloatingButton={openEditor}
       canGoBack={route.params?.canGoBack}
       focusControl={true}
@@ -42,29 +43,29 @@ export const ColoredNotes = ({
   );
 };
 
-ColoredNotes.get = (params: NotesScreenParams, grouped = true) => {
-  const notes = db.notes?.colored(params.item.id) || [];
-  return grouped
-    ? groupArray(notes, db.settings?.getGroupOptions("notes"))
-    : notes;
+ColoredNotes.get = async (params: NotesScreenParams, grouped = true) => {
+  if (!grouped) {
+    return await db.relations.from(params.item, "note").resolve();
+  }
+
+  return await db.relations
+    .from(params.item, "note")
+    .selector.grouped(db.settings.getGroupOptions("notes"));
 };
 
-ColoredNotes.navigate = (item: ColorType, canGoBack: boolean) => {
+ColoredNotes.navigate = (item: Color, canGoBack: boolean) => {
   if (!item) return;
-  const alias = getAlias({ item: item });
-  Navigation.navigate<"ColoredNotes">(
-    {
-      name: "ColoredNotes",
-      alias: toCamelCase(alias as string),
-      title: toCamelCase(item.title),
-      id: item.id,
-      type: "color",
-      color: item.title?.toLowerCase()
-    },
-    {
-      item: item,
-      canGoBack,
-      title: toCamelCase(alias as string)
-    }
-  );
+
+  const { focusedRouteId } = useNavigationStore.getState();
+
+  if (focusedRouteId === item.id) {
+    console.log("ColoredNotes.navigate: route already focused for color");
+    return;
+  }
+
+  Navigation.push<"ColoredNotes">("ColoredNotes", {
+    item: item,
+    canGoBack,
+    title: toCamelCase(item.title)
+  });
 };

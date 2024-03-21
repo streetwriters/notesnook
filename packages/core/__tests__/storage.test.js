@@ -18,11 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { NodeStorageInterface } from "../__mocks__/node-storage.mock";
-import Storage from "../src/database/storage";
 import { test, expect } from "vitest";
 
 test("add a value", async () => {
-  const storage = new Storage(new NodeStorageInterface());
+  const storage = new NodeStorageInterface();
   await storage.write("hello", "world");
 
   let value = await storage.read("hello");
@@ -31,7 +30,7 @@ test("add a value", async () => {
 });
 
 test("remove", async () => {
-  const storage = new Storage(new NodeStorageInterface());
+  const storage = new NodeStorageInterface();
   await storage.write("hello", "world");
   await storage.remove("hello");
 
@@ -41,7 +40,7 @@ test("remove", async () => {
 });
 
 test("clear", async () => {
-  const storage = new Storage(new NodeStorageInterface());
+  const storage = new NodeStorageInterface();
   await storage.write("hello", "world");
   storage.clear();
 

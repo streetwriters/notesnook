@@ -47,7 +47,7 @@ export function ImageProperties(props: ImagePropertiesProps) {
             sx: { mr: 1 }
           }}
           onChange={(e) => {
-            editor.current?.commands.setImageSize({
+            editor.commands.setImageSize({
               width: e.target.valueAsNumber,
               height: aspectRatio
                 ? e.target.valueAsNumber / aspectRatio
@@ -60,7 +60,7 @@ export function ImageProperties(props: ImagePropertiesProps) {
           type="number"
           value={height || 0}
           onChange={(e) => {
-            editor.current?.commands.setImageSize({
+            editor.commands.setImageSize({
               width: aspectRatio
                 ? e.target.valueAsNumber * aspectRatio
                 : e.target.valueAsNumber,

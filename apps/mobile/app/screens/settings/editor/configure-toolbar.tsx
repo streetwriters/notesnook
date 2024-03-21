@@ -91,7 +91,7 @@ export const ConfigureToolbar = () => {
               }
             ].map((item) => (
               <Button
-                type={preset === item.id ? "accent" : "grayAccent"}
+                type={preset === item.id ? "accent" : "secondaryAccented"}
                 style={{
                   borderRadius: 100,
                   height: 35,
@@ -129,7 +129,7 @@ export const ConfigureToolbar = () => {
           >
             <Button
               title="Create a group"
-              type="grayAccent"
+              type="secondaryAccented"
               icon="plus"
               style={{
                 width: "100%"

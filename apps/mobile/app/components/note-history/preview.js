@@ -17,36 +17,40 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import Editor from "../../screens/editor";
-import EditorOverlay from "../../screens/editor/loading";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../screens/editor/tiptap/utils";
-import { eSendEvent, ToastEvent } from "../../services/event-manager";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
-import { useEditorStore } from "../../stores/use-editor-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
-import { useThemeColors } from "@notesnook/theme";
 import { useTrashStore } from "../../stores/use-trash-store";
 import { eCloseSheet, eOnLoadNote } from "../../utils/events";
-import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
 import DialogHeader from "../dialog/dialog-header";
 import { presentDialog } from "../dialog/functions";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
+import { ReadonlyEditor } from "../../screens/editor/readonly-editor";
 
+/**
+ *
+ * @param {any} param0
+ * @returns
+ */
 export default function NotePreview({ session, content, note }) {
   const { colors } = useThemeColors();
-  const editorId = ":noteHistory";
+  const [locked, setLocked] = useState(false);
 
   async function restore() {
     if (note && note.type === "trash") {
       await db.trash.restore(note.id);
       Navigation.queueRoutesForUpdate();
       useSelectionStore.getState().setSelectionMode(false);
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Restore successful",
         type: "success"
       });
@@ -54,10 +58,11 @@ export default function NotePreview({ session, content, note }) {
       return;
     }
     await db.noteHistory.restore(session.id);
-    if (useEditorStore.getState()?.currentEditingNote === session?.noteId) {
-      if (editorController.current?.note) {
+    if (useTabStore.getState().hasTabForNote(session?.noteId)) {
+      const note = editorController.current.note.current[session?.noteId];
+      if (note) {
         eSendEvent(eOnLoadNote, {
-          ...editorController.current?.note,
+          item: note,
           forced: true
         });
       }
@@ -66,11 +71,15 @@ export default function NotePreview({ session, content, note }) {
     eSendEvent(eCloseSheet);
     Navigation.queueRoutesForUpdate();
 
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Note restored successfully",
       type: "success"
     });
   }
+
+  useEffect(() => {
+    db.vaults.itemExists(note).then((locked) => setLocked(locked));
+  }, [note]);
 
   const deleteNote = async () => {
     presentDialog({
@@ -81,9 +90,9 @@ export default function NotePreview({ session, content, note }) {
       context: "local",
       positivePress: async () => {
         await db.trash.delete(note.id);
-        useTrashStore.getState().setTrash();
+        useTrashStore.getState().refresh();
         useSelectionStore.getState().setSelectionMode(false);
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Permanently deleted items",
           type: "success",
           context: "local"
@@ -97,32 +106,28 @@ export default function NotePreview({ session, content, note }) {
   return (
     <View
       style={{
-        height: note?.locked || session?.locked ? null : 600,
+        height: locked || session?.locked ? null : 600,
         width: "100%"
       }}
     >
       <Dialog context="local" />
       <DialogHeader padding={12} title={note?.title || session?.session} />
-      {!session?.locked && !note?.locked ? (
+      {!session?.locked && !locked ? (
         <View
           style={{
             flex: 1
           }}
         >
-          <Editor
-            noHeader
-            noToolbar
-            readonly
-            editorId={editorId}
-            onLoad={async () => {
-              const _note = note || db.notes.note(session?.noteId)?.data;
-              eSendEvent(eOnLoadNote + editorId, {
-                ..._note,
-                content: {
-                  ...content,
-                  isPreview: true
-                }
-              });
+          <ReadonlyEditor
+            editorId="historyPreview"
+            onLoad={async (loadContent) => {
+              if (content.data) {
+                const _note = note || (await db.notes.note(session?.noteId));
+                loadContent({
+                  data: content.data,
+                  id: _note.id
+                });
+              }
             }}
           />
         </View>

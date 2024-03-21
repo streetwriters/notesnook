@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
+import React, { useRef } from "react";
 import { Flex, Text } from "@theme-ui/components";
 import ListItem from "../list-item";
 import { useStore, store } from "../../stores/notebook-store";
+import { useStore as useNotesStore } from "../../stores/note-store";
 import { store as appStore } from "../../stores/app-store";
-import { showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common/db";
 import {
-  Topic,
+  Topic as TopicIcon,
   PinFilled,
   NotebookEdit,
   Notebook as NotebookIcon,
@@ -36,16 +36,17 @@ import {
 } from "../icons";
 import { hashNavigate, navigate } from "../../navigation";
 import IconTag from "../icon-tag";
-import { showToast } from "../../utils/toast";
 import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "@notesnook/common";
 import { confirm } from "../../common/dialog-controller";
 import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
-import { Item } from "../list-container/types";
+import { Notebook as NotebookType } from "@notesnook/core";
+import { handleDrop } from "../../common/drop-handler";
+import { useDragHandler } from "../../hooks/use-drag-handler";
 
 type NotebookProps = {
-  item: Item;
+  item: NotebookType;
   totalNotes: number;
   date: number;
   simplified?: boolean;
@@ -54,18 +55,36 @@ function Notebook(props: NotebookProps) {
   const { item, totalNotes, date, simplified } = props;
   const notebook = item;
   const isCompact = useStore((store) => store.viewMode === "compact");
+  const dragTimeout = useRef(0);
+  const { isDragEntering, isDragLeaving } = useDragHandler(`id_${notebook.id}`);
 
   return (
     <ListItem
+      draggable
       isCompact={isCompact}
       isSimple={simplified}
       item={notebook}
-      onClick={() => {
-        navigate(`/notebooks/${notebook.id}`);
+      onClick={() => openNotebook(notebook, totalNotes)}
+      onDragEnter={(e) => {
+        if (!isDragEntering(e)) return;
+        e.currentTarget.focus();
+        dragTimeout.current = setTimeout(
+          () => openNotebook(notebook, totalNotes),
+          1000
+        ) as unknown as number;
+      }}
+      onDragLeave={(e) => {
+        if (!isDragLeaving(e)) return;
+        clearTimeout(dragTimeout.current);
+      }}
+      onDrop={async (e) => {
+        clearTimeout(dragTimeout.current);
+
+        handleDrop(e.dataTransfer, notebook);
       }}
       title={notebook.title}
       body={notebook.description as string}
-      menuItems={menuItems}
+      menuItems={notebookMenuItems}
       footer={
         <>
           {isCompact ? (
@@ -76,11 +95,11 @@ function Notebook(props: NotebookProps) {
             <>
               {notebook?.topics && (
                 <Flex mb={1} sx={{ gap: 1 }}>
-                  {(notebook?.topics as Item[]).slice(0, 3).map((topic) => (
+                  {notebook.topics.slice(0, 3).map((topic) => (
                     <IconTag
                       key={topic.id}
                       text={topic.title}
-                      icon={Topic}
+                      icon={TopicIcon}
                       onClick={() => {
                         navigate(`/notebooks/${notebook.id}/${topic.id}`);
                       }}
@@ -128,20 +147,11 @@ export default React.memo(Notebook, (prev, next) => {
   );
 });
 
-const pin = (notebook: Item) => {
-  return store
-    .pin(notebook.id)
-    .then(() => {
-      if (notebook.pinned) showUnpinnedToast(notebook.id, "notebook");
-    })
-    .catch((error) => showToast("error", error.message));
-};
-
-const menuItems: (notebook: any, items?: any[]) => MenuItem[] = (
-  notebook,
-  items = []
-) => {
-  const defaultNotebook = db.settings?.getDefaultNotebook();
+export const notebookMenuItems: (
+  notebook: NotebookType,
+  ids?: string[]
+) => MenuItem[] = (notebook, ids = []) => {
+  const defaultNotebook = db.settings.getDefaultNotebook();
 
   return [
     {
@@ -155,14 +165,13 @@ const menuItems: (notebook: any, items?: any[]) => MenuItem[] = (
       type: "button",
       key: "set-as-default",
       title: "Set as default",
-      isChecked: defaultNotebook?.id === notebook.id && !defaultNotebook?.topic,
+      isChecked: defaultNotebook === notebook.id,
       icon: NotebookIcon.path,
       onClick: async () => {
-        const defaultNotebook = db.settings?.getDefaultNotebook();
-        const isDefault =
-          defaultNotebook?.id === notebook.id && !defaultNotebook?.topic;
-        await db.settings?.setDefaultNotebook(
-          isDefault ? undefined : { id: notebook.id }
+        const defaultNotebook = db.settings.getDefaultNotebook();
+        const isDefault = defaultNotebook === notebook.id;
+        await db.settings.setDefaultNotebook(
+          isDefault ? undefined : notebook.id
         );
       }
     },
@@ -172,15 +181,16 @@ const menuItems: (notebook: any, items?: any[]) => MenuItem[] = (
       icon: Pin.path,
       title: "Pin",
       isChecked: notebook.pinned,
-      onClick: () => pin(notebook)
+      onClick: () => store.pin(!notebook.pinned, ...ids),
+      multiSelect: true
     },
     {
       type: "button",
       key: "shortcut",
-      icon: db.shortcuts?.exists(notebook.id)
+      icon: db.shortcuts.exists(notebook.id)
         ? RemoveShortcutLink.path
         : Shortcut.path,
-      title: db.shortcuts?.exists(notebook.id)
+      title: db.shortcuts.exists(notebook.id)
         ? "Remove shortcut"
         : "Create shortcut",
       onClick: () => appStore.addToShortcuts(notebook)
@@ -194,13 +204,13 @@ const menuItems: (notebook: any, items?: any[]) => MenuItem[] = (
       icon: Trash.path,
       onClick: async () => {
         const result = await confirm({
-          title: `Delete ${pluralize(items.length, "notebook")}?`,
+          title: `Delete ${pluralize(ids.length, "notebook")}?`,
           positiveButtonText: `Yes`,
           negativeButtonText: "No",
           checks: {
             deleteContainingNotes: {
               text: `Move all notes in ${
-                items.length > 1 ? "these notebooks" : "this notebook"
+                ids.length > 1 ? "these notebooks" : "this notebook"
               } to trash`
             }
           }
@@ -208,21 +218,25 @@ const menuItems: (notebook: any, items?: any[]) => MenuItem[] = (
 
         if (result) {
           if (result.deleteContainingNotes) {
-            const notes = [];
-            for (const item of items) {
-              notes.push(...(db.relations?.from(item, "note") || []));
-              const topics = db.notebooks?.notebook(item.id).topics;
-              if (!topics) return;
-              for (const topic of topics.all) {
-                notes.push(...topics.topic(topic.id).all);
-              }
-            }
-            await Multiselect.moveNotesToTrash(notes, false);
+            await Multiselect.moveNotesToTrash(
+              await db.notebooks.notes(notebook.id),
+              false
+            );
           }
-          await Multiselect.moveNotebooksToTrash(items);
+          await Multiselect.moveNotebooksToTrash(ids);
         }
       },
       multiSelect: true
     }
   ];
 };
+
+async function openNotebook(notebook: NotebookType, totalNotes?: number) {
+  await useNotesStore.getState().setContext({
+    type: "notebook",
+    id: notebook.id,
+    item: notebook,
+    totalNotes: totalNotes
+  });
+  navigate(`/notebooks/${notebook.id}`);
+}

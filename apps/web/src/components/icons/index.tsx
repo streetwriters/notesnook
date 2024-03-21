@@ -207,12 +207,15 @@ import {
   mdiFormTextarea,
   mdiGavel,
   mdiDesktopClassic,
-  mdiBellBadgeOutline
+  mdiBellBadgeOutline,
+  mdiDotsHorizontal,
+  mdiCalendarBlank,
+  mdiFormatListBulleted,
+  mdiLink
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
 import { Flex, FlexProps } from "@theme-ui/components";
-import { MotionProps } from "framer-motion";
 import { isThemeColor, SchemeColors } from "@notesnook/theme";
 
 type MDIIconWrapperProps = {
@@ -221,13 +224,15 @@ type MDIIconWrapperProps = {
   size?: keyof Theme["iconSizes"] | number;
   color?: SchemeColors;
   rotate?: boolean;
+  rotateDirection?: "clockwise" | "counterclockwise";
 };
 function _MDIIconWrapper({
   title,
   path,
   size = 24,
   color = "icon",
-  rotate
+  rotate,
+  rotateDirection
 }: MDIIconWrapperProps) {
   const theme = useTheme() as Theme;
 
@@ -251,7 +256,7 @@ function _MDIIconWrapper({
         stroke: themedColor
       }}
       color={themedColor}
-      spin={rotate}
+      spin={rotate ? (rotateDirection === "clockwise" ? 2 : -2) : false}
     />
   );
 }
@@ -263,9 +268,7 @@ const MDIIconWrapper = memo(
     prev.title === next.title
 );
 
-export type IconProps = FlexProps &
-  MotionProps &
-  Omit<MDIIconWrapperProps, "path">;
+export type IconProps = FlexProps & Omit<MDIIconWrapperProps, "path">;
 
 export type Icon = {
   (props: IconProps): JSX.Element;
@@ -326,10 +329,12 @@ export const Update = createIcon(mdiUpdate);
 export const Check = createIcon(mdiCheck);
 export const Cross = createIcon(mdiClose);
 export const MoreVertical = createIcon(mdiDotsVertical);
+export const MoreHorizontal = createIcon(mdiDotsHorizontal);
 export const Trash = createIcon(mdiTrashCanOutline);
 export const TopicRemove = createIcon(mdiBookmarkRemoveOutline);
 export const NotebookRemove = createIcon(mdiBookRemoveOutline);
 export const Search = createIcon(mdiMagnify);
+export const TableOfContents = createIcon(mdiFormatListBulleted);
 export const Menu = createIcon(mdiMenu);
 export const Login = createIcon(mdiLoginVariant);
 export const Email = createIcon(mdiEmailAlertOutline);
@@ -401,6 +406,7 @@ export const Copy = createIcon(mdiContentCopy);
 export const Refresh = createIcon(mdiRefresh);
 export const Clock = createIcon(mdiClockTimeFiveOutline);
 export const Duplicate = createIcon(mdiContentDuplicate);
+export const InternalLink = createIcon(mdiLink);
 export const Select = createIcon(mdiCheckboxMultipleMarkedCircleOutline);
 export const NotebookEdit = createIcon(mdiBookEditOutline);
 export const DeleteForver = createIcon(mdiDeleteForeverOutline);
@@ -531,3 +537,4 @@ export const Documentation = createIcon(mdiFileDocumentOutline);
 export const Legal = createIcon(mdiGavel);
 export const Desktop = createIcon(mdiDesktopClassic);
 export const Notification = createIcon(mdiBellBadgeOutline);
+export const Calendar = createIcon(mdiCalendarBlank);

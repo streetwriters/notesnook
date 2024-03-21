@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import EventManager from "@notesnook/core/dist/utils/event-manager";
+import EventManager, {
+  EventHandler
+} from "@notesnook/core/dist/utils/event-manager";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { RefObject } from "react";
 import { ActionSheetRef } from "react-native-actions-sheet";
@@ -60,20 +62,22 @@ const eventManager = new EventManager();
 
 export const eSubscribeEvent = <T = unknown>(
   eventName: string,
-  action?: (data: T) => void
+  action: EventHandler
 ) => {
+  if (!action) return;
   return eventManager.subscribe(eventName, action);
 };
 
 export const eUnSubscribeEvent = <T = unknown>(
   eventName: string,
-  action?: (data: T) => void
+  action: EventHandler
 ) => {
+  if (!action) return;
   eventManager.unsubscribe(eventName, action);
 };
 
-export const eSendEvent = (eventName: string, data?: unknown) => {
-  eventManager.publish(eventName, data);
+export const eSendEvent = (eventName: string, ...args: any[]) => {
+  eventManager.publish(eventName, ...args);
 };
 
 export const openVault = (data: Partial<Vault>) => {
@@ -116,6 +120,7 @@ export type PresentSheetOptions = {
   learnMorePress: () => void;
   enableGesturesInScrollView?: boolean;
   noBottomPadding?: boolean;
+  keyboardHandlerDisabled?: boolean;
 };
 
 export function presentSheet(data: Partial<PresentSheetOptions>) {
@@ -126,17 +131,17 @@ export function hideSheet() {
   eSendEvent(eCloseSheet);
 }
 
-export type ShowToastEvent = {
+export type ToastOptions = {
   heading?: string;
   message?: string;
-  context?: "global" | "local";
-  type?: "error" | "success";
+  context?: any;
+  type?: "error" | "success" | "info";
   duration?: number;
   func?: () => void;
   actionText?: string;
 };
 
-export const ToastEvent = {
+export const ToastManager = {
   show: ({
     heading,
     message,
@@ -144,7 +149,7 @@ export const ToastEvent = {
     context = "global",
     func,
     actionText
-  }: ShowToastEvent) => {
+  }: ToastOptions) => {
     if (Config.isTesting) return;
     eSendEvent(eShowToast, {
       heading: heading,
@@ -157,8 +162,8 @@ export const ToastEvent = {
     });
   },
   hide: () => eSendEvent(eHideToast),
-  error: (e: Error, title?: string, context?: "global" | "local") => {
-    ToastEvent.show({
+  error: (e: Error, title?: string, context?: any) => {
+    ToastManager.show({
       heading: title,
       message: e?.message || "",
       type: "error",
@@ -167,7 +172,7 @@ export const ToastEvent = {
       duration: 6000,
       func: () => {
         Clipboard.setString(e?.stack || "");
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Logs copied!",
           type: "success",
           context: "global",
@@ -177,7 +182,3 @@ export const ToastEvent = {
     });
   }
 };
-
-/*
-
-*/

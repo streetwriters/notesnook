@@ -66,7 +66,7 @@ function toMenuItems(
     isChecked: level === currentHeadingLevel,
     modifier: `Mod-Alt-${level}`,
     onClick: () =>
-      editor.current
+      editor
         ?.chain()
         .focus()
         .updateAttributes("textStyle", { fontSize: null, fontStyle: null })
@@ -79,7 +79,7 @@ function toMenuItems(
     title: "Paragraph",
     isChecked: !currentHeadingLevel,
     modifier: `Mod-Alt-0`,
-    onClick: () => editor.current?.chain().focus().setParagraph().run()
+    onClick: () => editor.chain().focus().setParagraph().run()
   };
   return [paragraph, ...menuItems];
 }

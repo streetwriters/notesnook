@@ -20,15 +20,15 @@
     "clipboard-polyfill": "^4.0.0",
     "file-saver": "^2.0.5",
     "katex": "^0.16.2",
-    "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
     "@types/babel__core": "^7.20.1",
     "@types/file-saver": "^2.0.5",
-    "@types/react": "17.0.2",
-    "@types/react-dom": "17.0.2",
+    "@types/react": "^18.2.39",
+    "@types/react": "^18.2.17",
     "@vitejs/plugin-react-swc": "^3.3.2",
     "autoprefixer": "^10.4.14",
     "buffer": "^6.0.3",
@@ -44,11 +44,6 @@
     "vitest": "^0.32.0"
   },
   "overrides": {
-    "react@>17": "17.0.2",
-    "react-dom@>17": "17.0.2",
-    "@types/react@>17": "17.0.2",
-    "@types/react-dom@>17": "17.0.2",
-    "@emotion/react@>11": "11.10.5",
     "@theme-ui/components@>0": "0.14.7",
     "@theme-ui/core@>0": "0.14.7"
   },

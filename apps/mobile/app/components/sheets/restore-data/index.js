@@ -31,12 +31,13 @@ import { db } from "../../../common/database";
 import storage from "../../../common/database/storage";
 import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
 import {
-  ToastEvent,
+  ToastManager,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
 import SettingsService from "../../../services/settings";
-import { initialize } from "../../../stores";
+import { refreshAllStores } from "../../../stores/create-db-collection-store";
 import { eCloseRestoreDialog, eOpenRestoreDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
@@ -79,7 +80,7 @@ const RestoreDataSheet = () => {
   }, [restoring]);
 
   const showIsWorking = () => {
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Restoring Backup",
       message: "Your backup data is being restored. please wait.",
       type: "error",
@@ -241,19 +242,24 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   };
 
   const restoreBackup = async (backup, password, key) => {
-    await db.backup.import(backup, password, key);
+    await db.transaction(async () => {
+      await db.backup.import(backup, password, key);
+    });
     await db.initCollections();
     initialize();
-    ToastEvent.show({
+    refreshAllStores();
+    ToastManager.show({
       heading: "Backup restored successfully.",
       type: "success",
       context: "global"
     });
+    Navigation.queueRoutesForUpdate();
     return true;
   };
 
   const backupError = (e) => {
-    ToastEvent.show({
+    console.log(e.stack);
+    ToastManager.show({
       heading: "Restore failed",
       message:
         e.message ||
@@ -283,41 +289,44 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         throw new Error("Backup file is invalid");
       }
 
-      let password;
-      let key;
+      await db.transaction(async () => {
+        let password;
+        let key;
+        console.log(
+          `Found ${backupFiles?.length} files to restore from backup`
+        );
+        for (const path of backupFiles) {
+          if (path === ".nnbackup") continue;
+          const filePath = `${zipOutputFolder}/${path}`;
+          const data = await RNFetchBlob.fs.readFile(filePath, "utf8");
+          const parsed = JSON.parse(data);
 
-      console.log(`Found ${backupFiles?.length} files to restore from backup`);
-      for (const path of backupFiles) {
-        if (path === ".nnbackup") continue;
-        const filePath = `${zipOutputFolder}/${path}`;
-        const data = await RNFetchBlob.fs.readFile(filePath, "utf8");
-        const parsed = JSON.parse(data);
+          if (parsed.encrypted && !password) {
+            console.log("Backup is encrypted...", "requesting password");
+            const { value, isEncryptionKey } = await withPassword();
 
-        if (parsed.encrypted && !password) {
-          console.log("Backup is encrypted...", "requesting password");
-          const { value, isEncryptionKey } = await withPassword();
-
-          if (isEncryptionKey) {
-            key = value;
-          } else {
-            password = value;
+            if (isEncryptionKey) {
+              key = value;
+            } else {
+              password = value;
+            }
+            if (!password && !key) throw new Error("Failed to decrypt backup");
           }
-          if (!password && !key) throw new Error("Failed to decrypt backup");
+          await db.backup.import(parsed, password, key);
+          console.log("Imported", path);
         }
-        await db.backup.import(parsed, password, key);
-        console.log("Imported", path);
-      }
+      });
       // Remove files from cache
       RNFetchBlob.fs.unlink(zipOutputFolder).catch(console.log);
       if (remove) {
         RNFetchBlob.fs.unlink(file).catch(console.log);
       }
 
-      await db.initCollections();
-      initialize();
+      refreshAllStores();
+      Navigation.queueRoutesForUpdate();
       setRestoring(false);
       close();
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Backup restored successfully.",
         type: "success",
         context: "global"

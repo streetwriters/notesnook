@@ -17,24 +17,39 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatDate } from "@notesnook/core/dist/utils/date";
+import {
+  FormatDateOptions,
+  TimeFormat,
+  formatDate
+} from "@notesnook/core/dist/utils/date";
 import { database } from "../database";
 import { formatReminderTime } from "@notesnook/core/dist/collections/reminders";
+import { HistorySession, Reminder } from "@notesnook/core/dist/types";
 
 export function getFormattedDate(
   date: string | number | Date,
-  type: "time" | "date-time" | "date" = "date-time"
+  type: FormatDateOptions["type"] = "date-time"
 ) {
   return formatDate(date, {
     dateFormat: database.settings?.getDateFormat() as string,
     timeFormat: database.settings?.getTimeFormat() as string,
     type: type
+  } as FormatDateOptions);
+}
+
+export function getFormattedReminderTime(reminder: Reminder, short = false) {
+  return formatReminderTime(reminder, short, {
+    dateFormat: database.settings?.getDateFormat() as string,
+    timeFormat: database.settings?.getTimeFormat() as TimeFormat
   });
 }
 
-export function getFormattedReminderTime(reminder: any, short = false) {
-  return formatReminderTime(reminder, short, {
-    dateFormat: database.settings?.getDateFormat() as string,
-    timeFormat: database.settings?.getTimeFormat() as string
-  });
+export function getFormattedHistorySessionDate(session: HistorySession) {
+  const fromDate = getFormattedDate(session.dateCreated, "date");
+  const toDate = getFormattedDate(session.dateModified, "date");
+  const fromTime = getFormattedDate(session.dateCreated, "time");
+  const toTime = getFormattedDate(session.dateModified, "time");
+  return `${fromDate}, ${fromTime} — ${
+    fromDate !== toDate ? `${toDate}, ` : ""
+  }${toTime}`;
 }

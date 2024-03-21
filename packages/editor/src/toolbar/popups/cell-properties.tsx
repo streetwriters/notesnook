@@ -44,19 +44,14 @@ export function CellProperties(props: CellPropertiesProps) {
         >
           <Box mt={2} />
           <ColorPicker
+            editor={editor}
             expanded={true}
             color={attributes.backgroundColor}
             onChange={(color) =>
-              editor.current?.commands.setCellAttribute(
-                "backgroundColor",
-                color
-              )
+              editor.commands.setCellAttribute("backgroundColor", color)
             }
             onClear={() =>
-              editor.current?.commands.setCellAttribute(
-                "backgroundColor",
-                undefined
-              )
+              editor.commands.setCellAttribute("backgroundColor", undefined)
             }
           />
         </Tab>
@@ -67,14 +62,13 @@ export function CellProperties(props: CellPropertiesProps) {
         >
           <Box mt={2} />
           <ColorPicker
+            editor={editor}
             expanded={true}
             color={attributes.color}
             onChange={(color) =>
-              editor.current?.commands.setCellAttribute("color", color)
+              editor.commands.setCellAttribute("color", color)
             }
-            onClear={() =>
-              editor.current?.commands.setCellAttribute("color", undefined)
-            }
+            onClear={() => editor.commands.setCellAttribute("color", undefined)}
           />
         </Tab>
         <Tab
@@ -88,16 +82,14 @@ export function CellProperties(props: CellPropertiesProps) {
         >
           <Box mt={2} />
           <ColorPicker
+            editor={editor}
             expanded={true}
             color={attributes.borderColor}
             onChange={(color) =>
-              editor.current?.commands.setCellAttribute("borderColor", color)
+              editor.commands.setCellAttribute("borderColor", color)
             }
             onClear={() =>
-              editor.current?.commands.setCellAttribute(
-                "borderColor",
-                undefined
-              )
+              editor.commands.setCellAttribute("borderColor", undefined)
             }
           />
         </Tab>

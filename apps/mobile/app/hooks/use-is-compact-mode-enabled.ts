@@ -16,19 +16,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { ItemType } from "@notesnook/core";
 import { useSettingStore } from "../stores/use-setting-store";
 
-export function useIsCompactModeEnabled(item: any) {
+export function useIsCompactModeEnabled(dataType: ItemType) {
   const [notebooksListMode, notesListMode] = useSettingStore((state) => [
     state.settings.notebooksListMode,
     state.settings.notesListMode
   ]);
 
-  const type = item.itemType || item.type;
+  if (dataType !== "note" && dataType !== "notebook") return false;
 
-  if (type !== "note" && type !== "notebook") return false;
-
-  const listMode = type === "notebook" ? notebooksListMode : notesListMode;
+  const listMode = dataType === "notebook" ? notebooksListMode : notesListMode;
 
   return listMode === "compact";
 }

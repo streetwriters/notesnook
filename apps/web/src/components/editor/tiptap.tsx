@@ -35,48 +35,57 @@ import {
   countWords,
   getFontById,
   TiptapOptions,
-  Attachment
+  Attachment,
+  getTableOfContents
 } from "@notesnook/editor";
-import { Box, Flex } from "@theme-ui/components";
-import { PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
-import { IEditor } from "./types";
+import { Flex } from "@theme-ui/components";
 import {
-  useConfigureEditor,
-  useSearch,
-  useToolbarConfig,
-  configureEditor,
-  useEditorConfig
-} from "./context";
-import { createPortal } from "react-dom";
-import { getCurrentPreset } from "../../common/toolbar-config";
+  PropsWithChildren,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef
+} from "react";
+import { IEditor } from "./types";
+import { useEditorConfig, useToolbarConfig, useEditorManager } from "./manager";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
-import { debounce, debounceWithId } from "@notesnook/common";
-import { store as editorstore } from "../../stores/editor-store";
+import { debounce } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
-import { writeText } from "clipboard-polyfill";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { getChangedNodes } from "@notesnook/editor/dist/utils/prosemirror";
+import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
+import { writeToClipboard } from "../../utils/clipboard";
+import { useEditorStore } from "../../stores/editor-store";
+import { parseInternalLink } from "@notesnook/core";
 
-type OnChangeHandler = (
-  id: string | undefined,
-  sessionId: number,
-  content: string,
+export type OnChangeHandler = (
+  content: () => string,
   ignoreEdit: boolean
 ) => void;
 type TipTapProps = {
-  editorContainer: HTMLElement;
-  onLoad?: () => void;
+  id: string;
+  editorContainer: () => HTMLElement | undefined;
+  onLoad?: (editor: IEditor) => void;
   onChange?: OnChangeHandler;
   onContentChange?: () => void;
+  onSelectionChange?: (range: { from: number; to: number }) => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
   onPreviewAttachment?: (attachment: Attachment) => void;
-  onGetAttachmentData?: (attachment: Attachment) => Promise<string | undefined>;
+  onGetAttachmentData?:
+    | ((
+        attachment: Pick<Attachment, "hash" | "type">
+      ) => Promise<string | undefined>)
+    | undefined;
+  onAttachFiles?: (files: File[]) => void;
+  onInsertInternalLink?: (
+    attributes?: LinkAttributes
+  ) => Promise<LinkAttributes | undefined>;
   onAttachFile?: (file: File) => void;
   onFocus?: () => void;
   content?: () => string | undefined;
-  toolbarContainerId?: string;
   readonly?: boolean;
   nonce?: number;
   isMobile?: boolean;
@@ -85,46 +94,35 @@ type TipTapProps = {
   fontFamily: string;
 };
 
-const SAVE_INTERVAL = IS_TESTING ? 100 : 300;
-
-function save(
-  sessionId: number,
-  noteId: string | undefined,
-  editor: Editor,
-  content: Fragment,
-  preventSave: boolean,
-  ignoreEdit: boolean,
-  onChange?: OnChangeHandler
-) {
-  configureEditor({
+function updateWordCount(id: string, content: () => Fragment) {
+  const fragment = content();
+  useEditorManager.getState().updateEditor(id, {
     statistics: {
       words: {
-        total: countWords(content.textBetween(0, content.size, "\n", " ")),
+        total: countWords(fragment.textBetween(0, fragment.size, "\n", " ")),
         selected: 0
       }
     }
   });
-
-  if (preventSave) return;
-  const html = getHTMLFromFragment(content, editor.schema);
-  onChange?.(noteId, sessionId, html, ignoreEdit);
 }
 
-const deferredSave = debounceWithId(save, SAVE_INTERVAL);
+const deferredUpdateWordCount = debounce(updateWordCount, 1000);
 
 function TipTap(props: TipTapProps) {
   const {
+    id,
+    onSelectionChange,
     onLoad,
     onChange,
     onInsertAttachment,
     onDownloadAttachment,
     onPreviewAttachment,
     onGetAttachmentData,
-    onAttachFile,
+    onAttachFiles,
+    onInsertInternalLink,
     onContentChange,
     onFocus = () => {},
     content,
-    toolbarContainerId,
     editorContainer,
     readonly,
     nonce,
@@ -135,7 +133,7 @@ function TipTap(props: TipTapProps) {
   } = props;
 
   const isUserPremium = useIsUserPremium();
-  const configure = useConfigureEditor();
+  // const configure = useConfigureEditor();
   const doubleSpacedLines = useSettingsStore(
     (store) => store.doubleSpacedParagraphs
   );
@@ -145,7 +143,6 @@ function TipTap(props: TipTapProps) {
     (store) => store.markdownShortcuts
   );
   const { toolbarConfig } = useToolbarConfig();
-  const { isSearching, toggleSearch } = useSearch();
 
   usePermissionHandler({
     claims: {
@@ -173,12 +170,10 @@ function TipTap(props: TipTapProps) {
           // files if there is text.
           // TODO: give user an actionable hint to allow them to select what they
           // want to do in such cases.
-          if (!hasText && event.clipboardData?.files?.length && onAttachFile) {
+          if (!hasText && event.clipboardData?.files?.length && onAttachFiles) {
             event.preventDefault();
             event.stopPropagation();
-            for (const file of event.clipboardData.files) {
-              onAttachFile(file);
-            }
+            onAttachFiles(Array.from(event.clipboardData.files));
             return true;
           }
         }
@@ -188,71 +183,71 @@ function TipTap(props: TipTapProps) {
       doubleSpacedLines,
       dateFormat,
       timeFormat,
-      isMobile: isMobile || false,
-      element: editorContainer,
+      element: editorContainer(),
       editable: !readonly,
       content: content?.(),
       autofocus: "start",
       onFocus,
-      onCreate: ({ editor }) => {
-        if (onLoad) onLoad();
+      onCreate: async ({ editor }) => {
         if (oldNonce.current !== nonce)
           editor.commands.focus("start", { scrollIntoView: true });
         oldNonce.current = nonce;
 
-        configure({
-          editor: toIEditor(editor as Editor),
+        const instance = toIEditor(editor as Editor);
+        if (onLoad) onLoad(instance);
+        useEditorManager.getState().setEditor(id, {
+          editor: instance,
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
-          toolbarConfig: getCurrentPreset().tools,
           statistics: {
             words: {
               total: getTotalWords(editor as Editor),
               selected: 0
             }
-          }
+          },
+          tableOfContents: getTableOfContents(editor.view.dom)
         });
-        editor.commands.refreshSearch();
       },
       onUpdate: ({ editor, transaction }) => {
+        const changedHeadings = getChangedNodes(transaction, {
+          descend: true,
+          predicate: (n) => n.isBlock && n.type.name === "heading"
+        });
+        if (changedHeadings.length > 0) {
+          useEditorManager.getState().updateEditor(id, {
+            tableOfContents: getTableOfContents(editor.view.dom)
+          });
+        }
+
         onContentChange?.();
 
-        const preventSave = transaction.getMeta("preventSave") as boolean;
+        deferredUpdateWordCount(id, () => editor.state.doc.content);
+
+        const preventSave = transaction?.getMeta("preventSave") as boolean;
         const ignoreEdit = transaction.getMeta("ignoreEdit") as boolean;
-        const { id, sessionId } = editorstore.get().session;
-        const content = editor.state.doc.content;
-        deferredSave(
-          sessionId,
-          sessionId,
-          id,
-          editor as Editor,
-          content,
-          preventSave || !editor.isEditable,
-          ignoreEdit,
-          onChange
+        if (preventSave || !editor.isEditable || !onChange) return;
+
+        onChange(
+          () => getHTMLFromFragment(editor.state.doc.content, editor.schema),
+          ignoreEdit
         );
       },
       onDestroy: () => {
-        configure({
-          editor: undefined,
-          canRedo: false,
-          canUndo: false,
-          searching: false,
-          statistics: undefined
-        });
+        useEditorManager.getState().setEditor(id);
       },
       onTransaction: ({ editor }) => {
-        configure({
+        useEditorManager.getState().updateEditor(id, {
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo()
         });
       },
-      copyToClipboard(text) {
-        writeText(text);
+      copyToClipboard(text, html) {
+        writeToClipboard({ "text/plain": text, "text/html": html });
       },
       onSelectionUpdate: debounce(({ editor, transaction }) => {
         const isEmptySelection = transaction.selection.empty;
-        configure((old) => {
+        if (onSelectionChange) onSelectionChange(transaction.selection);
+        useEditorManager.getState().updateEditor(id, (old) => {
           const oldSelected = old.statistics?.words?.selected;
           const oldWords = old.statistics?.words.total || 0;
           if (isEmptySelection)
@@ -276,23 +271,19 @@ function TipTap(props: TipTapProps) {
           };
         });
       }, 500),
-      onOpenAttachmentPicker: (_editor, type) => {
-        onInsertAttachment?.(type);
-        return true;
-      },
-      onDownloadAttachment: (_editor, attachment) => {
-        onDownloadAttachment?.(attachment);
-        return true;
-      },
-      onPreviewAttachment(_editor, attachment) {
-        onPreviewAttachment?.(attachment);
-        return true;
-      },
-      onOpenLink: (url) => {
-        window.open(url, "_blank");
-        return true;
-      },
-      getAttachmentData: onGetAttachmentData
+      openAttachmentPicker: onInsertAttachment,
+      downloadAttachment: onDownloadAttachment,
+      previewAttachment: onPreviewAttachment,
+      createInternalLink: onInsertInternalLink,
+      getAttachmentData: onGetAttachmentData,
+      openLink: (url) => {
+        const link = parseInternalLink(url);
+        if (link && link.type === "note") {
+          useEditorStore.getState().openSession(link.id, {
+            activeBlockId: link.params?.blockId || undefined
+          });
+        } else window.open(url, "_blank");
+      }
     };
   }, [
     readonly,
@@ -309,30 +300,12 @@ function TipTap(props: TipTapProps) {
     [tiptapOptions]
   );
 
-  useEffect(
-    () => {
-      const isEditorSearching = editor?.storage.searchreplace?.isSearching;
-      if (isSearching) editor?.commands.startSearch();
-      else if (isEditorSearching) editor?.commands.endSearch();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isSearching]
-  );
-
-  useEffect(
-    () => {
-      const isEditorSearching = editor?.storage.searchreplace?.isSearching;
-      if (isSearching && !isEditorSearching) toggleSearch();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [toggleSearch, editor?.storage.searchreplace?.isSearching]
-  );
-
   useEffect(() => {
-    if (!editorContainer) return;
+    const container = editorContainer();
+    if (!container) return;
     const currentEditor = editor;
     function onClick(e: MouseEvent) {
-      if (e.target !== editorContainer || !currentEditor?.state.selection.empty)
+      if (e.target !== container || !currentEditor?.state.selection.empty)
         return;
 
       const lastNode = currentEditor?.state.doc.lastChild;
@@ -347,99 +320,113 @@ function TipTap(props: TipTapProps) {
           .run();
       }
     }
-    editorContainer.addEventListener("click", onClick);
+    container.addEventListener("click", onClick);
     return () => {
-      editorContainer.removeEventListener("click", onClick);
+      container.removeEventListener("click", onClick);
     };
   }, [editor, editorContainer]);
 
-  if (!toolbarContainerId) return null;
+  if (readonly) return null;
   return (
     <>
-      <Portal containerId={toolbarContainerId}>
-        <ScopedThemeProvider scope="editorToolbar" sx={{ width: "100%" }}>
-          <Toolbar
-            editor={editor}
-            location={isMobile ? "bottom" : "top"}
-            tools={toolbarConfig}
-            defaultFontFamily={fontFamily}
-            defaultFontSize={fontSize}
-          />
-        </ScopedThemeProvider>
-      </Portal>
+      <ScopedThemeProvider
+        scope="editorToolbar"
+        sx={{
+          width: "100%",
+          position: "sticky",
+          top: 0,
+          bg: "background",
+          zIndex: 1
+        }}
+      >
+        <Toolbar
+          editor={editor}
+          location={isMobile ? "bottom" : "top"}
+          tools={toolbarConfig}
+          defaultFontFamily={fontFamily}
+          defaultFontSize={fontSize}
+        />
+      </ScopedThemeProvider>
     </>
   );
 }
 
 function TiptapWrapper(
-  props: Omit<
-    TipTapProps,
-    "editorContainer" | "theme" | "fontSize" | "fontFamily"
+  props: PropsWithChildren<
+    Omit<TipTapProps, "editorContainer" | "theme" | "fontSize" | "fontFamily">
   >
 ) {
-  const colorScheme = useThemeStore((store) => store.colorScheme);
   const theme = useThemeStore((store) =>
-    colorScheme === "dark" ? store.darkTheme : store.lightTheme
+    store.colorScheme === "dark" ? store.darkTheme : store.lightTheme
   );
-  const [isReady, setIsReady] = useState(false);
-  const editorContainerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const editorContainerRef = useRef<HTMLDivElement>();
   const { editorConfig } = useEditorConfig();
-  useEffect(() => {
-    setIsReady(true);
+
+  useLayoutEffect(() => {
+    if (
+      !containerRef.current ||
+      !editorContainerRef.current ||
+      editorContainerRef.current.parentElement === containerRef.current
+    )
+      return;
+    containerRef.current.appendChild(editorContainerRef.current);
   }, []);
+
+  useEffect(() => {
+    if (!editorContainerRef.current) return;
+    editorContainerRef.current.style.color =
+      theme.scopes.editor?.primary?.paragraph ||
+      theme.scopes.base.primary.paragraph;
+  }, [theme]);
 
   return (
     <PortalProvider>
-      <Flex sx={{ flex: 1, flexDirection: "column" }}>
-        {isReady && editorContainerRef.current ? (
-          <TipTap
-            {...props}
-            editorContainer={editorContainerRef.current}
-            fontFamily={editorConfig.fontFamily}
-            fontSize={editorConfig.fontSize}
-          />
-        ) : null}
-        <Box
-          ref={editorContainerRef}
-          className="selectable"
-          style={{
-            flex: 1,
-            cursor: "text",
-            color:
+      <Flex ref={containerRef} sx={{ flex: 1, flexDirection: "column" }}>
+        <TipTap
+          {...props}
+          editorContainer={() => {
+            if (editorContainerRef.current) return editorContainerRef.current;
+            const editorContainer = document.createElement("div");
+            editorContainer.id = "editor-container";
+            editorContainer.classList.add("selectable");
+            editorContainer.style.flex = "1";
+            editorContainer.style.cursor = "text";
+            editorContainer.style.color =
               theme.scopes.editor?.primary?.paragraph ||
-              theme.scopes.base.primary.paragraph, // TODO!
-            paddingBottom: 150,
-            fontSize: editorConfig.fontSize,
-            fontFamily: getFontById(editorConfig.fontFamily)?.font
+              theme.scopes.base.primary.paragraph;
+            editorContainer.style.paddingBottom = `150px`;
+            editorContainer.style.fontSize = `${editorConfig.fontSize}px`;
+            editorContainer.style.fontFamily =
+              getFontById(editorConfig.fontFamily)?.font || "sans-serif";
+            editorContainerRef.current = editorContainer;
+            return editorContainer;
           }}
+          fontFamily={editorConfig.fontFamily}
+          fontSize={editorConfig.fontSize}
         />
+        {props.children}
       </Flex>
     </PortalProvider>
   );
 }
 export default TiptapWrapper;
 
-function Portal(props: PropsWithChildren<{ containerId?: string }>) {
-  const { containerId, children } = props;
-  const container = containerId && document.getElementById(containerId);
-  return container ? (
-    <>{createPortal(children, container, containerId)}</>
-  ) : (
-    <>{children}</>
-  );
-}
-
 function toIEditor(editor: Editor): IEditor {
   return {
-    focus: ({ position, scrollIntoView } = {}) =>
-      editor.current?.commands.focus(position, {
-        scrollIntoView
-      }),
-    undo: () => editor.current?.commands.undo(),
-    redo: () => editor.current?.commands.redo(),
+    focus: ({ position, scrollIntoView } = {}) => {
+      if (typeof position === "object")
+        editor.chain().focus().setTextSelection(position).run();
+      else
+        editor.commands.focus(position, {
+          scrollIntoView
+        });
+    },
+    undo: () => editor.commands.undo(),
+    redo: () => editor.commands.redo(),
     updateContent: (content) => {
       const { from, to } = editor.state.selection;
-      editor.current
+      editor
         ?.chain()
         .command(({ tr }) => {
           tr.setMeta("preventSave", true);
@@ -454,15 +441,16 @@ function toIEditor(editor: Editor): IEditor {
     },
     attachFile: (file: Attachment) =>
       file.type === "image"
-        ? editor.current?.commands.insertImage(file)
-        : editor.current?.commands.insertAttachment(file),
+        ? editor.commands.insertImage(file)
+        : editor.commands.insertAttachment(file),
     sendAttachmentProgress: (hash, progress) =>
-      editor.current?.commands.updateAttachment(
+      editor.commands.updateAttachment(
         {
           progress
         },
         { query: (a) => a.hash === hash, preventUpdate: true }
-      )
+      ),
+    startSearch: () => editor.commands.startSearch()
   };
 }
 

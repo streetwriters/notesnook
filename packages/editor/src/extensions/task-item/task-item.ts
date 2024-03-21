@@ -55,16 +55,7 @@ export const TaskItemNode = TaskItem.extend({
   parseHTML() {
     return [
       {
-        tag: "li",
-        getAttrs: (node: any) => {
-          if (node instanceof Node && node instanceof HTMLElement) {
-            return node.classList.contains("checklist--item") ||
-              node.parentElement?.classList.contains("checklist")
-              ? null
-              : false;
-          }
-          return false;
-        },
+        tag: ".checklist > li",
         priority: 51
       }
     ];

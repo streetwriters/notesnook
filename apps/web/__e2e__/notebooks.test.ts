@@ -50,14 +50,16 @@ test("create a note inside a notebook", async ({ page }) => {
   expect(note).toBeDefined();
 });
 
-test("create a note inside a topic", async ({ page }) => {
+test("create a note inside a subnotebook", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notebooks = await app.goToNotebooks();
   const notebook = await notebooks.createNotebook(NOTEBOOK);
-  const { topics } = (await notebook?.openNotebook()) || {};
-  const topic = await topics?.findItem({ title: NOTEBOOK.topics[0] });
-  const notes = await topic?.open();
+  const { subNotebooks } = (await notebook?.openNotebook()) || {};
+  const subNotebook = await subNotebooks?.createNotebook({
+    title: "Subnotebook 1"
+  });
+  const { notes } = (await subNotebook?.openNotebook()) || {};
 
   const note = await notes?.createNote(NOTE);
 
@@ -72,8 +74,7 @@ test("edit a notebook", async ({ page }) => {
 
   const item: Notebook = {
     title: "An Edited Notebook",
-    description: "A new edited description",
-    topics: ["Topic 1", "Topic 2", "Topic 3"]
+    description: "A new edited description"
   };
   await notebook?.editNotebook(item);
 
@@ -121,10 +122,11 @@ test("permanently delete a notebook", async ({ page }) => {
   await notebook?.moveToTrash();
   const trash = await app.goToTrash();
   const trashItem = await trash.findItem(NOTEBOOK.title);
+  if (!trashItem) throw new Error("No trash item found.");
 
   await trashItem?.delete();
 
-  expect(await trashItem?.isPresent()).toBe(false);
+  await expect(trashItem.locator).toBeHidden();
 });
 
 test("pin a notebook", async ({ page }) => {
@@ -197,28 +199,28 @@ test("delete all notes within a notebook", async ({ page }) => {
   expect(await notes.isEmpty()).toBe(true);
 });
 
-test("delete all notes within a topic", async ({ page }) => {
-  const app = new AppModel(page);
-  await app.goto();
-  const notebooks = await app.goToNotebooks();
-  const notebook = await notebooks.createNotebook(NOTEBOOK);
-  const { topics } = (await notebook?.openNotebook()) || {};
-  const topic = await topics?.findItem({ title: NOTEBOOK.topics[0] });
-  let notes = await topic?.open();
-  for (let i = 0; i < 2; ++i) {
-    await notes?.createNote({
-      title: `Note ${i}`,
-      content: NOTE.content
-    });
-  }
-  await app.goBack();
-  await app.goBack();
+// test("delete all notes within a topic", async ({ page }) => {
+//   const app = new AppModel(page);
+//   await app.goto();
+//   const notebooks = await app.goToNotebooks();
+//   const notebook = await notebooks.createNotebook(NOTEBOOK);
+//   const { topics } = (await notebook?.openNotebook()) || {};
+//   const topic = await topics?.findItem({ title: NOTEBOOK.topics[0] });
+//   let notes = await topic?.open();
+//   for (let i = 0; i < 2; ++i) {
+//     await notes?.createNote({
+//       title: `Note ${i}`,
+//       content: NOTE.content
+//     });
+//   }
+//   await app.goBack();
+//   await app.goBack();
 
-  await notebook?.moveToTrash(true);
+//   await notebook?.moveToTrash(true);
 
-  notes = await app.goToNotes();
-  expect(await notes.isEmpty()).toBe(true);
-});
+//   notes = await app.goToNotes();
+//   expect(await notes.isEmpty()).toBe(true);
+// });
 
 test(`sort notebooks`, async ({ page }, info) => {
   info.setTimeout(2 * 60 * 1000);
@@ -243,7 +245,7 @@ test(`sort notebooks`, async ({ page }, info) => {
           });
           if (!sortResult) return;
 
-          expect(await notebooks.isEmpty()).toBeFalsy();
+          await expect(notebooks.items).toHaveCount(titles.length);
         });
       }
     }

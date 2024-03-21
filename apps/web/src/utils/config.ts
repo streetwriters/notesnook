@@ -21,6 +21,7 @@ import { tryParse } from "./parse";
 
 function set<T>(key: string, value: T) {
   window.localStorage.setItem(key, JSON.stringify(value));
+  return value;
 }
 
 function get<T>(key: string, def?: T): T {

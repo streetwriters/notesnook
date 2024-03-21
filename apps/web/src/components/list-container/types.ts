@@ -17,41 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ListProfiles } from "./list-profiles";
-
-export type Item = {
+import { Notebook, Tag } from "@notesnook/core";
+export type NotebookContext = {
+  type: "notebook";
   id: string;
-  type: string;
-  title: string;
-
-  dateEdited: number;
-  dateModified: number;
-  dateDeleted: number;
-  dateCreated: number;
-} & Record<string, unknown>;
-
-export type NotebookReference = Item & { topics: string[] };
-export type NotebookType = Item & { topics: Item[] };
-
-export type Context = { type: string } & Record<string, unknown>;
-export type ItemWrapperProps<TItem = Item> = {
-  item: TItem;
-  type: keyof typeof ListProfiles;
-  context?: Context;
-  compact?: boolean;
+  item?: Notebook;
+  totalNotes?: number;
 };
+export type Context =
+  | {
+      type: "tag" | "color";
+      id: string;
+    }
+  | NotebookContext
+  | {
+      type: "favorite" | "monographs";
+    };
 
-export type ItemWrapper<TItem = Item> = (
-  props: ItemWrapperProps<TItem>
-) => JSX.Element | null;
-
-export type Reference = {
-  type: "topic" | "notebook";
-  url: string;
-  title: string;
-};
-
-export type ReferencesWithDateEdited = {
-  dateEdited: number;
-  references: Reference[];
-};
+export type WithDateEdited<T> = { items: T[]; dateEdited: number };
+export type NotebooksWithDateEdited = WithDateEdited<Notebook>;
+export type TagsWithDateEdited = WithDateEdited<Tag>;

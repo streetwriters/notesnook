@@ -28,7 +28,7 @@ export type NoteStatistics = {
 
 export interface IEditor {
   focus: (options?: {
-    position?: "start" | "end";
+    position?: "start" | "end" | { from: number; to: number };
     scrollIntoView?: boolean;
   }) => void;
   undo: () => void;
@@ -36,4 +36,5 @@ export interface IEditor {
   updateContent: (content: string) => void;
   attachFile: (file: Attachment) => void;
   sendAttachmentProgress: (hash: string, progress: number) => void;
+  startSearch: () => void;
 }

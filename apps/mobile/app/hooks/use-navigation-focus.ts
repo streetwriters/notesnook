@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { useRoute } from "@react-navigation/core";
+import useNavigationStore, { RouteName } from "../stores/use-navigation-store";
 
 type NavigationFocus = {
   onFocus?: (prev: RefObject<boolean>) => boolean;
@@ -31,6 +33,7 @@ export const useNavigationFocus = (
   navigation: NativeStackNavigationProp<Record<string, object | undefined>>,
   { onFocus, onBlur, delay, focusOnInit = true }: NavigationFocus
 ) => {
+  const route = useRoute();
   const [isFocused, setFocused] = useState(focusOnInit);
   const prev = useRef(false);
   const isBlurred = useRef(false);
@@ -39,6 +42,12 @@ export const useNavigationFocus = (
     setTimeout(
       () => {
         const shouldFocus = onFocus ? onFocus(prev) : true;
+
+        const routeName = route.name?.startsWith("Settings")
+          ? "Settings"
+          : route.name;
+        useNavigationStore.getState().update(routeName as RouteName);
+
         if (shouldFocus) {
           setFocused(true);
           prev.current = true;

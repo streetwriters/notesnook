@@ -56,7 +56,7 @@ export function FilteredList<T>({
   }, [refresh]);
 
   const _filter = useCallback(
-    (query) => {
+    (query: string) => {
       if (!filter) return;
       setItems(() => {
         const items = getAll();
@@ -71,7 +71,7 @@ export function FilteredList<T>({
   );
 
   const _createNewItem = useCallback(
-    (title) => {
+    (title: string) => {
       onCreateNewItem?.(title);
       refresh();
       setQuery(null);

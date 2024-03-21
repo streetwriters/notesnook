@@ -105,6 +105,7 @@ function ReminderDialog(props) {
 
   return (
     <Dialog
+      testId="reminder-dialog"
       isOpen={true}
       title={reminder.title}
       onClose={() => props.onClose(false)}

@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { useNoteStore } from "../../stores/use-notes-store";
 import { useThemeColors } from "@notesnook/theme";
+import React from "react";
 import { AnnouncementDialog } from "../announcements";
 import AuthModal from "../auth/auth-modal";
 import { SessionExpired } from "../auth/session-expired";
 import { Dialog } from "../dialog";
-import { AddTopicDialog } from "../dialogs/add-topic";
+import JumpToSectionDialog from "../dialogs/jump-to-section";
 import { LoadingDialog } from "../dialogs/loading";
+import PDFPreview from "../dialogs/pdf-preview";
 import ResultDialog from "../dialogs/result";
 import { VaultDialog } from "../dialogs/vault";
 import ImagePreview from "../image-preview";
@@ -36,17 +36,16 @@ import SheetProvider from "../sheet-provider";
 import RateAppSheet from "../sheets/rate-app";
 import RecoveryKeySheet from "../sheets/recovery-key";
 import RestoreDataSheet from "../sheets/restore-data";
-import PDFPreview from "../dialogs/pdf-preview";
+import { AppLockPassword } from "../dialogs/applock-password";
 
 const DialogProvider = () => {
   const { colors } = useThemeColors();
-  const loading = useNoteStore((state) => state.loading);
 
   return (
     <>
+      <AppLockPassword />
       <LoadingDialog />
       <Dialog context="global" />
-      <AddTopicDialog colors={colors} />
       <PremiumDialog colors={colors} />
       <AuthModal colors={colors} />
       <MergeConflicts />
@@ -58,10 +57,11 @@ const DialogProvider = () => {
       <VaultDialog colors={colors} />
       <RateAppSheet />
       <ImagePreview />
-      {loading ? null : <Expiring />}
+      <Expiring />
       <AnnouncementDialog />
       <SessionExpired />
       <PDFPreview />
+      <JumpToSectionDialog />
     </>
   );
 };

@@ -6,6 +6,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    env:
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      NDK_CCACHE: ccache
+      USE_CCACHE: 1
 
     steps:
       - name: Checkout
@@ -28,8 +33,53 @@ jobs:
       - name: Make Gradlew Executable
         run: cd apps/mobile/native/android && chmod +x ./gradlew
 
+      - name: Install CCache
+        uses: hendrikmuhs/ccache-action@v1.2.11
+        with:
+          key: ${{ runner.os }}-ccache-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          max-size: 1500M
+          restore-keys: |
+            ${{ runner.os }}-ccache-
+
+      - name: Setup CCache
+        run: |
+          ln -s $(which ccache) /usr/local/bin/gcc
+          ln -s $(which ccache) /usr/local/bin/g++
+          ln -s $(which ccache) /usr/local/bin/cc
+          ln -s $(which ccache) /usr/local/bin/c++
+          ln -s $(which ccache) /usr/local/bin/clang
+          ln -s $(which ccache) /usr/local/bin/clang++
+          ccache --set-config=base_dir=$PWD
+          ccache --set-config=inode_cache=true
+          ccache --set-config=compiler_check=content
+          ccache --set-config=depend_mode=true
+          ccache --set-config=file_clone=true
+          ccache --set-config=sloppiness=clang_index_store,file_stat_matches,include_file_ctime,include_file_mtime,ivfsoverlay,pch_defines,modules,system_headers,time_macros
+          ccache -p
+
+      - name: Cache gradle
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      - name: Patch CPP Projects to use CCache
+        run: |
+          sed -i -e 's/arguments/arguments "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache",/g' apps/mobile/node_modules/react-native-mmkv-storage/android/build.gradle
+          sed -i -e 's/arguments/arguments "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache",/g' apps/mobile/node_modules/react-native-reanimated/android/build.gradle
+          sed -i -e 's/defaultConfig {/ndkVersion safeExtGet('ndkVersion', "25.2.9519653")\n  defaultConfig {/g' apps/mobile/node_modules/react-native-reanimated//android/build.gradle
+          sed -i -e 's/defaultConfig {/ndkVersion safeExtGet('ndkVersion', "25.2.9519653")\n  defaultConfig {/g' apps/mobile/node_modules/react-native-mmkv-storage/android/build.gradle
+
+      - name: CCache Stats Before Build
+        run: ccache -sv
+
       - name: Build unsigned app bundle
         run: yarn release:android:bundle
+
+      - name: CCache Stats after build
+        run: ccache -sv
 
       - name: Sign app bundle for Playstore release
         id: sign_app
@@ -42,17 +92,6 @@ jobs:
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
           BUILD_TOOLS_VERSION: "33.0.0"
-
-      - name: Publish to Playstore
-        id: deploy
-        uses: r0adkll/upload-google-play@v1.1.1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: com.streetwriters.notesnook
-          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
-          track: production
-          status: completed
-          whatsNewDirectory: apps/mobile/native/android/releasenotes/
 
       - name: Build apks for Github release
         run: yarn release:android
@@ -83,6 +122,18 @@ jobs:
         with:
           path: apps/mobile
 
+      - name: Publish to Playstore
+        id: deploy
+        uses: r0adkll/upload-google-play@v1.1.1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: com.streetwriters.notesnook
+          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
+          track: production
+          status: completed
+          whatsNewDirectory: apps/mobile/native/android/releasenotes/
+
+     
       - name: Create release draft on Github
         uses: softprops/action-gh-release@v1
         with:
@@ -96,3 +147,9 @@ jobs:
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86.apk
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86_64.apk
+
+      - name: Upload signed aab to Github
+        uses: actions/upload-artifact@v2
+        with:
+          name: Notesnook.aab
+          path: ${{steps.sign_app.outputs.signedReleaseFile}}

@@ -91,6 +91,8 @@ describe("VAULT", () => {
     await elementById(notesnook.ids.dialogs.vault.pwd).typeText("1234");
     await elementById(notesnook.ids.dialogs.vault.changePwd).typeText("2362");
     await tapByText("Change");
+    await sleep(2000);
+    await device.pressBack();
     await device.pressBack();
     await device.pressBack();
     await openLockedNote("2362");

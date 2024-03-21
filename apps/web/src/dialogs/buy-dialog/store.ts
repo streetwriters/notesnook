@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Plan, PricingInfo } from "./types";
 import { create } from "zustand";
-import produce from "immer";
+import { produce } from "immer";
 
 interface ICheckoutStore {
   isCompleted: boolean;

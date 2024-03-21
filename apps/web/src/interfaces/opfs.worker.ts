@@ -90,7 +90,6 @@ class OriginPrivateFileStore implements IFileStorage {
       );
     } catch (e) {
       console.error("Failed to read chunk", e);
-      return;
     }
   }
 

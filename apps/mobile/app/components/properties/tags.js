@@ -27,6 +27,7 @@ import { sleep } from "../../utils/time";
 import ManageTagsSheet from "../sheets/manage-tags";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
+
 export const Tags = ({ item, close }) => {
   const { colors } = useThemeColors();
 
@@ -34,8 +35,6 @@ export const Tags = ({ item, close }) => {
     <View
       style={{
         marginTop: 5,
-        paddingTop: 6,
-        paddingBottom: 6,
         flexDirection: "row",
         flexWrap: "wrap",
         alignItems: "center",
@@ -47,21 +46,20 @@ export const Tags = ({ item, close }) => {
     >
       <Button
         onPress={async () => {
-          ManageTagsSheet.present([item]);
+          ManageTagsSheet.present([item.id]);
         }}
         buttonType={{
           text: colors.primary.accent
         }}
-        title="Add tags"
-        type="grayBg"
+        title="Add tag"
+        type="secondary"
         icon="plus"
         iconPosition="right"
         height={30}
-        fontSize={SIZE.xs}
+        fontSize={SIZE.sm - 1}
         style={{
-          marginRight: 5,
-          borderRadius: 100,
-          paddingHorizontal: 8
+          height: 35,
+          borderRadius: 100
         }}
       />
       <ColorTags item={item} />
@@ -105,7 +103,7 @@ const TagItem = ({ tag, close }) => {
     <Button
       onPress={onPress}
       title={"#" + tag}
-      type="grayBg"
+      type="secondary"
       height={20}
       fontSize={SIZE.xs}
       style={style}

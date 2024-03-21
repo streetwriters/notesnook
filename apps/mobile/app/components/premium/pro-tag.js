@@ -23,6 +23,11 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useThemeColors } from "@notesnook/theme";
 import Paragraph from "../ui/typography/paragraph";
 
+/**
+ *
+ * @param {any} param0
+ * @returns
+ */
 export const ProTag = ({ width, size, background }) => {
   const { colors } = useThemeColors();
 

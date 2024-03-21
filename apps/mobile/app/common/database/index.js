@@ -16,15 +16,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import "./logger";
 import { database } from "@notesnook/common";
 import { logger as dbLogger } from "@notesnook/core/dist/logger";
 import { Platform } from "react-native";
 import * as Gzip from "react-native-gzip";
 import EventSource from "../../utils/sse/even-source-ios";
 import AndroidEventSource from "../../utils/sse/event-source";
+import { SqliteAdapter, SqliteIntrospector, SqliteQueryCompiler } from "kysely";
 import filesystem from "../filesystem";
-import "./logger";
 import Storage from "./storage";
+import { RNSqliteDriver } from "./sqlite.kysely";
+import { getDatabaseKey } from "./encryption";
 
 database.host(
   __DEV__
@@ -34,11 +37,11 @@ database.host(
         SSE_HOST: "https://events.streetwriters.co",
         SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
         ISSUES_HOST: "https://issues.streetwriters.co"
-        // API_HOST: "http://192.168.43.108:5264",
-        // AUTH_HOST: "http://192.168.43.108:8264",
-        // SSE_HOST: "http://192.168.43.108:7264",
-        // SUBSCRIPTIONS_HOST: "http://192.168.43.108:9264",
-        // ISSUES_HOST: "http://192.168.43.108:2624"
+        // API_HOST: "http://192.168.43.5:5264",
+        // AUTH_HOST: "http://192.168.43.5:8264",
+        // SSE_HOST: "http://192.168.43.5:7264",
+        // SUBSCRIPTIONS_HOST: "http://192.168.43.5:9264",
+        // ISSUES_HOST: "http://192.168.43.5:2624"
       }
     : {
         API_HOST: "https://api.notesnook.com",
@@ -49,15 +52,37 @@ database.host(
       }
 );
 
-database.setup(
-  Storage,
-  Platform.OS === "ios" ? EventSource : AndroidEventSource,
-  filesystem,
-  {
-    compress: Gzip.deflate,
-    decompress: Gzip.inflate
-  }
-);
+export async function setupDatabase(password) {
+  const key = await getDatabaseKey(password);
+  if (!key)
+    throw new Error("Database setup failed, could not get database key");
+
+  console.log("Opening database with key:", !!key);
+
+  database.setup({
+    storage: Storage,
+    eventsource: Platform.OS === "ios" ? EventSource : AndroidEventSource,
+    fs: filesystem,
+    compressor: {
+      compress: Gzip.deflate,
+      decompress: Gzip.inflate
+    },
+    batchSize: 100,
+    sqliteOptions: {
+      dialect: (name) => ({
+        createDriver: () => {
+          return new RNSqliteDriver({ async: true, dbName: name });
+        },
+        createAdapter: () => new SqliteAdapter(),
+        createIntrospector: (db) => new SqliteIntrospector(db),
+        createQueryCompiler: () => new SqliteQueryCompiler()
+      }),
+      tempStore: "memory",
+      journalMode: Platform.OS === "ios" ? "DELETE" : "WAL",
+      password: key
+    }
+  });
+}
 
 export const db = database;
 export const DatabaseLogger = dbLogger;

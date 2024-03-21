@@ -21,11 +21,11 @@ import { Perform } from "../common/dialog-controller";
 import Dialog from "../components/dialog";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { db } from "../common/db";
-import { Reminder } from "@notesnook/core/dist/collections/reminders";
+import { Reminder } from "@notesnook/core/dist/types";
 import IconTag from "../components/icon-tag";
 import { Clock, Refresh } from "../components/icons";
 import Note from "../components/note";
-import { getFormattedReminderTime } from "@notesnook/common";
+import { getFormattedReminderTime, usePromise } from "@notesnook/common";
 
 export type ReminderPreviewDialogProps = {
   onClose: Perform;
@@ -35,7 +35,8 @@ export type ReminderPreviewDialogProps = {
 const RECURRING_MODE_MAP = {
   week: "Weekly",
   day: "Daily",
-  month: "Monthly"
+  month: "Monthly",
+  year: "Yearly"
 } as const;
 
 const SNOOZE_TIMES = [
@@ -57,9 +58,10 @@ export default function ReminderPreviewDialog(
   props: ReminderPreviewDialogProps
 ) {
   const { reminder } = props;
-  const referencedNotes = db.relations?.to(
-    { id: reminder.id, type: "reminder" },
-    "note"
+  const referencedNotes = usePromise(
+    () =>
+      db.relations.to({ id: reminder.id, type: "reminder" }, "note").resolve(),
+    [reminder.id]
   );
 
   return (
@@ -101,7 +103,7 @@ export default function ReminderPreviewDialog(
             key={time.id}
             variant="secondary"
             onClick={() => {
-              db.reminders?.add({
+              db.reminders.add({
                 id: reminder.id,
                 snoozeUntil: Date.now() + time.interval
               });
@@ -118,20 +120,16 @@ export default function ReminderPreviewDialog(
           </Button>
         ))}
       </Flex>
-      {referencedNotes && referencedNotes.length > 0 && (
-        <>
-          <Text variant="body">References:</Text>
-          {referencedNotes.map((item, index) => (
-            <Note
-              key={item.id}
-              item={item}
-              date={item.dateCreated}
-              tags={[]}
-              compact
-            />
-          ))}
-        </>
-      )}
+      {referencedNotes &&
+        referencedNotes.status === "fulfilled" &&
+        referencedNotes.value.length > 0 && (
+          <>
+            <Text variant="body">References:</Text>
+            {referencedNotes.value.map((item, index) => (
+              <Note key={item.id} item={item} date={item.dateCreated} compact />
+            ))}
+          </>
+        )}
     </Dialog>
   );
 }

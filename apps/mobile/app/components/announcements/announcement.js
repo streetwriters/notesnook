@@ -17,18 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { FlatList, View } from "react-native";
-import { useSelectionStore } from "../../stores/use-selection-store";
-import { useMessageStore } from "../../stores/use-message-store";
 import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { View } from "react-native";
+import { useMessageStore } from "../../stores/use-message-store";
+import { useSelectionStore } from "../../stores/use-selection-store";
 import { allowedOnPlatform, renderItem } from "./functions";
+import { getContainerBorder } from "../../utils/colors";
 
 export const Announcement = ({ color }) => {
   const { colors } = useThemeColors();
   const announcements = useMessageStore((state) => state.announcements);
   let announcement = announcements.length > 0 ? announcements[0] : null;
   const selectionMode = useSelectionStore((state) => state.selectionMode);
+
   return !announcement || selectionMode ? null : (
     <View
       style={{
@@ -45,7 +47,8 @@ export const Announcement = ({ color }) => {
           borderRadius: 10,
           overflow: "hidden",
           backgroundColor: colors.secondary.background,
-          paddingBottom: 12
+          paddingBottom: 12,
+          ...getContainerBorder(colors.secondary.background)
         }}
       >
         <View

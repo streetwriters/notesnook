@@ -20,21 +20,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
 import { hashNavigate } from "../navigation";
-import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
+import { useEffect } from "react";
+import { db } from "../common/db";
+import { useSearch } from "../hooks/use-search";
 
 function Notebooks() {
-  useNavigate("notebooks", () => store.refresh());
   const notebooks = useStore((state) => state.notebooks);
   const refresh = useStore((state) => state.refresh);
+  const filteredItems = useSearch("notebooks", (query) =>
+    db.lookup.notebooks(query).sorted()
+  );
 
+  useEffect(() => {
+    store.get().refresh();
+  }, []);
+
+  if (!notebooks) return <Placeholder context="notebooks" />;
   return (
     <>
       <ListContainer
-        type="notebooks"
-        groupingKey="notebooks"
+        group="notebooks"
         refresh={refresh}
-        items={notebooks}
+        items={filteredItems || notebooks}
         placeholder={<Placeholder context="notebooks" />}
         button={{
           onClick: () => hashNavigate("/notebooks/create")

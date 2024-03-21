@@ -60,5 +60,7 @@ class SpellCheckerStore extends BaseStore<SpellCheckerStore> {
   };
 }
 
-const [useSpellChecker] = createStore(SpellCheckerStore);
+const [useSpellChecker] = createStore<SpellCheckerStore>(
+  (set, get) => new SpellCheckerStore(set, get)
+);
 export { useSpellChecker };

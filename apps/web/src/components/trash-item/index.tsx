@@ -24,24 +24,22 @@ import { store } from "../../stores/trash-store";
 import { Flex, Text } from "@theme-ui/components";
 import TimeAgo from "../time-ago";
 import { pluralize, toTitleCase } from "@notesnook/common";
-import { showUndoableToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
-import { hashNavigate } from "../../navigation";
-import { useStore } from "../../stores/note-store";
-import { Item } from "../list-container/types";
 import { MenuItem } from "@notesnook/ui";
+import { TrashItem as TrashItemType } from "@notesnook/core/dist/types";
+import { useEditorStore } from "../../stores/editor-store";
 
-type TrashItemProps = { item: Item; date: number };
+type TrashItemProps = { item: TrashItemType; date: number };
 function TrashItem(props: TrashItemProps) {
   const { item, date } = props;
-  const isOpened = useStore((store) => store.selectedNote === item.id);
+  const isOpened = useEditorStore((store) => store.activeSessionId === item.id);
 
   return (
     <ListItem
       isFocused={isOpened}
       item={item}
       title={item.title}
-      body={(item.headline || item.description) as string}
+      body={item.itemType === "note" ? item.headline : item.description}
       footer={
         <Flex
           mt={1}
@@ -57,20 +55,18 @@ function TrashItem(props: TrashItemProps) {
         </Flex>
       }
       menuItems={menuItems}
-      onClick={() => {
+      onClick={async () => {
         if (item.itemType === "note")
-          !item.locked
-            ? hashNavigate(`/notes/${item.id}/edit`, { replace: true })
-            : showToast("error", "Locked notes cannot be previewed in trash.");
+          useEditorStore.getState().openSession(item);
       }}
     />
   );
 }
 export default TrashItem;
 
-const menuItems: (item: any, items?: any[]) => MenuItem[] = (
+const menuItems: (item: TrashItemType, ids?: string[]) => MenuItem[] = (
   item,
-  items = []
+  ids = []
 ) => {
   return [
     {
@@ -78,9 +74,9 @@ const menuItems: (item: any, items?: any[]) => MenuItem[] = (
       key: "restore",
       title: "Restore",
       icon: Restore.path,
-      onClick: () => {
-        store.restore(items.map((i) => i.id));
-        showToast("success", `${pluralize(items.length, "item")} restored`);
+      onClick: async () => {
+        await store.restore(...ids);
+        showToast("success", `${pluralize(ids.length, "item")} restored`);
       },
       multiSelect: true
     },
@@ -91,13 +87,11 @@ const menuItems: (item: any, items?: any[]) => MenuItem[] = (
       icon: DeleteForver.path,
       variant: "dangerous",
       onClick: async () => {
-        if (!(await showMultiPermanentDeleteConfirmation(items.length))) return;
-        const ids = items.map((i) => i.id);
-        showUndoableToast(
-          `${pluralize(items.length, "item")} permanently deleted`,
-          () => store.delete(ids),
-          () => store.delete(ids, true),
-          () => store.refresh()
+        if (!(await showMultiPermanentDeleteConfirmation(ids.length))) return;
+        await store.delete(...ids);
+        showToast(
+          "success",
+          `${pluralize(ids.length, "item")} permanently deleted`
         );
       },
       multiSelect: true

@@ -38,7 +38,7 @@ export type TipButton = {
   onClick: () => void;
   icon?: Icon;
 };
-export type Context =
+export type TipContext =
   | "notes"
   | "notebooks"
   | "tags"
@@ -47,23 +47,22 @@ export type Context =
   | "reminders"
   | "monographs"
   | "trash"
-  | "topics"
   | "attachments";
 
 export type Tip = {
   text: string;
-  contexts: Context[];
+  contexts: TipContext[];
   button?: TipButton;
 };
 
 const destructiveContexts: string[] = [];
 
-let tipState: Partial<Record<Context, boolean>> | undefined = undefined;
+let tipState: Partial<Record<TipContext, boolean>> | undefined = undefined;
 
 export class TipManager {
   static init() {}
 
-  static tip(context: Context) {
+  static tip(context: TipContext) {
     if (!tipState) tipState = Config.get("tipState", {});
 
     if (destructiveContexts.indexOf(context) > -1) {
@@ -78,7 +77,7 @@ export class TipManager {
 }
 
 export const useTip = (
-  context: Context,
+  context: TipContext,
   options?: {
     rotate: boolean;
     delay: number;
@@ -110,7 +109,7 @@ export const useTip = (
 const tips: Tip[] = [
   {
     text: "Hold Ctrl/Cmd & click on multiple items to select them.",
-    contexts: ["notes", "notebooks", "tags", "topics"]
+    contexts: ["notes", "notebooks", "tags"]
   },
   {
     text: "Monographs enable you to share your notes in a secure and private way.",
@@ -129,12 +128,12 @@ const tips: Tip[] = [
     contexts: ["notebooks", "notebooks"]
   },
   {
-    text: "A notebook can have unlimited topics with unlimited notes.",
-    contexts: ["notebooks", "topics"]
+    text: "A notebook can have unlimited sub-notebooks with unlimited notes.",
+    contexts: ["notebooks"]
   },
   {
-    text: "You can multi-select notes and move them to a notebook or topic at once.",
-    contexts: ["notebooks", "topics"]
+    text: "You can multi-select notes and move them to a notebook or a sub-notebook at once.",
+    contexts: ["notebooks"]
   },
   {
     text: "Mark important notes by adding them to favorites.",
@@ -150,7 +149,7 @@ const tips: Tip[] = [
   },
   {
     text: "We value your feedback so join us on Discord and share your experiences and ideas.",
-    contexts: ["notes", "notebooks", "tags", "topics"],
+    contexts: ["notes", "notebooks", "tags"],
     button: {
       title: "Join the Notesnook community",
       icon: ArrowTopRight,
@@ -164,7 +163,7 @@ const tips: Tip[] = [
   }
 ];
 
-const DEFAULT_TIPS: Record<Context, Omit<Tip, "contexts">> = {
+const DEFAULT_TIPS: Record<TipContext, Omit<Tip, "contexts">> = {
   attachments: {
     text: "You have no attachments."
   },
@@ -190,13 +189,6 @@ const DEFAULT_TIPS: Record<Context, Omit<Tip, "contexts">> = {
     text: "You have not created any notes yet.",
     button: {
       ...CREATE_BUTTON_MAP.notes,
-      icon: Plus
-    }
-  },
-  topics: {
-    text: "You can add topics in notebooks to further organize your notes.",
-    button: {
-      ...CREATE_BUTTON_MAP.topics,
       icon: Plus
     }
   },

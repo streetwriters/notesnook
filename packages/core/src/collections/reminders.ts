@@ -1,0 +1,304 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import isToday from "dayjs/plugin/isToday";
+import isTomorrow from "dayjs/plugin/isTomorrow";
+import isYesterday from "dayjs/plugin/isYesterday";
+import { TimeFormat, formatDate } from "../utils/date";
+import { getId } from "../utils/id";
+import { ICollection } from "./collection";
+import { Reminder } from "../types";
+import Database from "../api";
+import { SQLCollection } from "../database/sql-collection";
+import { isFalse } from "../database";
+import { sql } from "kysely";
+
+dayjs.extend(isTomorrow);
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isYesterday);
+dayjs.extend(isToday);
+
+export class Reminders implements ICollection {
+  name = "reminders";
+  readonly collection: SQLCollection<"reminders", Reminder>;
+  constructor(private readonly db: Database) {
+    this.collection = new SQLCollection(
+      db.sql,
+      db.transaction,
+      "reminders",
+      db.eventManager,
+      db.sanitizer
+    );
+  }
+
+  async init() {
+    await this.collection.init();
+  }
+
+  async add(reminder: Partial<Reminder>) {
+    if (!reminder) return;
+    if (reminder.remote)
+      throw new Error("Please use db.reminders.merge to merge reminders.");
+
+    const id = reminder.id || getId();
+    const oldReminder = await this.collection.get(id);
+
+    reminder = {
+      ...oldReminder,
+      ...reminder
+    };
+
+    if (!reminder.date || !reminder.title)
+      throw new Error(`date and title are required in a reminder.`);
+
+    await this.collection.upsert({
+      id,
+      type: "reminder",
+      dateCreated: reminder.dateCreated || Date.now(),
+      dateModified: reminder.dateModified || Date.now(),
+      date: reminder.date,
+      description: reminder.description,
+      mode: reminder.mode || "once",
+      priority: reminder.priority || "vibrate",
+      recurringMode: reminder.recurringMode,
+      selectedDays: reminder.selectedDays || [],
+      title: reminder.title,
+      localOnly: reminder.localOnly,
+      disabled: reminder.disabled,
+      snoozeUntil: reminder.snoozeUntil
+    });
+    return id;
+  }
+
+  // get raw() {
+  //   return this.collection.raw();
+  // }
+
+  get all() {
+    return this.collection.createFilter<Reminder>(
+      (qb) => qb.where(isFalse("deleted")),
+      this.db.options?.batchSize
+    );
+  }
+
+  exists(itemId: string) {
+    return this.collection.exists(itemId);
+  }
+
+  reminder(id: string) {
+    return this.collection.get(id);
+  }
+
+  async remove(...reminderIds: string[]) {
+    await this.collection.softDelete(reminderIds);
+  }
+}
+
+export function formatReminderTime(
+  reminder: Reminder,
+  short = false,
+  options: { timeFormat: TimeFormat; dateFormat: string } = {
+    timeFormat: "12-hour",
+    dateFormat: "DD-MM-YYYY"
+  }
+) {
+  const { date } = reminder;
+  let time = date;
+  let tag = "";
+  let text = "";
+
+  if (reminder.mode === "permanent") return `Ongoing`;
+
+  if (reminder.snoozeUntil && reminder.snoozeUntil > Date.now()) {
+    return `Snoozed until ${formatDate(reminder.snoozeUntil, {
+      timeFormat: options.timeFormat,
+      type: "time"
+    })}`;
+  }
+
+  if (reminder.mode === "repeat") {
+    time = getUpcomingReminderTime(reminder);
+  }
+
+  const formattedTime = formatDate(time, {
+    timeFormat: options.timeFormat,
+    type: "time"
+  });
+
+  const formattedDateTime = formatDate(time, {
+    dateFormat: `ddd, ${options.dateFormat}`,
+    timeFormat: options.timeFormat,
+    type: "date-time"
+  });
+
+  if (dayjs(time).isTomorrow()) {
+    tag = "Upcoming";
+    text = `Tomorrow, ${formattedTime}`;
+  } else if (dayjs(time).isYesterday()) {
+    tag = "Last";
+    text = `Yesterday, ${formattedTime}`;
+  } else {
+    const isPast = dayjs(time).isSameOrBefore(dayjs());
+    tag = isPast ? "Last" : "Upcoming";
+    if (dayjs(time).isToday()) {
+      text = `Today, ${formattedTime}`;
+    } else {
+      text = formattedDateTime;
+    }
+  }
+
+  return short ? text : `${tag}: ${text}`;
+}
+
+export function isReminderToday(reminder: Reminder) {
+  const { date } = reminder;
+  let time = date;
+
+  if (reminder.mode === "permanent") return true;
+
+  if (reminder.mode === "repeat") {
+    time = getUpcomingReminderTime(reminder);
+  }
+
+  return dayjs(time).isToday();
+}
+
+export function getUpcomingReminderTime(reminder: Reminder) {
+  if (reminder.mode === "once") return reminder.date;
+
+  const isDay = reminder.recurringMode === "day";
+  const isWeek = reminder.recurringMode === "week";
+  const isMonth = reminder.recurringMode === "month";
+  const isYear = reminder.recurringMode === "year";
+
+  // this is only the time (hour & minutes) unless it is a
+  // yearly reminder
+  const time = dayjs(reminder.date);
+  const now = dayjs();
+  const relativeTime = isYear
+    ? now
+        .clone()
+        .hour(time.hour())
+        .minute(time.minute())
+        .month(time.month())
+        .date(time.date())
+    : now.clone().hour(time.hour()).minute(time.minute());
+
+  const isPast = relativeTime.isSameOrBefore(now);
+
+  if (isYear) {
+    if (isPast) return relativeTime.add(1, "year").valueOf();
+    else return relativeTime.valueOf();
+  }
+
+  if (isDay) {
+    if (isPast) return relativeTime.add(1, "day").valueOf();
+    else return relativeTime.valueOf();
+  }
+
+  if (!reminder.selectedDays || !reminder.selectedDays.length)
+    return relativeTime.valueOf();
+
+  const sorted = reminder.selectedDays.sort((a, b) => a - b);
+  const lastSelectedDay = sorted[sorted.length - 1];
+  if (isWeek) {
+    if (now.day() > lastSelectedDay || isPast)
+      return relativeTime.day(sorted[0]).add(1, "week").valueOf();
+    else {
+      for (const day of reminder.selectedDays)
+        if (now.day() <= day) return relativeTime.day(day).valueOf();
+    }
+  } else if (isMonth) {
+    if (now.date() > lastSelectedDay || isPast)
+      return relativeTime.date(sorted[0]).add(1, "month").valueOf();
+    else {
+      for (const day of reminder.selectedDays)
+        if (now.date() <= day) return relativeTime.date(day).valueOf();
+    }
+  }
+
+  return relativeTime.valueOf();
+}
+
+export function getUpcomingReminder(reminders: Reminder[]) {
+  const sorted = reminders.sort((a, b) => {
+    const d1 = a.mode === "repeat" ? getUpcomingReminderTime(a) : a.date;
+    const d2 = b.mode === "repeat" ? getUpcomingReminderTime(b) : b.date;
+    return !d1 || !d2 ? 0 : d2 - d1;
+  });
+  return sorted[0];
+}
+
+export function isReminderActive(reminder: Reminder) {
+  return (
+    !reminder.disabled &&
+    (reminder.mode !== "once" ||
+      reminder.date > Date.now() ||
+      (!!reminder.snoozeUntil && reminder.snoozeUntil > Date.now()))
+  );
+}
+
+export function createUpcomingReminderTimeQuery(now = "now") {
+  return sql`CASE 
+        WHEN mode = 'once' THEN date / 1000
+        WHEN recurringMode = 'year' THEN
+            strftime('%s',
+                strftime('%Y-', date(${now})) || strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime'), 
+                IIF(datetime(strftime('%Y-', date(${now})) || strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime')) <= datetime(${now}), '+1 year', '+0 year'),
+                'utc'
+            )
+        WHEN recurringMode = 'day' THEN
+            strftime('%s',
+                date(${now}) || time(date / 1000, 'unixepoch', 'localtime'), 
+                IIF(datetime(date(${now}) || time(date / 1000, 'unixepoch', 'localtime')) <= datetime(${now}), '+1 day', '+0 day'),
+                'utc'
+            )
+        WHEN recurringMode = 'week' AND selectedDays IS NOT NULL AND json_array_length(selectedDays) > 0 THEN 
+            CASE
+                WHEN CAST(strftime('%w', date(${now})) AS INTEGER) > (SELECT MAX(value) FROM json_each(selectedDays))
+                OR datetime(date(${now}) || time(date / 1000, 'unixepoch', 'localtime')) <= datetime(${now})
+                THEN
+                    strftime('%s', datetime(date(${now}), time(date / 1000, 'unixepoch', 'localtime'), '+1 day', 'weekday ' || json_extract(selectedDays, '$[0]'), 'utc'))
+                ELSE
+                    strftime('%s', datetime(date(${now}), time(date / 1000, 'unixepoch', 'localtime'), 'weekday ' || (SELECT value FROM json_each(selectedDays) WHERE CAST(strftime('%w', date(${now})) AS INTEGER) <= value), 'utc'))
+            END
+        WHEN recurringMode = 'month' AND selectedDays IS NOT NULL AND json_array_length(selectedDays) > 0 THEN
+            CASE
+                WHEN CAST(strftime('%d', date(${now})) AS INTEGER) > (SELECT MAX(value) FROM json_each(selectedDays))
+                OR datetime(date(${now}) || time(date / 1000, 'unixepoch', 'localtime')) <= datetime(${now})
+                THEN
+                    strftime('%s', strftime('%Y-%m-', date(${now})) || printf('%02d', json_extract(selectedDays, '$[0]')) || time(date / 1000, 'unixepoch', 'localtime'), '+1 month', 'utc')
+                ELSE strftime('%s', strftime('%Y-%m-', date(${now})) || (SELECT printf('%02d', value) FROM json_each(selectedDays) WHERE value <= strftime('%d', date(${now}))) || time(date / 1000, 'unixepoch', 'localtime'), 'utc')
+            END
+        ELSE strftime('%s', date(${now}) || time(date / 1000, 'unixepoch', 'localtime'), 'utc')
+    END * 1000
+`.$castTo<number>();
+}
+
+export function createIsReminderActiveQuery(now = "now") {
+  return sql`IIF(
+    (disabled IS NULL OR disabled = 0)
+    AND (mode != 'once'
+      OR datetime(date / 1000, 'unixepoch', 'localtime') > datetime(${now}) 
+      OR (snoozeUntil IS NOT NULL
+        AND datetime(snoozeUntil / 1000, 'unixepoch', 'localtime') > datetime(${now}))
+    ), 1, 0)`.$castTo<boolean>();
+}

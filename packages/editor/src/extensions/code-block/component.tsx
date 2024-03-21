@@ -37,6 +37,7 @@ export function CodeblockComponent(
   const { language, indentLength, indentType, caretPosition } = node.attrs;
 
   // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
+  const elementRef = useRef<HTMLElement>();
   const [isOpen, setIsOpen] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const theme = useThemeEngineStore((store) => store.theme);
@@ -57,7 +58,10 @@ export function CodeblockComponent(
         }}
       >
         <Text
-          ref={forwardRef}
+          ref={(ref) => {
+            elementRef.current = ref ?? undefined;
+            forwardRef?.(ref);
+          }}
           autoCorrect="off"
           autoCapitalize="none"
           css={theme.codeBlockCSS}
@@ -163,7 +167,10 @@ export function CodeblockComponent(
                 bg: "transparent"
               }}
               onClick={() => {
-                editor.commands.copyToClipboard(node.textContent);
+                editor.storage.copyToClipboard?.(
+                  node.textContent,
+                  elementRef?.current?.innerHTML
+                );
                 start();
               }}
               title="Copy to clipboard"
@@ -193,7 +200,7 @@ export function CodeblockComponent(
         }}
         focusOnRender={false}
         mobile="sheet"
-        desktop="menu"
+        desktop="popup"
         position={{
           target: toolbarRef.current || undefined,
           align: "end",

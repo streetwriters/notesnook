@@ -24,6 +24,7 @@ import Field from "../components/field";
 function ItemDialog(props) {
   return (
     <Dialog
+      testId="item-dialog"
       isOpen={true}
       title={props.title}
       description={props.subtitle}

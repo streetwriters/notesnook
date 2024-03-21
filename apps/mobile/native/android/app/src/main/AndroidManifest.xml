@@ -161,12 +161,12 @@
                 android:resource="@xml/file_viewer_provider_paths" />
         </provider>
 
-<!--        <receiver android:exported="true" android:name=".BootRecieverService" >-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.BOOT_COMPLETED" />-->
-<!--                <action android:name="android.intent.action.QUICKBOOT_POWERON" />-->
-<!--            </intent-filter>-->
-<!--        </receiver>-->
+       <receiver android:exported="true" android:name=".BootRecieverService" >
+           <intent-filter>
+               <action android:name="android.intent.action.BOOT_COMPLETED" />
+               <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+           </intent-filter>
+      </receiver>
         
 
     </application>

@@ -31,3 +31,73 @@
 .container::-webkit-scrollbar {
   display: none;
 }
+
+@keyframes menuShow {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes menuHide {
+  to {
+    opacity: 0;
+  }
+}
+
+.menu {
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+  z-index: 999;
+  list-style: none;
+  user-select: none;
+  padding: 0px;
+  font-family: sans-serif;
+  font-size: 0.95em;
+  border: 1px solid var(--nn_primary_border);
+  box-shadow: 1px 1px 20px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background-color: var(--nn_secondary_background);
+  min-width: 12rem;
+}
+
+.menuOpening {
+  composes: menu;
+  animation: menuShow 0.15s ease-out;
+}
+
+.menuClosing {
+  composes: menu;
+  animation: menuHide 0.2s ease-out forwards;
+}
+
+.menuItem {
+  cursor: pointer;
+  border-radius: 0;
+  padding: 1rem 0.6rem !important;
+  color: var(--nn_primary_paragraph);
+  font-family: "Open Sans";
+  padding: 12px 6px;
+}
+
+.menuItemHover {
+  composes: menuItem;
+  color: #fff;
+  background-color: var(--nn_primary_hover);
+}
+
+.menuItemDisabled {
+  composes: menuItem;
+  cursor: default;
+  color: #aaa;
+}
+
+.menu:focus,
+.menuItem:focus {
+  outline: none;
+}
+
+.menuDivider {
+  height: 1px;
+  margin: 0.1rem 0.1rem;
+  background-color: var(--nn_primary_border);
+}

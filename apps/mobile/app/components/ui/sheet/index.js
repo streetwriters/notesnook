@@ -29,6 +29,11 @@ import { useAppState } from "../../../hooks/use-app-state";
 import SettingsService from "../../../services/settings";
 import { useUserStore } from "../../../stores/use-user-store";
 
+/**
+ *
+ * @param {any} param0
+ * @returns
+ */
 const SheetWrapper = ({
   children,
   fwdRef,
@@ -86,7 +91,7 @@ const SheetWrapper = ({
 
   useEffect(() => {
     if (useUserStore.getState().disableAppLockRequests) return;
-    if (SettingsService.get().appLockMode === "background") {
+    if (SettingsService.canLockAppInBackground()) {
       if (appState === "background") {
         const ref = fwdRef || localRef;
         ref?.current?.hide();
@@ -115,7 +120,8 @@ const SheetWrapper = ({
           width: 100,
           backgroundColor: colors.secondary.background
         }}
-        drawUnderStatusBar={false}
+        statusBarTranslucent
+        drawUnderStatusBar={true}
         containerStyle={style}
         gestureEnabled={gestureEnabled}
         initialOffsetFromBottom={1}

@@ -17,17 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Global, css } from "@emotion/react";
 import {
   ScopedThemeProvider,
   themeToCSS,
   useThemeEngineStore
 } from "@notesnook/theme";
+import { useMemo } from "react";
+import { Freeze } from "react-freeze";
 import "./App.css";
 import Tiptap from "./components/editor";
+import { TabContext, useTabStore } from "./hooks/useTabStore";
 import { EmotionEditorTheme } from "./theme-factory";
-import { Global, css } from "@emotion/react";
-import { useMemo } from "react";
 import { getTheme } from "./utils";
+import { ReadonlyEditorProvider } from "./components/readonly-editor";
 
 const currentTheme = getTheme();
 if (currentTheme) {
@@ -35,11 +38,24 @@ if (currentTheme) {
 }
 
 function App(): JSX.Element {
+  const tabs = useTabStore((state) => state.tabs);
+  const currentTab = useTabStore((state) => state.currentTab);
   return (
     <ScopedThemeProvider value="base">
       <EmotionEditorTheme>
         <GlobalStyles />
-        <Tiptap />
+
+        {globalThis["readonlyEditor"] ? (
+          <ReadonlyEditorProvider />
+        ) : (
+          tabs.map((tab) => (
+            <TabContext.Provider key={tab.id} value={tab}>
+              <Freeze freeze={currentTab !== tab.id}>
+                <Tiptap />
+              </Freeze>
+            </TabContext.Provider>
+          ))
+        )}
       </EmotionEditorTheme>
     </ScopedThemeProvider>
   );

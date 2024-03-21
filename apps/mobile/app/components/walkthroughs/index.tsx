@@ -121,7 +121,7 @@ export const Walkthrough = ({
           onPress={async () => {
             eSendEvent(eCloseSheet);
           }}
-          type="gray"
+          type="plain"
           title="Skip introduction"
         />
       ) : null}

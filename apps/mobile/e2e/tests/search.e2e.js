@@ -34,7 +34,7 @@ describe("Search", () => {
     let note = await createNote();
     await tapById("icon-search");
     await sleep(300);
-    await elementById("search-input").typeText("n");
+    await elementById("search-input").typeText("Test");
     await sleep(1000);
     await tapByText(note.body);
     await sleep(1000);

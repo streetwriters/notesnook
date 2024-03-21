@@ -30,7 +30,7 @@ import { IconButton } from "../../components/ui/icon-button";
 import { Notice } from "../../components/ui/notice";
 import Paragraph from "../../components/ui/typography/paragraph";
 import useTimer from "../../hooks/use-timer";
-import { ToastEvent } from "../../services/event-manager";
+import { ToastManager } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { hexToRGBA } from "../../utils/colors";
 import { sanitizeFilename } from "@notesnook/common";
@@ -88,7 +88,7 @@ export default function DebugLogs() {
           activeOpacity={1}
           onLongPress={() => {
             Clipboard.setString(format(item));
-            ToastEvent.show({
+            ToastManager.show({
               heading: "Debug log copied!",
               context: "global",
               type: "success"
@@ -152,7 +152,7 @@ export default function DebugLogs() {
       }
 
       if (path) {
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Debug logs downloaded",
           context: "global",
           type: "success"
@@ -171,7 +171,7 @@ export default function DebugLogs() {
       .join("\n");
     if (!data) return;
     Clipboard.setString(data);
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Debug log copied!",
       context: "global",
       type: "success"
@@ -241,7 +241,7 @@ export default function DebugLogs() {
                 <Paragraph>{currentLog.key}</Paragraph>
 
                 <IconButton
-                  customStyle={{
+                  style={{
                     width: 30,
                     height: 30,
                     marginHorizontal: 5
@@ -259,7 +259,7 @@ export default function DebugLogs() {
                 />
 
                 <IconButton
-                  customStyle={{
+                  style={{
                     width: 30,
                     height: 30
                   }}
@@ -284,7 +284,7 @@ export default function DebugLogs() {
                 <IconButton
                   onPress={copyLogs}
                   size={20}
-                  customStyle={{
+                  style={{
                     width: 30,
                     height: 30,
                     marginRight: 5
@@ -294,7 +294,7 @@ export default function DebugLogs() {
                 />
                 <IconButton
                   onPress={downloadLogs}
-                  customStyle={{
+                  style={{
                     width: 30,
                     height: 30,
                     marginRight: 5
@@ -306,7 +306,7 @@ export default function DebugLogs() {
 
                 <IconButton
                   onPress={clearLogs}
-                  customStyle={{
+                  style={{
                     width: 30,
                     height: 30,
                     marginRight: 5

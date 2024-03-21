@@ -22,13 +22,11 @@ import { FileAttachment } from "./types";
 import { useRef, useState } from "react";
 import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons";
-import { SelectionBasedReactNodeViewProps } from "../react";
+import { ReactNodeViewProps } from "../react";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 import { DesktopOnly } from "../../components/responsive";
 
-export function AttachmentComponent(
-  props: SelectionBasedReactNodeViewProps<FileAttachment>
-) {
+export function AttachmentComponent(props: ReactNodeViewProps<FileAttachment>) {
   const { editor, node, selected } = props;
   const { filename, size, progress } = node.attrs;
   const elementRef = useRef<HTMLSpanElement>();

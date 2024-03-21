@@ -29,9 +29,9 @@ import * as ScopedStorage from "react-native-scoped-storage";
 import { subscribe, zip } from "react-native-zip-archive";
 import RNFetchBlob from "react-native-blob-util";
 import { ShareComponent } from "../../components/sheets/export-notes/share";
-import { ToastEvent, presentSheet } from "../../services/event-manager";
+import { ToastManager, presentSheet } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { db } from "../database";
+import { DatabaseLogger, db } from "../database";
 import Storage from "../database/storage";
 import { cacheDir, copyFileAsync, releasePermissions } from "./utils";
 import { createCacheDir, exists } from "./io";
@@ -46,15 +46,15 @@ export const FileDownloadStatus = {
  * Download all user's attachments
  * @returns
  */
-export function downloadAllAttachments() {
-  const attachments = db.attachments.all;
+export async function downloadAllAttachments() {
+  const attachments = await db.attachments.all.ids();
   return downloadAttachments(attachments);
 }
 
 /**
  * Downloads provided attachments to a .zip file
  * on user's device.
- * @param attachments
+ * @param {string[]} attachments
  * @param onProgress
  * @returns
  */
@@ -84,13 +84,15 @@ export async function downloadAttachments(
     Platform.OS === "ios"
       ? `${outputFolder}/notesnook-attachments-${Date.now()}.zip`
       : `${cacheDir}/notesnook-attachments.zip`;
-  if (await RNFetchBlob.fs.exists(zipSourceFolder))
+  if (await RNFetchBlob.fs.exists(zipSourceFolder)) {
     await RNFetchBlob.fs.unlink(zipSourceFolder);
+  }
+
   await RNFetchBlob.fs.mkdir(zipSourceFolder);
 
   for (let i = 0; i < attachments.length; i++) {
-    let attachment = attachments[i];
-    const hash = attachment.metadata.hash;
+    let attachment = await db.attachments.attachment(attachments[i]);
+    const hash = attachment.hash;
     try {
       if (canceled.current) {
         RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
@@ -114,19 +116,20 @@ export async function downloadAttachments(
       }
       if (!uri) throw new Error("Failed to download file");
       // Move file to the source folder we will zip eventually and rename the file to it's actual name.
-      const filePath = `${zipSourceFolder}/${attachment.metadata.filename}`;
+      const filePath = `${zipSourceFolder}/${attachment.filename}`;
       await RNFetchBlob.fs.mv(`${cacheDir}/${uri}`, filePath);
       result.set(hash, {
-        filename: attachment.metadata.filename,
-        status: FileDownloadStatus.Success
+        filename: attachment.filename,
+        status: FileDownloadStatus.Success,
+        attachment: attachment
       });
     } catch (e) {
       result.set(hash, {
-        filename: attachment.metadata.filename,
+        filename: attachment.filename,
         status: FileDownloadStatus.Fail,
         reason: e
       });
-      console.log("Error downloading attachment", e);
+      ToastManager.error(e, "Error downloading attachment");
     }
   }
   if (canceled.current) {
@@ -163,7 +166,7 @@ export async function downloadAttachments(
     } catch (e) {
       releasePermissions(outputFolder);
       sub?.remove();
-      console.log("Error zipping attachments", e);
+      ToastManager.error(e, "Error zipping attachments");
     }
     // Remove source & zip file from cache.
     RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
@@ -189,9 +192,9 @@ export default async function downloadAttachment(
 ) {
   await createCacheDir();
 
-  let attachment = db.attachments.attachment(hash);
+  let attachment = await db.attachments.attachment(hash);
   if (!attachment) {
-    console.log("attachment not found");
+    DatabaseLogger.log("Attachment not found");
     return;
   }
 
@@ -206,47 +209,47 @@ export default async function downloadAttachment(
   }
 
   try {
-    console.log(
-      "starting download attachment",
-      attachment.metadata.hash,
-      options.groupId
-    );
-    await db.fs.downloadFile(
-      options.groupId || attachment.metadata.hash,
-      attachment.metadata.hash
-    );
-
-    if (!(await exists(attachment.metadata.hash))) {
+    await db
+      .fs()
+      .downloadFile(options.groupId || attachment.hash, attachment.hash);
+    if (!(await exists(attachment.hash))) {
+      DatabaseLogger.log("Attachment does not exist after download.");
       return;
     }
 
     if (options.base64 || options.text) {
+      console.log(
+        "starting decrypt base64 file...",
+        options.base64,
+        options.text,
+        attachment.hash
+      );
       return await db.attachments.read(
-        attachment.metadata.hash,
+        attachment.hash,
         options.base64 ? "base64" : "text"
       );
     }
 
     let filename = getFileNameWithExtension(
-      attachment.metadata.filename,
-      attachment.metadata.type
+      attachment.filename,
+      attachment.mimeType
     );
 
     let key = await db.attachments.decryptKey(attachment.key);
+
     let info = {
       iv: attachment.iv,
       salt: attachment.salt,
-      length: attachment.length,
+      length: attachment.size,
       alg: attachment.alg,
-      hash: attachment.metadata.hash,
-      hashType: attachment.metadata.hashType,
-      mime: attachment.metadata.type,
+      hash: attachment.hash,
+      hashType: attachment.hashType,
+      mime: attachment.mimeType,
       fileName: options.cache ? undefined : filename,
       uri: options.cache ? undefined : folder.uri,
       chunkSize: attachment.chunkSize,
       appGroupId: IOS_APPGROUPID
     };
-
     let fileUri = await Sodium.decryptFile(
       key,
       info,
@@ -254,7 +257,7 @@ export default async function downloadAttachment(
     );
 
     if (!options.silent) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Download successful",
         message: filename + " downloaded",
         type: "success"
@@ -263,11 +266,11 @@ export default async function downloadAttachment(
 
     if (
       attachment.dateUploaded &&
-      !isImage(attachment.metadata?.type) &&
-      !isDocument(attachment.metadata?.type)
+      !isImage(attachment.mimeType) &&
+      !isDocument(attachment.mimeType)
     ) {
       RNFetchBlob.fs
-        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
+        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}`)
         .catch(console.log);
     }
     if (Platform.OS === "ios" && !options.cache) {
@@ -282,7 +285,7 @@ export default async function downloadAttachment(
             : "File Manager/Notesnook/downloads"
         }`,
         icon: "download",
-        context: global ? null : attachment.metadata.hash,
+        context: global ? null : attachment.hash,
         component: <ShareComponent uri={fileUri} name={filename} padding={12} />
       });
     }
@@ -292,10 +295,13 @@ export default async function downloadAttachment(
     console.log("download attachment error: ", e);
     if (attachment.dateUploaded) {
       RNFetchBlob.fs
-        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
+        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}`)
+        .catch(console.log);
+      RNFetchBlob.fs
+        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}_dcache`)
         .catch(console.log);
     }
-    useAttachmentStore.getState().remove(attachment.metadata.hash);
+    useAttachmentStore.getState().remove(attachment.hash);
     if (options.throwError) {
       throw e;
     }

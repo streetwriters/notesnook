@@ -17,35 +17,42 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Color, Notebook, Tag } from "@notesnook/core/dist/types";
 import create, { State } from "zustand";
 import { db } from "../common/database";
-import { ColorType } from "../utils/types";
 
 export interface MenuStore extends State {
-  menuPins: [];
-  colorNotes: ColorType[];
+  menuPins: (Notebook | Tag)[];
+  colorNotes: Color[];
   setMenuPins: () => void;
   setColorNotes: () => void;
   clearAll: () => void;
+  loadingShortcuts: boolean;
+  loadingColors: boolean;
 }
 
 export const useMenuStore = create<MenuStore>((set) => ({
   menuPins: [],
   colorNotes: [],
+  loadingShortcuts: true,
+  loadingColors: true,
   setMenuPins: () => {
-    try {
-      set({ menuPins: [...(db.shortcuts?.resolved as [])] });
-    } catch (e) {
-      setTimeout(() => {
-        try {
-          set({ menuPins: [...(db.shortcuts?.resolved as [])] });
-        } catch (e) {
-          console.error(e);
-        }
-      }, 1000);
-    }
+    db.shortcuts.resolved().then((shortcuts) => {
+      set({ menuPins: [...(shortcuts as [])], loadingShortcuts: false });
+    });
   },
-  setColorNotes: () =>
-    set({ colorNotes: (db.colors?.all as ColorType[]) || [] }),
+  setColorNotes: () => {
+    db.colors?.all
+      .items(undefined, {
+        sortBy: "dateCreated",
+        sortDirection: "asc"
+      })
+      .then((colors) => {
+        set({
+          colorNotes: colors,
+          loadingColors: false
+        });
+      });
+  },
   clearAll: () => set({ menuPins: [], colorNotes: [] })
 }));

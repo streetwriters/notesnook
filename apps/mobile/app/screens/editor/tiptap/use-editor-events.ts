@@ -19,9 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import Clipboard from "@react-native-clipboard/clipboard";
+import { parseInternalLink } from "@notesnook/core";
+import { ItemReference } from "@notesnook/core/dist/types";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
+import Clipboard from "@react-native-clipboard/clipboard";
 import { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,
@@ -33,45 +35,50 @@ import {
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
 import { db } from "../../../common/database";
+import downloadAttachment from "../../../common/filesystem/download-attachment";
+import EditorTabs from "../../../components/sheets/editor-tabs";
+import LinkNote from "../../../components/sheets/link-note";
 import ManageTagsSheet from "../../../components/sheets/manage-tags";
 import { RelationsList } from "../../../components/sheets/relations-list";
 import ReminderSheet from "../../../components/sheets/reminder";
+import TableOfContents from "../../../components/sheets/toc";
 import { DDS } from "../../../services/device-detection";
 import {
-  ToastEvent,
+  ToastManager,
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
-import { useEditorStore } from "../../../stores/use-editor-store";
+import SettingsService from "../../../services/settings";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
+  eEditorTabFocused,
   eOnLoadNote,
   eOpenFullscreenEditor,
   eOpenLoginDialog,
   eOpenPremiumDialog,
-  eOpenPublishNoteDialog
+  eOpenPublishNoteDialog,
+  eUnlockWithBiometrics,
+  eUnlockWithPassword
 } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { tabBarRef } from "../../../utils/global-refs";
-import { NoteType } from "../../../utils/types";
 import { useDragState } from "../../settings/editor/state";
 import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
+import { useTabStore } from "./use-tab-store";
 import { EditorEvents, editorState } from "./utils";
-import { useNoteStore } from "../../../stores/use-notes-store";
-import SettingsService from "../../../services/settings";
-import downloadAttachment from "../../../common/filesystem/download-attachment";
 
-const publishNote = async (editor: useEditorType) => {
+const publishNote = async () => {
   const user = useUserStore.getState().user;
   if (!user) {
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Login required",
       message: "Login to publish",
       context: "global",
@@ -84,18 +91,22 @@ const publishNote = async (editor: useEditorType) => {
   }
 
   if (!user?.isEmailConfirmed) {
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Email not verified",
       message: "Please verify your email first.",
       context: "global"
     });
     return;
   }
-  const currentNote = editor?.note?.current;
-  if (currentNote?.id) {
-    const note = db.notes?.note(currentNote.id)?.data as NoteType;
-    if (note?.locked) {
-      ToastEvent.show({
+  const noteId = useTabStore
+    .getState()
+    .getNoteIdForTab(useTabStore.getState().currentTab);
+
+  if (noteId) {
+    const note = await db.notes?.note(noteId);
+    const locked = note && (await db.vaults.itemExists(note));
+    if (locked) {
+      ToastManager.show({
         heading: "Locked notes cannot be published",
         type: "error",
         context: "global"
@@ -109,18 +120,19 @@ const publishNote = async (editor: useEditorType) => {
   }
 };
 
-const showActionsheet = async (editor: useEditorType) => {
-  const currentNote = editor?.note?.current;
-  if (currentNote?.id) {
-    const note = db.notes?.note(currentNote.id)?.data as NoteType;
-
+const showActionsheet = async () => {
+  const noteId = useTabStore
+    .getState()
+    .getNoteIdForTab(useTabStore.getState().currentTab);
+  if (noteId) {
+    const note = await db.notes?.note(noteId);
     if (editorState().isFocused || editorState().isFocused) {
       editorState().isFocused = true;
     }
     const { Properties } = require("../../../components/properties/index.js");
     Properties.present(note, ["Dark Mode"]);
   } else {
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Start writing to create a new note",
       type: "success",
       context: "global"
@@ -137,14 +149,12 @@ export const useEditorEvents = (
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const corsProxy = useSettingStore((state) => state.settings.corsProxy);
-  const loading = useNoteStore((state) => state.loading);
+  const loading = useSettingStore((state) => state.isAppLoading);
   const [dateFormat, timeFormat] = useSettingStore((state) => [
     state.dateFormat,
     state.timeFormat
   ]);
-
   const handleBack = useRef<NativeEventSubscription>();
-  const readonly = useEditorStore((state) => state.readonly);
   const isPremium = useUserStore((state) => state.premium);
   const { fontScale } = useWindowDimensions();
 
@@ -192,7 +202,7 @@ export const useEditorEvents = (
       deviceMode: deviceMode || "mobile",
       fullscreen: fullscreen || false,
       premium: isPremium,
-      readonly: readonly || editorPropReadonly,
+      readonly: false,
       tools: tools || getDefaultPresets().default,
       noHeader: noHeader,
       noToolbar: noToolbar,
@@ -211,13 +221,11 @@ export const useEditorEvents = (
   }, [
     fullscreen,
     isPremium,
-    readonly,
     editor.loading,
     deviceMode,
     tools,
     editor.commands,
     doubleSpacedLines,
-    editorPropReadonly,
     noHeader,
     noToolbar,
     corsProxy,
@@ -237,7 +245,8 @@ export const useEditorEvents = (
       return;
     }
     editorState().currentlyEditing = false;
-    editor.reset();
+    // editor.reset(); Notes remain open.
+    editor.commands?.blur(useTabStore.getState().currentTab);
     setTimeout(async () => {
       if (deviceMode !== "mobile" && fullscreen) {
         if (fullscreen) {
@@ -331,24 +340,14 @@ export const useEditorEvents = (
   }, [editor.editorId, onClearEditorSessionRequest, onLoadNote]);
 
   const onMessage = useCallback(
-    (event: WebViewMessageEvent) => {
+    async (event: WebViewMessageEvent) => {
       const data = event.nativeEvent.data;
-      const editorMessage = JSON.parse(data) as EditorMessage;
+      const editorMessage = JSON.parse(data) as EditorMessage<any>;
 
-      if (editorMessage.type === EventTypes.content) {
-        editor.saveContent({
-          type: editorMessage.type,
-          content: (editorMessage.value as ContentMessage).html,
-          ignoreEdit: (editorMessage.value as ContentMessage).ignoreEdit,
-          forSessionId: editorMessage.sessionId
-        });
-      } else if (editorMessage.type === EventTypes.title) {
-        editor.saveContent({
-          type: editorMessage.type,
-          title: editorMessage.value as string,
-          forSessionId: editorMessage.sessionId,
-          ignoreEdit: false
-        });
+      if (editorMessage.type === EventTypes.load) {
+        console.log("Editor loaded");
+        editor.onLoad();
+        return;
       }
 
       if (editorMessage.type === EventTypes.back) {
@@ -362,51 +361,77 @@ export const useEditorEvents = (
         return;
       }
 
+      const noteId = useTabStore
+        .getState()
+        .getNoteIdForTab(editorMessage.tabId);
+
       switch (editorMessage.type) {
+        case EventTypes.content:
+          editor.saveContent({
+            type: editorMessage.type,
+            content: editorMessage.value.html as string,
+            noteId: noteId,
+            tabId: editorMessage.tabId,
+            ignoreEdit: (editorMessage.value as ContentMessage).ignoreEdit
+          });
+          break;
+        case EventTypes.title:
+          editor.saveContent({
+            type: editorMessage.type,
+            title: editorMessage.value as string,
+            noteId: noteId,
+            tabId: editorMessage.tabId,
+            ignoreEdit: false
+          });
+          break;
         case EventTypes.logger:
           logger.info("[WEBVIEW LOG]", editorMessage.value);
           break;
         case EventTypes.contentchange:
-          editor.onContentChanged();
+          editor.onContentChanged(editorMessage.noteId);
           break;
         case EventTypes.selection:
           break;
         case EventTypes.reminders:
-          if (!editor.note.current) {
-            ToastEvent.show({
+          if (!noteId) {
+            ToastManager.show({
               heading: "Create a note first to add a reminder",
               type: "success"
             });
             return;
           }
+          const note = await db.notes.note(noteId);
+          if (!note) return;
           RelationsList.present({
-            reference: editor.note.current as any,
+            reference: note as any,
             referenceType: "reminder",
             relationType: "from",
             title: "Reminders",
-            onAdd: () =>
-              ReminderSheet.present(undefined, editor.note.current as any, true)
+            onAdd: () => ReminderSheet.present(undefined, note, true)
           });
           break;
         case EventTypes.newtag:
-          if (!editor.note.current) {
-            ToastEvent.show({
+          if (!noteId) {
+            ToastManager.show({
               heading: "Create a note first to add a tag",
               type: "success"
             });
             return;
           }
-          ManageTagsSheet.present([editor.note.current]);
+          ManageTagsSheet.present([noteId]);
           break;
         case EventTypes.tag:
           if (editorMessage.value) {
-            if (!editor.note.current) return;
-            db.notes
-              ?.note(editor.note.current?.id)
-              .untag(editorMessage.value)
+            if (!noteId) return;
+            const note = await db.notes.note(noteId);
+            if (!note) return;
+
+            db.relations
+              .unlink(editorMessage.value as ItemReference, note)
               .then(async () => {
-                useTagStore.getState().setTags();
-                await editor.commands.setTags(editor.note.current);
+                useTagStore.getState().refresh();
+                useRelationStore.getState().update();
+                await editor.commands.setTags(note);
                 Navigation.queueRoutesForUpdate();
               });
           }
@@ -414,7 +439,11 @@ export const useEditorEvents = (
         case EventTypes.filepicker:
           editorState().isAwaitingResult = true;
           const { pick } = require("./picker.js").default;
-          pick({ type: editorMessage.value });
+          pick({
+            type: editorMessage.value,
+            noteId: noteId,
+            tabId: editorMessage.tabId
+          });
           setTimeout(() => {
             editorState().isAwaitingResult = false;
           }, 1000);
@@ -471,33 +500,157 @@ export const useEditorEvents = (
           eSendEvent(eOpenPremiumDialog);
           break;
         case EventTypes.monograph:
-          publishNote(editor);
+          publishNote();
           break;
         case EventTypes.properties:
-          showActionsheet(editor);
+          showActionsheet();
+          break;
+        case EventTypes.scroll:
+          editorState().scrollPosition = editorMessage.value;
           break;
         case EventTypes.fullscreen:
           editorState().isFullscreen = true;
           eSendEvent(eOpenFullscreenEditor);
           break;
         case EventTypes.link:
-          openLinkInBrowser(editorMessage.value as string);
+          if (editorMessage.value.startsWith("nn://")) {
+            const data = parseInternalLink(editorMessage.value);
+            if (!data?.id) break;
+            if (
+              data.id ===
+              useTabStore
+                .getState()
+                .getNoteIdForTab(useTabStore.getState().currentTab)
+            ) {
+              if (data.params?.blockId) {
+                setTimeout(() => {
+                  if (!data.params?.blockId) return;
+                  editor.commands.scrollIntoViewById(data.params.blockId);
+                }, 150);
+              }
+              return;
+            }
+
+            eSendEvent(eOnLoadNote, {
+              item: await db.notes.note(data?.id),
+              blockId: data.params?.blockId
+            });
+            console.log(
+              "Opening note from internal link:",
+              editorMessage.value
+            );
+          } else {
+            openLinkInBrowser(editorMessage.value as string);
+          }
           break;
 
         case EventTypes.previewAttachment: {
           const hash = (editorMessage.value as Attachment)?.hash;
-          const attachment = db.attachments?.attachment(hash);
+          const attachment = await db.attachments?.attachment(hash);
           if (!attachment) return;
-          if (attachment.metadata.type.startsWith("image/")) {
+          if (attachment.mimeType.startsWith("image/")) {
             eSendEvent("ImagePreview", editorMessage.value);
           } else {
             eSendEvent("PDFPreview", attachment);
           }
-
           break;
         }
         case EventTypes.copyToClipboard: {
           Clipboard.setString(editorMessage.value as string);
+          break;
+        }
+        case EventTypes.tabsChanged: {
+          // useTabStore.setState({
+          //   tabs: (editorMessage.value as any)?.tabs,
+          //   currentTab: (editorMessage.value as any)?.currentTab
+          // });
+          // console.log("Tabs updated");
+          break;
+        }
+        case EventTypes.toc:
+          TableOfContents.present(editorMessage.value);
+          break;
+        case EventTypes.showTabs: {
+          EditorTabs.present();
+          break;
+        }
+        case EventTypes.tabFocused: {
+          console.log(
+            "Focused tab",
+            editorMessage.tabId,
+            editorMessage.noteId,
+            "Content:",
+            editorMessage.value
+          );
+
+          eSendEvent(eEditorTabFocused, editorMessage.tabId);
+
+          if (
+            (!editorMessage.value || editor.currentLoadingNoteId.current) &&
+            editorMessage.noteId
+          ) {
+            if (!useSettingStore.getState().isAppLoading) {
+              const note = await db.notes.note(editorMessage.noteId);
+              if (note) {
+                eSendEvent(eOnLoadNote, {
+                  item: note,
+                  forced: true,
+                  tabId: editorMessage.tabId
+                });
+              }
+            } else {
+              const unsub = useSettingStore.subscribe(async (state) => {
+                if (!state.isAppLoading) {
+                  unsub();
+                  const note = await db.notes.note(editorMessage.noteId);
+                  if (note) {
+                    eSendEvent(eOnLoadNote, {
+                      item: note,
+                      forced: true,
+                      tabId: editorMessage.tabId
+                    });
+                  }
+                }
+              });
+            }
+          }
+
+          break;
+        }
+        case EventTypes.createInternalLink: {
+          LinkNote.present(
+            editorMessage.value.attributes,
+            editorMessage.value.resolverId
+          );
+          break;
+        }
+
+        case EventTypes.unlock: {
+          eSendEvent(eUnlockWithPassword, editorMessage.value);
+          break;
+        }
+
+        case EventTypes.unlockWithBiometrics: {
+          eSendEvent(eUnlockWithBiometrics);
+          break;
+        }
+
+        case EventTypes.disableReadonlyMode: {
+          const noteId = editorMessage.value;
+          if (noteId) {
+            await db.notes.readonly(false, noteId);
+            editor.note.current[noteId] = await db.notes?.note(noteId);
+            useTabStore
+              .getState()
+              .updateTab(useTabStore.getState().currentTab, {
+                readonly: false
+              });
+            Navigation.queueRoutesForUpdate();
+            ToastManager.show({
+              heading: "Readonly mode disabled.",
+              type: "success"
+            });
+          }
           break;
         }
 

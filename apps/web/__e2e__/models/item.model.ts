@@ -23,6 +23,7 @@ import { ContextMenuModel } from "./context-menu.model";
 import { NotesViewModel } from "./notes-view.model";
 import { Item } from "./types";
 import { confirmDialog, fillItemDialog } from "./utils";
+import { getTestId } from "../utils";
 
 export class ItemModel extends BaseItemModel {
   private readonly contextMenu: ContextMenuModel;
@@ -35,7 +36,8 @@ export class ItemModel extends BaseItemModel {
     await this.locator.click();
     return new NotesViewModel(
       this.page,
-      this.id === "topic" ? "notebook" : "notes"
+      this.id === "topic" ? "notebook" : "notes",
+      "notes"
     );
   }
 
@@ -53,7 +55,7 @@ export class ItemModel extends BaseItemModel {
     if (deleteContainedNotes)
       await this.page.locator("#deleteContainingNotes").check({ force: true });
 
-    await confirmDialog(this.page);
+    await confirmDialog(this.page.locator(getTestId("confirm-dialog")));
     await this.waitFor("detached");
   }
 

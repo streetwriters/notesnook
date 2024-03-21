@@ -17,75 +17,45 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { ScrollView, View } from "react-native";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
-import Notebook from "../../screens/notebook";
-import { TopicNotes } from "../../screens/notes/topic-notes";
-import {
-  eSendEvent,
-  presentSheet,
-  ToastEvent
-} from "../../services/event-manager";
-import Navigation from "../../services/navigation";
-import { useNotebookStore } from "../../stores/use-notebook-store";
-import { useThemeColors } from "@notesnook/theme";
+import NotebookScreen from "../../screens/notebook";
+import { eSendEvent, presentSheet } from "../../services/event-manager";
+import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
-import { eClearEditor } from "../../utils/events";
+import { Pressable } from "../ui/pressable";
 
 export default function Notebooks({ note, close, full }) {
   const { colors } = useThemeColors();
-  const notebooks = useNotebookStore((state) => state.notebooks);
-  function getNotebooks(item) {
-    let filteredNotebooks = [];
-    const relations = db.relations.to(note, "notebook");
-    filteredNotebooks.push(
-      ...relations.map((notebook) => ({
-        ...notebook,
-        topics: []
-      }))
-    );
-    if (!item.notebooks || item.notebooks.length < 1) return filteredNotebooks;
-
-    for (let notebookReference of item.notebooks) {
-      let notebook = {
-        ...(notebooks.find((item) => item.id === notebookReference.id) || {})
-      };
-      if (notebook.id) {
-        notebook.topics = notebook.topics.filter((topic) => {
-          return notebookReference.topics.findIndex((t) => t === topic.id) > -1;
-        });
-        const index = filteredNotebooks.findIndex(
-          (item) => item.id === notebook.id
-        );
-        if (index > -1) {
-          filteredNotebooks[index].topics = notebook.topics;
-        } else {
-          filteredNotebooks.push(notebook);
-        }
-      }
-    }
-    return filteredNotebooks;
+  async function getNotebooks() {
+    let filteredNotebooks = await db.relations.to(note, "notebook").resolve();
+    return filteredNotebooks || [];
   }
-  const noteNotebooks = getNotebooks(note);
+  const [noteNotebooks, setNoteNotebooks] = useState([]);
+  useEffect(() => {
+    getNotebooks().then((notebooks) => setNoteNotebooks(notebooks));
+  });
 
-  const navigateNotebook = (id) => {
-    let item = db.notebooks.notebook(id)?.data;
+  const navigateNotebook = async (id) => {
+    let item = await db.notebooks.notebook(id);
     if (!item) return;
-    Notebook.navigate(item, true);
+    NotebookScreen.navigate(item, true);
   };
 
-  const navigateTopic = (id, notebookId) => {
-    let item = db.notebooks.notebook(notebookId)?.topics?.topic(id)?._topic;
-    if (!item) return;
-    TopicNotes.navigate(item, true);
-  };
   const renderItem = (item) => (
-    <View
+    <Pressable
       key={item.id}
+      onPress={() => {
+        navigateNotebook(item.id);
+        eSendEvent(eClearEditor);
+        close();
+      }}
+      type={full ? "transparent" : "secondary"}
       style={{
         justifyContent: "flex-start",
         paddingHorizontal: 12,
@@ -94,10 +64,7 @@ export default function Notebooks({ note, close, full }) {
         flexShrink: 1,
         flexGrow: 1,
         padding: 6,
-        borderWidth: full ? 0 : 1,
-        borderColor: colors.primary.background,
         borderRadius: 10,
-        backgroundColor: full ? "transparent" : colors.secondary.background,
         minHeight: 42
       }}
     >
@@ -115,65 +82,10 @@ export default function Notebooks({ note, close, full }) {
           maxWidth: "50%"
         }}
         size={SIZE.sm}
-        onPress={() => {
-          navigateNotebook(item.id);
-          eSendEvent(eClearEditor);
-          close();
-        }}
       >
         {item.title}
       </Heading>
-
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        style={{
-          flexDirection: "row",
-          marginLeft: 8,
-          borderLeftColor: colors.primary.hover,
-          borderLeftWidth: 1,
-          paddingLeft: 8
-        }}
-      >
-        {item.topics.map((topic) => (
-          <Button
-            key={topic.id}
-            onPress={() => {
-              navigateTopic(topic.id, item.id);
-              eSendEvent(eClearEditor);
-              close();
-            }}
-            onLongPress={async () => {
-              await db.notes.removeFromNotebook(
-                {
-                  id: item.id,
-                  topic: topic.id
-                },
-                note
-              );
-              useNotebookStore.getState().setNotebooks();
-              Navigation.queueRoutesForUpdate();
-              ToastEvent.show({
-                heading: "Note removed from topic",
-                context: "local",
-                type: "success"
-              });
-            }}
-            title={topic.title}
-            type="gray"
-            height={30}
-            fontSize={SIZE.xs}
-            icon="bookmark-outline"
-            style={{
-              marginRight: 5,
-              borderRadius: 100,
-              paddingHorizontal: 8
-            }}
-          />
-        ))}
-        <View style={{ width: 10 }} />
-      </ScrollView>
-    </View>
+    </Pressable>
   );
 
   return noteNotebooks.length === 0 ? null : (
@@ -190,7 +102,7 @@ export default function Notebooks({ note, close, full }) {
 
       {noteNotebooks.length > 1 && !full ? (
         <Button
-          title={`See all linked notebooks`}
+          title={`View all linked notebooks`}
           fontSize={SIZE.xs}
           style={{
             alignSelf: "flex-end",
@@ -198,7 +110,7 @@ export default function Notebooks({ note, close, full }) {
             paddingHorizontal: 0,
             backgroundColor: "transparent"
           }}
-          type="gray"
+          type="plain"
           textStyle={{
             textDecorationLine: "underline"
           }}

@@ -24,8 +24,12 @@ import {
   PopupPresenterProps,
   PopupPresenter
 } from "@notesnook/ui";
-import ReactDOM from "react-dom";
-import { getPopupContainer, getToolbarElement } from "../../toolbar/utils/dom";
+import {
+  getPopupContainer,
+  getPopupRoot,
+  getToolbarElement,
+  unmountPopupRoot
+} from "../../toolbar/utils/dom";
 import {
   useIsMobile,
   useToolbarStore
@@ -57,7 +61,9 @@ export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
       position={position}
       blocking
       focusOnRender
+      className={isMobile ? "editor-mobile-toolbar-popup" : undefined}
       isMobile={isMobile}
+      container={getPopupContainer()}
       {...presenterProps}
       isOpen={isPopupOpen}
     >
@@ -117,10 +123,10 @@ export function showPopup(options: ShowPopupOptions) {
   const { popup, ...props } = options;
 
   function hide() {
-    ReactDOM.unmountComponentAtNode(getPopupContainer());
+    unmountPopupRoot();
   }
 
-  ReactDOM.render(
+  getPopupRoot().render(
     <ResponsivePresenter
       isOpen
       position={{
@@ -132,6 +138,7 @@ export function showPopup(options: ShowPopupOptions) {
       }}
       blocking
       focusOnRender
+      container={getPopupContainer()}
       {...props}
       onClose={() => {
         hide();
@@ -139,8 +146,7 @@ export function showPopup(options: ShowPopupOptions) {
       }}
     >
       {popup(hide)}
-    </ResponsivePresenter>,
-    getPopupContainer()
+    </ResponsivePresenter>
   );
 
   return hide;

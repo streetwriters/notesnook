@@ -55,7 +55,10 @@ const SheetProvider = ({ context = "global" }) => {
     async (payload) => {
       if (!payload.context) payload.context = "global";
       if (payload.context !== context) return;
-      setData(payload);
+      setData((state) => {
+        if (state?.onClose) state.onClose();
+        return payload;
+      });
       setVisible(true);
       if (payload.editor) {
         editor.current.refocus = false;
@@ -174,7 +177,7 @@ const SheetProvider = ({ context = "global" }) => {
           data.valueArray.map((v) => (
             <Button
               title={v}
-              type="gray"
+              type="plain"
               key={v}
               textStyle={{ fontWeight: "normal" }}
               fontSize={SIZE.sm}

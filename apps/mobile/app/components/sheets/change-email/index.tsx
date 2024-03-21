@@ -24,7 +24,7 @@ import {
   eSendEvent,
   presentSheet,
   PresentSheetOptions,
-  ToastEvent
+  ToastManager
 } from "../../../services/event-manager";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
@@ -87,7 +87,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
         );
         eSendEvent(eUserLoggedIn);
         close?.();
-        ToastEvent.show({
+        ToastManager.show({
           heading: `Email changed`,
           message: `Your account email has been updated to ${emailChangeData.current.email}`,
           type: "success",
@@ -96,7 +96,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
       }
     } catch (e) {
       setLoading(false);
-      ToastEvent.error(e as Error);
+      ToastManager.error(e as Error);
     }
   };
 

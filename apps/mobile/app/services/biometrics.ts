@@ -25,7 +25,8 @@ import * as Keychain from "react-native-keychain";
 import { MMKV } from "../common/database/mmkv";
 import Storage from "../common/database/storage";
 import { useSettingStore } from "../stores/use-setting-store";
-import { ShowToastEvent, ToastEvent } from "./event-manager";
+import { ToastOptions, ToastManager } from "./event-manager";
+import { useUserStore } from "../stores/use-user-store";
 
 const KeychainConfig = Platform.select({
   ios: {
@@ -74,13 +75,13 @@ async function getCredentials(title?: string, description?: string) {
 
     const options = Platform.select({
       ios: {
-        fallbackEnabled: true,
+        fallbackEnabled: false,
         description: description
       },
       android: {
         title: title,
         description: description,
-        deviceCredentialAllowed: true
+        deviceCredentialAllowed: false
       }
     });
     await FingerprintScanner.authenticate(options as AuthenticateIOS);
@@ -93,7 +94,7 @@ async function getCredentials(title?: string, description?: string) {
     const e = error as { name: string };
     useSettingStore.getState().setRequestBiometrics(false);
     FingerprintScanner.release();
-    let message: ShowToastEvent = {
+    let message: ToastOptions = {
       heading: "Authentication with biometrics failed.",
       message: 'Tap "Biometric Unlock" to try again.',
       type: "error",
@@ -115,40 +116,52 @@ async function getCredentials(title?: string, description?: string) {
       };
     }
 
-    setTimeout(() => ToastEvent.show(message), 1000);
+    setTimeout(() => ToastManager.show(message), 1000);
     return null;
   }
 }
 
 async function validateUser(title: string, description?: string) {
   try {
+    useUserStore.setState({
+      disableAppLockRequests: true
+    });
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
     await FingerprintScanner.authenticate(
       Platform.select({
         ios: {
-          fallbackEnabled: true,
+          fallbackEnabled: false,
           description: title
         },
         android: {
           title: title,
           description: description,
-          deviceCredentialAllowed: true
+          deviceCredentialAllowed: false
         }
       }) as AuthenticateIOS
     );
+    useUserStore.setState({
+      disableAppLockRequests: false
+    });
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
     FingerprintScanner.release();
     return true;
   } catch (error) {
     const e = error as { name: string };
+    useUserStore.setState({
+      disableAppLockRequests: false
+    });
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
     FingerprintScanner.release();
     if (e.name === "DeviceLocked") {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Biometrics authentication failed.",
         message: "Wait 30 seconds to try again.",
         type: "error",
         context: "local"
       });
     } else {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Authentication failed.",
         message: "Tap to try again.",
         type: "error",

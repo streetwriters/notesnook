@@ -36,46 +36,61 @@ function isDocumentHidden() {
     : document.hidden;
 }
 
+export function onNetworkStatusChanged(
+  handler: (status: "online" | "offline") => void
+) {
+  const onlineListener = debounce((_) => handler("online"), 1000);
+  const offlineListener = debounce((_) => handler("online"), 1000);
+  window.addEventListener("online", onlineListener);
+  window.addEventListener("offline", offlineListener);
+
+  return () => {
+    window.removeEventListener("online", onlineListener);
+    window.removeEventListener("offline", offlineListener);
+  };
+}
+
 export function onPageVisibilityChanged(
   handler: (
-    status: "online" | "offline" | "visibilitychange" | "focus",
-    bool: boolean
+    status: "visibilitychange" | "focus" | "blur",
+    isDocumentHidden: boolean
   ) => void
 ) {
-  window.addEventListener(
-    "online",
-    debounce((_) => {
-      handler("online", false);
-    }, 1000)
-  );
-  window.addEventListener(
-    "offline",
-    debounce((_) => {
-      handler("offline", false);
-    }, 1000)
-  );
+  const onVisibilityChanged = debounce((_) => {
+    if (isEventIgnored()) return;
 
-  // Handle page visibility change
-  document.addEventListener(
-    visibilityChange(),
-    debounce((_) => {
-      if (PAGE_VISIBILITY_CHANGE.ignore) {
-        PAGE_VISIBILITY_CHANGE.ignore = false;
-        return;
-      }
-      handler("visibilitychange", isDocumentHidden());
-    }, 1000)
-  );
+    handler("visibilitychange", isDocumentHidden());
+  }, 1000);
 
-  window.addEventListener(
-    "focus",
-    debounce((_) => {
-      if (!window.document.hasFocus()) return;
-      if (PAGE_VISIBILITY_CHANGE.ignore) {
-        PAGE_VISIBILITY_CHANGE.ignore = false;
-        return;
-      }
-      handler("focus", false);
-    }, 1000)
-  );
+  const onFocus = debounce((_) => {
+    if (isEventIgnored()) return;
+
+    if (!window.document.hasFocus()) return;
+    handler("focus", isDocumentHidden());
+  }, 1000);
+
+  const onBlur = debounce((_) => {
+    if (isEventIgnored()) return;
+
+    if (window.document.hasFocus()) return;
+    handler("blur", isDocumentHidden());
+  }, 1000);
+
+  document.addEventListener(visibilityChange(), onVisibilityChanged);
+  window.addEventListener("focus", onFocus);
+  window.addEventListener("blur", onBlur);
+
+  return () => {
+    document.removeEventListener(visibilityChange(), onVisibilityChanged);
+    window.removeEventListener("focus", onFocus);
+    window.removeEventListener("blur", onBlur);
+  };
+}
+
+function isEventIgnored() {
+  if (PAGE_VISIBILITY_CHANGE.ignore) {
+    PAGE_VISIBILITY_CHANGE.ignore = false;
+    return true;
+  }
+  return false;
 }

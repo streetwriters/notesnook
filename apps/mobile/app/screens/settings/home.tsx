@@ -38,6 +38,7 @@ import { SectionGroup } from "./section-group";
 import { settingsGroups } from "./settings-data";
 import { RouteParams, SettingSection } from "./types";
 import SettingsUserSection from "./user-section";
+import { Header } from "../../components/header";
 const keyExtractor = (item: SettingSection) => item.id;
 
 const Home = ({
@@ -48,9 +49,7 @@ const Home = ({
 
   useNavigationFocus(navigation, {
     onFocus: () => {
-      useNavigationStore.getState().update({
-        name: "Settings"
-      });
+      useNavigationStore.getState().setFocusedRouteId("Settings");
       return false;
     },
     focusOnInit: true
@@ -74,19 +73,17 @@ const Home = ({
   }, []);
 
   return (
-    <DelayLayout delay={300} type="settings">
-      {loading && (
-        //@ts-ignore // Migrate to typescript required.
-        <BaseDialog animated={false} bounce={false} visible={true}>
-          <View
-            style={{
-              width: "100%",
-              height: "100%",
-              backgroundColor: colors.primary.background,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
+    <>
+      <Header
+        renderedInRoute="Settings"
+        title="Settings"
+        canGoBack={false}
+        id="Settings"
+      />
+      <DelayLayout delay={300} type="settings">
+        {loading && (
+          //@ts-ignore // Migrate to typescript required.
+          <BaseDialog animated={false} bounce={false} visible={true}>
             <View
               style={{
                 width: "100%",
@@ -96,45 +93,55 @@ const Home = ({
                 alignItems: "center"
               }}
             >
-              <Heading color={colors.primary.paragraph} size={SIZE.lg}>
-                Logging out
-              </Heading>
-              <Paragraph color={colors.secondary.paragraph}>
-                Please wait while we log out and clear app data.
-              </Paragraph>
               <View
                 style={{
-                  flexDirection: "row",
-                  width: 100,
-                  marginTop: 15
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: colors.primary.background,
+                  justifyContent: "center",
+                  alignItems: "center"
                 }}
               >
-                <ProgressBarComponent
-                  height={5}
-                  width={100}
-                  animated={true}
-                  useNativeDriver
-                  indeterminate
-                  indeterminateAnimationDuration={2000}
-                  unfilledColor={colors.secondary.background}
-                  color={colors.primary.accent}
-                  borderWidth={0}
-                />
+                <Heading color={colors.primary.paragraph} size={SIZE.lg}>
+                  Logging out
+                </Heading>
+                <Paragraph color={colors.secondary.paragraph}>
+                  Please wait while we log out and clear app data.
+                </Paragraph>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    width: 100,
+                    marginTop: 15
+                  }}
+                >
+                  <ProgressBarComponent
+                    height={5}
+                    width={100}
+                    animated={true}
+                    useNativeDriver
+                    indeterminate
+                    indeterminateAnimationDuration={2000}
+                    unfilledColor={colors.secondary.background}
+                    color={colors.primary.accent}
+                    borderWidth={0}
+                  />
+                </View>
               </View>
             </View>
-          </View>
-        </BaseDialog>
-      )}
+          </BaseDialog>
+        )}
 
-      <Animated.FlatList
-        entering={FadeInDown}
-        data={settingsGroups}
-        windowSize={1}
-        keyExtractor={keyExtractor}
-        ListFooterComponent={<View style={{ height: 200 }} />}
-        renderItem={renderItem}
-      />
-    </DelayLayout>
+        <Animated.FlatList
+          entering={FadeInDown}
+          data={settingsGroups}
+          windowSize={1}
+          keyExtractor={keyExtractor}
+          ListFooterComponent={<View style={{ height: 200 }} />}
+          renderItem={renderItem}
+        />
+      </DelayLayout>
+    </>
   );
 };
 

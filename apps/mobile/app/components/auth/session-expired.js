@@ -24,7 +24,7 @@ import { db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
 import BiometricService from "../../services/biometrics";
 import {
-  ToastEvent,
+  ToastManager,
   eSendEvent,
   eSubscribeEvent
 } from "../../services/event-manager";
@@ -91,7 +91,7 @@ export const SessionExpired = () => {
         disableAppLockRequests: false
       });
     } catch (e) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: e.message,
         type: "error",
         context: "local"
@@ -108,9 +108,9 @@ export const SessionExpired = () => {
 
   const open = React.useCallback(async () => {
     try {
-      let res = await db.user.tokenManager.getToken();
+      let res = await db.tokenManager.getToken();
       if (!res) throw new Error("no token found");
-      if (db.user.tokenManager._isTokenExpired(res))
+      if (db.tokenManager._isTokenExpired(res))
         throw new Error("token expired");
       Sync.run("global", false, true, async (complete) => {
         if (!complete) {
@@ -148,6 +148,9 @@ export const SessionExpired = () => {
         animated={false}
         centered={false}
         onShow={async () => {
+          useUserStore.setState({
+            disableAppLockRequests: true
+          });
           await sleep(300);
           passwordInputRef.current?.focus();
           setFocused(true);
@@ -178,7 +181,7 @@ export const SessionExpired = () => {
             }}
           >
             <IconButton
-              customStyle={{
+              style={{
                 width: 60,
                 height: 60
               }}

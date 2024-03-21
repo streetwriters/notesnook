@@ -23,6 +23,7 @@ import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { DatabaseLogger, db } from "../common/database";
 import { IOS_APPGROUPID } from "./constants";
+import { compressToFile } from "../common/filesystem/compress";
 
 const santizeUri = (uri) => {
   uri = decodeURI(uri);
@@ -32,7 +33,7 @@ const santizeUri = (uri) => {
 
 export async function attachFile(uri, hash, type, filename, options) {
   try {
-    let exists = db.attachments.exists(hash);
+    let exists = await db.attachments.exists(hash);
     let encryptionInfo;
     if (options?.hash && options.hash !== hash) return false;
 
@@ -44,11 +45,12 @@ export async function attachFile(uri, hash, type, filename, options) {
         hash: hash,
         appGroupId: options.appGroupId
       });
-      encryptionInfo.type = type;
+      encryptionInfo.mimeType = type;
       encryptionInfo.filename = filename;
       encryptionInfo.alg = "xcha-stream";
       encryptionInfo.size = encryptionInfo.length;
       encryptionInfo.key = key;
+      console.log(encryptionInfo);
       if (options?.reupload && exists) await db.attachments.reset(hash);
     } else {
       encryptionInfo = { hash: hash };
@@ -70,40 +72,44 @@ async function createNotes(bundle) {
   if (!bundle.notebooks || !bundle.notebooks.length) {
     const defaultNotebook = db.settings?.getDefaultNotebook();
     if (defaultNotebook) {
-      if (!defaultNotebook.topic) {
-        db.relations.add(
-          { type: "notebook", id: defaultNotebook.id },
-          { id, type: "note" }
-        );
-      } else {
-        db.notes.addToNotebook(
-          {
-            id: defaultNotebook?.id,
-            topic: defaultNotebook.topic
-          },
-          id
-        );
-      }
+      await db.notes.addToNotebook(defaultNotebook, id);
     }
   } else {
     for (const item of bundle.notebooks) {
-      if (item.type === "notebook") {
-        db.relations.add(item, { id, type: "note" });
-      } else {
-        db.notes.addToNotebook(
-          {
-            id: item.notebookId,
-            topic: item.id
-          },
-          id
-        );
-      }
+      await db.notes.addToNotebook(item, id);
     }
   }
 
+  if (bundle.tags) {
+    for (const tagId of bundle.tags) {
+      await db.relations.add(
+        {
+          type: "tag",
+          id: tagId
+        },
+        {
+          id: id,
+          type: "note"
+        }
+      );
+    }
+  }
+  const compress = bundle.compress;
+
   for (const file of bundle.files) {
-    const uri =
-      Platform.OS === "ios" ? santizeUri(file.value) : `${file.value}`;
+    let uri = Platform.OS === "ios" ? santizeUri(file.value) : `${file.value}`;
+
+    const isPng = /(png)/g.test(file.type);
+    const isJpeg = /(jpeg|jpg)/g.test(file.type);
+
+    if ((isPng || isJpeg) && compress) {
+      console.log(uri, "before compressed");
+      uri = await compressToFile("file://" + uri, isPng ? "PNG" : "JPEG");
+
+      uri = `${uri.replace("file://", "")}`;
+    }
+    console.log(uri, "after compressed");
+
     const hash = await Sodium.hashFile({
       uri: uri,
       type: "cache"
@@ -117,13 +123,12 @@ async function createNotes(bundle) {
 
     if (attached) {
       if (isImage(file.type)) {
-        content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" />`;
+        content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" />`;
       } else {
         content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" /></p>`;
       }
-      const rawContent = await db.content.raw(
-        db.notes.note(id).data?.contentId
-      );
+      const note = await db.notes.note(id);
+      const rawContent = await db.content.get(note?.contentId);
       await db.notes.add({
         id: id,
         content: {

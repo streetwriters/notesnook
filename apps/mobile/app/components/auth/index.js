@@ -59,22 +59,6 @@ const Auth = ({ navigation, route }) => {
         />
       )}
 
-      {/* {initialAuthMode.current === AuthMode.welcomeSignup ? null : (
-        <IconButton
-          name="arrow-left"
-          onPress={() => {
-            hideAuth();
-          }}
-          color={colors.primary.paragraph}
-          customStyle={{
-            position: 'absolute',
-            zIndex: 999,
-            left: 12,
-            top: Platform.OS === 'ios' ? 12 + insets.top : insets.top
-          }}
-        />
-      )} */}
-
       <Toast context="local" />
     </View>
   );

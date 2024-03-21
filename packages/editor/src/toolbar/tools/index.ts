@@ -35,7 +35,7 @@ import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
 import { Alignment } from "./alignment";
 import { Headings } from "./headings";
-import { NumberedList, BulletList, Outdent, Indent } from "./lists";
+import { NumberedList, BulletList, Outdent, Indent, CheckList } from "./lists";
 import { TextDirection } from "./text-direction";
 import { Highlight, TextColor } from "./colors";
 import {
@@ -84,6 +84,7 @@ import {
 } from "./embed";
 import {
   AddLink,
+  AddInternalLink,
   EditLink,
   RemoveLink,
   LinkSettings,
@@ -108,6 +109,7 @@ const tools = {
   subscript: Subscript,
   superscript: Superscript,
   clearformatting: ClearFormatting,
+  addInternalLink: AddInternalLink,
   addLink: AddLink,
   editLink: EditLink,
   removeLink: RemoveLink,
@@ -117,6 +119,7 @@ const tools = {
   insertBlock: InsertBlock,
   numberedList: NumberedList,
   bulletList: BulletList,
+  checkList: CheckList,
   fontSize: FontSize,
   fontFamily: FontFamily,
   headings: Headings,

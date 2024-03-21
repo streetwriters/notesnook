@@ -30,7 +30,6 @@ const ASSET_PATH = process.env.ASSET_PATH || "./public";
 const MANIFEST_VERSION = process.env.MANIFEST_VERSION || "2";
 
 var alias = {
-  "react-dom": "@hot-loader/react-dom",
   react: path.resolve(path.join(__dirname, "node_modules", "react")),
   "@emotion/react": path.resolve(
     path.join(__dirname, "node_modules", "@emotion", "react")

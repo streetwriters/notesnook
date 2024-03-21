@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Flex, Text } from "@theme-ui/components";
 import { useEffect, useRef, useState } from "react";
-import { SelectionBasedReactNodeViewProps } from "../react";
+import { ReactNodeViewProps } from "../react";
 import { Icons } from "../../toolbar";
 import { Icon } from "@notesnook/ui";
 import { WebClipAttributes } from "./web-clip";
@@ -34,9 +34,7 @@ const FAILED_CONTENT = `<html><head>
 </body>
 </html>`;
 
-export function WebClipComponent(
-  props: SelectionBasedReactNodeViewProps<WebClipAttributes>
-) {
+export function WebClipComponent(props: ReactNodeViewProps<WebClipAttributes>) {
   const { editor, selected, node, updateAttributes } = props;
   const [isLoading, setIsLoading] = useState(true);
   const embedRef = useRef<HTMLIFrameElement>(null);
@@ -45,12 +43,14 @@ export function WebClipComponent(
 
   useEffect(() => {
     (async function () {
-      const iframe = embedRef.current;
-      if (!iframe || !iframe.contentDocument || !isLoading) return;
+      if (!isLoading) return;
 
-      const html = await editor.current?.storage
+      const html = await editor.storage
         .getAttachmentData?.(node.attrs)
         .catch(() => null);
+
+      const iframe = embedRef.current;
+      if (!iframe || !iframe.contentDocument) return;
       iframe.contentDocument.open();
       iframe.contentDocument.write(
         typeof html !== "string" || !html ? FAILED_CONTENT : html
@@ -87,12 +87,15 @@ export function WebClipComponent(
   useEffect(() => {
     if (embedRef.current?.contentDocument) {
       resizeObserverRef.current = new ResizeObserver(() => {
-        resizeIframe(node.attrs, embedRef.current);
+        setTimeout(() => resizeIframe(node.attrs, embedRef.current), 100);
       });
       resizeObserverRef.current.observe(
         embedRef.current?.contentDocument?.body
       );
     }
+    return () => {
+      resizeObserverRef.current?.disconnect();
+    };
   }, []);
 
   return (

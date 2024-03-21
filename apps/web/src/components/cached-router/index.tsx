@@ -24,6 +24,7 @@ import useRoutes from "../../hooks/use-routes";
 import RouteContainer from "../route-container";
 import routes from "../../navigation/routes";
 import { Flex } from "@theme-ui/components";
+import { isRouteResult } from "../../navigation/types";
 
 function CachedRouter() {
   const [RouteResult, location] = useRoutes(routes, {
@@ -39,9 +40,10 @@ function CachedRouter() {
     NavigationEvents.publish("onNavigate", RouteResult, location);
   }, [RouteResult, location]);
 
-  if (!RouteResult) return null;
+  if (!RouteResult || !isRouteResult(RouteResult)) return null;
   if (RouteResult.key === "general" || !cachedRoutes.current[RouteResult.key])
-    cachedRoutes.current[RouteResult.key] = RouteResult.component;
+    cachedRoutes.current[RouteResult.key] =
+      RouteResult.component as React.FunctionComponent;
 
   return (
     <RouteContainer
@@ -56,10 +58,11 @@ function CachedRouter() {
           sx={{
             display: key === RouteResult.key ? "flex" : "none",
             flexDirection: "column",
-            flex: 1
+            flex: 1,
+            overflow: "hidden"
           }}
         >
-          <Component key={key} />
+          <Component key={key} {...RouteResult.props} />
         </Flex>
       ))}
     </RouteContainer>

@@ -46,7 +46,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
             title: "Update",
             action: async () => {
               try {
-                window.open(await db.subscriptions?.updateUrl(), "_blank");
+                window.open(await db.subscriptions.updateUrl(), "_blank");
               } catch (e) {
                 if (e instanceof Error) showToast("error", e.message);
               }

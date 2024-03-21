@@ -18,15 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { createContext, useContext, useMemo } from "react";
+import { create } from "zustand";
+import _ThemeDark from "./themes/default-dark.json";
+import _ThemeLight from "./themes/default-light.json";
 import {
-  ThemeDefinition,
   ThemeCompatibilityVersion,
+  ThemeDefinition,
   ThemeScopes,
   VariantsWithStaticColors
 } from "./types";
-import { create } from "zustand";
-import _ThemeLight from "./themes/default-light.json";
-import _ThemeDark from "./themes/default-dark.json";
 import { buildVariants } from "./utils";
 
 const ThemeLight = _ThemeLight as ThemeDefinition;
