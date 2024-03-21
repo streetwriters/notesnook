@@ -40,10 +40,10 @@ export default class Attachments extends Collection {
       async ({ success, filename, groupId, eventData }) => {
         if (!success || !eventData || !eventData.readOnDownload) return;
         const attachment = this.attachment(filename);
-        if (!attachment) return;
+        if (!attachment || !attachment.metadata) return;
 
         const src = await this.read(filename, getOutputType(attachment));
-        if (!src || !attachment.metadata) return;
+        if (!src) return;
 
         EV.publish(EVENTS.mediaAttachmentDownloaded, {
           groupId,
@@ -348,6 +348,7 @@ export default class Attachments extends Collection {
   async downloadMedia(noteId, hashesToLoad) {
     const attachments = this.media.filter(
       (attachment) =>
+        !!attachment.metadata &&
         hasItem(attachment.noteIds, noteId) &&
         (!hashesToLoad || hasItem(hashesToLoad, attachment.metadata?.hash))
     );
@@ -404,23 +405,30 @@ export default class Attachments extends Collection {
   }
 
   get images() {
-    return this.all.filter((attachment) => isImage(attachment.metadata.type));
+    return this.all.filter(
+      (attachment) => attachment.metadata && isImage(attachment.metadata.type)
+    );
   }
 
   get webclips() {
-    return this.all.filter((attachment) => isWebClip(attachment.metadata.type));
+    return this.all.filter(
+      (attachment) => attachment.metadata && isWebClip(attachment.metadata.type)
+    );
   }
 
   get media() {
     return this.all.filter(
       (attachment) =>
-        isImage(attachment.metadata.type) || isWebClip(attachment.metadata.type)
+        attachment.metadata &&
+        (isImage(attachment.metadata.type) ||
+          isWebClip(attachment.metadata.type))
     );
   }
 
   get files() {
     return this.all.filter(
       (attachment) =>
+        attachment.metadata &&
         !isImage(attachment.metadata.type) &&
         !isWebClip(attachment.metadata.type)
     );
