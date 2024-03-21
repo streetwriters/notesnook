@@ -27,7 +27,7 @@ import { useEditorStore } from "./editor-store";
 import { isTelemetryEnabled, setTelemetry } from "../utils/telemetry";
 import { setDocumentTitle } from "../utils/dom";
 import { TimeFormat } from "@notesnook/core/dist/utils/date";
-import { TrashCleanupInterval } from "@notesnook/core";
+import { Profile, TrashCleanupInterval } from "@notesnook/core";
 
 class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
@@ -47,6 +47,7 @@ class SettingStore extends BaseStore<SettingStore> {
   dateFormat = "DD-MM-YYYY";
   timeFormat: TimeFormat = "12-hour";
   titleFormat = "Note $date$ $time$";
+  profile?: Profile;
 
   trashCleanupInterval: TrashCleanupInterval = 7;
   homepage = Config.get("homepage", 0);
@@ -61,6 +62,7 @@ class SettingStore extends BaseStore<SettingStore> {
       timeFormat: db.settings.getTimeFormat(),
       titleFormat: db.settings.getTitleFormat(),
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
+      profile: db.settings.getProfile(),
       isFlatpak: await desktop?.integration.isFlatpak.query(),
       desktopIntegrationSettings:
         await desktop?.integration.desktopIntegration.query(),

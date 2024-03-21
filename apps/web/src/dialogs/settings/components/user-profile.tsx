@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex, Image, Text } from "@theme-ui/components";
 import { Edit, User } from "../../../components/icons";
 import { useStore as useUserStore } from "../../../stores/user-store";
+import { useStore as useSettingStore } from "../../../stores/setting-store";
 import { getObjectIdTimestamp } from "@notesnook/core/dist/utils/object-id";
 import { getFormattedDate } from "@notesnook/common";
 import { SUBSCRIPTION_STATUS } from "../../../common/constants";
@@ -34,7 +35,7 @@ import { showToast } from "../../../utils/toast";
 
 export function UserProfile() {
   const user = useUserStore((store) => store.user);
-  const profile = useUserStore((store) => store.profile);
+  const profile = useSettingStore((store) => store.profile);
 
   const {
     isTrial,
@@ -179,10 +180,10 @@ export function UserProfile() {
                   defaultValue: profile?.fullName
                 });
                 try {
-                  await db.user.setProfile({ fullName: fullName || undefined });
-                  useUserStore.setState({
-                    profile: { ...profile, fullName: fullName || undefined }
+                  await db.settings.setProfile({
+                    fullName: fullName || undefined
                   });
+                  await useSettingStore.getState().refresh();
                   showToast("success", "Full name updated!");
                 } catch (e) {
                   showToast("error", (e as Error).message);

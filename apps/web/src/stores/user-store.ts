@@ -31,7 +31,7 @@ import { hashNavigate } from "../navigation";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
-import { AuthenticatorType, Profile, User } from "@notesnook/core";
+import { AuthenticatorType, User } from "@notesnook/core";
 
 class UserStore extends BaseStore<UserStore> {
   isLoggedIn?: boolean;
@@ -39,7 +39,6 @@ class UserStore extends BaseStore<UserStore> {
   isSigningIn = false;
 
   user?: User = undefined;
-  profile?: Profile;
   counter = 0;
 
   init = () => {
@@ -60,17 +59,12 @@ class UserStore extends BaseStore<UserStore> {
       if (Config.get("sessionExpired")) EV.publish(EVENTS.userSessionExpired);
     });
 
-    db.user.getProfile().then((profile) => this.set({ profile }));
-
     if (Config.get("sessionExpired")) return;
 
     return db.user.fetchUser().then(async (user) => {
       if (!user) return false;
 
-      const profile = await db.user.getProfile();
-
       this.set({
-        profile,
         user,
         isLoggedIn: true
       });
@@ -110,9 +104,8 @@ class UserStore extends BaseStore<UserStore> {
   };
 
   refreshUser = async () => {
-    return db.user.fetchUser().then(async (user) => {
-      const profile = await db.user.getProfile();
-      this.set({ user, profile });
+    return db.user.fetchUser().then((user) => {
+      this.set({ user });
     });
   };
 

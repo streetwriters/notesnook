@@ -26,8 +26,8 @@ import { User } from "../components/icons";
 import { useRef, useState } from "react";
 import { showFilePicker } from "../utils/file-picker";
 import { db } from "../common/db";
-import { useStore as useUserStore } from "../stores/user-store";
 import { showToast } from "../utils/toast";
+import { useStore as useSettingStore } from "../stores/setting-store";
 
 export type EditProfilePictureDialogProps = {
   onClose: Perform;
@@ -66,12 +66,10 @@ export default function EditProfilePictureDialog(
               : clearProfilePicture
               ? undefined
               : profile?.profilePicture;
-            await db.user.setProfile({
+            await db.settings.setProfile({
               profilePicture: pic
             });
-            useUserStore.setState({
-              profile: { ...profile, profilePicture: pic }
-            });
+            await useSettingStore.getState().refresh();
             showToast("success", "Profile updated!");
             props.onClose(true);
           } catch (e) {

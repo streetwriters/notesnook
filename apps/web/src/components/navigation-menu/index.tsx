@@ -47,6 +47,7 @@ import { showRenameColorDialog } from "../../common/dialog-controller";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { useStore as useSettingStore } from "../../stores/setting-store";
 import useLocation from "../../hooks/use-location";
 import { FlexScrollContainer } from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
@@ -135,7 +136,7 @@ function NavigationMenu(props: NavigationMenuProps) {
   const shortcuts = useAppStore((store) => store.shortcuts);
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
-  const profile = useUserStore((store) => store.profile);
+  const profile = useSettingStore((store) => store.profile);
   const isMobile = useMobile();
   const theme = useThemeStore((store) => store.colorScheme);
   const toggleNightMode = useThemeStore((store) => store.toggleColorScheme);
