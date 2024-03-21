@@ -55,7 +55,11 @@ export class ChunkedStream extends TransformStream<Uint8Array, Uint8Array> {
         }
       },
       flush(controller) {
-        if (backBuffer) controller.enqueue(backBuffer);
+        if (backBuffer) {
+          const buffer =
+            mode === "copy" ? new Uint8Array(backBuffer) : backBuffer;
+          controller.enqueue(buffer);
+        }
       }
     });
   }
