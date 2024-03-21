@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User, Profile } from "../types";
+import { User } from "../types";
 import http from "../utils/http";
 import constants from "../utils/constants";
 import TokenManager from "./token-manager";
@@ -275,38 +275,18 @@ class UserManager {
     return true;
   }
 
-  private async updateUser(user: User) {
+  private async updateUser(partial: Partial<User>) {
+    const user = await this.getUser();
+    if (!user) return;
+
     const token = await this.tokenManager.getAccessToken();
     await http.patch.json(
       `${constants.API_HOST}${ENDPOINTS.user}`,
-      user,
+      partial,
       token
     );
 
-    await this.setUser(user);
-  }
-
-  async setProfile(profile: Partial<Profile>) {
-    const user = await this.getUser();
-    const key = await this.getEncryptionKey();
-    const userProfile = await this.getProfile();
-    if (!user || !key) return;
-
-    user.profile = await this.db
-      .storage()
-      .encrypt(key, JSON.stringify({ ...userProfile, ...profile }));
-    await this.updateUser(user);
-  }
-
-  async getProfile() {
-    const user = await this.getUser();
-    const key = await this.getEncryptionKey();
-    if (!user || !key || !user.profile) return;
-
-    const profile = JSON.parse(
-      await this.db.storage().decrypt(key, user.profile)
-    );
-    return profile as Profile;
+    await this.setUser({ ...user, ...partial });
   }
 
   async deleteUser(password: string) {
@@ -410,7 +390,7 @@ class UserManager {
           .storage()
           .encrypt(userEncryptionKey, JSON.stringify(key));
 
-        await this.updateUser(user);
+        await this.updateUser({ attachmentsKey: user.attachmentsKey });
         return key;
       }
 
@@ -527,7 +507,7 @@ class UserManager {
       user.attachmentsKey = await this.db
         .storage()
         .encrypt(userEncryptionKey, JSON.stringify(attachmentsKey));
-      await this.updateUser(user);
+      await this.updateUser({ attachmentsKey: user.attachmentsKey });
     }
 
     if (old_password)

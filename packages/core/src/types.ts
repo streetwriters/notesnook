@@ -456,6 +456,7 @@ export type SettingItemMap = {
   timeFormat: TimeFormat;
   dateFormat: string;
   defaultNotebook: string | undefined;
+  profile: Profile | undefined;
 } & Record<`groupOptions:${GroupingKey}`, GroupOptions> &
   Record<`toolbarConfig:${ToolbarConfigPlatforms}`, ToolbarConfig | undefined> &
   Record<`sideBarOrder:${SideBarSection}`, string[]> &
@@ -515,7 +516,6 @@ export type User = {
   isEmailConfirmed: boolean;
   salt: string;
   attachmentsKey?: Cipher<"base64">;
-  profile?: Cipher<"base64">;
   marketingConsent?: boolean;
   mfa: {
     isEnabled: boolean;

@@ -22,6 +22,7 @@ import Database from "../api";
 import {
   GroupOptions,
   GroupingKey,
+  Profile,
   SettingItem,
   SettingItemMap,
   SideBarHideableSection,
@@ -54,6 +55,7 @@ const defaultSettings: SettingItemMap = {
   titleFormat: "Note $date$ $time$",
   defaultNotebook: undefined,
   trashCleanupInterval: 7,
+  profile: undefined,
 
   "groupOptions:trash": DEFAULT_GROUP_OPTIONS("trash"),
   "groupOptions:tags": DEFAULT_GROUP_OPTIONS("tags"),
@@ -194,5 +196,17 @@ export class Settings implements ICollection {
 
   setSideBarHiddenItems(section: SideBarHideableSection, ids: string[]) {
     return this.set(`sideBarHiddenItems:${section}`, ids);
+  }
+
+  getProfile() {
+    return this.get("profile");
+  }
+
+  setProfile(partial: Partial<Profile> | undefined) {
+    const profile =
+      partial === undefined || (!partial.fullName && !partial.profilePicture)
+        ? undefined
+        : { ...this.getProfile(), ...partial };
+    return this.set("profile", profile);
   }
 }
