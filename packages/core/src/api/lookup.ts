@@ -78,6 +78,13 @@ export default class Lookup {
         .groupBy("results.id")
         .orderBy(sql`SUM(results.rank)`, "asc")
         .$if(!!limit, (eb) => eb.limit(limit!))
+
+        // filter out ids that have no note against them
+        .where(
+          "results.id",
+          "in",
+          (notes || this.db.notes.all).filter.select("id")
+        )
         .execute();
       return results.map((r) => r.id);
     }, notes || this.db.notes.all);
