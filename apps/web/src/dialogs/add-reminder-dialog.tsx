@@ -25,6 +25,7 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { db } from "../common/db";
 import { useStore } from "../stores/reminder-store";
+import { useStore as useSettingStore } from "../stores/setting-store";
 import { showToast } from "../utils/toast";
 import { useIsUserPremium } from "../hooks/use-is-user-premium";
 import { Pro } from "../components/icons";
@@ -56,7 +57,9 @@ const RecurringModes = {
   DAY: "day"
 } as const;
 
-const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+let WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEK_DAYS_MON = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
 const modes = [
   {
     id: Modes.ONCE,
@@ -116,6 +119,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
   const [title, setTitle] = useState<string>();
   const [description, setDescription] = useState<string>();
   const refresh = useStore((state) => state.refresh);
+  const weekFromat = useSettingStore((state) => state.weekFormat);
   const isUserPremium = useIsUserPremium();
 
   useEffect(() => {
@@ -141,6 +145,10 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
     setTitle(note.title);
     setDescription(note.headline);
   }, [noteId]);
+
+  useEffect(() => {
+    if (weekFromat === "Mon") WEEK_DAYS = WEEK_DAYS_MON;
+  }, [weekFromat]);
 
   const repeatsDaily =
     (selectedDays.length === 7 && recurringMode === RecurringModes.WEEK) ||
