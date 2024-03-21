@@ -78,7 +78,13 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
         hoverTimeoutId.current = setTimeout(
           () => {
             const PopupHandler = handlers.find((h) => h.isActive(element));
-            if (!PopupHandler || !editor) return;
+            if (
+              !PopupHandler ||
+              !editor ||
+              !editor.view ||
+              editor.view.isDestroyed
+            )
+              return;
 
             const { popup: Popup } = PopupHandler;
 
