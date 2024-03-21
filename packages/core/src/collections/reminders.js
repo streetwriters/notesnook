@@ -223,14 +223,20 @@ export function getUpcomingReminderTime(reminder) {
   const sorted = reminder.selectedDays.sort((a, b) => a - b);
   const lastSelectedDay = sorted[sorted.length - 1];
   if (isWeek) {
-    if (now.day() > lastSelectedDay || isPast)
+    if (
+      now.day() > lastSelectedDay ||
+      (now.day() === lastSelectedDay && isPast)
+    ) {
       return relativeTime.day(sorted[0]).add(1, "week").valueOf();
-    else {
+    } else {
       for (const day of reminder.selectedDays)
         if (now.day() <= day) return relativeTime.day(day).valueOf();
     }
   } else if (isMonth) {
-    if (now.date() > lastSelectedDay || isPast)
+    if (
+      now.date() > lastSelectedDay ||
+      (now.date() === lastSelectedDay && isPast)
+    )
       return relativeTime.date(sorted[0]).add(1, "month").valueOf();
     else {
       for (const day of reminder.selectedDays)
