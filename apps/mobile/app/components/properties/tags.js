@@ -119,7 +119,6 @@ const TagItem = ({ tag, close }) => {
       fontSize={SIZE.xs}
       style={style}
       textStyle={{
-        textDecorationLine: "underline",
         color: colors.secondary.paragraph
       }}
     />

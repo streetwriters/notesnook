@@ -73,7 +73,7 @@ export const Items = ({ item, buttons, close }) => {
         <Icon
           allowFontScaling
           name={item.icon}
-          size={DDS.isTab ? SIZE.xxl : SIZE.lg}
+          size={DDS.isTab ? SIZE.xxl : shouldShrink ? SIZE.xxl : SIZE.lg}
           color={
             item.on
               ? colors.primary.accent
@@ -241,8 +241,8 @@ export const Items = ({ item, buttons, close }) => {
         }}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          gap: 10,
-          paddingRight: 25
+          paddingRight: 25,
+          gap: 5
         }}
       >
         {topBarItems.map(renderTopBarItem)}
