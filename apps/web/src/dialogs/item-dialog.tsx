@@ -20,8 +20,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Box } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
+import { Perform } from "../common/dialog-controller";
+import { useState } from "react";
+import { ErrorText } from "../components/error-text";
 
-function ItemDialog(props) {
+type ItemDialogProps = {
+  title: string;
+  subtitle?: string;
+  onClose: Perform;
+  onAction: (title: string) => Promise<void>;
+  defaultValue?: string;
+};
+function ItemDialog(props: ItemDialogProps) {
+  const [error, setError] = useState<Error>();
+
   return (
     <Dialog
       testId="item-dialog"
@@ -39,10 +51,19 @@ function ItemDialog(props) {
       <Box
         as="form"
         id="itemForm"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          const title = e.target.title.value;
-          props.onAction(title);
+          setError(undefined);
+          const formData = new FormData(e.target as HTMLFormElement);
+          const title = formData.get("title");
+          if (!title) return;
+          try {
+            await props.onAction(title as string);
+          } catch (e) {
+            if (e instanceof Error) {
+              setError(e);
+            }
+          }
         }}
       >
         <Field
@@ -54,6 +75,7 @@ function ItemDialog(props) {
           data-test-id="title-input"
           defaultValue={props.defaultValue}
         />
+        <ErrorText error={error?.message} />
       </Box>
     </Dialog>
   );

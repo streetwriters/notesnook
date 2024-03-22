@@ -365,15 +365,10 @@ export function showCreateTagDialog() {
         perform(false);
       }}
       onAction={async (title: string) => {
-        if (!title) return showToast("error", "Tag title cannot be empty.");
-        try {
-          await db.tags.add({ title });
-          showToast("success", "Tag created!");
-          tagStore.refresh();
-          perform(true);
-        } catch (e) {
-          if (e instanceof Error) showToast("error", e.message);
-        }
+        await db.tags.add({ title });
+        showToast("success", "Tag created!");
+        tagStore.refresh();
+        perform(true);
       }}
     />
   ));
@@ -385,10 +380,8 @@ export function showEditTagDialog(tag: Tag) {
       title={"Edit tag"}
       subtitle={`You are editing #${tag.title}.`}
       defaultValue={tag.title}
-      item={tag}
       onClose={() => perform(false)}
       onAction={async (title: string) => {
-        if (!title) return;
         await db.tags.add({ id: tag.id, title });
         showToast("success", "Tag edited!");
         await tagStore.refresh();
@@ -406,7 +399,6 @@ export function showRenameColorDialog(color: Color) {
     <Dialog
       title={"Rename color"}
       subtitle={`You are renaming color ${color.title}.`}
-      item={color}
       defaultValue={color.title}
       onClose={() => perform(false)}
       onAction={async (title: string) => {
