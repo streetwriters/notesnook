@@ -267,7 +267,7 @@ class Sync {
 
   async stop() {
     // refresh monographs
-    await this.db.monographs.refresh();
+    await this.db.monographs.refresh().catch(console.error);
     // update trash cache
     await this.db.trash.buildCache();
 

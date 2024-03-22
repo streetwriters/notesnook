@@ -104,7 +104,7 @@ export function useAutoUpdater() {
     );
 
     checkingForUpdate();
-    checkForUpdate();
+    checkForUpdate().catch(console.error);
 
     return () => {
       checkingForUpdateEvent.unsubscribe();

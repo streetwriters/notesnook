@@ -309,7 +309,7 @@ class Database {
 
     // we must not wait on network requests that's why
     // no await
-    this.monographs.refresh();
+    this.monographs.refresh().catch(console.error);
   }
 
   disconnectSSE() {
