@@ -197,19 +197,22 @@ export const useActions = ({
       paragraph: "Change the title of the tag " + item.title,
       positivePress: async (value: string) => {
         if (!value || value === "" || value.trimStart().length == 0) return;
+        try {
+          await db.tags.add({
+            id: item.id,
+            title: value
+          });
 
-        await db.tags.add({
-          id: item.id,
-          title: value
-        });
-
-        eSendEvent(Navigation.routeNames.TaggedNotes);
-        InteractionManager.runAfterInteractions(() => {
-          useTagStore.getState().refresh();
-          useMenuStore.getState().setMenuPins();
-          Navigation.queueRoutesForUpdate();
-          useRelationStore.getState().update();
-        });
+          eSendEvent(Navigation.routeNames.TaggedNotes);
+          InteractionManager.runAfterInteractions(() => {
+            useTagStore.getState().refresh();
+            useMenuStore.getState().setMenuPins();
+            Navigation.queueRoutesForUpdate();
+            useRelationStore.getState().update();
+          });
+        } catch (e) {
+          ToastManager.error(e as Error, undefined, "local");
+        }
       },
       input: true,
       defaultValue: item.title,
