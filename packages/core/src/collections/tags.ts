@@ -49,18 +49,16 @@ export class Tags implements ICollection {
     return this.all.find((eb) => eb.and([eb("title", "==", title)]));
   }
 
-  async add(item: Partial<Tag>) {
-    item.title = item.title ? Tags.sanitize(item.title) : item.title;
+  async add(item: Partial<Tag> & { title: string }) {
+    item.title = Tags.sanitize(item.title);
 
     const id = item.id || getId();
-    const oldTag = item.id
-      ? await this.tag(item.id)
-      : item.title
-      ? await this.find(item.title)
-      : undefined;
+    const oldTag = item.id ? await this.tag(item.id) : undefined;
 
-    if (!item.title && !oldTag?.title) throw new Error("Title is required.");
     if (oldTag && item.title === oldTag.title) return oldTag.id;
+
+    if (await this.find(item.title))
+      throw new Error("Tag with this title already exists.");
 
     await this.collection.upsert({
       id,

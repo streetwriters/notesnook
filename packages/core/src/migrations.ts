@@ -21,7 +21,7 @@ import { parseHTML } from "./utils/html-parser";
 import { decodeHTML5 } from "entities";
 import { CURRENT_DATABASE_VERSION } from "./common";
 import Database from "./api";
-import { getId, makeId } from "./utils/id";
+import { makeId } from "./utils/id";
 import {
   Color,
   ContentItem,
