@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import { TaggedNotes } from "../../screens/notes/tagged";
@@ -68,26 +68,38 @@ export const Tags = ({ item, close }) => {
 };
 
 export const TagStrip = ({ item, close }) => {
-  return item.tags?.length > 0 ? (
+  const [tags, setTags] = useState([]);
+
+  useEffect(() => {
+    db.relations
+      .to(item, "tag")
+      .resolve()
+      .then((tags) => {
+        setTags(tags);
+      });
+  });
+
+  return tags?.length > 0 ? (
     <View
       style={{
         flexDirection: "row",
         flexWrap: "wrap",
-        alignItems: "center"
+        alignItems: "center",
+        marginTop: 10,
+        gap: 5
       }}
     >
-      {item.tags.map((tag) =>
-        tag ? <TagItem key={tag} tag={tag} close={close} /> : null
+      {tags?.map((tag) =>
+        tag ? <TagItem key={tag.id} tag={tag} close={close} /> : null
       )}
     </View>
   ) : null;
 };
 
 const TagItem = ({ tag, close }) => {
+  const { colors } = useThemeColors();
   const onPress = async () => {
-    let tags = db.tags.all;
-    let _tag = tags.find((t) => t.title === tag);
-    TaggedNotes.navigate(_tag, true);
+    TaggedNotes.navigate(tag, true);
     await sleep(300);
     close();
   };
@@ -95,20 +107,20 @@ const TagItem = ({ tag, close }) => {
   const style = {
     paddingHorizontal: 0,
     borderRadius: 100,
-    marginRight: 10,
     marginTop: 0,
     backgroundColor: "transparent"
   };
   return (
     <Button
       onPress={onPress}
-      title={"#" + tag}
-      type="secondary"
+      title={"#" + tag.title}
+      type="plain"
       height={20}
       fontSize={SIZE.xs}
       style={style}
       textStyle={{
-        textDecorationLine: "underline"
+        textDecorationLine: "underline",
+        color: colors.secondary.paragraph
       }}
     />
   );
