@@ -203,10 +203,7 @@ export class Settings implements ICollection {
   }
 
   setProfile(partial: Partial<Profile> | undefined) {
-    const profile =
-      partial === undefined || (!partial.fullName && !partial.profilePicture)
-        ? undefined
-        : { ...this.getProfile(), ...partial };
+    const profile = !partial ? undefined : { ...this.getProfile(), ...partial };
     return this.set("profile", profile);
   }
 }
