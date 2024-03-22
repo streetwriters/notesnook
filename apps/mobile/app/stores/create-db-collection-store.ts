@@ -21,6 +21,8 @@ import { Item, VirtualizedGrouping } from "@notesnook/core";
 import create, { State, StoreApi, UseBoundStore } from "zustand";
 import { resolveItems } from "@notesnook/common";
 import { useSettingStore } from "./use-setting-store";
+import { DatabaseLogger } from "../common/database";
+import { ToastManager } from "../services/event-manager";
 
 export interface DBCollectionStore<Type extends Item> extends State {
   items: VirtualizedGrouping<Type> | undefined;
@@ -55,14 +57,21 @@ export default function createDBCollectionStore<Type extends Item>({
     items: undefined,
     loading: true,
     refresh: async () => {
-      const items = await getCollection();
-      if (get().loading && eagerlyFetchFirstBatch) {
-        await items.item(0, resolveItems);
+      try {
+        const items = await getCollection();
+        if (get().loading && eagerlyFetchFirstBatch) {
+          await items.item(0, resolveItems);
+        }
+        set({
+          items,
+          loading: false
+        });
+      } catch (e) {
+        DatabaseLogger.error(e as Error, "useDBCollectionStore.refresh", {
+          useDBCollectionStore: "refresh"
+        });
+        ToastManager.error(e as Error, "Failed to load items");
       }
-      set({
-        items,
-        loading: false
-      });
     },
     clear: () => set({ items: undefined, loading: true })
   }));
