@@ -45,8 +45,8 @@ const IGNORED_NATIVE_PACKAGES = [
   "canvas",
   // optional dependency only used on Node.js platform
   "@azure/msal-node-runtime",
-  // no need to rebuild esbuild (it already has prebuilt binaries)
-  "esbuild"
+  // not needed on mobile
+  ...(args.scope === "mobile" ? ["esbuild"] : [])
 ];
 
 if (args.scope && !scopes[args.scope])
