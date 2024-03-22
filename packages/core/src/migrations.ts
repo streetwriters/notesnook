@@ -235,6 +235,8 @@ const migrations: Migration[] = [
           if (newTag) return "skip";
         }
 
+        // there's a case where dateCreated is null in tags
+        item.dateCreated = item.dateCreated || Date.now();
         item.title = alias || item.title;
         item.id = getId(item.dateCreated);
 
