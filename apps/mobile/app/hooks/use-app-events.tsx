@@ -309,6 +309,9 @@ export const useAppEvents = () => {
     initAfterSync();
     setLastSynced(await db.lastSynced());
     eSendEvent(eCloseSheet, "sync_progress");
+    useUserStore.setState({
+      profile: db.settings.getProfile()
+    });
   }, [setLastSynced]);
 
   useEffect(() => {
@@ -390,7 +393,7 @@ export const useAppEvents = () => {
         setUser(user);
 
         useUserStore.setState({
-          profile: await db.user.getProfile()
+          profile: db.settings.getProfile()
         });
 
         if (SettingsService.get().sessionExpired) {

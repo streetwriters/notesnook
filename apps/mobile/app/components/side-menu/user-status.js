@@ -34,8 +34,6 @@ import { Pressable } from "../ui/pressable";
 import { TimeSince } from "../ui/time-since";
 import Paragraph from "../ui/typography/paragraph";
 
-const PROFILE_PIC_URL = `https://picsum.photos/id/177/367/267`;
-
 export const UserStatus = () => {
   const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);

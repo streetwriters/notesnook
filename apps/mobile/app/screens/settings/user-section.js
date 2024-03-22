@@ -75,11 +75,11 @@ const ProfilePicPlaceholder = () => {
           cropperToolbarWidgetColor: theme.scopes.base.primary.icon
         }).then(async (image) => {
           if (!image.data) return;
-          await db.user.setProfile({
+          await db.settings.setProfile({
             profilePicture: "data:image/jpeg;base64," + image.data
           });
           useUserStore.setState({
-            profile: await db.user.getProfile()
+            profile: db.settings.getProfile()
           });
         });
       }}
@@ -181,13 +181,13 @@ const SettingsUserSection = ({ item }) => {
                         inputPlaceholder: "Enter your full name",
                         defaultValue: userProfile?.fullName,
                         positivePress: async (value) => {
-                          db.user
+                          db.settings
                             .setProfile({
                               fullName: value
                             })
                             .then(async () => {
                               useUserStore.setState({
-                                profile: await db.user.getProfile()
+                                profile: db.settings.getProfile()
                               });
                             });
                         }

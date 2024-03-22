@@ -147,13 +147,13 @@ export const settingsGroups: SettingSection[] = [
                   "Are you sure you want to remove your profile picture?",
                 positiveText: "Remove",
                 positivePress: async () => {
-                  db.user
+                  db.settings
                     .setProfile({
                       profilePicture: undefined
                     })
                     .then(async () => {
                       useUserStore.setState({
-                        profile: await db.user.getProfile()
+                        profile: db.settings.getProfile()
                       });
                     });
                 }
@@ -172,13 +172,13 @@ export const settingsGroups: SettingSection[] = [
                 paragraph: "Are you sure you want to remove your name?",
                 positiveText: "Remove",
                 positivePress: async () => {
-                  db.user
+                  db.settings
                     .setProfile({
                       fullName: undefined
                     })
                     .then(async () => {
                       useUserStore.setState({
-                        profile: await db.user.getProfile()
+                        profile: db.settings.getProfile()
                       });
                     });
                 }
