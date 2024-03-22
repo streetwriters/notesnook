@@ -27,6 +27,7 @@ import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { eOnNotebookUpdated, eUpdateNoteInEditor } from "./events";
 import { getParentNotebookId } from "./notebooks";
+import { useTagStore } from "../stores/use-tag-store";
 
 function confirmDeleteAllNotes(items, type, context) {
   return new Promise((resolve) => {
@@ -110,6 +111,20 @@ export const deleteItems = async (items, type, context) => {
       await deleteNotebook(id, result.deleteNotes);
       eSendEvent(eOnNotebookUpdated, await getParentNotebookId(id));
     }
+  } else if (type === "tag") {
+    presentDialog({
+      title: `Delete ${ids.length} ${ids.length > 1 ? "tags" : "tag"}?`,
+      positiveText: "Delete",
+      negativeText: "Cancel",
+      paragraph: "Are you sure you want to delete these tags?",
+      positivePress: async () => {
+        await db.tags.remove(...ids);
+        useTagStore.getState().refresh();
+        useRelationStore.getState().update();
+      },
+      context: context
+    });
+    return;
   }
 
   let message = `${ids.length} ${
