@@ -52,7 +52,7 @@ export class Tags implements ICollection {
   async add(item: Partial<Tag>) {
     item.title = item.title ? Tags.sanitize(item.title) : item.title;
 
-    const id = item.id || getId(item.dateCreated);
+    const id = item.id || getId();
     const oldTag = item.id
       ? await this.tag(item.id)
       : item.title

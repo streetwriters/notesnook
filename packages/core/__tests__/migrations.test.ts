@@ -326,7 +326,8 @@ describe.concurrent("[5.9] make tags syncable", () => {
         title: "oldone"
       };
       expect(await migrateItem(tag, 5.9, 6.0, "tag", db, "backup")).toBe(true);
-      expect(tag.id).not.toBe(makeId("oldone"));
+      expect(tag.id).toBe(makeId("oldone"));
+      expect(tag.dateCreated).toBeGreaterThan(0);
       expect(tag.noteIds).toBeUndefined();
       expect(tag.alias).toBeUndefined();
       expect(tag.title).toBe("oldone");

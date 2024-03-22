@@ -238,7 +238,7 @@ const migrations: Migration[] = [
         // there's a case where dateCreated is null in tags
         item.dateCreated = item.dateCreated || Date.now();
         item.title = alias || item.title;
-        item.id = getId(item.dateCreated);
+        item.id = makeId(item.title);
 
         delete item.localOnly;
         delete item.noteIds;
@@ -257,6 +257,9 @@ const migrations: Migration[] = [
           const newTagId =
             newTag?.id ||
             (await db.tags.add({
+              // IMPORTANT: the id must be deterministic to avoid creating
+              // duplicate colors when migrating on different devices
+              id: makeId(alias || tag),
               dateCreated: oldTag?.dateCreated,
               dateModified: oldTag?.dateModified,
               title: alias || tag,
@@ -278,6 +281,9 @@ const migrations: Migration[] = [
           const newColorId =
             newColor?.id ||
             (await db.colors.add({
+              // IMPORTANT: the id must be deterministic to avoid creating
+              // duplicate colors when migrating on different devices
+              id: makeId(alias || item.color),
               dateCreated: oldColor?.dateCreated,
               dateModified: oldColor?.dateModified,
               title: alias || item.color,
