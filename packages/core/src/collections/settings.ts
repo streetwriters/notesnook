@@ -76,6 +76,13 @@ const defaultSettings: SettingItemMap = {
   "sideBarHiddenItems:colors": []
 };
 
+// since setting keys are static, we can calculate ids for them
+// once instead of on each get/set. This can be further optimized
+// by generating the ids at build time.
+const KEY_IDS = Object.fromEntries(
+  Object.keys(defaultSettings).map((key) => [key, makeId(key)])
+) as Record<keyof SettingItemMap, string>;
+
 export class Settings implements ICollection {
   name = "settings";
   readonly collection: SQLCachedCollection<"settings", SettingItem>;
@@ -93,15 +100,11 @@ export class Settings implements ICollection {
     return this.collection.init();
   }
 
-  // get raw() {
-  //   return this.collection.raw();
-  // }
-
   private async set<TKey extends keyof SettingItemMap>(
     key: TKey,
     value: SettingItemMap[TKey]
   ) {
-    const id = makeId(key);
+    const id = KEY_IDS[key];
     const oldItem = this.collection.get(id);
     if (oldItem && oldItem.key !== key) throw new Error("Key conflict.");
 
@@ -119,7 +122,7 @@ export class Settings implements ICollection {
   private get<TKey extends keyof SettingItemMap>(
     key: TKey
   ): SettingItemMap[TKey] {
-    const item = this.collection.get(makeId(key)) as
+    const item = this.collection.get(KEY_IDS[key]) as
       | SettingItem<TKey>
       | undefined;
     if (!item || item.key !== key) return defaultSettings[key];
