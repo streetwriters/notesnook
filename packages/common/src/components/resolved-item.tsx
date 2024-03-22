@@ -34,6 +34,6 @@ export function ResolvedItem<TItemType extends ItemType>(
   props: ResolvedItemProps<TItemType>
 ) {
   const { children } = props;
-  const result = useResolvedItem(props);
-  return result ? <>{children(result)}</> : null;
+  const { item, data } = useResolvedItem(props) || {};
+  return item ? <>{children({ item, data })}</> : null;
 }
