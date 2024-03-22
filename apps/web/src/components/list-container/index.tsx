@@ -37,7 +37,6 @@ import {
   Virtuoso,
   VirtuosoHandle
 } from "react-virtuoso";
-import Skeleton from "react-loading-skeleton";
 import { useResolvedItem } from "@notesnook/common";
 import { Context } from "./types";
 
@@ -261,39 +260,77 @@ function ItemRenderer({
   if (!resolvedItem || !resolvedItem.item) {
     if (compact)
       return (
-        <Box key="list-item-skeleton" sx={{ py: 1, px: 1 }}>
-          <Skeleton enableAnimation={false} height={12} width={`50%`} />
-        </Box>
-      );
-    return (
-      <Box key="list-item-skeleton" sx={{ py: 2, px: 1 }}>
-        <Skeleton
-          enableAnimation={false}
-          height={16}
-          width={`50%`}
-          style={{ marginBottom: 5 }}
+        <div
+          key="list-item-skeleton"
+          style={{
+            padding: 5,
+            height: 12,
+            width: "50%",
+            backgroundColor: "var(--background-secondary)"
+          }}
         />
-        <Skeleton height={12} count={2} />
-        <Flex>
-          <Skeleton enableAnimation={false} height={10} inline width={50} />
-          <Skeleton
-            enableAnimation={false}
-            height={10}
-            inline
-            width={10}
-            circle
-            style={{ marginLeft: 5 }}
+      );
+
+    return (
+      <div
+        key="list-item-skeleton"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          paddingTop: 10,
+          paddingBottom: 10,
+          paddingLeft: 5,
+          paddingRight: 5,
+          gap: 5
+        }}
+      >
+        <div
+          style={{
+            height: 16,
+            width: "50%",
+            backgroundColor: "var(--background-secondary)"
+          }}
+        />
+        <div
+          style={{
+            height: 12,
+            width: "100%",
+            backgroundColor: "var(--background-secondary)"
+          }}
+        />
+        <div
+          style={{
+            height: 12,
+            width: "100%",
+            backgroundColor: "var(--background-secondary)"
+          }}
+        />
+        <div style={{ display: "flex", gap: 5 }}>
+          <span
+            style={{
+              height: 10,
+              width: "50px",
+              backgroundColor: "var(--background-secondary)"
+            }}
           />
-          <Skeleton
-            enableAnimation={false}
-            height={10}
-            inline
-            width={10}
-            circle
-            style={{ marginLeft: 5 }}
+          <span
+            style={{
+              height: 10,
+              width: 10,
+              borderRadius: 50,
+              backgroundColor: "var(--background-secondary)"
+            }}
           />
-        </Flex>
-      </Box>
+          <span
+            style={{
+              height: 10,
+              width: 10,
+              borderRadius: 50,
+              backgroundColor: "var(--background-secondary)"
+            }}
+          />
+        </div>
+      </div>
     );
   }
 
