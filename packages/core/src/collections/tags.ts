@@ -23,6 +23,7 @@ import Database from "../api";
 import { ICollection } from "./collection";
 import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
+import { sql } from "kysely";
 
 export class Tags implements ICollection {
   name = "tags";
@@ -46,7 +47,7 @@ export class Tags implements ICollection {
   }
 
   find(title: string) {
-    return this.all.find((eb) => eb.and([eb("title", "==", title)]));
+    return this.all.find(sql`title == ${title} COLLATE BINARY`);
   }
 
   async add(item: Partial<Tag> & { title: string }) {
