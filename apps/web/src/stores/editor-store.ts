@@ -329,8 +329,8 @@ class EditorStore extends BaseStore<EditorStore> {
 
               if (
                 // when a note is locked or unlocked
-                (session.type === "locked") !==
-                !!event.item.locked
+                (session.type === "locked") !== !!event.item.locked &&
+                (session.type !== "default" || !session.locked)
               ) {
                 openSession(session.id, { force: true, silent: true });
               }
