@@ -25,14 +25,14 @@ import { makeId } from "./utils/id";
 import {
   Color,
   ContentItem,
-  GroupingKey,
   HistorySession,
   Item,
   ItemMap,
   ItemType,
   MaybeDeletedItem,
   ToolbarConfigPlatforms,
-  isDeleted
+  isDeleted,
+  isGroupingKey
 } from "./types";
 import { isCipher } from "./database/crypto";
 import { IndexedCollection } from "./database/indexed-collection";
@@ -390,9 +390,10 @@ const migrations: Migration[] = [
 
         if (item.groupOptions) {
           for (const key in item.groupOptions) {
-            const value = item.groupOptions[key as GroupingKey];
+            if (!isGroupingKey(key)) continue;
+            const value = item.groupOptions[key];
             if (!value) continue;
-            await db.settings.setGroupOptions(key as GroupingKey, value);
+            await db.settings.setGroupOptions(key, value);
           }
         }
         if (item.toolbarConfig) {

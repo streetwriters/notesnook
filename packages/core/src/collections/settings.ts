@@ -105,6 +105,8 @@ export class Settings implements ICollection {
     value: SettingItemMap[TKey]
   ) {
     const id = KEY_IDS[key];
+    if (!id) throw new Error(`Invalid settings key: ${key}.`);
+
     const oldItem = this.collection.get(id);
     if (oldItem && oldItem.key !== key) throw new Error("Key conflict.");
 

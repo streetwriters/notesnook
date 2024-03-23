@@ -40,14 +40,16 @@ export type GroupOptions = SortOptions & {
 
 export type GroupedItems<T> = (T | GroupHeader)[];
 
-export type GroupingKey =
-  | "home"
-  | "notes"
-  | "notebooks"
-  | "tags"
-  | "trash"
-  | "favorites"
-  | "reminders";
+export const GroupingKey = [
+  "home",
+  "notes",
+  "notebooks",
+  "tags",
+  "trash",
+  "favorites",
+  "reminders"
+] as const;
+export type GroupingKey = (typeof GroupingKey)[number];
 
 export type ValueOf<T> = T[keyof T];
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
@@ -550,6 +552,10 @@ export function isTrashItem(item: any): item is TrashItem {
 
 export function isGroupHeader(item: any): item is GroupHeader {
   return item.type === "header";
+}
+
+export function isGroupingKey(key: any): key is GroupingKey {
+  return GroupingKey.includes(key);
 }
 
 export type ContentBlock = {
