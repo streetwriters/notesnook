@@ -572,7 +572,9 @@ function ReorderableList<T extends { id: string }>(
         const overId = over?.id as string;
         if (overId && active.id !== overId) {
           const transitionOrder =
-            order.length === 0 ? orderedItems.map((i) => i.id) : order;
+            order.length === 0 || order.length !== orderedItems.length
+              ? orderedItems.map((i) => i.id)
+              : order;
           const newIndex = transitionOrder.indexOf(overId);
           const oldIndex = transitionOrder.indexOf(active.id as string);
           const newOrder = arrayMove(transitionOrder, oldIndex, newIndex);
