@@ -50,7 +50,9 @@ function Header(props: HeaderProps) {
       if (oldTag) {
         await db.relations.unlink(oldTag, { type: "note", id: noteId });
       } else {
-        const id = await db.tags.add({ title: value });
+        const id =
+          (await db.tags.find(value))?.id ??
+          (await db.tags.add({ title: value }));
         await db.relations.add(
           { id, type: "tag" },
           { type: "note", id: noteId }
