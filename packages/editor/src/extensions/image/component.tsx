@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ThemeUIStyleObject } from "@theme-ui/core";
 import { Box, Flex, Image, Text } from "@theme-ui/components";
 import { ImageAttributes } from "./image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ReactNodeViewProps } from "../react";
 import { DesktopOnly } from "../../components/responsive";
 import { Icon } from "@notesnook/ui";
@@ -54,6 +54,7 @@ export function ImageComponent(
   const [bloburl, setBloburl] = useState<string | undefined>(
     toBlobURL("", "image", mime, hash)
   );
+  const controllerRef = useRef(new AbortController());
 
   const isMobile = useIsMobile();
   const { inView, ref: imageRef } = useObserver<HTMLImageElement>({
@@ -91,9 +92,10 @@ export function ImageComponent(
   }, [inView]);
 
   useEffect(() => {
+    const controller = controllerRef.current;
     return () => {
-      if (!hash) return;
-      revokeBloburl(hash);
+      controller.abort();
+      if (hash) revokeBloburl(hash);
     };
   }, []);
 
@@ -296,8 +298,12 @@ export function ImageComponent(
               );
 
               if (src && !DataURL.isValid(src) && canParse(src)) {
-                const image = await downloadImage(src, downloadOptions);
-                if (!image) return;
+                const image = await downloadImage(src, {
+                  ...downloadOptions,
+                  signal: controllerRef.current.signal
+                }).catch(console.error);
+                if (!image || !imageRef.current) return;
+
                 const { url, size, blob, mimeType } = image;
                 imageRef.current.src = url;
                 const dataurl = await toDataURL(blob);

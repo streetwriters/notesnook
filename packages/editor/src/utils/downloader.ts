@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import DataURL from "@notesnook/core/dist/utils/dataurl";
 
 export type DownloadOptions = {
-  corsHost: string;
+  corsHost?: string;
+  signal?: AbortSignal;
 };
 
 /**
@@ -73,7 +74,8 @@ export async function downloadImage(url: string, options?: DownloadOptions) {
   const response = await fetch(corsifiedURL, {
     mode: "cors",
     credentials: "omit",
-    cache: "force-cache"
+    cache: "force-cache",
+    signal: options?.signal
   });
   if (!response.ok) throw new Error(`invalid status code ${response.status}`);
 
