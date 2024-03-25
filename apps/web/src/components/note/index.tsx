@@ -147,6 +147,9 @@ function Note(props: NoteProps) {
       context={{ color, locked }}
       menuItems={menuItems}
       onClick={() => useEditorStore.getState().openSession(note)}
+      onMiddleClick={() =>
+        useEditorStore.getState().openSession(note, { newSession: true })
+      }
       header={
         <Flex
           sx={{ alignItems: "center", flexWrap: "wrap", gap: 1, mt: "small" }}

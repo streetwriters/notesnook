@@ -453,7 +453,6 @@ function Tab(props: TabProps) {
       }}
       onClick={(e) => {
         e.stopPropagation();
-        console.log(e);
         onFocus();
       }}
       {...listeners}

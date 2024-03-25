@@ -46,6 +46,7 @@ type ListItemProps<TItem extends Item, TContext> = {
 
   onKeyPress?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   onClick?: () => void;
+  onMiddleClick?: () => void;
   onSelect?: () => void;
 
   onDragEnter?: (e: React.DragEvent<HTMLDivElement>) => void;
@@ -178,7 +179,7 @@ function ListItem<TItem extends Item, TContext>(
         },
         ...sx
       }}
-      onKeyPress={(e) => {
+      onKeyUp={(e) => {
         if (e.key !== "Enter") {
           if (props.onKeyPress) props.onKeyPress(e);
         }
@@ -186,6 +187,12 @@ function ListItem<TItem extends Item, TContext>(
       onClick={(e) => {
         if (!e.metaKey && !e.shiftKey && !e.ctrlKey && props.onClick) {
           props.onClick();
+        }
+      }}
+      onMouseDown={(e) => {
+        if (e.button == 1 && props.onMiddleClick) {
+          e.preventDefault();
+          props.onMiddleClick();
         }
       }}
       data-test-id={`list-item`}

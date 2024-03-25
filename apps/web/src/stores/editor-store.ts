@@ -487,7 +487,12 @@ class EditorStore extends BaseStore<EditorStore> {
 
   openSession = async (
     noteOrId: string | Note | BaseTrashItem<Note>,
-    options: { force?: boolean; activeBlockId?: string; silent?: boolean } = {}
+    options: {
+      force?: boolean;
+      activeBlockId?: string;
+      silent?: boolean;
+      newSession?: boolean;
+    } = {}
   ): Promise<void> => {
     const { getSession, openDiffSession } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
@@ -508,7 +513,7 @@ class EditorStore extends BaseStore<EditorStore> {
         ? noteOrId
         : (await db.notes.note(noteId)) || (await db.notes.trashed(noteId));
     if (!note) return;
-    const isPreview = session ? session.preview : true;
+    const isPreview = session ? session.preview : !options?.newSession;
     const isLocked = await db.vaults.itemExists(note);
 
     if (isLocked && note.type !== "trash") {
