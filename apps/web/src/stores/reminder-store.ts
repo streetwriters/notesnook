@@ -101,7 +101,7 @@ function scheduleReminder(id: string, reminder: Reminder, cron: string) {
     if (IS_DESKTOP_APP) {
       const tag = await desktop?.integration.showNotification.query({
         title: reminder.title,
-        body: reminder.description,
+        body: reminder.description ?? "",
         silent: reminder.priority === "silent",
         timeoutType: reminder.priority === "urgent" ? "never" : "default",
         urgency:
