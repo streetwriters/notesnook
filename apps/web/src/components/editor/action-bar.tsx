@@ -448,8 +448,12 @@ function Tab(props: TabProps) {
         e.stopPropagation();
         if (isTemporary) onKeepOpen();
       }}
+      onAuxClick={(e) => {
+        if (e.button == 1) onClose();
+      }}
       onClick={(e) => {
         e.stopPropagation();
+        console.log(e);
         onFocus();
       }}
       {...listeners}
