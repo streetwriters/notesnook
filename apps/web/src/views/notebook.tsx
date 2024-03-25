@@ -42,7 +42,8 @@ import {
   UncontrolledTreeEnvironment,
   Tree,
   TreeItemIndex,
-  TreeEnvironmentRef
+  TreeEnvironmentRef,
+  TreeItem
 } from "react-complex-tree";
 // import "react-complex-tree/lib/style-modern.css";
 import SubNotebook from "../components/sub-notebook";
@@ -77,8 +78,16 @@ function Notebook(props: NotebookProps) {
       return;
     if (!notebookId && !rootId) return;
 
-    console.log("setContext", context, notebookId, rootId);
-    setContext({ type: "notebook", id: notebookId || rootId });
+    Promise.all([
+      !!notebookId && db.notebooks.exists(notebookId),
+      db.notebooks.exists(rootId)
+    ]).then((exists) => {
+      if (exists.every((e) => !e)) {
+        navigate(`/notebooks`, { replace: true });
+        return;
+      }
+      setContext({ type: "notebook", id: notebookId || rootId });
+    });
   }, [rootId, notebookId]);
 
   const toggleCollapse = useCallback((isCollapsed: boolean) => {
@@ -97,7 +106,6 @@ function Notebook(props: NotebookProps) {
     toggleCollapse(isCollapsed);
   }, [isCollapsed, toggleCollapse]);
 
-  console.log(context, rootId, notebookId);
   if (!context || !notes || context.type !== "notebook") return null;
   return (
     <>
@@ -192,7 +200,16 @@ function SubNotebooks({
       !treeRef.current?.items[context.id]
     )
       return;
-    reloadItem.current?.([context.id]);
+    db.notebooks.exists(context.id).then((exists) => {
+      if (!exists) {
+        return navigate(
+          rootId && rootId !== context.id
+            ? `/notebooks/${rootId}`
+            : `/notebooks/`
+        );
+      }
+      reloadItem.current?.([context.id]);
+    });
   }, [contextNotes, context]);
 
   if (!rootId) return null;
@@ -326,32 +343,39 @@ function SubNotebooks({
                   "note"
                 ])
                 .get();
-              return itemIds.filter(Boolean).map((id) => {
+
+              return itemIds.reduce((prev, id) => {
                 if (id === "root") {
-                  return {
+                  prev.push({
                     data: { notebook: { title: "Root" } },
                     index: id,
                     isFolder: true,
                     canMove: false,
                     canRename: false,
                     children: [rootId]
-                  };
+                  });
+                  return prev;
                 }
 
                 const notebook = notebooks[id];
+                if (!notebook) return prev;
+
                 const children = allChildren
                   .filter((r) => r.fromId === id && r.toType === "notebook")
                   .map((r) => r.toId);
                 const totalNotes = allChildren.filter(
                   (r) => r.fromId === id && r.toType === "note"
                 ).length;
-                return {
+
+                prev.push({
                   index: id,
                   data: { notebook, totalNotes },
                   children: children,
                   isFolder: children.length > 0
-                };
-              });
+                });
+
+                return prev;
+              }, [] as TreeItem[]);
             }
           }}
           renderItem={(props) => (
