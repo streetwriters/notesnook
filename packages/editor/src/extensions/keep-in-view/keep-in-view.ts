@@ -74,7 +74,8 @@ export function keepLastLineInView(
   THRESHOLD = 80,
   SCROLL_THRESHOLD = 100
 ) {
-  if (!editor.state.selection.empty) return;
+  if (!editor.view || editor.view.isDestroyed || !editor.state.selection.empty)
+    return;
 
   const isPopupVisible = document.getElementsByClassName(
     "editor-mobile-toolbar-popup"
