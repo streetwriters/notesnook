@@ -237,7 +237,7 @@ export class Notebooks implements ICollection {
   }
 
   exists(id: string) {
-    return this.collection.exists(id);
+    return this.all.has(id);
   }
 
   async moveToTrash(...ids: string[]) {
