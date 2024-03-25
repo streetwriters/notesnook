@@ -28,13 +28,17 @@ type UpdateInfo = { version: string };
 type Progress = { percent: number };
 
 const t = initTRPC.create();
+let cancellationToken: CancellationToken | undefined = undefined;
 
 export const updaterRouter = t.router({
   autoUpdates: t.procedure.query(() => config.automaticUpdates),
   install: t.procedure.query(() => autoUpdater.quitAndInstall()),
   download: t.procedure.query(async () => {
-    const cancellationToken = new CancellationToken();
-    await autoUpdater.downloadUpdate(cancellationToken);
+    if (cancellationToken) return;
+    cancellationToken = new CancellationToken();
+    await autoUpdater
+      .downloadUpdate(cancellationToken)
+      .finally(() => (cancellationToken = undefined));
   }),
   check: t.procedure.query(async () => {
     await autoUpdater.checkForUpdates();
