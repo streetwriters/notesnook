@@ -50,6 +50,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
 
   const onChangeSettings = async () => {
     if (loading) return;
+    if (item.onVerify && !(await item.onVerify())) return;
     if (item.modifer) {
       setLoading(true);
       await item.modifer(item.property || current);
@@ -115,7 +116,6 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             break;
           case "switch":
             {
-              if (item.onVerify && !(await item.onVerify())) return;
               onChangeSettings();
             }
             break;
