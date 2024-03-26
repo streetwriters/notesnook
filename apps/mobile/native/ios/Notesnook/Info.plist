@@ -92,6 +92,7 @@
 	<string>group.org.streetwriters.notesnook</string>
 	<key>UIAppFonts</key>
 	<array>
+		<string>OpenSans-Italic.ttf</string>
 		<string>OpenSans-SemiBold.ttf</string>
 		<string>OpenSans-Regular.ttf</string>
 		<string>MaterialCommunityIcons.ttf</string>

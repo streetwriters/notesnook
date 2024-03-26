@@ -20,7 +20,7 @@ import { Note } from "@notesnook/core";
 import { EVENTS } from "@notesnook/core/dist/common";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
@@ -129,7 +129,9 @@ const TabItemComponent = (props: {
               : colors.primary.paragraph
           }
           style={{
-            fontStyle: props.tab.previewTab ? "italic" : "normal"
+            fontFamily: props.tab.previewTab
+              ? "OpenSans-Italic"
+              : "OpenSans-Regular"
           }}
           numberOfLines={1}
           size={SIZE.md}
