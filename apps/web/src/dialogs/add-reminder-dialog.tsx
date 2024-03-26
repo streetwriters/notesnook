@@ -23,7 +23,7 @@ import Field from "../components/field";
 import { Box, Button, Flex, Label, Radio, Text } from "@theme-ui/components";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { db } from "../common/db";
 import { useStore } from "../stores/reminder-store";
 import { showToast } from "../utils/toast";
@@ -36,13 +36,14 @@ import { PopupPresenter } from "@notesnook/ui";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { getFormattedDate } from "@notesnook/common";
 import { MONTHS_FULL, getTimeFormat } from "@notesnook/core/dist/utils/date";
+import { Note, Reminder } from "@notesnook/core";
 
 dayjs.extend(customParseFormat);
 
 export type AddReminderDialogProps = {
   onClose: Perform;
-  reminderId?: string;
-  noteId?: string;
+  reminder?: Reminder;
+  note?: Note;
 };
 
 type ValueOf<T> = T[keyof T];
@@ -116,48 +117,32 @@ const recurringModes = [
 ];
 
 export default function AddReminderDialog(props: AddReminderDialogProps) {
-  const { reminderId, noteId } = props;
+  const { reminder, note } = props;
 
-  const [selectedDays, setSelectedDays] = useState<number[]>([]);
+  const [selectedDays, setSelectedDays] = useState<number[]>(
+    reminder?.selectedDays ?? []
+  );
   const [recurringMode, setRecurringMode] = useState<
     ValueOf<typeof RecurringModes>
-  >(RecurringModes.DAY);
-  const [mode, setMode] = useState<ValueOf<typeof Modes>>(Modes.ONCE);
+  >(reminder?.recurringMode ?? RecurringModes.DAY);
+  const [mode, setMode] = useState<ValueOf<typeof Modes>>(
+    reminder?.mode ?? Modes.ONCE
+  );
   const [priority, setPriority] = usePersistentState<
     ValueOf<typeof Priorities>
-  >("reminders:default_priority", Priorities.VIBRATE);
-  const [date, setDate] = useState(dayjs());
-  const [title, setTitle] = useState<string>();
-  const [description, setDescription] = useState<string>();
+  >("reminders:default_priority", reminder?.priority ?? Priorities.VIBRATE);
+  const [date, setDate] = useState(dayjs(reminder?.date));
+  const [title, setTitle] = useState<string>(
+    note?.title ?? reminder?.title ?? ""
+  );
+  const [description, setDescription] = useState<string>(
+    note?.headline ?? reminder?.description ?? ""
+  );
   const [showCalendar, setShowCalendar] = useState(false);
   const refresh = useStore((state) => state.refresh);
   const isUserPremium = useIsUserPremium();
   const theme = useThemeStore((store) => store.colorScheme);
   const dateInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (!reminderId) return;
-    db.reminders.reminder(reminderId).then((reminder) => {
-      if (!reminder) return;
-
-      setSelectedDays(reminder.selectedDays || []);
-      setRecurringMode(reminder.recurringMode || RecurringModes.DAY);
-      setMode(reminder.mode || Modes.ONCE);
-      setPriority(reminder.priority || Priorities.VIBRATE);
-      setDate(dayjs(reminder.date));
-      setTitle(reminder.title);
-      setDescription(reminder.description);
-    });
-  }, [reminderId]);
-
-  useEffect(() => {
-    if (!noteId) return;
-    db.notes.note(noteId).then((note) => {
-      if (!note) return;
-      setTitle(note.title);
-      setDescription(note.headline);
-    });
-  }, [noteId]);
 
   const repeatsDaily =
     (selectedDays.length === 7 && recurringMode === RecurringModes.WEEK) ||
@@ -167,12 +152,12 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
   return (
     <Dialog
       isOpen={true}
-      title={reminderId ? "Edit reminder" : "Add a reminder"}
+      title={reminder ? "Edit reminder" : "Add a reminder"}
       testId="add-reminder-dialog"
       onClose={() => props.onClose(false)}
       sx={{ fontFamily: "body" }}
       positiveButton={{
-        text: reminderId ? "Save" : "Add",
+        text: reminder ? "Save" : "Add",
         disabled:
           !title ||
           (mode !== Modes.ONCE &&
@@ -204,7 +189,7 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
           }
 
           const id = await db.reminders.add({
-            id: reminderId,
+            id: reminder?.id,
             recurringMode,
             mode,
             priority,
@@ -216,11 +201,8 @@ export default function AddReminderDialog(props: AddReminderDialogProps) {
             ...(date.isAfter(dayjs()) ? { snoozeUntil: 0 } : {})
           });
 
-          if (id && noteId) {
-            await db.relations.add(
-              { id: noteId, type: "note" },
-              { id, type: "reminder" }
-            );
+          if (id && note) {
+            await db.relations.add(note, { id, type: "reminder" });
           }
 
           refresh();

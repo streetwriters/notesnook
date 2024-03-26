@@ -438,15 +438,18 @@ export function showReminderPreviewDialog(reminder: Reminder) {
   ));
 }
 
-export function showAddReminderDialog(noteId?: string) {
+export async function showAddReminderDialog(noteId?: string) {
+  const note = noteId ? await db.notes.note(noteId) : undefined;
   return showDialog("AddReminderDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} noteId={noteId} />
+    <Dialog onClose={(res: boolean) => perform(res)} note={note} />
   ));
 }
 
-export function showEditReminderDialog(reminderId: string) {
+export async function showEditReminderDialog(reminderId: string) {
+  const reminder = await db.reminders.reminder(reminderId);
+  if (!reminder) return null;
   return showDialog("AddReminderDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} reminderId={reminderId} />
+    <Dialog onClose={(res: boolean) => perform(res)} reminder={reminder} />
   ));
 }
 
