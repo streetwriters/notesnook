@@ -797,7 +797,7 @@ export const useEditor = (
     );
     await commands.setSettings();
 
-    if (!state.current.ready && (await onReady())) {
+    if (!state.current.ready) {
       state.current.ready = true;
     }
 
@@ -810,7 +810,6 @@ export const useEditor = (
       }
     }
   }, [
-    onReady,
     postMessage,
     theme,
     commands,
