@@ -46,6 +46,7 @@ import { createJSONStorage } from "zustand/middleware";
 import { getFormattedHistorySessionDate } from "@notesnook/common";
 import { isCipher } from "@notesnook/core/dist/database/crypto";
 import { hashNavigate } from "../navigation";
+import { AppEventManager, AppEvents } from "../common/app-events";
 
 export enum SaveState {
   NotSaved = -1,
@@ -451,6 +452,12 @@ class EditorStore extends BaseStore<EditorStore> {
       this.updateSession(session.id, [session.type], {
         activeBlockId
       });
+
+    if (session)
+      AppEventManager.publish(
+        AppEvents.revealItemInList,
+        "note" in session ? session.note.id : session.id
+      );
   };
 
   openDiffSession = async (noteId: string, sessionId: string) => {

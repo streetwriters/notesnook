@@ -23,8 +23,9 @@ import { store as selectionStore } from "../../stores/selection-store";
 import useRoutes from "../../hooks/use-routes";
 import RouteContainer from "../route-container";
 import routes from "../../navigation/routes";
-import { Flex } from "@theme-ui/components";
 import { isRouteResult } from "../../navigation/types";
+import { Freeze } from "react-freeze";
+import { Flex } from "@theme-ui/components";
 
 function CachedRouter() {
   const [RouteResult, location] = useRoutes(routes, {
@@ -52,18 +53,19 @@ function CachedRouter() {
       buttons={RouteResult.buttons}
     >
       {Object.entries(cachedRoutes.current).map(([key, Component]) => (
-        <Flex
-          id={key}
-          key={key}
-          sx={{
-            display: key === RouteResult.key ? "flex" : "none",
-            flexDirection: "column",
-            flex: 1,
-            overflow: "hidden"
-          }}
-        >
-          <Component key={key} {...RouteResult.props} />
-        </Flex>
+        <Freeze key={key} freeze={key !== RouteResult.key}>
+          <Flex
+            id={key}
+            key={key}
+            sx={{
+              flexDirection: "column",
+              flex: 1,
+              overflow: "hidden"
+            }}
+          >
+            <Component key={key} {...RouteResult.props} />
+          </Flex>
+        </Freeze>
       ))}
     </RouteContainer>
   );

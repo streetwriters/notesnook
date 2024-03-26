@@ -17,8 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { forwardRef, useEffect, useRef, useState } from "react";
-import { Flex, Button, Box } from "@theme-ui/components";
+import {
+  forwardRef,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState
+} from "react";
+import { Flex, Button } from "@theme-ui/components";
 import { Plus } from "../icons";
 import {
   useStore as useSelectionStore,
@@ -39,6 +45,8 @@ import {
 } from "react-virtuoso";
 import { useResolvedItem } from "@notesnook/common";
 import { Context } from "./types";
+import { AppEventManager, AppEvents } from "../../common/app-events";
+import { useSessionState } from "../../hooks/use-session-state";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
@@ -69,7 +77,7 @@ type ListContainerProps = {
     onClick: () => void;
   };
 };
-
+var activeItem: { focus: boolean; id: string } | undefined = undefined;
 function ListContainer(props: ListContainerProps) {
   const { group, items, context, refresh, header, button, compact } = props;
 
@@ -91,6 +99,41 @@ function ListContainer(props: ListContainerProps) {
       selectionStore.toggleSelectionMode(false);
     };
   }, []);
+
+  useLayoutEffect(() => {
+    if (activeItem) {
+      items
+        .ids()
+        .then(
+          (ids) =>
+            listRef.current &&
+            activeItem &&
+            revealItemInList(
+              listRef.current,
+              activeItem.id,
+              ids,
+              activeItem.focus
+            )
+        );
+    }
+
+    const event = AppEventManager.subscribe(
+      AppEvents.revealItemInList,
+      (id, focus) => {
+        activeItem = { id, focus };
+        items
+          .ids()
+          .then(
+            (ids) =>
+              listRef.current &&
+              revealItemInList(listRef.current, id, ids, focus)
+          );
+      }
+    );
+    return () => {
+      event.unsubscribe();
+    };
+  }, [items]);
 
   const { onFocus, onMouseDown, onKeyDown } = useKeyboardListNavigation({
     length: items.length,
@@ -439,4 +482,20 @@ function waitForElement(
       callback(element);
     }
   });
+}
+
+function revealItemInList(
+  list: VirtuosoHandle,
+  itemId: string,
+  ids: string[],
+  focus: boolean
+) {
+  const index = ids.indexOf(itemId);
+  if (index === -1) return;
+  waitForElement(
+    list,
+    index,
+    `id_${itemId}`,
+    (element) => focus && element.focus()
+  );
 }

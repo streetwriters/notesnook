@@ -23,7 +23,6 @@ import {
   notesFromContext,
   useStore as useNotesStore
 } from "../stores/note-store";
-import { hashNavigate, navigate } from "../navigation";
 import Placeholder from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
@@ -47,12 +46,6 @@ function Notes(props: NotesProps) {
     },
     [context, contextNotes]
   );
-
-  useEffect(() => {
-    if (context?.type === "color" && contextNotes && contextNotes.length <= 0) {
-      navigate("/", { replace: true });
-    }
-  }, [context, contextNotes]);
 
   if (!context || !contextNotes) return <Placeholder context="notes" />;
   return (

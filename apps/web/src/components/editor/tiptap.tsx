@@ -388,7 +388,6 @@ function TiptapWrapper(
           editorContainer={() => {
             if (editorContainerRef.current) return editorContainerRef.current;
             const editorContainer = document.createElement("div");
-            editorContainer.id = "editor-container";
             editorContainer.classList.add("selectable");
             editorContainer.style.flex = "1";
             editorContainer.style.cursor = "text";

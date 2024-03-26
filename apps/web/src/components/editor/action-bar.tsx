@@ -63,6 +63,7 @@ import {
   useSortable
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export function EditorActionBar() {
   const editorMargins = useEditorStore((store) => store.editorMargins);
@@ -303,6 +304,13 @@ function TabStrip() {
                       .map((s) => s.id)
                   )
               }
+              onRevealInList={() =>
+                AppEventManager.publish(
+                  AppEvents.revealItemInList,
+                  "note" in session ? session.note.id : session.id,
+                  true
+                )
+              }
               onPin={() => {
                 useEditorStore.setState((state) => {
                   // preview tabs can never be pinned.
@@ -336,6 +344,7 @@ type TabProps = {
   onCloseToTheRight: () => void;
   onCloseToTheLeft: () => void;
   onCloseAll: () => void;
+  onRevealInList: () => void;
   onPin: () => void;
 };
 function Tab(props: TabProps) {
@@ -354,6 +363,7 @@ function Tab(props: TabProps) {
     onCloseOthers,
     onCloseToTheRight,
     onCloseToTheLeft,
+    onRevealInList,
     onPin
   } = props;
   const Icon = isLocked
@@ -425,6 +435,13 @@ function Tab(props: TabProps) {
             title: "Close all",
             key: "close-all",
             onClick: onCloseAll
+          },
+          { type: "separator", key: "sep" },
+          {
+            type: "button",
+            title: "Reveal in list",
+            key: "reveal-in-list",
+            onClick: onRevealInList
           },
           { type: "separator", key: "sep" },
           {

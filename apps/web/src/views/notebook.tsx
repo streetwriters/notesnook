@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState
+} from "react";
 import { useStore as useAppStore } from "../stores/app-store";
 import { hashNavigate, navigate } from "../navigation";
 import { Button, Flex, Text } from "@theme-ui/components";
@@ -67,7 +73,7 @@ function Notebook(props: NotebookProps) {
   const context = useNotesStore((store) => store.context);
   const notes = useNotesStore((store) => store.contextNotes);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const { context, setContext } = useNotesStore.getState();
     if (
       context &&
