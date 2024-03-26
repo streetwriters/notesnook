@@ -30,6 +30,7 @@ import {
 } from "./utils";
 import { test, expect } from "vitest";
 import { MONTHS_FULL } from "../src/utils/date";
+import { GroupOptions, Note } from "../src/types";
 
 async function createAndAddNoteToNotebook(
   db: Database,
@@ -380,148 +381,227 @@ test("adding a note with an invalid tag should clean the tag array", () =>
     ).toBe(0);
   }));
 
-test("get grouped notes by abc", () =>
-  databaseTest().then(async (db) => {
-    const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    for (const letter of alphabet) {
-      for (const letter2 of alphabet) {
-        await db.notes.add({ title: `${letter}${letter2}` });
-      }
-    }
-    await db.notes.add({ title: `Pinned note`, pinned: true });
-    await db.notes.add({
-      title: `Conflicted`,
-      conflicted: true
-    });
-    const grouping = await db.notes.all.grouped({
-      groupBy: "abc",
-      sortDirection: "asc",
-      sortBy: "title"
-    });
+const groups: { notes: () => Partial<Note>[]; groupOptions: GroupOptions[] }[] =
+  [
+    {
+      notes: () => {
+        const alphabet =
+          "6789ABCDEFGHIJKLMNOPQRSTUVWMNOPQGHIJKLMNOPQRS0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/.=-";
+        const notes: Partial<Note>[] = [];
+        for (let i = 0; i < alphabet.length; ++i) {
+          const letter = alphabet[i];
+          const letter2 = alphabet[alphabet.length - i];
+          notes.push({ title: `${letter}${letter2}` });
+        }
+        return notes;
+      },
+      groupOptions: [
+        {
+          groupBy: "abc",
+          sortDirection: "asc",
+          sortBy: "title"
+        },
+        {
+          groupBy: "abc",
+          sortDirection: "desc",
+          sortBy: "title"
+        },
+        {
+          groupBy: "none",
+          sortDirection: "asc",
+          sortBy: "title"
+        },
+        {
+          groupBy: "none",
+          sortDirection: "desc",
+          sortBy: "title"
+        }
+      ]
+    },
+    {
+      notes: () => {
+        const notes: Partial<Note>[] = [];
+        const now = dayjs(1711420693667);
+        const months = [3, 8, 6, 4, 7, 9, 1, 4, 6, 7, 10, 11];
+        for (const month of months) {
+          const date = now.add(month, "month").valueOf();
+          notes.push({
+            title: `Note in ${now.add(month, "month").month()} - ${month}`,
+            dateCreated: date,
+            dateEdited: date
+          });
+        }
+        return notes;
+      },
+      groupOptions: [
+        {
+          groupBy: "month",
+          sortDirection: "desc",
+          sortBy: "dateCreated"
+        },
+        {
+          groupBy: "month",
+          sortDirection: "asc",
+          sortBy: "dateCreated"
+        },
+        {
+          groupBy: "month",
+          sortDirection: "asc",
+          sortBy: "dateEdited"
+        },
+        {
+          groupBy: "month",
+          sortDirection: "desc",
+          sortBy: "dateEdited"
+        },
+        {
+          groupBy: "none",
+          sortDirection: "desc",
+          sortBy: "dateEdited"
+        },
+        {
+          groupBy: "none",
+          sortDirection: "asc",
+          sortBy: "dateEdited"
+        },
+        {
+          groupBy: "none",
+          sortDirection: "asc",
+          sortBy: "dateCreated"
+        },
+        {
+          groupBy: "none",
+          sortDirection: "desc",
+          sortBy: "dateCreated"
+        },
+        {
+          groupBy: "week",
+          sortDirection: "asc",
+          sortBy: "dateCreated"
+        },
+        {
+          groupBy: "week",
+          sortDirection: "desc",
+          sortBy: "dateCreated"
+        },
+        {
+          groupBy: "week",
+          sortDirection: "asc",
+          sortBy: "dateEdited"
+        },
+        {
+          groupBy: "week",
+          sortDirection: "desc",
+          sortBy: "dateEdited"
+        }
+      ]
+    },
+    {
+      notes: () => {
+        const notes: Partial<Note>[] = [];
+        const now = dayjs(1711420693667);
+        const years = [3, 8, 6, 4, 7, 9, 1, 4, 6, 7, 10, 11];
+        for (const year of years) {
+          const date = now.add(year, "year").valueOf();
+          notes.push({
+            title: `Note in ${now.add(year, "year").year()} - ${year}`,
+            dateCreated: date,
+            dateEdited: date
+          });
+        }
+        return notes;
+      },
+      groupOptions: [
+        {
+          groupBy: "year",
+          sortDirection: "desc",
+          sortBy: "dateCreated"
+        },
+        {
+          groupBy: "year",
+          sortDirection: "asc",
+          sortBy: "dateCreated"
+        },
+        {
+          groupBy: "year",
+          sortDirection: "asc",
+          sortBy: "dateEdited"
+        },
+        {
+          groupBy: "year",
+          sortDirection: "desc",
+          sortBy: "dateEdited"
+        }
+      ]
+    },
+    {
+      notes: () => {
+        const notes: Partial<Note>[] = [];
+        const ranges = {
+          Recent: [0, 7],
+          "Last week": [7, 14],
+          Older: [14, 28]
+        };
+        for (const key in ranges) {
+          const range = ranges[key];
+          for (let i = range[0]; i < range[1]; i++) {
+            const date = dayjs().subtract(i, "days").toDate().getTime();
 
-    expect((await grouping.item(0))?.group?.title).toBe("Conflicted");
-    expect((await grouping.item(1))?.group?.title).toBe("Pinned");
-    for (let i = 0; i < alphabet.length; ++i) {
-      expect((await grouping.item(i * alphabet.length + 2))?.group?.title).toBe(
-        alphabet[i]
-      );
-    }
-  }));
+            notes.push({
+              title: `Note in ${key} - ${i}`,
+              dateCreated: date,
+              dateEdited: date
+            });
+          }
+        }
 
-test("get grouped notes by month", () =>
-  databaseTest().then(async (db) => {
-    for (let month = 0; month <= 11; ++month) {
-      for (let i = 0; i < 5; ++i) {
-        const date = dayjs().month(month).toDate().getTime();
+        return notes;
+      },
+      groupOptions: [
+        {
+          groupBy: "default",
+          sortDirection: "desc",
+          sortBy: "dateCreated"
+        },
+        {
+          groupBy: "default",
+          sortDirection: "asc",
+          sortBy: "dateCreated"
+        },
+        {
+          groupBy: "default",
+          sortDirection: "asc",
+          sortBy: "dateEdited"
+        },
+        {
+          groupBy: "default",
+          sortDirection: "desc",
+          sortBy: "dateEdited"
+        }
+      ]
+    }
+  ];
+
+for (const group of groups) {
+  const notes = group.notes();
+  for (const groupOptions of group.groupOptions) {
+    const title = `group notes by ${groupOptions.groupBy}, sort by ${groupOptions.sortBy}, direction ${groupOptions.sortDirection}`;
+    test(`${title}`, () =>
+      databaseTest().then(async (db) => {
+        await Promise.all(notes.map((note) => db.notes.add(note)));
+        await db.notes.add({ title: `Pinned note`, pinned: true });
         await db.notes.add({
-          title: `Note in ${month} - ${i}`,
-          dateCreated: date
+          title: `Conflicted`,
+          conflicted: true
         });
-      }
-    }
-
-    const grouping = await db.notes.all.grouped({
-      groupBy: "month",
-      sortDirection: "desc",
-      sortBy: "dateCreated"
-    });
-
-    for (let month = 11; month >= 0; --month) {
-      expect((await grouping.item((11 - month) * 5))?.group?.title).toContain(
-        MONTHS_FULL[month]
-      );
-    }
-  }));
-
-test("get grouped notes by year", () =>
-  databaseTest().then(async (db) => {
-    for (let year = 2020; year <= 2025; ++year) {
-      for (let i = 0; i < 5; ++i) {
-        const date = dayjs().year(year).toDate().getTime();
-        await db.notes.add({
-          title: `Note in ${year} - ${i}`,
-          dateCreated: date
-        });
-      }
-    }
-
-    const grouping = await db.notes.all.grouped({
-      groupBy: "year",
-      sortDirection: "desc",
-      sortBy: "dateCreated"
-    });
-
-    for (let year = 2020; year <= 2025; ++year) {
-      expect((await grouping.item((2025 - year) * 5))?.group?.title).toBe(
-        year.toString()
-      );
-    }
-  }));
-
-test("get grouped notes by week", () =>
-  databaseTest().then(async (db) => {
-    for (let i = 1; i <= 6; ++i) {
-      for (let week = 1; week <= 4; ++week) {
-        const date = dayjs()
-          .month(i)
-          .date(week * 7)
-          .year(2023)
-          .startOf("week")
-          .toDate()
-          .getTime();
-        await db.notes.add({
-          title: `Note in ${week} - ${i}`,
-          dateCreated: date
-        });
-      }
-    }
-
-    const grouping = await db.notes.all.grouped({
-      groupBy: "week",
-      sortDirection: "desc",
-      sortBy: "dateCreated"
-    });
-
-    const weeks = [
-      "19 - 25 Jun, 2023",
-      "22 - 28 May, 2023",
-      "17 - 23 Apr, 2023",
-      "20 - 26 Mar, 2023",
-      "20 - 26 Feb, 2023"
-    ];
-    for (let i = 1; i <= 5; ++i) {
-      expect((await grouping.item(i * 4))?.group?.title).toBe(weeks[i - 1]);
-    }
-  }));
-
-test("get grouped notes default", () =>
-  databaseTest().then(async (db) => {
-    const ranges = {
-      Recent: [0, 7],
-      "Last week": [7, 14],
-      Older: [14, 28]
-    };
-    for (const key in ranges) {
-      const range = ranges[key];
-      for (let i = range[0]; i < range[1]; i++) {
-        const date = dayjs().subtract(i, "days").toDate().getTime();
-
-        await db.notes.add({
-          title: `Note in ${key} - ${i}`,
-          dateCreated: date
-        });
-      }
-    }
-
-    const grouping = await db.notes.all.grouped({
-      groupBy: "default",
-      sortDirection: "desc",
-      sortBy: "dateCreated"
-    });
-
-    let i = 0;
-    for (const key in ranges) {
-      expect((await grouping.item(i * 7))?.group?.title).toBe(key);
-      ++i;
-    }
-  }));
+        const grouping = await db.notes.all.grouped(groupOptions);
+        const items: string[] = [];
+        for (let i = 0; i < grouping.length; i++) {
+          const item = await grouping.item(i);
+          if (item.group) items.push(`GROUP: ${item.group.title}`);
+          if (item.item) items.push(item.item.title);
+        }
+        expect(items).toMatchSnapshot();
+      }));
+  }
+}

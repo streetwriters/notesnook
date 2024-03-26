@@ -527,7 +527,8 @@ export class FilteredSelector<T extends Item> {
     const sortBy: Set<SortOptions["sortBy"]> = new Set();
     if (isGroupOptions(options)) {
       if (options.groupBy === "abc") sortBy.add("title");
-      else if (options.sortBy === "title") sortBy.add("dateCreated");
+      else if (options.sortBy === "title" && options.groupBy !== "none")
+        sortBy.add("dateCreated");
     }
     sortBy.add(options.sortBy);
 
