@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { test, Browser, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { USER } from "./utils";
+import exp from "constants";
 
 async function createDevice(browser: Browser) {
   // Create two isolated browser contexts
@@ -28,7 +29,7 @@ async function createDevice(browser: Browser) {
   const app = new AppModel(page);
   await app.auth.goto();
   await app.auth.login(USER.CURRENT);
-  await app.waitForSync();
+  await app.waitForSync("synced");
 
   return app;
 }
@@ -39,7 +40,7 @@ async function actAndSync<T>(
 ) {
   const results = await Promise.all([
     ...actions.filter((a) => !!a),
-    ...devices.map((d) => d.waitForSync("completed"))
+    ...devices.map((d) => d.waitForSync("synced"))
   ]);
 
   await Promise.all(devices.map((d) => d.page.waitForTimeout(2000)));
@@ -71,14 +72,14 @@ test(`edits in a note opened on 2 devices should sync in real-time`, async ({
 
   if ((await notesB.editor.getContent("text")) !== "")
     await actAndSync([deviceA, deviceB], notesB.editor.clear());
-  expect(await notesA.editor.getContent("text")).toBe("");
-  expect(await notesB.editor.getContent("text")).toBe("");
+  await expect(notesA.editor.content).toHaveText("");
+  await expect(notesB.editor.content).toHaveText("");
   await actAndSync([deviceA, deviceB], notesB.editor.setContent(newContent));
 
   expect(noteA).toBeDefined();
   expect(noteB).toBeDefined();
-  expect(await notesA.editor.getContent("text")).toBe(newContent);
-  expect(await notesB.editor.getContent("text")).toBe(newContent);
+  await expect(notesA.editor.content).toHaveText(newContent);
+  await expect(notesB.editor.content).toHaveText(newContent);
 });
 
 function makeid(length: number) {

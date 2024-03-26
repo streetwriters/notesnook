@@ -23,7 +23,7 @@ import { getTestId } from "../utils";
 export class EditorModel {
   private readonly page: Page;
   private readonly title: Locator;
-  private readonly content: Locator;
+  readonly content: Locator;
   private readonly tags: Locator;
   private readonly tagInput: Locator;
   private readonly focusModeButton: Locator;

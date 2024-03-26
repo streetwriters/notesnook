@@ -252,11 +252,14 @@ test("unlock a note for editing", async ({ page }) => {
   await note?.contextMenu.lock(PASSWORD);
   await note?.openLockedNote(PASSWORD);
 
-  const content = "Edits 1 2 3 ";
+  const content = "Edits 1 2 3";
   await notes.editor.setContent(content);
   await page.waitForTimeout(150);
 
-  const newContent = `${content}${NOTE.content}`;
+  await page.reload();
+  await page.waitForTimeout(500);
+
+  const newContent = `${NOTE.content}${content}`;
   const editedNote = await notes.findNote({
     title: NOTE.title,
     content: newContent
@@ -277,6 +280,9 @@ test("change title of a locked note", async ({ page }) => {
   const title = "NEW TITLE!";
   await notes.editor.setTitle(title);
   await page.waitForTimeout(150);
+
+  await page.reload();
+  await page.waitForTimeout(500);
 
   const editedNote = await notes.findNote({ title, content: NOTE.content });
   await editedNote?.openLockedNote(PASSWORD);
