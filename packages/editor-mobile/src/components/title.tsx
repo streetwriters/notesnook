@@ -79,7 +79,7 @@ function Title({
     if (!loading) {
       setTimeout(() => {
         resizeTextarea();
-      });
+      }, 300);
     }
   }, [loading, resizeTextarea]);
 
