@@ -460,7 +460,13 @@ export class FilteredSelector<T extends Item> {
         "reminders.date",
         createUpcomingReminderTimeQuery().as("dueDate")
       );
-    } else fields.push(options.sortBy);
+    }
+
+    if (options.groupBy === "abc") fields.push("title");
+    else if (options.sortBy === "title" && options.groupBy !== "none")
+      fields.push("dateCreated");
+    else if (options.sortBy !== "dueDate") fields.push(options.sortBy);
+
     return Array.from(
       groupArray(
         await this.filter
