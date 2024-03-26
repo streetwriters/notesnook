@@ -26,7 +26,8 @@ import {
   MfaSms,
   MfaEmail,
   MfaRecoveryCode,
-  Icon
+  Icon,
+  Warn
 } from "../components/icons";
 import Field, { FieldProps } from "../components/field";
 import { getQueryParams, hardNavigate, makeURL } from "../navigation";
@@ -243,6 +244,20 @@ function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
     >
       {(form?: EmailFormData) => (
         <>
+          {IS_BETA ? (
+            <Flex
+              bg="background"
+              p={2}
+              sx={{ borderRadius: "default", alignItems: "start" }}
+            >
+              <Warn size={16} color="icon-error" />
+              <Text variant="body" ml={1}>
+                After logging in from v3 beta, your account data will be
+                migrated and you won&apos;t be able to use the v2 clients to
+                sync your notes.
+              </Text>
+            </Flex>
+          ) : null}
           <AuthField
             id="email"
             type="email"
