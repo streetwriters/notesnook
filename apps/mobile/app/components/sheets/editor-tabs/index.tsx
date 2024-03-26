@@ -83,7 +83,6 @@ const TabItemComponent = (props: {
       onPress={() => {
         if (!props.isFocused) {
           useTabStore.getState().focusTab(props.tab.id);
-          props.close?.();
           if (props.tab.locked) {
             eSendEvent(eUnlockNote);
           }
@@ -94,6 +93,7 @@ const TabItemComponent = (props: {
             }, 300);
           }
         }
+        props.close?.();
       }}
       onLongPress={() => {
         useTabStore.getState().updateTab(props.tab.id, {

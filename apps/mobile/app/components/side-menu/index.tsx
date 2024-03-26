@@ -19,7 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback } from "react";
-import { FlatList, View } from "react-native";
+import { View } from "react-native";
+import { DraxProvider, DraxScrollView } from "react-native-drax";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
@@ -134,16 +135,12 @@ export const SideMenu = React.memo(
             paddingTop: insets.top
           }}
         >
-          <FlatList
-            alwaysBounceVertical={false}
-            contentContainerStyle={{
-              flexGrow: 1
-            }}
-            showsVerticalScrollIndicator={false}
-            data={[0]}
-            keyExtractor={() => "mainMenuView"}
-            renderItem={renderItem}
-          />
+          <DraxProvider>
+            <DraxScrollView nestedScrollEnabled={false}>
+              {renderItem()}
+            </DraxScrollView>
+          </DraxProvider>
+
           <View
             style={{
               paddingHorizontal: 12

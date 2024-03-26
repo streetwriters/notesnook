@@ -23,9 +23,9 @@ import { FlatList, StyleSheet, View } from "react-native";
 import {
   DraxList,
   DraxListProps,
-  DraxListRenderItemContent,
-  DraxProvider
+  DraxListRenderItemContent
 } from "react-native-drax";
+
 import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
 import { useSideBarDraggingStore } from "../side-menu/dragging-store";
@@ -74,6 +74,7 @@ function ReorderableList<T extends { id: string }>({
   const renderItemContent: DraxListRenderItemContent<T> = React.useCallback(
     (info, props) => {
       const isHidden = hiddenItemsState.indexOf(info?.item?.id) > -1;
+
       return isHidden && !dragging ? null : (
         <View
           style={{
@@ -136,53 +137,49 @@ function ReorderableList<T extends { id: string }>({
   }
 
   return (
-    <DraxProvider>
-      <View style={styles.container}>
-        <DraxList
-          {...restProps}
-          ref={listRef}
-          data={getOrderedItems()}
-          renderItemContent={renderItemContent}
-          itemStyles={{
-            hoverDragReleasedStyle: {
-              display: "none"
-            },
-            hoverDraggingWithoutReceiverStyle: {
-              opacity: 0.5
-            },
-            dragReleasedStyle: {
-              opacity: 1
-            },
-            hoverDraggingStyle: {
-              backgroundColor: colors.secondary.background
-            }
-          }}
-          longPressDelay={500}
-          onItemDragStart={() =>
-            useSideBarDraggingStore.setState({
-              dragging: true
-            })
+    <View style={styles.container}>
+      <DraxList
+        {...restProps}
+        ref={listRef}
+        data={getOrderedItems()}
+        renderItemContent={renderItemContent}
+        itemStyles={{
+          hoverDragReleasedStyle: {
+            display: "none"
+          },
+          hoverDraggingWithoutReceiverStyle: {
+            opacity: 0.5
+          },
+          dragReleasedStyle: {
+            opacity: 1
+          },
+          hoverDraggingStyle: {
+            backgroundColor: colors.secondary.background
           }
-          itemsDraggable={disableDefaultDrag ? dragging : true}
-          lockItemDragsToMainAxis
-          onItemReorder={({ fromIndex, fromItem, toIndex, toItem }) => {
-            const newOrder = getOrderedItems().map((item) => item.id);
-            const element = newOrder.splice(fromIndex, 1)[0];
-            if (toIndex === 0) {
-              newOrder.unshift(element);
-            } else {
-              newOrder.splice(toIndex, 0, element);
-            }
-            setItemsOrder(newOrder);
-            onListOrderChanged?.(newOrder);
-          }}
-          onItemDragEnd={(e) => {
-            console.log(e.receiver?.receiveOffset);
-          }}
-          keyExtractor={(item) => (item as any).id}
-        />
-      </View>
-    </DraxProvider>
+        }}
+        longPressDelay={500}
+        onItemDragStart={() =>
+          useSideBarDraggingStore.setState({
+            dragging: true
+          })
+        }
+        disableVirtualization
+        itemsDraggable={disableDefaultDrag ? dragging : true}
+        lockItemDragsToMainAxis
+        onItemReorder={({ fromIndex, fromItem, toIndex, toItem }) => {
+          const newOrder = getOrderedItems().map((item) => item.id);
+          const element = newOrder.splice(fromIndex, 1)[0];
+          if (toIndex === 0) {
+            newOrder.unshift(element);
+          } else {
+            newOrder.splice(toIndex, 0, element);
+          }
+          setItemsOrder(newOrder);
+          onListOrderChanged?.(newOrder);
+        }}
+        keyExtractor={(item) => (item as any).id}
+      />
+    </View>
   );
 }
 

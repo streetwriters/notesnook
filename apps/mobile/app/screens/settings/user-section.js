@@ -44,7 +44,7 @@ export const getTimeLeft = (t2) => {
   };
 };
 
-const ProfilePicPlaceholder = () => {
+const ProfilePicPlaceholder = (props) => {
   const { colors } = useThemeColors();
   return (
     <TouchableOpacity
@@ -52,37 +52,7 @@ const ProfilePicPlaceholder = () => {
         alignItems: "center"
       }}
       activeOpacity={0.9}
-      onPress={() => {
-        const theme =
-          useThemeStore.getState().colorScheme === "dark"
-            ? useThemeStore.getState().darkTheme
-            : useThemeStore.getState().lightTheme;
-
-        ImagePicker.openPicker({
-          compressImageMaxWidth: 256,
-          compressImageMaxHeight: 256,
-          compressImageQuality: 0.8,
-          avoidEmptySpaceAroundImage: true,
-          cropping: true,
-          cropperCircleOverlay: true,
-          mediaType: "photo",
-          forceJpg: true,
-          includeBase64: true,
-          writeTempFile: false,
-          cropperToolbarColor: theme.scopes.base.primary.background,
-          cropperToolbarTitle: "Edit profile picture",
-          cropperActiveWidgetColor: theme.scopes.base.primary.accent,
-          cropperToolbarWidgetColor: theme.scopes.base.primary.icon
-        }).then(async (image) => {
-          if (!image.data) return;
-          await db.settings.setProfile({
-            profilePicture: "data:image/jpeg;base64," + image.data
-          });
-          useUserStore.setState({
-            profile: db.settings.getProfile()
-          });
-        });
-      }}
+      onPress={props?.onChangePicture}
     >
       <View
         style={{
@@ -98,6 +68,38 @@ const ProfilePicPlaceholder = () => {
       </View>
     </TouchableOpacity>
   );
+};
+
+const onChangePicture = () => {
+  const theme =
+    useThemeStore.getState().colorScheme === "dark"
+      ? useThemeStore.getState().darkTheme
+      : useThemeStore.getState().lightTheme;
+
+  ImagePicker.openPicker({
+    compressImageMaxWidth: 256,
+    compressImageMaxHeight: 256,
+    compressImageQuality: 0.8,
+    avoidEmptySpaceAroundImage: true,
+    cropping: true,
+    cropperCircleOverlay: true,
+    mediaType: "photo",
+    forceJpg: true,
+    includeBase64: true,
+    writeTempFile: false,
+    cropperToolbarColor: theme.scopes.base.primary.background,
+    cropperToolbarTitle: "Edit profile picture",
+    cropperActiveWidgetColor: theme.scopes.base.primary.accent,
+    cropperToolbarWidgetColor: theme.scopes.base.primary.icon
+  }).then(async (image) => {
+    if (!image.data) return;
+    await db.settings.setProfile({
+      profilePicture: "data:image/jpeg;base64," + image.data
+    });
+    useUserStore.setState({
+      profile: db.settings.getProfile()
+    });
+  });
 };
 
 const SettingsUserSection = ({ item }) => {
@@ -145,18 +147,23 @@ const SettingsUserSection = ({ item }) => {
                   }}
                 >
                   {userProfile?.profilePicture ? (
-                    <Image
-                      source={{
-                        uri: userProfile?.profilePicture
-                      }}
-                      style={{
-                        width: 100,
-                        height: 100,
-                        borderRadius: 100
-                      }}
-                    />
+                    <TouchableOpacity
+                      onPress={onChangePicture}
+                      activeOpacity={1}
+                    >
+                      <Image
+                        source={{
+                          uri: userProfile?.profilePicture
+                        }}
+                        style={{
+                          width: 100,
+                          height: 100,
+                          borderRadius: 100
+                        }}
+                      />
+                    </TouchableOpacity>
                   ) : (
-                    <ProfilePicPlaceholder />
+                    <ProfilePicPlaceholder onChangePicture={onChangePicture} />
                   )}
                 </View>
 

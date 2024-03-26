@@ -124,12 +124,13 @@ const statusBar = statusBars[${tabId}];
 
 if (typeof editor !== "undefined") {
   editor.commands.blur();
+  editor.commands.clearContent(false);
 }
 
 typeof editorTitle !== "undefined" && editorTitle.current && editorTitle.current?.blur();
-if (typeof editorController.content !== undefined) editorController.content.current = null;
+if (typeof editorController.content !== undefined) editorController.content.current = '';
 editorController.onUpdate();
-editorController.setTitle(null);
+editorController.setTitle('');
 if (typeof statusBar !== "undefined") {
   statusBar.current.resetWords();
   statusBar.current.set({date:"",saved:""});

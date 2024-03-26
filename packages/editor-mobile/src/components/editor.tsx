@@ -158,6 +158,27 @@ const Tiptap = ({
           }, 500);
         }
       },
+      onCreate() {
+        setTimeout(() => {
+          const noteState = tabRef.current.noteId
+            ? useTabStore.getState().noteState[tabRef.current.noteId]
+            : undefined;
+          const top = noteState?.top;
+          logger("info", tabRef.current.noteId, noteState?.top);
+
+          if (noteState?.to || noteState?.from) {
+            editors[tabRef.current.id]?.chain().setTextSelection({
+              to: noteState.to,
+              from: noteState.from
+            });
+          }
+          containerRef.current?.scrollTo({
+            left: 0,
+            top: top || 0,
+            behavior: "auto"
+          });
+        }, 32);
+      },
       downloadOptions: {
         corsHost: settings.corsProxy
       },
@@ -182,28 +203,8 @@ const Tiptap = ({
 
   const update = useCallback(() => {
     logger("info", "LOADING NOTE...");
-    _editor.commands.setTextSelection(0);
+    editors[tabRef.current.id]?.commands.setTextSelection(0);
     setTick((tick) => tick + 1);
-    setTimeout(() => {
-      const noteState = tabRef.current.noteId
-        ? useTabStore.getState().noteState[tabRef.current.noteId]
-        : undefined;
-      const top = noteState?.top;
-
-      if (noteState?.to || noteState?.from) {
-        editors[tabRef.current.id]?.chain().setTextSelection({
-          to: noteState.to,
-          from: noteState.from
-        });
-      }
-
-      containerRef.current?.scrollTo({
-        left: 0,
-        top: top || 0,
-        behavior: "auto"
-      });
-    }, 32);
-
     globalThis.editorControllers[tabRef.current.id]?.setTitlePlaceholder(
       "Note title"
     );
@@ -256,6 +257,12 @@ const Tiptap = ({
               from: noteState.from
             });
           }
+        } else {
+          containerRef.current?.scrollTo({
+            left: 0,
+            top: 0,
+            behavior: "auto"
+          });
         }
 
         if (
@@ -284,6 +291,7 @@ const Tiptap = ({
       }
       if (state.currentTab === prevState.currentTab) return;
       updateScrollPosition(state);
+      logger("info", "updating scroll position");
     });
     logger("info", tabRef.current.id, "active");
     return () => {
@@ -436,7 +444,7 @@ const Tiptap = ({
                       userSelect: "none"
                     }}
                   >
-                    {controller.title} ajklsdksa jdlksaj dksljk jdalkjskldj
+                    {controller.title}
                   </p>
                   <p
                     style={{
@@ -673,13 +681,21 @@ const Tiptap = ({
             </div>
           ) : null}
 
-          <div ref={contentPlaceholderRef} className="theme-scope-editor" />
+          <div
+            style={{
+              display: tab.locked ? "none" : "block"
+            }}
+            ref={contentPlaceholderRef}
+            className="theme-scope-editor"
+          />
 
           <div
             onClick={(e) => {
+              if (tab.locked) return;
               onClickBottomArea();
             }}
             onMouseDown={(e) => {
+              if (tab.locked) return;
               if (globalThis.keyboardShown) {
                 e.preventDefault();
               }
@@ -687,7 +703,7 @@ const Tiptap = ({
             style={{
               flexGrow: 1,
               width: "100%",
-              minHeight: 250
+              minHeight: 300
             }}
           />
         </div>
@@ -730,7 +746,6 @@ const TiptapProvider = (): JSX.Element => {
     editorContainer.style.cursor = "text";
     editorContainer.style.padding = "0px 12px";
     editorContainer.style.color = colors.primary.paragraph;
-    editorContainer.style.paddingBottom = `150px`;
     editorContainer.style.fontSize = `${settings.fontSize}px`;
     editorContainer.style.fontFamily =
       getFontById(settings.fontFamily)?.font || "sans-serif";

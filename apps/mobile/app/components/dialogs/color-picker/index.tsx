@@ -75,7 +75,7 @@ const ColorPicker = ({
             style={{
               width: "100%",
               height: 250,
-              backgroundColor: selectedColor,
+              backgroundColor: colors.primary.background,
               borderRadius: 10
             }}
           >
@@ -170,7 +170,6 @@ const ColorPicker = ({
                   return ToastManager.error(
                     new Error(`Color #${selectedColor} already exists`)
                   );
-
                 const id = await db.colors.add({
                   title: title.current,
                   colorCode: selectedColor

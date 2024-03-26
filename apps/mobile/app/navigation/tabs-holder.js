@@ -524,8 +524,10 @@ const onChangeTab = async (obj) => {
       if (
         useTabStore.getState().getTab(useTabStore.getState().currentTab).locked
       ) {
-        console.log("Unlocking note....");
         eSendEvent(eUnlockNote);
+      } else {
+        editorState().currentlyEditing = true;
+        eSendEvent(eOnLoadNote);
       }
     }
   } else {

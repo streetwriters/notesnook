@@ -74,6 +74,7 @@ export const useEditor = (
           })
         );
         if (oldIsFocused && !editor.isFocused) editor.commands.focus();
+        options.onCreate?.({ editor: editor });
       }
       editor.options = { ...editor.options, ...options };
 

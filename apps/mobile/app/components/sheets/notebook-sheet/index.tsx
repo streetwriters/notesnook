@@ -205,7 +205,7 @@ export const NotebookSheet = () => {
         style={{
           position: "absolute",
           right: 12,
-          marginTop: -80
+          marginTop: -90
         }}
       >
         <Pressable

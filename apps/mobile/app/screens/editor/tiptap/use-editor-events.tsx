@@ -24,7 +24,7 @@ import { ItemReference } from "@notesnook/core/dist/types";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
 import Clipboard from "@react-native-clipboard/clipboard";
-import { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,
   InteractionManager,
@@ -47,7 +47,8 @@ import {
   ToastManager,
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
+  presentSheet
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SettingsService from "../../../services/settings";
@@ -74,6 +75,7 @@ import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { EditorEvents, editorState } from "./utils";
+import { Issue } from "../../../components/sheets/github/issue";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -274,6 +276,7 @@ export const useEditorEvents = (
   }, [onBackPress]);
 
   const onLoadNote = useCallback(async () => {
+    console.log("Loading...");
     InteractionManager.runAfterInteractions(() => {
       if (!DDS.isTab) {
         handleBack.current = BackHandler.addEventListener(
@@ -572,6 +575,18 @@ export const useEditorEvents = (
           break;
         case EventTypes.showTabs: {
           EditorTabs.present();
+          break;
+        }
+        case EventTypes.error: {
+          presentSheet({
+            component: (
+              <Issue
+                defaultBody={editorMessage.value.stack}
+                defaultTitle={editorMessage.value.message}
+                issueTitle={editorMessage.value.message}
+              />
+            )
+          });
           break;
         }
         case EventTypes.tabFocused: {

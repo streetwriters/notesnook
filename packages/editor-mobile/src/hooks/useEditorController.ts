@@ -154,9 +154,7 @@ export function useEditorController({
       if (typeof timers.current.wordCounter === "number")
         clearTimeout(timers.current.wordCounter);
       timers.current.wordCounter = setTimeout(() => {
-        console.time("wordCounter");
         statusBars[tab.id]?.current?.updateWords();
-        console.timeEnd("wordCounter");
       }, ms);
     },
     [tab.id]
@@ -168,6 +166,7 @@ export function useEditorController({
 
   const contentChange = useCallback(
     (editor: Editor, ignoreEdit?: boolean) => {
+      if (editorControllers[tab.id]?.loading) return;
       const currentSessionId = globalThis.sessionId;
       post(EventTypes.contentchange, undefined, tab.id, tab.noteId);
       if (!editor) return;
@@ -195,19 +194,30 @@ export function useEditorController({
 
   const scroll = useCallback(
     (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {
-      if (!tab) return;
-      if (tab.noteId) {
-        useTabStore.getState().setNoteState(tab.noteId, {
+      const noteId = useTabStore
+        .getState()
+        .getNoteIdForTab(useTabStore.getState().currentTab);
+      if (noteId) {
+        useTabStore.getState().setNoteState(noteId, {
           top: _event.currentTarget.scrollTop
         });
       }
     },
-    [tab]
+    []
   );
 
   const onUpdate = useCallback(() => {
     update();
+    logger("info", "Updating content...");
   }, [update]);
+
+  useEffect(() => {
+    if (tab.locked) {
+      htmlContentRef.current = "";
+      setLoading(true);
+      onUpdate();
+    }
+  }, [tab.locked, onUpdate]);
 
   const onMessage = useCallback(
     (event: Event & { data?: string }) => {

@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { useThemeColors } from "@notesnook/theme";
 import React, {
   forwardRef,
   useCallback,
@@ -33,17 +32,12 @@ import WebView from "react-native-webview";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
-import { IconButton } from "../../components/ui/icon-button";
-import { useDBItem } from "../../hooks/use-db-item";
-import useKeyboard from "../../hooks/use-keyboard";
 import BiometicService from "../../services/biometrics";
 import {
   ToastManager,
   eSendEvent,
   eSubscribeEvent
 } from "../../services/event-manager";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { getElevationStyle } from "../../utils/elevation";
 import {
   eOnLoadNote,
   eUnlockNote,
@@ -51,13 +45,13 @@ import {
   eUnlockWithPassword
 } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
+import EditorOverlay from "./loading";
 import { EDITOR_URI } from "./source";
 import { EditorProps, useEditorType } from "./tiptap/types";
 import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { syncTabs, useTabStore } from "./tiptap/use-tab-store";
 import { editorController, editorState } from "./tiptap/utils";
-import EditorOverlay from "./loading";
 
 const style: ViewStyle = {
   height: "100%",
@@ -105,6 +99,7 @@ const Editor = React.memo(
       useImperativeHandle(ref, () => ({
         get: () => editor
       }));
+      useLockedNoteHandler();
 
       const onError = useCallback(() => {
         renderKey.current =
@@ -178,7 +173,6 @@ const Editor = React.memo(
             onMessage={onMessage || undefined}
           />
           <EditorOverlay editor={editor} editorId={editorId} />
-          <LockOverlay />
         </>
       );
     }
@@ -188,12 +182,8 @@ const Editor = React.memo(
 
 export default Editor;
 
-const LockOverlay = () => {
-  const tab = useTabStore((state) =>
-    state.tabs.find((t) => t.id === state.currentTab)
-  );
-  const isAppLoading = useSettingStore((state) => state.isAppLoading);
-  const [item] = useDBItem(isAppLoading ? undefined : tab?.noteId, "note");
+const useLockedNoteHandler = () => {
+  const tab = useTabStore((state) => state.getTab(state.currentTab));
   const tabRef = useRef(tab);
   tabRef.current = tab;
 
@@ -201,8 +191,8 @@ const LockOverlay = () => {
     for (const tab of useTabStore.getState().tabs) {
       const noteId = useTabStore.getState().getTab(tab.id)?.noteId;
       if (!noteId) continue;
-      if (tab.noteLocked) {
-        useTabStore.getState().updateTab(tab.id, {
+      if (tabRef.current && tabRef.current.noteLocked) {
+        useTabStore.getState().updateTab(tabRef.current.id, {
           locked: true
         });
       }
@@ -224,15 +214,18 @@ const LockOverlay = () => {
   useEffect(() => {
     const unlockWithBiometrics = async () => {
       try {
-        if (!item || !tabRef.current) return;
+        if (!tabRef.current?.noteLocked || !tabRef.current) return;
         console.log("Trying to unlock with biometrics...");
         const credentials = await BiometicService.getCredentials(
           "Unlock note",
           "Unlock note to open it in editor. If biometrics are not working, you can enter device pin to unlock vault."
         );
 
-        if (credentials && credentials?.password) {
-          const note = await db.vault.open(item.id, credentials?.password);
+        if (credentials && credentials?.password && tabRef.current.noteId) {
+          const note = await db.vault.open(
+            tabRef.current.noteId,
+            credentials?.password
+          );
           eSendEvent(eOnLoadNote, {
             item: note
           });
@@ -253,7 +246,7 @@ const LockOverlay = () => {
       password: string;
       biometrics?: boolean;
     }) => {
-      if (!item || !tabRef.current) return;
+      if (!tabRef.current?.noteId || !tabRef.current) return;
       if (!password || password.trim().length === 0) {
         ToastManager.show({
           heading: "Password not entered",
@@ -264,7 +257,7 @@ const LockOverlay = () => {
       }
 
       try {
-        const note = await db.vault.open(item.id, password);
+        const note = await db.vault.open(tabRef.current?.noteId, password);
         if (enrollBiometrics) {
           try {
             await db.vault.unlock(password);
@@ -343,7 +336,7 @@ const LockOverlay = () => {
     return () => {
       subs.map((s) => s?.unsubscribe());
     };
-  }, [item]);
+  }, [tab?.id]);
 
   return null;
 };

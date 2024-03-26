@@ -191,7 +191,8 @@ export const EventTypes = {
   unlock: "editor-events:unlock",
   unlockWithBiometrics: "editor-events:unlock-biometrics",
   disableReadonlyMode: "editor-events:disable-readonly-mode",
-  readonlyEditorLoaded: "readonlyEditorLoaded"
+  readonlyEditorLoaded: "readonlyEditorLoaded",
+  error: "editorError"
 } as const;
 
 export function randId(prefix: string) {

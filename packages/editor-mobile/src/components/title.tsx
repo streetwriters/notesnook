@@ -75,6 +75,14 @@ function Title({
     };
   }, [tab.id, titleRef]);
 
+  useEffect(() => {
+    if (!loading) {
+      setTimeout(() => {
+        resizeTextarea();
+      });
+    }
+  }, [loading, resizeTextarea]);
+
   return loading ? null : (
     <>
       <div

@@ -105,7 +105,7 @@ export const MoveNotes = ({
 
       <DialogHeader
         title={`Add notes to ${currentNotebook.title}`}
-        paragraph={"Select the topic in which you would like to move notes."}
+        paragraph={"Select the notes you want to move to this Notebook."}
       />
       <Seperator />
 

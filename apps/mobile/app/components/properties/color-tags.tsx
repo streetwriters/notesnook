@@ -111,6 +111,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
         visible={visible}
         setVisible={setVisible}
         onColorAdded={async (color) => {
+          await db.relations.to(note, "color").unlink();
           await db.relations.add(color, note);
           useRelationStore.getState().update();
           useMenuStore.getState().setColorNotes();

@@ -28,7 +28,7 @@ export const Container = ({ children }: PropsWithChildren) => {
   const [height, setHeight] = useState(0);
   const windowHeightRef = useRef(Dimensions.get("window").height);
   const { height: windowHeight } = useWindowDimensions();
-
+  const timerRef = useRef<NodeJS.Timeout>();
   useEffect(() => {
     if (windowHeight !== windowHeightRef.current) {
       setHeight(0);
@@ -46,9 +46,13 @@ export const Container = ({ children }: PropsWithChildren) => {
         width: "100%"
       }}
       onLayout={(event) => {
-        if (!keyboard.keyboardShown) {
-          setHeight(event.nativeEvent.layout.height);
-        }
+        const height = event.nativeEvent.layout.height;
+        clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => {
+          if (!keyboard.keyboardShown) {
+            setHeight(height);
+          }
+        }, 500);
       }}
     >
       {children}

@@ -367,6 +367,9 @@ export const useEditor = (
       blockId?: string;
       presistTab?: boolean;
     }) => {
+      if (!event) return;
+      console.log(event.item?.id, event?.item?.title, "loading note...");
+
       if (event.blockId) {
         blockIdRef.current = event.blockId;
       }
@@ -401,10 +404,11 @@ export const useEditor = (
         if (currentTab?.previewTab && item.id !== currentTab.noteId) {
           await commands.setLoading(true, useTabStore.getState().currentTab);
         }
-
-        const noteIsLocked =
-          (await db.vaults.itemExists(event.item as ItemReference)) &&
-          !(event.item as NoteWithContent).content;
+        const isLockedNote = await db.vaults.itemExists(
+          event.item as ItemReference
+        );
+        const tabLocked =
+          isLockedNote && !(event.item as NoteWithContent).content;
 
         // If note was already opened in a tab, focus that tab.
         if (typeof event.tabId !== "number") {
@@ -413,8 +417,8 @@ export const useEditor = (
             if (typeof tabId === "number") {
               useTabStore.getState().updateTab(tabId, {
                 readonly: event.item.readonly || readonly,
-                locked: noteIsLocked,
-                noteLocked: noteIsLocked
+                locked: tabLocked,
+                noteLocked: isLockedNote
               });
               useTabStore.getState().focusTab(tabId);
               setTimeout(() => {
@@ -431,8 +435,8 @@ export const useEditor = (
               // Open note in new tab.
               useTabStore.getState().newTab({
                 readonly: event.item.readonly || readonly,
-                locked: noteIsLocked,
-                noteLocked: noteIsLocked,
+                locked: tabLocked,
+                noteLocked: isLockedNote,
                 noteId: event.item.id,
                 previewTab: false
               });
@@ -442,8 +446,8 @@ export const useEditor = (
               // Otherwise we focus the preview tab or create one to open the note in.
               useTabStore.getState().focusPreviewTab(event.item.id, {
                 readonly: event.item.readonly || readonly,
-                locked: noteIsLocked,
-                noteLocked: noteIsLocked
+                locked: tabLocked,
+                noteLocked: isLockedNote
               });
             }
           }
@@ -467,7 +471,7 @@ export const useEditor = (
         state.current.movedAway = false;
         state.current.currentlyEditing = true;
 
-        if (!noteIsLocked) {
+        if (!tabLocked) {
           await loadContent(item);
         }
 
@@ -530,6 +534,7 @@ export const useEditor = (
           }
         }, 300);
       }
+      postMessage(EditorEvents.theme, theme);
     },
     [
       commands,
@@ -538,7 +543,8 @@ export const useEditor = (
       overlay,
       postMessage,
       readonly,
-      reset
+      reset,
+      theme
     ]
   );
 
@@ -554,6 +560,8 @@ export const useEditor = (
       if (isDeleted(data) || isTrashItem(data)) {
         const tabId = useTabStore.getState().getTabForNote(data.id);
         if (tabId !== undefined) {
+          console.log("Removing tab");
+          await commands.clearContent(tabId);
           useTabStore.getState().removeTab(tabId);
         }
         return;
@@ -781,7 +789,9 @@ export const useEditor = (
 
   const onLoad = useCallback(async () => {
     if (currentNotes.current) overlay(true);
-    postMessage(EditorEvents.theme, theme);
+    setTimeout(() => {
+      postMessage(EditorEvents.theme, theme);
+    });
     commands.setInsets(
       isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
     );
