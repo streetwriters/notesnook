@@ -136,11 +136,10 @@ export async function validateAppLockPassword(appLockPassword) {
     const appLockCipher = CipherStorage.getMap(APPLOCK_CIPHER);
     if (!appLockCipher) return true;
     const decrypted = await decrypt(
-      {
-        password: appLockPassword
-      },
+      await Sodium.deriveKey(appLockPassword, NOTESNOOK_APPLOCK_KEY_SALT),
       appLockCipher
     );
+
     DatabaseLogger.info(
       `validateAppLockPassword: ${typeof decrypted === "string"}`
     );
@@ -319,7 +318,6 @@ export async function decrypt(password, data) {
   _data.output = "plain";
 
   if (!password.salt) password.salt = data.salt;
-
   return await Sodium.decrypt(password, _data);
 }
 
