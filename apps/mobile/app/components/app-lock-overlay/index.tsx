@@ -45,6 +45,7 @@ import Input from "../ui/input";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { ToastManager } from "../../services/event-manager";
 
 const getUser = () => {
   const user = MMKV.getString("user");
@@ -131,9 +132,9 @@ const AppLockedOverlay = () => {
     if (!password.current) return;
     try {
       const unlocked = appLockHasPasswordSecurity
-        ? validateAppLockPassword(password.current)
+        ? await validateAppLockPassword(password.current)
         : await verifyUserPassword(password.current);
-
+      console.log(unlocked);
       if (unlocked) {
         if (!appLockHasPasswordSecurity) {
           await setAppLockVerificationCipher(password.current);

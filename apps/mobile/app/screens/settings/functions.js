@@ -87,7 +87,7 @@ export async function verifyUserWithApplock() {
         paragraph: `Please enter your app lock ${
           keyboardType === "numeric" ? "pin" : "password"
         }`,
-        positiveText: "Disable",
+        positiveText: "Verify",
         secureTextEntry: true,
         negativeText: "Cancel",
         positivePress: async (value) => {

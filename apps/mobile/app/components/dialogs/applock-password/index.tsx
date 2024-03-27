@@ -314,6 +314,7 @@ export const AppLockPassword = () => {
                   new Error(
                     `${keyboardType === "pin" ? "Pin" : "Password"} incorrect`
                   ),
+                  undefined,
                   "local"
                 );
                 return;
