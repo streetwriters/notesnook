@@ -258,9 +258,10 @@ const useLockedNoteHandler = () => {
 
       try {
         const note = await db.vault.open(tabRef.current?.noteId, password);
-        if (enrollBiometrics) {
+        if (enrollBiometrics && note) {
           try {
-            await db.vault.unlock(password);
+            const unlocked = await db.vault.unlock(password);
+            if (!unlocked) throw new Error("Incorrect vault password");
             await BiometicService.storeCredentials(password);
             eSendEvent("vaultUpdated");
             ToastManager.show({
@@ -282,8 +283,7 @@ const useLockedNoteHandler = () => {
               heading: "Incorrect password",
               message:
                 "Please enter the correct vault password to enable biometrics.",
-              type: "error",
-              context: "local"
+              type: "error"
             });
           }
         }
@@ -297,8 +297,7 @@ const useLockedNoteHandler = () => {
         console.log(e);
         ToastManager.show({
           heading: "Incorrect password",
-          type: "error",
-          context: "local"
+          type: "error"
         });
       }
     };
@@ -310,7 +309,9 @@ const useLockedNoteHandler = () => {
           useTabStore.getState().biometryEnrolled &&
           !editorState().movedAway)
       ) {
-        unlockWithBiometrics();
+        setTimeout(() => {
+          unlockWithBiometrics();
+        }, 150);
       } else {
         console.log("Biometrics unavailable.", editorState().movedAway);
         if (!editorState().movedAway) {
@@ -336,7 +337,7 @@ const useLockedNoteHandler = () => {
     return () => {
       subs.map((s) => s?.unsubscribe());
     };
-  }, [tab?.id]);
+  }, [tab?.id, tab?.locked]);
 
   return null;
 };
