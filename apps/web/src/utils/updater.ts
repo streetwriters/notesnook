@@ -22,7 +22,7 @@ import { desktop } from "../common/desktop-bridge";
 import { appVersion, getServiceWorkerVersion } from "./version";
 
 export async function checkForUpdate() {
-  if (IS_DESKTOP_APP) await desktop?.updater.check.query();
+  if (IS_DESKTOP_APP) await desktop?.updater.check.query().catch(console.error);
   else {
     AppEventManager.publish(AppEvents.checkingForUpdate);
 
