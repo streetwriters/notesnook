@@ -75,6 +75,7 @@ function createSubscription<
       const listener: AppUpdaterEvents[TName] = (...args: any[]) => {
         emit.next(args[0]);
       };
+      autoUpdater.removeAllListeners(eventName);
       autoUpdater.addListener(eventName, listener);
       return () => {
         autoUpdater.removeListener(eventName, listener);

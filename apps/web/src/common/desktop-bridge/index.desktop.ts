@@ -77,11 +77,14 @@ export async function createWritableStream(path: string) {
     filePath: path
   });
   if (!resolvedPath) throw new Error("invalid path.");
-  const fs = require("fs");
+  const { mkdirSync, createWriteStream }: typeof import("fs") = require("fs");
+  const { dirname }: typeof import("path") = require("path");
   const { Writable } = require("stream");
+
+  mkdirSync(dirname(resolvedPath), { recursive: true });
   return new WritableStream(
     Writable.toWeb(
-      fs.createWriteStream(resolvedPath, { encoding: "utf-8" })
+      createWriteStream(resolvedPath, { encoding: "utf-8" })
     ).getWriter()
   );
 }
