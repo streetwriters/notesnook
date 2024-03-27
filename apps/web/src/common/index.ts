@@ -36,7 +36,6 @@ import { logger } from "../utils/logger";
 import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core/dist/common";
-import { getFormattedDate } from "@notesnook/common";
 import { createWritableStream } from "./desktop-bridge";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { FeatureKeys } from "../dialogs/feature-dialog";
@@ -44,6 +43,7 @@ import { ZipEntry, createUnzipIterator } from "../utils/streams/unzip-stream";
 import { User } from "@notesnook/core";
 import { LegacyBackupFile } from "@notesnook/core";
 import { useEditorStore } from "../stores/editor-store";
+import { formatDate } from "@notesnook/core/dist/utils/date";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -91,7 +91,12 @@ export async function createBackup() {
   const encryptedBackups = isLoggedIn && encryptBackups;
 
   const filename = sanitizeFilename(
-    `notesnook-backup-${getFormattedDate(Date.now())}`
+    `${formatDate(Date.now(), {
+      type: "date-time",
+      dateFormat: "YYYY-MM-DD",
+      timeFormat: "24-hour"
+    })}-${new Date().getSeconds()}`,
+    { replacement: "-" }
   );
   const directory = Config.get("backupStorageLocation", PATHS.backupsDirectory);
   const ext = "nnbackupz";
