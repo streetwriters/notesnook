@@ -74,7 +74,7 @@ const menuItems: (topic: any, items?: any[]) => MenuItem[] = (
       type: "button",
       key: "set-as-default",
       title: "Set as default",
-      checked:
+      isChecked:
         defaultNotebook?.id === topic.notebookId &&
         defaultNotebook?.topic === topic.id,
       icon: TopicIcon.path,
