@@ -155,7 +155,7 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
 
   const getInputValue = useCallback(() => {
     if (!inputRef.current) return;
-    return inputRef.current.value.trim().toLowerCase();
+    return inputRef.current.value.trim();
   }, []);
 
   const reset = useCallback(() => {
