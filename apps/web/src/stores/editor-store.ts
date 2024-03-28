@@ -809,8 +809,9 @@ class EditorStore extends BaseStore<EditorStore> {
       state.sessions = sessions;
     });
 
-    const { history } = this.get();
+    const { history, sessions } = this.get();
     this.activateSession(history.pop());
+    if (sessions.length === 0) this.newSession();
   };
 
   setTitle = (id: string, title: string) => {
