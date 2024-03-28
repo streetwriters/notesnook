@@ -25,6 +25,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
   await db.schema
     .createTrigger("content_after_insert_content_fts")
     .temporary()
+    .ifNotExists()
     .onTable("content", "main")
     .after()
     .addEvent("insert")
@@ -48,6 +49,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
   await db.schema
     .createTrigger("content_after_delete_content_fts")
     .temporary()
+    .ifNotExists()
     .onTable("content", "main")
     .after()
     .addEvent("delete")
@@ -65,6 +67,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
   await db.schema
     .createTrigger("content_after_update_content_fts")
     .temporary()
+    .ifNotExists()
     .onTable("content", "main")
     .after()
     .addEvent("update")
@@ -91,6 +94,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
   await db.schema
     .createTrigger("notes_after_insert_notes_fts")
     .temporary()
+    .ifNotExists()
     .onTable("notes", "main")
     .after()
     .addEvent("insert")
@@ -111,6 +115,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
   await db.schema
     .createTrigger("notes_after_delete_notes_fts")
     .temporary()
+    .ifNotExists()
     .onTable("notes", "main")
     .after()
     .addEvent("delete")
@@ -127,6 +132,7 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
   await db.schema
     .createTrigger("notes_after_update_notes_fts")
     .temporary()
+    .ifNotExists()
     .onTable("notes", "main")
     .after()
     .addEvent("update", ["title"])
