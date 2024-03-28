@@ -255,30 +255,10 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
   }
 };
 
-export type SQLiteOptions = {
-  dialect: (name: string) => Dialect;
-  journalMode?: "WAL" | "MEMORY" | "OFF" | "PERSIST" | "TRUNCATE" | "DELETE";
-  synchronous?: "normal" | "extra" | "full" | "off";
-  lockingMode?: "normal" | "exclusive";
-  tempStore?: "memory" | "file" | "default";
-  cacheSize?: number;
-  pageSize?: number;
-  password?: string;
-};
-export async function createDatabase(name: string, options: SQLiteOptions) {
-  const db = new Kysely<RawDatabaseSchema>({
-    dialect: options.dialect(name),
-    plugins: [new SqliteBooleanPlugin()]
-  });
+async function init(db: Kysely<RawDatabaseSchema>, options: SQLiteOptions) {
   try {
     if (options.password)
       await sql`PRAGMA key = ${sql.ref(options.password)}`.execute(db);
-
-    const migrator = new Migrator({
-      db,
-      provider: new NNMigrationProvider()
-    });
-
     await sql`PRAGMA journal_mode = ${sql.raw(
       options.journalMode || "WAL"
     )}`.execute(db);
@@ -309,6 +289,10 @@ export async function createDatabase(name: string, options: SQLiteOptions) {
         db
       );
 
+    const migrator = new Migrator({
+      db,
+      provider: new NNMigrationProvider()
+    });
     const { error, results } = await migrator.migrateToLatest();
 
     results?.forEach((it) => {
@@ -325,9 +309,33 @@ export async function createDatabase(name: string, options: SQLiteOptions) {
 
     return db;
   } catch (e) {
+    console.error(e);
     await db.destroy();
     throw e;
   }
+}
+
+export type SQLiteOptions = {
+  dialect: (name: string, init?: () => Promise<void>) => Dialect;
+  journalMode?: "WAL" | "MEMORY" | "OFF" | "PERSIST" | "TRUNCATE" | "DELETE";
+  synchronous?: "normal" | "extra" | "full" | "off";
+  lockingMode?: "normal" | "exclusive";
+  tempStore?: "memory" | "file" | "default";
+  cacheSize?: number;
+  pageSize?: number;
+  password?: string;
+
+  skipInitialization?: boolean;
+};
+export async function createDatabase(name: string, options: SQLiteOptions) {
+  const db = new Kysely<RawDatabaseSchema>({
+    dialect: options.dialect(name, async () => {
+      await init(db, options);
+    }),
+    plugins: [new SqliteBooleanPlugin()]
+  });
+  if (!options.skipInitialization) return await init(db, options);
+  return db;
 }
 
 export async function changeDatabasePassword(
