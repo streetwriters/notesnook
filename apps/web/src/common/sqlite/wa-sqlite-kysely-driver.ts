@@ -23,32 +23,63 @@ import Worker from "./sqlite.worker.ts?worker";
 import type { SQLiteWorker } from "./sqlite.worker";
 import SQLiteSyncURI from "./wa-sqlite.wasm?url";
 import SQLiteAsyncURI from "./wa-sqlite-async.wasm?url";
-import { wrap } from "comlink";
 import { Mutex } from "async-mutex";
+import { SharedService } from "./shared-service";
 
-type Config = { dbName: string; async: boolean };
-
+type Config = { dbName: string; async: boolean; init?: () => Promise<void> };
+const SHARED_SERVICE_NAME = "notesnook-sqlite";
 export class WaSqliteWorkerDriver implements Driver {
   private connection?: DatabaseConnection;
   private connectionMutex = new ConnectionMutex();
-  private worker: SQLiteWorker;
-  constructor(private readonly config: Config) {
-    this.worker = wrap<SQLiteWorker>(new Worker()) as SQLiteWorker;
-  }
+  private worker?: SQLiteWorker;
+  constructor(private readonly config: Config) {}
 
   async init(): Promise<void> {
-    await this.worker.init(
-      this.config.dbName,
-      this.config.async,
-      this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
+    const sharedService = new SharedService<SQLiteWorker>(SHARED_SERVICE_NAME);
+    sharedService.activate(
+      () =>
+        new Promise<MessagePort>((resolve) => {
+          this.needsInitialization = true;
+
+          const baseWorker = new Worker();
+          baseWorker.addEventListener(
+            "message",
+            (event) => resolve(event.ports[0]),
+            { once: true }
+          );
+          baseWorker.postMessage({
+            dbName: this.config.dbName,
+            async: this.config.async,
+            uri: this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
+          });
+        })
     );
 
-    this.connection = new WaSqliteWorkerConnection(this.worker);
+    console.log("waiting to initialize");
+    // we have to wait until a provider becomes available, otherwise
+    // a race condition is created where the client starts executing
+    // queries before it is initialized.
+    await sharedService.getProviderPort();
 
-    // await this.config.onCreateConnection?.(this.connection);
+    this.worker = sharedService.proxy;
+    this.connection = new WaSqliteWorkerConnection(this.worker);
+  }
+
+  private needsInitialization = false;
+  async #initialize() {
+    if (this.needsInitialization) {
+      this.needsInitialization = false;
+      try {
+        await this.config.init?.();
+      } catch (e) {
+        this.needsInitialization = true;
+        throw e;
+      }
+    }
   }
 
   async acquireConnection(): Promise<DatabaseConnection> {
+    await this.#initialize();
     // SQLite only has one single connection. We use a mutex here to wait
     // until the single connection has been released.
     await this.connectionMutex.lock();
@@ -72,18 +103,15 @@ export class WaSqliteWorkerDriver implements Driver {
   }
 
   async destroy(): Promise<void> {
-    if (!this.worker) {
-      return;
-    }
-    return await this.worker.close();
+    return await this.worker?.close();
   }
 
   async delete() {
-    return this.worker.delete();
+    return this.worker?.delete();
   }
 
   async export() {
-    return this.worker.export(this.config.dbName, this.config.async);
+    return this.worker?.export(this.config.dbName, this.config.async);
   }
 }
 

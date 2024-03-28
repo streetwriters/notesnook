@@ -69,7 +69,8 @@ async function initializeDatabase(persistence: DatabasePersistence) {
       synchronous: "normal",
       pageSize: 8192,
       cacheSize: -32000,
-      password: Buffer.from(databaseKey).toString("hex")
+      password: Buffer.from(databaseKey).toString("hex"),
+      skipInitialization: !IS_DESKTOP_APP
     },
     storage: storage,
     eventsource: EventSource,

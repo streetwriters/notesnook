@@ -23,10 +23,11 @@ import SQLiteAsyncESMFactory from "./wa-sqlite-async";
 import SQLiteSyncESMFactory from "./wa-sqlite";
 import { IDBBatchAtomicVFS } from "./IDBBatchAtomicVFS";
 import { AccessHandlePoolVFS } from "./AccessHandlePoolVFS";
-import { expose, transfer } from "comlink";
+import { transfer } from "comlink";
 import type { RunMode } from "./type";
 import { QueryResult } from "kysely";
 import { DatabaseSource } from "./sqlite-export";
+import { createSharedServicePort } from "./shared-service";
 
 type PreparedStatement = {
   stmt: number;
@@ -39,6 +40,8 @@ let vfs: IDBBatchAtomicVFS | AccessHandlePoolVFS | null = null;
 const preparedStatements: Map<string, PreparedStatement> = new Map();
 
 async function init(dbName: string, async: boolean, url?: string) {
+  if (db) return;
+
   const option = url ? { locateFile: () => url } : {};
   const SQLiteAsyncModule = async
     ? await SQLiteAsyncESMFactory(option)
@@ -162,4 +165,9 @@ const worker = {
 };
 
 export type SQLiteWorker = typeof worker;
-expose(worker);
+
+addEventListener("message", async (event) => {
+  await worker.init(event.data.dbName, event.data.async, event.data.uri);
+  const providerPort = createSharedServicePort(worker);
+  postMessage(null, [providerPort]);
+});

@@ -32,12 +32,16 @@ declare module "kysely" {
   }
 }
 
-export const createDialect = (name: string): Dialect => {
+export const createDialect = (
+  name: string,
+  init?: () => Promise<void>
+): Dialect => {
   return {
     createDriver: () =>
       new WaSqliteWorkerDriver({
         async: !isFeatureSupported("opfs"),
-        dbName: name
+        dbName: name,
+        init
       }),
     createAdapter: () => new SqliteAdapter(),
     createIntrospector: (db) => new SqliteIntrospector(db),
