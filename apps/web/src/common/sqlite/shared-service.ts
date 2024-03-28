@@ -323,8 +323,8 @@ export class SharedService<T extends object> extends EventTarget {
         throw new Error("Could not find a provider port to communicate with.");
 
       providerPort = await this.#providerPort;
-      console.warn("Provider port not found. Retrying in 500ms...");
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      console.warn("Provider port not found. Retrying in 50ms...");
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
     return providerPort;
   }
