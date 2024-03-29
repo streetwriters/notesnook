@@ -41,6 +41,9 @@ export const ProfileSettings: SettingsGroup[] = [
     key: "user-profile",
     section: "profile",
     header: UserProfile,
+    onStateChange(listener) {
+      return useUserStore.subscribe((s) => s.isLoggedIn, listener);
+    },
     settings: [
       {
         key: "email",
@@ -77,7 +80,7 @@ export const ProfileSettings: SettingsGroup[] = [
         description:
           "In case you lose your password, this data recovery key is the only way to recovery your data.",
         keywords: ["data recovery key", "lose your password", "backup"],
-        isHidden: () => !userstore.get().isLoggedIn,
+        isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
             type: "button",
@@ -95,7 +98,7 @@ export const ProfileSettings: SettingsGroup[] = [
         description:
           "Permanently delete your account clearing all data including your notes, notebooks, and attachments.",
         keywords: ["delete account", "clear data"],
-        isHidden: () => !userstore.get().isLoggedIn,
+        isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
             type: "button",
@@ -125,7 +128,10 @@ export const ProfileSettings: SettingsGroup[] = [
     key: "user-sessions",
     section: "profile",
     header: "Sessions",
-    isHidden: () => !userstore.get().isLoggedIn,
+    onStateChange(listener) {
+      return useUserStore.subscribe((s) => s.isLoggedIn, listener);
+    },
+    isHidden: () => !useUserStore.getState().isLoggedIn,
     settings: [
       {
         key: "logout",
