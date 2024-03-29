@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Kysely, sql } from "kysely";
-import { RawDatabaseSchema } from ".";
+import { DatabaseSchema, RawDatabaseSchema } from ".";
 
 export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
   // content triggers
@@ -152,4 +152,13 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
       })
     )
     .execute();
+}
+
+export async function dropTriggers(db: Kysely<DatabaseSchema>) {
+  await db.schema.dropTrigger("content_after_insert_content_fts").execute();
+  await db.schema.dropTrigger("content_after_delete_content_fts").execute();
+  await db.schema.dropTrigger("content_after_update_content_fts").execute();
+  await db.schema.dropTrigger("notes_after_insert_notes_fts").execute();
+  await db.schema.dropTrigger("notes_after_delete_notes_fts").execute();
+  await db.schema.dropTrigger("notes_after_update_notes_fts").execute();
 }
