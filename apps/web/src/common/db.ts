@@ -100,7 +100,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   await db.init();
 
   window.addEventListener("beforeunload", () => {
-    db.sql().destroy();
+    if (IS_DESKTOP_APP) db.sql().destroy();
   });
 
   logger.measure("Database initialization");
