@@ -26,13 +26,23 @@ import { zip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../common/database/index";
 import Storage from "../common/database/storage";
 
-import { sanitizeFilename } from "@notesnook/common";
+import {
+  exportNote as _exportNote,
+  ExportableAttachment,
+  ExportableNote,
+  exportNotes,
+  sanitizeFilename
+} from "@notesnook/common";
 import { Note } from "@notesnook/core";
 import { NoteContent } from "@notesnook/core/dist/collections/session-content";
+import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
+import { basename, dirname, join } from "pathe";
+import downloadAttachment from "../common/filesystem/download-attachment";
 import { presentDialog } from "../components/dialog/functions";
 import { useSettingStore } from "../stores/use-setting-store";
 import BiometicService from "./biometrics";
 import { ToastManager } from "./event-manager";
+import { cacheDir } from "../common/filesystem/utils";
 
 const MIMETypes = {
   txt: "text/plain",
@@ -222,49 +232,6 @@ async function unlockVault() {
   });
 }
 
-async function exportNote(
-  id: string,
-  type: "txt" | "pdf" | "md" | "html" | "md-frontmatter"
-) {
-  const note = await db.notes.note(id);
-  if (!note) return;
-
-  let content;
-  const locked = note && (await db.vaults.itemExists(note));
-  if (locked) {
-    try {
-      const unlocked = await unlockVault();
-      if (!unlocked) return null;
-      const unlockedNote = await db.vault.open(note.id);
-      content = unlockedNote?.content;
-    } catch (e) {
-      DatabaseLogger.error(e as Error);
-    }
-  }
-
-  let path = await getPath(FolderNames[type]);
-  if (!path) return;
-
-  const result = await exportAs(type, note, false, content);
-  if (!result) return null;
-  const fileName = sanitizeFilename(note.title + Date.now(), {
-    replacement: "_"
-  });
-
-  if (type === "pdf" && Platform.OS === "ios") {
-    path = result;
-  } else {
-    path = await save(path, result, fileName, type);
-  }
-
-  return {
-    filePath: path,
-    type: "text/plain",
-    name: "Text",
-    fileName: fileName + `.${type === "md-frontmatter" ? "md" : type}`
-  };
-}
-
 function copyFileAsync(source: string, dest: string) {
   return new Promise((resolve) => {
     ScopedStorage.copyFile(source, dest, () => {
@@ -273,128 +240,59 @@ function copyFileAsync(source: string, dest: string) {
   });
 }
 
-function getUniqueFileName(
-  fileName: string,
-  notebookPath: string,
-  results: { [name: string]: boolean }
+async function resolveFileFunctions(
+  type: "txt" | "pdf" | "md" | "html" | "md-frontmatter"
 ) {
-  const chunks = fileName.split(".");
-  const ext = chunks.pop();
-  const name = chunks.join(".");
-  let resolvedName = fileName;
-  let count = 0;
-  while (results[`${notebookPath}${resolvedName}`]) {
-    resolvedName = `${name}${++count}.${ext}`;
-  }
-
-  return resolvedName;
-}
-
-async function bulkExport(
-  ids: string[],
-  type: "txt" | "pdf" | "md" | "html" | "md-frontmatter",
-  callback: (progress?: string) => void
-) {
-  let path = await getPath(FolderNames[type]);
+  const path = await getPath(FolderNames[type]);
   if (!path) return;
 
-  const exportCacheFolder =
-    RNFetchBlob.fs.dirs.CacheDir + `/export_${Date.now()}`;
+  const exportCacheFolder = join(
+    RNFetchBlob.fs.dirs.CacheDir,
+    `/export_${Date.now()}`
+  );
 
   await RNFetchBlob.fs.mkdir(exportCacheFolder).catch((e) => console.log(e));
 
   const mkdir = async (dir: string) => {
-    const folder = `${exportCacheFolder}/${dir}`;
+    const folder = join(exportCacheFolder, dir);
     if (!(await RNFetchBlob.fs.exists(folder))) {
       await RNFetchBlob.fs.mkdir(folder);
     }
   };
 
   const writeFile = async (path: string, result: string) => {
-    const cacheFilePath = exportCacheFolder + path;
+    const cacheFilePath = join(exportCacheFolder, path);
+    console.log(cacheFilePath, result.length);
     await RNFetchBlob.fs.writeFile(
       cacheFilePath,
       result,
       type === "pdf" ? "base64" : "utf8"
     );
   };
+  return {
+    path,
+    cacheFolder: exportCacheFolder,
+    mkdir,
+    writeFile
+  };
+}
 
-  const results: { [name: string]: boolean } = {};
-  for (let i = 0; i < ids.length; i++) {
-    try {
-      const note = await db.notes.note(ids[i]);
-      if (!note) continue;
-
-      let content;
-      const locked = note && (await db.vaults.itemExists(note));
-      if (locked) {
-        try {
-          const unlocked = !db.vault.unlocked ? await unlockVault() : true;
-          if (!unlocked) {
-            continue;
-          }
-          const unlockedNote = await db.vault.open(note.id);
-          content = unlockedNote?.content;
-        } catch (e) {
-          DatabaseLogger.error(e as Error);
-          continue;
-        }
-      }
-
-      const result = await exportAs(type, note, true, content);
-      const fileName = sanitizeFilename(note.title, {
-        replacement: "_"
-      });
-      if (result) {
-        const notebooks = await db.relations
-          ?.to({ id: note.id, type: "note" }, "notebook")
-          .resolve();
-
-        for (const notebook of notebooks) {
-          const notebookPath = (await db.notebooks.breadcrumbs(notebook.id))
-            .map((notebook) => {
-              return notebook.title + "/";
-            })
-            .join("");
-
-          await mkdir(notebookPath);
-
-          console.log("Dir created", notebookPath);
-
-          const exportedNoteName = getUniqueFileName(
-            fileName + `.${type}`,
-            notebookPath,
-            results
-          );
-          results[`${notebookPath}${exportedNoteName}`] = true;
-          await writeFile(`/${notebookPath}${exportedNoteName}`, result);
-        }
-
-        if (!notebooks.length) {
-          const exportedNoteName = getUniqueFileName(
-            fileName + `.${type}`,
-            "",
-            results
-          );
-          results[exportedNoteName] = true;
-          await writeFile(`/${exportedNoteName}`, result);
-        }
-      }
-      callback(`${i + 1}/${ids.length}`);
-    } catch (e) {
-      DatabaseLogger.error(e as Error);
-    }
-  }
-  const fileName = `nn-export-${ids.length}-${type}-${Date.now()}.zip`;
-
+async function createZip(
+  totalNotes: number,
+  cacheFolder: string,
+  type: "txt" | "pdf" | "md" | "html" | "md-frontmatter",
+  path: string,
+  callback: (progress?: string) => void
+) {
+  const fileName = `nn-export-${totalNotes}-${type}-${Date.now()}.zip`;
   try {
-    callback("zipping");
+    callback("Creating zip");
     const zipOutputPath =
       Platform.OS === "ios"
-        ? path + `/${fileName}`
-        : RNFetchBlob.fs.dirs.CacheDir + `/${fileName}`;
-    await zip(exportCacheFolder, zipOutputPath);
-    callback("saving to disk");
+        ? join(path, fileName)
+        : join(RNFetchBlob.fs.dirs.CacheDir, fileName);
+    await zip(cacheFolder, zipOutputPath);
+    callback("Saving zip file");
     if (Platform.OS === "android") {
       const file = await ScopedStorage.createFile(
         path,
@@ -406,7 +304,7 @@ async function bulkExport(
       await RNFetchBlob.fs.unlink(zipOutputPath);
       callback();
     }
-    RNFetchBlob.fs.unlink(exportCacheFolder);
+    RNFetchBlob.fs.unlink(cacheFolder);
   } catch (e) {
     DatabaseLogger.error(e as Error);
   }
@@ -416,8 +314,150 @@ async function bulkExport(
     type: "application/zip",
     name: "zip",
     fileName: fileName,
-    count: results?.length || 0
+    count: totalNotes
   };
+}
+
+async function exportNoteToFile(
+  item: ExportableNote,
+  type: "txt" | "pdf" | "md" | "html" | "md-frontmatter",
+  mkdir: (dir: string) => Promise<void>,
+  writeFile: (path: string, result: string) => Promise<void>
+) {
+  const dir = dirname(item.path);
+  const filename = basename(item.path);
+  await mkdir(dir);
+  if (type === "pdf") {
+    const options = {
+      html: item.data,
+      fileName: Platform.OS === "ios" ? "/exported/PDF/" + filename : filename,
+      width: 595,
+      height: 852,
+      bgColor: "#FFFFFF",
+      padding: 30,
+      base64: true
+    } as { [name: string]: any };
+
+    if (Platform.OS === "ios") {
+      options.directory = "Documents";
+    }
+    const res = await RNHTMLtoPDF.convert(options);
+    if (res.filePath) {
+      RNFetchBlob.fs.unlink(res.filePath);
+    }
+    await writeFile(item.path, res.base64);
+  } else {
+    await writeFile(item.path, item.data);
+  }
+}
+
+async function exportAttachmentToFile(
+  item: ExportableAttachment,
+  mkdir: (dir: string) => Promise<void>,
+  cacheFolder: string
+) {
+  const dir = dirname(item.path);
+  await mkdir(dir);
+  const cacheFileName = await downloadAttachment(item.data.hash, true, {
+    silent: true,
+    cache: true,
+    throwError: false
+  } as any);
+
+  await RNFetchBlob.fs.mv(
+    join(cacheDir, cacheFileName as string),
+    join(cacheFolder, item.path)
+  );
+}
+
+async function bulkExport(
+  notes: FilteredSelector<Note>,
+  type: "txt" | "pdf" | "md" | "html" | "md-frontmatter",
+  callback: (progress?: string) => void
+) {
+  const totalNotes = await notes.count();
+
+  const fileFuncions = await resolveFileFunctions(type);
+
+  if (!fileFuncions) return;
+
+  const path = fileFuncions.path;
+  const { mkdir, writeFile, cacheFolder } = fileFuncions;
+
+  let currentProgress = 0;
+  let currentAttachmentProgress = 0;
+  for await (const item of exportNotes(notes, {
+    format: type,
+    unlockVault: unlockVault as () => Promise<boolean>
+  })) {
+    if (item instanceof Error) {
+      DatabaseLogger.error(item);
+      continue;
+    }
+
+    if (item.type === "note") {
+      currentProgress += 1;
+      callback(`Exporting notes (${currentProgress}/${totalNotes})`);
+      try {
+        await exportNoteToFile(item, type, mkdir, writeFile);
+      } catch (e) {
+        console.log(item.type, e);
+      }
+    } else if (item.type === "attachment") {
+      currentAttachmentProgress += 1;
+      callback(`Downloading attachments (${currentAttachmentProgress})`);
+      try {
+        await exportAttachmentToFile(item, mkdir, cacheFolder);
+      } catch (e) {
+        console.log(item.path, e);
+      }
+    }
+  }
+  console.log(cacheFolder);
+  return createZip(totalNotes, cacheFolder, type, path, callback);
+}
+
+async function exportNote(
+  note: Note,
+  type: "txt" | "pdf" | "md" | "html" | "md-frontmatter",
+  callback: (progress?: string) => void
+) {
+  const fileFuncions = await resolveFileFunctions(type);
+
+  if (!fileFuncions) return;
+
+  const path = fileFuncions.path;
+  const { mkdir, writeFile, cacheFolder } = fileFuncions;
+
+  let currentAttachmentProgress = 0;
+  for await (const item of _exportNote(note, {
+    format: type,
+    unlockVault: unlockVault as () => Promise<boolean>
+  })) {
+    if (item instanceof Error) {
+      DatabaseLogger.error(item);
+      continue;
+    }
+
+    if (item.type === "note") {
+      callback(`Exporting note`);
+      try {
+        await exportNoteToFile(item, type, mkdir, writeFile);
+      } catch (e) {
+        console.log("exportNoteToFile", item.type, e);
+      }
+    } else if (item.type === "attachment") {
+      currentAttachmentProgress += 1;
+      callback(`Downloading attachments (${currentAttachmentProgress})`);
+      try {
+        await exportAttachmentToFile(item, mkdir, cacheFolder);
+      } catch (e) {
+        console.log("exportAttachmentToFile", item.path, e);
+      }
+    }
+  }
+
+  return createZip(1, cacheFolder, type, path, callback);
 }
 
 const Exporter = {

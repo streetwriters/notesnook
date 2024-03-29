@@ -39,6 +39,7 @@ import { getElevationStyle } from "../../../utils/elevation";
 import { eCloseSheet } from "../../../utils/events";
 import { SIZE, ph, pv } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
+import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { ProTag } from "../../premium/pro-tag";
 import { Button } from "../../ui/button";
@@ -47,7 +48,6 @@ import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { Dialog } from "../../dialog";
 
 const ExportNotesSheet = ({
   ids,
@@ -71,7 +71,7 @@ const ExportNotesSheet = ({
   const [status, setStatus] = useState<string>();
   const premium = useUserStore((state) => state.premium);
 
-  const save = async (
+  const exportNoteAs = async (
     type: "pdf" | "txt" | "md" | "html" | "md-frontmatter"
   ) => {
     if (exporting) return;
@@ -81,9 +81,18 @@ const ExportNotesSheet = ({
     setComplete(false);
     let result;
     if (ids.length > 1) {
-      result = await Exporter.bulkExport(ids, type, setStatus);
+      result = await Exporter.bulkExport(
+        db.notes.all.where((eb) => eb("id", "in", ids)),
+        type,
+        setStatus
+      );
     } else {
-      result = await Exporter.exportNote(ids[0], type);
+      const note = await db.notes.note(ids[0]);
+      if (!note) {
+        setExporting(false);
+        return;
+      }
+      result = await Exporter.exportNote(note, type, setStatus);
       await sleep(1000);
     }
     if (!result) {
@@ -101,7 +110,7 @@ const ExportNotesSheet = ({
     {
       title: "PDF",
       func: async () => {
-        await save("pdf");
+        await exportNoteAs("pdf");
       },
       icon: "file-pdf-box",
       desc: "View in any pdf reader app",
@@ -111,7 +120,7 @@ const ExportNotesSheet = ({
     {
       title: "Markdown",
       func: async () => {
-        await save("md");
+        await exportNoteAs("md");
       },
       icon: "language-markdown",
       desc: "View in any text or markdown editor",
@@ -121,7 +130,7 @@ const ExportNotesSheet = ({
     {
       title: "Markdown + Frontmatter",
       func: async () => {
-        await save("md-frontmatter");
+        await exportNoteAs("md-frontmatter");
       },
       icon: "language-markdown",
       desc: "View in any text or markdown editor",
@@ -131,7 +140,7 @@ const ExportNotesSheet = ({
     {
       title: "Plain Text",
       func: async () => {
-        await save("txt");
+        await exportNoteAs("txt");
       },
       icon: "card-text",
       desc: "View in any text editor",
@@ -141,7 +150,7 @@ const ExportNotesSheet = ({
     {
       title: "HTML",
       func: async () => {
-        await save("html");
+        await exportNoteAs("html");
       },
       icon: "language-html5",
       desc: "View in any web browser & html reader",
@@ -250,11 +259,9 @@ const ExportNotesSheet = ({
               <>
                 <ActivityIndicator />
                 <Paragraph>
-                  {ids.length === 1
-                    ? "Exporting note... Please wait"
-                    : `Exporting notes${
-                        status ? ` (${status})` : ``
-                      }... Please wait`}
+                  {`${
+                    status ? `${status})` : `Exporting notes`
+                  }... Please wait`}
                 </Paragraph>
               </>
             ) : (
