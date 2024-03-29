@@ -93,7 +93,6 @@ class UserStore extends BaseStore<UserStore> {
           state.isLoggedIn = false;
         });
         config.clear();
-        EV.publish(EVENTS.appRefreshRequested);
         if (reason) {
           await showAccountLoggedOutNotice(reason);
         }
