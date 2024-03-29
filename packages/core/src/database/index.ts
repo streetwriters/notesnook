@@ -255,40 +255,45 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
   }
 };
 
-async function init(db: Kysely<RawDatabaseSchema>, options: SQLiteOptions) {
+async function setupDatabase(
+  db: Kysely<RawDatabaseSchema>,
+  options: SQLiteOptions
+) {
+  if (options.password)
+    await sql`PRAGMA key = ${sql.ref(options.password)}`.execute(db);
+  await sql`PRAGMA journal_mode = ${sql.raw(
+    options.journalMode || "WAL"
+  )}`.execute(db);
+
+  await sql`PRAGMA synchronous = ${sql.raw(
+    options.synchronous || "normal"
+  )}`.execute(db);
+
+  // recursive_triggers are required so that SQLite fires DELETE trigger on
+  // REPLACE INTO statements
+  await sql`PRAGMA recursive_triggers = true`.execute(db);
+
+  if (options.pageSize)
+    await sql`PRAGMA page_size = ${sql.raw(
+      options.pageSize.toString()
+    )}`.execute(db);
+
+  if (options.tempStore)
+    await sql`PRAGMA temp_store = ${sql.raw(options.tempStore)}`.execute(db);
+
+  if (options.cacheSize)
+    await sql`PRAGMA cache_size = ${sql.raw(
+      options.cacheSize.toString()
+    )}`.execute(db);
+
+  if (options.lockingMode)
+    await sql`PRAGMA locking_mode = ${sql.raw(options.lockingMode)}`.execute(
+      db
+    );
+}
+
+export async function initializeDatabase(db: Kysely<RawDatabaseSchema>) {
   try {
-    if (options.password)
-      await sql`PRAGMA key = ${sql.ref(options.password)}`.execute(db);
-    await sql`PRAGMA journal_mode = ${sql.raw(
-      options.journalMode || "WAL"
-    )}`.execute(db);
-
-    await sql`PRAGMA synchronous = ${sql.raw(
-      options.synchronous || "normal"
-    )}`.execute(db);
-
-    // recursive_triggers are required so that SQLite fires DELETE trigger on
-    // REPLACE INTO statements
-    await sql`PRAGMA recursive_triggers = true`.execute(db);
-
-    if (options.pageSize)
-      await sql`PRAGMA page_size = ${sql.raw(
-        options.pageSize.toString()
-      )}`.execute(db);
-
-    if (options.tempStore)
-      await sql`PRAGMA temp_store = ${sql.raw(options.tempStore)}`.execute(db);
-
-    if (options.cacheSize)
-      await sql`PRAGMA cache_size = ${sql.raw(
-        options.cacheSize.toString()
-      )}`.execute(db);
-
-    if (options.lockingMode)
-      await sql`PRAGMA locking_mode = ${sql.raw(options.lockingMode)}`.execute(
-        db
-      );
-
     const migrator = new Migrator({
       db,
       provider: new NNMigrationProvider()
@@ -330,11 +335,19 @@ export type SQLiteOptions = {
 export async function createDatabase(name: string, options: SQLiteOptions) {
   const db = new Kysely<RawDatabaseSchema>({
     dialect: options.dialect(name, async () => {
-      await init(db, options);
+      await db.connection().execute(async (db) => {
+        await setupDatabase(db, options);
+        await initializeDatabase(db);
+      });
     }),
     plugins: [new SqliteBooleanPlugin()]
   });
-  if (!options.skipInitialization) return await init(db, options);
+  if (!options.skipInitialization)
+    await db.connection().execute(async (db) => {
+      await setupDatabase(db, options);
+      await initializeDatabase(db);
+    });
+
   return db;
 }
 
