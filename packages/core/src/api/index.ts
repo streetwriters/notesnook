@@ -65,7 +65,8 @@ import {
   DatabaseSchema,
   SQLiteOptions,
   changeDatabasePassword,
-  createDatabase
+  createDatabase,
+  initializeDatabase
 } from "../database";
 import { Kysely, Transaction, sql } from "kysely";
 import { CachedCollection } from "../database/cached-collection";
@@ -73,6 +74,7 @@ import { Vaults } from "../collections/vaults";
 import { KVStorage } from "../database/kv";
 import { QueueValue } from "../utils/queue-value";
 import { Sanitizer } from "../database/sanitizer";
+import { dropTriggers } from "../database/triggers";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -226,6 +228,7 @@ class Database {
   async reset() {
     await this.storage().clear();
 
+    await dropTriggers(this.sql());
     for (const statement of [
       "PRAGMA writable_schema = 1",
       "DELETE FROM sqlite_master",
@@ -235,11 +238,10 @@ class Database {
     ]) {
       await sql.raw(statement).execute(this.sql());
     }
-    await this.sql().destroy();
-    this._sql = (await createDatabase(
-      "notesnook",
-      this.options.sqliteOptions
-    )) as unknown as Kysely<DatabaseSchema>;
+
+    await initializeDatabase(this.sql().withTables());
+    await this.initCollections();
+    return true;
   }
 
   async changePassword(password?: string) {
