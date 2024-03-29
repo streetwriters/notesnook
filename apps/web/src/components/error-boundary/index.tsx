@@ -154,7 +154,9 @@ function getErrorHelp(props: FallbackProps) {
   if (
     errorText.includes("file is not a database") ||
     errorText.includes("unsupported file format") ||
-    errorText.includes("database disk image is malformed")
+    errorText.includes("database disk image is malformed") ||
+    errorText.includes("null function or function signature mismatch") ||
+    errorText.includes("malformed database schema")
   ) {
     return {
       explanation: `This error usually means the database file is either corrupt or it could not be decrypted.`,
@@ -166,7 +168,6 @@ function getErrorHelp(props: FallbackProps) {
         await useKeyStore.getState().clear();
         const dialect = createDialect("notesnook");
         const driver = dialect.createDriver();
-        if (!IS_DESKTOP_APP) await driver.init();
         await driver.delete();
         resetErrorBoundary();
       }
@@ -182,7 +183,6 @@ function getErrorHelp(props: FallbackProps) {
         await useKeyStore.getState().clear();
         const dialect = createDialect("notesnook");
         const driver = dialect.createDriver();
-        if (!IS_DESKTOP_APP) await driver.init();
         await driver.delete();
         resetErrorBoundary();
       }
