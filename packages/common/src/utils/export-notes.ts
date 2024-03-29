@@ -164,7 +164,8 @@ export async function* exportNote(
     const content = await exportContent(note, {
       format,
       attachmentsRoot,
-      pendingAttachments
+      pendingAttachments,
+      unlockVault: options.unlockVault
     });
     if (!content) return false;
 
