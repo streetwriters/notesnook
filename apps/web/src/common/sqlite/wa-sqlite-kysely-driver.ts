@@ -27,63 +27,135 @@ import { Mutex } from "async-mutex";
 import { SharedService } from "./shared-service";
 
 type Config = { dbName: string; async: boolean; init?: () => Promise<void> };
-const SHARED_SERVICE_NAME = "notesnook-sqlite";
+
+const servicePool = new Map<
+  string,
+  { service: SharedService<SQLiteWorker>; activated: boolean; closed: boolean }
+>();
+
 export class WaSqliteWorkerDriver implements Driver {
   private connection?: DatabaseConnection;
-  private connectionMutex = new ConnectionMutex();
-  private worker?: SQLiteWorker;
-  constructor(private readonly config: Config) {}
+  private connectionMutex = new Mutex();
+  private initializationMutex = new Mutex();
+  private readonly serviceName = `${this.config.dbName}-service`;
+
+  constructor(private readonly config: Config) {
+    console.log("new driver");
+  }
 
   async init(): Promise<void> {
-    const sharedService = new SharedService<SQLiteWorker>(SHARED_SERVICE_NAME);
-    sharedService.activate(
+    const { service, activated, closed } = servicePool.get(
+      this.serviceName
+    ) || {
+      service: new SharedService<SQLiteWorker>(this.serviceName),
+      activated: false,
+      closed: true
+    };
+    if (activated) {
+      if (closed) {
+        console.log("Already activated. Reinitializing...");
+        await service.proxy.open(
+          this.config.dbName,
+          this.config.async,
+          this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
+        );
+        this.needsInitialization = true;
+        servicePool.set(this.serviceName, {
+          service,
+          activated: true,
+          closed: false
+        });
+        this.connection = new WaSqliteWorkerConnection(service.proxy);
+      }
+      return;
+    }
+
+    service.activate(
       () =>
         new Promise<MessagePort>((resolve) => {
+          console.log("initializing worker");
           this.needsInitialization = true;
 
-          const baseWorker = new Worker();
-          baseWorker.addEventListener(
+          const worker = new Worker();
+          worker.addEventListener(
             "message",
             (event) => resolve(event.ports[0]),
             { once: true }
           );
-          baseWorker.postMessage({
+          worker.postMessage({
             dbName: this.config.dbName,
             async: this.config.async,
             uri: this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
           });
-        })
+        }),
+      async () => {
+        console.log(
+          "new client connected.",
+          this.needsInitialization,
+          this.initializing
+        );
+        await this.#initialize();
+      }
     );
 
     console.log("waiting to initialize");
     // we have to wait until a provider becomes available, otherwise
     // a race condition is created where the client starts executing
     // queries before it is initialized.
-    await sharedService.getProviderPort();
+    await service.getProviderPort();
 
-    this.worker = sharedService.proxy;
-    this.connection = new WaSqliteWorkerConnection(this.worker);
+    this.connection = new WaSqliteWorkerConnection(service.proxy);
+
+    servicePool.set(this.serviceName, {
+      service,
+      activated: true,
+      closed: false
+    });
   }
 
   private needsInitialization = false;
+  private initializing = false;
   async #initialize() {
-    if (this.needsInitialization) {
-      this.needsInitialization = false;
+    if (this.needsInitialization && !this.initializing) {
       try {
+        console.log("Starting initialization...");
+        this.initializing = true;
         await this.config.init?.();
+        this.needsInitialization = false;
+        console.log("Initialization done...");
       } catch (e) {
+        console.error(e);
         this.needsInitialization = true;
         throw e;
+      } finally {
+        this.initializing = false;
+        // there can be multiple locks on this mutex
+        while (this.initializationMutex.isLocked())
+          this.initializationMutex.release();
       }
     }
   }
 
   async acquireConnection(): Promise<DatabaseConnection> {
+    if (!this.connection) throw new Error("Driver not initialized.");
     await this.#initialize();
+
+    // We don't want to create deadlock in cases where database
+    // hasn't yet been initialized but another query has already taken
+    // the connection.
+    // Secondly, we don't want to give any other connection until
+    // database has finished initializing.
+    await this.initializationMutex.waitForUnlock();
+    if (this.initializing) {
+      await this.initializationMutex.acquire();
+      return this.connection;
+    }
+
     // SQLite only has one single connection. We use a mutex here to wait
     // until the single connection has been released.
-    await this.connectionMutex.lock();
-    return this.connection!;
+    await this.connectionMutex.waitForUnlock();
+    await this.connectionMutex.acquire();
+    return this.connection;
   }
 
   async beginTransaction(connection: DatabaseConnection): Promise<void> {
@@ -99,48 +171,29 @@ export class WaSqliteWorkerDriver implements Driver {
   }
 
   async releaseConnection(): Promise<void> {
-    this.connectionMutex.unlock();
+    this.connectionMutex.release();
   }
 
   async destroy(): Promise<void> {
-    return await this.worker?.close();
+    const service = servicePool.get(this.serviceName);
+    if (!service) return;
+    await service.service?.proxy.close();
+    service.closed = true;
   }
 
   async delete() {
-    return this.worker?.delete();
+    const { service } = servicePool.get(this.serviceName) || {};
+    await service?.proxy?.delete(this.config.dbName, this.config.async);
   }
 
   async export() {
-    return this.worker?.export(this.config.dbName, this.config.async);
-  }
-}
-
-class ConnectionMutex {
-  private promise?: Promise<void>;
-  private resolve?: () => void;
-
-  async lock(): Promise<void> {
-    while (this.promise) {
-      await this.promise;
-    }
-
-    this.promise = new Promise((resolve) => {
-      this.resolve = resolve;
-    });
-  }
-
-  unlock(): void {
-    const resolve = this.resolve;
-
-    this.promise = undefined;
-    this.resolve = undefined;
-
-    resolve?.();
+    return servicePool
+      .get(this.serviceName)
+      ?.service?.proxy?.export(this.config.dbName, this.config.async);
   }
 }
 
 class WaSqliteWorkerConnection implements DatabaseConnection {
-  private readonly queryMutex = new Mutex();
   constructor(private readonly worker: SQLiteWorker) {}
 
   streamQuery<R>(): AsyncIterableIterator<QueryResult<R>> {
@@ -157,8 +210,6 @@ class WaSqliteWorkerConnection implements DatabaseConnection {
         : query.kind === "RawNode"
         ? "raw"
         : "exec";
-    return this.queryMutex.runExclusive(() =>
-      this.worker.run(mode, sql, parameters as any)
-    );
+    return this.worker.run(mode, sql, parameters as any);
   }
 }

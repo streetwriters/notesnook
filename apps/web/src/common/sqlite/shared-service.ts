@@ -38,7 +38,13 @@ export class SharedService<T extends object> extends EventTarget {
   #providerPort: Promise<MessagePort | null>;
   providerCallbacks: Map<
     string,
-    { resolve: (result: unknown) => void; reject: (reason: unknown) => void }
+    {
+      resolve: (result: unknown) => void;
+      reject: (reason: unknown) => void;
+      nonce: string;
+      method: string | symbol;
+      args: any[];
+    }
   > = new Map();
   #providerCounter = 0;
   #providerChangeCleanup: (() => void)[] = [];
@@ -61,8 +67,9 @@ export class SharedService<T extends object> extends EventTarget {
         ) {
           // A context (possibly this one) announced itself as the new provider.
           // Discard any old provider and connect to the new one.
-          this.#closeProviderPort(this.#providerPort);
+          this.#providerPort.then((port) => port?.close());
           this.#providerPort = this.#providerChange();
+          await this.#resendPendingCallbacks();
         }
       },
       { signal: this.#onClose.signal }
@@ -71,7 +78,10 @@ export class SharedService<T extends object> extends EventTarget {
     this.proxy = this.#createProxy();
   }
 
-  activate(portProviderFunc: () => MessagePort | Promise<MessagePort>) {
+  activate(
+    portProviderFunc: () => MessagePort | Promise<MessagePort>,
+    onClientConnected: () => Promise<void>
+  ) {
     if (this.#onDeactivate) return;
 
     // When acquire a lock on the service name then we become the service
@@ -80,10 +90,8 @@ export class SharedService<T extends object> extends EventTarget {
     this.#onDeactivate = new AbortController();
 
     const LOCK_NAME = `SharedService-${this.serviceName}`;
-    navigator.locks.request(
-      LOCK_NAME,
-      { signal: this.#onDeactivate.signal },
-      async () => {
+    navigator.locks
+      .request(LOCK_NAME, { signal: this.#onDeactivate.signal }, async () => {
         // Get the port to request client ports.
         const port = await portProviderFunc();
         port.start();
@@ -93,12 +101,16 @@ export class SharedService<T extends object> extends EventTarget {
         // request.
         const providerId = await this.#clientId;
         const broadcastChannel = new BroadcastChannel("SharedService");
+
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const thisArg = this;
         broadcastChannel.addEventListener(
           "message",
-          async ({ data }) => {
+          async function onMessage(event) {
+            const { data } = event;
             if (
               data?.type === "request" &&
-              data?.sharedService === this.serviceName
+              data?.sharedService === thisArg.serviceName
             ) {
               // Get a port to send to the client.
               const requestedPort = await new Promise<MessagePort>(
@@ -112,7 +124,22 @@ export class SharedService<T extends object> extends EventTarget {
                 }
               );
 
-              this.#sendPortToClient(data, requestedPort);
+              if (data.clientId !== providerId) {
+                await onClientConnected();
+              }
+
+              try {
+                thisArg.#sendPortToClient(data, requestedPort);
+              } catch (e) {
+                console.error(e, providerId, data);
+                // retry if port has been neutered, this can happen when
+                // closing the provider tab/window
+                if (e instanceof Error && e.message.includes("neutered")) {
+                  console.warn("Retrying in 100ms...");
+                  await new Promise((resolve) => setTimeout(resolve, 100));
+                  onMessage.bind(broadcastChannel, event)();
+                } else throw e;
+              }
             }
           },
           { signal: this.#onDeactivate?.signal }
@@ -132,8 +159,8 @@ export class SharedService<T extends object> extends EventTarget {
             reject(this.#onDeactivate?.signal.reason);
           });
         });
-      }
-    );
+      })
+      .catch(console.error);
   }
 
   deactivate() {
@@ -142,14 +169,14 @@ export class SharedService<T extends object> extends EventTarget {
   }
 
   close() {
+    for (const { reject } of this.providerCallbacks.values()) {
+      reject(new Error("SharedService closed."));
+    }
     this.deactivate();
     this.#onClose.abort();
-    for (const { reject } of this.providerCallbacks.values()) {
-      reject(new Error("SharedService closed"));
-    }
   }
 
-  async #sendPortToClient(message: any, port: MessagePort) {
+  #sendPortToClient(message: any, port: MessagePort) {
     sharedWorker?.port.postMessage(message, [port]);
   }
 
@@ -271,10 +298,10 @@ export class SharedService<T extends object> extends EventTarget {
     }
   }
 
-  #closeProviderPort(providerPort: Promise<MessagePort | null>) {
-    providerPort.then((port) => port?.close());
-    for (const { reject } of this.providerCallbacks.values()) {
-      reject(new Error("SharedService provider change"));
+  async #resendPendingCallbacks() {
+    const port = await this.getProviderPort();
+    for (const { method, args, nonce } of this.providerCallbacks.values()) {
+      port.postMessage({ nonce, method, args });
     }
   }
 
@@ -288,7 +315,13 @@ export class SharedService<T extends object> extends EventTarget {
 
           const providerPort = await this.getProviderPort();
           return new Promise((resolve, reject) => {
-            this.providerCallbacks.set(nonce, { resolve, reject });
+            this.providerCallbacks.set(nonce, {
+              resolve,
+              reject,
+              nonce,
+              method,
+              args
+            });
             providerPort.postMessage({ nonce, method, args });
           }).finally(() => {
             this.providerCallbacks.delete(nonce);
