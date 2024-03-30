@@ -89,6 +89,10 @@ async function createWindow() {
       color: "#00000000",
       symbolColor: config.windowControlsIconColor
     },
+    trafficLightPosition: {
+      x: 16,
+      y: 12
+    },
 
     webPreferences: {
       zoomFactor: config.zoomFactor,
