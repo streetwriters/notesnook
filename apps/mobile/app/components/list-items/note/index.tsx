@@ -211,6 +211,19 @@ const NoteItem = ({
                     color={colors.error.accent}
                   />
                 ) : null}
+
+                {item.localOnly ? (
+                  <Icon
+                    testID="sync-off"
+                    name="sync-off"
+                    size={SIZE.md}
+                    style={{
+                      marginRight: 6
+                    }}
+                    color={primaryColors.icon}
+                  />
+                ) : null}
+
                 <TimeSince
                   style={{
                     fontSize: SIZE.xs,
