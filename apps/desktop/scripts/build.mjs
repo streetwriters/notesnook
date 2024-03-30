@@ -64,7 +64,7 @@ if (args.run) {
   if (process.platform === "win32") {
     await exec(`.\\output\\win-unpacked\\Notesnook.exe`);
   } else if (process.platform === "darwin") {
-    await exec(`./output/darwin-unpacked/Notesnook`);
+    await exec(`./output/mac/Notesnook.app/Contents/MacOS/Notesnook`);
   } else {
     await exec(`./output/linux-unpacked/Notesnook`);
   }
