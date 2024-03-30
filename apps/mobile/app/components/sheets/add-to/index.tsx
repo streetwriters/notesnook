@@ -46,6 +46,7 @@ import { IconButton } from "../../ui/icon-button";
 import Paragraph from "../../ui/typography/paragraph";
 import { NotebookItem } from "./notebook-item";
 import { useNotebookItemSelectionStore } from "./store";
+import { AddNotebookSheet } from "../add-notebook";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -141,6 +142,11 @@ const MoveNoteSheet = ({
     actionSheetRef.current?.hide();
   };
 
+  const hasSelected = () => {
+    const selection = useNotebookItemSelectionStore.getState().selection;
+    return Object.keys(selection).some((key) => selection[key] === "selected");
+  };
+
   const renderNotebook = useCallback(
     ({ index }: { item: boolean; index: number }) => (
       <NotebookItem items={notebooks} id={index} index={index} />
@@ -190,18 +196,21 @@ const MoveNoteSheet = ({
               columnGap: 10
             }}
           >
-            <IconButton
-              name="restore"
-              type="secondaryAccented"
-              onPress={() => {
-                const items = note ? [note.id] : selectedItemsList;
-                updateInitialSelectionState(items);
-              }}
-              style={{
-                width: 40,
-                height: 40
-              }}
-            />
+            {hasSelected() ? (
+              <IconButton
+                name="restore"
+                type="secondaryAccented"
+                color={colors.primary.icon}
+                onPress={() => {
+                  const items = note ? [note.id] : selectedItemsList;
+                  updateInitialSelectionState(items);
+                }}
+                style={{
+                  width: 40,
+                  height: 40
+                }}
+              />
+            ) : null}
 
             <Button
               height={40}
@@ -230,6 +239,36 @@ const MoveNoteSheet = ({
             style={{
               width: "100%"
             }}
+            ListHeaderComponent={
+              <View
+                style={{
+                  paddingHorizontal: 12,
+                  width: "100%"
+                }}
+              >
+                <Button
+                  title="Add new notebook"
+                  style={{
+                    alignSelf: "flex-start",
+                    paddingHorizontal: 12,
+                    justifyContent: "space-between"
+                  }}
+                  onPress={() => {
+                    AddNotebookSheet.present(
+                      undefined,
+                      undefined,
+                      "link-notebooks",
+                      undefined,
+                      false
+                    );
+                  }}
+                  icon="plus"
+                  iconPosition="right"
+                  type="secondaryAccented"
+                  width="100%"
+                />
+              </View>
+            }
             estimatedItemSize={50}
             renderItem={renderNotebook}
             ListEmptyComponent={
@@ -265,7 +304,8 @@ MoveNoteSheet.present = (note?: Note) => {
   presentSheet({
     component: (ref) => <MoveNoteSheet actionSheetRef={ref} note={note} />,
     enableGesturesInScrollView: false,
-    noBottomPadding: true
+    noBottomPadding: true,
+    keyboardHandlerDisabled: true
   });
 };
 export default MoveNoteSheet;

@@ -39,15 +39,18 @@ import Heading from "../../ui/typography/heading";
 import { MoveNotes } from "../move-notes/movenote";
 import { eOnNotebookUpdated } from "../../../utils/events";
 import { getParentNotebookId } from "../../../utils/notebooks";
+import { useNotebookStore } from "../../../stores/use-notebook-store";
 
 export const AddNotebookSheet = ({
   notebook,
   parentNotebook,
-  close
+  close,
+  showMoveNotesOnComplete
 }: {
   notebook?: Notebook;
   parentNotebook?: Notebook;
-  close: ((context?: string | undefined) => void) | undefined;
+  close?: (didAddNotebook: boolean) => void;
+  showMoveNotesOnComplete: boolean;
 }) => {
   const title = useRef(notebook?.title);
   const description = useRef(notebook?.description);
@@ -85,6 +88,7 @@ export const AddNotebookSheet = ({
     useMenuStore.getState().setMenuPins();
     Navigation.queueRoutesForUpdate();
     useRelationStore.getState().update();
+    useNotebookStore.getState().refresh();
 
     const parent =
       parentNotebook?.id || (await getParentNotebookId(notebook?.id || id));
@@ -97,10 +101,10 @@ export const AddNotebookSheet = ({
       });
     }
 
-    if (!notebook) {
+    if (!notebook && showMoveNotesOnComplete) {
       MoveNotes.present(await db.notebooks.notebook(id));
     } else {
-      close?.();
+      close?.(true);
     }
   };
 
@@ -169,7 +173,8 @@ AddNotebookSheet.present = (
   notebook?: Notebook,
   parentNotebook?: Notebook,
   context?: string,
-  onClose?: () => void
+  onClose?: (didAddNotebook: boolean) => void,
+  showMoveNotesOnComplete = true
 ) => {
   presentSheet({
     context: context,
@@ -177,9 +182,12 @@ AddNotebookSheet.present = (
       <AddNotebookSheet
         notebook={notebook}
         parentNotebook={parentNotebook}
-        close={close}
+        close={(didAddNotebook: boolean) => {
+          close?.();
+          onClose?.(didAddNotebook);
+        }}
+        showMoveNotesOnComplete={showMoveNotesOnComplete || false}
       />
-    ),
-    onClose: onClose
+    )
   });
 };

@@ -226,7 +226,13 @@ export const NotebookItem = ({
             testID={notesnook.ids.notebook.menu}
             onPress={() => {
               if (!item) return;
-              AddNotebookSheet.present(undefined, item, "link-notebooks");
+              AddNotebookSheet.present(
+                undefined,
+                item,
+                "link-notebooks",
+                undefined,
+                false
+              );
             }}
             left={0}
             right={0}
