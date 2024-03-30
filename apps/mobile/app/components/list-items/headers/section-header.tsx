@@ -25,7 +25,7 @@ import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enab
 import { presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { RouteName } from "../../../stores/use-navigation-store";
-import { ColorValues, getContainerBorder } from "../../../utils/colors";
+import { getContainerBorder } from "../../../utils/colors";
 import { GROUP } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
 import Sort from "../../sheets/sort";
@@ -96,10 +96,7 @@ export const SectionHeader = React.memo<
           }}
         >
           <Heading
-            color={
-              ColorValues[color?.toLowerCase() as keyof typeof ColorValues] ||
-              colors.primary.accent
-            }
+            color={color || colors.primary.accent}
             size={SIZE.sm}
             style={{
               minWidth: 60,
