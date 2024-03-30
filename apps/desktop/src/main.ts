@@ -82,6 +82,14 @@ async function createWindow() {
       size: 512,
       format: process.platform === "win32" ? "ico" : "png"
     }),
+
+    titleBarStyle: "hidden",
+    titleBarOverlay: {
+      height: 37,
+      color: "#00000000",
+      symbolColor: config.windowControlsIconColor
+    },
+
     webPreferences: {
       zoomFactor: config.zoomFactor,
       nodeIntegration: true,
@@ -122,7 +130,7 @@ async function createWindow() {
   setupJumplist();
 
   if (isDevelopment())
-    mainWindow.webContents.openDevTools({ mode: "right", activate: true });
+    mainWindow.webContents.openDevTools({ mode: "bottom", activate: true });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);

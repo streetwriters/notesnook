@@ -24,6 +24,7 @@ import { spellCheckerRouter } from "./spell-checker";
 import { updaterRouter } from "./updater";
 import { bridgeRouter } from "./bridge";
 import { safeStorageRouter } from "./safe-storage";
+import { windowRouter } from "./window";
 
 const t = initTRPC.create();
 
@@ -33,7 +34,8 @@ export const router = t.router({
   spellChecker: spellCheckerRouter,
   updater: updaterRouter,
   bridge: bridgeRouter,
-  safeStorage: safeStorageRouter
+  safeStorage: safeStorageRouter,
+  window: windowRouter
 });
 
 export const api = router.createCaller({});

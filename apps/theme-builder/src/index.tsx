@@ -25,12 +25,11 @@ import { App } from "./app";
 renderApp();
 
 async function renderApp() {
-  const { component, props, path } = await init();
+  const { component, props } = await init();
 
   const { default: Component } = await component();
   render(
     <BaseThemeProvider
-      addGlobalStyles
       sx={{
         display: "flex",
         "#app": { flex: 1, height: "unset" },

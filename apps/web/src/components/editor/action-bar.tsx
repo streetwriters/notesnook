@@ -35,7 +35,11 @@ import {
   Search,
   TableOfContents,
   Trash,
-  Unlock
+  Unlock,
+  WindowClose,
+  WindowMaximize,
+  WindowMinimize,
+  WindowRestore
 } from "../icons";
 import { ScrollContainer } from "@notesnook/ui";
 import {
@@ -64,11 +68,16 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { AppEventManager, AppEvents } from "../../common/app-events";
+import { desktop } from "../../common/desktop-bridge";
+import { useWindowControls } from "../../hooks/use-window-controls";
+import { ScopedThemeProvider } from "../theme-provider";
+import { getPlatform } from "../../utils/platform";
 
 export function EditorActionBar() {
   const editorMargins = useEditorStore((store) => store.editorMargins);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const { isMaximized, isFullscreen, hasNativeWindowControls } =
+    useWindowControls();
   const activeSession = useEditorStore((store) =>
     store.activeSessionId ? store.getSession(store.activeSessionId) : undefined
   );
@@ -95,7 +104,6 @@ export function EditorActionBar() {
         } else {
           enterFullscreen(document.documentElement);
         }
-        setIsFullscreen((s) => !s);
       }
     },
     {
@@ -145,44 +153,96 @@ export function EditorActionBar() {
         activeSession.type !== "conflicted" &&
         !isFocusMode,
       onClick: () => useEditorStore.getState().toggleProperties()
+    },
+
+    {
+      title: "Minimize",
+      icon: WindowMinimize,
+      hidden: hasNativeWindowControls || isFullscreen,
+      enabled: true,
+      onClick: () => desktop?.window.minimze.mutate()
+    },
+    {
+      title: isMaximized ? "Restore" : "Maximize",
+      icon: isMaximized ? WindowRestore : WindowMaximize,
+      enabled: true,
+      hidden: hasNativeWindowControls || isFullscreen,
+      onClick: () =>
+        isMaximized
+          ? desktop?.window.restore.mutate()
+          : desktop?.window.maximize.mutate()
+    },
+    {
+      title: "Close",
+      icon: WindowClose,
+      hidden: hasNativeWindowControls || isFullscreen,
+      enabled: true,
+      onClick: () => window.close()
     }
   ];
 
   return (
-    <Flex sx={{ mb: 1, gap: 2 }}>
-      <TabStrip />
-      <Flex
-        bg="background"
-        sx={{
-          borderRadius: "default",
-          overflow: "hidden",
-          alignItems: "center",
-          justifyContent: "flex-end",
-          mr: 2
-        }}
-      >
-        {tools.map((tool) => (
-          <Button
-            data-test-id={tool.title}
-            disabled={!tool.enabled}
-            variant="secondary"
-            title={tool.title}
-            key={tool.title}
-            sx={{
-              display: [
-                tool.hideOnMobile ? "none" : "flex",
-                tool.hidden ? "none" : "flex"
-              ],
-              borderRadius: 0,
-              flexShrink: 0
-            }}
-            onClick={tool.onClick}
-          >
-            <tool.icon size={18} />
-          </Button>
-        ))}
+    <ScopedThemeProvider scope="titleBar" injectCssVars>
+      <Flex sx={{ gap: 2, borderBottom: "1px solid var(--border)", pl: 2 }}>
+        {IS_DESKTOP_APP ? (
+          getPlatform() === "darwin" && !isFullscreen ? (
+            <></>
+          ) : (
+            <svg
+              className="titlebarLogo"
+              style={{
+                alignSelf: "center",
+                height: 24,
+                width: 24
+              }}
+            >
+              <use href="#themed-logo" />
+            </svg>
+          )
+        ) : null}
+        <TabStrip />
+        <Flex
+          bg="transparent"
+          sx={{
+            // borderRadius: "default",
+            // overflow: "hidden",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            mr: IS_DESKTOP_APP ? `calc(100vw - env(titlebar-area-width))` : 2
+          }}
+        >
+          {tools.map((tool) => (
+            <Button
+              data-test-id={tool.title}
+              disabled={!tool.enabled}
+              variant={tool.title === "Close" ? "error" : "secondary"}
+              title={tool.title}
+              key={tool.title}
+              sx={{
+                height: "100%",
+                alignItems: "center",
+                bg: "transparent",
+                display: [
+                  tool.hideOnMobile ? "none" : "flex",
+                  tool.hidden ? "none" : "flex"
+                ],
+                borderRadius: 0,
+                flexShrink: 0,
+                "&:hover svg path": {
+                  fill:
+                    tool.title === "Close"
+                      ? "var(--accentForeground-error) !important"
+                      : "var(--icon)"
+                }
+              }}
+              onClick={tool.onClick}
+            >
+              <tool.icon size={18} />
+            </Button>
+          ))}
+        </Flex>
       </Flex>
-    </Flex>
+    </ScopedThemeProvider>
   );
 }
 
@@ -210,8 +270,7 @@ function TabStrip() {
       <Flex
         sx={{
           flex: 1,
-          my: 1,
-          ml: 1,
+          my: "2.5px",
           gap: 1,
           height: 32
         }}
@@ -392,12 +451,12 @@ function Tab(props: TabProps) {
         transition,
         visibility: active?.id === id ? "hidden" : "visible",
 
-        bg: isActive ? "background" : "background-secondary",
+        bg: isActive ? "background-selected" : "background-secondary",
         // borderTopLeftRadius: "default",
         // borderTopRightRadius: "default",
         // borderBottom: isActive ? "none" : "1px solid var(--border)",
         border: "1px solid",
-        borderColor: isActive ? "border" : "transparent",
+        borderColor: isActive ? "border-selected" : "transparent",
         justifyContent: "space-between",
         alignItems: "center",
         flexShrink: 0,
@@ -405,7 +464,7 @@ function Tab(props: TabProps) {
           "& .closeTabButton": {
             visibility: "visible"
           },
-          bg: isActive ? "background" : "hover"
+          bg: isActive ? "hover-selected" : "hover"
         }
       }}
       onContextMenu={(e) => {
@@ -476,7 +535,7 @@ function Tab(props: TabProps) {
       {...attributes}
     >
       <Flex mr={1}>
-        <Icon size={16} color={isActive ? "accent" : "icon"} />
+        <Icon size={16} color={isActive ? "accent-selected" : "icon"} />
         <Text
           variant="body"
           sx={{
@@ -485,7 +544,8 @@ function Tab(props: TabProps) {
             overflowX: "hidden",
             pointerEvents: "none",
             fontStyle: isTemporary ? "italic" : "normal",
-            maxWidth: 120
+            maxWidth: 120,
+            color: isActive ? "paragraph-selected" : "paragraph"
           }}
           ml={1}
         >

@@ -24,34 +24,32 @@ import { desktop } from "../common/desktop-bridge";
 import {
   THEME_COMPATIBILITY_VERSION,
   ThemeDark,
+  ThemeDefinition,
   ThemeLight
 } from "@notesnook/theme";
 import { ThemesRouter } from "../common/themes-router";
 
-/**
- * @extends {BaseStore<ThemeStore>}
- */
-class ThemeStore extends BaseStore {
-  /**
-   * @type {"dark" | "light"}
-   */
-  colorScheme = Config.get("colorScheme", "light");
+type ColorScheme = "dark" | "light";
+class ThemeStore extends BaseStore<ThemeStore> {
+  colorScheme: "dark" | "light" = Config.get("colorScheme", "light");
   darkTheme = getTheme("dark");
   lightTheme = getTheme("light");
   followSystemTheme = Config.get("followSystemTheme", false);
 
   init = async () => {
-    const { darkTheme, lightTheme } = this.get();
+    const { darkTheme, lightTheme, colorScheme } = this.get();
+    await changeDesktopTheme(
+      colorScheme === "dark" ? darkTheme : lightTheme,
+      this.get().followSystemTheme
+    );
     this.set({
       darkTheme: await updateTheme(darkTheme),
       lightTheme: await updateTheme(lightTheme)
     });
   };
 
-  /**
-   * @param {import("@notesnook/theme").ThemeDefinition} theme
-   */
-  setTheme = (theme) => {
+  setTheme = (theme: ThemeDefinition) => {
+    changeDesktopTheme(theme, this.get().followSystemTheme);
     Config.set(`theme:${theme.colorScheme}`, theme);
     this.set({
       [getKey(theme)]: theme,
@@ -59,21 +57,17 @@ class ThemeStore extends BaseStore {
     });
   };
 
-  setColorScheme = async (colorScheme) => {
-    if (!this.get().followSystemTheme)
-      await desktop?.integration.changeTheme.mutate(colorScheme);
+  setColorScheme = async (colorScheme: ColorScheme) => {
     const theme = getTheme(colorScheme);
-    this.set({
-      colorScheme,
-      theme
-    });
-    Config.set("colorScheme", colorScheme);
+    this.set({ colorScheme, [getKey(theme)]: theme });
+    changeDesktopTheme(theme, this.get().followSystemTheme);
 
-    updateTheme(theme).then((theme) =>
-      this.set({
-        [getKey(theme)]: theme
-      })
-    );
+    updateTheme(theme).then((theme) => {
+      changeDesktopTheme(theme, this.get().followSystemTheme);
+      Config.set("colorScheme", colorScheme);
+      Config.set(`theme:${theme.colorScheme}`, theme);
+      this.set({ [getKey(theme)]: theme });
+    });
   };
 
   toggleColorScheme = () => {
@@ -81,12 +75,12 @@ class ThemeStore extends BaseStore {
     this.setColorScheme(theme === "dark" ? "light" : "dark");
   };
 
-  setFollowSystemTheme = async (followSystemTheme) => {
+  setFollowSystemTheme = async (followSystemTheme: boolean) => {
     this.set({ followSystemTheme });
     Config.set("followSystemTheme", followSystemTheme);
-    await desktop?.integration.changeTheme.mutate(
-      followSystemTheme ? "system" : "light"
-    );
+    await desktop?.integration.changeTheme.mutate({
+      theme: followSystemTheme ? "system" : this.get().colorScheme
+    });
   };
 
   toggleFollowSystemTheme = () => {
@@ -94,25 +88,27 @@ class ThemeStore extends BaseStore {
     this.setFollowSystemTheme(!followSystemTheme);
   };
 
-  isThemeCurrentlyApplied = (id) => {
+  isThemeCurrentlyApplied = (id: string) => {
     return this.get().darkTheme.id === id || this.get().lightTheme.id === id;
   };
 }
 
-const [useStore, store] = createStore((set, get) => new ThemeStore(set, get));
+const [useStore, store] = createStore<ThemeStore>(
+  (set, get) => new ThemeStore(set, get)
+);
 export { useStore, store };
 
-function getKey(theme) {
+function getKey(theme: ThemeDefinition) {
   return theme.colorScheme === "dark" ? "darkTheme" : "lightTheme";
 }
 
-function getTheme(colorScheme) {
+function getTheme(colorScheme: ColorScheme) {
   return colorScheme === "dark"
     ? Config.get("theme:dark", ThemeDark)
     : Config.get("theme:light", ThemeLight);
 }
 
-async function updateTheme(theme) {
+async function updateTheme(theme: ThemeDefinition) {
   const { id, version } = theme;
   try {
     const updatedTheme = await ThemesRouter.updateTheme.query({
@@ -125,4 +121,12 @@ async function updateTheme(theme) {
   } catch (e) {
     return theme;
   }
+}
+
+function changeDesktopTheme(theme: ThemeDefinition, system: boolean) {
+  return desktop?.integration.changeTheme.mutate({
+    theme: system ? "system" : theme.colorScheme,
+    backgroundColor: theme.scopes.base.primary.background,
+    windowControlsIconColor: theme.scopes.base.primary.icon
+  });
 }
