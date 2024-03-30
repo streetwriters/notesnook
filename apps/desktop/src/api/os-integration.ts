@@ -181,9 +181,10 @@ export const osIntegrationRouter = t.router({
       ({ input: { theme, windowControlsIconColor, backgroundColor } }) => {
         if (windowControlsIconColor) {
           config.windowControlsIconColor = windowControlsIconColor;
-          globalThis.window?.setTitleBarOverlay({
-            symbolColor: windowControlsIconColor
-          });
+          if (process.platform === "win32")
+            globalThis.window?.setTitleBarOverlay({
+              symbolColor: windowControlsIconColor
+            });
         }
 
         if (backgroundColor) {

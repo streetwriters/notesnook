@@ -183,11 +183,20 @@ export function EditorActionBar() {
 
   return (
     <ScopedThemeProvider scope="titleBar" injectCssVars>
-      <Flex sx={{ gap: 2, borderBottom: "1px solid var(--border)", pl: 2 }}>
+      <Flex
+        sx={{
+          gap: 2,
+          borderBottom: "1px solid var(--border)",
+          px: 2,
+          ...(IS_DESKTOP_APP && !isFullscreen && !hasNativeWindowControls
+            ? getPlatform() === "darwin"
+              ? { pl: "calc(100vw - env(titlebar-area-width))" }
+              : { pr: "calc(100vw - env(titlebar-area-width))" }
+            : {})
+        }}
+      >
         {IS_DESKTOP_APP ? (
-          getPlatform() === "darwin" && !isFullscreen ? (
-            <></>
-          ) : (
+          getPlatform() === "darwin" && !isFullscreen ? null : (
             <svg
               className="titlebarLogo"
               style={{
@@ -207,8 +216,8 @@ export function EditorActionBar() {
             // borderRadius: "default",
             // overflow: "hidden",
             alignItems: "center",
-            justifyContent: "flex-end",
-            mr: IS_DESKTOP_APP ? `calc(100vw - env(titlebar-area-width))` : 2
+            justifyContent: "flex-end"
+            // mr: IS_DESKTOP_APP ? `calc(100vw - env(titlebar-area-width))` : 2
           }}
         >
           {tools.map((tool) => (
