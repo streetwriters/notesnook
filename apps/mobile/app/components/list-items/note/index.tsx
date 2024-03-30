@@ -216,7 +216,19 @@ const NoteItem = ({
                   <Icon
                     testID="sync-off"
                     name="sync-off"
-                    size={SIZE.md}
+                    size={SIZE.sm}
+                    style={{
+                      marginRight: 6
+                    }}
+                    color={primaryColors.icon}
+                  />
+                ) : null}
+
+                {item.readonly ? (
+                  <Icon
+                    testID="pencil-lock"
+                    name="pencil-lock"
+                    size={SIZE.sm}
                     style={{
                       marginRight: 6
                     }}
@@ -239,12 +251,13 @@ const NoteItem = ({
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
-                      marginRight: 6
+                      marginRight: 6,
+                      gap: 2
                     }}
                   >
                     <Icon
                       name="attachment"
-                      size={SIZE.md}
+                      size={SIZE.sm}
                       color={primaryColors.icon}
                     />
                     <Paragraph
@@ -284,7 +297,7 @@ const NoteItem = ({
                   <Icon
                     testID="icon-star"
                     name="star-outline"
-                    size={SIZE.md}
+                    size={SIZE.sm}
                     style={{
                       marginRight: 6
                     }}
@@ -301,7 +314,8 @@ const NoteItem = ({
                           height={23}
                           type="plain"
                           textStyle={{
-                            textDecorationLine: "underline"
+                            textDecorationLine: "underline",
+                            color: colors.secondary.paragraph
                           }}
                           hitSlop={{ top: 8, bottom: 12, left: 0, right: 0 }}
                           fontSize={SIZE.xs}
@@ -383,7 +397,7 @@ const NoteItem = ({
               <Icon
                 testID="icon-star"
                 name="star-outline"
-                size={SIZE.md}
+                size={SIZE.sm}
                 style={{
                   marginRight: 6
                 }}
