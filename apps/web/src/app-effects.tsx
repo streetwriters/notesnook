@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useEffect } from "react";
 import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
-import { useStore as useThemeStore } from "./stores/theme-store";
 import { useStore as useAttachmentStore } from "./stores/attachment-store";
 import { useEditorStore } from "./stores/editor-store";
 import { useStore as useAnnouncementStore } from "./stores/announcement-store";
@@ -37,7 +36,6 @@ import {
   showFeatureDialog,
   showOnboardingDialog
 } from "./common/dialog-controller";
-import useSystemTheme from "./hooks/use-system-theme";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
 import { interruptedOnboarding } from "./dialogs/onboarding-dialog";
@@ -55,13 +53,10 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
   const initStore = useStore((store) => store.init);
   const initAttachments = useAttachmentStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
-  const setColorScheme = useThemeStore((store) => store.setColorScheme);
-  const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
   const initEditorStore = useEditorStore((store) => store.init);
   const dialogAnnouncements = useAnnouncementStore(
     (store) => store.dialogAnnouncements
   );
-  const isSystemThemeDark = useSystemTheme();
 
   useEffect(
     function initializeApp() {
@@ -232,11 +227,6 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
       await showAnnouncementDialog(dialogAnnouncements[0]);
     })();
   }, [dialogAnnouncements]);
-
-  useEffect(() => {
-    if (!followSystemTheme) return;
-    setColorScheme(isSystemThemeDark ? "dark" : "light");
-  }, [isSystemThemeDark, followSystemTheme, setColorScheme]);
 
   useEffect(() => {
     const { unsubscribe } =

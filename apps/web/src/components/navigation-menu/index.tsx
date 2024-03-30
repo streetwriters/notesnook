@@ -232,6 +232,10 @@ function NavigationMenu(props: NavigationMenuProps) {
             flexDirection: "column",
             display: "flex"
           }}
+          trackStyle={() => ({
+            width: 3
+          })}
+          thumbStyle={() => ({ width: 3 })}
           suppressScrollX={true}
         >
           <Flex sx={{ flexDirection: "column" }}>

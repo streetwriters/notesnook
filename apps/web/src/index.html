@@ -40,32 +40,31 @@
     <meta name="twitter:card" content="summary_large_image" />
     <title>Notesnook</title>
 
-    <script nonce="7WIq8hRwApoXhctoGZZthMLYQLRNiprTwcPi6Azdf">
+    <style id="theme-colors">
+      #splash {
+        display: none !important;
+      }
+    </style>
+    <script type="module">
+      import { themeToCSS } from "@notesnook/theme";
+
       const colorScheme = JSON.parse(
         window.localStorage.getItem("colorScheme") || '"light"'
       );
       const root = document.querySelector("html");
       if (root) root.setAttribute("data-theme", colorScheme);
+
+      const theme = window.localStorage.getItem(`theme:${colorScheme}`);
+      if (theme) {
+        const css = themeToCSS(JSON.parse(theme));
+        const stylesheet = document.getElementById("theme-colors");
+        if (stylesheet) stylesheet.innerHTML = css;
+      }
     </script>
     <script type="module" src="/index.tsx"></script>
     <style>
       html {
         overscroll-behavior: none;
-      }
-
-      html[data-theme="dark"] {
-        --bg: #0f0f0f;
-        --fg: #fff;
-        --three-bars-bg: #494949;
-        --gradient-stop-color: #111111;
-        --n-letter-color: #e1e1e1;
-      }
-
-      html[data-theme="light"] {
-        --bg: #fff;
-        --three-bars-bg: #bebebe;
-        --gradient-stop-color: #fff9f9;
-        --n-letter-color: #000;
       }
 
       html[data-theme="light"] .react-loading-skeleton {
@@ -76,6 +75,19 @@
       html[data-theme="dark"] .react-loading-skeleton {
         --base-color: var(--background-secondary);
         --highlight-color: var(--background-secondary);
+      }
+
+      #splash {
+        background-color: var(--background);
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
 
       #splash svg {
@@ -161,28 +173,13 @@
     </style>
   </head>
 
-  <body>
+  <body class="theme-scope-base">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <!--     <script src="https://cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
  -->
     <div id="root"></div>
-    <div
-      id="splash"
-      style="
-        background-color: var(--bg);
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      "
-    >
-      <svg viewBox="0 0 339 339" style="width: 150px">
-        <defs />
+    <svg xmlns="http://www.w3.org/2000/svg">
+      <symbol id="themed-logo" viewBox="0 0 339 339">
         <defs>
           <linearGradient
             xlink:href="#a"
@@ -199,7 +196,7 @@
             <stop offset="0" />
             <stop
               offset="1"
-              stop-color="var(--gradient-stop-color)"
+              stop-color="var(--background-secondary)"
               stop-opacity="0"
             />
           </linearGradient>
@@ -223,7 +220,7 @@
             d="M160 205V-35m0 240L18 249m142-44l154 41"
           />
           <path
-            fill="var(--n-letter-color)"
+            fill="var(--paragraph)"
             d="M84 109l35 54V98l21-7v91l-27 9-35-54v65l-21 6v-91z"
           />
           <rect
@@ -231,15 +228,20 @@
             height="12.6"
             x="185"
             y="97"
-            fill="var(--three-bars-bg)"
+            fill="var(--paragraph-secondary)"
             ry="2.3"
             transform="skewY(15) scale(.9669 1)"
           />
           <path
-            fill="var(--three-bars-bg)"
+            fill="var(--paragraph-secondary)"
             d="M181 169l99 26 2 3v8c0 1-1 2-2 1l-99-26-2-3v-7c0-2 1-2 2-2zm0-47l99 27 2 2v8l-2 2-99-27c-1 0-2-1-2-3v-7l2-2z"
           />
         </g>
+      </symbol>
+    </svg>
+    <div id="splash" class="hidden">
+      <svg>
+        <use href="#themed-logo" />
       </svg>
     </div>
     <div id="dialogContainer"></div>

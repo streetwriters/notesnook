@@ -3,6 +3,15 @@
   --sash-hover-size: 4px;
 }
 
+.tabsScroll,
+.titlebarLogo {
+  -webkit-app-region: drag;
+}
+
+.tabsScroll .tab {
+  -webkit-app-region: no-drag;
+}
+
 .sash-module_sash__K-9lB.sash-module_hover__80W6I:before,
 .sash-module_sash__K-9lB.sash-module_active__bJspD:before {
   background: var(--accent);

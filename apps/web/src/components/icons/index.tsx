@@ -211,7 +211,8 @@ import {
   mdiDotsHorizontal,
   mdiCalendarBlank,
   mdiFormatListBulleted,
-  mdiLink
+  mdiLink,
+  mdiWindowClose
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -538,3 +539,10 @@ export const Legal = createIcon(mdiGavel);
 export const Desktop = createIcon(mdiDesktopClassic);
 export const Notification = createIcon(mdiBellBadgeOutline);
 export const Calendar = createIcon(mdiCalendarBlank);
+
+export const WindowMinimize = createIcon("M4 20v-2h16v2H4Z");
+export const WindowMaximize = createIcon("M4 20V4h16v16Zm2-2h12V6H6ZM6 6v12Z");
+export const WindowRestore = createIcon(
+  "M8 16V4h12v12Zm2-2h8V6h-8Zm-6 6V8.525h2V18h9.475v2Zm6-6V6v8Z"
+);
+export const WindowClose = createIcon(mdiWindowClose);

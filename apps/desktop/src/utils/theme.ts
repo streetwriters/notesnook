@@ -41,7 +41,10 @@ function setTheme(theme: Theme) {
 }
 
 function getBackgroundColor() {
-  return nativeTheme.shouldUseDarkColors ? "#0f0f0f" : "#ffffff";
+  return (
+    config.backgroundColor ||
+    (nativeTheme.shouldUseDarkColors ? "#0f0f0f" : "#ffffff")
+  );
 }
 
 function getSystemTheme() {

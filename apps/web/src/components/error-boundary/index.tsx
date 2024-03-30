@@ -45,7 +45,6 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
   return (
     <BaseThemeProvider
       onRender={() => document.getElementById("splash")?.remove()}
-      addGlobalStyles
       sx={{
         height: "100%",
         bg: "background",

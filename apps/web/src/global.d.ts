@@ -62,4 +62,10 @@ declare global {
       mode: "read-only" | "readwrite" | "readwrite-unsafe";
     }): Promise<FileSystemSyncAccessHandle>;
   }
+  interface Navigator {
+    windowControlsOverlay?: {
+      getTitlebarAreaRect(): DOMRect;
+      visible: boolean;
+    };
+  }
 }

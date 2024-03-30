@@ -61,7 +61,6 @@ import { showToast } from "../../utils/toast";
 import { Item, MaybeDeletedItem, isDeleted } from "@notesnook/core/dist/types";
 import { debounce, debounceWithId } from "@notesnook/common";
 import { Freeze } from "react-freeze";
-import { EditorActionBar } from "./action-bar";
 import { UnlockView } from "../unlock";
 import DiffViewer from "../diff-viewer";
 import TableOfContents from "./table-of-contents";
@@ -91,11 +90,12 @@ export default function TabsView() {
 
   return (
     <>
-      <EditorActionBar />
       <ScopedThemeProvider
         scope="editor"
         ref={dropRef}
         sx={{
+          bg: "background",
+          pt: 1,
           flex: 1,
           overflow: "hidden",
           display: "flex",

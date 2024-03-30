@@ -45,7 +45,6 @@ async function renderApp() {
       <ErrorBoundary>
         <BaseThemeProvider
           onRender={() => document.getElementById("splash")?.remove()}
-          addGlobalStyles
           sx={{ height: "100%", bg: "background" }}
         >
           <AppLock>
