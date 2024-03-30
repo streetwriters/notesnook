@@ -188,7 +188,7 @@ export function EditorActionBar() {
           gap: 2,
           borderBottom: "1px solid var(--border)",
           px: 2,
-          ...(IS_DESKTOP_APP && !isFullscreen && !hasNativeWindowControls
+          ...(IS_DESKTOP_APP && !isFullscreen && hasNativeWindowControls
             ? getPlatform() === "darwin"
               ? { pl: "calc(100vw - env(titlebar-area-width))" }
               : { pr: "calc(100vw - env(titlebar-area-width))" }
