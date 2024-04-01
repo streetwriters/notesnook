@@ -182,8 +182,10 @@ export class WaSqliteWorkerDriver implements Driver {
   }
 
   async delete() {
-    const { service } = servicePool.get(this.serviceName) || {};
-    await service?.proxy?.delete(this.config.dbName, this.config.async);
+    const service = servicePool.get(this.serviceName);
+    if (!service || !service.service) return;
+    await service.service?.proxy?.delete(this.config.dbName, this.config.async);
+    service.closed = true;
   }
 
   async export() {
