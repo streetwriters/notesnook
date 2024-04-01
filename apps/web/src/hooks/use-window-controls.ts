@@ -50,17 +50,6 @@ export function useWindowControls() {
     isMaximized,
     isFullscreen,
     hasNativeWindowControls:
-      IS_DESKTOP_APP || getPlatform() === "darwin" || getPlatform() === "win32"
+      !IS_DESKTOP_APP || getPlatform() === "darwin" || getPlatform() === "win32"
   };
-}
-
-function windowControlsMargin() {
-  if (
-    !window.navigator.windowControlsOverlay ||
-    !window.navigator.windowControlsOverlay.visible
-  )
-    return 0;
-  const overlayRect =
-    window.navigator.windowControlsOverlay.getTitlebarAreaRect();
-  return window.innerWidth - overlayRect.width + 5;
 }
