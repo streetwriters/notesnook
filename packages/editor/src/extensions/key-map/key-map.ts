@@ -50,6 +50,10 @@ export const KeyMap = Extension.create({
           .unsetMark("link")
           .run();
         return true;
+      },
+      "Shift-Mod-L": ({ editor }) => {
+        editor.storage.createInternalLink?.();
+        return true;
       }
     };
   }
