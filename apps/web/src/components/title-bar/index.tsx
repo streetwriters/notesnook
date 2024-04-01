@@ -72,7 +72,7 @@ export function TitleBar() {
           ? getPlatform() === "darwin"
             ? { pl: "calc(100vw - env(titlebar-area-width))" }
             : { pr: "calc(100vw - env(titlebar-area-width))" }
-          : { pl: 2, pr: 0 })
+          : { pr: 0 })
       }}
       injectCssVars
     >
@@ -83,7 +83,8 @@ export function TitleBar() {
             alignSelf: "center",
             height: 24,
             width: 24,
-            marginRight: 10
+            marginRight: 10,
+            marginLeft: 10
           }}
         >
           <use href="#themed-logo" />
