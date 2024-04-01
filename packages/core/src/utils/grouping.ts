@@ -33,17 +33,17 @@ type PartialGroupableItem = {
 type EvaluateKeyFunction<T> = (item: T) => string;
 
 export const getSortValue = (
-  options: GroupOptions,
+  options: GroupOptions | undefined,
   item: PartialGroupableItem
 ) => {
   if (
-    options.sortBy === "dateDeleted" &&
+    options?.sortBy === "dateDeleted" &&
     "dateDeleted" in item &&
     item.dateDeleted
   )
     return item.dateDeleted;
   else if (
-    options.sortBy === "dateEdited" &&
+    options?.sortBy === "dateEdited" &&
     "dateEdited" in item &&
     item.dateEdited
   )
