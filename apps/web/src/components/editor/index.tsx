@@ -67,6 +67,7 @@ import TableOfContents from "./table-of-contents";
 import { showNoteLinkingDialog } from "../../common/dialog-controller";
 import { scrollIntoViewById } from "@notesnook/editor";
 import { IEditor } from "./types";
+import { EditorActionBar } from "./action-bar";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -90,6 +91,7 @@ export default function TabsView() {
 
   return (
     <>
+      {IS_DESKTOP_APP ? null : <EditorActionBar />}
       <ScopedThemeProvider
         scope="editor"
         ref={dropRef}

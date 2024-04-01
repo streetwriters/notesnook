@@ -186,7 +186,7 @@ export function EditorActionBar() {
       <Flex
         sx={{
           gap: 2,
-          borderBottom: "1px solid var(--border)",
+          borderBottom: IS_DESKTOP_APP ? "1px solid var(--border)" : "none",
           px: 1,
           ...(IS_DESKTOP_APP && !isFullscreen && hasNativeWindowControls
             ? getPlatform() === "darwin"
@@ -195,29 +195,24 @@ export function EditorActionBar() {
             : {})
         }}
       >
-        {IS_DESKTOP_APP ? (
-          getPlatform() === "darwin" && !isFullscreen ? null : (
-            <svg
-              className="titlebarLogo"
-              style={{
-                alignSelf: "center",
-                height: 24,
-                width: 24
-              }}
-            >
-              <use href="#themed-logo" />
-            </svg>
-          )
+        {IS_DESKTOP_APP && (getPlatform() !== "darwin" || isFullscreen) ? (
+          <svg
+            className="titlebarLogo"
+            style={{
+              alignSelf: "center",
+              height: 24,
+              width: 24
+            }}
+          >
+            <use href="#themed-logo" />
+          </svg>
         ) : null}
         <TabStrip />
         <Flex
           bg="transparent"
           sx={{
-            // borderRadius: "default",
-            // overflow: "hidden",
             alignItems: "center",
             justifyContent: "flex-end"
-            // mr: IS_DESKTOP_APP ? `calc(100vw - env(titlebar-area-width))` : 2
           }}
         >
           {tools.map((tool) => (
