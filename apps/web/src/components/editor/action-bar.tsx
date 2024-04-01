@@ -35,11 +35,7 @@ import {
   Search,
   TableOfContents,
   Trash,
-  Unlock,
-  WindowClose,
-  WindowMaximize,
-  WindowMinimize,
-  WindowRestore
+  Unlock
 } from "../icons";
 import { ScrollContainer } from "@notesnook/ui";
 import {
@@ -68,16 +64,12 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { AppEventManager, AppEvents } from "../../common/app-events";
-import { desktop } from "../../common/desktop-bridge";
 import { useWindowControls } from "../../hooks/use-window-controls";
-import { ScopedThemeProvider } from "../theme-provider";
-import { getPlatform } from "../../utils/platform";
 
 export function EditorActionBar() {
   const editorMargins = useEditorStore((store) => store.editorMargins);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const { isMaximized, isFullscreen, hasNativeWindowControls } =
-    useWindowControls();
+  const { isFullscreen } = useWindowControls();
   const activeSession = useEditorStore((store) =>
     store.activeSessionId ? store.getSession(store.activeSessionId) : undefined
   );
@@ -153,100 +145,42 @@ export function EditorActionBar() {
         activeSession.type !== "conflicted" &&
         !isFocusMode,
       onClick: () => useEditorStore.getState().toggleProperties()
-    },
-
-    {
-      title: "Minimize",
-      icon: WindowMinimize,
-      hidden: hasNativeWindowControls || isFullscreen,
-      enabled: true,
-      onClick: () => desktop?.window.minimze.mutate()
-    },
-    {
-      title: isMaximized ? "Restore" : "Maximize",
-      icon: isMaximized ? WindowRestore : WindowMaximize,
-      enabled: true,
-      hidden: hasNativeWindowControls || isFullscreen,
-      onClick: () =>
-        isMaximized
-          ? desktop?.window.restore.mutate()
-          : desktop?.window.maximize.mutate()
-    },
-    {
-      title: "Close",
-      icon: WindowClose,
-      hidden: hasNativeWindowControls || isFullscreen,
-      enabled: true,
-      onClick: () => window.close()
     }
   ];
 
   return (
-    <ScopedThemeProvider scope="titleBar" injectCssVars>
-      <Flex
-        sx={{
-          gap: 2,
-          borderBottom: IS_DESKTOP_APP ? "1px solid var(--border)" : "none",
-          px: 1,
-          ...(IS_DESKTOP_APP && !isFullscreen && hasNativeWindowControls
-            ? getPlatform() === "darwin"
-              ? { pl: "calc(100vw - env(titlebar-area-width))" }
-              : { pr: "calc(100vw - env(titlebar-area-width))" }
-            : {})
-        }}
-      >
-        {IS_DESKTOP_APP && (getPlatform() !== "darwin" || isFullscreen) ? (
-          <svg
-            className="titlebarLogo"
-            style={{
-              alignSelf: "center",
-              height: 24,
-              width: 24
-            }}
-          >
-            <use href="#themed-logo" />
-          </svg>
-        ) : null}
-        <TabStrip />
-        <Flex
-          bg="transparent"
+    <>
+      <TabStrip />
+      {tools.map((tool) => (
+        <Button
+          data-test-id={tool.title}
+          disabled={!tool.enabled}
+          variant={tool.title === "Close" ? "error" : "secondary"}
+          title={tool.title}
+          key={tool.title}
           sx={{
+            height: "100%",
             alignItems: "center",
-            justifyContent: "flex-end"
+            bg: "transparent",
+            display: [
+              tool.hideOnMobile ? "none" : "flex",
+              tool.hidden ? "none" : "flex"
+            ],
+            borderRadius: 0,
+            flexShrink: 0,
+            "&:hover svg path": {
+              fill:
+                tool.title === "Close"
+                  ? "var(--accentForeground-error) !important"
+                  : "var(--icon)"
+            }
           }}
+          onClick={tool.onClick}
         >
-          {tools.map((tool) => (
-            <Button
-              data-test-id={tool.title}
-              disabled={!tool.enabled}
-              variant={tool.title === "Close" ? "error" : "secondary"}
-              title={tool.title}
-              key={tool.title}
-              sx={{
-                height: "100%",
-                alignItems: "center",
-                bg: "transparent",
-                display: [
-                  tool.hideOnMobile ? "none" : "flex",
-                  tool.hidden ? "none" : "flex"
-                ],
-                borderRadius: 0,
-                flexShrink: 0,
-                "&:hover svg path": {
-                  fill:
-                    tool.title === "Close"
-                      ? "var(--accentForeground-error) !important"
-                      : "var(--icon)"
-                }
-              }}
-              onClick={tool.onClick}
-            >
-              <tool.icon size={18} />
-            </Button>
-          ))}
-        </Flex>
-      </Flex>
-    </ScopedThemeProvider>
+          <tool.icon size={18} />
+        </Button>
+      ))}
+    </>
   );
 }
 

@@ -84,6 +84,7 @@ async function createWindow() {
     }),
 
     titleBarStyle: "hidden",
+    frame: process.platform === "win32" || process.platform === "darwin",
     titleBarOverlay: {
       height: 37,
       color: "#00000000",

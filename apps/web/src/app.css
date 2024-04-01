@@ -4,10 +4,12 @@
 }
 
 .tabsScroll,
-.titlebarLogo {
+.titlebarLogo,
+.theme-scope-titleBar {
   -webkit-app-region: drag;
 }
 
+.theme-scope-titleBar button,
 .tabsScroll .tab {
   -webkit-app-region: no-drag;
 }

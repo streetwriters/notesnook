@@ -38,7 +38,6 @@ import { getDocumentTitle, setDocumentTitle } from "../utils/dom";
 import { CredentialWithoutSecret, useKeyStore } from "../interfaces/key-store";
 
 export default function AppLock(props: PropsWithChildren<unknown>) {
-  const init = usePromise(() => useKeyStore.getState().init());
   const credentials = useKeyStore((store) => store.activeCredentials());
   const isLocked = useKeyStore((store) => store.isLocked);
   const _lockAfter = useKeyStore((store) => store.secrets.lockAfter);
@@ -119,8 +118,6 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
       return () => stop();
     }
   }, [lockAfter, credentials]);
-
-  if (init.status !== "fulfilled") return null;
 
   if (isLocked)
     return (

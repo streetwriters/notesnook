@@ -25,6 +25,7 @@ import { BaseThemeProvider } from "./components/theme-provider";
 import { register } from "./utils/stream-saver/mitm";
 import { getServiceWorkerVersion } from "./utils/version";
 import { ErrorBoundary, ErrorComponent } from "./components/error-boundary";
+import { TitleBar } from "./components/title-bar";
 
 renderApp();
 
@@ -36,29 +37,38 @@ async function renderApp() {
   try {
     const { component, props, path } = await init();
 
+    const { useKeyStore } = await import("./interfaces/key-store");
+    await useKeyStore.getState().init();
+
     if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
 
     const { default: Component } = await component();
-
     const { default: AppLock } = await import("./views/app-lock");
+
     root.render(
-      <ErrorBoundary>
-        <BaseThemeProvider
-          onRender={() => document.getElementById("splash")?.remove()}
-          sx={{ height: "100%", bg: "background" }}
-        >
-          <AppLock>
-            <Component route={props?.route || "login:email"} />
-          </AppLock>
-        </BaseThemeProvider>
-      </ErrorBoundary>
+      <>
+        {IS_DESKTOP_APP ? <TitleBar /> : null}
+        <ErrorBoundary>
+          <BaseThemeProvider
+            onRender={() => document.getElementById("splash")?.remove()}
+            sx={{ bg: "background", flex: 1 }}
+          >
+            <AppLock>
+              <Component route={props?.route || "login:email"} />
+            </AppLock>
+          </BaseThemeProvider>
+        </ErrorBoundary>
+      </>
     );
   } catch (e) {
     root.render(
-      <ErrorComponent
-        error={e}
-        resetErrorBoundary={() => window.location.reload()}
-      />
+      <>
+        {IS_DESKTOP_APP ? <TitleBar /> : null}
+        <ErrorComponent
+          error={e}
+          resetErrorBoundary={() => window.location.reload()}
+        />
+      </>
     );
   }
 }

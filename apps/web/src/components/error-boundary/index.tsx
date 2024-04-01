@@ -49,98 +49,105 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
         height: "100%",
         bg: "background",
         display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        overflowY: "auto"
+        flexDirection: "column"
       }}
     >
       <Flex
         sx={{
-          width: ["95%", "50%"],
-          flexDirection: "column"
+          width: "100%",
+          flexDirection: "column",
+          alignItems: "center",
+          overflowY: "auto",
+          py: 5
         }}
       >
-        <Image
-          src={colorScheme === "dark" ? LogoDark : Logo}
-          sx={{ borderRadius: "default", width: 60, alignSelf: "start" }}
-          mb={4}
-        />
-        <Text
-          variant="heading"
-          sx={{ borderBottom: "1px solid var(--border)", pb: 1 }}
+        <Flex
+          sx={{
+            width: ["95%", "50%"],
+            flexDirection: "column"
+          }}
         >
-          Something went wrong
-        </Text>
-        <ErrorText error={error} />
-        {help ? (
-          <>
-            <Text variant="subtitle" sx={{ mt: 2 }}>
-              What went wrong?
-            </Text>
-            <Text variant="body">{help.explanation}</Text>
-            <Text variant="subtitle" sx={{ mt: 1 }}>
-              How to fix it?
-            </Text>
-            <Text variant="body">{help.action}</Text>
-          </>
-        ) : null}
-        <Flex sx={{ gap: 1 }}>
+          <Image
+            src={colorScheme === "dark" ? LogoDark : Logo}
+            sx={{ borderRadius: "default", width: 60, alignSelf: "start" }}
+            mb={4}
+          />
+          <Text
+            variant="heading"
+            sx={{ borderBottom: "1px solid var(--border)", pb: 1 }}
+          >
+            Something went wrong
+          </Text>
+          <ErrorText error={error} />
           {help ? (
-            <Button
-              variant="error"
-              sx={{ alignSelf: "start", px: 30, mt: 1 }}
-              onClick={() =>
-                help.fix().catch((e) => {
-                  console.error(e);
-                  alert(errorToString(e));
-                })
-              }
-            >
-              Fix it
-            </Button>
-          ) : (
-            <Button
-              variant="error"
-              sx={{ alignSelf: "start", px: 30, mt: 1 }}
-              onClick={() => window.location.reload()}
-            >
-              Reload app
-            </Button>
-          )}
-          <>
-            <Button
-              variant="secondary"
-              sx={{ alignSelf: "start", px: 30, mt: 1 }}
-              onClick={async () => {
-                navigator.clipboard.writeText(errorToString(error));
-              }}
-            >
-              Copy
-            </Button>
-            <Button
-              variant="secondary"
-              sx={{ alignSelf: "start", px: 30, mt: 1 }}
-              onClick={async () => {
-                const { getDeviceInfo } = await import(
-                  "../../dialogs/issue-dialog"
-                );
-                const mailto = new URL("mailto:support@streetwriters.co");
-                mailto.searchParams.set(
-                  "body",
-                  `${errorToString(error)}
+            <>
+              <Text variant="subtitle" sx={{ mt: 2 }}>
+                What went wrong?
+              </Text>
+              <Text variant="body">{help.explanation}</Text>
+              <Text variant="subtitle" sx={{ mt: 1 }}>
+                How to fix it?
+              </Text>
+              <Text variant="body">{help.action}</Text>
+            </>
+          ) : null}
+          <Flex sx={{ gap: 1 }}>
+            {help ? (
+              <Button
+                variant="error"
+                sx={{ alignSelf: "start", px: 30, mt: 1 }}
+                onClick={() =>
+                  help.fix().catch((e) => {
+                    console.error(e);
+                    alert(errorToString(e));
+                  })
+                }
+              >
+                Fix it
+              </Button>
+            ) : (
+              <Button
+                variant="error"
+                sx={{ alignSelf: "start", px: 30, mt: 1 }}
+                onClick={() => window.location.reload()}
+              >
+                Reload app
+              </Button>
+            )}
+            <>
+              <Button
+                variant="secondary"
+                sx={{ alignSelf: "start", px: 30, mt: 1 }}
+                onClick={async () => {
+                  navigator.clipboard.writeText(errorToString(error));
+                }}
+              >
+                Copy
+              </Button>
+              <Button
+                variant="secondary"
+                sx={{ alignSelf: "start", px: 30, mt: 1 }}
+                onClick={async () => {
+                  const { getDeviceInfo } = await import(
+                    "../../dialogs/issue-dialog"
+                  );
+                  const mailto = new URL("mailto:support@streetwriters.co");
+                  mailto.searchParams.set(
+                    "body",
+                    `${errorToString(error)}
 
 ---
 Device information:
 
 ${getDeviceInfo()}`
-                );
-                window.open(mailto.toString(), "_blank");
-              }}
-            >
-              Contact support
-            </Button>
-          </>
+                  );
+                  window.open(mailto.toString(), "_blank");
+                }}
+              >
+                Contact support
+              </Button>
+            </>
+          </Flex>
         </Flex>
       </Flex>
     </BaseThemeProvider>

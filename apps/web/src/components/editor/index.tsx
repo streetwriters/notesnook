@@ -91,7 +91,17 @@ export default function TabsView() {
 
   return (
     <>
-      {IS_DESKTOP_APP ? null : <EditorActionBar />}
+      {IS_DESKTOP_APP ? (
+        ReactDOM.createPortal(
+          <EditorActionBar />,
+          document.getElementById("titlebar-portal-container")!
+        )
+      ) : (
+        <Flex>
+          <EditorActionBar />
+        </Flex>
+      )}
+
       <ScopedThemeProvider
         scope="editor"
         ref={dropRef}

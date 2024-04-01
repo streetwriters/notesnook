@@ -34,7 +34,6 @@ import { FlexScrollContainer } from "./components/scroll-container";
 import CachedRouter from "./components/cached-router";
 import { WebExtensionRelay } from "./utils/web-extension-relay";
 import { usePersistentState } from "./hooks/use-persistent-state";
-import { EditorActionBar } from "./components/editor/action-bar";
 
 new WebExtensionRelay();
 
@@ -136,7 +135,6 @@ function DesktopAppContents({
 
   return (
     <>
-      {IS_DESKTOP_APP ? <EditorActionBar /> : null}
       <Flex
         variant="rowFill"
         sx={{
