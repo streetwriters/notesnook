@@ -136,7 +136,7 @@ function DesktopAppContents({
 
   return (
     <>
-      <EditorActionBar />
+      {IS_DESKTOP_APP ? <EditorActionBar /> : null}
       <Flex
         variant="rowFill"
         sx={{
