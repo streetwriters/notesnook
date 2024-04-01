@@ -97,7 +97,7 @@ export default function TabsView() {
           document.getElementById("titlebar-portal-container")!
         )
       ) : (
-        <Flex>
+        <Flex sx={{ px: 1 }}>
           <EditorActionBar />
         </Flex>
       )}
