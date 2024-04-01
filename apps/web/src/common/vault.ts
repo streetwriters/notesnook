@@ -139,9 +139,13 @@ class Vault {
       .catch(({ message }) => {
         switch (message) {
           case VAULT_ERRORS.noVault:
-            return Vault.createVault().then(() => Vault.lockNote(id));
+            return Vault.createVault().then((result) =>
+              result ? Vault.lockNote(id) : false
+            );
           case VAULT_ERRORS.vaultLocked:
-            return Vault.unlockVault().then(() => Vault.lockNote(id));
+            return Vault.unlockVault().then((result) =>
+              result ? Vault.lockNote(id) : false
+            );
           default:
             showToast("error", message);
             console.error(message);
