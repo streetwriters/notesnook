@@ -24,6 +24,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@electron/rebuild": "^3.6.0",
     "@types/node": "18.16.1",
     "@types/yargs": "^17.0.24",
     "chokidar": "^3.5.3",
