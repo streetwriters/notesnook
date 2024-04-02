@@ -124,6 +124,7 @@ for (const lockfile of lockfiles) {
   execute(
     `flatpak-node-generator`,
     [
+      lockfile.name === "desktop" ? "--electron-node-headers" : false,
       lockfile.ignoreDev ? "--no-devel" : false,
       "npm",
       lockfile.path,

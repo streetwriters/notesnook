@@ -40,6 +40,11 @@ const scopes = {
 };
 // packages that we shouldn't run npm rebuild for
 const IGNORED_NATIVE_PACKAGES = [
+  // these get built by electron-builder automatically.
+  ...(args.scope === "desktop"
+    ? ["better-sqlite3-multiple-ciphers", "sodium-native"]
+    : []),
+
   // optional dependency of pdfjs-dist, we can ignore
   // it because it's only needed in non-browser environments
   "canvas",
