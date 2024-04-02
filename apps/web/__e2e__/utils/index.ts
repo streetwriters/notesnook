@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import fs from "fs";
 import dotenv from "dotenv";
-import path from "path";
+import path, { join } from "path";
 import { Locator, Page } from "@playwright/test";
 import {
   GroupByOptions,
@@ -27,6 +27,7 @@ import {
   OrderByOptions,
   SortByOptions
 } from "../models/types";
+import { tmpdir } from "os";
 
 type Note = {
   title: string;
@@ -103,17 +104,22 @@ async function editNote(page: Page, note: Partial<Note>, noDelay = false) {
 async function downloadAndReadFile(
   page: Page,
   action: Locator,
-  encoding: BufferEncoding = "utf-8"
+  encoding: BufferEncoding | null | undefined = "utf-8"
 ) {
   const [download] = await Promise.all([
     page.waitForEvent("download"),
     await action.click()
   ]);
 
-  const path = await download.path();
-  if (!path) throw new Error("Download path not found.");
+  const dir = fs.mkdtempSync(join(tmpdir(), "nntests_"));
+  const filePath = join(dir, download.suggestedFilename());
+  await download.saveAs(filePath);
 
-  return fs.readFileSync(path, { encoding });
+  const content = fs.readFileSync(filePath, encoding);
+
+  fs.rmSync(dir, { force: true, recursive: true });
+
+  return content;
 }
 
 async function uploadFile(page: Page, action: Locator, filename: string) {

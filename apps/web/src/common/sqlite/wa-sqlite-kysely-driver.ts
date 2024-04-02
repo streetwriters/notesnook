@@ -37,10 +37,10 @@ export class WaSqliteWorkerDriver implements Driver {
   private connection?: DatabaseConnection;
   private connectionMutex = new Mutex();
   private initializationMutex = new Mutex();
-  private readonly serviceName = `${this.config.dbName}-service`;
+  private readonly serviceName;
 
   constructor(private readonly config: Config) {
-    console.log("new driver");
+    this.serviceName = `${config.dbName}-service`;
   }
 
   async init(): Promise<void> {

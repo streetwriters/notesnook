@@ -28,6 +28,13 @@ import {
   fillPasswordDialog,
   iterateList
 } from "./utils";
+import {
+  FS,
+  ZipReader,
+  BlobReader,
+  TextWriter,
+  Uint8ArrayReader
+} from "@zip.js/zip.js";
 
 abstract class BaseProperties {
   protected readonly page: Page;
@@ -239,11 +246,19 @@ export class NoteContextMenuModel extends BaseProperties {
     await this.open();
     await this.menu.clickOnItem("export");
 
-    const content = await downloadAndReadFile(
+    const zip = await downloadAndReadFile(
       this.noteLocator.page(),
       this.menu.getItem(format),
-      "utf-8"
+      null
     );
+
+    const entries = await new ZipReader(
+      new Uint8ArrayReader(new Uint8Array(zip as Buffer))
+    ).getEntries();
+    const writer = new TextWriter();
+    await entries[0].getData?.(writer);
+    const content = await writer.getData();
+
     if (format === "html") {
       return content
         .replace(/(name="created-at" content=")(.+?)"/, '$1xxx"')

@@ -53,7 +53,7 @@ import {
 import { ProfileSettings } from "./profile-settings";
 import { AuthenticationSettings } from "./auth-settings";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
-import { store as userstore } from "../../stores/user-store";
+import { useStore as useUserStore } from "../../stores/user-store";
 import { SyncSettings } from "./sync-settings";
 import { BehaviourSettings } from "./behaviour-settings";
 import { DesktopIntegrationSettings } from "./desktop-integration-settings";
@@ -87,19 +87,19 @@ const sectionGroups: SectionGroup[] = [
         key: "subscription",
         title: "Subscription",
         icon: Pro,
-        isHidden: () => !userstore.get().isLoggedIn
+        isHidden: () => !useUserStore.getState().isLoggedIn
       },
       {
         key: "auth",
         title: "Authentication",
         icon: PasswordAndAuth,
-        isHidden: () => !userstore.get().isLoggedIn
+        isHidden: () => !useUserStore.getState().isLoggedIn
       },
       {
         key: "sync",
         title: "Sync",
         icon: Sync,
-        isHidden: () => !userstore.get().isLoggedIn
+        isHidden: () => !useUserStore.getState().isLoggedIn
       }
     ]
   },
@@ -231,6 +231,7 @@ type SettingsSideBarProps = { onNavigate: (settings: SettingsGroup[]) => void };
 function SettingsSideBar(props: SettingsSideBarProps) {
   const { onNavigate } = props;
   const [route, setRoute] = useState<SectionKeys>("profile");
+  useUserStore((store) => store.isLoggedIn);
 
   return (
     <FlexScrollContainer
