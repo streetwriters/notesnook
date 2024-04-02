@@ -53,7 +53,7 @@ async function onChange(first) {
   if (first) {
     await fs.rm("./build/", { force: true, recursive: true });
 
-    await exec("npx electron-rebuild");
+    await exec("npx electron-builder install-app-deps");
   }
 
   await exec(`npm run bundle`);
