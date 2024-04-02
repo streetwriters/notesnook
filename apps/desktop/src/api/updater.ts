@@ -41,7 +41,7 @@ export const updaterRouter = t.router({
       .finally(() => (cancellationToken = undefined));
   }),
   check: t.procedure.query(async () => {
-    await autoUpdater.checkForUpdates();
+    await autoUpdater.checkForUpdates().catch(console.error);
   }),
 
   toggleAutoUpdates: t.procedure
