@@ -98,7 +98,7 @@ jobs:
         uses: ./.github/actions/setup-node-with-cache
 
       - name: Install setuptools
-        run: python3 -m pip install setuptools
+        run: brew install python-setuptools
 
       - name: Setup notarization
         run: |
