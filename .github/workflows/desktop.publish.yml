@@ -97,6 +97,9 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
+      - name: Install setuptools
+        run: python3 -m pip install setuptools
+
       - name: Setup notarization
         run: |
           mkdir -p ~/private_keys/
