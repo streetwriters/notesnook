@@ -111,7 +111,11 @@ function Header(props: RouteContainerProps) {
     <Flex
       className="route-container-header"
       mx={2}
-      sx={{ alignItems: "center", justifyContent: "space-between" }}
+      sx={{
+        alignItems: "center",
+        justifyContent: "space-between",
+        height: 42.8
+      }}
     >
       <Flex py={1} sx={{ alignItems: "center", justifyContent: "center" }}>
         {buttons?.back ? (

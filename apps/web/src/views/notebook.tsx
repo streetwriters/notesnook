@@ -438,6 +438,7 @@ function NotebookHeader({
   context: NotebookContext;
 }) {
   const moreCrumbsRef = useRef<HTMLButtonElement>(null);
+  const notebooks = useNotebookStore((store) => store.notebooks);
   const [notebook, setNotebook] = useState(context.item);
   const [totalNotes, setTotalNotes] = useState(context.totalNotes);
   const [crumbs, setCrumbs] = useState<{ id: string; title: string }[]>([]);
@@ -448,6 +449,12 @@ function NotebookHeader({
   useEffect(() => {
     setIsShortcut(shortcuts.findIndex((p) => p.id === context.id) > -1);
   }, [shortcuts, context.id]);
+
+  useEffect(() => {
+    (async function () {
+      setNotebook(await db.notebooks.notebook(context.id));
+    })();
+  }, [notebooks]);
 
   useEffect(() => {
     (async function () {
