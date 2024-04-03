@@ -296,18 +296,18 @@ class EditorStore extends BaseStore<EditorStore> {
 
               if (
                 // when a note's readonly property is toggled
-                (session.type === "readonly") !== !!event.item.readonly ||
+                (session.type !== "readonly" && !!event.item.readonly) ||
                 // when a note is restored from trash
-                (session.type === "deleted") === (event.item.type !== "trash")
+                (session.type === "deleted" && event.item.type !== "trash")
               ) {
                 openSession(session.id, { force: true, silent: true });
               } else if (
                 // when a note is moved to trash
-                (session.type !== "deleted") ===
-                (event.item.type === "trash")
-              )
+                session.type !== "deleted" &&
+                event.item.type === "trash"
+              ) {
                 clearIds.push(session.id);
-              else {
+              } else {
                 updateSession(session.id, [session.type], (session) => {
                   session.note.pinned =
                     event.item.pinned ?? session.note.pinned;
@@ -330,7 +330,8 @@ class EditorStore extends BaseStore<EditorStore> {
 
               if (
                 // when a note is locked or unlocked
-                (session.type === "locked") !== !!event.item.locked &&
+                session.type !== "locked" &&
+                !!event.item.locked &&
                 (session.type !== "default" || !session.locked)
               ) {
                 openSession(session.id, { force: true, silent: true });
