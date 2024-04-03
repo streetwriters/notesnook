@@ -87,6 +87,13 @@ function Header(props: RouteContainerProps) {
             (e) => useSearchStore.setState({ query: e.target.value }),
             250
           )}
+          onKeyUp={(e) => {
+            if (e.key === "Escape")
+              useSearchStore.setState({
+                isSearching: false,
+                searchType: undefined
+              });
+          }}
           action={{
             icon: Close,
             testId: "search-button",
