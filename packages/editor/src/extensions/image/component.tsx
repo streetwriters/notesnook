@@ -61,7 +61,10 @@ export function ImageComponent(
     threshold: 0.2,
     once: true
   });
-  const size = clampSize(node.attrs, editor.view.dom.clientWidth, aspectRatio);
+  const size =
+    editor.view.dom.clientWidth === 0
+      ? node.attrs
+      : clampSize(node.attrs, editor.view.dom.clientWidth, aspectRatio);
 
   const float = isMobile ? false : node.attrs.float;
 
