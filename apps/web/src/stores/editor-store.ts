@@ -680,10 +680,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
     this.setSaveState(id, 0);
     try {
-      const sessionId =
-        "sessionId" in currentSession
-          ? currentSession.sessionId
-          : `${Date.now()}`;
+      const sessionId = getSessionId(currentSession);
 
       if (isLockedSession(currentSession) && partial.content) {
         await db.vault.save({
@@ -762,7 +759,8 @@ class EditorStore extends BaseStore<EditorStore> {
         this.updateSession(id, ["default"], {
           preview: false,
           attachmentsLength: attachmentsLength,
-          note
+          note,
+          sessionId
         });
       }
 
@@ -917,4 +915,13 @@ function findSessionIndices(
     previewSessionIndex,
     duplicateSessionIndex
   };
+}
+
+const MILLISECONDS_IN_A_MINUTE = 60 * 1000;
+const SESSION_DURATION = MILLISECONDS_IN_A_MINUTE * 5;
+function getSessionId(session: DefaultEditorSession | NewEditorSession) {
+  const sessionId =
+    "sessionId" in session ? parseInt(session.sessionId) : Date.now();
+  if (sessionId + SESSION_DURATION < Date.now()) return `${Date.now()}`;
+  return `${sessionId}`;
 }
