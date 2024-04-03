@@ -36,7 +36,7 @@ function EditorFooter() {
 
   const saveState = session.type === "default" ? session.saveState : null;
   const dateEdited = "note" in session ? session.note.dateEdited : 0;
-  const SaveStateIcon = saveState ? SAVE_STATE_ICON_MAP[saveState] : null;
+  const SaveStateIcon = SAVE_STATE_ICON_MAP[saveState ?? -1];
 
   return (
     <Flex sx={{ alignItems: "center", gap: 2 }}>
