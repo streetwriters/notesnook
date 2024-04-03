@@ -41,7 +41,7 @@ export default class Lookup {
 
   notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
     return this.toSearchResults(async (limit) => {
-      if (query.length <= 3) return [];
+      if (query.length < 3) return [];
 
       const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       query = query.replace(/"/, '""');
