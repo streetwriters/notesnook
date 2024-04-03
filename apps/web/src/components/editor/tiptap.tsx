@@ -301,30 +301,26 @@ function TipTap(props: TipTapProps) {
   );
 
   useEffect(() => {
-    const container = editorContainer();
-    if (!container) return;
-    const currentEditor = editor;
     function onClick(e: MouseEvent) {
-      if (e.target !== container || !currentEditor?.state.selection.empty)
-        return;
+      if (e.target !== editor.view.dom || !editor.state.selection.empty) return;
 
-      const lastNode = currentEditor?.state.doc.lastChild;
+      const lastNode = editor.state.doc.lastChild;
       const isLastNodeParagraph = lastNode?.type.name === "paragraph";
       const isEmpty = lastNode?.nodeSize === 2;
-      if (isLastNodeParagraph && isEmpty) currentEditor?.commands.focus("end");
-      else {
-        currentEditor
+      if (!isLastNodeParagraph || !isEmpty) {
+        e.preventDefault();
+        editor
           ?.chain()
-          .insertContentAt(currentEditor?.state.doc.nodeSize - 2, "<p></p>")
+          .insertContentAt(editor.state.doc.nodeSize - 2, "<p></p>")
           .focus("end")
           .run();
       }
     }
-    container.addEventListener("click", onClick);
+    editor.view.dom.addEventListener("click", onClick);
     return () => {
-      container.removeEventListener("click", onClick);
+      editor.view.dom.removeEventListener("click", onClick);
     };
-  }, [editor, editorContainer]);
+  }, [editor]);
 
   if (readonly) return null;
   return (
@@ -382,7 +378,14 @@ function TiptapWrapper(
 
   return (
     <PortalProvider>
-      <Flex ref={containerRef} sx={{ flex: 1, flexDirection: "column" }}>
+      <Flex
+        ref={containerRef}
+        sx={{
+          flex: 1,
+          flexDirection: "column",
+          ".tiptap.ProseMirror": { pb: 150 }
+        }}
+      >
         <TipTap
           {...props}
           editorContainer={() => {
@@ -394,7 +397,6 @@ function TiptapWrapper(
             editorContainer.style.color =
               theme.scopes.editor?.primary?.paragraph ||
               theme.scopes.base.primary.paragraph;
-            editorContainer.style.paddingBottom = `150px`;
             editorContainer.style.fontSize = `${editorConfig.fontSize}px`;
             editorContainer.style.fontFamily =
               getFontById(editorConfig.fontFamily)?.font || "sans-serif";
