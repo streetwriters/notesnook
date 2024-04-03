@@ -530,8 +530,8 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         content.classList.add("node-content-wrapper");
         content.classList.add(
           `language-${
-            languageDefinition?.alias ?? languageDefinition?.title ?? "xyz"
-          }`
+            languageDefinition?.filename ?? languageDefinition?.title ?? "xyz"
+          }`.replace(/\s/, "-")
         );
         content.style.whiteSpace = "pre";
         // caret is not visible if content element width is 0px
