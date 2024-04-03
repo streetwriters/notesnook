@@ -217,13 +217,13 @@ export const Callout = Node.create({
     return ({ node, getPos, editor, HTMLAttributes }) => {
       const container = document.createElement("div");
 
-      container.classList.add("callout");
-      if (node.attrs.collapsed) container.classList.add("collapsed");
-      else container.classList.remove("collapsed");
-
       for (const attr in HTMLAttributes) {
         container.setAttribute(attr, HTMLAttributes[attr]);
       }
+
+      container.classList.add("callout");
+      if (node.attrs.collapsed) container.classList.add("collapsed");
+      else container.classList.remove("collapsed");
 
       function onClick(e: MouseEvent | TouchEvent) {
         if (e instanceof MouseEvent && e.button !== 0) return;
