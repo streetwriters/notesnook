@@ -292,11 +292,11 @@ export function ImageComponent(
 
               const { naturalWidth, naturalHeight, clientHeight, clientWidth } =
                 imageRef.current;
-              const orignalWidth = naturalWidth || clientWidth;
-              const orignalHeight = naturalHeight || clientHeight;
-              const naturalAspectRatio = orignalWidth / orignalHeight;
+              const originalWidth = naturalWidth || clientWidth;
+              const originalHeight = naturalHeight || clientHeight;
+              const naturalAspectRatio = originalWidth / originalHeight;
               const fixedDimensions = fixAspectRatio(
-                size.width,
+                size.width ?? originalWidth,
                 naturalAspectRatio
               );
 
