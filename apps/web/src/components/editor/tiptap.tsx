@@ -332,7 +332,7 @@ function TipTap(props: TipTapProps) {
           position: "sticky",
           top: 0,
           bg: "background",
-          zIndex: 1
+          zIndex: 2
         }}
       >
         <Toolbar
