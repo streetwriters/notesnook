@@ -6,7 +6,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@ammarahmed/notifee-react-native": "7.4.7",
-    "@ammarahmed/react-native-share-extension": "^2.5.5",
+    "@ammarahmed/react-native-share-extension": "^2.5.7",
     "@ammarahmed/react-native-sodium": "1.5.4",
     "@bam.tech/react-native-image-resizer": "3.0.5",
     "@callstack/repack": "^3.2.0",
