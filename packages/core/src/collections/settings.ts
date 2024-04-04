@@ -67,6 +67,8 @@ const defaultSettings: SettingItemMap = {
 
   "toolbarConfig:desktop": undefined,
   "toolbarConfig:mobile": undefined,
+  "toolbarConfig:tablet": undefined,
+  "toolbarConfig:smallTablet": undefined,
 
   "sideBarOrder:routes": [],
   "sideBarOrder:colors": [],

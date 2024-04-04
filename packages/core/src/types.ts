@@ -449,7 +449,11 @@ export interface LegacySettingsItem extends BaseItem<"settings"> {
   }[];
 }
 
-export type ToolbarConfigPlatforms = "desktop" | "mobile";
+export type ToolbarConfigPlatforms =
+  | "desktop"
+  | "mobile"
+  | "tablet"
+  | "smallTablet";
 export type SideBarSection = "routes" | "colors" | "shortcuts";
 export type SideBarHideableSection = "routes" | "colors";
 export type SettingItemMap = {

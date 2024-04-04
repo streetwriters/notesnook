@@ -76,7 +76,8 @@ const EXTRA_ICON_NAMES = [
   "restore",
   "keyboard",
   "numeric",
-  "vector-link"
+  "vector-link",
+  "notebook-plus"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

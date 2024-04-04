@@ -204,6 +204,38 @@ export const NotebookSheet = () => {
       <View
         style={{
           position: "absolute",
+          right: 24 + normalize(60),
+          marginTop: -90
+        }}
+      >
+        <Pressable
+          testID={notesnook.buttons.add}
+          type="secondary"
+          onPress={openEditor}
+          style={{
+            borderRadius: 100
+          }}
+        >
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              height: normalize(60),
+              width: normalize(60)
+            }}
+          >
+            <Icon
+              name="notebook-plus"
+              color={colors.primary.accent}
+              size={SIZE.xxl}
+            />
+          </View>
+        </Pressable>
+      </View>
+
+      <View
+        style={{
+          position: "absolute",
           right: 12,
           marginTop: -90
         }}
@@ -211,7 +243,16 @@ export const NotebookSheet = () => {
         <Pressable
           testID={notesnook.buttons.add}
           type="accent"
-          onPress={openEditor}
+          onPress={() => {
+            if (!notebook) return;
+            AddNotebookSheet.present(
+              undefined,
+              notebook,
+              undefined,
+              undefined,
+              false
+            );
+          }}
           style={{
             borderRadius: 100
           }}
@@ -319,8 +360,8 @@ export const NotebookSheet = () => {
                     height: 40 * fontScale
                   }}
                 />
-                <IconButton
-                  name="plus"
+                {/* <IconButton
+                  name="notebook-plus"
                   onPress={() => {
                     if (!notebook) return;
                     AddNotebookSheet.present(undefined, notebook, undefined);
@@ -332,7 +373,7 @@ export const NotebookSheet = () => {
                     width: 40 * fontScale,
                     height: 40 * fontScale
                   }}
-                />
+                /> */}
 
                 <IconButton
                   name={collapsed ? "chevron-up" : "chevron-down"}
