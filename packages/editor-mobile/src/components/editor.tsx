@@ -417,7 +417,7 @@ const Tiptap = ({
             <div
               style={{
                 width: "100%",
-                height: "90%",
+                height: "100%",
                 position: "absolute",
                 zIndex: 999,
                 backgroundColor: colors.primary.background,

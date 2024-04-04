@@ -275,7 +275,7 @@ export const useEditor = (
             "Saving",
             tabId
           );
-        }, 100);
+        }, 50);
 
         if (!locked) {
           DatabaseLogger.log(`Saving note: ${id}...`);
