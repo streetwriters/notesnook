@@ -204,6 +204,14 @@ const ShareView = () => {
             note.content.data = makeHtmlFromPlainText(item.value);
           }
           noteContent.current = note.content.data;
+        } else if (item.type === "extras") {
+          for (const key in item) {
+            if (!key) continue;
+            if (key.includes("TITLE") || key.includes("SUBJECT")) {
+              note.title = item[key];
+              console.log("Note title will be", note.title);
+            }
+          }
         } else {
           const user = await db.user.getUser();
           if (user && user.subscription.type !== 0) {
