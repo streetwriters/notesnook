@@ -204,45 +204,13 @@ export const NotebookSheet = () => {
       <View
         style={{
           position: "absolute",
-          right: 24 + normalize(60),
-          marginTop: -90
+          right: 24 + normalize(50),
+          marginTop: -80
         }}
       >
         <Pressable
           testID={notesnook.buttons.add}
           type="secondary"
-          onPress={openEditor}
-          style={{
-            borderRadius: 100
-          }}
-        >
-          <View
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              height: normalize(60),
-              width: normalize(60)
-            }}
-          >
-            <Icon
-              name="notebook-plus"
-              color={colors.primary.accent}
-              size={SIZE.xxl}
-            />
-          </View>
-        </Pressable>
-      </View>
-
-      <View
-        style={{
-          position: "absolute",
-          right: 12,
-          marginTop: -90
-        }}
-      >
-        <Pressable
-          testID={notesnook.buttons.add}
-          type="accent"
           onPress={() => {
             if (!notebook) return;
             AddNotebookSheet.present(
@@ -261,8 +229,40 @@ export const NotebookSheet = () => {
             style={{
               alignItems: "center",
               justifyContent: "center",
-              height: normalize(60),
-              width: normalize(60)
+              height: normalize(50),
+              width: normalize(50)
+            }}
+          >
+            <Icon
+              name="notebook-plus"
+              color={colors.primary.accent}
+              size={SIZE.xxl}
+            />
+          </View>
+        </Pressable>
+      </View>
+
+      <View
+        style={{
+          position: "absolute",
+          right: 12,
+          marginTop: -80
+        }}
+      >
+        <Pressable
+          testID={notesnook.buttons.add}
+          type="accent"
+          onPress={openEditor}
+          style={{
+            borderRadius: 100
+          }}
+        >
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              height: normalize(50),
+              width: normalize(50)
             }}
           >
             <Icon name="plus" color="white" size={SIZE.xxl} />

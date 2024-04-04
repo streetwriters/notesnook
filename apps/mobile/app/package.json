@@ -40,7 +40,8 @@
     "@trpc/client": "10.38.3",
     "@trpc/react-query": "10.38.3",
     "@trpc/server": "10.38.3",
-    "kysely": "^0.26.3"
+    "kysely": "^0.26.3",
+    "pathe": "1.1.2"
   },
   "sideEffects": false
 }

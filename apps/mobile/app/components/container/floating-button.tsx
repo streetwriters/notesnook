@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useThemeColors } from "@notesnook/theme";
+import { useRoute } from "@react-navigation/native";
 import React, { useCallback, useEffect } from "react";
 import { Keyboard, View } from "react-native";
 import Animated, {
@@ -54,6 +55,7 @@ const FloatingButton = ({
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const translate = useSharedValue(0);
+  const route = useRoute();
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -140,7 +142,13 @@ const FloatingButton = ({
           }}
         >
           <Icon
-            name={title === "Clear all trash" ? "delete" : "plus"}
+            name={
+              route.name === "Notebooks"
+                ? "notebook-plus"
+                : route.name === "Trash"
+                ? "delete"
+                : "plus"
+            }
             color={colors.primary.accentForeground}
             size={SIZE.xxl}
           />
