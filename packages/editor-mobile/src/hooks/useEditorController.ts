@@ -122,6 +122,9 @@ export function useEditorController({
 }): EditorController {
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const tab = useTabContext();
+  const tabRef = useRef(tab);
+  tabRef.current = tab;
+
   const [loading, setLoading] = useState(true);
   const setTheme = useThemeEngineStore((store) => store.setTheme);
   const { colors } = useThemeColors("editor");
@@ -135,30 +138,29 @@ export function useEditorController({
     wordCounter: null
   });
 
-  if (!tab.noteId && loading) {
+  if (!tabRef.current.noteId && loading) {
     setLoading(false);
   }
 
   const selectionChange = useCallback((_editor: Editor) => {}, []);
 
-  const titleChange = useCallback(
-    (title: string) => {
-      post(EventTypes.contentchange, undefined, tab.id, tab.noteId);
-      post(EventTypes.title, title, tab.id, tab.noteId);
-    },
-    [tab.id, tab.noteId]
-  );
+  const titleChange = useCallback((title: string) => {
+    post(
+      EventTypes.contentchange,
+      undefined,
+      tabRef.current.id,
+      tabRef.current.noteId
+    );
+    post(EventTypes.title, title, tabRef.current.id, tabRef.current.noteId);
+  }, []);
 
-  const countWords = useCallback(
-    (ms = 300) => {
-      if (typeof timers.current.wordCounter === "number")
-        clearTimeout(timers.current.wordCounter);
-      timers.current.wordCounter = setTimeout(() => {
-        statusBars[tab.id]?.current?.updateWords();
-      }, ms);
-    },
-    [tab.id]
-  );
+  const countWords = useCallback((ms = 300) => {
+    if (typeof timers.current.wordCounter === "number")
+      clearTimeout(timers.current.wordCounter);
+    timers.current.wordCounter = setTimeout(() => {
+      statusBars[tabRef.current.id]?.current?.updateWords();
+    }, ms);
+  }, []);
 
   useEffect(() => {
     injectCss(transform(colors));
@@ -166,9 +168,17 @@ export function useEditorController({
 
   const contentChange = useCallback(
     (editor: Editor, ignoreEdit?: boolean) => {
-      if (editorControllers[tab.id]?.loading) return;
+      if (editorControllers[tabRef.current.id]?.loading) {
+        logger("info", "Edit skipped, tab is in loading state");
+        return;
+      }
       const currentSessionId = globalThis.sessionId;
-      post(EventTypes.contentchange, undefined, tab.id, tab.noteId);
+      post(
+        EventTypes.contentchange,
+        undefined,
+        tabRef.current.id,
+        tabRef.current.noteId
+      );
       if (!editor) return;
       if (typeof timers.current.change === "number") {
         clearTimeout(timers.current?.change);
@@ -181,15 +191,21 @@ export function useEditorController({
             html: htmlContentRef.current,
             ignoreEdit: ignoreEdit
           },
-          tab.id,
-          tab.noteId,
+          tabRef.current.id,
+          tabRef.current.noteId,
           currentSessionId
+        );
+        logger(
+          "info",
+          "Editor saving content",
+          tabRef.current.id,
+          tabRef.current.noteId
         );
       }, 300);
 
       countWords(5000);
     },
-    [countWords, tab.id, tab.noteId]
+    [countWords]
   );
 
   const scroll = useCallback(
@@ -226,15 +242,15 @@ export function useEditorController({
       const type = message.type;
       const value = message.value;
 
-      if (message.tabId !== tab.id && type !== "native:status") {
+      if (message.tabId !== tabRef.current.id && type !== "native:status") {
         return;
       }
 
-      const editor = editors[tab.id];
+      const editor = editors[tabRef.current.id];
       switch (type) {
         case "native:updatehtml": {
           htmlContentRef.current = value;
-          if (tab.id !== useTabStore.getState().currentTab) {
+          if (tabRef.current.id !== useTabStore.getState().currentTab) {
             updateTabOnFocus.current = true;
           } else {
             if (!editor) break;
@@ -257,7 +273,9 @@ export function useEditorController({
           logger("info", "LOADING NOTE HTML");
           if (!editor) break;
           update();
-          countWords(0);
+          setTimeout(() => {
+            countWords(0);
+          }, 300);
           break;
         case "native:theme":
           setTheme(message.value);
@@ -289,7 +307,7 @@ export function useEditorController({
       }
       post(type); // Notify that message was delivered successfully.
     },
-    [tab, update, countWords, setTheme]
+    [update, countWords, setTheme]
   );
 
   useEffect(() => {
@@ -306,32 +324,30 @@ export function useEditorController({
     };
   }, [onMessage]);
 
-  const openFilePicker = useCallback(
-    (type: "image" | "file" | "camera") => {
-      post(EventTypes.filepicker, type, tab.id, tab.noteId);
-    },
-    [tab.id, tab.noteId]
-  );
+  const openFilePicker = useCallback((type: "image" | "file" | "camera") => {
+    post(EventTypes.filepicker, type, tabRef.current.id, tabRef.current.noteId);
+  }, []);
 
-  const downloadAttachment = useCallback(
-    (attachment: Attachment) => {
-      post(EventTypes.download, attachment, tab.id, tab.noteId);
-    },
-    [tab.id, tab.noteId]
-  );
-  const previewAttachment = useCallback(
-    (attachment: Attachment) => {
-      post(EventTypes.previewAttachment, attachment, tab.id, tab.noteId);
-    },
-    [tab.id, tab.noteId]
-  );
-  const openLink = useCallback(
-    (url: string) => {
-      post(EventTypes.link, url, tab.id, tab.noteId);
-      return true;
-    },
-    [tab.id, tab.noteId]
-  );
+  const downloadAttachment = useCallback((attachment: Attachment) => {
+    post(
+      EventTypes.download,
+      attachment,
+      tabRef.current.id,
+      tabRef.current.noteId
+    );
+  }, []);
+  const previewAttachment = useCallback((attachment: Attachment) => {
+    post(
+      EventTypes.previewAttachment,
+      attachment,
+      tabRef.current.id,
+      tabRef.current.noteId
+    );
+  }, []);
+  const openLink = useCallback((url: string) => {
+    post(EventTypes.link, url, tabRef.current.id, tabRef.current.noteId);
+    return true;
+  }, []);
 
   const copyToClipboard = (text: string) => {
     post(EventTypes.copyToClipboard, text);
@@ -379,7 +395,7 @@ export function useEditorController({
       updateTabOnFocus.current = false;
       setTimeout(() => {
         if (!updateTabOnFocus.current) return;
-        const editor = editors[tab.id];
+        const editor = editors[tabRef.current.id];
         if (!editor) return;
         const { from, to } = editor.state.selection;
         editor?.commands.setContent(htmlContentRef.current, false, {
@@ -390,12 +406,10 @@ export function useEditorController({
           to
         });
         countWords();
-        logger("info", `Tab ${tab.id} updated.`);
       }, 1);
     },
     passwordInputRef,
     focusPassInput: () => {
-      logger("info", "focus pass input...");
       passwordInputRef.current?.focus();
     },
     blurPassInput: () => {

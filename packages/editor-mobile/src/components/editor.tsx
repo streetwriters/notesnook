@@ -29,6 +29,7 @@ import {
 } from "@notesnook/editor";
 import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 import { useThemeColors } from "@notesnook/theme";
+import FingerprintIcon from "mdi-react/FingerprintIcon";
 import {
   useCallback,
   useEffect,
@@ -51,7 +52,6 @@ import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
-import FingerprintIcon from "mdi-react/FingerprintIcon";
 
 globalThis.toBlobURL = toBlobURL as typeof globalThis.toBlobURL;
 

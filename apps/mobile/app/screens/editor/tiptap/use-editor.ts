@@ -50,6 +50,7 @@ import { useTagStore } from "../../../stores/use-tag-store";
 import {
   eEditorTabFocused,
   eOnLoadNote,
+  eShowMergeDialog,
   eUpdateNoteInEditor
 } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
@@ -200,7 +201,8 @@ export const useEditor = (
       useTabStore.getState().updateTab(tabId, {
         noteId: undefined,
         locked: false,
-        noteLocked: false
+        noteLocked: false,
+        readonly: false
       });
     },
     [commands, editorSessionHistory, postMessage]
@@ -224,7 +226,11 @@ export const useEditor = (
         }
         let note = id ? await db.notes?.note(id) : undefined;
         const locked = note && (await db.vaults.itemExists(note));
-        if (note?.conflicted) return;
+
+        if (note?.conflicted) {
+          eSendEvent(eShowMergeDialog, note);
+          return;
+        }
 
         if (isContentInvalid(data) && id) {
           // Create a new history session if recieved empty or invalid content
@@ -243,7 +249,7 @@ export const useEditor = (
         noteData.title = title;
 
         if (ignoreEdit) {
-          console.log("Ignoring edits...");
+          DatabaseLogger.log("Ignoring edits...");
           noteData.dateEdited = note?.dateEdited;
         }
 
@@ -261,8 +267,22 @@ export const useEditor = (
           });
         }
 
+        let saved = false;
+        setTimeout(() => {
+          if (saved) return;
+          commands.setStatus(
+            getFormattedDate(note ? note.dateEdited : Date.now(), "date-time"),
+            "Saving",
+            tabId
+          );
+        }, 100);
+
         if (!locked) {
+          DatabaseLogger.log(`Saving note: ${id}...`);
           id = await db.notes?.add({ ...noteData });
+          saved = true;
+          DatabaseLogger.log(`Note saved: ${id}...`);
+
           if (!note && id) {
             editorSessionHistory.newSession(id);
             if (id) {
@@ -553,7 +573,6 @@ export const useEditor = (
       data: Note | ContentItem | TrashItem | DeletedItem,
       isLocal?: boolean
     ) => {
-      console.log("Local changes in editor", isLocal, data?.id);
       if (SettingsService.get().disableRealtimeSync && !isLocal) return;
       if (!data) return;
 
@@ -634,7 +653,10 @@ export const useEditor = (
       }
 
       if (data.type === "tiptap" && note && !isLocal) {
-        if (lastContentChangeTime.current[noteId] >= data.dateEdited) return;
+        if (lastContentChangeTime.current[noteId] >= data.dateEdited) {
+          lock.current = false;
+          return;
+        }
 
         if (locked && isEncryptedContent(data)) {
           const decryptedContent = await db.vault?.decryptContent(data, noteId);
@@ -657,7 +679,10 @@ export const useEditor = (
           }
         } else {
           const _nextContent = data.data;
-          if (_nextContent === currentContents.current?.data) return;
+          if (_nextContent === currentContents.current?.data) {
+            lock.current = false;
+            return;
+          }
           lastContentChangeTime.current[note.id] = note.dateEdited;
           await postMessage(EditorEvents.updatehtml, _nextContent, tabId);
           if (!isEncryptedContent(data)) {
@@ -697,12 +722,19 @@ export const useEditor = (
       ignoreEdit: boolean;
       tabId: number;
     }) => {
+      DatabaseLogger.log(`Saving content...`);
       if (
         lock.current ||
         (currentLoadingNoteId.current &&
           currentLoadingNoteId.current === noteId)
-      )
+      ) {
+        DatabaseLogger.log(`Skipped saving conent:
+
+          lock.current: ${lock.current}
+          currentLoadingNoteId.current: ${currentLoadingNoteId.current}
+        `);
         return;
+      }
 
       if (noteId) {
         lastContentChangeTime.current[noteId] = Date.now();

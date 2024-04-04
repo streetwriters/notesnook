@@ -34,7 +34,7 @@ import {
   useWindowDimensions
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
-import { db } from "../../../common/database";
+import { DatabaseLogger, db } from "../../../common/database";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
 import EditorTabs from "../../../components/sheets/editor-tabs";
 import LinkNote from "../../../components/sheets/link-note";
@@ -370,6 +370,7 @@ export const useEditorEvents = (
 
       switch (editorMessage.type) {
         case EventTypes.content:
+          DatabaseLogger.log("EventTypes.content");
           editor.saveContent({
             type: editorMessage.type,
             content: editorMessage.value.html as string,
@@ -379,6 +380,7 @@ export const useEditorEvents = (
           });
           break;
         case EventTypes.title:
+          DatabaseLogger.log("EventTypes.title");
           editor.saveContent({
             type: editorMessage.type,
             title: editorMessage.value as string,
