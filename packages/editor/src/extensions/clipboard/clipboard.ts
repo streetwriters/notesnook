@@ -35,11 +35,9 @@ export const Clipboard = Extension.create({
       new Plugin({
         key: new PluginKey("clipboard"),
         props: {
-          clipboardParser: ClipboardDOMParser.fromSchema(
-            this.editor.view.state.schema
-          ),
+          clipboardParser: ClipboardDOMParser.fromSchema(this.editor.schema),
           clipboardSerializer: ClipboardDOMSerializer.fromSchema(
-            this.editor.view.state.schema
+            this.editor.schema
           ),
           transformCopied,
           clipboardTextParser,
