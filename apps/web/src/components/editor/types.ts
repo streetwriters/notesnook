@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Attachment } from "@notesnook/editor";
 
+export const MAX_AUTO_SAVEABLE_WORDS = 100_000;
+
 export type NoteStatistics = {
   words: {
     total: number;

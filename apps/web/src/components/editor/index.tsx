@@ -395,7 +395,6 @@ export function Editor(props: EditorProps) {
     readonly: false,
     focusMode: false
   };
-  const [isLoading, setIsLoading] = useState(true);
   useScrollToBlock(session);
 
   useEffect(() => {
@@ -416,7 +415,7 @@ export function Editor(props: EditorProps) {
   }, [id]);
 
   return (
-    <EditorChrome isLoading={isLoading} {...props}>
+    <EditorChrome {...props}>
       <Tiptap
         id={id}
         nonce={nonce}
@@ -428,7 +427,6 @@ export function Editor(props: EditorProps) {
         onLoad={(editor) => {
           restoreSelection(editor, id);
           restoreScrollPosition(session);
-          setIsLoading(false);
         }}
         onSelectionChange={({ from, to }) =>
           Config.set(`${id}:selection`, { from, to })
@@ -508,9 +506,7 @@ export function Editor(props: EditorProps) {
   );
 }
 
-function EditorChrome(
-  props: PropsWithChildren<EditorProps & { isLoading: boolean }>
-) {
+function EditorChrome(props: PropsWithChildren<EditorProps>) {
   const { id, options, children } = props;
   const { focusMode, headless, onRequestFocus } = options || {
     headless: false,

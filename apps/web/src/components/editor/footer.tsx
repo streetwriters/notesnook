@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@theme-ui/components";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { SaveState, useEditorStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
 import { useNoteStatistics } from "./manager";
 import { getFormattedDate } from "@notesnook/common";
+import { MAX_AUTO_SAVEABLE_WORDS } from "./types";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -34,12 +35,22 @@ function EditorFooter() {
   const session = useEditorStore((store) => store.getActiveSession());
   if (!session) return null;
 
-  const saveState = session.type === "default" ? session.saveState : null;
+  const saveState =
+    session.type === "default" ? session.saveState : SaveState.NotSaved;
   const dateEdited = "note" in session ? session.note.dateEdited : 0;
-  const SaveStateIcon = SAVE_STATE_ICON_MAP[saveState ?? -1];
+  const SaveStateIcon = SAVE_STATE_ICON_MAP[saveState];
 
   return (
-    <Flex sx={{ alignItems: "center", gap: 2 }}>
+    <Flex sx={{ alignItems: "center", justifyContent: "center", gap: 2 }}>
+      {words.total > MAX_AUTO_SAVEABLE_WORDS ? (
+        <Text
+          className="selectable"
+          variant="subBody"
+          sx={{ color: "paragraph" }}
+        >
+          Auto save: off
+        </Text>
+      ) : null}
       <Text
         className="selectable"
         data-test-id="editor-word-count"
@@ -67,7 +78,7 @@ function EditorFooter() {
             saveState === SaveState.Saved
               ? "accent"
               : saveState === SaveState.NotSaved
-              ? "red"
+              ? "icon-error"
               : "paragraph"
           }
         />

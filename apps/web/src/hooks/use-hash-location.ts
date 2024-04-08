@@ -63,3 +63,5 @@ export default function useHashLocation() {
   }, []);
   return [loc, queryParams, hashNavigate] as const;
 }
+
+export const getHashLocation = currentLocation;

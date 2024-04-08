@@ -197,13 +197,7 @@ function DesktopAppContents({
                 bg: "background"
               }}
             >
-              {isAppLoaded && (
-                <SuspenseLoader
-                  fallback={<EditorLoader />}
-                  component={HashRouter}
-                  condition={isAppLoaded}
-                />
-              )}
+              {isAppLoaded && <HashRouter />}
             </Flex>
           </Allotment.Pane>
         </Allotment>

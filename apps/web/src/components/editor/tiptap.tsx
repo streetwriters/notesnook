@@ -38,15 +38,16 @@ import {
   Attachment,
   getTableOfContents
 } from "@notesnook/editor";
-import { Flex } from "@theme-ui/components";
+import { Box, Flex } from "@theme-ui/components";
 import {
   PropsWithChildren,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef
 } from "react";
-import { IEditor } from "./types";
+import { IEditor, MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { useEditorConfig, useToolbarConfig, useEditorManager } from "./manager";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
@@ -59,6 +60,8 @@ import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
 import { writeToClipboard } from "../../utils/clipboard";
 import { useEditorStore } from "../../stores/editor-store";
 import { parseInternalLink } from "@notesnook/core";
+import Skeleton from "react-loading-skeleton";
+import { showToast } from "../../utils/toast";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -133,7 +136,7 @@ function TipTap(props: TipTapProps) {
   } = props;
 
   const isUserPremium = useIsUserPremium();
-  // const configure = useConfigureEditor();
+  const autoSave = useRef(true);
   const doubleSpacedLines = useSettingsStore(
     (store) => store.doubleSpacedParagraphs
   );
@@ -159,8 +162,14 @@ function TipTap(props: TipTapProps) {
     return {
       editorProps: {
         handleKeyDown(view, event) {
-          if ((event.ctrlKey || event.metaKey) && event.key === "s")
+          if ((event.ctrlKey || event.metaKey) && event.key === "s") {
             event.preventDefault();
+            onChange?.(
+              () =>
+                getHTMLFromFragment(editor.state.doc.content, editor.schema),
+              false
+            );
+          }
         },
         handlePaste: (view, event) => {
           const hasText = event.clipboardData?.types?.some((type) =>
@@ -195,13 +204,15 @@ function TipTap(props: TipTapProps) {
 
         const instance = toIEditor(editor as Editor);
         if (onLoad) onLoad(instance);
+
+        const totalWords = getTotalWords(editor as Editor);
         useEditorManager.getState().setEditor(id, {
           editor: instance,
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
           statistics: {
             words: {
-              total: getTotalWords(editor as Editor),
+              total: totalWords,
               selected: 0
             }
           },
@@ -226,6 +237,8 @@ function TipTap(props: TipTapProps) {
         const preventSave = transaction?.getMeta("preventSave") as boolean;
         const ignoreEdit = transaction.getMeta("ignoreEdit") as boolean;
         if (preventSave || !editor.isEditable || !onChange) return;
+
+        if (!autoSave.current) return;
 
         onChange(
           () => getHTMLFromFragment(editor.state.doc.content, editor.schema),
@@ -322,6 +335,18 @@ function TipTap(props: TipTapProps) {
     };
   }, [editor]);
 
+  useEffect(() => {
+    const unsubscribe = useEditorManager.subscribe(
+      (s) => s.editors[id]?.statistics?.words.total,
+      (totalWords) => {
+        autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
+      }
+    );
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   if (readonly) return null;
   return (
     <>
@@ -388,6 +413,12 @@ function TiptapWrapper(
       >
         <TipTap
           {...props}
+          onLoad={(editor) => {
+            props.onLoad?.(editor);
+            containerRef.current
+              ?.querySelector(".editor-loading-container")
+              ?.remove();
+          }}
           editorContainer={() => {
             if (editorContainerRef.current) return editorContainerRef.current;
             const editorContainer = document.createElement("div");
@@ -407,6 +438,20 @@ function TiptapWrapper(
           fontSize={editorConfig.fontSize}
         />
         {props.children}
+        <Box className="editor-loading-container">
+          <Skeleton
+            enableAnimation={false}
+            height={22}
+            style={{ marginTop: 16 }}
+            count={2}
+          />
+          <Skeleton
+            enableAnimation={false}
+            height={22}
+            width={25}
+            style={{ marginTop: 16 }}
+          />
+        </Box>
       </Flex>
     </PortalProvider>
   );
