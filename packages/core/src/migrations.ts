@@ -393,6 +393,8 @@ const migrations: Migration[] = [
             if (!isGroupingKey(key)) continue;
             const value = item.groupOptions[key];
             if (!value) continue;
+            if (key === "tags" && value.sortBy === "dateEdited")
+              value.sortBy = "dateModified";
             await db.settings.setGroupOptions(key, value);
           }
         }

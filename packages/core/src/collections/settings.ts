@@ -134,7 +134,11 @@ export class Settings implements ICollection {
   }
 
   getGroupOptions(key: GroupingKey) {
-    return this.get(`groupOptions:${key}`);
+    const options = this.get(`groupOptions:${key}`);
+    // TODO: remove this check
+    if (key === "tags" && options.sortBy === "dateEdited")
+      options.sortBy = "dateModified";
+    return options;
   }
 
   setGroupOptions(key: GroupingKey, groupOptions: GroupOptions) {
