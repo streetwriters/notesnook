@@ -1,4 +1,7 @@
-
+.ProseMirror {
+  contain: content;
+  content-visibility: auto;
+}
 
 .ProseMirror p span {
   font-family: inherit;
