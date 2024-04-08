@@ -18,11 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Extension, NodeWithPos } from "@tiptap/core";
+import { Node } from "@tiptap/pm/model";
 import { Plugin } from "@tiptap/pm/state";
 import { nanoid } from "nanoid";
-import { Callout } from "../callout";
 
-const BLOCK_ID_TYPES = [
+const NESTED_BLOCK_ID_TYPES = new Set(["callout"]);
+const BLOCK_ID_TYPES = new Set([
   "paragraph",
   "heading",
   "blockquote",
@@ -38,10 +39,15 @@ const BLOCK_ID_TYPES = [
   "mathBlock",
   "webclip",
   "embed"
-];
+]);
 
-export const BlockId = Extension.create({
+export const BlockId = Extension.create<any, { seen: WeakSet<Node> }>({
   name: "blockId",
+  addStorage() {
+    return {
+      seen: new WeakSet()
+    };
+  },
 
   addGlobalAttributes() {
     return [
@@ -75,19 +81,21 @@ export const BlockId = Extension.create({
           if (!isDocChanged) return null;
 
           const blocksWithoutBlockId: NodeWithPos[] = [];
+          const seen = this.storage.seen;
           newState.tr.doc.forEach(function addBlocks(n, offset) {
-            if (
-              n.isBlock &&
-              BLOCK_ID_TYPES.includes(n.type.name) &&
-              !n.attrs.blockId
-            )
+            if (seen.has(n)) return;
+            seen.add(n);
+
+            if (!n.isBlock || !BLOCK_ID_TYPES.has(n.type.name)) return;
+            if (!n.attrs.blockId)
               blocksWithoutBlockId.push({ node: n, pos: offset });
 
-            if (n.type.name === Callout.name)
+            if (NESTED_BLOCK_ID_TYPES.has(n.type.name))
               n.forEach((n, pos) => addBlocks(n, offset + pos + 1));
           });
           if (blocksWithoutBlockId.length > 0) {
             const { tr } = newState;
+            tr.setMeta("ignoreEdit", true);
             for (const { node, pos } of blocksWithoutBlockId) {
               const id = nanoid(8);
               tr.setNodeMarkup(pos, undefined, {
