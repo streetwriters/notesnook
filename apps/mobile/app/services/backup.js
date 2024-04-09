@@ -183,8 +183,10 @@ async function run(progress = false, context) {
       ? `${path}/${backupFileName}.nnbackupz`
       : `${cacheDir}/${backupFileName}.nnbackupz`;
 
-  if (await RNFetchBlob.fs.exists(zipSourceFolder))
-    await RNFetchBlob.fs.unlink(zipSourceFolder);
+  try {
+    if (await RNFetchBlob.fs.exists(zipSourceFolder))
+      await RNFetchBlob.fs.unlink(zipSourceFolder);
+  } catch (e) {}
 
   await RNFetchBlob.fs.mkdir(zipSourceFolder);
 
@@ -202,8 +204,6 @@ async function run(progress = false, context) {
     }
 
     await zip(zipSourceFolder, zipOutputFile);
-
-    console.log("Final zip:", await RNFetchBlob.fs.stat(zipOutputFile));
 
     if (Platform.OS === "android") {
       // Move the zip to user selected directory.
@@ -251,7 +251,13 @@ async function run(progress = false, context) {
     };
   } catch (e) {
     ToastManager.error(e, "Backup failed", context || "global");
-    DatabaseLogger.error("Backup failed", e);
+
+    if (e.message.includes("android.net.Uri") && androidBackupDirectory) {
+      SettingsService.setProperty("backupDirectoryAndroid", null);
+      return run(progress, context);
+    }
+
+    DatabaseLogger.error(e, "Backup failed");
     await sleep(300);
     progress && eSendEvent(eCloseSheet);
     return {
