@@ -271,9 +271,11 @@ const _TabsHolder = () => {
     if (!needsUpdate) {
       return;
     }
-    setTimeout(() => {
-      console.log("movedAway", editorState().movedAway);
 
+    const state = getAppState();
+    console.log("MOVED AWAY", state?.movedAway);
+
+    setTimeout(() => {
       switch (current) {
         case "tablet":
           tabBarRef.current?.goToIndex(0, false);
@@ -287,7 +289,8 @@ const _TabsHolder = () => {
           break;
         case "mobile":
           if (
-            !editorState().movedAway &&
+            state &&
+            !state?.movedAway &&
             useTabStore.getState().getCurrentNoteId()
           ) {
             tabBarRef.current?.goToIndex(2, false);

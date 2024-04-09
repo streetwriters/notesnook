@@ -244,18 +244,16 @@ async function checkForShareExtensionLaunchedInBackground() {
 }
 
 async function saveEditorState() {
-  if (editorState().currentlyEditing) {
+  if (!editorState().movedAway) {
     const id = useTabStore.getState().getCurrentNoteId();
     const note = id ? await db.notes.note(id) : undefined;
     const locked = note && (await db.vaults.itemExists(note));
     if (locked) return;
     const state = JSON.stringify({
       editing: editorState().currentlyEditing,
-      note: note,
       movedAway: editorState().movedAway,
       timestamp: Date.now()
     });
-
     MMKV.setString("appState", state);
   } else {
     MMKV.removeItem("appState");
