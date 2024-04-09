@@ -283,7 +283,7 @@ export class SharedService<T extends object> extends EventTarget {
         if (!data.error) {
           callbacks.resolve(data.result);
         } else {
-          callbacks.reject(Object.assign(new Error(), data.error));
+          callbacks.reject(data.error);
         }
       });
       providerPort.addEventListener("messageerror", console.error);
@@ -384,16 +384,10 @@ export function createSharedServicePort(target: any) {
           result: await target[data.method](...data.args)
         });
       } catch (e) {
-        // Error is not structured cloneable so copy into POJO.
-        const error =
-          e instanceof Error
-            ? Object.fromEntries(
-                Object.getOwnPropertyNames(e).map((k) => [k, (e as any)[k]])
-              )
-            : e;
+        console.error(e);
         port1.postMessage({
           nonce: data.nonce,
-          error
+          error: e
         });
       }
     });
