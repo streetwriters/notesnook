@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { db } from "../../common/db";
 import { lazify } from "../lazify";
+import { showToast } from "../toast";
 import { makeUniqueFilename } from "./utils";
 import { ZipFile } from "./zip-stream";
 import { Attachment } from "@notesnook/core";
@@ -52,9 +53,12 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
           const attachment = await resolve(ids[index++]);
           if (!attachment) return;
 
-          await db
-            .fs()
-            .downloadFile(GROUP_ID, attachment.hash, attachment.chunkSize);
+          if (
+            !(await db
+              .fs()
+              .downloadFile(GROUP_ID, attachment.hash, attachment.chunkSize))
+          )
+            return;
 
           const key = await db.attachments.decryptKey(attachment.key);
           if (!key) return;
@@ -78,11 +82,13 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
               data: new Uint8Array(await file.arrayBuffer())
             });
           } else {
-            controller.error(new Error("Failed to decrypt file."));
+            throw new Error(
+              `Failed to decrypt file (hash: ${attachment.hash}, filename: ${attachment.filename}).`
+            );
           }
         } catch (e) {
           console.error(e);
-          controller.error(e);
+          showToast("error", (e as Error).message);
         } finally {
           if (index === ids.length) {
             controller.close();
