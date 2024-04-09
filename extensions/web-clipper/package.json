@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/web-clipper",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "main": "./dist/index.js",
   "dependencies": {
