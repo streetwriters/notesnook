@@ -30,6 +30,7 @@ import { ICollection } from "./collection";
 import { NoteContent } from "./session-content";
 import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
+import { logger } from "../logger";
 
 export type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";
@@ -79,6 +80,7 @@ export class Notes implements ICollection {
       let headline = item.headline;
 
       if (item.content && item.content.data && item.content.type) {
+        logger.debug("saving content", { id });
         const { type, data } = item.content;
 
         const content = getContentFromData(type, data);

@@ -702,12 +702,19 @@ class EditorStore extends BaseStore<EditorStore> {
       const sessionId = getSessionId(currentSession);
 
       if (isLockedSession(currentSession) && partial.content) {
+        logger.debug("Saving locked content", { id });
+
         await db.vault.save({
           content: partial.content,
           sessionId,
           id
         });
       } else {
+        if (partial.content)
+          logger.debug("Saving content", {
+            id,
+            length: partial.content.data.length
+          });
         await db.notes.add({
           ...partial.note,
           dateEdited:

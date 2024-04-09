@@ -68,10 +68,16 @@ import { showNoteLinkingDialog } from "../../common/dialog-controller";
 import { scrollIntoViewById } from "@notesnook/editor";
 import { IEditor } from "./types";
 import { EditorActionBar } from "./action-bar";
+import { logger } from "../../utils/logger";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
 function saveContent(noteId: string, ignoreEdit: boolean, content: string) {
+  logger.debug("saving content", {
+    noteId,
+    ignoreEdit,
+    length: content.length
+  });
   useEditorStore.getState().saveSessionContent(noteId, ignoreEdit, {
     type: "tiptap",
     data: content
@@ -310,6 +316,10 @@ function EditorView({
           const data = content();
           if (!session.content) session.content = { type: "tiptap", data };
           else session.content.data = data;
+          logger.debug("scheduling save", {
+            id: session.id,
+            length: data.length
+          });
           deferredSave(session.id, session.id, ignoreEdit, data);
         }}
         options={{

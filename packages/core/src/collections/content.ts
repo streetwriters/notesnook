@@ -35,6 +35,7 @@ import { InternalLink } from "../utils/internal-link";
 import { tinyToTiptap } from "../migrations";
 import { EVENTS } from "../common";
 import { DeleteEvent, UpdateEvent } from "../database";
+import { logger } from "../logger";
 
 export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
   noteId,
@@ -82,6 +83,7 @@ export class Content implements ICollection {
 
     if (content.noteId && !content.id) {
       // find content from noteId
+      logger.debug("finding content id", { id: content.noteId });
       content.id = (
         await this.db
           .sql()
@@ -111,6 +113,13 @@ export class Content implements ICollection {
         : unencryptedData
         ? { locked: false as const, data: unencryptedData }
         : undefined;
+
+      if (contentData)
+        logger.debug("updating content", {
+          id: content.noteId,
+          contentId: content.id,
+          length: JSON.stringify(contentData.data).length
+        });
 
       await this.collection.update([content.id], {
         dateEdited: content.dateEdited,
@@ -146,6 +155,12 @@ export class Content implements ICollection {
           ? { locked: true, data: encryptedData }
           : { locked: false, data: unencryptedData || "<p></p>" })
       };
+
+      logger.debug("inserting content", {
+        id: content.noteId,
+        contentId: content.id,
+        length: JSON.stringify(contentItem.data).length
+      });
 
       await this.collection.upsert(contentItem);
 
