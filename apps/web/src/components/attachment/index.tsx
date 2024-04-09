@@ -132,6 +132,7 @@ export function Attachment({
       sx={{ height: 30, ":hover": { bg: "hover" } }}
       onContextMenu={(e) => {
         e.preventDefault();
+        e.stopPropagation();
         Menu.openMenu(AttachmentMenuItems(item, status));
       }}
       onClick={onSelected}
