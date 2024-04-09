@@ -66,7 +66,7 @@ export class WebExtensionServer implements Server {
 
   async getTags(): Promise<ItemReference[] | undefined> {
     const tags = await db.tags.all
-      .fields(["notes.id", "notes.title"])
+      .fields(["tags.id", "tags.title"])
       .items(undefined, db.settings.getGroupOptions("tags"));
     return tags;
   }
