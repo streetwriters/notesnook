@@ -242,7 +242,6 @@ Properties.present = async (item, buttons = [], isSheet) => {
         "attachments",
         "lock-unlock",
         "trash",
-        "remove-from-topic",
         "remove-from-notebook",
         "history",
         "read-only",
@@ -264,7 +263,8 @@ Properties.present = async (item, buttons = [], isSheet) => {
         "trash",
         "default-notebook",
         "add-notebook",
-        "move-notes"
+        "move-notes",
+        "move-notebook"
       ]);
       break;
     case "tag":

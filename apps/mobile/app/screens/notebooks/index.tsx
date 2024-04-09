@@ -67,7 +67,12 @@ export const Notebooks = ({
 
   return (
     <>
-      <SelectionHeader id={route.name} items={notebooks} type="notebook" />
+      <SelectionHeader
+        id={route.name}
+        items={notebooks}
+        renderedInRoute={route.name}
+        type="notebook"
+      />
       <Header
         renderedInRoute={route.name}
         title={route.name}

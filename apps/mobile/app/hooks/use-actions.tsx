@@ -67,6 +67,7 @@ import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
 import { ReferencesList } from "../components/sheets/references";
 import { createInternalLink } from "@notesnook/core";
+import { MoveNotebookSheet } from "../components/sheets/move-notebook";
 
 export const useActions = ({
   close,
@@ -489,6 +490,14 @@ export const useActions = ({
         icon: "text",
         func: () => {
           MoveNotes.present(item);
+        }
+      },
+      {
+        id: "move-notebook",
+        title: "Move notebook",
+        icon: "arrow-right-bold-box-outline",
+        func: () => {
+          MoveNotebookSheet.present([item]);
         }
       }
     );

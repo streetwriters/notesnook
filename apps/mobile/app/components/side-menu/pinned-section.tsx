@@ -94,7 +94,7 @@ export const PinnedSection = React.memo(
             <Notice
               size="small"
               type="information"
-              text="Add shortcuts for notebooks, topics and tags here."
+              text="Add shortcuts for notebooks and tags here."
               style={{
                 marginHorizontal: 12
               }}

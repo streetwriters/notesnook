@@ -148,10 +148,6 @@ export const NotebookHeader = ({
         size={SIZE.xs}
         color={colors.secondary.paragraph}
       >
-        {/* {notebook.topics.length === 1
-          ? "1 topic"
-          : `${notebook.topics.length} topics`}
-        ,{" "} */}
         {notebook && totalNotes > 1
           ? totalNotes + " notes"
           : totalNotes === 1

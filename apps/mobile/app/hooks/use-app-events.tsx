@@ -17,12 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { User } from "@notesnook/core";
 import {
   EV,
   EVENTS,
   SYNC_CHECK_IDS,
   SyncStatusEvent
 } from "@notesnook/core/dist/common";
+import { EventManagerSubscription } from "@notesnook/core/dist/utils/event-manager";
 import notifee from "@notifee/react-native";
 import NetInfo, {
   NetInfoState,
@@ -44,10 +46,6 @@ import RNBootSplash from "react-native-bootsplash";
 import { checkVersion } from "react-native-check-version";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
-import { User } from "@notesnook/core";
-import { EventManagerSubscription } from "@notesnook/core/dist/utils/event-manager";
-//@ts-ignore
-import { enabled } from "react-native-privacy-snapshot";
 import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import Migrate from "../components/sheets/migrate";
@@ -75,6 +73,7 @@ import {
   setRecoveryKeyMessage,
   setUpdateAvailableMessage
 } from "../services/message";
+import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
 import Sync from "../services/sync";
@@ -84,6 +83,7 @@ import { useMessageStore } from "../stores/use-message-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { updateStatusBarColor } from "../utils/colors";
+import { BETA } from "../utils/constants";
 import {
   eClearEditor,
   eCloseSheet,
@@ -97,8 +97,6 @@ import {
 import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
-import Notifications from "../services/notifications";
-import { BETA } from "../utils/constants";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -259,6 +257,8 @@ async function saveEditorState() {
     });
 
     MMKV.setString("appState", state);
+  } else {
+    MMKV.removeItem("appState");
   }
 }
 
@@ -516,18 +516,8 @@ export const useAppEvents = () => {
 
     const onAppStateChanged = async (state: AppStateStatus) => {
       if (state === "active") {
-        if (SettingsService.shouldLockAppOnEnterForeground()) {
-          useUserStore.getState().lockApp(true);
-        }
-
         notifee.setBadgeCount(0);
         updateStatusBarColor();
-        if (
-          !SettingsService.canLockAppInBackground() &&
-          !SettingsService.get().privacyScreen
-        ) {
-          enabled(false);
-        }
 
         checkAutoBackup();
         await reconnectSSE();
@@ -547,7 +537,6 @@ export const useAppEvents = () => {
         //@ts-ignore
         globalThis["IS_SHARE_EXTENSION"] = false;
       } else {
-        SettingsService.appEnteredBackground();
         const id = useTabStore.getState().getCurrentNoteId();
         const note = id ? await db.notes.note(id) : undefined;
         const locked = note && (await db.vaults.itemExists(note));
@@ -561,7 +550,8 @@ export const useAppEvents = () => {
           !useUserStore.getState().appLocked &&
           !useUserStore.getState().disableAppLockRequests
         ) {
-          if (SettingsService.getProperty("appLockTimer") === 0) {
+          if (SettingsService.shouldLockAppOnEnterForeground()) {
+            DatabaseLogger.log(`AppEvents: Locking app on enter background`);
             useUserStore.getState().lockApp(true);
           }
 
@@ -571,13 +561,6 @@ export const useAppEvents = () => {
             );
             Keyboard.dismiss();
           }
-        }
-        if (
-          (SettingsService.get().privacyScreen ||
-            SettingsService.canLockAppInBackground()) &&
-          !useSettingStore.getState().requestBiometrics
-        ) {
-          enabled(true);
         }
       }
     };

@@ -129,9 +129,9 @@ const notebooks: { id: string; steps: TStep[] } = {
       }
     },
     {
-      title: "Notebook > Topic > Notes",
-      text: "Every Notebook has various topics which are like sections that hold all your notes.",
-      walkthroughItem: (colors: ThemeStore["colors"]) => (
+      title: "Notebook > Notes",
+      text: "Every Notebook can have notes and sub notebooks.",
+      walkthroughItem: (colors: any) => (
         <View
           style={{
             width: "100%",
@@ -245,7 +245,7 @@ const notebooks: { id: string; steps: TStep[] } = {
     },
     {
       title: "Easy access",
-      text: "You can create shortcuts of frequently accessed notebooks or topics in Side Menu",
+      text: "You can create shortcuts of frequently accessed notebooks in the side menu",
       walkthroughItem: () => (
         <View
           style={{

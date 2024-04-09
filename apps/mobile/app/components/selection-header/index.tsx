@@ -44,6 +44,7 @@ import ExportNotesSheet from "../sheets/export-notes";
 import ManageTagsSheet from "../sheets/manage-tags";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
+import { MoveNotebookSheet } from "../sheets/move-notebook";
 
 export const SelectionHeader = React.memo(
   ({
@@ -212,6 +213,23 @@ export const SelectionHeader = React.memo(
             name="select-all"
             size={SIZE.xl}
           />
+
+          {renderedInRoute === "Notebooks" ? (
+            <IconButton
+              style={{
+                marginLeft: 10
+              }}
+              onPress={async () => {
+                const ids = selectedItemsList;
+                const notebooks = await db.notebooks.all.items(ids);
+                MoveNotebookSheet.present(notebooks);
+              }}
+              tooltipText="Move notebooks"
+              tooltipPosition={1}
+              name="arrow-right-bold-box-outline"
+              size={SIZE.xl}
+            />
+          ) : null}
 
           {type !== "note" ? null : (
             <>

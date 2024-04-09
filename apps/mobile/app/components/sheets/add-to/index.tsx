@@ -186,7 +186,7 @@ const MoveNoteSheet = ({
             paragraph={
               !multiSelect
                 ? "Long press to enable multi-select."
-                : "Select topics you want to add note(s) to."
+                : "Select notebooks you want to add note(s) to."
             }
           />
 

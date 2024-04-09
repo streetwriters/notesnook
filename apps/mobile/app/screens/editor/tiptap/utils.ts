@@ -165,6 +165,7 @@ export function getAppState() {
     if (canRestoreAppState(appState)) {
       return appState;
     } else {
+      clearAppState();
       return null;
     }
   }

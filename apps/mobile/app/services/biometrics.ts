@@ -72,7 +72,6 @@ async function hasInternetCredentials() {
 async function getCredentials(title?: string, description?: string) {
   try {
     useSettingStore.getState().setRequestBiometrics(true);
-
     const options = Platform.select({
       ios: {
         fallbackEnabled: false,
@@ -87,12 +86,16 @@ async function getCredentials(title?: string, description?: string) {
     await FingerprintScanner.authenticate(options as AuthenticateIOS);
     setTimeout(() => {
       useSettingStore.getState().setRequestBiometrics(false);
-    }, 1000);
+    }, 500);
     FingerprintScanner.release();
     return await Keychain.getInternetCredentials("nn_vault");
   } catch (error) {
     const e = error as { name: string };
-    useSettingStore.getState().setRequestBiometrics(false);
+    setTimeout(() => {
+      useUserStore.setState({
+        disableAppLockRequests: false
+      });
+    }, 500);
     FingerprintScanner.release();
     let message: ToastOptions = {
       heading: "Authentication with biometrics failed.",
@@ -140,18 +143,22 @@ async function validateUser(title: string, description?: string) {
         }
       }) as AuthenticateIOS
     );
-    useUserStore.setState({
-      disableAppLockRequests: false
-    });
-    useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
+    setTimeout(() => {
+      useUserStore.setState({
+        disableAppLockRequests: false
+      });
+      useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
+    }, 500);
     FingerprintScanner.release();
     return true;
   } catch (error) {
     const e = error as { name: string };
-    useUserStore.setState({
-      disableAppLockRequests: false
-    });
-    useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
+    setTimeout(() => {
+      useUserStore.setState({
+        disableAppLockRequests: false
+      });
+      useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
+    }, 500);
     FingerprintScanner.release();
     if (e.name === "DeviceLocked") {
       ToastManager.show({

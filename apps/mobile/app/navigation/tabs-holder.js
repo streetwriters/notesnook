@@ -272,6 +272,8 @@ const _TabsHolder = () => {
       return;
     }
     setTimeout(() => {
+      console.log("movedAway", editorState().movedAway);
+
       switch (current) {
         case "tablet":
           tabBarRef.current?.goToIndex(0, false);
@@ -294,7 +296,7 @@ const _TabsHolder = () => {
           }
           break;
       }
-    }, 1000);
+    }, 300);
   }
 
   const onScroll = (scrollOffset) => {

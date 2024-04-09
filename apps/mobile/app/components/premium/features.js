@@ -162,7 +162,7 @@ export const features = [
         platform: "android"
       }
     ],
-    info: "* Free users are limited to keeping 3 notebooks (no limit on topics) and 5 tags."
+    info: "* Free users are limited to keeping 3 notebooks and 5 tags."
   },
 
   {

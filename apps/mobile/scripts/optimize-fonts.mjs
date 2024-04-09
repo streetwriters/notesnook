@@ -77,7 +77,9 @@ const EXTRA_ICON_NAMES = [
   "keyboard",
   "numeric",
   "vector-link",
-  "notebook-plus"
+  "notebook-plus",
+  "arrow-right-bold-box-outline",
+  "arrow-up-bold"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

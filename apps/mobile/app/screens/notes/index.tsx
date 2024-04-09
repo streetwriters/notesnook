@@ -17,32 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { resolveItems } from "@notesnook/common";
 import { VirtualizedGrouping } from "@notesnook/core";
 import { Color, Note } from "@notesnook/core/dist/types";
 import React, { useEffect, useRef, useState } from "react";
+import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import List from "../../components/list";
 import { PlaceholderData } from "../../components/list/empty";
+import SelectionHeader from "../../components/selection-header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
-import { resolveItems } from "@notesnook/common";
 import useNavigationStore, {
   HeaderRightButton,
   NotesScreenParams,
   RouteName
 } from "../../stores/use-navigation-store";
 import { setOnFirstSave } from "./common";
-import { db } from "../../common/database";
-import SelectionHeader from "../../components/selection-header";
-export const WARNING_DATA = {
-  title: "Some notes in this topic are not synced"
-};
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
   get: (
@@ -71,9 +68,7 @@ const NotesPage = ({
   onPressFloatingButton,
   focusControl = true,
   rightButtons
-}: RouteProps<
-  "NotesPage" | "TaggedNotes" | "Monographs" | "ColoredNotes" | "TopicNotes"
->) => {
+}: RouteProps<"NotesPage" | "TaggedNotes" | "Monographs" | "ColoredNotes">) => {
   const params = useRef<NotesScreenParams>(route?.params);
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
   const [loadingNotes, setLoadingNotes] = useState(true);

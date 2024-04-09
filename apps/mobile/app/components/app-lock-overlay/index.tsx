@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useCallback, useEffect, useRef } from "react";
-import { Platform, TextInput, View } from "react-native";
+import { AppStateStatus, Platform, TextInput, View } from "react-native";
 //@ts-ignore
 import { useThemeColors } from "@notesnook/theme";
 import { enabled } from "react-native-privacy-snapshot";
@@ -45,7 +45,6 @@ import Input from "../ui/input";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { ToastManager } from "../../services/event-manager";
 
 const getUser = () => {
   const user = MMKV.getString("user");
@@ -75,6 +74,7 @@ const verifyUserPassword = async (password: string) => {
 };
 
 const AppLockedOverlay = () => {
+  const initialLaunchBiometricRequest = useRef(true);
   const { colors } = useThemeColors();
   const user = getUser();
   const appLocked = useUserStore((state) => state.appLocked);
@@ -83,6 +83,7 @@ const AppLockedOverlay = () => {
   const passwordInputRef = useRef<TextInput>(null);
   const password = useRef<string>();
   const appState = useAppState();
+  const lastAppState = useRef<AppStateStatus>(appState);
   const biometricUnlockAwaitingUserInput = useRef(false);
   const keyboardType = useSettingStore(
     (state) => state.settings.applockKeyboardType
@@ -134,7 +135,6 @@ const AppLockedOverlay = () => {
       const unlocked = appLockHasPasswordSecurity
         ? await validateAppLockPassword(password.current)
         : await verifyUserPassword(password.current);
-      console.log(unlocked);
       if (unlocked) {
         if (!appLockHasPasswordSecurity) {
           await setAppLockVerificationCipher(password.current);
@@ -155,18 +155,46 @@ const AppLockedOverlay = () => {
   };
 
   useEffect(() => {
+    if (appState === "active") {
+      enabled(false);
+    }
+
+    const prevState = lastAppState.current;
+    lastAppState.current = appState;
+
     if (
-      biometricUnlockAwaitingUserInput.current ||
-      useUserStore.getState().disableAppLockRequests
-    )
-      return;
-    if (
-      appLocked &&
       appState === "active" &&
-      !useSettingStore.getState().requestBiometrics
+      (prevState === "background" || initialLaunchBiometricRequest.current)
     ) {
-      biometricUnlockAwaitingUserInput.current = true;
-      onUnlockAppRequested();
+      if (SettingsService.shouldLockAppOnEnterForeground()) {
+        DatabaseLogger.info("Locking app on entering foreground");
+        useUserStore.getState().lockApp(true);
+      }
+
+      if (
+        !(
+          biometricUnlockAwaitingUserInput.current ||
+          useUserStore.getState().disableAppLockRequests ||
+          !appLocked ||
+          useSettingStore.getState().requestBiometrics ||
+          useSettingStore.getState().appDidEnterBackgroundForAction
+        )
+      ) {
+        initialLaunchBiometricRequest.current = false;
+        DatabaseLogger.info("Biometric unlock request");
+        onUnlockAppRequested();
+      }
+
+      enabled(false);
+    } else {
+      SettingsService.appEnteredBackground();
+
+      if (
+        SettingsService.get().privacyScreen ||
+        SettingsService.getProperty("appLockEnabled")
+      ) {
+        enabled(true);
+      }
     }
   }, [appState, onUnlockAppRequested, appLocked]);
 

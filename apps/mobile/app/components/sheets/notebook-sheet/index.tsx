@@ -44,6 +44,8 @@ import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
 import Sort from "../sort";
+import { MoveNotebookSheet } from "../move-notebook";
+import { db } from "../../../common/database";
 
 const useItemSelectionStore = createItemSelectionStore(true, false);
 
@@ -325,6 +327,26 @@ export const NotebookSheet = () => {
                     width: 40 * fontScale,
                     height: 40 * fontScale
                   }}
+                  onPress={async () => {
+                    const ids = useItemSelectionStore
+                      .getState()
+                      .getSelectedItemIds();
+                    const notebooks = await db.notebooks.all.items(ids);
+                    MoveNotebookSheet.present(notebooks);
+                  }}
+                  color={colors.primary.icon}
+                  tooltipText="Clear selection"
+                  tooltipPosition={1}
+                  name="arrow-right-bold-box-outline"
+                  size={22}
+                />
+
+                <IconButton
+                  style={{
+                    marginLeft: 10,
+                    width: 40 * fontScale,
+                    height: 40 * fontScale
+                  }}
                   onPress={() => {
                     useSelectionStore.getState().clearSelection();
                     useItemSelectionStore.setState({
@@ -360,20 +382,6 @@ export const NotebookSheet = () => {
                     height: 40 * fontScale
                   }}
                 />
-                {/* <IconButton
-                  name="notebook-plus"
-                  onPress={() => {
-                    if (!notebook) return;
-                    AddNotebookSheet.present(undefined, notebook, undefined);
-                  }}
-                  testID="add-notebook-button"
-                  color={colors.primary.icon}
-                  size={22}
-                  style={{
-                    width: 40 * fontScale,
-                    height: 40 * fontScale
-                  }}
-                /> */}
 
                 <IconButton
                   name={collapsed ? "chevron-up" : "chevron-down"}
