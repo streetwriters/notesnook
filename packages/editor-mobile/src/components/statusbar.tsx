@@ -120,7 +120,7 @@ function StatusBar({
         backgroundColor: "var(--nn_primary_background)",
         zIndex: 1,
         justifyContent: sticky ? "center" : "flex-start",
-        paddingTop: 2,
+        paddingTop: 4,
         paddingBottom: 2
       }}
       id="statusbar"
