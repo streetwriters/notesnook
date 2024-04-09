@@ -273,7 +273,6 @@ const _TabsHolder = () => {
     }
 
     const state = getAppState();
-    console.log("MOVED AWAY", state?.movedAway);
 
     setTimeout(() => {
       switch (current) {
@@ -299,7 +298,7 @@ const _TabsHolder = () => {
           }
           break;
       }
-    }, 300);
+    }, 1000);
   }
 
   const onScroll = (scrollOffset) => {
