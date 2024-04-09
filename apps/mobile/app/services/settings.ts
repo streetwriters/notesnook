@@ -98,7 +98,7 @@ function init() {
 }
 
 function setPrivacyScreen(settings: SettingStore["settings"]) {
-  if (settings.privacyScreen || canLockAppInBackground()) {
+  if (settings.privacyScreen || settings.appLockEnabled) {
     if (Platform.OS === "android") {
       NotesnookModule.setSecureMode(true);
     } else {
@@ -226,7 +226,8 @@ export const SettingsService = {
   resetSettings,
   shouldLockAppOnEnterForeground,
   canLockAppInBackground,
-  appEnteredBackground
+  appEnteredBackground,
+  setPrivacyScreen
 };
 
 init();

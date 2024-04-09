@@ -849,6 +849,9 @@ export const settingsGroups: SettingSection[] = [
             icon: "lock",
             type: "switch",
             property: "appLockEnabled",
+            onChange: () => {
+              SettingsService.setPrivacyScreen(SettingsService.get());
+            },
             onVerify: async () => {
               const verified = await verifyUserWithApplock();
               if (!verified) return false;

@@ -327,6 +327,7 @@ export const AppLockPassword = () => {
                 SettingsService.getProperty("biometricsAuthEnabled") === false
               ) {
                 SettingsService.setProperty("appLockEnabled", false);
+                SettingsService.setPrivacyScreen(SettingsService.get());
                 ToastManager.show({
                   message: "App lock disabled",
                   type: "success"
