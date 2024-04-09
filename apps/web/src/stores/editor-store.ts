@@ -365,6 +365,25 @@ class EditorStore extends BaseStore<EditorStore> {
                 color: undefined
               });
             }
+          } else if (
+            event.type === "unlink" &&
+            event.reference.type === "note" &&
+            event.types.includes("color")
+          ) {
+            for (const session of sessions) {
+              const ids =
+                "id" in event.reference
+                  ? [event.reference.id]
+                  : event.reference.ids;
+              if (
+                session.type === "new" ||
+                (!ids.includes(session.id) && !ids.includes(session.note.id))
+              )
+                continue;
+              updateSession(session.id, undefined, {
+                color: undefined
+              });
+            }
           }
         }
         if (clearIds.length > 0) closeSessions(...clearIds);
