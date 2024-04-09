@@ -63,6 +63,7 @@ const formats = {
   default: "%Y-%W",
   none: null
 } satisfies Record<GroupOptions["groupBy"], string | null>;
+const MAX_PARAMETERS = 200;
 
 export class SQLCollection<
   TCollectionType extends keyof DatabaseSchema,
@@ -112,18 +113,21 @@ export class SQLCollection<
   }
 
   async softDelete(ids: string[]) {
-    await this.db()
-      .replaceInto<keyof DatabaseSchema>(this.type)
-      .values(
-        ids.map((id) => ({
-          id,
-          deleted: true,
-          dateModified: Date.now(),
-          synced: false
-        }))
-      )
-      .execute();
-
+    await this.startTransaction(async (tx) => {
+      for (const chunk of toChunks(ids, MAX_PARAMETERS)) {
+        await tx
+          .replaceInto<keyof DatabaseSchema>(this.type)
+          .values(
+            chunk.map((id) => ({
+              id,
+              deleted: true,
+              dateModified: Date.now(),
+              synced: false
+            }))
+          )
+          .execute();
+      }
+    });
     this.eventManager.publish(EVENTS.databaseUpdated, <DeleteEvent>{
       type: "softDelete",
       collection: this.type,
@@ -133,11 +137,15 @@ export class SQLCollection<
 
   async delete(ids: string[]) {
     if (ids.length <= 0) return;
-    await this.db()
-      .deleteFrom<keyof DatabaseSchema>(this.type)
-      .where("id", "in", ids)
-      .execute();
 
+    await this.startTransaction(async (tx) => {
+      for (const chunk of toChunks(ids, MAX_PARAMETERS)) {
+        await tx
+          .deleteFrom<keyof DatabaseSchema>(this.type)
+          .where("id", "in", chunk)
+          .execute();
+      }
+    });
     this.eventManager.publish(EVENTS.databaseUpdated, <DeleteEvent>{
       type: "delete",
       collection: this.type,
@@ -199,7 +207,7 @@ export class SQLCollection<
     if (entries.length <= 0) return [];
 
     await this.startTransaction(async (tx) => {
-      for (const chunk of toChunks(entries, 200)) {
+      for (const chunk of toChunks(entries, MAX_PARAMETERS)) {
         await tx
           .replaceInto<keyof DatabaseSchema>(this.type)
           .values(chunk)
@@ -215,15 +223,20 @@ export class SQLCollection<
     options: { sendEvent: boolean } = { sendEvent: true }
   ) {
     if (!this.sanitizer.sanitize(this.type, partial)) return;
-    await this.db()
-      .updateTable<keyof DatabaseSchema>(this.type)
-      .where("id", "in", ids)
-      .set({
-        ...partial,
-        dateModified: Date.now(),
-        synced: partial.synced || false
-      })
-      .execute();
+
+    await this.startTransaction(async (tx) => {
+      for (const chunk of toChunks(ids, MAX_PARAMETERS)) {
+        await tx
+          .updateTable<keyof DatabaseSchema>(this.type)
+          .where("id", "in", chunk)
+          .set({
+            ...partial,
+            dateModified: Date.now(),
+            synced: partial.synced || false
+          })
+          .execute();
+      }
+    });
     if (options.sendEvent) {
       this.eventManager.publish(EVENTS.databaseUpdated, <UpdateEvent>{
         type: "update",
