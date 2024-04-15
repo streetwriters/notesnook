@@ -357,7 +357,9 @@ const PublishNoteSheet = ({
         }}
         onPress={async () => {
           try {
-            await openLinkInBrowser("https://docs.notesnook.com/monographs/");
+            await openLinkInBrowser(
+              "https://help.notesnook.com/publish-notes-with-monographs"
+            );
           } catch (e) {
             console.error(e);
           }

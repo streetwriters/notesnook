@@ -44,7 +44,9 @@ export function toCamelCase(title: string) {
 
 export function openMonographsWebpage() {
   try {
-    openLinkInBrowser("https://docs.notesnook.com/monographs/");
+    openLinkInBrowser(
+      "https://help.notesnook.com/publish-notes-with-monographs"
+    );
   } catch (e) {
     console.error(e);
   }

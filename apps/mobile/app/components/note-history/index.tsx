@@ -199,7 +199,9 @@ export default function NoteHistory({
         Note version history is local only.{" "}
         <Text
           onPress={() => {
-            openLinkInBrowser("https://docs.notesnook.com/versionhistory");
+            openLinkInBrowser(
+              "https://help.notesnook.com/note-version-history"
+            );
           }}
           style={{
             color: colors.primary.accent,
