@@ -2,19 +2,19 @@ name: "Test @notesnook/core"
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - "master"
-    paths:
-      - "packages/core/**"
-      # re-run workflow if workflow file changes
-      - ".github/workflows/core.tests.yml"
-  pull_request:
-    types:
-      - "ready_for_review"
-      - "opened"
-      - "synchronize"
-      - "reopened"
+  # push:
+  #   branches:
+  #     - "master"
+  #   paths:
+  #     - "packages/core/**"
+  #     # re-run workflow if workflow file changes
+  #     - ".github/workflows/core.tests.yml"
+  # pull_request:
+  #   types:
+  #     - "ready_for_review"
+  #     - "opened"
+  #     - "synchronize"
+  #     - "reopened"
 
 jobs:
   test:

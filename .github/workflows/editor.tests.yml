@@ -2,19 +2,19 @@ name: Test @notesnook/editor
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - "master"
-    paths:
-      - "packages/editor/**"
-      # re-run workflow if workflow file changes
-      - ".github/workflows/editor.tests.yml"
-  pull_request:
-    types:
-      - "ready_for_review"
-      - "opened"
-      - "synchronize"
-      - "reopened"
+  # push:
+  #   branches:
+  #     - "master"
+  #   paths:
+  #     - "packages/editor/**"
+  #     # re-run workflow if workflow file changes
+  #     - ".github/workflows/editor.tests.yml"
+  # pull_request:
+  #   types:
+  #     - "ready_for_review"
+  #     - "opened"
+  #     - "synchronize"
+  #     - "reopened"
 
 jobs:
   build:

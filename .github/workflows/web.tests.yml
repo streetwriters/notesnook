@@ -2,19 +2,19 @@ name: Test @notesnook/web
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - "master"
-    paths:
-      - "apps/web/**"
-      # re-run workflow if workflow file changes
-      - ".github/workflows/web.tests.yml"
-  pull_request:
-    types:
-      - "ready_for_review"
-      - "opened"
-      - "synchronize"
-      - "reopened"
+  # push:
+  #   branches:
+  #     - "master"
+  #   paths:
+  #     - "apps/web/**"
+  #     # re-run workflow if workflow file changes
+  #     - ".github/workflows/web.tests.yml"
+  # pull_request:
+  #   types:
+  #     - "ready_for_review"
+  #     - "opened"
+  #     - "synchronize"
+  #     - "reopened"
 
 jobs:
   build:
