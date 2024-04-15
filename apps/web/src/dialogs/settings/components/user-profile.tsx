@@ -75,10 +75,7 @@ export function UserProfile() {
           <User size={30} />
         </Flex>
         <Flex sx={{ flexDirection: "column" }}>
-          <Text variant={"title"}>You are not logged in</Text>
-          <Text variant={"subBody"}>
-            Login or create an account to sync your notes.
-          </Text>
+
         </Flex>
       </Flex>
     );
@@ -114,10 +111,10 @@ export function UserProfile() {
           {remainingDays > 0 && (isPro || isProCancelled)
             ? `PRO`
             : remainingDays > 0 && isTrial
-            ? "TRIAL"
-            : isBeta
-            ? "BETA TESTER"
-            : "BASIC"}
+              ? "TRIAL"
+              : isBeta
+                ? "BETA TESTER"
+                : "BASIC"}
         </Text>
         <Text variant={"title"}>{user.email}</Text>
         <Text variant={"subBody"}>

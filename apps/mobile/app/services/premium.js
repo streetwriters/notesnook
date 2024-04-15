@@ -38,7 +38,7 @@ import {
 import { eSendEvent, presentSheet, ToastEvent } from "./event-manager";
 
 import SettingsService from "./settings";
-let premiumStatus = 0;
+let premiumStatus = 5;
 
 /**
  * @type {RNIap.Subscription[]}
@@ -106,7 +106,8 @@ async function getProducts() {
 function get() {
   if (__DEV__ || Config.isTesting === "true") return true;
 
-  return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
+  //return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
+  return true;
 }
 
 async function verify(callback, error) {
