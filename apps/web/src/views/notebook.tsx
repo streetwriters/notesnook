@@ -481,7 +481,7 @@ function NotebookHeader({
     <Flex
       data-test-id="notebook-header"
       mx={2}
-      my={2}
+      mb={2}
       sx={{ flexDirection: "column", minWidth: 200 }}
     >
       <Flex sx={{ alignItems: "center", mb: 1 }}>
