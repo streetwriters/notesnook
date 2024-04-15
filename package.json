@@ -1,5 +1,5 @@
 {
-  "name": "inotesnook",
+  "name": "notesnook",
   "private": true,
   "scripts": {
     "prepare": "husky install && npm run bootstrap",
