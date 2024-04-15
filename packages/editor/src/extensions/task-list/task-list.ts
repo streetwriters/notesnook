@@ -238,6 +238,8 @@ export const TaskListNode = TaskList.extend({
               return false;
             }
           });
+          tr.setMeta("preventUpdate", true);
+          tr.setMeta("addToHistory", false);
           view.dispatch(tr);
           return {};
         },
