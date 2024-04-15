@@ -19,11 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import dayjs from "dayjs";
 import Database from "../api";
-import { deleteItems } from "../utils/array";
+import { deleteItems, toChunks } from "../utils/array";
 import { GroupOptions, TrashItem } from "../types";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { getSortSelectors, groupArray } from "../utils/grouping";
 import { sql } from "kysely";
+import { MAX_SQL_PARAMETERS } from "../database/sql-collection";
 
 export default class Trash {
   collections = ["notes", "notebooks"] as const;
@@ -143,17 +144,21 @@ export default class Trash {
 
   private async _delete(noteIds: string[], notebookIds: string[]) {
     if (noteIds.length > 0) {
-      await this.db.content.removeByNoteId(...noteIds);
-      await this.db.noteHistory.clearSessions(...noteIds);
-      await this.db.notes.remove(...noteIds);
-      deleteItems(this.cache.notes, ...noteIds);
+      for (const chunk of toChunks(noteIds, MAX_SQL_PARAMETERS)) {
+        await this.db.content.removeByNoteId(...chunk);
+        await this.db.noteHistory.clearSessions(...chunk);
+        await this.db.notes.remove(...chunk);
+        deleteItems(this.cache.notes, ...chunk);
+      }
     }
 
     if (notebookIds.length > 0) {
       const ids = [...notebookIds, ...(await this.subNotebooks(notebookIds))];
-      await this.db.notebooks.remove(...ids);
-      await this.db.relations.unlinkOfType("notebook", ids);
-      deleteItems(this.cache.notebooks, ...ids);
+      for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
+        await this.db.notebooks.remove(...chunk);
+        await this.db.relations.unlinkOfType("notebook", chunk);
+        deleteItems(this.cache.notebooks, ...chunk);
+      }
     }
   }
 

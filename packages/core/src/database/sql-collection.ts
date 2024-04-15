@@ -63,7 +63,7 @@ const formats = {
   default: "%Y-%W",
   none: null
 } satisfies Record<GroupOptions["groupBy"], string | null>;
-const MAX_PARAMETERS = 200;
+export const MAX_SQL_PARAMETERS = 200;
 
 export class SQLCollection<
   TCollectionType extends keyof DatabaseSchema,
@@ -114,7 +114,7 @@ export class SQLCollection<
 
   async softDelete(ids: string[]) {
     await this.startTransaction(async (tx) => {
-      for (const chunk of toChunks(ids, MAX_PARAMETERS)) {
+      for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
         await tx
           .replaceInto<keyof DatabaseSchema>(this.type)
           .values(
@@ -139,7 +139,7 @@ export class SQLCollection<
     if (ids.length <= 0) return;
 
     await this.startTransaction(async (tx) => {
-      for (const chunk of toChunks(ids, MAX_PARAMETERS)) {
+      for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
         await tx
           .deleteFrom<keyof DatabaseSchema>(this.type)
           .where("id", "in", chunk)
@@ -207,7 +207,7 @@ export class SQLCollection<
     if (entries.length <= 0) return [];
 
     await this.startTransaction(async (tx) => {
-      for (const chunk of toChunks(entries, MAX_PARAMETERS)) {
+      for (const chunk of toChunks(entries, MAX_SQL_PARAMETERS)) {
         await tx
           .replaceInto<keyof DatabaseSchema>(this.type)
           .values(chunk)
@@ -225,7 +225,7 @@ export class SQLCollection<
     if (!this.sanitizer.sanitize(this.type, partial)) return;
 
     await this.startTransaction(async (tx) => {
-      for (const chunk of toChunks(ids, MAX_PARAMETERS)) {
+      for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
         await tx
           .updateTable<keyof DatabaseSchema>(this.type)
           .where("id", "in", chunk)
