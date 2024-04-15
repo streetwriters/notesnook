@@ -85,7 +85,7 @@ async function setPremiumStatus() {
 
 function getMontlySub() {
   let _product = products.find(
-    (p) => p.productId === "com.streetwriters.notesnook.sub.mo"
+    (p) => p.productId === "com.cdl.notesnook.sub.mo"
   );
   if (!_product) {
     _product = {

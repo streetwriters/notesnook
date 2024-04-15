@@ -1,4 +1,4 @@
-package com.streetwriters.notesnook;
+package com.cdl.notesnook;
 
 import com.wix.detox.Detox;
 import com.wix.detox.config.DetoxConfig;

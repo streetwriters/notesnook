@@ -84,7 +84,7 @@ import { useCallback } from "react";
             type: "promo",
             title: "15% Off",
             platforms: ["android"],
-            data: "com.streetwriters.notesnook.sub.yr.15"
+            data: "com.cdl.notesnook.sub.yr.15"
           }
         ],
         platforms: ["all"]

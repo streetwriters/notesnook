@@ -1,4 +1,4 @@
-package com.streetwriters.notesnook;
+package com.cdl.notesnook;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -60,6 +60,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
             // If you opted-in for the New Architecture, we load the native entry point for this app.
             DefaultNewArchitectureEntryPoint.load();
         }
-        com.streetwriters.notesnook.ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+        com.cdl.notesnook.ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
     }
 }

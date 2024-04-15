@@ -405,9 +405,9 @@ async function scheduleNotification(
             style: !description
               ? undefined
               : {
-                  type: AndroidStyle.BIGTEXT,
-                  text: description
-                }
+                type: AndroidStyle.BIGTEXT,
+                text: description
+              }
           },
           ios: {
             interruptionLevel: "active",
@@ -451,25 +451,25 @@ async function getChannelId(id: "silent" | "vibrate" | "urgent" | "default") {
   switch (id) {
     case "default":
       return await notifee.createChannel({
-        id: "com.streetwriters.notesnook",
+        id: "com.cdl.notesnook",
         name: "Default",
         vibration: false
       });
     case "silent":
       return await notifee.createChannel({
-        id: "com.streetwriters.notesnook.silent",
+        id: "com.cdl.notesnook.silent",
         name: "Silent",
         vibration: false
       });
     case "vibrate":
       return await notifee.createChannel({
-        id: "com.streetwriters.notesnook.silent",
+        id: "com.cdl.notesnook.silent",
         name: "Vibrate",
         vibration: true
       });
     case "urgent":
       return await notifee.createChannel({
-        id: "com.streetwriters.notesnook.urgent",
+        id: "com.cdl.notesnook.urgent",
         name: "Urgent",
         description:
           "This channel is used to show notifications with sound & vibration.",
@@ -532,16 +532,16 @@ async function displayNotification({
             action !== "ReplyInput"
               ? undefined
               : {
-                  placeholder: reply_placeholder_text,
-                  allowFreeFormInput: true
-                }
+                placeholder: reply_placeholder_text,
+                allowFreeFormInput: true
+              }
         })),
         style: !bigText
           ? undefined
           : {
-              type: AndroidStyle.BIGTEXT,
-              text: bigText
-            }
+            type: AndroidStyle.BIGTEXT,
+            text: bigText
+          }
       }
     });
   } catch (e) {
@@ -560,8 +560,8 @@ function openSettingsDialog(context: any) {
         Platform.OS === "ios"
           ? undefined
           : () => {
-              resolve(true);
-            },
+            resolve(true);
+          },
       onClose: () => {
         resolve(false);
       },
@@ -873,7 +873,7 @@ async function setupReminders(checkNeedsScheduling = false) {
     if (!needsReschedule) {
       needsReschedule = pending[0].notification.data?.dateModified
         ? parseInt(pending[0].notification.data?.dateModified as string) <
-          reminder.dateModified
+        reminder.dateModified
         : true;
     }
     if (!needsReschedule && checkNeedsScheduling) continue;

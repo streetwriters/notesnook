@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.streetwriters.notesnook">
+    package="com.cdl.notesnook">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.android.vending.BILLING" />
@@ -98,7 +98,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="com.streetwriters.notesnook" />
+                <data android:scheme="com.cdl.notesnook" />
             </intent-filter>
 
         </activity>
@@ -139,7 +139,7 @@
             android:stopWithTask="false" />
         <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />   
 
-        <service android:name="com.streetwriters.notesnook.BootTaskService" />
+        <service android:name="com.cdl.notesnook.BootTaskService" />
 
         <provider
         android:name="androidx.core.content.FileProvider"

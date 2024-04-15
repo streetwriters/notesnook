@@ -26,7 +26,7 @@ export const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 export const STORE_LINK =
   Platform.OS === "ios"
     ? "https://apps.apple.com/us/app/notesnook/id1544027013"
-    : "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook";
+    : "https://play.google.com/store/apps/details?id=com.cdl.notesnook";
 
 export const GROUP = {
   default: "default",
@@ -46,19 +46,19 @@ export const SORT = {
 };
 
 export const itemSkus = [
-  "com.streetwriters.notesnook.sub.mo",
-  "com.streetwriters.notesnook.sub.yr",
-  "com.streetwriters.notesnook.sub.yr.15",
-  "com.streetwriters.notesnook.sub.mo.15",
-  "com.streetwriters.notesnook.sub.mo.ofr",
-  "com.streetwriters.notesnook.sub.yr.trialoffer",
-  "com.streetwriters.notesnook.sub.mo.trialoffer",
-  "com.streetwriters.notesnook.sub.mo.tier1",
-  "com.streetwriters.notesnook.sub.yr.tier1",
-  "com.streetwriters.notesnook.sub.mo.tier2",
-  "com.streetwriters.notesnook.sub.yr.tier2",
-  "com.streetwriters.notesnook.sub.mo.tier3",
-  "com.streetwriters.notesnook.sub.yr.tier3"
+  "com.cdl.notesnook.sub.mo",
+  "com.cdl.notesnook.sub.yr",
+  "com.cdl.notesnook.sub.yr.15",
+  "com.cdl.notesnook.sub.mo.15",
+  "com.cdl.notesnook.sub.mo.ofr",
+  "com.cdl.notesnook.sub.yr.trialoffer",
+  "com.cdl.notesnook.sub.mo.trialoffer",
+  "com.cdl.notesnook.sub.mo.tier1",
+  "com.cdl.notesnook.sub.yr.tier1",
+  "com.cdl.notesnook.sub.mo.tier2",
+  "com.cdl.notesnook.sub.yr.tier2",
+  "com.cdl.notesnook.sub.mo.tier3",
+  "com.cdl.notesnook.sub.yr.tier3"
 ];
 
 export const SUBSCRIPTION_STATUS = {

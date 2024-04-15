@@ -1,4 +1,4 @@
-package com.streetwriters.notesnook;
+package com.cdl.notesnook;
 
 import android.content.Intent;
 import com.facebook.react.HeadlessJsTaskService;
@@ -11,7 +11,7 @@ public class BootTaskService extends HeadlessJsTaskService {
     @Override
   protected @Nullable HeadlessJsTaskConfig getTaskConfig(Intent intent) {
       return new HeadlessJsTaskConfig(
-              "com.streetwriters.notesnook.BOOT_TASK",
+              "com.cdl.notesnook.BOOT_TASK",
               Arguments.createMap(),
               30000, // timeout for the task
               false // optional: defines whether or not the task is allowed in foreground. Default is false

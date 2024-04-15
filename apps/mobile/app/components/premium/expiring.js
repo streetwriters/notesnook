@@ -58,7 +58,7 @@ export const Expiring = () => {
           promoCode:
             pricing?.info?.discount > 30
               ? pricing.info.sku
-              : "com.streetwriters.notesnook.sub.yr.trialoffer",
+              : "com.cdl.notesnook.sub.yr.trialoffer",
           text: `GET ${
             pricing?.info?.discount > 30 ? pricing?.info?.discount : 30
           }% OFF on yearly`,

@@ -41,8 +41,8 @@ export const usePricing = (period: "monthly" | "yearly") => {
 
   const getDefaultSku = (period: "monthly" | "yearly") => {
     return period === "monthly"
-      ? "com.streetwriters.notesnook.sub.mo"
-      : "com.streetwriters.notesnook.sub.yr";
+      ? "com.cdl.notesnook.sub.mo"
+      : "com.cdl.notesnook.sub.yr";
   };
 
   useEffect(() => {

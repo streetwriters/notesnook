@@ -56,7 +56,7 @@ export function getDownloadLink(platform: string) {
       return [
         {
           type: "Install from Google Play Store",
-          link: "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook"
+          link: "https://play.google.com/store/apps/details?id=com.cdl.notesnook"
         },
         {
           type: "Download .apk (arm64-v8a)",

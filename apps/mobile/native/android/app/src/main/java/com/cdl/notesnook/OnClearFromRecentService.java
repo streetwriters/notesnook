@@ -1,4 +1,4 @@
-package com.streetwriters.notesnook;
+package com.cdl.notesnook;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;

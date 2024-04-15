@@ -117,8 +117,8 @@ export const WEB_MANIFEST: Partial<ManifestOptions> = {
   related_applications: [
     {
       platform: "play",
-      url: "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook",
-      id: "com.streetwriters.notesnook"
+      url: "https://play.google.com/store/apps/details?id=com.cdl.notesnook",
+      id: "com.cdl.notesnook"
     },
     {
       platform: "itunes",

@@ -46,7 +46,7 @@
 -keep class com.goterl.** { *; }
 -keepclassmembers class * extends com.sun.jna.* { public *; }
 
--keep class com.streetwriters.notesnook.BuildConfig { *; }
+-keep class com.cdl.notesnook.BuildConfig { *; }
 
 # Reanimated 
 -keep class com.swmansion.reanimated.** { *; }

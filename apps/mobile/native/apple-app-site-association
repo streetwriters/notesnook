@@ -3,7 +3,7 @@
 		"apps":[],
 		"details":[
 			{
-				"appID":"com.streetwriters.notesnook",
+				"appID":"com.cdl.notesnook",
 				"paths":["*"]
 			}
 		]

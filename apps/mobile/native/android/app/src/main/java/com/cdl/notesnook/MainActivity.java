@@ -1,4 +1,4 @@
-package com.streetwriters.notesnook;
+package com.cdl.notesnook;
 
 import com.facebook.react.ReactActivity;
 import android.content.Intent;

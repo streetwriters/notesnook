@@ -105,9 +105,9 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     
-    namespace "com.streetwriters.notesnook"
+    namespace "com.cdl.notesnook"
     defaultConfig {
-        applicationId "com.streetwriters.notesnook"
+        applicationId "com.cdl.notesnook"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true

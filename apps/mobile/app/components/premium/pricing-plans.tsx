@@ -125,7 +125,7 @@ export const PricingPlans = ({
   const getPromo = async (code: string) => {
     try {
       let skuId: string;
-      if (code.startsWith("com.streetwriters.notesnook")) {
+      if (code.startsWith("com.cdl.notesnook")) {
         skuId = code;
       } else {
         skuId = await db.offers?.getCode(code.split(":")[0], Platform.OS);
@@ -138,25 +138,25 @@ export const PricingPlans = ({
 
       const cycleText = isMonthly
         ? promoCyclesMonthly[
-            (Platform.OS === "android"
-              ? (product as RNIap.SubscriptionAndroid)
-                  .subscriptionOfferDetails[0]?.pricingPhases
-                  .pricingPhaseList?.[0].billingCycleCount
-              : parseInt(
-                  (product as RNIap.SubscriptionIOS)
-                    .introductoryPriceNumberOfPeriodsIOS as string
-                )) as keyof typeof promoCyclesMonthly
-          ]
+        (Platform.OS === "android"
+          ? (product as RNIap.SubscriptionAndroid)
+            .subscriptionOfferDetails[0]?.pricingPhases
+            .pricingPhaseList?.[0].billingCycleCount
+          : parseInt(
+            (product as RNIap.SubscriptionIOS)
+              .introductoryPriceNumberOfPeriodsIOS as string
+          )) as keyof typeof promoCyclesMonthly
+        ]
         : promoCyclesYearly[
-            (Platform.OS === "android"
-              ? (product as RNIap.SubscriptionAndroid)
-                  .subscriptionOfferDetails[0]?.pricingPhases
-                  .pricingPhaseList?.[0].billingCycleCount
-              : parseInt(
-                  (product as RNIap.SubscriptionIOS)
-                    .introductoryPriceNumberOfPeriodsIOS as string
-                )) as keyof typeof promoCyclesYearly
-          ];
+        (Platform.OS === "android"
+          ? (product as RNIap.SubscriptionAndroid)
+            .subscriptionOfferDetails[0]?.pricingPhases
+            .pricingPhaseList?.[0].billingCycleCount
+          : parseInt(
+            (product as RNIap.SubscriptionIOS)
+              .introductoryPriceNumberOfPeriodsIOS as string
+          )) as keyof typeof promoCyclesYearly
+        ];
 
       setProduct({
         type: "promo",
@@ -188,7 +188,7 @@ export const PricingPlans = ({
       const androidOfferToken =
         Platform.OS === "android"
           ? (product as RNIap.SubscriptionAndroid).subscriptionOfferDetails[0]
-              .offerToken
+            .offerToken
           : null;
 
       DatabaseLogger.info(
@@ -203,11 +203,11 @@ export const PricingPlans = ({
         andDangerouslyFinishTransactionAutomaticallyIOS: false,
         subscriptionOffers: androidOfferToken
           ? [
-              {
-                offerToken: androidOfferToken,
-                sku: product?.productId
-              }
-            ]
+            {
+              offerToken: androidOfferToken,
+              sku: product?.productId
+            }
+          ]
           : undefined
       });
       useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
@@ -293,10 +293,10 @@ export const PricingPlans = ({
           >
             {(Platform.OS === "android"
               ? (monthlyPlan?.product as RNIap.SubscriptionAndroid | undefined)
-                  ?.subscriptionOfferDetails[0]?.pricingPhases
-                  .pricingPhaseList?.[0]?.formattedPrice
+                ?.subscriptionOfferDetails[0]?.pricingPhases
+                .pricingPhaseList?.[0]?.formattedPrice
               : (monthlyPlan?.product as RNIap.SubscriptionIOS | undefined)
-                  ?.localizedPrice) ||
+                ?.localizedPrice) ||
               (PremiumService.getMontlySub() as any)?.localizedPrice}
             / mo
           </Paragraph>
@@ -393,12 +393,12 @@ export const PricingPlans = ({
                 >
                   {Platform.OS === "android"
                     ? (product.data as RNIap.SubscriptionAndroid)
-                        ?.subscriptionOfferDetails[0].pricingPhases
-                        .pricingPhaseList?.[0]?.formattedPrice
+                      ?.subscriptionOfferDetails[0].pricingPhases
+                      .pricingPhaseList?.[0]?.formattedPrice
                     : (product.data as RNIap.SubscriptionIOS)
-                        ?.introductoryPrice ||
-                      (product.data as RNIap.SubscriptionIOS)
-                        ?.localizedPrice}{" "}
+                      ?.introductoryPrice ||
+                    (product.data as RNIap.SubscriptionIOS)
+                      ?.localizedPrice}{" "}
                   {product?.cycleText
                     ? `for ${product.cycleText}`
                     : product?.offerType}
@@ -570,8 +570,8 @@ export const PricingPlans = ({
                     }}
                   />
                   {Platform.OS !== "ios" &&
-                  promo &&
-                  !promo.promoCode.startsWith("com.streetwriters.notesnook") ? (
+                    promo &&
+                    !promo.promoCode.startsWith("com.cdl.notesnook") ? (
                     <Paragraph
                       size={SIZE.md}
                       textBreakStrategy="balanced"
@@ -696,8 +696,8 @@ export const PricingPlans = ({
                 size={SIZE.xs}
                 onPress={() => {
                   openLinkInBrowser("https://notesnook.com/tos")
-                    .catch(() => {})
-                    .then(() => {});
+                    .catch(() => { })
+                    .then(() => { });
                 }}
                 style={{
                   textDecorationLine: "underline"
@@ -711,8 +711,8 @@ export const PricingPlans = ({
                 size={SIZE.xs}
                 onPress={() => {
                   openLinkInBrowser("https://notesnook.com/privacy")
-                    .catch(() => {})
-                    .then(() => {});
+                    .catch(() => { })
+                    .then(() => { });
                 }}
                 style={{
                   textDecorationLine: "underline"

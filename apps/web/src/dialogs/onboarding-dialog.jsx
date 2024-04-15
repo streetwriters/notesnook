@@ -418,7 +418,7 @@ function CrossPlatform() {
     <Flex my={4} sx={{ alignItems: "center" }}>
       {isMacStoreApp() ? null : (
         <Link
-          href="https://play.google.com/store/apps/details?id=com.streetwriters.notesnook"
+          href="https://play.google.com/store/apps/details?id=com.cdl.notesnook"
           target="_blank"
           rel="noopener noreferrer"
         >

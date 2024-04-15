@@ -1,4 +1,4 @@
-package com.streetwriters.notesnook;
+package com.cdl.notesnook;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;

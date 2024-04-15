@@ -138,7 +138,7 @@ async function doInBackground(callback: () => Promise<void>) {
 
 // const registerHeadlessTask = () =>
 //   AppRegistry.registerHeadlessTask(
-//     "com.streetwriters.notesnook.BOOT_TASK",
+//     "com.cdl.notesnook.BOOT_TASK",
 //     () => {
 //       return onBoot;
 //     }
