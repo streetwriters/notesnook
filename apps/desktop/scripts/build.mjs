@@ -24,6 +24,7 @@ import yargs from "yargs-parser";
 import os from "os";
 import * as childProcess from "child_process";
 import { fileURLToPath } from "url";
+import packageJson from "../package.json" with {type: "json"};
 
 const args = yargs(process.argv);
 const __filename = fileURLToPath(import.meta.url);
@@ -42,7 +43,7 @@ await patchBetterSQLite3();
 
 if (os.platform() === "win32")
   await exec(
-    "npx prebuildify --arch=arm64 --strip",
+    `npx prebuildify --arch=arm64 --strip -t electron@${packageJson.devDependencies.electron}`,
     path.join(__dirname, "..", "node_modules", "sodium-native")
   );
 
