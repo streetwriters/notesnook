@@ -119,7 +119,7 @@ export type NewEditorSession = BaseEditorSession & {
 export type ConflictedEditorSession = BaseEditorSession & {
   type: "conflicted" | "diff";
   note: Note;
-  content: ContentItem;
+  content?: ContentItem;
 };
 
 export type EditorSession =
@@ -771,12 +771,12 @@ class EditorStore extends BaseStore<EditorStore> {
             const session = state.sessions.find(
               (s): s is ConflictedEditorSession =>
                 (s.type === "diff" || s.type === "conflicted") &&
-                !!s.content.conflicted &&
+                !!s.content?.conflicted &&
                 s.content.conflicted.id === currentSession.note.contentId &&
                 s.content.conflicted.dateEdited ===
                   currentSession.note.dateEdited
             );
-            if (!session || !session.content.conflicted) return;
+            if (!session || !session.content?.conflicted) return;
             session.content.conflicted.data = partial.content!.data;
             session.content.conflicted.dateEdited = note.dateEdited;
           });

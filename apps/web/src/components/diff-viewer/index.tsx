@@ -42,17 +42,17 @@ function DiffViewer(props: DiffViewerProps) {
 
   const [content, setContent] = useState(session.content);
   const [conflictedContent, setConflictedContent] = useState(
-    content.conflicted
+    content?.conflicted
   );
 
   useLayoutEffect(() => {
     setConflictedContent((c) => {
-      if (c?.dateEdited === session.content.conflicted?.dateEdited) return c;
-      return session.content.conflicted;
+      if (c?.dateEdited === session.content?.conflicted?.dateEdited) return c;
+      return session.content?.conflicted;
     });
   }, [session]);
 
-  if (!conflictedContent) return null;
+  if (!conflictedContent || !content) return null;
 
   return (
     <Flex

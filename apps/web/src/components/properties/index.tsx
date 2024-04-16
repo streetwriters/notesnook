@@ -317,7 +317,7 @@ function InternalLinkItem({
   const { items, tabIndex, noteId, isExpanded, toggleExpand } = context;
   const item = useResolvedItem({ items, index });
 
-  if (!item || item.item.type !== "note") return null;
+  if (!item || item.item?.type !== "note") return null;
 
   if (tabIndex === InternalLinksTabs.LINKED_NOTES)
     return (
@@ -325,7 +325,7 @@ function InternalLinkItem({
         item={item.item}
         noteId={noteId}
         isExpanded={isExpanded(item.item.id)}
-        toggleExpand={() => toggleExpand(item.item.id)}
+        toggleExpand={() => toggleExpand(item.item!.id)}
       />
     );
   return (
@@ -333,7 +333,7 @@ function InternalLinkItem({
       item={item.item}
       noteId={noteId}
       isExpanded={isExpanded(item.item.id)}
-      toggleExpand={() => toggleExpand(item.item.id)}
+      toggleExpand={() => toggleExpand(item.item!.id)}
     />
   );
 }
