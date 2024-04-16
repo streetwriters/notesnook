@@ -48,6 +48,7 @@ function App() {
   const isMobile = useMobile();
   const [show, setShow] = useState(true);
   const [isAppLoaded] = useDatabase();
+  const isFocusMode = useStore((store) => store.isFocusMode);
 
   return (
     <>
@@ -69,6 +70,7 @@ function App() {
       <Flex
         id="app"
         bg="background"
+        className={isFocusMode ? "app-focus-mode" : ""}
         sx={{ overflow: "hidden", flexDirection: "column", height: "100%" }}
       >
         {isMobile ? (

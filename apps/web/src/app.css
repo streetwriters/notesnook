@@ -235,3 +235,7 @@ textarea,
   margin-inline-start: 0px !important;
   padding: 0px !important;
 }
+
+#app.app-focus-mode .toasts-container {
+  display: none;
+}

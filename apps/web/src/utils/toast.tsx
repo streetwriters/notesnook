@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Button, Flex, Text } from "@theme-ui/components";
 import { ScopedThemeProvider } from "../components/theme-provider";
 import { Error, Warn, Success, Info } from "../components/icons";
-import { store as appstore } from "../stores/app-store";
 import toast from "react-hot-toast";
 
 type ToastType = "success" | "error" | "warn" | "info";
@@ -43,8 +42,6 @@ function showToast(
   actions?: ToastAction[],
   hideAfter = 5000
 ): { hide: () => void } {
-  if (appstore.get().isFocusMode) return { hide: () => {} }; // TODO
-
   const id = toast(<ToastContainer message={message} actions={actions} />, {
     duration: hideAfter || Infinity,
     icon: <ToastIcon type={type} />,
