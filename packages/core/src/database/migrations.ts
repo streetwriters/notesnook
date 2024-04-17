@@ -275,6 +275,12 @@ export class NNMigrationProvider implements MigrationProvider {
             .on("attachments")
             .column("hash")
             .execute();
+
+          await db.schema
+            .createIndex("content_noteId")
+            .on("content")
+            .columns(["noteId"])
+            .execute();
         },
         async down(db) {}
       }
