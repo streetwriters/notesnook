@@ -38,9 +38,13 @@ const ENDPOINTS = {
   temporaryToken: "/account/token",
   logout: "/account/logout"
 };
+const REFRESH_TOKEN_MUTEX = withTimeout(
+  new Mutex(),
+  10 * 1000,
+  new Error("Timed out while refreshing access token.")
+);
 
 class TokenManager {
-  mutex = withTimeout(new Mutex(), 10 * 1000);
   logger = logger.scope("TokenManager");
   constructor(private readonly storage: KVStorageAccessor) {}
 
@@ -84,7 +88,7 @@ class TokenManager {
   }
 
   async _refreshToken(forceRenew = false) {
-    await this.mutex.runExclusive(async () => {
+    await REFRESH_TOKEN_MUTEX.runExclusive(async () => {
       this.logger.info("Refreshing access token");
 
       const token = await this.getToken(false, false);

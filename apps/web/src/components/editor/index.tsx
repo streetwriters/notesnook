@@ -26,7 +26,7 @@ import React, {
   useLayoutEffect
 } from "react";
 import ReactDOM from "react-dom";
-import { Box, Flex, Progress, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Progress, Text } from "@theme-ui/components";
 import Properties from "../properties";
 import {
   useEditorStore,
@@ -373,6 +373,17 @@ function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
         max={100}
         sx={{ width: ["90%", "35%"], mt: 1 }}
       />
+      <Button
+        variant="secondary"
+        mt={2}
+        onClick={() => {
+          const id = useEditorStore.getState().activeSessionId;
+          useEditorStore.setState({ documentPreview: undefined });
+          if (id) db.fs().cancel(id).catch(console.error);
+        }}
+      >
+        Cancel
+      </Button>
     </Flex>
   );
 }
@@ -455,11 +466,7 @@ export function Editor(props: EditorProps) {
             const container = document.getElementById("dialogContainer");
             if (!(container instanceof HTMLElement)) return;
 
-            const dataurl = await downloadAttachment(
-              hash,
-              "base64",
-              id?.toString()
-            );
+            const dataurl = await downloadAttachment(hash, "base64", id);
             if (!dataurl)
               return showToast("error", "This image cannot be previewed.");
 
@@ -476,8 +483,11 @@ export function Editor(props: EditorProps) {
             );
           } else if (attachment && onPreviewDocument) {
             onPreviewDocument({ hash });
-            const blob = await downloadAttachment(hash, "blob", id?.toString());
-            if (!blob) return;
+            const blob = await downloadAttachment(hash, "blob", id);
+            if (!blob) {
+              useEditorStore.setState({ documentPreview: undefined });
+              return;
+            }
             onPreviewDocument({ url: URL.createObjectURL(blob), hash });
           }
         }}

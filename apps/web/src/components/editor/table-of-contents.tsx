@@ -101,7 +101,7 @@ function TableOfContents(props: TableOfContentsProps) {
         position: "absolute",
         right: 0,
         top: 0,
-        zIndex: 1,
+        zIndex: 999,
         height: "100%",
         width: "300px",
         borderLeft: "1px solid",

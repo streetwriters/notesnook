@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { lazify } from "../utils/lazify";
+import { showToast } from "../utils/toast";
 import { db } from "./db";
 
 async function download(hash: string, groupId?: string) {
@@ -67,26 +68,33 @@ export async function downloadAttachment<
   type: TType,
   groupId?: string
 ): Promise<TOutputType | undefined> {
-  console.log("DOWNLOADING FILE", hash);
-  const response = await download(hash, groupId);
-  if (!response) return;
-  const { attachment, key } = response;
+  try {
+    const response = await download(hash, groupId);
+    if (!response) return;
+    const { attachment, key } = response;
 
-  if (type === "base64" || type === "text")
-    return (await db.attachments.read(hash, type)) as TOutputType;
+    if (type === "base64" || type === "text")
+      return (await db.attachments.read(hash, type)) as TOutputType;
 
-  const blob = await lazify(import("../interfaces/fs"), ({ decryptFile }) =>
-    decryptFile(attachment.hash, {
-      key,
-      iv: attachment.iv,
-      name: attachment.filename,
-      type: attachment.mimeType,
-      isUploaded: !!attachment.dateUploaded
-    })
-  );
+    const blob = await lazify(import("../interfaces/fs"), ({ decryptFile }) =>
+      decryptFile(attachment.hash, {
+        key,
+        iv: attachment.iv,
+        name: attachment.filename,
+        type: attachment.mimeType,
+        isUploaded: !!attachment.dateUploaded
+      })
+    );
 
-  if (!blob) return;
-  return blob as TOutputType;
+    if (!blob) return;
+    return blob as TOutputType;
+  } catch (e) {
+    console.error(e);
+    showToast(
+      "error",
+      `Failed to download attachment: ${hash} (error: ${(e as Error).message})`
+    );
+  }
 }
 
 export async function checkAttachment(hash: string) {
