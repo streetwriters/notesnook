@@ -56,7 +56,6 @@ import Titlebox from "./title-box";
 import Config from "../../utils/config";
 import { ScopedThemeProvider } from "../theme-provider";
 import { Lightbox } from "../lightbox";
-import { Allotment } from "allotment";
 import { showToast } from "../../utils/toast";
 import { Item, MaybeDeletedItem, isDeleted } from "@notesnook/core/dist/types";
 import { debounce, debounceWithId } from "@notesnook/common";
@@ -69,6 +68,7 @@ import { scrollIntoViewById } from "@notesnook/editor";
 import { IEditor } from "./types";
 import { EditorActionBar } from "./action-bar";
 import { logger } from "../../utils/logger";
+import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -120,13 +120,8 @@ export default function TabsView() {
           flexDirection: "column"
         }}
       >
-        <Allotment
-          proportionalLayout={true}
-          onDragEnd={(sizes) => {
-            Config.set("editor:panesize", sizes[1]);
-          }}
-        >
-          <Allotment.Pane className="editor-pane">
+        <PanelGroup direction="horizontal" autoSaveId={"editor-panels"}>
+          <Panel id="editor-panel" className="editor-pane" order={1}>
             {sessions.map((session) => (
               <Freeze
                 key={session.id}
@@ -164,46 +159,55 @@ export default function TabsView() {
                 )}
               </Freeze>
             ))}
-          </Allotment.Pane>
+          </Panel>
 
           {documentPreview && (
-            <Allotment.Pane
-              minSize={450}
-              preferredSize={Config.get("editor:panesize", 500)}
-            >
-              <ScopedThemeProvider
-                scope="editorSidebar"
-                id="editorSidebar"
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  overflow: "hidden",
-                  borderLeft: "1px solid var(--border)",
-                  height: "100%",
-                  bg: "background"
-                }}
+            <>
+              <PanelResizeHandle className="panel-resize-handle" />
+              <Panel
+                id="pdf-preview-panel"
+                order={2}
+                minSize={35}
+                defaultSize={35}
               >
-                {documentPreview.url ? (
-                  <Suspense
-                    fallback={
-                      <DownloadAttachmentProgress hash={documentPreview.hash} />
-                    }
-                  >
-                    <PDFPreview
-                      fileUrl={documentPreview.url}
-                      hash={documentPreview.hash}
-                      onClose={() =>
-                        useEditorStore.setState({ documentPreview: undefined })
+                <ScopedThemeProvider
+                  scope="editorSidebar"
+                  id="editorSidebar"
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "hidden",
+                    borderLeft: "1px solid var(--border)",
+                    height: "100%",
+                    bg: "background"
+                  }}
+                >
+                  {documentPreview.url ? (
+                    <Suspense
+                      fallback={
+                        <DownloadAttachmentProgress
+                          hash={documentPreview.hash}
+                        />
                       }
-                    />
-                  </Suspense>
-                ) : (
-                  <DownloadAttachmentProgress hash={documentPreview.hash} />
-                )}
-              </ScopedThemeProvider>
-            </Allotment.Pane>
+                    >
+                      <PDFPreview
+                        fileUrl={documentPreview.url}
+                        hash={documentPreview.hash}
+                        onClose={() =>
+                          useEditorStore.setState({
+                            documentPreview: undefined
+                          })
+                        }
+                      />
+                    </Suspense>
+                  ) : (
+                    <DownloadAttachmentProgress hash={documentPreview.hash} />
+                  )}
+                </ScopedThemeProvider>
+              </Panel>
+            </>
           )}
-        </Allotment>
+        </PanelGroup>
         <DropZone overlayRef={overlayRef} />
         {arePropertiesVisible && activeSessionId && (
           <Properties sessionId={activeSessionId} />

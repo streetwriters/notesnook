@@ -67,6 +67,7 @@ export async function downloadAttachment<
   type: TType,
   groupId?: string
 ): Promise<TOutputType | undefined> {
+  console.log("DOWNLOADING FILE", hash);
   const response = await download(hash, groupId);
   if (!response) return;
   const { attachment, key } = response;

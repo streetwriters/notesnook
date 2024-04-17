@@ -458,6 +458,7 @@ async function downloadFile(
   requestOptions: RequestOptionsWithSignal
 ) {
   try {
+    console.log("DOWNLOADING FILE", filename);
     const { url, headers, chunkSize, signal } = requestOptions;
     const handle = await streamablefs.readFile(filename);
 

@@ -29,6 +29,7 @@ export type RouteResult = {
     | React.MemoExoticComponent<React.FunctionComponent>;
   props?: any;
   buttons?: RouteContainerButtons;
+  noCache?: boolean;
 };
 
 export function isRouteResult(obj: any): obj is RouteResult {

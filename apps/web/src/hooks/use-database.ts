@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useState } from "react";
 import { initializeDatabase } from "../common/db";
 import { useErrorBoundary } from "react-error-boundary";
-import "allotment/dist/style.css";
 import "../utils/analytics";
 import "../app.css";
 

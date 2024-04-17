@@ -65,6 +65,7 @@ const routes = defineRoutes({
     return defineRoute({
       key: "notebook",
       type: "notes",
+      noCache: true,
       component: Notebook,
       props: {
         rootId,

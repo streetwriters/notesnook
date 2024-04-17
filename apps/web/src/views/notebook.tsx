@@ -37,7 +37,6 @@ import {
   ShortcutLink
 } from "../components/icons";
 import { pluralize } from "@notesnook/common";
-import { Allotment, AllotmentHandle } from "allotment";
 import { Plus } from "../components/icons";
 import { useStore as useNotesStore } from "../stores/note-store";
 import { useStore as useNotebookStore } from "../stores/notebook-store";
@@ -58,6 +57,12 @@ import { FlexScrollContainer } from "../components/scroll-container";
 import { Menu } from "../hooks/use-menu";
 import Config from "../utils/config";
 import Notes from "./notes";
+import {
+  PanelGroup,
+  Panel,
+  PanelResizeHandle,
+  ImperativePanelHandle
+} from "react-resizable-panels";
 
 type NotebookProps = {
   rootId: string;
@@ -67,8 +72,7 @@ function Notebook(props: NotebookProps) {
   const { rootId, notebookId } = props;
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const paneRef = useRef<AllotmentHandle>(null);
-  const sizes = useRef<number[]>([]);
+  const subNotebooksPane = useRef<ImperativePanelHandle>(null);
 
   const context = useNotesStore((store) => store.context);
   const notes = useNotesStore((store) => store.contextNotes);
@@ -96,68 +100,44 @@ function Notebook(props: NotebookProps) {
     });
   }, [rootId, notebookId]);
 
-  const toggleCollapse = useCallback((isCollapsed: boolean) => {
-    if (!paneRef.current || !sizes.current) return;
-
-    if (!isCollapsed) {
-      if (sizes.current[1] < 60) {
-        paneRef.current.reset();
-      } else {
-        paneRef.current.resize(sizes.current);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    toggleCollapse(isCollapsed);
-  }, [isCollapsed, toggleCollapse]);
-
   if (!context || !notes || context.type !== "notebook") return null;
   return (
-    <>
-      <Allotment
-        ref={paneRef}
-        vertical
-        onChange={(paneSizes) => {
-          const [_, topicsPane] = paneSizes;
-          if (topicsPane > 30 && !isCollapsed) sizes.current = paneSizes;
-        }}
-        onDragEnd={([_, topicsPane]) => {
-          if (topicsPane < 35 && !isCollapsed) {
-            setIsCollapsed(true);
-          }
-        }}
-      >
-        <Allotment.Pane>
-          <Flex variant="columnFill" sx={{ height: "100%" }}>
-            <Notes
-              header={
-                <NotebookHeader
-                  key={context.id}
-                  rootId={rootId}
-                  context={context}
-                />
-              }
+    <PanelGroup
+      direction="vertical"
+      autoSaveId={`notebook-panel-sizes:${rootId}`}
+    >
+      <Panel>
+        <Notes
+          header={
+            <NotebookHeader
+              key={context.id}
+              rootId={rootId}
+              context={context}
             />
-          </Flex>
-        </Allotment.Pane>
-        <Allotment.Pane
-          preferredSize={250}
-          visible
-          maxSize={isCollapsed ? 30 : Infinity}
-        >
-          <SubNotebooks
-            key={rootId}
-            notebookId={notebookId}
-            isCollapsed={isCollapsed}
-            rootId={rootId}
-            onClick={() => {
-              setIsCollapsed((isCollapsed) => !isCollapsed);
-            }}
-          />
-        </Allotment.Pane>
-      </Allotment>
-    </>
+          }
+        />
+      </Panel>
+      <PanelResizeHandle className="panel-resize-handle" />
+      <Panel
+        ref={subNotebooksPane}
+        defaultSize={25}
+        collapsedSize={7}
+        collapsible
+        minSize={7}
+        onResize={(size) => setIsCollapsed(size <= 7)}
+      >
+        <SubNotebooks
+          key={rootId}
+          notebookId={notebookId}
+          isCollapsed={isCollapsed}
+          rootId={rootId}
+          onClick={() => {
+            if (isCollapsed) subNotebooksPane.current?.expand();
+            else subNotebooksPane.current?.collapse();
+          }}
+        />
+      </Panel>
+    </PanelGroup>
   );
 }
 export default Notebook;
