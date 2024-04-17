@@ -721,6 +721,10 @@ class EditorStore extends BaseStore<EditorStore> {
             partial.ignoreEdit && currentSession.type === "default"
               ? currentSession.note.dateEdited
               : undefined,
+          contentId:
+            currentSession.type === "default"
+              ? currentSession.note.contentId
+              : undefined,
           content: partial.content,
           sessionId,
           id
