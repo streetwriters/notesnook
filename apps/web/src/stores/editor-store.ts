@@ -297,6 +297,7 @@ class EditorStore extends BaseStore<EditorStore> {
               if (
                 // when a note's readonly property is toggled
                 (session.type !== "readonly" && !!event.item.readonly) ||
+                (session.type === "readonly" && !event.item.readonly) ||
                 // when a note is restored from trash
                 (session.type === "deleted" && event.item.type !== "trash")
               ) {
