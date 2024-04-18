@@ -51,7 +51,7 @@ async function renderApp() {
         <ErrorBoundary>
           <BaseThemeProvider
             onRender={() => document.getElementById("splash")?.remove()}
-            sx={{ bg: "background", flex: 1 }}
+            sx={{ bg: "background", flex: 1, overflow: "hidden" }}
           >
             <AppLock>
               <Component route={props?.route || "login:email"} />
