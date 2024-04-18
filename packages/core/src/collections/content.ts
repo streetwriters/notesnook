@@ -337,7 +337,7 @@ export class Content implements ICollection {
     const content = getContentFromData(contentItem.type, contentItem.data);
     if (!content) return contentItem.data;
     const { data, hashes, internalLinks } = await content.postProcess(
-      this.db.attachments.save
+      this.db.attachments.save.bind(this.db.attachments)
     );
 
     await this.processInternalLinks(contentItem.noteId, internalLinks);
