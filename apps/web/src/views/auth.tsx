@@ -252,9 +252,10 @@ function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
             >
               <Warn size={16} color="icon-error" />
               <Text variant="body" ml={1}>
-                After logging in from v3 beta, your account data will be
-                migrated and you won&apos;t be able to use the v2 clients to
-                sync your notes.
+                You are logging into the beta version of Notesnook. Switching
+                between beta &amp; stable versions can cause weird issues
+                including data loss. It is recommended that you do not use both
+                simultaneously.
               </Text>
             </Flex>
           ) : null}

@@ -104,8 +104,7 @@ const routes: Route[] = [
     id: "reminders",
     title: "Reminders",
     path: "/reminders",
-    icon: Reminders,
-    tag: "Beta"
+    icon: Reminders
   },
   {
     id: "monographs",
