@@ -645,7 +645,7 @@ p > *::selection {
   display: flex;
 }
 
-.ProseMirror ul.simple-checklist > li  > input {
+.ProseMirror ul.simple-checklist > li input {
   flex: 0 0 auto;
   margin-right: 0.5rem;
   user-select: none;

@@ -96,10 +96,12 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
   addNodeView() {
     return ({ node, getPos, editor }) => {
       const listItem = document.createElement("li");
+      const checkboxWrapper = document.createElement("label");
+      const checkboxStyler = document.createElement("span");
       const checkbox = document.createElement("input");
       const content = document.createElement("div");
 
-      checkbox.contentEditable = "false";
+      checkboxWrapper.contentEditable = "false";
       checkbox.type = "checkbox";
 
       checkbox.addEventListener("mousedown", (event) => {
@@ -148,7 +150,8 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
         checkbox.setAttribute("checked", "checked");
       }
 
-      listItem.append(checkbox, content);
+      checkboxWrapper.append(checkbox, checkboxStyler);
+      listItem.append(checkboxWrapper, content);
 
       return {
         dom: listItem,
