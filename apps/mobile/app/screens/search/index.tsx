@@ -19,11 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Item, Note, VirtualizedGrouping } from "@notesnook/core";
 import React, { useEffect, useRef, useState } from "react";
-import { db } from "../../common/database";
+import { DatabaseLogger, db } from "../../common/database";
 import List from "../../components/list";
 import SelectionHeader from "../../components/selection-header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import {
+  ToastManager,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
@@ -37,6 +38,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
   const [loading, setLoading] = useState(false);
   const [searchStatus, setSearchStatus] = useState<string>();
   const currentQuery = useRef<string>();
+  const timer = useRef<NodeJS.Timeout>();
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
       useNavigationStore.getState().setFocusedRouteId(route.name);
@@ -68,6 +70,8 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         console.log(
           `Found ${results.placeholders?.length} results for ${query}`
         );
+        if (currentQuery.current !== query) return;
+        await results.item(0);
         setResults(results);
         if (results.placeholders?.length === 0) {
           setSearchStatus(`No results found for ${query}`);
@@ -76,7 +80,8 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         }
         setLoading(false);
       } catch (e) {
-        console.log(e);
+        ToastManager.error(e as Error);
+        DatabaseLogger.error(e);
       }
     },
     [route.params?.items, route.params.type]
@@ -89,7 +94,6 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
       }
     };
     eSubscribeEvent(eOnRefreshSearch, onRefreshSearch);
-
     return () => {
       eUnSubscribeEvent(eOnRefreshSearch, onRefreshSearch);
     };
@@ -103,18 +107,26 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         type={route.params?.type}
         renderedInRoute={route.name}
       />
-      <SearchBar onChangeText={onSearch} loading={loading} />
+      <SearchBar
+        onChangeText={(query) => {
+          clearTimeout(timer.current);
+          timer.current = setTimeout(() => {
+            onSearch(query);
+          }, 300);
+        }}
+        loading={loading}
+      />
       <List
         data={results}
         dataType={route.params?.type}
         renderedInRoute={route.name}
-        loading={false}
+        loading={loading}
         placeholder={{
           title: route.name,
           paragraph:
             searchStatus ||
             `Type a keyword to search in ${route.params?.title}`,
-          loading: "Searching..."
+          loading: `Searching for ${currentQuery.current}...`
         }}
       />
     </>
