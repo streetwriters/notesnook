@@ -307,9 +307,6 @@ export const useAppEvents = () => {
     initAfterSync();
     setLastSynced(await db.lastSynced());
     eSendEvent(eCloseSheet, "sync_progress");
-    useUserStore.setState({
-      profile: db.settings.getProfile()
-    });
   }, [setLastSynced]);
 
   useEffect(() => {

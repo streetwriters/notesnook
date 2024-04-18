@@ -27,6 +27,7 @@ import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
+import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
@@ -50,6 +51,10 @@ export const SideMenu = React.memo(
     );
     const isAppLoading = useSettingStore((state) => state.isAppLoading);
     const dragging = useSideBarDraggingStore((state) => state.dragging);
+    const [order, hiddensItems] = useMenuStore((state) => [
+      state.order["routes"],
+      state.hiddenItems["routes"]
+    ]);
 
     const introCompleted = useSettingStore(
       (state) => state.settings.introCompleted
@@ -93,8 +98,8 @@ export const SideMenu = React.memo(
             onHiddenItemsChanged={(data) => {
               db.settings.setSideBarHiddenItems("routes", data);
             }}
-            itemOrder={db.settings.getSideBarOrder("routes")}
-            hiddenItems={db.settings.getSideBarHiddenItems("routes")}
+            itemOrder={order}
+            hiddenItems={hiddensItems}
             alwaysBounceVertical={false}
             data={MenuItemsList}
             style={{

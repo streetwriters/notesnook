@@ -44,7 +44,7 @@ export const PinnedSection = React.memo(
     const menuPins = useMenuStore((state) => state.menuPins);
     const loading = useSettingStore((state) => state.isAppLoading);
     const setMenuPins = useMenuStore((state) => state.setMenuPins);
-
+    const [order] = useMenuStore((state) => [state.order["shortcuts"]]);
     useEffect(() => {
       if (!loading) {
         setMenuPins();
@@ -61,7 +61,13 @@ export const PinnedSection = React.memo(
         Navigation.closeDrawer();
       });
     };
-    const renderItem = ({ item }: { item: Notebook | Tag; index: number }) => {
+    const renderItem = ({
+      item,
+      index
+    }: {
+      item: Notebook | Tag;
+      index: number;
+    }) => {
       return <PinItem item={item} onPress={onPress} />;
     };
 
@@ -77,7 +83,7 @@ export const PinnedSection = React.memo(
           }}
           onHiddenItemsChanged={(data) => {}}
           canHideItems={false}
-          itemOrder={db.settings.getSideBarOrder("shortcuts")}
+          itemOrder={order}
           hiddenItems={[]}
           alwaysBounceVertical={false}
           data={menuPins}

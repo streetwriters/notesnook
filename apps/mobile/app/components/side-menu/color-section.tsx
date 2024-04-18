@@ -43,6 +43,10 @@ export const ColorSection = React.memo(
     ]);
     const loading = useSettingStore((state) => state.isAppLoading);
     const setColorNotes = useMenuStore((state) => state.setColorNotes);
+    const [order, hiddensItems] = useMenuStore((state) => [
+      state.order["colors"],
+      state.hiddenItems["colors"]
+    ]);
 
     useEffect(() => {
       if (!loading) {
@@ -59,8 +63,8 @@ export const ColorSection = React.memo(
           db.settings.setSideBarHiddenItems("colors", data);
         }}
         disableDefaultDrag={true}
-        itemOrder={db.settings.getSideBarOrder("colors")}
-        hiddenItems={db.settings.getSideBarHiddenItems("colors")}
+        itemOrder={order}
+        hiddenItems={hiddensItems}
         alwaysBounceVertical={false}
         data={colorNotes}
         style={{

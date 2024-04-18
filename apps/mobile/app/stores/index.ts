@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { db } from "../common/database";
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
 import { useFavoriteStore } from "./use-favorite-store";
@@ -27,6 +28,7 @@ import { useRelationStore } from "./use-relation-store";
 import { useReminderStore } from "./use-reminder-store";
 import { useTagStore } from "./use-tag-store";
 import { useTrashStore } from "./use-trash-store";
+import { useUserStore } from "./use-user-store";
 
 export function initAfterSync() {
   Navigation.queueRoutesForUpdate();
@@ -36,6 +38,9 @@ export function initAfterSync() {
   useRelationStore.getState().update();
   useMenuStore.getState().setColorNotes();
   useMenuStore.getState().setMenuPins();
+  useUserStore.setState({
+    profile: db.settings.getProfile()
+  });
 }
 
 export async function initialize() {}
