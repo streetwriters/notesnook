@@ -95,6 +95,7 @@ const Tiptap = ({
           transaction.getMeta("ignoreEdit")
         );
       },
+
       openAttachmentPicker: (type) => {
         globalThis.editorControllers[tab.id]?.openFilePicker(type);
         return true;
@@ -132,7 +133,39 @@ const Tiptap = ({
       element: getContentDiv(),
       editable: !tab.readonly,
       editorProps: {
-        editable: () => !tab.readonly
+        editable: () => !tab.readonly,
+        handlePaste: (view, event) => {
+          const hasFiles = event.clipboardData?.types?.some((type) =>
+            type.startsWith("Files")
+          );
+          if (hasFiles && event.clipboardData?.files?.length) {
+            let stopped = false;
+            for (let i = 0; i < event.clipboardData.files.length; i++) {
+              const file = event.clipboardData.files.item(i);
+              if (!file) continue;
+              if (!stopped) {
+                event.preventDefault();
+                event.stopPropagation();
+                stopped = true;
+              }
+              if (!file?.type.startsWith("image/")) continue;
+              const reader = new FileReader();
+              reader.onload = () => {
+                const data = reader.result;
+                if (typeof data === "string") {
+                  editors[tabRef.current.id]?.commands.insertImage({
+                    src: data,
+                    filename: file.name,
+                    mime: file.type,
+                    size: file.size
+                  });
+                }
+              };
+              reader.readAsDataURL(file);
+            }
+            return true;
+          }
+        }
       },
       content: globalThis.editorControllers[tab.id]?.content?.current,
       isMobile: true,
