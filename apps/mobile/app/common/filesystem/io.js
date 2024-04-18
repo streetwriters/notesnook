@@ -67,7 +67,7 @@ export async function hashBase64(data) {
   };
 }
 
-export async function writeEncryptedBase64({ data, key }) {
+export async function writeEncryptedBase64(data, key) {
   await createCacheDir();
   let filepath = cacheDir + `/${getRandomId("imagecache_")}`;
   await RNFetchBlob.fs.writeFile(filepath, data, "base64");
@@ -77,6 +77,8 @@ export async function writeEncryptedBase64({ data, key }) {
   });
   RNFetchBlob.fs.unlink(filepath).catch(console.log);
   console.log("encrypted file output: ", output);
+  output.size = output.length;
+  delete output.length;
   return {
     ...output,
     alg: "xcha-stream"
