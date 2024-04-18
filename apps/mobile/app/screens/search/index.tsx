@@ -89,7 +89,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
 
   useEffect(() => {
     const onRefreshSearch = (type: string) => {
-      if (type === route.params?.type) {
+      if (type === undefined || type === route.params?.type) {
         onSearch(currentQuery.current);
       }
     };
