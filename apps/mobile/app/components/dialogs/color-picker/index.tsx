@@ -146,12 +146,16 @@ const ColorPicker = ({
               onChangeText={(value) => {
                 title.current = value;
               }}
+              testID="color-title-input"
               defaultValue={title.current}
               placeholder={title.current || "Color title"}
             />
 
             <Button
               title="Add color"
+              style={{
+                marginBottom: 10
+              }}
               onPress={async () => {
                 if (!selectedColor)
                   return ToastManager.error(

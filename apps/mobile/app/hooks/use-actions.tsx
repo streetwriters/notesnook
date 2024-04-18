@@ -748,41 +748,45 @@ export const useActions = ({
     }
 
     async function copyContent() {
-      if (processingId.current === "copyContent") {
-        ToastManager.show({
-          heading: "Please wait...",
-          message: "We are preparing your note for copy to clipboard",
-          context: "local"
-        });
-        return;
-      }
-      if (!checkItemSynced()) return;
-      if (locked) {
-        close();
-        await sleep(300);
-        openVault({
-          copyNote: true,
-          novault: true,
-          locked: true,
-          item: item,
-          title: "Copy note",
-          description: "Unlock note to copy to clipboard."
-        });
-      } else {
-        processingId.current = "copyContent";
-
-        const text = await convertNoteToText(item as Note, true);
-        if (!text) {
-          ToastManager.error(new Error(Errors.export("text")));
+      try {
+        if (processingId.current === "copyContent") {
+          ToastManager.show({
+            heading: "Please wait...",
+            message: "We are preparing your note for copy to clipboard",
+            context: "local"
+          });
           return;
         }
-        Clipboard.setString(text);
-        processingId.current = undefined;
-        ToastManager.show({
-          heading: "Note copied to clipboard",
-          type: "success",
-          context: "local"
-        });
+
+        if (locked) {
+          close();
+          await sleep(300);
+          openVault({
+            copyNote: true,
+            novault: true,
+            locked: true,
+            item: item,
+            title: "Copy note",
+            description: "Unlock note to copy to clipboard."
+          });
+        } else {
+          processingId.current = "copyContent";
+          const text = await convertNoteToText(item as Note, true);
+          if (!text) {
+            ToastManager.error(new Error(Errors.export("text")));
+            return;
+          }
+          Clipboard.setString(text);
+          processingId.current = undefined;
+          ToastManager.show({
+            heading: "Note copied to clipboard",
+            type: "success",
+            context: "local"
+          });
+        }
+      } catch (e) {
+        console.error(e);
+        ToastManager.error(e as Error);
       }
     }
 

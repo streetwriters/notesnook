@@ -85,7 +85,9 @@ async function createNote(_title, _body) {
   await webview.element(by.web.className("ProseMirror")).tap();
   await webview.element(by.web.className("ProseMirror")).typeText(body, true);
   await exitEditor();
-  await expect(element(by.text(body))).toBeVisible();
+  await waitFor(element(by.text(body)))
+    .toBeVisible()
+    .withTimeout(500);
 
   return { title, body };
 }
