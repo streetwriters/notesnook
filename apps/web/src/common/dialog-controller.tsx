@@ -17,29 +17,32 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import ReactDOM from "react-dom";
 import { Dialogs } from "../dialogs";
-import qclone from "qclone";
-import { store as notebookStore } from "../stores/notebook-store";
 import { store as tagStore } from "../stores/tag-store";
 import { store as appStore } from "../stores/app-store";
-import { store as editorStore } from "../stores/editor-store";
+import { useEditorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
-import { Text } from "@theme-ui/components";
-import { Topic } from "../components/icons";
 import Config from "../utils/config";
 import { AppVersion, getChangelog } from "../utils/version";
 import { Period } from "../dialogs/buy-dialog/types";
 import { FeatureKeys } from "../dialogs/feature-dialog";
-import { AuthenticatorType } from "../dialogs/mfa/types";
 import { Suspense } from "react";
-import { Reminder } from "@notesnook/core/dist/collections/reminders";
 import { ConfirmDialogProps } from "../dialogs/confirm";
 import { getFormattedDate } from "@notesnook/common";
 import { downloadUpdate } from "../utils/updater";
 import { ThemeMetadata } from "@notesnook/themes-server";
+import {
+  Color,
+  Profile,
+  Reminder,
+  Tag,
+  AuthenticatorType
+} from "@notesnook/core";
+import { createRoot } from "react-dom/client";
+import { PasswordDialogProps } from "../dialogs/password-dialog";
+import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;
@@ -59,21 +62,21 @@ function showDialog<TId extends DialogIds, TReturnType>(
 
     const container = document.createElement("div");
     container.id = id;
+    const root = createRoot(container);
 
     const perform = (result: TReturnType) => {
       openDialogs[id] = false;
-      ReactDOM.unmountComponentAtNode(container);
+      root.unmount();
       container.remove();
       resolve(result);
     };
     const PropDialog = () => render(Dialogs[id], perform);
-    ReactDOM.render(
+    root.render(
       <Suspense fallback={<div />}>
         <PropDialog />
-      </Suspense>,
-      container,
-      () => (openDialogs[id] = true)
+      </Suspense>
     );
+    openDialogs[id] = true;
   });
 }
 
@@ -87,24 +90,23 @@ export function closeOpenedDialog() {
 
 export function showAddTagsDialog(noteIds: string[]) {
   return showDialog("AddTagsDialog", (Dialog, perform) => (
-    <Dialog onClose={(res) => perform(res)} noteIds={noteIds} />
+    <Dialog onClose={(res: any) => perform(res)} noteIds={noteIds} />
   ));
 }
 
-export function showAddNotebookDialog() {
+export function showCreateColorDialog() {
+  return showDialog<"CreateColorDialog", string | undefined>(
+    "CreateColorDialog",
+    (Dialog, perform) => (
+      <Dialog onClose={() => perform(undefined)} onDone={(id) => perform(id)} />
+    )
+  );
+}
+
+export function showAddNotebookDialog(parentId?: string) {
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
-      isOpen={true}
-      onDone={async (nb: Record<string, unknown>) => {
-        // add the notebook to db
-        const notebook = await db.notebooks?.add({ ...nb });
-        if (!notebook) return perform(false);
-
-        notebookStore.refresh();
-
-        showToast("success", "Notebook added successfully!");
-        perform(true);
-      }}
+      parentId={parentId}
       onClose={() => {
         perform(false);
       }}
@@ -112,36 +114,26 @@ export function showAddNotebookDialog() {
   ));
 }
 
-export function showEditNotebookDialog(notebookId: string) {
-  const notebook = db.notebooks?.notebook(notebookId)?.data;
+export function showNoteLinkingDialog(attr?: LinkAttributes) {
+  return showDialog<"NoteLinkingDialog", LinkAttributes | undefined>(
+    "NoteLinkingDialog",
+    (Dialog, perform) => (
+      <Dialog
+        attributes={attr}
+        onDone={(link) => perform(link)}
+        onClose={() => perform(undefined)}
+      />
+    )
+  );
+}
+
+export async function showEditNotebookDialog(notebookId: string) {
+  const notebook = await db.notebooks.notebook(notebookId);
   if (!notebook) return;
-  return showDialog("AddNotebookDialog", (Dialog, perform) => (
+  return await showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
-      isOpen={true}
       notebook={notebook}
       edit={true}
-      onDone={async (nb: Record<string, unknown>, deletedTopics: string[]) => {
-        // we remove the topics from notebook
-        // beforehand so we can add them manually, later
-        const topics = qclone(nb.topics);
-        nb.topics = [];
-
-        const notebookId = await db.notebooks?.add(nb);
-
-        // add or delete topics as required
-        const notebookTopics = db.notebooks?.notebook(notebookId).topics;
-        if (notebookTopics) {
-          await notebookTopics.add(...topics);
-          await notebookTopics.delete(...deletedTopics);
-        }
-
-        notebookStore.refresh();
-        noteStore.refresh();
-        appStore.refreshNavItems();
-
-        showToast("success", "Notebook edited successfully!");
-        perform(true);
-      }}
       onClose={() => {
         perform(false);
       }}
@@ -200,7 +192,7 @@ export function showMultiDeleteConfirmation(length: number) {
   return confirm({
     title: `Delete ${length} items?`,
     message: `These items will be **kept in your Trash for ${
-      db.settings?.getTrashCleanupInterval() || 7
+      db.settings.getTrashCleanupInterval() || 7
     } days** after which they will be permanently deleted.`,
     positiveButtonText: "Yes",
     negativeButtonText: "No"
@@ -326,132 +318,23 @@ export function showMoveNoteDialog(noteIds: string[]) {
   ));
 }
 
-function getDialogData(type: string) {
-  switch (type) {
-    case "create_vault":
-      return {
-        title: "Create your vault",
-        subtitle: "A vault stores your notes in a password-encrypted storage.",
-        positiveButtonText: "Create vault"
-      };
-    case "clear_vault":
-      return {
-        title: "Clear your vault",
-        subtitle:
-          "Enter vault password to unlock and remove all notes from the vault.",
-        positiveButtonText: "Clear vault"
-      };
-    case "delete_vault":
-      return {
-        title: "Delete your vault",
-        subtitle: "Enter your account password to delete your vault.",
-        positiveButtonText: "Delete vault",
-        checks: [
-          { key: "deleteAllLockedNotes", title: "Delete all locked notes?" }
-        ]
-      };
-    case "lock_note":
-      return {
-        title: "Lock note",
-        subtitle: "Please open your vault to encrypt & lock this note.",
-        positiveButtonText: "Lock note"
-      };
-    case "unlock_note":
-      return {
-        title: "Unlock note",
-        subtitle: "Your note will be unencrypted and removed from the vault.",
-        positiveButtonText: "Unlock note"
-      };
-    case "unlock_and_delete_note":
-      return {
-        title: "Delete note",
-        subtitle: "Please unlock this note to move it to trash.",
-        positiveButtonText: "Unlock & delete"
-      };
-    case "change_password":
-      return {
-        title: "Change vault password",
-        subtitle:
-          "All locked notes will be re-encrypted with the new password.",
-        positiveButtonText: "Change password"
-      };
-    case "ask_vault_password":
-      return {
-        title: "Unlock vault",
-        subtitle: "Please enter your vault password to continue.",
-        positiveButtonText: "Unlock"
-      };
-    case "change_account_password":
-      return {
-        title: "Change account password",
-        subtitle: (
-          <>
-            All your data will be re-encrypted and synced with the new password.
-            <Text
-              as="div"
-              mt={1}
-              p={1}
-              bg="var(--background-error)"
-              sx={{ color: "var(--paragraph-error)" }}
-            >
-              <Text as="p" my={0} sx={{ color: "inherit" }}>
-                It is recommended that you <b>log out from all other devices</b>{" "}
-                before continuing.
-              </Text>
-              <Text as="p" my={0} mt={1} sx={{ color: "inherit" }}>
-                If this process is interrupted, there is a high chance of data
-                corruption so{" "}
-                <b>please do NOT shut down your device or close your browser</b>{" "}
-                until this process completes.
-              </Text>
-            </Text>
-          </>
-        ),
-        positiveButtonText: "Change password"
-      };
-    case "verify_account":
-      return {
-        title: "Verify it's you",
-        subtitle: "Enter your account password to proceed.",
-        positiveButtonText: "Verify"
-      };
-    case "delete_account":
-      return {
-        title: "Delete your account",
-        subtitle: (
-          <Text as="span" sx={{ color: "var(--paragraph-error)" }}>
-            All your data will be permanently deleted with{" "}
-            <b>no way of recovery</b>. Proceed with caution.
-          </Text>
-        ),
-        positiveButtonText: "Delete Account"
-      };
-    default:
-      return {};
-  }
-}
-
-export function showPasswordDialog(
-  type: string,
-  validate: ({
-    password
-  }: {
-    password?: string;
-    oldPassword?: string;
-    newPassword?: string;
-  }) => boolean | Promise<boolean>
-) {
-  const { title, subtitle, positiveButtonText, checks } = getDialogData(type);
-  return showDialog("PasswordDialog", (Dialog, perform) => (
+export function showPasswordDialog<
+  TInputId extends string,
+  TCheckId extends string
+>(props: Omit<PasswordDialogProps<TInputId, TCheckId>, "onClose">) {
+  return showDialog<
+    "PasswordDialog",
+    string extends TCheckId ? boolean : false | Record<TCheckId, boolean>
+  >("PasswordDialog", (Dialog, perform) => (
     <Dialog
-      type={type}
-      title={title}
-      subtitle={subtitle}
-      checks={checks}
-      positiveButtonText={positiveButtonText}
-      validate={validate}
-      onClose={() => perform(false)}
-      onDone={() => perform(true)}
+      {...props}
+      onClose={(result) =>
+        perform(
+          result as string extends TCheckId
+            ? boolean
+            : false | Record<TCheckId, boolean>
+        )
+      }
     />
   ));
 }
@@ -473,52 +356,6 @@ export function showRecoveryKeyDialog() {
   ));
 }
 
-export function showCreateTopicDialog() {
-  return showDialog("ItemDialog", (Dialog, perform) => (
-    <Dialog
-      title={"Create topic"}
-      subtitle={"You can create as many topics as you want."}
-      onClose={() => {
-        perform(false);
-      }}
-      onAction={async (topic: Record<string, unknown>) => {
-        if (!topic) return;
-        const notebook = notebookStore.get().selectedNotebook;
-        if (!notebook) return;
-        await db.notebooks?.notebook(notebook.id).topics.add(topic);
-        notebookStore.setSelectedNotebook(notebook.id);
-        showToast("success", "Topic created!");
-        perform(true);
-      }}
-    />
-  ));
-}
-
-export function showEditTopicDialog(notebookId: string, topicId: string) {
-  const topic = db.notebooks?.notebook(notebookId)?.topics?.topic(topicId)
-    ?._topic as Record<string, unknown> | undefined;
-  if (!topic) return;
-  return showDialog("ItemDialog", (Dialog, perform) => (
-    <Dialog
-      title={"Edit topic"}
-      subtitle={`You are editing "${topic.title}" topic.`}
-      defaultValue={topic.title}
-      icon={Topic}
-      item={topic}
-      onClose={() => perform(false)}
-      onAction={async (t: string) => {
-        await db.notebooks
-          ?.notebook(topic.notebookId as string)
-          .topics.add({ ...topic, title: t });
-        notebookStore.setSelectedNotebook(topic.notebookId);
-        appStore.refreshNavItems();
-        showToast("success", "Topic edited!");
-        perform(true);
-      }}
-    />
-  ));
-}
-
 export function showCreateTagDialog() {
   return showDialog("ItemDialog", (Dialog, perform) => (
     <Dialog
@@ -528,57 +365,45 @@ export function showCreateTagDialog() {
         perform(false);
       }}
       onAction={async (title: string) => {
-        if (!title) return showToast("error", "Tag title cannot be empty.");
-        try {
-          await db.tags?.add(title);
-          showToast("success", "Tag created!");
-          tagStore.refresh();
-          perform(true);
-        } catch (e) {
-          if (e instanceof Error) showToast("error", e.message);
-        }
-      }}
-    />
-  ));
-}
-
-export function showEditTagDialog(tagId: string) {
-  const tag = db.tags?.tag(tagId);
-  if (!tag) return;
-  return showDialog("ItemDialog", (Dialog, perform) => (
-    <Dialog
-      title={"Edit tag"}
-      subtitle={`You are editing #${db.tags?.alias(tag.id)}.`}
-      defaultValue={db.tags?.alias(tag.id)}
-      item={tag}
-      onClose={() => perform(false)}
-      onAction={async (title: string) => {
-        if (!title) return;
-        await db.tags?.rename(tagId, title);
-        showToast("success", "Tag edited!");
+        await db.tags.add({ title });
+        showToast("success", "Tag created!");
         tagStore.refresh();
-        editorStore.refreshTags();
-        noteStore.refresh();
-        appStore.refreshNavItems();
         perform(true);
       }}
     />
   ));
 }
 
-export function showRenameColorDialog(colorId: string) {
-  const color = db.colors?.tag(colorId);
-  if (!color) return;
+export function showEditTagDialog(tag: Tag) {
+  return showDialog("ItemDialog", (Dialog, perform) => (
+    <Dialog
+      title={"Edit tag"}
+      subtitle={`You are editing #${tag.title}.`}
+      defaultValue={tag.title}
+      onClose={() => perform(false)}
+      onAction={async (title: string) => {
+        await db.tags.add({ id: tag.id, title });
+        showToast("success", "Tag edited!");
+        await tagStore.refresh();
+        await useEditorStore.getState().refreshTags();
+        await noteStore.refresh();
+        await appStore.refreshNavItems();
+        perform(true);
+      }}
+    />
+  ));
+}
+
+export function showRenameColorDialog(color: Color) {
   return showDialog("ItemDialog", (Dialog, perform) => (
     <Dialog
       title={"Rename color"}
-      subtitle={`You are renaming color ${db.colors?.alias(color.id)}.`}
-      item={color}
-      defaultValue={db.colors?.alias(color.id)}
+      subtitle={`You are renaming color ${color.title}.`}
+      defaultValue={color.title}
       onClose={() => perform(false)}
       onAction={async (title: string) => {
         if (!title) return;
-        await db.colors?.rename(colorId, title);
+        await db.colors.add({ id: color.id, title });
         showToast("success", "Color renamed!");
         appStore.refreshNavItems();
         perform(true);
@@ -613,15 +438,18 @@ export function showReminderPreviewDialog(reminder: Reminder) {
   ));
 }
 
-export function showAddReminderDialog(noteId?: string) {
+export async function showAddReminderDialog(noteId?: string) {
+  const note = noteId ? await db.notes.note(noteId) : undefined;
   return showDialog("AddReminderDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} noteId={noteId} />
+    <Dialog onClose={(res: boolean) => perform(res)} note={note} />
   ));
 }
 
-export function showEditReminderDialog(reminderId: string) {
+export async function showEditReminderDialog(reminderId: string) {
+  const reminder = await db.reminders.reminder(reminderId);
+  if (!reminder) return null;
   return showDialog("AddReminderDialog", (Dialog, perform) => (
-    <Dialog onClose={(res: boolean) => perform(res)} reminderId={reminderId} />
+    <Dialog onClose={(res: boolean) => perform(res)} reminder={reminder} />
   ));
 }
 
@@ -659,6 +487,20 @@ export function show2FARecoveryCodesDialog(primaryMethod: AuthenticatorType) {
 export function showAttachmentsDialog() {
   return showDialog("AttachmentsDialog", (Dialog, perform) => (
     <Dialog onClose={(res: boolean) => perform(res)} />
+  ));
+}
+
+export function showEditProfilePictureDialog(profile?: Profile) {
+  return showDialog("EditProfilePictureDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} profile={profile} />
+  ));
+}
+
+export function showImagePickerDialog(images: File[]): Promise<false | File[]> {
+  if (images.length <= 0) return Promise.resolve(false);
+
+  return showDialog("ImagePickerDialog", (Dialog, perform) => (
+    <Dialog onClose={(res) => perform(res)} images={images} />
   ));
 }
 

@@ -16,20 +16,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Reminder } from "@notesnook/core";
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
-import type { Reminder } from "../../../services/notifications";
-import { useThemeColors } from "@notesnook/theme";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
+import ReminderSheet from "../../sheets/reminder";
 import { IconButton } from "../../ui/icon-button";
+import { ReminderTime } from "../../ui/reminder-time";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper from "../selection-wrapper";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import ReminderSheet from "../../sheets/reminder";
-import { ReminderTime } from "../../ui/reminder-time";
 
 const ReminderItem = React.memo(
   ({
@@ -43,21 +44,28 @@ const ReminderItem = React.memo(
   }) => {
     const { colors } = useThemeColors();
     const openReminder = () => {
+      const {
+        selectedItemsList,
+        setSelectedItem,
+        selectionMode,
+        clearSelection
+      } = useSelectionStore.getState();
+      if (selectedItemsList.length > 0 && selectionMode === item.type) {
+        setSelectedItem(item.id);
+        return;
+      } else {
+        clearSelection();
+      }
+
       ReminderSheet.present(item, undefined, isSheet);
     };
     return (
-      <SelectionWrapper
-        //@ts-ignore
-        index={index}
-        height={100}
-        onPress={openReminder}
-        item={item}
-        isSheet={isSheet}
-      >
+      <SelectionWrapper onPress={openReminder} item={item} isSheet={isSheet}>
         <View
           style={{
-            flexShrink: 1,
-            opacity: item.disabled ? 0.5 : 1
+            opacity: item.disabled ? 0.5 : 1,
+            maxWidth: "80%",
+            flexGrow: 1
           }}
         >
           <Heading
@@ -131,7 +139,11 @@ const ReminderItem = React.memo(
                   height: 30
                 }}
               >
-                <Icon name="reload" size={SIZE.md} color={colors.primary.accent} />
+                <Icon
+                  name="reload"
+                  size={SIZE.md}
+                  color={colors.primary.accent}
+                />
                 <Paragraph
                   size={SIZE.xs}
                   color={colors.secondary.paragraph}
@@ -164,7 +176,7 @@ const ReminderItem = React.memo(
           name="dots-horizontal"
           size={SIZE.xl}
           onPress={() => Properties.present(item, [], isSheet)}
-          customStyle={{
+          style={{
             justifyContent: "center",
             height: 35,
             width: 35,

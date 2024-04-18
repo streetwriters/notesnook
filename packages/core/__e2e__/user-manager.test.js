@@ -39,7 +39,7 @@ test(
     databaseTest().then(async (db) => {
       await expect(login(db)).resolves.not.toThrow();
 
-      await expect(db.user.tokenManager.getToken()).resolves.toBeDefined();
+      await expect(db.tokenManager.getToken()).resolves.toBeDefined();
     }),
   30000
 );

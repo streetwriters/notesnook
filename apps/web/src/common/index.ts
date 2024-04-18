@@ -36,25 +36,23 @@ import { logger } from "../utils/logger";
 import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core/dist/common";
-import { getFormattedDate } from "@notesnook/common";
 import { createWritableStream } from "./desktop-bridge";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { FeatureKeys } from "../dialogs/feature-dialog";
 import { ZipEntry, createUnzipIterator } from "../utils/streams/unzip-stream";
+import { User } from "@notesnook/core";
+import { LegacyBackupFile } from "@notesnook/core";
+import { useEditorStore } from "../stores/editor-store";
+import { formatDate } from "@notesnook/core/dist/utils/date";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
     title: "Add a note",
-    onClick: () =>
-      hashNavigate("/notes/create", { addNonce: true, replace: true })
+    onClick: () => useEditorStore.getState().newSession()
   },
   notebooks: {
     title: "Create a notebook",
     onClick: () => hashNavigate("/notebooks/create", { replace: true })
-  },
-  topics: {
-    title: "Create a topic",
-    onClick: () => hashNavigate(`/topics/create`, { replace: true })
   },
   tags: {
     title: "Create a tag",
@@ -93,7 +91,12 @@ export async function createBackup() {
   const encryptedBackups = isLoggedIn && encryptBackups;
 
   const filename = sanitizeFilename(
-    `notesnook-backup-${getFormattedDate(Date.now())}`
+    `${formatDate(Date.now(), {
+      type: "date-time",
+      dateFormat: "YYYY-MM-DD",
+      timeFormat: "24-hour"
+    })}-${new Date().getSeconds()}`,
+    { replacement: "-" }
   );
   const directory = Config.get("backupStorageLocation", PATHS.backupsDirectory);
   const ext = "nnbackupz";
@@ -140,7 +143,7 @@ export async function createBackup() {
 }
 
 export async function selectBackupFile() {
-  const file = await showFilePicker({
+  const [file] = await showFilePicker({
     acceptedFileTypes: ".nnbackup,.nnbackupz"
   });
   if (!file) return;
@@ -192,30 +195,33 @@ export async function restoreBackupFile(backupFile: File) {
         }
         if (!isValid) throw new Error("Invalid backup.");
 
-        for (const entry of entries) {
-          const backup = JSON.parse(await entry.text());
-          if (backup.encrypted) {
-            if (!cachedPassword && !cachedKey) {
-              const result = await showBackupPasswordDialog(
-                async ({ password, key }) => {
-                  if (!password && !key) return false;
-                  await db.backup?.import(backup, password, key);
-                  cachedPassword = password;
-                  cachedKey = key;
-                  return true;
-                }
-              );
-              if (!result) break;
-            } else await db.backup?.import(backup, cachedPassword, cachedKey);
-          } else {
-            await db.backup?.import(backup);
-          }
+        await db.transaction(async () => {
+          for (const entry of entries) {
+            const backup = JSON.parse(await entry.text());
+            if (backup.encrypted) {
+              if (!cachedPassword && !cachedKey) {
+                const result = await showBackupPasswordDialog(
+                  async ({ password, key }) => {
+                    if (!password && !key) return false;
+                    await db.backup?.import(backup, password, key);
+                    cachedPassword = password;
+                    cachedKey = key;
+                    return true;
+                  }
+                );
+                if (!result) break;
+              } else await db.backup?.import(backup, cachedPassword, cachedKey);
+            } else {
+              await db.backup?.import(backup);
+            }
 
-          report({
-            text: `Processed ${entry.name}`,
-            current: filesProcessed++
-          });
-        }
+            report({
+              text: `Processed ${entry.name}`,
+              current: filesProcessed++,
+              total: entries.length
+            });
+          }
+        });
         await db.initCollections();
       }
     });
@@ -227,7 +233,7 @@ export async function restoreBackupFile(backupFile: File) {
 }
 
 async function restoreWithProgress(
-  backup: Record<string, unknown>,
+  backup: LegacyBackupFile,
   password?: string,
   key?: string
 ) {
@@ -263,8 +269,18 @@ async function restoreWithProgress(
 
 export async function verifyAccount() {
   if (!(await db.user?.getUser())) return true;
-  return showPasswordDialog("verify_account", ({ password }) => {
-    return db.user?.verifyPassword(password) || false;
+  return await showPasswordDialog({
+    title: "Verify it's you",
+    subtitle: "Enter your account password to proceed.",
+    inputs: {
+      password: {
+        label: "Password",
+        autoComplete: "current-password"
+      }
+    },
+    validate: async ({ password }) => {
+      return !!password && (await db.user?.verifyPassword(password));
+    }
   });
 }
 
@@ -287,8 +303,8 @@ export async function showUpgradeReminderDialogs() {
   if (!user || !user.subscription || user.subscription?.expiry === 0) return;
 
   const consumed = totalSubscriptionConsumed(user);
-  const isTrial = user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
-  const isBasic = user?.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
+  const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
+  const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
   if (isBasic && consumed >= 100) {
     await showReminderDialog("trialexpired");
   } else if (isTrial && consumed >= 75) {
@@ -297,7 +313,7 @@ export async function showUpgradeReminderDialogs() {
 }
 
 async function restore(
-  backup: Record<string, unknown>,
+  backup: LegacyBackupFile,
   password?: string,
   key?: string
 ) {

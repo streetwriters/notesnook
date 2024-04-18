@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { SyntheticEvent } from "react";
+import React, { FunctionComponent, SyntheticEvent } from "react";
 import { NodeView, Decoration, DecorationSource } from "prosemirror-view";
 import { Node as PMNode, Slice } from "prosemirror-model";
 import { NodeSelection } from "prosemirror-state";
@@ -26,7 +26,6 @@ import {
   ReactNodeViewProps,
   ReactNodeViewOptions,
   GetPosNode,
-  ForwardRef,
   ContentDOM
 } from "./types";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
@@ -47,20 +46,51 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private domRef!: HTMLElement;
   private contentDOMWrapper?: Node;
 
-  contentDOM: HTMLElement | undefined;
+  contentDOM?: HTMLElement;
   node: PMNode;
   isDragging = false;
-  portalProviderAPI: PortalProviderAPI;
+  selected = false;
+  pos = -1;
+  posEnd: number | undefined;
+
+  // in order to cleanly unmount a React Portal, we have to preserve the
+  // dom structure for the full node. However, Prosemirror/browser can,
+  // sometimes, detach the node before React is able to call "unmount".
+  // Unmounting a React child whose DOM counterpart is already removed
+  // results in a DOMException.
+  // To fix that, we observe and store all the detached subnodes and later add
+  // them back when we are ready to destroy our node view once & for all.
+  // This wouldn't be necessary if React allowed for a way to "sync" the DOM
+  // changes to its Virtual DOM.
+  detached: Set<Node> = new Set();
+  detachObserver = new MutationObserver((mutations) => {
+    const filtered = mutations.filter(
+      (m) => m.target === this.domRef && m.removedNodes.length > 0
+    );
+    for (const mutation of filtered) {
+      for (const node of mutation.removedNodes) this.detached.add(node);
+    }
+  });
 
   constructor(
     node: PMNode,
     protected readonly editor: Editor,
     protected readonly getPos: GetPosNode,
+    protected readonly portalProviderAPI: PortalProviderAPI,
     protected readonly options: ReactNodeViewOptions<P>
   ) {
-    this.portalProviderAPI = editor.storage
-      .portalProviderAPI as PortalProviderAPI;
     this.node = node;
+    this.#updatePos();
+  }
+
+  deselectNode() {
+    this.selected = false;
+    this.render();
+  }
+
+  selectNode() {
+    this.selected = true;
+    this.render();
   }
 
   /**
@@ -75,12 +105,13 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   init() {
     this.domRef = this.createDomRef();
     this.domRef.ondragstart = (ev) => this.onDragStart(ev);
+    this.detachObserver.observe(this.domRef, {
+      childList: true,
+      subtree: true
+    });
     // this.setDomAttrs(this.node, this.domRef);
 
-    const { dom: contentDOMWrapper, contentDOM } = this.getContentDOM() || {
-      dom: undefined,
-      contentDOM: undefined
-    };
+    const { dom: contentDOMWrapper, contentDOM } = this.getContentDOM() ?? {};
 
     if (this.domRef && contentDOMWrapper) {
       this.domRef.appendChild(contentDOMWrapper);
@@ -93,24 +124,19 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     // nodeView if DOM structure has nested plain "div"s, it doesn't see the
     // difference between them and it kills the nodeView
     this.domRef.classList.add(`${this.node.type.name}-view-content-wrap`);
-
-    this.renderReactComponent(() =>
-      this.render(this.options.props, this.handleRef)
-    );
+    this.render();
 
     return this;
   }
 
-  private renderReactComponent(
-    component: () => React.ReactElement<unknown> | null
-  ) {
+  private render() {
     if (process.env.NODE_ENV === "test") return;
-    if (!this.domRef || !component || !this.portalProviderAPI) {
+    if (!this.domRef || !this.portalProviderAPI) {
       console.warn("Cannot render node view");
       return;
     }
 
-    this.portalProviderAPI.render(component, this.domRef);
+    this.portalProviderAPI.render(this.Component, this.domRef);
   }
 
   createDomRef(): HTMLElement {
@@ -136,35 +162,38 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
       content.style.minWidth = "20px";
       return { dom: content };
     }
-    return this.options.contentDOMFactory?.();
+    return this.options.contentDOMFactory?.(this.node);
+  }
+
+  #updatePos() {
+    this.pos = this.getPos();
+    this.posEnd = this.pos + this.node.nodeSize;
   }
 
   handleRef = (node: HTMLElement | null) => this._handleRef(node);
 
-  private _handleRef(node: HTMLElement | null) {
+  private _handleRef = (node: HTMLElement | null) => {
     const contentDOM = this.contentDOMWrapper || this.contentDOM;
 
     // move the contentDOM node inside the inner reference after rendering
     if (node && contentDOM && !node.contains(contentDOM)) {
       node.appendChild(contentDOM);
     }
-  }
+  };
 
-  render(
-    props: P = {} as P,
-    forwardRef?: ForwardRef
-  ): React.ReactElement<unknown> | null {
+  Component: FunctionComponent = () => {
     if (!this.options.component) return null;
 
     return (
       <EmotionThemeProvider scope="editor" injectCssVars={false}>
         <this.options.component
-          {...props}
-          pos={this.getPos()}
+          {...(this.options.props as P)}
+          pos={this.pos}
           editor={this.editor}
           getPos={this.getPos}
           node={this.node}
-          forwardRef={forwardRef}
+          forwardRef={this._handleRef}
+          selected={this.selected}
           updateAttributes={(attr, options) =>
             this.updateAttributes(
               attr,
@@ -177,7 +206,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
         />
       </EmotionThemeProvider>
     );
-  }
+  };
 
   updateAttributes(
     attributes: object,
@@ -224,9 +253,9 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
 
     this.node = node;
 
-    this.renderReactComponent(() =>
-      this.render(this.options.props, this.handleRef)
-    );
+    this.#updatePos();
+
+    this.render();
 
     return true;
   }
@@ -466,13 +495,15 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   }
 
   destroy() {
-    if (!this.domRef || !this.portalProviderAPI) {
-      return;
+    this.detachObserver.disconnect();
+    // add back the detached nodes because React expects an untouched
+    // DOM representation (and there's no way to reconcile the DOM later).
+    for (const node of this.detached) {
+      this.domRef.appendChild(node);
     }
-
     this.portalProviderAPI.remove(this.domRef);
-    // this.domRef = undefined;
-    this.contentDOM = undefined;
+    this.detached.clear();
+    this.domRef.remove();
   }
 }
 
@@ -482,11 +513,18 @@ export function createNodeView<TProps extends ReactNodeViewProps>(
 ) {
   return ({ node, getPos, editor }: NodeViewRendererProps) => {
     const _getPos = () => (typeof getPos === "boolean" ? -1 : getPos());
+    if (!editor.storage.portalProviderAPI) return {};
 
-    return new ReactNodeView<TProps>(node, editor as Editor, _getPos, {
-      ...options,
-      component
-    }).init();
+    return new ReactNodeView<TProps>(
+      node,
+      editor as Editor,
+      _getPos,
+      editor.storage.portalProviderAPI,
+      {
+        ...options,
+        component
+      }
+    ).init();
   };
 }
 

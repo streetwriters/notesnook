@@ -17,270 +17,97 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { NotebookType, NoteType, TopicType } from "app/utils/types";
-import React, { RefObject, useState } from "react";
-import { Platform, useWindowDimensions, View } from "react-native";
+import { VirtualizedGrouping } from "@notesnook/core";
+import { Note, Notebook } from "@notesnook/core/dist/types";
+import { useThemeColors } from "@notesnook/theme";
+import React, { RefObject, useEffect, useState } from "react";
+import { View } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import { db } from "../../../common/database";
-import {
-  eSendEvent,
-  presentSheet,
-  ToastEvent
-} from "../../../services/event-manager";
+import { useDBItem } from "../../../hooks/use-db-item";
+import { presentSheet } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
-import SearchService from "../../../services/search";
-import { useThemeColors } from "@notesnook/theme";
-import { eCloseSheet } from "../../../utils/events";
+import { createItemSelectionStore } from "../../../stores/item-selection-store";
+import { updateNotebook } from "../../../utils/notebooks";
 import { SIZE } from "../../../utils/size";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
-import { presentDialog } from "../../dialog/functions";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
-import { PressableButton } from "../../ui/pressable";
+import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
-import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
-type CommonItemType = {
-  id: string;
-  title: string;
-  headline?: string;
-  type: string;
-  notes?: string[];
-};
+const useItemSelectionStore = createItemSelectionStore(true);
 
 export const MoveNotes = ({
   notebook,
-  selectedTopic,
   fwdRef
 }: {
-  notebook: NotebookType;
-  selectedTopic?: TopicType;
+  notebook: Notebook;
   fwdRef: RefObject<ActionSheetRef>;
 }) => {
   const { colors } = useThemeColors();
-  const [currentNotebook, setCurrentNotebook] = useState(notebook);
-  const { height } = useWindowDimensions();
-  let notes = db.notes?.all as NoteType[];
-
-  const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
-  const [topic, setTopic] = useState(selectedTopic);
-
-  notes = notes.filter((note) => {
-    if (!topic) return [];
-    const noteIds = db.notes?.topicReferences.get(topic.id);
-    return noteIds.indexOf(note.id) === -1;
-  });
-
-  const select = React.useCallback(
-    (id: string) => {
-      const index = selectedNoteIds.indexOf(id);
-      if (index > -1) {
-        setSelectedNoteIds((selectedNoteIds) => {
-          const next = [...selectedNoteIds];
-          next.splice(index, 1);
-          return next;
-        });
-      } else {
-        setSelectedNoteIds((selectedNoteIds) => {
-          const next = [...selectedNoteIds];
-          next.push(id);
-          return next;
-        });
-      }
-    },
-    [selectedNoteIds]
+  const currentNotebook = notebook;
+  const selectionCount = useItemSelectionStore(
+    (state) =>
+      Object.keys(state.selection).filter(
+        (k) =>
+          state.initialState?.[k] !== "selected" &&
+          state.selection[k] !== "deselected"
+      )?.length > 0
   );
 
-  const openAddTopicDialog = () => {
-    presentDialog({
-      context: "local",
-      input: true,
-      inputPlaceholder: "Enter title",
-      title: "New topic",
-      paragraph: "Add a new topic in " + currentNotebook.title,
-      positiveText: "Add",
-      positivePress: (value) => {
-        return addNewTopic(value as string);
-      }
+  const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
+
+  useEffect(() => {
+    db.notes?.all.sorted(db.settings.getGroupOptions("notes")).then((notes) => {
+      setNotes(notes);
     });
-  };
-
-  const addNewTopic = async (value: string) => {
-    if (!value || value.trim().length === 0) {
-      ToastEvent.show({
-        heading: "Topic title is required",
-        type: "error",
-        context: "local"
+    db.relations
+      .from(currentNotebook, "note")
+      .get()
+      .then((existingNotes) => {
+        const selection: { [name: string]: any } = {};
+        existingNotes.forEach((rel) => {
+          selection[rel.toId] = "selected";
+        });
+        useItemSelectionStore.setState({
+          selection: selection,
+          initialState: selection
+        });
       });
-      return false;
-    }
-    await db.notebooks?.notebook(currentNotebook.id).topics.add(value);
-    setCurrentNotebook(
-      db.notebooks?.notebook(currentNotebook.id).data as NotebookType
-    );
 
-    Navigation.queueRoutesForUpdate();
-    return true;
-  };
+    return () => {
+      useItemSelectionStore.getState().reset();
+    };
+  }, [currentNotebook]);
 
   const renderItem = React.useCallback(
-    ({ item }: { item: CommonItemType }) => {
-      return (
-        <PressableButton
-          testID="listitem.select"
-          onPress={() => {
-            if (item.type == "topic") {
-              setTopic(topic || (item as TopicType));
-            } else {
-              select(item.id);
-            }
-          }}
-          type={"transparent"}
-          customStyle={{
-            paddingVertical: 12,
-            justifyContent: "space-between",
-            paddingHorizontal: 12,
-            flexDirection: "row"
-          }}
-        >
-          <View
-            style={{
-              flexShrink: 1
-            }}
-          >
-            <Paragraph
-              numberOfLines={1}
-              color={
-                item?.id === topic?.id
-                  ? colors.primary.accent
-                  : colors.primary.paragraph
-              }
-            >
-              {item.title}
-            </Paragraph>
-            {item.type == "note" && item.headline ? (
-              <Paragraph
-                numberOfLines={1}
-                color={colors.secondary.paragraph}
-                size={SIZE.xs}
-              >
-                {item.headline}
-              </Paragraph>
-            ) : null}
-          </View>
-
-          {item.type === "topic" ? (
-            <Paragraph
-              style={{
-                fontSize: SIZE.xs
-              }}
-              color={colors.secondary.paragraph}
-            >
-              {item.notes?.length} Notes
-            </Paragraph>
-          ) : null}
-
-          {selectedNoteIds.indexOf(item.id) > -1 ? (
-            <IconButton
-              customStyle={{
-                width: undefined,
-                height: undefined,
-                backgroundColor: "transparent"
-              }}
-              name="check"
-              type="selected"
-              color={colors.selected.icon}
-            />
-          ) : null}
-        </PressableButton>
-      );
+    ({ index }: { item: boolean; index: number }) => {
+      return <SelectableNoteItem id={index} items={notes} />;
     },
-    [
-      colors.primary.accent,
-      colors.secondary.paragraph,
-      colors.primary.paragraph,
-      colors.selected.icon,
-      select,
-      selectedNoteIds,
-      topic
-    ]
+    [notes]
   );
 
-  /**
-   *
-   */
   return (
     <View
       style={{
         paddingHorizontal: 12,
-        maxHeight: Platform.OS === "ios" ? "96%" : "97%",
-        height: height * 0.9
+        maxHeight: "100%",
+        height: notes?.placeholders.length
+          ? 50 * (notes?.placeholders.length + 2)
+          : 300
       }}
     >
       <Dialog context="local" />
-      {topic ? (
-        <PressableButton
-          onPress={() => {
-            setTopic(undefined);
-          }}
-          customStyle={{
-            paddingVertical: 12,
-            justifyContent: "space-between",
-            paddingHorizontal: 12,
-            marginBottom: 10,
-            alignItems: "flex-start"
-          }}
-          type="grayBg"
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              width: "100%"
-            }}
-          >
-            <Heading size={SIZE.md}>
-              Adding notes to {currentNotebook.title}
-            </Heading>
-          </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              width: "100%",
-              marginTop: 5
-            }}
-          >
-            <Paragraph color={colors.selected.paragraph}>
-              in {topic.title}
-            </Paragraph>
-
-            <Paragraph
-              style={{
-                fontSize: SIZE.xs
-              }}
-            >
-              Tap to change
-            </Paragraph>
-          </View>
-        </PressableButton>
-      ) : (
-        <>
-          <DialogHeader
-            title={`Add notes to ${currentNotebook.title}`}
-            paragraph={
-              "Select the topic in which you would like to move notes."
-            }
-          />
-          <Seperator />
-        </>
-      )}
+      <DialogHeader
+        title={`Add notes to ${currentNotebook.title}`}
+        paragraph={"Select the notes you want to move to this Notebook."}
+      />
+      <Seperator />
 
       <FlashList
         ListEmptyComponent={
@@ -292,41 +119,25 @@ export const MoveNotes = ({
             }}
           >
             <Paragraph color={colors.secondary.paragraph}>
-              {topic ? "No notes to show" : "No topics in this notebook"}
+              No notes to show
             </Paragraph>
-
-            {!topic && (
-              <Button
-                style={{
-                  marginTop: 10,
-                  height: 40
-                }}
-                onPress={() => {
-                  openAddTopicDialog();
-                }}
-                title="Add first topic"
-                type="grayAccent"
-              />
-            )}
           </View>
         }
-        data={topic ? notes : currentNotebook.topics}
+        estimatedItemSize={50}
+        data={notes?.placeholders}
         renderItem={renderItem}
       />
-      {selectedNoteIds.length > 0 ? (
+
+      {selectionCount ? (
         <Button
           onPress={async () => {
-            if (!topic) return;
             await db.notes?.addToNotebook(
-              {
-                topic: topic.id,
-                id: topic.notebookId
-              },
-              ...selectedNoteIds
+              currentNotebook.id,
+              ...useItemSelectionStore.getState().getSelectedItemIds()
             );
+            updateNotebook(currentNotebook.id);
             Navigation.queueRoutesForUpdate();
-            SearchService.updateAndSearch();
-            eSendEvent(eCloseSheet);
+            fwdRef?.current?.hide();
           }}
           title="Move selected notes"
           type="accent"
@@ -337,10 +148,97 @@ export const MoveNotes = ({
   );
 };
 
-MoveNotes.present = (notebook: NotebookType, topic: TopicType) => {
+const SelectableNoteItem = React.memo(
+  ({
+    id,
+    items
+  }: {
+    id: string | number;
+    items?: VirtualizedGrouping<Note>;
+  }) => {
+    const { colors } = useThemeColors();
+    const [item] = useDBItem(id, "note", items);
+    const selected = useItemSelectionStore((state) =>
+      item?.id ? state.selection[item.id] === "selected" : false
+    );
+    const exists = useItemSelectionStore((state) =>
+      item?.id ? state.initialState[item.id] === "selected" : false
+    );
+
+    return exists ? null : (
+      <Pressable
+        testID="listitem.select"
+        onPress={() => {
+          if (!item) return;
+          useItemSelectionStore
+            .getState()
+            .markAs(item, selected ? "deselected" : "selected");
+        }}
+        type={"transparent"}
+        style={{
+          paddingVertical: 12,
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "flex-start",
+          height: 50
+        }}
+      >
+        {!item ? null : (
+          <>
+            <IconButton
+              style={{
+                backgroundColor: "transparent",
+                marginRight: 5
+              }}
+              onPress={() => {
+                if (!item) return;
+                useItemSelectionStore
+                  .getState()
+                  .markAs(item, selected ? "deselected" : "selected");
+              }}
+              top={0}
+              left={0}
+              right={0}
+              bottom={0}
+              name={
+                selected
+                  ? "check-circle-outline"
+                  : "checkbox-blank-circle-outline"
+              }
+              type="selected"
+              color={selected ? colors.selected.icon : colors.primary.icon}
+            />
+
+            <View
+              style={{
+                flexShrink: 1
+              }}
+            >
+              <Paragraph numberOfLines={1}>{item?.title}</Paragraph>
+              {item.type == "note" && item.headline ? (
+                <Paragraph
+                  numberOfLines={1}
+                  color={colors?.secondary.paragraph}
+                  size={SIZE.xs}
+                >
+                  {item.headline}
+                </Paragraph>
+              ) : null}
+            </View>
+          </>
+        )}
+      </Pressable>
+    );
+  }
+);
+
+SelectableNoteItem.displayName = "SelectableNoteItem";
+
+MoveNotes.present = (notebook?: Notebook) => {
+  if (!notebook) return;
   presentSheet({
     component: (ref: RefObject<ActionSheetRef>) => (
-      <MoveNotes fwdRef={ref} notebook={notebook} selectedTopic={topic} />
+      <MoveNotes fwdRef={ref} notebook={notebook} />
     )
   });
 };

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Box, Flex, Embed } from "@theme-ui/components";
 import { useRef, useState } from "react";
 import { EmbedAlignmentOptions, EmbedAttributes } from "./embed";
-import { SelectionBasedReactNodeViewProps } from "../react";
+import { ReactNodeViewProps } from "../react";
 import { DesktopOnly } from "../../components/responsive";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 import { Icons } from "../../toolbar";
@@ -28,9 +28,7 @@ import { Icon } from "@notesnook/ui";
 import { Resizer } from "../../components/resizer";
 
 export function EmbedComponent(
-  props: SelectionBasedReactNodeViewProps<
-    EmbedAttributes & EmbedAlignmentOptions
-  >
+  props: ReactNodeViewProps<EmbedAttributes & EmbedAlignmentOptions>
 ) {
   const { editor, updateAttributes, selected, node } = props;
   const [isLoading, setIsLoading] = useState(true);

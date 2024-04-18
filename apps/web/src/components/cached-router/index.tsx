@@ -23,6 +23,8 @@ import { store as selectionStore } from "../../stores/selection-store";
 import useRoutes from "../../hooks/use-routes";
 import RouteContainer from "../route-container";
 import routes from "../../navigation/routes";
+import { isRouteResult } from "../../navigation/types";
+import { Freeze } from "react-freeze";
 import { Flex } from "@theme-ui/components";
 
 function CachedRouter() {
@@ -39,9 +41,10 @@ function CachedRouter() {
     NavigationEvents.publish("onNavigate", RouteResult, location);
   }, [RouteResult, location]);
 
-  if (!RouteResult) return null;
+  if (!RouteResult || !isRouteResult(RouteResult)) return null;
   if (RouteResult.key === "general" || !cachedRoutes.current[RouteResult.key])
-    cachedRoutes.current[RouteResult.key] = RouteResult.component;
+    cachedRoutes.current[RouteResult.key] =
+      RouteResult.component as React.FunctionComponent;
 
   return (
     <RouteContainer
@@ -50,17 +53,19 @@ function CachedRouter() {
       buttons={RouteResult.buttons}
     >
       {Object.entries(cachedRoutes.current).map(([key, Component]) => (
-        <Flex
-          id={key}
-          key={key}
-          sx={{
-            display: key === RouteResult.key ? "flex" : "none",
-            flexDirection: "column",
-            flex: 1
-          }}
-        >
-          <Component key={key} />
-        </Flex>
+        <Freeze key={key} freeze={key !== RouteResult.key}>
+          <Flex
+            id={key}
+            key={key}
+            sx={{
+              flexDirection: "column",
+              flex: 1,
+              overflow: "hidden"
+            }}
+          >
+            <Component key={key} {...RouteResult.props} />
+          </Flex>
+        </Freeze>
       ))}
     </RouteContainer>
   );

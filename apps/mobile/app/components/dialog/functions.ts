@@ -25,12 +25,12 @@ type DialogInfo = {
   paragraph?: string;
   positiveText?: string;
   negativeText?: string;
-  positivePress?: (value: unknown) => void;
+  positivePress?: (value: any) => void;
   onClose?: () => void;
   positiveType?:
     | "transparent"
-    | "gray"
-    | "grayBg"
+    | "plain"
+    | "secondary"
     | "accent"
     | "inverted"
     | "shade"
@@ -41,7 +41,9 @@ type DialogInfo = {
   input: boolean;
   inputPlaceholder: string;
   defaultValue: string;
-  context: "global" | "local";
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  context: "global" | "local" | (string & {});
+  secureTextEntry?: boolean;
 };
 
 export function presentDialog(data: Partial<DialogInfo>): void {

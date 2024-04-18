@@ -21,6 +21,7 @@ import { ThemeDefinition } from "@notesnook/theme";
 import { Appearance } from "react-native";
 import create, { State } from "zustand";
 import SettingsService from "../services/settings";
+import switchTheme from "react-native-theme-switch-animation";
 
 export interface ThemeStore extends State {
   lightTheme: ThemeDefinition;
@@ -31,6 +32,20 @@ export interface ThemeStore extends State {
   setColorScheme: (colorScheme?: "dark" | "light") => void;
 }
 
+function switchThemeWithAnimation(fn: () => void) {
+  switchTheme({
+    switchThemeFunction: fn,
+    animationConfig: {
+      type: "circular",
+      duration: 500,
+      startingPoint: {
+        cxRatio: 0,
+        cyRatio: 0
+      }
+    }
+  });
+}
+
 export const useThemeStore = create<ThemeStore>((set, get) => ({
   lightTheme: SettingsService.get().lighTheme,
   darkTheme: SettingsService.get().darkTheme,
@@ -38,27 +53,33 @@ export const useThemeStore = create<ThemeStore>((set, get) => ({
     ? (Appearance.getColorScheme() as "dark" | "light")
     : SettingsService.get().colorScheme,
   setDarkTheme: (darkTheme) => {
-    set({ darkTheme });
-    SettingsService.setProperty("darkTheme", darkTheme);
+    switchThemeWithAnimation(() => {
+      set({ darkTheme });
+      SettingsService.setProperty("darkTheme", darkTheme);
+    });
   },
   setLightTheme: (lightTheme) => {
-    set({ lightTheme });
-    SettingsService.setProperty("lighTheme", lightTheme);
+    switchThemeWithAnimation(() => {
+      set({ lightTheme });
+      SettingsService.setProperty("lighTheme", lightTheme);
+    });
   },
   setColorScheme: (colorScheme) => {
-    const nextColorScheme =
-      colorScheme === undefined
-        ? get().colorScheme === "dark"
-          ? "light"
-          : "dark"
-        : colorScheme;
-    set({
-      colorScheme: nextColorScheme
-    });
-    if (!SettingsService.getProperty("useSystemTheme")) {
-      SettingsService.set({
+    switchThemeWithAnimation(() => {
+      const nextColorScheme =
+        colorScheme === undefined
+          ? get().colorScheme === "dark"
+            ? "light"
+            : "dark"
+          : colorScheme;
+      set({
         colorScheme: nextColorScheme
       });
-    }
+      if (!SettingsService.getProperty("useSystemTheme")) {
+        SettingsService.set({
+          colorScheme: nextColorScheme
+        });
+      }
+    });
   }
 }));

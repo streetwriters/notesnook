@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor } from "@notesnook/editor";
+import { Editor, scrollIntoViewById } from "@notesnook/editor";
 import {
   ThemeDefinition,
   useThemeColors,
@@ -32,6 +32,8 @@ import {
 } from "react";
 import { EventTypes, isReactNative, post, randId, saveTheme } from "../utils";
 import { injectCss, transform } from "../utils/css";
+import { useTabContext, useTabStore } from "./useTabStore";
+
 type Attachment = {
   hash: string;
   filename: string;
@@ -101,35 +103,62 @@ export type EditorController = {
   setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
   countWords: (ms: number) => void;
   copyToClipboard: (text: string) => void;
-  getAttachmentData: (attachment: Attachment) => Promise<string>;
+  getAttachmentData: (attachment: Partial<Attachment>) => Promise<string>;
+  updateTab: () => void;
+  loading: boolean;
+  setLoading: (value: boolean) => void;
+  getTableOfContents: () => any[];
+  scrollIntoView: (id: string) => void;
+  passwordInputRef: MutableRefObject<HTMLInputElement | null>;
+  focusPassInput: () => void;
+  blurPassInput: () => void;
 };
+export function useEditorController({
+  update,
+  getTableOfContents
+}: {
+  update: () => void;
+  getTableOfContents: () => any[];
+}): EditorController {
+  const passwordInputRef = useRef<HTMLInputElement | null>(null);
+  const tab = useTabContext();
+  const tabRef = useRef(tab);
+  tabRef.current = tab;
 
-export function useEditorController(update: () => void): EditorController {
+  const [loading, setLoading] = useState(true);
   const setTheme = useThemeEngineStore((store) => store.setTheme);
   const { colors } = useThemeColors("editor");
   const [title, setTitle] = useState("");
   const [titlePlaceholder, setTitlePlaceholder] = useState("Note title");
   const htmlContentRef = useRef<string | null>(null);
+  const updateTabOnFocus = useRef(false);
   const timers = useRef<Timers>({
     selectionChange: null,
     change: null,
     wordCounter: null
   });
 
+  if (!tabRef.current.noteId && loading) {
+    setLoading(false);
+  }
+
   const selectionChange = useCallback((_editor: Editor) => {}, []);
 
   const titleChange = useCallback((title: string) => {
-    post(EventTypes.contentchange);
-    post(EventTypes.title, title);
+    post(
+      EventTypes.contentchange,
+      undefined,
+      tabRef.current.id,
+      tabRef.current.noteId
+    );
+    post(EventTypes.title, title, tabRef.current.id, tabRef.current.noteId);
   }, []);
 
   const countWords = useCallback((ms = 300) => {
     if (typeof timers.current.wordCounter === "number")
       clearTimeout(timers.current.wordCounter);
     timers.current.wordCounter = setTimeout(() => {
-      console.time("wordCounter");
-      statusBar?.current?.updateWords();
-      console.timeEnd("wordCounter");
+      statusBars[tabRef.current.id]?.current?.updateWords();
     }, ms);
   }, []);
 
@@ -138,27 +167,41 @@ export function useEditorController(update: () => void): EditorController {
   }, [colors]);
 
   const contentChange = useCallback(
-    (editor: Editor, ignoreEdit) => {
+    (editor: Editor, ignoreEdit?: boolean) => {
+      if (editorControllers[tabRef.current.id]?.loading) {
+        logger("info", "Edit skipped, tab is in loading state");
+        return;
+      }
       const currentSessionId = globalThis.sessionId;
-      post(EventTypes.contentchange);
+      post(
+        EventTypes.contentchange,
+        undefined,
+        tabRef.current.id,
+        tabRef.current.noteId
+      );
       if (!editor) return;
       if (typeof timers.current.change === "number") {
         clearTimeout(timers.current?.change);
       }
-      timers.current.change = setTimeout(
-        () => {
-          htmlContentRef.current = editor.getHTML();
-          post(
-            EventTypes.content,
-            {
-              html: htmlContentRef.current,
-              ignoreEdit: ignoreEdit
-            },
-            currentSessionId
-          );
-        },
-        ignoreEdit ? 0 : 300
-      );
+      timers.current.change = setTimeout(() => {
+        htmlContentRef.current = editor.getHTML();
+        post(
+          EventTypes.content,
+          {
+            html: htmlContentRef.current,
+            ignoreEdit: ignoreEdit
+          },
+          tabRef.current.id,
+          tabRef.current.noteId,
+          currentSessionId
+        );
+        logger(
+          "info",
+          "Editor saving content",
+          tabRef.current.id,
+          tabRef.current.noteId
+        );
+      }, 300);
 
       countWords(5000);
     },
@@ -166,41 +209,73 @@ export function useEditorController(update: () => void): EditorController {
   );
 
   const scroll = useCallback(
-    (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {},
+    (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {
+      const noteId = useTabStore
+        .getState()
+        .getNoteIdForTab(useTabStore.getState().currentTab);
+      if (noteId) {
+        useTabStore.getState().setNoteState(noteId, {
+          top: _event.currentTarget.scrollTop
+        });
+      }
+    },
     []
   );
 
   const onUpdate = useCallback(() => {
     update();
+    logger("info", "Updating content...");
   }, [update]);
+
+  useEffect(() => {
+    if (tab.locked) {
+      htmlContentRef.current = "";
+      setLoading(true);
+      onUpdate();
+    }
+  }, [tab.locked, onUpdate]);
 
   const onMessage = useCallback(
     (event: Event & { data?: string }) => {
       if (event?.data?.[0] !== "{") return;
-
       const message = JSON.parse(event.data);
       const type = message.type;
       const value = message.value;
-      global.sessionId = message.sessionId;
+
+      if (message.tabId !== tabRef.current.id && type !== "native:status") {
+        return;
+      }
+
+      const editor = editors[tabRef.current.id];
       switch (type) {
         case "native:updatehtml": {
           htmlContentRef.current = value;
-          if (!editor) break;
-          const { from, to } = editor.state.selection;
-          editor?.commands.setContent(htmlContentRef.current, false, {
-            preserveWhitespace: true
-          });
-          editor.commands.setTextSelection({
-            from,
-            to
-          });
-          countWords();
+          if (tabRef.current.id !== useTabStore.getState().currentTab) {
+            updateTabOnFocus.current = true;
+          } else {
+            if (!editor) break;
+            const { from, to } = editor.state.selection;
+            editor?.commands.setContent(htmlContentRef.current, false, {
+              preserveWhitespace: true
+            });
+
+            editor.commands.setTextSelection({
+              from,
+              to
+            });
+            countWords(0);
+          }
+
           break;
         }
         case "native:html":
           htmlContentRef.current = value;
+          logger("info", "LOADING NOTE HTML");
+          if (!editor) break;
           update();
-          countWords();
+          setTimeout(() => {
+            countWords(0);
+          }, 300);
           break;
         case "native:theme":
           setTheme(message.value);
@@ -217,8 +292,8 @@ export function useEditorController(update: () => void): EditorController {
         case "native:status":
           break;
         case "native:keyboardShown":
-          if (editor?.current) {
-            scrollIntoView(editor?.current as any);
+          if (editor) {
+            scrollIntoView(editor as any);
           }
           break;
         case "native:attachment-data":
@@ -249,18 +324,28 @@ export function useEditorController(update: () => void): EditorController {
     };
   }, [onMessage]);
 
-  const openFilePicker = useCallback((type) => {
-    post(EventTypes.filepicker, type);
+  const openFilePicker = useCallback((type: "image" | "file" | "camera") => {
+    post(EventTypes.filepicker, type, tabRef.current.id, tabRef.current.noteId);
   }, []);
 
   const downloadAttachment = useCallback((attachment: Attachment) => {
-    post(EventTypes.download, attachment);
+    post(
+      EventTypes.download,
+      attachment,
+      tabRef.current.id,
+      tabRef.current.noteId
+    );
   }, []);
   const previewAttachment = useCallback((attachment: Attachment) => {
-    post(EventTypes.previewAttachment, attachment);
+    post(
+      EventTypes.previewAttachment,
+      attachment,
+      tabRef.current.id,
+      tabRef.current.noteId
+    );
   }, []);
   const openLink = useCallback((url: string) => {
-    post(EventTypes.link, url);
+    post(EventTypes.link, url, tabRef.current.id, tabRef.current.noteId);
     return true;
   }, []);
 
@@ -268,7 +353,7 @@ export function useEditorController(update: () => void): EditorController {
     post(EventTypes.copyToClipboard, text);
   };
 
-  const getAttachmentData = (attachment: Attachment) => {
+  const getAttachmentData = (attachment: Partial<Attachment>) => {
     return new Promise<string>((resolve, reject) => {
       const resolverId = randId("get_attachment_data");
       pendingResolvers[resolverId] = (data) => {
@@ -283,10 +368,14 @@ export function useEditorController(update: () => void): EditorController {
   };
 
   return {
+    getTableOfContents: getTableOfContents,
+    scrollIntoView: (id: string) => scrollIntoViewById(id),
     contentChange,
     selectionChange,
     titleChange,
     scroll,
+    loading,
+    setLoading,
     title,
     setTitle,
     titlePlaceholder,
@@ -299,6 +388,32 @@ export function useEditorController(update: () => void): EditorController {
     onUpdate: onUpdate,
     countWords,
     copyToClipboard,
-    getAttachmentData
+    getAttachmentData,
+    updateTab: () => {
+      // When the tab is focused, we apply any updates to content that were recieved when
+      // the tab was not focused.
+      updateTabOnFocus.current = false;
+      setTimeout(() => {
+        if (!updateTabOnFocus.current) return;
+        const editor = editors[tabRef.current.id];
+        if (!editor) return;
+        const { from, to } = editor.state.selection;
+        editor?.commands.setContent(htmlContentRef.current, false, {
+          preserveWhitespace: true
+        });
+        editor.commands.setTextSelection({
+          from,
+          to
+        });
+        countWords();
+      }, 1);
+    },
+    passwordInputRef,
+    focusPassInput: () => {
+      passwordInputRef.current?.focus();
+    },
+    blurPassInput: () => {
+      passwordInputRef.current?.blur();
+    }
   };
 }

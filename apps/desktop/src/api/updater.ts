@@ -28,16 +28,20 @@ type UpdateInfo = { version: string };
 type Progress = { percent: number };
 
 const t = initTRPC.create();
+let cancellationToken: CancellationToken | undefined = undefined;
 
 export const updaterRouter = t.router({
   autoUpdates: t.procedure.query(() => config.automaticUpdates),
   install: t.procedure.query(() => autoUpdater.quitAndInstall()),
   download: t.procedure.query(async () => {
-    const cancellationToken = new CancellationToken();
-    await autoUpdater.downloadUpdate(cancellationToken);
+    if (cancellationToken) return;
+    cancellationToken = new CancellationToken();
+    await autoUpdater
+      .downloadUpdate(cancellationToken)
+      .finally(() => (cancellationToken = undefined));
   }),
   check: t.procedure.query(async () => {
-    await autoUpdater.checkForUpdates();
+    await autoUpdater.checkForUpdates().catch(console.error);
   }),
 
   toggleAutoUpdates: t.procedure
@@ -71,6 +75,7 @@ function createSubscription<
       const listener: AppUpdaterEvents[TName] = (...args: any[]) => {
         emit.next(args[0]);
       };
+      autoUpdater.removeAllListeners(eventName);
       autoUpdater.addListener(eventName, listener);
       return () => {
         autoUpdater.removeListener(eventName, listener);

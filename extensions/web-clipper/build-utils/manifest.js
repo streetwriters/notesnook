@@ -37,6 +37,7 @@ const nnHost =
   process.env.NODE_ENV === "production"
     ? "*://app.notesnook.com/*"
     : "*://localhost/*";
+const v3nnHost = "*://v3.notesnook.com/*";
 const corsHost = "https://cors.notesnook.com/*";
 const common = {
   name: "Notesnook Web Clipper",
@@ -49,7 +50,7 @@ const common = {
 
 const v2 = {
   ...common,
-  permissions: [...common.permissions, corsHost, nnHost],
+  permissions: [...common.permissions, corsHost, nnHost, v3nnHost],
   optional_permissions: ["http://*/*", "https://*/*"],
   browser_specific_settings: {
     gecko: {

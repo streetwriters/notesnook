@@ -82,6 +82,19 @@ async function createWindow() {
       size: 512,
       format: process.platform === "win32" ? "ico" : "png"
     }),
+
+    titleBarStyle: "hidden",
+    frame: process.platform === "win32" || process.platform === "darwin",
+    titleBarOverlay: {
+      height: 37,
+      color: "#00000000",
+      symbolColor: config.windowControlsIconColor
+    },
+    trafficLightPosition: {
+      x: 16,
+      y: 12
+    },
+
     webPreferences: {
       zoomFactor: config.zoomFactor,
       nodeIntegration: true,
@@ -122,7 +135,7 @@ async function createWindow() {
   setupJumplist();
 
   if (isDevelopment())
-    mainWindow.webContents.openDevTools({ mode: "right", activate: true });
+    mainWindow.webContents.openDevTools({ mode: "bottom", activate: true });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);
@@ -137,6 +150,15 @@ async function createWindow() {
 
 app.once("ready", async () => {
   console.info("App ready. Opening window.");
+
+  app.configureHostResolver({
+    secureDnsServers: [
+      "https://mozilla.cloudflare-dns.com/dns-query",
+      "https://dns.quad9.net/dns-query"
+    ],
+    enableBuiltInResolver: true,
+    secureDnsMode: "automatic"
+  });
 
   if (!isDevelopment()) registerProtocol();
   await createWindow();

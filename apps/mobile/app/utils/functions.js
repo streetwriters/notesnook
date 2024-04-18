@@ -20,13 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Linking } from "react-native";
 import { db } from "../common/database";
 import { presentDialog } from "../components/dialog/functions";
-import { eSendEvent, ToastEvent } from "../services/event-manager";
+import { eSendEvent, ToastManager } from "../services/event-manager";
 import Navigation from "../services/navigation";
-import SearchService from "../services/search";
 import { useMenuStore } from "../stores/use-menu-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
-import { eClearEditor, eOnTopicSheetUpdate } from "./events";
+import { eOnNotebookUpdated, eUpdateNoteInEditor } from "./events";
+import { getParentNotebookId } from "./notebooks";
+import { useTagStore } from "../stores/use-tag-store";
 
 function confirmDeleteAllNotes(items, type, context) {
   return new Promise((resolve) => {
@@ -57,37 +58,33 @@ function confirmDeleteAllNotes(items, type, context) {
   });
 }
 
-export const deleteItems = async (item, context) => {
-  if (item && db.monographs.isPublished(item.id)) {
-    ToastEvent.show({
-      heading: "Can not delete note",
-      message: "Unpublish note to delete it",
-      type: "error",
-      context: "global"
-    });
-    return;
-  }
-
-  const selectedItemsList = item
-    ? [item]
-    : useSelectionStore.getState().selectedItemsList;
-
-  let notes = selectedItemsList.filter((i) => i.type === "note");
-  let notebooks = selectedItemsList.filter((i) => i.type === "notebook");
-  let topics = selectedItemsList.filter((i) => i.type === "topic");
-  let reminders = selectedItemsList.filter((i) => i.type === "reminder");
-
-  if (reminders.length > 0) {
-    for (let reminder of reminders) {
-      await db.reminders.remove(reminder.id);
+async function deleteNotebook(id, deleteNotes) {
+  const notebook = await db.notebooks.notebook(id);
+  const parentId = getParentNotebookId(id);
+  if (deleteNotes) {
+    const noteRelations = await db.relations.from(notebook, "note").get();
+    if (noteRelations?.length) {
+      await db.notes.moveToTrash(
+        ...noteRelations.map((relation) => relation.toId)
+      );
     }
-    useRelationStore.getState().update();
   }
+  await db.notebooks.moveToTrash(id);
+  if (parentId) {
+    eSendEvent(eOnNotebookUpdated, parentId);
+  }
+}
 
-  if (notes?.length > 0) {
-    for (const note of notes) {
-      if (db.monographs.isPublished(note.id)) {
-        ToastEvent.show({
+export const deleteItems = async (items, type, context) => {
+  const ids = items ? items : useSelectionStore.getState().selectedItemsList;
+
+  if (type === "reminder") {
+    await db.reminders.remove(...ids);
+    useRelationStore.getState().update();
+  } else if (type === "note") {
+    for (const id of ids) {
+      if (db.monographs.isPublished(id)) {
+        ToastManager.show({
           heading: "Some notes are published",
           message: "Unpublish published notes to delete them",
           type: "error",
@@ -95,92 +92,77 @@ export const deleteItems = async (item, context) => {
         });
         continue;
       }
-      await db.notes.delete(note.id);
-    }
-    eSendEvent(eClearEditor);
-  }
+      await db.notes.moveToTrash(id);
 
-  if (topics?.length > 0) {
-    const result = await confirmDeleteAllNotes(topics, "topic", context);
-    if (!result.delete) return;
-    for (const topic of topics) {
-      if (result.deleteNotes) {
-        const notes = db.notebooks
-          .notebook(topic.notebookId)
-          .topics.topic(topic.id).all;
-        await db.notes.delete(...notes.map((note) => note.id));
-      }
-      await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);
+      eSendEvent(
+        eUpdateNoteInEditor,
+        {
+          type: "trash",
+          id: id,
+          itemType: "note"
+        },
+        true
+      );
     }
-    useMenuStore.getState().setMenuPins();
-    ToastEvent.show({
-      heading: `${topics.length > 1 ? "Topics" : "Topic"} deleted`,
-      type: "success"
+  } else if (type === "notebook") {
+    const result = await confirmDeleteAllNotes(ids, "notebook", context);
+    if (!result.delete) return;
+    for (const id of ids) {
+      await deleteNotebook(id, result.deleteNotes);
+      eSendEvent(eOnNotebookUpdated, await getParentNotebookId(id));
+    }
+  } else if (type === "tag") {
+    presentDialog({
+      title: `Delete ${ids.length} ${ids.length > 1 ? "tags" : "tag"}?`,
+      positiveText: "Delete",
+      negativeText: "Cancel",
+      paragraph: "Are you sure you want to delete these tags?",
+      positivePress: async () => {
+        await db.tags.remove(...ids);
+        useTagStore.getState().refresh();
+        useRelationStore.getState().update();
+      },
+      context: context
     });
+    return;
   }
 
-  if (notebooks?.length > 0) {
-    const result = await confirmDeleteAllNotes(notebooks, "notebook", context);
-    if (!result.delete) return;
-    let ids = notebooks.map((i) => i.id);
-    if (result.deleteNotes) {
-      for (let id of ids) {
-        const notebook = db.notebooks.notebook(id);
-        const topics = notebook.topics.all;
-        for (let topic of topics) {
-          const notes = db.notebooks
-            .notebook(topic.notebookId)
-            .topics.topic(topic.id).all;
-          await db.notes.delete(...notes.map((note) => note.id));
-        }
-        const notes = db.relations.from(notebook.data, "note");
-        await db.notes.delete(...notes.map((note) => note.id));
-      }
-    }
-    await db.notebooks.delete(...ids);
-    useMenuStore.getState().setMenuPins();
-  }
-
-  Navigation.queueRoutesForUpdate();
-
-  let message = `${selectedItemsList.length} ${
-    selectedItemsList.length === 1 ? "item" : "items"
+  let message = `${ids.length} ${
+    ids.length === 1 ? "item" : "items"
   } moved to trash.`;
 
-  let deletedItems = [...selectedItemsList];
-  if (
-    topics.length === 0 &&
-    reminders.length === 0 &&
-    (notes.length > 0 || notebooks.length > 0)
-  ) {
-    ToastEvent.show({
+  let deletedIds = [...ids];
+  if (type === "notebook" || type === "note") {
+    ToastManager.show({
       heading: message,
       type: "success",
       func: async () => {
-        let trash = db.trash.all;
-        let ids = [];
-        for (var i = 0; i < deletedItems.length; i++) {
-          let it = deletedItems[i];
-          let trashItem = trash.find((item) => item.id === it.id);
-          ids.push(trashItem.id);
-        }
-        await db.trash.restore(...ids);
+        await db.trash.restore(...deletedIds);
         Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
-        ToastEvent.hide();
+        ToastManager.hide();
+        if (type === "notebook") {
+          deletedIds.forEach(async (id) => {
+            eSendEvent(eOnNotebookUpdated, await getParentNotebookId(id));
+          });
+        }
       },
       actionText: "Undo"
     });
   }
+
   Navigation.queueRoutesForUpdate();
-  if (!item) {
+  if (!items) {
     useSelectionStore.getState().clearSelection();
   }
-  useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
-  SearchService.updateAndSearch();
-  eSendEvent(eOnTopicSheetUpdate);
+  if (type === "notebook") {
+    ids.forEach(async (id) => {
+      eSendEvent(eOnNotebookUpdated, await getParentNotebookId(id));
+    });
+    useMenuStore.getState().setMenuPins();
+  }
 };
 
 export const openLinkInBrowser = async (link) => {

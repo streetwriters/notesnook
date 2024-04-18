@@ -27,3 +27,20 @@ export async function consumeReadableStream<T>(
   }
   return chunks;
 }
+
+export function fromAsyncIterator<T>(
+  iterator: AsyncIterableIterator<T>
+): ReadableStream<T> {
+  return new ReadableStream<T>({
+    start() {},
+    async pull(controller) {
+      const result = await iterator.next();
+      if (result.done) controller.close();
+      else if (result.value) controller.enqueue(result.value);
+    },
+    async cancel(reason) {
+      if (iterator.throw) await iterator.throw(reason);
+      else throw new Error(reason);
+    }
+  });
+}

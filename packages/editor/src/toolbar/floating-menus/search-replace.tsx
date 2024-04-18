@@ -17,20 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SearchStorage } from "../../extensions/search-replace";
+import { useLayoutEffect } from "react";
 import { FloatingMenuProps } from "./types";
 import { SearchReplacePopup } from "../popups/search-replace";
 import { ResponsivePresenter } from "../../components/responsive";
 import { getEditorContainer, getToolbarElement } from "../utils/dom";
+import { useEditorSearchStore } from "../stores/search-store";
 
 export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
   const { editor } = props;
-  const { isSearching } = editor.storage.searchreplace as SearchStorage;
+  const isSearching = useEditorSearchStore((store) => store.isSearching);
+
+  useLayoutEffect(() => {
+    const { searchTerm, ...options } = useEditorSearchStore.getState();
+    if (!options.isSearching) editor.commands.endSearch();
+    else editor.commands.search(searchTerm, options);
+  }, []);
 
   return (
     <ResponsivePresenter
       mobile="sheet"
-      desktop="menu"
+      desktop="popup"
       isOpen={isSearching}
       onClose={() => editor.commands.endSearch()}
       position={{

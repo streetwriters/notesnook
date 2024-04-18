@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useRef, useEffect, PropsWithChildren } from "react";
-import { Box } from "@theme-ui/components";
+import { Box, BoxProps } from "@theme-ui/components";
 import { getPosition, PositionOptions } from "../../utils/position";
 import Modal from "react-modal";
 import { EmotionThemeProvider, ThemeScopes } from "@notesnook/theme";
@@ -32,7 +32,8 @@ export type PopupPresenterProps = {
   movable?: boolean;
   scope?: keyof ThemeScopes;
   isMobile?: boolean;
-};
+  container?: HTMLElement;
+} & BoxProps;
 
 function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
   const {
@@ -43,7 +44,9 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
     focusOnRender = true,
     children,
     scope,
-    isMobile
+    isMobile,
+    container,
+    ...restProps
   } = props;
 
   const contentRef = useRef<HTMLDivElement>();
@@ -139,7 +142,8 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
       className={"popup-presenter"}
       role="menu"
       isOpen={isOpen}
-      appElement={document.body}
+      appElement={container || document.body}
+      parentSelector={() => container || document.body}
       shouldCloseOnEsc
       shouldReturnFocusAfterClose
       shouldCloseOnOverlayClick
@@ -149,6 +153,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
       onRequestClose={onClose}
       portalClassName={"popup-presenter-portal"}
       onAfterOpen={(obj) => {
+        Modal.setAppElement(container || document.body);
         if (!obj || !position) return;
         repositionPopup(position);
 
@@ -201,6 +206,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
             padding: 0,
             zIndex: 999,
             outline: 0,
+            opacity: `1 !important`,
             isolation: "isolate"
           }}
         >
@@ -211,11 +217,14 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
         content: {},
         overlay: {
           zIndex: 999,
-          background: "transparent"
+          background: "transparent",
+          opacity: 1
         }
       }}
     >
-      <EmotionThemeProvider scope={scope}>{children}</EmotionThemeProvider>
+      <EmotionThemeProvider scope={scope} {...restProps}>
+        {children}
+      </EmotionThemeProvider>
     </Modal>
   );
 }

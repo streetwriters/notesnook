@@ -17,24 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Item } from "@notesnook/core";
 import { useSelectionStore } from "../stores/use-selection-store";
 
-export default function useIsSelected(item: any) {
+export default function useIsSelected(item: Item) {
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const selectedItemsList = useSelectionStore(
     (state) => state.selectedItemsList
   );
   const selected =
     selectionMode &&
-    selectedItemsList.findIndex(
-      (selectedItem: any) => selectedItem.id === item.id
-    ) > -1;
+    selectedItemsList.findIndex((selectedId) => selectedId === item.id) > -1;
 
   function toggle() {
-    if (!useSelectionStore.getState().selectionMode) {
-      useSelectionStore.getState().setSelectionMode(true);
+    if (useSelectionStore.getState().selectionMode !== item.type) {
+      useSelectionStore.getState().setSelectionMode(item.type);
     }
-    useSelectionStore.getState().setSelectedItem(item);
+    useSelectionStore.getState().setSelectedItem(item.id);
   }
 
   return [selected, toggle];

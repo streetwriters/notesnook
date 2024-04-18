@@ -17,34 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useMemo } from "react";
-import { Text, TextProps } from "react-native";
-import Animated, {
-  ComplexAnimationBuilder,
-  Layout
-} from "react-native-reanimated";
 import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { Text, TextProps } from "react-native";
 import { SIZE } from "../../../utils/size";
 interface ParagraphProps extends TextProps {
   color?: string;
   size?: number;
-  layout?: ComplexAnimationBuilder;
-  animated?: boolean;
 }
-const AnimatedText = Animated.createAnimatedComponent(Text);
 const Paragraph = ({
   color,
   size = SIZE.sm,
   style,
-  animated,
   ...restProps
 }: ParagraphProps) => {
   const { colors } = useThemeColors();
-  const Component = useMemo(() => (animated ? AnimatedText : Text), [animated]);
 
   return (
-    <Component
-      layout={restProps.layout || Layout}
+    <Text
       {...restProps}
       style={[
         {

@@ -19,14 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { db } from "../../common/db";
 import { lazify } from "../lazify";
+import { showToast } from "../toast";
 import { makeUniqueFilename } from "./utils";
 import { ZipFile } from "./zip-stream";
+import { Attachment } from "@notesnook/core";
 
 export const METADATA_FILENAME = "metadata.json";
 const GROUP_ID = "all-attachments";
 export class AttachmentStream extends ReadableStream<ZipFile> {
   constructor(
-    attachments: Array<any>,
+    ids: string[],
+    resolve: (id: string) => Promise<Attachment | undefined> | undefined,
     signal?: AbortSignal,
     onProgress?: (current: number) => void
   ) {
@@ -34,7 +37,7 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
     const counters: Record<string, number> = {};
     if (signal)
       signal.onabort = async () => {
-        await db.fs?.cancel(GROUP_ID, "download");
+        await db.fs().cancel(GROUP_ID);
       };
 
     super({
@@ -47,42 +50,47 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
           }
 
           onProgress && onProgress(index);
-          const attachment = attachments[index++];
+          const attachment = await resolve(ids[index++]);
+          if (!attachment) return;
 
-          await db.fs?.downloadFile(
-            GROUP_ID,
-            attachment.metadata.hash,
-            attachment.chunkSize,
-            attachment.metadata
-          );
+          if (
+            !(await db
+              .fs()
+              .downloadFile(GROUP_ID, attachment.hash, attachment.chunkSize))
+          )
+            return;
 
-          const key = await db.attachments?.decryptKey(attachment.key);
+          const key = await db.attachments.decryptKey(attachment.key);
+          if (!key) return;
+
           const file = await lazify(
             import("../../interfaces/fs"),
             ({ decryptFile }) =>
-              decryptFile(attachment.metadata.hash, {
+              decryptFile(attachment.hash, {
                 key,
                 iv: attachment.iv,
-                name: attachment.metadata.filename,
-                type: attachment.metadata.type,
+                name: attachment.filename,
+                type: attachment.mimeType,
                 isUploaded: !!attachment.dateUploaded
               })
           );
 
           if (file) {
-            const filePath: string = attachment.metadata.filename;
+            const filePath: string = attachment.filename;
             controller.enqueue({
               path: makeUniqueFilename(filePath, counters),
               data: new Uint8Array(await file.arrayBuffer())
             });
           } else {
-            controller.error(new Error("Failed to decrypt file."));
+            throw new Error(
+              `Failed to decrypt file (hash: ${attachment.hash}, filename: ${attachment.filename}).`
+            );
           }
         } catch (e) {
           console.error(e);
-          controller.error(e);
+          showToast("error", (e as Error).message);
         } finally {
-          if (index === attachments.length) {
+          if (index === ids.length) {
             controller.close();
           }
         }

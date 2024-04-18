@@ -40,6 +40,7 @@ import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { useThemeColors } from "@notesnook/theme";
+import { getContainerBorder } from "../../utils/colors";
 
 export type TStep = {
   text?: string;
@@ -82,7 +83,8 @@ const NotebookWelcome = () => {
         width: "100%",
         padding: 12,
         backgroundColor: colors.secondary.background,
-        borderRadius: 10
+        borderRadius: 10,
+        ...getContainerBorder(colors.secondary.background)
       }}
     >
       <View
@@ -127,15 +129,16 @@ const notebooks: { id: string; steps: TStep[] } = {
       }
     },
     {
-      title: "Notebook > Topic > Notes",
-      text: "Every Notebook has various topics which are like sections that hold all your notes.",
-      walkthroughItem: (colors: ThemeStore["colors"]) => (
+      title: "Notebook > Notes",
+      text: "Every Notebook can have notes and sub notebooks.",
+      walkthroughItem: (colors: any) => (
         <View
           style={{
             width: "100%",
             padding: 12,
             backgroundColor: colors.secondary.background,
-            borderRadius: 10
+            borderRadius: 10,
+            ...getContainerBorder(colors.secondary.background)
           }}
         >
           <View
@@ -242,7 +245,7 @@ const notebooks: { id: string; steps: TStep[] } = {
     },
     {
       title: "Easy access",
-      text: "You can create shortcuts of frequently accessed notebooks or topics in Side Menu",
+      text: "You can create shortcuts of frequently accessed notebooks in the side menu",
       walkthroughItem: () => (
         <View
           style={{
@@ -257,7 +260,7 @@ const notebooks: { id: string; steps: TStep[] } = {
               title: "Tasks",
               type: "topic"
             }}
-            onPress={() => { }}
+            onPress={() => {}}
           />
 
           <PinItem
@@ -267,7 +270,7 @@ const notebooks: { id: string; steps: TStep[] } = {
               title: "Work and office",
               type: "notebook"
             }}
-            onPress={() => { }}
+            onPress={() => {}}
           />
         </View>
       ),
@@ -399,7 +402,7 @@ const Support = () => {
           Linking.openURL("https://discord.gg/zQBK97EE22").catch(console.log);
         }}
         icon="discord"
-        type="grayBg"
+        type="secondary"
         title="Join our community on Discord"
       />
 
@@ -413,7 +416,7 @@ const Support = () => {
           Linking.openURL("https://t.me/notesnook").catch(console.log);
         }}
         icon="telegram"
-        type="grayBg"
+        type="secondary"
         title="Join our Telegram group"
       />
       <Button
@@ -423,7 +426,7 @@ const Support = () => {
           width: "90%"
         }}
         icon="bug"
-        type="grayBg"
+        type="secondary"
         title="Submit an issue from Settings"
       />
       <Button
@@ -433,7 +436,7 @@ const Support = () => {
           width: "90%"
         }}
         icon="mail"
-        type="grayBg"
+        type="secondary"
         title="Email us at support@streetwriters.co"
       />
     </View>

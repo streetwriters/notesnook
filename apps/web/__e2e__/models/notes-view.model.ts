@@ -32,8 +32,12 @@ export class NotesViewModel extends BaseViewModel {
   private readonly createButton: Locator;
   readonly editor: EditorModel;
 
-  constructor(page: Page, pageId: "home" | "notes" | "notebook") {
-    super(page, pageId, pageId === "home" ? "home" : "notes");
+  constructor(
+    page: Page,
+    pageId: "home" | "notes" | "favorites" | "notebook",
+    listType: string
+  ) {
+    super(page, pageId, listType);
     this.createButton = page.locator(
       // TODO:
       getTestId(`notes-action-button`)

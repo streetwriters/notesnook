@@ -16,6 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { VirtualizedGrouping } from "@notesnook/core";
+import { Item, ItemReference } from "@notesnook/core/dist/types";
+import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useEffect, useState } from "react";
 import { View } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
@@ -23,18 +26,16 @@ import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
 import {
-  presentSheet,
-  PresentSheetOptions
+  PresentSheetOptions,
+  presentSheet
 } from "../../../services/event-manager";
-import { Reminder } from "../../../services/notifications";
 import { useRelationStore } from "../../../stores/use-relation-store";
-import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
 import List from "../../list";
 import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
-import { PressableButtonProps } from "../../ui/pressable";
+import { PressableProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 
 type RelationsListProps = {
@@ -53,7 +54,7 @@ type Button = {
   onPress?: (() => void) | undefined;
   loading?: boolean | undefined;
   title?: string | undefined;
-  type?: PressableButtonProps["type"];
+  type?: PressableProps["type"];
   icon?: string;
 };
 
@@ -73,13 +74,23 @@ export const RelationsList = ({
   const updater = useRelationStore((state) => state.updater);
   const { colors } = useThemeColors();
 
-  const items =
-    (db.relations?.[relationType]?.(
-      { id: item?.id, type: item?.type },
-      referenceType
-    ) as any) || [];
+  const [items, setItems] = useState<VirtualizedGrouping<Item>>();
 
-  const hasNoRelations = !items || items.length === 0;
+  const hasNoRelations = !items || items?.placeholders?.length === 0;
+
+  useEffect(() => {
+    db.relations?.[relationType]?.(
+      { id: item?.id, type: item?.type } as ItemReference,
+      referenceType as any
+    )
+      .selector.sorted({
+        sortBy: "dateEdited",
+        sortDirection: "desc"
+      })
+      .then((grouped) => {
+        setItems(grouped);
+      });
+  }, [relationType, referenceType, item?.id, item?.type]);
 
   return (
     <View
@@ -119,15 +130,11 @@ export const RelationsList = ({
         </View>
       ) : (
         <List
-          listData={items}
-          ScrollComponent={FlashList}
+          data={items}
+          CustomListComponent={FlashList}
           loading={false}
-          type={referenceType}
-          headerProps={null}
-          isSheet={true}
-          onMomentumScrollEnd={() => {
-            actionSheetRef?.current?.handleChildScrollEnd();
-          }}
+          dataType={referenceType as any}
+          isRenderedInActionSheet={true}
         />
       )}
     </View>

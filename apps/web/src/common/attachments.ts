@@ -18,20 +18,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { lazify } from "../utils/lazify";
+import { showToast } from "../utils/toast";
 import { db } from "./db";
 
 async function download(hash: string, groupId?: string) {
-  const attachment = db.attachments?.attachment(hash);
+  const attachment = await db.attachments.attachment(hash);
   if (!attachment) return;
-  const downloadResult = await db.fs?.downloadFile(
-    groupId || attachment.metadata.hash,
-    attachment.metadata.hash,
-    attachment.chunkSize,
-    attachment.metadata
-  );
+  const downloadResult = await db
+    .fs()
+    .downloadFile(
+      groupId || attachment.hash,
+      attachment.hash,
+      attachment.chunkSize
+    );
   if (!downloadResult) throw new Error("Failed to download file.");
 
-  const key = await db.attachments?.decryptKey(attachment.key);
+  const key = await db.attachments.decryptKey(attachment.key);
   if (!key) throw new Error("Invalid key for attachment.");
 
   return { key, attachment };
@@ -42,12 +44,12 @@ export async function saveAttachment(hash: string) {
   if (!response) return;
 
   const { attachment, key } = response;
-  await lazify(import("../interfaces/fs"), ({ default: FS }) =>
-    FS.saveFile(attachment.metadata.hash, {
+  await lazify(import("../interfaces/fs"), ({ saveFile }) =>
+    saveFile(attachment.hash, {
       key,
       iv: attachment.iv,
-      name: attachment.metadata.filename,
-      type: attachment.metadata.type,
+      name: attachment.filename,
+      type: attachment.mimeType,
       isUploaded: !!attachment.dateUploaded
     })
   );
@@ -66,47 +68,47 @@ export async function downloadAttachment<
   type: TType,
   groupId?: string
 ): Promise<TOutputType | undefined> {
-  const response = await download(hash, groupId);
-  if (!response) return;
-  const { attachment, key } = response;
+  try {
+    const response = await download(hash, groupId);
+    if (!response) return;
+    const { attachment, key } = response;
 
-  if (type === "base64" || type === "text")
-    return (await db.attachments?.read(hash, type)) as TOutputType;
+    if (type === "base64" || type === "text")
+      return (await db.attachments.read(hash, type)) as TOutputType;
 
-  const blob = await lazify(import("../interfaces/fs"), ({ default: FS }) =>
-    FS.decryptFile(attachment.metadata.hash, {
-      key,
-      iv: attachment.iv,
-      name: attachment.metadata.filename,
-      type: attachment.metadata.type,
-      isUploaded: !!attachment.dateUploaded
-    })
-  );
+    const blob = await lazify(import("../interfaces/fs"), ({ decryptFile }) =>
+      decryptFile(attachment.hash, {
+        key,
+        iv: attachment.iv,
+        name: attachment.filename,
+        type: attachment.mimeType,
+        isUploaded: !!attachment.dateUploaded
+      })
+    );
 
-  if (!blob) return;
-  return blob as TOutputType;
+    if (!blob) return;
+    return blob as TOutputType;
+  } catch (e) {
+    console.error(e);
+    showToast(
+      "error",
+      `Failed to download attachment: ${hash} (error: ${(e as Error).message})`
+    );
+  }
 }
 
 export async function checkAttachment(hash: string) {
-  const attachment = db.attachments?.attachment(hash);
+  const attachment = await db.attachments.attachment(hash);
   if (!attachment) return { failed: "Attachment not found." };
 
   try {
-    const size = await lazify(import("../interfaces/fs"), ({ default: FS }) =>
-      FS.getUploadedFileSize(hash)
+    const size = await lazify(
+      import("../interfaces/fs"),
+      ({ getUploadedFileSize }) => getUploadedFileSize(hash)
     );
     if (size <= 0) return { failed: "File length is 0." };
   } catch (e) {
     return { failed: e instanceof Error ? e.message : "Unknown error." };
   }
   return { success: true };
-}
-
-const ABYTES = 17;
-export function getTotalSize(attachments: any[]) {
-  let size = 0;
-  for (const attachment of attachments) {
-    size += attachment.length + ABYTES;
-  }
-  return size;
 }

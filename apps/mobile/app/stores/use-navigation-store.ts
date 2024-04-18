@@ -17,73 +17,72 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import create, { State } from "zustand";
-import { ColorValues } from "../utils/colors";
+import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
 import {
-  ColorType,
-  MonographType,
-  NotebookType,
-  TagType,
-  TopicType
-} from "../utils/types";
+  Color,
+  Item,
+  ItemType,
+  Note,
+  Notebook,
+  Reminder,
+  Tag,
+  TrashItem
+} from "@notesnook/core/dist/types";
+import create, { State } from "zustand";
 
-export type GenericRouteParam = { [name: string]: unknown };
+export type GenericRouteParam = undefined;
 
 export type NotebookScreenParams = {
-  item: NotebookType;
+  item: Notebook;
   title: string;
-  canGoBack: boolean;
+  canGoBack?: boolean;
 };
 
 export type NotesScreenParams = {
-  item: TopicType | TagType | ColorType | MonographType;
+  item: Note | Notebook | Tag | Color | TrashItem | Reminder;
   title: string;
-  canGoBack: boolean;
+  canGoBack?: boolean;
 };
 
 export type AppLockRouteParams = {
   welcome: boolean;
-  canGoBack: boolean;
+  canGoBack?: boolean;
 };
 
 export type AuthParams = {
   mode: number;
   title: string;
-  canGoBack: boolean;
+  canGoBack?: boolean;
 };
 
 export type RouteParams = {
   Notes: GenericRouteParam;
-  Notebooks: GenericRouteParam;
+  Notebooks: {
+    canGoBack?: boolean;
+  };
   Notebook: NotebookScreenParams;
   NotesPage: NotesScreenParams;
   Tags: GenericRouteParam;
   Favorites: GenericRouteParam;
   Trash: GenericRouteParam;
-  Search: GenericRouteParam;
+  Search: {
+    placeholder: string;
+    type: ItemType;
+    title: string;
+    route: RouteName;
+    items?: FilteredSelector<Item>;
+  };
   Settings: GenericRouteParam;
   TaggedNotes: NotesScreenParams;
   ColoredNotes: NotesScreenParams;
   TopicNotes: NotesScreenParams;
   Monographs: NotesScreenParams;
   AppLock: AppLockRouteParams;
-  Auth: AuthParams;
   Reminders: GenericRouteParam;
   SettingsGroup: GenericRouteParam;
 };
 
 export type RouteName = keyof RouteParams;
-
-export type CurrentScreen = {
-  name: RouteName;
-  id?: string;
-  title?: string;
-  type?: string;
-  color?: string | null;
-  alias?: string;
-  notebookId?: string;
-  beta?: boolean;
-};
 
 export type HeaderRightButton = {
   title: string;
@@ -91,52 +90,31 @@ export type HeaderRightButton = {
 };
 
 interface NavigationStore extends State {
-  currentScreen: CurrentScreen;
-  currentScreenRaw: CurrentScreen;
-  canGoBack: boolean | undefined;
-  update: (
-    currentScreen: CurrentScreen,
-    canGoBack?: boolean,
-    headerRightButtons?: HeaderRightButton[]
-  ) => void;
+  currentRoute: RouteName;
+  canGoBack?: boolean;
+  focusedRouteId?: string;
+  update: (currentScreen: RouteName) => void;
   headerRightButtons?: HeaderRightButton[];
   buttonAction: () => void;
   setButtonAction: (buttonAction: () => void) => void;
+  setFocusedRouteId: (id?: string) => void;
 }
 
 const useNavigationStore = create<NavigationStore>((set, get) => ({
-  currentScreen: {
-    name: "Notes",
-    id: "notes_navigation",
-    title: "Notes",
-    type: "notes"
-  },
-  currentScreenRaw: { name: "Notes" },
-  canGoBack: false,
-  update: (currentScreen, canGoBack, headerRightButtons) => {
-    const color =
-      ColorValues[
-        currentScreen.color?.toLowerCase() as keyof typeof ColorValues
-      ];
-    if (
-      JSON.stringify(currentScreen) === JSON.stringify(get().currentScreenRaw)
-    )
-      return;
+  focusedRouteId: "Notes",
+  setFocusedRouteId: (id) => {
     set({
-      currentScreen: {
-        name: currentScreen.name,
-        id:
-          currentScreen.id || currentScreen.name.toLowerCase() + "_navigation",
-        title: currentScreen.alias || currentScreen.title || currentScreen.name,
-        type: currentScreen.type,
-        color: color,
-        notebookId: currentScreen.notebookId,
-        beta: currentScreen.beta
-      },
-      currentScreenRaw: currentScreen,
-      canGoBack,
-      headerRightButtons: headerRightButtons
+      focusedRouteId: id
     });
+    console.log("CurrentRoute ID", id);
+  },
+  currentRoute: "Notes",
+  canGoBack: false,
+  update: (currentScreen) => {
+    set({
+      currentRoute: currentScreen
+    });
+    console.log("CurrentRoute", currentScreen);
   },
   headerRightButtons: [],
   buttonAction: () => null,

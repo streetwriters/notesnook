@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ToolProps } from "../types";
 import { Box, Button, Flex } from "@theme-ui/components";
 import { IconNames } from "../icons";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useLayoutEffect } from "react";
 import { SplitButton } from "../components/split-button";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { getToolbarElement } from "../utils/dom";
@@ -52,6 +52,8 @@ function _ListTool<TListStyleTypes extends string>(
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
+  useLayoutEffect(() => () => setIsOpen(false), []);
+
   return (
     <SplitButton
       {...toolProps}
@@ -81,6 +83,7 @@ function _ListTool<TListStyleTypes extends string>(
             bg: "background",
             display: "grid",
             gridTemplateColumns: "1fr 1fr 1fr",
+            gap: 1,
             p: 1
           }}
         >
@@ -88,12 +91,12 @@ function _ListTool<TListStyleTypes extends string>(
             <Button
               key={item.title}
               variant={"menuitem"}
-              sx={{ width: 80 }}
+              sx={{ width: 80, p: 0 }}
               onClick={() => {
-                let chain = editor.current?.chain().focus();
-                if (!chain || !editor.current) return;
+                let chain = editor.chain().focus();
+                if (!chain || !editor) return;
 
-                if (!isListActive(editor.current)) {
+                if (!isListActive(editor)) {
                   if (type === "bulletList") chain = chain.toggleBulletList();
                   else chain = chain.toggleOrderedList();
                 }
@@ -120,7 +123,7 @@ export function NumberedList(props: ToolProps) {
   const { editor } = props;
 
   const onClick = useCallback(
-    () => editor.current?.chain().focus().toggleOrderedList().run(),
+    () => editor.chain().focus().toggleOrderedList().run(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -154,7 +157,7 @@ export function NumberedList(props: ToolProps) {
 export function BulletList(props: ToolProps) {
   const { editor } = props;
   const onClick = useCallback(
-    () => editor.current?.chain().focus().toggleBulletList().run(),
+    () => editor.chain().focus().toggleBulletList().run(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -174,6 +177,18 @@ export function BulletList(props: ToolProps) {
   );
 }
 
+export function CheckList(props: ToolProps) {
+  const { editor, ...toolProps } = props;
+
+  return (
+    <ToolButton
+      {...toolProps}
+      toggled={false}
+      onClick={() => editor.chain().focus().toggleCheckList().run()}
+    />
+  );
+}
+
 export function Indent(props: ToolProps) {
   const { editor, ...toolProps } = props;
   const isBottom = useToolbarLocation() === "bottom";
@@ -185,9 +200,7 @@ export function Indent(props: ToolProps) {
     <ToolButton
       {...toolProps}
       toggled={false}
-      onClick={() =>
-        editor.current?.chain().focus().sinkListItem(listItemType).run()
-      }
+      onClick={() => editor.chain().focus().sinkListItem(listItemType).run()}
     />
   );
 }
@@ -203,9 +216,7 @@ export function Outdent(props: ToolProps) {
     <ToolButton
       {...toolProps}
       toggled={false}
-      onClick={() =>
-        editor.current?.chain().focus().liftListItem(listItemType).run()
-      }
+      onClick={() => editor.chain().focus().liftListItem(listItemType).run()}
     />
   );
 }
@@ -221,9 +232,16 @@ function ListThumbnail(props: ListThumbnailProps) {
         flex: 1,
         p: 0,
         listStyleType,
-        gap: 1
+        ml: 4,
+        mr: 1,
+        my: 1,
+        gap: `7px`
       }}
-      onMouseDown={(e) => e.preventDefault()}
+      onMouseDown={(e) => {
+        if (globalThis.keyboardShown) {
+          e.preventDefault();
+        }
+      }}
     >
       {[0, 1, 2].map((i) => (
         <Box
@@ -232,25 +250,12 @@ function ListThumbnail(props: ListThumbnailProps) {
           sx={{
             display: "list-item",
             color: "paragraph",
-            fontSize: 8
+            fontSize: 8,
+            bg: "border",
+            height: `7px`,
+            borderRadius: "small"
           }}
-        >
-          <Flex
-            sx={{
-              alignItems: "center"
-            }}
-          >
-            <Box
-              sx={{
-                width: "100%",
-                flexShrink: 0,
-                height: 5,
-                bg: "border",
-                borderRadius: "small"
-              }}
-            />
-          </Flex>
-        </Box>
+        />
       ))}
     </Flex>
   );

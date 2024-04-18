@@ -61,7 +61,7 @@ export class AppModel {
 
   async goToNotes() {
     await this.navigateTo("Notes");
-    return new NotesViewModel(this.page, "home");
+    return new NotesViewModel(this.page, "home", "home");
   }
 
   async goToNotebooks() {
@@ -71,7 +71,7 @@ export class AppModel {
 
   async goToFavorites() {
     await this.navigateTo("Favorites");
-    return new NotesViewModel(this.page, "notes");
+    return new NotesViewModel(this.page, "notes", "favorites");
   }
 
   async goToReminders() {
@@ -81,12 +81,12 @@ export class AppModel {
 
   async goToTags() {
     await this.navigateTo("Tags");
-    return new ItemsViewModel(this.page, "tags");
+    return new ItemsViewModel(this.page);
   }
 
   async goToColor(color: string) {
     await this.navigateTo(color);
-    return new NotesViewModel(this.page, "notes");
+    return new NotesViewModel(this.page, "notes", "notes");
   }
 
   async goToTrash() {
@@ -123,12 +123,9 @@ export class AppModel {
     );
   }
 
-  async waitForSync(
-    state: "completed" | "synced" = "completed",
-    text?: string
-  ) {
+  async waitForSync(state: "completed" | "synced" = "completed") {
     await this.page
-      .locator(getTestId(`sync-status-${state}`), { hasText: text })
+      .locator(getTestId(`sync-status-${state}`))
       .waitFor({ state: "visible" });
   }
 

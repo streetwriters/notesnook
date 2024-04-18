@@ -24,7 +24,7 @@ import { eSendEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useThemeColors } from "@notesnook/theme";
 import { GROUP, SORT } from "../../../utils/constants";
-import { refreshNotesPage } from "../../../utils/events";
+import { eGroupOptionsUpdated, refreshNotesPage } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
@@ -33,15 +33,16 @@ const Sort = ({ type, screen }) => {
   const isTopicSheet = screen === "TopicSheet";
   const { colors } = useThemeColors();
   const [groupOptions, setGroupOptions] = useState(
-    db.settings.getGroupOptions(type)
+    db.settings.getGroupOptions(screen === "Notes" ? "home" : type + "s")
   );
   const updateGroupOptions = async (_groupOptions) => {
-    await db.settings.setGroupOptions(type, _groupOptions);
-
+    const groupType = screen === "Notes" ? "home" : type + "s";
+    console.log("updateGroupOptions for group", groupType, "in", screen);
+    await db.settings.setGroupOptions(groupType, _groupOptions);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
       if (screen !== "TopicSheet") Navigation.queueRoutesForUpdate(screen);
-      eSendEvent("groupOptionsUpdate");
+      eSendEvent(eGroupOptionsUpdated, groupType);
       eSendEvent(refreshNotesPage);
     }, 1);
   };
@@ -135,7 +136,7 @@ const Sort = ({ type, screen }) => {
       >
         {groupOptions.groupBy === "abc" ? (
           <Button
-            type={"grayBg"}
+            type="secondary"
             title="Title"
             height={40}
             iconPosition="left"
@@ -147,14 +148,13 @@ const Sort = ({ type, screen }) => {
         ) : (
           Object.keys(SORT).map((item) =>
             (item === "dueDate" && screen !== "Reminders") ||
-            (item === "title" && groupOptions.groupBy !== "none") ||
             ((screen !== "Tags" || screen !== "Reminders") &&
               item === "dateModified") ||
             ((screen === "Tags" || screen === "Reminders") &&
               item === "dateEdited") ? null : (
               <Button
                 key={item}
-                type={groupOptions.sortBy === item ? "selected" : "gray"}
+                type={groupOptions.sortBy === item ? "selected" : "plain"}
                 title={SORT[item]}
                 height={40}
                 iconPosition="left"
@@ -175,7 +175,7 @@ const Sort = ({ type, screen }) => {
                     ...groupOptions,
                     sortBy: type === "trash" ? "dateDeleted" : item
                   };
-                  if (type === "topics") {
+                  if (screen === "TopicSheet") {
                     _groupOptions.groupBy = "none";
                   }
                   await updateGroupOptions(_groupOptions);
@@ -213,7 +213,7 @@ const Sort = ({ type, screen }) => {
                 key={item}
                 testID={"btn-" + item}
                 type={
-                  groupOptions.groupBy === GROUP[item] ? "selected" : "gray"
+                  groupOptions.groupBy === GROUP[item] ? "selected" : "plain"
                 }
                 buttonType={{
                   text:
@@ -230,12 +230,8 @@ const Sort = ({ type, screen }) => {
                   if (item === "abc") {
                     _groupOptions.sortBy = "title";
                     _groupOptions.sortDirection = "asc";
-                  } else {
-                    if (groupOptions.sortBy === "title") {
-                      _groupOptions.sortBy = "dateEdited";
-                      _groupOptions.sortDirection = "desc";
-                    }
                   }
+
                   updateGroupOptions(_groupOptions);
                 }}
                 height={40}

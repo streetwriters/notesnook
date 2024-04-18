@@ -37,10 +37,10 @@ import {
 import { ThemeMetadata } from "@notesnook/themes-server";
 import { showThemeDetails } from "../../../common/dialog-controller";
 import { ThemePreview } from "../../../components/theme-preview";
-import { VirtuosoGrid } from "react-virtuoso";
 import { Loader } from "../../../components/loader";
 import { showToast } from "../../../utils/toast";
 import { showFilePicker, readFile } from "../../../utils/file-picker";
+import { VirtualizedGrid } from "../../../components/virtualized-grid";
 
 const ThemesClient = ThemesTRPC.createClient({
   links: [
@@ -107,6 +107,18 @@ function ThemesList() {
     }
   );
 
+  const items = [
+    {
+      ...darkTheme,
+      previewColors: getPreviewColors(darkTheme)
+    },
+    {
+      ...lightTheme,
+      previewColors: getPreviewColors(lightTheme)
+    },
+    ...(themes.data?.pages.flatMap((a) => a.themes) || [])
+  ];
+
   const setTheme = useCallback(
     async (theme: ThemeMetadata) => {
       if (isThemeCurrentlyApplied(theme.id)) return;
@@ -168,7 +180,7 @@ function ThemesList() {
           <Button
             variant="secondary"
             onClick={async () => {
-              const file = await showFilePicker({
+              const [file] = await showFilePicker({
                 acceptedFileTypes: "application/json"
               });
               if (!file) return;
@@ -198,38 +210,22 @@ function ThemesList() {
 
       <Box
         sx={{
-          ".virtuoso-grid-list": {
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 2
-          },
           mt: 2
         }}
       >
         {themes.isInitialLoading ? (
           <Loader title={"Loading themes..."} />
         ) : (
-          <VirtuosoGrid
-            customScrollParent={
-              document.getElementById("settings-scrollbar") || undefined
-            }
-            data={[
-              {
-                ...darkTheme,
-                previewColors: getPreviewColors(darkTheme)
-              },
-              {
-                ...lightTheme,
-                previewColors: getPreviewColors(lightTheme)
-              },
-              ...(themes.data?.pages.flatMap((a) => a.themes) || [])
-            ]}
-            endReached={() =>
+          <VirtualizedGrid
+            columns={2}
+            items={items}
+            getItemKey={(index) => items[index].id}
+            estimatedSize={285}
+            mode="dynamic"
+            onEndReached={() =>
               themes.hasNextPage ? themes.fetchNextPage() : null
             }
-            context={{ darkTheme, lightTheme, setTheme }}
-            computeItemKey={(_index, item) => item.id}
-            itemContent={(_index, theme) => (
+            renderItem={({ item: theme }) => (
               <ThemeItem
                 key={theme.id}
                 theme={theme}

@@ -29,16 +29,18 @@ import { MMKV } from "../../common/database/mmkv";
 import { AttachmentDialog } from "../../components/attachments";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
+import { AppLockPassword } from "../../components/dialogs/applock-password";
 import { ChangeEmail } from "../../components/sheets/change-email";
 import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
 import { Progress } from "../../components/sheets/progress";
 import { Update } from "../../components/sheets/update";
 import { VaultStatusType, useVaultStatus } from "../../hooks/use-vault-status";
+import { BackgroundSync } from "../../services/background-sync";
 import BackupService from "../../services/backup";
 import BiometicService from "../../services/biometrics";
 import {
-  ToastEvent,
+  ToastManager,
   eSendEvent,
   openVault,
   presentSheet
@@ -50,6 +52,7 @@ import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
 import { clearAllStores } from "../../stores";
+import { refreshAllStores } from "../../stores/create-db-collection-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
@@ -63,11 +66,11 @@ import {
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
-import AppLock from "./app-lock";
 import { useDragState } from "./editor/state";
-import { verifyUser } from "./functions";
+import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+
 type User = any;
 
 export const settingsGroups: SettingSection[] = [
@@ -130,6 +133,58 @@ export const settingsGroups: SettingSection[] = [
         icon: "account-cog",
         description: "Manage account",
         sections: [
+          {
+            id: "remove-profile-picture",
+            name: "Remove profile picture",
+            description: "Remove your picture from profile",
+            useHook: () =>
+              useUserStore((state) => state.profile?.profilePicture),
+            hidden: () => !useUserStore.getState().profile?.profilePicture,
+            modifer: () => {
+              presentDialog({
+                title: "Remove profile picture",
+                paragraph:
+                  "Are you sure you want to remove your profile picture?",
+                positiveText: "Remove",
+                positivePress: async () => {
+                  db.settings
+                    .setProfile({
+                      profilePicture: undefined
+                    })
+                    .then(async () => {
+                      useUserStore.setState({
+                        profile: db.settings.getProfile()
+                      });
+                    });
+                }
+              });
+            }
+          },
+          {
+            id: "remove-name",
+            name: "Remove full name",
+            description: "Remove your name from profile",
+            useHook: () => useUserStore((state) => state.profile?.fullName),
+            hidden: () => !useUserStore.getState().profile?.fullName,
+            modifer: () => {
+              presentDialog({
+                title: "Remove name",
+                paragraph: "Are you sure you want to remove your name?",
+                positiveText: "Remove",
+                positivePress: async () => {
+                  db.settings
+                    .setProfile({
+                      fullName: undefined
+                    })
+                    .then(async () => {
+                      useUserStore.setState({
+                        profile: db.settings.getProfile()
+                      });
+                    });
+                }
+              });
+            }
+          },
           {
             id: "recovery-key",
             name: "Save data recovery key",
@@ -297,6 +352,8 @@ export const settingsGroups: SettingSection[] = [
                       await BiometicService.resetCredentials();
                       MMKV.clearStore();
                       clearAllStores();
+                      refreshAllStores();
+                      Navigation.queueRoutesForUpdate();
                       SettingsService.resetSettings();
                       useUserStore.getState().setUser(null);
                       useUserStore.getState().setSyncing(false);
@@ -304,10 +361,10 @@ export const settingsGroups: SettingSection[] = [
                       Navigation.popToTop();
                       setTimeout(() => {
                         eSendEvent("settings-loading", false);
-                      }, 2000);
+                      }, 3000);
                     }, 300);
                   } catch (e) {
-                    ToastEvent.error(e as Error, "Error logging out");
+                    ToastManager.error(e as Error, "Error logging out");
                     eSendEvent("settings-loading", false);
                   }
                 }
@@ -342,7 +399,7 @@ export const settingsGroups: SettingSection[] = [
                         introCompleted: true
                       });
                     } else {
-                      ToastEvent.show({
+                      ToastManager.show({
                         heading: "Incorrect password",
                         message:
                           "The account password you entered is incorrect",
@@ -355,7 +412,7 @@ export const settingsGroups: SettingSection[] = [
                   } catch (e) {
                     eSendEvent("settings-loading", false);
                     console.log(e);
-                    ToastEvent.error(
+                    ToastManager.error(
                       e as Error,
                       "Failed to delete account",
                       "global"
@@ -396,6 +453,21 @@ export const settingsGroups: SettingSection[] = [
               "Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device.",
             type: "switch",
             property: "disableSync"
+          },
+          {
+            id: "background-sync",
+            name: "Background sync (Experimental)",
+            description:
+              "Periodically wake up the app in background to sync your notes from other devices.",
+            type: "switch",
+            property: "backgroundSync",
+            onChange: (value) => {
+              if (value) {
+                BackgroundSync.start();
+              } else {
+                BackgroundSync.stop();
+              }
+            }
           },
           {
             id: "sync-issues-fix",
@@ -513,12 +585,12 @@ export const settingsGroups: SettingSection[] = [
           },
           {
             id: "default-notebook",
-            name: "Clear default notebook/topic",
-            description: "Clear the default notebook/topic for new notes",
+            name: "Clear default notebook",
+            description: "Clear the default notebook for new notes",
             modifer: () => {
-              db.settings?.setDefaultNotebook(undefined);
+              db.settings.setDefaultNotebook(undefined);
             },
-            hidden: () => !db.settings?.getDefaultNotebook()
+            hidden: () => !db.settings.getDefaultNotebook()
           }
         ]
       },
@@ -553,7 +625,7 @@ export const settingsGroups: SettingSection[] = [
             property: "doubleSpacedLines",
             icon: "format-line-spacing",
             onChange: () => {
-              ToastEvent.show({
+              ToastManager.show({
                 heading: "Line spacing changed",
                 type: "success"
               });
@@ -622,7 +694,7 @@ export const settingsGroups: SettingSection[] = [
             );
             useUserStore.getState().setUser(await db.user?.fetchUser());
           } catch (e) {
-            ToastEvent.error(e as Error);
+            ToastManager.error(e as Error);
           }
         },
         getter: (current: any) => current?.marketingConsent,
@@ -766,11 +838,156 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "app-lock",
         name: "App lock",
-        description: "Change app lock mode to suit your needs",
-        icon: "fingerprint",
-        modifer: () => {
-          AppLock.present();
-        }
+        type: "screen",
+        description: "Enhanced at rest encryption with app lock",
+        icon: "lock",
+        sections: [
+          {
+            id: "app-lock-mode",
+            name: "App lock",
+            description: "Keep intruders away with app lock security.",
+            icon: "lock",
+            type: "switch",
+            property: "appLockEnabled",
+            onChange: () => {
+              SettingsService.setPrivacyScreen(SettingsService.get());
+            },
+            onVerify: async () => {
+              const verified = await verifyUserWithApplock();
+              if (!verified) return false;
+
+              if (!SettingsService.getProperty("appLockEnabled")) {
+                if (
+                  !SettingsService.getProperty("appLockHasPasswordSecurity") &&
+                  (await BiometicService.isBiometryAvailable())
+                ) {
+                  SettingsService.setProperty("biometricsAuthEnabled", true);
+                }
+
+                if (
+                  !(await BiometicService.isBiometryAvailable()) &&
+                  !SettingsService.getProperty("appLockHasPasswordSecurity")
+                ) {
+                  ToastManager.show({
+                    heading: "Biometrics not enrolled",
+                    type: "error",
+                    message:
+                      "To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone."
+                  });
+                  return false;
+                }
+              }
+
+              return verified;
+            }
+          },
+          {
+            id: "app-lock-timer",
+            name: "App lock timeout",
+            description:
+              "Set the time after which the app should lock when in background",
+            type: "component",
+            component: "applock-timer"
+          },
+          {
+            id: "app-lock-pin",
+            name: () =>
+              `Setup app lock ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              }`,
+            description: () =>
+              `Set up a ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              } for app lock`,
+            hidden: () => {
+              return !!SettingsService.getProperty(
+                "appLockHasPasswordSecurity"
+              );
+            },
+            onVerify: () => {
+              return verifyUserWithApplock();
+            },
+            property: "appLockHasPasswordSecurity",
+            modifer: () => {
+              console.log("called modifier..");
+              AppLockPassword.present("create");
+            }
+          },
+          {
+            id: "app-lock-pin-change",
+            name: () =>
+              `Change app lock ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              }`,
+            description: () =>
+              `Set up a ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              } for app lock`,
+            hidden: () => {
+              return !SettingsService.getProperty("appLockHasPasswordSecurity");
+            },
+            property: "appLockHasPasswordSecurity",
+            modifer: () => {
+              AppLockPassword.present("change");
+            }
+          },
+          {
+            id: "app-lock-pin-remove",
+            name: () =>
+              `Remove app lock ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              }`,
+            description: () =>
+              `Remove app lock ${
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? "pin"
+                  : "password"
+              }, app lock will fallback to using account password to unlock the app`,
+            hidden: () => {
+              return !SettingsService.getProperty("appLockHasPasswordSecurity");
+            },
+            property: "appLockHasPasswordSecurity",
+            modifer: () => {
+              AppLockPassword.present("remove");
+            }
+          },
+          {
+            id: "app-lock-fingerprint",
+            name: "Unlock with biometrics",
+            description: "Allow biometric authentication to unlock the app",
+            type: "switch",
+            property: "biometricsAuthEnabled",
+            onVerify: async () => {
+              const verified = await verifyUserWithApplock();
+              if (!verified) return false;
+
+              if (SettingsService.getProperty("biometricsAuthEnabled")) {
+                if (
+                  !SettingsService.getProperty("appLockHasPasswordSecurity")
+                ) {
+                  SettingsService.setProperty("appLockEnabled", false);
+                  ToastManager.show({
+                    heading: "App lock disabled",
+                    type: "success"
+                  });
+                }
+              }
+
+              return verified;
+            },
+            icon: "fingerprint"
+          }
+        ]
       }
     ]
   },
@@ -824,7 +1041,7 @@ export const settingsGroups: SettingSection[] = [
                 console.error(e);
               } finally {
                 if (!dir) {
-                  ToastEvent.show({
+                  ToastManager.show({
                     heading: "No directory selected",
                     type: "error"
                   });
@@ -850,7 +1067,7 @@ export const settingsGroups: SettingSection[] = [
                 console.error(e);
               } finally {
                 if (!dir) {
-                  ToastEvent.show({
+                  ToastManager.show({
                     heading: "No directory selected",
                     type: "error"
                   });
@@ -869,7 +1086,7 @@ export const settingsGroups: SettingSection[] = [
               const user = useUserStore.getState().user;
               const settings = SettingsService.get();
               if (!user) {
-                ToastEvent.show({
+                ToastManager.show({
                   heading: "Login required to enable encryption",
                   type: "error",
                   func: () => {

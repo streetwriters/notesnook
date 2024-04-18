@@ -92,12 +92,15 @@ test("add a note to notebook", async ({ page }) => {
 
   await note?.contextMenu.addToNotebook({
     title: "Notebook 1",
-    topics: ["Hello", "World", "Did", "what"]
+    subNotebooks: [
+      { title: "Hello" },
+      { title: "World", subNotebooks: [{ title: "Did" }, { title: "what" }] }
+    ]
   });
 
-  expect(
-    await app.toasts.waitForToast("1 note added to Hello and 3 others.")
-  ).toBe(true);
+  expect(await app.toasts.waitForToast("1 note added to 5 notebooks.")).toBe(
+    true
+  );
 });
 
 const actors = ["contextMenu", "properties"] as const;
@@ -165,7 +168,7 @@ for (const actor of actors) {
 
     await note?.[actor].color("red");
 
-    const coloredNotes = await app.goToColor("red");
+    const coloredNotes = await app.goToColor("Red");
     const coloredNote = await coloredNotes.findNote(NOTE);
     expect(coloredNote).toBeDefined();
     expect(await coloredNote?.contextMenu.isColored("red")).toBe(true);
@@ -249,11 +252,14 @@ test("unlock a note for editing", async ({ page }) => {
   await note?.contextMenu.lock(PASSWORD);
   await note?.openLockedNote(PASSWORD);
 
-  const content = "Edits 1 2 3 ";
+  const content = "Edits 1 2 3";
   await notes.editor.setContent(content);
   await page.waitForTimeout(150);
 
-  const newContent = `${content}${NOTE.content}`;
+  await page.reload();
+  await page.waitForTimeout(500);
+
+  const newContent = `${NOTE.content}${content}`;
   const editedNote = await notes.findNote({
     title: NOTE.title,
     content: newContent
@@ -274,6 +280,9 @@ test("change title of a locked note", async ({ page }) => {
   const title = "NEW TITLE!";
   await notes.editor.setTitle(title);
   await page.waitForTimeout(150);
+
+  await page.reload();
+  await page.waitForTimeout(500);
 
   const editedNote = await notes.findNote({ title, content: NOTE.content });
   await editedNote?.openLockedNote(PASSWORD);
@@ -307,7 +316,7 @@ test(`sort notes`, async ({ page }, info) => {
           });
           if (!sortResult) return;
 
-          expect(await notes.isEmpty()).toBeFalsy();
+          await expect(notes.items).toHaveCount(titles.length);
         });
       }
     }

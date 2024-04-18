@@ -29,7 +29,7 @@ configure({ Deflate, Inflate });
 
 export type ZipFile = {
   path: string;
-  data: string | Uint8Array;
+  data: string | Uint8Array | ReadableStream<Uint8Array>;
   mtime?: Date;
   ctime?: Date;
 };
@@ -52,7 +52,9 @@ export function createZipStream(signal?: AbortSignal) {
           chunk.path,
           typeof chunk.data === "string"
             ? new TextReader(chunk.data)
-            : new Uint8ArrayReader(chunk.data),
+            : chunk.data instanceof Uint8Array
+            ? new Uint8ArrayReader(chunk.data)
+            : chunk.data,
           {
             creationDate: chunk.ctime,
             lastModDate: chunk.mtime

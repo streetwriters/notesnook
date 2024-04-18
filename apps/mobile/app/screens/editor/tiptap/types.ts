@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
-import { NoteType } from "../../../utils/types";
 import { useEditor } from "./use-editor";
+import { Note } from "@notesnook/core/dist/types";
 export type useEditorType = ReturnType<typeof useEditor>;
 
 export type EditorState = {
@@ -35,6 +35,8 @@ export type EditorState = {
   ready: boolean;
   saveCount: 0;
   isAwaitingResult: boolean;
+  scrollPosition: number;
+  overlay?: boolean;
 };
 
 export type Settings = {
@@ -57,52 +59,35 @@ export type Settings = {
 };
 
 export type EditorProps = {
-  readonly: boolean;
-  noToolbar: boolean;
-  noHeader: boolean;
-  withController: boolean;
+  readonly?: boolean;
+  noToolbar?: boolean;
+  noHeader?: boolean;
+  withController?: boolean;
   editorId?: string;
   onLoad?: () => void;
   onChange?: (html: string) => void;
 };
 
-export type EditorMessage = {
+export type EditorMessage<T> = {
   sessionId: string;
-  value: unknown;
-  type: string;
-};
-
-export type Note = {
-  [name: string]: unknown;
-  id: string | null;
-  type: string;
-  contentId: string;
-  title: string;
-  locked: boolean;
-  conflicted: boolean;
-  dateEdited: number;
-  headline: string;
-};
-
-export type Content = {
-  data?: string;
+  value: T;
   type: string;
   noteId: string;
-  id?: string;
+  tabId: number;
 };
 
 export type SavePayload = {
   title?: string;
-  id?: string | null;
-  data?: Content["data"];
-  type?: Content["type"];
-  sessionId?: string | null;
+  id?: string;
+  data?: string;
+  type?: "tiptap";
   sessionHistoryId?: number;
   ignoreEdit: boolean;
+  tabId: number;
 };
 
 export type AppState = {
-  note?: NoteType;
+  note?: Note;
   editing: boolean;
   movedAway: boolean;
   timestamp: number;

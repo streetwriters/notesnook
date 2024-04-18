@@ -22,6 +22,7 @@ import React, {
   RefObject,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState
 } from "react";
@@ -36,14 +37,15 @@ import Animated, {
   WithSpringConfig,
   withTiming
 } from "react-native-reanimated";
-import { editorState } from "../../screens/editor/tiptap/utils";
+import { getAppState } from "../../screens/editor/tiptap/utils";
 import { eSendEvent } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eClearEditor } from "../../utils/events";
+import { useSideBarDraggingStore } from "../side-menu/dragging-store";
 
 interface TabProps extends ViewProps {
   dimensions: { width: number; height: number };
-  widths: { a: number; b: number; c: number };
+  widths: { sidebar: number; list: number; editor: number };
   onChangeTab: (data: { i: number; from: number }) => void;
   onScroll: (offset: number) => void;
   enabled: boolean;
@@ -75,12 +77,19 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
   }: TabProps,
   ref
 ) {
+  const appState = useMemo(() => getAppState(), []);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
-  const translateX = useSharedValue(widths ? widths.a : 0);
+  const translateX = useSharedValue(
+    widths
+      ? appState && !appState?.movedAway
+        ? widths.sidebar + widths.list
+        : widths.sidebar
+      : 0
+  );
   const startX = useSharedValue(0);
   const currentTab = useSharedValue(1);
   const previousTab = useSharedValue(1);
@@ -94,12 +103,12 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
   const [disabled, setDisabled] = useState(false);
   const node = useRef<Animated.View>(null);
   const containerWidth = widths
-    ? widths.a + widths.b + widths.c
+    ? widths.sidebar + widths.list + widths.editor
     : dimensions.width;
 
   const drawerPosition = 0;
-  const homePosition = widths.a;
-  const editorPosition = widths.a + widths.b;
+  const homePosition = widths.sidebar;
+  const editorPosition = widths.sidebar + widths.list;
   const isSmallTab = deviceMode === "smallTablet";
   const isLoaded = useRef(false);
   const prevWidths = useRef(widths);
@@ -110,10 +119,9 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       if (deviceMode === "tablet" || fullscreen) {
         translateX.value = 0;
       } else {
-        if (prevWidths.current?.a !== widths.a) {
-          translateX.value = editorState().movedAway
-            ? widths.a
-            : editorPosition;
+        if (prevWidths.current?.sidebar !== widths.sidebar) {
+          translateX.value =
+            !appState || appState?.movedAway ? widths.sidebar : editorPosition;
         }
       }
       isLoaded.current = true;
@@ -141,7 +149,8 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
     isDrawerOpen,
     homePosition,
     onDrawerStateChange,
-    editorPosition
+    editorPosition,
+    appState
   ]);
 
   useImperativeHandle(
@@ -209,6 +218,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
         onDrawerStateChange(true);
       },
       closeDrawer: (animated = true) => {
+        if (forcedLock.value) return;
         if (deviceMode === "tablet") {
           translateX.value = animated ? withTiming(0) : 0;
           return;
@@ -218,6 +228,9 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
           translateX.value = 299;
           translateX.value = 300;
         }
+        useSideBarDraggingStore.setState({
+          dragging: false
+        });
         onDrawerStateChange(false);
         isDrawerOpen.value = false;
       },
@@ -339,6 +352,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
           isDrawerOpen.value = false;
           currentTab.value = 1;
           runOnJS(onDrawerStateChange)(false);
+
           return;
         } else if (!isSwipeLeft && finalValue < 100) {
           translateX.value = withSpring(0, animationConfig);

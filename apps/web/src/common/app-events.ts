@@ -36,5 +36,7 @@ export const AppEvents = {
   notificationClicked: "notificationClicked",
   createItem: "createItem",
 
-  changeNoteTitle: "changeNoteTitle"
+  changeNoteTitle: "changeNoteTitle",
+
+  revealItemInList: "list:revealItem"
 };

@@ -21,7 +21,7 @@ import React, { useRef, useState } from "react";
 import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
-import { ToastEvent } from "../../services/event-manager";
+import { ToastManager } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
 import { useThemeColors } from "@notesnook/theme";
@@ -52,7 +52,7 @@ export const Signup = ({ changeMode, trial }) => {
   const { width, height } = useWindowDimensions();
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "All fields required",
         message: "Fill all the fields and try again",
         type: "error",
@@ -85,7 +85,7 @@ export const Signup = ({ changeMode, trial }) => {
       }
     } catch (e) {
       setLoading(false);
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Signup failed",
         message: e.message,
         type: "error",
@@ -111,7 +111,7 @@ export const Signup = ({ changeMode, trial }) => {
             paddingHorizontal: 20,
             backgroundColor: colors.secondary.background,
             marginBottom: 20,
-            borderBottomWidth: 1,
+            borderBottomWidth: 0.8,
             borderBottomColor: colors.primary.border,
             alignSelf: deviceMode !== "mobile" ? "center" : undefined,
             borderWidth: deviceMode !== "mobile" ? 1 : null,

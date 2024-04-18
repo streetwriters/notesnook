@@ -18,18 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EVENTS } from "@notesnook/core/dist/common";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
 import BackupService from "../../../services/backup";
 import {
+  ToastManager,
   eSendEvent,
-  presentSheet,
-  ToastEvent
+  presentSheet
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
-import { useThemeColors } from "@notesnook/theme";
+import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
@@ -90,21 +91,23 @@ export default function Migrate() {
 
   const startMigration = useCallback(async () => {
     try {
+      useUserStore.setState({
+        disableAppLockRequests: true
+      });
       setLoading(true);
-      await sleep(1000);
-      const backupSaved = await BackupService.run(false, "local");
-      if (!backupSaved) {
-        ToastEvent.show({
-          heading: "Migration failed",
-          message: "You must download a backup of your data before migrating.",
-          context: "local"
-        });
+      await sleep(1);
+      const { error } = await BackupService.run(false, "local");
+      if (error) {
+        ToastManager.error(error, "Backup failed");
         setLoading(false);
         return;
       }
+
       await db.migrations?.migrate();
+      useUserStore.setState({
+        disableAppLockRequests: false
+      });
       eSendEvent(eCloseSheet);
-      await sleep(500);
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -122,10 +125,13 @@ export default function Migrate() {
     <View
       style={{
         paddingHorizontal: 12,
-        paddingTop: 12
+        paddingTop: 12,
+        height: "100%",
+        alignItems: "center",
+        justifyContent: "center"
       }}
     >
-      {!loading ? (
+      {!loading && !error ? (
         <DialogHeader
           title="Save a backup of your notes"
           centered
@@ -140,33 +146,39 @@ export default function Migrate() {
         <>
           <View
             style={{
-              width: 200,
               height: 100,
               alignSelf: "center",
               justifyContent: "center"
             }}
           >
-            <ProgressBarComponent
-              height={5}
-              width={200}
-              animated={true}
-              useNativeDriver
-              indeterminate
-              unfilledColor={colors.secondary.background}
-              color={colors.primary.accent}
-              borderWidth={0}
-            />
-
             <Paragraph
               style={{
                 marginTop: 5,
+                marginBottom: 10,
                 textAlign: "center"
               }}
             >
-              Updating {progress ? progress?.collection : null}
+              Migrating database{progress ? `(${progress?.collection})` : null}
               {progress ? `(${progress.current}/${progress.total}) ` : null}...
               please wait
             </Paragraph>
+
+            <View
+              style={{
+                width: 200
+              }}
+            >
+              <ProgressBarComponent
+                height={5}
+                width={200}
+                animated={true}
+                useNativeDriver
+                indeterminate
+                unfilledColor={colors.secondary.background}
+                color={colors.primary.accent}
+                borderWidth={0}
+              />
+            </View>
           </View>
         </>
       ) : error ? (
@@ -198,6 +210,7 @@ export default function Migrate() {
               width={250}
               onPress={async () => {
                 MMKV.clearStore();
+                await db.reset();
                 setReset(true);
               }}
               style={{

@@ -26,7 +26,7 @@ const TEST_TIMEOUT = 30 * 1000;
 afterAll(async () => {
   const db = await databaseTest();
   await login(db);
-  await db.monographs.init();
+  await db.monographs.refresh();
 
   for (const id of db.monographs.monographs) {
     await db.monographs.unpublish(id);
@@ -39,7 +39,7 @@ afterAll(async () => {
 //   databaseTest().then(async (db) => {
 //     await db.user.login(user.email, user.password, user.hashedPassword);
 
-//     await db.monographs.init();
+//     await db.monographs.refresh();
 
 //     expect(db.monographs.all).toBeGreaterThanOrEqual(0);
 //   }));
@@ -49,14 +49,14 @@ test(
   () =>
     noteTest().then(async ({ db, id }) => {
       await login(db);
-      await db.monographs.init();
+      await db.monographs.refresh();
 
       const monographId = await db.monographs.publish(id);
 
-      expect(db.monographs.all.find((m) => m.id === id)).toBeDefined();
+      expect(await db.monographs.all.has(id)).toBeTruthy();
 
       const monograph = await db.monographs.get(monographId);
-      const note = db.notes.note(id);
+      const note = await db.notes.note(id);
       expect(monograph.id).toBe(monographId);
       expect(monograph.title).toBe(note.title);
 
@@ -70,11 +70,11 @@ test(
   () =>
     noteTest().then(async ({ db, id }) => {
       await login(db);
-      await db.monographs.init();
+      await db.monographs.refresh();
 
       const monographId = await db.monographs.publish(id);
       let monograph = await db.monographs.get(monographId);
-      const note = db.notes.note(id);
+      const note = await db.notes.note(id);
       expect(monograph.title).toBe(note.title);
 
       const editedTitle = "EDITED TITLE OF MY NOTE!";
@@ -93,13 +93,13 @@ test(
   () =>
     noteTest().then(async ({ db, id }) => {
       await login(db);
-      await db.monographs.init();
+      await db.monographs.refresh();
 
       await db.monographs.publish(id);
-      expect(db.monographs.all.find((m) => m.id === id)).toBeDefined();
+      expect(await db.monographs.all.has(id)).toBeTruthy();
 
       await db.monographs.unpublish(id);
-      expect(db.monographs.all.find((m) => m.id === id)).toBeUndefined();
+      expect(await db.monographs.all.has(id)).toBeFalsy();
 
       await logout(db);
     }),

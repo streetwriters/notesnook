@@ -77,14 +77,9 @@ export const WelcomeNotice = () => {
             SettingsService.set({
               introCompleted: true
             });
-            Navigation.replace(
-              {
-                name: "Notes"
-              },
-              {
-                canGoBack: false
-              }
-            );
+            Navigation.replace("Notes", {
+              canGoBack: false
+            });
           }, 1000);
         }}
         style={{
@@ -106,19 +101,14 @@ export const WelcomeNotice = () => {
           SettingsService.set({
             introCompleted: true
           });
-          Navigation.replace(
-            {
-              name: "Notes"
-            },
-            {
-              canGoBack: false
-            }
-          );
+          Navigation.replace("Notes", {
+            canGoBack: false
+          });
           await sleep(1000);
           eSendEvent(eCloseLoading);
         }}
         iconSize={20}
-        type="gray"
+        type="plain"
         iconPosition="right"
         icon="chevron-right"
         height={25}

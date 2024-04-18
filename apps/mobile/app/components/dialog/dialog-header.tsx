@@ -22,7 +22,7 @@ import { Text, View, ViewStyle } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
-import { PressableButtonProps } from "../ui/pressable";
+import { PressableProps } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
@@ -34,7 +34,7 @@ type DialogHeaderProps = {
     onPress?: () => void;
     loading?: boolean;
     title?: string;
-    type?: PressableButtonProps["type"];
+    type?: PressableProps["type"];
     icon?: string;
   };
   paragraphColor?: string;
@@ -86,7 +86,9 @@ const DialogHeader = ({
             >
               {title}{" "}
               {titlePart ? (
-                <Text style={{ color: colors.primary.accent }}>{titlePart}</Text>
+                <Text style={{ color: colors.primary.accent }}>
+                  {titlePart}
+                </Text>
               ) : null}
             </Heading>
 
@@ -101,8 +103,8 @@ const DialogHeader = ({
                 fontSize={13}
                 title={button.title}
                 icon={button.icon}
-                type={button.type || "grayBg"}
-                height={25}
+                type={button.type || "secondary"}
+                height={30}
               />
             ) : null}
           </View>

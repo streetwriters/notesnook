@@ -17,79 +17,73 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { PropsWithChildren, useContext } from "react";
-import {
-  createPortal,
-  unstable_renderSubtreeIntoContainer,
-  unmountComponentAtNode
-} from "react-dom";
+import React, {
+  FunctionComponent,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
+import { createPortal, flushSync } from "react-dom";
 import { EventDispatcher } from "./event-dispatcher";
+import { nanoid } from "nanoid";
 
 export type BasePortalProviderProps = PropsWithChildren<unknown>;
 
-export type Portals = Map<HTMLElement, React.ReactChild>;
+export type Portals = Map<HTMLElement, MountedPortal>;
+
+export interface MountedPortal {
+  key: string;
+  Component: FunctionComponent;
+}
 
 export type PortalRendererState = {
   portals: Portals;
 };
 
-type MountedPortal = {
-  children: () => React.ReactChild | null;
-};
-
-export class PortalProviderAPI extends EventDispatcher {
+export class PortalProviderAPI extends EventDispatcher<Portals> {
   portals: Map<HTMLElement, MountedPortal> = new Map();
-  context?: PortalRenderer;
 
   constructor() {
     super();
   }
 
-  setContext = (context: PortalRenderer) => {
-    this.context = context;
-  };
-
-  render(
-    children: () => React.ReactChild | JSX.Element | null,
-    container: HTMLElement,
-    callback?: () => void
-  ) {
-    if (!this.context) return;
-
-    this.portals.set(container, {
-      children
-    });
-    const wrappedChildren = children() as JSX.Element;
-
-    unstable_renderSubtreeIntoContainer(
-      this.context,
-      wrappedChildren,
-      container,
-      callback
-    );
+  /**
+   * Trigger an update in all subscribers.
+   */
+  private update() {
+    this.emit("update", this.portals);
   }
 
-  // TODO: until https://product-fabric.atlassian.net/browse/ED-5013
-  // we (unfortunately) need to re-render to pass down any updated context.
-  // selectively do this for nodeviews that opt-in via `hasAnalyticsContext`
-  forceUpdate() {}
+  render(Component: FunctionComponent, container: HTMLElement) {
+    const portal = this.portals.get(container);
+    this.portals.set(container, { Component, key: portal?.key ?? nanoid() });
+    this.update();
+  }
 
-  remove(container: HTMLElement) {
-    this.portals.delete(container);
-
-    // There is a race condition that can happen caused by Prosemirror vs React,
-    // where Prosemirror removes the container from the DOM before React gets
-    // around to removing the child from the container
-    // This will throw a NotFoundError: The node to be removed is not a child of this node
-    // Both Prosemirror and React remove the elements asynchronously, and in edge
-    // cases Prosemirror beats React
-    try {
-      unmountComponentAtNode(container);
-    } catch (error) {
-      // IGNORE console.error(error);
+  /**
+   * Force an update in all the portals by setting new keys for every portal.
+   *
+   * Delete all orphaned containers (deleted from the DOM). This is useful for
+   * Decoration where there is no destroy method.
+   */
+  forceUpdate(): void {
+    for (const [container, { Component }] of this.portals) {
+      this.portals.set(container, { Component, key: nanoid() });
     }
   }
+
+  remove(container: HTMLElement) {
+    // Remove the portal which was being wrapped in the provided container.
+    this.portals.delete(container);
+
+    // Trigger an update
+    this.update();
+  }
 }
+
 const PortalProviderContext = React.createContext<
   PortalProviderAPI | undefined
 >(undefined);
@@ -97,51 +91,47 @@ export function usePortalProvider() {
   return useContext(PortalProviderContext);
 }
 
-export class PortalProvider extends React.Component<BasePortalProviderProps> {
-  static displayName = "PortalProvider";
+export function PortalProvider(props: PropsWithChildren) {
+  const portalProviderAPI = useMemo(() => new PortalProviderAPI(), []);
 
-  portalProviderAPI: PortalProviderAPI;
-
-  constructor(props: BasePortalProviderProps) {
-    super(props);
-    this.portalProviderAPI = new PortalProviderAPI();
-  }
-
-  render() {
-    return (
-      <PortalProviderContext.Provider value={this.portalProviderAPI}>
-        {this.props.children}
-        <PortalRenderer portalProviderAPI={this.portalProviderAPI} />
-      </PortalProviderContext.Provider>
-    );
-  }
-
-  componentDidUpdate() {
-    this.portalProviderAPI.forceUpdate();
-  }
+  return (
+    <PortalProviderContext.Provider value={portalProviderAPI}>
+      {props.children}
+      <PortalRenderer portalProviderAPI={portalProviderAPI} />
+    </PortalProviderContext.Provider>
+  );
 }
 
-export class PortalRenderer extends React.Component<
-  { portalProviderAPI: PortalProviderAPI },
-  PortalRendererState
-> {
-  constructor(props: { portalProviderAPI: PortalProviderAPI }) {
-    super(props);
-    props.portalProviderAPI.setContext(this);
-    props.portalProviderAPI.on("update", this.handleUpdate);
-    this.state = { portals: new Map() };
-  }
+function PortalRenderer(props: { portalProviderAPI: PortalProviderAPI }) {
+  const { portalProviderAPI } = props;
+  const mounted = useRef(true);
+  const [portals, setPortals] = useState(() =>
+    Array.from(portalProviderAPI.portals.entries())
+  );
 
-  handleUpdate = (portals: Portals) => this.setState({ portals });
+  useEffect(() => {
+    mounted.current = true;
+    function onUpdate(portalMap: Portals) {
+      // we have to make sure the component is mounted otherwise React
+      // throws an error.
+      if (!mounted.current) return;
 
-  render() {
-    const { portals } = this.state;
-    return (
-      <>
-        {Array.from(portals.entries()).map(([container, children]) =>
-          createPortal(children, container)
-        )}
-      </>
-    );
-  }
+      // flushSync is necessary here, otherwise we get into a loop where
+      // ProseMirror destroys and recreates the node view over and over again.
+      flushSync(() => setPortals(Array.from(portalMap.entries())));
+    }
+    portalProviderAPI.on("update", onUpdate);
+    return () => {
+      mounted.current = false;
+      portalProviderAPI.off("update", onUpdate);
+    };
+  }, [portalProviderAPI]);
+
+  return (
+    <>
+      {portals.map(([container, { Component, key }]) =>
+        createPortal(<Component />, container, key)
+      )}
+    </>
+  );
 }

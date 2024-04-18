@@ -17,43 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
-import create, { State } from "zustand";
 import { db } from "../common/database";
-import { NoteType } from "../utils/types";
+import createDBCollectionStore from "./create-db-collection-store";
 
-export interface NoteStore extends State {
-  notes: NoteType[];
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
-  setNotes: (items?: NoteType[]) => void;
-  clearNotes: () => void;
-}
+const { useStore: useNoteStore, useCollection: useNotes } =
+  createDBCollectionStore({
+    getCollection: () =>
+      db.notes.all.grouped(db.settings.getGroupOptions("home")),
+    eagerlyFetchFirstBatch: true
+  });
 
-export const useNoteStore = create<NoteStore>((set, get) => ({
-  notes: [],
-  loading: true,
-  setLoading: (loading) => set({ loading: loading }),
-
-  setNotes: (items) => {
-    if (!items) {
-      set({
-        notes: groupArray(
-          (db.notes?.all as NoteType[]) || [],
-          db.settings?.getGroupOptions("home")
-        )
-      });
-      return;
-    }
-    const prev = get().notes;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const index = prev.findIndex((v) => v.id === item.id);
-      if (index !== -1) {
-        prev[index] = item;
-      }
-    }
-    set({ notes: prev });
-  },
-  clearNotes: () => set({ notes: [] })
-}));
+export { useNoteStore, useNotes };

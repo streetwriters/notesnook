@@ -92,7 +92,7 @@ export const Synced = ({ item, close }) => {
             close();
             await sleep(300);
             await openLinkInBrowser(
-              "https://docs.notesnook.com/how-is-my-data-encrypted/",
+              "https://help.notesnook.com/how-is-my-data-encrypted",
               colors
             );
           } catch (e) {
@@ -102,7 +102,7 @@ export const Synced = ({ item, close }) => {
         title="Learn more"
         fontSize={SIZE.xs}
         height={30}
-        type="grayAccent"
+        type="secondaryAccented"
       />
     </View>
   ) : null;

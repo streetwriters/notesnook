@@ -17,36 +17,60 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { render } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Routes, init } from "./bootstrap";
 import { logger } from "./utils/logger";
-import { loadDatabase } from "./hooks/use-database";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { BaseThemeProvider } from "./components/theme-provider";
 import { register } from "./utils/stream-saver/mitm";
 import { getServiceWorkerVersion } from "./utils/version";
+import { ErrorBoundary, ErrorComponent } from "./components/error-boundary";
+import { TitleBar } from "./components/title-bar";
 
 renderApp();
 
 async function renderApp() {
-  const { component, props, path } = await init();
+  const rootElement = document.getElementById("root");
+  if (!rootElement) return;
+  const root = createRoot(rootElement);
 
-  if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
-  if (IS_DESKTOP_APP) await loadDatabase("db");
+  try {
+    const { component, props, path } = await init();
 
-  const { default: Component } = await component();
-  logger.measure("app render");
-  render(
-    <BaseThemeProvider addGlobalStyles sx={{ height: "100%" }}>
-      <Component route={props?.route || "login:email"} />
-    </BaseThemeProvider>,
-    document.getElementById("root"),
-    () => {
-      logger.measure("app render");
+    const { useKeyStore } = await import("./interfaces/key-store");
+    await useKeyStore.getState().init();
 
-      document.getElementById("splash")?.remove();
-    }
-  );
+    if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
+
+    const { default: Component } = await component();
+    const { default: AppLock } = await import("./views/app-lock");
+
+    root.render(
+      <>
+        {IS_DESKTOP_APP ? <TitleBar /> : null}
+        <ErrorBoundary>
+          <BaseThemeProvider
+            onRender={() => document.getElementById("splash")?.remove()}
+            sx={{ bg: "background", flex: 1, overflow: "hidden" }}
+          >
+            <AppLock>
+              <Component route={props?.route || "login:email"} />
+            </AppLock>
+          </BaseThemeProvider>
+        </ErrorBoundary>
+      </>
+    );
+  } catch (e) {
+    root.render(
+      <>
+        {IS_DESKTOP_APP ? <TitleBar /> : null}
+        <ErrorComponent
+          error={e}
+          resetErrorBoundary={() => window.location.reload()}
+        />
+      </>
+    );
+  }
 }
 
 const serviceWorkerWhitelist: Routes[] = ["default"];
@@ -75,3 +99,5 @@ async function initializeServiceWorker() {
     // window.addEventListener("beforeinstallprompt", () => showInstallNotice());
   }
 }
+
+if (import.meta.hot) import.meta.hot.accept();

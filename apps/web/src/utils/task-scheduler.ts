@@ -23,6 +23,7 @@ import type {
   TaskSchedulerEvent
 } from "./task-scheduler.worker";
 import { wrap, Remote } from "comlink";
+import { showToast } from "./toast";
 
 let worker: globalThis.Worker | undefined;
 let scheduler: Remote<TaskSchedulerType> | undefined;
@@ -45,7 +46,14 @@ export class TaskScheduler {
           break;
       }
     });
-    await scheduler?.registerTask(id, time);
+    try {
+      await scheduler?.registerTask(id, time);
+    } catch (e) {
+      showToast(
+        "error",
+        `Failed to register task: ${(e as Error).message} (cron: ${time})`
+      );
+    }
   }
 
   static async stop(id: string) {

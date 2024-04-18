@@ -37,5 +37,16 @@ export const EventTypes = {
   reminders: "editor-event:reminders",
   previewAttachment: "editor-event:preview-attachment",
   copyToClipboard: "editor-events:copy-to-clipboard",
-  getAttachmentData: "editor-events:get-attachment-data"
+  getAttachmentData: "editor-events:get-attachment-data",
+  tabsChanged: "editor-events:tabs-changed",
+  showTabs: "editor-events:show-tabs",
+  tabFocused: "editor-events:tab-focused",
+  toc: "editor-events:toc",
+  createInternalLink: "editor-events:create-internal-link",
+  load: "editor-events:load",
+  unlock: "editor-events:unlock",
+  unlockWithBiometrics: "editor-events:unlock-biometrics",
+  disableReadonlyMode: "editor-events:disable-readonly-mode",
+  readonlyEditorLoaded: "readonlyEditorLoaded",
+  error: "editorError"
 };

@@ -18,29 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import path from "path";
-import fs from "fs/promises";
+import fs, { readFile, writeFile } from "fs/promises";
 import { existsSync } from "fs";
 import yargs from "yargs-parser";
 import os from "os";
 import * as childProcess from "child_process";
 import { fileURLToPath } from "url";
+import packageJson from "../package.json" with {type: "json"};
 
 const args = yargs(process.argv);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const sodiumNativePrebuildPath = (arch) =>
-  path.join(
-    `node_modules`,
-    `@notesnook`,
-    `crypto`,
-    `node_modules`,
-    `@notesnook`,
-    `sodium`,
-    `node_modules`,
-    `sodium-native`,
-    `prebuilds`,
-    `${os.platform()}-${arch}`
-  );
+
 const webAppPath = path.resolve(path.join(__dirname, "..", "..", "web"));
 
 await fs.rm("./build/", { force: true, recursive: true });
@@ -48,6 +37,15 @@ await fs.rm("./build/", { force: true, recursive: true });
 if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   await exec(`cd ${webAppPath} && npm run build:desktop`);
 }
+
+// temporary until there's support for prebuilt binaries for windows ARM & linux ARM
+await patchBetterSQLite3();
+
+if (os.platform() === "win32")
+  await exec(
+    `npx prebuildify --arch=arm64 --strip -t electron@${packageJson.devDependencies.electron}`,
+    path.join(__dirname, "..", "node_modules", "sodium-native")
+  );
 
 await fs.cp(path.join(webAppPath, "build"), "build", {
   recursive: true,
@@ -62,56 +60,39 @@ if (args.variant === "mas") {
 
 await exec(`npx tsc`);
 
-if (existsSync(sodiumNativePrebuildPath("x64"))) {
-  console.log("copying sodium-native-x64");
-  await fs.cp(
-    sodiumNativePrebuildPath("x64"),
-    path.join("build", "prebuilds", `${process.platform}-x64`),
-    {
-      recursive: true,
-      force: true
-    }
-  );
-}
-
-if (existsSync(sodiumNativePrebuildPath("ia32"))) {
-  console.log("copying sodium-native-ia32");
-  await fs.cp(
-    sodiumNativePrebuildPath("ia32"),
-    path.join("build", "prebuilds", `${process.platform}-ia32`),
-    {
-      recursive: true,
-      force: true
-    }
-  );
-}
-
-if (existsSync(sodiumNativePrebuildPath("arm64"))) {
-  console.log("copying sodium-native-arm64");
-  await fs.cp(
-    sodiumNativePrebuildPath("arm64"),
-    path.join("build", "prebuilds", `${process.platform}-arm64`),
-    {
-      recursive: true,
-      force: true
-    }
-  );
-}
-
 if (args.run) {
   await exec(`npx electron-builder --dir --x64`);
   if (process.platform === "win32") {
     await exec(`.\\output\\win-unpacked\\Notesnook.exe`);
   } else if (process.platform === "darwin") {
-    await exec(`./output/darwin-unpacked/Notesnook`);
+    await exec(`./output/mac/Notesnook.app/Contents/MacOS/Notesnook`);
   } else {
     await exec(`./output/linux-unpacked/Notesnook`);
   }
 }
 
-async function exec(cmd) {
+async function exec(cmd, cwd) {
   return childProcess.execSync(cmd, {
-    env: process.env,
-    stdio: "inherit"
+    env: { ...process.env, NOTESNOOK_STAGING: true },
+    stdio: "inherit",
+    cwd: cwd || process.cwd()
   });
+}
+
+async function patchBetterSQLite3() {
+  const jsonPath = path.join(
+    __dirname,
+    "..",
+    "node_modules",
+    "better-sqlite3-multiple-ciphers",
+    "package.json"
+  );
+  const json = JSON.parse(await readFile(jsonPath, "utf-8"));
+
+  json.version = "9.4.1";
+  json.homepage = "https://github.com/thecodrr/better-sqlite3-multiple-ciphers";
+  json.repository.url =
+    "git://github.com/thecodrr/better-sqlite3-multiple-ciphers.git";
+
+  await writeFile(jsonPath, JSON.stringify(json));
 }

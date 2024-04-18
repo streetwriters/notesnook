@@ -32,8 +32,9 @@ const sleep = (duration) =>
   );
 
 async function LaunchApp() {
-  await expect(element(by.id(notesnook.ids.default.root))).toBeVisible();
-  await sleep(500);
+  await waitFor(element(by.id(notesnook.ids.default.root)))
+    .toBeVisible()
+    .withTimeout(500);
 }
 
 function elementById(id) {
@@ -78,14 +79,15 @@ async function createNote(_title, _body) {
   let body =
     _body ||
     "Test note description that is very long and should not fit in text.";
-
   await tapById(notesnook.buttons.add);
   let webview = web(by.id(notesnook.editor.id));
   await expect(webview.element(by.web.className("ProseMirror"))).toExist();
   await webview.element(by.web.className("ProseMirror")).tap();
   await webview.element(by.web.className("ProseMirror")).typeText(body, true);
   await exitEditor();
-  await expect(element(by.text(body))).toBeVisible();
+  await waitFor(element(by.text(body)))
+    .toBeVisible()
+    .withTimeout(500);
 
   return { title, body };
 }
@@ -93,14 +95,14 @@ async function createNote(_title, _body) {
 async function openSideMenu() {
   let menu = elementById(notesnook.ids.default.header.buttons.left);
   await menu.tap();
-  await sleep(100);
 }
 
 async function navigate(screen) {
-  await sleep(500);
   let menu = elementById(notesnook.ids.default.header.buttons.left);
+  await waitFor(menu).toBeVisible().withTimeout(300);
   await menu.tap();
-  await sleep(500);
+
+  await waitFor(elementByText(screen)).toBeVisible().withTimeout(300);
   await elementByText(screen).tap();
 }
 
@@ -109,6 +111,7 @@ const testvars = {
 };
 
 async function prepare() {
+  await device.disableSynchronization();
   if (testvars.isFirstTest) {
     testvars.isFirstTest = false;
     return await LaunchApp();
@@ -129,13 +132,7 @@ async function matchSnapshot(element, name) {
   });
 }
 
-async function createNotebook(
-  title = "Notebook 1",
-  description = true,
-  topic = true,
-  topicCount = 1
-) {
-  await tapByText("Add your first notebook");
+async function createNotebook(title = "Notebook 1", description = true) {
   await elementById(notesnook.ids.dialogs.notebook.inputs.title).typeText(
     title
   );
@@ -144,16 +141,8 @@ async function createNotebook(
       notesnook.ids.dialogs.notebook.inputs.description
     ).typeText(`Description of ${title}`);
   }
-  if (topic) {
-    for (let i = 1; i <= topicCount; i++) {
-      await elementById(notesnook.ids.dialogs.notebook.inputs.topic).typeText(
-        i === 1 ? "Topic" : "Topic " + i
-      );
-      await tapById("topic-add-button");
-    }
-  }
-  await tapByText("Save");
-  await sleep(500);
+  await tapByText("Add");
+  await sleep(300);
 }
 
 export {

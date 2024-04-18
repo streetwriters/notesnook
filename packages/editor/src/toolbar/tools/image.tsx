@@ -66,11 +66,7 @@ export function ImageAlignLeft(props: ToolProps) {
       {...props}
       toggled={!align || align === "left"}
       onClick={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setImageAlignment({ align: "left" })
-          .run()
+        editor.chain().focus().setImageAlignment({ align: "left" }).run()
       }
     />
   );
@@ -88,11 +84,7 @@ export function ImageAlignRight(props: ToolProps) {
       {...props}
       toggled={align === "right"}
       onClick={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setImageAlignment({ align: "right" })
-          .run()
+        editor.chain().focus().setImageAlignment({ align: "right" }).run()
       }
     />
   );
@@ -110,11 +102,7 @@ export function ImageAlignCenter(props: ToolProps) {
       {...props}
       toggled={align === "center"}
       onClick={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setImageAlignment({ align: "center" })
-          .run()
+        editor.chain().focus().setImageAlignment({ align: "center" }).run()
       }
     />
   );
@@ -132,11 +120,7 @@ export function ImageFloat(props: ToolProps) {
       {...props}
       toggled={!!float}
       onClick={() =>
-        editor.current
-          ?.chain()
-          .focus()
-          .setImageAlignment({ float: !float })
-          .run()
+        editor.chain().focus().setImageAlignment({ float: !float }).run()
       }
     />
   );
@@ -158,7 +142,7 @@ export function ImageProperties(props: ToolProps) {
 
       <ResponsivePresenter
         isOpen={isOpen}
-        desktop="menu"
+        desktop="popup"
         mobile="sheet"
         onClose={() => setIsOpen(false)}
         blocking

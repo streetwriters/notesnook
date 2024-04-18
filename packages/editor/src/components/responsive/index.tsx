@@ -23,7 +23,12 @@ import {
   ActionSheetPresenter,
   ActionSheetPresenterProps
 } from "../action-sheet";
-import { MenuPresenter, MenuPresenterProps } from "@notesnook/ui";
+import {
+  MenuPresenter,
+  MenuPresenterProps,
+  PopupPresenter
+} from "@notesnook/ui";
+import { getPopupContainer } from "../../toolbar/utils/dom";
 
 type ResponsiveContainerProps = {
   mobile?: JSX.Element;
@@ -44,7 +49,7 @@ export function MobileOnly(props: PropsWithChildren<unknown>) {
   return <ResponsiveContainer mobile={<>{props.children}</>} />;
 }
 
-export type PopupType = "sheet" | "menu" | "none";
+export type PopupType = "sheet" | "menu" | "none" | "popup";
 export type ResponsivePresenterProps = MenuPresenterProps &
   ActionSheetPresenterProps & {
     mobile?: PopupType;
@@ -60,5 +65,7 @@ export function ResponsivePresenter(
     return <ActionSheetPresenter {...restProps} />;
   else if (mobile === "menu" || desktop === "menu")
     return <MenuPresenter {...restProps} />;
-  else return props.isOpen ? <>{props.children}</> : null;
+  else if (mobile === "popup" || desktop === "popup") {
+    return <PopupPresenter container={getPopupContainer()} {...restProps} />;
+  } else return props.isOpen ? <>{props.children}</> : null;
 }

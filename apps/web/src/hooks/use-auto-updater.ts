@@ -41,7 +41,9 @@ class AutoUpdateStore extends BaseStore<AutoUpdateStore> {
   };
 }
 
-const [useAutoUpdateStore] = createStore(AutoUpdateStore);
+const [useAutoUpdateStore] = createStore<AutoUpdateStore>(
+  (set, get) => new AutoUpdateStore(set, get)
+);
 
 let checkingForUpdateTimeout = 0;
 export function useAutoUpdater() {
@@ -102,7 +104,7 @@ export function useAutoUpdater() {
     );
 
     checkingForUpdate();
-    checkForUpdate();
+    checkForUpdate().catch(console.error);
 
     return () => {
       checkingForUpdateEvent.unsubscribe();

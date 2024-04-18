@@ -26,9 +26,10 @@ import {
   MfaSms,
   MfaEmail,
   MfaRecoveryCode,
-  Icon
+  Icon,
+  Warn
 } from "../components/icons";
-import Field from "../components/field";
+import Field, { FieldProps } from "../components/field";
 import { getQueryParams, hardNavigate, makeURL } from "../navigation";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
@@ -37,14 +38,13 @@ import useDatabase from "../hooks/use-database";
 import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
-
 import { useTimer } from "../hooks/use-timer";
-import { AuthenticatorType } from "../dialogs/mfa/types";
 import {
   showLoadingDialog,
   showLogoutConfirmation
 } from "../common/dialog-controller";
 import { ErrorText } from "../components/error-text";
+import { AuthenticatorType, User } from "@notesnook/core";
 
 type EmailFormData = {
   email: string;
@@ -55,8 +55,8 @@ type PasswordFormData = EmailFormData & {
 };
 
 type MFALoginFormData = {
-  code?: string;
-  method?: MFAMethodType;
+  code: string;
+  method: MFAMethodType;
 };
 
 type SignupFormData = EmailFormData &
@@ -177,7 +177,7 @@ function Auth(props: AuthProps) {
 
   useEffect(() => {
     if (!isAppLoaded) return;
-    db.user?.getUser().then((user) => {
+    db.user.getUser().then((user) => {
       if (user && authorizedRoutes.includes(route) && !isSessionExpired())
         return openURL("/");
       setIsReady(true);
@@ -244,6 +244,20 @@ function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
     >
       {(form?: EmailFormData) => (
         <>
+          {IS_BETA ? (
+            <Flex
+              bg="background"
+              p={2}
+              sx={{ borderRadius: "default", alignItems: "start" }}
+            >
+              <Warn size={16} color="icon-error" />
+              <Text variant="body" ml={1}>
+                After logging in from v3 beta, your account data will be
+                migrated and you won&apos;t be able to use the v2 clients to
+                sync your notes.
+              </Text>
+            </Flex>
+          ) : null}
           <AuthField
             id="email"
             type="email"
@@ -406,7 +420,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
 
   useEffect(() => {
     (async () => {
-      const user = await db.user?.getUser();
+      const user = await db.user.getUser();
       if (user && isSessionExpired()) {
         setUser(user);
       } else if (!user) {
@@ -485,7 +499,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
           if (await showLogoutConfirmation()) {
             await showLoadingDialog({
               title: "You are being logged out",
-              action: () => db.user?.logout(true),
+              action: () => db.user.logout(true),
               subtitle: "Please wait..."
             });
             openURL("/login");
@@ -522,7 +536,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
           return;
         }
 
-        const url = await db.user?.recoverAccount(form.email.toLowerCase());
+        const url = await db.user.recoverAccount(form.email.toLowerCase());
         console.log(url);
         if (IS_TESTING) {
           window.open(url, "_self");
@@ -606,7 +620,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
     async (selectedMethod: "sms" | "email") => {
       setIsSending(true);
       try {
-        await db.mfa?.sendCode(selectedMethod);
+        await db.mfa.sendCode(selectedMethod);
         setEnabled(false);
       } catch (e) {
         const error = e as Error;
@@ -653,6 +667,8 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         subtitle: "Please wait while you are authenticated."
       }}
       onSubmit={async (form) => {
+        if (!form.code) throw new Error("2FA code is required.");
+
         const loginForm: MFALoginFormData = {
           code: form.code,
           method: formData.selectedMethod
@@ -933,44 +949,15 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
   );
 }
 
-type AuthFieldProps = {
-  id: string;
-  type: string;
-  autoFocus?: boolean;
-  autoComplete: string;
-  label?: string;
-  placeholder?: string;
-  helpText?: string;
-  defaultValue?: string;
-  disabled?: boolean;
-  inputMode?: string;
-  pattern?: string;
-  action?: {
-    disabled?: boolean;
-    component?: JSX.Element;
-    onClick?: () => void | Promise<void>;
-  };
-};
-export function AuthField(props: AuthFieldProps) {
+export function AuthField(props: FieldProps) {
   return (
     <Field
-      type={props.type}
-      id={props.id}
-      name={props.id}
-      data-test-id={props.id}
-      autoComplete={props.autoComplete}
-      label={props.label}
-      autoFocus={props.autoFocus}
-      defaultValue={props.defaultValue}
-      helpText={props.helpText}
-      disabled={props.disabled}
-      pattern={props.pattern}
-      inputMode={props.inputMode}
-      placeholder={props.placeholder}
+      {...props}
+      name={props.name || props.id}
+      data-test-id={props["data-test-id"] || props.id}
       required
-      action={props.action}
+      sx={{ mt: 2, width: "100%" }}
       styles={{
-        container: { mt: 2, width: "100%" },
         // label: { fontWeight: "normal" },
         input: {
           p: "12px",

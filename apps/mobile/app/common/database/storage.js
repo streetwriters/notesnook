@@ -91,7 +91,8 @@ export class KV {
   }
 
   async removeMulti(keys) {
-    return this.storage.removeItems(...keys);
+    if (!keys) return true;
+    return this.storage.removeItems(keys);
   }
 
   async clear() {

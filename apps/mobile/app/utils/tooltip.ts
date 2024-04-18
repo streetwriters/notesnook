@@ -16,8 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import RNTooltips from "react-native-tooltips";
-import { tabBarRef } from "./global-refs";
 import { Platform } from "react-native";
 
 export const POSITIONS = {
@@ -26,9 +24,13 @@ export const POSITIONS = {
   TOP: 3,
   BOTTOM: 4
 };
-
+let RNTooltips: any;
 let prevTarget: any = null;
 function show(event: any, text: string, position = 2) {
+  const tabBarRef = require("./global-refs").tabBarRef;
+  if (!RNTooltips) {
+    RNTooltips = require("react-native-tooltips").default;
+  }
   if (!event._targetInst?.ref?.current) return;
   prevTarget && RNTooltips.Dismiss(prevTarget);
   prevTarget = null;

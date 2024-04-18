@@ -21,7 +21,6 @@ import { StackActions } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFavoriteStore } from "../stores/use-favorite-store";
 import useNavigationStore, {
-  CurrentScreen,
   GenericRouteParam,
   RouteName,
   RouteParams
@@ -31,11 +30,9 @@ import { useNoteStore } from "../stores/use-notes-store";
 import { useReminderStore } from "../stores/use-reminder-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useTrashStore } from "../stores/use-trash-store";
-import { eOnNewTopicAdded } from "../utils/events";
+import { eOnRefreshSearch, eUpdateNotebookRoute } from "../utils/events";
 import { rootNavigatorRef, tabBarRef } from "../utils/global-refs";
 import { eSendEvent } from "./event-manager";
-import SettingsService from "./settings";
-import SearchService from "./search";
 
 /**
  * Routes that should be updated on focus
@@ -76,19 +73,19 @@ export type NavigationProps<T extends RouteName> = NativeStackScreenProps<
 const routeUpdateFunctions: {
   [name: string]: (...params: GenericRouteParam[]) => void;
 } = {
-  Notes: () => useNoteStore.getState().setNotes(),
-  Notebooks: () => useNotebookStore.getState().setNotebooks(),
-  Tags: () => useTagStore.getState().setTags(),
-  Favorites: () => useFavoriteStore.getState().setFavorites(),
-  Trash: () => useTrashStore.getState().setTrash(),
-  Notebook: (params) => eSendEvent(eOnNewTopicAdded, params),
+  Notes: () => useNoteStore.getState().refresh(),
+  Notebooks: () => useNotebookStore.getState().refresh(),
+  Tags: () => useTagStore.getState().refresh(),
+  Favorites: () => useFavoriteStore.getState().refresh(),
+  Trash: () => useTrashStore.getState().refresh(),
+  Notebook: (params) => eSendEvent(eUpdateNotebookRoute, params),
   NotesPage: (params) => eSendEvent("NotesPage", params),
   TaggedNotes: (params) => eSendEvent("TaggedNotes", params),
   ColoredNotes: (params) => eSendEvent("ColoredNotes", params),
   TopicNotes: (params) => eSendEvent("TopicNotes", params),
   Monographs: (params) => eSendEvent("Monographs", params),
-  Reminders: () => useReminderStore.getState().setReminders(),
-  Search: () => SearchService.updateAndSearch()
+  Reminders: () => useReminderStore.getState().refresh(),
+  Search: () => eSendEvent(eOnRefreshSearch)
 };
 
 function clearRouteFromQueue(routeName: RouteName) {
@@ -113,54 +110,39 @@ function queueRoutesForUpdate(...routesToUpdate: RouteName[]) {
     routesToUpdate?.length > 0
       ? routesToUpdate
       : (Object.keys(routeNames) as (keyof RouteParams)[]);
-  const currentScreen = useNavigationStore.getState().currentScreen;
-  if (routes.indexOf(currentScreen.name) > -1) {
-    routeUpdateFunctions[currentScreen.name]?.();
-    clearRouteFromQueue(currentScreen.name);
+  const currentRoute = useNavigationStore.getState().currentRoute;
+  if (routes.indexOf(currentRoute) > -1) {
+    routeUpdateFunctions[currentRoute]?.();
+    clearRouteFromQueue(currentRoute);
     // Remove focused screen from queue
-    routes.splice(routes.indexOf(currentScreen.name), 1);
+    routes.splice(routes.indexOf(currentRoute), 1);
   }
   routesUpdateQueue = routesUpdateQueue.concat(routes);
   routesUpdateQueue = [...new Set(routesUpdateQueue)];
 }
 
-function navigate<T extends RouteName>(
-  screen: CurrentScreen,
-  params: RouteParams[T]
-) {
-  useNavigationStore.getState().update(screen, !!params?.canGoBack);
-  if (screen.name === "Notebook") routeUpdateFunctions["Notebook"](params);
-  if (screen.name.endsWith("Notes") && screen.name !== "Notes")
-    routeUpdateFunctions[screen.name]?.(params);
-  //@ts-ignore Not sure how to fix this for now ignore it.
-  rootNavigatorRef.current?.navigate<RouteName>(screen.name, params);
+function navigate<T extends RouteName>(screen: T, params?: RouteParams[T]) {
+  console.log(`Navigation.navigate ${screen} route`);
+  rootNavigatorRef.current?.navigate(screen as any, params);
 }
 
 function goBack() {
   rootNavigatorRef.current?.goBack();
 }
 
-function push<T extends RouteName>(
-  screen: CurrentScreen,
-  params: RouteParams[T]
-) {
-  useNavigationStore.getState().update(screen, !!params?.canGoBack);
-  rootNavigatorRef.current?.dispatch(StackActions.push(screen.name, params));
+function push<T extends RouteName>(screen: T, params: RouteParams[T]) {
+  console.log(`Navigation.push ${screen} route`);
+  rootNavigatorRef.current?.dispatch(StackActions.push(screen as any, params));
 }
 
-function replace<T extends RouteName>(
-  screen: CurrentScreen,
-  params: RouteParams[T]
-) {
-  useNavigationStore.getState().update(screen, !!params?.canGoBack);
-  rootNavigatorRef.current?.dispatch(StackActions.replace(screen.name, params));
+function replace<T extends RouteName>(screen: T, params: RouteParams[T]) {
+  console.log(`Navigation.replace ${screen} route`);
+  rootNavigatorRef.current?.dispatch(StackActions.replace(screen, params));
 }
 
 function popToTop() {
+  console.log(`Navigation.popToTop`);
   rootNavigatorRef.current?.dispatch(StackActions.popToTop());
-  useNavigationStore.getState().update({
-    name: (SettingsService.get().homepage as RouteName) || "Notes"
-  });
 }
 
 function openDrawer() {

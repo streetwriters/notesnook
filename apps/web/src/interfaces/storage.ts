@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { IStorage } from "@notesnook/core/dist/interfaces";
 import {
   IndexedDBKVStore,
   LocalStorageKVStore,
@@ -25,27 +26,44 @@ import {
 } from "./key-value";
 import { NNCrypto } from "./nncrypto";
 import type { Cipher, SerializedKey } from "@notesnook/crypto/dist/src/types";
+import { isFeatureSupported } from "../utils/feature-check";
+import { IKeyStore } from "./key-store";
+import { User } from "@notesnook/core";
 
 type EncryptedKey = { iv: Uint8Array; cipher: BufferSource };
 export type DatabasePersistence = "memory" | "db";
 
 const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
 
-export class NNStorage {
-  database!: IKVStore;
+export class NNStorage implements IStorage {
+  database: IKVStore;
 
-  static async createInstance(
+  constructor(
     name: string,
+    private readonly keyStore: () => IKeyStore | null = () => null,
     persistence: DatabasePersistence = "db"
   ) {
-    const storage = new NNStorage();
-    storage.database =
+    this.database =
       persistence === "memory"
         ? new MemoryKVStore()
-        : (await IndexedDBKVStore.isIndexedDBSupported())
+        : isFeatureSupported("indexedDB")
         ? new IndexedDBKVStore(name, "keyvaluepairs")
         : new LocalStorageKVStore();
-    return storage;
+  }
+
+  async migrate() {
+    if (!this.keyStore) return;
+    const user = await this.read<User>("user");
+    if (!user) return;
+
+    const key = await this._getCryptoKey(`_uk_@${user.email}`);
+    if (!key) return;
+
+    await this.database.deleteMany([
+      `_uk_@${user.email}`,
+      `_uk_@${user.email}@_k`
+    ]);
+    await this.keyStore()?.setValue("userEncryptionKey", key);
   }
 
   read<T>(key: string): Promise<T | undefined> {
@@ -53,8 +71,8 @@ export class NNStorage {
     return this.database.get(key);
   }
 
-  readMulti(keys: string[]) {
-    if (keys.length <= 0) return [];
+  readMulti<T>(keys: string[]): Promise<[string, T][]> {
+    if (keys.length <= 0) return Promise.resolve([]);
     return this.database.getMany(keys.sort());
   }
 
@@ -82,43 +100,22 @@ export class NNStorage {
     return this.database.keys();
   }
 
-  async deriveCryptoKey(name: string, credentials: SerializedKey) {
+  async deriveCryptoKey(credentials: SerializedKey) {
+    if (!this.keyStore) throw new Error("No key store found!");
+
     const { password, salt } = credentials;
     if (!password) throw new Error("Invalid data provided to deriveCryptoKey.");
 
     const keyData = await NNCrypto.exportKey(password, salt);
+    if (!keyData.key) throw new Error("Invalid key.");
 
-    if (
-      (await IndexedDBKVStore.isIndexedDBSupported()) &&
-      window?.crypto?.subtle &&
-      keyData.key
-    ) {
-      const pbkdfKey = await derivePBKDF2Key(password);
-      await this.write(name, pbkdfKey);
-      const cipheredKey = await aesEncrypt(pbkdfKey, keyData.key);
-      await this.write(`${name}@_k`, cipheredKey);
-    } else if (keyData.key) {
-      await this.write(`${name}@_k`, keyData.key);
-    } else {
-      throw new Error(`Invalid key.`);
-    }
+    await this.keyStore()?.setValue("userEncryptionKey", keyData.key);
   }
 
-  async getCryptoKey(name: string): Promise<string | undefined> {
-    if (
-      (await IndexedDBKVStore.isIndexedDBSupported()) &&
-      window?.crypto?.subtle
-    ) {
-      const pbkdfKey = await this.read<CryptoKey>(name);
-      const cipheredKey = await this.read<EncryptedKey | string>(`${name}@_k`);
-      if (typeof cipheredKey === "string") return cipheredKey;
-      if (!pbkdfKey || !cipheredKey) return;
-      return await aesDecrypt(pbkdfKey, cipheredKey);
-    } else {
-      const key = await this.read<string>(`${name}@_k`);
-      if (!key) return;
-      return key;
-    }
+  async getCryptoKey(): Promise<string | undefined> {
+    if (!this.keyStore) throw new Error("No key store found!");
+
+    return this.keyStore()?.getValue("userEncryptionKey");
   }
 
   async generateCryptoKey(
@@ -146,10 +143,7 @@ export class NNStorage {
     return NNCrypto.encryptMulti(key, items, "text", "base64");
   }
 
-  decrypt(
-    key: SerializedKey,
-    cipherData: Cipher<"base64">
-  ): Promise<string | undefined> {
+  decrypt(key: SerializedKey, cipherData: Cipher<"base64">): Promise<string> {
     cipherData.format = "base64";
     return NNCrypto.decrypt(key, cipherData, "text");
   }
@@ -157,60 +151,30 @@ export class NNStorage {
   decryptMulti(
     key: SerializedKey,
     items: Cipher<"base64">[]
-  ): Promise<string[] | undefined> {
+  ): Promise<string[]> {
     items.forEach((c) => (c.format = "base64"));
     return NNCrypto.decryptMulti(key, items, "text");
   }
+
+  /**
+   * @deprecated
+   */
+  private async _getCryptoKey(name: string) {
+    if (isFeatureSupported("indexedDB") && window?.crypto?.subtle) {
+      const pbkdfKey = await this.read<CryptoKey>(name);
+      const cipheredKey = await this.read<EncryptedKey | string>(`${name}@_k`);
+      if (typeof cipheredKey === "string") return cipheredKey;
+      if (!pbkdfKey || !cipheredKey) return;
+      return await aesDecrypt(pbkdfKey, cipheredKey);
+    } else {
+      const key = await this.read<string>(`${name}@_k`);
+      if (!key) return;
+      return key;
+    }
+  }
 }
 
-const enc = new TextEncoder();
 const dec = new TextDecoder();
-
-async function derivePBKDF2Key(password: string): Promise<CryptoKey> {
-  const key = await window.crypto.subtle.importKey(
-    "raw",
-    enc.encode(password),
-    "PBKDF2",
-    false,
-    ["deriveKey"]
-  );
-
-  const salt = window.crypto.getRandomValues(new Uint8Array(16));
-  return await window.crypto.subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      salt,
-      iterations: 100000,
-      hash: "SHA-256"
-    },
-    key,
-    { name: "AES-GCM", length: 256 },
-    true,
-    ["encrypt", "decrypt"]
-  );
-}
-
-async function aesEncrypt(
-  cryptoKey: CryptoKey,
-  data: string
-): Promise<EncryptedKey> {
-  const iv = window.crypto.getRandomValues(new Uint8Array(12));
-
-  const cipher = await window.crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv: iv
-    },
-    cryptoKey,
-    enc.encode(data)
-  );
-
-  return {
-    iv,
-    cipher
-  };
-}
-
 async function aesDecrypt(
   cryptoKey: CryptoKey,
   data: EncryptedKey

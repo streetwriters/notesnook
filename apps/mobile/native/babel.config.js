@@ -6,7 +6,15 @@ const configs = {
       plugins: [
         '@babel/plugin-transform-named-capturing-groups-regex',
         'react-native-reanimated/plugin',
-        "@babel/plugin-transform-export-namespace-from"
+        "@babel/plugin-transform-export-namespace-from",
+      ],
+      overrides: [
+        {
+          test: '../node_modules/kysely',
+          plugins: [
+            ["@babel/plugin-transform-private-methods", { "loose": true }]
+          ]
+        }
       ]
     },
     test: {
@@ -14,8 +22,22 @@ const configs = {
       plugins: [
         '@babel/plugin-transform-named-capturing-groups-regex',
         'react-native-reanimated/plugin',
-        ["@babel/plugin-transform-private-methods", { "loose": true }]
+      ],
+      overrides: [
+        {
+          test: '../node_modules/kysely',
+          plugins: [
+            ["@babel/plugin-transform-private-methods", { "loose": true }]
+          ]
+        },
+        {
+          test: '../node_modules/jest-runner',
+          plugins: [
+            ["@babel/plugin-transform-private-methods", { "loose": true }]
+          ]
+        }
       ]
+      
     },
     production: {
       presets: ['module:metro-react-native-babel-preset'],
@@ -23,7 +45,15 @@ const configs = {
         'transform-remove-console',
         '@babel/plugin-transform-named-capturing-groups-regex',
         'react-native-reanimated/plugin',
-        "@babel/plugin-transform-export-namespace-from"
+        "@babel/plugin-transform-export-namespace-from",
+      ],
+      overrides: [
+        {
+          test: '../node_modules/kysely',
+          plugins: [
+            ["@babel/plugin-transform-private-methods", { "loose": true }]
+          ]
+        }
       ]
     }
   }

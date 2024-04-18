@@ -17,27 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import {
   NavigationProp,
   StackActions,
   useNavigation
 } from "@react-navigation/native";
 import React, { useRef, useState } from "react";
-import { View, TextInput, ActivityIndicator } from "react-native";
+import { ActivityIndicator, TextInput, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ToggleSwitch from "toggle-switch-react-native";
+import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
-import { PressableButton } from "../../components/ui/pressable";
+import { Pressable } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
 import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
-import { IconButton } from "../../components/ui/icon-button";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
@@ -50,6 +50,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
 
   const onChangeSettings = async () => {
     if (loading) return;
+    if (item.onVerify && !(await item.onVerify())) return;
     if (item.modifer) {
       setLoading(true);
       await item.modifer(item.property || current);
@@ -57,10 +58,11 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       return;
     }
     if (!item.property) return;
+    const nextValue = !settings[item.property];
     SettingsService.set({
-      [item.property]: !settings[item.property]
+      [item.property]: nextValue
     });
-    item.onChange?.(!settings[item.property]);
+    setImmediate(() => item.onChange?.(nextValue));
   };
 
   const styles =
@@ -91,9 +93,9 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   };
 
   return isHidden ? null : (
-    <PressableButton
+    <Pressable
       disabled={item.type === "component"}
-      customStyle={{
+      style={{
         width: "100%",
         alignItems: "center",
         padding: 12,
@@ -103,26 +105,25 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         borderRadius: 0,
         ...styles
       }}
-      onPress={() => {
+      onPress={async () => {
         switch (item.type) {
           case "screen":
-            navigation.dispatch(StackActions.push("SettingsGroup", item));
-            useNavigationStore.getState().update(
-              {
-                name: "SettingsGroup" as never,
-                title:
-                  typeof item.name === "function"
-                    ? item.name(current)
-                    : item.name
-              },
-              true
-            );
+            {
+              if (item.onVerify && !(await item.onVerify())) return;
+              navigation.dispatch(StackActions.push("SettingsGroup", item));
+              useNavigationStore.getState().update("Settings");
+            }
             break;
           case "switch":
-            onChangeSettings();
+            {
+              onChangeSettings();
+            }
             break;
           default:
-            item.modifer && item.modifer(current);
+            {
+              if (item.onVerify && !(await item.onVerify())) return;
+              item.modifer && item.modifer(current);
+            }
             break;
         }
       }}
@@ -329,7 +330,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       {loading ? (
         <ActivityIndicator size={SIZE.xxl} color={colors.primary.accent} />
       ) : null}
-    </PressableButton>
+    </Pressable>
   );
 };
 export const SectionItem = React.memo(_SectionItem, () => true);

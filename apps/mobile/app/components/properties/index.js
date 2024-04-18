@@ -16,17 +16,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React, { useRef } from "react";
-import { Dimensions, Platform, View, useWindowDimensions } from "react-native";
+import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { Platform, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
-import { presentSheet } from "../../services/event-manager";
-import SearchService from "../../services/search";
-import { useThemeColors } from "@notesnook/theme";
+import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { ColorValues } from "../../utils/colors";
+import { eOnLoadNote } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
+import { useSideBarDraggingStore } from "../side-menu/dragging-store";
+import { IconButton } from "../ui/icon-button";
+import { Pressable } from "../ui/pressable";
 import { ReminderTime } from "../ui/reminder-time";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
@@ -34,7 +37,9 @@ import { DateMeta } from "./date-meta";
 import { Items } from "./items";
 import Notebooks from "./notebooks";
 import { Synced } from "./synced";
-import { Tags, TagStrip } from "./tags";
+import { TagStrip, Tags } from "./tags";
+import { tabBarRef } from "../../utils/global-refs";
+
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
   return (
@@ -52,7 +57,6 @@ const Line = ({ top = 6, bottom = 6 }) => {
 
 export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   const { colors } = useThemeColors();
-  const alias = item.alias || item.title;
   const isColor = !!ColorValues[item.title];
   if (!item || !item.id) {
     return (
@@ -72,6 +76,8 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
         maxHeight: "100%"
       }}
+      nestedScrollEnabled
+      bounces={false}
       data={[0]}
       keyExtractor={() => "properties-scroll-item"}
       renderItem={() => (
@@ -81,17 +87,72 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               paddingHorizontal: 12,
               marginTop: 5,
               zIndex: 10,
-              marginBottom: 6
+              marginBottom: 5
             }}
           >
-            <Heading size={SIZE.lg}>
-              {item.type === "tag" && !isColor ? (
-                <Heading size={SIZE.xl} color={colors.primary.accent}>
-                  #
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between"
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  flexShrink: 1
+                }}
+              >
+                {item.type === "color" ? (
+                  <Pressable
+                    type="accent"
+                    accentColor={item.colorCode}
+                    accentText={colors.static.white}
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 100,
+                      marginRight: 10
+                    }}
+                  />
+                ) : null}
+
+                <Heading size={SIZE.lg}>
+                  {item.type === "tag" && !isColor ? (
+                    <Heading size={SIZE.xl} color={colors.primary.accent}>
+                      #
+                    </Heading>
+                  ) : null}
+                  {item.title}
                 </Heading>
+              </View>
+
+              {item.type === "note" ? (
+                <IconButton
+                  name="open-in-new"
+                  type="plain"
+                  color={colors.primary.icon}
+                  size={SIZE.lg}
+                  style={{
+                    alignSelf: "flex-start"
+                  }}
+                  onPress={() => {
+                    close();
+                    eSendEvent(eOnLoadNote, {
+                      item: item,
+                      presistTab: true
+                    });
+                    if (!DDS.isTab) {
+                      tabBarRef.current?.goToPage(1);
+                    }
+                  }}
+                />
               ) : null}
-              {alias}
-            </Heading>
+            </View>
+
+            {item.type === "notebook" && item.description ? (
+              <Paragraph>{item.description}</Paragraph>
+            ) : null}
 
             {item.type === "note" ? (
               <TagStrip close={close} item={item} />
@@ -115,24 +176,28 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
 
           <DateMeta item={item} />
           <Line bottom={0} />
-          {item.type === "note" ? <Tags close={close} item={item} /> : null}
 
-          <View
-            style={{
-              paddingHorizontal: 12
-            }}
-          >
-            <Notebooks note={item} close={close} />
-          </View>
+          {item.type === "note" ? (
+            <>
+              <Tags close={close} item={item} />
+              <Line bottom={0} />
+            </>
+          ) : null}
+          {item.type === "note" ? (
+            <View
+              style={{
+                paddingHorizontal: 12
+              }}
+            >
+              <Notebooks note={item} close={close} />
+            </View>
+          ) : null}
 
           <Items
             item={item}
             buttons={buttons}
             close={() => {
               close();
-              setTimeout(() => {
-                SearchService.updateAndSearch();
-              }, 1000);
             }}
           />
 
@@ -152,7 +217,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   );
 };
 
-Properties.present = (item, buttons = [], isSheet) => {
+Properties.present = async (item, buttons = [], isSheet) => {
   if (!item) return;
   let type = item?.type;
   let props = [];
@@ -164,7 +229,7 @@ Properties.present = (item, buttons = [], isSheet) => {
       break;
     case "note":
       android = Platform.OS === "android" ? ["pin-to-notifications"] : [];
-      props[0] = db.notes.note(item.id).data;
+      props[0] = await db.notes.note(item.id);
       props.push([
         "notebooks",
         "add-reminder",
@@ -177,45 +242,46 @@ Properties.present = (item, buttons = [], isSheet) => {
         "attachments",
         "lock-unlock",
         "trash",
-        "remove-from-topic",
         "remove-from-notebook",
         "history",
         "read-only",
         "reminders",
         "local-only",
         "duplicate",
+        "copy-link",
+        "references",
         ...android,
         ...buttons
       ]);
       break;
     case "notebook":
-      props[0] = db.notebooks.notebook(item.id).data;
+      props[0] = await db.notebooks.notebook(item.id);
       props.push([
         "edit-notebook",
         "pin",
         "add-shortcut",
         "trash",
-        "default-notebook"
-      ]);
-      break;
-    case "topic":
-      props[0] = db.notebooks
-        .notebook(item.notebookId)
-        .topics.topic(item.id)._topic;
-      props.push([
+        "default-notebook",
+        "add-notebook",
         "move-notes",
-        "edit-topic",
-        "add-shortcut",
-        "trash",
-        "default-topic"
+        "move-notebook"
       ]);
       break;
     case "tag":
-      props[0] = db.tags.tag(item.id);
+      props[0] = await db.tags.tag(item.id);
       props.push(["add-shortcut", "trash", "rename-tag"]);
       break;
+    case "color":
+      props[0] = await db.colors.color(item.id);
+
+      props.push([
+        "trash",
+        "rename-color",
+        ...(useSideBarDraggingStore.getState().dragging ? [] : ["reorder"])
+      ]);
+      break;
     case "reminder": {
-      props[0] = db.reminders.reminder(item.id);
+      props[0] = await db.reminders.reminder(item.id);
       props.push(["edit-reminder", "trash", "disable-reminder"]);
       break;
     }

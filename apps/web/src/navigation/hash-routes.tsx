@@ -22,7 +22,6 @@ import {
   showBuyDialog,
   showCreateTagDialog,
   showEditReminderDialog,
-  showEditTagDialog,
   showEmailVerificationDialog,
   showFeatureDialog,
   showOnboardingDialog,
@@ -32,25 +31,13 @@ import {
   showAddNotebookDialog,
   showEditNotebookDialog
 } from "../common/dialog-controller";
-import { closeOpenedDialog } from "../common/dialog-controller";
-import RouteContainer from "../components/route-container";
-import DiffViewer from "../components/diff-viewer";
-import Unlock from "../components/unlock";
-import { store as editorStore } from "../stores/editor-store";
-import { isMobile } from "../utils/dimensions";
-import {
-  showEditTopicDialog,
-  showCreateTopicDialog
-} from "../common/dialog-controller";
 import { hashNavigate } from ".";
-import Editor from "../components/editor";
 import { defineRoutes } from "./types";
+import { useEditorStore } from "../stores/editor-store";
 
 const hashroutes = defineRoutes({
   "/": () => {
-    return (
-      !editorStore.get().session.state && <Editor noteId={0} nonce={"-1"} />
-    );
+    // return <Editor nonce={"-1"} />;
   },
   "/email/verify": () => {
     showEmailVerificationDialog().then(afterAction);
@@ -61,68 +48,20 @@ const hashroutes = defineRoutes({
   "/notebooks/:notebookId/edit": ({ notebookId }) => {
     showEditNotebookDialog(notebookId)?.then(afterAction);
   },
-  "/topics/create": () => {
-    showCreateTopicDialog().then(afterAction);
-  },
   "/reminders/create": () => {
     showAddReminderDialog().then(afterAction);
   },
   "/reminders/:reminderId/edit": ({ reminderId }) => {
     showEditReminderDialog(reminderId).then(afterAction);
   },
-  "/notebooks/:notebookId/topics/:topicId/edit": ({
-    notebookId,
-    topicId
-  }: {
-    notebookId: string;
-    topicId: string;
-  }) => {
-    showEditTopicDialog(notebookId, topicId)?.then(afterAction);
-  },
   "/tags/create": () => {
     showCreateTagDialog().then(afterAction);
   },
-  "/tags/:tagId/edit": ({ tagId }) => {
-    showEditTagDialog(tagId)?.then(afterAction);
-  },
-  "/notes/create": () => {
-    closeOpenedDialog();
-    hashNavigate("/notes/create", { addNonce: true, replace: true });
-  },
-  "/notes/create/:nonce": ({ nonce }) => {
-    closeOpenedDialog();
-    return <Editor noteId={0} nonce={nonce} />;
+  "/notes/:noteId/create": ({ noteId }) => {
+    useEditorStore.getState().openSession(noteId);
   },
   "/notes/:noteId/edit": ({ noteId }) => {
-    closeOpenedDialog();
-
-    return <Editor noteId={noteId} />;
-  },
-  "/notes/:noteId/unlock": ({ noteId }) => {
-    closeOpenedDialog();
-    return (
-      <RouteContainer
-        type="unlock"
-        buttons={{
-          back: isMobile()
-            ? {
-                title: "Go back",
-                onClick: () =>
-                  hashNavigate("/notes/create", {
-                    addNonce: true,
-                    replace: true
-                  })
-              }
-            : undefined
-        }}
-      >
-        <Unlock noteId={noteId} />
-      </RouteContainer>
-    );
-  },
-  "/notes/:noteId/conflict": ({ noteId }) => {
-    closeOpenedDialog();
-    return <DiffViewer noteId={noteId} />;
+    useEditorStore.getState().openSession(noteId);
   },
   "/buy": () => {
     showBuyDialog().then(afterAction);

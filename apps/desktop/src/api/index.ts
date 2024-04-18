@@ -23,6 +23,8 @@ import { osIntegrationRouter } from "./os-integration";
 import { spellCheckerRouter } from "./spell-checker";
 import { updaterRouter } from "./updater";
 import { bridgeRouter } from "./bridge";
+import { safeStorageRouter } from "./safe-storage";
+import { windowRouter } from "./window";
 
 const t = initTRPC.create();
 
@@ -31,7 +33,9 @@ export const router = t.router({
   integration: osIntegrationRouter,
   spellChecker: spellCheckerRouter,
   updater: updaterRouter,
-  bridge: bridgeRouter
+  bridge: bridgeRouter,
+  safeStorage: safeStorageRouter,
+  window: windowRouter
 });
 
 export const api = router.createCaller({});

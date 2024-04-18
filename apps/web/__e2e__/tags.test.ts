@@ -200,7 +200,7 @@ test(`sort tags`, async ({ page }, info) => {
           });
           if (!sortResult) return;
 
-          expect(await tags.isEmpty()).toBeFalsy();
+          await expect(tags.items).toHaveCount(titles.length);
         });
       }
     }

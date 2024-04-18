@@ -89,13 +89,7 @@ export const TaskListNode = TaskList.extend({
   parseHTML() {
     return [
       {
-        tag: "ul",
-        getAttrs: (node) => {
-          if (node instanceof Node && node instanceof HTMLElement) {
-            return node.classList.contains("checklist") && null;
-          }
-          return false;
-        },
+        tag: "ul.checklist",
         priority: 51
       }
     ];
@@ -244,6 +238,8 @@ export const TaskListNode = TaskList.extend({
               return false;
             }
           });
+          tr.setMeta("preventUpdate", true);
+          tr.setMeta("addToHistory", false);
           view.dispatch(tr);
           return {};
         },

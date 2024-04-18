@@ -23,11 +23,10 @@ import { Platform, View } from "react-native";
 import FileViewer from "react-native-file-viewer";
 import * as ScopedStorage from "react-native-scoped-storage";
 import Share from "react-native-share";
-//import { LOGO_BASE64 } from '../../../assets/images/assets';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastManager
 } from "../../../services/event-manager";
 import { clearMessage } from "../../../services/message";
 import SettingsService from "../../../services/settings";
@@ -75,7 +74,7 @@ class RecoveryKeySheet extends React.Component {
 
   close = () => {
     if (this.tapCount === 0) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Did you save recovery key?",
         message: "Tap one more time to confirm.",
         type: "success",
@@ -129,7 +128,7 @@ class RecoveryKeySheet extends React.Component {
           path = await Storage.checkAndCreateDir("/");
           await RNFetchBlob.fs.writeFile(path + fileName, data, "base64");
         }
-        ToastEvent.show({
+        ToastManager.show({
           heading: "Recovery key QR-Code saved",
           message:
             "QR-Code image has been saved to Gallery at " + path + fileName,
@@ -164,7 +163,7 @@ class RecoveryKeySheet extends React.Component {
         path = path + fileName;
       }
 
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Recovery key text file saved",
         message: "Recovery key saved in text file.",
         type: "success",
@@ -284,7 +283,7 @@ class RecoveryKeySheet extends React.Component {
           <Button
             onPress={() => {
               Clipboard.setString(this.state.key);
-              ToastEvent.show({
+              ToastManager.show({
                 heading: "Recovery key copied!",
                 type: "success",
                 context: "local"
@@ -293,7 +292,7 @@ class RecoveryKeySheet extends React.Component {
             icon="content-copy"
             title="Copy to clipboard"
             width="100%"
-            type="grayAccent"
+            type="secondaryAccented"
             fontSize={SIZE.md}
           />
           <Seperator />
@@ -301,7 +300,7 @@ class RecoveryKeySheet extends React.Component {
             title="Save QR-Code to gallery"
             onPress={this.saveQRCODE}
             width="100%"
-            type="grayAccent"
+            type="secondaryAccented"
             fontSize={SIZE.md}
             icon="qrcode"
           />
@@ -310,7 +309,7 @@ class RecoveryKeySheet extends React.Component {
             onPress={this.saveToTextFile}
             title="Save to text file"
             width="100%"
-            type="grayAccent"
+            type="secondaryAccented"
             icon="text"
             fontSize={SIZE.md}
           />
@@ -320,7 +319,7 @@ class RecoveryKeySheet extends React.Component {
             onPress={this.shareFile}
             title="Share to Cloud"
             width="100%"
-            type="grayAccent"
+            type="secondaryAccented"
             icon="cloud"
             fontSize={SIZE.md}
           />

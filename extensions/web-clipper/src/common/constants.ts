@@ -22,5 +22,5 @@ export const APP_URL =
     : "http://localhost:3000";
 export const APP_URL_FILTER =
   process.env.NODE_ENV === "production"
-    ? ["*://app.notesnook.com/*"]
+    ? ["*://app.notesnook.com/*", "*://v3.notesnook.com/*"]
     : ["*://localhost/*"];

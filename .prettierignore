@@ -12,3 +12,4 @@ apps/web/public/an.js
 
 # editor
 packages/editor/styles/
+/.nx/cache

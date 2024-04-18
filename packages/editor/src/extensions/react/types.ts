@@ -50,19 +50,15 @@ export type ReactNodeViewProps<TAttributes = Attrs> = {
   editor: Editor;
   updateAttributes: UpdateAttributes<TAttributes>;
   forwardRef?: ForwardRef;
+  selected: boolean;
 };
-
-export type SelectionBasedReactNodeViewProps<TAttributes = Attrs> =
-  ReactNodeViewProps<TAttributes> & {
-    selected: boolean;
-  };
 
 export type ReactNodeViewOptions<P> = {
   props?: P;
   component?: React.ComponentType<P>;
   componentKey?: (node: PMNode) => string;
   shouldUpdate?: ShouldUpdate;
-  contentDOMFactory?: (() => ContentDOM) | boolean;
+  contentDOMFactory?: ((node: PMNode) => ContentDOM) | boolean;
   wrapperFactory?: () => HTMLElement;
   forceEnableSelection?: boolean;
 };

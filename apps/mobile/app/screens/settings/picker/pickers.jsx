@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { db } from "../../../common/database";
-import { ToastEvent } from "../../../services/event-manager";
+import { ToastManager } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { MenuItemsList } from "../../../utils/menu-items";
@@ -27,6 +27,7 @@ import { getFontById, getFonts } from "@notesnook/editor/dist/utils/font";
 import { DATE_FORMATS, TIME_FORMATS } from "@notesnook/core/dist/common";
 import dayjs from "dayjs";
 import { useUserStore } from "../../../stores/use-user-store";
+import { verifyUserWithApplock } from "../functions";
 
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
@@ -48,7 +49,7 @@ export const HomePicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.homepage,
   updateValue: (item) => {
     SettingsService.set({ homepage: item.name });
-    ToastEvent.show({
+    ToastManager.show({
       heading: "Homepage set to " + item.name,
       message: "Restart the app for changes to take effect.",
       type: "success"
@@ -136,5 +137,27 @@ export const BackupReminderPicker = createSettingsPicker({
   },
   onCheckOptionIsPremium: (item) => {
     return item !== "useroff";
+  }
+});
+
+export const ApplockTimerPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.appLockTimer,
+  updateValue: (item) => {
+    SettingsService.set({ appLockTimer: item });
+  },
+  formatValue: (item) => {
+    return item === -1
+      ? "Never"
+      : item === 0 || item === undefined
+      ? "Immediately"
+      : item === 1
+      ? "1 minute"
+      : item + " minutes";
+  },
+  getItemKey: (item) => item.toString(),
+  options: [-1, 0, 1, 5, 15, 30],
+  compareValue: (current, item) => current === item,
+  onVerify: () => {
+    return verifyUserWithApplock();
   }
 });

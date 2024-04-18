@@ -168,7 +168,7 @@ function Notebook(props: NotebookProps) {
         }}
       />
 
-      <FilteredList
+      {/* <FilteredList
         getAll={() => notebook.topics}
         itemName="topic"
         placeholder={"Search for a topic"}
@@ -188,7 +188,7 @@ function Notebook(props: NotebookProps) {
             }}
           />
         )}
-      />
+      /> */}
     </Flex>
   );
 }

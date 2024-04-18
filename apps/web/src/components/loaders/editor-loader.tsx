@@ -23,14 +23,16 @@ import { Box, Flex, Text } from "@theme-ui/components";
 import "react-loading-skeleton/dist/skeleton.css";
 import Config from "../../utils/config";
 import { TextScramble } from "../text-scramble";
-import useHashLocation from "../../hooks/use-hash-location";
+import useHashLocation, {
+  getHashLocation
+} from "../../hooks/use-hash-location";
 import makeMatcher from "wouter/matcher";
 import { Lock } from "../icons";
 
 const matcher = makeMatcher();
 const EDITOR_MARGINS = Config.get("editor:margins", true);
 export const EditorLoader = memo(function EditorLoader() {
-  const [{ location }] = useHashLocation();
+  const location = getHashLocation();
   const [isNoteLoading] = matcher("/notes/:noteId/edit", location);
   const [isNoteLocked] = matcher("/notes/:noteId/unlock", location);
 

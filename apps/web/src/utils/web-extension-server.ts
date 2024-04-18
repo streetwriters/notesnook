@@ -28,41 +28,47 @@ import { isUserPremium } from "../hooks/use-is-user-premium";
 import { store as appstore } from "../stores/app-store";
 import { h } from "./html";
 import { sanitizeFilename } from "@notesnook/common";
-import { attachFile } from "../components/editor/picker";
 import { getFormattedDate } from "@notesnook/common";
 import { useStore as useThemeStore } from "../stores/theme-store";
+import { isCipher } from "@notesnook/core/dist/database/crypto";
+import { attachFiles } from "../components/editor/picker";
 
 export class WebExtensionServer implements Server {
   async login() {
     const { colorScheme, darkTheme, lightTheme } = useThemeStore.getState();
-    const user = await db.user?.getUser();
+    const user = await db.user.getUser();
     const theme = colorScheme === "dark" ? darkTheme : lightTheme;
     if (!user) return { pro: false, theme };
     return { email: user.email, pro: isUserPremium(user), theme };
   }
 
   async getNotes(): Promise<ItemReference[] | undefined> {
-    return db.notes?.all
-      .filter((n) => !n.locked)
-      .map((note) => ({ id: note.id, title: note.title }));
+    const notes = await db.notes.all
+      // TODO: .where((eb) => eb("notes.locked", "==", false))
+      .fields(["notes.id", "notes.title"])
+      .items(undefined, db.settings.getGroupOptions("notes"));
+    return notes;
   }
 
-  async getNotebooks(): Promise<NotebookReference[] | undefined> {
-    return db.notebooks?.all.map((nb) => ({
-      id: nb.id,
-      title: nb.title,
-      topics: nb.topics.map((topic: ItemReference) => ({
-        id: topic.id,
-        title: topic.title
-      }))
-    }));
+  async getNotebooks(
+    parentId?: string
+  ): Promise<NotebookReference[] | undefined> {
+    if (!parentId)
+      return await db.notebooks.roots
+        .fields(["notebooks.id", "notebooks.title"])
+        .items();
+
+    return await db.relations
+      .from({ type: "notebook", id: parentId as string }, "notebook")
+      .selector.fields(["notebooks.id", "notebooks.title"])
+      .items();
   }
 
   async getTags(): Promise<ItemReference[] | undefined> {
-    return db.tags?.all.map((tag) => ({
-      id: tag.id,
-      title: tag.title
-    }));
+    const tags = await db.tags.all
+      .fields(["tags.id", "tags.title"])
+      .items(undefined, db.settings.getGroupOptions("tags"));
+    return tags;
   }
 
   async saveClip(clip: Clip) {
@@ -79,7 +85,7 @@ export class WebExtensionServer implements Server {
         }
       );
 
-      const attachment = await attachFile(clippedFile);
+      const attachment = (await attachFiles([clippedFile]))?.at(0);
       if (!attachment) return;
 
       clipContent += h("iframe", [], {
@@ -93,9 +99,12 @@ export class WebExtensionServer implements Server {
       }).outerHTML;
     }
 
-    const note = clip.note?.id ? db.notes?.note(clip.note?.id) : null;
+    const note = clip.note?.id ? await db.notes.note(clip.note?.id) : null;
 
-    let content = (await note?.content()) || "";
+    let content =
+      (!!note?.contentId && (await db.content.get(note.contentId))?.data) || "";
+    if (isCipher(content)) return;
+
     content += clipContent;
     content += h("div", [
       h("hr"),
@@ -103,24 +112,24 @@ export class WebExtensionServer implements Server {
       h("p", [`Date clipped: ${getFormattedDate(Date.now())}`])
     ]).innerHTML;
 
-    const id = await db.notes?.add({
+    const id = await db.notes.add({
       id: note?.id,
       title: note ? note.title : clip.title,
-      content: { type: "tiptap", data: content },
-      tags: note ? note.tags : clip.tags
+      content: { type: "tiptap", data: content }
     });
+
+    if (id && clip.tags) {
+      for (const id of clip.tags) {
+        if (!(await db.tags.exists(id))) continue;
+        await db.relations.add({ id: id, type: "tag" }, { id, type: "note" });
+      }
+    }
 
     if (clip.refs && id && !clip.note) {
       for (const ref of clip.refs) {
         switch (ref.type) {
           case "notebook":
-            await db.notes?.addToNotebook({ id: ref.id }, id);
-            break;
-          case "topic":
-            await db.notes?.addToNotebook(
-              { id: ref.parentId, topic: ref.id },
-              id
-            );
+            await db.notes.addToNotebook(ref.id, id);
             break;
         }
       }

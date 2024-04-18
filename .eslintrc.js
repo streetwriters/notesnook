@@ -78,7 +78,13 @@ module.exports = {
     semi: ["error", "always"],
     "@typescript-eslint/no-empty-function": "off",
     "react/prop-types": "off",
-    "header/header": ["error", "block", LICENSE, 1]
+    "header/header": ["error", "block", LICENSE, 1],
+    "@typescript-eslint/no-empty-interface": [
+      "error",
+      {
+        allowSingleExtends: true
+      }
+    ]
   },
   settings: {
     react: {

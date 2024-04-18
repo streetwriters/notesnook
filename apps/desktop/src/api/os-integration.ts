@@ -31,6 +31,7 @@ import { observable } from "@trpc/server/observable";
 import { AssetManager } from "../utils/asset-manager";
 import { isFlatpak } from "../utils";
 import { setupDesktopIntegration } from "../utils/desktop-integration";
+import { rm } from "fs/promises";
 
 const t = initTRPC.create();
 
@@ -134,9 +135,12 @@ export const osIntegrationRouter = t.router({
     .input(z.object({ filePath: z.string() }))
     .query(({ input }) => {
       const { filePath } = input;
-      if (!filePath) return;
       return resolvePath(filePath);
     }),
+
+  deleteFile: t.procedure.input(z.string()).query(async ({ input }) => {
+    await rm(input);
+  }),
 
   showNotification: t.procedure
     .input(NotificationOptions)
@@ -166,16 +170,42 @@ export const osIntegrationRouter = t.router({
     }),
   bringToFront: t.procedure.query(() => bringToFront()),
   changeTheme: t.procedure
-    .input(Theme)
-    .mutation(({ input }) => setTheme(input)),
+    .input(
+      z.object({
+        theme: Theme,
+        windowControlsIconColor: z.string().optional(),
+        backgroundColor: z.string().optional()
+      })
+    )
+    .mutation(
+      ({ input: { theme, windowControlsIconColor, backgroundColor } }) => {
+        if (windowControlsIconColor) {
+          config.windowControlsIconColor = windowControlsIconColor;
+          if (process.platform === "win32")
+            globalThis.window?.setTitleBarOverlay({
+              symbolColor: windowControlsIconColor
+            });
+        }
+
+        if (backgroundColor) {
+          config.backgroundColor = backgroundColor;
+        }
+
+        setTheme(theme);
+      }
+    ),
 
   onThemeChanged: t.procedure.subscription(() =>
     observable<"dark" | "light">((emit) => {
-      nativeTheme.on("updated", () => {
+      const updated = () => {
         if (getTheme() === "system") {
           emit.next(nativeTheme.shouldUseDarkColors ? "dark" : "light");
         }
-      });
+      };
+      nativeTheme.on("updated", updated);
+      return () => {
+        nativeTheme.off("updated", updated);
+      };
     })
   )
 });

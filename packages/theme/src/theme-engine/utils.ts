@@ -74,12 +74,12 @@ export function themeToCSS(theme: ThemeDefinition) {
     const scope = theme.scopes[scopeKey] || {};
     const variants = buildVariants(scopeKey, theme, scope);
 
-    let scopeCss = `.theme-scope-${scopeKey} {`;
+    let scopeCss = `.theme-scope-${scopeKey} {\n\t`;
     for (const variantKey in variants) {
       const variant = variants[variantKey as keyof Variants];
       if (!variant) continue;
 
-      css.push(`.theme-scope-${scopeKey}-${variant} {
+      css.push(`.theme-scope-${scopeKey}-${variantKey} {
           ${colorsToCSSVariables(variant, variantKey)}
         }`);
 

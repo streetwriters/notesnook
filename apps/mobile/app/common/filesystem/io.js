@@ -17,13 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Platform } from "react-native";
 import Sodium from "@ammarahmed/react-native-sodium";
+import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
-import { cacheDir, cacheDirOld, getRandomId } from "./utils";
-import { db } from "../database";
-import { compressToBase64 } from "./compress";
 import { IOS_APPGROUPID } from "../../utils/constants";
+import { db } from "../database";
+import { cacheDir, cacheDirOld, getRandomId } from "./utils";
 
 export async function readEncrypted(filename, key, cipherData) {
   await migrateFilesFromCache();
@@ -35,14 +34,8 @@ export async function readEncrypted(filename, key, cipherData) {
       return false;
     }
 
-    const attachment = db.attachments.attachment(filename);
-    const isPng = !attachment.metadata.type
-      ? false
-      : /(png)/g.test(attachment?.metadata.type);
-    const isJpeg = !attachment.metadata.type
-      ? false
-      : /(jpeg|jpg)/g.test(attachment?.metadata.type);
-
+    const attachment = await db.attachments.attachment(filename);
+    console.log("decrypting....");
     let output = await Sodium.decryptFile(
       key,
       {
@@ -50,20 +43,9 @@ export async function readEncrypted(filename, key, cipherData) {
         hash: filename,
         appGroupId: IOS_APPGROUPID
       },
-      cipherData.outputType === "base64"
-        ? isPng || isJpeg
-          ? "cache"
-          : "base64"
-        : "text"
+      cipherData.outputType === "base64" ? "base64" : "text"
     );
-    console.log("file decrypted...");
-    if (cipherData.outputType === "base64" && (isPng || isJpeg)) {
-      const dCachePath = `${cacheDir}/${output}`;
-      output = await compressToBase64(
-        `file://${dCachePath}`,
-        isPng ? "PNG" : "JPEG"
-      );
-    }
+    console.log("file decrypted...", attachment?.mimeType);
 
     return output;
   } catch (e) {
@@ -85,7 +67,7 @@ export async function hashBase64(data) {
   };
 }
 
-export async function writeEncryptedBase64({ data, key }) {
+export async function writeEncryptedBase64(data, key) {
   await createCacheDir();
   let filepath = cacheDir + `/${getRandomId("imagecache_")}`;
   await RNFetchBlob.fs.writeFile(filepath, data, "base64");
@@ -95,6 +77,8 @@ export async function writeEncryptedBase64({ data, key }) {
   });
   RNFetchBlob.fs.unlink(filepath).catch(console.log);
   console.log("encrypted file output: ", output);
+  output.size = output.length;
+  delete output.length;
   return {
     ...output,
     alg: "xcha-stream"
@@ -194,10 +178,10 @@ export async function exists(filename) {
   }
 
   if (exists || existsInAppGroup) {
-    const attachment = db.attachments.attachment(filename);
-    const totalChunks = Math.ceil(attachment.length / attachment.chunkSize);
+    const attachment = await db.attachments.attachment(filename);
+    const totalChunks = Math.ceil(attachment.size / attachment.chunkSize);
     const totalAbytes = totalChunks * ABYTES;
-    const expectedFileSize = attachment.length + totalAbytes;
+    const expectedFileSize = attachment.size + totalAbytes;
 
     const stat = await RNFetchBlob.fs.stat(
       existsInAppGroup ? appGroupPath : path

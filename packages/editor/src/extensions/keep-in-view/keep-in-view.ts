@@ -24,27 +24,39 @@ type KeepInViewOptions = {
   scrollIntoViewOnWindowResize: boolean;
 };
 
-let onWindowResize: ((this: Window, ev: UIEvent) => void) | undefined =
-  undefined;
-export const KeepInView = Extension.create<KeepInViewOptions>({
+export const KeepInView = Extension.create<
+  KeepInViewOptions,
+  {
+    onWindowResize?: ((this: Window, ev: UIEvent) => void) | undefined;
+  }
+>({
   name: "keepinview",
   addOptions() {
     return {
       scrollIntoViewOnWindowResize: true
     };
   },
+
+  addStorage() {
+    return {
+      onWindowResize: undefined
+    };
+  },
+
   onCreate() {
     if (!this.options.scrollIntoViewOnWindowResize) return;
-    onWindowResize = () => {
+    if (this.storage.onWindowResize) return;
+
+    this.storage.onWindowResize = () => {
       keepLastLineInView(this.editor);
     };
-    window.addEventListener("resize", onWindowResize);
+    window.addEventListener("resize", this.storage.onWindowResize);
   },
 
   onDestroy() {
-    if (!onWindowResize) return;
-    window.removeEventListener("resize", onWindowResize);
-    onWindowResize = undefined;
+    if (!this.storage.onWindowResize) return;
+    window.removeEventListener("resize", this.storage.onWindowResize);
+    this.storage.onWindowResize = undefined;
   },
   onSelectionUpdate() {
     inlineDebounce(
@@ -62,11 +74,19 @@ export function keepLastLineInView(
   THRESHOLD = 80,
   SCROLL_THRESHOLD = 100
 ) {
-  if (!editor.state.selection.empty) return;
+  if (!editor.view || editor.view.isDestroyed || !editor.state.selection.empty)
+    return;
+
+  const isPopupVisible = document.getElementsByClassName(
+    "editor-mobile-toolbar-popup"
+  );
 
   const node = editor.state.selection.$from;
+  if (node.pos > editor.state.doc.nodeSize) return;
+
   const { top } = posToDOMRect(editor.view, node.pos, node.pos + 1);
-  const isBelowThreshold = window.innerHeight - top < THRESHOLD;
+  const isBelowThreshold =
+    window.innerHeight - top < (isPopupVisible ? THRESHOLD + 60 : THRESHOLD);
   const isAboveThreshold = top < THRESHOLD;
   const DIFF_BOTTOM = THRESHOLD - (window.innerHeight - top);
 
@@ -83,7 +103,9 @@ export function keepLastLineInView(
       const container = findScrollContainer(domNode);
       if (container) {
         container.scrollBy({
-          top: isAboveThreshold ? DIFF_TOP + 10 : DIFF_BOTTOM,
+          top: isAboveThreshold
+            ? DIFF_TOP + 10
+            : DIFF_BOTTOM + (isPopupVisible ? 60 : 0),
           behavior: "smooth"
         });
       } else domNode.scrollIntoView({ behavior: "smooth", block: "center" });

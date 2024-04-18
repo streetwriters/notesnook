@@ -20,19 +20,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
-import type Database from "@notesnook/core/dist/api";
 import { showMigrationDialog } from "./dialog-controller";
+import { database } from "@notesnook/common";
+import { createDialect } from "./sqlite";
+import { isFeatureSupported } from "../utils/feature-check";
+import { generatePassword } from "../utils/password-generator";
+import { deriveKey } from "../interfaces/key-store";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-let db: Database = {};
+const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
   logger.measure("Database initialization");
 
-  const { database } = await import("@notesnook/common");
-  const { default: FS } = await import("../interfaces/fs");
+  const { FileStorage } = await import("../interfaces/fs");
   const { Compressor } = await import("../utils/compressor");
-  db = database;
+  const { useKeyStore } = await import("../interfaces/key-store");
+
+  let databaseKey = await useKeyStore.getState().getValue("databaseKey");
+  if (!databaseKey) {
+    databaseKey = await deriveKey(generatePassword());
+    await useKeyStore.getState().setValue("databaseKey", databaseKey);
+  }
 
   db.host({
     API_HOST: "https://api.notesnook.com",
@@ -42,12 +49,36 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co"
   });
 
-  database.setup(
-    await NNStorage.createInstance("Notesnook", persistence),
-    EventSource,
-    FS,
-    new Compressor()
+  const storage = new NNStorage(
+    "Notesnook",
+    () => useKeyStore.getState(),
+    persistence
   );
+  await storage.migrate();
+
+  database.setup({
+    sqliteOptions: {
+      dialect: createDialect,
+      ...(IS_DESKTOP_APP || isFeatureSupported("opfs")
+        ? { journalMode: "WAL", lockingMode: "exclusive" }
+        : {
+            journalMode: "MEMORY",
+            lockingMode: "exclusive"
+          }),
+      tempStore: "memory",
+      synchronous: "normal",
+      pageSize: 8192,
+      cacheSize: -32000,
+      password: Buffer.from(databaseKey).toString("hex"),
+      skipInitialization: !IS_DESKTOP_APP
+    },
+    storage: storage,
+    eventsource: EventSource,
+    fs: FileStorage,
+    compressor: new Compressor(),
+    batchSize: 100
+  });
+
   // if (IS_TESTING) {
 
   // } else {
@@ -67,6 +98,10 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   // }
 
   await db.init();
+
+  window.addEventListener("beforeunload", () => {
+    if (IS_DESKTOP_APP) db.sql().destroy();
+  });
 
   logger.measure("Database initialization");
 

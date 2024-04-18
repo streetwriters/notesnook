@@ -18,63 +18,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Input } from "@theme-ui/components";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Flex, Text } from "@theme-ui/components";
 import { SearchStorage } from "../../extensions/search-replace";
 import { ToolButton } from "../components/tool-button";
 import { Editor } from "../../types";
+import { useEditorSearchStore } from "../stores/search-store";
 
 export type SearchReplacePopupProps = { editor: Editor };
 export function SearchReplacePopup(props: SearchReplacePopupProps) {
   const { editor } = props;
-  const { selectedText, results, selectedIndex, focusNonce } = editor.storage
+  const {
+    enableRegex,
+    focusNonce,
+    isExpanded,
+    isReplacing,
+    matchCase,
+    matchWholeWord,
+    searchTerm,
+    replaceTerm
+  } = useEditorSearchStore();
+  const { results, selectedIndex } = editor.storage
     .searchreplace as SearchStorage;
-
-  const [isReplacing, setIsReplacing] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [matchCase, setMatchCase] = useState(false);
-  const [matchWholeWord, setMatchWholeWord] = useState(false);
-  const [enableRegex, setEnableRegex] = useState(false);
-  const replaceText = useRef("");
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const search = useCallback(
     (term: string) => {
-      editor.current?.commands.search(term, {
+      editor.commands.search(term, {
         matchCase,
         enableRegex,
         matchWholeWord
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [matchCase, enableRegex, matchWholeWord]
   );
 
   useEffect(() => {
-    if (!searchInputRef.current) return;
-    search(searchInputRef.current.value);
-  }, [search, matchCase, matchWholeWord, enableRegex]);
-
-  useEffect(() => {
-    if (selectedText) {
-      if (searchInputRef.current) {
-        const input = searchInputRef.current;
-        setTimeout(() => {
-          input.value = selectedText;
-          input.focus();
-        }, 0);
-      }
-      search(selectedText);
-    }
-  }, [selectedText, search]);
-
-  useEffect(() => {
-    if (searchInputRef.current) {
-      const input = searchInputRef.current;
-      setTimeout(() => {
-        input.focus();
-      }, 0);
-    }
+    setTimeout(() => searchInputRef.current?.focus(), 0);
   }, [focusNonce]);
 
   return (
@@ -111,17 +91,18 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
           >
             <Input
               variant={"clean"}
-              defaultValue={selectedText}
               ref={searchInputRef}
               autoFocus
               placeholder="Find"
               sx={{ p: 0 }}
+              value={searchTerm}
               onChange={(e) => {
                 search(e.target.value);
+                useEditorSearchStore.setState({ searchTerm: e.target.value });
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  editor.current?.commands.moveToNextResult();
+                  editor.commands.moveToNextResult();
                 }
               }}
             />
@@ -140,7 +121,9 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 title="Expand"
                 id="expand"
                 icon={isExpanded ? "chevronRight" : "chevronLeft"}
-                onClick={() => setIsExpanded((s) => !s)}
+                onClick={() =>
+                  useEditorSearchStore.setState({ isExpanded: !isExpanded })
+                }
                 iconSize={"medium"}
               />
               {isExpanded && (
@@ -153,7 +136,9 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                     title="Match case"
                     id="matchCase"
                     icon="caseSensitive"
-                    onClick={() => setMatchCase((s) => !s)}
+                    onClick={() =>
+                      useEditorSearchStore.setState({ matchCase: !matchCase })
+                    }
                     iconSize={"medium"}
                   />
                   <ToolButton
@@ -164,7 +149,11 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                     title="Match whole word"
                     id="matchWholeWord"
                     icon="wholeWord"
-                    onClick={() => setMatchWholeWord((s) => !s)}
+                    onClick={() =>
+                      useEditorSearchStore.setState({
+                        matchWholeWord: !matchWholeWord
+                      })
+                    }
                     iconSize={"medium"}
                   />
                   <ToolButton
@@ -175,7 +164,11 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                     title="Enable regex"
                     id="enableRegex"
                     icon="regex"
-                    onClick={() => setEnableRegex((s) => !s)}
+                    onClick={() =>
+                      useEditorSearchStore.setState({
+                        enableRegex: !enableRegex
+                      })
+                    }
                     iconSize={"medium"}
                   />
                 </>
@@ -189,7 +182,9 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                   px: 1
                 }}
               >
-                {results ? `${selectedIndex + 1}/${results.length}` : ""}
+                {results?.length
+                  ? `${selectedIndex + 1}/${results.length}`
+                  : "0/0"}
               </Text>
             </Flex>
           </Flex>
@@ -197,7 +192,10 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
             <Input
               sx={{ mt: 1, p: "7px" }}
               placeholder="Replace"
-              onChange={(e) => (replaceText.current = e.target.value)}
+              value={replaceTerm}
+              onChange={(e) =>
+                useEditorSearchStore.setState({ replaceTerm: e.target.value })
+              }
             />
           )}
         </Flex>
@@ -209,7 +207,11 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 title="Toggle replace"
                 id="toggleReplace"
                 icon="replace"
-                onClick={() => setIsReplacing((s) => !s)}
+                onClick={() =>
+                  useEditorSearchStore.setState({
+                    isReplacing: !isReplacing
+                  })
+                }
                 sx={{ mr: 0 }}
                 iconSize={"big"}
               />
@@ -219,7 +221,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               title="Previous match"
               id="previousMatch"
               icon="previousMatch"
-              onClick={() => editor.current?.commands.moveToPreviousResult()}
+              onClick={() => editor.commands.moveToPreviousResult()}
               sx={{ mr: 0 }}
               iconSize={"big"}
             />
@@ -228,7 +230,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               title="Next match"
               id="nextMatch"
               icon="nextMatch"
-              onClick={() => editor.current?.commands.moveToNextResult()}
+              onClick={() => editor.commands.moveToNextResult()}
               sx={{ mr: 0 }}
               iconSize={"big"}
             />
@@ -237,7 +239,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               title="Close"
               id="close"
               icon="close"
-              onClick={() => editor.current?.chain().focus().endSearch().run()}
+              onClick={() => editor.chain().focus().endSearch().run()}
               sx={{ mr: 0 }}
               iconSize={"big"}
             />
@@ -249,9 +251,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 title="Replace"
                 id="replace"
                 icon="replaceOne"
-                onClick={() =>
-                  editor.current?.commands.replace(replaceText.current)
-                }
+                onClick={() => editor.commands.replace(replaceTerm)}
                 sx={{ mr: 0 }}
                 iconSize={18}
               />
@@ -260,9 +260,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 title="Replace all"
                 id="replaceAll"
                 icon="replaceAll"
-                onClick={() =>
-                  editor.current?.commands.replaceAll(replaceText.current)
-                }
+                onClick={() => editor.commands.replaceAll(replaceTerm)}
                 sx={{ mr: 0 }}
                 iconSize={18}
               />

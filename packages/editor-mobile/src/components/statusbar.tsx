@@ -19,12 +19,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { RefObject, useEffect, useRef, useState } from "react";
 import { getTotalWords, Editor } from "@notesnook/editor";
+import { useTabContext } from "../hooks/useTabStore";
 
-function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
+function StatusBar({
+  container,
+  loading
+}: {
+  container: RefObject<HTMLDivElement>;
+  loading?: boolean;
+}) {
   const [status, setStatus] = useState({
     date: "",
     saved: ""
   });
+  const tab = useTabContext();
   const [sticky, setSticky] = useState(false);
   const stickyRef = useRef(false);
   const prevScroll = useRef(0);
@@ -34,15 +42,28 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   const statusBar = useRef({
     set: setStatus,
     updateWords: () => {
+      const editor = editors[tab.id];
+      if (!editor) return;
       const words = getTotalWords(editor as Editor) + " words";
       if (currentWords.current === words) return;
       setWords(words);
+    },
+    resetWords: () => {
+      currentWords.current = `0 words`;
+      setWords(`0 words`);
     }
   });
-  globalThis.statusBar = statusBar;
 
-  const onScroll = React.useCallback((event) => {
-    const currentOffset = event.target.scrollTop;
+  useEffect(() => {
+    globalThis.statusBars[tab.id] = statusBar;
+    return () => {
+      globalThis.statusBars[tab.id] = undefined;
+    };
+  }, [tab.id, statusBar]);
+
+  const onScroll = React.useCallback((event: Event) => {
+    const currentOffset = (event.target as HTMLElement)?.scrollTop;
+    post("editor-event:scroll", currentOffset);
     if (currentOffset < 200) {
       if (stickyRef.current) {
         stickyRef.current = false;
@@ -91,7 +112,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
     <div
       style={{
         flexDirection: "row",
-        display: "flex",
+        display: loading ? "none" : "flex",
         paddingRight: 12,
         paddingLeft: 12,
         position: sticky ? "sticky" : "relative",
@@ -99,7 +120,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
         backgroundColor: "var(--nn_primary_background)",
         zIndex: 1,
         justifyContent: sticky ? "center" : "flex-start",
-        paddingTop: 2,
+        paddingTop: 4,
         paddingBottom: 2
       }}
       id="statusbar"
@@ -111,4 +132,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   );
 }
 
-export default React.memo(StatusBar, () => true);
+export default React.memo(
+  StatusBar,
+  (prev, next) => prev.loading === next.loading
+);

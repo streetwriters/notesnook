@@ -72,9 +72,7 @@ test("login user & wait for sync", async ({ page }, info) => {
 
   await app.auth.login(USER.CURRENT);
 
-  await page
-    .locator(getTestId("sync-status-completed"))
-    .waitFor({ state: "visible" });
+  await app.waitForSync("synced");
   expect(await app.isSynced()).toBeTruthy();
 });
 

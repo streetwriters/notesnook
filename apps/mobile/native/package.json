@@ -5,8 +5,8 @@
   "main": "index.js",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@ammarahmed/notifee-react-native": "7.4.4",
-    "@ammarahmed/react-native-share-extension": "^2.5.5",
+    "@ammarahmed/notifee-react-native": "7.4.7",
+    "@ammarahmed/react-native-share-extension": "^2.5.9",
     "@ammarahmed/react-native-sodium": "1.5.4",
     "@bam.tech/react-native-image-resizer": "3.0.5",
     "@callstack/repack": "^3.2.0",
@@ -44,7 +44,7 @@
     "react-native-image-picker": "4.1.2",
     "react-native-in-app-review": "4.3.3",
     "react-native-keychain": "4.0.5",
-    "react-native-mmkv-storage": "^0.10.0-alpha.11",
+    "react-native-mmkv-storage": "^0.10.0-alpha.12",
     "react-native-modal-datetime-picker": "14.0.0",
     "react-native-navigation-bar-color": "2.0.2",
     "react-native-notification-sounds": "0.5.5",
@@ -62,12 +62,18 @@
     "react-native-tooltips": "^1.0.3",
     "react-native-vector-icons": "9.2.0",
     "react-native-webview": "^11.14.1",
-    "react-native-zip-archive": "6.0.9"
+    "react-native-zip-archive": "6.0.9",
+    "react-native-quick-sqlite": "^8.0.6",
+    "react-native-theme-switch-animation": "^0.6.0",
+    "@ammarahmed/react-native-background-fetch": "^4.2.2",
+    "react-native-image-crop-picker": "^0.40.2",
+    "react-native-url-polyfill": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@babel/eslint-parser": "^7.16.5",
     "@babel/plugin-transform-named-capturing-groups-regex": "^7.16.5",
+    "@babel/plugin-transform-private-methods": "^7.22.5",
     "@babel/preset-env": "^7.20.0",
     "@babel/runtime": "^7.20.0",
     "@react-native/eslint-config": "^0.72.2",
@@ -107,7 +113,6 @@
     "react-test-renderer": "18.2.0",
     "terser-webpack-plugin": "^5.3.5",
     "ts-jest": "^29.1.1",
-    "typescript": "4.8.4",
     "webpack-cli": "^5.1.4",
     "webpack": "^5.88.2"
   }

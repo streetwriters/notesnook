@@ -2,3 +2,4 @@ node_modules
 build
 output
 dist
+_catalog

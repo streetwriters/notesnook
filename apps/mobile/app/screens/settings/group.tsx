@@ -29,6 +29,7 @@ import { tabBarRef } from "../../utils/global-refs";
 import { components } from "./components";
 import { SectionItem } from "./section-item";
 import { RouteParams, SettingSection } from "./types";
+import { Header } from "../../components/header";
 
 const keyExtractor = (item: SettingSection) => item.id;
 const AnimatedKeyboardAvoidingFlatList = Animated.createAnimatedComponent(
@@ -42,13 +43,7 @@ const Group = ({
   useNavigationFocus(navigation, {
     onFocus: () => {
       tabBarRef.current?.lock();
-      useNavigationStore.getState().update(
-        {
-          name: "SettingsGroup",
-          title: route.params.name as string
-        },
-        true
-      );
+      useNavigationStore.getState().setFocusedRouteId("Settings");
       return false;
     }
   });
@@ -62,25 +57,33 @@ const Group = ({
   );
 
   return (
-    <DelayLayout type="settings" delay={1}>
-      <View
-        style={{
-          flex: 1
-        }}
-      >
-        {route.params.sections ? (
-          <AnimatedKeyboardAvoidingFlatList
-            entering={FadeInDown}
-            data={route.params.sections}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            enableOnAndroid
-            enableAutomaticScroll
-          />
-        ) : null}
-        {route.params.component ? components[route.params.component] : null}
-      </View>
-    </DelayLayout>
+    <>
+      <Header
+        renderedInRoute="Settings"
+        title={route.params.name as string}
+        canGoBack={true}
+        id="Settings"
+      />
+      <DelayLayout type="settings" delay={1}>
+        <View
+          style={{
+            flex: 1
+          }}
+        >
+          {route.params.sections ? (
+            <AnimatedKeyboardAvoidingFlatList
+              entering={FadeInDown}
+              data={route.params.sections}
+              keyExtractor={keyExtractor}
+              renderItem={renderItem}
+              enableOnAndroid
+              enableAutomaticScroll
+            />
+          ) : null}
+          {route.params.component ? components[route.params.component] : null}
+        </View>
+      </DelayLayout>
+    </>
   );
 };
 

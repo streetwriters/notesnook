@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import useMediaQuery from "./use-media-query";
 import { desktop } from "../common/desktop-bridge";
 
-function useSystemTheme() {
+export function useSystemTheme() {
   const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const [systemTheme, setSystemTheme] = useState(isDarkMode ? "dark" : "light");
 
@@ -41,4 +41,3 @@ function useSystemTheme() {
 
   return systemTheme === "dark";
 }
-export default useSystemTheme;

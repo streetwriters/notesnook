@@ -19,36 +19,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   EmotionThemeProvider,
-  themeToCSS,
   ThemeScopes,
+  themeToCSS,
   useThemeEngineStore
 } from "@notesnook/theme";
-import { PropsWithChildren, useEffect, useMemo } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import { BoxProps } from "@theme-ui/components";
-import { Global, css } from "@emotion/react";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { useSystemTheme } from "../../hooks/use-system-theme";
 
 export function BaseThemeProvider(
   props: PropsWithChildren<
     {
       injectCssVars?: boolean;
-      addGlobalStyles?: boolean;
       scope?: keyof ThemeScopes;
+      onRender?: () => void;
     } & Omit<BoxProps, "variant">
   >
 ) {
-  const {
-    children,
-    addGlobalStyles = false,
-    scope = "base",
-    ...restProps
-  } = props;
+  const { children, scope = "base", onRender, ...restProps } = props;
 
   const colorScheme = useThemeStore((store) => store.colorScheme);
   const theme = useThemeStore((store) =>
     colorScheme === "dark" ? store.darkTheme : store.lightTheme
   );
-  const cssTheme = useMemo(() => themeToCSS(theme), [theme]);
+  // const cssTheme = useMemo(() => themeToCSS(theme), [theme]);
+  const isSystemThemeDark = useSystemTheme();
+  const setColorScheme = useThemeStore((store) => store.setColorScheme);
+  const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
+
+  useEffect(() => {
+    if (!followSystemTheme) return;
+    setColorScheme(isSystemThemeDark ? "dark" : "light");
+  }, [isSystemThemeDark, followSystemTheme, setColorScheme]);
 
   useEffect(() => {
     if (IS_THEME_BUILDER) return;
@@ -69,18 +72,18 @@ export function BaseThemeProvider(
         theme.scopes.base.primary.background
       );
     }
+
+    const css = themeToCSS(theme);
+    const stylesheet = document.getElementById("theme-colors");
+    if (stylesheet) stylesheet.innerHTML = css;
   }, [theme]);
+
+  useEffect(() => {
+    onRender?.();
+  }, [onRender]);
 
   return (
     <>
-      {addGlobalStyles && (
-        <Global
-          styles={css`
-            ${cssTheme}
-          `}
-        />
-      )}
-
       <EmotionThemeProvider {...restProps} scope={scope}>
         {children}
       </EmotionThemeProvider>

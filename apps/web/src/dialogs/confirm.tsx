@@ -52,6 +52,7 @@ function ConfirmDialog<TCheckId extends string>(
 
   return (
     <Dialog
+      testId="confirm-dialog"
       isOpen={true}
       title={title}
       width={width}
@@ -107,7 +108,7 @@ function ConfirmDialog<TCheckId extends string>(
                           e.currentTarget.checked)
                       }
                     />
-                    {check.text}{" "}
+                    {check.text}
                   </Label>
                 )
             )

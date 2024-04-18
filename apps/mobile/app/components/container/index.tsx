@@ -17,41 +17,46 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { PropsWithChildren } from "react";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import React, { PropsWithChildren, useEffect, useRef, useState } from "react";
+import { Dimensions, Platform, View, useWindowDimensions } from "react-native";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { Header } from "../header";
-import SelectionHeader from "../selection-header";
+import useKeyboard from "../../hooks/use-keyboard";
 
 export const Container = ({ children }: PropsWithChildren) => {
-  const floating = useIsFloatingKeyboard();
-  const introCompleted = useSettingStore(
-    (state) => state.settings.introCompleted
-  );
   const insets = useGlobalSafeAreaInsets();
+  const keyboard = useKeyboard();
+  const [height, setHeight] = useState(0);
+  const windowHeightRef = useRef(Dimensions.get("window").height);
+  const { height: windowHeight } = useWindowDimensions();
+  const timerRef = useRef<NodeJS.Timeout>();
+  useEffect(() => {
+    if (windowHeight !== windowHeightRef.current) {
+      setHeight(0);
+      windowHeightRef.current = windowHeight;
+    }
+  }, [windowHeight]);
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      enabled={Platform.OS === "ios" && !floating}
+    <View
       style={{
-        flex: 1,
         overflow: "hidden",
         paddingTop: Platform.OS === "android" ? 0 : insets.top,
-        paddingBottom: Platform.OS === "android" ? 0 : insets.bottom
+        paddingBottom: Platform.OS === "android" ? 0 : insets.bottom,
+        height: height || "100%",
+        width: "100%"
+      }}
+      onLayout={(event) => {
+        const height = event.nativeEvent.layout.height;
+        clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => {
+          if (!keyboard.keyboardShown) {
+            setHeight(height);
+          }
+        }, 500);
       }}
     >
-      {!introCompleted ? null : (
-        <>
-          <SelectionHeader />
-          <Header />
-        </>
-      )}
-
       {children}
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 

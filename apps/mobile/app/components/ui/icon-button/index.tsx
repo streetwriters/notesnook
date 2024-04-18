@@ -20,13 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { ColorValue, GestureResponderEvent, TextStyle } from "react-native";
-import Animated, { Layout } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RGB_Linear_Shade, hexToRGBA } from "../../../utils/colors";
 import { SIZE } from "../../../utils/size";
 import NativeTooltip from "../../../utils/tooltip";
-import { PressableButton, PressableButtonProps } from "../pressable";
-interface IconButtonProps extends PressableButtonProps {
+import { Pressable, PressableProps } from "../pressable";
+interface IconButtonProps extends PressableProps {
   name: string;
   color?: ColorValue;
   size?: number;
@@ -44,7 +43,7 @@ export const IconButton = ({
   onPress,
   name,
   color,
-  customStyle,
+  style,
   size = SIZE.xxl,
   iconStyle = {},
   left = 10,
@@ -53,7 +52,7 @@ export const IconButton = ({
   bottom = 10,
   onLongPress,
   tooltipText,
-  type = "gray",
+  type = "plain",
   fwdRef,
   tooltipPosition = NativeTooltip.POSITIONS.TOP,
   ...restProps
@@ -71,20 +70,20 @@ export const IconButton = ({
   };
 
   return (
-    <PressableButton
+    <Pressable
       {...restProps}
       fwdRef={fwdRef}
       onPress={onPress}
       hitSlop={{ top: top, left: left, right: right, bottom: bottom }}
       onLongPress={_onLongPress}
       type={type}
-      customStyle={{
+      style={{
         width: 40,
         height: 40,
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 100,
-        ...customStyle
+        ...style
       }}
     >
       <Icon
@@ -98,6 +97,6 @@ export const IconButton = ({
         }
         size={size}
       />
-    </PressableButton>
+    </Pressable>
   );
 };

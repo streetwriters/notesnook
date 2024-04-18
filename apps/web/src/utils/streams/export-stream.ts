@@ -17,78 +17,54 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Note from "@notesnook/core/dist/models/note";
+import { ExportableItem } from "@notesnook/common";
 import { db } from "../../common/db";
-import { exportNote } from "../../common/export";
-import { makeUniqueFilename } from "./utils";
+import { showToast } from "../toast";
 import { ZipFile } from "./zip-stream";
+import { lazify } from "../lazify";
 
-export class ExportStream extends TransformStream<Note, ZipFile> {
-  constructor(
-    format: "pdf" | "md" | "txt" | "html" | "md-frontmatter",
-    signal?: AbortSignal
-  ) {
-    const counters: Record<string, number> = {};
-
+export class ExportStream extends TransformStream<
+  ExportableItem | Error,
+  ZipFile
+> {
+  constructor(report: (progress: { text: string; current?: number }) => void) {
+    let progress = 0;
     super({
-      async transform(note, controller) {
-        try {
-          if (signal?.aborted) {
-            controller.terminate();
-            return;
-          }
-
-          if (!note || format === "pdf") return;
-
-          const result = await exportNote(note, format);
-          if (!result) return;
-
-          const { filename, content } = result;
-
-          const notebooks = [
-            ...(
-              db.relations?.to({ id: note.id, type: "note" }, "notebook") || []
-            ).map((n) => ({ title: n.title, topics: [] })),
-            ...(note.notebooks || []).map(
-              (ref: { id: string; topics: string[] }) => {
-                const notebook = db.notebooks?.notebook(ref.id);
-                const topics: any[] = notebook?.topics.all || [];
-
-                return {
-                  title: notebook?.title,
-                  topics: ref.topics
-                    .map((topicId: string) =>
-                      topics.find((topic) => topic.id === topicId)
-                    )
-                    .filter(Boolean)
-                };
-              }
-            )
-          ];
-
-          const filePaths: Array<string> =
-            notebooks.length > 0
-              ? notebooks
-                  .map((notebook) => {
-                    if (notebook.topics.length > 0)
-                      return notebook.topics.map((topic: { title: string }) =>
-                        [notebook.title, topic.title, filename].join("/")
-                      );
-                    return [notebook.title, filename].join("/");
-                  })
-                  .flat()
-              : [filename];
-
-          filePaths.forEach((filePath) => {
-            controller.enqueue({
-              path: makeUniqueFilename(filePath, counters),
-              data: content,
-              mtime: new Date(note.data.dateEdited),
-              ctime: new Date(note.data.dateCreated)
-            });
+      async transform(item, controller) {
+        if (item instanceof Error) {
+          showToast("error", item.message);
+          return;
+        }
+        if (item.type === "attachment") {
+          report({ text: `Downloading attachment: ${item.path}` });
+          await db
+            .fs()
+            .downloadFile("exports", item.data.hash, item.data.chunkSize);
+          const key = await db.attachments.decryptKey(item.data.key);
+          if (!key) return;
+          const stream = await lazify(
+            import("../../interfaces/fs"),
+            ({ streamingDecryptFile }) =>
+              streamingDecryptFile(item.data.hash, {
+                key,
+                iv: item.data.iv,
+                name: item.data.filename,
+                type: item.data.mimeType,
+                isUploaded: !!item.data.dateUploaded
+              })
+          );
+          if (!stream) return;
+          controller.enqueue({ ...item, data: stream });
+          report({
+            current: progress++,
+            text: `Saving attachment: ${item.path}`
           });
-        } catch (e) {
-          controller.error(e);
+        } else {
+          controller.enqueue(item);
+          report({
+            current: progress++,
+            text: `Exporting note: ${item.path}`
+          });
         }
       }
     });

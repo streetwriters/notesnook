@@ -42,7 +42,11 @@ export const config = {
   zoomFactor: 1,
   theme: nativeTheme.themeSource,
   automaticUpdates: true,
-  proxyRules: ""
+  proxyRules: "",
+
+  backgroundColor: nativeTheme.themeSource === "dark" ? "#0f0f0f" : "#ffffff",
+  windowControlsIconColor:
+    nativeTheme.themeSource === "dark" ? "#ffffff" : "#000000"
 };
 
 type ConfigKey = keyof typeof config;

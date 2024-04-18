@@ -17,24 +17,39 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { createRoot, Root } from "react-dom/client";
+
 export function getToolbarElement() {
   return (
-    (document.querySelector(".editor-toolbar") as HTMLElement) || undefined
+    (document.querySelector(".active .editor-toolbar") as HTMLElement) ||
+    undefined
   );
 }
 
 export function getPopupContainer() {
   return (
-    (document.getElementById("dialogContainer") as HTMLElement) || undefined
+    document.querySelector<HTMLElement>(".active .dialogContainer") ||
+    document.body
   );
 }
 
 export function getEditorContainer() {
-  return (document.querySelector(".editor") ||
+  return (document.querySelector(".active .editor") ||
     getPopupContainer()) as HTMLElement;
 }
 
 export function getEditorDOM() {
-  return (document.querySelector(".ProseMirror") ||
+  return (document.querySelector(".active .ProseMirror") ||
     getEditorContainer()) as HTMLElement; // ProseMirror
+}
+
+let popupRoot: Root | undefined = undefined;
+export function getPopupRoot() {
+  if (!popupRoot) popupRoot = createRoot(getPopupContainer());
+  return popupRoot;
+}
+
+export function unmountPopupRoot() {
+  if (popupRoot) popupRoot.unmount();
+  popupRoot = undefined;
 }

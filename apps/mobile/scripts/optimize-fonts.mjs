@@ -36,6 +36,7 @@ const EXTRA_ICON_NAMES = [
   "star-outline",
   "link-variant-remove",
   "link-variant",
+  "link-variant-off",
   "bell",
   "bell-off-outline",
   "check",
@@ -43,6 +44,7 @@ const EXTRA_ICON_NAMES = [
   "plus",
   "view-list-outline",
   "view-list",
+  "tab-plus",
   "play",
   "pause",
   "notebook-outline",
@@ -70,7 +72,14 @@ const EXTRA_ICON_NAMES = [
   "close-circle-outline",
   "qrcode",
   "text",
-  "cloud"
+  "cloud",
+  "restore",
+  "keyboard",
+  "numeric",
+  "vector-link",
+  "notebook-plus",
+  "arrow-right-bold-box-outline",
+  "arrow-up-bold"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

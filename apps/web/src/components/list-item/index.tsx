@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Flex, Text } from "@theme-ui/components";
+import { ThemeUIStyleObject } from "@theme-ui/css";
 import {
   store as selectionStore,
   useStore as useSelectionStore
@@ -25,11 +26,12 @@ import {
 import { useMenuTrigger } from "../../hooks/use-menu";
 import React, { useRef } from "react";
 import { SchemeColors } from "@notesnook/theme";
-import { Item } from "../list-container/types";
 import { MenuItem } from "@notesnook/ui";
 import { alpha } from "@theme-ui/color";
+import { Item } from "@notesnook/core/dist/types";
+import { setDragData } from "../../utils/data-transfer";
 
-type ListItemProps = {
+type ListItemProps<TItem extends Item, TContext> = {
   colors?: {
     heading: SchemeColors;
     accent: SchemeColors;
@@ -39,19 +41,32 @@ type ListItemProps = {
   isCompact?: boolean;
   isDisabled?: boolean;
   isSimple?: boolean;
-  item: Item;
+  item: TItem;
+  draggable?: boolean;
 
   onKeyPress?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   onClick?: () => void;
+  onMiddleClick?: () => void;
+  onSelect?: () => void;
+
+  onDragEnter?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDragLeave?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
+
   title: string | JSX.Element;
   header?: JSX.Element;
   body?: JSX.Element | string;
   footer?: JSX.Element;
 
-  menuItems?: (item: any, items?: any[]) => MenuItem[];
+  context?: TContext;
+  menuItems?: (item: TItem, ids?: string[], context?: TContext) => MenuItem[];
+
+  sx?: ThemeUIStyleObject;
 };
 
-function ListItem(props: ListItemProps) {
+function ListItem<TItem extends Item, TContext>(
+  props: ListItemProps<TItem, TContext>
+) {
   const {
     colors: { heading, background, accent } = {
       heading: "heading",
@@ -62,7 +77,13 @@ function ListItem(props: ListItemProps) {
     isCompact,
     isDisabled,
     isSimple,
-    item
+    item,
+    sx,
+    context,
+    onDragEnter,
+    onDragLeave,
+    onDrop,
+    draggable
   } = props;
 
   const listItemRef = useRef<HTMLDivElement>(null);
@@ -70,8 +91,7 @@ function ListItem(props: ListItemProps) {
   const isMenuTarget = target && target === listItemRef.current;
 
   const isSelected = useSelectionStore((store) => {
-    const isInSelection =
-      store.selectedItems.findIndex((item) => item.id === props.item.id) > -1;
+    const isInSelection = store.selectedItems.includes(props.item.id);
     return isFocused
       ? store.selectedItems.length > 1 && isInSelection
       : isInSelection;
@@ -83,21 +103,33 @@ function ListItem(props: ListItemProps) {
       id={`id_${item.id}`}
       className={isSelected ? "selected" : ""}
       ref={listItemRef}
+      draggable={draggable}
+      onDragEnter={onDragEnter}
+      onDrop={onDrop}
+      onDragOver={(e) => e.preventDefault()}
+      onDragLeave={onDragLeave}
+      onDragEnd={onDragLeave}
+      onDragStart={(e) => {
+        if (!draggable) return;
+        let selectedItems = selectionStore.get().selectedItems;
+        if (selectedItems.findIndex((i) => i === item.id) === -1) {
+          selectedItems = [];
+          selectedItems.push(item.id);
+        }
+        setDragData(e.dataTransfer, item.type, selectedItems);
+      }}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
 
         let title = undefined;
-        let selectedItems = selectionStore
-          .get()
-          .selectedItems.filter((i) => i.type === item.type);
+        let selectedItems = selectionStore.get().selectedItems; // .filter((i) => i.type === item.type);
 
-        if (selectedItems.findIndex((i) => i.id === item.id) === -1) {
+        if (selectedItems.findIndex((i) => i === item.id) === -1) {
           selectedItems = [];
-          selectedItems.push(item);
+          selectedItems.push(item.id);
         }
-
-        let menuItems = props.menuItems?.(item, selectedItems);
+        let menuItems = props.menuItems?.(item, selectedItems, context);
 
         if (selectedItems.length > 1) {
           title = `${selectedItems.length} items selected`;
@@ -110,13 +142,12 @@ function ListItem(props: ListItemProps) {
           title
         });
       }}
-      pl={1}
-      pr={2}
-      py={1}
-      mb={isCompact ? 0 : 0}
       tabIndex={-1}
-      dir="auto"
       sx={{
+        pl: 1,
+        pr: 2,
+        py: 1,
+        mb: "1px",
         height: "inherit",
         cursor: "pointer",
         position: "relative",
@@ -145,9 +176,10 @@ function ListItem(props: ListItemProps) {
           outlineColor: accent === "accent" ? "accent" : alpha("accent", 0.7),
           backgroundColor:
             isSelected || isFocused ? "background-selected" : background
-        }
+        },
+        ...sx
       }}
-      onKeyPress={(e) => {
+      onKeyUp={(e) => {
         if (e.key !== "Enter") {
           if (props.onKeyPress) props.onKeyPress(e);
         }
@@ -157,30 +189,44 @@ function ListItem(props: ListItemProps) {
           props.onClick();
         }
       }}
+      onMouseDown={(e) => {
+        if (e.button == 1 && props.onMiddleClick) {
+          e.preventDefault();
+          props.onMiddleClick();
+        }
+      }}
       data-test-id={`list-item`}
     >
       {!isCompact && props.header}
 
-      <Text
-        data-test-id={`title`}
-        variant={isSimple || isCompact ? "body" : "subtitle"}
-        sx={{
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          fontWeight: isCompact || isSimple ? "body" : "bold",
-          color:
-            selected && heading === "heading" ? `${heading}-selected` : heading,
-          display: "block"
-        }}
-      >
-        {props.title}
-      </Text>
+      {typeof props.title === "string" ? (
+        <Text
+          dir="auto"
+          data-test-id={`title`}
+          variant={isSimple || isCompact ? "body" : "subtitle"}
+          sx={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            fontWeight: isCompact || isSimple ? "body" : "bold",
+            color:
+              selected && heading === "heading"
+                ? `${heading}-selected`
+                : heading,
+            display: "block"
+          }}
+        >
+          {props.title}
+        </Text>
+      ) : (
+        props.title
+      )}
 
       {!isSimple && !isCompact && props.body && (
         <Text
           as="p"
           variant="body"
+          dir="auto"
           data-test-id={`description`}
           sx={{
             color: selected ? "paragraph-selected" : "paragraph",

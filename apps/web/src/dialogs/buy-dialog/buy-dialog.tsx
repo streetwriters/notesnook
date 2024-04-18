@@ -42,14 +42,13 @@ import { Theme } from "@notesnook/theme";
 import { isMacStoreApp } from "../../utils/platform";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../../common/constants";
-
-import { alpha } from "@theme-ui/color";
 import BaseDialog from "../../components/dialog";
 import { ScopedThemeProvider } from "../../components/theme-provider";
+import { User } from "@notesnook/core";
 
 type BuyDialogProps = {
   couponCode?: string;
-  plan?: "monthly" | "yearly";
+  plan?: "monthly" | "yearly" | "education";
   onClose: () => void;
 };
 
@@ -178,7 +177,7 @@ function SideBar(props: SideBarProps) {
               report({
                 text: "Activating trial"
               });
-              return db.user?.activateTrial();
+              return db.user.activateTrial();
             }
           });
           if (result) onClose();
@@ -491,7 +490,7 @@ function SelectedPlan(props: SelectedPlanProps) {
             }
             autoFocus={pricingInfo.invalidCoupon}
             disabled={!!pricingInfo?.coupon}
-            onKeyUp={(e: KeyboardEvent) => {
+            onKeyUp={(e) => {
               if (e.code === "Enter") applyCoupon();
             }}
             action={{

@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "vite/client";
 import "vite-plugin-svgr/client";
+import "@notesnook/desktop/dist/preload";
 
 declare global {
   var PUBLIC_URL: string;
@@ -32,13 +33,39 @@ declare global {
   var APP_TITLE: string;
   var IS_THEME_BUILDER: boolean;
 
-  interface Window {
-    os?: () => NodeJS.Platform | "mas";
-    NativeNNCrypto?: new () => import("@notesnook/crypto").NNCrypto;
+  interface AuthenticationExtensionsClientInputs {
+    prf?: {
+      eval: {
+        first: BufferSource;
+      };
+    };
   }
+
+  interface AuthenticationExtensionsClientOutputs {
+    prf?: {
+      enabled?: boolean;
+      results?: {
+        first: ArrayBuffer;
+      };
+    };
+  }
+
+  interface PublicKeyCredentialRequestOptions {
+    hints?: ("security-key" | "client-device" | "hybrid")[];
+  }
+  interface PublicKeyCredentialCreationOptions {
+    hints?: ("security-key" | "client-device" | "hybrid")[];
+  }
+
   interface FileSystemFileHandle {
     createSyncAccessHandle(options?: {
       mode: "read-only" | "readwrite" | "readwrite-unsafe";
     }): Promise<FileSystemSyncAccessHandle>;
+  }
+  interface Navigator {
+    windowControlsOverlay?: {
+      getTitlebarAreaRect(): DOMRect;
+      visible: boolean;
+    };
   }
 }

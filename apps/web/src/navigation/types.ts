@@ -17,7 +17,36 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-type IsParameter<Part> = Part extends `:${infer Parameter}` ? Parameter : never;
+import { RouteContainerButtons } from "../components/route-container";
+
+export type RouteResult = {
+  key: string;
+  type: "notes" | "notebooks" | "reminders" | "trash" | "tags";
+  title?: string | (() => Promise<string | undefined>);
+  component:
+    | ((props?: any) => JSX.Element | null)
+    | React.ReactNode
+    | React.MemoExoticComponent<React.FunctionComponent>;
+  props?: any;
+  buttons?: RouteContainerButtons;
+  noCache?: boolean;
+};
+
+export function isRouteResult(obj: any): obj is RouteResult {
+  return (
+    !!obj &&
+    typeof obj === "object" &&
+    "key" in obj &&
+    "type" in obj &&
+    "component" in obj
+  );
+}
+
+type IsParameter<Part> = Part extends `:${infer Parameter}?`
+  ? Parameter
+  : Part extends `:${infer Parameter}`
+  ? Parameter
+  : never;
 
 type FilteredParts<Path> = Path extends `${infer PartA}/${infer PartB}`
   ? IsParameter<PartA> | FilteredParts<PartB>
@@ -34,12 +63,12 @@ export type Params<Path> = {
   [Key in FilteredParts<Path>]: string;
 };
 
-export type Routes<T extends string, TRouteResult> = {
-  [Path in T]: (params: Params<Path>) => TRouteResult | void;
+export type Routes<T extends string> = {
+  [Path in T]: (
+    params: Params<Path>
+  ) => boolean | React.ReactNode | RouteResult | void;
 };
 
-export function defineRoutes<T extends string, TRouteResult>(
-  routes: Routes<T, TRouteResult>
-): Routes<T, TRouteResult> {
+export function defineRoutes<T extends string>(routes: Routes<T>): Routes<T> {
   return routes;
 }

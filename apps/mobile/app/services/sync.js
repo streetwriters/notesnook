@@ -23,7 +23,7 @@ import { DatabaseLogger } from "../common/database/index";
 import { initAfterSync } from "../stores/index";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import BackgroundSync from "./background-sync";
-import { ToastEvent } from "./event-manager";
+import { ToastManager } from "./event-manager";
 import SettingsService from "./settings";
 
 export const ignoredMessages = [
@@ -100,7 +100,10 @@ const run = async (
         status.isConnected &&
         status.isInternetReachable
       ) {
-        ToastEvent.error(e, "Sync failed", context);
+        userstore.setSyncing(false, SyncStatus.Failed);
+        if (status.isConnected && status.isInternetReachable) {
+          ToastManager.error(e, "Sync failed", context);
+        }
       }
 
       DatabaseLogger.error(e, "[Client] Failed to sync");

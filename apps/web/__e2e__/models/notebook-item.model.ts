@@ -21,10 +21,11 @@ import { Locator } from "@playwright/test";
 import { BaseItemModel } from "./base-item.model";
 import { ContextMenuModel } from "./context-menu.model";
 import { ToggleModel } from "./toggle.model";
-import { ItemsViewModel } from "./items-view.model";
 import { Notebook } from "./types";
 import { confirmDialog, fillNotebookDialog } from "./utils";
 import { NotesViewModel } from "./notes-view.model";
+import { getTestId } from "../utils";
+import { SubnotebooksViewModel } from "./subnotebooks-view.model";
 
 export class NotebookItemModel extends BaseItemModel {
   private readonly contextMenu: ContextMenuModel;
@@ -36,8 +37,8 @@ export class NotebookItemModel extends BaseItemModel {
   async openNotebook() {
     await this.locator.click();
     return {
-      topics: new ItemsViewModel(this.page, "topics"),
-      notes: new NotesViewModel(this.page, "notebook")
+      subNotebooks: new SubnotebooksViewModel(this.page),
+      notes: new NotesViewModel(this.page, "notebook", "notes")
     };
   }
 
@@ -45,7 +46,7 @@ export class NotebookItemModel extends BaseItemModel {
     await this.contextMenu.open(this.locator);
     await this.contextMenu.clickOnItem("edit");
 
-    await fillNotebookDialog(this.page, notebook, true);
+    await fillNotebookDialog(this.page, notebook);
   }
 
   async moveToTrash(deleteContainedNotes = false) {
@@ -55,7 +56,7 @@ export class NotebookItemModel extends BaseItemModel {
     if (deleteContainedNotes)
       await this.page.locator("#deleteContainingNotes").check({ force: true });
 
-    await confirmDialog(this.page);
+    await confirmDialog(this.page.locator(getTestId("confirm-dialog")));
     await this.waitFor("detached");
   }
 

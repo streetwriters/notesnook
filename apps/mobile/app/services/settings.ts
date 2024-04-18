@@ -27,6 +27,8 @@ import {
 } from "../stores/use-setting-store";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { scale, updateSize } from "../utils/size";
+import { DatabaseLogger } from "../common/database";
+import { useUserStore } from "../stores/use-user-store";
 function reset() {
   const settings = get();
   if (settings.reminder !== "off" && settings.reminder !== "useroff") {
@@ -44,6 +46,36 @@ function resetSettings() {
   init();
 }
 
+function migrateAppLock() {
+  const appLockMode = get().appLockMode;
+  if (appLockMode === "none") {
+    if (
+      get().appLockEnabled &&
+      !get().appLockHasPasswordSecurity &&
+      !get().biometricsAuthEnabled
+    ) {
+      setProperty("biometricsAuthEnabled", true);
+    }
+    return;
+  }
+  if (appLockMode === "background") {
+    set({
+      appLockEnabled: true,
+      appLockTimer: 0,
+      appLockMode: "none",
+      biometricsAuthEnabled: true
+    });
+  } else if (appLockMode === "launch") {
+    set({
+      appLockEnabled: true,
+      appLockTimer: -1,
+      appLockMode: "none",
+      biometricsAuthEnabled: true
+    });
+  }
+  DatabaseLogger.debug("App lock Migrated");
+}
+
 function init() {
   scale.fontScale = 1;
   const settingsJson = MMKV.getString("appSettings");
@@ -56,17 +88,17 @@ function init() {
       ...JSON.parse(settingsJson)
     };
   }
-
   if (settings.fontScale) {
     scale.fontScale = settings.fontScale;
   }
   setTimeout(() => setPrivacyScreen(settings), 1);
   updateSize();
   useSettingStore.getState().setSettings({ ...settings });
+  migrateAppLock();
 }
 
 function setPrivacyScreen(settings: SettingStore["settings"]) {
-  if (settings.privacyScreen || settings.appLockMode === "background") {
+  if (settings.privacyScreen || settings.appLockEnabled) {
     if (Platform.OS === "android") {
       NotesnookModule.setSecureMode(true);
     } else {
@@ -127,6 +159,7 @@ function setProperty<K extends keyof SettingStore["settings"]>(
 function onFirstLaunch() {
   const introCompleted = get().introCompleted;
   if (!introCompleted) {
+    MMKV.setInt("editor:tools_version", 1);
     set({
       rateApp: Date.now() + 86400000 * 2,
       nextBackupRequestTime: Date.now() + 86400000 * 3
@@ -153,6 +186,33 @@ function checkOrientation() {
   //});
 }
 
+function canLockAppInBackground() {
+  return get().appLockEnabled && get().appLockTimer !== -1;
+}
+let backgroundEnterTime = 0;
+function appEnteredBackground() {
+  if (canLockAppInBackground()) {
+    backgroundEnterTime = Date.now();
+  }
+}
+
+function shouldLockAppOnEnterForeground() {
+  if (
+    useUserStore.getState().disableAppLockRequests ||
+    useSettingStore.getState().requestBiometrics
+  )
+    return false;
+
+  const settings = get();
+  if (!settings.appLockEnabled) return false;
+  if (settings.appLockTimer === -1) return false;
+  if (settings.appLockTimer === 0) return true;
+  const time = Date.now();
+  const diff = time - backgroundEnterTime;
+
+  return diff > settings.appLockTimer * 60000;
+}
+
 export const SettingsService = {
   init,
   set,
@@ -163,7 +223,11 @@ export const SettingsService = {
   reset,
   getProperty,
   setProperty,
-  resetSettings
+  resetSettings,
+  shouldLockAppOnEnterForeground,
+  canLockAppInBackground,
+  appEnteredBackground,
+  setPrivacyScreen
 };
 
 init();

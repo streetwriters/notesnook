@@ -3,16 +3,42 @@
   --sash-hover-size: 4px;
 }
 
-.sash-module_sash__K-9lB.sash-module_hover__80W6I:before,
-.sash-module_sash__K-9lB.sash-module_active__bJspD:before {
-  background: var(--accent);
+.tabsScroll,
+.titlebarLogo,
+.theme-scope-titleBar {
+  -webkit-app-region: drag;
 }
 
-.allotment-module_splitView__L-yRc.allotment-module_separatorBorder__x-rDS
-  > .allotment-module_splitViewContainer__rQnVa
-  > .allotment-module_splitViewView__MGZ6O:not(:first-child)::before {
-  background-color: transparent;
+.theme-scope-titleBar button,
+.tabsScroll .tab {
+  -webkit-app-region: no-drag;
 }
+
+.panel-resize-handle {
+  position: relative;
+}
+
+.panel-resize-handle::before {
+  content: " ";
+  position: absolute;
+  transition: background-color 300ms ease-out;
+  z-index: 999;
+}
+
+.panel-resize-handle[data-panel-group-direction="horizontal"]::before {
+  width: 5px;
+  height: 100%;
+}
+
+.panel-resize-handle[data-panel-group-direction="vertical"]::before {
+  width: 100%;
+  height: 5px;
+}
+
+.panel-resize-handle[data-resize-handle-state="hover"]::before {
+  background-color: var(--accent);
+}
+
 /* open-sans-regular - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
 @font-face {
   font-family: "Open Sans";
@@ -214,4 +240,17 @@ textarea,
 
 .ms-thumb {
   background: var(--paragraph-secondary) !important;
+}
+
+.rct-tree-items-container {
+  margin: 0px;
+  margin-block-start: 0px !important;
+  margin-block-end: 0px !important;
+  margin-inline-end: 0px !important;
+  margin-inline-start: 0px !important;
+  padding: 0px !important;
+}
+
+#app.app-focus-mode .toasts-container {
+  display: none;
 }

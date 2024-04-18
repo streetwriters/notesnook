@@ -22,20 +22,26 @@ import { isImage } from "@notesnook/core/dist/utils/filename";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import DocumentPicker from "react-native-document-picker";
-import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-import { db } from "../../../common/database";
-import { compressToBase64 } from "../../../common/filesystem/compress";
 import {
-  ToastEvent,
+  ImagePickerResponse,
+  launchCamera,
+  launchImageLibrary
+} from "react-native-image-picker";
+import { DatabaseLogger, db } from "../../../common/database";
+import filesystem from "../../../common/filesystem";
+import { compressToFile } from "../../../common/filesystem/compress";
+import AttachImage from "../../../components/dialogs/attach-image-dialog";
+import {
+  ToastManager,
   eSendEvent,
   presentSheet
 } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 import { eCloseSheet } from "../../../utils/events";
+import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
-import { useSettingStore } from "../../../stores/use-setting-store";
-import filesystem from "../../../common/filesystem";
 
 const showEncryptionSheet = (file) => {
   presentSheet({
@@ -51,6 +57,15 @@ const santizeUri = (uri) => {
   return uri;
 };
 
+/**
+ * @param {{
+ *  noteId: string,
+ * tabId: string,
+ * type: "image" | "camera" | "file"
+ * reupload: boolean
+ * hash?: string
+ * }} fileOptions
+ */
 const file = async (fileOptions) => {
   try {
     const options = {
@@ -75,7 +90,7 @@ const file = async (fileOptions) => {
     let uri = Platform.OS === "ios" ? file.fileCopyUri : file.uri;
 
     if (file.size > FILE_SIZE_LIMIT) {
-      ToastEvent.show({
+      ToastManager.show({
         title: "File too large",
         message: "The maximum allowed size per file is 500 MB",
         type: "error"
@@ -84,7 +99,7 @@ const file = async (fileOptions) => {
     }
 
     if (file.copyError) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Failed to open file",
         message: file.copyError,
         type: "error",
@@ -103,29 +118,40 @@ const file = async (fileOptions) => {
     if (!(await attachFile(uri, hash, file.type, file.name, fileOptions)))
       return;
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
-    if (isImage(file.type)) {
-      editorController.current?.commands.insertImage({
-        hash: hash,
-        filename: file.name,
-        mime: file.type,
-        size: file.size,
-        dataurl: await db.attachments.read(hash, "base64"),
-        title: file.name
-      });
-    } else {
-      editorController.current?.commands.insertAttachment({
-        hash: hash,
-        filename: file.name,
-        mime: file.type,
-        size: file.size
-      });
+
+    if (
+      useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
+    ) {
+      if (isImage(file.type)) {
+        editorController.current?.commands.insertImage(
+          {
+            hash: hash,
+            filename: file.name,
+            mime: file.type,
+            size: file.size,
+            dataurl: await db.attachments.read(hash, "base64"),
+            title: file.name
+          },
+          fileOptions.tabId
+        );
+      } else {
+        editorController.current?.commands.insertAttachment(
+          {
+            hash: hash,
+            filename: file.name,
+            mime: file.type,
+            size: file.size
+          },
+          fileOptions.tabId
+        );
+      }
     }
 
     setTimeout(() => {
       eSendEvent(eCloseSheet);
     }, 1000);
   } catch (e) {
-    ToastEvent.show({
+    ToastManager.show({
       heading: e.message,
       message: "You need internet access to attach a file",
       type: "error",
@@ -135,6 +161,15 @@ const file = async (fileOptions) => {
   }
 };
 
+/**
+ * @param {{
+ *  noteId: string,
+ * tabId: string,
+ * type: "image" | "camera" | "file"
+ * reupload: boolean
+ * hash?: string
+ * }} options
+ */
 const camera = async (options) => {
   try {
     await db.attachments.generateKey();
@@ -147,7 +182,7 @@ const camera = async (options) => {
       (response) => handleImageResponse(response, options)
     );
   } catch (e) {
-    ToastEvent.show({
+    ToastManager.show({
       heading: e.message,
       message: "You need internet access to attach a file",
       type: "error",
@@ -165,12 +200,12 @@ const gallery = async (options) => {
       {
         includeBase64: true,
         mediaType: "photo",
-        selectionLimit: 1
+        selectionLimit: 10
       },
       (response) => handleImageResponse(response, options)
     );
   } catch (e) {
-    ToastEvent.show({
+    ToastManager.show({
       heading: e.message,
       message: "You need internet access to attach a file",
       type: "error",
@@ -180,6 +215,27 @@ const gallery = async (options) => {
   }
 };
 
+/**
+ *
+ * @typedef {{
+ *  noteId?: string,
+ * tabId?: string,
+ * type: "image" | "camera" | "file"
+ * reupload: boolean
+ * hash?: string
+ * context?: string
+ * }} ImagePickerOptions
+ *
+ * @param {{
+ *  noteId?: string,
+ * tabId?: string,
+ * type: "image" | "camera" | "file"
+ * reupload: boolean
+ * hash?: string
+ * context?: string
+ * }} options
+ * @returns
+ */
 const pick = async (options) => {
   if (!PremiumService.get()) {
     let user = await db.user.getUser();
@@ -203,7 +259,12 @@ const pick = async (options) => {
     file(options);
   }
 };
-
+/**
+ *
+ * @param {ImagePickerResponse} response
+ * @param {ImagePickerOptions} options
+ * @returns
+ */
 const handleImageResponse = async (response, options) => {
   if (
     response.didCancel ||
@@ -214,55 +275,80 @@ const handleImageResponse = async (response, options) => {
     return;
   }
 
-  let image = response.assets[0];
-  if (image.fileSize > IMAGE_SIZE_LIMIT) {
-    ToastEvent.show({
-      title: "File too large",
-      message: "The maximum allowed size per image is 50 MB",
-      type: "error"
-    });
-    return;
-  }
-  let b64 = `data:${image.type};base64, ` + image.base64;
-  const uri = decodeURI(image.uri);
-  const hash = await Sodium.hashFile({
-    uri: uri,
-    type: "url"
-  });
+  const result = await AttachImage.present(response);
 
-  let fileName = image.originalFileName || image.fileName;
+  if (!result) return;
+  const compress = result.compress;
 
-  editorController.current?.commands.insertImage({
-    hash: hash,
-    mime: image.type,
-    title: fileName,
-    dataurl: b64,
-    size: image.fileSize,
-    filename: fileName
-  });
+  for (let image of response.assets) {
+    const isPng = /(png)/g.test(image.type);
+    const isJpeg = /(jpeg|jpg)/g.test(image.type);
 
-  if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
-  const isPng = /(png)/g.test(image.type);
-  const isJpeg = /(jpeg|jpg)/g.test(image.type);
-  if (isPng || isJpeg) {
-    b64 =
-      `data:${image.type};base64, ` +
-      (await compressToBase64(
+    if (compress && (isPng || isJpeg)) {
+      image.uri = await compressToFile(
         Platform.OS === "ios" ? "file://" + image.uri : image.uri,
         isPng ? "PNG" : "JPEG"
-      ));
-  }
+      );
+      const stat = await RNFetchBlob.fs.stat(image.uri.replace("file://", ""));
+      image.fileSize = stat.size;
+    }
 
-  if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
+    if (image.fileSize > IMAGE_SIZE_LIMIT) {
+      ToastManager.show({
+        title: "File too large",
+        message: "The maximum allowed size per image is 50 MB",
+        type: "error"
+      });
+      return;
+    }
+    let b64 = `data:${image.type};base64, ` + image.base64;
+    const uri = decodeURI(image.uri);
+    const hash = await Sodium.hashFile({
+      uri: uri,
+      type: "url"
+    });
+
+    let fileName = image.originalFileName || image.fileName;
+    console.log("attaching file...");
+    if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
+
+    if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
+    console.log("attaching image to note...");
+    if (
+      options.tabId !== undefined &&
+      useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
+    ) {
+      console.log("attaching image to note...");
+      editorController.current?.commands.insertImage(
+        {
+          hash: hash,
+          mime: image.type,
+          title: fileName,
+          dataurl: b64,
+          size: image.fileSize,
+          filename: fileName
+        },
+        options.tabId
+      );
+    }
+  }
 };
 
+/**
+ *
+ * @param {string} uri
+ * @param {string} hash
+ * @param {string} type
+ * @param {string} filename
+ * @param {ImagePickerOptions} options
+ * @returns
+ */
 export async function attachFile(uri, hash, type, filename, options) {
   try {
-    let exists = db.attachments.exists(hash);
+    let exists = await db.attachments.exists(hash);
     let encryptionInfo;
-
     if (options?.hash && options.hash !== hash) {
-      ToastEvent.show({
+      ToastManager.show({
         heading: "Please select the same file for reuploading",
         message: `Expected hash ${options.hash} but got ${hash}.`,
         type: "error",
@@ -282,7 +368,7 @@ export async function attachFile(uri, hash, type, filename, options) {
         type: options.type || "url",
         hash: hash
       });
-      encryptionInfo.type = type;
+      encryptionInfo.mimeType = type;
       encryptionInfo.filename = filename;
       encryptionInfo.alg = "xcha-stream";
       encryptionInfo.size = encryptionInfo.length;
@@ -291,14 +377,10 @@ export async function attachFile(uri, hash, type, filename, options) {
     } else {
       encryptionInfo = { hash: hash };
     }
-    await db.attachments.add(
-      encryptionInfo,
-      editorController.current?.note?.id
-    );
-
+    await db.attachments.add(encryptionInfo, options.noteId);
     return true;
   } catch (e) {
-    console.log("attach file error: ", e);
+    DatabaseLogger.error(e);
     if (Platform.OS === "ios") {
       await RNFetchBlob.fs.unlink(uri);
     }

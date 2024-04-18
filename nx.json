@@ -1,13 +1,4 @@
 {
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "@nrwl/nx-cloud",
-      "options": {
-        "cacheableOperations": ["build", "build:test", "build:desktop"],
-        "accessToken": "ZWM3ODgxNDgtNGUzZC00MjQ0LWE3MzMtZDdhMzE3ZGY2MWFlfHJlYWQ="
-      }
-    }
-  },
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],
@@ -15,7 +6,8 @@
         "{projectRoot}/build",
         "{projectRoot}/dist",
         "{projectRoot}/languages"
-      ]
+      ],
+      "cache": true
     },
     "release": {
       "dependsOn": ["^build"],
@@ -23,7 +15,8 @@
     },
     "build:test": {
       "dependsOn": ["^build"],
-      "outputs": ["{projectRoot}/build"]
+      "outputs": ["{projectRoot}/build"],
+      "cache": true
     },
     "build:beta": {
       "dependsOn": ["^build"],
@@ -31,7 +24,8 @@
     },
     "build:desktop": {
       "dependsOn": ["^build"],
-      "outputs": ["{projectRoot}/build"]
+      "outputs": ["{projectRoot}/build"],
+      "cache": true
     },
     "start": {
       "dependsOn": ["^build"]
@@ -66,5 +60,12 @@
     "release-ios": {
       "dependsOn": ["^build"]
     }
-  }
+  },
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "sharedGlobals": [],
+    "production": ["default"]
+  },
+  "parallel": 4,
+  "nxCloudAccessToken": "ZWM3ODgxNDgtNGUzZC00MjQ0LWE3MzMtZDdhMzE3ZGY2MWFlfHJlYWQ="
 }

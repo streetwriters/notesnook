@@ -41,6 +41,9 @@ export const ProfileSettings: SettingsGroup[] = [
     key: "user-profile",
     section: "profile",
     header: UserProfile,
+    onStateChange(listener) {
+      return useUserStore.subscribe((s) => s.isLoggedIn, listener);
+    },
     settings: [
       {
         key: "email",
@@ -77,7 +80,7 @@ export const ProfileSettings: SettingsGroup[] = [
         description:
           "In case you lose your password, this data recovery key is the only way to recovery your data.",
         keywords: ["data recovery key", "lose your password", "backup"],
-        isHidden: () => !userstore.get().isLoggedIn,
+        isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
             type: "button",
@@ -95,16 +98,26 @@ export const ProfileSettings: SettingsGroup[] = [
         description:
           "Permanently delete your account clearing all data including your notes, notebooks, and attachments.",
         keywords: ["delete account", "clear data"],
-        isHidden: () => !userstore.get().isLoggedIn,
+        isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
             type: "button",
             variant: "error",
             title: "Delete account",
-            action: async () =>
-              showPasswordDialog("delete_account", async ({ password }) => {
-                await db.user?.deleteUser(password);
-                return true;
+            action: () =>
+              showPasswordDialog({
+                title: "Delete your account",
+                message: ` All your data will be permanently deleted with **no way of recovery**. Proceed with caution.`,
+                inputs: {
+                  password: {
+                    label: "Password",
+                    autoComplete: "current-password"
+                  }
+                },
+                validate: async ({ password }) => {
+                  await db.user.deleteUser(password);
+                  return true;
+                }
               })
           }
         ]
@@ -115,7 +128,10 @@ export const ProfileSettings: SettingsGroup[] = [
     key: "user-sessions",
     section: "profile",
     header: "Sessions",
-    isHidden: () => !userstore.get().isLoggedIn,
+    onStateChange(listener) {
+      return useUserStore.subscribe((s) => s.isLoggedIn, listener);
+    },
+    isHidden: () => !useUserStore.getState().isLoggedIn,
     settings: [
       {
         key: "logout",
@@ -132,7 +148,7 @@ export const ProfileSettings: SettingsGroup[] = [
                 await showLoadingDialog({
                   title: "You are being logged out",
                   subtitle: "Please wait...",
-                  action: () => db.user?.logout(true)
+                  action: () => db.user.logout(true)
                 });
                 showToast("success", "You have been logged out.");
               }
@@ -153,7 +169,7 @@ export const ProfileSettings: SettingsGroup[] = [
             action: async () => {
               if (!(await showClearSessionsConfirmation())) return;
 
-              await db.user?.clearSessions();
+              await db.user.clearSessions();
               showToast(
                 "success",
                 "You have been logged out from all other devices."

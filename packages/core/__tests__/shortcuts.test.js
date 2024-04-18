@@ -23,52 +23,41 @@ import { test, expect } from "vitest";
 test("create a shortcut of an invalid item should throw", () =>
   databaseTest().then(async (db) => {
     await expect(() =>
-      db.shortcuts.add({ item: { type: "HELLO!" } })
+      db.shortcuts.add({ itemType: "HELLO!" })
     ).rejects.toThrow(/cannot create a shortcut/i);
   }));
 
 test("create a shortcut of notebook", () =>
   notebookTest().then(async ({ db, id }) => {
-    await db.shortcuts.add({ item: { type: "notebook", id } });
+    await db.shortcuts.add({ itemType: "notebook", itemId: id });
     expect(db.shortcuts.exists(id)).toBe(true);
-    expect(db.shortcuts.all[0].item.id).toBe(id);
+    expect(db.shortcuts.all.find((s) => s.id === id)).toBeDefined();
   }));
 
 test("create a duplicate shortcut of notebook", () =>
   notebookTest().then(async ({ db, id }) => {
-    await db.shortcuts.add({ item: { type: "notebook", id } });
-    await db.shortcuts.add({ item: { type: "notebook", id } });
+    await db.shortcuts.add({ itemType: "notebook", itemId: id });
+    await db.shortcuts.add({ itemType: "notebook", itemId: id });
 
     expect(db.shortcuts.all).toHaveLength(1);
-    expect(db.shortcuts.all[0].item.id).toBe(id);
-  }));
-
-test("create shortcut of a topic", () =>
-  notebookTest().then(async ({ db, id }) => {
-    const notebook = db.notebooks.notebook(id)._notebook;
-    const topic = notebook.topics[0];
-    await db.shortcuts.add({
-      item: { type: "topic", id: topic.id, notebookId: id }
-    });
-
-    expect(db.shortcuts.all).toHaveLength(1);
-    expect(db.shortcuts.all[0].item.id).toBe(topic.id);
+    expect(db.shortcuts.all.find((s) => s.id === id)).toBeDefined();
   }));
 
 test("pin a tag", () =>
   databaseTest().then(async (db) => {
-    const tag = await db.tags.add("HELLO!");
-    await db.shortcuts.add({ item: { type: "tag", id: tag.id } });
+    const tagId = await db.tags.add({ title: "HELLO!" });
+    await db.shortcuts.add({ itemType: "tag", itemId: tagId });
 
     expect(db.shortcuts.all).toHaveLength(1);
-    expect(db.shortcuts.all[0].item.id).toBe(tag.id);
+    expect(db.shortcuts.all.find((s) => s.id === tagId)).toBeDefined();
   }));
 
 test("remove shortcut", () =>
   databaseTest().then(async (db) => {
-    const tag = await db.tags.add("HELLO!");
+    const tagId = await db.tags.add({ title: "HELLO!" });
     const shortcutId = await db.shortcuts.add({
-      item: { type: "tag", id: tag.id }
+      itemType: "tag",
+      itemId: tagId
     });
 
     expect(db.shortcuts.all).toHaveLength(1);

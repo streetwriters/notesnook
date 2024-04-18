@@ -67,7 +67,7 @@ class NavigationItemModel {
   private readonly shortcut: Locator;
   private readonly menu: ContextMenuModel;
   private readonly page: Page;
-  constructor(private readonly locator: Locator) {
+  constructor(readonly locator: Locator) {
     this.page = locator.page();
     this.shortcut = locator.locator(getTestId("shortcut"));
     this.menu = new ContextMenuModel(this.page);

@@ -36,7 +36,7 @@ import {
 import { ToolbarDefinition } from "./types";
 
 type ToolbarProps = FlexProps & {
-  editor: Editor | null;
+  editor: Editor;
   location: ToolbarLocation;
   tools?: ToolbarDefinition;
   defaultFontFamily: string;
@@ -58,11 +58,11 @@ export function Toolbar(props: ToolbarProps) {
   const toolbarTools = useMemo(
     () =>
       isMobile
-        ? editor?.current?.isEditable
+        ? editor.isEditable
           ? [...MOBILE_STATIC_TOOLBAR_GROUPS, ...tools]
           : READONLY_MOBILE_STATIC_TOOLBAR_GROUPS
         : [...STATIC_TOOLBAR_GROUPS, ...tools],
-    [tools, isMobile]
+    [tools, editor.isEditable, isMobile]
   );
 
   const setToolbarLocation = useToolbarStore(
@@ -85,7 +85,6 @@ export function Toolbar(props: ToolbarProps) {
     setDefaultFontSize
   ]);
 
-  if (!editor) return null;
   return (
     <>
       <Flex

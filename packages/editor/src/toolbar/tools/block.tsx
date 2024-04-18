@@ -37,24 +37,21 @@ export function InsertBlock(props: ToolProps) {
   const toolbarLocation = useToolbarLocation();
   const isMobile = useIsMobile();
 
-  const menuItems = useMemo(
-    () => {
-      return [
-        tasklist(editor),
-        outlinelist(editor),
-        horizontalRule(editor),
-        codeblock(editor),
-        mathblock(editor),
-        blockquote(editor),
-        image(editor, isMobile),
-        attachment(editor),
-        isMobile ? embedMobile(editor) : embedDesktop(editor),
-        table(editor)
-      ];
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isMobile]
-  );
+  const menuItems = useMemo(() => {
+    return [
+      tasklist(editor),
+      outlinelist(editor),
+      horizontalRule(editor),
+      codeblock(editor),
+      mathblock(editor),
+      callout(editor),
+      blockquote(editor),
+      image(editor, isMobile),
+      attachment(editor),
+      isMobile ? embedMobile(editor) : embedDesktop(editor),
+      table(editor)
+    ];
+  }, [editor, isMobile]);
 
   return (
     <>
@@ -72,7 +69,11 @@ export function InsertBlock(props: ToolProps) {
             mr: 0
           }
         }}
-        onMouseDown={(e) => e.preventDefault()}
+        onMouseDown={(e) => {
+          if (globalThis.keyboardShown) {
+            e.preventDefault();
+          }
+        }}
         onClick={() => setIsOpen((s) => !s)}
       >
         <Icon path={Icons.plus} size="medium" color={"accent"} />
@@ -101,8 +102,8 @@ const horizontalRule = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Horizontal rule",
   icon: Icons.horizontalRule,
-  isChecked: editor?.isActive("horizontalRule"),
-  onClick: () => editor.current?.chain().focus().setHorizontalRule().run()
+  isChecked: editor.isActive("horizontalRule"),
+  onClick: () => editor.chain().focus().setHorizontalRule().run()
 });
 
 const codeblock = (editor: Editor): MenuItem => ({
@@ -110,8 +111,8 @@ const codeblock = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Code block",
   icon: Icons.codeblock,
-  isChecked: editor?.isActive("codeBlock"),
-  onClick: () => editor.current?.chain().focus().toggleCodeBlock().run(),
+  isChecked: editor.isActive("codeBlock"),
+  onClick: () => editor.chain().focus().toggleCodeBlock().run(),
   modifier: "Mod-Shift-C"
 });
 
@@ -120,8 +121,8 @@ const blockquote = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Quote",
   icon: Icons.blockquote,
-  isChecked: editor?.isActive("blockQuote"),
-  onClick: () => editor.current?.chain().focus().toggleBlockquote().run(),
+  isChecked: editor.isActive("blockQuote"),
+  onClick: () => editor.chain().focus().toggleBlockquote().run(),
   modifier: "Mod-Shift-B"
 });
 
@@ -130,9 +131,39 @@ const mathblock = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Math & formulas",
   icon: Icons.mathBlock,
-  isChecked: editor?.isActive("mathBlock"),
-  onClick: () => editor.current?.chain().focus().insertMathBlock().run(),
+  isChecked: editor.isActive("mathBlock"),
+  onClick: () => editor.chain().focus().insertMathBlock().run(),
   modifier: "Mod-Shift-M"
+});
+
+const callout = (editor: Editor): MenuItem => ({
+  key: "callout",
+  type: "button",
+  title: "Callout",
+  icon: Icons.callout,
+  menu: {
+    items: [
+      "Abstract",
+      "Hint",
+      "Info",
+      "Success",
+      "Warn",
+      "Error",
+      "Example",
+      "Quote"
+    ].map((type) => ({
+      title: type,
+      key: type,
+      type: "button",
+      isChecked: editor.isActive("callout", { type: type.toLowerCase() }),
+      onClick: () =>
+        editor
+          .chain()
+          .focus()
+          .setCallout({ type: type.toLowerCase() as any })
+          .run()
+    }))
+  }
 });
 
 const image = (editor: Editor, isMobile: boolean): MenuItem => ({
@@ -148,8 +179,7 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         type: "button",
         title: "Upload from disk",
         icon: Icons.upload,
-        onClick: () =>
-          editor.current?.chain().focus().openAttachmentPicker("image").run(),
+        onClick: () => editor.storage.openAttachmentPicker?.("image"),
         modifier: "Mod-Shift-I"
       },
       {
@@ -158,8 +188,7 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         title: "Take a photo using camera",
         icon: Icons.camera,
         isHidden: !isMobile,
-        onClick: () =>
-          editor.current?.chain().focus().openAttachmentPicker("camera").run()
+        onClick: () => editor.storage.openAttachmentPicker?.("camera")
       },
       isMobile ? uploadImageFromURLMobile(editor) : uploadImageFromURL(editor)
     ]
@@ -180,7 +209,7 @@ const table = (editor: Editor): MenuItem => ({
         component: (props) => (
           <TablePopup
             onInsertTable={(size) => {
-              editor.current
+              editor
                 ?.chain()
                 .focus()
                 .insertTable({
@@ -214,7 +243,7 @@ const embedMobile = (editor: Editor): MenuItem => ({
               title="Insert embed"
               onClose={(embed) => {
                 if (!embed) return onClick?.();
-                editor.current?.chain().insertEmbed(embed).run();
+                editor.chain().insertEmbed(embed).run();
                 onClick?.();
               }}
             />
@@ -238,7 +267,7 @@ const embedDesktop = (editor: Editor): MenuItem => ({
           title="Insert embed"
           onClose={(embed) => {
             if (!embed) return hide();
-            editor.current?.chain().insertEmbed(embed).run();
+            editor.chain().insertEmbed(embed).run();
             hide();
           }}
         />
@@ -252,9 +281,8 @@ const attachment = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Attachment",
   icon: Icons.attachment,
-  isChecked: editor?.isActive("attachment"),
-  onClick: () =>
-    editor.current?.chain().focus().openAttachmentPicker("file").run(),
+  isChecked: editor.isActive("attachment"),
+  onClick: () => editor.storage.openAttachmentPicker?.("file"),
   modifier: "Mod-Shift-A"
 });
 
@@ -263,8 +291,8 @@ const tasklist = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Task list",
   icon: Icons.checkbox,
-  isChecked: editor?.isActive("taskList"),
-  onClick: () => editor.current?.chain().focus().toggleTaskList().run(),
+  isChecked: editor.isActive("taskList"),
+  onClick: () => editor.chain().focus().toggleTaskList().run(),
   modifier: "Mod-Shift-T"
 });
 
@@ -273,8 +301,8 @@ const outlinelist = (editor: Editor): MenuItem => ({
   type: "button",
   title: "Outline list",
   icon: Icons.outlineList,
-  isChecked: editor?.isActive("outlineList"),
-  onClick: () => editor.current?.chain().focus().toggleOutlineList().run(),
+  isChecked: editor.isActive("outlineList"),
+  onClick: () => editor.chain().focus().toggleOutlineList().run(),
   modifier: "Mod-Shift-O"
 });
 

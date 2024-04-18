@@ -17,36 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Platform, ScrollView, View } from "react-native";
-import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { AuthMode } from "../../components/auth";
-import { Button } from "../../components/ui/button";
-import { PressableButton } from "../../components/ui/pressable";
+import { Pressable } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import BiometicService from "../../services/biometrics";
-import { DDS } from "../../services/device-detection";
-import {
-  ToastEvent,
-  eSendEvent,
-  presentSheet
-} from "../../services/event-manager";
-import Navigation from "../../services/navigation";
+import { ToastManager, presentSheet } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
-import { getElevationStyle } from "../../utils/elevation";
-import { eOpenLoginDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
-const AppLock = ({ route }) => {
+const AppLock = () => {
   const { colors } = useThemeColors();
   const appLockMode = useSettingStore((state) => state.settings.appLockMode);
-  const welcome = route?.params?.welcome;
-  const deviceMode = useSettingStore((state) => state.deviceMode);
 
   const modes = [
     {
@@ -76,143 +64,67 @@ const AppLock = ({ route }) => {
 
   return (
     <>
-      <Animated.View
-        exiting={!welcome ? undefined : FadeOutUp}
-        entering={!welcome ? undefined : FadeInDown}
-        style={{
-          height: !welcome ? undefined : "100%",
-          width: !welcome ? undefined : "100%"
-        }}
-      >
+      <Animated.View>
         <>
-          {!welcome ? (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "flex-end",
+              justifyContent: "space-between",
+              width: "95%",
+              paddingVertical: 12,
+              paddingHorizontal: 0,
+              alignSelf: "center",
+              minHeight: 125,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.secondary.background
+            }}
+          >
+            <Icon
+              name="shield-lock"
+              color={colors.secondary.icon}
+              size={100}
+              style={{
+                position: "absolute",
+                right: 0,
+                top: 6,
+                opacity: 0.2
+              }}
+            />
+
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "flex-end",
-                justifyContent: "space-between",
-                width: DDS.isTab && welcome ? "50%" : "95%",
-                paddingVertical: 12,
-                paddingHorizontal: 0,
-                alignSelf: "center",
-                minHeight: 125,
-                borderBottomWidth: 1,
-                borderBottomColor: welcome
-                  ? "transparent"
-                  : colors.secondary.background
+                width: "100%"
               }}
             >
-              <Icon
-                name="shield-lock"
-                color={colors.secondary.icon}
-                size={100}
-                style={{
-                  position: "absolute",
-                  right: 0,
-                  top: 6,
-                  opacity: 0.2
-                }}
-              />
-
-              <View
-                style={{
-                  alignItems: !welcome ? undefined : "center",
-                  width: "100%"
-                }}
-              >
-                <Heading>Protect your notes</Heading>
-                <Paragraph
-                  style={{
-                    textAlign: !welcome ? undefined : "center"
-                  }}
-                  size={SIZE.md}
-                >
-                  Choose how you want to secure your notes locally.
-                </Paragraph>
-              </View>
-            </View>
-          ) : (
-            <View
-              style={{
-                flexGrow: 1,
-                justifyContent: "flex-end",
-                paddingHorizontal: 20,
-                backgroundColor: colors.secondary.background,
-                borderBottomWidth: 1,
-                borderBottomColor: colors.primary.border,
-                alignSelf: deviceMode !== "mobile" ? "center" : undefined,
-                borderWidth: deviceMode !== "mobile" ? 1 : null,
-                borderColor:
-                  deviceMode !== "mobile" ? colors.primary.border : null,
-                borderRadius: deviceMode !== "mobile" ? 20 : null,
-                marginTop: deviceMode !== "mobile" ? 50 : null,
-                width: deviceMode === "mobile" ? null : "50%",
-                minHeight: 180
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row"
-                }}
-              >
-                <View
-                  style={{
-                    width: 100,
-                    height: 5,
-                    backgroundColor: colors.primary.accent,
-                    borderRadius: 2,
-                    marginRight: 7
-                  }}
-                />
-
-                <View
-                  style={{
-                    width: 20,
-                    height: 5,
-                    backgroundColor: colors.secondary.background,
-                    borderRadius: 2
-                  }}
-                />
-              </View>
-              <Heading
-                style={{
-                  marginTop: 10
-                }}
-                extraBold
-                size={SIZE.xxl}
-              >
-                Protect your notes
-              </Heading>
-              <Paragraph
-                style={{
-                  marginBottom: 25
-                }}
-              >
+              <Heading>Protect your notes</Heading>
+              <Paragraph size={SIZE.md}>
                 Choose how you want to secure your notes locally.
               </Paragraph>
             </View>
-          )}
+          </View>
 
           <Seperator />
           <ScrollView
             style={{
               paddingHorizontal: 12,
-              width: DDS.isTab && welcome ? "50%" : "100%",
+              width: "100%",
               alignSelf: "center",
               flexGrow: 1
             }}
           >
             {modes.map((item) => (
-              <PressableButton
+              <Pressable
                 key={item.title}
-                type={appLockMode === item.value ? "grayBg" : "transparent"}
+                type={appLockMode === item.value ? "secondary" : "transparent"}
                 onPress={async () => {
                   if (
                     !(await BiometicService.isBiometryAvailable()) &&
                     !useUserStore.getState().user &&
-                    item.value !== modes[0].value
+                    item.value !== modes[0].value &&
+                    !SettingsService.getProperty("appLockHasPasswordSecurity")
                   ) {
-                    ToastEvent.show({
+                    ToastManager.show({
                       heading: "Biometrics not enrolled",
                       type: "error",
                       message:
@@ -220,9 +132,29 @@ const AppLock = ({ route }) => {
                     });
                     return;
                   }
+
+                  if (
+                    !SettingsService.getProperty(
+                      "appLockHasPasswordSecurity"
+                    ) &&
+                    item.value !== modes[0].value
+                  ) {
+                    const verified = await BiometicService.validateUser(
+                      "Verify it's you"
+                    );
+                    if (verified) {
+                      SettingsService.setProperty(
+                        "biometricsAuthEnabled",
+                        true
+                      );
+                    } else {
+                      return;
+                    }
+                  }
+
                   SettingsService.set({ appLockMode: item.value });
                 }}
-                customStyle={{
+                style={{
                   justifyContent: "flex-start",
                   alignItems: "flex-start",
                   paddingHorizontal: 12,
@@ -234,9 +166,6 @@ const AppLock = ({ route }) => {
                     appLockMode === item.value
                       ? item.activeColor
                       : colors.secondary.background
-                }}
-                style={{
-                  marginBottom: 10
                 }}
               >
                 <Heading
@@ -261,41 +190,8 @@ const AppLock = ({ route }) => {
                 >
                   {item.desc}
                 </Paragraph>
-              </PressableButton>
+              </Pressable>
             ))}
-
-            {welcome && (
-              <Button
-                fontSize={SIZE.md}
-                width={250}
-                onPress={async () => {
-                  eSendEvent(eOpenLoginDialog, AuthMode.welcomeSignup);
-                  setTimeout(() => {
-                    SettingsService.set({
-                      introCompleted: true
-                    });
-                    Navigation.replace(
-                      {
-                        name: "Notes"
-                      },
-                      {
-                        canGoBack: false
-                      }
-                    );
-                  }, 1000);
-                }}
-                style={{
-                  paddingHorizontal: 24,
-                  alignSelf: "center",
-                  ...getElevationStyle(5),
-                  marginTop: 30,
-                  borderRadius: 100,
-                  marginBottom: 30
-                }}
-                type="accent"
-                title="Next"
-              />
-            )}
           </ScrollView>
         </>
       </Animated.View>
@@ -303,10 +199,9 @@ const AppLock = ({ route }) => {
   );
 };
 
-AppLock.present = async (isWelcome) => {
+AppLock.present = async () => {
   presentSheet({
-    component: <AppLock welcome={isWelcome} s={0} />,
-    disableClosing: isWelcome
+    component: <AppLock />
   });
 };
 

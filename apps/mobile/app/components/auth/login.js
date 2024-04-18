@@ -38,6 +38,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { eUserLoggedIn } from "../../utils/events";
 import { useUserStore } from "../../stores/use-user-store";
 import Sync from "../../services/sync";
+import { Notice } from "../ui/notice";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -103,7 +104,7 @@ export const Login = ({ changeMode }) => {
             justifyContent: "flex-end",
             paddingHorizontal: 20,
             backgroundColor: colors.secondary.background,
-            borderBottomWidth: 1,
+            borderBottomWidth: 0.8,
             marginBottom: 12,
             borderBottomColor: colors.primary.border,
             alignSelf: deviceMode !== "mobile" ? "center" : undefined,
@@ -222,7 +223,7 @@ export const Login = ({ changeMode }) => {
                   textDecorationLine: "underline"
                 }}
                 fontSize={SIZE.xs}
-                type="gray"
+                type="plain"
               />
             </>
           )}
@@ -295,6 +296,11 @@ export const Login = ({ changeMode }) => {
                 </Paragraph>
               </TouchableOpacity>
             ) : null}
+
+            <Notice
+              type="alert"
+              text="After logging in from V3 beta, your account data will be migrated and you won't be able to use V2 clients to sync your notes."
+            />
           </View>
         </View>
       </View>

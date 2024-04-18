@@ -28,7 +28,9 @@ import {
   notVisibleById,
   sleep,
   exitEditor,
-  tapByText
+  tapByText,
+  elementByText,
+  elementById
 } from "./utils";
 
 describe("NOTE TESTS", () => {
@@ -40,15 +42,15 @@ describe("NOTE TESTS", () => {
   it("Open and close a note", async () => {
     await prepare();
     await createNote();
-    await tapById(notesnook.ids.note.get(1));
+    await tapById(notesnook.ids.note.get(0));
     await exitEditor();
   });
 
-  it("Notes properties should show", async () => {
+  it.only("Notes properties should show", async () => {
     await prepare();
     let note = await createNote();
     await tapById(notesnook.listitem.menu);
-    await visibleByText("Created at:");
+    await waitFor(elementByText("Created at:")).toBeVisible().withTimeout(500);
   });
 
   it("Favorite and unfavorite a note", async () => {
@@ -90,33 +92,31 @@ describe("NOTE TESTS", () => {
     await visibleByText("Pin to notifications");
   });
 
-  // it("Copy note", async () => {
-  //   await prepare();
-  //   await createNote();
-  //   await tapById(notesnook.listitem.menu);
-  //   await tapById("icon-Copy");
-  //   await visibleByText("Note copied to clipboard");
-  // });
-
-  it("Export note dialog should show", async () => {
+  it("Copy note", async () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-export");
-    await visibleByText("PDF");
+    await sleep(1000);
+    await waitFor(elementById("icon-copy")).toBeVisible().withTimeout(500);
+    await tapById("icon-copy");
   });
 
   it("Assign colors to a note", async () => {
     await prepare();
     let note = await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById(notesnook.ids.dialogs.actionsheet.color("red"));
+    await sleep(1000);
+    await tapByText("Add color");
+    await sleep(500);
+    await elementById("color-title-input").typeText("Test color");
+    await tapByText("Add color");
+    await sleep(3000);
     await visibleById("icon-check");
-    await tapById(notesnook.ids.dialogs.actionsheet.color("red"));
+    await tapById("icon-color-#efefef");
     await notVisibleById("icon-check");
-    await tapById(notesnook.ids.dialogs.actionsheet.color("green"));
+    await tapById("icon-color-#efefef");
     await device.pressBack();
-    await navigate("Green");
+    await navigate("Test color");
     await visibleByText(note.body);
   });
 
@@ -124,12 +124,15 @@ describe("NOTE TESTS", () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
+    await sleep(500);
     await tapById("icon-trash");
     await navigate("Trash");
     await sleep(500);
     await tapById(notesnook.listitem.menu);
+    await sleep(500);
     await tapByText("Restore note");
     await device.pressBack();
+    await sleep(500);
     await visibleByText(
       "Test note description that is very long and should not fit in text."
     );

@@ -17,23 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useMemo } from "react";
-import { Platform, Text, TextProps, ViewStyle } from "react-native";
-import Animated, {
-  ComplexAnimationBuilder,
-  Layout
-} from "react-native-reanimated";
 import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { Platform, Text, TextProps, ViewStyle } from "react-native";
 import { SIZE } from "../../../utils/size";
 interface HeadingProps extends TextProps {
   color?: string;
   size?: number;
-  layout?: ComplexAnimationBuilder;
-  animated?: boolean;
   extraBold?: boolean;
 }
-
-const AnimatedText = Animated.createAnimatedComponent(Text);
 
 const extraBoldStyle = {
   fontFamily: Platform.OS === "android" ? "OpenSans-Bold" : undefined,
@@ -48,16 +40,13 @@ const Heading = ({
   color,
   size = SIZE.xl,
   style,
-  animated,
   extraBold,
   ...restProps
 }: HeadingProps) => {
   const { colors } = useThemeColors();
-  const Component = useMemo(() => (animated ? AnimatedText : Text), [animated]);
 
   return (
-    <Component
-      layout={restProps.layout || Layout}
+    <Text
       allowFontScaling={true}
       {...restProps}
       style={[
@@ -68,7 +57,7 @@ const Heading = ({
         extraBold ? (extraBoldStyle as ViewStyle) : (boldStyle as ViewStyle),
         style
       ]}
-    ></Component>
+    ></Text>
   );
 };
 

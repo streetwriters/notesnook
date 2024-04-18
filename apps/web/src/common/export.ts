@@ -18,14 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { TaskManager } from "./task-manager";
-import { ExportStream } from "../utils/streams/export-stream";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
-import { showToast } from "../utils/toast";
+import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
+import { Note } from "@notesnook/core";
+import { fromAsyncIterator } from "../utils/stream";
+import {
+  sanitizeFilename,
+  exportNotes as _exportNotes,
+  exportNote as _exportNote,
+  exportContent
+} from "@notesnook/common";
 import Vault from "./vault";
-import { db } from "./db";
-import Note from "@notesnook/core/dist/models/note";
-import { sanitizeFilename } from "@notesnook/common";
+import { ExportStream } from "../utils/streams/export-stream";
 
 export async function exportToPDF(
   title: string,
@@ -72,51 +77,20 @@ export async function exportToPDF(
 
 export async function exportNotes(
   format: "pdf" | "md" | "txt" | "html" | "md-frontmatter",
-  noteIds: string[]
+  notes: FilteredSelector<Note>
 ): Promise<boolean> {
   return await TaskManager.startTask({
     type: "modal",
     title: "Exporting notes",
     subtitle: "Please wait while your notes are exported.",
     action: async (report) => {
-      try {
-        let progress = 0;
-        await createNoteStream(noteIds)
-          .pipeThrough(
-            new TransformStream<Note, Note>({
-              transform(note, controller) {
-                controller.enqueue(note);
-                report({
-                  total: noteIds.length,
-                  current: progress++,
-                  text: `Exporting "${note?.title || "Unknown note"}"`
-                });
-              }
-            })
-          )
-          .pipeThrough(new ExportStream(format))
-          .pipeThrough(createZipStream())
-          .pipeTo(await createWriteStream("notes.zip"));
-        return true;
-      } catch (e) {
-        if (e instanceof Error) showToast("error", e.message);
-      }
-      return false;
-    }
-  });
-}
-
-function createNoteStream(noteIds: string[]) {
-  let i = 0;
-  return new ReadableStream<Note>({
-    start() {},
-    async pull(controller) {
-      const noteId = noteIds[i++];
-      if (!noteId) controller.close();
-      else controller.enqueue(db.notes?.note(noteId));
-    },
-    async cancel(reason) {
-      throw new Error(reason);
+      await fromAsyncIterator(
+        _exportNotes(notes, { format, unlockVault: Vault.unlockVault })
+      )
+        .pipeThrough(new ExportStream(report))
+        .pipeThrough(createZipStream())
+        .pipeTo(await createWriteStream("notes.zip"));
+      return true;
     }
   });
 }
@@ -131,39 +105,39 @@ const FORMAT_TO_EXT = {
 
 export async function exportNote(
   note: Note,
-  format: keyof typeof FORMAT_TO_EXT,
-  disableTemplate = false
+  options: {
+    format: keyof typeof FORMAT_TO_EXT;
+  }
 ) {
-  if (!db.vault?.unlocked && note.data.locked && !(await Vault.unlockVault())) {
-    showToast("error", `Skipping note "${note.title}" as it is locked.`);
-    return false;
+  if (options.format === "pdf") {
+    const content = await exportContent(note, {
+      format: "pdf",
+      unlockVault: Vault.unlockVault
+    });
+    if (!content) return false;
+    console.log(content);
+    return await exportToPDF(note.title, content);
   }
 
-  const rawContent = note.data.contentId
-    ? await db.content?.raw(note.data.contentId)
-    : undefined;
-
-  const content =
-    rawContent &&
-    !rawContent.deleted &&
-    (typeof rawContent.data === "object"
-      ? await db.vault?.decryptContent(rawContent)
-      : rawContent);
-
-  const exported = await note
-    .export(format === "pdf" ? "html" : format, content, !disableTemplate)
-    .catch((e: Error) => {
-      console.error(note.data, e);
-      showToast("error", `Failed to export note "${note.title}": ${e.message}`);
-      return false as const;
-    });
-
-  if (typeof exported === "boolean" && !exported) return false;
-
-  const filename = sanitizeFilename(note.title, { replacement: "-" });
-  const ext = FORMAT_TO_EXT[format];
-  return {
-    filename: [filename, ext].join("."),
-    content: exported
-  };
+  return await TaskManager.startTask({
+    type: "modal",
+    title: `Exporting "${note.title}"`,
+    subtitle: "Please wait while your note is exported.",
+    action: async (report) => {
+      await fromAsyncIterator(
+        _exportNote(note, {
+          format: options.format,
+          unlockVault: Vault.unlockVault
+        })
+      )
+        .pipeThrough(new ExportStream(report))
+        .pipeThrough(createZipStream())
+        .pipeTo(
+          await createWriteStream(
+            `${sanitizeFilename(note.title, { replacement: "-" })}.zip`
+          )
+        );
+      return true;
+    }
+  });
 }

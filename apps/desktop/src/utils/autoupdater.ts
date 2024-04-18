@@ -20,11 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { autoUpdater } from "electron-updater";
 import { config } from "./config";
 
+const CHANNEL = autoUpdater.currentVersion.raw.endsWith("-beta")
+  ? "beta"
+  : "latest";
 async function configureAutoUpdater() {
   autoUpdater.setFeedURL({
     provider: "generic",
-    url: `https://notesnook.com/releases/${process.platform}/`,
-    useMultipleRangeRequest: false
+    url: `https://notesnook.com/api/v1/releases/${process.platform}/${CHANNEL}`,
+    useMultipleRangeRequest: false,
+    channel: CHANNEL
   });
 
   autoUpdater.autoDownload = config.automaticUpdates;

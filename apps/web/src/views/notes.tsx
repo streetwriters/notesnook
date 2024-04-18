@@ -19,33 +19,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect } from "react";
 import ListContainer from "../components/list-container";
-import { useStore as useNotesStore } from "../stores/note-store";
-import { hashNavigate, navigate } from "../navigation";
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
-import { db } from "../common/db";
+import {
+  notesFromContext,
+  useStore as useNotesStore
+} from "../stores/note-store";
 import Placeholder from "../components/placeholders";
+import { useSearch } from "../hooks/use-search";
+import { db } from "../common/db";
+import { handleDrop } from "../common/drop-handler";
+import { useEditorStore } from "../stores/editor-store";
 
-function Notes() {
+type NotesProps = { header?: JSX.Element };
+function Notes(props: NotesProps) {
+  const { header } = props;
   const context = useNotesStore((store) => store.context);
+  const contextNotes = useNotesStore((store) => store.contextNotes);
   const refreshContext = useNotesStore((store) => store.refreshContext);
   const type = context?.type === "favorite" ? "favorites" : "notes";
   const isCompact = useNotesStore((store) => store.viewMode === "compact");
+  const filteredItems = useSearch(
+    "notes",
+    (query) => {
+      if (!context || !contextNotes) return;
+      const notes = notesFromContext(context);
+      return db.lookup.notes(query, notes).sorted();
+    },
+    [context, contextNotes]
+  );
 
-  useEffect(() => {
-    if (context?.type === "color" && context?.notes?.length <= 0) {
-      navigate("/", true);
-    }
-  }, [context]);
-
-  if (!context) return null;
+  if (!context || !contextNotes) return <Placeholder context="notes" />;
   return (
     <ListContainer
-      type="notes"
-      groupingKey={type}
+      group={type}
       refresh={refreshContext}
       compact={isCompact}
-      context={{ ...context, notes: undefined }}
-      items={groupArray(context.notes, db.settings?.getGroupOptions(type))}
+      context={context}
+      items={filteredItems || contextNotes}
+      onDrop={(e) => handleDrop(e.dataTransfer, context)}
       placeholder={
         <Placeholder
           context={
@@ -58,9 +68,9 @@ function Notes() {
         />
       }
       button={{
-        onClick: () =>
-          hashNavigate("/notes/create", { addNonce: true, replace: true })
+        onClick: () => useEditorStore.getState().newSession()
       }}
+      header={header}
     />
   );
 }

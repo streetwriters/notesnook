@@ -41,6 +41,7 @@ describe("Sort & filter", () => {
     await prepare();
     let webview = web(by.id(notesnook.editor.id));
     await createNote("Note 1", "Note 1");
+    await sleep(300);
     await createNote("Note 2", "Note 2");
     await sleep(300);
     await tapByText("Note 1");
@@ -104,23 +105,6 @@ describe("Sort & filter", () => {
     await sortBy("Month");
     await sleep(300);
     await visibleByText("Month");
-  });
-
-  it("Sort notes in topic", async () => {
-    await prepare();
-    await navigate("Notebooks");
-    await sleep(500);
-    await createNotebook("Notebook 1", true, true);
-    await sleep(500);
-    await device.pressBack();
-    await sleep(500);
-    await tapByText("Topic");
-    await createNote("A", "A letter");
-    await sleep(500);
-    await createNote("B", "B letter");
-    await sortBy("Abc");
-    await sleep(300);
-    await visibleByText("N");
   });
 
   it("Compact mode", async () => {

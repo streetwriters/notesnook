@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { noteTest, TEST_NOTE, notebookTest, TEST_NOTEBOOK2 } from "./utils";
+import {
+  noteTest,
+  TEST_NOTE,
+  notebookTest,
+  TEST_NOTEBOOK2,
+  databaseTest
+} from "./utils";
 import { test, expect } from "vitest";
 
 const content = {
@@ -31,7 +37,7 @@ test("search notes", () =>
     content: content
   }).then(async ({ db }) => {
     await db.notes.add(TEST_NOTE);
-    let filtered = await db.lookup.notes(db.notes.all, "note of the world");
+    let filtered = await db.lookup.notes("note of the world").ids();
     expect(filtered).toHaveLength(1);
   }));
 
@@ -42,8 +48,8 @@ test("search notes with a locked note", () =>
     const noteId = await db.notes.add(TEST_NOTE);
     await db.vault.create("password");
     await db.vault.add(noteId);
-    let filtered = await db.lookup.notes(db.notes.all, "note of the world");
-    expect(filtered).toHaveLength(1);
+    expect(await db.lookup.notes("note of the world").ids()).toHaveLength(1);
+    expect(await db.lookup.notes("format").ids()).toHaveLength(0);
   }));
 
 test("search notes with an empty note", () =>
@@ -54,20 +60,38 @@ test("search notes with an empty note", () =>
       title: "world is a heavy tune",
       content: { type: "tiptap", data: "<p><br></p>" }
     });
-    let filtered = await db.lookup.notes(db.notes.all, "heavy tune");
+    let filtered = await db.lookup.notes("heavy tune").ids();
     expect(filtered).toHaveLength(1);
   }));
 
 test("search notebooks", () =>
   notebookTest().then(async ({ db }) => {
     await db.notebooks.add(TEST_NOTEBOOK2);
-    let filtered = db.lookup.notebooks(db.notebooks.all, "Description");
+    let filtered = await db.lookup.notebooks("Description").ids();
     expect(filtered.length).toBeGreaterThan(0);
   }));
 
-test("search topics", () =>
-  notebookTest().then(async ({ db, id }) => {
-    const topics = db.notebooks.notebook(id).topics.all;
-    let filtered = db.lookup.topics(topics, "hello");
+test("search should not return trashed notes", () =>
+  databaseTest().then(async (db) => {
+    const id = await db.notes.add({
+      title: "world is a heavy tune"
+    });
+    await db.notes.moveToTrash(id);
+
+    const filtered = await db.lookup.notes("heavy tune").ids();
+
+    expect(filtered).toHaveLength(0);
+  }));
+
+test("search should return restored notes", () =>
+  databaseTest().then(async (db) => {
+    const id = await db.notes.add({
+      title: "world is a heavy tune"
+    });
+    await db.notes.moveToTrash(id);
+    await db.trash.restore(id);
+
+    const filtered = await db.lookup.notes("heavy tune").ids();
+
     expect(filtered).toHaveLength(1);
   }));

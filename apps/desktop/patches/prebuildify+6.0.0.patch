@@ -1,0 +1,60 @@
+diff --git a/node_modules/prebuildify/index.js b/node_modules/prebuildify/index.js
+index ca9829a..7729aaf 100644
+--- a/node_modules/prebuildify/index.js
++++ b/node_modules/prebuildify/index.js
+@@ -1,5 +1,4 @@
+ var proc = require('child_process')
+-var execspawn = require('execspawn')
+ var os = require('os')
+ var path = require('path')
+ var fs = require('fs')
+@@ -179,11 +178,12 @@ function copySharedLibs (builds, folder, opts, cb) {
+ function run (cmd, opts, cb) {
+   if (!cmd) return cb()
+ 
+-  var child = execspawn(cmd, {
++  var child = proc.spawn(cmd, [], {
+     cwd: opts.cwd,
+     env: opts.env,
+     stdio: 'inherit',
+-    shell: opts.shell
++    shell: opts.shell || true,
++    windowsHide: true
+   })
+ 
+   child.on('exit', function (code) {
+@@ -230,6 +230,8 @@ function build (target, runtime, opts, cb) {
+     var child = proc.spawn(opts.nodeGyp, args, {
+       cwd: opts.cwd,
+       env: opts.env,
++      shell: opts.shell,
++      windowsHide: true,
+       stdio: opts.quiet ? 'ignore' : 'inherit'
+     })
+ 
+@@ -266,7 +268,11 @@ function strip (file, opts, cb) {
+   if (!opts.strip || (platform !== 'darwin' && platform !== 'linux')) return cb()
+ 
+   var args = platform === 'darwin' ? [file, '-Sx'] : [file, '--strip-all']
+-  var child = proc.spawn(opts.stripBin, args, { stdio: 'ignore' })
++  var child = proc.spawn(opts.stripBin, args, {
++    stdio: 'ignore',
++    shell: opts.shell,
++    windowsHide: true
++  })
+ 
+   child.on('exit', function (code) {
+     if (code) return cb(spawnError(opts.stripBin, code))
+@@ -300,7 +306,11 @@ function npmbin (name) {
+ }
+ 
+ function shell () {
+-  return os.platform() === 'android' ? 'sh' : undefined
++  switch (os.platform()) {
++    case 'win32': return true
++    case 'android': return 'sh'
++    default: return undefined
++  }
+ }
+ 
+ function resolveTargets (targets, all, napi, electronCompat) {

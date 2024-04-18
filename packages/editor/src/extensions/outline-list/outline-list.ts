@@ -123,10 +123,12 @@ export const OutlineList = Node.create<OutlineListOptions>({
     ];
   },
   addNodeView() {
-    return ({ node }) => {
+    return ({ node, HTMLAttributes }) => {
       const ul = document.createElement("ul");
       ul.classList.add("outline-list");
       if (node.attrs.textDirection) ul.dir = node.attrs.textDirection;
+      for (const key in HTMLAttributes)
+        ul.setAttribute(key, HTMLAttributes[key]);
       return {
         dom: ul,
         contentDOM: ul

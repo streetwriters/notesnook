@@ -17,39 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "@notesnook/core/dist/types";
-import { groupArray } from "@notesnook/core/dist/utils/grouping";
-import create, { State } from "zustand";
 import { db } from "../common/database";
-import { TagType } from "../utils/types";
+import createDBCollectionStore from "./create-db-collection-store";
 
-export interface TagStore extends State {
-  tags: TagType[];
-  setTags: (items?: TagType[]) => void;
-  clearTags: () => void;
-}
+const { useStore: useTagStore, useCollection: useTags } =
+  createDBCollectionStore({
+    getCollection: () =>
+      db.tags.all.grouped(db.settings.getGroupOptions("tags")),
+    eagerlyFetchFirstBatch: true
+  });
 
-export const useTagStore = create<TagStore>((set, get) => ({
-  tags: [],
-  setTags: (items) => {
-    if (!items) {
-      set({
-        tags: groupArray(
-          (db?.tags?.all as TagType[]) || [],
-          db.settings?.getGroupOptions("tags")
-        )
-      });
-      return;
-    }
-    const prev = get().tags;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const index = prev.findIndex((v) => v.id === item.id);
-      if (index !== -1) {
-        prev[index] = item;
-      }
-    }
-    set({ tags: prev });
-  },
-  clearTags: () => set({ tags: [] })
-}));
+export { useTagStore, useTags };

@@ -18,53 +18,59 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ListItem from "../list-item";
-import { hashNavigate, navigate } from "../../navigation";
+import { navigate } from "../../navigation";
 import { Text } from "@theme-ui/components";
 import { store as appStore } from "../../stores/app-store";
 import { store as tagStore } from "../../stores/tag-store";
 import { store as noteStore } from "../../stores/note-store";
-import { store as editorStore } from "../../stores/editor-store";
+import { useEditorStore } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { Edit, Shortcut, DeleteForver } from "../icons";
 import { showToast } from "../../utils/toast";
 import { pluralize } from "@notesnook/common";
-import { Item } from "../list-container/types";
 import { MenuItem } from "@notesnook/ui";
+import { Tag as TagType } from "@notesnook/core";
+import { showEditTagDialog } from "../../common/dialog-controller";
+import { handleDrop } from "../../common/drop-handler";
 
-type TagProps = { item: Item };
+type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
-  const { item } = props;
-  const { id, noteIds, alias } = item;
+  const { item, totalNotes } = props;
+  const { id, title } = item;
 
   return (
     <ListItem
       item={item}
       isCompact
       title={
-        <Text as="span">
+        <Text as="span" variant="body" data-test-id={`title`}>
           <Text as="span" sx={{ color: "accent" }}>
             {"#"}
           </Text>
-          {alias}
+          {title}
         </Text>
       }
       footer={
         <Text mt={1} variant="subBody">
-          {(noteIds as string[]).length}
+          {totalNotes}
         </Text>
       }
       menuItems={menuItems}
       onClick={() => {
         navigate(`/tags/${id}`);
       }}
+      onDragEnter={(e) => {
+        e?.currentTarget.focus();
+      }}
+      onDrop={(e) => handleDrop(e.dataTransfer, item)}
     />
   );
 }
 export default Tag;
 
-const menuItems: (tag: any, items?: any[]) => MenuItem[] = (
+const menuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
   tag,
-  items = []
+  ids = []
 ) => {
   return [
     {
@@ -73,13 +79,13 @@ const menuItems: (tag: any, items?: any[]) => MenuItem[] = (
       title: "Rename tag",
       icon: Edit.path,
       onClick: () => {
-        hashNavigate(`/tags/${tag.id}/edit`);
+        showEditTagDialog(tag);
       }
     },
     {
       type: "button",
       key: "shortcut",
-      title: db.shortcuts?.exists(tag.id)
+      title: db.shortcuts.exists(tag.id)
         ? "Remove shortcut"
         : "Create shortcut",
       icon: Shortcut.path,
@@ -93,14 +99,12 @@ const menuItems: (tag: any, items?: any[]) => MenuItem[] = (
       title: "Delete",
       icon: DeleteForver.path,
       onClick: async () => {
-        for (const tag of items) {
-          if (tag.noteIds.includes(editorStore.get().session.id))
-            await editorStore.clearSession();
-          await db.tags?.remove(tag.id);
-        }
-        showToast("success", `${pluralize(items.length, "tag")} deleted`);
-        tagStore.refresh();
-        noteStore.refresh();
+        await db.tags.remove(...ids);
+        showToast("success", `${pluralize(ids.length, "tag")} deleted`);
+        await appStore.refreshNavItems();
+        await useEditorStore.getState().refreshTags();
+        await tagStore.refresh();
+        await noteStore.refresh();
       },
       multiSelect: true
     }

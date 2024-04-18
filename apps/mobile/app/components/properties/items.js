@@ -17,19 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { Dimensions, FlatList, ScrollView, View } from "react-native";
+import { Dimensions, ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useActions } from "../../hooks/use-actions";
+import { useStoredRef } from "../../hooks/use-stored-ref";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
-import { PressableButton } from "../ui/pressable";
+import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
+
 export const Items = ({ item, buttons, close }) => {
   const { colors } = useThemeColors();
+  const topBarSorting = useStoredRef("topbar-sorting-ref", {});
+
   const dimensions = useSettingStore((state) => state.dimensions);
   const actions = useActions({ item, close });
   const data = actions.filter((i) => buttons.indexOf(i.id) > -1 && !i.hidden);
@@ -44,7 +48,6 @@ export const Items = ({ item, buttons, close }) => {
 
   const _renderRowItem = ({ item }) => (
     <View
-      onPress={item.func}
       key={item.id}
       testID={"icon-" + item.id}
       style={{
@@ -53,10 +56,10 @@ export const Items = ({ item, buttons, close }) => {
         marginBottom: 10
       }}
     >
-      <PressableButton
+      <Pressable
         onPress={item.func}
-        type={item.on ? "shade" : "grayBg"}
-        customStyle={{
+        type={item.on ? "shade" : "secondary"}
+        style={{
           height: columnItemWidth - 12,
           width: columnItemWidth - 12,
           borderRadius: 10,
@@ -70,7 +73,7 @@ export const Items = ({ item, buttons, close }) => {
         <Icon
           allowFontScaling
           name={item.icon}
-          size={DDS.isTab ? SIZE.xxl : SIZE.lg}
+          size={DDS.isTab ? SIZE.xxl : shouldShrink ? SIZE.xxl : SIZE.lg}
           color={
             item.on
               ? colors.primary.accent
@@ -79,7 +82,7 @@ export const Items = ({ item, buttons, close }) => {
               : colors.secondary.icon
           }
         />
-      </PressableButton>
+      </Pressable>
 
       <Paragraph
         size={SIZE.xs}
@@ -104,7 +107,7 @@ export const Items = ({ item, buttons, close }) => {
       onPress={item.func}
       title={item.title}
       icon={item.icon}
-      type={item.on ? "shade" : "gray"}
+      type={item.on ? "shade" : "plain"}
       fontSize={SIZE.sm}
       style={{
         borderRadius: 0,
@@ -116,24 +119,30 @@ export const Items = ({ item, buttons, close }) => {
   );
 
   const renderTopBarItem = (item, index) => {
-    const isLast = index === topBarItems.length;
     return (
-      <PressableButton
-        onPress={item.func}
+      <Pressable
+        onPress={() => {
+          item.func();
+          setImmediate(() => {
+            const currentValue = topBarSorting.current[item.id] || 0;
+            topBarSorting.current = {
+              ...topBarSorting.current,
+              [item.id]: currentValue + 1
+            };
+          });
+        }}
         key={item.id}
         testID={"icon-" + item.id}
         activeOpacity={1}
-        customStyle={{
+        style={{
           alignSelf: "flex-start",
-          marginRight: isLast ? 0 : 10,
           paddingHorizontal: 0,
           width: topBarItemWidth
         }}
       >
-        <PressableButton
+        <View
           onPress={item.func}
-          type={item.on ? "shade" : "gray"}
-          customStyle={{
+          style={{
             height: topBarItemWidth,
             width: topBarItemWidth,
             justifyContent: "center",
@@ -156,7 +165,7 @@ export const Items = ({ item, buttons, close }) => {
                 : colors.secondary.icon
             }
           />
-        </PressableButton>
+        </View>
 
         <Paragraph
           textBreakStrategy="simple"
@@ -165,7 +174,7 @@ export const Items = ({ item, buttons, close }) => {
         >
           {item.title}
         </Paragraph>
-      </PressableButton>
+      </Pressable>
     );
   };
 
@@ -174,23 +183,52 @@ export const Items = ({ item, buttons, close }) => {
     "favorite",
     "copy",
     "share",
+    "lock-unlock",
+    "publish",
     "export",
-    "lock-unlock"
+    "copy-link",
+    "duplicate",
+    "local-only",
+    "read-only"
   ];
-  if (!shouldShrink) {
-    topBarItemsList.push("publish");
-  }
 
-  const topBarItems = data.filter(
-    (item) => topBarItemsList.indexOf(item.id) > -1
-  );
+  const bottomBarItemsList = [
+    "notebooks",
+    "add-reminder",
+    "pin-to-notifications",
+    "history",
+    "reminders",
+    "attachments",
+    "references",
+    "trash"
+  ];
 
-  const bottomGridItems = data.filter(
-    (item) => topBarItemsList.indexOf(item.id) === -1
-  );
+  const topBarItems = data
+    .filter((item) => topBarItemsList.indexOf(item.id) > -1)
+    .sort((a, b) =>
+      topBarItemsList.indexOf(a.id) > topBarItemsList.indexOf(b.id) ? 1 : -1
+    )
+    .sort((a, b) => {
+      return (
+        (topBarSorting.current[b.id] || 0) - (topBarSorting.current[a.id] || 0)
+      );
+    });
 
-  const topBarItemWidth =
+  const bottomGridItems = data
+    .filter((item) => bottomBarItemsList.indexOf(item.id) > -1)
+    .sort((a, b) =>
+      bottomBarItemsList.indexOf(a.id) > bottomBarItemsList.indexOf(b.id)
+        ? 1
+        : -1
+    );
+
+  let topBarItemWidth =
     (width - (topBarItems.length * 10 + 14)) / topBarItems.length;
+  topBarItemWidth;
+
+  if (topBarItemWidth < 60) {
+    topBarItemWidth = 60;
+  }
 
   return item.type === "note" ? (
     <>
@@ -198,30 +236,30 @@ export const Items = ({ item, buttons, close }) => {
         horizontal
         style={{
           paddingHorizontal: 12,
-          paddingVertical: 12
+          marginTop: 6,
+          marginBottom: 6
+        }}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingRight: 25,
+          gap: 5
         }}
       >
         {topBarItems.map(renderTopBarItem)}
       </ScrollView>
 
-      <FlatList
-        data={bottomGridItems}
-        keyExtractor={(item) => item.title}
-        key={columnItemsCount + "key"}
-        numColumns={columnItemsCount}
-        disableVirtualization={true}
+      <View
         style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          alignContent: "flex-start",
           marginTop: item.type !== "note" ? 10 : 0,
           paddingTop: 10,
           marginLeft: 6
         }}
-        contentContainerStyle={{
-          alignSelf: "center",
-          width: buttons.length < 5 ? "100%" : null,
-          paddingLeft: buttons.length < 5 ? 10 : 0
-        }}
-        renderItem={_renderRowItem}
-      />
+      >
+        {bottomGridItems.map((item) => _renderRowItem({ item }))}
+      </View>
     </>
   ) : (
     <View data={data}>{data.map(renderColumnItem)}</View>

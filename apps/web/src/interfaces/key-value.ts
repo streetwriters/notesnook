@@ -41,7 +41,7 @@ export interface IKVStore {
    *
    * @param entries Array of entries, where each entry is an array of `[key, value]`.
    */
-  setMany<T>(entries: [string, T][]): Promise<void>;
+  setMany(entries: [string, unknown][]): Promise<void>;
 
   /**
    * Get multiple values by their keys
@@ -173,17 +173,6 @@ export type UseStore = <T>(
 
 export class IndexedDBKVStore implements IKVStore {
   store: UseStore;
-
-  static async isIndexedDBSupported(): Promise<boolean> {
-    if (!("indexedDB" in window)) return false;
-    try {
-      await promisifyIDBRequest(indexedDB.open("checkIDBSupport"));
-      return true;
-    } catch {
-      console.error("IndexedDB is not supported in this browser.");
-      return false;
-    }
-  }
 
   constructor(databaseName: string, storeName: string) {
     this.store = this.createStore(databaseName, storeName);

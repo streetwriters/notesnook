@@ -449,7 +449,9 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             if (!event.clipboardData) {
               return false;
             }
-            const { isCode, language } = detectCodeBlock(event.clipboardData);
+            const { isCode, language, isBlock } = detectCodeBlock(
+              event.clipboardData
+            );
 
             const isInsideCodeBlock = this.editor.isActive(this.type.name);
             if (!isInsideCodeBlock && !isCode) {
@@ -470,6 +472,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             const { tr } = view.state;
 
             const isInlineCode =
+              !isBlock &&
               indent.code.length < 80 &&
               indent.code.split(/[\r\n]/).length === 1;
             if (isInlineCode && !isInsideCodeBlock) {
@@ -517,10 +520,19 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
   addNodeView() {
     return createNodeView(CodeblockComponent, {
-      contentDOMFactory: () => {
+      contentDOMFactory: (node) => {
+        const languageDefinition = Languages.find(
+          (l) =>
+            l.filename === node.attrs.language ||
+            l.alias?.some((a) => a === node.attrs.language)
+        );
         const content = document.createElement("pre");
         content.classList.add("node-content-wrapper");
-        content.classList.add("language-xyz");
+        content.classList.add(
+          `language-${
+            languageDefinition?.filename ?? languageDefinition?.title ?? "xyz"
+          }`.replace(/\s/, "-")
+        );
         content.style.whiteSpace = "pre";
         // caret is not visible if content element width is 0px
         content.style.minWidth = "20px";
@@ -597,10 +609,10 @@ function indentOnEnter(editor: Editor, $from: ResolvedPos, options: Indent) {
 
   return editor
     .chain()
-    .insertContent(`${newline}${indentation}`, {
+    .newlineInCode()
+    .insertContent(`${indentation}`, {
       parseOptions: { preserveWhitespace: true }
     })
-    .focus()
     .run();
 }
 
@@ -741,6 +753,7 @@ function detectCodeBlock(dataTransfer: DataTransfer) {
 
   const document = new DOMParser().parseFromString(html, "text/html");
 
+  const isBlock = !!document.querySelector(".node-content-wrapper");
   const isGitHub = !!document.querySelector(
     ".react-code-text.react-code-line-contents"
   );
@@ -756,7 +769,11 @@ function detectCodeBlock(dataTransfer: DataTransfer) {
       ? inferLanguage(document.body.firstElementChild)
       : undefined);
 
-  return { isCode: isVSCode || isGitHub || !!language, language };
+  return {
+    isCode: isVSCode || isGitHub || !!language,
+    language,
+    isBlock
+  };
 }
 
 const LANGUAGE_CLASS_REGEX = /(?:language|lang|brush)[-:](\s+\w+|\w+)/;

@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Attachment } from "@notesnook/editor";
 
+export const MAX_AUTO_SAVEABLE_WORDS = 100_000;
+
 export type NoteStatistics = {
   words: {
     total: number;
@@ -28,7 +30,7 @@ export type NoteStatistics = {
 
 export interface IEditor {
   focus: (options?: {
-    position?: "start" | "end";
+    position?: "start" | "end" | { from: number; to: number };
     scrollIntoView?: boolean;
   }) => void;
   undo: () => void;
@@ -36,4 +38,5 @@ export interface IEditor {
   updateContent: (content: string) => void;
   attachFile: (file: Attachment) => void;
   sendAttachmentProgress: (hash: string, progress: number) => void;
+  startSearch: () => void;
 }

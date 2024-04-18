@@ -25,7 +25,6 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
-import { NoteType } from "../../../utils/types";
 import { AppState, EditorState, useEditorType } from "./types";
 export const textInput = createRef<TextInput>();
 export const editorController =
@@ -60,20 +59,22 @@ export function randId(prefix: string) {
     .replace("0.", prefix || "");
 }
 
-export function makeSessionId(item?: NoteType) {
-  return item?.id ? item.id + randId("_session_") : randId("session_");
+export function makeSessionId(id?: string) {
+  return id ? id + randId("_session_") : randId("session_");
 }
 
 export async function isEditorLoaded(
   ref: RefObject<WebView>,
-  sessionId: string
+  sessionId: string,
+  tabId: number
 ) {
-  return await post(ref, sessionId, EditorEvents.status);
+  return await post(ref, sessionId, tabId, EditorEvents.status);
 }
 
 export async function post<T>(
   ref: RefObject<WebView>,
   sessionId: string,
+  tabId: number,
   type: string,
   value: T | null = null,
   waitFor = 300
@@ -85,7 +86,8 @@ export async function post<T>(
   const message = {
     type,
     value,
-    sessionId: sessionId
+    sessionId: sessionId,
+    tabId
   };
   setImmediate(() => ref.current?.postMessage(JSON.stringify(message)));
   const response = await getResponse(type, waitFor);
@@ -110,6 +112,25 @@ export const getResponse = async (
     };
     eSubscribeEvent(type, callback);
     setTimeout(() => {
+      eUnSubscribeEvent(type, callback);
+      resolve(false);
+    }, waitFor);
+  });
+};
+
+export const waitForEvent = async (
+  type: string,
+  waitFor = 300
+): Promise<any> => {
+  return new Promise((resolve) => {
+    const callback = (data: any) => {
+      eUnSubscribeEvent(type, callback);
+      resolve(data);
+    };
+    eSubscribeEvent(type, callback);
+    setTimeout(() => {
+      console.log("return..");
+      eUnSubscribeEvent(type, callback);
       resolve(false);
     }, waitFor);
   });
@@ -126,18 +147,25 @@ export function isContentInvalid(content: string | undefined) {
   );
 }
 
+const canRestoreAppState = (appState: AppState) => {
+  return (
+    appState.editing &&
+    !appState.note?.locked &&
+    appState.note?.id &&
+    Date.now() < appState.timestamp + 3600000
+  );
+};
+
+let appState: AppState | undefined;
 export function getAppState() {
+  if (appState && canRestoreAppState(appState)) return appState as AppState;
   const json = MMKV.getString("appState");
   if (json) {
-    const appState = JSON.parse(json) as AppState;
-    if (
-      appState.editing &&
-      !appState.note?.locked &&
-      appState.note?.id &&
-      Date.now() < appState.timestamp + 3600000
-    ) {
+    appState = JSON.parse(json) as AppState;
+    if (canRestoreAppState(appState)) {
       return appState;
     } else {
+      clearAppState();
       return null;
     }
   }
@@ -145,5 +173,6 @@ export function getAppState() {
 }
 
 export function clearAppState() {
+  appState = undefined;
   MMKV.removeItem("appState");
 }

@@ -115,6 +115,10 @@ export type ThemeScopes = {
    */
   base: Variants<true>;
   /**
+   * Scope for the title bar on Desktop & Web.
+   */
+  titleBar?: PartialVariants;
+  /**
    * Scope for the status bar on Desktop & mobile. On mobile, the status
    * bar can be found at the bottom of the side navigation menu which
    * includes the sync status, logged in status etc.
