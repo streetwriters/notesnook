@@ -336,10 +336,10 @@ export type SQLiteOptions = {
 };
 export async function createDatabase(name: string, options: SQLiteOptions) {
   const db = new Kysely<RawDatabaseSchema>({
-    log: (event) => {
-      if (event.queryDurationMillis > 5)
-        console.warn(event.query.sql, event.queryDurationMillis);
-    },
+    // log: (event) => {
+    //   if (event.queryDurationMillis > 5)
+    //     console.warn(event.query.sql, event.queryDurationMillis);
+    // },
     dialect: options.dialect(name, async () => {
       await db.connection().execute(async (db) => {
         await setupDatabase(db, options);

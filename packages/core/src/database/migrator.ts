@@ -99,13 +99,19 @@ class Migrator {
 
           await indexedCollection.init();
           await table.init();
+          let count = 0;
           for await (const entries of indexedCollection.iterate(100)) {
             await this.migrateToSQLite(
               db,
               table,
-              collection.name,
               entries.map((i) => i[1]),
               version
+            );
+            sendMigrationProgressEvent(
+              db.eventManager,
+              collection.name,
+              indexedCollection.indexer.indices.length,
+              (count += 100)
             );
           }
           await indexedCollection.clear();
@@ -123,7 +129,6 @@ class Migrator {
   private async migrateToSQLite(
     db: Database,
     table: SQLCollection<keyof DatabaseSchema>,
-    type: keyof Collections,
     items: (RawItem | undefined)[],
     version: number
   ) {
@@ -168,12 +173,6 @@ class Migrator {
 
     if (toAdd.length > 0) {
       await table.put(toAdd as any);
-      sendMigrationProgressEvent(
-        db.eventManager,
-        type,
-        toAdd.length,
-        toAdd.length
-      );
     }
   }
 
