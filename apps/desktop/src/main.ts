@@ -151,6 +151,15 @@ async function createWindow() {
 app.once("ready", async () => {
   console.info("App ready. Opening window.");
 
+  app.configureHostResolver({
+    secureDnsServers: [
+      "https://mozilla.cloudflare-dns.com/dns-query",
+      "https://dns.quad9.net/dns-query"
+    ],
+    enableBuiltInResolver: true,
+    secureDnsMode: "automatic"
+  });
+
   if (!isDevelopment()) registerProtocol();
   await createWindow();
   configureAutoUpdater();
