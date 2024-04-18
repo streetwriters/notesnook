@@ -46,7 +46,6 @@ import {
 import { useResolvedItem } from "@notesnook/common";
 import { Context } from "./types";
 import { AppEventManager, AppEvents } from "../../common/app-events";
-import { useSessionState } from "../../hooks/use-session-state";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
@@ -120,6 +119,7 @@ function ListContainer(props: ListContainerProps) {
     const event = AppEventManager.subscribe(
       AppEvents.revealItemInList,
       (id, focus) => {
+        if (activeItem?.id === id) return;
         activeItem = { id, focus };
         items
           .ids()
