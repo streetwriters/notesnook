@@ -49,7 +49,7 @@ export const Licenses = () => {
           alignSelf: "flex-start",
           padding: 12,
           borderBottomWidth: 1,
-          borderBottomColor: colors.secondary.background,
+          borderBottomColor: colors.primary.border,
           borderRadius: 0
         }}
         onPress={() => {

@@ -100,7 +100,7 @@ export default function DebugLogs() {
             backgroundColor: background,
             flexShrink: 1,
             borderBottomWidth: 1,
-            borderBottomColor: colors.secondary.background
+            borderBottomColor: colors.primary.border
           }}
         >
           <Paragraph

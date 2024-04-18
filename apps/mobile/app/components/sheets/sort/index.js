@@ -127,7 +127,7 @@ const Sort = ({ type, screen }) => {
           justifyContent: "flex-start",
           flexWrap: "wrap",
           borderBottomWidth: isTopicSheet ? 0 : 1,
-          borderBottomColor: colors.secondary.background,
+          borderBottomColor: colors.primary.border,
           marginBottom: 12,
           paddingHorizontal: 12,
           paddingBottom: 12,

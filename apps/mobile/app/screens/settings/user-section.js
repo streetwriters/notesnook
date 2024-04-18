@@ -121,7 +121,7 @@ const SettingsUserSection = ({ item }) => {
               paddingTop: 50,
               borderBottomWidth: 1,
               paddingBottom: 20,
-              borderColor: colors.secondary.background
+              borderColor: colors.primary.border
             }}
           >
             <View

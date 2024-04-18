@@ -313,7 +313,7 @@ const MergeConflicts = () => {
               height: height / 2 - (50 + insets.top / 2),
               backgroundColor: colors.primary.background,
               borderBottomWidth: 1,
-              borderBottomColor: colors.secondary.background
+              borderBottomColor: colors.primary.border
             }}
           >
             <ReadonlyEditor

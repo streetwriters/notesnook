@@ -141,7 +141,7 @@ Logged in: ${user ? "yes" : "no"}`,
         defaultValue={title.current}
         style={{
           borderWidth: 1,
-          borderColor: colors.secondary.background,
+          borderColor: colors.primary.border,
           borderRadius: 5,
           padding: 12,
           fontFamily: "OpenSans-Regular",
@@ -178,7 +178,7 @@ For example:
         }}
         style={{
           borderWidth: 1,
-          borderColor: colors.secondary.background,
+          borderColor: colors.primary.border,
           borderRadius: 5,
           padding: 12,
           fontFamily: "OpenSans-Regular",

@@ -221,7 +221,7 @@ const Actions = ({
       <View
         style={{
           borderBottomWidth: 1,
-          borderBottomColor: colors.secondary.background,
+          borderBottomColor: colors.primary.border,
           marginBottom: notes && notes.length > 0 ? 0 : 12
         }}
       >
@@ -295,7 +295,7 @@ const Actions = ({
         <View
           style={{
             borderBottomWidth: 1,
-            borderBottomColor: colors.secondary.background,
+            borderBottomColor: colors.primary.border,
             marginBottom: 12,
             paddingVertical: 12
           }}

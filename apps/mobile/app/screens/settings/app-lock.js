@@ -77,7 +77,7 @@ const AppLock = () => {
               alignSelf: "center",
               minHeight: 125,
               borderBottomWidth: 1,
-              borderBottomColor: colors.secondary.background
+              borderBottomColor: colors.primary.border
             }}
           >
             <Icon

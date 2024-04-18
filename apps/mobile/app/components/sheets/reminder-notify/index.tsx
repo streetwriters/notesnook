@@ -159,7 +159,7 @@ export default function ReminderNotify({
                 ? 160 * references?.placeholders?.length
                 : 500,
             borderTopWidth: 1,
-            borderTopColor: colors.secondary.background,
+            borderTopColor: colors.primary.border,
             marginTop: 5,
             paddingTop: 5
           }}

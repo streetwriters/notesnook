@@ -48,7 +48,7 @@ export const Synced = ({ item, close }) => {
         paddingTop: 10,
         marginTop: 10,
         borderTopWidth: 1,
-        borderTopColor: colors.secondary.background
+        borderTopColor: colors.primary.border
       }}
     >
       <Icon

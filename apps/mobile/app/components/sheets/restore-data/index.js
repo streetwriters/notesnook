@@ -415,7 +415,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         borderRadius: 0,
         flexDirection: "row",
         borderBottomWidth: 0.5,
-        borderBottomColor: colors.secondary.background
+        borderBottomColor: colors.primary.border
       }}
     >
       <View

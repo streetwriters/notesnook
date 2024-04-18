@@ -53,7 +53,7 @@ export const UserStatus = () => {
         alignSelf: "center",
         paddingBottom: Platform.OS === "ios" ? insets.bottom / 2 : null,
         borderTopWidth: 1,
-        borderTopColor: colors.secondary.background
+        borderTopColor: colors.primary.border
       }}
     >
       <View
