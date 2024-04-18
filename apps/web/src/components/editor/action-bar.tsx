@@ -31,6 +31,8 @@ import {
   Note,
   Pin,
   Properties,
+  Publish,
+  Published,
   Readonly,
   Search,
   TableOfContents,
@@ -65,6 +67,10 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { useWindowControls } from "../../hooks/use-window-controls";
+import { useStore as useMonographStore } from "../../stores/monograph-store";
+import { useStore as useUserStore } from "../../stores/user-store";
+import { db } from "../../common/db";
+import { showPublishView } from "../publish-view";
 
 export function EditorActionBar() {
   const editorMargins = useEditorStore((store) => store.editorMargins);
@@ -76,8 +82,25 @@ export function EditorActionBar() {
   const editor = useEditorManager((store) =>
     activeSession?.id ? store.editors[activeSession?.id]?.editor : undefined
   );
+  const isLoggedIn = useUserStore((store) => store.isLoggedIn);
+  const monographs = useMonographStore((store) => store.monographs);
+  const isNotePublished =
+    activeSession && db.monographs.isPublished(activeSession.id);
 
   const tools = [
+    {
+      title: isNotePublished ? "Published" : "Publish",
+      icon: isNotePublished ? Published : Publish,
+      hidden: !isLoggedIn,
+      enabled:
+        activeSession &&
+        (activeSession.type === "default" || activeSession.type === "readonly"),
+      onClick: () =>
+        activeSession &&
+        (activeSession.type === "default" ||
+          activeSession.type === "readonly") &&
+        showPublishView(activeSession.note, "top")
+    },
     {
       title: editorMargins ? "Disable editor margins" : "Enable editor margins",
       icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
