@@ -296,11 +296,6 @@ export const Login = ({ changeMode }) => {
                 </Paragraph>
               </TouchableOpacity>
             ) : null}
-
-            <Notice
-              type="alert"
-              text="After logging in from V3 beta, your account data will be migrated and you won't be able to use V2 clients to sync your notes."
-            />
           </View>
         </View>
       </View>
