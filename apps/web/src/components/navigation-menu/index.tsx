@@ -556,6 +556,10 @@ function ReorderableList<T extends { id: string }>(
   const [order, setOrder] = usePersistentState<string[]>(orderKey, _order());
   const orderedItems = orderItems(items, order);
 
+  useEffect(() => {
+    setOrder(_order());
+  }, [_order]);
+
   return (
     <DndContext
       sensors={sensors}
