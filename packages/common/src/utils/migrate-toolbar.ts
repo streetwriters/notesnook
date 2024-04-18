@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ToolbarConfig, ToolbarConfigPlatforms } from "@notesnook/core";
 import { database } from "../database";
 
-export const CURRENT_TOOLBAR_VERSION = 1;
+export const CURRENT_TOOLBAR_VERSION = 2;
 export async function migrateToolbar(
   platform: ToolbarConfigPlatforms,
   tools: ToolbarConfig
@@ -42,6 +42,16 @@ function runMigration(
     case 0: {
       tools.config?.push(["checkList"]);
       return runMigration(1, platform, tools);
+    }
+    case 1: {
+      const group = tools.config?.find(
+        (g) => Array.isArray(g) && g.includes("addLink")
+      );
+      if (!group) tools.config?.push(["addInternalLink"]);
+      else if (!group.includes("addInternalLink"))
+        group.push("addInternalLink");
+
+      return runMigration(2, platform, tools);
     }
     case CURRENT_TOOLBAR_VERSION:
     default:
