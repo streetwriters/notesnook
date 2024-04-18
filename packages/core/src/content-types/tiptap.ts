@@ -42,6 +42,7 @@ import {
 } from "../utils/internal-link";
 import { Element } from "domhandler";
 import { render } from "dom-serializer";
+import { logger } from "../logger";
 
 export type ResolveHashes = (
   hashes: string[]
@@ -322,7 +323,9 @@ export class Tiptap {
 
         images[image.id] = hash;
       } catch (e) {
-        console.error(e);
+        logger.error(e, "Failed to save image attachment.", {
+          filename: image.filename
+        });
         images[image.id] = false;
       }
     }

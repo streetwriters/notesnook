@@ -267,7 +267,7 @@ class Sync {
 
   async stop() {
     // refresh monographs
-    await this.db.monographs.refresh().catch(console.error);
+    await this.db.monographs.refresh().catch(this.logger.error);
     // update trash cache
     await this.db.trash.buildCache();
 
@@ -412,7 +412,7 @@ class Sync {
           await promiseTimeout(30000, this.connection.start());
         }
       } catch (e) {
-        console.error(e);
+        this.logger.error(e, "Could not connect to the Sync server.");
         if (e instanceof Error) {
           this.logger.warn(e.message);
           throw new Error(

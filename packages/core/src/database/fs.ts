@@ -25,6 +25,7 @@ import {
 } from "../interfaces";
 import { DataFormat, SerializedKey } from "@notesnook/crypto/dist/src/types";
 import { EV, EVENTS } from "../common";
+import { logger } from "../logger";
 
 export type FileStorageAccessor = () => FileStorage;
 export type DownloadableFile = {
@@ -121,7 +122,7 @@ export class FileStorage {
 
       let error = null;
       const result = await execute().catch((e) => {
-        console.error("Failed to upload attachment:", e);
+        logger.error(e, "failed to upload attachment", { hash: filename });
         error = e;
         return false;
       });

@@ -23,6 +23,7 @@ import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
 import { isCipher } from "../database/crypto";
 import { NoteContent } from "../collections/session-content";
 import { Note } from "../types";
+import { logger } from "../logger";
 
 export const VAULT_ERRORS = {
   noVault: "ERR_NO_VAULT",
@@ -119,7 +120,7 @@ export default class Vault {
             `${Date.now()}`
           );
         } catch (e) {
-          console.error(e);
+          logger.error(e, `Could not decrypt content of note ${noteId}`);
           throw new Error(
             `Could not decrypt content of note ${noteId}. Error: ${
               (e as Error).message

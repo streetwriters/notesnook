@@ -30,6 +30,7 @@ import Database from "../api";
 import { FilteredSelector, SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
 import { sql } from "kysely";
+import { logger } from "../logger";
 
 export class Attachments implements ICollection {
   name = "attachments";
@@ -108,7 +109,7 @@ export class Attachments implements ICollection {
       }
     >
   ) {
-    if (!item) return console.error("attachment cannot be undefined");
+    if (!item) throw new Error("attachment cannot be undefined");
     if (!item.hash) throw new Error("Please provide attachment hash.");
 
     const oldAttachment = await this.attachment(item.hash);
@@ -148,11 +149,11 @@ export class Attachments implements ICollection {
       !chunkSize ||
       !key
     ) {
-      console.error(
+      logger.error(
+        {},
         "Attachment is invalid because all properties are required:",
-        attachment
+        { attachment }
       );
-      // throw new Error("Could not add attachment: all properties are required.");
       return;
     }
 

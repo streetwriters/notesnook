@@ -180,7 +180,7 @@ async function handleResponse(response: Response) {
         );
     }
   } catch (e) {
-    logger.error(e as Error, "Error while sending request:", {
+    logger.error(e, "Error while sending request:", {
       url: response.url
     });
     throw e;

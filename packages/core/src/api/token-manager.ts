@@ -154,7 +154,7 @@ async function getSafeToken<T>(action: () => Promise<T>, errorMessage: string) {
   try {
     return await action();
   } catch (e) {
-    console.error(errorMessage, e);
+    logger.error(e, errorMessage);
     if (
       e instanceof Error &&
       (e.message === "invalid_grant" || e.message === "invalid_client")

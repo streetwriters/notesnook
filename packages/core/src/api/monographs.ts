@@ -23,6 +23,7 @@ import Database from ".";
 import { Note, isDeleted } from "../types";
 import { Cipher } from "@notesnook/crypto";
 import { isFalse } from "../database";
+import { logger } from "../logger";
 
 type BaseMonograph = {
   id: string;
@@ -61,7 +62,7 @@ export class Monographs {
       await this.db.kv().write("monographs", monographs);
       if (monographs) this.monographs = monographs;
     } catch (e) {
-      console.error(e);
+      logger.error(e, "Error while refreshing monographs.");
     }
   }
 

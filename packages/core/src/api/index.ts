@@ -311,7 +311,7 @@ class Database {
 
     // we must not wait on network requests that's why
     // no await
-    this.monographs.refresh().catch(console.error);
+    this.monographs.refresh().catch(logger.error);
   }
 
   disconnectSSE() {

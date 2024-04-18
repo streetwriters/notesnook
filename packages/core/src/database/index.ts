@@ -60,6 +60,7 @@ import {
 } from "../types";
 import { NNMigrationProvider } from "./migrations";
 import { createTriggers } from "./triggers";
+import { logger } from "../logger";
 
 // type FilteredKeys<T, U> = {
 //   [P in keyof T]: T[P] extends U ? P : never;
@@ -300,21 +301,22 @@ export async function initializeDatabase(db: Kysely<RawDatabaseSchema>) {
     });
     const { error, results } = await migrator.migrateToLatest();
 
-    results?.forEach((it) => {
-      if (it.status === "Error")
-        console.error(`failed to execute migration "${it.migrationName}"`);
-    });
+    if (error)
+      throw error instanceof Error ? error : new Error(JSON.stringify(error));
 
-    if (error) {
-      console.error("failed to run `migrateToLatest`");
-      console.error(error);
-    }
+    const errors = results?.filter((it) => it.status === "Error") || [];
+    if (errors.length > 0)
+      throw new Error(
+        `failed to execute migrations: ${errors
+          .map((e) => e.migrationName)
+          .join(", ")}`
+      );
 
     await createTriggers(db);
 
     return db;
   } catch (e) {
-    console.error(e);
+    logger.error(e, "Failed to initialized database.");
     await db.destroy();
     throw e;
   }
@@ -334,6 +336,10 @@ export type SQLiteOptions = {
 };
 export async function createDatabase(name: string, options: SQLiteOptions) {
   const db = new Kysely<RawDatabaseSchema>({
+    log: (event) => {
+      if (event.queryDurationMillis > 5)
+        console.warn(event.query.sql, event.queryDurationMillis);
+    },
     dialect: options.dialect(name, async () => {
       await db.connection().execute(async (db) => {
         await setupDatabase(db, options);

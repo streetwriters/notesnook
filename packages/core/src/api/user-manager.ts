@@ -25,6 +25,7 @@ import { EV, EVENTS } from "../common";
 import { HealthCheck } from "./healthcheck";
 import Database from ".";
 import { SerializedKey } from "@notesnook/crypto";
+import { logger } from "../logger";
 
 const ENDPOINTS = {
   signup: "/users",
@@ -241,7 +242,7 @@ class UserManager {
       await this.db.syncer.devices.unregister();
       if (revoke) await this.tokenManager.revokeToken();
     } catch (e) {
-      console.error(e);
+      logger.error(e, "Error logging out user.", { revoke, reason });
     } finally {
       await this.db.reset();
       EV.publish(EVENTS.userLoggedOut, reason);
@@ -319,7 +320,7 @@ class UserManager {
         return await this.getUser();
       }
     } catch (e) {
-      console.error("Error fetching user", e);
+      logger.error(e, "Error fetching user");
       return await this.getUser();
     }
   }
@@ -400,10 +401,10 @@ class UserManager {
       if (!plainData) return;
       return JSON.parse(plainData);
     } catch (e) {
-      console.error(e);
+      logger.error(e, "Could not get attachments encryption key.");
       if (e instanceof Error)
         throw new Error(
-          `Could not get attachments encryption key. Please make sure you have Internet access. Error: ${e.message}`
+          `Could not get attachments encryption key. Error: ${e.message}`
         );
     }
   }

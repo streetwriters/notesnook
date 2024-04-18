@@ -35,6 +35,7 @@ import { migrateItem } from "../migrations";
 import { DatabaseCollection } from "./index.js";
 import { DefaultColors } from "../collections/colors.js";
 import { toChunks } from "../utils/array.js";
+import { logger } from "../logger.js";
 
 type BackupDataItem = MaybeDeletedItem<Item> | string[];
 type BackupPlatform = "web" | "mobile" | "node";
@@ -340,7 +341,11 @@ export default class Backup {
     };
   }
 
-  async import(backup: LegacyBackupFile | BackupFile, password?: string, encryptionKey?: string) {
+  async import(
+    backup: LegacyBackupFile | BackupFile,
+    password?: string,
+    encryptionKey?: string
+  ) {
     if (!this.validate(backup)) throw new Error("Invalid backup.");
 
     backup = this.migrateBackup(backup);
@@ -364,7 +369,7 @@ export default class Backup {
       try {
         decryptedData = await this.db.storage().decrypt(key, backup.data);
       } catch (e) {
-        console.error(e);
+        logger.error(e, "Failed to import backup");
         if (e instanceof Error) {
           if (
             e.message.includes("ciphertext cannot be decrypted") ||
