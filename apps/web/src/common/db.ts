@@ -76,7 +76,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     eventsource: EventSource,
     fs: FileStorage,
     compressor: new Compressor(),
-    batchSize: 500
+    batchSize: 100
   });
 
   // if (IS_TESTING) {
