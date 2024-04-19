@@ -117,14 +117,21 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
       }
       currentItemId.current = resolvedItem.item.id;
       setItem(resolvedItem.item);
+    }
+
+    if (resolvedItem?.group) {
       setGroupHeader(resolvedItem.group);
+    } else {
+      setGroupHeader(undefined);
     }
   }, []);
 
   if (previousIndex.current !== index) {
     previousIndex.current = index;
     const resolvedItem = items?.cacheItem(index);
-    refreshItem(resolvedItem);
+    if (resolvedItem) {
+      refreshItem(resolvedItem);
+    }
   }
 
   useEffect(() => {
@@ -132,12 +139,15 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
       try {
         clearTimeout(refreshTimeout.current);
         const idx = index;
-        refreshTimeout.current = setTimeout(async () => {
-          if (idx !== previousIndex.current) return;
-          const resolvedItem = await items?.item(idx, resolveItems);
-          if (idx !== previousIndex.current) return;
-          refreshItem(resolvedItem);
-        }, 100);
+        refreshTimeout.current = setTimeout(
+          async () => {
+            if (idx !== previousIndex.current) return;
+            const resolvedItem = await items?.item(idx, resolveItems);
+            if (idx !== previousIndex.current) return;
+            refreshItem(resolvedItem);
+          },
+          items?.cacheItem(index) ? 100 : 0
+        );
       } catch (e) {
         console.log("Error", e);
       }
