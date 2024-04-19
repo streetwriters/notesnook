@@ -36,6 +36,7 @@ import DialogButtons from "./dialog-buttons";
 import DialogHeader from "./dialog-header";
 import { useCallback } from "react";
 import { Button } from "../ui/button";
+import { getContainerBorder } from "../../utils/colors";
 
 export const Dialog = ({ context = "global" }) => {
   const { colors } = useThemeColors();
@@ -121,7 +122,8 @@ export const Dialog = ({ context = "global" }) => {
     maxHeight: 450,
     borderRadius: 5,
     backgroundColor: colors.primary.background,
-    paddingTop: 12
+    paddingTop: 12,
+    ...getContainerBorder(colors.primary.border, 0.5)
   };
 
   return visible ? (

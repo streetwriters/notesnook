@@ -45,8 +45,8 @@ const DialogButtons = ({
         {
           backgroundColor: colors.secondary.background,
           height: 60,
-          borderBottomRightRadius: 10,
-          borderBottomLeftRadius: 10,
+          borderBottomRightRadius: 5,
+          borderBottomLeftRadius: 5,
           paddingHorizontal: 12,
           borderTopWidth: 0.7,
           borderTopColor: getColorLinearShade(

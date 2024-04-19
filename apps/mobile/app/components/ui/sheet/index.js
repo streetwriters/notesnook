@@ -28,6 +28,7 @@ import { Toast } from "../../toast";
 import { useAppState } from "../../../hooks/use-app-state";
 import SettingsService from "../../../services/settings";
 import { useUserStore } from "../../../stores/use-user-store";
+import { getContainerBorder } from "../../../utils/colors";
 
 /**
  *
@@ -73,9 +74,17 @@ const SheetWrapper = ({
       borderTopLeftRadius: 15,
       alignSelf: "center",
       borderBottomRightRadius: 0,
-      borderBottomLeftRadius: 0
+      borderBottomLeftRadius: 0,
+      ...getContainerBorder(colors.primary.border, 0.5),
+      borderBottomWidth: 0
     };
-  }, [colors.primary.background, largeTablet, smallTablet, width]);
+  }, [
+    colors.primary.background,
+    colors.primary.border,
+    largeTablet,
+    smallTablet,
+    width
+  ]);
 
   const _onOpen = () => {
     if (lockEvents.current) return;
