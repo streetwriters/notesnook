@@ -48,6 +48,7 @@ import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import ReminderItem from "../list-items/reminder";
 import TagItem from "../list-items/tag";
+import { useIsCompactModeEnabled } from "../../hooks/use-is-compact-mode-enabled";
 
 type ListItemWrapperProps<TItem = Item> = {
   group?: GroupingKey;
@@ -75,6 +76,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
   const refreshTimeout = useRef<NodeJS.Timeout>();
   const currentItemId = useRef<string>();
   const locked = useRef(false);
+  const compactMode = useIsCompactModeEnabled(props.dataType as ItemType);
 
   const refreshItem = useCallback((resolvedItem: any) => {
     if (!resolvedItem || !resolvedItem.data) {
@@ -131,6 +133,9 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
     const resolvedItem = items?.cacheItem(index);
     if (resolvedItem) {
       refreshItem(resolvedItem);
+    } else {
+      setItem(undefined);
+      setGroupHeader(undefined);
     }
   }
 
@@ -158,7 +163,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
     return (
       <View
         style={{
-          height: 120,
+          height: compactMode ? 50 : 120,
           width: "100%"
         }}
       />
