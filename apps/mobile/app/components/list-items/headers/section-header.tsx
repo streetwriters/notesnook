@@ -99,7 +99,6 @@ export const SectionHeader = React.memo<
             color={color || colors.primary.accent}
             size={SIZE.sm}
             style={{
-              minWidth: 60,
               alignSelf: "center",
               textAlignVertical: "center"
             }}
