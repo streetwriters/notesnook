@@ -65,7 +65,6 @@ export const Reminders = ({
             route: route.name
           });
         }}
-        isBeta
         id={route.name}
         onPressDefaultRightButton={() => {
           ReminderSheet.present();

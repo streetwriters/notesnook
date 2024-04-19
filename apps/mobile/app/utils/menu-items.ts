@@ -47,8 +47,7 @@ export const MenuItemsList = [
     id: "reminders",
     name: "Reminders",
     icon: "bell",
-    close: true,
-    isBeta: true
+    close: true
   },
   {
     id: "monographs",
