@@ -25,6 +25,7 @@ type Batch<T> = {
   groups?: Map<number, { index: number; hidden?: boolean; group: GroupHeader }>;
   data?: unknown[];
 };
+const CACHE_SIZE = 2;
 export class VirtualizedGrouping<T> {
   private cache: Map<number, Batch<T>> = new Map();
   private pending: Map<number, Promise<Batch<T>>> = new Map();
@@ -110,34 +111,37 @@ export class VirtualizedGrouping<T> {
     operate?: BatchOperator<T>
   ): Promise<Batch<T>> {
     const [lastBatchIndex, lastBatch] = lastInMap(this.cache) || [];
+
+    const direction =
+      lastBatchIndex !== undefined && lastBatchIndex < batchIndex
+        ? "down"
+        : "up";
+
     const start = batchIndex * this.batchSize;
     const end = start + this.batchSize;
 
     const { ids, items } = await this.fetchItems(start, end);
     const groups = this.groupItems?.(items);
 
-    if (
-      lastBatch &&
-      lastBatch.groups &&
-      lastBatch.groups.size > 0 &&
-      groups &&
-      groups.size > 0 &&
-      lastBatchIndex !== undefined
-    ) {
-      const [, firstGroup] = firstInMap(groups);
-      // if user is moving downwards, we hide the first group from the
-      // current batch, otherwise we hide the last group from the previous
-      // batch.
-      const group =
-        lastBatchIndex < batchIndex
-          ? firstGroup
-          : lastInMap(lastBatch.groups)[1];
+    if (direction === "down") {
+      const [, firstGroup] = groups ? firstInMap(groups) : [];
+      const group = lastBatch?.groups
+        ? lastInMap(lastBatch.groups)[1]
+        : undefined;
 
-      // if the last group of the previous batch has the same title as the
-      // first group of the current batch, we hide the current group otherwise
-      // we will be seeing 2 group headers with the same title.
-      if (group && firstGroup && group.group.title === firstGroup.group.title) {
-        group.hidden = true;
+      if (group && firstGroup && group.group.title === firstGroup.group.title)
+        firstGroup.hidden = true;
+    } else {
+      const prevGroups =
+        this.groupItems && start > 0
+          ? this.groupItems((await this.fetchItems(start - 1, start)).items)
+          : undefined;
+
+      if (prevGroups && groups) {
+        const [, prevGroup] = lastInMap(prevGroups);
+        const [, group] = firstInMap(groups);
+        if (group && prevGroup?.group.title === group?.group.title)
+          group.hidden = true;
       }
     }
 
@@ -161,10 +165,10 @@ export class VirtualizedGrouping<T> {
   }
 
   private clear() {
-    if (this.cache.size <= 2) return;
+    if (this.cache.size <= CACHE_SIZE) return;
     for (const [key] of this.cache) {
       this.cache.delete(key);
-      if (this.cache.size === 2) break;
+      if (this.cache.size === CACHE_SIZE) break;
     }
   }
 }
