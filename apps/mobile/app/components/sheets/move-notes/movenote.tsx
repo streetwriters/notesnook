@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { VirtualizedGrouping } from "@notesnook/core";
 import { Note, Notebook } from "@notesnook/core/dist/types";
 import { useThemeColors } from "@notesnook/theme";
-import React, { RefObject, useEffect, useState } from "react";
-import { View } from "react-native";
+import React, { RefObject, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, TextInput, View } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import { db } from "../../../common/database";
@@ -35,6 +35,7 @@ import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
+import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
@@ -50,39 +51,60 @@ export const MoveNotes = ({
 }) => {
   const { colors } = useThemeColors();
   const currentNotebook = notebook;
+  const inputRef = useRef<TextInput>(null);
+  const [loading, setLoading] = useState(false);
   const selectionCount = useItemSelectionStore(
     (state) =>
       Object.keys(state.selection).filter(
         (k) =>
-          state.initialState?.[k] !== "selected" &&
-          state.selection[k] !== "deselected"
+          state.selection?.[k] === "selected" ||
+          state.selection[k] === "deselected"
       )?.length > 0
   );
 
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
 
+  const loadNotes = React.useCallback(
+    async (query?: string) => {
+      setLoading(true);
+      const notes = query
+        ? db.lookup.notes(query).sorted()
+        : db.notes?.all.sorted(db.settings.getGroupOptions("notes") as any);
+
+      notes
+        .then(async (notes) => {
+          await notes.item(0);
+          setNotes(notes);
+          setLoading(false);
+        })
+        .catch(() => {
+          setLoading(false);
+        });
+
+      db.relations
+        .from(currentNotebook, "note")
+        .get()
+        .then((existingNotes) => {
+          const selection: { [name: string]: any } = {};
+          existingNotes.forEach((rel) => {
+            selection[rel.toId] = "selected";
+          });
+          useItemSelectionStore.setState({
+            selection: selection,
+            initialState: selection
+          });
+        });
+    },
+    [currentNotebook]
+  );
+
   useEffect(() => {
-    db.notes?.all.sorted(db.settings.getGroupOptions("notes")).then((notes) => {
-      setNotes(notes);
-    });
-    db.relations
-      .from(currentNotebook, "note")
-      .get()
-      .then((existingNotes) => {
-        const selection: { [name: string]: any } = {};
-        existingNotes.forEach((rel) => {
-          selection[rel.toId] = "selected";
-        });
-        useItemSelectionStore.setState({
-          selection: selection,
-          initialState: selection
-        });
-      });
+    loadNotes();
 
     return () => {
       useItemSelectionStore.getState().reset();
     };
-  }, [currentNotebook]);
+  }, [currentNotebook, loadNotes]);
 
   const renderItem = React.useCallback(
     ({ index }: { item: boolean; index: number }) => {
@@ -96,9 +118,7 @@ export const MoveNotes = ({
       style={{
         paddingHorizontal: 12,
         maxHeight: "100%",
-        height: notes?.placeholders.length
-          ? 50 * (notes?.placeholders.length + 2)
-          : 300
+        height: "100%"
       }}
     >
       <Dialog context="local" />
@@ -109,6 +129,22 @@ export const MoveNotes = ({
       />
       <Seperator />
 
+      <Input
+        button={{
+          icon: "magnify",
+          color: colors.primary.accent,
+          size: SIZE.lg,
+          onPress: () => {}
+        }}
+        testID="search-input"
+        fwdRef={inputRef}
+        autoCapitalize="none"
+        onChangeText={(v) => {
+          loadNotes(v && v.trim() === "" ? undefined : v.trim());
+        }}
+        placeholder="Search a note"
+      />
+
       <FlashList
         ListEmptyComponent={
           <View
@@ -118,13 +154,17 @@ export const MoveNotes = ({
               alignItems: "center"
             }}
           >
-            <Paragraph color={colors.secondary.paragraph}>
-              No notes to show
-            </Paragraph>
+            {loading ? (
+              <ActivityIndicator size="large" color={colors.primary.accent} />
+            ) : (
+              <Paragraph color={colors.secondary.paragraph}>
+                No notes to show
+              </Paragraph>
+            )}
           </View>
         }
         estimatedItemSize={50}
-        data={notes?.placeholders}
+        data={loading ? [] : notes?.placeholders}
         renderItem={renderItem}
       />
 
@@ -135,6 +175,12 @@ export const MoveNotes = ({
               currentNotebook.id,
               ...useItemSelectionStore.getState().getSelectedItemIds()
             );
+
+            await db.notes?.removeFromNotebook(
+              currentNotebook.id,
+              ...useItemSelectionStore.getState().getDeselectedItemIds()
+            );
+
             updateNotebook(currentNotebook.id);
             Navigation.queueRoutesForUpdate();
             fwdRef?.current?.hide();
@@ -161,11 +207,12 @@ const SelectableNoteItem = React.memo(
     const selected = useItemSelectionStore((state) =>
       item?.id ? state.selection[item.id] === "selected" : false
     );
+
     const exists = useItemSelectionStore((state) =>
       item?.id ? state.initialState[item.id] === "selected" : false
     );
 
-    return exists ? null : (
+    return (
       <Pressable
         testID="listitem.select"
         onPress={() => {
@@ -205,8 +252,14 @@ const SelectableNoteItem = React.memo(
                   ? "check-circle-outline"
                   : "checkbox-blank-circle-outline"
               }
-              type="selected"
-              color={selected ? colors.selected.icon : colors.primary.icon}
+              type="plain"
+              color={
+                selected
+                  ? colors.selected.icon
+                  : exists && !selected
+                  ? colors.static.red
+                  : colors.primary.icon
+              }
             />
 
             <View

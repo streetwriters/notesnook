@@ -32,6 +32,7 @@ export interface SelectionStore extends State {
   reset: () => void;
   enabled?: boolean;
   getSelectedItemIds: () => string[];
+  getDeselectedItemIds: () => string[];
 }
 
 export function createItemSelectionStore(
@@ -84,6 +85,16 @@ export function createItemSelectionStore(
         }
       }
       return selected;
+    },
+    getDeselectedItemIds: () => {
+      const deselected: string[] = [];
+      if (!get().selection) return deselected;
+      for (const item in get().selection) {
+        if (get().selection[item] === "deselected") {
+          deselected.push(item);
+        }
+      }
+      return deselected;
     }
   }));
 }
