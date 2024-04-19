@@ -22,7 +22,11 @@ import Database from "../api";
 import { deleteItems, toChunks } from "../utils/array";
 import { GroupOptions, TrashItem } from "../types";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
-import { getSortSelectors, groupArray } from "../utils/grouping";
+import {
+  createKeySelector,
+  getSortSelectors,
+  groupArray
+} from "../utils/grouping";
 import { sql } from "kysely";
 import { MAX_SQL_PARAMETERS } from "../database/sql-collection";
 
@@ -282,11 +286,13 @@ export default class Trash {
           items
         };
       },
-      (items) => groupArray(items, options),
+      (items) => groupArray(items, createKeySelector(options)),
       async () => {
         const items = await this.all();
         items.sort(selector);
-        return Array.from(groupArray(items, options).values());
+        return Array.from(
+          groupArray(items, createKeySelector(options)).values()
+        );
       }
     );
   }

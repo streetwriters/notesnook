@@ -123,6 +123,9 @@ export class VirtualizedGrouping<T> {
     const { ids, items } = await this.fetchItems(start, end);
     const groups = this.groupItems?.(items);
 
+    if (items.length > this.batchSize)
+      throw new Error("Got more items than the batch size.");
+
     if (direction === "down") {
       const [, firstGroup] = groups ? firstInMap(groups) : [];
       const group = lastBatch?.groups

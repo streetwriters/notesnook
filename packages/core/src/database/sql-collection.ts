@@ -47,7 +47,7 @@ import {
   sql
 } from "kysely";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
-import { groupArray } from "../utils/grouping";
+import { createKeySelector, groupArray } from "../utils/grouping";
 import { toChunks } from "../utils/array";
 import { Sanitizer } from "./sanitizer";
 import {
@@ -450,7 +450,7 @@ export class FilteredSelector<T extends Item> {
           items
         };
       },
-      (items) => groupArray(items as any, options),
+      (items) => groupArray(items as any, createKeySelector(options)),
       () => this.groups(options)
     );
   }
@@ -486,7 +486,7 @@ export class FilteredSelector<T extends Item> {
           .select(fields)
           .$call(this.buildSortExpression(options, true))
           .execute(),
-        options
+        createKeySelector(options)
       ).values()
     );
   }

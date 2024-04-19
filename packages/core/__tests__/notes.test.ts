@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import dayjs from "dayjs";
 import Database from "../src/api";
-import { groupArray } from "../src/utils/grouping";
+import { createKeySelector, groupArray } from "../src/utils/grouping";
 import {
   databaseTest,
   noteTest,
@@ -346,11 +346,14 @@ test("grouping items where item.title is empty or undefined shouldn't throw", ()
   expect(
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    groupArray([{ title: "" }], {
-      groupBy: "abc",
-      sortBy: "title",
-      sortDirection: "asc"
-    })
+    groupArray(
+      [{ title: "" }],
+      createKeySelector({
+        groupBy: "abc",
+        sortBy: "title",
+        sortDirection: "asc"
+      })
+    )
   ).toBeTruthy();
 });
 

@@ -17,110 +17,108 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, vi } from "vitest";
+import { test } from "vitest";
 import { VirtualizedGrouping } from "../virtualized-grouping";
+import { groupArray } from "../grouping";
 
-function item<T>(value: T) {
-  return { item: value };
+function generateItems(length: number, groupSize: number) {
+  const items: { group: string; id: string }[] = [];
+  const ids: string[] = [];
+  const divider = length / groupSize;
+  for (let i = 0; i < length; ++i) {
+    items.push({ group: `${i % divider}`, id: `${i}` });
+    ids.push(`${i}`);
+  }
+  items.sort((a, b) => a.group.localeCompare(b.group));
+  return { items, ids };
 }
-function createMock() {
-  return vi.fn(async (ids: string[]) =>
-    Object.fromEntries(ids.map((id) => [id, id]))
+
+function createVirtualizedGrouping(
+  length: number,
+  groupSize: number,
+  batchSize: number
+) {
+  const { ids, items } = generateItems(length, groupSize);
+  return new VirtualizedGrouping<{ group: string; id: string }>(
+    items.length,
+    batchSize,
+    () => Promise.resolve(ids),
+    async (start, end) => ({
+      ids: ids.slice(start, end),
+      items: items.slice(start, end)
+    }),
+    (items) => groupArray(items, (item) => item.group)
   );
 }
-test.todo("renable virtualized grouping tests");
-// test("fetch items in batch if not found in cache", async (t) => {
-//   const mocked = createMock();
-//   const grouping = new VirtualizedGrouping<string>(
-//     ["1", "2", "3", "4", "5", "6", "7"],
-//     3,
-//     mocked
-//   );
-//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-//   t.expect(mocked).toHaveBeenCalledOnce();
-// });
 
-// test("do not fetch items in batch if found in cache", async (t) => {
-//   const mocked = createMock();
-//   const grouping = new VirtualizedGrouping<string>(
-//     ["1", "2", "3", "4", "5", "6", "7"],
-//     3,
-//     mocked
-//   );
-//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-//   t.expect(mocked).toHaveBeenCalledOnce();
-// });
+test("load first batch with a single group", async (t) => {
+  const grouping = createVirtualizedGrouping(100, 10, 10);
 
-// test("clear old cached batches", async (t) => {
-//   const mocked = createMock();
-//   const grouping = new VirtualizedGrouping<string>(
-//     ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-//     3,
-//     mocked
-//   );
-//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
-//   t.expect(await grouping.item("4")).toStrictEqual(item("4"));
-//   t.expect(mocked).toHaveBeenLastCalledWith(["4", "5", "6"]);
-//   t.expect(await grouping.item("7")).toStrictEqual(item("7"));
-//   t.expect(mocked).toHaveBeenLastCalledWith(["7", "8", "9"]);
-//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
-// });
+  t.expect((await grouping.item(0)).group?.title).toBe("0");
+  for (let i = 1; i < 10; ++i)
+    t.expect(grouping.cacheItem(i)?.group?.title).toBeUndefined();
+});
 
-// test("clear old cached batches (random access)", async (t) => {
-//   const mocked = createMock();
-//   const grouping = new VirtualizedGrouping<string>(
-//     ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-//     3,
-//     mocked
-//   );
-//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
+test("load first batch with a multiple groups", async (t) => {
+  const grouping = createVirtualizedGrouping(100, 2, 10);
 
-//   t.expect(await grouping.item("7")).toStrictEqual(item("7"));
-//   t.expect(mocked).toHaveBeenLastCalledWith(["7", "8", "9"]);
+  t.expect((await grouping.item(0)).group?.title).toBe(`0`);
+  t.expect(grouping.cacheItem(2)?.group?.title).toBe(`1`);
+  t.expect(grouping.cacheItem(4)?.group?.title).toBe(`10`);
+  t.expect(grouping.cacheItem(6)?.group?.title).toBe(`11`);
+  t.expect(grouping.cacheItem(8)?.group?.title).toBe(`12`);
+});
 
-//   t.expect(await grouping.item("11")).toStrictEqual(item("11"));
-//   t.expect(mocked).toHaveBeenLastCalledWith(["10", "11", "12"]);
+test("load last batch with a single group", async (t) => {
+  const grouping = createVirtualizedGrouping(100, 10, 10);
 
-//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
+  t.expect((await grouping.item(90)).group?.title).toBe("9");
+  for (let i = 91; i < 100; ++i)
+    t.expect(grouping.cacheItem(i)?.group?.title).toBeUndefined();
+});
 
-//   t.expect(await grouping.item("7")).toStrictEqual(item("7"));
-//   t.expect(mocked).toHaveBeenLastCalledWith(["7", "8", "9"]);
-// });
+test("load last batch with a multiple groups", async (t) => {
+  const grouping = createVirtualizedGrouping(100, 2, 10);
 
-// test("reloading ids should clear all cached batches", async (t) => {
-//   const mocked = createMock();
-//   const grouping = new VirtualizedGrouping<string>(
-//     ["1", "3", "4", "5", "7", "6", "50"],
-//     3,
-//     mocked
-//   );
+  t.expect((await grouping.item(90)).group?.title).toBe(`5`);
+  t.expect(grouping.cacheItem(92)?.group?.title).toBe(`6`);
+  t.expect(grouping.cacheItem(94)?.group?.title).toBe(`7`);
+  t.expect(grouping.cacheItem(96)?.group?.title).toBe(`8`);
+  t.expect(grouping.cacheItem(98)?.group?.title).toBe(`9`);
+});
 
-//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "3", "4"]);
+test("group spanning multiple batches (down)", async (t) => {
+  const grouping = createVirtualizedGrouping(140, 14, 10);
 
-//   grouping.refresh([
-//     "1",
-//     "2",
-//     "3",
-//     "4",
-//     "5",
-//     "6",
-//     "7",
-//     "8",
-//     "9",
-//     "10",
-//     "11",
-//     "12"
-//   ]);
+  t.expect((await grouping.item(0)).group?.title).toBe(`0`);
+  t.expect((await grouping.item(12)).group).toBeUndefined();
+  t.expect((await grouping.item(14)).group?.title).toBe("1");
+  t.expect((await grouping.item(24)).group).toBeUndefined();
+  t.expect((await grouping.item(28)).group?.title).toBe("2");
+});
 
-//   t.expect(await grouping.item("1")).toStrictEqual(item("1"));
-//   t.expect(mocked).toHaveBeenLastCalledWith(["1", "2", "3"]);
-// });
+test("single group in all batches", async (t) => {
+  const grouping = createVirtualizedGrouping(100, 100, 10);
+
+  t.expect((await grouping.item(0)).group?.title).toBe(`0`);
+  for (let i = 1; i < 100; ++i) {
+    t.expect((await grouping.item(i)).group).toBeUndefined();
+  }
+});
+
+test("group at start of each batch", async (t) => {
+  const grouping = createVirtualizedGrouping(100, 10, 10);
+
+  for (let i = 0; i < 100; i += 10) {
+    t.expect((await grouping.item(i)).group?.title).toBe(`${i / 10}`);
+  }
+});
+
+test("group spanning multiple batches (up)", async (t) => {
+  const grouping = createVirtualizedGrouping(140, 28, 10);
+
+  t.expect((await grouping.item(130)).group).toBeUndefined();
+  t.expect((await grouping.item(120)).group).toBeUndefined();
+  t.expect((await grouping.item(140 - 28)).group).toBeDefined();
+  t.expect((await grouping.item(110)).group).toBeUndefined();
+});

@@ -30,7 +30,7 @@ type PartialGroupableItem = {
   dateEdited?: number | null;
   dateCreated?: number | null;
 };
-type EvaluateKeyFunction<T> = (item: T) => string;
+export type GroupKeySelectorFunction<T> = (item: T) => string;
 
 export const getSortValue = (
   options: GroupOptions | undefined,
@@ -72,9 +72,13 @@ export function getSortSelectors<T extends PartialGroupableItem>(
 const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
 const MILLISECONDS_IN_WEEK = MILLISECONDS_IN_DAY * 7;
 
-function getKeySelector(
-  options: GroupOptions
-): EvaluateKeyFunction<PartialGroupableItem> {
+export function createKeySelector(
+  options: GroupOptions = {
+    groupBy: "default",
+    sortBy: "dateEdited",
+    sortDirection: "desc"
+  }
+): GroupKeySelectorFunction<PartialGroupableItem> {
   return (item) => {
     if ("pinned" in item && item.pinned) return "Pinned";
     else if ("conflicted" in item && item.conflicted) return "Conflicted";
@@ -110,20 +114,15 @@ function getKeySelector(
   };
 }
 
-export function groupArray(
-  items: PartialGroupableItem[],
-  options: GroupOptions = {
-    groupBy: "default",
-    sortBy: "dateEdited",
-    sortDirection: "desc"
-  }
+export function groupArray<T>(
+  items: T[],
+  keySelector: GroupKeySelectorFunction<T>
 ): Map<number, { index: number; group: GroupHeader }> {
   const groups = new Map<
     string,
     [number, { index: number; group: GroupHeader }]
   >();
 
-  const keySelector = getKeySelector(options);
   for (let i = 0; i < items.length; ++i) {
     const item = items[i];
     const groupTitle = keySelector(item);
