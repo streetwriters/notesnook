@@ -75,7 +75,7 @@ async function renderApp() {
 
 const serviceWorkerWhitelist: Routes[] = ["default"];
 async function initializeServiceWorker() {
-  if (!IS_DESKTOP_APP) {
+  if (!IS_DESKTOP_APP && !IS_TESTING) {
     logger.info("Initializing service worker...");
     const serviceWorker = await import("./service-worker-registration");
 

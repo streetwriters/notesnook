@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Reminder } from "@notesnook/core/dist/types";
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
-import { Item, Notebook } from "./types";
+import { Color, Item, Notebook } from "./types";
 import dayjs from "dayjs";
 
 export async function* iterateList(list: Locator) {
@@ -99,6 +99,20 @@ export async function fillItemDialog(page: Page, item: Item) {
   await titleInput.waitFor({ state: "visible" });
 
   await titleInput.fill(item.title);
+
+  await confirmDialog(dialog);
+}
+
+export async function fillColorDialog(page: Page, item: Color) {
+  const dialog = page.locator(getTestId("new-color-dialog"));
+
+  const titleInput = dialog.locator(getTestId("title-input"));
+  await titleInput.waitFor({ state: "visible" });
+  await titleInput.fill(item.title);
+
+  const colorInput = dialog.locator(getTestId("color-input"));
+  await colorInput.waitFor({ state: "visible" });
+  await colorInput.fill(item.color);
 
   await confirmDialog(dialog);
 }

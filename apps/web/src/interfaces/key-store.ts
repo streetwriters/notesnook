@@ -140,12 +140,14 @@ class KeyStore extends BaseStore<KeyStore> {
   ) {
     super(setState, get);
 
-    this.#metadataStore = isFeatureSupported("indexedDB")
-      ? new IndexedDBKVStore(`${dbName}-metadata`, "metadata")
-      : new MemoryKVStore();
-    this.#secretStore = isFeatureSupported("indexedDB")
-      ? new IndexedDBKVStore(`${dbName}-secrets`, "secrets")
-      : new MemoryKVStore();
+    this.#metadataStore =
+      isFeatureSupported("indexedDB") && isFeatureSupported("clonableCryptoKey")
+        ? new IndexedDBKVStore(`${dbName}-metadata`, "metadata")
+        : new MemoryKVStore();
+    this.#secretStore =
+      isFeatureSupported("indexedDB") && isFeatureSupported("clonableCryptoKey")
+        ? new IndexedDBKVStore(`${dbName}-secrets`, "secrets")
+        : new MemoryKVStore();
   }
 
   activeCredentials = () => this.get().credentials.filter((c) => c.active);

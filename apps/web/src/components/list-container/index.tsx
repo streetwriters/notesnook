@@ -150,6 +150,7 @@ function ListContainer(props: ListContainerProps) {
       else selectItem(id);
     },
     bulkSelect: async (indices) => {
+      console.log(indices.length, items.length);
       const ids =
         indices.length === items.length
           ? await items.ids()

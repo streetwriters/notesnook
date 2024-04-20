@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 const FEATURE_CHECKS = {
   opfs: false,
   cache: false,
-  indexedDB: false
+  indexedDB: false,
+  clonableCryptoKey: false
 };
 
 async function isOPFSSupported() {
@@ -67,11 +68,26 @@ async function isIndexedDBSupported() {
   );
 }
 
+async function isCryptoKeyClonable() {
+  const key = await window.crypto.subtle.generateKey(
+    { name: "AES-KW", length: 256 },
+    false,
+    ["wrapKey", "unwrapKey"]
+  );
+  try {
+    structuredClone(key);
+    FEATURE_CHECKS.clonableCryptoKey = true;
+  } catch {
+    FEATURE_CHECKS.clonableCryptoKey = false;
+  }
+}
+
 export async function initializeFeatureChecks() {
   await Promise.allSettled([
     isOPFSSupported(),
     isCacheSupported(),
-    isIndexedDBSupported()
+    isIndexedDBSupported(),
+    isCryptoKeyClonable()
   ]);
 }
 

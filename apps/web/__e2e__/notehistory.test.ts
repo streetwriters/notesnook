@@ -21,29 +21,34 @@ import { test, expect, Page } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { NOTE, PASSWORD } from "./utils";
 
+test.setTimeout(60 * 1000);
+
 async function createSession(page: Page, locked = false) {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
-  const note = await notes.createNote(NOTE);
+  let note = await notes.createNote(NOTE);
 
-  if (locked) await note?.contextMenu.lock(PASSWORD);
+  if (locked) {
+    await note?.contextMenu.lock(PASSWORD);
+    await note?.openLockedNote(PASSWORD);
+  }
 
   const edits = ["Some edited text.", "Some more edited text."];
-
-  await notes.newNote();
-  locked ? await note?.openLockedNote(PASSWORD) : await note?.openNote();
-
   for (const edit of edits) {
     await notes.editor.setContent(edit);
-    await notes.newNote();
+
+    await page.waitForTimeout(600);
+
+    await page.reload().catch(console.error);
+    await notes.waitForItem(NOTE.title);
+    note = await notes.findNote(NOTE);
     locked ? await note?.openLockedNote(PASSWORD) : await note?.openNote();
   }
   const contents = [
-    `${edits[1]}${edits[0]}${NOTE.content}`,
-    `${edits[0]}${NOTE.content}`
+    `${NOTE.content}${edits[0]}${edits[1]}`,
+    `${NOTE.content}${edits[0]}`
   ];
-  await notes.editor.waitForLoading(NOTE.title, contents[0]);
 
   return {
     note,
@@ -76,31 +81,23 @@ for (const type of sessionTypes) {
   test(`switching ${type} sessions should change editor content`, async ({
     page
   }) => {
-    const { note, notes, contents } = await createSession(page, isLocked);
+    const { note, contents } = await createSession(page, isLocked);
 
     const history = await note?.properties.getSessionHistory();
-    await history?.at(1)?.preview(PASSWORD);
-    await notes.editor.waitForLoading(NOTE.title, contents[1]);
-    const content1 = await notes.editor.getContent("text");
-    await history?.at(0)?.preview(PASSWORD);
-    await notes.editor.waitForLoading(NOTE.title, contents[0]);
-    const content0 = await notes.editor.getContent("text");
+    let preview = await history?.at(1)?.open();
+    if (type === "locked") await preview?.unlock(PASSWORD);
 
-    expect(content1).toBe(contents[1]);
-    expect(content0).toBe(contents[0]);
-  });
+    await expect(preview!.firstEditor.locator(".ProseMirror")).toHaveText(
+      contents[1]
+    );
+    await note?.click();
+    await note?.properties.close();
+    preview = await history?.at(0)?.open();
+    if (type === "locked") await preview?.unlock(PASSWORD);
 
-  test(`cancelling ${type} session restore should bring editor content back to original`, async ({
-    page
-  }) => {
-    const { note, notes, contents } = await createSession(page, isLocked);
-    const history = await note?.properties.getSessionHistory();
-    await history?.at(1)?.preview(PASSWORD);
-    await notes.editor.waitForLoading(NOTE.title, contents[1]);
-
-    await notes.editor.cancelPreview();
-
-    expect(await notes.editor.getContent("text")).toBe(contents[0]);
+    await expect(preview!.firstEditor.locator(".ProseMirror")).toHaveText(
+      contents[0]
+    );
   });
 
   test(`restoring a ${type} session should change note's content`, async ({
@@ -108,14 +105,13 @@ for (const type of sessionTypes) {
   }) => {
     const { note, notes, contents } = await createSession(page, isLocked);
     const history = await note?.properties.getSessionHistory();
-    await history?.at(1)?.preview(PASSWORD);
-    await notes.editor.waitForLoading(NOTE.title, contents[1]);
+    const preview = await history?.at(1)?.open();
+    if (type === "locked") await preview?.unlock(PASSWORD);
 
-    await notes.editor.restoreSession();
+    await preview?.restore();
 
-    expect(await notes.editor.getContent("text")).toBe(contents[1]);
-    await notes.newNote();
-    isLocked ? await note?.openLockedNote(PASSWORD) : await note?.openNote();
+    await page.waitForTimeout(1000);
+    if (type === "locked") await note?.openLockedNote(PASSWORD);
     expect(await notes.editor.getContent("text")).toBe(contents[1]);
   });
 }

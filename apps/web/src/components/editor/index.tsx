@@ -36,7 +36,8 @@ import {
   NewEditorSession,
   ReadonlyEditorSession,
   EditorSession,
-  DocumentPreview
+  DocumentPreview,
+  LockedEditorSession
 } from "../../stores/editor-store";
 import {
   useStore as useAppStore,
@@ -130,28 +131,7 @@ export default function TabsView() {
                 }
               >
                 {session.type === "locked" ? (
-                  <UnlockView
-                    buttonTitle="Open note"
-                    subtitle="Please enter the password to unlock this note."
-                    title={session.note.title}
-                    unlock={async (password) => {
-                      const note = await db.vault.open(session.id, password);
-                      if (!note || !note.content)
-                        throw new Error("note with this id does not exist.");
-
-                      useEditorStore.getState().addSession({
-                        type: "default",
-                        locked: true,
-                        id: session.id,
-                        note: session.note,
-                        saveState: SaveState.Saved,
-                        sessionId: `${Date.now()}`,
-                        pinned: session.pinned,
-                        preview: session.preview,
-                        content: note.content
-                      });
-                    }}
-                  />
+                  <UnlockNoteView session={session} />
                 ) : session.type === "conflicted" || session.type === "diff" ? (
                   <DiffViewer session={session} />
                 ) : (
@@ -747,4 +727,53 @@ function restoreSelection(editor: IEditor, id: string) {
   editor.focus({
     position: Config.get(`${id}:selection`, { from: 0, to: 0 })
   });
+}
+
+type UnlockNoteViewProps = { session: LockedEditorSession };
+function UnlockNoteView(props: UnlockNoteViewProps) {
+  const { session } = props;
+  const root = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const element = root.current;
+    element?.classList.add("active");
+    return () => {
+      element?.classList.remove("active");
+    };
+  }, []);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        overflow: "hidden",
+        alignItems: "center",
+        flex: 1
+      }}
+      ref={root}
+    >
+      <UnlockView
+        buttonTitle="Open note"
+        subtitle="Please enter the password to unlock this note."
+        title={session.note.title}
+        unlock={async (password) => {
+          const note = await db.vault.open(session.id, password);
+          if (!note || !note.content)
+            throw new Error("note with this id does not exist.");
+
+          useEditorStore.getState().addSession({
+            type: "default",
+            locked: true,
+            id: session.id,
+            note: session.note,
+            saveState: SaveState.Saved,
+            sessionId: `${Date.now()}`,
+            pinned: session.pinned,
+            preview: session.preview,
+            content: note.content
+          });
+        }}
+      />
+    </div>
+  );
 }

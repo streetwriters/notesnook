@@ -47,8 +47,14 @@ export class NoteItemModel extends BaseItemModel {
   async openLockedNote(password: string) {
     if (!(await this.contextMenu.isLocked())) return;
 
-    await this.page.locator(getTestId("unlock-note-password")).fill(password);
-    await this.page.locator(getTestId("unlock-note-submit")).click();
+    await this.page
+      .locator(".active")
+      .locator(getTestId("unlock-note-password"))
+      .fill(password);
+    await this.page
+      .locator(".active")
+      .locator(getTestId("unlock-note-submit"))
+      .click();
 
     const title = await this.getTitle();
     await this.editor.waitForLoading(title);

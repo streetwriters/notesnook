@@ -21,20 +21,16 @@ import { Locator, Page } from "@playwright/test";
 import { downloadAndReadFile, getTestId } from "../utils";
 import { ContextMenuModel } from "./context-menu.model";
 import { ToggleModel } from "./toggle.model";
-import { Notebook } from "./types";
+import { Color, Notebook } from "./types";
 import {
   confirmDialog,
+  fillColorDialog,
   fillNotebookDialog,
   fillPasswordDialog,
   iterateList
 } from "./utils";
-import {
-  FS,
-  ZipReader,
-  BlobReader,
-  TextWriter,
-  Uint8ArrayReader
-} from "@zip.js/zip.js";
+import { ZipReader, TextWriter, Uint8ArrayReader } from "@zip.js/zip.js";
+import { SessionHistoryItemModel } from "./session-history-item-model";
 
 abstract class BaseProperties {
   protected readonly page: Page;
@@ -234,6 +230,20 @@ export class NoteContextMenuModel extends BaseProperties {
     await this.close();
   }
 
+  async uncolor(color: string) {
+    await this.open();
+    await this.menu.clickOnItem("colors");
+    await new ToggleModel(this.page, `menu-button-${color}`).off();
+    await this.close();
+  }
+
+  async newColor(color: Color) {
+    await this.open();
+    await this.menu.clickOnItem("colors");
+    await new ToggleModel(this.page, `menu-button-new-color`).on();
+    await fillColorDialog(this.page, color);
+  }
+
   async moveToTrash() {
     await this.open();
     await Promise.all([
@@ -334,43 +344,5 @@ export class NoteContextMenuModel extends BaseProperties {
 
   title() {
     return this.menu.title();
-  }
-}
-
-class SessionHistoryItemModel {
-  private readonly title: Locator;
-  private readonly page: Page;
-  private readonly previewNotice: Locator;
-  private readonly locked: Locator;
-  constructor(
-    private readonly properties: NotePropertiesModel,
-    private readonly locator: Locator
-  ) {
-    this.page = locator.page();
-    this.title = locator.locator(getTestId("title"));
-    this.previewNotice = this.page.locator(getTestId("preview-notice"));
-    this.locked = locator.locator(getTestId("locked"));
-  }
-
-  async getTitle() {
-    return await this.title.textContent();
-  }
-
-  async preview(password?: string) {
-    await this.properties.open();
-    const isLocked = await this.locked.isVisible();
-    await this.locator.click();
-    if (password && isLocked) {
-      await fillPasswordDialog(this.page, password);
-    }
-    await this.previewNotice.waitFor();
-    await this.properties.close();
-  }
-
-  async isLocked() {
-    await this.properties.open();
-    const state = await this.locked.isVisible();
-    await this.properties.close();
-    return state;
   }
 }

@@ -106,7 +106,7 @@ function Notebook(props: NotebookProps) {
       direction="vertical"
       autoSaveId={`notebook-panel-sizes:${rootId}`}
     >
-      <Panel>
+      <Panel style={{ display: "flex" }}>
         <Notes
           header={
             <NotebookHeader

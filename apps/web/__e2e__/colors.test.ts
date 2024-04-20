@@ -25,7 +25,7 @@ test("delete the last note of a color", async ({ page }) => {
   await app.goto();
   const notes = await app.goToNotes();
   const note = await notes.createNote(NOTE);
-  await note?.contextMenu.color("red");
+  await note?.contextMenu.newColor({ title: "red", color: "#ff0000" });
   await app.navigation.findItem("red");
 
   await note?.contextMenu.moveToTrash();
@@ -34,15 +34,29 @@ test("delete the last note of a color", async ({ page }) => {
   expect(await app.getRouteHeader()).toBe("Trash");
 });
 
+test("remove color", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+  await note?.contextMenu.newColor({ title: "red", color: "#ff0000" });
+  const colorItem = await app.navigation.findItem("red");
+
+  await colorItem?.removeColor();
+
+  expect(await app.navigation.findItem("red")).toBeUndefined();
+  expect(await note?.contextMenu.isColored("red")).toBe(false);
+});
+
 test("rename color", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
   const note = await notes.createNote(NOTE);
-  await note?.contextMenu.color("red");
+  await note?.contextMenu.newColor({ title: "red", color: "#ff0000" });
   const colorItem = await app.navigation.findItem("red");
 
   await colorItem?.renameColor("priority-33");
 
-  expect(await app.navigation.findItem("priority-33"));
+  expect(await app.navigation.findItem("priority-33")).toBeDefined();
 });

@@ -165,10 +165,12 @@ for (const actor of actors) {
     await app.goto();
     const notes = await app.goToNotes();
     const note = await notes.createNote(NOTE);
+    await note?.contextMenu.newColor({ title: "red", color: "#ff0000" });
+    await note?.contextMenu.uncolor("red");
 
     await note?.[actor].color("red");
 
-    const coloredNotes = await app.goToColor("Red");
+    const coloredNotes = await app.goToColor("red");
     const coloredNote = await coloredNotes.findNote(NOTE);
     expect(coloredNote).toBeDefined();
     expect(await coloredNote?.contextMenu.isColored("red")).toBe(true);

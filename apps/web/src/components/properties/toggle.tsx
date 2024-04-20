@@ -43,19 +43,18 @@ function Toggle(props: ToggleProps) {
         "& label": { width: "auto", flexShrink: 0 }
       }}
       data-test-id={props.testId}
+      onClick={() => onToggle(!isOn)}
     >
       <Text
         variant="body"
         sx={{ alignItems: "center", color: "paragraph", display: "flex" }}
         data-test-id={`toggle-state-${isOn ? "on" : "off"}`}
-        onClick={() => onToggle(!isOn)}
       >
         <ToggleIcon size={13} sx={{ flexShrink: 0, mr: 1 }} />
         {label}
       </Text>
       <Switch
         sx={{ m: 0, bg: isOn ? "accent" : "icon-secondary" }}
-        onClick={() => onToggle(!isOn)}
         checked={isOn}
       />
     </Flex>

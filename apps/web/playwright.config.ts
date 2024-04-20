@@ -66,9 +66,23 @@ const config: PlaywrightTestConfig = {
         {
           name: "Chromium",
           use: {
-            browserName: "chromium"
+            browserName: "chromium",
+            permissions: ["notifications"]
           }
         }
+        // {
+        //   name: "Firefox",
+        //   use: {
+        //     browserName: "firefox",
+        //     permissions: ["notifications"]
+        //   }
+        // },we
+        // {
+        //   name: "WebKit",
+        //   use: {
+        //     browserName: "webkit"
+        //   }
+        // }
       ]
 };
 

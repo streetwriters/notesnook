@@ -130,7 +130,7 @@ export function useKeyboardListNavigation(
         },
         "Mod-a": () => {
           resetSelection();
-          for (let i = 0; i < length; ++i) select(i);
+          bulkSelect(new Array(length).fill(0).map((_, i) => i));
           return true;
         },
         "Shift-ArrowUp": () => {

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
 import { Copy, Restore } from "../icons";
 import ContentToggle from "./content-toggle";
@@ -39,11 +39,11 @@ function DiffViewer(props: DiffViewerProps) {
   const { session } = props;
 
   const [selectedContent, setSelectedContent] = useState(-1);
-
   const [content, setContent] = useState(session.content);
   const [conflictedContent, setConflictedContent] = useState(
     content?.conflicted
   );
+  const root = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     setConflictedContent((c) => {
@@ -52,11 +52,21 @@ function DiffViewer(props: DiffViewerProps) {
     });
   }, [session]);
 
+  useLayoutEffect(() => {
+    const element = root.current;
+    element?.classList.add("active");
+    return () => {
+      element?.classList.remove("active");
+    };
+  }, []);
+
   if (!conflictedContent || !content) return null;
 
   return (
     <Flex
+      ref={root}
       className="diffviewer"
+      data-test-id="diff-viewer"
       sx={{
         flex: "1 1 auto",
         flexDirection: "column",
@@ -81,6 +91,7 @@ function DiffViewer(props: DiffViewerProps) {
           <>
             <Button
               variant="secondary"
+              data-test-id="restore-session"
               onClick={async () => {
                 const { closeSessions, openSession } =
                   useEditorStore.getState();
@@ -138,6 +149,7 @@ function DiffViewer(props: DiffViewerProps) {
         >
           <Flex
             className="firstEditor"
+            data-test-id="first-editor"
             sx={{
               flex: "1 1 auto",
               flexDirection: "column",
@@ -219,6 +231,7 @@ function DiffViewer(props: DiffViewerProps) {
           </Flex>
           <Flex
             className="secondEditor"
+            data-test-id="second-editor"
             sx={{
               flex: "1 1 auto",
               flexDirection: "column",

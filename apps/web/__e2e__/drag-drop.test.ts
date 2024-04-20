@@ -40,10 +40,10 @@ for (const item of [
     await note?.locator.hover();
     await page.mouse.down();
     await navigationItem?.locator.hover();
+    await navigationItem?.locator.hover();
     await page.waitForTimeout(1000);
-    await page.keyboard.press("Escape");
 
-    expect(await app.getRouteHeader()).toBe(item.title);
+    await expect(app.routeHeader).toHaveText(item.title);
   });
 }
 
@@ -96,7 +96,9 @@ test(`drag & drop note over a notebook should get assigned to the notebook`, asy
   await note?.locator.hover();
   await page.mouse.down();
   await navigationItem?.locator.hover();
+  await navigationItem?.locator.hover();
   await page.waitForTimeout(1000);
+  await notebook?.locator.hover();
   await notebook?.locator.hover();
   await page.mouse.up();
 
@@ -120,7 +122,9 @@ test(`drag & drop note over a tag should get assigned to the tag`, async ({
   await note?.locator.hover();
   await page.mouse.down();
   await navigationItem?.locator.hover();
+  await navigationItem?.locator.hover();
   await page.waitForTimeout(1000);
+  await tag?.locator.hover();
   await tag?.locator.hover();
   await page.mouse.up();
 
@@ -198,7 +202,9 @@ test(`drag & drop note over a nested notebook should get assigned to the noteboo
   await note?.locator.hover();
   await page.mouse.down();
   await navigationItem?.locator.hover();
+  await navigationItem?.locator.hover();
   await page.waitForTimeout(1000);
+  await nestedNotebook?.locator.hover();
   await nestedNotebook?.locator.hover();
   await page.mouse.up();
 
@@ -232,9 +238,12 @@ test(`drag & hover over a nested notebook should navigate inside`, async ({
   await note?.locator.hover();
   await page.mouse.down();
   await navigationItem?.locator.hover();
+  await navigationItem?.locator.hover();
   await page.waitForTimeout(1000);
   await notebook?.locator.hover();
+  await notebook?.locator.hover();
   await page.waitForTimeout(1000);
+  await nestedNotebook?.locator.hover();
   await nestedNotebook?.locator.hover();
   await page.waitForTimeout(1000);
   await page.keyboard.press("Escape");

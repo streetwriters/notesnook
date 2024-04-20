@@ -33,9 +33,6 @@ export class EditorModel {
   private readonly wordCountText: Locator;
   private readonly dateEditedText: Locator;
   private readonly searchButton: Locator;
-  private readonly previewCancelButton: Locator;
-  private readonly previewRestoreButton: Locator;
-  private readonly previewNotice: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -54,11 +51,6 @@ export class EditorModel {
     this.wordCountText = page.locator(getTestId("editor-word-count"));
     this.dateEditedText = page.locator(getTestId("editor-date-edited"));
     this.searchButton = page.locator(getTestId("Search"));
-    this.previewNotice = page.locator(getTestId("preview-notice"));
-    this.previewCancelButton = page.locator(getTestId("preview-notice-cancel"));
-    this.previewRestoreButton = page.locator(
-      getTestId("preview-notice-restore")
-    );
   }
 
   async waitForLoading(title?: string, content?: string) {
@@ -126,7 +118,7 @@ export class EditorModel {
   async setContent(text: string) {
     await this.editAndWait(async () => {
       await this.content.focus();
-      await this.content.type(text);
+      await this.content.pressSequentially(text);
     });
   }
 
@@ -226,16 +218,6 @@ export class EditorModel {
 
   async isFullscreen() {
     return await this.exitFullscreenButton.isVisible();
-  }
-
-  async cancelPreview() {
-    await this.previewCancelButton.click();
-    await this.previewNotice.waitFor({ state: "hidden" });
-  }
-
-  async restoreSession() {
-    await this.previewRestoreButton.click();
-    await this.previewNotice.waitFor({ state: "hidden" });
   }
 
   async getWordCount() {

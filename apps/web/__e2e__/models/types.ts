@@ -27,6 +27,11 @@ export type Item = {
   title: string;
 };
 
+export type Color = {
+  title: string;
+  color: string;
+};
+
 export type PriceItem = { label: string; value: string };
 
 export type OrderByOptions = "asc" | "desc";

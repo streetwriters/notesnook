@@ -75,7 +75,7 @@ export class AuthModel {
     }
 
     await this.page
-      .locator(getTestId("sync-status-syncing"))
+      .locator(getTestId("sync-status-synced"))
       .waitFor({ state: "visible" });
   }
 }

@@ -69,7 +69,7 @@ export function Menu(props: MenuProps) {
     const item = items[focusIndex];
     if (!item || !subMenuRef.current) return;
 
-    const menuItemElement = document.getElementById(`${item.key}-menu-item`);
+    const menuItemElement = document.getElementById(`menu-item-${item.key}`);
     if (!menuItemElement) return;
 
     if (!isSubmenuOpen) {

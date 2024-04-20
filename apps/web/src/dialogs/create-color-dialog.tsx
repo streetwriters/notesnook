@@ -24,6 +24,7 @@ import { Perform } from "../common/dialog-controller";
 import { useRef } from "react";
 import tinycolor from "tinycolor2";
 import { db } from "../common/db";
+import { showToast } from "../utils/toast";
 
 type CreateColorDialogProps = {
   onClose: Perform;
@@ -53,6 +54,10 @@ function CreateColorDialog(props: CreateColorDialogProps) {
           const form = Object.fromEntries(
             new FormData(e.target as HTMLFormElement).entries()
           ) as { color: string; title: string };
+          if (!tinycolor(form.color, { format: "hex" }).isValid()) {
+            showToast("error", "Please enter a valid hex color (e.g. #ffffff)");
+            return;
+          }
           const colorId = await db.colors.add({
             colorCode: form.color,
             title: form.title

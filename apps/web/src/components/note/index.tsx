@@ -596,7 +596,7 @@ function colorsToMenuItems(
             const isChecked = !!noteColor && noteColor.id === color.id;
             return {
               type: "button",
-              key: color.id,
+              key: color.title,
               title: color.title,
               icon: Circle.path,
               styles: { icon: { color: color.colorCode } },
