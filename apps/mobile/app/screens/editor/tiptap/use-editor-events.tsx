@@ -60,6 +60,7 @@ import {
   eClearEditor,
   eCloseFullscreenEditor,
   eEditorTabFocused,
+  eOnEnterEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
   eOpenLoginDialog,
@@ -269,14 +270,13 @@ export const useEditorEvents = (
   }, [editor, deviceMode, fullscreen]);
 
   const onHardwareBackPress = useCallback(() => {
-    if (editorState().currentlyEditing) {
+    if (tabBarRef.current?.page === 2) {
       onBackPress();
       return true;
     }
   }, [onBackPress]);
 
-  const onLoadNote = useCallback(async () => {
-    console.log("Loading...");
+  const onEnterEditor = useCallback(async () => {
     InteractionManager.runAfterInteractions(() => {
       if (!DDS.isTab) {
         handleBack.current = BackHandler.addEventListener(
@@ -331,16 +331,16 @@ export const useEditorEvents = (
   }, [fullscreen, onHardwareBackPress]);
 
   useEffect(() => {
-    eSubscribeEvent(eOnLoadNote + editor.editorId, onLoadNote);
+    eSubscribeEvent(eOnEnterEditor, onEnterEditor);
     eSubscribeEvent(
       eClearEditor + editor.editorId,
       onClearEditorSessionRequest
     );
     return () => {
       eUnSubscribeEvent(eClearEditor, onClearEditorSessionRequest);
-      eUnSubscribeEvent(eOnLoadNote, onLoadNote);
+      eUnSubscribeEvent(eOnEnterEditor, onEnterEditor);
     };
-  }, [editor.editorId, onClearEditorSessionRequest, onLoadNote]);
+  }, [editor.editorId, onClearEditorSessionRequest, onEnterEditor]);
 
   const onMessage = useCallback(
     async (event: WebViewMessageEvent) => {

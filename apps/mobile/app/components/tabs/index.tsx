@@ -121,7 +121,12 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       } else {
         if (prevWidths.current?.sidebar !== widths.sidebar) {
           translateX.value =
-            !appState || appState?.movedAway ? widths.sidebar : editorPosition;
+            !appState || (appState && appState?.movedAway)
+              ? widths.sidebar
+              : editorPosition;
+          if (translateX.value === editorPosition) {
+            onChangeTab?.({ i: 2, from: 1 });
+          }
         }
       }
       isLoaded.current = true;

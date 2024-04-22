@@ -64,6 +64,7 @@ import { useSettingStore } from "../stores/use-setting-store";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
+  eOnEnterEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
   eUnlockNote
@@ -515,11 +516,12 @@ const _TabsHolder = () => {
 };
 export const TabHolder = React.memo(_TabsHolder, () => true);
 
-const onChangeTab = async (obj) => {
-  if (obj.i === 2) {
+const onChangeTab = async (event) => {
+  if (event.i === 2) {
     editorState().movedAway = false;
     editorState().isFocused = true;
     activateKeepAwake();
+
     if (!useTabStore.getState().getCurrentNoteId()) {
       eSendEvent(eOnLoadNote, {
         newNote: true
@@ -529,13 +531,11 @@ const onChangeTab = async (obj) => {
         useTabStore.getState().getTab(useTabStore.getState().currentTab).locked
       ) {
         eSendEvent(eUnlockNote);
-      } else {
-        editorState().currentlyEditing = true;
-        eSendEvent(eOnLoadNote);
       }
+      eSendEvent(eOnEnterEditor);
     }
   } else {
-    if (obj.from === 2) {
+    if (event.from === 2) {
       deactivateKeepAwake();
       editorState().movedAway = true;
       editorState().isFocused = false;
