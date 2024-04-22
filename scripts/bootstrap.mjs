@@ -135,7 +135,7 @@ async function bootstrapPackage(cwd, outputs) {
   const cmd = `npm ${
     IS_CI ? "ci" : "i"
   } --legacy-peer-deps --no-audit --no-fund ${
-    args.offline ? "--offline" : "--prefer-offline"
+    args.offline ? "--offline" : ""
   } --progress=false --ignore-scripts`;
 
   outputs.stdout.push("> " + cwd);
