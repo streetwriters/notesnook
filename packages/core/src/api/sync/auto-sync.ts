@@ -57,11 +57,13 @@ export class AutoSync {
 
   private schedule(event: DatabaseUpdatedEvent) {
     if (
-      (event.type === "upsert" || event.type === "update") &&
-      (event.item.remote ||
-        ("localOnly" in event.item && event.item.localOnly) ||
-        ("failed" in event.item && event.item.failed) ||
-        ("dateUploaded" in event.item && event.item.dateUploaded))
+      event.collection === "notehistory" ||
+      event.collection === "sessioncontent" ||
+      ((event.type === "upsert" || event.type === "update") &&
+        (event.item.remote ||
+          ("localOnly" in event.item && event.item.localOnly) ||
+          ("failed" in event.item && event.item.failed) ||
+          ("dateUploaded" in event.item && event.item.dateUploaded)))
     )
       return;
 
