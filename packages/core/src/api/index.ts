@@ -130,7 +130,7 @@ class Database {
 
   private _sql?: Kysely<DatabaseSchema>;
   sql: DatabaseAccessor = () => {
-    if (this._transaction) return this._transaction.value;
+    // if (this._transaction) return this._transaction.value;
 
     if (!this._sql)
       throw new Error(
@@ -144,25 +144,26 @@ class Database {
 
   private _transaction?: QueueValue<Transaction<DatabaseSchema>>;
   transaction = async (
-    executor: (tr: Transaction<DatabaseSchema>) => Promise<void>
+    executor: (tr: Kysely<DatabaseSchema>) => Promise<void>
   ) => {
-    if (this._transaction) {
-      await executor(this._transaction.use()).finally(() =>
-        this._transaction?.discard()
-      );
-      return;
-    }
+    await executor(this.sql());
+    // if (this._transaction) {
+    //   await executor(this._transaction.use()).finally(() =>
+    //     this._transaction?.discard()
+    //   );
+    //   return;
+    // }
 
-    return this.sql()
-      .transaction()
-      .execute(async (tr) => {
-        this._transaction = new QueueValue(
-          tr,
-          () => (this._transaction = undefined)
-        );
-        await executor(this._transaction.use());
-      })
-      .finally(() => this._transaction?.discard());
+    // return this.sql()
+    //   .transaction()
+    //   .execute(async (tr) => {
+    //     this._transaction = new QueueValue(
+    //       tr,
+    //       () => (this._transaction = undefined)
+    //     );
+    //     await executor(this._transaction.use());
+    //   })
+    //   .finally(() => this._transaction?.discard());
   };
 
   options!: Options;

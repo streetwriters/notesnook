@@ -21,7 +21,7 @@ import { MaybeDeletedItem, isDeleted } from "../types";
 import EventManager from "../utils/event-manager";
 import { DatabaseAccessor, DatabaseCollection, DatabaseSchema } from ".";
 import { SQLCollection } from "./sql-collection";
-import { Transaction } from "kysely";
+import { Kysely, Transaction } from "kysely";
 import { Sanitizer } from "./sanitizer";
 
 export class SQLCachedCollection<
@@ -36,7 +36,7 @@ export class SQLCachedCollection<
   constructor(
     sql: DatabaseAccessor,
     startTransaction: (
-      executor: (tr: Transaction<DatabaseSchema>) => Promise<void>
+      executor: (tr: Kysely<DatabaseSchema>) => Promise<void>
     ) => Promise<void>,
     type: TCollectionType,
     eventManager: EventManager,

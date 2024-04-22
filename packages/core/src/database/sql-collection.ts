@@ -41,6 +41,7 @@ import {
   AnyColumn,
   AnyColumnWithTable,
   ExpressionOrFactory,
+  Kysely,
   SelectQueryBuilder,
   SqlBool,
   Transaction,
@@ -72,8 +73,8 @@ export class SQLCollection<
 {
   constructor(
     private readonly db: DatabaseAccessor,
-    private readonly startTransaction: (
-      executor: (tr: Transaction<DatabaseSchema>) => Promise<void>
+    _startTransaction: (
+      executor: (tr: Kysely<DatabaseSchema>) => Promise<void>
     ) => Promise<void>,
     private readonly type: TCollectionType,
     private readonly eventManager: EventManager,
@@ -113,21 +114,23 @@ export class SQLCollection<
   }
 
   async softDelete(ids: string[]) {
-    await this.startTransaction(async (tx) => {
-      for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
-        await tx
-          .replaceInto<keyof DatabaseSchema>(this.type)
-          .values(
-            chunk.map((id) => ({
-              id,
-              deleted: true,
-              dateModified: Date.now(),
-              synced: false
-            }))
-          )
-          .execute();
-      }
-    });
+    await this.db()
+      .transaction()
+      .execute(async (tx) => {
+        for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
+          await tx
+            .replaceInto<keyof DatabaseSchema>(this.type)
+            .values(
+              chunk.map((id) => ({
+                id,
+                deleted: true,
+                dateModified: Date.now(),
+                synced: false
+              }))
+            )
+            .execute();
+        }
+      });
     this.eventManager.publish(EVENTS.databaseUpdated, <DeleteEvent>{
       type: "softDelete",
       collection: this.type,
@@ -138,14 +141,16 @@ export class SQLCollection<
   async delete(ids: string[]) {
     if (ids.length <= 0) return;
 
-    await this.startTransaction(async (tx) => {
-      for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
-        await tx
-          .deleteFrom<keyof DatabaseSchema>(this.type)
-          .where("id", "in", chunk)
-          .execute();
-      }
-    });
+    await this.db()
+      .transaction()
+      .execute(async (tx) => {
+        for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
+          await tx
+            .deleteFrom<keyof DatabaseSchema>(this.type)
+            .where("id", "in", chunk)
+            .execute();
+        }
+      });
     this.eventManager.publish(EVENTS.databaseUpdated, <DeleteEvent>{
       type: "delete",
       collection: this.type,
@@ -206,14 +211,16 @@ export class SQLCollection<
 
     if (entries.length <= 0) return [];
 
-    await this.startTransaction(async (tx) => {
-      for (const chunk of toChunks(entries, MAX_SQL_PARAMETERS)) {
-        await tx
-          .replaceInto<keyof DatabaseSchema>(this.type)
-          .values(chunk)
-          .execute();
-      }
-    });
+    await this.db()
+      .transaction()
+      .execute(async (tx) => {
+        for (const chunk of toChunks(entries, MAX_SQL_PARAMETERS)) {
+          await tx
+            .replaceInto<keyof DatabaseSchema>(this.type)
+            .values(chunk)
+            .execute();
+        }
+      });
     return entries;
   }
 
@@ -224,19 +231,21 @@ export class SQLCollection<
   ) {
     if (!this.sanitizer.sanitize(this.type, partial)) return;
 
-    await this.startTransaction(async (tx) => {
-      for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
-        await tx
-          .updateTable<keyof DatabaseSchema>(this.type)
-          .where("id", "in", chunk)
-          .set({
-            ...partial,
-            dateModified: Date.now(),
-            synced: partial.synced || false
-          })
-          .execute();
-      }
-    });
+    await this.db()
+      .transaction()
+      .execute(async (tx) => {
+        for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
+          await tx
+            .updateTable<keyof DatabaseSchema>(this.type)
+            .where("id", "in", chunk)
+            .set({
+              ...partial,
+              dateModified: Date.now(),
+              synced: partial.synced || false
+            })
+            .execute();
+        }
+      });
     if (options.sendEvent) {
       this.eventManager.publish(EVENTS.databaseUpdated, <UpdateEvent>{
         type: "update",
