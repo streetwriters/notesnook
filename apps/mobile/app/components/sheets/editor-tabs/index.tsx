@@ -20,7 +20,7 @@ import { Note } from "@notesnook/core";
 import { EVENTS } from "@notesnook/core/dist/common";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../../common/database";
@@ -43,6 +43,7 @@ type TabItem = {
   locked?: boolean;
   noteLocked?: boolean;
   readonly?: boolean;
+  pinned?: boolean;
 };
 
 const TabItemComponent = (props: {
@@ -140,24 +141,50 @@ const TabItemComponent = (props: {
         </Paragraph>
       </View>
 
-      <IconButton
-        name="close"
-        size={SIZE.lg}
-        color={colors.primary.icon}
-        onPress={() => {
-          const isLastTab = useTabStore.getState().tabs.length === 1;
-          useTabStore.getState().removeTab(props.tab.id);
-          // The last tab is not actually removed, it is just cleaned up.
-          if (isLastTab) {
-            editorController.current?.reset(props.tab.id, true, true);
-            props.close?.();
-          }
+      <View
+        style={{
+          flexDirection: "row",
+          gap: 5,
+          paddingRight: 12
         }}
-        top={0}
-        left={0}
-        right={20}
-        bottom={0}
-      />
+      >
+        <IconButton
+          name="pin"
+          size={SIZE.lg}
+          color={props.tab.pinned ? colors.primary.accent : colors.primary.icon}
+          onPress={() => {
+            useTabStore.getState().updateTab(props.tab.id, {
+              pinned: !props.tab.pinned,
+              previewTab: false
+            });
+          }}
+          top={0}
+          left={0}
+          right={20}
+          bottom={0}
+        />
+
+        {!props.tab?.pinned ? (
+          <IconButton
+            name="close"
+            size={SIZE.lg}
+            color={colors.primary.icon}
+            onPress={() => {
+              const isLastTab = useTabStore.getState().tabs.length === 1;
+              useTabStore.getState().removeTab(props.tab.id);
+              // The last tab is not actually removed, it is just cleaned up.
+              if (isLastTab) {
+                editorController.current?.reset(props.tab.id, true, true);
+                props.close?.();
+              }
+            }}
+            top={0}
+            left={0}
+            right={20}
+            bottom={0}
+          />
+        ) : null}
+      </View>
     </Pressable>
   );
 };
@@ -225,7 +252,16 @@ export default function EditorTabs({
         />
       </View>
 
-      <FlatList windowSize={3} data={tabs} renderItem={renderTabItem} />
+      <FlatList
+        windowSize={3}
+        data={tabs.sort((t1, t2) => {
+          if (t1.pinned && t2.pinned) return 0;
+          if (t1.pinned) return -1;
+          if (t2.pinned) return 1;
+          return 0;
+        })}
+        renderItem={renderTabItem}
+      />
     </View>
   );
 }

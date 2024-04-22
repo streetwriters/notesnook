@@ -76,6 +76,7 @@ export type TabItem = {
   readonly?: boolean;
   locked?: boolean;
   noteLocked?: boolean;
+  pinned?: boolean;
 };
 
 const history = new History();

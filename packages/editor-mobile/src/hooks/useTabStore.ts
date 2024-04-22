@@ -33,6 +33,7 @@ export type TabItem = {
   readonly?: boolean;
   locked?: boolean;
   noteLocked?: boolean;
+  pinned?: boolean;
 };
 
 type NoteState = {
