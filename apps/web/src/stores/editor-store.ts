@@ -802,7 +802,9 @@ class EditorStore extends BaseStore<EditorStore> {
     } catch (err) {
       showToast(
         "error",
-        err instanceof Error ? err.stack || err.message : JSON.stringify(err)
+        err instanceof Error && err.stack
+          ? err.message + err.stack
+          : JSON.stringify(err)
       );
       this.setSaveState(id, SaveState.NotSaved);
       console.error(err);

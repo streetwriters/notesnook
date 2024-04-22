@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { SQLiteAPI, SQLiteCompatibleType } from "./sqlite-types";
-import { Factory, SQLITE_ROW } from "./sqlite-api";
+import { Factory, SQLITE_ROW, SQLiteError } from "./sqlite-api";
 import { transfer } from "comlink";
 import type { RunMode } from "./type";
 import { QueryResult } from "kysely";
@@ -97,6 +97,8 @@ async function prepare(sql: string) {
       return prepare(sql);
     } else retryCounter[sql] = 0;
 
+    if (ex instanceof Error || ex instanceof SQLiteError)
+      ex.message += ` (query: ${sql})`;
     throw ex;
   }
 }
@@ -126,6 +128,10 @@ async function run(
     }
 
     return rows;
+  } catch (e) {
+    if (e instanceof Error || e instanceof SQLiteError)
+      e.message += ` (query: ${sql})`;
+    throw e;
   } finally {
     await sqlite
       .reset(prepared.stmt)
