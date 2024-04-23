@@ -679,6 +679,9 @@ export const useAppEvents = () => {
 
     if (db.isInitialized) {
       Notifications.setupReminders(true);
+      if (SettingsService.get().notifNotes) {
+        Notifications.pinQuickNote(false);
+      }
       useSettingStore.getState().setAppLoading(false);
       DatabaseLogger.info("Database initialized");
     }
