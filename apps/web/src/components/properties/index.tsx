@@ -414,6 +414,7 @@ function LinkedNote({
                 sx={{
                   bg: "background-secondary",
                   p: "small",
+                  flexShrink: 0,
                   px: 1,
                   borderRadius: "default",
                   alignSelf: "flex-start"
