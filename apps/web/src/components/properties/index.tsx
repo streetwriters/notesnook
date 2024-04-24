@@ -658,7 +658,13 @@ function Attachments({ noteId }: { noteId: string }) {
         estimatedSize={30}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.placeholders}
-        header={<></>}
+        header={
+          <tr>
+            <th style={{ width: "75%" }} />
+            <th style={{ width: "5%" }} />
+            <th style={{ width: "20%" }} />
+          </tr>
+        }
         headerSize={0}
         renderRow={({ index }) => (
           <ResolvedItem index={index} type="attachment" items={result.value}>
