@@ -21,8 +21,10 @@ import React, { PropsWithChildren, useEffect, useRef, useState } from "react";
 import { Dimensions, Platform, View, useWindowDimensions } from "react-native";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useKeyboard from "../../hooks/use-keyboard";
+import { useThemeColors } from "@notesnook/theme";
 
 export const Container = ({ children }: PropsWithChildren) => {
+  const { colors } = useThemeColors();
   const insets = useGlobalSafeAreaInsets();
   const keyboard = useKeyboard();
   const [height, setHeight] = useState(0);
@@ -43,7 +45,8 @@ export const Container = ({ children }: PropsWithChildren) => {
         paddingTop: Platform.OS === "android" ? 0 : insets.top,
         paddingBottom: Platform.OS === "android" ? 0 : insets.bottom,
         height: height || "100%",
-        width: "100%"
+        width: "100%",
+        backgroundColor: colors.primary.background
       }}
       onLayout={(event) => {
         const height = event.nativeEvent.layout.height;

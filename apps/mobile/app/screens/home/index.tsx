@@ -29,7 +29,6 @@ import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotes } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
-import LinkNote from "../../components/sheets/link-note";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const [notes, loading] = useNotes();
@@ -80,7 +79,9 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
             loading: "Loading your notes"
           }}
         />
-        <FloatingButton title="Create a new note" onPress={openEditor} />
+        {!notes || !notes.placeholders?.length ? null : (
+          <FloatingButton title="Create a new note" onPress={openEditor} />
+        )}
       </DelayLayout>
     </>
   );

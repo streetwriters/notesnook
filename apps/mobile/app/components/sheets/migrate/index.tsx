@@ -159,13 +159,14 @@ export default function Migrate() {
               }}
             >
               Migrating database{progress ? `(${progress?.collection})` : null}
-              {progress ? `(${progress.current}/${progress.total}) ` : null}...
-              please wait
+              {progress ? `(${progress.current}/${progress.total}) ` : null}
+              ... please wait
             </Paragraph>
 
             <View
               style={{
-                width: 200
+                width: 200,
+                alignSelf: "center"
               }}
             >
               <ProgressBarComponent
