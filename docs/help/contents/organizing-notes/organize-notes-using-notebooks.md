@@ -4,13 +4,13 @@ title: Notebooks
 
 # Organizing notes with notebooks
 
-Notebooks are a quick and easy way for multi-level notes organization. Starting from v2.4.7, topics are now optional in Notebooks and notes can be put directly under a notebook.
+Notebooks are a quick and easy way for nested organization of notes.
 
-If you are coming from Evernote, you can think of Notebooks as "Evernote Stacks" & topics as "Evernote Notebooks". However, keep in mind, that there is a key difference:
+In Notesnook, one note can belong to multiple notebooks. This allows for very flexible organization structures. For example, an author can "link" the character list to all the chapters instead of duplicating it for each chapter. Similarly, a user can link common notes between multiple notebooks without any duplication.
 
-> "Evernote Stacks" do not allow putting notes directly under them i.e., a Stack is just a collection of Notebooks and nothing else.
-
-In Notesnook, one note can belong to multiple notebooks & topics. This allows for very flexible organization structures. For example, an author can "link" the character list to all the chapter topics instead of duplicating it for each chapter. Similarly, a user can link common notes between multiple topics without the need for any duplication.
+> info
+>
+> Starting from v3, topics have been replaced with sub notebooks and all existing topics have been converted into Notebooks. You can now create new notebooks inside existing notebooks.
 
 ## Creating a notebook
 
@@ -22,24 +22,19 @@ In Notesnook, one note can belong to multiple notebooks & topics. This allows fo
 4. Click on `Create` button
 5. You have created your first notebook in Notesnook
 
-> info
->
-> Adding a description & topics are optional.
-
 # [Mobile](#/tab/mobile)
 
-1. Go to `Notebooks` from side menu.
+1. Go to `Notebooks` from side menu
 2. Press the ![Three dot button](/plus-button-desktop.png) button on bottom right corner
-3. Add title for your notebook.
-
-> info
->
-> Adding a description & topics are optional.
-
+3. Enter notebook title and description
 4. Press the `Create notebook` button.
 5. You have created your first notebook in Notesnook.
 
 ---
+
+> info
+>
+> Starting from v3, you can create new Notebooks inside existing notebooks. Simply go to any notebook's properties and click on "Add notebook".
 
 ## Editing a notebook
 
@@ -57,45 +52,6 @@ In Notesnook, one note can belong to multiple notebooks & topics. This allows fo
 3. Press on `Edit Notebook`
 4. Edit your notebook
 5. Press `Save` button to save changes
-
----
-
-## Create a new topic
-
-# [Desktop/Web](#/tab/web)
-
-1. Go to `Notebooks` and open a notebook
-2. Click on the ![Three dot button](/plus-button-desktop.png) button on top right corner.
-3. Enter title of the topic
-4. Click on `Create topic`
-5. You have added a new topic to notebook
-
-# [Mobile](#/tab/mobile)
-
-1. Go to `Notebooks` and open a notebook
-2. Press the ![Three dot button](/plus-button-desktop.png) button on bottom right corner.
-3. Enter title of the topic
-4. Press the `Create` button.
-5. You have added a new topic to notebook
-
----
-
-## Editing an existing topic
-
-# [Desktop/Web](#/tab/web)
-
-1. Go to `Notebooks` and open a notebook
-2. Right click on a topic and select "Edit".
-3. Edit the topic title
-4. Click "Save" to save changes.
-
-# [Mobile](#/tab/mobile)
-
-1. Go to `Notebooks` and open a notebook
-2. Press the ![Three dot button](/three-dot-button.png) button
-3. Press on `Edit topic`
-4. Edit title of topic
-5. Press `Save` to save changes
 
 ---
 
@@ -117,40 +73,40 @@ In Notesnook, one note can belong to multiple notebooks & topics. This allows fo
 
 > info
 >
-> Once a note is added to a notebook, you will see its path on top of the note in the list. Clicking on it will take you to the respective notebook/topic.
+> Once a note is added to a notebook, you will see its path on top of the note in the list. Clicking on it will take you to the respective notebook.
 >
 > ![Notebook reference on a note](/notebook-ref.png)
 
-## Linking an existing note to a notebook/topic
+## Linking an existing note to a notebook
 
 # [Desktop/Web](#/tab/web)
 
 1. Right click on a note
 2. Click on `Notebooks` > `Link to...`
-3. Select the notebook or topic you want to link the note to (you can select multiple)
+3. Select the notebook you want to link the note to (you can select multiple)
 4. Click `Done` to save your changes.
 
 # [Mobile](#/tab/mobile)
 
 1. Tap the ![Three dot button](/three-dot-button.png) button
 2. Tap on `Link Notebooks` button.
-3. Select the notebook or topic you want to link the note to (you can select multiple)
+3. Select the notebook you want to link the note to (you can select multiple)
 4. Click the `Save` button at the top right corner to save your changes.
 
 ---
 
 > info
 >
-> In Notesnook a single note can exist in multiple Notebooks and topics. However, a note will show only one reference on top.
+> In Notesnook a single note can exist in multiple Notebooks. However, a note will show only one reference on top.
 
-## Linking multiple notes to a notebook/topic
+## Linking multiple notes to a notebook
 
 # [Desktop/Web](#/tab/web)
 
 1. Hold `Ctrl` key and click on all the notes you want to link
 2. Right click on selected notes
 3. Click on `Notebooks` > `Link to...`
-4. Select the notebook or topic you want to link the note to (you can select multiple)
+4. Select the notebook you want to link the note to (you can select multiple)
 5. Click `Done` to save your changes.
 
 # [Mobile](#/tab/mobile)
@@ -158,42 +114,24 @@ In Notesnook, one note can belong to multiple notebooks & topics. This allows fo
 1. Long press on a note to enter multi selection mode.
 2. Tap on all the notes you want to link to select them
 3. Tap the `+` button in top header
-4. Select the notebook or topic you want to link the note to (you can select multiple)
+4. Select the notebook you want to link the note to (you can select multiple)
 5. Click the `Save` button at the top right corner to save your changes.
 
 ---
 
-## Remove note from a notebook/topic
+## Remove note from a notebook
 
 # [Desktop/Web](#/tab/web)
 
 1. Right click on a note
 2. Click on `Notebooks` in the context menu
-3. Click on the notebook/topic you want to remove the note from
+3. Click on the notebook you want to remove the note from
 
 # [Mobile](#/tab/mobile)
 
 1. Press the ![Three dot button](/three-dot-button.png) button
 2. Click on `See all linked notebooks`
-3. Long press on the notebook or topic you want to removve the note from
-
----
-
-## Delete a topic
-
-# [Desktop/Web](#/tab/web)
-
-1. Go to `Notebooks` and open the notebook from which you want to delete a topic.
-2. Right click on the topic
-3. Click on `Delete` to delete the topic.
-4. (Optional) Select whether you also want to delete the notes inside this topic.
-
-# [Mobile](#/tab/mobile)
-
-1. Go to `Notebooks` from side menu and open the notebook from which you want to delete a topic.
-2. Press the ![Three dot button](/three-dot-button.png) button to open `Topic properties` sheet
-3. Press `Delete topic`
-4. (Optional) Select whether you also want to delete the notes inside this topic.
+3. Long press on the notebook you want to removve the note from
 
 ---
 
