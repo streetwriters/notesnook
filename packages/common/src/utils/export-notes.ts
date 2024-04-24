@@ -172,7 +172,7 @@ export async function* exportNote(
     yield <ExportableNote>{
       type: "note",
       path,
-      data: content,
+      data: resolvePaths(content, path),
       mtime: new Date(note.dateEdited),
       ctime: new Date(note.dateCreated)
     };
@@ -256,7 +256,8 @@ export async function exportContent(
 
       const sources: Record<string, string> = {};
       for (const attachment of attachments) {
-        const attachmentPath = join(attachmentsRoot, attachment.filename);
+        const filename = [attachment.hash, attachment.filename].join("-");
+        const attachmentPath = join(attachmentsRoot, filename);
         sources[attachment.hash] = resolveAttachment(
           elements,
           attachment,
