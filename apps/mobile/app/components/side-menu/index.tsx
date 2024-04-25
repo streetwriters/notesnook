@@ -155,26 +155,6 @@ export const SideMenu = React.memo(
             subscriptionType === SUBSCRIPTION_STATUS.BASIC ? (
               <MenuItem testID={pro.name} key={pro.name} item={pro} index={0} />
             ) : null}
-
-            {BottomItemsList.slice(DDS.isLargeTablet() ? 0 : 1, 3).map(
-              (item, index) => (
-                <MenuItem
-                  testID={
-                    item.name == "Night mode"
-                      ? notesnook.ids.menu.nightmode
-                      : item.name
-                  }
-                  key={item.name}
-                  item={item}
-                  index={index}
-                  rightBtn={
-                    DDS.isLargeTablet() || item.name === "Notesnook Pro"
-                      ? undefined
-                      : BottomItemsList[0]
-                  }
-                />
-              )
-            )}
           </View>
 
           {dragging ? (
@@ -206,14 +186,7 @@ export const SideMenu = React.memo(
               />
             </View>
           ) : (
-            <View
-              style={{
-                width: "100%",
-                paddingHorizontal: 0
-              }}
-            >
-              <UserStatus />
-            </View>
+            <UserStatus />
           )}
         </View>
       </View>

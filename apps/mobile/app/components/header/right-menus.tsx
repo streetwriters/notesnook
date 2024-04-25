@@ -71,7 +71,7 @@ export const RightMenus = ({
           testID={notesnook.ids.default.addBtn}
           icon={renderedInRoute === "Trash" ? "delete" : "plus"}
           iconSize={SIZE.xl}
-          type="shade"
+          type="accent"
           hitSlop={{
             top: 10,
             right: 10,
@@ -82,7 +82,7 @@ export const RightMenus = ({
             marginLeft: 10,
             width: 32,
             height: 32,
-            borderRadius: 5,
+            borderRadius: 100,
             paddingHorizontal: 0,
             borderWidth: 1,
             borderColor: colors.primary.accent

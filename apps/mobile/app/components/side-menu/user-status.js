@@ -20,7 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React from "react";
-import { ActivityIndicator, Image, Platform, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  Platform,
+  TouchableOpacity,
+  View
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useSyncProgress from "../../hooks/use-sync-progress";
@@ -33,6 +39,7 @@ import { SIZE } from "../../utils/size";
 import { Pressable } from "../ui/pressable";
 import { TimeSince } from "../ui/time-since";
 import Paragraph from "../ui/typography/paragraph";
+import Navigation from "../../services/navigation";
 
 export const UserStatus = () => {
   const { colors } = useThemeColors();
@@ -53,7 +60,8 @@ export const UserStatus = () => {
         alignSelf: "center",
         paddingBottom: Platform.OS === "ios" ? insets.bottom / 2 : null,
         borderTopWidth: 1,
-        borderTopColor: colors.primary.border
+        borderTopColor: colors.primary.border,
+        backgroundColor: colors.primary.background
       }}
     >
       <View
@@ -64,13 +72,9 @@ export const UserStatus = () => {
         }}
       >
         <Pressable
-          onPress={async () => {
-            if (user) {
-              Sync.run();
-            } else {
-              tabBarRef.current?.closeDrawer();
-              eSendEvent(eOpenLoginDialog);
-            }
+          onPress={() => {
+            Navigation.navigate("Settings");
+            tabBarRef.current.closeDrawer();
           }}
           type="plain"
           style={{
@@ -78,7 +82,8 @@ export const UserStatus = () => {
             justifyContent: "flex-start",
             padding: 12,
             borderRadius: 0,
-            alignItems: "center"
+            alignItems: "center",
+            gap: 10
           }}
         >
           {userProfile?.profilePicture ? (
@@ -89,8 +94,7 @@ export const UserStatus = () => {
               style={{
                 width: 35,
                 height: 35,
-                borderRadius: 100,
-                marginRight: 10
+                borderRadius: 100
               }}
             />
           ) : null}
@@ -102,9 +106,7 @@ export const UserStatus = () => {
             }}
           >
             <Paragraph
-              style={{
-                flexWrap: "wrap"
-              }}
+              numberOfLines={1}
               size={SIZE.sm}
               color={colors.primary.heading}
             >
@@ -113,9 +115,7 @@ export const UserStatus = () => {
                 : lastSyncStatus === SyncStatus.Failed
                 ? "Sync failed, tap to retry"
                 : syncing
-                ? `Syncing your notes${
-                    progress ? ` (${progress.current})` : ""
-                  }`
+                ? `Syncing ${progress ? `(${progress.current})` : ""}`
                 : !userProfile?.fullName
                 ? "Tap to sync"
                 : userProfile.fullName}
@@ -162,25 +162,56 @@ export const UserStatus = () => {
             </Paragraph>
           </View>
 
-          {user ? (
-            syncing ? (
-              <ActivityIndicator color={colors.primary.accent} size={SIZE.xl} />
-            ) : lastSyncStatus === SyncStatus.Failed ? (
-              <Icon
-                color={colors.error.icon}
-                name="sync-alert"
-                size={SIZE.lg}
-                allowFontScaling
-              />
+          <Pressable
+            style={{
+              borderRadius: 100,
+              width: 40,
+              height: 40
+            }}
+            hitSlop={{
+              top: 10,
+              bottom: 10,
+              left: 20
+            }}
+            onPress={() => {
+              if (user) {
+                Sync.run();
+              } else {
+                tabBarRef.current?.closeDrawer();
+                eSendEvent(eOpenLoginDialog);
+              }
+            }}
+          >
+            {user ? (
+              syncing ? (
+                <ActivityIndicator
+                  color={colors.primary.accent}
+                  size={SIZE.xl}
+                />
+              ) : lastSyncStatus === SyncStatus.Failed ? (
+                <Icon
+                  color={colors.error.icon}
+                  name="sync-alert"
+                  size={SIZE.lg}
+                  allowFontScaling
+                />
+              ) : (
+                <Icon
+                  allowFontScaling
+                  color={colors.primary.accent}
+                  name="sync"
+                  size={SIZE.lg}
+                />
+              )
             ) : (
               <Icon
                 allowFontScaling
                 color={colors.primary.accent}
-                name="sync"
                 size={SIZE.lg}
+                name="login"
               />
-            )
-          ) : null}
+            )}
+          </Pressable>
         </Pressable>
       </View>
     </View>

@@ -165,9 +165,7 @@ const _TabsHolder = () => {
             _deviceMode === "smallTablet"
               ? dimensions.width -
                 valueLimiter(dimensions.width * 0.4, 300, 450)
-              : dimensions.width > 1100
-              ? dimensions.width * 0.55
-              : dimensions.width * 0.5,
+              : dimensions.width * 0.48,
           zIndex: null,
           paddingHorizontal: 0
         }
@@ -258,9 +256,7 @@ const _TabsHolder = () => {
           position: "relative",
           width:
             current === "tablet"
-              ? size.width > 1100
-                ? size.width * 0.55
-                : size.width * 0.5
+              ? size.width * 0.48
               : current === "smallTablet"
               ? size.width - valueLimiter(size.width * 0.4, 300, 450)
               : size.width,
@@ -372,15 +368,9 @@ const _TabsHolder = () => {
       editor: dimensions.width - valueLimiter(dimensions.width * 0.4, 300, 450)
     },
     tablet: {
-      sidebar:
-        dimensions.width > 1100
-          ? dimensions.width * 0.15
-          : dimensions.width * 0.2,
+      sidebar: dimensions.width * 0.22,
       list: dimensions.width * 0.3,
-      editor:
-        dimensions.width > 1100
-          ? dimensions.width * 0.55
-          : dimensions.width * 0.5
+      editor: dimensions.width * 0.48
     }
   };
 

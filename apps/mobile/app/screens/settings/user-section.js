@@ -104,7 +104,7 @@ const onChangePicture = () => {
 
 const SettingsUserSection = ({ item }) => {
   const { colors } = useThemeColors();
-  const user = useUserStore((state) => state.user);
+  const [user, premium] = useUserStore((state) => [state.user, state.premium]);
   const lastSynced = useUserStore((state) => state.lastSynced);
   const lastSyncStatus = useUserStore((state) => state.lastSyncStatus);
   const { isInternetReachable } = useNetInfo();
@@ -172,17 +172,20 @@ const SettingsUserSection = ({ item }) => {
                     alignItems: "center"
                   }}
                 >
-                  <Heading color={colors.primary.accent} size={SIZE.sm}>
-                    {SUBSCRIPTION_STATUS_STRINGS[
-                      user.subscription?.type
-                    ]?.toUpperCase() || "Basic"}
-                  </Heading>
+                  {premium ? (
+                    <Heading color={colors.primary.accent} size={SIZE.sm}>
+                      {SUBSCRIPTION_STATUS_STRINGS[
+                        user.subscription?.type
+                      ]?.toUpperCase() || "Basic"}
+                    </Heading>
+                  ) : null}
 
                   <Paragraph
                     onPress={() => {
                       presentDialog({
-                        title: "Set name",
-                        paragraph: "Set your full name",
+                        title: "Set your full name",
+                        paragraph:
+                          "Your name is end-to-end encrypted and only visible to you.",
                         positiveText: "Save",
                         input: true,
                         inputPlaceholder: "Enter your full name",

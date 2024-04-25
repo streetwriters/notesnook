@@ -456,7 +456,7 @@ export const settingsGroups: SettingSection[] = [
           },
           {
             id: "background-sync",
-            name: "Background sync (Experimental)",
+            name: "Background sync (experimental)",
             description:
               "Periodically wake up the app in background to sync your notes from other devices.",
             type: "switch",
