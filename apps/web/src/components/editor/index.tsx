@@ -297,14 +297,21 @@ function EditorView({
         }
         onContentChange={() => (lastChangedTime.current = Date.now())}
         onSave={(content, ignoreEdit) => {
+          const currentSession = useEditorStore
+            .getState()
+            .getSession(session.id, ["default", "readonly", "new"]);
+          if (!currentSession) return;
+
           const data = content();
-          if (!session.content) session.content = { type: "tiptap", data };
-          else session.content.data = data;
+          if (!currentSession.content)
+            currentSession.content = { type: "tiptap", data };
+          else currentSession.content.data = data;
+
           logger.debug("scheduling save", {
             id: session.id,
             length: data.length
           });
-          deferredSave(session.id, session.id, ignoreEdit, data);
+          deferredSave(currentSession.id, currentSession.id, ignoreEdit, data);
         }}
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
