@@ -139,7 +139,7 @@ export const NotebookSheet = () => {
         currentItem.current = nextRoot;
         const snapPoint = NotebookSheetConfig.get({
           type: "notebook",
-          id: nextRoot as string
+          id: focusedRouteId as string
         });
 
         if (ref.current?.isOpen()) {
