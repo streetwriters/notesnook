@@ -56,6 +56,7 @@ export function Login() {
         </Text>
       ) : (
         <Button
+          variant="accent"
           sx={{ px: 4, mt: 4, borderRadius: 100 }}
           onClick={async () =>
             await login(true).catch((e) => {

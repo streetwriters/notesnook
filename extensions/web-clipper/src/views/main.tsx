@@ -186,6 +186,7 @@ export function Main() {
             Permission is required to use the CORS proxy: {settings.corsProxy}
           </Text>
           <Button
+            variant="accent"
             onClick={async () => {
               if (!settings.corsProxy) return;
               setHasPermission(

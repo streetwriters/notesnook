@@ -91,7 +91,7 @@ export function Settings() {
           sx={{ p: 1, py: "7px", mt: 1 }}
         />
       </Label>
-      <Button type="submit" sx={{ mt: 2 }}>
+      <Button variant="accent" type="submit" sx={{ mt: 2 }}>
         Save
       </Button>
     </Flex>
