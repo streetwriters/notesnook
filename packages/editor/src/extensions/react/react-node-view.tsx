@@ -264,16 +264,10 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     const { view } = this.editor;
     const target = event.target as HTMLElement;
 
-    // get the drag handle element
-    // `closest` is not available for text nodes so we may have to use its parent
-    const dragHandle =
-      target.nodeType === 3
-        ? target.parentElement?.closest("[data-drag-handle]")
-        : target.closest("[data-drag-handle]");
+    const dragHandle = this.dom.querySelector("[data-drag-handle]");
+    const dragImage = this.dom.querySelector("[data-drag-image]") || this.dom;
 
     if (!this.dom || this.contentDOM?.contains(target) || !dragHandle) return;
-
-    const dragImage = this.dom.querySelector("[data-drag-image]") || this.dom;
 
     // workaround to prevent opening of keyboard on drag start
     if (isAndroid || isiOS) {
