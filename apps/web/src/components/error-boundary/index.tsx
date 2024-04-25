@@ -20,14 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { PropsWithChildren } from "react";
 import { ErrorText } from "../error-text";
 import { BaseThemeProvider } from "../theme-provider";
-import { Button, Flex, Image, Text } from "@theme-ui/components";
+import { Button, Flex, Text } from "@theme-ui/components";
 import {
   ErrorBoundary as RErrorBoundary,
   FallbackProps
 } from "react-error-boundary";
-import Logo from "../../assets/logo.svg";
-import LogoDark from "../../assets/logo-dark.svg";
-import { useStore as useThemeStore } from "../../stores/theme-store";
 import { createDialect } from "../../common/sqlite";
 
 export function ErrorBoundary(props: PropsWithChildren) {
@@ -40,7 +37,6 @@ export function ErrorBoundary(props: PropsWithChildren) {
 
 export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
   const help = getErrorHelp({ error, resetErrorBoundary });
-  const colorScheme = useThemeStore((store) => store.colorScheme);
 
   return (
     <BaseThemeProvider
@@ -67,11 +63,17 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
             flexDirection: "column"
           }}
         >
-          <Image
-            src={colorScheme === "dark" ? LogoDark : Logo}
-            sx={{ borderRadius: "default", width: 60, alignSelf: "start" }}
-            mb={4}
-          />
+          <svg
+            style={{
+              borderRadius: "default",
+              height: 60,
+              width: 40,
+              alignSelf: "start",
+              marginBottom: 20
+            }}
+          >
+            <use href="#full-logo" />
+          </svg>
           <Text
             variant="heading"
             sx={{ borderBottom: "1px solid var(--border)", pb: 1 }}

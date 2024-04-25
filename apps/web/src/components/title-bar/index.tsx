@@ -81,8 +81,8 @@ export function TitleBar() {
           className="titlebarLogo"
           style={{
             alignSelf: "center",
-            height: 24,
-            width: 24,
+            height: 16,
+            width: 12,
             marginRight: 10,
             marginLeft: 10
           }}

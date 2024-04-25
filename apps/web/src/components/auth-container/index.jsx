@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useMemo } from "react";
 import { Box, Flex, Image, Link, Text } from "@theme-ui/components";
-import Logo from "../../assets/logo.svg";
-import LogoDark from "../../assets/logo-dark.svg";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { getRandom } from "@notesnook/common";
 import Grberk from "../../assets/testimonials/grberk.jpeg";
@@ -154,11 +152,16 @@ function AuthContainer(props) {
             justifyContent: "end"
           }}
         >
-          <Image
-            src={colorScheme === "dark" ? LogoDark : Logo}
-            sx={{ borderRadius: "default", width: 70, alignSelf: "start" }}
-            mb={4}
-          />
+          <svg
+            style={{
+              height: 90,
+              width: 90,
+              alignSelf: "start",
+              marginBottom: 20
+            }}
+          >
+            <use href="#full-logo" />
+          </svg>
           <Text variant={"heading"} sx={{ fontSize: 48 }}>
             {title}
           </Text>
@@ -171,10 +174,10 @@ function AuthContainer(props) {
             {testimonial.text} —{" "}
             <Link
               sx={{ fontStyle: "italic", color: "paragraph-secondary" }}
-              href={testimonial.link}  
+              href={testimonial.link}
               target="_blank"
               rel="noopener noreferrer"
-              >
+            >
               source
             </Link>
           </Text>

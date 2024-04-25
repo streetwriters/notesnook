@@ -87,9 +87,9 @@ function RecoveryKeyDialog(props) {
               <QRCode
                 value={key}
                 logoImage={Logo}
-                logoWidth={25}
+                logoWidth={40}
+                logoHeight={40}
                 ecLevel={"M"}
-                logoHeight={25}
               />
             </Suspense>
 
