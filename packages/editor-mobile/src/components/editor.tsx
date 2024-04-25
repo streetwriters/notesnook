@@ -774,7 +774,7 @@ const TiptapProvider = (): JSX.Element => {
       return contentRef.current;
     }
     const editorContainer = document.createElement("div");
-    editorContainer.classList.add("selectable");
+    editorContainer.classList.add("selectable", "main-editor");
     editorContainer.style.flex = "1";
     editorContainer.style.cursor = "text";
     editorContainer.style.padding = "0px 12px";
