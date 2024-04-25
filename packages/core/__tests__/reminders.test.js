@@ -25,7 +25,7 @@ import {
   isReminderActive
 } from "../src/collections/reminders";
 import MockDate from "mockdate";
-import { describe, afterAll, beforeAll, test, expect } from "vitest";
+import { describe, afterAll, beforeEach, test, expect } from "vitest";
 import { databaseTest } from "./utils";
 import dayjs from "dayjs";
 import assert from "assert";
@@ -35,7 +35,7 @@ describe("format reminder time", () => {
     MockDate.reset();
   });
 
-  beforeAll(() => {
+  beforeEach(() => {
     MockDate.set(new Date(2022, 5, 6, 5, 5, 0, 0));
   });
 
@@ -134,6 +134,20 @@ describe("format reminder time", () => {
     expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
   });
 
+  test("weekly reminder [current week, tomorrow]", async () => {
+    MockDate.set(new Date(2024, 0, 9, 17, 0, 0, 0));
+    const reminder = {
+      recurringMode: "week",
+      date: new Date().setHours(7),
+      selectedDays: [1, 2, 3, 4],
+      mode: "repeat",
+      title: "Random reminder"
+    };
+
+    expect(await compareReminder(reminder)).toBe(true);
+    expect(formatReminderTime(reminder)).toBe("Upcoming: Tomorrow, 07:00 AM");
+  });
+
   test("monthly reminder [current month]", async () => {
     const reminder = {
       recurringMode: "month",
@@ -147,6 +161,20 @@ describe("format reminder time", () => {
     expect(formatReminderTime(reminder)).toBe(
       "Upcoming: Sun, 12-06-2022 08:00 AM"
     );
+  });
+
+  test("monthly reminder [current month, tomorrow]", async () => {
+    MockDate.set(new Date(2024, 0, 9, 17, 0, 0, 0));
+    const reminder = {
+      recurringMode: "month",
+      date: new Date().setHours(7),
+      selectedDays: [8, 9, 10, 11, 12],
+      mode: "repeat",
+      title: "Random reminder"
+    };
+
+    expect(await compareReminder(reminder)).toBe(true);
+    expect(formatReminderTime(reminder)).toBe("Upcoming: Tomorrow, 07:00 AM");
   });
 
   test("monthly reminder [next month]", async () => {

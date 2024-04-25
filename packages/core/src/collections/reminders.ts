@@ -220,18 +220,28 @@ export function getUpcomingReminderTime(reminder: Reminder) {
   const sorted = reminder.selectedDays.sort((a, b) => a - b);
   const lastSelectedDay = sorted[sorted.length - 1];
   if (isWeek) {
-    if (now.day() > lastSelectedDay || isPast)
+    if (
+      now.day() > lastSelectedDay ||
+      (now.day() === lastSelectedDay && isPast)
+    )
       return relativeTime.day(sorted[0]).add(1, "week").valueOf();
     else {
-      for (const day of reminder.selectedDays)
-        if (now.day() <= day) return relativeTime.day(day).valueOf();
+      for (const selectedDay of sorted) {
+        if (selectedDay > now.day() || (selectedDay === now.day() && !isPast))
+          return relativeTime.day(selectedDay).valueOf();
+      }
     }
   } else if (isMonth) {
-    if (now.date() > lastSelectedDay || isPast)
+    if (
+      now.date() > lastSelectedDay ||
+      (now.date() === lastSelectedDay && isPast)
+    )
       return relativeTime.date(sorted[0]).add(1, "month").valueOf();
     else {
-      for (const day of reminder.selectedDays)
-        if (now.date() <= day) return relativeTime.date(day).valueOf();
+      for (const selectedDay of sorted) {
+        if (selectedDay > now.date() || (now.date() === selectedDay && !isPast))
+          return relativeTime.date(selectedDay).valueOf();
+      }
     }
   }
 
@@ -256,39 +266,47 @@ export function isReminderActive(reminder: Reminder) {
   );
 }
 
-export function createUpcomingReminderTimeQuery(now = "now") {
+export function createUpcomingReminderTimeQuery(unix = "now") {
+  const time = sql`time(date / 1000, 'unixepoch', 'localtime')`;
+  const dateNow = sql`date(${unix})`;
+  const dateTime = sql`datetime(${dateNow} || ${time})`;
+  const dateTimeNow = sql`datetime(${unix})`;
+  const weekDayNow = sql`CAST(strftime('%w', ${dateNow}) AS INTEGER)`;
+  const monthDayNow = sql`CAST(strftime('%d', ${dateNow}) AS INTEGER)`;
+  const lastSelectedDay = sql`(SELECT MAX(value) FROM json_each(selectedDays))`;
+
   return sql`CASE 
         WHEN mode = 'once' THEN date / 1000
         WHEN recurringMode = 'year' THEN
             strftime('%s',
-                strftime('%Y-', date(${now})) || strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime'), 
-                IIF(datetime(strftime('%Y-', date(${now})) || strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime')) <= datetime(${now}), '+1 year', '+0 year'),
+                strftime('%Y-', ${dateNow}) || strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime'), 
+                IIF(datetime(strftime('%Y-', ${dateNow}) || strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime')) <= ${dateTimeNow}, '+1 year', '+0 year'),
                 'utc'
             )
         WHEN recurringMode = 'day' THEN
             strftime('%s',
-                date(${now}) || time(date / 1000, 'unixepoch', 'localtime'), 
-                IIF(datetime(date(${now}) || time(date / 1000, 'unixepoch', 'localtime')) <= datetime(${now}), '+1 day', '+0 day'),
+                ${dateNow} || ${time}, 
+                IIF(${dateTime} <= ${dateTimeNow}, '+1 day', '+0 day'),
                 'utc'
             )
         WHEN recurringMode = 'week' AND selectedDays IS NOT NULL AND json_array_length(selectedDays) > 0 THEN 
             CASE
-                WHEN CAST(strftime('%w', date(${now})) AS INTEGER) > (SELECT MAX(value) FROM json_each(selectedDays))
-                OR datetime(date(${now}) || time(date / 1000, 'unixepoch', 'localtime')) <= datetime(${now})
+                WHEN ${weekDayNow} > ${lastSelectedDay}
+                OR (${weekDayNow} == ${lastSelectedDay} AND ${dateTime} <= ${dateTimeNow})
                 THEN
-                    strftime('%s', datetime(date(${now}), time(date / 1000, 'unixepoch', 'localtime'), '+1 day', 'weekday ' || json_extract(selectedDays, '$[0]'), 'utc'))
+                    strftime('%s', datetime(${dateNow}, ${time}, '+1 day', 'weekday ' || json_extract(selectedDays, '$[0]'), 'utc'))
                 ELSE
-                    strftime('%s', datetime(date(${now}), time(date / 1000, 'unixepoch', 'localtime'), 'weekday ' || (SELECT value FROM json_each(selectedDays) WHERE CAST(strftime('%w', date(${now})) AS INTEGER) <= value), 'utc'))
+                    strftime('%s', datetime(${dateNow}, ${time}, 'weekday ' || (SELECT value FROM json_each(selectedDays) WHERE value > ${weekDayNow} OR (value == ${weekDayNow} AND ${dateTime} > ${dateTimeNow})), 'utc'))
             END
         WHEN recurringMode = 'month' AND selectedDays IS NOT NULL AND json_array_length(selectedDays) > 0 THEN
             CASE
-                WHEN CAST(strftime('%d', date(${now})) AS INTEGER) > (SELECT MAX(value) FROM json_each(selectedDays))
-                OR datetime(date(${now}) || time(date / 1000, 'unixepoch', 'localtime')) <= datetime(${now})
+                WHEN ${monthDayNow} > ${lastSelectedDay}
+                OR (${monthDayNow} == ${lastSelectedDay} AND datetime(${dateNow} || ${time}) <= ${dateTimeNow})
                 THEN
-                    strftime('%s', strftime('%Y-%m-', date(${now})) || printf('%02d', json_extract(selectedDays, '$[0]')) || time(date / 1000, 'unixepoch', 'localtime'), '+1 month', 'utc')
-                ELSE strftime('%s', strftime('%Y-%m-', date(${now})) || (SELECT printf('%02d', value) FROM json_each(selectedDays) WHERE value <= strftime('%d', date(${now}))) || time(date / 1000, 'unixepoch', 'localtime'), 'utc')
+                    strftime('%s', strftime('%Y-%m-', ${dateNow}) || printf('%02d', json_extract(selectedDays, '$[0]')) || ${time}, '+1 month', 'utc')
+                ELSE strftime('%s', strftime('%Y-%m-', ${dateNow}) || (SELECT printf('%02d', value) FROM json_each(selectedDays) WHERE value > ${monthDayNow} OR (value == ${monthDayNow} AND ${dateTime} > ${dateTimeNow})) || ${time}, 'utc')
             END
-        ELSE strftime('%s', date(${now}) || time(date / 1000, 'unixepoch', 'localtime'), 'utc')
+        ELSE strftime('%s', ${dateNow} || ${time}, 'utc')
     END * 1000
 `.$castTo<number>();
 }
