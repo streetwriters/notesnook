@@ -22,7 +22,7 @@ import {
   endBackgroundTask
 } from "react-native-begin-background-task";
 import BackgroundFetch from "@ammarahmed/react-native-background-fetch";
-import { DatabaseLogger, db } from "../common/database";
+import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { AppState, AppRegistry } from "react-native";
 import Notifications from "./notifications";
 import SettingsService from "./settings";
@@ -110,6 +110,7 @@ BackgroundFetch.registerHeadlessTask(task);
 async function onBackgroundSyncStarted() {
   try {
     if (!db.isInitialized) {
+      await setupDatabase();
       await db.init();
     }
     const user = await db.user?.getUser();
