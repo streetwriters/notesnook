@@ -168,7 +168,8 @@ export const defaultSettings: SettingStore["settings"] = {
   darkTheme: ThemeDark,
   markdownShortcuts: true,
   biometricsAuthEnabled: false,
-  appLockHasPasswordSecurity: false
+  appLockHasPasswordSecurity: false,
+  backgroundSync: true
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
