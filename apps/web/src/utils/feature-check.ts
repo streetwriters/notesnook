@@ -69,6 +69,11 @@ async function isIndexedDBSupported() {
 }
 
 async function isCryptoKeyClonable() {
+  if (IS_DESKTOP_APP) {
+    FEATURE_CHECKS.clonableCryptoKey = true;
+    return;
+  }
+
   const key = await window.crypto.subtle.generateKey(
     { name: "AES-KW", length: 256 },
     false,
