@@ -37,20 +37,21 @@
 		}
 
 
-		[contenteditable=true]:empty:before {
+		[contenteditable][placeholder]:empty:before {
 			content: attr(placeholder);
-			pointer-events: none;
-			display: block;
+			position: absolute;
 			color: gray;
+			background-color: transparent;
 		}
+
+		
+
 
 	</style>
 </head>
 
 <body>
-	<div aria-autocomplete="none" placeholder="Write something..." contenteditable="true" id="editor" class="editor double-spaced" >
-		
-	</div>
+	<div aria-autocomplete="none" placeholder="Write something..." contenteditable="true" id="editor" class="editor double-spaced" ></div>
 	<script>
 		function postMessage(type, value) {
 			if (window.ReactNativeWebView) {
@@ -99,6 +100,9 @@
 					case 'line-spacing': {
 						doubleSpacedLines = JSON.parse(value);
 					}
+					case 'focus':
+						document.getElementById('editor').focus();
+						break;
 					default:
 						break;
 				}
