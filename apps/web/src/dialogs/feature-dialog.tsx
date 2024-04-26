@@ -91,34 +91,29 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Sort reminders by due date",
-            subtitle:
-              "You can now sort your reminders by due date to quickly see which reminders are upcoming."
+            title: "Bi-directional note linking",
+            subtitle: "You can now link any 2 notes for easier referencing."
           },
           {
-            title: "Restore backups using encryption key",
+            title: "Tabs",
             subtitle:
-              "If you forget your password but still have your recovery key, you can now use that to restore your backups."
+              "Open multiple notes side by side for faster multi-tasking."
           },
           {
-            title: "Disable markdown in editor",
+            title: "Nested notebooks",
             subtitle:
-              "If you find automatic markdown shortcuts annoying, you can now turn those off from Settings > Editor > Disable markdown shortcuts."
+              "Create subnotebooks inside notebooks upto unlimited depth."
           },
           {
-            title: "Improved password reset",
+            title: "At rest encryption",
             subtitle:
-              "Resetting password should now be much more reliable and safer."
+              "All your data will now be stored encrypted on your device to keep you safe even if your device gets compromised."
           },
-          ...(IS_DESKTOP_APP
-            ? [
-                {
-                  title: "Proxy settings",
-                  subtitle:
-                    "Desktop app now support setting a custom proxy url to route all network through it. Useful if you are behind a firewall and would like to bypass it."
-                }
-              ]
-            : [])
+          {
+            title: "App lock",
+            subtitle:
+              "App lock is now here on desktop/web apps! Put a lock on the app, and keep it safe from intruders."
+          }
         ],
     cta: {
       title: "Got it",
