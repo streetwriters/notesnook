@@ -48,6 +48,7 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
+import { useUserStore } from "../../../stores/use-user-store";
 
 const RestoreDataSheet = () => {
   const [visible, setVisible] = useState(false);
@@ -246,7 +247,6 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
       await db.backup.import(backup, password, key);
     });
     await db.initCollections();
-    initialize();
     refreshAllStores();
     ToastManager.show({
       heading: "Backup restored successfully.",
@@ -384,9 +384,19 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         return;
       }
       try {
+        useUserStore.setState({
+          disableAppLockRequests: true
+        });
+        console.log("disabled...");
         const file = await DocumentPicker.pickSingle({
           copyTo: "cachesDirectory"
         });
+
+        setTimeout(() => {
+          useUserStore.setState({
+            disableAppLockRequests: false
+          });
+        }, 1000);
 
         if (file.name.endsWith(".nnbackupz")) {
           setRestoring(true);
@@ -399,6 +409,11 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         }
       } catch (e) {
         console.log("error", e.stack);
+        setTimeout(() => {
+          useUserStore.setState({
+            disableAppLockRequests: false
+          });
+        }, 1000);
         setRestoring(false);
         backupError(e);
       }
