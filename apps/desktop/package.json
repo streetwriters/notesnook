@@ -14,7 +14,7 @@
     "@notesnook/crypto": "file:../../packages/crypto",
     "@trpc/client": "10.38.3",
     "@trpc/server": "10.38.3",
-    "better-sqlite3-multiple-ciphers": "^9.4.0",
+    "better-sqlite3-multiple-ciphers": "^9.5.0",
     "electron-trpc": "0.5.2",
     "electron-updater": "6.1.4",
     "icojs": "^0.17.1",
@@ -27,12 +27,12 @@
     "@types/node": "18.16.1",
     "@types/yargs": "^17.0.24",
     "chokidar": "^3.5.3",
-    "electron": "^28.2.1",
-    "electron-builder": "^24.9.1",
+    "electron": "^29.3.1",
+    "electron-builder": "^24.13.3",
     "esbuild": "^0.20.0",
     "prebuildify": "^6.0.1",
     "tree-kill": "^1.2.2",
-    "undici": "^6.6.1"
+    "undici": "^6.14.1"
   },
   "optionalDependencies": {
     "dmg-license": "^1.0.11"
