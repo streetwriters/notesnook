@@ -58,7 +58,6 @@
     "copyright": "Copyright © 2023 Streetwriters (Private) Limited",
     "artifactName": "notesnook_${os}_${arch}.${ext}",
     "asar": false,
-    "generateUpdatesFilesForAllChannels": true,
     "files": [
       "!*.chunk.js.map",
       "!*.chunk.js.LICENSE.txt",
