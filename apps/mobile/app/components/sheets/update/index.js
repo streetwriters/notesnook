@@ -170,6 +170,7 @@ export const Update = ({ version: appVersion, fwdRef }) => {
                   lineHeight: 20,
                   marginTop: 10
                 }}
+                selectable
               >
                 {version.body}
               </Paragraph>
@@ -181,6 +182,7 @@ export const Update = ({ version: appVersion, fwdRef }) => {
                 style={{
                   marginBottom: 5
                 }}
+                selectable
               >
                 • {item}
               </Paragraph>
