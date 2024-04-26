@@ -40,8 +40,8 @@ if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   await exec(`cd ${webAppPath} && npm run build:desktop`);
 }
 
-// temporary until there's support for prebuilt binaries for windows ARM & linux ARM
-await patchBetterSQLite3();
+// temporary until there's support for prebuilt binaries for linux ARM
+if (os.platform() === "linux") await patchBetterSQLite3();
 
 if (os.platform() === "win32")
   await exec(
@@ -91,7 +91,7 @@ async function patchBetterSQLite3() {
   );
   const json = JSON.parse(await readFile(jsonPath, "utf-8"));
 
-  json.version = "9.4.1";
+  json.version = "9.5.1";
   json.homepage = "https://github.com/thecodrr/better-sqlite3-multiple-ciphers";
   json.repository.url =
     "git://github.com/thecodrr/better-sqlite3-multiple-ciphers.git";
