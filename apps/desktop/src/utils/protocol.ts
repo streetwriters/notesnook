@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { protocol } from "electron";
+import { net, protocol } from "electron";
 import { isDevelopment } from "./index";
 import { createReadStream } from "fs";
 import { extname, normalize } from "path";
@@ -62,26 +62,7 @@ function registerProtocol() {
         headers: { "Content-Type": extensionToMimeType[fileExtension] }
       });
     } else {
-      if (request.headers.has("X-Content-Length")) {
-        request.headers.set(
-          "Content-Length",
-          request.headers.get("X-Content-Length") || "0"
-        );
-        request.headers.delete("X-Content-Length");
-      }
-      const headers = Object.fromEntries(request.headers.entries());
-
-      return await fetch(request.url, {
-        signal: request.signal,
-        mode: request.mode,
-        headers,
-        method: request.method,
-        body: request.body,
-        credentials: request.credentials,
-        referrer: (request as any).referrer,
-        duplex: "half",
-        redirect: "manual"
-      });
+      return net.fetch(request, { bypassCustomProtocolHandlers: true });
     }
   });
   console.info(`${SCHEME} protocol inteception "successful"`);
