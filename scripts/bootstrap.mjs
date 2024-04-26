@@ -154,7 +154,7 @@ async function bootstrapPackage(cwd, outputs) {
 
   for (const cmd of postInstallCommands) {
     let retries = 3;
-    while (retries > 0) {
+    while (--retries > 0) {
       try {
         await execute(cmd, cwd, outputs);
         break;
