@@ -153,7 +153,15 @@ async function bootstrapPackage(cwd, outputs) {
     postInstallCommands.push(`npm run postinstall `);
 
   for (const cmd of postInstallCommands) {
-    await execute(cmd, cwd, outputs);
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        await execute(cmd, cwd, outputs);
+        break;
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
 }
 
