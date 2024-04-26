@@ -21,6 +21,7 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 import { useEditorStore } from "./editor-store";
+import { useStore as useNoteStore } from "./note-store";
 import { checkAttachment } from "../common/attachments";
 import { showToast } from "../utils/toast";
 import { AttachmentStream } from "../utils/streams/attachment-stream";
@@ -122,19 +123,12 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
         await db.relations
           .to({ id: attachment.id, type: "attachment" }, "note")
           .get()
-      ).map((l) => l.toId);
+      ).map((l) => l.fromId);
+
       if (await db.attachments.remove(attachment.hash, false)) {
         await this.get().refresh();
-
-        const { sessions, openSession } = useEditorStore.getState();
-        for (const session of sessions) {
-          if (
-            linkedNotes.includes(session.id) ||
-            ("note" in session && linkedNotes.includes(session.note.id))
-          )
-            continue;
-          await openSession(session.id, { force: true, silent: true });
-        }
+        await useNoteStore.getState().refresh();
+        useEditorStore.getState().closeSessions(...linkedNotes);
       }
     } catch (e) {
       console.error(e);
