@@ -7,7 +7,7 @@ runs:
     - name: Setup Node
       uses: actions/setup-node@v4
       with:
-        node-version: 20.2.0
+        node-version: 18.x
         cache: "npm"
         cache-dependency-path: |
           package-lock.json
