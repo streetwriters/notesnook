@@ -260,6 +260,7 @@ async function uploadFile(
 
     return uploaded;
   } catch (e) {
+    console.error(e);
     reportProgress(undefined, { type: "upload", hash: filename });
     const error = toS3Error(e);
     if (
@@ -301,9 +302,7 @@ async function singlePartUploadFile(
     headers: {
       "Content-Type": ""
     },
-    data: IS_DESKTOP_APP
-      ? await (await fileHandle.toBlob()).arrayBuffer()
-      : await fileHandle.toBlob(),
+    data: await fileHandle.toBlob(),
     signal,
     onUploadProgress: (ev) =>
       reportProgress(
@@ -376,14 +375,13 @@ async function multiPartUploadFile(
       UPLOAD_PART_REQUIRED_CHUNKS
     );
     const url = parts[i];
-    const data = await blob.arrayBuffer();
     const response = await axios
       .request({
         url,
         method: "PUT",
-        headers: { "Content-Type": "", "X-Content-Length": data.byteLength },
+        headers: { "Content-Type": "" },
         signal,
-        data,
+        data: blob,
         onUploadProgress
       })
       .catch((e) => {
@@ -603,10 +601,13 @@ export async function saveFile(filename: string, fileMetadata: FileMetadata) {
 
 async function deleteFile(
   filename: string,
-  requestOptions: RequestOptionsWithSignal
+  requestOptions?: RequestOptionsWithSignal
 ) {
-  if (!requestOptions) return await streamablefs.deleteFile(filename);
-  if (!requestOptions && !(await streamablefs.exists(filename))) return true;
+  if (!requestOptions)
+    return (
+      !(await streamablefs.exists(filename)) ||
+      (await streamablefs.deleteFile(filename))
+    );
 
   try {
     const { url, headers } = requestOptions;
