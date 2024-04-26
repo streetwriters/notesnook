@@ -732,22 +732,23 @@ class EditorStore extends BaseStore<EditorStore> {
         });
       }
 
-      const defaultNotebook = db.settings.getDefaultNotebook();
-      if (currentSession.type === "new" && currentSession.context) {
-        const { type } = currentSession.context;
-        if (type === "notebook")
-          await db.notes.addToNotebook(currentSession.context.id, id);
-        else if (type === "color" || type === "tag")
-          await db.relations.add(
-            { type, id: currentSession.context.id },
-            { id, type: "note" }
-          );
-      } else if (!id && defaultNotebook) {
-        await db.notes.addToNotebook(defaultNotebook, id);
-      }
-
       const note = await db.notes.note(id);
       if (!note) throw new Error("Note not saved.");
+
+      if (currentSession.type === "new") {
+        if (currentSession.context) {
+          const { type } = currentSession.context;
+          if (type === "notebook")
+            await db.notes.addToNotebook(currentSession.context.id, id);
+          else if (type === "color" || type === "tag")
+            await db.relations.add(
+              { type, id: currentSession.context.id },
+              { id, type: "note" }
+            );
+        }
+        const defaultNotebook = db.settings.getDefaultNotebook();
+        if (defaultNotebook) await db.notes.addToNotebook(defaultNotebook, id);
+      }
 
       const attachmentsLength = await db.attachments.ofNote(id, "all").count();
       const shouldRefreshNotes =
