@@ -254,8 +254,8 @@ jobs:
         with:
           dotnet-version: 6.0.x
 
-      - name: Install AzureCodeSigning
-        run: Install-Module -Name AzureCodeSigning -RequiredVersion 0.3.4 -Force -Repository PSGallery
+      - name: Install TrustedSigning
+        run: Install-Module -Name TrustedSigning -RequiredVersion 0.3.15 -Force -Repository PSGallery
         shell: pwsh
 
       - name: Setup Node
