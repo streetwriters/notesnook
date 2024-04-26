@@ -71,7 +71,7 @@ export default class FileHandle {
 
   async readChunks(from: number, length: number): Promise<Blob> {
     const blobParts: BlobPart[] = [];
-    for (let i = from; i < from + length; ++i) {
+    for (let i = from; i < Math.min(from + length, this.file.chunks); ++i) {
       const array = await this.readChunk(i);
       if (!array) continue;
       blobParts.push(array.buffer);
