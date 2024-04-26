@@ -33,6 +33,7 @@ import {
   FileWebClip,
   Icon,
   Loading,
+  References,
   Rename,
   Reupload,
   Uploading
@@ -238,22 +239,40 @@ const AttachmentMenuItems: (
   return [
     {
       key: "notes",
-      type: "lazy-loader",
-      async items() {
-        const menuItems: MenuItem[] = [];
-        for await (const note of db.relations.from(attachment, "note")
-          .selector) {
-          menuItems.push({
-            type: "button",
-            key: note.id,
-            title: note.title,
-            onClick: () => {
-              useEditorStore.getState().openSession(note);
-              closeOpenedDialog();
+      type: "button",
+      title: "Linked notes",
+      icon: References.path,
+      menu: {
+        items: [
+          {
+            type: "lazy-loader",
+            key: "linked-notes",
+            async items() {
+              const menuItems: MenuItem[] = [];
+              for (const note of await db.relations
+                .to(attachment, "note")
+                .selector.fields(["notes.id", "notes.title"])
+                .items()) {
+                menuItems.push({
+                  type: "button",
+                  key: note.id,
+                  title: note.title,
+                  onClick: () => {
+                    useEditorStore.getState().openSession(note.id);
+                    closeOpenedDialog();
+                  }
+                });
+              }
+              if (menuItems.length <= 0)
+                menuItems.push({
+                  type: "button",
+                  key: "no-linked-note",
+                  title: "No linked note"
+                });
+              return menuItems;
             }
-          });
-        }
-        return menuItems;
+          }
+        ]
       }
     },
     {
