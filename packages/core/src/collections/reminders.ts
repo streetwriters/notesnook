@@ -275,12 +275,13 @@ export function createUpcomingReminderTimeQuery(unix = "now") {
   const monthDayNow = sql`CAST(strftime('%d', ${dateNow}) AS INTEGER)`;
   const lastSelectedDay = sql`(SELECT MAX(value) FROM json_each(selectedDays))`;
 
+  const monthDate = sql`strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime')`;
   return sql`CASE 
         WHEN mode = 'once' THEN date / 1000
         WHEN recurringMode = 'year' THEN
             strftime('%s',
-                strftime('%Y-', ${dateNow}) || strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime'), 
-                IIF(datetime(strftime('%Y-', ${dateNow}) || strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime')) <= ${dateTimeNow}, '+1 year', '+0 year'),
+                strftime('%Y-', ${dateNow}) || ${monthDate},
+                IIF(datetime(strftime('%Y-', ${dateNow}) || ${monthDate}) <= ${dateTimeNow}, '+1 year', '+0 year'),
                 'utc'
             )
         WHEN recurringMode = 'day' THEN
