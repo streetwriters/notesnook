@@ -35,7 +35,10 @@ test("focus mode", async ({ page }) => {
   ).toMatchSnapshot("focus-mode.jpg", { maxDiffPixelRatio: 0.01 });
 });
 
-test("full screen in focus mode", async ({ page }) => {
+test("full screen in focus mode", async ({ page, headless }) => {
+  // fullscreen doesn't work in headless mode
+  if (headless) return;
+
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
