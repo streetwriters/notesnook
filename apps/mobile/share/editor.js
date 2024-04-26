@@ -25,7 +25,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import { Linking, Platform, View } from "react-native";
+import { Linking, Platform, TextInput, View } from "react-native";
 import { WebView } from "react-native-webview";
 import Commands from "../app/screens/editor/tiptap/commands";
 import {
@@ -141,14 +141,32 @@ const style = {
   backgroundColor: "transparent"
 };
 
-export const Editor = ({ onChange, onLoad }) => {
+export const Editor = ({ onChange, onLoad, editorRef }) => {
   const { colors } = useThemeColors();
   const editor = useEditor();
+  const inputRef = useRef();
   const onMessage = useEditorEvents(editor, onChange);
   const [loading, setLoading] = useState(true);
   useLayoutEffect(() => {
     onLoad?.();
   }, [onLoad]);
+
+  if (editorRef) {
+    editorRef.current = {
+      focus: () => {
+        setTimeout(() => {
+          inputRef.current?.focus();
+          editor.ref.current?.injectJavaScript(`(() => {
+            const editor = document.getElementById('editor');
+            if (editor) {
+              editor.focus();
+            }
+          })();`);
+          editor.ref?.current?.requestFocus();
+        });
+      }
+    };
+  }
 
   return (
     <View
@@ -156,6 +174,15 @@ export const Editor = ({ onChange, onLoad }) => {
         flex: 1
       }}
     >
+      <TextInput
+        ref={inputRef}
+        style={{
+          width: 1,
+          height: 1,
+          position: "absolute",
+          zIndex: -1
+        }}
+      />
       <WebView
         ref={editor.ref}
         onLoad={() => {

@@ -140,6 +140,17 @@
 
         <service android:name="com.streetwriters.notesnook.BootTaskService" />
 
+        <service
+            android:name=".NotesnookTileService"
+            android:icon="@drawable/add_note"
+            android:label="New note"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+            </intent-filter>
+        </service>
+
         <provider
         android:name="androidx.core.content.FileProvider"
         android:authorities="${applicationId}.provider"
@@ -166,6 +177,8 @@
                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
            </intent-filter>
       </receiver>
+
+
         
 
     </application>
