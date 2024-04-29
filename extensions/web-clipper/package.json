@@ -62,7 +62,6 @@
     "babel-preset-react-app": "^10.0.1",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^7.0.0",
-    "cross-env": "^7.0.3",
     "css-loader": "^6.6.0",
     "eslint": "^8.8.0",
     "eslint-config-react-app": "^7.0.0",

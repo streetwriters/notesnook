@@ -109,7 +109,6 @@
     "better-sqlite3-multiple-ciphers": "^9.4.0",
     "buffer": "^6.0.3",
     "chalk": "^4.1.0",
-    "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "file-loader": "^6.2.0",
     "find-process": "^1.4.4",

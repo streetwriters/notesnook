@@ -41,6 +41,7 @@
     "@types/node": "^18.7.13",
     "@typescript-eslint/eslint-plugin": "^5.59.9",
     "@typescript-eslint/parser": "^5.59.9",
+    "cross-env": "^7.0.3",
     "eslint": "^8.42.0",
     "eslint-config-react-app": "^7.0.1",
     "eslint-config-react-hooks": "^1.0.0",
@@ -61,12 +62,12 @@
     "listr": "^0.14.3",
     "nx": "^17.3.1",
     "patch-package": "^7.0.0",
-    "typescript": "^5.4.2",
     "rxjs": "^7.8.1",
+    "typescript": "^5.4.2",
     "yargs-parser": "^21.1.1"
   },
   "license": "GPL-3.0-or-later",
   "volta": {
-    "node": "20.11.0"
+    "node": "20.12.0"
   }
 }
