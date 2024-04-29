@@ -252,7 +252,7 @@ async function run(progress = false, context) {
   } catch (e) {
     ToastManager.error(e, "Backup failed", context || "global");
 
-    if (e.message.includes("android.net.Uri") && androidBackupDirectory) {
+    if (e?.message?.includes("android.net.Uri") && androidBackupDirectory) {
       SettingsService.setProperty("backupDirectoryAndroid", null);
       return run(progress, context);
     }
