@@ -460,7 +460,7 @@ function BackupData(props: BaseRecoveryComponentProps<"backup">) {
           "Please wait while we create a backup file for you to download."
       }}
       onSubmit={async () => {
-        await createBackup();
+        await createBackup(true);
         navigate("new");
       }}
     >
