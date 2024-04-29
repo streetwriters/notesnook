@@ -106,7 +106,7 @@ function NavigationItem(
       <Button
         data-test-id={`navigation-item`}
         sx={{
-          px: 2,
+          px: isTablet ? 1 : 2,
           flex: 1,
           alignItems: "center",
           justifyContent: isTablet ? "center" : "flex-start",
@@ -124,7 +124,10 @@ function NavigationItem(
         }}
       >
         {image ? (
-          <Image src={image} sx={{ borderRadius: 50, size: 20 }} />
+          <Image
+            src={image}
+            sx={{ borderRadius: 50, size: 20, minWidth: 20, flexShrink: 0 }}
+          />
         ) : Icon ? (
           <Icon
             size={isTablet ? 16 : 15}
