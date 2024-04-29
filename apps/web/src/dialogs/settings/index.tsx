@@ -508,6 +508,7 @@ function SettingItem(props: { item: Setting }) {
                     type={"number"}
                     min={component.min}
                     max={component.max}
+                    step={component.step}
                     defaultValue={component.defaultValue()}
                     sx={{ width: 80, mr: 1 }}
                     onChange={debounce((e) => {
