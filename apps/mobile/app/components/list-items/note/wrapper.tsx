@@ -28,13 +28,12 @@ import {
   hideSheet,
   presentSheet
 } from "../../../services/event-manager";
-import { useSelectionStore } from "../../../stores/use-selection-store";
 import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 
 import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
 import NotePreview from "../../note-history/preview";
-import SelectionWrapper from "../selection-wrapper";
+import SelectionWrapper, { selectItem } from "../selection-wrapper";
 
 export const openNote = async (
   item: Note,
@@ -47,21 +46,8 @@ export const openNote = async (
   if (!isTrash) {
     note = (await db.notes.note(item.id)) as Note;
   }
-  if (useSelectionStore.getState().selectionMode === item.type) {
-    const {
-      selectedItemsList,
-      selectionMode,
-      clearSelection,
-      setSelectedItem
-    } = useSelectionStore.getState();
 
-    if (selectedItemsList.length > 0 && selectionMode === item.type) {
-      setSelectedItem(note.id);
-    } else {
-      clearSelection();
-    }
-    return;
-  }
+  if (selectItem(item)) return;
 
   if (note.conflicted) {
     eSendEvent(eShowMergeDialog, note);

@@ -26,6 +26,23 @@ import { Filler } from "./back-fill";
 import { SelectionIcon } from "./selection";
 import { Item, TrashItem } from "@notesnook/core";
 
+export function selectItem(item: Item) {
+  if (useSelectionStore.getState().selectionMode === item.type) {
+    const { selectionMode, clearSelection, setSelectedItem } =
+      useSelectionStore.getState();
+
+    if (selectionMode === item.type) {
+      setSelectedItem(item.id);
+    }
+
+    if (useSelectionStore.getState().selectedItemsList.length === 0) {
+      clearSelection();
+    }
+    return true;
+  }
+  return false;
+}
+
 type SelectionWrapperProps = PropsWithChildren<{
   item: Item;
   onPress: () => void;

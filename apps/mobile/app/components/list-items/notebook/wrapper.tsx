@@ -27,18 +27,12 @@ import Navigation from "../../../services/navigation";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useTrashStore } from "../../../stores/use-trash-store";
 import { presentDialog } from "../../dialog/functions";
-import SelectionWrapper from "../selection-wrapper";
+import SelectionWrapper, { selectItem } from "../selection-wrapper";
 
 export const openNotebook = (item: Notebook | BaseTrashItem<Notebook>) => {
   const isTrash = item.type === "trash";
-  const { selectedItemsList, setSelectedItem, selectionMode, clearSelection } =
-    useSelectionStore.getState();
-  if (selectedItemsList.length > 0 && selectionMode === item.type) {
-    setSelectedItem(item.id);
-    return;
-  } else {
-    clearSelection();
-  }
+
+  if (selectItem(item)) return;
 
   if (isTrash) {
     presentDialog({

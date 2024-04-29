@@ -23,13 +23,12 @@ import React from "react";
 import { View } from "react-native";
 import { notesnook } from "../../../../e2e/test.ids";
 import { TaggedNotes } from "../../../screens/notes/tagged";
-import { useSelectionStore } from "../../../stores/use-selection-store";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import SelectionWrapper from "../selection-wrapper";
+import SelectionWrapper, { selectItem } from "../selection-wrapper";
 
 const TagItem = React.memo(
   ({
@@ -43,18 +42,7 @@ const TagItem = React.memo(
   }) => {
     const { colors } = useThemeColors();
     const onPress = () => {
-      const {
-        selectedItemsList,
-        setSelectedItem,
-        selectionMode,
-        clearSelection
-      } = useSelectionStore.getState();
-      if (selectedItemsList.length > 0 && selectionMode === item.type) {
-        setSelectedItem(item.id);
-        return;
-      } else {
-        clearSelection();
-      }
+      if (selectItem(item)) return;
 
       TaggedNotes.navigate(item, true);
     };
