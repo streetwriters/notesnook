@@ -142,8 +142,13 @@ function DesktopAppContents({
   }, [show]);
 
   useEffect(() => {
-    if (isFocusMode) navPane.current?.collapse();
-    else navPane.current?.expand();
+    if (isFocusMode) {
+      const middlePaneSize = middlePane.current?.getSize() || 20;
+      navPane.current?.collapse();
+      // the middle pane has to be resized because collapsing the nav
+      // pane increases the middle pane's size every time.
+      middlePane.current?.resize(middlePaneSize);
+    } else navPane.current?.expand();
   }, [isFocusMode]);
 
   return (
@@ -192,7 +197,7 @@ function DesktopAppContents({
             </ScopedThemeProvider>
           </Panel>
           <PanelResizeHandle className="panel-resize-handle" />
-          <Panel className="editor-pane">
+          <Panel className="editor-pane" defaultSize={70}>
             <Flex
               sx={{
                 display: "flex",
