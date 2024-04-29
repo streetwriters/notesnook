@@ -56,6 +56,7 @@ function Toggle(props: ToggleProps) {
       <Switch
         sx={{ m: 0, bg: isOn ? "accent" : "icon-secondary" }}
         checked={isOn}
+        onClick={(e) => e.stopPropagation()}
       />
     </Flex>
   );
