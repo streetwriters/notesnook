@@ -40,6 +40,7 @@ import { Pressable } from "../ui/pressable";
 import { TimeSince } from "../ui/time-since";
 import Paragraph from "../ui/typography/paragraph";
 import Navigation from "../../services/navigation";
+import { IconButton } from "../ui/icon-button";
 
 export const UserStatus = () => {
   const { colors } = useThemeColors();
@@ -110,15 +111,15 @@ export const UserStatus = () => {
               size={SIZE.sm}
               color={colors.primary.heading}
             >
-              {!user
-                ? "Login to sync your notes."
-                : lastSyncStatus === SyncStatus.Failed
-                ? "Sync failed, tap to retry"
-                : syncing
-                ? `Syncing ${progress ? `(${progress.current})` : ""}`
-                : !userProfile?.fullName
-                ? "Tap to sync"
-                : userProfile.fullName}
+              {!user || !userProfile?.fullName
+                ? "Settings"
+                : userProfile.fullName}{" "}
+              <Icon
+                allowFontScaling
+                color={colors.primary.icon}
+                size={SIZE.md}
+                name="cog-outline"
+              />
             </Paragraph>
 
             <Paragraph
@@ -132,16 +133,20 @@ export const UserStatus = () => {
                 "Not logged in"
               ) : lastSynced && lastSynced !== "Never" ? (
                 <>
-                  {lastSyncStatus === SyncStatus.Failed
+                  {syncing
+                    ? `Syncing ${progress ? `(${progress.current})` : ""}`
+                    : lastSyncStatus === SyncStatus.Failed
                     ? "Sync failed"
                     : "Synced"}{" "}
-                  <TimeSince
-                    style={{
-                      fontSize: SIZE.xs,
-                      color: colors.secondary.paragraph
-                    }}
-                    time={lastSynced}
-                  />
+                  {!syncing ? (
+                    <TimeSince
+                      style={{
+                        fontSize: SIZE.xs,
+                        color: colors.secondary.paragraph
+                      }}
+                      time={lastSynced}
+                    />
+                  ) : null}
                   {isOffline ? " (offline)" : ""}
                 </>
               ) : (
@@ -149,7 +154,7 @@ export const UserStatus = () => {
               )}{" "}
               <Icon
                 name="checkbox-blank-circle"
-                size={11}
+                size={9}
                 allowFontScaling
                 color={
                   !user || lastSyncStatus === SyncStatus.Failed
@@ -198,7 +203,7 @@ export const UserStatus = () => {
               ) : (
                 <Icon
                   allowFontScaling
-                  color={colors.primary.accent}
+                  color={colors.primary.icon}
                   name="sync"
                   size={SIZE.lg}
                 />
