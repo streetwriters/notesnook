@@ -57,6 +57,7 @@
     "productName": "Notesnook",
     "copyright": "Copyright © 2023 Streetwriters (Private) Limited",
     "artifactName": "notesnook_${os}_${arch}.${ext}",
+    "generateUpdatesFilesForAllChannels": true,
     "asar": false,
     "files": [
       "!*.chunk.js.map",
@@ -134,15 +135,13 @@
         {
           "target": "nsis",
           "arch": [
-            "x64",
-            "arm64"
+            "x64"
           ]
         },
         {
           "target": "portable",
           "arch": [
-            "x64",
-            "arm64"
+            "x64"
           ]
         }
       ],
@@ -220,8 +219,7 @@
       {
         "provider": "github",
         "repo": "notesnook",
-        "owner": "streetwriters",
-        "channel": "beta"
+        "owner": "streetwriters"
       }
     ]
   }
