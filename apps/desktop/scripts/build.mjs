@@ -37,7 +37,10 @@ const webAppPath = path.resolve(path.join(__dirname, "..", "..", "web"));
 await fs.rm("./build/", { force: true, recursive: true });
 
 if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
-  await exec(`cd ${webAppPath} && npm run build:desktop`);
+  await exec(
+    "npx nx build:desktop @notesnook/web",
+    path.join(__dirname, "..", "..", "..")
+  );
 }
 
 // temporary until there's support for prebuilt binaries for linux ARM
