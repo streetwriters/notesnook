@@ -66,8 +66,8 @@ export function scrollIntoViewById(blockId: string) {
       () =>
         element.scrollIntoView({
           behavior: "smooth",
-          block: "center",
-          inline: "nearest"
+          block: "start",
+          inline: "start"
         }),
       100
     );
