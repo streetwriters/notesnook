@@ -51,7 +51,11 @@ import { EditorProps, useEditorType } from "./tiptap/types";
 import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { syncTabs, useTabStore } from "./tiptap/use-tab-store";
-import { editorController, editorState } from "./tiptap/utils";
+import {
+  editorController,
+  editorState,
+  openInternalLink
+} from "./tiptap/utils";
 
 const style: ViewStyle = {
   height: "100%",
@@ -61,7 +65,10 @@ const style: ViewStyle = {
   backgroundColor: "transparent"
 };
 const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
-  if (request.url.includes("https")) {
+  if (request.url.includes("nn://")) {
+    openInternalLink(request.url);
+    return false;
+  } else if (request.url.includes("https")) {
     if (Platform.OS === "ios" && !request.isTopFrame) return true;
     openLinkInBrowser(request.url);
     return false;
