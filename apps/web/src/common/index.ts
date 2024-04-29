@@ -85,7 +85,7 @@ export async function createBackup(rescueMode = false) {
   const verified = rescueMode || encryptBackups || (await verifyAccount());
   if (!verified) {
     showToast("error", "Could not create a backup: user verification failed.");
-    return;
+    return false;
   }
 
   const encryptedBackups = !rescueMode && isLoggedIn && encryptBackups;
@@ -139,7 +139,9 @@ export async function createBackup(rescueMode = false) {
     console.error(error);
   } else {
     showToast("success", `Backup saved at ${filePath}.`);
+    return true;
   }
+  return false;
 }
 
 export async function selectBackupFile() {
