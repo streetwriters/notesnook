@@ -65,6 +65,7 @@ import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnEnterEditor,
+  eOnExitEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
   eUnlockNote
@@ -511,6 +512,7 @@ const onChangeTab = async (event) => {
     editorState().movedAway = false;
     editorState().isFocused = true;
     activateKeepAwake();
+    eSendEvent(eOnEnterEditor);
 
     if (!useTabStore.getState().getCurrentNoteId()) {
       eSendEvent(eOnLoadNote, {
@@ -522,14 +524,13 @@ const onChangeTab = async (event) => {
       ) {
         eSendEvent(eUnlockNote);
       }
-      eSendEvent(eOnEnterEditor);
     }
   } else {
     if (event.from === 2) {
       deactivateKeepAwake();
       editorState().movedAway = true;
       editorState().isFocused = false;
-      eSendEvent(eClearEditor, "removeHandler");
+      eSendEvent(eOnExitEditor);
 
       // Lock all tabs with locked notes...
       for (const tab of useTabStore.getState().tabs) {

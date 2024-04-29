@@ -27,7 +27,6 @@ import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,
-  InteractionManager,
   Keyboard,
   KeyboardEventListener,
   NativeEventSubscription,
@@ -37,6 +36,7 @@ import { WebViewMessageEvent } from "react-native-webview";
 import { DatabaseLogger, db } from "../../../common/database";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
 import EditorTabs from "../../../components/sheets/editor-tabs";
+import { Issue } from "../../../components/sheets/github/issue";
 import LinkNote from "../../../components/sheets/link-note";
 import ManageTagsSheet from "../../../components/sheets/manage-tags";
 import { RelationsList } from "../../../components/sheets/relations-list";
@@ -61,6 +61,7 @@ import {
   eCloseFullscreenEditor,
   eEditorTabFocused,
   eOnEnterEditor,
+  eOnExitEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
   eOpenLoginDialog,
@@ -76,7 +77,6 @@ import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { EditorEvents, editorState } from "./utils";
-import { Issue } from "../../../components/sheets/github/issue";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -270,21 +270,20 @@ export const useEditorEvents = (
   }, [editor, deviceMode, fullscreen]);
 
   const onHardwareBackPress = useCallback(() => {
-    if (tabBarRef.current?.page === 2) {
+    console.log(tabBarRef.current?.page());
+    if (tabBarRef.current?.page() === 2) {
       onBackPress();
       return true;
     }
   }, [onBackPress]);
 
   const onEnterEditor = useCallback(async () => {
-    InteractionManager.runAfterInteractions(() => {
-      if (!DDS.isTab) {
-        handleBack.current = BackHandler.addEventListener(
-          "hardwareBackPress",
-          onHardwareBackPress
-        );
-      }
-    });
+    if (!DDS.isTab) {
+      handleBack.current = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onHardwareBackPress
+      );
+    }
   }, [onHardwareBackPress]);
 
   const onClearEditorSessionRequest = useCallback(
@@ -331,7 +330,14 @@ export const useEditorEvents = (
   }, [fullscreen, onHardwareBackPress]);
 
   useEffect(() => {
+    const onExitEditor = () => {
+      if (handleBack.current) {
+        handleBack.current.remove();
+      }
+    };
+
     eSubscribeEvent(eOnEnterEditor, onEnterEditor);
+    eSubscribeEvent(eOnExitEditor, onExitEditor);
     eSubscribeEvent(
       eClearEditor + editor.editorId,
       onClearEditorSessionRequest
@@ -339,6 +345,7 @@ export const useEditorEvents = (
     return () => {
       eUnSubscribeEvent(eClearEditor, onClearEditorSessionRequest);
       eUnSubscribeEvent(eOnEnterEditor, onEnterEditor);
+      eUnSubscribeEvent(eOnExitEditor, onExitEditor);
     };
   }, [editor.editorId, onClearEditorSessionRequest, onEnterEditor]);
 
@@ -662,10 +669,8 @@ export const useEditorEvents = (
               .updateTab(useTabStore.getState().currentTab, {
                 readonly: false
               });
-            Navigation.queueRoutesForUpdate();
-            ToastManager.show({
-              heading: "Readonly mode disabled.",
-              type: "success"
+            setTimeout(() => {
+              Navigation.queueRoutesForUpdate();
             });
           }
           break;

@@ -837,7 +837,7 @@ export const useEditor = (
     if (!noteId) {
       overlay(false);
       loadNote({ newNote: true });
-      if (tabBarRef.current?.page === 1) {
+      if (tabBarRef.current?.page() === 1) {
         state.current.currentlyEditing = false;
       }
     }
