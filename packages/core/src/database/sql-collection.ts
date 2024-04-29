@@ -44,7 +44,6 @@ import {
   Kysely,
   SelectQueryBuilder,
   SqlBool,
-  Transaction,
   sql
 } from "kysely";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
@@ -338,8 +337,10 @@ export class SQLCollection<
 }
 
 export class FilteredSelector<T extends Item> {
-  private _fields: AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>[] =
-    [];
+  private _fields: (
+    | AnyColumn<DatabaseSchema, keyof DatabaseSchema>
+    | AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>
+  )[] = [];
   filter: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, unknown>;
   private _limit = 0;
   constructor(
@@ -524,6 +525,11 @@ export class FilteredSelector<T extends Item> {
 
   async *[Symbol.asyncIterator]() {
     let lastRow: any | null = null;
+    const fields = this._fields.slice();
+    if (!fields.find((f) => f.includes(".dateCreated")))
+      fields.push("dateCreated");
+    if (!fields.find((f) => f.includes(".id"))) fields.push("id");
+
     while (true) {
       const rows = await this.filter
         .orderBy("dateCreated asc")
@@ -536,8 +542,8 @@ export class FilteredSelector<T extends Item> {
           )
         )
         .limit(this.batchSize)
-        .$if(this._fields.length === 0, (eb) => eb.selectAll())
-        .$if(this._fields.length > 0, (eb) => eb.select(this._fields))
+        .$if(fields.length === 0, (eb) => eb.selectAll())
+        .$if(fields.length > 0, (eb) => eb.select(fields))
         .execute();
       if (rows.length === 0) break;
       for (const row of rows) {
