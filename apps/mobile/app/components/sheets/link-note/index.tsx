@@ -219,7 +219,7 @@ export default function LinkNote(props: {
     <View
       style={{
         paddingHorizontal: 12,
-        minHeight: 400,
+        minHeight: "100%",
         maxHeight: "100%"
       }}
     >
@@ -311,6 +311,7 @@ export default function LinkNote(props: {
           style={{
             marginTop: 10
           }}
+          keyboardShouldPersistTaps="handled"
           windowSize={3}
           keyExtractor={(item) => item.id}
           data={nodes}
@@ -324,6 +325,7 @@ export default function LinkNote(props: {
               onSelectNote={onSelectNote}
             />
           )}
+          keyboardShouldPersistTaps="handled"
           style={{
             marginTop: 10
           }}

@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { parseInternalLink } from "@notesnook/core";
 import { ItemReference } from "@notesnook/core/dist/types";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
@@ -37,6 +36,7 @@ import { WebViewMessageEvent } from "react-native-webview";
 import { DatabaseLogger, db } from "../../../common/database";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
 import EditorTabs from "../../../components/sheets/editor-tabs";
+import { Issue } from "../../../components/sheets/github/issue";
 import LinkNote from "../../../components/sheets/link-note";
 import ManageTagsSheet from "../../../components/sheets/manage-tags";
 import { RelationsList } from "../../../components/sheets/relations-list";
@@ -75,8 +75,7 @@ import { useDragState } from "../../settings/editor/state";
 import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
-import { EditorEvents, editorState } from "./utils";
-import { Issue } from "../../../components/sheets/github/issue";
+import { EditorEvents, editorState, openInternalLink } from "./utils";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -519,27 +518,7 @@ export const useEditorEvents = (
           break;
         case EventTypes.link:
           if (editorMessage.value.startsWith("nn://")) {
-            const data = parseInternalLink(editorMessage.value);
-            if (!data?.id) break;
-            if (
-              data.id ===
-              useTabStore
-                .getState()
-                .getNoteIdForTab(useTabStore.getState().currentTab)
-            ) {
-              if (data.params?.blockId) {
-                setTimeout(() => {
-                  if (!data.params?.blockId) return;
-                  editor.commands.scrollIntoViewById(data.params.blockId);
-                }, 150);
-              }
-              return;
-            }
-
-            eSendEvent(eOnLoadNote, {
-              item: await db.notes.note(data?.id),
-              blockId: data.params?.blockId
-            });
+            openInternalLink(editorMessage.value);
             console.log(
               "Opening note from internal link:",
               editorMessage.value
