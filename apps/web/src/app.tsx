@@ -159,9 +159,10 @@ function DesktopAppContents({
             ref={navPane}
             className="nav-pane"
             defaultSize={10}
-            minSize={3}
-            onResize={(size) => setIsNarrow(size <= 3)}
+            minSize={3.5}
+            onResize={(size) => setIsNarrow(size <= 5)}
             collapsible
+            collapsedSize={3.5}
           >
             <NavigationMenu
               toggleNavigationContainer={(state) => {
