@@ -63,7 +63,8 @@ class NotebookSheetConfig {
   }
 
   static get(item: ConfigItem) {
-    return MMKV.getInt(NotebookSheetConfig.makeId(item)) || 0;
+    const value = MMKV.getInt(NotebookSheetConfig.makeId(item));
+    return typeof value === "number" ? value : 0;
   }
 
   static set(item: ConfigItem, index = 0) {
@@ -126,11 +127,6 @@ export const NotebookSheet = () => {
         if (!focusedRouteId) return;
         const nextRoot = await findRootNotebookId(focusedRouteId);
         if (nextRoot !== currentItem.current) {
-          console.log(
-            "NotebookSheet.useEffect.canShow",
-            "Root changed to",
-            nextRoot
-          );
           useItemSelectionStore.setState({
             enabled: false,
             selection: {}
@@ -145,11 +141,8 @@ export const NotebookSheet = () => {
         if (ref.current?.isOpen()) {
           ref.current?.snapToIndex(snapPoint);
         } else {
-          setTimeout(() => {
-            ref.current?.show(snapPoint);
-          }, 150);
+          ref.current?.show(snapPoint);
         }
-        console.log("NotebookSheet.useEffect.didShow", focusedRouteId);
         setRoot(nextRoot);
         onRequestUpdate();
       });
@@ -162,7 +155,7 @@ export const NotebookSheet = () => {
         ref.current?.hide();
       }
     }
-  }, [canShow, onRequestUpdate, focusedRouteId]);
+  }, [canShow, focusedRouteId]);
 
   return (
     <ActionSheet

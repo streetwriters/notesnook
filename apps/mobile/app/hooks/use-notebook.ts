@@ -36,7 +36,6 @@ export const useNotebook = (
 
   const onRequestUpdate = React.useCallback(() => {
     if (!item?.id) return;
-    console.log("useNotebook.onRequestUpdate", item?.id, Date.now());
 
     const selector = db.relations.from(
       {
@@ -59,7 +58,6 @@ export const useNotebook = (
 
   useEffect(() => {
     if (nestedNotebooks) {
-      console.log("useNotebook.useEffect.onRequestUpdate");
       onRequestUpdate();
     }
   }, [item?.id, onRequestUpdate, nestedNotebooks]);
