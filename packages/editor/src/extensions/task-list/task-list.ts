@@ -240,7 +240,9 @@ export const TaskListNode = TaskList.extend({
           });
           tr.setMeta("preventUpdate", true);
           tr.setMeta("addToHistory", false);
-          view.dispatch(tr);
+          try {
+            view.dispatch(tr);
+          } catch (e) {}
           return {};
         },
         appendTransaction(transactions, oldState, newState) {
