@@ -29,6 +29,8 @@ import {
   ZoomIn,
   ZoomOut
 } from "../icons";
+import { getPlatform } from "../../utils/platform";
+import { TITLE_BAR_HEIGHT } from "../title-bar";
 
 const DEFAULT_ZOOM_STEP = 0.3;
 const DEFAULT_LARGE_ZOOM = 4;
@@ -337,7 +339,12 @@ export class Lightbox extends React.Component<LightboxProps> {
               borderRadius: "0px 0px 0px 5px",
               overflow: "hidden",
               alignItems: "center",
-              justifyContent: "flex-end"
+              justifyContent: "flex-end",
+              height: IS_DESKTOP_APP ? TITLE_BAR_HEIGHT : "auto",
+              pr:
+                IS_DESKTOP_APP && getPlatform() !== "darwin"
+                  ? "calc(100vw - env(titlebar-area-width))"
+                  : 0
             }}
           >
             {tools.map((tool) => (
@@ -349,6 +356,7 @@ export class Lightbox extends React.Component<LightboxProps> {
                 bg="transparent"
                 title={tool.title}
                 sx={{
+                  height: "100%",
                   borderRadius: 0,
                   display: [
                     tool.hideOnMobile ? "none" : "flex",
