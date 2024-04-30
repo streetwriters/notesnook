@@ -29,7 +29,7 @@ import {
 } from "../icons";
 import { BaseThemeProvider } from "../theme-provider";
 
-export const TITLE_BAR_HEIGHT = 37.8;
+export const TITLE_BAR_HEIGHT = IS_DESKTOP_APP ? 37.8 : 0;
 export function TitleBar() {
   const { isMaximized, isFullscreen, hasNativeWindowControls } =
     useWindowControls();
