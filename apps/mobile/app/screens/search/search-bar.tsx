@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { IconButton } from "../../components/ui/icon-button";
 import Navigation from "../../services/navigation";
@@ -49,8 +49,8 @@ export const SearchBar = ({
   return selectionMode && isFocused ? null : (
     <View
       style={{
-        height: 50 + insets.top,
-        paddingTop: insets.top,
+        height: Platform.OS === "android" ? 50 + insets.top : 50,
+        paddingTop: Platform.OS === "ios" ? 0 : insets.top,
         flexDirection: "row",
         alignItems: "center",
         flexShrink: 1,
