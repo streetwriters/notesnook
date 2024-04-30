@@ -20,30 +20,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React from "react";
-import {
-  ActivityIndicator,
-  Image,
-  Platform,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { ActivityIndicator, Image, Platform, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useSyncProgress from "../../hooks/use-sync-progress";
 import { eSendEvent } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
 import Sync from "../../services/sync";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { eOpenLoginDialog } from "../../utils/events";
 import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
+import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
 import { TimeSince } from "../ui/time-since";
 import Paragraph from "../ui/typography/paragraph";
-import Navigation from "../../services/navigation";
-import { IconButton } from "../ui/icon-button";
 
 export const UserStatus = () => {
-  const { colors } = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const user = useUserStore((state) => state.user);
   const syncing = useUserStore((state) => state.syncing);
   const lastSyncStatus = useUserStore((state) => state.lastSyncStatus);
@@ -114,12 +109,6 @@ export const UserStatus = () => {
               {!user || !userProfile?.fullName
                 ? "Settings"
                 : userProfile.fullName}{" "}
-              <Icon
-                allowFontScaling
-                color={colors.primary.icon}
-                size={SIZE.md}
-                name="cog-outline"
-              />
             </Paragraph>
 
             <Paragraph
@@ -167,56 +156,80 @@ export const UserStatus = () => {
             </Paragraph>
           </View>
 
-          <Pressable
+          <View
             style={{
-              borderRadius: 100,
-              width: 40,
-              height: 40
-            }}
-            hitSlop={{
-              top: 10,
-              bottom: 10,
-              left: 20
-            }}
-            onPress={() => {
-              if (user) {
-                Sync.run();
-              } else {
-                tabBarRef.current?.closeDrawer();
-                eSendEvent(eOpenLoginDialog);
-              }
+              flexDirection: "row",
+              gap: 0
             }}
           >
-            {user ? (
-              syncing ? (
-                <ActivityIndicator
-                  color={colors.primary.accent}
-                  size={SIZE.xl}
-                />
-              ) : lastSyncStatus === SyncStatus.Failed ? (
-                <Icon
-                  color={colors.error.icon}
-                  name="sync-alert"
-                  size={SIZE.lg}
-                  allowFontScaling
-                />
+            <IconButton
+              hitSlop={{
+                top: 10,
+                bottom: 10
+              }}
+              onPress={() => {
+                useThemeStore.getState().setColorScheme();
+              }}
+              name="theme-light-dark"
+              color={isDark ? colors.primary.accent : colors.primary.icon}
+              size={SIZE.lg}
+              style={{
+                borderRadius: 100,
+                width: 40,
+                height: 40
+              }}
+            />
+
+            <Pressable
+              style={{
+                borderRadius: 100,
+                width: 40,
+                height: 40
+              }}
+              hitSlop={{
+                top: 10,
+                bottom: 10
+              }}
+              onPress={() => {
+                if (user) {
+                  Sync.run();
+                } else {
+                  tabBarRef.current?.closeDrawer();
+                  eSendEvent(eOpenLoginDialog);
+                }
+              }}
+            >
+              {user ? (
+                syncing ? (
+                  <ActivityIndicator
+                    color={colors.primary.accent}
+                    size={SIZE.xl}
+                  />
+                ) : lastSyncStatus === SyncStatus.Failed ? (
+                  <Icon
+                    color={colors.error.icon}
+                    name="sync-alert"
+                    size={SIZE.lg}
+                    allowFontScaling
+                  />
+                ) : (
+                  <Icon
+                    allowFontScaling
+                    color={colors.primary.icon}
+                    name="sync"
+                    size={SIZE.lg}
+                  />
+                )
               ) : (
                 <Icon
                   allowFontScaling
-                  color={colors.primary.icon}
-                  name="sync"
+                  color={colors.primary.accent}
                   size={SIZE.lg}
+                  name="login"
                 />
-              )
-            ) : (
-              <Icon
-                allowFontScaling
-                color={colors.primary.accent}
-                size={SIZE.lg}
-                name="login"
-              />
-            )}
-          </Pressable>
+              )}
+            </Pressable>
+          </View>
         </Pressable>
       </View>
     </View>
