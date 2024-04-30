@@ -71,12 +71,10 @@ export const useDBItem = <T extends keyof ItemTypeKey>(
       if (typeof itemId === "string" && itemId !== itemIdRef.current) return;
       if (!isValidIdOrIndex(idOrIndex)) return;
 
-      console.log("useDBItem.onUpdateItem", idOrIndex, type);
-
       if (items && typeof idOrIndex === "number") {
         items.item(idOrIndex).then((item) => {
           setItem(item.item);
-          itemIdRef.current = item.item.id;
+          itemIdRef.current = item.item?.id;
         });
       } else {
         if (!(db as any)[type + "s"][type]) {

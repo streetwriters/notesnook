@@ -81,16 +81,21 @@ const NotesPage = ({
     route.name === "ColoredNotes"
       ? (params.current?.item as Color)?.colorCode
       : undefined;
-
+  const updateOnFocus = useRef(false);
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {
-      Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
+      if (updateOnFocus.current) {
+        onRequestUpdate();
+        updateOnFocus.current = false;
+      } else {
+        Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
+      }
       syncWithNavigation();
-
       if (focusControl) return !prev.current;
       return false;
     },
     onBlur: () => {
+      updateOnFocus.current = false;
       setOnFirstSave(null);
       return false;
     },
@@ -99,7 +104,6 @@ const NotesPage = ({
 
   const syncWithNavigation = React.useCallback(() => {
     const { item } = params.current;
-
     useNavigationStore
       .getState()
       .setFocusedRouteId(params?.current?.item?.id || route.name);
@@ -113,6 +117,14 @@ const NotesPage = ({
 
   const onRequestUpdate = React.useCallback(
     async (data?: NotesScreenParams) => {
+      if (
+        useNavigationStore.getState().focusedRouteId !==
+          params.current.item.id &&
+        !data
+      ) {
+        updateOnFocus.current = false;
+        return;
+      }
       const isNew = data && data?.item?.id !== params.current?.item?.id;
       if (data) params.current = data;
 
