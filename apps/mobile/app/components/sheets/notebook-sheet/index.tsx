@@ -19,13 +19,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Notebook, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
-import { RefreshControl, View, useWindowDimensions } from "react-native";
+import {
+  Platform,
+  RefreshControl,
+  View,
+  useWindowDimensions
+} from "react-native";
 import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Config from "react-native-config";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import create from "zustand";
 import { notesnook } from "../../../../e2e/test.ids";
+import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
 import { useNotebook } from "../../../hooks/use-notebook";
 import NotebookScreen from "../../../screens/notebook";
@@ -43,9 +49,8 @@ import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
-import Sort from "../sort";
 import { MoveNotebookSheet } from "../move-notebook";
-import { db } from "../../../common/database";
+import Sort from "../sort";
 
 const useItemSelectionStore = createItemSelectionStore(true, false);
 
@@ -191,7 +196,11 @@ export const NotebookSheet = () => {
         backgroundColor: colors.secondary.background
       }}
       keyboardHandlerEnabled={false}
-      snapPoints={Config.isTesting === "true" ? [100] : [20, 100]}
+      snapPoints={
+        Config.isTesting === "true"
+          ? [100]
+          : [Platform.OS === "android" ? 15 : 10, 100]
+      }
       initialSnapIndex={1}
       backgroundInteractionEnabled
       gestureEnabled
@@ -230,7 +239,7 @@ export const NotebookSheet = () => {
           >
             <Icon
               name="notebook-plus"
-              color={colors.primary.accent}
+              color={colors.primary.icon}
               size={SIZE.xxl}
             />
           </View>
