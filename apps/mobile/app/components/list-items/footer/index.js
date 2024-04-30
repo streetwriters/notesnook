@@ -19,6 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { View } from "react-native";
 import React from "react";
-export const Footer = () => {
-  return <View style={{ height: 150 }} />;
+export const Footer = ({ height = 150 }) => {
+  return <View style={{ height: height }} />;
 };
