@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { expect, test } from "vitest";
-import { databaseTest } from "./utils";
+import { TEST_NOTE, databaseTest, noteTest } from "./utils";
 
 test("updating deleted content should not throw", () =>
   databaseTest().then(async (db) => {
@@ -86,4 +86,91 @@ test("updating deleted note should not throw", () =>
     await expect(
       db.notes.collection.update([id], { synced: true }, { sendEvent: false })
     ).resolves.toBeFalsy();
+  }));
+
+test("overwriting unlocked content with locked content should update search index", () =>
+  noteTest({
+    content: {
+      data: "hello world",
+      type: "tiptap"
+    }
+  }).then(async ({ db, id }) => {
+    await db.content.collection.upsert({
+      id: "something",
+      locked: false,
+      data: "What is this?",
+      noteId: id,
+      dateCreated: Date.now(),
+      dateEdited: Date.now(),
+      synced: false,
+      dateModified: Date.now()
+    });
+
+    await db.content.collection.put([
+      {
+        id: "something",
+        locked: true,
+        data: {
+          alg: "as",
+          cipher: "s",
+          format: "base64",
+          iv: "",
+          length: 20,
+          salt: ""
+        },
+        noteId: id,
+        dateCreated: Date.now(),
+        dateEdited: Date.now(),
+        synced: false,
+        dateModified: Date.now()
+      }
+    ]);
+
+    expect(await db.lookup.notes("what is this").ids()).not.toContain(id);
+  }));
+
+test("overwriting content with deleted content should update search index", () =>
+  noteTest({
+    content: {
+      data: "hello world",
+      type: "tiptap"
+    }
+  }).then(async ({ db, id }) => {
+    await db.content.collection.upsert({
+      id: "something",
+      locked: false,
+      data: "What is this?",
+      noteId: id,
+      dateCreated: Date.now(),
+      dateEdited: Date.now(),
+      synced: false,
+      dateModified: Date.now()
+    });
+
+    await db.content.collection.put([
+      {
+        id: "something",
+        deleted: true,
+        synced: true,
+        dateModified: Date.now()
+      }
+    ]);
+
+    expect(await db.lookup.notes("what is this").ids()).not.toContain(id);
+  }));
+
+test("overwriting note with deleted note should update search index", () =>
+  noteTest({
+    title: "I am title"
+  }).then(async ({ db, id }) => {
+    await db.notes.collection.put([
+      {
+        id,
+        deleted: true,
+        synced: true,
+        dateModified: Date.now()
+      }
+    ]);
+
+    expect(await db.lookup.notes("title").ids()).not.toContain(id);
   }));
