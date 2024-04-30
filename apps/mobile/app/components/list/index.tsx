@@ -192,7 +192,9 @@ export default function List(props: ListProps) {
               />
             ) : null
           }
-          ListFooterComponent={<Footer />}
+          ListFooterComponent={
+            <Footer height={props.renderedInRoute === "Notebook" ? 300 : 150} />
+          }
           ListHeaderComponent={
             <>
               {props.CustomLisHeader ? (
