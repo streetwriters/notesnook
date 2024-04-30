@@ -37,6 +37,7 @@ import { WebViewMessageEvent } from "react-native-webview";
 import { DatabaseLogger, db } from "../../../common/database";
 import downloadAttachment from "../../../common/filesystem/download-attachment";
 import EditorTabs from "../../../components/sheets/editor-tabs";
+import { Issue } from "../../../components/sheets/github/issue";
 import LinkNote from "../../../components/sheets/link-note";
 import ManageTagsSheet from "../../../components/sheets/manage-tags";
 import { RelationsList } from "../../../components/sheets/relations-list";
@@ -76,7 +77,6 @@ import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { EditorEvents, editorState } from "./utils";
-import { Issue } from "../../../components/sheets/github/issue";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -443,7 +443,7 @@ export const useEditorEvents = (
           break;
         case EventTypes.filepicker:
           editorState().isAwaitingResult = true;
-          const { pick } = require("./picker.js").default;
+          const { pick } = require("./picker").default;
           pick({
             type: editorMessage.value,
             noteId: noteId,

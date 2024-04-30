@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React, { useState } from "react";
 import { Image, ScrollView, TouchableOpacity, View } from "react-native";
-import { ImagePickerResponse } from "react-native-image-picker";
+import { Image as ImageType } from "react-native-image-crop-picker";
 import { useThemeColors } from "../../../../../../packages/theme/dist";
 import { presentSheet } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
@@ -32,7 +32,7 @@ export default function AttachImage({
   onAttach,
   close
 }: {
-  response: ImagePickerResponse;
+  response: ImageType[];
   onAttach: ({ compress }: { compress: boolean }) => void;
   close: ((ctx?: string | undefined) => void) | undefined;
 }) {
@@ -58,14 +58,14 @@ export default function AttachImage({
         }}
       >
         <Paragraph style={{ color: colors.primary.paragraph, marginBottom: 6 }}>
-          Attaching {response.assets?.length} image(s):
+          Attaching {response?.length} image(s):
         </Paragraph>
         <ScrollView horizontal>
-          {response.assets?.map((item) => (
-            <TouchableOpacity key={item.fileName} activeOpacity={0.9}>
+          {response?.map((item) => (
+            <TouchableOpacity key={item.filename} activeOpacity={0.9}>
               <Image
                 source={{
-                  uri: item.uri
+                  uri: item.sourceURL || item.path
                 }}
                 style={{
                   width: 100,
@@ -142,7 +142,7 @@ export default function AttachImage({
 
       <Button
         title={`${
-          (response.assets?.length || 0) > 1 ? "Attach Images" : "Attach Image"
+          (response?.length || 0) > 1 ? "Attach Images" : "Attach Image"
         }`}
         type="accent"
         width="100%"
@@ -156,8 +156,13 @@ export default function AttachImage({
   );
 }
 
-AttachImage.present = (response: ImagePickerResponse) => {
-  return new Promise((resolve) => {
+AttachImage.present = (response: ImageType[]) => {
+  return new Promise<
+    | {
+        compress: boolean;
+      }
+    | undefined
+  >((resolve) => {
     let resolved = false;
     presentSheet({
       component: (ref, close, update) => (

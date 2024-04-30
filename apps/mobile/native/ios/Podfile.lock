@@ -319,7 +319,8 @@ PODS:
     - React-Core
   - react-native-html-to-pdf-lite (0.9.1):
     - React
-  - react-native-image-picker (4.1.2):
+  - react-native-image-picker (7.1.2):
+    - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - react-native-image-resizer (3.0.5):
     - React-Core
@@ -345,7 +346,7 @@ PODS:
     - React-Core
   - react-native-safe-area-context (4.9.0):
     - React-Core
-  - react-native-share-extension (2.5.6):
+  - react-native-share-extension (2.5.9):
     - React
   - react-native-sodium (1.5.4):
     - React
@@ -899,7 +900,7 @@ SPEC CHECKSUMS:
   react-native-get-random-values: dee677497c6a740b71e5612e8dbd83e7539ed5bb
   react-native-gzip: c5e87ee9e359f02350e3a2ee52eb35eddc398868
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
-  react-native-image-picker: 9c8a2687b69300ad9e95cec5d38f35ab9d32467d
+  react-native-image-picker: 51fdb07f7ef722988c8a219e1416153760a25e4d
   react-native-image-resizer: 00ceb0e05586c7aadf061eea676957a6c2ec60fa
   react-native-in-app-review: db8bb167a5f238e7ceca5c242d6b36ce8c4404a4
   react-native-keep-awake: caee3ff89eaa21dfe29010f0d143566874a04441
@@ -910,7 +911,7 @@ SPEC CHECKSUMS:
   react-native-pdf: 33c622cbdf776a649929e8b9d1ce2d313347c4fa
   react-native-quick-sqlite: e0e23b749382a85e4b57146f753de737a6c3a9e1
   react-native-safe-area-context: b97eb6f9e3b7f437806c2ce5983f479f8eb5de4b
-  react-native-share-extension: df66a2ee48a62277d79898375e2142bde0782063
+  react-native-share-extension: 26f6d9b869540a5c69a71e0455b2ae43fbede407
   react-native-sodium: 955bb0dc3ea05f8ea06d5e96cb89d1be7b5d7681
   react-native-theme-switch-animation: 220f883f7be290e79f2ab022093ed1a7a5929e6d
   react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
@@ -964,4 +965,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 2b8b28a341b202bf3ca5f231b75bb05893486ed8
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.14.2

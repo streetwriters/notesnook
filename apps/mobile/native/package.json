@@ -41,7 +41,6 @@
     "react-native-gzip": "1.1.0",
     "react-native-html-to-pdf-lite": "^0.9.1",
     "react-native-iap": "12.11.0",
-    "react-native-image-picker": "4.1.2",
     "react-native-in-app-review": "4.3.3",
     "react-native-keychain": "4.0.5",
     "react-native-mmkv-storage": "^0.10.0-alpha.12",

@@ -165,12 +165,6 @@ export const LICENSES = [
     link: "https://github.com/dooboolab/react-native-iap"
   },
   {
-    name: "react-native-image-picker",
-    licenseType: "MIT",
-    author: "Johan du Toit (Johan-dutoit)",
-    link: "https://github.com/react-native-image-picker/react-native-image-picker"
-  },
-  {
     name: "react-native-keychain",
     licenseType: "MIT",
     author: "Joel Arvidsson joel@oblador.se",

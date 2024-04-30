@@ -21,12 +21,11 @@ import Sodium from "@ammarahmed/react-native-sodium";
 import { isImage } from "@notesnook/core/dist/utils/filename";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
-import DocumentPicker from "react-native-document-picker";
-import {
-  ImagePickerResponse,
-  launchCamera,
-  launchImageLibrary
-} from "react-native-image-picker";
+import DocumentPicker, {
+  DocumentPickerOptions,
+  DocumentPickerResponse
+} from "react-native-document-picker";
+import { Image, openCamera, openPicker } from "react-native-image-crop-picker";
 import { DatabaseLogger, db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
 import { compressToFile } from "../../../common/filesystem/compress";
@@ -43,7 +42,7 @@ import { eCloseSheet } from "../../../utils/events";
 import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
 
-const showEncryptionSheet = (file) => {
+const showEncryptionSheet = (file: DocumentPickerResponse) => {
   presentSheet({
     title: "Encrypting attachment",
     paragraph: `Please wait while we encrypt ${file.name} file for upload`,
@@ -51,24 +50,25 @@ const showEncryptionSheet = (file) => {
   });
 };
 
-const santizeUri = (uri) => {
+const santizeUri = (uri: string) => {
   uri = decodeURI(uri);
   uri = Platform.OS === "ios" ? uri.replace("file:///", "/") : uri;
   return uri;
 };
 
-/**
- * @param {{
- *  noteId: string,
- * tabId: string,
- * type: "image" | "camera" | "file"
- * reupload: boolean
- * hash?: string
- * }} fileOptions
- */
-const file = async (fileOptions) => {
+type PickerOptions = {
+  noteId?: string;
+  tabId?: number;
+  type: "image" | "camera" | "file";
+  reupload: boolean;
+  hash?: string;
+  context?: string;
+  outputType?: "base64" | "url" | "cache";
+};
+
+const file = async (fileOptions: PickerOptions) => {
   try {
-    const options = {
+    const options: DocumentPickerOptions<"ios"> = {
       mode: "import",
       allowMultiSelection: false
     };
@@ -87,11 +87,11 @@ const file = async (fileOptions) => {
 
     file = file[0];
 
-    let uri = Platform.OS === "ios" ? file.fileCopyUri : file.uri;
+    let uri = Platform.OS === "ios" ? file.fileCopyUri || file.uri : file.uri;
 
-    if (file.size > FILE_SIZE_LIMIT) {
+    if ((file.size || 0) > FILE_SIZE_LIMIT) {
       ToastManager.show({
-        title: "File too large",
+        heading: "File too large",
         message: "The maximum allowed size per file is 500 MB",
         type: "error"
       });
@@ -115,22 +115,34 @@ const file = async (fileOptions) => {
       uri: uri,
       type: "url"
     });
-    if (!(await attachFile(uri, hash, file.type, file.name, fileOptions)))
+    if (
+      !(await attachFile(
+        uri,
+        hash,
+        file.type || "application/octet-stream",
+        file.name,
+        fileOptions
+      ))
+    )
       return;
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
 
+    if (!fileOptions.tabId) return;
     if (
-      useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
+      fileOptions.tabId &&
+      fileOptions.noteId &&
+      useTabStore.getState().getNoteIdForTab(fileOptions.tabId) ===
+        fileOptions.noteId
     ) {
-      if (isImage(file.type)) {
+      if (isImage(file.type || "application/octet-stream")) {
         editorController.current?.commands.insertImage(
           {
             hash: hash,
             filename: file.name,
-            mime: file.type,
-            size: file.size,
-            dataurl: await db.attachments.read(hash, "base64"),
-            title: file.name
+            mime: file.type || "application/octet-stream",
+            size: file.size || 0,
+            dataurl: (await db.attachments.read(hash, "base64")) as string,
+            type: "image"
           },
           fileOptions.tabId
         );
@@ -139,8 +151,9 @@ const file = async (fileOptions) => {
           {
             hash: hash,
             filename: file.name,
-            mime: file.type,
-            size: file.size
+            mime: file.type || "application/octet-stream",
+            size: file.size || 0,
+            type: "file"
           },
           fileOptions.tabId
         );
@@ -152,7 +165,7 @@ const file = async (fileOptions) => {
     }, 1000);
   } catch (e) {
     ToastManager.show({
-      heading: e.message,
+      heading: (e as Error).message,
       message: "You need internet access to attach a file",
       type: "error",
       context: "global"
@@ -161,29 +174,51 @@ const file = async (fileOptions) => {
   }
 };
 
-/**
- * @param {{
- *  noteId: string,
- * tabId: string,
- * type: "image" | "camera" | "file"
- * reupload: boolean
- * hash?: string
- * }} options
- */
-const camera = async (options) => {
+const camera = async (options: PickerOptions) => {
   try {
     await db.attachments.generateKey();
     useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
-    launchCamera(
-      {
-        includeBase64: true,
-        mediaType: "photo"
-      },
-      (response) => handleImageResponse(response, options)
-    );
+    openCamera({
+      mediaType: "photo",
+      includeBase64: true,
+      cropping: false,
+      multiple: true,
+      maxFiles: 10,
+      writeTempFile: true
+    })
+      .then((response) => handleImageResponse(response, options))
+      .catch((e) => {
+        console.log("camera error: ", e);
+      });
   } catch (e) {
     ToastManager.show({
-      heading: e.message,
+      heading: (e as Error).message,
+      type: "error",
+      context: "global"
+    });
+    console.log("attachment error:", e);
+  }
+};
+
+const gallery = async (options: PickerOptions) => {
+  try {
+    await db.attachments.generateKey();
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
+    openPicker({
+      includeBase64: true,
+      mediaType: "photo",
+      maxFiles: 10,
+      cropping: false,
+      multiple: true
+    })
+      .then((response) => handleImageResponse(response, options))
+      .catch((e) => {
+        console.log("gallery error: ", e);
+      });
+  } catch (e) {
+    useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
+    ToastManager.show({
+      heading: (e as Error).message,
       message: "You need internet access to attach a file",
       type: "error",
       context: "global"
@@ -192,53 +227,9 @@ const camera = async (options) => {
   }
 };
 
-const gallery = async (options) => {
-  try {
-    await db.attachments.generateKey();
-    useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
-    launchImageLibrary(
-      {
-        includeBase64: true,
-        mediaType: "photo",
-        selectionLimit: 10
-      },
-      (response) => handleImageResponse(response, options)
-    );
-  } catch (e) {
-    ToastManager.show({
-      heading: e.message,
-      message: "You need internet access to attach a file",
-      type: "error",
-      context: "global"
-    });
-    console.log("attachment error:", e);
-  }
-};
-
-/**
- *
- * @typedef {{
- *  noteId?: string,
- * tabId?: string,
- * type: "image" | "camera" | "file"
- * reupload: boolean
- * hash?: string
- * context?: string
- * }} ImagePickerOptions
- *
- * @param {{
- *  noteId?: string,
- * tabId?: string,
- * type: "image" | "camera" | "file"
- * reupload: boolean
- * hash?: string
- * context?: string
- * }} options
- * @returns
- */
-const pick = async (options) => {
+const pick = async (options: PickerOptions) => {
   if (!PremiumService.get()) {
-    let user = await db.user.getUser();
+    const user = await db.user.getUser();
     if (editorState().isFocused) {
       editorState().isFocused = true;
     }
@@ -259,58 +250,51 @@ const pick = async (options) => {
     file(options);
   }
 };
-/**
- *
- * @param {ImagePickerResponse} response
- * @param {ImagePickerOptions} options
- * @returns
- */
-const handleImageResponse = async (response, options) => {
-  if (
-    response.didCancel ||
-    response.errorMessage ||
-    !response.assets ||
-    response.assets?.length === 0
-  ) {
-    return;
-  }
+
+const handleImageResponse = async (
+  response: Image[],
+  options: PickerOptions
+) => {
+  console.log(response[0].mime);
 
   const result = await AttachImage.present(response);
-
   if (!result) return;
   const compress = result.compress;
 
-  for (let image of response.assets) {
-    const isPng = /(png)/g.test(image.type);
-    const isJpeg = /(jpeg|jpg)/g.test(image.type);
+  for (const image of response) {
+    const isPng = /(png)/g.test(image.mime);
+    const isJpeg = /(jpeg|jpg)/g.test(image.mime);
 
     if (compress && (isPng || isJpeg)) {
-      image.uri = await compressToFile(
-        Platform.OS === "ios" ? "file://" + image.uri : image.uri,
+      console.log("compressing files...");
+      image.path = await compressToFile(
+        Platform.OS === "ios" ? "file://" + image.path : image.path,
         isPng ? "PNG" : "JPEG"
       );
-      const stat = await RNFetchBlob.fs.stat(image.uri.replace("file://", ""));
-      image.fileSize = stat.size;
+      const stat = await RNFetchBlob.fs.stat(image.path.replace("file://", ""));
+      image.size = stat.size;
+      image.path =
+        Platform.OS === "ios" ? image.path.replace("file://", "") : image.path;
     }
-
-    if (image.fileSize > IMAGE_SIZE_LIMIT) {
+    console.log("here....");
+    if (image.size > IMAGE_SIZE_LIMIT) {
       ToastManager.show({
-        title: "File too large",
+        heading: "File too large",
         message: "The maximum allowed size per image is 50 MB",
         type: "error"
       });
       return;
     }
-    let b64 = `data:${image.type};base64, ` + image.base64;
-    const uri = decodeURI(image.uri);
+    const b64 = `data:${image.mime};base64, ` + image.data;
+    const uri = decodeURI(image.path);
     const hash = await Sodium.hashFile({
       uri: uri,
       type: "url"
     });
 
-    let fileName = image.originalFileName || image.fileName;
+    const fileName = image.filename || "image";
     console.log("attaching file...");
-    if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
+    if (!(await attachFile(uri, hash, image.mime, fileName, options))) return;
 
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
     console.log("attaching image to note...");
@@ -322,11 +306,13 @@ const handleImageResponse = async (response, options) => {
       editorController.current?.commands.insertImage(
         {
           hash: hash,
-          mime: image.type,
-          title: fileName,
+          mime: image.mime,
+          type: "image",
           dataurl: b64,
-          size: image.fileSize,
-          filename: fileName
+          size: image.size,
+          filename: fileName as string,
+          width: image.width,
+          height: image.height
         },
         options.tabId
       );
@@ -343,10 +329,16 @@ const handleImageResponse = async (response, options) => {
  * @param {ImagePickerOptions} options
  * @returns
  */
-export async function attachFile(uri, hash, type, filename, options) {
+export async function attachFile(
+  uri: string,
+  hash: string,
+  type: string,
+  filename: string,
+  options: PickerOptions
+) {
   try {
-    let exists = await db.attachments.exists(hash);
-    let encryptionInfo;
+    const exists = await db.attachments.exists(hash);
+    let encryptionInfo: any;
     if (options?.hash && options.hash !== hash) {
       ToastManager.show({
         heading: "Please select the same file for reuploading",
@@ -362,12 +354,12 @@ export async function attachFile(uri, hash, type, filename, options) {
     }
 
     if (!exists || options?.reupload) {
-      let key = await db.attachments.generateKey();
+      const key = await db.attachments.generateKey();
       encryptionInfo = await Sodium.encryptFile(key, {
         uri: uri,
-        type: options.type || "url",
+        type: options.outputType || "url",
         hash: hash
-      });
+      } as any);
       encryptionInfo.mimeType = type;
       encryptionInfo.filename = filename;
       encryptionInfo.alg = "xcha-stream";
@@ -377,7 +369,9 @@ export async function attachFile(uri, hash, type, filename, options) {
     } else {
       encryptionInfo = { hash: hash };
     }
-    await db.attachments.add(encryptionInfo, options.noteId);
+    if (options.noteId) {
+      await db.attachments.add(encryptionInfo);
+    }
     return true;
   } catch (e) {
     DatabaseLogger.error(e);
