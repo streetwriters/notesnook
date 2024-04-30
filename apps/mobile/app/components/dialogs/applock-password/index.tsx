@@ -24,7 +24,7 @@ import {
   setAppLockVerificationCipher,
   validateAppLockPassword
 } from "../../../common/database/encryption";
-import BiometicService from "../../../services/biometrics";
+import BiometricService from "../../../services/biometrics";
 import { DDS } from "../../../services/device-detection";
 import {
   ToastManager,
@@ -323,7 +323,7 @@ export const AppLockPassword = () => {
               SettingsService.setProperty("appLockHasPasswordSecurity", false);
 
               if (
-                !(await BiometicService.isBiometryAvailable()) ||
+                !(await BiometricService.isBiometryAvailable()) ||
                 SettingsService.getProperty("biometricsAuthEnabled") === false
               ) {
                 SettingsService.setProperty("appLockEnabled", false);

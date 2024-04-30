@@ -85,7 +85,6 @@ import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { updateStatusBarColor } from "../utils/colors";
 import { BETA } from "../utils/constants";
 import {
-  eClearEditor,
   eCloseSheet,
   eLoginSessionExpired,
   eOnLoadNote,
@@ -532,12 +531,6 @@ export const useAppEvents = () => {
         //@ts-ignore
         globalThis["IS_SHARE_EXTENSION"] = false;
       } else {
-        const id = useTabStore.getState().getCurrentNoteId();
-        const note = id ? await db.notes.note(id) : undefined;
-        const locked = note && (await db.vaults.itemExists(note));
-        if (locked && SettingsService.canLockAppInBackground()) {
-          eSendEvent(eClearEditor);
-        }
         await saveEditorState();
         if (
           SettingsService.canLockAppInBackground() &&
