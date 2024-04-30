@@ -112,6 +112,26 @@ What data is collected & when?`,
     header: "Advanced",
     settings: [
       {
+        key: "custom-dns",
+        title: "Use custom DNS",
+        description: `Notesnook uses the following DNS providers:
+
+1. Cloudflare DNS
+2. Quad9
+
+This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this if you want the app to use system's DNS settings.`,
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.customDns, listener),
+        isHidden: () => !IS_DESKTOP_APP,
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useSettingStore.getState().customDns,
+            toggle: () => useSettingStore.getState().toggleCustomDns()
+          }
+        ]
+      },
+      {
         key: "custom-cors",
         title: "Custom CORS proxy",
         description:
