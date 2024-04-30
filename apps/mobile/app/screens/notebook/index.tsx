@@ -104,7 +104,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
 
         if (notebook) {
           const breadcrumbs = await db.notebooks.breadcrumbs(notebook.id);
-          setBreadcrumbs(breadcrumbs);
+          setBreadcrumbs(breadcrumbs.slice(0, breadcrumbs.length - 1));
           params.current.item = notebook;
           const notes = await db.relations
             .from(notebook, "note")
@@ -167,7 +167,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
         onPressDefaultRightButton={openEditor}
       />
 
-      {breadcrumbs ? (
+      {breadcrumbs && breadcrumbs.length > 0 ? (
         <View
           style={{
             width: "100%",
