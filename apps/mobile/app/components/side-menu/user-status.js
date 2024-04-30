@@ -93,7 +93,16 @@ export const UserStatus = () => {
                 borderRadius: 100
               }}
             />
-          ) : null}
+          ) : (
+            <Icon
+              name="cog-outline"
+              size={SIZE.lg - 2}
+              color={colors.secondary.icon}
+              style={{
+                paddingLeft: 8
+              }}
+            />
+          )}
 
           <View
             style={{
@@ -108,7 +117,7 @@ export const UserStatus = () => {
             >
               {!user || !userProfile?.fullName
                 ? "Settings"
-                : userProfile.fullName}{" "}
+                : userProfile.fullName}
             </Paragraph>
 
             <Paragraph
