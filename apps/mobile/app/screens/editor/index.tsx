@@ -32,7 +32,7 @@ import WebView from "react-native-webview";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
-import BiometicService from "../../services/biometrics";
+import BiometricService from "../../services/biometrics";
 import {
   ToastManager,
   eSendEvent,
@@ -201,8 +201,8 @@ const useLockedNoteHandler = () => {
 
   useEffect(() => {
     (async () => {
-      const biometry = await BiometicService.isBiometryAvailable();
-      const fingerprint = await BiometicService.hasInternetCredentials();
+      const biometry = await BiometricService.isBiometryAvailable();
+      const fingerprint = await BiometricService.hasInternetCredentials();
       useTabStore.setState({
         biometryAvailable: !!biometry,
         biometryEnrolled: !!fingerprint
@@ -216,9 +216,9 @@ const useLockedNoteHandler = () => {
       try {
         if (!tabRef.current?.noteLocked || !tabRef.current) return;
         console.log("Trying to unlock with biometrics...");
-        const credentials = await BiometicService.getCredentials(
+        const credentials = await BiometricService.getCredentials(
           "Unlock note",
-          "Unlock note to open it in editor. If biometrics are not working, you can enter device pin to unlock vault."
+          "Unlock note to open it in editor."
         );
 
         if (credentials && credentials?.password && tabRef.current.noteId) {
@@ -226,6 +226,7 @@ const useLockedNoteHandler = () => {
             tabRef.current.noteId,
             credentials?.password
           );
+
           eSendEvent(eOnLoadNote, {
             item: note
           });
@@ -262,7 +263,7 @@ const useLockedNoteHandler = () => {
           try {
             const unlocked = await db.vault.unlock(password);
             if (!unlocked) throw new Error("Incorrect vault password");
-            await BiometicService.storeCredentials(password);
+            await BiometricService.storeCredentials(password);
             eSendEvent("vaultUpdated");
             ToastManager.show({
               heading: "Biometric unlocking enabled!",
@@ -271,8 +272,8 @@ const useLockedNoteHandler = () => {
               context: "global"
             });
 
-            const biometry = await BiometicService.isBiometryAvailable();
-            const fingerprint = await BiometicService.hasInternetCredentials();
+            const biometry = await BiometricService.isBiometryAvailable();
+            const fingerprint = await BiometricService.hasInternetCredentials();
             useTabStore.setState({
               biometryAvailable: !!biometry,
               biometryEnrolled: !!fingerprint

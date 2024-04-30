@@ -128,7 +128,7 @@ export class VaultDialog extends Component {
           : this.state.copyNote
           ? "Unlock note to copy it. If biometrics are not working, you can enter device pin to unlock vault."
           : this.state.goToEditor
-          ? "Unlock note to open it in editor. If biometrics are not working, you can enter device pin to unlock vault."
+          ? "Unlock note to open it in editor."
           : "Enter vault password to unlock note. If biometrics are not working, you can enter device pin to unlock vault."
         : "Enter vault password to lock note. If biometrics are not working, you can enter device pin to lock note.");
   }

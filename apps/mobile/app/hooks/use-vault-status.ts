@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useCallback, useEffect } from "react";
-import BiometicService from "../services/biometrics";
+import BiometricService from "../services/biometrics";
 import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
 import { db } from "../common/database";
 
@@ -39,8 +39,8 @@ export const useVaultStatus = () => {
 
   const checkVaultStatus = useCallback(() => {
     db.vault?.exists().then(async (exists) => {
-      const available = await BiometicService.isBiometryAvailable();
-      const fingerprint = await BiometicService.hasInternetCredentials();
+      const available = await BiometricService.isBiometryAvailable();
+      const fingerprint = await BiometricService.hasInternetCredentials();
       if (
         VaultStatusCache.exists === exists &&
         VaultStatusCache.biometryEnrolled === fingerprint &&

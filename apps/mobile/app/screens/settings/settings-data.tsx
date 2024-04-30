@@ -38,7 +38,7 @@ import { Update } from "../../components/sheets/update";
 import { VaultStatusType, useVaultStatus } from "../../hooks/use-vault-status";
 import { BackgroundSync } from "../../services/background-sync";
 import BackupService from "../../services/backup";
-import BiometicService from "../../services/biometrics";
+import BiometricService from "../../services/biometrics";
 import {
   ToastManager,
   eSendEvent,
@@ -349,7 +349,7 @@ export const settingsGroups: SettingSection[] = [
                       await db.user?.logout();
                       setLoginMessage();
                       await PremiumService.setPremiumStatus();
-                      await BiometicService.resetCredentials();
+                      await BiometricService.resetCredentials();
                       MMKV.clearStore();
                       clearAllStores();
                       refreshAllStores();
@@ -394,7 +394,7 @@ export const settingsGroups: SettingSection[] = [
                     if (verified) {
                       eSendEvent("settings-loading", true);
                       await db.user?.deleteUser(value);
-                      await BiometicService.resetCredentials();
+                      await BiometricService.resetCredentials();
                       SettingsService.set({
                         introCompleted: true
                       });
@@ -789,7 +789,7 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
-            id: "biometic-unlock",
+            id: "biometric-unlock",
             type: "switch",
             name: "Biometric unlocking",
             icon: "fingerprint",
@@ -859,13 +859,13 @@ export const settingsGroups: SettingSection[] = [
               if (!SettingsService.getProperty("appLockEnabled")) {
                 if (
                   !SettingsService.getProperty("appLockHasPasswordSecurity") &&
-                  (await BiometicService.isBiometryAvailable())
+                  (await BiometricService.isBiometryAvailable())
                 ) {
                   SettingsService.setProperty("biometricsAuthEnabled", true);
                 }
 
                 if (
-                  !(await BiometicService.isBiometryAvailable()) &&
+                  !(await BiometricService.isBiometryAvailable()) &&
                   !SettingsService.getProperty("appLockHasPasswordSecurity")
                 ) {
                   ToastManager.show({
