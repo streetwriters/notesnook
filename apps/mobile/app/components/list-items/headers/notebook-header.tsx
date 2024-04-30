@@ -95,7 +95,7 @@ export const NotebookHeader = ({
           style={{
             flexShrink: 1
           }}
-          size={SIZE.xxl}
+          size={SIZE.lg}
         >
           {notebook.title}
         </Heading>
@@ -114,7 +114,7 @@ export const NotebookHeader = ({
               width: 40,
               height: 40
             }}
-            type={isPinnedToMenu ? "secondary" : "secondary"}
+            type="transparent"
             color={isPinnedToMenu ? colors.primary.accent : colors.primary.icon}
             size={SIZE.lg}
           />
@@ -123,7 +123,7 @@ export const NotebookHeader = ({
             onPress={onEditNotebook}
             tooltipText="Edit this notebook"
             name="pencil"
-            type="secondary"
+            type="transparent"
             color={colors.primary.icon}
             style={{
               width: 40,
@@ -134,7 +134,7 @@ export const NotebookHeader = ({
       </View>
 
       {notebook.description ? (
-        <Paragraph size={SIZE.md} color={colors.primary.paragraph}>
+        <Paragraph size={SIZE.sm} color={colors.primary.paragraph}>
           {notebook.description}
         </Paragraph>
       ) : null}
