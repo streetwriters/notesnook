@@ -291,6 +291,8 @@ const handleImageResponse = async (response, options) => {
       );
       const stat = await RNFetchBlob.fs.stat(image.uri.replace("file://", ""));
       image.fileSize = stat.size;
+      image.uri =
+        Platform.OS === "ios" ? image.uri.replace("file://", "") : image.uri;
     }
 
     if (image.fileSize > IMAGE_SIZE_LIMIT) {
@@ -318,7 +320,11 @@ const handleImageResponse = async (response, options) => {
       options.tabId !== undefined &&
       useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
     ) {
-      console.log("attaching image to note...");
+      console.log(
+        "attaching image to note...",
+        b64 ? b64.slice(0, 100) : "no b64"
+      );
+
       editorController.current?.commands.insertImage(
         {
           hash: hash,
