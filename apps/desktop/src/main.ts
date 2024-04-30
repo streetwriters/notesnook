@@ -35,6 +35,7 @@ import path from "path";
 import { bringToFront } from "./utils/bring-to-front";
 import { bridge } from "./api/bridge";
 import { setupDesktopIntegration } from "./utils/desktop-integration";
+import { disableCustomDns, enableCustomDns } from "./utils/custom-dns";
 
 // only run a single instance
 if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
@@ -151,14 +152,8 @@ async function createWindow() {
 app.once("ready", async () => {
   console.info("App ready. Opening window.");
 
-  app.configureHostResolver({
-    secureDnsServers: [
-      "https://mozilla.cloudflare-dns.com/dns-query",
-      "https://dns.quad9.net/dns-query"
-    ],
-    enableBuiltInResolver: true,
-    secureDnsMode: "automatic"
-  });
+  if (config.customDns) enableCustomDns();
+  else disableCustomDns();
 
   if (!isDevelopment()) registerProtocol();
   await createWindow();

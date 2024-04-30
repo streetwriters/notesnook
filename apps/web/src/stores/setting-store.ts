@@ -42,6 +42,7 @@ class SettingStore extends BaseStore<SettingStore> {
 
   zoomFactor = 1.0;
   privacyMode = false;
+  customDns = true;
   hideNoteTitle = Config.get("hideNoteTitle", false);
   telemetry = isTelemetryEnabled();
   dateFormat = "DD-MM-YYYY";
@@ -67,6 +68,7 @@ class SettingStore extends BaseStore<SettingStore> {
       desktopIntegrationSettings:
         await desktop?.integration.desktopIntegration.query(),
       privacyMode: await desktop?.integration.privacyMode.query(),
+      customDns: await desktop?.integration.customDns.query(),
       zoomFactor: await desktop?.integration.zoomFactor.query(),
       autoUpdates: await desktop?.updater.autoUpdates.query(),
       proxyRules: await desktop?.integration.proxyRules.query()
@@ -175,6 +177,12 @@ class SettingStore extends BaseStore<SettingStore> {
     const privacyMode = this.get().privacyMode;
     this.set({ privacyMode: !privacyMode });
     await desktop?.integration.setPrivacyMode.mutate({ enabled: !privacyMode });
+  };
+
+  toggleCustomDns = async () => {
+    const customDns = this.get().customDns;
+    this.set({ customDns: !customDns });
+    await desktop?.integration.setCustomDns.mutate(!customDns);
   };
 
   toggleHideTitle = async () => {
