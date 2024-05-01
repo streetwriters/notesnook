@@ -195,6 +195,7 @@ const ShareView = () => {
           }
           return;
         }
+
         let note = { ...defaultNote };
         for (let item of data) {
           if (item.type === "text") {
@@ -211,7 +212,13 @@ const ShareView = () => {
               if (key.includes("TITLE") || key.includes("SUBJECT")) {
                 note.title = item[key];
                 noteTitle.current = note.title;
-                console.log("Note title will be", note.title);
+                inputRef.current?.setNativeProps?.({
+                  text: noteTitle.current
+                });
+              }
+              if (key.includes("TEXT") && !note.content.data) {
+                note.content.data = item[key];
+                noteContent.current = item[key];
               }
             }
           } else {
@@ -220,8 +227,9 @@ const ShareView = () => {
               if (
                 (isImage(item.type) && item.size > IMAGE_SIZE_LIMIT) ||
                 (!isImage(item.type) && item.size > FILE_SIZE_LIMIT)
-              )
+              ) {
                 continue;
+              }
 
               setRawFiles((files) => {
                 const index = files.findIndex(
@@ -248,6 +256,7 @@ const ShareView = () => {
   );
 
   const onLoad = useCallback(() => {
+    console.log(noteContent.current, "current...");
     eSendEvent(eOnLoadNote + "shareEditor", {
       id: null,
       content: {
@@ -474,7 +483,8 @@ const ShareView = () => {
                     borderBottomWidth: 1,
                     paddingBottom: 12,
                     borderBottomColor: colors.secondary.background,
-                    paddingHorizontal: 12
+                    paddingHorizontal: 12,
+                    gap: 10
                   }}
                 >
                   <TextInput
@@ -482,6 +492,7 @@ const ShareView = () => {
                     ref={inputRef}
                     style={{
                       flexShrink: 1,
+                      flexGrow: 1,
                       fontFamily: "OpenSans-SemiBold",
                       fontSize: SIZE.lg,
                       paddingBottom: 0,
@@ -677,7 +688,7 @@ const ShareView = () => {
                     onLoad={(title) => {
                       if (!noteTitle.current) {
                         noteTitle.current = title;
-                        inputRef.current?.setNativeProps({
+                        inputRef.current?.setNativeProps?.({
                           text: noteTitle.current
                         });
                       }
