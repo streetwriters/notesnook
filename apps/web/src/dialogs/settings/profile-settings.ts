@@ -64,7 +64,6 @@ export const ProfileSettings: SettingsGroup[] = [
         key: "manage-attachments",
         title: "Attachments",
         description: "Manage all your attachments in one place.",
-        isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
             type: "button",
