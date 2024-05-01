@@ -118,7 +118,12 @@ NewFeature.present = () => {
   );
   if (_features.length === 0) return;
   presentSheet({
-    component: <NewFeature features={features} version={version} />,
+    component: (
+      <NewFeature
+        features={features}
+        version={SettingsService.getProperty("version")}
+      />
+    ),
     disableClosing: true
   });
   return true;

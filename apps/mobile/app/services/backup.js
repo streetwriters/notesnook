@@ -31,6 +31,7 @@ import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
+import { useUserStore } from "../stores/use-user-store";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -191,9 +192,10 @@ async function run(progress = false, context) {
   await RNFetchBlob.fs.mkdir(zipSourceFolder);
 
   try {
+    const user = await db.user.getUser();
     for await (const file of db.backup.export(
       "mobile",
-      SettingsService.get().encryptedBackup
+      SettingsService.get().encryptedBackup && user
     )) {
       console.log("Writing backup chunk of size...", file?.data?.length);
       await RNFetchBlob.fs.writeFile(
@@ -252,7 +254,7 @@ async function run(progress = false, context) {
   } catch (e) {
     ToastManager.error(e, "Backup failed", context || "global");
 
-    if (e.message.includes("android.net.Uri") && androidBackupDirectory) {
+    if (e?.message?.includes("android.net.Uri") && androidBackupDirectory) {
       SettingsService.setProperty("backupDirectoryAndroid", null);
       return run(progress, context);
     }

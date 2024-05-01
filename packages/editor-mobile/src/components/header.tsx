@@ -331,7 +331,10 @@ function Header({
 
             <ControlledMenu
               align="end"
-              anchorRef={btnRef}
+              anchorPoint={{
+                x: window.innerWidth - 10,
+                y: 70
+              }}
               state={isOpen ? "open" : "closed"}
               menuClassName={menuClassName}
               onClose={() => {

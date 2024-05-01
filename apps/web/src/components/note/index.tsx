@@ -282,7 +282,8 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevProps.notebooks?.dateEdited === nextProps.notebooks?.dateEdited &&
     prevProps.tags?.dateEdited === nextProps.tags?.dateEdited &&
     prevProps.reminder?.dateModified === nextProps.reminder?.dateModified &&
-    prevProps.attachments === nextProps.attachments &&
+    prevProps.attachments?.failed === nextProps.attachments?.failed &&
+    prevProps.attachments?.total === nextProps.attachments?.total &&
     prevProps.locked === nextProps.locked
   );
 });

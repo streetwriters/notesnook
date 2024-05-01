@@ -22,10 +22,15 @@ import { TextInput } from "react-native";
 import WebView from "react-native-webview";
 import { MMKV } from "../../../common/database/mmkv";
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import { AppState, EditorState, useEditorType } from "./types";
+import { useTabStore } from "./use-tab-store";
+import { parseInternalLink } from "@notesnook/core";
+import { eOnLoadNote } from "../../../utils/events";
+import { db } from "../../../common/database";
 export const textInput = createRef<TextInput>();
 export const editorController =
   createRef<useEditorType>() as MutableRefObject<useEditorType>;
@@ -175,4 +180,28 @@ export function getAppState() {
 export function clearAppState() {
   appState = undefined;
   MMKV.removeItem("appState");
+}
+
+export async function openInternalLink(url: string) {
+  const data = parseInternalLink(url);
+  if (!data?.id) return false;
+  if (
+    data.id ===
+    useTabStore.getState().getNoteIdForTab(useTabStore.getState().currentTab)
+  ) {
+    if (data.params?.blockId) {
+      setTimeout(() => {
+        if (!data.params?.blockId) return;
+        editorController.current.commands.scrollIntoViewById(
+          data.params.blockId
+        );
+      }, 150);
+    }
+    return;
+  }
+
+  eSendEvent(eOnLoadNote, {
+    item: await db.notes.note(data?.id),
+    blockId: data.params?.blockId
+  });
 }

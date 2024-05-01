@@ -438,7 +438,11 @@ class EditorStore extends BaseStore<EditorStore> {
       if (index === -1) return;
       const session = state.sessions[index] as SessionTypeMap[T[number]];
       if (typeof partial === "function") partial(session);
-      else state.sessions[index] = { ...session, ...partial };
+      else {
+        for (const key in partial) {
+          session[key] = partial[key] as any;
+        }
+      }
     });
   };
 

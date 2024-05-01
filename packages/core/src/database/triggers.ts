@@ -31,8 +31,8 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addEvent("insert")
     .when((eb) =>
       eb.and([
-        eb.or([eb("new.deleted", "is", null), eb("new.deleted", "==", false)]),
-        eb.or([eb("new.locked", "is", null), eb("new.locked", "==", false)]),
+        eb("new.deleted", "is not", true),
+        eb("new.locked", "is not", true),
         eb("new.data", "is not", null)
       ])
     )
@@ -71,6 +71,13 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .onTable("content", "main")
     .after()
     .addEvent("update")
+    .when((eb) =>
+      eb.and([
+        eb("old.deleted", "is not", true),
+        eb("old.noteId", "is not", null),
+        eb("old.data", "is not", null)
+      ])
+    )
     .addQuery((c) =>
       c.insertInto("content_fts").values({
         content_fts: sql.lit("delete"),
@@ -135,7 +142,13 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .ifNotExists()
     .onTable("notes", "main")
     .after()
-    .addEvent("update", ["title"])
+    .addEvent("update")
+    .when((eb) =>
+      eb.and([
+        eb("old.deleted", "is not", true),
+        eb("old.title", "is not", null)
+      ])
+    )
     .addQuery((c) =>
       c.insertInto("notes_fts").values({
         notes_fts: sql.lit("delete"),

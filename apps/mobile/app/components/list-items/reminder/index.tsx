@@ -22,7 +22,6 @@ import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
-import { useSelectionStore } from "../../../stores/use-selection-store";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import ReminderSheet from "../../sheets/reminder";
@@ -30,7 +29,7 @@ import { IconButton } from "../../ui/icon-button";
 import { ReminderTime } from "../../ui/reminder-time";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import SelectionWrapper from "../selection-wrapper";
+import SelectionWrapper, { selectItem } from "../selection-wrapper";
 
 const ReminderItem = React.memo(
   ({
@@ -44,18 +43,7 @@ const ReminderItem = React.memo(
   }) => {
     const { colors } = useThemeColors();
     const openReminder = () => {
-      const {
-        selectedItemsList,
-        setSelectedItem,
-        selectionMode,
-        clearSelection
-      } = useSelectionStore.getState();
-      if (selectedItemsList.length > 0 && selectionMode === item.type) {
-        setSelectedItem(item.id);
-        return;
-      } else {
-        clearSelection();
-      }
+      if (selectItem(item)) return;
 
       ReminderSheet.present(item, undefined, isSheet);
     };

@@ -6,7 +6,7 @@
   font-family: inherit;
 }
 
-.ProseMirror p.is-empty:first-child::before {
+.ProseMirror p.is-editor-empty::before {
   color: var(--placeholder);
   content: attr(data-placeholder);
   float: left;

@@ -214,7 +214,7 @@ export const SelectionHeader = React.memo(
             size={SIZE.xl}
           />
 
-          {renderedInRoute === "Notebooks" ? (
+          {renderedInRoute === "Notebooks" && selectedItemsList.length ? (
             <IconButton
               style={{
                 marginLeft: 10
@@ -231,7 +231,7 @@ export const SelectionHeader = React.memo(
             />
           ) : null}
 
-          {type !== "note" ? null : (
+          {type !== "note" || !selectedItemsList.length ? null : (
             <>
               <IconButton
                 onPress={async () => {
@@ -278,16 +278,14 @@ export const SelectionHeader = React.memo(
             </>
           )}
 
-          {renderedInRoute === "Notebook" ? (
+          {renderedInRoute === "Notebook" && selectedItemsList.length ? (
             <IconButton
               onPress={async () => {
-                if (selectedItemsList.length > 0) {
-                  if (!id) return;
-                  await db.notes.removeFromNotebook(id, ...selectedItemsList);
-                  updateNotebook(id);
-                  Navigation.queueRoutesForUpdate();
-                  clearSelection();
-                }
+                if (!id) return;
+                await db.notes.removeFromNotebook(id, ...selectedItemsList);
+                updateNotebook(id);
+                Navigation.queueRoutesForUpdate();
+                clearSelection();
               }}
               style={{
                 marginLeft: 10
@@ -301,7 +299,7 @@ export const SelectionHeader = React.memo(
             />
           ) : null}
 
-          {focusedRouteId === "Favorites" ? (
+          {focusedRouteId === "Favorites" && selectedItemsList.length ? (
             <IconButton
               onPress={addToFavorite}
               style={{
@@ -315,7 +313,7 @@ export const SelectionHeader = React.memo(
             />
           ) : null}
 
-          {type === "trash" ? null : (
+          {type === "trash" || !selectedItemsList.length ? null : (
             <IconButton
               style={{
                 marginLeft: 10
@@ -337,7 +335,7 @@ export const SelectionHeader = React.memo(
             />
           )}
 
-          {type === "trash" ? (
+          {type === "trash" && selectedItemsList.length ? (
             <>
               <IconButton
                 style={{

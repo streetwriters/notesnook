@@ -24,6 +24,7 @@ import { DatabaseSchema, RawDatabaseSchema } from "../database";
 import { AnyColumnWithTable, Kysely, sql } from "kysely";
 import { FilteredSelector } from "../database/sql-collection";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
+import { logger } from "../logger";
 
 type SearchResults<T> = {
   sorted: (limit?: number) => Promise<VirtualizedGrouping<T>>;
@@ -44,8 +45,6 @@ export default class Lookup {
       if (query.length < 3) return [];
 
       const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
-      query = query.replace(/"/, '""');
-
       const excludedIds = this.db.trash.cache.notes;
       const results = await db
         .selectFrom((eb) =>
@@ -57,7 +56,7 @@ export default class Lookup {
             .$if(excludedIds.length > 0, (eb) =>
               eb.where("id", "not in", excludedIds)
             )
-            .where("title", "match", `"${query}"`)
+            .where("title", "match", query)
             .select(["id", sql<number>`rank * 10`.as("rank")])
             .unionAll((eb) =>
               eb
@@ -68,7 +67,7 @@ export default class Lookup {
                 .$if(excludedIds.length > 0, (eb) =>
                   eb.where("id", "not in", excludedIds)
                 )
-                .where("data", "match", `"${query}"`)
+                .where("data", "match", query)
                 .select(["noteId as id", "rank"])
                 .$castTo<{ id: string; rank: number }>()
             )
@@ -85,7 +84,11 @@ export default class Lookup {
           "in",
           (notes || this.db.notes.all).filter.select("id")
         )
-        .execute();
+        .execute()
+        .catch((e) => {
+          logger.error(e, `Error while searching`, { query });
+          return [];
+        });
       return results.map((r) => r.id);
     }, notes || this.db.notes.all);
   }

@@ -61,6 +61,7 @@ import {
 } from "@notesnook/core";
 import { VirtualizedTable } from "../virtualized-table";
 import { TextSlice } from "@notesnook/core/dist/utils/content-block";
+import { TITLE_BAR_HEIGHT } from "../title-bar";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Pin, label: "Pin" },
@@ -129,7 +130,7 @@ function EditorProperties(props: EditorPropertiesProps) {
       sx={{
         display: "flex",
         position: "absolute",
-        top: 0,
+        top: TITLE_BAR_HEIGHT,
         right: 0,
         zIndex: 999,
         height: "100%",
