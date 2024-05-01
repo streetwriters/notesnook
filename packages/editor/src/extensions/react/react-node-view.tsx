@@ -32,6 +32,7 @@ import { Editor, NodeViewRendererProps } from "@tiptap/core";
 import { __serializeForClipboard, EditorView } from "prosemirror-view";
 import { EmotionThemeProvider } from "@notesnook/theme";
 import { isAndroid, isiOS } from "../../utils/platform";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store";
 
 // This is hacky workaround to manually handle serialization when
 // drag/dropping on mobile devices.
@@ -158,9 +159,16 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
 
   Component: FunctionComponent = () => {
     if (!this.options.component) return null;
-
     return (
-      <EmotionThemeProvider scope="editor" injectCssVars={false}>
+      <EmotionThemeProvider
+        scope="editor"
+        injectCssVars={false}
+        theme={
+          useToolbarStore.getState().isMobile
+            ? { space: [0, 10, 12, 20] }
+            : undefined
+        }
+      >
         <this.options.component
           {...(this.options.props as P)}
           pos={this.pos}

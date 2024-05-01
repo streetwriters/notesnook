@@ -33,6 +33,7 @@ import { useTheme } from "@emotion/react";
 export type EmotionThemeProviderProps = {
   scope?: keyof ThemeScopes;
   injectCssVars?: boolean;
+  theme?: Partial<Theme>;
 } & Omit<BoxProps, "variant" | "ref">;
 
 function _EmotionThemeProvider(
@@ -44,6 +45,7 @@ function _EmotionThemeProvider(
     scope = "base",
     injectCssVars = true,
     className,
+    theme: partialTheme,
     ...restProps
   } = props;
   const emotionTheme = useTheme() as Theme;
@@ -66,6 +68,7 @@ function _EmotionThemeProvider(
         ...(emotionTheme && "space" in emotionTheme
           ? emotionTheme
           : themeProperties),
+        ...partialTheme,
         colors: themeProperties.colors
       }}
     >
