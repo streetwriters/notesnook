@@ -87,6 +87,7 @@ function saveContent(noteId: string, ignoreEdit: boolean, content: string) {
 const deferredSave = debounceWithId(saveContent, 100);
 
 export default function TabsView() {
+  const sessions = useEditorStore((store) => store.sessions);
   const documentPreview = useEditorStore((store) => store.documentPreview);
   const activeSessionId = useEditorStore((store) => store.activeSessionId);
   const arePropertiesVisible = useEditorStore(
@@ -95,7 +96,6 @@ export default function TabsView() {
   const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
   const [dropRef, overlayRef] = useDragOverlay();
 
-  const sessions = useEditorStore.getState().sessions;
   return (
     <>
       {IS_DESKTOP_APP ? (

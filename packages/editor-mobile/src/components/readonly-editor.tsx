@@ -16,12 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import {
-  PortalProvider,
-  TiptapOptions,
-  getFontById,
-  useTiptap
-} from "@notesnook/editor";
+import { TiptapOptions, getFontById, useTiptap } from "@notesnook/editor";
 import { useThemeColors } from "@notesnook/theme";
 import {
   useCallback,
@@ -71,11 +66,7 @@ export const ReadonlyEditorProvider = (): JSX.Element => {
     }
   }, [settings.fontSize, settings.fontFamily]);
 
-  return (
-    <PortalProvider>
-      <Tiptap settings={settings} getContentDiv={getContentDiv} />
-    </PortalProvider>
-  );
+  return <Tiptap settings={settings} getContentDiv={getContentDiv} />;
 };
 
 const Tiptap = ({

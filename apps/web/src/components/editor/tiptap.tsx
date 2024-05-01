@@ -24,7 +24,6 @@ import "@notesnook/editor/styles/fonts.css";
 import {
   Toolbar,
   useTiptap,
-  PortalProvider,
   Editor,
   AttachmentType,
   usePermissionHandler,
@@ -41,7 +40,6 @@ import {
 import { Box, Flex } from "@theme-ui/components";
 import {
   PropsWithChildren,
-  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -61,7 +59,6 @@ import { writeToClipboard } from "../../utils/clipboard";
 import { useEditorStore } from "../../stores/editor-store";
 import { parseInternalLink } from "@notesnook/core";
 import Skeleton from "react-loading-skeleton";
-import { showToast } from "../../utils/toast";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -402,58 +399,56 @@ function TiptapWrapper(
   }, [theme]);
 
   return (
-    <PortalProvider>
-      <Flex
-        ref={containerRef}
-        sx={{
-          flex: 1,
-          flexDirection: "column",
-          ".tiptap.ProseMirror": { pb: 150 }
+    <Flex
+      ref={containerRef}
+      sx={{
+        flex: 1,
+        flexDirection: "column",
+        ".tiptap.ProseMirror": { pb: 150 }
+      }}
+    >
+      <TipTap
+        {...props}
+        onLoad={(editor) => {
+          props.onLoad?.(editor);
+          containerRef.current
+            ?.querySelector(".editor-loading-container")
+            ?.remove();
         }}
-      >
-        <TipTap
-          {...props}
-          onLoad={(editor) => {
-            props.onLoad?.(editor);
-            containerRef.current
-              ?.querySelector(".editor-loading-container")
-              ?.remove();
-          }}
-          editorContainer={() => {
-            if (editorContainerRef.current) return editorContainerRef.current;
-            const editorContainer = document.createElement("div");
-            editorContainer.classList.add("selectable");
-            editorContainer.style.flex = "1";
-            editorContainer.style.cursor = "text";
-            editorContainer.style.color =
-              theme.scopes.editor?.primary?.paragraph ||
-              theme.scopes.base.primary.paragraph;
-            editorContainer.style.fontSize = `${editorConfig.fontSize}px`;
-            editorContainer.style.fontFamily =
-              getFontById(editorConfig.fontFamily)?.font || "sans-serif";
-            editorContainerRef.current = editorContainer;
-            return editorContainer;
-          }}
-          fontFamily={editorConfig.fontFamily}
-          fontSize={editorConfig.fontSize}
+        editorContainer={() => {
+          if (editorContainerRef.current) return editorContainerRef.current;
+          const editorContainer = document.createElement("div");
+          editorContainer.classList.add("selectable");
+          editorContainer.style.flex = "1";
+          editorContainer.style.cursor = "text";
+          editorContainer.style.color =
+            theme.scopes.editor?.primary?.paragraph ||
+            theme.scopes.base.primary.paragraph;
+          editorContainer.style.fontSize = `${editorConfig.fontSize}px`;
+          editorContainer.style.fontFamily =
+            getFontById(editorConfig.fontFamily)?.font || "sans-serif";
+          editorContainerRef.current = editorContainer;
+          return editorContainer;
+        }}
+        fontFamily={editorConfig.fontFamily}
+        fontSize={editorConfig.fontSize}
+      />
+      {props.children}
+      <Box className="editor-loading-container">
+        <Skeleton
+          enableAnimation={false}
+          height={22}
+          style={{ marginTop: 16 }}
+          count={2}
         />
-        {props.children}
-        <Box className="editor-loading-container">
-          <Skeleton
-            enableAnimation={false}
-            height={22}
-            style={{ marginTop: 16 }}
-            count={2}
-          />
-          <Skeleton
-            enableAnimation={false}
-            height={22}
-            width={25}
-            style={{ marginTop: 16 }}
-          />
-        </Box>
-      </Flex>
-    </PortalProvider>
+        <Skeleton
+          enableAnimation={false}
+          height={22}
+          width={25}
+          style={{ marginTop: 16 }}
+        />
+      </Box>
+    </Flex>
   );
 }
 export default TiptapWrapper;
