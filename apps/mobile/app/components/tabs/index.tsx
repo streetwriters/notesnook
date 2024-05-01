@@ -59,7 +59,7 @@ export interface TabsRef {
   lock: () => boolean;
   openDrawer: (animated?: boolean) => void;
   closeDrawer: (animated?: boolean) => void;
-  page: number;
+  page: () => number;
   setScrollEnabled: () => true;
   isDrawerOpen: () => boolean;
   node: RefObject<Animated.View>;
@@ -239,7 +239,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
         onDrawerStateChange(false);
         isDrawerOpen.value = false;
       },
-      page: currentTab.value,
+      page: () => currentTab.value,
       setScrollEnabled: () => true,
       node: node
     }),

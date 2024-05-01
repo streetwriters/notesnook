@@ -173,3 +173,4 @@ export const eUnlockWithBiometrics = "618";
 export const eUnlockWithPassword = "619";
 export const eUpdateNoteInEditor = "620";
 export const eOnEnterEditor = "621";
+export const eOnExitEditor = "622";
