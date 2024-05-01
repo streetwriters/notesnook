@@ -151,7 +151,10 @@ async function resolveNotes(ids: string[]) {
     notebooks: await db.notebooks.all.records(
       Array.from(relationIds.notebooks)
     ),
-    tags: await db.tags.all.records(Array.from(relationIds.tags)),
+    tags: await db.tags.all.records(Array.from(relationIds.tags), {
+      sortBy: "title",
+      sortDirection: "desc"
+    }),
     colors: await db.colors.all.records(Array.from(relationIds.colors)),
     reminders: await db.reminders.all.records(
       Array.from(relationIds.reminders)
