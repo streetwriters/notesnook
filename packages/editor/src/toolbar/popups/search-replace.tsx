@@ -50,7 +50,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
         matchWholeWord
       });
     },
-    [matchCase, enableRegex, matchWholeWord]
+    [editor.commands, matchCase, enableRegex, matchWholeWord]
   );
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               ref={searchInputRef}
               autoFocus
               placeholder="Find"
-              sx={{ p: 0 }}
+              sx={{ p: 0, fontFamily: "monospace" }}
               value={searchTerm}
               onChange={(e) => {
                 search(e.target.value);
@@ -102,7 +102,8 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  editor.commands.moveToNextResult();
+                  if (e.shiftKey) editor.commands.moveToPreviousResult();
+                  else editor.commands.moveToNextResult();
                 }
               }}
             />
@@ -136,9 +137,10 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                     title="Match case"
                     id="matchCase"
                     icon="caseSensitive"
-                    onClick={() =>
-                      useEditorSearchStore.setState({ matchCase: !matchCase })
-                    }
+                    onClick={() => {
+                      useEditorSearchStore.setState({ matchCase: !matchCase });
+                      search(useEditorSearchStore.getState().searchTerm);
+                    }}
                     iconSize={"medium"}
                   />
                   <ToolButton
@@ -149,11 +151,12 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                     title="Match whole word"
                     id="matchWholeWord"
                     icon="wholeWord"
-                    onClick={() =>
+                    onClick={() => {
                       useEditorSearchStore.setState({
                         matchWholeWord: !matchWholeWord
-                      })
-                    }
+                      });
+                      search(useEditorSearchStore.getState().searchTerm);
+                    }}
                     iconSize={"medium"}
                   />
                   <ToolButton
@@ -164,11 +167,12 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                     title="Enable regex"
                     id="enableRegex"
                     icon="regex"
-                    onClick={() =>
+                    onClick={() => {
                       useEditorSearchStore.setState({
                         enableRegex: !enableRegex
-                      })
-                    }
+                      });
+                      search(useEditorSearchStore.getState().searchTerm);
+                    }}
                     iconSize={"medium"}
                   />
                 </>
@@ -190,7 +194,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
           </Flex>
           {isReplacing && (
             <Input
-              sx={{ mt: 1, p: "7px" }}
+              sx={{ mt: 1, p: "7px", fontFamily: "monospace" }}
               placeholder="Replace"
               value={replaceTerm}
               onChange={(e) =>
@@ -251,7 +255,11 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 title="Replace"
                 id="replace"
                 icon="replaceOne"
-                onClick={() => editor.commands.replace(replaceTerm)}
+                onClick={() =>
+                  editor.commands.replace(
+                    useEditorSearchStore.getState().replaceTerm
+                  )
+                }
                 sx={{ mr: 0 }}
                 iconSize={18}
               />
@@ -260,7 +268,11 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 title="Replace all"
                 id="replaceAll"
                 icon="replaceAll"
-                onClick={() => editor.commands.replaceAll(replaceTerm)}
+                onClick={() =>
+                  editor.commands.replaceAll(
+                    useEditorSearchStore.getState().replaceTerm
+                  )
+                }
                 sx={{ mr: 0 }}
                 iconSize={18}
               />
