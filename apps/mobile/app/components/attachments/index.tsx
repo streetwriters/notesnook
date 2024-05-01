@@ -177,7 +177,7 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
       case "audio":
         items = note
           ? db.attachments.ofNote(note.id, "audio")
-          : db.attachments.all;
+          : db.attachments.audios;
         break;
       case "documents":
         items = note
