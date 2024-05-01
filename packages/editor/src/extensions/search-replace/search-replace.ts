@@ -19,13 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Extension } from "@tiptap/core";
 import { Decoration, DecorationSet } from "prosemirror-view";
-import {
-  EditorState,
-  Plugin,
-  PluginKey,
-  TextSelection,
-  Transaction
-} from "prosemirror-state";
+import { EditorState, Plugin, PluginKey, Transaction } from "prosemirror-state";
 import { SearchSettings } from "../../toolbar/stores/search-store";
 
 type DispatchFn = (tr: Transaction) => void;
@@ -62,7 +56,10 @@ export type SearchStorage = {
 
 interface TextNodesWithPosition {
   text: string;
-  pos: number;
+  startPos: number;
+  endPos: number;
+  start: number;
+  end: number;
 }
 
 const updateView = (state: EditorState, dispatch: DispatchFn) => {
@@ -71,15 +68,19 @@ const updateView = (state: EditorState, dispatch: DispatchFn) => {
   dispatch(state.tr);
 };
 
-const regex = (s: string, settings: SearchSettings): RegExp => {
+const regex = (s: string, settings: SearchSettings): RegExp | undefined => {
   const { enableRegex, matchCase, matchWholeWord } = settings;
   const boundary = matchWholeWord ? "\\b" : "";
-  return RegExp(
-    boundary +
-      (enableRegex ? s : s.replace(/[/\\^$*+?.()|[\]]/g, "\\$&")) +
-      boundary,
-    matchCase ? "gu" : "gui"
-  );
+  try {
+    return RegExp(
+      boundary +
+        (enableRegex ? s : s.replace(/[/\\^$*+?.()|[\]]/g, "\\$&")) +
+        boundary,
+      matchCase ? "gum" : "guim"
+    );
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 function searchDocument(
@@ -98,41 +99,61 @@ function searchDocument(
   const doc = tr.doc;
   const results: Result[] = [];
 
-  let index = 0;
-  let textNodesWithPosition: TextNodesWithPosition[] = [];
+  let index = -1;
+  const textNodesWithPosition: TextNodesWithPosition[] = [];
 
+  let cursor = 0;
   doc?.descendants((node, pos) => {
     if (node.isText) {
       if (textNodesWithPosition[index]) {
-        textNodesWithPosition[index] = {
-          text: textNodesWithPosition[index].text + node.text,
-          pos: textNodesWithPosition[index].pos
-        };
+        textNodesWithPosition[index].text += node.text;
+        textNodesWithPosition[index].end = cursor + (node.text?.length || 0);
       } else {
         textNodesWithPosition[index] = {
           text: node.text || "",
-          pos
+          startPos: pos,
+          endPos: pos + node.nodeSize,
+          start: cursor,
+          end: cursor + (node.text?.length || 0)
         };
       }
-    } else {
-      index += 1;
+      cursor += node.text?.length || 0;
+    } else if (node.isBlock) {
+      const lastNode = textNodesWithPosition[index];
+      if (lastNode) {
+        lastNode.text += "\n";
+        lastNode.end++;
+        lastNode.endPos = pos;
+        cursor++;
+      }
+      index++;
     }
   });
-  textNodesWithPosition = textNodesWithPosition.filter(Boolean);
 
-  for (const { text, pos } of textNodesWithPosition) {
-    const matches = text.matchAll(searchTerm);
+  const text = textNodesWithPosition.map((c) => c.text).join("");
+  for (const match of text.matchAll(searchTerm)) {
+    const start = match.index;
+    const end = match.index + match[0].length;
 
-    for (const m of matches) {
-      if (m[0] === "") break;
+    // Gets all matching nodes that have either the start or end of the
+    // search term in them. This adds support for multi line regex searches.
+    const nodes = textNodesWithPosition.filter((node) => {
+      const nodeStart = node.start;
+      const nodeEnd = node.end;
+      return (
+        (start >= nodeStart && start < nodeEnd) ||
+        (end >= nodeStart && end < nodeEnd)
+      );
+    });
 
-      if (m.index !== undefined) {
-        results.push({
-          from: pos + m.index,
-          to: pos + m.index + m[0].length
-        });
-      }
-    }
+    if (!nodes.length) continue;
+    const endNode = nodes[nodes.length - 1];
+    const startNode = nodes[0];
+    results.push({
+      // reposition our RegExp match index relative to the actual node.
+      from: start + (startNode.startPos - startNode.start),
+      to: end + (endNode.endPos - endNode.end)
+    });
   }
 
   const { from: selectedFrom, to: selectedTo } = tr.selection;
@@ -299,24 +320,8 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           const { from, to } = results[index];
 
           tr.insertText(term, from, to);
-
-          if (index + 1 < results.length) {
-            const { from, to } = results[index + 1];
-            const nextResult = (results[index + 1] = {
-              from: tr.mapping.map(from),
-              to: tr.mapping.map(to)
-            });
-
-            commands.focus();
-            tr.setSelection(
-              new TextSelection(
-                tr.doc.resolve(nextResult.from),
-                tr.doc.resolve(nextResult.to)
-              )
-            );
-          }
           dispatch(tr);
-          results.splice(index, 1);
+          commands.moveToNextResult();
           return true;
         },
       replaceAll:
