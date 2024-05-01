@@ -21,7 +21,6 @@ import {
   Editor,
   getFontById,
   getTableOfContents,
-  PortalProvider,
   TiptapOptions,
   Toolbar,
   usePermissionHandler,
@@ -801,11 +800,7 @@ const TiptapProvider = (): JSX.Element => {
     }
   }, [settings.fontSize, settings.fontFamily]);
 
-  return (
-    <PortalProvider>
-      <Tiptap settings={settings} getContentDiv={getContentDiv} />
-    </PortalProvider>
-  );
+  return <Tiptap settings={settings} getContentDiv={getContentDiv} />;
 };
 
 export default TiptapProvider;

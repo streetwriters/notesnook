@@ -61,7 +61,6 @@ import OrderedList from "./extensions/ordered-list";
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Paragraph } from "./extensions/paragraph";
-import { PortalProviderAPI, usePortalProvider } from "./extensions/react";
 import { SearchReplace } from "./extensions/search-replace";
 import { Table } from "./extensions/table";
 import TableCell from "./extensions/table-cell";
@@ -87,7 +86,6 @@ import { useEditorSearchStore } from "./toolbar/stores/search-store";
 import { DiffHighlighter } from "./extensions/diff-highlighter";
 
 interface TiptapStorage {
-  portalProviderAPI?: PortalProviderAPI;
   dateFormat?: DateTimeOptions["dateFormat"];
   timeFormat?: DateTimeOptions["timeFormat"];
   openLink?: (url: string) => void;
@@ -124,7 +122,7 @@ export type TiptapOptions = EditorOptions &
   Omit<WebClipOptions, "HTMLAttributes"> &
   Omit<ImageOptions, "HTMLAttributes"> &
   DateTimeOptions &
-  Omit<TiptapStorage, "portalProviderAPI"> & {
+  TiptapStorage & {
     downloadOptions?: DownloadOptions;
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
@@ -153,7 +151,6 @@ const useTiptap = (
     ...restOptions
   } = options;
 
-  const PortalProviderAPI = usePortalProvider();
   const setIsMobile = useToolbarStore((store) => store.setIsMobile);
   const closeAllPopups = useToolbarStore((store) => store.closeAllPopups);
   const setDownloadOptions = useToolbarStore(
@@ -356,7 +353,6 @@ const useTiptap = (
         })
       ],
       onBeforeCreate: ({ editor }) => {
-        editor.storage.portalProviderAPI = PortalProviderAPI;
         editor.storage.dateFormat = dateFormat;
         editor.storage.timeFormat = timeFormat;
 
@@ -378,7 +374,6 @@ const useTiptap = (
       downloadAttachment,
       openAttachmentPicker,
       getAttachmentData,
-      PortalProviderAPI,
       onBeforeCreate,
       openLink,
       dateFormat,
@@ -403,7 +398,6 @@ const useTiptap = (
 export { type Fragment } from "prosemirror-model";
 export { type Attachment, type AttachmentType } from "./extensions/attachment";
 export { type ImageAttributes } from "./extensions/image";
-export * from "./extensions/react";
 export * from "./toolbar";
 export * from "./types";
 export * from "./utils/word-counter";
