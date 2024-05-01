@@ -40,7 +40,7 @@ async function renderApp() {
     const { useKeyStore } = await import("./interfaces/key-store");
     await useKeyStore.getState().init();
 
-    // if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
+    if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
 
     const { default: Component } = await component();
     const { default: AppLock } = await import("./views/app-lock");
