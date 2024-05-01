@@ -218,12 +218,7 @@ export default async function downloadAttachment(
     }
 
     if (options.base64 || options.text) {
-      console.log(
-        "starting decrypt base64 file...",
-        options.base64,
-        options.text,
-        attachment.hash
-      );
+      DatabaseLogger.log(`Starting to decrypt... hash: ${attachment.hash}`);
       return await db.attachments.read(
         attachment.hash,
         options.base64 ? "base64" : "text"
@@ -292,7 +287,7 @@ export default async function downloadAttachment(
 
     return fileUri;
   } catch (e) {
-    console.log("download attachment error: ", e);
+    DatabaseLogger.error(e);
     if (attachment.dateUploaded) {
       RNFetchBlob.fs
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}`)

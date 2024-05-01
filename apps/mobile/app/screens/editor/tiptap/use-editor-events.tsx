@@ -77,7 +77,6 @@ import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { EditorEvents, editorState, openInternalLink } from "./utils";
 
-
 const publishNote = async () => {
   const user = useUserStore.getState().user;
   if (!user) {
@@ -469,12 +468,10 @@ export const useEditorEvents = (
 
         case EventTypes.getAttachmentData: {
           const attachment = (editorMessage.value as any)
-            .attachment as Attachment;
+            ?.attachment as Attachment;
 
-          console.log(
-            "Getting attachment data:",
-            attachment.hash,
-            attachment.type
+          DatabaseLogger.log(
+            `Getting attachment data: ${attachment?.hash} ${attachment?.type}`
           );
           downloadAttachment(attachment.hash, true, {
             base64: attachment.type === "image",
@@ -494,8 +491,8 @@ export const useEditorEvents = (
                 data
               });
             })
-            .catch(() => {
-              console.log("Error downloading attachment data");
+            .catch((e) => {
+              DatabaseLogger.error(e);
               editor.postMessage(EditorEvents.attachmentData, {
                 resolverId: (editorMessage.value as any).resolverId,
                 data: undefined
