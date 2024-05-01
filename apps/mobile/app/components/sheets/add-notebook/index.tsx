@@ -45,14 +45,16 @@ export const AddNotebookSheet = ({
   notebook,
   parentNotebook,
   close,
-  showMoveNotesOnComplete
+  showMoveNotesOnComplete,
+  defaultTitle
 }: {
   notebook?: Notebook;
   parentNotebook?: Notebook;
   close?: (didAddNotebook: boolean) => void;
   showMoveNotesOnComplete: boolean;
+  defaultTitle?: string;
 }) => {
-  const title = useRef(notebook?.title);
+  const title = useRef(notebook?.title || defaultTitle);
   const description = useRef(notebook?.description);
   const titleInput = useRef<TextInput>(null);
   const descriptionInput = useRef<TextInput>(null);
@@ -139,7 +141,7 @@ export const AddNotebookSheet = ({
         }}
         returnKeyLabel="Next"
         returnKeyType="next"
-        defaultValue={notebook ? notebook.title : ""}
+        defaultValue={notebook ? notebook.title : title.current}
       />
 
       <Input
@@ -174,7 +176,8 @@ AddNotebookSheet.present = (
   parentNotebook?: Notebook,
   context?: string,
   onClose?: (didAddNotebook: boolean) => void,
-  showMoveNotesOnComplete = true
+  showMoveNotesOnComplete = true,
+  defaultTitle?: string
 ) => {
   presentSheet({
     context: context,
@@ -187,6 +190,7 @@ AddNotebookSheet.present = (
           onClose?.(didAddNotebook);
         }}
         showMoveNotesOnComplete={showMoveNotesOnComplete || false}
+        defaultTitle={defaultTitle}
       />
     )
   });

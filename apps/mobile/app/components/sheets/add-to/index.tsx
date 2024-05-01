@@ -19,7 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Note } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
-import React, { RefObject, useCallback, useEffect } from "react";
+import React, {
+  RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 import {
   ActivityIndicator,
   Keyboard,
@@ -47,6 +53,8 @@ import Paragraph from "../../ui/typography/paragraph";
 import { NotebookItem } from "./notebook-item";
 import { useNotebookItemSelectionStore } from "./store";
 import { AddNotebookSheet } from "../add-notebook";
+import Input from "../../ui/input";
+import { presentDialog } from "../../dialog/functions";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -93,7 +101,11 @@ const MoveNoteSheet = ({
   actionSheetRef: RefObject<ActionSheetRef>;
 }) => {
   const { colors } = useThemeColors();
-  const [notebooks, loading] = useNotebooks();
+  const [rootNotebooks, loading] = useNotebooks();
+  const searchQuery = useRef("");
+  const searchTimer = useRef<NodeJS.Timeout>();
+  const [notebooks, setNotebooks] = useState(rootNotebooks);
+
   const dimensions = useSettingStore((state) => state.dimensions);
   const selectedItemsList = useSelectionStore(
     (state) => state.selectedItemsList
@@ -102,6 +114,12 @@ const MoveNoteSheet = ({
   const multiSelect = useNotebookItemSelectionStore(
     (state) => state.multiSelect
   );
+
+  useEffect(() => {
+    if (!loading) {
+      setNotebooks(rootNotebooks);
+    }
+  }, [loading, rootNotebooks]);
 
   useEffect(() => {
     const items = note ? [note.id] : selectedItemsList;
@@ -199,7 +217,6 @@ const MoveNoteSheet = ({
             {hasSelected() ? (
               <IconButton
                 name="restore"
-                type="secondaryAccented"
                 color={colors.primary.icon}
                 onPress={() => {
                   const items = note ? [note.id] : selectedItemsList;
@@ -239,33 +256,48 @@ const MoveNoteSheet = ({
             style={{
               width: "100%"
             }}
+            keyboardShouldPersistTaps="handled"
             ListHeaderComponent={
               <View
                 style={{
                   paddingHorizontal: 12,
-                  width: "100%"
+                  width: "100%",
+                  paddingTop: 12
                 }}
               >
-                <Button
-                  title="Add new notebook"
-                  style={{
-                    alignSelf: "flex-start",
-                    paddingHorizontal: 12,
-                    justifyContent: "space-between"
+                <Input
+                  placeholder="Search notebooks...."
+                  button={{
+                    icon: "plus",
+                    onPress: () => {
+                      AddNotebookSheet.present(
+                        undefined,
+                        undefined,
+                        "link-notebooks",
+                        undefined,
+                        false,
+                        searchQuery.current
+                      );
+                    },
+                    color: colors.primary.icon
                   }}
-                  onPress={() => {
-                    AddNotebookSheet.present(
-                      undefined,
-                      undefined,
-                      "link-notebooks",
-                      undefined,
-                      false
-                    );
+                  onChangeText={(value) => {
+                    searchQuery.current = value;
+                    if (!searchQuery.current) {
+                      setNotebooks(rootNotebooks);
+                      return;
+                    }
+                    searchTimer.current = setTimeout(() => {
+                      db.lookup
+                        .notebooks(searchQuery.current)
+                        .sorted()
+                        .then((result) => {
+                          if (searchQuery.current === value) {
+                            setNotebooks(result);
+                          }
+                        });
+                    }, 300);
                   }}
-                  icon="plus"
-                  iconPosition="right"
-                  type="secondaryAccented"
-                  width="100%"
                 />
               </View>
             }
