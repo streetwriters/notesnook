@@ -50,7 +50,7 @@ const Sort = ({ type, screen }) => {
   const setOrderBy = async () => {
     let _groupOptions = {
       ...groupOptions,
-      sortDirection: groupOptions.sortDirection === "asc" ? "desc" : "asc"
+      sortDirection: groupOptions?.sortDirection === "asc" ? "desc" : "asc"
     };
     if (type === "topics") {
       _groupOptions.groupBy = "none";
@@ -85,7 +85,7 @@ const Sort = ({ type, screen }) => {
 
         <Button
           title={
-            groupOptions.sortDirection === "asc"
+            groupOptions?.sortDirection === "asc"
               ? groupOptions.groupBy === "abc" ||
                 groupOptions.sortBy === "title"
                 ? "A - Z"
@@ -100,7 +100,7 @@ const Sort = ({ type, screen }) => {
               : "New - Old"
           }
           icon={
-            groupOptions.sortDirection === "asc"
+            groupOptions?.sortDirection === "asc"
               ? "sort-ascending"
               : "sort-descending"
           }
@@ -229,7 +229,7 @@ const Sort = ({ type, screen }) => {
 
                   if (item === "abc") {
                     _groupOptions.sortBy = "title";
-                    _groupOptions.sortDirection = "asc";
+                    _groupOptions.sortDirection = "desc";
                   }
 
                   updateGroupOptions(_groupOptions);
