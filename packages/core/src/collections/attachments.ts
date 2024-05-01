@@ -452,6 +452,13 @@ export class Attachments implements ICollection {
     );
   }
 
+  get audios() {
+    return this.collection.createFilter<Attachment>(
+      (qb) => qb.where(isFalse("deleted")).where("mimeType", "like", `audio/%`),
+      this.db.options?.batchSize
+    );
+  }
+
   get documents() {
     return this.collection.createFilter<Attachment>(
       (qb) =>
