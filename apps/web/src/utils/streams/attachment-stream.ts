@@ -43,16 +43,15 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
     super({
       start() {},
       async pull(controller) {
+        if (signal?.aborted) {
+          controller.close();
+          return;
+        }
+
+        onProgress && onProgress(index);
+        const attachment = await resolve(ids[index++]);
+        if (!attachment) return;
         try {
-          if (signal?.aborted) {
-            controller.close();
-            return;
-          }
-
-          onProgress && onProgress(index);
-          const attachment = await resolve(ids[index++]);
-          if (!attachment) return;
-
           if (
             !(await db
               .fs()
@@ -87,7 +86,7 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
             );
           }
         } catch (e) {
-          console.error(e);
+          console.error(e, attachment);
           showToast("error", (e as Error).message);
         } finally {
           if (index === ids.length) {
