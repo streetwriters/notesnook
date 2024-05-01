@@ -41,7 +41,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { db } from "../../common/database";
+import { DatabaseLogger, db } from "../../common/database";
 import SheetProvider from "../../components/sheet-provider";
 import { Button } from "../../components/ui/button";
 import Input from "../../components/ui/input";
@@ -326,11 +326,10 @@ function ThemeSelector() {
           return page.themes;
         })
         .flat()
-        .filter(
-          (theme) =>
-            (!searchQuery || searchQuery === "") &&
-            darkTheme.id !== theme.id &&
-            lightTheme.id !== theme.id
+        .filter((theme) =>
+          searchQuery && searchQuery !== ""
+            ? true
+            : darkTheme.id !== theme.id && lightTheme.id !== theme.id
         ) || []
     );
   }
@@ -546,7 +545,7 @@ const ThemeSetter = ({
         context: "global"
       });
     } catch (e) {
-      console.log("Error", e);
+      DatabaseLogger.error(e);
     }
 
     setTimeout(() => {
