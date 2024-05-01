@@ -195,7 +195,10 @@ export async function restoreBackupFile(backupFile: File) {
           }
           entries.push(entry);
         }
-        if (!isValid) throw new Error("Invalid backup.");
+        if (!isValid)
+          console.warn(
+            "The backup file does not contain the verification .nnbackup file."
+          );
 
         await db.transaction(async () => {
           for (const entry of entries) {
