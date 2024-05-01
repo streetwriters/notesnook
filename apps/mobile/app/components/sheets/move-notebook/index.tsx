@@ -84,7 +84,7 @@ export const MoveNotebookSheet = ({
         }
       }
     })();
-  }, []);
+  }, [selectedNotebooks]);
 
   const renderItem = useCallback(
     ({ index }: { index: number }) => {
