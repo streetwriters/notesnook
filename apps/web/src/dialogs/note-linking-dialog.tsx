@@ -185,9 +185,16 @@ export default function NoteLinkingDialog(props: NoteLinkingDialogProps) {
               autoFocus
               placeholder="Search for a note to link to..."
               sx={{ mx: 0 }}
-              onChange={async (e) =>
-                setNotes(await db.lookup.notes(e.target.value).sorted())
-              }
+              onChange={async (e) => {
+                const query = e.target.value.trim();
+                setNotes(
+                  query
+                    ? await db.lookup.notes(e.target.value).sorted()
+                    : await db.notes.all.sorted(
+                        db.settings.getGroupOptions("home")
+                      )
+                );
+              }}
             />
             {notes && (
               <ScrollContainer>
