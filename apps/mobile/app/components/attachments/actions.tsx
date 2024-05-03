@@ -238,36 +238,20 @@ const Actions = ({
           style={{
             flexDirection: "row",
             marginBottom: 10,
-            paddingHorizontal: 12
+            paddingHorizontal: 12,
+            marginTop: 6,
+            gap: 10
           }}
         >
-          <Paragraph
-            size={SIZE.xs}
-            style={{
-              marginRight: 10
-            }}
-            color={colors.secondary.paragraph}
-          >
-            {attachment.type}
+          <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
+            {attachment.mimeType}
           </Paragraph>
-          <Paragraph
-            style={{
-              marginRight: 10
-            }}
-            size={SIZE.xs}
-            color={colors.secondary.paragraph}
-          >
+          <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
             {formatBytes(attachment.size)}
           </Paragraph>
 
           {notes.length ? (
-            <Paragraph
-              style={{
-                marginRight: 10
-              }}
-              size={SIZE.xs}
-              color={colors.secondary.paragraph}
-            >
+            <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
               {notes.length} note
               {notes.length > 1 ? "s" : ""}
             </Paragraph>
