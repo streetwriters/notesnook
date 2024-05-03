@@ -166,7 +166,7 @@ export const Link = Mark.create<LinkOptions>({
 
   renderHTML({ HTMLAttributes }) {
     // False positive; we're explicitly checking for javascript: links to ignore them
-    if (HTMLAttributes.href?.startsWith("javascript:")) {
+    if (HTMLAttributes.href?.startsWith?.("javascript:")) {
       // strip out the href
       return [
         "a",
