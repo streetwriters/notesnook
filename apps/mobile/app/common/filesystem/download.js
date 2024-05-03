@@ -27,16 +27,19 @@ import { cacheDir, fileCheck } from "./utils";
 import { createCacheDir, exists } from "./io";
 
 export async function downloadFile(filename, data, cancelToken) {
-  if (!data) return false;
+  if (!data) {
+    DatabaseLogger.log(`Error downloading file: ${filename}, reason: No data`);
+    return false;
+  }
 
-  console.log("Downloading", filename);
+  DatabaseLogger.log(`Downloading ${filename}`);
   await createCacheDir();
   let { url, headers } = data;
   let path = `${cacheDir}/${filename}`;
 
   try {
     if (await exists(filename)) {
-      console.log("Exists already", filename);
+      DatabaseLogger.log(`File Exists already: ${filename}`);
       return true;
     }
 
@@ -44,13 +47,24 @@ export async function downloadFile(filename, data, cancelToken) {
       method: "GET",
       headers
     });
-    if (!res.ok)
+
+    if (!res.ok) {
+      DatabaseLogger.log(
+        `Error downloading file: ${filename}, ${res.status}, ${res.statusText}, reason: Unable to resolve download url`
+      );
       throw new Error(`${res.status}: Unable to resolve download url`);
+    }
+
     const downloadUrl = await res.text();
 
-    if (!downloadUrl) throw new Error("Unable to resolve download url");
+    if (!downloadUrl) {
+      DatabaseLogger.log(
+        `Error downloading file: ${filename}, reason: Unable to resolve download url`
+      );
+      throw new Error("Unable to resolve download url");
+    }
     let totalSize = 0;
-    console.log("Download starting");
+    DatabaseLogger.log(`Download starting: ${filename}`);
     let request = RNFetchBlob.config({
       path: path,
       IOSBackgroundTask: true
@@ -61,13 +75,15 @@ export async function downloadFile(filename, data, cancelToken) {
           .getState()
           .setProgress(0, total, filename, recieved, "download");
         totalSize = total;
-        console.log("downloading: ", recieved, total);
+        DatabaseLogger.log(`Downloading: ${filename}, ${recieved}/${total}`);
       });
 
     cancelToken.cancel = () => {
       useAttachmentStore.getState().remove(filename);
       request.cancel();
+      DatabaseLogger.log(`Download cancelled: ${filename}`);
     };
+
     let response = await request;
     await fileCheck(response, totalSize);
     let status = response.info().status;
@@ -91,7 +107,10 @@ export async function downloadFile(filename, data, cancelToken) {
 
     useAttachmentStore.getState().remove(filename);
     RNFetchBlob.fs.unlink(path).catch(console.log);
-    console.log("Download file error:", e, url, headers);
+    DatabaseLogger.error(e, {
+      url,
+      headers
+    });
     return false;
   }
 }

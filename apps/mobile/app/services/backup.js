@@ -31,7 +31,6 @@ import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
-import { useUserStore } from "../stores/use-user-store";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -152,13 +151,14 @@ async function updateNextBackupTime() {
 /**
  * @param {boolean=} progress
  * @param {string=} context
- * @returns {Promise<{path?: string, error?: Error}}>
+ * @returns {Promise<{path?: string, error?: Error, report?: boolean}}>
  */
 async function run(progress = false, context) {
   let androidBackupDirectory = await checkBackupDirExists(false, context);
   if (!androidBackupDirectory)
     return {
-      error: new Error("Backup directory not selected")
+      error: new Error("Backup directory not selected"),
+      report: false
     };
 
   if (progress) {
@@ -259,11 +259,12 @@ async function run(progress = false, context) {
       return run(progress, context);
     }
 
-    DatabaseLogger.error(e, "Backup failed");
+    DatabaseLogger.error(e);
     await sleep(300);
     progress && eSendEvent(eCloseSheet);
     return {
-      error: e
+      error: e,
+      report: true
     };
   }
 }

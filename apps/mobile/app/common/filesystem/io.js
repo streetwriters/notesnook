@@ -21,12 +21,12 @@ import Sodium from "@ammarahmed/react-native-sodium";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { IOS_APPGROUPID } from "../../utils/constants";
-import { db } from "../database";
+import { DatabaseLogger, db } from "../database";
 import { cacheDir, cacheDirOld, getRandomId } from "./utils";
 
 export async function readEncrypted(filename, key, cipherData) {
   await migrateFilesFromCache();
-  console.log("Read encrypted file...");
+  DatabaseLogger.log("Read encrypted file...");
   let path = `${cacheDir}/${filename}`;
 
   try {
@@ -34,8 +34,6 @@ export async function readEncrypted(filename, key, cipherData) {
       return false;
     }
 
-    const attachment = await db.attachments.attachment(filename);
-    console.log("decrypting....");
     let output = await Sodium.decryptFile(
       key,
       {
@@ -45,12 +43,13 @@ export async function readEncrypted(filename, key, cipherData) {
       },
       cipherData.outputType === "base64" ? "base64" : "text"
     );
-    console.log("file decrypted...", attachment?.mimeType);
+
+    DatabaseLogger.log("File decrypted...");
 
     return output;
   } catch (e) {
     RNFetchBlob.fs.unlink(path).catch(console.log);
-    console.log("readEncrypted", e);
+    DatabaseLogger.error(e);
     return false;
   }
 }
@@ -128,7 +127,7 @@ export async function clearFileStorage() {
 export async function createCacheDir() {
   if (!(await RNFetchBlob.fs.exists(cacheDir))) {
     await RNFetchBlob.fs.mkdir(cacheDir);
-    console.log("Cache directory created");
+    DatabaseLogger.log("Cache directory created");
   }
 }
 
@@ -188,6 +187,9 @@ export async function exists(filename) {
     );
 
     if (stat.size !== expectedFileSize) {
+      DatabaseLogger.log(
+        `File size mismatch: ${filename}, expected: ${expectedFileSize}, actual: ${stat.size}`
+      );
       RNFetchBlob.fs
         .unlink(existsInAppGroup ? appGroupPath : path)
         .catch(console.log);
