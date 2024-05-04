@@ -234,6 +234,12 @@ async function uploadFile(
   filename: string,
   requestOptions: RequestOptionsWithSignal
 ) {
+  // if file already exists on the server, we just return true
+  // we don't reupload the file i.e. overwriting is not possible.
+  const uploadedFileSize = await getUploadedFileSize(filename);
+  if (uploadedFileSize === -1) return false;
+  if (uploadedFileSize > 0) return true;
+
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle || !(await exists(filename)))
     throw new Error(
