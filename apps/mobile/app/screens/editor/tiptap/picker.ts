@@ -255,9 +255,7 @@ const handleImageResponse = async (
   response: Image[],
   options: PickerOptions
 ) => {
-  console.log(response[0].mime);
-
-  const result = await AttachImage.present(response);
+  const result = await AttachImage.present(response, options.context);
   if (!result) return;
   const compress = result.compress;
 
@@ -266,17 +264,17 @@ const handleImageResponse = async (
     const isJpeg = /(jpeg|jpg)/g.test(image.mime);
 
     if (compress && (isPng || isJpeg)) {
-      console.log("compressing files...");
       image.path = await compressToFile(
         Platform.OS === "ios" ? "file://" + image.path : image.path,
         isPng ? "PNG" : "JPEG"
       );
+
       const stat = await RNFetchBlob.fs.stat(image.path.replace("file://", ""));
       image.size = stat.size;
       image.path =
         Platform.OS === "ios" ? image.path.replace("file://", "") : image.path;
     }
-    console.log("here....");
+
     if (image.size > IMAGE_SIZE_LIMIT) {
       ToastManager.show({
         heading: "File too large",
@@ -350,7 +348,14 @@ export async function attachFile(
     }
 
     if (!options.reupload && exists) {
-      options.reupload = (await filesystem.getUploadedFileSize(hash)) <= 0;
+      options.reupload = (await filesystem.getUploadedFileSize(hash)) === 0;
+    }
+
+    if (options.reupload) {
+      DatabaseLogger.log(`Deleting file before reupload. ${hash}`);
+      const deleted = await db.fs().deleteFile(hash, false);
+      if (!deleted)
+        throw new Error(`Failed to delete file before reupload. ${hash}`);
     }
 
     if (!exists || options?.reupload) {
@@ -365,13 +370,14 @@ export async function attachFile(
       encryptionInfo.alg = "xcha-stream";
       encryptionInfo.size = encryptionInfo.length;
       encryptionInfo.key = key;
-      if (options?.reupload && exists) await db.attachments.reset(hash);
+      if (options?.reupload && exists) {
+        const attachment = await db.attachments.attachment(hash);
+        if (attachment) await db.attachments.reset(attachment?.id);
+      }
     } else {
       encryptionInfo = { hash: hash };
     }
-    if (options.noteId) {
-      await db.attachments.add(encryptionInfo);
-    }
+    await db.attachments.add(encryptionInfo);
     return true;
   } catch (e) {
     DatabaseLogger.error(e);

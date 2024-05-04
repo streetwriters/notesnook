@@ -22,7 +22,7 @@ import NetInfo from "@react-native-community/netinfo";
 import RNFetchBlob from "react-native-blob-util";
 import { ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { db } from "../database";
+import { DatabaseLogger, db } from "../database";
 import { cacheDir, fileCheck } from "./utils";
 import { createCacheDir, exists } from "./io";
 
@@ -100,18 +100,17 @@ export async function getUploadedFileSize(hash) {
   try {
     const url = `${hosts.API_HOST}/s3?name=${hash}`;
     const token = await db.tokenManager.getAccessToken();
-
     const attachmentInfo = await fetch(url, {
       method: "HEAD",
       headers: { Authorization: `Bearer ${token}` }
     });
-
     const contentLength = parseInt(
       attachmentInfo.headers?.get("content-length")
     );
     return isNaN(contentLength) ? 0 : contentLength;
   } catch (e) {
-    return 0;
+    DatabaseLogger.error(e);
+    return -1;
   }
 }
 
@@ -125,7 +124,9 @@ export async function checkAttachment(hash) {
 
   try {
     const size = await getUploadedFileSize(hash);
-    if (size <= 0) return { failed: "File length is 0." };
+    if (size === -1) return { success: true };
+
+    if (size === 0) return { failed: "File length is 0." };
   } catch (e) {
     return { failed: e?.message };
   }

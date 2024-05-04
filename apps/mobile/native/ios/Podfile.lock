@@ -319,9 +319,6 @@ PODS:
     - React-Core
   - react-native-html-to-pdf-lite (0.9.1):
     - React
-  - react-native-image-picker (7.1.2):
-    - RCT-Folly (= 2021.07.22.00)
-    - React-Core
   - react-native-image-resizer (3.0.5):
     - React-Core
   - react-native-in-app-review (4.3.3):
@@ -598,7 +595,6 @@ DEPENDENCIES:
   - react-native-get-random-values (from `../../node_modules/react-native-get-random-values`)
   - react-native-gzip (from `../../node_modules/react-native-gzip`)
   - react-native-html-to-pdf-lite (from `../../node_modules/react-native-html-to-pdf-lite`)
-  - react-native-image-picker (from `../../node_modules/react-native-image-picker`)
   - "react-native-image-resizer (from `../../node_modules/@bam.tech/react-native-image-resizer`)"
   - react-native-in-app-review (from `../../node_modules/react-native-in-app-review`)
   - "react-native-keep-awake (from `../../node_modules/@sayem314/react-native-keep-awake`)"
@@ -737,8 +733,6 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native-gzip"
   react-native-html-to-pdf-lite:
     :path: "../../node_modules/react-native-html-to-pdf-lite"
-  react-native-image-picker:
-    :path: "../../node_modules/react-native-image-picker"
   react-native-image-resizer:
     :path: "../../node_modules/@bam.tech/react-native-image-resizer"
   react-native-in-app-review:
@@ -900,7 +894,6 @@ SPEC CHECKSUMS:
   react-native-get-random-values: dee677497c6a740b71e5612e8dbd83e7539ed5bb
   react-native-gzip: c5e87ee9e359f02350e3a2ee52eb35eddc398868
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
-  react-native-image-picker: 51fdb07f7ef722988c8a219e1416153760a25e4d
   react-native-image-resizer: 00ceb0e05586c7aadf061eea676957a6c2ec60fa
   react-native-in-app-review: db8bb167a5f238e7ceca5c242d6b36ce8c4404a4
   react-native-keep-awake: caee3ff89eaa21dfe29010f0d143566874a04441

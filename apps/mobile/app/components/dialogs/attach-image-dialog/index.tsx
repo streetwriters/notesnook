@@ -156,7 +156,7 @@ export default function AttachImage({
   );
 }
 
-AttachImage.present = (response: ImageType[]) => {
+AttachImage.present = (response: ImageType[], context?: string) => {
   return new Promise<
     | {
         compress: boolean;
@@ -165,6 +165,7 @@ AttachImage.present = (response: ImageType[]) => {
   >((resolve) => {
     let resolved = false;
     presentSheet({
+      context: context,
       component: (ref, close, update) => (
         <AttachImage
           response={response}

@@ -100,7 +100,7 @@ const ImagePreview = () => {
             backgroundColor: "black"
           }}
         >
-          {loading || image ? (
+          {loading || !image ? (
             <View
               style={{
                 flex: 1,

@@ -25,6 +25,7 @@ import { isImage, isDocument } from "@notesnook/core/dist/utils/filename";
 import { Platform } from "react-native";
 import { IOS_APPGROUPID } from "../../utils/constants";
 import { createCacheDir } from "./io";
+import { getUploadedFileSize } from "./download";
 
 export async function uploadFile(filename, data, cancelToken) {
   if (!data) return false;
@@ -33,6 +34,18 @@ export async function uploadFile(filename, data, cancelToken) {
   DatabaseLogger.info(`Preparing to upload file: ${filename}`);
 
   try {
+    const uploadedFileSize = await getUploadedFileSize(filename);
+    if (uploadedFileSize === -1) {
+      DatabaseLogger.log("Upload verification failed.");
+      return false;
+    }
+
+    const isUploaded = uploadedFileSize !== 0;
+    if (isUploaded) {
+      DatabaseLogger.log(`File ${filename} is already uploaded.`);
+      return true;
+    }
+
     let res = await fetch(url, {
       method: "PUT",
       headers
@@ -50,7 +63,15 @@ export async function uploadFile(filename, data, cancelToken) {
     let exists = await RNFetchBlob.fs.exists(uploadFilePath);
     if (!exists && Platform.OS === "ios") {
       uploadFilePath = appGroupPath;
+      exists = await RNFetchBlob.fs.exists(uploadFilePath);
     }
+
+    if (!exists) {
+      throw new Error(
+        `Trying to upload file at path ${uploadFilePath} that doest not exist.`
+      );
+    }
+
     DatabaseLogger.info(`Starting upload: ${filename}`);
 
     let request = RNFetchBlob.config({
