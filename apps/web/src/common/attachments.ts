@@ -44,19 +44,27 @@ async function download(hash: string, groupId?: string) {
 }
 
 export async function saveAttachment(hash: string) {
-  const response = await download(hash);
-  if (!response) return;
+  try {
+    const response = await download(hash);
+    if (!response) return;
 
-  const { attachment, key } = response;
-  await lazify(import("../interfaces/fs"), ({ saveFile }) =>
-    saveFile(attachment.hash, {
-      key,
-      iv: attachment.iv,
-      name: attachment.filename,
-      type: attachment.mimeType,
-      isUploaded: !!attachment.dateUploaded
-    })
-  );
+    const { attachment, key } = response;
+    await lazify(import("../interfaces/fs"), ({ saveFile }) =>
+      saveFile(attachment.hash, {
+        key,
+        iv: attachment.iv,
+        name: attachment.filename,
+        type: attachment.mimeType,
+        isUploaded: !!attachment.dateUploaded
+      })
+    );
+  } catch (e) {
+    console.error(e);
+    showToast(
+      "error",
+      `Failed to download attachment: ${hash} (error: ${(e as Error).message})`
+    );
+  }
 }
 
 type OutputTypeToReturnType = {
