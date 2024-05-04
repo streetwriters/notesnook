@@ -443,6 +443,7 @@ export class FilteredSelector<T extends Item> {
   }
 
   async grouped(options: GroupOptions) {
+    sanitizeSortOptions(this.type, options);
     const count = await this.count();
     return new VirtualizedGrouping<T>(
       count,
@@ -466,6 +467,8 @@ export class FilteredSelector<T extends Item> {
   }
 
   async groups(options: GroupOptions) {
+    sanitizeSortOptions(this.type, options);
+
     const fields: Array<
       | AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>
       | AnyColumn<DatabaseSchema, keyof DatabaseSchema>
@@ -558,6 +561,8 @@ export class FilteredSelector<T extends Item> {
     options: GroupOptions | SortOptions,
     hasDueDate?: boolean
   ) {
+    sanitizeSortOptions(this.type, options);
+
     const sortBy: Set<SortOptions["sortBy"]> = new Set();
     if (isGroupOptions(options)) {
       if (options.groupBy === "abc") sortBy.add("title");
@@ -612,7 +617,6 @@ export class FilteredSelector<T extends Item> {
           );
         }
       }
-
       return qb;
     };
   }
@@ -633,4 +637,31 @@ function isSortByDate(options: SortOptions | GroupOptions) {
     options.sortBy === "dateUploaded" ||
     options.sortBy === "dueDate"
   );
+}
+
+const BASE_FIELDS: SortOptions["sortBy"][] = ["dateCreated", "dateModified"];
+const VALID_SORT_OPTIONS: Record<
+  keyof DatabaseSchema,
+  SortOptions["sortBy"][]
+> = {
+  reminders: ["dueDate", "title"],
+  tags: ["title"],
+  attachments: ["filename", "dateUploaded", "size"],
+  colors: ["title"],
+  notebooks: ["title"],
+  notes: ["title"],
+
+  content: [],
+  notehistory: [],
+  relations: [],
+  sessioncontent: [],
+  settings: [],
+  shortcuts: [],
+  vaults: []
+};
+
+function sanitizeSortOptions(type: keyof DatabaseSchema, options: SortOptions) {
+  const validFields = [...VALID_SORT_OPTIONS[type], ...BASE_FIELDS];
+  if (!validFields.includes(options.sortBy)) options.sortBy = validFields[0];
+  return options;
 }
