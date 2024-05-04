@@ -331,6 +331,39 @@ describe("format reminder time", () => {
   });
 });
 
+test("sorting reminders by dateEdited shouldn't throw", () =>
+  databaseTest().then(async (db) => {
+    await db.reminders.add({
+      recurringMode: "day",
+      date: new Date(0).setHours(14),
+      mode: "repeat",
+      title: "Random reminder"
+    });
+    await expect(
+      db.reminders.all.ids({
+        groupBy: "default",
+        sortBy: "dateEdited",
+        sortDirection: "desc"
+      })
+    ).resolves.toBeDefined();
+    await expect(
+      db.reminders.all.groups({
+        groupBy: "default",
+        sortBy: "dateEdited",
+        sortDirection: "desc"
+      })
+    ).resolves.toBeDefined();
+    await expect(
+      db.reminders.all
+        .grouped({
+          groupBy: "default",
+          sortBy: "dateEdited",
+          sortDirection: "desc"
+        })
+        .then((g) => g.item(0))
+    ).resolves.toBeDefined();
+  }));
+
 async function compareReminder(reminder) {
   const db = await databaseTest();
   const id = await db.reminders.add(reminder);
