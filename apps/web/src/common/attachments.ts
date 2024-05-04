@@ -106,9 +106,12 @@ export async function checkAttachment(hash: string) {
       import("../interfaces/fs"),
       ({ getUploadedFileSize }) => getUploadedFileSize(hash)
     );
-    if (size <= 0) return { failed: "File length is 0." };
+    if (size === 0) throw new Error("File length is 0.");
+    else if (size === -1) throw new Error("File verification check failed.");
   } catch (e) {
-    return { failed: e instanceof Error ? e.message : "Unknown error." };
+    const reason = e instanceof Error ? e.message : "Unknown error.";
+    await db.attachments.markAsFailed(attachment.id, reason);
+    return { failed: reason };
   }
   return { success: true };
 }

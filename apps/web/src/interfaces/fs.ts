@@ -49,6 +49,7 @@ import {
   Output,
   RequestOptions
 } from "@notesnook/core/dist/interfaces";
+import { logger } from "../utils/logger";
 
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -624,6 +625,13 @@ async function deleteFile(
   }
 }
 
+/**
+ * `-1` means an error during file size
+ *
+ * `0` means file either doesn't exist or file is actually of 0 length
+ *
+ * `>0` means file is valid
+ */
 export async function getUploadedFileSize(filename: string) {
   try {
     const url = `${hosts.API_HOST}/s3?name=${filename}`;
@@ -636,8 +644,8 @@ export async function getUploadedFileSize(filename: string) {
     const contentLength = parseInt(attachmentInfo.headers["content-length"]);
     return isNaN(contentLength) ? 0 : contentLength;
   } catch (e) {
-    console.error(e);
-    return 0;
+    logger.error(e, "Failed to get uploaded file size.", { filename });
+    return -1;
   }
 }
 
