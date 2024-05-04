@@ -130,8 +130,6 @@ function useAuthenticateUser({
     async function authenticateUser() {
       setIsAuthenticating(true);
       try {
-        await db.init();
-
         const accessToken = await db.tokenManager.getAccessToken();
         if (!accessToken) {
           await db.tokenManager.getAccessTokenFromAuthorizationCode(
