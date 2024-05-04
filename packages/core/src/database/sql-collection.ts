@@ -648,8 +648,8 @@ const VALID_SORT_OPTIONS: Record<
   tags: ["title"],
   attachments: ["filename", "dateUploaded", "size"],
   colors: ["title"],
-  notebooks: ["title"],
-  notes: ["title"],
+  notebooks: ["title", "dateDeleted", "dateEdited"],
+  notes: ["title", "dateDeleted", "dateEdited"],
 
   content: [],
   notehistory: [],
