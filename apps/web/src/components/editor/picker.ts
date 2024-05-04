@@ -189,7 +189,7 @@ async function addAttachment(
 
     const exists = await db.attachments.attachment(hash);
     if (!forceWrite && exists) {
-      forceWrite = (await getUploadedFileSize(hash)) <= 0;
+      forceWrite = (await getUploadedFileSize(hash)) === 0;
     }
 
     if (forceWrite || !exists) {
