@@ -346,7 +346,6 @@ export class Attachments implements ICollection {
 
   markAsFailed(id: string, reason?: string) {
     return this.collection.update([id], {
-      dateUploaded: null,
       failed: reason
     });
   }
