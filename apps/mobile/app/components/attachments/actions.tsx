@@ -56,6 +56,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../screens/editor/tiptap/utils";
+import SheetProvider from "../sheet-provider";
 
 const Actions = ({
   attachment,
@@ -218,6 +219,7 @@ const Actions = ({
       }}
     >
       <Dialog context={contextId} />
+      <SheetProvider context={contextId} />
       <View
         style={{
           borderBottomWidth: 1,

@@ -19,10 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Sodium from "@ammarahmed/react-native-sodium";
 import dataurl from "@notesnook/core/dist/utils/dataurl";
+import type { ImageAttributes } from "@notesnook/editor/dist/extensions/image/index";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
 import ImageViewer from "react-native-image-zoom-viewer";
+import { db } from "../../common/database";
 import downloadAttachment from "../../common/filesystem/download-attachment";
 import { cacheDir } from "../../common/filesystem/utils";
 import {
@@ -32,13 +34,13 @@ import {
 import BaseDialog from "../dialog/base-dialog";
 import { IconButton } from "../ui/icon-button";
 import { ProgressBarComponent } from "../ui/svg/lazy";
-import type { ImageAttributes } from "@notesnook/editor/dist/extensions/image/index";
 const ImagePreview = () => {
   const { colors } = useThemeColors("dialog");
 
   const [visible, setVisible] = useState(false);
   const [image, setImage] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const imageRef = useRef<ImageAttributes>();
 
   useEffect(() => {
     eSubscribeEvent("ImagePreview", open);
@@ -48,6 +50,7 @@ const ImagePreview = () => {
   }, []);
 
   const open = async (image: ImageAttributes) => {
+    imageRef.current = image;
     setVisible(true);
     setLoading(true);
     setTimeout(async () => {
@@ -60,6 +63,9 @@ const ImagePreview = () => {
           type: "base64",
           uri: ""
         });
+        if (imageRef.current) {
+          imageRef.current.hash = hash;
+        }
       }
       if (!hash) return;
       //@ts-ignore // FIX ME
@@ -80,7 +86,13 @@ const ImagePreview = () => {
 
   return (
     visible && (
-      <BaseDialog animation="slide" visible={true} onRequestClose={close}>
+      <BaseDialog
+        background="black"
+        animation="slide"
+        visible={true}
+        onRequestClose={close}
+        transparent
+      >
         <View
           style={{
             width: "100%",
@@ -101,6 +113,21 @@ const ImagePreview = () => {
                 color={colors.primary.accent}
                 borderColor="transparent"
               />
+              <IconButton
+                onPress={() => {
+                  if (imageRef.current?.hash) {
+                    db.fs().cancel(imageRef.current?.hash);
+                  }
+                  close();
+                }}
+                style={{
+                  position: "absolute",
+                  top: Platform.OS === "android" ? 35 : 0,
+                  right: 12
+                }}
+                color={colors.static.white}
+                name="close"
+              />
             </View>
           ) : (
             <ImageViewer
@@ -117,13 +144,12 @@ const ImagePreview = () => {
                     width: "100%",
                     justifyContent: "flex-end",
                     alignItems: "center",
-                    height: 80,
-                    marginTop: 0,
-                    paddingHorizontal: 12,
+                    height: 50,
+                    paddingHorizontal: 24,
                     position: "absolute",
                     zIndex: 999,
                     backgroundColor: "rgba(0,0,0,0.3)",
-                    paddingTop: Platform.OS === "android" ? 30 : 0
+                    marginTop: Platform.OS === "android" ? 30 : 0
                   }}
                 >
                   <IconButton
@@ -137,7 +163,7 @@ const ImagePreview = () => {
               )}
               imageUrls={[
                 {
-                  url: image
+                  url: image as string
                 }
               ]}
             />

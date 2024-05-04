@@ -77,6 +77,7 @@ import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { EditorEvents, editorState, openInternalLink } from "./utils";
 
+
 const publishNote = async () => {
   const user = useUserStore.getState().user;
   if (!user) {
@@ -449,7 +450,7 @@ export const useEditorEvents = (
           break;
         case EventTypes.filepicker:
           editorState().isAwaitingResult = true;
-          const { pick } = require("./picker.js").default;
+          const { pick } = require("./picker").default;
           pick({
             type: editorMessage.value,
             noteId: noteId,
