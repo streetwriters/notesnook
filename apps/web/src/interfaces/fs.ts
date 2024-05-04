@@ -497,13 +497,13 @@ async function downloadFile(
     );
     if (contentLength === 0 || isNaN(contentLength)) {
       const error = `File length is 0. Please upload this file again from the attachment manager. (File hash: ${filename})`;
-      await db.attachments.markAsFailed(filename, error);
+      await db.attachments.markAsFailed(attachment.id, error);
       throw new Error(error);
     }
 
     if (!response.body) {
       const error = `The download response does not contain a body. Please upload this file again from the attachment manager. (File hash: ${filename})`;
-      await db.attachments.markAsFailed(filename, error);
+      await db.attachments.markAsFailed(attachment.id, error);
       throw new Error(error);
     }
 
@@ -511,7 +511,7 @@ async function downloadFile(
     const decryptedLength = contentLength - totalChunks * ABYTES;
     if (attachment && attachment.size !== decryptedLength) {
       const error = `File length mismatch. Please upload this file again from the attachment manager. (File hash: ${filename})`;
-      await db.attachments.markAsFailed(filename, error);
+      await db.attachments.markAsFailed(attachment.id, error);
       throw new Error(error);
     }
 
