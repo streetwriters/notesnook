@@ -140,6 +140,8 @@ export class FileStorage {
   }
 
   async downloadFile(groupId: string, filename: string, chunkSize: number) {
+    logger.debug("[downloadFile] downloading", { filename, groupId });
+
     const url = `${hosts.API_HOST}/s3?name=${filename}`;
     const token = await this.tokenManager.getAccessToken();
     const { execute, cancel } = this.fs.downloadFile(filename, {

@@ -18,12 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { lazify } from "../utils/lazify";
+import { logger } from "../utils/logger";
 import { showToast } from "../utils/toast";
 import { db } from "./db";
 
 async function download(hash: string, groupId?: string) {
   const attachment = await db.attachments.attachment(hash);
-  if (!attachment) return;
+  if (!attachment) {
+    logger.debug("could not find attachment for download", { hash, groupId });
+    return;
+  }
   const downloadResult = await db
     .fs()
     .downloadFile(
@@ -68,6 +72,7 @@ export async function downloadAttachment<
   type: TType,
   groupId?: string
 ): Promise<TOutputType | undefined> {
+  logger.debug("downloading attachment", { hash, type, groupId });
   try {
     const response = await download(hash, groupId);
     if (!response) return;
@@ -85,6 +90,7 @@ export async function downloadAttachment<
         isUploaded: !!attachment.dateUploaded
       })
     );
+    logger.debug("Attachment decrypted", { hash });
 
     if (!blob) return;
     return blob as TOutputType;

@@ -488,12 +488,25 @@ export function Editor(props: EditorProps) {
             editor?.attachFile(attachment);
           }
         }}
-        onGetAttachmentData={(attachment) => {
-          return downloadAttachment(
+        onGetAttachmentData={async (attachment) => {
+          logger.debug("Getting attachment data", {
+            hash: attachment.hash,
+            type: attachment.type
+          });
+
+          const result = await downloadAttachment(
             attachment.hash,
             attachment.type === "web-clip" ? "text" : "base64",
             id?.toString()
           );
+
+          if (!result)
+            logger.debug("Got no result after downloading attachment", {
+              hash: attachment.hash,
+              type: attachment.type
+            });
+
+          return result;
         }}
         onAttachFiles={async (files) => {
           const editor = useEditorManager.getState().getEditor(id)?.editor;
