@@ -93,14 +93,18 @@ class Merger {
       isDeleted(localItem) ||
       isDeleted(remoteItem) ||
       !localItem.dateUploaded ||
-      !remoteItem.dateUploaded
+      !remoteItem.dateUploaded ||
+      localItem.dateUploaded === remoteItem.dateUploaded
     ) {
       return this.mergeItem(remoteItem, localItem);
     }
 
     if (localItem.dateUploaded > remoteItem.dateUploaded) return;
 
-    const isRemoved = await this.db.attachments.remove(localItem.hash, true);
+    logger.debug("Removing local attachment file due to conflict", {
+      hash: localItem.hash
+    });
+    const isRemoved = await this.db.fs().deleteFile(localItem.hash, true);
     if (!isRemoved)
       throw new Error(
         "Conflict could not be resolved in one of the attachments."
