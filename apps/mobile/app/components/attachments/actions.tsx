@@ -352,7 +352,7 @@ const Actions = ({
         {failed ? (
           <Notice
             type="alert"
-            text={`File check failed with error: ${attachment.failed} Try reuploading the file to fix the issue.`}
+            text={`File check failed: ${failed} Try reuploading the file to fix the issue.`}
             size="small"
           />
         ) : null}
