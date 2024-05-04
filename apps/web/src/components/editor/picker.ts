@@ -193,12 +193,16 @@ async function addAttachment(
     }
 
     if (forceWrite || !exists) {
+      if (forceWrite && exists) {
+        if (!(await db.fs().deleteFile(hash, false)))
+          throw new Error("Failed to delete attachment from server.");
+        await db.attachments.reset(exists.id);
+      }
+
       const key: SerializedKey = await getEncryptionKey();
 
       const output = await writeEncryptedFile(file, key, hash);
       if (!output) throw new Error("Could not encrypt file.");
-
-      if (forceWrite && exists) await db.attachments.reset(hash);
 
       await db.attachments.add({
         ...output,
