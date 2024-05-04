@@ -552,6 +552,12 @@ export class FilteredSelector<T extends Item> {
     options: GroupOptions | SortOptions,
     hasDueDate?: boolean
   ) {
+    console.log(
+      "buildSortExpression",
+      options,
+      hasDueDate,
+      isGroupOptions(options)
+    );
     const sortBy: Set<SortOptions["sortBy"]> = new Set();
     if (isGroupOptions(options)) {
       if (options.groupBy === "abc") sortBy.add("title");
@@ -572,6 +578,8 @@ export class FilteredSelector<T extends Item> {
           (qb) => qb.parens(createIsReminderActiveQuery()),
           "desc"
         );
+      if (this.type === "reminders" && options.sortBy === "dateEdited")
+        options.sortBy = "dateModified";
 
       for (const item of sortBy) {
         if (item === "title") {
@@ -606,7 +614,6 @@ export class FilteredSelector<T extends Item> {
           );
         }
       }
-
       return qb;
     };
   }
