@@ -285,10 +285,6 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
 
       const backupFiles = await RNFetchBlob.fs.ls(zipOutputFolder);
 
-      if (backupFiles.findIndex((file) => file === ".nnbackup") === -1) {
-        throw new Error("Backup file is invalid");
-      }
-
       await db.transaction(async () => {
         let password;
         let key;
