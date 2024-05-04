@@ -100,6 +100,9 @@ export class Attachments implements ICollection {
 
   async init() {
     await this.collection.init();
+    logger.debug("attachments initialized", {
+      total: await this.collection.count()
+    });
   }
 
   async add(
@@ -199,8 +202,12 @@ export class Attachments implements ICollection {
   }
 
   async remove(hashOrId: string, localOnly: boolean) {
+    logger.debug("Removing attachment", { hashOrId, localOnly });
     const attachment = await this.attachment(hashOrId);
-    if (!attachment) return false;
+    if (!attachment) {
+      logger.debug("Attachment not found", { hashOrId, localOnly });
+      return false;
+    }
 
     if (!localOnly && !(await this.canDetach(attachment)))
       throw new Error("This attachment is inside a locked note.");
@@ -326,9 +333,11 @@ export class Attachments implements ICollection {
   }
 
   async attachment(hashOrId: string): Promise<Attachment | undefined> {
-    return this.all.find((eb) =>
+    const attachment = await this.all.find((eb) =>
       eb.or([eb("id", "==", hashOrId), eb("hash", "==", hashOrId)])
     );
+    if (attachment) logger.debug("attachment exists", { hashOrId });
+    return attachment;
   }
 
   markAsUploaded(id: string) {

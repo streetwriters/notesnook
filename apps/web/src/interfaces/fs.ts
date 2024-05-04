@@ -463,7 +463,7 @@ async function downloadFile(
   requestOptions: RequestOptionsWithSignal
 ) {
   try {
-    console.log("DOWNLOADING FILE", filename);
+    logger.debug("DOWNLOADING FILE", { filename });
     const { url, headers, chunkSize, signal } = requestOptions;
     const handle = await streamablefs.readFile(filename);
 
@@ -475,6 +475,7 @@ async function downloadFile(
     else if (handle) await handle.delete();
 
     const attachment = await db.attachments.attachment(filename);
+    if (!attachment) throw new Error("Attachment doesn't exist.");
 
     reportProgress(
       { total: 100, loaded: 0 },
@@ -488,9 +489,13 @@ async function downloadFile(
       })
     ).data;
 
+    logger.debug("Got attachment signed url", { filename });
+
     const response = await fetch(signedUrl, {
       signal
     });
+
+    logger.debug("Got attachment", { filename });
 
     const contentType = response.headers.get("content-type");
     if (contentType === "application/xml") {
@@ -548,9 +553,10 @@ async function downloadFile(
       )
       .pipeTo(fileHandle.writeable);
 
+    logger.debug("Attachment downloaded", { filename });
     return true;
   } catch (e) {
-    console.error(e);
+    logger.error(e, "Could not download file", { filename });
     showError(toS3Error(e), "Could not download file");
     reportProgress(undefined, { type: "download", hash: filename });
     return false;
@@ -597,9 +603,11 @@ export async function streamingDecryptFile(
 }
 
 export async function saveFile(filename: string, fileMetadata: FileMetadata) {
+  logger.debug("Saving file", { filename });
   const { name, type, isUploaded } = fileMetadata;
 
   const decrypted = await decryptFile(filename, fileMetadata);
+  logger.debug("Decrypting file", { filename, result: !!decrypted });
   if (decrypted) saveAs(decrypted, getFileNameWithExtension(name, type));
 
   if (isUploaded && isAttachmentDeletable(type))
