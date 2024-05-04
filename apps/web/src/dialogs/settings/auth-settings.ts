@@ -46,7 +46,7 @@ export const AuthenticationSettings: SettingsGroup[] = [
             title: "Change password",
             variant: "secondary",
             action: async () => {
-              await createBackup();
+              if (!(await createBackup())) return;
               const result = await showPasswordDialog({
                 title: "Change account password",
                 message: `All your data will be re-encrypted and synced with the new password.

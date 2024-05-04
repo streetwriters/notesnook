@@ -72,7 +72,7 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
         section as SideBarSection
       );
       hiddenItems[section as SideBarHideableSection] =
-        db.settings.getSideBarHiddenItems("colors");
+        db.settings.getSideBarHiddenItems(section as SideBarHideableSection);
     }
 
     if (
@@ -80,6 +80,7 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
       JSON.stringify(get().hiddenItems || {}) !==
         JSON.stringify(hiddenItems || {})
     ) {
+      console.log(order, hiddenItems);
       set({
         order: order,
         hiddenItems: hiddenItems

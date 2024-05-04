@@ -16,40 +16,37 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { resolveItems } from "@notesnook/common";
 import { VirtualizedGrouping } from "@notesnook/core";
 import { Note, Notebook } from "@notesnook/core/dist/types";
 import React, { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
 import { db } from "../../common/database";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import List from "../../components/list";
 import { NotebookHeader } from "../../components/list-items/headers/notebook-header";
+import SelectionHeader from "../../components/selection-header";
 import { AddNotebookSheet } from "../../components/sheets/add-notebook";
+import { IconButton } from "../../components/ui/icon-button";
+import { Pressable } from "../../components/ui/pressable";
+import Paragraph from "../../components/ui/typography/paragraph";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from "../../services/event-manager";
+import { eSendEvent, eSubscribeEvent } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import useNavigationStore, {
   NotebookScreenParams
 } from "../../stores/use-navigation-store";
 import { eUpdateNotebookRoute } from "../../utils/events";
 import { findRootNotebookId } from "../../utils/notebooks";
-import { openEditor, setOnFirstSave } from "../notes/common";
-import SelectionHeader from "../../components/selection-header";
-import Paragraph from "../../components/ui/typography/paragraph";
-import { View } from "react-native";
 import { SIZE } from "../../utils/size";
-import { IconButton } from "../../components/ui/icon-button";
-import { Pressable } from "../../components/ui/pressable";
-import { resolveItems } from "@notesnook/common";
+import { openEditor, setOnFirstSave } from "../notes/common";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
   const params = useRef<NotebookScreenParams>(route?.params);
   const [loading, setLoading] = useState(true);
+  const updateOnFocus = useRef(false);
   const [breadcrumbs, setBreadcrumbs] = useState<
     {
       id: string;
@@ -59,11 +56,17 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
 
   useNavigationFocus(navigation, {
     onFocus: () => {
-      Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
+      if (updateOnFocus.current) {
+        onRequestUpdate();
+        updateOnFocus.current = false;
+      } else {
+        Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
+      }
       syncWithNavigation();
       return false;
     },
     onBlur: () => {
+      updateOnFocus.current = false;
       setOnFirstSave(null);
       return false;
     }
@@ -79,6 +82,15 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
 
   const onRequestUpdate = React.useCallback(
     async (data?: NotebookScreenParams) => {
+      if (
+        useNavigationStore.getState().focusedRouteId !==
+          params.current.item.id &&
+        !data
+      ) {
+        updateOnFocus.current = true;
+        return;
+      }
+
       if (data?.item?.id && params.current.item?.id !== data?.item?.id) {
         const nextRootNotebookId = await findRootNotebookId(data?.item?.id);
         const currentNotebookRoot = await findRootNotebookId(
@@ -104,7 +116,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
 
         if (notebook) {
           const breadcrumbs = await db.notebooks.breadcrumbs(notebook.id);
-          setBreadcrumbs(breadcrumbs);
+          setBreadcrumbs(breadcrumbs.slice(0, breadcrumbs.length - 1));
           params.current.item = notebook;
           const notes = await db.relations
             .from(notebook, "note")
@@ -122,10 +134,10 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   );
 
   useEffect(() => {
-    onRequestUpdate();
-    eSubscribeEvent(eUpdateNotebookRoute, onRequestUpdate);
+    onRequestUpdate(params.current);
+    const sub = eSubscribeEvent(eUpdateNotebookRoute, onRequestUpdate);
     return () => {
-      eUnSubscribeEvent(eUpdateNotebookRoute, onRequestUpdate);
+      sub?.unsubscribe();
     };
   }, [onRequestUpdate]);
 
@@ -167,7 +179,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
         onPressDefaultRightButton={openEditor}
       />
 
-      {breadcrumbs ? (
+      {breadcrumbs && breadcrumbs.length > 0 ? (
         <View
           style={{
             width: "100%",

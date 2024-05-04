@@ -77,18 +77,18 @@ export async function introduceFeatures() {
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
 
-export async function createBackup() {
+export async function createBackup(rescueMode = false) {
   const { isLoggedIn } = useUserStore.getState();
   const { encryptBackups, toggleEncryptBackups } = useSettingStore.getState();
   if (!isLoggedIn && encryptBackups) toggleEncryptBackups();
 
-  const verified = encryptBackups || (await verifyAccount());
+  const verified = rescueMode || encryptBackups || (await verifyAccount());
   if (!verified) {
     showToast("error", "Could not create a backup: user verification failed.");
-    return;
+    return false;
   }
 
-  const encryptedBackups = isLoggedIn && encryptBackups;
+  const encryptedBackups = !rescueMode && isLoggedIn && encryptBackups;
 
   const filename = sanitizeFilename(
     `${formatDate(Date.now(), {
@@ -139,7 +139,9 @@ export async function createBackup() {
     console.error(error);
   } else {
     showToast("success", `Backup saved at ${filePath}.`);
+    return true;
   }
+  return false;
 }
 
 export async function selectBackupFile() {
@@ -193,7 +195,10 @@ export async function restoreBackupFile(backupFile: File) {
           }
           entries.push(entry);
         }
-        if (!isValid) throw new Error("Invalid backup.");
+        if (!isValid)
+          console.warn(
+            "The backup file does not contain the verification .nnbackup file."
+          );
 
         await db.transaction(async () => {
           for (const entry of entries) {

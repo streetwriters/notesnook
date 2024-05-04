@@ -32,6 +32,7 @@ import { AssetManager } from "../utils/asset-manager";
 import { isFlatpak } from "../utils";
 import { setupDesktopIntegration } from "../utils/desktop-integration";
 import { rm } from "fs/promises";
+import { disableCustomDns, enableCustomDns } from "../utils/custom-dns";
 
 const t = initTRPC.create();
 
@@ -54,6 +55,15 @@ export const osIntegrationRouter = t.router({
     globalThis.window?.webContents.setZoomFactor(factor);
     config.zoomFactor = factor;
   }),
+
+  customDns: t.procedure.query(() => config.customDns),
+  setCustomDns: t.procedure
+    .input(z.boolean())
+    .mutation(({ input: customDns }) => {
+      if (customDns) enableCustomDns();
+      else disableCustomDns();
+      config.customDns = customDns;
+    }),
 
   proxyRules: t.procedure.query(() => config.proxyRules),
   setProxyRules: t.procedure

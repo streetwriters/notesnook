@@ -17,8 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { View } from "react-native";
-import React from "react";
-export const Footer = ({ height = 150 }) => {
-  return <View style={{ height: height }} />;
-};
+import { app } from "electron";
+
+export function enableCustomDns() {
+  app.configureHostResolver({
+    secureDnsServers: [
+      "https://mozilla.cloudflare-dns.com/dns-query",
+      "https://dns.quad9.net/dns-query"
+    ],
+    enableBuiltInResolver: true
+  });
+}
+
+export function disableCustomDns() {
+  app.configureHostResolver({
+    secureDnsServers: [],
+    enableBuiltInResolver: true
+  });
+}

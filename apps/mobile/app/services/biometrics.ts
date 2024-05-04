@@ -179,7 +179,7 @@ async function validateUser(title: string, description?: string) {
   }
 }
 
-const BiometicService = {
+const BiometricService = {
   isBiometryAvailable,
   enableFingerprintAuth,
   isFingerprintAuthEnabled,
@@ -190,4 +190,4 @@ const BiometicService = {
   validateUser
 };
 
-export default BiometicService;
+export default BiometricService;

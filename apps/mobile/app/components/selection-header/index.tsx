@@ -19,14 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Item, ItemType, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   BackHandler,
   NativeEventSubscription,
   Platform,
   View
 } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import Menu from "react-native-reanimated-material-menu/src/Menu";
 import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { ToastManager } from "../../services/event-manager";
@@ -42,9 +42,10 @@ import { presentDialog } from "../dialog/functions";
 import MoveNoteSheet from "../sheets/add-to";
 import ExportNotesSheet from "../sheets/export-notes";
 import ManageTagsSheet from "../sheets/manage-tags";
+import { MoveNotebookSheet } from "../sheets/move-notebook";
+import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
-import { MoveNotebookSheet } from "../sheets/move-notebook";
 
 export const SelectionHeader = React.memo(
   ({
@@ -58,6 +59,8 @@ export const SelectionHeader = React.memo(
     type?: ItemType;
     renderedInRoute?: string;
   }) => {
+    const menuRef = useRef<Menu>(null);
+    const { colors: contextMenuColors } = useThemeColors("contextMenu");
     const { colors } = useThemeColors();
     const selectionMode = useSelectionStore((state) => state.selectionMode);
     const selectedItemsList = useSelectionStore(
@@ -132,8 +135,7 @@ export const SelectionHeader = React.memo(
     }, [clearSelection, selectionMode]);
 
     return selectionMode !== type || focusedRouteId !== id ? null : (
-      <Animated.View
-        entering={FadeInUp}
+      <View
         style={{
           width: "100%",
           height: Platform.OS === "android" ? 50 + insets.top : 50,
@@ -143,8 +145,7 @@ export const SelectionHeader = React.memo(
           alignItems: "center",
           flexDirection: "row",
           zIndex: 999,
-          paddingHorizontal: 12,
-          marginVertical: 10
+          paddingHorizontal: 12
         }}
       >
         <View
@@ -164,18 +165,15 @@ export const SelectionHeader = React.memo(
               borderRadius: 100,
               marginRight: 10
             }}
-            type="secondary"
             onPress={() => {
               clearSelection();
             }}
-            size={SIZE.xl}
             color={colors.primary.icon}
             name="close"
           />
 
           <View
             style={{
-              backgroundColor: colors.secondary.background,
               height: 40,
               borderRadius: 100,
               paddingHorizontal: 16,
@@ -184,11 +182,12 @@ export const SelectionHeader = React.memo(
               alignItems: "center"
             }}
           >
-            <Heading size={SIZE.md} color={colors.primary.accent}>
+            <Heading size={SIZE.lg} color={colors.primary.paragraph}>
               {selectedItemsList.length}
             </Heading>
           </View>
         </View>
+
         <View
           style={{
             flexDirection: "row",
@@ -211,159 +210,142 @@ export const SelectionHeader = React.memo(
               allSelected ? colors.primary.accent : colors.primary.paragraph
             }
             name="select-all"
-            size={SIZE.xl}
           />
 
-          {renderedInRoute === "Notebooks" && selectedItemsList.length ? (
-            <IconButton
+          {selectedItemsList.length ? (
+            <Menu
+              ref={menuRef}
+              animationDuration={200}
               style={{
-                marginLeft: 10
+                borderRadius: 5,
+                backgroundColor: contextMenuColors.primary.background,
+                marginTop: -20
               }}
-              onPress={async () => {
-                const ids = selectedItemsList;
-                const notebooks = await db.notebooks.all.items(ids);
-                MoveNotebookSheet.present(notebooks);
+              onRequestClose={() => {
+                menuRef.current?.hide();
               }}
-              tooltipText="Move notebooks"
-              tooltipPosition={1}
-              name="arrow-right-bold-box-outline"
-              size={SIZE.xl}
-            />
-          ) : null}
-
-          {type !== "note" || !selectedItemsList.length ? null : (
-            <>
-              <IconButton
-                onPress={async () => {
-                  await sleep(100);
-                  ManageTagsSheet.present(selectedItemsList);
-                }}
-                style={{
-                  marginLeft: 10
-                }}
-                color={colors.primary.icon}
-                tooltipText="Manage tags"
-                tooltipPosition={4}
-                name="pound"
-                size={SIZE.xl}
-              />
-
-              <IconButton
-                onPress={async () => {
-                  ExportNotesSheet.present(selectedItemsList);
-                }}
-                tooltipText="Export"
-                tooltipPosition={4}
-                style={{
-                  marginLeft: 10
-                }}
-                color={colors.primary.paragraph}
-                name="export"
-                size={SIZE.xl}
-              />
-
-              <IconButton
-                onPress={async () => {
-                  MoveNoteSheet.present();
-                }}
-                style={{
-                  marginLeft: 10
-                }}
-                tooltipText="Add to notebooks"
-                tooltipPosition={4}
-                color={colors.primary.paragraph}
-                name="plus"
-                size={SIZE.xl}
-              />
-            </>
-          )}
-
-          {renderedInRoute === "Notebook" && selectedItemsList.length ? (
-            <IconButton
-              onPress={async () => {
-                if (!id) return;
-                await db.notes.removeFromNotebook(id, ...selectedItemsList);
-                updateNotebook(id);
-                Navigation.queueRoutesForUpdate();
-                clearSelection();
-              }}
-              style={{
-                marginLeft: 10
-              }}
-              tooltipText={`Remove from Notebook`}
-              tooltipPosition={4}
-              testID="select-minus"
-              color={colors.primary.paragraph}
-              name="minus"
-              size={SIZE.xl}
-            />
-          ) : null}
-
-          {focusedRouteId === "Favorites" && selectedItemsList.length ? (
-            <IconButton
-              onPress={addToFavorite}
-              style={{
-                marginLeft: 10
-              }}
-              tooltipText="Remove from favorites"
-              tooltipPosition={4}
-              color={colors.primary.paragraph}
-              name="star-off"
-              size={SIZE.xl}
-            />
-          ) : null}
-
-          {type === "trash" || !selectedItemsList.length ? null : (
-            <IconButton
-              style={{
-                marginLeft: 10
-              }}
-              onPress={() => {
-                deleteItems(
-                  undefined,
-                  useSelectionStore.getState().selectionMode
-                ).then(() => {
-                  useSelectionStore.getState().clearSelection();
-                  useSelectionStore.getState().setSelectionMode(undefined);
-                });
-              }}
-              tooltipText="Move to trash"
-              tooltipPosition={1}
-              color={colors.primary.paragraph}
-              name="delete"
-              size={SIZE.xl}
-            />
-          )}
-
-          {type === "trash" && selectedItemsList.length ? (
-            <>
-              <IconButton
-                style={{
-                  marginLeft: 10
-                }}
-                color={colors.primary.paragraph}
-                onPress={restoreItem}
-                name="delete-restore"
-                tooltipText="Restore"
-                tooltipPosition={4}
-                size={SIZE.xl - 3}
-              />
-
-              <IconButton
-                style={{
-                  marginLeft: 10
-                }}
-                color={colors.primary.paragraph}
-                onPress={deleteItem}
-                tooltipText="Delete"
-                tooltipPosition={4}
-                name="delete"
-                size={SIZE.xl - 3}
-              />
-            </>
+              anchor={
+                <IconButton
+                  onPress={() => {
+                    menuRef.current?.show();
+                  }}
+                  name="dots-vertical"
+                  color={colors.primary.paragraph}
+                />
+              }
+            >
+              {[
+                {
+                  title:
+                    selectedItemsList.length > 1
+                      ? "Move notebooks"
+                      : "Move notebook",
+                  onPress: async () => {
+                    const ids = selectedItemsList;
+                    const notebooks = await db.notebooks.all.items(ids);
+                    MoveNotebookSheet.present(notebooks);
+                  },
+                  visible: renderedInRoute === "Notebooks",
+                  icon: "arrow-right-bold-box-outline"
+                },
+                {
+                  title: "Manage tags",
+                  onPress: async () => {
+                    await sleep(100);
+                    ManageTagsSheet.present(selectedItemsList);
+                  },
+                  visible: type === "note",
+                  icon: "pound"
+                },
+                {
+                  title: "Export",
+                  onPress: async () => {
+                    await sleep(100);
+                    ExportNotesSheet.present(selectedItemsList);
+                  },
+                  visible: type === "note",
+                  icon: "export"
+                },
+                {
+                  title: "Link notebook",
+                  onPress: async () => {
+                    await sleep(100);
+                    MoveNoteSheet.present();
+                  },
+                  visible: type === "note",
+                  icon: "plus"
+                },
+                {
+                  title: "Unlink notebook",
+                  onPress: async () => {
+                    if (!id) return;
+                    await db.notes.removeFromNotebook(id, ...selectedItemsList);
+                    updateNotebook(id);
+                    Navigation.queueRoutesForUpdate();
+                    clearSelection();
+                  },
+                  visible: renderedInRoute === "Notebook",
+                  icon: "minus"
+                },
+                {
+                  title: "Unfavorite",
+                  onPress: addToFavorite,
+                  visible: focusedRouteId === "Favorites",
+                  icon: "star-off"
+                },
+                {
+                  title: `Move to trash`,
+                  onPress: async () => {
+                    deleteItems(
+                      undefined,
+                      useSelectionStore.getState().selectionMode
+                    ).then(() => {
+                      useSelectionStore.getState().clearSelection();
+                      useSelectionStore.getState().setSelectionMode(undefined);
+                    });
+                  },
+                  visible: type !== "trash",
+                  icon: "delete"
+                },
+                {
+                  title: `Restore`,
+                  onPress: restoreItem,
+                  visible: type === "trash",
+                  icon: "delete-restore"
+                },
+                {
+                  title: `Delete`,
+                  onPress: deleteItem,
+                  visible: type === "trash",
+                  icon: "delete"
+                }
+              ].map((item) =>
+                !item.visible ? null : (
+                  <Button
+                    style={{
+                      width: 150,
+                      justifyContent: "flex-start",
+                      borderRadius: 0
+                    }}
+                    type="plain"
+                    buttonType={{
+                      text: contextMenuColors.primary.paragraph
+                    }}
+                    icon={item.icon}
+                    key={item.title}
+                    title={item.title}
+                    onPress={async () => {
+                      menuRef.current?.hide();
+                      if (Platform.OS === "ios") await sleep(300);
+                      item.onPress();
+                    }}
+                  />
+                )
+              )}
+            </Menu>
           ) : null}
         </View>
-      </Animated.View>
+      </View>
     );
   }
 );

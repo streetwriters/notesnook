@@ -82,8 +82,6 @@ export function TableComponent(props: ReactNodeViewProps) {
 }
 
 export function TableNodeView(editor: TiptapEditor) {
-  if (!editor.storage.portalProviderAPI) return;
-  const api = editor.storage.portalProviderAPI;
   class TableNode
     extends ReactNodeView<ReactNodeViewProps<unknown>>
     implements NodeView
@@ -93,7 +91,6 @@ export function TableNodeView(editor: TiptapEditor) {
         node,
         editor,
         () => 0, // todo
-        api,
         {
           component: TableComponent,
           shouldUpdate: (prev, next) => {

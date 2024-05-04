@@ -26,7 +26,7 @@ import { Pressable } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
-import BiometicService from "../../services/biometrics";
+import BiometricService from "../../services/biometrics";
 import { ToastManager, presentSheet } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
@@ -119,7 +119,7 @@ const AppLock = () => {
                 type={appLockMode === item.value ? "secondary" : "transparent"}
                 onPress={async () => {
                   if (
-                    !(await BiometicService.isBiometryAvailable()) &&
+                    !(await BiometricService.isBiometryAvailable()) &&
                     !useUserStore.getState().user &&
                     item.value !== modes[0].value &&
                     !SettingsService.getProperty("appLockHasPasswordSecurity")
@@ -139,7 +139,7 @@ const AppLock = () => {
                     ) &&
                     item.value !== modes[0].value
                   ) {
-                    const verified = await BiometicService.validateUser(
+                    const verified = await BiometricService.validateUser(
                       "Verify it's you"
                     );
                     if (verified) {

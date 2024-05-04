@@ -29,6 +29,7 @@ import {
 } from "../icons";
 import { BaseThemeProvider } from "../theme-provider";
 
+export const TITLE_BAR_HEIGHT = IS_DESKTOP_APP ? 37.8 : 0;
 export function TitleBar() {
   const { isMaximized, isFullscreen, hasNativeWindowControls } =
     useWindowControls();
@@ -65,7 +66,7 @@ export function TitleBar() {
       scope="titleBar"
       sx={{
         background: "background",
-        height: 37.8,
+        height: TITLE_BAR_HEIGHT,
         display: "flex",
         borderBottom: "1px solid var(--border)",
         ...(!isFullscreen && hasNativeWindowControls

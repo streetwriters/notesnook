@@ -33,6 +33,7 @@ import {
   SafeAreaView,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
   useWindowDimensions
@@ -115,12 +116,14 @@ const ShareView = () => {
   const appendNoteId = useShareStore((state) => state.appendNote);
   const [note, setNote] = useState({ ...defaultNote });
   const noteContent = useRef("");
+  const noteTitle = useRef("");
   const [loading, setLoading] = useState(false);
   const [loadingExtension, setLoadingExtension] = useState(true);
   const [rawData, setRawData] = useState({
     type: null,
     value: null
   });
+  const inputRef = useRef(null);
   const [mode, setMode] = useState(1);
   const keyboardHeight = useRef(0);
   const { width, height } = useWindowDimensions();
@@ -192,6 +195,7 @@ const ShareView = () => {
           }
           return;
         }
+
         let note = { ...defaultNote };
         for (let item of data) {
           if (item.type === "text") {
@@ -207,7 +211,14 @@ const ShareView = () => {
               if (!key) continue;
               if (key.includes("TITLE") || key.includes("SUBJECT")) {
                 note.title = item[key];
-                console.log("Note title will be", note.title);
+                noteTitle.current = note.title;
+                inputRef.current?.setNativeProps?.({
+                  text: noteTitle.current
+                });
+              }
+              if (key.includes("TEXT") && !note.content.data) {
+                note.content.data = item[key];
+                noteContent.current = item[key];
               }
             }
           } else {
@@ -216,8 +227,9 @@ const ShareView = () => {
               if (
                 (isImage(item.type) && item.size > IMAGE_SIZE_LIMIT) ||
                 (!isImage(item.type) && item.size > FILE_SIZE_LIMIT)
-              )
+              ) {
                 continue;
+              }
 
               setRawFiles((files) => {
                 const index = files.findIndex(
@@ -244,6 +256,7 @@ const ShareView = () => {
   );
 
   const onLoad = useCallback(() => {
+    console.log(noteContent.current, "current...");
     eSendEvent(eOnLoadNote + "shareEditor", {
       id: null,
       content: {
@@ -275,7 +288,7 @@ const ShareView = () => {
 
   const onPress = async () => {
     setLoading(true);
-    if (!noteContent.current && rawFiles.length === 0) {
+    if (!noteContent.current && rawFiles.length === 0 && !noteTitle.current) {
       setLoading(false);
       return;
     }
@@ -298,12 +311,14 @@ const ShareView = () => {
           type: "tiptap"
         },
         id: note.id,
-        sessionId: Date.now()
+        sessionId: Date.now(),
+        title: noteTitle.current
       };
     } else {
       noteData = { ...note };
       noteData.content.data = noteContent.current;
       noteData.sessionId = Date.now();
+      noteData.title = noteTitle.current;
     }
 
     try {
@@ -468,10 +483,29 @@ const ShareView = () => {
                     borderBottomWidth: 1,
                     paddingBottom: 12,
                     borderBottomColor: colors.secondary.background,
-                    paddingHorizontal: 12
+                    paddingHorizontal: 12,
+                    gap: 10
                   }}
                 >
-                  <Heading size={SIZE.lg}>Save to Notesnook</Heading>
+                  <TextInput
+                    placeholder="Enter note title"
+                    ref={inputRef}
+                    style={{
+                      flexShrink: 1,
+                      flexGrow: 1,
+                      fontFamily: "OpenSans-SemiBold",
+                      fontSize: SIZE.lg,
+                      paddingBottom: 0,
+                      paddingTop: 0
+                    }}
+                    onChangeText={(value) => {
+                      noteTitle.current = value;
+                    }}
+                    blurOnSubmit={false}
+                    onSubmitEditing={() => {
+                      editorRef.current.focus();
+                    }}
+                  />
                   <Button
                     title="Done"
                     type="accent"
@@ -626,13 +660,15 @@ const ShareView = () => {
                     }}
                   >
                     {!loadingExtension && !loadingPage ? (
-                      <Editor
-                        editorRef={editorRef}
-                        onLoad={onLoadEditor}
-                        onChange={(html) => {
-                          noteContent.current = html;
-                        }}
-                      />
+                      <>
+                        <Editor
+                          editorRef={editorRef}
+                          onLoad={onLoadEditor}
+                          onChange={(html) => {
+                            noteContent.current = html;
+                          }}
+                        />
+                      </>
                     ) : (
                       <>
                         {loadingPage ? (
@@ -646,7 +682,19 @@ const ShareView = () => {
                   </SafeAreaProvider>
                 </View>
 
-                {appendNoteId ? <AppendNote id={appendNoteId} /> : null}
+                {appendNoteId ? (
+                  <AppendNote
+                    id={appendNoteId}
+                    onLoad={(title) => {
+                      if (!noteTitle.current) {
+                        noteTitle.current = title;
+                        inputRef.current?.setNativeProps?.({
+                          text: noteTitle.current
+                        });
+                      }
+                    }}
+                  />
+                ) : null}
 
                 <View
                   style={{
@@ -766,9 +814,15 @@ const ShareView = () => {
   );
 };
 
-const AppendNote = ({ id }) => {
+const AppendNote = ({ id, onLoad }) => {
   const { colors } = useThemeColors();
   const [item] = useDBItem(id, "note");
+
+  useEffect(() => {
+    if (item?.title) {
+      onLoad?.(item.title);
+    }
+  }, [item?.title, onLoad]);
 
   return !item ? null : (
     <Paragraph

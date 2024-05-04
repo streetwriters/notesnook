@@ -46,6 +46,7 @@ import { Section } from "../properties";
 import { scrollIntoViewById } from "@notesnook/editor";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { useEditorManager } from "./manager";
+import { TITLE_BAR_HEIGHT } from "../title-bar";
 
 type TableOfContentsProps = {
   sessionId: string;
@@ -100,7 +101,7 @@ function TableOfContents(props: TableOfContentsProps) {
         display: "flex",
         position: "absolute",
         right: 0,
-        top: 0,
+        top: TITLE_BAR_HEIGHT,
         zIndex: 999,
         height: "100%",
         width: "300px",

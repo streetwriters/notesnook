@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { db } from "../../common/database";
 import { validateAppLockPassword } from "../../common/database/encryption";
 import { presentDialog } from "../../components/dialog/functions";
-import BiometicService from "../../services/biometrics";
+import BiometricService from "../../services/biometrics";
 import { ToastManager } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { useUserStore } from "../../stores/use-user-store";
@@ -100,9 +100,9 @@ export async function verifyUserWithApplock() {
         }
       });
     } else {
-      BiometicService.isBiometryAvailable().then((available) => {
+      BiometricService.isBiometryAvailable().then((available) => {
         if (available) {
-          BiometicService.validateUser("Verify it's you").then((verified) => {
+          BiometricService.validateUser("Verify it's you").then((verified) => {
             resolve(verified);
           });
         } else if (useUserStore.getState().user) {

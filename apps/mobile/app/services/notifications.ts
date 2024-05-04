@@ -49,6 +49,7 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import Navigation from "./navigation";
 import SettingsService from "./settings";
+import { useUserStore } from "../stores/use-user-store";
 
 let pinned: DisplayedNotification[] = [];
 
@@ -476,7 +477,15 @@ async function displayNotification({
   reply_button_text?: string;
   id?: string;
 }) {
-  if (!(await checkAndRequestPermissions())) return;
+  useUserStore.setState({
+    disableAppLockRequests: true
+  });
+  const permission = await checkAndRequestPermissions();
+  useUserStore.setState({
+    disableAppLockRequests: false
+  });
+
+  if (!permission) return;
 
   try {
     await notifee.displayNotification({
@@ -846,7 +855,16 @@ async function remove(id: string) {
 }
 
 async function pinQuickNote(launch: boolean) {
-  if (!(await checkAndRequestPermissions())) return;
+  useUserStore.setState({
+    disableAppLockRequests: true
+  });
+  const permission = await checkAndRequestPermissions();
+  useUserStore.setState({
+    disableAppLockRequests: false
+  });
+  if (!permission) {
+    return;
+  }
   get().then((items) => {
     const notification = items.filter((n) => n.id === "notesnook_note_input");
     if (notification && launch) {

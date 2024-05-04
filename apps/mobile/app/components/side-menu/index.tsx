@@ -21,15 +21,11 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback } from "react";
 import { View } from "react-native";
 import { DraxProvider, DraxScrollView } from "react-native-drax";
-import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
-import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
@@ -59,26 +55,6 @@ export const SideMenu = React.memo(
     const introCompleted = useSettingStore(
       (state) => state.settings.introCompleted
     );
-    const BottomItemsList = [
-      {
-        name: isDark ? "Day" : "Night",
-        icon: "theme-light-dark",
-        func: () => {
-          useThemeStore.getState().setColorScheme();
-        },
-        switch: true,
-        on: !!isDark,
-        close: false
-      },
-      {
-        name: "Settings",
-        icon: "cog-outline",
-        close: true,
-        func: () => {
-          Navigation.navigate("Settings");
-        }
-      }
-    ];
 
     const pro = {
       name: "Notesnook Pro",
@@ -121,7 +97,7 @@ export const SideMenu = React.memo(
           <PinnedSection />
         </>
       ),
-      []
+      [order, hiddensItems]
     );
 
     return !isAppLoading && introCompleted ? (

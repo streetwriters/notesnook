@@ -19,13 +19,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Notebook, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
-import { RefreshControl, View, useWindowDimensions } from "react-native";
+import {
+  Platform,
+  RefreshControl,
+  View,
+  useWindowDimensions
+} from "react-native";
 import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import Config from "react-native-config";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import create from "zustand";
 import { notesnook } from "../../../../e2e/test.ids";
+import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
 import { useNotebook } from "../../../hooks/use-notebook";
 import NotebookScreen from "../../../screens/notebook";
@@ -43,9 +49,8 @@ import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
-import Sort from "../sort";
 import { MoveNotebookSheet } from "../move-notebook";
-import { db } from "../../../common/database";
+import Sort from "../sort";
 
 const useItemSelectionStore = createItemSelectionStore(true, false);
 
@@ -63,7 +68,8 @@ class NotebookSheetConfig {
   }
 
   static get(item: ConfigItem) {
-    return MMKV.getInt(NotebookSheetConfig.makeId(item)) || 0;
+    const value = MMKV.getInt(NotebookSheetConfig.makeId(item));
+    return typeof value === "number" ? value : 0;
   }
 
   static set(item: ConfigItem, index = 0) {
@@ -126,11 +132,6 @@ export const NotebookSheet = () => {
         if (!focusedRouteId) return;
         const nextRoot = await findRootNotebookId(focusedRouteId);
         if (nextRoot !== currentItem.current) {
-          console.log(
-            "NotebookSheet.useEffect.canShow",
-            "Root changed to",
-            nextRoot
-          );
           useItemSelectionStore.setState({
             enabled: false,
             selection: {}
@@ -145,11 +146,8 @@ export const NotebookSheet = () => {
         if (ref.current?.isOpen()) {
           ref.current?.snapToIndex(snapPoint);
         } else {
-          setTimeout(() => {
-            ref.current?.show(snapPoint);
-          }, 150);
+          ref.current?.show(snapPoint);
         }
-        console.log("NotebookSheet.useEffect.didShow", focusedRouteId);
         setRoot(nextRoot);
         onRequestUpdate();
       });
@@ -162,7 +160,7 @@ export const NotebookSheet = () => {
         ref.current?.hide();
       }
     }
-  }, [canShow, onRequestUpdate, focusedRouteId]);
+  }, [canShow, focusedRouteId]);
 
   return (
     <ActionSheet
@@ -198,7 +196,11 @@ export const NotebookSheet = () => {
         backgroundColor: colors.secondary.background
       }}
       keyboardHandlerEnabled={false}
-      snapPoints={Config.isTesting === "true" ? [100] : [20, 100]}
+      snapPoints={
+        Config.isTesting === "true"
+          ? [100]
+          : [Platform.OS === "android" ? 15 : 10, 100]
+      }
       initialSnapIndex={1}
       backgroundInteractionEnabled
       gestureEnabled
@@ -237,7 +239,7 @@ export const NotebookSheet = () => {
           >
             <Icon
               name="notebook-plus"
-              color={colors.primary.accent}
+              color={colors.primary.icon}
               size={SIZE.xxl}
             />
           </View>

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Notebook, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import create from "zustand";
@@ -72,6 +72,20 @@ export const MoveNotebookSheet = ({
 }) => {
   const [notebooks] = useNotebooks();
   const { colors } = useThemeColors();
+  const [moveToTop, setMoveToTop] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      for (const notebook of selectedNotebooks) {
+        const root = await findRootNotebookId(notebook.id);
+        if (root !== notebook.id) {
+          setMoveToTop(true);
+          return;
+        }
+      }
+    })();
+  }, [selectedNotebooks]);
+
   const renderItem = useCallback(
     ({ index }: { index: number }) => {
       return (
@@ -93,6 +107,7 @@ export const MoveNotebookSheet = ({
                   : selectedNotebooks[0].title
               } to ${selectedNotebook.title}?`,
               positiveText: "Move",
+              context: "move-notebook",
               positivePress: async () => {
                 for (const notebook of selectedNotebooks) {
                   const parent = await getParentNotebookId(notebook.id);
@@ -157,36 +172,38 @@ export const MoveNotebookSheet = ({
               paddingHorizontal: 12
             }}
           >
-            <Button
-              title="Move to top"
-              style={{
-                alignSelf: "flex-start",
-                width: "100%",
-                justifyContent: "space-between"
-              }}
-              icon="arrow-up-bold"
-              iconPosition="right"
-              type="secondaryAccented"
-              onPress={async () => {
-                for (const notebook of selectedNotebooks) {
-                  const parent = await getParentNotebookId(notebook.id);
-                  const root = await findRootNotebookId(notebook.id);
-                  if (root !== notebook.id) {
-                    await db.relations.unlink(
-                      {
-                        type: "notebook",
-                        id: parent
-                      },
-                      notebook
-                    );
-                    eSendEvent(eOnNotebookUpdated, parent);
-                    eSendEvent(eOnNotebookUpdated, notebook.id);
+            {moveToTop ? (
+              <Button
+                title="Move to top"
+                style={{
+                  alignSelf: "flex-start",
+                  width: "100%",
+                  justifyContent: "space-between"
+                }}
+                icon="arrow-up-bold"
+                iconPosition="right"
+                type="secondaryAccented"
+                onPress={async () => {
+                  for (const notebook of selectedNotebooks) {
+                    const parent = await getParentNotebookId(notebook.id);
+                    const root = await findRootNotebookId(notebook.id);
+                    if (root !== notebook.id) {
+                      await db.relations.unlink(
+                        {
+                          type: "notebook",
+                          id: parent
+                        },
+                        notebook
+                      );
+                      eSendEvent(eOnNotebookUpdated, parent);
+                      eSendEvent(eOnNotebookUpdated, notebook.id);
+                    }
                   }
-                }
-                useNotebookStore.getState().refresh();
-                close?.();
-              }}
-            />
+                  useNotebookStore.getState().refresh();
+                  close?.();
+                }}
+              />
+            ) : null}
           </View>
         }
         ListEmptyComponent={

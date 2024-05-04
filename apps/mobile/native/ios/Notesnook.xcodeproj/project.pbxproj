@@ -21,9 +21,9 @@
 		6517B7C32B6838EB0079FF37 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6517B7C02B6838EB0079FF37 /* OpenSans-Bold.ttf */; };
 		6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */; };
 		656835812BB29A9800144BAB /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 656835802BB29A8300144BAB /* OpenSans-Italic.ttf */; };
-		656DD2AB2B1891DF00A362EA /* (null) in Resources */ = {isa = PBXBuildFile; };
-		656DD2AC2B1891DF00A362EA /* (null) in Resources */ = {isa = PBXBuildFile; };
-		656DD2AD2B1891DF00A362EA /* (null) in Resources */ = {isa = PBXBuildFile; };
+		656DD2AB2B1891DF00A362EA /* BuildFile in Resources */ = {isa = PBXBuildFile; };
+		656DD2AC2B1891DF00A362EA /* BuildFile in Resources */ = {isa = PBXBuildFile; };
+		656DD2AD2B1891DF00A362EA /* BuildFile in Resources */ = {isa = PBXBuildFile; };
 		6593E4A3281C345400492C50 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6593E4A2281C345400492C50 /* AppDelegate.mm */; };
 		659BE46725E11A5100E05671 /* notesnook-text.png in Resources */ = {isa = PBXBuildFile; fileRef = 659BE46625E11A5100E05671 /* notesnook-text.png */; };
 		65AA857925E6DDEC00772A01 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65AA857825E6DDEC00772A01 /* WidgetKit.framework */; };
@@ -586,9 +586,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				656DD2AB2B1891DF00A362EA /* (null) in Resources */,
-				656DD2AC2B1891DF00A362EA /* (null) in Resources */,
-				656DD2AD2B1891DF00A362EA /* (null) in Resources */,
+				656DD2AB2B1891DF00A362EA /* BuildFile in Resources */,
+				656DD2AC2B1891DF00A362EA /* BuildFile in Resources */,
+				656DD2AD2B1891DF00A362EA /* BuildFile in Resources */,
 				65C400DF2A80B6B600AA3DF5 /* MaterialCommunityIcons.ttf in Resources */,
 				65C149872A61151B005C40F1 /* extension.bundle in Resources */,
 				65B5014725A672B200E2D264 /* MainInterface.storyboard in Resources */,
@@ -1015,7 +1015,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2097;
+				CURRENT_PROJECT_VERSION = 2098;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1089,7 +1089,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1120,7 +1120,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2097;
+				CURRENT_PROJECT_VERSION = 2098;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1194,7 +1194,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.0.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1353,7 +1353,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2097;
+				CURRENT_PROJECT_VERSION = 2098;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1365,7 +1365,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.0.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.notewidget;
@@ -1396,7 +1396,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2097;
+				CURRENT_PROJECT_VERSION = 2098;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
@@ -1409,7 +1409,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.0.1;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.notewidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1439,7 +1439,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Make Note/Make Note.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2097;
+				CURRENT_PROJECT_VERSION = 2098;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1513,7 +1513,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.0.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
@@ -1544,7 +1544,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2097;
+				CURRENT_PROJECT_VERSION = 2098;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 53CWBG3QUC;
@@ -1619,7 +1619,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.0.1;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
 				PRODUCT_NAME = "$(TARGET_NAME)";

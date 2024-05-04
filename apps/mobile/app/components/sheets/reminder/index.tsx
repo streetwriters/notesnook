@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useRef, useState } from "react";
-import { Platform, TextInput, View } from "react-native";
+import {
+  Platform,
+  TextInput,
+  View,
+  ScrollView as RNScrollView
+} from "react-native";
 import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {
@@ -364,7 +369,7 @@ export default function ReminderSheet({
               ))}
             </View>
 
-            <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+            <RNScrollView showsHorizontalScrollIndicator={false} horizontal>
               {recurringMode === RecurringModes.Daily ||
               recurringMode === RecurringModes.Year
                 ? null
@@ -425,7 +430,7 @@ export default function ReminderSheet({
                       }}
                     />
                   ))}
-            </ScrollView>
+            </RNScrollView>
           </View>
         ) : null}
 

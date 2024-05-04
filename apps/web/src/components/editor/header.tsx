@@ -121,7 +121,7 @@ function Header(props: HeaderProps) {
             }}
             defaultItems={() =>
               db.tags.all.limit(10).items(undefined, {
-                sortBy: "dateCreated",
+                sortBy: "title",
                 sortDirection: "desc"
               })
             }

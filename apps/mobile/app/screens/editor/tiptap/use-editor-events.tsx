@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { parseInternalLink } from "@notesnook/core";
 import { ItemReference } from "@notesnook/core/dist/types";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
@@ -27,7 +26,6 @@ import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,
-  InteractionManager,
   Keyboard,
   KeyboardEventListener,
   NativeEventSubscription,
@@ -62,6 +60,7 @@ import {
   eCloseFullscreenEditor,
   eEditorTabFocused,
   eOnEnterEditor,
+  eOnExitEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
   eOpenLoginDialog,
@@ -76,7 +75,8 @@ import { useDragState } from "../../settings/editor/state";
 import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
-import { EditorEvents, editorState } from "./utils";
+import { EditorEvents, editorState, openInternalLink } from "./utils";
+
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -270,21 +270,20 @@ export const useEditorEvents = (
   }, [editor, deviceMode, fullscreen]);
 
   const onHardwareBackPress = useCallback(() => {
-    if (tabBarRef.current?.page === 2) {
+    console.log(tabBarRef.current?.page());
+    if (tabBarRef.current?.page() === 2) {
       onBackPress();
       return true;
     }
   }, [onBackPress]);
 
   const onEnterEditor = useCallback(async () => {
-    InteractionManager.runAfterInteractions(() => {
-      if (!DDS.isTab) {
-        handleBack.current = BackHandler.addEventListener(
-          "hardwareBackPress",
-          onHardwareBackPress
-        );
-      }
-    });
+    if (!DDS.isTab) {
+      handleBack.current = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onHardwareBackPress
+      );
+    }
   }, [onHardwareBackPress]);
 
   const onClearEditorSessionRequest = useCallback(
@@ -331,7 +330,14 @@ export const useEditorEvents = (
   }, [fullscreen, onHardwareBackPress]);
 
   useEffect(() => {
+    const onExitEditor = () => {
+      if (handleBack.current) {
+        handleBack.current.remove();
+      }
+    };
+
     eSubscribeEvent(eOnEnterEditor, onEnterEditor);
+    eSubscribeEvent(eOnExitEditor, onExitEditor);
     eSubscribeEvent(
       eClearEditor + editor.editorId,
       onClearEditorSessionRequest
@@ -339,6 +345,7 @@ export const useEditorEvents = (
     return () => {
       eUnSubscribeEvent(eClearEditor, onClearEditorSessionRequest);
       eUnSubscribeEvent(eOnEnterEditor, onEnterEditor);
+      eUnSubscribeEvent(eOnExitEditor, onExitEditor);
     };
   }, [editor.editorId, onClearEditorSessionRequest, onEnterEditor]);
 
@@ -462,12 +469,10 @@ export const useEditorEvents = (
 
         case EventTypes.getAttachmentData: {
           const attachment = (editorMessage.value as any)
-            .attachment as Attachment;
+            ?.attachment as Attachment;
 
-          console.log(
-            "Getting attachment data:",
-            attachment.hash,
-            attachment.type
+          DatabaseLogger.log(
+            `Getting attachment data: ${attachment?.hash} ${attachment?.type}`
           );
           downloadAttachment(attachment.hash, true, {
             base64: attachment.type === "image",
@@ -487,8 +492,8 @@ export const useEditorEvents = (
                 data
               });
             })
-            .catch(() => {
-              console.log("Error downloading attachment data");
+            .catch((e) => {
+              DatabaseLogger.error(e);
               editor.postMessage(EditorEvents.attachmentData, {
                 resolverId: (editorMessage.value as any).resolverId,
                 data: undefined
@@ -519,27 +524,7 @@ export const useEditorEvents = (
           break;
         case EventTypes.link:
           if (editorMessage.value.startsWith("nn://")) {
-            const data = parseInternalLink(editorMessage.value);
-            if (!data?.id) break;
-            if (
-              data.id ===
-              useTabStore
-                .getState()
-                .getNoteIdForTab(useTabStore.getState().currentTab)
-            ) {
-              if (data.params?.blockId) {
-                setTimeout(() => {
-                  if (!data.params?.blockId) return;
-                  editor.commands.scrollIntoViewById(data.params.blockId);
-                }, 150);
-              }
-              return;
-            }
-
-            eSendEvent(eOnLoadNote, {
-              item: await db.notes.note(data?.id),
-              blockId: data.params?.blockId
-            });
+            openInternalLink(editorMessage.value);
             console.log(
               "Opening note from internal link:",
               editorMessage.value
@@ -662,10 +647,8 @@ export const useEditorEvents = (
               .updateTab(useTabStore.getState().currentTab, {
                 readonly: false
               });
-            Navigation.queueRoutesForUpdate();
-            ToastManager.show({
-              heading: "Readonly mode disabled.",
-              type: "success"
+            setTimeout(() => {
+              Navigation.queueRoutesForUpdate();
             });
           }
           break;

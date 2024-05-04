@@ -43,6 +43,7 @@ export const config = {
   theme: nativeTheme.themeSource,
   automaticUpdates: true,
   proxyRules: "",
+  customDns: true,
 
   backgroundColor: nativeTheme.themeSource === "dark" ? "#0f0f0f" : "#ffffff",
   windowControlsIconColor:

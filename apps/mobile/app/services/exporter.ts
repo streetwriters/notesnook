@@ -40,7 +40,7 @@ import { basename, dirname, join } from "pathe";
 import downloadAttachment from "../common/filesystem/download-attachment";
 import { presentDialog } from "../components/dialog/functions";
 import { useSettingStore } from "../stores/use-setting-store";
-import BiometicService from "./biometrics";
+import BiometricService from "./biometrics";
 import { ToastManager } from "./event-manager";
 import { cacheDir } from "../common/filesystem/utils";
 
@@ -186,10 +186,10 @@ async function exportAs(
 }
 
 async function unlockVault() {
-  const biometry = await BiometicService.isBiometryAvailable();
-  const fingerprint = await BiometicService.hasInternetCredentials();
+  const biometry = await BiometricService.isBiometryAvailable();
+  const fingerprint = await BiometricService.hasInternetCredentials();
   if (biometry && fingerprint) {
-    const credentials = await BiometicService.getCredentials(
+    const credentials = await BiometricService.getCredentials(
       "Unlock vault",
       "Unlock vault to export locked notes"
     );

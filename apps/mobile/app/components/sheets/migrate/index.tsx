@@ -99,6 +99,7 @@ export default function Migrate() {
       const { error } = await BackupService.run(false, "local");
       if (error) {
         ToastManager.error(error, "Backup failed");
+        reportError(error);
         setLoading(false);
         return;
       }

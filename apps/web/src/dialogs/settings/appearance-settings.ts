@@ -44,7 +44,8 @@ export const AppearanceSettings: SettingsGroup[] = [
             type: "input",
             inputType: "number",
             min: 0.5,
-            max: 2.0,
+            max: 3.0,
+            step: 0.1,
             defaultValue: () => useSettingStore.getState().zoomFactor,
             onChange: (value) => useSettingStore.getState().setZoomFactor(value)
           }
