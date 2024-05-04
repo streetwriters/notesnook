@@ -165,11 +165,10 @@ export default class Backup {
   async *exportLegacy(type: BackupPlatform, encrypt = false) {
     if (!validTypes.some((t) => t === type))
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
-    if (encrypt && !(await this.db.user.getLegacyUser()))
-      throw new Error("Please login to create encrypted backups.");
+    if (encrypt && !(await this.db.user.getLegacyUser())) encrypt = false;
 
     const key = await this.db.user.getLegacyEncryptionKey();
-    if (encrypt && !key) throw new Error("No encryption key found.");
+    if (encrypt && !key) encrypt = false;
 
     const keys = await this.db.storage().getAllKeys();
     const chunks = toChunks(keys, 20);
