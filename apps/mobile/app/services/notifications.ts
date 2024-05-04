@@ -50,6 +50,7 @@ import { eSendEvent } from "./event-manager";
 import Navigation from "./navigation";
 import SettingsService from "./settings";
 import { useUserStore } from "../stores/use-user-store";
+import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 
 let pinned: DisplayedNotification[] = [];
 
@@ -140,6 +141,7 @@ const onEvent = async ({ type, detail }: Event) => {
     }
     editorState().movedAway = false;
     const noteId = notification?.id;
+    console.log("NOTE ID", noteId);
     loadNote(noteId as string, true);
   }
 
@@ -408,18 +410,31 @@ async function loadNote(id: string, jump: boolean) {
   if (!DDS.isTab && jump) {
     tabBarRef.current?.goToPage(1);
   }
-  eSendEvent("loadingNote", note);
-  setTimeout(
-    () => {
-      eSendEvent(eOnLoadNote, {
-        item: note
-      });
-      if (!jump && !DDS.isTab) {
-        tabBarRef.current?.goToPage(1);
-      }
-    },
-    tabBarRef?.current ? 0 : 2000
+
+  MMKV.setString(
+    "appState",
+    JSON.stringify({
+      editing: true,
+      movedAway: false,
+      timestamp: Date.now()
+    })
   );
+
+  const isLocked = await db.vaults.itemExists({
+    type: "note",
+    id: id
+  });
+
+  const tab = useTabStore.getState().getTabForNote(id);
+  if (tab !== undefined) {
+    useTabStore.getState().focusTab(tab);
+  } else {
+    useTabStore.getState().focusPreviewTab(id, {
+      noteId: id,
+      readonly: note.readonly,
+      noteLocked: isLocked
+    });
+  }
 }
 
 async function getChannelId(id: "silent" | "vibrate" | "urgent" | "default") {
