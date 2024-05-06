@@ -197,7 +197,7 @@ export class Content implements ICollection {
     await this.db
       .sql()
       .replaceInto("content")
-      .columns(["id", "dateModified", "deleted"])
+      .columns(["id", "dateModified", "deleted", "synced"])
       .expression((eb) =>
         eb
           .selectFrom("content")
@@ -205,7 +205,8 @@ export class Content implements ICollection {
           .select((eb) => [
             "content.id",
             eb.lit(Date.now()).as("dateModified"),
-            eb.lit(1).as("deleted")
+            eb.lit(1).as("deleted"),
+            eb.lit(0).as("synced")
           ])
       )
       .execute();

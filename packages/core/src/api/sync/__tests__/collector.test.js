@@ -90,6 +90,25 @@ test("localOnly note should get included as a deleted item in collector", () =>
     expect(items[1].type).toBe("note");
   }));
 
+test("unlinked relation should get included in collector", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+    const collector = new Collector(db);
+    await db.relations.add(
+      { id: "h", type: "note" },
+      { id: "h", type: "attachment" }
+    );
+
+    await iteratorToArray(collector.collect(100, false));
+
+    await db.relations.from({ id: "h", type: "note" }, "attachment").unlink();
+
+    const items = await iteratorToArray(collector.collect(100, false));
+
+    expect(items).toHaveLength(1);
+    expect(items[0].items[0].id).toBe("cd93df7a4c64fbd5f100361d629ac5b5");
+  }));
+
 async function iteratorToArray(iterator) {
   let items = [];
   for await (const item of iterator) {
