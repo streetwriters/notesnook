@@ -154,7 +154,7 @@ export class Relations implements ICollection {
     await this.db
       .sql()
       .replaceInto("relations")
-      .columns(["id", "dateModified", "deleted"])
+      .columns(["id", "dateModified", "deleted", "synced"])
       .expression((eb) =>
         eb
           .selectFrom("relations")
@@ -169,7 +169,8 @@ export class Relations implements ICollection {
           .select((eb) => [
             "relations.id",
             eb.lit(Date.now()).as("dateModified"),
-            eb.lit(1).as("deleted")
+            eb.lit(1).as("deleted"),
+            eb.lit(0).as("synced")
           ])
       )
       .execute();
@@ -265,7 +266,7 @@ class RelationsArray<TType extends keyof RelatableTable> {
     await this.db
       .sql()
       .replaceInto("relations")
-      .columns(["id", "dateModified", "deleted"])
+      .columns(["id", "dateModified", "deleted", "synced"])
       .expression((eb) =>
         eb
           .selectFrom("relations")
@@ -274,7 +275,8 @@ class RelationsArray<TType extends keyof RelatableTable> {
           .select((eb) => [
             "relations.id",
             eb.lit(Date.now()).as("dateModified"),
-            eb.lit(1).as("deleted")
+            eb.lit(true).as("deleted"),
+            eb.lit(false).as("synced")
           ])
       )
       .execute();
