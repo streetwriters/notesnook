@@ -95,6 +95,66 @@ test(
   TEST_TIMEOUT
 );
 
+test(
+  "edge case 1: items updated while push is running",
+  async (t) => {
+    const [deviceA, deviceB] = await Promise.all([
+      initializeDevice("deviceA"),
+      initializeDevice("deviceB")
+    ]);
+
+    t.onTestFinished(async () => {
+      console.log(`${t.task.name} log out`);
+      await cleanup(deviceA, deviceB);
+    });
+
+    const id = await deviceA.notes.add({ title: "hello" });
+    for (let i = 0; i < 10; ++i) {
+      await Promise.all([
+        deviceA.sync({ type: "send" }),
+        new Promise((resolve) => setTimeout(resolve), 100).then(() =>
+          deviceA.notes.add({ id, title: `edit ${i}` })
+        )
+      ]);
+
+      expect((await deviceA.notes.note(id))?.synced).toBe(false);
+      await deviceA.sync({ type: "send" });
+      await deviceB.sync({ type: "fetch" });
+      expect((await deviceB.notes.note(id))?.title).toBe(`edit ${i}`);
+    }
+  },
+  TEST_TIMEOUT * 10
+);
+
+test(
+  "edge case 2: new items added while push is running",
+  async (t) => {
+    const [deviceA, deviceB] = await Promise.all([
+      initializeDevice("deviceA"),
+      initializeDevice("deviceB")
+    ]);
+
+    t.onTestFinished(async () => {
+      console.log(`${t.task.name} log out`);
+      await cleanup(deviceA, deviceB);
+    });
+
+    for (let i = 0; i < 10; ++i) {
+      await Promise.all([
+        deviceA.sync({ type: "send" }),
+        new Promise((resolve) => setTimeout(resolve), 100).then(() =>
+          deviceA.notes.add({ title: `note ${i}` })
+        )
+      ]);
+      expect(await deviceB.notes.all.count()).toBe(i);
+      await deviceA.sync({ type: "send" });
+      await deviceB.sync({ type: "fetch" });
+      expect(await deviceB.notes.all.count()).toBe(i + 1);
+    }
+  },
+  TEST_TIMEOUT * 10
+);
+
 // test(
 //   "case 4: Device A's sync is interrupted halfway and Device B makes some changes afterwards and syncs.",
 //   async () => {

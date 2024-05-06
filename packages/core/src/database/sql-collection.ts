@@ -226,7 +226,14 @@ export class SQLCollection<
   async update(
     ids: string[],
     partial: Partial<SQLiteItem<T>>,
-    options: { sendEvent: boolean } = { sendEvent: true }
+    options: {
+      sendEvent: boolean;
+      condition?: ExpressionOrFactory<
+        DatabaseSchema,
+        keyof DatabaseSchema,
+        SqlBool
+      >;
+    } = { sendEvent: true }
   ) {
     if (!this.sanitizer.sanitize(this.type, partial)) return;
 
@@ -237,6 +244,7 @@ export class SQLCollection<
           await tx
             .updateTable<keyof DatabaseSchema>(this.type)
             .where("id", "in", chunk)
+            .$if(!!options.condition, (eb) => eb.where(options.condition!))
             .set({
               ...partial,
               dateModified: Date.now(),

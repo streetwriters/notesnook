@@ -51,7 +51,7 @@ async function writeEncryptedBase64(
     hashType,
     iv: "some iv",
     salt: key.salt!,
-    length: data.length
+    size: data.length
   };
 }
 
