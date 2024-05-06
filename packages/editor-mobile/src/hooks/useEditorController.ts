@@ -54,6 +54,7 @@ type Timers = {
   selectionChange: NodeJS.Timeout | null;
   change: NodeJS.Timeout | null;
   wordCounter: NodeJS.Timeout | null;
+  scroll: NodeJS.Timeout | null;
 };
 
 function isInViewport(element: any) {
@@ -135,7 +136,8 @@ export function useEditorController({
   const timers = useRef<Timers>({
     selectionChange: null,
     change: null,
-    wordCounter: null
+    wordCounter: null,
+    scroll: null
   });
 
   if (!tabRef.current.noteId && loading) {
@@ -210,14 +212,19 @@ export function useEditorController({
 
   const scroll = useCallback(
     (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {
-      const noteId = useTabStore
-        .getState()
-        .getNoteIdForTab(useTabStore.getState().currentTab);
-      if (noteId) {
-        useTabStore.getState().setNoteState(noteId, {
-          top: _event.currentTarget.scrollTop
-        });
-      }
+      const value = _event.currentTarget.scrollTop;
+      if (timers.current.scroll !== null) clearTimeout(timers.current.scroll);
+      timers.current.scroll = setTimeout(() => {
+        if (
+          tabRef.current.noteId &&
+          tabRef.current.noteId === useTabStore.getState().getCurrentNoteId()
+        ) {
+          logger("info", tabRef.current.noteId, value);
+          useTabStore.getState().setNoteState(tabRef.current.noteId, {
+            top: value
+          });
+        }
+      }, 16);
     },
     []
   );
@@ -259,10 +266,13 @@ export function useEditorController({
               preserveWhitespace: true
             });
 
-            editor.commands.setTextSelection({
-              from,
-              to
-            });
+            if (editor.isFocused && (to !== 1 || from !== 1)) {
+              logger("info", "Setting focus", to, from);
+              editor.commands.setTextSelection({
+                from,
+                to
+              });
+            }
             countWords(0);
           }
 
