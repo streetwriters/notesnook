@@ -32,19 +32,24 @@ export const ignoredMessages = [
   "WebSocket failed to connect",
   "Failed to start the HttpConnection before"
 ];
-let pendingSync = undefined;
-let syncTimer = 0;
+let pendingSync: any = undefined;
+let syncTimer: NodeJS.Timeout;
+
 const run = async (
   context = "global",
   forced = false,
-  full = true,
-  onCompleted,
-  lastSyncTime
+  type: "full" | "send" | "fetch" = "full",
+  onCompleted?: (status?: number) => void,
+  lastSyncTime?: number
 ) => {
   if (useUserStore.getState().syncing) {
     DatabaseLogger.info("Sync in progress");
     pendingSync = {
-      full: full
+      forced,
+      type: type,
+      context: context,
+      onCompleted,
+      lastSyncTime
     };
     return;
   }
@@ -70,7 +75,7 @@ const run = async (
     ) {
       initAfterSync();
       pendingSync = undefined;
-      return onCompleted?.(false);
+      return onCompleted?.(SyncStatus.Failed);
     }
     userstore.setSyncing(true);
 
@@ -80,9 +85,8 @@ const run = async (
       await BackgroundSync.doInBackground(async () => {
         try {
           await db.sync({
-            type: full ? "full" : "send",
-            force: forced,
-            lastSyncTime
+            type: type,
+            force: forced
           });
         } catch (e) {
           error = e;
@@ -95,14 +99,16 @@ const run = async (
     } catch (e) {
       error = e;
       if (
-        !ignoredMessages.find((message) => e.message?.includes(message)) &&
+        !ignoredMessages.find((message) =>
+          (e as Error).message?.includes(message)
+        ) &&
         userstore.user &&
         status.isConnected &&
         status.isInternetReachable
       ) {
         userstore.setSyncing(false, SyncStatus.Failed);
         if (status.isConnected && status.isInternetReachable) {
-          ToastManager.error(e, "Sync failed", context);
+          ToastManager.error(e as Error, "Sync failed", context);
         }
       }
 
@@ -115,7 +121,14 @@ const run = async (
       );
       onCompleted?.(error ? SyncStatus.Failed : SyncStatus.Passed);
       setImmediate(() => {
-        if (pendingSync) Sync.run("global", false, pendingSync.full);
+        if (pendingSync)
+          Sync.run(
+            pendingSync.context,
+            pendingSync.forced,
+            pendingSync.type,
+            pendingSync.onCompleted,
+            pendingSync.lastSyncTime
+          );
       });
     }
   }, 300);

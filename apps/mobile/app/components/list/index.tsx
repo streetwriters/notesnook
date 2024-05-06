@@ -80,7 +80,7 @@ export default function List(props: ListProps) {
   const groupOptions = useGroupOptions(groupType);
 
   const _onRefresh = async () => {
-    Sync.run("global", false, true, () => {
+    Sync.run("global", false, "full", () => {
       props.onRefresh?.();
     });
   };
