@@ -60,7 +60,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
       eSendEvent(eCloseSheet);
       await sleep(300);
       Progress.present();
-      Sync.run("global", true, true, () => {
+      Sync.run("global", true, "full", () => {
         eSendEvent(eCloseSheet);
       });
     }

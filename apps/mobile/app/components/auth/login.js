@@ -67,7 +67,7 @@ export const Login = ({ changeMode }) => {
     Progress.present();
     setTimeout(() => {
       if (!useUserStore.getState().syncing) {
-        Sync.run("global", false, true);
+        Sync.run("global", false, "full");
       }
     }, 5000);
   });

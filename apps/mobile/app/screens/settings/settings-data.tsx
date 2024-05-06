@@ -470,22 +470,45 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
-            id: "sync-issues-fix",
-            name: "Having problems with sync",
-            description: "Try force sync to resolve issues with syncing",
-            icon: "sync-alert",
-            modifer: async () => {
+            id: "pull-sync",
+            name: "Force pull changes",
+            description:
+              "Force pull changes from the server. Use this if some changes are not appearing on this device.",
+            modifer: () => {
               presentDialog({
-                title: "Force sync",
+                title: "Force Pull changes",
                 paragraph:
-                  "If your data on two devices is out of sync even after trying to sync normally. You can run force sync to solve such problems. Usually you should never need to run this otherwise. Force sync means that all your data on this device is reuploaded to the server.",
+                  "Force pull changes from the server. Run this if some changes are not appearing on this device.",
                 negativeText: "Cancel",
                 positiveText: "Start",
                 positivePress: async () => {
                   eSendEvent(eCloseSheet);
                   await sleep(300);
                   Progress.present();
-                  Sync.run("global", true, true, () => {
+                  Sync.run("global", true, "fetch", () => {
+                    eSendEvent(eCloseSheet);
+                  });
+                }
+              });
+            }
+          },
+          {
+            id: "push-sync",
+            name: "Force push changes",
+            description:
+              "Force push changes to the server. Use this if some changes from this device are not appearing on other devices.",
+            modifer: () => {
+              presentDialog({
+                title: "Force Push changes",
+                paragraph:
+                  "Force push changes to the server. Run this only if some changes from this device are not appearing on other devices.",
+                negativeText: "Cancel",
+                positiveText: "Start",
+                positivePress: async () => {
+                  eSendEvent(eCloseSheet);
+                  await sleep(300);
+                  Progress.present();
+                  Sync.run("global", true, "send", () => {
                     eSendEvent(eCloseSheet);
                   });
                 }
