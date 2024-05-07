@@ -147,8 +147,10 @@ jobs:
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86.apk
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86_64.apk
 
-      - name: Upload signed aab to Github
+      - name: Upload sourcemaps
         uses: actions/upload-artifact@v2
         with:
-          name: Notesnook.aab
-          path: ${{steps.sign_app.outputs.signedReleaseFile}}
+          name: sourcemaps
+          path: |
+            apps/mobile/native/android/app/build/**/*.map
+            packages/editor-mobile/sourcemaps/*.map

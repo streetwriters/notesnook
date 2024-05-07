@@ -27,7 +27,7 @@
   },
   "scripts": {
     "start": "env-cmd -e all react-scripts start",
-    "build": "env-cmd -e all react-scripts build && rm -rf build.bundle && mv build build.bundle",
+    "build": "env-cmd -e all react-scripts build && rm -rf build.bundle && rm -rf sourcemaps && mv build build.bundle && cp -r ./build.bundle/static/js/ sourcemaps && rm -r ./build.bundle/static/js/*.map",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "postinstall": "patch-package"

@@ -100,5 +100,8 @@ jobs:
       - name: Upload Notesnook.ipa to Github
         uses: actions/upload-artifact@v2
         with:
-          name: Notesnook.ipa
-          path: Notesnook.ipa
+          name: Notesnook.zip
+          path: |
+            Notesnook.ipa
+            apps/mobile/native/ios/**/*.map
+            packages/editor-mobile/sourcemaps/*.map
