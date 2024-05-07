@@ -95,6 +95,7 @@ class Database {
   isInitialized = false;
   eventManager = new EventManager();
   sseMutex = new Mutex();
+  _fs?: FileStorage;
 
   storage: StorageAccessor = () => {
     if (!this.options?.storage)
@@ -109,7 +110,10 @@ class Database {
       throw new Error(
         "Database not initialized. Did you forget to call db.setup()?"
       );
-    return new FileStorage(this.options.fs, this.tokenManager);
+    return (
+      this._fs ||
+      (this._fs = new FileStorage(this.options.fs, this.tokenManager))
+    );
   };
 
   crypto: CryptoAccessor = () => {
