@@ -41,6 +41,7 @@ import {
 } from "../types";
 import { IndexedCollection } from "./indexed-collection";
 import { SQLCollection } from "./sql-collection";
+import { logger } from "../logger";
 
 export type RawItem = MaybeDeletedItem<Item>;
 type MigratableCollection = {
@@ -136,10 +137,16 @@ class Migrator {
     for (let i = 0; i < items.length; ++i) {
       const item = items[i];
       // can be true due to corrupted data.
-      if (Array.isArray(item)) continue;
+      if (Array.isArray(item)) {
+        logger.debug("Skipping item during migration to SQLite", {
+          table,
+          version,
+          item
+        });
+        continue;
+      }
       if (!item) continue;
 
-      const itemId = item.id;
       let migrated = await migrateItem(
         item,
         version,
@@ -161,14 +168,7 @@ class Migrator {
         );
       }
 
-      if (migrated === true) {
-        toAdd.push(item);
-
-        // if id changed after migration, we need to delete the old one.
-        if (item.id !== itemId) {
-          // await collection.deleteItem(itemId);
-        }
-      }
+      if (migrated !== "skip") toAdd.push(item);
     }
 
     if (toAdd.length > 0) {
@@ -217,7 +217,7 @@ class Migrator {
         );
       }
 
-      if (!migrated) continue;
+      if (!migrated || migrated === "skip") continue;
 
       toAdd.push(item);
 
