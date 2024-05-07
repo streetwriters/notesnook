@@ -186,7 +186,12 @@ const camera = async (options: PickerOptions) => {
       maxFiles: 10,
       writeTempFile: true
     })
-      .then((response) => handleImageResponse(response, options))
+      .then((response) => {
+        handleImageResponse(
+          Array.isArray(response) ? response : [response],
+          options
+        );
+      })
       .catch((e) => {
         console.log("camera error: ", e);
       });
@@ -211,7 +216,12 @@ const gallery = async (options: PickerOptions) => {
       cropping: false,
       multiple: true
     })
-      .then((response) => handleImageResponse(response, options))
+      .then((response) =>
+        handleImageResponse(
+          Array.isArray(response) ? response : [response],
+          options
+        )
+      )
       .catch((e) => {
         console.log("gallery error: ", e);
       });
