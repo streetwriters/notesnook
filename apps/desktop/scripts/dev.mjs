@@ -53,11 +53,11 @@ async function onChange(first) {
   if (first) {
     await fs.rm("./build/", { force: true, recursive: true });
 
-    await exec("npx electron-builder install-app-deps");
+    await exec("yarn electron-builder install-app-deps");
   }
 
-  await exec(`npm run bundle`);
-  execAsync(`npx`, [`tsc`]);
+  await exec(`yarn run bundle`);
+  execAsync(`yarn`, [`tsc`]);
 
   if (await isBundleSame()) {
     console.log("Bundle is same. Doing nothing.");
@@ -66,7 +66,7 @@ async function onChange(first) {
 
   if (first) {
     await spawnAndWaitUntil(
-      ["npx", "nx", "start:desktop", "@notesnook/web"],
+      ["yarn", "nx", "start:desktop", "@notesnook/web"],
       path.join(__dirname, "..", "..", ".."),
       (data) => data.includes("Network: use --host to expose")
     );
@@ -78,7 +78,7 @@ async function onChange(first) {
   }
 
   execAsync(
-    "npx",
+    "yarn",
     ["electron", path.join("build", "electron.js")],
     true,
     cleanup
