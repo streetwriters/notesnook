@@ -145,8 +145,9 @@ export const useEditor = (
 
   useEffect(() => {
     const event = eSubscribeEvent(eEditorTabFocused, (tabId) => {
+      console.log("Editot tab focus changed", lastTabFocused.current, tabId);
+      if (lastTabFocused.current !== tabId) lock.current = false;
       lastTabFocused.current = tabId as number;
-      console.log(tabId);
     });
     return () => {
       event?.unsubscribe();
@@ -573,124 +574,134 @@ export const useEditor = (
       data: Note | ContentItem | TrashItem | DeletedItem,
       isLocal?: boolean
     ) => {
-      if (SettingsService.get().disableRealtimeSync && !isLocal) return;
-      if (!data) return;
+      try {
+        await (async () => {
+          if (SettingsService.get().disableRealtimeSync && !isLocal) return;
+          if (!data) return;
 
-      if (isDeleted(data) || isTrashItem(data)) {
-        const tabId = useTabStore.getState().getTabForNote(data.id);
-        if (tabId !== undefined) {
-          console.log("Removing tab");
-          await commands.clearContent(tabId);
-          useTabStore.getState().removeTab(tabId);
-        }
-        return;
-      }
-
-      const noteId =
-        (data as ContentItem).type === "tiptap"
-          ? (data as ContentItem).noteId
-          : data.id;
-
-      if (!useTabStore.getState().hasTabForNote(noteId)) return;
-      const tabId = useTabStore.getState().getTabForNote(noteId) as number;
-
-      const tab = useTabStore.getState().getTab(tabId);
-
-      const note = data.type === "note" ? data : await db.notes?.note(noteId);
-
-      lock.current = true;
-
-      // Handle this case where note was locked on another device and synced.
-      const locked = await db.vaults.itemExists(
-        currentNotes.current[noteId] as ItemReference
-      );
-
-      if (note) {
-        if (!locked && tab?.noteLocked) {
-          // Note lock removed.
-          if (tab.locked) {
-            if (useTabStore.getState().currentTab === tabId) {
-              eSendEvent(eOnLoadNote, {
-                item: note,
-                forced: true
-              });
-            } else {
-              useTabStore.getState().updateTab(tabId, {
-                locked: false,
-                noteLocked: false
-              });
-              commands.setLoading(true, tabId);
+          if (isDeleted(data) || isTrashItem(data)) {
+            const tabId = useTabStore.getState().getTabForNote(data.id);
+            if (tabId !== undefined) {
+              console.log("Removing tab");
+              await commands.clearContent(tabId);
+              useTabStore.getState().removeTab(tabId);
             }
-          }
-        } else if (!tab?.noteLocked && locked) {
-          // Note lock added.
-          useTabStore.getState().updateTab(tabId, {
-            locked: true,
-            noteLocked: true
-          });
-          if (useTabStore.getState().currentTab !== tabId) {
-            commands.clearContent(tabId);
-            commands.setLoading(true, tabId);
-          }
-        }
-
-        if (currentNotes.current[noteId]?.title !== note.title) {
-          postMessage(EditorEvents.title, note.title, tabId);
-        }
-        commands.setTags(note);
-        if (currentNotes.current[noteId]?.dateEdited !== note.dateEdited) {
-          commands.setStatus(
-            getFormattedDate(note.dateEdited, "date-time"),
-            "Saved",
-            tabId as number
-          );
-        }
-
-        console.log("readonly state changed...", note.readonly);
-        useTabStore.getState().updateTab(tabId, {
-          readonly: note.readonly
-        });
-      }
-
-      if (data.type === "tiptap" && note && !isLocal) {
-        if (lastContentChangeTime.current[noteId] >= data.dateEdited) {
-          lock.current = false;
-          return;
-        }
-
-        if (locked && isEncryptedContent(data)) {
-          const decryptedContent = await db.vault?.decryptContent(data);
-          if (!decryptedContent) {
-            useTabStore.getState().updateTab(tabId, {
-              locked: true,
-              noteLocked: true
-            });
-            if (useTabStore.getState().currentTab !== tabId) {
-              commands.clearContent(tabId);
-              commands.setLoading(true, tabId);
-            }
-          } else {
-            await postMessage(
-              EditorEvents.updatehtml,
-              decryptedContent.data,
-              tabId
-            );
-            currentContents.current[note.id] = decryptedContent;
-          }
-        } else {
-          const _nextContent = data.data;
-          if (_nextContent === currentContents.current?.data) {
-            lock.current = false;
             return;
           }
-          lastContentChangeTime.current[note.id] = note.dateEdited;
-          await postMessage(EditorEvents.updatehtml, _nextContent, tabId);
-          if (!isEncryptedContent(data)) {
-            currentContents.current[note.id] = data as UnencryptedContentItem;
+
+          const noteId =
+            (data as ContentItem).type === "tiptap"
+              ? (data as ContentItem).noteId
+              : data.id;
+
+          if (!useTabStore.getState().hasTabForNote(noteId)) return;
+          const tabId = useTabStore.getState().getTabForNote(noteId) as number;
+
+          const tab = useTabStore.getState().getTab(tabId);
+
+          const note =
+            data.type === "note" ? data : await db.notes?.note(noteId);
+
+          lock.current = true;
+
+          // Handle this case where note was locked on another device and synced.
+          const locked = await db.vaults.itemExists(
+            currentNotes.current[noteId] as ItemReference
+          );
+
+          if (note) {
+            if (!locked && tab?.noteLocked) {
+              // Note lock removed.
+              if (tab.locked) {
+                if (useTabStore.getState().currentTab === tabId) {
+                  eSendEvent(eOnLoadNote, {
+                    item: note,
+                    forced: true
+                  });
+                } else {
+                  useTabStore.getState().updateTab(tabId, {
+                    locked: false,
+                    noteLocked: false
+                  });
+                  commands.setLoading(true, tabId);
+                }
+              }
+            } else if (!tab?.noteLocked && locked) {
+              // Note lock added.
+              useTabStore.getState().updateTab(tabId, {
+                locked: true,
+                noteLocked: true
+              });
+              if (useTabStore.getState().currentTab !== tabId) {
+                commands.clearContent(tabId);
+                commands.setLoading(true, tabId);
+              }
+            }
+
+            if (currentNotes.current[noteId]?.title !== note.title) {
+              postMessage(EditorEvents.title, note.title, tabId);
+            }
+            commands.setTags(note);
+            if (currentNotes.current[noteId]?.dateEdited !== note.dateEdited) {
+              commands.setStatus(
+                getFormattedDate(note.dateEdited, "date-time"),
+                "Saved",
+                tabId as number
+              );
+            }
+
+            console.log("readonly state changed...", note.readonly);
+            useTabStore.getState().updateTab(tabId, {
+              readonly: note.readonly
+            });
           }
-        }
+
+          if (data.type === "tiptap" && note && !isLocal) {
+            if (lastContentChangeTime.current[noteId] >= data.dateEdited) {
+              return;
+            }
+
+            if (locked && isEncryptedContent(data)) {
+              const decryptedContent = await db.vault?.decryptContent(
+                data,
+                noteId
+              );
+              if (!decryptedContent) {
+                useTabStore.getState().updateTab(tabId, {
+                  locked: true,
+                  noteLocked: true
+                });
+                if (useTabStore.getState().currentTab !== tabId) {
+                  commands.clearContent(tabId);
+                  commands.setLoading(true, tabId);
+                }
+              } else {
+                await postMessage(
+                  EditorEvents.updatehtml,
+                  decryptedContent.data,
+                  tabId
+                );
+                currentContents.current[note.id] = decryptedContent;
+              }
+            } else {
+              const _nextContent = data.data;
+              if (_nextContent === currentContents.current?.data) {
+                return;
+              }
+              lastContentChangeTime.current[note.id] = note.dateEdited;
+              await postMessage(EditorEvents.updatehtml, _nextContent, tabId);
+              if (!isEncryptedContent(data)) {
+                currentContents.current[note.id] =
+                  data as UnencryptedContentItem;
+              }
+            }
+          }
+        })();
+      } catch (e) {
+        DatabaseLogger.error(e as Error, "Error when applying sync changes");
+      } finally {
+        lock.current = false;
       }
-      lock.current = false;
     },
     [postMessage, commands]
   );
@@ -728,11 +739,19 @@ export const useEditor = (
         (currentLoadingNoteId.current &&
           currentLoadingNoteId.current === noteId)
       ) {
-        DatabaseLogger.log(`Skipped saving conent:
+        DatabaseLogger.log(`Skipped saving content:
 
           lock.current: ${lock.current}
           currentLoadingNoteId.current: ${currentLoadingNoteId.current}
         `);
+        if (lock.current) {
+          setTimeout(() => {
+            if (lock.current) {
+              DatabaseLogger.warn("Editor force removed lock after 5 seconds");
+              lock.current = false;
+            }
+          }, 5000);
+        }
         return;
       }
 
