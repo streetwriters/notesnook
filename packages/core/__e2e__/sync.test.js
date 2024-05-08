@@ -109,16 +109,17 @@ test(
     });
 
     const id = await deviceA.notes.add({ title: "hello" });
-    for (let i = 0; i < 10; ++i) {
+    for (let i = 0; i < 5; ++i) {
+      if (i > 0) await deviceA.notes.add({ id, title: `edit ${i - 1}` });
       await Promise.all([
         deviceA.sync({ type: "send" }),
-        new Promise((resolve) => setTimeout(resolve), 100).then(() =>
+        new Promise((resolve) => setTimeout(resolve, 40)).then(() =>
           deviceA.notes.add({ id, title: `edit ${i}` })
         )
       ]);
 
-      expect((await deviceA.notes.note(id))?.synced).toBe(false);
-      await deviceA.sync({ type: "send" });
+      expect((await deviceA.notes.note(id))?.title).toBe(`edit ${i}`);
+      expect((await deviceA.notes.note(id))?.synced).toBe(true);
       await deviceB.sync({ type: "fetch" });
       expect((await deviceB.notes.note(id))?.title).toBe(`edit ${i}`);
     }
@@ -139,17 +140,17 @@ test(
       await cleanup(deviceA, deviceB);
     });
 
-    for (let i = 0; i < 10; ++i) {
+    const id = await deviceA.notes.add({ title: "hello" });
+    for (let i = 0; i < 5; ++i) {
+      if (i > 0) await deviceA.notes.add({ id, title: `edit ${i - 1}` });
       await Promise.all([
         deviceA.sync({ type: "send" }),
-        new Promise((resolve) => setTimeout(resolve), 100).then(() =>
+        new Promise((resolve) => setTimeout(resolve, 40)).then(() =>
           deviceA.notes.add({ title: `note ${i}` })
         )
       ]);
-      expect(await deviceB.notes.all.count()).toBe(i);
-      await deviceA.sync({ type: "send" });
       await deviceB.sync({ type: "fetch" });
-      expect(await deviceB.notes.all.count()).toBe(i + 1);
+      expect(await deviceB.notes.all.count()).toBe(i + 2);
     }
   },
   TEST_TIMEOUT * 10

@@ -160,7 +160,7 @@ class Sync {
     )
       this.logger.info("New data sent");
 
-    await this.stop();
+    await this.stop(options);
 
     if (!(await checkSyncStatus(SYNC_CHECK_IDS.autoSync))) {
       await this.connection.stop();
@@ -265,7 +265,15 @@ class Sync {
     return true;
   }
 
-  async stop() {
+  async stop(options: SyncOptions) {
+    if (
+      (options.type === "send" || options.type === "full") &&
+      (await this.collector.hasUnsyncedChanges())
+    ) {
+      this.logger.info("Changes made during last sync. Syncing again...");
+      await this.start({ type: "send" });
+      return;
+    }
     // refresh monographs
     await this.db.monographs.refresh().catch(this.logger.error);
     // update trash cache

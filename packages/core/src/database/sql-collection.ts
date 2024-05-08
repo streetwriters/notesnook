@@ -278,6 +278,21 @@ export class SQLCollection<
     return items;
   }
 
+  async unsyncedCount() {
+    const { count } =
+      (await this.db()
+        .selectFrom<keyof DatabaseSchema>(this.type)
+        .select((a) => a.fn.count<number>("id").as("count"))
+        .where(isFalse("synced"))
+        .$if(this.type === "attachments", (eb) =>
+          eb.where((eb) =>
+            eb.or([eb("dateUploaded", ">", 0), eb("deleted", "==", true)])
+          )
+        )
+        .executeTakeFirst()) || {};
+    return count || 0;
+  }
+
   async *unsynced(
     chunkSize: number,
     forceSync?: boolean

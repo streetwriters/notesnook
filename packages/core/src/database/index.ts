@@ -167,6 +167,7 @@ export interface DatabaseCollection<T, IsAsync extends boolean> {
   delete(ids: string[]): Promise<void>;
   exists(id: string): AsyncOrSyncResult<IsAsync, boolean>;
   count(): AsyncOrSyncResult<IsAsync, number>;
+  unsyncedCount(): Promise<number>;
   get(id: string): AsyncOrSyncResult<IsAsync, T | undefined>;
   put(items: (T | undefined)[]): Promise<SQLiteItem<T>[]>;
   update(ids: string[], partial: Partial<T>): Promise<void>;

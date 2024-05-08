@@ -33,6 +33,15 @@ class Collector {
   logger = logger.scope("SyncCollector");
   constructor(private readonly db: Database) {}
 
+  async hasUnsyncedChanges() {
+    for (const itemType of SYNC_ITEM_TYPES) {
+      const collectionKey = SYNC_COLLECTIONS_MAP[itemType];
+      const collection = this.db[collectionKey].collection;
+      if ((await collection.unsyncedCount()) > 0) return true;
+    }
+    return false;
+  }
+
   async *collect(
     chunkSize: number,
     isForceSync = false
