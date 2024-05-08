@@ -246,7 +246,6 @@ const Tiptap = ({
   const _editor = useTiptap(tiptapOptions, [tiptapOptions]);
 
   const update = useCallback(() => {
-    logger("info", "LOADING NOTE...");
     editors[tabRef.current.id]?.commands.setTextSelection(0);
     setTick((tick) => tick + 1);
     globalThis.editorControllers[tabRef.current.id]?.setTitlePlaceholder(
@@ -290,6 +289,15 @@ const Tiptap = ({
           ? state.noteState[tabRef.current.noteId]
           : undefined;
         if (noteState) {
+          
+          if (
+            containerRef.current &&
+            containerRef.current?.scrollHeight < noteState.top
+          ) {
+            console.log("Container too small to scroll.");
+            return;
+          }
+
           restoreNoteSelection(noteState);
         } else {
           containerRef.current?.scrollTo({
@@ -319,6 +327,7 @@ const Tiptap = ({
     };
 
     updateScrollPosition(useTabStore.getState());
+
     const unsub = useTabStore.subscribe((state, prevState) => {
       if (state.currentTab !== tabRef.current.id) {
         isFocusedRef.current = false;

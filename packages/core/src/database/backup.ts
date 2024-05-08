@@ -22,10 +22,12 @@ import { CURRENT_DATABASE_VERSION } from "../common.js";
 import Migrator from "./migrator.js";
 import Database from "../api/index.js";
 import {
+  Attachment,
   Item,
   MaybeDeletedItem,
   Note,
   Notebook,
+  Relation,
   ValueOf,
   isDeleted
 } from "../types.js";
@@ -36,6 +38,7 @@ import { DatabaseCollection } from "./index.js";
 import { DefaultColors } from "../collections/colors.js";
 import { toChunks } from "../utils/array.js";
 import { logger } from "../logger.js";
+import { clone } from "../utils/clone.js";
 
 type BackupDataItem = MaybeDeletedItem<Item> | string[];
 type BackupPlatform = "web" | "mobile" | "node";
@@ -92,10 +95,44 @@ function isEncryptedBackup(
   return "encrypted" in backup ? backup.encrypted : isCipher(backup.data);
 }
 
-function isLegacyBackupFile(
-  backup: LegacyBackupFile | BackupFile
-): backup is LegacyBackupFile {
-  return backup.version <= 5.8;
+/**
+ * Due to a bug in v3.0, legacy backups were created with version set to 6.1
+ * while their actual data was at version 5.9. This caused various issues when
+ * restoring such a backup.
+ * This function tries to work around that bug by detecting the version based on
+ * the actual data.
+ */
+function isLegacyBackup(data: BackupDataItem[]) {
+  const note = data.find(
+    (c): c is Note => !isDeleted(c) && !Array.isArray(c) && c.type === "note"
+  );
+  if (note)
+    return (
+      "color" in note ||
+      "notebooks" in note ||
+      "tags" in note ||
+      "locked" in note
+    );
+
+  const notebook = data.find(
+    (c): c is Notebook =>
+      !isDeleted(c) && !Array.isArray(c) && c.type === "notebook"
+  );
+  if (notebook) return "topics" in notebook;
+
+  const attachment = data.find(
+    (c): c is Attachment =>
+      !isDeleted(c) && !Array.isArray(c) && c.type === "attachment"
+  );
+  if (attachment) return "noteIds" in attachment;
+
+  const relation = data.find(
+    (c): c is Relation =>
+      !isDeleted(c) && !Array.isArray(c) && c.type === "relation"
+  );
+  if (relation) return "from" in relation || "to" in relation;
+
+  return false;
 }
 
 const MAX_CHUNK_SIZE = 10 * 1024 * 1024;
@@ -221,7 +258,7 @@ export default class Backup {
         yield {
           path: `${chunkIndex++}-${encrypt ? "encrypted" : "plain"}-${hash}`,
           data: `{
-"version": ${CURRENT_DATABASE_VERSION},
+"version": 5.9,
 "type": "${type}",
 "date": ${Date.now()},
 "data": ${itemsJSON},
@@ -397,13 +434,16 @@ export default class Backup {
 
     if (!data) throw new Error("No data found.");
 
+    const normalizedData: BackupDataItem[] = Array.isArray(data)
+      ? (data as BackupDataItem[])
+      : typeof data === "object"
+      ? Object.values(data)
+      : [];
     await this.migrateData(
-      Array.isArray(data)
-        ? (data as BackupDataItem[])
-        : typeof data === "object"
-        ? Object.values(data)
-        : [],
-      backup.version
+      normalizedData,
+      backup.version === 6.1 && isLegacyBackup(normalizedData)
+        ? 5.9
+        : backup.version
     );
   }
 

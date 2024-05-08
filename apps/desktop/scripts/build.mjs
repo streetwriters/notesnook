@@ -38,7 +38,7 @@ await fs.rm("./build/", { force: true, recursive: true });
 
 if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   await exec(
-    "npx nx build:desktop @notesnook/web",
+    "yarn nx build:desktop @notesnook/web",
     path.join(__dirname, "..", "..", "..")
   );
 }
@@ -48,7 +48,7 @@ if (os.platform() === "linux") await patchBetterSQLite3();
 
 if (os.platform() === "win32")
   await exec(
-    `npx prebuildify --arch=arm64 --strip -t electron@${packageJson.devDependencies.electron}`,
+    `yarn prebuildify --arch=arm64 --strip -t electron@${packageJson.devDependencies.electron}`,
     path.join(__dirname, "..", "node_modules", "sodium-native")
   );
 
@@ -58,15 +58,15 @@ await fs.cp(path.join(webAppPath, "build"), "build", {
 });
 
 if (args.variant === "mas") {
-  await exec(`npm run bundle:mas`);
+  await exec(`yarn run bundle:mas`);
 } else {
-  await exec(`npm run bundle`);
+  await exec(`yarn run bundle`);
 }
 
-await exec(`npx tsc`);
+await exec(`yarn tsc`);
 
 if (args.run) {
-  await exec(`npx electron-builder --dir --x64`);
+  await exec(`yarn electron-builder --dir --x64`);
   if (process.platform === "win32") {
     await exec(`.\\output\\win-unpacked\\Notesnook.exe`);
   } else if (process.platform === "darwin") {

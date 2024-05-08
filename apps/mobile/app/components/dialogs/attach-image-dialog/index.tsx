@@ -61,7 +61,7 @@ export default function AttachImage({
           Attaching {response?.length} image(s):
         </Paragraph>
         <ScrollView horizontal>
-          {response?.map((item) => (
+          {response?.map?.((item) => (
             <TouchableOpacity key={item.filename} activeOpacity={0.9}>
               <Image
                 source={{
