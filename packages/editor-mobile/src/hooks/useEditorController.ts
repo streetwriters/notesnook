@@ -219,7 +219,6 @@ export function useEditorController({
           tabRef.current.noteId &&
           tabRef.current.noteId === useTabStore.getState().getCurrentNoteId()
         ) {
-          logger("info", tabRef.current.noteId, value);
           useTabStore.getState().setNoteState(tabRef.current.noteId, {
             top: value
           });
