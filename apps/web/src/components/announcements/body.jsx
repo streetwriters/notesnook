@@ -303,7 +303,7 @@ function CalltoAction({ action, variant, sx, dismissAnnouncement }) {
             break;
           }
           case "force-sync": {
-            await appStore.sync(true, true);
+            await appStore.sync({ type: "full", force: true });
             break;
           }
           case "backup": {

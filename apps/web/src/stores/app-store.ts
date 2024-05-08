@@ -41,6 +41,7 @@ import {
 } from "../utils/page-visibility";
 import { NetworkCheck } from "../utils/network-check";
 import { Color, Notebook, Tag } from "@notesnook/core";
+import { SyncOptions } from "@notesnook/core/dist/api/sync";
 
 type SyncState =
   | "synced"
@@ -57,7 +58,7 @@ type SyncStatus = {
 };
 const networkCheck = new NetworkCheck();
 let syncStatusTimeout = 0;
-let pendingSync: { full: boolean } | undefined = undefined;
+let pendingSync: SyncOptions | undefined = undefined;
 
 class AppStore extends BaseStore<AppStore> {
   // default state
@@ -115,9 +116,9 @@ class AppStore extends BaseStore<AppStore> {
 
     db.eventManager.subscribe(
       EVENTS.databaseSyncRequested,
-      async (full, force, lastSynced) => {
+      async (full, force) => {
         if (!this.get().isAutoSyncEnabled) return;
-        await this.get().sync(full, force, lastSynced);
+        await this.get().sync({ type: full ? "full" : "send", force });
       }
     );
 
@@ -268,7 +269,7 @@ class AppStore extends BaseStore<AppStore> {
     this.set((state) => (state.lastSynced = lastSynced));
   };
 
-  sync = async (full = true, force = false, lastSynced?: number) => {
+  sync = async (options: SyncOptions = { type: "full", force: false }) => {
     if (
       this.isSyncing() ||
       !this.get().isSyncEnabled ||
@@ -276,14 +277,12 @@ class AppStore extends BaseStore<AppStore> {
       !(await networkCheck.waitForInternet())
     ) {
       logger.info("Ignoring duplicate sync", {
-        full,
-        force,
-        lastSynced,
+        options,
         syncing: this.isSyncing(),
         syncDisabled: !this.get().isSyncEnabled,
         offline: !navigator.onLine
       });
-      if (this.isSyncing()) pendingSync = { full };
+      if (this.isSyncing()) pendingSync = options;
       return;
     }
 
@@ -292,10 +291,7 @@ class AppStore extends BaseStore<AppStore> {
 
     this.updateSyncStatus("syncing");
     try {
-      const result = await db.sync({
-        type: full ? "full" : "send",
-        force
-      });
+      const result = await db.sync(options);
 
       if (!result) return this.updateSyncStatus("failed");
       this.updateSyncStatus("completed", true);
@@ -304,9 +300,9 @@ class AppStore extends BaseStore<AppStore> {
 
       if (pendingSync) {
         logger.info("Running pending sync", pendingSync);
-        const isFullSync = pendingSync.full;
+        const syncOptions = { ...pendingSync };
         pendingSync = undefined;
-        await this.get().sync(isFullSync, false);
+        await this.get().sync(syncOptions);
       }
     } catch (err) {
       if (!(err instanceof Error)) {
@@ -316,9 +312,6 @@ class AppStore extends BaseStore<AppStore> {
 
       logger.error(err);
       if (err.cause === "MERGE_CONFLICT") {
-        // TODO: reopen conflicted note
-        // const sessionId = editorstore.get().session.id;
-        // if (sessionId) await editorstore.openSession(sessionId, true);
         await this.refresh();
         this.updateSyncStatus("conflicts");
       } else {
