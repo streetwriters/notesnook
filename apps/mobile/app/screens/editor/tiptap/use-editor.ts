@@ -50,6 +50,7 @@ import SettingsService from "../../../services/settings";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import {
+  eEditorReset,
   eEditorTabFocused,
   eOnLoadNote,
   eShowMergeDialog,
@@ -464,6 +465,7 @@ export const useEditor = (
           overlay(false);
           return;
         }
+        console.log("LOADING NOTE", event.item.id);
         const item = event.item;
 
         const currentTab = useTabStore
@@ -549,6 +551,7 @@ export const useEditor = (
           loadingState.current === currentContents.current[item.id]?.data
         ) {
           // If note is already loading, return.
+          console.log("Note is already loading...");
           return;
         }
 
@@ -886,7 +889,7 @@ export const useEditor = (
         useTabStore.getState().currentTab
       ))
     ) {
-      eSendEvent("webview_reset", "onReady");
+      eSendEvent(eEditorReset, "onReady");
       return false;
     } else {
       syncTabs();
@@ -917,7 +920,6 @@ export const useEditor = (
     } else if (state.current?.initialLoadCalled) {
       const note = currentNotes.current[noteId];
       if (note) {
-        console.log("Loading note in onLoad...");
         loadNote({
           item: note
         });

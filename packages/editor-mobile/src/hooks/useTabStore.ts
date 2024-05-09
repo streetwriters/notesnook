@@ -89,6 +89,8 @@ export const useTabStore = create(
       currentTab: 0,
       scrollPosition: {},
       setNoteState: (noteId: string, state: Partial<NoteState>) => {
+        if (editorControllers[get().currentTab]?.loading) return;
+
         const noteState = {
           ...get().noteState
         };
@@ -96,6 +98,7 @@ export const useTabStore = create(
           ...get().noteState[noteId],
           ...state
         };
+
         set({
           noteState
         });

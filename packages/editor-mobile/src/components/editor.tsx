@@ -296,8 +296,6 @@ const Tiptap = ({
       pendingSaveRequests
         .getPendingContentIds()
         .then(async (result) => {
-          logger("info", result.length, "PENDING ITEMS");
-
           if (result && result.length) {
             dbLogger("log", "Pending save requests found... restoring");
             await pendingSaveRequests.postPendingRequests();
@@ -315,6 +313,16 @@ const Tiptap = ({
         const noteState = tabRef.current.noteId
           ? state.noteState[tabRef.current.noteId]
           : undefined;
+
+        post(
+          EventTypes.tabFocused,
+          !!globalThis.editorControllers[tabRef.current.id]?.content.current &&
+            !editorControllers[tabRef.current.id]?.loading,
+          tabRef.current.id,
+          state.getCurrentNoteId()
+        );
+        editorControllers[tabRef.current.id]?.updateTab();
+
         if (noteState) {
           if (
             containerRef.current &&
@@ -339,14 +347,6 @@ const Tiptap = ({
         ) {
           editorControllers[tabRef.current.id]?.setLoading(true);
         }
-        post(
-          EventTypes.tabFocused,
-          !!globalThis.editorControllers[tabRef.current.id]?.content.current &&
-            !editorControllers[tabRef.current.id]?.loading,
-          tabRef.current.id,
-          state.getCurrentNoteId()
-        );
-        editorControllers[tabRef.current.id]?.updateTab();
       } else {
         isFocusedRef.current = false;
       }

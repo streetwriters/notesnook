@@ -191,10 +191,10 @@ function canLockAppInBackground() {
 }
 let backgroundEnterTime = 0;
 function appEnteredBackground() {
-  if (canLockAppInBackground()) {
-    backgroundEnterTime = Date.now();
-  }
+  backgroundEnterTime = Date.now();
 }
+
+const getBackgroundEnterTime = () => backgroundEnterTime;
 
 function shouldLockAppOnEnterForeground() {
   if (
@@ -227,7 +227,8 @@ export const SettingsService = {
   shouldLockAppOnEnterForeground,
   canLockAppInBackground,
   appEnteredBackground,
-  setPrivacyScreen
+  setPrivacyScreen,
+  getBackgroundEnterTime
 };
 
 init();
