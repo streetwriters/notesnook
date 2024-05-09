@@ -99,8 +99,9 @@ class UserManager {
   async authenticateMultiFactorCode(code: string, method: string) {
     if (!code || !method) throw new Error("code & method are required.");
 
-    const token = await this.tokenManager.getAccessToken();
-    if (!token) throw new Error("Unauthorized.");
+    const token = await this.tokenManager.getToken();
+    if (!token || token.scope !== "auth:grant_types:mfa")
+      throw new Error("No token found.");
 
     await this.tokenManager.saveToken(
       await http.post(
@@ -111,7 +112,7 @@ class UserManager {
           "mfa:code": code,
           "mfa:method": method
         },
-        token
+        token.access_token
       )
     );
     return true;
@@ -126,7 +127,8 @@ class UserManager {
     if (!email || !password) throw new Error("email & password are required.");
 
     const token = await this.tokenManager.getToken();
-    if (!token) throw new Error("No token found.");
+    if (!token || token.scope !== "auth:grant_types:mfa_password")
+      throw new Error("No token found.");
 
     email = email.toLowerCase();
     if (!hashedPassword) {

@@ -82,7 +82,7 @@ class TokenManager {
   async getAccessToken(forceRenew = false) {
     return await getSafeToken(async () => {
       const token = await this.getToken(true, forceRenew);
-      if (!token) return;
+      if (!token || token.scope.includes("auth:grant_types")) return;
       return token.access_token;
     }, "Error getting access token:");
   }
