@@ -350,7 +350,8 @@ PODS:
   - react-native-theme-switch-animation (0.6.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
-  - react-native-webview (11.26.1):
+  - react-native-webview (13.10.0):
+    - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - React-NativeModulesApple (0.72.0):
     - React-callinvoker
@@ -907,7 +908,7 @@ SPEC CHECKSUMS:
   react-native-share-extension: faed334b1ddf165f1e576fcabd3dc1c9e748bfa9
   react-native-sodium: 955bb0dc3ea05f8ea06d5e96cb89d1be7b5d7681
   react-native-theme-switch-animation: 220f883f7be290e79f2ab022093ed1a7a5929e6d
-  react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
+  react-native-webview: 90153193e679163ec257011fa457d02765120210
   React-NativeModulesApple: 1d81d927ef1a67a3545a01e14c2e98500bf9b199
   React-perflogger: 684a11499a0589cc42135d6d5cc04d0e4e0e261a
   React-RCTActionSheet: 00b0a4c382a13b834124fa3f541a7d8d1d56efb9

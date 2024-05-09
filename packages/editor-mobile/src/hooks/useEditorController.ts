@@ -30,8 +30,15 @@ import {
   useRef,
   useState
 } from "react";
-import { EventTypes, isReactNative, post, randId, saveTheme } from "../utils";
+import {
+  EventTypes,
+  getRoot,
+  post,
+  postAsyncWithTimeout,
+  saveTheme
+} from "../utils";
 import { injectCss, transform } from "../utils/css";
+import { pendingSaveRequests } from "../utils/pending-saves";
 import { useTabContext, useTabStore } from "./useTabStore";
 
 type Attachment = {
@@ -146,14 +153,49 @@ export function useEditorController({
 
   const selectionChange = useCallback((_editor: Editor) => {}, []);
 
-  const titleChange = useCallback((title: string) => {
+  const titleChange = useCallback(async (title: string) => {
+    const currentSessionId = globalThis.sessionId;
     post(
       EventTypes.contentchange,
       undefined,
       tabRef.current.id,
       tabRef.current.noteId
     );
-    post(EventTypes.title, title, tabRef.current.id, tabRef.current.noteId);
+    const params = [
+      {
+        title
+      },
+      tabRef.current.id,
+      tabRef.current.noteId,
+      currentSessionId
+    ];
+    const pendingTitleIds = await pendingSaveRequests.getPendingTitleIds();
+    postAsyncWithTimeout(EventTypes.title, ...params, 1000)
+      .then(() => {
+        if (pendingTitleIds.length) {
+          dbLogger(
+            "log",
+            `Title saved: ${title}, removing ${pendingTitleIds.length} pending requests `
+          );
+        }
+        pendingSaveRequests.removePendingTitlesById(pendingTitleIds);
+      })
+      .catch((e) => {
+        dbLogger("error", e);
+        dbLogger(
+          "log",
+          `Saving title failed, setting pending request ${pendingTitleIds.length}`
+        );
+        if (params[2]) {
+          pendingSaveRequests.setTitle(params);
+        }
+        const element = document.getElementById("editor-saving-failed-overlay");
+        if (element) {
+          element.style.display = "flex";
+          editors[tabRef.current.id]?.commands?.blur();
+          element.focus();
+        }
+      });
   }, []);
 
   const countWords = useCallback((ms = 300) => {
@@ -185,10 +227,10 @@ export function useEditorController({
       if (typeof timers.current.change === "number") {
         clearTimeout(timers.current?.change);
       }
-      timers.current.change = setTimeout(() => {
+      timers.current.change = setTimeout(async () => {
         htmlContentRef.current = editor.getHTML();
-        post(
-          EventTypes.content,
+
+        const params = [
           {
             html: htmlContentRef.current,
             ignoreEdit: ignoreEdit
@@ -196,7 +238,40 @@ export function useEditorController({
           tabRef.current.id,
           tabRef.current.noteId,
           currentSessionId
-        );
+        ];
+        const pendingContentIds =
+          await pendingSaveRequests.getPendingContentIds();
+        postAsyncWithTimeout(EventTypes.content, ...params, 5000)
+          .then(() => {
+            if (pendingContentIds.length) {
+              dbLogger(
+                "log",
+                `Content saved, removing ${pendingContentIds.length} pending requests`
+              );
+            }
+            pendingSaveRequests.removePendingContentsById(pendingContentIds);
+          })
+          .catch((e) => {
+            dbLogger("error", e);
+            dbLogger(
+              "log",
+              `Saving content failed, setting pending request ${
+                pendingContentIds.length + 1
+              }`
+            );
+            if (params[2]) {
+              pendingSaveRequests.setContent(params);
+            }
+
+            const element = document.getElementById(
+              "editor-saving-failed-overlay"
+            );
+            if (element) {
+              element.style.display = "flex";
+              element.focus();
+            }
+          });
+
         logger(
           "info",
           "Editor saving content",
@@ -305,9 +380,8 @@ export function useEditorController({
             scrollIntoView(editor as any);
           }
           break;
-        case "native:attachment-data":
+        case "native:resolve":
           if (pendingResolvers[value.resolverId]) {
-            logger("info", "resolved data for attachment", value.resolverId);
             pendingResolvers[value.resolverId](value.data);
           }
           break;
@@ -320,16 +394,9 @@ export function useEditorController({
   );
 
   useEffect(() => {
-    if (!isReactNative()) return; // Subscribe only in react native webview.
-    const isSafari = navigator.vendor.match(/apple/i);
-    let root: Document | Window = document;
-    if (isSafari) {
-      root = window;
-    }
-    root.addEventListener("message", onMessage);
-
+    getRoot()?.addEventListener("message", onMessage);
     return () => {
-      root.removeEventListener("message", onMessage);
+      getRoot()?.removeEventListener("message", onMessage);
     };
   }, [onMessage]);
 
@@ -363,16 +430,8 @@ export function useEditorController({
   };
 
   const getAttachmentData = (attachment: Partial<Attachment>) => {
-    return new Promise<string>((resolve, reject) => {
-      const resolverId = randId("get_attachment_data");
-      pendingResolvers[resolverId] = (data) => {
-        delete pendingResolvers[resolverId];
-        resolve(data);
-      };
-      post(EventTypes.getAttachmentData, {
-        attachment,
-        resolverId: resolverId
-      });
+    return postAsyncWithTimeout(EventTypes.getAttachmentData, {
+      attachment
     });
   };
 

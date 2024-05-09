@@ -17,40 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { decode, EntityLevel } from "entities";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import RNHTMLtoPDF from "react-native-html-to-pdf-lite";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { zip } from "react-native-zip-archive";
-import { DatabaseLogger, db } from "../common/database/index";
+import { DatabaseLogger } from "../common/database/index";
 import Storage from "../common/database/storage";
 
 import {
   exportNote as _exportNote,
   ExportableAttachment,
   ExportableNote,
-  exportNotes,
-  sanitizeFilename
+  exportNotes
 } from "@notesnook/common";
 import { Note } from "@notesnook/core";
-import { NoteContent } from "@notesnook/core/dist/collections/session-content";
 import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
 import { basename, dirname, join } from "pathe";
 import downloadAttachment from "../common/filesystem/download-attachment";
-import { presentDialog } from "../components/dialog/functions";
-import { useSettingStore } from "../stores/use-setting-store";
-import BiometricService from "./biometrics";
-import { ToastManager } from "./event-manager";
 import { cacheDir } from "../common/filesystem/utils";
-
-const MIMETypes = {
-  txt: "text/plain",
-  pdf: "application/pdf",
-  md: "text/markdown",
-  "md-frontmatter": "text/markdown",
-  html: "text/html"
-};
+import { unlockVault } from "../utils/unlock-vault";
 
 const FolderNames: { [name: string]: string } = {
   txt: "Text",
@@ -58,16 +44,6 @@ const FolderNames: { [name: string]: string } = {
   md: "Markdown",
   html: "Html"
 };
-
-async function releasePermissions(path: string) {
-  if (Platform.OS === "ios") return;
-  const uris = await ScopedStorage.getPersistedUriPermissions();
-  for (const uri of uris) {
-    if (path.startsWith(uri)) {
-      await ScopedStorage.releasePersistableUriPermission(uri);
-    }
-  }
-}
 
 async function getPath(type: string) {
   let path =
@@ -82,153 +58,11 @@ async function getPath(type: string) {
   return path;
 }
 
-async function save(
-  path: string,
-  data: string,
-  fileName: string,
-  extension: "txt" | "pdf" | "md" | "html" | "md-frontmatter"
-) {
-  let uri;
-  if (Platform.OS === "android") {
-    uri = await ScopedStorage.writeFile(
-      path,
-      data,
-      `${fileName}.${extension}`,
-      MIMETypes[extension],
-      extension === "pdf" ? "base64" : "utf8",
-      false
-    );
-    await releasePermissions(path);
-  } else {
-    path = path + fileName + `.${extension}`;
-    await RNFetchBlob.fs.writeFile(path, data, "utf8");
-  }
-  return uri || path;
-}
-
-async function makeHtml(note: Note, content?: NoteContent<false>) {
-  let html = await db.notes.export(note.id, {
-    format: "html",
-    contentItem: content
-  });
-  if (!html) return "";
-
-  html = decode(html, {
-    level: EntityLevel.HTML
-  });
-  return html;
-}
-
-async function exportAs(
-  type: string,
-  note: Note,
-  bulk?: boolean,
-  content?: NoteContent<false>
-) {
-  let data;
-  switch (type) {
-    case "html":
-      {
-        data = await makeHtml(note, content);
-      }
-      break;
-    case "md":
-      data = await db.notes.export(note.id, {
-        format: "md",
-        contentItem: content
-      });
-      break;
-    case "md-frontmatter":
-      data = await db.notes.export(note.id, {
-        format: "md-frontmatter",
-        contentItem: content
-      });
-      break;
-    case "pdf":
-      {
-        const html = await makeHtml(note, content);
-        const fileName = sanitizeFilename(note.title + Date.now(), {
-          replacement: "_"
-        });
-
-        const options = {
-          html: html,
-          fileName:
-            Platform.OS === "ios" ? "/exported/PDF/" + fileName : fileName,
-          width: 595,
-          height: 852,
-          bgColor: "#FFFFFF",
-          padding: 30,
-          base64: bulk || Platform.OS === "android"
-        } as { [name: string]: any };
-
-        if (Platform.OS === "ios") {
-          options.directory = "Documents";
-        }
-        const res = await RNHTMLtoPDF.convert(options);
-        data = !bulk && Platform.OS === "ios" ? res.filePath : res.base64;
-        if (bulk && res.filePath) {
-          RNFetchBlob.fs.unlink(res.filePath);
-        }
-      }
-      break;
-    case "txt":
-      {
-        data = await db.notes.export(note.id, {
-          format: "txt",
-          contentItem: content
-        });
-      }
-      break;
-  }
-
-  return data;
-}
-
-async function unlockVault() {
-  const biometry = await BiometricService.isBiometryAvailable();
-  const fingerprint = await BiometricService.hasInternetCredentials();
-  if (biometry && fingerprint) {
-    const credentials = await BiometricService.getCredentials(
-      "Unlock vault",
-      "Unlock vault to export locked notes"
-    );
-    if (credentials) {
-      return db.vault.unlock(credentials.password);
-    }
-  }
-  useSettingStore.getState().setSheetKeyboardHandler(false);
-  return new Promise((resolve) => {
-    setImmediate(() => {
-      presentDialog({
-        context: "export-notes",
-        input: true,
-        secureTextEntry: true,
-        positiveText: "Unlock",
-        title: "Unlock vault",
-        paragraph: "Some exported notes are locked, Unlock to export them",
-        inputPlaceholder: "Enter password",
-        positivePress: async (value) => {
-          const unlocked = await db.vault.unlock(value);
-          if (!unlocked) {
-            ToastManager.show({
-              heading: "Invalid password",
-              message: "Please enter a valid password",
-              type: "error",
-              context: "local"
-            });
-            return false;
-          }
-          resolve(unlocked);
-          useSettingStore.getState().setSheetKeyboardHandler(true);
-          return true;
-        },
-        onClose: () => {
-          resolve(false);
-          useSettingStore.getState().setSheetKeyboardHandler(true);
-        }
-      });
-    });
+async function unlockVaultForNoteExport() {
+  return await unlockVault({
+    title: "Unlock vault",
+    paragraph: "Some exported notes are locked, Unlock to export them",
+    context: "export-notes"
   });
 }
 
@@ -388,7 +222,7 @@ async function bulkExport(
   let currentAttachmentProgress = 0;
   for await (const item of exportNotes(notes, {
     format: type,
-    unlockVault: unlockVault as () => Promise<boolean>
+    unlockVault: unlockVaultForNoteExport as () => Promise<boolean>
   })) {
     if (item instanceof Error) {
       DatabaseLogger.error(item);
@@ -432,7 +266,7 @@ async function exportNote(
   let currentAttachmentProgress = 0;
   for await (const item of _exportNote(note, {
     format: type,
-    unlockVault: unlockVault as () => Promise<boolean>
+    unlockVault: unlockVaultForNoteExport as () => Promise<boolean>
   })) {
     if (item instanceof Error) {
       DatabaseLogger.error(item);

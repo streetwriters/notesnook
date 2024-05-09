@@ -48,5 +48,6 @@ export const EventTypes = {
   unlockWithBiometrics: "editor-events:unlock-biometrics",
   disableReadonlyMode: "editor-events:disable-readonly-mode",
   readonlyEditorLoaded: "readonlyEditorLoaded",
-  error: "editorError"
+  error: "editorError",
+  dbLogger: "editor-events:dbLogger"
 };

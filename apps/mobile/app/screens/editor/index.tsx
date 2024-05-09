@@ -56,6 +56,7 @@ import {
   editorState,
   openInternalLink
 } from "./tiptap/utils";
+import { tabBarRef } from "../../utils/global-refs";
 
 const style: ViewStyle = {
   height: "100%",
@@ -339,7 +340,7 @@ const useLockedNoteHandler = () => {
       }),
       eSubscribeEvent(eUnlockWithPassword, onSubmit)
     ];
-    if (tabRef.current?.locked) {
+    if (tabRef.current?.locked && tabBarRef.current?.page() === 2) {
       unlock();
     }
     return () => {

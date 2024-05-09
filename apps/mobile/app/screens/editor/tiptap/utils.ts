@@ -46,7 +46,7 @@ export function editorState() {
   return editorController.current?.state.current || defaultState;
 }
 
-export const EditorEvents: { [name: string]: string } = {
+export const EditorEvents = {
   html: "native:html",
   updatehtml: "native:updatehtml",
   title: "native:title",
@@ -55,7 +55,8 @@ export const EditorEvents: { [name: string]: string } = {
   logger: "native:logger",
   status: "native:status",
   keyboardShown: "native:keyboardShown",
-  attachmentData: "native:attachment-data"
+  attachmentData: "native:attachment-data",
+  resolve: "native:resolve"
 };
 
 export function randId(prefix: string) {

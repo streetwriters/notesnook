@@ -108,7 +108,6 @@ const file = async (fileOptions: PickerOptions) => {
       return;
     }
 
-    console.log("file uri: ", uri);
     uri = Platform.OS === "ios" ? santizeUri(uri) : uri;
     showEncryptionSheet(file);
     const hash = await Sodium.hashFile({
@@ -164,13 +163,14 @@ const file = async (fileOptions: PickerOptions) => {
       eSendEvent(eCloseSheet);
     }, 1000);
   } catch (e) {
+    eSendEvent(eCloseSheet);
     ToastManager.show({
       heading: (e as Error).message,
       message: "You need internet access to attach a file",
       type: "error",
       context: "global"
     });
-    console.log("attachment error: ", e);
+    DatabaseLogger.error(e);
   }
 };
 

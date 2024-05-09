@@ -136,6 +136,7 @@ declare global {
   >;
 
   function logger(type: "info" | "warn" | "error", ...logs: unknown[]): void;
+  function dbLogger(type: "log" | "error", ...logs: unknown[]): void;
   /**
    * Function to post message to react native
    * @param type
@@ -158,6 +159,24 @@ declare global {
     };
   }
 }
+
+export function getRoot() {
+  if (!isReactNative()) return; // Subscribe only in react native webview.
+  const isSafari = navigator.vendor.match(/apple/i);
+  let root: Document | Window = document;
+  if (isSafari) {
+    root = window;
+  }
+  return root;
+}
+
+export function getOnMessageListener(callback: () => void) {
+  getRoot()?.addEventListener("onMessage", callback);
+  return {
+    remove: getRoot()?.removeEventListener("onMessage", callback)
+  };
+}
+
 /* eslint-enable no-var */
 
 export const EventTypes = {
@@ -192,7 +211,8 @@ export const EventTypes = {
   unlockWithBiometrics: "editor-events:unlock-biometrics",
   disableReadonlyMode: "editor-events:disable-readonly-mode",
   readonlyEditorLoaded: "readonlyEditorLoaded",
-  error: "editorError"
+  error: "editorError",
+  dbLogger: "editor-events:dbLogger"
 } as const;
 
 export function randId(prefix: string) {
@@ -218,29 +238,81 @@ export function logger(
   post(EventTypes.logger, `[${type}]: ` + logString);
 }
 
-export function post<T extends keyof typeof EventTypes>(
-  type: (typeof EventTypes)[T],
+export function dbLogger(type: "error" | "log", ...logs: unknown[]): void {
+  const logString = logs
+    .map((log) => {
+      return typeof log !== "string" ? JSON.stringify(log) : log;
+    })
+    .join(" ");
+
+  post(EventTypes.dbLogger, {
+    message: `[${type}]: ` + logString,
+    error: logs[0] instanceof Error ? logs[0] : undefined
+  });
+}
+
+export function post(
+  type: string,
   value?: unknown,
   tabId?: number,
   noteId?: string,
-  sessionId?: string
-): void {
+  sessionId?: string,
+  hasTimeout?: boolean
+): string {
+  const id = randId(type);
   if (isReactNative()) {
-    window.ReactNativeWebView.postMessage(
-      JSON.stringify({
-        type,
-        value: value,
-        sessionId: sessionId || globalThis.sessionId,
-        tabId,
-        noteId
-      })
+    setTimeout(() =>
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          type,
+          value: value,
+          sessionId: sessionId || globalThis.sessionId,
+          tabId,
+          noteId,
+          resolverId: id,
+          hasTimeout: hasTimeout
+        })
+      )
     );
-  } else {
-    // console.log(type, value);
   }
+  return id;
+}
+
+export async function postAsyncWithTimeout<R = any>(
+  type: string,
+  value?: unknown,
+  tabId?: number,
+  noteId?: string,
+  sessionId?: string,
+  waitFor?: number
+): Promise<R> {
+  return new Promise((resolve, reject) => {
+    const id = post(
+      type,
+      value,
+      tabId,
+      noteId,
+      sessionId,
+      waitFor !== undefined ? true : false
+    );
+    globalThis.pendingResolvers[id] = (result) => {
+      delete globalThis.pendingResolvers[id];
+      logger("info", `Async post request resolved for ${id}`);
+      resolve(result);
+    };
+    if (waitFor !== undefined) {
+      setTimeout(() => {
+        if (globalThis.pendingResolvers[id]) {
+          delete globalThis.pendingResolvers[id];
+          reject(new Error(`Async post request timed out for ${id}`));
+        }
+      }, waitFor);
+    }
+  });
 }
 
 globalThis.logger = logger;
+globalThis.dbLogger = dbLogger;
 globalThis.post = post;
 
 export function saveTheme(theme: ThemeDefinition) {

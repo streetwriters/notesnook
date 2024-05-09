@@ -47,11 +47,12 @@ import {
   useTabStore
 } from "../hooks/useTabStore";
 import { EmotionEditorToolbarTheme } from "../theme-factory";
-import { EventTypes, randId, Settings } from "../utils";
+import { EventTypes, postAsyncWithTimeout, randId, Settings } from "../utils";
 import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
+import { pendingSaveRequests } from "../utils/pending-saves";
 
 globalThis.toBlobURL = toBlobURL as typeof globalThis.toBlobURL;
 
@@ -141,20 +142,8 @@ const Tiptap = ({
         ) as Promise<string | undefined>;
       },
       createInternalLink(attributes) {
-        logger("info", "create internal link");
-        return new Promise((resolve) => {
-          const id = randId("createInternalLink");
-
-          globalThis.pendingResolvers[id] = (value) => {
-            delete globalThis.pendingResolvers[id];
-            resolve(value);
-            logger("info", "resolved create link request:", id);
-          };
-
-          post("editor-events:create-internal-link", {
-            attributes: attributes,
-            resolverId: id
-          });
+        return postAsyncWithTimeout(EventTypes.createInternalLink, {
+          attributes
         });
       },
       element: getContentDiv(),
@@ -221,6 +210,31 @@ const Tiptap = ({
       onCreate() {
         setTimeout(() => {
           restoreNoteSelection();
+          const noteState = tabRef.current.noteId
+            ? useTabStore.getState().noteState[tabRef.current.noteId]
+            : undefined;
+          const top = noteState?.top;
+          logger(
+            "info",
+            "editor.onCreate",
+            tabRef.current?.noteId,
+            noteState?.top,
+            noteState?.to,
+            noteState?.from
+          );
+
+          if (noteState?.to || noteState?.from) {
+            editors[tabRef.current.id]?.chain().setTextSelection({
+              to: noteState.to,
+              from: noteState.from
+            });
+          }
+
+          containerRef.current?.scrollTo({
+            left: 0,
+            top: top || 0,
+            behavior: "auto"
+          });
         }, 32);
       },
       downloadOptions: {
@@ -279,6 +293,19 @@ const Tiptap = ({
     if (!didCallOnLoad) {
       didCallOnLoad = true;
       post("editor-events:load");
+      pendingSaveRequests
+        .getPendingContentIds()
+        .then(async (result) => {
+          logger("info", result.length, "PENDING ITEMS");
+
+          if (result && result.length) {
+            dbLogger("log", "Pending save requests found... restoring");
+            await pendingSaveRequests.postPendingRequests();
+          }
+        })
+        .catch(() => {
+          logger("info", "Error restoring pending contents...");
+        });
     }
 
     const updateScrollPosition = (state: TabStore) => {
@@ -289,7 +316,6 @@ const Tiptap = ({
           ? state.noteState[tabRef.current.noteId]
           : undefined;
         if (noteState) {
-          
           if (
             containerRef.current &&
             containerRef.current?.scrollHeight < noteState.top
@@ -424,6 +450,105 @@ const Tiptap = ({
           settings={settings}
           noHeader={settings.noHeader || false}
         />
+
+        <div
+          id="editor-saving-failed-overlay"
+          style={{
+            display: "none",
+            position: "absolute",
+            zIndex: 999,
+            width: "100%",
+            height: "100%",
+            backgroundColor: colors.primary.background,
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            rowGap: 10
+          }}
+        >
+          <p
+            style={{
+              color: colors.primary.paragraph,
+              fontSize: 18,
+              fontWeight: "600",
+              textAlign: "center",
+              padding: "0px 20px",
+              marginBottom: 0,
+              userSelect: "none"
+            }}
+          >
+            Your changes could not be saved.
+          </p>
+          <p
+            style={{
+              color: colors.primary.paragraph,
+              marginTop: 0,
+              marginBottom: 0,
+              userSelect: "none",
+              textAlign: "center",
+              maxWidth: "90%",
+              fontSize: "0.9rem"
+            }}
+          >
+            It seems that your changes could not be saved. What to do next:
+          </p>
+
+          <p
+            style={{
+              width: "90%",
+              fontSize: "0.9rem"
+            }}
+          >
+            <ol>
+              <li>
+                <p>
+                  Tap on "Dismiss" and copy the contents of your note so they
+                  are not lost.
+                </p>
+              </li>
+              <li>
+                <p>Restart the app.</p>
+              </li>
+            </ol>
+          </p>
+
+          <button
+            style={{
+              backgroundColor: colors.primary.accent,
+              borderRadius: 5,
+              boxSizing: "border-box",
+              border: "none",
+              color: colors.static.white,
+              width: 250,
+              fontSize: "1em",
+              height: 45,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+            onMouseDown={(e) => {
+              if (globalThis.keyboardShown) {
+                e.preventDefault();
+              }
+            }}
+            onClick={() => {
+              const element = document.getElementById(
+                "editor-saving-failed-overlay"
+              );
+              if (element) {
+                element.style.display = "none";
+              }
+            }}
+          >
+            <p
+              style={{
+                userSelect: "none"
+              }}
+            >
+              Dismiss
+            </p>
+          </button>
+        </div>
 
         <div
           onScroll={controller.scroll}

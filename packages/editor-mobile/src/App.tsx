@@ -31,7 +31,6 @@ import { TabContext, useTabStore } from "./hooks/useTabStore";
 import { EmotionEditorTheme } from "./theme-factory";
 import { getTheme } from "./utils";
 import { ReadonlyEditorProvider } from "./components/readonly-editor";
-import { error } from "console";
 
 const currentTheme = getTheme();
 if (currentTheme) {

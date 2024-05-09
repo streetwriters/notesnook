@@ -39,6 +39,7 @@ import { DatabaseLogger, db } from "../../../common/database";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../../services/device-detection";
 import {
+  ToastManager,
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
@@ -46,6 +47,7 @@ import {
 import Navigation from "../../../services/navigation";
 import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import {
   eEditorTabFocused,
@@ -54,8 +56,10 @@ import {
   eUpdateNoteInEditor
 } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
+import { unlockVault } from "../../../utils/unlock-vault";
 import { onNoteCreated } from "../../notes/common";
 import Commands from "./commands";
+import { EventTypes } from "./editor-events";
 import { SessionHistory } from "./session-history";
 import { EditorState, SavePayload } from "./types";
 import { syncTabs, useTabStore } from "./use-tab-store";
@@ -68,6 +72,7 @@ import {
   isEditorLoaded,
   post
 } from "./utils";
+import { sleep } from "../../../utils/time";
 
 type NoteWithContent = Note & {
   content?: NoteContent<false>;
@@ -166,10 +171,11 @@ export const useEditor = (
 
   useEffect(() => {
     if (loading) {
+      overlay(true);
       state.current.ready = false;
       setLoading(false);
     }
-  }, [loading]);
+  }, [loading, overlay]);
 
   const withTimer = useCallback(
     (id: string, fn: () => void, duration: number) => {
@@ -217,7 +223,8 @@ export const useEditor = (
       type,
       ignoreEdit,
       sessionHistoryId: currentSessionHistoryId,
-      tabId
+      tabId,
+      pendingChanges
     }: SavePayload) => {
       if (currentNotes.current[id as string]?.readonly || readonly) return;
       try {
@@ -278,11 +285,25 @@ export const useEditor = (
           );
         }, 50);
 
+        const saveTimer = setTimeout(() => {
+          DatabaseLogger.log(`Note save timeout: ${id}...`);
+          ToastManager.error(
+            new Error(
+              "Copy your changes and restart the app to avoid data loss. If the issue persists, please report to us at support@streetwriters.co."
+            ),
+            "Saving note is taking too long",
+            "global",
+            15000
+          );
+        }, 30 * 1000);
+
         if (!locked) {
           DatabaseLogger.log(`Saving note: ${id}...`);
           id = await db.notes?.add({ ...noteData });
           saved = true;
           DatabaseLogger.log(`Note saved: ${id}...`);
+
+          clearTimeout(saveTimer);
 
           if (!note && id) {
             editorSessionHistory.newSession(id);
@@ -317,9 +338,22 @@ export const useEditor = (
             Notifications.pinNote(id as string);
           }
         } else {
+          if (!db.vault.unlocked) {
+            if (pendingChanges) await sleep(3000);
+            const unlocked = await unlockVault({
+              title: "Unlock vault to save note",
+              paragraph: `This note is locked, unlock to save ${
+                pendingChanges ? "some pending" : ""
+              } changes`,
+              context: "global"
+            });
+            if (!unlocked)
+              throw new Error("Could not save note, vault is locked");
+          }
           noteData.contentId = note?.contentId;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await db.vault?.save(noteData as any);
+          clearTimeout(saveTimer);
         }
 
         if (id && useTabStore.getState().getTabForNote(id) === tabId) {
@@ -340,6 +374,16 @@ export const useEditor = (
           ) {
             Navigation.queueRoutesForUpdate();
           }
+        }
+
+        if (
+          id &&
+          id === useTabStore.getState().getCurrentNoteId() &&
+          pendingChanges
+        ) {
+          postMessage(EditorEvents.title, title || note?.title, tabId);
+          postMessage(EditorEvents.html, data, tabId);
+          currentNotes.current[id] = note;
         }
 
         saveCount.current++;
@@ -416,7 +460,10 @@ export const useEditor = (
             commands.focus(tabId);
         });
       } else {
-        if (!event.item) return;
+        if (!event.item) {
+          overlay(false);
+          return;
+        }
         const item = event.item;
 
         const currentTab = useTabStore
@@ -444,7 +491,6 @@ export const useEditor = (
               useTabStore.getState().focusTab(tabId);
               setTimeout(() => {
                 if (blockIdRef.current) {
-                  console.log("scrolling to block", blockIdRef.current);
                   commands.scrollIntoViewById(blockIdRef.current);
                   blockIdRef.current = undefined;
                 }
@@ -536,11 +582,8 @@ export const useEditor = (
           10000
         );
 
-        console.log("blockId", blockIdRef.current);
-
         setTimeout(() => {
           if (blockIdRef.current) {
-            console.log("scrolling to block", blockIdRef.current);
             commands.scrollIntoViewById(blockIdRef.current);
             blockIdRef.current = undefined;
           }
@@ -724,7 +767,8 @@ export const useEditor = (
       type,
       ignoreEdit,
       noteId,
-      tabId
+      tabId,
+      pendingChanges
     }: {
       noteId?: string;
       title?: string;
@@ -732,8 +776,11 @@ export const useEditor = (
       type: string;
       ignoreEdit: boolean;
       tabId: number;
+      pendingChanges?: boolean;
     }) => {
-      DatabaseLogger.log(`Saving content...`);
+      DatabaseLogger.log(
+        `saveContent... title: ${!!title}, content: ${!!content}, noteId: ${noteId}`
+      );
       if (
         lock.current ||
         (currentLoadingNoteId.current &&
@@ -759,7 +806,7 @@ export const useEditor = (
         lastContentChangeTime.current[noteId] = Date.now();
       }
 
-      if (type === EditorEvents.content && noteId) {
+      if (type === EventTypes.content && noteId) {
         currentContents.current[noteId as string] = {
           data: content,
           type: "tiptap",
@@ -774,7 +821,8 @@ export const useEditor = (
         id: noteId,
         ignoreEdit,
         sessionHistoryId: noteId ? editorSessionHistory.get(noteId) : undefined,
-        tabId: tabId
+        tabId: tabId,
+        pendingChanges
       };
       withTimer(
         noteId || "newnote",
@@ -786,7 +834,16 @@ export const useEditor = (
             onChange(params.data);
             return;
           }
-          saveNote(params);
+          if (useSettingStore.getState().isAppLoading) {
+            const sub = useSettingStore.subscribe((state) => {
+              if (!state.isAppLoading) {
+                saveNote(params);
+                sub();
+              }
+            });
+          } else {
+            saveNote(params);
+          }
         },
         ignoreEdit ? 0 : 150
       );
@@ -839,7 +896,6 @@ export const useEditor = (
   }, [isDefaultEditor, restoreEditorState]);
 
   const onLoad = useCallback(async () => {
-    if (currentNotes.current) overlay(true);
     setTimeout(() => {
       postMessage(EditorEvents.theme, theme);
     });
@@ -854,12 +910,23 @@ export const useEditor = (
 
     const noteId = useTabStore.getState().getCurrentNoteId();
     if (!noteId) {
-      overlay(false);
       loadNote({ newNote: true });
       if (tabBarRef.current?.page() === 1) {
         state.current.currentlyEditing = false;
       }
+    } else if (state.current?.initialLoadCalled) {
+      const note = currentNotes.current[noteId];
+      if (note) {
+        console.log("Loading note in onLoad...");
+        loadNote({
+          item: note
+        });
+      }
     }
+    if (!state.current?.initialLoadCalled) {
+      state.current.initialLoadCalled = true;
+    }
+    overlay(false);
   }, [
     postMessage,
     theme,
