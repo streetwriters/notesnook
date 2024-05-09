@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ExportableItem } from "@notesnook/common";
 import { db } from "../../common/db";
-import { showToast } from "../toast";
 import { ZipFile } from "./zip-stream";
 import { lazify } from "../lazify";
 
@@ -27,12 +26,15 @@ export class ExportStream extends TransformStream<
   ExportableItem | Error,
   ZipFile
 > {
-  constructor(report: (progress: { text: string; current?: number }) => void) {
-    let progress = 0;
+  progress = 0;
+  constructor(
+    report: (progress: { text: string; current?: number }) => void,
+    handleError: (error: Error) => void
+  ) {
     super({
-      async transform(item, controller) {
+      transform: async (item, controller) => {
         if (item instanceof Error) {
-          showToast("error", item.message);
+          handleError(item);
           return;
         }
         if (item.type === "attachment") {
@@ -56,13 +58,13 @@ export class ExportStream extends TransformStream<
           if (!stream) return;
           controller.enqueue({ ...item, data: stream });
           report({
-            current: progress++,
+            current: this.progress++,
             text: `Saving attachment: ${item.path}`
           });
         } else {
           controller.enqueue(item);
           report({
-            current: progress++,
+            current: this.progress++,
             text: `Exporting note: ${item.path}`
           });
         }

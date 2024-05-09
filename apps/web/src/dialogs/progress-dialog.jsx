@@ -33,6 +33,7 @@ function ProgressDialog(props) {
       try {
         props.onDone(await props.action(setProgress));
       } catch (e) {
+        console.error(e);
         props.onDone(e);
       }
     })();

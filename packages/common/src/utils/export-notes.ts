@@ -104,31 +104,37 @@ export async function* exportNotes(
       continue;
     }
 
-    const content = await exportContent(note, {
-      unlockVault: options.unlockVault,
-      format,
-      attachmentsRoot,
-      pendingAttachments,
-      resolveInternalLink: (link) => {
-        const internalLink = parseInternalLink(link);
-        if (!internalLink) return link;
-        const paths = notePathMap.get(internalLink.id);
-        if (!paths) return link;
-        // if the internal link is linking within the same note
-        if (paths === notePaths) return `{{NOTE_PATH:}}`;
-        return `{{NOTE_PATH:${paths[0]}}}`;
-      }
-    });
-    if (!content) continue;
+    try {
+      const content = await exportContent(note, {
+        unlockVault: options.unlockVault,
+        format,
+        attachmentsRoot,
+        pendingAttachments,
+        resolveInternalLink: (link) => {
+          const internalLink = parseInternalLink(link);
+          if (!internalLink) return link;
+          const paths = notePathMap.get(internalLink.id);
+          if (!paths) return link;
+          // if the internal link is linking within the same note
+          if (paths === notePaths) return `{{NOTE_PATH:}}`;
+          return `{{NOTE_PATH:${paths[0]}}}`;
+        }
+      });
+      if (!content) continue;
 
-    for (const path of notePaths) {
-      yield <ExportableNote>{
-        type: "note",
-        path,
-        data: resolvePaths(content, path),
-        mtime: new Date(note.dateEdited),
-        ctime: new Date(note.dateCreated)
-      };
+      for (const path of notePaths) {
+        yield <ExportableNote>{
+          type: "note",
+          path,
+          data: resolvePaths(content, path),
+          mtime: new Date(note.dateEdited),
+          ctime: new Date(note.dateCreated)
+        };
+      }
+    } catch (e) {
+      yield new Error(
+        `Failed to export note "${note.title}": ${(e as Error).message}`
+      );
     }
   }
 
@@ -225,10 +231,15 @@ export async function exportContent(
   }
 
   const contentItem = rawContent?.locked
-    ? await database.vault
-        .decryptContent(rawContent, note.id)
-        .catch(() => undefined)
-    : rawContent;
+    ? await database.vault.decryptContent(rawContent)
+    : // .catch((e) => {
+      //     console.error(e, note);
+      //     return <NoteContent<false>>{
+      //       type: "tiptap",
+      //       data: `This note could not be decrypted: ${e}`
+      //     };
+      //   })
+      rawContent;
 
   const { data, type } =
     format === "pdf"
