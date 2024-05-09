@@ -246,7 +246,7 @@ function EditorView({
           if (!item.locked) return editor.updateContent(item.data);
 
           const result = await db.vault
-            .decryptContent(item, item.noteId)
+            .decryptContent(item)
             .catch(() => EV.publish(EVENTS.vaultLocked));
           if (!result) return;
           editor.updateContent(result.data);

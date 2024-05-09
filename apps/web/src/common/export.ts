@@ -31,6 +31,8 @@ import {
 } from "@notesnook/common";
 import Vault from "./vault";
 import { ExportStream } from "../utils/streams/export-stream";
+import { showToast } from "../utils/toast";
+import { confirm } from "./dialog-controller";
 
 export async function exportToPDF(
   title: string,
@@ -79,20 +81,36 @@ export async function exportNotes(
   format: "pdf" | "md" | "txt" | "html" | "md-frontmatter",
   notes: FilteredSelector<Note>
 ): Promise<boolean> {
-  return await TaskManager.startTask({
+  const result = await TaskManager.startTask({
     type: "modal",
     title: "Exporting notes",
     subtitle: "Please wait while your notes are exported.",
     action: async (report) => {
+      const errors: Error[] = [];
+      const exportStream = new ExportStream(report, (e) => errors.push(e));
       await fromAsyncIterator(
         _exportNotes(notes, { format, unlockVault: Vault.unlockVault })
       )
-        .pipeThrough(new ExportStream(report))
+        .pipeThrough(exportStream)
         .pipeThrough(createZipStream())
         .pipeTo(await createWriteStream("notes.zip"));
-      return true;
+      return {
+        errors,
+        count: exportStream.progress
+      };
     }
   });
+  confirm({
+    title: `Exported ${result.count} notes`,
+    message:
+      result.errors.length > 0
+        ? `Export completed with ${result.errors.length} errors:
+
+${result.errors.map((e, i) => `${i + 1}. ${e.message}`).join("\n")}`
+        : "Export completed with 0 errors.",
+    positiveButtonText: "Okay"
+  });
+  return true;
 }
 
 const FORMAT_TO_EXT = {
@@ -130,7 +148,9 @@ export async function exportNote(
           unlockVault: Vault.unlockVault
         })
       )
-        .pipeThrough(new ExportStream(report))
+        .pipeThrough(
+          new ExportStream(report, (e) => showToast("error", e.message))
+        )
         .pipeThrough(createZipStream())
         .pipeTo(
           await createWriteStream(
