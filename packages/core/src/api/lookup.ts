@@ -25,6 +25,7 @@ import { AnyColumnWithTable, Kysely, sql } from "kysely";
 import { FilteredSelector } from "../database/sql-collection";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { logger } from "../logger";
+import { rebuildSearchIndex } from "../database/fts";
 
 type SearchResults<T> = {
   sorted: (limit?: number) => Promise<VirtualizedGrouping<T>>;
@@ -244,5 +245,10 @@ export default class Lookup {
   ) {
     if (!ids.length) return [];
     return selector.items(ids);
+  }
+
+  async rebuild() {
+    const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
+    await rebuildSearchIndex(db);
   }
 }

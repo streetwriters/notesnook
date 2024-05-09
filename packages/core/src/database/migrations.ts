@@ -24,6 +24,7 @@ import {
   MigrationProvider,
   sql
 } from "kysely";
+import { rebuildSearchIndex } from "./fts";
 
 const COLLATE_NOCASE: ColumnBuilderCallback = (col) =>
   col.modifyEnd(sql`collate nocase`);
@@ -283,6 +284,11 @@ export class NNMigrationProvider implements MigrationProvider {
             .execute();
         },
         async down(db) {}
+      },
+      "2": {
+        async up(db) {
+          await rebuildSearchIndex(db);
+        }
       }
     };
   }

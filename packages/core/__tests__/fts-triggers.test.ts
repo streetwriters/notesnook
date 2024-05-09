@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { expect, test } from "vitest";
-import { TEST_NOTE, databaseTest, noteTest } from "./utils";
+import { databaseTest, noteTest } from "./utils";
 
 test("updating deleted content should not throw", () =>
   databaseTest().then(async (db) => {

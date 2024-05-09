@@ -31,16 +31,16 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addEvent("insert")
     .when((eb) =>
       eb.and([
-        eb("new.deleted", "is not", true),
-        eb("new.locked", "is not", true),
-        eb("new.data", "is not", null)
+        eb("new.noteId", "is not", null),
+        eb("new.data", "is not", null),
+        eb("new.deleted", "is not", true)
       ])
     )
     .addQuery((c) =>
       c.insertInto("content_fts").values({
         rowid: sql`new.rowid`,
         id: sql`new.id`,
-        data: sql`new.data`,
+        data: sql`IIF(new.locked == 1, '', new.data)`,
         noteId: sql`new.noteId`
       })
     )
@@ -53,6 +53,13 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .onTable("content", "main")
     .after()
     .addEvent("delete")
+    .when((eb) =>
+      eb.and([
+        eb("old.noteId", "is not", null),
+        eb("old.data", "is not", null),
+        eb("old.deleted", "is not", true)
+      ])
+    )
     .addQuery((c) =>
       c.insertInto("content_fts").values({
         content_fts: sql.lit("delete"),
@@ -73,9 +80,9 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addEvent("update")
     .when((eb) =>
       eb.and([
-        eb("old.deleted", "is not", true),
         eb("old.noteId", "is not", null),
-        eb("old.data", "is not", null)
+        eb("old.data", "is not", null),
+        eb("old.deleted", "is not", true)
       ])
     )
     .addQuery((c) =>
@@ -107,7 +114,8 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .addEvent("insert")
     .when((eb) =>
       eb.and([
-        eb.or([eb("new.deleted", "is", null), eb("new.deleted", "==", false)])
+        eb("new.title", "is not", null),
+        eb("new.deleted", "is not", true)
       ])
     )
     .addQuery((c) =>
@@ -126,6 +134,12 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .onTable("notes", "main")
     .after()
     .addEvent("delete")
+    .when((eb) =>
+      eb.and([
+        eb("old.title", "is not", null),
+        eb("old.deleted", "is not", true)
+      ])
+    )
     .addQuery((c) =>
       c.insertInto("notes_fts").values({
         notes_fts: sql.lit("delete"),
