@@ -75,6 +75,10 @@ export class SharedService<T extends object> extends EventTarget {
       { signal: this.#onClose.signal }
     );
 
+    window.addEventListener("beforeunload", () => {
+      this.close();
+    });
+
     this.proxy = this.#createProxy();
   }
 
