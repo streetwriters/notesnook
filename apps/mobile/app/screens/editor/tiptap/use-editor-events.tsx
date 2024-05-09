@@ -77,7 +77,6 @@ import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { EditorEvents, editorState, openInternalLink } from "./utils";
 
-
 const publishNote = async () => {
   const user = useUserStore.getState().user;
   if (!user) {
@@ -354,8 +353,15 @@ export const useEditorEvents = (
       const data = event.nativeEvent.data;
       const editorMessage = JSON.parse(data) as EditorMessage<any>;
 
+      if (editorMessage.hasTimeout && editorMessage.resolverId) {
+        editor.postMessage(EditorEvents.resolve, {
+          data: true,
+          resolverId: editorMessage.resolverId
+        });
+      }
+
       if (editorMessage.type === EventTypes.load) {
-        console.log("Editor loaded");
+        DatabaseLogger.log("Editor is ready");
         editor.onLoad();
         return;
       }
@@ -383,21 +389,36 @@ export const useEditorEvents = (
             content: editorMessage.value.html as string,
             noteId: noteId,
             tabId: editorMessage.tabId,
-            ignoreEdit: (editorMessage.value as ContentMessage).ignoreEdit
+            ignoreEdit: (editorMessage.value as ContentMessage).ignoreEdit,
+            pendingChanges: editorMessage.value?.pendingChanges
           });
           break;
         case EventTypes.title:
           DatabaseLogger.log("EventTypes.title");
           editor.saveContent({
             type: editorMessage.type,
-            title: editorMessage.value as string,
+            title: editorMessage.value?.title as string,
             noteId: noteId,
             tabId: editorMessage.tabId,
-            ignoreEdit: false
+            ignoreEdit: false,
+            pendingChanges: editorMessage.value?.pendingChanges
           });
           break;
         case EventTypes.logger:
-          logger.info("[WEBVIEW LOG]", editorMessage.value);
+          logger.info("[EDITOR LOG]", editorMessage.value);
+          break;
+        case EventTypes.dbLogger:
+          if (editorMessage.value.error) {
+            DatabaseLogger.error(
+              editorMessage.value.error,
+              editorMessage.value.error,
+              {
+                message: "[EDITOR_ERROR]" + editorMessage.value.message
+              }
+            );
+          } else {
+            DatabaseLogger.info("[EDITOR_LOG]" + editorMessage.value.message);
+          }
           break;
         case EventTypes.contentchange:
           editor.onContentChanged(editorMessage.noteId);
@@ -485,17 +506,17 @@ export const useEditorEvents = (
               console.log(
                 "Got attachment data:",
                 !!data,
-                (editorMessage.value as any).resolverId
+                editorMessage.resolverId
               );
-              editor.postMessage(EditorEvents.attachmentData, {
-                resolverId: (editorMessage.value as any).resolverId,
+              editor.postMessage(EditorEvents.resolve, {
+                resolverId: editorMessage.resolverId,
                 data
               });
             })
             .catch((e) => {
               DatabaseLogger.error(e);
-              editor.postMessage(EditorEvents.attachmentData, {
-                resolverId: (editorMessage.value as any).resolverId,
+              editor.postMessage(EditorEvents.resolve, {
+                resolverId: editorMessage.resolverId,
                 data: undefined
               });
             });
@@ -622,7 +643,7 @@ export const useEditorEvents = (
         case EventTypes.createInternalLink: {
           LinkNote.present(
             editorMessage.value.attributes,
-            editorMessage.value.resolverId
+            editorMessage.resolverId as string
           );
           break;
         }

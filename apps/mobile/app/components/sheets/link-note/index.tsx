@@ -35,7 +35,10 @@ import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import type { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
-import { editorController } from "../../../screens/editor/tiptap/utils";
+import {
+  EditorEvents,
+  editorController
+} from "../../../screens/editor/tiptap/utils";
 
 const ListNoteItem = ({
   id,
@@ -190,13 +193,13 @@ export default function LinkNote(props: {
           }
         : undefined
     );
-    editorController.current.commands.createInternalLink(
-      {
+    editorController.current?.postMessage(EditorEvents.resolve, {
+      data: {
         href: link,
         title: selectedNote.title
       },
-      props.resolverId
-    );
+      resolverId: props.resolverId
+    });
   };
 
   const onSelectNote = async (note: Note) => {

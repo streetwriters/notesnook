@@ -162,7 +162,7 @@ export const ToastManager = {
     });
   },
   hide: () => eSendEvent(eHideToast),
-  error: (e: Error, title?: string, context?: any) => {
+  error: (e: Error, title?: string, context?: any, duration = 5000) => {
     ToastManager.show({
       heading: title,
       message: e?.message || "",
@@ -176,7 +176,7 @@ export const ToastManager = {
           heading: "Logs copied!",
           type: "success",
           context: "global",
-          duration: 5000
+          duration: duration
         });
       }
     });
