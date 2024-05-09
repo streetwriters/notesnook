@@ -39,6 +39,7 @@ import {
   eSubscribeEvent
 } from "../../services/event-manager";
 import {
+  eEditorReset,
   eOnLoadNote,
   eUnlockNote,
   eUnlockWithBiometrics,
@@ -54,7 +55,8 @@ import { syncTabs, useTabStore } from "./tiptap/use-tab-store";
 import {
   editorController,
   editorState,
-  openInternalLink
+  openInternalLink,
+  randId
 } from "./tiptap/utils";
 import { tabBarRef } from "../../utils/global-refs";
 
@@ -103,24 +105,20 @@ const Editor = React.memo(
         noToolbar,
         noHeader
       });
-      const renderKey = useRef(`editor-0` + editorId);
+      const renderKey = useRef(randId("editor-id") + editorId);
       useImperativeHandle(ref, () => ({
         get: () => editor
       }));
       useLockedNoteHandler();
 
       const onError = useCallback(() => {
-        renderKey.current =
-          renderKey.current === `editor-0`
-            ? `editor-1` + editorId
-            : `editor-0` + editorId;
-
+        renderKey.current = randId("editor-id") + editorId;
         editor.state.current.ready = false;
         editor.setLoading(true);
       }, [editor, editorId]);
 
       useEffect(() => {
-        const sub = [eSubscribeEvent("webview_reset", onError)];
+        const sub = [eSubscribeEvent(eEditorReset, onError)];
         return () => {
           sub.forEach((s) => s?.unsubscribe());
         };

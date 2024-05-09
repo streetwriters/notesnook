@@ -86,6 +86,7 @@ import { updateStatusBarColor } from "../utils/colors";
 import { BETA } from "../utils/constants";
 import {
   eCloseSheet,
+  eEditorReset,
   eLoginSessionExpired,
   eOnLoadNote,
   eOpenAnnouncementDialog,
@@ -235,7 +236,7 @@ async function checkForShareExtensionLaunchedInBackground() {
     if (notesAddedFromIntent || shareExtensionOpened) {
       const id = useTabStore.getState().getCurrentNoteId();
       const note = id && (await db.notes.note(id));
-      eSendEvent("webview_reset");
+      eSendEvent(eEditorReset);
       if (note) setTimeout(() => eSendEvent("loadingNote", note), 1);
       MMKV.removeItem("shareExtensionOpened");
     }
@@ -532,6 +533,14 @@ export const useAppEvents = () => {
         }
         //@ts-ignore
         globalThis["IS_SHARE_EXTENSION"] = false;
+
+        if (
+          SettingsService.getBackgroundEnterTime() + 60 * 1000 * 30 <
+          Date.now()
+        ) {
+          // Reset the editor if the app has been in background for more than 10 minutes.
+          eSendEvent(eEditorReset);
+        }
       } else {
         await saveEditorState();
         if (
