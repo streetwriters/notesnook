@@ -458,7 +458,7 @@ export const settingsGroups: SettingSection[] = [
             id: "background-sync",
             name: "Background sync (experimental)",
             description:
-              "Periodically wake up the app in background to sync your notes from other devices.",
+              "Periodically wake up the app in background to run sync.",
             type: "switch",
             property: "backgroundSync",
             onChange: (value) => {
@@ -472,13 +472,12 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "pull-sync",
             name: "Force pull changes",
-            description:
-              "Force pull changes from the server. Use this if some changes are not appearing on this device.",
+            description: `Use this if some changes are not appearing on this device from other devices. This will pull everything from the server and overwrite with whatever is one this device.\n\nThese must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.`,
             modifer: () => {
               presentDialog({
                 title: "Force Pull changes",
                 paragraph:
-                  "Force pull changes from the server. Run this if some changes are not appearing on this device.",
+                  "This must only be used for troubleshooting. Using this regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.",
                 negativeText: "Cancel",
                 positiveText: "Start",
                 positivePress: async () => {
@@ -495,13 +494,12 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "push-sync",
             name: "Force push changes",
-            description:
-              "Force push changes to the server. Use this if some changes from this device are not appearing on other devices.",
+            description: `Use this if some changes are not appearing on this device from other devices. This will pull everything from the server and overwrite with whatever is one this device.`,
             modifer: () => {
               presentDialog({
                 title: "Force Push changes",
                 paragraph:
-                  "Force push changes to the server. Run this only if some changes from this device are not appearing on other devices.",
+                  "This must only be used for troubleshooting. Using this regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.",
                 negativeText: "Cancel",
                 positiveText: "Start",
                 positivePress: async () => {
