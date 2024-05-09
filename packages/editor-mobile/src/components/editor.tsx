@@ -40,6 +40,7 @@ import {
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
 import {
+  NoteState,
   TabItem,
   TabStore,
   useTabContext,
@@ -76,6 +77,33 @@ const Tiptap = ({
   const editorRoot = useRef<HTMLDivElement>(null);
   const isFocusedRef = useRef<boolean>(false);
   tabRef.current = tab;
+
+  function restoreNoteSelection(state?: NoteState) {
+    if (!tabRef.current.noteId) return;
+    const noteState =
+      state || useTabStore.getState().noteState[tabRef.current.noteId];
+
+    if (noteState.to || noteState.from) {
+      const size = editors[tabRef.current.id]?.state.doc.content.size || 0;
+      if (
+        noteState.to > 0 &&
+        noteState.to <= size &&
+        noteState.from > 0 &&
+        noteState.from <= size
+      ) {
+        editors[tabRef.current.id]?.chain().setTextSelection({
+          to: noteState.to,
+          from: noteState.from
+        });
+      }
+    }
+
+    containerRef.current?.scrollTo({
+      left: 0,
+      top: noteState.top || 0,
+      behavior: "auto"
+    });
+  }
 
   usePermissionHandler({
     claims: {
@@ -192,31 +220,7 @@ const Tiptap = ({
       },
       onCreate() {
         setTimeout(() => {
-          const noteState = tabRef.current.noteId
-            ? useTabStore.getState().noteState[tabRef.current.noteId]
-            : undefined;
-          const top = noteState?.top;
-          logger(
-            "info",
-            "editor.onCreate",
-            tabRef.current?.noteId,
-            noteState?.top,
-            noteState?.to,
-            noteState?.from
-          );
-
-          if (noteState?.to || noteState?.from) {
-            editors[tabRef.current.id]?.chain().setTextSelection({
-              to: noteState.to,
-              from: noteState.from
-            });
-          }
-          logger("info", "Scrolling to", top, useTabStore.getState().noteState);
-          containerRef.current?.scrollTo({
-            left: 0,
-            top: top || 0,
-            behavior: "auto"
-          });
+          restoreNoteSelection();
         }, 32);
       },
       downloadOptions: {
@@ -285,6 +289,7 @@ const Tiptap = ({
           ? state.noteState[tabRef.current.noteId]
           : undefined;
         if (noteState) {
+          
           if (
             containerRef.current &&
             containerRef.current?.scrollHeight < noteState.top
@@ -292,17 +297,8 @@ const Tiptap = ({
             console.log("Container too small to scroll.");
             return;
           }
-          containerRef.current?.scrollTo({
-            left: 0,
-            top: noteState.top,
-            behavior: "auto"
-          });
-          if (noteState.to || noteState.from) {
-            editors[tabRef.current.id]?.chain().setTextSelection({
-              to: noteState.to,
-              from: noteState.from
-            });
-          }
+
+          restoreNoteSelection(noteState);
         } else {
           containerRef.current?.scrollTo({
             left: 0,

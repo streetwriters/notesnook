@@ -70,7 +70,13 @@ export const useEditor = (
           EditorState.create({
             doc,
             plugins: editor.extensionManager.plugins,
-            selection: selection || undefined
+            selection:
+              selection.from > 0 &&
+              selection.from <= doc.content.size &&
+              selection.to > 0 &&
+              selection.to <= doc.content.size
+                ? selection
+                : undefined
           })
         );
         if (oldIsFocused && !editor.isFocused) editor.commands.focus();

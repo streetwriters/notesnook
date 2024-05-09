@@ -36,7 +36,7 @@ export type TabItem = {
   pinned?: boolean;
 };
 
-type NoteState = {
+export type NoteState = {
   top: number;
   to: number;
   from: number;
