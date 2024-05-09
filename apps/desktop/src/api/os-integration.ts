@@ -58,11 +58,11 @@ export const osIntegrationRouter = t.router({
 
   customDns: t.procedure.query(() => config.customDns),
   setCustomDns: t.procedure
-    .input(z.boolean())
+    .input(z.boolean().optional())
     .mutation(({ input: customDns }) => {
       if (customDns) enableCustomDns();
       else disableCustomDns();
-      config.customDns = customDns;
+      config.customDns = !!customDns;
     }),
 
   proxyRules: t.procedure.query(() => config.proxyRules),
