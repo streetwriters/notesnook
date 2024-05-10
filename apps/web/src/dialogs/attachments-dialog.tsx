@@ -37,6 +37,7 @@ import {
   Close,
   DoubleCheckmark,
   Download,
+  FileAudio,
   FileDocument,
   FileGeneral,
   FileImage,
@@ -111,7 +112,8 @@ function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
     images: 0,
     orphaned: 0,
     uploads: 0,
-    videos: 0
+    videos: 0,
+    audio: 0
   });
   const [selected, setSelected] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOptions>({
@@ -375,7 +377,14 @@ function AttachmentRow(
   );
 }
 
-type Route = "all" | "images" | "documents" | "videos" | "uploads" | "orphaned";
+type Route =
+  | "all"
+  | "images"
+  | "documents"
+  | "videos"
+  | "audio"
+  | "uploads"
+  | "orphaned";
 
 const routes: { id: Route; icon: Icon; title: string }[] = [
   {
@@ -397,6 +406,11 @@ const routes: { id: Route; icon: Icon; title: string }[] = [
     id: "videos",
     icon: FileVideo,
     title: "Videos"
+  },
+  {
+    id: "audio",
+    icon: FileAudio,
+    title: "Audios"
   },
   {
     id: "uploads",
@@ -525,6 +539,7 @@ async function getCounts(): Promise<Record<Route, number>> {
     documents: await db.attachments.documents.count(),
     images: await db.attachments.images.count(),
     videos: await db.attachments.videos.count(),
+    audio: await db.attachments.audios.count(),
     uploads: await db.attachments.pending.count(),
     orphaned: await db.attachments.orphaned.count()
   };
@@ -541,5 +556,7 @@ function filterAttachments(route: Route) {
     ? db.attachments.documents
     : route === "orphaned"
     ? db.attachments.orphaned
+    : route === "audio"
+    ? db.attachments.audios
     : db.attachments.pending;
 }

@@ -212,7 +212,8 @@ import {
   mdiCalendarBlank,
   mdiFormatListBulleted,
   mdiLink,
-  mdiWindowClose
+  mdiWindowClose,
+  mdiFileMusicOutline
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -516,6 +517,7 @@ export const FilePDF = createIcon(
 );
 export const FileDocument = createIcon(mdiFileDocumentOutline);
 export const FileVideo = createIcon(mdiFileVideoOutline);
+export const FileAudio = createIcon(mdiFileMusicOutline);
 export const FileGeneral = createIcon(mdiFileOutline);
 export const FileWebClip = createIcon(mdiWeb);
 export const Unlink = createIcon(mdiLinkOff);
