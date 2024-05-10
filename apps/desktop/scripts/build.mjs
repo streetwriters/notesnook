@@ -48,7 +48,7 @@ if (os.platform() === "linux") await patchBetterSQLite3();
 
 if (os.platform() === "win32")
   await exec(
-    `yarn prebuildify --arch=arm64 --strip -t electron@${packageJson.devDependencies.electron}`,
+    `npx prebuildify --arch=arm64 --strip -t electron@${packageJson.devDependencies.electron}`,
     path.join(__dirname, "..", "node_modules", "sodium-native")
   );
 
