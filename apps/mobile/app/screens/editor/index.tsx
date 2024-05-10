@@ -145,6 +145,7 @@ const Editor = React.memo(
             nestedScrollEnabled
             onError={onError}
             injectedJavaScriptBeforeContentLoaded={`
+          globalThis.__DEV__ = ${__DEV__}
           globalThis.readonly=${readonly};
           globalThis.noToolbar=${noToolbar};
           globalThis.noHeader=${noHeader};

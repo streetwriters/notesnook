@@ -135,6 +135,8 @@ declare global {
     | undefined
   >;
 
+  var __DEV__: boolean;
+
   function logger(type: "info" | "warn" | "error", ...logs: unknown[]): void;
   function dbLogger(type: "log" | "error", ...logs: unknown[]): void;
   /**
@@ -229,6 +231,8 @@ export function logger(
   type: "info" | "warn" | "error",
   ...logs: unknown[]
 ): void {
+  if (typeof globalThis.__DEV__ !== "undefined" && !globalThis.__DEV__) return;
+
   const logString = logs
     .map((log) => {
       return typeof log !== "string" ? JSON.stringify(log) : log;

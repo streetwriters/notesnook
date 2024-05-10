@@ -708,10 +708,7 @@ export const useEditor = (
             }
 
             if (locked && isEncryptedContent(data)) {
-              const decryptedContent = await db.vault?.decryptContent(
-                data,
-                noteId
-              );
+              const decryptedContent = await db.vault?.decryptContent(data);
               if (!decryptedContent) {
                 useTabStore.getState().updateTab(tabId, {
                   locked: true,
