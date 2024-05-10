@@ -71,7 +71,10 @@ export default function AttachImage({
             <TouchableOpacity key={item.filename} activeOpacity={0.9}>
               <Image
                 source={{
-                  uri: Platform.OS === "ios" ? item.sourceURL : item.path
+                  uri:
+                    Platform.OS === "ios"
+                      ? item.sourceURL || item.path
+                      : item.path
                 }}
                 style={{
                   width: 100,
