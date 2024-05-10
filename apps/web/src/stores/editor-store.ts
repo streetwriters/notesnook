@@ -47,6 +47,7 @@ import { getFormattedHistorySessionDate } from "@notesnook/common";
 import { isCipher } from "@notesnook/core/dist/database/crypto";
 import { hashNavigate } from "../navigation";
 import { AppEventManager, AppEvents } from "../common/app-events";
+import Vault from "../common/vault";
 
 export enum SaveState {
   NotSaved = -1,
@@ -222,8 +223,15 @@ class EditorStore extends BaseStore<EditorStore> {
         const clearIds: string[] = [];
         for (const session of sessions) {
           if (session.type === "new") continue;
-          if (session.id !== item.id && session.note.id !== item.id) continue;
-
+          const noteId = isDeleted(item)
+            ? null
+            : item.type === "note"
+            ? item.id
+            : item.type === "tiptap"
+            ? item.noteId
+            : null;
+          if (noteId && session.id !== noteId && session.note.id !== noteId)
+            continue;
           if (isDeleted(item) || isTrashItem(item)) clearIds.push(session.id);
           // if a note is locked, reopen the session
           else if (
@@ -232,21 +240,26 @@ class EditorStore extends BaseStore<EditorStore> {
             item.type === "tiptap" &&
             item.locked
           ) {
-            openSession(item.id, { force: true, silent: true });
+            waitForSync().then(() =>
+              openSession(session.note.id, { force: true, silent: true })
+            );
           }
           // if locked note is unlocked, reopen the session
           else if (
-            session.type === "locked" ||
-            (session.type === "default" &&
-              session.locked &&
-              item.type === "tiptap" &&
-              !item.locked)
+            (session.type === "locked" ||
+              (session.type === "default" && session.locked)) &&
+            item.type === "tiptap" &&
+            !item.locked
           ) {
-            openSession(item.id, { force: true, silent: true });
+            waitForSync().then(() =>
+              openSession(session.note.id, { force: true, silent: true })
+            );
           }
           // if a deleted note is restored, reopen the session
           else if (session.type === "deleted" && item.type === "note") {
-            openSession(item.id, { force: true, silent: true });
+            waitForSync().then(() =>
+              openSession(session.note.id, { force: true, silent: true })
+            );
           }
           // if a readonly note is made editable, reopen the session
           else if (
@@ -254,7 +267,9 @@ class EditorStore extends BaseStore<EditorStore> {
             item.type === "note" &&
             !item.readonly
           )
-            openSession(item.id, { force: true, silent: true });
+            waitForSync().then(() =>
+              openSession(session.note.id, { force: true, silent: true })
+            );
           // update the note in all sessions
           else if (item.type === "note") {
             updateSession(
@@ -328,12 +343,15 @@ class EditorStore extends BaseStore<EditorStore> {
               const contentId =
                 session.type !== "new" && session.note.contentId;
               if (!contentId || !event.ids.includes(contentId)) continue;
-
               if (
-                // when a note is locked or unlocked
-                session.type !== "locked" &&
-                !!event.item.locked &&
-                (session.type !== "default" || !session.locked)
+                // if note is locked
+                (session.type === "default" &&
+                  !session.locked &&
+                  event.item.locked) ||
+                // if note is unlocked
+                ((session.type === "locked" ||
+                  (session.type === "default" && session.locked)) &&
+                  !event.item.locked)
               ) {
                 openSession(session.id, { force: true, silent: true });
               }
@@ -600,7 +618,7 @@ class EditorStore extends BaseStore<EditorStore> {
         : undefined;
 
       if (content?.locked) {
-        await db.vault.add(noteId);
+        await Vault.lockNote(noteId);
         return this.openSession(note, { ...options, force: true });
       }
 
@@ -962,4 +980,11 @@ function getSessionId(session: DefaultEditorSession | NewEditorSession) {
     "sessionId" in session ? parseInt(session.sessionId) : Date.now();
   if (sessionId + SESSION_DURATION < Date.now()) return `${Date.now()}`;
   return `${sessionId}`;
+}
+
+async function waitForSync() {
+  if (!appStore.get().isSyncing()) return true;
+  return new Promise((resolve) => {
+    db.eventManager.subscribe(EVENTS.syncCompleted, resolve, true);
+  });
 }
