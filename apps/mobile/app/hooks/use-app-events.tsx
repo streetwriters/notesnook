@@ -535,7 +535,7 @@ export const useAppEvents = () => {
         globalThis["IS_SHARE_EXTENSION"] = false;
 
         if (
-          SettingsService.getBackgroundEnterTime() + 60 * 1000 * 30 <
+          SettingsService.getBackgroundEnterTime() + 60 * 1000 * 10 <
           Date.now()
         ) {
           // Reset the editor if the app has been in background for more than 10 minutes.
