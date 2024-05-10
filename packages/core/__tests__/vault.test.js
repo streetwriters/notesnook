@@ -144,6 +144,7 @@ test("save an edited locked note", () =>
     expect(content.data.cipher).toBeTypeOf("string");
     expect(() => JSON.parse(content.data.cipher)).toThrow();
     expect(note.dateEdited).toBeLessThan((await db.notes.note(id)).dateEdited);
+    expect(note.dateEdited).toBeLessThan(content.dateEdited);
   }));
 
 test("change vault password", () =>

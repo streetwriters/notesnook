@@ -255,6 +255,7 @@ export default class Vault {
       noteId,
       sessionId,
       data: encryptedContent,
+      dateEdited: Date.now(),
       type: content.type
     });
   }
