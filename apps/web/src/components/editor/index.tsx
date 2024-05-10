@@ -73,16 +73,38 @@ import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
-function saveContent(noteId: string, ignoreEdit: boolean, content: string) {
+async function saveContent(
+  noteId: string,
+  ignoreEdit: boolean,
+  content: string
+) {
   logger.debug("saving content", {
     noteId,
     ignoreEdit,
     length: content.length
   });
-  useEditorStore.getState().saveSessionContent(noteId, ignoreEdit, {
-    type: "tiptap",
-    data: content
-  });
+  await Promise.race([
+    useEditorStore.getState().saveSessionContent(noteId, ignoreEdit, {
+      type: "tiptap",
+      data: content
+    }),
+    new Promise((resolve) =>
+      setTimeout(() => {
+        const { hide } = showToast(
+          "error",
+          "Saving this note is taking too long. Copy your changes and restart the app to prevent data loss. If the problem persists, please report it to us at support@streetwriters.co.",
+          [
+            {
+              text: "Dismiss",
+              onClick: () => hide()
+            }
+          ],
+          0
+        );
+        resolve(undefined);
+      }, 30 * 1000)
+    )
+  ]);
 }
 const deferredSave = debounceWithId(saveContent, 100);
 
