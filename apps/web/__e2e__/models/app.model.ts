@@ -123,7 +123,7 @@ export class AppModel {
     );
   }
 
-  async waitForSync(state: "completed" | "synced" = "completed") {
+  async waitForSync(state: "completed" | "synced" | "syncing" = "completed") {
     await this.page
       .locator(getTestId(`sync-status-${state}`))
       .waitFor({ state: "visible" });
