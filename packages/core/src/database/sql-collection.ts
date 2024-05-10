@@ -552,9 +552,11 @@ export class FilteredSelector<T extends Item> {
   async *[Symbol.asyncIterator]() {
     let lastRow: any | null = null;
     const fields = this._fields.slice();
-    if (!fields.find((f) => f.includes(".dateCreated")))
-      fields.push("dateCreated");
-    if (!fields.find((f) => f.includes(".id"))) fields.push("id");
+    if (fields.length > 0) {
+      if (!fields.find((f) => f.includes(".dateCreated")))
+        fields.push("dateCreated");
+      if (!fields.find((f) => f.includes(".id"))) fields.push("id");
+    }
 
     while (true) {
       const rows = await this.filter
