@@ -41,6 +41,7 @@ import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 import { eCloseSheet } from "../../../utils/events";
 import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
+import { basename } from "pathe";
 
 const showEncryptionSheet = (file: DocumentPickerResponse) => {
   presentSheet({
@@ -265,6 +266,7 @@ const handleImageResponse = async (
   response: Image[],
   options: PickerOptions
 ) => {
+  console.log(response, "result-file-picker");
   const result = await AttachImage.present(response, options.context);
   if (!result) return;
   const compress = result.compress;
@@ -300,7 +302,12 @@ const handleImageResponse = async (
       type: "url"
     });
 
-    const fileName = image.filename || "image";
+    const fileName = image.sourceURL
+      ? basename(image.sourceURL)
+      : image.filename || "image";
+
+    console.log("attaching image...", fileName);
+
     console.log("attaching file...");
     if (!(await attachFile(uri, hash, image.mime, fileName, options))) return;
 

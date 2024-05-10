@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React, { useState } from "react";
-import { Image, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  View
+} from "react-native";
 import { Image as ImageType } from "react-native-image-crop-picker";
 import { useThemeColors } from "../../../../../../packages/theme/dist";
 import { presentSheet } from "../../../services/event-manager";
@@ -65,7 +71,7 @@ export default function AttachImage({
             <TouchableOpacity key={item.filename} activeOpacity={0.9}>
               <Image
                 source={{
-                  uri: item.sourceURL || item.path
+                  uri: Platform.OS === "ios" ? item.sourceURL : item.path
                 }}
                 style={{
                   width: 100,
