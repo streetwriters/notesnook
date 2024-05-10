@@ -119,6 +119,7 @@ async function createZip(
   callback: (progress?: string) => void
 ) {
   const fileName = `nn-export-${totalNotes}-${type}-${Date.now()}.zip`;
+  const dir = path;
   try {
     callback("Creating zip");
     const zipOutputPath =
@@ -126,6 +127,7 @@ async function createZip(
         ? join(path, fileName)
         : join(RNFetchBlob.fs.dirs.CacheDir, fileName);
     await zip(cacheFolder, zipOutputPath);
+
     callback("Saving zip file");
     if (Platform.OS === "android") {
       const file = await ScopedStorage.createFile(
@@ -137,6 +139,8 @@ async function createZip(
       await copyFileAsync("file://" + zipOutputPath, path);
       await RNFetchBlob.fs.unlink(zipOutputPath);
       callback();
+    } else {
+      path = zipOutputPath;
     }
     RNFetchBlob.fs.unlink(cacheFolder);
   } catch (e) {
@@ -145,6 +149,7 @@ async function createZip(
 
   return {
     filePath: path,
+    fileDir: dir,
     type: "application/zip",
     name: "zip",
     fileName: fileName,

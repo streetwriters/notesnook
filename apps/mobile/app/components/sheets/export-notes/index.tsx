@@ -19,7 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, { Fragment, useState } from "react";
-import { ActivityIndicator, Platform, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  Linking,
+  Platform,
+  StyleSheet,
+  View
+} from "react-native";
 import FileViewer from "react-native-file-viewer";
 import Share from "react-native-share";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -29,14 +35,12 @@ import { requestInAppReview } from "../../../services/app-review";
 import {
   PresentSheetOptions,
   ToastManager,
-  eSendEvent,
   presentSheet
 } from "../../../services/event-manager";
 import Exporter from "../../../services/exporter";
 import PremiumService from "../../../services/premium";
 import { useUserStore } from "../../../stores/use-user-store";
 import { getElevationStyle } from "../../../utils/elevation";
-import { eCloseSheet } from "../../../utils/events";
 import { SIZE, ph, pv } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
@@ -65,6 +69,7 @@ const ExportNotesSheet = ({
         filePath: string;
         name: string;
         type: string;
+        fileDir: string;
       }
     | undefined
   >();
@@ -295,7 +300,9 @@ const ExportNotesSheet = ({
                   successfully as {result?.fileName}
                 </Paragraph>
                 <Button
-                  title="Open"
+                  title={
+                    Platform.OS === "android" ? "Open file location" : "Open"
+                  }
                   type="accent"
                   width={250}
                   fontSize={SIZE.md}
@@ -305,20 +312,23 @@ const ExportNotesSheet = ({
                   }}
                   onPress={async () => {
                     if (!result?.filePath) return;
-                    eSendEvent(eCloseSheet);
-                    await sleep(500);
-                    FileViewer.open(result?.filePath, {
-                      showOpenWithDialog: true,
-                      showAppsSuggestions: true
-                    }).catch((e) => {
-                      console.log(e);
-                      ToastManager.show({
-                        heading: "Cannot open",
-                        message: `No application found to open ${result.name} file.`,
-                        type: "success",
-                        context: "local"
+                    if (Platform.OS === "android") {
+                      Linking.openURL(result.fileDir).catch((e) => {
+                        ToastManager.error(e as Error);
                       });
-                    });
+                    } else {
+                      FileViewer.open(result?.filePath, {
+                        showOpenWithDialog: true,
+                        showAppsSuggestions: true
+                      }).catch((e) => {
+                        ToastManager.show({
+                          heading: "Cannot open",
+                          message: `No application found to open ${result.name} file.`,
+                          type: "success",
+                          context: "local"
+                        });
+                      });
+                    }
                   }}
                 />
                 <Button
@@ -331,10 +341,10 @@ const ExportNotesSheet = ({
                     borderRadius: 100
                   }}
                   onPress={async () => {
-                    if (!result?.filePath) return;
+                    if (!result) return;
                     if (Platform.OS === "ios") {
                       Share.open({
-                        url: result.filePath
+                        url: result?.fileDir + result.fileName
                       }).catch(console.log);
                     } else {
                       FileViewer.open(result.filePath, {
@@ -347,7 +357,7 @@ const ExportNotesSheet = ({
                 />
                 <Button
                   title="Export in another format"
-                  type="secondaryAccented"
+                  type="inverted"
                   width={250}
                   fontSize={SIZE.md}
                   style={{
