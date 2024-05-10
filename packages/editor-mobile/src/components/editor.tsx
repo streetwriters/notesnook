@@ -80,30 +80,34 @@ const Tiptap = ({
   tabRef.current = tab;
 
   function restoreNoteSelection(state?: NoteState) {
-    if (!tabRef.current.noteId) return;
-    const noteState =
-      state || useTabStore.getState().noteState[tabRef.current.noteId];
+    try {
+      if (!tabRef.current.noteId) return;
+      const noteState =
+        state || useTabStore.getState().noteState[tabRef.current.noteId];
 
-    if (noteState.to || noteState.from) {
-      const size = editors[tabRef.current.id]?.state.doc.content.size || 0;
-      if (
-        noteState.to > 0 &&
-        noteState.to <= size &&
-        noteState.from > 0 &&
-        noteState.from <= size
-      ) {
-        editors[tabRef.current.id]?.chain().setTextSelection({
-          to: noteState.to,
-          from: noteState.from
-        });
+      if (noteState && (noteState.to || noteState.from)) {
+        const size = editors[tabRef.current.id]?.state.doc.content.size || 0;
+        if (
+          noteState.to > 0 &&
+          noteState.to <= size &&
+          noteState.from > 0 &&
+          noteState.from <= size
+        ) {
+          editors[tabRef.current.id]?.chain().setTextSelection({
+            to: noteState.to,
+            from: noteState.from
+          });
+        }
       }
-    }
 
-    containerRef.current?.scrollTo({
-      left: 0,
-      top: noteState.top || 0,
-      behavior: "auto"
-    });
+      containerRef.current?.scrollTo({
+        left: 0,
+        top: noteState?.top || 0,
+        behavior: "auto"
+      });
+    } catch (e) {
+      logger("error", (e as Error).message, (e as Error).stack);
+    }
   }
 
   usePermissionHandler({
@@ -210,31 +214,6 @@ const Tiptap = ({
       onCreate() {
         setTimeout(() => {
           restoreNoteSelection();
-          const noteState = tabRef.current.noteId
-            ? useTabStore.getState().noteState[tabRef.current.noteId]
-            : undefined;
-          const top = noteState?.top;
-          logger(
-            "info",
-            "editor.onCreate",
-            tabRef.current?.noteId,
-            noteState?.top,
-            noteState?.to,
-            noteState?.from
-          );
-
-          if (noteState?.to || noteState?.from) {
-            editors[tabRef.current.id]?.chain().setTextSelection({
-              to: noteState.to,
-              from: noteState.from
-            });
-          }
-
-          containerRef.current?.scrollTo({
-            left: 0,
-            top: top || 0,
-            behavior: "auto"
-          });
         }, 32);
       },
       downloadOptions: {
