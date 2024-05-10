@@ -262,7 +262,7 @@ test("using Shift+Click when no notes are selected should not crash the app", as
   info.setTimeout(60 * 1000);
 
   const { notes } = await populateList(page, 5);
-  await page.reload();
+  await notes.focus();
 
   const note = await notes.findNote({ title: "Test note 3" });
 

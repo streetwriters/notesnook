@@ -284,11 +284,9 @@ test("change title of a locked note", async ({ page }) => {
   await page.waitForTimeout(150);
 
   await page.reload();
-  await page.waitForTimeout(500);
-
-  const editedNote = await notes.findNote({ title, content: NOTE.content });
+  await notes.waitForList();
+  const editedNote = await notes.findNote({ title });
   await editedNote?.openLockedNote(PASSWORD);
-  await notes.editor.waitForLoading();
   expect(await note?.getTitle()).toContain(title);
   expect(await notes.editor.getTitle()).toContain(title);
 });
