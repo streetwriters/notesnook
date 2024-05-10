@@ -255,6 +255,9 @@ const Tiptap = ({
       return !containerRef.current
         ? []
         : getTableOfContents(containerRef.current);
+    },
+    scrollTo: (top) => {
+      containerRef.current?.scrollTo({ top, behavior: "auto" });
     }
   });
   const controllerRef = useRef(controller);

@@ -123,10 +123,12 @@ export type EditorController = {
 };
 export function useEditorController({
   update,
-  getTableOfContents
+  getTableOfContents,
+  scrollTo
 }: {
   update: () => void;
   getTableOfContents: () => any[];
+  scrollTo: (top: number) => void;
 }): EditorController {
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const tab = useTabContext();
@@ -331,22 +333,29 @@ export function useEditorController({
       switch (type) {
         case "native:updatehtml": {
           htmlContentRef.current = value;
+          logger("info", "UPDATING NOTE HTML");
           if (tabRef.current.id !== useTabStore.getState().currentTab) {
             updateTabOnFocus.current = true;
           } else {
             if (!editor) break;
-            const { from, to } = editor.state.selection;
+
+            const noteState = tabRef.current?.noteId
+              ? useTabStore.getState().noteState[tabRef.current?.noteId]
+              : null;
+
             editor?.commands.setContent(htmlContentRef.current, false, {
               preserveWhitespace: true
             });
 
-            if (editor.isFocused && (to !== 1 || from !== 1)) {
-              logger("info", "Setting focus", to, from);
+            if (noteState) {
               editor.commands.setTextSelection({
-                from,
-                to
+                from: noteState.from,
+                to: noteState.to
               });
             }
+
+            scrollTo?.(noteState?.top || 0);
+
             countWords(0);
           }
 
