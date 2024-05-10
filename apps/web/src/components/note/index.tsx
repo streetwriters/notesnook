@@ -284,7 +284,8 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevProps.reminder?.dateModified === nextProps.reminder?.dateModified &&
     prevProps.attachments?.failed === nextProps.attachments?.failed &&
     prevProps.attachments?.total === nextProps.attachments?.total &&
-    prevProps.locked === nextProps.locked
+    prevProps.locked === nextProps.locked &&
+    prevProps.color?.id === nextProps.color?.id
   );
 });
 
