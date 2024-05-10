@@ -88,23 +88,30 @@ async function saveContent(
       type: "tiptap",
       data: content
     }),
-    new Promise((resolve) =>
-      setTimeout(() => {
-        const { hide } = showToast(
-          "error",
-          "Saving this note is taking too long. Copy your changes and restart the app to prevent data loss. If the problem persists, please report it to us at support@streetwriters.co.",
-          [
-            {
-              text: "Dismiss",
-              onClick: () => hide()
-            }
-          ],
-          0
-        );
-        resolve(undefined);
-      }, 30 * 1000)
+    new Promise((_, reject) =>
+      setTimeout(
+        () =>
+          reject(
+            new Error(
+              "Saving this note is taking too long. Copy your changes and restart the app to prevent data loss. If the problem persists, please report it to us at support@streetwriters.co."
+            )
+          ),
+        30 * 1000
+      )
     )
-  ]);
+  ]).catch((e) => {
+    const { hide } = showToast(
+      "error",
+      (e as Error).message,
+      [
+        {
+          text: "Dismiss",
+          onClick: () => hide()
+        }
+      ],
+      0
+    );
+  });
 }
 const deferredSave = debounceWithId(saveContent, 100);
 
