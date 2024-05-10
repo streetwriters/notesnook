@@ -148,7 +148,7 @@ jobs:
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-x86_64.apk
 
       - name: Upload sourcemaps
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: sourcemaps
           path: |

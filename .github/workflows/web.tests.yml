@@ -40,7 +40,7 @@ jobs:
         run: npm run build:test:web
 
       - name: Archive build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: apps/web/build/**/*
@@ -56,7 +56,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: ./apps/web/build
@@ -88,7 +88,7 @@ jobs:
         working-directory: apps/web
 
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: test-results-${{ matrix.shard }}
