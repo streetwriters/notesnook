@@ -478,7 +478,8 @@ const Tiptap = ({
           <p
             style={{
               width: "90%",
-              fontSize: "0.9rem"
+              fontSize: "0.9rem",
+              color: colors.primary.paragraph
             }}
           >
             <ol>
