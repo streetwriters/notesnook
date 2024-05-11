@@ -601,19 +601,10 @@ export const useActions = ({
         return;
       }
       const text = await convertNoteToText(item as Note, false);
-      if (!text) {
-        ToastManager.error(
-          new Error(Errors.export("text")),
-          undefined,
-          "local"
-        );
-        return;
-      }
-
-      const html = text.replace(/\n/g, "<br />");
+      const html = (text || "").replace(/\n/g, "<br />");
       await Notifications.displayNotification({
         title: item.title,
-        message: (item as Note).headline || text,
+        message: (item as Note).headline || text || "",
         subtitle: "",
         bigText: html,
         ongoing: true,
@@ -684,15 +675,11 @@ export const useActions = ({
       } else {
         processingId.current = "shareNote";
         const convertedText = await convertNoteToText(item);
-        if (!convertedText) {
-          ToastManager.error(new Error(Errors.export("text")));
-          return;
-        }
         processingId.current = undefined;
         Share.open({
           title: "Share note to",
           failOnCancel: false,
-          message: convertedText
+          message: [item.title, "\n\n", convertedText || ""].join("\n")
         });
       }
     }
@@ -772,11 +759,7 @@ export const useActions = ({
         } else {
           processingId.current = "copyContent";
           const text = await convertNoteToText(item as Note, true);
-          if (!text) {
-            ToastManager.error(new Error(Errors.export("text")));
-            return;
-          }
-          Clipboard.setString(text);
+          Clipboard.setString(text || "");
           processingId.current = undefined;
           ToastManager.show({
             heading: "Note copied to clipboard",
