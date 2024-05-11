@@ -301,5 +301,5 @@ function LinkTool(props: LinkToolProps) {
 }
 
 function isInternalLink(href?: string | null) {
-  return !!href?.startsWith("nn://");
+  return typeof href === "string" ? href.startsWith("nn://") : false;
 }
