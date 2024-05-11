@@ -600,7 +600,7 @@ export const useActions = ({
         });
         return;
       }
-      const text = await convertNoteToText(item as Note, false);
+      const text = await convertNoteToText(item as Note, true);
       const html = (text || "").replace(/\n/g, "<br />");
       await Notifications.displayNotification({
         title: item.title,
@@ -679,7 +679,7 @@ export const useActions = ({
         Share.open({
           title: "Share note to",
           failOnCancel: false,
-          message: [item.title, "\n\n", convertedText || ""].join("\n")
+          message: convertedText || ""
         });
       }
     }

@@ -952,13 +952,13 @@ async function pinNote(id: string) {
     const note = await db.notes.note(id as string);
     if (!note) return;
 
-    let text = await convertNoteToText(note, false);
+    let text = await convertNoteToText(note, true);
     if (!text) text = "";
     const html = text.replace(/\n/g, "<br />");
     Notifications.displayNotification({
       title: note.title,
       message: note.headline || text,
-      subtitle: note.headline || text,
+      subtitle: "",
       bigText: html,
       ongoing: true,
       actions: ["UNPIN"],

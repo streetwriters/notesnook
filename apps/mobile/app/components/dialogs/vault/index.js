@@ -586,7 +586,7 @@ export class VaultDialog extends Component {
   }
 
   async _copyNote(note) {
-    Clipboard.setString(await convertNoteToText(note));
+    Clipboard.setString((await convertNoteToText(note, true)) || "");
     ToastManager.show({
       heading: "Note copied",
       type: "success",
@@ -602,7 +602,7 @@ export class VaultDialog extends Component {
       await Share.open({
         heading: "Share note",
         failOnCancel: false,
-        message: await convertNoteToText(note)
+        message: (await convertNoteToText(note)) || ""
       });
     } catch (e) {
       console.error(e);
