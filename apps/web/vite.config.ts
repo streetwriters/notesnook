@@ -56,6 +56,7 @@ export default defineConfig({
     minify: "esbuild",
     cssMinify: true,
     emptyOutDir: true,
+    sourcemap: !isDesktop,
     rollupOptions: {
       output: {
         plugins: [emitEditorStyles()],
