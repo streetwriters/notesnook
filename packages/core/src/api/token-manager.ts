@@ -94,7 +94,7 @@ class TokenManager {
   ) {
     return await getSafeToken(async () => {
       const token = await this.getToken(true, forceRenew);
-      if (!token) return;
+      if (!token || !token.scope) return;
       if (!scopes.some((s) => token.scope.includes(s))) return;
       return token.access_token;
     }, "Error getting access token:");
