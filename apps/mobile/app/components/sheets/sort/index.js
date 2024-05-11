@@ -86,16 +86,16 @@ const Sort = ({ type, screen }) => {
         <Button
           title={
             groupOptions?.sortDirection === "asc"
-              ? groupOptions.groupBy === "abc" ||
-                groupOptions.sortBy === "title"
+              ? groupOptions?.groupBy === "abc" ||
+                groupOptions?.sortBy === "title"
                 ? "A - Z"
-                : groupOptions.sortBy === "dueDate"
+                : groupOptions?.sortBy === "dueDate"
                 ? "Earliest first"
                 : "Old - New"
-              : groupOptions.groupBy === "abc" ||
-                groupOptions.sortBy === "title"
+              : groupOptions?.groupBy === "abc" ||
+                groupOptions?.sortBy === "title"
               ? "Z - A"
-              : groupOptions.sortBy === "dueDate"
+              : groupOptions?.sortBy === "dueDate"
               ? "Latest first"
               : "New - Old"
           }
@@ -134,7 +134,7 @@ const Sort = ({ type, screen }) => {
           alignItems: "center"
         }}
       >
-        {groupOptions.groupBy === "abc" ? (
+        {groupOptions?.groupBy === "abc" ? (
           <Button
             type="secondary"
             title="Title"
@@ -154,18 +154,18 @@ const Sort = ({ type, screen }) => {
               item === "dateEdited") ? null : (
               <Button
                 key={item}
-                type={groupOptions.sortBy === item ? "selected" : "plain"}
+                type={groupOptions?.sortBy === item ? "selected" : "plain"}
                 title={SORT[item]}
                 height={40}
                 iconPosition="left"
-                icon={groupOptions.sortBy === item ? "check" : null}
+                icon={groupOptions?.sortBy === item ? "check" : null}
                 style={{
                   marginRight: 10,
                   paddingHorizontal: 8
                 }}
                 buttonType={{
                   text:
-                    groupOptions.sortBy === item
+                    groupOptions?.sortBy === item
                       ? colors.primary.accent
                       : colors.secondary.paragraph
                 }}
@@ -213,11 +213,11 @@ const Sort = ({ type, screen }) => {
                 key={item}
                 testID={"btn-" + item}
                 type={
-                  groupOptions.groupBy === GROUP[item] ? "selected" : "plain"
+                  groupOptions?.groupBy === GROUP[item] ? "selected" : "plain"
                 }
                 buttonType={{
                   text:
-                    groupOptions.groupBy === GROUP[item]
+                    groupOptions?.groupBy === GROUP[item]
                       ? colors.primary.accent
                       : colors.secondary.paragraph
                 }}
@@ -235,7 +235,7 @@ const Sort = ({ type, screen }) => {
                   updateGroupOptions(_groupOptions);
                 }}
                 height={40}
-                icon={groupOptions.groupBy === GROUP[item] ? "check" : null}
+                icon={groupOptions?.groupBy === GROUP[item] ? "check" : null}
                 title={
                   item.slice(0, 1).toUpperCase() + item.slice(1, item.length)
                 }
