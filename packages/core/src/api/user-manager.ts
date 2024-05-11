@@ -191,7 +191,7 @@ class UserManager {
         username: email,
         password: hashedPassword,
         grant_type: code ? "mfa" : "password",
-        scope: "notesnook.sync offline_access openid IdentityServerApi",
+        scope: "notesnook.sync offline_access IdentityServerApi",
         client_id: "notesnook",
         "mfa:code": code,
         "mfa:method": method

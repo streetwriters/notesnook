@@ -32,6 +32,15 @@ export type Token = {
   refresh_token: string;
 };
 
+type Scope = (typeof SCOPES)[number];
+
+const SCOPES = [
+  "notesnook.sync",
+  "offline_access",
+  "IdentityServerApi",
+  "auth:grant_types:mfa",
+  "auth:grant_types:mfa_password"
+] as const;
 const ENDPOINTS = {
   token: "/connect/token",
   revoke: "/connect/revocation",
@@ -79,10 +88,14 @@ class TokenManager {
     return scopes.includes("offline_access") && Boolean(refresh_token);
   }
 
-  async getAccessToken(forceRenew = false) {
+  async getAccessToken(
+    scopes: Scope[] = ["notesnook.sync", "IdentityServerApi"],
+    forceRenew = false
+  ) {
     return await getSafeToken(async () => {
       const token = await this.getToken(true, forceRenew);
-      if (!token || token.scope.includes("auth:grant_types")) return;
+      if (!token) return;
+      if (!scopes.some((s) => token.scope.includes(s))) return;
       return token.access_token;
     }, "Error getting access token:");
   }

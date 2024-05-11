@@ -92,7 +92,10 @@ class MFAManager {
   }
 
   async sendCode(method: "sms" | "email") {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.tokenManager.getAccessToken([
+      "IdentityServerApi",
+      "auth:grant_types:mfa"
+    ]);
     if (!token) throw new Error("Unauthorized.");
 
     return await http.post(
