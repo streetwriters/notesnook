@@ -162,9 +162,9 @@ function getErrorHelp(props: FallbackProps) {
   if (
     errorText.includes("file is not a database") ||
     errorText.includes("unsupported file format") ||
-    errorText.includes("database disk image is malformed") ||
     errorText.includes("null function or function signature mismatch") ||
-    errorText.includes("malformed database schema")
+    errorText.includes("malformed database schema") ||
+    /table ".+?" already exists/.test(errorText)
   ) {
     return {
       explanation: `This error usually means the database file is either corrupt or it could not be decrypted.`,
@@ -192,6 +192,17 @@ function getErrorHelp(props: FallbackProps) {
         const dialect = createDialect("notesnook");
         const driver = dialect.createDriver();
         await driver.delete();
+        resetErrorBoundary();
+      }
+    };
+  } else if (errorText.includes("database disk image is malformed")) {
+    return {
+      explanation: `This error usually means the search index is corrupted.`,
+      action:
+        "This error can be fixed by rebuilding the search index. This action won't result in any kind of data loss.",
+      fix: async () => {
+        const { db } = await import("../../common/db");
+        await db.lookup.rebuild();
         resetErrorBoundary();
       }
     };
