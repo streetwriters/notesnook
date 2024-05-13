@@ -21,10 +21,10 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
-import Editor from "../../screens/editor";
+import { ReadonlyEditor } from "../../screens/editor/readonly-editor";
 import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../screens/editor/tiptap/utils";
-import { eSendEvent, ToastManager } from "../../services/event-manager";
+import { ToastManager, eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrashStore } from "../../stores/use-trash-store";
@@ -34,7 +34,7 @@ import DialogHeader from "../dialog/dialog-header";
 import { presentDialog } from "../dialog/functions";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
-import { ReadonlyEditor } from "../../screens/editor/readonly-editor";
+import { diff } from "diffblazer";
 
 /**
  *
@@ -121,12 +121,21 @@ export default function NotePreview({ session, content, note }) {
           <ReadonlyEditor
             editorId="historyPreview"
             onLoad={async (loadContent) => {
-              if (content.data) {
-                const _note = note || (await db.notes.note(session?.noteId));
-                loadContent({
-                  data: content.data,
-                  id: _note.id
-                });
+              try {
+                if (content.data) {
+                  const _note = note || (await db.notes.note(session?.noteId));
+                  const currentContent = await db.content.get(_note.contentId);
+                  loadContent({
+                    data: diff(currentContent.data, content.data),
+                    id: _note.id
+                  });
+                }
+              } catch (e) {
+                ToastManager.error(
+                  e,
+                  "Failed to load history preview",
+                  "local"
+                );
               }
             }}
           />

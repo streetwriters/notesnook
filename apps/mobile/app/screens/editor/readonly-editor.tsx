@@ -75,14 +75,16 @@ export function ReadonlyEditor(props: {
     if (editorMessage.type === EventTypes.readonlyEditorLoaded) {
       console.log("Readonly editor loaded.");
       props.onLoad?.((content: { data: string; id: string }) => {
-        noteId.current = content.id;
-        editorRef.current?.postMessage(
-          JSON.stringify({
-            type: "native:html",
-            value: content.data
-          })
-        );
-        setLoading(false);
+        setTimeout(() => {
+          noteId.current = content.id;
+          editorRef.current?.postMessage(
+            JSON.stringify({
+              type: "native:html",
+              value: content.data
+            })
+          );
+          setLoading(false);
+        }, 300);
       });
     } else if (editorMessage.type === EventTypes.getAttachmentData) {
       const attachment = (editorMessage.value as any).attachment as Attachment;
