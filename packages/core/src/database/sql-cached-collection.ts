@@ -38,7 +38,7 @@ export class SQLCachedCollection<
     startTransaction: (
       executor: (tr: Kysely<DatabaseSchema>) => Promise<void>
     ) => Promise<void>,
-    type: TCollectionType,
+    public type: TCollectionType,
     eventManager: EventManager,
     sanitizer: Sanitizer
   ) {

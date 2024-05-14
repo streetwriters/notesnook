@@ -57,36 +57,33 @@ class Collector {
       const collection = this.db[collectionKey].collection;
       let pushTimestamp = Date.now();
       for await (const chunk of collection.unsynced(chunkSize, isForceSync)) {
-        const items = await this.prepareChunk(chunk, key);
+        const { ids, items: syncableItems } = filterSyncableItems(chunk);
+        if (!ids.length) continue;
+        const ciphers = await this.db
+          .storage()
+          .encryptMulti(key, syncableItems);
+        const items = toPushItem(ids, ciphers);
         if (!items) continue;
         yield { items, type: itemType };
 
-        await collection.update(
-          chunk.map((i) => i.id),
-          { synced: true },
-          {
-            sendEvent: false,
-            // EDGE CASE:
-            // Sometimes an item can get updated while it's being pushed.
-            // The result is that its `synced` property becomes true even
-            // though it's modification wasn't yet synced.
-            // In order to prevent that, we only set the `synced` property
-            // to true for items that haven't been modified since we last ran
-            // the push. Everything else will be collected again in the next
-            // push.
-            condition: (eb) => eb("dateModified", "<=", pushTimestamp)
-          }
-        );
+        await this.db
+          .sql()
+          .updateTable(collection.type)
+          .where("id", "in", ids)
+          // EDGE CASE:
+          // Sometimes an item can get updated while it's being pushed.
+          // The result is that its `synced` property becomes true even
+          // though it's modification wasn't yet synced.
+          // In order to prevent that, we only set the `synced` property
+          // to true for items that haven't been modified since we last ran
+          // the push. Everything else will be collected again in the next
+          // push.
+          .where("dateModified", "<=", pushTimestamp)
+          .set({ synced: true })
+          .execute();
         pushTimestamp = Date.now();
       }
     }
-  }
-
-  async prepareChunk(chunk: MaybeDeletedItem<Item>[], key: SerializedKey) {
-    const { ids, items } = filterSyncableItems(chunk);
-    if (!ids.length) return;
-    const ciphers = await this.db.storage().encryptMulti(key, items);
-    return toPushItem(ids, ciphers);
   }
 }
 export default Collector;

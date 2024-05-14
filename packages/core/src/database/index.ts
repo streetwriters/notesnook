@@ -160,6 +160,7 @@ type AsyncOrSyncResult<Async extends boolean, Response> = Async extends true
   : Response;
 
 export interface DatabaseCollection<T, IsAsync extends boolean> {
+  type: keyof DatabaseSchema;
   clear(): Promise<void>;
   init(): Promise<void>;
   upsert(item: T): Promise<void>;

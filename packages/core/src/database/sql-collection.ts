@@ -75,7 +75,7 @@ export class SQLCollection<
     _startTransaction: (
       executor: (tr: Kysely<DatabaseSchema>) => Promise<void>
     ) => Promise<void>,
-    private readonly type: TCollectionType,
+    public readonly type: TCollectionType,
     private readonly eventManager: EventManager,
     private readonly sanitizer: Sanitizer
   ) {}

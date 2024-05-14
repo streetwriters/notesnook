@@ -156,6 +156,34 @@ test(
   TEST_TIMEOUT * 10
 );
 
+test(
+  "issue: syncing should not affect the items' dateModified",
+  async (t) => {
+    const [deviceA] = await Promise.all([initializeDevice("deviceA")]);
+
+    t.onTestFinished(async (r) => {
+      console.log(`${t.task.name} log out`);
+      await cleanup(deviceA);
+    });
+
+    const noteId = await deviceA.notes.add({
+      title: "Test note from device A",
+      content: { data: "<p>Hello</p>", type: "tiptap" }
+    });
+    const noteDateBefore = (await deviceA.notes.note(noteId)).dateModified;
+    const contentDateBefore = (await deviceA.content.findByNoteId(noteId))
+      .dateModified;
+    await deviceA.sync({ type: "full" });
+    const noteDateAfter = (await deviceA.notes.note(noteId)).dateModified;
+    const contentDateAfter = (await deviceA.content.findByNoteId(noteId))
+      .dateModified;
+    expect(noteDateBefore).toBe(noteDateAfter);
+    expect(contentDateBefore).toBe(contentDateAfter);
+  },
+  TEST_TIMEOUT
+);
+
+
 // test(
 //   "case 4: Device A's sync is interrupted halfway and Device B makes some changes afterwards and syncs.",
 //   async () => {
