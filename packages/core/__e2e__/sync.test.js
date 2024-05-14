@@ -28,7 +28,7 @@ import { login } from "./utils";
 import { SqliteDialect } from "kysely";
 import BetterSQLite3 from "better-sqlite3-multiple-ciphers";
 
-const TEST_TIMEOUT = 30 * 1000;
+const TEST_TIMEOUT = 60 * 1000;
 
 test(
   "case 1: device A & B should only download the changes from device C (no uploading)",
@@ -183,6 +183,44 @@ test(
   TEST_TIMEOUT
 );
 
+test(
+  "case 4: local content changed after remote content should create a conflict",
+  async (t) => {
+    const [deviceA, deviceB] = await Promise.all([
+      initializeDevice("deviceA"),
+      initializeDevice("deviceB")
+    ]);
+
+    t.onTestFinished(async (r) => {
+      console.log(`${t.task.name} log out`);
+      await cleanup(deviceA, deviceB);
+    });
+
+    const noteId = await deviceA.notes.add({
+      title: "Test note from device A",
+      content: { data: "<p>Hello</p>", type: "tiptap" }
+    });
+    await deviceA.sync({ type: "full" });
+    await deviceB.sync({ type: "full" });
+
+    await deviceB.notes.add({
+      id: noteId,
+      content: { data: "<p>Hello (I am from device B)</p>", type: "tiptap" }
+    });
+    await deviceB.sync({ type: "full" });
+
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+
+    await deviceA.notes.add({
+      id: noteId,
+      content: { data: "<p>Hello (I am from device A)</p>", type: "tiptap" }
+    });
+    await deviceA.sync({ type: "full" });
+
+    expect(await deviceA.notes.conflicted.count()).toBeGreaterThan(0);
+  },
+  TEST_TIMEOUT * 10
+);
 
 // test(
 //   "case 4: Device A's sync is interrupted halfway and Device B makes some changes afterwards and syncs.",
@@ -406,6 +444,8 @@ test(
  * @returns {Promise<Database>}
  */
 async function initializeDevice(id, capabilities = []) {
+  // initialize(new NodeStorageInterface(), false);
+
   console.time(`Init ${id}`);
   EV.subscribe(EVENTS.userCheckStatus, async (type) => {
     return {
