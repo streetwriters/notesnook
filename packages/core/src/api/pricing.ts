@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import http from "../utils/http";
 
-type Product = {
+export type Product = {
   country: string;
   countryCode: string;
   sku?: string;

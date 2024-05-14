@@ -22,20 +22,14 @@ import { Platform } from "react-native";
 import { Subscription } from "react-native-iap";
 import PremiumService from "../services/premium";
 import { db } from "../common/database";
+import { Product } from "@notesnook/core/dist/api/pricing";
 
-type PurchaseInfo = {
-  country: string;
-  countryCode: string;
-  sku: string;
-  discount: number;
-};
-
-const skuInfos: { [name: string]: PurchaseInfo | undefined } = {};
+const skuInfos: { [name: string]: Product | undefined } = {};
 
 export const usePricing = (period: "monthly" | "yearly") => {
   const [current, setCurrent] = useState<{
     period: string;
-    info?: PurchaseInfo;
+    info?: Product;
     product?: Subscription;
   }>();
 
@@ -54,6 +48,7 @@ export const usePricing = (period: "monthly" | "yearly") => {
           period
         ));
       skuInfos[period] = skuInfo;
+
       const products = (await PremiumService.getProducts()) as Subscription[];
       let product = products.find((p) => p.productId === skuInfo?.sku);
       if (!product)
