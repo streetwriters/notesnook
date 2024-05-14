@@ -175,10 +175,7 @@ export class Content implements ICollection {
     const content = await this.collection.get(id);
     if (!content || isDeleted(content)) return;
     if (!content.locked && this.preProcess(content)) {
-      await this.db.content.add({
-        ...content,
-        sessionId: `${Date.now()}`
-      });
+      await this.collection.update([content.id], content, { modify: false });
     }
     return content;
   }
@@ -246,10 +243,7 @@ export class Content implements ICollection {
       .executeTakeFirst()) as ContentItem;
     if (!content || isDeleted(content)) return;
     if (!content.locked && this.preProcess(content)) {
-      await this.db.content.add({
-        ...content,
-        sessionId: `${Date.now()}`
-      });
+      await this.collection.update([content.id], content, { modify: false });
     }
     return content;
   }

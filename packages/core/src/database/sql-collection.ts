@@ -227,14 +227,16 @@ export class SQLCollection<
     ids: string[],
     partial: Partial<SQLiteItem<T>>,
     options: {
-      sendEvent: boolean;
+      sendEvent?: boolean;
+      modify?: boolean;
       condition?: ExpressionOrFactory<
         DatabaseSchema,
         keyof DatabaseSchema,
         SqlBool
       >;
-    } = { sendEvent: true }
+    } = {}
   ) {
+    const { sendEvent = true, modify = true, condition } = options;
     if (!this.sanitizer.sanitize(this.type, partial)) return;
 
     await this.db()
@@ -244,16 +246,16 @@ export class SQLCollection<
           await tx
             .updateTable<keyof DatabaseSchema>(this.type)
             .where("id", "in", chunk)
-            .$if(!!options.condition, (eb) => eb.where(options.condition!))
+            .$if(!!condition, (eb) => eb.where(condition!))
             .set({
               ...partial,
-              dateModified: Date.now(),
+              dateModified: modify ? Date.now() : undefined,
               synced: partial.synced || false
             })
             .execute();
         }
       });
-    if (options.sendEvent) {
+    if (sendEvent) {
       this.eventManager.publish(EVENTS.databaseUpdated, <UpdateEvent>{
         type: "update",
         collection: this.type,
