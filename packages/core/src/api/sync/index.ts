@@ -242,6 +242,19 @@ class Sync {
 
     this.connection?.off("SendItems");
     this.connection?.off("SendVaultKey");
+
+    await this.db
+      .sql()
+      .updateTable("notes")
+      .where("id", "in", (eb) =>
+        eb
+          .selectFrom("content")
+          .select("noteId as id")
+          .where("conflicted", "is not", null)
+          .$castTo<string | null>()
+      )
+      .set({ conflicted: true })
+      .execute();
   }
 
   async send(deviceId: string, isForceSync?: boolean) {
@@ -334,10 +347,8 @@ class Sync {
     const localItems = await collection.records(chunk.items.map((i) => i.id));
     let items: (MaybeDeletedItem<Item> | undefined)[] = [];
     if (itemType === "content") {
-      items = await Promise.all(
-        deserialized.map((item) =>
-          this.merger.mergeContent(item, localItems[item.id])
-        )
+      items = deserialized.map((item) =>
+        this.merger.mergeContent(item, localItems[item.id])
       );
     } else {
       items =

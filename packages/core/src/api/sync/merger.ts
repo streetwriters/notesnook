@@ -46,7 +46,7 @@ class Merger {
     }
   }
 
-  async mergeContent(
+  mergeContent(
     remoteItem: MaybeDeletedItem<Item>,
     localItem: MaybeDeletedItem<Item> | undefined
   ) {
@@ -75,10 +75,7 @@ class Merger {
       else if (!conflicted) return;
 
       // otherwise we trigger the conflicts
-      await this.db.notes.add({
-        id: localItem.noteId,
-        conflicted: true
-      });
+      this.logger.info("conflict marked", { id: localItem.noteId });
       localItem.conflicted = remoteItem;
       return localItem;
     }
