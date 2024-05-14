@@ -29,6 +29,9 @@ globalThis.statusBars = {};
 export type TabItem = {
   id: number;
   noteId?: string;
+  /**
+   * @deprecated
+   */
   previewTab?: boolean;
   readonly?: boolean;
   locked?: boolean;
@@ -66,6 +69,10 @@ export type TabStore = {
   setNoteState: (noteId: string, state: Partial<NoteState>) => void;
   biometryAvailable?: boolean;
   biometryEnrolled?: boolean;
+  canGoBack?: boolean;
+  canGoForward?: boolean;
+  sessionId?: string;
+  getNoteState: (noteId: string) => NoteState | undefined;
 };
 
 function getId(id: number, tabs: TabItem[]): number {
@@ -80,16 +87,36 @@ export const useTabStore = create(
   persist<TabStore>(
     (set, get) => ({
       noteState: {},
+      getNoteState: (noteId: string) => {
+        const sessionId = get().sessionId;
+        const session = sessionId ? global.sessions.get(sessionId) : undefined;
+        if (session?.noteId === noteId) {
+          return {
+            top: session.scrollTop,
+            to: session.to,
+            from: session.from
+          };
+        }
+        return undefined;
+      },
       tabs: [
         {
-          id: 0,
-          previewTab: true
+          id: 0
         }
       ],
       currentTab: 0,
       scrollPosition: {},
       setNoteState: (noteId: string, state: Partial<NoteState>) => {
         if (editorControllers[get().currentTab]?.loading) return;
+
+        const sessionId = get().sessionId;
+        if (sessionId) {
+          globalThis.sessions.updateSession(sessionId, {
+            from: state.from,
+            to: state.to,
+            scrollTop: state.top
+          });
+        }
 
         const noteState = {
           ...get().noteState
@@ -127,21 +154,7 @@ export const useTabStore = create(
           scrollPosition
         });
       },
-      focusPreviewTab: (noteId: string, options) => {
-        const index = get().tabs.findIndex((t) => t.previewTab);
-        if (index == -1) return get().newTab(noteId, true);
-        const tabs = [...get().tabs];
-        tabs[index] = {
-          ...tabs[index],
-          noteId: noteId,
-          previewTab: true,
-          ...options
-        };
-
-        set({
-          currentTab: tabs[index].id
-        });
-      },
+      focusPreviewTab: (noteId: string, options) => {},
       focusEmptyTab: () => {
         const index = get().tabs.findIndex((t) => !t.noteId);
         if (index == -1) return get().newTab();
@@ -159,8 +172,7 @@ export const useTabStore = create(
           ...get().tabs,
           {
             id: id,
-            noteId,
-            previewTab: previewTab
+            noteId
           }
         ];
         set({

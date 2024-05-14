@@ -21,6 +21,8 @@ import { Editor, ToolbarGroupDefinition } from "@notesnook/editor";
 import { ThemeDefinition } from "@notesnook/theme";
 import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import { EditorController } from "../hooks/useEditorController";
+import { EditorSessions } from "@notesnook/common/dist/utils/editor-sessions";
+import { EditorEvents } from "./editor-events";
 
 globalThis.sessionId = "notesnook-editor";
 globalThis.pendingResolvers = {};
@@ -61,6 +63,7 @@ declare global {
   };
 
   var readonlyEditor: boolean;
+  var sessions: EditorSessions;
   var statusBars: Record<
     number,
     | React.MutableRefObject<{
@@ -150,8 +153,8 @@ declare global {
    * @param value
    */
 
-  function post<T extends keyof typeof EventTypes>(
-    type: (typeof EventTypes)[T],
+  function post<T extends keyof typeof EditorEvents>(
+    type: (typeof EditorEvents)[T],
     value?: unknown,
     tabId?: number,
     noteId?: string,
@@ -184,44 +187,6 @@ export function getOnMessageListener(callback: () => void) {
   };
 }
 
-/* eslint-enable no-var */
-
-export const EventTypes = {
-  selection: "editor-event:selection",
-  content: "editor-event:content",
-  title: "editor-event:title",
-  scroll: "editor-event:scroll",
-  history: "editor-event:history",
-  newtag: "editor-event:newtag",
-  tag: "editor-event:tag",
-  filepicker: "editor-event:picker",
-  download: "editor-event:download-attachment",
-  logger: "native:logger",
-  back: "editor-event:back",
-  pro: "editor-event:pro",
-  monograph: "editor-event:monograph",
-  properties: "editor-event:properties",
-  fullscreen: "editor-event:fullscreen",
-  link: "editor-event:link",
-  contentchange: "editor-event:content-change",
-  reminders: "editor-event:reminders",
-  previewAttachment: "editor-event:preview-attachment",
-  copyToClipboard: "editor-events:copy-to-clipboard",
-  getAttachmentData: "editor-events:get-attachment-data",
-  tabsChanged: "editor-events:tabs-changed",
-  showTabs: "editor-events:show-tabs",
-  tabFocused: "editor-events:tab-focused",
-  toc: "editor-events:toc",
-  createInternalLink: "editor-events:create-internal-link",
-  load: "editor-events:load",
-  unlock: "editor-events:unlock",
-  unlockWithBiometrics: "editor-events:unlock-biometrics",
-  disableReadonlyMode: "editor-events:disable-readonly-mode",
-  readonlyEditorLoaded: "readonlyEditorLoaded",
-  error: "editorError",
-  dbLogger: "editor-events:dbLogger"
-} as const;
-
 export function randId(prefix: string) {
   return Math.random()
     .toString(36)
@@ -244,7 +209,7 @@ export function logger(
     })
     .join(" ");
 
-  post(EventTypes.logger, `[${type}]: ` + logString);
+  post(EditorEvents.logger, `[${type}]: ` + logString);
 }
 
 export function dbLogger(type: "error" | "log", ...logs: unknown[]): void {
@@ -254,7 +219,7 @@ export function dbLogger(type: "error" | "log", ...logs: unknown[]): void {
     })
     .join(" ");
 
-  post(EventTypes.dbLogger, {
+  post(EditorEvents.dbLogger, {
     message: `[${type}]: ` + logString,
     error: logs[0] instanceof Error ? logs[0] : undefined
   });
@@ -335,3 +300,10 @@ export function getTheme() {
   }
   return undefined;
 }
+
+const editorSessions = new EditorSessions({
+  getGlobalNoteState: () => {
+    return globalThis.tabStore.getState().noteState;
+  }
+});
+globalThis.sessions = editorSessions;
