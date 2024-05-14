@@ -179,7 +179,7 @@ class Database {
   subscriptions = new Subscriptions(this.tokenManager);
   offers = new Offers();
   debug = new Debug();
-  pricing = new Pricing();
+  pricing = Pricing;
 
   user = new UserManager(this);
   syncer = new Sync(this);
