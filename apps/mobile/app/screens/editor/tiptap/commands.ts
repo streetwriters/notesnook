@@ -30,6 +30,7 @@ import { sleep } from "../../../utils/time";
 import { Settings } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { getResponse, randId, textInput } from "./utils";
+import { EditorSessionItem } from "./tab-history";
 
 type Action = { job: string; id: string };
 
@@ -167,9 +168,10 @@ if (typeof statusBar !== "undefined") {
   setLoading = async (loading?: boolean, tabId?: number) => {
     await this.doAsync(`
     const editorController = editorControllers[${
-      tabId || useTabStore.getState().currentTab
+      tabId === undefined ? useTabStore.getState().currentTab : tabId
     }];
     editorController.setLoading(${loading})
+    logger("info", editorController.setLoading);
     `);
   };
 
@@ -353,7 +355,46 @@ editor && editor.commands.insertImage({
       response = editorControllers[${tabId}]?.scrollIntoView("${id}") || [];
     `);
   };
-  //todo add replace image function
+
+  newSession = async (sessionId: string, tabId: number, noteId: string) => {
+    return this.doAsync(`
+      globalThis.sessions.newSession("${sessionId}", ${tabId}, "${noteId}");
+    `);
+  };
+
+  getSession = async (id: string): Promise<EditorSessionItem | false> => {
+    return this.doAsync(`
+      response = globalThis.sessions.get("${id}");
+    `);
+  };
+
+  deleteSession = async (id: string) => {
+    return this.doAsync(`
+      globalThis.sessions.delete("${id}");
+    `);
+  };
+
+  deleteSessionsForTabId = async (tabId: number) => {
+    return this.doAsync(`
+      globalThis.sessions.deleteForTabId(${tabId});
+    `);
+  };
+
+  updateSession = async (
+    id: string,
+    session: {
+      tabId: number;
+      noteId: string;
+      scrollTop: number;
+      from: number;
+      to: number;
+      sessionId: string;
+    }
+  ) => {
+    return this.doAsync(`
+      globalThis.sessions.updateSession("${id}", ${JSON.stringify(session)});
+    `);
+  };
 }
 
 export default Commands;

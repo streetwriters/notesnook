@@ -16,7 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { EventTypes, postAsyncWithTimeout, randId } from ".";
+import { postAsyncWithTimeout, randId } from ".";
+import { EditorEvents } from "./editor-events";
 
 class PendingSaveRequests {
   static TITLES = "pendingTitles";
@@ -118,7 +119,7 @@ class PendingSaveRequests {
       this.remove(PendingSaveRequests.TITLES);
       for (const pending of pendingTitles) {
         if (pending.params[0]) pending.params[0].pendingChanges = true;
-        await postAsyncWithTimeout(EventTypes.title, ...pending.params, 5000);
+        await postAsyncWithTimeout(EditorEvents.title, ...pending.params, 5000);
       }
     };
 
@@ -127,7 +128,11 @@ class PendingSaveRequests {
       this.remove(PendingSaveRequests.CONTENT);
       for (const pending of pendingContents) {
         if (pending.params[0]) pending.params[0].pendingChanges = true;
-        await postAsyncWithTimeout(EventTypes.content, ...pending.params, 5000);
+        await postAsyncWithTimeout(
+          EditorEvents.content,
+          ...pending.params,
+          5000
+        );
       }
     };
 
