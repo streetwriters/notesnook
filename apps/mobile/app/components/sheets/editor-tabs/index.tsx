@@ -96,11 +96,6 @@ const TabItemComponent = (props: {
         }
         props.close?.();
       }}
-      onLongPress={() => {
-        useTabStore.getState().updateTab(props.tab.id, {
-          previewTab: false
-        });
-      }}
     >
       <View
         style={{
@@ -154,8 +149,7 @@ const TabItemComponent = (props: {
           color={props.tab.pinned ? colors.primary.accent : colors.primary.icon}
           onPress={() => {
             useTabStore.getState().updateTab(props.tab.id, {
-              pinned: !props.tab.pinned,
-              previewTab: false
+              pinned: !props.tab.pinned
             });
           }}
           top={0}

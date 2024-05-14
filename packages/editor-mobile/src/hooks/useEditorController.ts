@@ -30,13 +30,8 @@ import {
   useRef,
   useState
 } from "react";
-import {
-  EventTypes,
-  getRoot,
-  post,
-  postAsyncWithTimeout,
-  saveTheme
-} from "../utils";
+import { getRoot, post, postAsyncWithTimeout, saveTheme } from "../utils";
+import { EditorEvents } from "../utils/editor-events";
 import { injectCss, transform } from "../utils/css";
 import { pendingSaveRequests } from "../utils/pending-saves";
 import { useTabContext, useTabStore } from "./useTabStore";
@@ -150,7 +145,11 @@ export function useEditorController({
   });
 
   if (!tabRef.current.noteId && loading) {
-    setLoading(false);
+    setTimeout(() => {
+      if (!tabRef.current.noteId && loading) {
+        setLoading(false);
+      }
+    }, 3000);
   }
 
   const selectionChange = useCallback((_editor: Editor) => {}, []);
@@ -158,7 +157,7 @@ export function useEditorController({
   const titleChange = useCallback(async (title: string) => {
     const currentSessionId = globalThis.sessionId;
     post(
-      EventTypes.contentchange,
+      EditorEvents.contentchange,
       undefined,
       tabRef.current.id,
       tabRef.current.noteId
@@ -172,7 +171,7 @@ export function useEditorController({
       currentSessionId
     ];
     const pendingTitleIds = await pendingSaveRequests.getPendingTitleIds();
-    postAsyncWithTimeout(EventTypes.title, ...params, 1000)
+    postAsyncWithTimeout(EditorEvents.title, ...params, 1000)
       .then(() => {
         if (pendingTitleIds.length) {
           dbLogger(
@@ -220,7 +219,7 @@ export function useEditorController({
       }
       const currentSessionId = globalThis.sessionId;
       post(
-        EventTypes.contentchange,
+        EditorEvents.contentchange,
         undefined,
         tabRef.current.id,
         tabRef.current.noteId
@@ -229,21 +228,22 @@ export function useEditorController({
       if (typeof timers.current.change === "number") {
         clearTimeout(timers.current?.change);
       }
+
+      const params = [
+        {
+          html: htmlContentRef.current,
+          ignoreEdit: ignoreEdit
+        },
+        tabRef.current.id,
+        tabRef.current.noteId,
+        currentSessionId
+      ];
+
       timers.current.change = setTimeout(async () => {
         htmlContentRef.current = editor.getHTML();
-
-        const params = [
-          {
-            html: htmlContentRef.current,
-            ignoreEdit: ignoreEdit
-          },
-          tabRef.current.id,
-          tabRef.current.noteId,
-          currentSessionId
-        ];
         const pendingContentIds =
           await pendingSaveRequests.getPendingContentIds();
-        postAsyncWithTimeout(EventTypes.content, ...params, 5000)
+        postAsyncWithTimeout(EditorEvents.content, ...params, 5000)
           .then(() => {
             if (pendingContentIds.length) {
               dbLogger(
@@ -274,12 +274,7 @@ export function useEditorController({
             }
           });
 
-        logger(
-          "info",
-          "Editor saving content",
-          tabRef.current.id,
-          tabRef.current.noteId
-        );
+        logger("info", "Editor saving content", params[1], params[2]);
       }, 300);
 
       countWords(5000);
@@ -333,14 +328,14 @@ export function useEditorController({
       switch (type) {
         case "native:updatehtml": {
           htmlContentRef.current = value;
-          logger("info", "UPDATING NOTE HTML");
+
           if (tabRef.current.id !== useTabStore.getState().currentTab) {
             updateTabOnFocus.current = true;
           } else {
             if (!editor) break;
 
             const noteState = tabRef.current?.noteId
-              ? useTabStore.getState().noteState[tabRef.current?.noteId]
+              ? useTabStore.getState().getNoteState(tabRef.current?.noteId)
               : null;
 
             editor?.commands.setContent(htmlContentRef.current, false, {
@@ -410,12 +405,17 @@ export function useEditorController({
   }, [onMessage]);
 
   const openFilePicker = useCallback((type: "image" | "file" | "camera") => {
-    post(EventTypes.filepicker, type, tabRef.current.id, tabRef.current.noteId);
+    post(
+      EditorEvents.filepicker,
+      type,
+      tabRef.current.id,
+      tabRef.current.noteId
+    );
   }, []);
 
   const downloadAttachment = useCallback((attachment: Attachment) => {
     post(
-      EventTypes.download,
+      EditorEvents.download,
       attachment,
       tabRef.current.id,
       tabRef.current.noteId
@@ -423,23 +423,23 @@ export function useEditorController({
   }, []);
   const previewAttachment = useCallback((attachment: Attachment) => {
     post(
-      EventTypes.previewAttachment,
+      EditorEvents.previewAttachment,
       attachment,
       tabRef.current.id,
       tabRef.current.noteId
     );
   }, []);
   const openLink = useCallback((url: string) => {
-    post(EventTypes.link, url, tabRef.current.id, tabRef.current.noteId);
+    post(EditorEvents.link, url, tabRef.current.id, tabRef.current.noteId);
     return true;
   }, []);
 
   const copyToClipboard = (text: string) => {
-    post(EventTypes.copyToClipboard, text);
+    post(EditorEvents.copyToClipboard, text);
   };
 
   const getAttachmentData = (attachment: Partial<Attachment>) => {
-    return postAsyncWithTimeout(EventTypes.getAttachmentData, {
+    return postAsyncWithTimeout(EditorEvents.getAttachmentData, {
       attachment
     });
   };

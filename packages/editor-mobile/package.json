@@ -17,7 +17,8 @@
     "react-dom": "^18.2.0",
     "react-freeze": "^1.0.3",
     "tinycolor2": "1.6.0",
-    "zustand": "^4.4.7"
+    "zustand": "^4.4.7",
+    "@notesnook/common": "file:../common"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",

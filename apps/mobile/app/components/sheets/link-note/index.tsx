@@ -22,23 +22,21 @@ import {
   VirtualizedGrouping,
   createInternalLink
 } from "@notesnook/core";
+import type { LinkAttributes } from "@notesnook/editor";
+import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import { db } from "../../../common/database";
 import { useDBItem } from "../../../hooks/use-db-item";
+import { editorController } from "../../../screens/editor/tiptap/utils";
 import { presentSheet } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import type { LinkAttributes } from "@notesnook/editor";
-import {
-  EditorEvents,
-  editorController
-} from "../../../screens/editor/tiptap/utils";
 
 const ListNoteItem = ({
   id,
@@ -193,7 +191,7 @@ export default function LinkNote(props: {
           }
         : undefined
     );
-    editorController.current?.postMessage(EditorEvents.resolve, {
+    editorController.current?.postMessage(NativeEvents.resolve, {
       data: {
         href: link,
         title: selectedNote.title

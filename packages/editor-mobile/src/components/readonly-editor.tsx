@@ -27,7 +27,8 @@ import {
   useState
 } from "react";
 import { useSettings } from "../hooks/useSettings";
-import { EventTypes, Settings, isReactNative, randId } from "../utils";
+import { Settings, isReactNative, randId } from "../utils";
+import { EditorEvents } from "../utils/editor-events";
 
 export const ReadonlyEditorProvider = (): JSX.Element => {
   const settings = useSettings();
@@ -95,7 +96,7 @@ const Tiptap = ({
             delete pendingResolvers[resolverId];
             resolve(data);
           };
-          post(EventTypes.getAttachmentData, {
+          post(EditorEvents.getAttachmentData, {
             attachment,
             resolverId: resolverId
           });
@@ -142,7 +143,7 @@ const Tiptap = ({
     if (isSafari) {
       root = window;
     }
-    post(EventTypes.readonlyEditorLoaded);
+    post(EditorEvents.readonlyEditorLoaded);
 
     const onMessage = (event: any) => {
       if (event?.data?.[0] !== "{") return;

@@ -18,8 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import create from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
+import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
+import { eSendEvent } from "../../../services/event-manager";
+import { eOnLoadNote } from "../../../utils/events";
 import { editorController } from "./utils";
+import { TabHistory } from "@notesnook/common/dist/utils/tab-history";
 
 class History {
   history: number[];
@@ -36,7 +40,7 @@ class History {
     this.history.unshift(item); // Add item to the beginning of the array
 
     useTabStore.setState({
-      tabHistory: this.history.slice()
+      history: this.history.slice()
     });
     return true; // Item added successfully
   }
@@ -48,7 +52,7 @@ class History {
       return removedItem;
     }
     useTabStore.setState({
-      tabHistory: this.history.slice()
+      history: this.history.slice()
     });
     return null; // Invalid index
   }
@@ -59,7 +63,7 @@ class History {
       return restoredItem;
     }
     useTabStore.setState({
-      tabHistory: this.history.slice()
+      history: this.history.slice()
     });
     return null; // History is empty
   }
@@ -99,9 +103,13 @@ export type TabStore = {
   focusEmptyTab: () => void;
   getCurrentNoteId: () => string | undefined;
   getTab: (tabId: number) => TabItem | undefined;
-  tabHistory: number[];
+  history: number[];
   biometryAvailable?: boolean;
   biometryEnrolled?: boolean;
+  tabHistory: Record<number, { back_stack: string[]; forward_stack: string[] }>;
+  canGoBack?: boolean;
+  canGoForward?: boolean;
+  sessionId?: string;
 };
 
 function getId(id: number, tabs: TabItem[]): number {
@@ -112,16 +120,73 @@ function getId(id: number, tabs: TabItem[]): number {
   return id;
 }
 
-export function syncTabs() {
+export function syncTabs(
+  type: "tabs" | "history" | "biometry" | "all" = "all"
+) {
+  const data: Partial<TabStore> = {};
+
+  if (type === "tabs" || type === "all") {
+    data.tabs = useTabStore.getState().tabs;
+    data.currentTab = useTabStore.getState().currentTab;
+  }
+  if (type === "history" || type === "all") {
+    data.canGoBack = useTabStore.getState().canGoBack;
+    data.canGoForward = useTabStore.getState().canGoForward;
+    data.sessionId = useTabStore.getState().sessionId;
+  }
+
+  if (type === "biometry" || type === "all") {
+    data.biometryAvailable = useTabStore.getState().biometryAvailable;
+    data.biometryEnrolled = useTabStore.getState().biometryEnrolled;
+  }
+
   editorController.current?.commands.doAsync(`
-    globalThis.tabStore?.setState({
-      tabs: ${JSON.stringify(useTabStore.getState().tabs)},
-      currentTab: ${useTabStore.getState().currentTab},
-      biometryAvailable: ${useTabStore.getState().biometryAvailable},
-      biometryEnrolled: ${useTabStore.getState().biometryEnrolled}
-    });
+    globalThis.tabStore?.setState(${JSON.stringify(data)});
 `);
 }
+export const tabHistory = new TabHistory({
+  get() {
+    return useTabStore.getState();
+  },
+  set(state) {
+    console.log(state, "saving tab history...");
+    useTabStore.setState({
+      ...state
+    });
+  },
+  getCurrentTab: () => useTabStore.getState().currentTab,
+  loadSession: async (sessionId: string) => {
+    const session = await editorController?.current?.commands.getSession(
+      sessionId
+    );
+    console.log("LOADING SESSION FOR ID", sessionId, session);
+    if (session && session.noteId) {
+      const note = await db.notes.note(session.noteId);
+      if (note) {
+        eSendEvent(eOnLoadNote, {
+          item: note,
+          tabId: useTabStore.getState().currentTab
+        });
+        return true;
+      }
+      return false;
+    }
+    return false;
+  },
+  newSession: (sessionId, tabId, noteId) => {
+    editorController?.current?.commands?.newSession(sessionId, tabId, noteId);
+  },
+  clearSessionsForTabId: (tabId: number) => {
+    editorController?.current?.commands?.deleteSessionsForTabId(tabId);
+  },
+  getSession: async (sessionId: string) => {
+    return (
+      (await editorController?.current?.commands.getSession(sessionId)) ||
+      undefined
+    );
+  },
+  commit: () => syncTabs("history")
+});
 
 export const useTabStore = create<TabStore>(
   persist(
@@ -131,14 +196,19 @@ export const useTabStore = create<TabStore>(
           id: 0
         }
       ],
-      tabHistory: [0],
-      history: new History(),
+      tabHistory: {},
+      history: [0],
       currentTab: 0,
       updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => {
         if (!options) return;
         const index = get().tabs.findIndex((t) => t.id === id);
         if (index == -1) return;
         const tabs = [...get().tabs];
+
+        if (options.noteId) {
+          tabHistory.add(options.noteId);
+        }
+
         tabs[index] = {
           ...tabs[index],
           ...options
@@ -147,35 +217,14 @@ export const useTabStore = create<TabStore>(
         set({
           tabs: tabs
         });
-        syncTabs();
+        syncTabs("tabs");
       },
       focusPreviewTab: (
         noteId: string,
         options: Omit<Partial<TabItem>, "id" | "noteId">
-      ) => {
-        const index = get().tabs.findIndex((t) => t.previewTab);
-        if (index === -1)
-          return get().newTab({
-            noteId,
-            previewTab: true,
-            ...options
-          });
-        const tabs = [...get().tabs];
-        tabs[index] = {
-          ...tabs[index],
-          ...options,
-          previewTab: true,
-          noteId: noteId
-        };
-        console.log("focus preview", noteId);
-        set({
-          tabs: tabs
-        });
-        get().focusTab(tabs[index].id);
-      },
+      ) => {},
       removeTab: (id: number) => {
         const index = get().tabs.findIndex((t) => t.id === id);
-
         if (index > -1) {
           const isFocused = id === get().currentTab;
           const nextTabs = get().tabs.slice();
@@ -186,6 +235,7 @@ export const useTabStore = create<TabStore>(
               id: 0
             });
           }
+          tabHistory.clearStackForTab(id);
           set({
             tabs: nextTabs
           });
@@ -203,6 +253,11 @@ export const useTabStore = create<TabStore>(
             ...options
           }
         ];
+
+        if (options?.noteId) {
+          tabHistory.add(options.noteId);
+        }
+
         set({
           tabs: nextTabs
         });
@@ -221,15 +276,24 @@ export const useTabStore = create<TabStore>(
         set({
           tabs: tabs
         });
-        syncTabs();
+        syncTabs("tabs");
       },
 
       focusTab: (id: number) => {
-        console.log(history.getHistory(), id);
         history.add(id);
         set({
           currentTab: id
         });
+        set({
+          canGoBack: tabHistory.canGoBack(),
+          canGoForward: tabHistory.canGoForward(),
+          sessionId: tabHistory.getCurrentSession()
+        });
+        console.log(
+          tabHistory.canGoBack(),
+          tabHistory.canGoForward(),
+          tabHistory.getCurrentSession()
+        );
         syncTabs();
       },
       getNoteIdForTab: (id: number) => {
@@ -255,7 +319,7 @@ export const useTabStore = create<TabStore>(
       getStorage: () => MMKV as unknown as StateStorage,
       onRehydrateStorage: () => {
         return (state) => {
-          history.history = state?.tabHistory.slice() || [];
+          history.history = state?.history || [];
         };
       }
     }
