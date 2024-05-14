@@ -284,6 +284,12 @@ export class SQLCollection<
         .selectFrom<keyof DatabaseSchema>(this.type)
         .select((a) => a.fn.count<number>("id").as("count"))
         .where(isFalse("synced"))
+        .$if(this.type === "content", (eb) =>
+          eb.where("conflicted", "is", null)
+        )
+        .$if(this.type === "notes", (eb) =>
+          eb.where("conflicted", "is not", true)
+        )
         .$if(this.type === "attachments", (eb) =>
           eb.where((eb) =>
             eb.or([eb("dateUploaded", ">", 0), eb("deleted", "==", true)])
@@ -304,6 +310,12 @@ export class SQLCollection<
         .selectAll()
         .$if(lastRowId != null, (qb) => qb.where("id", ">", lastRowId!))
         .$if(!forceSync, (eb) => eb.where(isFalse("synced")))
+        .$if(this.type === "content", (eb) =>
+          eb.where("conflicted", "is", null)
+        )
+        .$if(this.type === "notes", (eb) =>
+          eb.where("conflicted", "is not", true)
+        )
         .$if(this.type === "attachments", (eb) =>
           eb.where((eb) =>
             eb.or([eb("dateUploaded", ">", 0), eb("deleted", "==", true)])

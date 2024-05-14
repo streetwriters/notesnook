@@ -110,9 +110,6 @@ function filterSyncableItems(items: MaybeDeletedItem<Item>[]): {
   const ids = [];
   const syncableItems = [];
   for (const item of items) {
-    // do not sync conflicted note or content
-    if ("conflicted" in item && item.conflicted) continue;
-
     delete item.synced;
 
     ids.push(item.id);
