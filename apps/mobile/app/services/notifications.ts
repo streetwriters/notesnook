@@ -458,7 +458,7 @@ async function loadNote(id: string, jump: boolean) {
   if (tab !== undefined) {
     useTabStore.getState().focusTab(tab);
   } else {
-    useTabStore.getState().focusPreviewTab(id, {
+    useTabStore.getState().updateTab(useTabStore.getState().currentTab, {
       noteId: id,
       readonly: note.readonly,
       noteLocked: isLocked

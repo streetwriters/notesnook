@@ -141,7 +141,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                     close();
                     eSendEvent(eOnLoadNote, {
                       item: item,
-                      presistTab: true
+                      newTab: true
                     });
                     if (!DDS.isTab) {
                       tabBarRef.current?.goToPage(1);
