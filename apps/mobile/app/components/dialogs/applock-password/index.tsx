@@ -291,7 +291,8 @@ export const AppLockPassword = () => {
                 );
                 return;
               }
-              await setAppLockVerificationCipher(values.current.password);
+              const password = values.current.password;
+              setAppLockVerificationCipher(password);
               SettingsService.setProperty("appLockHasPasswordSecurity", true);
             } else if (mode === "change") {
               if (
@@ -319,7 +320,6 @@ export const AppLockPassword = () => {
                 );
                 return;
               }
-
               const isCurrentPasswordCorrect = await validateAppLockPassword(
                 values.current.currentPassword
               );
@@ -335,8 +335,10 @@ export const AppLockPassword = () => {
                 return;
               }
 
+              const password = values.current.password;
+              await clearAppLockVerificationCipher();
               SettingsService.setProperty("appLockHasPasswordSecurity", true);
-              await setAppLockVerificationCipher(values.current.password);
+              await setAppLockVerificationCipher(password);
             } else if (mode === "remove") {
               if (!values.current.password) {
                 ToastManager.error(
@@ -354,7 +356,11 @@ export const AppLockPassword = () => {
               if (!isCurrentPasswordCorrect) {
                 ToastManager.error(
                   new Error(
-                    `${keyboardType === "pin" ? "Pin" : "Password"} incorrect`
+                    accountPass
+                      ? "Account password incorrect"
+                      : `${
+                          keyboardType === "pin" ? "Pin" : "Password"
+                        } incorrect`
                   ),
                   undefined,
                   "local"

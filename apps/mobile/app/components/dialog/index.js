@@ -174,6 +174,7 @@ export const Dialog = ({ context = "global" }) => {
               onSubmit={onPressPositive}
               returnKeyLabel="Done"
               returnKeyType="done"
+              keyboardType={dialogInfo.keyboardType || "default"}
               placeholder={dialogInfo.inputPlaceholder}
             />
           </View>
