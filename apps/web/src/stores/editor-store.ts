@@ -233,6 +233,15 @@ class EditorStore extends BaseStore<EditorStore> {
           if (noteId && session.id !== noteId && session.note.id !== noteId)
             continue;
           if (isDeleted(item) || isTrashItem(item)) clearIds.push(session.id);
+          // if a note becomes conflicted, reopen the session
+          else if (
+            session.type !== "conflicted" &&
+            item.type === "tiptap" &&
+            item.conflicted
+          )
+            waitForSync().then(() =>
+              openSession(session.note.id, { force: true, silent: true })
+            );
           // if a note is locked, reopen the session
           else if (
             session.type === "default" &&
@@ -257,9 +266,7 @@ class EditorStore extends BaseStore<EditorStore> {
           }
           // if a deleted note is restored, reopen the session
           else if (session.type === "deleted" && item.type === "note") {
-            waitForSync().then(() =>
-              openSession(session.note.id, { force: true, silent: true })
-            );
+            openSession(session.note.id, { force: true, silent: true });
           }
           // if a readonly note is made editable, reopen the session
           else if (
@@ -267,9 +274,7 @@ class EditorStore extends BaseStore<EditorStore> {
             item.type === "note" &&
             !item.readonly
           )
-            waitForSync().then(() =>
-              openSession(session.note.id, { force: true, silent: true })
-            );
+            openSession(session.note.id, { force: true, silent: true });
           // update the note in all sessions
           else if (item.type === "note") {
             updateSession(
@@ -344,6 +349,10 @@ class EditorStore extends BaseStore<EditorStore> {
                 session.type !== "new" && session.note.contentId;
               if (!contentId || !event.ids.includes(contentId)) continue;
               if (
+                // if note's conflict is resolved
+                (session.type === "conflicted" && !event.item.conflicted) ||
+                // if note becomes conflicted
+                (session.type !== "conflicted" && event.item.conflicted) ||
                 // if note is locked
                 (session.type === "default" &&
                   !session.locked &&
@@ -548,12 +557,14 @@ class EditorStore extends BaseStore<EditorStore> {
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
     const session = getSession(noteId);
 
-    if (session && !options.force && !session.needsHydration) {
-      return this.activateSession(noteId, options.activeBlockId);
-    }
+    if (session && !options.force) {
+      if (!session.needsHydration) {
+        return this.activateSession(noteId, options.activeBlockId);
+      }
 
-    if (session && (session.type === "diff" || session.type === "conflicted")) {
-      return openDiffSession(session.note.id, session.id);
+      if (session.type === "diff" || session.type === "conflicted") {
+        return openDiffSession(session.note.id, session.id);
+      }
     }
 
     if (session && session.id) await db.fs().cancel(session.id);
@@ -566,19 +577,7 @@ class EditorStore extends BaseStore<EditorStore> {
     const isPreview = session ? session.preview : !options?.newSession;
     const isLocked = await db.vaults.itemExists(note);
 
-    if (isLocked && note.type !== "trash") {
-      this.addSession(
-        {
-          type: "locked",
-          id: note.id,
-          pinned: session?.pinned,
-          note,
-          preview: isPreview,
-          activeBlockId: options.activeBlockId
-        },
-        !options.silent
-      );
-    } else if (note.conflicted) {
+    if (note.conflicted) {
       const content = note.contentId
         ? await db.content.get(note.contentId)
         : undefined;
@@ -604,6 +603,18 @@ class EditorStore extends BaseStore<EditorStore> {
         {
           type: "conflicted",
           content: content,
+          id: note.id,
+          pinned: session?.pinned,
+          note,
+          preview: isPreview,
+          activeBlockId: options.activeBlockId
+        },
+        !options.silent
+      );
+    } else if (isLocked && note.type !== "trash") {
+      this.addSession(
+        {
+          type: "locked",
           id: note.id,
           pinned: session?.pinned,
           note,

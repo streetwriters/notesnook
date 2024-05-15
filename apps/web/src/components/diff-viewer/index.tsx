@@ -331,12 +331,6 @@ async function resolveConflict({
   toKeepDateEdited: number;
   dateResolved?: number;
 }) {
-  await db.notes.add({
-    id: note.id,
-    dateEdited: toKeepDateEdited,
-    conflicted: false
-  });
-
   await db.content.add({
     id: note.contentId,
     data: toKeep,
@@ -345,12 +339,17 @@ async function resolveConflict({
     sessionId: `${Date.now()}`
   });
 
+  await db.notes.add({
+    id: note.id,
+    dateEdited: toKeepDateEdited,
+    conflicted: false
+  });
+
   if (toCopy) {
     await createCopy(note, toCopy);
   }
 
   await notesStore.refresh();
-  useEditorStore.getState().openSession(note.id, { force: true });
 }
 
 async function createCopy(note: Note, content: ContentItem) {
