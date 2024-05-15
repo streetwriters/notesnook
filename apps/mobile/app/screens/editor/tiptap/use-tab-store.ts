@@ -81,6 +81,7 @@ export type TabItem = {
   locked?: boolean;
   noteLocked?: boolean;
   pinned?: boolean;
+  needsRefresh?: boolean;
 };
 
 const history = new History();
@@ -95,10 +96,12 @@ export type TabStore = {
   ) => void;
   removeTab: (index: number) => void;
   moveTab: (index: number, toIndex: number) => void;
-  newTab: (options?: Omit<Partial<TabItem>, "id">) => void;
+  newTab: (options?: Omit<Partial<TabItem>, "id">) => number;
   focusTab: (id: number) => void;
   getNoteIdForTab: (id: number) => string | undefined;
   getTabForNote: (noteId: string) => number | undefined;
+  getTabsForNote: (noteId: string) => TabItem[];
+  forEachNoteTab: (noteId: string, cb: (tab: TabItem) => void) => void;
   hasTabForNote: (noteId: string) => boolean;
   focusEmptyTab: () => void;
   getCurrentNoteId: () => string | undefined;
@@ -230,18 +233,23 @@ export const useTabStore = create<TabStore>(
           const nextTabs = get().tabs.slice();
           nextTabs.splice(index, 1);
           history.remove(id);
-          if (nextTabs.length === 0) {
-            nextTabs.push({
-              id: 0
-            });
-          }
           tabHistory.clearStackForTab(id);
           set({
             tabs: nextTabs
           });
-          get().focusTab(
-            isFocused ? history.restoreLast() || 0 : get().currentTab
-          );
+          syncTabs("tabs");
+          setTimeout(() => {
+            if (nextTabs.length === 0) {
+              set({
+                tabs: [{ id: 0 }]
+              });
+              get().focusTab(0);
+            } else {
+              get().focusTab(
+                isFocused ? history.restoreLast() || 0 : get().currentTab
+              );
+            }
+          });
         }
       },
       newTab: (options) => {
@@ -262,6 +270,7 @@ export const useTabStore = create<TabStore>(
           tabs: nextTabs
         });
         get().focusTab(id);
+        return id;
       },
       focusEmptyTab: () => {
         const index = get().tabs.findIndex((t) => !t.noteId);
@@ -306,6 +315,13 @@ export const useTabStore = create<TabStore>(
       },
       getTabForNote: (noteId: string) => {
         return get().tabs.find((t) => t.noteId === noteId)?.id;
+      },
+      getTabsForNote(noteId: string) {
+        return get().tabs.filter((t) => t.noteId === noteId);
+      },
+      forEachNoteTab: (noteId: string, cb: (tab: TabItem) => void) => {
+        const tabs = get().tabs.filter((t) => t.noteId === noteId);
+        tabs.forEach(cb);
       },
       getCurrentNoteId: () => {
         return get().tabs.find((t) => t.id === get().currentTab)?.noteId;

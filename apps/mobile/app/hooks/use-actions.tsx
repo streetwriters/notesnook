@@ -17,15 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
-import { VAULT_ERRORS } from "@notesnook/core";
 import {
   Color,
+  createInternalLink,
   ItemReference,
   Note,
   Notebook,
   Reminder,
   Tag,
-  TrashItem
+  TrashItem,
+  VAULT_ERRORS
 } from "@notesnook/core";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -39,18 +40,20 @@ import NoteHistory from "../components/note-history";
 import { AddNotebookSheet } from "../components/sheets/add-notebook";
 import MoveNoteSheet from "../components/sheets/add-to";
 import ExportNotesSheet from "../components/sheets/export-notes";
+import { MoveNotebookSheet } from "../components/sheets/move-notebook";
 import { MoveNotes } from "../components/sheets/move-notes/movenote";
 import PublishNoteSheet from "../components/sheets/publish-note";
+import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
 import ReminderSheet from "../components/sheets/reminder";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
-  ToastManager,
   eSendEvent,
   eSubscribeEvent,
   openVault,
-  presentSheet
+  presentSheet,
+  ToastManager
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
@@ -60,14 +63,10 @@ import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useUserStore } from "../stores/use-user-store";
-import Errors from "../utils/errors";
 import { eOpenLoginDialog, eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
-import { ReferencesList } from "../components/sheets/references";
-import { createInternalLink } from "@notesnook/core";
-import { MoveNotebookSheet } from "../components/sheets/move-notebook";
 
 export const useActions = ({
   close,
@@ -542,14 +541,11 @@ export const useActions = ({
     const toggleReadyOnlyMode = async () => {
       const currentReadOnly = (item as Note).readonly;
       await db.notes.readonly(!currentReadOnly, item?.id);
-
-      if (useTabStore.getState().hasTabForNote(item.id)) {
-        const tabId = useTabStore.getState().getTabForNote(item.id);
-        if (!tabId) return;
-        useTabStore.getState().updateTab(tabId, {
+      useTabStore.getState().forEachNoteTab(item.id, (tab) => {
+        useTabStore.getState().updateTab(tab.id, {
           readonly: !currentReadOnly
         });
-      }
+      });
       Navigation.queueRoutesForUpdate();
       close();
     };
