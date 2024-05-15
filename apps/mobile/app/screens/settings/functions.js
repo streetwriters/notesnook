@@ -90,13 +90,26 @@ export async function verifyUserWithApplock() {
         positiveText: "Verify",
         secureTextEntry: true,
         negativeText: "Cancel",
+        keyboardType: keyboardType,
         positivePress: async (value) => {
           try {
             const verified = await validateAppLockPassword(value);
+            if (!verified) {
+              ToastManager.show({
+                heading: `Invalid ${
+                  keyboardType === "numeric" ? "pin" : "password"
+                }`,
+                type: "error",
+                context: "local"
+              });
+              return false;
+            }
             resolve(verified);
           } catch (e) {
             resolve(false);
+            return false;
           }
+          return true;
         }
       });
     } else {

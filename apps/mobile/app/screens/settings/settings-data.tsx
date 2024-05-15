@@ -976,7 +976,7 @@ export const settingsGroups: SettingSection[] = [
                 SettingsService.getProperty("applockKeyboardType") === "numeric"
                   ? "pin"
                   : "password"
-              }, app lock will fallback to using account password to unlock the app`,
+              }, app lock will be disabled if no other security method is enabled.`,
             hidden: () => {
               return !SettingsService.getProperty("appLockHasPasswordSecurity");
             },

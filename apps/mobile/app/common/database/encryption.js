@@ -43,9 +43,8 @@ const IOS_KEYCHAIN_ACCESS_GROUP = "group.org.streetwriters.notesnook";
 const IOS_KEYCHAIN_SERVICE_NAME = "org.streetwriters.notesnook";
 const KEYCHAIN_SERVER_DBKEY = "notesnook:db";
 
-const NOTESNOOK_APPLOCK_KEY_SALT = "3dqclWbOYllfk9kk";
-const NOTESNOOK_DB_KEY_SALT = "2rcgSprDmRvZ1AAa";
-const NOTESNOOK_USER_KEY_SALT = "7qO4qeoM6PbsAJ0Q";
+const NOTESNOOK_APPLOCK_KEY_SALT = "kBwr1Kre86ebOZ8ThLu2OA";
+const NOTESNOOK_DB_KEY_SALT = "SNuzOcEK3amoqL0WvPeKqw";
 
 const DB_KEY_CIPHER = "databaseKeyCipher";
 const USER_KEY_CIPHER = "userKeyCipher";
@@ -117,9 +116,7 @@ export async function setAppLockVerificationCipher(appLockPassword) {
       NOTESNOOK_APPLOCK_KEY_SALT
     );
     const encrypted = await encrypt(appLockCredentials, generatePassword());
-
     CipherStorage.setMap(APPLOCK_CIPHER, encrypted);
-
     DatabaseLogger.info("setAppLockVerificationCipher");
   } catch (e) {
     DatabaseLogger.error(e);
@@ -135,10 +132,8 @@ export async function validateAppLockPassword(appLockPassword) {
   try {
     const appLockCipher = CipherStorage.getMap(APPLOCK_CIPHER);
     if (!appLockCipher) return true;
-    const decrypted = await decrypt(
-      await Sodium.deriveKey(appLockPassword, NOTESNOOK_APPLOCK_KEY_SALT),
-      appLockCipher
-    );
+    const key = await Sodium.deriveKey(appLockPassword, appLockCipher.salt);
+    const decrypted = await decrypt(key, appLockCipher);
 
     DatabaseLogger.info(
       `validateAppLockPassword: ${typeof decrypted === "string"}`
@@ -213,8 +208,7 @@ export async function getDatabaseKey(appLockPassword) {
       if (userKeyCredentials) {
         const userKeyCipher = await encrypt(
           {
-            key: DB_KEY,
-            salt: NOTESNOOK_USER_KEY_SALT
+            key: DB_KEY
           },
           userKeyCredentials.password
         );
@@ -238,8 +232,7 @@ export async function deriveCryptoKey(data) {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
     const userKeyCipher = await encrypt(
       {
-        key: await getDatabaseKey(),
-        salt: NOTESNOOK_USER_KEY_SALT
+        key: await getDatabaseKey()
       },
       credentials.key
     );

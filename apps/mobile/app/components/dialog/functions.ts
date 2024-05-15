@@ -44,6 +44,7 @@ type DialogInfo = {
   // eslint-disable-next-line @typescript-eslint/ban-types
   context: "global" | "local" | (string & {});
   secureTextEntry?: boolean;
+  keyboardType?: string;
 };
 
 export function presentDialog(data: Partial<DialogInfo>): void {

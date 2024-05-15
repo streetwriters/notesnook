@@ -34,11 +34,13 @@ import {
 import { MMKV } from "../../common/database/mmkv";
 import { useAppState } from "../../hooks/use-app-state";
 import BiometricService from "../../services/biometrics";
+import { ToastManager } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { SIZE } from "../../utils/size";
+import { Toast } from "../toast";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Input from "../ui/input";
@@ -148,6 +150,12 @@ const AppLockedOverlay = () => {
         lockApp(false);
         enabled(false);
         password.current = undefined;
+      } else {
+        ToastManager.show({
+          heading: `Invalid ${keyboardType === "numeric" ? "pin" : "password"}`,
+          type: "error",
+          context: "local"
+        });
       }
     } catch (e) {
       console.error(e);
@@ -205,6 +213,7 @@ const AppLockedOverlay = () => {
         justifyContent: "center"
       }}
     >
+      <Toast context="local" />
       <View
         style={{
           flex: 1,
