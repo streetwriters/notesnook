@@ -81,6 +81,7 @@ export type Settings = {
   biometricsAuthEnabled?: boolean;
   backgroundSync?: boolean;
   applockKeyboardType: "numeric" | "default";
+  settingsVersion?: number;
 };
 
 type DimensionsType = {
@@ -169,7 +170,8 @@ export const defaultSettings: SettingStore["settings"] = {
   markdownShortcuts: true,
   biometricsAuthEnabled: false,
   appLockHasPasswordSecurity: false,
-  backgroundSync: true
+  backgroundSync: true,
+  settingsVersion: 0
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
