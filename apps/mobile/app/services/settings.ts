@@ -76,6 +76,17 @@ function migrateAppLock() {
   DatabaseLogger.debug("App lock Migrated");
 }
 
+function migrateSettings(settings: SettingStore["settings"]) {
+  const version = settings.settingsVersion;
+  if (!version) {
+    settings.settingsVersion = 1;
+    settings.privacyScreen = settings.appLockEnabled
+      ? true
+      : settings.privacyScreen;
+    MMKV.setString("appSettings", JSON.stringify(settings));
+  }
+}
+
 function init() {
   scale.fontScale = 1;
   const settingsJson = MMKV.getString("appSettings");
@@ -83,14 +94,17 @@ function init() {
   if (!settingsJson) {
     MMKV.setString("appSettings", JSON.stringify(settings));
   } else {
+    const settingsParsed = JSON.parse(settingsJson);
+    migrateSettings(settingsParsed);
     settings = {
       ...settings,
-      ...JSON.parse(settingsJson)
+      ...settingsParsed
     };
   }
   if (settings.fontScale) {
     scale.fontScale = settings.fontScale;
   }
+
   setTimeout(() => setPrivacyScreen(settings), 1);
   updateSize();
   useSettingStore.getState().setSettings({ ...settings });
@@ -98,7 +112,7 @@ function init() {
 }
 
 function setPrivacyScreen(settings: SettingStore["settings"]) {
-  if (settings.privacyScreen || settings.appLockEnabled) {
+  if (settings.privacyScreen) {
     if (Platform.OS === "android") {
       NotesnookModule.setSecureMode(true);
     } else {

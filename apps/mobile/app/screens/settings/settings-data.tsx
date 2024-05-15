@@ -871,6 +871,9 @@ export const settingsGroups: SettingSection[] = [
             type: "switch",
             property: "appLockEnabled",
             onChange: () => {
+              SettingsService.set({
+                privacyScreen: true
+              });
               SettingsService.setPrivacyScreen(SettingsService.get());
             },
             onVerify: async () => {

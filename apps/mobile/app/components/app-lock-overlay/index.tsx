@@ -188,11 +188,7 @@ const AppLockedOverlay = () => {
       enabled(false);
     } else {
       SettingsService.appEnteredBackground();
-
-      if (
-        SettingsService.get().privacyScreen ||
-        SettingsService.getProperty("appLockEnabled")
-      ) {
+      if (SettingsService.get().privacyScreen) {
         enabled(true);
       }
     }
