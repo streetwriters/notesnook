@@ -222,6 +222,45 @@ test(
   TEST_TIMEOUT * 10
 );
 
+test(
+  "case 5: remote content changed after local content should create a conflict",
+  async (t) => {
+    const [deviceA, deviceB] = await Promise.all([
+      initializeDevice("deviceA"),
+      initializeDevice("deviceB")
+    ]);
+
+    t.onTestFinished(async (r) => {
+      console.log(`${t.task.name} log out`);
+      await cleanup(deviceA, deviceB);
+    });
+
+    const noteId = await deviceA.notes.add({
+      title: "Test note from device A",
+      content: { data: "<p>Hello</p>", type: "tiptap" }
+    });
+    await deviceA.sync({ type: "full" });
+    await deviceB.sync({ type: "full" });
+
+    await deviceA.notes.add({
+      id: noteId,
+      content: { data: "<p>Hello (I am from device B)</p>", type: "tiptap" }
+    });
+    await deviceA.sync({ type: "full" });
+
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+
+    await deviceB.notes.add({
+      id: noteId,
+      content: { data: "<p>Hello (I am from device A)</p>", type: "tiptap" }
+    });
+    await deviceB.sync({ type: "full" });
+
+    expect(await deviceB.notes.conflicted.count()).toBeGreaterThan(0);
+  },
+  TEST_TIMEOUT * 10
+);
+
 // test(
 //   "case 4: Device A's sync is interrupted halfway and Device B makes some changes afterwards and syncs.",
 //   async () => {

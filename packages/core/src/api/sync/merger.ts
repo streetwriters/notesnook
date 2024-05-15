@@ -121,9 +121,8 @@ export function isContentConflicted(
     remoteItem.dateModified &&
     localItem.dateResolved === remoteItem.dateModified;
   const isEdited =
-    // the local item is edited if it was changed/edited after the remote
-    // note and it also wasn't synced yet.
-    localItem.dateEdited > remoteItem.dateEdited && !localItem.synced;
+    // the local item is edited if it wasn't synced yet.
+    !localItem.synced;
   if (isEdited && !isResolved) {
     // If time difference between local item's edits & remote item's edits
     // is less than threshold, we shouldn't trigger a merge conflict; instead
