@@ -30,7 +30,7 @@ import { sleep } from "../../../utils/time";
 import { Settings } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { getResponse, randId, textInput } from "./utils";
-import { EditorSessionItem } from "./tab-history";
+import { EditorSessionItem } from "@notesnook/common/dist/utils/editor-sessions";
 
 type Action = { job: string; id: string };
 
@@ -217,11 +217,11 @@ if (typeof statusBar !== "undefined") {
 
   setTags = async (note: Note | null | undefined) => {
     if (!note) return;
-    const tabId = useTabStore.getState().getTabForNote(note.id);
-
-    const tags = await db.relations.to(note, "tag").resolve();
-    await this.doAsync(
-      `
+    useTabStore.getState().forEachNoteTab(note.id, async (tab) => {
+      const tabId = tab.id;
+      const tags = await db.relations.to(note, "tag").resolve();
+      await this.doAsync(
+        `
     const tags = editorTags[${tabId}];
     if (tags && tags.current) {
       tags.current.setTags(${JSON.stringify(
@@ -234,8 +234,9 @@ if (typeof statusBar !== "undefined") {
       )});
     }
   `,
-      "setTags"
-    );
+        "setTags"
+      );
+    });
   };
 
   clearTags = async (tabId: number) => {

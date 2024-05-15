@@ -314,8 +314,13 @@ const Tiptap = ({
 
         post(
           EditorEvents.tabFocused,
-          !!globalThis.editorControllers[tabRef.current.id]?.content.current &&
-            !editorControllers[tabRef.current.id]?.loading,
+          {
+            hasContent:
+              !!globalThis.editorControllers[tabRef.current.id]?.content
+                .current,
+            isLoading: editorControllers[tabRef.current.id]?.loading,
+            needsRefresh: tabRef.current?.needsRefresh
+          },
           tabRef.current.id,
           state.getCurrentNoteId()
         );

@@ -597,10 +597,26 @@ export const useEditorEvents = (
           break;
         }
         case EditorEvents.tabFocused: {
+          console.log(
+            "Focused tab",
+            editorMessage.tabId,
+            editorMessage.noteId,
+            "Content:",
+            editorMessage.value
+          );
+
+          const { hasContent, isLoading, needsRefresh } = editorMessage.value;
+
           eSendEvent(eEditorTabFocused, editorMessage.tabId);
 
+          if (needsRefresh) {
+            useTabStore.getState().updateTab(editorMessage.tabId, {
+              needsRefresh: false
+            });
+          }
+
           if (
-            (!editorMessage.value || editor.currentLoadingNoteId.current) &&
+            (isLoading || !hasContent || needsRefresh) &&
             editorMessage.noteId
           ) {
             if (!useSettingStore.getState().isAppLoading) {
@@ -609,7 +625,8 @@ export const useEditorEvents = (
                 eSendEvent(eOnLoadNote, {
                   item: note,
                   forced: true,
-                  tabId: editorMessage.tabId
+                  tabId: editorMessage.tabId,
+                  refresh: hasContent && needsRefresh ? needsRefresh : false
                 });
               }
             } else {

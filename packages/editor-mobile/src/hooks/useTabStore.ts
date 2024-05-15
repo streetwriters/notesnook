@@ -37,6 +37,7 @@ export type TabItem = {
   locked?: boolean;
   noteLocked?: boolean;
   pinned?: boolean;
+  needsRefresh?: boolean;
 };
 
 export type NoteState = {

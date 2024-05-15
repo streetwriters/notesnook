@@ -19,14 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* eslint-disable no-inner-declarations */
 import {
   Color,
+  createInternalLink,
   ItemReference,
   Note,
   Notebook,
   Reminder,
   Tag,
   TrashItem,
-  VAULT_ERRORS,
-  createInternalLink
+  VAULT_ERRORS
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { DisplayedNotification } from "@notifee/react-native";
@@ -50,11 +50,11 @@ import ReminderSheet from "../components/sheets/reminder";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
-  ToastManager,
   eSendEvent,
   eSubscribeEvent,
   openVault,
-  presentSheet
+  presentSheet,
+  ToastManager
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
@@ -544,14 +544,11 @@ export const useActions = ({
     const toggleReadyOnlyMode = async () => {
       const currentReadOnly = (item as Note).readonly;
       await db.notes.readonly(!currentReadOnly, item?.id);
-
-      if (useTabStore.getState().hasTabForNote(item.id)) {
-        const tabId = useTabStore.getState().getTabForNote(item.id);
-        if (!tabId) return;
-        useTabStore.getState().updateTab(tabId, {
+      useTabStore.getState().forEachNoteTab(item.id, (tab) => {
+        useTabStore.getState().updateTab(tab.id, {
           readonly: !currentReadOnly
         });
-      }
+      });
       Navigation.queueRoutesForUpdate();
       close();
     };
