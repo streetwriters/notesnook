@@ -72,14 +72,18 @@ export class WaSqliteWorkerDriver implements Driver {
 
     service.activate(
       () =>
-        new Promise<MessagePort>((resolve) => {
+        new Promise<{ port: MessagePort; onclose: () => void }>((resolve) => {
           console.log("initializing worker");
           this.needsInitialization = true;
 
           const worker = new Worker();
           worker.addEventListener(
             "message",
-            (event) => resolve(event.ports[0]),
+            (event) =>
+              resolve({
+                port: event.ports[0],
+                onclose: () => worker.terminate()
+              }),
             { once: true }
           );
           worker.postMessage({

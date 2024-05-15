@@ -83,7 +83,7 @@ export class SharedService<T extends object> extends EventTarget {
   }
 
   activate(
-    portProviderFunc: () => MessagePort | Promise<MessagePort>,
+    portProviderFunc: () => Promise<{ port: MessagePort; onclose: () => void }>,
     onClientConnected: () => Promise<void>
   ) {
     if (this.#onDeactivate) return;
@@ -97,7 +97,7 @@ export class SharedService<T extends object> extends EventTarget {
     navigator.locks
       .request(LOCK_NAME, { signal: this.#onDeactivate.signal }, async () => {
         // Get the port to request client ports.
-        const port = await portProviderFunc();
+        const { port, onclose } = await portProviderFunc();
         port.start();
 
         // Listen for client requests. A separate BroadcastChannel
@@ -159,6 +159,7 @@ export class SharedService<T extends object> extends EventTarget {
         // Release the lock only on user abort or context destruction.
         return new Promise((_, reject) => {
           this.#onDeactivate?.signal.addEventListener("abort", () => {
+            onclose();
             broadcastChannel.close();
             reject(this.#onDeactivate?.signal.reason);
           });

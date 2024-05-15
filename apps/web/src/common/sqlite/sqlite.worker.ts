@@ -233,6 +233,8 @@ addEventListener("message", async (event) => {
     await worker.open(event.data.dbName, event.data.async, event.data.uri);
     const providerPort = createSharedServicePort(worker);
     postMessage(null, [providerPort]);
+
+    self.addEventListener("beforeunload", () => worker.close());
   }
 });
 
