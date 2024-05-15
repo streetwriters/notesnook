@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
+import { db } from "../../../common/database";
 import {
   clearAppLockVerificationCipher,
   setAppLockVerificationCipher,
@@ -44,6 +45,7 @@ import BaseDialog from "../../dialog/base-dialog";
 import DialogButtons from "../../dialog/dialog-buttons";
 import DialogHeader from "../../dialog/dialog-header";
 import { Toast } from "../../toast";
+import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
@@ -66,6 +68,7 @@ export const AppLockPassword = () => {
     confirmPassword?: string;
   }>({});
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [accountPass, setAccountPass] = useState(false);
 
   useEffect(() => {
     const subs = [
@@ -73,6 +76,7 @@ export const AppLockPassword = () => {
         eOpenAppLockPasswordDialog,
         (mode: "create" | "change" | "remove") => {
           setMode(mode);
+          setAccountPass(false);
           setVisible(true);
         }
       ),
@@ -126,7 +130,9 @@ export const AppLockPassword = () => {
             mode === "change"
               ? `Change app lock ${keyboardType}`
               : mode === "remove"
-              ? `Remove app lock ${keyboardType}`
+              ? `Enter ${
+                  accountPass ? "account password" : `app lock ${keyboardType}`
+                } to remove ${keyboardType}`
               : `Set up a custom app lock ${keyboardType} to unlock the app`
           }
           icon="shield"
@@ -169,33 +175,39 @@ export const AppLockPassword = () => {
               confirmPasswordInputRef.current?.focus();
             }}
             defaultValue={values.current.password}
-            keyboardType={keyboardType === "pin" ? "number-pad" : "default"}
+            keyboardType={
+              keyboardType === "pin" && !accountPass ? "number-pad" : "default"
+            }
             autoComplete="password"
             returnKeyLabel={mode !== "remove" ? "Next" : "Remove"}
             returnKeyType={mode !== "remove" ? "next" : "done"}
             secureTextEntry={secureTextEntry}
             buttonLeft={
-              <IconButton
-                name={keyboardType === "password" ? "numeric" : "keyboard"}
-                onPress={() => {
-                  setKeyboardType(
-                    keyboardType === "password" ? "pin" : "password"
-                  );
-                  setSecureTextEntry(false);
-                  setImmediate(() => {
-                    setSecureTextEntry(true);
-                  });
-                }}
-                style={{
-                  width: 25,
-                  height: 25,
-                  marginRight: 5
-                }}
-                size={SIZE.lg}
-              />
+              accountPass ? null : (
+                <IconButton
+                  name={keyboardType === "password" ? "numeric" : "keyboard"}
+                  onPress={() => {
+                    setKeyboardType(
+                      keyboardType === "password" ? "pin" : "password"
+                    );
+                    setSecureTextEntry(false);
+                    setImmediate(() => {
+                      setSecureTextEntry(true);
+                    });
+                  }}
+                  style={{
+                    width: 25,
+                    height: 25,
+                    marginRight: 5
+                  }}
+                  size={SIZE.lg}
+                />
+              )
             }
             placeholder={
-              mode === "change"
+              accountPass
+                ? "Account password"
+                : mode === "change"
                 ? `New ${keyboardType}`
                 : `${keyboardType === "pin" ? "Pin" : "Password"}`
             }
@@ -221,6 +233,36 @@ export const AppLockPassword = () => {
               secureTextEntry={secureTextEntry}
               placeholder={`Confirm ${keyboardType}`}
             />
+          ) : null}
+
+          {mode === "remove" ? (
+            <>
+              <Button
+                icon={
+                  accountPass ? "checkbox-marked" : "checkbox-blank-outline"
+                }
+                onPress={() => {
+                  setSecureTextEntry(false);
+                  setAccountPass(!accountPass);
+                  setTimeout(() => {
+                    setSecureTextEntry(true);
+                  });
+                }}
+                iconSize={SIZE.lg}
+                type="plain"
+                iconColor={
+                  accountPass ? colors.primary.accent : colors.primary.icon
+                }
+                title="Use account password instead"
+                style={{
+                  width: "100%",
+                  alignSelf: "flex-start",
+                  justifyContent: "flex-start",
+                  paddingHorizontal: 0,
+                  height: 30
+                }}
+              />
+            </>
           ) : null}
         </View>
 
@@ -305,9 +347,9 @@ export const AppLockPassword = () => {
                 return;
               }
 
-              const isCurrentPasswordCorrect = await validateAppLockPassword(
-                values.current.password
-              );
+              const isCurrentPasswordCorrect = accountPass
+                ? await db.user.verifyPassword(values.current.password)
+                : await validateAppLockPassword(values.current.password);
 
               if (!isCurrentPasswordCorrect) {
                 ToastManager.error(
@@ -342,7 +384,9 @@ export const AppLockPassword = () => {
 
             close();
           }}
-          positiveTitle="Save"
+          positiveTitle={
+            mode === "remove" ? "Remove" : mode === "change" ? "Change" : "Save"
+          }
           negativeTitle="Cancel"
           positiveType="transparent"
           loading={false}
