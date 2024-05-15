@@ -318,17 +318,9 @@ export class Notes implements ICollection {
       const content = note.contentId
         ? await this.db.content.get(note.contentId)
         : undefined;
-      if (content && (isDeleted(content) || content.locked))
-        throw new Error("Cannot duplicate a locked or deleted note.");
       const duplicateId = await this.db.notes.add({
         ...clone(note),
         id: undefined,
-        content: content
-          ? {
-              type: content.type,
-              data: content.data
-            }
-          : undefined,
         readonly: false,
         favorite: false,
         pinned: false,
@@ -338,17 +330,36 @@ export class Notes implements ICollection {
         dateCreated: undefined,
         dateModified: undefined
       });
-      if (!duplicateId) continue;
 
-      for (const relation of await this.db.relations
-        .to(note, "notebook")
-        .get()) {
+      const contentId = await this.db.content.add({
+        ...clone(content),
+        id: undefined,
+        noteId: duplicateId,
+        dateResolved: undefined,
+        dateEdited: undefined,
+        dateCreated: undefined,
+        dateModified: undefined
+      });
+
+      await this.db.notes.add({ id: duplicateId, contentId });
+
+      for (const relation of await this.db.relations.to(note).get()) {
         await this.db.relations.add(
-          { type: "notebook", id: relation.fromId },
+          { type: relation.fromType, id: relation.fromId },
           {
             id: duplicateId,
             type: "note"
           }
+        );
+      }
+
+      for (const relation of await this.db.relations.from(note).get()) {
+        await this.db.relations.add(
+          {
+            id: duplicateId,
+            type: "note"
+          },
+          { type: relation.toType, id: relation.toId }
         );
       }
     }

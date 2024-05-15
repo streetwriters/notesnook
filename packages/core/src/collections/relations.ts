@@ -64,6 +64,9 @@ export class Relations implements ICollection {
   }
 
   from(
+    reference: ItemReference | ItemReferences
+  ): RelationsArray<keyof RelatableTable>;
+  from(
     reference: ItemReference | ItemReferences,
     types: (keyof RelatableTable)[]
   ): RelationsArray<keyof RelatableTable>;
@@ -73,16 +76,19 @@ export class Relations implements ICollection {
   ): RelationsArray<TType>;
   from<TType extends keyof RelatableTable = keyof RelatableTable>(
     reference: ItemReference | ItemReferences,
-    type: TType | keyof RelatableTable[]
+    type?: TType | keyof RelatableTable[]
   ) {
     return new RelationsArray(
       this.db,
       reference,
-      Array.isArray(type) ? type : [type],
+      type ? (Array.isArray(type) ? type : ([type] as TType[])) : undefined,
       "from"
     );
   }
 
+  to(
+    reference: ItemReference | ItemReferences
+  ): RelationsArray<keyof RelatableTable>;
   to(
     reference: ItemReference | ItemReferences,
     types: (keyof RelatableTable)[]
@@ -93,12 +99,12 @@ export class Relations implements ICollection {
   ): RelationsArray<TType>;
   to<TType extends keyof RelatableTable = keyof RelatableTable>(
     reference: ItemReference | ItemReferences,
-    type: TType | keyof RelatableTable[]
+    type?: TType | keyof RelatableTable[]
   ) {
     return new RelationsArray(
       this.db,
       reference,
-      Array.isArray(type) ? type : [type],
+      type ? (Array.isArray(type) ? type : ([type] as TType[])) : undefined,
       "to"
     );
   }
@@ -224,21 +230,26 @@ const TABLE_MAP = {
 type RelatableTable = typeof TABLE_MAP;
 
 class RelationsArray<TType extends keyof RelatableTable> {
-  private table: ValueOf<RelatableTable> = TABLE_MAP[this.types[0]];
-
   constructor(
     private readonly db: Database,
     private readonly reference: ItemReference | ItemReferences,
-    private readonly types: TType[],
+    private readonly types: TType[] | undefined,
     private readonly direction: "from" | "to"
   ) {}
 
   get selector() {
+    if (!this.types)
+      throw new Error("Cannot use selector when no tables are specified.");
+    if (this.types.length > 1)
+      throw new Error(
+        "Cannot use selector when more than 1 tables are specified."
+      );
+    const table: ValueOf<RelatableTable> = TABLE_MAP[this.types[0]];
     return new FilteredSelector<ItemMap[TType]>(
-      this.table,
+      table,
       this.db
         .sql()
-        .selectFrom<keyof DatabaseSchema>(this.table)
+        .selectFrom<keyof DatabaseSchema>(table)
         .where("id", "in", (b) =>
           b
             .selectFrom("relations")
@@ -356,10 +367,12 @@ class RelationsArray<TType extends keyof RelatableTable> {
     ) => {
       if (this.direction === "to") {
         return builder
-          .where(
-            "fromType",
-            this.types.length > 1 ? "in" : "==",
-            this.types.length > 1 ? this.types : this.types[0]
+          .$if(!!this.types, (eb) =>
+            eb.where(
+              "fromType",
+              this.types!.length > 1 ? "in" : "==",
+              this.types!.length > 1 ? this.types : this.types![0]
+            )
           )
           .where("toType", "==", this.reference.type)
           .where(
@@ -370,12 +383,12 @@ class RelationsArray<TType extends keyof RelatableTable> {
               : this.reference.id
           )
           .$if(
-            this.types.includes("note" as TType) &&
+            !!this.types?.includes("note" as TType) &&
               this.db.trash.cache.notes.length > 0,
             (b) => b.where("fromId", "not in", this.db.trash.cache.notes)
           )
           .$if(
-            this.types.includes("notebook" as TType) &&
+            !!this.types?.includes("notebook" as TType) &&
               this.db.trash.cache.notebooks.length > 0,
             (b) => b.where("fromId", "not in", this.db.trash.cache.notebooks)
           )
@@ -383,10 +396,12 @@ class RelationsArray<TType extends keyof RelatableTable> {
           .$narrowType<{ id: string }>();
       } else {
         return builder
-          .where(
-            "toType",
-            this.types.length > 1 ? "in" : "==",
-            this.types.length > 1 ? this.types : this.types[0]
+          .$if(!!this.types, (eb) =>
+            eb.where(
+              "toType",
+              this.types!.length > 1 ? "in" : "==",
+              this.types!.length > 1 ? this.types : this.types![0]
+            )
           )
           .where("fromType", "==", this.reference.type)
           .where(
@@ -397,12 +412,12 @@ class RelationsArray<TType extends keyof RelatableTable> {
               : this.reference.id
           )
           .$if(
-            this.types.includes("note" as TType) &&
+            !!this.types?.includes("note" as TType) &&
               this.db.trash.cache.notes.length > 0,
             (b) => b.where("toId", "not in", this.db.trash.cache.notes)
           )
           .$if(
-            this.types.includes("notebook" as TType) &&
+            !!this.types?.includes("notebook" as TType) &&
               this.db.trash.cache.notebooks.length > 0,
             (b) => b.where("toId", "not in", this.db.trash.cache.notebooks)
           )
