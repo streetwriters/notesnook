@@ -271,7 +271,7 @@ function EditorView({
         const isContent =
           item.type === "tiptap" && item.noteId === session.note.id;
         const isNote = item.type === "note" && item.id === session.note.id;
-        if (isContent && lastChangedTime.current < item.dateEdited) {
+        if (isContent && lastChangedTime.current < item.dateModified) {
           if (!item.locked) return editor.updateContent(item.data);
 
           const result = await db.vault
