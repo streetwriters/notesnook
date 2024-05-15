@@ -524,8 +524,6 @@ const menuItems: (
       type: "button",
       key: "duplicate",
       title: "Duplicate",
-      //!isSynced ||
-      isDisabled: context?.locked,
       icon: Duplicate.path,
       onClick: () => store.get().duplicate(...ids),
       multiSelect: true
