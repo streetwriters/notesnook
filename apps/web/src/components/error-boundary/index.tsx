@@ -164,7 +164,8 @@ function getErrorHelp(props: FallbackProps) {
     errorText.includes("unsupported file format") ||
     errorText.includes("null function or function signature mismatch") ||
     errorText.includes("malformed database schema") ||
-    /table ".+?" already exists/.test(errorText)
+    /table ".+?" already exists/.test(errorText) ||
+    errorText.includes("corrupted migrations:")
   ) {
     return {
       explanation: `This error usually means the database file is either corrupt or it could not be decrypted.`,
