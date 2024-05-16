@@ -259,14 +259,15 @@ test("unlock a note for editing", async ({ page }) => {
   await page.waitForTimeout(150);
 
   await page.reload();
-  await page.waitForTimeout(500);
+  await notes.waitForList();
 
   const newContent = `${NOTE.content}${content}`;
   const editedNote = await notes.findNote({
     title: NOTE.title,
     content: newContent
   });
-  await editedNote?.openLockedNote(PASSWORD);
+  if (!editedNote) throw new Error("Could not find note.");
+  await editedNote.openLockedNote(PASSWORD);
   await notes.editor.waitForLoading();
   expect(await notes.editor.getContent("text")).toContain(newContent);
 });
