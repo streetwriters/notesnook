@@ -311,8 +311,7 @@ const ShareView = () => {
           type: "tiptap"
         },
         id: note.id,
-        sessionId: Date.now(),
-        title: noteTitle.current
+        sessionId: Date.now()
       };
     } else {
       noteData = { ...note };
@@ -487,25 +486,42 @@ const ShareView = () => {
                     gap: 10
                   }}
                 >
-                  <TextInput
-                    placeholder="Enter note title"
-                    ref={inputRef}
-                    style={{
-                      flexShrink: 1,
-                      flexGrow: 1,
-                      fontFamily: "OpenSans-SemiBold",
-                      fontSize: SIZE.lg,
-                      paddingBottom: 0,
-                      paddingTop: 0
-                    }}
-                    onChangeText={(value) => {
-                      noteTitle.current = value;
-                    }}
-                    blurOnSubmit={false}
-                    onSubmitEditing={() => {
-                      editorRef.current.focus();
-                    }}
-                  />
+                  {appendNoteId ? (
+                    <Heading
+                      style={{
+                        flexShrink: 1,
+                        flexGrow: 1,
+                        fontFamily: "OpenSans-SemiBold",
+                        fontSize: SIZE.lg,
+                        paddingBottom: 0,
+                        paddingTop: 0
+                      }}
+                    >
+                      Save note
+                    </Heading>
+                  ) : (
+                    <TextInput
+                      placeholder="Enter note title"
+                      ref={inputRef}
+                      style={{
+                        flexShrink: 1,
+                        flexGrow: 1,
+                        fontFamily: "OpenSans-SemiBold",
+                        fontSize: SIZE.lg,
+                        paddingBottom: 0,
+                        paddingTop: 0,
+                        color: colors.primary.heading
+                      }}
+                      onChangeText={(value) => {
+                        noteTitle.current = value;
+                      }}
+                      defaultValue={noteTitle.current}
+                      blurOnSubmit={false}
+                      onSubmitEditing={() => {
+                        editorRef.current.focus();
+                      }}
+                    />
+                  )}
                   <Button
                     title="Done"
                     type="accent"
