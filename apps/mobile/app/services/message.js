@@ -59,14 +59,14 @@ const recoveryKeyMessage = {
       () => {
         eSendEvent(eOpenRecoveryKeyDialog);
       },
-      true,
+      false,
       async () => {
         SettingsService.set({
           recoveryKeySaved: true
         });
         clearMessage();
       },
-      "I have saved my key already"
+      "Cancel"
     );
   },
   data: {},
