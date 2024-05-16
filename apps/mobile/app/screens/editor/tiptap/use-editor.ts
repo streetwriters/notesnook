@@ -351,9 +351,18 @@ export const useEditor = (
             if (!unlocked)
               throw new Error("Could not save note, vault is locked");
           }
-          noteData.contentId = note?.contentId;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await db.vault?.save(noteData as any);
+          if (typeof noteData.title === "string") {
+            await db.notes.add({
+              title: noteData.title,
+              id: noteData.id
+            });
+          }
+
+          noteData.contentId = note?.contentId;
+          if (data) {
+            await db.vault?.save(noteData as any);
+          }
           clearTimeout(saveTimer);
         }
 
@@ -696,14 +705,13 @@ export const useEditor = (
               );
             }
 
-            console.log("readonly state changed...", note.readonly);
             useTabStore.getState().updateTab(tabId, {
               readonly: note.readonly
             });
           }
 
           if (data.type === "tiptap" && note && !isLocal) {
-            if (lastContentChangeTime.current[noteId] >= data.dateEdited) {
+            if (lastContentChangeTime.current[noteId] >= data.dateModified) {
               return;
             }
 
@@ -728,7 +736,7 @@ export const useEditor = (
               }
             } else {
               const _nextContent = data.data;
-              if (_nextContent === currentContents.current?.data) {
+              if (_nextContent === currentContents.current[note.id]?.data) {
                 return;
               }
               lastContentChangeTime.current[note.id] = note.dateEdited;
