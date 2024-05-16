@@ -184,7 +184,7 @@ export class Tiptap {
     this.data = new HTMLRewriter({
       ontag: (name, attr) => {
         const href = attr[ATTRIBUTES.href];
-        if (name === "a" && href.startsWith("nn://")) {
+        if (name === "a" && href && href.startsWith("nn://")) {
           const link = resolve(href);
           if (!link) return;
           attr[ATTRIBUTES.href] = link;
@@ -244,7 +244,10 @@ export class Tiptap {
     if (types.includes("internalLinks")) {
       result.internalLinks.push(
         ...findAll(
-          (e) => e.tagName === "a" && e.attribs.href.startsWith("nn://"),
+          (e) =>
+            e.tagName === "a" &&
+            !!e.attribs.href &&
+            e.attribs.href.startsWith("nn://"),
           document.childNodes
         )
           .map((e) => parseInternalLink(e.attribs.href))
