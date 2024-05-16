@@ -61,7 +61,9 @@ export function Toolbar(props: ToolbarProps) {
         ? editor.isEditable
           ? [...MOBILE_STATIC_TOOLBAR_GROUPS, ...tools]
           : READONLY_MOBILE_STATIC_TOOLBAR_GROUPS
-        : [...STATIC_TOOLBAR_GROUPS, ...tools],
+        : editor.isEditable
+        ? [...STATIC_TOOLBAR_GROUPS, ...tools]
+        : [],
     [tools, editor.isEditable, isMobile]
   );
 

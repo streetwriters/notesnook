@@ -21,7 +21,7 @@ import { useLayoutEffect } from "react";
 import { FloatingMenuProps } from "./types";
 import { SearchReplacePopup } from "../popups/search-replace";
 import { ResponsivePresenter } from "../../components/responsive";
-import { getEditorContainer, getToolbarElement } from "../utils/dom";
+import { getToolbarElement } from "../utils/dom";
 import { useEditorSearchStore } from "../stores/search-store";
 
 export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
@@ -41,11 +41,11 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
       isOpen={isSearching}
       onClose={() => editor.commands.endSearch()}
       position={{
-        target: editor.isEditable ? getToolbarElement() : getEditorContainer(),
+        target: getToolbarElement(),
         isTargetAbsolute: true,
-        location: editor.isEditable ? "below" : "top",
+        location: "below",
         align: "end",
-        yOffset: editor.isEditable ? 5 : -50
+        yOffset: 5
       }}
       blocking={false}
       focusOnRender={false}
