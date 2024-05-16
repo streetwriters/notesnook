@@ -123,7 +123,7 @@ describe.concurrent("merge content", (test) => {
       await loginFakeUser(db);
       const merger = new Merger(db);
 
-      const merged = await merger.mergeContent(
+      const merged = merger.mergeContent(
         {
           type: "tiptap",
           data: "Remote",
@@ -132,6 +132,7 @@ describe.concurrent("merge content", (test) => {
         {
           type: "tiptap",
           data: "Local",
+          synced: true,
           dateEdited: Date.now() - 1000
         }
       );
@@ -140,13 +141,13 @@ describe.concurrent("merge content", (test) => {
       expect(merged.data).toBe("Remote");
     }));
 
-  test("trigger conflict if local item dateEdited is newer", () =>
+  test("trigger conflict if local item is unsynced", () =>
     databaseTest().then(async (db) => {
       await loginFakeUser(db);
       const merger = new Merger(db);
 
       const noteId = await db.notes.add(TEST_NOTE);
-      const merged = await merger.mergeContent(
+      const merged = merger.mergeContent(
         {
           type: "tiptap",
           data: "Remote",
@@ -157,7 +158,7 @@ describe.concurrent("merge content", (test) => {
           type: "tiptap",
           data: "Local",
           noteId,
-
+          synced: false,
           dateEdited: Date.now()
         }
       );
@@ -166,7 +167,6 @@ describe.concurrent("merge content", (test) => {
       expect(merged.data).toBe("Local");
       expect(merged.conflicted).toBeDefined();
       expect(merged.conflicted.data).toBe("Remote");
-      expect(await db.notes.conflicted.has(noteId)).toBe(true);
     }));
 
   test("merge conflicts if local item is already conflicted", () =>
