@@ -66,7 +66,7 @@ export function parseInternalLink(link: string): InternalLink | undefined {
 }
 
 export function isInternalLink(link: string) {
-  return link.startsWith("nn://");
+  return link && link.startsWith("nn://");
 }
 
 function isValidInternalType(type: string): type is InternalLinkType {
