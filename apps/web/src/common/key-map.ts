@@ -18,9 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import hotkeys from "hotkeys-js";
-import { navigate } from "../navigation";
-// import { store as themestore } from "../stores/theme-store";
 import { GlobalKeyboard } from "../utils/keyboard";
+import { useEditorStore } from "../stores/editor-store";
+import { useStore as useSearchStore } from "../stores/search-store";
+import { useEditorManager } from "../components/editor/manager";
 
 const KEYMAP = [
   // {
@@ -57,11 +58,24 @@ const KEYMAP = [
     keys: ["command+f", "ctrl+f"],
     description: "Search all notes",
     global: false,
-    action: (e) => {
-      if (e.target?.classList.contains("ProseMirror")) return;
+    action: (e: KeyboardEvent) => {
+      const isInEditor =
+        e.target instanceof HTMLElement &&
+        !!e.target?.closest(".editor-container");
+      if (isInEditor) {
+        const activeSession = useEditorStore.getState().getActiveSession();
+        if (activeSession?.type === "readonly") {
+          e.preventDefault();
+          const editor = useEditorManager
+            .getState()
+            .getEditor(activeSession.id);
+          editor?.editor?.startSearch();
+        }
+        return;
+      }
       e.preventDefault();
 
-      navigate("/search/notes");
+      useSearchStore.setState({ isSearching: true, searchType: "notes" });
     }
   }
   // {
@@ -137,7 +151,11 @@ export function registerKeyMap() {
   KEYMAP.forEach((key) => {
     hotkeys(
       key.keys.join(","),
-      { element: key.global ? GlobalKeyboard : window },
+      {
+        element: key.global
+          ? (GlobalKeyboard as unknown as HTMLElement)
+          : document.body
+      },
       key.action
     );
   });

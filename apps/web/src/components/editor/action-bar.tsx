@@ -152,7 +152,6 @@ export function EditorActionBar() {
         activeSession &&
         activeSession.type !== "new" &&
         activeSession.type !== "locked" &&
-        activeSession.type !== "readonly" &&
         activeSession.type !== "diff" &&
         activeSession.type !== "conflicted",
       onClick: editor?.startSearch

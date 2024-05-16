@@ -344,7 +344,6 @@ function TipTap(props: TipTapProps) {
     };
   }, []);
 
-  if (readonly) return null;
   return (
     <>
       <ScopedThemeProvider
@@ -418,7 +417,7 @@ function TiptapWrapper(
         editorContainer={() => {
           if (editorContainerRef.current) return editorContainerRef.current;
           const editorContainer = document.createElement("div");
-          editorContainer.classList.add("selectable");
+          editorContainer.classList.add("selectable", "editor-container");
           editorContainer.style.flex = "1";
           editorContainer.style.cursor = "text";
           editorContainer.style.color =
@@ -427,6 +426,7 @@ function TiptapWrapper(
           editorContainer.style.fontSize = `${editorConfig.fontSize}px`;
           editorContainer.style.fontFamily =
             getFontById(editorConfig.fontFamily)?.font || "sans-serif";
+          editorContainer.tabIndex = -1;
           editorContainerRef.current = editorContainer;
           return editorContainer;
         }}
