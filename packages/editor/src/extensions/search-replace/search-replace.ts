@@ -19,7 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Extension } from "@tiptap/core";
 import { Decoration, DecorationSet } from "prosemirror-view";
-import { EditorState, Plugin, PluginKey, Transaction } from "prosemirror-state";
+import {
+  EditorState,
+  Plugin,
+  PluginKey,
+  Transaction,
+  TextSelection
+} from "prosemirror-state";
 import { SearchSettings } from "../../toolbar/stores/search-store";
 
 type DispatchFn = (tr: Transaction) => void;
@@ -274,44 +280,58 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
         },
       moveToNextResult:
         () =>
-        ({ state, dispatch, commands }) => {
+        ({ state, dispatch }) => {
           const { selectedIndex, results } = this.storage;
           if (!results || results.length <= 0) return false;
 
           let nextIndex = selectedIndex + 1;
           if (isNaN(nextIndex) || nextIndex >= results.length) nextIndex = 0;
 
+          const { tr } = state;
           const { from, to } = results[nextIndex];
-          commands.setTextSelection({ from, to });
+          tr.setSelection(
+            TextSelection.create(
+              tr.doc,
+              tr.mapping.map(from),
+              tr.mapping.map(to)
+            )
+          );
           scrollIntoView();
 
           this.storage.selectedIndex = nextIndex;
-          state.tr.setMeta("selectedIndex", nextIndex);
+          tr.setMeta("selectedIndex", nextIndex);
           if (dispatch) updateView(state, dispatch);
           return true;
         },
       moveToPreviousResult:
         () =>
-        ({ state, dispatch, commands }) => {
+        ({ state, dispatch }) => {
           const { selectedIndex, results } = this.storage;
           if (!results || results.length <= 0) return false;
 
           let prevIndex = selectedIndex - 1;
           if (isNaN(prevIndex) || prevIndex < 0) prevIndex = results.length - 1;
 
+          const { tr } = state;
           const { from, to } = results[prevIndex];
-          commands.setTextSelection({ from, to });
+          tr.setSelection(
+            TextSelection.create(
+              tr.doc,
+              tr.mapping.map(from),
+              tr.mapping.map(to)
+            )
+          );
           scrollIntoView();
 
           this.storage.selectedIndex = prevIndex;
-          state.tr.setMeta("selectedIndex", prevIndex);
+          tr.setMeta("selectedIndex", prevIndex);
           if (dispatch) updateView(state, dispatch);
 
           return true;
         },
       replace:
         (term) =>
-        ({ commands, tr, dispatch }) => {
+        ({ chain, tr, dispatch }) => {
           const { selectedIndex, results } = this.storage;
 
           if (!dispatch || !results || results.length <= 0) return false;
@@ -320,9 +340,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           const { from, to } = results[index];
 
           tr.insertText(term, from, to);
-          dispatch(tr);
-          commands.moveToNextResult();
-          return true;
+          return chain().moveToNextResult().run();
         },
       replaceAll:
         (term) =>
