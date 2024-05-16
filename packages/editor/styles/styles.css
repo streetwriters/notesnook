@@ -282,9 +282,10 @@ img.ProseMirror-separator {
   background-color: var(--paragraph, var(--nn_primary_paragraph)) !important;
 }
 
-.search-result.selected {
+.search-result.selected,
+.search-result.selected::selection {
   background-color: var(--accent-secondary) !important;
-  color: var(--accentForeground-secondary);
+  color: var(--accentForeground-secondary) !important;
 }
 
 .search-result {
