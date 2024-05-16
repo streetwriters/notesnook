@@ -307,7 +307,7 @@ function CalltoAction({ action, variant, sx, dismissAnnouncement }) {
             break;
           }
           case "backup": {
-            await createBackup(true);
+            await createBackup();
             break;
           }
           default: {

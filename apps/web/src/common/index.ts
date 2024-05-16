@@ -77,12 +77,19 @@ export async function introduceFeatures() {
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
 
-export async function createBackup(rescueMode = false) {
+export async function createBackup(
+  options: {
+    rescueMode?: boolean;
+    noVerify?: boolean;
+  } = {}
+) {
+  const { rescueMode, noVerify } = options;
   const { isLoggedIn } = useUserStore.getState();
   const { encryptBackups, toggleEncryptBackups } = useSettingStore.getState();
   if (!isLoggedIn && encryptBackups) toggleEncryptBackups();
 
-  const verified = rescueMode || encryptBackups || (await verifyAccount());
+  const verified =
+    rescueMode || encryptBackups || noVerify || (await verifyAccount());
   if (!verified) {
     showToast("error", "Could not create a backup: user verification failed.");
     return false;
