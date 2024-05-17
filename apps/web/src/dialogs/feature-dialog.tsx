@@ -89,32 +89,7 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [
-          {
-            title: "Bi-directional note linking",
-            subtitle: "You can now link any 2 notes for easier referencing."
-          },
-          {
-            title: "Tabs",
-            subtitle:
-              "Open multiple notes side by side for faster multi-tasking."
-          },
-          {
-            title: "Nested notebooks",
-            subtitle:
-              "Create subnotebooks inside notebooks upto unlimited depth."
-          },
-          {
-            title: "At rest encryption",
-            subtitle:
-              "All your data will now be stored encrypted on your device to keep you safe even if your device gets compromised."
-          },
-          {
-            title: "App lock",
-            subtitle:
-              "App lock is now here on desktop/web apps! Put a lock on the app, and keep it safe from intruders."
-          }
-        ],
+      : [],
     cta: {
       title: "Got it",
       icon: Checkmark,
