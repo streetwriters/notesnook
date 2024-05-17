@@ -232,7 +232,8 @@ export async function deriveCryptoKey(data) {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
     const userKeyCipher = await encrypt(
       {
-        key: await getDatabaseKey()
+        key: await getDatabaseKey(),
+        salt: NOTESNOOK_DB_KEY_SALT
       },
       credentials.key
     );
@@ -257,12 +258,11 @@ export async function getCryptoKey(_name) {
 
     const key = await decrypt(
       {
-        key: await getDatabaseKey()
+        key: await getDatabaseKey(),
+        salt: keyCipher.salt
       },
       keyCipher
     );
-
-    DatabaseLogger.info("User key decrypted: ", !!key);
 
     return key;
   } catch (e) {

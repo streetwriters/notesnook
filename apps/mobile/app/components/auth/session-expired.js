@@ -112,6 +112,10 @@ export const SessionExpired = () => {
       if (!res) throw new Error("no token found");
       if (db.tokenManager._isTokenExpired(res))
         throw new Error("token expired");
+
+      const key = await db.user.getEncryptionKey();
+      if (!key) throw new Error("No encryption key found.");
+
       Sync.run("global", false, "full", async (complete) => {
         if (!complete) {
           let user = await db.user.getUser();
@@ -127,7 +131,6 @@ export const SessionExpired = () => {
         setVisible(false);
       });
     } catch (e) {
-      console.log(e);
       let user = await db.user.getUser();
       if (!user) return;
       email.current = user.email;
