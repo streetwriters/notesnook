@@ -289,6 +289,26 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await rebuildSearchIndex(db);
         }
+      },
+      "3": {
+        async up(db) {
+          await db
+            .updateTable("notes")
+            .where("id", "in", (eb) =>
+              eb
+                .selectFrom("content")
+                .select("noteId as id")
+                .where((eb) =>
+                  eb.or([
+                    eb("conflicted", "is", null),
+                    eb("conflicted", "==", false)
+                  ])
+                )
+                .$castTo<string | null>()
+            )
+            .set({ conflicted: false })
+            .execute();
+        }
       }
     };
   }

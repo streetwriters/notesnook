@@ -251,7 +251,7 @@ class Sync {
           .selectFrom("content")
           .select("noteId as id")
           .where("conflicted", "is not", null)
-          .where("conflicted", "is not", false)
+          .where("conflicted", "!=", false)
           .$castTo<string | null>()
       )
       .set({ conflicted: true })
