@@ -18,31 +18,59 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { init } from "@notesnook/web/src/bootstrap";
-import { render } from "react-dom";
+import { createRoot } from "react-dom/client";
+import {
+  ErrorBoundary,
+  ErrorComponent
+} from "@notesnook/web/src/components/error-boundary";
 import { BaseThemeProvider } from "@notesnook/web/src/components/theme-provider";
 import { App } from "./app";
 
 renderApp();
 
 async function renderApp() {
-  const { component, props } = await init();
+  const rootElement = document.getElementById("root");
+  if (!rootElement) return;
+  const root = createRoot(rootElement);
+  try {
+    const { component, props } = await init();
 
-  const { default: Component } = await component();
-  render(
-    <BaseThemeProvider
-      sx={{
-        display: "flex",
-        "#app": { flex: 1, height: "unset" },
-        "& > :first-child:not(#menu-wrapper)": { flex: 1 },
-        height: "100%"
-      }}
-    >
-      <Component route={props?.route || "login:email"} />
-      <App />
-    </BaseThemeProvider>,
-    document.getElementById("root"),
-    () => {
-      document.getElementById("splash")?.remove();
-    }
-  );
+    const { useKeyStore } = await import(
+      "@notesnook/web/src/interfaces/key-store"
+    );
+    await useKeyStore.getState().init();
+
+    const { default: Component } = await component();
+    const { default: AppLock } = await import(
+      "@notesnook/web/src/views/app-lock"
+    );
+
+    root.render(
+      <ErrorBoundary>
+        <BaseThemeProvider
+          onRender={() => document.getElementById("splash")?.remove()}
+          sx={{
+            display: "flex",
+            "#app": { flex: 1, height: "unset" },
+            "& > :first-child:not(#menu-wrapper)": { flex: 1 },
+            height: "100%"
+          }}
+        >
+          <AppLock>
+            <Component route={props?.route || "login:email"} />
+          </AppLock>
+          <App />
+        </BaseThemeProvider>
+      </ErrorBoundary>
+    );
+  } catch (e) {
+    root.render(
+      <>
+        <ErrorComponent
+          error={e}
+          resetErrorBoundary={() => window.location.reload()}
+        />
+      </>
+    );
+  }
 }
