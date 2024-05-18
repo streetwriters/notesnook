@@ -22,9 +22,7 @@ import {
   getFontById,
   getTableOfContents,
   TiptapOptions,
-  Toolbar,
-  usePermissionHandler,
-  useTiptap
+  usePermissionHandler
 } from "@notesnook/editor";
 import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
 import { useThemeColors } from "@notesnook/theme";
@@ -46,13 +44,13 @@ import {
   useTabContext,
   useTabStore
 } from "../hooks/useTabStore";
-import { EmotionEditorToolbarTheme } from "../theme-factory";
-import { EventTypes, postAsyncWithTimeout, randId, Settings } from "../utils";
+import { EventTypes, postAsyncWithTimeout, Settings } from "../utils";
+import { pendingSaveRequests } from "../utils/pending-saves";
 import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
+import TiptapEditorWrapper from "./tiptap";
 import Title from "./title";
-import { pendingSaveRequests } from "../utils/pending-saves";
 
 globalThis.toBlobURL = toBlobURL as typeof globalThis.toBlobURL;
 
@@ -77,6 +75,8 @@ const Tiptap = ({
   const biometryEnrolled = useTabStore((state) => state.biometryEnrolled);
   const editorRoot = useRef<HTMLDivElement>(null);
   const isFocusedRef = useRef<boolean>(false);
+  const [undo, setUndo] = useState(false);
+  const [redo, setRedo] = useState(false);
   tabRef.current = tab;
 
   function restoreNoteSelection(state?: NoteState) {
@@ -232,14 +232,11 @@ const Tiptap = ({
     settings.dateFormat,
     settings.timeFormat,
     settings.markdownShortcuts,
-    tick,
-    tab.id
+    tab.id,
+    tick
   ]);
 
-  const _editor = useTiptap(tiptapOptions, [tiptapOptions]);
-
   const update = useCallback(() => {
-    editors[tabRef.current.id]?.commands.setTextSelection(0);
     setTick((tick) => tick + 1);
     globalThis.editorControllers[tabRef.current.id]?.setTitlePlaceholder(
       "Note title"
@@ -263,7 +260,6 @@ const Tiptap = ({
   const controllerRef = useRef(controller);
 
   globalThis.editorControllers[tab.id] = controller;
-  globalThis.editors[tab.id] = _editor;
 
   useLayoutEffect(() => {
     if (!getContentDiv().parentElement) {
@@ -427,8 +423,8 @@ const Tiptap = ({
         onDoubleClick={onClickEmptyArea}
       >
         <Header
-          hasRedo={_editor?.can().redo() || false}
-          hasUndo={_editor?.can().undo() || false}
+          hasRedo={redo}
+          hasUndo={undo}
           settings={settings}
           noHeader={settings.noHeader || false}
         />
@@ -859,24 +855,23 @@ const Tiptap = ({
           />
         </div>
 
-        {tab.locked ? null : (
-          <EmotionEditorToolbarTheme>
-            <Toolbar
-              className="theme-scope-editorToolbar"
-              sx={{
-                display: settings.noToolbar ? "none" : "flex",
-                overflowY: "hidden",
-                minHeight: "50px",
-                backgroundColor: "red"
-              }}
-              editor={_editor}
-              location="bottom"
-              tools={[...settings.tools]}
-              defaultFontFamily={settings.fontFamily}
-              defaultFontSize={settings.fontSize}
-            />
-          </EmotionEditorToolbarTheme>
-        )}
+        <TiptapEditorWrapper
+          key={tick + tab.id + "-editor"}
+          options={tiptapOptions}
+          settings={settings}
+          onEditorUpdate={(editor) => {
+            if (!editor) {
+              setUndo(false);
+              setRedo(false);
+            }
+            if (undo !== editor.can().undo()) {
+              setUndo(editor.can().undo());
+            }
+            if (redo !== editor.can().redo()) {
+              setRedo(editor.can().redo());
+            }
+          }}
+        />
       </div>
     </>
   );
