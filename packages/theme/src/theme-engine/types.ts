@@ -294,6 +294,7 @@ export const THEME_SCOPES: readonly (keyof ThemeScopes)[] = [
   "editor",
   "editorToolbar",
   "editorSidebar",
+  "titleBar",
   "dialog",
   "navigationMenu",
   "contextMenu",
