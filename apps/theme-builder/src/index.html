@@ -2,19 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAHUUExURUxpcf////////////////////////////////////////////////////////////////////////////////////39/f39/f////////////////////////////////z8/O3s7P7+/vTz8wAAAPz7++/v7/Py8u/u7vDv7+7t7dfX1/79/ezr66Kiovv6+vf29vX09OTj4w0NDfv7++Ti4vr6+vT09Ovq6vn5+f39/fb19dnX1/b29tvb29/f3xMTE/j4+Pn4+O7s7MnJyerq6uno6M/Pz8jIyN3d3dnZ2d7e3kZGRvj39/38/Pf39+zs7PDw8OPi4ubl5cvLy+rp6czMzPLy8vPz887Ozujo6MrKyuDf3+fn59PT0+bm5uXl5c3NzfX19evr6wsLC+/t7ePj4/Ty8u3r6/Lx8eXk5OPh4dDQ0Nza2tjX19vZ2fHw8Nva2tLR0djW1tbW1tra2tLS0uHh4evp6eLi4tXV1djY2L+/vysrK7q6utHR0aGhoa6urrm5uQICAigoKCEhIZCQkFxcXBgYGFRUVBISEm1tbQ4ODklJSbu7uyAgID09PZqamkVFRXh4eLGxsTg4OOTk5FFRUQEBAQoKCnx8fBcXF7/+rP8AAAAfdFJOUwBOqO2h6KT9Mtyr5+w3Str+6TTZOjXb31M24O8BOd0PapSsAAABxElEQVQ4y2NgYOBgYWWXxwLYBdmEGICAjx9Z1NJJVQfB42QE6hdG0RaoaaCqhKSCl4EF1VxNVAXyTAzcaArUUBXwMLBjKDBBViDAII+uwBZFgTy6AjU1awIKNKz1aa0g1VBfB58CDS08CuIb40AKzLAqsJKXN2tXacChwKS+rTtB3tJHRU9ewxmbFZ6tKiqTrSAKdIO1LDEUaPeoqMzsUwAp0NIt8Uj0ijJXQFVgnDJVZcK0XrACXcXY0sjoHM8AfyUkBbOn9KvMmgRSYFEW4hUVqJagHeaShqTAwX7ijJQusAkW5VXRHu6eruFqaigKkqarqAAVKFbYxWiYq1XGedijuMHBWz6xo7m2Rl7RwtvdJaw6NjzCFl2BVVNdshJQgbqBsqtdpIu7nasjXIFXS2cyRL2CW6i6JTCgFCLitUPs4QrM7cDmKZi7FRYVm6o5QeLbDGICLNEqJAVk59rk2djY5Me4FThawQOKFSzrrxmaZWpqBAamQUGmwRaakNTNzMAm7+ekrKmlqOjsrIgAGcAA1ci0NVPiYhAV8zVURgbp6nBg7isuwsDAKKfkp4AEVOHASklKApS9JZmY5bECaS5ZGQYA3vqpy6NoYh0AAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII="
-    />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <!-- <link rel="manifest" href="/site.webmanifest" /> -->
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#01c352" />
-    <meta name="msapplication-TileColor" content="#01c352" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#01c352" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -49,33 +40,31 @@
     />
     <meta name="twitter:card" content="summary_large_image" />
     <title>Notesnook Theme Builder</title>
+    <style id="theme-colors">
+      #splash {
+        display: none !important;
+      }
+    </style>
+    <script type="module">
+      import { themeToCSS } from "@notesnook/theme";
 
-    <script nonce="7WIq8hRwApoXhctoGZZthMLYQLRNiprTwcPi6Azdf">
       const colorScheme = JSON.parse(
         window.localStorage.getItem("colorScheme") || '"light"'
       );
       const root = document.querySelector("html");
       if (root) root.setAttribute("data-theme", colorScheme);
+
+      const theme = window.localStorage.getItem(`theme:${colorScheme}`);
+      if (theme) {
+        const css = themeToCSS(JSON.parse(theme));
+        const stylesheet = document.getElementById("theme-colors");
+        if (stylesheet) stylesheet.innerHTML = css;
+      }
     </script>
     <script type="module" src="/index.tsx"></script>
     <style>
       html {
         overscroll-behavior: none;
-      }
-
-      html[data-theme="dark"] {
-        --bg: #0f0f0f;
-        --fg: #fff;
-        --three-bars-bg: #494949;
-        --gradient-stop-color: #111111;
-        --n-letter-color: #e1e1e1;
-      }
-
-      html[data-theme="light"] {
-        --bg: #fff;
-        --three-bars-bg: #bebebe;
-        --gradient-stop-color: #fff9f9;
-        --n-letter-color: #000;
       }
 
       html[data-theme="light"] .react-loading-skeleton {
@@ -88,6 +77,19 @@
         --highlight-color: var(--background-secondary);
       }
 
+      #splash {
+        background-color: var(--background);
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
       #splash svg {
         transform: scale(1);
         animation: pulse 2s infinite;
@@ -95,7 +97,7 @@
 
       @keyframes pulse {
         0% {
-          transform: scale(0.95);
+          transform: scale(0.9);
         }
 
         70% {
@@ -103,7 +105,7 @@
         }
 
         100% {
-          transform: scale(0.95);
+          transform: scale(0.9);
         }
       }
 
@@ -128,20 +130,9 @@
         overflow: hidden;
       }
 
-      @keyframes fadeUp {
-        0% {
-          transform: translateY(500px);
-          opacity: 0;
-        }
-
-        80% {
-          transform: translateY(0px);
-          opacity: 0.7;
-        }
-
-        100% {
-          opacity: 1;
-        }
+      #root {
+        display: flex;
+        flex-direction: column;
       }
 
       /* svg {
@@ -171,85 +162,40 @@
     </style>
   </head>
 
-  <body>
+  <body class="theme-scope-base">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <!--     <script src="https://cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
  -->
     <div id="root"></div>
-    <div
-      id="splash"
-      style="
-        background-color: var(--bg);
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      "
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      style="height: 0; width: 0; z-index: -1; position: absolute"
     >
-      <svg viewBox="0 0 339 339" style="width: 150px">
-        <defs />
-        <defs>
-          <linearGradient
-            xlink:href="#a"
-            id="b"
-            x1="188.61227"
-            x2="193.54405"
-            y1="165.2058"
-            y2="216.81519"
-            gradientTransform="rotate(5 4448 -4204) scale(2.93671)"
-            gradientUnits="userSpaceOnUse"
-          />
-
-          <linearGradient id="a">
-            <stop offset="0" />
-            <stop
-              offset="1"
-              stop-color="var(--gradient-stop-color)"
-              stop-opacity="0"
-            />
-          </linearGradient>
-          <linearGradient
-            id="c"
-            x1="167.8"
-            x2="270.6"
-            y1="76.9"
-            y2="64.2"
-            gradientTransform="rotate(5 465 -2050) scale(1.50082)"
-            gradientUnits="userSpaceOnUse"
-            xlink:href="#a"
-          />
-        </defs>
-        <g transform="translate(0 42)">
-          <path fill="url(#b)" d="M160 205l154 42-141 44-155-42z" />
-          <path fill="url(#c)" d="M160-35v240l154 42 1-253z" />
+      <symbol id="full-logo" viewBox="0 0 1000 1000">
+        <rect
+          width="1000"
+          height="1000"
+          rx="30%"
+          ry="30%"
+          style="fill: var(--paragraph)"
+        />
+        <g transform="translate(275,176.95254)">
           <path
-            fill="none"
-            stroke-width="1.2"
-            d="M160 205V-35m0 240L18 249m142-44l154 41"
-          />
-          <path
-            fill="var(--n-letter-color)"
-            d="M84 109l35 54V98l21-7v91l-27 9-35-54v65l-21 6v-91z"
-          />
-          <rect
-            width="86.1"
-            height="12.6"
-            x="185"
-            y="97"
-            fill="var(--three-bars-bg)"
-            ry="2.3"
-            transform="skewY(15) scale(.9669 1)"
-          />
-          <path
-            fill="var(--three-bars-bg)"
-            d="M181 169l99 26 2 3v8c0 1-1 2-2 1l-99-26-2-3v-7c0-2 1-2 2-2zm0-47l99 27 2 2v8l-2 2-99-27c-1 0-2-1-2-3v-7l2-2z"
+            style="fill: var(--background)"
+            d="M437.985 493.919c-17.255 50.411-51.835 93.065-97.588 120.372-45.752 27.307-99.71 37.496-152.269 28.753-52.56-8.743-100.313999-35.85-134.763-76.498C18.916 525.898.006 474.347 0 421.064v-110.25l79.121001 33.053v77.152c-.007 20.779 4.434 41.318 13.024 60.237C100.735 500.176 113.276 517.037 128.925 530.707c2.97 2.587 6.053 5.107 9.236 7.459 23.357 17.388 51.402 27.352 80.494 28.597.99 0 1.946.079 2.925.101.979.023 2.25 0 3.375 0h3.375c1.125 0 1.935 0 2.925-.101 29.081-1.248 57.116-11.203 80.471-28.575 3.173-2.351 6.255-4.86 9.237-7.447 20.556-17.98 35.656-41.366 43.582-67.5zM450 225v196.065c0 2.531 0 5.074-.158 7.605l-78.963-33.019V225c-.013-37.684-14.607-73.901-40.725-101.066-26.119-27.164003-61.735-43.168003-99.389-44.660003-37.655-1.492-74.426 11.644-102.611 36.657003-28.185999 25.013-45.599999 59.962-48.593999 97.526-.281 3.803-.439 7.662-.439 11.543v48.712L0 240.637V0h225c59.674 0 116.903 23.705 159.099 65.901C426.295 108.097 450 165.326 450 225Z"
           />
         </g>
+      </symbol>
+      <symbol id="themed-logo" viewBox="0 0 450 646.09491">
+        <path
+          style="fill: var(--paragraph)"
+          d="M437.985 493.919c-17.255 50.411-51.835 93.065-97.588 120.372-45.752 27.307-99.71 37.496-152.269 28.753-52.56-8.743-100.313999-35.85-134.763-76.498C18.916 525.898.006 474.347 0 421.064v-110.25l79.121001 33.053v77.152c-.007 20.779 4.434 41.318 13.024 60.237C100.735 500.176 113.276 517.037 128.925 530.707c2.97 2.587 6.053 5.107 9.236 7.459 23.357 17.388 51.402 27.352 80.494 28.597.99 0 1.946.079 2.925.101.979.023 2.25 0 3.375 0h3.375c1.125 0 1.935 0 2.925-.101 29.081-1.248 57.116-11.203 80.471-28.575 3.173-2.351 6.255-4.86 9.237-7.447 20.556-17.98 35.656-41.366 43.582-67.5zM450 225v196.065c0 2.531 0 5.074-.158 7.605l-78.963-33.019V225c-.013-37.684-14.607-73.901-40.725-101.066-26.119-27.164003-61.735-43.168003-99.389-44.660003-37.655-1.492-74.426 11.644-102.611 36.657003-28.185999 25.013-45.599999 59.962-48.593999 97.526-.281 3.803-.439 7.662-.439 11.543v48.712L0 240.637V0h225c59.674 0 116.903 23.705 159.099 65.901C426.295 108.097 450 165.326 450 225Z"
+        />
+      </symbol>
+    </svg>
+    <div id="splash" class="hidden">
+      <svg style="height: 120px">
+        <use href="#themed-logo" />
       </svg>
     </div>
     <div id="dialogContainer"></div>
