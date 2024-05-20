@@ -122,7 +122,8 @@ export default function DebugLogs() {
       colors.primary.paragraph,
       colors.error.paragraph,
       colors.static.black,
-      colors.static.orange
+      colors.static.orange,
+      colors.primary.border
     ]
   );
 

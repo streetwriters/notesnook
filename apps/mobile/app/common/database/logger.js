@@ -16,14 +16,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { MMKVLoader } from "react-native-mmkv-storage";
+
 import { initialize } from "@notesnook/core/dist/logger";
-import { KV } from "./storage";
+import { SqliteAdapter, SqliteIntrospector, SqliteQueryCompiler } from "kysely";
+import { Platform } from "react-native";
+import { setLogger } from ".";
+import { RNSqliteDriver } from "./sqlite.kysely";
 
-const LoggerStorage = new MMKVLoader()
-  .withInstanceID("notesnook_logs")
-  .initialize();
+const initializeLogger = async () => {
+  await initialize({
+    dialect: (name) => ({
+      createDriver: () => {
+        return new RNSqliteDriver({ async: true, dbName: name });
+      },
+      createAdapter: () => new SqliteAdapter(),
+      createIntrospector: (db) => new SqliteIntrospector(db),
+      createQueryCompiler: () => new SqliteQueryCompiler()
+    }),
+    tempStore: "memory",
+    journalMode: Platform.OS === "ios" ? "DELETE" : "WAL"
+  });
+  setLogger();
+};
 
-initialize(new KV(LoggerStorage));
-
-export { LoggerStorage };
+export { initializeLogger };
