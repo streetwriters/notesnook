@@ -118,7 +118,9 @@ function errorLogLevelFactory(level: LogLevel, config: LoggerConfig) {
       extras:
         error instanceof Error
           ? { ...extras, fallbackMessage }
-          : { ...extras, error },
+          : error
+          ? { ...extras, error }
+          : extras,
       scope: config.scope,
       elapsed: now - config.lastTime
     });
