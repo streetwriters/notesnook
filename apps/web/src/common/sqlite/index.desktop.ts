@@ -40,7 +40,7 @@ class SqliteDriver extends KSqliteDriver {
   }
 }
 
-export const createDialect = (name: string): Dialect => {
+export const createDialect = (name: string, _encrypted: boolean): Dialect => {
   return {
     createDriver: () =>
       new SqliteDriver({

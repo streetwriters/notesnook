@@ -58,7 +58,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
 
   database.setup({
     sqliteOptions: {
-      dialect: createDialect,
+      dialect: (name, init) => createDialect(name, true, init),
       ...(IS_DESKTOP_APP || isFeatureSupported("opfs")
         ? { journalMode: "WAL", lockingMode: "exclusive" }
         : {

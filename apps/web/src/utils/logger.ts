@@ -22,15 +22,32 @@ import {
   logger as _logger,
   logManager
 } from "@notesnook/core/dist/logger";
-import { LogMessage } from "@notesnook/logger";
-import { DatabasePersistence, NNStorage } from "../interfaces/storage";
+import { LogMessage, format } from "@notesnook/logger";
 import { ZipFile, createZipStream } from "./streams/zip-stream";
 import { createWriteStream } from "./stream-saver";
 import { sanitizeFilename } from "@notesnook/common";
+import { createDialect } from "../common/sqlite";
+import { isFeatureSupported } from "./feature-check";
 
 let logger: typeof _logger;
-async function initializeLogger(persistence: DatabasePersistence = "db") {
-  initialize(new NNStorage("Logs", () => null, persistence), false);
+async function initializeLogger() {
+  await initialize(
+    {
+      dialect: (name, init) => createDialect(name, false, init),
+      ...(IS_DESKTOP_APP || isFeatureSupported("opfs")
+        ? { journalMode: "WAL", lockingMode: "exclusive" }
+        : {
+            journalMode: "MEMORY",
+            lockingMode: "exclusive"
+          }),
+      tempStore: "memory",
+      synchronous: "normal",
+      pageSize: 8192,
+      cacheSize: -32000,
+      skipInitialization: !IS_DESKTOP_APP
+    },
+    false
+  );
   logger = _logger.scope("notesnook-web");
 }
 
@@ -47,11 +64,9 @@ async function downloadLogs() {
         return;
       }
       controller.enqueue({
-        path: sanitizeFilename(log.key, { replacement: "-" }),
+        path: sanitizeFilename(log.key, { replacement: "-" }) + ".log",
         data: textEncoder.encode(
-          (log.logs as LogMessage[])
-            .map((line) => JSON.stringify(line))
-            .join("\n")
+          (log.logs as LogMessage[]).map((line) => format(line)).join("\n")
         )
       });
     }
