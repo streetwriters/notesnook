@@ -22,14 +22,14 @@ import {
   logger as _logger,
   logManager
 } from "@notesnook/core/dist/logger";
-import { LogMessage, format } from "@notesnook/logger";
+import { LogMessage, NoopLogger, format } from "@notesnook/logger";
 import { ZipFile, createZipStream } from "./streams/zip-stream";
 import { createWriteStream } from "./stream-saver";
 import { sanitizeFilename } from "@notesnook/common";
 import { createDialect } from "../common/sqlite";
 import { isFeatureSupported } from "./feature-check";
 
-let logger: typeof _logger;
+let logger: typeof _logger = new NoopLogger();
 async function initializeLogger() {
   await initialize(
     {
