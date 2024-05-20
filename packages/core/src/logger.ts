@@ -28,8 +28,9 @@ import {
   format,
   ILogger
 } from "@notesnook/logger";
-import { Kysely, Migration, MigrationProvider, sql } from "kysely";
+import { Kysely, Migration, MigrationProvider } from "kysely";
 import { SQLiteOptions, createDatabase } from "./database";
+import { toChunks } from "./utils/array";
 
 const WEEK = 86400000 * 7;
 
@@ -43,8 +44,9 @@ type SQLiteItem<T> = {
   [P in keyof T]?: T[P] | null;
 };
 
+type LogMessageWithDate = LogMessage & { date: string };
 export type LogDatabaseSchema = {
-  logs: SQLiteItem<LogMessage>;
+  logs: SQLiteItem<LogMessageWithDate>;
 };
 
 class NNLogsMigrationProvider implements MigrationProvider {
@@ -57,6 +59,7 @@ class NNLogsMigrationProvider implements MigrationProvider {
             .addColumn("timestamp", "integer", (c) => c.notNull())
             .addColumn("message", "text", (c) => c.notNull())
             .addColumn("level", "integer", (c) => c.notNull())
+            .addColumn("date", "text")
             .addColumn("scope", "text")
             .addColumn("extras", "text")
             .addColumn("elapsed", "integer")
@@ -85,7 +88,7 @@ class DatabaseLogReporter {
 }
 
 class DatabaseLogWriter {
-  private queue: LogMessage[] = [];
+  private queue: LogMessageWithDate[] = [];
   private hasCleared = false;
 
   constructor(private readonly db: Kysely<LogDatabaseSchema>) {
@@ -101,14 +104,20 @@ class DatabaseLogWriter {
   }
 
   push(message: LogMessage) {
-    this.queue.push(message);
+    const date = new Date(message.timestamp);
+    (message as LogMessageWithDate).date = `${date.getFullYear()}-${
+      date.getMonth() + 1
+    }-${date.getDate()}`;
+    this.queue.push(message as LogMessageWithDate);
   }
 
   async flush() {
     if (this.queue.length === 0) return;
     const queueCopy = this.queue.slice();
     this.queue = [];
-    await this.db.insertInto("logs").values(queueCopy).execute();
+    for (const chunk of toChunks(queueCopy, 1000)) {
+      await this.db.insertInto("logs").values(chunk).execute();
+    }
   }
 
   async rotate() {
@@ -130,15 +139,13 @@ class DatabaseLogManager {
         "scope",
         "extras",
         "elapsed",
-        sql<string>`strftime('%Y-%m-%d', date(timestamp / 1000, 'unixepoch', 'localtime'))`.as(
-          "date"
-        )
+        "date"
       ])
       .execute();
     const groupedLogs: Record<string, LogMessage[]> = {};
 
     for (const log of logs) {
-      const key = log.date;
+      const key = log.date!;
       if (!groupedLogs[key]) groupedLogs[key] = [];
       groupedLogs[key].push(log as LogMessage);
     }
@@ -156,14 +163,7 @@ class DatabaseLogManager {
   }
 
   async delete(key: string) {
-    await this.db
-      .deleteFrom("logs")
-      .where(
-        sql`strftime('%Y-%m-%d', date(timestamp / 1000, 'unixepoch', 'localtime'))`,
-        "==",
-        key
-      )
-      .execute();
+    await this.db.deleteFrom("logs").where("date", "==", key).execute();
   }
 }
 
