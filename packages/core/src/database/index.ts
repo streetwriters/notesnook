@@ -34,7 +34,8 @@ import {
   ColumnType,
   ExpressionBuilder,
   ReferenceExpression,
-  Dialect
+  Dialect,
+  MigrationProvider
 } from "kysely";
 import {
   Attachment,
@@ -58,8 +59,6 @@ import {
   Vault,
   isDeleted
 } from "../types";
-import { NNMigrationProvider } from "./migrations";
-import { createTriggers } from "./triggers";
 import { logger } from "../logger";
 
 // type FilteredKeys<T, U> = {
@@ -258,10 +257,11 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
   }
 };
 
-async function setupDatabase(
-  db: Kysely<RawDatabaseSchema>,
+async function setupDatabase<Schema>(
+  db: Kysely<Schema>,
   options: SQLiteOptions
 ) {
+  await sql`PRAGMA init;`.execute(db);
   if (options.password)
     await sql`PRAGMA key = ${sql.ref(options.password)}`.execute(db);
   await sql`PRAGMA journal_mode = ${sql.raw(
@@ -295,11 +295,14 @@ async function setupDatabase(
     );
 }
 
-export async function initializeDatabase(db: Kysely<RawDatabaseSchema>) {
+export async function initializeDatabase<Schema>(
+  db: Kysely<Schema>,
+  migrationProvider: MigrationProvider
+) {
   try {
     const migrator = new Migrator({
       db,
-      provider: new NNMigrationProvider()
+      provider: migrationProvider
     });
     const { error, results } = await migrator.migrateToLatest();
 
@@ -313,8 +316,6 @@ export async function initializeDatabase(db: Kysely<RawDatabaseSchema>) {
           .map((e) => e.migrationName)
           .join(", ")}`
       );
-
-    await createTriggers(db);
 
     return db;
   } catch (e) {
@@ -336,8 +337,14 @@ export type SQLiteOptions = {
 
   skipInitialization?: boolean;
 };
-export async function createDatabase(name: string, options: SQLiteOptions) {
-  const db = new Kysely<RawDatabaseSchema>({
+export async function createDatabase<Schema>(
+  name: string,
+  options: SQLiteOptions & {
+    migrationProvider: MigrationProvider;
+    onInit?: (db: Kysely<Schema>) => Promise<void>;
+  }
+) {
+  const db = new Kysely<Schema>({
     // log: (event) => {
     //   if (event.queryDurationMillis > 5)
     //     console.warn(event.query.sql, event.queryDurationMillis);
@@ -345,7 +352,8 @@ export async function createDatabase(name: string, options: SQLiteOptions) {
     dialect: options.dialect(name, async () => {
       await db.connection().execute(async (db) => {
         await setupDatabase(db, options);
-        await initializeDatabase(db);
+        await initializeDatabase(db, options.migrationProvider);
+        if (options.onInit) await options.onInit(db);
       });
     }),
     plugins: [new SqliteBooleanPlugin()]
@@ -353,7 +361,8 @@ export async function createDatabase(name: string, options: SQLiteOptions) {
   if (!options.skipInitialization)
     await db.connection().execute(async (db) => {
       await setupDatabase(db, options);
-      await initializeDatabase(db);
+      await initializeDatabase(db, options.migrationProvider);
+      if (options.onInit) await options.onInit(db);
     });
 
   return db;
