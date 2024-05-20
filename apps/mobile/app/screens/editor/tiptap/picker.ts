@@ -185,7 +185,8 @@ const camera = async (options: PickerOptions) => {
       cropping: false,
       multiple: true,
       maxFiles: 10,
-      writeTempFile: true
+      writeTempFile: true,
+      compressImageQuality: 1
     })
       .then((response) => {
         handleImageResponse(
@@ -215,7 +216,8 @@ const gallery = async (options: PickerOptions) => {
       mediaType: "photo",
       maxFiles: 10,
       cropping: false,
-      multiple: true
+      multiple: true,
+      compressImageQuality: 1
     })
       .then((response) =>
         handleImageResponse(
@@ -266,7 +268,6 @@ const handleImageResponse = async (
   response: Image[],
   options: PickerOptions
 ) => {
-  console.log(response, "result-file-picker");
   const result = await AttachImage.present(response, options.context);
   if (!result) return;
   const compress = result.compress;

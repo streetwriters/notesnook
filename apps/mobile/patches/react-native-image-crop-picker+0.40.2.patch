@@ -10,3 +10,19 @@ index 5de0845..1b158d8 100644
  
          if (includeBase64) {
              image.putString("data", getBase64StringFromFile(compressedImagePath));
+diff --git a/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.m b/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.m
+index 9f20973..5e14da8 100644
+--- a/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.m
++++ b/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.m
+@@ -595,8 +595,10 @@ - (void)qb_imagePickerController:
+                                     NSString *mimeType = [self determineMimeTypeFromImageData:imageData];
+                                     Boolean isKnownMimeType = [mimeType length] > 0;
+                                     
++                                    Boolean isHeicOrHeif = [mimeType isEqualToString:@"image/heic"] || [mimeType isEqualToString:@"image/heif"];
++                                    
+                                     ImageResult *imageResult = [[ImageResult alloc] init];
+-                                    if (isLossless && useOriginalWidth && useOriginalHeight && isKnownMimeType && !forceJpg) {
++                                    if (isLossless && useOriginalWidth && useOriginalHeight && isKnownMimeType && !forceJpg && !isHeicOrHeif) {
+                                         // Use original, unmodified image
+                                         imageResult.data = imageData;
+                                         imageResult.width = @(imgT.size.width);
