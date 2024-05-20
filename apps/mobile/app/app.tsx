@@ -16,15 +16,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import "react-native-gesture-handler";
 import {
   THEME_COMPATIBILITY_VERSION,
   useThemeEngineStore
 } from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { I18nManager, View } from "react-native";
+import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { initializeLogger } from "./common/database/logger";
 import AppLockedOverlay from "./components/app-lock-overlay";
 import { withErrorBoundry } from "./components/exception-handler";
 import GlobalSafeAreaProvider from "./components/globalsafearea";
@@ -44,23 +45,28 @@ I18nManager.swapLeftAndRightInRTL(false);
 const App = () => {
   const init = useAppEvents();
   useEffect(() => {
-    const { appLockEnabled, appLockMode } = SettingsService.get();
-    if (appLockEnabled || appLockMode !== "none") {
-      useUserStore.getState().lockApp(true);
-    }
+    initializeLogger()
+      .catch((e) => {
+        console.log(e);
+      })
+      .finally(() => {
+        const { appLockEnabled, appLockMode } = SettingsService.get();
+        if (appLockEnabled || appLockMode !== "none") {
+          useUserStore.getState().lockApp(true);
+        }
 
-    //@ts-ignore
-    globalThis["IS_MAIN_APP_RUNNING"] = true;
-    init();
-    setTimeout(async () => {
-      SettingsService.onFirstLaunch();
-      await Notifications.get();
-      if (SettingsService.get().notifNotes) {
-        Notifications.pinQuickNote(true);
-      }
-      TipManager.init();
-    }, 100);
-
+        //@ts-ignore
+        globalThis["IS_MAIN_APP_RUNNING"] = true;
+        init();
+        setTimeout(async () => {
+          SettingsService.onFirstLaunch();
+          await Notifications.get();
+          if (SettingsService.get().notifNotes) {
+            Notifications.pinQuickNote(true);
+          }
+          TipManager.init();
+        }, 100);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

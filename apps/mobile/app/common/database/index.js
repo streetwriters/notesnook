@@ -85,4 +85,10 @@ export async function setupDatabase(password) {
 }
 
 export const db = database;
-export const DatabaseLogger = dbLogger;
+let DatabaseLogger = dbLogger.scope(Platform.OS);
+
+const setLogger = () => {
+  DatabaseLogger = dbLogger.scope(Platform.OS);
+};
+
+export { DatabaseLogger, setLogger };
