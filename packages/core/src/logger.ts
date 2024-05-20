@@ -156,15 +156,14 @@ class DatabaseLogManager {
   }
 
   async delete(key: string) {
-    // const logKeys = await this.storage.getAllKeys();
-    // const keysToRemove = [];
-    // for (const logKey of logKeys) {
-    //   const keyParts = logKey.split(":");
-    //   if (keyParts.length === 1) continue;
-    //   const currKey = keyParts[0];
-    //   if (currKey === key) keysToRemove.push(logKey);
-    // }
-    // if (keysToRemove.length) await this.storage.removeMulti(keysToRemove);
+    await this.db
+      .deleteFrom("logs")
+      .where(
+        sql`strftime('%Y-%m-%d', date(timestamp / 1000, 'unixepoch', 'localtime'))`,
+        "==",
+        key
+      )
+      .execute();
   }
 }
 
