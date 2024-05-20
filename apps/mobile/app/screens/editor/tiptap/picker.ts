@@ -303,9 +303,14 @@ const handleImageResponse = async (
       type: "url"
     });
 
-    const fileName = image.sourceURL
+    let fileName = image.sourceURL
       ? basename(image.sourceURL)
       : image.filename || "image";
+
+    fileName =
+      image.mime === "image/jpeg"
+        ? fileName.replace(/HEIC|HEIF/, "jpeg")
+        : fileName;
 
     console.log("attaching image...", fileName);
 
