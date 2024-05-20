@@ -100,9 +100,6 @@ export class Attachments implements ICollection {
 
   async init() {
     await this.collection.init();
-    logger.debug("attachments initialized", {
-      total: await this.collection.count()
-    });
   }
 
   async add(
