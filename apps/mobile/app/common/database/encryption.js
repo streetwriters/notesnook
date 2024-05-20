@@ -25,6 +25,7 @@ import { MMKVLoader, ProcessingModes } from "react-native-mmkv-storage";
 import { generateSecureRandom } from "react-native-securerandom";
 import { DatabaseLogger } from ".";
 import { MMKV } from "./mmkv";
+import { ToastManager } from "../../services/event-manager";
 
 // Database key cipher is persisted across different user sessions hence it has
 // it's independent storage which we will never clear. This is only used when application has
@@ -208,7 +209,8 @@ export async function getDatabaseKey(appLockPassword) {
       if (userKeyCredentials) {
         const userKeyCipher = await encrypt(
           {
-            key: DB_KEY
+            key: DB_KEY,
+            salt: NOTESNOOK_DB_KEY_SALT
           },
           userKeyCredentials.password
         );
@@ -221,6 +223,7 @@ export async function getDatabaseKey(appLockPassword) {
 
     return DB_KEY;
   } catch (e) {
+    ToastManager.error(e, "Error getting database key");
     console.log(e, "error");
     DatabaseLogger.error(e);
     return null;
