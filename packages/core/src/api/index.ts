@@ -63,6 +63,7 @@ import { Settings } from "../collections/settings";
 import {
   DatabaseAccessor,
   DatabaseSchema,
+  RawDatabaseSchema,
   SQLiteOptions,
   changeDatabasePassword,
   createDatabase,
@@ -74,7 +75,8 @@ import { Vaults } from "../collections/vaults";
 import { KVStorage } from "../database/kv";
 import { QueueValue } from "../utils/queue-value";
 import { Sanitizer } from "../database/sanitizer";
-import { dropTriggers } from "../database/triggers";
+import { createTriggers, dropTriggers } from "../database/triggers";
+import { NNMigrationProvider } from "../database/migrations";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -244,7 +246,10 @@ class Database {
       await sql.raw(statement).execute(this.sql());
     }
 
-    await initializeDatabase(this.sql().withTables());
+    await initializeDatabase(
+      this.sql().withTables(),
+      new NNMigrationProvider()
+    );
     await this.initCollections();
     return true;
   }
@@ -274,10 +279,11 @@ class Database {
       this.disconnectSSE();
     });
 
-    this._sql = (await createDatabase(
-      "notesnook",
-      this.options.sqliteOptions
-    )) as unknown as Kysely<DatabaseSchema>;
+    this._sql = (await createDatabase<RawDatabaseSchema>("notesnook", {
+      ...this.options.sqliteOptions,
+      migrationProvider: new NNMigrationProvider(),
+      onInit: (db) => createTriggers(db)
+    })) as unknown as Kysely<DatabaseSchema>;
 
     await this.sanitizer.init();
 
