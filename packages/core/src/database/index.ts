@@ -261,7 +261,6 @@ async function setupDatabase<Schema>(
   db: Kysely<Schema>,
   options: SQLiteOptions
 ) {
-  await sql`PRAGMA init;`.execute(db);
   if (options.password)
     await sql`PRAGMA key = ${sql.ref(options.password)}`.execute(db);
   await sql`PRAGMA journal_mode = ${sql.raw(
