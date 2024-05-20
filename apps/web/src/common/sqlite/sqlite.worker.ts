@@ -32,221 +32,230 @@ type PreparedStatement = {
   columns: string[];
 };
 
-let sqlite: SQLiteAPI;
-let db: number | undefined = undefined;
-let vfs: IDBBatchAtomicVFS | AccessHandlePoolVFS | null = null;
-let initialized = false;
-const preparedStatements: Map<string, PreparedStatement> = new Map();
-const retryCounter: Record<string, number> = {};
-console.log("new sqlite worker");
-
-async function open(dbName: string, async: boolean, url?: string) {
-  if (db) {
-    console.error("Database is already initialized", db);
-    return;
-  }
-
-  const option = url ? { locateFile: () => url } : {};
-  const sqliteModule = async
-    ? await import("./wa-sqlite-async").then(
-        ({ default: SQLiteAsyncESMFactory }) => SQLiteAsyncESMFactory(option)
-      )
-    : await import("./wa-sqlite").then(({ default: SQLiteSyncESMFactory }) =>
-        SQLiteSyncESMFactory(option)
-      );
-  sqlite = Factory(sqliteModule);
-  vfs = await getVFS(dbName, async);
-
-  sqlite.vfs_register(vfs, false);
-  db = await sqlite.open_v2(dbName, undefined, `multipleciphers-${vfs.name}`);
-}
-
-/**
- * Wrapper function for preparing SQL statements with caching
- * to avoid unnecessary computations.
- */
-async function prepare(sql: string) {
-  if (!db) throw new Error("Database is not initialized.");
-  try {
-    const cached = preparedStatements.get(sql);
-    if (cached !== undefined) return cached;
-
-    const str = sqlite.str_new(db, sql);
-    const prepared = await sqlite.prepare_v2(db, sqlite.str_value(str));
-    if (!prepared) return;
-
-    const statement: PreparedStatement = {
-      stmt: prepared.stmt,
-      columns: sqlite.column_names(prepared.stmt)
-    };
-    preparedStatements.set(sql, statement);
-
-    sqlite.str_finish(str);
-
-    // reset retry count on success
-    retryCounter[sql] = 0;
-    return statement;
-  } catch (ex) {
-    console.error(ex);
-
-    // statement prepare process can be flaky so retry at least 5 times
-    // before giving up.
-    if (retryCounter[sql] < 5) {
-      retryCounter[sql] = (retryCounter[sql] || 0) + 1;
-      console.warn("Failed to prepare statement. Retrying:", sql);
-      return prepare(sql);
-    } else retryCounter[sql] = 0;
-
-    if (ex instanceof Error || ex instanceof SQLiteError)
-      ex.message += ` (query: ${sql})`;
-    throw ex;
-  }
-}
-
-async function run(
-  sql: string,
-  mode: RunMode,
-  parameters?: SQLiteCompatibleType[]
-) {
-  const prepared = await prepare(sql);
-  if (!prepared) return [];
-  try {
-    if (parameters) sqlite.bind_collection(prepared.stmt, parameters);
-
-    // fast path for exec statements
-    if (mode === "exec") {
-      while ((await sqlite.step(prepared.stmt)) === SQLITE_ROW);
-      return [];
-    }
-
-    const rows: Record<string, SQLiteCompatibleType>[] = [];
-    while ((await sqlite.step(prepared.stmt)) === SQLITE_ROW) {
-      const row = sqlite.row(prepared.stmt);
-      const acc: Record<string, SQLiteCompatibleType> = {};
-      row.forEach((v, i) => (acc[prepared.columns[i]] = v));
-      rows.push(acc);
-    }
-
-    return rows;
-  } catch (e) {
-    if (e instanceof Error || e instanceof SQLiteError)
-      e.message += ` (query: ${sql})`;
-    throw e;
-  } finally {
-    await sqlite
-      .reset(prepared.stmt)
-      // we must clear/destruct the prepared statement if it can't be reset
-      .catch(() =>
-        sqlite
-          .finalize(prepared.stmt)
-          // ignore error (we will just prepare a new statement)
-          .catch(console.error)
-          .finally(() => preparedStatements.delete(sql))
-      );
-  }
-}
-
-async function exec<R>(
-  mode: RunMode,
-  sql: string,
-  parameters?: SQLiteCompatibleType[]
-): Promise<QueryResult<R>> {
-  if (!sql.startsWith("PRAGMA key")) {
-    await waitForDatabase();
-  }
-  if (!db) throw new Error("No database is not opened.");
-
-  const rows = (await run(sql, mode, parameters)) as R[];
-  if (mode === "query") return { rows };
-
-  // initialize the database after it has been successfully decrypted.
-  // all queries prior to that must wait otherwise we get the
-  // "file is not a database" error
-  if (sql.startsWith("PRAGMA key")) await initialize();
-
-  return {
-    insertId: BigInt(sqlite.last_insert_rowid(db)),
-    numAffectedRows: BigInt(sqlite.changes(db)),
-    rows: mode === "raw" ? rows : []
-  };
-}
-
-async function close() {
-  if (!db) return;
-
-  for (const [_, prepared] of preparedStatements) {
-    await sqlite.finalize(prepared.stmt);
-  }
-  preparedStatements.clear();
-  await sqlite.close(db);
-  await vfs?.close();
-
-  db = undefined;
+class _SQLiteWorker {
+  sqlite!: SQLiteAPI;
+  db: number | undefined = undefined;
+  vfs: IDBBatchAtomicVFS | AccessHandlePoolVFS | null = null;
   initialized = false;
-}
+  preparedStatements: Map<string, PreparedStatement> = new Map();
+  retryCounter: Record<string, number> = {};
+  constructor(
+    private readonly dbName: string,
+    private readonly encrypted: boolean
+  ) {
+    console.log("new sqlite worker", dbName, encrypted);
+  }
 
-async function exportDatabase(dbName: string, async: boolean) {
-  const vfs = await getVFS(dbName, async);
-  const stream = new ReadableStream(new DatabaseSource(vfs, dbName));
-  return transfer(stream, [stream]);
-}
+  async open(async: boolean, url?: string) {
+    if (this.db) {
+      console.error("Database is already initialized", this.db);
+      return;
+    }
 
-async function deleteDatabase(dbName: string, async: boolean) {
-  await close();
-  if (vfs) await vfs.delete();
-  else await (await getVFS(dbName, async)).delete();
-}
+    const option = url ? { locateFile: () => url } : {};
+    const sqliteModule = async
+      ? await import("./wa-sqlite-async").then(
+          ({ default: SQLiteAsyncESMFactory }) => SQLiteAsyncESMFactory(option)
+        )
+      : await import("./wa-sqlite").then(({ default: SQLiteSyncESMFactory }) =>
+          SQLiteSyncESMFactory(option)
+        );
+    this.sqlite = Factory(sqliteModule);
+    this.vfs = await this.getVFS(this.dbName, async);
 
-async function getVFS(dbName: string, async: boolean) {
-  const vfs = async
-    ? await import("./IDBBatchAtomicVFS").then(
-        ({ IDBBatchAtomicVFS }) =>
-          new IDBBatchAtomicVFS(dbName, { durability: "strict" })
-      )
-    : await import("./AccessHandlePoolVFS").then(
-        ({ AccessHandlePoolVFS }) => new AccessHandlePoolVFS(dbName)
+    this.sqlite.vfs_register(this.vfs, false);
+    this.db = await this.sqlite.open_v2(
+      this.dbName,
+      undefined,
+      `multipleciphers-${this.vfs.name}`
+    );
+  }
+
+  /**
+   * Wrapper function for preparing SQL statements with caching
+   * to avoid unnecessary computations.
+   */
+  async prepare(sql: string): Promise<PreparedStatement | undefined> {
+    if (!this.db) throw new Error("Database is not initialized.");
+    try {
+      const cached = this.preparedStatements.get(sql);
+      if (cached !== undefined) return cached;
+
+      const str = this.sqlite.str_new(this.db, sql);
+      const prepared = await this.sqlite.prepare_v2(
+        this.db,
+        this.sqlite.str_value(str)
       );
-  if ("isReady" in vfs) await vfs.isReady;
-  return vfs;
+      if (!prepared) return;
+
+      const statement: PreparedStatement = {
+        stmt: prepared.stmt,
+        columns: this.sqlite.column_names(prepared.stmt)
+      };
+      this.preparedStatements.set(sql, statement);
+
+      this.sqlite.str_finish(str);
+
+      // reset retry count on success
+      this.retryCounter[sql] = 0;
+      return statement;
+    } catch (ex) {
+      console.error(ex);
+
+      // statement prepare process can be flaky so retry at least 5 times
+      // before giving up.
+      if (this.retryCounter[sql] < 5) {
+        this.retryCounter[sql] = (this.retryCounter[sql] || 0) + 1;
+        console.warn("Failed to prepare statement. Retrying:", sql);
+        return this.prepare(sql);
+      } else this.retryCounter[sql] = 0;
+
+      if (ex instanceof Error || ex instanceof SQLiteError)
+        ex.message += ` (query: ${sql})`;
+      throw ex;
+    }
+  }
+
+  async exec(sql: string, mode: RunMode, parameters?: SQLiteCompatibleType[]) {
+    const prepared = await this.prepare(sql);
+    if (!prepared) return [];
+    try {
+      if (parameters) this.sqlite.bind_collection(prepared.stmt, parameters);
+
+      // fast path for exec statements
+      if (mode === "exec") {
+        while ((await this.sqlite.step(prepared.stmt)) === SQLITE_ROW);
+        return [];
+      }
+
+      const rows: Record<string, SQLiteCompatibleType>[] = [];
+      while ((await this.sqlite.step(prepared.stmt)) === SQLITE_ROW) {
+        const row = this.sqlite.row(prepared.stmt);
+        const acc: Record<string, SQLiteCompatibleType> = {};
+        row.forEach((v, i) => (acc[prepared.columns[i]] = v));
+        rows.push(acc);
+      }
+
+      return rows;
+    } catch (e) {
+      if (e instanceof Error || e instanceof SQLiteError)
+        e.message += ` (query: ${sql})`;
+      throw e;
+    } finally {
+      await this.sqlite
+        .reset(prepared.stmt)
+        // we must clear/destruct the prepared statement if it can't be reset
+        .catch(() =>
+          this.sqlite
+            .finalize(prepared.stmt)
+            // ignore error (we will just prepare a new statement)
+            .catch(console.error)
+            .finally(() => this.preparedStatements.delete(sql))
+        );
+    }
+  }
+
+  async run<R>(
+    mode: RunMode,
+    sql: string,
+    parameters?: SQLiteCompatibleType[]
+  ): Promise<QueryResult<R>> {
+    if (this.encrypted && !sql.startsWith("PRAGMA key")) {
+      await this.waitForDatabase();
+    }
+    if (!this.db) throw new Error("No database is not opened.");
+
+    const rows = (await this.exec(sql, mode, parameters)) as R[];
+    if (mode === "query") return { rows };
+
+    // initialize the database after it has been successfully decrypted.
+    // all queries prior to that must wait otherwise we get the
+    // "file is not a database" error
+    if (this.encrypted && sql.startsWith("PRAGMA key")) await this.initialize();
+
+    return {
+      insertId: BigInt(this.sqlite.last_insert_rowid(this.db)),
+      numAffectedRows: BigInt(this.sqlite.changes(this.db)),
+      rows: mode === "raw" ? rows : []
+    };
+  }
+
+  async close() {
+    if (!this.db) return;
+
+    for (const [_, prepared] of this.preparedStatements) {
+      await this.sqlite.finalize(prepared.stmt);
+    }
+    this.preparedStatements.clear();
+    await this.sqlite.close(this.db);
+    await this.vfs?.close();
+
+    this.db = undefined;
+    this.initialized = false;
+  }
+
+  async export(dbName: string, async: boolean) {
+    const vfs = await this.getVFS(dbName, async);
+    const stream = new ReadableStream(new DatabaseSource(vfs, dbName));
+    return transfer(stream, [stream]);
+  }
+
+  async delete(dbName: string, async: boolean) {
+    await this.close();
+    if (this.vfs) await this.vfs.delete();
+    else await (await this.getVFS(dbName, async)).delete();
+  }
+
+  async getVFS(dbName: string, async: boolean) {
+    const vfs = async
+      ? await import("./IDBBatchAtomicVFS").then(
+          ({ IDBBatchAtomicVFS }) =>
+            new IDBBatchAtomicVFS(dbName, { durability: "strict" })
+        )
+      : await import("./AccessHandlePoolVFS").then(
+          ({ AccessHandlePoolVFS }) => new AccessHandlePoolVFS(dbName)
+        );
+    if ("isReady" in vfs) await vfs.isReady;
+    return vfs;
+  }
+
+  async initialize() {
+    self.dispatchEvent(
+      new MessageEvent("message", {
+        data: { type: "databaseInitialized", dbName: this.dbName }
+      })
+    );
+    console.log("Database initialized", this.db);
+    this.initialized = true;
+  }
+
+  async waitForDatabase() {
+    // if the database hasn't yet been initialized.
+    if (!this.initialized) {
+      console.log("Waiting for database to be initialized...", this.db);
+      return await new Promise<boolean>((resolve) =>
+        self.addEventListener("message", (ev) => {
+          if (
+            ev.data.type === "databaseInitialized" &&
+            ev.data.dbName === this.dbName
+          )
+            resolve(true);
+        })
+      );
+    }
+    return true;
+  }
 }
 
-async function initialize() {
-  self.dispatchEvent(
-    new MessageEvent("message", { data: { type: "databaseInitialized" } })
-  );
-  console.log("Database initialized", db);
-  initialized = true;
-}
-
-const worker = {
-  close,
-  open,
-  run: exec,
-  export: exportDatabase,
-  delete: deleteDatabase
-};
-
-export type SQLiteWorker = typeof worker;
+export type SQLiteWorker = typeof _SQLiteWorker.prototype;
 
 addEventListener("message", async (event) => {
   if (!event.data.type) {
-    await worker.open(event.data.dbName, event.data.async, event.data.uri);
+    const worker = new _SQLiteWorker(event.data.dbName, event.data.encrypted);
+    await worker.open(event.data.async, event.data.uri);
     const providerPort = createSharedServicePort(worker);
     postMessage(null, [providerPort]);
 
     self.addEventListener("beforeunload", () => worker.close());
   }
 });
-
-async function waitForDatabase() {
-  // if the database hasn't yet been initialized.
-  if (!initialized) {
-    console.log("Waiting for database to be initialized...", db);
-    return await new Promise<boolean>((resolve) =>
-      self.addEventListener("message", (ev) => {
-        if (ev.data.type === "databaseInitialized") resolve(true);
-      })
-    );
-  }
-  return true;
-}

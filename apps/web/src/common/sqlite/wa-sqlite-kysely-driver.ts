@@ -26,7 +26,12 @@ import SQLiteAsyncURI from "./wa-sqlite-async.wasm?url";
 import { Mutex } from "async-mutex";
 import { SharedService } from "./shared-service";
 
-type Config = { dbName: string; async: boolean; init?: () => Promise<void> };
+type Config = {
+  dbName: string;
+  async: boolean;
+  encrypted: boolean;
+  init?: () => Promise<void>;
+};
 
 const servicePool = new Map<
   string,
@@ -55,7 +60,6 @@ export class WaSqliteWorkerDriver implements Driver {
       if (closed) {
         console.log("Already activated. Reinitializing...");
         await service.proxy.open(
-          this.config.dbName,
           this.config.async,
           this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
         );
@@ -89,6 +93,7 @@ export class WaSqliteWorkerDriver implements Driver {
           worker.postMessage({
             dbName: this.config.dbName,
             async: this.config.async,
+            encrypted: this.config.encrypted,
             uri: this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
           });
         }),

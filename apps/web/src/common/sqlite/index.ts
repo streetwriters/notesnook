@@ -34,6 +34,7 @@ declare module "kysely" {
 
 export const createDialect = (
   name: string,
+  encrypted: boolean,
   init?: () => Promise<void>
 ): Dialect => {
   return {
@@ -41,6 +42,7 @@ export const createDialect = (
       new WaSqliteWorkerDriver({
         async: !isFeatureSupported("opfs"),
         dbName: name,
+        encrypted,
         init
       }),
     createAdapter: () => new SqliteAdapter(),
