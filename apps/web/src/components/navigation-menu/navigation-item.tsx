@@ -181,7 +181,11 @@ function NavigationItem(
       ) : !isTablet && count !== undefined ? (
         <Text
           variant="subBody"
-          sx={{ mr: 1, bg: "hover", px: "3px", borderRadius: "default" }}
+          sx={{
+            mr: 1,
+            px: "3px",
+            borderRadius: "default"
+          }}
         >
           {count > 100 ? "100+" : count}
         </Text>
