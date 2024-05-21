@@ -250,6 +250,7 @@ class Database {
       this.sql().withTables(),
       new NNMigrationProvider()
     );
+    await this.onInit(this.sql() as Kysely<RawDatabaseSchema>);
     await this.initCollections();
     return true;
   }
@@ -282,7 +283,7 @@ class Database {
     this._sql = (await createDatabase<RawDatabaseSchema>("notesnook", {
       ...this.options.sqliteOptions,
       migrationProvider: new NNMigrationProvider(),
-      onInit: (db) => createTriggers(db)
+      onInit: (db) => this.onInit(db)
     })) as unknown as Kysely<DatabaseSchema>;
 
     await this.sanitizer.init();
@@ -294,6 +295,10 @@ class Database {
     if (this.migrations.required()) {
       logger.warn("Database migration is required.");
     }
+  }
+
+  private async onInit(db: Kysely<RawDatabaseSchema>) {
+    await createTriggers(db);
   }
 
   async initCollections() {

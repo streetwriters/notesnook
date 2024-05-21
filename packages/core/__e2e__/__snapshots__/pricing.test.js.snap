@@ -63,6 +63,15 @@ exports[`get web pricing tier > get monthly web tier > monthly-web-pricing 1`] =
 }
 `;
 
+exports[`get web pricing tier > get monthly web tier > yearly-ios-pricing 1`] = `
+{
+  "country": Any<String>,
+  "countryCode": Any<String>,
+  "discount": Any<Number>,
+  "sku": Any<String>,
+}
+`;
+
 exports[`get web pricing tier > get yearly web tier > yearly-web-pricing 1`] = `
 {
   "country": Any<String>,
