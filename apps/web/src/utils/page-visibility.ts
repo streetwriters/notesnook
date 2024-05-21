@@ -66,24 +66,28 @@ export function onPageVisibilityChanged(
     if (isEventIgnored()) return;
 
     if (!window.document.hasFocus()) return;
-    handler("focus", isDocumentHidden());
+    handler("focus", false);
   }, 1000);
 
   const onBlur = debounce((_) => {
     if (isEventIgnored()) return;
 
     if (window.document.hasFocus()) return;
-    handler("blur", isDocumentHidden());
+    handler("blur", true);
   }, 1000);
 
   document.addEventListener(visibilityChange(), onVisibilityChanged);
   window.addEventListener("focus", onFocus);
   window.addEventListener("blur", onBlur);
+  window.addEventListener("pageshow", onFocus);
+  window.addEventListener("pagehide", onBlur);
 
   return () => {
     document.removeEventListener(visibilityChange(), onVisibilityChanged);
     window.removeEventListener("focus", onFocus);
     window.removeEventListener("blur", onBlur);
+    window.removeEventListener("pageshow", onFocus);
+    window.removeEventListener("pagehide", onBlur);
   };
 }
 

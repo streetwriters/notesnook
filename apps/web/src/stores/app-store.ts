@@ -134,7 +134,7 @@ class AppStore extends BaseStore<AppStore> {
     });
 
     onPageVisibilityChanged(async (_, documentHidden) => {
-      if (!documentHidden) return;
+      if (documentHidden) return;
 
       logger.info("Page visibility changed. Reconnecting SSE...");
       await db.connectSSE({ force: false }).catch(logger.error);

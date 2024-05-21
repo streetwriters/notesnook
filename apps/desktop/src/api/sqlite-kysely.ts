@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { Database, Statement } from "better-sqlite3-multiple-ciphers";
 import type { QueryResult } from "kysely";
-const rm = require("fs/promises").rm;
-const sqlite3 = require("better-sqlite3-multiple-ciphers");
 
 type SQLiteCompatibleType =
   | number
@@ -45,7 +43,9 @@ export class SQLite {
       return;
     }
 
-    this.sqlite = sqlite3(filePath).unsafeMode(true);
+    this.sqlite = require("better-sqlite3-multiple-ciphers")(
+      filePath
+    ).unsafeMode(true);
   }
 
   /**
@@ -134,6 +134,10 @@ export class SQLite {
 
   async delete(filePath: string) {
     await this.close();
-    await rm(filePath, { force: true, maxRetries: 5, retryDelay: 500 });
+    await require("fs/promises").rm(filePath, {
+      force: true,
+      maxRetries: 5,
+      retryDelay: 500
+    });
   }
 }
