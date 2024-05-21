@@ -100,6 +100,7 @@ async function createWindow() {
       zoomFactor: config.zoomFactor,
       nodeIntegration: true,
       contextIsolation: false,
+      nodeIntegrationInWorker: true,
       spellcheck: config.isSpellCheckerEnabled,
       preload: __dirname + "/preload.js"
     }

@@ -26,6 +26,7 @@ import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
 import { deriveKey } from "../interfaces/key-store";
+import { logManager } from "@notesnook/core/dist/logger";
 
 const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
@@ -99,8 +100,11 @@ async function initializeDatabase(persistence: DatabasePersistence) {
 
   await db.init();
 
-  window.addEventListener("beforeunload", () => {
-    if (IS_DESKTOP_APP) db.sql().destroy();
+  window.addEventListener("beforeunload", async () => {
+    if (IS_DESKTOP_APP) {
+      await db.sql().destroy();
+      await logManager?.close();
+    }
   });
 
   logger.measure("Database initialization");
