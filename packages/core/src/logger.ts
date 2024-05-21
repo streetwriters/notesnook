@@ -183,10 +183,12 @@ async function initialize(
   const reporters: ILogReporter[] = [new DatabaseLogReporter(db)];
   if (process.env.NODE_ENV !== "production" && !disableConsoleLogs)
     reporters.push(consoleReporter);
-  logger = new Logger({
+  const instance = new Logger({
     reporter: combineReporters(reporters),
     lastTime: Date.now()
   });
+  if (logger instanceof NoopLogger) logger.replaceWith(instance);
+  logger = instance;
   logManager = new DatabaseLogManager(db);
 }
 

@@ -79,6 +79,9 @@ export class NoopLogger implements ILogger {
   scope() {
     return this;
   }
+  replaceWith(logger: ILogger) {
+    Object.assign(this, logger);
+  }
 }
 
 export * from "./types";
