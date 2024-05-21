@@ -165,6 +165,10 @@ class DatabaseLogManager {
   async delete(key: string) {
     await this.db.deleteFrom("logs").where("date", "==", key).execute();
   }
+
+  close() {
+    return this.db.destroy();
+  }
 }
 
 async function initialize(
