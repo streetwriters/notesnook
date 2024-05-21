@@ -90,6 +90,7 @@ export type ReadonlyEditorSession = BaseEditorSession & {
   content?: NoteContent<false>;
   color?: string;
   tags?: Tag[];
+  locked?: boolean;
 };
 
 export type DeletedEditorSession = BaseEditorSession & {

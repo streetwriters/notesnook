@@ -782,6 +782,7 @@ type UnlockNoteViewProps = { session: LockedEditorSession };
 function UnlockNoteView(props: UnlockNoteViewProps) {
   const { session } = props;
   const root = useRef<HTMLDivElement>(null);
+  const isReadOnly = session.note.readonly;
 
   useLayoutEffect(() => {
     const element = root.current;
@@ -811,7 +812,7 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
             throw new Error("note with this id does not exist.");
 
           useEditorStore.getState().addSession({
-            type: "default",
+            type: isReadOnly ? "readonly" : "default",
             locked: true,
             id: session.id,
             note: session.note,
