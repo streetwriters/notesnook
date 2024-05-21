@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
 import { Copy, Restore } from "../icons";
 import ContentToggle from "./content-toggle";
@@ -44,6 +44,24 @@ function DiffViewer(props: DiffViewerProps) {
     content?.conflicted
   );
   const root = useRef<HTMLDivElement>(null);
+
+  const onResolveContent = useCallback(
+    (saveCopy: boolean) => {
+      const toKeep =
+        selectedContent === 1 ? session.content?.conflicted : session.content;
+      const toCopy =
+        selectedContent === 1 ? session.content : session.content?.conflicted;
+      if (!toKeep) return;
+      resolveConflict({
+        note: session.note,
+        toKeep,
+        toCopy: saveCopy ? toCopy : undefined,
+        toKeepDateEdited: toKeep.dateEdited,
+        dateResolved: conflictedContent!.dateModified
+      });
+    },
+    [conflictedContent, selectedContent, session.content, session.note]
+  );
 
   useLayoutEffect(() => {
     setConflictedContent((c) => {
@@ -185,15 +203,7 @@ function DiffViewer(props: DiffViewerProps) {
                   isSelected={selectedContent === 0}
                   isOtherSelected={selectedContent === 1}
                   onToggle={() => setSelectedContent((s) => (s === 0 ? -1 : 0))}
-                  resolveConflict={({ saveCopy }) => {
-                    resolveConflict({
-                      note: session.note,
-                      toKeep: content.data,
-                      toCopy: saveCopy ? conflictedContent : undefined,
-                      toKeepDateEdited: content.dateEdited,
-                      dateResolved: conflictedContent.dateModified
-                    });
-                  }}
+                  resolveConflict={onResolveContent}
                   sx={{
                     borderStyle: "solid",
                     borderWidth: 0,
@@ -263,15 +273,7 @@ function DiffViewer(props: DiffViewerProps) {
               <>
                 <ContentToggle
                   readonly={session.type === "diff"}
-                  resolveConflict={({ saveCopy }) => {
-                    resolveConflict({
-                      note: session.note,
-                      toKeep: conflictedContent.data,
-                      toCopy: saveCopy ? content : undefined,
-                      toKeepDateEdited: conflictedContent.dateEdited,
-                      dateResolved: conflictedContent.dateModified
-                    });
-                  }}
+                  resolveConflict={onResolveContent}
                   label={
                     session.type === "diff"
                       ? "Current version"
@@ -326,17 +328,18 @@ async function resolveConflict({
   dateResolved
 }: {
   note: Note;
-  toKeep: string;
+  toKeep: ContentItem;
   toCopy?: ContentItem;
   toKeepDateEdited: number;
   dateResolved?: number;
 }) {
   await db.content.add({
     id: note.contentId,
-    data: toKeep,
-    type: "tiptap",
     dateResolved,
-    sessionId: `${Date.now()}`
+    sessionId: `${Date.now()}`,
+    ...(toKeep.locked
+      ? { data: toKeep.data, locked: true }
+      : { data: toKeep.data, locked: false })
   });
 
   await db.notes.add({

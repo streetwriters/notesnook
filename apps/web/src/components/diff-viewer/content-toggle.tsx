@@ -26,7 +26,7 @@ type ContentToggle = {
   onToggle: () => void;
   label: string;
   dateEdited: number;
-  resolveConflict: (options: { saveCopy: boolean }) => void;
+  resolveConflict: (saveCopy: boolean) => void;
   readonly: boolean;
   sx: FlexProps["sx"];
 };
@@ -50,7 +50,7 @@ function ContentToggle(props: ContentToggle) {
             <Button
               variant="accent"
               mr={2}
-              onClick={() => resolveConflict({ saveCopy: true })}
+              onClick={() => resolveConflict(true)}
               p={1}
               px={2}
             >
@@ -61,7 +61,7 @@ function ContentToggle(props: ContentToggle) {
             variant={isOtherSelected ? "error" : "accent"}
             onClick={() => {
               if (isOtherSelected) {
-                resolveConflict({ saveCopy: false });
+                resolveConflict(false);
               } else {
                 onToggle();
               }
