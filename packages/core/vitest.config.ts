@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { defineConfig } from "vitest/config";
 
 const IS_E2E = process.env.IS_E2E === "true";
+const IS_CI = !!process.env.CI;
 
 export default defineConfig({
   test: {
@@ -30,7 +31,7 @@ export default defineConfig({
       exclude: ["src/utils/templates/html/languages/*.js"],
       include: ["src/**/*.ts"]
     },
-    retry: 1,
+    retry: IS_CI ? 1 : 0,
     exclude: ["__benches__/**/*.bench.ts"],
     include: [
       ...(IS_E2E ? ["__e2e__/**/*.test.{js,ts}"] : []),

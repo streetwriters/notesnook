@@ -536,7 +536,6 @@ async function cleanup(...devices) {
     await device.syncer.stop();
     await device.user.logout();
     device.eventManager.unsubscribeAll();
-    await device.reset();
   }
   EV.unsubscribeAll();
 }
