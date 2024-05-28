@@ -89,6 +89,21 @@ async function processAttachment(
   attachments[name] = { ...cipherData, key };
 }
 
+const colorMap: Record<string, string | undefined> = {
+  default: undefined,
+  teal: "#00897B",
+  red: "#D32F2F",
+  purple: "#7B1FA2",
+  blue: "#1976D2",
+  cerulean: "#03A9F4",
+  pink: "#C2185B",
+  brown: "#795548",
+  gray: "#9E9E9E",
+  green: "#388E3C",
+  orange: "#FFA000",
+  yellow: "#FFC107"
+};
+
 async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
   const note = await fileToJson<Note>(entry);
   for (const attachment of note.attachments || []) {
@@ -121,7 +136,51 @@ async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
     content: { type: "tiptap", data: note.content?.data },
     notebooks: []
   });
+
   if (!noteId) return;
+
+  for (const tag of note.tags || []) {
+    let tagId = (await db.tags.find(tag))?.id;
+    if (!tagId)
+      tagId = await db.tags.add({
+        title: tag
+      });
+
+    if (tagId) {
+      await db.relations.add(
+        {
+          id: tagId,
+          type: "tag"
+        },
+        {
+          id: noteId,
+          type: "note"
+        }
+      );
+    }
+  }
+  const colorCode = note.color ? colorMap[note.color] : undefined;
+  if (colorCode) {
+    let colorId = (await db.colors.find(colorCode))?.id;
+    if (!colorId)
+      colorId = await db.colors.add({
+        colorCode: colorCode,
+        title: note.color
+      });
+
+    if (colorId) {
+      await db.relations.add(
+        {
+          id: colorId,
+          type: "color"
+        },
+        {
+          id: noteId,
+          type: "note"
+        }
+      );
+    }
+  }
 
   for (const nb of notebooks) {
     const notebookId = await importNotebook(nb).catch(() => undefined);
