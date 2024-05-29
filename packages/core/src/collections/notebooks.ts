@@ -245,10 +245,10 @@ export class Notebooks implements ICollection {
       const query = tr
         .withRecursive(`subNotebooks(id)`, (eb) =>
           eb
-            .selectFrom((eb) =>
+            .selectFrom(() =>
               sql<{ id: string }>`(VALUES ${sql.join(
-                ids.map((id) => eb.parens(sql`${id}`))
-              )})`.as("notebookIds")
+                ids.map((id) => sql.raw(`('${id}')`))
+              )})`.as("roots")
             )
             .selectAll()
             .unionAll((eb) =>

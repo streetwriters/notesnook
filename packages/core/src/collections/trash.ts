@@ -39,33 +39,47 @@ export default class Trash {
     notebooks: [],
     notes: []
   };
+  private userDeletedCache: {
+    notes: string[];
+    notebooks: string[];
+  } = {
+    notebooks: [],
+    notes: []
+  };
   constructor(private readonly db: Database) {}
 
   async init() {
-    await this.cleanup();
     await this.buildCache();
+    await this.cleanup();
   }
 
   async buildCache() {
     this.cache.notes = [];
     this.cache.notebooks = [];
+    this.userDeletedCache.notes = [];
+    this.userDeletedCache.notebooks = [];
 
     const result = await this.db
       .sql()
       .selectFrom("notes")
       .where("type", "==", "trash")
-      .select(["id", sql`'note'`.as("itemType")])
+      .select(["id", sql`'note'`.as("itemType"), "deletedBy"])
       .unionAll((eb) =>
         eb
           .selectFrom("notebooks")
           .where("type", "==", "trash")
-          .select(["id", sql`'notebook'`.as("itemType")])
+          .select(["id", sql`'notebook'`.as("itemType"), "deletedBy"])
       )
       .execute();
 
-    for (const { id, itemType } of result) {
-      if (itemType === "note") this.cache.notes.push(id);
-      else if (itemType === "notebook") this.cache.notebooks.push(id);
+    for (const { id, itemType, deletedBy } of result) {
+      if (itemType === "note") {
+        this.cache.notes.push(id);
+        if (deletedBy === "user") this.userDeletedCache.notes.push(id);
+      } else if (itemType === "notebook") {
+        this.cache.notebooks.push(id);
+        if (deletedBy === "user") this.userDeletedCache.notebooks.push(id);
+      }
     }
   }
 
@@ -116,6 +130,7 @@ export default class Trash {
         deletedBy
       });
       this.cache.notes.push(...ids);
+      if (deletedBy === "user") this.userDeletedCache.notes.push(...ids);
     } else if (type === "notebook") {
       await this.db.notebooks.collection.update(ids, {
         type: "trash",
@@ -124,24 +139,15 @@ export default class Trash {
         deletedBy
       });
       this.cache.notebooks.push(...ids);
+      if (deletedBy === "user") this.userDeletedCache.notebooks.push(...ids);
     }
   }
 
   async delete(...ids: string[]) {
     if (ids.length <= 0) return;
 
-    const noteIds = [];
-    const notebookIds = [];
-    for (const id of ids) {
-      const isNote = this.cache.notes.includes(id);
-      if (isNote) {
-        noteIds.push(id);
-        this.cache.notes.splice(this.cache.notes.indexOf(id), 1);
-      } else if (!isNote) {
-        notebookIds.push(id);
-        this.cache.notebooks.splice(this.cache.notebooks.indexOf(id), 1);
-      }
-    }
+    const noteIds = ids.filter((id) => this.cache.notes.includes(id));
+    const notebookIds = ids.filter((id) => this.cache.notebooks.includes(id));
 
     await this._delete(noteIds, notebookIds);
   }
@@ -153,6 +159,7 @@ export default class Trash {
         await this.db.noteHistory.clearSessions(...chunk);
         await this.db.notes.remove(...chunk);
         deleteItems(this.cache.notes, ...chunk);
+        deleteItems(this.userDeletedCache.notes, ...chunk);
       }
     }
 
@@ -162,6 +169,7 @@ export default class Trash {
         await this.db.notebooks.remove(...chunk);
         await this.db.relations.unlinkOfType("notebook", chunk);
         deleteItems(this.cache.notebooks, ...chunk);
+        deleteItems(this.userDeletedCache.notebooks, ...chunk);
       }
     }
   }
@@ -169,18 +177,8 @@ export default class Trash {
   async restore(...ids: string[]) {
     if (ids.length <= 0) return;
 
-    const noteIds = [];
-    const notebookIds = [];
-    for (const id of ids) {
-      const isNote = this.cache.notes.includes(id);
-      if (isNote) {
-        noteIds.push(id);
-        //  this.cache.notes.splice(this.cache.notes.indexOf(id), 1);
-      } else if (!isNote) {
-        notebookIds.push(id);
-        // this.cache.notebooks.splice(this.cache.notebooks.indexOf(id), 1);
-      }
-    }
+    const noteIds = ids.filter((id) => this.cache.notes.includes(id));
+    const notebookIds = ids.filter((id) => this.cache.notebooks.includes(id));
 
     if (noteIds.length > 0) {
       await this.db.notes.collection.update(noteIds, {
@@ -190,6 +188,7 @@ export default class Trash {
         deletedBy: null
       });
       deleteItems(this.cache.notes, ...noteIds);
+      deleteItems(this.userDeletedCache.notes, ...noteIds);
     }
 
     if (notebookIds.length > 0) {
@@ -201,12 +200,14 @@ export default class Trash {
         deletedBy: null
       });
       deleteItems(this.cache.notebooks, ...ids);
+      deleteItems(this.userDeletedCache.notebooks, ...ids);
     }
   }
 
   async clear() {
     await this._delete(this.cache.notes, this.cache.notebooks);
     this.cache = { notebooks: [], notes: [] };
+    this.userDeletedCache = { notebooks: [], notes: [] };
   }
 
   // synced(id: string) {
@@ -228,6 +229,7 @@ export default class Trash {
     ids: string[],
     deletedBy?: TrashItem["deletedBy"]
   ) {
+    if (ids.length <= 0) return [];
     return (await this.db
       .sql()
       .selectFrom("notes")
@@ -242,6 +244,7 @@ export default class Trash {
     ids: string[],
     deletedBy?: TrashItem["deletedBy"]
   ) {
+    if (ids.length <= 0) return [];
     return (await this.db
       .sql()
       .selectFrom("notebooks")
@@ -253,36 +256,31 @@ export default class Trash {
   }
 
   async grouped(options: GroupOptions) {
-    const ids = [...this.cache.notes, ...this.cache.notebooks];
+    const ids = [
+      ...this.userDeletedCache.notes,
+      ...this.userDeletedCache.notebooks
+    ];
     const selector = getSortSelectors(options)[options.sortDirection];
     return new VirtualizedGrouping<TrashItem>(
       ids.length,
       this.db.options.batchSize,
       () => Promise.resolve(ids),
       async (start, end) => {
-        const notesRange =
-          end < this.cache.notes.length
-            ? [start, end]
-            : [start, this.cache.notes.length];
-        const notebooksRange =
-          start >= this.cache.notes.length
-            ? [start, end]
-            : [0, Math.min(this.cache.notebooks.length, end)];
-
+        const slicedIds = ids.slice(start, end);
+        const noteIds = slicedIds.filter((id) =>
+          this.userDeletedCache.notes.includes(id)
+        );
+        const notebookIds = slicedIds.filter((id) =>
+          this.userDeletedCache.notebooks.includes(id)
+        );
         const items = [
-          ...(await this.trashedNotes(
-            this.cache.notes.slice(notesRange[0], notesRange[1]),
-            "user"
-          )),
-          ...(await this.trashedNotebooks(
-            this.cache.notebooks.slice(notebooksRange[0], notebooksRange[1]),
-            "user"
-          ))
+          ...(await this.trashedNotes(noteIds)),
+          ...(await this.trashedNotebooks(notebookIds))
         ];
         items.sort(selector);
 
         return {
-          ids: ids.slice(start, end),
+          ids: slicedIds,
           items
         };
       },
@@ -318,32 +316,19 @@ export default class Trash {
           .selectAll()
           .unionAll((eb) =>
             eb
-              .selectFrom(["relations", "subNotebooks", "notebooks"])
+              .selectFrom(["relations", "subNotebooks"])
               .select("relations.toId as id")
               .where("toType", "==", "notebook")
               .where("fromType", "==", "notebook")
               .whereRef("fromId", "==", "subNotebooks.id")
-              .where(
-                (eb) =>
-                  eb
-                    .selectFrom("notebooks")
-                    .whereRef("notebooks.id", "==", "relations.toId")
-                    .where("notebooks.type", "==", "trash")
-                    .limit(1)
-                    .select("deletedBy"),
-                "!=",
-                "user"
-              )
+              .where("toId", "not in", this.userDeletedCache.notebooks)
               .$narrowType<{ id: string }>()
           )
       )
       .selectFrom("subNotebooks")
       .select("id")
+      .where("id", "not in", notebookIds)
       .execute();
-
-    return deleteItems(
-      ids.map((ref) => ref.id),
-      ...notebookIds
-    );
+    return ids.map((ref) => ref.id);
   }
 }
