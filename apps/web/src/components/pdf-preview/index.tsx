@@ -239,6 +239,10 @@ export function PdfPreview(props: PdfPreviewProps) {
         onZoom={(e) => {
           if (hash) setPDFConfig(hash, { scale: e.scale });
         }}
+        transformGetDocumentParams={(options) => {
+          (options as any).isEvalSupported = false;
+          return options;
+        }}
         // onDocumentAskPassword={(e) => {
         //   e.verifyPassword("failed");
         // }}
