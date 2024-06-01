@@ -34,9 +34,11 @@ import {
   Publish,
   Published,
   Readonly,
+  Redo,
   Search,
   TableOfContents,
   Trash,
+  Undo,
   Unlock
 } from "../icons";
 import { ScrollContainer } from "@notesnook/ui";
@@ -79,8 +81,8 @@ export function EditorActionBar() {
   const activeSession = useEditorStore((store) =>
     store.activeSessionId ? store.getSession(store.activeSessionId) : undefined
   );
-  const editor = useEditorManager((store) =>
-    activeSession?.id ? store.editors[activeSession?.id]?.editor : undefined
+  const editorManager = useEditorManager((store) =>
+    activeSession?.id ? store.editors[activeSession?.id] : undefined
   );
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const monographs = useMonographStore((store) => store.monographs);
@@ -88,6 +90,18 @@ export function EditorActionBar() {
     activeSession && db.monographs.isPublished(activeSession.id);
 
   const tools = [
+    {
+      title: "Undo",
+      icon: Undo,
+      enabled: editorManager?.canUndo,
+      onClick: () => editorManager?.editor?.undo()
+    },
+    {
+      title: "Redo",
+      icon: Redo,
+      enabled: editorManager?.canRedo,
+      onClick: () => editorManager?.editor?.redo()
+    },
     {
       title: isNotePublished ? "Published" : "Publish",
       icon: isNotePublished ? Published : Publish,
@@ -154,7 +168,7 @@ export function EditorActionBar() {
         activeSession.type !== "locked" &&
         activeSession.type !== "diff" &&
         activeSession.type !== "conflicted",
-      onClick: editor?.startSearch
+      onClick: editorManager?.editor?.startSearch
     },
     {
       title: "Properties",
