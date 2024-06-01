@@ -165,33 +165,69 @@ function Header({
               flexDirection: "row"
             }}
           >
-            {!settings.premium && (
-              <Button
-                onPress={() => {
-                  post(EventTypes.pro);
-                }}
-                preventDefault={false}
-                style={{
-                  borderWidth: 0,
-                  borderRadius: 100,
-                  color: "var(--nn_primary_icon)",
-                  marginRight: 10,
-                  width: 39,
-                  height: 39,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  position: "relative"
-                }}
-              >
-                <CrownIcon
-                  size={25 * settings.fontScale}
-                  style={{
-                    position: "absolute"
+            {tab.locked ? null : (
+              <>
+                <Button
+                  onPress={() => {
+                    editor?.commands.undo();
                   }}
-                  color="orange"
-                />
-              </Button>
+                  style={{
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    marginRight: 10,
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
+                  }}
+                >
+                  <ArrowULeftTopIcon
+                    color={
+                      !hasUndo
+                        ? "var(--nn_secondary_border)"
+                        : "var(--nn_primary_icon)"
+                    }
+                    size={25 * settings.fontScale}
+                    style={{
+                      position: "absolute"
+                    }}
+                  />
+                </Button>
+
+                <Button
+                  onPress={() => {
+                    if (tab.locked) return;
+                    editor?.commands.redo();
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    marginRight: 10,
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
+                  }}
+                >
+                  <ArrowURightTopIcon
+                    color={
+                      !hasRedo
+                        ? "var(--nn_secondary_border)"
+                        : "var(--nn_primary_icon)"
+                    }
+                    size={25 * settings.fontScale}
+                    style={{
+                      position: "absolute"
+                    }}
+                  />
+                </Button>
+              </>
             )}
 
             {settings.deviceMode !== "mobile" && !settings.fullscreen ? (
@@ -304,7 +340,11 @@ function Header({
             <Button
               fwdRef={btnRef}
               onPress={() => {
-                setOpen(!isOpen);
+                if (tab.locked) {
+                  post(EventTypes.properties, undefined, tab.id, tab.noteId);
+                } else {
+                  setOpen(!isOpen);
+                }
               }}
               preventDefault={false}
               style={{
@@ -320,13 +360,23 @@ function Header({
                 position: "relative"
               }}
             >
-              <DotsVerticalIcon
-                size={25 * settings.fontScale}
-                style={{
-                  position: "absolute"
-                }}
-                color="var(--nn_primary_icon)"
-              />
+              {tab.locked ? (
+                <DotsHorizontalIcon
+                  size={25 * settings.fontScale}
+                  style={{
+                    position: "absolute"
+                  }}
+                  color="var(--nn_primary_icon)"
+                />
+              ) : (
+                <DotsVerticalIcon
+                  size={25 * settings.fontScale}
+                  style={{
+                    position: "absolute"
+                  }}
+                  color="var(--nn_primary_icon)"
+                />
+              )}
             </Button>
 
             <ControlledMenu
@@ -351,6 +401,9 @@ function Header({
                       tab.noteId
                     );
                     break;
+                  case "search":
+                    editor?.commands.startSearch();
+                    break;
                   case "properties":
                     logger("info", "post properties...");
                     post(EventTypes.properties, undefined, tab.id, tab.noteId);
@@ -360,127 +413,66 @@ function Header({
                 }
               }}
             >
-              <div
+              <MenuItem
+                value="search"
                 style={{
                   display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "100%"
+                  gap: 10,
+                  alignItems: "center"
                 }}
               >
-                <Button
-                  onPress={() => {
-                    editor?.commands.undo();
-                  }}
+                <MagnifyIcon
+                  size={22 * settings.fontScale}
+                  color="var(--nn_primary_icon)"
+                />
+                <span
                   style={{
-                    borderWidth: 0,
-                    borderRadius: 100,
-                    color: "var(--nn_primary_icon)",
-                    marginRight: 10,
-                    width: 39,
-                    height: 39,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative"
+                    color: "var(--nn_primary_paragraph)"
                   }}
                 >
-                  <ArrowULeftTopIcon
-                    color={
-                      !hasUndo
-                        ? "var(--nn_secondary_border)"
-                        : "var(--nn_primary_icon)"
-                    }
-                    size={25 * settings.fontScale}
-                    style={{
-                      position: "absolute"
-                    }}
-                  />
-                </Button>
-
-                <Button
-                  onPress={() => {
-                    editor?.commands.redo();
-                  }}
-                  style={{
-                    borderWidth: 0,
-                    borderRadius: 100,
-                    color: "var(--nn_primary_icon)",
-                    marginRight: 10,
-                    width: 39,
-                    height: 39,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative"
-                  }}
-                >
-                  <ArrowURightTopIcon
-                    color={
-                      !hasRedo
-                        ? "var(--nn_secondary_border)"
-                        : "var(--nn_primary_icon)"
-                    }
-                    size={25 * settings.fontScale}
-                    style={{
-                      position: "absolute"
-                    }}
-                  />
-                </Button>
-
-                <Button
-                  onPress={() => {
-                    editor?.commands.startSearch();
-                  }}
-                  style={{
-                    borderWidth: 0,
-                    borderRadius: 100,
-                    color: "var(--nn_primary_icon)",
-                    marginRight: 10,
-                    width: 39,
-                    height: 39,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative"
-                  }}
-                >
-                  <MagnifyIcon
-                    size={28 * settings.fontScale}
-                    style={{
-                      position: "absolute"
-                    }}
-                    color="var(--nn_primary_icon)"
-                  />
-                </Button>
-              </div>
+                  Search
+                </span>
+              </MenuItem>
 
               <MenuItem
                 value="toc"
                 style={{
                   display: "flex",
-                  gap: 10
+                  gap: 10,
+                  alignItems: "center"
                 }}
               >
                 <TableOfContentsIcon
                   size={22 * settings.fontScale}
                   color="var(--nn_primary_icon)"
                 />
-                Table of contents
+                <span
+                  style={{
+                    color: "var(--nn_primary_paragraph)"
+                  }}
+                >
+                  Table of contents
+                </span>
               </MenuItem>
               <MenuItem
                 value="properties"
                 style={{
                   display: "flex",
-                  gap: 10
+                  gap: 10,
+                  alignItems: "center"
                 }}
               >
                 <DotsHorizontalIcon
                   size={22 * settings.fontScale}
                   color="var(--nn_primary_icon)"
                 />
-                Note Properties
+                <span
+                  style={{
+                    color: "var(--nn_primary_paragraph)"
+                  }}
+                >
+                  Properties
+                </span>
               </MenuItem>
             </ControlledMenu>
           </div>

@@ -49,7 +49,8 @@ export const Card = ({ color }: { color?: string }) => {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingHorizontal: 0
+          paddingHorizontal: 0,
+          width: "100%"
         }}
       >
         <View
@@ -91,7 +92,6 @@ export const Card = ({ color }: { color?: string }) => {
           <View
             style={{
               marginLeft: 10,
-              flexShrink: 1,
               marginRight: 10
             }}
           >

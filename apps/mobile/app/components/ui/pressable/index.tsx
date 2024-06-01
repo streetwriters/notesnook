@@ -21,11 +21,12 @@ import { VariantsWithStaticColors, useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useCallback } from "react";
 import {
   ColorValue,
+  PressableStateCallbackType,
   Pressable as RNPressable,
   PressableProps as RNPressableProps,
-  PressableStateCallbackType,
   View,
-  ViewStyle
+  ViewStyle,
+  useWindowDimensions
 } from "react-native";
 import {
   RGB_Linear_Shade,
@@ -256,6 +257,8 @@ export const Pressable = ({
     ? 1
     : colorOpacity;
   const alpha = customAlpha ? customAlpha : isDark ? 0.03 : -0.03;
+  const { fontScale } = useWindowDimensions();
+  const growFactor = 1 + (fontScale - 1) / 8;
 
   const getStyle = useCallback(
     ({ pressed }: PressableStateCallbackType): ViewStyle | ViewStyle[] => [
@@ -276,7 +279,13 @@ export const Pressable = ({
           : borderColor || "transparent",
         borderWidth: borderWidth
       },
-      style
+      style,
+      {
+        height:
+          typeof style.height === "number"
+            ? style.height * growFactor
+            : style.height
+      }
     ],
     [
       alpha,
@@ -288,7 +297,8 @@ export const Pressable = ({
       borderSelectedColor,
       borderColor,
       borderWidth,
-      style
+      style,
+      growFactor
     ]
   );
 
