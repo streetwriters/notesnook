@@ -37,6 +37,7 @@ import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { useCallback } from "react";
+import { ScrollView } from "react-native-actions-sheet";
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   const { colors } = useThemeColors();
@@ -143,7 +144,10 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   }, [currentMethod.method, mfaInfo.token, seconds, sending, start]);
 
   return (
-    <View>
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
+    >
       <View
         style={{
           alignItems: "center",
@@ -214,6 +218,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                 code.current = value;
                 //onNext();
               }}
+              onSubmitEditing={onNext}
               caretHidden
               inputStyle={{
                 fontSize: SIZE.lg,
@@ -225,6 +230,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
               keyboardType={
                 currentMethod.method === "recoveryCode" ? "default" : "numeric"
               }
+              enablesReturnKeyAutomatically
               containerStyle={{
                 height: 60,
                 borderWidth: 0,
@@ -297,7 +303,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
           </>
         )}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

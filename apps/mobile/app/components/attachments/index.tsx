@@ -355,6 +355,7 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
 
 AttachmentDialog.present = (note?: Note) => {
   presentSheet({
-    component: () => <AttachmentDialog note={note} />
+    component: () => <AttachmentDialog note={note} />,
+    keyboardHandlerDisabled: true
   });
 };

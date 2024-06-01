@@ -17,12 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
+import Sync from "../../services/sync";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { useUserStore } from "../../stores/use-user-store";
+import { eUserLoggedIn } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import SheetProvider from "../sheet-provider";
@@ -34,11 +38,6 @@ import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { useLogin } from "./use-login";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { eUserLoggedIn } from "../../utils/events";
-import { useUserStore } from "../../stores/use-user-store";
-import Sync from "../../services/sync";
-import { Notice } from "../ui/notice";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -184,7 +183,11 @@ export const Login = ({ changeMode }) => {
             defaultValue={email.current}
             editable={step === LoginSteps.emailAuth && !loading}
             onSubmit={() => {
-              passwordInputRef.current?.focus();
+              if (step === LoginSteps.emailAuth) {
+                login();
+              } else {
+                passwordInputRef.current?.focus();
+              }
             }}
           />
 
@@ -243,6 +246,7 @@ export const Login = ({ changeMode }) => {
                 width: 250,
                 borderRadius: 100
               }}
+              height={50}
               fontSize={SIZE.md}
               type="accent"
               title={!loading ? "Continue" : null}
