@@ -26,6 +26,7 @@ import { register } from "./utils/stream-saver/mitm";
 import { getServiceWorkerVersion } from "./utils/version";
 import { ErrorBoundary, ErrorComponent } from "./components/error-boundary";
 import { TitleBar } from "./components/title-bar";
+import { desktop } from "./common/desktop-bridge";
 
 renderApp();
 
@@ -33,6 +34,12 @@ async function renderApp() {
   const rootElement = document.getElementById("root");
   if (!rootElement) return;
   const root = createRoot(rootElement);
+
+  window.hasNativeTitlebar =
+    !IS_DESKTOP_APP ||
+    !!(await desktop?.integration.desktopIntegration
+      .query()
+      ?.then((s) => s.nativeTitlebar));
 
   try {
     const { component, props, path } = await init();
@@ -47,7 +54,7 @@ async function renderApp() {
 
     root.render(
       <>
-        {IS_DESKTOP_APP ? <TitleBar /> : null}
+        {hasNativeTitlebar ? null : <TitleBar />}
         <ErrorBoundary>
           <BaseThemeProvider
             onRender={() => document.getElementById("splash")?.remove()}
@@ -63,7 +70,7 @@ async function renderApp() {
   } catch (e) {
     root.render(
       <>
-        {IS_DESKTOP_APP ? <TitleBar /> : null}
+        {hasNativeTitlebar ? null : <TitleBar />}
         <ErrorComponent
           error={e}
           resetErrorBoundary={() => window.location.reload()}

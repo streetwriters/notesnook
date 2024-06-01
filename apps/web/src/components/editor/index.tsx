@@ -127,7 +127,7 @@ export default function TabsView() {
 
   return (
     <>
-      {IS_DESKTOP_APP ? (
+      {!hasNativeTitlebar ? (
         ReactDOM.createPortal(
           <EditorActionBar />,
           document.getElementById("titlebar-portal-container")!

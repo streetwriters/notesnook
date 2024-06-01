@@ -84,17 +84,21 @@ async function createWindow() {
       format: process.platform === "win32" ? "ico" : "png"
     }),
 
-    titleBarStyle: "hidden",
-    frame: process.platform === "win32" || process.platform === "darwin",
-    titleBarOverlay: {
-      height: 37,
-      color: "#00000000",
-      symbolColor: config.windowControlsIconColor
-    },
-    trafficLightPosition: {
-      x: 16,
-      y: 12
-    },
+    ...(config.desktopSettings.nativeTitlebar
+      ? {}
+      : {
+          titleBarStyle: "hidden",
+          frame: process.platform === "win32" || process.platform === "darwin",
+          titleBarOverlay: {
+            height: 37,
+            color: "#00000000",
+            symbolColor: config.windowControlsIconColor
+          },
+          trafficLightPosition: {
+            x: 16,
+            y: 12
+          }
+        }),
 
     webPreferences: {
       zoomFactor: config.zoomFactor,
