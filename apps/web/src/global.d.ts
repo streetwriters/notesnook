@@ -32,6 +32,7 @@ declare global {
   var IS_BETA: boolean;
   var APP_TITLE: string;
   var IS_THEME_BUILDER: boolean;
+  var hasNativeTitlebar: boolean;
 
   interface AuthenticationExtensionsClientInputs {
     prf?: {

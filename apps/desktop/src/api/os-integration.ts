@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
-import { dialog, nativeTheme, Notification, shell } from "electron";
+import { app, dialog, nativeTheme, Notification, shell } from "electron";
 import { AutoLaunch } from "../utils/autolaunch";
 import { config, DesktopIntegration } from "../utils/config";
 import { bringToFront } from "../utils/bring-to-front";
@@ -152,6 +152,10 @@ export const osIntegrationRouter = t.router({
     await rm(input);
   }),
 
+  restart: t.procedure.query(() => {
+    app.relaunch();
+    app.exit();
+  }),
   showNotification: t.procedure
     .input(NotificationOptions)
     .query(({ input }) => {
@@ -191,7 +195,10 @@ export const osIntegrationRouter = t.router({
       ({ input: { theme, windowControlsIconColor, backgroundColor } }) => {
         if (windowControlsIconColor) {
           config.windowControlsIconColor = windowControlsIconColor;
-          if (process.platform === "win32")
+          if (
+            process.platform === "win32" &&
+            !config.desktopSettings.nativeTitlebar
+          )
             globalThis.window?.setTitleBarOverlay({
               symbolColor: windowControlsIconColor
             });

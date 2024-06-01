@@ -50,6 +50,9 @@ export function useWindowControls() {
     isMaximized,
     isFullscreen,
     hasNativeWindowControls:
-      !IS_DESKTOP_APP || getPlatform() === "darwin" || getPlatform() === "win32"
+      !IS_DESKTOP_APP ||
+      hasNativeTitlebar ||
+      getPlatform() === "darwin" ||
+      getPlatform() === "win32"
   };
 }

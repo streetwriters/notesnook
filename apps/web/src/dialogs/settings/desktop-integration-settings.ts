@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
+import { showToast } from "../../utils/toast";
+import { desktop } from "../../common/desktop-bridge";
 
 export const DesktopIntegrationSettings: SettingsGroup[] = [
   {
@@ -124,6 +126,42 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
                   !useSettingStore.getState().desktopIntegrationSettings
                     ?.closeToSystemTray
               })
+          }
+        ]
+      },
+      {
+        key: "use-native-titlebar",
+        title: "Use native titlebar",
+        description:
+          "Use native OS titlebar instead of replacing it with a custom one. Requires app restart for changes to take effect.",
+        onStateChange: (listener) =>
+          useSettingStore.subscribe(
+            (s) => s.desktopIntegrationSettings,
+            listener
+          ),
+        components: [
+          {
+            type: "toggle",
+            isToggled: () =>
+              !!useSettingStore.getState().desktopIntegrationSettings
+                ?.nativeTitlebar,
+            toggle: () => {
+              useSettingStore.getState().setDesktopIntegration({
+                nativeTitlebar:
+                  !useSettingStore.getState().desktopIntegrationSettings
+                    ?.nativeTitlebar
+              });
+              showToast(
+                "success",
+                "Restart the app for changes to take effect.",
+                [
+                  {
+                    text: "Restart now",
+                    onClick: () => desktop?.integration.restart.query()
+                  }
+                ]
+              );
+            }
           }
         ]
       }

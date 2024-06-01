@@ -25,7 +25,8 @@ export const DesktopIntegration = z.object({
   autoStart: z.boolean().optional(),
   startMinimized: z.boolean().optional(),
   minimizeToSystemTray: z.boolean().optional(),
-  closeToSystemTray: z.boolean().optional()
+  closeToSystemTray: z.boolean().optional(),
+  nativeTitlebar: z.boolean().optional()
 });
 
 export type DesktopIntegration = z.infer<typeof DesktopIntegration>;
@@ -35,7 +36,8 @@ export const config = {
     autoStart: false,
     startMinimized: false,
     minimizeToSystemTray: false,
-    closeToSystemTray: false
+    closeToSystemTray: false,
+    nativeTitlebar: false
   },
   privacyMode: false,
   isSpellCheckerEnabled: true,

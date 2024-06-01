@@ -123,8 +123,8 @@ const decoder = new TextDecoder();
  */
 
 class KeyStore extends BaseStore<KeyStore> {
-  #secretStore: IKVStore;
-  #metadataStore: IKVStore;
+  #secretStore!: IKVStore;
+  #metadataStore!: IKVStore;
   #keyId = "key";
   #wrappingKeyId = "wrappingKey";
   #key?: CryptoKey;
@@ -134,25 +134,25 @@ class KeyStore extends BaseStore<KeyStore> {
   isLocked = false;
 
   constructor(
-    dbName: string,
+    private readonly dbName: string,
     setState: SetState<KeyStore>,
     get: GetState<KeyStore>
   ) {
     super(setState, get);
-
-    this.#metadataStore =
-      isFeatureSupported("indexedDB") && isFeatureSupported("clonableCryptoKey")
-        ? new IndexedDBKVStore(`${dbName}-metadata`, "metadata")
-        : new MemoryKVStore();
-    this.#secretStore =
-      isFeatureSupported("indexedDB") && isFeatureSupported("clonableCryptoKey")
-        ? new IndexedDBKVStore(`${dbName}-secrets`, "secrets")
-        : new MemoryKVStore();
   }
 
   activeCredentials = () => this.get().credentials.filter((c) => c.active);
 
   init = async () => {
+    this.#metadataStore =
+      isFeatureSupported("indexedDB") && isFeatureSupported("clonableCryptoKey")
+        ? new IndexedDBKVStore(`${this.dbName}-metadata`, "metadata")
+        : new MemoryKVStore();
+    this.#secretStore =
+      isFeatureSupported("indexedDB") && isFeatureSupported("clonableCryptoKey")
+        ? new IndexedDBKVStore(`${this.dbName}-secrets`, "secrets")
+        : new MemoryKVStore();
+
     const credentials = await this.getCredentials();
     const secrets = Object.fromEntries(
       await this.#secretStore.entries<EncryptedData>()

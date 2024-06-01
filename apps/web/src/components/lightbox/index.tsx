@@ -340,9 +340,9 @@ export class Lightbox extends React.Component<LightboxProps> {
               overflow: "hidden",
               alignItems: "center",
               justifyContent: "flex-end",
-              height: IS_DESKTOP_APP ? TITLE_BAR_HEIGHT : "auto",
+              height: !hasNativeTitlebar ? TITLE_BAR_HEIGHT : "auto",
               pr:
-                IS_DESKTOP_APP && getPlatform() !== "darwin"
+                !hasNativeTitlebar && getPlatform() !== "darwin"
                   ? "calc(100vw - env(titlebar-area-width))"
                   : 0
             }}
