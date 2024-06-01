@@ -140,46 +140,43 @@ async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
   if (!noteId) return;
 
   for (const tag of note.tags || []) {
-    let tagId = (await db.tags.find(tag))?.id;
-    if (!tagId)
-      tagId = await db.tags.add({
+    const tagId =
+      (await db.tags.find(tag))?.id ||
+      (await db.tags.add({
         title: tag
-      });
+      }));
 
-    if (tagId) {
-      await db.relations.add(
-        {
-          id: tagId,
-          type: "tag"
-        },
-        {
-          id: noteId,
-          type: "note"
-        }
-      );
-    }
+    await db.relations.add(
+      {
+        id: tagId,
+        type: "tag"
+      },
+      {
+        id: noteId,
+        type: "note"
+      }
+    );
   }
+
   const colorCode = note.color ? colorMap[note.color] : undefined;
   if (colorCode) {
-    let colorId = (await db.colors.find(colorCode))?.id;
-    if (!colorId)
-      colorId = await db.colors.add({
+    const colorId =
+      (await db.colors.find(colorCode))?.id ||
+      (await db.colors.add({
         colorCode: colorCode,
         title: note.color
-      });
+      }));
 
-    if (colorId) {
-      await db.relations.add(
-        {
-          id: colorId,
-          type: "color"
-        },
-        {
-          id: noteId,
-          type: "note"
-        }
-      );
-    }
+    await db.relations.add(
+      {
+        id: colorId,
+        type: "color"
+      },
+      {
+        id: noteId,
+        type: "note"
+      }
+    );
   }
 
   for (const nb of notebooks) {
