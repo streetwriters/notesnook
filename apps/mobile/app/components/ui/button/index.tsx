@@ -25,7 +25,8 @@ import {
   DimensionValue,
   TextStyle,
   View,
-  ViewStyle
+  ViewStyle,
+  useWindowDimensions
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useUserStore } from "../../../stores/use-user-store";
@@ -92,6 +93,9 @@ export const Button = ({
   });
   const textColor = buttonType?.text ? buttonType.text : text;
 
+  const { fontScale } = useWindowDimensions();
+  const growFactor = 1 + (fontScale - 1) / 10;
+
   const Component = bold ? Heading : Paragraph;
 
   return (
@@ -117,8 +121,11 @@ export const Button = ({
       customOpacity={buttonType?.opacity}
       customAlpha={buttonType?.alpha}
       style={{
-        height: height,
-        width: (width as DimensionValue) || undefined,
+        height: typeof height === "number" ? height * growFactor : height,
+        width:
+          typeof width === "number"
+            ? width * growFactor
+            : (width as DimensionValue) || undefined,
         paddingHorizontal: 12,
         borderRadius: 5,
         alignSelf: "center",
