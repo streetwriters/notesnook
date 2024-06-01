@@ -811,7 +811,7 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
             throw new Error("note with this id does not exist.");
 
           useEditorStore.getState().addSession({
-            type: "default",
+            type: session.note.readonly ? "readonly" : "default",
             locked: true,
             id: session.id,
             note: session.note,
