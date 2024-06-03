@@ -197,7 +197,7 @@ function getErrorHelp(props: FallbackProps) {
     return {
       explanation: `This error usually means the database file is either corrupt or it could not be decrypted.`,
       action:
-        "This error can only be fixed by wiping & reseting the database. Beware that this will wipe all your data inside the database with no way to recover it later on.",
+        "This error can only be fixed by wiping & reseting the database. Beware that this will wipe all your data inside the database with no way to recover it later on. This WILL NOT change/affect/delete/wipe your data on the server but ONLY on this device.",
       fix: async () => {
         const { createDialect } = await import("../../common/sqlite");
         await useKeyStore.getState().clear();
@@ -211,7 +211,7 @@ function getErrorHelp(props: FallbackProps) {
     return {
       explanation: `This error means the at rest encryption key could not be decrypted. This can be due to data corruption or implementation change.`,
       action:
-        "This error can only be fixed by wiping & reseting the Key Store and the database.",
+        "This error can only be fixed by wiping & reseting the Key Store and the database. This WILL NOT change/affect/delete/wipe your data on the server but ONLY on this device.",
       fix: async () => {
         const { createDialect } = await import("../../common/sqlite");
         await useKeyStore.getState().clear();
