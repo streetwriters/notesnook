@@ -34,7 +34,6 @@ import { getQueryParams, hardNavigate, makeURL } from "../navigation";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
 import Config from "../utils/config";
-import useDatabase from "../hooks/use-database";
 import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
@@ -173,16 +172,13 @@ function Auth(props: AuthProps) {
     window.history.replaceState({}, "", makeURL(routePaths[route]));
   }, [route]);
 
-  const [isAppLoaded] = useDatabase();
-
   useEffect(() => {
-    if (!isAppLoaded) return;
     db.user.getUser().then((user) => {
       if (user && authorizedRoutes.includes(route) && !isSessionExpired())
         return openURL("/");
       setIsReady(true);
     });
-  }, [isAppLoaded, route]);
+  }, [route]);
 
   if (!isReady) return <></>;
 

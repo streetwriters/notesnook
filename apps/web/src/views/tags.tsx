@@ -23,6 +23,7 @@ import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
+import { ListLoader } from "../components/loaders/list-loader";
 
 function Tags() {
   useNavigate("tags", () => store.refresh());
@@ -32,7 +33,7 @@ function Tags() {
     db.lookup.tags(query).sorted()
   );
 
-  if (!tags) return <Placeholder context="tags" />;
+  if (!tags) return <ListLoader />;
   return (
     <ListContainer
       group="tags"

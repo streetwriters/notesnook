@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Text, Flex, Button } from "@theme-ui/components";
 import { Loading } from "../../components/icons";
-import { ReactComponent as Nomad } from "../../assets/nomad.svg";
+import Nomad from "../../assets/nomad.svg?react";
 import { Period, Plan } from "./types";
 import { PLAN_METADATA, usePlans } from "./plans";
 import { useEffect } from "react";

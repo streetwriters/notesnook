@@ -25,7 +25,7 @@ import { database } from "@notesnook/common";
 import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
-import { deriveKey } from "../interfaces/key-store";
+import { deriveKey, useKeyStore } from "../interfaces/key-store";
 import { logManager } from "@notesnook/core/dist/logger";
 
 const db = database;
@@ -34,7 +34,6 @@ async function initializeDatabase(persistence: DatabasePersistence) {
 
   const { FileStorage } = await import("../interfaces/fs");
   const { Compressor } = await import("../utils/compressor");
-  const { useKeyStore } = await import("../interfaces/key-store");
 
   let databaseKey = await useKeyStore.getState().getValue("databaseKey");
   if (!databaseKey) {
@@ -59,7 +58,8 @@ async function initializeDatabase(persistence: DatabasePersistence) {
 
   database.setup({
     sqliteOptions: {
-      dialect: (name, init) => createDialect(name, true, init),
+      dialect: (name, init) =>
+        createDialect(persistence === "memory" ? ":memory:" : name, true, init),
       ...(IS_DESKTOP_APP || isFeatureSupported("opfs")
         ? { journalMode: "WAL", lockingMode: "exclusive" }
         : {
@@ -98,7 +98,9 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   // });
   // }
 
+  console.log("loading db");
   await db.init();
+  console.log("db loaded");
 
   window.addEventListener("beforeunload", async () => {
     if (IS_DESKTOP_APP) {

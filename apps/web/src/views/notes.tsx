@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect } from "react";
 import ListContainer from "../components/list-container";
 import {
   notesFromContext,
@@ -28,6 +27,7 @@ import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { handleDrop } from "../common/drop-handler";
 import { useEditorStore } from "../stores/editor-store";
+import { ListLoader } from "../components/loaders/list-loader";
 
 type NotesProps = { header?: JSX.Element };
 function Notes(props: NotesProps) {
@@ -47,7 +47,7 @@ function Notes(props: NotesProps) {
     [context, contextNotes]
   );
 
-  if (!context || !contextNotes) return <Placeholder context="notes" />;
+  if (!context || !contextNotes) return <ListLoader />;
   return (
     <ListContainer
       group={type}

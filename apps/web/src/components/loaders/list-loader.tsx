@@ -27,28 +27,6 @@ const Lines = [1, 2].map(() => getRandomArbitrary(40, 90));
 export const ListLoader = memo(function ListLoader() {
   return (
     <>
-      <Flex
-        sx={{ py: 1, alignItems: "center", justifyContent: "center", px: 1 }}
-      >
-        <Box sx={{ height: 38 }}>
-          <Skeleton enableAnimation={false} width={38} height={38} circle />
-        </Box>
-        <Flex
-          sx={{
-            flex: 1,
-            ml: 1,
-            flexDirection: "column",
-            justifyContent: "center"
-          }}
-        >
-          <Box sx={{ height: 14 }}>
-            <Skeleton enableAnimation={false} inline height={14} />
-          </Box>
-          <Box sx={{ mt: 1, height: 10 }}>
-            <Skeleton enableAnimation={false} inline height={10} />
-          </Box>
-        </Flex>
-      </Flex>
       {Lines.map((width) => (
         <Box key={width} sx={{ py: 2, px: 1 }}>
           <Skeleton

@@ -24,6 +24,7 @@ import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
 import { db } from "../common/db";
 import { useSearch } from "../hooks/use-search";
+import { ListLoader } from "../components/loaders/list-loader";
 
 function Reminders() {
   useNavigate("reminders", () => store.refresh());
@@ -33,7 +34,7 @@ function Reminders() {
     db.lookup.reminders(query).sorted()
   );
 
-  if (!reminders) return <Placeholder context="reminders" />;
+  if (!reminders) return <ListLoader />;
   return (
     <>
       <ListContainer

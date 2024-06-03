@@ -31,6 +31,7 @@ function Notice() {
     if (!notices) return null;
     return notices.slice().sort((a, b) => a.priority - b.priority)[0];
   }, [notices]);
+
   if (!notice) return null;
   const NoticeData = NoticesData[notice.type];
   return (

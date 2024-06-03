@@ -18,11 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "./polyfills";
-import "@notesnook/core/dist/types";
 import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";
 import Config from "./utils/config";
 
-import { initializeLogger, logger } from "./utils/logger";
+// import { initializeLogger, logger } from "./utils/logger";
 import type { AuthProps } from "./views/auth";
 import { initializeFeatureChecks } from "./utils/feature-check";
 
@@ -102,7 +101,7 @@ const sessionExpiryExceptions: Routes[] = [
 
 function getRoute(): RouteWithPath<AuthProps> | RouteWithPath {
   const path = getCurrentPath() as Routes;
-  logger.info(`Getting route for path: ${path}`);
+  // logger.info(`Getting route for path: ${path}`);
 
   const signup = redirectToRegistration(path);
   const sessionExpired = isSessionExpired(path);
@@ -129,7 +128,7 @@ function redirectToRegistration(path: Routes): RouteWithPath<AuthProps> | null {
 function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
   const isSessionExpired = Config.get("sessionExpired", false);
   if (isSessionExpired && !sessionExpiryExceptions.includes(path)) {
-    logger.info(`User session has expired. Routing to /sessionexpired`);
+    // logger.info(`User session has expired. Routing to /sessionexpired`);
 
     window.history.replaceState(
       {},
@@ -143,7 +142,10 @@ function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
 
 export async function init() {
   await initializeFeatureChecks();
-  await initializeLogger();
+
+  await await import("./utils/logger").then(({ initializeLogger }) =>
+    initializeLogger()
+  );
 
   const { path, route } = getRoute();
   return { ...route, path };
