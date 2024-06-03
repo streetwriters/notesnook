@@ -55,7 +55,7 @@ type TaskProgress = {
 type ProgressReportCallback = (progress: TaskProgress) => void;
 
 export class TaskManager {
-  static async startTask<T>(task: TaskDefinition<T>): Promise<T> {
+  static async startTask<T>(task: TaskDefinition<T>): Promise<T | Error> {
     switch (task.type) {
       case "status": {
         const statusTask = task;
@@ -74,7 +74,7 @@ export class TaskManager {
         return result;
       }
       case "modal": {
-        return await showProgressDialog<T>({
+        return await showProgressDialog<T | Error>({
           title: task.title,
           subtitle: task.subtitle,
           action: task.action
