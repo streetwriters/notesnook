@@ -96,6 +96,7 @@ import { Context } from "../list-container/types";
 import { SchemeColors } from "@notesnook/theme";
 import { writeToClipboard } from "../../utils/clipboard";
 import Vault from "../../common/vault";
+import { isUserPremium } from "../../hooks/use-is-user-premium";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -335,6 +336,7 @@ const menuItems: (
   ids?: string[],
   context?: { color?: Color; locked?: boolean }
 ) => MenuItem[] = (note, ids = [], context) => {
+  const isPro = isUserPremium();
   // const isSynced = db.notes.note(note.id)?.synced();
 
   return [
@@ -371,6 +373,7 @@ const menuItems: (
       //isDisabled: !isSynced,
       title: "Lock",
       isChecked: context?.locked,
+      isDisabled: !isPro,
       icon: Lock.path,
       onClick: async () => {
         const { unlock, lock } = store.get();
@@ -380,8 +383,7 @@ const menuItems: (
         } else if (await unlock(note.id)) {
           showToast("success", "Note unlocked successfully!");
         }
-      },
-      isPro: true
+      }
     },
     {
       type: "button",
@@ -458,11 +460,12 @@ const menuItems: (
           title: format.title,
           tooltip: `Export as ${format.title} - ${format.subtitle}`,
           icon: format.icon.path,
-          isDisabled: format.type === "pdf" && ids.length > 1,
+          isDisabled:
+            (format.type !== "txt" && !isPro) ||
+            (format.type === "pdf" && ids.length > 1),
           // ? "Multiple notes cannot be exported as PDF."
           // : false,
           multiSelect: true,
-          isPro: format.type !== "txt",
           onClick: async () => {
             if (ids.length === 1) {
               return await exportNote(note, {
@@ -477,8 +480,7 @@ const menuItems: (
           }
         }))
       },
-      multiSelect: true,
-      isPro: true
+      multiSelect: true
     },
     {
       type: "button",
@@ -650,7 +652,8 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
             }
           });
 
-        menuItems.push({ key: "sep3", type: "separator" });
+        if (notebookShortcuts.size > 0 || notebooks.size > 0)
+          menuItems.push({ key: "sep3", type: "separator" });
 
         if (notebookShortcuts.size > 0) {
           notebookShortcuts.forEach((notebook) => {
