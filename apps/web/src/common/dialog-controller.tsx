@@ -213,7 +213,7 @@ export function showLogoutConfirmation() {
   return confirm({
     title: `Logout?`,
     message:
-      "Logging out will delete all local data and reset the app. Make sure you have synced your data before logging out.",
+      "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.",
     positiveButtonText: "Yes",
     negativeButtonText: "No"
   });

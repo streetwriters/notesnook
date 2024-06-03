@@ -135,7 +135,8 @@ export const ProfileSettings: SettingsGroup[] = [
       {
         key: "logout",
         title: "Logout",
-        description: "Logging out will clear all data on this device.",
+        description:
+          "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.",
         keywords: [],
         components: [
           {
