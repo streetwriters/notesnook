@@ -18,12 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { createRoot } from "react-dom/client";
-import { init } from "./bootstrap";
-// import { logger } from "./utils/logger";
-// import { AppEventManager, AppEvents } from "./common/app-events";
+import { init, Routes } from "./bootstrap";
 import { BaseThemeProvider } from "./components/theme-provider";
-// import { register as registerStreamSaver } from "./utils/stream-saver/mitm";
-// import { getServiceWorkerVersion } from "./utils/version";
 import {
   ErrorBoundary,
   ErrorComponent,
@@ -31,9 +27,10 @@ import {
 } from "./components/error-boundary";
 import { TitleBar } from "./components/title-bar";
 import { desktop } from "./common/desktop-bridge";
-// import { register } from "./service-worker-registration";
 import { useKeyStore } from "./interfaces/key-store";
 import Config from "./utils/config";
+import { usePromise } from "@notesnook/common";
+import { AuthProps } from "./views/auth";
 
 export async function startApp() {
   const rootElement = document.getElementById("root");
@@ -51,15 +48,6 @@ export async function startApp() {
 
     await useKeyStore.getState().init();
 
-    await import("./hooks/use-database").then(({ loadDatabase }) =>
-      loadDatabase(
-        path !== "/sessionexpired" || Config.get("sessionExpired", false)
-          ? "db"
-          : "memory"
-      )
-    );
-
-    const { default: Component } = await component();
     const { default: AppLock } = await import("./views/app-lock");
 
     root.render(
@@ -72,7 +60,11 @@ export async function startApp() {
               sx={{ bg: "background", flex: 1, overflow: "hidden" }}
             >
               <AppLock>
-                <Component route={props?.route || "login:email"} />
+                <RouteWrapper
+                  component={component}
+                  path={path}
+                  routeProps={props}
+                />
               </AppLock>
             </BaseThemeProvider>
           </GlobalErrorHandler>
@@ -93,30 +85,49 @@ export async function startApp() {
   }
 }
 
-// const serviceWorkerWhitelist: Routes[] = ["default"];
-// async function initializeServiceWorker() {
-//   if (!IS_DESKTOP_APP && !IS_TESTING) {
-//     //   logger.info("Initializing service worker...");
+function RouteWrapper(props: {
+  component: () => Promise<{
+    default: (props: AuthProps) => JSX.Element;
+  }>;
+  path: Routes;
+  routeProps: AuthProps | null;
+}) {
+  const { component, path, routeProps } = props;
+  const result = usePromise(async () => {
+    await import("./hooks/use-database").then(({ loadDatabase }) =>
+      loadDatabase(
+        path !== "/sessionexpired" || Config.get("sessionExpired", false)
+          ? "db"
+          : "memory"
+      )
+    );
 
-//     // If you want your app to work offline and load faster, you can change
-//     // unregister() to register() below. Note this comes with some pitfalls.
-//     // Learn more about service workers: https://bit.ly/CRA-PWA
-//     register({
-//       onUpdate: async (registration: ServiceWorkerRegistration) => {
-//         if (!registration.waiting) return;
-//         const { formatted } = await getServiceWorkerVersion(
-//           registration.waiting
-//         );
-//         AppEventManager.publish(AppEvents.updateDownloadCompleted, {
-//           version: formatted
-//         });
-//       },
-//       onSuccess() {
-//         registerStreamSaver();
-//       }
-//     });
-//     // window.addEventListener("beforeinstallprompt", () => showInstallNotice());
-//   }
-// }
+    const { default: Component } = await component();
+    return Component;
+  }, [component, path]);
+
+  if (result.status !== "fulfilled")
+    return (
+      <div
+        style={{
+          backgroundColor: "var(--background)",
+          height: "100%",
+          width: "100%",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center"
+        }}
+      >
+        <svg style={{ height: 120 }}>
+          <use href="#themed-logo" />
+        </svg>
+      </div>
+    );
+  return <result.value route={routeProps?.route || "login:email"} />;
+}
 
 if (import.meta.hot) import.meta.hot.accept();

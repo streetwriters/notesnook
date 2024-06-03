@@ -143,7 +143,7 @@ function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
 export async function init() {
   await initializeFeatureChecks();
 
-  await await import("./utils/logger").then(({ initializeLogger }) =>
+  await import("./utils/logger").then(({ initializeLogger }) =>
     initializeLogger()
   );
 
