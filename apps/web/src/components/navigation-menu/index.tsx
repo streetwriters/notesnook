@@ -71,6 +71,7 @@ import { usePersistentState } from "../../hooks/use-persistent-state";
 import { MenuItem } from "@notesnook/ui";
 import { Notebook, Tag } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
+import { Menu } from "../../hooks/use-menu";
 
 type Route = {
   id: string;
@@ -172,6 +173,24 @@ function NavigationMenu(props: NavigationMenuProps) {
 
   const getSidebarItems = useCallback(async () => {
     return [
+      {
+        key: "reset-sidebar",
+        type: "button",
+        title: "Reset sidebar",
+        onClick: () => {
+          db.settings
+            .setSideBarHiddenItems("routes", [])
+            .then(() => db.settings.setSideBarHiddenItems("colors", []))
+            .then(() => db.settings.setSideBarOrder("colors", []))
+            .then(() => db.settings.setSideBarOrder("routes", []))
+            .then(() => db.settings.setSideBarOrder("shortcuts", []))
+            .then(() => {
+              setHiddenRoutes([]);
+              setHiddenColors([]);
+            });
+        }
+      },
+      { type: "separator", key: "sep" },
       ...toMenuItems(
         orderItems(routes, db.settings.getSideBarOrder("routes")),
         hiddenRoutes,
@@ -180,7 +199,7 @@ function NavigationMenu(props: NavigationMenuProps) {
             .setSideBarHiddenItems("routes", ids)
             .then(() => setHiddenRoutes(ids))
       ),
-      { type: "separator", key: "sep" },
+      { type: "separator", key: "sep", isHidden: colors.length <= 0 },
       ...toMenuItems(
         orderItems(colors, db.settings.getSideBarOrder("colors")),
         hiddenColors,
@@ -225,6 +244,10 @@ function NavigationMenu(props: NavigationMenuProps) {
           justifyContent: "space-between"
         }}
         px={0}
+        onContextMenu={async (e) => {
+          e.preventDefault();
+          Menu.openMenu(await getSidebarItems());
+        }}
       >
         <FlexScrollContainer
           style={{
