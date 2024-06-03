@@ -333,12 +333,14 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "logout",
             name: "Log out",
-            description: "Clear all your data and reset the app.",
+            description:
+              "Logging out will clear all data stored on THIS DEVICE.",
             icon: "logout",
             modifer: () => {
               presentDialog({
                 title: "Logout",
-                paragraph: "Clear all your data and reset the app.",
+                paragraph:
+                  "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.",
                 positiveText: "Logout",
                 positivePress: async () => {
                   try {
