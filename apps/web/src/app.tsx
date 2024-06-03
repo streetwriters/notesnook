@@ -22,10 +22,8 @@ import { Box, Flex } from "@theme-ui/components";
 import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
-import useDatabase from "./hooks/use-database";
 import { useStore } from "./stores/app-store";
 import { Toaster } from "react-hot-toast";
-import { ViewLoader } from "./components/loaders/view-loader";
 import NavigationMenu from "./components/navigation-menu";
 import StatusBar from "./components/status-bar";
 import { EditorLoader } from "./components/loaders/editor-loader";
@@ -38,12 +36,13 @@ import {
   PanelResizeHandle,
   ImperativePanelHandle
 } from "react-resizable-panels";
+import GlobalMenuWrapper from "./components/global-menu-wrapper";
 
 new WebExtensionRelay();
 
-const GlobalMenuWrapper = React.lazy(
-  () => import("./components/global-menu-wrapper")
-);
+// const GlobalMenuWrapper = React.lazy(
+//   () => import("./components/global-menu-wrapper")
+// );
 const AppEffects = React.lazy(() => import("./app-effects"));
 const MobileAppEffects = React.lazy(() => import("./app-effects.mobile"));
 const HashRouter = React.lazy(() => import("./components/hash-router"));
@@ -51,26 +50,24 @@ const HashRouter = React.lazy(() => import("./components/hash-router"));
 function App() {
   const isMobile = useMobile();
   const [show, setShow] = useState(true);
-  const [isAppLoaded] = useDatabase();
   const isFocusMode = useStore((store) => store.isFocusMode);
 
   return (
     <>
-      {isAppLoaded && (
-        <Suspense fallback={<div style={{ display: "none" }} />}>
-          <div id="menu-wrapper">
-            <GlobalMenuWrapper />
-          </div>
-          <AppEffects setShow={setShow} />
-          {isMobile && (
-            <MobileAppEffects
-              sliderId="slider"
-              overlayId="overlay"
-              setShow={setShow}
-            />
-          )}
-        </Suspense>
-      )}
+      <Suspense fallback={<div style={{ display: "none" }} />}>
+        <div id="menu-wrapper">
+          <GlobalMenuWrapper />
+        </div>
+        <AppEffects setShow={setShow} />
+        {isMobile && (
+          <MobileAppEffects
+            sliderId="slider"
+            overlayId="overlay"
+            setShow={setShow}
+          />
+        )}
+      </Suspense>
+
       <Flex
         id="app"
         bg="background"
@@ -78,13 +75,9 @@ function App() {
         sx={{ overflow: "hidden", flexDirection: "column", height: "100%" }}
       >
         {isMobile ? (
-          <MobileAppContents isAppLoaded={isAppLoaded} />
+          <MobileAppContents />
         ) : (
-          <DesktopAppContents
-            isAppLoaded={isAppLoaded}
-            setShow={setShow}
-            show={show}
-          />
+          <DesktopAppContents setShow={setShow} show={show} />
         )}
         <Toaster containerClassName="toasts-container" />
       </Flex>
@@ -121,15 +114,10 @@ function SuspenseLoader<TComponent extends React.JSXElementConstructor<any>>({
 }
 
 type DesktopAppContentsProps = {
-  isAppLoaded: boolean;
   show: boolean;
   setShow: (show: boolean) => void;
 };
-function DesktopAppContents({
-  isAppLoaded,
-  show,
-  setShow
-}: DesktopAppContentsProps) {
+function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isTablet = useTablet();
   const [isNarrow, setIsNarrow] = useState(isTablet || false);
@@ -194,7 +182,7 @@ function DesktopAppContents({
                 borderRight: "1px solid var(--separator)"
               }}
             >
-              {isAppLoaded && <CachedRouter />}
+              <CachedRouter />
             </ScopedThemeProvider>
           </Panel>
           <PanelResizeHandle className="panel-resize-handle" />
@@ -208,7 +196,7 @@ function DesktopAppContents({
                 bg: "background"
               }}
             >
-              {isAppLoaded && <HashRouter />}
+              {<HashRouter />}
             </Flex>
           </Panel>
         </PanelGroup>
@@ -218,7 +206,7 @@ function DesktopAppContents({
   );
 }
 
-function MobileAppContents({ isAppLoaded }: { isAppLoaded: boolean }) {
+function MobileAppContents() {
   return (
     <FlexScrollContainer
       id="slider"
@@ -257,11 +245,7 @@ function MobileAppContents({ isAppLoaded }: { isAppLoaded: boolean }) {
           width: "100vw"
         }}
       >
-        <SuspenseLoader
-          condition={isAppLoaded}
-          component={CachedRouter}
-          fallback={<ViewLoader />}
-        />
+        <CachedRouter />
         <Box
           id="overlay"
           sx={{
@@ -290,7 +274,7 @@ function MobileAppContents({ isAppLoaded }: { isAppLoaded: boolean }) {
         <SuspenseLoader
           fallback={<EditorLoader />}
           component={HashRouter}
-          condition={isAppLoaded}
+          condition={true}
         />
       </Flex>
     </FlexScrollContainer>

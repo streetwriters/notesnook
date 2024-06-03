@@ -57,7 +57,7 @@ function Placeholder(props: PlaceholderProps) {
         </Flex>
 
         <Text variant="subBody" sx={{ fontSize: "body", mt: 1 }}>
-          {toTitleCase(syncStatus.type || "syncing")}ing {syncStatus.progress}{" "}
+          {toTitleCase(syncStatus.type || "sync")}ing {syncStatus.progress}{" "}
           items
         </Text>
       </Flex>

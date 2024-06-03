@@ -46,8 +46,8 @@ import { phone } from "phone";
 import { db } from "../../common/db";
 import FileSaver from "file-saver";
 import { writeText } from "clipboard-polyfill";
-import { ReactComponent as MFA } from "../../assets/mfa.svg";
-import { ReactComponent as Fallback2FA } from "../../assets/fallback2fa.svg";
+import MFA from "../../assets/mfa.svg?react";
+import Fallback2FA from "../../assets/fallback2fa.svg?react";
 import {
   Authenticator,
   StepComponent,

@@ -25,6 +25,7 @@ import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
+import { ListLoader } from "../components/loaders/list-loader";
 
 function Trash() {
   useNavigate("trash", store.refresh);
@@ -35,7 +36,7 @@ function Trash() {
     db.lookup.trash(query).sorted()
   );
 
-  if (!items) return <Placeholder context="trash" />;
+  if (!items) return <ListLoader />;
   return (
     <ListContainer
       group="trash"

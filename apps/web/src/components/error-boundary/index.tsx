@@ -17,15 +17,42 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import { ErrorText } from "../error-text";
 import { BaseThemeProvider } from "../theme-provider";
 import { Button, Flex, Text } from "@theme-ui/components";
 import {
   ErrorBoundary as RErrorBoundary,
-  FallbackProps
+  FallbackProps,
+  useErrorBoundary
 } from "react-error-boundary";
-import { createDialect } from "../../common/sqlite";
+import { useKeyStore } from "../../interfaces/key-store";
+
+export function GlobalErrorHandler(props: PropsWithChildren) {
+  const { showBoundary } = useErrorBoundary();
+
+  useEffect(() => {
+    function handleError(e: ErrorEvent) {
+      const error = new Error(e.message);
+      error.stack = `${e.filename}:${e.lineno}:${e.colno}`;
+      showBoundary(e.error || error);
+    }
+    function handleUnhandledRejection(e: PromiseRejectionEvent) {
+      showBoundary(e.reason);
+    }
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+    window.addEventListener("error", handleError);
+    return () => {
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection
+      );
+      window.removeEventListener("error", handleError);
+    };
+  }, [showBoundary]);
+
+  return <>{props.children}</>;
+}
 
 export function ErrorBoundary(props: PropsWithChildren) {
   return (
@@ -172,10 +199,9 @@ function getErrorHelp(props: FallbackProps) {
       action:
         "This error can only be fixed by wiping & reseting the database. Beware that this will wipe all your data inside the database with no way to recover it later on.",
       fix: async () => {
-        const { useKeyStore } = await import("../../interfaces/key-store");
-
+        const { createDialect } = await import("../../common/sqlite");
         await useKeyStore.getState().clear();
-        const dialect = createDialect("notesnook");
+        const dialect = createDialect("notesnook", true);
         const driver = dialect.createDriver();
         await driver.delete();
         resetErrorBoundary();
@@ -187,10 +213,9 @@ function getErrorHelp(props: FallbackProps) {
       action:
         "This error can only be fixed by wiping & reseting the Key Store and the database.",
       fix: async () => {
-        const { useKeyStore } = await import("../../interfaces/key-store");
-
+        const { createDialect } = await import("../../common/sqlite");
         await useKeyStore.getState().clear();
-        const dialect = createDialect("notesnook");
+        const dialect = createDialect("notesnook", true);
         const driver = dialect.createDriver();
         await driver.delete();
         resetErrorBoundary();

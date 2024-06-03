@@ -27,11 +27,11 @@ import {
   Github,
   Loading
 } from "../components/icons";
-import { ReactComponent as E2E } from "../assets/e2e.svg";
-import { ReactComponent as Note } from "../assets/note2.svg";
-import { ReactComponent as Nomad } from "../assets/nomad.svg";
-import { ReactComponent as WorkAnywhere } from "../assets/workanywhere.svg";
-import { ReactComponent as Friends } from "../assets/cause.svg";
+import E2E from "../assets/e2e.svg?react";
+import Note from "../assets/note2.svg?react";
+import Nomad from "../assets/nomad.svg?react";
+import WorkAnywhere from "../assets/workanywhere.svg?react";
+import Friends from "../assets/cause.svg?react";
 import LightUI from "../assets/light1.png";
 import DarkUI from "../assets/dark1.png";
 import GooglePlay from "../assets/play.png";

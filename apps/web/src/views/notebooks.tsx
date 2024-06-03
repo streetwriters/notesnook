@@ -24,6 +24,7 @@ import Placeholder from "../components/placeholders";
 import { useEffect } from "react";
 import { db } from "../common/db";
 import { useSearch } from "../hooks/use-search";
+import { ListLoader } from "../components/loaders/list-loader";
 
 function Notebooks() {
   const notebooks = useStore((state) => state.notebooks);
@@ -36,7 +37,7 @@ function Notebooks() {
     store.get().refresh();
   }, []);
 
-  if (!notebooks) return <Placeholder context="notebooks" />;
+  if (!notebooks) return <ListLoader />;
   return (
     <>
       <ListContainer

@@ -43,9 +43,7 @@ export function template(data: TemplateData) {
         ? `<meta name="tags" content="${data.tags.join(", ")}" />`
         : ""
     }
-    <link rel="stylesheet" href="https://app.notesnook.com/assets/editor-styles.css?d=${
-      process.env.NN_BUILD_TIMESTAMP || "1690887574068"
-    }">
+    <link rel="stylesheet" href="https://app.notesnook.com/assets/editor-styles.css?d=1690887574068">
 
     <style>
 

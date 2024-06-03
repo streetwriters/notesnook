@@ -21,7 +21,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { makeURL, useQueryParams } from "../navigation";
 import { db } from "../common/db";
-import useDatabase from "../hooks/use-database";
 import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
@@ -122,11 +121,9 @@ function useAuthenticateUser({
   code: string;
   userId: string;
 }) {
-  const [isAppLoaded] = useDatabase(isSessionExpired() ? "db" : "memory");
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [user, setUser] = useState<User>();
   useEffect(() => {
-    if (!isAppLoaded) return;
     async function authenticateUser() {
       setIsAuthenticating(true);
       try {
@@ -148,7 +145,7 @@ function useAuthenticateUser({
     }
 
     authenticateUser();
-  }, [code, userId, isAppLoaded]);
+  }, [code, userId]);
   return { isAuthenticating, user };
 }
 

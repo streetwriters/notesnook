@@ -38,28 +38,8 @@
     <meta name="twitter:card" content="summary_large_image" />
     <title>Notesnook</title>
 
-    <style id="theme-colors">
-      #splash {
-        display: none !important;
-      }
-    </style>
-    <script type="module">
-      import { themeToCSS } from "@notesnook/theme";
-
-      const colorScheme = JSON.parse(
-        window.localStorage.getItem("colorScheme") || '"light"'
-      );
-      const root = document.querySelector("html");
-      if (root) root.setAttribute("data-theme", colorScheme);
-
-      const theme = window.localStorage.getItem(`theme:${colorScheme}`);
-      if (theme) {
-        const css = themeToCSS(JSON.parse(theme));
-        const stylesheet = document.getElementById("theme-colors");
-        if (stylesheet) stylesheet.innerHTML = css;
-      }
-    </script>
-    <script type="module" src="/index.tsx"></script>
+    <style id="theme-colors"></style>
+    <script type="module" src="./index.ts"></script>
     <style>
       html {
         overscroll-behavior: none;

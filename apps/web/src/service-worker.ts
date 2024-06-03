@@ -21,7 +21,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { clientsClaim } from "workbox-core";
 import { ExpirationPlugin } from "workbox-expiration";
-import { precacheAndRoute, createHandlerBoundToURL } from "workbox-precaching";
+import {
+  precacheAndRoute,
+  createHandlerBoundToURL,
+  cleanupOutdatedCaches
+} from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
 import { StaleWhileRevalidate } from "workbox-strategies";
 
@@ -29,15 +33,8 @@ declare var self: ServiceWorkerGlobalScope & typeof globalThis;
 
 clientsClaim();
 
-const precacheRoutes = self.__WB_MANIFEST;
-const filters = [/KaTeX/i, /hack/i, /code-lang-/i];
-precacheAndRoute(
-  precacheRoutes.filter((route) => {
-    return filters.every(
-      (filter) => !filter.test(typeof route === "string" ? route : route.url)
-    );
-  })
-);
+cleanupOutdatedCaches();
+precacheAndRoute(self.__WB_MANIFEST);
 
 // Set up App Shell-style routing, so that all navigation requests
 // are fulfilled with your index.html shell. Learn more at

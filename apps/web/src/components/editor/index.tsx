@@ -128,10 +128,7 @@ export default function TabsView() {
   return (
     <>
       {!hasNativeTitlebar ? (
-        ReactDOM.createPortal(
-          <EditorActionBar />,
-          document.getElementById("titlebar-portal-container")!
-        )
+        <EditorActionBarPortal />
       ) : (
         <Flex sx={{ px: 1 }}>
           <EditorActionBar />
@@ -153,12 +150,7 @@ export default function TabsView() {
         <PanelGroup direction="horizontal" autoSaveId={"editor-panels"}>
           <Panel id="editor-panel" className="editor-pane" order={1}>
             {sessions.map((session) => (
-              <Freeze
-                key={session.id}
-                freeze={
-                  session.needsHydration || session.id !== activeSessionId
-                }
-              >
+              <Freeze key={session.id} freeze={session.id !== activeSessionId}>
                 {session.type === "locked" ? (
                   <UnlockNoteView session={session} />
                 ) : session.type === "conflicted" || session.type === "diff" ? (
@@ -233,7 +225,8 @@ const MemoizedEditorView = React.memo(
   EditorView,
   (prev, next) =>
     prev.session.id === next.session.id &&
-    prev.session.type === next.session.type
+    prev.session.type === next.session.type &&
+    prev.session.needsHydration === next.session.needsHydration
 );
 function EditorView({
   session
@@ -301,6 +294,12 @@ function EditorView({
       element?.classList.remove("active");
     };
   }, [editor]);
+
+  useEffect(() => {
+    if (!session.needsHydration && session.content) {
+      editor?.updateContent(session.content.data);
+    }
+  }, [editor, session.needsHydration]);
 
   return (
     <Flex
@@ -459,6 +458,7 @@ export function Editor(props: EditorProps) {
     <EditorChrome {...props}>
       <Tiptap
         id={id}
+        isHydrating={!!session.needsHydration}
         nonce={nonce}
         readonly={readonly}
         content={content}
@@ -466,7 +466,8 @@ export function Editor(props: EditorProps) {
           corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
         }}
         onLoad={(editor) => {
-          restoreSelection(editor, id);
+          editor = editor || useEditorManager.getState().getEditor(id)?.editor;
+          if (editor) restoreSelection(editor, id);
           restoreScrollPosition(session);
         }}
         onSelectionChange={({ from, to }) =>
@@ -773,8 +774,10 @@ function restoreScrollPosition(session: EditorSession) {
 }
 
 function restoreSelection(editor: IEditor, id: string) {
-  editor.focus({
-    position: Config.get(`${id}:selection`, { from: 0, to: 0 })
+  setTimeout(() => {
+    editor.focus({
+      position: Config.get(`${id}:selection`, { from: 0, to: 0 })
+    });
   });
 }
 
@@ -825,4 +828,10 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
       />
     </div>
   );
+}
+
+function EditorActionBarPortal() {
+  const container = document.getElementById("titlebar-portal-container");
+  if (!container) return null;
+  return ReactDOM.createPortal(<EditorActionBar />, container);
 }

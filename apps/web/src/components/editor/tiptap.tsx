@@ -67,7 +67,7 @@ export type OnChangeHandler = (
 type TipTapProps = {
   id: string;
   editorContainer: () => HTMLElement | undefined;
-  onLoad?: (editor: IEditor) => void;
+  onLoad?: (editor?: IEditor) => void;
   onChange?: OnChangeHandler;
   onContentChange?: () => void;
   onSelectionChange?: (range: { from: number; to: number }) => void;
@@ -371,8 +371,11 @@ function TipTap(props: TipTapProps) {
 function TiptapWrapper(
   props: PropsWithChildren<
     Omit<TipTapProps, "editorContainer" | "theme" | "fontSize" | "fontFamily">
-  >
+  > & {
+    isHydrating?: boolean;
+  }
 ) {
+  const { onLoad, isHydrating } = props;
   const theme = useThemeStore((store) =>
     store.colorScheme === "dark" ? store.darkTheme : store.lightTheme
   );
@@ -397,22 +400,35 @@ function TiptapWrapper(
       theme.scopes.base.primary.paragraph;
   }, [theme]);
 
+  useEffect(() => {
+    if (!isHydrating) {
+      onLoad?.();
+      containerRef.current
+        ?.querySelector(".editor-loading-container")
+        ?.classList.add("hidden");
+    }
+  }, [isHydrating]);
+
   return (
     <Flex
       ref={containerRef}
       sx={{
         flex: 1,
         flexDirection: "column",
-        ".tiptap.ProseMirror": { pb: 150 }
+        ".tiptap.ProseMirror": { pb: 150 },
+        ".editor-container": { opacity: isHydrating ? 0 : 1 },
+        ".editor-loading-container.hidden": { display: "none" }
       }}
     >
       <TipTap
         {...props}
         onLoad={(editor) => {
-          props.onLoad?.(editor);
-          containerRef.current
-            ?.querySelector(".editor-loading-container")
-            ?.remove();
+          if (!isHydrating) {
+            onLoad?.(editor);
+            containerRef.current
+              ?.querySelector(".editor-loading-container")
+              ?.classList.add("hidden");
+          }
         }}
         editorContainer={() => {
           if (editorContainerRef.current) return editorContainerRef.current;

@@ -20,12 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useEffect } from "react";
 import { useStore } from "../stores/note-store";
 import ListContainer from "../components/list-container";
-import { hashNavigate } from "../navigation";
 import useNavigate from "../hooks/use-navigate";
 import Placeholder from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { useEditorStore } from "../stores/editor-store";
+import { ListLoader } from "../components/loaders/list-loader";
 
 function Home() {
   const notes = useStore((store) => store.notes);
@@ -60,7 +60,7 @@ function Home() {
   //   })();
   // }, []);
 
-  if (!notes) return <Placeholder context="notes" />;
+  if (!notes) return <ListLoader />;
   return (
     <ListContainer
       group="home"
