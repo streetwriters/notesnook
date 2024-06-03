@@ -100,17 +100,26 @@ export async function exportNotes(
       };
     }
   });
-  confirm({
-    title: `Exported ${result.count} notes`,
-    message:
-      result.errors.length > 0
-        ? `Export completed with ${result.errors.length} errors:
+  if (result instanceof Error) {
+    confirm({
+      title: `Export failed`,
+      message: result.stack || result.message,
+      positiveButtonText: "Okay"
+    });
+    return false;
+  } else {
+    confirm({
+      title: `Exported ${result.count} notes`,
+      message:
+        result.errors.length > 0
+          ? `Export completed with ${result.errors.length} errors:
 
 ${result.errors.map((e, i) => `${i + 1}. ${e.message}`).join("\n")}`
-        : "Export completed with 0 errors.",
-    positiveButtonText: "Okay"
-  });
-  return true;
+          : "Export completed with 0 errors.",
+      positiveButtonText: "Okay"
+    });
+    return true;
+  }
 }
 
 const FORMAT_TO_EXT = {
