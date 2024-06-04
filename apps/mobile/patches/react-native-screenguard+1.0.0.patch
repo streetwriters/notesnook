@@ -1,0 +1,54 @@
+diff --git a/node_modules/react-native-screenguard/ios/ScreenGuard.mm b/node_modules/react-native-screenguard/ios/ScreenGuard.mm
+index 9fa7d33..d2e6d68 100644
+--- a/node_modules/react-native-screenguard/ios/ScreenGuard.mm
++++ b/node_modules/react-native-screenguard/ios/ScreenGuard.mm
+@@ -11,7 +11,7 @@
+ @implementation ScreenGuard
+ RCT_EXPORT_MODULE(ScreenGuard)
+ 
+-bool hasListeners;
++bool hasListeners_;
+ 
+ UITextField *textField;
+ UIImageView *imageView;
+@@ -22,11 +22,11 @@ @implementation ScreenGuard
+ }
+ 
+ - (void)startObserving {
+-  hasListeners = YES;
++  hasListeners_ = YES;
+ }
+ 
+ - (void)stopObserving {
+-  hasListeners = NO;
++  hasListeners_ = NO;
+ }
+ 
+ - (void)secureViewWithBackgroundColor: (NSString *)color {
+@@ -335,7 +335,7 @@ - (UIImage *)convertViewToImage:(UIView *)view {
+                          queue:mainQueue
+                     usingBlock:^(NSNotification *notification) {
+       
+-      if (hasListeners && getScreenShotPath) {
++      if (hasListeners_ && getScreenShotPath) {
+           UIViewController *presentedViewController = RCTPresentedViewController();
+ 
+           UIImage *image = [self convertViewToImage:presentedViewController.view.superview];
+@@ -359,7 +359,7 @@ - (UIImage *)convertViewToImage:(UIView *)view {
+                     result = @{@"path": filePath, @"name": fileName, @"type": @"PNG"};
+                   }
+           [self emit:SCREENSHOT_EVT body: result];
+-      } else if (hasListeners) {
++      } else if (hasListeners_) {
+           [self emit:SCREENSHOT_EVT body: nil];
+       }
+     }];
+@@ -376,7 +376,7 @@ - (UIImage *)convertViewToImage:(UIView *)view {
+                          queue:mainQueue
+                     usingBlock:^(NSNotification *notification) {
+       
+-      if (hasListeners) {
++      if (hasListeners_) {
+         [self emit:SCREEN_RECORDING_EVT body:nil];
+       }
+     }];

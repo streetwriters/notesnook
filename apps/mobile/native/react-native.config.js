@@ -17,6 +17,12 @@ config.dependencies['react-native-vector-icons'] = {
   },
 }
 
+config.dependencies['react-native-screenguard'] = {
+  platforms: {
+    android: null,
+  },
+}
+
 if (isGithubRelease) {
   config.dependencies["react-native-iap"] = {
     platforms: {

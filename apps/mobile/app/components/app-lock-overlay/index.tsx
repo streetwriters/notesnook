@@ -21,7 +21,6 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { AppStateStatus, Platform, TextInput, View } from "react-native";
 //@ts-ignore
 import { useThemeColors } from "@notesnook/theme";
-import { enabled } from "react-native-privacy-snapshot";
 import { DatabaseLogger } from "../../common/database";
 import {
   decrypt,
@@ -121,7 +120,6 @@ const AppLockedOverlay = () => {
     );
     if (unlocked) {
       lockApp(false);
-      enabled(false);
       password.current = undefined;
     }
     biometricUnlockAwaitingUserInput.current = false;
@@ -148,7 +146,6 @@ const AppLockedOverlay = () => {
         }
 
         lockApp(false);
-        enabled(false);
         password.current = undefined;
       } else {
         ToastManager.show({
@@ -163,10 +160,6 @@ const AppLockedOverlay = () => {
   };
 
   useEffect(() => {
-    if (appState === "active") {
-      enabled(false);
-    }
-
     const prevState = lastAppState.current;
     lastAppState.current = appState;
 
@@ -192,13 +185,8 @@ const AppLockedOverlay = () => {
         DatabaseLogger.info("Biometric unlock request");
         onUnlockAppRequested();
       }
-
-      enabled(false);
     } else {
       SettingsService.appEnteredBackground();
-      if (SettingsService.get().privacyScreen) {
-        enabled(true);
-      }
     }
   }, [appState, onUnlockAppRequested, appLocked]);
 
