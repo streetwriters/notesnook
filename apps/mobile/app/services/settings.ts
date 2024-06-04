@@ -29,6 +29,7 @@ import { NotesnookModule } from "../utils/notesnook-module";
 import { scale, updateSize } from "../utils/size";
 import { DatabaseLogger } from "../common/database";
 import { useUserStore } from "../stores/use-user-store";
+import ScreenGuardModule from "react-native-screenguard";
 function reset() {
   const settings = get();
   if (settings.reminder !== "off" && settings.reminder !== "useroff") {
@@ -117,12 +118,14 @@ function setPrivacyScreen(settings: SettingStore["settings"]) {
       NotesnookModule.setSecureMode(true);
     } else {
       enabled(true);
+      ScreenGuardModule.register({ backgroundColor: "#000000" });
     }
   } else {
     if (Platform.OS === "android") {
       NotesnookModule.setSecureMode(false);
     } else {
       enabled(false);
+      ScreenGuardModule.unregister();
     }
   }
 }

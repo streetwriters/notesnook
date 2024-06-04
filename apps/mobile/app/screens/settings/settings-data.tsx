@@ -70,6 +70,7 @@ import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import ScreenGuardModule from "react-native-screenguard";
 
 type User = any;
 
@@ -850,9 +851,18 @@ export const settingsGroups: SettingSection[] = [
           "Hide app contents when you switch to other apps. This will also disable screenshot taking in the app.",
         modifer: () => {
           const settings = SettingsService.get();
-          Platform.OS === "android"
-            ? NotesnookModule.setSecureMode(!settings.privacyScreen)
-            : enabled(true);
+          if (Platform.OS === "ios") {
+            enabled(!settings.privacyScreen);
+            if (settings.privacyScreen) {
+              ScreenGuardModule.unregister();
+            } else {
+              ScreenGuardModule.register({
+                backgroundColor: "#000000"
+              });
+            }
+          } else {
+            NotesnookModule.setSecureMode(!settings.privacyScreen);
+          }
 
           SettingsService.set({ privacyScreen: !settings.privacyScreen });
         },

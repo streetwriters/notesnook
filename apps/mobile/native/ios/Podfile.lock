@@ -343,6 +343,9 @@ PODS:
     - React-Core
   - react-native-safe-area-context (4.9.0):
     - React-Core
+  - react-native-screenguard (1.0.0):
+    - React-Core
+    - SDWebImage (~> 5.11.1)
   - react-native-share-extension (3.0.0):
     - React
   - react-native-sodium (1.5.4):
@@ -548,6 +551,9 @@ PODS:
   - RNZipArchive/Core (6.0.9):
     - React-Core
     - SSZipArchive (~> 2.2)
+  - SDWebImage (5.11.1):
+    - SDWebImage/Core (= 5.11.1)
+  - SDWebImage/Core (5.11.1)
   - SexyTooltip (1.2.5):
     - pop (~> 1.0)
   - SocketRocket (0.6.0)
@@ -606,6 +612,7 @@ DEPENDENCIES:
   - react-native-pdf (from `../../node_modules/react-native-pdf`)
   - react-native-quick-sqlite (from `../../node_modules/react-native-quick-sqlite`)
   - react-native-safe-area-context (from `../../node_modules/react-native-safe-area-context`)
+  - react-native-screenguard (from `../../node_modules/react-native-screenguard`)
   - "react-native-share-extension (from `../../node_modules/@ammarahmed/react-native-share-extension`)"
   - "react-native-sodium (from `../../node_modules/@ammarahmed/react-native-sodium`)"
   - react-native-theme-switch-animation (from `../../node_modules/react-native-theme-switch-animation`)
@@ -664,6 +671,7 @@ SPEC REPOS:
     - MMKV
     - MMKVCore
     - pop
+    - SDWebImage
     - SocketRocket
     - SSZipArchive
     - SwiftyRSA
@@ -754,6 +762,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native-quick-sqlite"
   react-native-safe-area-context:
     :path: "../../node_modules/react-native-safe-area-context"
+  react-native-screenguard:
+    :path: "../../node_modules/react-native-screenguard"
   react-native-share-extension:
     :path: "../../node_modules/@ammarahmed/react-native-share-extension"
   react-native-sodium:
@@ -905,6 +915,7 @@ SPEC CHECKSUMS:
   react-native-pdf: 33c622cbdf776a649929e8b9d1ce2d313347c4fa
   react-native-quick-sqlite: e0e23b749382a85e4b57146f753de737a6c3a9e1
   react-native-safe-area-context: b97eb6f9e3b7f437806c2ce5983f479f8eb5de4b
+  react-native-screenguard: 8b36a3df84c76cd2b82c477f71c26fa1c8cc14a0
   react-native-share-extension: faed334b1ddf165f1e576fcabd3dc1c9e748bfa9
   react-native-sodium: 955bb0dc3ea05f8ea06d5e96cb89d1be7b5d7681
   react-native-theme-switch-animation: 220f883f7be290e79f2ab022093ed1a7a5929e6d
@@ -949,6 +960,7 @@ SPEC CHECKSUMS:
   RNSVG: d7d7bc8229af3842c9cfc3a723c815a52cdd1105
   RNTooltips: 5424d4bf0b3d441104127943b1115cc7f0616b1f
   RNZipArchive: 68a0c6db4b1c103f846f1559622050df254a3ade
+  SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SexyTooltip: 5c9b4dec52bfb317938cb0488efd9da3717bb6fd
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
