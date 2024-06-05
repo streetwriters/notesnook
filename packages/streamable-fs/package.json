@@ -1,11 +1,12 @@
 {
   "name": "@notesnook/streamable-fs",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "description": "",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc --declaration --outDir ./dist"
+    "build": "tsc --declaration --outDir ./dist",
+    "prepublishOnly": "npm run build"
   },
   "author": "",
   "license": "GPL-3.0-or-later",

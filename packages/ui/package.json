@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/ui",
-  "version": "1.0.0",
+  "version": "2.0.2",
   "main": "./dist/index.js",
   "license": "GPL-3.0-or-later",
   "repository": {

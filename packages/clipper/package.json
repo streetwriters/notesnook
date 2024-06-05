@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/clipper",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "description": "Web clipper core used by the Notesnook Web Clipper",
   "keywords": [
     "web-clipper"
@@ -24,6 +24,7 @@
   },
   "scripts": {
     "build": "tsc && yarn webpack -c webpack.config.js",
+    "prepublishOnly": "npm run build",
     "test": "playwright test",
     "postinstall": "patch-package",
     "watch": "tsc --watch"

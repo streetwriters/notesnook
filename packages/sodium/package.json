@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/sodium",
-  "version": "1.1.0",
+  "version": "2.0.1",
   "description": "",
   "main": "./dist/node.js",
   "types": "./dist/node.d.ts",
