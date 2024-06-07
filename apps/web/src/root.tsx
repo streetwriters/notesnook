@@ -106,7 +106,12 @@ function RouteWrapper(props: {
     return Component;
   }, [component, path]);
 
-  if (result.status !== "fulfilled")
+  if (result.status === "rejected") {
+    throw result.reason instanceof Error
+      ? result.reason
+      : new Error(result.reason);
+  }
+  if (result.status === "pending")
     return (
       <div
         style={{
