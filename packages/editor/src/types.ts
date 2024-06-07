@@ -32,14 +32,7 @@ export class Editor extends TiptapEditor {
    * @returns latest editor instance
    */
   requestPermission(id: keyof UnionCommands): TiptapEditor | undefined {
-    const event = new CustomEvent("permissionrequest", {
-      detail: { id },
-      cancelable: true
-    });
-
-    if (!window.dispatchEvent(event)) return undefined;
-
-    return this;
+    return hasPermission(id) ? this : undefined;
   }
 
   /**
@@ -50,4 +43,12 @@ export class Editor extends TiptapEditor {
   threadsafe(callback: (editor: TiptapEditor) => void) {
     return this.mutex.runExclusive(() => (this ? callback(this) : void 0));
   }
+}
+
+export function hasPermission(id: keyof UnionCommands): boolean {
+  const event = new CustomEvent("permissionrequest", {
+    detail: { id },
+    cancelable: true
+  });
+  return window.dispatchEvent(event);
 }

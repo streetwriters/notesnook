@@ -24,6 +24,7 @@ import {
 import { encodeNonAsciiHTML } from "entities";
 import { Schema, Slice } from "prosemirror-model";
 import { inferLanguage } from "../code-block";
+import { hasPermission } from "../../types";
 
 export class ClipboardDOMParser extends ProsemirrorDOMParser {
   static fromSchema(schema: Schema): ClipboardDOMParser {
@@ -41,6 +42,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       convertGoogleDocsChecklist(dom);
       formatCodeblocks(dom);
       convertBrToSingleSpacedParagraphs(dom);
+      if (!hasPermission("insertImage")) removeImages(dom);
     }
     return super.parseSlice(dom, options);
   }
@@ -131,6 +133,12 @@ export function convertGoogleDocsChecklist(dom: HTMLElement | Document) {
     if (li.getAttribute("aria-checked") === "true") {
       li.classList.add("checked");
     }
+  }
+}
+
+export function removeImages(dom: HTMLElement | Document) {
+  for (const img of dom.querySelectorAll(`img`)) {
+    img.remove();
   }
 }
 

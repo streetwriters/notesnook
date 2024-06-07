@@ -28,7 +28,7 @@ export type PermissionHandlerOptions = {
 };
 
 const ClaimsMap: Record<Claims, (keyof UnionCommands)[]> = {
-  premium: ["insertImage"]
+  premium: ["insertImage", "insertAttachment"]
 };
 
 export function usePermissionHandler(options: PermissionHandlerOptions) {
