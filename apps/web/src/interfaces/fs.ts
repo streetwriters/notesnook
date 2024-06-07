@@ -296,12 +296,15 @@ async function singlePartUploadFile(
   console.log("Streaming file upload!");
   const { url, headers, signal } = requestOptions;
 
-  const uploadUrl = await fetch(url, {
+  const uploadUrl: string | { error?: string } = await fetch(url, {
     method: "PUT",
     headers,
     signal
-  }).then((res) => (res.ok ? res.text() : null));
-  if (!uploadUrl) throw new Error("Unable to resolve attachment upload url.");
+  }).then((res) => (res.ok ? res.text() : res.json()));
+  if (typeof uploadUrl !== "string")
+    throw new Error(
+      uploadUrl.error || "Unable to resolve attachment upload url."
+    );
 
   const response = await axios.request({
     url: uploadUrl,
@@ -353,6 +356,9 @@ async function multiPartUploadFile(
     .catch((e) => {
       throw new WrappedError("Could not initiate multi-part upload.", e);
     });
+
+  if (initiateMultiPartUpload.data.error)
+    throw new Error(initiateMultiPartUpload.data.error);
 
   uploadId = initiateMultiPartUpload.data.uploadId;
   const { parts } = initiateMultiPartUpload.data;
