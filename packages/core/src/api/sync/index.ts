@@ -190,58 +190,7 @@ class Sync {
   async fetch(deviceId: string) {
     await this.checkConnection();
 
-    const key = await this.db.user.getEncryptionKey();
-    if (!key || !key.key || !key.salt) {
-      this.logger.error(
-        new Error("User encryption key not generated. Please relogin.")
-      );
-      EV.publish(EVENTS.userSessionExpired);
-      return;
-    }
-
-    let count = 0;
-    this.connection?.off("SendItems");
-    this.connection?.off("SendVaultKey");
-
-    this.connection?.on("SendVaultKey", async (vaultKey) => {
-      if (this.connection?.state !== signalr.HubConnectionState.Connected)
-        return false;
-
-      if (
-        vaultKey &&
-        vaultKey.cipher !== null &&
-        vaultKey.iv !== null &&
-        vaultKey.salt !== null &&
-        vaultKey.length > 0
-      ) {
-        const vault = await this.db.vaults.default();
-        if (!vault)
-          await migrateVaultKey(
-            this.db,
-            vaultKey,
-            5.9,
-            CURRENT_DATABASE_VERSION
-          );
-      }
-
-      return true;
-    });
-
-    this.connection?.on("SendItems", async (chunk) => {
-      if (this.connection?.state !== signalr.HubConnectionState.Connected)
-        return false;
-
-      await this.processChunk(chunk, key);
-
-      count += chunk.items.length;
-      sendSyncProgressEvent(this.db.eventManager, `download`, count);
-
-      return true;
-    });
     await this.connection?.invoke("RequestFetch", deviceId);
-
-    this.connection?.off("SendItems");
-    this.connection?.off("SendVaultKey");
 
     await this.db
       .sql()
@@ -414,6 +363,55 @@ class Sync {
       .build();
     this.connection.serverTimeoutInMilliseconds = 60 * 1000 * 5;
     this.connection.on("PushCompleted", () => this.onPushCompleted());
+    this.connection.on("SendVaultKey", async (vaultKey) => {
+      if (this.connection?.state !== signalr.HubConnectionState.Connected)
+        return false;
+
+      if (
+        vaultKey &&
+        vaultKey.cipher !== null &&
+        vaultKey.iv !== null &&
+        vaultKey.salt !== null &&
+        vaultKey.length > 0
+      ) {
+        const vault = await this.db.vaults.default();
+        if (!vault)
+          await migrateVaultKey(
+            this.db,
+            vaultKey,
+            5.9,
+            CURRENT_DATABASE_VERSION
+          );
+      }
+
+      return true;
+    });
+
+    this.connection.on("SendItems", async (chunk) => {
+      if (this.connection?.state !== signalr.HubConnectionState.Connected)
+        return false;
+
+      const key = await this.getKey();
+      if (!key) return false;
+
+      await this.processChunk(chunk, key);
+
+      sendSyncProgressEvent(this.db.eventManager, `download`, chunk.count);
+
+      return true;
+    });
+  }
+
+  private async getKey() {
+    const key = await this.db.user.getEncryptionKey();
+    if (!key || !key || !key) {
+      this.logger.error(
+        new Error("User encryption key not generated. Please relogin.")
+      );
+      EV.publish(EVENTS.userSessionExpired);
+      return;
+    }
+    return key;
   }
 
   private async checkConnection() {
