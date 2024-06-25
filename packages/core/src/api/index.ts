@@ -173,7 +173,6 @@ class Database {
   };
 
   options!: Options;
-  EventSource?: EventSourceConstructor;
   eventSource?: EventSource | null;
 
   tokenManager = new TokenManager(this.kv);
@@ -348,8 +347,9 @@ class Database {
       this.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
 
       const forceReconnect = args && args.force;
+      const EventSource = this.options.eventsource;
       if (
-        !this.EventSource ||
+        !EventSource ||
         (!forceReconnect &&
           this.eventSource &&
           this.eventSource.readyState === this.eventSource.OPEN)
@@ -360,7 +360,7 @@ class Database {
       const token = await this.tokenManager.getAccessToken();
       if (!token) return;
 
-      this.eventSource = new this.EventSource(`${Hosts.SSE_HOST}/sse`, {
+      this.eventSource = new EventSource(`${Hosts.SSE_HOST}/sse`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
