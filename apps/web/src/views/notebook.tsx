@@ -163,6 +163,7 @@ function SubNotebooks({
   const notebooks = useNotebookStore((store) => store.notebooks);
   const contextNotes = useNotesStore((store) => store.contextNotes);
   const context = useNotesStore((store) => store.context);
+  const [title, setTitle] = useState<string>();
 
   const saveViewState = useCallback((id: string) => {
     if (!treeRef.current?.viewState) return;
@@ -198,8 +199,15 @@ function SubNotebooks({
     });
   }, [contextNotes, context]);
 
-  if (!rootId) return null;
+  useEffect(() => {
+    (async function () {
+      const notebook = await db.notebooks.notebook(rootId);
+      if (!notebook) return;
+      setTitle(notebook.title);
+    })();
+  });
 
+  if (!rootId) return null;
   return (
     <Flex
       id="subnotebooks"
@@ -231,7 +239,7 @@ function SubNotebooks({
         <Flex sx={{ alignItems: "center" }}>
           {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
           <Text variant="subBody" sx={{ fontSize: 11 }}>
-            NOTEBOOKS
+            {title?.toUpperCase()}
           </Text>
         </Flex>
         <Flex sx={{ alignItems: "center" }}>
@@ -269,7 +277,6 @@ function SubNotebooks({
           </Button>
         </Flex>
       </Flex>
-
       <FlexScrollContainer>
         <UncontrolledTreeEnvironment
           ref={treeRef}
@@ -296,16 +303,16 @@ function SubNotebooks({
               };
             },
             async getTreeItem(itemId) {
-              if (itemId === "root") {
-                return {
-                  data: { notebook: { title: "Root" } },
-                  index: itemId,
-                  isFolder: true,
-                  canMove: false,
-                  canRename: false,
-                  children: [rootId]
-                };
-              }
+              // if (itemId === "root") {
+              //   return {
+              //     data: { notebook: { title: "Root" } },
+              //     index: itemId,
+              //     isFolder: true,
+              //     canMove: false,
+              //     canRename: false,
+              //     children: [rootId]
+              //   };
+              // }
 
               const notebook = (await db.notebooks.notebook(itemId as string))!;
               const children = await db.relations
@@ -331,17 +338,17 @@ function SubNotebooks({
                 .get();
 
               return itemIds.reduce((prev, id) => {
-                if (id === "root") {
-                  prev.push({
-                    data: { notebook: { title: "Root" } },
-                    index: id,
-                    isFolder: true,
-                    canMove: false,
-                    canRename: false,
-                    children: [rootId]
-                  });
-                  return prev;
-                }
+                // if (id === "root") {
+                //   prev.push({
+                //     data: { notebook: { title: "Root" } },
+                //     index: id,
+                //     isFolder: true,
+                //     canMove: false,
+                //     canRename: false,
+                //     children: [rootId]
+                //   });
+                //   return prev;
+                // }
 
                 const notebook = notebooks[id];
                 if (!notebook) return prev;
@@ -401,7 +408,7 @@ function SubNotebooks({
                 {children}
               </div>
             )}
-            rootItem="root"
+            rootItem={rootId}
             treeLabel="Tree Example"
           />
         </UncontrolledTreeEnvironment>
