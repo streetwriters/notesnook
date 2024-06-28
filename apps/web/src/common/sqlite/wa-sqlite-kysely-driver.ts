@@ -25,6 +25,7 @@ import SQLiteSyncURI from "./wa-sqlite.wasm?url";
 import SQLiteAsyncURI from "./wa-sqlite-async.wasm?url";
 import { Mutex } from "async-mutex";
 import { SharedService } from "./shared-service";
+import { Remote, wrap } from "comlink";
 
 type Config = {
   dbName: string;
@@ -38,13 +39,14 @@ const servicePool = new Map<
   { service: SharedService<SQLiteWorker>; activated: boolean; closed: boolean }
 >();
 
-export class WaSqliteWorkerDriver implements Driver {
+export class WaSqliteWorkerMultipleTabDriver implements Driver {
   private connection?: DatabaseConnection;
   private connectionMutex = new Mutex();
   private initializationMutex = new Mutex();
   private readonly serviceName;
 
   constructor(private readonly config: Config) {
+    console.log("multi tab driver", config.dbName);
     this.serviceName = `${config.dbName}-service`;
   }
 
@@ -59,10 +61,11 @@ export class WaSqliteWorkerDriver implements Driver {
     if (activated) {
       if (closed) {
         console.log("Already activated. Reinitializing...");
-        await service.proxy.open(
-          this.config.async,
-          this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
-        );
+        await service.proxy.open(this.config.dbName, {
+          async: this.config.async,
+          encrypted: this.config.encrypted,
+          url: this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
+        });
         this.needsInitialization = true;
         servicePool.set(this.serviceName, {
           service,
@@ -193,19 +196,76 @@ export class WaSqliteWorkerDriver implements Driver {
   async delete() {
     const service = servicePool.get(this.serviceName);
     if (!service || !service.service) return;
-    await service.service?.proxy?.delete(this.config.dbName, this.config.async);
+    await service.service?.proxy?.delete();
     service.closed = true;
   }
 
   async export() {
-    return servicePool
-      .get(this.serviceName)
-      ?.service?.proxy?.export(this.config.dbName, this.config.async);
+    return servicePool.get(this.serviceName)?.service?.proxy?.export();
+  }
+}
+
+export class WaSqliteWorkerSingleTabDriver implements Driver {
+  private connection?: DatabaseConnection;
+  private connectionMutex = new Mutex();
+  private readonly worker = wrap<SQLiteWorker>(
+    new Worker({ name: this.config.dbName })
+  );
+
+  constructor(private readonly config: Config) {
+    console.log("single tab driver", config.dbName);
+  }
+
+  async init(): Promise<void> {
+    await this.worker.open(this.config.dbName, {
+      async: this.config.async,
+      encrypted: this.config.encrypted,
+      url: this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
+    });
+    this.connection = new WaSqliteWorkerConnection(this.worker);
+  }
+
+  async acquireConnection(): Promise<DatabaseConnection> {
+    if (!this.connection) throw new Error("Driver not initialized.");
+
+    // SQLite only has one single connection. We use a mutex here to wait
+    // until the single connection has been released.
+    await this.connectionMutex.waitForUnlock();
+    await this.connectionMutex.acquire();
+    return this.connection;
+  }
+
+  async beginTransaction(connection: DatabaseConnection): Promise<void> {
+    await connection.executeQuery(CompiledQuery.raw("begin"));
+  }
+
+  async commitTransaction(connection: DatabaseConnection): Promise<void> {
+    await connection.executeQuery(CompiledQuery.raw("commit"));
+  }
+
+  async rollbackTransaction(connection: DatabaseConnection): Promise<void> {
+    await connection.executeQuery(CompiledQuery.raw("rollback"));
+  }
+
+  async releaseConnection(): Promise<void> {
+    this.connectionMutex.release();
+  }
+
+  async destroy(): Promise<void> {
+    await this.worker.close();
+  }
+
+  async delete() {
+    await this.worker.delete();
+  }
+
+  async export() {
+    return await this.worker.export();
   }
 }
 
 class WaSqliteWorkerConnection implements DatabaseConnection {
-  constructor(private readonly worker: SQLiteWorker) {}
+  constructor(private readonly worker: SQLiteWorker | Remote<SQLiteWorker>) {}
 
   streamQuery<R>(): AsyncIterableIterator<QueryResult<R>> {
     throw new Error("wasqlite driver doesn't support streaming");
@@ -221,6 +281,8 @@ class WaSqliteWorkerConnection implements DatabaseConnection {
         : query.kind === "RawNode"
         ? "raw"
         : "exec";
-    return this.worker.run(mode, sql, parameters as any);
+    return this.worker.run(mode, sql, parameters as any) as Promise<
+      QueryResult<R>
+    >;
   }
 }

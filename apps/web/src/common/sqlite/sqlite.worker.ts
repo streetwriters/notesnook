@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { SQLiteAPI, SQLiteCompatibleType } from "./sqlite-types";
 import { Factory, SQLITE_ROW, SQLiteError } from "./sqlite-api";
-import { transfer } from "comlink";
+import { expose, transfer } from "comlink";
 import type { RunMode } from "./type";
 import { QueryResult } from "kysely";
 import { DatabaseSource } from "./sqlite-export";
@@ -32,6 +32,12 @@ type PreparedStatement = {
   columns: string[];
 };
 
+type SQLiteOptions = {
+  async: boolean;
+  url?: string;
+  encrypted: boolean;
+};
+
 class _SQLiteWorker {
   sqlite!: SQLiteAPI;
   db: number | undefined = undefined;
@@ -39,21 +45,22 @@ class _SQLiteWorker {
   initialized = false;
   preparedStatements: Map<string, PreparedStatement> = new Map();
   retryCounter: Record<string, number> = {};
-  constructor(
-    private readonly dbName: string,
-    private readonly encrypted: boolean
-  ) {
-    console.log("new sqlite worker", dbName, encrypted);
-  }
+  encrypted = false;
+  name = "";
+  async = false;
 
-  async open(async: boolean, url?: string) {
+  async open(name: string, options: SQLiteOptions) {
     if (this.db) {
       console.error("Database is already initialized", this.db);
       return;
     }
 
-    const option = url ? { locateFile: () => url } : {};
-    const sqliteModule = async
+    this.encrypted = options.encrypted;
+    this.name = name;
+    this.async = options.async;
+
+    const option = options.url ? { locateFile: () => options.url } : {};
+    const sqliteModule = options.async
       ? await import("./wa-sqlite-async").then(
           ({ default: SQLiteAsyncESMFactory }) => SQLiteAsyncESMFactory(option)
         )
@@ -61,11 +68,11 @@ class _SQLiteWorker {
           SQLiteSyncESMFactory(option)
         );
     this.sqlite = Factory(sqliteModule);
-    this.vfs = await this.getVFS(this.dbName, async);
+    this.vfs = await this.getVFS(name, options.async);
 
     this.sqlite.vfs_register(this.vfs, false);
     this.db = await this.sqlite.open_v2(
-      this.dbName,
+      name,
       undefined,
       `multipleciphers-${this.vfs.name}`
     );
@@ -163,7 +170,7 @@ class _SQLiteWorker {
     if (this.encrypted && !sql.startsWith("PRAGMA key")) {
       await this.waitForDatabase();
     }
-    if (!this.db) throw new Error("No database is not opened.");
+    if (!this.db) throw new Error("Database is not opened.");
 
     const rows = (await this.exec(sql, mode, parameters)) as R[];
     if (mode === "query") return { rows };
@@ -194,16 +201,16 @@ class _SQLiteWorker {
     this.initialized = false;
   }
 
-  async export(dbName: string, async: boolean) {
-    const vfs = await this.getVFS(dbName, async);
-    const stream = new ReadableStream(new DatabaseSource(vfs, dbName));
+  async export() {
+    const vfs = await this.getVFS(this.name, this.async);
+    const stream = new ReadableStream(new DatabaseSource(vfs, this.name));
     return transfer(stream, [stream]);
   }
 
-  async delete(dbName: string, async: boolean) {
+  async delete() {
     await this.close();
     if (this.vfs) await this.vfs.delete();
-    else await (await this.getVFS(dbName, async)).delete();
+    else await (await this.getVFS(this.name, this.async)).delete();
   }
 
   async getVFS(dbName: string, async: boolean) {
@@ -222,7 +229,7 @@ class _SQLiteWorker {
   async initialize() {
     self.dispatchEvent(
       new MessageEvent("message", {
-        data: { type: "databaseInitialized", dbName: this.dbName }
+        data: { type: "databaseInitialized", dbName: this.name }
       })
     );
     console.log("Database initialized", this.db);
@@ -237,7 +244,7 @@ class _SQLiteWorker {
         self.addEventListener("message", (ev) => {
           if (
             ev.data.type === "databaseInitialized" &&
-            ev.data.dbName === this.dbName
+            ev.data.dbName === this.name
           )
             resolve(true);
         })
@@ -251,11 +258,17 @@ export type SQLiteWorker = typeof _SQLiteWorker.prototype;
 
 addEventListener("message", async (event) => {
   if (!event.data.type) {
-    const worker = new _SQLiteWorker(event.data.dbName, event.data.encrypted);
-    await worker.open(event.data.async, event.data.uri);
+    const worker = new _SQLiteWorker();
+    await worker.open(event.data.dbName, {
+      async: event.data.async,
+      encrypted: event.data.encrypted,
+      url: event.data.uri
+    });
     const providerPort = createSharedServicePort(worker);
     postMessage(null, [providerPort]);
 
     self.addEventListener("beforeunload", () => worker.close());
   }
 });
+const worker = new _SQLiteWorker();
+expose(worker);

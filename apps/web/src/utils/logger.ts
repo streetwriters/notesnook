@@ -44,7 +44,7 @@ async function initializeLogger() {
       synchronous: "normal",
       pageSize: 8192,
       cacheSize: -32000,
-      skipInitialization: !IS_DESKTOP_APP
+      skipInitialization: !IS_DESKTOP_APP && !!globalThis.SharedWorker
     },
     false
   );
