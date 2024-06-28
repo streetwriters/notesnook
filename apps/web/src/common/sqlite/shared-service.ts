@@ -182,7 +182,9 @@ export class SharedService<T extends object> extends EventTarget {
   }
 
   #sendPortToClient(message: any, port: MessagePort) {
-    sharedWorker?.port.postMessage(message, [port]);
+    if (!sharedWorker)
+      throw new Error("Shared worker is not supported in this environment.");
+    sharedWorker.port.postMessage(message, [port]);
   }
 
   async #getClientId() {

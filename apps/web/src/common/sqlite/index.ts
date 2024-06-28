@@ -23,7 +23,10 @@ import {
   SqliteIntrospector,
   Dialect
 } from "kysely";
-import { WaSqliteWorkerDriver } from "./wa-sqlite-kysely-driver";
+import {
+  WaSqliteWorkerMultipleTabDriver,
+  WaSqliteWorkerSingleTabDriver
+} from "./wa-sqlite-kysely-driver";
 import { isFeatureSupported } from "../../utils/feature-check";
 
 declare module "kysely" {
@@ -39,12 +42,18 @@ export const createDialect = (
 ): Dialect => {
   return {
     createDriver: () =>
-      new WaSqliteWorkerDriver({
-        async: !isFeatureSupported("opfs"),
-        dbName: name,
-        encrypted,
-        init
-      }),
+      globalThis.SharedWorker
+        ? new WaSqliteWorkerMultipleTabDriver({
+            async: !isFeatureSupported("opfs"),
+            dbName: name,
+            encrypted,
+            init
+          })
+        : new WaSqliteWorkerSingleTabDriver({
+            async: !isFeatureSupported("opfs"),
+            dbName: name,
+            encrypted
+          }),
     createAdapter: () => new SqliteAdapter(),
     createIntrospector: (db) => new SqliteIntrospector(db),
     createQueryCompiler: () => new SqliteQueryCompiler()
