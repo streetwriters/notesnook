@@ -38,6 +38,7 @@ import ScrollContainer from "../scroll-container";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import { VirtualizedGrouping, GroupingKey, Item } from "@notesnook/core";
 import {
+  FlatScrollIntoViewLocation,
   ItemProps,
   ScrollerProps,
   Virtuoso,
@@ -76,7 +77,6 @@ type ListContainerProps = {
     onClick: () => void;
   };
 };
-var activeItem: { focus: boolean; id: string } | undefined = undefined;
 function ListContainer(props: ListContainerProps) {
   const { group, items, context, refresh, header, button, compact } = props;
 
@@ -92,6 +92,7 @@ function ListContainer(props: ListContainerProps) {
 
   const listRef = useRef<VirtuosoHandle>(null);
   const listContainerRef = useRef(null);
+  const activeItem = useRef<{ focus: boolean; id: string }>();
 
   useEffect(() => {
     return () => {
@@ -100,18 +101,18 @@ function ListContainer(props: ListContainerProps) {
   }, []);
 
   useLayoutEffect(() => {
-    if (activeItem) {
+    if (activeItem.current) {
       items
         .ids()
         .then(
           (ids) =>
             listRef.current &&
-            activeItem &&
+            activeItem.current &&
             revealItemInList(
               listRef.current,
-              activeItem.id,
+              activeItem.current.id,
               ids,
-              activeItem.focus
+              activeItem.current.focus
             )
         );
     }
@@ -119,8 +120,8 @@ function ListContainer(props: ListContainerProps) {
     const event = AppEventManager.subscribe(
       AppEvents.revealItemInList,
       (id, focus) => {
-        if (activeItem?.id === id) return;
-        activeItem = { id, focus };
+        if (activeItem.current?.id === id) return;
+        activeItem.current = { id, focus };
         items
           .ids()
           .then(
@@ -461,11 +462,13 @@ function waitForElement(
   list: VirtuosoHandle,
   index: number,
   elementId: string,
-  callback: (element: HTMLElement) => void
+  callback: (element: HTMLElement) => void,
+  options?: Partial<FlatScrollIntoViewLocation>
 ) {
   let waitInterval = 0;
   let maxAttempts = 3;
   list.scrollIntoView({
+    ...options,
     index,
     done: function scrollDone() {
       if (!maxAttempts) return;
@@ -497,6 +500,7 @@ function revealItemInList(
     list,
     index,
     `id_${itemId}`,
-    (element) => focus && element.focus()
+    (element) => focus && element.focus(),
+    { align: "center" }
   );
 }
