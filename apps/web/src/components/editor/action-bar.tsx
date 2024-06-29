@@ -498,15 +498,11 @@ function Tab(props: TabProps) {
         e.stopPropagation();
         if (isTemporary) onKeepOpen();
       }}
-      onMouseDown={(e) => {
-        if (e.button == 1) {
-          e.preventDefault();
-          onClose();
-        }
+      onAuxClick={(e) => {
+        if (e.button == 1) onClose();
       }}
-      onClick={(e) => {
-        e.stopPropagation();
-        onFocus();
+      onMouseUp={(e) => {
+        if (e.button == 0) onFocus();
       }}
       {...listeners}
       {...attributes}
