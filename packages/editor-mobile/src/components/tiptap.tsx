@@ -17,11 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Editor, TiptapOptions, Toolbar, useTiptap } from "@notesnook/editor";
+import { useEffect } from "react";
 import { useTabContext } from "../hooks/useTabStore";
 import { EmotionEditorToolbarTheme } from "../theme-factory";
 import { Settings } from "../utils";
-import { useEffect } from "react";
-
 export default function TiptapEditorWrapper(props: {
   options: Partial<TiptapOptions>;
   onEditorUpdate: (editor: Editor) => void;
@@ -49,7 +48,11 @@ export default function TiptapEditorWrapper(props: {
             }}
             editor={editor}
             location="bottom"
-            tools={[...props.settings.tools]}
+            tools={
+              Array.isArray(props.settings.tools)
+                ? [...props.settings.tools]
+                : []
+            }
             defaultFontFamily={props.settings.fontFamily}
             defaultFontSize={props.settings.fontSize}
           />
