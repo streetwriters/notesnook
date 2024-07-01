@@ -569,7 +569,7 @@ export const useEditor = (
           return;
         }
 
-        lastContentChangeTime.current[item.id] = item.dateEdited;
+        lastContentChangeTime.current[item.id] = 0;
         currentLoadingNoteId.current = item.id;
         currentNotes.current[item.id] = item;
 
