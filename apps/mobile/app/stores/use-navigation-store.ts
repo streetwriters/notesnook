@@ -30,7 +30,9 @@ import {
 } from "@notesnook/core";
 import create, { State } from "zustand";
 
-export type GenericRouteParam = undefined;
+export type GenericRouteParam = {
+  canGoBack?: boolean;
+};
 
 export type NotebookScreenParams = {
   item: Notebook;
@@ -80,6 +82,7 @@ export type RouteParams = {
   AppLock: AppLockRouteParams;
   Reminders: GenericRouteParam;
   SettingsGroup: GenericRouteParam;
+  Intro: GenericRouteParam;
 };
 
 export type RouteName = keyof RouteParams;

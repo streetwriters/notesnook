@@ -48,6 +48,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { PricingItem } from "./pricing-item";
 import { useSettingStore } from "../../stores/use-setting-store";
+import usePricingPlans from "../../hooks/use-pricing-plans";
 
 const UUID_PREFIX = "0bdaea";
 const UUID_VERSION = "4";
@@ -92,173 +93,21 @@ export const PricingPlans = ({
   compact?: boolean;
 }) => {
   const { colors } = useThemeColors();
-  const user = useUserStore((state) => state.user);
-  const [product, setProduct] = useState<{
-    type: string;
-    offerType: "monthly" | "yearly";
-    data: RNIap.Subscription;
-    cycleText: string;
-    info: string;
-  }>();
-
-  const [buying, setBuying] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const userCanRequestTrial =
-    user && (!user.subscription || !user.subscription.expiry) ? true : false;
-  const [upgrade, setUpgrade] = useState(!userCanRequestTrial);
-  const yearlyPlan = usePricing("yearly");
-  const monthlyPlan = usePricing("monthly");
-
-  const getSkus = useCallback(async () => {
-    try {
-      setLoading(true);
-      if (promo?.promoCode) {
-        getPromo(promo?.promoCode);
-      }
-      setLoading(false);
-    } catch (e) {
-      setLoading(false);
-      console.log("error getting sku", e);
-    }
-  }, [promo?.promoCode]);
-
-  const getPromo = async (code: string) => {
-    try {
-      let skuId: string;
-      if (code.startsWith("com.streetwriters.notesnook")) {
-        skuId = code;
-      } else {
-        skuId = await db.offers?.getCode(code.split(":")[0], Platform.OS);
-      }
-
-      const products = await PremiumService.getProducts();
-      const product = products.find((p) => p.productId === skuId);
-      if (!product) return false;
-      const isMonthly = product.productId.indexOf(".mo") > -1;
-
-      const cycleText = isMonthly
-        ? promoCyclesMonthly[
-            (Platform.OS === "android"
-              ? (product as RNIap.SubscriptionAndroid)
-                  .subscriptionOfferDetails[0]?.pricingPhases
-                  .pricingPhaseList?.[0].billingCycleCount
-              : parseInt(
-                  (product as RNIap.SubscriptionIOS)
-                    .introductoryPriceNumberOfPeriodsIOS as string
-                )) as keyof typeof promoCyclesMonthly
-          ]
-        : promoCyclesYearly[
-            (Platform.OS === "android"
-              ? (product as RNIap.SubscriptionAndroid)
-                  .subscriptionOfferDetails[0]?.pricingPhases
-                  .pricingPhaseList?.[0].billingCycleCount
-              : parseInt(
-                  (product as RNIap.SubscriptionIOS)
-                    .introductoryPriceNumberOfPeriodsIOS as string
-                )) as keyof typeof promoCyclesYearly
-          ];
-
-      setProduct({
-        type: "promo",
-        offerType: isMonthly ? "monthly" : "yearly",
-        data: product,
-        cycleText: cycleText,
-        info: `Pay ${isMonthly ? "monthly" : "yearly"}, cancel anytime`
-      });
-      return true;
-    } catch (e) {
-      console.log("PROMOCODE ERROR:", code, e);
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    getSkus();
-  }, [getSkus]);
-
-  const buySubscription = async (product: RNIap.Subscription) => {
-    if (buying || !product) return;
-    setBuying(true);
-    try {
-      if (!user) {
-        setBuying(false);
-        return;
-      }
-      useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
-      const androidOfferToken =
-        Platform.OS === "android"
-          ? (product as RNIap.SubscriptionAndroid).subscriptionOfferDetails[0]
-              .offerToken
-          : null;
-
-      DatabaseLogger.info(
-        `Subscription Requested initiated for user ${toUUID(user.id)}`
-      );
-
-      await RNIap.requestSubscription({
-        sku: product?.productId,
-        obfuscatedAccountIdAndroid: user.id,
-        obfuscatedProfileIdAndroid: user.id,
-        appAccountToken: toUUID(user.id),
-        andDangerouslyFinishTransactionAutomaticallyIOS: false,
-        subscriptionOffers: androidOfferToken
-          ? [
-              {
-                offerToken: androidOfferToken,
-                sku: product?.productId
-              }
-            ]
-          : undefined
-      });
-      useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
-      setBuying(false);
-      eSendEvent(eCloseSheet);
-      eSendEvent(eClosePremiumDialog);
-      await sleep(500);
-      presentSheet({
-        title: "Thank you for subscribing!",
-        paragraph:
-          "Your Notesnook Pro subscription will be activated soon. If your account is not upgraded to Notesnook Pro, your money will be refunded to you. In case of any issues, please reach out to us at support@streetwriters.co",
-        action: async () => {
-          eSendEvent(eCloseSheet);
-        },
-        icon: "check",
-        actionText: "Continue"
-      });
-    } catch (e) {
-      setBuying(false);
-      console.log(e);
-    }
-  };
-
-  function getStandardPrice() {
-    if (!product) return;
-    const productType = product.offerType;
-
-    if (Platform.OS === "android") {
-      const pricingPhaseListItem = (product.data as RNIap.SubscriptionAndroid)
-        ?.subscriptionOfferDetails[0]?.pricingPhases.pricingPhaseList?.[1];
-
-      if (!pricingPhaseListItem) {
-        const product =
-          productType === "monthly"
-            ? monthlyPlan?.product
-            : yearlyPlan?.product;
-        return (product as RNIap.SubscriptionAndroid)
-          ?.subscriptionOfferDetails[0]?.pricingPhases.pricingPhaseList?.[0]
-          ?.formattedPrice;
-      }
-
-      return pricingPhaseListItem?.formattedPrice;
-    } else {
-      const productDefault =
-        productType === "monthly" ? monthlyPlan?.product : yearlyPlan?.product;
-      return (
-        (product.data as RNIap.SubscriptionIOS)?.localizedPrice ||
-        (productDefault as RNIap.SubscriptionIOS)?.localizedPrice
-      );
-    }
-  }
+  const {
+    buySubscription,
+    buying,
+    getStandardPrice,
+    product,
+    setBuying,
+    loading,
+    user,
+    setProduct,
+    monthlyPlan,
+    yearlyPlan,
+    getPromo
+  } = usePricingPlans({
+    promo: promo
+  });
 
   return loading ? (
     <View
@@ -278,354 +127,215 @@ export const PricingPlans = ({
       }}
     >
       {buying ? (
-        <BaseDialog statusBarTranslucent centered>
+        <BaseDialog visible statusBarTranslucent centered>
           <ActivityIndicator size={50} color="white" />
         </BaseDialog>
       ) : null}
 
-      {!upgrade ? (
+      {!user && !product ? (
         <>
-          <Paragraph
-            style={{
-              alignSelf: "center"
-            }}
-            size={SIZE.lg}
-          >
-            {(Platform.OS === "android"
-              ? (monthlyPlan?.product as RNIap.SubscriptionAndroid | undefined)
-                  ?.subscriptionOfferDetails[0]?.pricingPhases
-                  .pricingPhaseList?.[0]?.formattedPrice
-              : (monthlyPlan?.product as RNIap.SubscriptionIOS | undefined)
-                  ?.localizedPrice) ||
-              (PremiumService.getMontlySub() as any)?.localizedPrice}
-            / mo
-          </Paragraph>
-          <Button
-            onPress={() => {
-              setUpgrade(true);
-            }}
-            title={"Upgrade now"}
-            type="accent"
-            width={250}
-            style={{
-              paddingHorizontal: 12,
-              marginBottom: 15,
-              marginTop: 15,
-              borderRadius: 100
-            }}
-          />
-
-          <Button
-            onPress={async () => {
-              try {
-                await db.user?.activateTrial();
-                eSendEvent(eClosePremiumDialog);
-                eSendEvent(eCloseSheet);
-                await sleep(300);
-                Walkthrough.present("trialstarted", false, true);
-              } catch (e) {
-                console.error(e);
-              }
-            }}
-            title={"Try free for 14 days"}
-            type="secondaryAccented"
-            width={250}
-            style={{
-              paddingHorizontal: 12,
-              marginBottom: 15
-            }}
-          />
-        </>
-      ) : (
-        <>
-          {product?.type === "promo" ? (
-            <View
-              style={{
-                paddingVertical: 15,
-                alignItems: "center"
-              }}
-            >
-              {product?.offerType === "monthly" ? (
-                <PricingItem
-                  product={{
-                    type: "monthly",
-                    data: monthlyPlan?.product,
-                    info: "Pay once a month, cancel anytime."
+          {heading || (monthlyPlan?.info?.discount || 0) > 0 ? (
+            <>
+              {monthlyPlan && (monthlyPlan?.info?.discount || 0) > 0 ? (
+                <View
+                  style={{
+                    alignSelf: "center",
+                    marginTop: marginTop || 20,
+                    marginBottom: 20
                   }}
-                  strikethrough={true}
-                />
+                >
+                  <Heading
+                    style={{
+                      textAlign: "center"
+                    }}
+                    color={colors.primary.accent}
+                  >
+                    Get {monthlyPlan?.info?.discount}% off in{" "}
+                    {monthlyPlan?.info?.country}
+                  </Heading>
+                </View>
               ) : (
-                <PricingItem
-                  onPress={() => {
-                    if (!monthlyPlan?.product) return;
-                    buySubscription(monthlyPlan?.product);
-                  }}
-                  product={{
-                    type: "yearly",
-                    data: yearlyPlan?.product,
-                    info: "Pay once a year, cancel anytime."
-                  }}
-                  strikethrough={true}
-                />
-              )}
-
-              <Heading
-                style={{
-                  paddingTop: 15,
-                  fontSize: SIZE.lg
-                }}
-              >
-                Special offer for you
-              </Heading>
-
-              <View
-                style={{
-                  paddingVertical: 20,
-                  paddingBottom: 10
-                }}
-              >
                 <Heading
                   style={{
                     alignSelf: "center",
-                    textAlign: "center"
+                    marginTop: marginTop || 20,
+                    marginBottom: 20
                   }}
-                  size={SIZE.xxl}
                 >
-                  {Platform.OS === "android"
-                    ? (product.data as RNIap.SubscriptionAndroid)
-                        ?.subscriptionOfferDetails[0]?.pricingPhases
-                        .pricingPhaseList?.[0]?.formattedPrice
-                    : (product.data as RNIap.SubscriptionIOS)
-                        ?.introductoryPrice ||
-                      (product.data as RNIap.SubscriptionIOS)
-                        ?.localizedPrice}{" "}
-                  {product?.cycleText
-                    ? `for ${product.cycleText}`
-                    : product?.offerType}
+                  Choose a plan
                 </Heading>
-                {product?.cycleText ? (
-                  <Paragraph
-                    style={{
-                      color: colors.secondary.paragraph,
-                      alignSelf: "center",
-                      textAlign: "center"
-                    }}
-                    size={SIZE.md}
-                  >
-                    then {getStandardPrice()} {product?.offerType}.
-                  </Paragraph>
-                ) : null}
-              </View>
-            </View>
-          ) : null}
-
-          {user && !product ? (
-            <>
-              {heading || (monthlyPlan?.info?.discount || 0) > 0 ? (
-                <>
-                  {monthlyPlan && (monthlyPlan?.info?.discount || 0) > 0 ? (
-                    <View
-                      style={{
-                        alignSelf: "center",
-                        marginTop: marginTop || 20,
-                        marginBottom: 20
-                      }}
-                    >
-                      <Heading
-                        style={{
-                          textAlign: "center"
-                        }}
-                        color={colors.primary.accent}
-                      >
-                        Get {monthlyPlan?.info?.discount}% off in{" "}
-                        {monthlyPlan?.info?.country}
-                      </Heading>
-                    </View>
-                  ) : (
-                    <Heading
-                      style={{
-                        alignSelf: "center",
-                        marginTop: marginTop || 20,
-                        marginBottom: 20
-                      }}
-                    >
-                      Choose a plan
-                    </Heading>
-                  )}
-                </>
-              ) : null}
-
-              <View
-                style={{
-                  flexDirection: !compact ? "column" : "row",
-                  flexWrap: "wrap",
-                  justifyContent: "space-around"
-                }}
-              >
-                <PricingItem
-                  onPress={() => {
-                    if (!monthlyPlan?.product) return;
-                    buySubscription(monthlyPlan?.product);
-                  }}
-                  compact={compact}
-                  product={{
-                    type: "monthly",
-                    data: monthlyPlan?.product,
-                    info: "Pay once a month, cancel anytime."
-                  }}
-                />
-
-                {!compact && (
-                  <View
-                    style={{
-                      height: 1,
-                      marginVertical: 5
-                    }}
-                  />
-                )}
-
-                <PricingItem
-                  onPress={() => {
-                    if (!yearlyPlan?.product) return;
-                    buySubscription(yearlyPlan?.product);
-                  }}
-                  compact={compact}
-                  product={{
-                    type: "yearly",
-                    data: yearlyPlan?.product,
-                    info: "Pay once a year, cancel anytime."
-                  }}
-                />
-              </View>
-
-              {Platform.OS !== "ios" ? (
-                <Button
-                  height={35}
-                  style={{
-                    marginTop: 10
-                  }}
-                  onPress={() => {
-                    presentDialog({
-                      context: "local",
-                      input: true,
-                      inputPlaceholder: "Enter code",
-                      positiveText: "Apply",
-                      positivePress: async (value) => {
-                        if (!value) return;
-                        eSendEvent(eCloseSimpleDialog);
-                        setBuying(true);
-                        try {
-                          if (!(await getPromo(value as string)))
-                            throw new Error("Error applying promo code");
-                          ToastManager.show({
-                            heading: "Discount applied!",
-                            type: "success",
-                            context: "local"
-                          });
-                          setBuying(false);
-                        } catch (e) {
-                          setBuying(false);
-                          ToastManager.show({
-                            heading: "Promo code invalid or expired",
-                            message: (e as Error).message,
-                            type: "error",
-                            context: "local"
-                          });
-                        }
-                      },
-                      title: "Have a promo code?",
-                      paragraph:
-                        "Enter your promo code to get a special discount."
-                    });
-                  }}
-                  title="I have a promo code"
-                />
-              ) : (
-                <View
-                  style={{
-                    height: 15
-                  }}
-                />
               )}
             </>
-          ) : (
-            <View>
-              {!user ? (
-                <>
-                  <Button
-                    onPress={() => {
-                      eSendEvent(eClosePremiumDialog);
-                      eSendEvent(eCloseSheet);
-                      setTimeout(() => {
-                        eSendEvent(eOpenLoginDialog, 1);
-                      }, 400);
-                    }}
-                    title={"Sign up for free"}
-                    type="accent"
-                    width={250}
-                    style={{
-                      paddingHorizontal: 12,
-                      marginTop: product?.type === "promo" ? 0 : 30,
-                      marginBottom: 10
-                    }}
-                  />
-                  {Platform.OS !== "ios" &&
-                  promo &&
-                  !promo.promoCode.startsWith("com.streetwriters.notesnook") ? (
-                    <Paragraph
-                      size={SIZE.md}
-                      textBreakStrategy="balanced"
-                      style={{
-                        alignSelf: "center",
-                        justifyContent: "center",
-                        textAlign: "center"
-                      }}
-                    >
-                      Use promo code{" "}
-                      <Text
-                        style={{
-                          fontFamily: "OpenSans-SemiBold"
-                        }}
-                      >
-                        {promo.promoCode}
-                      </Text>{" "}
-                      at checkout
-                    </Paragraph>
-                  ) : null}
-                </>
-              ) : (
-                <>
-                  <Button
-                    onPress={() => {
-                      if (!product?.data) return;
-                      buySubscription(product.data);
-                    }}
-                    height={40}
-                    width="50%"
-                    type="accent"
-                    title="Subscribe now"
-                  />
+          ) : null}
 
-                  <Button
-                    onPress={() => {
-                      setProduct(undefined);
-                    }}
-                    style={{
-                      marginTop: 5
-                    }}
-                    height={30}
-                    fontSize={13}
-                    type="errorShade"
-                    title="Cancel promo code"
-                  />
-                </>
-              )}
-            </View>
+          <View
+            style={{
+              flexDirection: !compact ? "column" : "row",
+              flexWrap: "wrap",
+              justifyContent: "space-around"
+            }}
+          >
+            <PricingItem
+              onPress={() => {
+                if (!monthlyPlan?.product) return;
+                buySubscription(monthlyPlan?.product);
+              }}
+              compact={compact}
+              product={{
+                type: "monthly",
+                data: monthlyPlan?.product,
+                info: "Pay once a month, cancel anytime."
+              }}
+            />
+
+            {!compact && (
+              <View
+                style={{
+                  height: 1,
+                  marginVertical: 5
+                }}
+              />
+            )}
+
+            <PricingItem
+              onPress={() => {
+                if (!yearlyPlan?.product) return;
+                buySubscription(yearlyPlan?.product);
+              }}
+              compact={compact}
+              product={{
+                type: "yearly",
+                data: yearlyPlan?.product,
+                info: "Pay once a year, cancel anytime."
+              }}
+            />
+          </View>
+
+          {Platform.OS !== "ios" ? (
+            <Button
+              height={35}
+              style={{
+                marginTop: 10
+              }}
+              onPress={() => {
+                presentDialog({
+                  context: "local",
+                  input: true,
+                  inputPlaceholder: "Enter code",
+                  positiveText: "Apply",
+                  positivePress: async (value) => {
+                    if (!value) return;
+                    eSendEvent(eCloseSimpleDialog);
+                    setBuying(true);
+                    try {
+                      if (!(await getPromo(value as string)))
+                        throw new Error("Error applying promo code");
+                      ToastManager.show({
+                        heading: "Discount applied!",
+                        type: "success",
+                        context: "local"
+                      });
+                      setBuying(false);
+                    } catch (e) {
+                      setBuying(false);
+                      ToastManager.show({
+                        heading: "Promo code invalid or expired",
+                        message: (e as Error).message,
+                        type: "error",
+                        context: "local"
+                      });
+                    }
+                  },
+                  title: "Have a promo code?",
+                  paragraph: "Enter your promo code to get a special discount."
+                });
+              }}
+              title="I have a promo code"
+            />
+          ) : (
+            <View
+              style={{
+                height: 15
+              }}
+            />
           )}
         </>
+      ) : (
+        <View>
+          {!user ? (
+            <>
+              <Button
+                onPress={() => {
+                  eSendEvent(eClosePremiumDialog);
+                  eSendEvent(eCloseSheet);
+                  setTimeout(() => {
+                    eSendEvent(eOpenLoginDialog, 1);
+                  }, 400);
+                }}
+                title={"Sign up for free"}
+                type="accent"
+                width={250}
+                style={{
+                  paddingHorizontal: 12,
+                  marginTop: product?.type === "promo" ? 0 : 30,
+                  marginBottom: 10
+                }}
+              />
+              {Platform.OS !== "ios" &&
+              promo &&
+              !promo.promoCode.startsWith("com.streetwriters.notesnook") ? (
+                <Paragraph
+                  size={SIZE.md}
+                  textBreakStrategy="balanced"
+                  style={{
+                    alignSelf: "center",
+                    justifyContent: "center",
+                    textAlign: "center"
+                  }}
+                >
+                  Use promo code{" "}
+                  <Text
+                    style={{
+                      fontFamily: "OpenSans-SemiBold"
+                    }}
+                  >
+                    {promo.promoCode}
+                  </Text>{" "}
+                  at checkout
+                </Paragraph>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <Button
+                onPress={() => {
+                  if (!product?.data) return;
+                  buySubscription(product.data);
+                }}
+                height={40}
+                width="50%"
+                type="accent"
+                title="Subscribe now"
+              />
+
+              <Button
+                onPress={() => {
+                  setProduct(undefined);
+                }}
+                style={{
+                  marginTop: 5
+                }}
+                height={30}
+                fontSize={13}
+                type="errorShade"
+                title="Cancel promo code"
+              />
+            </>
+          )}
+        </View>
       )}
 
-      {!user || !upgrade ? (
+      {!user ? (
         <Paragraph
           color={colors.secondary.paragraph}
           size={SIZE.xs}
@@ -645,7 +355,7 @@ export const PricingPlans = ({
         </Paragraph>
       ) : null}
 
-      {user && upgrade ? (
+      {user ? (
         <>
           {Platform.OS === "ios" ? (
             <Paragraph

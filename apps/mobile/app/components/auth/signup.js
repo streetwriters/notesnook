@@ -17,18 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { ToastManager } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
-import PremiumService from "../../services/premium";
-import { useThemeColors } from "@notesnook/theme";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
-import { sleep } from "../../utils/time";
+import { Loading } from "../loading";
+import { PaywallComponent } from "../premium/component";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
@@ -36,8 +38,17 @@ import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { useSettingStore } from "../../stores/use-setting-store";
 import SettingsService from "../../services/settings";
+import { AuthHeader } from "./header";
+import { SignupContext } from "./signup-context";
 
-export const Signup = ({ changeMode, trial }) => {
+const SignupSteps = {
+  signup: 0,
+  selectPlan: 1,
+  createAccount: 2
+};
+
+export const Signup = ({ changeMode, welcome }) => {
+  const [currentStep, setCurrentStep] = useState(SignupSteps.signup);
   const { colors } = useThemeColors();
   const email = useRef();
   const emailInputRef = useRef();
@@ -67,25 +78,24 @@ export const Signup = ({ changeMode, trial }) => {
   };
 
   const signup = async () => {
+    setCurrentStep(SignupSteps.selectPlan);
+    return;
     if (!validateInfo() || error) return;
     if (loading) return;
+
     setLoading(true);
     try {
+      setCurrentStep(SignupSteps.createAccount);
       await db.user.signup(email.current.toLowerCase(), password.current);
       let user = await db.user.getUser();
       setUser(user);
       setLastSynced(await db.lastSynced());
       clearMessage();
       setEmailVerifyMessage();
-      hideAuth();
-      SettingsService.setProperty("encryptedBackup", true);
-      await sleep(300);
-      if (trial) {
-        PremiumService.sheet(null, null, true);
-      } else {
-        PremiumService.showVerifyEmailDialog();
-      }
+      setCurrentStep(SignupSteps.selectPlan);
+      return true;
     } catch (e) {
+      setCurrentStep(SignupSteps.signup);
       setLoading(false);
       ToastManager.show({
         heading: "Signup failed",
@@ -93,215 +103,266 @@ export const Signup = ({ changeMode, trial }) => {
         type: "error",
         context: "local"
       });
+      return false;
     }
   };
 
   return (
-    <>
-      <View
-        style={{
-          borderRadius: DDS.isTab ? 5 : 0,
-          backgroundColor: colors.primary.background,
-          zIndex: 10,
-          width: "100%",
-          alignSelf: "center"
-        }}
-      >
-        <View
-          style={{
-            justifyContent: "flex-end",
-            paddingHorizontal: 20,
-            backgroundColor: colors.secondary.background,
-            marginBottom: 20,
-            borderBottomWidth: 0.8,
-            borderBottomColor: colors.primary.border,
-            alignSelf: deviceMode !== "mobile" ? "center" : undefined,
-            borderWidth: deviceMode !== "mobile" ? 1 : null,
-            borderColor: deviceMode !== "mobile" ? colors.primary.border : null,
-            borderRadius: deviceMode !== "mobile" ? 20 : null,
-            marginTop: deviceMode !== "mobile" ? 50 : null,
-            width: deviceMode === "mobile" ? null : "50%",
-            minHeight: height * 0.4
-          }}
-        >
-          <View
+    <SignupContext.Provider
+      value={{
+        signup: signup
+      }}
+    >
+      {currentStep === SignupSteps.signup ? (
+        <>
+          <AuthHeader welcome={welcome} />
+          <KeyboardAwareScrollView
             style={{
-              flexDirection: "row"
+              width: "100%"
             }}
+            contentContainerStyle={{
+              minHeight: "90%"
+            }}
+            nestedScrollEnabled
+            enableAutomaticScroll={false}
+            keyboardShouldPersistTaps="handled"
           >
             <View
               style={{
-                width: 100,
-                height: 5,
-                backgroundColor: colors.primary.accent,
-                borderRadius: 2,
-                marginRight: 7
+                borderRadius: DDS.isTab ? 5 : 0,
+                backgroundColor: colors.primary.background,
+                zIndex: 10,
+                width: "100%",
+                alignSelf: "center",
+                height: "100%"
               }}
-            />
-
-            <View
-              style={{
-                width: 20,
-                height: 5,
-                backgroundColor: colors.secondary.background,
-                borderRadius: 2
-              }}
-            />
-          </View>
-          <Heading
-            extraBold
-            style={{
-              marginBottom: 25,
-              marginTop: 10
-            }}
-            size={SIZE.xxl}
-          >
-            Create your {"\n"}account
-          </Heading>
-        </View>
-
-        <View
-          style={{
-            width: DDS.isTab ? "50%" : "100%",
-            paddingHorizontal: 20,
-            backgroundColor: colors.primary.background,
-            alignSelf: "center"
-          }}
-        >
-          <Input
-            fwdRef={emailInputRef}
-            onChangeText={(value) => {
-              email.current = value;
-            }}
-            testID="input.email"
-            onErrorCheck={(e) => setError(e)}
-            returnKeyLabel="Next"
-            returnKeyType="next"
-            autoComplete="email"
-            validationType="email"
-            autoCorrect={false}
-            autoCapitalize="none"
-            errorMessage="Email is invalid"
-            placeholder="Email"
-            onSubmit={() => {
-              passwordInputRef.current?.focus();
-            }}
-          />
-
-          <Input
-            fwdRef={passwordInputRef}
-            onChangeText={(value) => {
-              password.current = value;
-            }}
-            testID="input.password"
-            onErrorCheck={(e) => setError(e)}
-            returnKeyLabel="Next"
-            returnKeyType="next"
-            secureTextEntry
-            autoComplete="password"
-            autoCapitalize="none"
-            validationType="password"
-            autoCorrect={false}
-            placeholder="Password"
-            onSubmit={() => {
-              confirmPasswordInputRef.current?.focus();
-            }}
-          />
-
-          <Input
-            fwdRef={confirmPasswordInputRef}
-            onChangeText={(value) => {
-              confirmPassword.current = value;
-            }}
-            testID="input.confirmPassword"
-            onErrorCheck={(e) => setError(e)}
-            returnKeyLabel="Signup"
-            returnKeyType="done"
-            secureTextEntry
-            autoComplete="password"
-            autoCapitalize="none"
-            autoCorrect={false}
-            validationType="confirmPassword"
-            customValidator={() => password.current}
-            placeholder="Confirm password"
-            marginBottom={12}
-            onSubmit={signup}
-          />
-
-          <Paragraph
-            style={{
-              marginBottom: 25
-            }}
-            size={SIZE.xs}
-            color={colors.secondary.paragraph}
-          >
-            By signing up, you agree to our{" "}
-            <Paragraph
-              size={SIZE.xs}
-              onPress={() => {
-                openLinkInBrowser("https://notesnook.com/tos", colors);
-              }}
-              style={{
-                textDecorationLine: "underline"
-              }}
-              color={colors.primary.accent}
             >
-              Terms of Service{" "}
-            </Paragraph>
-            and{" "}
-            <Paragraph
-              size={SIZE.xs}
-              onPress={() => {
-                openLinkInBrowser("https://notesnook.com/privacy", colors);
-              }}
-              style={{
-                textDecorationLine: "underline"
-              }}
-              color={colors.primary.accent}
-            >
-              Privacy Policy.
-            </Paragraph>{" "}
-            You also agree to recieve marketing emails from us which you can
-            opt-out of from app settings.
-          </Paragraph>
-
-          <Button
-            title={!loading ? "Continue" : null}
-            type="accent"
-            loading={loading}
-            onPress={signup}
-            fontSize={SIZE.md}
-            style={{
-              marginRight: 12,
-              width: 250,
-              borderRadius: 100
-            }}
-          />
-
-          <TouchableOpacity
-            onPress={() => {
-              if (loading) return;
-              changeMode(0);
-            }}
-            activeOpacity={0.8}
-            style={{
-              alignSelf: "center",
-              marginTop: 12,
-              paddingVertical: 12
-            }}
-          >
-            <Paragraph size={SIZE.xs + 1} color={colors.secondary.paragraph}>
-              Already have an account?{" "}
-              <Paragraph
-                size={SIZE.xs + 1}
-                style={{ color: colors.primary.accent }}
+              <View
+                style={{
+                  justifyContent: "flex-end",
+                  paddingHorizontal: 16,
+                  backgroundColor: colors.secondary.background,
+                  marginBottom: 20,
+                  borderBottomWidth: 0.8,
+                  borderBottomColor: colors.primary.border,
+                  alignSelf: deviceMode !== "mobile" ? "center" : undefined,
+                  borderWidth: deviceMode !== "mobile" ? 1 : null,
+                  borderColor:
+                    deviceMode !== "mobile" ? colors.primary.border : null,
+                  borderRadius: deviceMode !== "mobile" ? 20 : null,
+                  marginTop: deviceMode !== "mobile" ? 50 : null,
+                  width: deviceMode === "mobile" ? null : "50%",
+                  minHeight: height * 0.25
+                }}
               >
-                Login
+                <View
+                  style={{
+                    flexDirection: "row"
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 100,
+                      height: 5,
+                      backgroundColor: colors.primary.accent,
+                      borderRadius: 2,
+                      marginRight: 7
+                    }}
+                  />
+
+                  <View
+                    style={{
+                      width: 20,
+                      height: 5,
+                      backgroundColor: colors.secondary.background,
+                      borderRadius: 2
+                    }}
+                  />
+                </View>
+                <Heading
+                  extraBold
+                  style={{
+                    marginBottom: 25,
+                    marginTop: 10
+                  }}
+                  size={SIZE.xxl}
+                >
+                  Create your account
+                </Heading>
+              </View>
+
+              <View
+                style={{
+                  width: DDS.isTab ? "50%" : "100%",
+                  paddingHorizontal: 16,
+                  backgroundColor: colors.primary.background,
+                  flexGrow: 1
+                }}
+              >
+                <Input
+                  fwdRef={emailInputRef}
+                  onChangeText={(value) => {
+                    email.current = value;
+                  }}
+                  testID="input.email"
+                  onErrorCheck={(e) => setError(e)}
+                  returnKeyLabel="Next"
+                  returnKeyType="next"
+                  autoComplete="email"
+                  validationType="email"
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  errorMessage="Email is invalid"
+                  placeholder="Email"
+                  blurOnSubmit={false}
+                  onSubmit={() => {
+                    if (!email.current) return;
+                    passwordInputRef.current?.focus();
+                  }}
+                />
+
+                <Input
+                  fwdRef={passwordInputRef}
+                  onChangeText={(value) => {
+                    password.current = value;
+                  }}
+                  testID="input.password"
+                  onErrorCheck={(e) => setError(e)}
+                  returnKeyLabel="Next"
+                  returnKeyType="next"
+                  secureTextEntry
+                  autoComplete="password"
+                  autoCapitalize="none"
+                  blurOnSubmit={false}
+                  validationType="password"
+                  autoCorrect={false}
+                  placeholder="Password"
+                  onSubmit={() => {
+                    if (!password.current) return;
+                    confirmPasswordInputRef.current?.focus();
+                  }}
+                />
+
+                <Input
+                  fwdRef={confirmPasswordInputRef}
+                  onChangeText={(value) => {
+                    confirmPassword.current = value;
+                  }}
+                  testID="input.confirmPassword"
+                  onErrorCheck={(e) => setError(e)}
+                  returnKeyLabel="Signup"
+                  returnKeyType="done"
+                  secureTextEntry
+                  autoComplete="password"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  blurOnSubmit={false}
+                  validationType="confirmPassword"
+                  customValidator={() => password.current}
+                  placeholder="Confirm password"
+                  marginBottom={12}
+                  onSubmit={signup}
+                />
+
+                <Button
+                  title={!loading ? "Continue" : null}
+                  type="accent"
+                  loading={loading}
+                  onPress={() => {
+                    signup();
+                  }}
+                  fontSize={SIZE.md}
+                  width="100%"
+                />
+
+                <TouchableOpacity
+                  onPress={() => {
+                    if (loading) return;
+                    changeMode(0);
+                  }}
+                  activeOpacity={0.8}
+                  style={{
+                    alignSelf: "center",
+                    marginTop: 12,
+                    paddingVertical: 12
+                  }}
+                >
+                  <Paragraph
+                    size={SIZE.xs + 1}
+                    color={colors.secondary.paragraph}
+                  >
+                    Already have an account?{" "}
+                    <Paragraph
+                      size={SIZE.xs + 1}
+                      style={{ color: colors.primary.accent }}
+                    >
+                      Login
+                    </Paragraph>
+                  </Paragraph>
+                </TouchableOpacity>
+              </View>
+
+              <Paragraph
+                style={{
+                  marginBottom: 25,
+                  paddingHorizontal: 16,
+                  textAlign: "center"
+                }}
+                size={SIZE.xs}
+                color={colors.secondary.paragraph}
+              >
+                By signing up, you agree to our{" "}
+                <Paragraph
+                  size={SIZE.xs}
+                  onPress={() => {
+                    openLinkInBrowser("https://notesnook.com/tos", colors);
+                  }}
+                  style={{
+                    textDecorationLine: "underline"
+                  }}
+                  color={colors.primary.accent}
+                >
+                  Terms of Service{" "}
+                </Paragraph>
+                and{" "}
+                <Paragraph
+                  size={SIZE.xs}
+                  onPress={() => {
+                    openLinkInBrowser("https://notesnook.com/privacy", colors);
+                  }}
+                  style={{
+                    textDecorationLine: "underline"
+                  }}
+                  color={colors.primary.accent}
+                >
+                  Privacy Policy.
+                </Paragraph>{" "}
+                You also agree to recieve marketing emails from us which you can
+                opt-out of from app settings.
               </Paragraph>
-            </Paragraph>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </>
+            </View>
+          </KeyboardAwareScrollView>
+        </>
+      ) : currentStep === SignupSteps.createAccount ? (
+        <>
+          <Loading
+            title="Setting up your account..."
+            description="Your account is almost ready, please wait..."
+          />
+        </>
+      ) : (
+        <>
+          <PaywallComponent
+            close={() => {
+              hideAuth();
+            }}
+            setupAccount={() => {
+              setCurrentStep(SignupSteps.createAccount);
+            }}
+            isModal={false}
+          />
+        </>
+      )}
+    </SignupContext.Provider>
   );
 };

@@ -21,6 +21,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Sync from "../../services/sync";
@@ -89,220 +90,233 @@ export const Login = ({ changeMode }) => {
     <>
       <ForgotPassword />
       <SheetProvider context="two_factor_verify" />
-      <View
+      <KeyboardAwareScrollView
         style={{
-          borderRadius: DDS.isTab ? 5 : 0,
-          backgroundColor: colors.primary.background,
-          zIndex: 10,
-          width: "100%",
-          alignSelf: "center"
+          width: "100%"
         }}
+        contentContainerStyle={{
+          minHeight: "90%"
+        }}
+        nestedScrollEnabled
+        enableAutomaticScroll={false}
+        keyboardShouldPersistTaps="handled"
       >
         <View
           style={{
-            justifyContent: "flex-end",
-            paddingHorizontal: 20,
-            backgroundColor: colors.secondary.background,
-            borderBottomWidth: 0.8,
-            marginBottom: 12,
-            borderBottomColor: colors.primary.border,
-            alignSelf: deviceMode !== "mobile" ? "center" : undefined,
-            borderWidth: deviceMode !== "mobile" ? 1 : null,
-            borderColor: deviceMode !== "mobile" ? colors.primary.border : null,
-            borderRadius: deviceMode !== "mobile" ? 20 : null,
-            marginTop: deviceMode !== "mobile" ? 50 : null,
-            width: deviceMode === "mobile" ? null : "50%",
-            minHeight: height * 0.4
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row"
-            }}
-          >
-            <View
-              style={{
-                width: 100,
-                height: 5,
-                backgroundColor: colors.primary.accent,
-                borderRadius: 2,
-                marginRight: 7
-              }}
-            />
-
-            <View
-              style={{
-                width: 20,
-                height: 5,
-                backgroundColor: colors.secondary.background,
-                borderRadius: 2
-              }}
-            />
-          </View>
-          <Heading
-            style={{
-              marginBottom: 25,
-              marginTop: 10
-            }}
-            extraBold
-            size={SIZE.xxl}
-          >
-            Login to your {"\n"}account
-          </Heading>
-        </View>
-
-        <View
-          style={{
-            width: DDS.isTab
-              ? focused
-                ? "50%"
-                : "49.99%"
-              : focused
-              ? "100%"
-              : "99.9%",
+            borderRadius: DDS.isTab ? 5 : 0,
             backgroundColor: colors.primary.background,
-            alignSelf: "center",
-            paddingHorizontal: 20
+            zIndex: 10,
+            width: "100%",
+            alignSelf: "center"
           }}
         >
-          <Input
-            fwdRef={emailInputRef}
-            onChangeText={(value) => {
-              email.current = value;
+          <View
+            style={{
+              justifyContent: "flex-end",
+              paddingHorizontal: 20,
+              backgroundColor: colors.secondary.background,
+              borderBottomWidth: 0.8,
+              marginBottom: 12,
+              borderBottomColor: colors.primary.border,
+              alignSelf: deviceMode !== "mobile" ? "center" : undefined,
+              borderWidth: deviceMode !== "mobile" ? 1 : null,
+              borderColor:
+                deviceMode !== "mobile" ? colors.primary.border : null,
+              borderRadius: deviceMode !== "mobile" ? 20 : null,
+              marginTop: deviceMode !== "mobile" ? 50 : null,
+              width: deviceMode === "mobile" ? null : "50%",
+              minHeight: height * 0.4
             }}
-            testID="input.email"
-            onErrorCheck={(e) => setError(e)}
-            returnKeyLabel="Next"
-            returnKeyType="next"
-            autoComplete="email"
-            validationType="email"
-            autoCorrect={false}
-            autoCapitalize="none"
-            errorMessage="Email is invalid"
-            placeholder="Enter your email"
-            defaultValue={email.current}
-            editable={step === LoginSteps.emailAuth && !loading}
-            onSubmit={() => {
-              if (step === LoginSteps.emailAuth) {
-                login();
-              } else {
-                passwordInputRef.current?.focus();
-              }
-            }}
-          />
-
-          {step === LoginSteps.passwordAuth && (
-            <>
-              <Input
-                fwdRef={passwordInputRef}
-                onChangeText={(value) => {
-                  password.current = value;
-                }}
-                testID="input.password"
-                returnKeyLabel="Done"
-                returnKeyType="done"
-                secureTextEntry
-                autoComplete="password"
-                autoCapitalize="none"
-                autoCorrect={false}
-                placeholder="Password"
-                marginBottom={0}
-                editable={!loading}
-                defaultValue={password.current}
-                onSubmit={() => login()}
-              />
-              <Button
-                title="Forgot your password?"
+          >
+            <View
+              style={{
+                flexDirection: "row"
+              }}
+            >
+              <View
                 style={{
-                  alignSelf: "flex-end",
-                  height: 30,
-                  paddingHorizontal: 0
+                  width: 100,
+                  height: 5,
+                  backgroundColor: colors.primary.accent,
+                  borderRadius: 2,
+                  marginRight: 7
                 }}
-                onPress={() => {
-                  if (loading) return;
-                  SheetManager.show("forgotpassword_sheet", email.current);
-                }}
-                textStyle={{
-                  textDecorationLine: "underline"
-                }}
-                fontSize={SIZE.xs}
-                type="plain"
               />
-            </>
-          )}
+
+              <View
+                style={{
+                  width: 20,
+                  height: 5,
+                  backgroundColor: colors.secondary.background,
+                  borderRadius: 2
+                }}
+              />
+            </View>
+            <Heading
+              style={{
+                marginBottom: 25,
+                marginTop: 10
+              }}
+              extraBold
+              size={SIZE.xxl}
+            >
+              Login to your {"\n"}account
+            </Heading>
+          </View>
 
           <View
             style={{
-              marginTop: 25
+              width: DDS.isTab
+                ? focused
+                  ? "50%"
+                  : "49.99%"
+                : focused
+                ? "100%"
+                : "99.9%",
+              backgroundColor: colors.primary.background,
+              alignSelf: "center",
+              paddingHorizontal: 20
             }}
           >
-            <Button
-              loading={loading}
-              onPress={() => {
-                if (loading) return;
-                login();
+            <Input
+              fwdRef={emailInputRef}
+              onChangeText={(value) => {
+                email.current = value;
               }}
-              style={{
-                width: 250,
-                borderRadius: 100
+              testID="input.email"
+              onErrorCheck={(e) => setError(e)}
+              returnKeyLabel="Next"
+              returnKeyType="next"
+              autoComplete="email"
+              validationType="email"
+              autoCorrect={false}
+              autoCapitalize="none"
+              errorMessage="Email is invalid"
+              placeholder="Enter your email"
+              defaultValue={email.current}
+              editable={step === LoginSteps.emailAuth && !loading}
+              onSubmit={() => {
+                if (step === LoginSteps.emailAuth) {
+                  login();
+                } else {
+                  passwordInputRef.current?.focus();
+                }
               }}
-              height={50}
-              fontSize={SIZE.md}
-              type="accent"
-              title={!loading ? "Continue" : null}
             />
 
             {step === LoginSteps.passwordAuth && (
-              <Button
-                title="Cancel logging in"
-                style={{
-                  alignSelf: "center",
-                  height: 30,
-                  marginTop: 10
-                }}
-                onPress={() => {
-                  if (loading) return;
-                  setStep(LoginSteps.emailAuth);
-                  setLoading(false);
-                }}
-                textStyle={{
-                  textDecorationLine: "underline"
-                }}
-                fontSize={SIZE.xs}
-                type="errorShade"
-              />
+              <>
+                <Input
+                  fwdRef={passwordInputRef}
+                  onChangeText={(value) => {
+                    password.current = value;
+                  }}
+                  testID="input.password"
+                  returnKeyLabel="Done"
+                  returnKeyType="done"
+                  secureTextEntry
+                  autoComplete="password"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  placeholder="Password"
+                  marginBottom={0}
+                  editable={!loading}
+                  defaultValue={password.current}
+                  onSubmit={() => login()}
+                />
+                <Button
+                  title="Forgot your password?"
+                  style={{
+                    alignSelf: "flex-end",
+                    height: 30,
+                    paddingHorizontal: 0
+                  }}
+                  onPress={() => {
+                    if (loading) return;
+                    SheetManager.show("forgotpassword_sheet", email.current);
+                  }}
+                  textStyle={{
+                    textDecorationLine: "underline"
+                  }}
+                  fontSize={SIZE.xs}
+                  type="plain"
+                />
+              </>
             )}
 
-            {!loading ? (
-              <TouchableOpacity
+            <View
+              style={{
+                marginTop: 25
+              }}
+            >
+              <Button
+                loading={loading}
                 onPress={() => {
                   if (loading) return;
-                  changeMode(1);
+                  login();
                 }}
-                activeOpacity={0.8}
                 style={{
-                  alignSelf: "center",
-                  marginTop: 12,
-                  paddingVertical: 12
+                  width: 250,
+                  borderRadius: 100
                 }}
-              >
-                <Paragraph
-                  size={SIZE.xs + 1}
-                  color={colors.secondary.paragraph}
+                height={50}
+                fontSize={SIZE.md}
+                type="accent"
+                title={!loading ? "Continue" : null}
+              />
+
+              {step === LoginSteps.passwordAuth && (
+                <Button
+                  title="Cancel logging in"
+                  style={{
+                    alignSelf: "center",
+                    height: 30,
+                    marginTop: 10
+                  }}
+                  onPress={() => {
+                    if (loading) return;
+                    setStep(LoginSteps.emailAuth);
+                    setLoading(false);
+                  }}
+                  textStyle={{
+                    textDecorationLine: "underline"
+                  }}
+                  fontSize={SIZE.xs}
+                  type="errorShade"
+                />
+              )}
+
+              {!loading ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (loading) return;
+                    changeMode(1);
+                  }}
+                  activeOpacity={0.8}
+                  style={{
+                    alignSelf: "center",
+                    marginTop: 12,
+                    paddingVertical: 12
+                  }}
                 >
-                  Don't have an account?{" "}
                   <Paragraph
                     size={SIZE.xs + 1}
-                    style={{ color: colors.primary.accent }}
+                    color={colors.secondary.paragraph}
                   >
-                    Sign up
+                    Don't have an account?{" "}
+                    <Paragraph
+                      size={SIZE.xs + 1}
+                      style={{ color: colors.primary.accent }}
+                    >
+                      Sign up
+                    </Paragraph>
                   </Paragraph>
-                </Paragraph>
-              </TouchableOpacity>
-            ) : null}
+                </TouchableOpacity>
+              ) : null}
+            </View>
           </View>
         </View>
-      </View>
+      </KeyboardAwareScrollView>
     </>
   );
 };
