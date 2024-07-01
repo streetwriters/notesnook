@@ -237,7 +237,7 @@ function EditorView({
     | ReadonlyEditorSession
     | DeletedEditorSession;
 }) {
-  const lastChangedTime = useRef<number>(Date.now());
+  const lastChangedTime = useRef<number>(0);
   const root = useRef<HTMLDivElement>(null);
 
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
