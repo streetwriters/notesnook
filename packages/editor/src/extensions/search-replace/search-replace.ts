@@ -261,7 +261,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
         },
       endSearch:
         () =>
-        ({ state, dispatch, editor }) => {
+        ({ state, dispatch }) => {
           state.tr.setMeta("isSearching", false);
           if (dispatch) updateView(state, dispatch);
           return this.options.onEndSearch();
@@ -271,9 +271,9 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
         ({ state, dispatch }) => {
           state.tr.setMeta("isSearching", true);
           state.tr.setMeta("searchTerm", term);
-          if (options?.enableRegex) state.tr.setMeta("enableRegex", true);
-          if (options?.matchCase) state.tr.setMeta("matchCase", true);
-          if (options?.matchWholeWord) state.tr.setMeta("matchWholeWord", true);
+          state.tr.setMeta("enableRegex", options?.enableRegex);
+          state.tr.setMeta("matchCase", options?.matchCase);
+          state.tr.setMeta("matchWholeWord", options?.matchWholeWord);
 
           if (dispatch) updateView(state, dispatch);
           return true;
