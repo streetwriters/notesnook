@@ -44,13 +44,9 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
 
   const search = useCallback(
     (term: string) => {
-      editor.commands.search(term, {
-        matchCase,
-        enableRegex,
-        matchWholeWord
-      });
+      editor.commands.search(term, useEditorSearchStore.getState());
     },
-    [editor.commands, matchCase, enableRegex, matchWholeWord]
+    [editor.commands]
   );
 
   useEffect(() => {
