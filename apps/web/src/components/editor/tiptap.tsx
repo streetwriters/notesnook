@@ -245,10 +245,13 @@ function TipTap(props: TipTapProps) {
       onDestroy: () => {
         useEditorManager.getState().setEditor(id);
       },
-      onTransaction: ({ editor }) => {
+      onTransaction: ({ editor, transaction }) => {
         useEditorManager.getState().updateEditor(id, {
           canRedo: editor.can().redo(),
-          canUndo: editor.can().undo()
+          canUndo: editor.can().undo(),
+          tableOfContents: transaction.getMeta("isUpdatingContent")
+            ? getTableOfContents(editor.view.dom)
+            : useEditorManager.getState().getEditor(id)?.tableOfContents
         });
       },
       copyToClipboard(text, html) {
@@ -487,6 +490,7 @@ function toIEditor(editor: Editor): IEditor {
         ?.chain()
         .command(({ tr }) => {
           tr.setMeta("preventSave", true);
+          tr.setMeta("isUpdatingContent", true);
           return true;
         })
         .setContent(content, false, { preserveWhitespace: true })
