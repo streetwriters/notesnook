@@ -149,7 +149,7 @@ function TableOfContents(props: TableOfContentsProps) {
                     key={t.id}
                     sx={{
                       textAlign: "left",
-                      paddingLeft: `${t.level * 5}px`,
+                      paddingLeft: `${t.level * 5 + (t.level - 1) * 5}px`,
                       py: 1,
                       pr: 1,
                       borderLeft: "5px solid transparent",
