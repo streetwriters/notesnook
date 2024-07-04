@@ -256,7 +256,7 @@ function ListContainer(props: ListContainerProps) {
             height: 45
           }}
         >
-          <Plus color="static" />
+          <Plus color="accentForeground" />
         </Button>
       )}
     </Flex>

@@ -198,10 +198,9 @@ class AppStore extends BaseStore<AppStore> {
   };
 
   toggleSideMenu = (toggleState: boolean) => {
+    console.log("toggling side menu");
     this.set(
-      (state) =>
-        (state.isSideMenuOpen =
-          toggleState != null ? toggleState : !state.isSideMenuOpen)
+      (state) => (state.isSideMenuOpen = toggleState ?? !state.isSideMenuOpen)
     );
   };
 

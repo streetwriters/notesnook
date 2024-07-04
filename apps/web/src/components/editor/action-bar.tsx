@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Button, Flex, Text } from "@theme-ui/components";
 import { useState } from "react";
 import {
+  ArrowLeft,
   Cross,
   EditorFullWidth,
   EditorNormalWidth,
@@ -74,6 +75,7 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
 import { showPublishView } from "../publish-view";
 import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
+import useMobile from "../../hooks/use-mobile";
 
 export function EditorActionBar() {
   const editorMargins = useEditorStore((store) => store.editorMargins);
@@ -89,6 +91,8 @@ export function EditorActionBar() {
   const monographs = useMonographStore((store) => store.monographs);
   const isNotePublished =
     activeSession && db.monographs.isPublished(activeSession.id);
+  const isMobile = useMobile();
+  const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
 
   const tools = [
     {
@@ -107,6 +111,7 @@ export function EditorActionBar() {
       title: isNotePublished ? "Published" : "Publish",
       icon: isNotePublished ? Published : Publish,
       hidden: !isLoggedIn,
+      hideOnMobile: true,
       enabled:
         activeSession &&
         (activeSession.type === "default" || activeSession.type === "readonly"),
@@ -120,6 +125,7 @@ export function EditorActionBar() {
       title: editorMargins ? "Disable editor margins" : "Enable editor margins",
       icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
       enabled: true,
+      hideOnMobile: true,
       onClick: () => useEditorStore.getState().toggleEditorMargins()
     },
     {
@@ -187,7 +193,24 @@ export function EditorActionBar() {
 
   return (
     <>
-      <TabStrip />
+      {isMobile ? (
+        <Flex sx={{ flex: 1 }}>
+          <Button
+            variant={"secondary"}
+            sx={{
+              height: "100%",
+              bg: "transparent",
+              borderRadius: 0,
+              flexShrink: 0
+            }}
+            onClick={() => setIsEditorOpen(false)}
+          >
+            <ArrowLeft size={18} />
+          </Button>
+        </Flex>
+      ) : (
+        <TabStrip />
+      )}
       {tools.map((tool) => (
         <Button
           data-test-id={tool.title}

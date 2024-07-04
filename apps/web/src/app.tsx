@@ -125,19 +125,23 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
   const middlePane = useRef<ImperativePanelHandle>(null);
 
   useEffect(() => {
-    if (show) middlePane.current?.expand();
-    else middlePane.current?.collapse();
-  }, [show]);
+    setIsNarrow(isTablet);
+  }, [isTablet]);
 
-  useEffect(() => {
-    if (isFocusMode) {
-      const middlePaneSize = middlePane.current?.getSize() || 20;
-      navPane.current?.collapse();
-      // the middle pane has to be resized because collapsing the nav
-      // pane increases the middle pane's size every time.
-      middlePane.current?.resize(middlePaneSize);
-    } else navPane.current?.expand();
-  }, [isFocusMode]);
+  // useEffect(() => {
+  //   if (show) middlePane.current?.expand();
+  //   else middlePane.current?.collapse();
+  // }, [show]);
+
+  // useEffect(() => {
+  //   if (isFocusMode) {
+  //     const middlePaneSize = middlePane.current?.getSize() || 20;
+  //     navPane.current?.collapse();
+  //     // the middle pane has to be resized because collapsing the nav
+  //     // pane increases the middle pane's size every time.
+  //     middlePane.current?.resize(middlePaneSize);
+  //   } else navPane.current?.expand();
+  // }, [isFocusMode]);
 
   return (
     <>
@@ -148,45 +152,67 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
         }}
       >
         <PanelGroup autoSaveId="global-panel-group" direction="horizontal">
-          <Panel
-            ref={navPane}
-            className="nav-pane"
-            defaultSize={10}
-            minSize={3.5}
-            onResize={(size) => setIsNarrow(size <= 5)}
-            collapsible
-            collapsedSize={3.5}
-          >
-            <NavigationMenu
-              toggleNavigationContainer={(state) => {
-                setShow(state || !show);
-              }}
-              isTablet={isNarrow}
-            />
-          </Panel>
-          <PanelResizeHandle className="panel-resize-handle" />
-          <Panel
-            ref={middlePane}
-            className="middle-pane"
-            collapsible
-            defaultSize={20}
-          >
-            <ScopedThemeProvider
-              className="listMenu"
-              scope="list"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                flex: 1,
-                bg: "background",
-                borderRight: "1px solid var(--separator)"
-              }}
-            >
-              <CachedRouter />
-            </ScopedThemeProvider>
-          </Panel>
-          <PanelResizeHandle className="panel-resize-handle" />
-          <Panel className="editor-pane" defaultSize={70}>
+          {!isFocusMode && isTablet ? (
+            <Flex sx={{ width: 50 }}>
+              <NavigationMenu
+                toggleNavigationContainer={(state) => {
+                  setShow(state || !show);
+                }}
+                isTablet={isNarrow}
+              />
+            </Flex>
+          ) : (
+            !isFocusMode && (
+              <>
+                <Panel
+                  ref={navPane}
+                  order={1}
+                  className="nav-pane"
+                  defaultSize={10}
+                  minSize={3.5}
+                  // maxSize={isNarrow ? 5 : undefined}
+                  onResize={(size) => setIsNarrow(size <= 5)}
+                  collapsible
+                  collapsedSize={3.5}
+                >
+                  <NavigationMenu
+                    toggleNavigationContainer={(state) => {
+                      setShow(state || !show);
+                    }}
+                    isTablet={isNarrow}
+                  />
+                </Panel>
+                <PanelResizeHandle className="panel-resize-handle" />
+              </>
+            )
+          )}
+          {!isFocusMode && show && (
+            <>
+              <Panel
+                ref={middlePane}
+                className="middle-pane"
+                order={2}
+                collapsible
+                defaultSize={20}
+              >
+                <ScopedThemeProvider
+                  className="listMenu"
+                  scope="list"
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                    bg: "background",
+                    borderRight: "1px solid var(--separator)"
+                  }}
+                >
+                  <CachedRouter />
+                </ScopedThemeProvider>
+              </Panel>
+              <PanelResizeHandle className="panel-resize-handle" />
+            </>
+          )}
+          <Panel className="editor-pane" order={3} defaultSize={70}>
             <Flex
               sx={{
                 display: "flex",
