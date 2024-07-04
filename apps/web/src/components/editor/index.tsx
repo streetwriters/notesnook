@@ -630,8 +630,8 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
             maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
             width: "100%"
           }}
-          pl={6}
-          pr={6}
+          pl={[2, 2, 6]}
+          pr={[2, 2, 6]}
           onClick={onRequestFocus}
         >
           {children}

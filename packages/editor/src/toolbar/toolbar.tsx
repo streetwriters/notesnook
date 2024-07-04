@@ -92,11 +92,11 @@ export function Toolbar(props: ToolbarProps) {
       <Flex
         className={["editor-toolbar", className].join(" ")}
         sx={{
-          ...sx,
           flexWrap: isMobile ? "nowrap" : "wrap",
           overflowX: isMobile ? "auto" : "hidden",
           bg: "background",
-          borderRadius: isMobile ? "0px" : "default"
+          borderRadius: isMobile ? "0px" : "default",
+          ...sx
         }}
         {...flexProps}
       >

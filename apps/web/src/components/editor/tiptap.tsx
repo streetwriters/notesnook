@@ -59,6 +59,8 @@ import { writeToClipboard } from "../../utils/clipboard";
 import { useEditorStore } from "../../stores/editor-store";
 import { parseInternalLink } from "@notesnook/core";
 import Skeleton from "react-loading-skeleton";
+import useMobile from "../../hooks/use-mobile";
+import useTablet from "../../hooks/use-tablet";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -89,6 +91,7 @@ type TipTapProps = {
   readonly?: boolean;
   nonce?: number;
   isMobile?: boolean;
+  isTablet?: boolean;
   downloadOptions?: DownloadOptions;
   fontSize: number;
   fontFamily: string;
@@ -127,6 +130,7 @@ function TipTap(props: TipTapProps) {
     readonly,
     nonce,
     isMobile,
+    isTablet,
     downloadOptions,
     fontSize,
     fontFamily
@@ -361,7 +365,12 @@ function TipTap(props: TipTapProps) {
       >
         <Toolbar
           editor={editor}
-          location={isMobile ? "bottom" : "top"}
+          location={"top"}
+          sx={
+            isTablet || isMobile
+              ? { overflowX: "scroll", flexWrap: "nowrap" }
+              : {}
+          }
           tools={toolbarConfig}
           defaultFontFamily={fontFamily}
           defaultFontSize={fontSize}
@@ -385,6 +394,8 @@ function TiptapWrapper(
   const containerRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>();
   const { editorConfig } = useEditorConfig();
+  const isMobile = useMobile();
+  const isTablet = useTablet();
 
   useLayoutEffect(() => {
     if (
@@ -425,6 +436,8 @@ function TiptapWrapper(
     >
       <TipTap
         {...props}
+        isMobile={isMobile}
+        isTablet={isTablet}
         onLoad={(editor) => {
           if (!isHydrating) {
             onLoad?.(editor);

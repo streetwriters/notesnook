@@ -91,7 +91,6 @@ export default function useSlider(
   const slideToIndex = useCallback(
     (index: number) => {
       if (!slides || !ref.current || index >= slides.length) return;
-      console.log(slides[index].offset, slides[index].width);
       const slider = ref.current;
       setTimeout(() => {
         slider.scrollTo({

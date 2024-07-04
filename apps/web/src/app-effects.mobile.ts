@@ -58,9 +58,8 @@ export default function MobileAppEffects({
         overlay.style.pointerEvents = "none";
       }
     },
-    onChange: (e, { slide, lastSlide }) => {
-      if (!lastSlide || !isMobile) return;
-      toggleSideMenu(slide?.index === 1 ? true : false);
+    onChange: (e, { slide }) => {
+      toggleSideMenu(slide?.index === 0 ? true : false);
       setIsEditorOpen(slide?.index === 3 ? true : false);
     }
   });

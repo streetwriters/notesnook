@@ -40,8 +40,8 @@ function Notice() {
         cursor: "pointer",
         borderRadius: "default",
         ":hover": { bg: "hover" },
-        alignItems: "center",
-        minWidth: 250
+        alignItems: "center"
+        // minWidth: 250
       }}
       p={1}
       onClick={() => NoticeData.action()}
@@ -53,11 +53,30 @@ function Notice() {
           color="accent"
           sx={{ bg: "shade", mr: 2, p: 2, borderRadius: 80 }}
         />
-        <Flex variant="columnCenter" sx={{ alignItems: "flex-start" }}>
-          <Text variant="body" sx={{ fontSize: "body" }}>
+        <Flex
+          variant="columnCenter"
+          sx={{ alignItems: "flex-start", overflow: "hidden" }}
+        >
+          <Text
+            variant="body"
+            sx={{
+              fontSize: "body",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis"
+            }}
+          >
             {NoticeData.title}
           </Text>
-          <Text variant="subBody" sx={{ display: "block" }}>
+          <Text
+            variant="subBody"
+            sx={{
+              display: "block",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis"
+            }}
+          >
             {NoticeData.subtitle}
           </Text>
         </Flex>
