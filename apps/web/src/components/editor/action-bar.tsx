@@ -533,9 +533,11 @@ function Tab(props: TabProps) {
             flexShrink: 0
           }}
           size={14}
-          onClick={(e) => {
-            e.stopPropagation();
-            onPin();
+          onMouseUp={(e) => {
+            if (e.button == 0) {
+              e.stopPropagation();
+              onPin();
+            }
           }}
         />
       ) : (
@@ -546,9 +548,11 @@ function Tab(props: TabProps) {
             borderRadius: "default",
             flexShrink: 0
           }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
+          onMouseUp={(e) => {
+            if (e.button == 0) {
+              e.stopPropagation();
+              onClose();
+            }
           }}
           className="closeTabButton"
           size={16}
