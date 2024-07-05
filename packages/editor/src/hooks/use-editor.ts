@@ -48,15 +48,16 @@ export const useEditor = (
       let isMounted = true;
       let updateTimeout: number;
 
+      const oldContent = editor.options.content;
+      editor.options = { ...editor.options, ...options };
+      (editor as any).createExtensionManager();
+      options.onBeforeCreate?.({ editor });
       // we try very hard not to create a new editor, instead
       // we just update the props & other things. This is dangerous but faster
       // than creating a new editor
       // This part below is copied from @tiptap/core
       if (options.editorProps) editor.view.setProps(options.editorProps);
-      if (
-        options.content !== undefined &&
-        options.content !== editor.options.content
-      ) {
+      if (options.content !== undefined && options.content !== oldContent) {
         const doc = createDocument(
           options.content,
           editor.schema,
@@ -80,9 +81,19 @@ export const useEditor = (
           })
         );
         if (oldIsFocused && !editor.isFocused) editor.commands.focus();
-        options.onCreate?.({ editor: editor });
+      } else {
+        editor.view.updateState(
+          editor.state.reconfigure({ plugins: editor.extensionManager.plugins })
+        );
       }
-      editor.options = { ...editor.options, ...options };
+      options.onCreate?.({ editor: editor });
+      editor.on("create", editor.options.onCreate);
+      editor.on("update", editor.options.onUpdate);
+      editor.on("selectionUpdate", editor.options.onSelectionUpdate);
+      editor.on("transaction", editor.options.onTransaction);
+      editor.on("focus", editor.options.onFocus);
+      editor.on("blur", editor.options.onBlur);
+      editor.on("destroy", editor.options.onDestroy);
 
       function onTransaction({ editor }: { editor: TiptapEditor }) {
         editorRef.current = editor;
