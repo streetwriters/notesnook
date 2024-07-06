@@ -182,6 +182,9 @@ function TipTap(props: TipTapProps) {
             onAttachFiles(Array.from(event.clipboardData.files));
             return true;
           }
+        },
+        handleDrop: (e: DragEvent) => {
+          console.log("handleDrop...", e.dataTransfer?.getData("note-id"));
         }
       },
       enableInputRules: markdownShortcuts,
