@@ -62,10 +62,6 @@ export function useKeyboardListNavigation(
       : DIRECTION.UP;
   }, []);
 
-  const onFocus = useCallback((itemIndex: number) => {
-    cursor.current = itemIndex;
-  }, []);
-
   const resetSelection = useCallback(() => {
     reset();
     anchor.current = -1;
@@ -79,8 +75,9 @@ export function useKeyboardListNavigation(
     return true;
   }, [open, resetSelection, select]);
 
-  const onMouseDown = useCallback(
+  const onMouseUp = useCallback(
     (e: MouseEvent, itemIndex: number) => {
+      if (e.button !== 0) return;
       if (e.ctrlKey || e.metaKey) {
         select(itemIndex, true);
       } else if (e.shiftKey) {
@@ -95,10 +92,11 @@ export function useKeyboardListNavigation(
         }
         bulkSelect(indices);
         focusItemAt(endIndex);
-      } else if (e.button === 0) {
+      } else {
         resetSelection();
         select(itemIndex);
       }
+      cursor.current = itemIndex;
     },
     [select, resetSelection, bulkSelect, skip, focusItemAt]
   );
@@ -117,6 +115,7 @@ export function useKeyboardListNavigation(
           while (skip && skip(nextIndex))
             nextIndex = moveUpCyclic(nextIndex, max);
           focusItemAt(nextIndex);
+          cursor.current = nextIndex;
           return true;
         },
         ArrowDown: () => {
@@ -126,6 +125,7 @@ export function useKeyboardListNavigation(
           while (skip && skip(nextIndex))
             nextIndex = moveDownCyclic(nextIndex, max);
           focusItemAt(nextIndex);
+          cursor.current = nextIndex;
           return true;
         },
         "Mod-a": () => {
@@ -148,9 +148,11 @@ export function useKeyboardListNavigation(
           if (nextIndex === cursor.current) return false;
 
           focusItemAt(nextIndex);
+          cursor.current = nextIndex;
           if (direction() === DIRECTION.UP) {
             select(nextIndex);
           }
+          e.preventDefault();
           return false;
         },
         "Shift-ArrowDown": () => {
@@ -168,9 +170,11 @@ export function useKeyboardListNavigation(
           if (nextIndex === cursor.current) return false;
 
           focusItemAt(nextIndex);
+          cursor.current = nextIndex;
           if (direction() === DIRECTION.DOWN) {
             select(nextIndex);
           }
+          e.preventDefault();
           return false;
         },
         Escape: () => {
@@ -185,13 +189,14 @@ export function useKeyboardListNavigation(
       resetSelection,
       skip,
       focusItemAt,
-      select,
+      bulkSelect,
       direction,
+      select,
       deselect
     ]
   );
 
-  return { onFocus, onMouseDown, onKeyDown };
+  return { onMouseUp, onKeyDown };
 }
 
 const moveDownCyclic = (i: number, max: number) => (i < max ? ++i : 0);

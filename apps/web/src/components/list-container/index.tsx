@@ -136,7 +136,7 @@ function ListContainer(props: ListContainerProps) {
     };
   }, [items]);
 
-  const { onFocus, onMouseDown, onKeyDown } = useKeyboardListNavigation({
+  const { onMouseUp, onKeyDown } = useKeyboardListNavigation({
     length: items.length,
     reset: () => toggleSelection(false),
     deselect: (index) => {
@@ -228,8 +228,7 @@ function ListContainer(props: ListContainerProps) {
                 focusGroup: setFocusedGroupIndex,
                 context,
                 compact,
-                onMouseDown,
-                onFocus
+                onMouseUp
               }}
               itemContent={(index, _data, context) => (
                 <ItemRenderer context={context} index={index} />
@@ -280,8 +279,7 @@ type ListContext = {
   context?: Context;
   compact?: boolean;
 
-  onMouseDown: (e: MouseEvent, itemIndex: number) => void;
-  onFocus: (itemIndex: number) => void;
+  onMouseUp: (e: MouseEvent, itemIndex: number) => void;
 };
 function ItemRenderer({
   index,
@@ -437,9 +435,8 @@ function VirtuosoItem({
   return (
     <div
       {...props}
-      onFocus={() => context?.onFocus(props["data-item-index"])}
-      onMouseDown={(e) =>
-        context?.onMouseDown(e.nativeEvent, props["data-item-index"])
+      onMouseUp={(e) =>
+        context?.onMouseUp(e.nativeEvent, props["data-item-index"])
       }
     >
       {props.children}
