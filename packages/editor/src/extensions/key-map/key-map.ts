@@ -52,7 +52,18 @@ export const KeyMap = Extension.create({
         return true;
       },
       "Shift-Mod-L": ({ editor }) => {
-        editor.storage.createInternalLink?.();
+        editor.storage.createInternalLink?.().then((link) => {
+          if (!link) return;
+
+          const selectedText = editor.state.doc.textBetween(
+            editor.state.selection.from,
+            editor.state.selection.to
+          );
+          editor.commands.setLink({
+            ...link,
+            title: selectedText || link.title
+          });
+        });
         return true;
       }
     };
