@@ -23,10 +23,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Dialog } from "../dialog";
 import { Issue } from "../sheets/github/issue";
 
-const error = (
-  stack: string,
-  component: string
-) => `Please let us know what happened. What steps we can take to reproduce the issue here.
+const error = (stack: string, component: string) => `
 
 _______________________________
 Stacktrace: In ${component}::${stack}`;
@@ -39,9 +36,9 @@ class ExceptionHandler extends React.Component<{
     error: Error | null;
     hasError: boolean;
   } = {
-      hasError: false,
-      error: null
-    };
+    hasError: false,
+    error: null
+  };
   static getDerivedStateFromError(error: Error) {
     return { hasError: true, error: error };
   }

@@ -42,10 +42,7 @@ import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import { Issue } from "../github/issue";
 
-export const makeError = (
-  stack: string,
-  component: string
-) => `Please let us know what happened. What steps we can take to reproduce the issue here.
+export const makeError = (stack: string, component: string) => `
 
 _______________________________
 Stacktrace: In ${component}::${stack}`;
