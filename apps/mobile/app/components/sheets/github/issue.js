@@ -18,15 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Debug } from "@notesnook/core/dist/api/debug";
+import { getModel, getBrand, getSystemVersion } from "react-native-device-info";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { Linking, Platform, Text, TextInput, View } from "react-native";
 import { getVersion } from "react-native-device-info";
 import { useStoredRef } from "../../../hooks/use-stored-ref";
-import { ToastManager, eSendEvent } from "../../../services/event-manager";
+import { ToastManager } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useUserStore } from "../../../stores/use-user-store";
-import { eCloseSheet } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { SIZE } from "../../../utils/size";
 import DialogHeader from "../../dialog/dialog-header";
@@ -58,20 +58,17 @@ export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
         title: title.current,
         body:
           body.current +
-          `\n${defaultBody}` +
+          `\n${defaultBody || ""}` +
           `\n_______________
 **Device information:**
 App version: ${getVersion()}
 Platform: ${Platform.OS}
-Model: ${Platform.constants.Brand || ""}-${Platform.constants.Model || ""}-${
-            Platform.constants.Version || ""
-          }
+Device: ${getBrand() || ""}-${getModel() || ""}-${getSystemVersion() || ""}
 Pro: ${PremiumService.get()}
 Logged in: ${user ? "yes" : "no"}`,
         userId: user?.id
       });
       setLoading(false);
-      eSendEvent(eCloseSheet);
       body.reset();
       title.reset();
       setDone(true);
@@ -207,11 +204,9 @@ For example:
           <Paragraph
             size={SIZE.xs}
             color={colors.secondary.paragraph}
-          >{`App version: ${getVersion()} Platform: ${Platform.OS} Model: ${
-            Platform.constants.Brand
-          }-${Platform.constants.Model}-${
-            Platform.constants.Version
-          }`}</Paragraph>
+          >{`App version: ${getVersion()} Platform: ${
+            Platform.OS
+          } Model: ${getBrand()}-${getModel()}-${getSystemVersion()}`}</Paragraph>
 
           <Seperator />
           <Button
