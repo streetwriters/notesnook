@@ -73,6 +73,7 @@ import { useStore as useMonographStore } from "../../stores/monograph-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
 import { showPublishView } from "../publish-view";
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 
 export function EditorActionBar() {
   const editorMargins = useEditorStore((store) => store.editorMargins);
@@ -607,6 +608,7 @@ function ReorderableList<T extends { id: string }>(
       measuring={{
         droppable: { strategy: MeasuringStrategy.Always }
       }}
+      modifiers={[restrictToHorizontalAxis]}
     >
       <SortableContext items={items} strategy={horizontalListSortingStrategy}>
         {items.map((item, index) => (
