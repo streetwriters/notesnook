@@ -116,6 +116,7 @@ function NavigationItem(
         onContextMenu={(e) => {
           if (!menuItems) return;
           e.preventDefault();
+          e.stopPropagation();
           Menu.openMenu(menuItems);
         }}
         onClick={() => {

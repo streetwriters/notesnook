@@ -97,6 +97,7 @@ test("logged in user should not be able to open unauthorized routes", async ({
     await page.goto(route);
 
     await page.waitForURL(/\/notes/gm);
+    await page.waitForTimeout(1000);
     expect(await app.navigation.findItem("Notes")).toBeDefined();
   }
 });

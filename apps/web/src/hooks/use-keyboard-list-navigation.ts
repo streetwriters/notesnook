@@ -91,7 +91,7 @@ export function useKeyboardListNavigation(
           indices.push(i);
         }
         bulkSelect(indices);
-        focusItemAt(endIndex);
+        focusItemAt(itemIndex);
       } else {
         resetSelection();
         select(itemIndex);
