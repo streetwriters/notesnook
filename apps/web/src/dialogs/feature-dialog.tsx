@@ -90,13 +90,7 @@ const features: Record<FeatureKeys, Feature> = {
           }
         ]
       : IS_DESKTOP_APP
-      ? [
-          {
-            title: "Use native titlebar",
-            subtitle:
-              "You can now disable the custom titlebar from Settings > Desktop integration and use your operating system's native title bar."
-          }
-        ]
+      ? []
       : [],
     cta: {
       title: "Got it",
