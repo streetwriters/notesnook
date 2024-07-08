@@ -26,6 +26,7 @@ import { Platform } from "react-native";
 import { IOS_APPGROUPID } from "../../utils/constants";
 import { createCacheDir } from "./io";
 import { getUploadedFileSize } from "./download";
+import { ToastManager } from "../../services/event-manager";
 
 export async function uploadFile(filename, data, cancelToken) {
   if (!data) return false;
@@ -50,9 +51,15 @@ export async function uploadFile(filename, data, cancelToken) {
       method: "PUT",
       headers
     });
-    if (!res.ok) throw new Error(`${res.status}: Unable to resolve upload url`);
-    const uploadUrl = await res.text();
-    if (!uploadUrl) throw new Error("Unable to resolve attachment upload url");
+
+    const uploadUrl = res.ok ? await res.text() : await res.json();
+
+    if (typeof uploadUrl !== "string") {
+      throw new Error(
+        uploadUrl.error || "Unable to resolve attachment upload url."
+      );
+    }
+
     let uploadFilePath = `${cacheDir}/${filename}`;
 
     const iosAppGroup =
@@ -125,8 +132,10 @@ export async function uploadFile(filename, data, cancelToken) {
     return result;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
-    DatabaseLogger.info(`File upload error: ${filename}, ${e}`);
-    DatabaseLogger.error(e);
+    ToastManager.error(e, "File upload failed");
+    DatabaseLogger.error(e, "File upload failed", {
+      filename
+    });
     return false;
   }
 }
