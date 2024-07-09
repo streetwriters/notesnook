@@ -61,6 +61,7 @@ import { parseInternalLink } from "@notesnook/core";
 import Skeleton from "react-loading-skeleton";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
+import { TimeFormat } from "@notesnook/core/dist/utils/date";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -95,6 +96,11 @@ type TipTapProps = {
   downloadOptions?: DownloadOptions;
   fontSize: number;
   fontFamily: string;
+
+  doubleSpacedLines: boolean;
+  dateFormat: string;
+  timeFormat: TimeFormat;
+  markdownShortcuts: boolean;
 };
 
 function updateWordCount(id: string, content: () => Fragment) {
@@ -133,19 +139,15 @@ function TipTap(props: TipTapProps) {
     isTablet,
     downloadOptions,
     fontSize,
-    fontFamily
+    fontFamily,
+    doubleSpacedLines,
+    dateFormat,
+    timeFormat,
+    markdownShortcuts
   } = props;
 
   const isUserPremium = useIsUserPremium();
   const autoSave = useRef(true);
-  const doubleSpacedLines = useSettingsStore(
-    (store) => store.doubleSpacedParagraphs
-  );
-  const dateFormat = useSettingsStore((store) => store.dateFormat);
-  const timeFormat = useSettingsStore((store) => store.timeFormat);
-  const markdownShortcuts = useSettingsStore(
-    (store) => store.markdownShortcuts
-  );
   const { toolbarConfig } = useToolbarConfig();
 
   usePermissionHandler({
@@ -382,7 +384,17 @@ function TipTap(props: TipTapProps) {
 
 function TiptapWrapper(
   props: PropsWithChildren<
-    Omit<TipTapProps, "editorContainer" | "theme" | "fontSize" | "fontFamily">
+    Omit<
+      TipTapProps,
+      | "editorContainer"
+      | "theme"
+      | "fontSize"
+      | "fontFamily"
+      | "doubleSpacedLines"
+      | "dateFormat"
+      | "timeFormat"
+      | "markdownShortcuts"
+    >
   > & {
     isHydrating?: boolean;
   }
@@ -390,6 +402,14 @@ function TiptapWrapper(
   const { onLoad, isHydrating } = props;
   const theme = useThemeStore((store) =>
     store.colorScheme === "dark" ? store.darkTheme : store.lightTheme
+  );
+  const doubleSpacedLines = useSettingsStore(
+    (store) => store.doubleSpacedParagraphs
+  );
+  const dateFormat = useSettingsStore((store) => store.dateFormat);
+  const timeFormat = useSettingsStore((store) => store.timeFormat);
+  const markdownShortcuts = useSettingsStore(
+    (store) => store.markdownShortcuts
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>();
@@ -435,9 +455,14 @@ function TiptapWrapper(
       }}
     >
       <TipTap
+        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${markdownShortcuts}`}
         {...props}
         isMobile={isMobile}
         isTablet={isTablet}
+        doubleSpacedLines={doubleSpacedLines}
+        dateFormat={dateFormat}
+        timeFormat={timeFormat}
+        markdownShortcuts={markdownShortcuts}
         onLoad={(editor) => {
           if (!isHydrating) {
             onLoad?.(editor);
