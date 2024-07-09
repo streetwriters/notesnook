@@ -50,7 +50,6 @@ export const useEditor = (
 
       const oldContent = editor.options.content;
       editor.options = { ...editor.options, ...options };
-      (editor as any).createExtensionManager();
       options.onBeforeCreate?.({ editor });
       // we try very hard not to create a new editor, instead
       // we just update the props & other things. This is dangerous but faster
@@ -81,19 +80,8 @@ export const useEditor = (
           })
         );
         if (oldIsFocused && !editor.isFocused) editor.commands.focus();
-      } else {
-        editor.view.updateState(
-          editor.state.reconfigure({ plugins: editor.extensionManager.plugins })
-        );
       }
       options.onCreate?.({ editor: editor });
-      editor.on("create", editor.options.onCreate);
-      editor.on("update", editor.options.onUpdate);
-      editor.on("selectionUpdate", editor.options.onSelectionUpdate);
-      editor.on("transaction", editor.options.onTransaction);
-      editor.on("focus", editor.options.onFocus);
-      editor.on("blur", editor.options.onBlur);
-      editor.on("destroy", editor.options.onDestroy);
 
       function onTransaction({ editor }: { editor: TiptapEditor }) {
         editorRef.current = editor;
