@@ -42,7 +42,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       convertGoogleDocsChecklist(dom);
       formatCodeblocks(dom);
       convertBrToSingleSpacedParagraphs(dom);
-      if (!hasPermission("insertImage")) removeImages(dom);
+      removeImages(dom);
     }
     return super.parseSlice(dom, options);
   }
@@ -137,8 +137,10 @@ export function convertGoogleDocsChecklist(dom: HTMLElement | Document) {
 }
 
 export function removeImages(dom: HTMLElement | Document) {
+  let canInsertImages: boolean | null = null;
   for (const img of dom.querySelectorAll(`img`)) {
-    img.remove();
+    canInsertImages = canInsertImages ?? hasPermission("insertImage");
+    if (!canInsertImages) img.remove();
   }
 }
 
