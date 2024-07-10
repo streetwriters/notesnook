@@ -518,6 +518,39 @@ export type TrashItem = BaseTrashItem<Note> | BaseTrashItem<Notebook>;
 
 export type AuthenticatorType = "app" | "sms" | "email";
 
+export enum SubscriptionPlan {
+  FREE = 0,
+  ESSENTIAL = 1,
+  PRO = 2,
+  BELIEVER = 3,
+  EDUCATION = 4
+}
+
+export enum SubscriptionStatus {
+  ACTIVE,
+  TRIAL,
+  CANCELED,
+  PAUSED,
+  EXPIRED
+}
+
+export enum SubscriptionProvider {
+  STREETWRITERS = 0,
+  APPLE = 1,
+  GOOGLE = 2,
+  PADDLE = 3
+}
+
+export enum SubscriptionType {
+  BASIC = 0,
+  TRIAL = 1,
+  BETA = 2,
+  PREMIUM = 5,
+  PREMIUM_EXPIRED = 6,
+  PREMIUM_CANCELED = 7,
+  PREMIUM_PAUSED = 8
+}
+
 export type User = {
   id: string;
   email: string;
@@ -536,9 +569,11 @@ export type User = {
     cancelURL: string | null;
     expiry: number;
     productId: string;
-    provider: 0 | 1 | 2 | 3;
+    provider: SubscriptionProvider;
     start: number;
-    type: 0 | 1 | 2 | 5 | 6 | 7;
+    type: SubscriptionType;
+    plan: SubscriptionPlan;
+    status: SubscriptionStatus;
     updateURL: string | null;
   };
 };
