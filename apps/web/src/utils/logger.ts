@@ -31,9 +31,17 @@ import { isFeatureSupported } from "./feature-check";
 
 let logger: typeof _logger = new NoopLogger();
 async function initializeLogger() {
+  const multiTab = !!globalThis.SharedWorker && isFeatureSupported("opfs");
   await initialize(
     {
-      dialect: (name, init) => createDialect(name, false, init),
+      dialect: (name, init) =>
+        createDialect({
+          name,
+          init,
+          async: !isFeatureSupported("opfs"),
+          multiTab,
+          encrypted: false
+        }),
       ...(IS_DESKTOP_APP || isFeatureSupported("opfs")
         ? { journalMode: "WAL", lockingMode: "exclusive" }
         : {
@@ -44,7 +52,7 @@ async function initializeLogger() {
       synchronous: "normal",
       pageSize: 8192,
       cacheSize: -32000,
-      skipInitialization: !IS_DESKTOP_APP && !!globalThis.SharedWorker
+      skipInitialization: !IS_DESKTOP_APP && multiTab
     },
     false
   );

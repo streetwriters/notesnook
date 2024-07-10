@@ -32,6 +32,7 @@ import Worker from "./sqlite.worker.desktop.ts?worker";
 import type { SQLiteWorker } from "./sqlite.worker.desktop";
 import { wrap, Remote } from "comlink";
 import { Mutex } from "async-mutex";
+import { DialectOptions } from ".";
 
 class SqliteDriver implements Driver {
   connection?: DatabaseConnection;
@@ -100,11 +101,11 @@ class SqliteWorkerConnection implements DatabaseConnection {
   }
 }
 
-export const createDialect = (name: string, _encrypted: boolean): Dialect => {
+export const createDialect = (options: DialectOptions): Dialect => {
   return {
     createDriver: () =>
       new SqliteDriver({
-        name
+        name: options.name
       }),
     createAdapter: () => new SqliteAdapter(),
     createIntrospector: (db) => new SqliteIntrospector(db),
