@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useRef } from "react";
 import { Flex, Text } from "@theme-ui/components";
 import ListItem from "../list-item";
-import { useStore, store } from "../../stores/notebook-store";
+import { store } from "../../stores/notebook-store";
 import { useStore as useNotesStore } from "../../stores/note-store";
 import { store as appStore } from "../../stores/app-store";
 import { db } from "../../common/db";
@@ -49,20 +49,18 @@ type NotebookProps = {
   item: NotebookType;
   totalNotes: number;
   date: number;
-  simplified?: boolean;
+  compact?: boolean;
 };
 function Notebook(props: NotebookProps) {
-  const { item, totalNotes, date, simplified } = props;
+  const { item, totalNotes, date, compact } = props;
   const notebook = item;
-  const isCompact = useStore((store) => store.viewMode === "compact");
   const dragTimeout = useRef(0);
   const { isDragEntering, isDragLeaving } = useDragHandler(`id_${notebook.id}`);
 
   return (
     <ListItem
       draggable
-      isCompact={isCompact}
-      isSimple={simplified}
+      isCompact={compact}
       item={notebook}
       onClick={() => openNotebook(notebook, totalNotes)}
       onDragEnter={(e) => {
@@ -87,7 +85,7 @@ function Notebook(props: NotebookProps) {
       menuItems={notebookMenuItems}
       footer={
         <>
-          {isCompact ? (
+          {compact ? (
             <>
               <Text variant="subBody">{pluralize(totalNotes, "note")}</Text>
             </>
@@ -143,7 +141,8 @@ export default React.memo(Notebook, (prev, next) => {
     prevItem.pinned === nextItem.pinned &&
     prevItem.title === nextItem.title &&
     prevItem.description === nextItem.description &&
-    prev.totalNotes === next.totalNotes
+    prev.totalNotes === next.totalNotes &&
+    prev.compact === next.compact
   );
 });
 

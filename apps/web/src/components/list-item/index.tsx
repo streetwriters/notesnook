@@ -40,7 +40,6 @@ type ListItemProps<TItem extends Item, TContext> = {
   isFocused?: boolean;
   isCompact?: boolean;
   isDisabled?: boolean;
-  isSimple?: boolean;
   item: TItem;
   draggable?: boolean;
 
@@ -76,7 +75,6 @@ function ListItem<TItem extends Item, TContext>(
     isFocused,
     isCompact,
     isDisabled,
-    isSimple,
     item,
     sx,
     context,
@@ -203,12 +201,12 @@ function ListItem<TItem extends Item, TContext>(
         <Text
           dir="auto"
           data-test-id={`title`}
-          variant={isSimple || isCompact ? "body" : "subtitle"}
+          variant={isCompact ? "body" : "subtitle"}
           sx={{
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            fontWeight: isCompact || isSimple ? "body" : "bold",
+            fontWeight: isCompact ? "body" : "bold",
             color:
               selected && heading === "heading"
                 ? `${heading}-selected`
@@ -222,7 +220,7 @@ function ListItem<TItem extends Item, TContext>(
         props.title
       )}
 
-      {!isSimple && !isCompact && props.body && (
+      {!isCompact && props.body && (
         <Text
           as="p"
           variant="body"

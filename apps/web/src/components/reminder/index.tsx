@@ -61,11 +61,11 @@ const PRIORITY_ICON_MAP = {
 
 type ReminderProps = {
   item: ReminderType;
-  simplified?: boolean;
+  compact?: boolean;
 };
 
 function Reminder(props: ReminderProps) {
-  const { item, simplified } = props;
+  const { item, compact } = props;
   const reminder = item as unknown as ReminderType;
   const PriorityIcon = PRIORITY_ICON_MAP[reminder.priority];
   return (
@@ -74,7 +74,7 @@ function Reminder(props: ReminderProps) {
       title={reminder.title}
       body={reminder.description}
       isDisabled={reminder.disabled}
-      isSimple={simplified}
+      isCompact={compact}
       onClick={() => showEditReminderDialog(reminder.id)}
       footer={
         <Flex
