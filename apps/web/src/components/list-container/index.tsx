@@ -31,7 +31,11 @@ import {
   store as selectionStore
 } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
-import { DEFAULT_ITEM_HEIGHT, ListItemWrapper } from "./list-profiles";
+import {
+  ListItemWrapper,
+  getListItemDefaultHeight,
+  getListItemPlaceholderData
+} from "./list-profiles";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
 import ScrollContainer from "../scroll-container";
@@ -44,7 +48,7 @@ import {
   Virtuoso,
   VirtuosoHandle
 } from "react-virtuoso";
-import { useResolvedItem } from "@notesnook/common";
+import { getRandom, useResolvedItem } from "@notesnook/common";
 import { Context } from "./types";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 
@@ -207,7 +211,7 @@ function ListContainer(props: ListContainerProps) {
             <Virtuoso
               ref={listRef}
               computeItemKey={(index) => items.key(index)}
-              defaultItemHeight={DEFAULT_ITEM_HEIGHT}
+              defaultItemHeight={getListItemDefaultHeight(group, compact)}
               totalCount={items.length}
               onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => onKeyDown(e.nativeEvent)}
@@ -216,7 +220,7 @@ function ListContainer(props: ListContainerProps) {
                 Item: VirtuosoItem,
                 Header: ListHeader
               }}
-              increaseViewportBy={{ top: 10, bottom: 10 }}
+              increaseViewportBy={{ top: 200, bottom: 200 }}
               context={{
                 header,
                 items,
@@ -301,78 +305,32 @@ function ItemRenderer({
   } = context;
   const resolvedItem = useResolvedItem({ index, items });
   if (!resolvedItem || !resolvedItem.item) {
-    if (compact)
-      return (
-        <div
-          key="list-item-skeleton"
-          style={{
-            padding: 5,
-            height: 12,
-            width: "50%",
-            backgroundColor: "var(--background-secondary)"
-          }}
-        />
-      );
-
+    const placeholderData = getListItemPlaceholderData(group, compact);
     return (
       <div
         key="list-item-skeleton"
         style={{
           display: "flex",
           flexDirection: "column",
-          paddingTop: 10,
-          paddingBottom: 10,
-          paddingLeft: 5,
-          paddingRight: 5,
-          gap: 5
+          paddingTop: placeholderData.padding[0],
+          paddingRight: placeholderData.padding[1],
+          paddingBottom: placeholderData.padding[2],
+          paddingLeft: placeholderData.padding[3],
+          gap: placeholderData.gap
         }}
       >
-        <div
-          style={{
-            height: 16,
-            width: "50%",
-            backgroundColor: "var(--background-secondary)"
-          }}
-        />
-        <div
-          style={{
-            height: 12,
-            width: "100%",
-            backgroundColor: "var(--background-secondary)"
-          }}
-        />
-        <div
-          style={{
-            height: 12,
-            width: "100%",
-            backgroundColor: "var(--background-secondary)"
-          }}
-        />
-        <div style={{ display: "flex", gap: 5 }}>
-          <span
+        {placeholderData.lines.map((line, index) => (
+          <div
+            key={`${index}`}
             style={{
-              height: 10,
-              width: "50px",
-              backgroundColor: "var(--background-secondary)"
+              height: line.height,
+              width:
+                line.width === "random" ? `${getRandom(20, 60)}%` : line.width,
+              backgroundColor: "var(--background-secondary)",
+              borderRadius: line.height / 4
             }}
           />
-          <span
-            style={{
-              height: 10,
-              width: 10,
-              borderRadius: 50,
-              backgroundColor: "var(--background-secondary)"
-            }}
-          />
-          <span
-            style={{
-              height: 10,
-              width: 10,
-              borderRadius: 50,
-              backgroundColor: "var(--background-secondary)"
-            }}
-          />
-        </div>
+        ))}
       </div>
     );
   }

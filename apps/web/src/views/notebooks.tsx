@@ -32,6 +32,7 @@ function Notebooks() {
   const filteredItems = useSearch("notebooks", (query) =>
     db.lookup.notebooks(query).sorted()
   );
+  const isCompact = useStore((store) => store.viewMode === "compact");
 
   useEffect(() => {
     store.get().refresh();
@@ -45,6 +46,7 @@ function Notebooks() {
         refresh={refresh}
         items={filteredItems || notebooks}
         placeholder={<Placeholder context="notebooks" />}
+        compact={isCompact}
         button={{
           onClick: () => hashNavigate("/notebooks/create")
         }}
