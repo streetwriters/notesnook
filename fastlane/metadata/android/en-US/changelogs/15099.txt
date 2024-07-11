@@ -1,0 +1,5 @@
+- Fixed realtime sync issues
+- Fixed color popups not opening from main toolbar
+- Bug fixes and performance improvements
+
+Thank you for using Notesnook!
