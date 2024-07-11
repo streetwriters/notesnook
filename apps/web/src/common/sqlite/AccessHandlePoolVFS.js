@@ -213,7 +213,7 @@ export class AccessHandlePoolVFS extends VFS.Base {
   }
 
   async delete() {
-    for await (const [name] of this.#directoryHandle) {
+    for await (const [name] of await this.#directoryHandle.entries()) {
       await this.#directoryHandle.removeEntry(name, { recursive: true });
     }
   }
@@ -300,7 +300,7 @@ export class AccessHandlePoolVFS extends VFS.Base {
   async #acquireAccessHandles() {
     // Enumerate all the files in the directory.
     const files = [];
-    for await (const [name, handle] of this.#directoryHandle) {
+    for await (const [name, handle] of await this.#directoryHandle.entries()) {
       if (handle.kind === "file") {
         files.push([name, handle]);
       }
