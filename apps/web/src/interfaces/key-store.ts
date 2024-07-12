@@ -513,7 +513,7 @@ function deserializeCredential(
   throw new Error("Credentials are of different types.");
 }
 
-function wrongCredentialError(query: CredentialQuery): string {
+export function wrongCredentialError(query: CredentialQuery): string {
   switch (query.type) {
     case "password":
       return "Wrong password";

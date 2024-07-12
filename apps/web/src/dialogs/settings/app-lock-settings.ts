@@ -27,7 +27,8 @@ import {
   CredentialType,
   CredentialWithSecret,
   CredentialWithoutSecret,
-  useKeyStore
+  useKeyStore,
+  wrongCredentialError
 } from "../../interfaces/key-store";
 import { showToast } from "../../utils/toast";
 import { WebAuthn } from "../../utils/webauthn";
@@ -412,7 +413,8 @@ async function authenticateAppLock() {
   if (!defaultCredential) {
     return verifyAccount();
   }
-  return !!(await verifyCredential(defaultCredential, (c) =>
-    useKeyStore.getState().verifyCredential(c)
-  ));
+  return !!(await verifyCredential(defaultCredential, async (c) => {
+    if (!(await useKeyStore.getState().verifyCredential(c)))
+      throw new Error(wrongCredentialError(c));
+  }));
 }
