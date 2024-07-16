@@ -42,7 +42,7 @@ import { NoteContent } from "@notesnook/core/dist/collections/session-content";
 import { Context } from "../components/list-container/types";
 import { showToast } from "../utils/toast";
 import { getId } from "@notesnook/core/dist/utils/id";
-import { createJSONStorage } from "zustand/middleware";
+import { PersistStorage } from "zustand/middleware";
 import { getFormattedHistorySessionDate } from "@notesnook/common";
 import { isCipher } from "@notesnook/core/dist/database/crypto";
 import { hashNavigate } from "../navigation";
@@ -976,7 +976,7 @@ const useEditorStore = createPersistedStore(EditorStore, {
       return sessions;
     }, [] as EditorSession[])
   }),
-  storage: createJSONStorage(() => localStorage)
+  storage: db.config() as PersistStorage<Partial<EditorStore>>
 });
 export { useEditorStore, SESSION_STATES };
 
