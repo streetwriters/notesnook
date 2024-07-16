@@ -22,10 +22,10 @@ import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { getPlatform } from "../../utils/platform";
 import { db } from "../../common/db";
-import { showPromptDialog } from "../../common/dialog-controller";
 import Config from "../../utils/config";
 import { showToast } from "../../utils/toast";
 import { TrackingDetails } from "./components/tracking-details";
+import { PromptDialog } from "../prompt";
 
 export const PrivacySettings: SettingsGroup[] = [
   {
@@ -143,7 +143,7 @@ This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this
             type: "button",
             title: "Change proxy",
             action: async () => {
-              const result = await showPromptDialog({
+              const result = await PromptDialog.show({
                 title: "CORS bypass proxy",
                 description:
                   "You can set a custom proxy URL to increase your privacy.",

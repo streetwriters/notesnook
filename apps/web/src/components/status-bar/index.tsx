@@ -34,15 +34,13 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { hardNavigate, hashNavigate } from "../../navigation";
 import { useAutoUpdater, UpdateStatus } from "../../hooks/use-auto-updater";
-import {
-  showIssueDialog,
-  showUpdateAvailableNotice
-} from "../../common/dialog-controller";
 import useStatus, { statusToString } from "../../hooks/use-status";
 import { ScopedThemeProvider } from "../theme-provider";
 import { checkForUpdate, installUpdate } from "../../utils/updater";
 import { getTimeAgo, toTitleCase } from "@notesnook/common";
 import { User } from "@notesnook/core";
+import { showUpdateAvailableNotice } from "../../dialogs/confirm";
+import { IssueDialog } from "../../dialogs/issue-dialog";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -114,7 +112,7 @@ function StatusBar() {
           ) : null}
           <Button
             variant="statusitem"
-            onClick={() => showIssueDialog()}
+            onClick={() => IssueDialog.show({})}
             sx={{
               alignItems: "center",
               justifyContent: "center",

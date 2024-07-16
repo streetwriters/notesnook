@@ -19,10 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SettingComponent, SettingsGroup } from "./types";
 import { useStore as useUserStore } from "../../stores/user-store";
-import {
-  showPasswordDialog,
-  showPromptDialog
-} from "../../common/dialog-controller";
+import { showPasswordDialog } from "../../dialogs/password-dialog";
 import {
   CredentialType,
   CredentialWithSecret,
@@ -35,6 +32,7 @@ import { WebAuthn } from "../../utils/webauthn";
 import { generatePassword } from "../../utils/password-generator";
 import { verifyAccount } from "../../common";
 import { Checkmark } from "../../components/icons";
+import { PromptDialog } from "../prompt";
 
 export const AppLockSettings: SettingsGroup[] = [
   {
@@ -318,7 +316,7 @@ async function registerCredential(type: CredentialType) {
     const user = useUserStore.getState().user;
     const username =
       user?.email ||
-      (await showPromptDialog({
+      (await PromptDialog.show({
         title: "Enter your username",
         description:
           "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."

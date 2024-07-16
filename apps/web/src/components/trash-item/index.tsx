@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ListItem from "../list-item";
-import { showMultiPermanentDeleteConfirmation } from "../../common/dialog-controller";
 import { Restore, DeleteForver } from "../icons";
 import { store } from "../../stores/trash-store";
 import { Flex, Text } from "@theme-ui/components";
@@ -28,6 +27,7 @@ import { showToast } from "../../utils/toast";
 import { MenuItem } from "@notesnook/ui";
 import { TrashItem as TrashItemType } from "@notesnook/core/dist/types";
 import { useEditorStore } from "../../stores/editor-store";
+import { showMultiPermanentDeleteConfirmation } from "../../dialogs/confirm";
 
 type TrashItemProps = { item: TrashItemType; date: number };
 function TrashItem(props: TrashItemProps) {

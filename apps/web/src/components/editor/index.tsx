@@ -64,12 +64,12 @@ import { Freeze } from "react-freeze";
 import { UnlockView } from "../unlock";
 import DiffViewer from "../diff-viewer";
 import TableOfContents from "./table-of-contents";
-import { showNoteLinkingDialog } from "../../common/dialog-controller";
 import { scrollIntoViewById } from "@notesnook/editor";
 import { IEditor } from "./types";
 import { EditorActionBar } from "./action-bar";
 import { logger } from "../../utils/logger";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
+import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -545,8 +545,8 @@ export function Editor(props: EditorProps) {
           result.forEach((attachment) => editor?.attachFile(attachment));
         }}
         onInsertInternalLink={async (attributes) => {
-          const link = await showNoteLinkingDialog(attributes);
-          return link;
+          const link = await NoteLinkingDialog.show({ attributes });
+          return link || undefined;
         }}
       >
         {headless ? null : (

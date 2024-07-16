@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { confirm, showMultiDeleteConfirmation } from "./dialog-controller";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as attachmentStore } from "../stores/attachment-store";
@@ -27,6 +26,7 @@ import { showToast } from "../utils/toast";
 import Vault from "./vault";
 import { TaskManager } from "./task-manager";
 import { pluralize } from "@notesnook/common";
+import { ConfirmDialog, showMultiDeleteConfirmation } from "../dialogs/confirm";
 
 async function moveNotesToTrash(ids: string[], confirm = true) {
   if (confirm && !(await showMultiDeleteConfirmation(ids.length))) return;
@@ -79,7 +79,7 @@ async function moveNotebooksToTrash(ids: string[]) {
 
 async function deleteAttachments(ids: string[]) {
   if (
-    !(await confirm({
+    !(await ConfirmDialog.show({
       title: "Are you sure?",
       message:
         "Are you sure you want to permanently delete these attachments? This action is IRREVERSIBLE.",

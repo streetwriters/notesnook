@@ -32,7 +32,7 @@ import {
 import Vault from "./vault";
 import { ExportStream } from "../utils/streams/export-stream";
 import { showToast } from "../utils/toast";
-import { confirm } from "./dialog-controller";
+import { ConfirmDialog } from "../dialogs/confirm";
 
 export async function exportToPDF(
   title: string,
@@ -101,14 +101,14 @@ export async function exportNotes(
     }
   });
   if (result instanceof Error) {
-    confirm({
+    ConfirmDialog.show({
       title: `Export failed`,
       message: result.stack || result.message,
       positiveButtonText: "Okay"
     });
     return false;
   } else {
-    confirm({
+    ConfirmDialog.show({
       title: `Exported ${result.count} notes`,
       message:
         result.errors.length > 0

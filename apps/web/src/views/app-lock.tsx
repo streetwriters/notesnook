@@ -32,7 +32,6 @@ import { ErrorText } from "../components/error-text";
 import Field from "../components/field";
 import { startIdleDetection } from "../utils/idle-detection";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
-import { closeOpenedDialog } from "../common/dialog-controller";
 import { WebAuthn } from "../utils/webauthn";
 import { getDocumentTitle, setDocumentTitle } from "../utils/dom";
 import { CredentialWithoutSecret, useKeyStore } from "../interfaces/key-store";
@@ -90,7 +89,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
   useEffect(() => {
     if (isLocked) {
       windowTitle.current = getDocumentTitle();
-      closeOpenedDialog();
+      // ../common/dialog-controller  closeOpenedDialog();
       document.title = `Notesnook 🔒`;
     } else {
       setDocumentTitle(windowTitle.current);

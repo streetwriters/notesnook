@@ -29,12 +29,12 @@ import Dialog from "../components/dialog";
 import { useStore, store } from "../stores/tag-store";
 import { store as notestore } from "../stores/note-store";
 import { useEditorStore } from "../stores/editor-store";
-import { Perform } from "../common/dialog-controller";
 import { FilteredList } from "../components/filtered-list";
 import { ItemReference, Tag } from "@notesnook/core/dist/types";
 import { create } from "zustand";
 import { VirtualizedGrouping } from "@notesnook/core";
 import { ResolvedItem } from "@notesnook/common";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
 type SelectedReference = {
   id: string;
@@ -51,12 +51,10 @@ export const useSelectionStore = create<ISelectionStore>((set) => ({
   setSelected: (selected) => set({ selected: selected.slice() })
 }));
 
-export type AddTagsDialogProps = {
-  onClose: Perform;
-  noteIds: string[];
-};
-
-function AddTagsDialog(props: AddTagsDialogProps) {
+type AddTagsDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
+export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
+  props: AddTagsDialogProps
+) {
   const { onClose, noteIds } = props;
 
   const [tags, setTags] = useState<VirtualizedGrouping<Tag> | undefined>(
@@ -101,7 +99,6 @@ function AddTagsDialog(props: AddTagsDialogProps) {
               else await db.relations.unlink(tagRef, noteRef);
             }
           }
-          await useEditorStore.getState().refreshTags();
           await store.get().refresh();
           await notestore.get().refresh();
           onClose(true);
@@ -150,7 +147,7 @@ function AddTagsDialog(props: AddTagsDialogProps) {
       )}
     </Dialog>
   );
-}
+});
 
 function TagItem(props: { tag: Tag }) {
   const { tag } = props;
@@ -200,8 +197,6 @@ function TagItem(props: { tag: Tag }) {
     </Flex>
   );
 }
-
-export default AddTagsDialog;
 
 function SelectedCheck({ id, size = 20 }: { id: string; size?: number }) {
   const selected = useSelectionStore((store) => store.selected);

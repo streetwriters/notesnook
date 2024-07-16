@@ -35,12 +35,12 @@ import {
   ThemesTRPC
 } from "../../../common/themes-router";
 import { ThemeMetadata } from "@notesnook/themes-server";
-import { showThemeDetails } from "../../../common/dialog-controller";
 import { ThemePreview } from "../../../components/theme-preview";
 import { Loader } from "../../../components/loader";
 import { showToast } from "../../../utils/toast";
 import { showFilePicker, readFile } from "../../../utils/file-picker";
 import { VirtualizedGrid } from "../../../components/virtualized-grid";
+import { ThemeDetailsDialog } from "../../theme-details-dialog";
 
 const ThemesClient = ThemesTRPC.createClient({
   links: [
@@ -189,7 +189,7 @@ function ThemesList() {
               if (error) return showToast("error", error);
 
               if (
-                await showThemeDetails({
+                await ThemeDetailsDialog.show({
                   ...theme,
                   totalInstalls: 0,
                   previewColors: getPreviewColors(theme)
@@ -266,7 +266,7 @@ function ThemeItem(props: ThemeItemProps) {
         }
       }}
       onClick={async () => {
-        if (await showThemeDetails(theme)) {
+        if (await ThemeDetailsDialog.show(theme)) {
           await setTheme(theme);
         }
       }}

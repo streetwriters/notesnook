@@ -43,7 +43,6 @@ import NavigationItem, { SortableNavigationItem } from "./navigation-item";
 import { hardNavigate, hashNavigate, navigate } from "../../navigation";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
-import { showRenameColorDialog } from "../../common/dialog-controller";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -72,6 +71,7 @@ import { MenuItem } from "@notesnook/ui";
 import { Notebook, Tag } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { Menu } from "../../hooks/use-menu";
+import { RenameColorDialog } from "../../dialogs/item-dialog";
 
 type Route = {
   id: string;
@@ -368,7 +368,7 @@ function NavigationMenu(props: NavigationMenuProps) {
                       type: "button",
                       key: "rename-color",
                       title: "Rename color",
-                      onClick: () => showRenameColorDialog(color)
+                      onClick: () => RenameColorDialog.show(color)
                     },
                     {
                       type: "button",

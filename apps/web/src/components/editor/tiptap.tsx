@@ -48,7 +48,6 @@ import {
 import { IEditor, MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { useEditorConfig, useToolbarConfig, useEditorManager } from "./manager";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
-import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
@@ -62,6 +61,7 @@ import Skeleton from "react-loading-skeleton";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
 import { TimeFormat } from "@notesnook/core/dist/utils/date";
+import { BuyDialog } from "../../dialogs/buy-dialog";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -155,7 +155,7 @@ function TipTap(props: TipTapProps) {
       premium: isUserPremium
     },
     onPermissionDenied: (claim) => {
-      if (claim === "premium") showBuyDialog();
+      if (claim === "premium") BuyDialog.show({});
     }
   });
 

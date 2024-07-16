@@ -23,15 +23,14 @@ import { Text } from "@theme-ui/components";
 import { store as appStore } from "../../stores/app-store";
 import { store as tagStore } from "../../stores/tag-store";
 import { store as noteStore } from "../../stores/note-store";
-import { useEditorStore } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { Edit, Shortcut, DeleteForver } from "../icons";
 import { showToast } from "../../utils/toast";
 import { pluralize } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Tag as TagType } from "@notesnook/core";
-import { showEditTagDialog } from "../../common/dialog-controller";
 import { handleDrop } from "../../common/drop-handler";
+import { EditTagDialog } from "../../dialogs/item-dialog";
 
 type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
@@ -78,9 +77,7 @@ const menuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
       key: "edit",
       title: "Rename tag",
       icon: Edit.path,
-      onClick: () => {
-        showEditTagDialog(tag);
-      }
+      onClick: () => EditTagDialog.show(tag)
     },
     {
       type: "button",

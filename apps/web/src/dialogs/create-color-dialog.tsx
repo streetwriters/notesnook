@@ -20,91 +20,91 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Box, Flex } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
-import { Perform } from "../common/dialog-controller";
 import { useRef } from "react";
 import tinycolor from "tinycolor2";
 import { db } from "../common/db";
 import { showToast } from "../utils/toast";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
-type CreateColorDialogProps = {
-  onClose: Perform;
-  onDone: Perform<string>;
-};
-function CreateColorDialog(props: CreateColorDialogProps) {
-  const colorRef = useRef<HTMLInputElement>(null);
-  const colorPickerRef = useRef<HTMLInputElement>(null);
-  return (
-    <Dialog
-      testId="new-color-dialog"
-      isOpen={true}
-      title={"Create a new color"}
-      onClose={() => props.onClose(false)}
-      positiveButton={{
-        form: "colorForm",
-        type: "submit",
-        text: "Create"
-      }}
-      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
-    >
-      <Box
-        as="form"
-        id="colorForm"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          const form = Object.fromEntries(
-            new FormData(e.target as HTMLFormElement).entries()
-          ) as { color: string; title: string };
-          if (!tinycolor(form.color, { format: "hex" }).isValid()) {
-            showToast("error", "Please enter a valid hex color (e.g. #ffffff)");
-            return;
-          }
-          const colorId = await db.colors.add({
-            colorCode: form.color,
-            title: form.title
-          });
-          props.onDone(colorId);
+type CreateColorDialogProps = BaseDialogProps<string | false>;
+export const CreateColorDialog = DialogManager.register(
+  function CreateColorDialog(props: CreateColorDialogProps) {
+    const colorRef = useRef<HTMLInputElement>(null);
+    const colorPickerRef = useRef<HTMLInputElement>(null);
+    return (
+      <Dialog
+        testId="new-color-dialog"
+        isOpen={true}
+        title={"Create a new color"}
+        onClose={() => props.onClose(false)}
+        positiveButton={{
+          form: "colorForm",
+          type: "submit",
+          text: "Create"
         }}
+        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
       >
-        <Field
-          required
-          label="Title"
-          id="title"
-          name="title"
-          autoFocus
-          data-test-id="title-input"
-        />
-        <Flex sx={{ alignItems: "end" }}>
+        <Box
+          as="form"
+          id="colorForm"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const form = Object.fromEntries(
+              new FormData(e.target as HTMLFormElement).entries()
+            ) as { color: string; title: string };
+            if (!tinycolor(form.color, { format: "hex" }).isValid()) {
+              showToast(
+                "error",
+                "Please enter a valid hex color (e.g. #ffffff)"
+              );
+              return;
+            }
+            const colorId = await db.colors.add({
+              colorCode: form.color,
+              title: form.title
+            });
+            props.onClose(colorId);
+          }}
+        >
           <Field
-            inputRef={colorRef}
             required
-            label="Color"
-            id="color"
-            name="color"
-            data-test-id="color-input"
-            sx={{ flex: 1 }}
-            onChange={(e) => {
-              const color = tinycolor(e.target.value);
-              if (colorPickerRef.current && color.isValid())
-                colorPickerRef.current.value = color.toHexString();
-            }}
+            label="Title"
+            id="title"
+            name="title"
+            autoFocus
+            data-test-id="title-input"
           />
-          <input
-            ref={colorPickerRef}
-            type="color"
-            style={{
-              height: 41,
-              backgroundColor: "transparent",
-              border: "1px solid var(--border)",
-              borderRadius: 5
-            }}
-            onChange={(e) => {
-              if (colorRef.current) colorRef.current.value = e.target.value;
-            }}
-          />
-        </Flex>
-      </Box>
-    </Dialog>
-  );
-}
-
-export default CreateColorDialog;
+          <Flex sx={{ alignItems: "end" }}>
+            <Field
+              inputRef={colorRef}
+              required
+              label="Color"
+              id="color"
+              name="color"
+              data-test-id="color-input"
+              sx={{ flex: 1 }}
+              onChange={(e) => {
+                const color = tinycolor(e.target.value);
+                if (colorPickerRef.current && color.isValid())
+                  colorPickerRef.current.value = color.toHexString();
+              }}
+            />
+            <input
+              ref={colorPickerRef}
+              type="color"
+              style={{
+                height: 41,
+                backgroundColor: "transparent",
+                border: "1px solid var(--border)",
+                borderRadius: 5
+              }}
+              onChange={(e) => {
+                if (colorRef.current) colorRef.current.value = e.target.value;
+              }}
+            />
+          </Flex>
+        </Box>
+      </Dialog>
+    );
+  }
+);

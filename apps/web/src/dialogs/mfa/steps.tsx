@@ -55,9 +55,9 @@ import {
   StepComponentProps,
   OnNextFunction
 } from "./types";
-import { showMultifactorDialog } from "../../common/dialog-controller";
 import { ErrorText } from "../../components/error-text";
 import { AuthenticatorType } from "@notesnook/core";
+import { MultifactorDialog } from "./multi-factor-dialog";
 
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 
@@ -734,7 +734,9 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
         onClick={() => {
           props.onClose && props.onClose(true);
           setTimeout(async () => {
-            await showMultifactorDialog(props.authenticatorType);
+            await MultifactorDialog.show({
+              primaryMethod: props.authenticatorType
+            });
           }, 100);
         }}
       >

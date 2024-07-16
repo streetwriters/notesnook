@@ -23,12 +23,12 @@ import { db } from "./db";
 import { store as appStore } from "../stores/app-store";
 import { Backup, User, Email, Warn, Icon } from "../components/icons";
 import dayjs from "dayjs";
-import { showBuyDialog, showRecoveryKeyDialog } from "./dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
-
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { showToast } from "../utils/toast";
 import { TaskScheduler } from "../utils/task-scheduler";
+import { BuyDialog } from "../dialogs/buy-dialog";
+import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
 
 export type NoticeType = "autoBackupsOff" | "login" | "email" | "recoverykey";
 
@@ -119,7 +119,7 @@ export const NoticesData: Record<NoticeType, NoticeData> = {
     key: "autoBackupsOff",
     title: "Automatic backups disabled",
     subtitle: "Please upgrade to Pro to enable automatic backups.",
-    action: () => showBuyDialog(),
+    action: () => BuyDialog.show({}),
     dismissable: true,
     icon: Backup
   },
@@ -143,7 +143,7 @@ export const NoticesData: Record<NoticeType, NoticeData> = {
     subtitle: "Keep your recovery key safe",
     dismissable: true,
     action: async () => {
-      if (await verifyAccount()) await showRecoveryKeyDialog();
+      if (await verifyAccount()) await RecoveryKeyDialog.show({});
     },
     icon: Warn
   }

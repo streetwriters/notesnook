@@ -22,11 +22,10 @@ import { Text } from "@theme-ui/components";
 import { useCallback, useEffect, useState } from "react";
 import { createBackup } from "../common";
 import { db } from "../common/db";
-import { Perform } from "../common/dialog-controller";
 import { TaskManager } from "../common/task-manager";
-
 import Dialog from "../components/dialog";
 import { ErrorText } from "../components/error-text";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
 type MigrationProgressEvent = {
   collection: string;
@@ -34,11 +33,10 @@ type MigrationProgressEvent = {
   current: number;
 };
 
-export type MigrationDialogProps = {
-  onClose: Perform;
-};
-
-export default function MigrationDialog(props: MigrationDialogProps) {
+export type MigrationDialogProps = BaseDialogProps<boolean>;
+export const MigrationDialog = DialogManager.register(function MigrationDialog(
+  props: MigrationDialogProps
+) {
   const [error, setError] = useState<Error>();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -133,4 +131,4 @@ export default function MigrationDialog(props: MigrationDialogProps) {
       </Text>
     </Dialog>
   );
-}
+});

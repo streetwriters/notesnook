@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SettingsGroup } from "./types";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { confirm } from "../../common/dialog-controller";
+import { ConfirmDialog } from "../confirm";
 
 export const SyncSettings: SettingsGroup[] = [
   {
@@ -93,7 +93,7 @@ Use this if some changes are not appearing on this device from other devices. Th
             title: "Force push",
             variant: "error",
             action: () =>
-              confirm({
+              ConfirmDialog.show({
                 title: "Are you sure?",
                 message:
                   "This must only be used for troubleshooting. Using them regularly for sync is **not recommended** and will lead to **unexpected data loss** and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.",
@@ -114,7 +114,7 @@ Use this if some changes are not appearing on this device from other devices. Th
             title: "Force pull",
             variant: "error",
             action: () =>
-              confirm({
+              ConfirmDialog.show({
                 title: "Are you sure?",
                 message:
                   "This must only be used for troubleshooting. Using them regularly for sync is **not recommended** and will lead to **unexpected data loss** and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.",

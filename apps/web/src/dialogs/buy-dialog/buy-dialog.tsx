@@ -45,14 +45,16 @@ import { SUBSCRIPTION_STATUS } from "../../common/constants";
 import BaseDialog from "../../components/dialog";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 import { User } from "@notesnook/core";
+import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 
-type BuyDialogProps = {
+type BuyDialogProps = BaseDialogProps<false> & {
   couponCode?: string;
   plan?: "monthly" | "yearly" | "education";
-  onClose: () => void;
 };
 
-export function BuyDialog(props: BuyDialogProps) {
+export const BuyDialog = DialogManager.register(function BuyDialog(
+  props: BuyDialogProps
+) {
   const { onClose, couponCode, plan } = props;
   const theme = useTheme() as Theme;
 
@@ -73,7 +75,7 @@ export function BuyDialog(props: BuyDialogProps) {
     <BaseDialog
       isOpen={true}
       width={"868px"}
-      onClose={() => props.onClose()}
+      onClose={() => props.onClose(false)}
       noScroll
       sx={{
         bg: "transparent",
@@ -107,13 +109,13 @@ export function BuyDialog(props: BuyDialogProps) {
             py: 50
           }}
         >
-          <SideBar onClose={onClose} initialPlan={plan} />
+          <SideBar onClose={() => onClose(false)} initialPlan={plan} />
         </ScopedThemeProvider>
         <Details />
       </Flex>
     </BaseDialog>
   );
-}
+});
 
 type SideBarProps = {
   initialPlan?: Period;

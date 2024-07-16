@@ -22,16 +22,14 @@ import { db } from "../common/db";
 import BaseStore from "./index";
 import config from "../utils/config";
 import { EV, EVENTS } from "@notesnook/core/dist/common";
-import {
-  showAccountLoggedOutNotice,
-  showOnboardingDialog
-} from "../common/dialog-controller";
 import Config from "../utils/config";
 import { hashNavigate } from "../navigation";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { AuthenticatorType, User } from "@notesnook/core";
+import { ConfirmDialog } from "../dialogs/confirm";
+import { OnboardingDialog } from "../dialogs/onboarding-dialog";
 
 class UserStore extends BaseStore<UserStore> {
   isLoggedIn?: boolean;
@@ -78,9 +76,10 @@ class UserStore extends BaseStore<UserStore> {
           state.user.subscription = subscription;
         });
         if (!wasUserPremium && isUserPremium())
-          showOnboardingDialog(
-            subscription.type === SUBSCRIPTION_STATUS.TRIAL ? "trial" : "pro"
-          );
+          OnboardingDialog.show({
+            type:
+              subscription.type === SUBSCRIPTION_STATUS.TRIAL ? "trial" : "pro"
+          });
       });
 
       EV.subscribe(EVENTS.userEmailConfirmed, () => {
@@ -94,7 +93,11 @@ class UserStore extends BaseStore<UserStore> {
         });
         config.clear();
         if (reason) {
-          await showAccountLoggedOutNotice(reason);
+          await ConfirmDialog.show({
+            title: "You were logged out",
+            message: reason,
+            negativeButtonText: "Okay"
+          });
         }
       });
 

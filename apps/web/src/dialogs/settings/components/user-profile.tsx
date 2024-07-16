@@ -26,12 +26,10 @@ import { getFormattedDate } from "@notesnook/common";
 import { SUBSCRIPTION_STATUS } from "../../../common/constants";
 import dayjs from "dayjs";
 import { useMemo } from "react";
-import {
-  showEditProfilePictureDialog,
-  showPromptDialog
-} from "../../../common/dialog-controller";
 import { db } from "../../../common/db";
 import { showToast } from "../../../utils/toast";
+import { EditProfilePictureDialog } from "../../edit-profile-picture-dialog";
+import { PromptDialog } from "../../prompt";
 
 export function UserProfile() {
   const user = useUserStore((store) => store.user);
@@ -142,7 +140,7 @@ export function UserProfile() {
             }}
             title="Edit profile picture"
             onClick={async () => {
-              await showEditProfilePictureDialog(profile);
+              await EditProfilePictureDialog.show({ profile });
             }}
           >
             <Text variant="body" sx={{ color: "white" }}>
@@ -173,7 +171,7 @@ export function UserProfile() {
               size={12}
               title="Edit full name"
               onClick={async () => {
-                const fullName = await showPromptDialog({
+                const fullName = await PromptDialog.show({
                   title: "Edit your full name",
                   description:
                     "Your profile data is 100% end-to-end encrypted.",

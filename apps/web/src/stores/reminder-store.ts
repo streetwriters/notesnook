@@ -21,13 +21,13 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 import { TaskScheduler } from "../utils/task-scheduler";
-import { showReminderPreviewDialog } from "../common/dialog-controller";
 import dayjs from "dayjs";
 import Config from "../utils/config";
 import { desktop } from "../common/desktop-bridge";
 import { Reminder, VirtualizedGrouping } from "@notesnook/core";
 import { store as noteStore } from "./note-store";
 import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
+import { ReminderPreviewDialog } from "../dialogs/reminder-preview-dialog";
 
 class ReminderStore extends BaseStore<ReminderStore> {
   reminders: VirtualizedGrouping<Reminder> | undefined = undefined;
@@ -115,7 +115,7 @@ function scheduleReminder(id: string, reminder: Reminder, cron: string) {
 
       if (tag) {
         await desktop?.integration.bringToFront.query();
-        showReminderPreviewDialog(reminder);
+        await ReminderPreviewDialog.show({ reminder });
       }
     } else {
       const notification = new Notification(reminder.title, {
@@ -129,7 +129,7 @@ function scheduleReminder(id: string, reminder: Reminder, cron: string) {
 
       notification.onclick = function () {
         window.focus();
-        showReminderPreviewDialog(reminder);
+        ReminderPreviewDialog.show({ reminder });
       };
     }
 

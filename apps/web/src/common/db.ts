@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
-import { showMigrationDialog } from "./dialog-controller";
 import { database } from "@notesnook/common";
 import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
@@ -119,7 +118,9 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   logger.measure("Database initialization");
 
   if (db.migrations?.required()) {
-    await showMigrationDialog();
+    await import("../dialogs/migration-dialog").then(({ MigrationDialog }) =>
+      MigrationDialog.show({})
+    );
   }
 
   return db;

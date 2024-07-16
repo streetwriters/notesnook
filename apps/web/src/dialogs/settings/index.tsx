@@ -39,7 +39,6 @@ import {
   ShieldLock,
   Sync
 } from "../../components/icons";
-import { Perform } from "../../common/dialog-controller";
 import NavigationItem from "../../components/navigation-menu/navigation-item";
 import { FlexScrollContainer } from "../../components/scroll-container";
 import { useCallback, useEffect, useState } from "react";
@@ -74,8 +73,9 @@ import { debounce, usePromise } from "@notesnook/common";
 import { SubscriptionSettings } from "./subscription-settings";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 import { AppLockSettings } from "./app-lock-settings";
+import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 
-type SettingsDialogProps = { onClose: Perform };
+type SettingsDialogProps = BaseDialogProps<false>;
 
 const sectionGroups: SectionGroup[] = [
   {
@@ -179,7 +179,9 @@ const SettingsGroups = [
 // 5. Settings will be stateful but independent such that any one setting
 // can appear independent of others (e.g. as a search result)
 
-export default function SettingsDialog(props: SettingsDialogProps) {
+export const SettingsDialog = DialogManager.register(function SettingsDialog(
+  props: SettingsDialogProps
+) {
   const [activeSettings, setActiveSettings] = useState<SettingsGroup[]>(
     SettingsGroups.filter((g) => g.section === "profile")
   );
@@ -225,7 +227,7 @@ export default function SettingsDialog(props: SettingsDialogProps) {
       </Flex>
     </Dialog>
   );
-}
+});
 
 type SettingsSideBarProps = { onNavigate: (settings: SettingsGroup[]) => void };
 function SettingsSideBar(props: SettingsSideBarProps) {

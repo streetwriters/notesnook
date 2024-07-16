@@ -20,22 +20,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SerializedKey } from "@notesnook/crypto/dist/src/types";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { db } from "../../common/db";
-import {
-  showBuyDialog,
-  showImagePickerDialog
-} from "../../common/dialog-controller";
 import { TaskManager } from "../../common/task-manager";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { showToast } from "../../utils/toast";
 import { showFilePicker } from "../../utils/file-picker";
 import { Attachment } from "@notesnook/editor";
+import { ImagePickerDialog } from "../../dialogs/image-picker-dialog";
+import { BuyDialog } from "../../dialogs/buy-dialog";
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
 export async function insertAttachments(type = "*/*") {
   if (!isUserPremium()) {
-    await showBuyDialog();
+    await BuyDialog.show({});
     return;
   }
 
@@ -49,14 +47,14 @@ export async function insertAttachments(type = "*/*") {
 
 export async function attachFiles(files: File[]) {
   if (!isUserPremium()) {
-    await showBuyDialog();
+    await BuyDialog.show({});
     return;
   }
 
   const images =
-    (await showImagePickerDialog(
-      files.filter((f) => f.type.startsWith("image/"))
-    )) || [];
+    (await ImagePickerDialog.show({
+      images: files.filter((f) => f.type.startsWith("image/"))
+    })) || [];
   const documents = files.filter((f) => !f.type.startsWith("image/"));
   const attachments: Attachment[] = [];
   for (const file of [...images, ...documents]) {

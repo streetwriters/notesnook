@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Perform } from "../common/dialog-controller";
 import Dialog from "../components/dialog";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { db } from "../common/db";
@@ -26,9 +25,9 @@ import IconTag from "../components/icon-tag";
 import { Clock, Refresh } from "../components/icons";
 import Note from "../components/note";
 import { getFormattedReminderTime, usePromise } from "@notesnook/common";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
-export type ReminderPreviewDialogProps = {
-  onClose: Perform;
+export type ReminderPreviewDialogProps = BaseDialogProps<false> & {
   reminder: Reminder;
 };
 
@@ -54,82 +53,89 @@ const SNOOZE_TIMES = [
   { id: "1-hour", title: "1 hour", interval: 60 * 60 * 1000 }
 ];
 
-export default function ReminderPreviewDialog(
-  props: ReminderPreviewDialogProps
-) {
-  const { reminder } = props;
-  const referencedNotes = usePromise(
-    () =>
-      db.relations.to({ id: reminder.id, type: "reminder" }, "note").resolve(),
-    [reminder.id]
-  );
+export const ReminderPreviewDialog = DialogManager.register(
+  function ReminderPreviewDialog(props: ReminderPreviewDialogProps) {
+    const { reminder } = props;
+    const referencedNotes = usePromise(
+      () =>
+        db.relations
+          .to({ id: reminder.id, type: "reminder" }, "note")
+          .resolve(),
+      [reminder.id]
+    );
 
-  return (
-    <Dialog
-      isOpen={true}
-      title={reminder.title}
-      description={reminder.description}
-      onClose={() => props.onClose(false)}
-      negativeButton={{
-        text: "Close",
-        onClick: () => props.onClose(false)
-      }}
-    >
-      <Flex
-        sx={{
-          alignItems: "center",
-          mb: 2
+    return (
+      <Dialog
+        isOpen={true}
+        title={reminder.title}
+        description={reminder.description}
+        onClose={() => props.onClose(false)}
+        negativeButton={{
+          text: "Close",
+          onClick: () => props.onClose(false)
         }}
       >
-        {reminder.mode === "repeat" && reminder.recurringMode && (
-          <IconTag
-            icon={Refresh}
-            text={RECURRING_MODE_MAP[reminder.recurringMode]}
-          />
-        )}
-        <IconTag icon={Clock} text={getFormattedReminderTime(reminder)} />
-      </Flex>
+        <Flex
+          sx={{
+            alignItems: "center",
+            mb: 2
+          }}
+        >
+          {reminder.mode === "repeat" && reminder.recurringMode && (
+            <IconTag
+              icon={Refresh}
+              text={RECURRING_MODE_MAP[reminder.recurringMode]}
+            />
+          )}
+          <IconTag icon={Clock} text={getFormattedReminderTime(reminder)} />
+        </Flex>
 
-      <Text variant="body">Remind me in:</Text>
-      <Flex
-        sx={{
-          alignItems: "center",
-          my: 1,
-          gap: 1
-        }}
-      >
-        {SNOOZE_TIMES.map((time) => (
-          <Button
-            key={time.id}
-            variant="secondary"
-            onClick={() => {
-              db.reminders.add({
-                id: reminder.id,
-                snoozeUntil: Date.now() + time.interval
-              });
-              props.onClose(false);
-            }}
-            sx={{
-              borderRadius: 100,
-              py: 1,
-              px: 2,
-              flexShrink: 0
-            }}
-          >
-            {time.title}
-          </Button>
-        ))}
-      </Flex>
-      {referencedNotes &&
-        referencedNotes.status === "fulfilled" &&
-        referencedNotes.value.length > 0 && (
-          <>
-            <Text variant="body">References:</Text>
-            {referencedNotes.value.map((item, index) => (
-              <Note key={item.id} item={item} date={item.dateCreated} compact />
-            ))}
-          </>
-        )}
-    </Dialog>
-  );
-}
+        <Text variant="body">Remind me in:</Text>
+        <Flex
+          sx={{
+            alignItems: "center",
+            my: 1,
+            gap: 1
+          }}
+        >
+          {SNOOZE_TIMES.map((time) => (
+            <Button
+              key={time.id}
+              variant="secondary"
+              onClick={() => {
+                db.reminders.add({
+                  id: reminder.id,
+                  snoozeUntil: Date.now() + time.interval
+                });
+                props.onClose(false);
+              }}
+              sx={{
+                borderRadius: 100,
+                py: 1,
+                px: 2,
+                flexShrink: 0
+              }}
+            >
+              {time.title}
+            </Button>
+          ))}
+        </Flex>
+        {referencedNotes &&
+          referencedNotes.status === "fulfilled" &&
+          referencedNotes.value.length > 0 && (
+            <>
+              <Text variant="body">References:</Text>
+              {referencedNotes.value.map((item, index) => (
+                <Note
+                  key={item.id}
+                  item={item}
+                  date={item.dateCreated}
+                  compact
+                />
+              ))}
+            </>
+          )}
+      </Dialog>
+    );
+  }
+);

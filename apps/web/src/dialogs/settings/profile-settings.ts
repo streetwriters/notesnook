@@ -17,24 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  useStore as useUserStore,
-  store as userstore
-} from "../../stores/user-store";
+import { useStore as useUserStore } from "../../stores/user-store";
 import { SettingsGroup } from "./types";
-import {
-  showAttachmentsDialog,
-  showClearSessionsConfirmation,
-  showEmailChangeDialog,
-  showLoadingDialog,
-  showLogoutConfirmation,
-  showPasswordDialog,
-  showRecoveryKeyDialog
-} from "../../common/dialog-controller";
+import { showPasswordDialog } from "../../dialogs/password-dialog";
 import { db } from "../../common/db";
 import { showToast } from "../../utils/toast";
 import { UserProfile } from "./components/user-profile";
 import { verifyAccount } from "../../common";
+import { EmailChangeDialog } from "../email-change-dialog";
+import {
+  showClearSessionsConfirmation,
+  showLogoutConfirmation
+} from "../confirm";
+import { TaskManager } from "../../common/task-manager";
+import { AttachmentsDialog } from "../attachments-dialog";
+import { RecoveryKeyDialog } from "../recovery-key-dialog";
 
 export const ProfileSettings: SettingsGroup[] = [
   {
@@ -56,7 +53,7 @@ export const ProfileSettings: SettingsGroup[] = [
             type: "button",
             title: "Change email",
             variant: "secondary",
-            action: showEmailChangeDialog
+            action: () => EmailChangeDialog.show({})
           }
         ]
       },
@@ -69,7 +66,7 @@ export const ProfileSettings: SettingsGroup[] = [
             type: "button",
             title: "Open manager",
             variant: "secondary",
-            action: showAttachmentsDialog
+            action: () => AttachmentsDialog.show({})
           }
         ]
       },
@@ -86,7 +83,7 @@ export const ProfileSettings: SettingsGroup[] = [
             title: "Backup your recovery key",
             variant: "secondary",
             action: async () => {
-              if (await verifyAccount()) await showRecoveryKeyDialog();
+              if (await verifyAccount()) await RecoveryKeyDialog.show({});
             }
           }
         ]
@@ -145,7 +142,8 @@ export const ProfileSettings: SettingsGroup[] = [
             title: "Logout",
             action: async () => {
               if (await showLogoutConfirmation()) {
-                await showLoadingDialog({
+                await TaskManager.startTask({
+                  type: "modal",
                   title: "You are being logged out",
                   subtitle: "Please wait...",
                   action: () => db.user.logout(true)

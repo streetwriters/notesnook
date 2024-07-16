@@ -20,14 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SettingsGroup } from "./types";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { createBackup, verifyAccount } from "../../common";
-import {
-  show2FARecoveryCodesDialog,
-  showMultifactorDialog,
-  showPasswordDialog,
-  showRecoveryKeyDialog
-} from "../../common/dialog-controller";
+import { showPasswordDialog } from "../../dialogs/password-dialog";
 import { db } from "../../common/db";
 import { showToast } from "../../utils/toast";
+import { RecoveryCodesDialog } from "../mfa/recovery-code-dialog";
+import { MultifactorDialog } from "../mfa/multi-factor-dialog";
+import { RecoveryKeyDialog } from "../recovery-key-dialog";
 
 export const AuthenticationSettings: SettingsGroup[] = [
   {
@@ -74,7 +72,7 @@ If this process is interrupted, there is a high chance of data corruption so **p
               });
               if (result) {
                 showToast("success", "Account password changed!");
-                await showRecoveryKeyDialog();
+                await RecoveryKeyDialog.show({});
               }
             }
           }
@@ -110,7 +108,7 @@ If this process is interrupted, there is a high chance of data corruption so **p
             title: "Change",
             action: async () => {
               if (await verifyAccount()) {
-                await showMultifactorDialog();
+                await MultifactorDialog.show({});
                 await useUserStore.getState().refreshUser();
               }
             },
@@ -135,9 +133,10 @@ If this process is interrupted, there is a high chance of data corruption so **p
             variant: "secondary",
             action: async () => {
               if (await verifyAccount()) {
-                await showMultifactorDialog(
-                  useUserStore.getState().user?.mfa.primaryMethod || "email"
-                );
+                await MultifactorDialog.show({
+                  primaryMethod:
+                    useUserStore.getState().user?.mfa.primaryMethod || "email"
+                });
                 await useUserStore.getState().refreshUser();
               }
             }
@@ -157,9 +156,10 @@ If this process is interrupted, there is a high chance of data corruption so **p
             variant: "secondary",
             action: async () => {
               if (await verifyAccount()) {
-                await show2FARecoveryCodesDialog(
-                  useUserStore.getState().user?.mfa.primaryMethod || "email"
-                );
+                await RecoveryCodesDialog.show({
+                  primaryMethod:
+                    useUserStore.getState().user?.mfa.primaryMethod || "email"
+                });
                 await useUserStore.getState().refreshUser();
               }
             }

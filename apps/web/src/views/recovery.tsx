@@ -26,11 +26,11 @@ import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { AuthField, SubmitButton } from "./auth";
 import { createBackup, restoreBackupFile, selectBackupFile } from "../common";
-import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { EVENTS } from "@notesnook/core/dist/common";
 import { ErrorText } from "../components/error-text";
 import { User } from "@notesnook/core";
+import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
 
 type RecoveryMethodType = "key" | "backup" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
@@ -537,7 +537,7 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
   const [isReady, setIsReady] = useState(false);
   useEffect(() => {
     async function finalize() {
-      await showRecoveryKeyDialog();
+      await RecoveryKeyDialog.show({});
       if (!isSessionExpired()) {
         await db.user.logout(true, "Password changed.");
         await db.user.clearSessions(true);

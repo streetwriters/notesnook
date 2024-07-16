@@ -20,21 +20,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useState } from "react";
 import { Box, Flex, Text } from "@theme-ui/components";
 import Dialog from "../components/dialog";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
-function ProgressDialog(props) {
-  const [{ current, total, text }, setProgress] = useState({
-    current: 0,
-    total: 1,
+type Progress = {
+  total?: number;
+  current?: number;
+  text: string;
+};
+type ProgressDialogProps<T> = BaseDialogProps<T | Error> & {
+  title: string;
+  subtitle: string;
+  action: (report: (progress: Progress) => void) => T;
+};
+export const ProgressDialog = DialogManager.register(function ProgressDialog<T>(
+  props: ProgressDialogProps<T>
+) {
+  const [{ current = 0, total = 1, text }, setProgress] = useState<Progress>({
     text: ""
   });
 
   useEffect(() => {
     (async function () {
       try {
-        props.onDone(await props.action(setProgress));
+        props.onClose(await props.action(setProgress));
       } catch (e) {
         console.error(e);
-        props.onDone(e);
+        props.onClose(e as Error);
       }
     })();
   }, [props]);
@@ -69,5 +80,4 @@ function ProgressDialog(props) {
       </Flex>
     </Dialog>
   );
-}
-export default ProgressDialog;
+});

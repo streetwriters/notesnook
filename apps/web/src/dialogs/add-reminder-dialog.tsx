@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Perform } from "../common/dialog-controller";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
 import { Box, Button, Flex, Label, Radio, Text } from "@theme-ui/components";
@@ -37,11 +36,11 @@ import { useStore as useThemeStore } from "../stores/theme-store";
 import { getFormattedDate } from "@notesnook/common";
 import { MONTHS_FULL, getTimeFormat } from "@notesnook/core/dist/utils/date";
 import { Note, Reminder } from "@notesnook/core";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
 dayjs.extend(customParseFormat);
 
-export type AddReminderDialogProps = {
-  onClose: Perform;
+export type AddReminderDialogProps = BaseDialogProps<boolean> & {
   reminder?: Reminder;
   note?: Note;
 };
@@ -116,419 +115,425 @@ const recurringModes = [
   }
 ];
 
-export default function AddReminderDialog(props: AddReminderDialogProps) {
-  const { reminder, note } = props;
+export const AddReminderDialog = DialogManager.register(
+  function AddReminderDialog(props: AddReminderDialogProps) {
+    const { reminder, note } = props;
 
-  const [selectedDays, setSelectedDays] = useState<number[]>(
-    reminder?.selectedDays ?? []
-  );
-  const [recurringMode, setRecurringMode] = useState<
-    ValueOf<typeof RecurringModes>
-  >(reminder?.recurringMode ?? RecurringModes.DAY);
-  const [mode, setMode] = useState<ValueOf<typeof Modes>>(
-    reminder?.mode ?? Modes.ONCE
-  );
-  const [priority, setPriority] = usePersistentState<
-    ValueOf<typeof Priorities>
-  >("reminders:default_priority", reminder?.priority ?? Priorities.VIBRATE);
-  const [date, setDate] = useState(dayjs(reminder?.date));
-  const [title, setTitle] = useState<string>(
-    note?.title ?? reminder?.title ?? ""
-  );
-  const [description, setDescription] = useState<string>(
-    note?.headline ?? reminder?.description ?? ""
-  );
-  const [showCalendar, setShowCalendar] = useState(false);
-  const refresh = useStore((state) => state.refresh);
-  const isUserPremium = useIsUserPremium();
-  const theme = useThemeStore((store) => store.colorScheme);
-  const dateInputRef = useRef<HTMLInputElement>(null);
+    const [selectedDays, setSelectedDays] = useState<number[]>(
+      reminder?.selectedDays ?? []
+    );
+    const [recurringMode, setRecurringMode] = useState<
+      ValueOf<typeof RecurringModes>
+    >(reminder?.recurringMode ?? RecurringModes.DAY);
+    const [mode, setMode] = useState<ValueOf<typeof Modes>>(
+      reminder?.mode ?? Modes.ONCE
+    );
+    const [priority, setPriority] = usePersistentState<
+      ValueOf<typeof Priorities>
+    >("reminders:default_priority", reminder?.priority ?? Priorities.VIBRATE);
+    const [date, setDate] = useState(dayjs(reminder?.date));
+    const [title, setTitle] = useState<string>(
+      note?.title ?? reminder?.title ?? ""
+    );
+    const [description, setDescription] = useState<string>(
+      note?.headline ?? reminder?.description ?? ""
+    );
+    const [showCalendar, setShowCalendar] = useState(false);
+    const refresh = useStore((state) => state.refresh);
+    const isUserPremium = useIsUserPremium();
+    const theme = useThemeStore((store) => store.colorScheme);
+    const dateInputRef = useRef<HTMLInputElement>(null);
 
-  const repeatsDaily =
-    (selectedDays.length === 7 && recurringMode === RecurringModes.WEEK) ||
-    (selectedDays.length === 31 && recurringMode === RecurringModes.MONTH) ||
-    recurringMode === RecurringModes.DAY;
+    const repeatsDaily =
+      (selectedDays.length === 7 && recurringMode === RecurringModes.WEEK) ||
+      (selectedDays.length === 31 && recurringMode === RecurringModes.MONTH) ||
+      recurringMode === RecurringModes.DAY;
 
-  return (
-    <Dialog
-      isOpen={true}
-      title={reminder ? "Edit reminder" : "Add a reminder"}
-      testId="add-reminder-dialog"
-      onClose={() => props.onClose(false)}
-      sx={{ fontFamily: "body" }}
-      positiveButton={{
-        text: reminder ? "Save" : "Add",
-        disabled:
-          !title ||
-          (mode !== Modes.ONCE &&
-            recurringMode !== RecurringModes.DAY &&
-            recurringMode !== RecurringModes.YEAR &&
-            !selectedDays.length),
-        onClick: async () => {
-          if (!("Notification" in window))
-            showToast(
-              "warn",
-              "Reminders will not be active on this device as it does not support notifications."
-            );
+    return (
+      <Dialog
+        isOpen={true}
+        title={reminder ? "Edit reminder" : "Add a reminder"}
+        testId="add-reminder-dialog"
+        onClose={() => props.onClose(false)}
+        sx={{ fontFamily: "body" }}
+        positiveButton={{
+          text: reminder ? "Save" : "Add",
+          disabled:
+            !title ||
+            (mode !== Modes.ONCE &&
+              recurringMode !== RecurringModes.DAY &&
+              recurringMode !== RecurringModes.YEAR &&
+              !selectedDays.length),
+          onClick: async () => {
+            if (!("Notification" in window))
+              showToast(
+                "warn",
+                "Reminders will not be active on this device as it does not support notifications."
+              );
 
-          const permissionResult = await Notification.requestPermission();
-          if (!IS_TESTING && permissionResult !== "granted") {
-            showToast(
-              "error",
-              "Please grant notifications permission to add new reminders."
-            );
-            return;
-          }
+            const permissionResult = await Notification.requestPermission();
+            if (!IS_TESTING && permissionResult !== "granted") {
+              showToast(
+                "error",
+                "Please grant notifications permission to add new reminders."
+              );
+              return;
+            }
 
-          if (mode !== Modes.REPEAT && date.isBefore(dayjs())) {
-            showToast(
-              "error",
-              "Reminder time cannot be earlier than the current time."
-            );
-            return;
-          }
+            if (mode !== Modes.REPEAT && date.isBefore(dayjs())) {
+              showToast(
+                "error",
+                "Reminder time cannot be earlier than the current time."
+              );
+              return;
+            }
 
-          const id = await db.reminders.add({
-            id: reminder?.id,
-            recurringMode,
-            mode,
-            priority,
-            selectedDays,
-            date: date.valueOf(),
-            title,
-            description,
-            disabled: false,
-            ...(date.isAfter(dayjs()) ? { snoozeUntil: 0 } : {})
-          });
+            const id = await db.reminders.add({
+              id: reminder?.id,
+              recurringMode,
+              mode,
+              priority,
+              selectedDays,
+              date: date.valueOf(),
+              title,
+              description,
+              disabled: false,
+              ...(date.isAfter(dayjs()) ? { snoozeUntil: 0 } : {})
+            });
 
-          if (id && note) {
-            await db.relations.add(note, { id, type: "reminder" });
-          }
+            if (id && note) {
+              await db.relations.add(note, { id, type: "reminder" });
+            }
 
-          refresh();
-          props.onClose(true);
-        }
-      }}
-      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
-    >
-      <Field
-        id="title"
-        label="Title"
-        required
-        value={title}
-        data-test-id="title-input"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setTitle(e.target.value)
-        }
-      />
-      <Field
-        as="textarea"
-        id="description"
-        label="Description"
-        data-test-id="description-input"
-        helpText="Optional"
-        value={description}
-        styles={{
-          input: {
-            height: 100
+            refresh();
+            props.onClose(true);
           }
         }}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setDescription(e.target.value)
-        }
-      />
-      <Flex sx={{ gap: 2, mt: 2 }}>
-        {modes.map((m) => (
-          <Label
-            key={m.id}
-            variant="text.body"
-            data-test-id={`mode-${m.id}`}
-            sx={{
-              width: "auto",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Radio
-              id="mode"
-              name="mode"
-              defaultChecked={m.id === Modes.ONCE}
-              checked={m.id === mode}
-              disabled={m.premium && !isUserPremium}
-              sx={{ color: m.id === mode ? "accent" : "icon" }}
-              onChange={() => {
-                if (m.premium && !isUserPremium) return;
-                setMode(m.id);
-                setRecurringMode(RecurringModes.DAY);
-                setSelectedDays([]);
-              }}
-            />
-            {m.title}
-            {m.premium && !isUserPremium && (
-              <Pro size={18} color="accent" sx={{ ml: 1 }} />
-            )}
-          </Label>
-        ))}
-      </Flex>
-      {mode === Modes.REPEAT ? (
-        <Flex
-          sx={{
-            mt: 2,
-            bg: "var(--background-secondary)",
-            borderRadius: "default",
-            p: 1,
-            flexDirection: "column"
+        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+      >
+        <Field
+          id="title"
+          label="Title"
+          required
+          value={title}
+          data-test-id="title-input"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setTitle(e.target.value)
+          }
+        />
+        <Field
+          as="textarea"
+          id="description"
+          label="Description"
+          data-test-id="description-input"
+          helpText="Optional"
+          value={description}
+          styles={{
+            input: {
+              height: 100
+            }
           }}
-        >
-          <Flex sx={{ alignItems: "center", gap: 1 }}>
-            {recurringModes.map((mode) => (
-              <Button
-                key={mode.id}
-                variant="secondary"
-                data-test-id={`recurring-mode-${mode.id}`}
-                onClick={() => {
-                  setRecurringMode(mode.id);
-                  setSelectedDays([]);
-                }}
-                sx={{
-                  borderRadius: 100,
-                  py: 1,
-                  px: 2,
-                  flexShrink: 0,
-                  bg:
-                    mode.id === recurringMode
-                      ? "background-selected"
-                      : "transparent",
-                  color:
-                    mode.id === recurringMode
-                      ? "paragraph-selected"
-                      : "paragraph"
-                }}
-              >
-                {mode.title}
-              </Button>
-            ))}
-          </Flex>
-          {recurringModes.map((mode) =>
-            mode.id === recurringMode ? (
-              <Box
-                key={mode.id}
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    mode.id === RecurringModes.WEEK
-                      ? "1fr 1fr 1fr 1fr 1fr 1fr 1fr"
-                      : "1fr 1fr 1fr 1fr 1fr 1fr 1fr",
-                  mt: mode.options.length > 0 ? 1 : 0,
-                  maxHeight: 150,
-                  overflowY: "auto",
-                  gap: 1
-                }}
-              >
-                {mode.options.map((day, i) => (
-                  <Button
-                    key={day}
-                    variant="secondary"
-                    data-test-id={`day-${day}`}
-                    onClick={() => {
-                      setSelectedDays((days) => {
-                        const clone = days.slice();
-                        if (clone.indexOf(day) > -1)
-                          clone.splice(clone.indexOf(day), 1);
-                        else clone.push(day);
-                        return clone;
-                      });
-                    }}
-                    sx={{
-                      borderRadius: "default",
-                      py: 1,
-                      px: 2,
-                      flexShrink: 0,
-                      textAlign: "left",
-                      bg: selectedDays.includes(day)
-                        ? "background-selected"
-                        : "transparent",
-                      color: selectedDays.includes(day)
-                        ? "paragraph-selected"
-                        : "paragraph"
-                    }}
-                  >
-                    {mode.id === "week" ? WEEK_DAYS[i] : day}
-                  </Button>
-                ))}
-              </Box>
-            ) : null
-          )}
-        </Flex>
-      ) : null}
-
-      <Flex sx={{ gap: 2, overflowX: "auto", mt: 2 }}>
-        {mode === Modes.ONCE ? (
-          <>
-            <Field
-              id="date"
-              label="Date"
-              required
-              inputRef={dateInputRef}
-              data-test-id="date-input"
-              helpText={`${db.settings.getDateFormat()}`}
-              action={{
-                icon: Calendar,
-                onClick() {
-                  setShowCalendar(true);
-                }
-              }}
-              validate={(t) =>
-                dayjs(t, db.settings.getDateFormat(), true).isValid()
-              }
-              defaultValue={date.format(db.settings.getDateFormat())}
-              onChange={(e) => setDate((d) => setDateOnly(e.target.value, d))}
-            />
-            <PopupPresenter
-              isOpen={showCalendar}
-              onClose={() => setShowCalendar(false)}
-              position={{
-                isTargetAbsolute: true,
-                target: dateInputRef.current,
-                location: "top"
-              }}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setDescription(e.target.value)
+          }
+        />
+        <Flex sx={{ gap: 2, mt: 2 }}>
+          {modes.map((m) => (
+            <Label
+              key={m.id}
+              variant="text.body"
+              data-test-id={`mode-${m.id}`}
               sx={{
-                ".rdp": {
-                  bg: "background",
-                  p: 1,
-                  boxShadow: `0px 0px 25px 5px ${
-                    theme === "dark" ? "#000000aa" : "#0000004e"
-                  }`,
-                  borderRadius: "dialog",
-                  fontFamily: "body",
-                  "--rdp-accent-color": "var(--accent)",
-                  "--rdp-background-color": "var(--background)",
-                  "--rdp-background-color-dark": "var(--background)",
-                  "--rdp-selected-color": "var(--paragraph-selected)",
-                  color: "paragraph"
-                },
-                ".rdp-caption_label": { fontWeight: "heading" }
+                width: "auto",
+                justifyContent: "center",
+                alignItems: "center"
               }}
             >
-              <DayPicker
-                mode="single"
-                captionLayout="dropdown-buttons"
-                fromYear={new Date().getFullYear()}
-                toYear={new Date().getFullYear() + 99}
-                modifiers={{
-                  disabled: { before: new Date() }
-                }}
-                selected={dayjs(date).toDate()}
-                onSelect={(day) => {
-                  if (!day) return;
-                  const date = getFormattedDate(day, "date");
-                  setDate((d) => setDateOnly(date, d));
-                  if (dateInputRef.current) dateInputRef.current.value = date;
-                }}
-                styles={{
-                  day: {
-                    fontFamily: "inherit",
-                    fontSize: 14
-                  }
+              <Radio
+                id="mode"
+                name="mode"
+                defaultChecked={m.id === Modes.ONCE}
+                checked={m.id === mode}
+                disabled={m.premium && !isUserPremium}
+                sx={{ color: m.id === mode ? "accent" : "icon" }}
+                onChange={() => {
+                  if (m.premium && !isUserPremium) return;
+                  setMode(m.id);
+                  setRecurringMode(RecurringModes.DAY);
+                  setSelectedDays([]);
                 }}
               />
-            </PopupPresenter>
-          </>
-        ) : recurringMode === RecurringModes.YEAR ? (
-          <>
-            <LabeledSelect
-              id="month"
-              label="Month"
-              value={`${dayjs(date).month()}`}
-              options={MONTHS_FULL.map((month, index) => ({
-                value: `${index}`,
-                title: month
-              }))}
-              onSelectionChanged={(month) => {
-                setDate((d) => d.month(parseInt(month)));
-              }}
-            />
-            <LabeledSelect
-              id="day"
-              label="Day"
-              value={`${dayjs(date).date()}`}
-              options={new Array(dayjs(date).daysInMonth())
-                .fill("0")
-                .map((_, day) => ({
-                  value: `${day + 1}`,
-                  title: `${day + 1}`
-                }))}
-              onSelectionChanged={(day) => {
-                setDate((d) => d.date(parseInt(day)));
-              }}
-            />
-          </>
-        ) : null}
-        <Field
-          id="time"
-          label="Time"
-          required
-          data-test-id="time-input"
-          helpText={`${
-            db.settings.getTimeFormat() === "12-hour" ? "hh:mm AM/PM" : "hh:mm"
-          }`}
-          validate={(t) => {
-            const format =
-              db.settings.getTimeFormat() === "12-hour" ? "hh:mm a" : "HH:mm";
-            return dayjs(t.toLowerCase(), format, true).isValid();
-          }}
-          defaultValue={date.format(getTimeFormat(db.settings.getTimeFormat()))}
-          onChange={(e) => setDate((d) => setTimeOnly(e.target.value, d))}
-        />
-      </Flex>
-      <Flex sx={{ gap: 2, mt: 2 }}>
-        {priorities.map((p) => (
-          <Label
-            key={p.id}
-            variant="text.body"
-            data-test-id={`priority-${p.id}`}
+              {m.title}
+              {m.premium && !isUserPremium && (
+                <Pro size={18} color="accent" sx={{ ml: 1 }} />
+              )}
+            </Label>
+          ))}
+        </Flex>
+        {mode === Modes.REPEAT ? (
+          <Flex
             sx={{
-              width: "auto",
-              justifyContent: "center",
-              alignItems: "center"
+              mt: 2,
+              bg: "var(--background-secondary)",
+              borderRadius: "default",
+              p: 1,
+              flexDirection: "column"
             }}
           >
-            <Radio
-              id="priority"
-              name="priority"
-              sx={{ color: p.id === priority ? "accent" : "icon" }}
-              defaultChecked={p.id === Priorities.VIBRATE}
-              checked={p.id === priority}
-              onChange={() => setPriority(p.id)}
-            />
-            {p.title}
-          </Label>
-        ))}
-      </Flex>
+            <Flex sx={{ alignItems: "center", gap: 1 }}>
+              {recurringModes.map((mode) => (
+                <Button
+                  key={mode.id}
+                  variant="secondary"
+                  data-test-id={`recurring-mode-${mode.id}`}
+                  onClick={() => {
+                    setRecurringMode(mode.id);
+                    setSelectedDays([]);
+                  }}
+                  sx={{
+                    borderRadius: 100,
+                    py: 1,
+                    px: 2,
+                    flexShrink: 0,
+                    bg:
+                      mode.id === recurringMode
+                        ? "background-selected"
+                        : "transparent",
+                    color:
+                      mode.id === recurringMode
+                        ? "paragraph-selected"
+                        : "paragraph"
+                  }}
+                >
+                  {mode.title}
+                </Button>
+              ))}
+            </Flex>
+            {recurringModes.map((mode) =>
+              mode.id === recurringMode ? (
+                <Box
+                  key={mode.id}
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      mode.id === RecurringModes.WEEK
+                        ? "1fr 1fr 1fr 1fr 1fr 1fr 1fr"
+                        : "1fr 1fr 1fr 1fr 1fr 1fr 1fr",
+                    mt: mode.options.length > 0 ? 1 : 0,
+                    maxHeight: 150,
+                    overflowY: "auto",
+                    gap: 1
+                  }}
+                >
+                  {mode.options.map((day, i) => (
+                    <Button
+                      key={day}
+                      variant="secondary"
+                      data-test-id={`day-${day}`}
+                      onClick={() => {
+                        setSelectedDays((days) => {
+                          const clone = days.slice();
+                          if (clone.indexOf(day) > -1)
+                            clone.splice(clone.indexOf(day), 1);
+                          else clone.push(day);
+                          return clone;
+                        });
+                      }}
+                      sx={{
+                        borderRadius: "default",
+                        py: 1,
+                        px: 2,
+                        flexShrink: 0,
+                        textAlign: "left",
+                        bg: selectedDays.includes(day)
+                          ? "background-selected"
+                          : "transparent",
+                        color: selectedDays.includes(day)
+                          ? "paragraph-selected"
+                          : "paragraph"
+                      }}
+                    >
+                      {mode.id === "week" ? WEEK_DAYS[i] : day}
+                    </Button>
+                  ))}
+                </Box>
+              ) : null
+            )}
+          </Flex>
+        ) : null}
 
-      {mode === Modes.REPEAT ? (
-        <Text variant="subBody" sx={{ mt: 1 }}>
-          {selectedDays.length === 0 && recurringMode !== RecurringModes.DAY
-            ? recurringMode === RecurringModes.WEEK
-              ? "Select day of the week to repeat the reminder."
-              : "Select nth day(s) of the month to repeat the reminder."
-            : repeatsDaily
-            ? `Repeats daily at ${date.format(timeFormat())}.`
-            : `Repeats every ${recurringMode} on ${getSelectedDaysText(
-                selectedDays,
-                recurringMode
-              )} at ${date.format(timeFormat())}.`}
-        </Text>
-      ) : (
-        <Text variant="subBody" sx={{ mt: 1 }}>
-          {`The reminder will start on ${date} at ${date.format(
-            timeFormat()
-          )}.`}
-        </Text>
-      )}
-    </Dialog>
-  );
-}
+        <Flex sx={{ gap: 2, overflowX: "auto", mt: 2 }}>
+          {mode === Modes.ONCE ? (
+            <>
+              <Field
+                id="date"
+                label="Date"
+                required
+                inputRef={dateInputRef}
+                data-test-id="date-input"
+                helpText={`${db.settings.getDateFormat()}`}
+                action={{
+                  icon: Calendar,
+                  onClick() {
+                    setShowCalendar(true);
+                  }
+                }}
+                validate={(t) =>
+                  dayjs(t, db.settings.getDateFormat(), true).isValid()
+                }
+                defaultValue={date.format(db.settings.getDateFormat())}
+                onChange={(e) => setDate((d) => setDateOnly(e.target.value, d))}
+              />
+              <PopupPresenter
+                isOpen={showCalendar}
+                onClose={() => setShowCalendar(false)}
+                position={{
+                  isTargetAbsolute: true,
+                  target: dateInputRef.current,
+                  location: "top"
+                }}
+                sx={{
+                  ".rdp": {
+                    bg: "background",
+                    p: 1,
+                    boxShadow: `0px 0px 25px 5px ${
+                      theme === "dark" ? "#000000aa" : "#0000004e"
+                    }`,
+                    borderRadius: "dialog",
+                    fontFamily: "body",
+                    "--rdp-accent-color": "var(--accent)",
+                    "--rdp-background-color": "var(--background)",
+                    "--rdp-background-color-dark": "var(--background)",
+                    "--rdp-selected-color": "var(--paragraph-selected)",
+                    color: "paragraph"
+                  },
+                  ".rdp-caption_label": { fontWeight: "heading" }
+                }}
+              >
+                <DayPicker
+                  mode="single"
+                  captionLayout="dropdown-buttons"
+                  fromYear={new Date().getFullYear()}
+                  toYear={new Date().getFullYear() + 99}
+                  modifiers={{
+                    disabled: { before: new Date() }
+                  }}
+                  selected={dayjs(date).toDate()}
+                  onSelect={(day) => {
+                    if (!day) return;
+                    const date = getFormattedDate(day, "date");
+                    setDate((d) => setDateOnly(date, d));
+                    if (dateInputRef.current) dateInputRef.current.value = date;
+                  }}
+                  styles={{
+                    day: {
+                      fontFamily: "inherit",
+                      fontSize: 14
+                    }
+                  }}
+                />
+              </PopupPresenter>
+            </>
+          ) : recurringMode === RecurringModes.YEAR ? (
+            <>
+              <LabeledSelect
+                id="month"
+                label="Month"
+                value={`${dayjs(date).month()}`}
+                options={MONTHS_FULL.map((month, index) => ({
+                  value: `${index}`,
+                  title: month
+                }))}
+                onSelectionChanged={(month) => {
+                  setDate((d) => d.month(parseInt(month)));
+                }}
+              />
+              <LabeledSelect
+                id="day"
+                label="Day"
+                value={`${dayjs(date).date()}`}
+                options={new Array(dayjs(date).daysInMonth())
+                  .fill("0")
+                  .map((_, day) => ({
+                    value: `${day + 1}`,
+                    title: `${day + 1}`
+                  }))}
+                onSelectionChanged={(day) => {
+                  setDate((d) => d.date(parseInt(day)));
+                }}
+              />
+            </>
+          ) : null}
+          <Field
+            id="time"
+            label="Time"
+            required
+            data-test-id="time-input"
+            helpText={`${
+              db.settings.getTimeFormat() === "12-hour"
+                ? "hh:mm AM/PM"
+                : "hh:mm"
+            }`}
+            validate={(t) => {
+              const format =
+                db.settings.getTimeFormat() === "12-hour" ? "hh:mm a" : "HH:mm";
+              return dayjs(t.toLowerCase(), format, true).isValid();
+            }}
+            defaultValue={date.format(
+              getTimeFormat(db.settings.getTimeFormat())
+            )}
+            onChange={(e) => setDate((d) => setTimeOnly(e.target.value, d))}
+          />
+        </Flex>
+        <Flex sx={{ gap: 2, mt: 2 }}>
+          {priorities.map((p) => (
+            <Label
+              key={p.id}
+              variant="text.body"
+              data-test-id={`priority-${p.id}`}
+              sx={{
+                width: "auto",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Radio
+                id="priority"
+                name="priority"
+                sx={{ color: p.id === priority ? "accent" : "icon" }}
+                defaultChecked={p.id === Priorities.VIBRATE}
+                checked={p.id === priority}
+                onChange={() => setPriority(p.id)}
+              />
+              {p.title}
+            </Label>
+          ))}
+        </Flex>
+
+        {mode === Modes.REPEAT ? (
+          <Text variant="subBody" sx={{ mt: 1 }}>
+            {selectedDays.length === 0 && recurringMode !== RecurringModes.DAY
+              ? recurringMode === RecurringModes.WEEK
+                ? "Select day of the week to repeat the reminder."
+                : "Select nth day(s) of the month to repeat the reminder."
+              : repeatsDaily
+              ? `Repeats daily at ${date.format(timeFormat())}.`
+              : `Repeats every ${recurringMode} on ${getSelectedDaysText(
+                  selectedDays,
+                  recurringMode
+                )} at ${date.format(timeFormat())}.`}
+          </Text>
+        ) : (
+          <Text variant="subBody" sx={{ mt: 1 }}>
+            {`The reminder will start on ${date} at ${date.format(
+              timeFormat()
+            )}.`}
+          </Text>
+        )}
+      </Dialog>
+    );
+  }
+);
 
 function setTimeOnly(str: string, date: dayjs.Dayjs) {
   const value = dayjs(str, timeFormat(), true);
@@ -619,3 +624,12 @@ function LabeledSelect(props: LabeledSelectProps) {
     </Label>
   );
 }
+
+type EditReminderDialogProps = { reminderId: string };
+export const EditReminderDialog = {
+  show: async (props: EditReminderDialogProps) => {
+    const reminder = await db.reminders.reminder(props.reminderId);
+    if (!reminder) return;
+    return AddReminderDialog.show({ reminder });
+  }
+};

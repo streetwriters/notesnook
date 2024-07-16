@@ -38,10 +38,6 @@ import {
   Reupload,
   Uploading
 } from "../icons";
-import {
-  closeOpenedDialog,
-  showPromptDialog
-} from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/attachment-store";
 import { db } from "../../common/db";
 import { saveAttachment } from "../../common/attachments";
@@ -59,6 +55,8 @@ import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Attachment as AttachmentType } from "@notesnook/core";
 import { useEditorStore } from "../../stores/editor-store";
+import { PromptDialog } from "../../dialogs/prompt";
+import { DialogManager } from "../../common/dialog-manager";
 
 const FILE_ICONS: Record<string, Icon> = {
   "image/": FileImage,
@@ -259,7 +257,7 @@ const AttachmentMenuItems: (
                   title: note.title,
                   onClick: () => {
                     useEditorStore.getState().openSession(note.id);
-                    closeOpenedDialog();
+                    DialogManager.closeAll();
                   }
                 });
               }
@@ -291,7 +289,7 @@ const AttachmentMenuItems: (
       title: "Rename",
       icon: Rename.path,
       onClick: async () => {
-        const newName = await showPromptDialog({
+        const newName = await PromptDialog.show({
           title: "Rename attachment",
           description: attachment.filename,
           defaultValue: attachment.filename

@@ -18,19 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef } from "react";
-import { Perform } from "../common/dialog-controller";
 import Field from "../components/field";
 import Dialog from "../components/dialog";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
-export type PromptDialogProps = {
-  onClose: Perform;
+export type PromptDialogProps = BaseDialogProps<false | string> & {
   title: string;
-  onSave: (text: string) => void;
   description?: string;
   defaultValue?: string;
 };
 
-export default function Prompt(props: PromptDialogProps) {
+export const PromptDialog = DialogManager.register(function PromptDialog(
+  props: PromptDialogProps
+) {
   const inputRef = useRef<HTMLInputElement>(null);
   return (
     <Dialog
@@ -40,7 +40,7 @@ export default function Prompt(props: PromptDialogProps) {
       onClose={() => props.onClose(false)}
       positiveButton={{
         text: "Done",
-        onClick: () => props.onSave(inputRef.current?.value || "")
+        onClick: () => props.onClose(inputRef.current?.value || "")
       }}
       negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
     >
@@ -49,9 +49,9 @@ export default function Prompt(props: PromptDialogProps) {
         defaultValue={props.defaultValue}
         autoFocus
         onKeyUp={(e) => {
-          if (e.key == "Enter") props.onSave(inputRef.current?.value || "");
+          if (e.key == "Enter") props.onClose(inputRef.current?.value || "");
         }}
       />
     </Dialog>
   );
-}
+});

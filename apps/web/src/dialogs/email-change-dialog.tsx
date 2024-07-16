@@ -20,162 +20,162 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex, Text } from "@theme-ui/components";
 import { useCallback, useRef, useState } from "react";
 import { db } from "../common/db";
-import { Perform } from "../common/dialog-controller";
 import { useTimer } from "../hooks/use-timer";
 import Field from "../components/field";
 import { Loading } from "../components/icons";
 import Dialog from "../components/dialog";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
 type EmailChangeState = {
   newEmail: string;
   password: string;
 };
-export type EmailChangeDialogProps = {
-  onClose: Perform;
-};
+export type EmailChangeDialogProps = BaseDialogProps<boolean>;
+export const EmailChangeDialog = DialogManager.register(
+  function EmailChangeDialog(props: EmailChangeDialogProps) {
+    const [error, setError] = useState<string>();
+    const [isLoading, setIsLoading] = useState(false);
+    const [emailChangeState, setEmailChangeState] =
+      useState<EmailChangeState>();
+    const [isSending, setIsSending] = useState(false);
+    const { elapsed, enabled, setEnabled } = useTimer(`email_change_code`, 60);
 
-export default function EmailChangeDialog(props: EmailChangeDialogProps) {
-  const [error, setError] = useState<string>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [emailChangeState, setEmailChangeState] = useState<EmailChangeState>();
-  const [isSending, setIsSending] = useState(false);
-  const { elapsed, enabled, setEnabled } = useTimer(`email_change_code`, 60);
+    const emailRef = useRef<HTMLInputElement>(null);
+    const passwordRef = useRef<HTMLInputElement>(null);
+    const codeRef = useRef<HTMLInputElement>(null);
 
-  const emailRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
-  const codeRef = useRef<HTMLInputElement>(null);
+    const sendCode = useCallback(
+      async (emailChangeState: EmailChangeState) => {
+        setIsSending(true);
+        try {
+          await db.user.sendVerificationEmail(emailChangeState.newEmail);
 
-  const sendCode = useCallback(
-    async (emailChangeState: EmailChangeState) => {
-      setIsSending(true);
-      try {
-        await db.user.sendVerificationEmail(emailChangeState.newEmail);
+          setEnabled(false);
+        } catch (e) {
+          const error = e as Error;
+          setError(error.message);
+        } finally {
+          setIsSending(false);
+        }
+      },
+      [setEnabled]
+    );
 
-        setEnabled(false);
-      } catch (e) {
-        const error = e as Error;
-        setError(error.message);
-      } finally {
-        setIsSending(false);
-      }
-    },
-    [setEnabled]
-  );
+    return (
+      <Dialog
+        isOpen={true}
+        title={"Change account email"}
+        description={
+          "Your account email will be changed without affecting your subscription or any other settings."
+        }
+        onClose={() => props.onClose(false)}
+        positiveButton={{
+          text: "Next",
+          disabled: isLoading,
+          loading: isLoading,
+          form: "changeEmailForm"
+        }}
+        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+      >
+        <Flex
+          id="changeEmailForm"
+          as="form"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            try {
+              setIsLoading(true);
+              setError(undefined);
 
-  return (
-    <Dialog
-      isOpen={true}
-      title={"Change account email"}
-      description={
-        "Your account email will be changed without affecting your subscription or any other settings."
-      }
-      onClose={() => props.onClose(false)}
-      positiveButton={{
-        text: "Next",
-        disabled: isLoading,
-        loading: isLoading,
-        form: "changeEmailForm"
-      }}
-      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
-    >
-      <Flex
-        id="changeEmailForm"
-        as="form"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          try {
-            setIsLoading(true);
-            setError(undefined);
+              const formData = new FormData(e.target as HTMLFormElement);
+              const { password, newEmail, code } = Object.fromEntries(
+                formData.entries() as IterableIterator<[string, string]>
+              );
 
-            const formData = new FormData(e.target as HTMLFormElement);
-            const { password, newEmail, code } = Object.fromEntries(
-              formData.entries() as IterableIterator<[string, string]>
-            );
+              if (emailChangeState) {
+                if (!code || code.length < 6) {
+                  setError("Please enter a valid verification code.");
+                  return;
+                }
 
-            if (emailChangeState) {
-              if (!code || code.length < 6) {
-                setError("Please enter a valid verification code.");
+                await db.user.changeEmail(
+                  emailChangeState.newEmail,
+                  emailChangeState.password,
+                  code
+                );
+                props.onClose(true);
                 return;
               }
 
-              await db.user.changeEmail(
-                emailChangeState.newEmail,
-                emailChangeState.password,
-                code
-              );
-              props.onClose(true);
-              return;
-            }
+              if (!newEmail.trim() || !password.trim()) return;
 
-            if (!newEmail.trim() || !password.trim()) return;
-
-            if (!password || !(await db.user.verifyPassword(password))) {
-              setError("Password is not correct.");
-              return;
-            }
-
-            await db.user.sendVerificationEmail(newEmail);
-            setEmailChangeState({ newEmail, password });
-          } catch (e) {
-            if (e instanceof Error) setError(e.message);
-          } finally {
-            setIsLoading(false);
-          }
-        }}
-        sx={{ flexDirection: "column" }}
-      >
-        {emailChangeState ? (
-          <Field
-            inputRef={codeRef}
-            id="code"
-            name="code"
-            label="6-digit code"
-            helpText={`Enter 6-digit code sent to ${emailChangeState.newEmail}`}
-            type="text"
-            required
-            action={{
-              disabled: isSending || !enabled,
-              component: (
-                <Text variant={"body"}>
-                  {isSending ? (
-                    <Loading size={18} />
-                  ) : enabled ? (
-                    `Resend code`
-                  ) : (
-                    `Resend in ${elapsed}`
-                  )}
-                </Text>
-              ),
-              onClick: async () => {
-                await sendCode(emailChangeState);
+              if (!password || !(await db.user.verifyPassword(password))) {
+                setError("Password is not correct.");
+                return;
               }
-            }}
-          />
-        ) : (
-          <>
+
+              await db.user.sendVerificationEmail(newEmail);
+              setEmailChangeState({ newEmail, password });
+            } catch (e) {
+              if (e instanceof Error) setError(e.message);
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+          sx={{ flexDirection: "column" }}
+        >
+          {emailChangeState ? (
             <Field
-              inputRef={emailRef}
-              id="newEmail"
-              name="newEmail"
-              label="New email"
-              type="email"
+              inputRef={codeRef}
+              id="code"
+              name="code"
+              label="6-digit code"
+              helpText={`Enter 6-digit code sent to ${emailChangeState.newEmail}`}
+              type="text"
               required
+              action={{
+                disabled: isSending || !enabled,
+                component: (
+                  <Text variant={"body"}>
+                    {isSending ? (
+                      <Loading size={18} />
+                    ) : enabled ? (
+                      `Resend code`
+                    ) : (
+                      `Resend in ${elapsed}`
+                    )}
+                  </Text>
+                ),
+                onClick: async () => {
+                  await sendCode(emailChangeState);
+                }
+              }}
             />
-            <Field
-              inputRef={passwordRef}
-              id="password"
-              name="password"
-              label="Your account password"
-              type="password"
-              required
-            />
-            <Text variant="subBody" sx={{ mt: 1 }}>
-              You will be logged out from all your other devices.
-            </Text>
-          </>
-        )}
-        {error && <Text variant="error">{error}</Text>}
-      </Flex>
-    </Dialog>
-  );
-}
+          ) : (
+            <>
+              <Field
+                inputRef={emailRef}
+                id="newEmail"
+                name="newEmail"
+                label="New email"
+                type="email"
+                required
+              />
+              <Field
+                inputRef={passwordRef}
+                id="password"
+                name="password"
+                label="Your account password"
+                type="password"
+                required
+              />
+              <Text variant="subBody" sx={{ mt: 1 }}>
+                You will be logged out from all your other devices.
+              </Text>
+            </>
+          )}
+          {error && <Text variant="error">{error}</Text>}
+        </Flex>
+      </Dialog>
+    );
+  }
+);

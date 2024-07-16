@@ -17,12 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  showBackupPasswordDialog,
-  showFeatureDialog,
-  showPasswordDialog,
-  showReminderDialog
-} from "./dialog-controller";
 import Config from "../utils/config";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
@@ -38,12 +32,15 @@ import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core/dist/common";
 import { createWritableStream } from "./desktop-bridge";
 import { createZipStream } from "../utils/streams/zip-stream";
-import { FeatureKeys } from "../dialogs/feature-dialog";
+import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
 import { ZipEntry, createUnzipIterator } from "../utils/streams/unzip-stream";
 import { User } from "@notesnook/core";
 import { LegacyBackupFile } from "@notesnook/core";
 import { useEditorStore } from "../stores/editor-store";
 import { formatDate } from "@notesnook/core/dist/utils/date";
+import { showPasswordDialog } from "../dialogs/password-dialog";
+import { BackupPasswordDialog } from "../dialogs/backup-password-dialog";
+import { ReminderDialog } from "../dialogs/reminder-dialog";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -70,7 +67,7 @@ export async function introduceFeatures() {
   const features: FeatureKeys[] = [];
   for (const feature of features) {
     if (!Config.get(`feature:${feature}`)) {
-      await showFeatureDialog(feature);
+      await FeatureDialog.show({ featureName: feature });
     }
   }
 }
@@ -173,10 +170,12 @@ export async function restoreBackupFile(backupFile: File) {
     const backup = JSON.parse(await readFile(backupFile));
 
     if (backup.data.iv && backup.data.salt) {
-      await showBackupPasswordDialog(async ({ password, key }) => {
-        if (!password && !key) return false;
-        const error = await restoreWithProgress(backup, password, key);
-        return !error;
+      await BackupPasswordDialog.show({
+        validate: async ({ password, key }) => {
+          if (!password && !key) return false;
+          const error = await restoreWithProgress(backup, password, key);
+          return !error;
+        }
       });
     } else {
       await restoreWithProgress(backup);
@@ -212,15 +211,15 @@ export async function restoreBackupFile(backupFile: File) {
             const backup = JSON.parse(await entry.text());
             if (backup.encrypted) {
               if (!cachedPassword && !cachedKey) {
-                const result = await showBackupPasswordDialog(
-                  async ({ password, key }) => {
+                const result = await BackupPasswordDialog.show({
+                  validate: async ({ password, key }) => {
                     if (!password && !key) return false;
                     await db.backup?.import(backup, password, key);
                     cachedPassword = password;
                     cachedKey = key;
                     return true;
                   }
-                );
+                });
                 if (!result) break;
               } else await db.backup?.import(backup, cachedPassword, cachedKey);
             } else {
@@ -318,9 +317,9 @@ export async function showUpgradeReminderDialogs() {
   const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
   const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
   if (isBasic && consumed >= 100) {
-    await showReminderDialog("trialexpired");
+    await ReminderDialog.show({ reminderKey: "trialexpired" });
   } else if (isTrial && consumed >= 75) {
-    await showReminderDialog("trialexpiring");
+    await ReminderDialog.show({ reminderKey: "trialexpiring" });
   }
 }
 

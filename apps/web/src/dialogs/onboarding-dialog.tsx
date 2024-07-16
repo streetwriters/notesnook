@@ -39,7 +39,6 @@ import AppleStore from "../assets/apple.png";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { Checkbox, Label } from "@theme-ui/components";
 import { Features } from "../components/announcements/body";
-import { showBuyDialog } from "../common/dialog-controller";
 import { TaskManager } from "../common/task-manager";
 import { db } from "../common/db";
 import { usePersistentState } from "../hooks/use-persistent-state";
@@ -47,8 +46,20 @@ import { useCallback, useState } from "react";
 import Config from "../utils/config";
 import { isMacStoreApp } from "../utils/platform";
 import { ErrorText } from "../components/error-text";
+import { BuyDialog } from "./buy-dialog";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
-const newUserSteps = [
+type Step = {
+  title: string;
+  subtitle: string;
+  buttonText?: string;
+  image?: JSX.Element;
+  component?:
+    | (() => JSX.Element)
+    | ((props: { onNext: () => void }) => JSX.Element)
+    | ((props: { onClose: () => void }) => JSX.Element);
+};
+const newUserSteps: Step[] = [
   {
     title: "Safe & encrypted notes",
     subtitle: "Write with freedom. Never compromise on privacy again.",
@@ -86,7 +97,7 @@ const newUserSteps = [
   }
 ];
 
-const proUserSteps = [
+const proUserSteps: Step[] = [
   {
     title: "Welcome to Notesnook Pro",
     subtitle: "Thank you. You are the proof that privacy always comes first.",
@@ -112,7 +123,7 @@ const proUserSteps = [
   }
 ];
 
-const trialUserSteps = [
+const trialUserSteps: Step[] = [
   {
     title: "Congratulations!",
     subtitle: "You 14-day free trial has been activated.",
@@ -125,93 +136,111 @@ const onboarding = {
   new: newUserSteps,
   pro: proUserSteps,
   trial: trialUserSteps
-};
+} as const;
 
-export function interruptedOnboarding() {
-  for (let key in onboarding) {
+export function interruptedOnboarding(): keyof typeof onboarding | undefined {
+  for (const key in onboarding) {
     const index = Config.get(key, undefined);
     if (index === null || index === undefined) continue;
-    if (index >= 0 && index < onboarding[key].length - 1) return key;
+    if (
+      index >= 0 &&
+      index < onboarding[key as keyof typeof onboarding].length - 1
+    )
+      return key as keyof typeof onboarding;
   }
 }
 
-function OnboardingDialog({ onClose: _onClose, type }) {
-  const [step, setStep] = usePersistentState(type, 0);
-  const steps = onboarding[type];
+type OnboardingDialogProps = BaseDialogProps<boolean> & {
+  type: keyof typeof onboarding;
+};
+export const OnboardingDialog = DialogManager.register(
+  function OnboardingDialog({
+    onClose: _onClose,
+    type
+  }: OnboardingDialogProps) {
+    const [step, setStep] = usePersistentState(type, 0);
+    console.log("STEPS", type);
+    const steps = onboarding[type];
 
-  const onClose = useCallback(() => {
-    Config.set(type, steps.length);
-    _onClose();
-  }, [_onClose, type, steps]);
+    const onClose = useCallback(
+      (result: boolean) => {
+        Config.set(type, steps.length);
+        _onClose(result);
+      },
+      [_onClose, type, steps]
+    );
 
-  const onNext = useCallback(() => {
-    if (step === steps.length - 1) onClose();
-    else setStep((s) => ++s);
-  }, [onClose, setStep, step, steps.length]);
+    const onNext = useCallback(() => {
+      if (step === steps.length - 1) onClose(true);
+      else setStep((s) => ++s);
+    }, [onClose, setStep, step, steps.length]);
 
-  if (!steps || !steps[step] || !type) {
-    onClose();
-    return null;
-  }
+    if (!steps || !steps[step] || !type) {
+      onClose(false);
+      return null;
+    }
 
-  const {
-    title,
-    subtitle,
-    image,
-    component: Component,
-    buttonText
-  } = steps[step];
+    const {
+      title,
+      subtitle,
+      image,
+      component: Component,
+      buttonText
+    } = steps[step];
 
-  return (
-    <Dialog isOpen={true} width={500}>
-      <Flex
-        sx={{
-          flexDirection: "column",
-          alignItems: "center",
-          overflowY: "auto"
-        }}
-      >
-        {image}
-        <Text variant={"heading"} mt={2}>
-          {title}
-        </Text>
-        <Text
-          variant={"body"}
+    return (
+      <Dialog isOpen={true} width={500}>
+        <Flex
           sx={{
-            textAlign: "center",
-            maxWidth: "70%",
-            color: "var(--paragraph-secondary)"
+            flexDirection: "column",
+            alignItems: "center",
+            overflowY: "auto"
           }}
         >
-          {subtitle}
-        </Text>
-        {Component && <Component onClose={onClose} onNext={onNext} />}
-        {buttonText && (
-          <Button
-            variant="accent"
-            sx={{ borderRadius: 50, px: 30, mb: 4, mt: Component ? 0 : 4 }}
-            onClick={onNext}
+          {image}
+          <Text variant={"heading"} mt={2}>
+            {title}
+          </Text>
+          <Text
+            variant={"body"}
+            sx={{
+              textAlign: "center",
+              maxWidth: "70%",
+              color: "var(--paragraph-secondary)"
+            }}
           >
-            {buttonText}
-          </Button>
-        )}
-      </Flex>
-    </Dialog>
-  );
-}
-export default OnboardingDialog;
+            {subtitle}
+          </Text>
+          {Component && (
+            <Component onClose={() => onClose(true)} onNext={onNext} />
+          )}
+          {buttonText && (
+            <Button
+              variant="accent"
+              sx={{ borderRadius: 50, px: 30, mb: 4, mt: Component ? 0 : 4 }}
+              onClick={onNext}
+            >
+              {buttonText}
+            </Button>
+          )}
+        </Flex>
+      </Dialog>
+    );
+  }
+);
 
-function JoinCause({ onNext }) {
+function JoinCause({ onNext }: { onNext: () => void }) {
   return (
     <Flex mb={4} sx={{ flexDirection: "column" }}>
       <Button
         as="a"
-        href="https://discord.com/invite/zQBK97EE22"
-        target="_blank"
         mt={4}
         variant="accent"
         sx={{ borderRadius: 50, alignSelf: "center", px: 30 }}
-        onClick={() => onNext()}
+        onClick={() => {
+          window.open("https://go.notesnook.com/discord", "_blank");
+          onNext();
+        }}
       >
         Join the community
       </Button>
@@ -235,7 +264,7 @@ const importers = [
   { title: "Google Keep" },
   { title: "Standard Notes" }
 ];
-function Importer({ onClose }) {
+function Importer({ onClose }: { onClose: () => void }) {
   return (
     <Flex my={4} sx={{ flexDirection: "column" }}>
       <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 1 }}>
@@ -260,12 +289,13 @@ function Importer({ onClose }) {
       </Box>
       <Button
         as="a"
-        href="https://importer.notesnook.com/"
-        target="_blank"
         mt={4}
         variant="accent"
         sx={{ borderRadius: 50, alignSelf: "center", px: 30 }}
-        onClick={() => onClose()}
+        onClick={() => {
+          window.open("https://importer.notesnook.com/", "_blank");
+          onClose();
+        }}
       >
         Start importing now
       </Button>
@@ -315,7 +345,6 @@ function Support() {
         <Button
           key={channel.key}
           as="a"
-          href={channel.url}
           variant={"icon"}
           sx={{
             display: "flex",
@@ -323,6 +352,7 @@ function Support() {
             borderRadius: "default",
             alignItems: "center"
           }}
+          onClick={() => window.open(channel.url)}
         >
           <channel.icon size={16} />
           <Text variant={"body"} ml={1}>
@@ -335,8 +365,8 @@ function Support() {
 }
 
 const themes = [
-  { key: "light", name: "Light", image: LightUI },
-  { key: "dark", name: "Dark", image: DarkUI }
+  { key: "light" as const, name: "Light", image: LightUI },
+  { key: "dark" as const, name: "Dark", image: DarkUI }
 ];
 
 function ThemeSelector() {
@@ -436,9 +466,9 @@ function CrossPlatform() {
   );
 }
 
-function TrialOffer({ onClose }) {
-  const [error, setError] = useState();
-  const [loading, setLoading] = useState();
+function TrialOffer({ onClose }: { onClose: () => void }) {
+  const [error, setError] = useState<string>();
+  const [loading, setLoading] = useState<boolean>();
   return (
     <Flex
       my={4}
@@ -469,7 +499,7 @@ function TrialOffer({ onClose }) {
           sx={{ borderRadius: 50, alignSelf: "center", mr: 2, width: "40%" }}
           onClick={() => {
             onClose();
-            showBuyDialog("monthly", "TRIAL2PRO");
+            BuyDialog.show({ plan: "monthly", couponCode: "TRIAL2PRO" });
           }}
         >
           Upgrade now
@@ -493,7 +523,9 @@ function TrialOffer({ onClose }) {
               if (result) onClose();
             } catch (e) {
               setError(
-                `Could not activate trial. Please try again. Error: ${e.message}`
+                `Could not activate trial. Please try again. Error: ${
+                  (e as Error).message
+                }`
               );
             } finally {
               setLoading(false);

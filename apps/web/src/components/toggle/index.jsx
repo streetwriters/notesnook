@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useState } from "react";
-import { showBuyDialog } from "../../common/dialog-controller";
 import Tip from "../tip";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { Flex, Switch } from "@theme-ui/components";
 import { Loading } from "../icons";
+import { BuyDialog } from "../../dialogs/buy-dialog/buy-dialog";
 
 function Toggle(props) {
   const {
@@ -46,7 +46,7 @@ function Toggle(props) {
         setIsLoading(false);
       }
     } else {
-      await showBuyDialog();
+      await BuyDialog.show({});
     }
   }, [onToggled, premium, isToggled]);
 
