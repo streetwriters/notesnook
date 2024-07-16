@@ -152,8 +152,15 @@ export class Relations implements ICollection {
     await this.collection.softDelete(ids);
   }
 
-  unlink(from: ItemReference, to: ItemReference) {
-    return this.remove(generateId(from, to));
+  async unlink(from: ItemReference, to: ItemReference) {
+    await this.remove(generateId(from, to));
+    this.db.eventManager.publish(EVENTS.databaseUpdated, <UnlinkEvent>{
+      collection: "relations",
+      type: "unlink",
+      reference: to,
+      direction: "from",
+      types: [from.type]
+    });
   }
 
   async unlinkOfType(type: keyof RelatableTable, ids?: string[]) {
