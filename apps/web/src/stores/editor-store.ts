@@ -291,7 +291,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
     db.eventManager.subscribe(
       EVENTS.databaseUpdated,
-      (event: DatabaseUpdatedEvent) => {
+      async (event: DatabaseUpdatedEvent) => {
         const { sessions, openSession, closeSessions, updateSession } =
           this.get();
         const clearIds: string[] = [];
@@ -380,37 +380,71 @@ class EditorStore extends BaseStore<EditorStore> {
             });
           } else if (
             event.type === "unlink" &&
-            event.reference.type === "color" &&
-            event.types.includes("note")
-          ) {
-            for (const session of sessions) {
-              if (!("color" in session) || !session.color) continue;
-              const hasSameColor =
-                "id" in event.reference
-                  ? session.color === event.reference.id
-                  : event.reference.ids.includes(session.color);
-              if (!hasSameColor) continue;
-              updateSession(session.id, undefined, {
-                color: undefined
-              });
-            }
-          } else if (
-            event.type === "unlink" &&
-            event.reference.type === "note" &&
-            event.types.includes("color")
+            ((event.reference.type === "color" &&
+              event.types.includes("note")) ||
+              (event.reference.type === "note" &&
+                event.types.includes("color")))
           ) {
             for (const session of sessions) {
               const ids =
                 "id" in event.reference
                   ? [event.reference.id]
                   : event.reference.ids;
+              if (!("color" in session) || !session.color) continue;
               if (
-                session.type === "new" ||
-                (!ids.includes(session.id) && !ids.includes(session.note.id))
+                !ids.includes(session.id) &&
+                !ids.includes(session.note.id) &&
+                !ids.includes(session.color)
               )
                 continue;
               updateSession(session.id, undefined, {
                 color: undefined
+              });
+            }
+          } else if (
+            event.type === "unlink" &&
+            ((event.reference.type === "tag" && event.types.includes("note")) ||
+              (event.reference.type === "note" && event.types.includes("tag")))
+          ) {
+            for (const session of sessions) {
+              const ids =
+                "id" in event.reference
+                  ? [event.reference.id]
+                  : event.reference.ids;
+              if (!("tags" in session) || !session.tags) continue;
+              if (
+                !ids.includes(session.id) &&
+                !ids.includes(session.note.id) &&
+                session.tags.every((t) => !ids.includes(t.id))
+              )
+                continue;
+
+              updateSession(session.id, undefined, {
+                tags: await getTags(session.note.id)
+              });
+            }
+          } else if (
+            event.type === "upsert" &&
+            event.item.toId &&
+            event.item.fromId &&
+            event.item.fromType === "tag" &&
+            event.item.toType === "note"
+          ) {
+            updateSession(event.item.toId, undefined, {
+              tags: await getTags(event.item.toId)
+            });
+          }
+        } else if (event.collection === "tags") {
+          if (event.type === "update") {
+            for (const session of sessions) {
+              if (
+                !("tags" in session) ||
+                session.tags?.every((t) => !event.ids.includes(t.id))
+              )
+                continue;
+              console.log("UDPATE");
+              updateSession(session.id, undefined, {
+                tags: await getTags(session.note.id)
               });
             }
           }
@@ -436,21 +470,6 @@ class EditorStore extends BaseStore<EditorStore> {
       else openSession(activeSessionId);
     }
   };
-
-  refreshTags = async () => {
-    const { updateSession, getActiveSession } = this.get();
-    const session = getActiveSession();
-    if (!session || !("note" in session)) return;
-    const tags = await db.relations
-      .to({ id: session.note.id, type: "note" }, "tag")
-      .selector.items(undefined, {
-        sortBy: "dateCreated",
-        sortDirection: "asc"
-      });
-    updateSession(session.id, ["readonly", "default"], { tags });
-  };
-
-  refresh = async () => {};
 
   updateSession = <T extends SessionType[] = SessionType[]>(
     id: string,
@@ -646,38 +665,45 @@ class EditorStore extends BaseStore<EditorStore> {
           },
           !options.silent
         );
-      } else if (note.readonly) {
-        this.addSession(
-          {
-            type: "readonly",
-            note,
-            id: note.id,
-            pinned: session?.pinned,
-            content,
-            activeBlockId: options.activeBlockId
-          },
-          !options.silent
-        );
       } else {
         const attachmentsLength = await db.attachments
           .ofNote(note.id, "all")
           .count();
-
-        this.addSession(
-          {
-            type: "default",
-            id: note.id,
-            note,
-            saveState: SaveState.Saved,
-            sessionId: `${Date.now()}`,
-            attachmentsLength,
-            pinned: session?.pinned,
-            content,
-            preview: isPreview,
-            activeBlockId: options.activeBlockId
-          },
-          !options.silent
-        );
+        const tags = await getTags(note.id);
+        const colors = await db.relations.to(note, "color").get();
+        if (note.readonly) {
+          this.addSession(
+            {
+              type: "readonly",
+              note,
+              id: note.id,
+              pinned: session?.pinned,
+              content,
+              color: colors[0]?.fromId,
+              tags,
+              activeBlockId: options.activeBlockId
+            },
+            !options.silent
+          );
+        } else {
+          this.addSession(
+            {
+              type: "default",
+              id: note.id,
+              note,
+              saveState: SaveState.Saved,
+              sessionId: `${Date.now()}`,
+              attachmentsLength,
+              pinned: session?.pinned,
+              tags,
+              color: colors[0]?.fromId,
+              content,
+              preview: isPreview,
+              activeBlockId: options.activeBlockId
+            },
+            !options.silent
+          );
+        }
       }
     }
   };
@@ -794,16 +820,7 @@ class EditorStore extends BaseStore<EditorStore> {
       if (shouldRefreshNotes) useNoteStore.getState().refresh();
 
       if (currentSession.type === "new") {
-        this.addSession({
-          type: "default",
-          id,
-          note,
-          saveState: SaveState.Saved,
-          sessionId,
-          attachmentsLength,
-          pinned: currentSession.pinned,
-          content: partial.content
-        });
+        await this.openSession(note, { force: true });
       } else {
         // update any conflicted session that has the same content opened
         if (partial.content) {
@@ -999,4 +1016,13 @@ async function waitForSync() {
   return new Promise((resolve) => {
     db.eventManager.subscribe(EVENTS.syncCompleted, resolve, true);
   });
+}
+
+async function getTags(noteId: string) {
+  return await db.relations
+    .to({ id: noteId, type: "note" }, "tag")
+    .selector.items(undefined, {
+      sortBy: "dateCreated",
+      sortDirection: "asc"
+    });
 }
