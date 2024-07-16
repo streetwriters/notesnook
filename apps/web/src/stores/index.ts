@@ -21,7 +21,7 @@ import { StateCreator } from "zustand";
 
 type NNStoreCreator<T> = StateCreator<
   T,
-  [["zustand/subscribeWithSelector", never], ["zustand/immer", never]]
+  [["zustand/subscribeWithSelector", never], ["zustand/mutative", never]]
 >;
 
 export type GetState<T> = Parameters<NNStoreCreator<T>>[1];
