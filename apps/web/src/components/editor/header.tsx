@@ -34,36 +34,28 @@ import { Tag } from "@notesnook/core";
 type HeaderProps = { readonly: boolean; id: string };
 function Header(props: HeaderProps) {
   const { readonly, id } = props;
-  const session = useEditorStore((store) =>
-    store.getActiveSession(["default", "readonly"])
+  const tags = useEditorStore(
+    (store) => store.getActiveSession(["default", "readonly"])?.tags
   );
-  const tags = session?.tags || [];
-  const refreshTags = useEditorStore((store) => store.refreshTags);
 
-  useEffect(() => {
-    refreshTags();
-  }, [id, refreshTags, session?.type]);
-
-  const setTag = useCallback(
-    async function (noteId: string, tags: Tag[], value: string) {
-      const oldTag = tags.find((t) => t.title === value);
-      if (oldTag) {
-        await db.relations.unlink(oldTag, { type: "note", id: noteId });
-      } else {
-        const id =
-          (await db.tags.find(value))?.id ??
-          (await db.tags.add({ title: value }));
-        await db.relations.add(
-          { id, type: "tag" },
-          { type: "note", id: noteId }
-        );
-        await useTagStore.getState().refresh();
-      }
-      await refreshTags();
-      await useNoteStore.getState().refresh();
-    },
-    [refreshTags]
-  );
+  const setTag = useCallback(async function (
+    noteId: string,
+    tags: Tag[],
+    value: string
+  ) {
+    const oldTag = tags.find((t) => t.title === value);
+    if (oldTag) {
+      await db.relations.unlink(oldTag, { type: "note", id: noteId });
+    } else {
+      const id =
+        (await db.tags.find(value))?.id ??
+        (await db.tags.add({ title: value }));
+      await db.relations.add({ id, type: "tag" }, { type: "note", id: noteId });
+      await useTagStore.getState().refresh();
+    }
+    await useNoteStore.getState().refresh();
+  },
+  []);
 
   return (
     <>
@@ -82,7 +74,7 @@ function Header(props: HeaderProps) {
             styles={{ container: { mr: 1 }, text: { fontSize: "body" } }}
           />
         ))}
-        {!!session && !readonly && tags ? (
+        {!readonly && tags ? (
           <Autosuggest
             sessionId={id}
             filter={(query) => db.lookup.tags(query).items(10)}

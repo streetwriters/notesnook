@@ -102,7 +102,6 @@ const menuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
         await db.tags.remove(...ids);
         showToast("success", `${pluralize(ids.length, "tag")} deleted`);
         await appStore.refreshNavItems();
-        await useEditorStore.getState().refreshTags();
         await tagStore.refresh();
         await noteStore.refresh();
       },
