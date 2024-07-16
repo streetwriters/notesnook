@@ -51,6 +51,7 @@ import { Relations } from "../collections/relations";
 import Subscriptions from "./subscriptions";
 import {
   CompressorAccessor,
+  ConfigStorageAccessor,
   ICompressor,
   IFileStorage,
   IStorage,
@@ -77,6 +78,7 @@ import { QueueValue } from "../utils/queue-value";
 import { Sanitizer } from "../database/sanitizer";
 import { createTriggers, dropTriggers } from "../database/triggers";
 import { NNMigrationProvider } from "../database/migrations";
+import { ConfigStorage } from "../database/config";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -147,6 +149,9 @@ class Database {
 
   private _kv?: KVStorage;
   kv: KVStorageAccessor = () => this._kv || new KVStorage(this.sql);
+  private _config?: ConfigStorage;
+  config: ConfigStorageAccessor = () =>
+    this._config || new ConfigStorage(this.sql);
 
   private _transaction?: QueueValue<Transaction<DatabaseSchema>>;
   transaction = async (

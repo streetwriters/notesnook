@@ -97,6 +97,11 @@ export type RawDatabaseSchema = DatabaseSchema & {
     value?: string | null;
     dateModified?: number | null;
   };
+  config: {
+    name: string;
+    value?: string | null;
+    dateModified?: number | null;
+  };
 
   notes_fts: SQLiteItemWithRowID<{
     notes_fts: string;

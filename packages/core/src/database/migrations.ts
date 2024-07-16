@@ -309,6 +309,17 @@ export class NNMigrationProvider implements MigrationProvider {
             .set({ conflicted: false })
             .execute();
         }
+      },
+      "4": {
+        async up(db) {
+          await db.schema
+            .createTable("config")
+            .modifyEnd(sql`without rowid`)
+            .addColumn("name", "text", (c) => c.primaryKey().unique().notNull())
+            .addColumn("value", "text")
+            .addColumn("dateModified", "integer")
+            .execute();
+        }
       }
     };
   }
