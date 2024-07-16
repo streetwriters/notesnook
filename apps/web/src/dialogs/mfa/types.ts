@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { AuthenticatorType } from "@notesnook/core";
-import { Perform } from "../../common/dialog-controller";
 import { Icon } from "../../components/icons";
 
 export type Authenticator = {
@@ -31,7 +30,7 @@ export type Authenticator = {
 
 export type StepComponentProps<T extends OnNextFunction> = {
   onNext: T;
-  onClose?: Perform;
+  onClose?: (result: boolean) => void;
   onError?: (error: string) => void;
 };
 

@@ -20,18 +20,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Box } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
-import { Perform } from "../common/dialog-controller";
 import { useState } from "react";
 import { ErrorText } from "../components/error-text";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { db } from "../common/db";
+import { showToast } from "../utils/toast";
+import { useStore as useTagStore } from "../stores/tag-store";
+import { useStore as useNoteStore } from "../stores/note-store";
+import { useStore as useAppStore } from "../stores/app-store";
+import { Color, Tag } from "@notesnook/core";
 
-type ItemDialogProps = {
+type ItemDialogProps = BaseDialogProps<false | string> & {
   title: string;
   subtitle?: string;
-  onClose: Perform;
-  onAction: (title: string) => Promise<void>;
   defaultValue?: string;
 };
-function ItemDialog(props: ItemDialogProps) {
+export const ItemDialog = DialogManager.register(function ItemDialog(
+  props: ItemDialogProps
+) {
   const [error, setError] = useState<Error>();
 
   return (
@@ -58,7 +64,7 @@ function ItemDialog(props: ItemDialogProps) {
           const title = formData.get("title");
           if (!title) return;
           try {
-            await props.onAction(title as string);
+            await props.onClose(title as string);
           } catch (e) {
             if (e instanceof Error) {
               setError(e);
@@ -79,6 +85,47 @@ function ItemDialog(props: ItemDialogProps) {
       </Box>
     </Dialog>
   );
-}
+});
 
-export default ItemDialog;
+export const CreateTagDialog = {
+  show: () =>
+    ItemDialog.show({
+      title: "Create tag",
+      subtitle: "You can create as many tags as you want."
+    }).then(async (title) => {
+      if (!title) return;
+      await db.tags.add({ title });
+      showToast("success", "Tag created!");
+      useTagStore.getState().refresh();
+    })
+};
+
+export const EditTagDialog = {
+  show: (tag: Tag) =>
+    ItemDialog.show({
+      title: "Edit tag",
+      subtitle: `You are editing #${tag.title}.`,
+      defaultValue: tag.title
+    }).then(async (title) => {
+      if (!title) return;
+      await db.tags.add({ id: tag.id, title });
+      showToast("success", "Tag edited!");
+      await useTagStore.getState().refresh();
+      await useNoteStore.getState().refresh();
+      await useAppStore.getState().refreshNavItems();
+    })
+};
+
+export const RenameColorDialog = {
+  show: (color: Color) =>
+    ItemDialog.show({
+      title: "Rename color",
+      subtitle: `You are renaming color ${color.title}.`,
+      defaultValue: color.title
+    }).then(async (title) => {
+      if (!title) return;
+      await db.colors.add({ id: color.id, title });
+      showToast("success", "Color renamed!");
+      useAppStore.getState().refreshNavItems();
+    })
+};

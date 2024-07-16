@@ -34,7 +34,6 @@ import Dialog from "../components/dialog";
 import { useStore } from "../stores/notebook-store";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
-import { Perform, showAddNotebookDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
 import { isMac } from "../utils/platform";
 import { create } from "zustand";
@@ -48,8 +47,10 @@ import {
 import { FlexScrollContainer } from "../components/scroll-container";
 import { pluralize } from "@notesnook/common";
 import Field from "../components/field";
+import { AddNotebookDialog } from "./add-notebook-dialog";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
-type MoveDialogProps = { onClose: Perform; noteIds: string[] };
+type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 type NotebookReference = {
   id: string;
   new: boolean;
@@ -69,7 +70,10 @@ export const useSelectionStore = create<ISelectionStore>((set) => ({
   setIsMultiselect: (isMultiselect) => set({ isMultiselect })
 }));
 
-function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
+export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
+  onClose,
+  noteIds
+}: MoveNoteDialogProps) {
   const setSelected = useSelectionStore((store) => store.setSelected);
   const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
   const isMultiselect = useSelectionStore((store) => store.isMultiselect);
@@ -284,6 +288,7 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
                   isExpanded={props.context.isExpanded || false}
                   toggle={props.context.toggleExpandedState}
                   onCreateItem={() => {
+                    console.log([props.item.index]);
                     reloadItem.current?.([props.item.index]);
                     treeRef.current?.expandItem(
                       props.item.index,
@@ -318,10 +323,12 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
             variant="secondary"
             sx={{ mt: 2 }}
             onClick={() =>
-              showAddNotebookDialog().then(() =>
-                db.notebooks.roots
-                  .ids(db.settings.getGroupOptions("notebooks"))
-                  .then((ids) => setNotebooks(ids))
+              AddNotebookDialog.show({}).then((res) =>
+                res
+                  ? db.notebooks.roots
+                      .ids(db.settings.getGroupOptions("notebooks"))
+                      .then((ids) => setNotebooks(ids))
+                  : null
               )
             }
           >
@@ -331,7 +338,8 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
       )}
     </Dialog>
   );
-}
+});
+
 function calculateIndentation(
   expandable: boolean,
   depth: number,
@@ -443,7 +451,7 @@ function NotebookItem(props: {
             title="New notebook"
             onClick={async (e) => {
               e.stopPropagation();
-              await showAddNotebookDialog(notebook.id);
+              await AddNotebookDialog.show({ parentId: notebook.id });
               onCreateItem();
             }}
           />
@@ -461,8 +469,6 @@ function TopicSelectionIndicator({ notebook }: { notebook: Notebook }) {
   if (!hasSelectedTopics) return null;
   return <Circle size={8} color="accent" sx={{ mr: 1 }} />;
 }
-
-export default MoveDialog;
 
 function SelectedCheck({
   item,

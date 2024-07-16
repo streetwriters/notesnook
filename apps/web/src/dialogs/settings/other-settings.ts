@@ -23,9 +23,9 @@ import { writeText } from "clipboard-polyfill";
 import { showToast } from "../../utils/toast";
 import { checkForUpdate, downloadUpdate } from "../../utils/updater";
 import { isMacStoreApp } from "../../utils/platform";
-import { showIssueDialog } from "../../common/dialog-controller";
 import { clearLogs, downloadLogs } from "../../utils/logger";
 import { useAutoUpdateStore } from "../../hooks/use-auto-updater";
+import { IssueDialog } from "../issue-dialog";
 
 export const AboutSettings: SettingsGroup[] = [
   {
@@ -271,7 +271,7 @@ export const SupportSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
-            action: showIssueDialog,
+            action: () => IssueDialog.show({}),
             title: "Send bug report",
             variant: "secondary"
           }

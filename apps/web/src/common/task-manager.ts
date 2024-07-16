@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ProgressDialog } from "../dialogs/progress-dialog";
 import { removeStatus, updateStatus } from "../hooks/use-status";
-import { showProgressDialog } from "./dialog-controller";
 
 type TaskType = "status" | "modal";
 type TaskAction<T> = (report: ProgressReportCallback) => T | Promise<T>;
@@ -74,11 +74,11 @@ export class TaskManager {
         return result;
       }
       case "modal": {
-        return await showProgressDialog<T | Error>({
+        return (await ProgressDialog.show({
           title: task.title,
           subtitle: task.subtitle,
           action: task.action
-        });
+        })) as T;
       }
     }
   }

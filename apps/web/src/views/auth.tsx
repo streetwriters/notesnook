@@ -38,12 +38,10 @@ import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { useTimer } from "../hooks/use-timer";
-import {
-  showLoadingDialog,
-  showLogoutConfirmation
-} from "../common/dialog-controller";
 import { ErrorText } from "../components/error-text";
 import { AuthenticatorType, User } from "@notesnook/core";
+import { showLogoutConfirmation } from "../dialogs/confirm";
+import { TaskManager } from "../common/task-manager";
 
 type EmailFormData = {
   email: string;
@@ -494,7 +492,8 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         }}
         onClick={async () => {
           if (await showLogoutConfirmation()) {
-            await showLoadingDialog({
+            await TaskManager.startTask({
+              type: "modal",
               title: "You are being logged out",
               action: () => db.user.logout(true),
               subtitle: "Please wait..."

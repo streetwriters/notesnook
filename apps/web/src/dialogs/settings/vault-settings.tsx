@@ -24,7 +24,7 @@ import Vault from "../../common/vault";
 import { showToast } from "../../utils/toast";
 import { db } from "../../common/db";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
-import { showBuyDialog } from "../../common/dialog-controller";
+import { BuyDialog } from "../buy-dialog/buy-dialog";
 
 export const VaultSettings: SettingsGroup[] = [
   {
@@ -43,7 +43,7 @@ export const VaultSettings: SettingsGroup[] = [
             type: "button",
             title: "Create",
             action: () => {
-              if (!isUserPremium()) showBuyDialog();
+              if (!isUserPremium()) BuyDialog.show({});
               else
                 Vault.createVault().then((res) => {
                   useAppStore.getState().setIsVaultCreated(res);

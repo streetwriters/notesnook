@@ -17,45 +17,45 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  showAddReminderDialog,
-  showBuyDialog,
-  showCreateTagDialog,
-  showEditReminderDialog,
-  showEmailVerificationDialog,
-  showFeatureDialog,
-  showOnboardingDialog,
-  showSettings
-} from "../common/dialog-controller";
-import {
-  showAddNotebookDialog,
-  showEditNotebookDialog
-} from "../common/dialog-controller";
 import { hashNavigate } from ".";
 import { defineRoutes } from "./types";
 import { useEditorStore } from "../stores/editor-store";
+import {
+  AddNotebookDialog,
+  EditNotebookDialog
+} from "../dialogs/add-notebook-dialog";
+import { EmailVerificationDialog } from "../dialogs/email-verification-dialog";
+import { SettingsDialog } from "../dialogs/settings";
+import { BuyDialog } from "../dialogs/buy-dialog";
+import {
+  AddReminderDialog,
+  EditReminderDialog
+} from "../dialogs/add-reminder-dialog";
+import { FeatureDialog } from "../dialogs/feature-dialog";
+import { CreateTagDialog } from "../dialogs/item-dialog";
+import { OnboardingDialog } from "../dialogs/onboarding-dialog";
 
 const hashroutes = defineRoutes({
   "/": () => {
     // return <Editor nonce={"-1"} />;
   },
   "/email/verify": () => {
-    showEmailVerificationDialog().then(afterAction);
+    EmailVerificationDialog.show({}).then(afterAction);
   },
   "/notebooks/create": () => {
-    showAddNotebookDialog().then(afterAction);
+    AddNotebookDialog.show({}).then(afterAction);
   },
   "/notebooks/:notebookId/edit": ({ notebookId }) => {
-    showEditNotebookDialog(notebookId)?.then(afterAction);
+    EditNotebookDialog.show({ notebookId })?.then(afterAction);
   },
   "/reminders/create": () => {
-    showAddReminderDialog().then(afterAction);
+    AddReminderDialog.show({}).then(afterAction);
   },
   "/reminders/:reminderId/edit": ({ reminderId }) => {
-    showEditReminderDialog(reminderId).then(afterAction);
+    EditReminderDialog.show({ reminderId }).then(afterAction);
   },
   "/tags/create": () => {
-    showCreateTagDialog().then(afterAction);
+    CreateTagDialog.show().then(afterAction);
   },
   "/notes/:noteId/create": ({ noteId }) => {
     useEditorStore.getState().openSession(noteId);
@@ -64,24 +64,25 @@ const hashroutes = defineRoutes({
     useEditorStore.getState().openSession(noteId);
   },
   "/buy": () => {
-    showBuyDialog().then(afterAction);
+    BuyDialog.show({}).then(afterAction);
   },
   "/buy/:code": ({ code }: { code: string }) => {
-    showBuyDialog("monthly", code).then(afterAction);
+    BuyDialog.show({ couponCode: code, plan: "monthly" }).then(afterAction);
   },
   "/buy/:plan/:code": ({ plan, code }) => {
-    showBuyDialog(plan === "monthly" ? "monthly" : "yearly", code).then(
-      afterAction
-    );
+    BuyDialog.show({
+      plan: plan === "monthly" ? "monthly" : "yearly",
+      couponCode: code
+    }).then(afterAction);
   },
   "/welcome": () => {
-    showOnboardingDialog("new")?.then(afterAction);
+    OnboardingDialog.show({ type: "new" })?.then(afterAction);
   },
   "/confirmed": () => {
-    showFeatureDialog("confirmed").then(afterAction);
+    FeatureDialog.show({ featureName: "confirmed" }).then(afterAction);
   },
   "/settings": () => {
-    showSettings().then(afterAction);
+    SettingsDialog.show({}).then(afterAction);
   }
 });
 

@@ -42,7 +42,6 @@ import { useStore as useNotesStore } from "../stores/note-store";
 import { useStore as useNotebookStore } from "../stores/notebook-store";
 import { db } from "../common/db";
 import { getFormattedDate } from "@notesnook/common";
-import { showAddNotebookDialog } from "../common/dialog-controller";
 import {
   UncontrolledTreeEnvironment,
   Tree,
@@ -63,6 +62,7 @@ import {
   PanelResizeHandle,
   ImperativePanelHandle
 } from "react-resizable-panels";
+import { AddNotebookDialog } from "../dialogs/add-notebook-dialog";
 
 type NotebookProps = {
   rootId: string;
@@ -260,9 +260,9 @@ function SubNotebooks({
             }}
             onClick={async (e) => {
               e.stopPropagation();
-              await showAddNotebookDialog(
-                context?.type === "notebook" ? context.id : rootId
-              );
+              await AddNotebookDialog.show({
+                parentId: context?.type === "notebook" ? context.id : rootId
+              });
             }}
           >
             <Plus size={20} />

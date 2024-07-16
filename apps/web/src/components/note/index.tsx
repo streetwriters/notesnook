@@ -54,13 +54,6 @@ import {
 } from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
-import {
-  confirm,
-  showAddReminderDialog,
-  showAddTagsDialog,
-  showCreateColorDialog,
-  showMoveNoteDialog
-} from "../../common/dialog-controller";
 import { store } from "../../stores/note-store";
 import { store as userstore } from "../../stores/user-store";
 import { useEditorStore } from "../../stores/editor-store";
@@ -97,12 +90,16 @@ import { SchemeColors } from "@notesnook/theme";
 import { writeToClipboard } from "../../utils/clipboard";
 import Vault from "../../common/vault";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
+import { AddTagsDialog } from "../../dialogs/add-tags-dialog";
+import { CreateColorDialog } from "../../dialogs/create-color-dialog";
+import { ConfirmDialog } from "../../dialogs/confirm";
+import { MoveNoteDialog } from "../../dialogs/move-note-dialog";
+import { AddReminderDialog } from "../../dialogs/add-reminder-dialog";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
   context?: Context;
   date: number;
-  simplified?: boolean;
   compact?: boolean;
 };
 
@@ -116,7 +113,6 @@ function Note(props: NoteProps) {
     item,
     date,
     reminder,
-    simplified,
     compact,
     context
   } = props;
@@ -130,7 +126,6 @@ function Note(props: NoteProps) {
       draggable={true}
       isFocused={isOpened}
       isCompact={compact}
-      isSimple={simplified}
       item={note}
       title={note.title}
       body={note.headline as string}
@@ -391,7 +386,7 @@ const menuItems: (
       title: "Remind me",
       icon: AddReminder.path,
       onClick: async () => {
-        await showAddReminderDialog(note.id);
+        await AddReminderDialog.show({ note });
       }
     },
     { key: "sep1", type: "separator" },
@@ -541,7 +536,7 @@ const menuItems: (
       onClick: async () => {
         if (
           note.localOnly ||
-          (await confirm({
+          (await ConfirmDialog.show({
             title: `Prevent ${pluralize(ids.length, "note")} from syncing?`,
             message: `${pluralize(
               ids.length,
@@ -580,7 +575,7 @@ function colorsToMenuItems(
       title: "Add new color",
       icon: Plus.path,
       onClick: async () => {
-        const id = await showCreateColorDialog();
+        const id = await CreateColorDialog.show({});
         if (!id) return;
         await store.get().setColor(id, noteColor?.id === id, ...ids);
       }
@@ -620,7 +615,7 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
       key: "link-notebooks",
       title: "Link to...",
       icon: AddToNotebook.path,
-      onClick: () => showMoveNoteDialog(ids)
+      onClick: () => MoveNoteDialog.show({ noteIds: ids })
     },
     {
       type: "lazy-loader",
@@ -700,7 +695,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
       key: "assign-tags",
       title: "Assign to...",
       icon: Plus.path,
-      onClick: () => showAddTagsDialog(ids)
+      onClick: () => AddTagsDialog.show({ noteIds: ids })
     },
     {
       type: "lazy-loader",
@@ -732,7 +727,6 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
                   await db.relations.to({ id, type: "note" }, "tag").unlink();
                 }
                 tagStore.get().refresh();
-                await useEditorStore.getState().refreshTags();
                 await store.get().refresh();
               }
             },
@@ -753,7 +747,6 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
                   await db.relations.add(tag, { id, type: "note" });
                 }
                 await tagStore.get().refresh();
-                await useEditorStore.getState().refreshTags();
                 await store.get().refresh();
               }
             });
@@ -774,7 +767,6 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
                 await db.relations.unlink(tag, { id, type: "note" });
               }
               await tagStore.get().refresh();
-              await useEditorStore.getState().refreshTags();
               await store.get().refresh();
             }
           });

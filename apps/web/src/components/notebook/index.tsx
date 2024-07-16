@@ -38,12 +38,12 @@ import { hashNavigate, navigate } from "../../navigation";
 import IconTag from "../icon-tag";
 import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "@notesnook/common";
-import { confirm } from "../../common/dialog-controller";
 import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Notebook as NotebookType } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { useDragHandler } from "../../hooks/use-drag-handler";
+import { ConfirmDialog } from "../../dialogs/confirm";
 
 type NotebookProps = {
   item: NotebookType;
@@ -202,7 +202,7 @@ export const notebookMenuItems: (
       variant: "dangerous",
       icon: Trash.path,
       onClick: async () => {
-        const result = await confirm({
+        const result = await ConfirmDialog.show({
           title: `Delete ${pluralize(ids.length, "notebook")}?`,
           positiveButtonText: `Yes`,
           negativeButtonText: "No",

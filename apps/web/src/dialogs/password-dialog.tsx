@@ -22,25 +22,25 @@ import { Box, Text } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import Field, { FieldProps } from "../components/field";
 import { Checkbox, Label } from "@theme-ui/components";
-import { Perform } from "../common/dialog-controller";
 import { mdToHtml } from "../utils/md";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
 type Check = { text: string; default?: boolean };
 export type PasswordDialogProps<
   TInputId extends string,
   TCheckId extends string
-> = {
+> = BaseDialogProps<boolean | Record<TCheckId, boolean>> & {
   title: string;
   subtitle?: string;
   message?: string;
   inputs: Record<TInputId, FieldProps>;
   validate: (passwords: Record<TInputId, string>) => Promise<boolean>;
   checks?: Record<TCheckId, Check>;
-  onClose: Perform<boolean | Record<TCheckId, boolean>>;
 };
-function PasswordDialog<TInputId extends string, TCheckId extends string>(
-  props: PasswordDialogProps<TInputId, TCheckId>
-) {
+const PasswordDialog = DialogManager.register(function PasswordDialog<
+  TInputId extends string,
+  TCheckId extends string
+>(props: PasswordDialogProps<TInputId, TCheckId>) {
   const { checks, inputs, message, validate, onClose } = props;
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
@@ -150,5 +150,13 @@ function PasswordDialog<TInputId extends string, TCheckId extends string>(
       </Box>
     </Dialog>
   );
+});
+
+export function showPasswordDialog<
+  TInputId extends string,
+  TCheckId extends string
+>(props: Omit<PasswordDialogProps<TInputId, TCheckId>, "onClose">) {
+  return PasswordDialog.show(props) as Promise<
+    string extends TCheckId ? boolean : false | Record<TCheckId, boolean>
+  >;
 }
-export default PasswordDialog;

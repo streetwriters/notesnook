@@ -23,13 +23,14 @@ import Field from "../components/field";
 import Dialog from "../components/dialog";
 import platform from "platform";
 import { useState } from "react";
-import { confirm, Perform } from "../common/dialog-controller";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
 
 import { ErrorText } from "../components/error-text";
 import { Debug } from "@notesnook/core/dist/api/debug";
+import { ConfirmDialog } from "./confirm";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
 const PLACEHOLDERS = {
   title: "Briefly describe what happened",
@@ -43,10 +44,10 @@ For example things like:
 This is all optional, of course.`
 };
 
-type IssueDialogProps = {
-  onClose: Perform;
-};
-function IssueDialog(props: IssueDialogProps) {
+type IssueDialogProps = BaseDialogProps<boolean>;
+export const IssueDialog = DialogManager.register(function IssueDialog(
+  props: IssueDialogProps
+) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
 
@@ -143,12 +144,10 @@ function IssueDialog(props: IssueDialogProps) {
       </Flex>
     </Dialog>
   );
-}
-
-export default IssueDialog;
+});
 
 function showIssueReportedDialog({ url }: { url: string }) {
-  return confirm({
+  return ConfirmDialog.show({
     title: "Thank you for reporting!",
     positiveButtonText: "Copy link",
     message: `You can track your bug report at [${url}](${url}).

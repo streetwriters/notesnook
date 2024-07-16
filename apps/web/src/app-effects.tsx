@@ -30,17 +30,17 @@ import { db } from "./common/db";
 import { EV, EVENTS } from "@notesnook/core/dist/common";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
-import {
-  showAnnouncementDialog,
-  showBuyDialog,
-  showFeatureDialog,
-  showOnboardingDialog
-} from "./common/dialog-controller";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
-import { interruptedOnboarding } from "./dialogs/onboarding-dialog";
+import {
+  interruptedOnboarding,
+  OnboardingDialog
+} from "./dialogs/onboarding-dialog";
 import { hashNavigate } from "./navigation";
 import { desktop } from "./common/desktop-bridge";
+import { BuyDialog } from "./dialogs/buy-dialog";
+import { FeatureDialog } from "./dialogs/feature-dialog";
+import { AnnouncementDialog } from "./dialogs/announcement-dialog";
 
 type AppEffectsProps = {
   setShow: (show: boolean) => void;
@@ -69,7 +69,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
             showToast(
               "error",
               "Please upgrade your account to Pro to use this feature.",
-              [{ text: "Upgrade now", onClick: () => showBuyDialog() }]
+              [{ text: "Upgrade now", onClick: () => BuyDialog.show({}) }]
             );
             return { type, result: false };
           }
@@ -89,8 +89,9 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
         await resetNotices();
         setIsVaultCreated(await db.vault.exists());
 
-        await showOnboardingDialog(interruptedOnboarding());
-        await showFeatureDialog("highlights");
+        const onboardingKey = interruptedOnboarding();
+        if (onboardingKey) await OnboardingDialog.show({ type: onboardingKey });
+        await FeatureDialog.show({ featureName: "highlights" });
         await scheduleBackups();
       })();
 
@@ -224,7 +225,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
   useEffect(() => {
     if (!dialogAnnouncements.length || IS_TESTING) return;
     (async () => {
-      await showAnnouncementDialog(dialogAnnouncements[0]);
+      await AnnouncementDialog.show({ announcement: dialogAnnouncements[0] });
     })();
   }, [dialogAnnouncements]);
 

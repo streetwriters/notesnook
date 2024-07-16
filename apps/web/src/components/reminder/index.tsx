@@ -37,14 +37,12 @@ import { hashNavigate } from "../../navigation";
 import { Multiselect } from "../../common/multi-select";
 import { store } from "../../stores/reminder-store";
 import { db } from "../../common/db";
-import {
-  confirm,
-  showEditReminderDialog
-} from "../../common/dialog-controller";
 import { pluralize } from "@notesnook/common";
 import { getFormattedReminderTime } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Reminder as ReminderType } from "@notesnook/core/dist/types";
+import { ConfirmDialog } from "../../dialogs/confirm";
+import { EditReminderDialog } from "../../dialogs/add-reminder-dialog";
 
 const RECURRING_MODE_MAP = {
   week: "Weekly",
@@ -75,7 +73,7 @@ function Reminder(props: ReminderProps) {
       body={reminder.description}
       isDisabled={reminder.disabled}
       isCompact={compact}
-      onClick={() => showEditReminderDialog(reminder.id)}
+      onClick={() => EditReminderDialog.show({ reminderId: reminder.id })}
       footer={
         <Flex
           sx={{
@@ -145,7 +143,7 @@ const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
       variant: "dangerous",
       icon: Trash.path,
       onClick: async () => {
-        confirm({
+        ConfirmDialog.show({
           title: `Delete ${pluralize(items.length, "reminder")}`,
           message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`,
           positiveButtonText: "Yes",

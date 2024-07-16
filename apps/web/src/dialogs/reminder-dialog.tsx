@@ -27,9 +27,12 @@ import {
   Backup,
   Vault,
   PDF,
-  Edit
+  Edit,
+  Icon
 } from "../components/icons";
-import { showBuyDialog } from "../common/dialog-controller";
+import { BuyDialog } from "./buy-dialog";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import Config from "../utils/config";
 
 const features = [
   { icon: Sync, title: "Instant private sync" },
@@ -41,8 +44,22 @@ const features = [
   { icon: PDF, title: "Export to PDF" },
   { icon: Edit, title: "Rich text editor" }
 ];
+
+type Reminder = {
+  title: string;
+  description: string;
+  offer: {
+    title: JSX.Element;
+    subtitle?: string;
+  };
+  features: { icon: Icon; title: string }[];
+  cta: {
+    title: string;
+    action: () => Promise<void> | void;
+  };
+};
 // TODO create trial expiry coupon codes
-const reminders = {
+const reminders: Record<string, Reminder> = {
   trialexpired: {
     title: "Your free trial has expired",
     description: "But we have a special offer just for you!",
@@ -70,7 +87,7 @@ const reminders = {
       title: "Subscribe now",
       action: () => {
         setTimeout(async () => {
-          await showBuyDialog("yearly", "TRIAL2PRO");
+          await BuyDialog.show({ plan: "yearly", couponCode: "TRIAL2PRO" });
         }, 0);
       }
     }
@@ -91,17 +108,23 @@ const reminders = {
       title: "Upgrade now",
       action: () => {
         setTimeout(async () => {
-          await showBuyDialog();
+          await BuyDialog.show({});
         }, 0);
       }
     }
   }
 };
 
-function ReminderDialog(props) {
+type ReminderDialogProps = BaseDialogProps<boolean> & {
+  reminderKey: keyof typeof reminders;
+};
+export const ReminderDialog = DialogManager.register(function ReminderDialog(
+  props: ReminderDialogProps
+) {
   const { reminderKey } = props;
   const reminder = reminders[reminderKey];
   if (!reminder) return null;
+  if (Config.get(reminderKey, false)) return null;
 
   return (
     <Dialog
@@ -111,7 +134,6 @@ function ReminderDialog(props) {
       onClose={() => props.onClose(false)}
       showCloseButton
       description={reminder.description}
-      alignment="center"
       positiveButton={{
         text: <Flex>{reminder.cta.title}</Flex>,
         onClick: async () => {
@@ -120,7 +142,6 @@ function ReminderDialog(props) {
           props.onClose(true);
         }
       }}
-      footer={reminder.footer}
     >
       <Flex
         mt={2}
@@ -175,5 +196,4 @@ function ReminderDialog(props) {
       </Flex>
     </Dialog>
   );
-}
-export default ReminderDialog;
+});

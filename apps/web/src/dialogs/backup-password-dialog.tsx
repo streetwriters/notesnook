@@ -18,105 +18,106 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Perform } from "../common/dialog-controller";
 import Field from "../components/field";
 import Dialog from "../components/dialog";
 import { Box, Button, Text } from "@theme-ui/components";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
-export type PromptDialogProps = {
-  onClose: Perform;
+export type BackupPasswordDialogProps = BaseDialogProps<boolean> & {
   validate: (outputs: {
     password?: string;
     key?: string;
   }) => boolean | Promise<boolean>;
 };
 
-export default function BackupPasswordDialog(props: PromptDialogProps) {
-  const { onClose, validate } = props;
+export const BackupPasswordDialog = DialogManager.register(
+  function BackupPasswordDialog(props: BackupPasswordDialogProps) {
+    const { onClose, validate } = props;
 
-  const [error, setError] = useState<string>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isEncryptionKey, setIsEncryptionKey] = useState(false);
+    const [error, setError] = useState<string>();
+    const [isLoading, setIsLoading] = useState(false);
+    const [isEncryptionKey, setIsEncryptionKey] = useState(false);
 
-  return (
-    <Dialog
-      isOpen={true}
-      testId="password-dialog"
-      title={"Encrypted backup"}
-      description={
-        "Please enter the password to decrypt and restore this backup."
-      }
-      onClose={() => onClose(false)}
-      positiveButton={{
-        form: "backupPasswordForm",
-        type: "submit",
-        loading: isLoading,
-        disabled: isLoading,
-        text: "Restore"
-      }}
-      negativeButton={{ text: "Cancel", onClick: () => onClose(false) }}
-    >
-      <Box
-        id="backupPasswordForm"
-        as="form"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target as HTMLFormElement);
-
-          try {
-            setIsLoading(true);
-            setError(undefined);
-
-            const key = formData.get("key") as string;
-            const password = formData.get("password") as string;
-            if (!key && !password) return;
-
-            if (await validate({ key, password })) {
-              onClose(true);
-            } else {
-              setError("Wrong password.");
-            }
-          } catch (e) {
-            setError((e as Error).message);
-          } finally {
-            setIsLoading(false);
-          }
+    return (
+      <Dialog
+        isOpen={true}
+        testId="password-dialog"
+        title={"Encrypted backup"}
+        description={
+          "Please enter the password to decrypt and restore this backup."
+        }
+        onClose={() => onClose(false)}
+        positiveButton={{
+          form: "backupPasswordForm",
+          type: "submit",
+          loading: isLoading,
+          disabled: isLoading,
+          text: "Restore"
         }}
+        negativeButton={{ text: "Cancel", onClick: () => onClose(false) }}
       >
-        {isEncryptionKey ? (
-          <Field
-            required
-            autoFocus
-            data-test-id="encryption-key"
-            label="Encryption key"
-            type="password"
-            id="key"
-            name="key"
-          />
-        ) : (
-          <Field
-            required
-            autoFocus
-            data-test-id="password"
-            label="Password"
-            type="password"
-            autoComplete="current-password"
-            id="password"
-            name="password"
-          />
-        )}
-      </Box>
-      <Button variant="anchor" onClick={() => setIsEncryptionKey((s) => !s)}>
-        {isEncryptionKey
-          ? "Don't have encryption key? Use password."
-          : "Forgot password? Use encryption key."}
-      </Button>
+        <Box
+          id="backupPasswordForm"
+          as="form"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target as HTMLFormElement);
 
-      {error && (
-        <Text as="div" mt={1} variant={"error"}>
-          {error}
-        </Text>
-      )}
-    </Dialog>
-  );
-}
+            try {
+              setIsLoading(true);
+              setError(undefined);
+
+              const key = formData.get("key") as string;
+              const password = formData.get("password") as string;
+              if (!key && !password) return;
+
+              if (await validate({ key, password })) {
+                onClose(true);
+              } else {
+                setError("Wrong password.");
+              }
+            } catch (e) {
+              setError((e as Error).message);
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+        >
+          {isEncryptionKey ? (
+            <Field
+              required
+              autoFocus
+              data-test-id="encryption-key"
+              label="Encryption key"
+              type="password"
+              id="key"
+              name="key"
+            />
+          ) : (
+            <Field
+              required
+              autoFocus
+              data-test-id="password"
+              label="Password"
+              type="password"
+              autoComplete="current-password"
+              id="password"
+              name="password"
+            />
+          )}
+        </Box>
+        <Button variant="anchor" onClick={() => setIsEncryptionKey((s) => !s)}>
+          {isEncryptionKey
+            ? "Don't have encryption key? Use password."
+            : "Forgot password? Use encryption key."}
+        </Button>
+
+        {error && (
+          <Text as="div" mt={1} variant={"error"}>
+            {error}
+          </Text>
+        )}
+      </Dialog>
+    );
+  }
+);

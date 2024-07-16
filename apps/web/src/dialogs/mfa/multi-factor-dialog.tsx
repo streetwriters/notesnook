@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Perform } from "../../common/dialog-controller";
 import Dialog from "../../components/dialog";
 import {
   AuthenticatorOnNext,
@@ -31,65 +30,67 @@ import {
 import { Authenticator, OnNextFunction } from "./types";
 import { ErrorText } from "../../components/error-text";
 import { AuthenticatorType } from "@notesnook/core";
+import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 
-type MultifactorDialogProps = {
-  onClose: Perform;
+type MultifactorDialogProps = BaseDialogProps<boolean> & {
   primaryMethod?: AuthenticatorType;
 };
 
-export default function MultifactorDialog(props: MultifactorDialogProps) {
-  const { onClose, primaryMethod } = props;
-  const [step, setStep] = useState<
-    | Step<AuthenticatorOnNext>
-    | Step<AuthenticatorTypeOnNext>
-    | FallbackStep<OnNextFunction>
-  >(primaryMethod ? fallbackSteps.choose(primaryMethod) : steps.choose());
-  const [error, setError] = useState<string>();
+export const MultifactorDialog = DialogManager.register(
+  function MultifactorDialog(props: MultifactorDialogProps) {
+    const { onClose, primaryMethod } = props;
+    const [step, setStep] = useState<
+      | Step<AuthenticatorOnNext>
+      | Step<AuthenticatorTypeOnNext>
+      | FallbackStep<OnNextFunction>
+    >(primaryMethod ? fallbackSteps.choose(primaryMethod) : steps.choose());
+    const [error, setError] = useState<string>();
 
-  if (!step) return null;
-  return (
-    <Dialog
-      isOpen={true}
-      title={step.title}
-      description={step.description}
-      width={500}
-      positiveButton={
-        step.next
-          ? {
-              text: "Continue",
-              form: "2faForm"
-            }
-          : null
-      }
-      negativeButton={
-        step.cancellable
-          ? {
-              text: "Cancel",
-              onClick: () => props.onClose(false)
-            }
-          : null
-      }
-    >
-      {step.component && (
-        <step.component
-          onNext={(arg: AuthenticatorType | Authenticator) => {
-            if (!step.next) return onClose(true);
+    if (!step) return null;
+    return (
+      <Dialog
+        isOpen={true}
+        title={step.title}
+        description={step.description}
+        width={500}
+        positiveButton={
+          step.next
+            ? {
+                text: "Continue",
+                form: "2faForm"
+              }
+            : null
+        }
+        negativeButton={
+          step.cancellable
+            ? {
+                text: "Cancel",
+                onClick: () => props.onClose(false)
+              }
+            : null
+        }
+      >
+        {step.component && (
+          <step.component
+            onNext={(arg: AuthenticatorType | Authenticator) => {
+              if (!step.next) return onClose(true);
 
-            const nextStep =
-              step.next !== "recoveryCodes" && primaryMethod
-                ? fallbackSteps[step.next](
-                    arg as AuthenticatorType & Authenticator,
-                    primaryMethod
-                  )
-                : steps[step.next](arg as AuthenticatorType & Authenticator);
+              const nextStep =
+                step.next !== "recoveryCodes" && primaryMethod
+                  ? fallbackSteps[step.next](
+                      arg as AuthenticatorType & Authenticator,
+                      primaryMethod
+                    )
+                  : steps[step.next](arg as AuthenticatorType & Authenticator);
 
-            setStep(nextStep);
-          }}
-          onError={setError}
-          onClose={onClose}
-        />
-      )}
-      <ErrorText error={error} />
-    </Dialog>
-  );
-}
+              setStep(nextStep);
+            }}
+            onError={setError}
+            onClose={onClose}
+          />
+        )}
+        <ErrorText error={error} />
+      </Dialog>
+    );
+  }
+);

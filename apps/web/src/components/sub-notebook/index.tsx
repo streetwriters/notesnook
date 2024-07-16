@@ -24,11 +24,11 @@ import { Notebook } from "@notesnook/core";
 import { notebookMenuItems } from "../notebook";
 import { ChevronDown, ChevronRight, Plus } from "../icons";
 import { MenuItem } from "@notesnook/ui";
-import { showAddNotebookDialog } from "../../common/dialog-controller";
 import { navigate } from "../../navigation";
 import { useCallback, useRef } from "react";
 import { handleDrop } from "../../common/drop-handler";
 import { useDragHandler } from "../../hooks/use-drag-handler";
+import { AddNotebookDialog } from "../../dialogs/add-notebook-dialog";
 
 type SubNotebookProps = {
   item: Notebook;
@@ -173,7 +173,6 @@ const subNotebookMenuItems: (
   context?: { refresh?: () => void }
 ) => MenuItem[] = (notebook, ids = [], context) => {
   const menuItems = notebookMenuItems(notebook, ids);
-  console.log("ITEMS", context);
   return [
     {
       type: "button",
@@ -181,7 +180,9 @@ const subNotebookMenuItems: (
       title: "New notebook",
       icon: Plus.path,
       onClick: () =>
-        showAddNotebookDialog(notebook.id).then(() => context?.refresh?.())
+        AddNotebookDialog.show({ parentId: notebook.id }).then((res) =>
+          res ? context?.refresh?.() : null
+        )
     },
     { type: "separator", key: "sepep2" },
     ...menuItems
