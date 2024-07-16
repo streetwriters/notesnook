@@ -214,8 +214,8 @@ class AppStore extends BaseStore<AppStore> {
     this.set((state) => {
       for (const notice of notices) {
         const oldIndex = state.notices.findIndex((a) => a.type === notice.type);
-        if (oldIndex > -1) state.notices.splice(oldIndex, 1);
-        state.notices.push(notice);
+        if (oldIndex > -1) state.notices[oldIndex] = notice;
+        else state.notices.push(notice);
       }
     });
   };
