@@ -27,6 +27,7 @@ import {
   useErrorBoundary
 } from "react-error-boundary";
 import { useKeyStore } from "../../interfaces/key-store";
+import { isFeatureSupported } from "../../utils/feature-check";
 
 export function GlobalErrorHandler(props: PropsWithChildren) {
   const { showBoundary } = useErrorBoundary();
@@ -199,11 +200,7 @@ function getErrorHelp(props: FallbackProps) {
       action:
         "This error can only be fixed by wiping & reseting the database. Beware that this will wipe all your data inside the database with no way to recover it later on. This WILL NOT change/affect/delete/wipe your data on the server but ONLY on this device.",
       fix: async () => {
-        const { createDialect } = await import("../../common/sqlite");
-        await useKeyStore.getState().clear();
-        const dialect = createDialect("notesnook", true);
-        const driver = dialect.createDriver();
-        await driver.delete();
+        await resetDatabase();
         resetErrorBoundary();
       }
     };
@@ -213,11 +210,7 @@ function getErrorHelp(props: FallbackProps) {
       action:
         "This error can only be fixed by wiping & reseting the Key Store and the database. This WILL NOT change/affect/delete/wipe your data on the server but ONLY on this device.",
       fix: async () => {
-        const { createDialect } = await import("../../common/sqlite");
-        await useKeyStore.getState().clear();
-        const dialect = createDialect("notesnook", true);
-        const driver = dialect.createDriver();
-        await driver.delete();
+        await resetDatabase();
         resetErrorBoundary();
       }
     };
@@ -241,4 +234,18 @@ function errorToString(error: unknown) {
     : typeof error === "string"
     ? error
     : JSON.stringify(error);
+}
+
+async function resetDatabase() {
+  const { createDialect } = await import("../../common/sqlite");
+  const multiTab = !!globalThis.SharedWorker && isFeatureSupported("opfs");
+  await useKeyStore.getState().clear();
+  const dialect = createDialect({
+    name: "notesnook",
+    encrypted: true,
+    async: !isFeatureSupported("opfs"),
+    multiTab
+  });
+  const driver = dialect.createDriver();
+  await driver.delete();
 }
