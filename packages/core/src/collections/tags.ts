@@ -61,13 +61,17 @@ export class Tags implements ICollection {
     if (await this.find(item.title))
       throw new Error("Tag with this title already exists.");
 
-    await this.collection.upsert({
-      id,
-      dateCreated: item.dateCreated || oldTag?.dateCreated || Date.now(),
-      dateModified: item.dateModified || oldTag?.dateModified || Date.now(),
-      title: item.title || oldTag?.title || "",
-      type: "tag"
-    });
+    if (oldTag) {
+      await this.collection.update([oldTag.id], item);
+    } else {
+      await this.collection.upsert({
+        id,
+        dateCreated: item.dateCreated || Date.now(),
+        dateModified: item.dateModified || Date.now(),
+        title: item.title,
+        type: "tag"
+      });
+    }
     return id;
   }
 
