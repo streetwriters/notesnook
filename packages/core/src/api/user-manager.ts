@@ -411,7 +411,7 @@ class UserManager {
     }
   }
 
-  async sendVerificationEmail(newEmail: string) {
+  async sendVerificationEmail(newEmail?: string) {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
     await http.post(
