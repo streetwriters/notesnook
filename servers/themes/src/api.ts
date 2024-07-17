@@ -59,5 +59,8 @@ export const ThemesAPI = router({
   sync: publicProcedure.query(() => {
     syncThemes();
     return true;
+  }),
+  health: publicProcedure.query(() => {
+    return "Healthy";
   })
 });
