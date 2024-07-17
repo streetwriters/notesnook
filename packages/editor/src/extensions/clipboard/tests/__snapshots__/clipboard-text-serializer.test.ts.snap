@@ -29,6 +29,82 @@ exports[`copying a single nested list item shouldn't copy the list metadata 1`] 
       "type": "paragraph",
     },
   ],
-  "openStart": 5,
+
+exports[`copying multiple lists shouldn't copy only the first list 1`] = `
+{
+  "content": [
+    {
+      "attrs": {
+        "listType": "",
+        "start": 1,
+      },
+      "content": [
+        {
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "Hello",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+          ],
+          "type": "listItem",
+        },
+      ],
+      "type": "orderedList",
+    },
+    {
+      "attrs": {
+        "listType": "",
+        "start": 1,
+      },
+      "content": [
+        {
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "Hello 2",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+          ],
+          "type": "listItem",
+        },
+      ],
+      "type": "orderedList",
+    },
+    {
+      "attrs": {
+        "listType": "",
+        "start": 1,
+      },
+      "content": [
+        {
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "Hello 3",
+                  "type": "text",
+                },
+              ],
+              "type": "paragraph",
+            },
+          ],
+          "type": "listItem",
+        },
+      ],
+      "type": "orderedList",
+    },
+  ],
+}
+`;
+
 }
 `;

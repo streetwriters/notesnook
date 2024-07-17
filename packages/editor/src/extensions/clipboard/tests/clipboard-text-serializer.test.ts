@@ -77,7 +77,30 @@ test("copying a single list item shouldn't copy the list metadata", (t) => {
 
   t.expect(
     transformCopied(
-      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2)
+      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
+      editor.view
+    ).toJSON()
+  ).toMatchSnapshot();
+});
+
+
+test("copying multiple lists shouldn't copy only the first list", (t) => {
+  const { editor } = createEditor({
+    initialContent: h("div", [
+      h("ol", [h("li", ["Hello"])]),
+      h("ol", [h("li", ["Hello 2"])]),
+      h("ol", [h("li", ["Hello 3"])])
+    ]).innerHTML,
+    extensions: {
+      orderedList: OrderedList,
+      listItem: ListItem
+    }
+  });
+
+  t.expect(
+    transformCopied(
+      editor.state.doc.slice(0, editor.state.doc.nodeSize - 2),
+      editor.view
     ).toJSON()
   ).toMatchSnapshot();
 });

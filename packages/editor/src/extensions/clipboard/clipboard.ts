@@ -53,6 +53,7 @@ export function transformCopied(slice: Slice, view: EditorView): any {
   // list formatting but copy it as a paragraph.
   const maybeList = slice.content.firstChild;
   if (
+    slice.content.childCount === 1 &&
     maybeList &&
     LIST_NODE_TYPES.includes(maybeList.type.name) &&
     maybeList.childCount === 1 &&
