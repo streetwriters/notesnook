@@ -59,10 +59,7 @@ export function transformCopied(slice: Slice, view: EditorView): any {
     maybeList.childCount === 1 &&
     maybeList.firstChild
   ) {
-    return transformCopied(
-      new Slice(maybeList.firstChild.content, slice.openStart, slice.openEnd),
-      view
-    );
+    return transformCopied(Slice.maxOpen(maybeList.firstChild.content), view);
   }
 
   return slice;

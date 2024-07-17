@@ -13,6 +13,8 @@ exports[`copying a single list item shouldn't copy the list metadata 1`] = `
       "type": "paragraph",
     },
   ],
+  "openEnd": 1,
+  "openStart": 1,
 }
 `;
 
@@ -29,6 +31,10 @@ exports[`copying a single nested list item shouldn't copy the list metadata 1`] 
       "type": "paragraph",
     },
   ],
+  "openEnd": 1,
+  "openStart": 1,
+}
+`;
 
 exports[`copying multiple lists shouldn't copy only the first list 1`] = `
 {
@@ -106,5 +112,32 @@ exports[`copying multiple lists shouldn't copy only the first list 1`] = `
 }
 `;
 
+exports[`copying text from a list item shouldn't add extra spaces at the end 1`] = `
+{
+  "content": [
+    {
+      "content": [
+        {
+          "marks": [
+            {
+              "attrs": {
+                "class": null,
+                "href": "https://google.com/",
+                "rel": "noopener noreferrer nofollow",
+                "target": "_blank",
+                "title": null,
+              },
+              "type": "link",
+            },
+          ],
+          "text": "Hello",
+          "type": "text",
+        },
+      ],
+      "type": "paragraph",
+    },
+  ],
+  "openEnd": 1,
+  "openStart": 1,
 }
 `;
