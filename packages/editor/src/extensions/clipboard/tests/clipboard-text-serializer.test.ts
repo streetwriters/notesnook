@@ -25,6 +25,7 @@ import { transformCopied } from "../index";
 import { Paragraph } from "../../paragraph";
 import { ClipboardDOMSerializer } from "../clipboard-dom-serializer";
 import { clipboardTextSerializer } from "../clipboard-text-serializer";
+import Link from "../../link";
 
 test("copied list items shouldn't contain extra newlines", (t) => {
   const { editor } = createEditor({
@@ -83,6 +84,32 @@ test("copying a single list item shouldn't copy the list metadata", (t) => {
   ).toMatchSnapshot();
 });
 
+test("copying text from a list item shouldn't add extra spaces at the end", (t) => {
+  const { editor } = createEditor({
+    initialContent: h("div", [
+      h("ol", [
+        h("li", [
+          h("p", ["I am ", h("a", ["Hello"], { href: "https://google.com/" })])
+        ])
+      ])
+    ]).innerHTML,
+    extensions: {
+      orderedList: OrderedList,
+      listItem: ListItem,
+      link: Link
+    }
+  });
+
+  t.expect(
+    transformCopied(
+      editor.state.doc.slice(
+        editor.state.doc.nodeSize - 10,
+        editor.state.doc.nodeSize - 2
+      ),
+      editor.view
+    ).toJSON()
+  ).toMatchSnapshot();
+});
 
 test("copying multiple lists shouldn't copy only the first list", (t) => {
   const { editor } = createEditor({
@@ -123,7 +150,8 @@ test("copying a single nested list item shouldn't copy the list metadata", (t) =
 
   t.expect(
     transformCopied(
-      editor.state.doc.slice(12, editor.state.doc.nodeSize - 2)
+      editor.state.doc.slice(12, editor.state.doc.nodeSize - 2),
+      editor.view
     ).toJSON()
   ).toMatchSnapshot();
 });
