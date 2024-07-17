@@ -11,7 +11,7 @@ exports[`convert br tags to paragraphs 4`] = `"<p>line <span><em>1</em></span></
 exports[`convert br tags to paragraphs 5`] = `"<p></p>"`;
 
 exports[`convert br tags to paragraphs 6`] = `
-"<!--StartFragment--><p data-spacing=\\"single\\">A troll, they call me, but I have no wish
+"<p data-spacing=\\"single\\">A troll, they call me, but I have no wish<!--StartFragment-->
 </p><p data-spacing=\\"single\\">
 to be associated with those dolls</p><p data-spacing=\\"single\\">
 </p><p data-spacing=\\"single\\">
@@ -74,6 +74,8 @@ exports[`convert br tags to paragraphs 12`] = `
     
     </div>"
 `;
+
+exports[`convert br tags to paragraphs 13`] = `"<ul xmlns=\\"http://www.w3.org/1999/xhtml\\" data-block-id=\\"A9jEKaAm\\" class=\\"checklist\\"><li class=\\"checklist--item\\"><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a>hello <a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></li><li class=\\"checklist--item\\"><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></li><li class=\\"checklist--item\\"><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hellohello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello hello hello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></li><li class=\\"checklist--item\\">vsvdsavdsa</li><li class=\\"checklist--item\\">vadsvasdv</li></ul><p xmlns=\\"http://www.w3.org/1999/xhtml\\" data-block-id=\\"CuscJzDm\\" data-spacing=\\"double\\"></p>"`;
 
 exports[`convert google docs checklist 1`] = `
 "<div>

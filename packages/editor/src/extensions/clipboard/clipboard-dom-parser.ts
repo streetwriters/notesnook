@@ -161,12 +161,49 @@ function splitOn(bound: Element, cutElement: Element) {
   }
 }
 
+const inlineTags = new Set([
+  "A",
+  "ABBR",
+  "B",
+  "BDI",
+  "BDO",
+  // "BR",
+  "CITE",
+  "CODE",
+  "DATA",
+  "DFN",
+  "EM",
+  "I",
+  // "IMG",
+  // "INPUT",
+  "KBD",
+  "LABEL",
+  "MARK",
+  "Q",
+  "S",
+  "SAMP",
+  "SMALL",
+  "SPAN",
+  "STRONG",
+  "SUB",
+  "SUP",
+  "TEXTAREA",
+  "TIME",
+  "U",
+  "VAR",
+  "WBR"
+]);
+
 function getSiblingTextNodes(element: ChildNode) {
   const siblings = [];
   let sibling: ChildNode | null = element;
   while ((sibling = sibling.previousSibling)) {
-    if (sibling.nodeType === Node.ELEMENT_NODE) break;
-    else if (sibling.nodeType === Node.TEXT_NODE) siblings.push(sibling);
+    if (isElement(sibling) && !inlineTags.has(sibling.tagName)) break;
+    else siblings.push(sibling);
   }
   return siblings;
+}
+
+function isElement(node: ChildNode): node is HTMLElement {
+  return node.nodeType === Node.ELEMENT_NODE;
 }
