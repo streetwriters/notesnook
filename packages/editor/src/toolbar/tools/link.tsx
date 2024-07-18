@@ -30,6 +30,7 @@ import { Flex, Link } from "@theme-ui/components";
 import { ImageNode } from "../../extensions/image";
 import { Link as LinkNode } from "../../extensions/link";
 import { getMarkAttributes } from "@tiptap/core";
+import { useHoverPopupContext } from "../floating-menus/hover-popup/context";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
@@ -96,7 +97,8 @@ export function AddInternalLink(props: ToolProps) {
 }
 
 export function EditLink(props: ToolProps) {
-  const { editor, selectedNode: _selectedNode } = props;
+  const { editor } = props;
+  const { selectedNode: _selectedNode, hide } = useHoverPopupContext();
   const selectedNode = useRefValue(
     _selectedNode || selectionToOffset(editor.state)
   );
@@ -109,6 +111,7 @@ export function EditLink(props: ToolProps) {
       <ToolButton
         {...props}
         onClick={async () => {
+          hide();
           const link = await editor.storage.createInternalLink?.();
           if (!link) return;
           const { from, to } = editor.state.selection;
@@ -125,7 +128,12 @@ export function EditLink(props: ToolProps) {
     <LinkTool
       {...props}
       isEditing
-      onDone={(attributes) => editor.commands.setLink(attributes)}
+      onDone={(attributes) => {
+        if (selectedNode.current)
+          editor.chain().focus().setTextSelection(selectedNode.current).run();
+        editor.commands.setLink(attributes);
+        hide();
+      }}
       onClick={() => {
         if (!selectedNode.current) return;
 
@@ -146,7 +154,8 @@ export function EditLink(props: ToolProps) {
 }
 
 export function RemoveLink(props: ToolProps) {
-  const { editor, selectedNode } = props;
+  const { editor } = props;
+  const { selectedNode, hide } = useHoverPopupContext();
   if (!editor.isEditable) return null;
   return (
     <ToolButton
@@ -159,13 +168,15 @@ export function RemoveLink(props: ToolProps) {
             to: selectedNode.to
           });
         editor.chain().focus().unsetLink().run();
+        hide();
       }}
     />
   );
 }
 
 export function OpenLink(props: ToolProps) {
-  const { editor, selectedNode: _selectedNode } = props;
+  const { editor } = props;
+  const { selectedNode: _selectedNode, hide } = useHoverPopupContext();
   const selectedNode = useRefValue(
     _selectedNode || selectionToOffset(editor.state)
   );
@@ -181,6 +192,7 @@ export function OpenLink(props: ToolProps) {
         onClick={(e) => {
           e.preventDefault();
           editor.storage.openLink?.(href);
+          hide();
         }}
         target="_blank"
         variant="body"
@@ -204,6 +216,7 @@ export function OpenLink(props: ToolProps) {
         toggled={false}
         onClick={() => {
           editor.storage.openLink?.(href);
+          hide();
         }}
       />
     </Flex>
@@ -211,7 +224,8 @@ export function OpenLink(props: ToolProps) {
 }
 
 export function CopyLink(props: ToolProps) {
-  const { editor, selectedNode: _selectedNode } = props;
+  const { editor } = props;
+  const { selectedNode: _selectedNode, hide } = useHoverPopupContext();
   const selectedNode = useRefValue(
     _selectedNode || selectionToOffset(editor.state)
   );
@@ -231,6 +245,7 @@ export function CopyLink(props: ToolProps) {
             selectedNode.current?.node?.textContent || link?.attrs.title
           }</a>`
         );
+        hide();
       }}
     />
   );

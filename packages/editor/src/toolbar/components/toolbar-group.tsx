@@ -23,17 +23,15 @@ import { Flex, FlexProps } from "@theme-ui/components";
 import { Editor } from "../../types";
 import { MoreTools } from "./more-tools";
 import { getToolDefinition } from "../tool-definitions";
-import { NodeWithOffset } from "../../utils/prosemirror";
 
 export type ToolbarGroupProps = FlexProps & {
   tools: ToolbarGroupDefinition;
   editor: Editor;
   variant?: ToolButtonVariant;
   force?: boolean;
-  selectedNode?: NodeWithOffset;
 };
 export function ToolbarGroup(props: ToolbarGroupProps) {
-  const { tools, editor, force, selectedNode, sx, ...flexProps } = props;
+  const { tools, editor, force, sx, ...flexProps } = props;
 
   return (
     <Flex
@@ -66,7 +64,6 @@ export function ToolbarGroup(props: ToolbarGroupProps) {
               key={toolDefinition.title}
               editor={editor}
               force={force}
-              selectedNode={selectedNode}
               {...toolDefinition}
             />
           );

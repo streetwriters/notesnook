@@ -19,10 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ToolbarGroup } from "../../components/toolbar-group";
 import { HoverPopupProps } from ".";
+import { useHoverPopupContext } from "./context";
 
 function LinkHoverPopup(props: HoverPopupProps) {
-  const { editor, selectedNode } = props;
-  const { node } = selectedNode;
+  const { editor } = props;
+  const { selectedNode } = useHoverPopupContext();
+  const { node } = selectedNode || {};
 
   if (
     !node?.isText ||
@@ -36,7 +38,6 @@ function LinkHoverPopup(props: HoverPopupProps) {
       force
       tools={["openLink", "editLink", "removeLink", "copyLink"]}
       editor={editor}
-      selectedNode={selectedNode}
       sx={{
         bg: "background",
         boxShadow: "menu",

@@ -20,13 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useRef } from "react";
 import { showPopup } from "../../../components/popup-presenter";
 import { Editor } from "../../../types";
-import { NodeWithOffset } from "../../../utils/prosemirror";
 import { FloatingMenuProps } from "../types";
 import { LinkHoverPopupHandler } from "./link";
+import { HoverPopupContextProvider } from "./context";
 
 export type HoverPopupProps = {
   editor: Editor;
-  selectedNode: NodeWithOffset;
 };
 
 const handlers = [LinkHoverPopupHandler];
@@ -96,14 +95,18 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
 
             const hidePopup = showPopup({
               popup: () => (
-                <Popup
-                  editor={editor}
-                  selectedNode={{
-                    node,
-                    from: pos,
-                    to: pos + node.nodeSize
+                <HoverPopupContextProvider
+                  value={{
+                    selectedNode: {
+                      node,
+                      from: pos,
+                      to: pos + node.nodeSize
+                    },
+                    hide: () => hidePopup()
                   }}
-                />
+                >
+                  <Popup editor={editor} />
+                </HoverPopupContextProvider>
               ),
               blocking: false,
               focusOnRender: false,
