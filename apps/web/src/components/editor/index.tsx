@@ -769,6 +769,7 @@ function restoreScrollPosition(session: EditorSession) {
           scrollContainer.style.minHeight = `${scrollPosition + 100}px`;
         scrollContainer.scrollTop = scrollPosition;
       });
+      scrollContainer.style.minHeight = "unset";
     });
   }
 }
