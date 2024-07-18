@@ -25,6 +25,7 @@ import {
 import { eClosePremiumDialog, eOpenPremiumDialog } from "../../utils/events";
 import BaseDialog from "../dialog/base-dialog";
 import { PaywallComponent } from "./component";
+import { IconButton } from "../ui/icon-button";
 
 class PremiumDialog extends React.Component {
   constructor(props) {

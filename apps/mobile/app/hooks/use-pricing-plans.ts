@@ -38,7 +38,8 @@ export type PricingPlan = {
   name: string;
   description: string;
   subscriptionSkuList: string[];
-  products?: Record<string, RNIap.Subscription | undefined>;
+  subscriptions?: Record<string, RNIap.Subscription | undefined>;
+  products?: Record<string, RNIap.Product | undefined>;
   trialSupported?: boolean;
   recommended?: boolean;
   productSkuList: string[];
@@ -72,7 +73,10 @@ const pricingPlans: PricingPlan[] = [
     description: "Unlocks essential features for personal use",
     subscriptionSkuList: [
       "notesnook.essential.monthly",
-      "notesnook.essential.yearly"
+      "notesnook.essential.yearly",
+      // no trial
+      "notesnook.essential.monthly.nt",
+      "notesnook.essential.yearly.nt"
     ],
     trialSupported: true,
     productSkuList: []
@@ -87,7 +91,14 @@ const pricingPlans: PricingPlan[] = [
       "notesnook.pro.monthly.tier2",
       "notesnook.pro.yearly.tier2",
       "notesnook.pro.monthly.tier3",
-      "notesnook.pro.yearly.tier3"
+      "notesnook.pro.yearly.tier3",
+      // no trial
+      "notesnook.pro.monthly.nt",
+      "notesnook.pro.yearly.nt",
+      "notesnook.pro.monthly.tier2.nt",
+      "notesnook.pro.yearly.tier2.nt",
+      "notesnook.pro.monthly.tier3.nt",
+      "notesnook.pro.yearly.tier3.nt"
     ],
     productSkuList: ["notesnook.pro.5year"],
     trialSupported: true,
@@ -100,7 +111,9 @@ const pricingPlans: PricingPlan[] = [
     subscriptionSkuList: [
       "notesnook.believer.monthly",
       "notesnook.believer.yearly",
-      "notesnook.believer.5year"
+      // no trial
+      "notesnook.believer.monthly.nt",
+      "notesnook.believer.yearly.nt"
     ],
     productSkuList: ["notesnook.believer.5year"],
     trialSupported: true
@@ -128,6 +141,7 @@ type PricingPlansOptions = {
   };
   planId?: string;
   productId?: string;
+  onBuy?: () => void;
 };
 
 const usePricingPlans = (options?: PricingPlansOptions) => {
@@ -143,17 +157,53 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   >(options?.productId || undefined);
   const [isPromoOffer, setIsPromoOffer] = useState(false);
   const [cancelPromo, setCancelPromo] = useState(false);
-  const userCanRequestTrial =
-    user && (!user.subscription || !user.subscription.expiry) ? true : false;
+
+  const getProduct = (planId: string, skuId: string) => {
+    return (
+      plans.find((p) => p.id === planId)?.subscriptions?.[skuId] ||
+      plans.find((p) => p.id === planId)?.products?.[skuId]
+    );
+  };
+
+  const getProductAndroid = (planId: string, skuId: string) => {
+    return getProduct(planId, skuId) as RNIap.SubscriptionAndroid;
+  };
+
+  const getProductIOS = (planId: string, skuId: string) => {
+    return getProduct(planId, skuId) as RNIap.SubscriptionIOS;
+  };
+
+  const hasTrialOffer = () => {
+    if (!selectedProductSku) return false;
+
+    return Platform.OS === "ios"
+      ? !!(getProduct(currentPlan, selectedProductSku) as RNIap.SubscriptionIOS)
+          ?.introductoryPrice
+      : (
+          getProduct(
+            currentPlan,
+            selectedProductSku
+          ) as RNIap.SubscriptionAndroid
+        ).subscriptionOfferDetails?.[0]?.pricingPhases?.pricingPhaseList
+          ?.length > 1;
+  };
+
+  const userCanRequestTrial = hasTrialOffer();
+  // user && (!user.subscription || !user.subscription.expiry) ? true : false;
 
   useEffect(() => {
     const loadPlans = async () => {
       const items = await PremiumService.loadProductsAndSubs();
       pricingPlans.forEach((plan) => {
+        plan.subscriptions = {};
         plan.products = {};
         plan.subscriptionSkuList.forEach((sku) => {
+          if (!plan.subscriptions) plan.subscriptions = {};
+          plan.subscriptions[sku] = items.subs.find((p) => p.productId === sku);
+        });
+        plan.productSkuList.forEach((sku) => {
           if (!plan.products) plan.products = {};
-          plan.products[sku] = items.subs.find((p) => p.productId === sku);
+          plan.products[sku] = items.products.find((p) => p.productId === sku);
         });
       });
       setPlans([...pricingPlans]);
@@ -191,14 +241,18 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     loadPlans().then(() => loadPromoOffer());
   }, [options?.promoOffer, cancelPromo]);
 
-  function getLocalizedPrice(product: RNIap.Subscription) {
+  function getLocalizedPrice(product: RNIap.Subscription | RNIap.Product) {
     if (!product) return;
 
     if (Platform.OS === "android") {
       const pricingPhaseListItem = (product as RNIap.SubscriptionAndroid)
         ?.subscriptionOfferDetails?.[0]?.pricingPhases?.pricingPhaseList?.[1];
 
-      return pricingPhaseListItem?.formattedPrice;
+      return (
+        pricingPhaseListItem?.formattedPrice ||
+        (product as RNIap.ProductAndroid).oneTimePurchaseOfferDetails
+          ?.formattedPrice
+      );
     } else {
       return (product as RNIap.SubscriptionIOS)?.localizedPrice;
     }
@@ -225,44 +279,55 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       }
       useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
 
-      if (Platform.OS === "android") {
-        androidOfferToken =
-          (product as RNIap.SubscriptionAndroid).subscriptionOfferDetails.find(
-            (offer) => offer.offerToken === androidOfferToken
-          )?.offerToken ||
-          (product as RNIap.SubscriptionAndroid).subscriptionOfferDetails?.[0]
-            .offerToken;
+      if (product.productId.includes("5year")) {
+        if (Platform.OS === "android") {
+          androidOfferToken =
+            (
+              product as RNIap.SubscriptionAndroid
+            ).subscriptionOfferDetails.find(
+              (offer) => offer.offerToken === androidOfferToken
+            )?.offerToken ||
+            (product as RNIap.SubscriptionAndroid).subscriptionOfferDetails?.[0]
+              .offerToken;
 
-        if (!androidOfferToken) return;
+          if (!androidOfferToken) return;
+        }
+
+        DatabaseLogger.info(
+          `Subscription Requested initiated for user ${toUUID(user.id)}`
+        );
+
+        await RNIap.requestSubscription({
+          sku: product?.productId,
+          obfuscatedAccountIdAndroid: user.id,
+          obfuscatedProfileIdAndroid: user.id,
+          /**
+           * iOS
+           */
+          appAccountToken: toUUID(user.id),
+          andDangerouslyFinishTransactionAutomaticallyIOS: false,
+          subscriptionOffers: androidOfferToken
+            ? [
+                {
+                  offerToken: androidOfferToken,
+                  sku: product?.productId
+                }
+              ]
+            : undefined
+        });
+      } else {
+        await RNIap.requestPurchase({
+          andDangerouslyFinishTransactionAutomaticallyIOS: false,
+          appAccountToken: toUUID(user.id),
+          obfuscatedAccountIdAndroid: user.id,
+          obfuscatedProfileIdAndroid: user.id,
+          sku: product.productId,
+          quantity: 1
+        });
       }
-
-      DatabaseLogger.info(
-        `Subscription Requested initiated for user ${toUUID(user.id)}`
-      );
-
-      await RNIap.requestSubscription({
-        sku: product?.productId,
-        obfuscatedAccountIdAndroid: user.id,
-        obfuscatedProfileIdAndroid: user.id,
-        /**
-         * iOS
-         */
-        appAccountToken: toUUID(user.id),
-        andDangerouslyFinishTransactionAutomaticallyIOS: false,
-        subscriptionOffers: androidOfferToken
-          ? [
-              {
-                offerToken: androidOfferToken,
-                sku: product?.productId
-              }
-            ]
-          : undefined
-      });
       useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
       setLoading(false);
-      eSendEvent(eCloseSheet);
-      eSendEvent(eClosePremiumDialog);
-      await sleep(500);
+      options?.onBuy?.();
     } catch (e) {
       setLoading(false);
     }
@@ -295,18 +360,6 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     return cycleText;
   }
 
-  const getProduct = (planId: string, skuId: string) => {
-    return plans.find((p) => p.id === planId)?.products?.[skuId];
-  };
-
-  const getProductAndroid = (planId: string, skuId: string) => {
-    return getProduct(planId, skuId) as RNIap.SubscriptionAndroid;
-  };
-
-  const getProductIOS = (planId: string, skuId: string) => {
-    return getProduct(planId, skuId) as RNIap.SubscriptionIOS;
-  };
-
   const getBillingPeriod = (
     product: RNIap.Subscription,
     offerIndex: number
@@ -330,8 +383,16 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   const getBillingDuration = (
     product: RNIap.Subscription,
     offerIndex: number,
-    phaseIndex: number
+    phaseIndex: number,
+    trialDurationIos?: boolean
   ) => {
+    if (product.productId.includes("5year")) {
+      return {
+        type: "year",
+        duration: 5
+      };
+    }
+
     if (Platform.OS === "android") {
       const phase = (product as RNIap.SubscriptionAndroid)
         ?.subscriptionOfferDetails?.[offerIndex]?.pricingPhases
@@ -348,10 +409,15 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
           : "year"
       };
     } else {
-      const unit = (product as RNIap.SubscriptionIOS)
-        ?.subscriptionPeriodUnitIOS;
+      const productIos = product as RNIap.SubscriptionIOS;
+      const unit = trialDurationIos
+        ? productIos.introductoryPriceSubscriptionPeriodIOS
+        : productIos.subscriptionPeriodUnitIOS;
+
       const duration = parseInt(
-        (product as RNIap.SubscriptionIOS)?.subscriptionPeriodNumberIOS || "1"
+        (trialDurationIos
+          ? productIos.introductoryPriceNumberOfPeriodsIOS
+          : productIos.subscriptionPeriodNumberIOS) || "1"
       );
 
       return {
@@ -365,6 +431,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     if (Platform.OS === "android") {
       const ProductAndroid = (product as RNIap.SubscriptionAndroid)
         .subscriptionOfferDetails?.[0];
+      if (ProductAndroid.pricingPhases.pricingPhaseList?.length === 1) return;
       return {
         period:
           ProductAndroid?.pricingPhases.pricingPhaseList?.[0].billingPeriod,
@@ -373,6 +440,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       };
     } else {
       const productIos = product as RNIap.SubscriptionIOS;
+      if (!productIos.introductoryPrice) return;
       return {
         period: productIos.introductoryPriceSubscriptionPeriodIOS,
         cycles: productIos.introductoryPriceNumberOfPeriodsIOS
@@ -382,22 +450,34 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     }
   };
 
-  const convertYearlyPriceToMonthly = (
+  const convertPrice = (
     amount: number,
     symbol: string,
-    isAtLeft: boolean
+    isAtLeft: boolean,
+    splitBy = 12
   ) => {
-    const monthlyPrice = amount / 12;
+    const monthlyPrice = amount / splitBy;
     const formattedPrice = numberWithCommas(monthlyPrice.toFixed(2));
 
-    if (isAtLeft) return `${symbol} ${formattedPrice}`;
-    else return `${formattedPrice} ${symbol}`;
+    return isAtLeft
+      ? `${symbol} ${formattedPrice}`
+      : `${formattedPrice} ${symbol}`;
+  };
+
+  const getDiscountValue = (p1: string, p2: string, splitToMonth?: boolean) => {
+    let price1 = Platform.OS === "ios" ? parseInt(p1) : parseInt(p1) / 1000000;
+    const price2 =
+      Platform.OS === "ios" ? parseInt(p2) : parseInt(p2) / 1000000;
+
+    price1 = splitToMonth ? price1 / 12 : price1;
+
+    return (((price2 - price1) / price2) * 100).toFixed(0);
   };
 
   const compareProductPrice = (planId: string, sku1: string, sku2: string) => {
     const plan = pricingPlans.find((p) => p.id === planId);
-    const p1 = plan?.products?.[sku1];
-    const p2 = plan?.products?.[sku2];
+    const p1 = plan?.subscriptions?.[sku1];
+    const p2 = plan?.subscriptions?.[sku2];
 
     if (!p1 || !p2) return 0;
 
@@ -407,50 +487,93 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       const androidPricingPhase2 = (p2 as RNIap.SubscriptionAndroid)
         ?.subscriptionOfferDetails?.[0].pricingPhases?.pricingPhaseList?.[1];
 
-      const price = parseInt(androidPricingPhase1.priceAmountMicros) / 1000000;
-      const price2 = parseInt(androidPricingPhase2.priceAmountMicros) / 1000000;
-
-      const monthlyPrice = price / 12;
-
-      return (((price2 - monthlyPrice) / price2) * 100).toFixed(0);
+      return getDiscountValue(
+        androidPricingPhase1.priceAmountMicros,
+        androidPricingPhase2.priceAmountMicros,
+        true
+      );
     } else {
-      return 0;
+      return getDiscountValue(
+        (p1 as RNIap.SubscriptionIOS).price,
+        (p2 as RNIap.SubscriptionIOS).price,
+        true
+      );
     }
   };
 
-  const getAndroidPrice = (
-    product: RNIap.Subscription,
+  const getPriceParts = (price: number, localizedPrice: string) => {
+    let priceValue: number;
+
+    if (Platform.OS === "ios") {
+      priceValue = price;
+    } else {
+      priceValue = price / 1000000;
+    }
+    const priceSymbol = localizedPrice.replace(/[\s\d,.]+/, "");
+
+    return { priceValue, priceSymbol, localizedPrice };
+  };
+
+  const getPrice = (
+    product: RNIap.Subscription | RNIap.Product,
     phaseIndex: number,
     annualBilling?: boolean
   ) => {
     if (!product) return null;
 
-    let priceValue: number;
-    let priceSymbol: string;
-    let localizedPrice: string;
+    const androidPricingPhase = (product as RNIap.SubscriptionAndroid)
+      ?.subscriptionOfferDetails?.[0].pricingPhases?.pricingPhaseList?.[
+      phaseIndex
+    ];
+    console.log(product as RNIap.Product);
 
-    if (Platform.OS === "ios") {
-      priceValue = parseInt((product as RNIap.SubscriptionIOS).price);
-      localizedPrice = (product as RNIap.SubscriptionIOS).localizedPrice;
-      priceSymbol = localizedPrice.replace(/^[\s\d,]+/, "");
-    } else {
-      const androidPricingPhase = (product as RNIap.SubscriptionAndroid)
-        ?.subscriptionOfferDetails?.[0].pricingPhases?.pricingPhaseList?.[
-        phaseIndex
-      ];
-      priceValue = parseInt(androidPricingPhase.priceAmountMicros) / 1000000;
-      localizedPrice = androidPricingPhase?.formattedPrice;
-      priceSymbol = localizedPrice.replace(/[\s\d,.]+/, "");
-    }
+    const { localizedPrice, priceSymbol, priceValue } = getPriceParts(
+      Platform.OS === "android"
+        ? parseInt(
+            androidPricingPhase?.priceAmountMicros ||
+              (product as RNIap.ProductAndroid)?.oneTimePurchaseOfferDetails
+                ?.priceAmountMicros ||
+              "0"
+          )
+        : parseInt((product as RNIap.SubscriptionIOS).price),
+      Platform.OS === "android"
+        ? androidPricingPhase?.formattedPrice ||
+            (product as RNIap.ProductAndroid).oneTimePurchaseOfferDetails
+              ?.formattedPrice ||
+            "0"
+        : (product as RNIap.SubscriptionIOS).localizedPrice
+    );
 
-    return !annualBilling
+    return !annualBilling && !product?.productId.includes("5year")
       ? getLocalizedPrice(product as RNIap.Subscription)
-      : convertYearlyPriceToMonthly(
+      : convertPrice(
           priceValue,
           priceSymbol,
-          localizedPrice.startsWith(priceSymbol)
+          localizedPrice.startsWith(priceSymbol),
+          annualBilling ? 12 : 60
         );
   };
+
+  // const getPricingPhases = (product: RNIap.Subscription) => {
+  //   if (!product) return null;
+
+  //   if (Platform.OS === "android") {
+  //     const offer = (product as RNIap.SubscriptionAndroid)
+  //     ?.subscriptionOfferDetails?.[0];
+
+  //     return offer.pricingPhases?.pricingPhaseList?.map((phase, index) => {
+
+  //       return {
+  //         localizedPrice: phase.formattedPrice,
+  //         price: parseInt(phase.priceAmountMicros) / 1000000,
+  //         monthlyFormattedPrice: getPrice(product, index, offer?.pricingPhases?.pricingPhaseList?.[1].billingPeriod.endsWith("Y"),
+  //       }
+  //     })
+  //   } else {
+  //     return (product as RNIap.SubscriptionIOS)?.pricingPhases;
+  //   }
+
+  // }
 
   return {
     currentPlan: pricingPlans.find((p) => p.id === currentPlan),
@@ -465,7 +588,7 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
       );
       setIsPromoOffer(false);
     },
-    convertYearlyPriceToMonthly,
+    convertYearlyPriceToMonthly: convertPrice,
     getOfferTokenAndroid,
     subscribe,
     selectProduct: setSelectedProductSku,
@@ -477,14 +600,21 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     getProduct,
     getProductAndroid,
     getProductIOS,
-    userCanRequestTrial,
+    hasTrialOffer,
+    userCanRequestTrial: userCanRequestTrial,
     cancelPromoOffer: () => setCancelPromo(true),
     getBillingDuration,
     getBillingPeriod,
     getTrialInfo,
     user,
-    getAndroidPrice,
-    compareProductPrice
+    getPrice,
+    compareProductPrice,
+    get5YearPlanProduct: () => {
+      if (currentPlan === "free" || currentPlan === "essential") return;
+      return plans.find((p) => p.id === "pro")?.products?.[
+        `notesnook.${currentPlan}.5year`
+      ];
+    }
   };
 };
 

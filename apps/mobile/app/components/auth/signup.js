@@ -61,7 +61,7 @@ export const Signup = ({ changeMode, welcome }) => {
   const setUser = useUserStore((state) => state.setUser);
   const setLastSynced = useUserStore((state) => state.setLastSynced);
   const deviceMode = useSettingStore((state) => state.deviceMode);
-  const { width, height } = useWindowDimensions();
+  const { height } = useWindowDimensions();
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
       ToastManager.show({
@@ -78,8 +78,6 @@ export const Signup = ({ changeMode, welcome }) => {
   };
 
   const signup = async () => {
-    setCurrentStep(SignupSteps.selectPlan);
-    return;
     if (!validateInfo() || error) return;
     if (loading) return;
 

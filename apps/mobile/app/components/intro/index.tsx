@@ -195,9 +195,9 @@ const Intro = () => {
           onPress={() => {
             eSendEvent(eOpenLoginDialog, AuthMode.welcomeSignup);
             setTimeout(() => {
-              // SettingsService.set({
-              //   introCompleted: true
-              // });
+              SettingsService.set({
+                introCompleted: true
+              });
               Navigation.replace("Notes", {
                 canGoBack: false
               });
@@ -220,9 +220,9 @@ const Intro = () => {
           onPress={() => {
             eSendEvent(eOpenLoginDialog, AuthMode.login);
             setTimeout(() => {
-              // SettingsService.set({
-              //   introCompleted: true
-              // });
+              SettingsService.set({
+                introCompleted: true
+              });
               Navigation.replace("Notes", {
                 canGoBack: false
               });
