@@ -763,14 +763,23 @@ function restoreScrollPosition(session: EditorSession) {
   const scrollContainer = document.getElementById(`editorScroll_${session.id}`);
   const scrollPosition = Config.get(`${session.id}:scroll-position`, 0);
   if (scrollContainer) {
-    setTimeout(() => {
-      requestAnimationFrame(() => {
-        if (scrollContainer.scrollHeight < scrollPosition)
-          scrollContainer.style.minHeight = `${scrollPosition + 100}px`;
-        scrollContainer.scrollTop = scrollPosition;
+    if (scrollContainer.scrollHeight < scrollPosition) {
+      const observer = new ResizeObserver(() => {
+        if (scrollContainer.scrollHeight >= scrollPosition) {
+          observer.disconnect();
+          requestAnimationFrame(
+            () => (scrollContainer.scrollTop = scrollPosition)
+          );
+          clearTimeout(timeout);
+        }
       });
-      scrollContainer.style.minHeight = "unset";
-    });
+      observer.observe(scrollContainer);
+      // eslint-disable-next-line no-var
+      var timeout = setTimeout(() => {
+        observer.disconnect();
+      }, 30 * 1000);
+    } else
+      requestAnimationFrame(() => (scrollContainer.scrollTop = scrollPosition));
   }
 }
 
