@@ -17,24 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor } from "../types";
-import { IconNames } from "./icons";
-import { ToolId } from "./tools";
+import { NodeWithOffset } from "@/src/utils/prosemirror";
+import { createContext, useContext } from "react";
 
-export type ToolButtonVariant = "small" | "normal";
-export type ToolProps = ToolDefinition & {
-  editor: Editor;
-  variant?: ToolButtonVariant;
-  force?: boolean;
-};
-
-export type ToolDefinition = {
-  icon: IconNames;
-  title: string;
-  conditional?: boolean;
-  description?: string;
-};
-
-export type ToolbarGroupDefinition = (ToolId | ToolId[])[];
-
-export type ToolbarDefinition = ToolbarGroupDefinition[];
+const HoverPopupContext = createContext<{
+  selectedNode?: NodeWithOffset;
+  hide: () => void;
+}>({ hide: () => {} });
+export function useHoverPopupContext() {
+  return useContext(HoverPopupContext);
+}
+export const HoverPopupContextProvider = HoverPopupContext.Provider;
