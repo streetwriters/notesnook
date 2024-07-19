@@ -138,8 +138,8 @@ export function MenuButton(props: MenuButtonProps) {
   );
 }
 
-const platform = getPlatform();
 function translateModifier(modifier: string) {
+  const platform = getPlatform();
   if (platform === "Android" || platform === "iOS") return "";
   const isMacOS = platform === "macOS";
   const parts = modifier.split("-");
