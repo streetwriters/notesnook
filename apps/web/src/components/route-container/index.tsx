@@ -117,7 +117,14 @@ function Header(props: RouteContainerProps) {
         height: 42.8
       }}
     >
-      <Flex py={1} sx={{ alignItems: "center", justifyContent: "center" }}>
+      <Flex
+        py={1}
+        sx={{
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden"
+        }}
+      >
         {buttons?.back ? (
           <ArrowLeft
             size={24}
