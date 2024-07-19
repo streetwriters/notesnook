@@ -23,7 +23,7 @@ import { useEditorStore } from "../../stores/editor-store";
 import { debounceWithId } from "@notesnook/common";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
-import { useEditorConfig } from "./manager";
+import { useEditorConfig, useEditorManager } from "./manager";
 import { getFontById } from "@notesnook/editor";
 import { replaceDateTime } from "@notesnook/editor/dist/extensions/date-time";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
@@ -129,6 +129,13 @@ function TitleBox(props: TitleBoxProps) {
         width: "100%",
         "::placeholder": {
           color: "placeholder"
+        }
+      }}
+      onKeyUp={(e) => {
+        if (e.key === "Enter") {
+          const context = useEditorManager.getState().getEditor(id);
+          if (!context) return;
+          context.editor?.focus({ scrollIntoView: true });
         }
       }}
       onChange={(e) => {
