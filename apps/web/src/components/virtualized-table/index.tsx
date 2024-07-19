@@ -17,9 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Virtualizer, useVirtualizer } from "@tanstack/react-virtual";
-import { Box } from "@theme-ui/components";
+import { Virtualizer } from "@tanstack/react-virtual";
+import { Flex } from "@theme-ui/components";
 import React, { useRef } from "react";
+import { TableVirtuoso } from "react-virtuoso";
 
 export type VirtualizedTableRowProps<T, C> = {
   item: T;
@@ -36,12 +37,10 @@ type VirtualizedTableProps<T, C> = {
   mode?: "fixed" | "dynamic";
   items: T[];
   estimatedSize: number;
-  headerSize: number;
   getItemKey: (index: number) => string;
-  scrollElement?: Element | null;
+  scrollElement?: HTMLElement | null;
   context?: C;
   renderRow: (props: VirtualizedTableRowProps<T, C>) => JSX.Element | null;
-  scrollMargin?: number;
   header: React.ReactNode;
   style?: React.CSSProperties;
 };
@@ -50,59 +49,95 @@ export function VirtualizedTable<T, C>(props: VirtualizedTableProps<T, C>) {
     items,
     getItemKey,
     scrollElement,
-    scrollMargin,
-    headerSize,
     renderRow: Row,
     estimatedSize,
     mode,
-    virtualizerRef,
     header,
-    style,
-    context
+    context,
+    style
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const virtualizer = useVirtualizer({
-    count: items.length,
-    estimateSize: () => estimatedSize,
-    getItemKey,
-    getScrollElement: () =>
-      scrollElement || containerRef.current?.closest(".ms-container") || null,
-    scrollMargin: scrollMargin || containerRef.current?.offsetTop || 0
-  });
-
-  if (virtualizerRef) virtualizerRef.current = virtualizer;
-
-  const virtualItems = virtualizer.getVirtualItems();
   return (
-    <Box
+    <Flex
       ref={containerRef}
-      sx={{
-        height: virtualizer.getTotalSize() + headerSize
-      }}
+      variant="columnFill"
+      sx={{ height: estimatedSize * items.length }}
     >
-      <table style={style}>
-        <thead>{header}</thead>
-        <tbody>
-          {virtualItems.map((row, index) => (
-            <Row
-              key={row.key}
-              item={items[row.index]}
-              index={row.index}
-              rowRef={mode === "dynamic" ? virtualizer.measureElement : null}
-              context={context}
-              style={{
-                height: mode === "dynamic" ? "unset" : `${row.size}px`,
-                transform: `translateY(${
-                  row.start -
-                  index * row.size -
-                  virtualizer.options.scrollMargin
-                }px)`
-              }}
-            />
-          ))}
-        </tbody>
-      </table>
-    </Box>
+      <TableVirtuoso
+        data={items}
+        context={context}
+        customScrollParent={
+          scrollElement ||
+          containerRef.current?.closest(".ms-container") ||
+          undefined
+        }
+        computeItemKey={(index) => getItemKey(index)}
+        defaultItemHeight={estimatedSize}
+        fixedHeaderContent={() => <>{header}</>}
+        fixedItemHeight={mode === "fixed" ? estimatedSize : undefined}
+        components={{
+          Table: (props) => (
+            <table {...props} style={{ ...style, ...props.style }} />
+          ),
+          TableRow: (props) => {
+            return (
+              <Row
+                index={props["data-item-index"]}
+                item={props.item}
+                style={props.style || {}}
+                context={props.context}
+              />
+            );
+          }
+        }}
+      />
+    </Flex>
   );
+
+  //
+
+  // const virtualizer = useVirtualizer({
+  //   count: items.length,
+  //   estimateSize: () => estimatedSize,
+  //   getItemKey,
+  //   getScrollElement: () =>
+  //     scrollElement || containerRef.current?.closest(".ms-container") || null,
+  //   scrollMargin: scrollMargin || containerRef.current?.offsetTop || 0
+  // });
+
+  // if (virtualizerRef) virtualizerRef.current = virtualizer;
+
+  // const virtualItems = virtualizer.getVirtualItems();
+  // return (
+  //   <Box
+  //     ref={containerRef}
+  //     sx={{
+  //       height: virtualizer.getTotalSize() + headerSize
+  //     }}
+  //   >
+  //     <table style={style}>
+  //       <thead>{header}</thead>
+  //       <tbody>
+  //         {virtualItems.map((row, index) => (
+  //           <Row
+  //             key={row.key}
+  //             item={items[row.index]}
+  //             index={row.index}
+  //             rowRef={mode === "dynamic" ? virtualizer.measureElement : null}
+  //             context={context}
+  //             style={{
+  //               height: mode === "dynamic" ? "unset" : `${row.size}px`,
+  //               transform: `translateY(${
+  //                 row.start -
+  //                 index * row.size -
+  //                 virtualizer.options.scrollMargin
+  //               }px)`
+  //             }}
+  //           />
+  //         ))}
+  //       </tbody>
+  //     </table>
+  //   </Box>
+  // );
 }

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState, memo, useRef } from "react";
+import { useEffect, useState, memo, useRef, startTransition } from "react";
 import {
   Box,
   Button,
@@ -29,7 +29,7 @@ import {
   Text
 } from "@theme-ui/components";
 import { store, useStore } from "../stores/attachment-store";
-import { ResolvedItem, formatBytes, usePromise } from "@notesnook/common";
+import { formatBytes, usePromise, useResolvedItem } from "@notesnook/common";
 import Dialog from "../components/dialog";
 import {
   ChevronDown,
@@ -66,6 +66,7 @@ import { FlexScrollContainer } from "../components/scroll-container";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { ConfirmDialog } from "./confirm";
 import { showToast } from "../utils/toast";
+import { Loader } from "../components/loader";
 
 type ToolbarAction = {
   title: string;
@@ -107,7 +108,7 @@ type SortOptions = {
 type AttachmentsDialogProps = BaseDialogProps<false>;
 export const AttachmentsDialog = DialogManager.register(
   function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
-    const allAttachments = useStore((store) => store.attachments);
+    const nonce = useStore((store) => store.nonce);
     const [attachments, setAttachments] =
       useState<VirtualizedGrouping<AttachmentType>>();
     const [counts, setCounts] = useState<Record<Route, number>>({
@@ -125,29 +126,20 @@ export const AttachmentsDialog = DialogManager.register(
       direction: "asc"
     });
     const currentRoute = useRef<Route>("all");
-    const refresh = useStore((store) => store.refresh);
     const download = useStore((store) => store.download);
 
     useEffect(() => {
-      refresh();
-    }, [refresh]);
+      filterAttachments(currentRoute.current)
+        .sorted({
+          sortBy: sortBy.id,
+          sortDirection: sortBy.direction
+        })
+        .then((value) => startTransition(() => setAttachments(value)));
+    }, [sortBy, nonce]);
 
     useEffect(() => {
-      (async function () {
-        setAttachments(
-          await filterAttachments(currentRoute.current).sorted({
-            sortBy: sortBy.id,
-            sortDirection: sortBy.direction
-          })
-        );
-      })();
-    }, [sortBy, allAttachments]);
-
-    useEffect(() => {
-      (async function () {
-        setCounts(await getCounts());
-      })();
-    }, [allAttachments]);
+      getCounts().then((counts) => startTransition(() => setCounts(counts)));
+    }, [nonce]);
 
     return (
       <Dialog
@@ -234,7 +226,7 @@ export const AttachmentsDialog = DialogManager.register(
               </Text>
             </Button> */}
               </Flex>
-              {attachments && (
+              {attachments ? (
                 <VirtualizedTable
                   style={{
                     tableLayout: "fixed",
@@ -327,7 +319,6 @@ export const AttachmentsDialog = DialogManager.register(
                   }
                   mode="fixed"
                   estimatedSize={30}
-                  headerSize={40}
                   getItemKey={(index) => attachments.key(index)}
                   items={attachments.placeholders}
                   context={{
@@ -345,6 +336,8 @@ export const AttachmentsDialog = DialogManager.register(
                   }}
                   renderRow={AttachmentRow}
                 />
+              ) : (
+                <Loader title="Loading attachments..." />
               )}
             </FlexScrollContainer>
           </Flex>
@@ -364,23 +357,21 @@ function AttachmentRow(
     }
   >
 ) {
-  if (!props.context) return null;
+  const item = useResolvedItem({
+    index: props.index,
+    items: props.context!.attachments,
+    type: "attachment"
+  });
+  if (!item) return null;
   return (
-    <ResolvedItem
-      index={props.index}
-      items={props.context.attachments}
-      type="attachment"
-    >
-      {({ item }) => (
-        <Attachment
-          rowRef={props.rowRef}
-          style={props.style}
-          item={item}
-          isSelected={props.context?.isSelected(item.id)}
-          onSelected={() => props.context?.select(item.id)}
-        />
-      )}
-    </ResolvedItem>
+    <Attachment
+      key={item.item.id}
+      rowRef={props.rowRef}
+      style={props.style}
+      item={item?.item}
+      isSelected={props.context?.isSelected(item.item.id)}
+      onSelected={() => props.context?.select(item.item.id)}
+    />
   );
 }
 

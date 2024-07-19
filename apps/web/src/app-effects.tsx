@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useEffect } from "react";
 import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
-import { useStore as useAttachmentStore } from "./stores/attachment-store";
 import { useEditorStore } from "./stores/editor-store";
 import { useStore as useAnnouncementStore } from "./stores/announcement-store";
 import { resetNotices, scheduleBackups } from "./common/notices";
@@ -51,7 +50,6 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const initUser = useUserStore((store) => store.init);
   const initStore = useStore((store) => store.init);
-  const initAttachments = useAttachmentStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
   const initEditorStore = useEditorStore((store) => store.init);
   const dialogAnnouncements = useAnnouncementStore(
@@ -77,7 +75,6 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
       );
 
       initStore();
-      initAttachments();
       initEditorStore();
 
       (async function () {
@@ -102,7 +99,6 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
     [
       initEditorStore,
       initStore,
-      initAttachments,
       updateLastSynced,
       refreshNavItems,
       initUser,

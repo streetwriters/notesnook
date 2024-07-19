@@ -666,7 +666,6 @@ function Attachments({ noteId }: { noteId: string }) {
             <th style={{ width: "20%" }} />
           </tr>
         }
-        headerSize={0}
         renderRow={({ index }) => (
           <ResolvedItem index={index} type="attachment" items={result.value}>
             {({ item }) => <ListItemWrapper item={item} compact />}
