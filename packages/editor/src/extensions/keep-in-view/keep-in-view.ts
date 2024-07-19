@@ -74,7 +74,12 @@ export function keepLastLineInView(
   THRESHOLD = 80,
   SCROLL_THRESHOLD = 100
 ) {
-  if (!editor.view || editor.view.isDestroyed || !editor.state.selection.empty)
+  if (
+    !editor.view ||
+    editor.view.isDestroyed ||
+    !editor.state.selection.empty ||
+    !editor.isEditable
+  )
     return;
 
   const isPopupVisible = document.getElementsByClassName(
