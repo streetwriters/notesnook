@@ -27,6 +27,7 @@ type PositionData = {
 };
 
 const mousePosition: PositionData = { x: 0, y: 0, actualX: 0, actualY: 0 };
+let mouseMoveListenerAttached = false;
 attachMouseMoveListener();
 
 export type PositionOptions = {
@@ -177,7 +178,6 @@ export function getElementPosition(
   return position;
 }
 
-let mouseMoveListenerAttached = false;
 function attachMouseMoveListener() {
   if (mouseMoveListenerAttached || !("window" in globalThis)) return;
   window.addEventListener("mousemove", (e) => {
