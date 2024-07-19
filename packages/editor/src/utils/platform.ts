@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export const isiOS =
-  [
+  "navigator" in globalThis &&
+  ([
     "iPad Simulator",
     "iPhone Simulator",
     "iPod Simulator",
@@ -26,8 +27,9 @@ export const isiOS =
     "iPhone",
     "iPod"
   ].includes(navigator.platform) ||
-  // iPad on iOS 13 detection
-  (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+    // iPad on iOS 13 detection
+    (navigator.userAgent.includes("Mac") && "ontouchend" in document));
 
 export const isAndroid =
+  "navigator" in globalThis &&
   navigator.userAgent.toLowerCase().indexOf("android") > -1;
