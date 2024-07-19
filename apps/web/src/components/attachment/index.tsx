@@ -209,7 +209,12 @@ export function Attachment({
       <Text
         as="td"
         variant="body"
-        sx={{ color: status ? "accent" : "paragraph" }}
+        sx={{
+          color: status ? "accent" : "paragraph",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis"
+        }}
       >
         {status ? (
           <>

@@ -27,11 +27,11 @@ import { showToast } from "../utils/toast";
 import { AttachmentStream } from "../utils/streams/attachment-stream";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
-import { Attachment, VirtualizedGrouping } from "@notesnook/core";
+import { Attachment } from "@notesnook/core";
 
 let abortController: AbortController | undefined = undefined;
 class AttachmentStore extends BaseStore<AttachmentStore> {
-  attachments?: VirtualizedGrouping<Attachment>;
+  nonce = 0;
   status?: { current: number; total: number };
   processing: Record<
     string,
@@ -40,15 +40,8 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
 
   refresh = async () => {
     this.set({
-      attachments: await db.attachments.all.sorted({
-        sortBy: "dateCreated",
-        sortDirection: "desc"
-      })
+      nonce: this.get().nonce + 1
     });
-  };
-
-  init = () => {
-    this.refresh();
   };
 
   download = async (ids: string[]) => {
