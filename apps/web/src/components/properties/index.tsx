@@ -606,7 +606,7 @@ function Notebooks({ noteId }: { noteId: string }) {
         renderItem={({ index }) => (
           <ResolvedItem index={index} items={result.value} type="notebook">
             {({ item, data }) => (
-              <ListItemWrapper item={item} data={data} simplified />
+              <ListItemWrapper item={item} data={data} compact />
             )}
           </ResolvedItem>
         )}
@@ -635,7 +635,7 @@ function Reminders({ noteId }: { noteId: string }) {
         renderItem={({ index }) => (
           <ResolvedItem index={index} items={result.value} type="reminder">
             {({ item, data }) => (
-              <ListItemWrapper item={item} data={data} simplified />
+              <ListItemWrapper item={item} data={data} compact />
             )}
           </ResolvedItem>
         )}

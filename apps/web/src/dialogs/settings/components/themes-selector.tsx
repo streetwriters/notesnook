@@ -190,9 +190,11 @@ function ThemesList() {
 
               if (
                 await ThemeDetailsDialog.show({
-                  ...theme,
-                  totalInstalls: 0,
-                  previewColors: getPreviewColors(theme)
+                  theme: {
+                    ...theme,
+                    totalInstalls: 0,
+                    previewColors: getPreviewColors(theme)
+                  }
                 })
               ) {
                 setCurrentTheme(theme);
@@ -266,7 +268,7 @@ function ThemeItem(props: ThemeItemProps) {
         }
       }}
       onClick={async () => {
-        if (await ThemeDetailsDialog.show(theme)) {
+        if (await ThemeDetailsDialog.show({ theme })) {
           await setTheme(theme);
         }
       }}

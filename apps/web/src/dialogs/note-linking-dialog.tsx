@@ -68,7 +68,7 @@ export const NoteLinkingDialog = DialogManager.register(
           disabled: !selectedNote,
           onClick: () =>
             selectedNote
-              ? props.onDone({
+              ? props.onClose({
                   title: selectedNote.title,
                   href: createInternalLink("note", selectedNote.id)
                 })
@@ -145,7 +145,7 @@ export const NoteLinkingDialog = DialogManager.register(
                         borderBottom: "1px solid var(--border)"
                       }}
                       onClick={() => {
-                        props.onDone({
+                        props.onClose({
                           title: selectedNote.title,
                           href: createInternalLink("note", selectedNote.id, {
                             blockId: item.id
