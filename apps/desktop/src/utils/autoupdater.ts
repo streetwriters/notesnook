@@ -35,6 +35,7 @@ async function configureAutoUpdater() {
   autoUpdater.allowDowngrade = false;
   autoUpdater.allowPrerelease = false;
   autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.disableWebInstaller = true;
 }
 
 export { configureAutoUpdater };

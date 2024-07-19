@@ -1,3 +1,4 @@
 owner: streetwriters
 repo: notesnook
 provider: github
+updaterCacheDirName: "@notesnookdesktop-updater"

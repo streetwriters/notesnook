@@ -61,7 +61,18 @@ export const updaterRouter = t.router({
     "update-not-available"
   ),
   onAvailable: createSubscription<"update-available", UpdateInfo>(
-    "update-available"
+    "update-available",
+    () => {
+      if (!config.automaticUpdates) return false;
+      autoUpdater.emit("download-progress", {
+        bytesPerSecond: 0,
+        delta: 0,
+        percent: 0,
+        total: 100,
+        transferred: 0
+      });
+      return true;
+    }
   ),
   onError: createSubscription("error")
 });
@@ -69,10 +80,11 @@ export const updaterRouter = t.router({
 function createSubscription<
   TName extends keyof AppUpdaterEvents,
   TReturnType = Parameters<AppUpdaterEvents[TName]>[0]
->(eventName: TName) {
+>(eventName: TName, handler?: (args: TReturnType) => boolean) {
   return t.procedure.subscription(() => {
     return observable<TReturnType>((emit) => {
       const listener: AppUpdaterEvents[TName] = (...args: any[]) => {
+        if (handler?.(args[0])) return;
         emit.next(args[0]);
       };
       autoUpdater.removeAllListeners(eventName);

@@ -16,7 +16,7 @@
     "@trpc/server": "10.38.3",
     "better-sqlite3-multiple-ciphers": "^9.5.0",
     "electron-trpc": "0.5.2",
-    "electron-updater": "6.1.4",
+    "electron-updater": "^6.2.1",
     "icojs": "^0.17.1",
     "sodium-native": "^4.1.1",
     "typed-emitter": "^2.1.0",

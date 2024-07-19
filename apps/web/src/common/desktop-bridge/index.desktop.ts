@@ -28,7 +28,10 @@ export const desktop = createTRPCProxyClient<AppRouter>({
   links: [ipcLink()]
 });
 
-document.addEventListener("readystatechange", async () => {
+attachListeners();
+function attachListeners() {
+  console.log("attaching listeners");
+
   desktop.updater.onChecking.subscribe(
     undefined,
     attachListener(AppEvents.checkingForUpdate)
@@ -62,7 +65,7 @@ document.addEventListener("readystatechange", async () => {
   TaskScheduler.register("updateCheck", "0 0 */12 * * * *", () => {
     checkForUpdate();
   });
-});
+}
 
 function attachListener(event: string) {
   return {

@@ -46,11 +46,11 @@ if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
 // temporary until there's support for prebuilt binaries for linux ARM
 if (os.platform() === "linux") await patchBetterSQLite3();
 
-if (os.platform() === "win32")
-  await exec(
-    `npx prebuildify --arch=arm64 --strip -t electron@${packageJson.devDependencies.electron}`,
-    path.join(__dirname, "..", "node_modules", "sodium-native")
-  );
+// if (os.platform() === "win32")
+//   await exec(
+//     `npx prebuildify --arch=arm64 --strip -t electron@${packageJson.devDependencies.electron}`,
+//     path.join(__dirname, "..", "node_modules", "sodium-native")
+//   );
 
 await fs.cp(path.join(webAppPath, "build"), "build", {
   recursive: true,
