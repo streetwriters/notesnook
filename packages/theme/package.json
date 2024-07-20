@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/theme",
-  "version": "2.0.1",
+  "version": "2.0.7",
   "main": "./dist/index.js",
   "license": "GPL-3.0-or-later",
   "repository": {

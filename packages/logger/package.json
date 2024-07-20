@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/logger",
-  "version": "2.0.1",
+  "version": "2.0.7",
   "description": "A really simple logger with a pluggable interface.",
   "main": "dist/index.js",
   "scripts": {
