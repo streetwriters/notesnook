@@ -23,7 +23,7 @@ import path from "path";
 import os from "os";
 import parser from "yargs-parser";
 import { fdir } from "fdir";
-import Listr from "listr";
+import { Listr } from "listr2";
 
 const args = parser(process.argv, { alias: { scope: ["s"], offline: ["o"] } });
 const IS_CI = process.env.CI;
@@ -90,16 +90,16 @@ async function bootstrapPackages(dependencies) {
   console.log("> Using", THREADS, "threads.");
 
   const outputs = { stdout: [], stderr: [] };
-  const tasks = new Listr({
-    concurrent: THREADS,
-    exitOnError: false
-  });
-  for (const dependency of dependencies) {
-    tasks.add({
-      task: () => bootstrapPackage(dependency, outputs),
-      title: "Bootstrapping " + dependency
-    });
-  }
+  const tasks = new Listr(
+    dependencies.map((dep) => ({
+      task: () => bootstrapPackage(dep, outputs),
+      title: "Bootstrapping " + dep
+    })),
+    {
+      concurrent: THREADS,
+      exitOnError: false
+    }
+  );
 
   console.time("Took");
   await tasks.run();

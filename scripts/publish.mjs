@@ -26,10 +26,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { exec } from "child_process";
 import path from "path";
-import { readFile, writeFile } from "fs/promises";
+import { readFile, writeFile, cp, rm } from "fs/promises";
 import glob from "fast-glob";
 import parser from "yargs-parser";
-import Listr from "listr";
+import { Listr } from "listr2";
 
 const args = parser(process.argv, { alias: { scope: ["s"], version: ["v"] } });
 const allPackages = await glob("packages/*", {
@@ -55,34 +55,53 @@ async function publishPackages(dependencies) {
   console.log("> Found", dependencies.length, "dependencies to bootstrap.");
 
   const outputs = { stdout: [], stderr: [] };
-  const tasks = new Listr({
-    concurrent: 1,
-    exitOnError: false
-  });
-  for (const dependency of dependencies) {
-    tasks.add({
-      task: () => publishPackage(dependency, outputs),
-      title: "Bootstrapping " + dependency
-    });
-  }
+  await performTasks("bump", dependencies, (dep) => bumpVersion(dep, outputs));
 
-  console.time("Took");
-  await tasks.run();
+  try {
+    await performTasks("resolve local packages", dependencies, (dep) =>
+      resolveLocalPackages(dep)
+    );
+
+    await performTasks("dry run", dependencies, (dep) =>
+      publishPackage(dep, true)
+    );
+
+    await performTasks("publish", dependencies, (dep) =>
+      publishPackage(dep, false, outputs)
+    );
+  } finally {
+    await performTasks("unresolve", dependencies, (dep) =>
+      unresolveLocalPackages(dep)
+    );
+  }
 
   process.stdout.write(outputs.stdout.join(""));
   process.stderr.write(outputs.stderr.join(""));
-
-  console.timeEnd("Took");
 }
 
-async function publishPackage(cwd, outputs) {
+async function performTasks(title, dependencies, action) {
+  const tasks = new Listr(
+    dependencies.map((dep) => ({
+      task: (_, task) => action(dep, task),
+      title: title + " " + dep
+    })),
+    {
+      concurrent: 8,
+      exitOnError: true
+    }
+  );
+
+  await tasks.run();
+
+  if (tasks.errors.length > 0) throw new Error("Failed.");
+}
+
+async function bumpVersion(cwd, outputs) {
   const bumpCmd = `npm version ${args.version} --no-git-tag-version`;
-  const publishCmd = `npm publish --access public`;
-
-  outputs.stdout.push("> " + cwd);
-
   await execute(bumpCmd, cwd, outputs);
+}
 
+async function resolveLocalPackages(cwd) {
   const packageJsonPath = path.join(cwd, "package.json");
   const packageJson = JSON.parse(await readFile(packageJsonPath, "utf-8"));
 
@@ -97,25 +116,26 @@ async function publishPackage(cwd, outputs) {
     allDependencies.map((deps) => resolveDependencies(cwd, deps))
   );
 
+  await cp(packageJsonPath, packageJsonPath + ".old");
   await writeFile(
     packageJsonPath,
     JSON.stringify(packageJson, undefined, 2) + "\n"
   );
 
-  try {
-    await execute(publishCmd, cwd, outputs);
-  } finally {
-    await Promise.all(
-      allDependencies.map((deps, i) =>
-        unresolveDependencies(cwd, deps, resolved[i])
-      )
-    );
+  return { resolved, allDependencies, packageJson };
+}
 
-    await writeFile(
-      packageJsonPath,
-      JSON.stringify(packageJson, undefined, 2) + "\n"
-    );
-  }
+async function unresolveLocalPackages(cwd) {
+  const packageJsonPath = path.join(cwd, "package.json");
+  await cp(packageJsonPath + ".old", packageJsonPath, {
+    force: true
+  });
+  await rm(packageJsonPath + ".old", { force: true });
+}
+
+async function publishPackage(cwd, dryRun, outputs) {
+  const publishCmd = `npm publish --access public${dryRun ? " --dry-run" : ""}`;
+  await execute(publishCmd, cwd, outputs);
 }
 
 async function findDependencies(scope) {
@@ -167,17 +187,6 @@ async function resolveDependencies(basePath, dependencies) {
   return resolvedDependencies;
 }
 
-async function unresolveDependencies(
-  basePath,
-  dependencies,
-  resolvedDependencies
-) {
-  for (const name in dependencies) {
-    if (!resolvedDependencies[name]) continue;
-    dependencies[name] = resolvedDependencies[name];
-  }
-}
-
 function execute(cmd, cwd, outputs) {
   return new Promise((resolve, reject) =>
     exec(
@@ -190,8 +199,10 @@ function execute(cmd, cwd, outputs) {
       (err, stdout, stderr) => {
         if (err) return reject(err);
 
-        outputs.stdout.push(stdout);
-        outputs.stderr.push(stderr);
+        if (outputs) {
+          outputs.stdout.push(stdout);
+          outputs.stderr.push(stderr);
+        }
 
         resolve();
       }
