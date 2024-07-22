@@ -34,6 +34,7 @@ import Dialog from "../components/dialog";
 import {
   ChevronDown,
   ChevronUp,
+  ClearCache,
   Close,
   DoubleCheckmark,
   Download,
@@ -63,6 +64,8 @@ import {
 } from "../components/virtualized-table";
 import { FlexScrollContainer } from "../components/scroll-container";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { ConfirmDialog } from "./confirm";
+import { showToast } from "../utils/toast";
 
 type ToolbarAction = {
   title: string;
@@ -233,7 +236,11 @@ export const AttachmentsDialog = DialogManager.register(
               </Flex>
               {attachments && (
                 <VirtualizedTable
-                  style={{ tableLayout: "fixed", borderCollapse: "collapse" }}
+                  style={{
+                    tableLayout: "fixed",
+                    width: "100%",
+                    borderCollapse: "collapse"
+                  }}
                   header={
                     <Box
                       as="tr"
@@ -443,6 +450,7 @@ const Sidebar = memo(
         <Flex
           className="theme-scope-navigationMenu"
           sx={{
+            flexShrink: 0,
             flexDirection: "column",
             justifyContent: "space-between",
             width: 240,
@@ -484,40 +492,83 @@ const Sidebar = memo(
                   </Text>
                 )}
               </Flex>
-              <Button
-                variant="secondary"
-                sx={{
-                  bg: "transparent",
-                  borderRadius: 100,
-                  position: "relative",
-                  width: 38,
-                  height: 38
-                }}
-                title="Download all attachments"
-                onClick={async () => {
-                  if (downloadStatus) {
-                    await cancelDownload();
-                  } else {
-                    onDownloadAll();
-                  }
-                }}
-              >
-                {downloadStatus ? <Close size={18} /> : <Download size={18} />}
-                {downloadStatus ? (
-                  <Donut
-                    value={
-                      (downloadStatus.current / downloadStatus.total) * 100
+              <Flex>
+                <Button
+                  variant="secondary"
+                  sx={{
+                    bg: "transparent",
+                    borderRadius: 100,
+                    position: "relative",
+                    width: 38,
+                    height: 38
+                  }}
+                  disabled={!!downloadStatus}
+                  title="Clear cache"
+                  onClick={async () => {
+                    if (
+                      await ConfirmDialog.show({
+                        title: "Clear attachments cache?",
+                        message: `Clearing attachments cache will perform the following actions:
+                        
+- Downloaded images & files: **cleared**
+- Pending uploads: **cleared**
+- Uploaded images & files: _unaffected_
+
+All attachments will be downloaded & cached again on access.
+
+---
+
+**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**`,
+                        negativeButtonText: "No",
+                        positiveButtonText: "Yes"
+                      })
+                    ) {
+                      await db.fs().clear();
+                      showToast("success", "Attachments cache cleared!");
                     }
-                    max={100}
-                    size={38}
-                    sx={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0
-                    }}
-                  />
-                ) : null}
-              </Button>
+                  }}
+                >
+                  <ClearCache />
+                </Button>
+                <Button
+                  variant="secondary"
+                  sx={{
+                    bg: "transparent",
+                    borderRadius: 100,
+                    position: "relative",
+                    width: 38,
+                    height: 38
+                  }}
+                  title="Download all attachments"
+                  onClick={async () => {
+                    if (downloadStatus) {
+                      await cancelDownload();
+                    } else {
+                      onDownloadAll();
+                    }
+                  }}
+                >
+                  {downloadStatus ? (
+                    <Close size={18} />
+                  ) : (
+                    <Download size={18} />
+                  )}
+                  {downloadStatus ? (
+                    <Donut
+                      value={
+                        (downloadStatus.current / downloadStatus.total) * 100
+                      }
+                      max={100}
+                      size={38}
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0
+                      }}
+                    />
+                  ) : null}
+                </Button>
+              </Flex>
             </Flex>
           </Flex>
         </Flex>

@@ -213,7 +213,8 @@ import {
   mdiFormatListBulleted,
   mdiLink,
   mdiWindowClose,
-  mdiFileMusicOutline
+  mdiFileMusicOutline,
+  mdiBroom
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -548,3 +549,4 @@ export const WindowRestore = createIcon(
   "M8 16V4h12v12Zm2-2h8V6h-8Zm-6 6V8.525h2V18h9.475v2Zm6-6V6v8Z"
 );
 export const WindowClose = createIcon(mdiWindowClose);
+export const ClearCache = createIcon(mdiBroom);
