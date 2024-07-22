@@ -388,6 +388,7 @@ class Database {
               user.subscription = data;
               await this.user.setUser(user);
               EV.publish(EVENTS.userSubscriptionUpdated, data);
+              await this.tokenManager._refreshToken(true);
               break;
             }
             case "logout": {

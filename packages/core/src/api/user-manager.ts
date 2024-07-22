@@ -315,6 +315,17 @@ class UserManager {
         token
       );
       if (user) {
+        const oldUser = await this.getUser();
+        if (
+          oldUser &&
+          (oldUser.subscription.type !== user.subscription.type ||
+            oldUser.subscription.provider !== user.subscription.provider)
+        ) {
+          await this.tokenManager._refreshToken(true);
+          EV.publish(EVENTS.userSubscriptionUpdated, user.subscription);
+        }
+        if (oldUser && !oldUser.isEmailConfirmed && user.isEmailConfirmed)
+          EV.publish(EVENTS.userEmailConfirmed);
         await this.setUser(user);
         EV.publish(EVENTS.userFetched, user);
         return user;
