@@ -371,7 +371,7 @@ async function multiPartUploadFile(
   const onUploadProgress = (ev: AxiosProgressEvent) => {
     reportProgress(
       {
-        total: fileHandle.file.size + ABYTES,
+        total: fileHandle.file.size + ABYTES * TOTAL_PARTS,
         loaded: uploadedBytes + ev.loaded
       },
       {
@@ -414,7 +414,7 @@ async function multiPartUploadFile(
     await fileHandle.addAdditionalData("uploadedChunks", uploadedChunks);
     await fileHandle.addAdditionalData("uploadedBytes", uploadedBytes);
 
-    onUploadProgress({ bytes: 0, loaded: blob.size });
+    onUploadProgress({ bytes: 0, loaded: 0 });
   }
 
   await axios
