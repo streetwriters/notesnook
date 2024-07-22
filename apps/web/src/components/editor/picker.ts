@@ -51,10 +51,13 @@ export async function attachFiles(files: File[]) {
     return;
   }
 
-  const images =
-    (await ImagePickerDialog.show({
-      images: files.filter((f) => f.type.startsWith("image/"))
-    })) || [];
+  let images = files.filter((f) => f.type.startsWith("image/"));
+  images =
+    images.length > 0
+      ? (await ImagePickerDialog.show({
+          images
+        })) || []
+      : [];
   const documents = files.filter((f) => !f.type.startsWith("image/"));
   const attachments: Attachment[] = [];
   for (const file of [...images, ...documents]) {
