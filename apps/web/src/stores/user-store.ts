@@ -59,46 +59,44 @@ class UserStore extends BaseStore<UserStore> {
 
     if (Config.get("sessionExpired")) return;
 
+    EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
+      const wasUserPremium = isUserPremium();
+      this.set((state) => {
+        if (!state.user) return;
+        state.user.subscription = subscription;
+      });
+      if (!wasUserPremium && isUserPremium())
+        OnboardingDialog.show({
+          type:
+            subscription.type === SUBSCRIPTION_STATUS.TRIAL ? "trial" : "pro"
+        });
+    });
+
+    EV.subscribe(EVENTS.userEmailConfirmed, () => {
+      hashNavigate("/confirmed");
+    });
+
+    EV.subscribe(EVENTS.userLoggedOut, async (reason) => {
+      this.set((state) => {
+        state.user = undefined;
+        state.isLoggedIn = false;
+      });
+      config.clear();
+      if (reason) {
+        await ConfirmDialog.show({
+          title: "You were logged out",
+          message: reason,
+          negativeButtonText: "Okay"
+        });
+      }
+    });
+
     return db.user.fetchUser().then(async (user) => {
       if (!user) return false;
 
       this.set({
         user,
         isLoggedIn: true
-      });
-
-      EV.remove(EVENTS.userSubscriptionUpdated, EVENTS.userEmailConfirmed);
-
-      EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
-        const wasUserPremium = isUserPremium();
-        this.set((state) => {
-          if (!state.user) return;
-          state.user.subscription = subscription;
-        });
-        if (!wasUserPremium && isUserPremium())
-          OnboardingDialog.show({
-            type:
-              subscription.type === SUBSCRIPTION_STATUS.TRIAL ? "trial" : "pro"
-          });
-      });
-
-      EV.subscribe(EVENTS.userEmailConfirmed, () => {
-        hashNavigate("/confirmed");
-      });
-
-      EV.subscribe(EVENTS.userLoggedOut, async (reason) => {
-        this.set((state) => {
-          state.user = undefined;
-          state.isLoggedIn = false;
-        });
-        config.clear();
-        if (reason) {
-          await ConfirmDialog.show({
-            title: "You were logged out",
-            message: reason,
-            negativeButtonText: "Okay"
-          });
-        }
       });
 
       return true;
