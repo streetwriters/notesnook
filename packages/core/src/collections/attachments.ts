@@ -497,6 +497,22 @@ export class Attachments implements ICollection {
       this.db.options?.batchSize
     );
   }
+
+  get linked() {
+    return this.collection.createFilter<Attachment>(
+      (qb) =>
+        qb
+          .where(isFalse("deleted"))
+          .where("id", "in", (eb) =>
+            eb
+              .selectFrom("relations")
+              .where("toType", "==", "attachment")
+              .select("toId as id")
+              .$narrowType<{ id: string }>()
+          ),
+      this.db.options?.batchSize
+    );
+  }
   // get media() {
   //   return this.all.filter(
   //     (attachment) =>
