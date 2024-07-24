@@ -36,4 +36,5 @@ export interface IFileStorage {
   writeChunk(chunkName: string, data: Uint8Array): Promise<void>;
   deleteChunk(chunkName: string): Promise<void>;
   readChunk(chunkName: string): Promise<Uint8Array | undefined>;
+  listChunks(chunkPrefix: string): Promise<string[]>;
 }
