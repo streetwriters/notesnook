@@ -29,6 +29,7 @@ interface KV {
   monographs: string[];
   deviceId: string;
   lastBackupTime: number;
+  fullOfflineMode: boolean;
 }
 
 export const KEYS: (keyof KV)[] = [
@@ -38,7 +39,8 @@ export const KEYS: (keyof KV)[] = [
   "token",
   "monographs",
   "deviceId",
-  "lastBackupTime"
+  "lastBackupTime",
+  "fullOfflineMode"
 ];
 
 export class KVStorage {

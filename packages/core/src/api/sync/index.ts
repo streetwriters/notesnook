@@ -245,6 +245,21 @@ class Sync {
     this.logger.info("Stopping sync");
     await this.db.setLastSynced(Date.now());
     this.db.eventManager.publish(EVENTS.syncCompleted);
+
+    if (await this.db.kv().read("fullOfflineMode")) {
+      const attachments = await this.db.attachments.linked
+        .fields(["attachments.id", "attachments.hash", "attachments.chunkSize"])
+        .items();
+
+      await this.db.fs().queueDownloads(
+        attachments.map((a) => ({
+          filename: a.hash,
+          chunkSize: a.chunkSize
+        })),
+        "download-all-attachments",
+        { readOnDownload: false }
+      );
+    }
   }
 
   async cancel() {
