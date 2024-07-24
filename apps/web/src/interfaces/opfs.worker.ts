@@ -93,6 +93,14 @@ class OriginPrivateFileStore implements IFileStorage {
     }
   }
 
+  async listChunks(chunkPrefix: string): Promise<string[]> {
+    const chunks: string[] = [];
+    for await (const entry of this.directory.keys()) {
+      if (entry.startsWith(chunkPrefix)) chunks.push(entry);
+    }
+    return chunks;
+  }
+
   private async safeOp<T>(chunkName: string, createPromise: () => Promise<T>) {
     const lock = this.locks.get(chunkName);
     if (lock) await lock;
@@ -139,6 +147,9 @@ const workerModule = {
   async readChunk(directoryName: string, chunkName: string) {
     const chunk = await fileStores.get(directoryName)?.readChunk(chunkName);
     return chunk ? transfer(chunk, [chunk.buffer]) : undefined;
+  },
+  async listChunks(directoryName: string, chunkPrefix: string) {
+    return (await fileStores.get(directoryName)?.listChunks(chunkPrefix)) || [];
   }
 };
 
