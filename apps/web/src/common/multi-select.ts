@@ -46,6 +46,7 @@ async function moveNotesToTrash(ids: string[], confirm = true) {
   await TaskManager.startTask({
     type: "status",
     id: "deleteNotes",
+    title: "Deleting notes",
     action: async (report) => {
       report({
         text: `Deleting ${pluralize(items.length, "note")}...`
@@ -66,6 +67,7 @@ async function moveNotebooksToTrash(ids: string[]) {
   await TaskManager.startTask({
     type: "status",
     id: "deleteNotebooks",
+    title: "Deleting notebooks",
     action: async (report) => {
       report({
         text: `Deleting ${pluralize(ids.length, "notebook")}...`
@@ -92,6 +94,7 @@ async function deleteAttachments(ids: string[]) {
   await TaskManager.startTask({
     type: "status",
     id: "deleteAttachments",
+    title: "Deleting attachments",
     action: async (report) => {
       for (let i = 0; i < ids.length; ++i) {
         const id = ids[i];
@@ -119,6 +122,7 @@ async function moveRemindersToTrash(ids: string[]) {
   await TaskManager.startTask({
     type: "status",
     id: "deleteReminders",
+    title: "Deleting reminders",
     action: async (report) => {
       report({
         text: `Deleting ${pluralize(ids.length, "reminder")}...`
