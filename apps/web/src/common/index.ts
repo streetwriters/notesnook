@@ -82,9 +82,10 @@ export async function createBackup(
   options: {
     rescueMode?: boolean;
     noVerify?: boolean;
-  } = {}
+    mode?: "full" | "partial";
+  } = { mode: "partial" }
 ) {
-  const { rescueMode, noVerify } = options;
+  const { rescueMode, noVerify, mode } = options;
   const { isLoggedIn } = useUserStore.getState();
   const { encryptBackups, toggleEncryptBackups } = useSettingStore.getState();
   if (!isLoggedIn && encryptBackups) toggleEncryptBackups();
@@ -103,7 +104,7 @@ export async function createBackup(
       type: "date-time",
       dateFormat: "YYYY-MM-DD",
       timeFormat: "24-hour"
-    })}-${new Date().getSeconds()}`,
+    })}-${new Date().getSeconds()}${mode === "full" ? "-full" : ""}`,
     { replacement: "-" }
   );
   const directory = Config.get("backupStorageLocation", PATHS.backupsDirectory);
@@ -123,10 +124,11 @@ export async function createBackup(
         start() {},
         async pull(controller) {
           const { streamablefs } = await import("../interfaces/fs");
-          for await (const output of db.backup!.export(
-            "web",
-            encryptedBackups
-          )) {
+          for await (const output of db.backup!.export({
+            type: "web",
+            encrypt: encryptedBackups,
+            mode
+          })) {
             if (output.type === "file") {
               const file = output;
               report({

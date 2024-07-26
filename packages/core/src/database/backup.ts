@@ -277,10 +277,11 @@ export default class Backup {
     await this.updateBackupTime();
   }
 
-  async *export(
-    type: BackupPlatform,
-    encrypt = false
-  ): AsyncGenerator<
+  async *export(options: {
+    type: BackupPlatform;
+    encrypt?: boolean;
+    mode?: "full" | "partial";
+  }): AsyncGenerator<
     | {
         type: "file";
         path: string;
@@ -296,6 +297,7 @@ export default class Backup {
     void,
     unknown
   > {
+    const { encrypt = false, type, mode = "partial" } = options;
     if (this.db.migrations.version === 5.9) {
       yield* this.exportLegacy(type, encrypt);
       return;
@@ -343,6 +345,10 @@ export default class Backup {
     yield* this.backupCollection(this.db.vaults.collection, backupState);
 
     if (backupState.buffer.length > 0) yield* this.bufferToFile(backupState);
+    if (mode === "partial") {
+      await this.updateBackupTime();
+      return;
+    }
 
     const total = await this.db.attachments.all.count();
     if (total > 0 && user && user.attachmentsKey) {
