@@ -34,7 +34,7 @@ import { logger } from "../logger";
 
 export class Attachments implements ICollection {
   name = "attachments";
-  key: Cipher<"base64"> | null = null;
+  key?: SerializedKey;
   readonly collection: SQLCollection<"attachments", Attachment>;
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
@@ -44,7 +44,6 @@ export class Attachments implements ICollection {
       db.eventManager,
       db.sanitizer
     );
-    this.key = null;
 
     EV.subscribe(
       EVENTS.fileDownloaded,
@@ -542,7 +541,7 @@ export class Attachments implements ICollection {
     return result?.totalSize;
   }
 
-  private async encryptKey(key: SerializedKey) {
+  async encryptKey(key: SerializedKey) {
     const encryptionKey = await this._getEncryptionKey();
     const encryptedKey = await this.db
       .storage()

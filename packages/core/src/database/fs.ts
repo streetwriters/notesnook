@@ -287,4 +287,8 @@ export class FileStorage {
   hashBase64(data: string) {
     return this.fs.hashBase64(data);
   }
+
+  getUploadedFileSize(filename: string) {
+    return this.fs.getUploadedFileSize(filename);
+  }
 }

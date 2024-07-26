@@ -108,6 +108,7 @@ export interface IFileStorage {
     requestOptions?: RequestOptions
   ): Promise<boolean>;
   exists(filename: string): Promise<boolean>;
+  getUploadedFileSize(filename: string): Promise<number>;
   clearFileStorage(): Promise<void>;
   hashBase64(data: string): Promise<{ hash: string; type: string }>;
 }
