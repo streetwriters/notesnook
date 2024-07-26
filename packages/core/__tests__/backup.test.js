@@ -24,7 +24,10 @@ test("export backup", () =>
   notebookTest().then(async ({ db }) => {
     const id = await db.notes.add(TEST_NOTE);
     const exp = [];
-    for await (const file of db.backup.export("node", false)) {
+    for await (const file of db.backup.export({
+      type: "node",
+      encrypt: false
+    })) {
       exp.push(file);
     }
 
@@ -49,7 +52,10 @@ test("export encrypted backup", () =>
     await db.notes.add(TEST_NOTE);
 
     const exp = [];
-    for await (const file of db.backup.export("node", true)) {
+    for await (const file of db.backup.export({
+      type: "node",
+      encrypt: true
+    })) {
       exp.push(file);
     }
 
@@ -67,7 +73,10 @@ test("export encrypted backup", () =>
 test("import backup", async () => {
   const { db, id } = await notebookTest();
   const exp = [];
-  for await (const file of db.backup.export("node", false)) {
+  for await (const file of db.backup.export({
+    type: "node",
+    encrypt: false
+  })) {
     exp.push(file);
   }
 
@@ -82,12 +91,15 @@ test("import encrypted backup", async () => {
   await db.notes.add(TEST_NOTE);
 
   const exp = [];
-  for await (const file of db.backup.export("node", true)) {
+  for await (const file of db.backup.export({
+    type: "node",
+    encrypt: true
+  })) {
     exp.push(file);
   }
 
   const db2 = await databaseTest();
-  await db2.backup.import(JSON.parse(exp[1].data), "password");
+  await db2.backup.import(JSON.parse(exp[1].data), { password: "password" });
   expect((await db2.notebooks.notebook(id)).id).toBe(id);
 });
 
@@ -96,7 +108,10 @@ test("import tempered backup", () =>
     await db.notes.add(TEST_NOTE);
 
     const exp = [];
-    for await (const file of db.backup.export("node", false)) {
+    for await (const file of db.backup.export({
+      type: "node",
+      encrypt: false
+    })) {
       exp.push(file);
     }
 
