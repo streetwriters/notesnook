@@ -38,12 +38,18 @@ export type Notice = {
   params?: any;
 };
 
-export const BACKUP_CRON_EXPRESSIONS = [
-  "",
-  "0 0 8 * * *", // daily at 8 AM
-  "0 0 8 * * 1", // Every monday at 8 AM
-  "0 0 0 1 * *" // 1st day of every month
-];
+export const BACKUP_CRON_EXPRESSIONS = {
+  0: "",
+  1: "0 0 8 * * *", // daily at 8 AM
+  2: "0 0 8 * * 1", // Every monday at 8 AM
+  3: "0 0 0 1 * *" // 1st day of every month
+};
+
+export const FULL_BACKUP_CRON_EXPRESSIONS = {
+  0: "",
+  1: "0 0 8 * * 1", // Every monday at 8 AM
+  2: "0 0 0 1 * *" // 1st day of every month
+};
 
 export async function scheduleBackups() {
   const backupInterval = Config.get("backupReminderOffset", 0);
@@ -58,6 +64,23 @@ export async function scheduleBackups() {
     () => {
       console.log("Backing up automatically");
       saveBackup();
+    }
+  );
+}
+
+export async function scheduleFullBackups() {
+  const backupInterval = Config.get("fullBackupReminderOffset", 0);
+
+  await TaskScheduler.stop("automatic-full-backups");
+  if (!backupInterval) return false;
+
+  console.log("Scheduling automatic full backups");
+  await TaskScheduler.register(
+    "automatic-full-backups",
+    FULL_BACKUP_CRON_EXPRESSIONS[backupInterval],
+    () => {
+      console.log("Backing up automatically");
+      saveBackup("full");
     }
   );
 }
@@ -175,9 +198,9 @@ function isIgnored(key: keyof typeof NoticesData) {
 }
 
 let openedToast: { hide: () => void } | null = null;
-async function saveBackup() {
+async function saveBackup(mode: "full" | "partial" = "partial") {
   if (IS_DESKTOP_APP) {
-    await createBackup({ noVerify: true });
+    await createBackup({ noVerify: true, mode });
   } else if (isUserPremium() && !IS_TESTING) {
     if (openedToast !== null) return;
     openedToast = showToast(
@@ -196,7 +219,7 @@ async function saveBackup() {
         {
           text: "Download",
           onClick: async () => {
-            await createBackup();
+            await createBackup({ mode });
             openedToast?.hide();
             openedToast = null;
           },

@@ -32,6 +32,7 @@ import { Profile, TrashCleanupInterval } from "@notesnook/core";
 class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
   backupReminderOffset = Config.get("backupReminderOffset", 0);
+  fullBackupReminderOffset = Config.get("fullBackupReminderOffset", 0);
   backupStorageLocation = Config.get(
     "backupStorageLocation",
     PATHS.backupsDirectory
@@ -147,6 +148,11 @@ class SettingStore extends BaseStore<SettingStore> {
   setBackupReminderOffset = (offset: number) => {
     Config.set("backupReminderOffset", offset);
     this.set({ backupReminderOffset: offset });
+  };
+
+  setFullBackupReminderOffset = (offset: number) => {
+    Config.set("fullBackupReminderOffset", offset);
+    this.set({ fullBackupReminderOffset: offset });
   };
 
   setBackupStorageLocation = (location: string) => {
