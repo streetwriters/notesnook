@@ -134,7 +134,9 @@ export async function createBackup(
             if (output.type === "file") {
               const file = output;
               report({
-                text: `Saving file ${file.path}`
+                text: background
+                  ? `Creating backup (${file.path})`
+                  : `Saving file ${file.path}`
               });
               controller.enqueue({
                 path: file.path,
@@ -142,7 +144,9 @@ export async function createBackup(
               });
             } else if (output.type === "attachment") {
               report({
-                text: `Saving attachment ${output.hash}`,
+                text: background
+                  ? `Creating backup (${output.hash})`
+                  : `Saving attachment ${output.hash}`,
                 total: output.total,
                 current: output.current
               });
