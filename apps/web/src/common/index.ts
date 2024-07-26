@@ -31,7 +31,7 @@ import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
 import { EVENTS } from "@notesnook/core/dist/common";
 import { createWritableStream } from "./desktop-bridge";
-import { createZipStream } from "../utils/streams/zip-stream";
+import { createZipStream, ZipFile } from "../utils/streams/zip-stream";
 import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
 import { ZipEntry, createUnzipIterator } from "../utils/streams/unzip-stream";
 import { User } from "@notesnook/core";
@@ -41,6 +41,10 @@ import { formatDate } from "@notesnook/core/dist/utils/date";
 import { showPasswordDialog } from "../dialogs/password-dialog";
 import { BackupPasswordDialog } from "../dialogs/backup-password-dialog";
 import { ReminderDialog } from "../dialogs/reminder-dialog";
+import { Cipher, SerializedKey } from "@notesnook/crypto";
+import { ChunkedStream } from "../utils/streams/chunked-stream";
+import { isFeatureSupported } from "../utils/feature-check";
+import { NNCrypto } from "../interfaces/nncrypto";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -115,18 +119,36 @@ export async function createBackup(
     subtitle: "We are creating a backup of your data. Please wait...",
     action: async (report) => {
       const writeStream = await createWritableStream(filePath);
-
-      await new ReadableStream({
+      await new ReadableStream<ZipFile>({
         start() {},
         async pull(controller) {
-          for await (const file of db.backup!.export("web", encryptedBackups)) {
-            report({
-              text: `Saving chunk ${file.path}`
-            });
-            controller.enqueue({
-              path: file.path,
-              data: encoder.encode(file.data)
-            });
+          const { streamablefs } = await import("../interfaces/fs");
+          for await (const output of db.backup!.export(
+            "web",
+            encryptedBackups
+          )) {
+            if (output.type === "file") {
+              const file = output;
+              report({
+                text: `Saving file ${file.path}`
+              });
+              controller.enqueue({
+                path: file.path,
+                data: encoder.encode(file.data)
+              });
+            } else if (output.type === "attachment") {
+              report({
+                text: `Saving attachment ${output.hash}`,
+                total: output.total,
+                current: output.current
+              });
+              const handle = await streamablefs.readFile(output.hash);
+              if (!handle) continue;
+              controller.enqueue({
+                path: output.path,
+                data: handle.readable
+              });
+            }
           }
           controller.close();
         }
@@ -191,6 +213,8 @@ export async function restoreBackupFile(backupFile: File) {
         let cachedKey: string | undefined = undefined;
         // const { read, totalFiles } = await Reader(backupFile);
         const entries: ZipEntry[] = [];
+        const attachments: ZipEntry[] = [];
+        let attachmentsKey: SerializedKey | Cipher<"base64"> | undefined;
         let filesProcessed = 0;
 
         let isValid = false;
@@ -199,7 +223,13 @@ export async function restoreBackupFile(backupFile: File) {
             isValid = true;
             continue;
           }
-          entries.push(entry);
+          if (entry.name === "attachments/.attachments_key")
+            attachmentsKey = JSON.parse(await entry.text()) as
+              | SerializedKey
+              | Cipher<"base64">;
+          else if (entry.name.startsWith("attachments/"))
+            attachments.push(entry);
+          else entries.push(entry);
         }
         if (!isValid)
           console.warn(
@@ -212,18 +242,27 @@ export async function restoreBackupFile(backupFile: File) {
             if (backup.encrypted) {
               if (!cachedPassword && !cachedKey) {
                 const result = await BackupPasswordDialog.show({
-                  validate: async ({ password, key }) => {
-                    if (!password && !key) return false;
-                    await db.backup?.import(backup, password, key);
+                  validate: async ({ password, key: encryptionKey }) => {
+                    if (!password && !encryptionKey) return false;
+                    await db.backup?.import(backup, {
+                      password,
+                      encryptionKey,
+                      attachmentsKey
+                    });
                     cachedPassword = password;
-                    cachedKey = key;
+                    cachedKey = encryptionKey;
                     return true;
                   }
                 });
                 if (!result) break;
-              } else await db.backup?.import(backup, cachedPassword, cachedKey);
+              } else
+                await db.backup?.import(backup, {
+                  password: cachedPassword,
+                  encryptionKey: cachedKey,
+                  attachmentsKey
+                });
             } else {
-              await db.backup?.import(backup);
+              await db.backup?.import(backup, { attachmentsKey });
             }
 
             report({
@@ -234,6 +273,60 @@ export async function restoreBackupFile(backupFile: File) {
           }
         });
         await db.initCollections();
+
+        const { ABYTES, streamablefs, hashStream } = await import(
+          "../interfaces/fs"
+        );
+        let current = 0;
+        for (const entry of attachments) {
+          const hash = entry.name.replace("attachments/", "");
+
+          report({
+            text: `Importing attachment ${hash}`,
+            total: attachments.length,
+            current: current++
+          });
+
+          const attachment = await db.attachments.attachment(hash);
+          if (!attachment) continue;
+          if (attachment.dateUploaded) {
+            const key = await db.attachments.decryptKey(attachment.key);
+            if (!key) continue;
+            const result = await hashStream(
+              entry
+                .stream()
+                .pipeThrough(
+                  new ChunkedStream(
+                    attachment.chunkSize + ABYTES,
+                    isFeatureSupported("opfs") ? "copy" : "nocopy"
+                  )
+                )
+                .pipeThrough(
+                  await NNCrypto.createDecryptionStream(key, attachment.iv)
+                )
+                .getReader()
+            );
+            if (result.hash !== attachment.hash) continue;
+            await db.attachments.reset(attachment.id);
+          }
+          if (await db.fs().exists(attachment.hash)) continue;
+
+          await streamablefs.deleteFile(attachment.hash);
+          const handle = await streamablefs.createFile(
+            attachment.hash,
+            attachment.size,
+            attachment.mimeType
+          );
+          await entry
+            .stream()
+            .pipeThrough(
+              new ChunkedStream(
+                attachment.chunkSize + ABYTES,
+                isFeatureSupported("opfs") ? "copy" : "nocopy"
+              )
+            )
+            .pipeTo(handle.writeable);
+        }
       }
     });
     if (error) {
@@ -326,10 +419,10 @@ export async function showUpgradeReminderDialogs() {
 async function restore(
   backup: LegacyBackupFile,
   password?: string,
-  key?: string
+  encryptionKey?: string
 ) {
   try {
-    await db.backup?.import(backup, password, key);
+    await db.backup?.import(backup, { password, encryptionKey });
     showToast("success", "Backup restored!");
   } catch (e) {
     logger.error(e as Error, "Could not restore the backup");

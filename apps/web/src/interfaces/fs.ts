@@ -52,14 +52,14 @@ import {
 import { logger } from "../utils/logger";
 import { newQueue } from "@henrygd/queue";
 
-const ABYTES = 17;
+export const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
 const ENCRYPTED_CHUNK_SIZE = CHUNK_SIZE + ABYTES;
 const UPLOAD_PART_REQUIRED_CHUNKS = Math.ceil(
   (10 * 1024 * 1024) / ENCRYPTED_CHUNK_SIZE
 );
 const MINIMUM_MULTIPART_FILE_SIZE = 25 * 1024 * 1024;
-const streamablefs = new StreamableFS(
+export const streamablefs = new StreamableFS(
   isFeatureSupported("opfs")
     ? new OriginPrivateFileSystem("streamable-fs")
     : isFeatureSupported("cache")
@@ -665,7 +665,8 @@ export const FileStorage: IFileStorage = {
   deleteFile,
   exists,
   clearFileStorage,
-  hashBase64
+  hashBase64,
+  getUploadedFileSize
 };
 
 function isSuccessStatusCode(statusCode: number) {
