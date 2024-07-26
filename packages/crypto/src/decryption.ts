@@ -98,6 +98,7 @@ export default class Decryption {
           chunk,
           null
         );
+        if (!message) throw new Error("Could not decrypt chunk.");
         controller.enqueue(message);
         if (tag === crypto_secretstream_xchacha20poly1305_TAG_FINAL)
           controller.terminate();
