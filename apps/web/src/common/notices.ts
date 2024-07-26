@@ -200,7 +200,7 @@ function isIgnored(key: keyof typeof NoticesData) {
 let openedToast: { hide: () => void } | null = null;
 async function saveBackup(mode: "full" | "partial" = "partial") {
   if (IS_DESKTOP_APP) {
-    await createBackup({ noVerify: true, mode });
+    await createBackup({ noVerify: true, mode, background: true });
   } else if (isUserPremium() && !IS_TESTING) {
     if (openedToast !== null) return;
     openedToast = showToast(

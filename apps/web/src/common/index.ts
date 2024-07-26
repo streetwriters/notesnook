@@ -83,9 +83,10 @@ export async function createBackup(
     rescueMode?: boolean;
     noVerify?: boolean;
     mode?: "full" | "partial";
+    background?: boolean;
   } = { mode: "partial" }
 ) {
-  const { rescueMode, noVerify, mode } = options;
+  const { rescueMode, noVerify, mode, background } = options;
   const { isLoggedIn } = useUserStore.getState();
   const { encryptBackups, toggleEncryptBackups } = useSettingStore.getState();
   if (!isLoggedIn && encryptBackups) toggleEncryptBackups();
@@ -115,7 +116,8 @@ export async function createBackup(
 
   const encoder = new TextEncoder();
   const error = await TaskManager.startTask<Error | void>({
-    type: "modal",
+    type: background ? "status" : "modal",
+    id: "creating-backup",
     title: "Creating backup",
     subtitle: "We are creating a backup of your data. Please wait...",
     action: async (report) => {
