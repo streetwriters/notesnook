@@ -38,7 +38,6 @@ import { DatabaseCollection } from "./index.js";
 import { DefaultColors } from "../collections/colors.js";
 import { toChunks } from "../utils/array.js";
 import { logger } from "../logger.js";
-import { clone } from "../utils/clone.js";
 
 type BackupDataItem = MaybeDeletedItem<Item> | string[];
 type BackupPlatform = "web" | "mobile" | "node";
@@ -256,6 +255,7 @@ export default class Backup {
         else itemsJSON = JSON.stringify(itemsJSON);
 
         yield {
+          type: "file" as const,
           path: `${chunkIndex++}-${encrypt ? "encrypted" : "plain"}-${hash}`,
           data: `{
 "version": 5.9,
@@ -277,7 +277,25 @@ export default class Backup {
     await this.updateBackupTime();
   }
 
-  async *export(type: BackupPlatform, encrypt = false) {
+  async *export(
+    type: BackupPlatform,
+    encrypt = false
+  ): AsyncGenerator<
+    | {
+        type: "file";
+        path: string;
+        data: string;
+      }
+    | {
+        type: "attachment";
+        path: string;
+        hash: string;
+        total: number;
+        current: number;
+      },
+    void,
+    unknown
+  > {
     if (this.db.migrations.version === 5.9) {
       yield* this.exportLegacy(type, encrypt);
       return;
@@ -285,13 +303,15 @@ export default class Backup {
 
     if (!validTypes.some((t) => t === type))
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
-    if (encrypt && !(await this.db.user.getUser()))
+    const user = await this.db.user.getUser();
+    if (encrypt && !user)
       throw new Error("Please login to create encrypted backups.");
 
     const key = await this.db.user.getEncryptionKey();
     if (encrypt && !key) throw new Error("No encryption key found.");
 
     yield {
+      type: "file",
       path: ".nnbackup",
       data: ""
     };
@@ -323,6 +343,35 @@ export default class Backup {
     yield* this.backupCollection(this.db.vaults.collection, backupState);
 
     if (backupState.buffer.length > 0) yield* this.bufferToFile(backupState);
+
+    const total = await this.db.attachments.all.count();
+    if (total > 0 && user && user.attachmentsKey) {
+      yield {
+        type: "file",
+        path: `attachments/.attachments_key`,
+        data: backupState.encrypt
+          ? JSON.stringify(user.attachmentsKey)
+          : JSON.stringify((await this.db.user.getAttachmentsKey()) || {})
+      };
+
+      let current = 0;
+      for await (const attachment of this.db.attachments.all) {
+        current++;
+        if (
+          !(await this.db
+            .fs()
+            .downloadFile("backup", attachment.hash, attachment.chunkSize))
+        )
+          continue;
+        yield {
+          type: "attachment",
+          hash: attachment.hash,
+          path: `attachments/${attachment.hash}`,
+          total,
+          current
+        };
+      }
+    }
 
     await this.updateBackupTime();
   }
@@ -361,6 +410,7 @@ export default class Backup {
     else itemsJSON = JSON.stringify(itemsJSON);
 
     yield {
+      type: "file" as const,
       path: `${state.chunkIndex++}-${
         state.encrypt ? "encrypted" : "plain"
       }-${hash}`,
@@ -379,15 +429,21 @@ export default class Backup {
 
   async import(
     backup: LegacyBackupFile | BackupFile,
-    password?: string,
-    encryptionKey?: string
+    options: {
+      password?: string;
+      encryptionKey?: string;
+      attachmentsKey?: SerializedKey | Cipher<"base64">;
+    } = {}
   ) {
     if (!this.validate(backup)) throw new Error("Invalid backup.");
+
+    const { encryptionKey, password, attachmentsKey } = options;
 
     backup = this.migrateBackup(backup);
 
     let decryptedData: string | Record<string, BackupDataItem> | undefined =
       undefined;
+    let decryptedAttachmentsKey: SerializedKey | undefined = undefined;
     if (isEncryptedBackup(backup)) {
       if (!password && !encryptionKey)
         throw new Error(
@@ -402,6 +458,11 @@ export default class Backup {
       if (!key)
         throw new Error("Could not generate encryption key for backup.");
 
+      decryptedAttachmentsKey = isCipher(attachmentsKey)
+        ? (JSON.parse(
+            await this.db.storage().decrypt(key, attachmentsKey)
+          ) as Cipher<"base64">)
+        : attachmentsKey;
       try {
         decryptedData = await this.db.storage().decrypt(key, backup.data);
       } catch (e) {
@@ -416,6 +477,7 @@ export default class Backup {
         }
       }
     } else {
+      if (!isCipher(attachmentsKey)) decryptedAttachmentsKey = attachmentsKey;
       decryptedData = backup.data;
     }
 
@@ -443,7 +505,8 @@ export default class Backup {
       normalizedData,
       backup.version === 6.1 && isLegacyBackup(normalizedData)
         ? 5.9
-        : backup.version
+        : backup.version,
+      decryptedAttachmentsKey
     );
   }
 
@@ -474,7 +537,11 @@ export default class Backup {
     }
   }
 
-  private async migrateData(data: BackupDataItem[], version: number) {
+  private async migrateData(
+    data: BackupDataItem[],
+    version: number,
+    attachmentsKey?: SerializedKey
+  ) {
     const queue: Partial<Record<CollectionName, MaybeDeletedItem<Item>[]>> = {};
     for (let item of data) {
       // we do not want to restore deleted items
@@ -526,11 +593,43 @@ export default class Backup {
       if (!itemType || itemType === "topic" || itemType === "settings")
         continue;
 
-      if (item.type === "attachment" && (item.hash || item.metadata?.hash)) {
+      if (item.type === "attachment" && (item.metadata?.hash || item.hash)) {
         const attachment = await this.db.attachments.attachment(
           item.metadata?.hash || item.hash
         );
+        const isSameKey =
+          !!attachment &&
+          attachment.key.iv === item.key.iv &&
+          attachment.key.cipher === item.key.cipher &&
+          attachment.key.salt === item.key.salt;
+
+        if (attachmentsKey && !isSameKey) {
+          const newKey = await this.db.attachments.encryptKey(
+            JSON.parse(
+              await this.db.storage().decrypt(attachmentsKey, item.key)
+            )
+          );
+          if (attachment) {
+            attachment.key = newKey;
+            attachment.iv = item.iv;
+            attachment.salt = item.salt;
+            attachment.size = item.size;
+          } else item.key = newKey;
+          delete item.dateUploaded;
+          delete item.failed;
+        }
+
         if (attachment) {
+          if (
+            attachmentsKey &&
+            isSameKey &&
+            !(await this.db.fs().exists(attachment.hash)) &&
+            (await this.db.fs().getUploadedFileSize(attachment.hash)) <= 0
+          ) {
+            delete item.dateUploaded;
+            delete item.failed;
+          }
+
           const isNewGeneric =
             item.metadata?.type === "application/octet-stream" ||
             item.mimeType === "application/octet-stream";
