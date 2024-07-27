@@ -113,16 +113,17 @@ export class SettingsViewModel {
     const item = await this.navigation.findItem("Backup & export");
     await item?.click();
 
-    const backupData = this.page
-      .locator(getTestId("setting-create-backup"))
-      .locator("select");
-
-    if (password) {
-      await backupData.selectOption({ value: "partial", label: "Backup" });
-      await fillPasswordDialog(this.page, password);
-    }
-
-    return await downloadAndReadFile(this.page, backupData, "utf-8");
+    return await downloadAndReadFile(
+      this.page,
+      async () => {
+        const backupData = this.page
+          .locator(getTestId("setting-create-backup"))
+          .locator("select");
+        await backupData.selectOption({ value: "partial", label: "Backup" });
+        if (password) await fillPasswordDialog(this.page, password);
+      },
+      "utf-8"
+    );
   }
 
   async restoreData(filename: string, password?: string) {
