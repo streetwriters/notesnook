@@ -115,10 +115,10 @@ export class SettingsViewModel {
 
     const backupData = this.page
       .locator(getTestId("setting-create-backup"))
-      .locator("button");
+      .locator("select");
 
     if (password) {
-      await backupData.click();
+      await backupData.selectOption({ value: "partial", label: "Backup" });
       await fillPasswordDialog(this.page, password);
     }
 
