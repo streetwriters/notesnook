@@ -62,7 +62,6 @@ import {
 } from "../services/event-manager";
 import { useSettingStore } from "../stores/use-setting-store";
 import {
-  eClearEditor,
   eCloseFullscreenEditor,
   eOnEnterEditor,
   eOnExitEditor,
@@ -286,9 +285,10 @@ const _TabsHolder = () => {
           break;
         case "mobile":
           if (
-            state &&
-            !state?.movedAway &&
-            useTabStore.getState().getCurrentNoteId()
+            (state &&
+              !state?.movedAway &&
+              useTabStore.getState().getCurrentNoteId()) ||
+            editorState().movedAway === false
           ) {
             tabBarRef.current?.goToIndex(2, false);
           } else {
