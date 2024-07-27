@@ -37,6 +37,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { requestInAppReview } from "../../../services/app-review";
 import { Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 
 const PublishNoteSheet = ({
   note: item
@@ -120,10 +121,8 @@ const PublishNoteSheet = ({
       }}
     >
       <DialogHeader
-        title={note?.title}
-        paragraph={`Anyone with the link${
-          isLocked ? " and password" : ""
-        } of the published note can view it.`}
+        title={`${strings.publish()} ${strings.note()}`}
+        paragraph={strings.publishDesc()}
       />
 
       {publishing ? (
@@ -141,9 +140,9 @@ const PublishNoteSheet = ({
               textAlign: "center"
             }}
           >
-            Please wait...
+            {strings.pleaseWait()}...
             {downloading && downloading.current && downloading.total
-              ? `\nDownloading attachments (${
+              ? `\n${strings.downloadingAttachments()} (${
                   downloading?.current / downloading?.total
                 })`
               : ""}
@@ -168,7 +167,7 @@ const PublishNoteSheet = ({
                   flexShrink: 1
                 }}
               >
-                <Heading size={SIZE.md}>Published at:</Heading>
+                <Heading size={SIZE.md}>{strings.publishedAt()}:</Heading>
                 <Paragraph size={SIZE.sm} numberOfLines={1}>
                   {publishUrl}
                 </Paragraph>
@@ -186,8 +185,8 @@ const PublishNoteSheet = ({
                     color: colors.primary.paragraph
                   }}
                 >
-                  <Icon color={colors.primary.accent} name="open-in-new" /> Open
-                  in browser
+                  <Icon color={colors.primary.accent} name="open-in-new" />{" "}
+                  {strings.openInBrowser()}
                 </Paragraph>
               </View>
 
@@ -243,10 +242,8 @@ const PublishNoteSheet = ({
                 flexShrink: 1
               }}
             >
-              <Heading size={SIZE.md}>Password protection</Heading>
-              <Paragraph>
-                Published note can only be viewed by someone with the password.
-              </Paragraph>
+              <Heading size={SIZE.md}>{strings.monographPassHeading()}</Heading>
+              <Paragraph>{strings.monographPassDesc()}</Paragraph>
             </View>
           </TouchableOpacity>
 
@@ -282,11 +279,10 @@ const PublishNoteSheet = ({
                 flexShrink: 1
               }}
             >
-              <Heading size={SIZE.md}>Self destruct</Heading>
-              <Paragraph>
-                Published note link will be automatically deleted once it is
-                viewed by someone.
-              </Paragraph>
+              <Heading size={SIZE.md}>
+                {strings.monographSelfDestructHeading()}
+              </Heading>
+              <Paragraph>{strings.monographSelfDestructDesc()}</Paragraph>
             </View>
           </TouchableOpacity>
 
@@ -324,7 +320,7 @@ const PublishNoteSheet = ({
                     onPress={deletePublishedNote}
                     fontSize={SIZE.md}
                     type="error"
-                    title="Unpublish"
+                    title={strings.unpublish()}
                     style={{
                       width: "49%"
                     }}
@@ -340,7 +336,7 @@ const PublishNoteSheet = ({
                   borderRadius: isPublished ? 5 : 100
                 }}
                 type="accent"
-                title={isPublished ? "Update" : "Publish"}
+                title={isPublished ? strings.update() : strings.publish()}
               />
             </View>
           </View>
@@ -365,7 +361,7 @@ const PublishNoteSheet = ({
           }
         }}
       >
-        Learn more about Notesnook Monograph
+        {strings.monographLearnMore()}
       </Paragraph>
     </View>
   );

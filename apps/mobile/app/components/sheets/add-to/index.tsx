@@ -55,6 +55,7 @@ import { useNotebookItemSelectionStore } from "./store";
 import { AddNotebookSheet } from "../add-notebook";
 import Input from "../../ui/input";
 import { presentDialog } from "../../dialog/functions";
+import { strings } from "@notesnook/intl";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -200,11 +201,11 @@ const MoveNoteSheet = ({
               minHeight: 10,
               flexShrink: 1
             }}
-            title="Select notebooks"
+            title={strings.selectNotebooks()}
             paragraph={
               !multiSelect
-                ? "Long press to enable multi-select."
-                : "Select notebooks you want to add note(s) to."
+                ? strings.enableMultiSelect()
+                : strings.selectNotebooksDesc()
             }
           />
 
@@ -236,7 +237,7 @@ const MoveNoteSheet = ({
                 paddingHorizontal: 24,
                 alignSelf: "flex-start"
               }}
-              title="Save"
+              title={strings.save()}
               type={"accent"}
               onPress={onSave}
             />
@@ -319,7 +320,7 @@ const MoveNoteSheet = ({
                   />
                 ) : (
                   <Paragraph color={colors.primary.icon}>
-                    No notebooks
+                    {strings.emptyPlaceholders("notebook")}
                   </Paragraph>
                 )}
               </View>

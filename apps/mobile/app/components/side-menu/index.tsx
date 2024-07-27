@@ -37,6 +37,7 @@ import { useSideBarDraggingStore } from "./dragging-store";
 import { MenuItem } from "./menu-item";
 import { PinnedSection } from "./pinned-section";
 import { UserStatus } from "./user-status";
+import { strings } from "@notesnook/intl";
 
 export const SideMenu = React.memo(
   function SideMenu() {
@@ -153,7 +154,7 @@ export const SideMenu = React.memo(
                   width: "100%"
                 }}
                 icon="close"
-                title="Tap to stop reordering"
+                title={strings.stopReordering()}
                 onPress={() => {
                   useSideBarDraggingStore.setState({
                     dragging: false

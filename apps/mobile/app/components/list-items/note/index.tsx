@@ -46,6 +46,7 @@ import { ReminderTime } from "../../ui/reminder-time";
 import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 type NoteItemProps = {
   item: Note | BaseTrashItem<Note>;
@@ -341,9 +342,10 @@ const NoteItem = ({
                     marginRight: 6
                   }}
                 >
-                  Deleted on{" "}
                   {item && item.dateDeleted
-                    ? new Date(item.dateDeleted).toISOString().slice(0, 10)
+                    ? strings.deletedOn(
+                        new Date(item.dateDeleted).toISOString().slice(0, 10)
+                      )
                     : null}
                 </Paragraph>
 
@@ -354,8 +356,7 @@ const NoteItem = ({
                     marginRight: 6
                   }}
                 >
-                  {(item as TrashItem).itemType[0].toUpperCase() +
-                    (item as TrashItem).itemType.slice(1)}
+                  {strings.note()}
                 </Paragraph>
               </>
             )}

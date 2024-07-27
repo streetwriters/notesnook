@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { PluginOption, defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import svgrPlugin from "vite-plugin-svgr";
+import commonjs from "vite-plugin-commonjs";
 import envCompatible from "vite-plugin-env-compatible";
 import { VitePWA } from "vite-plugin-pwa";
 import autoprefixer from "autoprefixer";
@@ -127,6 +128,9 @@ export default defineConfig({
     }
   },
   plugins: [
+    commonjs({
+      filter: (id) => (id.includes("notesnook/packages/intl") ? true : false)
+    }),
     ...(isAnalyzing
       ? [
           visualizer({

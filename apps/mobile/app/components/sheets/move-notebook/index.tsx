@@ -45,6 +45,7 @@ import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
+import { strings } from "@notesnook/intl";
 
 const useNotebookExpandedStore = create<{
   expanded: {
@@ -152,12 +153,10 @@ export const MoveNotebookSheet = ({
         }}
       >
         <DialogHeader
-          title={`Moving ${
-            selectedNotebooks.length > 1
-              ? selectedNotebooks.length + " notebooks"
-              : selectedNotebooks[0].title
-          }`}
-          paragraph={"Select the notebook you want to move this notebook to."}
+          title={strings.moveNotebook(
+            selectedNotebooks.length,
+            selectedNotebooks[0].title
+          )}
         />
       </View>
       <Seperator />
@@ -174,7 +173,7 @@ export const MoveNotebookSheet = ({
           >
             {moveToTop ? (
               <Button
-                title="Move to top"
+                title={strings.moveToTop()}
                 style={{
                   alignSelf: "flex-start",
                   width: "100%",

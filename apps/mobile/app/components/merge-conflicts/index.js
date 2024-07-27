@@ -48,6 +48,7 @@ import { IconButton } from "../ui/icon-button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import { diff } from "diffblazer";
+import { strings } from "@notesnook/intl";
 
 const MergeConflicts = () => {
   const { colors } = useThemeColors();
@@ -171,7 +172,11 @@ const MergeConflicts = () => {
                 fontWeight: "bold"
               }}
             >
-              {isCurrent ? "(This Device)" : "(Incoming)"}
+              (
+              {isCurrent
+                ? strings.mergeConflict.thisDevice()
+                : strings.mergeConflict.otherDevice()}
+              )
             </Text>
             {"\n"}
             {getFormattedDate(contentToKeep?.dateEdited)}
@@ -191,7 +196,7 @@ const MergeConflicts = () => {
                 setCopy(contentToKeep);
                 setDialogVisible(true);
               }}
-              title="Save a copy"
+              title={strings.saveACopy()}
               type="secondary"
               height={30}
               style={{
@@ -204,7 +209,7 @@ const MergeConflicts = () => {
           <View style={{ width: 10 }} />
           {isDiscarded ? (
             <Button
-              title="Discard"
+              title={strings.discard()}
               type="accent"
               buttonType={{
                 color: colors.static.red,
@@ -234,7 +239,9 @@ const MergeConflicts = () => {
                 }}
                 type="accent"
                 fontSize={SIZE.xs}
-                title={keeping && !isDiscarded ? "Undo" : "Keep"}
+                title={
+                  keeping && !isDiscarded ? strings.undo() : strings.keep()
+                }
                 onPress={() => {
                   setKeep(keeping && !isDiscarded ? null : contentToKeep);
                 }}
@@ -277,11 +284,7 @@ const MergeConflicts = () => {
         {dialogVisible && (
           <BaseDialog visible={true}>
             <DialogContainer>
-              <DialogHeader
-                title="Apply Changes"
-                paragraph="Apply selected changes to note?"
-                padding={12}
-              />
+              <DialogHeader title={strings.applyChanges()} padding={12} />
               <Seperator />
               <DialogButtons
                 positiveTitle="Apply"

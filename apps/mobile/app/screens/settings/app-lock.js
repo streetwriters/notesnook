@@ -32,6 +32,7 @@ import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { SIZE } from "../../utils/size";
+import { strings } from "@notesnook/intl";
 const AppLock = () => {
   const { colors } = useThemeColors();
   const appLockMode = useSettingStore((state) => state.settings.appLockMode);
@@ -97,10 +98,8 @@ const AppLock = () => {
                 width: "100%"
               }}
             >
-              <Heading>Protect your notes</Heading>
-              <Paragraph size={SIZE.md}>
-                Choose how you want to secure your notes locally.
-              </Paragraph>
+              <Heading>{strings.protectNotes()}</Heading>
+              <Paragraph size={SIZE.md}>{strings.protectNotesDesc()}</Paragraph>
             </View>
           </View>
 

@@ -40,6 +40,7 @@ import { MoveNotes } from "../move-notes/movenote";
 import { eOnNotebookUpdated } from "../../../utils/events";
 import { getParentNotebookId } from "../../../utils/notebooks";
 import { useNotebookStore } from "../../../stores/use-notebook-store";
+import { strings } from "@notesnook/intl";
 
 export const AddNotebookSheet = ({
   notebook,
@@ -119,7 +120,7 @@ export const AddNotebookSheet = ({
       }}
     >
       <Heading size={SIZE.lg}>
-        {notebook ? "Edit Notebook" : "New Notebook"}
+        {notebook ? strings.editNotebook() : strings.newNotebook()}
       </Heading>
 
       <Seperator />
@@ -157,7 +158,7 @@ export const AddNotebookSheet = ({
       />
 
       <Button
-        title={notebook ? "Save" : "Add"}
+        title={notebook ? strings.save() : strings.add()}
         type="accent"
         height={45}
         fontSize={SIZE.md}

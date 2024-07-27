@@ -34,6 +34,7 @@ import ToolSheet from "./tool-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import type { ToolId } from "@notesnook/editor";
 import PremiumService from "../../../services/premium";
+import { strings } from "@notesnook/intl";
 
 export const Group = ({
   item,
@@ -203,7 +204,7 @@ export const Group = ({
                 color={colors.secondary.paragraph}
                 size={SIZE.xs}
               >
-                GROUP
+                {strings.group()}
               </Paragraph>
             </View>
 

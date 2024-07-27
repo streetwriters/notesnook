@@ -42,6 +42,7 @@
     "@notesnook/logger": "file:../../packages/logger",
     "@notesnook/theme": "file:../../packages/theme",
     "@notesnook/themes-server": "file:../../servers/themes",
+    "@notesnook/intl": "file:../../packages/intl",
     "diffblazer": "^1.0.1",
     "react": "18.2.0",
     "react-native": "0.74.5",

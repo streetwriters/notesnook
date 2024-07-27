@@ -34,6 +34,7 @@ import { ToastManager } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { hexToRGBA } from "../../utils/colors";
 import { sanitizeFilename } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 export default function DebugLogs() {
   const { colors } = useThemeColors();
@@ -213,10 +214,7 @@ export default function DebugLogs() {
           padding: 12
         }}
       >
-        <Notice
-          text="All logs are local only and are not sent to any server. You can share the logs from here with us if you face an issue to help us find the root cause."
-          type="information"
-        />
+        <Notice text={strings.debugNotice()} type="information" />
       </View>
 
       {currentLog && (

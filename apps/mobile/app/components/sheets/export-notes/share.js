@@ -23,6 +23,7 @@ import FileViewer from "react-native-file-viewer";
 import { ToastManager } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
+import { strings } from "@notesnook/intl";
 export const ShareComponent = ({ uri, name, padding }) => {
   return (
     <View
@@ -31,7 +32,7 @@ export const ShareComponent = ({ uri, name, padding }) => {
       }}
     >
       <Button
-        title="Open"
+        title={strings.open()}
         type="accent"
         width="100%"
         fontSize={SIZE.md}
@@ -50,7 +51,7 @@ export const ShareComponent = ({ uri, name, padding }) => {
         }}
       />
       <Button
-        title="Share"
+        title={strings.share()}
         type="shade"
         width="100%"
         fontSize={SIZE.md}

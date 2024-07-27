@@ -52,6 +52,7 @@ import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { sanitizeFilename } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",
@@ -105,8 +106,8 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
   return (
     <>
       <DialogHeader
-        title="Two-factor authentication"
-        paragraph="Protect your notes by enabling 2 factor authentication"
+        title={strings.twoFactorAuth()}
+        paragraph={strings.twoFactorAuthDesc()}
         padding={12}
       />
       <Seperator />
@@ -291,7 +292,9 @@ export const MFASetup = ({
                 height: 50
               }}
             />
-            <Paragraph>Getting information.. please wait</Paragraph>
+            <Paragraph>
+              {strings.gettingInformation()}... {strings.pleaseWait()}
+            </Paragraph>
           </View>
         ) : (
           <>
@@ -327,11 +330,11 @@ export const MFASetup = ({
                       sending
                         ? null
                         : method.id === "app"
-                        ? "Copy"
+                        ? strings.copy()
                         : `${
                             seconds
-                              ? `Resend code in (${seconds})`
-                              : "Send code"
+                              ? strings.resendCode(seconds)
+                              : strings.sendCode()
                           }`
                     }
                   />
@@ -339,7 +342,7 @@ export const MFASetup = ({
               }
             />
 
-            <Heading size={SIZE.md}>Enter the 6-digit code</Heading>
+            <Heading size={SIZE.md}>{strings.enterSixDigitCode()}</Heading>
             <Paragraph>{codeHelpText[method?.id]}</Paragraph>
             <Seperator />
             <Input
@@ -364,7 +367,7 @@ export const MFASetup = ({
             />
             <Seperator />
             <Button
-              title={enabling ? null : "Next"}
+              title={enabling ? null : strings.next()}
               type="accent"
               width={250}
               onPress={onNext}
@@ -376,7 +379,7 @@ export const MFASetup = ({
             />
 
             <Button
-              title="Select a different 2FA method"
+              title="Change 2FA method"
               type="plain"
               height={25}
               onPress={() => {
@@ -423,14 +426,8 @@ export const MFARecoveryCodes = ({
     <View>
       <DialogHeader
         centered={true}
-        title="Save your recovery codes"
-        paragraph={`If you lose access to your ${
-          method?.id === "email"
-            ? "email"
-            : method?.id === "sms"
-            ? "phone"
-            : "auth app"
-        }, you can login to Notesnook using your recovery codes. Each code can only be used once.`}
+        title={strings.saveRecoveryCodes()}
+        paragraph={strings.saveRecoveryCodesDesc()}
         padding={12}
       />
       <Seperator />
@@ -450,7 +447,9 @@ export const MFARecoveryCodes = ({
               height: 50
             }}
           />
-          <Paragraph>Getting recovery codes.. please wait</Paragraph>
+          <Paragraph>
+            {strings.gettingRecoveryCodes()}... {strings.pleaseWait()}
+          </Paragraph>
         </View>
       ) : (
         <>
@@ -483,7 +482,7 @@ export const MFARecoveryCodes = ({
             }}
           >
             <Button
-              title="Copy codes"
+              title={strings.copyCodes()}
               fontSize={SIZE.md}
               onPress={() => {
                 const codeString = codes.join("\n");
@@ -500,7 +499,7 @@ export const MFARecoveryCodes = ({
             />
 
             <Button
-              title="Save to file"
+              title={strings.saveToFile()}
               fontSize={SIZE.md}
               onPress={async () => {
                 try {
@@ -542,7 +541,7 @@ export const MFARecoveryCodes = ({
           </View>
 
           <Button
-            title={isSetup ? "Next" : "Done"}
+            title={isSetup ? strings.next() : strings.done()}
             type="accent"
             width={250}
             onPress={() => {
@@ -593,16 +592,16 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
         centered={true}
         title={
           recovery
-            ? "Fallback method for 2FA enabled"
-            : "Two-factor authentication enabled!"
+            ? strings.fallbackMethodEnabled()
+            : strings.twoFactorAuthEnabled()
         }
-        paragraph="Your account is now 100% secure against unauthorized logins."
+        paragraph={strings.accountIsSecure()}
         padding={12}
       />
       <Seperator />
 
       <Button
-        title="Done"
+        title={strings.done()}
         type="accent"
         width={250}
         onPress={() => {
@@ -616,7 +615,7 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
 
       {!recovery ? (
         <Button
-          title="Setup secondary 2FA method"
+          title={strings.secondary2faMethod()}
           type="plain"
           height={25}
           onPress={() => {

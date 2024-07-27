@@ -39,6 +39,7 @@ import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { TagStrip, Tags } from "./tags";
 import { tabBarRef } from "../../utils/global-refs";
+import { strings } from "@notesnook/intl";
 
 const Line = ({ top = 6, bottom = 6 }) => {
   const { colors } = useThemeColors();
@@ -61,7 +62,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   if (!item || !item.id) {
     return (
       <Paragraph style={{ marginVertical: 10, alignSelf: "center" }}>
-        Start writing to save your note.
+        {strings.noNotePropertiesNotice()}
       </Paragraph>
     );
   }

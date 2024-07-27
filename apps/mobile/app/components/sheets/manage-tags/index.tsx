@@ -48,6 +48,7 @@ import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -296,7 +297,7 @@ const ManageTagsSheet = (props: {
           type="selected"
         >
           <Heading size={SIZE.sm} color={colors.selected.heading}>
-            Add {'"' + "#" + query + '"'}
+            {strings.add()} {'"' + "#" + query + '"'}
           </Heading>
           <Icon name="plus" color={colors.selected.icon} size={SIZE.lg} />
         </Pressable>
@@ -331,7 +332,7 @@ const ManageTagsSheet = (props: {
                 textBreakStrategy="balanced"
                 color={colors.secondary.paragraph}
               >
-                You do not have any tags.
+                {strings.emptyPlaceholders("tag")}
               </Paragraph>
             </View>
           }

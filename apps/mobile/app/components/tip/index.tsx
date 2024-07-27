@@ -28,6 +28,7 @@ import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 export const Tip = ({
   tip,
@@ -67,7 +68,7 @@ export const Tip = ({
         }}
       >
         <Button
-          title="TIP"
+          title={strings.tip()}
           icon="information"
           fontSize={SIZE.xs}
           iconSize={SIZE.xs}
@@ -87,7 +88,7 @@ export const Tip = ({
 
         {neverShowAgain && (
           <Button
-            title="Never show again"
+            title={strings.neverShowAgain()}
             type="secondary"
             icon="close"
             fontSize={SIZE.xs}

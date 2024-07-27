@@ -52,6 +52,7 @@ import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 const ExportNotesSheet = ({
   ids,
@@ -175,14 +176,7 @@ const ExportNotesSheet = ({
           >
             <DialogHeader
               icon="export"
-              title={
-                ids.length > 1 ? `Export ${ids.length} Notes` : "Export Note"
-              }
-              paragraph={`All exports are saved in ${
-                Platform.OS === "android"
-                  ? "the selected"
-                  : "Notesnook/exported"
-              } folder in phone storage`}
+              title={`${strings.export()} ${strings.notes(ids.length)}`}
             />
           </View>
 
@@ -263,11 +257,7 @@ const ExportNotesSheet = ({
             {!complete ? (
               <>
                 <ActivityIndicator />
-                <Paragraph>
-                  {`${
-                    status ? `${status})` : `Exporting notes`
-                  }... Please wait`}
-                </Paragraph>
+                <Paragraph>{strings.exportingNotes(status)}</Paragraph>
               </>
             ) : (
               <>
@@ -287,21 +277,20 @@ const ExportNotesSheet = ({
                   }}
                   color={colors.secondary.heading}
                 >
-                  {ids.length > 1
-                    ? `${ids.length} Notes exported`
-                    : "Note exported"}
+                  {strings.exportSuccessHeading(ids.length)}
                 </Heading>
                 <Paragraph
                   style={{
                     textAlign: "center"
                   }}
                 >
-                  Your {ids.length > 1 ? "notes are" : "note is"} exported
-                  successfully as {result?.fileName}
+                  {strings.exportSuccessDesc(result?.fileName as string)}
                 </Paragraph>
                 <Button
                   title={
-                    Platform.OS === "android" ? "Open file location" : "Open"
+                    Platform.OS === "android"
+                      ? strings.openFileLocation()
+                      : strings.open()
                   }
                   type="accent"
                   width={250}
@@ -332,7 +321,7 @@ const ExportNotesSheet = ({
                   }}
                 />
                 <Button
-                  title="Share"
+                  title={strings.share()}
                   type="secondaryAccented"
                   width={250}
                   fontSize={SIZE.md}
@@ -356,7 +345,7 @@ const ExportNotesSheet = ({
                   }}
                 />
                 <Button
-                  title="Export in another format"
+                  title={strings.exportAgain()}
                   type="inverted"
                   width={250}
                   fontSize={SIZE.md}

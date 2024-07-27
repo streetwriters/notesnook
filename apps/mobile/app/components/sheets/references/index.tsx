@@ -41,6 +41,7 @@ import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 export const useExpandedStore = create<{
   expanded: {
@@ -99,7 +100,7 @@ const ListBlockItem = ({
           {item?.content.length > 200
             ? item?.content.slice(0, 200) + "..."
             : !item.content || item.content.trim() === ""
-            ? "(Empty block)"
+            ? strings.linkNoteEmptyBlock()
             : item.content}
         </Paragraph>
 
@@ -360,7 +361,7 @@ const ListNoteItem = ({
                 <>
                   {linkedBlocks.length === 0 ? (
                     <Paragraph color={colors.secondary.paragraph}>
-                      No blocks linked
+                      {strings.noBlocksLinked()}
                     </Paragraph>
                   ) : (
                     linkedBlocks.map(renderBlock)
@@ -370,7 +371,7 @@ const ListNoteItem = ({
                 <>
                   {noteInternalLinks.length === 0 ? (
                     <Paragraph color={colors.secondary.paragraph}>
-                      No references found of this note
+                      {strings.noReferencesFound()}
                     </Paragraph>
                   ) : (
                     noteInternalLinks.map(renderInternalLink)
@@ -447,7 +448,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
       >
         <Button
           type={"plain"}
-          title="Linked notes"
+          title={strings.linkedNotes()}
           style={{
             borderRadius: 0,
             borderWidth: 0,
@@ -462,7 +463,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
         />
         <Button
           type={"plain"}
-          title="Referenced in"
+          title={strings.referencedIn()}
           style={{
             width: "50%",
             borderWidth: 0,
@@ -486,9 +487,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
           }}
         >
           <Paragraph color={colors.secondary.paragraph}>
-            {tab === 1
-              ? "This note is not referenced in other notes."
-              : "This note does not link to other notes."}
+            {tab === 1 ? strings.notReferenced() : strings.notLinked()}
           </Paragraph>
         </View>
       ) : (
