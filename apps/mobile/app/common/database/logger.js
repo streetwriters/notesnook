@@ -23,7 +23,9 @@ import { Platform } from "react-native";
 import { setLogger } from ".";
 import { RNSqliteDriver } from "./sqlite.kysely";
 
+let loggerLoaded = false;
 const initializeLogger = async () => {
+  if (loggerLoaded) return;
   await initialize({
     dialect: (name) => ({
       createDriver: () => {
@@ -37,6 +39,7 @@ const initializeLogger = async () => {
     journalMode: Platform.OS === "ios" ? "DELETE" : "WAL"
   });
   setLogger();
+  loggerLoaded = true;
 };
 
 export { initializeLogger };

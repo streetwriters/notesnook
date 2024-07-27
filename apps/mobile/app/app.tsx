@@ -25,7 +25,6 @@ import { I18nManager, View } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { initializeLogger } from "./common/database/logger";
 import AppLockedOverlay from "./components/app-lock-overlay";
 import { withErrorBoundry } from "./components/exception-handler";
 import GlobalSafeAreaProvider from "./components/globalsafearea";
@@ -41,33 +40,24 @@ import { useUserStore } from "./stores/use-user-store";
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
+const { appLockEnabled, appLockMode } = SettingsService.get();
+if (appLockEnabled || appLockMode !== "none") {
+  useUserStore.getState().lockApp(true);
+}
 
 const App = () => {
-  const init = useAppEvents();
+  useAppEvents();
+  //@ts-ignore
+  globalThis["IS_MAIN_APP_RUNNING"] = true;
   useEffect(() => {
-    initializeLogger()
-      .catch((e) => {
-        console.log(e);
-      })
-      .finally(() => {
-        const { appLockEnabled, appLockMode } = SettingsService.get();
-        if (appLockEnabled || appLockMode !== "none") {
-          useUserStore.getState().lockApp(true);
-        }
-
-        //@ts-ignore
-        globalThis["IS_MAIN_APP_RUNNING"] = true;
-        init();
-        setTimeout(async () => {
-          SettingsService.onFirstLaunch();
-          await Notifications.get();
-          if (SettingsService.get().notifNotes) {
-            Notifications.pinQuickNote(true);
-          }
-          TipManager.init();
-        }, 100);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    SettingsService.onFirstLaunch();
+    setTimeout(async () => {
+      await Notifications.get();
+      if (SettingsService.get().notifNotes) {
+        Notifications.pinQuickNote(true);
+      }
+      TipManager.init();
+    }, 100);
   }, []);
   return (
     <View

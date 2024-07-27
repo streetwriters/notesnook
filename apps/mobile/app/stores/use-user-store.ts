@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Profile } from "@notesnook/core";
-import { User } from "@notesnook/core";
+import { Profile, User } from "@notesnook/core";
 import create, { State } from "zustand";
 
 export enum SyncStatus {
@@ -56,7 +55,9 @@ export const useUserStore = create<UserStore>((set) => ({
     set({ syncing: syncing, lastSyncStatus: status });
   },
   setLastSynced: (lastSynced) => set({ lastSynced: lastSynced }),
-  lockApp: (appLocked) => set({ appLocked }),
+  lockApp: (appLocked) => {
+    set({ appLocked });
+  },
   lastSyncStatus: SyncStatus.Never,
   disableAppLockRequests: false,
   setDisableAppLockRequests: (disableAppLockRequests) => {
