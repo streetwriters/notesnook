@@ -203,6 +203,8 @@ const AppLockedOverlay = () => {
       contentContainerStyle={{
         justifyContent: "center"
       }}
+      keyboardDismissMode="interactive"
+      keyboardShouldPersistTaps="handled"
     >
       <Toast context="local" />
       <View

@@ -97,6 +97,7 @@ import {
 import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
+import { initializeLogger } from "../common/database/logger";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -280,8 +281,108 @@ const onSubscriptionError = async (error: RNIap.PurchaseError) => {
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
+const doAppLoadActions = async () => {
+  if (SettingsService.get().sessionExpired) {
+    eSendEvent(eLoginSessionExpired);
+    return;
+  }
+  notifee.setBadgeCount(0);
+
+  if (!(await db.user.getUser())) {
+    setLoginMessage();
+    return;
+  }
+
+  await useMessageStore.getState().setAnnouncement();
+  if (NewFeature.present()) return;
+  if (await checkAppUpdateAvailable()) return;
+  if (await checkForRateAppRequest()) return;
+  if (await PremiumService.getRemainingTrialDaysStatus()) return;
+  if (SettingsService.get().introCompleted) {
+    useMessageStore.subscribe((state) => {
+      const dialogs = state.dialogs;
+      if (dialogs.length > 0) {
+        eSendEvent(eOpenAnnouncementDialog, dialogs[0]);
+      }
+    });
+  }
+};
+
+const checkAppUpdateAvailable = async () => {
+  if (__DEV__ || Config.isTesting === "true" || Config.FDROID_BUILD || BETA)
+    return;
+  try {
+    const version =
+      Config.GITHUB_RELEASE === "true"
+        ? await getGithubVersion()
+        : await checkVersion();
+    if (!version || !version?.needsUpdate) return false;
+
+    setUpdateAvailableMessage(version);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+const checkForRateAppRequest = async () => {
+  const rateApp = SettingsService.get().rateApp as number;
+  if (
+    rateApp &&
+    rateApp < Date.now() &&
+    !useMessageStore.getState().message?.visible
+  ) {
+    setRateAppMessage();
+    return false;
+  }
+  return false;
+};
+
+const IsDatabaseMigrationRequired = () => {
+  if (!db.migrations.required() || useUserStore.getState().appLocked)
+    return false;
+
+  presentSheet({
+    component: <Migrate />,
+    onClose: () => {
+      if (!db.migrations.required()) {
+        initializeDatabase();
+      }
+    },
+    disableClosing: true
+  });
+  return true;
+};
+
+const initializeDatabase = async (password?: string) => {
+  if (useUserStore.getState().appLocked) return;
+  if (!db.isInitialized) {
+    RNBootSplash.hide({ fade: true });
+    DatabaseLogger.info("Initializing database");
+    try {
+      await setupDatabase(password);
+      await db.init();
+    } catch (e) {
+      DatabaseLogger.error(e as Error);
+      ToastManager.error(e as Error, "Error initializing database", "global");
+    }
+  }
+
+  if (IsDatabaseMigrationRequired()) return;
+
+  if (db.isInitialized) {
+    Notifications.setupReminders(true);
+    if (SettingsService.get().notifNotes) {
+      Notifications.pinQuickNote(false);
+    }
+    useSettingStore.getState().setAppLoading(false);
+    DatabaseLogger.info("Database initialized");
+  }
+  Walkthrough.init();
+};
+
 export const useAppEvents = () => {
-  const loading = useSettingStore((state) => state.isAppLoading);
+  const isAppLoading = useSettingStore((state) => state.isAppLoading);
   const [setLastSynced, setUser, appLocked, syncing] = useUserStore((state) => [
     state.setLastSynced,
     state.setUser,
@@ -312,7 +413,7 @@ export const useAppEvents = () => {
   }, [setLastSynced]);
 
   useEffect(() => {
-    if (loading) return;
+    if (isAppLoading) return;
 
     let subscriptions: EventManagerSubscription[] = [];
     const eventManager = db.eventManager;
@@ -327,7 +428,7 @@ export const useAppEvents = () => {
     return () => {
       subscriptions.forEach((sub) => sub?.unsubscribe?.());
     };
-  }, [loading, onSyncComplete]);
+  }, [isAppLoading, onSyncComplete]);
 
   const subscribeToPurchaseListeners = useCallback(async () => {
     if (Platform.OS === "android") {
@@ -572,7 +673,7 @@ export const useAppEvents = () => {
       });
     }
     let sub: NativeEventSubscription;
-    if (!loading && !appLocked) {
+    if (!isAppLoading && !appLocked) {
       setTimeout(() => {
         sub = AppState.addEventListener("change", onAppStateChanged);
         if (
@@ -594,7 +695,7 @@ export const useAppEvents = () => {
       sub?.remove();
       unsubscribePurchaseListeners();
     };
-  }, [loading, appLocked, checkAutoBackup]);
+  }, [isAppLoading, appLocked, checkAutoBackup]);
 
   useEffect(() => {
     if (!appLocked && !syncing && refValues.current.backupDidWait) {
@@ -643,127 +744,22 @@ export const useAppEvents = () => {
   }
 
   useEffect(() => {
-    if (!loading) {
+    if (!isAppLoading) {
       onUserUpdated();
       doAppLoadActions();
     }
-  }, [loading, onUserUpdated]);
-
-  const initializeDatabase = useCallback(async (password?: string) => {
-    const IsDatabaseMigrationRequired = () => {
-      if (!db.migrations.required() || useUserStore.getState().appLocked)
-        return false;
-
-      presentSheet({
-        component: <Migrate />,
-        onClose: () => {
-          if (!db.migrations.required()) {
-            initializeDatabase();
-          }
-        },
-        disableClosing: true
-      });
-      return true;
-    };
-
-    if (useUserStore.getState().appLocked) return;
-    if (!db.isInitialized) {
-      RNBootSplash.hide({ fade: true });
-      DatabaseLogger.info("Initializing database");
-      try {
-        await setupDatabase(password);
-        await db.init();
-      } catch (e) {
-        DatabaseLogger.error(e as Error);
-        ToastManager.error(e as Error, "Error initializing database", "global");
-      }
-    }
-
-    if (IsDatabaseMigrationRequired()) return;
-
-    if (db.isInitialized) {
-      Notifications.setupReminders(true);
-      if (SettingsService.get().notifNotes) {
-        Notifications.pinQuickNote(false);
-      }
-      useSettingStore.getState().setAppLoading(false);
-      DatabaseLogger.info("Database initialized");
-    }
-    Walkthrough.init();
-  }, []);
+  }, [isAppLoading, onUserUpdated]);
 
   useEffect(() => {
-    let sub: () => void;
-    if (appLocked) {
-      const sub = useUserStore.subscribe((state) => {
-        if (!state.appLocked && useSettingStore.getState().isAppLoading) {
-          console.log("DB initialized");
+    if (!appLocked && isAppLoading) {
+      initializeLogger()
+        .catch((e) => {
+          console.log(e);
+        })
+        .finally(() => {
+          //@ts-ignore
           initializeDatabase();
-          sub();
-        }
-      });
+        });
     }
-    return () => {
-      sub?.();
-    };
-  }, [appLocked, initializeDatabase]);
-
-  return initializeDatabase;
-};
-
-const doAppLoadActions = async () => {
-  if (SettingsService.get().sessionExpired) {
-    eSendEvent(eLoginSessionExpired);
-    return;
-  }
-  notifee.setBadgeCount(0);
-
-  if (!(await db.user.getUser())) {
-    setLoginMessage();
-    return;
-  }
-
-  await useMessageStore.getState().setAnnouncement();
-  if (NewFeature.present()) return;
-  if (await checkAppUpdateAvailable()) return;
-  if (await checkForRateAppRequest()) return;
-  if (await PremiumService.getRemainingTrialDaysStatus()) return;
-  if (SettingsService.get().introCompleted) {
-    useMessageStore.subscribe((state) => {
-      const dialogs = state.dialogs;
-      if (dialogs.length > 0) {
-        eSendEvent(eOpenAnnouncementDialog, dialogs[0]);
-      }
-    });
-  }
-};
-
-const checkAppUpdateAvailable = async () => {
-  if (__DEV__ || Config.isTesting === "true" || Config.FDROID_BUILD || BETA)
-    return;
-  try {
-    const version =
-      Config.GITHUB_RELEASE === "true"
-        ? await getGithubVersion()
-        : await checkVersion();
-    if (!version || !version?.needsUpdate) return false;
-
-    setUpdateAvailableMessage(version);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
-
-const checkForRateAppRequest = async () => {
-  const rateApp = SettingsService.get().rateApp as number;
-  if (
-    rateApp &&
-    rateApp < Date.now() &&
-    !useMessageStore.getState().message?.visible
-  ) {
-    setRateAppMessage();
-    return false;
-  }
-  return false;
+  }, [appLocked, isAppLoading]);
 };

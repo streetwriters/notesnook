@@ -141,7 +141,6 @@ const onBoot = async () => {
     }
 
     await Notifications.setupReminders();
-    SettingsService.init();
     if (SettingsService.get().notifNotes) {
       Notifications.pinQuickNote(false);
     }
