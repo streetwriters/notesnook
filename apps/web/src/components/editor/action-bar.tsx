@@ -281,21 +281,21 @@ function TabStrip() {
           items={sessions}
           moveItem={(from, to) => {
             if (from === to) return;
-            useEditorStore.setState((state) => {
-              const isToPinned = state.sessions[to].pinned;
-              const [fromTab] = state.sessions.splice(from, 1);
+            const sessions = useEditorStore.getState().sessions.slice();
+            const isToPinned = sessions[to].pinned;
+            const [fromTab] = sessions.splice(from, 1);
 
-              // if the tab where this tab is being dropped is pinned,
-              // let's pin our tab too.
-              if (isToPinned) {
-                fromTab.pinned = true;
-                fromTab.preview = false;
-              }
-              // unpin the tab if it is moved.
-              else if (fromTab.pinned) fromTab.pinned = false;
+            // if the tab where this tab is being dropped is pinned,
+            // let's pin our tab too.
+            if (isToPinned) {
+              fromTab.pinned = true;
+              fromTab.preview = false;
+            }
+            // unpin the tab if it is moved.
+            else if (fromTab.pinned) fromTab.pinned = false;
 
-              state.sessions.splice(to, 0, fromTab);
-            });
+            sessions.splice(to, 0, fromTab);
+            useEditorStore.setState({ sessions });
           }}
           renderItem={({ item: session, index: i }) => (
             <Tab
