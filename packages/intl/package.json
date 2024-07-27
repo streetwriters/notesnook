@@ -1,0 +1,31 @@
+{
+  "name": "@notesnook/intl",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "extract": "lingui extract",
+    "compile": "lingui compile --typescript",
+    "build-locale": "yarn extract && yarn compile",
+    "clean": "rm -rf dist && rm -rf locales",
+    "build": "yarn build-locale && yarn rspack build && yarn tsc",
+    "start": "nodemon --watch ./src/strings.tsx --exec \"yarn rspack build && yarn tsc\""
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.9",
+    "@babel/preset-env": "^7.20.2",
+    "@lingui/cli": "^4.11.2",
+    "@lingui/macro": "^4.11.2",
+    "@types/react": "^18.2.39",
+    "babel-plugin-macros": "^3.1.0",
+    "react": "18.2.0",
+    "typescript": "5.5.3",
+    "@lingui/swc-plugin": "^4.0.7",
+    "@rspack/cli": "^0.6.2",
+    "@rspack/core": "^0.6.2"
+  },
+  "peerDependencies": {
+    "@lingui/macro": "*",
+    "react": ">=18"
+  }
+}
