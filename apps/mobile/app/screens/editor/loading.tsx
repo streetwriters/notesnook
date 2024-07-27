@@ -39,6 +39,7 @@ import { eClearEditor } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { useEditor } from "./tiptap/use-editor";
 import { editorState } from "./tiptap/utils";
+import { strings } from "@notesnook/intl";
 
 const EditorOverlay = ({
   editorId = "",
@@ -220,7 +221,7 @@ const EditorOverlay = ({
               }}
             >
               <Paragraph color={colors.secondary.paragraph} size={13}>
-                Add a tag
+                {strings.addItem("tag")}
               </Paragraph>
               <IconButton
                 size={20}
@@ -325,7 +326,7 @@ const EditorOverlay = ({
                   editor.setLoading(true);
                   setTimeout(() => editor.setLoading(false), 10);
                 }}
-                title="Taking too long? Reload editor"
+                title={strings.reloadEditor()}
               />
               <Paragraph
                 textBreakStrategy="balanced"
@@ -336,8 +337,7 @@ const EditorOverlay = ({
                   marginTop: 5
                 }}
               >
-                If the editor fails to load even after reloading. Try restarting
-                the app.
+                {strings.editorFailedToLoad()}
               </Paragraph>
             </>
           ) : null}

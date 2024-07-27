@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Sodium from "@ammarahmed/react-native-sodium";
 import { getFileNameWithExtension } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import React from "react";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
@@ -89,7 +90,7 @@ export async function downloadAttachments(attachments) {
         current: 0,
         total: 0,
         success: false,
-        message: "Download cancelled",
+        message: strings.network.dowloadCancelled(),
         canceled: true
       });
       return true;
@@ -116,7 +117,7 @@ export async function downloadAttachments(attachments) {
 
       if (isCancelled()) return;
 
-      if (!uri) throw new Error("Failed to download file");
+      if (!uri) throw new Error(strings.failedToDownloadFile());
       // Move file to the source folder we will zip eventually and rename the file to it's actual name.
       const filePath = `${zipSourceFolder}/${attachment.filename}`;
       await RNFetchBlob.fs.mv(`${cacheDir}/${uri}`, filePath);
@@ -139,7 +140,7 @@ export async function downloadAttachments(attachments) {
     useAttachmentStore.getState().setDownloading({
       current: 0,
       total: 1,
-      message: "Saving zip file... Please wait",
+      message: `${strings.savingZipFile()}... ${strings.pleaseWait()}`,
       groupId
     });
     // If all goes well, zip the notesnook-attachments folder in cache.
@@ -149,9 +150,9 @@ export async function downloadAttachments(attachments) {
         groupId,
         current: progress,
         total: 1,
-        message: `Saving zip file (${(progress * 100).toFixed(
+        message: `${strings.savingZipFile()} (${(progress * 100).toFixed(
           1
-        )}%)... Please wait`
+        )}%)... ${strings.pleaseWait()}`
       });
     });
     await zip(zipSourceFolder, zipOutputFile);
@@ -273,8 +274,8 @@ export default async function downloadAttachment(
 
     if (!options.silent) {
       ToastManager.show({
-        heading: "Download successful",
-        message: filename + " downloaded",
+        heading: strings.network.downloadSuccess(),
+        message: strings.network.fileDownloaded(filename),
         type: "success"
       });
     }
@@ -284,12 +285,8 @@ export default async function downloadAttachment(
     }
     if (!options.silent) {
       presentSheet({
-        title: "File downloaded",
-        paragraph: `${filename} saved to ${
-          Platform.OS === "android"
-            ? "selected path"
-            : "File Manager/Notesnook/downloads"
-        }`,
+        title: strings.network.fileDownloaded(),
+        paragraph: strings.fileSaved(filename, Platform.OS),
         icon: "download",
         context: global ? null : attachment.hash,
         component: <ShareComponent uri={fileUri} name={filename} padding={12} />

@@ -29,6 +29,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../../utils/size";
 import { Group } from "./group";
 import { DragState, useDragState } from "./state";
+import { strings } from "@notesnook/intl";
 export const ConfigureToolbar = () => {
   const data = useDragState((state) => state.data);
   const preset = useDragState((state) => state.preset);
@@ -52,10 +53,7 @@ export const ConfigureToolbar = () => {
             paddingVertical: 12
           }}
         >
-          <Notice
-            text="Curate the toolbar that fits your needs and matches your personality."
-            type="information"
-          />
+          <Notice text={strings.configureToolbarNotice()} type="information" />
 
           <Paragraph
             style={{
@@ -64,7 +62,7 @@ export const ConfigureToolbar = () => {
             size={SIZE.xs}
             color={colors.secondary.paragraph}
           >
-            PRESETS
+            {strings.presets()}
           </Paragraph>
 
           <View
@@ -128,7 +126,7 @@ export const ConfigureToolbar = () => {
             }}
           >
             <Button
-              title="Create a group"
+              title={strings.createAGroup()}
               type="secondaryAccented"
               icon="plus"
               style={{

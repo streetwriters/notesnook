@@ -39,6 +39,7 @@ import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 const useItemSelectionStore = createItemSelectionStore(true);
 
@@ -123,10 +124,7 @@ export const MoveNotes = ({
     >
       <Dialog context="local" />
 
-      <DialogHeader
-        title={`Add notes to ${currentNotebook.title}`}
-        paragraph={"Select the notes you want to move to this Notebook."}
-      />
+      <DialogHeader title={strings.addNotesToNotebook(currentNotebook.title)} />
       <Seperator />
 
       <Input
@@ -158,7 +156,7 @@ export const MoveNotes = ({
               <ActivityIndicator size="large" color={colors.primary.accent} />
             ) : (
               <Paragraph color={colors.secondary.paragraph}>
-                No notes to show
+                {strings.emptyPlaceholders("note")}
               </Paragraph>
             )}
           </View>
@@ -185,7 +183,7 @@ export const MoveNotes = ({
             Navigation.queueRoutesForUpdate();
             fwdRef?.current?.hide();
           }}
-          title="Move selected notes"
+          title={strings.moveSelectedNotes()}
           type="accent"
           width="100%"
         />

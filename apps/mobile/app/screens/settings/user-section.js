@@ -35,6 +35,7 @@ import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS_STRINGS } from "../../utils/constants";
 import { SIZE } from "../../utils/size";
 import { SectionItem } from "./section-item";
+import { strings } from "@notesnook/intl";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -176,7 +177,7 @@ const SettingsUserSection = ({ item }) => {
                     <Heading color={colors.primary.accent} size={SIZE.sm}>
                       {SUBSCRIPTION_STATUS_STRINGS[
                         user.subscription?.type
-                      ]?.toUpperCase() || "Basic"}
+                      ]?.toUpperCase() || strings.basic()}
                     </Heading>
                   ) : null}
 
@@ -208,7 +209,7 @@ const SettingsUserSection = ({ item }) => {
                   >
                     {userProfile?.fullName
                       ? userProfile.fullName + " "
-                      : "Set your name "}
+                      : strings.setYourName() + " "}
                     <AppIcon name="pencil" size={SIZE.lg} />
                   </Paragraph>
 
@@ -225,12 +226,12 @@ const SettingsUserSection = ({ item }) => {
                     color={colors.secondary.heading}
                   >
                     {!user ? (
-                      "Not logged in"
+                      strings.notLoggedIn()
                     ) : lastSynced && lastSynced !== "Never" ? (
                       <>
                         {lastSyncStatus === SyncStatus.Failed
-                          ? "Sync failed"
-                          : "Synced"}{" "}
+                          ? strings.syncFailed()
+                          : strings.synced()}{" "}
                         <TimeSince
                           style={{
                             fontSize: SIZE.xs,
@@ -238,10 +239,10 @@ const SettingsUserSection = ({ item }) => {
                           }}
                           time={lastSynced}
                         />
-                        {isOffline ? " (offline)" : ""}
+                        {isOffline ? ` (${strings.offline()})` : ""}
                       </>
                     ) : (
-                      "never"
+                      strings.never()
                     )}{" "}
                     <Icon
                       name="checkbox-blank-circle"

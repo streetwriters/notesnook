@@ -40,6 +40,7 @@ import {
   VirtualizedGrouping,
   Note
 } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -134,7 +135,7 @@ export default function ReminderNotify({
           marginTop: 10
         }}
       >
-        <Paragraph size={SIZE.xs}>Remind me in:</Paragraph>
+        <Paragraph size={SIZE.xs}>{strings.remindMeIn()}:</Paragraph>
         {QuickActions.map((item) => {
           return (
             <Button
@@ -171,7 +172,7 @@ export default function ReminderNotify({
               marginBottom: 10
             }}
           >
-            REFERENCED IN
+            {strings.referencedIn()}
           </Paragraph>
           <List
             data={references}

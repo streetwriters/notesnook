@@ -32,6 +32,7 @@ import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { Notice } from "../../ui/notice";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 export default function AttachImage({
   response,
@@ -64,7 +65,7 @@ export default function AttachImage({
         }}
       >
         <Paragraph style={{ color: colors.primary.paragraph, marginBottom: 6 }}>
-          Attaching {response?.length} image(s):
+          {strings.attachImageHeading(response?.length || 1)}
         </Paragraph>
         <ScrollView horizontal>
           {response?.map?.((item) => (
@@ -123,14 +124,14 @@ export default function AttachImage({
           }}
           size={SIZE.sm}
         >
-          Compress (recommended)
+          {strings.compress()} ({strings.recommended().toLowerCase()})
         </Paragraph>
       </TouchableOpacity>
 
       {!compress ? (
         <Notice
           type="alert"
-          text="Images uploaded without compression are slow to load and take more bandwidth. We recommend compressing images unless you need image in original quality."
+          text={strings.compressionOffNotice()}
           size="small"
           style={{
             width: "100%",
@@ -140,7 +141,7 @@ export default function AttachImage({
       ) : (
         <Notice
           type="information"
-          text="Compressed images are uploaded in Full HD resolution and usually are good enough for most use cases."
+          text={strings.compressionOnNotice()}
           size="small"
           style={{
             width: "100%",
@@ -150,9 +151,7 @@ export default function AttachImage({
       )}
 
       <Button
-        title={`${
-          (response?.length || 0) > 1 ? "Attach Images" : "Attach Image"
-        }`}
+        title={strings.attachImageHeading(response?.length || 1)}
         type="accent"
         width="100%"
         onPress={() => {

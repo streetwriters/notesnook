@@ -29,6 +29,7 @@ import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import { Pressable } from "../ui/pressable";
+import { strings } from "@notesnook/intl";
 
 export default function Notebooks({ note, close, full }) {
   const { colors } = useThemeColors();
@@ -102,7 +103,7 @@ export default function Notebooks({ note, close, full }) {
 
       {noteNotebooks.length > 1 && !full ? (
         <Button
-          title={`View all linked notebooks`}
+          title={strings.viewAllLinkedNotebooks()}
           fontSize={SIZE.xs}
           style={{
             alignSelf: "flex-end",

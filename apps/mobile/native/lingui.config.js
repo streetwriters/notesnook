@@ -17,40 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { strings } from "@notesnook/intl";
-import isEmail from "validator/lib/isEmail";
+/** @type {import('@lingui/conf').LinguiConfig} */
 
-export function validateEmail(email) {
-  if (email && email.length > 0) {
-    return isEmail(email);
-  } else {
-    return false;
-  }
-}
-
-export const ERRORS_LIST = {
-  SHORT_PASS: strings.passTooShort()
+module.exports = {
+  locales: ["en", "cs", "fr"],
+  sourceLocale: "en",
+  format: "po",
+  compileNamespace: "ts"
 };
-
-export function validatePass(password) {
-  let errors = {
-    SHORT_PASS: false
-  };
-
-  if (password?.length < 8) {
-    errors.SHORT_PASS = true;
-  } else {
-    errors.SHORT_PASS = false;
-  }
-
-  return errors;
-}
-
-export function validateUsername(username) {
-  let regex = /^[a-z0-9_-]{3,200}$/gim;
-  if (username && username.length > 0) {
-    return regex.test(username);
-  } else {
-    return false;
-  }
-}

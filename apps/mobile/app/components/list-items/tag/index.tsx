@@ -29,6 +29,7 @@ import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper, { selectItem } from "../selection-wrapper";
+import { strings } from "@notesnook/intl";
 
 const TagItem = React.memo(
   ({
@@ -77,11 +78,7 @@ const TagItem = React.memo(
               marginTop: 5
             }}
           >
-            {totalNotes > 1
-              ? totalNotes + " notes"
-              : totalNotes === 1
-              ? totalNotes + " note"
-              : null}
+            {strings.notes(totalNotes)}
           </Paragraph>
         </View>
 

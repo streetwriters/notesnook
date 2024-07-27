@@ -35,6 +35,7 @@ import { presentDialog } from "../dialog/functions";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
 import { diff } from "diffblazer";
+import { strings } from "@notesnook/intl";
 
 /**
  *
@@ -150,7 +151,7 @@ export default function NotePreview({ session, content, note }) {
           }}
         >
           <Paragraph color={colors.secondary.paragraph}>
-            Preview not available, content is encrypted.
+            {strings.encryptedNoteHistoryNotice()}
           </Paragraph>
         </View>
       )}
@@ -160,10 +161,15 @@ export default function NotePreview({ session, content, note }) {
           paddingHorizontal: 12
         }}
       >
-        <Button onPress={restore} title="Restore" type="accent" width="100%" />
+        <Button
+          onPress={restore}
+          title={strings.restore()}
+          type="accent"
+          width="100%"
+        />
         <Button
           onPress={deleteNote}
-          title="Delete permanently"
+          title={strings.deletePermanently()}
           type="error"
           width="100%"
           style={{

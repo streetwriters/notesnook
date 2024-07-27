@@ -39,6 +39,7 @@ import {
   EditorEvents,
   editorController
 } from "../../../screens/editor/tiptap/utils";
+import { strings } from "@notesnook/intl";
 
 const ListNoteItem = ({
   id,
@@ -117,7 +118,7 @@ const ListBlockItem = ({
           {item?.content.length > 200
             ? item?.content.slice(0, 200) + "..."
             : !item.content || item.content.trim() === ""
-            ? "(Empty block)"
+            ? strings.linkNoteEmptyBlock()
             : item.content}
         </Paragraph>
 
@@ -256,7 +257,7 @@ export default function LinkNote(props: {
             }}
           >
             <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-              SELECTED NOTE
+              {strings.linkNoteSelectedNote()}
             </Paragraph>
             <Pressable
               onPress={() => {
@@ -286,7 +287,7 @@ export default function LinkNote(props: {
                 <Paragraph numberOfLines={1}>{selectedNote?.title}</Paragraph>
 
                 <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-                  Tap to deselect
+                  {strings.tapToDeselect()}
                 </Paragraph>
               </View>
             </Pressable>
@@ -299,7 +300,7 @@ export default function LinkNote(props: {
                 color={colors.secondary.paragraph}
                 size={SIZE.xs}
               >
-                LINK TO A SECTION
+                {strings.linkNoteToSection()}
               </Paragraph>
             ) : null}
           </View>
@@ -342,7 +343,7 @@ export default function LinkNote(props: {
           style={{
             marginTop: 10
           }}
-          title="Create link"
+          title={strings.createLink()}
           type="accent"
           width="100%"
           onPress={() => {

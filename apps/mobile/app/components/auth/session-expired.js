@@ -47,6 +47,7 @@ import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { LoginSteps, useLogin } from "./use-login";
+import { strings } from "@notesnook/intl";
 
 function getObfuscatedEmail(email) {
   if (!email) return "";
@@ -193,15 +194,14 @@ export const SessionExpired = () => {
               size={50}
             />
             <Heading size={SIZE.xxxl} color={colors.primary.heading}>
-              Session expired
+              {strings.sessionExpired()}
             </Heading>
             <Paragraph
               style={{
                 textAlign: "center"
               }}
             >
-              Your session on this device has expired. Please enter password for{" "}
-              {getObfuscatedEmail(email.current)} to continue.
+              {strings.sessionExpiredDesc(getObfuscatedEmail(email.current))}
             </Paragraph>
           </View>
 
@@ -231,7 +231,7 @@ export const SessionExpired = () => {
             loading={loading}
             onPress={() => login()}
             type="accent"
-            title={loading ? null : "Login"}
+            title={loading ? null : strings.login()}
           />
 
           <Button
@@ -242,16 +242,15 @@ export const SessionExpired = () => {
             onPress={() => {
               presentDialog({
                 context: "session_expiry",
-                title: "Logout",
-                paragraph:
-                  "Are you sure you want to logout from this device? Any unsynced changes will be lost.",
-                positiveText: "Logout",
+                title: strings.logoutFromDevice(),
+                paragraph: strings.logoutDesc(),
+                positiveText: strings.logout(),
                 positiveType: "errorShade",
                 positivePress: logout
               });
             }}
             type="errorShade"
-            title={loading ? null : "Logout from this device"}
+            title={loading ? null : strings.logoutFromDevice()}
           />
         </View>
         <Toast context="local" />

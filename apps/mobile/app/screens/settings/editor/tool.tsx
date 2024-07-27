@@ -36,6 +36,7 @@ import ToolSheet from "./tool-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import type { ToolId } from "@notesnook/editor";
 import PremiumService from "../../../services/premium";
+import { strings } from "@notesnook/intl";
 
 export const Tool = ({
   item,
@@ -221,7 +222,7 @@ export const Tool = ({
               }
               size={isSubgroup ? SIZE.xs : SIZE.sm - 1}
             >
-              {isSubgroup ? "COLLAPSED" : tool?.title}
+              {isSubgroup ? strings.collapsed() : tool?.title}
             </Paragraph>
           </View>
 

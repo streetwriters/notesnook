@@ -32,6 +32,7 @@ import Sort from "../../sheets/sort";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
+import { strings } from "@notesnook/intl";
 
 type SectionHeaderProps = {
   item: GroupHeader;
@@ -103,7 +104,7 @@ export const SectionHeader = React.memo<
               textAlignVertical: "center"
             }}
           >
-            {!item.title || item.title === "" ? "Pinned" : item.title}
+            {!item.title || item.title === "" ? strings.pinned() : item.title}
           </Heading>
         </TouchableOpacity>
 

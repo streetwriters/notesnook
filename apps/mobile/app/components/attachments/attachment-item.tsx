@@ -30,6 +30,7 @@ import { IconButton } from "../ui/icon-button";
 import { ProgressCircleComponent } from "../ui/svg/lazy";
 import Paragraph from "../ui/typography/paragraph";
 import Actions from "./actions";
+import { strings } from "@notesnook/intl";
 
 function getFileExtension(filename: string) {
   const ext = /^.+\.([^.]+)$/.exec(filename);
@@ -136,7 +137,7 @@ export const AttachmentItem = ({
 
               {!hideWhenNotDownloading ? (
                 <Paragraph color={colors.secondary.paragraph} size={SIZE.xxs}>
-                  File size: {formatBytes(attachment.size)}
+                  {strings.fileSize()}: {formatBytes(attachment.size)}
                 </Paragraph>
               ) : null}
             </View>

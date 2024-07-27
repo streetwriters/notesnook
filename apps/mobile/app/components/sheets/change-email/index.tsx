@@ -30,6 +30,7 @@ import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { eUserLoggedIn } from "../../../utils/events";
+import { strings } from "@notesnook/intl";
 
 type ChangeEmailProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -103,8 +104,8 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
   return (
     <View style={{ paddingHorizontal: 12 }}>
       <DialogHeader
-        title="Change email"
-        paragraph="Your account email will be changed without affecting your subscription or any other settings."
+        title={strings.changeEmail()}
+        paragraph={strings.changeEmailDesc()}
       />
       <View
         style={{
@@ -149,8 +150,8 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
           loading
             ? undefined
             : step === EmailChangeSteps.verify
-            ? "Verify"
-            : "Change email"
+            ? strings.verify()
+            : strings.changeEmail()
         }
         type="accent"
         width={250}

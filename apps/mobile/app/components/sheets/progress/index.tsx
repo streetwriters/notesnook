@@ -27,6 +27,7 @@ import Seperator from "../../ui/seperator";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 export const Progress = () => {
   const { colors } = useThemeColors();
   const { progress } = useSyncProgress();
@@ -51,8 +52,8 @@ export const Progress = () => {
         paddingBottom: 15
       }}
     >
-      <Heading size={SIZE.lg}>Syncing your data</Heading>
-      <Paragraph>Please wait while we sync all your data.</Paragraph>
+      <Heading size={SIZE.lg}>{strings.syncingHeading()}</Heading>
+      <Paragraph>{strings.syncingDesc()}</Paragraph>
       <Seperator />
       <View
         style={{
@@ -73,8 +74,7 @@ export const Progress = () => {
 
       {progress ? (
         <Paragraph color={colors.secondary.paragraph}>
-          {progress.type?.slice(0, 1).toUpperCase() + progress.type?.slice(1)}
-          ing {progress?.current}
+          {strings.networkProgress(progress.type)} {progress?.current}
         </Paragraph>
       ) : null}
     </View>

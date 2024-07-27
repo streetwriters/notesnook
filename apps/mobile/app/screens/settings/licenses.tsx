@@ -63,7 +63,7 @@ export const Licenses = () => {
         </Paragraph>
       </Pressable>
     ),
-    [colors.secondary.background]
+    [colors.primary.border]
   );
   return (
     <FlatList

@@ -35,6 +35,7 @@ import {
 import { eOpenPremiumDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import Config from "react-native-config";
+import { strings } from "@notesnook/intl";
 export const Subscription = () => {
   const user = useUserStore((state) => state.user);
   const monthlyPlan = usePricing("monthly");
@@ -46,7 +47,7 @@ export const Subscription = () => {
     SUBSCRIPTION_STATUS.PREMIUM_CANCELLED === user?.subscription?.type;
 
   const subscriptionProviderInfo =
-    SUBSCRIPTION_PROVIDER[user?.subscription?.provider];
+    strings.subscriptionProviderInfo[user?.subscription?.provider];
 
   const manageSubscription = () => {
     if (!user?.isEmailConfirmed) {
@@ -110,17 +111,17 @@ export const Subscription = () => {
           onPress={manageSubscription}
           title={
             !user?.isEmailConfirmed
-              ? "Confirm your email"
+              ? strings.confirmEmail()
               : user.subscription?.provider === 3 && hasCancelledPremium
-              ? "Manage subscription from desktop app"
+              ? strings.manageSubDesktop()
               : hasCancelledPremium &&
                 Platform.OS === "android" &&
                 Config.GITHUB_RELEASE !== "true"
-              ? "Resubscribe from Google Playstore"
+              ? strings.resubFromPlaystore()
               : user.subscription?.type ===
                   SUBSCRIPTION_STATUS.PREMIUM_EXPIRED || hasCancelledPremium
-              ? `Resubscribe to Pro (${getPrice() || "$4.49"} / mo)`
-              : `Get Pro (${getPrice() || "$4.49"} / mo)`
+              ? `${strings.resubToPro()} (${getPrice() || "$4.49"} / mo)`
+              : `${strings.getPro()} (${getPrice() || "$4.49"} / mo)`
           }
         />
       ) : null}
