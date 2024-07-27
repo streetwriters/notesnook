@@ -659,6 +659,7 @@ function Attachments({ noteId }: { noteId: string }) {
         estimatedSize={30}
         getItemKey={(index) => result.value.key(index)}
         items={result.value.placeholders}
+        style={{ tableLayout: "fixed", width: "100%" }}
         header={
           <tr>
             <th style={{ width: "75%" }} />
