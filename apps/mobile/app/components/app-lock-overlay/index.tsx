@@ -46,6 +46,7 @@ import Input from "../ui/input";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const getUser = () => {
   const user = MMKV.getString("user");
@@ -191,13 +192,15 @@ const AppLockedOverlay = () => {
   }, [appState, onUnlockAppRequested, appLocked]);
 
   return appLocked ? (
-    <View
+    <KeyboardAwareScrollView
       style={{
         backgroundColor: colors.primary.background,
         width: "100%",
         height: "100%",
         position: "absolute",
-        zIndex: 999,
+        zIndex: 999
+      }}
+      contentContainerStyle={{
         justifyContent: "center"
       }}
     >
@@ -314,7 +317,7 @@ const AppLockedOverlay = () => {
           </View>
         </View>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   ) : null;
 };
 
