@@ -142,12 +142,12 @@ function reminderToCronExpression(reminder: Reminder) {
   const dateTime = dayjs(date);
 
   if (mode === "once" || !selectedDays) {
-    return dateTime.format("ss mm HH DD MM * YYYY");
+    return dateTime.format("00 mm HH DD MM * YYYY");
   } else {
-    const cron = dateTime.format("ss mm HH").split(" ");
+    const cron = dateTime.format("00 mm HH").split(" ");
     if (recurringMode === "year") {
       cron.push(`${dateTime.date()}`); // day of month
-      cron.push(`${dateTime.month()}`); // month
+      cron.push(`${dateTime.month() + 1}`); // month
       cron.push("*"); // day of week
       cron.push("*"); // year
     } else if (recurringMode === "week") {
