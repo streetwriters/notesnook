@@ -18,7 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useCallback, useEffect, useRef } from "react";
-import { AppStateStatus, Platform, TextInput, View } from "react-native";
+import {
+  AppStateStatus,
+  Platform,
+  TextInput,
+  useWindowDimensions,
+  View
+} from "react-native";
 //@ts-ignore
 import { useThemeColors } from "@notesnook/theme";
 import { DatabaseLogger } from "../../common/database";
@@ -87,6 +93,7 @@ const AppLockedOverlay = () => {
   const appState = useAppState();
   const lastAppState = useRef<AppStateStatus>(appState);
   const biometricUnlockAwaitingUserInput = useRef(false);
+  const { height } = useWindowDimensions();
   const keyboardType = useSettingStore(
     (state) => state.settings.applockKeyboardType
   );
@@ -201,7 +208,8 @@ const AppLockedOverlay = () => {
         zIndex: 999
       }}
       contentContainerStyle={{
-        justifyContent: "center"
+        justifyContent: "center",
+        minHeight: height
       }}
       keyboardDismissMode="interactive"
       keyboardShouldPersistTaps="handled"
