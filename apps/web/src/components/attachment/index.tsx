@@ -156,8 +156,7 @@ export function Attachment({
       <td>
         <Flex
           sx={{
-            alignItems: "center",
-            maxWidth: compact ? 180 : "95%"
+            alignItems: "center"
           }}
         >
           {status ? (
