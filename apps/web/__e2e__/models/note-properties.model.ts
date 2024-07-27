@@ -258,7 +258,7 @@ export class NoteContextMenuModel extends BaseProperties {
 
     const zip = await downloadAndReadFile(
       this.noteLocator.page(),
-      this.menu.getItem(format),
+      () => this.menu.getItem(format).click(),
       null
     );
 

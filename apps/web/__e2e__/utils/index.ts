@@ -103,12 +103,12 @@ async function editNote(page: Page, note: Partial<Note>, noDelay = false) {
 
 async function downloadAndReadFile(
   page: Page,
-  action: Locator,
+  action: () => Promise<void>,
   encoding: BufferEncoding | null | undefined = "utf-8"
 ) {
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    await action.click()
+    action()
   ]);
 
   const dir = fs.mkdtempSync(join(tmpdir(), "nntests_"));
