@@ -80,10 +80,10 @@ export const SyncSettings: SettingsGroup[] = [
         key: "force-sync",
         title: "Having problems with sync?",
         description: `Force push:
-Use this if some changes from this device are not appearing on other devices.This will push everything on this device and overwrite whatever is one the server.
+Use this if changes made on this device are not appearing on other devices. This will overwrite the data on the server with the data from this device.
 
 Force pull:
-Use this if some changes are not appearing on this device from other devices. This will pull everything from the server and overwrite with whatever is one this device.
+Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.
 
 **These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**`,
         keywords: ["force sync", "sync troubleshoot"],

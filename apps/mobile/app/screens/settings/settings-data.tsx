@@ -475,7 +475,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "pull-sync",
             name: "Force pull changes",
-            description: `Use this if some changes are not appearing on this device from other devices. This will pull everything from the server and overwrite with whatever is one this device.\n\nThese must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.`,
+            description: `Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.\n\nThis must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.`,
             modifer: () => {
               presentDialog({
                 title: "Force Pull changes",
@@ -497,7 +497,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "push-sync",
             name: "Force push changes",
-            description: `Use this if some changes are not appearing on this device from other devices. This will pull everything from the server and overwrite with whatever is one this device.`,
+            description: `Use this if changes made on this device are not appearing on other devices. This will overwrite the data on the server with the data from this device.\n\nThis must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.`,
             modifer: () => {
               presentDialog({
                 title: "Force Push changes",
