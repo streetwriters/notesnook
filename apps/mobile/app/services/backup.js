@@ -171,7 +171,6 @@ async function run(progress = false, context) {
   }
 
   let path;
-  let backupFilePath;
   let backupFileName = "notesnook_backup_" + Date.now();
 
   if (Platform.OS === "ios") {
@@ -236,7 +235,7 @@ async function run(progress = false, context) {
     await sleep(300);
 
     if (showBackupCompleteSheet) {
-      presentBackupCompleteSheet(backupFilePath);
+      presentBackupCompleteSheet(path);
     } else {
       progress && eSendEvent(eCloseSheet);
     }
