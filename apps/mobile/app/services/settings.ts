@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Platform } from "react-native";
+import { NativeModules, Platform } from "react-native";
 import { enabled } from "react-native-privacy-snapshot";
 import { MMKV } from "../common/database/mmkv";
 import {
@@ -118,14 +118,18 @@ function setPrivacyScreen(settings: SettingStore["settings"]) {
       NotesnookModule.setSecureMode(true);
     } else {
       enabled(true);
-      ScreenGuardModule.register({ backgroundColor: "#000000" });
+      if (NativeModules.ScreenGuard) {
+        ScreenGuardModule.register({ backgroundColor: "#000000" });
+      }
     }
   } else {
     if (Platform.OS === "android") {
       NotesnookModule.setSecureMode(false);
     } else {
       enabled(false);
-      ScreenGuardModule.unregister();
+      if (NativeModules.ScreenGuard) {
+        ScreenGuardModule.unregister();
+      }
     }
   }
 }
