@@ -140,6 +140,29 @@ export const BackupReminderPicker = createSettingsPicker({
   }
 });
 
+export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.reminder,
+  updateValue: (item) => {
+    SettingsService.set({ fullBackupReminder: item });
+  },
+  formatValue: (item) => {
+    return item.slice(0, 1).toUpperCase() + item.slice(1);
+  },
+  getItemKey: (item) => item,
+  options: ["never", "weekly", "monthly"],
+  compareValue: (current, item) => current === item,
+  premium: true,
+  requiresVerification: () => {
+    return (
+      !useSettingStore.getState().settings.encryptedBackup &&
+      useUserStore.getState().user
+    );
+  },
+  onCheckOptionIsPremium: (item) => {
+    return item !== "never";
+  }
+});
+
 export const ApplockTimerPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.appLockTimer,
   updateValue: (item) => {

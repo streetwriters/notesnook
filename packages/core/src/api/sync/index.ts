@@ -57,6 +57,7 @@ import { DefaultColors } from "../../collections/colors";
 export type SyncOptions = {
   type: "full" | "fetch" | "send";
   force?: boolean;
+  offlineMode?: boolean;
 };
 
 export default class SyncManager {
@@ -246,7 +247,7 @@ class Sync {
     await this.db.setLastSynced(Date.now());
     this.db.eventManager.publish(EVENTS.syncCompleted);
 
-    if (await this.db.kv().read("fullOfflineMode")) {
+    if (options.offlineMode) {
       const attachments = await this.db.attachments.linked
         .fields(["attachments.id", "attachments.hash", "attachments.chunkSize"])
         .items();

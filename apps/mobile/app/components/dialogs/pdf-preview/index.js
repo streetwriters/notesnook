@@ -44,6 +44,7 @@ import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import { sleep } from "../../../utils/time";
 import { MMKV } from "../../../common/database/mmkv";
+import { deleteCacheFileByPath } from "../../../common/filesystem/io";
 
 const WIN_WIDTH = Dimensions.get("window").width;
 const WIN_HEIGHT = Dimensions.get("window").height;
@@ -124,6 +125,7 @@ const PDFPreview = () => {
   );
 
   const close = () => {
+    deleteCacheFileByPath(pdfSource);
     setPDFSource(null);
     setVisible(false);
     setPassword("");
