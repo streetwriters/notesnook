@@ -299,6 +299,11 @@ function TabStrip() {
           }}
           renderItem={({ item: session, index: i }) => (
             <Tab
+              onDragStart={(e) => {
+                // e.dataTransfer.setData("note-id", "here is item");
+                // e.dataTransfer.dropEffect = "copy";
+                // console.log("ondragStart", e);
+              }}
               id={session.id}
               key={session.id}
               title={
@@ -403,6 +408,7 @@ type TabProps = {
   onCloseAll: () => void;
   onRevealInList: () => void;
   onPin: () => void;
+  onDragStart?: React.DragEventHandler<HTMLDivElement> | undefined;
 };
 function Tab(props: TabProps) {
   const {
@@ -421,7 +427,8 @@ function Tab(props: TabProps) {
     onCloseToTheRight,
     onCloseToTheLeft,
     onRevealInList,
-    onPin
+    onPin,
+    onDragStart
   } = props;
   const Icon = isLocked
     ? type === "locked"
@@ -530,6 +537,11 @@ function Tab(props: TabProps) {
       }}
       {...listeners}
       {...attributes}
+      draggable
+      onDragStart={(e) => {
+        //listeners?.onDragStart?.(e);
+        //onDragStart?.(e);
+      }}
     >
       <Flex mr={1}>
         <Icon size={16} color={isActive ? "accent-selected" : "icon"} />
