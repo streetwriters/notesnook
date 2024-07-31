@@ -158,6 +158,30 @@ export async function migrateFilesFromCache() {
   }
 }
 
+export async function clearCache() {
+  const files = await RNFetchBlob.fs.ls(cacheDir);
+  for (const file of files) {
+    await RNFetchBlob.fs.unlink(file).catch(console.log);
+  }
+}
+
+export async function deleteCacheFileByPath(path) {
+  await RNFetchBlob.fs.unlink(path).catch(console.log);
+}
+
+export async function deleteCacheFileByName(name) {
+  await RNFetchBlob.fs.unlink(`${cacheDir}/${name}`).catch(console.log);
+}
+
+export async function deleteDCacheFiles() {
+  const files = await RNFetchBlob.fs.ls(cacheDir);
+  for (const file of files) {
+    if (file.includes("_dcache")) {
+      await RNFetchBlob.fs.unlink(file).catch(console.log);
+    }
+  }
+}
+
 const ABYTES = 17;
 export async function exists(filename) {
   let path = `${cacheDir}/${filename}`;

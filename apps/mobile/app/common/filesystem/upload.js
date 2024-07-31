@@ -117,9 +117,6 @@ export async function uploadFile(filename, data, cancelToken) {
       );
       let attachment = await db.attachments.attachment(filename);
       if (!attachment) return result;
-      if (!isImage(attachment.mimeType) && !isDocument(attachment.mimeType)) {
-        RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
-      }
     } else {
       const fileInfo = await RNFetchBlob.fs.stat(uploadFilePath);
       throw new Error(

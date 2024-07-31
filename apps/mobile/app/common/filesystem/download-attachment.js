@@ -259,15 +259,6 @@ export default async function downloadAttachment(
       });
     }
 
-    if (
-      attachment.dateUploaded &&
-      !isImage(attachment.mimeType) &&
-      !isDocument(attachment.mimeType)
-    ) {
-      RNFetchBlob.fs
-        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}`)
-        .catch(console.log);
-    }
     if (Platform.OS === "ios" && !options.cache) {
       fileUri = folder.uri + `/${filename}`;
     }
@@ -287,7 +278,6 @@ export default async function downloadAttachment(
 
     return fileUri;
   } catch (e) {
-    DatabaseLogger.error(e);
     if (attachment.dateUploaded) {
       RNFetchBlob.fs
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}`)
@@ -296,6 +286,7 @@ export default async function downloadAttachment(
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}_dcache`)
         .catch(console.log);
     }
+    DatabaseLogger.error(e);
     useAttachmentStore.getState().remove(attachment.hash);
     if (options.throwError) {
       throw e;

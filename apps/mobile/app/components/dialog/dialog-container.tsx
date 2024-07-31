@@ -38,15 +38,18 @@ const DialogContainer = ({
   return (
     <View
       {...restProps}
-      style={{
-        ...getElevationStyle(5),
-        width: width || DDS.isTab ? 500 : "85%",
-        maxHeight: height || 450,
-        borderRadius: 10,
-        backgroundColor: colors.primary.background,
-        paddingTop: 12,
-        ...getContainerBorder(colors.secondary.background, 0.8, 0.05)
-      }}
+      style={[
+        style,
+        {
+          ...getElevationStyle(5),
+          width: width || DDS.isTab ? 500 : "85%",
+          maxHeight: height || 450,
+          borderRadius: 10,
+          backgroundColor: colors.primary.background,
+          paddingTop: 12,
+          ...getContainerBorder(colors.secondary.background, 0.8, 0.05)
+        }
+      ]}
     />
   );
 };

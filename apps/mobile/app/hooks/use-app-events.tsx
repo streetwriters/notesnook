@@ -465,15 +465,32 @@ export const useAppEvents = () => {
     const user = await db.user.getUser();
     if (PremiumService.get() && user) {
       if (
-        await BackupService.checkBackupRequired(SettingsService.get().reminder)
-      ) {
-        if (
-          !SettingsService.get().backupDirectoryAndroid &&
-          Platform.OS === "android"
-        )
-          return;
-        sleep(2000).then(() => BackupService.run());
-      }
+        !SettingsService.get().backupDirectoryAndroid &&
+        Platform.OS === "android"
+      )
+        return;
+
+      const partialBackup = await BackupService.checkBackupRequired(
+        SettingsService.get().reminder,
+        "lastBackupDate"
+      );
+      const fullBackup = await BackupService.checkBackupRequired(
+        SettingsService.get().fullBackupReminder,
+        "lastFullBackupDate"
+      );
+
+      sleep(2000).then(() => {
+        if (partialBackup) {
+          BackupService.run().then(() => {
+            if (fullBackup) {
+              eSendEvent(eCloseSheet);
+              BackupService.run(true, undefined, "full");
+            }
+          });
+        } else if (fullBackup) {
+          BackupService.run(true, undefined, "full");
+        }
+      });
     }
   }, []);
 

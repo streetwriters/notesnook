@@ -90,7 +90,7 @@ export async function downloadFile(filename, data, cancelToken) {
     useAttachmentStore.getState().remove(filename);
     return status >= 200 && status < 300;
   } catch (e) {
-    if (e.message !== "canceled") {
+    if (e.message !== "canceled" && !e.message.includes("NoSuchKey")) {
       ToastManager.show({
         heading: "Error downloading file",
         message: e.message,

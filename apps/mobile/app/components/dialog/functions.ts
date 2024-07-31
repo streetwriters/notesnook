@@ -25,7 +25,7 @@ type DialogInfo = {
   paragraph?: string;
   positiveText?: string;
   negativeText?: string;
-  positivePress?: (value: any) => void;
+  positivePress?: (...args: any[]) => void;
   onClose?: () => void;
   positiveType?:
     | "transparent"
@@ -45,6 +45,10 @@ type DialogInfo = {
   context: "global" | "local" | (string & {});
   secureTextEntry?: boolean;
   keyboardType?: string;
+  check?: {
+    info: string;
+    type: string;
+  };
 };
 
 export function presentDialog(data: Partial<DialogInfo>): void {
