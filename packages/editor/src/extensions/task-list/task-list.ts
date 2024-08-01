@@ -347,6 +347,8 @@ export const TaskListNode = TaskList.extend({
     });
     const oldHandler = inputRule.handler;
     inputRule.handler = ({ state, range, match, chain, can, commands }) => {
+      if (state.selection.$from.node().type.name === "heading")
+        commands.setParagraph();
       oldHandler({ state, range, match, chain, can, commands });
 
       state.tr.setNodeMarkup(state.tr.selection.to - 2, undefined, {
