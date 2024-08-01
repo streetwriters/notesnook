@@ -36,4 +36,10 @@ if (isGithubRelease) {
   }
 }
 
+const repackCommands = require('@callstack/repack/commands');
+
+config.commands = repackCommands.filter((command) =>
+  command.name.startsWith('webpack')
+),
+
 module.exports = config;

@@ -2,7 +2,7 @@ const env = process.env.BABEL_ENV || process.env.NODE_ENV;
 const configs = {
   env: {
     development: {
-      presets: ['module:metro-react-native-babel-preset'],
+      presets: ['module:@react-native/babel-preset'],
       plugins: [
         '@babel/plugin-transform-named-capturing-groups-regex',
         'react-native-reanimated/plugin',
@@ -18,7 +18,7 @@ const configs = {
       ]
     },
     test: {
-      presets: ['module:metro-react-native-babel-preset'],
+      presets: ['module:@react-native/babel-preset'],
       plugins: [
         '@babel/plugin-transform-named-capturing-groups-regex',
         'react-native-reanimated/plugin',
@@ -40,7 +40,7 @@ const configs = {
       
     },
     production: {
-      presets: ['module:metro-react-native-babel-preset'],
+      presets: ['module:@react-native/babel-preset'],
       plugins: [
         'transform-remove-console',
         '@babel/plugin-transform-named-capturing-groups-regex',
