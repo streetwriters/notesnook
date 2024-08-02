@@ -121,6 +121,8 @@ class Sync {
   syncConnectionMutex = new Mutex();
   connection?: signalr.HubConnection;
   devices = new SyncDevices(this.db.kv, this.db.tokenManager);
+  private conflictedNoteIds: string[] = [];
+  private uncachedAttachments: DownloadableFile[] = [];
 
   constructor(private readonly db: Database) {
     EV.subscribe(EVENTS.userLoggedOut, async () => {
@@ -130,7 +132,7 @@ class Sync {
   }
 
   async start(options: SyncOptions) {
-    this.createConnection();
+    this.createConnection(options);
     if (!this.connection) return;
 
     if (!(await checkSyncStatus(SYNC_CHECK_IDS.sync))) {
@@ -151,7 +153,7 @@ class Sync {
     this.logger.info("Initialized sync", { deviceId });
 
     if (options.type === "fetch" || options.type === "full") {
-      await this.fetch(deviceId);
+      await this.fetch(deviceId, options);
       this.logger.info("Data fetched");
     }
 
@@ -188,24 +190,31 @@ class Sync {
     return { deviceId };
   }
 
-  async fetch(deviceId: string) {
+  async fetch(deviceId: string, options: SyncOptions) {
     await this.checkConnection();
 
     await this.connection?.invoke("RequestFetch", deviceId);
 
-    await this.db
-      .sql()
-      .updateTable("notes")
-      .where("id", "in", (eb) =>
-        eb
-          .selectFrom("content")
-          .select("noteId as id")
-          .where("conflicted", "is not", null)
-          .where("conflicted", "!=", false)
-          .$castTo<string | null>()
-      )
-      .set({ conflicted: true })
-      .execute();
+    if (this.conflictedNoteIds.length > 0) {
+      await this.db
+        .sql()
+        .updateTable("notes")
+        .where("id", "in", this.conflictedNoteIds)
+        .set({ conflicted: true })
+        .execute();
+      this.conflictedNoteIds = [];
+    }
+
+    if (this.uncachedAttachments.length > 0 && options.offlineMode) {
+      await this.db
+        .fs()
+        .queueDownloads(
+          this.uncachedAttachments,
+          "download-uncached-attachments",
+          { readOnDownload: false }
+        );
+      this.uncachedAttachments = [];
+    }
   }
 
   async send(deviceId: string, isForceSync?: boolean) {
@@ -246,21 +255,6 @@ class Sync {
     this.logger.info("Stopping sync");
     await this.db.setLastSynced(Date.now());
     this.db.eventManager.publish(EVENTS.syncCompleted);
-
-    if (options.offlineMode) {
-      const attachments = await this.db.attachments.linked
-        .fields(["attachments.id", "attachments.hash", "attachments.chunkSize"])
-        .items();
-
-      await this.db.fs().queueDownloads(
-        attachments.map((a) => ({
-          filename: a.hash,
-          chunkSize: a.chunkSize
-        })),
-        "download-all-attachments",
-        { readOnDownload: false }
-      );
-    }
   }
 
   async cancel() {
@@ -291,7 +285,11 @@ class Sync {
     this.db.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
   }
 
-  async processChunk(chunk: SyncTransferItem, key: SerializedKey) {
+  async processChunk(
+    chunk: SyncTransferItem,
+    key: SerializedKey,
+    options: SyncOptions
+  ) {
     const itemType = chunk.type;
     const decrypted = await this.db.storage().decryptMulti(key, chunk.items);
 
@@ -332,11 +330,23 @@ class Sync {
             );
     }
 
-    if ((itemType === "note" || itemType === "content") && items.length > 0) {
+    if (itemType === "note" || itemType === "content") {
       items.forEach((item) =>
         this.db.eventManager.publish(EVENTS.syncItemMerged, item)
       );
+
+      for (const item of items)
+        if (!item?.deleted && item?.type === "tiptap" && !item.conflicted)
+          this.conflictedNoteIds.push(item.noteId);
     }
+
+    if (itemType === "attachment" && options.offlineMode)
+      for (const item of items)
+        if (!item?.deleted && item?.type === "attachment")
+          this.uncachedAttachments.push({
+            filename: item.hash,
+            chunkSize: item.chunkSize
+          });
 
     await collection.put(items as any);
   }
@@ -346,7 +356,7 @@ class Sync {
     return (await this.connection?.invoke("PushItems", deviceId, item)) === 1;
   }
 
-  private createConnection() {
+  private createConnection(options: SyncOptions) {
     if (this.connection) return;
 
     const tokenManager = new TokenManager(this.db.kv);
@@ -410,7 +420,7 @@ class Sync {
       const key = await this.getKey();
       if (!key) return false;
 
-      await this.processChunk(chunk, key);
+      await this.processChunk(chunk, key, options);
 
       sendSyncProgressEvent(this.db.eventManager, `download`, chunk.count);
 

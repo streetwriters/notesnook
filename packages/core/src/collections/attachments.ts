@@ -355,6 +355,20 @@ export class Attachments implements ICollection {
     });
   }
 
+  async cacheAttachments(attachments?: FilteredSelector<Attachment>) {
+    const items = await (attachments || this.db.attachments.linked)
+      .fields(["attachments.id", "attachments.hash", "attachments.chunkSize"])
+      .items();
+    await this.db.fs().queueDownloads(
+      items.map((a) => ({
+        filename: a.hash,
+        chunkSize: a.chunkSize
+      })),
+      "download-all-attachments",
+      { readOnDownload: false }
+    );
+  }
+
   async save(
     data: string,
     mimeType: string,
