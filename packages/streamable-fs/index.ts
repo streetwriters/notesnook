@@ -59,7 +59,7 @@ export class StreamableFS implements IStreamableFS {
   }
 
   async list(): Promise<string[]> {
-    return this.list();
+    return this.storage.list();
   }
 
   async deleteFile(filename: string): Promise<boolean> {
