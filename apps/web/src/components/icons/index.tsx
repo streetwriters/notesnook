@@ -214,7 +214,8 @@ import {
   mdiLink,
   mdiWindowClose,
   mdiFileMusicOutline,
-  mdiBroom
+  mdiBroom,
+  mdiServerSecurity
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -541,6 +542,7 @@ export const Documentation = createIcon(mdiFileDocumentOutline);
 export const Legal = createIcon(mdiGavel);
 export const Desktop = createIcon(mdiDesktopClassic);
 export const Notification = createIcon(mdiBellBadgeOutline);
+export const Servers = createIcon(mdiServerSecurity);
 export const Calendar = createIcon(mdiCalendarBlank);
 
 export const WindowMinimize = createIcon("M4 20v-2h16v2H4Z");

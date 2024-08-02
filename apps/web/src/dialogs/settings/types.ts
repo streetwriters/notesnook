@@ -28,6 +28,7 @@ export type SectionKeys =
   | "behaviour"
   | "desktop"
   | "notifications"
+  | "servers"
   | "editor"
   | "backup-export"
   | "export"
