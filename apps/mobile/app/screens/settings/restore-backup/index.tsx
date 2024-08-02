@@ -100,7 +100,7 @@ const restoreBackup = async (options: {
           await RNFetchBlob.fs.unlink(cacheFile);
         }
         await RNFetchBlob.fs.createFile(cacheFile, "", "utf8");
-        await copyFileAsync(filePath, cacheFile);
+        await RNFetchBlob.fs.cp(filePath, cacheFile);
         filePath = cacheFile;
       }
 
@@ -113,40 +113,33 @@ const restoreBackup = async (options: {
       await unzip(filePath, zipOutputFolder);
 
       const extractedBackupFiles = await RNFetchBlob.fs.ls(zipOutputFolder);
+      const extractedAttachments = await RNFetchBlob.fs.ls(
+        `${zipOutputFolder}/attachments`
+      );
 
-      const backupFiles: string[] = [];
-      const attachmentFiles: string[] = [];
-      let attachmentsKey: any = null;
-
-      for (const path of extractedBackupFiles) {
-        if (path === ".nnbackup") {
-          continue;
-        }
-        if (path.includes("attachments/.attachments_key"))
-          attachmentsKey = JSON.parse(
-            await RNFetchBlob.fs.readFile(path, "utf8")
-          );
-        else if (path.includes("attachments/")) attachmentFiles.push(path);
-        else backupFiles.push(path);
-      }
+      const attachmentsKeyPath: any = extractedAttachments?.find(
+        (path) => path === ".attachments_key"
+      );
+      const attachmentsKey = await JSON.parse(
+        await RNFetchBlob.fs.readFile(
+          `${zipOutputFolder}/attachments/${attachmentsKeyPath}`,
+          "utf8"
+        )
+      );
 
       let count = 0;
       await db.transaction(async () => {
         let passwordOrKey: PasswordOrKey;
-        for (const path of backupFiles) {
-          if (path === ".nnbackup") continue;
+        for (const path of extractedBackupFiles) {
+          if (path === ".nnbackup" || path === "attachments") continue;
 
           options.updateProgress(
-            `Restoring data (${count}/${backupFiles.length})`
+            `Restoring data (${count++}/${extractedBackupFiles.length})`
           );
-
-          console.log(path);
 
           const filePath = `${zipOutputFolder}/${path}`;
           const data = await RNFetchBlob.fs.readFile(filePath, "utf8");
           const backup = JSON.parse(data);
-
-          console.log(backup.encrypted, "encrypted...");
 
           const isEncryptedBackup = backup.encrypted;
 
@@ -162,7 +155,7 @@ const restoreBackup = async (options: {
             options.updateProgress(undefined);
             throw new Error("Failed to decrypt backup");
           }
-          console.log(typeof backup.data);
+
           await db.backup.import(backup, {
             ...passwordOrKey,
             attachmentsKey: attachmentsKey
@@ -172,11 +165,12 @@ const restoreBackup = async (options: {
 
       await db.initCollections();
       count = 0;
-      for (const path of attachmentFiles) {
+      for (const path of extractedAttachments) {
+        if (path === ".attachments_key") continue;
         options.updateProgress(
-          `Restoring attachments (${count++}/${attachmentFiles.length})`
+          `Restoring attachments (${count++}/${extractedAttachments.length})`
         );
-        const hash = path.split("/").pop();
+        const hash = path;
         const attachment = await db.attachments.attachment(hash as string);
         if (!attachment) continue;
 
@@ -193,7 +187,10 @@ const restoreBackup = async (options: {
         }
 
         await deleteCacheFileByName(hash);
-        await RNFetchBlob.fs.cp(path, `${cacheDir}/hash`);
+        const copied = await RNFetchBlob.fs.cp(
+          `${zipOutputFolder}/attachments/${hash}`,
+          `${cacheDir}/${hash}`
+        );
       }
 
       options.updateProgress(`Cleaning up...`);
@@ -409,8 +406,13 @@ export const RestoreBackup = () => {
                 });
               }, 1000);
 
+              console.log(file);
+
               restoreBackup({
-                uri: file.fileCopyUri as string,
+                uri:
+                  Platform.OS === "android"
+                    ? (("file://" + file.fileCopyUri) as string)
+                    : (file.fileCopyUri as string),
                 deleteFile: true,
                 updateProgress: setProgress
               });
