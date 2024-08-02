@@ -113,19 +113,22 @@ const restoreBackup = async (options: {
       await unzip(filePath, zipOutputFolder);
 
       const extractedBackupFiles = await RNFetchBlob.fs.ls(zipOutputFolder);
-      const extractedAttachments = await RNFetchBlob.fs.ls(
-        `${zipOutputFolder}/attachments`
-      );
+
+      const extractedAttachments = extractedBackupFiles.includes("attachments")
+        ? await RNFetchBlob.fs.ls(`${zipOutputFolder}/attachments`)
+        : [];
 
       const attachmentsKeyPath: any = extractedAttachments?.find(
         (path) => path === ".attachments_key"
       );
-      const attachmentsKey = await JSON.parse(
-        await RNFetchBlob.fs.readFile(
-          `${zipOutputFolder}/attachments/${attachmentsKeyPath}`,
-          "utf8"
-        )
-      );
+      const attachmentsKey = attachmentsKeyPath
+        ? await JSON.parse(
+            await RNFetchBlob.fs.readFile(
+              `${zipOutputFolder}/attachments/${attachmentsKeyPath}`,
+              "utf8"
+            )
+          )
+        : undefined;
 
       let count = 0;
       await db.transaction(async () => {
@@ -187,7 +190,7 @@ const restoreBackup = async (options: {
         }
 
         await deleteCacheFileByName(hash);
-        const copied = await RNFetchBlob.fs.cp(
+        await RNFetchBlob.fs.cp(
           `${zipOutputFolder}/attachments/${hash}`,
           `${cacheDir}/${hash}`
         );
@@ -234,11 +237,11 @@ const restoreBackup = async (options: {
         });
       });
       options.updateProgress(undefined);
-
-      ToastManager.show({
-        heading: "Backup restored successfully"
-      });
     }
+
+    ToastManager.show({
+      heading: "Backup restored successfully"
+    });
 
     await db.initCollections();
     refreshAllStores();
@@ -405,8 +408,6 @@ export const RestoreBackup = () => {
                   disableAppLockRequests: false
                 });
               }, 1000);
-
-              console.log(file);
 
               restoreBackup({
                 uri:
