@@ -57,6 +57,9 @@ export class IndexedDBFileStore implements IFileStorage {
       (k as string).startsWith(chunkPrefix)
     ) as string[];
   }
+  async list(): Promise<string[]> {
+    return (await this.storage.keys()) as string[];
+  }
 }
 
 export class CacheStorageFileStore implements IFileStorage {
@@ -122,6 +125,12 @@ export class CacheStorageFileStore implements IFileStorage {
       .map((r) => r.url.slice(1));
   }
 
+  async list(): Promise<string[]> {
+    const cache = await this.getCache();
+    const keys = await cache.keys();
+    return keys.map((r) => r.url.slice(1));
+  }
+
   private toURL(chunkName: string) {
     return `/${chunkName}`;
   }
@@ -175,5 +184,9 @@ export class OriginPrivateFileSystem implements IFileStorage {
   async listChunks(chunkPrefix: string): Promise<string[]> {
     await this.create();
     return (await this.worker.listChunks(this.name, chunkPrefix)) || [];
+  }
+  async list(): Promise<string[]> {
+    await this.create();
+    return (await this.worker.list(this.name)) || [];
   }
 }
