@@ -56,6 +56,10 @@ export class FileStorage {
     groupId: string,
     eventData?: Record<string, unknown>
   ) {
+    const newFiles = await this.fs.bulkExists(files.map((f) => f.filename));
+    files = files.filter((f) => newFiles.includes(f.filename));
+    if (files.length <= 0) return;
+
     let current = 0;
     const token = await this.tokenManager.getAccessToken();
     const total = files.length;
