@@ -58,6 +58,10 @@ export class StreamableFS implements IStreamableFS {
     return !!file;
   }
 
+  async list(): Promise<string[]> {
+    return this.list();
+  }
+
   async deleteFile(filename: string): Promise<boolean> {
     const handle = await this.readFile(filename);
     if (!handle) return true;
