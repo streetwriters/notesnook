@@ -564,6 +564,12 @@ async function exists(filename: string | FileHandle) {
   );
 }
 
+async function bulkExists(filenames: string[]) {
+  return Array.from(
+    new Set(filenames).difference(new Set(await streamablefs.list())).values()
+  );
+}
+
 type FileMetadata = {
   key: SerializedKey;
   iv: string;
@@ -666,7 +672,8 @@ export const FileStorage: IFileStorage = {
   exists,
   clearFileStorage,
   hashBase64,
-  getUploadedFileSize
+  getUploadedFileSize,
+  bulkExists
 };
 
 function isSuccessStatusCode(statusCode: number) {

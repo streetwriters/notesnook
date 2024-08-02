@@ -284,6 +284,7 @@ class AppStore extends BaseStore<AppStore> {
 
     this.updateSyncStatus("syncing");
     try {
+      options.offlineMode = settingStore.get().isFullOfflineMode;
       const result = await db.sync(options);
 
       if (!result) return this.updateSyncStatus("failed");
