@@ -29,6 +29,8 @@ import { setDocumentTitle } from "../utils/dom";
 import { TimeFormat } from "@notesnook/core/dist/utils/date";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 
+export const HostIds = ["API_HOST", "AUTH_HOST", "SSE_HOST"] as const;
+export type HostId = (typeof HostIds)[number];
 class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
   backupReminderOffset = Config.get("backupReminderOffset", 0);
@@ -41,6 +43,7 @@ class SettingStore extends BaseStore<SettingStore> {
   markdownShortcuts = Config.get("markdownShortcuts", true);
   notificationsSettings = Config.get("notifications", { reminder: true });
   isFullOfflineMode = Config.get("fullOfflineMode", false);
+  serverUrls: Partial<Record<HostId, string>> = Config.get("serverUrls", {});
 
   zoomFactor = 1.0;
   privacyMode = false;
@@ -216,6 +219,17 @@ class SettingStore extends BaseStore<SettingStore> {
 
     if (isFullOfflineMode) db.fs().cancel("offline-mode");
     else db.attachments.cacheAttachments();
+  };
+
+  setServerUrls = (urls?: Partial<Record<HostId, string>>) => {
+    if (!urls) {
+      Config.set("serverUrls", {});
+      this.set({ serverUrls: {} });
+      return;
+    }
+    const serverUrls = this.get().serverUrls;
+    this.set({ serverUrls: { ...serverUrls, ...urls } });
+    Config.set("serverUrls", { ...serverUrls, ...urls });
   };
 }
 

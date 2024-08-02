@@ -26,6 +26,7 @@ import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
 import { deriveKey, useKeyStore } from "../interfaces/key-store";
 import { logManager } from "@notesnook/core/dist/logger";
+import Config from "../utils/config";
 
 const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
@@ -45,7 +46,8 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     AUTH_HOST: "https://auth.streetwriters.co",
     SSE_HOST: "https://events.streetwriters.co",
     ISSUES_HOST: "https://issues.streetwriters.co",
-    SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co"
+    SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
+    ...Config.get("serverUrls", {})
   });
 
   const storage = new NNStorage(
