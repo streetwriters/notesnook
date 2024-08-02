@@ -418,7 +418,8 @@ export const RestoreBackup = () => {
                 updateProgress: setProgress
               });
             },
-            description: "Restore a backup from files"
+            description:
+              "Select a backup file from your device to restore backup"
           }}
         />
 
@@ -445,7 +446,7 @@ export const RestoreBackup = () => {
               setLoading(true);
             },
             description:
-              "Select folder where backup files are stored to view and restore them from the app"
+              "Select folder where Notesnook backup files are stored to view and restore them from the app"
           }}
         />
 
