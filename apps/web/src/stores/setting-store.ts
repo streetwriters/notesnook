@@ -40,7 +40,7 @@ class SettingStore extends BaseStore<SettingStore> {
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   markdownShortcuts = Config.get("markdownShortcuts", true);
   notificationsSettings = Config.get("notifications", { reminder: true });
-  isFullOfflineMode = false;
+  isFullOfflineMode = Config.get("fullOfflineMode", false);
 
   zoomFactor = 1.0;
   privacyMode = false;
@@ -73,8 +73,7 @@ class SettingStore extends BaseStore<SettingStore> {
       customDns: await desktop?.integration.customDns.query(),
       zoomFactor: await desktop?.integration.zoomFactor.query(),
       autoUpdates: await desktop?.updater.autoUpdates.query(),
-      proxyRules: await desktop?.integration.proxyRules.query(),
-      isFullOfflineMode: await db.kv().read("fullOfflineMode")
+      proxyRules: await desktop?.integration.proxyRules.query()
     });
   };
 
@@ -213,7 +212,7 @@ class SettingStore extends BaseStore<SettingStore> {
   toggleFullOfflineMode = async () => {
     const isFullOfflineMode = this.get().isFullOfflineMode;
     this.set({ isFullOfflineMode: !isFullOfflineMode });
-    await db.kv().write("fullOfflineMode", !isFullOfflineMode);
+    Config.set("fullOfflineMode", !isFullOfflineMode);
   };
 }
 
