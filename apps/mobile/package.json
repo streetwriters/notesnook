@@ -46,6 +46,6 @@
     "react": "18.2.0",
     "react-native": "0.74.4",
     "react-native-mmkv-storage": "^0.10.2",
-    "react-native-actions-sheeet": "^0.9.7"
+    "react-native-actions-sheet": "^0.9.7"
   }
 }
