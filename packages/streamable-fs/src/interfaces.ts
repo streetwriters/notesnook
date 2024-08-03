@@ -21,10 +21,17 @@ import FileHandle from "./filehandle";
 import { File } from "./types";
 
 export interface IStreamableFS {
-  createFile(filename: string, size: number, type: string): Promise<FileHandle>;
+  createFile(
+    filename: string,
+    size: number,
+    type: string,
+    options?: { overwrite?: boolean }
+  ): Promise<FileHandle>;
   readFile(filename: string): Promise<FileHandle | undefined>;
   exists(filename: string): Promise<boolean>;
   deleteFile(filename: string): Promise<boolean>;
+  list(): Promise<string[]>;
+  moveFile(source: FileHandle, dest: FileHandle): Promise<void>;
   clear(): Promise<void>;
 }
 
