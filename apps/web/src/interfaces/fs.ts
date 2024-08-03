@@ -514,10 +514,11 @@ async function downloadFile(
 
     logger.debug("Got attachment signed url", { filename });
 
-    const fileHandle = await streamablefs.createFile(
-      filename,
+    const tempFileHandle = await streamablefs.createFile(
+      `${filename}-temp`,
       decryptedLength,
-      attachment.mimeType || "application/octet-stream"
+      attachment.mimeType || "application/octet-stream",
+      { overwrite: true }
     );
 
     const response = await fetch(signedUrl, {
@@ -541,7 +542,17 @@ async function downloadFile(
           isFeatureSupported("opfs") ? "copy" : "nocopy"
         )
       )
-      .pipeTo(fileHandle.writeable);
+      .pipeTo(tempFileHandle.writeable);
+
+    await streamablefs.moveFile(
+      tempFileHandle,
+      await streamablefs.createFile(
+        filename,
+        decryptedLength,
+        attachment.mimeType || "application/octet-stream",
+        { overwrite: true }
+      )
+    );
 
     logger.debug("Attachment downloaded", { filename });
     return true;
