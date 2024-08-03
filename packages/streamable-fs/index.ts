@@ -31,9 +31,12 @@ export class StreamableFS implements IStreamableFS {
   async createFile(
     filename: string,
     size: number,
-    type: string
+    type: string,
+    options?: { overwrite?: boolean }
   ): Promise<FileHandle> {
-    if (await this.exists(filename)) throw new Error("File already exists.");
+    const exists = await this.exists(filename);
+    if (!options?.overwrite && exists) throw new Error("File already exists.");
+    else if (options?.overwrite && exists) await this.deleteFile(filename);
 
     const file: File = {
       filename,
@@ -67,6 +70,11 @@ export class StreamableFS implements IStreamableFS {
     if (!handle) return true;
     await handle.delete();
     return true;
+  }
+
+  async moveFile(source: FileHandle, dest: FileHandle) {
+    await source.readable.pipeTo(dest.writeable);
+    await source.delete();
   }
 
   async clear(): Promise<void> {
