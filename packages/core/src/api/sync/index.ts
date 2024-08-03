@@ -208,11 +208,9 @@ class Sync {
     if (this.uncachedAttachments.length > 0 && options.offlineMode) {
       await this.db
         .fs()
-        .queueDownloads(
-          this.uncachedAttachments,
-          "download-uncached-attachments",
-          { readOnDownload: false }
-        );
+        .queueDownloads(this.uncachedAttachments, "offline-mode", {
+          readOnDownload: false
+        });
       this.uncachedAttachments = [];
     }
   }

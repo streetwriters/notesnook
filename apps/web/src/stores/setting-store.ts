@@ -209,10 +209,13 @@ class SettingStore extends BaseStore<SettingStore> {
     await desktop?.updater.toggleAutoUpdates.mutate({ enabled: !autoUpdates });
   };
 
-  toggleFullOfflineMode = async () => {
+  toggleFullOfflineMode = () => {
     const isFullOfflineMode = this.get().isFullOfflineMode;
     this.set({ isFullOfflineMode: !isFullOfflineMode });
     Config.set("fullOfflineMode", !isFullOfflineMode);
+
+    if (isFullOfflineMode) db.fs().cancel("offline-mode");
+    else db.attachments.cacheAttachments();
   };
 }
 

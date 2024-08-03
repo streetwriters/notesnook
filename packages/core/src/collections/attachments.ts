@@ -364,7 +364,7 @@ export class Attachments implements ICollection {
         filename: a.hash,
         chunkSize: a.chunkSize
       })),
-      "download-all-attachments",
+      "offline-mode",
       { readOnDownload: false }
     );
   }
