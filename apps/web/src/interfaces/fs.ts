@@ -576,9 +576,10 @@ async function exists(filename: string | FileHandle) {
 }
 
 async function bulkExists(filenames: string[]) {
-  return Array.from(
-    new Set(filenames).difference(new Set(await streamablefs.list())).values()
+  const files = (await streamablefs.list()).map((c) =>
+    c.replace(/-chunk-\d+/, "")
   );
+  return Array.from(new Set(filenames).difference(new Set(files)).values());
 }
 
 type FileMetadata = {
