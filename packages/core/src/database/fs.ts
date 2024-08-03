@@ -68,7 +68,18 @@ export class FileStorage {
     this.groups.downloads.set(groupId, group);
 
     for (const file of files as QueueItem[]) {
-      if (!group.has(file.filename)) continue;
+      current++;
+      if (!group.has(file.filename)) {
+        EV.publish(EVENTS.fileDownloaded, {
+          success: false,
+          groupId,
+          filename: file.filename,
+          eventData,
+          current,
+          total
+        });
+        continue;
+      }
 
       const download = this.downloads.get(file.filename);
       if (download && download.operation) {
@@ -82,12 +93,13 @@ export class FileStorage {
 
       const { filename, chunkSize } = file;
       if (await this.exists(filename)) {
-        current++;
         EV.publish(EVENTS.fileDownloaded, {
           success: true,
           groupId,
           filename,
-          eventData
+          eventData,
+          current,
+          total
         });
         continue;
       }
@@ -119,7 +131,7 @@ export class FileStorage {
         EV.publish(EVENTS.fileDownloaded, {
           success: result,
           total,
-          current: ++current,
+          current,
           groupId,
           filename,
           eventData
