@@ -334,7 +334,7 @@ class Sync {
       );
 
       for (const item of items)
-        if (!item?.deleted && item?.type === "tiptap" && !item.conflicted)
+        if (!item?.deleted && item?.type === "tiptap" && !!item.conflicted)
           this.conflictedNoteIds.push(item.noteId);
     }
 
