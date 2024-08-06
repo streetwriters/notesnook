@@ -97,11 +97,13 @@ const Intro = ({ navigation }) => {
               extraBold
               size={SIZE.xxl}
             >
-              {heading}
+              {heading()}
             </Heading>
           ))}
 
-          {item.body ? <Paragraph size={SIZE.sm}>{item.body}</Paragraph> : null}
+          {item.body ? (
+            <Paragraph size={SIZE.sm}>{item.body()}</Paragraph>
+          ) : null}
 
           {item.tesimonial ? (
             <Paragraph
@@ -113,7 +115,7 @@ const Intro = ({ navigation }) => {
                 Linking.openURL(item.link);
               }}
             >
-              {item.tesimonial} — {item.user}
+              {item.tesimonial()} — {item.user}
             </Paragraph>
           ) : null}
         </View>
@@ -153,26 +155,7 @@ const Intro = ({ navigation }) => {
           index={0}
           useReactNativeGestureHandler={true}
           showPagination
-          data={[
-            {
-              headings: ["Open source.", "End to end encrypted.", "Private."],
-              body: "Write notes with freedom, no spying, no tracking."
-            },
-            {
-              headings: [
-                "Privacy for everyone",
-                "— not just the",
-                "privileged few"
-              ],
-              body: "Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Notesnook encrypts all your data before it leaves your device. With Notesnook no one can ever sell your data again."
-            },
-            {
-              tesimonial:
-                "You simply cannot get any better of a note taking app than @notesnook. The UI is clean and slick, it is feature rich, encrypted, reasonably priced (esp. for students & educators) & open source",
-              link: "https://twitter.com/andrewsayer/status/1637817220113002503",
-              user: "@andrewsayer on Twitter"
-            }
-          ]}
+          data={strings.introData()}
           paginationActiveColor={colors.primary.accent}
           paginationStyleItem={{
             width: 10,

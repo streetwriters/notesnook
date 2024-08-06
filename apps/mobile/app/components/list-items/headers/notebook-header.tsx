@@ -58,7 +58,7 @@ export const NotebookHeader = ({
           }
         });
         ToastManager.show({
-          heading: "Shortcut created",
+          heading: strings.shortcutCreated(),
           type: "success"
         });
       }

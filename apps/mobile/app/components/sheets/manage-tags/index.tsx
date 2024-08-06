@@ -139,11 +139,6 @@ const ManageTagsSheet = (props: {
 
   const onSubmit = async () => {
     if (!query || query === "" || query.trimStart().length == 0) {
-      ToastManager.show({
-        heading: "Tag field is empty",
-        type: "error",
-        context: "local"
-      });
       return;
     }
 
@@ -182,12 +177,7 @@ const ManageTagsSheet = (props: {
       useTagStore.getState().refresh();
       setQuery(undefined);
     } catch (e) {
-      ToastManager.show({
-        heading: "Cannot add tag",
-        type: "error",
-        message: (e as Error).message,
-        context: "local"
-      });
+      ToastManager.error(e as Error);
     }
 
     Navigation.queueRoutesForUpdate();

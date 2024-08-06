@@ -97,17 +97,12 @@ export const MoveNotebookSheet = ({
           selectedNotebooks={selectedNotebooks}
           onPress={async (selectedNotebook) => {
             presentDialog({
-              title: `Move ${
-                selectedNotebooks.length > 1
-                  ? selectedNotebooks.length + " notebooks"
-                  : selectedNotebooks[0].title
-              }`,
-              paragraph: `Are you sure you want to move ${
-                selectedNotebooks.length > 1
-                  ? selectedNotebooks.length + " notebooks"
-                  : selectedNotebooks[0].title
-              } to ${selectedNotebook.title}?`,
-              positiveText: "Move",
+              title: strings.moveNotebooks(selectedNotebooks.length),
+              paragraph: strings.moveNotebooksConfirm(
+                selectedNotebooks.length,
+                selectedNotebook.title
+              ),
+              positiveText: strings.move(),
               context: "move-notebook",
               positivePress: async () => {
                 for (const notebook of selectedNotebooks) {

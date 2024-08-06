@@ -119,7 +119,6 @@ const ExportNotesSheet = ({
         await exportNoteAs("pdf");
       },
       icon: "file-pdf-box",
-      desc: "View in any pdf reader app",
       id: notesnook.ids.dialogs.export.pdf,
       pro: premium
     },
@@ -129,7 +128,6 @@ const ExportNotesSheet = ({
         await exportNoteAs("md");
       },
       icon: "language-markdown",
-      desc: "View in any text or markdown editor",
       id: notesnook.ids.dialogs.export.md,
       pro: premium
     },
@@ -139,7 +137,6 @@ const ExportNotesSheet = ({
         await exportNoteAs("md-frontmatter");
       },
       icon: "language-markdown",
-      desc: "View in any text or markdown editor",
       id: notesnook.ids.dialogs.export.md,
       pro: premium
     },
@@ -149,7 +146,6 @@ const ExportNotesSheet = ({
         await exportNoteAs("txt");
       },
       icon: "card-text",
-      desc: "View in any text editor",
       id: notesnook.ids.dialogs.export.text,
       pro: true
     },
@@ -159,7 +155,6 @@ const ExportNotesSheet = ({
         await exportNoteAs("html");
       },
       icon: "language-html5",
-      desc: "View in any web browser & html reader",
       id: notesnook.ids.dialogs.export.html,
       pro: premium
     }
@@ -232,13 +227,13 @@ const ExportNotesSheet = ({
                   <Heading style={{ marginLeft: 10 }} size={SIZE.md}>
                     {item.title}
                   </Heading>
-                  <Paragraph
+                  {/* <Paragraph
                     style={{ marginLeft: 10 }}
                     size={SIZE.sm}
                     color={colors.secondary.paragraph}
                   >
                     {item.desc}
-                  </Paragraph>
+                  </Paragraph> */}
                 </View>
               </Pressable>
             </Fragment>
@@ -311,8 +306,7 @@ const ExportNotesSheet = ({
                         showAppsSuggestions: true
                       }).catch((e) => {
                         ToastManager.show({
-                          heading: "Cannot open",
-                          message: `No application found to open ${result.name} file.`,
+                          heading: strings.noApplicationFound(result.name),
                           type: "success",
                           context: "local"
                         });

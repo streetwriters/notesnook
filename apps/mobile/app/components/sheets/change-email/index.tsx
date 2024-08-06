@@ -89,8 +89,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
         eSendEvent(eUserLoggedIn);
         close?.();
         ToastManager.show({
-          heading: `Email changed`,
-          message: `Your account email has been updated to ${emailChangeData.current.email}`,
+          heading: strings.emailUpdated(emailChangeData.current.email),
           type: "success",
           context: "global"
         });

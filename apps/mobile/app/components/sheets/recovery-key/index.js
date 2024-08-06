@@ -76,8 +76,8 @@ class RecoveryKeySheet extends React.Component {
   close = () => {
     if (this.tapCount === 0) {
       ToastManager.show({
-        heading: "Did you save recovery key?",
-        message: "Tap one more time to confirm.",
+        heading: strings.recoveryKeySaved(),
+        message: strings.recoveryKeySavedDesc(),
         type: "success",
         context: "local"
       });
@@ -130,9 +130,7 @@ class RecoveryKeySheet extends React.Component {
           await RNFetchBlob.fs.writeFile(path + fileName, data, "base64");
         }
         ToastManager.show({
-          heading: "Recovery key QR-Code saved",
-          message:
-            "QR-Code image has been saved to Gallery at " + path + fileName,
+          heading: strings.recoveryKeyQRCodeSaved(),
           type: "success",
           context: "local"
         });
@@ -165,8 +163,7 @@ class RecoveryKeySheet extends React.Component {
       }
 
       ToastManager.show({
-        heading: "Recovery key text file saved",
-        message: "Recovery key saved in text file.",
+        heading: strings.recoveryKeyTextFileSaved(),
         type: "success",
         context: "local"
       });
@@ -284,7 +281,7 @@ class RecoveryKeySheet extends React.Component {
             onPress={() => {
               Clipboard.setString(this.state.key);
               ToastManager.show({
-                heading: "Recovery key copied!",
+                heading: strings.recoveryKeyCopied(),
                 type: "success",
                 context: "local"
               });

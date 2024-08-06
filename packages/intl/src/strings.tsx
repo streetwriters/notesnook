@@ -676,5 +676,162 @@ $headline$: Use starting line of the note as title.`,
   fileLengthMismatch: (expectedSize: number, currentSize: number) =>
     t`File length mismatch. Expected ${expectedSize} but got ${currentSize} bytes. Please upload this file again from the attachment manager.`,
   failedToResolvedDownloadUrl: () => t`Failed to resolve download url`,
-  fileSize: () => `File size`
+  fileSize: () => `File size`,
+  donwloadStarted: () => t`Download started... Please wait`,
+  passwordNotEntered: () => t`Password not entered`,
+  passwordNotMatched: () => t`Password does not match`,
+  passwordUpdated: () => t`Password updated`,
+  noteLocked: () => t`Note locked`,
+  biometricUnlockEnabled: () => t`Biometric unlocking enabled`,
+  biometricUnlockDisabled: () => t`Biometric unlocking disabled`,
+  vaultCreated: () => t`Vault created`,
+  noteUnlocked: () => t`Note unlocked`,
+  noteCopied: () => t`Note copied to clipboard`,
+  introData: [
+    {
+      headings: [
+        () => t`Open source.`,
+        () => t`End to end encrypted.`,
+        () => t`Private.`
+      ],
+      body: () => t`Write notes with freedom, no spying, no tracking.`
+    },
+    {
+      headings: [
+        () => t`Privacy for everyone`,
+        () => t`— not just the`,
+        () => t`privileged few`
+      ],
+      body: () =>
+        t`Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Notesnook encrypts all your data before it leaves your device. With Notesnook no one can ever sell your data again.`
+    },
+    {
+      tesimonial: () =>
+        t`You simply cannot get any better of a note taking app than @notesnook. The UI is clean and slick, it is feature rich, encrypted, reasonably priced (esp. for students & educators) & open source`,
+      link: "https://twitter.com/andrewsayer/status/1637817220113002503",
+      user: "@andrewsayer on Twitter"
+    }
+  ],
+  shortcutCreated: () => t`Shortcut created`,
+  notebookRestored: () => t`Notebook restored`,
+  restoreNotebook: () => t`Restore notebook`,
+  permanentlyDeletedNotebook: () => t`Permanently deleted notebook`,
+  noteRestoredFromHistory: () => t`Note restored from history`,
+  noteRestored: () => t`Note restored`,
+  deleteNoteConfirmation: () =>
+    t`Are you sure you want to delete this note permanently?`,
+  noteDeleted: () => t`Note deleted`,
+  restored: () => t`Restored successfully`,
+  deleteItems: (type: string, count: number) =>
+    plural(count, {
+      one: `Delete ${strings.dataTypes[
+        type as keyof typeof strings.dataTypes
+      ]()}`,
+      other: `Delete ${strings.dataTypesPlural[
+        type as keyof typeof strings.dataTypes
+      ]()}`
+    }),
+  deleteItemsConfirmation: (type: string, count: number) =>
+    plural(count, {
+      one: `Are you sure you want to delete this ${strings.dataTypes[
+        type as keyof typeof strings.dataTypes
+      ]()} permanently?`,
+      other: `Are you sure you want to delete these ${strings.dataTypesPlural[
+        type as keyof typeof strings.dataTypes
+      ]()} permanently?`
+    }),
+  manageTags: () => t`Manage tags`,
+  linkNotebook: () => t`Link to notebook`,
+  move: () => t`Move`,
+  unlinkNotebook: () => t`Unlink notebook`,
+  unfavorite: () => t`Unfavorite`,
+  moveToTrash: () => t`Move to trash`,
+  enterNotebookTitle: () => t`Enter notebook title`,
+  emailUpdated: (email: string) => t`Email updated to ${email}`,
+  noApplicationFound: (fileToOpen: string) =>
+    t`No application found to open ${fileToOpen}`,
+  moveNotebooks: (count: number) =>
+    plural(count, { one: "Move notebook", other: `Move # notebooks` }),
+  moveNotebooksConfirm: (count: number, selectedNotebookTitle: string) =>
+    plural(count, {
+      one: `Are you sure you want to move this notebook to ${selectedNotebookTitle}?`,
+      other: `Are you sure you want to move these # notebooks ${selectedNotebookTitle}?`
+    }),
+  failedToPublish: () => t`Failed to publish note`,
+  failedToUnpublish: () => t`Failed to unpublish note`,
+  monographUrlCopied: () => t`Monograph URL copied`,
+  recoveryKeySaved: () => t`Did you save recovery key?`,
+  recoveryKeySavedDesc: () =>
+    t`Please make sure you have saved the recovery key. Tap one more time to confirm.`,
+  recoveryKeyQRCodeSaved: () => t`Recovery key QR code saved`,
+  recoveryKeyTextFileSaved: () => t`Recovery key text file saved`,
+  recoveryKeyCopied: () => t`Recovery key copied`,
+  timeShort: {
+    second: () => t`sec`,
+    minute: () => t`min`,
+    hour: () => t`hr`
+  },
+  backupEncrypted: () => t`Backup is encrypted`,
+  password: () => t`Password`,
+  renameTag: () => t`Rename tag`,
+  renameColor: () => t`Rename color`,
+  name: () => t`Name`,
+  unlockToDelete: () => t`Unlock note to delete it`,
+  backupRestored: () => t`Backup restored`,
+  restoreFailed: () => t`Restore failed`,
+  itemDeleted: (count: number, type: string) =>
+    plural(count, {
+      one: `1 ${strings.dataTypesCamelCase[
+        type as keyof typeof strings.dataTypesCamelCase
+      ]()} deleted`,
+      other: `# ${strings.dataTypes[
+        type as keyof typeof strings.dataTypes
+      ]()} deleted`
+    }),
+  reorder: () => t`Reorder`,
+  turnOffReminder: () => t`Turn off reminder`,
+  turnOnReminder: () => t`Turn on reminder`,
+  addShortcut: () => t`Add shortcut`,
+  addNotebook: () => t`Add notebook`,
+  removeAsDefault: () => t`Remove as default`,
+  setAsDefault: () => t`Set as default`,
+  moveNotes: () => t`Move notes`,
+  unpin: () => t`Unpin`,
+  pin: () => t`Pin`,
+  lockedNotesPinnedFailed: () => t`Locked notes cannot be pinned`,
+  loginRequired: () => t`Login required`,
+  confirmEmailToPublish: () => t`Confirm email to publish note`,
+  lockedNotesPublishFailed: () => t`Locked notes cannot be published`,
+  notePreparingForShare: () => t`Preparing note for share`,
+  removeFromNotebook: () => t`Remove from notebook`,
+  attachments: () => t`Attachments`,
+  history: () => t`History`,
+  copyLink: () => t`Copy link`,
+  linkCopied: () => t`Link copied`,
+  readOnly: () => t`Read only`,
+  syncOff: () => t`Sync off`,
+  duplicate: () => t`Duplicate`,
+  remindMe: () => t`Remind me`,
+  published: () => t`Published`,
+  unpinFromNotifications: () => t`Unpin from notifications`,
+  pinToNotifications: () => t`Pin to notifications`,
+  linkNotebooks: () => t`Link notebooks`,
+  addTags: () => t`Add tags`,
+  references: () => t`References`,
+  moveNotebookFix: () => t`Move notebook`,
+  failedToSubscribe: () => t`Failed to subscribe`,
+  createNewNote: () => t`Create a new note`,
+  monographs: () => t`Monographs`,
+  encryptingAttachment: () => t`Encrypting attachment`,
+  encryptingAttachmentDesc: (name: string) =>
+    t`Please wait while we encrypt ${name} for upload.`,
+  fileTooLarge: () => t`File too large`,
+  fileTooLargeDesc: (sizeInMB: number) =>
+    t`File size should be less than ${sizeInMB}MB`,
+  failToOpen: () => t`Failed to open`,
+  fileMismatch: () => t`File mismatch`,
+  noNoteProperties: () => t`Start writing to create a new note`,
+  createNoteFirst: () => t`Create a note first`,
+  noteLockedSave: () => t`This note is locked. Unlock note to save changes`,
+  saveFailedVaultLocked: () => t`Save failed. Vault is locked`
 };

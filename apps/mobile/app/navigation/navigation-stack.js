@@ -44,6 +44,7 @@ import useNavigationStore from "../stores/use-navigation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { rootNavigatorRef } from "../utils/global-refs";
+import { strings } from "@notesnook/intl";
 
 const NativeStack = createNativeStackNavigator();
 const IntroStack = createNativeStackNavigator();
@@ -114,7 +115,7 @@ const _Tabs = () => {
         initialParams={{
           item: { type: "monograph" },
           canGoBack: false,
-          title: "Monographs"
+          title: strings.monographs()
         }}
         component={Monographs}
       />

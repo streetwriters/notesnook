@@ -23,6 +23,7 @@ import { useRef } from "react";
 import { Platform } from "react-native";
 import { Linking } from "react-native";
 import deviceInfoModule from "react-native-device-info";
+import { strings } from "@notesnook/intl";
 const ShortcutsEmitter = new NativeEventEmitter(
   Shortcuts as unknown as NativeModule
 );
@@ -33,8 +34,8 @@ function isSupported() {
 const defaultShortcuts: ShortcutItem[] = [
   {
     type: "notesnook.action.newnote",
-    title: "Create a new note",
-    shortTitle: "New note",
+    title: strings.createNewNote(),
+    shortTitle: strings.newNote(),
     iconName: Platform.OS === "android" ? "ic_newnote" : "plus"
   }
 ];

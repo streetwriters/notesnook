@@ -76,8 +76,7 @@ Logged in: ${user ? "yes" : "no"}`,
     } catch (e) {
       setLoading(false);
       ToastManager.show({
-        heading: "An error occured",
-        message: e.message,
+        heading: e.message,
         type: "error"
       });
     }

@@ -39,10 +39,9 @@ const ResultDialog = () => {
   const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
-    title: "Thank you for signing up!",
-    paragraph:
-      "Try out all features of Notesnook free for 7 days. No limitations. No commitments.",
-    button: "Start taking notes"
+    title: "",
+    paragraph: "",
+    button: ""
   });
   useEffect(() => {
     eSubscribeEvent(eOpenResultDialog, open);

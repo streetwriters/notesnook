@@ -63,17 +63,17 @@ export const AddNotebookSheet = ({
 
   const onSaveChanges = async () => {
     if (loading) return;
-    setLoading(true);
 
     if (!title.current || title?.current.trim().length === 0) {
       ToastManager.show({
-        heading: "Notebook title is required",
+        heading: strings.enterNotebookTitle(),
         type: "error",
         context: "local"
       });
-      setLoading(false);
       return;
     }
+
+    setLoading(true);
 
     const id = await db.notebooks.add({
       title: title.current,

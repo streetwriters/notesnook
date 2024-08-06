@@ -77,7 +77,7 @@ const PublishNoteSheet = ({
       requestInAppReview();
     } catch (e) {
       ToastManager.show({
-        heading: "Could not publish note",
+        heading: strings.failedToPublish(),
         message: (e as Error).message,
         type: "error",
         context: "local"
@@ -103,7 +103,7 @@ const PublishNoteSheet = ({
       }
     } catch (e) {
       ToastManager.show({
-        heading: "Could not unpublish note",
+        heading: strings.failedToUnpublish(),
         message: (e as Error).message,
         type: "error",
         context: "local"
@@ -194,7 +194,7 @@ const PublishNoteSheet = ({
                 onPress={() => {
                   Clipboard.setString(publishUrl as string);
                   ToastManager.show({
-                    heading: "Note publish url copied",
+                    heading: strings.monographUrlCopied(),
                     type: "success",
                     context: "local"
                   });
