@@ -52,7 +52,7 @@ export default function NotePreview({ session, content, note }) {
       Navigation.queueRoutesForUpdate();
       useSelectionStore.getState().setSelectionMode(false);
       ToastManager.show({
-        heading: "Restore successful",
+        heading: strings.noteRestored(),
         type: "success"
       });
       eSendEvent(eCloseSheet);
@@ -73,7 +73,7 @@ export default function NotePreview({ session, content, note }) {
     Navigation.queueRoutesForUpdate();
 
     ToastManager.show({
-      heading: "Note restored successfully",
+      heading: strings.noteRestoredFromHistory(),
       type: "success"
     });
   }
@@ -84,17 +84,17 @@ export default function NotePreview({ session, content, note }) {
 
   const deleteNote = async () => {
     presentDialog({
-      title: `Delete note permanently`,
-      paragraph: `Are you sure you want to delete this note from trash permanentaly`,
-      positiveText: "Delete",
-      negativeText: "Cancel",
+      title: strings.deleteNote(),
+      paragraph: strings.deleteNoteConfirmation(),
+      positiveText: strings.delete(),
+      negativeText: strings.cancel(),
       context: "local",
       positivePress: async () => {
         await db.trash.delete(note.id);
         useTrashStore.getState().refresh();
         useSelectionStore.getState().setSelectionMode(false);
         ToastManager.show({
-          heading: "Permanently deleted items",
+          heading: strings.noteDeleted(),
           type: "success",
           context: "local"
         });

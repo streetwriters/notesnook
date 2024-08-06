@@ -42,8 +42,7 @@ export const ShareComponent = ({ uri, name, padding }) => {
             showAppsSuggestions: true
           }).catch(() => {
             ToastManager.show({
-              heading: "Cannot open",
-              message: `No application found to open ${name} file.`,
+              heading: strings.noApplicationFound(name),
               type: "success",
               context: "local"
             });

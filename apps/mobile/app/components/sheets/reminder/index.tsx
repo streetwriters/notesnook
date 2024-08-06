@@ -206,12 +206,6 @@ export default function ReminderSheet({
       if (!reminderId) return;
       const _reminder = await db.reminders?.reminder(reminderId);
 
-      if (!_reminder) {
-        ToastManager.show({
-          heading: "Failed to add a new reminder",
-          context: "local"
-        });
-      }
       if (reference && _reminder) {
         await db.relations?.add(reference, {
           id: _reminder?.id as string,

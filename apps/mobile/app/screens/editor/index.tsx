@@ -59,6 +59,7 @@ import {
   randId
 } from "./tiptap/utils";
 import { tabBarRef } from "../../utils/global-refs";
+import { strings } from "@notesnook/intl";
 
 const style: ViewStyle = {
   height: "100%",
@@ -257,8 +258,7 @@ const useLockedNoteHandler = () => {
       if (!tabRef.current?.noteId || !tabRef.current) return;
       if (!password || password.trim().length === 0) {
         ToastManager.show({
-          heading: "Password not entered",
-          message: "Enter a password for the vault and try again.",
+          heading: strings.passwordNotEntered(),
           type: "error"
         });
         return;
@@ -273,8 +273,7 @@ const useLockedNoteHandler = () => {
             await BiometricService.storeCredentials(password);
             eSendEvent("vaultUpdated");
             ToastManager.show({
-              heading: "Biometric unlocking enabled!",
-              message: "Now you can unlock notes in vault with biometrics.",
+              heading: strings.biometricUnlockEnabled(),
               type: "success",
               context: "global"
             });
@@ -288,9 +287,7 @@ const useLockedNoteHandler = () => {
             syncTabs();
           } catch (e) {
             ToastManager.show({
-              heading: "Incorrect password",
-              message:
-                "Please enter the correct vault password to enable biometrics.",
+              heading: strings.passwordIncorrect(),
               type: "error"
             });
           }
@@ -304,7 +301,7 @@ const useLockedNoteHandler = () => {
       } catch (e) {
         console.log(e);
         ToastManager.show({
-          heading: "Incorrect password",
+          heading: strings.passwordIncorrect(),
           type: "error"
         });
       }
