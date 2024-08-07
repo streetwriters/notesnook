@@ -32,3 +32,4 @@ export {
   type TextSlice
 } from "./utils/content-block";
 export { type DatabaseUpdatedEvent } from "./database";
+export { isServerCompatible } from "./utils/constants";
