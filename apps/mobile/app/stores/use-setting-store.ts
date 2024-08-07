@@ -25,6 +25,8 @@ import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
 import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
 import { Reminder } from "@notesnook/core/dist/types";
+export const HostIds = ["API_HOST", "AUTH_HOST", "SSE_HOST"] as const;
+export type HostId = (typeof HostIds)[number];
 
 export type Settings = {
   showToolbarOnTop?: boolean;
@@ -82,6 +84,7 @@ export type Settings = {
   backgroundSync?: boolean;
   applockKeyboardType: "numeric" | "default";
   settingsVersion?: number;
+  serverUrls?: Record<HostId, string>;
 };
 
 type DimensionsType = {
