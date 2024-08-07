@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { isServerCompatible } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useState } from "react";
 import { View } from "react-native";
@@ -39,7 +40,7 @@ type Server = {
   description: string;
 };
 type VersionResponse = {
-  version: string;
+  version: number;
   id: string;
   instance: string;
 };
@@ -163,13 +164,17 @@ export function ServersConfiguration() {
                   const version = await fetch(`${url}/version`)
                     .then((r) => r.json() as Promise<VersionResponse>)
                     .catch(() => undefined);
-                  console.log(version, "fetch...");
                   if (!version)
                     throw new Error(`Could not connect to ${server.title}.`);
                   if (version.id !== server.id)
                     throw new Error(
                       `The URL you have given (${url}) does not point to the ${server.title}.`
                     );
+                  if (!isServerCompatible(version.version)) {
+                    throw new Error(
+                      `The server version is not compatible with the app.`
+                    );
+                  }
                 }
                 setSuccess(true);
               } catch (e) {
