@@ -112,7 +112,7 @@ export const Button = ({
           NativeTooltip.show(event, tooltipText, NativeTooltip.POSITIONS.TOP);
         }
       }}
-      disabled={loading}
+      disabled={loading || restProps.disabled}
       type={type}
       accentColor={accentColor}
       accentText={accentText}
@@ -132,6 +132,7 @@ export const Button = ({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
+        opacity: restProps?.disabled ? 0.5 : 1,
         ...(style as ViewStyle)
       }}
     >

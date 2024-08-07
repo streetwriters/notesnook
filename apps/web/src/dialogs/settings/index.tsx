@@ -36,6 +36,7 @@ import {
   PasswordAndAuth,
   Privacy,
   Pro,
+  Servers,
   ShieldLock,
   Sync
 } from "../../components/icons";
@@ -74,6 +75,7 @@ import { SubscriptionSettings } from "./subscription-settings";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 import { AppLockSettings } from "./app-lock-settings";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
+import { ServersSettings } from "./servers-settings";
 
 type SettingsDialogProps = BaseDialogProps<false>;
 
@@ -116,7 +118,8 @@ const sectionGroups: SectionGroup[] = [
         icon: Desktop,
         isHidden: () => !IS_DESKTOP_APP
       },
-      { key: "notifications", title: "Notifications", icon: Notification }
+      { key: "notifications", title: "Notifications", icon: Notification },
+      { key: "servers", title: "Servers", icon: Servers }
     ]
   },
   {
@@ -164,7 +167,8 @@ const SettingsGroups = [
   ...LegalSettings,
   ...SupportSettings,
   ...AboutSettings,
-  ...SubscriptionSettings
+  ...SubscriptionSettings,
+  ...ServersSettings
 ];
 
 // Thoughts:

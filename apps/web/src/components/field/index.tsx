@@ -55,6 +55,7 @@ function Field(props: FieldProps) {
     type,
     inputRef,
     validate,
+    disabled,
     ...inputProps
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -66,6 +67,8 @@ function Field(props: FieldProps) {
       sx={{
         m: "2px",
         mr: "2px",
+        opacity: disabled ? 0.7 : 1,
+        pointerEvents: disabled ? "none" : "all",
         ...sx,
         flexDirection: "column"
       }}

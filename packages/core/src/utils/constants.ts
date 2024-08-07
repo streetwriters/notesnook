@@ -19,6 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { extractHostname } from "./hostname";
 
+const COMPATIBLE_SERVER_VERSION = 1;
+
+export function isServerCompatible(version: number) {
+  return COMPATIBLE_SERVER_VERSION === version;
+}
+
 function isProduction() {
   return (
     process.env.NODE_ENV === "production" || process.env.NODE_ENV === "test"

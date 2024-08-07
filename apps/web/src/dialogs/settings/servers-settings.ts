@@ -17,19 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./types";
-export { VirtualizedGrouping } from "./utils/virtualized-grouping";
-export { DefaultColors } from "./collections/colors";
-export { type BackupFile, type LegacyBackupFile } from "./database/backup";
-export {
-  createInternalLink,
-  parseInternalLink,
-  type InternalLink
-} from "./utils/internal-link";
-export {
-  extractInternalLinks,
-  highlightInternalLinks,
-  type TextSlice
-} from "./utils/content-block";
-export { type DatabaseUpdatedEvent } from "./database";
-export { isServerCompatible } from "./utils/constants";
+import { ServersConfiguration } from "./components/servers-configuration";
+import { SettingsGroup } from "./types";
+
+export const ServersSettings: SettingsGroup[] = [
+  {
+    header: "Servers configuration",
+    key: "servers",
+    section: "servers",
+    settings: [
+      {
+        key: "config",
+        title: "",
+        components: [
+          {
+            type: "custom",
+            component: ServersConfiguration
+          }
+        ]
+      }
+    ]
+  }
+];
