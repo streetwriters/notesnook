@@ -141,7 +141,7 @@ export const BackupReminderPicker = createSettingsPicker({
 });
 
 export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
-  getValue: () => useSettingStore.getState().settings.reminder,
+  getValue: () => useSettingStore.getState().settings.fullBackupReminder,
   updateValue: (item) => {
     SettingsService.set({ fullBackupReminder: item });
   },

@@ -27,7 +27,9 @@ import {
   hashBase64,
   clearCache,
   deleteCacheFileByName,
-  deleteCacheFileByPath
+  deleteCacheFileByPath,
+  bulkExists,
+  getCacheSize
 } from "./io";
 import { uploadFile } from "./upload";
 import { cancelable } from "./utils";
@@ -45,5 +47,7 @@ export default {
   checkAttachment,
   clearCache,
   deleteCacheFileByName,
-  deleteCacheFileByPath
+  deleteCacheFileByPath,
+  bulkExists,
+  getCacheSize
 };

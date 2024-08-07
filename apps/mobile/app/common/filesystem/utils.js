@@ -64,7 +64,6 @@ export function cancelable(operation) {
       execute: () => operation(filename, { url, headers }, cancelToken),
       cancel: async () => {
         await cancelToken.cancel();
-        RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
       }
     };
   };
