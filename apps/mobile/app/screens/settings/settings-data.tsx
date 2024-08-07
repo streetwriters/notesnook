@@ -748,6 +748,14 @@ export const settingsGroups: SettingSection[] = [
             type: "switch"
           }
         ]
+      },
+      {
+        id: "servers",
+        type: "screen",
+        name: "Servers",
+        description: "Configure server URLs for Notesnook",
+        icon: "server",
+        component: "server-config"
       }
     ]
   },

@@ -37,6 +37,7 @@ import {
 } from "./picker/pickers";
 import ThemeSelector from "./theme-selector";
 import { RestoreBackup } from "./restore-backup";
+import { ServersConfiguration } from "./server-config";
 
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
@@ -55,5 +56,6 @@ export const components: { [name: string]: ReactElement } = {
   "theme-selector": <ThemeSelector />,
   "applock-timer": <ApplockTimerPicker />,
   autobackupsattachments: <BackupWithAttachmentsReminderPicker />,
-  backuprestore: <RestoreBackup />
+  backuprestore: <RestoreBackup />,
+  "server-config": <ServersConfiguration />
 };
