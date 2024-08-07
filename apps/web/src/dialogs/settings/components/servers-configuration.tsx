@@ -110,7 +110,7 @@ export function ServersConfiguration() {
               borderRadius: "default"
             }}
           >
-            Connected to all servers sucessfully.
+            Connected to all servers successfully.
           </Text>
         ) : null}
         <Flex sx={{ mt: 1, justifyContent: "end", gap: 1 }}>
@@ -146,7 +146,9 @@ export function ServersConfiguration() {
               try {
                 for (const host of HostIds) {
                   const url = urls[host];
-                  const server = SERVERS.find((s) => s.host === host)!;
+                  const server = SERVERS.find((s) => s.host === host);
+                  if (!server)
+                    throw new Error(`Server with host ${host} not found.`);
                   if (!url) throw new Error("All server urls are required.");
                   const version = await fetch(`${url}/version`)
                     .then((r) => r.json() as Promise<VersionResponse>)
