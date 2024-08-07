@@ -24,6 +24,7 @@ import { HostId, HostIds, useStore } from "../../../stores/setting-store";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { ErrorText } from "../../../components/error-text";
 import { TaskManager } from "../../../common/task-manager";
+import { isServerCompatible } from "@notesnook/core";
 
 export const ServerIds = ["notesnook-sync", "auth", "sse"] as const;
 export type ServerId = (typeof ServerIds)[number];
@@ -35,7 +36,7 @@ type Server = {
   description: string;
 };
 type VersionResponse = {
-  version: string;
+  version: number;
   id: string;
   instance: string;
 };
@@ -158,6 +159,10 @@ export function ServersConfiguration() {
                   if (version.id !== server.id)
                     throw new Error(
                       `The URL you have given (${url}) does not point to the ${server.title}.`
+                    );
+                  if (!isServerCompatible(version.version))
+                    throw new Error(
+                      `The ${server.title} at ${url} is not compatible with this client.`
                     );
                 }
                 setSuccess(true);
