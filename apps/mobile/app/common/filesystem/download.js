@@ -35,8 +35,8 @@ export async function downloadFile(filename, data, cancelToken) {
   DatabaseLogger.log(`Downloading ${filename}`);
   await createCacheDir();
   let { url, headers } = data;
-  let path = `${cacheDir}/${filename}`;
-
+  let tempFilePath = `${cacheDir}/${filename}_temp`;
+  let originalFilePath = `${cacheDir}/${filename}`;
   try {
     if (await exists(filename)) {
       DatabaseLogger.log(`File Exists already: ${filename}`);
@@ -66,7 +66,7 @@ export async function downloadFile(filename, data, cancelToken) {
     let totalSize = 0;
     DatabaseLogger.log(`Download starting: ${filename}`);
     let request = RNFetchBlob.config({
-      path: path,
+      path: tempFilePath,
       IOSBackgroundTask: true
     })
       .fetch("GET", downloadUrl, null)
@@ -81,13 +81,21 @@ export async function downloadFile(filename, data, cancelToken) {
     cancelToken.cancel = () => {
       useAttachmentStore.getState().remove(filename);
       request.cancel();
+      RNFetchBlob.fs.unlink(tempFilePath).catch(console.log);
       DatabaseLogger.log(`Download cancelled: ${filename}`);
     };
 
     let response = await request;
+
     await fileCheck(response, totalSize);
     let status = response.info().status;
     useAttachmentStore.getState().remove(filename);
+    await RNFetchBlob.fs.mv(tempFilePath, originalFilePath);
+
+    if (!(await exists(filename))) {
+      throw new Error("File size mismatch");
+    }
+
     return status >= 200 && status < 300;
   } catch (e) {
     if (e.message !== "canceled" && !e.message.includes("NoSuchKey")) {
@@ -106,7 +114,8 @@ export async function downloadFile(filename, data, cancelToken) {
     }
 
     useAttachmentStore.getState().remove(filename);
-    RNFetchBlob.fs.unlink(path).catch(console.log);
+    RNFetchBlob.fs.unlink(tempFilePath).catch(console.log);
+    RNFetchBlob.fs.unlink(originalFilePath).catch(console.log);
     DatabaseLogger.error(e, {
       url,
       headers

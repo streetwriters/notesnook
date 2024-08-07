@@ -339,13 +339,13 @@ async function checkBackupRequired(
   }
 
   if (type === "daily" && lastBackupDate + MS_DAY < now) {
-    DatabaseLogger.info("Daily backup started");
+    DatabaseLogger.info(`Daily backup started: ${type}`);
     return true;
   } else if (type === "weekly" && lastBackupDate + MS_WEEK < now) {
-    DatabaseLogger.info("Weekly backup started");
+    DatabaseLogger.info(`Weekly backup started: ${type}`);
     return true;
   } else if (type === "monthly" && lastBackupDate + MONTH < now) {
-    DatabaseLogger.info("Monthly backup started");
+    DatabaseLogger.info(`Monthly backup started: ${type}`);
     return true;
   }
   return false;

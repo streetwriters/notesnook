@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Sodium from "@ammarahmed/react-native-sodium";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
+import { eSendEvent } from "../../services/event-manager";
 import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
 import { cacheDir, cacheDirOld, getRandomId } from "./utils";
@@ -159,10 +160,9 @@ export async function migrateFilesFromCache() {
 }
 
 export async function clearCache() {
-  const files = await RNFetchBlob.fs.ls(cacheDir);
-  for (const file of files) {
-    await RNFetchBlob.fs.unlink(file).catch(console.log);
-  }
+  await RNFetchBlob.fs.unlink(cacheDir).catch(console.log);
+  await createCacheDir();
+  eSendEvent("cache-cleared");
 }
 
 export async function deleteCacheFileByPath(path) {
@@ -223,4 +223,30 @@ export async function exists(filename) {
     exists = true;
   }
   return exists;
+}
+
+export async function bulkExists(files) {
+  const cacheFiles = await RNFetchBlob.fs.ls(cacheDir);
+  let missingFiles = files.filter((file) => !cacheFiles.includes(file));
+
+  if (Platform.OS === "ios") {
+    const iosAppGroup =
+      Platform.OS === "ios"
+        ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+        : null;
+    const appGroupFiles = await RNFetchBlob.fs.ls(iosAppGroup);
+    missingFiles = missingFiles.filter((file) => !appGroupFiles.includes(file));
+  }
+
+  return missingFiles;
+}
+
+export async function getCacheSize() {
+  const stat = await RNFetchBlob.fs.lstat(`file://` + cacheDir);
+  let total = 0;
+  console.log("Total files", stat.length);
+  stat.forEach((s) => {
+    total += parseInt(s.size);
+  });
+  return total;
 }

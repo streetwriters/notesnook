@@ -17,16 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import RNFetchBlob from "react-native-blob-util";
-import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { DatabaseLogger, db } from "../database";
-import { cacheDir } from "./utils";
-import { isImage, isDocument } from "@notesnook/core/dist/utils/filename";
 import { Platform } from "react-native";
-import { IOS_APPGROUPID } from "../../utils/constants";
-import { createCacheDir } from "./io";
-import { getUploadedFileSize } from "./download";
+import RNFetchBlob from "react-native-blob-util";
 import { ToastManager } from "../../services/event-manager";
+import { useAttachmentStore } from "../../stores/use-attachment-store";
+import { IOS_APPGROUPID } from "../../utils/constants";
+import { DatabaseLogger, db } from "../database";
+import { getUploadedFileSize } from "./download";
+import { createCacheDir } from "./io";
+import { cacheDir } from "./utils";
 
 export async function uploadFile(filename, data, cancelToken) {
   if (!data) return false;
