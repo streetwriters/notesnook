@@ -207,7 +207,11 @@ export default async function downloadAttachment(
   try {
     await db
       .fs()
-      .downloadFile(options.groupId || attachment.hash, attachment.hash);
+      .downloadFile(
+        options.groupId || attachment.hash,
+        attachment.hash,
+        attachment.chunkSize
+      );
     if (!(await exists(attachment.hash))) {
       DatabaseLogger.log("Attachment does not exist after download.");
       return;

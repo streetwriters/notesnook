@@ -17,30 +17,53 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import hosts from "@notesnook/core/dist/utils/constants";
 import NetInfo from "@react-native-community/netinfo";
 import RNFetchBlob from "react-native-blob-util";
 import { ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { DatabaseLogger, db } from "../database";
-import { cacheDir, fileCheck } from "./utils";
 import { createCacheDir, exists } from "./io";
+import { ABYTES, cacheDir, getUploadedFileSize, parseS3Error } from "./utils";
 
-export async function downloadFile(filename, data, cancelToken) {
-  if (!data) {
-    DatabaseLogger.log(`Error downloading file: ${filename}, reason: No data`);
+export async function downloadFile(filename, requestOptions, cancelToken) {
+  if (!requestOptions) {
+    DatabaseLogger.log(
+      `Error downloading file: ${filename}, reason: No requestOptions`
+    );
     return false;
   }
 
   DatabaseLogger.log(`Downloading ${filename}`);
   await createCacheDir();
-  let { url, headers } = data;
+  let { url, headers, chunkSize } = requestOptions;
   let tempFilePath = `${cacheDir}/${filename}_temp`;
   let originalFilePath = `${cacheDir}/${filename}`;
   try {
     if (await exists(filename)) {
       DatabaseLogger.log(`File Exists already: ${filename}`);
       return true;
+    }
+    const attachment = await db.attachments.attachment(filename);
+    const size = await getUploadedFileSize(filename);
+
+    if (size === -1) {
+      const error = `Uploaded file verification failed. (File hash: ${filename})`;
+      throw new Error(error);
+    }
+
+    if (size === 0) {
+      const error = `File length is 0. Please upload this file again from the attachment manager. (File hash: ${filename})`;
+      await db.attachments.markAsFailed(attachment.id, error);
+      throw new Error(error);
+    }
+
+    const totalChunks = Math.ceil(size / chunkSize);
+    const decryptedLength = size - totalChunks * ABYTES;
+
+    if (attachment && attachment.size !== decryptedLength) {
+      const error = `File length mismatch. Expected ${attachment.size} but got ${decryptedLength} bytes. Please upload this file again from the attachment manager. (File hash: ${filename})`;
+      await db.attachments.markAsFailed(attachment.id, error);
+      throw new Error(error);
     }
 
     let res = await fetch(url, {
@@ -63,18 +86,18 @@ export async function downloadFile(filename, data, cancelToken) {
       );
       throw new Error("Unable to resolve download url");
     }
-    let totalSize = 0;
+
     DatabaseLogger.log(`Download starting: ${filename}`);
     let request = RNFetchBlob.config({
       path: tempFilePath,
       IOSBackgroundTask: true
     })
       .fetch("GET", downloadUrl, null)
-      .progress((recieved, total) => {
+      .progress(async (recieved, total) => {
         useAttachmentStore
           .getState()
           .setProgress(0, total, filename, recieved, "download");
-        totalSize = total;
+
         DatabaseLogger.log(`Downloading: ${filename}, ${recieved}/${total}`);
       });
 
@@ -86,8 +109,17 @@ export async function downloadFile(filename, data, cancelToken) {
     };
 
     let response = await request;
+    console.log(response.info().headers);
 
-    await fileCheck(response, totalSize);
+    const contentType =
+      response.info().headers?.["content-type"] ||
+      response.info().headers?.["Content-Type"];
+
+    if (contentType === "application/xml") {
+      const error = parseS3Error(await response.text());
+      throw new Error(`[${error.Code}] ${error.Message}`);
+    }
+
     let status = response.info().status;
     useAttachmentStore.getState().remove(filename);
     await RNFetchBlob.fs.mv(tempFilePath, originalFilePath);
@@ -121,24 +153,6 @@ export async function downloadFile(filename, data, cancelToken) {
       headers
     });
     return false;
-  }
-}
-
-export async function getUploadedFileSize(hash) {
-  try {
-    const url = `${hosts.API_HOST}/s3?name=${hash}`;
-    const token = await db.tokenManager.getAccessToken();
-    const attachmentInfo = await fetch(url, {
-      method: "HEAD",
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const contentLength = parseInt(
-      attachmentInfo.headers?.get("content-length")
-    );
-    return isNaN(contentLength) ? 0 : contentLength;
-  } catch (e) {
-    DatabaseLogger.error(e);
-    return -1;
   }
 }
 

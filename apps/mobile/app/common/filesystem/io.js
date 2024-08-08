@@ -23,7 +23,7 @@ import RNFetchBlob from "react-native-blob-util";
 import { eSendEvent } from "../../services/event-manager";
 import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
-import { cacheDir, cacheDirOld, getRandomId } from "./utils";
+import { ABYTES, cacheDir, cacheDirOld, getRandomId } from "./utils";
 
 export async function readEncrypted(filename, key, cipherData) {
   await migrateFilesFromCache();
@@ -182,7 +182,6 @@ export async function deleteDCacheFiles() {
   }
 }
 
-const ABYTES = 17;
 export async function exists(filename) {
   let path = `${cacheDir}/${filename}`;
 

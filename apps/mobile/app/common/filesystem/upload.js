@@ -23,25 +23,24 @@ import { ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
-import { getUploadedFileSize } from "./download";
 import { createCacheDir } from "./io";
-import { cacheDir } from "./utils";
+import { cacheDir, getUploadedFileSize } from "./utils";
 
-export async function uploadFile(filename, data, cancelToken) {
-  if (!data) return false;
-  let { url, headers } = data;
+export async function uploadFile(filename, requestOptions, cancelToken) {
+  if (!requestOptions) return false;
+  let { url, headers } = requestOptions;
   await createCacheDir();
   DatabaseLogger.info(`Preparing to upload file: ${filename}`);
 
   try {
     const uploadedFileSize = await getUploadedFileSize(filename);
+
     if (uploadedFileSize === -1) {
-      DatabaseLogger.log("Upload verification failed.");
-      return false;
+      const error = `Uploaded file verification failed. (File hash: ${filename})`;
+      throw new Error(error);
     }
 
-    const isUploaded = uploadedFileSize !== 0;
-    if (isUploaded) {
+    if (uploadedFileSize !== 0) {
       DatabaseLogger.log(`File ${filename} is already uploaded.`);
       return true;
     }
