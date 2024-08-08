@@ -202,17 +202,13 @@ async function run(
     });
   }
 
-  const zipSourceFolder = `${cacheDir}/${backupFileName}`;
+  const zipSourceFolder = `${cacheDir}/backup_temp`;
   const zipOutputFile =
     Platform.OS === "ios"
       ? `${path}/${backupFileName}.nnbackupz`
       : `${cacheDir}/${backupFileName}.nnbackupz`;
 
-  try {
-    if (await RNFetchBlob.fs.exists(zipSourceFolder))
-      await RNFetchBlob.fs.unlink(zipSourceFolder);
-  } catch (e) {}
-
+  await RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
   await RNFetchBlob.fs.mkdir(zipSourceFolder);
 
   const attachmentsDir = zipSourceFolder + "/attachments";
@@ -269,7 +265,13 @@ async function run(
     } else {
       path = zipOutputFile;
     }
+
     RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
+
+    if (Platform.OS === "android") {
+      RNFetchBlob.fs.unlink(zipOutputFile).catch(console.log);
+    }
+
     updateNextBackupTime();
 
     endProgress();
@@ -307,6 +309,11 @@ async function run(
     ) {
       SettingsService.setProperty("backupDirectoryAndroid", null);
       return run(progress, context, backupType);
+    }
+
+    RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
+    if (Platform.OS === "android") {
+      RNFetchBlob.fs.unlink(zipOutputFile).catch(console.log);
     }
 
     DatabaseLogger.error(e);
