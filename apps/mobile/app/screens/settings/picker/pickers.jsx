@@ -121,8 +121,8 @@ export const BackupReminderPicker = createSettingsPicker({
     SettingsService.set({ reminder: item });
   },
   formatValue: (item) => {
-    return item === "useroff"
-      ? "Never"
+    return item === "useroff" || item === "off" || item === "never"
+      ? "Off"
       : item.slice(0, 1).toUpperCase() + item.slice(1);
   },
   getItemKey: (item) => item,
@@ -146,7 +146,9 @@ export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
     SettingsService.set({ fullBackupReminder: item });
   },
   formatValue: (item) => {
-    return item.slice(0, 1).toUpperCase() + item.slice(1);
+    return item === "useroff" || item === "off" || item === "never"
+      ? "Off"
+      : item.slice(0, 1).toUpperCase() + item.slice(1);
   },
   getItemKey: (item) => item,
   options: ["never", "weekly", "monthly"],
