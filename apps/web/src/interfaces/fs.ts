@@ -514,16 +514,23 @@ async function downloadFile(
 
     logger.debug("Got attachment signed url", { filename });
 
+    const response = await fetch(signedUrl, {
+      signal
+    });
+
+    if (response.headers.get("content-type") === "application/xml") {
+      const error = parseS3Error(await response.text());
+      if (error.Code !== "Unknown") {
+        throw new Error(`[${error.Code}] ${error.Message}`);
+      }
+    }
+
     const tempFileHandle = await streamablefs.createFile(
       `${filename}-temp`,
       decryptedLength,
       attachment.mimeType || "application/octet-stream",
       { overwrite: true }
     );
-
-    const response = await fetch(signedUrl, {
-      signal
-    });
     await response.body
       ?.pipeThrough(
         new ProgressStream((totalRead, done) => {
