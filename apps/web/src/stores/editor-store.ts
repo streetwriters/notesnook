@@ -603,12 +603,7 @@ class EditorStore extends BaseStore<EditorStore> {
         ? await db.content.get(note.contentId)
         : undefined;
 
-      if (
-        !content ||
-        content.locked ||
-        !content.conflicted ||
-        note.type === "trash"
-      ) {
+      if (!content || !content.conflicted || note.type === "trash") {
         note.conflicted = false;
         await db.notes.add({ id: note.id, conflicted: false });
         if (content?.locked) {
