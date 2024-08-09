@@ -28,6 +28,7 @@ import SettingsService from "../../services/settings";
 import { useFavorites } from "../../stores/use-favorite-store";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { db } from "../../common/database";
+import { strings } from "@notesnook/intl";
 
 export const Favorites = ({
   navigation,
@@ -76,11 +77,11 @@ export const Favorites = ({
           renderedInRoute="Favorites"
           loading={loading}
           placeholder={{
-            title: "Your favorites",
-            paragraph: "You have not added any notes to favorites yet.",
-            loading: "Loading your favorites"
+            title: strings.yourFavorites(),
+            paragraph: strings.favoritesEmpty(),
+            loading: strings.loadingFavorites()
           }}
-          headerTitle="Favorites"
+          headerTitle={strings.dataTypesPluralCamelCase.favorite()}
         />
       </DelayLayout>
     </>

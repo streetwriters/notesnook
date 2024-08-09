@@ -56,21 +56,21 @@ import { strings } from "@notesnook/intl";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",
-    title: "Setup using an Authenticator app",
-    body: "Use an authenticator app like Google Authenticator on your phone to get authentication codes",
+    title: strings.mfaAuthAppTitle(),
+    body: strings.mfaAuthAppDesc(),
     icon: "cellphone-key",
     recommended: true
   },
   {
     id: "sms",
-    title: "Set up using SMS",
-    body: "Notesnook will send you an SMS with a 2FA code when prompted",
+    title: strings.mfaSmsTitle(),
+    body: strings.mfaSmsDesc(),
     icon: "message-plus-outline"
   },
   {
     id: "email",
-    title: "Set up using Email",
-    body: "Notesnook will send you a 2FA code on your email when prompted",
+    title: strings.mfaEmailTitle(),
+    body: strings.mfaEmailDesc(),
     icon: "email-outline"
   }
 ];
@@ -227,7 +227,7 @@ export const MFASetup = ({
       }
 
       ToastManager.show({
-        heading: "Code copied!",
+        heading: strings.codesCopied(),
         type: "success",
         context: "local"
       });
@@ -235,10 +235,9 @@ export const MFASetup = ({
     }
 
     try {
-      if (seconds)
-        throw new Error("Please wait a few seconds before resending code");
+      if (seconds) throw new Error(strings.resendCodeWait());
       if (method.id === "sms" && !phoneNumber.current)
-        throw new Error("Phone number not entered");
+        throw new Error(strings.phoneNumberNotEntered());
       setSending(true);
       await db.mfa.setup(method?.id, phoneNumber.current);
 
@@ -252,14 +251,14 @@ export const MFASetup = ({
       );
       setSending(false);
       ToastManager.show({
-        heading: `2FA code sent via ${method.id}.`,
+        heading: strings["2faCodeSentVia"](method.id),
         type: "success",
         context: "local"
       });
     } catch (e) {
       setSending(false);
       const error = e as Error;
-      ToastManager.error(error, "Error sending 2FA code");
+      ToastManager.error(error, strings.errorSend2fa());
     }
   };
 
@@ -488,7 +487,7 @@ export const MFARecoveryCodes = ({
                 const codeString = codes.join("\n");
                 Clipboard.setString(codeString);
                 ToastManager.show({
-                  heading: "Recovery codes copied!",
+                  heading: strings.codesCopied(),
                   type: "success",
                   context: "global"
                 });
@@ -528,7 +527,7 @@ export const MFARecoveryCodes = ({
                   }
 
                   ToastManager.show({
-                    heading: "Recovery codes saved to text file",
+                    heading: strings.codesSaved(),
                     type: "success",
                     context: "local"
                   });

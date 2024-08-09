@@ -90,7 +90,7 @@ export default function DebugLogs() {
           onLongPress={() => {
             Clipboard.setString(format(item));
             ToastManager.show({
-              heading: "Debug log copied!",
+              heading: strings.logsCopied(),
               context: "global",
               type: "success"
             });
@@ -155,7 +155,7 @@ export default function DebugLogs() {
 
       if (path) {
         ToastManager.show({
-          heading: "Debug logs downloaded",
+          heading: strings.logsDownloaded(),
           context: "global",
           type: "success"
         });
@@ -174,7 +174,7 @@ export default function DebugLogs() {
     if (!data) return;
     Clipboard.setString(data);
     ToastManager.show({
-      heading: "Debug log copied!",
+      heading: strings.logsCopied(),
       context: "global",
       type: "success"
     });
@@ -183,10 +183,10 @@ export default function DebugLogs() {
   const clearLogs = React.useCallback(() => {
     if (!currentLog) return;
     presentDialog({
-      title: "Clear logs",
-      paragraph: `Are you sure you want to delete all logs from ${currentLog.key}?`,
-      negativeText: "Cancel",
-      positiveText: "Clear",
+      title: strings.clearLogs(),
+      paragraph: strings.clearLogsConfirmation(currentLog.key),
+      negativeText: strings.cancel(),
+      positiveText: strings.clear(),
       positivePress: () => {
         const index = logs.findIndex((l) => (l.key = currentLog.key));
         logManager?.delete(currentLog.key);

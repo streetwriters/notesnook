@@ -29,6 +29,7 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useReminders } from "../../stores/use-reminder-store";
+import { strings } from "@notesnook/intl";
 
 export const Reminders = ({
   navigation,
@@ -75,22 +76,22 @@ export const Reminders = ({
         <List
           data={reminders}
           dataType="reminder"
-          headerTitle="Reminders"
+          headerTitle={strings.dataTypesPluralCamelCase.reminder()}
           renderedInRoute="Reminders"
           loading={loading}
           placeholder={{
-            title: "Your reminders",
-            paragraph: "You have not set any reminders yet.",
-            button: "Set a new reminder",
+            title: strings.yourReminders(),
+            paragraph: strings.remindersEmpty(),
+            button: strings.setReminder(),
             action: () => {
               ReminderSheet.present();
             },
-            loading: "Loading reminders"
+            loading: strings.loadingReminders()
           }}
         />
 
         <FloatingButton
-          title="Set a new reminder"
+          title={strings.setReminder()}
           onPress={() => {
             ReminderSheet.present();
           }}

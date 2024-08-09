@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
@@ -30,11 +31,11 @@ import { tabBarRef } from "../../utils/global-refs";
 import { editorState } from "../editor/tiptap/utils";
 
 export const PLACEHOLDER_DATA = {
-  title: "Your notes",
-  paragraph: "You have not added any notes yet.",
-  button: "Add your first Note",
+  title: strings.yourNotes(),
+  paragraph: strings.notesEmpty(),
+  button: strings.addFirstNote(),
   action: openEditor,
-  loading: "Loading your notes."
+  loading: strings.loadingNotes()
 };
 
 export function toCamelCase(title: string) {
