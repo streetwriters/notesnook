@@ -41,6 +41,7 @@ import { eUpdateNotebookRoute } from "../../utils/events";
 import { findRootNotebookId } from "../../utils/notebooks";
 import { SIZE } from "../../utils/size";
 import { openEditor, setOnFirstSave } from "../notes/common";
+import { strings } from "@notesnook/intl";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
@@ -252,10 +253,10 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           }
           placeholder={{
             title: params.current.item?.title,
-            paragraph: "You have not added any notes yet.",
-            button: "Add your first note",
+            paragraph: strings.notesEmpty(),
+            button: strings.addFirstNote(),
             action: openEditor,
-            loading: "Loading notebook notes"
+            loading: strings.loadingNotes()
           }}
         />
       </DelayLayout>

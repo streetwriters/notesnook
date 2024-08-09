@@ -31,6 +31,7 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotebooks } from "../../stores/use-notebook-store";
+import { strings } from "@notesnook/intl";
 
 const onButtonPress = () => {
   AddNotebookSheet.present();
@@ -96,13 +97,13 @@ export const Notebooks = ({
           renderedInRoute="Notebooks"
           loading={loading}
           placeholder={{
-            title: "Your notebooks",
-            paragraph: "You have not added any notebooks yet.",
-            button: "Add your first notebook",
+            title: strings.yourNotebooks(),
+            paragraph: strings.notebooksEmpty(),
+            button: strings.addFirstNotebook(),
             action: onButtonPress,
-            loading: "Loading your notebooks"
+            loading: strings.loadingNotebooks()
           }}
-          headerTitle="Notebooks"
+          headerTitle={strings.dataTypesPluralCamelCase.notebook()}
         />
 
         {!notebooks ||

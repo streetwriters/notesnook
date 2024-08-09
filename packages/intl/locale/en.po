@@ -41,6 +41,10 @@ msgstr "{0}... Please wait"
 msgid "{count, plural, one {# note} other {# notes} _0 {No notes}}"
 msgstr "{count, plural, one {# note} other {# notes} _0 {No notes}}"
 
+#: src/strings.tsx:769
+msgid "{count, plural, one {1 {0} deleted} other {# {1} deleted}}"
+msgstr "{count, plural, one {1 {0} deleted} other {# {1} deleted}}"
+
 #: src/strings.tsx:721
 msgid "{count, plural, one {Are you sure you want to delete this {0} permanently?} other {Are you sure you want to delete these {1} permanently?}}"
 msgstr "{count, plural, one {Are you sure you want to delete this {0} permanently?} other {Are you sure you want to delete these {1} permanently?}}"
@@ -165,9 +169,17 @@ msgstr "Add a {0}"
 msgid "Add color"
 msgstr "Add color"
 
+#: src/strings.tsx:781
+msgid "Add notebook"
+msgstr "Add notebook"
+
 #: src/strings.tsx:407
 msgid "Add notes to {title}"
 msgstr "Add notes to {title}"
+
+#: src/strings.tsx:780
+msgid "Add shortcut"
+msgstr "Add shortcut"
 
 #: src/strings.tsx:615
 msgid "Add shortcuts for notebooks and tags here."
@@ -176,6 +188,10 @@ msgstr "Add shortcuts for notebooks and tags here."
 #: src/strings.tsx:479
 msgid "Add tag"
 msgstr "Add tag"
+
+#: src/strings.tsx:805
+msgid "Add tags"
+msgstr "Add tags"
 
 #: src/strings.tsx:604
 #: src/strings.tsx:632
@@ -259,6 +275,7 @@ msgid "attachments"
 msgstr "attachments"
 
 #: src/strings.tsx:276
+#: src/strings.tsx:793
 msgid "Attachments"
 msgstr "Attachments"
 
@@ -390,6 +407,10 @@ msgstr "Compressed images are uploaded in Full HD resolution and usually are goo
 msgid "Confirm email"
 msgstr "Confirm email"
 
+#: src/strings.tsx:789
+msgid "Confirm email to publish note"
+msgstr "Confirm email to publish note"
+
 #: src/strings.tsx:453
 msgid "Continue"
 msgstr "Continue"
@@ -401,6 +422,10 @@ msgstr "Copy"
 #: src/strings.tsx:570
 msgid "Copy codes"
 msgstr "Copy codes"
+
+#: src/strings.tsx:795
+msgid "Copy link"
+msgstr "Copy link"
 
 #: src/strings.tsx:382
 msgid "Copy note"
@@ -417,6 +442,14 @@ msgstr "Create"
 #: src/strings.tsx:608
 msgid "Create a group"
 msgstr "Create a group"
+
+#: src/strings.tsx:809
+msgid "Create a new note"
+msgstr "Create a new note"
+
+#: src/strings.tsx:820
+msgid "Create a note first"
+msgstr "Create a note first"
 
 #: src/strings.tsx:487
 msgid "Create link"
@@ -545,6 +578,10 @@ msgstr "Downloading attachments"
 msgid "Due date"
 msgstr "Due date"
 
+#: src/strings.tsx:799
+msgid "Duplicate"
+msgstr "Duplicate"
+
 #: src/strings.tsx:541
 msgid "Earliest first"
 msgstr "Earliest first"
@@ -580,6 +617,10 @@ msgstr "Enable two-factor authentication to add an extra layer of security to yo
 #: src/strings.tsx:171
 msgid "Encrypted and synced"
 msgstr "Encrypted and synced"
+
+#: src/strings.tsx:811
+msgid "Encrypting attachment"
+msgstr "Encrypting attachment"
 
 #: src/strings.tsx:680
 msgid "End to end encrypted."
@@ -717,6 +758,10 @@ msgstr "Hash copied"
 msgid "Help improve Notesnook by sending completely anonymized"
 msgstr "Help improve Notesnook by sending completely anonymized"
 
+#: src/strings.tsx:794
+msgid "History"
+msgstr "History"
+
 #: src/strings.tsx:758
 msgid "hr"
 msgstr "hr"
@@ -817,6 +862,14 @@ msgstr "Let us know if you have faced any issue/bug while using Notesnook. We wi
 msgid "Light"
 msgstr "Light"
 
+#: src/strings.tsx:796
+msgid "Link copied"
+msgstr "Link copied"
+
+#: src/strings.tsx:804
+msgid "Link notebooks"
+msgstr "Link notebooks"
+
 #: src/strings.tsx:207
 msgid "LINK TO A SECTION"
 msgstr "LINK TO A SECTION"
@@ -849,6 +902,14 @@ msgstr "Lock"
 msgid "Lock note"
 msgstr "Lock note"
 
+#: src/strings.tsx:787
+msgid "Locked notes cannot be pinned"
+msgstr "Locked notes cannot be pinned"
+
+#: src/strings.tsx:790
+msgid "Locked notes cannot be published"
+msgstr "Locked notes cannot be published"
+
 #: src/strings.tsx:339
 msgid "Logging out"
 msgstr "Logging out"
@@ -860,6 +921,10 @@ msgstr "Login"
 #: src/strings.tsx:652
 msgid "Login failed"
 msgstr "Login failed"
+
+#: src/strings.tsx:788
+msgid "Login required"
+msgstr "Login required"
 
 #: src/strings.tsx:653
 msgid "Login successful"
@@ -917,6 +982,10 @@ msgstr "Monday"
 msgid "Monograph URL copied"
 msgstr "Monograph URL copied"
 
+#: src/strings.tsx:810
+msgid "Monographs"
+msgstr "Monographs"
+
 #: src/strings.tsx:305
 msgid "month"
 msgstr "month"
@@ -933,6 +1002,14 @@ msgstr "Monthly"
 #: src/strings.tsx:731
 msgid "Move"
 msgstr "Move"
+
+#: src/strings.tsx:807
+msgid "Move notebook"
+msgstr "Move notebook"
+
+#: src/strings.tsx:784
+msgid "Move notes"
+msgstr "Move notes"
 
 #: src/strings.tsx:491
 msgid "Move selected notes"
@@ -1211,6 +1288,14 @@ msgstr "Permanent"
 msgid "Permanently deleted notebook"
 msgstr "Permanently deleted notebook"
 
+#: src/strings.tsx:786
+msgid "Pin"
+msgstr "Pin"
+
+#: src/strings.tsx:803
+msgid "Pin to notifications"
+msgstr "Pin to notifications"
+
 #: src/strings.tsx:438
 msgid "Pinned"
 msgstr "Pinned"
@@ -1247,6 +1332,10 @@ msgstr "Please verify it's you"
 msgid "Please wait"
 msgstr "Please wait"
 
+#: src/strings.tsx:813
+msgid "Please wait while we encrypt {name} for upload."
+msgstr "Please wait while we encrypt {name} for upload."
+
 #: src/strings.tsx:340
 msgid "Please wait while we log you out."
 msgstr "Please wait while we log you out."
@@ -1254,6 +1343,10 @@ msgstr "Please wait while we log you out."
 #: src/strings.tsx:222
 msgid "Please wait while we sync all your data."
 msgstr "Please wait while we sync all your data."
+
+#: src/strings.tsx:791
+msgid "Preparing note for share"
+msgstr "Preparing note for share"
 
 #: src/strings.tsx:357
 #~ msgid "Presets"
@@ -1299,6 +1392,10 @@ msgstr "Publish"
 msgid "Publish your note to share it with others. You can set a password to protect it."
 msgstr "Publish your note to share it with others. You can set a password to protect it."
 
+#: src/strings.tsx:801
+msgid "Published"
+msgstr "Published"
+
 #: src/strings.tsx:225
 msgid "Published at"
 msgstr "Published at"
@@ -1322,6 +1419,10 @@ msgstr "Rate now (It takes only a second)"
 #: src/strings.tsx:323
 msgid "Read full release notes on Github"
 msgstr "Read full release notes on Github"
+
+#: src/strings.tsx:797
+msgid "Read only"
+msgstr "Read only"
 
 #: src/strings.tsx:110
 msgid "Recommended"
@@ -1355,9 +1456,17 @@ msgstr "Recovery key text file saved"
 msgid "REFERENCED IN"
 msgstr "REFERENCED IN"
 
+#: src/strings.tsx:806
+msgid "References"
+msgstr "References"
+
 #: src/strings.tsx:361
 msgid "Release notes"
 msgstr "Release notes"
+
+#: src/strings.tsx:800
+msgid "Remind me"
+msgstr "Remind me"
 
 #: src/strings.tsx:308
 msgid "Remind me in"
@@ -1383,6 +1492,14 @@ msgstr "Reminders"
 msgid "Remove"
 msgstr "Remove"
 
+#: src/strings.tsx:782
+msgid "Remove as default"
+msgstr "Remove as default"
+
+#: src/strings.tsx:792
+msgid "Remove from notebook"
+msgstr "Remove from notebook"
+
 #: src/strings.tsx:562
 msgid "Remove shortcut"
 msgstr "Remove shortcut"
@@ -1402,6 +1519,10 @@ msgstr "Rename file"
 #: src/strings.tsx:762
 msgid "Rename tag"
 msgstr "Rename tag"
+
+#: src/strings.tsx:777
+msgid "Reorder"
+msgstr "Reorder"
 
 #: src/strings.tsx:503
 msgid "Repeat"
@@ -1495,6 +1616,10 @@ msgstr "Save account recovery key"
 msgid "Save and continue"
 msgstr "Save and continue"
 
+#: src/strings.tsx:822
+msgid "Save failed. Vault is locked"
+msgstr "Save failed. Vault is locked"
+
 #: src/strings.tsx:498
 msgid "Save QR code to gallery"
 msgstr "Save QR code to gallery"
@@ -1587,6 +1712,10 @@ msgstr "Session expired"
 msgid "Set as dark theme"
 msgstr "Set as dark theme"
 
+#: src/strings.tsx:783
+msgid "Set as default"
+msgstr "Set as default"
+
 #: src/strings.tsx:607
 msgid "Set as light theme"
 msgstr "Set as light theme"
@@ -1643,6 +1772,10 @@ msgstr "Skip introduction"
 msgid "Sort by"
 msgstr "Sort by"
 
+#: src/strings.tsx:819
+msgid "Start writing to create a new note"
+msgstr "Start writing to create a new note"
+
 #: src/strings.tsx:170
 msgid "Start writing to save your note."
 msgstr "Start writing to save your note."
@@ -1674,6 +1807,10 @@ msgstr "Sunday"
 #: src/strings.tsx:329
 msgid "Sync failed"
 msgstr "Sync failed"
+
+#: src/strings.tsx:798
+msgid "Sync off"
+msgstr "Sync off"
 
 #: src/strings.tsx:330
 msgid "Synced"
@@ -1763,6 +1900,10 @@ msgstr "The reminder will repeat every year on {date}."
 msgid "This device"
 msgstr "This device"
 
+#: src/strings.tsx:821
+msgid "This note is locked. Unlock note to save changes"
+msgstr "This note is locked. Unlock note to save changes"
+
 #: src/strings.tsx:244
 msgid "This note is not linked to any other note."
 msgstr "This note is not linked to any other note."
@@ -1795,6 +1936,14 @@ msgstr "Tue"
 #: src/strings.tsx:516
 msgid "Tuesday"
 msgstr "Tuesday"
+
+#: src/strings.tsx:778
+msgid "Turn off reminder"
+msgstr "Turn off reminder"
+
+#: src/strings.tsx:779
+msgid "Turn on reminder"
+msgstr "Turn on reminder"
 
 #: src/strings.tsx:80
 msgid "Two factor authentication"
@@ -1848,6 +1997,14 @@ msgstr "Unlock with password once to enable biometric access."
 #: src/strings.tsx:25
 msgid "Unlock your notes"
 msgstr "Unlock your notes"
+
+#: src/strings.tsx:785
+msgid "Unpin"
+msgstr "Unpin"
+
+#: src/strings.tsx:802
+msgid "Unpin from notifications"
+msgstr "Unpin from notifications"
 
 #: src/strings.tsx:493
 msgid "Unpublish"

@@ -23,13 +23,14 @@ import { db } from "../../common/database";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { openMonographsWebpage } from "./common";
+import { strings } from "@notesnook/intl";
 
 export const MONOGRAPH_PLACEHOLDER_DATA = {
-  title: "Your monographs",
-  paragraph: "You have not published any notes as monographs yet.",
-  button: "Learn more about monographs",
+  title: strings.yourMonographs(),
+  paragraph: strings.monographsEmpty(),
+  button: strings.learnMoreMonographs(),
   action: openMonographsWebpage,
-  loading: "Loading published notes.",
+  loading: strings.loadingMonographs(),
   type: "monograph",
   buttonIcon: "information-outline"
 };
@@ -63,6 +64,6 @@ Monographs.navigate = (canGoBack?: boolean) => {
   Navigation.navigate<"Monographs">("Monographs", {
     item: { type: "monograph" } as any,
     canGoBack: canGoBack as boolean,
-    title: "Monographs"
+    title: strings.dataTypesPluralCamelCase.monograph()
   });
 };
