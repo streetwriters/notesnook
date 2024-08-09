@@ -110,21 +110,6 @@ function StatusBar() {
               </Text>
             </Button>
           ) : null}
-          <Button
-            variant="statusitem"
-            onClick={() => IssueDialog.show({})}
-            sx={{
-              alignItems: "center",
-              justifyContent: "center",
-              display: "flex"
-            }}
-            title="Facing an issue? Click here to create a bug report."
-          >
-            <Issue size={12} />
-            <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-              Report an issue
-            </Text>
-          </Button>
           {statuses?.map((status) => {
             const { key, icon: Icon } = status;
             return (
