@@ -235,23 +235,21 @@ async function uploadFile(
   filename: string,
   requestOptions: RequestOptionsWithSignal
 ) {
-  // if file already exists on the server, we just return true
-  // we don't reupload the file i.e. overwriting is not possible.
-  const uploadedFileSize = await getUploadedFileSize(filename);
-  if (uploadedFileSize === -1) return false;
-  if (uploadedFileSize > 0) return true;
-
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle || !(await exists(fileHandle)))
     throw new Error(
       `File is corrupt or missing data. Please upload the file again. (File hash: ${filename})`
     );
-  try {
-    if (fileHandle.file.additionalData?.uploaded) {
-      await checkUpload(filename);
-      return true;
-    }
+  if (fileHandle.file.additionalData?.uploaded) return true;
 
+  // if file already exists on the server, we just return true
+  // we don't reupload the file i.e. overwriting is not possible.
+  const uploadedFileSize = await getUploadedFileSize(filename);
+  if (uploadedFileSize === -1) return false;
+  if (uploadedFileSize > 0 && uploadedFileSize === (await fileHandle.size()))
+    return true;
+
+  try {
     const uploaded =
       fileHandle.file.size < MINIMUM_MULTIPART_FILE_SIZE
         ? await singlePartUploadFile(fileHandle, filename, requestOptions)
@@ -259,7 +257,6 @@ async function uploadFile(
 
     if (uploaded) {
       await checkUpload(filename);
-
       await fileHandle.addAdditionalData("uploaded", true);
     }
 
@@ -452,10 +449,14 @@ async function resetUpload(fileHandle: FileHandle) {
 }
 
 async function checkUpload(filename: string) {
-  if ((await getUploadedFileSize(filename)) <= 0) {
-    const error = `Upload verification failed: file size is 0. Please upload this file again. (File hash: ${filename})`;
-    throw new Error(error);
-  }
+  const size = await getUploadedFileSize(filename);
+  const error =
+    size === 0
+      ? `Upload verification failed: file size is 0. Please upload this file again. (File hash: ${filename})`
+      : size === -1
+      ? `Upload verification failed.`
+      : undefined;
+  if (error) throw new Error(error);
 }
 
 function reportProgress(
@@ -490,7 +491,21 @@ async function downloadFile(
       { type: "download", hash: filename }
     );
 
-    const size = await getUploadedFileSize(filename);
+    const signedUrl = (
+      await axios.get(url, {
+        headers,
+        responseType: "text"
+      })
+    ).data;
+
+    logger.debug("Got attachment signed url", { filename });
+
+    const response = await fetch(signedUrl, {
+      signal
+    });
+
+    const size = parseInt(response.headers.get("content-length") || "0");
+
     if (size <= 0) {
       const error = `File length is 0. Please upload this file again from the attachment manager. (File hash: ${filename})`;
       await db.attachments.markAsFailed(attachment.id, error);
@@ -505,24 +520,9 @@ async function downloadFile(
       throw new Error(error);
     }
 
-    const signedUrl = (
-      await axios.get(url, {
-        headers,
-        responseType: "text"
-      })
-    ).data;
-
-    logger.debug("Got attachment signed url", { filename });
-
-    const response = await fetch(signedUrl, {
-      signal
-    });
-
     if (response.headers.get("content-type") === "application/xml") {
       const error = parseS3Error(await response.text());
-      if (error.Code !== "Unknown") {
-        throw new Error(`[${error.Code}] ${error.Message}`);
-      }
+      throw new Error(`[${error.Code}] ${error.Message}`);
     }
 
     const tempFileHandle = await streamablefs.createFile(
