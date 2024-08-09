@@ -32,6 +32,7 @@ import { Profile, TrashCleanupInterval } from "@notesnook/core";
 class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
   backupReminderOffset = Config.get("backupReminderOffset", 0);
+  fullBackupReminderOffset = Config.get("fullBackupReminderOffset", 0);
   backupStorageLocation = Config.get(
     "backupStorageLocation",
     PATHS.backupsDirectory
@@ -39,6 +40,7 @@ class SettingStore extends BaseStore<SettingStore> {
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   markdownShortcuts = Config.get("markdownShortcuts", true);
   notificationsSettings = Config.get("notifications", { reminder: true });
+  isFullOfflineMode = Config.get("fullOfflineMode", false);
 
   zoomFactor = 1.0;
   privacyMode = false;
@@ -147,6 +149,11 @@ class SettingStore extends BaseStore<SettingStore> {
     this.set({ backupReminderOffset: offset });
   };
 
+  setFullBackupReminderOffset = (offset: number) => {
+    Config.set("fullBackupReminderOffset", offset);
+    this.set({ fullBackupReminderOffset: offset });
+  };
+
   setBackupStorageLocation = (location: string) => {
     Config.set("backupStorageLocation", location);
     this.set({ backupStorageLocation: location });
@@ -200,6 +207,15 @@ class SettingStore extends BaseStore<SettingStore> {
     const autoUpdates = this.get().autoUpdates;
     this.set({ autoUpdates: !autoUpdates });
     await desktop?.updater.toggleAutoUpdates.mutate({ enabled: !autoUpdates });
+  };
+
+  toggleFullOfflineMode = () => {
+    const isFullOfflineMode = this.get().isFullOfflineMode;
+    this.set({ isFullOfflineMode: !isFullOfflineMode });
+    Config.set("fullOfflineMode", !isFullOfflineMode);
+
+    if (isFullOfflineMode) db.fs().cancel("offline-mode");
+    else db.attachments.cacheAttachments();
   };
 }
 

@@ -51,6 +51,15 @@ export class IndexedDBFileStore implements IFileStorage {
   readChunk(chunkName: string): Promise<Uint8Array | undefined> {
     return this.storage.get(chunkName);
   }
+  async listChunks(chunkPrefix: string): Promise<string[]> {
+    const keys = await this.storage.keys();
+    return keys.filter((k) =>
+      (k as string).startsWith(chunkPrefix)
+    ) as string[];
+  }
+  async list(): Promise<string[]> {
+    return (await this.storage.keys()) as string[];
+  }
 }
 
 export class CacheStorageFileStore implements IFileStorage {
@@ -108,6 +117,20 @@ export class CacheStorageFileStore implements IFileStorage {
     return response ? new Uint8Array(await response.arrayBuffer()) : undefined;
   }
 
+  async listChunks(chunkPrefix: string): Promise<string[]> {
+    const cache = await this.getCache();
+    const keys = await cache.keys();
+    return keys
+      .filter((k) => k.url.startsWith(`/${chunkPrefix}`))
+      .map((r) => r.url.slice(1));
+  }
+
+  async list(): Promise<string[]> {
+    const cache = await this.getCache();
+    const keys = await cache.keys();
+    return keys.map((r) => r.url.slice(1));
+  }
+
   private toURL(chunkName: string) {
     return `/${chunkName}`;
   }
@@ -157,5 +180,13 @@ export class OriginPrivateFileSystem implements IFileStorage {
   async readChunk(chunkName: string): Promise<Uint8Array | undefined> {
     await this.create();
     return this.worker.readChunk(this.name, chunkName);
+  }
+  async listChunks(chunkPrefix: string): Promise<string[]> {
+    await this.create();
+    return (await this.worker.listChunks(this.name, chunkPrefix)) || [];
+  }
+  async list(): Promise<string[]> {
+    await this.create();
+    return (await this.worker.list(this.name)) || [];
   }
 }

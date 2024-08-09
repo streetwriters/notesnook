@@ -24,6 +24,7 @@ import { Appearance, Linking, Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
+import ScreenGuardModule from "react-native-screenguard";
 import { db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
 import { AttachmentDialog } from "../../components/attachments";
@@ -42,6 +43,7 @@ import BiometricService from "../../services/biometrics";
 import {
   ToastManager,
   eSendEvent,
+  eSubscribeEvent,
   openVault,
   presentSheet
 } from "../../services/event-manager";
@@ -60,8 +62,7 @@ import {
   eCloseSheet,
   eCloseSimpleDialog,
   eOpenLoginDialog,
-  eOpenRecoveryKeyDialog,
-  eOpenRestoreDialog
+  eOpenRecoveryKeyDialog
 } from "../../utils/events";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
@@ -70,7 +71,8 @@ import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import ScreenGuardModule from "react-native-screenguard";
+import filesystem from "../../common/filesystem";
+import { formatBytes } from "@notesnook/common";
 
 type User = any;
 
@@ -375,6 +377,44 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
+            id: "clear-cache",
+            name: "Clear cache",
+            icon: "delete",
+            modifer: async () => {
+              presentDialog({
+                title: "Clear cache",
+                paragraph: "Are you sure you want to clear the cache?",
+                positiveText: "Clear",
+                positivePress: async () => {
+                  filesystem.clearCache();
+                  ToastManager.show({
+                    heading: "Cache cleared",
+                    message: "All cached attachments have been removed",
+                    type: "success"
+                  });
+                }
+              });
+            },
+            description(current) {
+              return `Clear all cached attachments. Current cache size: ${
+                current as number
+              }`;
+            },
+            useHook: () => {
+              const [cacheSize, setCacheSize] = React.useState(0);
+              React.useEffect(() => {
+                filesystem.getCacheSize().then(setCacheSize).catch(console.log);
+                const sub = eSubscribeEvent("cache-cleared", () => {
+                  setCacheSize(0);
+                });
+                return () => {
+                  sub?.unsubscribe();
+                };
+              }, []);
+              return formatBytes(cacheSize);
+            }
+          },
+          {
             id: "delete-account",
             type: "danger",
             name: "Delete account",
@@ -434,6 +474,25 @@ export const settingsGroups: SettingSection[] = [
         type: "screen",
         icon: "autorenew",
         sections: [
+          {
+            id: "offline-mode",
+            name: "Full offline mode",
+            description: "Download everything including attachments on sync",
+            type: "switch",
+            property: "offlineMode",
+            modifer: () => {
+              const current = SettingsService.get().offlineMode;
+              if (current) {
+                SettingsService.setProperty("offlineMode", false);
+                db.fs().cancel("offline-mode");
+                return;
+              }
+              PremiumService.verify(() => {
+                SettingsService.setProperty("offlineMode", true);
+                db.attachments.cacheAttachments().catch(console.log);
+              });
+            }
+          },
           {
             id: "auto-sync",
             name: "Disable auto sync",
@@ -1041,15 +1100,35 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "backup-now",
             name: "Backup now",
-            description: "Create a backup of your data",
+            description:
+              "Take a partial backup of your data that does not include attachments",
             modifer: async () => {
               const user = useUserStore.getState().user;
               if (!user || SettingsService.getProperty("encryptedBackup")) {
-                await BackupService.run(true);
+                await BackupService.run(true, undefined, "partial");
                 return;
               }
 
-              verifyUser(null, () => BackupService.run(true));
+              verifyUser(null, () =>
+                BackupService.run(true, undefined, "partial")
+              );
+            }
+          },
+          {
+            id: "backup-now",
+            name: "Backup now with attachments",
+            hidden: () => !useUserStore.getState().user,
+            description: "Take a full backup of your data with all attachments",
+            modifer: async () => {
+              const user = useUserStore.getState().user;
+              if (!user || SettingsService.getProperty("encryptedBackup")) {
+                await BackupService.run(true, undefined, "full");
+                return;
+              }
+
+              verifyUser(null, () =>
+                BackupService.run(true, undefined, "full")
+              );
             }
           },
           {
@@ -1057,8 +1136,18 @@ export const settingsGroups: SettingSection[] = [
             type: "component",
             name: "Automatic backups",
             description:
-              "Backup your data once every week or daily automatically.",
+              "Set the interval to create a partial backup (without attachments) automatically.",
             component: "autobackups"
+          },
+          {
+            id: "auto-backups-with-attachments",
+            type: "component",
+            hidden: () => !useUserStore.getState().user,
+            name: "Automatic backups with attachments",
+            description: `Set the interval to create a backup (with attachments) automatically.
+
+NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`,
+            component: "autobackupsattachments"
           },
           {
             id: "select-backup-dir",
@@ -1151,9 +1240,8 @@ export const settingsGroups: SettingSection[] = [
         id: "restore-backup",
         name: "Restore backup",
         description: "Restore backup from phone storage.",
-        modifer: () => {
-          eSendEvent(eOpenRestoreDialog);
-        }
+        type: "screen",
+        component: "backuprestore"
       },
       {
         id: "export-notes",

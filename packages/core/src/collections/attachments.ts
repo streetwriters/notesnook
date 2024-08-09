@@ -34,7 +34,7 @@ import { logger } from "../logger";
 
 export class Attachments implements ICollection {
   name = "attachments";
-  key: Cipher<"base64"> | null = null;
+  key?: SerializedKey;
   readonly collection: SQLCollection<"attachments", Attachment>;
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
@@ -44,7 +44,6 @@ export class Attachments implements ICollection {
       db.eventManager,
       db.sanitizer
     );
-    this.key = null;
 
     EV.subscribe(
       EVENTS.fileDownloaded,
@@ -356,6 +355,20 @@ export class Attachments implements ICollection {
     });
   }
 
+  async cacheAttachments(attachments?: FilteredSelector<Attachment>) {
+    const items = await (attachments || this.db.attachments.linked)
+      .fields(["attachments.id", "attachments.hash", "attachments.chunkSize"])
+      .items();
+    await this.db.fs().queueDownloads(
+      items.map((a) => ({
+        filename: a.hash,
+        chunkSize: a.chunkSize
+      })),
+      "offline-mode",
+      { readOnDownload: false }
+    );
+  }
+
   async save(
     data: string,
     mimeType: string,
@@ -497,6 +510,22 @@ export class Attachments implements ICollection {
       this.db.options?.batchSize
     );
   }
+
+  get linked() {
+    return this.collection.createFilter<Attachment>(
+      (qb) =>
+        qb
+          .where(isFalse("deleted"))
+          .where("id", "in", (eb) =>
+            eb
+              .selectFrom("relations")
+              .where("toType", "==", "attachment")
+              .select("toId as id")
+              .$narrowType<{ id: string }>()
+          ),
+      this.db.options?.batchSize
+    );
+  }
   // get media() {
   //   return this.all.filter(
   //     (attachment) =>
@@ -526,7 +555,7 @@ export class Attachments implements ICollection {
     return result?.totalSize;
   }
 
-  private async encryptKey(key: SerializedKey) {
+  async encryptKey(key: SerializedKey) {
     const encryptionKey = await this._getEncryptionKey();
     const encryptedKey = await this.db
       .storage()

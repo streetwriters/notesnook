@@ -121,8 +121,8 @@ export const BackupReminderPicker = createSettingsPicker({
     SettingsService.set({ reminder: item });
   },
   formatValue: (item) => {
-    return item === "useroff"
-      ? "Never"
+    return item === "useroff" || item === "off" || item === "never"
+      ? "Off"
       : item.slice(0, 1).toUpperCase() + item.slice(1);
   },
   getItemKey: (item) => item,
@@ -137,6 +137,31 @@ export const BackupReminderPicker = createSettingsPicker({
   },
   onCheckOptionIsPremium: (item) => {
     return item !== "useroff";
+  }
+});
+
+export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.fullBackupReminder,
+  updateValue: (item) => {
+    SettingsService.set({ fullBackupReminder: item });
+  },
+  formatValue: (item) => {
+    return item === "useroff" || item === "off" || item === "never"
+      ? "Off"
+      : item.slice(0, 1).toUpperCase() + item.slice(1);
+  },
+  getItemKey: (item) => item,
+  options: ["never", "weekly", "monthly"],
+  compareValue: (current, item) => current === item,
+  premium: true,
+  requiresVerification: () => {
+    return (
+      !useSettingStore.getState().settings.encryptedBackup &&
+      useUserStore.getState().user
+    );
+  },
+  onCheckOptionIsPremium: (item) => {
+    return item !== "never";
   }
 });
 

@@ -175,12 +175,8 @@ function SideBar(props: SideBarProps) {
           const result = await TaskManager.startTask({
             type: "status",
             id: "trialActivation",
-            action: (report) => {
-              report({
-                text: "Activating trial"
-              });
-              return db.user.activateTrial();
-            }
+            title: "Activating trial",
+            action: () => db.user.activateTrial()
           });
           if (result) onClose();
         } catch (e) {

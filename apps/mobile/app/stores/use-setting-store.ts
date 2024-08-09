@@ -32,7 +32,8 @@ export type Settings = {
   fontScale?: number;
   forcePortraitOnTablet?: boolean;
   useSystemTheme?: boolean;
-  reminder?: string;
+  reminder: "daily" | "off" | "useroff" | "weekly" | "monthly";
+  fullBackupReminder: "never" | "weekly" | "monthly";
   encryptedBackup?: boolean;
   homepage?: string;
   sort?: string;
@@ -52,8 +53,8 @@ export type Settings = {
   rateApp?: boolean | number;
   migrated?: boolean;
   introCompleted?: boolean;
-  nextBackupRequestTime?: number | undefined;
-  lastBackupDate?: number | undefined;
+  nextBackupRequestTime?: number;
+  lastBackupDate?: number;
   userEmailConfirmed?: boolean;
   recoveryKeySaved?: boolean;
   backupDirectoryAndroid?: FileType | null;
@@ -82,6 +83,9 @@ export type Settings = {
   backgroundSync?: boolean;
   applockKeyboardType: "numeric" | "default";
   settingsVersion?: number;
+  backupType: "full" | "partial";
+  offlineMode?: boolean;
+  lastFullBackupDate?: number;
 };
 
 type DimensionsType = {
@@ -150,7 +154,7 @@ export const defaultSettings: SettingStore["settings"] = {
   migrated: false,
   introCompleted: Config.isTesting ? true : false,
   nextBackupRequestTime: undefined,
-  lastBackupDate: undefined,
+  lastBackupDate: 0,
   userEmailConfirmed: false,
   recoveryKeySaved: false,
   showBackupCompleteSheet: true,
@@ -171,7 +175,10 @@ export const defaultSettings: SettingStore["settings"] = {
   biometricsAuthEnabled: false,
   appLockHasPasswordSecurity: false,
   backgroundSync: true,
-  settingsVersion: 0
+  settingsVersion: 0,
+  backupType: "partial",
+  fullBackupReminder: "never",
+  lastFullBackupDate: 0
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({

@@ -37,14 +37,24 @@ export const BackupExportSettings: SettingsGroup[] = [
     settings: [
       {
         key: "create-backup",
-        title: "Backup now",
-        description: "Create a backup file containing all your data",
+        title: "Create backup",
+        description:
+          "Partial backups contain all your data except attachments. They are created from data already available on your device and do not require an Internet connection.",
         components: [
           {
-            type: "button",
-            title: "Create backup",
-            action: createBackup,
-            variant: "secondary"
+            type: "dropdown",
+            options: [
+              { value: "-", title: "Choose backup format" },
+              { value: "partial", title: "Backup" },
+              { value: "full", title: "Backup with attachments" }
+            ],
+            selectedOption: () => "-",
+            onSelectionChanged: async (value) => {
+              if (value === "-") return;
+              await createBackup({
+                mode: value === "partial" ? "partial" : "full"
+              });
+            }
           }
         ]
       },
@@ -67,10 +77,10 @@ export const BackupExportSettings: SettingsGroup[] = [
       },
       {
         key: "auto-backup",
-        title: IS_DESKTOP_APP ? "Automatic backups" : "Backup reminders",
-        description: IS_DESKTOP_APP
-          ? "Backup all your data automatically at a set interval."
-          : "You will be shown regular reminders to backup your data.",
+        title: "Automatic backups",
+        description: `Set the interval to create a backup automatically.
+        
+Note: these backups do not contain attachments.`,
         isHidden: () => !isUserPremium(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.backupReminderOffset, listener),
@@ -93,6 +103,40 @@ export const BackupExportSettings: SettingsGroup[] = [
                 useSettingStore
                   .getState()
                   .setBackupReminderOffset(parseInt(value));
+            }
+          }
+        ]
+      },
+      {
+        key: "auto-backup-with-attachments",
+        title: "Automatic backup with attachments",
+        description: `Set the interval to create a backup (with attachments) automatically.
+
+NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`,
+        isHidden: () => !isUserPremium(),
+        onStateChange: (listener) =>
+          useSettingStore.subscribe(
+            (s) => s.fullBackupReminderOffset,
+            listener
+          ),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { value: "0", title: "Never" },
+              { value: "1", title: "Weekly" },
+              { value: "2", title: "Monthly" }
+            ],
+            selectedOption: () =>
+              useSettingStore.getState().fullBackupReminderOffset.toString(),
+            onSelectionChanged: async (value) => {
+              const verified =
+                useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (verified)
+                useSettingStore
+                  .getState()
+                  .setFullBackupReminderOffset(parseInt(value));
             }
           }
         ]

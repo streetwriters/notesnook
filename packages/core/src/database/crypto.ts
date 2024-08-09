@@ -33,6 +33,7 @@ export class Crypto {
 
 export function isCipher(item: any): item is Cipher<"base64"> {
   return (
+    item !== null &&
     typeof item === "object" &&
     "cipher" in item &&
     "iv" in item &&

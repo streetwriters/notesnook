@@ -86,7 +86,8 @@ const run = async (
         try {
           await db.sync({
             type: type,
-            force: forced
+            force: forced,
+            offlineMode: SettingsService.get().offlineMode
           });
         } catch (e) {
           error = e;

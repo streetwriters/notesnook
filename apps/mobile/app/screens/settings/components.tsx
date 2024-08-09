@@ -32,9 +32,11 @@ import {
   TimeFormatPicker,
   TrashIntervalPicker,
   BackupReminderPicker,
-  ApplockTimerPicker
+  ApplockTimerPicker,
+  BackupWithAttachmentsReminderPicker
 } from "./picker/pickers";
 import ThemeSelector from "./theme-selector";
+import { RestoreBackup } from "./restore-backup";
 
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
@@ -51,5 +53,7 @@ export const components: { [name: string]: ReactElement } = {
   "date-format-selector": <DateFormatPicker />,
   "time-format-selector": <TimeFormatPicker />,
   "theme-selector": <ThemeSelector />,
-  "applock-timer": <ApplockTimerPicker />
+  "applock-timer": <ApplockTimerPicker />,
+  autobackupsattachments: <BackupWithAttachmentsReminderPicker />,
+  backuprestore: <RestoreBackup />
 };

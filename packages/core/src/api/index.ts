@@ -254,7 +254,7 @@ class Database {
       this.sql().withTables(),
       new NNMigrationProvider()
     );
-    await this.onInit(this.sql() as Kysely<RawDatabaseSchema>);
+    await this.onInit(this.sql() as unknown as Kysely<RawDatabaseSchema>);
     await this.initCollections();
     return true;
   }

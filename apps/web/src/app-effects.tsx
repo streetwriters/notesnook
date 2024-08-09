@@ -22,7 +22,12 @@ import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useEditorStore } from "./stores/editor-store";
 import { useStore as useAnnouncementStore } from "./stores/announcement-store";
-import { resetNotices, scheduleBackups } from "./common/notices";
+import { useStore as useSettingStore } from "./stores/setting-store";
+import {
+  resetNotices,
+  scheduleBackups,
+  scheduleFullBackups
+} from "./common/notices";
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
@@ -40,6 +45,7 @@ import { desktop } from "./common/desktop-bridge";
 import { BuyDialog } from "./dialogs/buy-dialog";
 import { FeatureDialog } from "./dialogs/feature-dialog";
 import { AnnouncementDialog } from "./dialogs/announcement-dialog";
+import { logger } from "./utils/logger";
 
 type AppEffectsProps = {
   setShow: (show: boolean) => void;
@@ -90,6 +96,10 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
         if (onboardingKey) await OnboardingDialog.show({ type: onboardingKey });
         await FeatureDialog.show({ featureName: "highlights" });
         await scheduleBackups();
+        await scheduleFullBackups();
+        if (useSettingStore.getState().isFullOfflineMode)
+          // NOTE: we deliberately don't await here because we don't want to pause execution.
+          db.attachments.cacheAttachments().catch(logger.error);
       })();
 
       return () => {

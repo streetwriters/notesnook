@@ -20,7 +20,6 @@ import { Dimensions, Image, Platform } from "react-native";
 import ImageResizer from "@bam.tech/react-native-image-resizer";
 import RNFetchBlob from "react-native-blob-util";
 
-console.log("hello world");
 /**
  * Scale down & compress images to screen width
  * for loading in editor.

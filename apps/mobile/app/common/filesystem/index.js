@@ -24,7 +24,12 @@ import {
   exists,
   readEncrypted,
   writeEncryptedBase64,
-  hashBase64
+  hashBase64,
+  clearCache,
+  deleteCacheFileByName,
+  deleteCacheFileByPath,
+  bulkExists,
+  getCacheSize
 } from "./io";
 import { uploadFile } from "./upload";
 import { cancelable } from "./utils";
@@ -39,5 +44,10 @@ export default {
   exists,
   clearFileStorage,
   getUploadedFileSize,
-  checkAttachment
+  checkAttachment,
+  clearCache,
+  deleteCacheFileByName,
+  deleteCacheFileByPath,
+  bulkExists,
+  getCacheSize
 };

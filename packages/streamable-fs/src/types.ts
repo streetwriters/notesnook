@@ -21,6 +21,6 @@ export type File = {
   filename: string;
   size: number;
   type: string;
-  chunks: number;
+  //  chunks: number;
   additionalData?: { [key: string]: unknown };
 };

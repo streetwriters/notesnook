@@ -29,7 +29,7 @@ type Progress = {
 };
 type ProgressDialogProps<T> = BaseDialogProps<T | Error> & {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   action: (report: (progress: Progress) => void) => T;
 };
 export const ProgressDialog = DialogManager.register(function ProgressDialog<T>(

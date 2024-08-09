@@ -20,12 +20,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import FileStreamSource from "./filestreamsource";
 import { IFileStorage } from "./interfaces";
 import { File } from "./types";
+import { chunkPrefix } from "./utils";
 
 export default class FileHandle {
-  constructor(private readonly storage: IFileStorage, readonly file: File) {}
+  constructor(
+    private readonly storage: IFileStorage,
+    readonly file: File,
+    readonly chunks: string[]
+  ) {}
 
   get readable() {
-    return new ReadableStream(new FileStreamSource(this.storage, this.file));
+    return new ReadableStream(
+      new FileStreamSource(this.storage, this.file, this.chunks)
+    );
   }
 
   get writeable() {
@@ -33,18 +40,20 @@ export default class FileHandle {
       write: async (chunk, controller) => {
         if (controller.signal.aborted) return;
 
-        await this.storage.writeChunk(
-          this.getChunkKey(this.file.chunks++),
-          chunk
-        );
-        await this.storage.setMetadata(this.file.filename, this.file);
+        const lastOffset = this.lastOffset();
+        await this.storage.writeChunk(this.getChunkKey(lastOffset + 1), chunk);
+        this.chunks.push(this.getChunkKey(lastOffset + 1));
       },
       abort: async () => {
-        for (let i = 0; i < this.file.chunks; ++i) {
-          await this.storage.deleteChunk(this.getChunkKey(i));
+        for (const chunk of this.chunks) {
+          await this.storage.deleteChunk(chunk);
         }
       }
     });
+  }
+
+  async writeChunkAtOffset(offset: number, chunk: Uint8Array) {
+    await this.storage.writeChunk(this.getChunkKey(offset), chunk);
   }
 
   async addAdditionalData<T>(key: string, value: T) {
@@ -54,14 +63,14 @@ export default class FileHandle {
   }
 
   async delete() {
-    for (let i = 0; i < this.file.chunks; ++i) {
-      await this.storage.deleteChunk(this.getChunkKey(i));
+    for (const chunk of this.chunks) {
+      await this.storage.deleteChunk(chunk);
     }
     await this.storage.deleteMetadata(this.file.filename);
   }
 
   private getChunkKey(offset: number): string {
-    return `${this.file.filename}-chunk-${offset}`;
+    return `${chunkPrefix(this.file.filename)}${offset}`;
   }
 
   async readChunk(offset: number): Promise<Uint8Array | null> {
@@ -71,9 +80,9 @@ export default class FileHandle {
 
   async readChunks(from: number, length: number): Promise<Blob> {
     const blobParts: BlobPart[] = [];
-    for (let i = from; i < Math.min(from + length, this.file.chunks); ++i) {
+    for (let i = from; i < from + length; ++i) {
       const array = await this.readChunk(i);
-      if (!array) continue;
+      if (!array) throw new Error(`No data found for chunk at offset ${i}.`);
       blobParts.push(array.buffer);
     }
     return new Blob(blobParts, { type: this.file.type });
@@ -81,8 +90,8 @@ export default class FileHandle {
 
   async toBlob() {
     const blobParts: BlobPart[] = [];
-    for (let i = 0; i < this.file.chunks; ++i) {
-      const array = await this.readChunk(i);
+    for (const chunk of this.chunks) {
+      const array = await this.storage.readChunk(chunk);
       if (!array) continue;
       blobParts.push(array.buffer);
     }
@@ -91,11 +100,23 @@ export default class FileHandle {
 
   async size() {
     let size = 0;
-    for (let i = 0; i < this.file.chunks; ++i) {
-      const array = await this.readChunk(i);
+    for (const chunk of this.chunks) {
+      const array = await this.storage.readChunk(chunk);
       if (!array) continue;
       size += array.length;
     }
     return size;
+  }
+
+  async listChunks() {
+    return (
+      await this.storage.listChunks(chunkPrefix(this.file.filename))
+    ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  }
+
+  private lastOffset() {
+    const lastChunk = this.chunks.at(-1);
+    if (!lastChunk) return -1;
+    return parseInt(lastChunk.replace(chunkPrefix(this.file.filename), ""));
   }
 }

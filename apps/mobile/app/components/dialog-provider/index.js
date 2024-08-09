@@ -23,6 +23,7 @@ import { AnnouncementDialog } from "../announcements";
 import AuthModal from "../auth/auth-modal";
 import { SessionExpired } from "../auth/session-expired";
 import { Dialog } from "../dialog";
+import { AppLockPassword } from "../dialogs/applock-password";
 import JumpToSectionDialog from "../dialogs/jump-to-section";
 import { LoadingDialog } from "../dialogs/loading";
 import PDFPreview from "../dialogs/pdf-preview";
@@ -35,8 +36,7 @@ import { Expiring } from "../premium/expiring";
 import SheetProvider from "../sheet-provider";
 import RateAppSheet from "../sheets/rate-app";
 import RecoveryKeySheet from "../sheets/recovery-key";
-import RestoreDataSheet from "../sheets/restore-data";
-import { AppLockPassword } from "../dialogs/applock-password";
+import Progress from "../dialogs/progress";
 
 const DialogProvider = () => {
   const { colors } = useThemeColors();
@@ -52,7 +52,6 @@ const DialogProvider = () => {
       <RecoveryKeySheet colors={colors} />
       <SheetProvider />
       <SheetProvider context="sync_progress" />
-      <RestoreDataSheet />
       <ResultDialog />
       <VaultDialog colors={colors} />
       <RateAppSheet />
@@ -62,6 +61,7 @@ const DialogProvider = () => {
       <SessionExpired />
       <PDFPreview />
       <JumpToSectionDialog />
+      <Progress />
     </>
   );
 };

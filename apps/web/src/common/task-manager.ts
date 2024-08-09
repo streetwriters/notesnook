@@ -21,7 +21,7 @@ import { ProgressDialog } from "../dialogs/progress-dialog";
 import { removeStatus, updateStatus } from "../hooks/use-status";
 
 type TaskType = "status" | "modal";
-type TaskAction<T> = (report: ProgressReportCallback) => T | Promise<T>;
+export type TaskAction<T> = (report: ProgressReportCallback) => T | Promise<T>;
 type BaseTaskDefinition<TTaskType extends TaskType, TReturnType> = {
   type: TTaskType;
   action: TaskAction<TReturnType>;
@@ -31,6 +31,7 @@ type StatusTaskDefinition<TReturnType> = BaseTaskDefinition<
   "status",
   TReturnType
 > & {
+  title: string;
   id: string;
 };
 
@@ -39,7 +40,7 @@ type ModalTaskDefinition<TReturnType> = BaseTaskDefinition<
   TReturnType
 > & {
   title: string;
-  subtitle: string;
+  subtitle?: string;
 };
 
 type TaskDefinition<TReturnType> =
@@ -59,6 +60,10 @@ export class TaskManager {
     switch (task.type) {
       case "status": {
         const statusTask = task;
+        updateStatus({
+          key: statusTask.id,
+          status: task.title
+        });
         const result = await statusTask.action((progress) => {
           let percentage: number | undefined = undefined;
           if (progress.current && progress.total)

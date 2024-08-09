@@ -412,7 +412,7 @@ class UserManager {
         .storage()
         .decrypt(userEncryptionKey, user.attachmentsKey);
       if (!plainData) return;
-      return JSON.parse(plainData);
+      return JSON.parse(plainData) as SerializedKey;
     } catch (e) {
       logger.error(e, "Could not get attachments encryption key.");
       if (e instanceof Error)

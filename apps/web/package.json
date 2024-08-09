@@ -15,6 +15,7 @@
     "@dnd-kit/sortable": "^8.0.0",
     "@emotion/react": "11.11.1",
     "@hazae41/foras": "^2.1.4",
+    "@henrygd/queue": "^1.0.6",
     "@mdi/js": "^7.2.96",
     "@mdi/react": "^1.6.1",
     "@notesnook-importer/core": "^2.0.0",

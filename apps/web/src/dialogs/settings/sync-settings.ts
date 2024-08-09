@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SettingsGroup } from "./types";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useSettingStore } from "../../stores/setting-store";
 import { ConfirmDialog } from "../confirm";
 
 export const SyncSettings: SettingsGroup[] = [
@@ -73,6 +74,21 @@ export const SyncSettings: SettingsGroup[] = [
             type: "toggle",
             isToggled: () => useAppStore.getState().isRealtimeSyncEnabled,
             toggle: () => useAppStore.getState().toggleRealtimeSync()
+          }
+        ]
+      },
+      {
+        key: "full-offline-mode",
+        title: "Full offline mode",
+        description: "Download everything including attachments on sync",
+        keywords: ["offline mode"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.isFullOfflineMode, listener),
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useSettingStore.getState().isFullOfflineMode,
+            toggle: () => useSettingStore.getState().toggleFullOfflineMode()
           }
         ]
       },

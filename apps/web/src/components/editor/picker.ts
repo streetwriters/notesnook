@@ -240,14 +240,13 @@ function withProgress<T>(
         ({ type, total, loaded }: AttachmentProgress) => {
           if (type !== "encrypt") return;
           report({
-            current: loaded,
-            total: total,
+            current: Math.round((loaded / total) * 100),
+            total: 100,
             text: file.name
           });
         }
       );
-      event.unsubscribe();
-      return action();
+      return action().finally(() => event.unsubscribe());
     }
   });
 }
