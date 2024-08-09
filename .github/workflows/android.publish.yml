@@ -22,7 +22,7 @@ jobs:
       - name: Use specific Java version for the builds
         uses: joschi/setup-jdk@v2
         with:
-          java-version: "11"
+          java-version: "17"
           architecture: "x64"
 
       - name: Install node modules
