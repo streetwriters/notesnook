@@ -98,6 +98,7 @@ def getNpmVersion() {
     return jsonPackage["version"]
 }
 
+def isBuildingAAB = gradle.startParameter.getTaskNames().any { it.contains("bundleRelease") }
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -183,9 +184,15 @@ android {
                        defaultConfig.versionCode * 5 + versionCodes.get(abi)
                     println("Fdroid Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
                 } else {
-                    println("Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
-                    output.versionCodeOverride =
+                    if (isBuildingAAB) {
+                        output.versionCodeOverride = 4 * 1048576 + defaultConfig.versionCode
+                        println("AAB version code: ${output.versionCodeOverride}");
+                    } else {
+                        output.versionCodeOverride =
                         versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
+                        println("Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
+                    }
+                    
                 }
                 
             }
