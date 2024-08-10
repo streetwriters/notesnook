@@ -30,9 +30,9 @@ PODS:
   - fmt (9.1.0)
   - glog (0.3.5)
   - GZIP (1.3.2)
-  - hermes-engine (0.74.4):
-    - hermes-engine/Pre-built (= 0.74.4)
-  - hermes-engine/Pre-built (0.74.4)
+  - hermes-engine (0.74.5):
+    - hermes-engine/Pre-built (= 0.74.5)
+  - hermes-engine/Pre-built (0.74.5)
   - JWTDecode (3.0.1)
   - MMKV (1.3.9):
     - MMKVCore (~> 1.3.9)
@@ -1807,7 +1807,7 @@ SPEC CHECKSUMS:
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
   GZIP: 3c0abf794bfce8c7cb34ea05a1837752416c8868
-  hermes-engine: 6312f669c895e05f0f6029554061593711770ea6
+  hermes-engine: 8c1577f3fdb849cbe7729c2e7b5abc4b845e88f8
   JWTDecode: 2eed97c2fa46ccaf3049a787004eedf0be474a87
   MMKV: 817ba1eea17421547e01e087285606eb270a8dcb
   MMKVCore: af055b00e27d88cd92fad301c5fecd1ff9b26dd9
