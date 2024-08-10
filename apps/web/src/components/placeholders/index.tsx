@@ -28,8 +28,9 @@ function Placeholder(props: PlaceholderProps) {
   const { context, text } = props;
   const tip = useTip(context);
   const syncStatus = useAppStore((store) => store.syncStatus);
+  const isFirstSync = useAppStore((store) => store.lastSynced === 0);
 
-  if (syncStatus.key === "syncing" && context === "notes") {
+  if (isFirstSync && syncStatus.key === "syncing" && context === "notes") {
     return (
       <Flex
         variant="columnCenter"
