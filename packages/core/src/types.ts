@@ -171,7 +171,7 @@ export interface Note extends BaseItem<"note"> {
   /**
    * @deprecated only kept here for migration purposes.
    */
-  tags?: string[];
+  tags?: (string | null)[];
   /**
    * @deprecated only kept here for migration purposes.
    */

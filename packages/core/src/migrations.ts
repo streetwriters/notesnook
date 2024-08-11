@@ -247,6 +247,8 @@ const migrations: Migration[] = [
       },
       note: async (item, db) => {
         for (const tag of item.tags || []) {
+          if (!tag) continue;
+
           const oldTagId = makeId(tag);
           const oldTag = db.legacyTags.get(oldTagId);
           const alias = db.legacySettings.getAlias(oldTagId);
