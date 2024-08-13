@@ -30,7 +30,7 @@ import { unzip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../../../common/database";
 import storage from "../../../common/database/storage";
 import { deleteCacheFileByName } from "../../../common/filesystem/io";
-import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
+import { cacheDir } from "../../../common/filesystem/utils";
 import { Dialog } from "../../../components/dialog";
 import BaseDialog from "../../../components/dialog/base-dialog";
 import DialogContainer from "../../../components/dialog/dialog-container";
@@ -327,202 +327,212 @@ export const RestoreBackup = () => {
 
   return (
     <>
-      <View>
-        {progress ? (
-          <BaseDialog visible>
-            <DialogContainer
-              style={{
-                paddingHorizontal: 12,
-                paddingBottom: 10
-              }}
-            >
-              <Dialog context="local" />
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  paddingHorizontal: 50,
-                  gap: 10,
-                  paddingBottom: 20
+      <FlatList
+        data={[0]}
+        renderItem={() => {
+          return (
+            <View>
+              {progress ? (
+                <BaseDialog visible>
+                  <DialogContainer
+                    style={{
+                      paddingHorizontal: 12,
+                      paddingBottom: 10
+                    }}
+                  >
+                    <Dialog context="local" />
+                    <View
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        paddingHorizontal: 50,
+                        gap: 10,
+                        paddingBottom: 20
+                      }}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          width: 100,
+                          paddingTop: 20
+                        }}
+                      >
+                        <ProgressBarComponent
+                          height={5}
+                          width={100}
+                          animated={true}
+                          useNativeDriver
+                          indeterminate
+                          indeterminateAnimationDuration={2000}
+                          unfilledColor={colors.secondary.background}
+                          color={colors.primary.accent}
+                          borderWidth={0}
+                        />
+                      </View>
+
+                      <Heading color={colors.primary.paragraph} size={SIZE.lg}>
+                        Creating backup
+                      </Heading>
+                      <Paragraph
+                        style={{
+                          textAlign: "center"
+                        }}
+                        color={colors.secondary.paragraph}
+                      >
+                        {progress
+                          ? progress
+                          : "Please wait while we create backup"}
+                      </Paragraph>
+
+                      <Button
+                        title="Cancel"
+                        type="secondaryAccented"
+                        onPress={() => {
+                          setProgress(undefined);
+                        }}
+                        width="100%"
+                      />
+                    </View>
+                  </DialogContainer>
+                </BaseDialog>
+              ) : null}
+
+              <SectionItem
+                item={{
+                  id: "restore-from-files",
+                  name: "Restore from files",
+                  icon: "folder",
+                  modifer: async () => {
+                    useUserStore.setState({
+                      disableAppLockRequests: true
+                    });
+                    const file = await DocumentPicker.pickSingle({
+                      copyTo: "cachesDirectory"
+                    });
+
+                    setTimeout(() => {
+                      useUserStore.setState({
+                        disableAppLockRequests: false
+                      });
+                    }, 1000);
+
+                    restoreBackup({
+                      uri:
+                        Platform.OS === "android"
+                          ? (("file://" + file.fileCopyUri) as string)
+                          : (file.fileCopyUri as string),
+                      deleteFile: true,
+                      updateProgress: setProgress
+                    });
+                  },
+                  description:
+                    "Select a backup file from your device to restore backup"
                 }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    width: 100,
-                    paddingTop: 20
-                  }}
-                >
-                  <ProgressBarComponent
-                    height={5}
-                    width={100}
-                    animated={true}
-                    useNativeDriver
-                    indeterminate
-                    indeterminateAnimationDuration={2000}
-                    unfilledColor={colors.secondary.background}
-                    color={colors.primary.accent}
-                    borderWidth={0}
+              />
+
+              <SectionItem
+                item={{
+                  id: "select-backup-folder",
+                  name: "Select folder with backup files",
+                  icon: "folder",
+                  modifer: async () => {
+                    const folder = await ScopedStorage.openDocumentTree(true);
+                    let subfolder;
+                    if (folder.name !== "Notesnook backups") {
+                      subfolder = await ScopedStorage.createDirectory(
+                        folder.uri,
+                        "Notesnook backups"
+                      );
+                    } else {
+                      subfolder = folder;
+                    }
+                    SettingsService.set({
+                      backupDirectoryAndroid: subfolder
+                    });
+                    setBackupDirectoryAndroid(subfolder);
+                    setLoading(true);
+                    checkBackups();
+                  },
+                  description:
+                    "Select folder where Notesnook backup files are stored to view and restore them from the app"
+                }}
+              />
+
+              <FlatList
+                ListHeaderComponent={
+                  <View
+                    style={{
+                      backgroundColor: colors.primary.background,
+                      marginBottom: 10
+                    }}
+                  >
+                    <Heading color={colors.primary.accent} size={SIZE.xs}>
+                      RECENT BACKUPS
+                    </Heading>
+                  </View>
+                }
+                stickyHeaderIndices={[0]}
+                ListEmptyComponent={
+                  loading ? (
+                    <View
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: 300,
+                        paddingHorizontal: 50
+                      }}
+                    >
+                      <ActivityIndicator
+                        color={colors.primary.accent}
+                        size={SIZE.lg}
+                      />
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: 12,
+                        height: 300,
+                        paddingHorizontal: 50
+                      }}
+                    >
+                      <Paragraph
+                        style={{
+                          textAlign: "center"
+                        }}
+                        color={colors.secondary.paragraph}
+                      >
+                        No backups were found.{" "}
+                        {!backupDirectoryAndroid
+                          ? `Please select a folder with backup files to view them here.`
+                          : null}
+                      </Paragraph>
+                    </View>
+                  )
+                }
+                windowSize={2}
+                keyExtractor={(item) =>
+                  (item as ScopedStorage.FileType).name ||
+                  (item as ReactNativeBlobUtilStat).filename
+                }
+                style={{
+                  paddingHorizontal: 12
+                }}
+                ListFooterComponent={
+                  <View
+                    style={{
+                      height: 200
+                    }}
                   />
-                </View>
-
-                <Heading color={colors.primary.paragraph} size={SIZE.lg}>
-                  Creating backup
-                </Heading>
-                <Paragraph
-                  style={{
-                    textAlign: "center"
-                  }}
-                  color={colors.secondary.paragraph}
-                >
-                  {progress ? progress : "Please wait while we create backup"}
-                </Paragraph>
-
-                <Button
-                  title="Cancel"
-                  type="secondaryAccented"
-                  onPress={() => {
-                    setProgress(undefined);
-                  }}
-                  width="100%"
-                />
-              </View>
-            </DialogContainer>
-          </BaseDialog>
-        ) : null}
-
-        <SectionItem
-          item={{
-            id: "restore-from-files",
-            name: "Restore from files",
-            icon: "folder",
-            modifer: async () => {
-              useUserStore.setState({
-                disableAppLockRequests: true
-              });
-              const file = await DocumentPicker.pickSingle({
-                copyTo: "cachesDirectory"
-              });
-
-              setTimeout(() => {
-                useUserStore.setState({
-                  disableAppLockRequests: false
-                });
-              }, 1000);
-
-              restoreBackup({
-                uri:
-                  Platform.OS === "android"
-                    ? (("file://" + file.fileCopyUri) as string)
-                    : (file.fileCopyUri as string),
-                deleteFile: true,
-                updateProgress: setProgress
-              });
-            },
-            description:
-              "Select a backup file from your device to restore backup"
-          }}
-        />
-
-        <SectionItem
-          item={{
-            id: "select-backup-folder",
-            name: "Select folder with backup files",
-            icon: "folder",
-            modifer: async () => {
-              const folder = await ScopedStorage.openDocumentTree(true);
-              let subfolder;
-              if (folder.name !== "Notesnook backups") {
-                subfolder = await ScopedStorage.createDirectory(
-                  folder.uri,
-                  "Notesnook backups"
-                );
-              } else {
-                subfolder = folder;
-              }
-              SettingsService.set({
-                backupDirectoryAndroid: subfolder
-              });
-              setBackupDirectoryAndroid(subfolder);
-              setLoading(true);
-            },
-            description:
-              "Select folder where Notesnook backup files are stored to view and restore them from the app"
-          }}
-        />
-
-        <FlatList
-          ListHeaderComponent={
-            <View
-              style={{
-                backgroundColor: colors.primary.background,
-                marginBottom: 10
-              }}
-            >
-              <Heading color={colors.primary.accent} size={SIZE.xs}>
-                RECENT BACKUPS
-              </Heading>
+                }
+                data={files}
+                renderItem={renderItem}
+              />
             </View>
-          }
-          stickyHeaderIndices={[0]}
-          ListEmptyComponent={
-            loading ? (
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: 300,
-                  paddingHorizontal: 50
-                }}
-              >
-                <ActivityIndicator
-                  color={colors.primary.accent}
-                  size={SIZE.lg}
-                />
-              </View>
-            ) : (
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: 12,
-                  height: 300,
-                  paddingHorizontal: 50
-                }}
-              >
-                <Paragraph
-                  style={{
-                    textAlign: "center"
-                  }}
-                  color={colors.secondary.paragraph}
-                >
-                  No backups were found.{" "}
-                  {!backupDirectoryAndroid
-                    ? `Please select a folder with backup files to view them here.`
-                    : null}
-                </Paragraph>
-              </View>
-            )
-          }
-          windowSize={2}
-          keyExtractor={(item) =>
-            (item as ScopedStorage.FileType).name ||
-            (item as ReactNativeBlobUtilStat).filename
-          }
-          style={{
-            paddingHorizontal: 12
-          }}
-          ListFooterComponent={
-            <View
-              style={{
-                height: 200
-              }}
-            />
-          }
-          data={files}
-          renderItem={renderItem}
-        />
-      </View>
+          );
+        }}
+      />
     </>
   );
 };
@@ -541,6 +551,12 @@ const BackupItem = ({
   const isLegacyBackup =
     item.path?.endsWith(".nnbackup") ||
     (item as ScopedStorage.FileType).uri?.endsWith(".nnbackup");
+  const itemName = (
+    (item as ReactNativeBlobUtilStat).filename ||
+    (item as ScopedStorage.FileType).name
+  )
+    .replace(".nnbackupz", "")
+    .replace(".nnbackup", "");
 
   return (
     <View
@@ -556,14 +572,7 @@ const BackupItem = ({
       }}
     >
       <View>
-        <Paragraph size={SIZE.sm}>
-          {(
-            (item as ReactNativeBlobUtilStat).filename ||
-            (item as ScopedStorage.FileType).name
-          )
-            .replace(".nnbackupz", "")
-            .replace(".nnbackup", "")}
-        </Paragraph>
+        <Paragraph size={SIZE.sm}>{itemName}</Paragraph>
         <Paragraph
           size={SIZE.xs}
           color={colors.secondary.paragraph}
@@ -580,15 +589,22 @@ const BackupItem = ({
           paddingHorizontal: 12,
           height: 35
         }}
-        onPress={() =>
-          restoreBackup({
-            uri:
-              Platform.OS === "android"
-                ? (item as ScopedStorage.FileType).uri
-                : item.path,
-            updateProgress: updateProgress
-          })
-        }
+        onPress={() => {
+          presentDialog({
+            title: `Restore ${itemName}`,
+            paragraph: `Are you sure you want to restore this backup?`,
+            positiveText: "Restore",
+            negativeText: "Cancel",
+            positivePress: async () =>
+              restoreBackup({
+                uri:
+                  Platform.OS === "android"
+                    ? (item as ScopedStorage.FileType).uri
+                    : (item as ReactNativeBlobUtilStat).path,
+                updateProgress
+              })
+          });
+        }}
       />
     </View>
   );
