@@ -242,7 +242,7 @@ export default function ReminderSheet({
         <Input
           fwdRef={titleRef}
           defaultValue={reminder?.title || referencedItem?.title}
-          placeholder="Remind me of..."
+          placeholder={strings.remindeMeOf()}
           onChangeText={(text) => (title.current = text)}
           wrapperStyle={{
             marginTop: 10
@@ -253,7 +253,7 @@ export default function ReminderSheet({
           defaultValue={
             reminder ? reminder?.description : referencedItem?.headline
           }
-          placeholder="Add a short note"
+          placeholder={strings.addShortNote()}
           onChangeText={(text) => (details.current = text)}
           containerStyle={{
             maxHeight: 80

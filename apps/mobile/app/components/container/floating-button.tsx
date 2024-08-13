@@ -34,11 +34,9 @@ import { useSelectionStore } from "../../stores/use-selection-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { getElevationStyle } from "../../utils/elevation";
 import { SIZE, normalize } from "../../utils/size";
-import NativeTooltip from "../../utils/tooltip";
 import { Pressable } from "../ui/pressable";
 
 interface FloatingButtonProps {
-  title: string;
   onPress: () => void;
   color?: string;
   shouldShow?: boolean;
@@ -46,7 +44,6 @@ interface FloatingButtonProps {
 }
 
 const FloatingButton = ({
-  title,
   onPress,
   color,
   alwaysVisible = false
@@ -125,11 +122,6 @@ const FloatingButton = ({
         style={{
           ...getElevationStyle(5),
           borderRadius: 100
-        }}
-        onLongPress={(event) => {
-          if (title) {
-            NativeTooltip.show(event, title, NativeTooltip.POSITIONS.LEFT);
-          }
         }}
         onPress={onPress}
       >

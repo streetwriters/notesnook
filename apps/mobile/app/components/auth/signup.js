@@ -176,14 +176,14 @@ export const Signup = ({ changeMode, trial }) => {
             }}
             testID="input.email"
             onErrorCheck={(e) => setError(e)}
-            returnKeyLabel="Next"
+            returnKeyLabel={strings.next()}
             returnKeyType="next"
             autoComplete="email"
             validationType="email"
             autoCorrect={false}
             autoCapitalize="none"
-            errorMessage="Email is invalid"
-            placeholder="Email"
+            errorMessage={strings.email()}
+            placeholder={strings.email()}
             onSubmit={() => {
               passwordInputRef.current?.focus();
             }}
@@ -196,14 +196,14 @@ export const Signup = ({ changeMode, trial }) => {
             }}
             testID="input.password"
             onErrorCheck={(e) => setError(e)}
-            returnKeyLabel="Next"
+            returnKeyLabel={strings.next()}
             returnKeyType="next"
             secureTextEntry
             autoComplete="password"
             autoCapitalize="none"
             validationType="password"
             autoCorrect={false}
-            placeholder="Password"
+            placeholder={strings.password()}
             onSubmit={() => {
               confirmPasswordInputRef.current?.focus();
             }}
@@ -216,7 +216,7 @@ export const Signup = ({ changeMode, trial }) => {
             }}
             testID="input.confirmPassword"
             onErrorCheck={(e) => setError(e)}
-            returnKeyLabel="Signup"
+            returnKeyLabel={strings.done()}
             returnKeyType="done"
             secureTextEntry
             autoComplete="password"
@@ -224,7 +224,7 @@ export const Signup = ({ changeMode, trial }) => {
             autoCorrect={false}
             validationType="confirmPassword"
             customValidator={() => password.current}
-            placeholder="Confirm password"
+            placeholder={strings.confirmPassword()}
             marginBottom={12}
             onSubmit={signup}
           />

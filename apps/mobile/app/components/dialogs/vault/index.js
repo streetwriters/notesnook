@@ -713,10 +713,16 @@ export class VaultDialog extends Component {
                       : this.onPress;
                   }}
                   autoComplete="password"
-                  returnKeyLabel={changePassword ? "Next" : this.state.title}
+                  returnKeyLabel={
+                    changePassword ? strings.next() : this.state.title
+                  }
                   returnKeyType={changePassword ? "next" : "done"}
                   secureTextEntry
-                  placeholder={changePassword ? "Current password" : "Password"}
+                  placeholder={
+                    changePassword
+                      ? strings.currentPassword()
+                      : strings.password()
+                  }
                 />
 
                 {!this.state.biometricUnlock ||
@@ -773,7 +779,7 @@ export class VaultDialog extends Component {
                   returnKeyLabel="Change"
                   returnKeyType="done"
                   secureTextEntry
-                  placeholder={"New password"}
+                  placeholder={strings.newPassword()}
                 />
               </>
             ) : null}
@@ -788,13 +794,13 @@ export class VaultDialog extends Component {
                     this.password = value;
                   }}
                   autoComplete="password"
-                  returnKeyLabel="Next"
+                  returnKeyLabel={strings.next()}
                   returnKeyType="next"
                   secureTextEntry
                   onSubmit={() => {
                     this.confirmPassRef.current?.focus();
                   }}
-                  placeholder="Password"
+                  placeholder={strings.password()}
                 />
 
                 <Input
@@ -823,7 +829,7 @@ export class VaultDialog extends Component {
                     }
                   }}
                   onSubmit={this.onPress}
-                  placeholder="Confirm password"
+                  placeholder={strings.confirmPassword()}
                 />
               </View>
             ) : null}

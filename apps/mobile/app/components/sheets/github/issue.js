@@ -141,7 +141,7 @@ Logged in: ${user ? "yes" : "no"}`,
           <Seperator half />
 
           <TextInput
-            placeholder="Title"
+            placeholder={strings.title()}
             onChangeText={(v) => (title.current = v)}
             defaultValue={title.current}
             style={{
@@ -160,13 +160,7 @@ Logged in: ${user ? "yes" : "no"}`,
           <TextInput
             ref={bodyRef}
             multiline
-            placeholder={`Tell us more about the issue you are facing. 
-
-For example:
-- What were you trying to do in the app?
-- What did you expect to happen?
-- Steps to reproduce the issue 
-- Things you have tried etc.`}
+            placeholder={strings.issuePlaceholder()}
             numberOfLines={5}
             textAlignVertical="top"
             onChangeText={(v) => (body.current = v)}

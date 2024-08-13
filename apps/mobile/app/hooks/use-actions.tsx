@@ -255,8 +255,8 @@ export const useActions = ({
       item.type === "color"
     ) {
       presentDialog({
-        title: `Delete ${item.type}`,
-        paragraph: `Are you sure you want to delete this ${item.type}?`,
+        title: strings.deleteItem(item.type),
+        paragraph: strings.deleteItemConfirmation(item.type),
         positivePress: async () => {
           if (item.type === "reminder") {
             await db.reminders.remove(item.id);

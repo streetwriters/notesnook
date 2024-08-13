@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { strings } from "@notesnook/intl";
 import { db } from "../common/database";
 import { presentDialog } from "../components/dialog/functions";
 import BiometricService from "../services/biometrics";
@@ -65,8 +66,7 @@ export async function unlockVault({
               const unlocked = await db.vault.unlock(value);
               if (!unlocked) {
                 ToastManager.show({
-                  heading: "Invalid password",
-                  message: "Please enter a valid password",
+                  heading: strings.passwordIncorrect(),
                   type: "error",
                   context: "local"
                 });

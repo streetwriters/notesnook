@@ -241,9 +241,9 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
             />
 
             <Button
-              title={
-                strings["2faCodeSecondaryMethodText"][currentMethod.method]
-              }
+              title={strings["2faCodeSecondaryMethodText"][
+                currentMethod.method
+              ]()}
               type="plain"
               onPress={onRequestSecondaryMethod}
               height={30}

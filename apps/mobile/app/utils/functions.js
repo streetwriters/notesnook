@@ -28,6 +28,7 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { eOnNotebookUpdated, eUpdateNoteInEditor } from "./events";
 import { getParentNotebookId } from "./notebooks";
 import { useTagStore } from "../stores/use-tag-store";
+import { strings } from "@notesnook/intl";
 
 function confirmDeleteAllNotes(items, type, context) {
   return new Promise((resolve) => {
@@ -85,8 +86,8 @@ export const deleteItems = async (items, type, context) => {
     for (const id of ids) {
       if (db.monographs.isPublished(id)) {
         ToastManager.show({
-          heading: "Some notes are published",
-          message: "Unpublish published notes to delete them",
+          heading: strings.someNotesPublished(),
+          message: strings.unpublishToDelete(),
           type: "error",
           context: "global"
         });
@@ -113,10 +114,10 @@ export const deleteItems = async (items, type, context) => {
     }
   } else if (type === "tag") {
     presentDialog({
-      title: `Delete ${ids.length} ${ids.length > 1 ? "tags" : "tag"}?`,
-      positiveText: "Delete",
-      negativeText: "Cancel",
-      paragraph: "Are you sure you want to delete these tags?",
+      title: strings.deleteTags(ids.length),
+      positiveText: strings.delete(),
+      negativeText: strings.cancel(),
+      paragraph: strings.deleteTagsConfirm(),
       positivePress: async () => {
         await db.tags.remove(...ids);
         useTagStore.getState().refresh();

@@ -311,15 +311,23 @@ export const MFASetup = ({
                 phoneNumber.current = value;
               }}
               placeholder={
-                method?.id === "email" ? "Enter email address" : "+1234567890"
+                method?.id === "email"
+                  ? strings.enterEmailAddress()
+                  : "+1234567890"
               }
               onSubmit={() => {
                 onSendCode();
               }}
               onErrorCheck={(e) => setError(e)}
-              validationType="phonenumber"
-              keyboardType="phone-pad"
-              errorMessage="Please enter a valid phone number with country code"
+              validationType={method?.id === "email" ? "email" : "phonenumber"}
+              keyboardType={
+                method.id == "email" ? "email-address" : "phone-pad"
+              }
+              errorMessage={
+                method?.id === "email"
+                  ? strings.enterValidEmail()
+                  : strings.enterValidPhone()
+              }
               buttons={
                 error ? null : (
                   <Button
@@ -378,7 +386,7 @@ export const MFASetup = ({
             />
 
             <Button
-              title="Change 2FA method"
+              title={strings.change2faMethod()}
               type="plain"
               height={25}
               onPress={() => {
@@ -415,7 +423,7 @@ export const MFARecoveryCodes = ({
         setLoading(false);
       } catch (e) {
         const error = e as Error;
-        ToastManager.error(error, "Error getting codes", "local");
+        ToastManager.error(error, strings.errorGettingCodes(), "local");
         setLoading(false);
       }
     })();

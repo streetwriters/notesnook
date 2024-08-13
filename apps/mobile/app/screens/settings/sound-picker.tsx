@@ -32,6 +32,7 @@ import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
+import { strings } from "@notesnook/intl";
 
 const SoundItem = ({
   playingSoundId,
@@ -131,7 +132,7 @@ export default function SoundPicker() {
       setRingtones([
         {
           soundID: "defaultSound",
-          title: "Default sound",
+          title: strings.defaultSound(),
           url: ""
         },
         ...results

@@ -238,8 +238,8 @@ export default function LinkNote(props: {
         <Input
           placeholder={
             selectedNote
-              ? "Search a section of a note to link to"
-              : "Search a note to link to"
+              ? strings.searchSectionToLinkPlaceholder()
+              : strings.searchNoteToLinkPlaceholder()
           }
           containerStyle={{
             width: "100%"

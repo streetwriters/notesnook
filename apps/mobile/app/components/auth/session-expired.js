@@ -211,13 +211,13 @@ export const SessionExpired = () => {
               onChangeText={(value) => {
                 password.current = value;
               }}
-              returnKeyLabel="Next"
+              returnKeyLabel={strings.done()}
               returnKeyType="next"
               secureTextEntry
               autoComplete="password"
               autoCapitalize="none"
               autoCorrect={false}
-              placeholder="Password"
+              placeholder={strings.password()}
               onSubmit={() => login()}
             />
           ) : null}

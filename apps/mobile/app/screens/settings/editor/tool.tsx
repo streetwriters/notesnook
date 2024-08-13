@@ -82,10 +82,9 @@ export const Tool = ({
               }
               presentDialog({
                 context: "global",
-                title: "Delete collapsed section?",
-                positiveText: "Delete",
-                paragraph:
-                  "All tools in the collapsed section will also be removed.",
+                title: strings.deleteCollapsed(),
+                positiveText: strings.delete(),
+                paragraph: strings.deleteCollapsedDesc(),
                 positivePress: () => {
                   if (typeof groupIndex !== "number") return;
                   const _data = useDragState.getState().data.slice();
