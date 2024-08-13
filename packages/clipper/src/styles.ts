@@ -70,18 +70,7 @@ const SHORTHANDS = [
 
 export async function inlineStylesheets(options?: FetchOptions) {
   for (const sheet of document.styleSheets) {
-    if (skipStyleSheet(sheet)) continue;
-
-    const node = sheet.ownerNode;
-    if (sheet.href && node instanceof HTMLLinkElement) {
-      try {
-        sheet.cssRules.length;
-      } catch (_e) {
-        const styleNode = await downloadStylesheet(node.href, options);
-        if (styleNode) node.replaceWith(styleNode);
-        console.error("Failed to access sheet", node.href, _e);
-      }
-    }
+    if (await skipStyleSheet(sheet, options)) continue;
   }
   await resolveImports(options);
 }
@@ -89,7 +78,7 @@ export async function inlineStylesheets(options?: FetchOptions) {
 async function resolveImports(options?: FetchOptions) {
   for (const sheet of document.styleSheets) {
     const rulesToDelete = [];
-    if (skipStyleSheet(sheet)) continue;
+    if (await skipStyleSheet(sheet, options)) continue;
 
     for (let i = 0; i < sheet.cssRules.length; ++i) {
       const rule = sheet.cssRules.item(i);
@@ -137,12 +126,12 @@ type PseudoElementStyle = BaseStyle & {
 type CSSStyledElements = Map<StyleableElement, SpecifiedStyle[]>;
 type CSSPseudoElements = Map<StyleableElement, PseudoElementStyle[]>;
 
-export function cacheStylesheets(documentStyles: CSSStyleDeclaration) {
+export async function cacheStylesheets(documentStyles: CSSStyleDeclaration) {
   const styledElements: CSSStyledElements = new Map();
   const styledPseudoElements: CSSPseudoElements = new Map();
 
   for (const sheet of document.styleSheets) {
-    if (skipStyleSheet(sheet)) continue;
+    if (await skipStyleSheet(sheet)) continue;
     let href = sheet.href || undefined;
     if (!href && sheet.ownerNode instanceof HTMLElement)
       href = sheet.ownerNode.getAttribute("href") || undefined;
@@ -339,7 +328,18 @@ function lazyComputedStyle(element: StyleableElement) {
   }) as { style: CSSStyleDeclaration };
 }
 
-function skipStyleSheet(sheet: StyleSheet) {
+async function skipStyleSheet(sheet: CSSStyleSheet, options?: FetchOptions) {
+  try {
+    sheet.cssRules.length;
+  } catch (_e) {
+    const node = sheet.ownerNode;
+    if (sheet.href && node instanceof HTMLLinkElement) {
+      const styleNode = await downloadStylesheet(node.href, options);
+      if (styleNode) node.replaceWith(styleNode);
+    }
+    return true;
+  }
+
   return sheet.media.mediaText
     .split(",")
     .map((t) => t.trim())
