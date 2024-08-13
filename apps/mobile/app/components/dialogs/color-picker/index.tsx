@@ -149,7 +149,7 @@ const ColorPicker = ({
               }}
               testID="color-title-input"
               defaultValue={title.current}
-              placeholder={title.current || "Color title"}
+              placeholder={title.current || strings.colorTitle()}
             />
 
             <Button

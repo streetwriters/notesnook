@@ -301,7 +301,7 @@ const PublishNoteSheet = ({
                   blurOnSubmit
                   secureTextEntry
                   defaultValue={passwordValue.current}
-                  placeholder="Enter Password"
+                  placeholder={strings.enterPassword()}
                 />
                 <Seperator half />
               </>

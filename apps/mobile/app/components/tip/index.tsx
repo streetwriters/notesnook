@@ -116,7 +116,7 @@ export const Tip = ({
         color={colors.primary.paragraph}
         size={SIZE.md}
       >
-        {tip.text}
+        {tip.text()}
       </Paragraph>
       {tip.image && !noImage && (
         <View

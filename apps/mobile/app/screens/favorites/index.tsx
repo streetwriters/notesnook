@@ -53,13 +53,13 @@ export const Favorites = ({
       <SelectionHeader id={route.name} items={favorites} type="note" />
       <Header
         renderedInRoute={route.name}
-        title={route.name}
+        title={strings.routes[route.name]()}
         canGoBack={false}
         hasSearch={true}
         id={route.name}
         onSearch={() => {
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${route.name?.toLowerCase()}`,
+            placeholder: strings.searchInRoute(route.name),
             type: "note",
             title: route.name,
             route: route.name,
@@ -81,7 +81,7 @@ export const Favorites = ({
             paragraph: strings.favoritesEmpty(),
             loading: strings.loadingFavorites()
           }}
-          headerTitle={strings.dataTypesPluralCamelCase.favorite()}
+          headerTitle={strings.routes.Favorites()}
         />
       </DelayLayout>
     </>

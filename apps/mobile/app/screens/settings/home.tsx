@@ -55,7 +55,7 @@ const Home = ({
     <>
       <Header
         renderedInRoute="Settings"
-        title="Settings"
+        title={strings.routes.Settings()}
         canGoBack={false}
         id="Settings"
       />

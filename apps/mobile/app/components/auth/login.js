@@ -179,8 +179,8 @@ export const Login = ({ changeMode }) => {
             validationType="email"
             autoCorrect={false}
             autoCapitalize="none"
-            errorMessage="Email is invalid"
-            placeholder="Enter your email"
+            errorMessage={strings.emailInvalid()}
+            placeholder={strings.email()}
             defaultValue={email.current}
             editable={step === LoginSteps.emailAuth && !loading}
             onSubmit={() => {
@@ -200,13 +200,13 @@ export const Login = ({ changeMode }) => {
                   password.current = value;
                 }}
                 testID="input.password"
-                returnKeyLabel="Done"
+                returnKeyLabel={strings.done()}
                 returnKeyType="done"
                 secureTextEntry
                 autoComplete="password"
                 autoCapitalize="none"
                 autoCorrect={false}
-                placeholder="Password"
+                placeholder={strings.password()}
                 marginBottom={0}
                 editable={!loading}
                 defaultValue={password.current}

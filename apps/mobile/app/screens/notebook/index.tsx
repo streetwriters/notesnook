@@ -168,7 +168,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           ).selector;
 
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${params.current.item?.title}`,
+            placeholder: strings.searchInRoute(params.current.item?.title),
             type: "note",
             title: params.current.item?.title,
             route: route.name,

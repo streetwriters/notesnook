@@ -33,6 +33,7 @@ import useNavigationStore from "../../stores/use-navigation-store";
 import { eOnRefreshSearch } from "../../utils/events";
 import { SearchBar } from "./search-bar";
 import { FilteredSelector } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
   const [results, setResults] = useState<VirtualizedGrouping<Item>>();
   const [loading, setLoading] = useState(false);
@@ -67,6 +68,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
           query,
           route.params.items as FilteredSelector<Note>
         ).sorted();
+
         console.log(
           `Found ${results.placeholders?.length} results for ${query}`
         );
@@ -74,7 +76,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         await results.item(0);
         setResults(results);
         if (results.placeholders?.length === 0) {
-          setSearchStatus(`No results found for ${query}`);
+          setSearchStatus(`${strings.noResultsFound()} ${query}`);
         } else {
           setSearchStatus(undefined);
         }
@@ -125,8 +127,8 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
           title: route.name,
           paragraph:
             searchStatus ||
-            `Type a keyword to search in ${route.params?.title}`,
-          loading: `Searching for ${currentQuery.current}...`
+            `${strings.typeAKeywordToSearchIn()} ${route.params?.title}`,
+          loading: `${strings.searchingFor()} ${currentQuery.current}...`
         }}
       />
     </>

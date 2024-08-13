@@ -28,6 +28,7 @@ import { useSettingStore } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { MenuItemsList } from "../../../utils/menu-items";
 import { verifyUserWithApplock } from "../functions";
+import { strings } from "@notesnook/intl";
 
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
@@ -50,8 +51,8 @@ export const HomePicker = createSettingsPicker({
   updateValue: (item) => {
     SettingsService.set({ homepage: item.name });
     ToastManager.show({
-      heading: "Homepage set to " + item.name,
-      message: "Restart the app for changes to take effect.",
+      heading: strings.homePageChangedTo(item.name),
+      message: strings.restartAppToApplyChanges(),
       type: "success"
     });
   },

@@ -89,7 +89,7 @@ const onChangePicture = () => {
     includeBase64: true,
     writeTempFile: false,
     cropperToolbarColor: theme.scopes.base.primary.background,
-    cropperToolbarTitle: "Edit profile picture",
+    cropperToolbarTitle: strings.editProfilePicture(),
     cropperActiveWidgetColor: theme.scopes.base.primary.accent,
     cropperToolbarWidgetColor: theme.scopes.base.primary.icon
   }).then(async (image) => {
@@ -184,12 +184,11 @@ const SettingsUserSection = ({ item }) => {
                   <Paragraph
                     onPress={() => {
                       presentDialog({
-                        title: "Set your full name",
-                        paragraph:
-                          "Your name is end-to-end encrypted and only visible to you.",
-                        positiveText: "Save",
+                        title: strings.setFullName(),
+                        paragraph: strings.setFullNameDesc(),
+                        positiveText: strings.save(),
                         input: true,
-                        inputPlaceholder: "Enter your full name",
+                        inputPlaceholder: strings.enterFullName(),
                         defaultValue: userProfile?.fullName,
                         positivePress: async (value) => {
                           db.settings

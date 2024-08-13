@@ -57,12 +57,11 @@ export const Subscription = () => {
 
     if (Config.GITHUB_RELEASE === "true") {
       presentSheet({
-        paragraph:
-          "This version of Notesnook app does not support in-app purchases. Kindly login on the Notesnook web app to make the purchase.",
+        paragraph: strings.subNotSupported(),
         action: () => {
           Linking.openURL("https://app.notesnook.com");
         },
-        actionText: "Go to web app"
+        actionText: strings.goToWebApp()
       });
       return;
     }
@@ -70,8 +69,8 @@ export const Subscription = () => {
     if (hasCancelledPremium && Platform.OS === "android") {
       if (user.subscription?.provider === 3) {
         ToastManager.show({
-          heading: "Subscribed on web",
-          message: "Open your web browser to manage your subscription.",
+          heading: strings.subOnWeb(),
+          message: strings.openInBrowserToManageSub(),
           type: "success"
         });
         return;

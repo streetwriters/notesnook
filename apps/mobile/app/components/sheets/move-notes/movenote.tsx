@@ -140,7 +140,7 @@ export const MoveNotes = ({
         onChangeText={(v) => {
           loadNotes(v && v.trim() === "" ? undefined : v.trim());
         }}
-        placeholder="Search a note"
+        placeholder={strings.searchANote()}
       />
 
       <FlashList

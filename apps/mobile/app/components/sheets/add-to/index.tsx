@@ -267,7 +267,7 @@ const MoveNoteSheet = ({
                 }}
               >
                 <Input
-                  placeholder="Search notebooks...."
+                  placeholder={strings.searchNotebooks()}
                   button={{
                     icon: "plus",
                     onPress: () => {

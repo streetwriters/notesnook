@@ -279,13 +279,13 @@ const AppLockedOverlay = () => {
                 keyboardType={
                   appLockHasPasswordSecurity ? keyboardType : "default"
                 }
-                placeholder={`Enter ${
+                placeholder={
                   appLockHasPasswordSecurity
-                    ? `app lock ${
-                        keyboardType === "numeric" ? "pin" : "password"
-                      }`
-                    : "account password"
-                }`}
+                    ? keyboardType === "numeric"
+                      ? strings.enterApplockPassword()
+                      : strings.enterApplockPin()
+                    : strings.enterAccountPassword()
+                }
                 onChangeText={(v) => (password.current = v)}
                 onSubmit={() => {
                   onSubmit();

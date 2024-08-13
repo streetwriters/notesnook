@@ -27,6 +27,7 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useTags } from "../../stores/use-tag-store";
+import { strings } from "@notesnook/intl";
 
 export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
   const [tags, loading] = useTags();
@@ -74,9 +75,9 @@ export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
           loading={!isFocused}
           renderedInRoute="Tags"
           placeholder={{
-            title: "Your tags",
-            paragraph: "You have not created any tags for your notes yet.",
-            loading: "Loading your tags."
+            title: strings.yourTags(),
+            paragraph: strings.tagsEmpty(),
+            loading: strings.loadingTags()
           }}
         />
       </DelayLayout>

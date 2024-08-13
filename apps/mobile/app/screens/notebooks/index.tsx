@@ -76,13 +76,13 @@ export const Notebooks = ({
       />
       <Header
         renderedInRoute={route.name}
-        title={route.name}
+        title={strings.routes[route.name]()}
         canGoBack={route.params?.canGoBack}
         hasSearch={true}
         id={route.name}
         onSearch={() => {
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${route.name?.toLowerCase()}`,
+            placeholder: strings.searchInRoute(route.name),
             type: "notebook",
             title: route.name,
             route: route.name
@@ -103,16 +103,13 @@ export const Notebooks = ({
             action: onButtonPress,
             loading: strings.loadingNotebooks()
           }}
-          headerTitle={strings.dataTypesPluralCamelCase.notebook()}
+          headerTitle={strings.routes[route.name]()}
         />
 
         {!notebooks ||
         notebooks.placeholders.length === 0 ||
         !isFocused ? null : (
-          <FloatingButton
-            title="Create a new notebook"
-            onPress={onButtonPress}
-          />
+          <FloatingButton onPress={onButtonPress} />
         )}
       </DelayLayout>
     </>

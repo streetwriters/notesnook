@@ -115,7 +115,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
           <>
             <Input
               fwdRef={emailInputRef}
-              placeholder="Enter your new email"
+              placeholder={strings.enterNewEmail()}
               validationType="email"
               onErrorCheck={(e) => setError(e)}
               onChangeText={(email) => {
@@ -124,7 +124,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
             />
             <Input
               fwdRef={passInputRef}
-              placeholder="Enter your account password"
+              placeholder={strings.enterAccountPassword()}
               secureTextEntry
               onChangeText={(pass) => {
                 emailChangeData.current.password = pass;
@@ -135,7 +135,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
           <>
             <Input
               fwdRef={codeInputRef}
-              placeholder="Enter verification code sent to your new email"
+              placeholder={strings.verifyNewEmail()}
               onChangeText={(code) => {
                 emailChangeData.current.code = code;
               }}

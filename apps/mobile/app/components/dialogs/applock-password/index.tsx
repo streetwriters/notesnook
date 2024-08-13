@@ -143,11 +143,15 @@ export const AppLockPassword = () => {
               }}
               defaultValue={values.current.currentPassword}
               autoComplete="password"
-              returnKeyLabel="Next"
+              returnKeyLabel={strings.next()}
               keyboardType={keyboardType === "pin" ? "number-pad" : "default"}
               returnKeyType="next"
               secureTextEntry={secureTextEntry}
-              placeholder={`Current ${keyboardType}`}
+              placeholder={
+                keyboardType === "pin"
+                  ? strings.currentPin()
+                  : strings.currentPassword()
+              }
             />
           ) : null}
 
@@ -165,7 +169,9 @@ export const AppLockPassword = () => {
               keyboardType === "pin" && !accountPass ? "number-pad" : "default"
             }
             autoComplete="password"
-            returnKeyLabel={mode !== "remove" ? "Next" : "Remove"}
+            returnKeyLabel={
+              mode !== "remove" ? strings.next() : strings.remove()
+            }
             returnKeyType={mode !== "remove" ? "next" : "done"}
             secureTextEntry={secureTextEntry}
             buttonLeft={
@@ -192,10 +198,14 @@ export const AppLockPassword = () => {
             }
             placeholder={
               accountPass
-                ? "Account password"
+                ? strings.enterAccountPassword()
                 : mode === "change"
-                ? `New ${keyboardType}`
-                : `${keyboardType === "pin" ? "Pin" : "Password"}`
+                ? keyboardType === "pin"
+                  ? strings.newPin()
+                  : strings.newPassword()
+                : `${
+                    keyboardType === "pin" ? strings.pin() : strings.password()
+                  }`
             }
           />
 
@@ -214,10 +224,14 @@ export const AppLockPassword = () => {
               customValidator={() => values.current.password || ""}
               validationType="confirmPassword"
               autoComplete="password"
-              returnKeyLabel="Done"
+              returnKeyLabel={strings.done()}
               returnKeyType="done"
               secureTextEntry={secureTextEntry}
-              placeholder={`Confirm ${keyboardType}`}
+              placeholder={
+                keyboardType === "pin"
+                  ? strings.confirmPin()
+                  : strings.confirmPassword()
+              }
             />
           ) : null}
 

@@ -151,14 +151,14 @@ export const ForgotPassword = () => {
               }}
               defaultValue={email.current}
               onErrorCheck={(e) => setError(e)}
-              returnKeyLabel="Next"
+              returnKeyLabel={strings.next()}
               returnKeyType="next"
               autoComplete="email"
               validationType="email"
               autoCorrect={false}
               autoCapitalize="none"
-              errorMessage="Email is invalid"
-              placeholder="Email"
+              errorMessage={strings.emailInvalid()}
+              placeholder={strings.email()}
               onSubmit={() => {}}
             />
 

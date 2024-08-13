@@ -78,7 +78,7 @@ const useTooltip = () => {
     timers[timers.length] = setTimeout(() => {
       //TipManager.markPopupUsed(popup.id);
       RNTooltips.Show(target.current, parent.current, {
-        text: popup.text,
+        text: popup.text(),
         tintColor: isDark ? colors.secondary.background : "#404040",
         corner: Platform.OS === "ios" ? 5 : 50,
         textSize: 15,

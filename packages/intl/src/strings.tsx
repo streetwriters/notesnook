@@ -884,5 +884,499 @@ $headline$: Use starting line of the note as title.`,
   enterApplockPasswordDesc: () =>
     t`Please enter your app lock password to continue`,
   enterApplockPin: () => t`Enter app lock pin`,
-  enterApplockPinDesc: () => t`Please enter your app lock pin to continue`
+  enterApplockPinDesc: () => t`Please enter your app lock pin to continue`,
+  account: () => t`account`,
+  subscribeToPro: () => t`Subscribe to Pro`,
+  trialStarted: () => t`Your free trial has started`,
+  subDetails: () => t`Subscription details`,
+  signedUpOn: (date: string) => t`Signed up on ${date}`,
+  trialEndsOn: (date: string) => t`Your free trial ends on ${date}`,
+  subEnded: () => t`Your subscription has ended`,
+  accountDowngradedIn: (days: number) =>
+    t`Your account will be downgraded in ${days} days`,
+  subEndsOn: (date: string) => t`Your subscription ends on ${date}`,
+  subRenewOn: (date: string) => t`Your subscription renews on ${date}`,
+  neverHesitate: () => t`Never hesitate to choose privacy`,
+  manageAccount: () => t`Manage account`,
+  manageAccountDesc: () => t`Manage your account related settings here`,
+  removeProfilePicture: () => t`Remove profile picture`,
+  removeProfilePictureDesc: () => t`Remove your profile picture`,
+  removeProfilePictureConfirmation: () =>
+    t`Are you sure you want to remove your profile picture?`,
+  removeFullName: () => t`Remove full name`,
+  removeFullNameConfirmation: () =>
+    t`Are you sure you want to remove your name?`,
+  removeFullNameDesc: () => t`Remove your full name from profile`,
+  saveDataRecoveryKey: () => t`Save data recovery key`,
+  saveDataRecoveryKeyDesc: () =>
+    t`Save your data recovery key in a safe place. You will need it to recover your data in case you forget your password.`,
+  manageAttachments: () => t`Manage attachments`,
+  manageAttachmentsDesc: () => t`Manage your attachments in one place`,
+  changePasswordDesc: () => t`Change your account password`,
+  change2faMethodDesc: () =>
+    t`Change your primary two-factor authentication method`,
+  addFallback2faMethod: () => t`Add 2FA fallback method`,
+  addFallback2faMethodDesc: () =>
+    t`You can use fallback 2FA method incase you are unable to login via primary method`,
+  change2faFallbackMethod: () => t`Change 2FA fallback method`,
+  viewRecoveryCodes: () => t`View recovery codes`,
+  viewRecoveryCodesDesc: () =>
+    t`View your recovery codes to recover your account in case you lose access to your two-factor authentication methods.`,
+  subscriptionNotActivated: () => t`Subscription not activated?`,
+  loadingSubscription: () => t`Loading subscription details`,
+  loadingSubscriptionDesc: () => t`Please wait while we load your subscription`,
+  notesnookPro: () => t`Notesnook Pro`,
+  subscribedOnVerify: (date: string) =>
+    t`You subscribed to Notesnook Pro on ${date}. Verify this subscription?`,
+  verifySubscription: () => t`Verify subscription`,
+  subscriptionVerifyWait: () =>
+    t`Please wait while we verify your subscription`,
+  verifySubDesc: () => t`Verify your subscription to Notesnook Pro`,
+  logoutWarnin: () =>
+    t`Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.`,
+  logoutError: () => t`Error logging out`,
+  deleteAccount: () => t`Delete account`,
+  deleteAccountDesc: () =>
+    t`All your data will be removed permanently. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.`,
+  enterAccountPassword: () => t`Enter account password`,
+  failedToDeleteAccount: () => t`Failed to delete account`,
+  syncSettings: () => t`Sync settings`,
+  syncSettingsDesc: () => t`Manage your sync settings here`,
+  disableAutoSync: () => t`Disable auto sync`,
+  disableAutoSyncDesc: () =>
+    t`Turn off automatic syncing. Changes from this client will be synced only when you run sync manually.`,
+  disableRealtimeSync: () => t`Disable realtime sync`,
+  disableRealtimeSyncDesc: () =>
+    t`Changes from other devices won't be updated in the editor in real-time.`,
+  disableSync: () => t`Disable sync`,
+  disableSyncDesc: () =>
+    t`Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device.`,
+  backgroundSync: () => t`Background sync (experimental)`,
+  backgroundSyncDesc: () =>
+    t`Sync your notes in the background even when the app is closed. This is an experimental feature. If you face any issues, please turn it off.`,
+  forcePullChanges: () => t`Force pull changes`,
+  forcePullChangesDesc: () =>
+    t`Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.\n\nThis must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.`,
+  forceSyncNotice: () =>
+    `This must only be used for troubleshooting. Using this regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.`,
+  forcePushChanges: () => t`Force push changes`,
+  forcePushChangesDesc: () =>
+    t`Use this if changes made on this device are not appearing on other devices. This will overwrite the data on the server with the data from this device.\n\nThis must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.`,
+  start: () => t`Start`,
+  customization: () => t`Customization`,
+  appearance: () => t`Appearance`,
+  appearanceDesc: () =>
+    t`Customize the appearance of the app with custom themes`,
+  themes: () => t`Themes`,
+  themesDesc: () => t`Choose from pre-built themes or create your own`,
+  useSystemTheme: () => t`Use system theme`,
+  useSystemThemeDesc: () =>
+    t`Automatically switch between light and dark themes based on your system settings`,
+  darkMode: () => t`Dark mode`,
+  darkModeDesc: () => t`Use dark mode for the app`,
+  behavior: () => t`Behavior`,
+  behaviorDesc: () => t`Change how the app behaves in different situations`,
+  homepage: () => t`Homepage`,
+  homepageDesc: () => t`Default screen to open on app launch`,
+  dateFormat: () => t`Date format`,
+  dateFormatDesc: () => t`Choose how dates are displayed in the app`,
+  timeFormat: () => t`Time format`,
+  timeFormatDesc: () => t`Choose how time is displayed in the app`,
+  clearTrashInterval: () => t`Clear trash interval`,
+  clearTrashIntervalDesc: () =>
+    t`Automatically clear trash after a certain period of time`,
+  clearDefaultNotebook: () => t`Clear default notebook`,
+  clearDefaultNotebookDesc: () => t`Newly created notes will be uncategorized`,
+  editor: () => t`Editor`,
+  editorDesc: () => t`Customize the note editor`,
+  customizeToolbar: () => t`Customize toolbar`,
+  customizeToolbarDesc: () => t`Customize the toolbar in the note editor`,
+  resetToolbar: () => t`Reset toolbar`,
+  resetToolbarDesc: () => t`Reset the toolbar to default settings`,
+  doubleSpacedLines: () => t`Double spaced lines`,
+  doubleSpacedLinesDesc: () =>
+    t`New lines will be double spaced (old ones won't be affected).`,
+  lineSpacingChanged: () => t`Line spacing changed`,
+  defaultFontSize: () => t`Default font size`,
+  defaultFontSizeDesc: () => t`Default font size in editor`,
+  defaultFontFamily: () => t`Default font family`,
+  defaultFontFamilyDesc: () => t`Default font family in editor`,
+  titleFormat: () => t`Title format`,
+  titleFormatDesc: () => t`Choose how the new note titles are formatted`,
+  mardownShortcuts: () => t`Markdown shortcuts`,
+  mardownShortcutsDesc: () => t`Use markdown shortcuts in the editor`,
+  privacyAndSecurity: () => t`Privacy & security`,
+  telemetry: () => t`Telemetry`,
+  telemetryDesc: () =>
+    t`Contribute towards a better Notesnook. All tracking information is anonymous.`,
+  marketingEmails: () => t`Marketing emails`,
+  marketingEmailsDesc: () =>
+    t`We will send you occasional promotional offers & product updates on your email (sent once every month).`,
+  corsBypass: () => t`CORS bypass`,
+  corsBypassDesc: () =>
+    t`You can set a custom proxy URL to increase your privacy.`,
+  vault: () => t`Vault`,
+  vaultDesc: () => t`Multi-layer encryption to most important notes`,
+  createVaultDesc: () => t`Create a vault to store your most important notes`,
+  changeVaultPasswordDesc: () => t`Setup a new password for your vault.`,
+  clearVaultDesc: () => t`Clear your vault and remove all notes from it`,
+  deleteVaultDesc: () => t`Delete vault (and optionally remove all notes).`,
+  biometricUnlock: () => t`Biometric unlocking`,
+  biometricUnlockDesc: () => t`Unlock your vault with biometric authentication`,
+  revokeBiometricUnlock: () => t`Revoke biometric unlocking`,
+  privacyMode: () => t`Privacy mode`,
+  privacyModeDesc: () =>
+    t`Hide app contents when you switch to other apps. This will also disable screenshot taking in the app.`,
+  appLock: () => t`App lock`,
+  appLockDesc: () => t`Lock the app with a password or pin`,
+  enableAppLock: () => t`Enable app lock`,
+  biometricsNotEnrolled: () => t`Biometrics not enrolled`,
+  biometricsNotEnrolledDesc: () =>
+    t`To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone.`,
+  appLockTimeout: () => t`App lock timeout`,
+  appLockTimeoutDesc: () =>
+    t`Automatically lock the app after a certain period`,
+  setupAppLockPin: () => t`Setup app lock pin`,
+  setupAppLockPinDesc: () => t`Setup a pin to lock the app`,
+  setupAppLockPassword: () => t`Setup app lock password`,
+  setupAppLockPasswordDesc: () => t`Setup a password to lock the app`,
+  changeAppLockPin: () => t`Change app lock pin`,
+  changeAppLockPassword: () => t`Change app lock password`,
+  changeAppLockPinDesc: () => t`Setup a new password for app lock`,
+  changeAppLockPasswordDesc: () => t`Setup a new password for app lock`,
+  removeAppLockPin: () => t`Remove app lock pin`,
+  removeAppLockPassword: () => t`Remove app lock password`,
+  removeAppLockPinDesc: () =>
+    t`Remove app lock pin, app lock will be disabled if no other security method is enabled.`,
+  removeAppLockPasswordDesc: () =>
+    t`Remove app lock password, app lock will be disabled if no other security method is enabled.`,
+  unlockWithBiometricsDesc: () =>
+    t`Unlock the app with biometric authentication. This requires biometrics to be enabled on your device.`,
+  appLockDisabled: () => t`App lock disabled`,
+  backupRestore: () => t`Backup & restore`,
+  backupsDesc: () => t`Manage your backups and restore data`,
+  backupNow: () => t`Backup now`,
+  backupNowWithAttachments: () => t`Backup now with attachments`,
+  backupNowWithAttachmentsDesc: () =>
+    t`Take a full backup of your data with all attachments`,
+  backupNowDesc: () =>
+    t`Take a partial backup of your data that does not include attachments`,
+  automaticBackups: () => t`Automatic backups`,
+  automaticBackupsDesc: () =>
+    t`Set the interval to create a partial backup (without attachments) automatically.`,
+  automaticBackupsWithAttachments: () => t`Automatic backups with attachments`,
+  automaticBackupsWithAttachmentsDesc: () =>
+    t`Set the interval to create a backup (with attachments) automatically.
+
+NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`,
+  selectBackupDir: () => t`Select backup directory`,
+  selectBackupDirDesc: () => t`Choose where to save your backups`,
+  noDirectorySelected: () => t`No directory selected`,
+  changeBackupDir: () => t`Change backup directory`,
+  backupEncryption: () => t`Backup encryption`,
+  backupEncryptionDesc: () => t`Encrypt your backups for added security`,
+  restoreBackup: () => t`Restore backup`,
+  restoreBackupDesc: () => t`Restore your data from a backup`,
+  exportAllNotes: () => t`Export all notes`,
+  exportAllNotesDesc: () =>
+    t`Export all notes as pdf, markdown, html or text in a single zip file`,
+  productivity: () => t`Productivity`,
+  quickNoteNotification: () => t`Quick note notification`,
+  quickNoteNotificationDesc: () =>
+    t`Quickly create a note from the notification`,
+  reminders: () => t`Reminders`,
+  remindersDesc: () => t`Manage your reminders`,
+  reminderNotification: () => t`Reminder notifications`,
+  reminderNotificationDesc: () =>
+    t`Controls whether this device should receive reminder notifications.`,
+  defaultSnoozeTime: () => t`Default snooze time`,
+  defaultSnoozeTimeDesc: () =>
+    t`Set the default time to snooze a reminder to when you press the snooze button on a notification.`,
+  setSnoozeTimePlaceholder: () => t`Set snooze time in minutes`,
+  changeNotificationSound: () => t`Change notification sound`,
+  changeNotificationSoundDesc: () =>
+    t`Change the sound that plays when you receive a notification`,
+  helpAndSupport: () => t`Help and support`,
+  reportAnIssue: () => t`Report an issue`,
+  reportAnIssueDesc: () =>
+    t`Faced an issue or have a suggestion? Click here to create a bug report`,
+  emailSupport: () => t`Email support`,
+  emailSupportDesc: () =>
+    t`Contact us directly via support@streetwriters.co for any help or support`,
+  documentation: () => t`Documentation`,
+  documentationDesc: () =>
+    t`Read the documentation to learn more about Notesnook`,
+  debugging: () => t`Debugging`,
+  debuggingDesc: () =>
+    t`Get helpful debug info about the app to help us find bugs.`,
+  debugLogs: () => t`Debug logs`,
+  debugLogsDesc: () => t`View and share debug logs`,
+  community: () => t`Community`,
+  joinTelegram: () => t`Join our Telegram group`,
+  joinTelegramDesc: () =>
+    t`Join our Telegram group to chat with other users and the team`,
+  joinMastodon: () => t`Follow us on Mastodon`,
+  joinMastodonDesc: () =>
+    t`Follow us on Mastodon for updates and news about Notesnook`,
+  followOnX: () => t`Follow us on X`,
+  followOnXDesc: () => t`Follow us on X for updates and news about Notesnook`,
+  joinDiscord: () => t`Join our Discord server`,
+  joinDiscordDesc: () =>
+    t`Join our Discord server to chat with other users and the team`,
+  tos: () => t`Terms of service`,
+  tosDesc: () => t`Read the terms of service`,
+  privacyPolicy: () => t`Privacy policy`,
+  privacyPolicyDesc: () => t`Read the privacy policy`,
+  licenses: () => t`Open source licenses`,
+  ossLibs: () => t`Open source libraries used in Notesnook`,
+  about: () => t`About`,
+  downloadOnDesktop: () => t`Download on desktop`,
+  downloadOnDesktopDesc: () =>
+    t`Get Notesnook app on your desktop and access all notes`,
+  roadmap: () => t`Roadmap`,
+  roadmapDesc: () => t`See what the future of Notesnook is going to be like.`,
+  checkForUpdates: () => t`Check for updates`,
+  checkForUpdatesDesc: () => t`Check for new version of Notesnook`,
+  appVersion: () => t`App version`,
+  defaultSound: () => t`Default sound`,
+  subNotSupported: () =>
+    t`"This version of Notesnook app does not support in-app purchases. Kindly login on the Notesnook web app to make the purchase."`,
+  goToWebApp: () => t`Go to web app`,
+  subOnWeb: () => t`Subscribed on web`,
+  openInBrowserToManageSub: () => t`Open in browser to manage subscription`,
+  editProfilePicture: () => t`Edit profile picture`,
+  setFullName: () => t`Set full name`,
+  setFullNameDesc: () =>
+    t`Your name is end-to-end encrypted and only visible to you.`,
+  enterFullName: () => t`Enter full name`,
+  deleteGroup: () => t`Delete group`,
+  deleteGroupDesc: () =>
+    t`All tools in this group will be removed from the toolbar.`,
+  homePageChangedTo: (name: string) => t`Homepage changed to ${name}`,
+  restartAppToApplyChanges: () => t`Restart the app to apply the changes`,
+  deleteCollapsed: () => t`Delete collapsed section`,
+  deleteCollapsedDesc: () =>
+    t`All tools in the collapsed section will be removed`,
+  clearTrash: () => t`Clear trash`,
+  clearTrashConfirm: () => t`Are you sure you want to clear trash?`,
+  trashCleared: () => t`Trash cleared`,
+  trash: () => t`Trash`,
+  loadingTrash: () => t`Loading trash`,
+  trashCleanupIntervalTextDaily: () =>
+    t`Trash gets automatically cleaned up daily`,
+  trashCleanupIntervalTextDays: (days: number) =>
+    t`Trash gets automatically cleaned up after ${days} days`,
+  noTrashCleanupInterval: () =>
+    t`Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval.`,
+  select: () => t`Select`,
+  backupComplete: () => t`Backup complete`,
+  backupSaved: (platform: string) =>
+    select(platform, {
+      android: 'Backup file saved in "Notesnook backups" folder on your phone.',
+      other: "Backup file is saved in File Manager/Notesnook folder"
+    }),
+  shareBackup: () => t`Share backup`,
+  neverAskAgain: () => t`Never ask again`,
+  backingUpData: (type?: "full" | "partial") =>
+    t`Creating a${type === "full" ? " full" : ""} backup`,
+  backupDataDesc: () =>
+    t`All your backups are stored in 'Phone Storage/Notesnook/backups/' folder`,
+  backupSuccess: () => t`Backup successful`,
+  biometricsAuthFailed: () => t`Biometrics authentication failed`,
+  biometricsAuthFailedDesc: () => t`Wait 30 seconds to try again`,
+  biometricsAuthCancelled: () => t`Authentication cancelled by user`,
+  biometricsAuthError: () => t`Authentication failed`,
+  tryAgain: () => t`Tap to try again`,
+  rateAppMessage: () => t`We would love to know what you think!`,
+  rateAppActionText: (platform: string) =>
+    t`Rate Notesnook on ${
+      platform === "ios" ? strings.appStore() : strings.playStore()
+    }`,
+  appStore: () => t`App Store`,
+  playStore: () => t`Play Store`,
+  recoveryKeyMessage: () => t`Keep your data safe`,
+  recoveryKeyMessageActionText: () => t`Save your account recovery key`,
+  loginMessage: () => t`You are not logged in`,
+  loginMessageActionText: () => t`Login to encrypt and sync notes`,
+  syncDisabled: () => t`Sync is disabled`,
+  syncDisabledActionText: () => t`Please confirm your email to sync notes`,
+  autoBackupsOffMessage: () => t`Automatic backups are off`,
+  autoBackupsOffActionText: () =>
+    t`Get Notesnook Pro to enable automatic backups`,
+  newUpdateMessage: () => t`New update available`,
+  newUpdateActionText: () => t`Tap here to update to the latest version`,
+  quickNoteTitle: () => t`Quick note`,
+  quickNoteContent: () => t`Tap on "Take note" to add a note.`,
+  takeNote: () => t`Take note`,
+  quickNotePlaceholder: () => t`Write something...`,
+  hide: () => t`Hide`,
+  disable: () => t`Disable`,
+  notificationsDisabled: () => t`Notifications disabled`,
+  notificationsDisabledDesc: () =>
+    t`Reminders cannot be set because notifications have been disabled from app settings. If you want to keep receiving reminder notifications, enable notifications for Notesnook from app settings.`,
+  openSettings: () => t`Open settings`,
+  close: () => t`Close`,
+  getNotesnookPro: () => t`Get Notesnook Pro`,
+  colorsProMessage: () => t`Unlock more colors with Notesnook Pro`,
+  exportProMessage: () =>
+    t`Export notes as PDF, Markdown and HTML with Notesnook Pro`,
+  tagsProMessage: () => t`Create unlimited tags with Notesnook Pro`,
+  notebookProMessage: () => t`Create unlimited notebooks with Notesnook Pro`,
+  vaultProMessage: () => t`Create unlimited vaults with Notesnook Pro`,
+  emailConfirmationLinkSent: () =>
+    t`We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder.`,
+  waitBeforeResendEmail: () => t`Please wait before requesting another email`,
+  verificationEmailSent: () => t`Verification email sent`,
+  failedToSendVerificationEmail: () => t`Failed to send verification email`,
+  resendEmail: () => t`Resend email`,
+  trialEndingSoon: () => t`Your free trial is ending soon`,
+  trialExpired: () => t`Your free trial has expired`,
+  tips: [
+    {
+      text: () =>
+        t`You can swipe left anywhere in the app to start a new note.`,
+      contexts: ["notes", "first-note"]
+    },
+    {
+      text: () => t`Long press on any item in list to enter multi-select mode.`,
+      contexts: ["notes", "notebook", "notebook", "tags", "topics"]
+    },
+    {
+      text: () =>
+        t`Monographs enable you to share your notes in a secure and private way.`,
+      contexts: ["monographs"]
+    },
+    {
+      text: () =>
+        t`Monographs can be encrypted with a secret key and shared with anyone.`,
+      contexts: ["monographs"]
+    },
+    {
+      text: () =>
+        t`You can pin frequently used Notebooks to the Side Menu to quickly access them.`,
+      contexts: ["notebook", "notebooks"]
+    },
+    {
+      text: () => t`A notebook can have unlimited topics with unlimited notes.`,
+      contexts: ["notebook", "topics"]
+    },
+    {
+      text: () =>
+        t`You can multi-select notes and move them to a notebook at once`,
+      contexts: ["notebook", "topics"]
+    },
+    {
+      text: () => t`Mark important notes by adding them to favorites.`,
+      contexts: ["notes"]
+    },
+    {
+      text: () =>
+        t`Are you scrolling a lot to find a specific note? Pin it to the top from Note properties.`,
+      contexts: ["notes"]
+    },
+    {
+      text: () =>
+        t`You can view & restore older versions of any note by going to its properties -> History.`,
+      contexts: ["notes"]
+    }
+  ],
+  popups: [
+    {
+      id: "sortmenu",
+      text: () => t`Tap here to change sorting`
+    },
+    {
+      id: "jumpto",
+      text: () => t`Tap here to jump to a section`
+    },
+    {
+      id: "compactmode",
+      text: () => t`Try compact mode to fit more items on screen`
+    },
+    {
+      id: "searchreplace",
+      text: () => t`Switch to search/replace mode`
+    },
+    {
+      id: "notebookshortcut",
+      text: () => t`Create shortcut of this notebook in side menu`
+    }
+  ],
+  someNotesPublished: () => t`Some notes are published`,
+  unpublishToDelete: () => t`Unpublish notes to delete them`,
+  deleteTags: (count: number) =>
+    plural(count, {
+      one: "Delete tag",
+      other: "Delete # tags"
+    }),
+  deleteTagsConfirm: () => t`Are you sure you want to delete these tags?`,
+  deleteItemConfirmation: (itemType: string) =>
+    t`Are you sure you want to delete this ${strings.dataTypes[
+      itemType as keyof typeof strings.dataTypes
+    ]()}?`,
+  deleteItem: (itemType: string) =>
+    t`Delete ${strings.dataTypes[
+      itemType as keyof typeof strings.dataTypes
+    ]()}`,
+  filterAttachments: () => t`Filter attachments by filename, type or hash`,
+  oldPassword: () => t`Old password`,
+  newPassword: () => t`New password`,
+  email: () => t`Email`,
+  emailInvalid: () => t`Invalid email`,
+  confirmPassword: () => t`Confirm password`,
+  currentPin: () => t`Current pin`,
+  currentPassword: () => t`Current password`,
+  newPin: () => t`New pin`,
+  confirmPin: () => t`Confirm pin`,
+  confirmNewPassword: () => t`Confirm new password`,
+  colorTitle: () => t`Color title`,
+  enterNotebookDescription: () => t`Enter notebook description`,
+  searchNotebooks: () => t`Search notebooks`,
+  enterNewEmail: () => t`Enter your new email`,
+  verifyNewEmail: () => t`Enter verification code sent to your new email`,
+  issuePlaceholder: () => t`Tell us more about the issue you are facing. 
+
+For example:
+- What were you trying to do in the app?
+- What did you expect to happen?
+- Steps to reproduce the issue 
+- Things you have tried etc.`,
+  searchSectionToLinkPlaceholder: () =>
+    t`Search a section of a note to link to`,
+  searchNoteToLinkPlaceholder: () => t`Search a note to link to`,
+  searchForTags: () => t`Search or add a tag`,
+  searchANote: () => t`Search a note`,
+  remindeMeOf: () => t`Remind me of...`,
+  addShortNote: () => t`Add a short note`,
+  typeAKeywordToSearchIn: () => t`Type a keyword to search in`,
+  searchingFor: () => t`Searching for`,
+  typeAKeyword: () => t`Type a keyword`,
+  search: () => t`Search`,
+  enterEmailAddress: () => t`Enter email address`,
+  enterValidEmail: () => t`Please enter a valid email address`,
+  enterValidPhone: () => t`Please enter a valid phone number with country code`,
+  errorGettingCodes: () => t`Error getting codes`,
+  noResultsFound: () => t`No results found for`,
+  routes: {
+    Notes: () => `Notes`,
+    Notebooks: () => `Notebooks`,
+    Notebook: () => `Notebook`,
+    Favorites: () => `Favorites`,
+    Reminders: () => `Reminders`,
+    Trash: () => `Trash`,
+    Settings: () => `Settings`,
+    Tags: () => `Tags`,
+    Editor: () => `Editor`,
+    Home: () => `Home`,
+    Search: () => `Search`
+  },
+  searchInRoute: (routeName: string) =>
+    `Type a keyword to search in ${
+      strings.routes[routeName as keyof typeof strings.routes]?.() || routeName
+    }`,
+  logoutConfirmation: () =>
+    t`Are you sure you want to logout and clear all data stored on this device?`,
+  backupDataBeforeLogout: () => t`Take a backup before logging out`,
+  unsyncedChangesWarning: () =>
+    t`You have unsynced notes. Take a backup or sync your notes to avoid losing your critical data.`
 };

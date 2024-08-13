@@ -132,9 +132,9 @@ export const Group = ({
         }
         presentDialog({
           context: "global",
-          title: "Delete group?",
-          positiveText: "Delete",
-          paragraph: "All tools in the collapsed section will also be removed.",
+          title: strings.deleteGroup(),
+          positiveText: strings.delete(),
+          paragraph: strings.deleteGroupDesc(),
           positivePress: () => {
             if (groupIndex === undefined) return;
             const _data = useDragState.getState().data.slice();

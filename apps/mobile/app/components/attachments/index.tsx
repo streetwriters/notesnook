@@ -415,7 +415,7 @@ export const AttachmentDialog = ({
       >
         <Seperator />
         <Input
-          placeholder="Filter attachments by filename, type or hash"
+          placeholder={strings.filterAttachments()}
           onChangeText={onChangeText}
           onSubmit={() => {
             onChangeText(attachmentSearchValue.current as string);
@@ -555,9 +555,7 @@ export const AttachmentDialog = ({
                     size={60}
                     color={colors.secondary.icon}
                   />
-                  <Paragraph>
-                    {note ? "No attachments on this note" : "No attachments"}
-                  </Paragraph>
+                  <Paragraph>{strings.noAttachments()}</Paragraph>
                 </>
               )}
             </View>

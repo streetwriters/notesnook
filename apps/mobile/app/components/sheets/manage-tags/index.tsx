@@ -271,7 +271,7 @@ const ManageTagsSheet = (props: {
         onSubmit={() => {
           onSubmit();
         }}
-        placeholder="Search or add a tag"
+        placeholder={strings.searchForTags()}
       />
 
       {query && !queryExists ? (

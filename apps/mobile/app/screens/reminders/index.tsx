@@ -55,12 +55,12 @@ export const Reminders = ({
       <SelectionHeader id={route.name} items={reminders} type="reminder" />
       <Header
         renderedInRoute={route.name}
-        title={route.name}
+        title={strings.routes[route.name]()}
         canGoBack={false}
         hasSearch={true}
         onSearch={() => {
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${route.name}`,
+            placeholder: strings.searchInRoute(route.name),
             type: "reminder",
             title: route.name,
             route: route.name
@@ -76,7 +76,7 @@ export const Reminders = ({
         <List
           data={reminders}
           dataType="reminder"
-          headerTitle={strings.dataTypesPluralCamelCase.reminder()}
+          headerTitle={strings.routes[route.name]()}
           renderedInRoute="Reminders"
           loading={loading}
           placeholder={{
