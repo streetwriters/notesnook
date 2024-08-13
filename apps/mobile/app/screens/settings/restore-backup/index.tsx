@@ -240,7 +240,8 @@ const restoreBackup = async (options: {
     }
 
     ToastManager.show({
-      heading: "Backup restored successfully"
+      heading: "Backup restored successfully",
+      type: "success"
     });
 
     await db.initCollections();
