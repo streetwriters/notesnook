@@ -23,19 +23,17 @@ import "../assets/64x64.png";
 import "../assets/128x128.png";
 import "../assets/256x256.png";
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { App } from "./app";
 import "./index.css";
 
 declare let module: NodeModule & {
   hot?: { accept: () => void };
 };
-
-ReactDOM.render(
+const root = createRoot(document.getElementById("root")!);
+root.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );
-
 if (module.hot) module.hot.accept();
