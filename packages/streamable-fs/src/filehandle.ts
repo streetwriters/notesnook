@@ -101,9 +101,9 @@ export default class FileHandle {
   async size() {
     let size = 0;
     for (const chunk of this.chunks) {
-      const array = await this.storage.readChunk(chunk);
-      if (!array) continue;
-      size += array.length;
+      const length = await this.storage.chunkSize(chunk);
+      if (!length) throw new Error(`Found 0 byte sized chunk.`);
+      size += length;
     }
     return size;
   }
