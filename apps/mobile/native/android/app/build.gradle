@@ -49,7 +49,6 @@ react {
     //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
     hermesFlags = ["-O", "-output-source-map"]
 }
-println(projectDir);
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -169,8 +168,12 @@ android {
       pickFirst 'lib/x86_64/libc++_shared.so'
       pickFirst 'lib/armeabi-v7a/libc++_shared.so'
       pickFirst 'lib/arm64-v8a/libc++_shared.so'
+      jniLibs {
+            useLegacyPackaging isBuildingAAB == false
+    }
   }
 
+    
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
