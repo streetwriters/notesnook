@@ -422,6 +422,10 @@ class Database {
     return this.syncer.start(options);
   }
 
+  hasUnsyncedChanges() {
+    return this.syncer.sync.collector.hasUnsyncedChanges();
+  }
+
   host(hosts: typeof Hosts) {
     if (process.env.NODE_ENV !== "production") {
       Hosts.AUTH_HOST = hosts.AUTH_HOST || Hosts.AUTH_HOST;
