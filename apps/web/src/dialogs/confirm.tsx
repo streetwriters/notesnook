@@ -23,7 +23,7 @@ import { mdToHtml } from "../utils/md";
 import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { db } from "../common/db";
-import { AppVersion, getChangelog } from "../utils/version";
+import { getChangelog } from "../utils/version";
 import { downloadUpdate } from "../utils/updater";
 
 type Check = { text: string; default?: boolean };
@@ -101,12 +101,17 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
                     key={id}
                     id={id}
                     variant="text.body"
-                    sx={{ alignItems: "center" }}
+                    sx={{ fontWeight: "bold", mt: 1 }}
                   >
                     <Checkbox
                       name={id}
                       defaultChecked={check.default}
-                      sx={{ mr: "small", width: 18, height: 18 }}
+                      sx={{
+                        mr: "small",
+                        width: 18,
+                        height: 18,
+                        color: "accent"
+                      }}
                       onChange={(e) =>
                         (checkedItems.current[id as TCheckId] =
                           e.currentTarget.checked)
@@ -147,9 +152,15 @@ export function showLogoutConfirmation() {
   return ConfirmDialog.show({
     title: `Logout?`,
     message:
-      "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.",
+      "Logging out will clear all data stored on THIS DEVICE. Are you sure you want to log out?",
     positiveButtonText: "Yes",
-    negativeButtonText: "No"
+    negativeButtonText: "No",
+    checks: {
+      backup: {
+        text: "Take a backup before logging out to prevent data loss?",
+        default: true
+      }
+    }
   });
 }
 

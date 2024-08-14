@@ -33,6 +33,7 @@ import {
 import { TaskManager } from "../../common/task-manager";
 import { AttachmentsDialog } from "../attachments-dialog";
 import { RecoveryKeyDialog } from "../recovery-key-dialog";
+import { logger } from "../../utils/logger";
 
 export const ProfileSettings: SettingsGroup[] = [
   {
@@ -142,26 +143,34 @@ export const ProfileSettings: SettingsGroup[] = [
             variant: "errorSecondary",
             title: "Logout",
             action: async () => {
-              if (await db.hasUnsyncedChanges()) {
-                const backup = await ConfirmDialog.show({
-                  title: "You have unsynced changes",
-                  message:
-                    "Do you want to take a backup before logging out to prevent data loss?",
-                  negativeButtonText: "No",
-                  positiveButtonText: "Yes"
-                });
-                if (backup) await createBackup({ mode: "partial" });
+              const result = await showLogoutConfirmation();
+              if (!result) return;
+
+              if (result.backup) {
+                try {
+                  await createBackup({ mode: "partial" });
+                } catch (e) {
+                  logger.error(e, "Failed to take backup before logout");
+                  if (
+                    !(await ConfirmDialog.show({
+                      title: "Failed to take backup",
+                      message:
+                        "Failed to take backup of your data. Do you want to continue logging out?",
+                      negativeButtonText: "No",
+                      positiveButtonText: "Yes"
+                    }))
+                  )
+                    return;
+                }
               }
 
-              if (await showLogoutConfirmation()) {
-                await TaskManager.startTask({
-                  type: "modal",
-                  title: "You are being logged out",
-                  subtitle: "Please wait...",
-                  action: () => db.user.logout(true)
-                });
-                showToast("success", "You have been logged out.");
-              }
+              await TaskManager.startTask({
+                type: "modal",
+                title: "You are being logged out",
+                subtitle: "Please wait...",
+                action: () => db.user.logout(true)
+              });
+              showToast("success", "You have been logged out.");
             }
           }
         ]
