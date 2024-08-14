@@ -496,6 +496,8 @@ export async function clip(
     };
   }
 
+  settings.images = true;
+  settings.inlineImages = true;
   return await browser.tabs.sendMessage(tab.id, {
     type: "clip",
     mode,
