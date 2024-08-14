@@ -30,8 +30,13 @@ export function ErrorText(props: ErrorTextProps) {
     <Flex
       bg="var(--background-error)"
       p={1}
-      mt={2}
-      sx={{ borderRadius: "default", ...sx, maxHeight: 300, overflowY: "auto" }}
+      sx={{
+        borderRadius: "default",
+        ...sx,
+        alignItems: "flex-start",
+        maxHeight: 300,
+        overflowY: "auto"
+      }}
       {...restProps}
     >
       <ErrorIcon size={15} color="var(--icon-error)" />
