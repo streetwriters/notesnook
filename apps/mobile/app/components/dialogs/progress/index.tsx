@@ -35,6 +35,8 @@ export type ProgressOptions = {
   cancelCallback?: () => void;
   title?: string;
   paragraph?: string;
+  fillBackground?: boolean;
+  canHideProgress?: boolean;
 };
 
 export const PROGRESS_EVENTS = {
@@ -51,18 +53,23 @@ export default function Progress() {
   const [data, setData] = React.useState<{
     title?: string;
     paragraph?: string;
+    fillBackground?: boolean;
+    canHideProgress?: boolean;
   }>();
 
   useEffect(() => {
     const events = [
       eSubscribeEvent(PROGRESS_EVENTS.start, (options: ProgressOptions) => {
         setProgress(options.progress);
-        setVisible(true);
         cancelCallback.current = options.cancelCallback;
+        console.log("options", options.fillBackground);
         setData({
           title: options.title,
-          paragraph: options.paragraph
+          paragraph: options.paragraph,
+          fillBackground: options.fillBackground,
+          canHideProgress: options.canHideProgress
         });
+        setVisible(true);
       }),
       eSubscribeEvent(PROGRESS_EVENTS.end, () => {
         setProgress(undefined);
@@ -76,16 +83,19 @@ export default function Progress() {
         if (options.cancelCallback) {
           cancelCallback.current = options.cancelCallback;
         }
-        if (options.title) {
-          setData({
-            title: options.title
-          });
-        }
-        if (options.paragraph) {
-          setData({
-            paragraph: options.paragraph
-          });
-        }
+
+        const data: ProgressOptions = {};
+        if (options.title) data.title = options.title;
+        if (options.paragraph) data.paragraph = options.paragraph;
+        if (options.fillBackground)
+          data.fillBackground = options.fillBackground;
+
+        setData((current) => {
+          return {
+            ...current,
+            ...data
+          };
+        });
       })
     ];
     return () => {
@@ -95,12 +105,16 @@ export default function Progress() {
   }, []);
 
   return !visible ? null : (
-    <BaseDialog visible>
+    <BaseDialog
+      background={data?.fillBackground ? colors.primary.background : undefined}
+      visible
+    >
       <DialogContainer
         style={{
           paddingHorizontal: 12,
           paddingBottom: 10
         }}
+        noBorder={data?.fillBackground ? true : false}
       >
         <Dialog context="local" />
         <View
@@ -112,26 +126,6 @@ export default function Progress() {
             paddingBottom: 20
           }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              width: 100,
-              paddingTop: 20
-            }}
-          >
-            <ProgressBarComponent
-              height={5}
-              width={100}
-              animated={true}
-              useNativeDriver
-              indeterminate
-              indeterminateAnimationDuration={2000}
-              unfilledColor={colors.secondary.background}
-              color={colors.primary.accent}
-              borderWidth={0}
-            />
-          </View>
-
           <Heading
             style={{
               textAlign: "center"
@@ -150,19 +144,41 @@ export default function Progress() {
             {progress ? progress : data?.paragraph}
           </Paragraph>
 
-          <Button
-            title={cancelCallback.current ? "Cancel" : "Hide"}
-            type="secondaryAccented"
-            onPress={() => {
-              if (cancelCallback.current) {
-                cancelCallback.current?.();
-              }
-              setVisible(false);
-              setProgress(undefined);
-              setData(undefined);
+          <View
+            style={{
+              flexDirection: "row",
+              width: 100,
+              paddingVertical: 12
             }}
-            width="100%"
-          />
+          >
+            <ProgressBarComponent
+              height={5}
+              width={100}
+              animated={true}
+              useNativeDriver
+              indeterminate
+              indeterminateAnimationDuration={2000}
+              unfilledColor={colors.secondary.background}
+              color={colors.primary.accent}
+              borderWidth={0}
+            />
+          </View>
+
+          {data?.canHideProgress ? null : (
+            <Button
+              title={cancelCallback.current ? "Cancel" : "Hide"}
+              type="secondaryAccented"
+              onPress={() => {
+                if (cancelCallback.current) {
+                  cancelCallback.current?.();
+                }
+                setVisible(false);
+                setProgress(undefined);
+                setData(undefined);
+              }}
+              width="100%"
+            />
+          )}
         </View>
       </DialogContainer>
     </BaseDialog>

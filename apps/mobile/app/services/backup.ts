@@ -267,14 +267,15 @@ async function run(
     }
 
     RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
-
     if (Platform.OS === "android") {
       RNFetchBlob.fs.unlink(zipOutputFile).catch(console.log);
     }
 
     updateNextBackupTime();
 
-    endProgress();
+    if (progress) {
+      endProgress();
+    }
 
     const canShowCompletionStatus =
       progress && SettingsService.get().showBackupCompleteSheet;
@@ -318,7 +319,9 @@ async function run(
 
     DatabaseLogger.error(e);
     await sleep(300);
-    endProgress();
+    if (progress) {
+      endProgress();
+    }
     return {
       error: e,
       report: true

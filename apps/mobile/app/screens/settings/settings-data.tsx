@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { formatBytes } from "@notesnook/common";
 import notifee from "@notifee/react-native";
 import dayjs from "dayjs";
 import React from "react";
@@ -25,12 +26,18 @@ import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import ScreenGuardModule from "react-native-screenguard";
-import { db } from "../../common/database";
+import { DatabaseLogger, db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
+import filesystem from "../../common/filesystem";
 import { AttachmentDialog } from "../../components/attachments";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
 import { AppLockPassword } from "../../components/dialogs/applock-password";
+import {
+  endProgress,
+  startProgress,
+  updateProgress
+} from "../../components/dialogs/progress";
 import { ChangeEmail } from "../../components/sheets/change-email";
 import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
@@ -71,8 +78,6 @@ import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import filesystem from "../../common/filesystem";
-import { formatBytes } from "@notesnook/common";
 
 type User = any;
 
@@ -334,49 +339,6 @@ export const settingsGroups: SettingSection[] = [
             description: "Verify your subscription to Notesnook Pro"
           },
           {
-            id: "logout",
-            name: "Log out",
-            description:
-              "Logging out will clear all data stored on THIS DEVICE.",
-            icon: "logout",
-            modifer: () => {
-              presentDialog({
-                title: "Logout",
-                paragraph:
-                  "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.",
-                positiveText: "Logout",
-                positivePress: async () => {
-                  try {
-                    eSendEvent(eCloseSimpleDialog);
-                    setTimeout(async () => {
-                      eSendEvent("settings-loading", true);
-                      Navigation.popToTop();
-                      await db.user?.logout();
-                      setLoginMessage();
-                      await PremiumService.setPremiumStatus();
-                      await BiometricService.resetCredentials();
-                      MMKV.clearStore();
-                      clearAllStores();
-                      refreshAllStores();
-                      Navigation.queueRoutesForUpdate();
-                      SettingsService.resetSettings();
-                      useUserStore.getState().setUser(null);
-                      useUserStore.getState().setSyncing(false);
-                      Navigation.goBack();
-                      Navigation.popToTop();
-                      setTimeout(() => {
-                        eSendEvent("settings-loading", false);
-                      }, 3000);
-                    }, 300);
-                  } catch (e) {
-                    ToastManager.error(e as Error, "Error logging out");
-                    eSendEvent("settings-loading", false);
-                  }
-                }
-              });
-            }
-          },
-          {
             id: "clear-cache",
             name: "Clear cache",
             icon: "delete",
@@ -414,6 +376,105 @@ export const settingsGroups: SettingSection[] = [
               return formatBytes(cacheSize);
             }
           },
+
+          {
+            id: "logout",
+            name: "Logout",
+            description:
+              "Logging out will clear all data stored on this device.",
+            icon: "logout",
+            modifer: async () => {
+              const hasUnsyncedChanges = await db.hasUnsyncedChanges();
+              presentDialog({
+                title: "Logout",
+                paragraph:
+                  "Are you sure you want to logout and clear all data stored on this device?",
+                positiveText: "Logout",
+                check: {
+                  info: "Take a backup before logging out",
+                  defaultValue: true
+                },
+                notice: hasUnsyncedChanges
+                  ? {
+                      text: "You have unsynced notes. Take a backup or sync your notes to avoid losing your critical data.",
+                      type: "alert"
+                    }
+                  : undefined,
+                positivePress: async (_, takeBackup) => {
+                  eSendEvent(eCloseSimpleDialog);
+                  setTimeout(async () => {
+                    try {
+                      startProgress({
+                        fillBackground: true,
+                        title: "Logging out",
+                        canHideProgress: true,
+                        paragraph:
+                          "Please wait while we log out and clear app data."
+                      });
+
+                      Navigation.navigate("Notes");
+
+                      if (takeBackup) {
+                        updateProgress({
+                          progress: "Taking a backup of your notes"
+                        });
+
+                        try {
+                          await BackupService.run(false, "local", "partial");
+                        } catch (e) {
+                          DatabaseLogger.error(e);
+                          const error = e;
+                          const canLogout = await new Promise((resolve) => {
+                            presentDialog({
+                              context: "local",
+                              title: "Backup failed",
+                              paragraph: `${
+                                (error as Error).message
+                              }. Do you want to continue logging out?`,
+                              positiveText: "Continue",
+                              positivePress: () => {
+                                resolve(true);
+                              },
+                              onClose: () => {
+                                resolve(false);
+                              }
+                            });
+                          });
+                          if (!canLogout) {
+                            endProgress();
+                            return;
+                          }
+                        }
+                      }
+
+                      updateProgress({
+                        progress: "Logging out... please wait"
+                      });
+
+                      await db.user?.logout();
+                      setLoginMessage();
+                      await PremiumService.setPremiumStatus();
+                      await BiometricService.resetCredentials();
+                      MMKV.clearStore();
+                      clearAllStores();
+                      setImmediate(() => {
+                        refreshAllStores();
+                      });
+                      Navigation.queueRoutesForUpdate();
+                      SettingsService.resetSettings();
+                      useUserStore.getState().setUser(null);
+                      useUserStore.getState().setSyncing(false);
+                      endProgress();
+                    } catch (e) {
+                      DatabaseLogger.error(e);
+                      ToastManager.error(e as Error, "Error logging out");
+                      endProgress();
+                    }
+                  }, 300);
+                }
+              });
+            }
+          },
           {
             id: "delete-account",
             type: "danger",
@@ -435,12 +496,18 @@ export const settingsGroups: SettingSection[] = [
                   try {
                     const verified = await db.user?.verifyPassword(value);
                     if (verified) {
-                      eSendEvent("settings-loading", true);
-                      await db.user?.deleteUser(value);
-                      await BiometricService.resetCredentials();
-                      SettingsService.set({
-                        introCompleted: true
-                      });
+                      setTimeout(async () => {
+                        startProgress({
+                          title: "Deleting account",
+                          paragraph: "Please wait while we delete your account"
+                        });
+                        Navigation.navigate("Notes");
+                        await db.user?.deleteUser(value);
+                        await BiometricService.resetCredentials();
+                        SettingsService.set({
+                          introCompleted: true
+                        });
+                      }, 300);
                     } else {
                       ToastManager.show({
                         heading: "Incorrect password",
@@ -451,9 +518,9 @@ export const settingsGroups: SettingSection[] = [
                       });
                     }
 
-                    eSendEvent("settings-loading", false);
+                    endProgress();
                   } catch (e) {
-                    eSendEvent("settings-loading", false);
+                    endProgress();
                     console.log(e);
                     ToastManager.error(
                       e as Error,

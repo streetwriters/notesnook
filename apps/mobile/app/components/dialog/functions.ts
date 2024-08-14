@@ -47,7 +47,12 @@ type DialogInfo = {
   keyboardType?: string;
   check?: {
     info: string;
-    type: string;
+    type?: string;
+    defaultValue?: boolean;
+  };
+  notice: {
+    text: string;
+    type: "alert" | "information";
   };
 };
 
