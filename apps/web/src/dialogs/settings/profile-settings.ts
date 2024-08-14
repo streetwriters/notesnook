@@ -23,9 +23,10 @@ import { showPasswordDialog } from "../../dialogs/password-dialog";
 import { db } from "../../common/db";
 import { showToast } from "../../utils/toast";
 import { UserProfile } from "./components/user-profile";
-import { verifyAccount } from "../../common";
+import { createBackup, verifyAccount } from "../../common";
 import { EmailChangeDialog } from "../email-change-dialog";
 import {
+  ConfirmDialog,
   showClearSessionsConfirmation,
   showLogoutConfirmation
 } from "../confirm";
@@ -141,6 +142,17 @@ export const ProfileSettings: SettingsGroup[] = [
             variant: "errorSecondary",
             title: "Logout",
             action: async () => {
+              if (await db.hasUnsyncedChanges()) {
+                const backup = await ConfirmDialog.show({
+                  title: "You have unsynced changes",
+                  message:
+                    "Do you want to take a backup before logging out to prevent data loss?",
+                  negativeButtonText: "No",
+                  positiveButtonText: "Yes"
+                });
+                if (backup) await createBackup({ mode: "partial" });
+              }
+
               if (await showLogoutConfirmation()) {
                 await TaskManager.startTask({
                   type: "modal",
