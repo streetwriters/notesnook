@@ -105,7 +105,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
           />
         ) : null}
         {warnings?.map((text) => (
-          <ErrorText key={text} error={text} />
+          <ErrorText key={text} error={text} sx={{ mt: 0 }} />
         ))}
         {checks
           ? Object.entries<Check | undefined>(checks).map(
