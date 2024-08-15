@@ -69,7 +69,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
         const verified = await db.user?.verifyPassword(
           emailChangeData.current.password
         );
-        if (!verified) throw new Error("Password is incorrect");
+        if (!verified) throw new Error(strings.passwordIncorrect());
         await db.user?.sendVerificationEmail(emailChangeData.current.email);
         setStep(EmailChangeSteps.changeEmail);
         setLoading(false);

@@ -52,12 +52,12 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
       <SelectionHeader id={route.name} items={notes} type="note" />
       <Header
         renderedInRoute={route.name}
-        title={strings.routes[route.name]()}
+        title={strings.routes[route.name as keyof typeof strings.routes]()}
         canGoBack={false}
         hasSearch={true}
         onSearch={() => {
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${route.name?.toLowerCase()}`,
+            placeholder: strings.searchInRoute(route.name),
             type: "note",
             title: route.name,
             route: route.name
@@ -72,7 +72,9 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
           dataType="note"
           renderedInRoute={route.name}
           loading={loading || !isFocused}
-          headerTitle={strings.routes[route.name]?.()}
+          headerTitle={strings.routes[
+            route.name as keyof typeof strings.routes
+          ]?.()}
           placeholder={{
             title: route.name?.toLowerCase(),
             paragraph: strings.notesEmpty(),

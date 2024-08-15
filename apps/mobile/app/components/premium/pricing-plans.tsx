@@ -48,6 +48,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { PricingItem } from "./pricing-item";
 import { useSettingStore } from "../../stores/use-setting-store";
+import { strings } from "@notesnook/intl";
 
 const UUID_PREFIX = "0bdaea";
 const UUID_VERSION = "4";
@@ -516,7 +517,7 @@ export const PricingPlans = ({
                         setBuying(true);
                         try {
                           if (!(await getPromo(value as string)))
-                            throw new Error("Error applying promo code");
+                            throw new Error(strings.errorApplyingPromoCode());
                           ToastManager.show({
                             heading: "Discount applied!",
                             type: "success",

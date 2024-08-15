@@ -126,6 +126,8 @@ export type TiptapOptions = EditorOptions &
     downloadOptions?: DownloadOptions;
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
+  } & {
+    placeholder: string;
   };
 
 const useTiptap = (
@@ -289,7 +291,7 @@ const useTiptap = (
           defaultAlignment: "left"
         }),
         Placeholder.configure({
-          placeholder: "Start writing your note..."
+          placeholder: options.placeholder || "Start writing your note..."
         }),
         ImageNode.configure({ allowBase64: true }),
         EmbedNode,

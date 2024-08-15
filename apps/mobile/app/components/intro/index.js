@@ -155,7 +155,7 @@ const Intro = ({ navigation }) => {
           index={0}
           useReactNativeGestureHandler={true}
           showPagination
-          data={strings.introData()}
+          data={strings.introData}
           paginationActiveColor={colors.primary.accent}
           paginationStyleItem={{
             width: 10,

@@ -98,7 +98,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
               }
             }, mfaInfo);
           } else {
-            finishWithError(new Error("Unable to send 2FA code"));
+            finishWithError(new Error(strings.unableToSend2faCode()));
           }
           break;
         }
@@ -132,7 +132,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
 
   const finishLogin = async () => {
     const user = await db.user.getUser();
-    if (!user) throw new Error("Email or password incorrect!");
+    if (!user) throw new Error(strings.emailOrPasswordIncorrect());
     PremiumService.setPremiumStatus();
     setUser(user);
     clearMessage();

@@ -27,12 +27,13 @@ export const setI18nGlobal = (i18n: I18n) => {
 export function getI18nGlobal() {
   return i18nGlobal;
 }
-export const i18n = i18nn;
-
-Object.keys(i18nGlobal || i18nn).forEach((key) => {
-  Object.defineProperty(i18n, key, {
-    get() {
-      return i18nGlobal?.[key as keyof I18n] || i18nn[key as keyof I18n];
+export const i18n = new Proxy(
+  {},
+  {
+    get: (target, property) => {
+      return (
+        i18nGlobal?.[property as keyof I18n] || i18nn[property as keyof I18n]
+      );
     }
-  });
-});
+  }
+);

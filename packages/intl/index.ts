@@ -18,5 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export { messages as $en } from "./locales/$en.json";
+export { messages as $de } from "./locales/$de.json";
+export { messages as $fr } from "./locales/$fr.json";
 export { strings } from "./src/strings";
 export { setI18nGlobal } from "./src/setup";

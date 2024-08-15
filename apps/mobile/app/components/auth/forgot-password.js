@@ -58,7 +58,7 @@ export const ForgotPassword = () => {
         lastRecoveryEmailTime &&
         Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 3
       ) {
-        throw new Error("Please wait before requesting another email");
+        throw new Error(strings.pleaseWaitBeforeSendEmail());
       }
       await db.user.recoverAccount(email.current.toLowerCase());
       SettingsService.set({

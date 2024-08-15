@@ -21,7 +21,6 @@ import { ControlledMenu, MenuItem as MenuItemInner } from "@szhsin/react-menu";
 import ArrowBackIcon from "mdi-react/ArrowBackIcon";
 import ArrowULeftTopIcon from "mdi-react/ArrowULeftTopIcon";
 import ArrowURightTopIcon from "mdi-react/ArrowURightTopIcon";
-import CrownIcon from "mdi-react/CrownIcon";
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import DotsVerticalIcon from "mdi-react/DotsVerticalIcon";
 import FullscreenIcon from "mdi-react/FullscreenIcon";

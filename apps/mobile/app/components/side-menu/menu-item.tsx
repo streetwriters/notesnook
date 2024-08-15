@@ -113,10 +113,10 @@ function _MenuItem({
         />
         {isFocused ? (
           <Heading color={colors.selected.heading} size={SIZE.md}>
-            {item.name}
+            {item.title || item.name}
           </Heading>
         ) : (
-          <Paragraph size={SIZE.md}>{item.name}</Paragraph>
+          <Paragraph size={SIZE.md}>{item.title || item.name}</Paragraph>
         )}
 
         {item.isBeta ? (

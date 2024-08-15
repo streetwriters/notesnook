@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /** @type {import('@lingui/conf').LinguiConfig} */
 module.exports = {
-  locales: ["en"],
+  locales: ["en", "de", "fr"],
   sourceLocale: "en",
   catalogs: [
     {
