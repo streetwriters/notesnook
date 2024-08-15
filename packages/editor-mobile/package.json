@@ -8,6 +8,7 @@
     "@mdi/react": "^1.6.0",
     "@notesnook/editor": "file:../editor",
     "@notesnook/theme": "file:../theme",
+    "@notesnook/intl": "file:../intl",
     "@szhsin/react-menu": "^4.1.0",
     "buffer": "^6.0.3",
     "framer-motion": "^10.16.8",
@@ -17,7 +18,9 @@
     "react-dom": "^18.2.0",
     "react-freeze": "^1.0.3",
     "tinycolor2": "1.6.0",
-    "zustand": "^4.4.7"
+    "zustand": "^4.4.7",
+    "@lingui/react": "4.11.2",
+    "@lingui/core": "4.11.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",

@@ -93,7 +93,7 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         hasSearch={true}
         onSearch={() => {
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${route.name}`,
+            placeholder: strings.searchInRoute(route.name),
             type: "trash",
             title: route.name,
             route: route.name

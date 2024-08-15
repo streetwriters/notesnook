@@ -21,6 +21,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
 import { useTabContext } from "../hooks/useTabStore";
+import { strings } from "@notesnook/intl";
 
 function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
   const [tags, setTags] = useState<
@@ -89,7 +90,7 @@ function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
               userSelect: "none"
             }}
           >
-            Add a tag
+            {strings.addATag()}
           </p>
         ) : null}
         <svg

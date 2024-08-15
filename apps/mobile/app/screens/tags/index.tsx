@@ -60,7 +60,7 @@ export const Tags = ({ navigation, route }: NavigationProps<"Tags">) => {
         hasSearch={true}
         onSearch={() => {
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${route.name}`,
+            placeholder: strings.searchInRoute(route.name),
             type: "tag",
             title: route.name,
             route: route.name

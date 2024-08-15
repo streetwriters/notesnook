@@ -169,9 +169,7 @@ export default function ReminderSheet({
   async function saveReminder() {
     try {
       if (!(await Notifications.checkAndRequestPermissions(true)))
-        throw new Error(
-          "App does not have permission to schedule notifications"
-        );
+        throw new Error(strings.noNotificationPermission());
       if (!date && reminderMode !== ReminderModes.Permanent) return;
       if (
         reminderMode === ReminderModes.Repeat &&
@@ -179,12 +177,12 @@ export default function ReminderSheet({
         recurringMode !== "year" &&
         selectedDays.length === 0
       )
-        throw new Error("Please select the day to repeat the reminder on");
+        throw new Error(strings.selectDayError());
 
-      if (!title.current) throw new Error("Please set title of the reminder");
+      if (!title.current) throw new Error(strings.setTitleError());
       if (date.getTime() < Date.now() && reminderMode === "once") {
         titleRef?.current?.focus();
-        throw new Error("Reminder date must be set in future");
+        throw new Error(strings.dateError());
       }
 
       date.setSeconds(0, 0);

@@ -171,7 +171,7 @@ async function run(
 
   if (!androidBackupDirectory)
     return {
-      error: new Error("Backup directory not selected"),
+      error: new Error(strings.backupDirectoryNotSelected()),
       report: false
     };
 

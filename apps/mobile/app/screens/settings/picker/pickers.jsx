@@ -57,7 +57,7 @@ export const HomePicker = createSettingsPicker({
     });
   },
   formatValue: (item) => {
-    return typeof item === "object" ? item.name : item;
+    return strings.routes[typeof item === "object" ? item.name : item]();
   },
   getItemKey: (item) => item.name,
   options: MenuItemsList.slice(0, MenuItemsList.length - 1),
@@ -71,7 +71,11 @@ export const TrashIntervalPicker = createSettingsPicker({
     db.settings.setTrashCleanupInterval(item);
   },
   formatValue: (item) => {
-    return item === -1 ? "Never" : item === 1 ? "Daily" : item + " days";
+    return item === -1
+      ? strings.never()
+      : item === 1
+      ? strings.reminderRecurringMode.day()
+      : item + " " + strings.days();
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 1, 7, 30, 365],
@@ -109,7 +113,7 @@ export const TimeFormatPicker = createSettingsPicker({
     });
   },
   formatValue: (item) => {
-    return `${item} (${dayjs().format(TimeFormats[item])})`;
+    return `${strings[item]()} (${dayjs().format(TimeFormats[item])})`;
   },
   getItemKey: (item) => item,
   options: TIME_FORMATS,
@@ -122,9 +126,7 @@ export const BackupReminderPicker = createSettingsPicker({
     SettingsService.set({ reminder: item });
   },
   formatValue: (item) => {
-    return item === "useroff" || item === "off" || item === "never"
-      ? "Off"
-      : item.slice(0, 1).toUpperCase() + item.slice(1);
+    return item === "useroff" ? strings.off() : strings[item]?.();
   },
   getItemKey: (item) => item,
   options: ["useroff", "daily", "weekly", "monthly"],
@@ -173,12 +175,12 @@ export const ApplockTimerPicker = createSettingsPicker({
   },
   formatValue: (item) => {
     return item === -1
-      ? "Never"
+      ? strings.never()
       : item === 0 || item === undefined
-      ? "Immediately"
+      ? strings.immediately()
       : item === 1
-      ? "1 minute"
-      : item + " minutes";
+      ? strings.minutes(1)
+      : strings.minutes(item);
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 0, 1, 5, 15, 30],

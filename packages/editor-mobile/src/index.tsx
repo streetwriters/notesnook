@@ -17,13 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 global.Buffer = require("buffer").Buffer;
+import { i18n } from "@lingui/core";
 import "@notesnook/editor/styles/fonts.mobile.css";
 import "@notesnook/editor/styles/katex-fonts.mobile.css";
 import "@notesnook/editor/styles/katex.min.css";
 import "@notesnook/editor/styles/styles.css";
+import { $en, setI18nGlobal } from "@notesnook/intl";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+
+i18n.load({
+  en: $en,
+  ...globalThis.LINGUI_LOCALE_DATA
+});
+i18n.activate(globalThis.LINGUI_LOCALE || "en");
+setI18nGlobal(i18n);
 
 const rootElement = document.getElementById("root");
 if (rootElement) {

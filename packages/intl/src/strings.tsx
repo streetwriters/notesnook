@@ -228,14 +228,12 @@ export const strings = {
   monographPassDesc: () =>
     t`Published note can only be viewed by someone with the password.`,
   monographSelfDestructHeading: () => t`Self destruct`,
-  monographSelfDestructDesc:
-    () => t`Published note link will be automatically deleted once it is
-                viewed by someone.`,
+  monographSelfDestructDesc: () =>
+    t`Published note link will be automatically deleted once it is viewed by someone.`,
   monographLearnMore: () => t`Learn more about Notesnook Monograph`,
   rateAppHeading: () => t`Do you enjoy using Notesnook?`,
-  rateAppDesc:
-    () => t`It took us a year to bring Notesnook to life. Share your experience
-          and suggestions to help us improve it.`,
+  rateAppDesc: () =>
+    t`It took us a year to bring Notesnook to life. Share your experience and suggestions to help us improve it.`,
   recoveryKeySavedConfirmation: () =>
     t`Tap twice to confirm you have saved the recovery key.`,
   noBlocksLinked: () => t`No blocks linked`,
@@ -1358,25 +1356,74 @@ For example:
   errorGettingCodes: () => t`Error getting codes`,
   noResultsFound: () => t`No results found for`,
   routes: {
-    Notes: () => `Notes`,
-    Notebooks: () => `Notebooks`,
-    Notebook: () => `Notebook`,
-    Favorites: () => `Favorites`,
-    Reminders: () => `Reminders`,
-    Trash: () => `Trash`,
-    Settings: () => `Settings`,
-    Tags: () => `Tags`,
-    Editor: () => `Editor`,
-    Home: () => `Home`,
-    Search: () => `Search`
+    Notes: () => t`Notes`,
+    Notebooks: () => t`Notebooks`,
+    Notebook: () => t`Notebook`,
+    Favorites: () => t`Favorites`,
+    Reminders: () => t`Reminders`,
+    Trash: () => t`Trash`,
+    Settings: () => t`Settings`,
+    Tags: () => t`Tags`,
+    Editor: () => t`Editor`,
+    Home: () => t`Home`,
+    Search: () => t`Search`,
+    Monographs: () => t`Monographs`
   },
   searchInRoute: (routeName: string) =>
-    `Type a keyword to search in ${
+    t`Type a keyword to search in ${
       strings.routes[routeName as keyof typeof strings.routes]?.() || routeName
     }`,
   logoutConfirmation: () =>
     t`Are you sure you want to logout and clear all data stored on this device?`,
   backupDataBeforeLogout: () => t`Take a backup before logging out`,
   unsyncedChangesWarning: () =>
-    t`You have unsynced notes. Take a backup or sync your notes to avoid losing your critical data.`
+    t`You have unsynced notes. Take a backup or sync your notes to avoid losing your critical data.`,
+  databaseSetupFailed: () =>
+    t`Database setup failed, could not get database key`,
+  streamingNotSupported: () => t`Streaming not supported`,
+  unableToResolveDownloadUrl: () => t`Unable to resolve download url`,
+  pleaseWaitBeforeSendEmail: () =>
+    t`Please wait before requesting another email`,
+  unableToSend2faCode: () => t`Unable to send 2FA code`,
+  emailOrPasswordIncorrect: () => t`Email or password incorrect`,
+  errorApplyingPromoCode: () => t`Error applying promo code`,
+  noNotificationPermission: () =>
+    t`"App does not have permission to schedule notifications"`,
+  selectDayError: () => t`Please select the day to repeat the reminder on`,
+  setTitleError: () => t`Please set title of the reminder`,
+  dateError: () => t`Reminder date must be set in future`,
+  failedToDecryptBackup: () => t`Failed to decrypt backup`,
+  backupDirectoryNotSelected: () => t`"Backup directory not selected"`,
+  legal: () => t`legal`,
+  days: () => t`days`,
+  daily: () => t`Daily`,
+  weekly: () => t`Weekly`,
+  monthly: () => t`Monthly`,
+  yearly: () => t`Yearly`,
+  minutes: (count: number) =>
+    plural(count, {
+      one: `1 minute`,
+      other: `# minutes`
+    }),
+  hours: (count: number) =>
+    plural(count, {
+      one: `1 hour`,
+      other: `# hours`
+    }),
+  immediately: () => t`Immediately`,
+  "12-hour": () => t`12-hour`,
+  "24-hour": () => t`24-hour`,
+  noteTitle: () => t`Note title`,
+  changesNotSaved: () => t`Your changes could not be saved`,
+  changesNotSavedDesc: () =>
+    t`It seems that your changes could not be saved. What to do next:`,
+  changesNotSavedStep1: () =>
+    t`Tap on "Dismiss" and copy the contents of your note so they are not lost.`,
+  changesNotSavedStep2: () => t`Restart the app.`,
+  thisNoteLocked: () => `This note is locked`,
+  dismiss: () => t`Dismiss`,
+  words: () => t`words`,
+  addATag: () => t`Add a tag`,
+  startWritingNote: () => t`Start writing your note...`,
+  off: () => t`Off`
 };

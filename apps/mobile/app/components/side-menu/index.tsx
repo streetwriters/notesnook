@@ -87,7 +87,13 @@ export const SideMenu = React.memo(
               return (
                 <MenuItem
                   key={item.name}
-                  item={item}
+                  item={{
+                    ...item,
+                    title:
+                      strings.routes[
+                        item.name as keyof typeof strings.routes
+                      ]?.() || item.name
+                  }}
                   testID={item.name}
                   index={index}
                 />

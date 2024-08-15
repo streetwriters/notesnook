@@ -812,7 +812,7 @@ export const settingsGroups: SettingSection[] = [
   },
   {
     id: "privacy-security",
-    name: "Privacy and security",
+    name: strings.privacyAndSecurity(),
     sections: [
       {
         id: "marketing-emails",
@@ -1460,7 +1460,7 @@ export const settingsGroups: SettingSection[] = [
   },
   {
     id: "legal",
-    name: "legal",
+    name: strings.legal(),
     sections: [
       {
         id: "tos",

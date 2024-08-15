@@ -13,11 +13,12 @@ global.Buffer = require('buffer').Buffer;
 import '../app/common/logger/index';
 import { DOMParser } from './worker.js';
 global.DOMParser = DOMParser;
-import { $en, setI18nGlobal } from "@notesnook/intl";
+import { $en, setI18nGlobal,$de } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 
 i18n.load({
   en: $en,
+  de: $de
 });
-i18n.activate("en");
+i18n.activate("de");
 setI18nGlobal(i18n);
