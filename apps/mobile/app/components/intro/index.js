@@ -43,9 +43,6 @@ import { eSendEvent } from "../../services/event-manager";
 
 const Intro = ({ navigation }) => {
   const { colors } = useThemeColors();
-  const isTelemetryEnabled = useSettingStore(
-    (state) => state.settings.telemetry
-  );
   const { width, height } = useWindowDimensions();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const insets = useGlobalSafeAreaInsets();
@@ -217,44 +214,6 @@ const Intro = ({ navigation }) => {
           type="accent"
           title="Get started"
         />
-
-        <TouchableOpacity
-          activeOpacity={1}
-          style={{
-            flexDirection: "row",
-            alignSelf: "center",
-            width: "90%",
-            marginBottom: 12,
-            paddingHorizontal: 12,
-            justifyContent: "center",
-            padding: 12,
-            maxWidth: 500
-          }}
-          onPress={() => {
-            SettingsService.set({ telemetry: !isTelemetryEnabled });
-          }}
-        >
-          <Icon
-            size={SIZE.md}
-            name={
-              isTelemetryEnabled ? "checkbox-marked" : "checkbox-blank-outline"
-            }
-            color={
-              isTelemetryEnabled ? colors.primary.accent : colors.primary.icon
-            }
-          />
-
-          <Paragraph
-            style={{
-              flexShrink: 1,
-              marginLeft: 6
-            }}
-            size={SIZE.xs}
-          >
-            Help improve Notesnook by sending completely anonymized{" "}
-            <Heading size={SIZE.xs}>private analytics and bug reports.</Heading>
-          </Paragraph>
-        </TouchableOpacity>
       </View>
     </ScrollView>
   );
