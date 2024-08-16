@@ -24,6 +24,7 @@ import { ICollection } from "./collection";
 import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
 import { sql } from "kysely";
+import { CHECK_IDS, checkIsUserPremium } from "../common";
 
 export class Tags implements ICollection {
   name = "tags";
@@ -53,7 +54,6 @@ export class Tags implements ICollection {
   async add(item: Partial<Tag> & { title: string }) {
     item.title = Tags.sanitize(item.title);
 
-    const id = item.id || getId();
     const oldTag = item.id ? await this.tag(item.id) : undefined;
 
     if (oldTag && item.title === oldTag.title) return oldTag.id;
@@ -63,15 +63,22 @@ export class Tags implements ICollection {
 
     if (oldTag) {
       await this.collection.update([oldTag.id], item);
-    } else {
-      await this.collection.upsert({
-        id,
-        dateCreated: item.dateCreated || Date.now(),
-        dateModified: item.dateModified || Date.now(),
-        title: item.title,
-        type: "tag"
-      });
+      return oldTag.id;
     }
+    if (
+      (await this.all.count()) >= 5 &&
+      !(await checkIsUserPremium(CHECK_IDS.noteTag))
+    )
+      return;
+
+    const id = item.id || getId();
+    await this.collection.upsert({
+      id,
+      dateCreated: item.dateCreated || Date.now(),
+      dateModified: item.dateModified || Date.now(),
+      title: item.title,
+      type: "tag"
+    });
     return id;
   }
 
