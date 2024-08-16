@@ -24,7 +24,6 @@ import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
 import { useEditorStore } from "./editor-store";
-import { isTelemetryEnabled, setTelemetry } from "../utils/telemetry";
 import { setDocumentTitle } from "../utils/dom";
 import { TimeFormat } from "@notesnook/core/dist/utils/date";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
@@ -49,7 +48,6 @@ class SettingStore extends BaseStore<SettingStore> {
   privacyMode = false;
   customDns = true;
   hideNoteTitle = Config.get("hideNoteTitle", false);
-  telemetry = isTelemetryEnabled();
   dateFormat = "DD-MM-YYYY";
   timeFormat: TimeFormat = "12-hour";
   titleFormat = "Note $date$ $time$";
@@ -175,12 +173,6 @@ class SettingStore extends BaseStore<SettingStore> {
       state.markdownShortcuts = toggleState ?? !state.markdownShortcuts;
       Config.set("markdownShortcuts", state.markdownShortcuts);
     });
-  };
-
-  toggleTelemetry = () => {
-    const telemetry = this.get().telemetry;
-    this.set({ telemetry: !telemetry });
-    setTelemetry(!telemetry);
   };
 
   togglePrivacyMode = async () => {

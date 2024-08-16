@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, Text } from "@theme-ui/components";
 import { Cross } from "../icons";
-import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import AnnouncementBody from "./body";
 import { useStore as useAnnouncementStore } from "../../stores/announcement-store";
 import Notice from "../notice";
@@ -59,7 +58,6 @@ function Announcements() {
         }}
         title="Dismiss announcement"
         onClick={() => {
-          trackEvent(ANALYTICS_EVENTS.announcementDismissed, announcement);
           dismiss(announcement.id);
         }}
       >

@@ -24,7 +24,6 @@ import { getPlatform } from "../../utils/platform";
 import { db } from "../../common/db";
 import Config from "../../utils/config";
 import { showToast } from "../../utils/toast";
-import { TrackingDetails } from "./components/tracking-details";
 import { PromptDialog } from "../prompt";
 
 export const PrivacySettings: SettingsGroup[] = [
@@ -33,26 +32,6 @@ export const PrivacySettings: SettingsGroup[] = [
     section: "privacy",
     header: "General",
     settings: [
-      {
-        key: "telemetry",
-        title: "Telemetry",
-        description: `Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy.
-
-What data is collected & when?`,
-        onStateChange: (listener) =>
-          useSettingStore.subscribe((s) => s.telemetry, listener),
-        components: [
-          {
-            type: "toggle",
-            isToggled: () => !!useSettingStore.getState().telemetry,
-            toggle: () => useSettingStore.getState().toggleTelemetry()
-          },
-          {
-            type: "custom",
-            component: TrackingDetails
-          }
-        ]
-      },
       {
         key: "marketing",
         title: "Marketing emails",
@@ -136,8 +115,6 @@ This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this
         title: "Custom CORS proxy",
         description:
           "CORS proxy is required to directly download images from within the Notesnook app. It allows Notesnook to bypass browser restrictions by using a proxy. You can set a custom self-hosted proxy URL to increase your privacy.",
-        onStateChange: (listener) =>
-          useSettingStore.subscribe((s) => s.telemetry, listener),
         components: [
           {
             type: "button",
