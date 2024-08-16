@@ -69,4 +69,9 @@ declare global {
       visible: boolean;
     };
   }
+  interface Window {
+    ApplePaySession?: {
+      canMakePayments(): boolean;
+    };
+  }
 }
