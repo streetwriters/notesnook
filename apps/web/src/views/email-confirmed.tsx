@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "../app.css";
 import { useEffect } from "react";
 import { Flex, Text } from "@theme-ui/components";
-import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { useQueryParams } from "../navigation";
 import { MailCheck, Discord, Twitter, Reddit } from "../components/icons";
 
@@ -152,7 +151,6 @@ function BlogPromoBanner() {
             title={account.title}
             onClick={() => {
               window.open(account.link, "_blank");
-              trackEvent(ANALYTICS_EVENTS.socialLink, { link: account.link });
             }}
             size={30}
             sx={{ mr: 1, cursor: "pointer" }}
