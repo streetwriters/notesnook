@@ -141,7 +141,9 @@ export function Main() {
 
       try {
         setIsClipping(true);
-        setClipData(await clip(clipArea, clipMode));
+        setClipData(
+          await clip(clipArea, clipMode, { ...DEFAULT_SETTINGS, ...settings })
+        );
       } catch (e) {
         console.error(e);
         if (e instanceof Error) setError(e.message);
