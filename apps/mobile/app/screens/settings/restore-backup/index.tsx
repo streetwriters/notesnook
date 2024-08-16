@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Sodium from "@ammarahmed/react-native-sodium";
-import { getFormattedDate } from "@notesnook/common";
+import { formatBytes, getFormattedDate } from "@notesnook/common";
 import { LegacyBackupFile } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
@@ -30,13 +29,14 @@ import { unzip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../../../common/database";
 import storage from "../../../common/database/storage";
 import { deleteCacheFileByName } from "../../../common/filesystem/io";
-import { cacheDir } from "../../../common/filesystem/utils";
-import { Dialog } from "../../../components/dialog";
-import BaseDialog from "../../../components/dialog/base-dialog";
-import DialogContainer from "../../../components/dialog/dialog-container";
+import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
 import { presentDialog } from "../../../components/dialog/functions";
+import {
+  endProgress,
+  startProgress,
+  updateProgress
+} from "../../../components/dialogs/progress";
 import { Button } from "../../../components/ui/button";
-import { ProgressBarComponent } from "../../../components/ui/svg/lazy";
 import Heading from "../../../components/ui/typography/heading";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { SectionItem } from "../../../screens/settings/section-item";
@@ -84,24 +84,37 @@ const withPassword = () => {
 const restoreBackup = async (options: {
   uri: string;
   deleteFile?: boolean;
-  updateProgress: (progress?: string) => void;
 }) => {
   try {
     const isLegacyBackup = options.uri.endsWith(".nnbackup");
 
-    options.updateProgress("Preparing to restore backup file...");
+    startProgress({
+      title: "Restoring backup",
+      paragraph: "Preparing to restore backup file...",
+      canHideProgress: false
+    });
 
     let filePath = options.uri;
+    let deleteBackupFile = options.deleteFile;
+
     if (!isLegacyBackup) {
       if (Platform.OS === "android") {
-        options.updateProgress(`Copying backup file to cache...`);
+        updateProgress({
+          progress: `Copying backup file to cache...`
+        });
         const cacheFile = `file://${RNFetchBlob.fs.dirs.CacheDir}/backup.zip`;
         if (await RNFetchBlob.fs.exists(cacheFile)) {
           await RNFetchBlob.fs.unlink(cacheFile);
         }
+
         await RNFetchBlob.fs.createFile(cacheFile, "", "utf8");
-        await RNFetchBlob.fs.cp(filePath, cacheFile);
+        if (filePath.startsWith("content://")) {
+          await copyFileAsync(filePath, cacheFile);
+        } else {
+          await RNFetchBlob.fs.cp(filePath, cacheFile);
+        }
         filePath = cacheFile;
+        deleteBackupFile = true;
       }
 
       const zipOutputFolder = `${cacheDir}/backup_extracted`;
@@ -109,7 +122,9 @@ const restoreBackup = async (options: {
         await RNFetchBlob.fs.unlink(zipOutputFolder);
         await RNFetchBlob.fs.mkdir(zipOutputFolder);
       }
-      options.updateProgress(`Extracting files from backup...`);
+      updateProgress({
+        progress: `Extracting files from backup...`
+      });
       await unzip(filePath, zipOutputFolder);
 
       const extractedBackupFiles = await RNFetchBlob.fs.ls(zipOutputFolder);
@@ -136,9 +151,11 @@ const restoreBackup = async (options: {
         for (const path of extractedBackupFiles) {
           if (path === ".nnbackup" || path === "attachments") continue;
 
-          options.updateProgress(
-            `Restoring data (${count++}/${extractedBackupFiles.length})`
-          );
+          updateProgress({
+            progress: `Restoring data (${count++}/${
+              extractedBackupFiles.length
+            })`
+          });
 
           const filePath = `${zipOutputFolder}/${path}`;
           const data = await RNFetchBlob.fs.readFile(filePath, "utf8");
@@ -155,7 +172,7 @@ const restoreBackup = async (options: {
             !passwordOrKey?.encryptionKey &&
             !passwordOrKey?.password
           ) {
-            options.updateProgress(undefined);
+            endProgress();
             throw new Error("Failed to decrypt backup");
           }
 
@@ -170,41 +187,34 @@ const restoreBackup = async (options: {
       count = 0;
       for (const path of extractedAttachments) {
         if (path === ".attachments_key") continue;
-        options.updateProgress(
-          `Restoring attachments (${count++}/${extractedAttachments.length})`
-        );
+        updateProgress({
+          progress: `Restoring attachments (${count++}/${
+            extractedAttachments.length
+          })`
+        });
         const hash = path;
         const attachment = await db.attachments.attachment(hash as string);
         if (!attachment) continue;
 
-        if (attachment.dateUploaded) {
-          const key = await db.attachments.decryptKey(attachment.key);
-          if (!key) continue;
-
-          const calculatedHash = await Sodium.hashFile({
-            uri: path,
-            type: "cache"
-          });
-          if (calculatedHash !== attachment.hash) continue;
-          await db.attachments.reset(attachment.id);
-        }
-
+        console.log("Saving attachment file", hash);
         await deleteCacheFileByName(hash);
         await RNFetchBlob.fs.cp(
           `${zipOutputFolder}/attachments/${hash}`,
           `${cacheDir}/${hash}`
         );
       }
-
-      options.updateProgress(`Cleaning up...`);
-
+      updateProgress({
+        progress: `Cleaning up...`
+      });
       // Remove files from cache
       RNFetchBlob.fs.unlink(zipOutputFolder).catch(console.log);
-      if (Platform.OS === "android" || options.deleteFile) {
+      if (Platform.OS === "android" || deleteBackupFile) {
         RNFetchBlob.fs.unlink(filePath).catch(console.log);
       }
     } else {
-      options.updateProgress(`Reading backup file...`);
+      updateProgress({
+        progress: `Reading backup file...`
+      });
       const rawData =
         Platform.OS === "android"
           ? await ScopedStorage.readFile(filePath, "utf8")
@@ -214,29 +224,31 @@ const restoreBackup = async (options: {
       const isEncryptedBackup =
         typeof backup.data !== "string" && backup.data.cipher;
 
-      options.updateProgress(
-        isEncryptedBackup
+      updateProgress({
+        progress: isEncryptedBackup
           ? `Backup is encrypted, decrypting...`
           : "Preparing to restore backup file..."
-      );
+      });
 
       const { encryptionKey, password } = isEncryptedBackup
         ? ({} as PasswordOrKey)
         : await withPassword();
 
       if (isEncryptedBackup && !encryptionKey && !password) {
-        options.updateProgress(undefined);
+        endProgress();
         throw new Error("Failed to decrypt backup");
       }
 
       await db.transaction(async () => {
-        options.updateProgress("Restoring backup...");
+        updateProgress({
+          progress: "Restoring backup..."
+        });
         await db.backup.import(backup, {
           encryptionKey,
           password
         });
       });
-      options.updateProgress(undefined);
+      endProgress();
     }
 
     ToastManager.show({
@@ -247,9 +259,9 @@ const restoreBackup = async (options: {
     await db.initCollections();
     refreshAllStores();
     Navigation.queueRoutesForUpdate();
-    options.updateProgress(undefined);
+    endProgress();
   } catch (e) {
-    options.updateProgress(undefined);
+    endProgress();
     DatabaseLogger.error(e as Error);
     ToastManager.error(e as Error, `Failed to restore backup`);
   }
@@ -267,8 +279,6 @@ export const RestoreBackup = () => {
   const [loading, setLoading] = useState(true);
   const [backupDirectoryAndroid, setBackupDirectoryAndroid] =
     useState<ScopedStorage.FileType>();
-
-  const [progress, setProgress] = useState<string>();
 
   useEffect(() => {
     setTimeout(() => {
@@ -309,6 +319,7 @@ export const RestoreBackup = () => {
       setFiles(files);
       BACKUP_FILES_CACHE.splice(0, BACKUP_FILES_CACHE.length, ...files);
     } catch (e) {
+      e;
     } finally {
       setLoading(false);
     }
@@ -321,7 +332,7 @@ export const RestoreBackup = () => {
     }: {
       item: ReactNativeBlobUtilStat | ScopedStorage.FileType;
       index: number;
-    }) => <BackupItem item={item} index={index} updateProgress={setProgress} />,
+    }) => <BackupItem item={item} index={index} />,
     []
   );
 
@@ -332,71 +343,6 @@ export const RestoreBackup = () => {
         renderItem={() => {
           return (
             <View>
-              {progress ? (
-                <BaseDialog visible>
-                  <DialogContainer
-                    style={{
-                      paddingHorizontal: 12,
-                      paddingBottom: 10
-                    }}
-                  >
-                    <Dialog context="local" />
-                    <View
-                      style={{
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingHorizontal: 50,
-                        gap: 10,
-                        paddingBottom: 20
-                      }}
-                    >
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          width: 100,
-                          paddingTop: 20
-                        }}
-                      >
-                        <ProgressBarComponent
-                          height={5}
-                          width={100}
-                          animated={true}
-                          useNativeDriver
-                          indeterminate
-                          indeterminateAnimationDuration={2000}
-                          unfilledColor={colors.secondary.background}
-                          color={colors.primary.accent}
-                          borderWidth={0}
-                        />
-                      </View>
-
-                      <Heading color={colors.primary.paragraph} size={SIZE.lg}>
-                        Creating backup
-                      </Heading>
-                      <Paragraph
-                        style={{
-                          textAlign: "center"
-                        }}
-                        color={colors.secondary.paragraph}
-                      >
-                        {progress
-                          ? progress
-                          : "Please wait while we create backup"}
-                      </Paragraph>
-
-                      <Button
-                        title="Cancel"
-                        type="secondaryAccented"
-                        onPress={() => {
-                          setProgress(undefined);
-                        }}
-                        width="100%"
-                      />
-                    </View>
-                  </DialogContainer>
-                </BaseDialog>
-              ) : null}
-
               <SectionItem
                 item={{
                   id: "restore-from-files",
@@ -421,8 +367,7 @@ export const RestoreBackup = () => {
                         Platform.OS === "android"
                           ? (("file://" + file.fileCopyUri) as string)
                           : (file.fileCopyUri as string),
-                      deleteFile: true,
-                      updateProgress: setProgress
+                      deleteFile: true
                     });
                   },
                   description:
@@ -539,12 +484,10 @@ export const RestoreBackup = () => {
 
 const BackupItem = ({
   item,
-  index,
-  updateProgress
+  index
 }: {
   item: ReactNativeBlobUtilStat | ScopedStorage.FileType;
   index: number;
-  updateProgress: (progress?: string) => void;
 }) => {
   const { colors } = useThemeColors();
 
@@ -579,7 +522,8 @@ const BackupItem = ({
           style={{ width: "100%", maxWidth: "100%" }}
         >
           Created on {getFormattedDate(item?.lastModified, "date-time")}
-          {isLegacyBackup ? "(Legacy backup)" : ""}
+          {isLegacyBackup ? "(Legacy backup)" : ""} (
+          {formatBytes((item as ReactNativeBlobUtilStat).size)})
         </Paragraph>
       </View>
       <Button
@@ -595,14 +539,15 @@ const BackupItem = ({
             paragraph: `Are you sure you want to restore this backup?`,
             positiveText: "Restore",
             negativeText: "Cancel",
-            positivePress: async () =>
+            positivePress: async () => {
+              console.log("file path", (item as ScopedStorage.FileType).uri);
               restoreBackup({
                 uri:
                   Platform.OS === "android"
                     ? (item as ScopedStorage.FileType).uri
-                    : (item as ReactNativeBlobUtilStat).path,
-                updateProgress
-              })
+                    : (item as ReactNativeBlobUtilStat).path
+              });
+            }
           });
         }}
       />

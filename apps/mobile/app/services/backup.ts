@@ -260,7 +260,8 @@ async function run(
       );
       console.log("Copying zip file...");
       await copyFileAsync(`file://${zipOutputFile}`, file.uri);
-      console.log("Copyied zip file...");
+
+      console.log("Copied zip file...");
       path = file.uri;
     } else {
       path = zipOutputFile;

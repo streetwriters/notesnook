@@ -170,6 +170,12 @@ export async function deleteCacheFileByPath(path) {
 }
 
 export async function deleteCacheFileByName(name) {
+  const iosAppGroup =
+    Platform.OS === "ios"
+      ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+      : null;
+  const appGroupPath = `${iosAppGroup}/${name}`;
+  await RNFetchBlob.fs.unlink(appGroupPath).catch(console.log);
   await RNFetchBlob.fs.unlink(`${cacheDir}/${name}`).catch(console.log);
 }
 

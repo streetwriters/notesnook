@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { checkAttachment, downloadFile, getUploadedFileSize } from "./download";
+import { checkAttachment, downloadFile } from "./download";
 import {
   clearFileStorage,
   deleteFile,
@@ -32,7 +32,7 @@ import {
   getCacheSize
 } from "./io";
 import { uploadFile } from "./upload";
-import { cancelable } from "./utils";
+import { cancelable, getUploadedFileSize } from "./utils";
 
 export default {
   readEncrypted,

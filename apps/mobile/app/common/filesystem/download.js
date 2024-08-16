@@ -160,15 +160,19 @@ export async function checkAttachment(hash) {
   const internetState = await NetInfo.fetch();
   const isInternetReachable =
     internetState.isConnected && internetState.isInternetReachable;
-  if (!isInternetReachable) return { success: true };
+  if (!isInternetReachable) return;
   const attachment = await db.attachments.attachment(hash);
   if (!attachment) return { failed: "Attachment not found." };
 
   try {
     const size = await getUploadedFileSize(hash);
+    console.log("File Size", size);
     if (size === -1) return { success: true };
 
-    if (size === 0) return { failed: "File length is 0." };
+    if (size === 0)
+      return {
+        failed: `File length is 0. Please upload this file again from the attachment manager. (File hash: ${hash})`
+      };
   } catch (e) {
     return { failed: e?.message };
   }

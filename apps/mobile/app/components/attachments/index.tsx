@@ -122,10 +122,11 @@ export const AttachmentDialog = ({ note }: { note?: Note }) => {
       const attachment = (await attachments.item(i))?.item;
       if (!attachment) continue;
       const result = await filesystem.checkAttachment(attachment.hash);
+      if (!result) return;
       if (result.failed) {
         await db.attachments.markAsFailed(attachment.hash, result.failed);
       } else {
-        await db.attachments.markAsFailed(attachment.id, undefined);
+        await db.attachments.markAsFailed(attachment.id);
       }
     }
     refresh();
