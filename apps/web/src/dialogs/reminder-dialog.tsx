@@ -131,14 +131,17 @@ export const ReminderDialog = DialogManager.register(function ReminderDialog(
       testId="reminder-dialog"
       isOpen={true}
       title={reminder.title}
-      onClose={() => props.onClose(false)}
+      onClose={() => {
+        Config.set(reminderKey, true);
+        props.onClose(false);
+      }}
       showCloseButton
       description={reminder.description}
       positiveButton={{
         text: <Flex>{reminder.cta.title}</Flex>,
         onClick: async () => {
           if (reminder.cta.action) await reminder.cta.action();
-
+          Config.set(reminderKey, true);
           props.onClose(true);
         }
       }}
