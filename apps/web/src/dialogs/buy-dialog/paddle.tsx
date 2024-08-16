@@ -32,6 +32,7 @@ import {
 } from "./types";
 import { ScrollContainer } from "@notesnook/ui";
 import useMobile from "../../hooks/use-mobile";
+import { logger } from "../../utils/logger";
 
 // const isDev = false; // import.meta.env.DEV;
 // const VENDOR_ID = isDev ? 1506 : 128190;
@@ -102,6 +103,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
   useEffect(() => {
     async function onMessage(ev: MessageEvent<PaddleEvent>) {
       if (ev.origin !== PADDLE_ORIGIN) return;
+      logger.debug("Paddle event received", { data: ev.data });
       const { event_name, callback_data } = ev.data;
       const { checkout } = callback_data;
 
@@ -109,8 +111,10 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
         !checkout ||
         !checkout.id ||
         SUBSCRIBED_EVENTS.indexOf(event_name) === -1
-      )
+      ) {
+        logger.debug("Ignoring paddle event", { event_name });
         return;
+      }
 
       if (event_name === PaddleEvents["Checkout.Complete"]) {
         onCompleted && onCompleted();
