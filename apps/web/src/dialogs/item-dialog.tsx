@@ -93,8 +93,8 @@ export const CreateTagDialog = {
       title: "Create tag",
       subtitle: "You can create as many tags as you want."
     }).then(async (title) => {
-      if (!title) return;
-      await db.tags.add({ title });
+      if (!title || !(await db.tags.add({ title }))) return;
+
       showToast("success", "Tag created!");
       useTagStore.getState().refresh();
     })

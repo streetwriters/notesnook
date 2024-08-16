@@ -31,7 +31,7 @@ import {
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
-import { EV, EVENTS } from "@notesnook/core/dist/common";
+import { CHECK_IDS, EV, EVENTS } from "@notesnook/core/dist/common";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
@@ -70,11 +70,27 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
           if (isUserPremium()) {
             return { type, result: true };
           } else {
-            showToast(
-              "error",
-              "Please upgrade your account to Pro to use this feature.",
-              [{ text: "Upgrade now", onClick: () => BuyDialog.show({}) }]
-            );
+            let sentence = "Please upgrade your account to Pro ";
+            switch (type) {
+              case CHECK_IDS.noteColor:
+                sentence += "to add colors.";
+                break;
+              case CHECK_IDS.noteTag:
+                sentence += "to add more tags.";
+                break;
+              case CHECK_IDS.notebookAdd:
+                sentence += "to add more notebooks.";
+                break;
+              case CHECK_IDS.vaultAdd:
+                sentence += "to use the notes vault.";
+                break;
+              default:
+                sentence += "to use this feature.";
+                break;
+            }
+            showToast("error", sentence, [
+              { text: "Upgrade now", onClick: () => BuyDialog.show({}) }
+            ]);
             return { type, result: false };
           }
         }

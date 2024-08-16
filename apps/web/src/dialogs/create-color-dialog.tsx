@@ -63,7 +63,7 @@ export const CreateColorDialog = DialogManager.register(
               colorCode: form.color,
               title: form.title
             });
-            props.onClose(colorId);
+            props.onClose(colorId || false);
           }}
         >
           <Field
