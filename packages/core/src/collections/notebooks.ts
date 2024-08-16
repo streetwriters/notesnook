@@ -25,6 +25,7 @@ import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
 import { sql } from "kysely";
 import { deleteItems } from "../utils/array";
+import { CHECK_IDS, checkIsUserPremium } from "../common";
 
 export class Notebooks implements ICollection {
   name = "notebooks";
@@ -58,6 +59,13 @@ export class Notebooks implements ICollection {
 
     if (oldNotebook && isTrashItem(oldNotebook))
       throw new Error("Cannot modify trashed notebooks.");
+
+    if (
+      !oldNotebook &&
+      (await this.all.count()) >= 20 &&
+      !(await checkIsUserPremium(CHECK_IDS.notebookAdd))
+    )
+      return;
 
     const mergedNotebook: Partial<Notebook> = {
       ...oldNotebook,
