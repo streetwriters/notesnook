@@ -420,7 +420,12 @@ export const settingsGroups: SettingSection[] = [
                         });
 
                         try {
-                          await BackupService.run(false, "local", "partial");
+                          const result = await BackupService.run(
+                            false,
+                            "local",
+                            "partial"
+                          );
+                          if (result.error) throw result.error as Error;
                         } catch (e) {
                           DatabaseLogger.error(e);
                           const error = e;
