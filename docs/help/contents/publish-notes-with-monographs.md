@@ -7,7 +7,7 @@ description: Anonymous, secure and encrypted note sharing with password protecti
 
 Sharing a note with someone can be such a tedious task. You have to copy/download/export it to a file and then attach it in an email or upload it to some cloud storage.
 
-With Notesnook, you don't need to do that anymore. Monographs enable you to share your notes with anyone in a single click. Once a note is published as a monograph, you get a public url which you can share with anyone. They don't need to download Notesnook or install any extra software — it's just like a blog, only simpler.
+With Notesnook, you don't need to do that anymore. Monographs enable you to share your notes with anyone in a single click. Once a note is published as a monograph, you get a public URL which you can share with anyone. They don't need to download Notesnook or install any extra software — it's just like a blog, only simpler.
 
 ## How to publish a note?
 
@@ -16,14 +16,14 @@ With Notesnook, you don't need to do that anymore. Monographs enable you to shar
 1. Right click on a note
 2. Click on `Publish` from Note properties to open publish note dialog.
 3. Click on `Publish` button to publish note.
-4. Copy the url and send it to respective person.
+4. Copy the URL and send it to respective person.
 
 # [Mobile](#/tab/mobile)
 
 5. Tap on ![Three dot button](/three-dot-button.png) button on a note.
 6. Tap on `Publish` to open Publish note sheet
 7. Tap on `Publish` button to publish note.
-8. Copy the url and send it to respective person.
+8. Copy the URL and send it to respective person.
 
 ---
 
@@ -33,7 +33,7 @@ When you are sharing sensitive information with someone, you can encrypt the mon
 
 ## Self destruct
 
-Self destruct means that the published note can be viewed only once. Once someone visits the public url to see the contents of the note, the monograph is deleted and it cannot be viewed again.
+Self destruct means that the published note can be viewed only once. Once someone visits the public URL to see the contents of the note, the monograph is deleted and it cannot be viewed again.
 
 ## Unpublish a monograph
 
