@@ -48,6 +48,7 @@ import { isCipher } from "@notesnook/core/dist/database/crypto";
 import { hashNavigate } from "../navigation";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import Vault from "../common/vault";
+import { Mutex } from "async-mutex";
 
 export enum SaveState {
   NotSaved = -1,
@@ -158,7 +159,7 @@ export function isLockedSession(session: EditorSession): boolean {
       session.content.locked)
   );
 }
-
+const saveMutex = new Mutex();
 class EditorStore extends BaseStore<EditorStore> {
   sessions: EditorSession[] = [];
   activeSessionId?: string;
@@ -752,119 +753,119 @@ class EditorStore extends BaseStore<EditorStore> {
 
     // do not allow saving of readonly session
     if (partial.note?.readonly) return;
-    if (
-      currentSession.saveState === SaveState.Saving ||
-      currentSession.id !== id
-    )
-      return;
 
-    this.setSaveState(id, 0);
-    try {
-      const sessionId = getSessionId(currentSession);
+    await saveMutex.runExclusive(async () => {
+      this.setSaveState(id, 0);
+      try {
+        const sessionId = getSessionId(currentSession);
 
-      if (isLockedSession(currentSession) && partial.content) {
-        logger.debug("Saving locked content", { id });
+        if (isLockedSession(currentSession) && partial.content) {
+          logger.debug("Saving locked content", { id });
 
-        await db.vault.save({
-          content: partial.content,
-          sessionId,
-          id
-        });
-      } else {
-        if (partial.content)
-          logger.debug("Saving content", {
-            id,
-            length: partial.content.data.length
+          await db.vault.save({
+            content: partial.content,
+            sessionId,
+            id
           });
-        await db.notes.add({
-          ...partial.note,
-          dateEdited:
-            partial.ignoreEdit && currentSession.type === "default"
-              ? currentSession.note.dateEdited
-              : undefined,
-          contentId:
-            currentSession.type === "default"
-              ? currentSession.note.contentId
-              : undefined,
-          content: partial.content,
-          sessionId,
-          id
-        });
-      }
-
-      const note = await db.notes.note(id);
-      if (!note) throw new Error("Note not saved.");
-
-      if (currentSession.type === "new") {
-        if (currentSession.context) {
-          const { type } = currentSession.context;
-          if (type === "notebook")
-            await db.notes.addToNotebook(currentSession.context.id, id);
-          else if (type === "color" || type === "tag")
-            await db.relations.add(
-              { type, id: currentSession.context.id },
-              { id, type: "note" }
-            );
-        }
-        const defaultNotebook = db.settings.getDefaultNotebook();
-        if (defaultNotebook) await db.notes.addToNotebook(defaultNotebook, id);
-      }
-
-      const attachmentsLength = await db.attachments.ofNote(id, "all").count();
-      const shouldRefreshNotes =
-        currentSession.type === "new" ||
-        !id ||
-        note.title !== currentSession.note?.title ||
-        note.headline !== currentSession.note?.headline ||
-        attachmentsLength !== currentSession.attachmentsLength;
-      if (shouldRefreshNotes) useNoteStore.getState().refresh();
-
-      if (currentSession.type === "new") {
-        await this.openSession(note, { force: true });
-      } else {
-        // update any conflicted session that has the same content opened
-        if (partial.content) {
-          this.set((state) => {
-            const session = state.sessions.find(
-              (s): s is ConflictedEditorSession =>
-                (s.type === "diff" || s.type === "conflicted") &&
-                !!s.content?.conflicted &&
-                s.content.conflicted.id === currentSession.note.contentId &&
-                s.content.conflicted.dateEdited ===
-                  currentSession.note.dateEdited
-            );
-            if (!session || !session.content?.conflicted) return;
-            session.content.conflicted.data = partial.content!.data;
-            session.content.conflicted.dateEdited = note.dateEdited;
+        } else {
+          if (partial.content)
+            logger.debug("Saving content", {
+              id,
+              length: partial.content.data.length
+            });
+          await db.notes.add({
+            ...partial.note,
+            dateEdited:
+              partial.ignoreEdit && currentSession.type === "default"
+                ? currentSession.note.dateEdited
+                : undefined,
+            contentId:
+              currentSession.type === "default"
+                ? currentSession.note.contentId
+                : undefined,
+            content: partial.content,
+            sessionId,
+            id
           });
         }
 
-        this.updateSession(id, ["default"], {
-          preview: false,
-          attachmentsLength: attachmentsLength,
-          note,
-          sessionId
-        });
-      }
+        const note = await db.notes.note(id);
+        if (!note) throw new Error("Note not saved.");
 
-      setDocumentTitle(
-        settingStore.get().hideNoteTitle ? undefined : note.title
-      );
-      this.setSaveState(id, SaveState.Saved);
-    } catch (err) {
-      showToast(
-        "error",
-        err instanceof Error && err.stack
-          ? err.message + err.stack
-          : JSON.stringify(err)
-      );
-      this.setSaveState(id, SaveState.NotSaved);
-      console.error(err);
-      if (err instanceof Error) logger.error(err);
-      if (isLockedSession(currentSession)) {
-        this.get().openSession(id, { force: true });
+        if (currentSession.type === "new") {
+          if (currentSession.context) {
+            const { type } = currentSession.context;
+            if (type === "notebook")
+              await db.notes.addToNotebook(currentSession.context.id, id);
+            else if (type === "color" || type === "tag")
+              await db.relations.add(
+                { type, id: currentSession.context.id },
+                { id, type: "note" }
+              );
+          }
+          const defaultNotebook = db.settings.getDefaultNotebook();
+          if (defaultNotebook)
+            await db.notes.addToNotebook(defaultNotebook, id);
+        }
+
+        const attachmentsLength = await db.attachments
+          .ofNote(id, "all")
+          .count();
+        const shouldRefreshNotes =
+          currentSession.type === "new" ||
+          !id ||
+          note.title !== currentSession.note?.title ||
+          note.headline !== currentSession.note?.headline ||
+          attachmentsLength !== currentSession.attachmentsLength;
+        if (shouldRefreshNotes) useNoteStore.getState().refresh();
+
+        if (currentSession.type === "new") {
+          await this.openSession(note, { force: true });
+        } else {
+          // update any conflicted session that has the same content opened
+          if (partial.content) {
+            this.set((state) => {
+              const session = state.sessions.find(
+                (s): s is ConflictedEditorSession =>
+                  (s.type === "diff" || s.type === "conflicted") &&
+                  !!s.content?.conflicted &&
+                  s.content.conflicted.id === currentSession.note.contentId &&
+                  s.content.conflicted.dateEdited ===
+                    currentSession.note.dateEdited
+              );
+              if (!session || !session.content?.conflicted) return;
+              session.content.conflicted.data = partial.content!.data;
+              session.content.conflicted.dateEdited = note.dateEdited;
+            });
+          }
+
+          this.updateSession(id, ["default"], {
+            preview: false,
+            attachmentsLength: attachmentsLength,
+            note,
+            sessionId
+          });
+        }
+
+        setDocumentTitle(
+          settingStore.get().hideNoteTitle ? undefined : note.title
+        );
+        this.setSaveState(id, SaveState.Saved);
+      } catch (err) {
+        showToast(
+          "error",
+          err instanceof Error && err.stack
+            ? err.message + err.stack
+            : JSON.stringify(err)
+        );
+        this.setSaveState(id, SaveState.NotSaved);
+        console.error(err);
+        if (err instanceof Error) logger.error(err);
+        if (isLockedSession(currentSession)) {
+          this.get().openSession(id, { force: true });
+        }
       }
-    }
+    });
   };
 
   newSession = () => {

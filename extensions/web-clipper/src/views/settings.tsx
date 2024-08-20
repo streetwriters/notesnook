@@ -26,7 +26,9 @@ import type { Config } from "@notesnook/clipper/dist/types";
 
 export const SETTINGS_KEY = "settings";
 export const DEFAULT_SETTINGS: Config = {
-  corsProxy: "https://cors.notesnook.com"
+  corsProxy: "https://cors.notesnook.com",
+  images: true,
+  inlineImages: true
 };
 
 export function Settings() {

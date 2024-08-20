@@ -21,15 +21,15 @@ import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import {
   decrypt,
+  decryptMulti,
   deriveCryptoKey,
   encrypt,
+  encryptMulti,
   generateCryptoKey,
   getCryptoKey,
   getRandomBytes,
   hash,
-  removeCryptoKey,
-  decryptMulti,
-  encryptMulti
+  removeCryptoKey
 } from "./encryption";
 import { MMKV } from "./mmkv";
 

@@ -21,7 +21,8 @@ const FEATURE_CHECKS = {
   opfs: false,
   cache: false,
   indexedDB: false,
-  clonableCryptoKey: false
+  clonableCryptoKey: false,
+  applePaySupported: window.ApplePaySession?.canMakePayments()
 };
 
 async function isOPFSSupported() {

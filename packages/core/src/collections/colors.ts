@@ -24,6 +24,7 @@ import Database from "../api";
 import { Tags } from "./tags";
 import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
+import { CHECK_IDS, checkIsUserPremium } from "../common";
 
 export const DefaultColors: Record<string, string> = {
   red: "#f44336",
@@ -69,9 +70,6 @@ export class Colors implements ICollection {
   // }
 
   async add(item: Partial<Color>) {
-    if (item.remote)
-      throw new Error("Please use db.colors.merge to merge remote colors.");
-
     item.title = item.title ? Tags.sanitize(item.title) : item.title;
     const oldColor = item.id
       ? await this.color(item.id)
@@ -83,20 +81,23 @@ export class Colors implements ICollection {
     if (!item.colorCode && !oldColor?.colorCode)
       throw new Error("Color code is required.");
 
-    const id =
-      oldColor && item.colorCode === oldColor.colorCode
-        ? oldColor.id
-        : item.id || getId(item.dateCreated);
+    if (oldColor) {
+      await this.collection.update([oldColor.id], item);
+      return oldColor.id;
+    }
+    if (!(await checkIsUserPremium(CHECK_IDS.noteColor))) return;
 
+    const id = item.id || getId(item.dateCreated);
     await this.collection.upsert({
       id,
-      dateCreated: item.dateCreated || oldColor?.dateCreated || Date.now(),
-      dateModified: item.dateModified || oldColor?.dateModified || Date.now(),
-      title: item.title || oldColor?.title || "",
-      colorCode: item.colorCode || oldColor?.colorCode || "",
+      dateCreated: item.dateCreated || Date.now(),
+      dateModified: item.dateModified || Date.now(),
+      title: item.title || "",
+      colorCode: item.colorCode || "",
       type: "color",
       remote: false
     });
+
     return id;
   }
 

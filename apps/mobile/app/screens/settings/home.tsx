@@ -18,35 +18,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import DelayLayout from "../../components/delay-layout";
-import BaseDialog from "../../components/dialog/base-dialog";
-import { ProgressBarComponent } from "../../components/ui/svg/lazy";
-import Heading from "../../components/ui/typography/heading";
-import Paragraph from "../../components/ui/typography/paragraph";
+import { Header } from "../../components/header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from "../../services/event-manager";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useThemeColors } from "@notesnook/theme";
-import { SIZE } from "../../utils/size";
 import { SectionGroup } from "./section-group";
 import { settingsGroups } from "./settings-data";
 import { RouteParams, SettingSection } from "./types";
 import SettingsUserSection from "./user-section";
-import { Header } from "../../components/header";
 const keyExtractor = (item: SettingSection) => item.id;
 
 const Home = ({
   navigation
 }: NativeStackScreenProps<RouteParams, "SettingsHome">) => {
-  const { colors } = useThemeColors();
-  const [loading, setLoading] = useState(false);
-
   useNavigationFocus(navigation, {
     onFocus: () => {
       useNavigationStore.getState().setFocusedRouteId("Settings");
@@ -62,16 +49,6 @@ const Home = ({
       <SectionGroup item={item} />
     );
 
-  useEffect(() => {
-    function settingsLoading(state: boolean) {
-      setLoading(state || true);
-    }
-    eSubscribeEvent("settings-loading", settingsLoading);
-    return () => {
-      eUnSubscribeEvent("settings-loading", settingsLoading);
-    };
-  }, []);
-
   return (
     <>
       <Header
@@ -81,57 +58,6 @@ const Home = ({
         id="Settings"
       />
       <DelayLayout delay={300} type="settings">
-        {loading && (
-          //@ts-ignore // Migrate to typescript required.
-          <BaseDialog animated={false} bounce={false} visible={true}>
-            <View
-              style={{
-                width: "100%",
-                height: "100%",
-                backgroundColor: colors.primary.background,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <View
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  backgroundColor: colors.primary.background,
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
-                <Heading color={colors.primary.paragraph} size={SIZE.lg}>
-                  Logging out
-                </Heading>
-                <Paragraph color={colors.secondary.paragraph}>
-                  Please wait while we log out and clear app data.
-                </Paragraph>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    width: 100,
-                    marginTop: 15
-                  }}
-                >
-                  <ProgressBarComponent
-                    height={5}
-                    width={100}
-                    animated={true}
-                    useNativeDriver
-                    indeterminate
-                    indeterminateAnimationDuration={2000}
-                    unfilledColor={colors.secondary.background}
-                    color={colors.primary.accent}
-                    borderWidth={0}
-                  />
-                </View>
-              </View>
-            </View>
-          </BaseDialog>
-        )}
-
         <Animated.FlatList
           entering={FadeInDown}
           data={settingsGroups}

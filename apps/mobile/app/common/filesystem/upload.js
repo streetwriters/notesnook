@@ -17,32 +17,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import RNFetchBlob from "react-native-blob-util";
-import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { DatabaseLogger, db } from "../database";
-import { cacheDir } from "./utils";
-import { isImage, isDocument } from "@notesnook/core/dist/utils/filename";
 import { Platform } from "react-native";
-import { IOS_APPGROUPID } from "../../utils/constants";
-import { createCacheDir } from "./io";
-import { getUploadedFileSize } from "./download";
+import RNFetchBlob from "react-native-blob-util";
 import { ToastManager } from "../../services/event-manager";
+import { useAttachmentStore } from "../../stores/use-attachment-store";
+import { IOS_APPGROUPID } from "../../utils/constants";
+import { DatabaseLogger, db } from "../database";
+import { createCacheDir } from "./io";
+import { cacheDir, getUploadedFileSize } from "./utils";
 
-export async function uploadFile(filename, data, cancelToken) {
-  if (!data) return false;
-  let { url, headers } = data;
+export async function uploadFile(filename, requestOptions, cancelToken) {
+  if (!requestOptions) return false;
+  let { url, headers } = requestOptions;
   await createCacheDir();
   DatabaseLogger.info(`Preparing to upload file: ${filename}`);
 
   try {
     const uploadedFileSize = await getUploadedFileSize(filename);
+
     if (uploadedFileSize === -1) {
-      DatabaseLogger.log("Upload verification failed.");
-      return false;
+      const error = `Uploaded file verification failed. (File hash: ${filename})`;
+      throw new Error(error);
     }
 
-    const isUploaded = uploadedFileSize !== 0;
-    if (isUploaded) {
+    if (uploadedFileSize !== 0) {
       DatabaseLogger.log(`File ${filename} is already uploaded.`);
       return true;
     }
@@ -117,9 +115,6 @@ export async function uploadFile(filename, data, cancelToken) {
       );
       let attachment = await db.attachments.attachment(filename);
       if (!attachment) return result;
-      if (!isImage(attachment.mimeType) && !isDocument(attachment.mimeType)) {
-        RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
-      }
     } else {
       const fileInfo = await RNFetchBlob.fs.stat(uploadFilePath);
       throw new Error(

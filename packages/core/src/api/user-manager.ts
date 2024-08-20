@@ -42,6 +42,7 @@ const ENDPOINTS = {
 
 class UserManager {
   private tokenManager: TokenManager;
+  private cachedAttachmentKey?: SerializedKey;
   constructor(private readonly db: Database) {
     this.tokenManager = new TokenManager(this.db.kv);
 
@@ -246,6 +247,7 @@ class UserManager {
     } catch (e) {
       logger.error(e, "Error logging out user.", { revoke, reason });
     } finally {
+      this.cachedAttachmentKey = undefined;
       await this.db.reset();
       EV.publish(EVENTS.userLoggedOut, reason);
       EV.publish(EVENTS.appRefreshRequested);
@@ -385,6 +387,7 @@ class UserManager {
   }
 
   async getAttachmentsKey() {
+    if (this.cachedAttachmentKey) return this.cachedAttachmentKey;
     try {
       let user = await this.getUser();
       if (!user) return;
@@ -412,7 +415,8 @@ class UserManager {
         .storage()
         .decrypt(userEncryptionKey, user.attachmentsKey);
       if (!plainData) return;
-      return JSON.parse(plainData);
+      this.cachedAttachmentKey = JSON.parse(plainData) as SerializedKey;
+      return this.cachedAttachmentKey;
     } catch (e) {
       logger.error(e, "Could not get attachments encryption key.");
       if (e instanceof Error)

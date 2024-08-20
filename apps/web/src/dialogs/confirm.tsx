@@ -17,14 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Checkbox, Label, Text } from "@theme-ui/components";
+import { Checkbox, Flex, Label, Text } from "@theme-ui/components";
 import { useRef } from "react";
 import { mdToHtml } from "../utils/md";
 import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { db } from "../common/db";
-import { AppVersion, getChangelog } from "../utils/version";
+import { getChangelog } from "../utils/version";
 import { downloadUpdate } from "../utils/updater";
+import { ErrorText } from "../components/error-text";
 
 type Check = { text: string; default?: boolean };
 export type ConfirmDialogProps<TCheckId extends string> = BaseDialogProps<
@@ -36,6 +37,7 @@ export type ConfirmDialogProps<TCheckId extends string> = BaseDialogProps<
   positiveButtonText?: string;
   negativeButtonText?: string;
   message?: string;
+  warnings?: string[];
   checks?: Partial<Record<TCheckId, Check>>;
 };
 
@@ -50,6 +52,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
     negativeButtonText,
     positiveButtonText,
     message,
+    warnings,
     checks
   } = props;
   const checkedItems = useRef<Record<TCheckId, boolean>>({} as any);
@@ -62,6 +65,12 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
       width={width}
       description={subtitle}
       onClose={() => onClose(false)}
+      onOpen={() => {
+        for (const checkId in checks) {
+          checkedItems.current[checkId as TCheckId] =
+            checks[checkId as TCheckId]?.default || false;
+        }
+      }}
       positiveButton={
         positiveButtonText
           ? {
@@ -80,8 +89,10 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
           : undefined
       }
     >
-      <Box
+      <Flex
         sx={{
+          flexDirection: "column",
+          gap: 1,
           pb: !negativeButtonText && !positiveButtonText ? 2 : 0,
           p: { m: 0 }
         }}
@@ -93,6 +104,9 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
             dangerouslySetInnerHTML={{ __html: mdToHtml(message) }}
           />
         ) : null}
+        {warnings?.map((text) => (
+          <ErrorText key={text} error={text} sx={{ mt: 0 }} />
+        ))}
         {checks
           ? Object.entries<Check | undefined>(checks).map(
               ([id, check]) =>
@@ -101,12 +115,17 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
                     key={id}
                     id={id}
                     variant="text.body"
-                    sx={{ alignItems: "center" }}
+                    sx={{ fontWeight: "bold" }}
                   >
                     <Checkbox
                       name={id}
                       defaultChecked={check.default}
-                      sx={{ mr: "small", width: 18, height: 18 }}
+                      sx={{
+                        mr: "small",
+                        width: 18,
+                        height: 18,
+                        color: "accent"
+                      }}
                       onChange={(e) =>
                         (checkedItems.current[id as TCheckId] =
                           e.currentTarget.checked)
@@ -117,7 +136,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
                 )
             )
           : null}
-      </Box>
+      </Flex>
     </Dialog>
   );
 });
@@ -143,13 +162,24 @@ export function showMultiPermanentDeleteConfirmation(length: number) {
   });
 }
 
-export function showLogoutConfirmation() {
-  return ConfirmDialog.show({
+export async function showLogoutConfirmation() {
+  return await ConfirmDialog.show({
     title: `Logout?`,
     message:
-      "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.",
+      "Are you sure you want to log out and clear all data stored on THIS DEVICE?",
     positiveButtonText: "Yes",
-    negativeButtonText: "No"
+    negativeButtonText: "No",
+    warnings: (await db.hasUnsyncedChanges())
+      ? [
+          "You have unsynced notes. Take a backup or sync your notes to avoid losing critical data."
+        ]
+      : [],
+    checks: {
+      backup: {
+        text: "Take a backup before logging out?",
+        default: true
+      }
+    }
   });
 }
 

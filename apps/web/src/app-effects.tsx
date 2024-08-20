@@ -22,11 +22,16 @@ import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useEditorStore } from "./stores/editor-store";
 import { useStore as useAnnouncementStore } from "./stores/announcement-store";
-import { resetNotices, scheduleBackups } from "./common/notices";
+import { useStore as useSettingStore } from "./stores/setting-store";
+import {
+  resetNotices,
+  scheduleBackups,
+  scheduleFullBackups
+} from "./common/notices";
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
-import { EV, EVENTS } from "@notesnook/core/dist/common";
+import { CHECK_IDS, EV, EVENTS } from "@notesnook/core/dist/common";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
@@ -40,6 +45,7 @@ import { desktop } from "./common/desktop-bridge";
 import { BuyDialog } from "./dialogs/buy-dialog";
 import { FeatureDialog } from "./dialogs/feature-dialog";
 import { AnnouncementDialog } from "./dialogs/announcement-dialog";
+import { logger } from "./utils/logger";
 
 type AppEffectsProps = {
   setShow: (show: boolean) => void;
@@ -64,11 +70,27 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
           if (isUserPremium()) {
             return { type, result: true };
           } else {
-            showToast(
-              "error",
-              "Please upgrade your account to Pro to use this feature.",
-              [{ text: "Upgrade now", onClick: () => BuyDialog.show({}) }]
-            );
+            let sentence = "Please upgrade your account to Pro ";
+            switch (type) {
+              case CHECK_IDS.noteColor:
+                sentence += "to add colors.";
+                break;
+              case CHECK_IDS.noteTag:
+                sentence += "to add more tags.";
+                break;
+              case CHECK_IDS.notebookAdd:
+                sentence += "to add more notebooks.";
+                break;
+              case CHECK_IDS.vaultAdd:
+                sentence += "to use the notes vault.";
+                break;
+              default:
+                sentence += "to use this feature.";
+                break;
+            }
+            showToast("error", sentence, [
+              { text: "Upgrade now", onClick: () => BuyDialog.show({}) }
+            ]);
             return { type, result: false };
           }
         }
@@ -90,6 +112,10 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
         if (onboardingKey) await OnboardingDialog.show({ type: onboardingKey });
         await FeatureDialog.show({ featureName: "highlights" });
         await scheduleBackups();
+        await scheduleFullBackups();
+        if (useSettingStore.getState().isFullOfflineMode)
+          // NOTE: we deliberately don't await here because we don't want to pause execution.
+          db.attachments.cacheAttachments().catch(logger.error);
       })();
 
       return () => {

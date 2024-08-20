@@ -1,0 +1,11 @@
+diff --git a/node_modules/@react-native/community-cli-plugin/dist/utils/loadMetroConfig.js b/node_modules/@react-native/community-cli-plugin/dist/utils/loadMetroConfig.js
+index 636c0d8..87f4ee6 100644
+--- a/node_modules/@react-native/community-cli-plugin/dist/utils/loadMetroConfig.js
++++ b/node_modules/@react-native/community-cli-plugin/dist/utils/loadMetroConfig.js
+@@ -105,5 +105,6 @@ This warning will be removed in future (https://github.com/facebook/metro/issues
+     ...options,
+   });
+   const overrideConfig = getOverrideConfig(ctx, config);
++  if (!overrideConfig.resolver.resolveRequest) delete overrideConfig.resolver.resolveRequest;
+   return (0, _metroConfig.mergeConfig)(config, overrideConfig);
+ }

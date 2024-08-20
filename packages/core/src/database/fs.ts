@@ -56,6 +56,10 @@ export class FileStorage {
     groupId: string,
     eventData?: Record<string, unknown>
   ) {
+    const newFiles = await this.fs.bulkExists(files.map((f) => f.filename));
+    files = files.filter((f) => newFiles.includes(f.filename));
+    if (files.length <= 0) return;
+
     let current = 0;
     const token = await this.tokenManager.getAccessToken();
     const total = files.length;
@@ -64,7 +68,18 @@ export class FileStorage {
     this.groups.downloads.set(groupId, group);
 
     for (const file of files as QueueItem[]) {
-      if (!group.has(file.filename)) continue;
+      current++;
+      if (!group.has(file.filename)) {
+        EV.publish(EVENTS.fileDownloaded, {
+          success: false,
+          groupId,
+          filename: file.filename,
+          eventData,
+          current,
+          total
+        });
+        continue;
+      }
 
       const download = this.downloads.get(file.filename);
       if (download && download.operation) {
@@ -78,12 +93,13 @@ export class FileStorage {
 
       const { filename, chunkSize } = file;
       if (await this.exists(filename)) {
-        current++;
         EV.publish(EVENTS.fileDownloaded, {
           success: true,
           groupId,
           filename,
-          eventData
+          eventData,
+          current,
+          total
         });
         continue;
       }
@@ -115,7 +131,7 @@ export class FileStorage {
         EV.publish(EVENTS.fileDownloaded, {
           success: result,
           total,
-          current: ++current,
+          current,
           groupId,
           filename,
           eventData
@@ -286,5 +302,9 @@ export class FileStorage {
 
   hashBase64(data: string) {
     return this.fs.hashBase64(data);
+  }
+
+  getUploadedFileSize(filename: string) {
+    return this.fs.getUploadedFileSize(filename);
   }
 }

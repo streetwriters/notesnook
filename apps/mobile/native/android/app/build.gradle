@@ -1,5 +1,7 @@
 apply plugin: "com.android.application"
+apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
 import com.android.build.OutputFile
@@ -47,7 +49,6 @@ react {
     //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
     hermesFlags = ["-O", "-output-source-map"]
 }
-println(projectDir);
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -96,10 +97,14 @@ def getNpmVersion() {
     return jsonPackage["version"]
 }
 
+def isBuildingAAB = gradle.startParameter.getTaskNames().any { it.contains("bundleRelease") }
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     ndkVersion rootProject.ext.ndkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk rootProject.ext.compileSdkVersion
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -111,7 +116,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-        versionCode 3020
+        versionCode 3024
         versionName getNpmVersion()
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -163,8 +168,12 @@ android {
       pickFirst 'lib/x86_64/libc++_shared.so'
       pickFirst 'lib/armeabi-v7a/libc++_shared.so'
       pickFirst 'lib/arm64-v8a/libc++_shared.so'
+      jniLibs {
+            useLegacyPackaging isBuildingAAB == false
+    }
   }
 
+    
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -178,9 +187,15 @@ android {
                        defaultConfig.versionCode * 5 + versionCodes.get(abi)
                     println("Fdroid Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
                 } else {
-                    println("Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
-                    output.versionCodeOverride =
+                    if (isBuildingAAB) {
+                        output.versionCodeOverride = 4 * 1048576 + defaultConfig.versionCode
+                        println("AAB version code: ${output.versionCodeOverride}");
+                    } else {
+                        output.versionCodeOverride =
                         versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
+                        println("Version code: ${output.versionCodeOverride} for abi ${versionCodes.get(abi)}");
+                    }
+                    
                 }
                 
             }
@@ -203,13 +218,7 @@ dependencies {
 
     androidTestImplementation('com.wix:detox:+')
     implementation 'androidx.appcompat:appcompat:1.1.0'
-
-    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
-    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
-        exclude group:'com.squareup.okhttp3', module:'okhttp'
-    }
-
-    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
+    
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

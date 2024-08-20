@@ -29,9 +29,12 @@ import { setDocumentTitle } from "../utils/dom";
 import { TimeFormat } from "@notesnook/core/dist/utils/date";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 
+export const HostIds = ["API_HOST", "AUTH_HOST", "SSE_HOST"] as const;
+export type HostId = (typeof HostIds)[number];
 class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
   backupReminderOffset = Config.get("backupReminderOffset", 0);
+  fullBackupReminderOffset = Config.get("fullBackupReminderOffset", 0);
   backupStorageLocation = Config.get(
     "backupStorageLocation",
     PATHS.backupsDirectory
@@ -39,6 +42,8 @@ class SettingStore extends BaseStore<SettingStore> {
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   markdownShortcuts = Config.get("markdownShortcuts", true);
   notificationsSettings = Config.get("notifications", { reminder: true });
+  isFullOfflineMode = Config.get("fullOfflineMode", false);
+  serverUrls: Partial<Record<HostId, string>> = Config.get("serverUrls", {});
 
   zoomFactor = 1.0;
   privacyMode = false;
@@ -147,6 +152,11 @@ class SettingStore extends BaseStore<SettingStore> {
     this.set({ backupReminderOffset: offset });
   };
 
+  setFullBackupReminderOffset = (offset: number) => {
+    Config.set("fullBackupReminderOffset", offset);
+    this.set({ fullBackupReminderOffset: offset });
+  };
+
   setBackupStorageLocation = (location: string) => {
     Config.set("backupStorageLocation", location);
     this.set({ backupStorageLocation: location });
@@ -200,6 +210,26 @@ class SettingStore extends BaseStore<SettingStore> {
     const autoUpdates = this.get().autoUpdates;
     this.set({ autoUpdates: !autoUpdates });
     await desktop?.updater.toggleAutoUpdates.mutate({ enabled: !autoUpdates });
+  };
+
+  toggleFullOfflineMode = () => {
+    const isFullOfflineMode = this.get().isFullOfflineMode;
+    this.set({ isFullOfflineMode: !isFullOfflineMode });
+    Config.set("fullOfflineMode", !isFullOfflineMode);
+
+    if (isFullOfflineMode) db.fs().cancel("offline-mode");
+    else db.attachments.cacheAttachments();
+  };
+
+  setServerUrls = (urls?: Partial<Record<HostId, string>>) => {
+    if (!urls) {
+      Config.set("serverUrls", {});
+      this.set({ serverUrls: {} });
+      return;
+    }
+    const serverUrls = this.get().serverUrls;
+    this.set({ serverUrls: { ...serverUrls, ...urls } });
+    Config.set("serverUrls", { ...serverUrls, ...urls });
   };
 }
 

@@ -32,17 +32,19 @@ import {
 } from "./types";
 import { ScrollContainer } from "@notesnook/ui";
 import useMobile from "../../hooks/use-mobile";
+import { logger } from "../../utils/logger";
+import { isFeatureSupported } from "../../utils/feature-check";
 
 // const isDev = false; // import.meta.env.DEV;
-// const VENDOR_ID = isDev ? 1506 : 128190;
+const VENDOR_ID = import.meta.env.DEV || IS_TESTING ? 1506 : 128190;
 const PADDLE_ORIGIN =
   import.meta.env.DEV || IS_TESTING
     ? "https://sandbox-buy.paddle.com"
     : "https://buy.paddle.com";
-const CHECKOUT_CREATE_ORIGIN =
+const SUBSCRIPTION_MANAGEMENT_URL =
   import.meta.env.DEV || IS_TESTING
-    ? "https://sandbox-create-checkout.paddle.com"
-    : "https://create-checkout.paddle.com";
+    ? "https://sandbox-subscription-management.paddle.com"
+    : "https://subscription-management.paddle.com";
 const CHECKOUT_SERVICE_ORIGIN =
   import.meta.env.DEV || IS_TESTING
     ? "https://sandbox-checkout-service.paddle.com"
@@ -102,6 +104,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
   useEffect(() => {
     async function onMessage(ev: MessageEvent<PaddleEvent>) {
       if (ev.origin !== PADDLE_ORIGIN) return;
+      logger.debug("Paddle event received", { data: ev.data });
       const { event_name, callback_data } = ev.data;
       const { checkout } = callback_data;
 
@@ -109,8 +112,10 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
         !checkout ||
         !checkout.id ||
         SUBSCRIBED_EVENTS.indexOf(event_name) === -1
-      )
+      ) {
+        logger.debug("Ignoring paddle event", { event_name });
         return;
+      }
 
       if (event_name === PaddleEvents["Checkout.Complete"]) {
         onCompleted && onCompleted();
@@ -124,9 +129,9 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
       appliedCouponCode.current = pricingInfo.coupon;
       setCheckoutId(checkout.id);
     }
-    window.addEventListener("message", onMessage);
+    window.addEventListener("message", onMessage, false);
     return () => {
-      window.removeEventListener("message", onMessage);
+      window.removeEventListener("message", onMessage, false);
     };
   }, [onPriceUpdated, updatePrice, plan, onCompleted]);
 
@@ -188,6 +193,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
           frameBorder={"0"}
           ref={checkoutRef}
           src={sourceUrl}
+          allow={`payment ${PADDLE_ORIGIN} ${SUBSCRIPTION_MANAGEMENT_URL};`}
           style={{
             //   padding: "0px 30px",
             height: "1000px",
@@ -206,21 +212,28 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
 
 async function getCheckoutURL(params: PaddleCheckoutProps) {
   const { plan, theme, user } = params;
-  const BASE_URL = `${CHECKOUT_CREATE_ORIGIN}/checkout/product/${plan.id}`;
+  const BASE_URL = `${PADDLE_ORIGIN}/paddlejs?ccsURL=${CHECKOUT_SERVICE_ORIGIN}/create/checkout/product/${plan.id}`;
   const queryParams = new URLSearchParams();
   queryParams.set("product", plan.id);
+  queryParams.set("vendor", VENDOR_ID.toString());
   queryParams.set("passthrough", JSON.stringify({ userId: user.id }));
   queryParams.set("guest_email", user.email);
   queryParams.set("quantity_variable", "0");
   queryParams.set("disable_logout", "true");
   queryParams.set("display_mode_theme", theme);
   queryParams.set("display_mode", "inline");
-  queryParams.set("apple_pay_enabled", "false");
-  queryParams.set("paddlejs-version", "2.0.14");
+  queryParams.set(
+    "apple_pay_enabled",
+    JSON.stringify(isFeatureSupported("applePaySupported"))
+  );
+  queryParams.set("paddlejs-version", "2.0.81");
+  queryParams.set("checkout_initiated", new Date().getTime().toString());
   queryParams.set("popup", "true");
   queryParams.set("paddle_js", "true");
   queryParams.set("is_popup", "true");
-  queryParams.set("parent_url", window.location.href);
+  queryParams.set("parent_url", window.location.origin);
+  queryParams.set("parentURL", window.location.origin);
+  queryParams.set("referring_domain", window.location.hostname);
   const fullURL = `${BASE_URL}?${queryParams.toString()}`;
   return fullURL;
 }

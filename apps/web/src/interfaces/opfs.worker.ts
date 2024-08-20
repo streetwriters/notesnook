@@ -93,6 +93,36 @@ class OriginPrivateFileStore implements IFileStorage {
     }
   }
 
+  async chunkSize(chunkName: string): Promise<number> {
+    try {
+      if (Object.hasOwn(FileSystemSyncAccessHandle.prototype, "mode")) {
+        return readFileSize(this.directory, chunkName);
+      }
+      return await this.safeOp(chunkName, () =>
+        readFileSize(this.directory, chunkName)
+      );
+    } catch (e) {
+      console.error("Failed to get chunk size", e);
+    }
+    return 0;
+  }
+
+  async listChunks(chunkPrefix: string): Promise<string[]> {
+    const chunks: string[] = [];
+    for await (const entry of this.directory.keys()) {
+      if (entry.startsWith(chunkPrefix)) chunks.push(entry);
+    }
+    return chunks;
+  }
+
+  async list(): Promise<string[]> {
+    const chunks: string[] = [];
+    for await (const entry of this.directory.keys()) {
+      chunks.push(entry);
+    }
+    return chunks;
+  }
+
   private async safeOp<T>(chunkName: string, createPromise: () => Promise<T>) {
     const lock = this.locks.get(chunkName);
     if (lock) await lock;
@@ -139,6 +169,15 @@ const workerModule = {
   async readChunk(directoryName: string, chunkName: string) {
     const chunk = await fileStores.get(directoryName)?.readChunk(chunkName);
     return chunk ? transfer(chunk, [chunk.buffer]) : undefined;
+  },
+  async listChunks(directoryName: string, chunkPrefix: string) {
+    return (await fileStores.get(directoryName)?.listChunks(chunkPrefix)) || [];
+  },
+  async list(directoryName: string) {
+    return (await fileStores.get(directoryName)?.list()) || [];
+  },
+  async chunkSize(directoryName: string, chunkName: string) {
+    return (await fileStores.get(directoryName)?.chunkSize(chunkName)) || 0;
   }
 };
 
@@ -153,4 +192,12 @@ async function readFile(directory: FileSystemDirectoryHandle, name: string) {
   handle.read(buffer);
   handle.close();
   return buffer;
+}
+async function readFileSize(
+  directory: FileSystemDirectoryHandle,
+  name: string
+) {
+  const file = await directory.getFileHandle(name);
+  const handle = await file.createSyncAccessHandle({ mode: "read-only" });
+  return handle.getSize();
 }

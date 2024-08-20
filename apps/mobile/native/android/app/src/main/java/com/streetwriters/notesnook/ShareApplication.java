@@ -67,7 +67,6 @@ public class ShareApplication extends MultiDexApplication implements ReactApplic
     @Override
     public void onCreate() {
         super.onCreate();
-        ReactFeatureFlags.useTurboModules = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
         SoLoader.init(this, /* native exopackage */ false);
     }
 

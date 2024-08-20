@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getFontById } from "@notesnook/editor";
+import { replaceDateTime } from "@notesnook/editor/dist/extensions/date-time";
 import React, { RefObject, useCallback, useEffect, useRef } from "react";
 import { EditorController } from "../hooks/useEditorController";
-import styles from "./styles.module.css";
-import { replaceDateTime } from "@notesnook/editor/dist/extensions/date-time";
 import { useTabContext } from "../hooks/useTabStore";
+import styles from "./styles.module.css";
 function Title({
   controller,
   title,
@@ -45,7 +45,6 @@ function Title({
   const tab = useTabContext();
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const titleSizeDiv = useRef<HTMLDivElement>(null);
-  const emitUpdate = useRef(true);
 
   const resizeTextarea = useCallback(() => {
     if (!titleSizeDiv.current || !titleRef.current) return;
@@ -56,10 +55,8 @@ function Title({
 
   useEffect(() => {
     if (titleRef.current) {
-      emitUpdate.current = false;
       titleRef.current.value = title;
       resizeTextarea();
-      emitUpdate.current = true;
     }
 
     window.addEventListener("resize", resizeTextarea);
@@ -136,8 +133,16 @@ function Title({
           overflowY: "hidden"
         }}
         maxLength={1000}
-        onInput={() => {
+        onInput={(event) => {
           resizeTextarea();
+          (event.target as HTMLTextAreaElement).value = replaceDateTime(
+            (event.target as HTMLTextAreaElement).value,
+            dateFormat,
+            timeFormat as "12-hour" | "24-hour"
+          );
+          controller.current?.titleChange(
+            (event.target as HTMLTextAreaElement).value
+          );
         }}
         onKeyDown={(e) => {
           const editor = editors[tab.id];
@@ -149,16 +154,6 @@ function Title({
         }}
         onPaste={() => {
           resizeTextarea();
-        }}
-        onChange={(event) => {
-          resizeTextarea();
-          if (!emitUpdate.current) return;
-          event.target.value = replaceDateTime(
-            event.target.value,
-            dateFormat,
-            timeFormat as "12-hour" | "24-hour"
-          );
-          controller.current?.titleChange(event.target.value);
         }}
         placeholder={titlePlaceholder}
       />

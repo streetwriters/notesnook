@@ -14,16 +14,7 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-# If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
-# because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
-#
-# To fix this you can also exclude `react-native-flipper` using a `react-native.config.js`
-# ```js
-# module.exports = {
-#   dependencies: {
-#     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
-# ```
-flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
+
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
@@ -38,22 +29,14 @@ pod 'MMKV'
 target 'Notesnook' do
 
   config = use_native_modules!
-  # Flags change depending on the env values.
-  flags = get_default_flags()
 
   use_react_native!(
     :path => config[:reactNativePath],
     # Hermes is now enabled by default. Disable by setting this flag to false.
     # Upcoming versions of React Native may rely on get_default_flags(), but
     # we make it explicit here to aid in the React Native upgrade process.
-    :hermes_enabled => false,
-    :fabric_enabled => flags[:fabric_enabled],
-    # Enables Flipper.
-    #
-    # Note that if you have use_frameworks! enabled, Flipper will not work and
-    # you should disable the next line.
-    # :flipper_configuration => flipper_config,
-    # An absolute path to your application root.
+    :hermes_enabled => true,
+    :fabric_enabled => false,
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
@@ -71,7 +54,7 @@ target 'Make Note' do
     # Hermes is now enabled by default. Disable by setting this flag to false.
     # Upcoming versions of React Native may rely on get_default_flags(), but
     # we make it explicit here to aid in the React Native upgrade process.
-    :hermes_enabled => false,
+    :hermes_enabled => true,
     :fabric_enabled => false,
     # Enables Flipper.
     #
@@ -118,9 +101,9 @@ post_install do |installer|
       react_native_path = "../../node_modules/react-native",
       # Set `mac_catalyst_enabled` to `true` in order to apply patches
       # necessary for Mac Catalyst builds
-      :mac_catalyst_enabled => false
+      :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
     )
-  __apply_Xcode_12_5_M1_post_install_workaround(installer)
   installer.pods_project.targets.each do |target|
   target.build_configurations.each do |config|
       config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
@@ -130,7 +113,7 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     if target.name == "react-native-quick-sqlite" then
       target.build_configurations.each do |config|
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'SQLITE_ENABLE_FTS5=1 SQLITE3MC_OMIT_AES_HARDWARE_SUPPORT=1 HAVE_CIPHER_AES_128_CBC=0 HAVE_CIPHER_AES_256_CBC=0 HAVE_CIPHER_SQLCIPHER=0 HAVE_CIPHER_RC4=0 HAVE_CIPHER_CHACHA20=1 SQLITE_OMIT_PROGRESS_CALLBACK=1 SQLITE_MAX_EXPR_DEPTH=0 SQLITE_OMIT_DEPRECATED=1 SQLITE_LIKE_DOESNT_MATCH_BLOBS=1 SQLITE_DQS=0 SQLITE_DEFAULT_MEMSTATUS=0 SQLITE_USE_ALLOCA=1'
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = 'SQLITE_ENABLE_FTS5=1 SQLITE3MC_OMIT_AES_HARDWARE_SUPPORT=1 HAVE_CIPHER_AES_128_CBC=0 HAVE_CIPHER_AES_256_CBC=0 HAVE_CIPHER_SQLCIPHER=0 HAVE_CIPHER_RC4=0 HAVE_CIPHER_CHACHA20=1 SQLITE_OMIT_PROGRESS_CALLBACK=1 SQLITE_MAX_EXPR_DEPTH=0 SQLITE_OMIT_DEPRECATED=1 SQLITE_LIKE_DOESNT_MATCH_BLOBS=1 SQLITE_DQS=0 SQLITE_DEFAULT_MEMSTATUS=0 SQLITE_USE_ALLOCA=1'
       end
     end
   end

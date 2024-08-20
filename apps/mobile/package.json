@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "3.0.12",
+  "version": "3.0.14",
   "private": true,
   "license": "GPL-3.0-or-later",
   "workspaces": [
@@ -25,9 +25,14 @@
   },
   "devDependencies": {
     "fonteditor-core": "^2.1.11",
+    "listr": "^0.14.3",
     "otplib": "12.0.1",
     "patch-package": "7.0.0",
     "react-refresh": "0.14.0"
+  },
+  "overrides": {
+    "react-native": "0.74.5",
+    "react": "18.2.0"
   },
   "dependencies": {
     "@notesnook/common": "file:../../packages/common",
@@ -39,6 +44,8 @@
     "@notesnook/themes-server": "file:../../servers/themes",
     "diffblazer": "^1.0.1",
     "react": "18.2.0",
-    "react-native": "0.72.0"
+    "react-native": "0.74.5",
+    "react-native-mmkv-storage": "^0.10.2",
+    "react-native-actions-sheet": "^0.9.7"
   }
 }

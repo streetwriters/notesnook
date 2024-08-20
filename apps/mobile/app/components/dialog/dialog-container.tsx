@@ -32,21 +32,29 @@ const DialogContainer = ({
 }: ViewProps & {
   width?: any;
   height?: any;
+  noBorder?: boolean;
 }) => {
   const { colors } = useThemeColors();
 
   return (
     <View
       {...restProps}
-      style={{
-        ...getElevationStyle(5),
-        width: width || DDS.isTab ? 500 : "85%",
-        maxHeight: height || 450,
-        borderRadius: 10,
-        backgroundColor: colors.primary.background,
-        paddingTop: 12,
-        ...getContainerBorder(colors.secondary.background, 0.8, 0.05)
-      }}
+      style={[
+        style,
+        {
+          width: width || DDS.isTab ? 500 : "85%",
+          maxHeight: height || 450,
+          borderRadius: 10,
+          backgroundColor: colors.primary.background,
+          paddingTop: 12
+        },
+        restProps?.noBorder
+          ? {}
+          : {
+              ...getElevationStyle(5),
+              ...getContainerBorder(colors.secondary.background, 0.8, 0.05)
+            }
+      ]}
     />
   );
 };

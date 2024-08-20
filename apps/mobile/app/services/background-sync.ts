@@ -26,6 +26,7 @@ import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { AppState, AppRegistry } from "react-native";
 import Notifications from "./notifications";
 import SettingsService from "./settings";
+import { deleteDCacheFiles } from "../common/filesystem/io";
 
 async function doInBackground(callback: () => Promise<void>) {
   if (Platform.OS === "ios") {
@@ -121,6 +122,7 @@ async function onBackgroundSyncStarted() {
       });
     }
     await Notifications.setupReminders();
+    deleteDCacheFiles();
     DatabaseLogger.info("BACKGROUND SYNC COMPLETE");
   } catch (e) {
     DatabaseLogger.error(e as Error);

@@ -26,7 +26,7 @@ module.exports = (env) => {
     mode = "development",
     context = __dirname,
     entry = "./index.js",
-    platform,
+    platform = process.env.PLATFORM,
     minimize = mode === "production",
     devServer = undefined,
     bundleFilename = undefined,
@@ -118,7 +118,8 @@ module.exports = (env) => {
      */
     output: {
       clean: true,
-      path: path.join(__dirname, "build/generated", platform),
+      hashFunction: 'xxhash64',
+      path: path.join(__dirname, 'build/generated', platform),
       filename: "index.bundle",
       chunkFilename: "[name].chunk.bundle",
       publicPath: Repack.getPublicPath({ platform, devServer }),
@@ -172,7 +173,7 @@ module.exports = (env) => {
                 "node_modules/.webpack-cache"
               ),
               babelrc: false,
-              presets: ["module:metro-react-native-babel-preset"],
+              presets: ["module:@react-native/babel-preset"],
               plugins: [
                 "react-native-reanimated/plugin",
                 "@babel/plugin-transform-named-capturing-groups-regex",
@@ -184,7 +185,7 @@ module.exports = (env) => {
         {
           test: /\.mjs$|cjs$|js$|jsx$|ts$|tsx$/,
           include: [
-            /node_modules(.*[/\\])+react/,
+            /node_modules(.*[/\\])+react-native/,
             /node_modules(.*[/\\])+@react-native/,
             /node_modules(.*[/\\])+@react-navigation/,
             /node_modules(.*[/\\])+@react-native-community/,
@@ -220,6 +221,7 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+whatwg-url/,
             /node_modules(.*[/\\])+react-native-url-polyfill/,
             /node_modules(.*[/\\])+diffblazer/,
+            /node_modules(.*[/\\])+react-freeze/,
           ],
           use: {
             loader: "babel-loader",
@@ -230,7 +232,7 @@ module.exports = (env) => {
                 "node_modules/.webpack-cache"
               ),
               babelrc: false,
-              presets: ["module:metro-react-native-babel-preset"],
+              presets: ["module:@react-native/babel-preset"],
               plugins: [
                 "react-native-reanimated/plugin",
                 "@babel/plugin-transform-named-capturing-groups-regex",
@@ -258,7 +260,7 @@ module.exports = (env) => {
                 "node_modules/.webpack-cache"
               ),
               babelrc: false,
-              presets: [["module:metro-react-native-babel-preset"]],
+              presets: [["module:@react-native/babel-preset"]],
               plugins:
                 devServer && devServer.hmr
                   ? [

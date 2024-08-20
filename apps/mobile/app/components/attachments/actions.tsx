@@ -118,12 +118,14 @@ const Actions = ({
         setLoading({
           name: "Run file check"
         });
-        const res = await filesystem.checkAttachment(attachment.hash);
-        if (res.failed) {
-          db.attachments.markAsFailed(attachment.id, res.failed);
-          setFailed(res.failed);
+        const result = await filesystem.checkAttachment(attachment.hash);
+        if (!result) return;
+
+        if (result.failed) {
+          db.attachments.markAsFailed(attachment.id, result.failed);
+          setFailed(result.failed);
           ToastManager.show({
-            heading: "File check failed with error: " + res.failed,
+            heading: "File check failed with error: " + result.failed,
             type: "error",
             context: "local"
           });

@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { sanitizeFilename } from "@notesnook/common";
+import { formatDate } from "@notesnook/core/dist/utils/date";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import FileViewer from "react-native-file-viewer";
@@ -25,8 +27,14 @@ import Share from "react-native-share";
 import { zip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../common/database";
 import storage from "../common/database/storage";
+import filesystem from "../common/filesystem";
 import { cacheDir, copyFileAsync } from "../common/filesystem/utils";
 import { presentDialog } from "../components/dialog/functions";
+import {
+  endProgress,
+  startProgress,
+  updateProgress
+} from "../components/dialogs/progress";
 import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
@@ -37,14 +45,14 @@ const MS_WEEK = MS_DAY * 7;
 const MONTH = MS_DAY * 30;
 
 async function getDirectoryAndroid() {
-  let folder = await ScopedStorage.openDocumentTree(true);
+  const folder = await ScopedStorage.openDocumentTree(true);
   if (!folder) return null;
   let subfolder;
   if (!folder.name.includes("Notesnook backups")) {
-    let folderFiles = await ScopedStorage.listFiles(folder.uri);
-    for (let f of folderFiles) {
-      if (f.type === "directory" && f.name === "Notesnook backups") {
-        subfolder = f;
+    const files = await ScopedStorage.listFiles(folder.uri);
+    for (const file of files) {
+      if (file.type === "directory" && file.name === "Notesnook backups") {
+        subfolder = file;
       }
     }
     if (!subfolder) {
@@ -67,10 +75,10 @@ async function checkBackupDirExists(reset = false, context = "global") {
   let dir = SettingsService.get().backupDirectoryAndroid;
   if (reset) dir = null;
   if (dir) {
-    let allDirs = await ScopedStorage.getPersistedUriPermissions();
+    const allDirs = await ScopedStorage.getPersistedUriPermissions();
     let exists = allDirs.findIndex((d) => {
-      return d === dir.uri || dir.uri.includes(d);
-    });
+      return d === dir?.uri || dir?.uri.includes(d);
+    }) as number | boolean;
     exists = exists !== -1;
     dir = exists ? dir : null;
   }
@@ -100,7 +108,7 @@ async function checkBackupDirExists(reset = false, context = "global") {
   return dir;
 }
 
-async function presentBackupCompleteSheet(backupFilePath) {
+async function presentBackupCompleteSheet(backupFilePath: string) {
   presentSheet({
     title: "Backup complete",
     icon: "cloud-upload",
@@ -123,7 +131,7 @@ async function presentBackupCompleteSheet(backupFilePath) {
               showOpenWithDialog: true,
               showAppsSuggestions: true,
               shareFile: true
-            }).catch(console.log);
+            } as any).catch(console.log);
           }
         },
         actionText: "Share"
@@ -153,77 +161,124 @@ async function updateNextBackupTime() {
  * @param {string=} context
  * @returns {Promise<{path?: string, error?: Error, report?: boolean}}>
  */
-async function run(progress = false, context) {
-  let androidBackupDirectory = await checkBackupDirExists(false, context);
+async function run(
+  progress = false,
+  context?: string,
+  backupType?: "full" | "partial"
+) {
+  console.log("Creating backup:", backupType, progress, context);
+
+  const androidBackupDirectory = (await checkBackupDirExists(
+    false,
+    context
+  )) as ScopedStorage.FileType;
+
   if (!androidBackupDirectory)
     return {
       error: new Error("Backup directory not selected"),
       report: false
     };
 
+  let path;
+
+  if (Platform.OS === "ios") {
+    path = await storage.checkAndCreateDir("/backups");
+  }
+
+  const backupFileName = sanitizeFilename(
+    `${formatDate(Date.now(), {
+      type: "date-time",
+      dateFormat: "YYYY-MM-DD",
+      timeFormat: "24-hour"
+    })}-${new Date().getSeconds()}${backupType === "full" ? "-full" : ""}`,
+    { replacement: "-" }
+  );
+
   if (progress) {
-    presentSheet({
-      title: "Backing up your data",
-      paragraph:
-        "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
-      progress: true
+    startProgress({
+      title: `Creating ${backupType === "full" ? "a full " : ""}backup`,
+      paragraph: `Please wait while we create a backup of your data. This may take a few minutes.`,
+      progress: undefined
     });
   }
 
-  let path;
-  let backupFileName = "notesnook_backup_" + Date.now();
-
-  if (Platform.OS === "ios") {
-    path = await storage.checkAndCreateDir("/backups/");
-  }
-
-  const zipSourceFolder = `${cacheDir}/${backupFileName}`;
+  const zipSourceFolder = `${cacheDir}/backup_temp`;
   const zipOutputFile =
     Platform.OS === "ios"
       ? `${path}/${backupFileName}.nnbackupz`
       : `${cacheDir}/${backupFileName}.nnbackupz`;
 
-  try {
-    if (await RNFetchBlob.fs.exists(zipSourceFolder))
-      await RNFetchBlob.fs.unlink(zipSourceFolder);
-  } catch (e) {}
-
+  await RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
   await RNFetchBlob.fs.mkdir(zipSourceFolder);
+
+  const attachmentsDir = zipSourceFolder + "/attachments";
+  if (backupType === "full") {
+    await RNFetchBlob.fs.mkdir(attachmentsDir);
+  }
 
   try {
     const user = await db.user.getUser();
-    for await (const file of db.backup.export(
-      "mobile",
-      SettingsService.get().encryptedBackup && user
-    )) {
-      console.log("Writing backup chunk of size...", file?.data?.length);
-      await RNFetchBlob.fs.writeFile(
-        `${zipSourceFolder}/${file.path}`,
-        file.data,
-        "utf8"
-      );
+    for await (const file of db.backup.export({
+      type: "mobile",
+      encrypt: SettingsService.get().encryptedBackup && !!user,
+      mode: backupType
+    })) {
+      if (file.type === "file") {
+        updateProgress({
+          progress: `Writing backup chunk of size... ${file?.data?.length}`
+        });
+        await RNFetchBlob.fs.writeFile(
+          `${zipSourceFolder}/${file.path}`,
+          file.data,
+          "utf8"
+        );
+      } else if (file.type === "attachment") {
+        updateProgress({
+          progress: `Saving attachments in backup... ${file.hash}`
+        });
+        if (await filesystem.exists(file.hash)) {
+          await RNFetchBlob.fs.cp(
+            `${cacheDir}/${file.hash}`,
+            `${attachmentsDir}/${file.hash}`
+          );
+        }
+      }
     }
+
+    updateProgress({
+      progress: "Creating backup zip file..."
+    });
 
     await zip(zipSourceFolder, zipOutputFile);
 
     if (Platform.OS === "android") {
       // Move the zip to user selected directory.
       const file = await ScopedStorage.createFile(
-        androidBackupDirectory.uri,
+        androidBackupDirectory?.uri,
         `${backupFileName}.nnbackupz`,
         "application/nnbackupz"
       );
       console.log("Copying zip file...");
       await copyFileAsync(`file://${zipOutputFile}`, file.uri);
-      console.log("Copyied zip file...");
+
+      console.log("Copied zip file...");
       path = file.uri;
     } else {
       path = zipOutputFile;
     }
+
     RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
+    if (Platform.OS === "android") {
+      RNFetchBlob.fs.unlink(zipOutputFile).catch(console.log);
+    }
+
     updateNextBackupTime();
 
-    let showBackupCompleteSheet =
+    if (progress) {
+      endProgress();
+    }
+
+    const canShowCompletionStatus =
       progress && SettingsService.get().showBackupCompleteSheet;
 
     if (context) {
@@ -234,15 +289,12 @@ async function run(progress = false, context) {
 
     await sleep(300);
 
-    if (showBackupCompleteSheet) {
+    if (canShowCompletionStatus) {
       presentBackupCompleteSheet(path);
-    } else {
-      progress && eSendEvent(eCloseSheet);
     }
 
     ToastManager.show({
       heading: "Backup successful",
-      message: "Your backup is stored in Notesnook folder on your phone.",
       type: "success",
       context: "global"
     });
@@ -251,16 +303,26 @@ async function run(progress = false, context) {
       path: path
     };
   } catch (e) {
-    ToastManager.error(e, "Backup failed", context || "global");
+    ToastManager.error(e as Error, "Backup failed", context || "global");
 
-    if (e?.message?.includes("android.net.Uri") && androidBackupDirectory) {
+    if (
+      (e as Error)?.message?.includes("android.net.Uri") &&
+      androidBackupDirectory
+    ) {
       SettingsService.setProperty("backupDirectoryAndroid", null);
-      return run(progress, context);
+      return run(progress, context, backupType);
+    }
+
+    RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
+    if (Platform.OS === "android") {
+      RNFetchBlob.fs.unlink(zipOutputFile).catch(console.log);
     }
 
     DatabaseLogger.error(e);
     await sleep(300);
-    progress && eSendEvent(eCloseSheet);
+    if (progress) {
+      endProgress();
+    }
     return {
       error: e,
       report: true
@@ -268,34 +330,41 @@ async function run(progress = false, context) {
   }
 }
 
-async function getLastBackupDate() {
-  return SettingsService.get().lastBackupDate;
-}
+async function checkBackupRequired(
+  type: "daily" | "off" | "useroff" | "weekly" | "monthly" | "never",
+  lastBackupDateType: "lastBackupDate" | "lastFullBackupDate" = "lastBackupDate"
+) {
+  console.log(lastBackupDateType, type);
+  if (type === "off" || type === "useroff" || type === "never" || !type) return;
+  const now = Date.now();
+  const lastBackupDate = SettingsService.getProperty(lastBackupDateType) as
+    | number
+    | "never";
 
-async function checkBackupRequired(type) {
-  if (type === "off" || type === "useroff") return;
-  let now = Date.now();
-  let lastBackupDate = await getLastBackupDate();
-  if (!lastBackupDate || lastBackupDate === "never") {
+  if (
+    lastBackupDate === undefined ||
+    lastBackupDate === "never" ||
+    lastBackupDate === 0
+  ) {
     return true;
   }
-  lastBackupDate = parseInt(lastBackupDate);
+
   if (type === "daily" && lastBackupDate + MS_DAY < now) {
-    DatabaseLogger.info("Daily backup started");
+    DatabaseLogger.info(`Daily backup started: ${type}`);
     return true;
   } else if (type === "weekly" && lastBackupDate + MS_WEEK < now) {
-    DatabaseLogger.info("Weekly backup started");
+    DatabaseLogger.info(`Weekly backup started: ${type}`);
     return true;
   } else if (type === "monthly" && lastBackupDate + MONTH < now) {
-    DatabaseLogger.info("Monthly backup started");
+    DatabaseLogger.info(`Monthly backup started: ${type}`);
     return true;
   }
   return false;
 }
 
 const checkAndRun = async () => {
-  let settings = SettingsService.get();
-  if (await checkBackupRequired(settings.reminder)) {
+  const settings = SettingsService.get();
+  if (await checkBackupRequired(settings?.reminder)) {
     try {
       await run();
     } catch (e) {

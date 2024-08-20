@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { formatBytes } from "@notesnook/common";
 import notifee from "@notifee/react-native";
 import dayjs from "dayjs";
 import React from "react";
@@ -24,12 +25,19 @@ import { Appearance, Linking, Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
-import { db } from "../../common/database";
+import ScreenGuardModule from "react-native-screenguard";
+import { DatabaseLogger, db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
+import filesystem from "../../common/filesystem";
 import { AttachmentDialog } from "../../components/attachments";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
 import { AppLockPassword } from "../../components/dialogs/applock-password";
+import {
+  endProgress,
+  startProgress,
+  updateProgress
+} from "../../components/dialogs/progress";
 import { ChangeEmail } from "../../components/sheets/change-email";
 import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
@@ -42,6 +50,7 @@ import BiometricService from "../../services/biometrics";
 import {
   ToastManager,
   eSendEvent,
+  eSubscribeEvent,
   openVault,
   presentSheet
 } from "../../services/event-manager";
@@ -60,8 +69,7 @@ import {
   eCloseSheet,
   eCloseSimpleDialog,
   eOpenLoginDialog,
-  eOpenRecoveryKeyDialog,
-  eOpenRestoreDialog
+  eOpenRecoveryKeyDialog
 } from "../../utils/events";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
@@ -70,7 +78,6 @@ import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import ScreenGuardModule from "react-native-screenguard";
 
 type User = any;
 
@@ -337,44 +344,143 @@ export const settingsGroups: SettingSection[] = [
             description: "Verify your subscription to Notesnook Pro"
           },
           {
+            id: "clear-cache",
+            name: "Clear cache",
+            icon: "delete",
+            modifer: async () => {
+              presentDialog({
+                title: "Clear cache",
+                paragraph: "Are you sure you want to clear the cache?",
+                positiveText: "Clear",
+                positivePress: async () => {
+                  filesystem.clearCache();
+                  ToastManager.show({
+                    heading: "Cache cleared",
+                    message: "All cached attachments have been removed",
+                    type: "success"
+                  });
+                }
+              });
+            },
+            description(current) {
+              return `Clear all cached attachments. Current cache size: ${
+                current as number
+              }`;
+            },
+            useHook: () => {
+              const [cacheSize, setCacheSize] = React.useState(0);
+              React.useEffect(() => {
+                filesystem.getCacheSize().then(setCacheSize).catch(console.log);
+                const sub = eSubscribeEvent("cache-cleared", () => {
+                  setCacheSize(0);
+                });
+                return () => {
+                  sub?.unsubscribe();
+                };
+              }, []);
+              return formatBytes(cacheSize);
+            }
+          },
+
+          {
             id: "logout",
-            name: "Log out",
+            name: "Logout",
             description:
-              "Logging out will clear all data stored on THIS DEVICE.",
+              "Logging out will clear all data stored on this device.",
             icon: "logout",
-            modifer: () => {
+            modifer: async () => {
+              const hasUnsyncedChanges = await db.hasUnsyncedChanges();
               presentDialog({
                 title: "Logout",
                 paragraph:
-                  "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.",
+                  "Are you sure you want to logout and clear all data stored on this device?",
                 positiveText: "Logout",
-                positivePress: async () => {
-                  try {
-                    eSendEvent(eCloseSimpleDialog);
-                    setTimeout(async () => {
-                      eSendEvent("settings-loading", true);
-                      Navigation.popToTop();
+                check: {
+                  info: "Take a backup before logging out",
+                  defaultValue: true
+                },
+                notice: hasUnsyncedChanges
+                  ? {
+                      text: "You have unsynced notes. Take a backup or sync your notes to avoid losing your critical data.",
+                      type: "alert"
+                    }
+                  : undefined,
+                positivePress: async (_, takeBackup) => {
+                  eSendEvent(eCloseSimpleDialog);
+                  setTimeout(async () => {
+                    try {
+                      startProgress({
+                        fillBackground: true,
+                        title: "Logging out",
+                        canHideProgress: true,
+                        paragraph:
+                          "Please wait while we log out and clear app data."
+                      });
+
+                      Navigation.navigate("Notes");
+
+                      if (takeBackup) {
+                        updateProgress({
+                          progress: "Taking a backup of your notes"
+                        });
+
+                        try {
+                          const result = await BackupService.run(
+                            false,
+                            "local",
+                            "partial"
+                          );
+                          if (result.error) throw result.error as Error;
+                        } catch (e) {
+                          DatabaseLogger.error(e);
+                          const error = e;
+                          const canLogout = await new Promise((resolve) => {
+                            presentDialog({
+                              context: "local",
+                              title: "Backup failed",
+                              paragraph: `${
+                                (error as Error).message
+                              }. Do you want to continue logging out?`,
+                              positiveText: "Continue",
+                              positivePress: () => {
+                                resolve(true);
+                              },
+                              onClose: () => {
+                                resolve(false);
+                              }
+                            });
+                          });
+                          if (!canLogout) {
+                            endProgress();
+                            return;
+                          }
+                        }
+                      }
+
+                      updateProgress({
+                        progress: "Logging out... please wait"
+                      });
+
                       await db.user?.logout();
                       setLoginMessage();
                       await PremiumService.setPremiumStatus();
                       await BiometricService.resetCredentials();
                       MMKV.clearStore();
                       clearAllStores();
-                      refreshAllStores();
+                      setImmediate(() => {
+                        refreshAllStores();
+                      });
                       Navigation.queueRoutesForUpdate();
                       SettingsService.resetSettings();
                       useUserStore.getState().setUser(null);
                       useUserStore.getState().setSyncing(false);
-                      Navigation.goBack();
-                      Navigation.popToTop();
-                      setTimeout(() => {
-                        eSendEvent("settings-loading", false);
-                      }, 3000);
-                    }, 300);
-                  } catch (e) {
-                    ToastManager.error(e as Error, "Error logging out");
-                    eSendEvent("settings-loading", false);
-                  }
+                      endProgress();
+                    } catch (e) {
+                      DatabaseLogger.error(e);
+                      ToastManager.error(e as Error, "Error logging out");
+                      endProgress();
+                    }
+                  }, 300);
                 }
               });
             }
@@ -400,12 +506,18 @@ export const settingsGroups: SettingSection[] = [
                   try {
                     const verified = await db.user?.verifyPassword(value);
                     if (verified) {
-                      eSendEvent("settings-loading", true);
-                      await db.user?.deleteUser(value);
-                      await BiometricService.resetCredentials();
-                      SettingsService.set({
-                        introCompleted: true
-                      });
+                      setTimeout(async () => {
+                        startProgress({
+                          title: "Deleting account",
+                          paragraph: "Please wait while we delete your account"
+                        });
+                        Navigation.navigate("Notes");
+                        await db.user?.deleteUser(value);
+                        await BiometricService.resetCredentials();
+                        SettingsService.set({
+                          introCompleted: true
+                        });
+                      }, 300);
                     } else {
                       ToastManager.show({
                         heading: "Incorrect password",
@@ -416,9 +528,9 @@ export const settingsGroups: SettingSection[] = [
                       });
                     }
 
-                    eSendEvent("settings-loading", false);
+                    endProgress();
                   } catch (e) {
-                    eSendEvent("settings-loading", false);
+                    endProgress();
                     console.log(e);
                     ToastManager.error(
                       e as Error,
@@ -439,6 +551,25 @@ export const settingsGroups: SettingSection[] = [
         type: "screen",
         icon: "autorenew",
         sections: [
+          {
+            id: "offline-mode",
+            name: "Full offline mode",
+            description: "Download everything including attachments on sync",
+            type: "switch",
+            property: "offlineMode",
+            modifer: () => {
+              const current = SettingsService.get().offlineMode;
+              if (current) {
+                SettingsService.setProperty("offlineMode", false);
+                db.fs().cancel("offline-mode");
+                return;
+              }
+              PremiumService.verify(() => {
+                SettingsService.setProperty("offlineMode", true);
+                db.attachments.cacheAttachments().catch(console.log);
+              });
+            }
+          },
           {
             id: "auto-sync",
             name: "Disable auto sync",
@@ -700,6 +831,14 @@ export const settingsGroups: SettingSection[] = [
             type: "switch"
           }
         ]
+      },
+      {
+        id: "servers",
+        type: "screen",
+        name: "Servers",
+        description: "Configure server URLs for Notesnook",
+        icon: "server",
+        component: "server-config"
       }
     ]
   },
@@ -1056,16 +1195,36 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "backup-now",
             name: "Backup now",
-            description: "Create a backup of your data",
+            description:
+              "Take a partial backup of your data that does not include attachments",
             icon: "backup",
             modifer: async () => {
               const user = useUserStore.getState().user;
               if (!user || SettingsService.getProperty("encryptedBackup")) {
-                await BackupService.run(true);
+                await BackupService.run(true, undefined, "partial");
                 return;
               }
 
-              verifyUser(null, () => BackupService.run(true));
+              verifyUser(null, () =>
+                BackupService.run(true, undefined, "partial")
+              );
+            }
+          },
+          {
+            id: "backup-now",
+            name: "Backup now with attachments",
+            hidden: () => !useUserStore.getState().user,
+            description: "Take a full backup of your data with all attachments",
+            modifer: async () => {
+              const user = useUserStore.getState().user;
+              if (!user || SettingsService.getProperty("encryptedBackup")) {
+                await BackupService.run(true, undefined, "full");
+                return;
+              }
+
+              verifyUser(null, () =>
+                BackupService.run(true, undefined, "full")
+              );
             }
           },
           {
@@ -1074,8 +1233,18 @@ export const settingsGroups: SettingSection[] = [
             name: "Automatic backups",
             icon: "clock",
             description:
-              "Backup your data once every week or daily automatically.",
+              "Set the interval to create a partial backup (without attachments) automatically.",
             component: "autobackups"
+          },
+          {
+            id: "auto-backups-with-attachments",
+            type: "component",
+            hidden: () => !useUserStore.getState().user,
+            name: "Automatic backups with attachments",
+            description: `Set the interval to create a backup (with attachments) automatically.
+
+NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`,
+            component: "autobackupsattachments"
           },
           {
             id: "select-backup-dir",
@@ -1168,9 +1337,8 @@ export const settingsGroups: SettingSection[] = [
         id: "restore-backup",
         name: "Restore backup",
         description: "Restore backup from phone storage.",
-        modifer: () => {
-          eSendEvent(eOpenRestoreDialog);
-        }
+        type: "screen",
+        component: "backuprestore"
       },
       {
         id: "export-notes",

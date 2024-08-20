@@ -37,7 +37,9 @@ async function getInlinedNode(node: HTMLElement, options: Options) {
 
   const documentStyles = getComputedStyle(document.documentElement);
 
-  const styleCache = stylesheets ? cacheStylesheets(documentStyles) : undefined;
+  const styleCache = stylesheets
+    ? await cacheStylesheets(documentStyles)
+    : undefined;
 
   let clone = await cloneNode(node, {
     styles: options.styles,

@@ -37,6 +37,7 @@ import DialogHeader from "./dialog-header";
 import { useCallback } from "react";
 import { Button } from "../ui/button";
 import { getContainerBorder } from "../../utils/colors";
+import { Notice } from "../ui/notice";
 
 export const Dialog = ({ context = "global" }) => {
   const { colors } = useThemeColors();
@@ -62,7 +63,8 @@ export const Dialog = ({ context = "global" }) => {
     disableBackdropClosing: false,
     check: {
       info: "Check",
-      type: "transparent"
+      type: "transparent",
+      defaultValue: false
     }
   });
 
@@ -86,7 +88,7 @@ export const Dialog = ({ context = "global" }) => {
       if (!data.context) data.context = "global";
       if (data.context !== context) return;
       setDialogInfo(data);
-      setChecked(false);
+      setChecked(data.check?.defaultValue);
       values.current.inputValue = data.defaultValue;
       setVisible(true);
     },
@@ -180,6 +182,19 @@ export const Dialog = ({ context = "global" }) => {
           </View>
         ) : null}
 
+        {dialogInfo?.notice ? (
+          <View
+            style={{
+              paddingHorizontal: 12
+            }}
+          >
+            <Notice
+              type={dialogInfo.notice.type || "information"}
+              text={dialogInfo.notice.text}
+            />
+          </View>
+        ) : null}
+
         {dialogInfo.check ? (
           <>
             <Button
@@ -198,7 +213,7 @@ export const Dialog = ({ context = "global" }) => {
               iconSize={20}
               width="100%"
               title={dialogInfo.check.info}
-              type={checked ? dialogInfo.check.type || "selected" : "plain"}
+              type={checked ? dialogInfo.check.type || "plain" : "plain"}
             />
           </>
         ) : null}

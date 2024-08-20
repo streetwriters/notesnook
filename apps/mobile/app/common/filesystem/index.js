@@ -17,17 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { checkAttachment, downloadFile, getUploadedFileSize } from "./download";
+import { checkAttachment, downloadFile } from "./download";
 import {
   clearFileStorage,
   deleteFile,
   exists,
   readEncrypted,
   writeEncryptedBase64,
-  hashBase64
+  hashBase64,
+  clearCache,
+  deleteCacheFileByName,
+  deleteCacheFileByPath,
+  bulkExists,
+  getCacheSize
 } from "./io";
 import { uploadFile } from "./upload";
-import { cancelable } from "./utils";
+import { cancelable, getUploadedFileSize } from "./utils";
 
 export default {
   readEncrypted,
@@ -39,5 +44,10 @@ export default {
   exists,
   clearFileStorage,
   getUploadedFileSize,
-  checkAttachment
+  checkAttachment,
+  clearCache,
+  deleteCacheFileByName,
+  deleteCacheFileByPath,
+  bulkExists,
+  getCacheSize
 };

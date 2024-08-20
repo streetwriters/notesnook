@@ -76,7 +76,7 @@ export default class Lookup {
         )
         .select(["results.id"])
         .groupBy("results.id")
-        .orderBy(sql`SUM(results.rank)`, "asc")
+        .orderBy(sql`SUM(results.rank)`, "desc")
         .$if(!!limit, (eb) => eb.limit(limit!))
 
         // filter out ids that have no note against them

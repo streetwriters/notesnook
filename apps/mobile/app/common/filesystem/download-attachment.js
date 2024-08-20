@@ -18,24 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium from "@ammarahmed/react-native-sodium";
-import {
-  getFileNameWithExtension,
-  isImage,
-  isDocument
-} from "@notesnook/core/dist/utils/filename";
+import { getFileNameWithExtension } from "@notesnook/core/dist/utils/filename";
 import React from "react";
 import { Platform } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { subscribe, zip } from "react-native-zip-archive";
-import RNFetchBlob from "react-native-blob-util";
 import { ShareComponent } from "../../components/sheets/export-notes/share";
 import { ToastManager, presentSheet } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
+import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
 import Storage from "../database/storage";
-import { cacheDir, copyFileAsync, releasePermissions } from "./utils";
 import { createCacheDir, exists } from "./io";
-import { IOS_APPGROUPID } from "../../utils/constants";
+import { cacheDir, copyFileAsync, releasePermissions } from "./utils";
 
 export const FileDownloadStatus = {
   Success: 1,
@@ -211,7 +207,11 @@ export default async function downloadAttachment(
   try {
     await db
       .fs()
-      .downloadFile(options.groupId || attachment.hash, attachment.hash);
+      .downloadFile(
+        options.groupId || attachment.hash,
+        attachment.hash,
+        attachment.chunkSize
+      );
     if (!(await exists(attachment.hash))) {
       DatabaseLogger.log("Attachment does not exist after download.");
       return;
@@ -259,15 +259,6 @@ export default async function downloadAttachment(
       });
     }
 
-    if (
-      attachment.dateUploaded &&
-      !isImage(attachment.mimeType) &&
-      !isDocument(attachment.mimeType)
-    ) {
-      RNFetchBlob.fs
-        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}`)
-        .catch(console.log);
-    }
     if (Platform.OS === "ios" && !options.cache) {
       fileUri = folder.uri + `/${filename}`;
     }
@@ -287,7 +278,6 @@ export default async function downloadAttachment(
 
     return fileUri;
   } catch (e) {
-    DatabaseLogger.error(e);
     if (attachment.dateUploaded) {
       RNFetchBlob.fs
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}`)
@@ -296,6 +286,7 @@ export default async function downloadAttachment(
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}_dcache`)
         .catch(console.log);
     }
+    DatabaseLogger.error(e);
     useAttachmentStore.getState().remove(attachment.hash);
     if (options.throwError) {
       throw e;

@@ -38,7 +38,7 @@ DerivedData
 *.ipa
 *.xcuserstate
 *.hprof
-ios/.xcode.env.local
+**/.xcode.env.local
 # Android/IntelliJ
 #
 rn-build-deps/
