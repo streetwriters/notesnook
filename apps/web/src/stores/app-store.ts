@@ -83,6 +83,7 @@ class AppStore extends BaseStore<AppStore> {
     // this needs to happen here so reminders can be set on app load.
     reminderStore.refresh();
     announcementStore.refresh();
+    this.get().sync({ type: "full" });
 
     EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
     db.eventManager.subscribe(EVENTS.syncCompleted, () => this.refresh());
@@ -128,6 +129,7 @@ class AppStore extends BaseStore<AppStore> {
         // a slight delay to make sure sockets are open and can be connected
         // to. Otherwise, this fails miserably.
         await networkCheck.waitForInternet();
+        await this.get().sync({ type: "full" });
         await db.connectSSE({ force: true }).catch(logger.error);
       }
     });
@@ -136,6 +138,7 @@ class AppStore extends BaseStore<AppStore> {
       if (documentHidden) return;
 
       logger.info("Page visibility changed. Reconnecting SSE...");
+      await this.get().sync({ type: "full" });
       await db.connectSSE({ force: false }).catch(logger.error);
     });
   };
