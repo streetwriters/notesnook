@@ -22,4 +22,5 @@ Here are the steps to resolve this:
 5. Press the Keep button on the note you want to keep.
 6. And Discard button on the note you don't want to keep (you can also press the Save a Copy button).
 
-
+(this image)[file:///home/muhammad/Pictures/Screenshots/Screenshot_20240820_165310.png] 
+file:///home/muhammad/Pictures/Screenshots/Screenshot_20240820_165247.png
