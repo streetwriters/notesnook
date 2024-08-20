@@ -18,9 +18,10 @@ Here are the steps to resolve this:
 1. Finding the conflicted note. It appears at the top.
 2. Opening it (you'll be taken to a conflict resolution screen)
 3. If you are on a phone, 2 versions will appear above and below. If you are on the Web version, they will be side by side.
-4. Go through both versions and choose which one you want to keep.
-5. Press the Keep button on the note you want to keep.
-6. And Discard button on the note you don't want to keep (you can also press the Save a Copy button).
+![](https://github.com/user-attachments/assets/7790bcd3-e87f-4a5e-a8e6-3fba1b3f3ab3)
+5. Go through both versions and choose which one you want to keep.
+6. Press the Keep button on the note you want to keep.
+7. And Discard button on the note you don't want to keep (you can also press the Save a Copy button).
+![](https://github.com/user-attachments/assets/58558f0e-6bf1-486d-a183-702dba54dcaf)
 
-(this image)[file:///home/muhammad/Pictures/Screenshots/Screenshot_20240820_165310.png] 
-file:///home/muhammad/Pictures/Screenshots/Screenshot_20240820_165247.png
+
