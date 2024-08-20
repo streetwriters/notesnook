@@ -349,8 +349,6 @@ class Database {
    */
   async connectSSE(args?: { force: boolean }) {
     await this.sseMutex.runExclusive(async () => {
-      this.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
-
       const forceReconnect = args && args.force;
       const EventSource = this.options.eventsource;
       if (
