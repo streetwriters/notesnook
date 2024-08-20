@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { debounce } from "@notesnook/common";
-
 export const PAGE_VISIBILITY_CHANGE = { ignore: false };
 function visibilityChange() {
   return "msHidden" in document
@@ -39,8 +37,8 @@ function isDocumentHidden() {
 export function onNetworkStatusChanged(
   handler: (status: "online" | "offline") => void
 ) {
-  const onlineListener = debounce((_) => handler("online"), 1000);
-  const offlineListener = debounce((_) => handler("online"), 1000);
+  const onlineListener = () => handler("online");
+  const offlineListener = () => handler("online");
   window.addEventListener("online", onlineListener);
   window.addEventListener("offline", offlineListener);
 
@@ -56,25 +54,25 @@ export function onPageVisibilityChanged(
     isDocumentHidden: boolean
   ) => void
 ) {
-  const onVisibilityChanged = debounce((_) => {
+  const onVisibilityChanged = () => {
     if (isEventIgnored()) return;
 
     handler("visibilitychange", isDocumentHidden());
-  }, 1000);
+  };
 
-  const onFocus = debounce((_) => {
+  const onFocus = () => {
     if (isEventIgnored()) return;
 
     if (!window.document.hasFocus()) return;
     handler("focus", false);
-  }, 1000);
+  };
 
-  const onBlur = debounce((_) => {
+  const onBlur = () => {
     if (isEventIgnored()) return;
 
     if (window.document.hasFocus()) return;
     handler("blur", true);
-  }, 1000);
+  };
 
   document.addEventListener(visibilityChange(), onVisibilityChanged);
   window.addEventListener("focus", onFocus);
