@@ -1,18 +1,26 @@
 # Merge Conflicts
 
-Merge conflicts occur when there are conflicting note edits on your devices for the same note. 
+## Why Merge Conflicts occur?
+Merge conflicts occur when there are conflicting note edits on different devices for the same note. 
 
+## How Merge Conflicts occur?
 Lets suppose that you have two devices running Notesnook:
 
 1. A desktop
 2. And a mobile.
 
-Suppose that one of your devices is offline (in this case your mobile phone). Now if you made edits to one of your same notea on both your devices and **synched changes** a merge conflict will occur. 
+Suppose that one of your devices is offline. Now if you made edits to one of your (same)notes on both your devices and **synched changes** a merge conflict will occur.
 
-The conflicted notes appear at the very top of the notes list.
+> info
+>
+> In order  for a merge conflict to occur the changes on the (same)note on both devices should occur in more than a minute
 
-Just navigate to the Notes page and you will see them right away.
+## Where do Merge conflicts shows
+The conflicted notes appear at the very top of the notes list. Just navigate to the Notes page and you will see them right away (If there are any).
 
+## How to Resolve Merge Conflicts
+
+# [Desktop/Web](#/tab/web)
 Here are the steps to resolve this:
 
 1. Finding the conflicted note. It appears at the top.
@@ -24,4 +32,6 @@ Here are the steps to resolve this:
 7. And Discard button on the note you don't want to keep (you can also press the Save a Copy button).
 ![](https://github.com/user-attachments/assets/58558f0e-6bf1-486d-a183-702dba54dcaf)
 
+# [Mobile](#/tab/mobile)
 
+---
