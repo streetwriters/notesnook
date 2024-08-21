@@ -30,6 +30,7 @@ Follow these steps to resolve a Merge Conflict:
 5. Go through both versions and choose which one you want to keep.
 6. Press the Keep button on the note you want to keep.
 7. Press Discard button on the note you don't want to keep (you can also press the Save a Copy button if you want to keep it too).
+ ![](https://github.com/user-attachments/assets/58558f0e-6bf1-486d-a183-702dba54dcaf)
 
 # [Mobile](#/tab/mobile)
 Follow these steps to resolve a Merge Conflict:
@@ -37,7 +38,6 @@ Follow these steps to resolve a Merge Conflict:
 1. Go to the conflicted note. It appears at the top of your note list.
 2. Open the note. This will take you to a conflict resolution screen.
 3. On the Coflict Resolution Screen 2 versions of your note will appear above and below. One will be from the device you are using (Current Note) and one will be from the server(Incomming Note).
-![](https://github.com/user-attachments/assets/58558f0e-6bf1-486d-a183-702dba54dcaf)
 5. Go through both versions and choose which one you want to keep.
 6. Press the Keep button on the note you want to keep.
 7. And Discard button on the note you don't want to keep (you can also press the Save a Copy button if you want to keep it too).
