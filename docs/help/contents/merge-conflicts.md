@@ -1,5 +1,5 @@
 ---
-title: How merge conflicts occur?
+title: Merge Conflicts
 description: Merge conflicts occur when there are conflicting note edits on different devices for the same note.
 ---
 
@@ -14,7 +14,7 @@ Merge conflicts occur when there are conflicting note edits on different devices
 Lets suppose that you have two devices running Notesnook:
 
 1. A desktop
-2. And a mobile.
+2. A mobile device
 
 Suppose that one of your devices is offline. Now if you made edits to one of your (same)notes on both your devices and **synched changes** a merge conflict will occur.
 
