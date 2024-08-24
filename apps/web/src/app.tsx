@@ -125,7 +125,9 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
   const middlePane = useRef<ImperativePanelHandle>(null);
 
   useEffect(() => {
-    setIsNarrow(isTablet);
+    const size = navPane.current?.getSize();
+    // Toggle `isNarrow` to true if panel size isn't set to narrow by user 
+    setIsNarrow((size && size <= 5) || isTablet);
   }, [isTablet]);
 
   // useEffect(() => {
