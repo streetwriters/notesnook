@@ -282,9 +282,7 @@ export async function restoreBackupFile(backupFile: File) {
         });
         await db.initCollections();
 
-        const { ABYTES, streamablefs, hashStream } = await import(
-          "../interfaces/fs"
-        );
+        const { ABYTES, streamablefs } = await import("../interfaces/fs");
         let current = 0;
         for (const entry of attachments) {
           const hash = entry.name.replace("attachments/", "");
@@ -297,27 +295,6 @@ export async function restoreBackupFile(backupFile: File) {
 
           const attachment = await db.attachments.attachment(hash);
           if (!attachment) continue;
-          if (attachment.dateUploaded) {
-            const key = await db.attachments.decryptKey(attachment.key);
-            if (!key) continue;
-            const result = await hashStream(
-              entry
-                .stream()
-                .pipeThrough(
-                  new ChunkedStream(
-                    attachment.chunkSize + ABYTES,
-                    isFeatureSupported("opfs") ? "copy" : "nocopy"
-                  )
-                )
-                .pipeThrough(
-                  await NNCrypto.createDecryptionStream(key, attachment.iv)
-                )
-                .getReader()
-            );
-            if (result.hash !== attachment.hash) continue;
-            await db.attachments.reset(attachment.id);
-          }
-          if (await db.fs().exists(attachment.hash)) continue;
 
           await streamablefs.deleteFile(attachment.hash);
           const handle = await streamablefs.createFile(
