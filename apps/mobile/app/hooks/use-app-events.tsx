@@ -26,10 +26,7 @@ import {
 } from "@notesnook/core/dist/common";
 import { EventManagerSubscription } from "@notesnook/core/dist/utils/event-manager";
 import notifee from "@notifee/react-native";
-import NetInfo, {
-  NetInfoState,
-  NetInfoSubscription
-} from "@react-native-community/netinfo";
+import NetInfo, { NetInfoSubscription } from "@react-native-community/netinfo";
 import React, { useCallback, useEffect, useRef } from "react";
 import {
   AppState,
@@ -47,6 +44,7 @@ import { checkVersion } from "react-native-check-version";
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { DatabaseLogger, db, setupDatabase } from "../common/database";
+import { initializeLogger } from "../common/database/logger";
 import { MMKV } from "../common/database/mmkv";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
@@ -97,7 +95,6 @@ import {
 import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
-import { initializeLogger } from "../common/database/logger";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -362,6 +359,7 @@ const initializeDatabase = async (password?: string) => {
     try {
       await setupDatabase(password);
       await db.init();
+      Sync.run();
     } catch (e) {
       DatabaseLogger.error(e as Error);
       ToastManager.error(e as Error, "Error initializing database", "global");
@@ -391,18 +389,15 @@ export const useAppEvents = () => {
   ]);
 
   const syncedOnLaunch = useRef(false);
-
   const refValues = useRef<
     Partial<{
       subsriptionSuccessListener: EmitterSubscription;
       subsriptionErrorListener: EmitterSubscription;
-      isUserReady: boolean;
       prevState: AppStateStatus;
-      showingDialog: boolean;
       removeInternetStateListener: NetInfoSubscription;
-      isReconnecting: boolean;
       initialUrl: string;
       backupDidWait: boolean;
+      isConnectingSSE: boolean;
     }>
   >({});
 
@@ -550,7 +545,6 @@ export const useAppEvents = () => {
         setRecoveryKeyMessage();
       }
       if (!user?.isEmailConfirmed) setEmailVerifyMessage();
-      refValues.current.isUserReady = true;
 
       syncedOnLaunch.current = true;
       if (!isLogin) {
@@ -624,18 +618,19 @@ export const useAppEvents = () => {
   }, [onSyncComplete, onUserUpdated]);
 
   useEffect(() => {
-    const onInternetStateChanged = async (state: NetInfoState) => {
+    const onInternetStateChanged = async () => {
       if (!syncedOnLaunch.current) return;
-      reconnectSSE(state);
+      Sync.run("global", false, "full");
+      reconnectSSE();
     };
 
     const onAppStateChanged = async (state: AppStateStatus) => {
       if (state === "active") {
         notifee.setBadgeCount(0);
         updateStatusBarColor();
-
         checkAutoBackup();
-        await reconnectSSE();
+        Sync.run("global", false, "full");
+        reconnectSSE();
         await checkForShareExtensionLaunchedInBackground();
         MMKV.removeItem("appState");
         let user = await db.user.getUser();
@@ -721,42 +716,15 @@ export const useAppEvents = () => {
     }
   }, [appLocked, syncing, checkAutoBackup]);
 
-  async function reconnectSSE(connection?: NetInfoState) {
-    if (refValues.current?.isReconnecting || !refValues.current?.isUserReady)
-      return;
-
-    if (useSettingStore.getState().appDidEnterBackgroundForAction) {
-      useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
-      console.log("AppDidEnterForegroundAfterAction");
-      return;
-    }
-
-    if (SettingsService.get().sessionExpired) {
-      refValues.current.isReconnecting = false;
-      return;
-    }
-
-    refValues.current.isReconnecting = true;
-    let connectionState = connection;
+  async function reconnectSSE() {
     try {
-      if (!connectionState) {
-        connectionState = await NetInfo.fetch();
-      }
-
-      const user = await db.user.getUser();
-      if (
-        user &&
-        connectionState.isConnected &&
-        connectionState.isInternetReachable
-      ) {
-        await db.connectSSE();
-      } else {
-        useUserStore.getState().setSyncing(false);
-        await db.syncer.stop();
-      }
-      refValues.current.isReconnecting = false;
+      if (refValues.current?.isConnectingSSE) return;
+      refValues.current.isConnectingSSE = true;
+      await db.connectSSE();
+      refValues.current.isConnectingSSE = false;
     } catch (e) {
-      refValues.current.isReconnecting = false;
+      refValues.current.isConnectingSSE = false;
+      DatabaseLogger.error(e as Error);
     }
   }
 
