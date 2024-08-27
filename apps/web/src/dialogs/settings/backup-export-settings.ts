@@ -21,7 +21,6 @@ import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
-import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { createBackup, importBackup, verifyAccount } from "../../common";
 import { db } from "../../common/db";
 import { exportNotes } from "../../common/export";
@@ -77,21 +76,21 @@ export const BackupExportSettings: SettingsGroup[] = [
       },
       {
         key: "auto-backup",
-        title: "Automatic backups",
-        description: `Set the interval to create a backup automatically.
+        title: "Automatic backup",
+        description: `Set the interval to automatically create a backup.
         
-Note: these backups do not contain attachments.`,
-        isHidden: () => !isUserPremium(),
+Note: these backups do not contain your attachments.`,
+        // isHidden: () => !isUserPremium(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.backupReminderOffset, listener),
         components: [
           {
             type: "dropdown",
             options: [
-              { value: "0", title: "Never" },
-              { value: "1", title: "Daily" },
-              { value: "2", title: "Weekly" },
-              { value: "3", title: "Monthly" }
+              { value: "0", title: "Never", premium: true },
+              { value: "1", title: "Daily", premium: true },
+              { value: "2", title: "Weekly", premium: true },
+              { value: "3", title: "Monthly", premium: true }
             ],
             selectedOption: () =>
               useSettingStore.getState().backupReminderOffset.toString(),
@@ -110,10 +109,10 @@ Note: these backups do not contain attachments.`,
       {
         key: "auto-backup-with-attachments",
         title: "Automatic backup with attachments",
-        description: `Set the interval to create a backup (with attachments) automatically.
+        description: `Set the interval to automatically create a full backup with attachments.
 
 NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`,
-        isHidden: () => !isUserPremium(),
+        // isHidden: () => !isUserPremium(),
         onStateChange: (listener) =>
           useSettingStore.subscribe(
             (s) => s.fullBackupReminderOffset,
@@ -123,9 +122,9 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
           {
             type: "dropdown",
             options: [
-              { value: "0", title: "Never" },
-              { value: "1", title: "Weekly" },
-              { value: "2", title: "Monthly" }
+              { value: "0", title: "Never", premium: true },
+              { value: "1", title: "Weekly", premium: true },
+              { value: "2", title: "Monthly", premium: true }
             ],
             selectedOption: () =>
               useSettingStore.getState().fullBackupReminderOffset.toString(),
