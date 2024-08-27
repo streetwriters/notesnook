@@ -30,7 +30,9 @@ export const ignoredMessages = [
   "Sync already running",
   "Not allowed to start service intent",
   "WebSocket failed to connect",
-  "Failed to start the HttpConnection before"
+  "Failed to start the HttpConnection before",
+  "Could not connect to the Sync server",
+  "Network request failed"
 ];
 let pendingSync: any = undefined;
 let syncTimer: NodeJS.Timeout;
@@ -61,25 +63,18 @@ const run = async (
 
   clearTimeout(syncTimer);
   syncTimer = setTimeout(async () => {
-    const status = await NetInfo.fetch();
     const userstore = useUserStore.getState();
+    userstore.setSyncing(true);
     const user = await db.user.getUser();
-    if (!status.isInternetReachable) {
-      DatabaseLogger.warn("Internet not reachable");
-    }
 
-    if (
-      !user ||
-      !status.isInternetReachable ||
-      SettingsService.get().disableSync
-    ) {
+    if (!user || SettingsService.get().disableSync) {
+      userstore.setSyncing(false);
       initAfterSync();
       pendingSync = undefined;
       return onCompleted?.(SyncStatus.Failed);
     }
-    userstore.setSyncing(true);
 
-    let error = null;
+    let error: Error | undefined = undefined;
 
     try {
       await BackgroundSync.doInBackground(async () => {
@@ -90,30 +85,23 @@ const run = async (
             offlineMode: SettingsService.get().offlineMode
           });
         } catch (e) {
-          error = e;
+          error = e as Error;
         }
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
     } catch (e) {
-      error = e;
+      error = e as Error;
+      DatabaseLogger.error(error, "[Client] Failed to sync");
       if (
-        !ignoredMessages.find((message) =>
-          (e as Error).message?.includes(message)
-        ) &&
-        userstore.user &&
-        status.isConnected &&
-        status.isInternetReachable
+        !ignoredMessages.find((message) => error?.message?.includes(message)) &&
+        userstore.user
       ) {
-        userstore.setSyncing(false, SyncStatus.Failed);
+        const status = await NetInfo.fetch();
         if (status.isConnected && status.isInternetReachable) {
           ToastManager.error(e as Error, "Sync failed", context);
         }
       }
-
-      DatabaseLogger.error(e, "[Client] Failed to sync");
     } finally {
       initAfterSync();
       userstore.setSyncing(
@@ -121,16 +109,14 @@ const run = async (
         error ? SyncStatus.Failed : SyncStatus.Passed
       );
       onCompleted?.(error ? SyncStatus.Failed : SyncStatus.Passed);
-      setImmediate(() => {
-        if (pendingSync)
-          Sync.run(
-            pendingSync.context,
-            pendingSync.forced,
-            pendingSync.type,
-            pendingSync.onCompleted,
-            pendingSync.lastSyncTime
-          );
-      });
+      if (pendingSync)
+        Sync.run(
+          pendingSync.context,
+          pendingSync.forced,
+          pendingSync.type,
+          pendingSync.onCompleted,
+          pendingSync.lastSyncTime
+        );
     }
   }, 300);
 };

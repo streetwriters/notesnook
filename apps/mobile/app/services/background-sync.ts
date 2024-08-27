@@ -27,6 +27,7 @@ import { AppState, AppRegistry } from "react-native";
 import Notifications from "./notifications";
 import SettingsService from "./settings";
 import { deleteDCacheFiles } from "../common/filesystem/io";
+import Sync from "./sync";
 
 async function doInBackground(callback: () => Promise<void>) {
   if (Platform.OS === "ios") {
@@ -116,10 +117,7 @@ async function onBackgroundSyncStarted() {
     }
     const user = await db.user?.getUser();
     if (user) {
-      await db.sync({
-        type: "full",
-        force: false
-      });
+      Sync.run("global", false, "full");
     }
     await Notifications.setupReminders();
     deleteDCacheFiles();
