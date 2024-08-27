@@ -150,10 +150,10 @@ async function presentBackupCompleteSheet(backupFilePath: string) {
   });
 }
 
-async function updateNextBackupTime() {
+async function updateNextBackupTime(type: "full" | "partial") {
   SettingsService.set({
     nextBackupRequestTime: Date.now() + 86400000 * 3,
-    lastBackupDate: Date.now()
+    [type === "full" ? "lastFullBackupDate" : "lastBackupDate"]: Date.now()
   });
 }
 /**
@@ -164,7 +164,7 @@ async function updateNextBackupTime() {
 async function run(
   progress = false,
   context?: string,
-  backupType?: "full" | "partial"
+  backupType: "full" | "partial" = "partial"
 ) {
   console.log("Creating backup:", backupType, progress, context);
 
@@ -272,7 +272,7 @@ async function run(
       RNFetchBlob.fs.unlink(zipOutputFile).catch(console.log);
     }
 
-    updateNextBackupTime();
+    updateNextBackupTime(backupType || "partial");
 
     if (progress) {
       endProgress();
