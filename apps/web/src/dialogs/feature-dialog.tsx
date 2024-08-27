@@ -90,9 +90,23 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : IS_DESKTOP_APP
-      ? []
-      : [],
+      : [
+          {
+            title: "Full offline mode",
+            subtitle:
+              "You can now download all your attachments upfront so they are always available on your device even without an Internet connection. To enable just go to Settings > Sync and toggle Full Offline Mode."
+          },
+          {
+            title: "Backup with attachments",
+            subtitle:
+              "You can now backup your notes alongwith all your attachments - kind of like a full account snapshot."
+          },
+          {
+            title: "Self hosting",
+            subtitle:
+              "This release also adds initial support for changing server URLs i.e. to connect your own instance of Notesnook. Please note that this is still experimental and may not work as expected."
+          }
+        ],
     cta: {
       title: "Got it",
       icon: Checkmark,
