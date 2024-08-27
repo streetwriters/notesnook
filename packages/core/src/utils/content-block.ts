@@ -25,10 +25,10 @@ export function extractInternalLinks(block: ContentBlock) {
   const matches = block.content.matchAll(INTERNAL_LINK_REGEX);
 
   const links: InternalLinkWithOffset[] = [];
-  for (const match of matches || []) {
+  for (const match of matches) {
     if (match.index === undefined) continue;
-    const url = match[1].slice(0, match[1].indexOf("|"));
-    const text = match[1].slice(match[1].indexOf("|") + 1);
+    const url = match[1].slice(0, match[1].lastIndexOf("|"));
+    const text = match[1].slice(match[1].lastIndexOf("|") + 1);
     const link = parseInternalLink(url);
     if (!link) continue;
     links.push({
@@ -44,7 +44,6 @@ export function extractInternalLinks(block: ContentBlock) {
 
 function normalize(block: ContentBlock, links: InternalLinkWithOffset[]) {
   let diff = 0;
-  console.log(links);
   for (const link of links) {
     link.start -= diff;
     link.end -= diff;

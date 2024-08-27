@@ -26,7 +26,7 @@ export class HealthCheck {
   }
 }
 
-async function check(host: string) {
+export async function check(host: string) {
   try {
     const response = await http.get(`${host}/health`);
     return response.trim() === "Healthy";

@@ -17,10 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export function areAllEmpty(obj: Record<string, unknown>) {
-  for (const key in obj) {
-    const value = obj[key];
-    if (Array.isArray(value) && value.length > 0) return false;
-  }
-  return true;
-}
+import { HealthCheck, check } from "../healthcheck";
+import { describe } from "vitest";
+
+describe.concurrent("Health check", (test) => {
+  test("Auth", async (t) => {
+    const result = await HealthCheck.auth();
+    t.expect(result).toBe(true);
+  });
+
+  test("Healthy host", async (t) => {
+    const host = "https://api.notesnook.com";
+    const result = await check(host);
+    t.expect(result).toBe(true);
+  });
+
+  test("Unhealthy host", async (t) => {
+    const host = "https://example.com";
+    // Simulate an error by passing an invalid host
+    const result = await check(host);
+    t.expect(result).toBe(false);
+  });
+});
