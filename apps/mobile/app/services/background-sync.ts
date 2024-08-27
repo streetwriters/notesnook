@@ -16,18 +16,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Platform } from "react-native";
+import BackgroundFetch from "@ammarahmed/react-native-background-fetch";
+import { AppRegistry, AppState, Platform } from "react-native";
 import {
   beginBackgroundTask,
   endBackgroundTask
 } from "react-native-begin-background-task";
-import BackgroundFetch from "@ammarahmed/react-native-background-fetch";
 import { DatabaseLogger, db, setupDatabase } from "../common/database";
-import { AppState, AppRegistry } from "react-native";
+import { deleteDCacheFiles } from "../common/filesystem/io";
+import { useUserStore } from "../stores/use-user-store";
 import Notifications from "./notifications";
 import SettingsService from "./settings";
-import { deleteDCacheFiles } from "../common/filesystem/io";
-import Sync from "./sync";
 
 async function doInBackground(callback: () => Promise<void>) {
   if (Platform.OS === "ios") {
@@ -116,13 +115,19 @@ async function onBackgroundSyncStarted() {
       await db.init();
     }
     const user = await db.user?.getUser();
-    if (user) {
-      Sync.run("global", false, "full");
+    if (user && !useUserStore.getState().syncing) {
+      useUserStore.getState().setSyncing(true);
+      await db.sync({
+        type: "full",
+        force: false
+      });
+      useUserStore.getState().setSyncing(false);
     }
     await Notifications.setupReminders();
     deleteDCacheFiles();
     DatabaseLogger.info("BACKGROUND SYNC COMPLETE");
   } catch (e) {
+    useUserStore.getState().setSyncing(false);
     DatabaseLogger.error(e as Error);
     console.log("BACKGROUND SYNC ERROR", (e as Error).message);
   }
