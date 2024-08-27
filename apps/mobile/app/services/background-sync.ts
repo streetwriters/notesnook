@@ -142,6 +142,7 @@ const onBoot = async () => {
 
     DatabaseLogger.info("BOOT TASK STARTED");
     if (!db.isInitialized) {
+      await setupDatabase();
       await db.init();
     }
 
