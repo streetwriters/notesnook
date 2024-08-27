@@ -347,11 +347,23 @@ export const TaskListNode = TaskList.extend({
     });
     const oldHandler = inputRule.handler;
     inputRule.handler = ({ state, range, match, chain, can, commands }) => {
-      if (state.selection.$from.node().type.name === "heading")
-        commands.setParagraph();
-      oldHandler({ state, range, match, chain, can, commands });
+      const tr = state.tr;
+      // reset nodes before converting them to a task list.
+      commands.clearNodes();
 
-      state.tr.setNodeMarkup(state.tr.selection.to - 2, undefined, {
+      oldHandler({
+        state,
+        range: {
+          from: tr.mapping.map(range.from),
+          to: tr.mapping.map(range.to)
+        },
+        match,
+        chain,
+        can,
+        commands
+      });
+
+      tr.setNodeMarkup(state.tr.selection.to - 2, undefined, {
         checked: match[match.length - 1] === "x"
       });
     };
