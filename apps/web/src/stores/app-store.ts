@@ -57,6 +57,7 @@ type SyncStatus = {
 };
 const networkCheck = new NetworkCheck();
 let syncStatusTimeout = 0;
+let syncTimeout = 0;
 let pendingSync: SyncOptions | undefined = undefined;
 
 class AppStore extends BaseStore<AppStore> {
@@ -266,12 +267,7 @@ class AppStore extends BaseStore<AppStore> {
   };
 
   sync = async (options: SyncOptions = { type: "full", force: false }) => {
-    if (
-      this.isSyncing() ||
-      !this.get().isSyncEnabled ||
-      !navigator.onLine ||
-      !(await networkCheck.waitForInternet())
-    ) {
+    if (this.isSyncing() || !this.get().isSyncEnabled) {
       logger.info("Ignoring duplicate sync", {
         options,
         syncing: this.isSyncing(),
@@ -282,47 +278,52 @@ class AppStore extends BaseStore<AppStore> {
       return;
     }
 
-    clearTimeout(syncStatusTimeout);
-    this.updateLastSynced();
+    clearTimeout(syncTimeout);
+    syncTimeout = setTimeout(async () => {
+      clearTimeout(syncStatusTimeout);
+      this.updateSyncStatus("syncing");
+      this.updateLastSynced();
 
-    this.updateSyncStatus("syncing");
-    try {
-      options.offlineMode = settingStore.get().isFullOfflineMode;
-      const result = await db.sync(options);
+      try {
+        options.offlineMode = settingStore.get().isFullOfflineMode;
+        const result = await db.sync(options);
 
-      if (!result) return this.updateSyncStatus("failed");
-      this.updateSyncStatus("completed", true);
+        if (!result) return this.updateSyncStatus("failed");
+        this.updateSyncStatus("completed", true);
 
-      await this.updateLastSynced();
+        await this.updateLastSynced();
 
-      if (pendingSync) {
-        logger.info("Running pending sync", pendingSync);
-        const syncOptions = { ...pendingSync };
-        pendingSync = undefined;
-        await this.get().sync(syncOptions);
+        if (pendingSync) {
+          logger.info("Running pending sync", pendingSync);
+          const syncOptions = { ...pendingSync };
+          pendingSync = undefined;
+          await this.get().sync(syncOptions);
+        }
+      } catch (err) {
+        if (!(err instanceof Error)) {
+          console.error(err);
+          return;
+        }
+
+        logger.error(err);
+        if (err.cause === "MERGE_CONFLICT") {
+          await this.refresh();
+          this.updateSyncStatus("conflicts");
+        } else {
+          this.updateSyncStatus("failed");
+        }
+
+        if (
+          err?.message?.indexOf("Failed to fetch") > -1 ||
+          err?.message?.indexOf("Could not connect to the Sync server.") > -1 ||
+          !navigator.onLine ||
+          !(await networkCheck.waitForInternet())
+        )
+          return;
+
+        showToast("error", err.message);
       }
-    } catch (err) {
-      if (!(err instanceof Error)) {
-        console.error(err);
-        return;
-      }
-
-      logger.error(err);
-      if (err.cause === "MERGE_CONFLICT") {
-        await this.refresh();
-        this.updateSyncStatus("conflicts");
-      } else {
-        this.updateSyncStatus("failed");
-      }
-
-      if (
-        err?.message?.indexOf("Failed to fetch") > -1 ||
-        err?.message?.indexOf("Could not connect to the Sync server.") > -1
-      )
-        return;
-
-      showToast("error", err.message);
-    }
+    }, 300) as unknown as number;
   };
 
   abortSync = async (status: SyncState = "offline") => {
