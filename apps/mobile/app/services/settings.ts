@@ -41,10 +41,15 @@ function reset() {
 }
 
 function resetSettings() {
-  MMKV.setString(
-    "appSettings",
-    JSON.stringify({ ...defaultSettings, introCompleted: true })
-  );
+  const settings: SettingStore["settings"] = {
+    ...defaultSettings,
+    introCompleted: true,
+    serverUrls: get().serverUrls,
+    backupDirectoryAndroid: undefined
+  };
+
+  MMKV.setString("appSettings", JSON.stringify(settings));
+  set(settings);
   init();
 }
 
