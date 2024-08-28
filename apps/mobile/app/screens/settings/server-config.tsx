@@ -29,6 +29,7 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import { HostId, HostIds } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
+import { ToastManager } from "../../services/event-manager";
 
 export const ServerIds = ["notesnook-sync", "auth", "sse"] as const;
 export type ServerId = (typeof ServerIds)[number];
@@ -90,6 +91,7 @@ export function ServersConfiguration() {
           type="alert"
         />
       ) : null}
+
       <View style={{ flexDirection: "column" }}>
         {SERVERS.map((server) => (
           <Input
@@ -131,31 +133,10 @@ export function ServersConfiguration() {
         ) : null}
         <View style={{ marginTop: 1, justifyContent: "flex-end", gap: 12 }}>
           <Button
-            type="accent"
-            disabled={!success}
-            width="100%"
-            onPress={async () => {
-              if (!success || isLoggedIn) return;
-              SettingsService.setProperty(
-                "serverUrls",
-                urls as Record<HostId, string>
-              );
-
-              presentDialog({
-                title: "Server url changed",
-                paragraph: "Restart the app for changes to take effect.",
-                negativeText: "Done"
-              });
-            }}
-            title="Save"
-          />
-
-          <Button
             disabled={isLoggedIn}
             type="secondary"
             width="100%"
             onPress={async () => {
-              setError(undefined);
               try {
                 for (const host of HostIds) {
                   const url = urls[host];
@@ -177,6 +158,7 @@ export function ServersConfiguration() {
                   }
                 }
                 setSuccess(true);
+                setError(undefined);
               } catch (e) {
                 setError((e as Error).message);
               }
@@ -185,10 +167,35 @@ export function ServersConfiguration() {
           />
 
           <Button
+            type="accent"
+            disabled={isLoggedIn}
+            width="100%"
+            onPress={async () => {
+              if (!success) {
+                ToastManager.show({
+                  heading: "Test connection before changing server urls"
+                });
+                return;
+              }
+              SettingsService.setProperty(
+                "serverUrls",
+                urls as Record<HostId, string>
+              );
+
+              presentDialog({
+                title: "Server url changed",
+                paragraph: "Restart the app for changes to take effect.",
+                negativeText: "Done"
+              });
+            }}
+            title="Save"
+          />
+
+          <Button
             disabled={isLoggedIn}
             type="error"
             width="100%"
-            title="Reset"
+            title="Reset server urls"
             onPress={async () => {
               if (isLoggedIn) return;
               SettingsService.setProperty("serverUrls", undefined);
