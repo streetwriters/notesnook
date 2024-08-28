@@ -57,7 +57,6 @@
     "hotkeys-js": "^3.8.3",
     "katex": "0.16.2",
     "kysely": "^0.26.3",
-    "libsodium-wrappers": "^0.7.13",
     "mac-scrollbar": "^0.13.5",
     "marked": "^4.1.0",
     "mutative": "^1.0.6",

@@ -44,6 +44,7 @@ const IGNORED_NATIVE_PACKAGES = [
   ...(args.scope === "desktop"
     ? ["better-sqlite3-multiple-ciphers", "sodium-native"]
     : []),
+  "electron",
 
   // optional dependency of pdfjs-dist, we can ignore
   // it because it's only needed in non-browser environments
