@@ -375,33 +375,35 @@ export const RestoreBackup = () => {
                 }}
               />
 
-              <SectionItem
-                item={{
-                  id: "select-backup-folder",
-                  name: "Select folder with backup files",
-                  icon: "folder",
-                  modifer: async () => {
-                    const folder = await ScopedStorage.openDocumentTree(true);
-                    let subfolder;
-                    if (folder.name !== "Notesnook backups") {
-                      subfolder = await ScopedStorage.createDirectory(
-                        folder.uri,
-                        "Notesnook backups"
-                      );
-                    } else {
-                      subfolder = folder;
-                    }
-                    SettingsService.set({
-                      backupDirectoryAndroid: subfolder
-                    });
-                    setBackupDirectoryAndroid(subfolder);
-                    setLoading(true);
-                    checkBackups();
-                  },
-                  description:
-                    "Select folder where Notesnook backup files are stored to view and restore them from the app"
-                }}
-              />
+              {Platform.OS === "android" ? (
+                <SectionItem
+                  item={{
+                    id: "select-backup-folder",
+                    name: "Select folder with backup files",
+                    icon: "folder",
+                    modifer: async () => {
+                      const folder = await ScopedStorage.openDocumentTree(true);
+                      let subfolder;
+                      if (folder.name !== "Notesnook backups") {
+                        subfolder = await ScopedStorage.createDirectory(
+                          folder.uri,
+                          "Notesnook backups"
+                        );
+                      } else {
+                        subfolder = folder;
+                      }
+                      SettingsService.set({
+                        backupDirectoryAndroid: subfolder
+                      });
+                      setBackupDirectoryAndroid(subfolder);
+                      setLoading(true);
+                      checkBackups();
+                    },
+                    description:
+                      "Select folder where Notesnook backup files are stored to view and restore them from the app"
+                  }}
+                />
+              ) : null}
 
               <FlatList
                 ListHeaderComponent={
