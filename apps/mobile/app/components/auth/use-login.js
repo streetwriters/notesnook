@@ -83,7 +83,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
                   setLoading(false);
                   setTimeout(() => {
                     passwordInputRef.current?.focus();
-                  }, 1);
+                  }, 500);
                   callback && callback(true);
                 }
                 callback && callback(false);
