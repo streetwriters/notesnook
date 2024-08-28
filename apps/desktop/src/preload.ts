@@ -20,14 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ELECTRON_TRPC_CHANNEL } from "electron-trpc/main";
 import { type RendererGlobalElectronTRPC } from "electron-trpc/src/types";
-import type { NNCrypto } from "@notesnook/crypto";
+// import type { NNCrypto } from "@notesnook/crypto";
 import { ipcRenderer } from "electron";
 import { platform } from "os";
 
 declare global {
   var os: () => "mas" | ReturnType<typeof platform>;
   var electronTRPC: RendererGlobalElectronTRPC;
-  var NativeNNCrypto: (new () => NNCrypto) | undefined;
+  // var NativeNNCrypto: (new () => NNCrypto) | undefined;
 }
 
 process.once("loaded", async () => {
@@ -40,5 +40,5 @@ process.once("loaded", async () => {
   globalThis.electronTRPC = electronTRPC;
 });
 
-globalThis.NativeNNCrypto = require("@notesnook/crypto").NNCrypto;
+// globalThis.NativeNNCrypto = require("@notesnook/crypto").NNCrypto;
 globalThis.os = () => (MAC_APP_STORE ? "mas" : platform());

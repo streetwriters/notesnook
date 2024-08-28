@@ -19,15 +19,18 @@
     "url": "https://github.com/streetwriters/notesnook.git",
     "directory": "packages/sodium"
   },
+  "peerDependencies": {
+    "sodium-native": ">=4"
+  },
   "devDependencies": {
     "@types/libsodium-wrappers-sumo": "0.7.8",
+    "sodium-native": "^4.1.1",
     "benny": "^3.7.1",
     "ts-node": "^10.9.1",
     "vitest": "^0.32.2"
   },
   "dependencies": {
-    "libsodium-wrappers-sumo": "^0.7.15",
-    "sodium-native": "^4.1.1"
+    "libsodium-wrappers-sumo": "^0.7.15"
   },
   "browser": "./dist/browser.js"
 }
