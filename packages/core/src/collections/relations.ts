@@ -51,6 +51,7 @@ export class Relations implements ICollection {
   }
 
   async add(from: ItemReference, to: ItemReference) {
+    if (!from.id || !to.id) throw new Error("Invalid item reference.");
     await this.collection.upsert({
       id: generateId(from, to),
       type: "relation",
