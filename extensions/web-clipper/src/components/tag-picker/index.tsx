@@ -24,25 +24,22 @@ import { useAppStore } from "../../stores/app-store";
 import { Picker } from "../picker";
 import { InlineTag } from "../inline-tag";
 import { CheckListItem } from "../check-list-item";
+import { SelectedReference } from "../../common/bridge";
 
 type TagPickerProps = {
-  selectedTags: string[];
-  onSelected: (tags: string[]) => void;
+  selectedTags: SelectedReference[];
+  onSelected: (tags: SelectedReference[]) => void;
 };
 export const TagPicker = (props: TagPickerProps) => {
-  const { onSelected } = props;
+  const { selectedTags, onSelected } = props;
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>(
-    props.selectedTags || []
-  );
 
   const close = () => {
     setModalVisible(false);
   };
 
   const open = () => {
-    setSelectedTags(props.selectedTags || []);
     setModalVisible(true);
   };
 
@@ -57,20 +54,20 @@ export const TagPicker = (props: TagPickerProps) => {
           gap: 1
         }}
       >
-        {props.selectedTags.length
-          ? props.selectedTags.map((tag) => (
+        {selectedTags.length
+          ? selectedTags.map((tag) => (
               <InlineTag
-                key={tag}
+                key={tag.id}
                 icon={Icons.tag}
-                title={tag}
+                title={tag.title}
                 onClick={() => {
-                  setSelectedTags((items) => {
-                    const copy = items.slice();
-                    const index = copy.indexOf(tag);
-                    if (index > -1) copy.splice(index, 1);
-                    onSelected(copy);
-                    return copy;
-                  });
+                  const copy = selectedTags.slice();
+                  const index = copy.findIndex(
+                    (c) => c.type === "tag" && c.id === tag.id
+                  );
+                  if (index <= -1) return;
+                  copy.splice(index, 1);
+                  onSelected(copy);
                 }}
               />
             ))
@@ -102,18 +99,19 @@ export const TagPicker = (props: TagPickerProps) => {
             <CheckListItem
               title={`#${tag.title}`}
               onSelected={() => {
-                setSelectedTags((items) => {
-                  const copy = items.slice();
-                  const index = copy.indexOf(tag.title);
-                  if (index > -1) {
-                    copy.splice(index, 1);
-                  } else {
-                    copy.push(tag.title);
-                  }
-                  return copy;
-                });
+                const copy = selectedTags.slice();
+                const index = copy.findIndex(
+                  (c) => c.type === "tag" && c.id === tag.id
+                );
+                if (index <= -1) copy.push({ ...tag, type: "tag" });
+                else copy.splice(index, 1);
+                onSelected(copy);
               }}
-              isSelected={selectedTags.indexOf(tag.title) > -1}
+              isSelected={
+                selectedTags.findIndex(
+                  (s) => s.type === "tag" && s.id === tag.id
+                ) > -1
+              }
             />
           )}
         />

@@ -44,17 +44,15 @@ export interface Gateway {
   connect(): ClientMetadata;
 }
 
-type SelectedTopicReference = ItemReference & {
-  type: "topic";
-  parentId: string;
-};
-
 type SelectedNotebookReference = ItemReference & {
   type: "notebook";
 };
+type SelectedTagReference = ItemReference & {
+  type: "tag";
+};
 
 export type SelectedReference =
-  | SelectedTopicReference
+  | SelectedTagReference
   | SelectedNotebookReference;
 
 export type Clip = {
@@ -66,7 +64,6 @@ export type Clip = {
   width?: number;
   height?: number;
   pageTitle?: string;
-  tags?: string[];
   note?: ItemReference;
   refs?: SelectedReference[];
 };
