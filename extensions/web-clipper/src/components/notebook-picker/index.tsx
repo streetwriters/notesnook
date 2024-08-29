@@ -19,11 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useState } from "react";
 import { Flex } from "@theme-ui/components";
 import { FilteredList } from "../filtered-list";
-import {
-  NotebookReference,
-  ItemReference,
-  SelectedReference
-} from "../../common/bridge";
+import { NotebookReference, SelectedReference } from "../../common/bridge";
 import { Icons } from "../icons";
 import { useAppStore } from "../../stores/app-store";
 import { Picker } from "../picker";
@@ -66,7 +62,7 @@ export const NotebookPicker = (props: NotebookPickerProps) => {
               <InlineTag
                 key={item.id}
                 title={item.title}
-                icon={item.type === "topic" ? Icons.topic : Icons.notebook}
+                icon={Icons.notebook}
                 onClick={() =>
                   setSelectedItems((items) => {
                     const copy = items.slice();
@@ -105,14 +101,6 @@ export const NotebookPicker = (props: NotebookPickerProps) => {
           renderItem={(item) => (
             <Notebook
               notebook={item}
-              isTopicSelected={(topic) =>
-                !!selectedItems.find(
-                  (n) =>
-                    n.id === topic.id &&
-                    n.type === "topic" &&
-                    n.parentId === item.id
-                )
-              }
               isSelected={
                 !!selectedItems.find(
                   (n) => n.id === item.id && n.type === "notebook"
@@ -144,10 +132,9 @@ type NotebookProps = {
   notebook: NotebookReference;
   isSelected: boolean;
   onSelected: (notebook: SelectedReference) => void;
-  isTopicSelected: (topic: ItemReference) => boolean;
 };
 function Notebook(props: NotebookProps) {
-  const { notebook, isSelected, onSelected, isTopicSelected } = props;
+  const { notebook, isSelected, onSelected } = props;
 
   return (
     <Flex
