@@ -24,7 +24,6 @@ import {
   Image as RebassImage,
   Text as RebassText
 } from "@theme-ui/components";
-import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import {
   Sync,
   Notebook,
@@ -284,7 +283,6 @@ function CalltoAction({ action, variant, sx, dismissAnnouncement }) {
       onClick={async () => {
         if (dismissAnnouncement) dismissAnnouncement();
         DialogManager.closeAll();
-        trackEvent(ANALYTICS_EVENTS.announcementCta, action);
         switch (action.type) {
           case "link": {
             const url = new URL(action.data);

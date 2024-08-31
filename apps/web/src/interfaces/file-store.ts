@@ -104,10 +104,10 @@ export class CacheStorageFileStore implements IFileStorage {
     await cache.put(
       this.toURL(chunkName),
       new Response(data, {
-        headers: new Headers({
+        headers: {
           "Content-Length": data.length.toString(),
           "Content-Type": "application/encrypted-octet-stream"
-        })
+        }
       })
     );
   }
@@ -127,8 +127,8 @@ export class CacheStorageFileStore implements IFileStorage {
     const cache = await this.getCache();
     const keys = await cache.keys();
     return keys
-      .filter((k) => k.url.startsWith(`/${chunkPrefix}`))
-      .map((r) => r.url.slice(1));
+      .filter((k) => k.url.includes(`/${chunkPrefix}`))
+      .map((r) => r.url.slice(r.url.lastIndexOf("/") + 1));
   }
 
   async list(): Promise<string[]> {

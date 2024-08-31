@@ -79,3 +79,4 @@ navigation:
       - path: custom-themes/create-a-theme-with-theme-builder.md
       - path: custom-themes/install-a-theme-from-file.md
       - path: custom-themes/publish-a-theme.md
+  - path: merge-conflicts.md

@@ -9,7 +9,8 @@
     "bench": "ts-node benches/bench.ts",
     "build": "tsc",
     "postbuild": "node scripts/postbuild.mjs",
-    "prepublishOnly": "npm run build && npm run test"
+    "prepublishOnly": "npm run build && npm run test",
+    "postinstall": "patch-package"
   },
   "author": "",
   "license": "GPL-3.0-or-later",
@@ -19,16 +20,17 @@
     "directory": "packages/sodium"
   },
   "peerDependencies": {
-    "libsodium-wrappers-sumo": ">=0.7",
     "sodium-native": ">=4"
   },
   "devDependencies": {
-    "@types/libsodium-wrappers-sumo": "0.7.5",
-    "benny": "^3.7.1",
-    "libsodium-wrappers-sumo": "^0.7.11",
+    "@types/libsodium-wrappers-sumo": "0.7.8",
     "sodium-native": "^4.1.1",
+    "benny": "^3.7.1",
     "ts-node": "^10.9.1",
     "vitest": "^0.32.2"
+  },
+  "dependencies": {
+    "libsodium-wrappers-sumo": "^0.7.15"
   },
   "browser": "./dist/browser.js"
 }

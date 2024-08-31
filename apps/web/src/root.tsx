@@ -94,16 +94,13 @@ function RouteWrapper(props: {
 }) {
   const { component, path, routeProps } = props;
   const result = usePromise(async () => {
-    await import("./hooks/use-database").then(({ loadDatabase }) =>
-      loadDatabase(
-        path !== "/sessionexpired" || Config.get("sessionExpired", false)
-          ? "db"
-          : "memory"
-      )
+    const { loadDatabase } = await import("./hooks/use-database");
+    await loadDatabase(
+      path !== "/sessionexpired" || Config.get("sessionExpired", false)
+        ? "db"
+        : "memory"
     );
-
-    const { default: Component } = await component();
-    return Component;
+    return (await component()).default;
   }, [component, path]);
 
   if (result.status === "rejected") {

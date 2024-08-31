@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Sodium from "@ammarahmed/react-native-sodium";
 import { isImage } from "@notesnook/core/dist/utils/filename";
+import { basename } from "pathe";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import DocumentPicker, {
@@ -41,7 +42,6 @@ import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 import { eCloseSheet } from "../../../utils/events";
 import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
-import { basename } from "pathe";
 
 const showEncryptionSheet = (file: DocumentPickerResponse) => {
   presentSheet({
@@ -123,13 +123,13 @@ const file = async (fileOptions: PickerOptions) => {
         file.name,
         fileOptions
       ))
-    )
-      return;
+    ) {
+      throw new Error("Failed to attach file");
+    }
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
 
-    if (!fileOptions.tabId) return;
     if (
-      fileOptions.tabId &&
+      fileOptions.tabId !== undefined &&
       fileOptions.noteId &&
       useTabStore.getState().getNoteIdForTab(fileOptions.tabId) ===
         fileOptions.noteId
@@ -158,16 +158,16 @@ const file = async (fileOptions: PickerOptions) => {
           fileOptions.tabId
         );
       }
+    } else {
+      throw new Error("Failed to attach file, no tabId is set");
     }
 
-    setTimeout(() => {
-      eSendEvent(eCloseSheet);
-    }, 1000);
+    eSendEvent(eCloseSheet);
   } catch (e) {
     eSendEvent(eCloseSheet);
     ToastManager.show({
-      heading: (e as Error).message,
-      message: "You need internet access to attach a file",
+      heading: "Failed to attach file",
+      message: (e as Error).message,
       type: "error",
       context: "global"
     });
@@ -203,7 +203,6 @@ const camera = async (options: PickerOptions) => {
       type: "error",
       context: "global"
     });
-    console.log("attachment error:", e);
   }
 };
 

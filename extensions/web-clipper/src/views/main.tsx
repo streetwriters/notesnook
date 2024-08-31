@@ -142,7 +142,12 @@ export function Main() {
       try {
         setIsClipping(true);
         setClipData(
-          await clip(clipArea, clipMode, { ...DEFAULT_SETTINGS, ...settings })
+          await clip(clipArea, clipMode, {
+            ...DEFAULT_SETTINGS,
+            ...settings,
+            images: isPremium,
+            inlineImages: isPremium
+          })
         );
       } catch (e) {
         console.error(e);

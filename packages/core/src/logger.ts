@@ -92,15 +92,18 @@ class DatabaseLogWriter {
   private hasCleared = false;
 
   constructor(private readonly db: Kysely<LogDatabaseSchema>) {
-    setInterval(() => {
-      setTimeout(() => {
-        if (!this.hasCleared) {
-          this.hasCleared = true;
-          this.rotate();
-        }
-        this.flush();
-      });
-    }, 10000);
+    setInterval(
+      () => {
+        setTimeout(() => {
+          if (!this.hasCleared) {
+            this.hasCleared = true;
+            this.rotate();
+          }
+          this.flush();
+        });
+      },
+      process.env.NODE_ENV === "test" ? 200 : 10000
+    );
   }
 
   push(message: LogMessage) {

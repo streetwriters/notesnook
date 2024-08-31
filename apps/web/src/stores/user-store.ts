@@ -26,7 +26,6 @@ import Config from "../utils/config";
 import { hashNavigate } from "../navigation";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
-import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { AuthenticatorType, User } from "@notesnook/core";
 import { ConfirmDialog } from "../dialogs/confirm";
 import { OnboardingDialog } from "../dialogs/onboarding-dialog";
@@ -148,7 +147,6 @@ class UserStore extends BaseStore<UserStore> {
     return db.user
       .signup(form.email.toLowerCase(), form.password)
       .then(() => {
-        trackEvent(ANALYTICS_EVENTS.accountCreated);
         return this.init();
       })
       .finally(() => {

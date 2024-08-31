@@ -847,15 +847,6 @@ export const settingsGroups: SettingSection[] = [
     name: "Privacy and security",
     sections: [
       {
-        id: "temeltery",
-        type: "switch",
-        name: "Telemetry",
-        icon: "radar",
-        description:
-          "Contribute towards a better Notesnook. All tracking information is anonymous.",
-        property: "telemetry"
-      },
-      {
         id: "marketing-emails",
         type: "switch",
         name: "Marketing emails",
@@ -1201,13 +1192,11 @@ export const settingsGroups: SettingSection[] = [
             modifer: async () => {
               const user = useUserStore.getState().user;
               if (!user || SettingsService.getProperty("encryptedBackup")) {
-                await BackupService.run(true, undefined, "partial");
+                await BackupService.run(true);
                 return;
               }
 
-              verifyUser(null, () =>
-                BackupService.run(true, undefined, "partial")
-              );
+              verifyUser(null, () => BackupService.run(true));
             }
           },
           {

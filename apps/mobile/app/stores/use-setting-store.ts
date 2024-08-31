@@ -45,7 +45,6 @@ export type Settings = {
   appLockTimer: number;
   appLockEnabled?: boolean;
   appLockMode?: "none" | "background" | "launch";
-  telemetry?: boolean;
   notebooksListMode?: "normal" | "compact";
   notesListMode?: "normal" | "compact";
   devMode?: boolean;
@@ -134,6 +133,12 @@ export const defaultSettings: SettingStore["settings"] = {
   applockKeyboardType: "numeric",
   appLockTimer: 0,
   showToolbarOnTop: false,
+  disableAutoSync: false,
+  disableRealtimeSync: false,
+  disableSync: false,
+  appLockEnabled: false,
+  backupDirectoryAndroid: null,
+  offlineMode: false,
   showKeyboardOnOpen: false,
   fontScale: 1,
   forcePortraitOnTablet: false,
@@ -146,7 +151,6 @@ export const defaultSettings: SettingStore["settings"] = {
   screenshotMode: true,
   privacyScreen: false,
   appLockMode: "none",
-  telemetry: false,
   notebooksListMode: "normal",
   notesListMode: "normal",
   devMode: false,

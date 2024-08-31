@@ -35,6 +35,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { useSettingStore } from "../../stores/use-setting-store";
+import SettingsService from "../../services/settings";
 
 export const Signup = ({ changeMode, trial }) => {
   const { colors } = useThemeColors();
@@ -77,6 +78,7 @@ export const Signup = ({ changeMode, trial }) => {
       clearMessage();
       setEmailVerifyMessage();
       hideAuth();
+      SettingsService.setProperty("encryptedBackup", true);
       await sleep(300);
       if (trial) {
         PremiumService.sheet(null, null, true);

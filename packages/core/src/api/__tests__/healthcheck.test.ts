@@ -17,15 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Config from "./config";
+import { HealthCheck, check } from "../healthcheck";
+import { describe } from "vitest";
 
-export function isTelemetryEnabled() {
-  // telemetry is always disabled in DEBUG/TEST mode
-  if (import.meta.env.DEV || IS_TESTING) return false;
+describe.concurrent("Health check", (test) => {
+  test("Auth", async (t) => {
+    const result = await HealthCheck.auth();
+    t.expect(result).toBe(true);
+  });
 
-  return Config.get("telemetry", false);
-}
+  test("Healthy host", async (t) => {
+    const host = "https://api.notesnook.com";
+    const result = await check(host);
+    t.expect(result).toBe(true);
+  });
 
-export function setTelemetry(state: boolean) {
-  Config.set("telemetry", state);
-}
+  test("Unhealthy host", async (t) => {
+    const host = "https://example.com";
+    // Simulate an error by passing an invalid host
+    const result = await check(host);
+    t.expect(result).toBe(false);
+  });
+});
