@@ -145,6 +145,7 @@ async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
       (await db.tags.add({
         title: tag
       }));
+    if (!tagId) continue;
 
     await db.relations.add(
       {
@@ -166,6 +167,7 @@ async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
         colorCode: colorCode,
         title: note.color
       }));
+    if (!colorId) return;
 
     await db.relations.add(
       {
