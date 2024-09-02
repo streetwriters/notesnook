@@ -1369,7 +1369,7 @@ export const settingsGroups: SettingSection[] = [
     sections: [
       {
         id: "report-issue",
-        name: "Report an issue",
+        name: strings.reportAnIssue(),
         icon: "bug",
         modifer: () => {
           presentSheet({

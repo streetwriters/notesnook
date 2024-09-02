@@ -37,6 +37,7 @@ import { basename, dirname, join } from "pathe";
 import downloadAttachment from "../common/filesystem/download-attachment";
 import { cacheDir } from "../common/filesystem/utils";
 import { unlockVault } from "../utils/unlock-vault";
+import { strings } from "@notesnook/intl";
 
 const FolderNames: { [name: string]: string } = {
   txt: "Text",
@@ -60,8 +61,8 @@ async function getPath(type: string) {
 
 async function unlockVaultForNoteExport() {
   return await unlockVault({
-    title: "Unlock vault",
-    paragraph: "Some exported notes are locked, Unlock to export them",
+    title: strings.unlockNotes(),
+    paragraph: strings.exportedNotesLocked(),
     context: "export-notes"
   });
 }
