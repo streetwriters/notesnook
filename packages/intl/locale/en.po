@@ -2099,6 +2099,10 @@ msgstr "Notesnook will send you an SMS with a 2FA code when prompted"
 msgid "Notifications disabled"
 msgstr "Notifications disabled"
 
+#: src/strings.tsx:1424
+msgid "Off"
+msgstr "Off"
+
 #: src/strings.tsx:331
 msgid "Offline"
 msgstr "Offline"
@@ -2806,6 +2810,10 @@ msgstr "Select day of the month to repeat the reminder."
 msgid "Select day of the week to repeat the reminder."
 msgstr "Select day of the week to repeat the reminder."
 
+#: src/strings.tsx:1428
+msgid "Select folder where Notesnook backup files are stored to view and restore them from the app"
+msgstr "Select folder where Notesnook backup files are stored to view and restore them from the app"
+
 #: src/strings.tsx:82
 msgid "Select how you would like to recieve the code"
 msgstr "Select how you would like to recieve the code"
@@ -2987,6 +2995,10 @@ msgstr "Skip"
 #: src/strings.tsx:565
 msgid "Skip introduction"
 msgstr "Skip introduction"
+
+#: src/strings.tsx:1426
+msgid "Some exported notes are locked, Unlock to export them"
+msgstr "Some exported notes are locked, Unlock to export them"
 
 #: src/strings.tsx:1299
 msgid "Some notes are published"

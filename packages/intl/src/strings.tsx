@@ -1427,5 +1427,21 @@ For example:
   startWritingNote: () => t`Start writing your note...`,
   off: () => t`Off`,
   exportedNotesLocked: () =>
-    t`Some exported notes are locked, Unlock to export them`
+    t`Some exported notes are locked, Unlock to export them`,
+  selectFolderForBackupFilesDesc: () =>
+    t`Select folder where Notesnook backup files are stored to view and restore them from the app`,
+  selectBackupFolder: () => t`Select folder with backup files`,
+  selectBackupFileDesc: () =>
+    t`Select a backup file from your device to restore backup`,
+  restoreFromFiles: () => t`Restore from files`,
+  recentBackups: () => t`RECENT BACKUPS`,
+  restoringBackup: () => t`Restoring backups...`,
+  decryptingBackup: () => t`Backup is encrypted, decrypting...`,
+  preparingBackupRestore: () => t`Preparing to restore backup file...`,
+  readingBackupFile: () => t`Reading backup file...`,
+  cleaningUp: () => t`cleaningUp`,
+  extractingFiles: () => t`Extracting files...`,
+  copyingBackupFileToCache: () => t`Copying backup files to cache`,
+  backupEnterPassword: () => t`Please enter password of this backup file`,
+  useEncryptionKey: () => t`Use encryption key`
 };
