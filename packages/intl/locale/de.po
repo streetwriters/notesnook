@@ -2093,6 +2093,10 @@ msgstr "123456"
 msgid "Notifications disabled"
 msgstr "123456"
 
+#: src/strings.tsx:1424
+msgid "Off"
+msgstr ""
+
 #: src/strings.tsx:331
 msgid "Offline"
 msgstr "123456"
@@ -2815,6 +2819,10 @@ msgstr "123456"
 msgid "Select day of the week to repeat the reminder."
 msgstr "123456"
 
+#: src/strings.tsx:1428
+msgid "Select folder where Notesnook backup files are stored to view and restore them from the app"
+msgstr ""
+
 #: src/strings.tsx:82
 msgid "Select how you would like to recieve the code"
 msgstr "123456"
@@ -2994,6 +3002,10 @@ msgstr "123456"
 #: src/strings.tsx:565
 msgid "Skip introduction"
 msgstr "123456"
+
+#: src/strings.tsx:1426
+msgid "Some exported notes are locked, Unlock to export them"
+msgstr ""
 
 #: src/strings.tsx:1299
 msgid "Some notes are published"
