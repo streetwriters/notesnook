@@ -1425,5 +1425,7 @@ For example:
   words: () => t`words`,
   addATag: () => t`Add a tag`,
   startWritingNote: () => t`Start writing your note...`,
-  off: () => t`Off`
+  off: () => t`Off`,
+  exportedNotesLocked: () =>
+    t`Some exported notes are locked, Unlock to export them`
 };

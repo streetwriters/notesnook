@@ -30,6 +30,7 @@ import {
   eOpenVaultDialog,
   eShowToast
 } from "../utils/events";
+import { strings } from "@notesnook/intl";
 
 type Vault = {
   item: unknown;
@@ -172,7 +173,7 @@ export const ToastManager = {
       func: () => {
         Clipboard.setString(e?.stack || "");
         ToastManager.show({
-          heading: "Logs copied!",
+          heading: strings.logsCopied(),
           type: "success",
           context: "global",
           duration: duration

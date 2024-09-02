@@ -167,7 +167,6 @@ async function validateUser(title: string, description?: string) {
     } else {
       ToastManager.show({
         heading: strings.biometricsAuthFailed(),
-        message: "Tap to try again.",
         type: "error",
         context: "local"
       });
