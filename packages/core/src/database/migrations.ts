@@ -320,6 +320,16 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("dateModified", "integer")
             .execute();
         }
+      },
+      "5": {
+        async up(db) {
+          await db
+            .deleteFrom("relations")
+            .where((eb) =>
+              eb.or([eb("fromId", "is", null), eb("toId", "is", null)])
+            )
+            .execute();
+        }
       }
     };
   }
