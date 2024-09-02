@@ -26,7 +26,6 @@ import {
   Update,
   SyncError,
   Alert,
-  Issue,
   SyncOff,
   Icon
 } from "../icons";
@@ -40,7 +39,6 @@ import { checkForUpdate, installUpdate } from "../../utils/updater";
 import { getTimeAgo, toTitleCase } from "@notesnook/common";
 import { User } from "@notesnook/core";
 import { showUpdateAvailableNotice } from "../../dialogs/confirm";
-import { IssueDialog } from "../../dialogs/issue-dialog";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
