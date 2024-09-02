@@ -29,19 +29,37 @@ type Progress = { percent: number };
 
 const t = initTRPC.create();
 let cancellationToken: CancellationToken | undefined = undefined;
+let downloadTimeout: NodeJS.Timeout | undefined = undefined;
 
 export const updaterRouter = t.router({
   autoUpdates: t.procedure.query(() => config.automaticUpdates),
   install: t.procedure.query(() => autoUpdater.quitAndInstall()),
   download: t.procedure.query(async () => {
     if (cancellationToken) return;
-    cancellationToken = new CancellationToken();
-    await autoUpdater
-      .downloadUpdate(cancellationToken)
-      .finally(() => (cancellationToken = undefined));
+    clearTimeout(downloadTimeout);
+    await new Promise<string[]>((resolve, reject) => {
+      downloadTimeout = setTimeout(async () => {
+        cancellationToken = new CancellationToken();
+        autoUpdater.isUpdaterActive();
+        await autoUpdater
+          .downloadUpdate(cancellationToken)
+          .then(resolve)
+          .catch(reject)
+          .finally(() => (cancellationToken = undefined));
+      }, 1000);
+    });
   }),
   check: t.procedure.query(async () => {
-    await autoUpdater.checkForUpdates().catch(console.error);
+    if (cancellationToken) return;
+    clearTimeout(downloadTimeout);
+    await new Promise<void>((resolve) => {
+      downloadTimeout = setTimeout(async () => {
+        await autoUpdater
+          .checkForUpdates()
+          .catch(console.error)
+          .finally(resolve);
+      }, 1000);
+    });
   }),
 
   toggleAutoUpdates: t.procedure
