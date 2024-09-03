@@ -26,6 +26,7 @@ import { FilteredSelector } from "../database/sql-collection";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { logger } from "../logger";
 import { rebuildSearchIndex } from "../database/fts";
+import { transformQuery } from "../utils/query-transformer";
 
 type SearchResults<T> = {
   sorted: (limit?: number) => Promise<VirtualizedGrouping<T>>;
@@ -86,6 +87,7 @@ export default class Lookup {
         return results.map((r) => r.id);
       }
 
+      query = transformQuery(query);
       const results = await db
         .selectFrom((eb) =>
           eb
