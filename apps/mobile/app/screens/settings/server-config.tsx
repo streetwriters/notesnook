@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { isServerCompatible } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useState } from "react";
 import { View } from "react-native";
@@ -26,10 +27,10 @@ import { Button } from "../../components/ui/button";
 import Input from "../../components/ui/input";
 import { Notice } from "../../components/ui/notice";
 import Paragraph from "../../components/ui/typography/paragraph";
+import { ToastManager } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { HostId, HostIds } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { ToastManager } from "../../services/event-manager";
 
 export const ServerIds = ["notesnook-sync", "auth", "sse"] as const;
 export type ServerId = (typeof ServerIds)[number];
@@ -49,23 +50,23 @@ const SERVERS: Server[] = [
   {
     id: "notesnook-sync",
     host: "API_HOST",
-    title: "Sync server",
+    title: strings.syncServer(),
     example: "http://localhost:4326",
-    description: "Server used to sync your notes & other data between devices."
+    description: strings.syncServerDesc()
   },
   {
     id: "auth",
     host: "AUTH_HOST",
-    title: "Auth server",
+    title: strings.authServer(),
     example: "http://localhost:5326",
-    description: "Server used for login/sign up and authentication."
+    description: strings.authServerDesc()
   },
   {
     id: "sse",
     host: "SSE_HOST",
-    title: "Events server",
+    title: strings.sseServer(),
     example: "http://localhost:7326",
-    description: "Server used to receive important notifications & events."
+    description: strings.sseServerDesc()
   }
 ];
 export function ServersConfiguration() {
@@ -86,10 +87,7 @@ export function ServersConfiguration() {
       }}
     >
       {isLoggedIn ? (
-        <Notice
-          text="You must log out in order to change/reset server URLs."
-          type="alert"
-        />
+        <Notice text={strings.logoutToChangeServerUrls()} type="alert" />
       ) : null}
 
       <View style={{ flexDirection: "column" }}>
@@ -100,7 +98,7 @@ export function ServersConfiguration() {
             placeholder={`${server.id} e.g. ${server.example}`}
             validationType="url"
             defaultValue={urls[server.host]}
-            errorMessage="Please enter a valid URL."
+            errorMessage={strings.enterValidUrl()}
             onChangeText={(value) =>
               setUrls((s) => {
                 s[server.host] = value;
@@ -128,7 +126,7 @@ export function ServersConfiguration() {
             }}
             color={colors.success.paragraph}
           >
-            Connected to all servers sucessfully.
+            {strings.connectedToServer()}
           </Paragraph>
         ) : null}
         <View style={{ marginTop: 1, justifyContent: "flex-end", gap: 12 }}>
@@ -141,20 +139,20 @@ export function ServersConfiguration() {
                 for (const host of HostIds) {
                   const url = urls[host];
                   const server = SERVERS.find((s) => s.host === host)!;
-                  if (!url) throw new Error("All server urls are required.");
+                  if (!url) throw new Error(strings.allServerUrlsRequired());
                   const version = await fetch(`${url}/version`)
                     .then((r) => r.json() as Promise<VersionResponse>)
                     .catch(() => undefined);
                   if (!version)
-                    throw new Error(`Could not connect to ${server.title}.`);
+                    throw new Error(
+                      `${strings.couldNotConnectTo()} ${server.title}.`
+                    );
                   if (version.id !== server.id)
                     throw new Error(
-                      `The URL you have given (${url}) does not point to the ${server.title}.`
+                      `${strings.incorrectServerUrl(url)} ${server.title}.`
                     );
                   if (!isServerCompatible(version.version)) {
-                    throw new Error(
-                      `The server version is not compatible with the app.`
-                    );
+                    throw new Error(strings.serverVersionMismatch());
                   }
                 }
                 setSuccess(true);
@@ -163,7 +161,7 @@ export function ServersConfiguration() {
                 setError((e as Error).message);
               }
             }}
-            title="Test connection"
+            title={strings.testConnection()}
           />
 
           <Button
@@ -173,7 +171,7 @@ export function ServersConfiguration() {
             onPress={async () => {
               if (!success) {
                 ToastManager.show({
-                  heading: "Test connection before changing server urls"
+                  heading: strings.testConnectionBeforeSave()
                 });
                 return;
               }
@@ -183,26 +181,26 @@ export function ServersConfiguration() {
               );
 
               presentDialog({
-                title: "Server url changed",
-                paragraph: "Restart the app for changes to take effect.",
-                negativeText: "Done"
+                title: strings.serverUrlChanged(),
+                paragraph: strings.restartAppToTakeEffect(),
+                negativeText: strings.done()
               });
             }}
-            title="Save"
+            title={strings.save()}
           />
 
           <Button
             disabled={isLoggedIn}
             type="error"
             width="100%"
-            title="Reset server urls"
+            title={strings.resetServerUrls()}
             onPress={async () => {
               if (isLoggedIn) return;
               SettingsService.setProperty("serverUrls", undefined);
               presentDialog({
-                title: "Server urls reset",
-                paragraph: "Restart the app for changes to take effect.",
-                negativeText: "Done"
+                title: strings.serverUrlsReset(),
+                paragraph: strings.restartAppToTakeEffect(),
+                negativeText: strings.done()
               });
             }}
           />

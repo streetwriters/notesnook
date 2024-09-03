@@ -1443,5 +1443,30 @@ For example:
   extractingFiles: () => t`Extracting files...`,
   copyingBackupFileToCache: () => t`Copying backup files to cache`,
   backupEnterPassword: () => t`Please enter password of this backup file`,
-  useEncryptionKey: () => t`Use encryption key`
+  useEncryptionKey: () => t`Use encryption key`,
+  testConnection: () => t`Test connection`,
+  syncServer: () => t`Sync server`,
+  syncServerDesc: () =>
+    t`Server used to sync your notes & other data between devices.`,
+  authServer: () => t`Auth server`,
+  authServerDesc: () => t`Server used for login/sign up and authentication.`,
+  sseServer: () => t`Events server`,
+  sseServerDesc: () =>
+    t`Server used to receive important notifications & events.`,
+  logoutToChangeServerUrls: () =>
+    t`You must log out in order to change/reset server URLs.`,
+  enterValidUrl: () => t`Please enter a valid URL`,
+  connectedToServer: () => t`Connected to all servers sucessfully.`,
+  allServerUrlsRequired: () => t`All server urls are required.`,
+  couldNotConnectTo: () => t`Could not connect to`,
+  incorrectServerUrl: (url: string) =>
+    t`The URL you have given (${url}) does not point to the`,
+  serverVersionMismatch: () =>
+    t`The server version is not compatible with the app.`,
+  testConnectionBeforeSave: () =>
+    t`Test connection before changing server urls`,
+  serverUrlChanged: () => t`Server url changed`,
+  restartAppToTakeEffect: () => t`Restart the app for changes to take effect.`,
+  resetServerUrls: () => t`Reset server urls`,
+  serverUrlsReset: () => t`Server urls reset`
 };
