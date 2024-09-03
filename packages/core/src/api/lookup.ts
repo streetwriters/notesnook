@@ -21,7 +21,7 @@ import { match } from "fuzzyjs";
 import Database from ".";
 import { Item, Note, TrashItem } from "../types";
 import { DatabaseSchema, RawDatabaseSchema } from "../database";
-import { AnyColumnWithTable, Kysely, sql } from "kysely";
+import { AnyColumnWithTable, Kysely, sql } from "@streetwriters/kysely";
 import { FilteredSelector } from "../database/sql-collection";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { logger } from "../logger";

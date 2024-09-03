@@ -23,7 +23,11 @@ import { Platform } from "react-native";
 import * as Gzip from "react-native-gzip";
 import EventSource from "../../utils/sse/even-source-ios";
 import AndroidEventSource from "../../utils/sse/event-source";
-import { SqliteAdapter, SqliteIntrospector, SqliteQueryCompiler } from "kysely";
+import {
+  SqliteAdapter,
+  SqliteIntrospector,
+  SqliteQueryCompiler
+} from "@streetwriters/kysely";
 import filesystem from "../filesystem";
 import Storage from "./storage";
 import { RNSqliteDriver } from "./sqlite.kysely";

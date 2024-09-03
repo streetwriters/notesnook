@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   ColumnBuilderCallback,
   CreateTableBuilder,
+  ExpressionBuilder,
   Migration,
   MigrationProvider,
   sql
-} from "kysely";
+} from "@streetwriters/kysely";
 import { rebuildSearchIndex } from "./fts";
 
 const COLLATE_NOCASE: ColumnBuilderCallback = (col) =>
@@ -294,7 +295,7 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await db
             .updateTable("notes")
-            .where("id", "in", (eb) =>
+            .where("id", "in", (eb: ExpressionBuilder<any, string>) =>
               eb
                 .selectFrom("content")
                 .select("noteId as id")

@@ -21,7 +21,7 @@ import type { SQLiteAPI, SQLiteCompatibleType } from "./sqlite-types";
 import { Factory, SQLITE_ROW, SQLiteError } from "./sqlite-api";
 import { expose, transfer } from "comlink";
 import type { RunMode } from "./type";
-import { QueryResult } from "kysely";
+import { QueryResult } from "@streetwriters/kysely";
 import { DatabaseSource } from "./sqlite-export";
 import { createSharedServicePort } from "./shared-service";
 import type { IDBBatchAtomicVFS } from "./IDBBatchAtomicVFS";

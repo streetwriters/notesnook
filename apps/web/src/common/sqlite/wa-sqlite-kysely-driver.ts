@@ -17,8 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { DatabaseConnection, Driver, QueryResult } from "kysely";
-import { CompiledQuery } from "kysely";
+import type {
+  DatabaseConnection,
+  Driver,
+  QueryResult
+} from "@streetwriters/kysely";
+import { CompiledQuery } from "@streetwriters/kysely";
 import Worker from "./sqlite.worker.ts?worker";
 import type { SQLiteWorker } from "./sqlite.worker";
 import SQLiteSyncURI from "./wa-sqlite.wasm?url";

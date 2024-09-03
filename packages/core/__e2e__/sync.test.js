@@ -25,7 +25,7 @@ import { CHECK_IDS, EV, EVENTS } from "../src/common";
 import { EventSource } from "event-source-polyfill";
 import { test, expect, vitest } from "vitest";
 import { login } from "./utils";
-import { SqliteDialect } from "kysely";
+import { SqliteDialect } from "@streetwriters/kysely";
 import BetterSQLite3 from "better-sqlite3-multiple-ciphers";
 
 const TEST_TIMEOUT = 60 * 1000;

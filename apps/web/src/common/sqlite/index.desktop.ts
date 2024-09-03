@@ -26,7 +26,7 @@ import {
   QueryResult,
   CompiledQuery,
   Driver
-} from "kysely";
+} from "@streetwriters/kysely";
 import { desktop } from "../desktop-bridge";
 import Worker from "./sqlite.worker.desktop.ts?worker";
 import type { SQLiteWorker } from "./sqlite.worker.desktop";

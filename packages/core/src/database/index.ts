@@ -36,7 +36,7 @@ import {
   ReferenceExpression,
   Dialect,
   MigrationProvider
-} from "kysely";
+} from "@streetwriters/kysely";
 import {
   Attachment,
   Color,

@@ -18,7 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { initialize } from "@notesnook/core/dist/logger";
-import { SqliteAdapter, SqliteIntrospector, SqliteQueryCompiler } from "kysely";
+import {
+  SqliteAdapter,
+  SqliteIntrospector,
+  SqliteQueryCompiler
+} from "@streetwriters/kysely";
 import { Platform } from "react-native";
 import { setLogger } from ".";
 import { RNSqliteDriver } from "./sqlite.kysely";

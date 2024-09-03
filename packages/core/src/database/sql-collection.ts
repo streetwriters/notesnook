@@ -45,7 +45,7 @@ import {
   SelectQueryBuilder,
   SqlBool,
   sql
-} from "kysely";
+} from "@streetwriters/kysely";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { createKeySelector, groupArray } from "../utils/grouping";
 import { toChunks } from "../utils/array";

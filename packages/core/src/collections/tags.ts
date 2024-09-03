@@ -23,7 +23,7 @@ import Database from "../api";
 import { ICollection } from "./collection";
 import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
-import { sql } from "kysely";
+import { sql } from "@streetwriters/kysely";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 
 export class Tags implements ICollection {

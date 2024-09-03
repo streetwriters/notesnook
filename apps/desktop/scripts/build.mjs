@@ -94,7 +94,7 @@ async function patchBetterSQLite3() {
   );
   const json = JSON.parse(await readFile(jsonPath, "utf-8"));
 
-  json.version = "9.5.1";
+  json.version = "11.2.2";
   json.homepage = "https://github.com/thecodrr/better-sqlite3-multiple-ciphers";
   json.repository.url =
     "git://github.com/thecodrr/better-sqlite3-multiple-ciphers.git";
