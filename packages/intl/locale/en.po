@@ -282,6 +282,10 @@ msgstr "All fields are required"
 msgid "All logs are local only and are not sent to any server. You can share the logs from here with us if you face an issue to help us find the root cause."
 msgstr "All logs are local only and are not sent to any server. You can share the logs from here with us if you face an issue to help us find the root cause."
 
+#: src/strings.tsx:1456
+msgid "All server urls are required."
+msgstr "All server urls are required."
+
 #: src/strings.tsx:359
 msgid "All tools are grouped"
 msgstr "All tools are grouped"
@@ -424,6 +428,10 @@ msgstr "Attachments"
 msgid "Audio"
 msgstr "Audio"
 
+#: src/strings.tsx:1447
+msgid "Auth server"
+msgstr "Auth server"
+
 #: src/strings.tsx:1181
 msgid "Authentication cancelled by user"
 msgstr "Authentication cancelled by user"
@@ -487,6 +495,10 @@ msgstr "Backup failed"
 #: src/strings.tsx:770
 msgid "Backup is encrypted"
 msgstr "Backup is encrypted"
+
+#: src/strings.tsx:1435
+msgid "Backup is encrypted, decrypting..."
+msgstr "Backup is encrypted, decrypting..."
 
 #: src/strings.tsx:1052
 msgid "Backup now"
@@ -660,6 +672,10 @@ msgstr "Choose how you want to secure your notes locally."
 msgid "Choose where to save your backups"
 msgstr "Choose where to save your backups"
 
+#: src/strings.tsx:1438
+msgid "cleaningUp"
+msgstr "cleaningUp"
+
 #: src/strings.tsx:120
 #: src/strings.tsx:872
 msgid "Clear"
@@ -749,6 +765,10 @@ msgstr "Confirm password"
 msgid "Confirm pin"
 msgstr "Confirm pin"
 
+#: src/strings.tsx:1455
+msgid "Connected to all servers sucessfully."
+msgstr "Connected to all servers sucessfully."
+
 #: src/strings.tsx:1099
 msgid "Contact us directly via support@streetwriters.co for any help or support"
 msgstr "Contact us directly via support@streetwriters.co for any help or support"
@@ -785,9 +805,17 @@ msgstr "Copy note"
 msgid "Copy to clipboard"
 msgstr "Copy to clipboard"
 
+#: src/strings.tsx:1440
+msgid "Copying backup files to cache"
+msgstr "Copying backup files to cache"
+
 #: src/strings.tsx:1009
 msgid "CORS bypass"
 msgstr "CORS bypass"
+
+#: src/strings.tsx:1457
+msgid "Could not connect to"
+msgstr "Could not connect to"
 
 #: src/strings.tsx:128
 msgid "Create"
@@ -1265,6 +1293,10 @@ msgstr "Error logging out"
 #: src/strings.tsx:867
 msgid "Error sending 2FA code"
 msgstr "Error sending 2FA code"
+
+#: src/strings.tsx:1449
+msgid "Events server"
+msgstr "Events server"
 
 #: src/strings.tsx:393
 msgid "Export"
@@ -2239,6 +2271,14 @@ msgstr "Please enter a valid email address"
 msgid "Please enter a valid phone number with country code"
 msgstr "Please enter a valid phone number with country code"
 
+#: src/strings.tsx:1454
+msgid "Please enter a valid URL"
+msgstr "Please enter a valid URL"
+
+#: src/strings.tsx:1441
+msgid "Please enter password of this backup file"
+msgstr "Please enter password of this backup file"
+
 #: src/strings.tsx:664
 msgid "Please enter the password to unlock the PDF and view the content."
 msgstr "Please enter the password to unlock the PDF and view the content."
@@ -2323,6 +2363,10 @@ msgstr "Please wait while we verify your subscription"
 #: src/strings.tsx:801
 msgid "Preparing note for share"
 msgstr "Preparing note for share"
+
+#: src/strings.tsx:1436
+msgid "Preparing to restore backup file..."
+msgstr "Preparing to restore backup file..."
 
 #: src/strings.tsx:357
 #~ msgid "Presets"
@@ -2447,6 +2491,14 @@ msgstr "Read the privacy policy"
 #: src/strings.tsx:1121
 msgid "Read the terms of service"
 msgstr "Read the terms of service"
+
+#: src/strings.tsx:1437
+msgid "Reading backup file..."
+msgstr "Reading backup file..."
+
+#: src/strings.tsx:1433
+msgid "RECENT BACKUPS"
+msgstr "RECENT BACKUPS"
 
 #: src/strings.tsx:110
 msgid "Recommended"
@@ -2634,6 +2686,10 @@ msgstr "Resend code in ({seconds})"
 msgid "Resend email"
 msgstr "Resend email"
 
+#: src/strings.tsx:1466
+msgid "Reset server urls"
+msgstr "Reset server urls"
+
 #: src/strings.tsx:989
 msgid "Reset the toolbar to default settings"
 msgstr "Reset the toolbar to default settings"
@@ -2641,6 +2697,10 @@ msgstr "Reset the toolbar to default settings"
 #: src/strings.tsx:988
 msgid "Reset toolbar"
 msgstr "Reset toolbar"
+
+#: src/strings.tsx:1465
+msgid "Restart the app for changes to take effect."
+msgstr "Restart the app for changes to take effect."
 
 #: src/strings.tsx:1150
 msgid "Restart the app to apply the changes"
@@ -2662,6 +2722,10 @@ msgstr "Restore backup"
 msgid "Restore failed"
 msgstr "Restore failed"
 
+#: src/strings.tsx:1432
+msgid "Restore from files"
+msgstr "Restore from files"
+
 #: src/strings.tsx:713
 msgid "Restore notebook"
 msgstr "Restore notebook"
@@ -2677,6 +2741,10 @@ msgstr "Restored successfully"
 #: src/strings.tsx:313
 msgid "Restoring"
 msgstr "Restoring"
+
+#: src/strings.tsx:1434
+msgid "Restoring backups..."
+msgstr "Restoring backups..."
 
 #: src/strings.tsx:575
 msgid "Resubscribe from Playstore"
@@ -2790,6 +2858,10 @@ msgstr "See what the future of Notesnook is going to be like."
 msgid "Select"
 msgstr "Select"
 
+#: src/strings.tsx:1431
+msgid "Select a backup file from your device to restore backup"
+msgstr "Select a backup file from your device to restore backup"
+
 #: src/strings.tsx:1066
 msgid "Select backup directory"
 msgstr "Select backup directory"
@@ -2813,6 +2885,10 @@ msgstr "Select day of the week to repeat the reminder."
 #: src/strings.tsx:1428
 msgid "Select folder where Notesnook backup files are stored to view and restore them from the app"
 msgstr "Select folder where Notesnook backup files are stored to view and restore them from the app"
+
+#: src/strings.tsx:1429
+msgid "Select folder with backup files"
+msgstr "Select folder with backup files"
 
 #: src/strings.tsx:82
 msgid "Select how you would like to recieve the code"
@@ -2853,6 +2929,26 @@ msgstr "Send code via email"
 #: src/strings.tsx:100
 msgid "Send code via SMS"
 msgstr "Send code via SMS"
+
+#: src/strings.tsx:1464
+msgid "Server url changed"
+msgstr "Server url changed"
+
+#: src/strings.tsx:1467
+msgid "Server urls reset"
+msgstr "Server urls reset"
+
+#: src/strings.tsx:1448
+msgid "Server used for login/sign up and authentication."
+msgstr "Server used for login/sign up and authentication."
+
+#: src/strings.tsx:1451
+msgid "Server used to receive important notifications & events."
+msgstr "Server used to receive important notifications & events."
+
+#: src/strings.tsx:1446
+msgid "Server used to sync your notes & other data between devices."
+msgstr "Server used to sync your notes & other data between devices."
 
 #: src/strings.tsx:67
 msgid "Session expired"
@@ -3084,6 +3180,10 @@ msgstr "Sync is disabled"
 msgid "Sync off"
 msgstr "Sync off"
 
+#: src/strings.tsx:1444
+msgid "Sync server"
+msgstr "Sync server"
+
 #: src/strings.tsx:937
 msgid "Sync settings"
 msgstr "Sync settings"
@@ -3225,6 +3325,14 @@ msgstr "Terms of service"
 msgid "Terms of Service"
 msgstr "Terms of Service"
 
+#: src/strings.tsx:1443
+msgid "Test connection"
+msgstr "Test connection"
+
+#: src/strings.tsx:1463
+msgid "Test connection before changing server urls"
+msgstr "Test connection before changing server urls"
+
 #: src/strings.tsx:401
 msgid "Thank you for updating Notesnook! We will be applying some minor changes for a better note taking experience."
 msgstr "Thank you for updating Notesnook! We will be applying some minor changes for a better note taking experience."
@@ -3240,6 +3348,14 @@ msgstr "The reminder will repeat daily at {date}."
 #: src/strings.tsx:288
 msgid "The reminder will repeat every year on {date}."
 msgstr "The reminder will repeat every year on {date}."
+
+#: src/strings.tsx:1461
+msgid "The server version is not compatible with the app."
+msgstr "The server version is not compatible with the app."
+
+#: src/strings.tsx:1459
+msgid "The URL you have given ({url}) does not point to the"
+msgstr "The URL you have given ({url}) does not point to the"
 
 #: src/strings.tsx:964
 msgid "Themes"
@@ -3484,6 +3600,10 @@ msgstr "Use an authenticator app to generate 2FA codes."
 #: src/strings.tsx:970
 msgid "Use dark mode for the app"
 msgstr "Use dark mode for the app"
+
+#: src/strings.tsx:1442
+msgid "Use encryption key"
+msgstr "Use encryption key"
 
 #: src/strings.tsx:1001
 msgid "Use markdown shortcuts in the editor"
@@ -3730,6 +3850,10 @@ msgstr "You have not set any reminders yet"
 #: src/strings.tsx:1376
 msgid "You have unsynced notes. Take a backup or sync your notes to avoid losing your critical data."
 msgstr "You have unsynced notes. Take a backup or sync your notes to avoid losing your critical data."
+
+#: src/strings.tsx:1453
+msgid "You must log out in order to change/reset server URLs."
+msgstr "You must log out in order to change/reset server URLs."
 
 #: src/strings.tsx:706
 msgid "You simply cannot get any better of a note taking app than @notesnook. The UI is clean and slick, it is feature rich, encrypted, reasonably priced (esp. for students & educators) & open source"
