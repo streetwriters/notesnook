@@ -41,6 +41,18 @@ test("search notes", () =>
     expect(filtered).toHaveLength(1);
   }));
 
+test("search notes (remove diacritics)", () =>
+  noteTest({
+    content: {
+      type: "tiptap",
+      data: "<p>hello i am à la maison</p>"
+    }
+  }).then(async ({ db }) => {
+    await db.notes.add(TEST_NOTE);
+    let filtered = await db.lookup.notes("a la maison").ids();
+    expect(filtered).toHaveLength(1);
+  }));
+
 test("search notes with a locked note", () =>
   noteTest({
     content: content
