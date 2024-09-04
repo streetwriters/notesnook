@@ -77,7 +77,9 @@ import { AppLockSettings } from "./app-lock-settings";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { ServersSettings } from "./servers-settings";
 
-type SettingsDialogProps = BaseDialogProps<false>;
+type SettingsDialogProps = BaseDialogProps<false> & {
+  activeSection?: SectionKeys;
+};
 
 const sectionGroups: SectionGroup[] = [
   {
@@ -187,7 +189,9 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
   props: SettingsDialogProps
 ) {
   const [activeSettings, setActiveSettings] = useState<SettingsGroup[]>(
-    SettingsGroups.filter((g) => g.section === "profile")
+    SettingsGroups.filter(
+      (g) => g.section === (props.activeSection || "profile")
+    )
   );
 
   return (
@@ -205,6 +209,7 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
         }}
       >
         <SettingsSideBar
+          activeSection={props.activeSection}
           onNavigate={(settings) => {
             const scrollbar = document.getElementById("settings-scrollbar");
             if (scrollbar !== null) scrollbar.scrollTop = 0;
@@ -233,10 +238,13 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
   );
 });
 
-type SettingsSideBarProps = { onNavigate: (settings: SettingsGroup[]) => void };
+type SettingsSideBarProps = {
+  onNavigate: (settings: SettingsGroup[]) => void;
+  activeSection?: SectionKeys;
+};
 function SettingsSideBar(props: SettingsSideBarProps) {
-  const { onNavigate } = props;
-  const [route, setRoute] = useState<SectionKeys>("profile");
+  const { onNavigate, activeSection } = props;
+  const [route, setRoute] = useState<SectionKeys>(activeSection || "profile");
   useUserStore((store) => store.isLoggedIn);
 
   return (
