@@ -5,6 +5,8 @@ description: We do not provide any ETAs.
 
 # Is there an ETA for X feature?
 
+![](https://imgs.xkcd.com/comics/estimating_time.png)
+
 We maintain an up-to-date [roadmap](https://notesnook.com/roadmap) which lists everything we are working on and everything we plan on adding in the future. There is no certainty _when_ something might land, though. It can be days, months, or even years before a feature becomes generally available. Asking us for ETAs is annoying and distracts us from what really matters.
 
 ## Why we don't provide ETAs
