@@ -201,9 +201,10 @@ export const strings = {
       t`If you want to ask something in general or need some assistance, we would suggest that you`,
     2: () => t`join our community on Discord.`
   },
-  linkNoteEmptyBlock: () => t`(Empty block)`,
+  linkNoteEmptyBlock: () => t`(empty block)`,
   linkNoteSelectedNote: () => t`SELECTED NOTE`,
   tapToDeselect: () => t`Tap to deselect`,
+  clickToDeselect: () => t`Click to deselect`,
   linkNoteToSection: () => t`LINK TO A SECTION`,
   migrationProgress: (progress?: {
     total: number;
@@ -217,12 +218,17 @@ export const strings = {
     t`An error occurred while migrating your data. You can logout of your account and try to relogin. However this is not recommended as it may result in some data loss if your data was not synced.`,
   migrationAppReset: () =>
     t`App data has been cleared. Kindly relaunch the app to login again.`,
+  migrationErrorNotice: () => [
+    t`If this continues to happen, please reach out to us via`,
+    t`or email us at`
+  ],
   notebooks: () => t`NOTEBOOKS`,
   syncingHeading: () => t`Syncing your data`,
   syncingDesc: () => t`Please wait while we sync all your data.`,
   downloadingAttachments: () => t`Downloading attachments`,
   pleaseWait: () => t`Please wait`,
   publishedAt: () => t`Published at`,
+  monographDesc: () => t`This note will be published to a public URL.`,
   openInBrowser: () => t`Open in browser`,
   monographPassHeading: () => t`Password protection`,
   monographPassDesc: () =>
@@ -241,6 +247,7 @@ export const strings = {
   notReferenced: () => t`This note is not referenced in other notes.`,
   notLinked: () => t`This note is not linked to any other note.`,
   noLinksFound: () => t`No links found`,
+  noBlocksOnNote: () => t`There are no blocks in this note.`,
   dataTypes: {
     note: () => t`note`,
     notebook: () => t`notebook`,
@@ -287,7 +294,7 @@ export const strings = {
     },
     year: (date: string) => t`The reminder will repeat every year on ${date}.`,
     month: {
-      selectDays: () => t`Select day of the month to repeat the reminder.`
+      selectDays: () => t`Select nth day of the month to repeat the reminder.`
     },
     repeats: (freq: number, mode: string, selectedDays: string, date: string) =>
       plural(freq, {
@@ -374,6 +381,8 @@ $headline$: Use starting line of the note as title.`,
     }),
 
   createVault: () => t`Create Vault`,
+  createVaultDesc: () =>
+    t`A vault stores your notes in a password-encrypted storage.`,
   vaultFingerprintUnlock: () => t`Vault Fingerprint Unlock`,
   revokeVaultFingerprintUnlock: () => t`Revoke Vault Fingerprint Unlock`,
   changeVaultPassword: () => t`Change Vault Password`,
@@ -390,6 +399,7 @@ $headline$: Use starting line of the note as title.`,
   changeEmail: () => t`Change email address`,
   changeEmailDesc: () =>
     t`Your account email will be changed without affecting your subscription or any other settings.`,
+  changeEmailNotice: () => t`You will be logged out from all your devices`,
   export: () => t`Export`,
   issueTitle: () => t`Report issue`,
   issueDesc: () =>
@@ -467,6 +477,8 @@ $headline$: Use starting line of the note as title.`,
   useAccountPassword: () => t`Use account password`,
   addColor: () => t`Add color`,
   unlockNote: () => t`Unlock note`,
+  unlockNoteDesc: () =>
+    t`"Your note will be unencrypted and removed from the vault."`,
   deleteAllNotes: () => t`Delete all notes`,
   getStarted: () => t`Get started`,
   saveACopy: () => t`Save a copy`,
@@ -475,6 +487,7 @@ $headline$: Use starting line of the note as title.`,
   keep: () => t`Keep`,
   restore: () => t`Restore`,
   deletePermanently: () => t`Delete permanently`,
+  deletedPermanently: () => t`deleted permanently`,
   viewAllLinkedNotebooks: () => t`View all linked notebooks`,
   learnMore: () => t`Learn more`,
   addTag: () => t`Add tag`,
@@ -566,7 +579,8 @@ $headline$: Use starting line of the note as title.`,
   skipIntroduction: () => t`Skip introduction`,
   reloadEditor: () => t`Taking too long? Reload editor`,
   copy: () => t`Copy`,
-  resendCode: (seconds: any) => t`Resend code (${seconds})`,
+  resendCode: (seconds?: number) =>
+    t`Resend code${seconds ? `in ${seconds}` : ""}`,
   change2faMethod: () => t`Change 2FA method`,
   copyCodes: () => t`Copy codes`,
   saveToFile: () => t`Save to file`,
@@ -643,7 +657,7 @@ $headline$: Use starting line of the note as title.`,
     t`Your email is not confirmed. Please confirm your email address to change account password.`,
   allFieldsRequired: () => t`All fields are required`,
   allFieldsRequiredDesc: () => t`Please fill all the fields to continue.`,
-  backupFailed: () => t`Backup failed`,
+  backupFailed: () => t`Could not create backup`,
   passwordChangedSuccessfully: () => t`Password changed successfully`,
   passwordChangeFailed: () => t`Password change failed`,
   emailRequired: () => t`Email is required`,
@@ -759,6 +773,7 @@ $headline$: Use starting line of the note as title.`,
     }),
   failedToPublish: () => t`Failed to publish note`,
   failedToUnpublish: () => t`Failed to unpublish note`,
+  notePublished: () => t`Note published`,
   monographUrlCopied: () => t`Monograph URL copied`,
   recoveryKeySaved: () => t`Did you save recovery key?`,
   recoveryKeySavedDesc: () =>
@@ -877,7 +892,7 @@ $headline$: Use starting line of the note as title.`,
   clearLogsConfirmation: (key: string) =>
     t`Are you sure you want to clear all logs from ${key}?`,
   enterPasswordDesc: () => t`Please enter your password to continue`,
-  verifyFailed: () => t`Verification failed`,
+  verifyFailed: () => t`User verification failed`,
   enterApplockPassword: () => t`Enter app lock password`,
   enterApplockPasswordDesc: () =>
     t`Please enter your app lock password to continue`,
@@ -1015,9 +1030,10 @@ $headline$: Use starting line of the note as title.`,
     t`You can set a custom proxy URL to increase your privacy.`,
   vault: () => t`Vault`,
   vaultDesc: () => t`Multi-layer encryption to most important notes`,
-  createVaultDesc: () => t`Create a vault to store your most important notes`,
-  changeVaultPasswordDesc: () => t`Setup a new password for your vault.`,
-  clearVaultDesc: () => t`Clear your vault and remove all notes from it`,
+  changeVaultPasswordDesc: () =>
+    t`All locked notes will be re-encrypted with the new password.`,
+  clearVaultDesc: () =>
+    t`Enter vault password to unlock and remove all notes from the vault.`,
   deleteVaultDesc: () => t`Delete vault (and optionally remove all notes).`,
   biometricUnlock: () => t`Biometric unlocking`,
   biometricUnlockDesc: () => t`Unlock your vault with biometric authentication`,
@@ -1157,7 +1173,7 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
     t`All tools in the collapsed section will be removed`,
   clearTrash: () => t`Clear trash`,
   clearTrashConfirm: () => t`Are you sure you want to clear trash?`,
-  trashCleared: () => t`Trash cleared`,
+  trashCleared: () => t`Trash cleared successfully!`,
   trash: () => t`Trash`,
   loadingTrash: () => t`Loading trash`,
   trashCleanupIntervalTextDaily: () =>
@@ -1223,6 +1239,12 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
   vaultProMessage: () => t`Create unlimited vaults with Notesnook Pro`,
   emailConfirmationLinkSent: () =>
     t`We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder.`,
+  emailConfirmationNotice: () => [
+    t`If you didn't get an email from us or the confirmation link isn't
+            working,`,
+    t`please send us an email from your registered email address`,
+    t`and we will manually confirm your account.`
+  ],
   waitBeforeResendEmail: () => t`Please wait before requesting another email`,
   verificationEmailSent: () => t`Verification email sent`,
   failedToSendVerificationEmail: () => t`Failed to send verification email`,
@@ -1332,6 +1354,7 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
   searchNotebooks: () => t`Search notebooks`,
   enterNewEmail: () => t`Enter your new email`,
   verifyNewEmail: () => t`Enter verification code sent to your new email`,
+  issueTitlePlaceholder: () => t`Tell us what happened`,
   issuePlaceholder: () => t`Tell us more about the issue you are facing. 
 
 For example:
@@ -1339,8 +1362,7 @@ For example:
 - What did you expect to happen?
 - Steps to reproduce the issue 
 - Things you have tried etc.`,
-  searchSectionToLinkPlaceholder: () =>
-    t`Search a section of a note to link to`,
+  searchSectionToLinkPlaceholder: () => t`Type # to search for headings`,
   searchNoteToLinkPlaceholder: () => t`Search a note to link to`,
   searchForTags: () => t`Search or add a tag`,
   searchANote: () => t`Search a note`,
@@ -1415,12 +1437,16 @@ For example:
   "24-hour": () => t`24-hour`,
   noteTitle: () => t`Note title`,
   changesNotSaved: () => t`Your changes could not be saved`,
+  savingNoteTakingTooLong: () =>
+    t`Saving this note is taking too long. Copy your changes and restart the app to prevent data loss. If the problem persists, please report it to us at support@streetwriters.co.`,
   changesNotSavedDesc: () =>
     t`It seems that your changes could not be saved. What to do next:`,
   changesNotSavedStep1: () =>
     t`Tap on "Dismiss" and copy the contents of your note so they are not lost.`,
   changesNotSavedStep2: () => t`Restart the app.`,
-  thisNoteLocked: () => `This note is locked`,
+  thisNoteLocked: () => t`This note is locked`,
+  noteLockedBlockLink: () =>
+    t`Linking to a specific block is not available for locked notes.`,
   dismiss: () => t`Dismiss`,
   words: () => t`words`,
   addATag: () => t`Add a tag`,
@@ -1458,15 +1484,363 @@ For example:
   enterValidUrl: () => t`Please enter a valid URL`,
   connectedToServer: () => t`Connected to all servers sucessfully.`,
   allServerUrlsRequired: () => t`All server urls are required.`,
+  serverNotFound: (host: string) => t`Server with host ${host} not found.`,
   couldNotConnectTo: () => t`Could not connect to`,
   incorrectServerUrl: (url: string) =>
     t`The URL you have given (${url}) does not point to the`,
-  serverVersionMismatch: () =>
-    t`The server version is not compatible with the app.`,
+  serverVersionMismatch: (title: string, url: string) =>
+    t`The ${title} at ${url} is not compatible with this client.`,
   testConnectionBeforeSave: () =>
     t`Test connection before changing server urls`,
   serverUrlChanged: () => t`Server url changed`,
   restartAppToTakeEffect: () => t`Restart the app for changes to take effect.`,
   resetServerUrls: () => t`Reset server urls`,
-  serverUrlsReset: () => t`Server urls reset`
+  serverUrlsReset: () => t`Server urls reset`,
+  dismissAnnouncement: () => t`Dismiss announcement`,
+  uploaded: () => t`Uploaded`,
+  waitingForUpload: () => t`Waiting for upload`,
+  webAuthTitles: [
+    () => t`Write with freedom.`,
+    () => t`Privacy comes first.`,
+    () => t`Take notes privately.`,
+    () => t`Encrypted, private, secure.`,
+    () => "❤️ = 🔒 + 🗒️"
+  ],
+  restoreThisVersion: () => t`Restore this version`,
+  autoSaveOff: () => t`Auto save: off`,
+  selected: () => t`selected`,
+  dropFilesToAttach: () => t`Drop your files here to attach`,
+  loadingEditor: () => t`Loading editor`,
+  noHeadingsFound: () => t`No headings found`,
+  somethingWentWrong: () => t`Something went wrong`,
+  whatWentWrong: () => t`What went wrong?`,
+  howToFix: () => t`How to fix it?`,
+  fixIt: () => t`Fix it`,
+  reloadApp: () => t`Reload app`,
+  contactSupport: () => t`Contact support`,
+  databaseCorruptExplain: () =>
+    t`This error usually means the database file is either corrupt or it could not be decrypted.`,
+  databaseCorruptFix: () =>
+    t`This error can only be fixed by wiping & reseting the database. Beware that this will wipe all your data inside the database with no way to recover it later on. This WILL NOT change/affect/delete/wipe your data on the server but ONLY on this device.`,
+  decryptKeyErrorExplain: () =>
+    t`This error means the at rest encryption key could not be decrypted. This can be due to data corruption or implementation change.`,
+  decryptKeyErrorFix: () =>
+    t`This error can only be fixed by wiping & reseting the Key Store and the database. This WILL NOT change/affect/delete/wipe your data on the server but ONLY on this device.`,
+  searchIndexCorrupt: () =>
+    t`This error usually means the search index is corrupted.`,
+  searchIndexCorruptFix: () =>
+    t`This error can be fixed by rebuilding the search index. This action won't result in any kind of data loss.`,
+  installNotesnook: () => t`Install Notesnook`,
+  installNotesnookDesc: (platform: string) =>
+    t`For a more integrated user experience, try out Notesnook for ${platform}`,
+  nativeFeatures: () => [
+    t`Native high-performance encryption`,
+    t`Automatic backups`,
+    t`Pin notes in notifications drawer`,
+    t`Share & append to notes from anywhere`,
+    t`Quick note widgets`,
+    t`App lock`
+  ],
+  loading: () => t`Loading`,
+  errorsInAttachments: (count: number) => t`Errors in ${count} attachments`,
+  goToNextPage: () => t`Go to next page`,
+  goToPreviousPage: () => t`Go to previous page`,
+  zoomOut: () => t`Zoom out`,
+  zoomIn: () => t`Zoom in`,
+  enterFullScreen: () => t`Enter fullscreen`,
+  syncingYour: (context: string) =>
+    t`Syncing your ${strings.routes[
+      (context.slice(0, 1).toUpperCase() +
+        context.slice(1)) as keyof typeof strings.routes
+    ]()}`,
+  items: () => t`items`,
+  downloadingImages: () => t`Downloading images`,
+  checkingForUpdates: () => t`Checking for updates`,
+  updating: () => t`updating`,
+  restartRequired: () => t`restart required`,
+  available: () => t`available`,
+  itemsRestored: (count: number) =>
+    plural(count, {
+      one: `# item restored`,
+      other: `# items restored`
+    }),
+  unlocking: () => t`Unlocking`,
+  reminderStarts: (date: string, time: string) =>
+    t`The reminder will start on ${date} at ${time}.`,
+  files: (count: number) =>
+    plural(count, {
+      one: "# file",
+      other: "# files"
+    }),
+  of: () => t`of`,
+  installs: () => t`installs`,
+  licenseUnder: () => t`Licensed under`,
+  pro: () => t`Pro`,
+  mfaScanQrCode: () => t`Scan the QR code with your authenticator app`,
+  scanQrError: () =>
+    t`If you can't scan the QR code above, enter this text instead (spaces don't matter)`,
+  mfaScanQrCodeHelpText: () =>
+    t`After scanning the QR code image, the app will display a code that you can enter below.`,
+  mfaDone: () =>
+    t`Your account is now 100% secure against unauthorized logins.`,
+  sms: () => t`phone number`,
+  app: () => t`authentication app`,
+  mfaFallbackMethodText: (fallback: string, primary: string) =>
+    `You will now receive your 2FA codes on your ${
+      strings[fallback as keyof typeof strings]
+    } in case you lose access to your ${
+      strings[primary as keyof typeof strings]
+    }.`,
+  transactionStatusToText: {
+    completed: () => t`Completed`,
+    refunded: () => t`"Refunded`,
+    partially_refunded: () => t`Partially refunded`,
+    disputed: () => t`Disputed`
+  },
+  viewReceipt: () => t`View receipt`,
+  customDictWords: (count: number) =>
+    t`You have ${count} custom dictionary words.`,
+  notesImported: () => t`notes imported`,
+  importCompleted: () => t`Import completed`,
+  errorsOccured: (count: number) =>
+    plural(count, {
+      one: "# error occured",
+      other: "# errors occured"
+    }),
+  startOver: () => t`Start over`,
+  filesReadyToImport: (count: number) =>
+    plural(count, {
+      one: "# file ready for import",
+      other: "# files ready for import"
+    }),
+  selectFilesToImport: () => t`Select files to import`,
+  importerHelpText: () => [
+    t`Please refer to the`,
+    t`import guide`,
+    t`for help regarding how to use the Notesnook Importer.`
+  ],
+  dropFilesHere: () => t`Drop the files here`,
+  dragAndDropFiles: () => t`Drag & drop files here, or click to select files`,
+  onlyZipSupported: () => t`Only .zip files are supported.`,
+  clickToRemove: () => t`Click to remove`,
+  currentPlan: () => t`CURRENT PLAN`,
+  appWillReloadIn: (sec: number) => t`App will reload in ${sec} seconds`,
+  changesReflectOnStart: () =>
+    t`Your changes have been saved and will be reflected after the app has refreshed.`,
+  edit: () => t`Edit`,
+  yourFullName: () => t`Your full name`,
+  memberSince: () => t`Member since`,
+  betaLoginNotice: () =>
+    t`You are logging into the beta version of Notesnook. Switching between beta &amp; stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously.`,
+  loggingIn: () => "Logging you in",
+  pleaseWaitLogin: () => t`Please wait while you are authenticated.`,
+  emailConfirmed: () => t`Your email has been confirmed.`,
+  confirmEmailThankyou: () =>
+    t`Thank you for choosing end-to-end encrypted note taking.`,
+  shareWithFriends: () => t`Share Notesnook with friends!`,
+  tagPromoWinText: () => [
+    t`Use`,
+    t`#notesnook`,
+    t`and get a chance to win free promo codes.`
+  ],
+  shareWithFriendsDesc: () => t`Because where's the fun in nookin' alone?`,
+  notebooksAllCaps: () => t`NOTEBOOKS`,
+  authenticatedAs: () => t`Authenticated as`,
+  rememberedYourPassword: () => t`Remembered your password?`,
+  accountRecoveryMethods: [
+    {
+      type: "key",
+      testId: "step-recovery-key",
+      title: () => `Use recovery key`,
+      description: () =>
+        `Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption.`
+    },
+    {
+      type: "backup",
+      testId: "step-backup",
+      title: () => `Use a backup file`,
+      description: () =>
+        `If you don't have a recovery key, you can recover your data by restoring a Notesnook data backup file (.nnbackup).`
+    },
+    {
+      type: "reset",
+      testId: "step-reset-account",
+      title: () => `Clear data & reset account`,
+      description: () =>
+        `EXTREMELY DANGEROUS! This action is irreversible. All your data including notes, notebooks, attachments & settings will be deleted. This is a full account reset. Proceed with caution.`,
+      isDangerous: true
+    }
+  ],
+  chooseRecoveryMethod: () => t`Choose a recovery method`,
+  chooseRecoveryMethodDesc: () => t`How do you want to recover your account?`,
+  browse: () => t`Browse`,
+  dontShowAgain: () => t`Don't show again`,
+  dontShowAgainConfirm: () => t`Don't show again on this device?`,
+  toggleDarkLightMode: () => t`Toggle dark/light mode`,
+  goTo: () => t`Go to`,
+  tagNotFound: () => `Tag not found`,
+  downloadAllAttachments: () => t`Download all attachments`,
+  selectProfilePicture: () => t`Select profile picture`,
+  changeProfilePicture: () => t`Change profile picture`,
+  editFullName: () => t`Edit your full name`,
+  reset: () => t`Reset`,
+  resetSelection: () => t`Reset selection`,
+  startImportingNow: () => t`Start importing now`,
+  activatingTrial: () => t`Activating trial`,
+  tryFreeFor14Days: () => t`Try free for 14 days`,
+  startImport: () => t`Start import`,
+  cancelSub: () => t`Cancel subscription`,
+  unlockWithSecurityKey: () => t`Unlock with security key`,
+  reloginToYourAccount: () => t`Relogin to your account`,
+  skipAndGoToApp: () => t`Skip & go directly to the app`,
+  startAccountRecovery: () => t`Start account recovery`,
+  dontHaveRecoveryKey: () => t`Don't have your account recovery key?`,
+  dontHaveBackupFile: () => t`Don't have backup file?`,
+  filterLanguages: () => t`Filter languages`,
+  searchThemes: () => t`Search themes`,
+  olderVersion: () => t`Older version`,
+  currentNote: () => t`Current note`,
+  incomingNote: () => t`Incoming note`,
+  description: () => t`Description`,
+  date: () => t`Date`,
+  month: () => t`month`,
+  day: () => t`Day`,
+  time: () => t`Time`,
+  encryptionKey: () => t`Encryption key`,
+  color: () => t`Color`,
+  sixDigitCode: () => t`6 digit code`,
+  newEmail: () => t`New Email`,
+  accountPassword: () => t`Account password`,
+  phoneNumber: () => t`Phone number`,
+  createAccount: () => t`Create account`,
+  accountRecoverHelpText: () =>
+    t`You will receive instructions on how to recover your account on this email`,
+  enterRecoveryKey: () => t`Enter account recovery key`,
+  enterRecoveryKeyHelp: () =>
+    t`Your data recovery key will be used to decrypt your data`,
+  selectBackupFile: () => t`Select backup file`,
+  newPasswordHelp: () => t`Your account password must be strong & unique.`,
+  optional: () => t`Optional`,
+  backupFileHelpText: () => t`Backup files have .nnbackup extension`,
+  sendRecoveryEmail: () => t`Send recovery email`,
+  downloadBackupFile: () => t`Download backup file`,
+  enterPasswordToUnlockVersion: () =>
+    t`Please enter the password to view this version`,
+  openNote: () => t`Open note`,
+  enterPasswordToUnlockNote: () =>
+    t`Please enter the password to unlock this note`,
+  properties: () => t`Properties`,
+  clickToPreview: () => t`Click to preview`,
+  clearCache: () => t`Clear cache`,
+  clearCacheConfirm: () => t`Clear attachments cache?`,
+  clearCacheConfirmDesc:
+    () => t`Clearing attachments cache will perform the following actions:
+                        
+- Downloaded images & files: **cleared**
+- Pending uploads: **cleared**
+- Uploaded images & files: _unaffected_
+
+All attachments will be downloaded & cached again on access.
+
+---
+
+**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**`,
+  cacheCleared: () => t`Attachments cache cleared!`,
+  gettingEncryptionKey: () => t`Getting encryption key...`,
+  keyBackedUp: () => t`I have saved my key`,
+  groupAdded: () => t`Group added successfully`,
+  welcomeBack: () => t`Welcome back!`,
+  verifyingEmail: () => t`Verifying your email`,
+  authWait: () => t`Please wait while you are authenticated.`,
+  accountPassDesc: () =>
+    t`"Your password is always hashed before leaving this device."`,
+  creatingAccount: () => `Creating your account`,
+  creatingAccountDesc: () => t`Please wait while we finalize your account.`,
+  sendingRecoveryEmail: () => t`Sending recovery email`,
+  sendingRecoveryEmailDesc: () =>
+    t`Please wait while we send you recovery instructions`,
+  authenticatingUser: () => t`Authenticating user`,
+  accountRecoveryWithKey: () =>
+    t`Use a data recovery key to reset your account password.`,
+  keyRecoveryProgressDesc: () =>
+    t`"Please wait while your data is downloaded & decrypted."`,
+  verifying2faCode: () => t`Verifying 2FA code`,
+  coreRequired: () => t`2FA code is required()`,
+  backupFileRecoveryError: () =>
+    t`All the data in your account will be overwritten with the data in the backup file. There is no way to reverse this action.`,
+  backupYourData: () => `Backup your data`,
+  backupYourDataDesc: () =>
+    t`Please download a backup of your data as your account will be cleared before recovery.`,
+  backingUpDataWait: () =>
+    t`Please wait while we create a backup file for you to download.`,
+  resetAccountPassword: () => t`Reset account password`,
+  resettingAccountPassword: () => t`Resetting account password`,
+  resetPasswordWait: () => t`Please wait while we reset your account password.`,
+  recoverySuccess: () => t`Recovery successful!`,
+  recoverySuccessDesc: () => t`Your account has been recovered.`,
+  upgradeNow: () => t`Upgrade now`,
+  backupSavedAt: (path: string) => t`Backup saved at ${path}`,
+  movedToTrash: (type: string, count: number) =>
+    plural(count, {
+      one: `1 ${
+        strings.dataTypes[type as keyof typeof strings.dataTypes]
+      } moved to trash`,
+      other: `# ${
+        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
+      } moved to trash`
+    }),
+  action: (type: string, count: number, action: "deleted" | "unpinned") => {
+    const actions: { [name: string]: any } = {
+      deleted: t`deleted`,
+      unpinned: t`unpinned`
+    };
+    return plural(count, {
+      one: `${
+        strings.dataTypesCamelCase[type as keyof typeof strings.dataTypes]
+      } ${actions[action]}`,
+      other: `# ${
+        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
+      } ${actions[action]}`
+    });
+  },
+  deleted: (type: string, count: number) =>
+    plural(count, {
+      one: `${
+        strings.dataTypesCamelCase[type as keyof typeof strings.dataTypes]
+      } deleted`,
+      other: `# ${
+        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
+      } deleted`
+    }),
+  unpinned: (type: string, count: number) =>
+    plural(count, {
+      one: `${
+        strings.dataTypesCamelCase[type as keyof typeof strings.dataTypes]
+      } unpinned`,
+      other: `# ${
+        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
+      } unpinned`
+    }),
+  deleting: () => t`Deleting`,
+  deletingItems: (type: string, count: number) =>
+    plural(count, {
+      one: `Deleting ${
+        strings.dataTypes[type as keyof typeof strings.dataTypes]
+      }`,
+      other: `Deleting ${
+        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
+      }`
+    }),
+
+  itemsPlural: (type: string, count: number) =>
+    plural(count, {
+      one: `${strings.dataTypes[type as keyof typeof strings.dataTypes]}`,
+      other: `# ${
+        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
+      }`
+    }),
+  backupReadyToDownload: () => t`Your backup is ready to download`,
+  unlockVault: () => t`Unlock vault`,
+  unlockVaultDesc: () => t`Please enter your vault password to continue`,
+  imagePreviewFailed: () => t`This image cannot be previewed`
 };
