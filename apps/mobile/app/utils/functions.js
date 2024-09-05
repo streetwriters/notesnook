@@ -128,12 +128,9 @@ export const deleteItems = async (items, type, context) => {
     return;
   }
 
-  let message = `${ids.length} ${
-    ids.length === 1 ? "item" : "items"
-  } moved to trash.`;
-
   let deletedIds = [...ids];
   if (type === "notebook" || type === "note") {
+    let message = strings.movedToTrash(type, ids.length);
     ToastManager.show({
       heading: message,
       type: "success",
@@ -150,6 +147,11 @@ export const deleteItems = async (items, type, context) => {
         }
       },
       actionText: "Undo"
+    });
+  } else {
+    ToastManager.show({
+      heading: strings.deleted(type, ids.length),
+      type: "success"
     });
   }
 

@@ -348,7 +348,7 @@ function ThemeSelector() {
             paddingTop: 12
           }}
         >
-          <Input onChangeText={onSearch} placeholder="Search themes" />
+          <Input onChangeText={onSearch} placeholder={strings.searchThemes()} />
 
           <View
             style={{
