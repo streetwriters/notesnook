@@ -116,12 +116,10 @@ export async function checkAttachment(hash: string) {
   if (!attachment) return { failed: "Attachment not found." };
 
   try {
-    const size = await lazify(
-      import("../interfaces/fs"),
-      ({ getUploadedFileSize }) => getUploadedFileSize(hash)
+    await lazify(import("../interfaces/fs"), ({ checkUpload }) =>
+      checkUpload(hash, attachment.chunkSize, attachment.size)
     );
-    if (size === 0) throw new Error("File length is 0.");
-    else if (size === -1) throw new Error("File verification check failed.");
+    await db.attachments.markAsFailed(attachment.id);
   } catch (e) {
     const reason = e instanceof Error ? e.message : "Unknown error.";
     await db.attachments.markAsFailed(attachment.id, reason);

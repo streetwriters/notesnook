@@ -256,7 +256,11 @@ async function uploadFile(
         : await multiPartUploadFile(fileHandle, filename, requestOptions);
 
     if (uploaded) {
-      await checkUpload(filename);
+      await checkUpload(
+        filename,
+        requestOptions.chunkSize,
+        fileHandle.file.size
+      );
       await fileHandle.addAdditionalData("uploaded", true);
     }
 
@@ -448,13 +452,21 @@ async function resetUpload(fileHandle: FileHandle) {
   await fileHandle.addAdditionalData("uploaded", false);
 }
 
-async function checkUpload(filename: string) {
+export async function checkUpload(
+  filename: string,
+  chunkSize: number,
+  expectedSize: number
+) {
   const size = await getUploadedFileSize(filename);
+  const totalChunks = Math.ceil(size / chunkSize);
+  const decryptedLength = size - totalChunks * ABYTES;
   const error =
     size === 0
-      ? `Upload verification failed: file size is 0. Please upload this file again. (File hash: ${filename})`
+      ? `File size is 0.`
       : size === -1
-      ? `Upload verification failed.`
+      ? `File verification check failed.`
+      : expectedSize !== decryptedLength
+      ? `File size mismatch. Expected ${size} bytes but got ${decryptedLength} bytes.`
       : undefined;
   if (error) throw new Error(error);
 }
