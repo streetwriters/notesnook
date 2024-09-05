@@ -35,6 +35,7 @@ import { create } from "zustand";
 import { VirtualizedGrouping } from "@notesnook/core";
 import { ResolvedItem } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type SelectedReference = {
   id: string;
@@ -118,8 +119,8 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
           sx={{ mt: 2 }}
           itemGap={5}
           placeholders={{
-            empty: "Add a new tag",
-            filter: "Search or add a new tag"
+            empty: strings.addATag(),
+            filter: strings.searchForTags()
           }}
           filter={async (query) => {
             setTags(

@@ -22,6 +22,7 @@ import { TipContext, useTip } from "../../hooks/use-tip";
 import { Info, Sync } from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { toTitleCase } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 type PlaceholderProps = { context: TipContext; text?: string };
 function Placeholder(props: PlaceholderProps) {
@@ -53,13 +54,13 @@ function Placeholder(props: PlaceholderProps) {
         >
           <Sync color="accent" size={12} sx={{ mr: "small" }} />
           <Text variant="subBody" sx={{ fontSize: 10 }} color="accent">
-            Syncing your {context}
+            {strings.syncingYour(context)}
           </Text>
         </Flex>
 
         <Text variant="subBody" sx={{ fontSize: "body", mt: 1 }}>
           {toTitleCase(syncStatus.type || "sync")}ing {syncStatus.progress}{" "}
-          items
+          {strings.items()}
         </Text>
       </Flex>
     );
@@ -88,7 +89,7 @@ function Placeholder(props: PlaceholderProps) {
         >
           <Info color="accent" size={13} sx={{ mr: "small" }} />
           <Text variant="subBody" sx={{ fontSize: 10 }} color="accent">
-            TIP
+            {strings.tip()}
           </Text>
         </Flex>
         <Text variant="subBody" sx={{ fontSize: "body", mt: 1 }}>

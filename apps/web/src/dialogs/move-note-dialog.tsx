@@ -49,6 +49,7 @@ import { pluralize } from "@notesnook/common";
 import Field from "../components/field";
 import { AddNotebookDialog } from "./add-notebook-dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 type NotebookReference = {
@@ -176,7 +177,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
         styles={{
           input: { p: "7.5px" }
         }}
-        placeholder={"Search notebooks"}
+        placeholder={strings.searchNotebooks()}
         onChange={async (e) => {
           const query = e.target.value.trim();
           const ids = await (query
@@ -199,7 +200,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
           }}
           sx={{ textDecoration: "none", mb: 2 }}
         >
-          Reset selection
+          {strings.resetSelection()}
         </Button>
       )}
       {notebooks.length > 0 ? (
@@ -315,9 +316,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
             alignItems: "center"
           }}
         >
-          <Text variant="body">
-            Please add a notebook to start linking notes.
-          </Text>
+          <Text variant="body">{strings.notebooksEmpty()}</Text>
           <Button
             data-test-id="add-new-notebook"
             variant="secondary"
@@ -332,7 +331,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
               )
             }
           >
-            Add new notebook
+            {strings.addNotebook()}
           </Button>
         </Flex>
       )}
@@ -448,7 +447,7 @@ function NotebookItem(props: {
         >
           <Plus
             size={18}
-            title="New notebook"
+            title={strings.newNotebook()}
             onClick={async (e) => {
               e.stopPropagation();
               await AddNotebookDialog.show({ parentId: notebook.id });

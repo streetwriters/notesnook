@@ -29,6 +29,7 @@ import { showToast } from "../utils/toast";
 import { TaskScheduler } from "../utils/task-scheduler";
 import { BuyDialog } from "../dialogs/buy-dialog";
 import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
+import { strings } from "@notesnook/intl";
 
 export type NoticeType = "autoBackupsOff" | "login" | "email" | "recoverykey";
 
@@ -205,10 +206,10 @@ async function saveBackup(mode: "full" | "partial" = "partial") {
     if (openedToast !== null) return;
     openedToast = showToast(
       "success",
-      "Your backup is ready for download.",
+      strings.backupReadyToDownload(),
       [
         {
-          text: "Later",
+          text: strings.later(),
           onClick: async () => {
             await db.backup.updateBackupTime();
             openedToast?.hide();
@@ -217,7 +218,7 @@ async function saveBackup(mode: "full" | "partial" = "partial") {
           type: "paragraph"
         },
         {
-          text: "Download",
+          text: strings.network.download(),
           onClick: async () => {
             await createBackup({ mode });
             openedToast?.hide();

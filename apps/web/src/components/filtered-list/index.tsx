@@ -22,6 +22,7 @@ import Field from "../field";
 import { Plus, Search } from "../icons";
 import { Button, Text } from "@theme-ui/components";
 import { VirtualizedList, VirtualizedListProps } from "../virtualized-list";
+import { strings } from "@notesnook/intl";
 
 type FilteredListProps<T> = {
   placeholders: { filter: string; empty: string };
@@ -93,7 +94,7 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
             await _createNewItem(query);
           }}
         >
-          <Text variant={"body"}>{`Add "${query}"`}</Text>
+          <Text variant={"body"}>{`${strings.add()} "${query}"`}</Text>
           <Plus size={16} color="accent" />
         </Button>
       ) : (

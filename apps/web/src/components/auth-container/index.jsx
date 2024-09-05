@@ -26,6 +26,7 @@ import Jason from "../../assets/testimonials/jason.jpg";
 import Cameron from "../../assets/testimonials/cameron.jpg";
 import { hosts } from "@notesnook/core";
 import { SettingsDialog } from "../../dialogs/settings";
+import { strings } from "@notesnook/intl";
 
 const testimonials = [
   {
@@ -58,20 +59,14 @@ const testimonials = [
   }
 ];
 
-const titles = [
-  "Write with freedom.",
-  "Privacy comes first.",
-  "Take notes privately.",
-  "Encrypted, private, secure.",
-  "❤️ = 🔒 + 🗒️"
-];
-
 function randomTestimonial() {
   return testimonials[getRandom(0, testimonials.length - 1)];
 }
 
 function randomTitle() {
-  return titles[getRandom(0, titles.length - 1)];
+  return strings.webAuthTitles[
+    getRandom(0, strings.webAuthTitles.length - 1)
+  ]();
 }
 
 function AuthContainer(props) {

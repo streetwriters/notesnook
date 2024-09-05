@@ -29,6 +29,7 @@ import { useStore as useTagStore } from "../stores/tag-store";
 import { useStore as useNoteStore } from "../stores/note-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import { Color, Tag } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 
 type ItemDialogProps = BaseDialogProps<false | string> & {
   title: string;
@@ -74,7 +75,7 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
       >
         <Field
           required
-          label="Title"
+          label={strings.title()}
           id="title"
           name="title"
           autoFocus

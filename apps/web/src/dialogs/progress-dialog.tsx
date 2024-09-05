@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import { Box, Flex, Text } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type Progress = {
   total?: number;
@@ -62,7 +63,7 @@ export const ProgressDialog = DialogManager.register(function ProgressDialog<T>(
         {current > 0 ? (
           <>
             <Text variant="subBody">
-              {current} of {total}
+              {current} {strings.of()} {total}
             </Text>
             <Box
               sx={{

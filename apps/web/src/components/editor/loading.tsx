@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, Text } from "@theme-ui/components";
 import { Loading } from "../icons";
+import { strings } from "@notesnook/intl";
 
 function EditorLoading({ text }: { text?: string }) {
   return (
@@ -32,7 +33,7 @@ function EditorLoading({ text }: { text?: string }) {
     >
       <Loading color="accent" sx={{ mt: 2 }} />
       <Text variant="body" mt={2} sx={{ textAlign: "center" }}>
-        {text || "Loading editor. Please wait..."}
+        {text || `${strings.loadingEditor()}. ${strings.pleaseWait()}...`}
       </Text>
     </Flex>
   );

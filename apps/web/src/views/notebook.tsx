@@ -63,6 +63,7 @@ import {
   ImperativePanelHandle
 } from "react-resizable-panels";
 import { AddNotebookDialog } from "../dialogs/add-notebook-dialog";
+import { strings } from "@notesnook/intl";
 
 type NotebookProps = {
   rootId: string;
@@ -231,7 +232,7 @@ function SubNotebooks({
         <Flex sx={{ alignItems: "center" }}>
           {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
           <Text variant="subBody" sx={{ fontSize: 11 }}>
-            NOTEBOOKS
+            {strings.notebooksAllCaps()}
           </Text>
         </Flex>
         <Flex sx={{ alignItems: "center" }}>
@@ -470,7 +471,7 @@ function NotebookHeader({
           variant="icon"
           sx={{ p: 0, flexShrink: 0 }}
           onClick={() => navigateCrumb("notebooks")}
-          title="Notebooks"
+          title={strings.notebooks()}
         >
           <Notebook2 size={14} />
         </Button>
@@ -576,7 +577,7 @@ function NotebookHeader({
             variant="secondary"
             sx={{ borderRadius: 100, width: 30, height: 30 }}
             p={0}
-            title="Edit notebook"
+            title={strings.editNotebook()}
             onClick={() => hashNavigate(`/notebooks/${notebook.id}/edit`)}
           >
             <Edit size={16} />
@@ -591,7 +592,7 @@ function NotebookHeader({
       )}
       <Text as="em" variant="subBody" mt={2}>
         {/* {pluralize(topics.length, "topic")},  */}
-        {pluralize(totalNotes, "note")}
+        {strings.notes(totalNotes || 0)}
       </Text>
     </Flex>
   );

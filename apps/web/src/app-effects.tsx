@@ -46,6 +46,7 @@ import { BuyDialog } from "./dialogs/buy-dialog";
 import { FeatureDialog } from "./dialogs/feature-dialog";
 import { AnnouncementDialog } from "./dialogs/announcement-dialog";
 import { logger } from "./utils/logger";
+import { strings } from "@notesnook/intl";
 
 type AppEffectsProps = {
   setShow: (show: boolean) => void;
@@ -89,7 +90,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
                 break;
             }
             showToast("error", sentence, [
-              { text: "Upgrade now", onClick: () => BuyDialog.show({}) }
+              { text: strings.upgradeNow(), onClick: () => BuyDialog.show({}) }
             ]);
             return { type, result: false };
           }

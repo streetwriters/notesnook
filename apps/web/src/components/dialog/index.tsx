@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { Flex, Text, Button, ButtonProps } from "@theme-ui/components";
-import { Loading, Close } from "../icons";
-import ReactModal from "react-modal";
-import { FlexScrollContainer } from "../scroll-container";
+import { Button, ButtonProps, Flex, Text } from "@theme-ui/components";
 import { SxProp } from "@theme-ui/core";
+import React from "react";
+import ReactModal from "react-modal";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { Close, Loading } from "../icons";
+import { FlexScrollContainer } from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
 
 ReactModal.setAppElement("#root");

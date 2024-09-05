@@ -26,6 +26,7 @@ import { Clock, Refresh } from "../components/icons";
 import Note from "../components/note";
 import { getFormattedReminderTime, usePromise } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 export type ReminderPreviewDialogProps = BaseDialogProps<false> & {
   reminder: Reminder;
@@ -90,7 +91,7 @@ export const ReminderPreviewDialog = DialogManager.register(
           <IconTag icon={Clock} text={getFormattedReminderTime(reminder)} />
         </Flex>
 
-        <Text variant="body">Remind me in:</Text>
+        <Text variant="body">{strings.remindMeIn()}:</Text>
         <Flex
           sx={{
             alignItems: "center",
@@ -124,7 +125,7 @@ export const ReminderPreviewDialog = DialogManager.register(
           referencedNotes.status === "fulfilled" &&
           referencedNotes.value.length > 0 && (
             <>
-              <Text variant="body">References:</Text>
+              <Text variant="body">{strings.references()}:</Text>
               {referencedNotes.value.map((item, index) => (
                 <Note
                   key={item.id}

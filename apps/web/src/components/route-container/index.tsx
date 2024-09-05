@@ -25,6 +25,7 @@ import { useStore as useSearchStore } from "../../stores/search-store";
 import useMobile from "../../hooks/use-mobile";
 import { debounce, usePromise } from "@notesnook/common";
 import Field from "../field";
+import { strings } from "@notesnook/intl";
 
 export type RouteContainerButtons = {
   search?: {
@@ -82,7 +83,7 @@ function Header(props: RouteContainerProps) {
           sx={{ m: 0, flex: 1 }}
           styles={{ input: { p: "7px" } }}
           defaultValue={query}
-          placeholder="Type your query here"
+          placeholder={strings.typeAKeyword()}
           onChange={debounce(
             (e) => useSearchStore.setState({ query: e.target.value }),
             250

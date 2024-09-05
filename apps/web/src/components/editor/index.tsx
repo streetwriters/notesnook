@@ -70,6 +70,7 @@ import { EditorActionBar } from "./action-bar";
 import { logger } from "../../utils/logger";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
+import { strings } from "@notesnook/intl";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -90,12 +91,7 @@ async function saveContent(
     }),
     new Promise((_, reject) =>
       setTimeout(
-        () =>
-          reject(
-            new Error(
-              "Saving this note is taking too long. Copy your changes and restart the app to prevent data loss. If the problem persists, please report it to us at support@streetwriters.co."
-            )
-          ),
+        () => reject(new Error(strings.savingNoteTakingTooLong())),
         30 * 1000
       )
     )
@@ -105,7 +101,7 @@ async function saveContent(
       (e as Error).message,
       [
         {
-          text: "Dismiss",
+          text: strings.dismiss(),
           onClick: () => hide()
         }
       ],
@@ -382,7 +378,9 @@ function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
         flexDirection: "column"
       }}
     >
-      <Text variant="title">Downloading attachment ({progress}%)</Text>
+      <Text variant="title">
+        {strings.downloadingAttachments()} ({progress}%)
+      </Text>
       <Progress
         value={progress}
         max={100}
@@ -397,7 +395,7 @@ function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
           if (id) db.fs().cancel(id).catch(console.error);
         }}
       >
-        Cancel
+        {strings.cancel()}
       </Button>
     </Flex>
   );
@@ -485,7 +483,7 @@ export function Editor(props: EditorProps) {
 
             const dataurl = await downloadAttachment(hash, "base64", id);
             if (!dataurl)
-              return showToast("error", "This image cannot be previewed.");
+              return showToast("error", strings.imagePreviewFailed());
 
             ReactDOM.render(
               <ScopedThemeProvider>
@@ -684,7 +682,7 @@ function DropZone(props: DropZoneProps) {
       >
         <Attachment size={72} />
         <Text variant={"heading"} sx={{ color: "icon", mt: 2 }}>
-          Drop your files here to attach
+          {strings.dropFilesToAttach()}
         </Text>
       </Flex>
     </Box>
@@ -815,8 +813,8 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
       ref={root}
     >
       <UnlockView
-        buttonTitle="Open note"
-        subtitle="Please enter the password to unlock this note."
+        buttonTitle={strings.openNote()}
+        subtitle={strings.enterPasswordToUnlockNote()}
         title={session.note.title}
         unlock={async (password) => {
           const note = await db.vault.open(session.id, password);

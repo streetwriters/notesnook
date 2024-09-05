@@ -32,6 +32,7 @@ import { useStore } from "../../stores/monograph-store";
 import ReactModal from "react-modal";
 import { DialogButton } from "../dialog";
 import { Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 
 type PublishViewProps = {
   note: Note;
@@ -98,10 +99,10 @@ function PublishView(props: PublishViewProps) {
               justifyContent: "center"
             }}
           >
-            <Text>Please wait...</Text>
+            <Text>{strings.pleaseWait()}...</Text>
             {processingStatus && (
               <Text variant="subBody" mt={1}>
-                Downloading images ({processingStatus.current}/
+                {strings.downloadingImages()} ({processingStatus.current}/
                 {processingStatus.total})
               </Text>
             )}
@@ -114,7 +115,7 @@ function PublishView(props: PublishViewProps) {
                   variant="body"
                   sx={{ fontWeight: "bold", color: "paragraph" }}
                 >
-                  Published at
+                  {strings.publishedAt()}
                 </Text>
                 <Flex
                   sx={{
@@ -154,20 +155,18 @@ function PublishView(props: PublishViewProps) {
               </Flex>
             ) : (
               <Text variant="body" sx={{ color: "paragraph" }}>
-                This note will be published to a public URL.
+                {strings.monographDesc()}
               </Text>
             )}
             <Toggle
-              title="Self destruct?"
-              onTip="Note will be automatically unpublished after first view."
-              offTip="Note will stay published until manually unpublished."
+              title={strings.monographSelfDestructHeading()}
+              tip={strings.monographSelfDestructDesc()}
               isToggled={selfDestruct}
               onToggled={() => setSelfDestruct((s) => !s)}
             />
             <Toggle
-              title="Password protect?"
-              onTip="Protect published note with a password."
-              offTip="Do not protect published note with a password."
+              title={strings.monographPassHeading()}
+              tip={strings.monographPassDesc()}
               isToggled={isPasswordProtected}
               onToggled={() => setIsPasswordProtected((s) => !s)}
             />
@@ -177,7 +176,7 @@ function PublishView(props: PublishViewProps) {
                 autoFocus
                 type="password"
                 id="publishPassword"
-                placeholder="Enter password to encrypt this note"
+                placeholder={strings.enterPassword()}
                 required
                 sx={{ my: 1 }}
               />
@@ -204,19 +203,19 @@ function PublishView(props: PublishViewProps) {
                 password
               });
               setPublishId(publishId);
-              showToast("success", "Note published.");
+              showToast("success", strings.notePublished());
             } catch (e) {
               console.error(e);
               showToast(
                 "error",
-                "Note could not be published: " + (e as Error).message
+                `${strings.failedToPublish()}: ${(e as Error).message}`
               );
             } finally {
               setIsPublishing(false);
             }
           }}
           loading={isPublishing}
-          text={publishId ? "Update" : "Publish"}
+          text={publishId ? strings.update() : strings.publish()}
         />
         {publishId && (
           <DialogButton

@@ -41,6 +41,7 @@ import { showToast } from "../../../utils/toast";
 import { showFilePicker, readFile } from "../../../utils/file-picker";
 import { VirtualizedGrid } from "../../../components/virtualized-grid";
 import { ThemeDetailsDialog } from "../../theme-details-dialog";
+import { strings } from "@notesnook/intl";
 
 const ThemesClient = ThemesTRPC.createClient({
   links: [
@@ -145,7 +146,7 @@ function ThemesList() {
   return (
     <>
       <Input
-        placeholder="Search themes"
+        placeholder={strings.searchThemes()}
         sx={{ mt: 2 }}
         onChange={debounce((e) => setSearchQuery(e.target.value), 500)}
       />
@@ -202,7 +203,7 @@ function ThemesList() {
               flexShrink: 0
             }}
           >
-            Load from file
+            {strings.loadFromFile()}
           </Button>
         </Flex>
       </Flex>
@@ -299,8 +300,10 @@ function ThemeItem(props: ThemeItemProps) {
           >
             {isApplying ? (
               <Loading color="accent" size={18} />
+            ) : theme.colorScheme === "dark" ? (
+              strings.setAsDarkTheme()
             ) : (
-              `Set as ${theme.colorScheme}`
+              strings.setAsLightTheme()
             )}
           </Button>
         )}

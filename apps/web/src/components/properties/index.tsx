@@ -62,6 +62,7 @@ import {
 import { VirtualizedTable } from "../virtualized-table";
 import { TextSlice } from "@notesnook/core";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
+import { strings } from "@notesnook/intl";
 
 const tools = [
   { key: "pin", property: "pinned", icon: Pin, label: "Pin" },
@@ -152,7 +153,7 @@ function EditorProperties(props: EditorPropertiesProps) {
       >
         <ScrollContainer>
           <Section
-            title="Properties"
+            title={strings.properties()}
             button={
               <ArrowLeft
                 data-test-id="properties-close"
@@ -277,8 +278,8 @@ function InternalLinks({ noteId }: { noteId: string }) {
         (result.value.length === 0 ? (
           <Text variant="body" mx={1}>
             {tabIndex === InternalLinksTabs.LINKED_NOTES
-              ? "This note does not link to other notes."
-              : "This note is not referenced in other notes."}
+              ? strings.notLinked()
+              : strings.notReferenced()}
           </Text>
         ) : (
           <VirtualizedList
@@ -597,7 +598,7 @@ function Notebooks({ noteId }: { noteId: string }) {
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
-    <Section title="Notebooks">
+    <Section title={strings.notebooks()}>
       <VirtualizedList
         mode="fixed"
         estimatedSize={50}
@@ -626,7 +627,7 @@ function Reminders({ noteId }: { noteId: string }) {
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
-    <Section title="Reminders">
+    <Section title={strings.dataTypesPluralCamelCase.reminder()}>
       <VirtualizedList
         mode="fixed"
         estimatedSize={54}
@@ -654,7 +655,7 @@ function Attachments({ noteId }: { noteId: string }) {
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
-    <Section title="Attachments">
+    <Section title={strings.dataTypesPluralCamelCase.attachment()}>
       <VirtualizedTable
         estimatedSize={30}
         getItemKey={(index) => result.value.key(index)}
@@ -688,8 +689,8 @@ function SessionHistory({ noteId }: { noteId: string }) {
 
   return (
     <Section
-      title="Previous Sessions"
-      subtitle={"Your session history is local only."}
+      title={strings.noteHistory()}
+      subtitle={strings.noteHistoryNotice[0]()}
     >
       <VirtualizedList
         mode="dynamic"

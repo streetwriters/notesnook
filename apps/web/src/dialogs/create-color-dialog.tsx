@@ -25,6 +25,7 @@ import tinycolor from "tinycolor2";
 import { db } from "../common/db";
 import { showToast } from "../utils/toast";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type CreateColorDialogProps = BaseDialogProps<string | false>;
 export const CreateColorDialog = DialogManager.register(
@@ -68,7 +69,7 @@ export const CreateColorDialog = DialogManager.register(
         >
           <Field
             required
-            label="Title"
+            label={strings.title()}
             id="title"
             name="title"
             autoFocus
@@ -78,7 +79,7 @@ export const CreateColorDialog = DialogManager.register(
             <Field
               inputRef={colorRef}
               required
-              label="Color"
+              label={strings.color()}
               id="color"
               name="color"
               data-test-id="color-input"

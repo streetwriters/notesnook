@@ -72,6 +72,7 @@ import { Notebook, Tag } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { Menu } from "../../hooks/use-menu";
 import { RenameColorDialog } from "../../dialogs/item-dialog";
+import { strings } from "@notesnook/intl";
 
 type Route = {
   id: string;
@@ -471,7 +472,7 @@ function NavigationMenu(props: NavigationMenuProps) {
             <NavigationItem
               id="login"
               isTablet={isTablet}
-              title="Login"
+              title={strings.login()}
               icon={Login}
               onClick={() => hardNavigate("/login")}
             />
@@ -480,7 +481,7 @@ function NavigationMenu(props: NavigationMenuProps) {
             <NavigationItem
               id="change-theme"
               isTablet={isTablet}
-              title={theme === "dark" ? "Light mode" : "Dark mode"}
+              title={theme === "dark" ? strings.light() : strings.dark()}
               icon={theme === "dark" ? LightMode : DarkMode}
               onClick={() => {
                 setFollowSystemTheme(false);
@@ -505,7 +506,7 @@ function NavigationMenu(props: NavigationMenuProps) {
             {isTablet ? null : (
               <Button
                 variant={"icon"}
-                title="Toggle dark/light mode"
+                title={strings.toggleDarkLightMode()}
                 sx={{ borderLeft: "1px solid var(--separator)" }}
                 onClick={() => {
                   setFollowSystemTheme(false);

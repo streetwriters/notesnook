@@ -25,6 +25,7 @@ import { useStore as useUserStore } from "../../../stores/user-store";
 import { ErrorText } from "../../../components/error-text";
 import { TaskManager } from "../../../common/task-manager";
 import { isServerCompatible } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 
 export const ServerIds = ["notesnook-sync", "auth", "sse"] as const;
 export type ServerId = (typeof ServerIds)[number];
@@ -44,23 +45,23 @@ const SERVERS: Server[] = [
   {
     id: "notesnook-sync",
     host: "API_HOST",
-    title: "Sync server",
+    title: strings.syncServer(),
     example: "http://localhost:4326",
-    description: "Server used to sync your notes & other data between devices."
+    description: strings.syncServerDesc()
   },
   {
     id: "auth",
     host: "AUTH_HOST",
-    title: "Auth server",
+    title: strings.authServer(),
     example: "http://localhost:5326",
-    description: "Server used for login/sign up and authentication."
+    description: strings.authServerDesc()
   },
   {
     id: "sse",
     host: "SSE_HOST",
-    title: "Events server",
+    title: strings.sseServer(),
     example: "http://localhost:7326",
-    description: "Server used to receive important notifications & events."
+    description: strings.sseServerDesc()
   }
 ];
 export function ServersConfiguration() {
@@ -74,7 +75,7 @@ export function ServersConfiguration() {
     <>
       {isLoggedIn ? (
         <ErrorText
-          error="You must log out in order to change/reset server URLs."
+          error={strings.logoutToChangeServerUrls()}
           sx={{ mb: 2, mt: 0 }}
         />
       ) : null}
@@ -111,7 +112,7 @@ export function ServersConfiguration() {
               borderRadius: "default"
             }}
           >
-            Connected to all servers successfully.
+            {strings.connectedToServer()}
           </Text>
         ) : null}
         <Flex sx={{ mt: 1, justifyContent: "end", gap: 1 }}>
@@ -123,9 +124,8 @@ export function ServersConfiguration() {
               useStore.getState().setServerUrls(urls);
               await TaskManager.startTask({
                 type: "modal",
-                title: "App will reload in 5 seconds",
-                subtitle:
-                  "Your changes have been saved and will be reflected after the app has refreshed.",
+                title: strings.appWillReloadIn(5),
+                subtitle: strings.changesReflectOnStart(),
                 action() {
                   return new Promise((resolve) => {
                     setTimeout(() => {
@@ -137,7 +137,7 @@ export function ServersConfiguration() {
               });
             }}
           >
-            Save
+            {strings.save()}
           </Button>
           <Button
             disabled={isLoggedIn}
@@ -148,21 +148,22 @@ export function ServersConfiguration() {
                 for (const host of HostIds) {
                   const url = urls[host];
                   const server = SERVERS.find((s) => s.host === host);
-                  if (!server)
-                    throw new Error(`Server with host ${host} not found.`);
-                  if (!url) throw new Error("All server urls are required.");
+                  if (!server) throw new Error(strings.serverNotFound(host));
+                  if (!url) throw new Error(strings.allServerUrlsRequired());
                   const version = await fetch(`${url}/version`)
                     .then((r) => r.json() as Promise<VersionResponse>)
                     .catch(() => undefined);
                   if (!version)
-                    throw new Error(`Could not connect to ${server.title}.`);
+                    throw new Error(
+                      `${strings.couldNotConnectTo()} ${server.title}.`
+                    );
                   if (version.id !== server.id)
                     throw new Error(
-                      `The URL you have given (${url}) does not point to the ${server.title}.`
+                      `${strings.incorrectServerUrl(url)} ${server.title}.`
                     );
                   if (!isServerCompatible(version.version))
                     throw new Error(
-                      `The ${server.title} at ${url} is not compatible with this client.`
+                      strings.serverVersionMismatch(server.title, url)
                     );
                 }
                 setSuccess(true);
@@ -171,7 +172,7 @@ export function ServersConfiguration() {
               }
             }}
           >
-            Test connection
+            {strings.testConnection()}
           </Button>
           <Button
             disabled={isLoggedIn}
@@ -181,9 +182,8 @@ export function ServersConfiguration() {
               useStore.getState().setServerUrls();
               await TaskManager.startTask({
                 type: "modal",
-                title: "App will reload in 5 seconds",
-                subtitle:
-                  "Your changes have been saved and will be reflected after the app has refreshed.",
+                title: strings.appWillReloadIn(5),
+                subtitle: strings.changesReflectOnStart(),
                 action() {
                   return new Promise((resolve) => {
                     setTimeout(() => {
@@ -195,7 +195,7 @@ export function ServersConfiguration() {
               });
             }}
           >
-            Reset
+            {strings.reset()}
           </Button>
         </Flex>
       </Flex>

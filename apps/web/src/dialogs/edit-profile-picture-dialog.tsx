@@ -28,6 +28,7 @@ import { db } from "../common/db";
 import { showToast } from "../utils/toast";
 import { useStore as useSettingStore } from "../stores/setting-store";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 export type EditProfilePictureDialogProps = BaseDialogProps<boolean> & {
   profile?: Profile;
@@ -129,8 +130,8 @@ export const EditProfilePictureDialog = DialogManager.register(
               }}
             >
               {profilePicture
-                ? "Change profile picture"
-                : "Select profile picture"}
+                ? strings.changeProfilePicture()
+                : strings.selectProfilePicture()}
             </Button>
             {profilePicture ? (
               <Button
@@ -144,7 +145,9 @@ export const EditProfilePictureDialog = DialogManager.register(
                   setScale(1);
                 }}
               >
-                {typeof profilePicture === "string" ? "Clear" : "Reset"}
+                {typeof profilePicture === "string"
+                  ? strings.clear()
+                  : strings.reset()}
               </Button>
             ) : null}
           </Flex>
