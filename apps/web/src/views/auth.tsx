@@ -42,6 +42,7 @@ import { ErrorText } from "../components/error-text";
 import { AuthenticatorType, User } from "@notesnook/core";
 import { showLogoutConfirmation } from "../dialogs/confirm";
 import { TaskManager } from "../common/task-manager";
+import { strings } from "@notesnook/intl";
 
 type EmailFormData = {
   email: string;
@@ -211,17 +212,17 @@ function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
   return (
     <AuthForm
       type="login:email"
-      title="Welcome back!"
+      title={strings.welcomeBack()}
       canSkip
       subtitle={
         <SubtitleWithAction
-          text="Don't have an account?"
-          action={{ text: "Sign up", onClick: () => navigate("signup") }}
+          text={strings.dontHaveAccount()}
+          action={{ text: strings.signUp(), onClick: () => navigate("signup") }}
         />
       }
       loading={{
-        title: "Verifying your email",
-        subtitle: "Please wait while you are authenticated."
+        title: strings.verifyingEmail(),
+        subtitle: strings.authWait()
       }}
       onSubmit={async (form) => {
         const { primaryMethod, phoneNumber, secondaryMethod } =
@@ -246,10 +247,7 @@ function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
             >
               <Warn size={16} color="icon-error" />
               <Text variant="body" ml={1}>
-                You are logging into the beta version of Notesnook. Switching
-                between beta &amp; stable versions can cause weird issues
-                including data loss. It is recommended that you do not use both
-                simultaneously.
+                {strings.betaLoginNotice()}
               </Text>
             </Flex>
           ) : null}
@@ -257,11 +255,11 @@ function LoginEmail(props: BaseAuthComponentProps<"login:email">) {
             id="email"
             type="email"
             autoComplete="email"
-            label="Enter email"
+            label={strings.enterEmailAddress()}
             autoFocus
             defaultValue={form?.email}
           />
-          <SubmitButton text="Continue" />
+          <SubmitButton text={strings.continue()} />
         </>
       )}
     </AuthForm>
@@ -279,12 +277,12 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
   return (
     <AuthForm
       type="login:password"
-      title="Your account password"
-      subtitle={"Your password is always hashed before leaving this device."}
+      title={strings.accountPassword()}
+      subtitle={strings.accountPassDesc()}
       loadForever
       loading={{
-        title: "Logging you in",
-        subtitle: "Please wait while you are authenticated."
+        title: strings.loggingIn(),
+        subtitle: strings.authWait()
       }}
       onSubmit={async (form) => {
         await userstore.login(
@@ -305,7 +303,7 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
             id="password"
             type="password"
             autoComplete="current-password"
-            label="Enter password"
+            label={strings.enterPassword()}
             autoFocus
             defaultValue={form?.password}
           />
@@ -317,9 +315,9 @@ function LoginPassword(props: BaseAuthComponentProps<"login:password">) {
             onClick={() => navigate("recover", { email: formData.email })}
             sx={{ color: "paragraph", alignSelf: "end" }}
           >
-            Forgot password?
+            {strings.forgotPassword()}
           </Button>
-          <SubmitButton text="Login to your account" />
+          <SubmitButton text={strings.loginToYourAccount()} />
         </>
       )}
     </AuthForm>
@@ -332,21 +330,24 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
   return (
     <AuthForm
       type="signup"
-      title="Create an account"
+      title={strings.createAccount()}
       canSkip
       subtitle={
         <SubtitleWithAction
-          text="Already have an account?"
-          action={{ text: "Log in", onClick: () => navigate("login:email") }}
+          text={strings.alreadyHaveAccount()}
+          action={{
+            text: strings.login(),
+            onClick: () => navigate("login:email")
+          }}
         />
       }
       loading={{
-        title: "Creating your account",
-        subtitle: "Please wait while we finalize your account."
+        title: strings.creatingAccount(),
+        subtitle: strings.creatingAccountDesc()
       }}
       onSubmit={async (form) => {
         if (form.password !== form["confirm-password"]) {
-          throw new Error("Passwords do not match.");
+          throw new Error(strings.passwordNotMatched());
         }
 
         await userstore.signup(form);
@@ -359,7 +360,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
             id="email"
             type="email"
             autoComplete="email"
-            label="Enter email"
+            label={strings.enterEmailAddress()}
             autoFocus
             defaultValue={form?.email}
           />
@@ -367,41 +368,40 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
             id="password"
             type="password"
             autoComplete="new-password"
-            label="Set password"
+            label={strings.newPassword()}
             defaultValue={form?.password}
           />
           <AuthField
             id="confirm-password"
             type="password"
             autoComplete="new-password"
-            label="Confirm password"
+            label={strings.confirmPassword()}
             defaultValue={form?.["confirm-password"]}
           />
-          <SubmitButton text="Create account" />
+          <SubmitButton text={strings.createAccount()} />
           <Text
             mt={4}
             variant="subBody"
             sx={{ fontSize: 13, textAlign: "center" }}
           >
-            By pressing {`"Create account" button, you agree to our`}{" "}
+            {strings.signupAgreement[0]()}{" "}
             <Link
               target="_blank"
               rel="noreferrer"
               href="https://notesnook.com/tos"
               sx={{ color: "accent" }}
             >
-              Terms of Service
+              {strings.signupAgreement[1]()}
             </Link>{" "}
-            &amp;{" "}
+            {strings.signupAgreement[2]()}{" "}
             <Link
               rel="noreferrer"
               href="https://notesnook.com/privacy"
               sx={{ color: "accent" }}
             >
-              Privacy Policy
+              {strings.signupAgreement[3]()}
             </Link>
-            . You also agree to receiving marketing emails from us which you can
-            opt-out of from the app settings.
+            . {strings.signupAgreement[4]()}
           </Text>
         </>
       )}
@@ -428,21 +428,17 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
   return (
     <AuthForm
       type="sessionExpiry"
-      title="Your session has expired"
+      title={strings.sessionExpired()}
       subtitle={
         <Flex bg="shade" p={1} sx={{ borderRadius: "default" }}>
           <Text as="span" sx={{ fontSize: "body", color: "accent" }}>
-            <b>
-              All your local changes are safe and will be synced after you
-              login.
-            </b>{" "}
-            Please enter your password to continue.
+            {strings.sessionExpiredDesc(user?.email as string)}
           </Text>
         </Flex>
       }
       loading={{
-        title: "Logging you in",
-        subtitle: "Please wait while you are authenticated."
+        title: strings.loggingIn(),
+        subtitle: strings.pleaseWaitLogin()
       }}
       onSubmit={async () => {
         if (!user) return;
@@ -463,7 +459,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         id="email"
         type="email"
         autoComplete={"false"}
-        label="Enter email"
+        label={strings.enterEmailAddress()}
         placeholder={user ? maskEmail(user.email) : undefined}
         autoFocus
         disabled
@@ -476,9 +472,9 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         onClick={() => user && navigate("recover", { email: user.email })}
         sx={{ color: "paragraph", alignSelf: "end" }}
       >
-        Forgot password?
+        {strings.forgotPassword()}
       </Button>
-      <SubmitButton text="Relogin to your account" />
+      <SubmitButton text={strings.reloginToYourAccount()} />
       <Button
         type="button"
         variant="anchor"
@@ -494,15 +490,15 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
           if (await showLogoutConfirmation()) {
             await TaskManager.startTask({
               type: "modal",
-              title: "You are being logged out",
+              title: strings.loggingOut(),
               action: () => db.user.logout(true),
-              subtitle: "Please wait..."
+              subtitle: strings.loggingOutDesc()
             });
             openURL("/login");
           }
         }}
       >
-        Logout permanently
+        {strings.logout()}
       </Button>
     </AuthForm>
   );
@@ -515,16 +511,19 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
   return (
     <AuthForm
       type="recover"
-      title="Recover your account"
+      title={strings.accountRecovery()}
       subtitle={
         <SubtitleWithAction
-          text="Remembered your password?"
-          action={{ text: "Log in", onClick: () => navigate("login:email") }}
+          text={strings.rememberedYourPassword()}
+          action={{
+            text: strings.login(),
+            onClick: () => navigate("login:email")
+          }}
         />
       }
       loading={{
-        title: "Sending recovery email",
-        subtitle: "Please wait while we send you recovery instructions."
+        title: strings.sendingRecoveryEmail(),
+        subtitle: strings.sendingRecoveryEmailDesc()
       }}
       onSubmit={async (form) => {
         if (!form.email) {
@@ -538,9 +537,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
           window.open(url, "_self");
           return;
         }
-        setSuccess(
-          `Recovery email sent. Please check your inbox (and spam folder) for further instructions.`
-        );
+        setSuccess(strings.recoveryEmailSentDesc());
       }}
     >
       {success ? (
@@ -551,7 +548,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
               {success}
             </Text>
           </Flex>
-          <SubmitButton text="Send again" />
+          <SubmitButton text={strings.confirmEmail()} />
         </>
       ) : (
         <>
@@ -559,12 +556,12 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
             id="email"
             type="email"
             autoComplete={"email"}
-            label="Enter your account email"
-            helpText="You will receive instructions on how to recover your account on this email"
+            label={strings.enterEmailAddress()}
+            helpText={strings.accountRecoverHelpText()}
             defaultValue={formData ? formData.email : ""}
             autoFocus
           />
-          <SubmitButton text="Send recovery email" />
+          <SubmitButton text={strings.sendRecoveryEmail()} />
         </>
       )}
     </AuthForm>
@@ -656,14 +653,14 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
   return (
     <AuthForm
       type="mfa:code"
-      title="Two-factor authentication"
+      title={strings["2fa"]()}
       subtitle={texts.subtitle}
       loading={{
-        title: "Verifying 2FA code",
-        subtitle: "Please wait while you are authenticated."
+        title: strings.verifying2faCode(),
+        subtitle: strings.authWait()
       }}
       onSubmit={async (form) => {
-        if (!form.code) throw new Error("2FA code is required.");
+        if (!form.code) throw new Error(strings.coreRequired());
 
         const loginForm: MFALoginFormData = {
           code: form.code,
@@ -695,9 +692,9 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                     {isSending ? (
                       <Loading size={18} />
                     ) : enabled ? (
-                      `Resend code`
+                      strings.resendCode()
                     ) : (
-                      `Resend in ${elapsed}`
+                      strings.resendCode(elapsed)
                     )}
                   </Text>
                 ),
@@ -708,7 +705,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
             : undefined
         }
       />
-      <SubmitButton text="Submit" />
+      <SubmitButton text={strings.submit()} />
       <Button
         type="button"
         mt={4}
@@ -755,11 +752,11 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
   return (
     <AuthForm
       type="mfa:select"
-      title="Select two-factor authentication method"
-      subtitle={`Where should we send you the authentication code?`}
+      title={strings.select2faMethod()}
+      subtitle={strings.select2faCodeHelpText()}
       loading={{
-        title: "Logging you in",
-        subtitle: "Please wait while you are authenticated."
+        title: strings.loggingIn(),
+        subtitle: strings.authWait()
       }}
       onSubmit={async () => {
         const selectedType = MFAMethods[selected];
@@ -907,7 +904,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
             openURL("/notes/");
           }}
         >
-          Skip & go directly to the app
+          {strings.skipAndGoToApp()}
         </Button>
       )}
 

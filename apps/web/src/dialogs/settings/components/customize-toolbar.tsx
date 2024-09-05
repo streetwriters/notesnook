@@ -64,6 +64,7 @@ import { Pro } from "../../../components/icons";
 
 import { Icon } from "@notesnook/ui";
 import { CURRENT_TOOLBAR_VERSION } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 export function CustomizeToolbar() {
   const sensors = useSensors(
@@ -158,10 +159,10 @@ export function CustomizeToolbar() {
               alignItems: "center",
               p: 1
             }}
-            title="Add group"
+            title={strings.createAGroup()}
             onClick={() => {
               setItems(addGroup);
-              showToast("success", "Group added successfully");
+              showToast("success", strings.groupAdded());
             }}
           >
             <Icon path={Icons.plus} color="paragraph" size={18} />

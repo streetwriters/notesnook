@@ -29,6 +29,7 @@ import { Loading } from "../../../components/icons";
 import { Features } from "../../buy-dialog/features";
 import { ConfirmDialog } from "../../confirm";
 import { BuyDialog } from "../../buy-dialog";
+import { strings } from "@notesnook/intl";
 
 const PROVIDER_MAP = {
   0: "Streetwriters",
@@ -108,7 +109,7 @@ export function SubscriptionStatus() {
             color: "accent"
           }}
         >
-          CURRENT PLAN
+          {strings.currentPlan()}
         </Text>
         <Text
           variant="heading"
@@ -164,7 +165,7 @@ export function SubscriptionStatus() {
                     }
                   }}
                 >
-                  Cancel subscription
+                  {strings.cancelSub()}
                 </Button>
               )}
               <Button
@@ -201,7 +202,7 @@ export function SubscriptionStatus() {
           {!isPro && (
             <>
               <Button variant="accent" onClick={() => BuyDialog.show({})}>
-                {isProCancelled ? "Resubscribe" : "Upgrade to Pro"}
+                {isProCancelled ? strings.resubToPro() : strings.upgradeToPro()}
               </Button>
               {isBasic && (
                 <Button
@@ -212,7 +213,7 @@ export function SubscriptionStatus() {
                   {isActivatingTrial ? (
                     <Loading size={16} />
                   ) : (
-                    "Try free for 14 days"
+                    strings.tryFreeFor14Days()
                   )}
                 </Button>
               )}

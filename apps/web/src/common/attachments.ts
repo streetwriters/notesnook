@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { lazify } from "../utils/lazify";
 import { logger } from "../utils/logger";
 import { showToast } from "../utils/toast";
@@ -62,7 +63,9 @@ export async function saveAttachment(hash: string) {
     console.error(e);
     showToast(
       "error",
-      `Failed to download attachment: ${hash} (error: ${(e as Error).message})`
+      `${strings.attachmentsDownloadFailed(1)}: ${hash} (error: ${
+        (e as Error).message
+      })`
     );
   }
 }
@@ -106,7 +109,9 @@ export async function downloadAttachment<
     console.error(e);
     showToast(
       "error",
-      `Failed to download attachment: ${hash} (error: ${(e as Error).message})`
+      `${strings.attachmentsDownloadFailed(1)}: ${hash} (error: ${
+        (e as Error).message
+      })`
     );
   }
 }

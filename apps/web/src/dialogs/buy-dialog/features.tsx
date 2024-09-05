@@ -68,6 +68,7 @@ import {
   CustomToolbar,
   SyncOff
 } from "../../components/icons";
+import { strings } from "@notesnook/intl";
 
 type Feature = {
   id: string;
@@ -458,7 +459,7 @@ export function Features() {
               >
                 <Pro color="accent" size={16} />
                 <Text variant="body" ml={"2px"} sx={{ color: "accent" }}>
-                  Pro
+                  {strings.pro()}
                 </Text>
               </Flex>
             )}
@@ -499,7 +500,7 @@ export function Features() {
                           ml={"2px"}
                           sx={{ color: "accent" }}
                         >
-                          Pro
+                          {strings.pro()}
                         </Text>
                       </Flex>
                     )}

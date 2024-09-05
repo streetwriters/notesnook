@@ -93,6 +93,7 @@ import { CreateColorDialog } from "../../dialogs/create-color-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { MoveNoteDialog } from "../../dialogs/move-note-dialog";
 import { AddReminderDialog } from "../../dialogs/add-reminder-dialog";
+import { strings } from "@notesnook/intl";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -218,7 +219,7 @@ function Note(props: NoteProps) {
               ) : null}
 
               {attachments?.failed ? (
-                <Flex title={`Errors in ${attachments.failed} attachments.`}>
+                <Flex title={strings.errorsInAttachments(attachments.failed)}>
                   <AttachmentError size={13} color="var(--icon-error)" />
                   <Text ml={"2px"}>{attachments.failed}</Text>
                 </Flex>
@@ -242,10 +243,11 @@ function Note(props: NoteProps) {
                     data-test-id={`tag-item`}
                     key={tag.id}
                     variant="anchor"
-                    title={`Go to #${tag.title}`}
+                    title={`${strings.goTo()} #${tag.title}`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (!tag.id) return showToast("error", "Tag not found.");
+                      if (!tag.id)
+                        return showToast("error", strings.tagNotFound());
                       navigate(`/tags/${tag.id}`);
                     }}
                     sx={{

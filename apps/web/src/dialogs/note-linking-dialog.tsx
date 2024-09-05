@@ -35,6 +35,7 @@ import { NoteResolvedData, ResolvedItem } from "@notesnook/common";
 import { Lock } from "../components/icons";
 import { ellipsize } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 export type NoteLinkingDialogProps = BaseDialogProps<LinkAttributes | false> & {
   attributes?: LinkAttributes;
@@ -82,7 +83,7 @@ export const NoteLinkingDialog = DialogManager.register(
             <>
               <Field
                 autoFocus
-                placeholder="Type # to only search headings"
+                placeholder={strings.searchSectionToLinkPlaceholder()}
                 sx={{ mx: 0 }}
                 onChange={async (e) => {
                   const query = e.target.value.trim().toLowerCase();
@@ -113,15 +114,16 @@ export const NoteLinkingDialog = DialogManager.register(
                   setBlocks([]);
                 }}
               >
-                Selected note: {selectedNote.title} (click to deselect)
+                {strings.linkNoteSelectedNote()}: {selectedNote.title} (
+                {strings.clickToDeselect()})
               </Button>
               {isNoteLocked ? (
                 <Text variant="body" sx={{ mt: 1 }}>
-                  Linking to a specific block is not available for locked notes.
+                  {strings.noteLockedBlockLink()}
                 </Text>
               ) : blocks.length <= 0 ? (
                 <Text variant="body" sx={{ mt: 1 }}>
-                  There are no blocks in this note.
+                  {strings.noBlocksOnNote()}
                 </Text>
               ) : null}
               <ScrollContainer>
@@ -158,7 +160,7 @@ export const NoteLinkingDialog = DialogManager.register(
                         sx={{ fontFamily: "monospace", whiteSpace: "pre-wrap" }}
                       >
                         {ellipsize(item.content, 200, "end").trim() ||
-                          "(empty block)"}
+                          strings.linkNoteEmptyBlock()}
                       </Text>
                       <Text
                         variant="subBody"
@@ -182,7 +184,7 @@ export const NoteLinkingDialog = DialogManager.register(
             <>
               <Field
                 autoFocus
-                placeholder="Search for a note to link to..."
+                placeholder={strings.searchNoteToLinkPlaceholder()}
                 sx={{ mx: 0 }}
                 onChange={async (e) => {
                   const query = e.target.value.trim();

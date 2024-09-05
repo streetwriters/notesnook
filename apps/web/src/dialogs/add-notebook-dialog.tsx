@@ -27,6 +27,7 @@ import { store as notebookStore } from "../stores/notebook-store";
 import { store as appStore } from "../stores/app-store";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type AddNotebookDialogProps = BaseDialogProps<boolean> & {
   parentId?: string;
@@ -92,7 +93,7 @@ export const AddNotebookDialog = DialogManager.register(
           data-test-id="title-input"
           autoFocus
           required
-          label="Title"
+          label={strings.title()}
           name="title"
           id="title"
           onChange={(e) => (title.current = e.target.value)}
@@ -104,12 +105,12 @@ export const AddNotebookDialog = DialogManager.register(
         />
         <Field
           data-test-id="description-input"
-          label="Description"
+          label={strings.description()}
           name="description"
           id="description"
           onChange={(e) => (description.current = e.target.value)}
           defaultValue={description.current}
-          helpText="Optional"
+          helpText={strings.optional()}
           sx={{ mt: 1 }}
         />
       </Dialog>

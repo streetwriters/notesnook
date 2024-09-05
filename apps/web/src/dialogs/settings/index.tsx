@@ -76,6 +76,7 @@ import { ScopedThemeProvider } from "../../components/theme-provider";
 import { AppLockSettings } from "./app-lock-settings";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { ServersSettings } from "./servers-settings";
+import { strings } from "@notesnook/intl";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -269,7 +270,7 @@ function SettingsSideBar(props: SettingsSideBarProps) {
           <Input
             id="search"
             name="search"
-            placeholder="Search"
+            placeholder={strings.search()}
             data-test-id="settings-search"
             sx={{
               m: 2,

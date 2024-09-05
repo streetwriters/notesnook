@@ -23,15 +23,7 @@ import Config from "../../utils/config";
 import { getDownloadLink, getPlatform } from "../../utils/platform";
 import DropdownButton from "../dropdown-button";
 import { BaseThemeProvider } from "../theme-provider";
-
-const nativeFeatures = [
-  "Native high-performance encryption",
-  "Automatic backups",
-  "Pin notes in notifications drawer",
-  "Share & append to notes from anywhere",
-  "Quick note widgets",
-  "App lock"
-];
+import { strings } from "@notesnook/intl";
 
 const platform = getPlatform();
 const isMobile = platform === "Android" || platform === "iOS";
@@ -67,10 +59,8 @@ export default function InstallNotice({ onClose }) {
       }}
       p={2}
     >
-      <Text variant={"title"}>Install Notesnook</Text>
-      <Text variant={"body"}>
-        For a more integrated user experience, try out Notesnook for {platform}.
-      </Text>
+      <Text variant={"title"}>{strings.installNotesnook()}</Text>
+      <Text variant={"body"}>{strings.installNotesnookDesc(platform)}.</Text>
       {isMobile && (
         <Box
           sx={{
@@ -81,7 +71,7 @@ export default function InstallNotice({ onClose }) {
             mt: 1
           }}
         >
-          {nativeFeatures.map((feature) => (
+          {strings.nativeFeatures().map((feature) => (
             <Flex
               key={feature}
               p={1}
@@ -109,7 +99,7 @@ export default function InstallNotice({ onClose }) {
           }}
           sx={{ alignSelf: "start" }}
         >
-          {`Don't show again`}
+          {strings.dontShowAgain()}
         </Button>
       </Flex>
     </Flex>

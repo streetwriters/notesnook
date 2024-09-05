@@ -39,6 +39,7 @@ import { checkForUpdate, installUpdate } from "../../utils/updater";
 import { getTimeAgo, toTitleCase } from "@notesnook/common";
 import { User } from "@notesnook/core";
 import { showUpdateAvailableNotice } from "../../dialogs/confirm";
+import { strings } from "@notesnook/intl";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -84,7 +85,7 @@ function StatusBar() {
                 >
                   <Circle size={7} color={"var(--icon-error)"} />
                   <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-                    Email not confirmed
+                    {strings.emailNotConfirmed()}
                   </Text>
                 </Button>
               )}
@@ -104,7 +105,7 @@ function StatusBar() {
             >
               <Circle size={7} color="var(--icon-error)" />
               <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-                Not logged in
+                {strings.notLoggedIn()}
               </Text>
             </Button>
           ) : null}
@@ -171,13 +172,15 @@ export default StatusBar;
 function statusToInfoText(status: UpdateStatus) {
   const { type } = status;
   return type === "checking"
-    ? "Checking for updates..."
+    ? strings.checkingForUpdates()
     : type === "downloading"
-    ? `${Math.round(status.progress)}% updating...`
+    ? `${Math.round(status.progress)}% ${strings.updating()}...`
     : type === "completed"
-    ? `v${status.version} downloaded (restart required)`
+    ? `v${
+        status.version
+      } ${strings.network.downloaded()} (${strings.restartRequired()})`
     : type === "available"
-    ? `v${status.version} available`
+    ? `v${status.version} ${strings.available()}`
     : "";
 }
 

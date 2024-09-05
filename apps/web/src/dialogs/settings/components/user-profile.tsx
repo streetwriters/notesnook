@@ -30,6 +30,7 @@ import { db } from "../../../common/db";
 import { showToast } from "../../../utils/toast";
 import { EditProfilePictureDialog } from "../../edit-profile-picture-dialog";
 import { PromptDialog } from "../../prompt";
+import { strings } from "@notesnook/intl";
 
 export function UserProfile() {
   const user = useUserStore((store) => store.user);
@@ -81,10 +82,8 @@ export function UserProfile() {
           <User size={30} />
         </Flex>
         <Flex sx={{ flexDirection: "column" }}>
-          <Text variant={"title"}>You are not logged in</Text>
-          <Text variant={"subBody"}>
-            Login or create an account to sync your notes.
-          </Text>
+          <Text variant={"title"}>{strings.loginMessage()}</Text>
+          <Text variant={"subBody"}>{strings.loginMessageActionText()}</Text>
         </Flex>
       </Flex>
     );
@@ -138,13 +137,13 @@ export function UserProfile() {
               visibility: "collapse",
               cursor: "pointer"
             }}
-            title="Edit profile picture"
+            title={strings.editProfilePicture()}
             onClick={async () => {
               await EditProfilePictureDialog.show({ profile });
             }}
           >
             <Text variant="body" sx={{ color: "white" }}>
-              Edit
+              {strings.edit()}
             </Text>
           </Flex>
         </Flex>
@@ -165,16 +164,15 @@ export function UserProfile() {
           </Text>
 
           <Text variant={"title"}>
-            {profile?.fullName || "Your full name"}{" "}
+            {profile?.fullName || strings.yourFullName()}{" "}
             <Edit
               sx={{ display: "inline-block", cursor: "pointer" }}
               size={12}
-              title="Edit full name"
+              title={strings.editFullName()}
               onClick={async () => {
                 const fullName = await PromptDialog.show({
-                  title: "Edit your full name",
-                  description:
-                    "Your profile data is 100% end-to-end encrypted.",
+                  title: strings.editFullName(),
+                  description: strings.setFullNameDesc(),
                   defaultValue: profile?.fullName
                 });
                 try {
@@ -190,7 +188,7 @@ export function UserProfile() {
             />
           </Text>
           <Text variant={"subBody"}>
-            {user.email} • Member since{" "}
+            {user.email} • {strings.memberSince()}{" "}
             {getFormattedDate(getObjectIdTimestamp(user.id), "date")}
           </Text>
         </Flex>

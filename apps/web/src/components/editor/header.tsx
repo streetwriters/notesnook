@@ -30,6 +30,7 @@ import { useMenuTrigger } from "../../hooks/use-menu";
 import { MenuItem } from "@notesnook/ui";
 import { navigate } from "../../navigation";
 import { Tag } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 
 type HeaderProps = { readonly: boolean; id: string };
 function Header(props: HeaderProps) {
@@ -194,7 +195,7 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
         fontSize: "body",
         alignSelf: "flex-start"
       }}
-      placeholder="Add a tag..."
+      placeholder={strings.addATag()}
       data-test-id="editor-tag-input"
       onFocus={async () => {
         const text = getInputValue();

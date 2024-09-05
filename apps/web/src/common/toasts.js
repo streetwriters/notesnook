@@ -21,10 +21,10 @@ import { db } from "./db";
 import { store as notestore } from "../stores/note-store";
 import { store as nbstore } from "../stores/notebook-store";
 import { showToast } from "../utils/toast";
+import { strings } from "@notesnook/intl";
 
 async function showUnpinnedToast(itemId, itemType) {
-  const noun = itemType === "note" ? "Note" : "Notebook";
-  const messageText = `${noun} unpinned successfully!`;
+  const messageText = strings.action(itemType, 1, "unpinned");
   const undoAction = async () => {
     toast.hide();
     if (itemType === "note") await notestore.pin(itemId);
@@ -35,8 +35,7 @@ async function showUnpinnedToast(itemId, itemType) {
 }
 
 function showItemDeletedToast(item) {
-  const noun = item.type === "note" ? "Note" : "Notebook";
-  const messageText = `${noun} deleted successfully!`;
+  const messageText = strings.action(item.type, 1, "deleted");
   const undoAction = async () => {
     toast.hide();
     let trashItem = db.trash.all.find((i) => i.id === item.id);
@@ -57,7 +56,7 @@ async function showUndoableToast(message, onAction, onPermanentAction, onUndo) {
     toast.hide();
     onUndo();
   };
-  let actions = [{ text: "Undo", onClick: undoAction }];
+  let actions = [{ text: strings.undo(), onClick: undoAction }];
   var toast = showToast("success", message, actions);
 }
 

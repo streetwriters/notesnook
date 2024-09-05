@@ -26,6 +26,7 @@ import { TaskManager } from "../common/task-manager";
 import Dialog from "../components/dialog";
 import { ErrorText } from "../components/error-text";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type MigrationProgressEvent = {
   collection: string;
@@ -102,9 +103,9 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
           }}
         />
         <Text as="p" variant={"subBody"} sx={{ mt: 2 }}>
-          If this continues to happen, please reach out to us via{" "}
-          <a href="https://discord.com/invite/zQBK97EE22">Discord</a> or email
-          us at{" "}
+          {strings.migrationErrorNotice()[0]}{" "}
+          <a href="https://discord.com/invite/zQBK97EE22">Discord</a>{" "}
+          {strings.migrationErrorNotice()[1]}{" "}
           <a href="mailto:support@streetwriters.co">support@streetwriters.co</a>
         </Text>
       </Dialog>

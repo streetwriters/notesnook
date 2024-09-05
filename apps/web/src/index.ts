@@ -25,13 +25,14 @@ import { getServiceWorkerVersion } from "./utils/version";
 import { register as registerStreamSaver } from "./utils/stream-saver/mitm";
 import { ThemeDark, ThemeLight, themeToCSS } from "@notesnook/theme";
 import Config from "./utils/config";
-import Intl from "@notesnook/intl";
+import { $en, setI18nGlobal, $de } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 i18n.load({
-  en: Intl.$en
+  en: $en,
+  de: $de
 });
-i18n.activate("en");
-Intl.setI18nGlobal(i18n);
+i18n.activate("de");
+setI18nGlobal(i18n);
 
 const colorScheme = JSON.parse(
   window.localStorage.getItem("colorScheme") || '"light"'

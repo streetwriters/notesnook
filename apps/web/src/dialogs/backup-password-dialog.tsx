@@ -22,6 +22,7 @@ import Field from "../components/field";
 import Dialog from "../components/dialog";
 import { Box, Button, Text } from "@theme-ui/components";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 export type BackupPasswordDialogProps = BaseDialogProps<boolean> & {
   validate: (outputs: {
@@ -88,7 +89,7 @@ export const BackupPasswordDialog = DialogManager.register(
               required
               autoFocus
               data-test-id="encryption-key"
-              label="Encryption key"
+              label={strings.encryptionKey()}
               type="password"
               id="key"
               name="key"
@@ -98,7 +99,7 @@ export const BackupPasswordDialog = DialogManager.register(
               required
               autoFocus
               data-test-id="password"
-              label="Password"
+              label={strings.password()}
               type="password"
               autoComplete="current-password"
               id="password"
@@ -107,9 +108,7 @@ export const BackupPasswordDialog = DialogManager.register(
           )}
         </Box>
         <Button variant="anchor" onClick={() => setIsEncryptionKey((s) => !s)}>
-          {isEncryptionKey
-            ? "Don't have encryption key? Use password."
-            : "Forgot password? Use encryption key."}
+          {strings.useEncryptionKey()}
         </Button>
 
         {error && (

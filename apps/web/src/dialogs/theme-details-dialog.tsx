@@ -23,6 +23,7 @@ import { ThemePreview } from "../components/theme-preview";
 import { Flex, Link, Text } from "@theme-ui/components";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 export type ThemeDetailsDialogProps = BaseDialogProps<boolean> & {
   theme: ThemeMetadata;
@@ -65,11 +66,11 @@ export const ThemeDetailsDialog = DialogManager.register(
           </Text>
           {theme.totalInstalls && theme.totalInstalls > 0 ? (
             <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
-              {theme.totalInstalls} installs
+              {theme.totalInstalls} {strings.installs()}
             </Text>
           ) : null}
           <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
-            Licensed under {theme.license}
+            {strings.licenseUnder()} {theme.license}
           </Text>
           <Flex sx={{ gap: 1, mt: 1 }}>
             {theme.homepage && (

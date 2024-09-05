@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, Button, Text, FlexProps } from "@theme-ui/components";
 import { getFormattedDate } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 type ContentToggle = {
   isSelected: boolean;
@@ -54,7 +55,7 @@ function ContentToggle(props: ContentToggle) {
               p={1}
               px={2}
             >
-              Save copy
+              {strings.saveACopy()}
             </Button>
           )}
           <Button
@@ -69,7 +70,11 @@ function ContentToggle(props: ContentToggle) {
             p={1}
             px={2}
           >
-            {isSelected ? "Undo" : isOtherSelected ? "Discard" : "Keep"}
+            {isSelected
+              ? strings.undo()
+              : isOtherSelected
+              ? strings.discard()
+              : strings.keep()}
           </Button>
         </Flex>
       )}

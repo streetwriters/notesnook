@@ -45,6 +45,7 @@ import { handleDrop } from "../../common/drop-handler";
 import { useDragHandler } from "../../hooks/use-drag-handler";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { strings } from "@notesnook/intl";
 
 type NotebookProps = {
   item: NotebookType;
@@ -95,7 +96,7 @@ function Notebook(props: NotebookProps) {
         <>
           {compact ? (
             <>
-              <Text variant="subBody">{pluralize(totalNotes, "note")}</Text>
+              <Text variant="subBody">{strings.notes(totalNotes)}</Text>
             </>
           ) : (
             <>
@@ -130,7 +131,7 @@ function Notebook(props: NotebookProps) {
                   •
                 </Text>
                 <Text sx={{ color: "inherit" }}>
-                  {pluralize(totalNotes, "note")}
+                  {strings.notes(totalNotes)}
                 </Text>
               </Flex>
             </>

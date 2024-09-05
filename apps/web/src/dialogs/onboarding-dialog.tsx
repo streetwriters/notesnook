@@ -47,6 +47,7 @@ import { isMacStoreApp } from "../utils/platform";
 import { ErrorText } from "../components/error-text";
 import { BuyDialog } from "./buy-dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type Step = {
   title: string;
@@ -240,7 +241,7 @@ function JoinCause({ onNext }: { onNext: () => void }) {
           onNext();
         }}
       >
-        Join the community
+        {strings.joinDiscord()}
       </Button>
       <Button
         variant={"anchor"}
@@ -248,7 +249,7 @@ function JoinCause({ onNext }: { onNext: () => void }) {
         onClick={() => onNext()}
         sx={{ color: "var(--paragraph-secondary)" }}
       >
-        Skip for now
+        {strings.skip()}
       </Button>
     </Flex>
   );
@@ -295,7 +296,7 @@ function Importer({ onClose }: { onClose: () => void }) {
           onClose();
         }}
       >
-        Start importing now
+        {strings.startImportingNow()}
       </Button>
       <Button
         variant={"anchor"}
@@ -303,7 +304,7 @@ function Importer({ onClose }: { onClose: () => void }) {
         onClick={() => onClose()}
         sx={{ color: "var(--paragraph-secondary)" }}
       >
-        Skip for now
+        {strings.skip()}
       </Button>
     </Flex>
   );
@@ -478,7 +479,7 @@ function TrialOffer({ onClose }: { onClose: () => void }) {
             BuyDialog.show({ plan: "monthly", couponCode: "TRIAL2PRO" });
           }}
         >
-          Upgrade now
+          {strings.upgradeToPro()}
         </Button>
         <Button
           variant={"secondary"}
@@ -489,7 +490,7 @@ function TrialOffer({ onClose }: { onClose: () => void }) {
               const result = await TaskManager.startTask({
                 type: "status",
                 id: "trialActivation",
-                title: "Activating trial",
+                title: strings.activatingTrial(),
                 action: () => db.user.activateTrial()
               });
               if (result) onClose();
@@ -504,7 +505,7 @@ function TrialOffer({ onClose }: { onClose: () => void }) {
             }
           }}
         >
-          {loading ? <Loading size={16} /> : "Try free for 14 days"}
+          {loading ? <Loading size={16} /> : strings.tryFreeFor14Days()}
         </Button>
       </Flex>
       <Button
@@ -513,7 +514,7 @@ function TrialOffer({ onClose }: { onClose: () => void }) {
         onClick={() => onClose()}
         sx={{ color: "var(--paragraph-secondary)" }}
       >
-        Skip for now
+        {strings.skip()}
       </Button>
     </Flex>
   );

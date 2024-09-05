@@ -24,6 +24,7 @@ import { useStore as useAnnouncementStore } from "../../stores/announcement-stor
 import Notice from "../notice";
 
 import { alpha } from "@theme-ui/color";
+import { strings } from "@notesnook/intl";
 
 function Announcements() {
   const announcements = useAnnouncementStore(
@@ -56,7 +57,7 @@ function Announcements() {
           cursor: "pointer",
           alignSelf: "end"
         }}
-        title="Dismiss announcement"
+        title={strings.dismissAnnouncement()}
         onClick={() => {
           dismiss(announcement.id);
         }}

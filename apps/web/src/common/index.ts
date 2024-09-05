@@ -45,6 +45,7 @@ import { Cipher, SerializedKey } from "@notesnook/crypto";
 import { ChunkedStream } from "../utils/streams/chunked-stream";
 import { isFeatureSupported } from "../utils/feature-check";
 import { NNCrypto } from "../interfaces/nncrypto";
+import { strings } from "@notesnook/intl";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -94,7 +95,7 @@ export async function createBackup(
   const verified =
     rescueMode || encryptBackups || noVerify || (await verifyAccount());
   if (!verified) {
-    showToast("error", "Could not create a backup: user verification failed.");
+    showToast("error", `${strings.backupFailed()}: ${strings.verifyFailed()}.`);
     return false;
   }
 
@@ -168,11 +169,11 @@ export async function createBackup(
   if (error) {
     showToast(
       "error",
-      `Could not create a backup of your data: ${(error as Error).message}`
+      `${strings.backupFailed()}: ${(error as Error).message}`
     );
     console.error(error);
   } else {
-    showToast("success", `Backup saved at ${filePath}.`);
+    showToast("success", `${strings.backupSavedAt(filePath)}`);
     return true;
   }
   return false;
@@ -316,7 +317,7 @@ export async function restoreBackupFile(backupFile: File) {
     });
     if (error) {
       console.error(error);
-      showToast("error", `Failed to restore backup: ${error.message}`);
+      showToast("error", `${strings.restoreFailed()}: ${error.message}`);
     }
   }
 }
@@ -408,12 +409,12 @@ async function restore(
 ) {
   try {
     await db.backup?.import(backup, { password, encryptionKey });
-    showToast("success", "Backup restored!");
+    showToast("success", strings.backupRestored());
   } catch (e) {
     logger.error(e as Error, "Could not restore the backup");
     showToast(
       "error",
-      `Could not restore the backup: ${(e as Error).message || e}`
+      `${strings.backupFailed()}: ${(e as Error).message || e}`
     );
   }
 }

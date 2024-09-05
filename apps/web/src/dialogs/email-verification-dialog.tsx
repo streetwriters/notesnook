@@ -26,6 +26,7 @@ import { useState } from "react";
 import { useSessionState } from "../hooks/use-session-state";
 import Accordion from "../components/accordion";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 let interval = 0;
 type EmailVerificationDialogProps = BaseDialogProps<boolean>;
@@ -98,11 +99,7 @@ export const EmailVerificationDialog = DialogManager.register(
             variant="body"
             sx={{ borderRadius: "default", alignSelf: "stretch" }}
           >
-            We have sent the email confirmation link at{" "}
-            <Text as="b" sx={{ color: "accent" }}>
-              {user.email}
-            </Text>
-            .
+            {strings.emailConfirmationLinkSent()}
           </Text>
           <Accordion
             isClosed
@@ -114,10 +111,9 @@ export const EmailVerificationDialog = DialogManager.register(
             }}
           >
             <Text variant={"body"} px={1} pb={1}>
-              {`If you didn't get an email from us or the confirmation link isn't
-            working,`}{" "}
-              <b>please send us an email from your registered email address</b>{" "}
-              and we will manually confirm your account.
+              {strings.emailConfirmationNotice()[0]}{" "}
+              <b>{strings.emailConfirmationNotice()[1]}</b>{" "}
+              {strings.emailConfirmationNotice()[2]}.
             </Text>
           </Accordion>
         </Flex>

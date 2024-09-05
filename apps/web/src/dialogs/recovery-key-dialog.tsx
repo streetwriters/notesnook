@@ -31,6 +31,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { usePromise } from "@notesnook/common";
 import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
+import { strings } from "@notesnook/intl";
 
 const QRCode = React.lazy(() => import("../re-exports/react-qrcode-logo"));
 type RecoveryKeyDialogProps = BaseDialogProps<false>;
@@ -45,10 +46,10 @@ export const RecoveryKeyDialog = DialogManager.register(
       <Dialog
         testId="recovery-key-dialog"
         isOpen={true}
-        title="Backup your recovery key"
+        title={strings.saveRecoveryKey()}
         width={400}
         positiveButton={{
-          text: "I have backed up my key",
+          text: strings.keyBackedUp(),
           onClick: () => {
             Config.set("recoveryKeyBackupDate", Date.now());
             props.onClose(false);
@@ -56,14 +57,11 @@ export const RecoveryKeyDialog = DialogManager.register(
         }}
       >
         {key.status !== "fulfilled" ? (
-          <Loader title="Getting your encryption key..." />
+          <Loader title={strings.gettingEncryptionKey()} />
         ) : (
           <Flex sx={{ overflow: "hidden", flex: 1, flexDirection: "column" }}>
             <Flex sx={{ overflowY: "auto", flexDirection: "column" }}>
-              <ErrorText
-                error="In case you forget your password, your recovery key is the only way to recover your data."
-                mt={0}
-              />
+              <ErrorText error={strings.saveRecoveryKeyDesc()} mt={0} />
               <Text
                 data-test-id="recovery-key"
                 className="selectable"
@@ -138,7 +136,7 @@ export const RecoveryKeyDialog = DialogManager.register(
                     }}
                     sx={{ fontSize: "body" }}
                   >
-                    Download QR Code
+                    {strings.saveQRCode()}
                   </Button>
                   <Button
                     variant="secondary"
@@ -156,7 +154,7 @@ export const RecoveryKeyDialog = DialogManager.register(
                     }}
                     sx={{ fontSize: "body" }}
                   >
-                    Download file
+                    {strings.network.download()}
                   </Button>
                 </Flex>
               </Flex>

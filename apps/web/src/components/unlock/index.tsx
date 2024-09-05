@@ -23,6 +23,7 @@ import { Lock } from "../icons";
 import Field from "../field";
 import { showToast } from "../../utils/toast";
 import { ErrorText } from "../error-text";
+import { strings } from "@notesnook/intl";
 
 type UnlockViewProps = {
   title: string;
@@ -104,7 +105,7 @@ export function UnlockView(props: UnlockViewProps) {
         inputRef={passwordRef}
         autoFocus
         sx={{ width: ["95%", "95%", "max(30%, 400px)"] }}
-        placeholder="Enter password"
+        placeholder={strings.enterPassword()}
         type="password"
         onKeyUp={async (e) => {
           if (e.key === "Enter") {
@@ -125,7 +126,7 @@ export function UnlockView(props: UnlockViewProps) {
           await submit();
         }}
       >
-        {isUnlocking ? "Unlocking..." : buttonTitle}
+        {isUnlocking ? strings.unlocking() + "..." : buttonTitle}
       </Button>
     </Flex>
   );

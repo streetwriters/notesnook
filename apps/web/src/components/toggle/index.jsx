@@ -34,7 +34,8 @@ function Toggle(props) {
     onlyIf,
     premium,
     testId,
-    disabled
+    disabled,
+    tip
   } = props;
   const [isLoading, setIsLoading] = useState(false);
   const onClick = useCallback(async () => {
@@ -68,7 +69,11 @@ function Toggle(props) {
         "& > label": { width: "auto", flexShrink: 0 }
       }}
     >
-      <Tip text={title} tip={isToggled ? onTip : offTip} sx={{ mr: 2 }} />
+      <Tip
+        text={title}
+        tip={tip ? tip : isToggled ? onTip : offTip}
+        sx={{ mr: 2 }}
+      />
       {isLoading ? (
         <Loading size={18} />
       ) : (
