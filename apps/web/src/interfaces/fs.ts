@@ -110,6 +110,11 @@ export async function writeEncryptedFile(
     )
     .pipeTo(fileHandle.writeable);
 
+  if (!(await exists(fileHandle))) {
+    await fileHandle.delete();
+    throw new Error("Failed to encrypt file. Please try again.");
+  }
+
   AppEventManager.publish(AppEvents.fileEncrypted, {
     hash,
     total: 1,
@@ -624,6 +629,11 @@ export async function streamingDecryptFile(
   if (!fileMetadata) return false;
 
   const fileHandle = await streamablefs.readFile(filename);
+  logger.info("decrypting file", {
+    filename,
+    size: fileHandle?.file.size,
+    actualSize: await fileHandle?.size()
+  });
   if (!fileHandle) return false;
 
   const { key, iv } = fileMetadata;
