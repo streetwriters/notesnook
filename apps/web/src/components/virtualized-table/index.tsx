@@ -72,6 +72,7 @@ export function VirtualizedTable<T, C>(props: VirtualizedTableProps<T, C>) {
           containerRef.current?.closest(".ms-container") ||
           undefined
         }
+        increaseViewportBy={300}
         computeItemKey={(index) => getItemKey(index)}
         defaultItemHeight={estimatedSize}
         fixedHeaderContent={() => <>{header}</>}
