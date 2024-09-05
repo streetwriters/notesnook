@@ -289,14 +289,11 @@ export const useEditor = (
 
         const saveTimer = setTimeout(() => {
           DatabaseLogger.log(`Note save timeout: ${id}...`);
-          ToastManager.error(
-            new Error(
-              "Copy your changes and restart the app to avoid data loss. If the issue persists, please report to us at support@streetwriters.co."
-            ),
-            "Saving note is taking too long",
-            "global",
-            15000
-          );
+          ToastManager.show({
+            message: strings.savingNoteTakingTooLong(),
+            type: "error",
+            duration: 10000
+          });
         }, 30 * 1000);
 
         if (!locked) {
