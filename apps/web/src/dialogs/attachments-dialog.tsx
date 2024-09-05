@@ -254,7 +254,14 @@ export const AttachmentsDialog = DialogManager.register(
                       >
                         <Label>
                           <Checkbox
-                            sx={{ width: 18, height: 18 }}
+                            sx={{
+                              width: 18,
+                              height: 18,
+                              color:
+                                selected.length === attachments.length
+                                  ? "accent"
+                                  : "icon"
+                            }}
                             onChange={async (e) => {
                               setSelected(
                                 e.currentTarget.checked
@@ -264,6 +271,7 @@ export const AttachmentsDialog = DialogManager.register(
                                   : []
                               );
                             }}
+                            checked={selected.length === attachments.length}
                           />
                         </Label>
                       </Text>
