@@ -28,6 +28,7 @@ import { AttachmentStream } from "../utils/streams/attachment-stream";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
 import { Attachment } from "@notesnook/core";
+import { TaskManager } from "../common/task-manager";
 
 let abortController: AbortController | undefined = undefined;
 class AttachmentStore extends BaseStore<AttachmentStore> {
@@ -80,25 +81,36 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
   };
 
   recheck = async (ids: string[]) => {
-    for (const id of ids) {
-      const attachment = await db.attachments.attachment(id);
-      if (!attachment) continue;
-      try {
-        this._changeWorkingStatus(attachment.hash, "recheck");
+    await TaskManager.startTask({
+      type: "status",
+      action: async (report) => {
+        let i = 0;
+        for (const id of ids) {
+          report({
+            text: `Checking attachments (${++i}/${ids.length})`
+          });
+          const attachment = await db.attachments.attachment(id);
+          if (!attachment) continue;
+          try {
+            this._changeWorkingStatus(attachment.hash, "recheck");
 
-        const { failed, success } = await checkAttachment(attachment.hash);
-        this._changeWorkingStatus(
-          attachment.hash,
-          undefined,
-          success ? undefined : failed
-        );
-      } catch (e) {
-        console.error(e);
-        this._changeWorkingStatus(attachment.hash);
-        if (e instanceof Error)
-          showToast("error", `Rechecking failed: ${e.message}`);
-      }
-    }
+            const { failed, success } = await checkAttachment(attachment.hash);
+            this._changeWorkingStatus(
+              attachment.hash,
+              undefined,
+              success ? undefined : failed
+            );
+          } catch (e) {
+            console.error(e);
+            this._changeWorkingStatus(attachment.hash);
+            if (e instanceof Error)
+              showToast("error", `Rechecking failed: ${e.message}`);
+          }
+        }
+      },
+      id: "checking-attachments",
+      title: "Checking attachments"
+    });
   };
 
   rename = async (hash: string, newName: string) => {
