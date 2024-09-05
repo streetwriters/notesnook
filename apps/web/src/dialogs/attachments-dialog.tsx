@@ -197,14 +197,15 @@ export const AttachmentsDialog = DialogManager.register(
                       variant="secondary"
                       key={tool.title}
                       title={tool.title}
-                      onClick={() =>
-                        tool.onClick({
-                          selected
-                          // : attachments.filter(
-                          //   (a) => selected.indexOf(a.id) > -1
-                          // )
-                        })
-                      }
+                      onClick={() => {
+                        try {
+                          tool.onClick({
+                            selected
+                          });
+                        } catch (e) {
+                          showToast("error", (e as Error).message);
+                        }
+                      }}
                       disabled={!selected.length}
                       sx={{ bg: "transparent", p: 1 }}
                     >
