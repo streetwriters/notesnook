@@ -51,7 +51,7 @@ export function UnlockView(props: UnlockViewProps) {
       ) {
         setIsWrong(true);
       } else {
-        showToast("error", "Could not unlock: " + e);
+        showToast("error", `${strings.couldNotUnlock()}: ` + e);
         console.error(e);
       }
     } finally {

@@ -374,10 +374,9 @@ const menuItems: (
       onClick: async () => {
         const { unlock, lock } = store.get();
         if (!context?.locked) {
-          if (await lock(note.id))
-            showToast("success", "Note locked successfully!");
+          if (await lock(note.id)) showToast("success", strings.noteLocked());
         } else if (await unlock(note.id)) {
-          showToast("success", "Note unlocked successfully!");
+          showToast("success", strings.noteUnlocked());
         }
       }
     },
@@ -827,9 +826,9 @@ async function copyNote(noteId: string, format: "md" | "txt") {
     if (!result) throw new Error(`Could not convert note to ${format}.`);
 
     await navigator.clipboard.writeText(result);
-    showToast("success", "Copied!");
+    showToast("success", strings.noteCopied());
   } catch (e) {
     if (e instanceof Error)
-      showToast("error", `Failed to copy note: ${e.message}.`);
+      showToast("error", `${strings.failedToCopyNote()}: ${e.message}.`);
   }
 }
