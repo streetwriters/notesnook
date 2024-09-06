@@ -137,6 +137,7 @@ const onBoot = async () => {
   try {
     if (!SettingsService.getProperty("backgroundSync")) {
       DatabaseLogger.info("BACKGROUND SYNC ON BOOT DISABLED");
+
       return;
     }
 
