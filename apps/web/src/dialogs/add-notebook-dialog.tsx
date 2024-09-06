@@ -43,7 +43,7 @@ export const AddNotebookDialog = DialogManager.register(
 
     const onSubmit = useCallback(async () => {
       if (!title.current.trim())
-        return showToast("error", "Notebook title cannot be empty.");
+        return showToast("error", strings.allFieldsRequired());
 
       const id = await db.notebooks.add({
         id: props.notebook?.id,

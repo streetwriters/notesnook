@@ -27,6 +27,7 @@ import { showFilePicker } from "../../utils/file-picker";
 import { Attachment } from "@notesnook/editor";
 import { ImagePickerDialog } from "../../dialogs/image-picker-dialog";
 import { BuyDialog } from "../../dialogs/buy-dialog";
+import { strings } from "@notesnook/intl";
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
@@ -104,8 +105,7 @@ async function pickFile(
 ): Promise<Attachment | undefined> {
   try {
     if (file.size > FILE_SIZE_LIMIT)
-      throw new Error("File too big. You cannot add files over 500 MB.");
-    if (!file) return;
+      throw new Error(strings.fileTooLargeDesc(500));
 
     const hash = await addAttachment(file, options);
     return {
@@ -131,7 +131,7 @@ async function pickImage(
 ): Promise<Attachment | undefined> {
   try {
     if (file.size > IMAGE_SIZE_LIMIT)
-      throw new Error("Image too big. You cannot add images over 50 MB.");
+      throw new Error(strings.imageTooLarge(50));
     if (!file) return;
 
     const hash = await addAttachment(file, options);

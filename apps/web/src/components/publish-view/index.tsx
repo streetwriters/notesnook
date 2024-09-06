@@ -203,12 +203,14 @@ function PublishView(props: PublishViewProps) {
                 password
               });
               setPublishId(publishId);
-              showToast("success", strings.notePublished());
+              showToast("success", strings.action("note", 1, "published"));
             } catch (e) {
               console.error(e);
               showToast(
                 "error",
-                `${strings.failedToPublish()}: ${(e as Error).message}`
+                `${strings.actionError("note", 1, "published")}: ${
+                  (e as Error).message
+                }`
               );
             } finally {
               setIsPublishing(false);
@@ -226,12 +228,13 @@ function PublishView(props: PublishViewProps) {
                 await unpublishNote(note.id);
                 setPublishId(undefined);
                 onClose(true);
-                showToast("success", "Note unpublished.");
+                showToast("success", strings.action("note", 1, "unpublished"));
               } catch (e) {
                 console.error(e);
                 showToast(
                   "error",
-                  "Note could not be unpublished: " + (e as Error).message
+                  `${strings.actionError("note", 1, "unpublished")}: ` +
+                    (e as Error).message
                 );
               } finally {
                 setIsPublishing(false);

@@ -18,6 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { I18n } from "@lingui/core";
 import { plural, select, t } from "@lingui/macro";
+type Actions =
+  | "deleted"
+  | "unpinned"
+  | "pinned"
+  | "unpublished"
+  | "published"
+  | "permanentlyDeleted";
 
 export const strings = {
   done: () => t`Done`,
@@ -254,7 +261,8 @@ export const strings = {
     tag: () => t`tag`,
     reminder: () => t`reminder`,
     color: () => t`color`,
-    attachment: () => t`attachment`
+    attachment: () => t`attachment`,
+    item: () => t`item`
   },
   dataTypesCamelCase: {
     note: () => t`Note`,
@@ -262,7 +270,8 @@ export const strings = {
     tag: () => t`Tag`,
     reminder: () => t`Reminder`,
     color: () => t`Color`,
-    attachment: () => t`Attachment`
+    attachment: () => t`Attachment`,
+    item: () => t`Item`
   },
   dataTypesPlural: {
     note: () => t`notes`,
@@ -270,7 +279,8 @@ export const strings = {
     tag: () => t`tags`,
     reminder: () => t`reminders`,
     color: () => t`colors`,
-    attachment: () => t`attachments`
+    attachment: () => t`attachments`,
+    item: () => t`items`
   },
   dataTypesPluralCamelCase: {
     note: () => t`Notes`,
@@ -280,7 +290,8 @@ export const strings = {
     color: () => t`Colors`,
     attachment: () => t`Attachments`,
     favorite: () => t`Favorites`,
-    monograph: () => t`Monographs`
+    monograph: () => t`Monographs`,
+    item: () => t`Items`
   },
   addItem: (referenceType: string) =>
     t`Add a ${strings.dataTypes[
@@ -477,6 +488,7 @@ $headline$: Use starting line of the note as title.`,
   useAccountPassword: () => t`Use account password`,
   addColor: () => t`Add color`,
   unlockNote: () => t`Unlock note`,
+  couldNotUnlock: () => t`Could not unlock`,
   unlockNoteDesc: () =>
     t`"Your note will be unencrypted and removed from the vault."`,
   deleteAllNotes: () => t`Delete all notes`,
@@ -840,9 +852,11 @@ $headline$: Use starting line of the note as title.`,
   encryptingAttachment: () => t`Encrypting attachment`,
   encryptingAttachmentDesc: (name: string) =>
     t`Please wait while we encrypt ${name} for upload.`,
-  fileTooLarge: () => t`File too large`,
+  fileTooLarge: () => t`File too big`,
   fileTooLargeDesc: (sizeInMB: number) =>
     t`File size should be less than ${sizeInMB}MB`,
+  imageTooLarge: (sizeInMB: number) =>
+    t`Image size should be less than ${sizeInMB}MB`,
   failToOpen: () => t`Failed to open`,
   fileMismatch: () => t`File mismatch`,
   noNoteProperties: () => t`Start writing to create a new note`,
@@ -1789,11 +1803,16 @@ All attachments will be downloaded & cached again on access.
         strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
       } moved to trash`
     }),
-  action: (type: string, count: number, action: "deleted" | "unpinned") => {
-    const actions: { [name: string]: any } = {
-      deleted: t`deleted`,
-      unpinned: t`unpinned`
-    };
+  actions: () => ({
+    deleted: t`deleted`,
+    unpinned: t`unpinned`,
+    pinned: t`pinned`,
+    unpublished: t`unpublished`,
+    published: t`published`,
+    permanentlyDeleted: t`permanently deleted`
+  }),
+  action: (type: string, count: number, action: Actions) => {
+    const actions = strings.actions();
     return plural(count, {
       one: `${
         strings.dataTypesCamelCase[type as keyof typeof strings.dataTypes]
@@ -1801,6 +1820,17 @@ All attachments will be downloaded & cached again on access.
       other: `# ${
         strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
       } ${actions[action]}`
+    });
+  },
+  actionError: (type: string, count: number, action: Actions) => {
+    const actions = strings.actions();
+    return plural(count, {
+      one: `${
+        strings.dataTypesCamelCase[type as keyof typeof strings.dataTypes]
+      } could not be ${actions[action]}`,
+      other: `# ${
+        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
+      } could not be ${actions[action]}`
     });
   },
   deleted: (type: string, count: number) =>
@@ -1842,5 +1872,6 @@ All attachments will be downloaded & cached again on access.
   backupReadyToDownload: () => t`Your backup is ready to download`,
   unlockVault: () => t`Unlock vault`,
   unlockVaultDesc: () => t`Please enter your vault password to continue`,
-  imagePreviewFailed: () => t`This image cannot be previewed`
+  imagePreviewFailed: () => t`This image cannot be previewed`,
+  failedToCopyNote: () => t`Failed to copy note`
 };
