@@ -29,12 +29,22 @@ export type AccordionProps = {
   testId?: string;
   buttonSx?: FlexProps["sx"];
   titleSx?: FlexProps["sx"];
+  containerSx?: FlexProps["sx"];
 };
 
 export default function Accordion(
   props: PropsWithChildren<AccordionProps> & FlexProps
 ) {
-  const { isClosed, title, color, children, testId, sx, ...restProps } = props;
+  const {
+    isClosed,
+    title,
+    color,
+    children,
+    testId,
+    sx,
+    containerSx,
+    ...restProps
+  } = props;
   const [isContentHidden, setIsContentHidden] = useState(false);
 
   useEffect(() => {
@@ -69,8 +79,9 @@ export default function Accordion(
       </Flex>
       <Flex
         sx={{
-          display: isContentHidden ? "none" : "flex",
-          flexDirection: "column"
+          flexDirection: "column",
+          ...containerSx,
+          display: isContentHidden ? "none" : "flex"
         }}
       >
         {children}

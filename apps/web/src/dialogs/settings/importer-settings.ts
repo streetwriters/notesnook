@@ -24,7 +24,18 @@ export const ImporterSettings: SettingsGroup[] = [
   {
     key: "importer",
     section: "importer",
-    header: Importer,
-    settings: []
+    header: "Notesnook Importer",
+    settings: [
+      {
+        key: "import-notes",
+        title: "",
+        components: [
+          {
+            type: "custom",
+            component: Importer
+          }
+        ]
+      }
+    ]
   }
 ];
