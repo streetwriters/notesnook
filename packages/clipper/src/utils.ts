@@ -165,6 +165,14 @@ function getRootStylesheet() {
   return null;
 }
 
+function safeQuerySelectorAll(root: Node, selector: string) {
+  try {
+    return (root as HTMLElement).querySelectorAll(selector);
+  } catch (e) {
+    return new NodeList();
+  }
+}
+
 export {
   injectCss,
   escape,
@@ -179,5 +187,6 @@ export {
   asArray,
   escapeXhtml,
   width,
-  height
+  height,
+  safeQuerySelectorAll
 };

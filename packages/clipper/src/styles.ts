@@ -20,6 +20,7 @@ import { constructUrl, FetchOptions } from "./fetch";
 import { compare, calculate, SpecificityArray } from "specificity";
 import { tokenize } from "./css-tokenizer";
 import { stringify, parse, SelectorType } from "css-what";
+import { safeQuerySelectorAll } from "./utils";
 
 const SHORTHANDS = [
   "animation",
@@ -186,7 +187,8 @@ function walkRules(
 
         for (const selector of selectors) {
           if (!selector || !selector.selector.trim()) continue;
-          const elements = document.querySelectorAll(
+          const elements = safeQuerySelectorAll(
+            document,
             selector.selector
           ) as NodeListOf<StyleableElement>;
 
@@ -210,7 +212,8 @@ function walkRules(
         }
       }
 
-      const elements = document.querySelectorAll(
+      const elements = safeQuerySelectorAll(
+        document,
         rule.selectorText
       ) as NodeListOf<StyleableElement>;
 
