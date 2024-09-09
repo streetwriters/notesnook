@@ -137,7 +137,10 @@ function useAuthenticateUser({
         const user = await db.user.fetchUser();
         setUser(user);
       } catch (e) {
-        showToast("error", "Failed to authenticate. Please try again.");
+        showToast(
+          "error",
+          `${strings.biometricsAuthFailed()}. ${strings.pleaseTryAgain()}.`
+        );
         openURL("/");
       } finally {
         setIsAuthenticating(false);
@@ -191,7 +194,7 @@ function Recovery(props: RecoveryProps) {
                 }}
                 variant={"body"}
               >
-                {strings.authenticatedAs()} {user?.email}
+                {strings.authenticatedAs(user?.email)}
               </Text>
               <Button
                 sx={{

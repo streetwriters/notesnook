@@ -40,6 +40,7 @@ import {
 } from "../utils/page-visibility";
 import { NetworkCheck } from "../utils/network-check";
 import { Color, Notebook, Tag } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 
 type SyncState =
   | "synced"
@@ -235,14 +236,14 @@ class AppStore extends BaseStore<AppStore> {
     if (await db.shortcuts.exists(item.id)) {
       await db.shortcuts.remove(item.id);
       this.refreshNavItems();
-      showToast("success", `Shortcut removed!`);
+      showToast("success", strings.shortcutRemoved());
     } else {
       await db.shortcuts.add({
         itemType: item.type,
         itemId: item.id
       });
       this.refreshNavItems();
-      showToast("success", `Shortcut created!`);
+      showToast("success", strings.shortcutCreated());
     }
 
     // refresh the respective list

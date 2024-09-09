@@ -165,14 +165,14 @@ export const notebookMenuItems: (
     {
       type: "button",
       key: "edit",
-      title: "Edit",
+      title: strings.edit(),
       icon: NotebookEdit.path,
       onClick: () => hashNavigate(`/notebooks/${notebook.id}/edit`)
     },
     {
       type: "button",
       key: "set-as-default",
-      title: "Set as default",
+      title: strings.setAsDefault(),
       isChecked: defaultNotebook === notebook.id,
       icon: NotebookIcon.path,
       onClick: async () => {
@@ -187,7 +187,7 @@ export const notebookMenuItems: (
       type: "button",
       key: "pin",
       icon: Pin.path,
-      title: "Pin",
+      title: strings.pin(),
       isChecked: notebook.pinned,
       onClick: () => store.pin(!notebook.pinned, ...ids),
       multiSelect: true
@@ -199,15 +199,15 @@ export const notebookMenuItems: (
         ? RemoveShortcutLink.path
         : Shortcut.path,
       title: db.shortcuts.exists(notebook.id)
-        ? "Remove shortcut"
-        : "Create shortcut",
+        ? strings.removeShortcut()
+        : strings.addShortcut(),
       onClick: () => appStore.addToShortcuts(notebook)
     },
     { key: "sep", type: "separator" },
     {
       type: "button",
       key: "movetotrash",
-      title: "Move to trash",
+      title: strings.moveToTrash(),
       variant: "dangerous",
       icon: Trash.path,
       onClick: async () => {

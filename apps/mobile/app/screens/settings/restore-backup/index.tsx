@@ -153,7 +153,7 @@ const restoreBackup = async (options: {
           if (path === ".nnbackup" || path === "attachments") continue;
 
           updateProgress({
-            progress: `${strings.restoringBackup()} (${count++}/${
+            progress: `${strings.restoringBackup()}... (${count++}/${
               extractedBackupFiles.length
             })`
           });
@@ -242,7 +242,7 @@ const restoreBackup = async (options: {
 
       await db.transaction(async () => {
         updateProgress({
-          progress: strings.restoringBackup()
+          progress: strings.restoringBackup() + "..."
         });
         await db.backup.import(backup, {
           encryptionKey,

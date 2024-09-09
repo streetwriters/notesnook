@@ -69,7 +69,7 @@ export const EditProfilePictureDialog = DialogManager.register(
                 profilePicture: pic
               });
               await useSettingStore.getState().refresh();
-              showToast("success", "Profile updated!");
+              showToast("success", strings.profileUpdated());
               props.onClose(true);
             } catch (e) {
               console.error(e);

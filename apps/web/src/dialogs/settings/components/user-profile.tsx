@@ -180,7 +180,7 @@ export function UserProfile() {
                     fullName: fullName || undefined
                   });
                   await useSettingStore.getState().refresh();
-                  showToast("success", "Full name updated!");
+                  showToast("success", strings.fullNameUpdated());
                 } catch (e) {
                   showToast("error", (e as Error).message);
                 }
@@ -188,8 +188,10 @@ export function UserProfile() {
             />
           </Text>
           <Text variant={"subBody"}>
-            {user.email} • {strings.memberSince()}{" "}
-            {getFormattedDate(getObjectIdTimestamp(user.id), "date")}
+            {user.email} •{" "}
+            {strings.memberSince(
+              getFormattedDate(getObjectIdTimestamp(user.id), "date")
+            )}
           </Text>
         </Flex>
       </Flex>

@@ -76,7 +76,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         await results.item(0);
         setResults(results);
         if (results.placeholders?.length === 0) {
-          setSearchStatus(`${strings.noResultsFound()} ${query}`);
+          setSearchStatus(`${strings.noResultsFound(query)}`);
         } else {
           setSearchStatus(undefined);
         }
@@ -127,8 +127,8 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
           title: route.name,
           paragraph:
             searchStatus ||
-            `${strings.typeAKeywordToSearchIn()} ${route.params?.title}`,
-          loading: `${strings.searchingFor()} ${currentQuery.current}...`
+            `${strings.typeAKeywordToSearchIn(route.params?.title)}`,
+          loading: `${strings.searchingFor(currentQuery.current as string)}...`
         }}
       />
     </>

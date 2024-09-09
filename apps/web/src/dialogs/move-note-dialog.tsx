@@ -159,7 +159,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
           if (stringified) {
             showToast(
               "success",
-              `${pluralize(noteIds.length, "note")} ${stringified}`
+              `${strings.notes(noteIds.length)} ${stringified}`
             );
           }
 
@@ -575,14 +575,13 @@ function stringifySelected(suggestion: NotebookReference[]) {
   if (!added.length && !removed.length) return;
 
   const parts = [];
-  if (added.length > 0)
-    parts.push(`added to ${pluralize(added.length, "notebook")}`);
+  if (added.length > 0) parts.push(strings.addedToNotebook(added.length));
   // if (added.length >= 1) parts.push(added[0]);
   // if (added.length > 1) parts.push(`and ${added.length - 1} others`);
 
   if (removed.length >= 1) {
     if (parts.length > 0) parts.push("&");
-    parts.push(`removed from ${pluralize(added.length, "notebook")}`);
+    parts.push(`removed from ${strings.removedFromNotebook(removed.length)}`);
   }
   // if (removed.length > 1) parts.push(`and ${removed.length - 1} others`);
 

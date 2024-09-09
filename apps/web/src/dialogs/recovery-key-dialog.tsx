@@ -98,7 +98,10 @@ export const RecoveryKeyDialog = DialogManager.register(
                     className="copyKey"
                     onClick={async () => {
                       if (!key.value)
-                        return showToast("error", "No encryption key found.");
+                        return showToast(
+                          "error",
+                          strings.noEncryptionKeyFound()
+                        );
 
                       writeText(key.value)
                         .then(() => {
@@ -143,7 +146,10 @@ export const RecoveryKeyDialog = DialogManager.register(
                     mt={1}
                     onClick={async () => {
                       if (!key.value)
-                        return showToast("error", "No encryption key found.");
+                        return showToast(
+                          "error",
+                          strings.noEncryptionKeyFound()
+                        );
                       const email = await db.user
                         .getUser()
                         .then((user) => user?.email || "user");

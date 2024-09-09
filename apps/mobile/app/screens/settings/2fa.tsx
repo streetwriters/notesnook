@@ -340,7 +340,7 @@ export const MFASetup = ({
                         ? strings.copy()
                         : `${
                             seconds
-                              ? strings.resendCode(seconds)
+                              ? strings.resendCode(seconds as number)
                               : strings.sendCode()
                           }`
                     }

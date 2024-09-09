@@ -102,22 +102,21 @@ const defaultAuthenticators: AuthenticatorType[] = ["app", "sms", "email"];
 const Authenticators: Authenticator[] = [
   {
     type: "app",
-    title: "Set up using an Authenticator app",
-    subtitle:
-      "Use an authenticator app like Aegis or Raivo Authenticator to get the authentication codes.",
+    title: strings.mfaAuthAppTitle(),
+    subtitle: strings.mfaAuthAppDesc(),
     icon: MfaAuthenticator,
     recommended: true
   },
   {
     type: "sms",
-    title: "Set up using SMS",
-    subtitle: "Notesnook will send you an SMS text with the 2FA code at login.",
+    title: strings.mfaSmsTitle(),
+    subtitle: strings.mfaSmsDesc(),
     icon: MfaSms
   },
   {
     type: "email",
-    title: "Set up using Email",
-    subtitle: "Notesnook will send you the 2FA code on your email at login.",
+    title: strings.mfaEmailTitle(),
+    subtitle: strings.mfaEmailDesc(),
     icon: MfaEmail
   }
 ];
@@ -126,8 +125,8 @@ export type AuthenticatorTypeOnNext = (type: AuthenticatorType) => void;
 
 export const steps = {
   choose: (): Step<AuthenticatorOnNext> => ({
-    title: "Protect your notes by enabling 2FA",
-    description: "Choose how you want to receive your authentication codes.",
+    title: strings["2fa"](),
+    description: strings.select2faMethod(),
     component: ({ onNext }) => (
       <ChooseAuthenticator
         onNext={onNext}
@@ -152,14 +151,8 @@ export const steps = {
   recoveryCodes: (
     authenticatorType: AuthenticatorType
   ): Step<AuthenticatorTypeOnNext> => ({
-    title: "Save your recovery codes",
-    description: `If you lose access to your ${
-      authenticatorType === "email"
-        ? "email"
-        : authenticatorType === "sms"
-        ? "phone"
-        : "auth app"
-    }, you can login to Notesnook using your recovery codes. Each code can only be used once!`,
+    title: strings.saveRecoveryCodes(),
+    description: strings.saveRecoveryCodesDesc(),
     component: ({ onNext, onClose, onError }) => (
       <BackupRecoveryCodes
         onClose={onClose}
@@ -188,9 +181,8 @@ export const fallbackSteps = {
   choose: (
     primaryMethod: AuthenticatorType
   ): FallbackStep<AuthenticatorOnNext> => ({
-    title: "Add a fallback 2FA method",
-    description:
-      "A fallback method helps you get your 2FA codes on an alternative device in case you lose your primary device.",
+    title: strings.addFallback2faMethod(),
+    description: strings.addFallback2faMethodDesc(),
     component: ({ onNext }) => (
       <ChooseAuthenticator
         onNext={onNext}
@@ -579,7 +571,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
   const actions = useMemo(
     () => [
       {
-        title: "Print",
+        title: strings.print(),
         icon: Print,
         action: async () => {
           if (!recoveryCodesRef.current) return;
@@ -590,7 +582,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
         }
       },
       {
-        title: "Copy",
+        title: strings.copy(),
         icon: Copy,
         action: async () => {
           await writeText(codes.join("\n"));
@@ -607,7 +599,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
         }
       },
       {
-        title: "Download",
+        title: strings.network.download(),
         icon: Download,
         action: () => {
           FileSaver.saveAs(
@@ -616,7 +608,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
           );
         }
       },
-      { title: "Regenerate", icon: Refresh, action: generate }
+      { title: strings.regenerate(), icon: Refresh, action: generate }
     ],
     [codes, generate]
   );

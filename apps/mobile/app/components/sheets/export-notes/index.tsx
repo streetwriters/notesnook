@@ -252,7 +252,12 @@ const ExportNotesSheet = ({
             {!complete ? (
               <>
                 <ActivityIndicator />
-                <Paragraph>{strings.exportingNotes(status)}</Paragraph>
+                <Paragraph>
+                  {strings.exportingNotes(status) +
+                    "..." +
+                    " " +
+                    strings.pleaseWait()}
+                </Paragraph>
               </>
             ) : (
               <>

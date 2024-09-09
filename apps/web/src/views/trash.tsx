@@ -26,6 +26,7 @@ import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { ListLoader } from "../components/loaders/list-loader";
 import { ConfirmDialog } from "../dialogs/confirm";
+import { strings } from "@notesnook/intl";
 
 function Trash() {
   useNavigate("trash", store.refresh);
@@ -55,12 +56,12 @@ function Trash() {
             if (res) {
               try {
                 await clearTrash();
-                showToast("success", "Trash cleared successfully!");
+                showToast("success", strings.trashCleared());
               } catch (e) {
                 if (e instanceof Error)
                   showToast(
                     "error",
-                    `Could not clear trash. Error: ${e.message}`
+                    `${strings.couldNotClearTrash()}. Error: ${e.message}`
                   );
               }
             }

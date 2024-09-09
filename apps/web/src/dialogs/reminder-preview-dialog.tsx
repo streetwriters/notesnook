@@ -42,16 +42,16 @@ const RECURRING_MODE_MAP = {
 const SNOOZE_TIMES = [
   {
     id: "5-min",
-    title: "5 minutes",
+    title: strings.minutes(5),
     interval: 60 * 5 * 1000
   },
   {
     id: "10-min",
-    title: "10 minutes",
+    title: strings.minutes(10),
     interval: 60 * 10 * 1000
   },
-  { id: "15-min", title: "15 minutes", interval: 60 * 15 * 1000 },
-  { id: "1-hour", title: "1 hour", interval: 60 * 60 * 1000 }
+  { id: "15-min", title: strings.minutes(15), interval: 60 * 15 * 1000 },
+  { id: "1-hour", title: strings.hours(1), interval: 60 * 60 * 1000 }
 ];
 
 export const ReminderPreviewDialog = DialogManager.register(

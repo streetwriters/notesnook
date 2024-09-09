@@ -88,38 +88,38 @@ function shouldSelectNavItem(route: string, pin: Notebook | Tag) {
 }
 
 const routes: Route[] = [
-  { id: "notes", title: "Notes", path: "/notes", icon: Note },
+  { id: "notes", title: strings.routes.Notes(), path: "/notes", icon: Note },
   {
     id: "notebooks",
-    title: "Notebooks",
+    title: strings.routes.Notebooks(),
     path: "/notebooks",
     icon: NotebookIcon
   },
   {
     id: "favorites",
-    title: "Favorites",
+    title: strings.routes.Favorites(),
     path: "/favorites",
     icon: StarOutline
   },
-  { id: "tags", title: "Tags", path: "/tags", icon: TagIcon },
+  { id: "tags", title: strings.routes.Tags(), path: "/tags", icon: TagIcon },
   {
     id: "reminders",
-    title: "Reminders",
+    title: strings.routes.Reminders(),
     path: "/reminders",
     icon: Reminders
   },
   {
     id: "monographs",
-    title: "Monographs",
+    title: strings.routes.Monographs(),
     path: "/monographs",
     icon: Monographs
   },
-  { id: "trash", title: "Trash", path: "/trash", icon: Trash }
+  { id: "trash", title: strings.routes.Trash(), path: "/trash", icon: Trash }
 ];
 
 const settings: Route = {
   id: "settings",
-  title: "Settings",
+  title: strings.routes.Settings(),
   path: "/settings",
   icon: Settings
 };
@@ -177,7 +177,7 @@ function NavigationMenu(props: NavigationMenuProps) {
       {
         key: "reset-sidebar",
         type: "button",
-        title: "Reset sidebar",
+        title: strings.resetSidebar(),
         onClick: () => {
           db.settings
             .setSideBarHiddenItems("routes", [])
@@ -368,13 +368,13 @@ function NavigationMenu(props: NavigationMenuProps) {
                     {
                       type: "button",
                       key: "rename-color",
-                      title: "Rename color",
+                      title: strings.doAction("color", 1, "rename"),
                       onClick: () => RenameColorDialog.show(color)
                     },
                     {
                       type: "button",
-                      key: "remove-color",
-                      title: "Remove color",
+                      key: strings.doAction("color", 1, "remove"),
+                      title: strings.removeColor(),
                       onClick: async () => {
                         await db.colors.remove(color.id);
                         await refreshNavItems();
@@ -432,7 +432,7 @@ function NavigationMenu(props: NavigationMenuProps) {
                     {
                       type: "button",
                       key: "removeshortcut",
-                      title: "Remove shortcut",
+                      title: strings.doAction("shortcut", 1, "remove"),
                       onClick: async () => {
                         await db.shortcuts.remove(item.id);
                         refreshNavItems();

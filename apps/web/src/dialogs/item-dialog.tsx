@@ -91,8 +91,8 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
 export const CreateTagDialog = {
   show: () =>
     ItemDialog.show({
-      title: "Create tag",
-      subtitle: "You can create as many tags as you want."
+      title: strings.addTag(),
+      subtitle: strings.addTagDesc()
     }).then(async (title) => {
       if (
         !title ||
@@ -103,7 +103,7 @@ export const CreateTagDialog = {
       )
         return;
 
-      showToast("success", "Tag created!");
+      showToast("success", strings.action("tag", 1, "created"));
       useTagStore.getState().refresh();
     })
 };
@@ -111,8 +111,8 @@ export const CreateTagDialog = {
 export const EditTagDialog = {
   show: (tag: Tag) =>
     ItemDialog.show({
-      title: "Edit tag",
-      subtitle: `You are editing #${tag.title}.`,
+      title: strings.doAction("tag", 1, "edit"),
+      subtitle: strings.editingTagDesc(tag.title),
       defaultValue: tag.title
     }).then(async (title) => {
       if (
@@ -123,7 +123,7 @@ export const EditTagDialog = {
         }))
       )
         return;
-      showToast("success", "Tag edited!");
+      showToast("success", strings.action("tag", 1, "edited"));
       await useTagStore.getState().refresh();
       await useNoteStore.getState().refresh();
       await useAppStore.getState().refreshNavItems();
@@ -133,8 +133,8 @@ export const EditTagDialog = {
 export const RenameColorDialog = {
   show: (color: Color) =>
     ItemDialog.show({
-      title: "Rename color",
-      subtitle: `You are renaming color ${color.title}.`,
+      title: strings.renameColor(),
+      subtitle: strings.renameColorDesc(color.title),
       defaultValue: color.title
     }).then(async (title) => {
       if (
@@ -145,7 +145,7 @@ export const RenameColorDialog = {
         }))
       )
         return;
-      showToast("success", "Color renamed!");
+      showToast("success", strings.action("color", 1, "renamed"));
       useAppStore.getState().refreshNavItems();
     })
 };

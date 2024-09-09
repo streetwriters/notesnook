@@ -77,29 +77,29 @@ type ToolbarAction = {
 
 const TOOLBAR_ACTIONS: ToolbarAction[] = [
   {
-    title: "Download",
+    title: strings.network.download(),
     icon: Download,
     onClick: async ({ selected }) => {
       await store.get().download(selected);
     }
   },
   {
-    title: "Recheck",
+    title: strings.fileCheck(),
     icon: DoubleCheckmark,
     onClick: async ({ selected }) => await store.recheck(selected)
   },
   {
-    title: "Delete",
+    title: strings.delete(),
     icon: Trash,
     onClick: ({ selected }) => Multiselect.deleteAttachments(selected)
   }
 ];
 
 const COLUMNS = [
-  { id: "filename" as const, title: "Name", width: "65%" },
+  { id: "filename" as const, title: strings.name(), width: "65%" },
   { id: "status" as const, width: "24px" },
-  { id: "size" as const, title: "Size", width: "15%" },
-  { id: "dateUploaded" as const, title: "Date uploaded", width: "20%" }
+  { id: "size" as const, title: strings.size(), width: "15%" },
+  { id: "dateUploaded" as const, title: strings.dateUploaded(), width: "20%" }
 ];
 
 type SortOptions = {
@@ -398,37 +398,37 @@ const routes: { id: Route; icon: Icon; title: string }[] = [
   {
     id: "all",
     icon: FileGeneral,
-    title: "All files"
+    title: strings.mediaTypes.all()
   },
   {
     id: "images",
     icon: FileImage,
-    title: "Images"
+    title: strings.mediaTypes.image()
   },
   {
     id: "documents",
     icon: FileDocument,
-    title: "Documents"
+    title: strings.mediaTypes.document()
   },
   {
     id: "videos",
     icon: FileVideo,
-    title: "Videos"
+    title: strings.mediaTypes.video()
   },
   {
     id: "audio",
     icon: FileAudio,
-    title: "Audios"
+    title: strings.mediaTypes.audio()
   },
   {
     id: "uploads",
     icon: Uploading,
-    title: "Uploads"
+    title: strings.uploads()
   },
   {
     id: "orphaned",
     icon: Unlink,
-    title: "Orphaned"
+    title: strings.orphaned()
   }
 ];
 

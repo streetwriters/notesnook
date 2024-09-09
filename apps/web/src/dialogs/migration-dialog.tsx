@@ -48,14 +48,14 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
 
     await TaskManager.startTask({
       type: "modal",
-      title: `Applying changes...`,
-      subtitle: "This might take while.",
+      title: strings.applyingChanges(),
+      subtitle: strings.thisMayTakeAWhile(),
       action: async (task) => {
         db.eventManager.subscribe(
           EVENTS.migrationProgress,
           ({ collection, total, current }: MigrationProgressEvent) => {
             task({
-              text: `Processing ${collection}...`,
+              text: `${strings.processing()} ${collection}...`,
               current,
               total
             });

@@ -232,8 +232,8 @@ function withProgress<T>(
 ): Promise<T | Error> {
   return TaskManager.startTask({
     type: "modal",
-    title: "Encrypting attachment",
-    subtitle: "Please wait while we encrypt this attachment for upload.",
+    title: strings.encryptingAttachment(),
+    subtitle: strings.encryptingAttachmentDesc(),
     action: (report) => {
       const event = AppEventManager.subscribe(
         AppEvents.UPDATE_ATTACHMENT_PROGRESS,

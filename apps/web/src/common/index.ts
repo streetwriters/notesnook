@@ -49,19 +49,19 @@ import { strings } from "@notesnook/intl";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
-    title: "Add a note",
+    title: strings.addItem("note"),
     onClick: () => useEditorStore.getState().newSession()
   },
   notebooks: {
-    title: "Create a notebook",
+    title: strings.addItem("notebook"),
     onClick: () => hashNavigate("/notebooks/create", { replace: true })
   },
   tags: {
-    title: "Create a tag",
+    title: strings.addItem("tag"),
     onClick: () => hashNavigate(`/tags/create`, { replace: true })
   },
   reminders: {
-    title: "Add a reminder",
+    title: strings.addItem("reminder"),
     onClick: () => hashNavigate(`/reminders/create`, { replace: true })
   }
 };
@@ -119,8 +119,8 @@ export async function createBackup(
   const error = await TaskManager.startTask<Error | void>({
     type: background ? "status" : "modal",
     id: "creating-backup",
-    title: "Creating backup",
-    subtitle: "We are creating a backup of your data. Please wait...",
+    title: strings.backingUpData(mode),
+    subtitle: strings.backingUpDataWait(),
     action: async (report) => {
       const writeStream = await createWritableStream(filePath);
       await new ReadableStream<ZipFile>({
@@ -214,8 +214,8 @@ export async function restoreBackupFile(backupFile: File) {
     await db.initCollections();
   } else {
     const error = await TaskManager.startTask<Error | void>({
-      title: "Restoring backup",
-      subtitle: "Please wait while we restore your backup...",
+      title: strings.restoringBackup(),
+      subtitle: `${strings.restoringBackupDesc()}...`,
       type: "modal",
       action: async (report) => {
         let cachedPassword: string | undefined = undefined;
@@ -328,8 +328,8 @@ async function restoreWithProgress(
   key?: string
 ) {
   return await TaskManager.startTask<Error | void>({
-    title: "Restoring backup",
-    subtitle: "This might take a while",
+    title: strings.restoringBackup(),
+    subtitle: strings.restoringBackupDesc(),
     type: "modal",
     action: (report) => {
       db.eventManager.subscribe(
@@ -360,11 +360,11 @@ async function restoreWithProgress(
 export async function verifyAccount() {
   if (!(await db.user?.getUser())) return true;
   return await showPasswordDialog({
-    title: "Verify it's you",
-    subtitle: "Enter your account password to proceed.",
+    title: strings.verifyItsYou(),
+    subtitle: strings.enterAccountPasswordDesc(),
     inputs: {
       password: {
-        label: "Password",
+        label: strings.password(),
         autoComplete: "current-password"
       }
     },

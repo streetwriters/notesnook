@@ -167,25 +167,16 @@ export const AddReminderDialog = DialogManager.register(
               !selectedDays.length),
           onClick: async () => {
             if (!("Notification" in window))
-              showToast(
-                "warn",
-                "Reminders will not be active on this device as it does not support notifications."
-              );
+              showToast("warn", strings.remindersNotSupported());
 
             const permissionResult = await Notification.requestPermission();
             if (!IS_TESTING && permissionResult !== "granted") {
-              showToast(
-                "error",
-                "Please grant notifications permission to add new reminders."
-              );
+              showToast("error", strings.noNotificationPermission());
               return;
             }
 
             if (mode !== Modes.REPEAT && date.isBefore(dayjs())) {
-              showToast(
-                "error",
-                "Reminder time cannot be earlier than the current time."
-              );
+              showToast("error", strings.dateError());
               return;
             }
 
@@ -264,7 +255,9 @@ export const AddReminderDialog = DialogManager.register(
                   setSelectedDays([]);
                 }}
               />
-              {m.title}
+              {strings.reminderModes[
+                m.id as keyof typeof strings.reminderModes
+              ]()}
               {m.premium && !isUserPremium && (
                 <Pro size={18} color="accent" sx={{ ml: 1 }} />
               )}
@@ -306,7 +299,9 @@ export const AddReminderDialog = DialogManager.register(
                         : "paragraph"
                   }}
                 >
-                  {mode.title}
+                  {strings.recurringModes[
+                    mode.id as keyof typeof strings.recurringModes
+                  ]()}
                 </Button>
               ))}
             </Flex>
@@ -506,7 +501,9 @@ export const AddReminderDialog = DialogManager.register(
                 checked={p.id === priority}
                 onChange={() => setPriority(p.id)}
               />
-              {p.title}
+              {strings.reminderNotificationModes[
+                p.title as keyof typeof strings.reminderNotificationModes
+              ]()}
             </Label>
           ))}
         </Flex>
