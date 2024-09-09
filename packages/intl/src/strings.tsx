@@ -18,13 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { I18n } from "@lingui/core";
 import { plural, select, t } from "@lingui/macro";
+
 type Actions =
   | "deleted"
   | "unpinned"
   | "pinned"
   | "unpublished"
   | "published"
-  | "permanentlyDeleted";
+  | "permanentlyDeleted"
+  | "restored"
+  | "edited"
+  | "created"
+  | "renamed";
 
 export const strings = {
   done: () => t`Done`,
@@ -188,7 +193,10 @@ export const strings = {
   untitledNote: () => t`Untitled`,
   newNote: () => t`New note`,
   exportingNotes: (status?: string) =>
-    t`${status ? status : "Exporting notes"}... Please wait `,
+    t`${status ? status : "Exporting notes"}`,
+  exportingNotesDesc: () => t`Please wait while we export your notes.`,
+  exportingNote: (title: string) => t`Exporting "${title}"`,
+  exportingNoteDesc: () => t`Please wait while we export your not.`,
   exportSuccessHeading: (count: number) =>
     plural(count, {
       one: "Note exported",
@@ -262,7 +270,8 @@ export const strings = {
     reminder: () => t`reminder`,
     color: () => t`color`,
     attachment: () => t`attachment`,
-    item: () => t`item`
+    item: () => t`item`,
+    shortcut: () => t`shortcut`
   },
   dataTypesCamelCase: {
     note: () => t`Note`,
@@ -271,7 +280,8 @@ export const strings = {
     reminder: () => t`Reminder`,
     color: () => t`Color`,
     attachment: () => t`Attachment`,
-    item: () => t`Item`
+    item: () => t`Item`,
+    shortcut: () => t`Shortcut`
   },
   dataTypesPlural: {
     note: () => t`notes`,
@@ -280,7 +290,8 @@ export const strings = {
     reminder: () => t`reminders`,
     color: () => t`colors`,
     attachment: () => t`attachments`,
-    item: () => t`items`
+    item: () => t`items`,
+    shortcut: () => t`shortcuts`
   },
   dataTypesPluralCamelCase: {
     note: () => t`Notes`,
@@ -291,7 +302,8 @@ export const strings = {
     attachment: () => t`Attachments`,
     favorite: () => t`Favorites`,
     monograph: () => t`Monographs`,
-    item: () => t`Items`
+    item: () => t`Items`,
+    shortcut: () => t`Shortcuts`
   },
   addItem: (referenceType: string) =>
     t`Add a ${strings.dataTypes[
@@ -454,8 +466,12 @@ $headline$: Use starting line of the note as title.`,
     reupload: () => t`Reupload`,
     downloadSuccess: () => t`Download successful`,
     fileDownloaded: (name?: string) => t`${name || "File"} downloaded`,
-    dowloadCancelled: () => t`Download cancelled`
+    dowloadCancelled: () => t`Download cancelled`,
+    cancelDownload: () => t`Cancel download`,
+    cancelUpload: () => t`Cancel upload`
   },
+  regenerate: () => t`Regenerate`,
+  redo: () => t`Redo`,
   createYourAccount: () => t`Create your {"\n"}account`,
   pinned: () => t`Pinned`,
   editNotebook: () => t`Edit notebook`,
@@ -503,6 +519,7 @@ $headline$: Use starting line of the note as title.`,
   viewAllLinkedNotebooks: () => t`View all linked notebooks`,
   learnMore: () => t`Learn more`,
   addTag: () => t`Add tag`,
+  addTagDesc: () => t`You can add as many tags as you want.`,
   save: () => t`Save`,
   verify: () => t`Verify`,
   newTab: () => t`New tab`,
@@ -525,6 +542,7 @@ $headline$: Use starting line of the note as title.`,
   saveAsText: () => t`Save to text file`,
   shareToCloud: () => t`Share to cloud`,
   linkedNotes: () => t`Linked notes`,
+  noLinkedNotes: () => t`No linked notes`,
   reminderModes: {
     Repeat: () => t`Repeat`,
     Once: () => t`Once`,
@@ -573,7 +591,8 @@ $headline$: Use starting line of the note as title.`,
     dateEdited: () => t`Date edited`,
     dateCreated: () => t`Date created`,
     title: () => t`Title`,
-    dueDate: () => t`Due date`
+    dueDate: () => t`Due date`,
+    dateDeleted: () => t`Date deleted`
   },
   groupByStrings: {
     default: () => t`Default`,
@@ -656,14 +675,16 @@ $headline$: Use starting line of the note as title.`,
   renameFile: () => t`Rename file`,
   hashCopied: () => t`Hash copied`,
   mediaTypes: {
-    all: () => t`All`,
+    all: () => t`All files`,
     image: () => t`Images`,
     video: () => t`Videos`,
-    audio: () => t`Audio`,
     document: () => t`Documents`,
     orphaned: () => t`Orphaned`,
-    errors: () => t`Errors`
+    errors: () => t`Errors`,
+    audio: () => t`Audios`
   },
+  orphaned: () => t`Orphaned`,
+  uploads: () => t`Uploads`,
   emailNotConfirmed: () => t`Email not confirmed`,
   emailNotConfirmedDesc: () =>
     t`Your email is not confirmed. Please confirm your email address to change account password.`,
@@ -802,6 +823,7 @@ $headline$: Use starting line of the note as title.`,
   password: () => t`Password`,
   renameTag: () => t`Rename tag`,
   renameColor: () => t`Rename color`,
+  renameColorDesc: (color: string) => t`You are renaming color ${color}`,
   name: () => t`Name`,
   unlockToDelete: () => t`Unlock note to delete it`,
   backupRestored: () => t`Backup restored`,
@@ -833,16 +855,26 @@ $headline$: Use starting line of the note as title.`,
   removeFromNotebook: () => t`Remove from notebook`,
   attachments: () => t`Attachments`,
   history: () => t`History`,
-  copyLink: () => t`Copy link`,
+  copyLink: () => t`Copy internal link`,
   linkCopied: () => t`Link copied`,
   readOnly: () => t`Read only`,
   syncOff: () => t`Sync off`,
+  syncOffConfirm: (count: number) =>
+    t`Prevent ${strings.itemsPlural("note", count)} from syncing`,
+  syncOffDesc: (count: number) =>
+    `${strings.itemsPlural(
+      "note",
+      count
+    )} will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?`,
   duplicate: () => t`Duplicate`,
   remindMe: () => t`Remind me`,
   published: () => t`Published`,
   unpinFromNotifications: () => t`Unpin from notifications`,
   pinToNotifications: () => t`Pin to notifications`,
   linkNotebooks: () => t`Link notebooks`,
+  unlinkFromAll: () => t`Unlink from all`,
+  removeFromAll: () => t`Remove from all`,
+  assignTo: () => t`Assign to`,
   addTags: () => t`Add tags`,
   references: () => t`References`,
   moveNotebookFix: () => t`Move notebook`,
@@ -850,7 +882,7 @@ $headline$: Use starting line of the note as title.`,
   createNewNote: () => t`Create a new note`,
   monographs: () => t`Monographs`,
   encryptingAttachment: () => t`Encrypting attachment`,
-  encryptingAttachmentDesc: (name: string) =>
+  encryptingAttachmentDesc: (name = "attachment") =>
     t`Please wait while we encrypt ${name} for upload.`,
   fileTooLarge: () => t`File too big`,
   fileTooLargeDesc: (sizeInMB: number) =>
@@ -966,6 +998,7 @@ $headline$: Use starting line of the note as title.`,
   deleteAccountDesc: () =>
     t`All your data will be removed permanently. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.`,
   enterAccountPassword: () => t`Enter account password`,
+  enterAccountPasswordDesc: () => t`Enter account password to proceed.`,
   failedToDeleteAccount: () => t`Failed to delete account`,
   syncSettings: () => t`Sync settings`,
   syncSettingsDesc: () => t`Manage your sync settings here`,
@@ -1064,6 +1097,7 @@ $headline$: Use starting line of the note as title.`,
   appLockTimeout: () => t`App lock timeout`,
   appLockTimeoutDesc: () =>
     t`Automatically lock the app after a certain period`,
+
   setupAppLockPin: () => t`Setup app lock pin`,
   setupAppLockPinDesc: () => t`Setup a pin to lock the app`,
   setupAppLockPassword: () => t`Setup app lock password`,
@@ -1186,6 +1220,7 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
   deleteCollapsedDesc: () =>
     t`All tools in the collapsed section will be removed`,
   clearTrash: () => t`Clear trash`,
+  areYouSure: () => t`Are you sure?`,
   clearTrashConfirm: () => t`Are you sure you want to clear trash?`,
   trashCleared: () => t`Trash cleared successfully!`,
   trash: () => t`Trash`,
@@ -1382,15 +1417,16 @@ For example:
   searchANote: () => t`Search a note`,
   remindeMeOf: () => t`Remind me of...`,
   addShortNote: () => t`Add a short note`,
-  typeAKeywordToSearchIn: () => t`Type a keyword to search in`,
-  searchingFor: () => t`Searching for`,
+  typeAKeywordToSearchIn: (route: string) =>
+    t`Type a keyword to search in ${route}`,
+  searchingFor: (query: string) => t`Searching for ${query}`,
   typeAKeyword: () => t`Type a keyword`,
   search: () => t`Search`,
   enterEmailAddress: () => t`Enter email address`,
   enterValidEmail: () => t`Please enter a valid email address`,
   enterValidPhone: () => t`Please enter a valid phone number with country code`,
   errorGettingCodes: () => t`Error getting codes`,
-  noResultsFound: () => t`No results found for`,
+  noResultsFound: (query: string) => t`No results found for ${query}`,
   routes: {
     Notes: () => t`Notes`,
     Notebooks: () => t`Notebooks`,
@@ -1424,7 +1460,7 @@ For example:
   emailOrPasswordIncorrect: () => t`Email or password incorrect`,
   errorApplyingPromoCode: () => t`Error applying promo code`,
   noNotificationPermission: () =>
-    t`"App does not have permission to schedule notifications"`,
+    t`Please grant notifications permission to add new reminders.`,
   selectDayError: () => t`Please select the day to repeat the reminder on`,
   setTitleError: () => t`Please set title of the reminder`,
   dateError: () => t`Reminder date must be set in future`,
@@ -1475,7 +1511,8 @@ For example:
     t`Select a backup file from your device to restore backup`,
   restoreFromFiles: () => t`Restore from files`,
   recentBackups: () => t`RECENT BACKUPS`,
-  restoringBackup: () => t`Restoring backups...`,
+  restoringBackup: () => t`Restoring backup...`,
+  restoringBackupDesc: () => t`Please wait while we restore your backup`,
   decryptingBackup: () => t`Backup is encrypted, decrypting...`,
   preparingBackupRestore: () => t`Preparing to restore backup file...`,
   readingBackupFile: () => t`Reading backup file...`,
@@ -1499,9 +1536,9 @@ For example:
   connectedToServer: () => t`Connected to all servers sucessfully.`,
   allServerUrlsRequired: () => t`All server urls are required.`,
   serverNotFound: (host: string) => t`Server with host ${host} not found.`,
-  couldNotConnectTo: () => t`Could not connect to`,
-  incorrectServerUrl: (url: string) =>
-    t`The URL you have given (${url}) does not point to the`,
+  couldNotConnectTo: (server: string) => t`Could not connect to ${server}`,
+  incorrectServerUrl: (url: string, server: string) =>
+    t`The URL you have given (${url}) does not point to the ${server}`,
   serverVersionMismatch: (title: string, url: string) =>
     t`The ${title} at ${url} is not compatible with this client.`,
   testConnectionBeforeSave: () =>
@@ -1588,7 +1625,7 @@ For example:
     }),
   of: () => t`of`,
   installs: () => t`installs`,
-  licenseUnder: () => t`Licensed under`,
+  licenseUnder: (license: string) => t`Licensed under ${license}`,
   pro: () => t`Pro`,
   mfaScanQrCode: () => t`Scan the QR code with your authenticator app`,
   scanQrError: () =>
@@ -1643,14 +1680,14 @@ For example:
     t`Your changes have been saved and will be reflected after the app has refreshed.`,
   edit: () => t`Edit`,
   yourFullName: () => t`Your full name`,
-  memberSince: () => t`Member since`,
+  memberSince: (date: string) => t`Member since ${date}`,
   betaLoginNotice: () =>
     t`You are logging into the beta version of Notesnook. Switching between beta &amp; stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously.`,
   loggingIn: () => "Logging you in",
   pleaseWaitLogin: () => t`Please wait while you are authenticated.`,
   emailConfirmed: () => t`Your email has been confirmed.`,
   confirmEmailThankyou: () =>
-    t`Thank you for choosing end-to-end encrypted note taking.`,
+    t`Thank you for choosing end-to-end encrypted note taking. Now you can sync your notes to unlimited devices.`,
   shareWithFriends: () => t`Share Notesnook with friends!`,
   tagPromoWinText: () => [
     t`Use`,
@@ -1659,7 +1696,7 @@ For example:
   ],
   shareWithFriendsDesc: () => t`Because where's the fun in nookin' alone?`,
   notebooksAllCaps: () => t`NOTEBOOKS`,
-  authenticatedAs: () => t`Authenticated as`,
+  authenticatedAs: (email?: string) => t`Authenticated as ${email}`,
   rememberedYourPassword: () => t`Remembered your password?`,
   accountRecoveryMethods: [
     {
@@ -1786,7 +1823,7 @@ All attachments will be downloaded & cached again on access.
   backupYourDataDesc: () =>
     t`Please download a backup of your data as your account will be cleared before recovery.`,
   backingUpDataWait: () =>
-    t`Please wait while we create a backup file for you to download.`,
+    t`We are creating a backup of your data. Please wait...`,
   resetAccountPassword: () => t`Reset account password`,
   resettingAccountPassword: () => t`Resetting account password`,
   resetPasswordWait: () => t`Please wait while we reset your account password.`,
@@ -1809,69 +1846,369 @@ All attachments will be downloaded & cached again on access.
     pinned: t`pinned`,
     unpublished: t`unpublished`,
     published: t`published`,
-    permanentlyDeleted: t`permanently deleted`
+    permanentlyDeleted: t`permanently deleted`,
+    restored: t`restored`,
+    edited: t`edited`,
+    created: t`created`,
+    renamed: t`renamed`
   }),
+  permanentlyDeleteDesc: (type: string, count: number) =>
+    plural(count, {
+      one: `Are you sure you want to permanently delete this ${
+        strings.dataTypes[type as never]
+      }? This action is IRREVERSIBLE.`,
+      other: `Are you sure you want to permanently delete these ${
+        strings.dataTypesPlural[type as never]
+      }? This action is IRREVERSIBLE.`
+    }),
+  doActions: () => ({
+    delete: t`Delete`,
+    unpin: t`Unpin`,
+    pin: t`Pin`,
+    unpublish: t`Unpublish`,
+    publish: t`Publish`,
+    permanentlyDelete: t`Permanently delete`,
+    restore: t`Restore`,
+    edit: t`Edit`,
+    create: t`Created`,
+    rename: t`Rename`,
+    remove: t`Remove`
+  }),
+
+  doAction: (type: string, count: number, action: string) => {
+    const actions = strings.doActions();
+    return plural(count, {
+      one: `${strings.dataTypesCamelCase[
+        type as keyof typeof strings.dataTypes
+      ]()} ${actions[action as never]}`,
+      other: `# ${strings.dataTypesPlural[
+        type as keyof typeof strings.dataTypesPlural
+      ]()} ${actions[action as never]}`
+    });
+  },
   action: (type: string, count: number, action: Actions) => {
     const actions = strings.actions();
     return plural(count, {
-      one: `${
-        strings.dataTypesCamelCase[type as keyof typeof strings.dataTypes]
-      } ${actions[action]}`,
-      other: `# ${
-        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
-      } ${actions[action]}`
+      one: `${strings.dataTypesCamelCase[
+        type as keyof typeof strings.dataTypes
+      ]()} ${actions[action]}`,
+      other: `# ${strings.dataTypesPlural[
+        type as keyof typeof strings.dataTypesPlural
+      ]()} ${actions[action]}`
     });
   },
   actionError: (type: string, count: number, action: Actions) => {
     const actions = strings.actions();
     return plural(count, {
-      one: `${
-        strings.dataTypesCamelCase[type as keyof typeof strings.dataTypes]
-      } could not be ${actions[action]}`,
-      other: `# ${
-        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
-      } could not be ${actions[action]}`
+      one: `${strings.dataTypesCamelCase[
+        type as keyof typeof strings.dataTypes
+      ]()} could not be ${actions[action]}`,
+      other: `# ${strings.dataTypesPlural[
+        type as keyof typeof strings.dataTypesPlural
+      ]()} could not be ${actions[action]}`
     });
   },
   deleted: (type: string, count: number) =>
     plural(count, {
-      one: `${
-        strings.dataTypesCamelCase[type as keyof typeof strings.dataTypes]
-      } deleted`,
-      other: `# ${
-        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
-      } deleted`
+      one: `${strings.dataTypesCamelCase[
+        type as keyof typeof strings.dataTypes
+      ]()} deleted`,
+      other: `# ${strings.dataTypesPlural[
+        type as keyof typeof strings.dataTypesPlural
+      ]()} deleted`
     }),
   unpinned: (type: string, count: number) =>
     plural(count, {
-      one: `${
-        strings.dataTypesCamelCase[type as keyof typeof strings.dataTypes]
-      } unpinned`,
-      other: `# ${
-        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
-      } unpinned`
+      one: `${strings.dataTypesCamelCase[
+        type as keyof typeof strings.dataTypes
+      ]()} unpinned`,
+      other: `# ${strings.dataTypesPlural[
+        type as keyof typeof strings.dataTypesPlural
+      ]()} unpinned`
     }),
   deleting: () => t`Deleting`,
   deletingItems: (type: string, count: number) =>
     plural(count, {
-      one: `Deleting ${
-        strings.dataTypes[type as keyof typeof strings.dataTypes]
-      }`,
-      other: `Deleting ${
-        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
-      }`
+      one: `Deleting ${strings.dataTypes[
+        type as keyof typeof strings.dataTypes
+      ]()}`,
+      other: `Deleting ${strings.dataTypesPlural[
+        type as keyof typeof strings.dataTypesPlural
+      ]()}`
     }),
 
   itemsPlural: (type: string, count: number) =>
     plural(count, {
-      one: `${strings.dataTypes[type as keyof typeof strings.dataTypes]}`,
-      other: `# ${
-        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
-      }`
+      one: `${strings.dataTypes[type as keyof typeof strings.dataTypes]()}`,
+      other: `# ${strings.dataTypesPlural[
+        type as keyof typeof strings.dataTypesPlural
+      ]()}`
     }),
   backupReadyToDownload: () => t`Your backup is ready to download`,
   unlockVault: () => t`Unlock vault`,
   unlockVaultDesc: () => t`Please enter your vault password to continue`,
   imagePreviewFailed: () => t`This image cannot be previewed`,
-  failedToCopyNote: () => t`Failed to copy note`
+  failedToCopyNote: () => t`Failed to copy note`,
+  upgradeToProToUseFeature: (feature = "default") => {
+    const features = {
+      color: t`Upgrade to Notesnook Pro to add colors.`,
+      tags: t`Upgrade to Notesnook Pro to create more tags.`,
+      notebook: t` Upgrade to Notesnook Proto add more notebooks.`,
+      vault: t` Upgrade to Notesnook Proto use the notes vault.`,
+      customPresets: t` Upgrade to Notesnook Pro to use custom toolbar presets.`,
+      customizeToolbar: t` Upgrade to Notesnook Pro to customize the toolbar.`,
+      default: t` Upgrade to Notesnook Proto use this feature.`
+    };
+    return features[feature as keyof typeof features];
+  },
+  noteDoesNotExist: () => t`Note does not exist`,
+  couldNotConvertNote: (format: string) =>
+    t`Could not convert note to ${format}`,
+  remindersNotSupported: () =>
+    t`Reminders will not be active on this device as it does not support notifications.`,
+  invalidHexColor: () => t`Please enter a valid hex color (e.g. #ffffff)`,
+  profileUpdated: () => t`Profile updated`,
+  addedToNotebook: (count: number) =>
+    plural(count, {
+      one: `added to 1 notebook`,
+      other: `added to # notebooks`
+    }),
+  removedFromNotebook: (count: number) =>
+    plural(count, {
+      one: `removed from 1 notebook`,
+      other: `removed from # notebooks`
+    }),
+  noEncryptionKeyFound: () => t`No encryption key found`,
+  couldNotActivateTrial: () => t`Could not activate trial`,
+  pleaseTryAgain: () => t`Please try again`,
+  securityKeyRegistered: () => t`Security key successfully registered.`,
+  restartNow: () => t`Restart now`,
+  copied: () => t`Copied to clipboard`,
+  invalidCors: () => t`Invalid CORS proxy url`,
+  vaultCleared: () => t`Vault cleared`,
+  vaultDeleted: () => t`Vault deleted`,
+  subgroupAdded: () => t`Subgroup added`,
+  subCanceled: () => t`Your subscription has been canceled.`,
+  refundIssued: () =>
+    t`Your refund has been issued. Please wait 24 hours before reaching out to us in case you do not receive your funds.`,
+  failedToInstallTheme: () => t`Failed to install theme`,
+  fullNameUpdated: () => t`Full name updated`,
+  shortcutRemoved: () => t`Shortcut removed`,
+  recheckFailed: () => t`Rechecking failed`,
+  failedToDelete: () => t`Failed to delete`,
+  failedToRegisterTask: () => t`Failed to register task`,
+  couldNotClearTrash: () => t`Could not clear trash`,
+  automaticBackupsDisabled: () => t`Automatic backups disabled`,
+  automaticBackupsDisabledDesc: () =>
+    t`Please upgrade to Pro to enable automatic backups.`,
+  default: () => t`Default`,
+  minimal: () => t`Minimal`,
+  custom: () => t`Custom`,
+  disableEditorMargins: () => t`Disable editor margins`,
+  enableEditorMargins: () => t`Enable editor margins`,
+  exitFullScreen: () => t`Exit fullscreen`,
+  normalMode: () => t`Normal mode`,
+  focusMode: () => t`Focus mode`,
+  closeOthers: () => t`Close others`,
+  closeToRight: () => t`Close to the right`,
+  closeToLeft: () => t`Close to the left`,
+  closeAll: () => t`Close all`,
+  revealInList: () => t`Reveal in list`,
+  keepOpen: () => t`Keep open`,
+  orderBy: () => t`Order by`,
+  oldestToNewest: () => t`Oldest - newest`,
+  newestToOldest: () => t`Newest - oldest`,
+  sort: () => t`Sort`,
+  jumpToGroup: () => t`Jump to group`,
+  rotateLeft: () => t`Rotate left`,
+  rotateRight: () => t`Rotate right`,
+  website: () => t`Website`,
+  resetSidebar: () => t`Reset sidebar`,
+  removeColor: () => t`Remove color`,
+  favorite: () => t`Favorite`,
+  assignColor: () => t`Assign color`,
+  print: () => t`Print`,
+  exportAs: (format?: string) => t`Export as${format ? " " + format : ""}`,
+  copyAs: (format?: string) => t`Copy as${format ? " " + format : ""}`,
+  activate: () => t`Activate`,
+  deactivate: () => t`Deactivate`,
+  minimize: () => t`Minimize`,
+  maximize: () => t`Maximize`,
+  size: () => t`Size`,
+  dateUploaded: () => t`Date uploaded`,
+  editingTagDesc: (tag: string) => t`You are editing #${tag}`,
+  applyingChanges: () => t`Applying changes`,
+  thisMayTakeAWhile: () => t`This may take a while`,
+  processing: () => t`Processing`,
+  root: () => t`Root`,
+  credientials: () => t`Credentials`,
+  thankYouForReporting: () => t`Thank you for reporting!`,
+  bugReportMessage: (
+    url: string
+  ) => t`You can track your bug report at [${url}](${url}).
+  
+Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**
+  
+If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`,
+
+  safeEncryptedNotes: () => t`Safe & encrypted notes`,
+  writeWithFreedom: () =>
+    t`Write with freedom. Never compromise on privacy again.`,
+  chooseYourStyle: () => t`Choose your style`,
+  changeTheme: () =>
+    t`You can change the theme at any time from Settings or the side menu.`,
+  crossPlatformEncrypted: () => t`Cross platform & 100% encrypted`,
+  encryptsEverything: () =>
+    t`Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us.`,
+  joinTheCause: () => t`Join the cause`,
+  meetPrivacyMinded: () =>
+    t`Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions.`,
+  nextLevelPrivateNoteTaking: () =>
+    t`Experience the next level of private note taking"`,
+  welcomeToNotesnookPro: () => t`Welcome to Notesnook Pro`,
+  thankYouPrivacy: () =>
+    t`Thank you. You are the proof that privacy always comes first.`,
+  weAreAlwaysListening: () =>
+    t`If you face any issue, you can reach out to us anytime.`,
+  importYourNotes: () =>
+    t`You can import your notes from most other note taking apps.`,
+  congratulations: () => t`Congratulations!`,
+  passwordPin: () => t`Password/pin`,
+  passwordPinDescription: () => t`The password/pin for unlocking the app.`,
+  securityKey: () => t`Security key`,
+  securityKeyDescription: () =>
+    t`The security key for unlocking the app. This is the most secure method.`,
+  unregister: () => t`Unregister`,
+  register: () => t`Register`,
+  enterPasswordOrPin: () => t`Enter pin or password to enable app lock.`,
+  securityKeyUsername: () => t`Enter your username`,
+  securityKeyUsernameDesc: () =>
+    t`This username will be used to distinguish between different credentials in your security key. Make sure it is unique.`,
+  general: () => t`General`,
+  zoomFactor: () => t`Zoom factor`,
+  zoomFactorDescription: () => t`Zoom in or out the app content.`,
+  colorScheme: () => t`Color scheme`,
+  colorSchemeDescription: () => t`Dark or light, we won't judge.`,
+  auto: () => t`Auto`,
+  selectTheme: () => t`Select a theme`,
+  current2faMethod: (method: string) => t`Your current 2FA method is ${method}`,
+  partialBackupDescription: () =>
+    t`Partial backups contain all your data except attachments. They are created from data already available on your device and do not require an Internet connection.`,
+  chooseBackupFormat: () => t`Choose backup format`,
+  backup: () => t`Backup`,
+  backupWithAttachments: () => t`Backup with attachments`,
+  dateAndTime: () => t`Date & time`,
+  desktopApp: () => t`Desktop app`,
+  automaticUpdates: () => t`Automatic updates`,
+  automaticUpdatesDesc: () =>
+    t`Automatically download & install updates in the background without prompting first.`,
+  desktopIntegration: () => t`Desktop integration`,
+  autoStartOnSystemStartup: () => t`Auto start on system startup`,
+  autoStartDescription: () =>
+    t`If true, Notesnook will automatically start up when you turn on & login to your system.`,
+  startMinimized: () => t`Start minimized`,
+  startMinimizedDescription: () =>
+    t`If true, Notesnook will start minimized to either the system tray or your system taskbar/dock. This setting only works with Auto start on system startup is enabled.`,
+  minimizeToSystemTray: () => t`Minimize to system tray`,
+  minimizeToSystemTrayDescription: () =>
+    t`Pressing "—" will hide the app in your system tray.`,
+  closeToSystemTray: () => t`Close to system tray`,
+  closeToSystemTrayDescription: () =>
+    t`Pressing "X" will hide the app in your system tray.`,
+  useNativeTitlebar: () => t`Use native titlebar`,
+  useNativeTitlebarDescription: () =>
+    t`Use native OS titlebar instead of replacing it with a custom one. Requires app restart for changes to take effect.`,
+  spellCheck: () => t`Spell check`,
+  enableSpellChecker: () => t`Enable spell checker`,
+  languages: () => t`Languages`,
+  spellCheckerLanguagesDescription: () =>
+    t`Select the languages the spell checker should check in.`,
+  customDictionaryWords: () => t`Custom dictionary words`,
+  toolbar: () => t`Toolbar`,
+  profile: () => t`Profile`,
+  authentication: () => t`Authentication`,
+  sync: () => t`Sync`,
+  behaviour: () => "Behaviour",
+  notifications: () => "Notifications",
+  servers: () => "Servers",
+  importExport: () => "Import & export",
+  backupExport: () => "Backup & export",
+  notesnookImporter: () => "Notesnook Importer",
+  securityPrivacy: () => "Security & privacy",
+  privacy: () => "Privacy",
+  other: () => "Other",
+  newVersionAvailable: (version: string) =>
+    `New version (v${version}) is available for download.`,
+  installUpdate: () => "Install update",
+  sourceCode: () => "Source code",
+  sourceCodeDescription: () =>
+    "All the source code for Notesnook is available & open for everyone on GitHub.",
+  viewSourceCode: () => "View source code",
+  checkRoadmap: () => "Check roadmap",
+  availableOnIOS: () => "Available on iOS",
+  availableOnIOSAndAndroid: () => "Available on iOS & Android",
+  availableOnIOSDescription: () =>
+    "Get Notesnook app on your iPhone and access all your notes on the go.",
+  availableOnIOSAndAndroidDescription: () =>
+    "Get Notesnook app on your iPhone or Android device and access all your notes on the go.",
+  joinCommunity: () => "Join community",
+  license: () => "License",
+  licenseDescription: () => "GNU GENERAL PUBLIC LICENSE Version 3",
+  follow: () => t`follow`,
+  report: () => t`Report`,
+  send: () => t`Send`,
+  marketingEmailsDescription: () =>
+    t`We send you occasional promotional offers & product updates on your email (once every month).`,
+  hideNoteTitle: () => t`Hide note title`,
+  hideNoteTitleDescription: () =>
+    t`Prevent note title from appearing in tab/window title.`,
+  advanced: () => t`Advanced`,
+  useCustomDns: () => t`Use custom DNS`,
+  customDnsDescription: () =>
+    t`Notesnook uses the following DNS providers:
+
+1. Cloudflare DNS
+2. Quad9
+
+This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this if you want the app to use system's DNS settings.`,
+  changeProxy: () => t`Change proxy`,
+  proxy: () => t`Proxy`,
+  proxyDescription: () =>
+    t`Setup an HTTP/HTTPS/SOCKS proxy.
+        
+For example:
+http://foobar:80
+socks4://proxy.example.com
+http://username:password@foobar:80
+
+To remove the proxy, simply erase everything in the input.`,
+  sessions: () => t`Sessions`,
+  loggedOut: () => t`You have been logged out.`,
+  logoutAllOtherDevices: () => t`Log out from all other devices`,
+  logoutAllOtherDevicesDescription: () =>
+    t`Force logout from all your other logged in devices.`,
+  clearSessions: () => t`clear sessions`,
+  loggedOutAllOtherDevices: () =>
+    t`You have been logged out from all other devices.`,
+  paymentMethod: () => t`Payment method`,
+  changePaymentMethodDescription: () =>
+    t`Change the payment method you used to purchase this subscription.`,
+  billingHistory: () => t`Billing history`,
+  failedToTakeBackup: () => t`Failed to take backup`,
+  failedToTakeBackupMessage: () =>
+    t`Failed to take backup of your data. Do you want to continue logging out?`,
+  fullOfflineMode: () => t`Full offline mode`,
+  fullOfflineModeDesc: () =>
+    t`Download everything including attachments on sync`,
+  havingProblemsWithSync: () => t`Having problems with sync?`,
+  understand: () => t`I understand`,
+  havingProblemsWithSyncDesc: () =>
+    t`Force push:
+Use this if changes made on this device are not appearing on other devices. This will overwrite the data on the server with the data from this device.
+
+Force pull:
+Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.
+
+**These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**`,
+  checkingAttachments: () => `Checking attachments`
 };

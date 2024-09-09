@@ -59,74 +59,66 @@ type Step = {
     | ((props: { onNext: () => void }) => JSX.Element)
     | ((props: { onClose: () => void }) => JSX.Element);
 };
+
 const newUserSteps: Step[] = [
   {
-    title: "Safe & encrypted notes",
-    subtitle: "Write with freedom. Never compromise on privacy again.",
-    buttonText: "Get started",
+    title: strings.safeEncryptedNotes(),
+    subtitle: strings.writeWithFreedom(),
+    buttonText: strings.getStarted(),
     image: <Note style={{ flexShrink: 0, width: 120, height: 120 }} />
   },
   {
-    title: "Choose your style",
-    subtitle:
-      "You can change the theme at any time from Settings or the side menu.",
-    buttonText: "Next",
+    title: strings.chooseYourStyle(),
+    subtitle: strings.changeTheme(),
+    buttonText: strings.next(),
     component: ThemeSelector
   },
   {
     image: <E2E style={{ flexShrink: 0, width: 180, height: 180 }} />,
-    title: "Cross platform & 100% encrypted",
-    subtitle:
-      "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us.",
+    title: strings.crossPlatformEncrypted(),
+    subtitle: strings.encryptsEverything(),
     component: CrossPlatform,
-    buttonText: "Next"
+    buttonText: strings.next()
   },
   {
-    title: "Join the cause",
-    subtitle:
-      "Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions.",
+    title: strings.joinTheCause(),
+    subtitle: strings.meetPrivacyMinded(),
     component: JoinCause,
     image: <Friends style={{ flexShrink: 0, width: 140, height: 140 }} />
   },
   {
     image: <Pro size={60} color="accent" />,
-    title: "Notesnook Pro",
-    subtitle: "Experience the next level of private note taking",
+    title: strings.notesnookPro(),
+    subtitle: strings.nextLevelPrivateNoteTaking(),
     component: TrialOffer
   }
 ];
 
 const proUserSteps: Step[] = [
   {
-    title: "Welcome to Notesnook Pro",
-    subtitle: "Thank you. You are the proof that privacy always comes first.",
-    buttonText: "Next",
+    title: strings.welcomeToNotesnookPro(),
+    subtitle: strings.thankYouPrivacy(),
+    buttonText: strings.next(),
     image: <Nomad style={{ flexShrink: 0, width: 120, height: 120 }} />
   },
-  // {
-  //   title: "Style your 'nook",
-  //   subtitle: "Let's make Notesnook your new note taking home",
-  //   buttonText: "Next",
-  //   component: AccentSelector
-  // },
   {
-    title: "We are always listening",
-    subtitle: "If you face any issue, you can reach out to us anytime.",
-    buttonText: "Next",
+    title: strings.weAreAlwaysListening(),
+    subtitle: strings.weAreAlwaysListening(),
+    buttonText: strings.next(),
     component: Support
   },
   {
-    title: "Import your notes",
-    subtitle: "You can import your notes from most other note taking apps.",
+    title: strings.importYourNotes(),
+    subtitle: strings.importYourNotes(),
     component: Importer
   }
 ];
 
 const trialUserSteps: Step[] = [
   {
-    title: "Congratulations!",
-    subtitle: "You 14-day free trial has been activated.",
-    buttonText: "Continue",
+    title: strings.congratulations(),
+    subtitle: strings.trialStarted(),
+    buttonText: strings.continue(),
     image: <WorkAnywhere style={{ flexShrink: 0, width: 160, height: 160 }} />
   }
 ];
@@ -314,25 +306,25 @@ const supportChannels = [
   {
     key: "email",
     url: "mailto:support@streetwriters.co",
-    title: "Email us",
+    title: strings.emailSupport(),
     icon: Email
   },
   {
     key: "discord",
     url: "https://discord.com/invite/zQBK97EE22",
-    title: "Join the community",
+    title: strings.joinDiscord(),
     icon: Discord
   },
   {
     key: "twitter",
     url: "https://twitter.com/notesnook",
-    title: "Follow us @notesnook",
+    title: strings.followOnX(),
     icon: Twitter
   },
   {
     key: "github",
     url: "https://github.com/streetwriters/notesnook",
-    title: "Create an issue",
+    title: strings.reportAnIssue(),
     icon: Github
   }
 ];

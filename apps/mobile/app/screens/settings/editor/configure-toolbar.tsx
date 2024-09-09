@@ -76,15 +76,15 @@ export const ConfigureToolbar = () => {
             {[
               {
                 id: "default",
-                name: "Default"
+                name: strings.default()
               },
               {
                 id: "minimal",
-                name: "Minimal"
+                name: strings.minimal()
               },
               {
                 id: "custom",
-                name: "Custom",
+                name: strings.custom(),
                 pro: true
               }
             ].map((item) => (

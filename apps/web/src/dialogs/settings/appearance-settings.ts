@@ -21,18 +21,19 @@ import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { ThemesSelector } from "./components/themes-selector";
+import { strings } from "@notesnook/intl";
 
 export const AppearanceSettings: SettingsGroup[] = [
   {
     key: "theme",
     section: "appearance",
-    header: "General",
+    header: strings.general(),
     isHidden: () => !IS_DESKTOP_APP,
     settings: [
       {
         key: "zoom-factor",
-        title: "Zoom factor",
-        description: "Zoom in or out the app content.",
+        title: strings.zoomFactor(),
+        description: strings.zoomFactorDescription(),
         isHidden: () => !IS_DESKTOP_APP,
         onStateChange: (listener) =>
           useThemeStore.subscribe(
@@ -56,12 +57,12 @@ export const AppearanceSettings: SettingsGroup[] = [
   {
     key: "theme",
     section: "appearance",
-    header: "Themes",
+    header: strings.themes(),
     settings: [
       {
         key: "color-scheme",
-        title: "Color scheme",
-        description: "Dark or light, we won't judge.",
+        title: strings.colorScheme(),
+        description: strings.colorSchemeDescription(),
         onStateChange: (listener) =>
           useThemeStore.subscribe(
             (s) => [s.colorScheme, s.followSystemTheme],
@@ -71,9 +72,9 @@ export const AppearanceSettings: SettingsGroup[] = [
           {
             type: "dropdown",
             options: [
-              { title: "Light", value: "light" },
-              { title: "Dark", value: "dark" },
-              { title: "Auto", value: "auto" }
+              { title: strings.light(), value: "light" },
+              { title: strings.dark(), value: "dark" },
+              { title: strings.auto(), value: "auto" }
             ],
             selectedOption: () =>
               useThemeStore.getState().followSystemTheme
@@ -82,14 +83,16 @@ export const AppearanceSettings: SettingsGroup[] = [
             onSelectionChanged: (value) => {
               useThemeStore.getState().setFollowSystemTheme(value === "auto");
               if (value !== "auto")
-                useThemeStore.getState().setColorScheme(value);
+                useThemeStore
+                  .getState()
+                  .setColorScheme(value as "dark" | "light");
             }
           }
         ]
       },
       {
         key: "themes",
-        title: "Select a theme",
+        title: strings.selectTheme(),
         components: [{ type: "custom", component: ThemesSelector }]
       }
     ]

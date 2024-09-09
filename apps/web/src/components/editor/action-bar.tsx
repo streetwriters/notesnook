@@ -76,6 +76,7 @@ import { db } from "../../common/db";
 import { showPublishView } from "../publish-view";
 import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 import useMobile from "../../hooks/use-mobile";
+import { strings } from "@notesnook/intl";
 
 export function EditorActionBar() {
   const editorMargins = useEditorStore((store) => store.editorMargins);
@@ -96,19 +97,19 @@ export function EditorActionBar() {
 
   const tools = [
     {
-      title: "Undo",
+      title: strings.undo(),
       icon: Undo,
       enabled: editorManager?.canUndo,
       onClick: () => editorManager?.editor?.undo()
     },
     {
-      title: "Redo",
+      title: strings.redo(),
       icon: Redo,
       enabled: editorManager?.canRedo,
       onClick: () => editorManager?.editor?.redo()
     },
     {
-      title: isNotePublished ? "Published" : "Publish",
+      title: isNotePublished ? strings.published() : strings.publish(),
       icon: isNotePublished ? Published : Publish,
       hidden: !isLoggedIn,
       hideOnMobile: true,
@@ -122,14 +123,18 @@ export function EditorActionBar() {
         showPublishView(activeSession.note, "top")
     },
     {
-      title: editorMargins ? "Disable editor margins" : "Enable editor margins",
+      title: editorMargins
+        ? strings.disableEditorMargins()
+        : strings.enableEditorMargins(),
       icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
       enabled: true,
       hideOnMobile: true,
       onClick: () => useEditorStore.getState().toggleEditorMargins()
     },
     {
-      title: isFullscreen ? "Exit fullscreen" : "Enter fullscreen",
+      title: isFullscreen
+        ? strings.exitFullScreen()
+        : strings.enterFullScreen(),
       icon: isFullscreen ? ExitFullscreen : Fullscreen,
       enabled: true,
       hidden: !isFocusMode,
@@ -143,7 +148,7 @@ export function EditorActionBar() {
       }
     },
     {
-      title: isFocusMode ? "Normal mode" : "Focus mode",
+      title: isFocusMode ? strings.normalMode() : strings.focusMode(),
       icon: isFocusMode ? FocusMode : NormalMode,
       enabled: true,
       hideOnMobile: true,
@@ -156,7 +161,7 @@ export function EditorActionBar() {
       }
     },
     {
-      title: "Table of contents",
+      title: strings.toc(),
       icon: TableOfContents,
       enabled:
         activeSession &&
@@ -167,7 +172,7 @@ export function EditorActionBar() {
       onClick: () => useEditorStore.getState().toggleTableOfContents()
     },
     {
-      title: "Search",
+      title: strings.search(),
       icon: Search,
       enabled:
         activeSession &&
@@ -178,7 +183,7 @@ export function EditorActionBar() {
       onClick: editorManager?.editor?.startSearch
     },
     {
-      title: "Properties",
+      title: strings.properties(),
       icon: Properties,
       enabled:
         activeSession &&
@@ -468,35 +473,40 @@ function Tab(props: TabProps) {
       onContextMenu={(e) => {
         e.preventDefault();
         Menu.openMenu([
-          { type: "button", title: "Close", key: "close", onClick: onClose },
           {
             type: "button",
-            title: "Close others",
+            title: strings.close(),
+            key: "close",
+            onClick: onClose
+          },
+          {
+            type: "button",
+            title: strings.closeOthers(),
             key: "close-others",
             onClick: onCloseOthers
           },
           {
             type: "button",
-            title: "Close to the right",
+            title: strings.closeToRight(),
             key: "close-to-the-right",
             onClick: onCloseToTheRight
           },
           {
             type: "button",
-            title: "Close to the left",
+            title: strings.closeToLeft(),
             key: "close-to-the-left",
             onClick: onCloseToTheLeft
           },
           {
             type: "button",
-            title: "Close all",
+            title: strings.closeAll(),
             key: "close-all",
             onClick: onCloseAll
           },
           { type: "separator", key: "sep" },
           {
             type: "button",
-            title: "Reveal in list",
+            title: strings.revealInList(),
             key: "reveal-in-list",
             onClick: onRevealInList
           },
@@ -504,14 +514,14 @@ function Tab(props: TabProps) {
           {
             type: "button",
             key: "keep-open",
-            title: "Keep open",
+            title: strings.keepOpen(),
             onClick: onKeepOpen,
             isDisabled: !isTemporary
           },
           {
             type: "button",
             key: "pin",
-            title: "Pin",
+            title: strings.pin(),
             onClick: onPin,
             isChecked: isPinned,
             icon: Pin.path

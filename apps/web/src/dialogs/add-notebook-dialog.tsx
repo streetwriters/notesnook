@@ -65,9 +65,7 @@ export const AddNotebookDialog = DialogManager.register(
 
       showToast(
         "success",
-        props.edit
-          ? "Notebook edited successfully!"
-          : "Notebook created successfully"
+        strings.action("notebook", 1, props.edit ? "edited" : "created")
       );
       onClose(true);
     }, [props.notebook?.id, props.edit, onClose, parentId]);

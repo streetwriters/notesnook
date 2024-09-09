@@ -25,6 +25,7 @@ import { showToast } from "../../utils/toast";
 import { db } from "../../common/db";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { BuyDialog } from "../buy-dialog/buy-dialog";
+import { strings } from "@notesnook/intl";
 
 export const VaultSettings: SettingsGroup[] = [
   {
@@ -83,7 +84,7 @@ export const VaultSettings: SettingsGroup[] = [
             action: async () => {
               if (await Vault.clearVault()) {
                 useNotesStore.getState().refresh();
-                showToast("success", "Vault cleared.");
+                showToast("success", strings.vaultCleared());
               }
             },
             variant: "errorSecondary"
@@ -105,7 +106,7 @@ export const VaultSettings: SettingsGroup[] = [
               if ((await Vault.deleteVault()) && !(await db.vault.exists())) {
                 useAppStore.getState().setIsVaultCreated(false);
                 await useAppStore.getState().refresh();
-                showToast("success", "Vault deleted.");
+                showToast("success", strings.vaultDeleted());
               }
             },
             variant: "errorSecondary"

@@ -24,6 +24,7 @@ import { db } from "../../common/db";
 import { BillingHistory } from "./components/billing-history";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
+import { strings } from "@notesnook/intl";
 
 export const SubscriptionSettings: SettingsGroup[] = [
   {
@@ -33,9 +34,8 @@ export const SubscriptionSettings: SettingsGroup[] = [
     settings: [
       {
         key: "payment-method",
-        title: "Payment method",
-        description:
-          "Change the payment method you used to purchase this subscription.",
+        title: strings.paymentMethod(),
+        description: strings.changePaymentMethodDescription(),
         isHidden: () => {
           const user = useUserStore.getState().user;
           return !isUserSubscribed(user) || user?.subscription.provider !== 3;
@@ -43,7 +43,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
-            title: "Update",
+            title: strings.update(),
             action: async () => {
               try {
                 window.open(await db.subscriptions.updateUrl(), "_blank");
@@ -57,7 +57,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
       },
       {
         key: "billing-history",
-        title: "Billing history",
+        title: strings.billingHistory(),
         isHidden: () => {
           const user = useUserStore.getState().user;
           return !isUserSubscribed(user) || user?.subscription.provider !== 3;

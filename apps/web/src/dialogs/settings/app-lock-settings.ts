@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SettingComponent, SettingsGroup } from "./types";
-import { useStore as useUserStore } from "../../stores/user-store";
+import { strings } from "@notesnook/intl";
+import { verifyAccount } from "../../common";
+import { Checkmark } from "../../components/icons";
 import { showPasswordDialog } from "../../dialogs/password-dialog";
 import {
   CredentialType,
@@ -27,91 +28,18 @@ import {
   useKeyStore,
   wrongCredentialError
 } from "../../interfaces/key-store";
+import { useStore as useUserStore } from "../../stores/user-store";
+import { generatePassword } from "../../utils/password-generator";
 import { showToast } from "../../utils/toast";
 import { WebAuthn } from "../../utils/webauthn";
-import { generatePassword } from "../../utils/password-generator";
-import { verifyAccount } from "../../common";
-import { Checkmark } from "../../components/icons";
 import { PromptDialog } from "../prompt";
+import { SettingComponent, SettingsGroup } from "./types";
 
 export const AppLockSettings: SettingsGroup[] = [
   {
-    key: "app-lock",
-    section: "app-lock",
-    header: "App lock",
-    onStateChange: (listener) =>
-      useKeyStore.subscribe((s) => s.credentials, listener),
-    settings: [
-      {
-        key: "enable-app-lock",
-        title: "Enable app lock",
-        onStateChange: (listener) =>
-          useKeyStore.subscribe((s) => s.credentials, listener),
-        components: [
-          {
-            type: "toggle",
-            toggle: async () => {
-              const { credentials } = useKeyStore.getState();
-              if (credentials.length <= 0) {
-                const verified = await verifyAccount();
-                if (!verified) return;
-
-                await registerCredential("password");
-              } else {
-                const { credentials } = useKeyStore.getState();
-                const defaultCredential = credentials
-                  .filter((c) => c.active)
-                  .at(0);
-                if (!defaultCredential) return;
-                await unlockAppLock(defaultCredential);
-              }
-            },
-            isToggled: () =>
-              useKeyStore.getState().credentials.some((c) => c.active)
-          }
-        ]
-      },
-      {
-        key: "lock-app-after",
-        title: "Lock app after",
-        description:
-          "How long should the app wait to lock itself after going into the background or going idle?",
-        isHidden: () => useKeyStore.getState().activeCredentials().length <= 0,
-        onStateChange: (listener) =>
-          useKeyStore.subscribe((s) => s.secrets.lockAfter, listener),
-        components: [
-          {
-            type: "dropdown",
-            options: [
-              { title: "Immediately", value: 0 },
-              { title: "1 minute", value: 1 },
-              { title: "5 minutes", value: 5 },
-              { title: "10 minutes", value: 10 },
-              { title: "15 minutes", value: 15 },
-              { title: "30 minutes", value: 30 },
-              { title: "45 minutes", value: 45 },
-              { title: "1 hour", value: 60 },
-              { title: "Never", value: -1 }
-            ],
-            onSelectionChanged: async (value) => {
-              if (!(await authenticateAppLock())) {
-                showToast("error", "Failed to authenticate.");
-                return;
-              }
-              useKeyStore.getState().setValue("lockAfter", parseInt(value));
-            },
-            selectedOption: async () => {
-              return (await useKeyStore.getState().getValue("lockAfter")) || 0;
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
     key: "app-lock-credentials",
     section: "app-lock",
-    header: "Credentials",
+    header: strings.credientials(),
     isHidden: () => {
       return useKeyStore.getState().activeCredentials().length <= 0;
     },
@@ -120,8 +48,8 @@ export const AppLockSettings: SettingsGroup[] = [
     settings: [
       {
         key: "password-pin",
-        title: "Password/pin",
-        description: "The password/pin for unlocking the app.",
+        title: strings.passwordPin(),
+        description: strings.passwordPinDescription(),
         components: () => {
           const credential = useKeyStore
             .getState()
@@ -132,17 +60,17 @@ export const AppLockSettings: SettingsGroup[] = [
           if (isEnabled) {
             inputs.push({
               type: "button",
-              title: "Change",
+              title: strings.change(),
               action: async () => {
                 const result = await showPasswordDialog({
-                  title: "Change app lock password",
+                  title: strings.changeAppLockPassword(),
                   inputs: {
                     oldPassword: {
-                      label: "Old password",
+                      label: strings.oldPassword(),
                       autoComplete: "current-password"
                     },
                     newPassword: {
-                      label: "New password",
+                      label: strings.newPassword(),
                       autoComplete: "new-password"
                     }
                   },
@@ -165,7 +93,8 @@ export const AppLockSettings: SettingsGroup[] = [
                       .catch(() => false);
                   }
                 });
-                if (result) showToast("success", "App lock password changed!");
+                if (result)
+                  showToast("success", strings.passwordChangedSuccessfully());
               },
               variant: "secondary"
             });
@@ -177,14 +106,14 @@ export const AppLockSettings: SettingsGroup[] = [
           )
             inputs.push({
               type: "button",
-              title: isEnabled ? "Disable" : "Enable",
+              title: isEnabled ? strings.disable() : strings.enable(),
               action: async () => {
                 if (credential?.active) await deactivateCredential(credential);
                 else if (credential)
                   await useKeyStore.getState().activate(credential);
                 else {
                   if (!(await authenticateAppLock())) {
-                    showToast("error", "Failed to authenticate.");
+                    showToast("error", strings.biometricsAuthError());
                     return;
                   }
                   await registerCredential("password");
@@ -198,8 +127,8 @@ export const AppLockSettings: SettingsGroup[] = [
       },
       {
         key: "security-key",
-        title: "Security key",
-        description: "Use security key (e.g. YubiKey) for unlocking the app.",
+        title: strings.securityKey(),
+        description: strings.securityKeyDescription(),
         onStateChange: (listener) =>
           useKeyStore.subscribe((s) => s.credentials, listener),
         components: () => {
@@ -216,7 +145,7 @@ export const AppLockSettings: SettingsGroup[] = [
           if (credential && hasActiveCredentials) {
             inputs.push({
               type: "button",
-              title: "Unregister",
+              title: strings.unregister(),
               action: async () => {
                 if (await useKeyStore.getState().credentialHasKey(credential)) {
                   await verifyCredential(credential, (c) =>
@@ -233,11 +162,11 @@ export const AppLockSettings: SettingsGroup[] = [
           if (!credential) {
             inputs.push({
               type: "button",
-              title: "Register",
+              title: strings.register(),
               variant: "secondary",
               async action() {
                 if (!(await authenticateAppLock())) {
-                  showToast("error", "Failed to authenticate.");
+                  showToast("error", strings.biometricsAuthError());
                   return;
                 }
                 await registerCredential("securityKey");
@@ -246,7 +175,7 @@ export const AppLockSettings: SettingsGroup[] = [
           } else if (!isEnabled || hasActiveCredentials) {
             inputs.push({
               type: "button",
-              title: isEnabled ? "Disable" : "Enable",
+              title: isEnabled ? strings.disable() : strings.enable(),
               action: async () => {
                 const hasKey = await useKeyStore.getState().credentialHasKey({
                   type: "securityKey",
@@ -283,15 +212,15 @@ export const AppLockSettings: SettingsGroup[] = [
 async function registerCredential(type: CredentialType) {
   if (type === "password") {
     await showPasswordDialog({
-      title: "App lock",
-      subtitle: `Enter pin or password to enable app lock.`,
+      title: strings.appLock(),
+      subtitle: strings.enterPasswordOrPin(),
       inputs: {
         password: {
-          label: "Password",
+          label: strings.password(),
           autoComplete: "new-password"
         },
         confirmPassword: {
-          label: "Confirm password",
+          label: strings.confirmPassword(),
           autoComplete: "new-password"
         }
       },
@@ -317,9 +246,8 @@ async function registerCredential(type: CredentialType) {
     const username =
       user?.email ||
       (await PromptDialog.show({
-        title: "Enter your username",
-        description:
-          "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
+        title: strings.securityKeyUsername(),
+        description: strings.securityKeyUsernameDesc()
       }));
     if (!username) return;
 
@@ -343,7 +271,7 @@ async function registerCredential(type: CredentialType) {
         }
       });
 
-      showToast("success", "Security key successfully registered.");
+      showToast("success", strings.securityKeyRegistered());
     } catch (e) {
       showToast("error", (e as Error).message);
     }
@@ -369,11 +297,11 @@ async function verifyCredential(
   try {
     if (credential.type === "password") {
       return await showPasswordDialog({
-        title: "App lock",
-        subtitle: `Enter app lock pin or password to continue.`,
+        title: strings.appLock(),
+        subtitle: strings.enterPasswordOrPin(),
         inputs: {
           password: {
-            label: "Password",
+            label: strings.password(),
             autoComplete: "new-password"
           }
         },

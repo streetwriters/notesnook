@@ -422,11 +422,12 @@ export const settingsGroups: SettingSection[] = [
                           const canLogout = await new Promise((resolve) => {
                             presentDialog({
                               context: "local",
-                              title: strings.backupFailed(),
+                              title: strings.failedToTakeBackup(),
                               paragraph: `${
                                 (error as Error).message
-                              }. ${strings.logout()}?`,
-                              positiveText: "Continue",
+                              }. ${strings.failedToTakeBackupMessage()}?`,
+                              positiveText: strings.yes(),
+                              negativeText: strings.no(),
                               positivePress: () => {
                                 resolve(true);
                               },
@@ -535,8 +536,8 @@ export const settingsGroups: SettingSection[] = [
         sections: [
           {
             id: "offline-mode",
-            name: "Full offline mode",
-            description: "Download everything including attachments on sync",
+            name: strings.fullOfflineMode(),
+            description: strings.fullOfflineModeDesc(),
             type: "switch",
             property: "offlineMode",
             modifer: () => {

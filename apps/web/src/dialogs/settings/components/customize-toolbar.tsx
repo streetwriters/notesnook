@@ -135,7 +135,7 @@ export function CustomizeToolbar() {
                   if (preset.id === "custom" && !isUserPremium()) {
                     showToast(
                       "info",
-                      "You need to be Pro to use the custom preset."
+                      strings.upgradeToProToUseFeature("customPresets")
                     );
                     return;
                   }
@@ -175,7 +175,10 @@ export function CustomizeToolbar() {
         collisionDetection={closestCenter}
         cancelDrop={() => {
           if (!isUserPremium()) {
-            showToast("error", "You need to be Pro to customize the toolbar.");
+            showToast(
+              "error",
+              strings.upgradeToProToUseFeature("customizeToolbar")
+            );
             return true;
           }
           return false;
@@ -233,7 +236,7 @@ export function CustomizeToolbar() {
                   canAddSubGroup
                     ? () => {
                         setItems((items) => addSubGroup(items, item.id));
-                        showToast("success", "Subgroup added successfully");
+                        showToast("success", strings.subgroupAdded());
                       }
                     : undefined
                 }

@@ -46,6 +46,7 @@ import BaseDialog from "../../components/dialog";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 import { User } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type BuyDialogProps = BaseDialogProps<false> & {
   couponCode?: string;
@@ -175,7 +176,7 @@ function SideBar(props: SideBarProps) {
           const result = await TaskManager.startTask({
             type: "status",
             id: "trialActivation",
-            title: "Activating trial",
+            title: strings.activatingTrial(),
             action: () => db.user.activateTrial()
           });
           if (result) onClose();
@@ -183,7 +184,9 @@ function SideBar(props: SideBarProps) {
           if (e instanceof Error)
             showToast(
               "error",
-              `Could not activate trial. Please try again. Error: ${e.message}`
+              `${strings.couldNotActivateTrial()}. ${strings.pleaseTryAgain()} Error: ${
+                e.message
+              }`
             );
         }
       }}

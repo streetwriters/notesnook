@@ -135,7 +135,10 @@ function ThemesList() {
       } catch (e) {
         console.error(e);
         if (e instanceof Error)
-          showToast("error", "Failed to install theme. Error: " + e.message);
+          showToast(
+            "error",
+            `${strings.failedToInstallTheme()}. Error: ` + e.message
+          );
       } finally {
         setIsApplying(false);
       }

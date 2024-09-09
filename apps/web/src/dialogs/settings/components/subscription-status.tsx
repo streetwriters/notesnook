@@ -157,10 +157,7 @@ export function SubscriptionStatus() {
                       })
                         .catch((e) => showToast("error", e.message))
                         .then(() =>
-                          showToast(
-                            "success",
-                            "Your subscription has been canceled."
-                          )
+                          showToast("success", strings.subCanceled())
                         );
                     }
                   }}
@@ -186,12 +183,7 @@ export function SubscriptionStatus() {
                       action: () => db.subscriptions.refund()
                     })
                       .catch((e) => showToast("error", e.message))
-                      .then(() =>
-                        showToast(
-                          "success",
-                          "Your refund has been issued. Please wait 24 hours before reaching out to us in case you do not receive your funds."
-                        )
-                      );
+                      .then(() => showToast("success", strings.refundIssued()));
                   }
                 }}
               >

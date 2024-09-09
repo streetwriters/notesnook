@@ -17,22 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SettingsGroup } from "./types";
+import { strings } from "@notesnook/intl";
+import { desktop } from "../../common/desktop-bridge";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { showToast } from "../../utils/toast";
-import { desktop } from "../../common/desktop-bridge";
+import { SettingsGroup } from "./types";
 
 export const DesktopIntegrationSettings: SettingsGroup[] = [
   {
     key: "desktop-integration",
     section: "desktop",
-    header: "Desktop integration",
+    header: strings.desktopIntegration(),
     settings: [
       {
         key: "auto-start",
-        title: "Auto start on system startup",
-        description:
-          "If true, Notesnook will automatically start up when you turn on & login to your system.",
+        title: strings.autoStartOnSystemStartup(),
+        description: strings.autoStartDescription(),
         onStateChange: (listener) =>
           useSettingStore.subscribe(
             (s) => s.desktopIntegrationSettings,
@@ -56,9 +56,8 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
       },
       {
         key: "start-minimized",
-        title: "Start minimized",
-        description:
-          "If true, Notesnook will start minimized to either the system tray or your system taskbar/dock. This setting only works with Auto start on system startup is enabled.",
+        title: strings.startMinimized(),
+        description: strings.startMinimizedDescription(),
         onStateChange: (listener) =>
           useSettingStore.subscribe(
             (s) => s.desktopIntegrationSettings,
@@ -83,8 +82,8 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
       },
       {
         key: "minimize-to-tray",
-        title: "Minimize to system tray",
-        description: 'Pressing "—" will hide the app in your system tray.',
+        title: strings.minimizeToSystemTray(),
+        description: strings.minimizeToSystemTrayDescription(),
         onStateChange: (listener) =>
           useSettingStore.subscribe(
             (s) => s.desktopIntegrationSettings,
@@ -107,8 +106,8 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
       },
       {
         key: "close-to-tray",
-        title: "Close to system tray",
-        description: 'Pressing "X" will hide the app in your system tray.',
+        title: strings.closeToSystemTray(),
+        description: strings.closeToSystemTrayDescription(),
         onStateChange: (listener) =>
           useSettingStore.subscribe(
             (s) => s.desktopIntegrationSettings,
@@ -131,9 +130,8 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
       },
       {
         key: "use-native-titlebar",
-        title: "Use native titlebar",
-        description:
-          "Use native OS titlebar instead of replacing it with a custom one. Requires app restart for changes to take effect.",
+        title: strings.useNativeTitlebar(),
+        description: strings.useNativeTitlebarDescription(),
         onStateChange: (listener) =>
           useSettingStore.subscribe(
             (s) => s.desktopIntegrationSettings,
@@ -151,16 +149,12 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
                   !useSettingStore.getState().desktopIntegrationSettings
                     ?.nativeTitlebar
               });
-              showToast(
-                "success",
-                "Restart the app for changes to take effect.",
-                [
-                  {
-                    text: "Restart now",
-                    onClick: () => desktop?.integration.restart.query()
-                  }
-                ]
-              );
+              showToast("success", strings.restartAppToTakeEffect(), [
+                {
+                  text: strings.restartNow(),
+                  onClick: () => desktop?.integration.restart.query()
+                }
+              ]);
             }
           }
         ]

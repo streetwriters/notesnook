@@ -90,9 +90,8 @@ async function moveNotebooksToTrash(ids: string[]) {
 async function deleteAttachments(ids: string[]) {
   if (
     !(await ConfirmDialog.show({
-      title: "Are you sure?",
-      message:
-        "Are you sure you want to permanently delete these attachments? This action is IRREVERSIBLE.",
+      title: strings.doAction("attachment", ids.length, "permanentlyDelete"),
+      message: strings.permanentlyDeleteDesc("attachment", ids.length),
       negativeButtonText: "No",
       positiveButtonText: "Yes"
     }))

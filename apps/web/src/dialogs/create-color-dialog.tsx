@@ -54,10 +54,7 @@ export const CreateColorDialog = DialogManager.register(
               new FormData(e.target as HTMLFormElement).entries()
             ) as { color: string; title: string };
             if (!tinycolor(form.color, { format: "hex" }).isValid()) {
-              showToast(
-                "error",
-                "Please enter a valid hex color (e.g. #ffffff)"
-              );
+              showToast("error", strings.invalidHexColor());
               return;
             }
             const colorId = await db.colors.add({
