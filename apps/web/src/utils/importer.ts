@@ -21,7 +21,8 @@ import { db } from "../common/db";
 import {
   Note,
   Notebook,
-  ContentType
+  ContentType,
+  LegacyNotebook
 } from "@notesnook-importer/core/dist/src/models";
 import {
   ATTACHMENTS_DIRECTORY_NAME,
@@ -182,9 +183,16 @@ async function processNote(entry: ZipEntry, attachments: Record<string, any>) {
   }
 
   for (const nb of notebooks) {
-    const notebookId = await importNotebook(nb).catch(() => undefined);
-    if (!notebookId) continue;
-    await db.notes.addToNotebook(notebookId, noteId);
+    if ("notebook" in nb) {
+      const notebookId = await importLegacyNotebook(nb).catch(() => undefined);
+      if (!notebookId) continue;
+      await db.notes.addToNotebook(notebookId, noteId);
+    } else {
+      const notebookIds = await importNotebook(nb).catch(() => undefined);
+      if (!notebookIds) continue;
+      for (const notebookId of notebookIds)
+        await db.notes.addToNotebook(notebookId, noteId);
+    }
   }
 }
 
@@ -193,8 +201,11 @@ async function fileToJson<T>(file: ZipEntry) {
   return JSON.parse(text) as T;
 }
 
-async function importNotebook(
-  notebook: Notebook | undefined
+/**
+ * @deprecated
+ */
+async function importLegacyNotebook(
+  notebook: LegacyNotebook | undefined
 ): Promise<string | undefined> {
   if (!notebook) return;
   const nb = await db.notebooks.find(notebook.notebook);
@@ -203,4 +214,30 @@ async function importNotebook(
     : await db.notebooks.add({
         title: notebook.notebook
       });
+}
+
+async function importNotebook(
+  notebook: Notebook,
+  parentId?: string
+): Promise<string[]> {
+  if (!notebook) return [];
+
+  const id =
+    (await db.notebooks.find(notebook.title))?.id ||
+    (await db.notebooks.add({
+      title: notebook.title
+    }));
+  if (!id) throw new Error(`Failed to import notebook: ${notebook.title}`);
+
+  if (parentId)
+    await db.relations.add(
+      { type: "notebook", id: parentId },
+      { type: "notebook", id: id }
+    );
+
+  const assignedNotebooks: string[] = notebook.children.length > 0 ? [] : [id];
+  for (const child of notebook.children || []) {
+    assignedNotebooks.push(...(await importNotebook(child, id)));
+  }
+  return assignedNotebooks;
 }
