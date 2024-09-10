@@ -53,7 +53,7 @@ export function ColorTool(props: ColorToolProps) {
   const position: PositionOptions = useMemo(() => {
     return {
       isTargetAbsolute: true,
-      target: getToolbarElement(),
+      target: isBottom ? getToolbarElement() : "mouse",
       align: isBottom ? "center" : "end",
       location: isBottom ? "top" : "below",
       yOffset: 10
@@ -135,8 +135,8 @@ export function Highlight(props: ToolProps) {
       title={"Background color"}
       onColorChange={(color) =>
         color
-          ? editor.chain().focus().setHighlight(color).run()
-          : editor.chain().focus().unsetHighlight().run()
+          ? editor.chain().setHighlight(color).run()
+          : editor.chain().unsetHighlight().run()
       }
     />
   );
@@ -152,8 +152,8 @@ export function TextColor(props: ToolProps) {
       title="Text color"
       onColorChange={(color) =>
         color
-          ? editor.chain().focus().setColor(color).run()
-          : editor.chain().focus().unsetColor().run()
+          ? editor.chain().setColor(color).run()
+          : editor.chain().unsetColor().run()
       }
     />
   );
