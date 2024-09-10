@@ -30,26 +30,10 @@ import { Popup } from "../components/popup";
 import { SchemeColors } from "@notesnook/theme";
 import { Editor } from "../../types";
 
-export const DEFAULT_COLORS = [
-  "#e91e63",
-  "#9c27b0",
-  "#673ab7",
-  "#3f51b5",
-  "#2196f3",
-  "#03a9f4",
-  "#00bcd4",
-  "#009688",
-  "#4caf50",
-  "#8bc34a",
-  "#cddc39",
-  "#ffeb3b",
-  "#ffc107",
-  "#f44336"
-];
-
 type ColorPickerProps = {
   editor: Editor;
   colors?: string[];
+  defaultColors?: string[];
   color?: string;
   onClear: () => void;
   expanded?: boolean;
@@ -71,6 +55,7 @@ export function ColorPicker(props: ColorPickerProps) {
     expanded,
     onSave,
     colors = [],
+    defaultColors = [],
     onDelete,
     editor
   } = props;
@@ -82,7 +67,7 @@ export function ColorPicker(props: ColorPickerProps) {
   );
   const [deleteMode, setDeleteMode] = useState(false);
   const tColor = tinycolor(currentColor);
-  const allColors = deleteMode ? colors : [...DEFAULT_COLORS, ...colors];
+  const allColors = deleteMode ? colors : [...defaultColors, ...colors];
 
   useEffect(() => {
     if (!ref.current) return;
