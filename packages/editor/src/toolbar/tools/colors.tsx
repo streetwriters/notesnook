@@ -22,7 +22,7 @@ import tinycolor from "tinycolor2";
 import { PopupWrapper } from "../../components/popup-presenter";
 import { config } from "../../utils/config";
 import { SplitButton } from "../components/split-button";
-import { ColorPicker, DEFAULT_COLORS } from "../popups/color-picker";
+import { ColorPicker } from "../popups/color-picker";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { ToolProps } from "../types";
 import { getToolbarElement } from "../utils/dom";
@@ -33,6 +33,7 @@ type ColorToolProps = ToolProps & {
   activeColor: string;
   title: string;
   cacheKey: string;
+  defaultColors: string[];
 };
 
 export function ColorTool(props: ColorToolProps) {
@@ -41,6 +42,7 @@ export function ColorTool(props: ColorToolProps) {
     activeColor: _activeColor,
     title,
     cacheKey,
+    defaultColors,
     ...toolProps
   } = props;
   const activeColor = _activeColor || config.get(cacheKey);
@@ -91,8 +93,9 @@ export function ColorTool(props: ColorToolProps) {
           color={activeColor}
           editor={props.editor}
           colors={colors}
+          defaultColors={defaultColors}
           onDelete={(color) => {
-            if (DEFAULT_COLORS.includes(color)) return;
+            if (defaultColors.includes(color)) return;
             setColors((colors) => colors.filter((item) => item !== color));
           }}
           onClear={() => {
@@ -133,6 +136,22 @@ export function Highlight(props: ToolProps) {
       cacheKey="highlight"
       activeColor={editor.getAttributes("textStyle").backgroundColor}
       title={"Background color"}
+      defaultColors={[
+        "#b0bec5", // Neutralized pink
+        "#a1887f", // Neutralized purple
+        "#9575cd", // Neutralized deep purple
+        "#7986cb", // Neutralized indigo
+        "#64b5f6", // Neutralized blue
+        "#4fc3f7", // Neutralized light blue
+        "#4dd0e1", // Neutralized cyan
+        "#4db6ac", // Neutralized teal
+        "#81c784", // Neutralized green
+        "#aed581", // Neutralized light green
+        "#dce775", // Neutralized lime
+        "#fff176", // Neutralized yellow
+        "#ffd54f", // Neutralized amber
+        "#e57373" // Neutralized red
+      ]}
       onColorChange={(color) =>
         color
           ? editor.chain().setHighlight(color).run()
@@ -150,6 +169,21 @@ export function TextColor(props: ToolProps) {
       cacheKey={"textColor"}
       activeColor={editor.getAttributes("textStyle").color}
       title="Text color"
+      defaultColors={[
+        "#e91e63",
+        "#9c27b0",
+        "#673ab7",
+        "#3f51b5",
+        "#2196f3",
+        "#03a9f4",
+        "#00bcd4",
+        "#009688",
+        "#4caf50",
+        "#8bc34a",
+        "#cddc39",
+        "#ffc107",
+        "#f44336"
+      ]}
       onColorChange={(color) =>
         color
           ? editor.chain().setColor(color).run()
