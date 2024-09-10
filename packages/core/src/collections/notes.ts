@@ -107,7 +107,7 @@ export class Notes implements ICollection {
       if (item.title) {
         item.title = item.title.replace(NEWLINE_STRIP_REGEX, " ");
         dateEdited = Date.now();
-      } else if (!isUpdating) {
+      } else {
         item.title = formatTitle(
           this.db.settings.getTitleFormat(),
           this.db.settings.getDateFormat(),
