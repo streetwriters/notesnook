@@ -67,9 +67,9 @@ export async function* exportNotes(
   const notePathMap: Map<string, string[]> = new Map();
 
   for await (const note of notes.fields(["notes.id", "notes.title"])) {
-    const filename = `${sanitizeFilename(note.title, { replacement: "-" })}.${
-      FORMAT_TO_EXT[format]
-    }`;
+    const filename = `${sanitizeFilename(note.title || "Untitled", {
+      replacement: "-"
+    })}.${FORMAT_TO_EXT[format]}`;
     const notebooks = await database.relations
       .to({ id: note.id, type: "note" }, "notebook")
       .get();
@@ -161,7 +161,9 @@ export async function* exportNote(
     return;
 
   const attachmentsRoot = "attachments";
-  const filename = sanitizeFilename(note.title, { replacement: "-" });
+  const filename = sanitizeFilename(note.title || "Untitled", {
+    replacement: "-"
+  });
   const ext = FORMAT_TO_EXT[options.format];
   const path = [filename, ext].join(".");
   const pendingAttachments: Map<string, Attachment> = new Map();
@@ -194,7 +196,9 @@ export async function* exportNote(
     }
   } catch (e) {
     yield new Error(
-      `Failed to export note "${note.title}": ${(e as Error).message}`
+      `Failed to export note "${note.title || "<Untitled>"}": ${
+        (e as Error).message
+      }`
     );
   }
 }
@@ -227,7 +231,9 @@ export async function exportContent(
     !database.vault.unlocked &&
     !(await unlockVault?.())
   ) {
-    throw new Error(`Could not export locked note: "${note.title}".`);
+    throw new Error(
+      `Could not export locked note: "${note.title || "<Untitled>"}".`
+    );
   }
 
   const contentItem = rawContent?.locked
