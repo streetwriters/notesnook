@@ -167,7 +167,7 @@ export const Component = ({ close, promo }) => {
           >
             (
             {Platform.OS === "android"
-              ? pricing.product?.subscriptionOfferDetails[0].pricingPhases
+              ? pricing.product?.subscriptionOfferDetails[0]?.pricingPhases
                   .pricingPhaseList?.[0].formattedPrice
               : pricing.product?.localizedPrice}{" "}
             / mo)

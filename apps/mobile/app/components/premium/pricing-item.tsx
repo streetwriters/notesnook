@@ -85,7 +85,7 @@ export const PricingItem = ({
           >
             {Platform.OS === "android"
               ? (product.data as RNIap.SubscriptionAndroid | undefined)
-                  ?.subscriptionOfferDetails[0].pricingPhases
+                  ?.subscriptionOfferDetails?.[0]?.pricingPhases
                   .pricingPhaseList?.[0]?.formattedPrice
               : (product.data as RNIap.SubscriptionIOS | undefined)
                   ?.localizedPrice}
