@@ -60,7 +60,7 @@ export function ColorTool(props: ColorToolProps) {
       location: isBottom ? "top" : "below",
       yOffset: 10
     };
-  }, [isBottom, isOpen]);
+  }, [isBottom]);
 
   useEffect(() => {
     config.set(`custom_${cacheKey}`, colors);
