@@ -30,7 +30,7 @@ export function template(data: TemplateData) {
       name="description"
       content="${data.headline}"
     />
-    <title>${data.title} - Notesnook</title>
+    <title>${data.title}</title>
     <meta name="created-at" content="${formatDate(data.dateCreated)}" />
     <meta name="updated-at" content="${formatDate(data.dateEdited)}" />
     ${data.pinned ? `<meta name="pinned" content="${data.pinned}" />` : ""}
