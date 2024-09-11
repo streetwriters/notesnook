@@ -660,9 +660,9 @@ export const useEditor = (
           lock.current = true;
 
           // Handle this case where note was locked on another device and synced.
-          const locked = await db.vaults.itemExists(
-            currentNotes.current[noteId] as ItemReference
-          );
+          const locked = note
+            ? await db.vaults.itemExists(note as ItemReference)
+            : false;
 
           if (note) {
             if (!locked && tab?.noteLocked) {
