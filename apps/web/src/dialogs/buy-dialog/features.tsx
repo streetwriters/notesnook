@@ -312,7 +312,7 @@ const sections: Section[] = [
         icon: Pin
       }
     ],
-    info: "* Free users can only create 3 notebooks (no limit on topics) and 5 tags."
+    info: "* Free users can only create 20 notebooks and 5 tags."
   },
 
   {
@@ -399,8 +399,7 @@ const sections: Section[] = [
       {
         id: "backup-encryption",
         title: "Backup encryption",
-        icon: EncryptedBackup,
-        pro: true
+        icon: EncryptedBackup
       }
     ]
   },
@@ -408,7 +407,6 @@ const sections: Section[] = [
     title: "Personalize & make Notesnook your own",
     detail:
       "Change app themes to match your style. Custom themes are coming soon.",
-    pro: true,
     features: [
       {
         id: "10-themes",
@@ -423,7 +421,8 @@ const sections: Section[] = [
       {
         id: "default-home-page",
         title: "Change default home page",
-        icon: Home
+        icon: Home,
+        pro: true
       }
     ]
   }
