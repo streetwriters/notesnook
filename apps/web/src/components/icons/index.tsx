@@ -215,7 +215,8 @@ import {
   mdiWindowClose,
   mdiFileMusicOutline,
   mdiBroom,
-  mdiServerSecurity
+  mdiServerSecurity,
+  mdiOpenInNew
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -552,3 +553,4 @@ export const WindowRestore = createIcon(
 );
 export const WindowClose = createIcon(mdiWindowClose);
 export const ClearCache = createIcon(mdiBroom);
+export const OpenInNew = createIcon(mdiOpenInNew);
