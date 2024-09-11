@@ -94,6 +94,7 @@ export const ToolButton = React.memo(
       prev.toggled === next.toggled &&
       prev.icon === next.icon &&
       prev.disabled === next.disabled &&
+      prev.onClick === next.onClick &&
       JSON.stringify(prev.sx) === JSON.stringify(next.sx)
     );
   }

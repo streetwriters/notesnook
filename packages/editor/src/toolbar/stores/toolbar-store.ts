@@ -19,10 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { create } from "zustand";
 import { DownloadOptions } from "../../utils/downloader";
+import { useCallback } from "react";
 
 export type ToolbarLocation = "top" | "bottom";
 
-export type PopupRef = { id: string; group: string };
+export type PopupRef = {
+  id: string;
+  group: string;
+  pinned?: boolean;
+  parent?: string;
+};
 interface ToolbarState {
   downloadOptions?: DownloadOptions;
   setDownloadOptions: (options?: DownloadOptions) => void;
@@ -69,13 +75,27 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
     set((state) => {
       for (const key in state.openedPopups) {
         const ref = state.openedPopups[key];
-        if (ref && ref.group === group && !excluded.includes(ref.id)) {
+        if (
+          ref &&
+          ref.group === group &&
+          !excluded.includes(ref.id) &&
+          !ref.pinned &&
+          !isChildPinned(state.openedPopups, ref.id)
+        ) {
           state.openedPopups[key] = undefined;
         }
       }
       return state;
     }),
-  closeAllPopups: () => set({ openedPopups: {} }),
+  closeAllPopups: () =>
+    set((state) => {
+      for (const key in state.openedPopups) {
+        const ref = state.openedPopups[key];
+        if (ref && !ref.pinned && !isChildPinned(state.openedPopups, ref.id))
+          state.openedPopups[key] = undefined;
+      }
+      return state;
+    }),
   fontFamily: "sans-serif",
   setFontFamily: (fontFamily) => set({ fontFamily }),
   fontSize: 16,
@@ -88,4 +108,108 @@ export function useToolbarLocation() {
 
 export function useIsMobile() {
   return useToolbarStore((store) => store.isMobile);
+}
+
+export function usePopupManager(options: {
+  id: string;
+  group: string;
+  parent?: string;
+}) {
+  const { id, parent } = options;
+  const openedPopups = useToolbarStore((store) => store.openedPopups);
+  const openPopup = useToolbarStore((store) => store.openPopup);
+  const closePopup = useToolbarStore((store) => store.closePopup);
+  const closePopupGroup = useToolbarStore((store) => store.closePopupGroup);
+  const isMobile = useIsMobile();
+  const isOpen = typeof openedPopups[id] === "object";
+  const isPinned =
+    typeof openedPopups[id] === "object" &&
+    (!!openedPopups[id]?.pinned || isChildPinned(openedPopups, id));
+  const group = isMobile ? "mobile" : options.group;
+
+  const open = useCallback(() => {
+    closePopupGroup(group, [id, parent || ""]);
+    openPopup({
+      id,
+      group,
+      parent,
+      pinned: isParentPinned(useToolbarStore.getState().openedPopups, parent)
+    });
+  }, [openPopup, closePopupGroup, group, id, parent]);
+
+  const close = useCallback(() => {
+    closePopup(id);
+    useToolbarStore.setState((state) => {
+      toggleChildState(
+        state.openedPopups,
+        (ref) => {
+          state.openedPopups[ref.id] = undefined;
+        },
+        id
+      );
+      return state;
+    });
+  }, [closePopup, id]);
+
+  const toggle = useCallback(() => {
+    if (isOpen) close();
+    else open();
+  }, [isOpen, close, open]);
+
+  const togglePinned = useCallback(() => {
+    useToolbarStore.setState((state) => {
+      toggleChildState(
+        state.openedPopups,
+        (ref) => (ref.pinned = !isPinned),
+        id
+      );
+      return state;
+    });
+    if (isPinned) openPopup({ group, id, parent, pinned: false });
+    else openPopup({ group, id, parent, pinned: true });
+  }, [isPinned, openPopup, id, group, parent]);
+
+  return { isOpen, open, close, toggle, isPinned, togglePinned };
+}
+
+function toggleChildState(
+  popups: Record<string, PopupRef | undefined | false>,
+  action: (ref: PopupRef) => void,
+  parent?: string
+) {
+  if (!parent) return;
+  for (const key in popups) {
+    const ref = popups[key];
+    if (ref && ref.parent === parent) {
+      action(ref);
+      toggleChildState(popups, action, ref.id);
+    }
+  }
+}
+
+function isParentPinned(
+  popups: Record<string, PopupRef | undefined | false>,
+  parent?: string
+) {
+  if (!parent) return;
+  for (const key in popups) {
+    const ref = popups[key];
+    if (ref && ref.id === parent && ref.pinned) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isChildPinned(
+  popups: Record<string, PopupRef | undefined | false>,
+  id: string
+) {
+  for (const key in popups) {
+    const ref = popups[key];
+    if (ref && ref.parent === id && ref.pinned) {
+      return true;
+    }
+  }
+  return false;
 }

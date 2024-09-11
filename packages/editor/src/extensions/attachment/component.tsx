@@ -88,6 +88,7 @@ export function AttachmentComponent(props: ReactNodeViewProps<FileAttachment>) {
         {selected && !isDragging && (
           <ToolbarGroup
             editor={editor}
+            groupId="attachmentTools"
             tools={
               editor.isEditable
                 ? [

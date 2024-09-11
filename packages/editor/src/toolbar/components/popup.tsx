@@ -33,11 +33,13 @@ type Action = {
 export type PopupProps = {
   title?: string;
   onClose?: () => void;
+  onPin?: () => void;
+  isPinned?: boolean;
   action?: Action;
 };
 
 export function Popup(props: PropsWithChildren<PopupProps>) {
-  const { title, onClose, action, children } = props;
+  const { title, onClose, onPin, isPinned, action, children } = props;
 
   return (
     <EmotionThemeProvider scope="editorToolbar">
@@ -63,13 +65,30 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
               }}
             >
               <Text variant={"title"}>{title}</Text>
-              <Button
-                variant={"secondary"}
-                sx={{ p: 0, bg: "transparent" }}
-                onClick={onClose}
-              >
-                <Icon path={Icons.close} size={"big"} />
-              </Button>
+              <Flex sx={{ alignItems: "center", gap: 1 }}>
+                {onPin ? (
+                  <Button
+                    variant={"secondary"}
+                    sx={{ p: 0, bg: "transparent" }}
+                    onClick={onPin}
+                  >
+                    <Icon
+                      path={Icons.pin}
+                      size={"medium"}
+                      color={isPinned ? "accent" : "icon"}
+                    />
+                  </Button>
+                ) : null}
+                {onClose ? (
+                  <Button
+                    variant={"secondary"}
+                    sx={{ p: 0, bg: "transparent" }}
+                    onClick={onClose}
+                  >
+                    <Icon path={Icons.close} size={"big"} />
+                  </Button>
+                ) : null}
+              </Flex>
             </Flex>
           )}
           {children}

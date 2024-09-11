@@ -106,6 +106,7 @@ export function Toolbar(props: ToolbarProps) {
               key={tools.join("")}
               tools={tools}
               editor={editor}
+              groupId={tools.join("")}
               sx={{
                 borderRight: "1px solid var(--separator)",
                 ":last-of-type": { borderRight: "none" },

@@ -26,6 +26,7 @@ import {
 import { DependencyList, useEffect, useMemo, useRef, useState } from "react";
 import { Editor } from "../types";
 import { EditorState } from "@tiptap/pm/state";
+import { useToolbarStore } from "../toolbar/stores/toolbar-store";
 
 function useForceUpdate() {
   const [, setValue] = useState(0);
@@ -121,9 +122,15 @@ export const useEditor = (
       }
     }
 
+    function onClick() {
+      useToolbarStore.getState().closeAllPopups();
+    }
+
     editor.view.dom.addEventListener("dragenter", onDragEnter);
+    editor.view.dom.addEventListener("click", onClick);
     return () => {
       editor.view.dom.removeEventListener("dragenter", onDragEnter);
+      editor.view.dom.removeEventListener("click", onClick);
     };
   }, [editor.view.dom, editor.view.dragging]);
 

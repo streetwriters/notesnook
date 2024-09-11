@@ -141,6 +141,7 @@ export function ImageComponent(
               >
                 <ToolbarGroup
                   editor={editor}
+                  groupId="imageTools"
                   tools={
                     isReadonly
                       ? [
