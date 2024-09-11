@@ -36,9 +36,6 @@ const QRCode = React.lazy(() => import("../re-exports/react-qrcode-logo"));
 type RecoveryKeyDialogProps = BaseDialogProps<false>;
 export const RecoveryKeyDialog = DialogManager.register(
   function RecoveryKeyDialog(props: RecoveryKeyDialogProps) {
-    const email = usePromise(() =>
-      db.user.getUser().then((user) => user?.email)
-    );
     const key = usePromise(() =>
       db.user.getEncryptionKey().then((key) => key?.key)
     );
@@ -124,6 +121,9 @@ export const RecoveryKeyDialog = DialogManager.register(
                     variant="secondary"
                     mt={1}
                     onClick={async () => {
+                      const email = await db.user
+                        .getUser()
+                        .then((user) => user?.email || "user");
                       const qrcode = document.getElementById(
                         "react-qrcode-logo"
                       ) as HTMLCanvasElement | null;
@@ -143,9 +143,12 @@ export const RecoveryKeyDialog = DialogManager.register(
                   <Button
                     variant="secondary"
                     mt={1}
-                    onClick={() => {
+                    onClick={async () => {
                       if (!key.value)
                         return showToast("error", "No encryption key found.");
+                      const email = await db.user
+                        .getUser()
+                        .then((user) => user?.email || "user");
                       FileSaver.saveAs(
                         new Blob([Buffer.from(key.value)]),
                         `${email}-notesnook-recoverykey.txt`
