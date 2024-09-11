@@ -230,6 +230,7 @@ export function CellBackgroundColor(props: ToolProps) {
       cacheKey="cellBackgroundColor"
       activeColor={editor.getAttributes("tableCell").backgroundColor}
       title={"Cell background color"}
+      type="background"
       onColorChange={(color) =>
         editor.chain().setCellAttribute("backgroundColor", color).run()
       }
@@ -244,6 +245,7 @@ export function CellTextColor(props: ToolProps) {
     <ColorTool
       {...props}
       cacheKey="cellTextColor"
+      type="text"
       activeColor={editor.getAttributes("tableCell").color}
       title={"Cell text color"}
       onColorChange={(color) =>
@@ -261,6 +263,7 @@ export function CellBorderColor(props: ToolProps) {
       {...props}
       cacheKey="cellBorderColor"
       activeColor={editor.getAttributes("tableCell").borderColor}
+      type="border"
       title={"Cell border color"}
       onColorChange={(color) =>
         editor.chain().focus().setCellAttribute("borderColor", color).run()

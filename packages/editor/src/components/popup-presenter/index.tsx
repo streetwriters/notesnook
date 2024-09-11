@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, PropsWithChildren } from "react";
-import { Box } from "@theme-ui/components";
 import {
   PositionOptions,
   PopupPresenterProps,
@@ -40,7 +39,7 @@ import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive";
 export type PopupWrapperProps = UsePopupHandlerOptions & {
   autoCloseOnUnmount?: boolean;
   position: PositionOptions;
-} & Partial<Omit<PopupPresenterProps, "onClose">>;
+} & Partial<Omit<PopupPresenterProps, "onClose" | "isOpen">>;
 export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
   const { id, position, children, autoCloseOnUnmount, ...presenterProps } =
     props;
@@ -67,15 +66,7 @@ export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
       {...presenterProps}
       isOpen={isPopupOpen}
     >
-      <Box
-        sx={{
-          boxShadow: "menu",
-          borderRadius: "default",
-          overflow: "hidden"
-        }}
-      >
-        {children}
-      </Box>
+      {children}
     </PopupPresenter>
   );
 }
@@ -83,13 +74,11 @@ export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
 type UsePopupHandlerOptions = {
   id: string;
   group: string;
-  isOpen: boolean;
   onClosed?: () => void;
 };
 export function usePopupHandler(options: UsePopupHandlerOptions) {
-  const { isOpen, id, onClosed, group } = options;
+  const { id, onClosed, group } = options;
   const openedPopups = useToolbarStore((store) => store.openedPopups);
-  const openPopup = useToolbarStore((store) => store.openPopup);
   const closePopup = useToolbarStore((store) => store.closePopup);
   const closePopupGroup = useToolbarStore((store) => store.closePopupGroup);
 
@@ -97,14 +86,9 @@ export function usePopupHandler(options: UsePopupHandlerOptions) {
   const isPopupDefined = typeof openedPopups[id] !== "undefined";
 
   useEffect(() => {
-    if (isOpen) openPopup({ id, group });
-    else closePopup(id);
-  }, [isOpen, closePopup, openPopup, id, group]);
-
-  useEffect(() => {
     // we don't want to close the popup just when it is about to open.
     if (!isPopupOpen && isPopupDefined) onClosed?.();
-  }, [isPopupOpen, isPopupDefined]);
+  }, [isPopupOpen, isPopupDefined, onClosed]);
 
   useEffect(() => {
     // if another popup in the same group is open, close it.

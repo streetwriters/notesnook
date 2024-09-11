@@ -39,6 +39,8 @@ type ColorPickerProps = {
   expanded?: boolean;
   onChange: (color: string) => void;
   onClose?: () => void;
+  isPinned?: boolean;
+  onPin?: () => void;
   title?: string;
   onSave?: (color: string) => void;
   cacheKey?: string;
@@ -52,6 +54,8 @@ export function ColorPicker(props: ColorPickerProps) {
     onChange,
     title,
     onClose,
+    isPinned,
+    onPin,
     expanded,
     onSave,
     colors = [],
@@ -83,12 +87,14 @@ export function ColorPicker(props: ColorPickerProps) {
   );
 
   return (
-    <Popup title={title} onClose={onClose}>
+    <Popup title={title} onClose={onClose} isPinned={isPinned} onPin={onPin}>
       <Flex
         ref={ref}
         tabIndex={-1}
         sx={{
           bg: "background",
+          boxShadow: ["menu", "none"],
+          borderRadius: ["default", "none"],
           flexDirection: "column",
           ".react-colorful": {
             width: "auto",

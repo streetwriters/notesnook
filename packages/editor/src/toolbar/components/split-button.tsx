@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { PropsWithChildren, useRef } from "react";
+import { PropsWithChildren } from "react";
 import { Flex } from "@theme-ui/components";
 import { ToolButton, ToolButtonProps } from "./tool-button";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
@@ -27,16 +27,16 @@ export type SplitButtonProps = ToolButtonProps & {
   onOpen: () => void;
 };
 function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
-  const { children, onOpen, sx, toggled, ...toolButtonProps } = props;
+  const { children, onOpen, sx, toggled, buttonRef, ...toolButtonProps } =
+    props;
 
-  const ref = useRef<HTMLDivElement>(null);
   const toolbarLocation = useToolbarLocation();
   const isMobile = useIsMobile();
 
   return (
     <>
       <Flex
-        ref={ref}
+        ref={buttonRef}
         sx={{
           flexShrink: 0,
           alignItems: "stretch",
@@ -66,6 +66,7 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
 }
 export const SplitButton = React.memo(_SplitButton, (prev, next) => {
   return (
+    prev.buttonRef === next.buttonRef &&
     prev.toggled === next.toggled &&
     JSON.stringify(prev.sx) === JSON.stringify(next.sx) &&
     prev.children === next.children

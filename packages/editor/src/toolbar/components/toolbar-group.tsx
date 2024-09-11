@@ -29,9 +29,10 @@ export type ToolbarGroupProps = FlexProps & {
   editor: Editor;
   variant?: ToolButtonVariant;
   force?: boolean;
+  groupId: string;
 };
 export function ToolbarGroup(props: ToolbarGroupProps) {
-  const { tools, editor, force, sx, ...flexProps } = props;
+  const { tools, editor, force, sx, groupId, ...flexProps } = props;
 
   return (
     <Flex
@@ -48,6 +49,7 @@ export function ToolbarGroup(props: ToolbarGroupProps) {
         if (Array.isArray(toolId)) {
           return (
             <MoreTools
+              parentGroup={groupId}
               key={"more-tools"}
               title="More"
               icon="more"
@@ -61,6 +63,7 @@ export function ToolbarGroup(props: ToolbarGroupProps) {
           const toolDefinition = getToolDefinition(toolId);
           return (
             <Component
+              parentGroup={groupId}
               key={toolDefinition.title}
               editor={editor}
               force={force}
