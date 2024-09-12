@@ -61,6 +61,8 @@ async function moveNotesToTrash(ids: string[], confirm = true) {
 }
 
 async function moveNotebooksToTrash(ids: string[]) {
+  if (!ids.length) return;
+
   const isMultiselect = ids.length > 1;
   if (isMultiselect) {
     if (!(await showMultiDeleteConfirmation(ids.length))) return;

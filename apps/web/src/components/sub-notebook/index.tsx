@@ -115,6 +115,7 @@ function SubNotebook(props: SubNotebookProps) {
             navigate(`/notebooks/${rootId}/${item.id}`);
           }
         } else if (e.code === "Delete") {
+          console.log("Delete", useSelectionStore.getState().selectedItems);
           await Multiselect.moveNotebooksToTrash(
             useSelectionStore.getState().selectedItems
           );
