@@ -111,52 +111,6 @@ async function resolveFileFunctions(
   };
 }
 
-async function createZip(
-  totalNotes: number,
-  cacheFolder: string,
-  type: "txt" | "pdf" | "md" | "html" | "md-frontmatter",
-  path: string,
-  callback: (progress?: string) => void
-) {
-  const fileName = `nn-export-${totalNotes}-${type}-${Date.now()}.zip`;
-  const dir = path;
-  try {
-    callback("Creating zip");
-    const zipOutputPath =
-      Platform.OS === "ios"
-        ? join(path, fileName)
-        : join(RNFetchBlob.fs.dirs.CacheDir, fileName);
-    await zip(cacheFolder, zipOutputPath);
-
-    callback("Saving zip file");
-    if (Platform.OS === "android") {
-      const file = await ScopedStorage.createFile(
-        path,
-        fileName,
-        "application/zip"
-      );
-      path = file.uri;
-      await copyFileAsync("file://" + zipOutputPath, path);
-      await RNFetchBlob.fs.unlink(zipOutputPath);
-      callback();
-    } else {
-      path = zipOutputPath;
-    }
-    RNFetchBlob.fs.unlink(cacheFolder);
-  } catch (e) {
-    DatabaseLogger.error(e as Error);
-  }
-
-  return {
-    filePath: path,
-    fileDir: dir,
-    type: "application/zip",
-    name: "zip",
-    fileName: fileName,
-    count: totalNotes
-  };
-}
-
 async function exportNoteToFile(
   item: ExportableNote,
   type: "txt" | "pdf" | "md" | "html" | "md-frontmatter",
@@ -269,6 +223,8 @@ async function exportNote(
   const { mkdir, writeFile, cacheFolder } = fileFuncions;
 
   let currentAttachmentProgress = 0;
+  let hasAttachments = false;
+  let noteItem;
   for await (const item of _exportNote(note, {
     format: type,
     unlockVault: unlockVaultForNoteExport as () => Promise<boolean>
@@ -281,6 +237,7 @@ async function exportNote(
     if (item.type === "note") {
       callback(`Exporting note`);
       try {
+        noteItem = item;
         await exportNoteToFile(item, type, mkdir, writeFile);
       } catch (e) {
         console.log("exportNoteToFile", item.type, e);
@@ -289,6 +246,7 @@ async function exportNote(
       currentAttachmentProgress += 1;
       callback(`Downloading attachments (${currentAttachmentProgress})`);
       try {
+        hasAttachments = true;
         await exportAttachmentToFile(item, mkdir, cacheFolder);
       } catch (e) {
         console.log("exportAttachmentToFile", item.path, e);
@@ -296,8 +254,89 @@ async function exportNote(
     }
   }
 
-  return createZip(1, cacheFolder, type, path, callback);
+  if (!hasAttachments) {
+    return createFile(noteItem as ExportableNote, type, path, cacheFolder);
+  } else {
+    return createZip(1, cacheFolder, type, path, callback);
+  }
 }
+
+async function createZip(
+  totalNotes: number,
+  cacheFolder: string,
+  type: "txt" | "pdf" | "md" | "html" | "md-frontmatter",
+  path: string,
+  callback: (progress?: string) => void
+) {
+  const fileName = `nn-export-${totalNotes}-${type}-${Date.now()}.zip`;
+  const dir = path;
+  try {
+    callback("Creating zip");
+    const zipOutputPath =
+      Platform.OS === "ios"
+        ? join(path, fileName)
+        : join(RNFetchBlob.fs.dirs.CacheDir, fileName);
+    await zip(cacheFolder, zipOutputPath);
+
+    callback("Saving zip file");
+    if (Platform.OS === "android") {
+      const file = await ScopedStorage.createFile(
+        path,
+        fileName,
+        "application/zip"
+      );
+      path = file.uri;
+      await copyFileAsync("file://" + zipOutputPath, path);
+      await RNFetchBlob.fs.unlink(zipOutputPath);
+      callback();
+    } else {
+      path = zipOutputPath;
+    }
+    RNFetchBlob.fs.unlink(cacheFolder);
+  } catch (e) {
+    DatabaseLogger.error(e as Error);
+  }
+
+  return {
+    filePath: path,
+    fileDir: dir,
+    type: "application/zip",
+    name: "zip",
+    fileName: fileName,
+    count: totalNotes
+  };
+}
+
+async function createFile(
+  noteItem: ExportableNote,
+  type: keyof typeof FileMime,
+  path: string,
+  cacheFolder: string
+) {
+  const file = await ScopedStorage.createFile(
+    path,
+    basename(noteItem?.path as string),
+    FileMime[type]
+  );
+  const exportedFile = join(cacheFolder, noteItem?.path as string);
+  await copyFileAsync("file://" + exportedFile, file.uri);
+  return {
+    filePath: file.uri,
+    fileDir: path,
+    type: FileMime[type],
+    name: type,
+    fileName: basename(noteItem?.path as string),
+    count: 1
+  };
+}
+
+const FileMime = {
+  pdf: "application/pdf",
+  txt: "text/plain",
+  md: "text/markdown",
+  html: "text/html",
+  "md-frontmatter": "text/markdown"
+};
 
 const Exporter = {
   exportNote,
