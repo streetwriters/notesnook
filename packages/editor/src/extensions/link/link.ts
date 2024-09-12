@@ -296,15 +296,8 @@ export const Link = Mark.create<LinkOptions>({
     return {
       Space: ({ editor }) => {
         const { from, to } = editor.state.selection;
-        let found;
 
-        editor.state.doc.nodesBetween(from, to + 1, (node) => {
-          found = node.marks.find(
-            (mark) => mark.type === editor.state.schema.marks.link
-          );
-        });
-
-        if (!found) {
+        if (!editor.state.doc.rangeHasMark(from, to + 1, this.type)) {
           const { tr } = editor.state;
           tr.removeStoredMark(editor.schema.marks.link);
           editor.view.dispatch(tr);
