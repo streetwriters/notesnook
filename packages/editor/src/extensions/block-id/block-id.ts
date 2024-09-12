@@ -22,8 +22,8 @@ import { Node } from "@tiptap/pm/model";
 import { Plugin } from "@tiptap/pm/state";
 import { nanoid } from "nanoid";
 
-const NESTED_BLOCK_ID_TYPES = new Set(["callout"]);
-const BLOCK_ID_TYPES = new Set([
+const NESTED_BLOCK_ID_TYPES = ["callout"];
+const BLOCK_ID_TYPES = [
   "paragraph",
   "heading",
   "blockquote",
@@ -39,7 +39,7 @@ const BLOCK_ID_TYPES = new Set([
   "mathBlock",
   "webclip",
   "embed"
-]);
+];
 
 export const BlockId = Extension.create<any, { seen: WeakSet<Node> }>({
   name: "blockId",
@@ -86,11 +86,11 @@ export const BlockId = Extension.create<any, { seen: WeakSet<Node> }>({
             if (seen.has(n)) return;
             seen.add(n);
 
-            if (!n.isBlock || !BLOCK_ID_TYPES.has(n.type.name)) return;
+            if (!n.isBlock || !BLOCK_ID_TYPES.includes(n.type.name)) return;
             if (!n.attrs.blockId)
               blocksWithoutBlockId.push({ node: n, pos: offset });
 
-            if (NESTED_BLOCK_ID_TYPES.has(n.type.name))
+            if (NESTED_BLOCK_ID_TYPES.includes(n.type.name))
               n.forEach((n, pos) => addBlocks(n, offset + pos + 1));
           });
           if (blocksWithoutBlockId.length > 0) {

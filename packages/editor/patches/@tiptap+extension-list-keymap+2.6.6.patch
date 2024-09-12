@@ -1,5 +1,5 @@
 diff --git a/node_modules/@tiptap/extension-list-keymap/dist/index.cjs b/node_modules/@tiptap/extension-list-keymap/dist/index.cjs
-index 9cd822f..1539b13 100644
+index 0f8ae36..2f715b5 100644
 --- a/node_modules/@tiptap/extension-list-keymap/dist/index.cjs
 +++ b/node_modules/@tiptap/extension-list-keymap/dist/index.cjs
 @@ -82,7 +82,9 @@ const handleBackspace = (editor, name, parentListTypes) => {
@@ -14,7 +14,7 @@ index 9cd822f..1539b13 100644
          const listDescendants = [];
          $listPos.node().descendants((node, pos) => {
 diff --git a/node_modules/@tiptap/extension-list-keymap/dist/index.js b/node_modules/@tiptap/extension-list-keymap/dist/index.js
-index e759826..11a385f 100644
+index f7ab1e4..8645c44 100644
 --- a/node_modules/@tiptap/extension-list-keymap/dist/index.js
 +++ b/node_modules/@tiptap/extension-list-keymap/dist/index.js
 @@ -78,7 +78,9 @@ const handleBackspace = (editor, name, parentListTypes) => {

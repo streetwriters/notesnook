@@ -43,6 +43,7 @@ exports[`copying multiple lists shouldn't copy only the first list 1`] = `
       "attrs": {
         "listType": "",
         "start": 1,
+        "type": undefined,
       },
       "content": [
         {
@@ -66,6 +67,7 @@ exports[`copying multiple lists shouldn't copy only the first list 1`] = `
       "attrs": {
         "listType": "",
         "start": 1,
+        "type": undefined,
       },
       "content": [
         {
@@ -89,6 +91,7 @@ exports[`copying multiple lists shouldn't copy only the first list 1`] = `
       "attrs": {
         "listType": "",
         "start": 1,
+        "type": undefined,
       },
       "content": [
         {
