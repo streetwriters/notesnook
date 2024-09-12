@@ -46,13 +46,17 @@ export function LinkPopup(props: LinkPopupProps) {
       onClose={onClose}
       action={{
         title: isEditing ? "Save edits" : "Insert link",
-        onClick: () => {
-          if (!link.current) return;
-          onDone(link.current);
-        }
+        onClick: () => onDone(link.current)
       }}
     >
-      <Flex sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}>
+      <Flex
+        sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}
+        onKeyUp={(e) => {
+          if (e.key === "Enter") {
+            onDone(link.current);
+          }
+        }}
+      >
         {!isImageActive && (
           <Input
             type="text"
