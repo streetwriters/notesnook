@@ -40,13 +40,6 @@ export function LinkPopup(props: LinkPopupProps) {
   } = props;
   const link = useRefValue(_link);
 
-  // const executeLinkOperation = (e?: React.KeyboardEvent<HTMLInputElement>) => {
-  //   if (e?.key === "Enter" || e?.type === "click") {
-  //     if (!link.current) return;
-  //     onDone(link.current);
-  //   }
-  // };
-
   return (
     <Popup
       title={isEditing ? "Edit link" : "Insert link"}
