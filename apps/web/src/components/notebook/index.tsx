@@ -44,6 +44,7 @@ import { Notebook as NotebookType } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { useDragHandler } from "../../hooks/use-drag-handler";
 import { ConfirmDialog } from "../../dialogs/confirm";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
 
 type NotebookProps = {
   item: NotebookType;
@@ -79,6 +80,13 @@ function Notebook(props: NotebookProps) {
         clearTimeout(dragTimeout.current);
 
         handleDrop(e.dataTransfer, notebook);
+      }}
+      onKeyPress={async (e) => {
+        if (e.key === "Delete") {
+          await Multiselect.moveNotebooksToTrash(
+            useSelectionStore.getState().selectedItems
+          );
+        }
       }}
       title={notebook.title}
       body={notebook.description as string}

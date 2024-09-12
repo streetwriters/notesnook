@@ -26,6 +26,7 @@ import { db } from "../common/db";
 import { getChangelog } from "../utils/version";
 import { downloadUpdate } from "../utils/updater";
 import { ErrorText } from "../components/error-text";
+import { pluralize } from "@notesnook/common";
 
 type Check = { text: string; default?: boolean };
 export type ConfirmDialogProps<TCheckId extends string> = BaseDialogProps<
@@ -143,7 +144,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
 
 export function showMultiDeleteConfirmation(length: number) {
   return ConfirmDialog.show({
-    title: `Delete ${length} items?`,
+    title: `Delete ${pluralize(length, "item")}?`,
     message: `These items will be **kept in your Trash for ${
       db.settings.getTrashCleanupInterval() || 7
     } days** after which they will be permanently deleted.`,
@@ -154,7 +155,7 @@ export function showMultiDeleteConfirmation(length: number) {
 
 export function showMultiPermanentDeleteConfirmation(length: number) {
   return ConfirmDialog.show({
-    title: `Permanently delete ${length} items?`,
+    title: `Permanently delete ${pluralize(length, "item")}?`,
     message:
       "These items will be **permanently deleted**. This is IRREVERSIBLE.",
     positiveButtonText: "Yes",
