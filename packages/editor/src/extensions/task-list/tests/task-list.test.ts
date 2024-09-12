@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createEditor, h, ul, li } from "@/test-utils";
+import { createEditor, h, ul, li } from "../../../../test-utils";
 import { test, expect } from "vitest";
 import { TaskListNode } from "../index";
 import { TaskItemNode } from "../../task-item";

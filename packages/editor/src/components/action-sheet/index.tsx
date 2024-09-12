@@ -25,7 +25,7 @@ import React, {
   useEffect
 } from "react";
 import { MenuItem, Icon, MenuButton, MenuSeparator } from "@notesnook/ui";
-import { Box, Button, Flex, Text, FlexProps } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { Icons } from "../../toolbar/icons";
 import Modal from "react-modal";
 import {
@@ -38,9 +38,7 @@ import {
 import { useTheme } from "@emotion/react";
 import { EmotionThemeProvider, Theme } from "@notesnook/theme";
 
-const AnimatedFlex = motion(
-  Flex as React.FunctionComponent<Omit<FlexProps, "onDrag" | "onDragEnd">>
-);
+const AnimatedFlex = motion(Flex);
 
 type ActionSheetHistoryItem = {
   title?: string;

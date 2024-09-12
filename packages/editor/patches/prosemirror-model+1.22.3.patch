@@ -1,8 +1,8 @@
 diff --git a/node_modules/prosemirror-model/dist/index.cjs b/node_modules/prosemirror-model/dist/index.cjs
-index 1c45f1c..c92ec8d 100644
+index aa31355..dcb4a75 100644
 --- a/node_modules/prosemirror-model/dist/index.cjs
 +++ b/node_modules/prosemirror-model/dist/index.cjs
-@@ -98,6 +98,7 @@ var Fragment = function () {
+@@ -95,6 +95,7 @@ var Fragment = function () {
        var nodeStart = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
        var parent = arguments.length > 4 ? arguments[4] : undefined;
        for (var i = 0, pos = 0; pos < to; i++) {
@@ -11,7 +11,7 @@ index 1c45f1c..c92ec8d 100644
            end = pos + child.nodeSize;
          if (end > from && f(child, nodeStart + pos, parent || null, i) !== false && child.content.size) {
 diff --git a/node_modules/prosemirror-model/dist/index.js b/node_modules/prosemirror-model/dist/index.js
-index 9c37a40..a215c60 100644
+index 0097d9f..44f7d4a 100644
 --- a/node_modules/prosemirror-model/dist/index.js
 +++ b/node_modules/prosemirror-model/dist/index.js
 @@ -84,6 +84,7 @@ class Fragment {

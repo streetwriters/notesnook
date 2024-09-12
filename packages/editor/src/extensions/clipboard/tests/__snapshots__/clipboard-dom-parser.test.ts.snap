@@ -1,38 +1,38 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`convert br tags to paragraphs 1`] = `"<p>line 1</p><p data-spacing=\\"single\\">line 2</p>"`;
+exports[`convert br tags to paragraphs 1`] = `"<p>line 1</p><p data-spacing="single">line 2</p>"`;
 
-exports[`convert br tags to paragraphs 2`] = `"<p>line <em>1</em></p><p data-spacing=\\"single\\"><em>line</em> 2</p>"`;
+exports[`convert br tags to paragraphs 2`] = `"<p>line <em>1</em></p><p data-spacing="single"><em>line</em> 2</p>"`;
 
-exports[`convert br tags to paragraphs 3`] = `"<p>line <span><em>1</em></span></p><p data-spacing=\\"single\\"><span><em>line</em></span> 2</p>"`;
+exports[`convert br tags to paragraphs 3`] = `"<p>line <span><em>1</em></span></p><p data-spacing="single"><span><em>line</em></span> 2</p>"`;
 
-exports[`convert br tags to paragraphs 4`] = `"<p>line <span><em>1</em></span></p><p data-spacing=\\"single\\"><span><em>line</em></span> 2</p>"`;
+exports[`convert br tags to paragraphs 4`] = `"<p>line <span><em>1</em></span></p><p data-spacing="single"><span><em>line</em></span> 2</p>"`;
 
 exports[`convert br tags to paragraphs 5`] = `"<p></p>"`;
 
 exports[`convert br tags to paragraphs 6`] = `
-"<p data-spacing=\\"single\\">A troll, they call me, but I have no wish<!--StartFragment-->
-</p><p data-spacing=\\"single\\">
-to be associated with those dolls</p><p data-spacing=\\"single\\">
-</p><p data-spacing=\\"single\\">
-We lack religion, purpose, politics,</p><p data-spacing=\\"single\\">
+"<p data-spacing="single">A troll, they call me, but I have no wish<!--StartFragment-->
+</p><p data-spacing="single">
+to be associated with those dolls</p><p data-spacing="single">
+</p><p data-spacing="single">
+We lack religion, purpose, politics,</p><p data-spacing="single">
 and yet, we somehow manage to get by.</p>"
 `;
 
 exports[`convert br tags to paragraphs 7`] = `
-"<!--StartFragment--><p dir=\\"auto\\">When I try to paste something (e.g. email content) to a note, the styling is kept, which is good, but the newlines are removed.</p><p data-spacing=\\"single\\">
+"<!--StartFragment--><p dir="auto">When I try to paste something (e.g. email content) to a note, the styling is kept, which is good, but the newlines are removed.</p><p data-spacing="single">
     Also when I share the selection to Notesnook via the share functionality from Android, I have the same issue.</p>
     <hr>
-    <p dir=\\"auto\\"><strong>Device information:</strong></p><p data-spacing=\\"single\\">
-    App version: 2.3.0</p><p data-spacing=\\"single\\">
-    Platform: android</p><p data-spacing=\\"single\\">
-    Model: OnePlus-CPH2409-31</p><p data-spacing=\\"single\\">
-    Pro: true</p><p data-spacing=\\"single\\">
+    <p dir="auto"><strong>Device information:</strong></p><p data-spacing="single">
+    App version: 2.3.0</p><p data-spacing="single">
+    Platform: android</p><p data-spacing="single">
+    Model: OnePlus-CPH2409-31</p><p data-spacing="single">
+    Pro: true</p><p data-spacing="single">
     Logged in: yes</p><!--EndFragment-->"
 `;
 
 exports[`convert br tags to paragraphs 8`] = `
-"<!--StartFragment--><span class=\\"css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0\\">Why switch from Gmail? 
+"<!--StartFragment--><span class="css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0">Why switch from Gmail? 
 
     Not sacrificing features for more privacy, prefer using one app, in many public groups and channels (Telegram)
     
@@ -43,10 +43,10 @@ exports[`convert br tags to paragraphs 8`] = `
 
 exports[`convert br tags to paragraphs 9`] = `
 "<div>
-  <p style=\\"line-height: 100%; margin-bottom: 0in\\">
+  <p style="line-height: 100%; margin-bottom: 0in">
   I am not talk9ing to you</p>
-  <p style=\\"line-height: 100%; margin-bottom: 0in\\"></p>
-  <p style=\\"line-height: 100%; margin-bottom: 0in\\">I am not talk9ing to
+  <p style="line-height: 100%; margin-bottom: 0in"></p>
+  <p style="line-height: 100%; margin-bottom: 0in">I am not talk9ing to
   you</p>
   
   </div>"
@@ -54,8 +54,8 @@ exports[`convert br tags to paragraphs 9`] = `
 
 exports[`convert br tags to paragraphs 10`] = `
 "<div>
-  <p style=\\"line-height: 100%; margin-bottom: 0in\\">
-  I am not talking to you</p><p data-spacing=\\"single\\">
+  <p style="line-height: 100%; margin-bottom: 0in">
+  I am not talking to you</p><p data-spacing="single">
   </p>
   <p>I am talking to you</p>
   </div>"
@@ -63,32 +63,32 @@ exports[`convert br tags to paragraphs 10`] = `
 
 exports[`convert br tags to paragraphs 11`] = `
 "<div>
-    <!--StartFragment--><p><span>Hello</span></p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\"><span>world</span></p><!--EndFragment-->
+    <!--StartFragment--><p><span>Hello</span></p><p data-spacing="single"></p><p data-spacing="single"></p><p data-spacing="single"></p><p data-spacing="single"></p><p data-spacing="single"></p><p data-spacing="single"><span>world</span></p><!--EndFragment-->
     
     </div>"
 `;
 
 exports[`convert br tags to paragraphs 12`] = `
 "<div>
-    <!--StartFragment--><meta charset=\\"utf-8\\"><h1><span>Write notes</span></h1><p data-spacing=\\"single\\"></p><p dir=\\"ltr\\" data-spacing=\\"single\\"><span>Welcome of </span><a><span>Notesnook</span></a><span>, an syncing.</span></p><p data-spacing=\\"single\\"></p><p dir=\\"ltr\\" data-spacing=\\"single\\"><span>Enjoy the read!</span></p><p data-spacing=\\"single\\"></p><p dir=\\"ltr\\" data-spacing=\\"single\\"><span><span><img></span></span></p><p data-spacing=\\"single\\"></p><p dir=\\"ltr\\" data-spacing=\\"single\\"><span>vision?</span></p><p data-spacing=\\"single\\"></p><p dir=\\"ltr\\" data-spacing=\\"single\\"><span>everyone means</span></p><!--EndFragment-->
+    <!--StartFragment--><meta charset="utf-8"><h1><span>Write notes</span></h1><p data-spacing="single"></p><p dir="ltr" data-spacing="single"><span>Welcome of </span><a><span>Notesnook</span></a><span>, an syncing.</span></p><p data-spacing="single"></p><p dir="ltr" data-spacing="single"><span>Enjoy the read!</span></p><p data-spacing="single"></p><p dir="ltr" data-spacing="single"><span><span><img></span></span></p><p data-spacing="single"></p><p dir="ltr" data-spacing="single"><span>vision?</span></p><p data-spacing="single"></p><p dir="ltr" data-spacing="single"><span>everyone means</span></p><!--EndFragment-->
     
     </div>"
 `;
 
-exports[`convert br tags to paragraphs 13`] = `"<ul xmlns=\\"http://www.w3.org/1999/xhtml\\" data-block-id=\\"A9jEKaAm\\" class=\\"checklist\\"><li class=\\"checklist--item\\"><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a>hello <a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></li><li class=\\"checklist--item\\"><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></li><li class=\\"checklist--item\\"><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hellohello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello hello hello</a></p><p data-spacing=\\"single\\"><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></p><a target=\\"_blank\\" rel=\\"noopener noreferrer nofollow\\" href=\\"https://google.com\\">hello</a></li><li class=\\"checklist--item\\">vsvdsavdsa</li><li class=\\"checklist--item\\">vadsvasdv</li></ul><p xmlns=\\"http://www.w3.org/1999/xhtml\\" data-block-id=\\"CuscJzDm\\" data-spacing=\\"double\\"></p>"`;
+exports[`convert br tags to paragraphs 13`] = `"<ul xmlns="http://www.w3.org/1999/xhtml" data-block-id="A9jEKaAm" class="checklist"><li class="checklist--item"><p data-spacing="single"><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello</a>hello <a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello</a></p><p data-spacing="single"><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello</a></p><p data-spacing="single"><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello</a></p><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello</a></li><li class="checklist--item"><p data-spacing="single"><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello</a></p><p data-spacing="single"><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello</a></p><p data-spacing="single"><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello</a></p><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello</a></li><li class="checklist--item"><p data-spacing="single"><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hellohello</a></p><p data-spacing="single"><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello hello hello</a></p><p data-spacing="single"><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello</a></p><a target="_blank" rel="noopener noreferrer nofollow" href="https://google.com">hello</a></li><li class="checklist--item">vsvdsavdsa</li><li class="checklist--item">vadsvasdv</li></ul><p xmlns="http://www.w3.org/1999/xhtml" data-block-id="CuscJzDm" data-spacing="double"></p>"`;
 
 exports[`convert google docs checklist 1`] = `
 "<div>
-    <!--StartFragment--><meta charset=\\"utf-8\\"><ul id=\\"docs-internal-guid-0d9a5db3-7fff-ab55-e7ca-b178e1031970\\" class=\\"checklist\\"><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"1\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Adsjkfhasdf</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"1\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Asdfsadf</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"true\\" aria-level=\\"1\\" class=\\"checklist--item checked\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Asdfsda</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"true\\" aria-level=\\"1\\" class=\\"checklist--item checked\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Fasd</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"true\\" aria-level=\\"1\\" class=\\"checklist--item checked\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Fasd</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"1\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>F</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"true\\" aria-level=\\"1\\" class=\\"checklist--item checked\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>akcasb</span></p></li><ul class=\\"checklist\\"><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"true\\" aria-level=\\"2\\" class=\\"checklist--item checked\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Asdf</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"2\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Asdcasdc</span></p></li><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"2\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>sdac</span></p></li></ul><li dir=\\"ltr\\" role=\\"checkbox\\" aria-checked=\\"false\\" aria-level=\\"1\\" class=\\"checklist--item\\"><p dir=\\"ltr\\" role=\\"presentation\\"><span>Asdfsda</span></p></li></ul><!--EndFragment-->
+    <!--StartFragment--><meta charset="utf-8"><ul id="docs-internal-guid-0d9a5db3-7fff-ab55-e7ca-b178e1031970" class="checklist"><li dir="ltr" role="checkbox" aria-checked="false" aria-level="1" class="checklist--item"><p dir="ltr" role="presentation"><span>Adsjkfhasdf</span></p></li><li dir="ltr" role="checkbox" aria-checked="false" aria-level="1" class="checklist--item"><p dir="ltr" role="presentation"><span>Asdfsadf</span></p></li><li dir="ltr" role="checkbox" aria-checked="true" aria-level="1" class="checklist--item checked"><p dir="ltr" role="presentation"><span>Asdfsda</span></p></li><li dir="ltr" role="checkbox" aria-checked="true" aria-level="1" class="checklist--item checked"><p dir="ltr" role="presentation"><span>Fasd</span></p></li><li dir="ltr" role="checkbox" aria-checked="true" aria-level="1" class="checklist--item checked"><p dir="ltr" role="presentation"><span>Fasd</span></p></li><li dir="ltr" role="checkbox" aria-checked="false" aria-level="1" class="checklist--item"><p dir="ltr" role="presentation"><span>F</span></p></li><li dir="ltr" role="checkbox" aria-checked="true" aria-level="1" class="checklist--item checked"><p dir="ltr" role="presentation"><span>akcasb</span></p></li><ul class="checklist"><li dir="ltr" role="checkbox" aria-checked="true" aria-level="2" class="checklist--item checked"><p dir="ltr" role="presentation"><span>Asdf</span></p></li><li dir="ltr" role="checkbox" aria-checked="false" aria-level="2" class="checklist--item"><p dir="ltr" role="presentation"><span>Asdcasdc</span></p></li><li dir="ltr" role="checkbox" aria-checked="false" aria-level="2" class="checklist--item"><p dir="ltr" role="presentation"><span>sdac</span></p></li></ul><li dir="ltr" role="checkbox" aria-checked="false" aria-level="1" class="checklist--item"><p dir="ltr" role="presentation"><span>Asdfsda</span></p></li></ul><!--EndFragment-->
     
     </div>"
 `;
 
 exports[`properly format codeblocks 1`] = `
 "<div>
-  <!--StartFragment--><p>Sure! Here's an implementation of a word counter for Thai that considers each syllable consisting of a consonant sound followed by a vowel sound as a word:</p><pre><code>javascript</code></pre><pre class=\\"language-javascript\\"><code>function countThaiWords(text) {
+  <!--StartFragment--><p>Sure! Here's an implementation of a word counter for Thai that considers each syllable consisting of a consonant sound followed by a vowel sound as a word:</p><pre><code>javascript</code></pre><pre class="language-javascript"><code>function countThaiWords(text) {
     // define a regular expression to match Thai syllables
-    const thaiSyllableRegex = /[&#xe01;-&#xe3a;&#xe40;-&#xe5b;]+[&#xe00;-&#xe7f;]?/g;
+    const thaiSyllableRegex = /[ก-ฺเ-๛]+[฀-๿]?/g;
   
     // count the number of matches of the Thai syllable regex in the text
     const matches = text.match(thaiSyllableRegex) || [];
@@ -99,9 +99,9 @@ exports[`properly format codeblocks 1`] = `
   }
   
   // example usage
-  const text = &quot;&#xe2a;&#xe27;&#xe31;&#xe2a;&#xe14;&#xe35;&#xe04;&#xe48;&#xe30;&#xe22;&#xe34;&#xe19;&#xe14;&#xe35;&#xe15;&#xe49;&#xe2d;&#xe19;&#xe23;&#xe31;&#xe1a;&#xe40;&#xe02;&#xe49;&#xe32;&#xe2a;&#xe39;&#xe48;&#xe42;&#xe25;&#xe01;&#xe02;&#xe2d;&#xe07;&#xe09;&#xe31;&#xe19;&quot;;
+  const text = "สวัสดีค่ะยินดีต้อนรับเข้าสู่โลกของฉัน";
   const wordCount = countThaiWords(text);
-  console.log(\`Word count: &dollar;{wordCount}\`);
+  console.log(\`Word count: \${wordCount}\`);
   // output: Word count: 9
   </code></pre><p>This implementation defines a regular expression to match Thai syllables, which are composed of one or more Thai characters. It then uses the <code>match</code> function of the <code>String</code> object to count the number of matches of the Thai syllable regex in the input text.</p><p>Note that this implementation assumes that each syllable consisting of a consonant sound followed by a vowel sound is considered a word in Thai. This may not always be accurate, as some words in Thai may consist of multiple syllables, and some syllables may be used as prefixes or suffixes to modify other words. However, this approach should work well for many cases where each syllable is considered a separate word.</p><!--EndFragment-->
   
