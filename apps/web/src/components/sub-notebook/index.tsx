@@ -29,6 +29,8 @@ import { useCallback, useRef } from "react";
 import { handleDrop } from "../../common/drop-handler";
 import { useDragHandler } from "../../hooks/use-drag-handler";
 import { AddNotebookDialog } from "../../dialogs/add-notebook-dialog";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { Multiselect } from "../../common/multi-select";
 
 type SubNotebookProps = {
   item: Notebook;
@@ -112,6 +114,10 @@ function SubNotebook(props: SubNotebookProps) {
             });
             navigate(`/notebooks/${rootId}/${item.id}`);
           }
+        } else if (e.code === "Delete") {
+          await Multiselect.moveNotebooksToTrash(
+            useSelectionStore.getState().selectedItems
+          );
         }
       }}
       title={
