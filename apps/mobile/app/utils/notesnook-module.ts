@@ -23,13 +23,17 @@ interface NotesnookModuleInterface {
   getActivityName: () => Promise<string>;
   setBackgroundColor: (color: string) => void;
   setSecureMode: (enabled: boolean) => void;
+  setAppState: (appState: string) => void;
+  getAppState: () => string;
 }
 
 export const NotesnookModule: NotesnookModuleInterface = Platform.select({
   ios: {
     getActivityName: () => {},
     setBackgroundColor: () => {},
-    setSecureMode: () => {}
+    setSecureMode: () => {},
+    setAppState: () => {},
+    getAppState: () => {}
   },
   android: NativeModules.NNativeModule
 });

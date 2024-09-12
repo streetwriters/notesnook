@@ -95,6 +95,7 @@ import {
 import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
+import { NotesnookModule } from "../utils/notesnook-module";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -254,9 +255,9 @@ async function saveEditorState() {
       movedAway: editorState().movedAway,
       timestamp: Date.now()
     });
-    MMKV.setString("appState", state);
+    NotesnookModule.setAppState(state);
   } else {
-    MMKV.removeItem("appState");
+    NotesnookModule.setAppState("");
   }
 }
 
@@ -632,7 +633,7 @@ export const useAppEvents = () => {
         Sync.run("global", false, "full");
         reconnectSSE();
         await checkForShareExtensionLaunchedInBackground();
-        MMKV.removeItem("appState");
+        NotesnookModule.setAppState("");
         let user = await db.user.getUser();
         if (user && !user?.isEmailConfirmed) {
           try {
