@@ -1,16 +1,11 @@
 package com.streetwriters.notesnook;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.ammarahmed.mmkv.MMKV;
-
 public class OnClearFromRecentService extends Service {
-
-    static {
-        System.loadLibrary("rnmmkv");
-    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -30,15 +25,12 @@ public class OnClearFromRecentService extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         try {
-            MMKV.initialize(getApplicationContext());
-            MMKV mmkv = MMKV.mmkvWithID("default",MMKV.SINGLE_PROCESS_MODE);
-            mmkv.removeValueForKey("appState");
+            SharedPreferences appStateDetails = getApplicationContext().getSharedPreferences("appStateDetails", MODE_PRIVATE);
+            SharedPreferences.Editor edit = appStateDetails.edit();
+            edit.remove("appState");
+            edit.apply();
             stopSelf();
-        } catch (UnsatisfiedLinkError e) {
-
-        } catch (Exception e) {
-            
+        } catch (UnsatisfiedLinkError | Exception e) {
         }
-        //System.exit(0);
     }
 }
