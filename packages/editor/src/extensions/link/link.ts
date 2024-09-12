@@ -290,6 +290,22 @@ export const Link = Mark.create<LinkOptions>({
     }
 
     return plugins;
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      Space: ({ editor }) => {
+        const { from, to } = editor.state.selection;
+
+        if (!editor.state.doc.rangeHasMark(from, to + 1, this.type)) {
+          const { tr } = editor.state;
+          tr.removeStoredMark(editor.schema.marks.link);
+          editor.view.dispatch(tr);
+        }
+
+        return false;
+      }
+    };
   }
 });
 
