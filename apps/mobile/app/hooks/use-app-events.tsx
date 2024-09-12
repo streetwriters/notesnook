@@ -96,6 +96,7 @@ import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NotesnookModule } from "../utils/notesnook-module";
+import { changeSystemBarColors } from "../stores/use-theme-store";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -355,7 +356,9 @@ const IsDatabaseMigrationRequired = () => {
 const initializeDatabase = async (password?: string) => {
   if (useUserStore.getState().appLocked) return;
   if (!db.isInitialized) {
-    RNBootSplash.hide({ fade: true });
+    RNBootSplash.hide({ fade: false });
+    changeSystemBarColors();
+
     DatabaseLogger.info("Initializing database");
     try {
       await setupDatabase(password);

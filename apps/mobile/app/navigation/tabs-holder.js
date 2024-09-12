@@ -24,7 +24,6 @@ import {
 } from "@sayem314/react-native-keep-awake";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Dimensions, Platform, StatusBar, View } from "react-native";
-import changeNavigationBarColor from "react-native-navigation-bar-color";
 import {
   addOrientationListener,
   addSpecificOrientationListener,
@@ -72,6 +71,7 @@ import {
 import { editorRef, tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
+import { changeSystemBarColors } from "../stores/use-theme-store";
 
 const _TabsHolder = () => {
   const { colors, isDark } = useThemeColors();
@@ -386,18 +386,12 @@ const _TabsHolder = () => {
     };
   }, []);
 
-  useEffect(() => {
-    function updateSystemBars() {
-      changeNavigationBarColor(colors.primary.background, isDark, true);
-      StatusBar.setBackgroundColor("transparent");
-      StatusBar.setTranslucent(true);
-      StatusBar.setBarStyle(isDark ? "light-content" : "dark-content");
-    }
-    updateSystemBars();
-    setTimeout(() => {
-      updateSystemBars();
-    }, 1000);
-  }, [colors.primary.background, isDark]);
+  // useEffect(() => {
+  //   changeSystemBarColors();
+  //   setTimeout(() => {
+  //     changeSystemBarColors();
+  //   }, 1000);
+  // }, [colors.primary.background, isDark]);
 
   return (
     <View
