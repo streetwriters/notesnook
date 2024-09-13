@@ -251,7 +251,7 @@ export default class Vault {
       .storage()
       .encrypt({ password }, JSON.stringify(content.data));
 
-    await this.db.content.add({
+    return await this.db.content.add({
       noteId,
       sessionId,
       data: encryptedContent,
@@ -295,7 +295,7 @@ export default class Vault {
     // Case: when note is being newly locked
     if (!locked && (!data || !type)) {
       const rawContent = await this.db.content.findByNoteId(id);
-      if (!rawContent || rawContent.locked) {
+      if (rawContent?.locked) {
         await this.db.relations.add(vault, {
           id,
           type: "note"
@@ -305,8 +305,8 @@ export default class Vault {
       // NOTE:
       // At this point, the note already has all the attachments extracted
       // so we should just encrypt it as normal.
-      data = rawContent.data;
-      type = rawContent.type;
+      data = rawContent?.data || "<p></p>";
+      type = rawContent?.type || "tiptap";
     } else if (data && type) {
       data = await this.db.content.postProcess({
         data,
@@ -315,13 +315,14 @@ export default class Vault {
       });
     }
 
-    if (data && type)
-      await this.encryptContent({ data, type }, id, password, sessionId);
-
     await this.db.notes.add({
       id,
       headline: "",
-      dateEdited: Date.now()
+      dateEdited: Date.now(),
+      contentId:
+        data && type
+          ? await this.encryptContent({ data, type }, id, password, sessionId)
+          : undefined
     });
 
     await this.db.relations.add(vault, {
