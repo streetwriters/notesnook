@@ -43,8 +43,15 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       formatCodeblocks(dom);
       convertBrToSingleSpacedParagraphs(dom);
       removeImages(dom);
+      removeBlockId(dom);
     }
     return super.parseSlice(dom, options);
+  }
+}
+
+export function removeBlockId(dom: HTMLElement | Document) {
+  for (const element of dom.querySelectorAll("[data-block-id]")) {
+    element.removeAttribute("data-block-id");
   }
 }
 
