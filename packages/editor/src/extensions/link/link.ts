@@ -29,7 +29,6 @@ import {
 } from "@tiptap/core";
 import { Plugin, TextSelection } from "@tiptap/pm/state";
 import { find, registerCustomProtocol, reset } from "linkifyjs";
-
 import { autolink } from "./helpers/autolink";
 import { clickHandler } from "./helpers/clickHandler";
 import { pasteHandler } from "./helpers/pasteHandler";

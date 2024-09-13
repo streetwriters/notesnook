@@ -25,7 +25,7 @@ import { MoreTools } from "../components/more-tools";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { ImageProperties as ImagePropertiesPopup } from "../popups/image-properties";
 import { findSelectedNode } from "../../utils/prosemirror";
-import { ImageAttributes } from "@/src/extensions/image";
+import { ImageAttributes } from "../../extensions/image";
 
 export function ImageSettings(props: ToolProps) {
   const { editor } = props;

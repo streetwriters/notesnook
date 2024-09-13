@@ -4,10 +4,6 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
     "outDir": "./dist/",
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["*"]
-    },
     "incremental": true
   },
   "exclude": ["src/**/*.test.ts"],
