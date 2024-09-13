@@ -21,6 +21,7 @@ import { Extension } from "@tiptap/core";
 import { isInTable } from "@tiptap/pm/tables";
 import { isListActive } from "../../utils/prosemirror";
 import { CodeBlock } from "../code-block";
+import { showLinkPopup } from "../../toolbar/popups/link-popup";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -64,6 +65,10 @@ export const KeyMap = Extension.create({
             title: selectedText || link.title
           });
         });
+        return true;
+      },
+      "Mod-k": ({ editor }) => {
+        showLinkPopup(editor);
         return true;
       }
     };
