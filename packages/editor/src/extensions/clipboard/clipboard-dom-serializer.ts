@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Fragment, Schema } from "prosemirror-model";
 import { DOMSerializer } from "@tiptap/pm/model";
+import { Fragment, Schema } from "prosemirror-model";
 
 export class ClipboardDOMSerializer extends DOMSerializer {
   static fromSchema(schema: Schema): ClipboardDOMSerializer {
@@ -41,6 +41,10 @@ export class ClipboardDOMSerializer extends DOMSerializer {
       if (p.parentElement && p.parentElement.childElementCount > 1) continue;
       p.parentElement?.append(...p.childNodes);
       p.remove();
+    }
+
+    for (const element of dom.querySelectorAll("[data-block-id]")) {
+      element.removeAttribute("data-block-id");
     }
 
     for (const p of dom.querySelectorAll('p[data-spacing="single"]')) {
