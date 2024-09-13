@@ -802,10 +802,11 @@ class EditorStore extends BaseStore<EditorStore> {
                 { type, id: currentSession.context.id },
                 { id, type: "note" }
               );
+          } else {
+            const defaultNotebook = db.settings.getDefaultNotebook();
+            if (defaultNotebook)
+              await db.notes.addToNotebook(defaultNotebook, id);
           }
-          const defaultNotebook = db.settings.getDefaultNotebook();
-          if (defaultNotebook)
-            await db.notes.addToNotebook(defaultNotebook, id);
         }
 
         const attachmentsLength = await db.attachments
