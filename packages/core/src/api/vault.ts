@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Cipher } from "@notesnook/crypto";
 import Database from ".";
+import { NoteContent } from "../collections/session-content";
 import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
 import { isCipher } from "../database/crypto";
-import { NoteContent } from "../collections/session-content";
-import { Note } from "../types";
 import { logger } from "../logger";
+import { Note } from "../types";
 
 export const VAULT_ERRORS = {
   noVault: "ERR_NO_VAULT",
@@ -290,30 +290,11 @@ export default class Vault {
     const { id, content, sessionId } = item;
     let { type, data } = content || {};
 
-    const locked = await this.db.relations.from(vault, "note").has(id);
-
-    // Case: when note is being newly locked
-    if (!locked && (!data || !type)) {
-      const rawContent = await this.db.content.findByNoteId(id);
-      if (!rawContent || rawContent.locked) {
-        await this.db.relations.add(vault, {
-          id,
-          type: "note"
-        });
-        return id;
-      }
-      // NOTE:
-      // At this point, the note already has all the attachments extracted
-      // so we should just encrypt it as normal.
-      data = rawContent.data;
-      type = rawContent.type;
-    } else if (data && type) {
-      data = await this.db.content.postProcess({
-        data,
-        type,
-        noteId: id
-      });
-    }
+    data = await this.db.content.postProcess({
+      data: data || "<p></p>",
+      type: type || "tiptap",
+      noteId: id
+    });
 
     if (data && type)
       await this.encryptContent({ data, type }, id, password, sessionId);
