@@ -292,7 +292,7 @@ export default class Vault {
 
     const locked = await this.db.relations.from(vault, "note").has(id);
     // Case: when note is not locked but content is locked.
-    if (!locked) {
+    if (!locked && (!data || !type)) {
       const rawContent = await this.db.content.findByNoteId(id);
       if (rawContent?.locked) {
         await this.db.relations.add(vault, {
