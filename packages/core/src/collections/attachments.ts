@@ -29,7 +29,7 @@ import { Attachment } from "../types";
 import Database from "../api";
 import { FilteredSelector, SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
-import { sql } from "kysely";
+import { sql } from "@streetwriters/kysely";
 import { logger } from "../logger";
 
 export class Attachments implements ICollection {

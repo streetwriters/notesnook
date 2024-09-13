@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { Database, Statement } from "better-sqlite3-multiple-ciphers";
-import type { QueryResult } from "kysely";
+import type { QueryResult } from "@streetwriters/kysely";
 
 type SQLiteCompatibleType =
   | number

@@ -23,7 +23,7 @@ import { Notebook, TrashOrItem, isTrashItem } from "../types";
 import { ICollection } from "./collection";
 import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
-import { sql } from "kysely";
+import { sql } from "@streetwriters/kysely";
 import { deleteItems } from "../utils/array";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 

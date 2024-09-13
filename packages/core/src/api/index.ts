@@ -70,7 +70,7 @@ import {
   createDatabase,
   initializeDatabase
 } from "../database";
-import { Kysely, Transaction, sql } from "kysely";
+import { Kysely, Transaction, sql } from "@streetwriters/kysely";
 import { CachedCollection } from "../database/cached-collection";
 import { Vaults } from "../collections/vaults";
 import { KVStorage } from "../database/kv";

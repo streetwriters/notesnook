@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Kysely, sql } from "kysely";
+import { Kysely, sql } from "@streetwriters/kysely";
 import { RawDatabaseSchema } from ".";
 
 export async function rebuildSearchIndex(db: Kysely<RawDatabaseSchema>) {

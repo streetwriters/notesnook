@@ -29,7 +29,7 @@ import {
 import Database from "../api";
 import { FilteredSelector, SQLCollection } from "../database/sql-collection";
 import { DatabaseSchema, UnlinkEvent, isFalse } from "../database";
-import { SelectQueryBuilder } from "kysely";
+import { SelectQueryBuilder } from "@streetwriters/kysely";
 import { EVENTS } from "../common";
 
 export class Relations implements ICollection {

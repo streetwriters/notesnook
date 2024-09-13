@@ -21,7 +21,7 @@ import { MaybeDeletedItem, isDeleted } from "../types";
 import EventManager from "../utils/event-manager";
 import { DatabaseAccessor, DatabaseCollection, DatabaseSchema } from ".";
 import { SQLCollection } from "./sql-collection";
-import { Kysely } from "kysely";
+import { Kysely } from "@streetwriters/kysely";
 import { Sanitizer } from "./sanitizer";
 
 export class SQLCachedCollection<
