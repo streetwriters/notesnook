@@ -19,6 +19,8 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" tools:node="remove" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
 
     <queries>
             <intent>
@@ -174,7 +176,7 @@
                 android:resource="@xml/file_viewer_provider_paths" />
         </provider>
 
-       <receiver android:exported="true" android:name=".BootRecieverService" >
+       <receiver android:exported="true" android:name=".BootRecieverService" android:foregroundServiceType="specialUse" >
            <intent-filter>
                <action android:name="android.intent.action.BOOT_COMPLETED" />
                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
