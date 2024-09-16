@@ -79,6 +79,12 @@ export default class Lookup {
           .select(["results.id"])
           .groupBy("results.id")
           .$if(!!limit, (eb) => eb.limit(limit!))
+          // filter out ids that have no note against them
+          .where(
+            "results.id",
+            "in",
+            (notes || this.db.notes.all).filter.select("id")
+          )
           .execute()
           .catch((e) => {
             logger.error(e, `Error while searching`, { query });
