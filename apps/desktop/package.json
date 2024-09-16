@@ -158,7 +158,8 @@
     },
     "nsis": {
       "oneClick": true,
-      "createDesktopShortcut": "always"
+      "createDesktopShortcut": "always",
+      "deleteAppDataOnUninstall": true
     },
     "linux": {
       "target": [
