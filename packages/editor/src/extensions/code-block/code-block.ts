@@ -234,11 +234,29 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         },
       toggleCodeBlock:
         (attributes) =>
-        ({ commands }) => {
-          return commands.toggleNode(this.name, "paragraph", {
-            ...attributes,
-            id: createCodeblockId()
-          });
+        ({ commands, state }) => {
+          const { from, to } = state.selection;
+
+          const isInsideCodeBlock = this.editor.isActive(this.type.name);
+          if (!isInsideCodeBlock) {
+            const text = state.doc.textBetween(from, to, "\n");
+
+            const newNode = this.type.create(
+              { ...attributes, id: createCodeblockId() },
+              state.schema.text(text)
+            );
+
+            state.tr.replaceSelectionWith(newNode);
+
+            commands.setTextSelection({
+              from: from,
+              to: to
+            });
+
+            return true;
+          } else {
+            return commands.clearNodes();
+          }
         },
       changeCodeBlockIndentation:
         (options) =>
