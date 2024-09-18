@@ -143,7 +143,7 @@
             android:stopWithTask="false" />
         <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />   
 
-        <service android:name="com.streetwriters.notesnook.BootTaskService" />
+        <service android:name="com.streetwriters.notesnook.BootTaskService" android:foregroundServiceType="specialUse" />
 
         <service
             android:name=".NotesnookTileService"
@@ -176,7 +176,7 @@
                 android:resource="@xml/file_viewer_provider_paths" />
         </provider>
 
-       <receiver android:exported="true" android:name=".BootRecieverService" android:foregroundServiceType="specialUse" >
+       <receiver android:exported="true" android:name=".BootRecieverService">
            <intent-filter>
                <action android:name="android.intent.action.BOOT_COMPLETED" />
                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
