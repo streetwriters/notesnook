@@ -39,9 +39,7 @@ import Paragraph from "../ui/typography/paragraph";
 
 export const Toast = ({ context = "global" }) => {
   const { colors, isDark } = useThemeColors();
-  const [toastOptions, setToastOptions] = useState<ToastOptions | undefined>(
-    undefined
-  );
+  const [toastOptions, setToastOptions] = useState<ToastOptions | undefined>();
   const hideTimeout = useRef<NodeJS.Timeout | undefined>();
   const keyboard = useKeyboard();
   const insets = useGlobalSafeAreaInsets();
@@ -107,16 +105,17 @@ export const Toast = ({ context = "global" }) => {
 
   return visible && toastOptions ? (
     <TouchableOpacity
-      onPress={hideToast}
+      onPress={() => {
+        hideToast();
+      }}
       activeOpacity={1}
       style={{
         width: DDS.isTab ? dimensions.width / 2 : "100%",
         alignItems: "center",
         alignSelf: "center",
-        minHeight: 30,
         top: keyboard.keyboardShown
           ? insets.top + 15
-          : dimensions.height - Math.max(insets.bottom, 50),
+          : dimensions.height - Math.max(insets.bottom, 70),
         position: "absolute",
         zIndex: 999,
         elevation: 15
@@ -126,27 +125,24 @@ export const Toast = ({ context = "global" }) => {
         style={{
           ...getElevationStyle(5),
           backgroundColor: isDark ? colors.static.black : colors.static.white,
-          minWidth: toastOptions.func ? "95%" : "70%",
           alignSelf: "center",
           borderRadius: 100,
-          minHeight: 30,
           paddingVertical: 12,
           paddingHorizontal: 12,
           justifyContent: "space-between",
           flexDirection: "row",
           alignItems: "center",
-          width: "75%",
           maxWidth: "95%",
-          gap: 10
+          gap: 10,
+          flexShrink: 1
         }}
       >
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
-            flexGrow: 1,
-            flex: 1,
-            gap: 10
+            gap: 10,
+            flexShrink: 1
           }}
         >
           <Icon
@@ -171,16 +167,14 @@ export const Toast = ({ context = "global" }) => {
 
           <View
             style={{
-              flexGrow: 1
+              paddingRight: toastOptions?.func ? 0 : 12,
+              flexShrink: 1
             }}
           >
             {isFullToastMessage ? (
               <Heading
                 color={!isDark ? colors.static.black : colors.static.white}
                 size={SIZE.sm}
-                onPress={() => {
-                  hideToast();
-                }}
               >
                 {toastOptions.heading}
               </Heading>
@@ -189,12 +183,6 @@ export const Toast = ({ context = "global" }) => {
             {toastOptions.message || toastOptions.heading ? (
               <Paragraph
                 color={!isDark ? colors.static.black : colors.static.white}
-                style={{
-                  paddingRight: 10
-                }}
-                onPress={() => {
-                  hideToast();
-                }}
               >
                 {toastOptions.message || toastOptions.heading}
               </Paragraph>
@@ -209,7 +197,7 @@ export const Toast = ({ context = "global" }) => {
             type={toastOptions.type === "error" ? "errorShade" : "transparent"}
             onPress={toastOptions.func}
             title={toastOptions.actionText}
-            height={30}
+            height={35}
             style={{
               zIndex: 10
             }}
