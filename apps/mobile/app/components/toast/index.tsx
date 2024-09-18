@@ -183,6 +183,7 @@ export const Toast = ({ context = "global" }) => {
             {toastOptions.message || toastOptions.heading ? (
               <Paragraph
                 color={!isDark ? colors.static.black : colors.static.white}
+                size={SIZE.xs}
               >
                 {toastOptions.message || toastOptions.heading}
               </Paragraph>
