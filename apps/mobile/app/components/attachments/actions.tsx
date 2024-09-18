@@ -30,6 +30,8 @@ import filesystem from "../../common/filesystem";
 import downloadAttachment from "../../common/filesystem/download-attachment";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import picker from "../../screens/editor/tiptap/picker";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
+import { editorController } from "../../screens/editor/tiptap/utils";
 import {
   ToastManager,
   eSendEvent,
@@ -49,14 +51,12 @@ import { Dialog } from "../dialog";
 import { presentDialog } from "../dialog/functions";
 import { openNote } from "../list-items/note/wrapper";
 import { DateMeta } from "../properties/date-meta";
+import SheetProvider from "../sheet-provider";
 import { Button } from "../ui/button";
 import { Notice } from "../ui/notice";
 import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
-import { editorController } from "../../screens/editor/tiptap/utils";
-import SheetProvider from "../sheet-provider";
 
 const Actions = ({
   attachment,
@@ -88,7 +88,7 @@ const Actions = ({
           useAttachmentStore.getState().remove(attachment.hash);
         }
         downloadAttachment(attachment.hash, false);
-        eSendEvent(eCloseSheet, contextId);
+        fwdRef.current?.hide();
       },
       icon: "download"
     },
@@ -149,9 +149,8 @@ const Actions = ({
     },
     {
       name: "Rename",
-      onPress: () => {
+      onPress: async () => {
         presentDialog({
-          context: contextId as any,
           input: true,
           title: "Rename file",
           paragraph: "Enter a new name for the file",
@@ -219,6 +218,7 @@ const Actions = ({
       style={{
         maxHeight: "100%"
       }}
+      keyboardShouldPersistTaps="never"
     >
       <Dialog context={contextId} />
       <SheetProvider context={contextId} />

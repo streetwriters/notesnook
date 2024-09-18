@@ -54,15 +54,10 @@ export async function downloadAllAttachments() {
  * @param onProgress
  * @returns
  */
-export async function downloadAttachments(
-  attachments,
-  onProgress,
-  canceled,
-  groupId
-) {
+export async function downloadAttachments(attachments) {
   await createCacheDir();
   if (!attachments || !attachments.length) return;
-  const result = new Map();
+  const groupId = `download-all-${Date.now()}`;
 
   let outputFolder;
   if (Platform.OS === "android") {
@@ -86,92 +81,117 @@ export async function downloadAttachments(
 
   await RNFetchBlob.fs.mkdir(zipSourceFolder);
 
+  const isCancelled = () => {
+    if (useAttachmentStore.getState().downloading[groupId]?.canceled) {
+      RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
+      useAttachmentStore.getState().setDownloading({
+        groupId,
+        current: 0,
+        total: 0,
+        success: false,
+        message: "Download cancelled",
+        canceled: true
+      });
+      return true;
+    }
+  };
+
   for (let i = 0; i < attachments.length; i++) {
+    if (isCancelled()) return;
     let attachment = await db.attachments.attachment(attachments[i]);
     const hash = attachment.hash;
     try {
-      if (canceled.current) {
-        RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
-        return;
-      }
-      onProgress?.(
-        i + 1 / attachments.length,
-        `Downloading attachments (${i + 1}/${
-          attachments.length
-        })... Please wait`
-      );
+      useAttachmentStore.getState().setDownloading({
+        groupId: groupId,
+        current: i + 1,
+        total: attachments.length,
+        filename: attachment.hash
+      });
       // Download to cache
       let uri = await downloadAttachment(hash, false, {
         silent: true,
         cache: true,
         groupId: groupId
       });
-      if (canceled.current) {
-        RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
-        return;
-      }
+
+      if (isCancelled()) return;
+
       if (!uri) throw new Error("Failed to download file");
       // Move file to the source folder we will zip eventually and rename the file to it's actual name.
       const filePath = `${zipSourceFolder}/${attachment.filename}`;
       await RNFetchBlob.fs.mv(`${cacheDir}/${uri}`, filePath);
-      result.set(hash, {
-        filename: attachment.filename,
-        status: FileDownloadStatus.Success,
-        attachment: attachment
-      });
     } catch (e) {
-      result.set(hash, {
-        filename: attachment.filename,
-        status: FileDownloadStatus.Fail,
-        reason: e
-      });
-      ToastManager.error(e, "Error downloading attachment");
+      DatabaseLogger.error(e);
     }
   }
-  if (canceled.current) {
-    RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
-    return;
-  }
-  if (result?.size) {
-    let sub;
-    try {
-      onProgress?.(0, `Zipping... Please wait`);
-      // If all goes well, zip the notesnook-attachments folder in cache.
 
-      sub = subscribe(({ progress }) => {
-        onProgress(
-          progress,
-          `Saving zip file (${(progress * 100).toFixed(1)}%)... Please wait`
-        );
+  useAttachmentStore.getState().setDownloading({
+    groupId: groupId,
+    current: 0,
+    total: 0,
+    success: true
+  });
+
+  if (isCancelled()) return;
+
+  let sub;
+  try {
+    useAttachmentStore.getState().setDownloading({
+      current: 0,
+      total: 1,
+      message: "Saving zip file... Please wait",
+      groupId
+    });
+    // If all goes well, zip the notesnook-attachments folder in cache.
+
+    sub = subscribe(({ progress }) => {
+      useAttachmentStore.getState().setDownloading({
+        groupId,
+        current: progress,
+        total: 1,
+        message: `Saving zip file (${(progress * 100).toFixed(
+          1
+        )}%)... Please wait`
       });
-      await zip(zipSourceFolder, zipOutputFile);
-      sub?.remove();
-      onProgress(1, `Saving zip file... Please wait`);
-      if (Platform.OS === "android") {
-        // Move the zip to user selected directory.
-        const file = await ScopedStorage.createFile(
-          outputFolder,
-          `notesnook-attachments-${Date.now()}.zip`,
-          "application/zip"
-        );
-        await copyFileAsync(`file://${zipOutputFile}`, file.uri);
-      }
+    });
+    await zip(zipSourceFolder, zipOutputFile);
+    sub?.remove();
 
-      onProgress?.(1, `Done`);
-      releasePermissions(outputFolder);
-    } catch (e) {
-      releasePermissions(outputFolder);
-      sub?.remove();
-      ToastManager.error(e, "Error zipping attachments");
-    }
-    // Remove source & zip file from cache.
-    RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
     if (Platform.OS === "android") {
-      RNFetchBlob.fs.unlink(zipOutputFile).catch(console.log);
+      // Move the zip to user selected directory.
+      const file = await ScopedStorage.createFile(
+        outputFolder,
+        `notesnook-attachments-${Date.now()}.zip`,
+        "application/zip"
+      );
+      await copyFileAsync(`file://${zipOutputFile}`, file.uri);
     }
-  }
 
-  return result;
+    useAttachmentStore.getState().setDownloading({
+      current: 0,
+      total: 0,
+      message: undefined,
+      success: true,
+      groupId
+    });
+    releasePermissions(outputFolder);
+  } catch (e) {
+    useAttachmentStore.getState().setDownloading({
+      current: 0,
+      total: 0,
+      message: undefined,
+      success: true,
+      groupId
+    });
+    releasePermissions(outputFolder);
+    sub?.remove();
+    ToastManager.error(e, "Error zipping attachments");
+  }
+  // Remove source & zip file from cache.
+  RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
+  if (Platform.OS === "android") {
+    RNFetchBlob.fs.unlink(zipOutputFile).catch(console.log);
+  }
 }
 
 export default async function downloadAttachment(

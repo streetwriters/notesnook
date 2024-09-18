@@ -67,8 +67,6 @@ export const Header = ({
   hasSearch?: boolean;
   onSearch?: () => void;
 }) => {
-  const navigation = useNavigation();
-
   const { colors } = useThemeColors();
   const insets = useGlobalSafeAreaInsets();
   const [borderHidden, setBorderHidden] = useState(true);

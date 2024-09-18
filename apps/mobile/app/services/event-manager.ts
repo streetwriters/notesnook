@@ -139,6 +139,7 @@ export type ToastOptions = {
   duration?: number;
   func?: () => void;
   actionText?: string;
+  icon?: string;
 };
 
 export const ToastManager = {
