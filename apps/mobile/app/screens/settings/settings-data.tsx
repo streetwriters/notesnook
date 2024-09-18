@@ -29,7 +29,6 @@ import ScreenGuardModule from "react-native-screenguard";
 import { DatabaseLogger, db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
 import filesystem from "../../common/filesystem";
-import { AttachmentDialog } from "../../components/attachments";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
 import { AppLockPassword } from "../../components/dialogs/applock-password";
@@ -209,10 +208,10 @@ export const settingsGroups: SettingSection[] = [
             id: "manage-attachments",
             name: "Manage attachments",
             icon: "attachment",
-            modifer: () => {
-              AttachmentDialog.present();
-            },
-            description: "Manage all attachments in one place."
+            type: "screen",
+            component: "attachments-manager",
+            description: "Manage all attachments in one place.",
+            hideHeader: true
           },
           {
             id: "change-password",
@@ -545,6 +544,7 @@ export const settingsGroups: SettingSection[] = [
         description: "Configure syncing for this device",
         type: "screen",
         icon: "autorenew",
+        component: "offline-mode-progress",
         sections: [
           {
             id: "offline-mode",
