@@ -22,7 +22,7 @@ import { appVersion } from "../utils/version";
 import Field from "../components/field";
 import Dialog from "../components/dialog";
 import platform from "platform";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
@@ -50,6 +50,14 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
+
+  async function x() {
+    await showIssueReportedDialog({ "url": "https://github.com/streetwriters/notesnook/issues/6570" });
+  }
+
+  useEffect(() => {
+    x();
+  }, [])
 
   return (
     <Dialog
@@ -150,11 +158,11 @@ function showIssueReportedDialog({ url }: { url: string }) {
   return ConfirmDialog.show({
     title: "Thank you for reporting!",
     positiveButtonText: "Copy link",
-    message: `You can track your bug report at [${url}](${url}).
-    
-    Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**
-    
-    If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`
+    message: "You can track your bug report at [" + url + "](" + url + ")."
+
+      + "\n\n<br />Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**"
+
+      + "\n\n<br />If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support."
   }).then((result) => {
     result && writeText(url);
   });
