@@ -87,11 +87,11 @@ export function BillingHistory() {
               }}
             >
               {[
-                { id: "date", title: "Date", width: "20%" },
-                { id: "orderId", title: "Order ID", width: "20%" },
-                { id: "amount", title: "Amount", width: "20%" },
-                { id: "status", title: "Status", width: "20%" },
-                { id: "receipt", title: "Receipt", width: "20%" }
+                { id: "date", title: strings.date(), width: "20%" },
+                { id: "orderId", title: strings.orderId(), width: "20%" },
+                { id: "amount", title: strings.amount(), width: "20%" },
+                { id: "status", title: strings.status(), width: "20%" },
+                { id: "receipt", title: strings.receipt(), width: "20%" }
               ].map((column) =>
                 !column.title ? (
                   <th key={column.id} />

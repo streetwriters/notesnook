@@ -501,6 +501,10 @@ msgstr "123456"
 msgid "Automatic backups with attachments"
 msgstr ""
 
+#: src/strings.tsx:2098
+msgid "Automatic updates"
+msgstr ""
+
 #: src/strings.tsx:1046
 #~ msgid "Automatically backup your data at regular intervals"
 #~ msgstr "123456"
@@ -564,6 +568,10 @@ msgstr "123456"
 #: src/strings.tsx:1182
 msgid "Backup successful"
 msgstr "123456"
+
+#: src/strings.tsx:2095
+msgid "Backup with attachments"
+msgstr ""
 
 #: src/strings.tsx:447
 msgid "Backups"
@@ -768,6 +776,10 @@ msgstr ""
 
 #: src/strings.tsx:2008
 msgid "Close others"
+msgstr ""
+
+#: src/strings.tsx:2111
+msgid "Close to system tray"
 msgstr ""
 
 #: src/strings.tsx:2010
@@ -1333,6 +1345,10 @@ msgstr "123456"
 msgid "Enable editor margins"
 msgstr ""
 
+#: src/strings.tsx:2118
+msgid "Enable spell checker"
+msgstr ""
+
 #: src/strings.tsx:450
 msgid "Enable two-factor authentication to add an extra layer of security to your account."
 msgstr "123456"
@@ -1393,6 +1409,10 @@ msgstr "123456"
 msgid "Enter password"
 msgstr "123456"
 
+#: src/strings.tsx:2079
+msgid "Enter pin or password to enable app lock."
+msgstr ""
+
 #: src/strings.tsx:101
 msgid "Enter the 6 digit code from your authenticator app to continue logging in"
 msgstr "123456"
@@ -1451,6 +1471,10 @@ msgstr ""
 
 #: src/strings.tsx:2005
 msgid "Exit fullscreen"
+msgstr ""
+
+#: src/strings.tsx:2063
+msgid "Experience the next level of private note taking\""
 msgstr ""
 
 #: src/strings.tsx:426
@@ -1718,12 +1742,24 @@ msgstr "123456"
 msgid "I have saved my key"
 msgstr ""
 
+#: src/strings.tsx:2200
+msgid "I understand"
+msgstr ""
+
 #: src/strings.tsx:363
 msgid "If the editor fails to load even after reloading. Try restarting the app."
 msgstr "123456"
 
 #: src/strings.tsx:237
 msgid "If this continues to happen, please reach out to us via"
+msgstr ""
+
+#: src/strings.tsx:2104
+msgid "If true, Notesnook will automatically start up when you turn on & login to your system."
+msgstr ""
+
+#: src/strings.tsx:2107
+msgid "If true, Notesnook will start minimized to either the system tray or your system taskbar/dock. This setting only works with Auto start on system startup is enabled."
 msgstr ""
 
 #: src/strings.tsx:1628
@@ -1734,6 +1770,10 @@ msgstr ""
 msgid ""
 "If you didn't get an email from us or the confirmation link isn't\n"
 "working,"
+msgstr ""
+
+#: src/strings.tsx:2068
+msgid "If you face any issue, you can reach out to us anytime."
 msgstr ""
 
 #: src/strings.tsx:216
@@ -1971,6 +2011,10 @@ msgstr "123456"
 msgid "Locked notes cannot be published"
 msgstr "123456"
 
+#: src/strings.tsx:2183
+msgid "Log out from all other devices"
+msgstr ""
+
 #: src/strings.tsx:369
 msgid "Logging out"
 msgstr "123456"
@@ -2069,6 +2113,10 @@ msgstr "123456"
 
 #: src/strings.tsx:2032
 msgid "Maximize"
+msgstr ""
+
+#: src/strings.tsx:2061
+msgid "Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions."
 msgstr ""
 
 #: src/strings.tsx:1621
@@ -2686,8 +2734,20 @@ msgstr ""
 msgid "PRESETS"
 msgstr "123456"
 
+#: src/strings.tsx:2110
+msgid "Pressing \"—\" will hide the app in your system tray."
+msgstr ""
+
+#: src/strings.tsx:2113
+msgid "Pressing \"X\" will hide the app in your system tray."
+msgstr ""
+
 #: src/strings.tsx:859
 msgid "Prevent {0} from syncing"
+msgstr ""
+
+#: src/strings.tsx:2160
+msgid "Prevent note title from appearing in tab/window title."
 msgstr ""
 
 #: src/strings.tsx:164
@@ -2730,6 +2790,10 @@ msgstr "123456"
 msgid "Productivity"
 msgstr "123456"
 
+#: src/strings.tsx:2124
+msgid "Profile"
+msgstr ""
+
 #: src/strings.tsx:1966
 msgid "Profile updated"
 msgstr ""
@@ -2741,6 +2805,10 @@ msgstr ""
 #: src/strings.tsx:367
 msgid "Protect your notes"
 msgstr "123456"
+
+#: src/strings.tsx:2171
+msgid "Proxy"
+msgstr ""
 
 #: src/strings.tsx:441
 #: src/strings.tsx:1865
@@ -2879,6 +2947,10 @@ msgstr "123456"
 
 #: src/strings.tsx:472
 msgid "Regenerate"
+msgstr ""
+
+#: src/strings.tsx:2078
+msgid "Register"
 msgstr ""
 
 #: src/strings.tsx:391
@@ -3292,6 +3364,10 @@ msgstr ""
 msgid "Select the folder that includes your backup files to list them here."
 msgstr "123456"
 
+#: src/strings.tsx:2121
+msgid "Select the languages the spell checker should check in."
+msgstr ""
+
 #: src/strings.tsx:1558
 msgid "selected"
 msgstr ""
@@ -3303,6 +3379,10 @@ msgstr "123456"
 #: src/strings.tsx:251
 msgid "Self destruct"
 msgstr "123456"
+
+#: src/strings.tsx:2155
+msgid "Send"
+msgstr ""
 
 #: src/strings.tsx:111
 msgid "Send code"
@@ -3568,6 +3648,10 @@ msgstr "123456"
 msgid "Switch to search/replace mode"
 msgstr "123456"
 
+#: src/strings.tsx:2126
+msgid "Sync"
+msgstr ""
+
 #: src/strings.tsx:359
 msgid "Sync failed"
 msgstr "123456"
@@ -3739,9 +3823,17 @@ msgstr ""
 msgid "Thank you for choosing end-to-end encrypted note taking. Now you can sync your notes to unlimited devices."
 msgstr ""
 
+#: src/strings.tsx:2041
+msgid "Thank you for reporting!"
+msgstr ""
+
 #: src/strings.tsx:434
 msgid "Thank you for updating Notesnook! We will be applying some minor changes for a better note taking experience."
 msgstr "123456"
+
+#: src/strings.tsx:2066
+msgid "Thank you. You are the proof that privacy always comes first."
+msgstr ""
 
 #: src/strings.tsx:1539
 msgid "The {title} at {url} is not compatible with this client."
@@ -3750,6 +3842,10 @@ msgstr ""
 #: src/strings.tsx:214
 msgid "The information above will be publically available at"
 msgstr "123456"
+
+#: src/strings.tsx:2073
+msgid "The password/pin for unlocking the app."
+msgstr ""
 
 #: src/strings.tsx:315
 msgid "The reminder will repeat daily at {date}."
@@ -3968,6 +4064,10 @@ msgstr "123456"
 
 #: src/strings.tsx:1843
 msgid "unpublished"
+msgstr ""
+
+#: src/strings.tsx:2077
+msgid "Unregister"
 msgstr ""
 
 #: src/strings.tsx:193
@@ -4205,6 +4305,10 @@ msgstr "123456"
 msgid "Write with freedom."
 msgstr ""
 
+#: src/strings.tsx:2052
+msgid "Write with freedom. Never compromise on privacy again."
+msgstr ""
+
 #: src/strings.tsx:336
 msgid "year"
 msgstr "123456"
@@ -4246,6 +4350,13 @@ msgstr "123456"
 #: src/strings.tsx:1235
 msgid "You can swipe left anywhere in the app to start a new note."
 msgstr "123456"
+
+#: src/strings.tsx:2044
+msgid ""
+"You can track your bug report at [{url}]({url}).\n"
+"Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**\n"
+"If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support."
+msgstr ""
 
 #: src/strings.tsx:209
 msgid "You can track your issue at"
@@ -4420,8 +4531,16 @@ msgstr "123456"
 msgid "Zipping"
 msgstr ""
 
+#: src/strings.tsx:2084
+msgid "Zoom factor"
+msgstr ""
+
 #: src/strings.tsx:1596
 msgid "Zoom in"
+msgstr ""
+
+#: src/strings.tsx:2085
+msgid "Zoom in or out the app content."
 msgstr ""
 
 #: src/strings.tsx:1595

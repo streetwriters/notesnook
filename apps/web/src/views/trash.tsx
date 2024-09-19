@@ -47,11 +47,11 @@ function Trash() {
       button={{
         onClick: function () {
           ConfirmDialog.show({
-            title: "Clear Trash",
-            subtitle: "Are you sure you want to clear all the trash?",
-            positiveButtonText: "Clear trash",
-            negativeButtonText: "Cancel",
-            message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`
+            title: strings.clearTrash(),
+            subtitle: strings.clearTrashDesc(),
+            positiveButtonText: strings.clear(),
+            negativeButtonText: strings.cancel(),
+            message: strings.areYouSure()
           }).then(async (res) => {
             if (res) {
               try {

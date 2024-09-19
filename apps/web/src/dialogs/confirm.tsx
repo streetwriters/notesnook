@@ -27,6 +27,7 @@ import { getChangelog } from "../utils/version";
 import { downloadUpdate } from "../utils/updater";
 import { ErrorText } from "../components/error-text";
 import { pluralize } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 type Check = { text: string; default?: boolean };
 export type ConfirmDialogProps<TCheckId extends string> = BaseDialogProps<
@@ -144,7 +145,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
 
 export function showMultiDeleteConfirmation(length: number) {
   return ConfirmDialog.show({
-    title: `Delete ${pluralize(length, "item")}?`,
+    title: strings.doAction("item", length, "delete"),
     message: `These items will be **kept in your Trash for ${
       db.settings.getTrashCleanupInterval() || 7
     } days** after which they will be permanently deleted.`,
@@ -186,9 +187,8 @@ export async function showLogoutConfirmation() {
 
 export function showClearSessionsConfirmation() {
   return ConfirmDialog.show({
-    title: `Logout from other devices?`,
-    message:
-      "All other logged-in devices will be forced to logout stopping sync. Use with care lest you lose important notes.",
+    title: strings.logoutAllOtherDevices(),
+    message: strings.logoutAllOtherDevicesDescription(),
     positiveButtonText: "Yes",
     negativeButtonText: "No"
   });
@@ -202,8 +202,8 @@ export async function showUpdateAvailableNotice({
   const changelog = await getChangelog(version);
 
   return showUpdateDialog({
-    title: `New version available`,
-    subtitle: `v${version} is available for download`,
+    title: strings.newVersion(),
+    subtitle: strings.newVersionAvailable(version),
     changelog,
     action: { text: `Update now`, onClick: () => downloadUpdate() }
   });
