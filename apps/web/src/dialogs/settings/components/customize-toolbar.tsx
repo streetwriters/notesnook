@@ -483,7 +483,7 @@ function createGroup(config: Partial<Group>): Group {
     type: "group",
     id: getId(),
     depth: 0,
-    title: "Group",
+    title: strings.group(),
     ...config
   };
 }
@@ -503,7 +503,7 @@ function createTrash() {
   return createGroup({
     id: "trash",
     depth: 0,
-    title: "Disabled items"
+    title: strings.disabled()
   });
 }
 
@@ -692,7 +692,7 @@ function addSubGroup(items: TreeNode[], groupId: string) {
   newArray.splice(
     group.index + group.items.length,
     0,
-    createGroup({ title: "Subgroup 1", depth: 1 })
+    createGroup({ title: strings.subgroupOne(), depth: 1 })
   );
   return newArray;
 }

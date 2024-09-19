@@ -63,9 +63,9 @@ export function ThemesSelector() {
 }
 
 const COLOR_SCHEMES = [
-  { id: "all", title: "All" },
-  { id: "dark", title: "Dark" },
-  { id: "light", title: "Light" }
+  { id: "all", title: strings.all() },
+  { id: "dark", title: strings.dark() },
+  { id: "light", title: strings.light() }
 ] as const;
 
 function ThemesList() {

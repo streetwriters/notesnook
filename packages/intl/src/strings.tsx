@@ -2210,5 +2210,14 @@ Force pull:
 Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.
 
 **These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**`,
-  checkingAttachments: () => `Checking attachments`
+  checkingAttachments: () => `Checking attachments`,
+  orderId: () => t`Order ID`,
+  amount: () => t`Amount`,
+  status: () => t`Status`,
+  receipt: () => t`Receipt`,
+  subgroupOne: () => t`Subgroup 1`,
+  goBackToNotebooks: () => t`Go back to notebooks`,
+  goBackToTags: () => t`Go back to tags`,
+  okay: () => t`Okay`,
+  clearTrashDesc: () => t`Do you want to clear the trash?`
 };

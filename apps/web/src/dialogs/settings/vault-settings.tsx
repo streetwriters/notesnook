@@ -35,14 +35,14 @@ export const VaultSettings: SettingsGroup[] = [
     settings: [
       {
         key: "create-vault",
-        title: "Create vault",
+        title: strings.createVault(),
         isHidden: () => useAppStore.getState().isVaultCreated,
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
             type: "button",
-            title: "Create",
+            title: strings.create(),
             action: () => {
               if (!isUserPremium()) BuyDialog.show({});
               else
@@ -56,15 +56,15 @@ export const VaultSettings: SettingsGroup[] = [
       },
       {
         key: "change-vault-password",
-        title: "Change vault password",
-        description: "Set a new password for your vault",
+        title: strings.changeVaultPassword(),
+        description: strings.changeVaultPasswordDesc(),
         isHidden: () => !useAppStore.getState().isVaultCreated,
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
             type: "button",
-            title: "Change",
+            title: strings.change(),
             action: () => Vault.changeVaultPassword(),
             variant: "secondary"
           }
@@ -72,15 +72,15 @@ export const VaultSettings: SettingsGroup[] = [
       },
       {
         key: "clear-vault",
-        title: "Clear vault",
-        description: "Unlock all locked notes and clear vault.",
+        title: strings.clearVault(),
+        description: strings.clearVaultDesc(),
         isHidden: () => !useAppStore.getState().isVaultCreated,
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
             type: "button",
-            title: "Clear",
+            title: strings.clear(),
             action: async () => {
               if (await Vault.clearVault()) {
                 useNotesStore.getState().refresh();
@@ -93,15 +93,15 @@ export const VaultSettings: SettingsGroup[] = [
       },
       {
         key: "delete-vault",
-        title: "Delete vault",
-        description: "Delete vault including all locked notes.",
+        title: strings.deleteVault(),
+        description: strings.deleteVaultDesc(),
         isHidden: () => !useAppStore.getState().isVaultCreated,
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
             type: "button",
-            title: "Delete",
+            title: strings.delete(),
             action: async () => {
               if ((await Vault.deleteVault()) && !(await db.vault.exists())) {
                 useAppStore.getState().setIsVaultCreated(false);

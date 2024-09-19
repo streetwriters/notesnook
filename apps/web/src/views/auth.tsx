@@ -726,10 +726,10 @@ type MFAMethod = {
   icon: Icon;
 };
 const MFAMethods: MFAMethod[] = [
-  { type: "app", title: "Use an authenticator app", icon: MfaAuthenticator },
-  { type: "sms", title: "Send code to your phone number", icon: MfaSms },
-  { type: "email", title: "Send code to your email address", icon: MfaEmail },
-  { type: "recoveryCode", title: "Use a recovery code", icon: MfaRecoveryCode }
+  { type: "app", title: strings.sendCode(), icon: MfaAuthenticator },
+  { type: "sms", title: strings.sendCodeSms(), icon: MfaSms },
+  { type: "email", title: strings.sendCodeEmail(), icon: MfaEmail },
+  { type: "recoveryCode", title: strings.recoveryCode(), icon: MfaRecoveryCode }
 ];
 function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
   const { navigate, formData } = props;
