@@ -144,6 +144,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "remove-profile-picture",
             name: "Remove profile picture",
+            icon: "face-man",
             description: "Remove your picture from profile",
             useHook: () =>
               useUserStore((state) => state.profile?.profilePicture),
@@ -171,6 +172,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "remove-name",
             name: "Remove full name",
+            icon: "rename-box",
             description: "Remove your name from profile",
             useHook: () => useUserStore((state) => state.profile?.fullName),
             hidden: () => !useUserStore.getState().profile?.fullName,
@@ -196,6 +198,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "recovery-key",
             name: "Save data recovery key",
+            icon: "account-key",
             modifer: async () => {
               verifyUser(null, async () => {
                 await sleep(300);
@@ -217,6 +220,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "change-password",
             name: "Change password",
+            icon: "password",
             modifer: async () => {
               ChangePassword.present();
             },
@@ -225,6 +229,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "change-email",
             name: "Change email",
+            icon: "email",
             modifer: async () => {
               ChangeEmail.present();
             },
@@ -666,6 +671,7 @@ export const settingsGroups: SettingSection[] = [
             id: "theme-picker",
             type: "screen",
             name: "Themes",
+            icon: "palette",
             description: "Customize Notesnook to absolute infinity.",
             component: "theme-selector"
           },
@@ -707,6 +713,7 @@ export const settingsGroups: SettingSection[] = [
         id: "behaviour",
         type: "screen",
         name: "Behaviour",
+        icon: "cog",
         description: "Change how the app behaves in different situations",
         sections: [
           {
@@ -761,12 +768,14 @@ export const settingsGroups: SettingSection[] = [
             type: "screen",
             name: "Configure toolbar",
             description: "Make the toolbar adaptable to your needs.",
+            icon: "format-text",
             component: "configuretoolbar"
           },
           {
             id: "reset-toolbar",
             name: "Reset toolbar",
             description: "Reset toolbar configuration to default",
+            icon: "reload",
             modifer: () => {
               useDragState.getState().setPreset("default");
             }
@@ -809,6 +818,7 @@ export const settingsGroups: SettingSection[] = [
             id: "title-format",
             name: "Title format",
             component: "title-format",
+            icon: "format-title",
             description: "Customize the formatting for new note title",
             type: "component"
           },
@@ -817,6 +827,7 @@ export const settingsGroups: SettingSection[] = [
             name: "Markdown shortcuts",
             property: "markdownShortcuts",
             description: "Toggle markdown in the editor",
+            icon: "language-markdown",
             type: "switch"
           }
         ]
@@ -839,6 +850,7 @@ export const settingsGroups: SettingSection[] = [
         id: "marketing-emails",
         type: "switch",
         name: "Marketing emails",
+        icon: "email-fast",
         description:
           "We will send you occasional promotional offers & product updates on your email (sent once every month).",
         modifer: async () => {
@@ -898,6 +910,7 @@ export const settingsGroups: SettingSection[] = [
             id: "change-vault-password",
             useHook: useVaultStatus,
             name: "Change vault password",
+            icon: "key-change",
             description: "Setup a new password for your vault.",
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () =>
@@ -913,6 +926,7 @@ export const settingsGroups: SettingSection[] = [
             id: "clear-vault",
             useHook: useVaultStatus,
             name: "Clear vault",
+            icon: "key-remove",
             description: "Unlock all locked notes",
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () => {
@@ -929,6 +943,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "delete-vault",
             name: "Delete vault",
+            icon: "delete-forever",
             description: "Delete vault (and optionally remove all notes).",
             useHook: useVaultStatus,
             hidden: (current) => !(current as VaultStatusType)?.exists,
@@ -1050,6 +1065,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "app-lock-timer",
             name: "App lock timeout",
+            icon: "timer",
             description:
               "Set the time after which the app should lock when in background",
             type: "component",
@@ -1173,6 +1189,7 @@ export const settingsGroups: SettingSection[] = [
             name: "Backup now",
             description:
               "Take a partial backup of your data that does not include attachments",
+            icon: "backup",
             modifer: async () => {
               const user = useUserStore.getState().user;
               if (!user || SettingsService.getProperty("encryptedBackup")) {
@@ -1204,6 +1221,7 @@ export const settingsGroups: SettingSection[] = [
             id: "auto-backups",
             type: "component",
             name: "Automatic backups",
+            icon: "clock",
             description:
               "Set the interval to create a partial backup (without attachments) automatically.",
             component: "autobackups"
@@ -1216,6 +1234,7 @@ export const settingsGroups: SettingSection[] = [
             description: `Set the interval to create a backup (with attachments) automatically.
 
 NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`,
+            icon: "clock",
             component: "autobackupsattachments"
           },
           {
@@ -1379,6 +1398,7 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
             property: "defaultSnoozeTime",
             type: "input",
             name: "Default snooze time",
+            icon: "alarm-snooze",
             description:
               "Set the default time to snooze a reminder to when you press the snooze button on a notification.",
             inputProperties: {
@@ -1484,6 +1504,7 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
       {
         id: "join-telegram",
         name: "Join our Telegram group",
+        icon: "message-text",
         description: "We are on telegram, let's talk",
         modifer: () => {
           Linking.openURL("https://t.me/notesnook").catch(console.log);
@@ -1558,11 +1579,13 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
             console.error(e);
           }
         },
+        icon: "file-document",
         description: "Read our terms of service"
       },
       {
         id: "privacy-policy",
         name: "Privacy policy",
+        icon: "shield",
         modifer: async () => {
           try {
             await Linking.openURL("https://notesnook.com/privacy");
