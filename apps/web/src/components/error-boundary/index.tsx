@@ -39,6 +39,11 @@ export function GlobalErrorHandler(props: PropsWithChildren) {
       showBoundary(e.error || error);
     }
     function handleUnhandledRejection(e: PromiseRejectionEvent) {
+      if (
+        e.reason instanceof TypeError &&
+        e.reason.message === "Error in input stream"
+      )
+        return;
       showBoundary(e.reason);
     }
     window.addEventListener("unhandledrejection", handleUnhandledRejection);

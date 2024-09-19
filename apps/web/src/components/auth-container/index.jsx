@@ -18,13 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useMemo } from "react";
-import { Box, Flex, Image, Link, Text } from "@theme-ui/components";
-import { useStore as useThemeStore } from "../../stores/theme-store";
-import { getRandom } from "@notesnook/common";
+import { Box, Button, Flex, Image, Link, Text } from "@theme-ui/components";
+import { getRandom, usePromise } from "@notesnook/common";
 import Grberk from "../../assets/testimonials/grberk.jpeg";
 import Holenstein from "../../assets/testimonials/holenstein.jpg";
 import Jason from "../../assets/testimonials/jason.jpg";
 import Cameron from "../../assets/testimonials/cameron.jpg";
+import hosts from "@notesnook/core/dist/utils/constants";
+import { SettingsDialog } from "../../dialogs/settings";
 
 const testimonials = [
   {
@@ -74,9 +75,15 @@ function randomTitle() {
 }
 
 function AuthContainer(props) {
-  const colorScheme = useThemeStore((store) => store.colorScheme);
   const testimonial = useMemo(() => randomTestimonial(), []);
   const title = useMemo(() => randomTitle(), []);
+
+  const version = usePromise(
+    async () =>
+      await fetch(`${hosts.API_HOST}/version`)
+        .then((r) => r.json())
+        .catch(() => undefined)
+  );
 
   return (
     <Flex
@@ -165,7 +172,6 @@ function AuthContainer(props) {
           <Text variant={"heading"} sx={{ fontSize: 48 }}>
             {title}
           </Text>
-
           <Text
             variant="body"
             mt={10}
@@ -192,6 +198,34 @@ function AuthContainer(props) {
               </Text>
               <Text variant="subBody">@{testimonial.username}</Text>
             </Flex>
+          </Flex>
+
+          <Flex
+            mt={2}
+            pt={2}
+            sx={{
+              justifyContent: "space-between",
+              borderTop: "1px solid var(--border)",
+              width: "100%"
+            }}
+          >
+            <Text variant={"subBody"}>
+              {version.status === "fulfilled" &&
+              version.value.instance !== "default" ? (
+                <>
+                  Using{" "}
+                  {version.value.instance + ` (v${version.value.version})`}
+                </>
+              ) : (
+                <>Using official Notesnook instance.</>
+              )}
+            </Text>
+            <Button
+              variant="anchor"
+              onClick={() => SettingsDialog.show({ activeSection: "servers" })}
+            >
+              Configure
+            </Button>
           </Flex>
         </Flex>
       </Box>

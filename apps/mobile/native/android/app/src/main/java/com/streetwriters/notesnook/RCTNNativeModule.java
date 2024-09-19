@@ -1,7 +1,10 @@
 package com.streetwriters.notesnook;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.facebook.react.bridge.Promise;
@@ -65,6 +68,21 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         } catch (Exception e) {
 
         }
+    }
+
+    @ReactMethod
+    public void setAppState(final String appState) {
+        SharedPreferences appStateDetails = getReactApplicationContext().getSharedPreferences("appStateDetails", Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = appStateDetails.edit();
+        edit.putString("appState", appState);
+        edit.apply();
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public String getAppState() {
+        SharedPreferences appStateDetails = getReactApplicationContext().getSharedPreferences("appStateDetails", Context.MODE_PRIVATE);
+        String appStateValue = appStateDetails.getString("appState", "");
+        return appStateValue.isEmpty() ? null : appStateValue;
     }
 
 

@@ -26,6 +26,7 @@ export type ToolProps = ToolDefinition & {
   editor: Editor;
   variant?: ToolButtonVariant;
   force?: boolean;
+  parentGroup?: string;
 };
 
 export type ToolDefinition = {

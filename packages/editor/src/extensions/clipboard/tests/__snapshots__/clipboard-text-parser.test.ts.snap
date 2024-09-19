@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`convert text to html 1`] = `"<p data-spacing=\\"single\\">Hello</p><p data-spacing=\\"single\\">world</p>"`;
+exports[`convert text to html 1`] = `"<p data-spacing="single">Hello</p><p data-spacing="single">world</p>"`;
 
-exports[`convert text to html 2`] = `"<p data-spacing=\\"single\\">What</p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\"></p><p data-spacing=\\"single\\">NO!</p>"`;
+exports[`convert text to html 2`] = `"<p data-spacing="single">What</p><p data-spacing="single"></p><p data-spacing="single"></p><p data-spacing="single">NO!</p>"`;
 
-exports[`convert text to html 3`] = `"<p data-spacing=\\"single\\">Hello</p><p data-spacing=\\"single\\">World</p><p data-spacing=\\"single\\">what?</p><p data-spacing=\\"single\\">Nay!</p>"`;
+exports[`convert text to html 3`] = `"<p data-spacing="single">Hello</p><p data-spacing="single">World</p><p data-spacing="single">what?</p><p data-spacing="single">Nay!</p>"`;

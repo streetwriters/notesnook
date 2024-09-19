@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   ColumnBuilderCallback,
   CreateTableBuilder,
+  ExpressionBuilder,
   Migration,
   MigrationProvider,
   sql
-} from "kysely";
+} from "@streetwriters/kysely";
 import { rebuildSearchIndex } from "./fts";
 
 const COLLATE_NOCASE: ColumnBuilderCallback = (col) =>
@@ -294,7 +295,7 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await db
             .updateTable("notes")
-            .where("id", "in", (eb) =>
+            .where("id", "in", (eb: ExpressionBuilder<any, string>) =>
               eb
                 .selectFrom("content")
                 .select("noteId as id")
@@ -319,6 +320,43 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("value", "text")
             .addColumn("dateModified", "integer")
             .execute();
+        }
+      },
+      "5": {
+        async up(db) {
+          await db
+            .deleteFrom("relations")
+            .where((eb) =>
+              eb.or([eb("fromId", "is", null), eb("toId", "is", null)])
+            )
+            .execute();
+        }
+      },
+      "6": {
+        async up(db) {
+          await db.transaction().execute(async (tx) => {
+            await tx.schema.dropTable("content_fts").execute();
+            await tx.schema.dropTable("notes_fts").execute();
+
+            await createFTS5Table(
+              "notes_fts",
+              [{ name: "id" }, { name: "title" }],
+              {
+                contentTable: "notes",
+                tokenizer: ["porter", "trigram", "remove_diacritics 1"]
+              }
+            ).execute(tx);
+
+            await createFTS5Table(
+              "content_fts",
+              [{ name: "id" }, { name: "noteId" }, { name: "data" }],
+              {
+                contentTable: "content",
+                tokenizer: ["porter", "trigram", "remove_diacritics 1"]
+              }
+            ).execute(tx);
+          });
+          await rebuildSearchIndex(db);
         }
       }
     };
@@ -347,7 +385,7 @@ const addTrashColumns = <T extends string, C extends string = never>(
     .addColumn("deletedBy", "text");
 };
 
-type Tokenizer = "porter" | "trigram" | "unicode61" | "ascii";
+type Tokenizer = "porter" | "trigram" | "unicode61" | "ascii" | (string & {});
 function createFTS5Table(
   name: string,
   columns: {

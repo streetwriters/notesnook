@@ -122,7 +122,8 @@ import {
   mdiCheckboxMultipleMarked,
   mdiFormatFloatLeft,
   mdiMessageOutline,
-  mdiVectorLink
+  mdiVectorLink,
+  mdiPinOutline
 } from "@mdi/js";
 
 export const Icons = {
@@ -254,6 +255,7 @@ export const Icons = {
   selectAllUnchecked: mdiCheckboxMultipleBlankOutline,
   selectAllChecked: mdiCheckboxMultipleMarked,
   checkList: mdiCheckboxMarkedOutline,
+  pin: mdiPinOutline,
   none: ""
 };
 

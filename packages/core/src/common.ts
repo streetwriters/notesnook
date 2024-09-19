@@ -123,26 +123,19 @@ export const EVENTS = {
   systemTimeInvalid: "system:invalidTime"
 };
 
-const separators = ["-", "/"];
+const separators = ["-", "/", "."];
 const DD = "DD";
 const MM = "MM";
 const YYYY = "YYYY";
 export const DATE_FORMATS = [
-  ...separators
-    .map((sep) => [
-      [DD, MM, YYYY].join(sep),
-      [MM, DD, YYYY].join(sep),
-      [YYYY, MM, DD].join(sep)
-    ])
+  ...[
+    [DD, MM, YYYY],
+    [MM, DD, YYYY],
+    [YYYY, MM, DD]
+  ]
+    .map((item) => separators.map((sep) => item.join(sep)))
     .flat(),
   "MMM D, YYYY"
-];
-
-export const DATE_FORMATS_WITHOUT_YEAR = [
-  ...separators
-    .map((sep) => [[DD, MM].join(sep), [MM, DD].join(sep), [MM, DD].join(sep)])
-    .flat(),
-  "MMM D"
 ];
 
 export const TIME_FORMATS = ["12-hour", "24-hour"];

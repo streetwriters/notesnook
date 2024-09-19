@@ -28,7 +28,7 @@ import {
   format,
   ILogger
 } from "@notesnook/logger";
-import { Kysely, Migration, MigrationProvider } from "kysely";
+import { Kysely, Migration, MigrationProvider } from "@streetwriters/kysely";
 import { SQLiteOptions, createDatabase } from "./database";
 import { toChunks } from "./utils/array";
 

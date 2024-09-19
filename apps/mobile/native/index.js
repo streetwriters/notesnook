@@ -11,6 +11,10 @@ import NetInfo from "@react-native-community/netinfo";
 import { enableFreeze } from "react-native-screens";
 import {BackgroundSync} from '../app/services/background-sync';
 
+BackgroundSync.registerHeadlessTask();
+BackgroundSync.start();
+Notifications.init();
+
 enableFreeze(true);
 NetInfo.configure({
   reachabilityUrl: "https://notesnook.com",
@@ -19,8 +23,7 @@ NetInfo.configure({
     return response?.status >= 200 && response?.status < 300;
   }
 });
-BackgroundSync.start();
-Notifications.init();
+
 
 const appName = appJson.name;
 if (Config.isTesting) {

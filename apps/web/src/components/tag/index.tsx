@@ -21,16 +21,14 @@ import ListItem from "../list-item";
 import { navigate } from "../../navigation";
 import { Text } from "@theme-ui/components";
 import { store as appStore } from "../../stores/app-store";
-import { store as tagStore } from "../../stores/tag-store";
-import { store as noteStore } from "../../stores/note-store";
 import { db } from "../../common/db";
 import { Edit, Shortcut, DeleteForver } from "../icons";
-import { showToast } from "../../utils/toast";
-import { pluralize } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Tag as TagType } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { EditTagDialog } from "../../dialogs/item-dialog";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { Multiselect } from "../../common/multi-select";
 
 type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
@@ -54,6 +52,13 @@ function Tag(props: TagProps) {
           {totalNotes}
         </Text>
       }
+      onKeyPress={async (e) => {
+        if (e.key === "Delete") {
+          await Multiselect.deleteTags(
+            useSelectionStore.getState().selectedItems
+          );
+        }
+      }}
       menuItems={menuItems}
       onClick={() => {
         navigate(`/tags/${id}`);
@@ -96,11 +101,7 @@ const menuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
       title: "Delete",
       icon: DeleteForver.path,
       onClick: async () => {
-        await db.tags.remove(...ids);
-        showToast("success", `${pluralize(ids.length, "tag")} deleted`);
-        await appStore.refreshNavItems();
-        await tagStore.refresh();
-        await noteStore.refresh();
+        await Multiselect.deleteTags(ids);
       },
       multiSelect: true
     }

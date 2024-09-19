@@ -393,7 +393,7 @@ export const PricingPlans = ({
                 >
                   {Platform.OS === "android"
                     ? (product.data as RNIap.SubscriptionAndroid)
-                        ?.subscriptionOfferDetails[0].pricingPhases
+                        ?.subscriptionOfferDetails[0]?.pricingPhases
                         .pricingPhaseList?.[0]?.formattedPrice
                     : (product.data as RNIap.SubscriptionIOS)
                         ?.introductoryPrice ||

@@ -22,7 +22,7 @@ import {
   SqliteQueryCompiler,
   SqliteIntrospector,
   Dialect
-} from "kysely";
+} from "@streetwriters/kysely";
 import {
   WaSqliteWorkerMultipleTabDriver,
   WaSqliteWorkerSingleTabDriver

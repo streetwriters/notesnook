@@ -14,6 +14,14 @@
   pointer-events: none;
 }
 
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6 {
+  margin-bottom: -10px;
+}
 .ProseMirror p code {
   background-color: var(--background-secondary);
 }

@@ -31,6 +31,7 @@ import { useTabStore } from "./use-tab-store";
 import { parseInternalLink } from "@notesnook/core";
 import { eOnLoadNote } from "../../../utils/events";
 import { db } from "../../../common/database";
+import { NotesnookModule } from "../../../utils/notesnook-module";
 export const textInput = createRef<TextInput>();
 export const editorController =
   createRef<useEditorType>() as MutableRefObject<useEditorType>;
@@ -165,7 +166,7 @@ const canRestoreAppState = (appState: AppState) => {
 let appState: AppState | undefined;
 export function getAppState() {
   if (appState && canRestoreAppState(appState)) return appState as AppState;
-  const json = MMKV.getString("appState");
+  const json = NotesnookModule.getAppState();
   if (json) {
     appState = JSON.parse(json) as AppState;
     if (canRestoreAppState(appState)) {
@@ -180,7 +181,7 @@ export function getAppState() {
 
 export function clearAppState() {
   appState = undefined;
-  MMKV.removeItem("appState");
+  NotesnookModule.setAppState("");
 }
 
 export async function openInternalLink(url: string) {

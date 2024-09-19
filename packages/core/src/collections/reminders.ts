@@ -29,7 +29,7 @@ import { Reminder } from "../types";
 import Database from "../api";
 import { SQLCollection } from "../database/sql-collection";
 import { isFalse } from "../database";
-import { sql } from "kysely";
+import { sql } from "@streetwriters/kysely";
 
 dayjs.extend(isTomorrow);
 dayjs.extend(isSameOrBefore);

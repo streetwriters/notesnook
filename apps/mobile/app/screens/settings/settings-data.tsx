@@ -1509,9 +1509,9 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
         }
       },
       {
-        id: "join-mastodom",
+        id: "join-mastodon",
         name: "Follow us on Mastodon",
-        description: "We are on mastodom",
+        description: "We are on mastodon",
         icon: "mastodon",
         modifer: () => {
           Linking.openURL("https://fosstodon.org/@notesnook").catch(

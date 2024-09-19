@@ -21,7 +21,12 @@ import { Input } from "@theme-ui/components";
 import { Flex } from "@theme-ui/components";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { Popup } from "../components/popup";
-import { LinkDefinition } from "../tools/link";
+import { isInternalLink, LinkDefinition } from "../tools/link";
+import { showPopup } from "../../components/popup-presenter";
+import Link, { LinkAttributes } from "../../extensions/link";
+import { ImageNode } from "../../extensions/image";
+import { findMark, selectionToOffset } from "../../utils/prosemirror";
+import { Editor, getMarkAttributes } from "@tiptap/core";
 
 export type LinkPopupProps = {
   link?: LinkDefinition;
@@ -46,13 +51,17 @@ export function LinkPopup(props: LinkPopupProps) {
       onClose={onClose}
       action={{
         title: isEditing ? "Save edits" : "Insert link",
-        onClick: () => {
-          if (!link.current) return;
-          onDone(link.current);
-        }
+        onClick: () => onDone(link.current)
       }}
     >
-      <Flex sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}>
+      <Flex
+        sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}
+        onKeyUp={(e) => {
+          if (e.key === "Enter") {
+            onDone(link.current);
+          }
+        }}
+      >
         {!isImageActive && (
           <Input
             type="text"
@@ -79,4 +88,61 @@ export function LinkPopup(props: LinkPopupProps) {
       </Flex>
     </Popup>
   );
+}
+
+export async function showLinkPopup(editor: Editor) {
+  const isActive = editor.isActive(Link.name);
+  const isImageActive = editor.isActive(ImageNode.name);
+  const selectedNode = selectionToOffset(editor.state);
+  const link = selectedNode?.node
+    ? findMark(selectedNode.node, Link.name)
+    : null;
+  const attrs = link?.attrs || getMarkAttributes(editor.state, Link.name);
+  const selectedText = editor.state.doc.textBetween(
+    editor.state.selection.from,
+    editor.state.selection.to
+  );
+  if (isInternalLink(attrs.href)) {
+    const link = await editor.storage.createInternalLink?.(
+      attrs as LinkAttributes
+    );
+    if (!link) return;
+    if (isActive) {
+      const { from, to } = editor.state.selection;
+      if (selectedNode) editor.commands.setTextSelection(selectedNode);
+      editor.commands.setLink(link);
+      if (selectedNode) editor.commands.setTextSelection({ from, to });
+    } else {
+      editor.commands.setLink({ ...link, title: selectedText || link.title });
+    }
+    return;
+  }
+
+  showPopup({
+    popup: (close) => (
+      <LinkPopup
+        link={
+          selectedNode && selectedNode.node
+            ? {
+                title: isActive ? selectedNode.node.textContent : selectedText,
+                href: link?.attrs.href || ""
+              }
+            : undefined
+        }
+        onClose={close}
+        onDone={(link) => {
+          if (isActive) {
+            if (selectedNode)
+              editor.chain().focus().setTextSelection(selectedNode).run();
+            editor.commands.setLink(link);
+          } else editor.commands.toggleLink(link);
+          close();
+        }}
+        isEditing={isActive}
+        isImageActive={isImageActive}
+      />
+    ),
+    mobile: "sheet",
+    desktop: "popup"
+  });
 }

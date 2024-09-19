@@ -24,12 +24,19 @@ import type {
 } from "./task-scheduler.worker";
 import { wrap, Remote } from "comlink";
 import { showToast } from "./toast";
+import dayjs from "dayjs";
+import { logger } from "./logger";
 
 let worker: globalThis.Worker | undefined;
 let scheduler: Remote<TaskSchedulerType> | undefined;
 
 export class TaskScheduler {
   static async register(id: string, time: string, action: () => void) {
+    if (!dayjs(time).isValid()) {
+      logger.error(`Invalid cron expression: ${time}`);
+      return;
+    }
+
     init();
 
     worker?.addEventListener("message", function handler(ev) {

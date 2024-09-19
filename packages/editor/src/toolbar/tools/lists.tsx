@@ -20,12 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ToolProps } from "../types";
 import { Box, Button, Flex } from "@theme-ui/components";
 import { IconNames } from "../icons";
-import { useCallback, useRef, useState, useLayoutEffect } from "react";
+import { useCallback, useRef } from "react";
 import { SplitButton } from "../components/split-button";
-import { useToolbarLocation } from "../stores/toolbar-store";
+import { usePopupManager, useToolbarLocation } from "../stores/toolbar-store";
 import { getToolbarElement } from "../utils/dom";
 import { PopupWrapper } from "../../components/popup-presenter";
-import React from "react";
 import { ToolButton } from "../components/tool-button";
 import { findListItemType, isListActive } from "../../utils/prosemirror";
 
@@ -43,16 +42,18 @@ type ListToolProps<TListStyleTypes> = ToolProps & {
   subTypes: ListSubType<TListStyleTypes>[];
 };
 
-function _ListTool<TListStyleTypes extends string>(
+function ListTool<TListStyleTypes extends string>(
   props: ListToolProps<TListStyleTypes>
 ) {
-  const { editor, onClick, subTypes, type, ...toolProps } = props;
+  const { editor, onClick, subTypes, type, parentGroup, ...toolProps } = props;
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
-  const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
-
-  useLayoutEffect(() => () => setIsOpen(false), []);
+  const { toggle, isOpen, close } = usePopupManager({
+    id: toolProps.title,
+    group: "lists",
+    parent: parentGroup
+  });
 
   return (
     <SplitButton
@@ -61,14 +62,14 @@ function _ListTool<TListStyleTypes extends string>(
       onClick={onClick}
       toggled={isOpen}
       sx={{ mr: 0 }}
-      onOpen={() => setIsOpen((s) => !s)}
+      onOpen={toggle}
     >
       <PopupWrapper
-        isOpen={isOpen}
         group="lists"
         id={toolProps.title}
         blocking={false}
         focusOnRender={false}
+        autoCloseOnUnmount
         position={{
           isTargetAbsolute: true,
           target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
@@ -76,14 +77,14 @@ function _ListTool<TListStyleTypes extends string>(
           location: isBottom ? "top" : "below",
           yOffset: 10
         }}
-        onClosed={() => setIsOpen(false)}
       >
         <Box
           sx={{
             bg: "background",
+            boxShadow: "menu",
+            borderRadius: "default",
             display: "grid",
             gridTemplateColumns: "1fr 1fr 1fr",
-            gap: 1,
             p: 1
           }}
         >
@@ -91,7 +92,7 @@ function _ListTool<TListStyleTypes extends string>(
             <Button
               key={item.title}
               variant={"menuitem"}
-              sx={{ width: 80, p: 0 }}
+              sx={{ width: 80, p: 0, borderRadius: "default" }}
               onClick={() => {
                 let chain = editor.chain().focus();
                 if (!chain || !editor) return;
@@ -100,7 +101,7 @@ function _ListTool<TListStyleTypes extends string>(
                   if (type === "bulletList") chain = chain.toggleBulletList();
                   else chain = chain.toggleOrderedList();
                 }
-                setIsOpen(false);
+                close();
                 return chain
                   .updateAttributes(type, { listType: item.type })
                   .run();
@@ -114,10 +115,6 @@ function _ListTool<TListStyleTypes extends string>(
     </SplitButton>
   );
 }
-
-const ListTool = React.memo(_ListTool, (prev, next) => {
-  return prev.isActive === next.isActive;
-});
 
 export function NumberedList(props: ToolProps) {
   const { editor } = props;
@@ -230,11 +227,11 @@ function ListThumbnail(props: ListThumbnailProps) {
       sx={{
         flexDirection: "column",
         flex: 1,
-        p: 0,
         listStyleType,
-        ml: 4,
-        mr: 1,
-        my: 1,
+        m: 0,
+        ml: "10px",
+        p: "5px",
+        pl: "7px",
         gap: `7px`
       }}
       onMouseDown={(e) => {

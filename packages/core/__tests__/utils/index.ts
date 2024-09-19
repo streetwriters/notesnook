@@ -25,7 +25,7 @@ import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { randomBytes } from "../../src/utils/random";
 import { Note, Notebook } from "../../src/types";
 import { NoteContent } from "../../src/collections/session-content";
-import { SqliteDialect } from "kysely";
+import { SqliteDialect } from "@streetwriters/kysely";
 import BetterSQLite3 from "better-sqlite3-multiple-ciphers";
 import path from "path";
 import { tmpdir } from "os";

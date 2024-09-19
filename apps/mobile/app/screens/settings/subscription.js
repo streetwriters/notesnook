@@ -90,7 +90,7 @@ export const Subscription = () => {
 
   function getPrice() {
     return Platform.OS === "android"
-      ? monthlyPlan?.product?.subscriptionOfferDetails[0].pricingPhases
+      ? monthlyPlan?.product?.subscriptionOfferDetails[0]?.pricingPhases
           .pricingPhaseList?.[0]?.formattedPrice
       : monthlyPlan?.product?.localizedPrice;
   }

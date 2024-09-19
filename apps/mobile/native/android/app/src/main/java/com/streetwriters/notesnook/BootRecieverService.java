@@ -3,6 +3,7 @@ package com.streetwriters.notesnook;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 import android.app.ActivityManager;
 import com.facebook.react.HeadlessJsTaskService;
@@ -19,8 +20,12 @@ public class BootRecieverService extends BroadcastReceiver {
              network connections
              **/
             Intent serviceIntent = new Intent(context, BootTaskService.class);
-            context.startService(serviceIntent);
-            HeadlessJsTaskService.acquireWakeLockNow(context);
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                  context.startForegroundService(serviceIntent);
+              } else {
+                  context.startService(serviceIntent);
+              }
+              HeadlessJsTaskService.acquireWakeLockNow(context);
         }
     }
 

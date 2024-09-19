@@ -33,6 +33,11 @@ export function getPopupContainer() {
   );
 }
 
+export function getEditorToolbarPopup() {
+  return (document.querySelector(".editor-mobile-toolbar-popup") ||
+    getToolbarElement()) as HTMLElement;
+}
+
 export function getEditorContainer() {
   return (document.querySelector(".active .editor") ||
     getPopupContainer()) as HTMLElement;

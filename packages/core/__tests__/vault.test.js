@@ -115,6 +115,23 @@ test("unlock a note permanently", () =>
     expect(await db.relations.from(vault, "note").has(id)).toBe(false);
   }));
 
+test("lock an empty note", () =>
+  noteTest({ title: "I am a note" }).then(async ({ db, id }) => {
+    await db.vault.create("password");
+
+    await db.vault.add(id);
+
+    const note = await db.notes.note(id);
+    const content = await db.content.get(note.contentId);
+    const vault = await db.vaults.default();
+    expect(note.headline).toBe("");
+    expect(content.locked).toBeTruthy();
+    expect(content.noteId).toBeDefined();
+    expect(content.data.iv).toBeDefined();
+    expect(content.data.cipher).toBeDefined();
+    expect(await db.relations.from(vault, "note").has(id)).toBe(true);
+  }));
+
 test("save a locked note", () =>
   noteTest().then(async ({ db, id }) => {
     await db.vault.create("password");

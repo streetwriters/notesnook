@@ -20,11 +20,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useStore as useAppStore } from "../../../stores/app-store";
 import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Button, Flex, Input, Link, Text } from "@theme-ui/components";
-import { pluralize } from "@notesnook/common";
+import { Box, Button, Flex, Input, Link, Text } from "@theme-ui/components";
 import { db } from "../../../common/db";
 import { importFiles } from "../../../utils/importer";
 import { CheckCircleOutline } from "../../../components/icons";
+import Accordion from "../../../components/accordion";
+
+type Provider = { title: string; link: string };
+const POPULAR_PROVIDERS: Provider[] = [
+  {
+    title: "Evernote",
+    link: "https://help.notesnook.com/importing-notes/import-notes-from-evernote"
+  },
+  {
+    title: "Simplenote",
+    link: "https://help.notesnook.com/importing-notes/import-notes-from-simplenote"
+  },
+  {
+    title: "Google Keep",
+    link: "https://help.notesnook.com/importing-notes/import-notes-from-google-keep"
+  },
+  {
+    title: "Obsidian",
+    link: "https://help.notesnook.com/importing-notes/import-notes-from-obsidian"
+  },
+  {
+    title: "Joplin",
+    link: "https://help.notesnook.com/importing-notes/import-notes-from-joplin"
+  },
+  {
+    title: "Markdown files",
+    link: "https://help.notesnook.com/importing-notes/import-notes-from-markdown-files"
+  },
+  {
+    title: "other apps",
+    link: "https://help.notesnook.com/importing-notes/"
+  }
+];
 
 export function Importer() {
   const [isDone, setIsDone] = useState(false);
@@ -114,75 +146,81 @@ export function Importer() {
         </>
       ) : (
         <>
-          <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
-            <Flex sx={{ flexDirection: "column" }}>
-              <Text variant="title">
-                {files.length
-                  ? `${pluralize(files.length, "file")} ready for import`
-                  : "Select files to import"}
+          <Accordion
+            isClosed={false}
+            title="How to import your notes from other apps?"
+            containerSx={{
+              px: 2,
+              pb: 2,
+              border: "1px solid var(--border)",
+              borderTopWidth: 0,
+              borderRadius: "default",
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0
+            }}
+          >
+            <Text variant="subtitle" sx={{ mt: 2 }}>
+              Quick start guide:
+            </Text>
+            <Box as="ol" sx={{ my: 1 }}>
+              <Text as="li" variant="body">
+                Go to{" "}
+                <Link href="https://importer.notesnook.com/" target="_blank">
+                  https://importer.notesnook.com/
+                </Link>
               </Text>
-              <Text
-                variant={"body"}
-                sx={{ color: "var(--paragraph-secondary)" }}
-              >
-                Please refer to the{" "}
-                <Link
-                  href="https://help.notesnook.com/importing-notes/import-notes-from-evernote"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{ color: "accent" }}
-                >
-                  import guide
-                </Link>{" "}
-                for help regarding how to use the Notesnook Importer.
+              <Text as="li" variant="body">
+                Select the app you want to import from.
               </Text>
-            </Flex>
-            <Button
-              variant="accent"
-              onClick={async () => {
-                setIsDone(false);
-                setIsImporting(true);
+              <Text as="li" variant="body">
+                Drag drop or select the files you exported from the other app.
+              </Text>
+              <Text as="li" variant="body">
+                Start the importer and wait for it to complete processing.
+              </Text>
+              <Text as="li" variant="body">
+                Download the .zip file from the Importer.
+              </Text>
+              <Text as="li" variant="body">
+                Drop the .zip file below to complete your import.
+              </Text>
+            </Box>
 
-                await db.syncer?.acquireLock(async () => {
-                  try {
-                    for await (const message of importFiles(files)) {
-                      switch (message.type) {
-                        case "error":
-                          setErrors((errors) => [...errors, message.error]);
-                          break;
-                        case "progress": {
-                          const { count } = message;
-                          if (notesCounter.current)
-                            notesCounter.current.innerText = `${count}`;
-                          break;
-                        }
-                      }
-                    }
-                  } catch (e) {
-                    console.error(e);
-                    if (e instanceof Error) {
-                      setErrors((errors) => [...errors, e as Error]);
-                    }
-                  }
-                });
-
-                await useAppStore.getState().refresh();
-
-                setIsDone(true);
-                setIsImporting(false);
+            <Text variant={"body"} sx={{ fontWeight: "bold" }}>
+              For detailed steps with screenshots, refer to the help article for
+              each app:
+            </Text>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: 1,
+                mt: 1
               }}
-              disabled={!files.length}
             >
-              Start import
-            </Button>
-          </Flex>
+              {POPULAR_PROVIDERS.map((provider) => (
+                <Button
+                  key={provider.link}
+                  variant="icon"
+                  sx={{
+                    borderRadius: "default",
+                    border: "1px solid var(--border)",
+                    textAlign: "left"
+                  }}
+                  onClick={() => window.open(provider.link, "_blank")}
+                >
+                  Import from {provider.title}
+                </Button>
+              ))}
+            </Box>
+          </Accordion>
           <Flex
             {...getRootProps()}
             data-test-id="import-dialog-select-files"
             sx={{
               justifyContent: "center",
               alignItems: "center",
-              height: 200,
+              minHeight: 200,
               flexShrink: 0,
               width: "full",
               border: "2px dashed var(--border)",
@@ -199,31 +237,75 @@ export function Importer() {
               <br />
               <Text variant="subBody">Only .zip files are supported.</Text>
             </Text>
+            <Box sx={{ display: "flex", flexWrap: "wrap", mt: 2 }}>
+              {files.map((file, i) => (
+                <Text
+                  key={file.name}
+                  p={1}
+                  sx={{
+                    ":hover": { bg: "hover" },
+                    cursor: "pointer",
+                    borderRadius: "default"
+                  }}
+                  onClick={() => {
+                    setFiles((files) => {
+                      const cloned = files.slice();
+                      cloned.splice(i, 1);
+                      return cloned;
+                    });
+                  }}
+                  variant="body"
+                  title="Click to remove"
+                >
+                  {file.name}
+                </Text>
+              ))}
+            </Box>
           </Flex>
-          <Flex my={1} sx={{ flexDirection: "column" }}>
-            {files.map((file, i) => (
-              <Text
-                key={file.name}
-                p={1}
-                sx={{
-                  ":hover": { bg: "hover" },
-                  cursor: "pointer",
-                  borderRadius: "default"
-                }}
-                onClick={() => {
-                  setFiles((files) => {
-                    const cloned = files.slice();
-                    cloned.splice(i, 1);
-                    return cloned;
-                  });
-                }}
-                variant="body"
-                title="Click to remove"
-              >
-                {file.name}
-              </Text>
-            ))}
-          </Flex>
+          {/* <Flex my={1} sx={{ flexDirection: "column" }}>
+            
+          </Flex> */}
+          <Button
+            variant="accent"
+            sx={{ alignSelf: "end", mt: 1 }}
+            onClick={async () => {
+              setIsDone(false);
+              setIsImporting(true);
+
+              await db.syncer?.acquireLock(async () => {
+                try {
+                  for await (const message of importFiles(files)) {
+                    switch (message.type) {
+                      case "error":
+                        setErrors((errors) => [...errors, message.error]);
+                        break;
+                      case "progress": {
+                        const { count } = message;
+                        if (notesCounter.current)
+                          notesCounter.current.innerText = `${count}`;
+                        break;
+                      }
+                    }
+                  }
+                } catch (e) {
+                  console.error(e);
+                  if (e instanceof Error) {
+                    setErrors((errors) => [...errors, e as Error]);
+                  }
+                }
+              });
+
+              await useAppStore.getState().refresh();
+
+              setIsDone(true);
+              setIsImporting(false);
+            }}
+            disabled={!files.length}
+          >
+            {files.length > 0
+              ? "Start import"
+              : "Select files to start importing"}
+          </Button>
         </>
       )}
     </Flex>

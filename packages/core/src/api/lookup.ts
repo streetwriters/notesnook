@@ -21,11 +21,12 @@ import { match } from "fuzzyjs";
 import Database from ".";
 import { Item, Note, TrashItem } from "../types";
 import { DatabaseSchema, RawDatabaseSchema } from "../database";
-import { AnyColumnWithTable, Kysely, sql } from "kysely";
+import { AnyColumnWithTable, Kysely, sql } from "@streetwriters/kysely";
 import { FilteredSelector } from "../database/sql-collection";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping";
 import { logger } from "../logger";
 import { rebuildSearchIndex } from "../database/fts";
+import { transformQuery } from "../utils/query-transformer";
 
 type SearchResults<T> = {
   sorted: (limit?: number) => Promise<VirtualizedGrouping<T>>;
@@ -43,10 +44,56 @@ export default class Lookup {
 
   notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
     return this.toSearchResults(async (limit) => {
-      if (query.length < 3) return [];
-
       const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       const excludedIds = this.db.trash.cache.notes;
+
+      if (query.length <= 2) {
+        const results = await db
+          .selectFrom((eb) =>
+            eb
+              .selectFrom("notes")
+              .$if(!!notes, (eb) =>
+                eb.where("id", "in", notes!.filter.select("id"))
+              )
+              .$if(excludedIds.length > 0, (eb) =>
+                eb.where("id", "not in", excludedIds)
+              )
+              .where("title", "like", `%${query}%`)
+              .select(["id"])
+              .unionAll((eb) =>
+                eb
+                  .selectFrom("content")
+                  .$if(!!notes, (eb) =>
+                    eb.where("id", "in", notes!.filter.select("id"))
+                  )
+                  .$if(excludedIds.length > 0, (eb) =>
+                    eb.where("id", "not in", excludedIds)
+                  )
+                  .where("locked", "!=", true)
+                  .where("data", "like", `%${query}%`)
+                  .select(["noteId as id"])
+                  .$castTo<{ id: string; dateCreated: number }>()
+              )
+              .as("results")
+          )
+          .select(["results.id"])
+          .groupBy("results.id")
+          .$if(!!limit, (eb) => eb.limit(limit!))
+          // filter out ids that have no note against them
+          .where(
+            "results.id",
+            "in",
+            (notes || this.db.notes.all).filter.select("id")
+          )
+          .execute()
+          .catch((e) => {
+            logger.error(e, `Error while searching`, { query });
+            return [];
+          });
+        return results.map((r) => r.id);
+      }
+
+      query = transformQuery(query);
       const results = await db
         .selectFrom((eb) =>
           eb

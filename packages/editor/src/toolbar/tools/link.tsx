@@ -315,6 +315,6 @@ function LinkTool(props: LinkToolProps) {
   );
 }
 
-function isInternalLink(href?: string | null) {
+export function isInternalLink(href?: string | null) {
   return typeof href === "string" ? href.startsWith("nn://") : false;
 }

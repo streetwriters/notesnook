@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import dayjs from "dayjs";
-import { DATE_FORMATS, DATE_FORMATS_WITHOUT_YEAR } from "../common";
 
 export type TimeFormat = "12-hour" | "24-hour";
 
@@ -70,7 +69,7 @@ export type TimeOptions = {
   timeFormat: TimeFormat;
 };
 export type DateOptions = {
-  type: "date" | "date-without-year";
+  type: "date";
   dateFormat: string;
 };
 export type DateTimeOptions = {
@@ -97,12 +96,6 @@ export function formatDate(
       return dayjs(date).format(getTimeFormat(options.timeFormat));
     case "date":
       return dayjs(date).format(options.dateFormat);
-    case "date-without-year": {
-      const format =
-        DATE_FORMATS_WITHOUT_YEAR[DATE_FORMATS.indexOf(options.dateFormat)];
-      if (!format) return dayjs(date).format("MM-DD");
-      return dayjs(date).format(format);
-    }
   }
 }
 

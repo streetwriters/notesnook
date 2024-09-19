@@ -70,7 +70,7 @@ import {
   createDatabase,
   initializeDatabase
 } from "../database";
-import { Kysely, Transaction, sql } from "kysely";
+import { Kysely, Transaction, sql } from "@streetwriters/kysely";
 import { CachedCollection } from "../database/cached-collection";
 import { Vaults } from "../collections/vaults";
 import { KVStorage } from "../database/kv";
@@ -425,14 +425,12 @@ class Database {
   }
 
   host(hosts: typeof Hosts) {
-    if (process.env.NODE_ENV !== "production") {
-      Hosts.AUTH_HOST = hosts.AUTH_HOST || Hosts.AUTH_HOST;
-      Hosts.API_HOST = hosts.API_HOST || Hosts.API_HOST;
-      Hosts.SSE_HOST = hosts.SSE_HOST || Hosts.SSE_HOST;
-      Hosts.SUBSCRIPTIONS_HOST =
-        hosts.SUBSCRIPTIONS_HOST || Hosts.SUBSCRIPTIONS_HOST;
-      Hosts.ISSUES_HOST = hosts.ISSUES_HOST || Hosts.ISSUES_HOST;
-    }
+    Hosts.AUTH_HOST = hosts.AUTH_HOST || Hosts.AUTH_HOST;
+    Hosts.API_HOST = hosts.API_HOST || Hosts.API_HOST;
+    Hosts.SSE_HOST = hosts.SSE_HOST || Hosts.SSE_HOST;
+    Hosts.SUBSCRIPTIONS_HOST =
+      hosts.SUBSCRIPTIONS_HOST || Hosts.SUBSCRIPTIONS_HOST;
+    Hosts.ISSUES_HOST = hosts.ISSUES_HOST || Hosts.ISSUES_HOST;
   }
 
   version() {

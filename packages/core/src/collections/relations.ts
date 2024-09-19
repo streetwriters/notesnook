@@ -29,7 +29,7 @@ import {
 import Database from "../api";
 import { FilteredSelector, SQLCollection } from "../database/sql-collection";
 import { DatabaseSchema, UnlinkEvent, isFalse } from "../database";
-import { SelectQueryBuilder } from "kysely";
+import { SelectQueryBuilder } from "@streetwriters/kysely";
 import { EVENTS } from "../common";
 
 export class Relations implements ICollection {
@@ -51,6 +51,7 @@ export class Relations implements ICollection {
   }
 
   async add(from: ItemReference, to: ItemReference) {
+    if (!from.id || !to.id) throw new Error("Invalid item reference.");
     await this.collection.upsert({
       id: generateId(from, to),
       type: "relation",

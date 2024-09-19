@@ -30,31 +30,17 @@ import { Popup } from "../components/popup";
 import { SchemeColors } from "@notesnook/theme";
 import { Editor } from "../../types";
 
-export const DEFAULT_COLORS = [
-  "#e91e63",
-  "#9c27b0",
-  "#673ab7",
-  "#3f51b5",
-  "#2196f3",
-  "#03a9f4",
-  "#00bcd4",
-  "#009688",
-  "#4caf50",
-  "#8bc34a",
-  "#cddc39",
-  "#ffeb3b",
-  "#ffc107",
-  "#f44336"
-];
-
 type ColorPickerProps = {
   editor: Editor;
   colors?: string[];
+  defaultColors?: string[];
   color?: string;
   onClear: () => void;
   expanded?: boolean;
   onChange: (color: string) => void;
   onClose?: () => void;
+  isPinned?: boolean;
+  onPin?: () => void;
   title?: string;
   onSave?: (color: string) => void;
   cacheKey?: string;
@@ -68,20 +54,24 @@ export function ColorPicker(props: ColorPickerProps) {
     onChange,
     title,
     onClose,
+    isPinned,
+    onPin,
     expanded,
     onSave,
     colors = [],
+    defaultColors = [],
     onDelete,
     editor
   } = props;
   const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isPickerOpen, setIsPickerOpen] = useState(expanded || false);
   const [currentColor, setCurrentColor] = useState<string>(
     tinycolor(color || colors?.[0]).toHexString()
   );
   const [deleteMode, setDeleteMode] = useState(false);
   const tColor = tinycolor(currentColor);
-  const allColors = deleteMode ? colors : [...DEFAULT_COLORS, ...colors];
+  const allColors = deleteMode ? colors : [...defaultColors, ...colors];
 
   useEffect(() => {
     if (!ref.current) return;
@@ -97,12 +87,14 @@ export function ColorPicker(props: ColorPickerProps) {
   );
 
   return (
-    <Popup title={title} onClose={onClose}>
+    <Popup title={title} onClose={onClose} isPinned={isPinned} onPin={onPin}>
       <Flex
         ref={ref}
         tabIndex={-1}
         sx={{
           bg: "background",
+          boxShadow: ["menu", "none"],
+          borderRadius: ["default", "none"],
           flexDirection: "column",
           ".react-colorful": {
             width: "auto",
@@ -122,6 +114,8 @@ export function ColorPicker(props: ColorPickerProps) {
               onChange={(color) => {
                 setCurrentColor(color);
                 onColorChange(color);
+                if (inputRef.current)
+                  inputRef.current.value = color.toUpperCase();
               }}
               onTouchEnd={() => onChange(currentColor)}
               onMouseUp={() => onChange(currentColor)}
@@ -134,6 +128,7 @@ export function ColorPicker(props: ColorPickerProps) {
               }}
             >
               <Input
+                ref={inputRef}
                 variant={"clean"}
                 placeholder="#000000"
                 spellCheck={false}
@@ -147,7 +142,7 @@ export function ColorPicker(props: ColorPickerProps) {
                   letterSpacing: 1.5,
                   textAlign: "center"
                 }}
-                value={currentColor.toUpperCase()}
+                defaultValue={currentColor.toUpperCase()}
                 maxLength={7}
                 onChange={(e) => {
                   const { value } = e.target;

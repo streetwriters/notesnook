@@ -95,6 +95,7 @@ export function EmbedComponent(
                 >
                   <ToolbarGroup
                     editor={editor}
+                    groupId="embedTools"
                     tools={[
                       "embedAlignLeft",
                       "embedAlignCenter",

@@ -115,6 +115,13 @@ test("note without a title should get a premade title", () =>
     expect(note?.title.startsWith("Note ")).toBe(true);
   }));
 
+test("setting note title to empty should set the default title", () =>
+  noteTest({ title: "I am some title" }).then(async ({ db, id }) => {
+    await db.notes.add({ id, title: "" });
+    const note = await db.notes.note(id);
+    expect(note?.title.startsWith("Note ")).toBe(true);
+  }));
+
 test("note should get headline from content", () =>
   noteTest({
     ...TEST_NOTE,

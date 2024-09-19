@@ -50,7 +50,8 @@ import {
   RemoveShortcutLink,
   Plus,
   Copy,
-  Tag as TagIcon
+  Tag as TagIcon,
+  OpenInNew
 } from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
@@ -132,8 +133,9 @@ function Note(props: NoteProps) {
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
           // @ts-expect-error write tests for this
-          const selectedItems = selectionStore.get().selectedItems;
-          await Multiselect.moveNotesToTrash([item.id, ...selectedItems]);
+          await Multiselect.moveNotesToTrash(
+            selectionStore.get().selectedItems
+          );
         }
       }}
       colors={{
@@ -430,17 +432,53 @@ const menuItems: (
     {
       type: "button",
       key: "publish",
-      isDisabled:
-        //!isSynced ||
-        !db.monographs.isPublished(note.id) && context?.locked,
+      isDisabled: !db.monographs.isPublished(note.id) && context?.locked,
       icon: Publish.path,
       title: "Publish",
-      isChecked: db.monographs.isPublished(note.id),
-      onClick: async () => {
-        const isPublished = db.monographs.isPublished(note.id);
-        if (isPublished) await useMonographStore.getState().unpublish(note.id);
-        else await showPublishView(note, "bottom");
-      }
+      menu: db.monographs.isPublished(note.id)
+        ? {
+            items: [
+              {
+                type: "button",
+                key: "open",
+                title: "Open",
+                icon: OpenInNew.path,
+                onClick: async () => {
+                  const url = `https://monogr.ph/${note.id}`;
+                  window.open(url, "_blank");
+                }
+              },
+              {
+                type: "button",
+                key: "copy-link",
+                title: "Copy link",
+                icon: Copy.path,
+                onClick: async () => {
+                  const url = `https://monogr.ph/${note.id}`;
+                  await writeToClipboard({
+                    "text/plain": url,
+                    "text/html": `<a href="${url}">${note.title}</a>`,
+                    "text/markdown": `[${note.title}](${url})`
+                  });
+                }
+              },
+              {
+                type: "separator",
+                key: "sep"
+              },
+              {
+                type: "button",
+                key: "unpublish",
+                title: "Unpublish",
+                icon: Publish.path,
+                onClick: async () => {
+                  await useMonographStore.getState().unpublish(note.id);
+                }
+              }
+            ]
+          }
+        : undefined,
+      onClick: () => showPublishView(note, "bottom")
     },
     {
       type: "button",

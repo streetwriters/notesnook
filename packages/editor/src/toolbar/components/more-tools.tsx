@@ -17,15 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { PopupWrapper } from "../../components/popup-presenter";
 import { ToolButton } from "../components/tool-button";
-import { useToolbarLocation } from "../stores/toolbar-store";
+import { usePopupManager, useToolbarLocation } from "../stores/toolbar-store";
 import { ToolProps } from "../types";
 import { getToolbarElement } from "../utils/dom";
 import { ToolId } from "../tools";
 import { ToolbarGroup } from "./toolbar-group";
-import { useCallback } from "react";
 
 type MoreToolsProps = ToolProps & {
   popupId: string;
@@ -35,13 +34,22 @@ type MoreToolsProps = ToolProps & {
   group?: string;
 };
 export function MoreTools(props: MoreToolsProps) {
-  const { popupId, editor, tools, autoCloseOnUnmount, autoOpen, group } = props;
+  const { popupId, editor, tools, autoCloseOnUnmount, autoOpen } = props;
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
+  const group = isBottom ? "mobile" : "toolbarGroup";
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const [isOpen, setIsOpen] = useState(autoOpen || false);
-  const onClosed = useCallback(() => setIsOpen(false), [setIsOpen]);
-  useLayoutEffect(() => () => setIsOpen(false), []);
+  const { open, toggle, isOpen, isPinned, togglePinned } = usePopupManager({
+    id: popupId,
+    group
+  });
+
+  useEffect(() => {
+    if (autoOpen) {
+      open();
+      togglePinned();
+    }
+  }, [autoOpen]);
 
   return (
     <>
@@ -49,14 +57,12 @@ export function MoreTools(props: MoreToolsProps) {
         {...props}
         toggled={isOpen}
         buttonRef={buttonRef}
-        onClick={() => setIsOpen((s) => !s)}
+        onClick={toggle}
       />
       <PopupWrapper
-        isOpen={isOpen}
         scope="editorToolbar"
-        group={group || "toolbarGroup"}
+        group={group}
         id={popupId}
-        onClosed={onClosed}
         position={{
           isTargetAbsolute: true,
           target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
@@ -67,19 +73,37 @@ export function MoreTools(props: MoreToolsProps) {
         autoCloseOnUnmount={autoCloseOnUnmount}
         focusOnRender={false}
         blocking={false}
+        sx={{
+          display: "flex",
+          boxShadow: "menu",
+          bg: "background",
+          gap: [0, 0, "small"],
+          p: ["4px", "4px", "small"],
+          flex: 1,
+          borderRadius: "default",
+          overflowX: "auto",
+          maxWidth: "95vw"
+        }}
       >
         <ToolbarGroup
           tools={tools}
           editor={editor}
+          groupId={popupId}
           sx={{
-            flex: 1,
-            boxShadow: "menu",
-            bg: "background",
-            borderRadius: "default",
-            overflowX: "auto",
-            maxWidth: "95vw"
+            p: 0,
+            borderRight: autoOpen ? "none" : "1px solid var(--border)",
+            pr: autoOpen ? 0 : ["4px", "4px", "small"],
+            mr: autoOpen ? 0 : ["4px", "4px", "small"]
           }}
         />
+        {autoOpen ? null : (
+          <ToolButton
+            toggled={isPinned}
+            onClick={togglePinned}
+            icon="pin"
+            variant="small"
+          />
+        )}
       </PopupWrapper>
     </>
   );

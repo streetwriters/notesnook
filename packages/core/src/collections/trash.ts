@@ -27,7 +27,7 @@ import {
   getSortSelectors,
   groupArray
 } from "../utils/grouping";
-import { sql } from "kysely";
+import { sql } from "@streetwriters/kysely";
 import { MAX_SQL_PARAMETERS } from "../database/sql-collection";
 
 export default class Trash {

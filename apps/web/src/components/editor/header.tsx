@@ -50,6 +50,7 @@ function Header(props: HeaderProps) {
       const id =
         (await db.tags.find(value))?.id ??
         (await db.tags.add({ title: value }));
+      if (!id) return;
       await db.relations.add({ id, type: "tag" }, { type: "note", id: noteId });
       await useTagStore.getState().refresh();
     }

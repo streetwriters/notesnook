@@ -38,7 +38,7 @@ const BLACKLIST = [CLASSES.nodeSelected, CLASSES.nodeSelectionContainer];
 
 const inlineOptions: InlineOptions = {
   fonts: false,
-  images: true,
+  images: false,
   stylesheets: true
 };
 
@@ -198,7 +198,11 @@ function enterNodeSelectionMode(doc: Document, config?: Config) {
           const inlined = await getInlinedNode(node as HTMLElement, {
             raster: false,
             fetchOptions: resolveFetchOptions(config),
-            inlineOptions
+            inlineOptions: {
+              ...inlineOptions,
+              images: config?.images,
+              inlineImages: config?.inlineImages
+            }
           });
           if (!inlined) continue;
           div.appendChild(inlined);

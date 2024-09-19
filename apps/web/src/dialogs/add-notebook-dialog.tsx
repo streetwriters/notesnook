@@ -49,6 +49,8 @@ export const AddNotebookDialog = DialogManager.register(
         title: title.current,
         description: description.current
       });
+      if (!id) return;
+
       if (parentId) {
         await db.relations.add(
           { type: "notebook", id: parentId },

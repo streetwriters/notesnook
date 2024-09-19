@@ -118,19 +118,16 @@ export class WebExtensionServer implements Server {
       content: { type: "tiptap", data: content }
     });
 
-    if (id && clip.tags) {
-      for (const id of clip.tags) {
-        if (!(await db.tags.exists(id))) continue;
-        await db.relations.add({ id: id, type: "tag" }, { id, type: "note" });
-      }
-    }
-
     if (clip.refs && id && !clip.note) {
       for (const ref of clip.refs) {
         switch (ref.type) {
           case "notebook":
+            if (!(await db.notebooks.exists(ref.id))) continue;
             await db.notes.addToNotebook(ref.id, id);
             break;
+          case "tag":
+            if (!(await db.tags.exists(ref.id))) continue;
+            await db.relations.add(ref, { id, type: "note" });
         }
       }
     }

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { NativeImage, nativeImage } from "electron";
 import path from "path";
 import { isDevelopment } from "./index";
-import { parse, ParsedImage } from "icojs";
+import { ParsedImage, parseICO } from "icojs";
 import { getSystemTheme } from "./theme";
 import { readFile } from "fs/promises";
 
@@ -71,7 +71,7 @@ export class AssetManager {
           `${icon}${prefix}.ico`
         );
         const icoBuffer = await readFile(icoPath);
-        const images = await parse(icoBuffer, "image/png");
+        const images = await parseICO(icoBuffer, "image/png");
         ALL_ICONS.push({ id: icon, images, prefix });
       }
     }

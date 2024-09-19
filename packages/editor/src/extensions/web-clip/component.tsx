@@ -158,6 +158,7 @@ export function WebClipComponent(props: ReactNodeViewProps<WebClipAttributes>) {
                 >
                   <ToolbarGroup
                     editor={editor}
+                    groupId="webclipTools"
                     tools={[
                       "webclipFullScreen",
                       "webclipOpenExternal",

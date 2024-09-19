@@ -171,9 +171,6 @@ function ThemesList() {
               {filter.title}
             </Button>
           ))}
-          {themes.isLoading && !themes.isInitialLoading ? (
-            <Loading color="accent" />
-          ) : null}
         </Flex>
 
         <Flex sx={{ mt: 2, gap: 1 }}>
@@ -238,6 +235,9 @@ function ThemesList() {
             )}
           />
         )}
+        {!themes.isInitialLoading && themes.isFetching ? (
+          <Loading color="accent" sx={{ mt: 2 }} />
+        ) : null}
       </Box>
     </>
   );
