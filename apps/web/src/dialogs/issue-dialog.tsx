@@ -22,7 +22,7 @@ import { appVersion } from "../utils/version";
 import Field from "../components/field";
 import Dialog from "../components/dialog";
 import platform from "platform";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
@@ -50,14 +50,6 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
-
-  async function x() {
-    await showIssueReportedDialog({ "url": "https://github.com/streetwriters/notesnook/issues/6570" });
-  }
-
-  useEffect(() => {
-    x();
-  }, [])
 
   return (
     <Dialog
