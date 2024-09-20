@@ -43,6 +43,7 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
       DatabaseLogger.log(`File Exists already: ${filename}`);
       return true;
     }
+
     const attachment = await db.attachments.attachment(filename);
     const size = await getUploadedFileSize(filename);
 
@@ -90,7 +91,8 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
     DatabaseLogger.log(`Download starting: ${filename}`);
     let request = RNFetchBlob.config({
       path: tempFilePath,
-      IOSBackgroundTask: true
+      IOSBackgroundTask: true,
+      overwrite: true
     })
       .fetch("GET", downloadUrl, null)
       .progress(async (recieved, total) => {
@@ -122,6 +124,11 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
 
     let status = response.info().status;
     useAttachmentStore.getState().remove(filename);
+
+    if (exists(originalFilePath)) {
+      await RNFetchBlob.fs.unlink(originalFilePath).catch(console.log);
+    }
+
     await RNFetchBlob.fs.mv(tempFilePath, originalFilePath);
 
     if (!(await exists(filename))) {
