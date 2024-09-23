@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import * as browser from "../src/browser";
-import * as node from "../src/node";
+import * as browser from "../src/browser.js";
+import * as node from "../src/node.js";
 import { test } from "vitest";
 import {
   decrypt,
@@ -27,7 +27,7 @@ import {
   hash,
   streamingDecrypt,
   streamingEncrypt
-} from "./utils";
+} from "./utils.js";
 
 test("secretstream tags should be equal on node & browser variants", async (t) => {
   t.expect(browser.crypto_secretstream_xchacha20poly1305_TAG_FINAL).toBe(

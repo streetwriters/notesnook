@@ -16,8 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import * as browser from "../src/browser";
-import * as node from "../src/node";
+import * as browser from "../src/browser.js";
+import * as node from "../src/node.js";
 import benny from "benny";
 import {
   decrypt,
@@ -25,7 +25,7 @@ import {
   getKey,
   hash,
   streamingEncrypt
-} from "../tests/utils";
+} from "../tests/utils.js";
 
 async function main() {
   await browser.initialize();
