@@ -1,18 +1,44 @@
 {
   "name": "@notesnook/sodium",
-  "version": "2.0.7",
+  "version": "2.1.1",
   "description": "",
   "main": "./dist/node.js",
+  "module": "./dist/node.mjs",
   "types": "./dist/node.d.ts",
+  "browser": "./dist/browser.js",
+  "exports": {
+    ".": {
+      "node": {
+        "require": {
+          "types": "./dist/node.d.ts",
+          "default": "./dist/node.js"
+        },
+        "import": {
+          "types": "./dist/node.d.mts",
+          "default": "./dist/node.mjs"
+        }
+      },
+      "default": {
+        "require": {
+          "types": "./dist/browser.d.ts",
+          "default": "./dist/browser.js"
+        },
+        "import": {
+          "types": "./dist/browser.d.mts",
+          "default": "./dist/browser.mjs"
+        }
+      }
+    }
+  },
   "scripts": {
     "test": "vitest run",
     "bench": "ts-node benches/bench.ts",
-    "build": "tsc",
     "postbuild": "node scripts/postbuild.mjs",
     "prepublishOnly": "npm run build && npm run test",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "build": "tsup-node src/browser.ts src/node.ts",
+    "watch": "npm run build -- --watch"
   },
-  "author": "",
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
@@ -31,6 +57,5 @@
   },
   "dependencies": {
     "libsodium-wrappers-sumo": "^0.7.15"
-  },
-  "browser": "./dist/browser.js"
+  }
 }
