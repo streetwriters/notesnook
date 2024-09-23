@@ -19,17 +19,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  TouchableOpacity,
+  useWindowDimensions,
+  View
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
+import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastOptions
 } from "../../services/event-manager";
-import { useSettingStore } from "../../stores/use-setting-store";
 import { getElevationStyle } from "../../utils/elevation";
 import { eHideToast, eShowToast } from "../../utils/events";
 import { SIZE } from "../../utils/size";
@@ -44,7 +49,9 @@ export const Toast = ({ context = "global" }) => {
   const insets = useGlobalSafeAreaInsets();
   const [visible, setVisible] = useState(false);
   const toastMessages = useRef<ToastOptions[]>([]);
-  const dimensions = useSettingStore((state) => state.dimensions);
+  const dimensions = useWindowDimensions();
+  const keyboard = useKeyboard();
+
   const hideToast = useCallback(() => {
     const nextToastMessage = toastMessages.current.shift();
     if (nextToastMessage) {
@@ -111,7 +118,11 @@ export const Toast = ({ context = "global" }) => {
         width: DDS.isTab ? dimensions.width / 2 : "100%",
         alignItems: "center",
         alignSelf: "center",
-        top: dimensions.height - Math.max(insets.bottom, 70),
+        bottom:
+          Platform.OS === "android"
+            ? Math.max(insets.bottom, 40)
+            : Math.max(insets.bottom, 40) +
+              (keyboard.keyboardShown ? keyboard.keyboardHeight : 0),
         position: "absolute",
         zIndex: 999,
         elevation: 15
@@ -156,7 +167,9 @@ export const Toast = ({ context = "global" }) => {
                 : toastOptions.type === "error"
                 ? colors.error.icon
                 : toastOptions.type === "info"
-                ? colors.static.white
+                ? isDark
+                  ? colors.static.white
+                  : colors.static.black
                 : colors.success.icon
             }
           />
