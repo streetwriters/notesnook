@@ -23,10 +23,10 @@ import {
   formatReminderTime,
   getUpcomingReminderTime,
   isReminderActive
-} from "../src/collections/reminders.js";
+} from "../src/collections/reminders.ts";
 import MockDate from "mockdate";
 import { describe, afterAll, beforeEach, test, expect } from "vitest";
-import { databaseTest } from "./utils/index.js";
+import { databaseTest } from "./utils/index.ts";
 import dayjs from "dayjs";
 import assert from "assert";
 

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { databaseTest } from "../__tests__/utils/index.js";
+import { databaseTest } from "../__tests__/utils/index.ts";
 import { login } from "./utils.js";
 import { test, expect } from "vitest";
 

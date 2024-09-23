@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { authenticator } from "otplib";
-import { databaseTest } from "../__tests__/utils/index.js";
+import { databaseTest } from "../__tests__/utils/index.ts";
 import { login, USER } from "./utils.js";
 import { test, expect } from "vitest";
 

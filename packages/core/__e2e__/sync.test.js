@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Database from "../src/api/index.js";
-import { NodeStorageInterface } from "../__mocks__/node-storage.mock.js";
-import { FS } from "../__mocks__/fs.mock.js";
+import Database from "../src/api/index.ts";
+import { NodeStorageInterface } from "../__mocks__/node-storage.mock.ts";
+import { FS } from "../__mocks__/fs.mock.ts";
 import Compressor from "../__mocks__/compressor.mock.js";
-import { CHECK_IDS, EV, EVENTS } from "../src/common.js";
+import { CHECK_IDS, EV, EVENTS } from "../src/common.ts";
 import { EventSource } from "event-source-polyfill";
 import { test, expect, vitest } from "vitest";
 import { login } from "./utils.js";
