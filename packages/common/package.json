@@ -1,19 +1,29 @@
 {
   "name": "@notesnook/common",
-  "version": "2.0.7",
+  "version": "2.1.1",
   "description": "A set of common utilities shared across multiple Notesnook clients and services.",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "require": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "import": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
   "scripts": {
-    "pub": "tsc && np",
-    "build": "tsc"
+    "prepublishOnly": "npm run build",
+    "build": "tsup-node src/index.ts",
+    "watch": "npm run build -- --watch"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/streetwriters/notesnook.git"
   },
-  "keywords": [
-    "logger"
-  ],
   "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/streetwriters/notesnook/issues"
@@ -31,6 +41,8 @@
   },
   "dependencies": {
     "@notesnook/core": "^8.0.0",
+    "@readme/data-urls": "^3.0.0",
+    "dayjs": "^1.11.13",
     "pathe": "^1.1.2",
     "timeago.js": "4.0.2"
   }
