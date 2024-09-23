@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { FetchOptions } from "./fetch";
+import { FetchOptions } from "./fetch.js";
 
 export type ClipArea = "full-page" | "visible" | "selection" | "article";
 export type ClipMode = "simplified" | "screenshot" | "complete";

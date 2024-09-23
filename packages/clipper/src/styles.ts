@@ -16,11 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { constructUrl, FetchOptions } from "./fetch";
+import { constructUrl, FetchOptions } from "./fetch.js";
 import { compare, calculate, SpecificityArray } from "specificity";
-import { tokenize } from "./css-tokenizer";
+import { tokenize } from "./css-tokenizer.js";
 import { stringify, parse, SelectorType } from "css-what";
-import { safeQuerySelectorAll } from "./utils";
+import { safeQuerySelectorAll } from "./utils.js";
 
 const SHORTHANDS = [
   "animation",

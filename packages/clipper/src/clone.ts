@@ -16,9 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { createImage, FetchOptions } from "./fetch";
-import { Filter } from "./types";
-import { uid } from "./utils";
+import { createImage, FetchOptions } from "./fetch.js";
+import { Filter } from "./types.js";
+import { uid } from "./utils.js";
 
 const SVGElements = [
   "altGlyph",

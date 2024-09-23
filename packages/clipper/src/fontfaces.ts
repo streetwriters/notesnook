@@ -16,8 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { FetchOptions } from "./fetch";
-import { inlineAll, shouldProcess } from "./inliner";
+import { FetchOptions } from "./fetch.js";
+import { inlineAll, shouldProcess } from "./inliner.js";
 
 async function resolveAll(options?: FetchOptions) {
   const fonts = readAll();
