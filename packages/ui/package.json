@@ -1,8 +1,20 @@
 {
   "name": "@notesnook/ui",
-  "version": "2.0.8",
+  "version": "2.1.1",
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "license": "GPL-3.0-or-later",
+  "exports": {
+    "require": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "import": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/streetwriters/notesnook.git"
@@ -38,8 +50,8 @@
     "react-dom": ">=18"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsup-node src/index.ts",
     "prepublishOnly": "npm run build",
-    "watch": "tsc --watch"
+    "watch": "npm run build -- --watch"
   }
 }
