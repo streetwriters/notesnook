@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { consoleReporter } from "./reporters/console";
-import { ILogReporter, LoggerConfig, LogLevel } from "./types";
+import { consoleReporter } from "./reporters/console.js";
+import { ILogReporter, LoggerConfig, LogLevel } from "./types.js";
 
 type LogLevelFunc = (message: string, extras?: Record<string, unknown>) => void;
 type ErrorLogLevelFunc = (
@@ -48,12 +48,12 @@ export class Logger implements ILogger {
   scope(scope: string) {
     return new Logger({ ...this.config, scope });
   }
-  fatal = errorLogLevelFactory(LogLevel.Fatal, this.config);
-  warn = logLevelFactory(LogLevel.Warn, this.config);
-  debug = logLevelFactory(LogLevel.Debug, this.config);
-  error = errorLogLevelFactory(LogLevel.Error, this.config);
-  info = logLevelFactory(LogLevel.Info, this.config);
-  log = logLevelFactory(LogLevel.Log, this.config);
+  fatal = errorLogLevelFactory(LogLevel.Fatal, () => this.config);
+  warn = logLevelFactory(LogLevel.Warn, () => this.config);
+  debug = logLevelFactory(LogLevel.Debug, () => this.config);
+  error = errorLogLevelFactory(LogLevel.Error, () => this.config);
+  info = logLevelFactory(LogLevel.Info, () => this.config);
+  log = logLevelFactory(LogLevel.Log, () => this.config);
 
   measure(tag: string) {
     performance.mark(tag);
@@ -84,12 +84,13 @@ export class NoopLogger implements ILogger {
   }
 }
 
-export * from "./types";
-export * from "./reporters";
+export * from "./types.js";
+export * from "./reporters/index.js";
 
-function logLevelFactory(level: LogLevel, config: LoggerConfig) {
+function logLevelFactory(level: LogLevel, getConfig: () => LoggerConfig) {
   return (message: string, extras?: Record<string, unknown>) => {
     const now = Date.now();
+    const config = getConfig();
     config.reporter.write({
       level,
       message,
@@ -102,13 +103,14 @@ function logLevelFactory(level: LogLevel, config: LoggerConfig) {
   };
 }
 
-function errorLogLevelFactory(level: LogLevel, config: LoggerConfig) {
+function errorLogLevelFactory(level: LogLevel, getConfig: () => LoggerConfig) {
   return (
     error: Error | unknown,
     fallbackMessage?: string,
     extras?: Record<string, unknown>
   ) => {
     const now = Date.now();
+    const config = getConfig();
     config.reporter.write({
       level,
       message:
