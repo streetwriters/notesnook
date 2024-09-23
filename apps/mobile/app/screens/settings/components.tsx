@@ -23,7 +23,7 @@ import { AccentColorPicker } from "./appearance";
 import DebugLogs from "./debug";
 import { ConfigureToolbar } from "./editor/configure-toolbar";
 import { Licenses } from "./licenses";
-import { AttachmentGroupProgress } from "./offline-mode-progress";
+import { AttachmentGroupProgress } from "./attachment-group-progress";
 import {
   ApplockTimerPicker,
   BackupReminderPicker,
@@ -40,6 +40,7 @@ import SoundPicker from "./sound-picker";
 import { Subscription } from "./subscription";
 import ThemeSelector from "./theme-selector";
 import { TitleFormat } from "./title-format";
+import { View } from "react-native";
 
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
@@ -61,5 +62,9 @@ export const components: { [name: string]: ReactElement } = {
   backuprestore: <RestoreBackup />,
   "server-config": <ServersConfiguration />,
   "attachments-manager": <AttachmentDialog note={undefined} isSheet={false} />,
-  "offline-mode-progress": <AttachmentGroupProgress groupId="offline-mode" />
+  "offline-mode-progress": (
+    <View style={{ paddingHorizontal: 12 }}>
+      <AttachmentGroupProgress groupId="offline-mode" />
+    </View>
+  )
 };

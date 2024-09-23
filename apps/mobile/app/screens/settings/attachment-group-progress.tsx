@@ -39,7 +39,6 @@ export const AttachmentGroupProgress = (props: { groupId?: string }) => {
   const [fileProgress] = useAttachmentProgress(file, false);
 
   return !progress ||
-    progress.success ||
     progress.canceled ||
     progress.current === progress.total ? null : (
     <View

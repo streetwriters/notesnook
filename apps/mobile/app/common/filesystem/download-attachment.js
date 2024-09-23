@@ -180,7 +180,7 @@ export async function downloadAttachments(attachments) {
       current: 0,
       total: 0,
       message: undefined,
-      success: true,
+      success: false,
       groupId
     });
     releasePermissions(outputFolder);

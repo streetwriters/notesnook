@@ -34,7 +34,7 @@ import create from "zustand";
 import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import { downloadAttachments } from "../../common/filesystem/download-attachment";
-import { AttachmentGroupProgress } from "../../screens/settings/offline-mode-progress";
+import { AttachmentGroupProgress } from "../../screens/settings/attachment-group-progress";
 import { presentSheet, ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { SIZE } from "../../utils/size";
