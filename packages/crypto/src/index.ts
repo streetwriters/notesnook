@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { initialize } from "@notesnook/sodium";
+import { ISodium, Sodium } from "@notesnook/sodium";
 import Decryption from "./decryption.js";
 import Encryption from "./encryption.js";
 import { INNCrypto } from "./interfaces.js";
@@ -34,10 +34,11 @@ import {
 
 export class NNCrypto implements INNCrypto {
   private isReady = false;
+  private sodium: ISodium = new Sodium();
 
   private async init() {
     if (this.isReady) return;
-    await initialize();
+    await this.sodium.initialize();
     this.isReady = true;
   }
 
@@ -49,6 +50,7 @@ export class NNCrypto implements INNCrypto {
   ): Promise<Cipher<TOutputFormat>> {
     await this.init();
     return Encryption.encrypt(
+      this.sodium,
       key,
       input,
       format,
@@ -64,7 +66,7 @@ export class NNCrypto implements INNCrypto {
   ): Promise<Cipher<TOutputFormat>[]> {
     await this.init();
     return items.map((data) =>
-      Encryption.encrypt(key, data, format, outputFormat)
+      Encryption.encrypt(this.sodium, key, data, format, outputFormat)
     );
   }
 
@@ -74,7 +76,7 @@ export class NNCrypto implements INNCrypto {
     outputFormat: TOutputFormat = "text" as TOutputFormat
   ): Promise<Output<TOutputFormat>> {
     await this.init();
-    return Decryption.decrypt(key, cipherData, outputFormat);
+    return Decryption.decrypt(this.sodium, key, cipherData, outputFormat);
   }
 
   async decryptMulti<TOutputFormat extends DataFormat>(
@@ -85,88 +87,37 @@ export class NNCrypto implements INNCrypto {
     await this.init();
     const decryptedItems: Output<TOutputFormat>[] = [];
     for (const cipherData of items) {
-      decryptedItems.push(Decryption.decrypt(key, cipherData, outputFormat));
+      decryptedItems.push(
+        Decryption.decrypt(this.sodium, key, cipherData, outputFormat)
+      );
     }
     return decryptedItems;
   }
 
   async hash(password: string, salt: string): Promise<string> {
     await this.init();
-    return Password.hash(password, salt);
+    return Password.hash(this.sodium, password, salt);
   }
 
   async deriveKey(password: string, salt?: string): Promise<EncryptionKey> {
     await this.init();
-    return KeyUtils.deriveKey(password, salt);
+    return KeyUtils.deriveKey(this.sodium, password, salt);
   }
 
   async exportKey(password: string, salt?: string): Promise<SerializedKey> {
     await this.init();
-    return KeyUtils.exportKey(password, salt);
+    return KeyUtils.exportKey(this.sodium, password, salt);
   }
 
   async createEncryptionStream(key: SerializedKey) {
     await this.init();
-    return Encryption.createStream(key);
-
-    // // eslint-disable-next-line no-constant-condition
-    // while (true) {
-    //   const chunk = await stream.read();
-    //   if (!chunk) break;
-
-    //   const { data, final } = chunk;
-    //   if (!data) break;
-
-    //   const encryptedChunk: Chunk = {
-    //     data: encryptionStream.write(data, final),
-    //     final
-    //   };
-    //   await stream.write(encryptedChunk);
-
-    //   if (final) break;
-    // }
-    // return encryptionStream.header;
+    return Encryption.createStream(this.sodium, key);
   }
 
   async createDecryptionStream(key: SerializedKey, iv: string) {
     await this.init();
-    return Decryption.createStream(iv, key);
-    // eslint-disable-next-line no-constant-condition
-    // while (true) {
-    //   const chunk = await stream.read();
-    //   if (!chunk) break;
-
-    //   const { data, final } = chunk;
-    //   if (!data) break;
-
-    //   const decryptedChunk: Chunk = {
-    //     data: decryptionStream.read(data),
-    //     final
-    //   };
-    //   await stream.write(decryptedChunk);
-
-    //   if (final) break;
-    // }
+    return Decryption.createStream(this.sodium, iv, key);
   }
-
-  // async encryptStream(
-  //   key: SerializedKey,
-  //   stream: IStreamable,
-  //   _streamId?: string
-  // ): Promise<string> {
-  //   await this.init();
-  //   return await this.createEncryptionStream(key, stream);
-  // }
-
-  // async decryptStream(
-  //   key: SerializedKey,
-  //   iv: string,
-  //   stream: IStreamable,
-  //   _streamId?: string
-  // ): Promise<void> {
-  //   await this.init();
-  //   await this.createDecryptionStream(iv, key, stream);
-  // }
 }
 
 export * from "./types.js";

@@ -32,18 +32,27 @@ import {
   crypto_secretstream_xchacha20poly1305_HEADERBYTES,
   crypto_secretstream_xchacha20poly1305_ABYTES,
   crypto_secretstream_xchacha20poly1305_STATEBYTES,
-  crypto_secretstream_xchacha20poly1305_TAGBYTES
+  crypto_secretstream_xchacha20poly1305_TAGBYTES,
+  crypto_pwhash_ALG_ARGON2ID13,
+  crypto_pwhash_SALTBYTES,
+  crypto_pwhash_ALG_ARGON2I13,
+  crypto_pwhash_ALG_DEFAULT,
+  crypto_pwhash_OPSLIMIT_INTERACTIVE,
+  crypto_pwhash_OPSLIMIT_MODERATE,
+  crypto_pwhash_OPSLIMIT_SENSITIVE,
+  crypto_pwhash_MEMLIMIT_INTERACTIVE,
+  crypto_pwhash_MEMLIMIT_MODERATE,
+  crypto_pwhash_MEMLIMIT_SENSITIVE,
+  crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
+  crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
+  crypto_secretstream_xchacha20poly1305_TAG_FINAL,
+  crypto_secretstream_xchacha20poly1305_TAG_MESSAGE
 } from "sodium-native";
 import { Buffer } from "node:buffer";
+import { base64_variants, ISodium } from "./types";
 
 export type Uint8ArrayOutputFormat = "uint8array";
 export type StringOutputFormat = "text" | "hex" | "base64";
-export enum base64_variants {
-  ORIGINAL = 1,
-  ORIGINAL_NO_PADDING = 3,
-  URLSAFE = 5,
-  URLSAFE_NO_PADDING = 7
-}
 export type StateAddress = { name: string };
 export interface MessageTag {
   message: Uint8Array;
@@ -54,9 +63,7 @@ export interface StringMessageTag {
   tag: number;
 }
 
-export async function initialize() {}
-
-export function crypto_pwhash(
+function crypto_pwhash(
   keyLength: number,
   password: string | Uint8Array,
   salt: Uint8Array,
@@ -65,7 +72,7 @@ export function crypto_pwhash(
   algorithm: number,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
-export function crypto_pwhash(
+function crypto_pwhash(
   keyLength: number,
   password: string | Uint8Array,
   salt: Uint8Array,
@@ -74,7 +81,7 @@ export function crypto_pwhash(
   algorithm: number,
   outputFormat: StringOutputFormat
 ): string;
-export function crypto_pwhash(
+function crypto_pwhash(
   keyLength: number,
   password: string | Uint8Array,
   salt: Uint8Array,
@@ -98,19 +105,19 @@ export function crypto_pwhash(
   );
 }
 
-export function crypto_generichash(
+function crypto_generichash(
   hash_length: number,
   message: string | Uint8Array,
   key?: string | Uint8Array | null,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
-export function crypto_generichash(
+function crypto_generichash(
   hash_length: number,
   message: string | Uint8Array,
   key: string | Uint8Array | null,
   outputFormat: StringOutputFormat
 ): string;
-export function crypto_generichash(
+function crypto_generichash(
   hash_length: number,
   message: string | Uint8Array,
   key?: string | Uint8Array | null,
@@ -131,7 +138,7 @@ export function crypto_generichash(
   );
 }
 
-export function crypto_aead_xchacha20poly1305_ietf_encrypt(
+function crypto_aead_xchacha20poly1305_ietf_encrypt(
   message: string | Uint8Array,
   additional_data: string | Uint8Array | null,
   secret_nonce: string | Uint8Array | null,
@@ -139,7 +146,7 @@ export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   key: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
-export function crypto_aead_xchacha20poly1305_ietf_encrypt(
+function crypto_aead_xchacha20poly1305_ietf_encrypt(
   message: string | Uint8Array,
   additional_data: string | Uint8Array | null,
   secret_nonce: string | Uint8Array | null,
@@ -147,7 +154,7 @@ export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   key: Uint8Array,
   outputFormat: StringOutputFormat
 ): string;
-export function crypto_aead_xchacha20poly1305_ietf_encrypt(
+function crypto_aead_xchacha20poly1305_ietf_encrypt(
   message: string | Uint8Array,
   additional_data: string | Uint8Array | null,
   secret_nonce: string | Uint8Array | null,
@@ -171,15 +178,15 @@ export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   );
 }
 
-export function crypto_secretstream_xchacha20poly1305_init_push(
+function crypto_secretstream_xchacha20poly1305_init_push(
   key: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): { state: StateAddress; header: Uint8Array };
-export function crypto_secretstream_xchacha20poly1305_init_push(
+function crypto_secretstream_xchacha20poly1305_init_push(
   key: Uint8Array,
   outputFormat: StringOutputFormat
 ): { state: StateAddress; header: string };
-export function crypto_secretstream_xchacha20poly1305_init_push(
+function crypto_secretstream_xchacha20poly1305_init_push(
   key: Uint8Array,
   outputFormat?: StringOutputFormat | Uint8ArrayOutputFormat | null
 ): { state: StateAddress; header: string | Uint8Array } {
@@ -198,21 +205,21 @@ export function crypto_secretstream_xchacha20poly1305_init_push(
   return { state: state as unknown as StateAddress, header };
 }
 
-export function crypto_secretstream_xchacha20poly1305_push(
+function crypto_secretstream_xchacha20poly1305_push(
   state_address: StateAddress,
   message_chunk: string | Uint8Array,
   ad: string | Uint8Array | null,
   tag: number,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
-export function crypto_secretstream_xchacha20poly1305_push(
+function crypto_secretstream_xchacha20poly1305_push(
   state_address: StateAddress,
   message_chunk: string | Uint8Array,
   ad: string | Uint8Array | null,
   tag: number,
   outputFormat: StringOutputFormat
 ): string;
-export function crypto_secretstream_xchacha20poly1305_push(
+function crypto_secretstream_xchacha20poly1305_push(
   state_address: StateAddress,
   message_chunk: string | Uint8Array,
   ad: string | Uint8Array | null,
@@ -234,7 +241,7 @@ export function crypto_secretstream_xchacha20poly1305_push(
   );
 }
 
-export function crypto_aead_xchacha20poly1305_ietf_decrypt(
+function crypto_aead_xchacha20poly1305_ietf_decrypt(
   secret_nonce: string | Uint8Array | null,
   ciphertext: string | Uint8Array,
   additional_data: string | Uint8Array | null,
@@ -242,7 +249,7 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
   key: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
-export function crypto_aead_xchacha20poly1305_ietf_decrypt(
+function crypto_aead_xchacha20poly1305_ietf_decrypt(
   secret_nonce: string | Uint8Array | null,
   ciphertext: string | Uint8Array,
   additional_data: string | Uint8Array | null,
@@ -250,7 +257,7 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
   key: Uint8Array,
   outputFormat: StringOutputFormat
 ): string;
-export function crypto_aead_xchacha20poly1305_ietf_decrypt(
+function crypto_aead_xchacha20poly1305_ietf_decrypt(
   _secret_nonce: string | Uint8Array | null,
   ciphertext: string | Uint8Array,
   additional_data: string | Uint8Array | null,
@@ -274,7 +281,7 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
   );
 }
 
-export function crypto_secretstream_xchacha20poly1305_init_pull(
+function crypto_secretstream_xchacha20poly1305_init_pull(
   header: Uint8Array,
   key: Uint8Array
 ): StateAddress {
@@ -287,19 +294,19 @@ export function crypto_secretstream_xchacha20poly1305_init_pull(
   return state as unknown as StateAddress;
 }
 
-export function crypto_secretstream_xchacha20poly1305_pull(
+function crypto_secretstream_xchacha20poly1305_pull(
   state_address: StateAddress,
   cipher: string | Uint8Array,
   ad?: string | Uint8Array | null,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): MessageTag;
-export function crypto_secretstream_xchacha20poly1305_pull(
+function crypto_secretstream_xchacha20poly1305_pull(
   state_address: StateAddress,
   cipher: string | Uint8Array,
   ad: string | Uint8Array | null,
   outputFormat: StringOutputFormat
 ): StringMessageTag;
-export function crypto_secretstream_xchacha20poly1305_pull(
+function crypto_secretstream_xchacha20poly1305_pull(
   state_address: StateAddress,
   ciphertext: string | Uint8Array,
   ad?: string | Uint8Array | null,
@@ -322,15 +329,15 @@ export function crypto_secretstream_xchacha20poly1305_pull(
   return { message, tag: tag.readUInt8() } as MessageTag | StringMessageTag;
 }
 
-export function randombytes_buf(
+function randombytes_buf(
   length: number,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
-export function randombytes_buf(
+function randombytes_buf(
   length: number,
   outputFormat: StringOutputFormat
 ): string;
-export function randombytes_buf(
+function randombytes_buf(
   length: number,
   outputFormat?: StringOutputFormat | Uint8ArrayOutputFormat | null
 ): string | Uint8Array {
@@ -341,10 +348,7 @@ export function randombytes_buf(
   );
 }
 
-export function from_base64(
-  input: string,
-  variant?: base64_variants
-): Uint8Array {
+function from_base64(input: string, variant?: base64_variants): Uint8Array {
   return new Uint8Array(
     Buffer.from(
       variant === base64_variants.URLSAFE_NO_PADDING ||
@@ -359,7 +363,7 @@ export function from_base64(
   );
 }
 
-export function to_base64(
+function to_base64(
   input: string | Uint8Array,
   variant: base64_variants = base64_variants.URLSAFE_NO_PADDING
 ): string {
@@ -377,32 +381,15 @@ export function to_base64(
     : base64;
 }
 
-export function from_hex(input: string): Uint8Array {
+function from_hex(input: string): Uint8Array {
   return new Uint8Array(Buffer.from(input, "hex"));
 }
 
-export function to_string(input: Uint8Array): string {
+function to_string(input: Uint8Array): string {
   return Buffer.from(input, input.byteOffset, input.byteLength).toString(
     "utf-8"
   );
 }
-
-export {
-  crypto_pwhash_ALG_ARGON2ID13,
-  crypto_pwhash_SALTBYTES,
-  crypto_pwhash_ALG_ARGON2I13,
-  crypto_pwhash_ALG_DEFAULT,
-  crypto_pwhash_OPSLIMIT_INTERACTIVE,
-  crypto_pwhash_OPSLIMIT_MODERATE,
-  crypto_pwhash_OPSLIMIT_SENSITIVE,
-  crypto_pwhash_MEMLIMIT_INTERACTIVE,
-  crypto_pwhash_MEMLIMIT_MODERATE,
-  crypto_pwhash_MEMLIMIT_SENSITIVE,
-  crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
-  crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
-  crypto_secretstream_xchacha20poly1305_TAG_FINAL,
-  crypto_secretstream_xchacha20poly1305_TAG_MESSAGE
-} from "sodium-native";
 
 type ToBufferInput = string | Uint8Array | null | undefined;
 type ToBufferResult<TInput extends ToBufferInput> = TInput extends
@@ -461,3 +448,97 @@ function trimPadding(str: string): string {
   }
   return str;
 }
+
+export class Sodium implements ISodium {
+  async initialize() {}
+
+  get crypto_generichash() {
+    return crypto_generichash;
+  }
+
+  get crypto_pwhash() {
+    return crypto_pwhash;
+  }
+
+  get crypto_pwhash_ALG_ARGON2ID13() {
+    return crypto_pwhash_ALG_ARGON2ID13;
+  }
+  get crypto_pwhash_SALTBYTES() {
+    return crypto_pwhash_SALTBYTES;
+  }
+  get crypto_pwhash_ALG_ARGON2I13() {
+    return crypto_pwhash_ALG_ARGON2I13;
+  }
+  get crypto_pwhash_ALG_DEFAULT() {
+    return crypto_pwhash_ALG_DEFAULT;
+  }
+  get crypto_pwhash_OPSLIMIT_INTERACTIVE() {
+    return crypto_pwhash_OPSLIMIT_INTERACTIVE;
+  }
+  get crypto_pwhash_OPSLIMIT_MODERATE() {
+    return crypto_pwhash_OPSLIMIT_MODERATE;
+  }
+  get crypto_pwhash_OPSLIMIT_SENSITIVE() {
+    return crypto_pwhash_OPSLIMIT_SENSITIVE;
+  }
+  get crypto_pwhash_MEMLIMIT_INTERACTIVE() {
+    return crypto_pwhash_MEMLIMIT_INTERACTIVE;
+  }
+  get crypto_pwhash_MEMLIMIT_MODERATE() {
+    return crypto_pwhash_MEMLIMIT_MODERATE;
+  }
+  get crypto_pwhash_MEMLIMIT_SENSITIVE() {
+    return crypto_pwhash_MEMLIMIT_SENSITIVE;
+  }
+
+  // helpers
+  get from_base64() {
+    return from_base64;
+  }
+  get to_base64() {
+    return to_base64;
+  }
+  get randombytes_buf() {
+    return randombytes_buf;
+  }
+  get to_string() {
+    return to_string;
+  }
+  get from_hex() {
+    return from_hex;
+  }
+
+  // aead
+  get crypto_aead_xchacha20poly1305_ietf_KEYBYTES() {
+    return crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
+  }
+  get crypto_aead_xchacha20poly1305_ietf_encrypt() {
+    return crypto_aead_xchacha20poly1305_ietf_encrypt;
+  }
+  get crypto_aead_xchacha20poly1305_ietf_decrypt() {
+    return crypto_aead_xchacha20poly1305_ietf_decrypt;
+  }
+  get crypto_secretstream_xchacha20poly1305_init_push() {
+    return crypto_secretstream_xchacha20poly1305_init_push;
+  }
+  get crypto_secretstream_xchacha20poly1305_push() {
+    return crypto_secretstream_xchacha20poly1305_push;
+  }
+  get crypto_secretstream_xchacha20poly1305_init_pull() {
+    return crypto_secretstream_xchacha20poly1305_init_pull;
+  }
+  get crypto_secretstream_xchacha20poly1305_pull() {
+    return crypto_secretstream_xchacha20poly1305_pull;
+  }
+  get crypto_aead_xchacha20poly1305_ietf_NPUBBYTES() {
+    return crypto_aead_xchacha20poly1305_ietf_NPUBBYTES;
+  }
+  get crypto_secretstream_xchacha20poly1305_TAG_FINAL() {
+    return crypto_secretstream_xchacha20poly1305_TAG_FINAL;
+  }
+  get crypto_secretstream_xchacha20poly1305_TAG_MESSAGE() {
+    return crypto_secretstream_xchacha20poly1305_TAG_MESSAGE;
+  }
+}
+
+export { base64_variants, type ISodium };
