@@ -150,11 +150,9 @@ function showIssueReportedDialog({ url }: { url: string }) {
   return ConfirmDialog.show({
     title: "Thank you for reporting!",
     positiveButtonText: "Copy link",
-    message: "You can track your bug report at [" + url + "](" + url + ")."
-
-      + "\n\n<br />Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**"
-
-      + "\n\n<br />If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support."
+    message: `You can track your bug report at [${url}](${url}).`
+      + `\n\nPlease note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**`
+      + `\n\nIf your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`
   }).then((result) => {
     result && writeText(url);
   });
