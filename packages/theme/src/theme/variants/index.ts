@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { buttonVariants } from "./button";
-import { inputVariants } from "./input";
-import { textVariants } from "./text";
-import { createFlexVariants } from "./flex";
+import { buttonVariants } from "./button.js";
+import { inputVariants } from "./input.js";
+import { textVariants } from "./text.js";
+import { createFlexVariants } from "./flex.js";
 
 export const variants = {
   buttons: buttonVariants,

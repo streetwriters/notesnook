@@ -26,7 +26,7 @@ import {
   ThemeScopes,
   Variants,
   VariantsWithStaticColors
-} from "./types";
+} from "./types.js";
 import _ThemeLight from "./themes/default-light.json";
 import tc from "tinycolor2";
 import _ThemeDark from "./themes/default-dark.json";

@@ -26,8 +26,8 @@ import {
   ThemeDefinition,
   ThemeScopes,
   VariantsWithStaticColors
-} from "./types";
-import { buildVariants } from "./utils";
+} from "./types.js";
+import { buildVariants } from "./utils.js";
 
 const ThemeLight = _ThemeLight as ThemeDefinition;
 const ThemeDark = _ThemeDark as ThemeDefinition;
@@ -73,5 +73,5 @@ export const useCurrentThemeScope = () => useContext(ThemeScopeContext);
 export const ScopedThemeProvider = ThemeScopeContext.Provider;
 export const THEME_COMPATIBILITY_VERSION: ThemeCompatibilityVersion = 1;
 export { ThemeLight, ThemeDark, useThemeEngineStore, type ThemeEngineState };
-export { getPreviewColors, themeToCSS } from "./utils";
-export { validateTheme } from "./validator";
+export { getPreviewColors, themeToCSS } from "./utils.js";
+export { validateTheme } from "./validator.js";
