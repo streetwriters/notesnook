@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import FileHandle from "./src/filehandle";
-import { IFileStorage, IStreamableFS } from "./src/interfaces";
-import { File } from "./src/types";
-import { chunkPrefix } from "./src/utils";
+import FileHandle from "./filehandle.js";
+import { IFileStorage, IStreamableFS } from "./interfaces.js";
+import { File } from "./types.js";
+import { chunkPrefix } from "./utils.js";
 
 export class StreamableFS implements IStreamableFS {
   /**
@@ -81,3 +81,5 @@ export class StreamableFS implements IStreamableFS {
     await this.storage.clear();
   }
 }
+
+export type { IFileStorage, File, FileHandle };
