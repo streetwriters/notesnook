@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Database from "..";
-import { EVENTS } from "../../common";
-import { DatabaseUpdatedEvent } from "../../database";
-import { logger } from "../../logger";
+import Database from "../index.js";
+import { EVENTS } from "../../common.js";
+import { DatabaseUpdatedEvent } from "../../database/index.js";
+import { logger } from "../../logger.js";
 
 export class AutoSync {
   timeout = 0;

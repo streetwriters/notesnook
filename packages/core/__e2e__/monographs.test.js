@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { databaseTest, noteTest } from "../__tests__/utils";
-import { login, logout } from "./utils";
+import { databaseTest, noteTest } from "../__tests__/utils/index.js";
+import { login, logout } from "./utils.js";
 import { test, expect, afterAll } from "vitest";
 
 const TEST_TIMEOUT = 30 * 1000;

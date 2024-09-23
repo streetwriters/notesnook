@@ -18,15 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { match } from "fuzzyjs";
-import Database from ".";
-import { Item, Note, TrashItem } from "../types";
-import { DatabaseSchema, RawDatabaseSchema } from "../database";
+import Database from "./index.js";
+import { Item, Note, TrashItem } from "../types.js";
+import { DatabaseSchema, RawDatabaseSchema } from "../database/index.js";
 import { AnyColumnWithTable, Kysely, sql } from "@streetwriters/kysely";
-import { FilteredSelector } from "../database/sql-collection";
-import { VirtualizedGrouping } from "../utils/virtualized-grouping";
-import { logger } from "../logger";
-import { rebuildSearchIndex } from "../database/fts";
-import { transformQuery } from "../utils/query-transformer";
+import { FilteredSelector } from "../database/sql-collection.js";
+import { VirtualizedGrouping } from "../utils/virtualized-grouping.js";
+import { logger } from "../logger.js";
+import { rebuildSearchIndex } from "../database/fts.js";
+import { transformQuery } from "../utils/query-transformer.js";
 
 type SearchResults<T> = {
   sorted: (limit?: number) => Promise<VirtualizedGrouping<T>>;

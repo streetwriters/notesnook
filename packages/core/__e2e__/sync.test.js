@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Database from "../src/api/index";
-import { NodeStorageInterface } from "../__mocks__/node-storage.mock";
-import { FS } from "../__mocks__/fs.mock";
-import Compressor from "../__mocks__/compressor.mock";
-import { CHECK_IDS, EV, EVENTS } from "../src/common";
+import Database from "../src/api/index.js";
+import { NodeStorageInterface } from "../__mocks__/node-storage.mock.js";
+import { FS } from "../__mocks__/fs.mock.js";
+import Compressor from "../__mocks__/compressor.mock.js";
+import { CHECK_IDS, EV, EVENTS } from "../src/common.js";
 import { EventSource } from "event-source-polyfill";
 import { test, expect, vitest } from "vitest";
-import { login } from "./utils";
+import { login } from "./utils.js";
 import { SqliteDialect } from "@streetwriters/kysely";
 import BetterSQLite3 from "better-sqlite3-multiple-ciphers";
 

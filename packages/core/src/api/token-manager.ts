@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import http from "../utils/http";
-import constants from "../utils/constants";
-import { EV, EVENTS } from "../common";
+import http from "../utils/http.js";
+import constants from "../utils/constants.js";
+import { EV, EVENTS } from "../common.js";
 import { withTimeout, Mutex } from "async-mutex";
-import { logger } from "../logger";
-import { KVStorageAccessor } from "../interfaces";
+import { logger } from "../logger.js";
+import { KVStorageAccessor } from "../interfaces.js";
 
 export type Token = {
   access_token: string;

@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import http from "../utils/http";
-import constants from "../utils/constants";
-import TokenManager from "./token-manager";
+import http from "../utils/http.js";
+import constants from "../utils/constants.js";
+import TokenManager from "./token-manager.js";
 
 const ENDPOINTS = {
   setup: "/mfa",

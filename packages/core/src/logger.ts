@@ -29,8 +29,8 @@ import {
   ILogger
 } from "@notesnook/logger";
 import { Kysely, Migration, MigrationProvider } from "@streetwriters/kysely";
-import { SQLiteOptions, createDatabase } from "./database";
-import { toChunks } from "./utils/array";
+import { SQLiteOptions, createDatabase } from "./database/index.js";
+import { toChunks } from "./utils/array.js";
 
 const WEEK = 86400000 * 7;
 

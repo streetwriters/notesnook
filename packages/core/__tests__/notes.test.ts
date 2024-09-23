@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import dayjs from "dayjs";
-import Database from "../src/api";
-import { createKeySelector, groupArray } from "../src/utils/grouping";
+import Database from "../src/api/index.js";
+import { createKeySelector, groupArray } from "../src/utils/grouping.js";
 import {
   databaseTest,
   noteTest,
@@ -27,10 +27,9 @@ import {
   TEST_NOTEBOOK,
   IMG_CONTENT,
   loginFakeUser
-} from "./utils";
+} from "./utils/index.js";
 import { test, expect } from "vitest";
-import { MONTHS_FULL } from "../src/utils/date";
-import { GroupOptions, Note } from "../src/types";
+import { GroupOptions, Note } from "../src/types.js";
 
 async function createAndAddNoteToNotebook(
   db: Database,

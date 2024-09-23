@@ -17,19 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import DB from "../../src/api";
-import { NodeStorageInterface } from "../../__mocks__/node-storage.mock";
-import { FS } from "../../__mocks__/fs.mock";
-import Compressor from "../../__mocks__/compressor.mock";
+import DB from "../../src/api/index.js";
+import { NodeStorageInterface } from "../../__mocks__/node-storage.mock.js";
+import { FS } from "../../__mocks__/fs.mock.js";
+import Compressor from "../../__mocks__/compressor.mock.js";
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
-import { randomBytes } from "../../src/utils/random";
-import { Note, Notebook } from "../../src/types";
-import { NoteContent } from "../../src/collections/session-content";
+import { randomBytes } from "../../src/utils/random.js";
+import { Note, Notebook } from "../../src/types.js";
+import { NoteContent } from "../../src/collections/session-content.js";
 import { SqliteDialect } from "@streetwriters/kysely";
 import BetterSQLite3 from "better-sqlite3-multiple-ciphers";
 import path from "path";
 import { tmpdir } from "os";
-import { getId } from "../../src/utils/id";
+import { getId } from "../../src/utils/id.js";
 import { existsSync, mkdirSync } from "fs";
 
 const TEST_NOTEBOOK: Partial<Notebook> = {

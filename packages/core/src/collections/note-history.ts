@@ -17,20 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Database from "../api";
-import { isCipher } from "../database/crypto";
-import { FilteredSelector, SQLCollection } from "../database/sql-collection";
-import { HistorySession, isDeleted } from "../types";
-import { makeSessionContentId } from "../utils/id";
-import { ICollection } from "./collection";
-import { NoteContent, SessionContent } from "./session-content";
+import Database from "../api/index.js";
+import { isCipher } from "../utils/crypto.js";
+import { FilteredSelector, SQLCollection } from "../database/sql-collection.js";
+import { HistorySession, isDeleted, NoteContent } from "../types.js";
+import { makeSessionContentId } from "../utils/id.js";
+import { ICollection } from "./collection.js";
+import { SessionContent } from "./session-content.js";
 
 export class NoteHistory implements ICollection {
   name = "notehistory";
   versionsLimit = 100;
-  sessionContent = new SessionContent(this.db);
+  sessionContent;
   readonly collection: SQLCollection<"notehistory", HistorySession>;
   constructor(private readonly db: Database) {
+    this.sessionContent = new SessionContent(db);
     this.collection = new SQLCollection(
       db.sql,
       db.transaction,

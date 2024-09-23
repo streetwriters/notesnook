@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ICollection } from "./collection";
-import { getId } from "../utils/id";
-import { Color } from "../types";
-import Database from "../api";
-import { Tags } from "./tags";
-import { SQLCollection } from "../database/sql-collection";
-import { isFalse } from "../database";
-import { CHECK_IDS, checkIsUserPremium } from "../common";
+import { ICollection } from "./collection.js";
+import { getId } from "../utils/id.js";
+import { Color } from "../types.js";
+import Database from "../api/index.js";
+import { sanitizeTag } from "./tags.js";
+import { SQLCollection } from "../database/sql-collection.js";
+import { isFalse } from "../database/index.js";
+import { CHECK_IDS, checkIsUserPremium } from "../common.js";
 
 export const DefaultColors: Record<string, string> = {
   red: "#f44336",
@@ -70,7 +70,7 @@ export class Colors implements ICollection {
   // }
 
   async add(item: Partial<Color>) {
-    item.title = item.title ? Tags.sanitize(item.title) : item.title;
+    item.title = item.title ? sanitizeTag(item.title) : item.title;
     const oldColor = item.id
       ? await this.color(item.id)
       : item.colorCode

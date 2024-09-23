@@ -24,17 +24,17 @@ import {
   EVENTS,
   sendSyncProgressEvent,
   SYNC_CHECK_IDS
-} from "../../common";
-import Constants from "../../utils/constants";
-import TokenManager from "../token-manager";
-import Collector from "./collector";
+} from "../../common.js";
+import Constants from "../../utils/constants.js";
+import TokenManager from "../token-manager.js";
+import Collector from "./collector.js";
 import * as signalr from "@microsoft/signalr";
-import Merger from "./merger";
-import { AutoSync } from "./auto-sync";
-import { logger } from "../../logger";
+import Merger from "./merger.js";
+import { AutoSync } from "./auto-sync.js";
+import { logger } from "../../logger.js";
 import { Mutex } from "async-mutex";
-import Database from "..";
-import { migrateItem, migrateVaultKey } from "../../migrations";
+import Database from "../index.js";
+import { migrateItem, migrateVaultKey } from "../../migrations.js";
 import { SerializedKey } from "@notesnook/crypto";
 import {
   Attachment,
@@ -44,15 +44,15 @@ import {
   MaybeDeletedItem,
   Note,
   Notebook
-} from "../../types";
+} from "../../types.js";
 import {
   SYNC_COLLECTIONS_MAP,
   SyncableItemType,
   SyncTransferItem
-} from "./types";
-import { DownloadableFile } from "../../database/fs";
-import { SyncDevices } from "./devices";
-import { DefaultColors } from "../../collections/colors";
+} from "./types.js";
+import { DownloadableFile } from "../../database/fs.js";
+import { SyncDevices } from "./devices.js";
+import { DefaultColors } from "../../collections/colors.js";
 
 export type SyncOptions = {
   type: "full" | "fetch" | "send";
@@ -61,9 +61,12 @@ export type SyncOptions = {
 };
 
 export default class SyncManager {
-  sync = new Sync(this.db);
-  devices = this.sync.devices;
-  constructor(private readonly db: Database) {}
+  sync;
+  devices;
+  constructor(private readonly db: Database) {
+    this.sync = new Sync(db);
+    this.devices = this.sync.devices;
+  }
 
   async start(options: SyncOptions) {
     try {
@@ -114,17 +117,22 @@ export default class SyncManager {
 }
 
 class Sync {
-  collector = new Collector(this.db);
-  merger = new Merger(this.db);
-  autoSync = new AutoSync(this.db, 1000);
+  collector;
+  merger;
+  autoSync;
   logger = logger.scope("Sync");
   syncConnectionMutex = new Mutex();
   connection?: signalr.HubConnection;
-  devices = new SyncDevices(this.db.kv, this.db.tokenManager);
+  devices;
   private conflictedNoteIds: string[] = [];
   private uncachedAttachments: DownloadableFile[] = [];
 
   constructor(private readonly db: Database) {
+    this.collector = new Collector(db);
+    this.merger = new Merger(db);
+    this.autoSync = new AutoSync(db, 1000);
+    this.devices = new SyncDevices(db.kv, db.tokenManager);
+
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.connection?.stop();
       this.autoSync.stop();

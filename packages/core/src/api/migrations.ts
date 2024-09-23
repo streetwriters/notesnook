@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Database from ".";
-import { CURRENT_DATABASE_VERSION } from "../common";
-import Migrator, { MigratableCollections } from "../database/migrator";
+import Database from "./index.js";
+import { CURRENT_DATABASE_VERSION } from "../common.js";
+import Migrator, { MigratableCollections } from "../database/migrator.js";
 
 const collections: MigratableCollections = [
   {

@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { test, expect, describe } from "vitest";
-import { migrateItem, migrateKV, migrateVaultKey } from "../src/migrations";
-import { databaseTest } from "./utils";
-import { getId, makeId } from "../src/utils/id";
-import { DeletedItem, LegacySettingsItem } from "../src/types";
-import { KEYS } from "../src/database/kv";
+import { migrateItem, migrateKV, migrateVaultKey } from "../src/migrations.js";
+import { databaseTest } from "./utils/index.js";
+import { getId, makeId } from "../src/utils/id.js";
+import { DeletedItem, LegacySettingsItem } from "../src/types.js";
+import { KEYS } from "../src/database/kv.js";
 
 describe.concurrent("[5.2] replace date edited with date modified", () => {
   const itemsWithDateEdited = ["note", "notebook", "trash", "tiny"] as const;

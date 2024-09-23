@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ContentType } from "../types";
-import { Tiptap } from "./tiptap";
+import { ContentType } from "../types.js";
+import { Tiptap } from "./tiptap.js";
 
 export function getContentFromData(type: ContentType, data: string) {
   switch (type) {
@@ -30,3 +30,5 @@ export function getContentFromData(type: ContentType, data: string) {
       );
   }
 }
+
+export * from "./tiptap.js";

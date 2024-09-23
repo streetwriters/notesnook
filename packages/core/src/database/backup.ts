@@ -32,8 +32,8 @@ import {
   isDeleted
 } from "../types.js";
 import { Cipher, SerializedKey } from "@notesnook/crypto";
-import { isCipher } from "./crypto.js";
-import { migrateItem } from "../migrations";
+import { isCipher } from "../utils/crypto.js";
+import { migrateItem } from "../migrations.js";
 import { DatabaseCollection } from "./index.js";
 import { DefaultColors } from "../collections/colors.js";
 import { toChunks } from "../utils/array.js";

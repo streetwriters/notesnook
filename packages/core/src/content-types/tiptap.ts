@@ -27,22 +27,22 @@ import {
 } from "html-to-text";
 import { BlockTextBuilder } from "html-to-text/lib/block-text-builder";
 import { parseDocument } from "htmlparser2";
-import dataurl from "../utils/dataurl";
+import dataurl from "../utils/dataurl.js";
 import {
   HTMLParser,
   extractFirstParagraph,
   getDummyDocument
-} from "../utils/html-parser";
-import { HTMLRewriter } from "../utils/html-rewriter";
-import { ContentBlock } from "../types";
+} from "../utils/html-parser.js";
+import { HTMLRewriter } from "../utils/html-rewriter.js";
+import { ContentBlock } from "../types.js";
 import {
   InternalLink,
   isInternalLink,
   parseInternalLink
-} from "../utils/internal-link";
+} from "../utils/internal-link.js";
 import { Element } from "domhandler";
 import { render } from "dom-serializer";
-import { logger } from "../logger";
+import { logger } from "../logger.js";
 
 export type ResolveHashes = (
   hashes: string[]

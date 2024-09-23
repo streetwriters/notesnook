@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { TemplateData } from "..";
-import { hasRequire } from "../../has-require";
-import { parseHTML } from "../../html-parser";
-import { template } from "./template";
+import { TemplateData } from "../index.js";
+import { parseHTML } from "../../html-parser.js";
+import { hasRequire } from "../../has-require.js";
+import { template } from "./template.js";
 
 const replaceableAttributes = {
   'data-float="true" data-align="right"': 'align="right"',

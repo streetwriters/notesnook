@@ -17,20 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getId } from "../utils/id";
-import { getContentFromData } from "../content-types";
-import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format";
-import { clone } from "../utils/clone";
-import { Tiptap } from "../content-types/tiptap";
-import { EMPTY_CONTENT } from "./content";
-import { buildFromTemplate } from "../utils/templates";
-import { Note, TrashOrItem, isTrashItem, isDeleted } from "../types";
-import Database from "../api";
-import { ICollection } from "./collection";
-import { NoteContent } from "./session-content";
-import { SQLCollection } from "../database/sql-collection";
-import { isFalse } from "../database";
-import { logger } from "../logger";
+import { getId } from "../utils/id.js";
+import { getContentFromData } from "../content-types/index.js";
+import { NEWLINE_STRIP_REGEX, formatTitle } from "../utils/title-format.js";
+import { clone } from "../utils/clone.js";
+import { Tiptap } from "../content-types/tiptap.js";
+import { EMPTY_CONTENT } from "./content.js";
+import { buildFromTemplate } from "../utils/templates/index.js";
+import {
+  Note,
+  TrashOrItem,
+  isTrashItem,
+  isDeleted,
+  NoteContent
+} from "../types.js";
+import Database from "../api/index.js";
+import { ICollection } from "./collection.js";
+import { SQLCollection } from "../database/sql-collection.js";
+import { isFalse } from "../database/index.js";
+import { logger } from "../logger.js";
 
 export type ExportOptions = {
   format: "html" | "md" | "txt" | "md-frontmatter";

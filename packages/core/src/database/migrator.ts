@@ -18,18 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Cipher } from "@notesnook/crypto";
-import { DatabaseSchema } from ".";
-import Database from "../api";
+import { DatabaseSchema } from "./index.js";
+import Database from "../api/index.js";
 import {
   CURRENT_DATABASE_VERSION,
   sendMigrationProgressEvent
-} from "../common";
+} from "../common.js";
 import {
   migrateCollection,
   migrateItem,
   migrateKV,
   migrateVaultKey
-} from "../migrations";
+} from "../migrations.js";
 import {
   CollectionType,
   Collections,
@@ -38,10 +38,10 @@ import {
   MaybeDeletedItem,
   isDeleted,
   isTrashItem
-} from "../types";
-import { IndexedCollection } from "./indexed-collection";
-import { SQLCollection } from "./sql-collection";
-import { logger } from "../logger";
+} from "../types.js";
+import { IndexedCollection } from "./indexed-collection.js";
+import { SQLCollection } from "./sql-collection.js";
+import { logger } from "../logger.js";
 
 export type RawItem = MaybeDeletedItem<Item>;
 type MigratableCollection = {

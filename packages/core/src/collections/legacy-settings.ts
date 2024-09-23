@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getId } from "../utils/id";
-import Database from "../api";
-import { LegacySettingsItem } from "../types";
-import { ICollection } from "./collection";
+import { getId } from "../utils/id.js";
+import Database from "../api/index.js";
+import { LegacySettingsItem } from "../types.js";
+import { ICollection } from "./collection.js";
 
 /**
  * @deprecated only kept here for migration purposes

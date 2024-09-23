@@ -18,8 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import dayjs from "dayjs";
-
-export type TimeFormat = "12-hour" | "24-hour";
+import { TimeFormat } from "../types.js";
 
 export function getWeekGroupFromTimestamp(timestamp: number) {
   const date = new Date(timestamp);

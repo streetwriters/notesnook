@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { hasRequire } from "./has-require";
+import { hasRequire } from "./has-require.js";
 
 export function randomBytes(size: number): Buffer {
   const crypto =
@@ -31,7 +31,7 @@ export function randomBytes(size: number): Buffer {
       "Crypto.getRandomValues is not available on this platform."
     );
 
-  const buffer = Buffer.allocUnsafe(size);
+  const buffer = Buffer.alloc(size);
   crypto.getRandomValues(buffer);
   return buffer;
 }

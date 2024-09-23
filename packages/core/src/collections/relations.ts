@@ -17,20 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { makeId } from "../utils/id";
-import { ICollection } from "./collection";
+import { makeId } from "../utils/id.js";
+import { ICollection } from "./collection.js";
 import {
   Relation,
   ItemMap,
   ItemReference,
   ItemReferences,
   ValueOf
-} from "../types";
-import Database from "../api";
-import { FilteredSelector, SQLCollection } from "../database/sql-collection";
-import { DatabaseSchema, UnlinkEvent, isFalse } from "../database";
+} from "../types.js";
+import Database from "../api/index.js";
+import { FilteredSelector, SQLCollection } from "../database/sql-collection.js";
+import { DatabaseSchema, UnlinkEvent, isFalse } from "../database/index.js";
 import { SelectQueryBuilder } from "@streetwriters/kysely";
-import { EVENTS } from "../common";
+import { EVENTS } from "../common.js";
 
 export class Relations implements ICollection {
   name = "relations";

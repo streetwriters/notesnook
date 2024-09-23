@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import SparkMD5 from "spark-md5";
-import { createObjectId } from "./object-id";
+import { createObjectId } from "./object-id.js";
 
 export function getId(time?: number) {
   return createObjectId(time);

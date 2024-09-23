@@ -17,25 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ICollection } from "./collection";
-import { getId } from "../utils/id";
-import { getContentFromData } from "../content-types";
-import { isCipher } from "../database/crypto";
+import { ICollection } from "./collection.js";
+import { getId } from "../utils/id.js";
+import { getContentFromData } from "../content-types/index.js";
+import { isCipher } from "../utils/crypto.js";
 import {
   ContentItem,
   ContentType,
   UnencryptedContentItem,
-  isDeleted
-} from "../types";
-import Database from "../api";
-import { getOutputType } from "./attachments";
-import { SQLCollection } from "../database/sql-collection";
-import { NoteContent } from "./session-content";
-import { InternalLink } from "../utils/internal-link";
-import { tinyToTiptap } from "../migrations";
-import { EVENTS } from "../common";
-import { DeleteEvent, UpdateEvent } from "../database";
-import { logger } from "../logger";
+  isDeleted,
+  NoteContent
+} from "../types.js";
+import Database from "../api/index.js";
+import { getOutputType } from "./attachments.js";
+import { SQLCollection } from "../database/sql-collection.js";
+import { InternalLink } from "../utils/internal-link.js";
+import { tinyToTiptap } from "../migrations.js";
+import { EVENTS } from "../common.js";
+import { DeleteEvent, UpdateEvent } from "../database/index.js";
+import { logger } from "../logger.js";
 
 export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
   noteId,
@@ -418,16 +418,4 @@ export class Content implements ICollection {
       );
     }
   }
-}
-
-export function isDecryptedContent(
-  content: NoteContent<boolean>
-): content is NoteContent<false> {
-  return !isCipher(content.data);
-}
-
-export function isEncryptedContent(
-  content: NoteContent<boolean>
-): content is NoteContent<true> {
-  return isCipher(content.data);
 }

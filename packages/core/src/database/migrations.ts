@@ -25,7 +25,7 @@ import {
   MigrationProvider,
   sql
 } from "@streetwriters/kysely";
-import { rebuildSearchIndex } from "./fts";
+import { rebuildSearchIndex } from "./fts.js";
 
 const COLLATE_NOCASE: ColumnBuilderCallback = (col) =>
   col.modifyEnd(sql`collate nocase`);

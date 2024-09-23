@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import hosts from "../utils/constants";
-import TokenManager from "../api/token-manager";
+import hosts from "../utils/constants.js";
+import TokenManager from "../api/token-manager.js";
 import {
   FileEncryptionMetadataWithOutputType,
   IFileStorage
-} from "../interfaces";
-import { DataFormat, SerializedKey } from "@notesnook/crypto/dist/src/types";
-import { EV, EVENTS } from "../common";
-import { logger } from "../logger";
+} from "../interfaces.js";
+import { DataFormat, SerializedKey } from "@notesnook/crypto";
+import { EV, EVENTS } from "../common.js";
+import { logger } from "../logger.js";
 
 export type FileStorageAccessor = () => FileStorage;
 export type DownloadableFile = {

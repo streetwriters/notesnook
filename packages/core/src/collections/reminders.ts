@@ -18,17 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import dayjs from "dayjs";
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import isToday from "dayjs/plugin/isToday";
-import isTomorrow from "dayjs/plugin/isTomorrow";
-import isYesterday from "dayjs/plugin/isYesterday";
-import { TimeFormat, formatDate } from "../utils/date";
-import { getId } from "../utils/id";
-import { ICollection } from "./collection";
-import { Reminder } from "../types";
-import Database from "../api";
-import { SQLCollection } from "../database/sql-collection";
-import { isFalse } from "../database";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore.js";
+import isToday from "dayjs/plugin/isToday.js";
+import isTomorrow from "dayjs/plugin/isTomorrow.js";
+import isYesterday from "dayjs/plugin/isYesterday.js";
+import { formatDate } from "../utils/date.js";
+import { getId } from "../utils/id.js";
+import { ICollection } from "./collection.js";
+import { Reminder, TimeFormat } from "../types.js";
+import Database from "../api/index.js";
+import { SQLCollection } from "../database/sql-collection.js";
+import { isFalse } from "../database/index.js";
 import { sql } from "@streetwriters/kysely";
 
 dayjs.extend(isTomorrow);

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { GroupHeader } from "../types";
+import { GroupHeader } from "../types.js";
 
 type BatchOperator<T> = (ids: string[], items: T[]) => Promise<unknown[]>;
 type Batch<T> = {

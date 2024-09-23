@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Database from "../api";
-import { ItemReference, Vault } from "../types";
-import { ICollection } from "./collection";
-import { SQLCollection } from "../database/sql-collection";
-import { getId } from "../utils/id";
-import { isFalse } from "../database";
+import Database from "../api/index.js";
+import { ItemReference, Vault } from "../types.js";
+import { ICollection } from "./collection.js";
+import { SQLCollection } from "../database/sql-collection.js";
+import { getId } from "../utils/id.js";
+import { isFalse } from "../database/index.js";
 
 export class Vaults implements ICollection {
   name = "vaults";

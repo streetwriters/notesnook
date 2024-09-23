@@ -17,17 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Cipher, SerializedKey } from "@notesnook/crypto";
-import Database from "..";
-import { CURRENT_DATABASE_VERSION, EV, EVENTS } from "../../common";
-import { logger } from "../../logger";
+import { Cipher } from "@notesnook/crypto";
+import Database from "../index.js";
+import { CURRENT_DATABASE_VERSION, EV, EVENTS } from "../../common.js";
+import { logger } from "../../logger.js";
 import {
   SyncItem,
   SyncTransferItem,
   SYNC_COLLECTIONS_MAP,
   SYNC_ITEM_TYPES
-} from "./types";
-import { Item, MaybeDeletedItem } from "../../types";
+} from "./types.js";
+import { Item, MaybeDeletedItem } from "../../types.js";
 
 class Collector {
   logger = logger.scope("SyncCollector");

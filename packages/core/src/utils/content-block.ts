@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ContentBlock } from "../types";
-import { InternalLinkWithOffset, parseInternalLink } from "./internal-link";
+import { ContentBlock } from "../types.js";
+import { InternalLinkWithOffset, parseInternalLink } from "./internal-link.js";
 
 const INTERNAL_LINK_REGEX = /(?:\[\[(nn:\/\/note\/.+?)\]\])/gm;
 export function extractInternalLinks(block: ContentBlock) {

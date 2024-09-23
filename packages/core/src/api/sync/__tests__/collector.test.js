@@ -21,8 +21,8 @@ import {
   databaseTest,
   TEST_NOTE,
   loginFakeUser
-} from "../../../../__tests__/utils";
-import Collector from "../collector";
+} from "../../../../__tests__/utils/index.js";
+import Collector from "../collector.js";
 import { test, expect } from "vitest";
 
 test("newly created note should get included in collector", () =>

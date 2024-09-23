@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { TEST_NOTE, databaseTest, loginFakeUser, notebookTest } from "./utils";
+import { TEST_NOTE, databaseTest, loginFakeUser, notebookTest } from "./utils/index.js";
 import { test, expect } from "vitest";
 
 test("export backup", () =>

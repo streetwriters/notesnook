@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import http from "../utils/http";
-import Constants from "../utils/constants";
-import Database from ".";
-import { Note, isDeleted } from "../types";
+import http from "../utils/http.js";
+import Constants from "../utils/constants.js";
+import Database from "./index.js";
+import { Note, isDeleted } from "../types.js";
 import { Cipher } from "@notesnook/crypto";
-import { isFalse } from "../database";
-import { logger } from "../logger";
+import { isFalse } from "../database/index.js";
+import { logger } from "../logger.js";
 
 type BaseMonograph = {
   id: string;

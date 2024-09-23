@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { isReminderActive } from "../collections/reminders";
-import { GroupHeader, GroupOptions, ItemType, Reminder } from "../types";
-import { getWeekGroupFromTimestamp, MONTHS_FULL } from "./date";
+import { isReminderActive } from "../collections/reminders.js";
+import { GroupHeader, GroupOptions, ItemType, Reminder } from "../types.js";
+import { getWeekGroupFromTimestamp, MONTHS_FULL } from "../utils/date.js";
 
 type PartialGroupableItem = {
   id: string;

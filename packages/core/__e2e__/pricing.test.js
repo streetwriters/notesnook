@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Pricing } from "../src/api/pricing";
+import { Pricing } from "../src/api/pricing.js";
 import { test, expect, describe } from "vitest";
 
 test.each(["monthly", "yearly", undefined])(`get %s price`, async (period) => {

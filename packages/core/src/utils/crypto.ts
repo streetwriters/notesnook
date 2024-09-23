@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Cipher } from "@notesnook/crypto";
-import { StorageAccessor } from "../interfaces";
-import { randomBytes } from "../utils/random";
+import { StorageAccessor } from "../interfaces.js";
+import { randomBytes } from "./random.js";
 
 export type CryptoAccessor = () => Crypto;
 export class Crypto {

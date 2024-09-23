@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { databaseTest, notebookTest } from "./utils";
+import { databaseTest, notebookTest } from "./utils/index.js";
 import { test, expect } from "vitest";
 
 test("create a shortcut of an invalid item should throw", () =>

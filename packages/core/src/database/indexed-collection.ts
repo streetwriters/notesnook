@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { toChunks } from "../utils/array";
-import { StorageAccessor } from "../interfaces";
+import { toChunks } from "../utils/array.js";
+import { StorageAccessor } from "../interfaces.js";
 import {
   CollectionType,
   Collections,
   ItemMap,
   MaybeDeletedItem
-} from "../types";
-import Indexer from "./indexer";
+} from "../types.js";
+import Indexer from "./indexer.js";
 
 /**
  * @deprecated only kept here for migration purposes

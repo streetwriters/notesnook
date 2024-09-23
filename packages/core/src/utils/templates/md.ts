@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { TemplateData } from ".";
-import { formatDate } from "../date";
+import { TemplateData } from "./index.js";
+import { formatDate } from "../date.js";
 
 export const buildMarkdown = (data: TemplateData) => `# ${data.title}
 

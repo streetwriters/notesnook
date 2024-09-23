@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User } from "../types";
-import http from "../utils/http";
-import constants from "../utils/constants";
-import TokenManager from "./token-manager";
-import { EV, EVENTS } from "../common";
-import { HealthCheck } from "./healthcheck";
-import Database from ".";
+import { User } from "../types.js";
+import http from "../utils/http.js";
+import constants from "../utils/constants.js";
+import TokenManager from "./token-manager.js";
+import { EV, EVENTS } from "../common.js";
+import { HealthCheck } from "./healthcheck.js";
+import Database from "./index.js";
 import { SerializedKey } from "@notesnook/crypto";
-import { logger } from "../logger";
+import { logger } from "../logger.js";
 
 const ENDPOINTS = {
   signup: "/users",

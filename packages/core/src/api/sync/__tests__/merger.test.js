@@ -21,9 +21,9 @@ import {
   TEST_NOTE,
   databaseTest,
   loginFakeUser
-} from "../../../../__tests__/utils";
+} from "../../../../__tests__/utils/index.js";
 import { expect, describe, vi } from "vitest";
-import Merger from "../merger";
+import Merger from "../merger.js";
 
 describe.concurrent("merge item synchronously", (test) => {
   test("accept remote item if no local item is found", () =>
