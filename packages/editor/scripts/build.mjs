@@ -42,9 +42,23 @@ for (const name in pathsToCopy) {
   });
 }
 
-const languagesList = await langen(ROOT_DIR, path.join(ROOT_DIR, "languages"));
+const { languageIndex, languages } = await langen(ROOT_DIR);
+
+if (!languageIndex || !languages) throw new Error("No language index found.");
+
+fs.writeFileSync(
+  path.join(
+    ROOT_DIR,
+    "src",
+    "extensions",
+    "code-block",
+    "languages",
+    "index.ts"
+  ),
+  languageIndex
+);
 
 fs.writeFileSync(
   path.join(ROOT_DIR, "src", "extensions", "code-block", "languages.json"),
-  JSON.stringify(languagesList)
+  JSON.stringify(languages)
 );
