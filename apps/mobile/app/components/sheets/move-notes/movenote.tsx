@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { VirtualizedGrouping } from "@notesnook/core";
-import { Note, Notebook } from "@notesnook/core/dist/types";
+import { Note, Notebook } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";

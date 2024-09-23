@@ -23,7 +23,7 @@ import {
   createInternalLink,
   highlightInternalLinks
 } from "@notesnook/core";
-import { ContentBlock, ItemReference, Note } from "@notesnook/core/dist/types";
+import { ContentBlock, ItemReference, Note } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";

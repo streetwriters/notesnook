@@ -21,9 +21,9 @@ import {
   Attachment,
   Note,
   SortOptions,
-  VirtualizedGrouping
+  VirtualizedGrouping,
+  FilteredSelector
 } from "@notesnook/core";
-import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";

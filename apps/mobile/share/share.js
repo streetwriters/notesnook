@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import ShareExtension from "@ammarahmed/react-native-share-extension";
 import { getPreviewData } from "@flyerhq/react-native-link-preview";
 import { formatBytes } from "@notesnook/common";
-import { isImage } from "@notesnook/core/dist/utils/filename";
+import { isImage } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {

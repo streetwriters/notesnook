@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { sanitizeFilename } from "@notesnook/common";
-import { formatDate } from "@notesnook/core/dist/utils/date";
+import { formatDate } from "@notesnook/core";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import FileViewer from "react-native-file-viewer";

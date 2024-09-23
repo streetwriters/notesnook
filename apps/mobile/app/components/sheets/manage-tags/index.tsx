@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { VirtualizedGrouping } from "@notesnook/core";
-import { Tags } from "@notesnook/core/dist/collections/tags";
-import { Tag } from "@notesnook/core/dist/types";
+import { sanitizeTag } from "@notesnook/core";
+import { Tag } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, {
   RefObject,
@@ -268,8 +268,8 @@ const ManageTagsSheet = (props: {
         fwdRef={inputRef}
         autoCapitalize="none"
         onChangeText={(v) => {
-          setQuery(Tags.sanitize(v));
-          checkQueryExists(Tags.sanitize(v));
+          setQuery(sanitizeTag(v));
+          checkQueryExists(sanitizeTag(v));
         }}
         onFocusInput={() => {
           setFocus(true);

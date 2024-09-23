@@ -32,7 +32,7 @@ import {
   exportNotes
 } from "@notesnook/common";
 import { Note } from "@notesnook/core";
-import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
+import { FilteredSelector } from "@notesnook/core";
 import { basename, dirname, join } from "pathe";
 import downloadAttachment from "../common/filesystem/download-attachment";
 import { cacheDir } from "../common/filesystem/utils";

@@ -22,7 +22,7 @@ import { Platform } from "react-native";
 import { Subscription } from "react-native-iap";
 import PremiumService from "../services/premium";
 import { db } from "../common/database";
-import { Product } from "@notesnook/core/dist/api/pricing";
+import { Product } from "@notesnook/core";
 
 const skuInfos: { [name: string]: Product | undefined } = {};
 

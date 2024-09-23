@@ -32,7 +32,7 @@ import { NavigationProps } from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { eOnRefreshSearch } from "../../utils/events";
 import { SearchBar } from "./search-bar";
-import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
+import { FilteredSelector } from "@notesnook/core";
 export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
   const [results, setResults] = useState<VirtualizedGrouping<Item>>();
   const [loading, setLoading] = useState(false);

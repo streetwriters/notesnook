@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
-import { VAULT_ERRORS } from "@notesnook/core/dist/api/vault";
+import { VAULT_ERRORS } from "@notesnook/core";
 import {
   Color,
   ItemReference,
@@ -26,7 +26,7 @@ import {
   Reminder,
   Tag,
   TrashItem
-} from "@notesnook/core/dist/types";
+} from "@notesnook/core";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef, useState } from "react";

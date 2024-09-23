@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { resolveItems } from "@notesnook/common";
 import { VirtualizedGrouping } from "@notesnook/core";
-import { Note, Notebook } from "@notesnook/core/dist/types";
+import { Note, Notebook } from "@notesnook/core";
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";

@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getFormattedDate } from "@notesnook/common";
-import { isEncryptedContent } from "@notesnook/core/dist/collections/content";
-import { NoteContent } from "@notesnook/core/dist/collections/session-content";
-import { EVENTS } from "@notesnook/core/dist/common";
 import {
+  EVENTS,
+  isEncryptedContent,
+  NoteContent,
   ContentItem,
   ContentType,
   DeletedItem,
@@ -31,7 +31,7 @@ import {
   UnencryptedContentItem,
   isDeleted,
   isTrashItem
-} from "@notesnook/core/dist/types";
+} from "@notesnook/core";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import WebView from "react-native-webview";

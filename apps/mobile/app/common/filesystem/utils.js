@@ -21,7 +21,7 @@ import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { DatabaseLogger, db } from "../database";
-import hosts from "@notesnook/core/dist/utils/constants";
+import { hosts } from "@notesnook/core";
 
 export const ABYTES = 17;
 export const cacheDirOld = RNFetchBlob.fs.dirs.CacheDir;

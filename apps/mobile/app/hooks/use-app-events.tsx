@@ -18,13 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { User } from "@notesnook/core";
-import {
-  EV,
-  EVENTS,
-  SYNC_CHECK_IDS,
-  SyncStatusEvent
-} from "@notesnook/core/dist/common";
-import { EventManagerSubscription } from "@notesnook/core/dist/utils/event-manager";
+import { EV, EVENTS, SYNC_CHECK_IDS, SyncStatusEvent } from "@notesnook/core";
+import { EventManagerSubscription } from "@notesnook/core";
 import notifee from "@notifee/react-native";
 import NetInfo, { NetInfoSubscription } from "@react-native-community/netinfo";
 import React, { useCallback, useEffect, useRef } from "react";

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
+import { FilteredSelector } from "@notesnook/core";
 import {
   Color,
   Item,
@@ -27,7 +27,7 @@ import {
   Reminder,
   Tag,
   TrashItem
-} from "@notesnook/core/dist/types";
+} from "@notesnook/core";
 import create, { State } from "zustand";
 
 export type GenericRouteParam = undefined;

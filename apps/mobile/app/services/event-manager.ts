@@ -17,9 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import EventManager, {
-  EventHandler
-} from "@notesnook/core/dist/utils/event-manager";
+import EventManager, { EventHandler } from "@notesnook/core";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { RefObject } from "react";
 import { ActionSheetRef } from "react-native-actions-sheet";

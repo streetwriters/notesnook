@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import "./logger";
 import { database } from "@notesnook/common";
-import { logger as dbLogger } from "@notesnook/core/dist/logger";
+import { logger as dbLogger } from "@notesnook/core";
 import { Platform } from "react-native";
 import * as Gzip from "react-native-gzip";
 import EventSource from "../../utils/sse/even-source-ios";

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Note } from "@notesnook/core";
-import { EVENTS } from "@notesnook/core/dist/common";
+import { EVENTS } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { View } from "react-native";

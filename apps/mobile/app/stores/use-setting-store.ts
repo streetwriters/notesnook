@@ -24,7 +24,7 @@ import { initialWindowMetrics } from "react-native-safe-area-context";
 import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
 import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
-import { Reminder } from "@notesnook/core/dist/types";
+import { Reminder } from "@notesnook/core";
 export const HostIds = ["API_HOST", "AUTH_HOST", "SSE_HOST"] as const;
 export type HostId = (typeof HostIds)[number];
 

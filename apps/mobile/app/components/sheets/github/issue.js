@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Debug } from "@notesnook/core/dist/api/debug";
+import { Debug } from "@notesnook/core";
 import { getModel, getBrand, getSystemVersion } from "react-native-device-info";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";

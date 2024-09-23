@@ -23,7 +23,7 @@ import {
   SideBarHideableSection,
   SideBarSection,
   Tag
-} from "@notesnook/core/dist/types";
+} from "@notesnook/core";
 import create, { State } from "zustand";
 import { db } from "../common/database";
 

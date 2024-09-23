@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { resolveItems } from "@notesnook/common";
 import { VirtualizedGrouping } from "@notesnook/core";
-import { Color, Note } from "@notesnook/core/dist/types";
+import { Color, Note } from "@notesnook/core";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";

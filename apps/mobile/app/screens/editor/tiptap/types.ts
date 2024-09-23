@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
 import { useEditor } from "./use-editor";
-import { Note } from "@notesnook/core/dist/types";
+import { Note } from "@notesnook/core";
 export type useEditorType = ReturnType<typeof useEditor>;
 
 export type EditorState = {
