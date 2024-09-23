@@ -2,23 +2,33 @@
   "name": "@notesnook/crypto",
   "private": false,
   "description": "An easy to use wrapper around libsodium exposing essential cryptographic methods. Currently only Web is supported.",
-  "version": "2.0.7",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc --declaration --outDir ./dist",
-    "prepublishOnly": "npm run build"
-  },
-  "keywords": [],
-  "author": "",
+  "version": "2.1.1",
   "license": "GPL-3.0-or-later",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "require": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "import": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup-node src/index.ts",
+    "prepublishOnly": "npm run build",
+    "watch": "npm run build -- --watch"
+  },
   "dependencies": {
     "@notesnook/sodium": "file:../sodium"
   },
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/streetwriters/notesnook.git",
+    "url": "git+https://github.com/streetwriters/notesnook.git",
     "directory": "packages/crypto"
   }
 }
