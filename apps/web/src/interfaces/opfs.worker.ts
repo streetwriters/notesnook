@@ -198,5 +198,7 @@ async function readFileSize(
 ) {
   const file = await directory.getFileHandle(name);
   const handle = await file.createSyncAccessHandle({ mode: "read-only" });
-  return handle.getSize();
+  const size = handle.getSize();
+  handle.close();
+  return size;
 }
