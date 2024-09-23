@@ -21,7 +21,7 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 import config from "../utils/config";
-import { EV, EVENTS } from "@notesnook/core/dist/common";
+import { EV, EVENTS } from "@notesnook/core";
 import Config from "../utils/config";
 import { hashNavigate } from "../navigation";
 import { isUserPremium } from "../hooks/use-is-user-premium";

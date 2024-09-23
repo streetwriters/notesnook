@@ -25,7 +25,7 @@ import TimeAgo from "../time-ago";
 import { pluralize, toTitleCase } from "@notesnook/common";
 import { showToast } from "../../utils/toast";
 import { MenuItem } from "@notesnook/ui";
-import { TrashItem as TrashItemType } from "@notesnook/core/dist/types";
+import { TrashItem as TrashItemType } from "@notesnook/core";
 import { useEditorStore } from "../../stores/editor-store";
 import { showMultiPermanentDeleteConfirmation } from "../../dialogs/confirm";
 import { useStore as useSelectionStore } from "../../stores/selection-store";

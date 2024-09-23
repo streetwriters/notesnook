@@ -24,7 +24,7 @@ import Grberk from "../../assets/testimonials/grberk.jpeg";
 import Holenstein from "../../assets/testimonials/holenstein.jpg";
 import Jason from "../../assets/testimonials/jason.jpg";
 import Cameron from "../../assets/testimonials/cameron.jpg";
-import hosts from "@notesnook/core/dist/utils/constants";
+import { hosts } from "@notesnook/core";
 import { SettingsDialog } from "../../dialogs/settings";
 
 const testimonials = [

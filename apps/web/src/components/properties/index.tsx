@@ -60,7 +60,7 @@ import {
   highlightInternalLinks
 } from "@notesnook/core";
 import { VirtualizedTable } from "../virtualized-table";
-import { TextSlice } from "@notesnook/core/dist/utils/content-block";
+import { TextSlice } from "@notesnook/core";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 
 const tools = [

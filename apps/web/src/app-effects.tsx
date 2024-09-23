@@ -31,7 +31,7 @@ import {
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
-import { CHECK_IDS, EV, EVENTS } from "@notesnook/core/dist/common";
+import { CHECK_IDS, EV, EVENTS } from "@notesnook/core";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";

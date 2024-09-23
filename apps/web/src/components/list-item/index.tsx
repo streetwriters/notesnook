@@ -28,7 +28,7 @@ import React, { useRef } from "react";
 import { SchemeColors } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
 import { alpha } from "@theme-ui/color";
-import { Item } from "@notesnook/core/dist/types";
+import { Item } from "@notesnook/core";
 import { setDragData } from "../../utils/data-transfer";
 
 type ListItemProps<TItem extends Item, TContext> = {

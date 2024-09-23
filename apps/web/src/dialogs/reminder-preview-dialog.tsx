@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Dialog from "../components/dialog";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { db } from "../common/db";
-import { Reminder } from "@notesnook/core/dist/types";
+import { Reminder } from "@notesnook/core";
 import IconTag from "../components/icon-tag";
 import { Clock, Refresh } from "../components/icons";
 import Note from "../components/note";

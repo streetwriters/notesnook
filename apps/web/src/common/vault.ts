@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { db } from "./db";
 import { showPasswordDialog } from "../dialogs/password-dialog";
 import { showToast } from "../utils/toast";
-import { VAULT_ERRORS } from "@notesnook/core/dist/api/vault";
+import { VAULT_ERRORS } from "@notesnook/core";
 
 class Vault {
   static async createVault() {

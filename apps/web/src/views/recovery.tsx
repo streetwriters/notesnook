@@ -27,9 +27,8 @@ import AuthContainer from "../components/auth-container";
 import { AuthField, SubmitButton } from "./auth";
 import { createBackup, restoreBackupFile, selectBackupFile } from "../common";
 import Config from "../utils/config";
-import { EVENTS } from "@notesnook/core/dist/common";
 import { ErrorText } from "../components/error-text";
-import { User } from "@notesnook/core";
+import { EVENTS, User } from "@notesnook/core";
 import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
 
 type RecoveryMethodType = "key" | "backup" | "reset";

@@ -21,8 +21,7 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 import { store as noteStore } from "./note-store";
-import { Note, VirtualizedGrouping } from "@notesnook/core";
-import { PublishOptions } from "@notesnook/core/dist/api/monographs";
+import { Note, VirtualizedGrouping, PublishOptions } from "@notesnook/core";
 
 class MonographStore extends BaseStore<MonographStore> {
   monographs: VirtualizedGrouping<Note> | undefined = undefined;

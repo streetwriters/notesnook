@@ -30,10 +30,10 @@ import {
 import { VirtualizedList } from "../components/virtualized-list";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { ScrollContainer } from "@notesnook/ui";
-import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
+import { LinkAttributes } from "@notesnook/editor";
 import { NoteResolvedData, ResolvedItem } from "@notesnook/common";
 import { Lock } from "../components/icons";
-import { ellipsize } from "@notesnook/core/dist/utils/content-block";
+import { ellipsize } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
 export type NoteLinkingDialogProps = BaseDialogProps<LinkAttributes | false> & {

@@ -30,7 +30,7 @@ import { useStore, store } from "../stores/tag-store";
 import { store as notestore } from "../stores/note-store";
 import { useEditorStore } from "../stores/editor-store";
 import { FilteredList } from "../components/filtered-list";
-import { ItemReference, Tag } from "@notesnook/core/dist/types";
+import { ItemReference, Tag } from "@notesnook/core";
 import { create } from "zustand";
 import { VirtualizedGrouping } from "@notesnook/core";
 import { ResolvedItem } from "@notesnook/common";

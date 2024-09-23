@@ -68,10 +68,7 @@ import IconTag from "../icon-tag";
 import { exportNote, exportNotes } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
 import { store as selectionStore } from "../../stores/selection-store";
-import {
-  isReminderActive,
-  isReminderToday
-} from "@notesnook/core/dist/collections/reminders";
+import { isReminderActive, isReminderToday } from "@notesnook/core";
 import {
   NoteResolvedData,
   exportContent,

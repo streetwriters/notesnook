@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { IStorage } from "@notesnook/core/dist/interfaces";
+import { IStorage } from "@notesnook/core";
 import {
   IndexedDBKVStore,
   LocalStorageKVStore,
@@ -25,7 +25,7 @@ import {
   IKVStore
 } from "./key-value";
 import { NNCrypto } from "./nncrypto";
-import type { Cipher, SerializedKey } from "@notesnook/crypto/dist/src/types";
+import type { Cipher, SerializedKey } from "@notesnook/crypto";
 import { isFeatureSupported } from "../utils/feature-check";
 import { IKeyStore } from "./key-store";
 import { User } from "@notesnook/core";

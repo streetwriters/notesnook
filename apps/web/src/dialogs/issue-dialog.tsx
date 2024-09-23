@@ -28,7 +28,7 @@ import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
 
 import { ErrorText } from "../components/error-text";
-import { Debug } from "@notesnook/core/dist/api/debug";
+import { Debug } from "@notesnook/core";
 import { ConfirmDialog } from "./confirm";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 

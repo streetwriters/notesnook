@@ -34,7 +34,7 @@ import "react-day-picker/dist/style.css";
 import { PopupPresenter } from "@notesnook/ui";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { getFormattedDate } from "@notesnook/common";
-import { MONTHS_FULL, getTimeFormat } from "@notesnook/core/dist/utils/date";
+import { MONTHS_FULL, getTimeFormat } from "@notesnook/core";
 import { Note, Reminder } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 

@@ -43,7 +43,7 @@ import {
   GroupHeader as GroupHeaderType,
   GroupOptions,
   GroupingKey
-} from "@notesnook/core/dist/types";
+} from "@notesnook/core";
 
 const groupByToTitleMap = {
   none: "None",

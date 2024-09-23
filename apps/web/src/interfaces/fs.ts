@@ -23,11 +23,11 @@ import axios from "axios";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import { StreamableFS } from "@notesnook/streamable-fs";
 import { NNCrypto } from "./nncrypto";
-import hosts from "@notesnook/core/dist/utils/constants";
+import { hosts } from "@notesnook/core";
 import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
 import { db } from "../common/db";
-import { getFileNameWithExtension } from "@notesnook/core/dist/utils/filename";
+import { getFileNameWithExtension } from "@notesnook/core";
 import { ChunkedStream, IntoChunks } from "../utils/streams/chunked-stream";
 import { ProgressStream } from "../utils/streams/progress-stream";
 import { consumeReadableStream } from "../utils/stream";
@@ -35,7 +35,7 @@ import { Base64DecoderStream } from "../utils/streams/base64-decoder-stream";
 import { toBlob } from "@notesnook-importer/core/dist/src/utils/stream";
 import { DataFormat, SerializedKey } from "@notesnook/crypto";
 import { IDataType } from "hash-wasm/dist/lib/util";
-import FileHandle from "@notesnook/streamable-fs/dist/src/filehandle";
+import { FileHandle } from "@notesnook/streamable-fs";
 import {
   CacheStorageFileStore,
   IndexedDBFileStore,
@@ -48,7 +48,7 @@ import {
   IFileStorage,
   Output,
   RequestOptions
-} from "@notesnook/core/dist/interfaces";
+} from "@notesnook/core";
 import { logger } from "../utils/logger";
 import { newQueue } from "@henrygd/queue";
 

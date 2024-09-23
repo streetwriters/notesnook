@@ -37,7 +37,7 @@ import { store as notebookStore } from "../stores/notebook-store";
 import { showToast } from "../utils/toast";
 import { isMac } from "../utils/platform";
 import { create } from "zustand";
-import { Notebook } from "@notesnook/core/dist/types";
+import { Notebook } from "@notesnook/core";
 import {
   UncontrolledTreeEnvironment,
   Tree,

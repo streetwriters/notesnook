@@ -21,7 +21,7 @@ import { Flex, Image, Text } from "@theme-ui/components";
 import { Edit, User } from "../../../components/icons";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { useStore as useSettingStore } from "../../../stores/setting-store";
-import { getObjectIdTimestamp } from "@notesnook/core/dist/utils/object-id";
+import { getObjectIdTimestamp } from "@notesnook/core";
 import { getFormattedDate } from "@notesnook/common";
 import { SUBSCRIPTION_STATUS } from "../../../common/constants";
 import dayjs from "dayjs";

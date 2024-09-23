@@ -32,7 +32,7 @@ import {
   Trash
 } from "../icons";
 import IconTag from "../icon-tag";
-import { isReminderToday } from "@notesnook/core/dist/collections/reminders";
+import { isReminderToday } from "@notesnook/core";
 import { hashNavigate } from "../../navigation";
 import { Multiselect } from "../../common/multi-select";
 import { store } from "../../stores/reminder-store";
@@ -40,7 +40,7 @@ import { db } from "../../common/db";
 import { pluralize } from "@notesnook/common";
 import { getFormattedReminderTime } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
-import { Reminder as ReminderType } from "@notesnook/core/dist/types";
+import { Reminder as ReminderType } from "@notesnook/core";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { EditReminderDialog } from "../../dialogs/add-reminder-dialog";
 import { useStore as useSelectionStore } from "../../stores/selection-store";

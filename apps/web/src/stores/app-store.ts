@@ -31,7 +31,7 @@ import { store as settingStore } from "./setting-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { Notice, resetNotices } from "../common/notices";
-import { EV, EVENTS, SYNC_CHECK_IDS } from "@notesnook/core/dist/common";
+import { EV, EVENTS, SYNC_CHECK_IDS, SyncOptions } from "@notesnook/core";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
 import {
@@ -40,7 +40,6 @@ import {
 } from "../utils/page-visibility";
 import { NetworkCheck } from "../utils/network-check";
 import { Color, Notebook, Tag } from "@notesnook/core";
-import { SyncOptions } from "@notesnook/core/dist/api/sync";
 
 type SyncState =
   | "synced"

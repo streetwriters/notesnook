@@ -22,10 +22,7 @@ import { Loading } from "../../../components/icons";
 import { Box, Flex, Link, Text } from "@theme-ui/components";
 import { getFormattedDate } from "@notesnook/common";
 import { db } from "../../../common/db";
-import {
-  Transaction,
-  TransactionStatus
-} from "@notesnook/core/dist/api/subscriptions";
+import { Transaction, TransactionStatus } from "@notesnook/core";
 
 const TransactionStatusToText: Record<TransactionStatus, string> = {
   completed: "Completed",

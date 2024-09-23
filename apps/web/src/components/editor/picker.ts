@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SerializedKey } from "@notesnook/crypto/dist/src/types";
+import { SerializedKey } from "@notesnook/crypto";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { db } from "../../common/db";
 import { TaskManager } from "../../common/task-manager";

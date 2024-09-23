@@ -17,11 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  initialize,
-  logger as _logger,
-  logManager
-} from "@notesnook/core/dist/logger";
+import { initialize, logger as _logger, logManager } from "@notesnook/core";
 import { LogMessage, NoopLogger, format } from "@notesnook/logger";
 import { ZipFile, createZipStream } from "./streams/zip-stream";
 import { createWriteStream } from "./stream-saver";

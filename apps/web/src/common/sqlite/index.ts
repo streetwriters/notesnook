@@ -28,7 +28,7 @@ import {
   WaSqliteWorkerSingleTabDriver
 } from "./wa-sqlite-kysely-driver";
 
-declare module "kysely" {
+declare module "@streetwriters/kysely" {
   interface Driver {
     delete(): Promise<void>;
   }

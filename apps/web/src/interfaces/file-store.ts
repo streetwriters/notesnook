@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { IFileStorage } from "@notesnook/streamable-fs/dist/src/interfaces";
-import { File } from "@notesnook/streamable-fs/dist/src/types";
+import { IFileStorage, File } from "@notesnook/streamable-fs";
 import { IndexedDBKVStore } from "./key-value";
 import OriginPrivateFileStoreWorker from "./opfs.worker?worker";
 import { OriginPrivateFileStoreWorkerType } from "./opfs.worker";

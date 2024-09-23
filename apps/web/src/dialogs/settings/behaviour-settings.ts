@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DATE_FORMATS } from "@notesnook/core/dist/common";
+import { DATE_FORMATS } from "@notesnook/core";
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import dayjs from "dayjs";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
-import { TimeFormat } from "@notesnook/core/dist/utils/date";
+import { TimeFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
 
 export const BehaviourSettings: SettingsGroup[] = [

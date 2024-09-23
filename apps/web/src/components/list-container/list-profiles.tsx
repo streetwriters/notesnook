@@ -24,7 +24,7 @@ import TrashItem from "../trash-item";
 import { db } from "../../common/db";
 import Reminder from "../reminder";
 import { Context } from "./types";
-import { getSortValue } from "@notesnook/core/dist/utils/grouping";
+import { getSortValue } from "@notesnook/core";
 import { GroupingKey, Item } from "@notesnook/core";
 import { isNoteResolvedData } from "@notesnook/common";
 import { Attachment } from "../attachment";

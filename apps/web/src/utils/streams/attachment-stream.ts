@@ -17,13 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getFileNameWithExtension } from "@notesnook/core/dist/utils/filename";
+import { getFileNameWithExtension, Attachment } from "@notesnook/core";
 import { db } from "../../common/db";
 import { lazify } from "../lazify";
 import { showToast } from "../toast";
 import { makeUniqueFilename } from "./utils";
 import { ZipFile } from "./zip-stream";
-import { Attachment } from "@notesnook/core";
 import { logger } from "../logger";
 
 export const METADATA_FILENAME = "metadata.json";

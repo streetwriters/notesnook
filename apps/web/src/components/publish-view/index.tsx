@@ -27,7 +27,7 @@ import { db } from "../../common/db";
 import { writeText } from "clipboard-polyfill";
 import { ScopedThemeProvider } from "../theme-provider";
 import { showToast } from "../../utils/toast";
-import { EV, EVENTS } from "@notesnook/core/dist/common";
+import { EV, EVENTS } from "@notesnook/core";
 import { useStore } from "../../stores/monograph-store";
 import ReactModal from "react-modal";
 import { DialogButton } from "../dialog";

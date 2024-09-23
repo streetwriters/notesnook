@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { TaskManager } from "./task-manager";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
-import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
+import { FilteredSelector } from "@notesnook/core";
 import { Note } from "@notesnook/core";
 import { fromAsyncIterator } from "../utils/stream";
 import {
