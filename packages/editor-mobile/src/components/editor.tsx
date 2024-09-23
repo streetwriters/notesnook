@@ -24,7 +24,7 @@ import {
   TiptapOptions,
   usePermissionHandler
 } from "@notesnook/editor";
-import { toBlobURL } from "@notesnook/editor/dist/utils/downloader";
+import { toBlobURL } from "@notesnook/editor";
 import { useThemeColors } from "@notesnook/theme";
 import FingerprintIcon from "mdi-react/FingerprintIcon";
 import {
