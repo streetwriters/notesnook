@@ -1,11 +1,24 @@
 {
   "name": "@notesnook/logger",
-  "version": "2.0.7",
+  "version": "2.1.1",
   "description": "A really simple logger with a pluggable interface.",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "require": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "import": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
   "scripts": {
-    "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "build": "tsup-node src/index.ts",
+    "prepublishOnly": "npm run build",
+    "watch": "npm run build -- --watch"
   },
   "repository": {
     "type": "git",
@@ -19,10 +32,5 @@
     "url": "https://github.com/streetwriters/logger/issues"
   },
   "homepage": "https://github.com/streetwriters/logger#readme",
-  "np": {
-    "tests": false,
-    "releaseDraft": false,
-    "message": "chore: bump version to %s"
-  },
   "devDependencies": {}
 }
