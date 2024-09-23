@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/streetwriters/notesnook#readme",
   "devDependencies": {
-    "@notesnook/core": "^8.0.0",
+    "@notesnook/core": "file:../core",
     "@types/react": "^18.2.39",
     "react": "18.2.0",
     "vitest": "^1.4.0"
@@ -40,7 +40,7 @@
     "timeago.js": "4.0.2"
   },
   "dependencies": {
-    "@notesnook/core": "^8.0.0",
+    "@notesnook/core": "file:../core",
     "@readme/data-urls": "^3.0.0",
     "dayjs": "^1.11.13",
     "pathe": "^1.1.2",
