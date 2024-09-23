@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { initialize } from "@notesnook/sodium";
-import Decryption from "./src/decryption";
-import Encryption from "./src/encryption";
-import { INNCrypto } from "./src/interfaces";
-import KeyUtils from "./src/keyutils";
-import Password from "./src/password";
+import Decryption from "./decryption.js";
+import Encryption from "./encryption.js";
+import { INNCrypto } from "./interfaces.js";
+import KeyUtils from "./keyutils.js";
+import Password from "./password.js";
 import {
   Cipher,
   EncryptionKey,
@@ -30,7 +30,7 @@ import {
   Output,
   DataFormat,
   SerializedKey
-} from "./src/types";
+} from "./types.js";
 
 export class NNCrypto implements INNCrypto {
   private isReady = false;
@@ -169,6 +169,6 @@ export class NNCrypto implements INNCrypto {
   // }
 }
 
-export * from "./src/types";
-export * from "./src/interfaces";
+export * from "./types.js";
+export * from "./interfaces.js";
 export { Decryption };

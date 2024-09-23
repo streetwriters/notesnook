@@ -28,8 +28,8 @@ import {
   crypto_secretstream_xchacha20poly1305_TAG_FINAL,
   from_hex
 } from "@notesnook/sodium";
-import KeyUtils from "./keyutils";
-import { Cipher, Output, DataFormat, SerializedKey } from "./types";
+import KeyUtils from "./keyutils.js";
+import { Cipher, Output, DataFormat, SerializedKey } from "./types.js";
 
 export default class Decryption {
   private static transformInput(cipherData: Cipher<DataFormat>): Uint8Array {

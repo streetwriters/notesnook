@@ -26,7 +26,7 @@ import {
   crypto_pwhash_ALG_ARGON2I13,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES
 } from "@notesnook/sodium";
-import { EncryptionKey, SerializedKey } from "./types";
+import { EncryptionKey, SerializedKey } from "./types.js";
 
 export default class KeyUtils {
   static deriveKey(password: string, salt?: string): EncryptionKey {

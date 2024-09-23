@@ -29,8 +29,8 @@ import {
   from_base64,
   base64_variants
 } from "@notesnook/sodium";
-import KeyUtils from "./keyutils";
-import { Chunk, Cipher, Input, DataFormat, SerializedKey } from "./types";
+import KeyUtils from "./keyutils.js";
+import { Chunk, Cipher, Input, DataFormat, SerializedKey } from "./types.js";
 
 const encoder = new TextEncoder();
 export default class Encryption {
