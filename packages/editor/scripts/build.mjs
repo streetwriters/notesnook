@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "isomorphic-fetch";
 import path from "path";
-import fs from "fs";
+import fs, { mkdirSync } from "fs";
 import { langen } from "./langen.mjs";
 import { fileURLToPath } from "url";
 
@@ -45,18 +45,16 @@ for (const name in pathsToCopy) {
 const { languageIndex, languages } = await langen(ROOT_DIR);
 
 if (!languageIndex || !languages) throw new Error("No language index found.");
-
-fs.writeFileSync(
-  path.join(
-    ROOT_DIR,
-    "src",
-    "extensions",
-    "code-block",
-    "languages",
-    "index.ts"
-  ),
-  languageIndex
+const languagesDir = path.join(
+  ROOT_DIR,
+  "src",
+  "extensions",
+  "code-block",
+  "languages"
 );
+mkdirSync(languagesDir, { recursive: true });
+
+fs.writeFileSync(path.join(languagesDir, "index.ts"), languageIndex);
 
 fs.writeFileSync(
   path.join(ROOT_DIR, "src", "extensions", "code-block", "languages.json"),
