@@ -30,6 +30,7 @@ import { readFile, writeFile, cp, rm } from "fs/promises";
 import glob from "fast-glob";
 import parser from "yargs-parser";
 import { Listr } from "listr2";
+import { existsSync } from "fs";
 
 const args = parser(process.argv, { alias: { scope: ["s"], version: ["v"] } });
 const allPackages = await glob("packages/*", {
@@ -52,25 +53,28 @@ const packages = Array.from(
 await publishPackages(packages);
 
 async function publishPackages(dependencies) {
-  console.log("> Found", dependencies.length, "dependencies to bootstrap.");
+  console.log("> Found", dependencies.length, "dependencies to publish.");
 
   const outputs = { stdout: [], stderr: [] };
-  await performTasks("bump", dependencies, (dep) => bumpVersion(dep, outputs));
 
   try {
-    await performTasks("resolve local packages", dependencies, (dep) =>
-      resolveLocalPackages(dep)
-    );
-
-    await performTasks("dry run", dependencies, (dep) =>
+    await performTasks("dry run", { dependencies, concurrency: 1 }, (dep) =>
       publishPackage(dep, true)
     );
 
-    await performTasks("publish", dependencies, (dep) =>
+    await performTasks("bump", { dependencies }, (dep) =>
+      bumpVersion(dep, outputs)
+    );
+
+    await performTasks("resolve local packages", { dependencies }, (dep) =>
+      resolveLocalPackages(dep)
+    );
+
+    await performTasks("publish", { dependencies, concurrency: 1 }, (dep) =>
       publishPackage(dep, false, outputs)
     );
   } finally {
-    await performTasks("unresolve", dependencies, (dep) =>
+    await performTasks("unresolve", { dependencies }, (dep) =>
       unresolveLocalPackages(dep)
     );
   }
@@ -79,14 +83,14 @@ async function publishPackages(dependencies) {
   process.stderr.write(outputs.stderr.join(""));
 }
 
-async function performTasks(title, dependencies, action) {
+async function performTasks(title, { dependencies, concurrency }, action) {
   const tasks = new Listr(
     dependencies.map((dep) => ({
       task: (_, task) => action(dep, task),
       title: title + " " + dep
     })),
     {
-      concurrent: 8,
+      concurrent: concurrency || 8,
       exitOnError: true
     }
   );
@@ -127,10 +131,12 @@ async function resolveLocalPackages(cwd) {
 
 async function unresolveLocalPackages(cwd) {
   const packageJsonPath = path.join(cwd, "package.json");
-  await cp(packageJsonPath + ".old", packageJsonPath, {
-    force: true
-  });
-  await rm(packageJsonPath + ".old", { force: true });
+  if (existsSync(packageJsonPath + ".old")) {
+    await cp(packageJsonPath + ".old", packageJsonPath, {
+      force: true
+    });
+    await rm(packageJsonPath + ".old", { force: true });
+  }
 }
 
 async function publishPackage(cwd, dryRun, outputs) {
