@@ -2,7 +2,7 @@
   "name": "@notesnook/crypto",
   "private": false,
   "description": "An easy to use wrapper around libsodium exposing essential cryptographic methods. Currently only Web is supported.",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "license": "GPL-3.0-or-later",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

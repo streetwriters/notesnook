@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/common",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "A set of common utilities shared across multiple Notesnook clients and services.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
