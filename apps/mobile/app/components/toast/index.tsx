@@ -19,17 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastOptions
 } from "../../services/event-manager";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { getElevationStyle } from "../../utils/elevation";
 import { eHideToast, eShowToast } from "../../utils/events";
 import { SIZE } from "../../utils/size";
@@ -41,12 +41,10 @@ export const Toast = ({ context = "global" }) => {
   const { colors, isDark } = useThemeColors();
   const [toastOptions, setToastOptions] = useState<ToastOptions | undefined>();
   const hideTimeout = useRef<NodeJS.Timeout | undefined>();
-  const keyboard = useKeyboard();
   const insets = useGlobalSafeAreaInsets();
   const [visible, setVisible] = useState(false);
   const toastMessages = useRef<ToastOptions[]>([]);
-  const dimensions = useWindowDimensions();
-
+  const dimensions = useSettingStore((state) => state.dimensions);
   const hideToast = useCallback(() => {
     const nextToastMessage = toastMessages.current.shift();
     if (nextToastMessage) {
@@ -113,9 +111,7 @@ export const Toast = ({ context = "global" }) => {
         width: DDS.isTab ? dimensions.width / 2 : "100%",
         alignItems: "center",
         alignSelf: "center",
-        top: keyboard.keyboardShown
-          ? insets.top + 15
-          : dimensions.height - Math.max(insets.bottom, 70),
+        top: dimensions.height - Math.max(insets.bottom, 70),
         position: "absolute",
         zIndex: 999,
         elevation: 15
