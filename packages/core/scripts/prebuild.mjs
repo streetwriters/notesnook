@@ -27,30 +27,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(path.join(__dirname, ".."));
 
-const languagesList = await langen(
-  ROOT_DIR,
-  path.join(ROOT_DIR, "src", "utils", "templates", "html", "languages")
-);
-const languageIndex = `function hasRequire() {
-  return (
-    typeof require === "function" &&
-    (typeof IS_DESKTOP_APP === "undefined" || !IS_DESKTOP_APP)
-  );
-}
-
-export async function loadLanguage(language) {
-  switch (language) {
-    ${languagesList
-      .map(({ filename, alias }) => {
-        return [
-          ...(alias || []).map((a) => `case "${a}":`),
-          `case "${filename}":`,
-          `return hasRequire() ? require("./${filename}.js") : await import("./${filename}.js");`
-        ].join("\n");
-      })
-      .join("\n\n")}
-  }
-}`;
+const { languageIndex } = await langen(ROOT_DIR);
+if (!languageIndex) throw new Error("No language index found.");
 
 await fs.writeFile(
   path.join(
@@ -60,7 +38,7 @@ await fs.writeFile(
     "templates",
     "html",
     "languages",
-    "index.js"
+    "index.ts"
   ),
   languageIndex
 );

@@ -25,17 +25,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import fs from "fs";
 import path from "path";
 
-export async function langen(rootDirectory, saveDirectory) {
+export async function langen(rootDirectory) {
   const response = await fetch(
     "https://github.com/PrismJS/prism/raw/master/components.json"
   );
-  if (!response.ok) return;
-
-  if (!fs.existsSync(saveDirectory))
-    fs.mkdirSync(saveDirectory, { recursive: true });
+  if (!response.ok) return {};
 
   const json = await response.json();
-  let output = [];
+  let languages = [];
   for (const key in json.languages) {
     if (key === "meta") continue;
     const language = json.languages[key];
@@ -49,7 +46,7 @@ export async function langen(rootDirectory, saveDirectory) {
     );
     if (!fs.existsSync(languagePath)) continue;
 
-    output.push({
+    languages.push({
       filename: key,
       title: language.title,
       alias: language.alias
@@ -58,10 +55,22 @@ export async function langen(rootDirectory, saveDirectory) {
           : [language.alias]
         : undefined
     });
-
-    fs.copyFileSync(languagePath, path.join(saveDirectory, `${key}.js`));
   }
 
-  return output;
+  const languageIndex = `/* !!! THIS IS A GENERATED FILE. DO NOT EDIT !!! */
+export async function loadLanguage(language: string) {
+  switch (language) {
+    ${languages
+      .map(({ filename, alias }) => {
+        return [
+          ...(alias || []).map((a) => `case "${a}":`),
+          `case "${filename}":`,
+          `return await import("refractor/lang/${filename}.js");`
+        ].join("\n");
+      })
+      .join("\n\n")}
+  }
+}`;
+
+  return { languages, languageIndex };
 }
-// main();
