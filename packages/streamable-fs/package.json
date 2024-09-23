@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/streamable-fs",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
