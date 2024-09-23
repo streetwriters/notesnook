@@ -169,10 +169,11 @@ class SettingStore extends BaseStore<SettingStore> {
   };
 
   toggleMarkdownShortcuts = (toggleState?: boolean) => {
+    const markdownShortcuts = this.get().markdownShortcuts;
     this.set((state) => {
       state.markdownShortcuts = toggleState ?? !state.markdownShortcuts;
-      Config.set("markdownShortcuts", state.markdownShortcuts);
     });
+    Config.set("markdownShortcuts", !markdownShortcuts);
   };
 
   togglePrivacyMode = async () => {
