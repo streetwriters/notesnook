@@ -71,10 +71,9 @@ import {
 import { editorRef, tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
-import { changeSystemBarColors } from "../stores/use-theme-store";
 
 const _TabsHolder = () => {
-  const { colors, isDark } = useThemeColors();
+  const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const setFullscreen = useSettingStore((state) => state.setFullscreen);
   const fullscreen = useSettingStore((state) => state.fullscreen);
@@ -270,33 +269,29 @@ const _TabsHolder = () => {
     }
 
     const state = getAppState();
-
-    setTimeout(() => {
-      switch (current) {
-        case "tablet":
-          tabBarRef.current?.goToIndex(0, false);
-          break;
-        case "smallTablet":
-          if (!fullscreen) {
-            tabBarRef.current?.closeDrawer(false);
-          } else {
-            tabBarRef.current?.openDrawer(false);
-          }
-          break;
-        case "mobile":
-          if (
-            (state &&
-              !state?.movedAway &&
-              useTabStore.getState().getCurrentNoteId()) ||
-            editorState().movedAway === false
-          ) {
-            tabBarRef.current?.goToIndex(2, false);
-          } else {
-            tabBarRef.current?.goToIndex(1, false);
-          }
-          break;
-      }
-    }, 1000);
+    switch (current) {
+      case "tablet":
+        tabBarRef.current?.goToIndex(0, false);
+        break;
+      case "smallTablet":
+        if (!fullscreen) {
+          tabBarRef.current?.closeDrawer(false);
+        } else {
+          tabBarRef.current?.openDrawer(false);
+        }
+        break;
+      case "mobile":
+        if (
+          state &&
+          editorState().movedAway === false &&
+          useTabStore.getState().getCurrentNoteId()
+        ) {
+          tabBarRef.current?.goToIndex(2, false);
+        } else {
+          tabBarRef.current?.goToIndex(1, false);
+        }
+        break;
+    }
   }
 
   const onScroll = (scrollOffset) => {

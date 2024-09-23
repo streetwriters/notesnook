@@ -17,21 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { parseInternalLink } from "@notesnook/core";
 import { createRef, MutableRefObject, RefObject } from "react";
 import { TextInput } from "react-native";
 import WebView from "react-native-webview";
-import { MMKV } from "../../../common/database/mmkv";
+import { db } from "../../../common/database";
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
+import { eOnLoadNote } from "../../../utils/events";
+import { NotesnookModule } from "../../../utils/notesnook-module";
 import { AppState, EditorState, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
-import { parseInternalLink } from "@notesnook/core";
-import { eOnLoadNote } from "../../../utils/events";
-import { db } from "../../../common/database";
-import { NotesnookModule } from "../../../utils/notesnook-module";
 export const textInput = createRef<TextInput>();
 export const editorController =
   createRef<useEditorType>() as MutableRefObject<useEditorType>;
@@ -155,12 +154,7 @@ export function isContentInvalid(content: string | undefined) {
 }
 
 const canRestoreAppState = (appState: AppState) => {
-  return (
-    appState.editing &&
-    !appState.note?.locked &&
-    appState.note?.id &&
-    Date.now() < appState.timestamp + 3600000
-  );
+  return appState.editing && Date.now() < appState.timestamp + 3600000;
 };
 
 let appState: AppState | undefined;
