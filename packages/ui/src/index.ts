@@ -17,5 +17,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./components";
-export * from "./utils";
+export * from "./components/index.js";
+export * from "./utils/index.js";

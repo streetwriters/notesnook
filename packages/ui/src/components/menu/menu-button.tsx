@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
-import { Icon } from "../icon";
-import { MenuButtonItem, MenuItemComponentProps } from "./types";
+import { Icon } from "../icon/index.js";
+import { MenuButtonItem, MenuItemComponentProps } from "./types.js";
 import { mdiCheck, mdiChevronRight } from "@mdi/js";
 
 type MenuButtonProps = {

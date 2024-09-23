@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useRef, useEffect, PropsWithChildren } from "react";
 import { Box, BoxProps } from "@theme-ui/components";
-import { getPosition, PositionOptions } from "../../utils/position";
+import { getPosition, PositionOptions } from "../../utils/position.js";
 import Modal from "react-modal";
 import { EmotionThemeProvider, ThemeScopes } from "@notesnook/theme";
 

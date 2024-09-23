@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { PropsWithChildren } from "react";
 import { MacScrollbar, MacScrollbarProps } from "mac-scrollbar";
-import "mac-scrollbar/dist/mac-scrollbar.css";
 
 type ScrollContainerProps = {
   id?: string;
