@@ -24,13 +24,13 @@ import {
   findParentNodeClosestToPos,
   NodeWithPos
 } from "@tiptap/core";
-import { Root, refractor } from "refractor/lib/core";
+import { Root, refractor } from "refractor/lib/core.js";
 import { RootContent } from "hast";
 import { ReplaceAroundStep, ReplaceStep } from "prosemirror-transform";
-import { toCaretPosition, toCodeLines } from "./code-block";
+import { toCaretPosition, toCodeLines } from "./utils.js";
 import Languages from "./languages.json";
-import { isLanguageLoaded, loadLanguage } from "./loader";
-import { getChangedNodes } from "../../utils/prosemirror";
+import { isLanguageLoaded, loadLanguage } from "./loader.js";
+import { getChangedNodes } from "../../utils/prosemirror.js";
 
 export type ReplaceMergedStep = ReplaceAroundStep | ReplaceStep;
 

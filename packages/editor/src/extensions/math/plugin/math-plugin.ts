@@ -29,9 +29,9 @@ import {
   PluginKey,
   PluginSpec
 } from "prosemirror-state";
-import { MathView } from "./math-node-view";
+import { MathView } from "./math-node-view.js";
 import { EditorView } from "prosemirror-view";
-import { KatexRenderer } from "./renderers/katex";
+import { KatexRenderer } from "./renderers/katex.js";
 
 ////////////////////////////////////////////////////////////
 

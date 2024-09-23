@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolProps } from "../types";
-import { Editor } from "../../types";
-import { Dropdown } from "../components/dropdown";
+import { ToolProps } from "../types.js";
+import { Editor } from "../../types.js";
+import { Dropdown } from "../components/dropdown.js";
 import { MenuItem } from "@notesnook/ui";
-import { ToolbarLocation, useToolbarLocation } from "../stores/toolbar-store";
+import { ToolbarLocation, useToolbarLocation } from "../stores/toolbar-store.js";
 import { useMemo } from "react";
-import { CodeBlock } from "../../extensions/code-block";
+import { CodeBlock } from "../../extensions/code-block/index.js";
 
 const defaultLevels = [1, 2, 3, 4, 5, 6] as const;
 

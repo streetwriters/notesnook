@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Table as TiptapTable, TableOptions } from "@tiptap/extension-table";
 import { tableEditing, columnResizing, TableView } from "@tiptap/pm/tables";
-import { TableNodeView } from "./component";
+import { TableNodeView } from "./component.js";
 import { Plugin, PluginKey } from "prosemirror-state";
 
 export const Table = TiptapTable.extend<TableOptions>({

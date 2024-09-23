@@ -17,27 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolProps } from "../types";
-import { Editor } from "../../types";
-import { ToolButton } from "../components/tool-button";
+import { ToolProps } from "../types.js";
+import { Editor } from "../../types.js";
+import { ToolButton } from "../components/tool-button.js";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { ResponsivePresenter } from "../../components/responsive";
+import { ResponsivePresenter } from "../../components/responsive/index.js";
 import { MenuButtonItem, MenuItem } from "@notesnook/ui";
 import {
   moveColumnLeft as moveColumnLeftAction,
   moveColumnRight as moveColumnRightAction,
   moveRowDown as moveRowDownAction,
   moveRowUp as moveRowUpAction
-} from "../../extensions/table/actions";
-import { MoreTools } from "../components/more-tools";
-import { menuButtonToTool, toolToMenuButton } from "./utils";
-import { getToolDefinition } from "../tool-definitions";
-import { CellProperties as CellPropertiesPopup } from "../popups/cell-properties";
-import { ColorTool } from "./colors";
-import { Counter } from "../components/counter";
-import { useToolbarLocation } from "../stores/toolbar-store";
-import { showPopup } from "../../components/popup-presenter";
-import { useRefValue } from "../../hooks/use-ref-value";
+} from "../../extensions/table/actions.js";
+import { MoreTools } from "../components/more-tools.js";
+import { menuButtonToTool, toolToMenuButton } from "./utils.js";
+import { getToolDefinition } from "../tool-definitions.js";
+import { CellProperties as CellPropertiesPopup } from "../popups/cell-properties.js";
+import { ColorTool } from "./colors.js";
+import { Counter } from "../components/counter.js";
+import { useToolbarLocation } from "../stores/toolbar-store.js";
+import { showPopup } from "../../components/popup-presenter/index.js";
+import { useRefValue } from "../../hooks/use-ref-value.js";
 
 export function TableSettings(props: ToolProps) {
   const { editor } = props;

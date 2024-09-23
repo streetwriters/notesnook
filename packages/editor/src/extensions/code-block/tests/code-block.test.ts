@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createEditor, h } from "../../../../test-utils";
+import { createEditor, h } from "../../../../test-utils/index.js";
 import { expect, test, vi } from "vitest";
-import { CodeBlock, inferLanguage } from "../code-block";
-import { HighlighterPlugin } from "../highlighter";
-import { getChangedNodes } from "../../../utils/prosemirror";
+import { CodeBlock, inferLanguage } from "../code-block.js";
+import { HighlighterPlugin } from "../highlighter.js";
+import { getChangedNodes } from "../../../utils/prosemirror.js";
 import { refractor } from "refractor/lib/core";
 
 const CODEBLOCKS_HTML = h("div", [

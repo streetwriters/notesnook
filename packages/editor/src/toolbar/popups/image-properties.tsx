@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex } from "@theme-ui/components";
-import { Popup } from "../components/popup";
-import { ImageAttributes } from "../../extensions/image";
-import { Editor } from "../../types";
-import { InlineInput } from "../../components/inline-input";
-import { findSelectedNode } from "../../utils/prosemirror";
+import { Popup } from "../components/popup.js";
+import { ImageAttributes } from "../../extensions/image/index.js";
+import { Editor } from "../../types.js";
+import { InlineInput } from "../../components/inline-input/index.js";
+import { findSelectedNode } from "../../utils/prosemirror.js";
 
 export type ImagePropertiesProps = {
   editor: Editor;

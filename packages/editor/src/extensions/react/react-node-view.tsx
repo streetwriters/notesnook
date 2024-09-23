@@ -21,18 +21,18 @@ import React, { FunctionComponent, SyntheticEvent } from "react";
 import { NodeView, Decoration, DecorationSource } from "prosemirror-view";
 import { Node as PMNode, Slice } from "prosemirror-model";
 import { NodeSelection } from "prosemirror-state";
-import { PortalProviderAPI } from "./react-portal-provider";
+import { PortalProviderAPI } from "./react-portal-provider.js";
 import {
   ReactNodeViewProps,
   ReactNodeViewOptions,
   GetPosNode,
   ContentDOM
-} from "./types";
+} from "./types.js";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
 import { __serializeForClipboard, EditorView } from "prosemirror-view";
 import { EmotionThemeProvider } from "@notesnook/theme";
-import { isAndroid, isiOS } from "../../utils/platform";
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store";
+import { isAndroid, isiOS } from "../../utils/platform.js";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
 // This is hacky workaround to manually handle serialization when
 // drag/dropping on mobile devices.

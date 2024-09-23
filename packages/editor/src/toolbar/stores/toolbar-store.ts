@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { create } from "zustand";
-import { DownloadOptions } from "../../utils/downloader";
+import { DownloadOptions } from "../../utils/downloader.js";
 import { useCallback } from "react";
 
 export type ToolbarLocation = "top" | "bottom";

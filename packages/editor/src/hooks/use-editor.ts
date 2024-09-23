@@ -24,9 +24,9 @@ import {
   resolveFocusPosition
 } from "@tiptap/core";
 import { DependencyList, useEffect, useMemo, useRef, useState } from "react";
-import { Editor } from "../types";
+import { Editor } from "../types.js";
 import { EditorState } from "@tiptap/pm/state";
-import { useToolbarStore } from "../toolbar/stores/toolbar-store";
+import { useToolbarStore } from "../toolbar/stores/toolbar-store.js";
 
 function useForceUpdate() {
   const [, setValue] = useState(0);

@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolbarGroupDefinition, ToolButtonVariant } from "../types";
-import { findTool } from "../tools";
+import { ToolbarGroupDefinition, ToolButtonVariant } from "../types.js";
+import { findTool } from "../tools/index.js";
 import { Flex, FlexProps } from "@theme-ui/components";
-import { Editor } from "../../types";
-import { MoreTools } from "./more-tools";
-import { getToolDefinition } from "../tool-definitions";
+import { Editor } from "../../types.js";
+import { MoreTools } from "./more-tools.js";
+import { getToolDefinition } from "../tool-definitions.js";
 
 export type ToolbarGroupProps = FlexProps & {
   tools: ToolbarGroupDefinition;

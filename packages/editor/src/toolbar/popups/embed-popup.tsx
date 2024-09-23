@@ -19,12 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, Text } from "@theme-ui/components";
 import { useCallback, useState } from "react";
-import { Popup } from "../components/popup";
+import { Popup } from "../components/popup.js";
 import { Input, Textarea } from "@theme-ui/components";
-import { Embed, EmbedSizeOptions } from "../../extensions/embed";
+import { Embed, EmbedSizeOptions } from "../../extensions/embed/index.js";
 import { convertUrlToEmbedUrl } from "@social-embed/lib";
-import { InlineInput } from "../../components/inline-input";
-import { Tabs, Tab } from "../../components/tabs";
+import { InlineInput } from "../../components/inline-input/index.js";
+import { Tabs, Tab } from "../../components/tabs/index.js";
 
 type EmbedSource = "url" | "code";
 export type EmbedPopupProps = {

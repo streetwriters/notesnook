@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolProps } from "../types";
-import { ToolButton } from "../components/tool-button";
-import { useToolbarLocation } from "../stores/toolbar-store";
-import { CodeBlock } from "../../extensions/code-block";
+import { ToolProps } from "../types.js";
+import { ToolButton } from "../components/tool-button.js";
+import { useToolbarLocation } from "../stores/toolbar-store.js";
+import { CodeBlock } from "../../extensions/code-block/index.js";
 
 export function Italic(props: ToolProps) {
   const { editor } = props;

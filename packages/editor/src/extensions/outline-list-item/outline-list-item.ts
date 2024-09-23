@@ -22,8 +22,8 @@ import {
   mergeAttributes,
   findParentNodeClosestToPos
 } from "@tiptap/core";
-import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror";
-import { OutlineList } from "../outline-list/outline-list";
+import { findParentNodeOfTypeClosestToPos } from "../../utils/prosemirror.js";
+import { OutlineList } from "../outline-list/outline-list.js";
 
 export interface ListItemOptions {
   HTMLAttributes: Record<string, unknown>;

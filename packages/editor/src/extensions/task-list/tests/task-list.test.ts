@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createEditor, h, ul, li } from "../../../../test-utils";
+import { createEditor, h, ul, li } from "../../../../test-utils/index.js";
 import { test, expect } from "vitest";
-import { TaskListNode } from "../index";
-import { TaskItemNode } from "../../task-item";
+import { TaskListNode } from "../index.js";
+import { TaskItemNode } from "../../task-item/index.js";
 import { p, eq } from "prosemirror-test-builder";
-import { countCheckedItems, deleteCheckedItems, sortList } from "../utils";
+import { countCheckedItems, deleteCheckedItems, sortList } from "../utils.js";
 
 function taskList(...children: HTMLLIElement[]) {
   return ul(children, { class: "checklist" });

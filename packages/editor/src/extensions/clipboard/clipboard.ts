@@ -20,11 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { Slice } from "prosemirror-model";
-import { LIST_NODE_TYPES } from "../../utils/node-types";
-import { ClipboardDOMParser } from "./clipboard-dom-parser";
-import { ClipboardDOMSerializer } from "./clipboard-dom-serializer";
-import { clipboardTextParser } from "./clipboard-text-parser";
-import { clipboardTextSerializer } from "./clipboard-text-serializer";
+import { LIST_NODE_TYPES } from "../../utils/node-types.js";
+import { ClipboardDOMParser } from "./clipboard-dom-parser.js";
+import { ClipboardDOMSerializer } from "./clipboard-dom-serializer.js";
+import { clipboardTextParser } from "./clipboard-text-parser.js";
+import { clipboardTextSerializer } from "./clipboard-text-serializer.js";
 import { EditorView } from "prosemirror-view";
 
 export const Clipboard = Extension.create({

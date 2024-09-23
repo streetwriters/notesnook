@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 import { Editor, Extension } from "@tiptap/core";
 
 type FontSizeOptions = {

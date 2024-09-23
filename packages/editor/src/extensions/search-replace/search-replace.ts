@@ -26,7 +26,7 @@ import {
   Transaction,
   TextSelection
 } from "prosemirror-state";
-import { SearchSettings } from "../../toolbar/stores/search-store";
+import { SearchSettings } from "../../toolbar/stores/search-store.js";
 
 type DispatchFn = (tr: Transaction) => void;
 declare module "@tiptap/core" {

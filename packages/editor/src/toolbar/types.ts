@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor } from "../types";
-import { IconNames } from "./icons";
-import { ToolId } from "./tools";
+import { Editor } from "../types.js";
+import { IconNames } from "./icons.js";
+import { ToolId } from "./tools/index.js";
 
 export type ToolButtonVariant = "small" | "normal";
 export type ToolProps = ToolDefinition & {

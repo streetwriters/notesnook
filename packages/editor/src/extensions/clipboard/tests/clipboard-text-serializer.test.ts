@@ -18,14 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { test } from "vitest";
-import { createEditor, h } from "../../../../test-utils";
-import OrderedList from "../../ordered-list";
-import { ListItem } from "../../list-item";
-import { transformCopied } from "../index";
-import { Paragraph } from "../../paragraph";
-import { ClipboardDOMSerializer } from "../clipboard-dom-serializer";
-import { clipboardTextSerializer } from "../clipboard-text-serializer";
-import Link from "../../link";
+import { createEditor, h } from "../../../../test-utils/index.js";
+import OrderedList from "../../ordered-list/index.js";
+import { ListItem } from "../../list-item/index.js";
+import { transformCopied } from "../index.js";
+import { Paragraph } from "../../paragraph/index.js";
+import { ClipboardDOMSerializer } from "../clipboard-dom-serializer.js";
+import { clipboardTextSerializer } from "../clipboard-text-serializer.js";
+import Link from "../../link/index.js";
 
 test("copied list items shouldn't contain extra newlines", (t) => {
   const { editor } = createEditor({

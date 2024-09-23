@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { getParentAttributes } from "../../utils/prosemirror";
+import { getParentAttributes } from "../../utils/prosemirror.js";
 import { wrappingInputRule } from "@tiptap/core";
 import TiptapBlockquote, { inputRegex } from "@tiptap/extension-blockquote";
 

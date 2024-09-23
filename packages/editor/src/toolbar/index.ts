@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Toolbar } from "./toolbar";
+import { Toolbar } from "./toolbar.js";
 
 export default Toolbar;
-export * from "./types";
-export * from "./icons";
-export * from "./tools";
-export * from "./tool-definitions";
+export * from "./types.js";
+export * from "./icons.js";
+export * from "./tools/index.js";
+export * from "./tool-definitions.js";

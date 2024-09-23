@@ -23,8 +23,8 @@ import {
 } from "@tiptap/pm/model";
 import { encodeNonAsciiHTML } from "entities";
 import { Schema, Slice } from "prosemirror-model";
-import { inferLanguage } from "../code-block";
-import { hasPermission } from "../../types";
+import { inferLanguage } from "../code-block/index.js";
+import { hasPermission } from "../../types.js";
 
 export class ClipboardDOMParser extends ProsemirrorDOMParser {
   static fromSchema(schema: Schema): ClipboardDOMParser {

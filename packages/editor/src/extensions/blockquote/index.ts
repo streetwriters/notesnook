@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Blockquote } from "./blockquote";
+import { Blockquote } from "./blockquote.js";
 
-export * from "./blockquote";
+export * from "./blockquote.js";
 
 export default Blockquote;

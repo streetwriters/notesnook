@@ -17,18 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolProps } from "../types";
-import { Editor } from "../../types";
-import { Icons } from "../icons";
+import { ToolProps } from "../types.js";
+import { Editor } from "../../types.js";
+import { Icons } from "../icons.js";
 import { useMemo, useRef, useState } from "react";
-import { EmbedPopup } from "../popups/embed-popup";
-import { TablePopup } from "../popups/table-popup";
+import { EmbedPopup } from "../popups/embed-popup.js";
+import { TablePopup } from "../popups/table-popup.js";
 import { MenuItem, Icon } from "@notesnook/ui";
-import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
-import { ResponsivePresenter } from "../../components/responsive";
-import { showPopup } from "../../components/popup-presenter";
-import { ImageUploadPopup } from "../popups/image-upload";
-import { Button } from "../../components/button";
+import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store.js";
+import { ResponsivePresenter } from "../../components/responsive/index.js";
+import { showPopup } from "../../components/popup-presenter/index.js";
+import { ImageUploadPopup } from "../popups/image-upload.js";
+import { Button } from "../../components/button.js";
 
 export function InsertBlock(props: ToolProps) {
   const { editor } = props;

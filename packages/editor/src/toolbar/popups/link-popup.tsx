@@ -19,13 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Input } from "@theme-ui/components";
 import { Flex } from "@theme-ui/components";
-import { useRefValue } from "../../hooks/use-ref-value";
-import { Popup } from "../components/popup";
-import { isInternalLink, LinkDefinition } from "../tools/link";
-import { showPopup } from "../../components/popup-presenter";
-import Link, { LinkAttributes } from "../../extensions/link";
-import { ImageNode } from "../../extensions/image";
-import { findMark, selectionToOffset } from "../../utils/prosemirror";
+import { useRefValue } from "../../hooks/use-ref-value.js";
+import { Popup } from "../components/popup.js";
+import { isInternalLink, LinkDefinition } from "../tools/link.js";
+import { showPopup } from "../../components/popup-presenter/index.js";
+import Link, { LinkAttributes } from "../../extensions/link/index.js";
+import { ImageNode } from "../../extensions/image/index.js";
+import { findMark, selectionToOffset } from "../../utils/prosemirror.js";
 import { Editor, getMarkAttributes } from "@tiptap/core";
 
 export type LinkPopupProps = {

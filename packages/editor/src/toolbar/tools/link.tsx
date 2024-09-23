@@ -17,20 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolProps } from "../types";
-import { ToolButton } from "../components/tool-button";
+import { ToolProps } from "../types.js";
+import { ToolButton } from "../components/tool-button.js";
 import { useRef, useState } from "react";
-import { ResponsivePresenter } from "../../components/responsive";
-import { LinkPopup } from "../popups/link-popup";
-import { useToolbarLocation } from "../stores/toolbar-store";
-import { MoreTools } from "../components/more-tools";
-import { useRefValue } from "../../hooks/use-ref-value";
-import { findMark, selectionToOffset } from "../../utils/prosemirror";
+import { ResponsivePresenter } from "../../components/responsive/index.js";
+import { LinkPopup } from "../popups/link-popup.js";
+import { useToolbarLocation } from "../stores/toolbar-store.js";
+import { MoreTools } from "../components/more-tools.js";
+import { useRefValue } from "../../hooks/use-ref-value.js";
+import { findMark, selectionToOffset } from "../../utils/prosemirror.js";
 import { Flex, Link } from "@theme-ui/components";
-import { ImageNode } from "../../extensions/image";
-import { Link as LinkNode } from "../../extensions/link";
+import { ImageNode } from "../../extensions/image/index.js";
+import { Link as LinkNode } from "../../extensions/link/index.js";
 import { getMarkAttributes } from "@tiptap/core";
-import { useHoverPopupContext } from "../floating-menus/hover-popup/context";
+import { useHoverPopupContext } from "../floating-menus/hover-popup/context.js";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;

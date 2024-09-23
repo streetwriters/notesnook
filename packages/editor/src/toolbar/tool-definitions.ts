@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolbarDefinition, ToolDefinition } from "./types";
-import { ToolId } from "./tools";
+import { ToolbarDefinition, ToolDefinition } from "./types.js";
+import { ToolId } from "./tools/index.js";
 
 const tools: Record<ToolId, ToolDefinition> = {
   none: {

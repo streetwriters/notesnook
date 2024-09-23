@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Input } from "@theme-ui/components";
 import { useCallback, useEffect, useRef } from "react";
 import { Flex, Text } from "@theme-ui/components";
-import { SearchStorage } from "../../extensions/search-replace";
-import { ToolButton } from "../components/tool-button";
-import { Editor } from "../../types";
-import { useEditorSearchStore } from "../stores/search-store";
+import { SearchStorage } from "../../extensions/search-replace/index.js";
+import { ToolButton } from "../components/tool-button.js";
+import { Editor } from "../../types.js";
+import { useEditorSearchStore } from "../stores/search-store.js";
 
 export type SearchReplacePopupProps = { editor: Editor };
 export function SearchReplacePopup(props: SearchReplacePopupProps) {

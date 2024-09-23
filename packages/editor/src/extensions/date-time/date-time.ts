@@ -23,9 +23,7 @@ import {
   InputRuleFinder,
   ExtendedRegExpMatchArray
 } from "@tiptap/core";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { formatDate } from "@notesnook/core/dist/utils/date";
+import { formatDate } from "@notesnook/common";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {

@@ -26,7 +26,7 @@ import React, {
 } from "react";
 import { MenuItem, Icon, MenuButton, MenuSeparator } from "@notesnook/ui";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
-import { Icons } from "../../toolbar/icons";
+import { Icons } from "../../toolbar/icons.js";
 import Modal from "react-modal";
 import {
   motion,

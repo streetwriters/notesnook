@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { Flex, Text } from "@theme-ui/components";
-import { ToolButton } from "./tool-button";
-import { useIsMobile } from "../stores/toolbar-store";
+import { ToolButton } from "./tool-button.js";
+import { useIsMobile } from "../stores/toolbar-store.js";
 
 export type CounterProps = {
   title: string;

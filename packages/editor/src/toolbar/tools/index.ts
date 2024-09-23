@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { ToolProps } from "../types";
+import { ToolProps } from "../types.js";
 import {
   Bold,
   Italic,
@@ -30,14 +30,14 @@ import {
   ClearFormatting,
   CodeRemove,
   Math
-} from "./inline";
-import { InsertBlock } from "./block";
-import { FontSize, FontFamily } from "./font";
-import { Alignment } from "./alignment";
-import { Headings } from "./headings";
-import { NumberedList, BulletList, Outdent, Indent, CheckList } from "./lists";
-import { TextDirection } from "./text-direction";
-import { Highlight, TextColor } from "./colors";
+} from "./inline.js";
+import { InsertBlock } from "./block.js";
+import { FontSize, FontFamily } from "./font.js";
+import { Alignment } from "./alignment.js";
+import { Headings } from "./headings.js";
+import { NumberedList, BulletList, Outdent, Indent, CheckList } from "./lists.js";
+import { TextDirection } from "./text-direction.js";
+import { Highlight, TextColor } from "./colors.js";
 import {
   TableSettings,
   ColumnProperties,
@@ -60,7 +60,7 @@ import {
   CellBorderColor,
   CellTextColor,
   CellBorderWidth
-} from "./table";
+} from "./table.js";
 import {
   ImageSettings,
   ImageAlignCenter,
@@ -68,20 +68,20 @@ import {
   ImageAlignRight,
   ImageFloat,
   ImageProperties
-} from "./image";
+} from "./image.js";
 import {
   AttachmentSettings,
   DownloadAttachment,
   PreviewAttachment,
   RemoveAttachment
-} from "./attachment";
+} from "./attachment.js";
 import {
   EmbedAlignCenter,
   EmbedAlignLeft,
   EmbedAlignRight,
   EmbedProperties,
   EmbedSettings
-} from "./embed";
+} from "./embed.js";
 import {
   AddLink,
   AddInternalLink,
@@ -90,13 +90,13 @@ import {
   LinkSettings,
   OpenLink,
   CopyLink
-} from "./link";
+} from "./link.js";
 import {
   WebClipFullScreen,
   WebClipSettings,
   WebClipOpenExternal,
   WebClipOpenSource
-} from "./web-clip";
+} from "./web-clip.js";
 
 export type ToolId = keyof typeof tools;
 const tools = {

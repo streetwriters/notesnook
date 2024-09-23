@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor, AnyExtension, Extensions } from "@tiptap/core";
-import StarterKit, { StarterKitOptions } from "@tiptap/starter-kit";
+import StarterKit from "@tiptap/starter-kit";
 import { builders, NodeBuilder } from "prosemirror-test-builder";
 import { Schema } from "@tiptap/pm/model";
 

@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor } from "../../types";
+import { Editor } from "../../types.js";
 import { Box } from "@theme-ui/components";
-import { Tab, Tabs } from "../../components/tabs";
+import { Tab, Tabs } from "../../components/tabs/index.js";
 import { Icon } from "@notesnook/ui";
 // import { MenuPresenter } from "../../components/menu/menu";
-import { Popup } from "../components/popup";
-import { Icons } from "../icons";
-import { ColorPicker } from "./color-picker";
+import { Popup } from "../components/popup.js";
+import { Icons } from "../icons.js";
+import { ColorPicker } from "./color-picker.js";
 
 type CellPropertiesProps = { editor: Editor; onClose: () => void };
 export function CellProperties(props: CellPropertiesProps) {

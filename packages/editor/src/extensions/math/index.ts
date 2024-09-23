@@ -17,5 +17,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export { MathInline } from "./math-inline";
-export { MathBlock } from "./math-block";
+export { MathInline } from "./math-inline.js";
+export { MathBlock } from "./math-block.js";

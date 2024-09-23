@@ -29,11 +29,11 @@ import {
 } from "@tiptap/core";
 import { Plugin, TextSelection } from "@tiptap/pm/state";
 import { find, registerCustomProtocol, reset } from "linkifyjs";
-import { autolink } from "./helpers/autolink";
-import { clickHandler } from "./helpers/clickHandler";
-import { pasteHandler } from "./helpers/pasteHandler";
-import { ImageNode } from "../image";
-import { selectionToOffset } from "../../utils/prosemirror";
+import { autolink } from "./helpers/autolink.js";
+import { clickHandler } from "./helpers/clickHandler.js";
+import { pasteHandler } from "./helpers/pasteHandler.js";
+import { ImageNode } from "../image/index.js";
+import { selectionToOffset } from "../../utils/prosemirror.js";
 
 export interface LinkProtocolOptions {
   scheme: string;

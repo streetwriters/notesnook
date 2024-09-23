@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Flex, Text } from "@theme-ui/components";
 import { useEffect, useState } from "react";
-import { Popup } from "../components/popup";
-import { useIsMobile } from "../stores/toolbar-store";
-import { InlineInput } from "../../components/inline-input";
+import { Popup } from "../components/popup.js";
+import { useIsMobile } from "../stores/toolbar-store.js";
+import { InlineInput } from "../../components/inline-input/index.js";
 
 const MAX_COLUMNS = 20;
 const MAX_ROWS = 20;

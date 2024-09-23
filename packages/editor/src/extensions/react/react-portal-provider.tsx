@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FunctionComponent, PropsWithChildren } from "react";
 import { flushSync } from "react-dom";
-import { EventDispatcher } from "./event-dispatcher";
+import { EventDispatcher } from "./event-dispatcher.js";
 import { Root, createRoot } from "react-dom/client";
 
 export type BasePortalProviderProps = PropsWithChildren<unknown>;

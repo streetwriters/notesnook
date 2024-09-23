@@ -19,15 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Flex, Input, Text } from "@theme-ui/components";
 import { useMemo } from "react";
-import { ToolButton } from "../../toolbar/components/tool-button";
-import { ReactNodeViewProps } from "../react";
-import { toggleChildren, type TaskListAttributes } from "./task-list";
-import { replaceDateTime } from "../date-time";
-import { deleteCheckedItems, sortList } from "./utils";
+import { ToolButton } from "../../toolbar/components/tool-button.js";
+import { ReactNodeViewProps } from "../react/index.js";
+import { type TaskListAttributes } from "./task-list.js";
+import { replaceDateTime } from "../date-time/index.js";
+import { deleteCheckedItems, sortList, toggleChildren } from "./utils.js";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store";
-import { Icons } from "../../toolbar/icons";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
+import { Icons } from "../../toolbar/icons.js";
 import { Icon } from "@notesnook/ui";
 
 export function TaskListComponent(

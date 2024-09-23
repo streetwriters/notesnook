@@ -17,16 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolProps } from "../types";
+import { ToolProps } from "../types.js";
 import { Box, Button, Flex } from "@theme-ui/components";
-import { IconNames } from "../icons";
+import { IconNames } from "../icons.js";
 import { useCallback, useRef } from "react";
-import { SplitButton } from "../components/split-button";
-import { usePopupManager, useToolbarLocation } from "../stores/toolbar-store";
-import { getToolbarElement } from "../utils/dom";
-import { PopupWrapper } from "../../components/popup-presenter";
-import { ToolButton } from "../components/tool-button";
-import { findListItemType, isListActive } from "../../utils/prosemirror";
+import { SplitButton } from "../components/split-button.js";
+import { usePopupManager, useToolbarLocation } from "../stores/toolbar-store.js";
+import { getToolbarElement } from "../utils/dom.js";
+import { PopupWrapper } from "../../components/popup-presenter/index.js";
+import { ToolButton } from "../components/tool-button.js";
+import { findListItemType, isListActive } from "../../utils/list.js";
 
 type ListSubType<TListStyleTypes> = {
   items: string[];

@@ -21,11 +21,11 @@ import { Theme } from "@notesnook/theme";
 import { SchemeColors } from "@notesnook/theme";
 import React from "react";
 import { ButtonProps } from "@theme-ui/components";
-import { IconNames, Icons } from "../icons";
-import { ToolButtonVariant } from "../types";
-import { Button } from "../../components/button";
+import { IconNames, Icons } from "../icons.js";
+import { ToolButtonVariant } from "../types.js";
+import { Button } from "../../components/button.js";
 import { Icon } from "@notesnook/ui";
-import { useIsMobile } from "../stores/toolbar-store";
+import { useIsMobile } from "../stores/toolbar-store.js";
 
 export type ToolButtonProps = ButtonProps & {
   icon: IconNames;

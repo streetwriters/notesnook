@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { mergeAttributes } from "@tiptap/core";
 import { TaskItem } from "@tiptap/extension-task-item";
-import { TaskItemComponent } from "./component";
-import { createNodeView } from "../react";
+import { TaskItemComponent } from "./component.js";
+import { createNodeView } from "../react/index.js";
 
 export type TaskItemAttributes = {
   checked: boolean;

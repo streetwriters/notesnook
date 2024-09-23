@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { TextDirection } from "./text-direction";
+import { TextDirection } from "./text-direction.js";
 
-export * from "./text-direction";
+export * from "./text-direction.js";
 
 export default TextDirection;

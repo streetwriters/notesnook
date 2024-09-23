@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { BlockId } from "./block-id";
+import { BlockId } from "./block-id.js";
 
-export * from "./block-id";
+export * from "./block-id.js";
 
 export default BlockId;

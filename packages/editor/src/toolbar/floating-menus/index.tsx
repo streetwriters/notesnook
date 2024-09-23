@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DesktopOnly } from "../../components/responsive";
-import { HoverPopupHandler } from "./hover-popup";
-import { SearchReplaceFloatingMenu } from "./search-replace";
-import { FloatingMenuProps } from "./types";
+import { DesktopOnly } from "../../components/responsive/index.js";
+import { HoverPopupHandler } from "./hover-popup/index.js";
+import { SearchReplaceFloatingMenu } from "./search-replace.js";
+import { FloatingMenuProps } from "./types.js";
 
 export function EditorFloatingMenus(props: FloatingMenuProps) {
   return (

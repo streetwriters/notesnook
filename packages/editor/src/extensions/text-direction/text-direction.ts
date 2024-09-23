@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { isListActive } from "../../utils/prosemirror";
 import { Extension, Editor, findParentNode } from "@tiptap/core";
 import "@tiptap/extension-text-style";
-import { Paragraph } from "../paragraph";
+import { Paragraph } from "../paragraph/index.js";
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
+import { isListActive } from "../../utils/list.js";
 
 export type TextDirections = undefined | "rtl";
 const TEXT_DIRECTION_TYPES = [

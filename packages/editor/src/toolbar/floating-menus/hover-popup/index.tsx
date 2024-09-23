@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useRef } from "react";
-import { showPopup } from "../../../components/popup-presenter";
-import { Editor } from "../../../types";
-import { FloatingMenuProps } from "../types";
-import { LinkHoverPopupHandler } from "./link";
-import { HoverPopupContextProvider } from "./context";
+import { showPopup } from "../../../components/popup-presenter/index.js";
+import { Editor } from "../../../types.js";
+import { FloatingMenuProps } from "../types.js";
+import { LinkHoverPopupHandler } from "./link.js";
+import { HoverPopupContextProvider } from "./context.js";
 
 export type HoverPopupProps = {
   editor: Editor;

@@ -21,8 +21,9 @@ import TaskList from "@tiptap/extension-task-list";
 import { Transaction } from "@tiptap/pm/state";
 import { Fragment, Node as ProsemirrorNode } from "prosemirror-model";
 import { NodeWithPos } from "@tiptap/core";
-import { findParentNodeClosestToPos } from "../../utils/prosemirror";
+import { findParentNodeClosestToPos } from "../../utils/prosemirror.js";
 import TaskItem from "@tiptap/extension-task-item";
+import { TaskItemNode } from "../task-item/index.js";
 
 export function countCheckedItems(node: ProsemirrorNode) {
   let checked = 0;
@@ -132,4 +133,27 @@ export function findRootTaskList(doc: ProsemirrorNode, pos?: number) {
       node.type.name === TaskList.name &&
       (!parent || !invalidTaskListParents.includes(parent.type.name))
   );
+}
+
+export function toggleChildren(
+  tr: Transaction,
+  node: ProsemirrorNode,
+  toggleState: boolean,
+  parentPos: number
+) {
+  let changes = 0;
+  node.descendants((node, pos) => {
+    if (
+      node.type.name === TaskItemNode.name &&
+      toggleState !== node.attrs.checked
+    ) {
+      const actualPos = pos + parentPos + 1;
+      tr.setNodeMarkup(tr.mapping.map(actualPos), undefined, {
+        ...node.attrs,
+        checked: toggleState
+      });
+      changes++;
+    }
+  });
+  return changes;
 }

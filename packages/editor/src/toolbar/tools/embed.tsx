@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolProps } from "../types";
-import { ToolButton } from "../components/tool-button";
+import { ToolProps } from "../types.js";
+import { ToolButton } from "../components/tool-button.js";
 import { useMemo, useRef, useState } from "react";
-import { ResponsivePresenter } from "../../components/responsive";
-import { MoreTools } from "../components/more-tools";
-import { useToolbarLocation } from "../stores/toolbar-store";
-import { findSelectedNode } from "../../utils/prosemirror";
-import { Embed } from "../../extensions/embed";
-import { EmbedPopup } from "../popups/embed-popup";
+import { ResponsivePresenter } from "../../components/responsive/index.js";
+import { MoreTools } from "../components/more-tools.js";
+import { useToolbarLocation } from "../stores/toolbar-store.js";
+import { findSelectedNode } from "../../utils/prosemirror.js";
+import { Embed } from "../../extensions/embed/index.js";
+import { EmbedPopup } from "../popups/embed-popup.js";
 
 export function EmbedSettings(props: ToolProps) {
   const { editor } = props;

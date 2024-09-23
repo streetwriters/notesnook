@@ -18,13 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useRef } from "react";
-import { PopupWrapper } from "../../components/popup-presenter";
-import { ToolButton } from "../components/tool-button";
-import { usePopupManager, useToolbarLocation } from "../stores/toolbar-store";
-import { ToolProps } from "../types";
-import { getToolbarElement } from "../utils/dom";
-import { ToolId } from "../tools";
-import { ToolbarGroup } from "./toolbar-group";
+import { PopupWrapper } from "../../components/popup-presenter/index.js";
+import { ToolButton } from "../components/tool-button.js";
+import { usePopupManager, useToolbarLocation } from "../stores/toolbar-store.js";
+import { ToolProps } from "../types.js";
+import { getToolbarElement } from "../utils/dom.js";
+import { ToolId } from "../tools/index.js";
+import { ToolbarGroup } from "./toolbar-group.js";
 
 type MoreToolsProps = ToolProps & {
   popupId: string;

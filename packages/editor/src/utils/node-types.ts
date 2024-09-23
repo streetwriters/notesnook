@@ -21,8 +21,8 @@ import { TaskList } from "@tiptap/extension-task-list";
 import { BulletList } from "@tiptap/extension-bullet-list";
 import { ListItem } from "@tiptap/extension-list-item";
 import { OrderedList } from "@tiptap/extension-ordered-list";
-import { OutlineList } from "../extensions/outline-list";
-import { OutlineListItem } from "../extensions/outline-list-item";
+import { OutlineList } from "../extensions/outline-list/index.js";
+import { OutlineListItem } from "../extensions/outline-list-item/index.js";
 import { TaskItem } from "@tiptap/extension-task-item";
 
 export const LIST_NODE_TYPES = [

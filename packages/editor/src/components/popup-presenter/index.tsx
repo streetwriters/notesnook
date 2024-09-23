@@ -28,13 +28,13 @@ import {
   getPopupRoot,
   getToolbarElement,
   unmountPopupRoot
-} from "../../toolbar/utils/dom";
+} from "../../toolbar/utils/dom.js";
 import {
   useIsMobile,
   useToolbarStore
-} from "../../toolbar/stores/toolbar-store";
+} from "../../toolbar/stores/toolbar-store.js";
 import React from "react";
-import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive";
+import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive/index.js";
 
 export type PopupWrapperProps = UsePopupHandlerOptions & {
   autoCloseOnUnmount?: boolean;

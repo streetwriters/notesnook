@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { TextSerializer } from "@tiptap/core";
 import { Schema, Slice } from "prosemirror-model";
-import { ListItem } from "../list-item";
+import { ListItem } from "../list-item/index.js";
 import { EditorView } from "@tiptap/pm/view";
 
 export function clipboardTextSerializer(content: Slice, view: EditorView) {

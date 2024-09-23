@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolbarGroup } from "../../components/toolbar-group";
-import { HoverPopupProps } from ".";
-import { useHoverPopupContext } from "./context";
-import { ToolbarGroupDefinition } from "../../types";
+import { ToolbarGroup } from "../../components/toolbar-group.js";
+import { HoverPopupProps } from "./index.js";
+import { useHoverPopupContext } from "./context.js";
+import { ToolbarGroupDefinition } from "../../types.js";
 
 const LINK_TOOLS: ToolbarGroupDefinition = [
   "openLink",
