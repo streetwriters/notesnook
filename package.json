@@ -53,7 +53,8 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "husky": "^8.0.1",
     "prettier": "^2.8.8",
-    "serve": "^14.0.1"
+    "serve": "^14.0.1",
+    "tsup": "^8.3.0"
   },
   "dependencies": {
     "eslint-plugin-header": "^3.1.1",
