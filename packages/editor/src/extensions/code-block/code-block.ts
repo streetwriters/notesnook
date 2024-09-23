@@ -243,7 +243,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             tr.replaceSelectionWith(
               this.type.create(
                 { ...attributes, id: createCodeblockId() },
-                state.schema.text(text)
+                text ? state.schema.text(text) : null
               )
             );
             return commands.setTextSelection({ from, to: tr.mapping.map(to) });
