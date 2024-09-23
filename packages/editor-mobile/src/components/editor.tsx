@@ -390,24 +390,28 @@ const Tiptap = ({
   );
 
   const onClickBottomArea = useCallback(() => {
-    const editor = editors[tab.id];
-    const docSize = editor?.state.doc.content.size;
-    if (!docSize) return;
-    const lastChild = editor?.state.doc.lastChild;
-    const isParagraph = lastChild?.type.name === "paragraph";
-    const isLastChildEmpty =
-      !lastChild?.textContent || lastChild?.textContent?.length === 0;
-    if (isParagraph && isLastChildEmpty) {
-      editor?.commands.focus("end");
-      return;
+    try {
+      const editor = editors[tab.id];
+      const docSize = editor?.state.doc.content.size;
+      if (!docSize) return;
+      const lastChild = editor?.state.doc.lastChild;
+      const isParagraph = lastChild?.type.name === "paragraph";
+      const isLastChildEmpty =
+        !lastChild?.textContent || lastChild?.textContent?.length === 0;
+      if (isParagraph && isLastChildEmpty) {
+        editor?.commands.focus("end");
+        return;
+      }
+      editor
+        ?.chain()
+        .insertContentAt(docSize, "<p></p>", {
+          updateSelection: true
+        })
+        .focus("end")
+        .run();
+    } catch (e) {
+      console.log(e);
     }
-    editor
-      ?.chain()
-      .insertContentAt(docSize - 1, "<p></p>", {
-        updateSelection: true
-      })
-      .focus("end")
-      .run();
   }, [tab.id]);
 
   return (
