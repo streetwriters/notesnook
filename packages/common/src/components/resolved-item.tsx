@@ -21,7 +21,7 @@ import { ItemMap, ItemType } from "@notesnook/core";
 import {
   ResolvedItemOptions,
   useResolvedItem
-} from "../hooks/use-resolved-item";
+} from "../hooks/use-resolved-item.js";
 
 type ResolvedItemProps<TItemType extends ItemType> =
   ResolvedItemOptions<TItemType> & {

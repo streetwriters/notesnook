@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { describe, test } from "vitest";
-import { PathTree } from "../src/utils/path-tree";
+import { PathTree } from "../src/utils/path-tree.js";
 
 test("adding duplicate path should make it unique", (t) => {
   const tree = new PathTree();

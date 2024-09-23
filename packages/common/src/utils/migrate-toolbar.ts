@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ToolbarConfig, ToolbarConfigPlatforms } from "@notesnook/core";
-import { database } from "../database";
+import { database } from "../database.js";
 
 export const CURRENT_TOOLBAR_VERSION = 2;
 export async function migrateToolbar(

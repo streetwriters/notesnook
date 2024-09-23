@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ItemMap, ItemType, VirtualizedGrouping } from "@notesnook/core";
-import { resolveItems } from "../utils/resolve-items";
+import { resolveItems } from "../utils/resolve-items.js";
 import { useDeferredValue, useEffect, useState, useTransition } from "react";
 
 export type ResolvedItemOptions<TItemType extends ItemType> = {

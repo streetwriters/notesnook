@@ -17,14 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { database } from "../database.js";
 import {
-  FormatDateOptions,
   TimeFormat,
+  formatReminderTime,
+  HistorySession,
+  Reminder,
+  FormatDateOptions,
   formatDate
-} from "@notesnook/core/dist/utils/date";
-import { database } from "../database";
-import { formatReminderTime } from "@notesnook/core/dist/collections/reminders";
-import { HistorySession, Reminder } from "@notesnook/core/dist/types";
+} from "@notesnook/core";
 
 export function getFormattedDate(
   date: string | number | Date,
@@ -53,3 +54,5 @@ export function getFormattedHistorySessionDate(session: HistorySession) {
     fromDate !== toDate ? `${toDate}, ` : ""
   }${toTime}`;
 }
+
+export { formatDate };
