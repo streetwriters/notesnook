@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "isomorphic-fetch";
 import path from "path";
-import fs from "fs/promises";
+import fs, { mkdir } from "fs/promises";
 import { langen } from "../../editor/scripts/langen.mjs";
 import { fileURLToPath } from "url";
 
@@ -30,15 +30,14 @@ const ROOT_DIR = path.resolve(path.join(__dirname, ".."));
 const { languageIndex } = await langen(ROOT_DIR);
 if (!languageIndex) throw new Error("No language index found.");
 
-await fs.writeFile(
-  path.join(
-    ROOT_DIR,
-    "src",
-    "utils",
-    "templates",
-    "html",
-    "languages",
-    "index.ts"
-  ),
-  languageIndex
+const languagesDir = path.join(
+  ROOT_DIR,
+  "src",
+  "utils",
+  "templates",
+  "html",
+  "languages"
 );
+await mkdir(languagesDir, { recursive: true });
+
+await fs.writeFile(path.join(languagesDir, "index.ts"), languageIndex);
