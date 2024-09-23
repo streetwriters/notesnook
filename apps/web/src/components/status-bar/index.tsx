@@ -148,6 +148,7 @@ function StatusBar() {
                   updateStatus.type !== "completed" &&
                   updateStatus.type !== "available"
                 }
+                rotateDirection="counterclockwise"
                 color={
                   updateStatus.type === "available" ? "accent" : "paragraph"
                 }
