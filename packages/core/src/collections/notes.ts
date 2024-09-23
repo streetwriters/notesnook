@@ -109,17 +109,21 @@ export class Notes implements ICollection {
         });
       }
 
-      if (item.title) {
+      if (typeof item.title !== "undefined") {
         item.title = item.title.replace(NEWLINE_STRIP_REGEX, " ");
         dateEdited = Date.now();
-      } else {
-        item.title = formatTitle(
-          this.db.settings.getTitleFormat(),
-          this.db.settings.getDateFormat(),
-          this.db.settings.getTimeFormat(),
-          headline?.split(" ").splice(0, 10).join(" ") || "",
-          this.totalNotes
-        );
+      }
+
+      if (!isUpdating || item.title === "") {
+        item.title =
+          item.title ||
+          formatTitle(
+            this.db.settings.getTitleFormat(),
+            this.db.settings.getDateFormat(),
+            this.db.settings.getTimeFormat(),
+            headline?.split(" ").splice(0, 10).join(" ") || "",
+            this.totalNotes
+          );
       }
 
       if (isUpdating) {

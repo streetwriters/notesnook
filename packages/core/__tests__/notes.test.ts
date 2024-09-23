@@ -121,6 +121,19 @@ test("setting note title to empty should set the default title", () =>
     expect(note?.title.startsWith("Note ")).toBe(true);
   }));
 
+test("changing content shouldn't reset the note title ", () =>
+  noteTest({ title: "I am a note" }).then(async ({ db, id }) => {
+    await db.notes.add({
+      id,
+      content: {
+        type: TEST_NOTE.content.type,
+        data: "<p>This is a very colorful existence.</p>"
+      }
+    });
+    const note = await db.notes.note(id);
+    expect(note?.title).toBe("I am a note");
+  }));
+
 test("note should get headline from content", () =>
   noteTest({
     ...TEST_NOTE,
