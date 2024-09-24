@@ -139,16 +139,10 @@ async function moveRemindersToTrash(ids: string[]) {
 }
 
 async function deleteTags(ids: string[]) {
-  if (
-    !(await ConfirmDialog.show({
-      title: "Are you sure?",
-      message:
-        "Are you sure you want to permanently delete these tags? This action is IRREVERSIBLE.",
-      negativeButtonText: "No",
-      positiveButtonText: "Yes"
-    }))
-  )
-    return;
+  const isMultiselect = ids.length > 1;
+  if (isMultiselect) {
+    if (!(await showMultiDeleteConfirmation(ids.length))) return;
+  }
 
   await TaskManager.startTask({
     type: "status",
