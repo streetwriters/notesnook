@@ -34,7 +34,7 @@ import { findToolById, getToolIcon } from "./toolbar-definition";
 import ToolSheet from "./tool-sheet";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { ToolId } from "@notesnook/editor/dist/toolbar/tools";
+import type { ToolId } from "@notesnook/editor";
 import PremiumService from "../../../services/premium";
 
 export const Tool = ({

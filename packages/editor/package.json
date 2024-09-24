@@ -15,7 +15,9 @@
         "default": "./dist/index.mjs"
       }
     },
-    "./styles/*.css": "./dist/styles/*.css"
+    "./styles/*.css": "./dist/styles/*.css",
+    "./tools": "./src/toolbar/tool-definitions.ts",
+    "./fonts": "./src/utils/font.ts"
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
@@ -114,7 +116,7 @@
     "start": "npm run watch",
     "prepublishOnly": "npm run build && npm run test",
     "postinstall": "patch-package",
-    "build": "tsup-node src/index.ts",
+    "build": "tsup-node src/index.ts src/utils/font.ts src/toolbar/tool-definitions.ts src/toolbar/icons.ts",
     "watch": "npm run build -- --watch"
   },
   "repository": {

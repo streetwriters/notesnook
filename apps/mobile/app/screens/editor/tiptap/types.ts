@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
+import type { ToolbarGroupDefinition } from "@notesnook/editor";
 import { useEditor } from "./use-editor";
 export type useEditorType = ReturnType<typeof useEditor>;
 

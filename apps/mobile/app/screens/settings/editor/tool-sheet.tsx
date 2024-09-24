@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolId } from "@notesnook/editor/dist/toolbar";
+import type { ToolId } from "@notesnook/editor";
 import React, { RefObject } from "react";
 import { View } from "react-native";
 import { Pressable } from "../../../components/ui/pressable";

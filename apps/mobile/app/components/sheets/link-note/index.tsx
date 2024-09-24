@@ -34,7 +34,7 @@ import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import type { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
+import type { LinkAttributes } from "@notesnook/editor";
 import {
   EditorEvents,
   editorController

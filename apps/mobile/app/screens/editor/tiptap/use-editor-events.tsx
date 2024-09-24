@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { ItemReference } from "@notesnook/core";
-import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
+import type { Attachment } from "@notesnook/editor";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef } from "react";
