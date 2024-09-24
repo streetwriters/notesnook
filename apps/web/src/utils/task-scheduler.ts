@@ -24,15 +24,15 @@ import type {
 } from "./task-scheduler.worker";
 import { wrap, Remote } from "comlink";
 import { showToast } from "./toast";
-import dayjs from "dayjs";
 import { logger } from "./logger";
+import { validate } from "cronosjs";
 
 let worker: globalThis.Worker | undefined;
 let scheduler: Remote<TaskSchedulerType> | undefined;
 
 export class TaskScheduler {
   static async register(id: string, time: string, action: () => void) {
-    if (!dayjs(time).isValid()) {
+    if (!validate(time)) {
       logger.error(`Invalid cron expression: ${time}`);
       return;
     }
