@@ -35,7 +35,7 @@ import { database } from "../database.js";
 import { join, relative } from "pathe";
 import { PathTree } from "./path-tree.js";
 
-const FORMAT_TO_EXT = {
+export const FORMAT_TO_EXT = {
   pdf: "pdf",
   md: "md",
   txt: "txt",
@@ -138,9 +138,12 @@ export async function* exportNotes(
         };
       }
     } catch (e) {
-      yield new Error(
-        `Failed to export note "${note.title}": ${(e as Error).message}`
-      );
+      if (e instanceof Error) {
+        e.message = `Failed to export note "${note.title || "<Untitled>"}": ${
+          e.message
+        }`;
+        yield e;
+      }
     }
   }
 
@@ -201,11 +204,12 @@ export async function* exportNote(
       };
     }
   } catch (e) {
-    yield new Error(
-      `Failed to export note "${note.title || "<Untitled>"}": ${
-        (e as Error).message
-      }`
-    );
+    if (e instanceof Error) {
+      e.message = `Failed to export note "${note.title || "<Untitled>"}": ${
+        e.message
+      }`;
+      yield e;
+    }
   }
 }
 
