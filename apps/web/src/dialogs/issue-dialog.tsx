@@ -151,10 +151,12 @@ function showIssueReportedDialog({ url }: { url: string }) {
     title: "Thank you for reporting!",
     positiveButtonText: "Copy link",
     message: `You can track your bug report at [${url}](${url}).
-    
-    Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**
-    
-    If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`
+
+\
+Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**
+
+\
+If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`
   }).then((result) => {
     result && writeText(url);
   });
