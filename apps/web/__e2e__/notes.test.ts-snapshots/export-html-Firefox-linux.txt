@@ -7,7 +7,7 @@
       name="description"
       content="This is Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1"
     />
-    <title>Test 1 - Notesnook</title> 
+    <title>Test 1</title> 
   </head>
   <body>
     <h1>Test 1</h1>
