@@ -93,7 +93,14 @@ export const CreateTagDialog = {
       title: "Create tag",
       subtitle: "You can create as many tags as you want."
     }).then(async (title) => {
-      if (!title || !(await db.tags.add({ title }))) return;
+      if (
+        !title ||
+        !(await db.tags.add({ title }).catch((e) => {
+          showToast("error", e.message);
+          return false;
+        }))
+      )
+        return;
 
       showToast("success", "Tag created!");
       useTagStore.getState().refresh();
@@ -107,8 +114,14 @@ export const EditTagDialog = {
       subtitle: `You are editing #${tag.title}.`,
       defaultValue: tag.title
     }).then(async (title) => {
-      if (!title) return;
-      await db.tags.add({ id: tag.id, title });
+      if (
+        !title ||
+        !(await db.tags.add({ id: tag.id, title }).catch((e) => {
+          showToast("error", e.message);
+          return false;
+        }))
+      )
+        return;
       showToast("success", "Tag edited!");
       await useTagStore.getState().refresh();
       await useNoteStore.getState().refresh();
@@ -123,8 +136,14 @@ export const RenameColorDialog = {
       subtitle: `You are renaming color ${color.title}.`,
       defaultValue: color.title
     }).then(async (title) => {
-      if (!title) return;
-      await db.colors.add({ id: color.id, title });
+      if (
+        !title ||
+        !(await db.colors.add({ id: color.id, title }).catch((e) => {
+          showToast("error", e.message);
+          return false;
+        }))
+      )
+        return;
       showToast("success", "Color renamed!");
       useAppStore.getState().refreshNavItems();
     })
