@@ -68,7 +68,7 @@
     "@notesnook/logger": "file:../logger",
     "@readme/data-urls": "^3.0.0",
     "@streetwriters/kysely": "^0.27.4",
-    "@streetwriters/showdown": "^3.0.8-alpha",
+    "@streetwriters/showdown": "^3.0.9-alpha",
     "async-mutex": "^0.3.2",
     "dayjs": "1.11.9",
     "dom-serializer": "^2.0.0",
