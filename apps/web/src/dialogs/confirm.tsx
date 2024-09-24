@@ -100,7 +100,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
       >
         {message ? (
           <Text
-            as="span"
+            as="div"
             variant="body"
             dangerouslySetInnerHTML={{ __html: mdToHtml(message) }}
           />
