@@ -16,8 +16,36 @@
       }
     },
     "./styles/*.css": "./dist/styles/*.css",
-    "./tools": "./src/toolbar/tool-definitions.ts",
-    "./fonts": "./src/utils/font.ts"
+    "./toolbar/tool-definitions": {
+      "require": {
+        "types": "./dist/toolbar/tool-definitions.d.ts",
+        "default": "./dist/toolbar/tool-definitions.js"
+      },
+      "import": {
+        "types": "./dist/toolbar/tool-definitions.d.mts",
+        "default": "./dist/toolbar/tool-definitions.mjs"
+      }
+    },
+    "./utils/font": {
+      "require": {
+        "types": "./dist/utils/font.d.ts",
+        "default": "./dist/utils/font.js"
+      },
+      "import": {
+        "types": "./dist/utils/font.d.mts",
+        "default": "./dist/utils/font.mjs"
+      }
+    },
+    "./toolbar/icons": {
+      "require": {
+        "types": "./dist/toolbar/icons.d.ts",
+        "default": "./dist/toolbar/icons.js"
+      },
+      "import": {
+        "types": "./dist/toolbar/icons.d.mts",
+        "default": "./dist/toolbar/icons.mjs"
+      }
+    }
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {

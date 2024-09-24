@@ -29,24 +29,40 @@ const ROOT_DIR = path.resolve(path.join(__dirname, ".."));
 const DIST_DIR = path.resolve(ROOT_DIR, "dist");
 const CJS_BUNDLE_PATH = path.resolve(ROOT_DIR, "dist", "index.js");
 const MJS_BUNDLE_PATH = path.resolve(ROOT_DIR, "dist", "index.mjs");
+const ICONS_MJS_BUNDLE_PATH = path.resolve(
+  ROOT_DIR,
+  "dist",
+  "toolbar",
+  "icons.mjs"
+);
+const ICONS_CJS_BUNDLE_PATH = path.resolve(
+  ROOT_DIR,
+  "dist",
+  "toolbar",
+  "icons.js"
+);
 
 if (
   !fs.existsSync(DIST_DIR) ||
   !fs.existsSync(CJS_BUNDLE_PATH) ||
-  !fs.existsSync(MJS_BUNDLE_PATH)
+  !fs.existsSync(MJS_BUNDLE_PATH) ||
+  !fs.existsSync(ICONS_MJS_BUNDLE_PATH) ||
+  !fs.existsSync(ICONS_CJS_BUNDLE_PATH)
 )
   throw new Error("Please build the editor before running this script.");
 
 for (const bundle of [
   { type: "cjs", path: CJS_BUNDLE_PATH },
-  { type: "mjs", path: MJS_BUNDLE_PATH }
+  { type: "mjs", path: MJS_BUNDLE_PATH },
+  { type: "cjs", path: ICONS_CJS_BUNDLE_PATH },
+  { type: "mjs", path: ICONS_MJS_BUNDLE_PATH }
 ]) {
   console.log("Replacing icons with their path...");
 
   let ICON_FILE = await readFile(bundle.path, "utf-8");
   const icons =
     bundle.type === "cjs"
-      ? ICON_FILE.matchAll(/: _js\.(mdi.+),/g)
+      ? ICON_FILE.matchAll(/: .+\.(mdi.+),/g)
       : ICON_FILE.matchAll(/: (mdi.+),/g);
   for (const icon of icons) {
     const iconPath = Mjs[icon[1]];
@@ -56,7 +72,7 @@ for (const bundle of [
 
   console.log("Removing @mdi/js import...");
 
-  ICON_FILE = ICON_FILE.replace("var _js = require('@mdi/js');", "");
+  ICON_FILE = ICON_FILE.replace(/var.+=\s+require\(['"]@mdi\/js['"]\);/gm, "");
 
   console.log("Saving file...");
 
