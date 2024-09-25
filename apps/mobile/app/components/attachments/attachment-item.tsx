@@ -86,7 +86,8 @@ export const AttachmentItem = ({
             style={{
               flexShrink: 1,
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              gap: 10
             }}
           >
             <View
@@ -97,7 +98,7 @@ export const AttachmentItem = ({
                 borderWidth: 1,
                 borderColor: colors.secondary.border,
                 paddingHorizontal: 2,
-                minWidth: 20,
+                width: 30,
                 height: 30,
                 borderRadius: 5
               }}
@@ -107,7 +108,7 @@ export const AttachmentItem = ({
                 size={8}
                 color={colors.secondary.paragraph}
                 style={{
-                  maxWidth: 20
+                  maxWidth: 30
                 }}
                 numberOfLines={1}
               >
@@ -118,8 +119,7 @@ export const AttachmentItem = ({
 
             <View
               style={{
-                flexShrink: 1,
-                marginLeft: 10
+                flexShrink: 1
               }}
             >
               <Paragraph
@@ -135,7 +135,7 @@ export const AttachmentItem = ({
               </Paragraph>
 
               {!hideWhenNotDownloading ? (
-                <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
+                <Paragraph color={colors.secondary.paragraph} size={SIZE.xxs}>
                   File size: {formatBytes(attachment.size)}
                 </Paragraph>
               ) : null}

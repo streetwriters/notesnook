@@ -60,6 +60,7 @@ type RecheckerProgress = {
   passed: number;
   isWorking: boolean;
   shown: boolean;
+  filter: string;
 };
 
 interface RecheckerState extends State {
@@ -67,6 +68,7 @@ interface RecheckerState extends State {
     [key: string]: RecheckerProgress;
   };
   setProgress: (key: string, progress: RecheckerProgress) => void;
+  currentFilter: string;
 }
 
 const useRechecker = create<RecheckerState>((set) => ({
@@ -75,11 +77,11 @@ const useRechecker = create<RecheckerState>((set) => ({
       failed: 0,
       passed: 0,
       isWorking: false,
-      shown: false
+      shown: false,
+      filter: "all"
     }
-  } as {
-    [key: string]: RecheckerProgress;
   },
+  currentFilter: "all",
   setProgress: (key: string, progress: RecheckerProgress) => {
     set((state) => ({
       progress: {
@@ -136,10 +138,16 @@ export const AttachmentDialog = ({
   const searchTimer = useRef<NodeJS.Timeout>();
   const [currentFilter, setCurrentFilter] = useState("all");
   const rechecker = useRechecker((state) =>
-    note ? state.progress[note.id] : state.progress.all
+    note ? state.progress[note.id] || {} : state.progress.all
   );
   const currentFilterRef = useRef(currentFilter);
   currentFilterRef.current = currentFilter;
+
+  useEffect(() => {
+    useRechecker.setState({
+      currentFilter: currentFilter
+    });
+  }, [currentFilter]);
 
   const refresh = React.useCallback(() => {
     if (note) {
@@ -209,15 +217,21 @@ export const AttachmentDialog = ({
         ...getState(),
         ...state
       });
+
     if (!attachments || getState().isWorking) return;
     setState({
       isWorking: true,
       failed: 0,
       passed: 0,
-      shown: true
+      shown: true,
+      filter: currentFilterRef.current
     });
+    const filter = currentFilterRef.current;
+    const filteredAttachments = await filterAttachments(
+      currentFilterRef.current
+    );
 
-    for (let i = 0; i < attachments.placeholders.length; i++) {
+    for (let i = 0; i < filteredAttachments.placeholders.length; i++) {
       if (!getState().isWorking) {
         ToastManager.show({
           message: "Attachment recheck cancelled",
@@ -244,7 +258,9 @@ export const AttachmentDialog = ({
         await db.attachments.markAsFailed(attachment.id);
       }
     }
-    setAttachments(await filterAttachments(currentFilter));
+    if (filter === useRechecker.getState().currentFilter) {
+      setAttachments(await filterAttachments(currentFilter));
+    }
 
     setState({
       isWorking: false
@@ -422,21 +438,26 @@ export const AttachmentDialog = ({
             <View
               style={{
                 flexDirection: "row",
-                gap: 12
+                gap: 12,
+                alignItems: "center"
               }}
             >
               {rechecker.isWorking ? (
                 <ActivityIndicator color={colors.primary.accent} />
               ) : (
-                <Icon name="check" size={30} color={colors.primary.accent} />
+                <Icon
+                  name="file-check"
+                  size={30}
+                  color={colors.primary.accent}
+                />
               )}
 
               <View>
                 <Paragraph>
                   {rechecker.isWorking
                     ? note
-                      ? `Checking ${currentFilter.toLowerCase()} note attachments`
-                      : `Checking ${currentFilter.toLowerCase()} attachments`
+                      ? `Checking ${rechecker.filter.toLowerCase()} note attachments`
+                      : `Checking ${rechecker.filter.toLowerCase()} attachments`
                     : "Attachments recheck complete"}
                 </Paragraph>
                 <Paragraph>
@@ -448,10 +469,12 @@ export const AttachmentDialog = ({
             </View>
 
             <IconButton
-              type="errorShade"
-              name="close"
+              type={rechecker.isWorking ? "errorShade" : "plain"}
+              name={rechecker.isWorking ? "close" : "check"}
               size={SIZE.lg}
-              color={colors.error.icon}
+              color={
+                rechecker.isWorking ? colors.error.icon : colors.primary.accent
+              }
               onPress={() => {
                 useRechecker.getState().setProgress(note?.id || "all", {
                   ...useRechecker.getState().progress[note?.id || "all"],
@@ -472,8 +495,7 @@ export const AttachmentDialog = ({
               paddingVertical: 12
             }}
             contentContainerStyle={{
-              alignItems: "center",
-              paddingRight: 50
+              alignItems: "center"
             }}
             horizontal
           >
