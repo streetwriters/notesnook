@@ -30,7 +30,7 @@ import { ActivityIndicator, View } from "react-native";
 import { FlashList } from "react-native-actions-sheet/dist/src/views/FlashList";
 import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import create from "zustand";
+import create, { State } from "zustand";
 import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import { downloadAttachments } from "../../common/filesystem/download-attachment";
@@ -55,19 +55,40 @@ const DEFAULT_SORTING: SortOptions = {
   sortDirection: "desc"
 };
 
-const useRechecker = create(
-  () =>
-    ({
+type RecheckerProgress = {
+  failed: number;
+  passed: number;
+  isWorking: boolean;
+  shown: boolean;
+};
+
+interface RecheckerState extends State {
+  progress: {
+    [key: string]: RecheckerProgress;
+  };
+  setProgress: (key: string, progress: RecheckerProgress) => void;
+}
+
+const useRechecker = create<RecheckerState>((set) => ({
+  progress: {
+    all: {
       failed: 0,
       passed: 0,
-      isWorking: false
-    } as {
-      failed: number;
-      passed: number;
-      isWorking: boolean;
-      shown: boolean;
-    })
-);
+      isWorking: false,
+      shown: false
+    }
+  } as {
+    [key: string]: RecheckerProgress;
+  },
+  setProgress: (key: string, progress: RecheckerProgress) => {
+    set((state) => ({
+      progress: {
+        ...state.progress,
+        [key]: progress
+      }
+    }));
+  }
+}));
 
 const attachmentTypes = [
   {
@@ -114,7 +135,9 @@ export const AttachmentDialog = ({
   const [loading, setLoading] = useState(true);
   const searchTimer = useRef<NodeJS.Timeout>();
   const [currentFilter, setCurrentFilter] = useState("all");
-  const rechecker = useRechecker();
+  const rechecker = useRechecker((state) =>
+    note ? state.progress[note.id] : state.progress.all
+  );
   const currentFilterRef = useRef(currentFilter);
   currentFilterRef.current = currentFilter;
 
@@ -179,8 +202,15 @@ export const AttachmentDialog = ({
   );
 
   const onCheck = async () => {
-    if (!attachments || useRechecker.getState().isWorking) return;
-    useRechecker.setState({
+    const getState = () =>
+      useRechecker.getState().progress[note?.id || "all"] || {};
+    const setState = (state: Partial<RecheckerProgress>) =>
+      useRechecker.getState().setProgress(note?.id || "all", {
+        ...getState(),
+        ...state
+      });
+    if (!attachments || getState().isWorking) return;
+    setState({
       isWorking: true,
       failed: 0,
       passed: 0,
@@ -188,7 +218,7 @@ export const AttachmentDialog = ({
     });
 
     for (let i = 0; i < attachments.placeholders.length; i++) {
-      if (!useRechecker.getState().isWorking) {
+      if (!getState().isWorking) {
         ToastManager.show({
           message: "Attachment recheck cancelled",
           type: "info",
@@ -203,20 +233,20 @@ export const AttachmentDialog = ({
       const result = await filesystem.checkAttachment(attachment.hash);
       if (!result) return;
       if (result.failed) {
-        useRechecker.setState({
-          failed: useRechecker.getState().failed + 1
+        setState({
+          failed: getState().failed + 1
         });
         await db.attachments.markAsFailed(attachment.hash, result.failed);
       } else {
-        useRechecker.setState({
-          passed: useRechecker.getState().passed + 1
+        setState({
+          passed: getState().passed + 1
         });
         await db.attachments.markAsFailed(attachment.id);
       }
     }
     setAttachments(await filterAttachments(currentFilter));
 
-    useRechecker.setState({
+    setState({
       isWorking: false
     });
   };
@@ -423,7 +453,8 @@ export const AttachmentDialog = ({
               size={SIZE.lg}
               color={colors.error.icon}
               onPress={() => {
-                useRechecker.setState({
+                useRechecker.getState().setProgress(note?.id || "all", {
+                  ...useRechecker.getState().progress[note?.id || "all"],
                   shown: false,
                   isWorking: false
                 });
