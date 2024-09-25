@@ -38,7 +38,7 @@ import {
 import { useTheme } from "@emotion/react";
 import { EmotionThemeProvider, Theme } from "@notesnook/theme";
 
-const AnimatedFlex = motion(Flex);
+const AnimatedFlex = motion.create(Flex);
 
 type ActionSheetHistoryItem = {
   title?: string;

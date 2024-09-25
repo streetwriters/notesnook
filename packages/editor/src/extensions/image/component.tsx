@@ -43,7 +43,7 @@ import { useObserver } from "../../hooks/use-observer.js";
 import { Attachment, ImageAlignmentOptions } from "../attachment/index.js";
 import { DataURL } from "@notesnook/common";
 
-export const AnimatedImage = motion(Image);
+export const AnimatedImage = motion.create(Image);
 
 export function ImageComponent(
   props: ReactNodeViewProps<Partial<ImageAttributes>>
