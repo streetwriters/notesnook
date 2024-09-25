@@ -19,10 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   Attachment,
+  FilteredSelector,
   Note,
   SortOptions,
-  VirtualizedGrouping,
-  FilteredSelector
+  VirtualizedGrouping
 } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
@@ -508,7 +508,7 @@ export const AttachmentDialog = ({
               )}
             </View>
           }
-          ListHeaderComponent={<AllProgress />}
+          ListHeaderComponent={<AllProgress note={note} />}
           ListFooterComponent={
             <View
               style={{
@@ -525,8 +525,20 @@ export const AttachmentDialog = ({
   );
 };
 
-const AllProgress = () => {
-  const progress = useAttachmentStore();
+const AllProgress = ({ note }: { note?: Note }) => {
+  const progress = useAttachmentStore((state) =>
+    note
+      ? {
+          downloading: {
+            [note.id]: state.downloading?.[note.id]
+          },
+          uploading: {
+            [note.id]: state.uploading?.[note.id]
+          }
+        }
+      : state
+  );
+
   return (
     <View
       style={{
