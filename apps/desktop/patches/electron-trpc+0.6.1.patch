@@ -1,0 +1,39 @@
+diff --git a/node_modules/electron-trpc/dist/main.mjs b/node_modules/electron-trpc/dist/main.mjs
+index 07971db..b67a3cf 100644
+--- a/node_modules/electron-trpc/dist/main.mjs
++++ b/node_modules/electron-trpc/dist/main.mjs
+@@ -537,8 +537,15 @@ class be {
+   attachWindow(r) {
+     F(this, w).includes(r) || (y("Attaching window", r.id), F(this, w).push(r), v(this, N, Z).call(this, r));
+   }
+-  detachWindow(r) {
+-    y("Detaching window", r.id), L(this, w, F(this, w).filter((e) => e !== r)), v(this, R, M).call(this, { webContentsId: r.webContents.id });
++  detachWindow(r, webContentsId) {
++    y("Detaching window", r.id);
++
++    if (r.isDestroyed() && webContentsId === undefined) {
++      throw new Error('webContentsId is required when calling detachWindow on a destroyed window');
++    }
++
++    L(this, w, F(this, w).filter((e) => e !== r));
++    v(this, R, M).call(this, { webContentsId: webContentsId ?? r.webContents.id });
+   }
+ }
+ w = new WeakMap(), E = new WeakMap(), R = new WeakSet(), M = function({
+@@ -548,6 +555,7 @@ w = new WeakMap(), E = new WeakMap(), R = new WeakSet(), M = function({
+   for (const [i, a] of F(this, E).entries())
+     i.startsWith(`${r}-${e ?? ""}`) && (y("Closing subscription", i), a.unsubscribe(), F(this, E).delete(i));
+ }, N = new WeakSet(), Z = function(r) {
++  const webContentsId = r.webContents.id;
+   r.webContents.on("did-start-navigation", ({ frame: e }) => {
+     y(
+       "Handling webContents `did-start-navigation` event",
+@@ -558,7 +566,7 @@ w = new WeakMap(), E = new WeakMap(), R = new WeakSet(), M = function({
+       frameRoutingId: e.routingId
+     });
+   }), r.webContents.on("destroyed", () => {
+-    y("Handling webContents `destroyed` event"), this.detachWindow(r);
++    y("Handling webContents `destroyed` event"), this.detachWindow(r, webContentsId);
+   });
+ };
+ const me = ({
