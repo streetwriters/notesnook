@@ -29,7 +29,6 @@ import {
   fillPasswordDialog,
   iterateList
 } from "./utils";
-import { ZipReader, TextWriter, Uint8ArrayReader } from "@zip.js/zip.js";
 import { SessionHistoryItemModel } from "./session-history-item-model";
 
 abstract class BaseProperties {
@@ -256,18 +255,11 @@ export class NoteContextMenuModel extends BaseProperties {
     await this.open();
     await this.menu.clickOnItem("export");
 
-    const zip = await downloadAndReadFile(
+    const content = (await downloadAndReadFile(
       this.noteLocator.page(),
       () => this.menu.getItem(format).click(),
-      null
-    );
-
-    const entries = await new ZipReader(
-      new Uint8ArrayReader(new Uint8Array(zip as Buffer))
-    ).getEntries();
-    const writer = new TextWriter();
-    await entries[0].getData?.(writer);
-    const content = await writer.getData();
+      "utf-8"
+    )) as string;
 
     if (format === "html") {
       return content

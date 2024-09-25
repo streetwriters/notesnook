@@ -222,6 +222,26 @@ test("delete all notes within a notebook", async ({ page }) => {
 //   expect(await notes.isEmpty()).toBe(true);
 // });
 
+test("creating more than 20 notebooks shouldn't be possible on basic plan", async ({
+  page
+}) => {
+  await page.exposeBinding("isBasic", () => true);
+  const app = new AppModel(page);
+  await app.goto();
+  const notebooks = await app.goToNotebooks();
+  for (let i = 0; i < 20; ++i) {
+    await notebooks.createNotebook({ title: `Notebook ${i}` });
+  }
+
+  const result = await Promise.race([
+    notebooks.createNotebook(NOTEBOOK),
+    app.toasts.waitForToast(
+      "Please upgrade your account to Pro to add more notebooks."
+    )
+  ]);
+  expect(result).toBe(true);
+});
+
 test(`sort notebooks`, async ({ page }, info) => {
   info.setTimeout(2 * 60 * 1000);
 

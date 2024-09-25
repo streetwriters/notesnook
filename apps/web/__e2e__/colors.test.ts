@@ -60,3 +60,21 @@ test("rename color", async ({ page }) => {
 
   expect(await app.navigation.findItem("priority-33")).toBeDefined();
 });
+
+test("creating a color shouldn't be possible on basic plan", async ({
+  page
+}) => {
+  await page.exposeBinding("isBasic", () => true);
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+
+  await note?.contextMenu.newColor({ title: "red", color: "#ff0000" });
+
+  expect(
+    await app.toasts.waitForToast(
+      "Please upgrade your account to Pro to add colors."
+    )
+  ).toBe(true);
+});
