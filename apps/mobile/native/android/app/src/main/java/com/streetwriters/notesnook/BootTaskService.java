@@ -55,7 +55,7 @@ public class BootTaskService extends HeadlessJsTaskService {
                 this.startForeground(
                         1,
                         notification,
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
             } else {
                 this.startForeground(
                         1,

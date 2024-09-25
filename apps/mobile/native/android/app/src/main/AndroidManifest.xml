@@ -143,7 +143,7 @@
             android:stopWithTask="false" />
         <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />   
 
-        <service android:name="com.streetwriters.notesnook.BootTaskService" android:foregroundServiceType="specialUse" />
+        <service android:name="com.streetwriters.notesnook.BootTaskService" android:foregroundServiceType="dataSync" />
 
         <service
             android:name=".NotesnookTileService"
