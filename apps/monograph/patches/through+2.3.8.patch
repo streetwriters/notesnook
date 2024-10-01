@@ -1,0 +1,10 @@
+diff --git a/node_modules/through/index.js b/node_modules/through/index.js
+index ca5fc59..9b4076f 100644
+--- a/node_modules/through/index.js
++++ b/node_modules/through/index.js
+@@ -1,4 +1,4 @@
+-var Stream = require('stream')
++var Stream = require('node:stream')
+ 
+ // through
+ //

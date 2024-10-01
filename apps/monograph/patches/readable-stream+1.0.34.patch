@@ -1,0 +1,120 @@
+diff --git a/node_modules/readable-stream/lib/_stream_duplex.js b/node_modules/readable-stream/lib/_stream_duplex.js
+index b513d61..797491d 100644
+--- a/node_modules/readable-stream/lib/_stream_duplex.js
++++ b/node_modules/readable-stream/lib/_stream_duplex.js
+@@ -37,7 +37,8 @@ var objectKeys = Object.keys || function (obj) {
+ 
+ /*<replacement>*/
+ var util = require('core-util-is');
+-util.inherits = require('inherits');
++const inherits = require('inherits');
++util.inherits = "default" in inherits ? inherits.default : inherits;
+ /*</replacement>*/
+ 
+ var Readable = require('./_stream_readable');
+diff --git a/node_modules/readable-stream/lib/_stream_passthrough.js b/node_modules/readable-stream/lib/_stream_passthrough.js
+index 895ca50..0328e1e 100644
+--- a/node_modules/readable-stream/lib/_stream_passthrough.js
++++ b/node_modules/readable-stream/lib/_stream_passthrough.js
+@@ -29,7 +29,8 @@ var Transform = require('./_stream_transform');
+ 
+ /*<replacement>*/
+ var util = require('core-util-is');
+-util.inherits = require('inherits');
++const inherits = require('inherits');
++util.inherits = "default" in inherits ? inherits.default : inherits;
+ /*</replacement>*/
+ 
+ util.inherits(PassThrough, Transform);
+diff --git a/node_modules/readable-stream/lib/_stream_readable.js b/node_modules/readable-stream/lib/_stream_readable.js
+index 6307220..06f813f 100644
+--- a/node_modules/readable-stream/lib/_stream_readable.js
++++ b/node_modules/readable-stream/lib/_stream_readable.js
+@@ -27,12 +27,12 @@ var isArray = require('isarray');
+ 
+ 
+ /*<replacement>*/
+-var Buffer = require('buffer').Buffer;
++var Buffer = require('node:buffer').Buffer;
+ /*</replacement>*/
+ 
+ Readable.ReadableState = ReadableState;
+ 
+-var EE = require('events').EventEmitter;
++var EE = require('node:events').EventEmitter;
+ 
+ /*<replacement>*/
+ if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {
+@@ -40,11 +40,12 @@ if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {
+ };
+ /*</replacement>*/
+ 
+-var Stream = require('stream');
++var Stream = require('node:stream');
+ 
+ /*<replacement>*/
+ var util = require('core-util-is');
+-util.inherits = require('inherits');
++const inherits = require('inherits');
++util.inherits = "default" in inherits ? inherits.default : inherits;
+ /*</replacement>*/
+ 
+ var StringDecoder;
+diff --git a/node_modules/readable-stream/lib/_stream_transform.js b/node_modules/readable-stream/lib/_stream_transform.js
+index eb188df..188b902 100644
+--- a/node_modules/readable-stream/lib/_stream_transform.js
++++ b/node_modules/readable-stream/lib/_stream_transform.js
+@@ -68,7 +68,8 @@ var Duplex = require('./_stream_duplex');
+ 
+ /*<replacement>*/
+ var util = require('core-util-is');
+-util.inherits = require('inherits');
++const inherits = require('inherits');
++util.inherits = "default" in inherits ? inherits.default : inherits;
+ /*</replacement>*/
+ 
+ util.inherits(Transform, Duplex);
+diff --git a/node_modules/readable-stream/lib/_stream_writable.js b/node_modules/readable-stream/lib/_stream_writable.js
+index 4bdaa4f..a5e4e32 100644
+--- a/node_modules/readable-stream/lib/_stream_writable.js
++++ b/node_modules/readable-stream/lib/_stream_writable.js
+@@ -26,7 +26,7 @@
+ module.exports = Writable;
+ 
+ /*<replacement>*/
+-var Buffer = require('buffer').Buffer;
++var Buffer = require('node:buffer').Buffer;
+ /*</replacement>*/
+ 
+ Writable.WritableState = WritableState;
+@@ -34,10 +34,11 @@ Writable.WritableState = WritableState;
+ 
+ /*<replacement>*/
+ var util = require('core-util-is');
+-util.inherits = require('inherits');
++const inherits = require('inherits');
++util.inherits = "default" in inherits ? inherits.default : inherits;
+ /*</replacement>*/
+ 
+-var Stream = require('stream');
++var Stream = require('node:stream');
+ 
+ util.inherits(Writable, Stream);
+ 
+diff --git a/node_modules/readable-stream/readable.js b/node_modules/readable-stream/readable.js
+index 26511e8..6190b62 100644
+--- a/node_modules/readable-stream/readable.js
++++ b/node_modules/readable-stream/readable.js
+@@ -1,4 +1,4 @@
+-var Stream = require('stream'); // hack to fix a circular dependency issue when used with browserify
++var Stream = require('node:stream'); // hack to fix a circular dependency issue when used with browserify
+ exports = module.exports = require('./lib/_stream_readable.js');
+ exports.Stream = Stream;
+ exports.Readable = exports;
+@@ -7,5 +7,5 @@ exports.Duplex = require('./lib/_stream_duplex.js');
+ exports.Transform = require('./lib/_stream_transform.js');
+ exports.PassThrough = require('./lib/_stream_passthrough.js');
+ if (!process.browser && process.env.READABLE_STREAM === 'disable') {
+-  module.exports = require('stream');
++  module.exports = require('node:stream');
+ }

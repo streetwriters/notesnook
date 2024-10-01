@@ -1,0 +1,205 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { Cipher } from "@notesnook/crypto";
+import { convert } from "html-to-text";
+import { Flex, Text } from "@theme-ui/components";
+import { useLoaderData } from "@remix-run/react";
+import { MonographPage } from "../components/monographpost";
+import { useHashLocation } from "../utils/use-hash-location";
+import { isSpam, isSpamCached } from "../utils/spam-filter.server";
+import { IS_CLOUDFLARE } from "../utils/is-cloudflare";
+import { Header } from "../components/header";
+import { Footer } from "../components/footer";
+
+type Monograph = {
+  title: string;
+  userId: string;
+  content?: {
+    type: string;
+    data: string;
+  };
+  selfDestruct: boolean;
+  encryptedContent?: Cipher<"base64">;
+  datePublished: string;
+  id: string;
+};
+
+type MonographResponse = Omit<Monograph, "content"> & { content: string };
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  const imageUrl = `/og.png?${new URLSearchParams({
+    title: data?.metadata?.title || "",
+    description: Buffer.from(
+      data?.metadata?.fullDescription || "",
+      "utf-8"
+    ).toString("base64"),
+    date: data?.metadata?.datePublished || ""
+  }).toString()}`;
+
+  return [
+    { title: data?.metadata.title + " - Monograph" },
+    { name: "description", content: data?.metadata.shortDescription },
+    { name: "robots", content: "noindex" },
+    { name: "og:image", content: imageUrl }
+  ];
+};
+
+export async function loader({ params, context }: LoaderFunctionArgs) {
+  try {
+    const monographId = params["id"];
+
+    if (
+      IS_CLOUDFLARE &&
+      monographId &&
+      (await isSpamCached(monographId, context.cloudflare.env.SPAM_FILTERS))
+    )
+      throw new Error();
+
+    const monograph = await fetch(
+      `https://api.notesnook.com/monographs/${monographId}`
+    )
+      .then((r) => r.json() as Promise<MonographResponse>)
+      .then(
+        (data) => ({ ...data, content: JSON.parse(data.content) } as Monograph)
+      );
+
+    if (
+      IS_CLOUDFLARE &&
+      !monograph.encryptedContent &&
+      (await isSpam(monograph, context.cloudflare.env.SPAM_FILTERS))
+    )
+      throw new Error();
+
+    const metadata = getMonographMetadata(monograph);
+    return {
+      monograph,
+      metadata
+    };
+  } catch (e) {
+    console.error(e);
+    return {
+      monograph: null,
+      metadata: {
+        title: "Not found",
+        fullDescription: "This monograph does not exist.",
+        shortDescription: "This monograph does not exist.",
+        datePublished: ""
+      }
+    };
+  }
+}
+
+export default function MonographPost() {
+  const { monograph } = useLoaderData<typeof loader>();
+  const [_, hashParams] = useHashLocation();
+
+  return (
+    <>
+      {monograph ? (
+        <MonographPage monograph={monograph} encodedKey={hashParams.key} />
+      ) : (
+        <>
+          <Header />
+          <Flex
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              flex: 1,
+              height: "100vh",
+              bg: "background"
+            }}
+          >
+            <Text variant="heading" sx={{ fontSize: 42, mt: 20 }}>
+              404
+            </Text>
+            <Text variant="body">This monograph does not exist.</Text>
+          </Flex>
+          <Footer />
+        </>
+      )}
+    </>
+  );
+}
+
+const extractParagraph = (html: string) => {
+  if (!html) return "";
+  return convert(html, {
+    wordwrap: false,
+    preserveNewlines: false,
+    decodeEntities: true
+  });
+};
+
+type Metadata = {
+  title: string;
+  fullDescription: string;
+  shortDescription: string;
+  datePublished: string;
+};
+
+function trimDescription(
+  str: string,
+  length: number,
+  collapse = false
+): string {
+  if (collapse) str = str.replace(/\n/gm, " ").replace(/\s+/gm, " ");
+  const index = str.indexOf(".", length) - 1;
+  return addPeriod(
+    str.substring(
+      0,
+      index < 0 ? Math.min(str.length, length) : Math.min(index, length)
+    )
+  );
+}
+
+const NOT_ALPHA_REGEX = /[^\w\s']|_/g;
+function addPeriod(str: string) {
+  str = str.trim();
+  const lastChar = str[str.length - 1];
+  if (lastChar === ".") return str;
+  if (NOT_ALPHA_REGEX.test(lastChar)) str = str.slice(0, str.length - 1);
+  return str + "...";
+}
+
+function getMonographMetadata(monograph?: Monograph): Metadata {
+  const title = monograph?.title || "Not found";
+  const text = monograph?.encryptedContent
+    ? "This monograph is encrypted. Enter password to view contents."
+    : monograph?.content
+    ? extractParagraph(monograph?.content.data)
+    : "";
+  const shortDescription = trimDescription(text, 150, true);
+  const fullDescription = trimDescription(text, 300, true);
+  const datePublished = monograph
+    ? new Date(monograph.datePublished).toLocaleDateString("en", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        weekday: "long"
+      })
+    : "";
+  return {
+    title,
+    fullDescription,
+    shortDescription,
+    datePublished
+  };
+}
