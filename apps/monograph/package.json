@@ -13,7 +13,8 @@
     "typegen": "wrangler types",
     "dev:express": "node server.js",
     "start:express": "cross-env NODE_ENV=production node server.js",
-    "build:express": "remix vite:build"
+    "build:express": "remix vite:build",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@emotion/cache": "11.11.0",

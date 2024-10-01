@@ -1,5 +1,6 @@
 {
   "include": [
+    "app/global.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/.server/**/*.ts",
