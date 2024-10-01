@@ -17,10 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { randomBytes, randomInt } from "./random.js";
-
-const PROCESS_UNIQUE = randomBytes(5).toString("hex");
-let index = ~~(randomInt() * 0xffffff);
+const supportsPid =
+  "process" in globalThis &&
+  (typeof process === "undefined" || typeof process.pid !== "number");
+const MACHINE_ID = Math.floor(Math.random() * 0xffffff);
+const pid =
+  (supportsPid ? process.pid : Math.floor(Math.random() * 100000)) % 0xffff;
+let index = Math.floor(Math.random() * 0xffffff);
+const PROCESS_UNIQUE = MACHINE_ID.toString(16) + pid.toString(16);
 export function createObjectId(date = Date.now()): string {
   index++;
   const time = Math.floor(date / 1000);
