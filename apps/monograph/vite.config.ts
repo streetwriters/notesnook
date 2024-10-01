@@ -53,6 +53,11 @@ export default defineConfig({
       external: ["svg2png-wasm/svg2png_wasm_bg.wasm"]
     }
   },
+  define: {
+    PUBLIC_URL: JSON.stringify(
+      process.env.PUBLIC_URL || `http://localhost:${process.env.PORT || 5017}`
+    )
+  },
   resolve: {
     dedupe: [
       "react",
