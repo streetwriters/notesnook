@@ -99,9 +99,8 @@
     "unfurl.js": "^6.4.0"
   },
   "devDependencies": {
-    "@emotion/react": "11.13.3",
+    "@emotion/react": "11.11.1",
     "@mdi/js": "^7.4.47",
-    "@mdi/react": "^1.6.1",
     "@theme-ui/components": "^0.16.2",
     "@theme-ui/core": "^0.16.2",
     "@types/katex": "^0.16.7",
@@ -126,7 +125,6 @@
   "peerDependencies": {
     "@emotion/react": ">=11",
     "@mdi/js": ">=7.2.96",
-    "@mdi/react": ">=1.6.1",
     "@theme-ui/components": ">=0.16.0",
     "@theme-ui/core": ">=0.16.0",
     "framer-motion": ">=11",
@@ -145,7 +143,7 @@
     "prepublishOnly": "npm run build && npm run test",
     "postinstall": "patch-package",
     "build": "tsup-node src/index.ts src/utils/font.ts src/toolbar/tool-definitions.ts src/toolbar/icons.ts",
-    "watch": "npm run build -- --watch"
+    "watch": "npm run build -- --onSuccess \"npm run postbuild\" --watch"
   },
   "repository": {
     "type": "git",
