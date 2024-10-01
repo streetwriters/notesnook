@@ -43,7 +43,7 @@ type ThemeEngineState = {
   setTheme: (theme: ThemeDefinition) => void;
 };
 const useThemeEngineStore = create<ThemeEngineState>((set) => ({
-  theme: ThemeLight,
+  theme: globalThis.DEFAULT_THEME || ThemeLight,
   setTheme: (theme) => set({ theme })
 }));
 
