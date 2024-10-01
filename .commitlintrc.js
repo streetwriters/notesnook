@@ -15,6 +15,7 @@ const SCOPES = [
   "mobile",
   "web",
   "vericrypt",
+  "monograph",
   "desktop",
   "crypto",
   "editor",

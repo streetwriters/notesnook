@@ -1,0 +1,13 @@
+diff --git a/node_modules/html-tokenize/index.js b/node_modules/html-tokenize/index.js
+index 162eef7..71070e2 100644
+--- a/node_modules/html-tokenize/index.js
++++ b/node_modules/html-tokenize/index.js
+@@ -1,6 +1,7 @@
+ var bufferFrom = require('buffer-from')
+ var Transform = require('readable-stream').Transform;
+-var inherits = require('inherits');
++const _inherits = require('inherits');
++const inherits = "default" in _inherits ? _inherits.default : _inherits;
+ 
+ inherits(Tokenize, Transform);
+ module.exports = Tokenize;
