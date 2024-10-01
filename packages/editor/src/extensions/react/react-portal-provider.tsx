@@ -44,9 +44,11 @@ export class PortalProviderAPI extends EventDispatcher<Portals> {
   }
 
   render(Component: FunctionComponent, container: HTMLElement) {
-    const root = this.roots.get(container) || createRoot(container);
-    flushSync(() => root.render(<Component />));
-    this.roots.set(container, root);
+    queueMicrotask(() => {
+      const root = this.roots.get(container) || createRoot(container);
+      flushSync(() => root.render(<Component />));
+      this.roots.set(container, root);
+    });
   }
 
   remove(container: HTMLElement) {
