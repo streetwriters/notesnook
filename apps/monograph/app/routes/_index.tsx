@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { MetaFunction } from "@remix-run/cloudflare";
+import { MetaFunction } from "@remix-run/node";
 import { generateMetaDescriptors } from "../utils/meta";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
 import {
