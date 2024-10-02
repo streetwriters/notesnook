@@ -163,7 +163,7 @@ module.exports = (env) => {
         {
           test: /\.mjs$|cjs$|js$|jsx$|ts$|tsx$/,
           include: [
-            /node_modules(.*[/\\])+kysely/,
+            /node_modules(.*[/\\])+@streetwriters\/kysely/,
           ],
           use: {
             loader: "babel-loader",
@@ -239,7 +239,8 @@ module.exports = (env) => {
               plugins: [
                 "react-native-reanimated/plugin",
                 "@babel/plugin-transform-named-capturing-groups-regex",
-                "macros"
+                "macros",
+                ["@babel/plugin-transform-private-methods", { "loose": true }],
               ]
             },
           },

@@ -11,15 +11,22 @@ module.exports = function (api, opts) {
       '@babel/plugin-transform-named-capturing-groups-regex',
       'react-native-reanimated/plugin',
       "@babel/plugin-transform-export-namespace-from",
+      ["@babel/plugin-transform-private-methods", { "loose": true }]
     ],
-    overrides: [
-      {
-        test: '../node_modules/kysely',
-        plugins: [
-          ["@babel/plugin-transform-private-methods", { "loose": true }]
-        ]
-      },
-    ]
+    // overrides: [
+    //   {
+    //     test: '../node_modules/@streetwriters/kysely',
+    //     plugins: [
+    //       ["@babel/plugin-transform-private-methods", { "loose": true }]
+    //     ]
+    //   },
+    //   {
+    //     test: '../node_modules/@streetwriters/kysely',
+    //     plugins: [
+    //       ["@babel/plugin-transform-private-methods", { "loose": true }]
+    //     ]
+    //   },
+    // ]
   }
 
   if (env === 'production') {
