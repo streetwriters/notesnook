@@ -17,4 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export const IS_CLOUDFLARE = process.env.CLOUDFLARE === "true";
+import { readFile, writeFile } from "node:fs/promises";
+
+export async function read<T>(key: string, fallback: T): Promise<T> {
+  try {
+    return (JSON.parse(await readFile(key, "utf-8")) as T) || fallback;
+  } catch (e) {
+    console.error(e);
+    return fallback;
+  }
+}
+
+export async function write<T>(key: string, data: T) {
+  await writeFile(key, JSON.stringify(data));
+}

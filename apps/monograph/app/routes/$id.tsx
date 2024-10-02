@@ -24,9 +24,9 @@ import { useLoaderData } from "@remix-run/react";
 import { MonographPage } from "../components/monographpost";
 import { useHashLocation } from "../utils/use-hash-location";
 import { isSpam, isSpamCached } from "../utils/spam-filter.server";
-import { IS_CLOUDFLARE } from "../utils/is-cloudflare";
 import { Header } from "../components/header";
 import { Footer } from "../components/footer";
+import { API_HOST, PUBLIC_URL } from "../utils/env";
 
 type Monograph = {
   title: string;
@@ -61,30 +61,19 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   ];
 };
 
-export async function loader({ params, context }: LoaderFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
   try {
     const monographId = params["id"];
 
-    if (
-      IS_CLOUDFLARE &&
-      monographId &&
-      (await isSpamCached(monographId, context.cloudflare.env.SPAM_FILTERS))
-    )
-      throw new Error();
+    if (monographId && (await isSpamCached(monographId))) throw new Error();
 
-    const monograph = await fetch(
-      `https://api.notesnook.com/monographs/${monographId}`
-    )
+    const monograph = await fetch(`${API_HOST}/monographs/${monographId}`)
       .then((r) => r.json() as Promise<MonographResponse>)
       .then(
         (data) => ({ ...data, content: JSON.parse(data.content) } as Monograph)
       );
 
-    if (
-      IS_CLOUDFLARE &&
-      !monograph.encryptedContent &&
-      (await isSpam(monograph, context.cloudflare.env.SPAM_FILTERS))
-    )
+    if (!monograph.encryptedContent && (await isSpam(monograph)))
       throw new Error();
 
     const metadata = getMonographMetadata(monograph);

@@ -16,22 +16,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { type PlatformProxy } from "wrangler";
 
-// When using `wrangler.toml` to configure bindings,
-// `wrangler types` will generate types for those bindings
-// into the global `Env` interface.
-// Need this empty interface so that typechecking passes
-// even if no `wrangler.toml` exists.
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface Env {
-  SPAM_FILTERS: KVNamespace;
+export async function read<T>(key: string, fallback: T) {
+  return (await provider).read<T>(key, fallback);
 }
 
-type Cloudflare = Omit<PlatformProxy<Env>, "dispose">;
+export async function write<T>(key: string, data: T) {
+  return (await provider).write<T>(key, data);
+}
 
-declare module "@remix-run/cloudflare" {
-  interface AppLoadContext {
-    cloudflare: Cloudflare;
-  }
+const provider = selectProvider();
+async function selectProvider() {
+  return await import("./kv").catch(() => import("./fs"));
 }

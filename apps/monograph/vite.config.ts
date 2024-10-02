@@ -16,19 +16,44 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import {
-  vitePlugin as remix,
-  cloudflareDevProxyVitePlugin as remixCloudflareDevProxy
-} from "@remix-run/dev";
+import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import arraybuffer from "vite-plugin-arraybuffer";
 import wasm from "vite-plugin-wasm";
-import { IS_CLOUDFLARE } from "./app/utils/is-cloudflare";
+import { ThemeDark } from "@notesnook/theme";
+import type { Plugin, ResolvedConfig } from "vite";
+import { writeFile } from "fs/promises";
+import path from "path";
+import * as pkg from "./package.json";
 
+const DEDUPE = [
+  "react",
+  "react-dom",
+  "@mdi/js",
+  "@mdi/react",
+  "@emotion/react",
+  "zustand",
+  "@theme-ui/core",
+  "@theme-ui/components"
+];
+const DEFAULT_THEME_KEY =
+  process.env.NODE_ENV === "development"
+    ? "DEFAULT_THEME"
+    : "globalThis.DEFAULT_THEME";
 export default defineConfig({
   plugins: [
-    IS_CLOUDFLARE ? remixCloudflareDevProxy() : null,
+    writePlugin({
+      "package.json": JSON.stringify({
+        name: pkg.name,
+        version: pkg.version,
+        type: "module",
+        scripts: { start: pkg.scripts.start },
+        dependencies: {
+          "@remix-run/serve": pkg.devDependencies["@remix-run/serve"]
+        }
+      })
+    }),
     remix({
       future: {
         v3_fetcherPersist: true,
@@ -48,26 +73,42 @@ export default defineConfig({
       }
     }
   },
+  ssr: {
+    noExternal: true,
+    target: "node"
+  },
   build: {
     rollupOptions: {
       external: ["svg2png-wasm/svg2png_wasm_bg.wasm"]
     }
   },
   define: {
-    PUBLIC_URL: JSON.stringify(
-      process.env.PUBLIC_URL || `http://localhost:${process.env.PORT || 5017}`
-    )
+    [DEFAULT_THEME_KEY]: JSON.stringify(ThemeDark)
   },
   resolve: {
-    dedupe: [
-      "react",
-      "react-dom",
-      "@mdi/js",
-      "@mdi/react",
-      "@emotion/react",
-      "zustand",
-      "@theme-ui/core",
-      "@theme-ui/components"
-    ]
+    dedupe: DEDUPE
   }
 });
+
+function writePlugin(files: Record<string, string>): Plugin {
+  let config: ResolvedConfig;
+  let output = false;
+
+  return {
+    name: "vite-plugin-static-copy:build",
+    apply: "build",
+    configResolved(_config) {
+      config = _config;
+    },
+    buildEnd() {
+      output = false;
+    },
+    async writeBundle() {
+      if (output) return;
+      for (const file in files) {
+        const content = files[file];
+        await writeFile(path.join(config.build.outDir, "..", file), content);
+      }
+    }
+  };
+}

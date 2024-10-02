@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { z } from "zod";
 import { Monograph } from "../components/monographpost/types";
+import { read, write } from "./storage";
 
 export const SpamFilterRule = z.object({
   type: z.union([z.literal("literal"), z.literal("regex")]),
@@ -31,17 +32,17 @@ export const SpamFilterRule = z.object({
 });
 export type SpamFilterRule = z.infer<typeof SpamFilterRule>;
 
-export async function isSpamCached(id: string, kv: KVNamespace) {
-  const cache = await json<string[]>(kv, "spam-cache", []);
+export async function isSpamCached(id: string) {
+  const cache = await read<string[]>("spam-cache", []);
   return cache.includes(id);
 }
 
-export async function isSpam(monograph: Monograph, kv: KVNamespace) {
+export async function isSpam(monograph: Monograph) {
   try {
-    const cache = await json<string[]>(kv, "spam-cache", []);
+    const cache = await read<string[]>("spam-cache", []);
     if (cache.includes(monograph.id)) return true;
 
-    const rules = await json<SpamFilterRule[]>(kv, "rules", []);
+    const rules = await read<SpamFilterRule[]>("rules", []);
     const userIdRules = new Set(
       rules.filter((r) => r.property === "userId").map((r) => r.value)
     );
@@ -69,7 +70,7 @@ export async function isSpam(monograph: Monograph, kv: KVNamespace) {
     if (isSpam) {
       console.log("Spam detected", monograph.id);
       cache.push(monograph.id);
-      await kv.put("spam-cache", JSON.stringify(cache));
+      await write("spam-cache", cache);
     }
     return isSpam;
   } catch (e) {
@@ -78,18 +79,9 @@ export async function isSpam(monograph: Monograph, kv: KVNamespace) {
   }
 }
 
-export async function addSpamFilterRule(maybeRule: unknown, kv: KVNamespace) {
+export async function addSpamFilterRule(maybeRule: unknown) {
   const rule = SpamFilterRule.parse(maybeRule);
-  const rules = await json<SpamFilterRule[]>(kv, "rules", []);
+  const rules = await read<SpamFilterRule[]>("rules", []);
   rules.push(rule);
-  await kv.put("rules", JSON.stringify(rules));
-}
-
-async function json<T>(kv: KVNamespace, key: string, fallback: T) {
-  try {
-    return (await kv.get<T>(key, "json")) || fallback;
-  } catch (e) {
-    console.error(e);
-    return fallback;
-  }
+  await write("rules", rules);
 }
