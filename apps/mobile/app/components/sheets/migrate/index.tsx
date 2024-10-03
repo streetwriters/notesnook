@@ -201,7 +201,7 @@ export default function Migrate() {
             </Paragraph>
           ) : (
             <Button
-              title={strings.logoutAnClearData()}
+              title={strings.logoutAndClearData()}
               type="error"
               width={250}
               onPress={async () => {
