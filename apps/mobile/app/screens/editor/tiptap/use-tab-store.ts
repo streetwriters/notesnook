@@ -152,7 +152,6 @@ export const tabHistory = new TabHistory({
     return useTabStore.getState();
   },
   set(state) {
-    console.log(state, "saving tab history...");
     useTabStore.setState({
       ...state
     });
@@ -162,7 +161,6 @@ export const tabHistory = new TabHistory({
     const session = await editorController?.current?.commands.getSession(
       sessionId
     );
-    console.log("LOADING SESSION FOR ID", sessionId, session);
     if (session && session.noteId) {
       const note = await db.notes.note(session.noteId);
       if (note) {
