@@ -19,17 +19,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { I18n } from "@lingui/core";
 import { plural, select, t } from "@lingui/macro";
 
-type Actions =
-  | "deleted"
-  | "unpinned"
-  | "pinned"
-  | "unpublished"
-  | "published"
-  | "permanentlyDeleted"
-  | "restored"
-  | "edited"
-  | "created"
-  | "renamed";
+const actions = {
+  deleted: t`deleted`,
+  unpinned: t`unpinned`,
+  pinned: t`pinned`,
+  unpublished: t`unpublished`,
+  published: t`published`,
+  permanentlyDeleted: t`permanently deleted`,
+  restored: t`restored`,
+  edited: t`edited`,
+  created: t`created`,
+  renamed: t`renamed`
+};
+
+const doActions = {
+  delete: t`Delete`,
+  unpin: t`Unpin`,
+  pin: t`Pin`,
+  unpublish: t`Unpublish`,
+  publish: t`Publish`,
+  permanentlyDelete: t`Permanently delete`,
+  restore: t`Restore`,
+  edit: t`Edit`,
+  create: t`Created`,
+  rename: t`Rename`,
+  remove: t`Remove`
+};
+
+const inProgressActions = {
+  deleting: t`Delete`
+};
+
+type Actions = keyof typeof actions;
+type DoActions = keyof typeof doActions;
+type InProgressActions = keyof typeof inProgressActions;
 
 export const strings = {
   done: () => t`Done`,
@@ -237,6 +260,7 @@ export const strings = {
     t`If this continues to happen, please reach out to us via`,
     t`or email us at`
   ],
+  migrationFailed: () => t`Migration failed`,
   notebooks: () => t`NOTEBOOKS`,
   syncingHeading: () => t`Syncing your data`,
   syncingDesc: () => t`Please wait while we sync all your data.`,
@@ -372,6 +396,7 @@ export const strings = {
   noResultsForSearch: (query: string) => t`No results found for "${query}"`,
   noThemesFound: () => t`No themes found`,
   errorLoadingThemes: () => t`Error loading themes`,
+  loadingThemes: () => t`Loading themes...`,
   version: () => t`Version`,
   visitHomePage: () => t`Visit homepage`,
   tapToApplyAgain: () => t`Tap to apply again`,
@@ -418,6 +443,8 @@ $headline$: Use starting line of the note as title.`,
   noteHistory: () => t`Note history`,
   selectNotebooks: () => t`Select notebooks`,
   selectNotebooksDesc: () => t`Select notebooks you want to add note(s) to.`,
+  selectNotebooksDesktopDesc: (keyboardShortcut: string) =>
+    t`Use ${keyboardShortcut}+click to select multiple notebooks`,
   enableMultiSelect: () => t`Tap and hold to enable multi-select.`,
   changeEmail: () => t`Change email address`,
   changeEmailDesc: () =>
@@ -476,6 +503,9 @@ $headline$: Use starting line of the note as title.`,
   pinned: () => t`Pinned`,
   editNotebook: () => t`Edit notebook`,
   newNotebook: () => t`New notebook`,
+  newInternalLink: () => t`Link to note`,
+  editInternalLink: () => t`Edit internal link`,
+  newColor: () => t`New color`,
   tabs: () => t`Tabs`,
   add: () => t`Add`,
   newVersion: () => t`New version`,
@@ -496,7 +526,7 @@ $headline$: Use starting line of the note as title.`,
   yes: () => t`Yes`,
   cancel: () => t`Cancel`,
   skip: () => t`Skip`,
-  changePasswordConfirm: () => t`"I understand, change my password"`,
+  changePasswordConfirm: () => t`I understand, change my password`,
   next: () => t`Next`,
   forgotPassword: () => t`Forgot password?`,
   cancelLogin: "Cancel login",
@@ -506,7 +536,7 @@ $headline$: Use starting line of the note as title.`,
   unlockNote: () => t`Unlock note`,
   couldNotUnlock: () => t`Could not unlock`,
   unlockNoteDesc: () =>
-    t`"Your note will be unencrypted and removed from the vault."`,
+    t`Your note will be unencrypted and removed from the vault.`,
   deleteAllNotes: () => t`Delete all notes`,
   getStarted: () => t`Get started`,
   saveACopy: () => t`Save a copy`,
@@ -528,7 +558,7 @@ $headline$: Use starting line of the note as title.`,
   openIssue: () => t`Open issue`,
   submit: () => t`Submit`,
   createLink: () => t`Create link`,
-  logoutAnClearData: () => t`Logout and clear data`,
+  logoutAndClearData: () => t`Logout and clear data`,
   saveAndContinue: () => t`Save and continue`,
   moveToTop: () => t`Move to top`,
   moveSelectedNotes: () => t`Move selected notes`,
@@ -543,17 +573,21 @@ $headline$: Use starting line of the note as title.`,
   shareToCloud: () => t`Share to cloud`,
   linkedNotes: () => t`Linked notes`,
   noLinkedNotes: () => t`No linked notes`,
-  reminderModes: {
-    Repeat: () => t`Repeat`,
-    Once: () => t`Once`,
-    Permanent: () => t`Permanent`
-  },
-  recurringModes: {
-    Daily: () => t`Daily`,
-    Weekly: () => t`Weekly`,
-    Monthly: () => t`Monthly`,
-    Yearly: () => t`Yearly`
-  },
+  reminderModes: (mode: string) =>
+    select(mode, {
+      Repeat: t`Repeat`,
+      Once: t`Once`,
+      Permanent: t`Permanent`,
+      other: t`Unknown mode`
+    }),
+  recurringModes: (mode: string) =>
+    select(mode, {
+      Daily: t`Daily`,
+      Weekly: t`Weekly`,
+      Monthly: t`Monthly`,
+      Yearly: t`Yearly`,
+      other: t`Unknown mode`
+    }),
   weekDayNames: {
     0: () => t`Sunday`,
     1: () => t`Monday`,
@@ -605,6 +639,7 @@ $headline$: Use starting line of the note as title.`,
   downloadUpdate: () => t`Download update`,
   stopReordering: () => t`Tap to stop reordering`,
   removeShortcut: () => t`Remove shortcut`,
+  createShortcut: () => t`Create a shortcut`,
   tip: () => t`TIP`,
   neverShowAgain: () => t`Never show again`,
   skipIntroduction: () => t`Skip introduction`,
@@ -617,6 +652,8 @@ $headline$: Use starting line of the note as title.`,
   saveToFile: () => t`Save to file`,
   secondary2faMethod: () => t`Setup secondary 2FA method`,
   confirmEmail: () => t`Confirm email`,
+  confirmEmailDesc: () =>
+    t`Check your spam folder if you haven't received an email yet.`,
   manageSubDesktop: () => t`Manage subscription on desktop`,
   resubFromPlaystore: () => t`Resubscribe from Playstore`,
   resubToPro: () => t`Resubscribe to Pro`,
@@ -876,6 +913,7 @@ $headline$: Use starting line of the note as title.`,
   removeFromAll: () => t`Remove from all`,
   assignTo: () => t`Assign to`,
   addTags: () => t`Add tags`,
+  addTagsDesc: () => t`Add tags to multiple notes at once`,
   references: () => t`References`,
   moveNotebookFix: () => t`Move notebook`,
   failedToSubscribe: () => t`Failed to subscribe`,
@@ -919,12 +957,31 @@ $headline$: Use starting line of the note as title.`,
   learnMoreMonographs: () => t`Learn more about Monographs`,
   mfaAuthAppTitle: () => t`Setup using an Authenticator app`,
   mfaAuthAppDesc: () => t`Use an authenticator app to generate 2FA codes.`,
+  mfaAuthAppSubtitle: () =>
+    t`Please confirm your identity by entering the authentication code from your authenticator app.`,
+  mfaAuthAppInstructions: () =>
+    t`Open the two-factor authentication (TOTP) app to view your authentication code.`,
+  mfaAuthAppSelector: () => t`Don't have access to your authenticator app?`,
   mfaEmailTitle: () => t`Setup using email`,
   mfaEmailDesc: () =>
     t`Notesnook will send you a 2FA code on your email when prompted`,
+  mfaEmailSubtitle: () =>
+    t`Please confirm your identity by entering the authentication code sent to your email address.`,
+  mfaEmailInstructions: () => t`It may take a minute to receive your code.`,
+  mfaEmailSelector: () => t`Don't have access to your email address?`,
   mfaSmsTitle: () => t`Setup using SMS`,
   mfaSmsDesc: () =>
     t`Notesnook will send you an SMS with a 2FA code when prompted`,
+  mfaSmsSubtitle: (phoneNumber?: string) =>
+    t`Please confirm your identity by entering the authentication code sent to ${
+      phoneNumber ? phoneNumber : "your registered phone number."
+    }.`,
+  mfaSmsInstructions: () => t`It may take a minute to receive your code.`,
+  mfaSmsSelector: () => t`Don't have access to your phone number?`,
+  mfaRecoveryCodeSubtitle: () =>
+    t`Please confirm your identity by entering a recovery code.`,
+  mfaRecoveryCodeSelector: () => t`Don't have your recovery codes?`,
+  enterRecoveryCode: () => t`Enter recovery code`,
   codesCopied: () => t`Recovery codes copied!`,
   resendCodeWait: () => t`Please wait before requesting a new code`,
   phoneNumberNotEntered: () => t`Phone number not entered`,
@@ -1202,14 +1259,16 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
   appVersion: () => t`App version`,
   defaultSound: () => t`Default sound`,
   subNotSupported: () =>
-    t`"This version of Notesnook app does not support in-app purchases. Kindly login on the Notesnook web app to make the purchase."`,
+    t`This version of Notesnook app does not support in-app purchases. Kindly login on the Notesnook web app to make the purchase.`,
   goToWebApp: () => t`Go to web app`,
   subOnWeb: () => t`Subscribed on web`,
   openInBrowserToManageSub: () => t`Open in browser to manage subscription`,
   editProfilePicture: () => t`Edit profile picture`,
+  editProfilePictureDesc: () =>
+    t`Your profile pictrure is stored 100% end-to-end encrypted and only visible to you.`,
   setFullName: () => t`Set full name`,
   setFullNameDesc: () =>
-    t`Your name is end-to-end encrypted and only visible to you.`,
+    t`Your name is stored 100% end-to-end encrypted and only visible to you.`,
   enterFullName: () => t`Enter full name`,
   deleteGroup: () => t`Delete group`,
   deleteGroupDesc: () =>
@@ -1268,6 +1327,7 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
     t`Get Notesnook Pro to enable automatic backups`,
   newUpdateMessage: () => t`New update available`,
   newUpdateActionText: () => t`Tap here to update to the latest version`,
+  updateNow: () => t`Update now`,
   quickNoteTitle: () => t`Quick note`,
   quickNoteContent: () => t`Tap on "Take note" to add a note.`,
   takeNote: () => t`Take note`,
@@ -1288,7 +1348,9 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
   vaultProMessage: () => t`Create unlimited vaults with Notesnook Pro`,
   emailConfirmationLinkSent: () =>
     t`We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder.`,
-  emailConfirmationNotice: () => [
+  confirmEmailTroubleshoot: () =>
+    t`What do I do if I am not getting the email?`,
+  confirmEmailTroubleshootNotice: () => [
     t`If you didn't get an email from us or the confirmation link isn't
             working,`,
     t`please send us an email from your registered email address`,
@@ -1446,7 +1508,7 @@ For example:
       strings.routes[routeName as keyof typeof strings.routes]?.() || routeName
     }`,
   logoutConfirmation: () =>
-    t`Are you sure you want to logout and clear all data stored on this device?`,
+    t`Are you sure you want to logout and clear all data stored on THIS DEVICE?`,
   backupDataBeforeLogout: () => t`Take a backup before logging out`,
   unsyncedChangesWarning: () =>
     t`You have unsynced notes. Take a backup or sync your notes to avoid losing your critical data.`,
@@ -1465,7 +1527,7 @@ For example:
   setTitleError: () => t`Please set title of the reminder`,
   dateError: () => t`Reminder date must be set in future`,
   failedToDecryptBackup: () => t`Failed to decrypt backup`,
-  backupDirectoryNotSelected: () => t`"Backup directory not selected"`,
+  backupDirectoryNotSelected: () => t`Backup directory not selected`,
   legal: () => t`legal`,
   days: () => t`days`,
   daily: () => t`Daily`,
@@ -1683,7 +1745,7 @@ For example:
   memberSince: (date: string) => t`Member since ${date}`,
   betaLoginNotice: () =>
     t`You are logging into the beta version of Notesnook. Switching between beta &amp; stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously.`,
-  loggingIn: () => "Logging you in",
+  loggingIn: () => t`Logging you in`,
   pleaseWaitLogin: () => t`Please wait while you are authenticated.`,
   emailConfirmed: () => t`Your email has been confirmed.`,
   confirmEmailThankyou: () =>
@@ -1804,7 +1866,7 @@ All attachments will be downloaded & cached again on access.
   verifyingEmail: () => t`Verifying your email`,
   authWait: () => t`Please wait while you are authenticated.`,
   accountPassDesc: () =>
-    t`"Your password is always hashed before leaving this device."`,
+    t`Your password is always hashed before leaving this device.`,
   creatingAccount: () => `Creating your account`,
   creatingAccountDesc: () => t`Please wait while we finalize your account.`,
   sendingRecoveryEmail: () => t`Sending recovery email`,
@@ -1814,7 +1876,7 @@ All attachments will be downloaded & cached again on access.
   accountRecoveryWithKey: () =>
     t`Use a data recovery key to reset your account password.`,
   keyRecoveryProgressDesc: () =>
-    t`"Please wait while your data is downloaded & decrypted."`,
+    t`Please wait while your data is downloaded & decrypted.`,
   verifying2faCode: () => t`Verifying 2FA code`,
   coreRequired: () => t`2FA code is required()`,
   backupFileRecoveryError: () =>
@@ -1840,74 +1902,43 @@ All attachments will be downloaded & cached again on access.
         strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
       } moved to trash`
     }),
-  actions: () => ({
-    deleted: t`deleted`,
-    unpinned: t`unpinned`,
-    pinned: t`pinned`,
-    unpublished: t`unpublished`,
-    published: t`published`,
-    permanentlyDeleted: t`permanently deleted`,
-    restored: t`restored`,
-    edited: t`edited`,
-    created: t`created`,
-    renamed: t`renamed`
-  }),
-  permanentlyDeleteDesc: (type: string, count: number) =>
+  irreverisibleAction: () => t`This action is IRREVERSIBLE.`,
+  doAction: (type: string, count: number, action: DoActions) =>
     plural(count, {
-      one: `Are you sure you want to permanently delete this ${
-        strings.dataTypes[type as never]
-      }? This action is IRREVERSIBLE.`,
-      other: `Are you sure you want to permanently delete these ${
-        strings.dataTypesPlural[type as never]
-      }? This action is IRREVERSIBLE.`
-    }),
-  doActions: () => ({
-    delete: t`Delete`,
-    unpin: t`Unpin`,
-    pin: t`Pin`,
-    unpublish: t`Unpublish`,
-    publish: t`Publish`,
-    permanentlyDelete: t`Permanently delete`,
-    restore: t`Restore`,
-    edit: t`Edit`,
-    create: t`Created`,
-    rename: t`Rename`,
-    remove: t`Remove`
-  }),
-
-  doAction: (type: string, count: number, action: string) => {
-    const actions = strings.doActions();
-    return plural(count, {
-      one: `${strings.dataTypesCamelCase[
+      one: `${doActions[action]} ${strings.dataTypesCamelCase[
         type as keyof typeof strings.dataTypes
-      ]()} ${actions[action as never]}`,
-      other: `# ${strings.dataTypesPlural[
+      ]()}?`,
+      other: `${doActions[action]} # ${strings.dataTypesPlural[
         type as keyof typeof strings.dataTypesPlural
-      ]()} ${actions[action as never]}`
-    });
-  },
-  action: (type: string, count: number, action: Actions) => {
-    const actions = strings.actions();
-    return plural(count, {
+      ]()}?`
+    }),
+  action: (type: string, count: number, action: Actions) =>
+    plural(count, {
       one: `${strings.dataTypesCamelCase[
         type as keyof typeof strings.dataTypes
       ]()} ${actions[action]}`,
       other: `# ${strings.dataTypesPlural[
         type as keyof typeof strings.dataTypesPlural
       ]()} ${actions[action]}`
-    });
-  },
-  actionError: (type: string, count: number, action: Actions) => {
-    const actions = strings.actions();
-    return plural(count, {
+    }),
+  inProgressAction: (type: string, count: number, action: InProgressActions) =>
+    plural(count, {
+      one: `${inProgressActions[action]} ${strings.dataTypesCamelCase[
+        type as keyof typeof strings.dataTypes
+      ]()}`,
+      other: `${inProgressActions[action]} # ${strings.dataTypesPlural[
+        type as keyof typeof strings.dataTypesPlural
+      ]()}`
+    }),
+  actionError: (type: string, count: number, action: Actions) =>
+    plural(count, {
       one: `${strings.dataTypesCamelCase[
         type as keyof typeof strings.dataTypes
       ]()} could not be ${actions[action]}`,
       other: `# ${strings.dataTypesPlural[
         type as keyof typeof strings.dataTypesPlural
       ]()} could not be ${actions[action]}`
-    });
-  },
+    }),
   deleted: (type: string, count: number) =>
     plural(count, {
       one: `${strings.dataTypesCamelCase[
@@ -2128,32 +2159,33 @@ If your issue is critical (e.g. notes not syncing, crashes etc.), please [join o
   profile: () => t`Profile`,
   authentication: () => t`Authentication`,
   sync: () => t`Sync`,
-  behaviour: () => "Behaviour",
-  notifications: () => "Notifications",
-  servers: () => "Servers",
-  importExport: () => "Import & export",
-  backupExport: () => "Backup & export",
-  notesnookImporter: () => "Notesnook Importer",
-  securityPrivacy: () => "Security & privacy",
-  privacy: () => "Privacy",
-  other: () => "Other",
+  behaviour: () => t`Behaviour`,
+  notifications: () => t`Notifications`,
+  servers: () => t`Servers`,
+  serversConfiguration: () => t`Servers configuration`,
+  importExport: () => t`Import & export`,
+  backupExport: () => t`Backup & export`,
+  notesnookImporter: () => t`Notesnook Importer`,
+  securityPrivacy: () => t`Security & privacy`,
+  privacy: () => t`Privacy`,
+  other: () => t`Other`,
   newVersionAvailable: (version: string) =>
     `New version (v${version}) is available for download.`,
-  installUpdate: () => "Install update",
-  sourceCode: () => "Source code",
+  installUpdate: () => t`Install update`,
+  sourceCode: () => t`Source code`,
   sourceCodeDescription: () =>
-    "All the source code for Notesnook is available & open for everyone on GitHub.",
-  viewSourceCode: () => "View source code",
-  checkRoadmap: () => "Check roadmap",
-  availableOnIOS: () => "Available on iOS",
-  availableOnIOSAndAndroid: () => "Available on iOS & Android",
+    t`All the source code for Notesnook is available & open for everyone on GitHub.`,
+  viewSourceCode: () => t`View source code`,
+  checkRoadmap: () => t`Check roadmap`,
+  availableOnIOS: () => t`Available on iOS`,
+  availableOnIOSAndAndroid: () => t`Available on iOS & Android`,
   availableOnIOSDescription: () =>
-    "Get Notesnook app on your iPhone and access all your notes on the go.",
+    t`Get Notesnook app on your iPhone and access all your notes on the go.`,
   availableOnIOSAndAndroidDescription: () =>
-    "Get Notesnook app on your iPhone or Android device and access all your notes on the go.",
-  joinCommunity: () => "Join community",
-  license: () => "License",
-  licenseDescription: () => "GNU GENERAL PUBLIC LICENSE Version 3",
+    t`Get Notesnook app on your iPhone or Android device and access all your notes on the go.`,
+  joinCommunity: () => t`Join community`,
+  license: () => t`License`,
+  licenseDescription: () => t`GNU GENERAL PUBLIC LICENSE Version 3`,
   follow: () => t`follow`,
   report: () => t`Report`,
   send: () => t`Send`,
@@ -2219,5 +2251,19 @@ Use this if changes from other devices are not appearing on this device. This wi
   goBackToNotebooks: () => t`Go back to notebooks`,
   goBackToTags: () => t`Go back to tags`,
   okay: () => t`Okay`,
-  clearTrashDesc: () => t`Do you want to clear the trash?`
+  clearTrashDesc: () => t`Do you want to clear the trash?`,
+  createdAt: () => t`Created at`,
+  lastEditedAt: () => t`Last edited at`,
+  enter6DigitCode: () =>
+    t`Please confirm your identity by entering the authentication code from your authenticator app.`,
+  insertLink: () => t`Insert link`,
+  insert: () => t`Insert`,
+  moveToTrashDesc: (interval: number) =>
+    t`These items will be **kept in your Trash for ${interval} days** after which they will be permanently deleted.`,
+  editNotebookDesc: (notebookTitle: string) =>
+    t`You are editing "${notebookTitle}".`,
+  newNotebookDesc: () => t`Notebooks are the best way to organize your notes.`,
+  encryptedBackup: () => t`Encrypted backup`,
+  encryptedBackupDesc: () =>
+    t`Please enter the password to decrypt and restore this backup.`
 };
