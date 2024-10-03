@@ -571,32 +571,28 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
 function getTexts(formData: MFAFormData) {
   return {
     app: {
-      subtitle:
-        "Please confirm your identity by entering the authentication code from your authenticator app.",
-      instructions: `Open the two-factor authentication (TOTP) app to view your authentication code.`,
-      selector: `Don't have access to your authenticator app?`,
-      label: "Enter 6-digit code"
+      subtitle: strings.mfaAuthAppSubtitle(),
+      instructions: strings.mfaAuthAppInstructions(),
+      selector: strings.mfaAuthAppSelector(),
+      label: strings.enterSixDigitCode()
     },
     email: {
-      subtitle:
-        "Please confirm your identity by entering the authentication code sent to your email address.",
-      instructions: `It may take a minute to receive your code.`,
-      selector: `Don't have access to your email address?`,
-      label: "Enter 6-digit code"
+      subtitle: strings.mfaEmailSubtitle(),
+      instructions: strings.mfaEmailInstructions(),
+      selector: strings.mfaEmailSelector(),
+      label: strings.enterSixDigitCode()
     },
     sms: {
-      subtitle: `Please confirm your identity by entering the authentication code sent to ${
-        formData.phoneNumber || "your registered phone number."
-      }.`,
-      instructions: `It may take a minute to receive your code.`,
-      selector: `Don't have access to your phone number?`,
-      label: "Enter 6-digit code"
+      subtitle: strings.mfaSmsSubtitle(formData.phoneNumber),
+      instructions: strings.mfaSmsInstructions(),
+      selector: strings.mfaSmsSelector(),
+      label: strings.enterSixDigitCode()
     },
     recoveryCode: {
-      subtitle: `Please confirm your identity by entering a recovery code.`,
+      subtitle: strings.mfaRecoveryCodeSubtitle(),
       instructions: "",
-      selector: `Don't have your recovery codes?`,
-      label: "Enter recovery code"
+      selector: strings.mfaRecoveryCodeSelector(),
+      label: strings.enterRecoveryCode()
     }
   };
 }

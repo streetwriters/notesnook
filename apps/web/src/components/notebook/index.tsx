@@ -213,8 +213,8 @@ export const notebookMenuItems: (
       onClick: async () => {
         const result = await ConfirmDialog.show({
           title: `Delete ${pluralize(ids.length, "notebook")}?`,
-          positiveButtonText: `Yes`,
-          negativeButtonText: "No",
+          positiveButtonText: strings.yes(),
+          negativeButtonText: strings.no(),
           checks: {
             deleteContainingNotes: {
               text: `Move all notes in ${

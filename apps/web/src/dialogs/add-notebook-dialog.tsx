@@ -73,18 +73,21 @@ export const AddNotebookDialog = DialogManager.register(
       <Dialog
         testId="add-notebook-dialog"
         isOpen={true}
-        title={props.edit ? "Edit Notebook" : "Create a Notebook"}
+        title={props.edit ? strings.editNotebook() : strings.newNotebook()}
         description={
-          props.edit
-            ? `You are editing "${notebook?.title}".`
-            : "Notebooks are the best way to organize your notes."
+          props.edit && notebook?.title
+            ? strings.editNotebookDesc(notebook.title)
+            : strings.newNotebookDesc()
         }
         onClose={() => onClose(false)}
         positiveButton={{
-          text: props.edit ? "Save" : "Create",
+          text: props.edit ? strings.save() : strings.create(),
           onClick: onSubmit
         }}
-        negativeButton={{ text: "Cancel", onClick: () => onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => onClose(false)
+        }}
       >
         <Field
           defaultValue={title.current}

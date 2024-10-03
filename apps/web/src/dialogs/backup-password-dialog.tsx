@@ -43,19 +43,20 @@ export const BackupPasswordDialog = DialogManager.register(
       <Dialog
         isOpen={true}
         testId="password-dialog"
-        title={"Encrypted backup"}
-        description={
-          "Please enter the password to decrypt and restore this backup."
-        }
+        title={strings.encryptedBackup()}
+        description={strings.encryptedBackupDesc()}
         onClose={() => onClose(false)}
         positiveButton={{
           form: "backupPasswordForm",
           type: "submit",
           loading: isLoading,
           disabled: isLoading,
-          text: "Restore"
+          text: strings.restore()
         }}
-        negativeButton={{ text: "Cancel", onClick: () => onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => onClose(false)
+        }}
       >
         <Box
           id="backupPasswordForm"

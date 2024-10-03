@@ -27,7 +27,6 @@ import { db } from "./db";
 import { showToast } from "../utils/toast";
 import Vault from "./vault";
 import { TaskManager } from "./task-manager";
-import { pluralize } from "@notesnook/common";
 import { ConfirmDialog, showMultiDeleteConfirmation } from "../dialogs/confirm";
 import { strings } from "@notesnook/intl";
 
@@ -52,7 +51,7 @@ async function moveNotesToTrash(ids: string[], confirm = true) {
     title: strings.deletingItems("note", items.length),
     action: async (report) => {
       report({
-        text: `${strings.deleting()} ${strings.notes(items.length)}...`
+        text: `${strings.inProgressAction("note", items.length, "deleting")}...`
       });
       await noteStore.delete(...items);
     }
@@ -75,9 +74,10 @@ async function moveNotebooksToTrash(ids: string[]) {
     title: strings.deletingItems("notebook", ids.length),
     action: async (report) => {
       report({
-        text: `${strings.deleting()} ${strings.itemsPlural(
+        text: `${strings.inProgressAction(
           "notebook",
-          ids.length
+          ids.length,
+          "deleting"
         )}...`
       });
       await notebookStore.delete(...ids);
@@ -91,9 +91,9 @@ async function deleteAttachments(ids: string[]) {
   if (
     !(await ConfirmDialog.show({
       title: strings.doAction("attachment", ids.length, "permanentlyDelete"),
-      message: strings.permanentlyDeleteDesc("attachment", ids.length),
-      negativeButtonText: "No",
-      positiveButtonText: "Yes"
+      message: strings.irreverisibleAction(),
+      negativeButtonText: strings.no(),
+      positiveButtonText: strings.yes()
     }))
   )
     return;
@@ -109,9 +109,10 @@ async function deleteAttachments(ids: string[]) {
         if (!attachment) continue;
 
         report({
-          text: `${strings.deleting()} ${strings.itemsPlural(
+          text: `${strings.inProgressAction(
             "attachment",
-            ids.length
+            ids.length,
+            "deleting"
           )}...`,
           current: i,
           total: ids.length
@@ -135,9 +136,10 @@ async function moveRemindersToTrash(ids: string[]) {
     title: strings.deletingItems("reminder", ids.length),
     action: async (report) => {
       report({
-        text: `${strings.deleting()} ${strings.itemsPlural(
+        text: `${strings.inProgressAction(
           "reminder",
-          ids.length
+          ids.length,
+          "deleting"
         )}...`
       });
       await reminderStore.delete(...ids);
@@ -159,7 +161,7 @@ async function deleteTags(ids: string[]) {
     title: "Deleting tags",
     action: async (report) => {
       report({
-        text: `Deleting ${pluralize(ids.length, "tag")}...`
+        text: `${strings.inProgressAction("tag", ids.length, "deleting")}...`
       });
       for (const id of ids) {
         await db.tags.remove(id);
@@ -170,7 +172,7 @@ async function deleteTags(ids: string[]) {
     }
   });
 
-  showToast("success", `${pluralize(ids.length, "tag")} deleted.`);
+  showToast("success", strings.deleted("tag", ids.length));
 }
 
 export const Multiselect = {

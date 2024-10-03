@@ -65,18 +65,19 @@ export const EmailChangeDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title={"Change account email"}
-        description={
-          "Your account email will be changed without affecting your subscription or any other settings."
-        }
+        title={strings.changeEmail()}
+        description={strings.changeEmailDesc()}
         onClose={() => props.onClose(false)}
         positiveButton={{
-          text: "Next",
+          text: strings.next(),
           disabled: isLoading,
           loading: isLoading,
           form: "changeEmailForm"
         }}
-        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => props.onClose(false)
+        }}
       >
         <Flex
           id="changeEmailForm"

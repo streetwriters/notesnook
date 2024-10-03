@@ -65,24 +65,24 @@ import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { strings } from "@notesnook/intl";
 
 const tools = [
-  { key: "pin", property: "pinned", icon: Pin, label: "Pin" },
+  { key: "pin", property: "pinned", icon: Pin, label: strings.pin() },
   {
     key: "favorite",
     property: "favorite",
     icon: StarOutline,
-    label: "Favorite"
+    label: strings.favorite()
   },
-  { key: "lock", icon: Unlock, label: "Lock", property: "locked" },
+  { key: "lock", icon: Unlock, label: strings.lock(), property: "locked" },
   {
     key: "readonly",
     icon: Readonly,
-    label: "Readonly",
+    label: strings.readOnly(),
     property: "readonly"
   },
   {
     key: "local-only",
     icon: SyncOff,
-    label: "Disable sync",
+    label: strings.disableSync(),
     property: "localOnly"
   }
 ] as const;
@@ -96,12 +96,12 @@ type MetadataItem<T extends "dateCreated" | "dateEdited"> = {
 const metadataItems = [
   {
     key: "dateCreated",
-    label: "Created at",
+    label: strings.createdAt(),
     value: (date) => getFormattedDate(date || Date.now())
   } as MetadataItem<"dateCreated">,
   {
     key: "dateEdited",
-    label: "Last edited at",
+    label: strings.lastEditedAt(),
     value: (date) => (date ? getFormattedDate(date) : "never")
   } as MetadataItem<"dateEdited">
 ];
@@ -251,7 +251,7 @@ function InternalLinks({ noteId }: { noteId: string }) {
           mb: 1
         }}
       >
-        {["Linked notes", "Referenced in"].map((title, index) => (
+        {[strings.linkedNotes(), strings.referencedIn()].map((title, index) => (
           <Button
             key={title}
             variant="secondary"

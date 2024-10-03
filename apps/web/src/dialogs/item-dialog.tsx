@@ -53,7 +53,10 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
         text: props.title
       }}
       onClose={() => props.onClose(false)}
-      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+      negativeButton={{
+        text: strings.cancel(),
+        onClick: () => props.onClose(false)
+      }}
     >
       <Box
         as="form"

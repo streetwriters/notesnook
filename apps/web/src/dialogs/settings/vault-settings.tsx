@@ -31,7 +31,7 @@ export const VaultSettings: SettingsGroup[] = [
   {
     key: "vault",
     section: "vault",
-    header: "Vault",
+    header: strings.vault(),
     settings: [
       {
         key: "create-vault",

@@ -217,7 +217,7 @@ function ThemesList() {
         }}
       >
         {themes.isInitialLoading ? (
-          <Loader title={"Loading themes..."} />
+          <Loader title={strings.loadingThemes()} />
         ) : (
           <VirtualizedGrid
             columns={2}

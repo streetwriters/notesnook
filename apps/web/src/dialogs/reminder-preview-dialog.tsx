@@ -72,7 +72,7 @@ export const ReminderPreviewDialog = DialogManager.register(
         description={reminder.description}
         onClose={() => props.onClose(false)}
         negativeButton={{
-          text: "Close",
+          text: strings.close(),
           onClick: () => props.onClose(false)
         }}
       >

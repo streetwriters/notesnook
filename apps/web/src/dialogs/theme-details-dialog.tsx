@@ -41,12 +41,12 @@ export const ThemeDetailsDialog = DialogManager.register(
         isOpen={true}
         onClose={() => onClose(false)}
         positiveButton={{
-          text: `Set as default`,
+          text: strings.setAsDefault(),
           onClick: () => onClose(true),
           disabled: isThemeCurrentlyApplied(theme.id)
         }}
         negativeButton={{
-          text: "Close",
+          text: strings.cancel(),
           onClick: () => onClose(false)
         }}
       >

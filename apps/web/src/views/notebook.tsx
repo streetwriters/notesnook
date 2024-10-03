@@ -564,7 +564,9 @@ function NotebookHeader({
             sx={{ borderRadius: 100, width: 30, height: 30 }}
             mr={1}
             p={0}
-            title={isShortcut ? "Remove shortcut" : "Create shortcut"}
+            title={
+              isShortcut ? strings.removeShortcut() : strings.createShortcut()
+            }
             onClick={() => addToShortcuts(notebook)}
           >
             {isShortcut ? (

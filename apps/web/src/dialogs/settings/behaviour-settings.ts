@@ -30,7 +30,7 @@ export const BehaviourSettings: SettingsGroup[] = [
   {
     key: "general",
     section: "behaviour",
-    header: "General",
+    header: strings.general(),
     isHidden: () => !isUserPremium(),
     settings: [
       {
