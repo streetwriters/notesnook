@@ -17,8 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export { messages as $en } from "./locales/$en.json";
-export { messages as $de } from "./locales/$de.json";
-export { messages as $fr } from "./locales/$fr.json";
-export { strings } from "./src/strings";
-export { setI18nGlobal } from "./src/setup";
+import { messages as _$en } from "../locales/$en.json";
+import { messages as _$de } from "../locales/$de.json";
+import { messages as _$fr } from "../locales/$fr.json";
+import type { Messages } from "@lingui/core";
+
+export const $en = _$en as Messages;
+export const $de = _$de as Messages;
+export const $fr = _$fr as Messages;
+export { strings } from "./strings";
+export { setI18nGlobal } from "./setup";

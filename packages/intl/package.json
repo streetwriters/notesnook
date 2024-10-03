@@ -2,27 +2,42 @@
   "name": "@notesnook/intl",
   "version": "1.0.0",
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "license": "GPL-3.0-or-later",
+  "exports": {
+    "require": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/streetwriters/notesnook.git"
+  },
   "scripts": {
     "extract": "lingui extract",
     "compile": "lingui compile --typescript",
-    "build-locale": "yarn extract && yarn compile",
+    "build-locale": "npm run extract && npm run compile",
     "clean": "rm -rf dist && rm -rf locales",
-    "build": "yarn build-locale && yarn rspack build && yarn tsc",
-    "start": "nodemon --watch ./src/strings.tsx --exec \"yarn rspack build && yarn tsc\""
+    "build": "npm run build-locale && npx vite build",
+    "watch": "nodemon --watch ./src/*.ts --exec \"npx vite build\""
   },
   "devDependencies": {
-    "@babel/core": "^7.24.9",
-    "@babel/preset-env": "^7.20.2",
-    "@lingui/cli": "^4.11.2",
-    "@lingui/macro": "^4.11.2",
+    "@lingui/cli": "^4.11.4",
+    "@lingui/macro": "^4.11.4 ",
+    "@lingui/swc-plugin": "^4.0.10",
     "@types/react": "^18.2.39",
     "babel-plugin-macros": "^3.1.0",
     "react": "18.2.0",
     "typescript": "5.5.3",
-    "@lingui/swc-plugin": "^4.0.7",
-    "@rspack/cli": "^0.6.2",
-    "@rspack/core": "^0.6.2"
+    "vite": "^5.4.8",
+    "vite-plugin-dts": "^4.2.3",
+    "vite-plugin-swc-transform": "^1.0.1"
   },
   "peerDependencies": {
     "@lingui/macro": "*",
