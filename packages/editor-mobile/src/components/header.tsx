@@ -171,71 +171,6 @@ function Header({
               flexDirection: "row"
             }}
           >
-            {tab.locked ? null : (
-              <>
-                <Button
-                  onPress={() => {
-                    editor?.commands.undo();
-                  }}
-                  style={{
-                    borderWidth: 0,
-                    borderRadius: 100,
-                    color: "var(--nn_primary_icon)",
-                    marginRight: 10,
-                    width: 39,
-                    height: 39,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative"
-                  }}
-                >
-                  <ArrowULeftTopIcon
-                    color={
-                      !hasUndo
-                        ? "var(--nn_secondary_border)"
-                        : "var(--nn_primary_icon)"
-                    }
-                    size={25 * settings.fontScale}
-                    style={{
-                      position: "absolute"
-                    }}
-                  />
-                </Button>
-
-                <Button
-                  onPress={() => {
-                    if (tab.locked) return;
-                    editor?.commands.redo();
-                  }}
-                  style={{
-                    borderWidth: 0,
-                    borderRadius: 100,
-                    color: "var(--nn_primary_icon)",
-                    marginRight: 10,
-                    width: 39,
-                    height: 39,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative"
-                  }}
-                >
-                  <ArrowURightTopIcon
-                    color={
-                      !hasRedo
-                        ? "var(--nn_secondary_border)"
-                        : "var(--nn_primary_icon)"
-                    }
-                    size={25 * settings.fontScale}
-                    style={{
-                      position: "absolute"
-                    }}
-                  />
-                </Button>
-              </>
-            )}
-
             {settings.deviceMode !== "mobile" && !settings.fullscreen ? (
               <Button
                 onPress={() => {
@@ -484,12 +419,15 @@ function Header({
                 }
               }}
             >
-              <MenuItem
-                value="search"
+              <div
                 style={{
                   display: "flex",
                   gap: 10,
-                  alignItems: "center"
+                  alignItems: "center",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  width: "100%",
+                  paddingTop: 5
                 }}
               >
                 <Button
@@ -498,7 +436,15 @@ function Header({
                     setOpen(false);
                   }}
                   style={{
-                    color: "var(--nn_primary_paragraph)"
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
                   }}
                 >
                   <ArrowBackIcon
@@ -523,7 +469,6 @@ function Header({
                     borderWidth: 0,
                     borderRadius: 100,
                     color: "var(--nn_primary_icon)",
-                    marginRight: 10,
                     width: 39,
                     height: 39,
                     display: "flex",
@@ -554,7 +499,6 @@ function Header({
                     borderWidth: 0,
                     borderRadius: 100,
                     color: "var(--nn_primary_icon)",
-                    marginRight: 10,
                     width: 39,
                     height: 39,
                     display: "flex",
@@ -571,7 +515,7 @@ function Header({
                     color="var(--nn_primary_icon)"
                   />
                 </Button>
-              </MenuItem>
+              </div>
 
               <MenuItem
                 value="toc"
