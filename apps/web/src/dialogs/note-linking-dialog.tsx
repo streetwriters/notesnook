@@ -56,7 +56,9 @@ export const NoteLinkingDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title={attributes ? "Edit internal link" : "Link to note"}
+        title={
+          attributes ? strings.editInternalLink() : strings.newInternalLink()
+        }
         width={500}
         onClose={() => props.onClose(false)}
         onOpen={async () => {
@@ -65,7 +67,7 @@ export const NoteLinkingDialog = DialogManager.register(
           );
         }}
         positiveButton={{
-          text: "Insert link",
+          text: attributes ? strings.done() : strings.insertLink(),
           disabled: !selectedNote,
           onClick: () =>
             selectedNote
@@ -75,7 +77,10 @@ export const NoteLinkingDialog = DialogManager.register(
                 })
               : null
         }}
-        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => props.onClose(false)
+        }}
         noScroll
       >
         <Flex variant="columnFill" sx={{ mx: 3, overflow: "hidden" }}>

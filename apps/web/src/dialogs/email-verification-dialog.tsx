@@ -66,10 +66,8 @@ export const EmailVerificationDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title={"Confirm your email"}
-        description={
-          "Check your spam folder if you haven't received an email yet."
-        }
+        title={strings.confirmEmail()}
+        description={strings.confirmEmailDesc()}
         onClose={() => props.onClose(false)}
         positiveButton={{
           text: canSendAgain || isSending ? "Resend" : `Resend (${resetTimer})`,
@@ -88,7 +86,7 @@ export const EmailVerificationDialog = DialogManager.register(
           disabled: isSending || !canSendAgain
         }}
         negativeButton={{
-          text: "Cancel",
+          text: strings.cancel(),
           onClick: () => props.onClose(true),
           disabled: isSending
         }}
@@ -103,7 +101,7 @@ export const EmailVerificationDialog = DialogManager.register(
           </Text>
           <Accordion
             isClosed
-            title={"What do I do if I am not getting the email?"}
+            title={strings.confirmEmailTroubleshoot()}
             sx={{
               mt: 2,
               bg: "var(--background-secondary)",
@@ -111,9 +109,9 @@ export const EmailVerificationDialog = DialogManager.register(
             }}
           >
             <Text variant={"body"} px={1} pb={1}>
-              {strings.emailConfirmationNotice()[0]}{" "}
-              <b>{strings.emailConfirmationNotice()[1]}</b>{" "}
-              {strings.emailConfirmationNotice()[2]}.
+              {strings.confirmEmailTroubleshootNotice()[0]}{" "}
+              <b>{strings.confirmEmailTroubleshootNotice()[1]}</b>{" "}
+              {strings.confirmEmailTroubleshootNotice()[2]}.
             </Text>
           </Accordion>
         </Flex>

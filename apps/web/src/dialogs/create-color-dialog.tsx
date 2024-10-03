@@ -36,14 +36,17 @@ export const CreateColorDialog = DialogManager.register(
       <Dialog
         testId="new-color-dialog"
         isOpen={true}
-        title={"Create a new color"}
+        title={strings.newColor()}
         onClose={() => props.onClose(false)}
         positiveButton={{
           form: "colorForm",
           type: "submit",
-          text: "Create"
+          text: strings.create()
         }}
-        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => props.onClose(false)
+        }}
       >
         <Box
           as="form"

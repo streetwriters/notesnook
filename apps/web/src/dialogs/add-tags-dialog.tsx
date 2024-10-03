@@ -28,7 +28,6 @@ import { db } from "../common/db";
 import Dialog from "../components/dialog";
 import { useStore, store } from "../stores/tag-store";
 import { store as notestore } from "../stores/note-store";
-import { useEditorStore } from "../stores/editor-store";
 import { FilteredList } from "../components/filtered-list";
 import { ItemReference, Tag } from "@notesnook/core";
 import { create } from "zustand";
@@ -85,12 +84,12 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
   return (
     <Dialog
       isOpen={true}
-      title={"Add tags"}
-      description={`Add tags to multiple notes at once`}
+      title={strings.addTags()}
+      description={strings.addTagsDesc()}
       onClose={() => onClose(false)}
       width={450}
       positiveButton={{
-        text: "Done",
+        text: strings.done(),
         onClick: async () => {
           for (const id of noteIds) {
             for (const item of useSelectionStore.getState().selected) {
@@ -106,7 +105,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
         }
       }}
       negativeButton={{
-        text: "Cancel",
+        text: strings.cancel(),
         onClick: () => onClose(false)
       }}
     >

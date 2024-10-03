@@ -129,14 +129,12 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
     <Dialog
       testId="move-note-dialog"
       isOpen={true}
-      title={"Select notebooks"}
-      description={`Use ${
-        isMac() ? "cmd" : "ctrl"
-      }+click to select multiple notebooks`}
+      title={strings.selectNotebooks()}
+      description={strings.selectNotebooksDesktopDesc(isMac() ? "Cmd" : "Ctrl")}
       onClose={() => _onClose(false)}
       width={450}
       positiveButton={{
-        text: "Done",
+        text: strings.done(),
         onClick: async () => {
           const { selected } = useSelectionStore.getState();
           for (const item of selected) {
@@ -167,7 +165,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
         }
       }}
       negativeButton={{
-        text: "Cancel",
+        text: strings.cancel(),
         onClick: () => _onClose(false)
       }}
     >

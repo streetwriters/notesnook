@@ -23,6 +23,7 @@ import { steps } from "./steps";
 import { ErrorText } from "../../components/error-text";
 import { AuthenticatorType } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type RecoveryCodesDialogProps = BaseDialogProps<boolean> & {
   primaryMethod: AuthenticatorType;
@@ -41,7 +42,7 @@ export const RecoveryCodesDialog = DialogManager.register(
         description={step.description}
         width={500}
         positiveButton={{
-          text: "Okay",
+          text: strings.okay(),
           onClick: () => onClose(true)
         }}
       >

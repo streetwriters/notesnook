@@ -146,39 +146,35 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
 export function showMultiDeleteConfirmation(length: number) {
   return ConfirmDialog.show({
     title: strings.doAction("item", length, "delete"),
-    message: `These items will be **kept in your Trash for ${
+    message: strings.moveToTrashDesc(
       db.settings.getTrashCleanupInterval() || 7
-    } days** after which they will be permanently deleted.`,
-    positiveButtonText: "Yes",
-    negativeButtonText: "No"
+    ),
+    positiveButtonText: strings.yes(),
+    negativeButtonText: strings.no()
   });
 }
 
 export function showMultiPermanentDeleteConfirmation(length: number) {
   return ConfirmDialog.show({
-    title: `Permanently delete ${pluralize(length, "item")}?`,
-    message:
-      "These items will be **permanently deleted**. This is IRREVERSIBLE.",
-    positiveButtonText: "Yes",
-    negativeButtonText: "No"
+    title: strings.doAction("item", length, "permanentlyDelete"),
+    message: strings.irreverisibleAction(),
+    positiveButtonText: strings.yes(),
+    negativeButtonText: strings.no()
   });
 }
 
 export async function showLogoutConfirmation() {
   return await ConfirmDialog.show({
-    title: `Logout?`,
-    message:
-      "Are you sure you want to log out and clear all data stored on THIS DEVICE?",
-    positiveButtonText: "Yes",
-    negativeButtonText: "No",
+    title: strings.logout(),
+    message: strings.logoutConfirmation(),
+    positiveButtonText: strings.yes(),
+    negativeButtonText: strings.no(),
     warnings: (await db.hasUnsyncedChanges())
-      ? [
-          "You have unsynced notes. Take a backup or sync your notes to avoid losing critical data."
-        ]
+      ? [strings.unsyncedChangesWarning()]
       : [],
     checks: {
       backup: {
-        text: "Take a backup before logging out?",
+        text: strings.backupDataBeforeLogout(),
         default: true
       }
     }
@@ -189,8 +185,8 @@ export function showClearSessionsConfirmation() {
   return ConfirmDialog.show({
     title: strings.logoutAllOtherDevices(),
     message: strings.logoutAllOtherDevicesDescription(),
-    positiveButtonText: "Yes",
-    negativeButtonText: "No"
+    positiveButtonText: strings.yes(),
+    negativeButtonText: strings.no()
   });
 }
 
@@ -205,7 +201,7 @@ export async function showUpdateAvailableNotice({
     title: strings.newVersion(),
     subtitle: strings.newVersionAvailable(version),
     changelog,
-    action: { text: `Update now`, onClick: () => downloadUpdate() }
+    action: { text: strings.updateNow(), onClick: () => downloadUpdate() }
   });
 }
 

@@ -49,7 +49,6 @@ import {
   Uploading
 } from "../components/icons";
 import NavigationItem from "../components/navigation-menu/navigation-item";
-import { pluralize } from "@notesnook/common";
 import { db } from "../common/db";
 import { Attachment } from "../components/attachment";
 import { ScopedThemeProvider } from "../components/theme-provider";
@@ -510,8 +509,8 @@ const Sidebar = memo(
                       await ConfirmDialog.show({
                         title: strings.clearCacheConfirm(),
                         message: strings.clearCacheConfirmDesc(),
-                        negativeButtonText: "No",
-                        positiveButtonText: "Yes"
+                        negativeButtonText: strings.no(),
+                        positiveButtonText: strings.yes()
                       })
                     ) {
                       await db.fs().clear();

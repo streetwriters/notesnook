@@ -86,10 +86,10 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
     return (
       <Dialog
         isOpen={true}
-        title={"There was an error"}
+        title={strings.migrationFailed()}
         description={""}
         positiveButton={{
-          text: "Try again",
+          text: strings.tryAgain(),
           onClick: startMigration
         }}
       >
@@ -118,17 +118,15 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
     <Dialog
       width={500}
       isOpen={true}
-      title={"Save a backup of your notes"}
+      title={strings.migrationSaveBackup()}
       description={""}
       positiveButton={{
-        text: "Save & continue",
+        text: strings.saveAndContinue(),
         onClick: startMigration
       }}
     >
       <Text as="p" variant={"body"}>
-        {
-          "Thank you for updating Notesnook! We'll be applying some minor changes for a better note taking experience."
-        }
+        {strings.migrationSaveBackupDesc()}
       </Text>
     </Dialog>
   );

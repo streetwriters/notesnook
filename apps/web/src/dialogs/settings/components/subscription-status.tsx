@@ -145,14 +145,14 @@ export function SubscriptionStatus() {
                       title: "Cancel subscription?",
                       message:
                         "Cancelling your subscription will automatically downgrade you to the Basic plan at the end of your billing period. You will have to resubscribe to continue using the Pro features.",
-                      negativeButtonText: "No",
-                      positiveButtonText: "Yes"
+                      negativeButtonText: strings.no(),
+                      positiveButtonText: strings.yes()
                     });
                     if (cancelSubscription) {
                       await TaskManager.startTask({
                         type: "modal",
                         title: "Cancelling your subscription",
-                        subtitle: "Please wait...",
+                        subtitle: strings.pleaseWait() + "...",
                         action: () => db.subscriptions.cancel()
                       })
                         .catch((e) => showToast("error", e.message))
@@ -172,14 +172,14 @@ export function SubscriptionStatus() {
                     title: "Request refund?",
                     message:
                       "You will only be issued a refund if you are eligible as per our refund policy. Your account will be immediately downgraded to Basic and your funds will be transferred to your account within 24 hours.",
-                    negativeButtonText: "No",
-                    positiveButtonText: "Yes"
+                    negativeButtonText: strings.no(),
+                    positiveButtonText: strings.yes()
                   });
                   if (refundSubscription) {
                     await TaskManager.startTask({
                       type: "modal",
                       title: "Requesting refund for your subscription",
-                      subtitle: "Please wait...",
+                      subtitle: strings.pleaseWait() + "...",
                       action: () => db.subscriptions.refund()
                     })
                       .catch((e) => showToast("error", e.message))

@@ -21,6 +21,7 @@ import { useRef } from "react";
 import Field from "../components/field";
 import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 export type PromptDialogProps = BaseDialogProps<false | string> & {
   title: string;
@@ -39,10 +40,13 @@ export const PromptDialog = DialogManager.register(function PromptDialog(
       description={props.description}
       onClose={() => props.onClose(false)}
       positiveButton={{
-        text: "Done",
+        text: strings.submit(),
         onClick: () => props.onClose(inputRef.current?.value || "")
       }}
-      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+      negativeButton={{
+        text: strings.cancel(),
+        onClick: () => props.onClose(false)
+      }}
     >
       <Field
         inputRef={inputRef}

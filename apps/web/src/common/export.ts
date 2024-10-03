@@ -34,7 +34,7 @@ import { ExportStream } from "../utils/streams/export-stream";
 import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "../dialogs/confirm";
 import { db } from "./db";
-import { toAsyncIterator } from "@notesnook-importer/core";
+import { toAsyncIterator } from "@notesnook-importer/core/dist/src/utils/stream";
 import { saveAs } from "file-saver";
 import { strings } from "@notesnook/intl";
 
@@ -108,7 +108,7 @@ export async function exportNotes(
     ConfirmDialog.show({
       title: `Export failed`,
       message: result.stack || result.message,
-      positiveButtonText: "Okay"
+      positiveButtonText: strings.okay()
     });
     return false;
   } else {
@@ -120,7 +120,7 @@ export async function exportNotes(
 
 ${result.errors.map((e, i) => `${i + 1}. ${e.message}`).join("\n")}`
           : "Export completed with 0 errors.",
-      positiveButtonText: "Okay"
+      positiveButtonText: strings.okay()
     });
     return true;
   }

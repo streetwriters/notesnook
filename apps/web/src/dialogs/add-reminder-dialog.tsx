@@ -153,12 +153,12 @@ export const AddReminderDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title={reminder ? "Edit reminder" : "Add a reminder"}
+        title={reminder ? strings.editReminder() : strings.newReminder()}
         testId="add-reminder-dialog"
         onClose={() => props.onClose(false)}
         sx={{ fontFamily: "body" }}
         positiveButton={{
-          text: reminder ? "Save" : "Add",
+          text: reminder ? strings.save() : strings.add(),
           disabled:
             !title ||
             (mode !== Modes.ONCE &&
@@ -201,7 +201,10 @@ export const AddReminderDialog = DialogManager.register(
             props.onClose(true);
           }
         }}
-        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => props.onClose(false)
+        }}
       >
         <Field
           id="title"
@@ -255,9 +258,7 @@ export const AddReminderDialog = DialogManager.register(
                   setSelectedDays([]);
                 }}
               />
-              {strings.reminderModes[
-                m.id as keyof typeof strings.reminderModes
-              ]()}
+              {strings.reminderModes(m.id)}
               {m.premium && !isUserPremium && (
                 <Pro size={18} color="accent" sx={{ ml: 1 }} />
               )}
@@ -299,9 +300,7 @@ export const AddReminderDialog = DialogManager.register(
                         : "paragraph"
                   }}
                 >
-                  {strings.recurringModes[
-                    mode.id as keyof typeof strings.recurringModes
-                  ]()}
+                  {strings.recurringModes(mode.id)}
                 </Button>
               ))}
             </Flex>

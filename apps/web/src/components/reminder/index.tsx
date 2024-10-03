@@ -37,7 +37,6 @@ import { hashNavigate } from "../../navigation";
 import { Multiselect } from "../../common/multi-select";
 import { store } from "../../stores/reminder-store";
 import { db } from "../../common/db";
-import { pluralize } from "@notesnook/common";
 import { getFormattedReminderTime } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Reminder as ReminderType } from "@notesnook/core";
@@ -153,10 +152,10 @@ const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
       icon: Trash.path,
       onClick: async () => {
         ConfirmDialog.show({
-          title: `Delete ${pluralize(items.length, "reminder")}`,
-          message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`,
-          positiveButtonText: "Yes",
-          negativeButtonText: "No"
+          title: strings.doAction("reminder", items.length, "delete"),
+          message: strings.irreverisibleAction(),
+          positiveButtonText: strings.yes(),
+          negativeButtonText: strings.no()
         }).then((result) => {
           result && Multiselect.moveRemindersToTrash(items);
         });

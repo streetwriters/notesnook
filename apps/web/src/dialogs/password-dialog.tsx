@@ -24,6 +24,7 @@ import Field, { FieldProps } from "../components/field";
 import { Checkbox, Label } from "@theme-ui/components";
 import { mdToHtml } from "../utils/md";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type Check = { text: string; default?: boolean };
 export type PasswordDialogProps<
@@ -55,11 +56,11 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
       positiveButton={{
         form: "passwordForm",
         type: "submit",
-        text: "Submit",
+        text: strings.submit(),
         loading: isLoading,
         disabled: isLoading
       }}
-      negativeButton={{ text: "Cancel", onClick: () => onClose(false) }}
+      negativeButton={{ text: strings.cancel(), onClick: () => onClose(false) }}
     >
       <Box
         id="passwordForm"

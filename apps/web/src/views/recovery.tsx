@@ -523,7 +523,7 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
   }, []);
 
   if (!isReady && !isSessionExpired)
-    return <Loader text="" title={"Finalizing. Please wait..."} />;
+    return <Loader text="" title={strings.loading() + "..."} />;
 
   return (
     <RecoveryForm
