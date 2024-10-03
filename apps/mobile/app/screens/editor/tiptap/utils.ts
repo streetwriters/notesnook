@@ -31,6 +31,8 @@ import { eOnLoadNote } from "../../../utils/events";
 import { NotesnookModule } from "../../../utils/notesnook-module";
 import { AppState, EditorState, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
+import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
+
 export const textInput = createRef<TextInput>();
 export const editorController =
   createRef<useEditorType>() as MutableRefObject<useEditorType>;
@@ -45,19 +47,6 @@ export function editorState() {
   }
   return editorController.current?.state.current || defaultState;
 }
-
-export const EditorEvents = {
-  html: "native:html",
-  updatehtml: "native:updatehtml",
-  title: "native:title",
-  theme: "native:theme",
-  titleplaceholder: "native:titleplaceholder",
-  logger: "native:logger",
-  status: "native:status",
-  keyboardShown: "native:keyboardShown",
-  attachmentData: "native:attachment-data",
-  resolve: "native:resolve"
-};
 
 export function randId(prefix: string) {
   return Math.random()
@@ -74,7 +63,7 @@ export async function isEditorLoaded(
   sessionId: string,
   tabId: number
 ) {
-  return await post(ref, sessionId, tabId, EditorEvents.status);
+  return await post(ref, sessionId, tabId, NativeEvents.status);
 }
 
 export async function post<T>(

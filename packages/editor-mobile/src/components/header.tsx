@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ControlledMenu, MenuItem as MenuItemInner } from "@szhsin/react-menu";
 import ArrowBackIcon from "mdi-react/ArrowBackIcon";
+import ArrowForwardIcon from "mdi-react/ArrowForwardIcon";
 import ArrowULeftTopIcon from "mdi-react/ArrowULeftTopIcon";
 import ArrowURightTopIcon from "mdi-react/ArrowURightTopIcon";
-import CrownIcon from "mdi-react/CrownIcon";
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import DotsVerticalIcon from "mdi-react/DotsVerticalIcon";
 import FullscreenIcon from "mdi-react/FullscreenIcon";
@@ -31,7 +31,8 @@ import TableOfContentsIcon from "mdi-react/TableOfContentsIcon";
 import React, { useRef, useState } from "react";
 import { useSafeArea } from "../hooks/useSafeArea";
 import { useTabContext, useTabStore } from "../hooks/useTabStore";
-import { EventTypes, Settings } from "../utils";
+import { Settings } from "../utils";
+import { EditorEvents } from "../utils/editor-events";
 import styles from "./styles.module.css";
 
 const menuClassName = ({ state }: any) =>
@@ -100,6 +101,10 @@ function Header({
   const openedTabsCount = useTabStore((state) => state.tabs.length);
   const [isOpen, setOpen] = useState(false);
   const btnRef = useRef(null);
+  const [canGoBack, canGoForward] = useTabStore((state) => [
+    state.canGoBack,
+    state.canGoForward
+  ]);
 
   return (
     <div
@@ -131,7 +136,7 @@ function Header({
           ) : (
             <Button
               onPress={() => {
-                post(EventTypes.back, undefined, tab.id, tab.noteId);
+                post(EditorEvents.back, undefined, tab.id, tab.noteId);
               }}
               preventDefault={false}
               style={{
@@ -165,75 +170,10 @@ function Header({
               flexDirection: "row"
             }}
           >
-            {tab.locked ? null : (
-              <>
-                <Button
-                  onPress={() => {
-                    editor?.commands.undo();
-                  }}
-                  style={{
-                    borderWidth: 0,
-                    borderRadius: 100,
-                    color: "var(--nn_primary_icon)",
-                    marginRight: 10,
-                    width: 39,
-                    height: 39,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative"
-                  }}
-                >
-                  <ArrowULeftTopIcon
-                    color={
-                      !hasUndo
-                        ? "var(--nn_secondary_border)"
-                        : "var(--nn_primary_icon)"
-                    }
-                    size={25 * settings.fontScale}
-                    style={{
-                      position: "absolute"
-                    }}
-                  />
-                </Button>
-
-                <Button
-                  onPress={() => {
-                    if (tab.locked) return;
-                    editor?.commands.redo();
-                  }}
-                  style={{
-                    borderWidth: 0,
-                    borderRadius: 100,
-                    color: "var(--nn_primary_icon)",
-                    marginRight: 10,
-                    width: 39,
-                    height: 39,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative"
-                  }}
-                >
-                  <ArrowURightTopIcon
-                    color={
-                      !hasRedo
-                        ? "var(--nn_secondary_border)"
-                        : "var(--nn_primary_icon)"
-                    }
-                    size={25 * settings.fontScale}
-                    style={{
-                      position: "absolute"
-                    }}
-                  />
-                </Button>
-              </>
-            )}
-
             {settings.deviceMode !== "mobile" && !settings.fullscreen ? (
               <Button
                 onPress={() => {
-                  post(EventTypes.fullscreen, undefined, tab.id, tab.noteId);
+                  post(EditorEvents.fullscreen, undefined, tab.id, tab.noteId);
                 }}
                 preventDefault={false}
                 style={{
@@ -296,7 +236,67 @@ function Header({
 
             <Button
               onPress={() => {
-                post(EventTypes.showTabs, undefined, tab.id, tab.noteId);
+                editor?.commands.undo();
+              }}
+              style={{
+                borderWidth: 0,
+                borderRadius: 100,
+                color: "var(--nn_primary_icon)",
+                marginRight: 10,
+                width: 39,
+                height: 39,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                position: "relative"
+              }}
+            >
+              <ArrowULeftTopIcon
+                color={
+                  !hasUndo
+                    ? "var(--nn_secondary_border)"
+                    : "var(--nn_primary_icon)"
+                }
+                size={25 * settings.fontScale}
+                style={{
+                  position: "absolute"
+                }}
+              />
+            </Button>
+
+            <Button
+              onPress={() => {
+                editor?.commands.redo();
+              }}
+              style={{
+                borderWidth: 0,
+                borderRadius: 100,
+                color: "var(--nn_primary_icon)",
+                marginRight: 10,
+                width: 39,
+                height: 39,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                position: "relative"
+              }}
+            >
+              <ArrowURightTopIcon
+                color={
+                  !hasRedo
+                    ? "var(--nn_secondary_border)"
+                    : "var(--nn_primary_icon)"
+                }
+                size={25 * settings.fontScale}
+                style={{
+                  position: "absolute"
+                }}
+              />
+            </Button>
+
+            <Button
+              onPress={() => {
+                post(EditorEvents.showTabs, undefined, tab.id, tab.noteId);
               }}
               preventDefault={false}
               style={{
@@ -341,7 +341,7 @@ function Header({
               fwdRef={btnRef}
               onPress={() => {
                 if (tab.locked) {
-                  post(EventTypes.properties, undefined, tab.id, tab.noteId);
+                  post(EditorEvents.properties, undefined, tab.id, tab.noteId);
                 } else {
                   setOpen(!isOpen);
                 }
@@ -395,7 +395,7 @@ function Header({
                 switch (e.value) {
                   case "toc":
                     post(
-                      EventTypes.toc,
+                      EditorEvents.toc,
                       editorControllers[tab.id]?.getTableOfContents(),
                       tab.id,
                       tab.noteId
@@ -405,34 +405,115 @@ function Header({
                     editor?.commands.startSearch();
                     break;
                   case "properties":
-                    logger("info", "post properties...");
-                    post(EventTypes.properties, undefined, tab.id, tab.noteId);
+                    post(
+                      EditorEvents.properties,
+                      undefined,
+                      tab.id,
+                      tab.noteId
+                    );
                     break;
                   default:
                     break;
                 }
               }}
             >
-              <MenuItem
-                value="search"
+              <div
                 style={{
                   display: "flex",
                   gap: 10,
-                  alignItems: "center"
+                  alignItems: "center",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  width: "100%",
+                  paddingTop: 5
                 }}
               >
-                <MagnifyIcon
-                  size={22 * settings.fontScale}
-                  color="var(--nn_primary_icon)"
-                />
-                <span
+                <Button
+                  onPress={() => {
+                    post(EditorEvents.goBack, undefined, tab.id, tab.noteId);
+                    setOpen(false);
+                  }}
                   style={{
-                    color: "var(--nn_primary_paragraph)"
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
                   }}
                 >
-                  Search
-                </span>
-              </MenuItem>
+                  <ArrowBackIcon
+                    color={
+                      !canGoBack
+                        ? "var(--nn_secondary_border)"
+                        : "var(--nn_primary_icon)"
+                    }
+                    size={25 * settings.fontScale}
+                    style={{
+                      position: "absolute"
+                    }}
+                  />
+                </Button>
+
+                <Button
+                  onPress={() => {
+                    post(EditorEvents.goForward, undefined, tab.id, tab.noteId);
+                    setOpen(false);
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
+                  }}
+                >
+                  <ArrowForwardIcon
+                    color={
+                      !canGoForward
+                        ? "var(--nn_secondary_border)"
+                        : "var(--nn_primary_icon)"
+                    }
+                    size={25 * settings.fontScale}
+                    style={{
+                      position: "absolute"
+                    }}
+                  />
+                </Button>
+
+                <Button
+                  onPress={() => {
+                    editor?.commands.startSearch();
+                    setOpen(false);
+                  }}
+                  style={{
+                    borderWidth: 0,
+                    borderRadius: 100,
+                    color: "var(--nn_primary_icon)",
+                    width: 39,
+                    height: 39,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative"
+                  }}
+                >
+                  <MagnifyIcon
+                    size={28 * settings.fontScale}
+                    style={{
+                      position: "absolute"
+                    }}
+                    color="var(--nn_primary_icon)"
+                  />
+                </Button>
+              </div>
 
               <MenuItem
                 value="toc"

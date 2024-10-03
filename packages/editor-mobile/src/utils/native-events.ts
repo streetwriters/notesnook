@@ -17,15 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./file.js";
-export * from "./number.js";
-export * from "./date-time.js";
-export * from "./debounce.js";
-export * from "./random.js";
-export * from "./string.js";
-export * from "./resolve-items.js";
-export * from "./migrate-toolbar.js";
-export * from "./export-notes.js";
-export * from "./dataurl.js";
-export * from "./tab-history.js";
-export * from "./editor-sessions.js";
+export const NativeEvents = {
+  html: "native:html",
+  updatehtml: "native:updatehtml",
+  title: "native:title",
+  theme: "native:theme",
+  titleplaceholder: "native:titleplaceholder",
+  logger: "native:logger",
+  status: "native:status",
+  keyboardShown: "native:keyboardShown",
+  attachmentData: "native:attachment-data",
+  resolve: "native:resolve",
+  session: "native:session"
+};

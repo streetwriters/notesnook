@@ -16,7 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-export const EventTypes = {
+
+export const EditorEvents = {
   selection: "editor-event:selection",
   content: "editor-event:content",
   title: "editor-event:title",
@@ -49,5 +50,7 @@ export const EventTypes = {
   disableReadonlyMode: "editor-events:disable-readonly-mode",
   readonlyEditorLoaded: "readonlyEditorLoaded",
   error: "editorError",
-  dbLogger: "editor-events:dbLogger"
-};
+  dbLogger: "editor-events:dbLogger",
+  goBack: "editor-events:go-back",
+  goForward: "editor-events:go-forward"
+} as const;

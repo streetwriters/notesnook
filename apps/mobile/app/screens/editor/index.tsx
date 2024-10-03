@@ -214,7 +214,7 @@ const useLockedNoteHandler = () => {
         biometryAvailable: !!biometry,
         biometryEnrolled: !!fingerprint
       });
-      syncTabs();
+      syncTabs("biometry");
     })();
   }, [tab?.id]);
 

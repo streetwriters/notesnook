@@ -27,10 +27,10 @@ import WebView from "react-native-webview";
 import { useRef } from "react";
 import { EDITOR_URI } from "./source";
 import { EditorMessage } from "./tiptap/types";
-import { EventTypes } from "./tiptap/editor-events";
+import { EditorEvents } from "@notesnook/editor-mobile/src/utils/editor-events";
 import { Attachment } from "@notesnook/editor";
 import downloadAttachment from "../../common/filesystem/download-attachment";
-import { EditorEvents } from "./tiptap/utils";
+import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
 import { useThemeColors } from "@notesnook/theme";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { db } from "../../common/database";
@@ -68,11 +68,11 @@ export function ReadonlyEditor(props: {
     const data = event.nativeEvent.data;
     const editorMessage = JSON.parse(data) as EditorMessage<any>;
 
-    if (editorMessage.type === EventTypes.logger) {
+    if (editorMessage.type === EditorEvents.logger) {
       logger.info("[READONLY EDITOR LOG]", editorMessage.value);
     }
 
-    if (editorMessage.type === EventTypes.readonlyEditorLoaded) {
+    if (editorMessage.type === EditorEvents.readonlyEditorLoaded) {
       console.log("Readonly editor loaded.");
       props.onLoad?.((content: { data: string; id: string }) => {
         setTimeout(() => {
@@ -86,7 +86,7 @@ export function ReadonlyEditor(props: {
           setLoading(false);
         }, 300);
       });
-    } else if (editorMessage.type === EventTypes.getAttachmentData) {
+    } else if (editorMessage.type === EditorEvents.getAttachmentData) {
       const attachment = (editorMessage.value as any).attachment as Attachment;
 
       console.log("Getting attachment data:", attachment.hash, attachment.type);
@@ -105,7 +105,7 @@ export function ReadonlyEditor(props: {
           );
           editorRef.current?.postMessage(
             JSON.stringify({
-              type: EditorEvents.attachmentData,
+              type: NativeEvents.attachmentData,
               value: {
                 resolverId: (editorMessage.value as any).resolverId,
                 data
@@ -117,7 +117,7 @@ export function ReadonlyEditor(props: {
           console.log("Error downloading attachment data");
           editorRef.current?.postMessage(
             JSON.stringify({
-              type: EditorEvents.attachmentData,
+              type: NativeEvents.attachmentData,
               data: {
                 resolverId: (editorMessage.value as any).resolverId,
                 data: undefined
