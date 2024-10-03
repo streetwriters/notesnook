@@ -23,7 +23,7 @@ import { MMKV } from "../../../common/database/mmkv";
 import { eSendEvent } from "../../../services/event-manager";
 import { eOnLoadNote } from "../../../utils/events";
 import { editorController } from "./utils";
-import { TabHistory } from "@notesnook/common/dist/utils/tab-history";
+import { TabHistory } from "@notesnook/common";
 
 class History {
   history: number[];
