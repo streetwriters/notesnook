@@ -106,7 +106,7 @@ export const PricingPlans = ({
     yearlyPlan,
     getPromo
   } = usePricingPlans({
-    promo: promo
+    promoOffer: promo
   });
 
   return loading ? (

@@ -23,6 +23,7 @@ import { Linking, ScrollView, useWindowDimensions, View } from "react-native";
 import { SwiperFlatList } from "react-native-swiper-flatlist";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
+import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { getElevationStyle } from "../../utils/elevation";
 import { eOpenLoginDialog } from "../../utils/events";
