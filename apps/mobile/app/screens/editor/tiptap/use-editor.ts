@@ -19,17 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getFormattedDate } from "@notesnook/common";
 import {
-  EVENTS,
-  isEncryptedContent,
-  NoteContent,
   ContentItem,
   ContentType,
   DeletedItem,
+  EVENTS,
   ItemReference,
   Note,
+  NoteContent,
   TrashItem,
   UnencryptedContentItem,
   isDeleted,
+  isEncryptedContent,
   isTrashItem
 } from "@notesnook/core";
 import { EditorEvents } from "@notesnook/editor-mobile/src/utils/editor-events";
