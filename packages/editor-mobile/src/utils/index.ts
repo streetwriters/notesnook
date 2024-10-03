@@ -21,7 +21,7 @@ import { Editor, ToolbarGroupDefinition } from "@notesnook/editor";
 import { ThemeDefinition } from "@notesnook/theme";
 import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import { EditorController } from "../hooks/useEditorController";
-import { EditorSessions } from "@notesnook/common/dist/utils/editor-sessions";
+import { EditorSessions } from "@notesnook/common";
 import { EditorEvents } from "./editor-events";
 
 globalThis.sessionId = "notesnook-editor";

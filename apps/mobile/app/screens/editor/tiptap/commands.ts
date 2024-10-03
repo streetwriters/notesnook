@@ -30,7 +30,7 @@ import { sleep } from "../../../utils/time";
 import { Settings } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { getResponse, randId, textInput } from "./utils";
-import { EditorSessionItem } from "@notesnook/common/dist/utils/editor-sessions";
+import { EditorSessionItem } from "@notesnook/common";
 
 type Action = { job: string; id: string };
 
