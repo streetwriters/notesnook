@@ -2,9 +2,8 @@
   "extends": "../../tsconfig",
   "compilerOptions": {
     "outDir": "dist",
-    "jsx": "react-jsx",
     "emitDeclarationOnly": true,
     "declaration": true
   },
-  "include": ["index.ts", "src", "locales"]
+  "include": ["src"]
 }
