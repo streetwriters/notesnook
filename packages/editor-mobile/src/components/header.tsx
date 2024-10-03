@@ -406,7 +406,6 @@ function Header({
                     editor?.commands.startSearch();
                     break;
                   case "properties":
-                    logger("info", "post properties...");
                     post(
                       EditorEvents.properties,
                       undefined,
