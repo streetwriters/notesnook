@@ -36,6 +36,14 @@ import { bringToFront } from "./utils/bring-to-front";
 import { bridge } from "./api/bridge";
 import { setupDesktopIntegration } from "./utils/desktop-integration";
 import { disableCustomDns, enableCustomDns } from "./utils/custom-dns";
+import { $en, setI18nGlobal, $de } from "@notesnook/intl";
+import { i18n } from "@lingui/core";
+i18n.load({
+  en: $en,
+  de: $de
+});
+i18n.activate("de");
+setI18nGlobal(i18n);
 
 // only run a single instance
 if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {
