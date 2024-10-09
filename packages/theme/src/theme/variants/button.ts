@@ -44,6 +44,10 @@ export const createButtonVariant = (
   px: 2,
   py: "7.5px",
 
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+
   transition: "transform 50ms ease-out",
   ":hover:not(:disabled):not(:active)": {
     bg: background,

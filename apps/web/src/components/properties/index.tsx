@@ -189,16 +189,24 @@ function EditorProperties(props: EditorPropertiesProps) {
                 sx={{
                   borderBottom: "1px solid var(--separator)",
                   alignItems: "center",
-                  justifyContent: "space-between"
+                  justifyContent: "space-between",
+                  gap: 1
                 }}
               >
-                <Text variant="subBody" sx={{ fontSize: "body" }}>
+                <Text
+                  variant="subBody"
+                  sx={{
+                    fontSize: "body",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                  }}
+                >
                   {item.label}
                 </Text>
                 <Text
                   className="selectable"
                   variant="subBody"
-                  sx={{ fontSize: "body" }}
+                  sx={{ fontSize: "body", flexShrink: 0 }}
                 >
                   {item.value(session.note[item.key])}
                 </Text>

@@ -119,7 +119,10 @@ export function CustomizeToolbar() {
             <Label
               key={preset.id}
               variant="text.body"
-              sx={{ alignItems: "center", width: "auto" }}
+              sx={{
+                alignItems: "center",
+                width: "auto"
+              }}
             >
               <input
                 id={preset.id.toString()}
@@ -143,7 +146,15 @@ export function CustomizeToolbar() {
                   setCurrentPreset(getPreset(value as PresetId));
                 }}
               />
-              <span style={{ marginLeft: 5 }}>{preset.title}</span>
+              <span
+                style={{
+                  marginLeft: 5,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis"
+                }}
+              >
+                {preset.title}
+              </span>
               {preset.id === "custom" && !isUserPremium() ? (
                 <Pro color="accent" size={18} sx={{ ml: 1 }} />
               ) : null}

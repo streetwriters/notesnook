@@ -208,18 +208,20 @@ function AuthContainer(props) {
               {version.status === "fulfilled" &&
               version.value.instance !== "default" ? (
                 <>
-                  Using{" "}
-                  {version.value.instance + ` (v${version.value.version})`}
+                  {strings.usingInstance(
+                    version.value.instance,
+                    version.value.version
+                  )}
                 </>
               ) : (
-                <>Using official Notesnook instance.</>
+                <>{strings.usingOfficialInstance()}</>
               )}
             </Text>
             <Button
               variant="anchor"
               onClick={() => SettingsDialog.show({ activeSection: "servers" })}
             >
-              Configure
+              {strings.configure()}
             </Button>
           </Flex>
         </Flex>
