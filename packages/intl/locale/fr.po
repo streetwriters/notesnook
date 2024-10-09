@@ -221,6 +221,10 @@ msgstr ""
 msgid "{platform, select, android {Backup file saved in \"Notesnook backups\" folder on your phone.} other {Backup file is saved in File Manager/Notesnook folder}}"
 msgstr ""
 
+#: src/strings.ts:2382
+msgid "{selected} selected"
+msgstr ""
+
 #: src/strings.ts:372
 msgid "{type, select, github {v{version} has been released on GitHub} store {v{version} has been released} other {v{version} has been released}}"
 msgstr ""
@@ -349,6 +353,10 @@ msgstr ""
 msgid "Add tags to multiple notes at once"
 msgstr ""
 
+#: src/strings.ts:2270
+msgid "Add to dictionary"
+msgstr ""
+
 #: src/strings.ts:954
 msgid "Add your first note"
 msgstr ""
@@ -363,6 +371,18 @@ msgstr ""
 
 #: src/strings.ts:1696
 msgid "After scanning the QR code image, the app will display a code that you can enter below."
+msgstr ""
+
+#: src/strings.ts:2333
+msgid "Align left"
+msgstr ""
+
+#: src/strings.ts:2334
+msgid "Align right"
+msgstr ""
+
+#: src/strings.ts:2303
+msgid "Alignment"
 msgstr ""
 
 #: src/strings.ts:687
@@ -555,12 +575,21 @@ msgstr ""
 msgid "Atleast 8 characters required"
 msgstr ""
 
+#: src/strings.ts:2371
+msgid "Attach image from URL"
+msgstr ""
+
 #: src/strings.ts:296
 msgid "attachment"
 msgstr ""
 
 #: src/strings.ts:306
+#: src/strings.ts:2368
 msgid "Attachment"
+msgstr ""
+
+#: src/strings.ts:2339
+msgid "Attachment settings"
 msgstr ""
 
 #: src/strings.ts:316
@@ -677,6 +706,10 @@ msgstr ""
 msgid "Available on iOS & Android"
 msgstr ""
 
+#: src/strings.ts:2326
+msgid "Background color"
+msgstr ""
+
 #: src/strings.ts:1071
 msgid "Background sync (experimental)"
 msgstr ""
@@ -773,6 +806,10 @@ msgstr ""
 msgid "BETA"
 msgstr ""
 
+#: src/strings.ts:2284
+msgid "Bi-directional note link"
+msgstr ""
+
 #: src/strings.ts:2228
 msgid "Billing history"
 msgstr ""
@@ -797,8 +834,16 @@ msgstr ""
 msgid "Biometrics not enrolled"
 msgstr ""
 
+#: src/strings.ts:2280
+msgid "Bold"
+msgstr ""
+
 #: src/strings.ts:1789
 msgid "Browse"
+msgstr ""
+
+#: src/strings.ts:2297
+msgid "Bullet list"
 msgstr ""
 
 #: src/strings.ts:395
@@ -807,6 +852,10 @@ msgstr ""
 
 #: src/strings.ts:106
 msgid "By signing up, you agree to our"
+msgstr ""
+
+#: src/strings.ts:2359
+msgid "Callout"
 msgstr ""
 
 #: src/strings.ts:527
@@ -823,6 +872,27 @@ msgstr ""
 
 #: src/strings.ts:498
 msgid "Cancel upload"
+msgstr ""
+
+#: src/strings.ts:2325
+msgid "Cell background color"
+msgstr ""
+
+#: src/strings.ts:2327
+msgid "Cell border color"
+msgstr ""
+
+#: src/strings.ts:2329
+#: src/strings.ts:2330
+msgid "Cell border width"
+msgstr ""
+
+#: src/strings.ts:2311
+msgid "Cell properties"
+msgstr ""
+
+#: src/strings.ts:2328
+msgid "Cell text color"
 msgstr ""
 
 #: src/strings.ts:158
@@ -855,6 +925,10 @@ msgstr ""
 
 #: src/strings.ts:1095
 msgid "Change how the app behaves in different situations"
+msgstr ""
+
+#: src/strings.ts:2377
+msgid "Change language"
 msgstr ""
 
 #: src/strings.ts:1215
@@ -925,12 +999,24 @@ msgstr ""
 msgid "Checking for updates"
 msgstr ""
 
+#: src/strings.ts:2299
+msgid "Checklist"
+msgstr ""
+
+#: src/strings.ts:2354
+msgid "Choose a block to insert"
+msgstr ""
+
 #: src/strings.ts:1787
 msgid "Choose a recovery method"
 msgstr ""
 
 #: src/strings.ts:2128
 msgid "Choose backup format"
+msgstr ""
+
+#: src/strings.ts:2390
+msgid "Choose custom color"
 msgstr ""
 
 #: src/strings.ts:1088
@@ -970,12 +1056,20 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
+#: src/strings.ts:2293
+msgid "Clear all formatting"
+msgstr ""
+
 #: src/strings.ts:1848
 msgid "Clear attachments cache?"
 msgstr ""
 
 #: src/strings.ts:1847
 msgid "Clear cache"
+msgstr ""
+
+#: src/strings.ts:2388
+msgid "Clear completed tasks"
 msgstr ""
 
 #: src/strings.ts:1105
@@ -1025,6 +1119,10 @@ msgstr ""
 msgid "Click to remove"
 msgstr ""
 
+#: src/strings.ts:2416
+msgid "Click to reset {title}"
+msgstr ""
+
 #: src/strings.ts:1341
 msgid "Close"
 msgstr ""
@@ -1047,6 +1145,18 @@ msgstr ""
 
 #: src/strings.ts:2044
 msgid "Close to the right"
+msgstr ""
+
+#: src/strings.ts:2291
+msgid "Code"
+msgstr ""
+
+#: src/strings.ts:2356
+msgid "Code block"
+msgstr ""
+
+#: src/strings.ts:2292
+msgid "Code remove"
 msgstr ""
 
 #: src/strings.ts:415
@@ -1082,6 +1192,10 @@ msgstr ""
 msgid "Colors"
 msgstr ""
 
+#: src/strings.ts:2309
+msgid "Column properties"
+msgstr ""
+
 #: src/strings.ts:1233
 msgid "Community"
 msgstr ""
@@ -1096,6 +1210,10 @@ msgstr ""
 
 #: src/strings.ts:149
 msgid "Compressed images are uploaded in Full HD resolution and usually are good enough for most use cases."
+msgstr ""
+
+#: src/strings.ts:2275
+msgid "Configure"
 msgstr ""
 
 #: src/strings.ts:654
@@ -1147,8 +1265,12 @@ msgid "Controls whether this device should receive reminder notifications."
 msgstr ""
 
 #: src/strings.ts:2017
-msgid "Copied to clipboard"
+msgid "Copied"
 msgstr ""
+
+#: src/strings.ts:2017
+#~ msgid "Copied to clipboard"
+#~ msgstr ""
 
 #: src/strings.ts:647
 msgid "Copy"
@@ -1162,6 +1284,10 @@ msgstr ""
 msgid "Copy codes"
 msgstr ""
 
+#: src/strings.ts:2273
+msgid "Copy image"
+msgstr ""
+
 #: src/strings.ts:895
 msgid "Copy internal link"
 msgstr ""
@@ -1169,6 +1295,10 @@ msgstr ""
 #: src/strings.tsx:816
 #~ msgid "Copy link"
 #~ msgstr ""
+
+#: src/strings.ts:2272
+msgid "Copy link text"
+msgstr ""
 
 #: src/strings.ts:439
 msgid "Copy note"
@@ -1346,6 +1476,10 @@ msgstr ""
 msgid "Customize toolbar"
 msgstr ""
 
+#: src/strings.ts:2271
+msgid "Cut"
+msgstr ""
+
 #: src/strings.ts:172
 #: src/strings.ts:1533
 msgid "Daily"
@@ -1431,6 +1565,10 @@ msgstr ""
 msgid "Debugging"
 msgstr ""
 
+#: src/strings.ts:2418
+msgid "Decrease {title}"
+msgstr ""
+
 #: src/strings.ts:632
 #: src/strings.ts:2035
 msgid "Default"
@@ -1487,8 +1625,16 @@ msgstr ""
 msgid "Delete collapsed section"
 msgstr ""
 
+#: src/strings.ts:2316
+msgid "Delete column"
+msgstr ""
+
 #: src/strings.ts:1273
 msgid "Delete group"
+msgstr ""
+
+#: src/strings.ts:2391
+msgid "Delete mode"
 msgstr ""
 
 #: src/strings.ts:437
@@ -1497,6 +1643,14 @@ msgstr ""
 
 #: src/strings.ts:547
 msgid "Delete permanently"
+msgstr ""
+
+#: src/strings.ts:2323
+msgid "Delete row"
+msgstr ""
+
+#: src/strings.ts:2324
+msgid "Delete table"
 msgstr ""
 
 #: src/strings.ts:1141
@@ -1643,6 +1797,10 @@ msgstr ""
 msgid "Download all attachments"
 msgstr ""
 
+#: src/strings.ts:2340
+msgid "Download attachment"
+msgstr ""
+
 #: src/strings.ts:1839
 msgid "Download backup file"
 msgstr ""
@@ -1721,6 +1879,11 @@ msgstr ""
 msgid "Edit internal link"
 msgstr ""
 
+#: src/strings.ts:2260
+#: src/strings.ts:2286
+msgid "Edit link"
+msgstr ""
+
 #: src/strings.ts:504
 msgid "Edit notebook"
 msgstr ""
@@ -1770,6 +1933,18 @@ msgstr ""
 msgid "Email updated to {email}"
 msgstr ""
 
+#: src/strings.ts:2366
+msgid "Embed"
+msgstr ""
+
+#: src/strings.ts:2346
+msgid "Embed properties"
+msgstr ""
+
+#: src/strings.ts:2342
+msgid "Embed settings"
+msgstr ""
+
 #: src/strings.ts:156
 msgid "Enable"
 msgstr ""
@@ -1780,6 +1955,10 @@ msgstr ""
 
 #: src/strings.ts:2039
 msgid "Enable editor margins"
+msgstr ""
+
+#: src/strings.ts:2406
+msgid "Enable regex"
 msgstr ""
 
 #: src/strings.ts:2153
@@ -1798,7 +1977,7 @@ msgstr ""
 msgid "Encrypted and synced"
 msgstr ""
 
-#: src/strings.ts:2266
+#: src/strings.ts:2267
 msgid "Encrypted backup"
 msgstr ""
 
@@ -1848,6 +2027,10 @@ msgstr ""
 
 #: src/strings.ts:1487
 msgid "Enter email address"
+msgstr ""
+
+#: src/strings.ts:2394
+msgid "Enter embed source URL"
 msgstr ""
 
 #: src/strings.ts:1272
@@ -1948,6 +2131,10 @@ msgstr ""
 
 #: src/strings.ts:2040
 msgid "Exit fullscreen"
+msgstr ""
+
+#: src/strings.ts:2398
+msgid "Expand"
 msgstr ""
 
 #: src/strings.ts:2098
@@ -2115,6 +2302,10 @@ msgstr ""
 msgid "Fix it"
 msgstr ""
 
+#: src/strings.ts:2335
+msgid "Float image"
+msgstr ""
+
 #: src/strings.ts:2042
 msgid "Focus mode"
 msgstr ""
@@ -2137,6 +2328,14 @@ msgstr ""
 
 #: src/strings.ts:1241
 msgid "Follow us on X for updates and news about Notesnook"
+msgstr ""
+
+#: src/strings.ts:2300
+msgid "Font family"
+msgstr ""
+
+#: src/strings.ts:2301
+msgid "Font size"
 msgstr ""
 
 #: src/strings.ts:1648
@@ -2180,12 +2379,24 @@ msgstr ""
 msgid "Friday"
 msgstr ""
 
+#: src/strings.ts:2396
+msgid "From code"
+msgstr ""
+
+#: src/strings.ts:2393
+msgid "From URL"
+msgstr ""
+
 #: src/strings.ts:2026
 msgid "Full name updated"
 msgstr ""
 
 #: src/strings.ts:2232
 msgid "Full offline mode"
+msgstr ""
+
+#: src/strings.ts:2348
+msgid "Full screen"
 msgstr ""
 
 #: src/strings.ts:2118
@@ -2288,6 +2499,18 @@ msgstr ""
 msgid "Having problems with sync?"
 msgstr ""
 
+#: src/strings.ts:2374
+msgid "Heading {level}"
+msgstr ""
+
+#: src/strings.ts:2302
+msgid "Headings"
+msgstr ""
+
+#: src/strings.ts:2409
+msgid "Height"
+msgstr ""
+
 #: src/strings.ts:1218
 msgid "Help and support"
 msgstr ""
@@ -2308,6 +2531,10 @@ msgstr ""
 msgid "Hide note title"
 msgstr ""
 
+#: src/strings.ts:2305
+msgid "Highlight"
+msgstr ""
+
 #: src/strings.ts:894
 msgid "History"
 msgstr ""
@@ -2322,6 +2549,10 @@ msgstr ""
 
 #: src/strings.ts:1276
 msgid "Homepage changed to {name}"
+msgstr ""
+
+#: src/strings.ts:2355
+msgid "Horizontal rule"
 msgstr ""
 
 #: src/strings.ts:1788
@@ -2402,6 +2633,18 @@ msgstr ""
 msgid "If you want to ask something in general or need some assistance, we would suggest that you"
 msgstr ""
 
+#: src/strings.ts:2360
+msgid "Image"
+msgstr ""
+
+#: src/strings.ts:2336
+msgid "Image properties"
+msgstr ""
+
+#: src/strings.ts:2331
+msgid "Image settings"
+msgstr ""
+
 #: src/strings.ts:929
 msgid "Image size should be less than {sizeInMB}MB"
 msgstr ""
@@ -2442,12 +2685,48 @@ msgstr ""
 msgid "Incorrect {type}"
 msgstr ""
 
-#: src/strings.ts:2260
+#: src/strings.ts:2417
+msgid "Increase {title}"
+msgstr ""
+
+#: src/strings.ts:2261
 msgid "Insert"
+msgstr ""
+
+#: src/strings.ts:2414
+msgid "Insert a {rows}x{columns} table"
+msgstr ""
+
+#: src/strings.ts:2365
+msgid "Insert a table"
+msgstr ""
+
+#: src/strings.ts:2367
+msgid "Insert an embed"
+msgstr ""
+
+#: src/strings.ts:2361
+msgid "Insert an image"
+msgstr ""
+
+#: src/strings.ts:2312
+msgid "Insert column left"
+msgstr ""
+
+#: src/strings.ts:2313
+msgid "Insert column right"
 msgstr ""
 
 #: src/strings.ts:2259
 msgid "Insert link"
+msgstr ""
+
+#: src/strings.ts:2319
+msgid "Insert row above"
+msgstr ""
+
+#: src/strings.ts:2320
+msgid "Insert row below"
 msgstr ""
 
 #: src/strings.ts:1646
@@ -2495,6 +2774,10 @@ msgstr ""
 
 #: src/strings.ts:281
 msgid "It took us a year to bring Notesnook to life. Share your experience and suggestions to help us improve it."
+msgstr ""
+
+#: src/strings.ts:2281
+msgid "Italic"
 msgstr ""
 
 #: src/strings.ts:297
@@ -2606,12 +2889,24 @@ msgstr ""
 msgid "Licensed under {license}"
 msgstr ""
 
+#: src/strings.ts:2351
+msgid "Lift list item"
+msgstr ""
+
 #: src/strings.ts:686
 msgid "Light"
 msgstr ""
 
+#: src/strings.ts:2381
+msgid "Line {line}, Column {column}"
+msgstr ""
+
 #: src/strings.ts:1116
 msgid "Line spacing changed"
+msgstr ""
+
+#: src/strings.ts:2285
+msgid "Link"
 msgstr ""
 
 #: src/strings.ts:896
@@ -2620,6 +2915,14 @@ msgstr ""
 
 #: src/strings.ts:911
 msgid "Link notebooks"
+msgstr ""
+
+#: src/strings.ts:2290
+msgid "Link settings"
+msgstr ""
+
+#: src/strings.ts:2411
+msgid "Link text"
 msgstr ""
 
 #: src/strings.ts:246
@@ -2774,6 +3077,10 @@ msgstr ""
 msgid "Long press on any item in list to enter multi-select mode."
 msgstr ""
 
+#: src/strings.ts:2386
+msgid "Make task list readonly"
+msgstr ""
+
 #: src/strings.ts:1016
 msgid "Manage account"
 msgstr ""
@@ -2822,6 +3129,22 @@ msgstr ""
 msgid "Marketing emails"
 msgstr ""
 
+#: src/strings.ts:2399
+msgid "Match case"
+msgstr ""
+
+#: src/strings.ts:2400
+msgid "Match whole word"
+msgstr ""
+
+#: src/strings.ts:2307
+msgid "Math (inline)"
+msgstr ""
+
+#: src/strings.ts:2358
+msgid "Math & formulas"
+msgstr ""
+
 #: src/strings.ts:2067
 msgid "Maximize"
 msgstr ""
@@ -2836,6 +3159,10 @@ msgstr ""
 
 #: src/strings.ts:1745
 msgid "Member since {date}"
+msgstr ""
+
+#: src/strings.ts:2318
+msgid "Merge cells"
 msgstr ""
 
 #: src/strings.ts:252
@@ -2906,8 +3233,24 @@ msgstr ""
 msgid "Monthly"
 msgstr ""
 
+#: src/strings.ts:2338
+msgid "More"
+msgstr ""
+
 #: src/strings.ts:829
 msgid "Move"
+msgstr ""
+
+#: src/strings.ts:2387
+msgid "Move all checked tasks to bottom"
+msgstr ""
+
+#: src/strings.ts:2314
+msgid "Move column left"
+msgstr ""
+
+#: src/strings.ts:2315
+msgid "Move column right"
 msgstr ""
 
 #: src/strings.ts:918
@@ -2916,6 +3259,14 @@ msgstr ""
 
 #: src/strings.ts:884
 msgid "Move notes"
+msgstr ""
+
+#: src/strings.ts:2322
+msgid "Move row down"
+msgstr ""
+
+#: src/strings.ts:2321
+msgid "Move row up"
 msgstr ""
 
 #: src/strings.ts:564
@@ -3016,6 +3367,10 @@ msgstr ""
 
 #: src/strings.ts:530
 msgid "Next"
+msgstr ""
+
+#: src/strings.ts:2403
+msgid "Next match"
 msgstr ""
 
 #: src/strings.ts:525
@@ -3190,7 +3545,7 @@ msgstr ""
 msgid "NOTEBOOKS"
 msgstr ""
 
-#: src/strings.ts:2265
+#: src/strings.ts:2266
 msgid "Notebooks are the best way to organize your notes."
 msgstr ""
 
@@ -3245,6 +3600,10 @@ msgstr ""
 
 #: src/strings.ts:1337
 msgid "Notifications disabled"
+msgstr ""
+
+#: src/strings.ts:2298
+msgid "Numbered list"
 msgstr ""
 
 #: src/strings.ts:1688
@@ -3307,8 +3666,16 @@ msgstr ""
 msgid "Open in browser to manage subscription"
 msgstr ""
 
+#: src/strings.ts:2349
+msgid "Open in new tab"
+msgstr ""
+
 #: src/strings.ts:558
 msgid "Open issue"
+msgstr ""
+
+#: src/strings.ts:2288
+msgid "Open link"
 msgstr ""
 
 #: src/strings.ts:1842
@@ -3317,6 +3684,10 @@ msgstr ""
 
 #: src/strings.ts:1340
 msgid "Open settings"
+msgstr ""
+
+#: src/strings.ts:2350
+msgid "Open source"
 msgstr ""
 
 #: src/strings.ts:1250
@@ -3358,6 +3729,14 @@ msgstr ""
 
 #: src/strings.ts:2171
 msgid "Other"
+msgstr ""
+
+#: src/strings.ts:2370
+msgid "Outline list"
+msgstr ""
+
+#: src/strings.ts:2373
+msgid "Paragraph"
 msgstr ""
 
 #: src/strings.ts:2127
@@ -3402,6 +3781,18 @@ msgstr ""
 
 #: src/strings.ts:2107
 msgid "Password/pin"
+msgstr ""
+
+#: src/strings.ts:2274
+msgid "Paste"
+msgstr ""
+
+#: src/strings.ts:2395
+msgid "Paste embed code here. Only iframes are supported."
+msgstr ""
+
+#: src/strings.ts:2410
+msgid "Paste image URL here"
 msgstr ""
 
 #: src/strings.ts:2225
@@ -3510,7 +3901,7 @@ msgstr ""
 msgid "Please enter password of this backup file"
 msgstr ""
 
-#: src/strings.ts:2268
+#: src/strings.ts:2269
 msgid "Please enter the password to decrypt and restore this backup."
 msgstr ""
 
@@ -3568,6 +3959,10 @@ msgstr ""
 
 #: src/strings.ts:1356
 msgid "please send us an email from your registered email address"
+msgstr ""
+
+#: src/strings.ts:2415
+msgid "Please set a table size"
 msgstr ""
 
 #: src/strings.ts:1527
@@ -3680,8 +4075,16 @@ msgstr ""
 msgid "Prevent note title from appearing in tab/window title."
 msgstr ""
 
+#: src/strings.ts:2337
+msgid "Preview attachment"
+msgstr ""
+
 #: src/strings.ts:187
 msgid "Preview not available, content is encrypted."
+msgstr ""
+
+#: src/strings.ts:2404
+msgid "Previous match"
 msgstr ""
 
 #: src/strings.ts:2061
@@ -3809,6 +4212,10 @@ msgstr ""
 
 #: src/strings.ts:1205
 msgid "Quickly create a note from the notification"
+msgstr ""
+
+#: src/strings.ts:2357
+msgid "Quote"
 msgstr ""
 
 #: src/strings.ts:1314
@@ -4002,6 +4409,10 @@ msgstr ""
 msgid "Remove as default"
 msgstr ""
 
+#: src/strings.ts:2341
+msgid "Remove attachment"
+msgstr ""
+
 #: src/strings.ts:2058
 msgid "Remove color"
 msgstr ""
@@ -4016,6 +4427,10 @@ msgstr ""
 
 #: src/strings.ts:1022
 msgid "Remove full name"
+msgstr ""
+
+#: src/strings.ts:2287
+msgid "Remove link"
 msgstr ""
 
 #: src/strings.ts:1018
@@ -4065,6 +4480,14 @@ msgstr ""
 
 #: src/strings.ts:337
 msgid "Repeats daily at {date}"
+msgstr ""
+
+#: src/strings.ts:2401
+msgid "Replace"
+msgstr ""
+
+#: src/strings.ts:2402
+msgid "Replace all"
 msgstr ""
 
 #: src/strings.ts:2190
@@ -4240,6 +4663,10 @@ msgstr ""
 msgid "Rotate right"
 msgstr ""
 
+#: src/strings.ts:2310
+msgid "Row properties"
+msgstr ""
+
 #: src/strings.ts:523
 msgid "Run file check"
 msgstr ""
@@ -4345,6 +4772,10 @@ msgstr ""
 #~ msgid "Search a section of a note to link to"
 #~ msgstr ""
 
+#: src/strings.ts:2383
+msgid "Search languages"
+msgstr ""
+
 #: src/strings.ts:1465
 msgid "Search notebooks"
 msgstr ""
@@ -4435,6 +4866,10 @@ msgstr ""
 
 #: src/strings.ts:117
 msgid "Select how you would like to recieve the code"
+msgstr ""
+
+#: src/strings.ts:2378
+msgid "Select language"
 msgstr ""
 
 #: src/strings.ts:116
@@ -4707,6 +5142,10 @@ msgstr ""
 msgid "Silent"
 msgstr ""
 
+#: src/strings.ts:2352
+msgid "Sink list item"
+msgstr ""
+
 #: src/strings.ts:2068
 msgid "Size"
 msgstr ""
@@ -4747,8 +5186,16 @@ msgstr ""
 msgid "Source code"
 msgstr ""
 
+#: src/strings.ts:2379
+msgid "Spaces"
+msgstr ""
+
 #: src/strings.ts:2152
 msgid "Spell check"
+msgstr ""
+
+#: src/strings.ts:2317
+msgid "Split cells"
 msgstr ""
 
 #: src/strings.ts:1082
@@ -4795,6 +5242,10 @@ msgstr ""
 msgid "Streaming not supported"
 msgstr ""
 
+#: src/strings.ts:2283
+msgid "Strikethrough"
+msgstr ""
+
 #: src/strings.ts:2250
 msgid "Subgroup 1"
 msgstr ""
@@ -4827,6 +5278,10 @@ msgstr ""
 msgid "Subscribed on Web"
 msgstr ""
 
+#: src/strings.ts:2294
+msgid "Subscript"
+msgstr ""
+
 #: src/strings.ts:1007
 msgid "Subscription details"
 msgstr ""
@@ -4841,6 +5296,10 @@ msgstr ""
 
 #: src/strings.ts:592
 msgid "Sunday"
+msgstr ""
+
+#: src/strings.ts:2295
+msgid "Superscript"
 msgstr ""
 
 #: src/strings.ts:1429
@@ -4891,8 +5350,16 @@ msgstr ""
 msgid "Syncing your data"
 msgstr ""
 
+#: src/strings.ts:2364
+msgid "Table"
+msgstr ""
+
 #: src/strings.ts:516
 msgid "Table of contents"
+msgstr ""
+
+#: src/strings.ts:2308
+msgid "Table settings"
 msgstr ""
 
 #: src/strings.ts:509
@@ -4926,6 +5393,10 @@ msgstr ""
 
 #: src/strings.ts:1182
 msgid "Take a partial backup of your data that does not include attachments"
+msgstr ""
+
+#: src/strings.ts:2363
+msgid "Take a photo using camera"
 msgstr ""
 
 #: src/strings.ts:1333
@@ -4988,6 +5459,10 @@ msgstr ""
 msgid "Tap twice to confirm you have saved the recovery key."
 msgstr ""
 
+#: src/strings.ts:2369
+msgid "Task list"
+msgstr ""
+
 #: src/strings.ts:1126
 msgid "Telemetry"
 msgstr ""
@@ -5020,6 +5495,14 @@ msgstr ""
 
 #: src/strings.ts:1607
 msgid "Test connection before changing server urls"
+msgstr ""
+
+#: src/strings.ts:2306
+msgid "Text color"
+msgstr ""
+
+#: src/strings.ts:2304
+msgid "Text direction"
 msgstr ""
 
 #: src/strings.tsx:1628
@@ -5090,7 +5573,7 @@ msgstr ""
 msgid "There are no blocks in this note."
 msgstr ""
 
-#: src/strings.ts:2262
+#: src/strings.ts:2263
 msgid "These items will be **kept in your Trash for {interval} days** after which they will be permanently deleted."
 msgstr ""
 
@@ -5199,6 +5682,14 @@ msgstr ""
 msgid "Toggle dark/light mode"
 msgstr ""
 
+#: src/strings.ts:2376
+msgid "Toggle indentation mode"
+msgstr ""
+
+#: src/strings.ts:2405
+msgid "Toggle replace"
+msgstr ""
+
 #: src/strings.ts:2158
 msgid "Toolbar"
 msgstr ""
@@ -5294,6 +5785,10 @@ msgstr ""
 
 #: src/strings.ts:1521
 msgid "Unable to send 2FA code"
+msgstr ""
+
+#: src/strings.ts:2282
+msgid "Underline"
 msgstr ""
 
 #: src/strings.ts:544
@@ -5392,6 +5887,7 @@ msgid "Unregister"
 msgstr ""
 
 #: src/strings.ts:216
+#: src/strings.ts:2385
 msgid "Untitled"
 msgstr ""
 
@@ -5449,6 +5945,10 @@ msgstr ""
 
 #: src/strings.ts:490
 msgid "Upload"
+msgstr ""
+
+#: src/strings.ts:2362
+msgid "Upload from disk"
 msgstr ""
 
 #: src/strings.ts:491
@@ -5550,6 +6050,14 @@ msgstr ""
 
 #: src/strings.ts:998
 msgid "User verification failed"
+msgstr ""
+
+#: src/strings.ts:2278
+msgid "Using {instance} (v{version})"
+msgstr ""
+
+#: src/strings.ts:2276
+msgid "Using official Notesnook instance"
 msgstr ""
 
 #: src/strings.ts:1135
@@ -5672,6 +6180,10 @@ msgstr ""
 msgid "We would love to know what you think!"
 msgstr ""
 
+#: src/strings.ts:2347
+msgid "Web clip settings"
+msgstr ""
+
 #: src/strings.ts:2056
 msgid "Website"
 msgstr ""
@@ -5717,6 +6229,10 @@ msgstr ""
 msgid "What went wrong?"
 msgstr ""
 
+#: src/strings.ts:2408
+msgid "Width"
+msgstr ""
+
 #: src/strings.ts:1563
 msgid "words"
 msgstr ""
@@ -5758,7 +6274,7 @@ msgstr ""
 msgid "You also agree to recieve marketing emails from us which you can opt-out of from app settings."
 msgstr ""
 
-#: src/strings.ts:2264
+#: src/strings.ts:2265
 msgid "You are editing \"{notebookTitle}\"."
 msgstr ""
 
