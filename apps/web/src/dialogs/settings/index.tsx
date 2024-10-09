@@ -331,7 +331,10 @@ function SettingsSideBar(props: SettingsSideBarProps) {
                   fontWeight: "bold",
                   color: "paragraph",
                   mx: 3,
-                  mb: 1
+                  mb: 1,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  wordSpacing: "nowrap"
                 }}
               >
                 {group.title}
@@ -463,7 +466,7 @@ function SettingItem(props: { item: Setting }) {
           gap: 4
         }}
       >
-        <Flex sx={{ flexDirection: "column" }}>
+        <Flex sx={{ flexDirection: "column", flexShrink: 0 }}>
           <Text variant={"subtitle"}>{item.title}</Text>
           {item.description && (
             <Text
@@ -480,7 +483,6 @@ function SettingItem(props: { item: Setting }) {
         <Flex
           sx={{
             alignItems: "center",
-            flexShrink: 0,
             justifyContent: "end",
             gap: 2,
             "& > label": { width: "auto" }
@@ -592,7 +594,8 @@ function SelectComponent(
         border: "1px solid var(--border-secondary)",
         borderRadius: "5px",
         color: "var(--paragraph)",
-        padding: "5px"
+        padding: "5px",
+        overflow: "hidden"
       }}
       value={
         selectedOption.status === "fulfilled" ? selectedOption.value : undefined

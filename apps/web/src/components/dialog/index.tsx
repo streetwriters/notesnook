@@ -137,7 +137,9 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                 sx={{
                   fontSize: "subheading",
                   textAlign: props.textAlignment || "left",
-                  color: "paragraph"
+                  color: "paragraph",
+                  overflowWrap: "anywhere",
+                  wordSpacing: "wrap"
                 }}
               >
                 {props.title}
@@ -148,7 +150,9 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                 variant="body"
                 sx={{
                   textAlign: props.textAlignment || "left",
-                  color: "var(--paragraph-secondary)"
+                  color: "var(--paragraph-secondary)",
+                  overflowWrap: "anywhere",
+                  wordSpacing: "wrap"
                 }}
               >
                 {props.description}
@@ -205,6 +209,12 @@ export function DialogButton(props: DialogButtonProps) {
       variant="dialog"
       disabled={props.disabled}
       onClick={props.disabled ? undefined : props.onClick}
+      sx={{
+        maxWidth: "100%",
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+        whiteSpace: "nowrap"
+      }}
     >
       {props.loading ? <Loading size={16} color="accent" /> : props.text}
     </Button>
