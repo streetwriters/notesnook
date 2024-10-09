@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ToolbarDefinition, ToolDefinition } from "./types.js";
 import { ToolId } from "./tools/index.js";
+import { strings } from "@notesnook/intl";
 
 const tools: Record<ToolId, ToolDefinition> = {
   none: {
@@ -27,332 +28,332 @@ const tools: Record<ToolId, ToolDefinition> = {
   },
   bold: {
     icon: "bold",
-    title: "Bold"
+    title: strings.bold()
   },
   italic: {
     icon: "italic",
-    title: "Italic"
+    title: strings.italic()
   },
   underline: {
     icon: "underline",
-    title: "Underline"
+    title: strings.underline()
   },
   strikethrough: {
     icon: "strikethrough",
-    title: "Strikethrough"
+    title: strings.strikethrough()
   },
   addInternalLink: {
     icon: "noteLink",
-    title: "Add bi-directional note link"
+    title: strings.noteLink()
   },
   addLink: {
     icon: "link",
-    title: "Link"
+    title: strings.link()
   },
   editLink: {
     icon: "linkEdit",
-    title: "Edit link",
+    title: strings.linkEdit(),
     conditional: true
   },
   removeLink: {
     icon: "linkRemove",
-    title: "Remove link",
+    title: strings.linkRemove(),
     conditional: true
   },
   openLink: {
     icon: "openLink",
-    title: "Open link",
+    title: strings.openLink(),
     conditional: true
   },
   copyLink: {
     icon: "copyLink",
-    title: "Copy link",
+    title: strings.copyLink(),
     conditional: true
   },
   linkSettings: {
     icon: "linkSettings",
-    title: "Link settings",
+    title: strings.linkSettings(),
     conditional: true
   },
   code: {
     icon: "code",
-    title: "Code"
+    title: strings.code()
   },
   codeRemove: {
     icon: "codeRemove",
-    title: "Code",
+    title: strings.codeRemove(),
     conditional: true
   },
   clearformatting: {
     icon: "formatClear",
-    title: "Clear all formatting"
+    title: strings.formatClear()
   },
   subscript: {
     icon: "subscript",
-    title: "Subscript"
+    title: strings.subscript()
   },
   superscript: {
     icon: "superscript",
-    title: "Superscript"
+    title: strings.superscript()
   },
   insertBlock: {
     icon: "plus",
-    title: "Insert",
+    title: strings.insert(),
     conditional: true
   },
   bulletList: {
     icon: "bulletList",
-    title: "Bullet list"
+    title: strings.bulletList()
   },
   numberedList: {
     icon: "numberedList",
-    title: "Numbered list"
+    title: strings.numberedList()
   },
   checkList: {
     icon: "checklist",
-    title: "Checklist"
+    title: strings.checklist()
   },
   fontFamily: {
     icon: "fontFamily",
-    title: "Font family"
+    title: strings.fontFamily()
   },
   fontSize: {
     icon: "fontSize",
-    title: "Font size"
+    title: strings.fontSize()
   },
   headings: {
     icon: "heading",
-    title: "Headings"
+    title: strings.headings()
   },
   alignment: {
     icon: "alignCenter",
-    title: "Alignment"
+    title: strings.alignCenter()
   },
   textDirection: {
     icon: "ltr",
-    title: "Text direction"
+    title: strings.ltr()
   },
   highlight: {
     icon: "highlight",
-    title: "Highlight"
+    title: strings.highlight()
   },
   textColor: {
     icon: "textColor",
-    title: "Text color"
+    title: strings.textColor()
   },
   math: {
     icon: "math",
-    title: "Math (inline)"
+    title: strings.mathInline()
   },
 
   tableSettings: {
     icon: "tableSettings",
-    title: "Table settings",
+    title: strings.tableSettings(),
     conditional: true
   },
   columnProperties: {
     icon: "columnProperties",
-    title: "Column properties",
+    title: strings.columnProperties(),
     conditional: true
   },
   rowProperties: {
     icon: "rowProperties",
-    title: "Row properties",
+    title: strings.rowProperties(),
     conditional: true
   },
   cellProperties: {
     icon: "cellProperties",
-    title: "Cell properties",
+    title: strings.cellProperties(),
     conditional: true
   },
   insertColumnLeft: {
     icon: "insertColumnLeft",
-    title: "Insert column left",
+    title: strings.insertColumnLeft(),
     conditional: true
   },
   insertColumnRight: {
     icon: "insertColumnRight",
-    title: "Insert column right",
+    title: strings.insertColumnRight(),
     conditional: true
   },
   moveColumnLeft: {
     icon: "moveColumnLeft",
-    title: "Move column left",
+    title: strings.moveColumnLeft(),
     conditional: true
   },
   moveColumnRight: {
     icon: "moveColumnRight",
-    title: "Move column right",
+    title: strings.moveColumnRight(),
     conditional: true
   },
   deleteColumn: {
     icon: "deleteColumn",
-    title: "Delete column",
+    title: strings.deleteColumn(),
     conditional: true
   },
   splitCells: {
     icon: "splitCells",
-    title: "Split cells",
+    title: strings.splitCells(),
     conditional: true
   },
   mergeCells: {
     icon: "mergeCells",
-    title: "Merge cells",
+    title: strings.mergeCells(),
     conditional: true
   },
   insertRowAbove: {
     icon: "insertRowAbove",
-    title: "Insert row above",
+    title: strings.insertRowAbove(),
     conditional: true
   },
   insertRowBelow: {
     icon: "insertRowBelow",
-    title: "Insert row below",
+    title: strings.insertRowBelow(),
     conditional: true
   },
   moveRowUp: {
     icon: "moveRowUp",
-    title: "Move row up",
+    title: strings.moveRowUp(),
     conditional: true
   },
   moveRowDown: {
     icon: "moveRowDown",
-    title: "Move row down",
+    title: strings.moveRowDown(),
     conditional: true
   },
   deleteRow: {
     icon: "deleteRow",
-    title: "Delete row",
+    title: strings.deleteRow(),
     conditional: true
   },
   deleteTable: {
     icon: "deleteTable",
-    title: "Delete table",
+    title: strings.deleteTable(),
     conditional: true
   },
   cellBackgroundColor: {
     icon: "backgroundColor",
-    title: "Cell background color",
+    title: strings.cellBackgroundColor(),
     conditional: true
   },
   cellBorderColor: {
     icon: "cellBorderColor",
-    title: "Cell border color",
+    title: strings.cellBorderColor(),
     conditional: true
   },
   cellTextColor: {
     icon: "textColor",
-    title: "Cell text color",
+    title: strings.textColor(),
     conditional: true
   },
   cellBorderWidth: {
     icon: "none",
-    title: "Cell border width",
+    title: strings.none(),
     conditional: true
   },
   imageSettings: {
     icon: "imageSettings",
-    title: "Image settings",
+    title: strings.imageSettings(),
     conditional: true
   },
   imageAlignCenter: {
     icon: "alignCenter",
-    title: "Align center",
+    title: strings.alignCenter(),
     conditional: true
   },
   imageAlignLeft: {
     icon: "alignLeft",
-    title: "Align left",
+    title: strings.alignLeft(),
     conditional: true
   },
   imageAlignRight: {
     icon: "alignRight",
-    title: "Align right",
+    title: strings.alignRight(),
     conditional: true
   },
   imageFloat: {
     icon: "imageFloat",
-    title: "Float image",
+    title: strings.imageFloat(),
     conditional: true
   },
   imageProperties: {
     icon: "more",
-    title: "Image properties",
+    title: strings.imageProperties(),
     conditional: true
   },
   previewAttachment: {
     icon: "previewAttachment",
-    title: "Preview attachment",
+    title: strings.previewAttachment(),
     conditional: true
   },
   attachmentSettings: {
     icon: "attachmentSettings",
-    title: "Attachment settings",
+    title: strings.attachmentSettings(),
     conditional: true
   },
   downloadAttachment: {
     icon: "download",
-    title: "Download attachment",
+    title: strings.downloadAttachment(),
     conditional: true
   },
   removeAttachment: {
     icon: "delete",
-    title: "Remove attachment",
+    title: strings.delete(),
     conditional: true
   },
   embedSettings: {
     icon: "embedSettings",
-    title: "Embed settings",
+    title: strings.embedSettings(),
     conditional: true
   },
   embedAlignCenter: {
     icon: "alignCenter",
-    title: "Align center",
+    title: strings.alignCenter(),
     conditional: true
   },
   embedAlignLeft: {
     icon: "alignLeft",
-    title: "Align left",
+    title: strings.alignLeft(),
     conditional: true
   },
   embedAlignRight: {
     icon: "alignRight",
-    title: "Align right",
+    title: strings.alignRight(),
     conditional: true
   },
   embedProperties: {
     icon: "more",
-    title: "Embed properties",
+    title: strings.embedProperties(),
     conditional: true
   },
   webclipSettings: {
     icon: "webclipSettings",
-    title: "Web clip settings",
+    title: strings.webclipSettings(),
     conditional: true
   },
   webclipFullScreen: {
     icon: "fullscreen",
-    title: "Full screen",
+    title: strings.fullscreen(),
     conditional: true
   },
   webclipOpenExternal: {
     icon: "openLink",
-    title: "Open in new tab",
+    title: strings.openLink(),
     conditional: true
   },
   webclipOpenSource: {
     icon: "openSource",
-    title: "Open source",
+    title: strings.openSource(),
     conditional: true
   },
   outdent: {
     icon: "outdent",
-    title: "Lift list item",
+    title: strings.outdent(),
     conditional: true
   },
   indent: {
     icon: "indent",
-    title: "Sink list item",
+    title: strings.indent(),
     conditional: true
   }
 };

@@ -50,6 +50,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@notesnook/common": "file:../common",
+    "@notesnook/intl": "file:../intl",
     "@notesnook/theme": "file:../theme",
     "@notesnook/ui": "file:../ui",
     "@social-embed/lib": "^0.1.0-next.7",

@@ -29,6 +29,7 @@ import { ResponsivePresenter } from "../../components/responsive/index.js";
 import { showPopup } from "../../components/popup-presenter/index.js";
 import { ImageUploadPopup } from "../popups/image-upload.js";
 import { Button } from "../../components/button.js";
+import { strings } from "@notesnook/intl";
 
 export function InsertBlock(props: ToolProps) {
   const { editor } = props;
@@ -82,7 +83,7 @@ export function InsertBlock(props: ToolProps) {
       <ResponsivePresenter
         desktop="menu"
         mobile="sheet"
-        title="Choose a block to insert"
+        title={strings.chooseBlockToInsert()}
         isOpen={isOpen}
         items={menuItems}
         onClose={() => setIsOpen(false)}
@@ -100,7 +101,7 @@ export function InsertBlock(props: ToolProps) {
 const horizontalRule = (editor: Editor): MenuItem => ({
   key: "hr",
   type: "button",
-  title: "Horizontal rule",
+  title: strings.horizontalRule(),
   icon: Icons.horizontalRule,
   isChecked: editor.isActive("horizontalRule"),
   onClick: () => editor.chain().focus().setHorizontalRule().run()
@@ -109,7 +110,7 @@ const horizontalRule = (editor: Editor): MenuItem => ({
 const codeblock = (editor: Editor): MenuItem => ({
   key: "codeblock",
   type: "button",
-  title: "Code block",
+  title: strings.codeBlock(),
   icon: Icons.codeblock,
   isChecked: editor.isActive("codeBlock"),
   onClick: () => editor.chain().focus().toggleCodeBlock().run(),
@@ -119,7 +120,7 @@ const codeblock = (editor: Editor): MenuItem => ({
 const blockquote = (editor: Editor): MenuItem => ({
   key: "blockquote",
   type: "button",
-  title: "Quote",
+  title: strings.quote(),
   icon: Icons.blockquote,
   isChecked: editor.isActive("blockQuote"),
   onClick: () => editor.chain().focus().toggleBlockquote().run(),
@@ -129,7 +130,7 @@ const blockquote = (editor: Editor): MenuItem => ({
 const mathblock = (editor: Editor): MenuItem => ({
   key: "math",
   type: "button",
-  title: "Math & formulas",
+  title: strings.mathAndFormulas(),
   icon: Icons.mathBlock,
   isChecked: editor.isActive("mathBlock"),
   onClick: () => editor.chain().focus().insertMathBlock().run(),
@@ -139,7 +140,7 @@ const mathblock = (editor: Editor): MenuItem => ({
 const callout = (editor: Editor): MenuItem => ({
   key: "callout",
   type: "button",
-  title: "Callout",
+  title: strings.callout(),
   icon: Icons.callout,
   menu: {
     items: [
@@ -169,15 +170,15 @@ const callout = (editor: Editor): MenuItem => ({
 const image = (editor: Editor, isMobile: boolean): MenuItem => ({
   key: "image",
   type: "button",
-  title: "Image",
+  title: strings.image(),
   icon: Icons.image,
   menu: {
-    title: "Insert an image",
+    title: strings.insertImage(),
     items: [
       {
         key: "upload-from-disk",
         type: "button",
-        title: "Upload from disk",
+        title: strings.uploadFromDisk(),
         icon: Icons.upload,
         onClick: () => editor.storage.openAttachmentPicker?.("image"),
         modifier: "Mod-Shift-I"
@@ -185,7 +186,7 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
       {
         key: "camera",
         type: "button",
-        title: "Take a photo using camera",
+        title: strings.takePhotoUsingCamera(),
         icon: Icons.camera,
         isHidden: !isMobile,
         onClick: () => editor.storage.openAttachmentPicker?.("camera")
@@ -198,10 +199,10 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
 const table = (editor: Editor): MenuItem => ({
   key: "table",
   type: "button",
-  title: "Table",
+  title: strings.table(),
   icon: Icons.table,
   menu: {
-    title: "Insert a table",
+    title: strings.insertTable(),
     items: [
       {
         key: "table-size-selector",
@@ -229,10 +230,10 @@ const table = (editor: Editor): MenuItem => ({
 const embedMobile = (editor: Editor): MenuItem => ({
   key: "embed",
   type: "button",
-  title: "Embed",
+  title: strings.embed(),
   icon: Icons.embed,
   menu: {
-    title: "Insert an embed",
+    title: strings.insertEmbed(),
     items: [
       {
         key: "embed-popup",
@@ -240,7 +241,7 @@ const embedMobile = (editor: Editor): MenuItem => ({
         component: function ({ onClick }) {
           return (
             <EmbedPopup
-              title="Insert embed"
+              title={strings.insertEmbed()}
               onClose={(embed) => {
                 if (!embed) return onClick?.();
                 editor.chain().insertEmbed(embed).run();
@@ -257,14 +258,14 @@ const embedMobile = (editor: Editor): MenuItem => ({
 const embedDesktop = (editor: Editor): MenuItem => ({
   key: "embed",
   type: "button",
-  title: "Embed",
+  title: strings.embed(),
   icon: Icons.embed,
   onClick: () => {
     if (!editor) return;
     showPopup({
       popup: (hide) => (
         <EmbedPopup
-          title="Insert embed"
+          title={strings.insertEmbed()}
           onClose={(embed) => {
             if (!embed) return hide();
             editor.chain().insertEmbed(embed).run();
@@ -279,7 +280,7 @@ const embedDesktop = (editor: Editor): MenuItem => ({
 const attachment = (editor: Editor): MenuItem => ({
   key: "attachment",
   type: "button",
-  title: "Attachment",
+  title: strings.attachment(),
   icon: Icons.attachment,
   isChecked: editor.isActive("attachment"),
   onClick: () => editor.storage.openAttachmentPicker?.("file"),
@@ -289,7 +290,7 @@ const attachment = (editor: Editor): MenuItem => ({
 const tasklist = (editor: Editor): MenuItem => ({
   key: "tasklist",
   type: "button",
-  title: "Task list",
+  title: strings.taskList(),
   icon: Icons.checkbox,
   isChecked: editor.isActive("taskList"),
   onClick: () => editor.chain().focus().toggleTaskList().run(),
@@ -299,7 +300,7 @@ const tasklist = (editor: Editor): MenuItem => ({
 const outlinelist = (editor: Editor): MenuItem => ({
   key: "outlinelist",
   type: "button",
-  title: "Outline list",
+  title: strings.outlineList(),
   icon: Icons.outlineList,
   isChecked: editor.isActive("outlineList"),
   onClick: () => editor.chain().focus().toggleOutlineList().run(),
@@ -309,10 +310,10 @@ const outlinelist = (editor: Editor): MenuItem => ({
 const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
   key: "upload-from-url",
   type: "button",
-  title: "Attach from URL",
+  title: strings.attachImageFromURL(),
   icon: Icons.link,
   menu: {
-    title: "Attach image from URL",
+    title: strings.attachImageFromURL(),
     items: [
       {
         key: "attach-image",
@@ -341,7 +342,7 @@ const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
 const uploadImageFromURL = (editor: Editor): MenuItem => ({
   key: "upload-from-url",
   type: "button",
-  title: "Attach from URL",
+  title: strings.attachImageFromURL(),
   icon: Icons.link,
   onClick: () => {
     showPopup({

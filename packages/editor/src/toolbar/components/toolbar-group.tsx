@@ -23,6 +23,7 @@ import { Flex, FlexProps } from "@theme-ui/components";
 import { Editor } from "../../types.js";
 import { MoreTools } from "./more-tools.js";
 import { getToolDefinition } from "../tool-definitions.js";
+import { strings } from "@notesnook/intl";
 
 export type ToolbarGroupProps = FlexProps & {
   tools: ToolbarGroupDefinition;
@@ -51,7 +52,7 @@ export function ToolbarGroup(props: ToolbarGroupProps) {
             <MoreTools
               parentGroup={groupId}
               key={"more-tools"}
-              title="More"
+              title={strings.more()}
               icon="more"
               popupId={toolId.join("")}
               tools={toolId}

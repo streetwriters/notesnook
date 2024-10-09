@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { Popup } from "../components/popup.js";
 import { useIsMobile } from "../stores/toolbar-store.js";
 import { InlineInput } from "../../components/inline-input/index.js";
+import { strings } from "@notesnook/intl";
 
 const MAX_COLUMNS = 20;
 const MAX_ROWS = 20;
@@ -76,8 +77,8 @@ export function TablePopup(props: TablePopupProps) {
       action={{
         title:
           !cellLocation.column || !cellLocation.row
-            ? "Please set a table size"
-            : `Insert a ${cellLocation.column} x ${cellLocation.row} table`,
+            ? strings.setTableSizeNotice()
+            : strings.insertTableOfSize(cellLocation.row, cellLocation.column),
         disabled: !cellLocation.column || !cellLocation.row,
         onClick: () =>
           onInsertTable({

@@ -38,6 +38,7 @@ import { Counter } from "../components/counter.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { showPopup } from "../../components/popup-presenter/index.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
+import { strings } from "@notesnook/intl";
 
 export function TableSettings(props: ToolProps) {
   const { editor } = props;
@@ -89,7 +90,7 @@ export function RowProperties(props: ToolProps) {
         onClick={() => setIsMenuOpen(true)}
       />
       <ResponsivePresenter
-        title="Row properties"
+        title={strings.rowProperties()}
         mobile="sheet"
         desktop="menu"
         isOpen={isMenuOpen}
@@ -132,7 +133,7 @@ export function ColumnProperties(props: ToolProps) {
         onClick={() => setIsMenuOpen(true)}
       />
       <ResponsivePresenter
-        title="Column properties"
+        title={strings.columnProperties()}
         mobile="sheet"
         desktop="menu"
         isOpen={isMenuOpen}
@@ -181,7 +182,7 @@ export function TableProperties(props: ToolProps) {
         onClick={() => setIsMenuOpen(true)}
       />
       <ResponsivePresenter
-        title="Table properties"
+        title={strings.tableSettings()}
         mobile="sheet"
         desktop="menu"
         isOpen={isMenuOpen}
@@ -229,7 +230,7 @@ export function CellBackgroundColor(props: ToolProps) {
       {...props}
       cacheKey="cellBackgroundColor"
       activeColor={editor.getAttributes("tableCell").backgroundColor}
-      title={"Cell background color"}
+      title={strings.cellBackgroundColor()}
       type="background"
       onColorChange={(color) =>
         editor.chain().setCellAttribute("backgroundColor", color).run()
@@ -247,7 +248,7 @@ export function CellTextColor(props: ToolProps) {
       cacheKey="cellTextColor"
       type="text"
       activeColor={editor.getAttributes("tableCell").color}
-      title={"Cell text color"}
+      title={strings.cellTextColor()}
       onColorChange={(color) =>
         editor.chain().focus().setCellAttribute("color", color).run()
       }
@@ -264,7 +265,7 @@ export function CellBorderColor(props: ToolProps) {
       cacheKey="cellBorderColor"
       activeColor={editor.getAttributes("tableCell").borderColor}
       type="border"
-      title={"Cell border color"}
+      title={strings.cellBorderColor()}
       onColorChange={(color) =>
         editor.chain().focus().setCellAttribute("borderColor", color).run()
       }
@@ -292,7 +293,7 @@ export function CellBorderWidth(props: ToolProps) {
 
   return (
     <Counter
-      title="cell border width"
+      title={strings.cellBorderWidth()}
       onDecrease={() =>
         editor.commands.setCellAttribute("borderWidth", decreaseBorderWidth())
       }

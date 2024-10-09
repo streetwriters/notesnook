@@ -27,6 +27,7 @@ import { useRefValue } from "../../hooks/use-ref-value.js";
 import { useToolbarStore } from "../stores/toolbar-store.js";
 import { getFontById, getFontIds, getFonts } from "../../utils/font.js";
 import { CodeBlock } from "../../extensions/code-block/index.js";
+import { strings } from "@notesnook/intl";
 
 export function FontSize(props: ToolProps) {
   const { editor } = props;
@@ -46,7 +47,7 @@ export function FontSize(props: ToolProps) {
 
   return (
     <Counter
-      title="Font size"
+      title={strings.fontSize()}
       disabled={editor.isActive(CodeBlock.name)}
       onDecrease={() =>
         editor.chain().focus().setFontSize(`${decreaseFontSize()}px`).run()

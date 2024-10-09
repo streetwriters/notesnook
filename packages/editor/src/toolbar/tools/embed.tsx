@@ -26,6 +26,7 @@ import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { findSelectedNode } from "../../utils/prosemirror.js";
 import { Embed } from "../../extensions/embed/index.js";
 import { EmbedPopup } from "../popups/embed-popup.js";
+import { strings } from "@notesnook/intl";
 
 export function EmbedSettings(props: ToolProps) {
   const { editor } = props;
@@ -121,7 +122,7 @@ export function EmbedProperties(props: ToolProps) {
         }}
       >
         <EmbedPopup
-          title="Embed properties"
+          title={strings.embedProperties()}
           onClose={(newEmbed) => {
             if (!newEmbed) {
               editor.commands.setEmbedSize(embed);

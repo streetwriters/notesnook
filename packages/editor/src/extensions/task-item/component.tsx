@@ -28,6 +28,7 @@ import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
 import { isiOS } from "../../utils/platform.js";
 import { DesktopOnly } from "../../components/responsive/index.js";
 import TaskItem from "@tiptap/extension-task-item";
+import { strings } from "@notesnook/intl";
 
 export function TaskItemComponent(
   props: ReactNodeViewProps<TaskItemAttributes>
@@ -146,7 +147,7 @@ export function TaskItemComponent(
           {editor.isEditable && (
             <Icon
               className="deleleTaskItem"
-              title="Delete this task item"
+              title={strings.delete()}
               path={Icons.close}
               size={18}
               sx={{
