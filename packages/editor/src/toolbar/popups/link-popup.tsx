@@ -27,6 +27,7 @@ import Link, { LinkAttributes } from "../../extensions/link/index.js";
 import { ImageNode } from "../../extensions/image/index.js";
 import { findMark, selectionToOffset } from "../../utils/prosemirror.js";
 import { Editor, getMarkAttributes } from "@tiptap/core";
+import { strings } from "@notesnook/intl";
 
 export type LinkPopupProps = {
   link?: LinkDefinition;
@@ -47,10 +48,10 @@ export function LinkPopup(props: LinkPopupProps) {
 
   return (
     <Popup
-      title={isEditing ? "Edit link" : "Insert link"}
+      title={isEditing ? strings.editLink() : strings.insertLink()}
       onClose={onClose}
       action={{
-        title: isEditing ? "Save edits" : "Insert link",
+        title: isEditing ? strings.save() : strings.insert(),
         onClick: () => onDone(link.current)
       }}
     >
@@ -65,7 +66,7 @@ export function LinkPopup(props: LinkPopupProps) {
         {!isImageActive && (
           <Input
             type="text"
-            placeholder="Link text"
+            placeholder={strings.linkText()}
             defaultValue={link.current?.title}
             sx={{ mb: 1 }}
             onChange={(e) =>

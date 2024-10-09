@@ -84,6 +84,7 @@ import BlockId from "./extensions/block-id/index.js";
 import { useEditorSearchStore } from "./toolbar/stores/search-store.js";
 import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
 import { getChangedNodes } from "./utils/prosemirror.js";
+import { strings } from "@notesnook/intl";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
@@ -291,7 +292,7 @@ const useTiptap = (
           defaultAlignment: "left"
         }),
         Placeholder.configure({
-          placeholder: options.placeholder || "Start writing your note..."
+          placeholder: options.placeholder || strings.startWritingNote()
         }),
         ImageNode.configure({ allowBase64: true }),
         EmbedNode,

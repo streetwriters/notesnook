@@ -29,6 +29,7 @@ import { debounce } from "../../utils/debounce.js";
 import { Popup } from "../components/popup.js";
 import { SchemeColors } from "@notesnook/theme";
 import { Editor } from "../../types.js";
+import { strings } from "@notesnook/intl";
 
 type ColorPickerProps = {
   editor: Editor;
@@ -162,7 +163,7 @@ export function ColorPicker(props: ColorPickerProps) {
                   icon={Icons.save}
                   iconSize={18}
                   onClick={() => onSave(currentColor)}
-                  title="Save color"
+                  title={strings.save()}
                 />
               )}
             </Flex>
@@ -183,7 +184,7 @@ export function ColorPicker(props: ColorPickerProps) {
               <PaletteButton
                 icon={Icons.colorClear}
                 onClick={onClear}
-                title="Clear color"
+                title={strings.clear()}
                 iconSize={15}
               />
             )}
@@ -192,11 +193,7 @@ export function ColorPicker(props: ColorPickerProps) {
               iconColor={deleteMode ? "var(--icon-error)" : "icon"}
               bg={deleteMode ? "var(--background-error)" : "transparent"}
               onClick={() => setDeleteMode((s) => !s)}
-              title={
-                deleteMode
-                  ? "Disable delete mode"
-                  : "Enable delete mode for deleting custom colors"
-              }
+              title={strings.deleteMode()}
               iconSize={18}
             />
             {!deleteMode && (
@@ -217,7 +214,7 @@ export function ColorPicker(props: ColorPickerProps) {
                     return !s;
                   });
                 }}
-                title="Choose custom color"
+                title={strings.chooseCustomColor()}
                 iconSize={18}
                 bg={currentColor}
               />
@@ -225,7 +222,7 @@ export function ColorPicker(props: ColorPickerProps) {
             {allColors.map((colorItem) => (
               <PaletteButton
                 key={colorItem}
-                title={deleteMode ? "Click to delete this color" : colorItem}
+                title={deleteMode ? strings.clickToRemove() : colorItem}
                 bg={colorItem}
                 iconSize={15}
                 iconColor={"white"}

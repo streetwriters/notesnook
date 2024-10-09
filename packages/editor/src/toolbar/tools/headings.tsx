@@ -21,9 +21,13 @@ import { ToolProps } from "../types.js";
 import { Editor } from "../../types.js";
 import { Dropdown } from "../components/dropdown.js";
 import { MenuItem } from "@notesnook/ui";
-import { ToolbarLocation, useToolbarLocation } from "../stores/toolbar-store.js";
+import {
+  ToolbarLocation,
+  useToolbarLocation
+} from "../stores/toolbar-store.js";
 import { useMemo } from "react";
 import { CodeBlock } from "../../extensions/code-block/index.js";
+import { strings } from "@notesnook/intl";
 
 const defaultLevels = [1, 2, 3, 4, 5, 6] as const;
 
@@ -45,7 +49,9 @@ export function Headings(props: ToolProps) {
       id="headings"
       group="headings"
       selectedItem={
-        currentHeadingLevel ? `Heading ${currentHeadingLevel}` : "Paragraph"
+        currentHeadingLevel
+          ? strings.heading(currentHeadingLevel)
+          : strings.paragraph()
       }
       items={items}
       menuWidth={130}
@@ -62,7 +68,7 @@ function toMenuItems(
   const menuItems: MenuItem[] = defaultLevels.map((level) => ({
     type: "button",
     key: `heading-${level}`,
-    title: toolbarLocation === "bottom" ? `H${level}` : `Heading ${level}`,
+    title: toolbarLocation === "bottom" ? `H${level}` : strings.heading(level),
     isChecked: level === currentHeadingLevel,
     modifier: `Mod-Alt-${level}`,
     onClick: () =>
@@ -76,7 +82,7 @@ function toMenuItems(
   const paragraph: MenuItem = {
     key: "paragraph",
     type: "button",
-    title: "Paragraph",
+    title: strings.paragraph(),
     isChecked: !currentHeadingLevel,
     modifier: `Mod-Alt-0`,
     onClick: () => editor.chain().focus().setParagraph().run()
