@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { Menu, MenuItem, clipboard, shell } from "electron";
 
 function setupMenu() {
@@ -40,7 +41,7 @@ function setupMenu() {
     if (params.misspelledWord) {
       menu.append(
         new MenuItem({
-          label: "Add to dictionary",
+          label: strings.addToDictionary(),
           click: () =>
             globalThis.window?.webContents.session.addWordToSpellCheckerDictionary(
               params.misspelledWord
@@ -59,7 +60,7 @@ function setupMenu() {
     if (params.linkURL.length) {
       menu.append(
         new MenuItem({
-          label: "Open in browser",
+          label: strings.openInBrowser(),
           click: () => shell.openExternal(params.linkURL)
         })
       );
@@ -68,7 +69,7 @@ function setupMenu() {
     if (params.isEditable) {
       menu.append(
         new MenuItem({
-          label: "Undo",
+          label: strings.undo(),
           role: "undo",
           enabled: params.isEditable,
           accelerator: "CommandOrControl+Z"
@@ -77,7 +78,7 @@ function setupMenu() {
 
       menu.append(
         new MenuItem({
-          label: "Redo",
+          label: strings.redo(),
           role: "redo",
           enabled: params.isEditable,
           accelerator: "CommandOrControl+Y"
@@ -94,7 +95,7 @@ function setupMenu() {
     if (params.isEditable)
       menu.append(
         new MenuItem({
-          label: "Cut",
+          label: strings.cut(),
           role: "cut",
           enabled: params.selectionText.length > 0,
           accelerator: "CommandOrControl+X"
@@ -104,7 +105,7 @@ function setupMenu() {
     if (params.linkURL?.length) {
       menu.append(
         new MenuItem({
-          label: "Copy link",
+          label: strings.copyLink(),
           click() {
             clipboard.writeText(params.linkURL);
           }
@@ -113,7 +114,7 @@ function setupMenu() {
 
       menu.append(
         new MenuItem({
-          label: "Copy link text",
+          label: strings.copyLinkText(),
           click() {
             clipboard.writeText(params.linkText);
           }
@@ -124,7 +125,7 @@ function setupMenu() {
     if (params.selectionText.length) {
       menu.append(
         new MenuItem({
-          label: "Copy",
+          label: strings.copy(),
           role: "copy",
           accelerator: "CommandOrControl+C"
         })
@@ -135,7 +136,7 @@ function setupMenu() {
       menu.append(
         new MenuItem({
           id: "copy-image",
-          label: "Copy Image",
+          label: strings.copyImage(),
           click() {
             globalThis.window?.webContents.copyImageAt(params.x, params.y);
           }
@@ -145,7 +146,7 @@ function setupMenu() {
     if (params.isEditable)
       menu.append(
         new MenuItem({
-          label: "Paste",
+          label: strings.paste(),
           role: "pasteAndMatchStyle",
           enabled: clipboard.readText("clipboard").length > 0,
           accelerator: "CommandOrControl+V"
