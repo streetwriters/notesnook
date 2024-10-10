@@ -17,21 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** @type {import('@lingui/conf').LinguiConfig} */
-module.exports = {
-  locales: ["en", "pseudo-LOCALE"],
-  sourceLocale: "en",
-  pseudoLocale: "pseudo-LOCALE",
-  fallbackLocales: {
-    "pseudo-LOCALE": "en"
-  },
-  catalogs: [
-    {
-      path: "<rootDir>/locale/{locale}",
-      include: ["src"]
-    }
-  ],
-  format: "po",
-  catalogsMergePath: "<rootDir>/locales/${locale}",
-  compileNamespace: "json"
-};
+import { cp } from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+await cp(
+  path.join(__dirname, "..", "locales"),
+  path.join(__dirname, "..", "dist/locales"),
+  {
+    recursive: true
+  }
+);

@@ -6,14 +6,17 @@
   "types": "./dist/index.d.ts",
   "license": "GPL-3.0-or-later",
   "exports": {
-    "require": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+    ".": {
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      }
     },
-    "import": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.mjs"
-    }
+    "./locales/*.json": "./dist/locales/*.json"
   },
   "repository": {
     "type": "git",
@@ -23,9 +26,9 @@
     "extract": "lingui extract",
     "compile": "lingui compile --typescript",
     "build-locale": "npm run extract && npm run compile",
-    "clean": "rm -rf dist && rm -rf locales",
-    "build": "npm run build-locale && npx vite build",
-    "watch": "nodemon --watch ./src/*.ts --exec \"npx vite build\""
+    "build": "npm run build-locale && npx vite build && node scripts/postbuild.mjs",
+    "watch": "nodemon --watch ./src/*.ts --exec \"npx vite build\"",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@lingui/cli": "^4.11.4",
@@ -37,6 +40,7 @@
     "typescript": "5.5.3",
     "vite": "^5.4.8",
     "vite-plugin-dts": "^4.2.3",
+    "vite-plugin-static-copy": "^2.0.0",
     "vite-plugin-swc-transform": "^1.0.1"
   },
   "peerDependencies": {

@@ -22,20 +22,28 @@ import "@notesnook/editor/styles/fonts.mobile.css";
 import "@notesnook/editor/styles/katex-fonts.mobile.css";
 import "@notesnook/editor/styles/katex.min.css";
 import "@notesnook/editor/styles/styles.css";
-import { $en, setI18nGlobal } from "@notesnook/intl";
+import { setI18nGlobal } from "@notesnook/intl";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
-i18n.load({
-  en: $en,
-  ...globalThis.LINGUI_LOCALE_DATA
-});
-i18n.activate(globalThis.LINGUI_LOCALE || "en");
-setI18nGlobal(i18n);
+const locale = globalThis.LINGUI_LOCALE_DATA
+  ? Promise.resolve(globalThis.LINGUI_LOCALE_DATA)
+  : globalThis.__DEV__ || process.env.NODE_ENV === "development"
+  ? import("@notesnook/intl/locales/$pseudo-LOCALE.json").then(
+      ({ default: locale }) => ({ en: locale.messages })
+    )
+  : import("@notesnook/intl/locales/$en.json").then(({ default: locale }) => ({
+      en: locale.messages
+    }));
+locale.then((locale) => {
+  i18n.load(locale);
+  i18n.activate(globalThis.LINGUI_LOCALE || "en");
+  setI18nGlobal(i18n);
 
-const rootElement = document.getElementById("root");
-if (rootElement) {
-  const root = createRoot(rootElement);
-  root.render(<App />);
-}
+  const rootElement = document.getElementById("root");
+  if (rootElement) {
+    const root = createRoot(rootElement);
+    root.render(<App />);
+  }
+});
