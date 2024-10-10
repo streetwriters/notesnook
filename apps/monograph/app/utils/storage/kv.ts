@@ -36,10 +36,10 @@ const WorkersKV = new WorkersKVREST({
 
 export async function read<T>(key: string, fallback: T): Promise<T> {
   try {
-    const response = await WorkersKV.readKey({
+    const response = (await WorkersKV.readKey({
       key
-    });
-    return response ? JSON.parse(response.result) || fallback : fallback;
+    })) as unknown as string;
+    return response ? JSON.parse(response) || fallback : fallback;
   } catch (e) {
     console.error(e);
     return fallback;
