@@ -37,10 +37,15 @@ import { Icon } from "@notesnook/ui";
 import { Footer } from "../components/footer";
 import { Header } from "../components/header";
 import { ForwardRef } from "@theme-ui/components/dist/declarations/src/types";
+import { PUBLIC_URL } from "../utils/env";
 
 export const meta: MetaFunction = () => {
   return generateMetaDescriptors({
-    title: "Monograph",
+    titleShort: "Monograph",
+    titleFull: "Monograph",
+    type: "website",
+    url: PUBLIC_URL,
+    imageUrl: `${PUBLIC_URL}/social.png`,
     description:
       "Anonymous, secure and encrypted note sharing with password protection."
   });

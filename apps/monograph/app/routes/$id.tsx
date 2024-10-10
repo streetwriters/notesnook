@@ -27,6 +27,8 @@ import { isSpam, isSpamCached } from "../utils/spam-filter.server";
 import { Header } from "../components/header";
 import { Footer } from "../components/footer";
 import { API_HOST, PUBLIC_URL } from "../utils/env";
+import { generateMetaDescriptors } from "../utils/meta";
+import { format } from "date-fns/format";
 
 type Monograph = {
   title: string;
@@ -53,12 +55,16 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     date: data?.metadata?.datePublished || ""
   }).toString()}`;
 
-  return [
-    { title: data?.metadata.title + " - Monograph" },
-    { name: "description", content: data?.metadata.shortDescription },
-    { name: "robots", content: "noindex" },
-    { name: "og:image", content: imageUrl }
-  ];
+  return generateMetaDescriptors({
+    titleFull: data?.metadata.title + " - Monograph",
+    titleShort: data?.metadata.title,
+    description: data?.metadata.shortDescription,
+    imageAlt: data?.metadata.fullDescription,
+    imageUrl: imageUrl,
+    url: data?.monograph ? `${PUBLIC_URL}/${data?.monograph.id}` : undefined,
+    publishedAt: data?.metadata.datePublished,
+    type: "article"
+  });
 };
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -178,12 +184,7 @@ function getMonographMetadata(monograph?: Monograph): Metadata {
   const shortDescription = trimDescription(text, 150, true);
   const fullDescription = trimDescription(text, 300, true);
   const datePublished = monograph
-    ? new Date(monograph.datePublished).toLocaleDateString("en", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        weekday: "long"
-      })
+    ? format(monograph.datePublished, "YYYY-MM-dd HH:mm")
     : "";
   return {
     title,
