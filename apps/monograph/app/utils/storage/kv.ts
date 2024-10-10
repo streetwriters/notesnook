@@ -39,7 +39,7 @@ export async function read<T>(key: string, fallback: T): Promise<T> {
     const response = await WorkersKV.readKey({
       key
     });
-    if (!response.success) {
+    if (typeof response === "object" && !response.success) {
       console.error("failed:", response.errors);
       return fallback;
     }
