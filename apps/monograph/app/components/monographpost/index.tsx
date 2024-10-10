@@ -265,6 +265,7 @@ export const MonographPage = ({
                 dangerouslySetInnerHTML={{
                   __html: content?.data || "<p></p>"
                 }}
+                sx={{ color: "paragraph", cursor: "text" }}
               />
             }
           >
