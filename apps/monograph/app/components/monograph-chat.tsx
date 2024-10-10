@@ -61,7 +61,7 @@ export function MonographChat({ sx }: SxProp) {
               borderRadius: 10,
               width: "100%"
             }}
-            src="https://monogr.ph/api/og?title=Open+sourcing&description=VGhpcyBtb25vZ3JhcGggaXMgZW5jcnlwdGVkLiBFbnRlciBwYXNzd29yZCB0byB2aWV3IGNvbnRlbnRzLg%3D%3D&date=Saturday%2C+February+18%2C+2023"
+            src="https://monogr.ph/api/og.png?title=Open+sourcing&description=VGhpcyBtb25vZ3JhcGggaXMgZW5jcnlwdGVkLiBFbnRlciBwYXNzd29yZCB0byB2aWV3IGNvbnRlbnRzLg%3D%3D&date=Saturday%2C+February+18%2C+2023"
           />
           <Text
             mt="12px"
