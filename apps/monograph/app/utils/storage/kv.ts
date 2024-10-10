@@ -36,10 +36,17 @@ const WorkersKV = new WorkersKVREST({
 
 export async function read<T>(key: string, fallback: T): Promise<T> {
   try {
-    const response = (await WorkersKV.readKey({
+    const response = await WorkersKV.readKey({
       key
-    })) as unknown as string;
-    return response ? JSON.parse(response) || fallback : fallback;
+    });
+    if (!response.success) {
+      console.error("failed:", response.errors);
+      return fallback;
+    }
+    return (
+      JSON.parse(typeof response === "string" ? response : response.result) ||
+      fallback
+    );
   } catch (e) {
     console.error(e);
     return fallback;
@@ -52,3 +59,5 @@ export async function write<T>(key: string, data: T) {
     value: JSON.stringify(data)
   });
 }
+
+read("spam-cache", "default").then(console.log);
