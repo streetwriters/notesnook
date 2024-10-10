@@ -39,7 +39,7 @@ export async function read<T>(key: string, fallback: T): Promise<T> {
     const response = await WorkersKV.readKey({
       key
     });
-    return JSON.parse(response.result) || fallback;
+    return response ? JSON.parse(response.result) || fallback : fallback;
   } catch (e) {
     console.error(e);
     return fallback;

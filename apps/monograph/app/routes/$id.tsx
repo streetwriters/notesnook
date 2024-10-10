@@ -184,7 +184,7 @@ function getMonographMetadata(monograph?: Monograph): Metadata {
   const shortDescription = trimDescription(text, 150, true);
   const fullDescription = trimDescription(text, 300, true);
   const datePublished = monograph
-    ? format(monograph.datePublished, "YYYY-MM-dd HH:mm")
+    ? format(monograph.datePublished, "yyyy-MM-dd HH:mm")
     : "";
   return {
     title,
