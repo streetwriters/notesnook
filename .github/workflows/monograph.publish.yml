@@ -55,8 +55,8 @@ jobs:
         run: docker pull streetwriters/monograph:latest
 
       # Setup QEMU
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v2
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
