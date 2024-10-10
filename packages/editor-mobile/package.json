@@ -19,8 +19,8 @@
     "react-freeze": "^1.0.3",
     "tinycolor2": "1.6.0",
     "zustand": "^4.4.7",
-    "@lingui/react": "4.11.2",
-    "@lingui/core": "4.11.2"
+    "@lingui/core": "4.11.4",
+    "@lingui/react": "4.11.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",

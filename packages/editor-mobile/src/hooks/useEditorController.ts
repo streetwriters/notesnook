@@ -40,6 +40,7 @@ import {
 import { injectCss, transform } from "../utils/css";
 import { pendingSaveRequests } from "../utils/pending-saves";
 import { useTabContext, useTabStore } from "./useTabStore";
+import { strings } from "@notesnook/intl";
 
 type Attachment = {
   hash: string;
@@ -139,7 +140,7 @@ export function useEditorController({
   const setTheme = useThemeEngineStore((store) => store.setTheme);
   const { colors } = useThemeColors("editor");
   const [title, setTitle] = useState("");
-  const [titlePlaceholder, setTitlePlaceholder] = useState("Note title");
+  const [titlePlaceholder, setTitlePlaceholder] = useState(strings.noteTitle());
   const htmlContentRef = useRef<string | null>(null);
   const updateTabOnFocus = useRef(false);
   const timers = useRef<Timers>({
