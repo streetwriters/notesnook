@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { CURRENT_TOOLBAR_VERSION, migrateToolbar } from "@notesnook/common";
-import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
+import type { ToolbarGroupDefinition } from "@notesnook/editor";
 import create, { State } from "zustand";
 import { StateStorage, persist } from "zustand/middleware";
 import { db } from "../../../common/database";

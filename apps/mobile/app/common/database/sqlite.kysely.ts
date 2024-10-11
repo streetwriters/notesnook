@@ -24,6 +24,7 @@ import type {
 } from "@streetwriters/kysely";
 import { CompiledQuery } from "@streetwriters/kysely";
 import { QuickSQLiteConnection, open } from "react-native-quick-sqlite";
+import { strings } from "@notesnook/intl";
 
 type Config = { dbName: string; async: boolean; location: string };
 
@@ -97,7 +98,7 @@ class RNSqliteConnection implements DatabaseConnection {
   constructor(private readonly db: QuickSQLiteConnection) {}
 
   streamQuery<R>(): AsyncIterableIterator<QueryResult<R>> {
-    throw new Error("wasqlite driver doesn't support streaming");
+    throw new Error(strings.streamingNotSupported());
   }
 
   async executeQuery<R>(

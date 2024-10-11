@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { expect, test } from "@playwright/test";
 import { buildSync } from "esbuild";
 import path, { join } from "path";
-import type { Clipper } from "../src";
+import type { Clipper } from "../src/index.js";
 import Websites from "./pages.json";
 import slugify from "slugify";
 import { mkdirSync, rmSync, writeFileSync } from "fs";

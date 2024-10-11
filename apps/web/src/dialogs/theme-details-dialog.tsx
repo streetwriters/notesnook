@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Dialog from "../components/dialog";
+import { strings } from "@notesnook/intl";
 import { ThemeMetadata } from "@notesnook/themes-server";
-import { ThemePreview } from "../components/theme-preview";
 import { Flex, Link, Text } from "@theme-ui/components";
-import { useStore as useThemeStore } from "../stores/theme-store";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import Dialog from "../components/dialog";
+import { ThemePreview } from "../components/theme-preview";
+import { useStore as useThemeStore } from "../stores/theme-store";
 
 export type ThemeDetailsDialogProps = BaseDialogProps<boolean> & {
   theme: ThemeMetadata;
@@ -40,12 +41,12 @@ export const ThemeDetailsDialog = DialogManager.register(
         isOpen={true}
         onClose={() => onClose(false)}
         positiveButton={{
-          text: `Set as default`,
+          text: strings.setAsDefault(),
           onClick: () => onClose(true),
           disabled: isThemeCurrentlyApplied(theme.id)
         }}
         negativeButton={{
-          text: "Close",
+          text: strings.cancel(),
           onClick: () => onClose(false)
         }}
       >
@@ -65,11 +66,11 @@ export const ThemeDetailsDialog = DialogManager.register(
           </Text>
           {theme.totalInstalls && theme.totalInstalls > 0 ? (
             <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
-              {theme.totalInstalls} installs
+              {theme.totalInstalls} {strings.installs()}
             </Text>
           ) : null}
           <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
-            Licensed under {theme.license}
+            {strings.licenseUnder(theme.license)}
           </Text>
           <Flex sx={{ gap: 1, mt: 1 }}>
             {theme.homepage && (
@@ -79,7 +80,7 @@ export const ThemeDetailsDialog = DialogManager.register(
                 variant="text.subBody"
                 sx={{ fontSize: "subtitle", color: "accent" }}
               >
-                Website
+                {strings.website()}
               </Link>
             )}
             {theme.sourceURL && (

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import TiptapTableCell from "@tiptap/extension-table-cell";
-import { addStyleAttribute } from "./utils";
+import { addStyleAttribute } from "./utils.js";
 
 export const TableCell = TiptapTableCell.extend({
   addAttributes() {

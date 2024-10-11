@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import * as browser from "../src/browser";
-import * as node from "../src/node";
+import { Sodium as BrowserSodium } from "../src/browser.ts";
+import { Sodium as NodeSodium } from "../src/node.ts";
+import { base64_variants } from "../src/types.ts";
 import { test } from "vitest";
 import {
   decrypt,
@@ -27,7 +28,10 @@ import {
   hash,
   streamingDecrypt,
   streamingEncrypt
-} from "./utils";
+} from "./utils.ts";
+
+const browser = new BrowserSodium();
+const node = new NodeSodium();
 
 test("secretstream tags should be equal on node & browser variants", async (t) => {
   t.expect(browser.crypto_secretstream_xchacha20poly1305_TAG_FINAL).toBe(
@@ -100,19 +104,19 @@ test("node & browser variants of base64 should be compatible", async (t) => {
 
   t.expect(browser.to_base64(text)).toBe(node.to_base64(text));
 
-  t.expect(browser.to_base64(text, browser.base64_variants.ORIGINAL)).toBe(
-    node.to_base64(text, node.base64_variants.ORIGINAL)
+  t.expect(browser.to_base64(text, base64_variants.ORIGINAL)).toBe(
+    node.to_base64(text, base64_variants.ORIGINAL)
   );
 
-  t.expect(
-    browser.to_base64(text, browser.base64_variants.ORIGINAL_NO_PADDING)
-  ).toBe(node.to_base64(text, node.base64_variants.ORIGINAL_NO_PADDING));
+  t.expect(browser.to_base64(text, base64_variants.ORIGINAL_NO_PADDING)).toBe(
+    node.to_base64(text, base64_variants.ORIGINAL_NO_PADDING)
+  );
 
-  t.expect(
-    browser.to_base64(text, browser.base64_variants.URLSAFE_NO_PADDING)
-  ).toBe(node.to_base64(text, node.base64_variants.URLSAFE_NO_PADDING));
+  t.expect(browser.to_base64(text, base64_variants.URLSAFE_NO_PADDING)).toBe(
+    node.to_base64(text, base64_variants.URLSAFE_NO_PADDING)
+  );
 
-  t.expect(browser.to_base64(text, browser.base64_variants.URLSAFE)).toBe(
-    node.to_base64(text, node.base64_variants.URLSAFE)
+  t.expect(browser.to_base64(text, base64_variants.URLSAFE)).toBe(
+    node.to_base64(text, base64_variants.URLSAFE)
   );
 });

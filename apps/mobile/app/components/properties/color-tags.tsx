@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Color, Note } from "@notesnook/core/dist/types";
+import { Color, Note } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
@@ -36,6 +36,7 @@ import ColorPicker from "../dialogs/color-picker";
 import { Button } from "../ui/button";
 import NativeTooltip from "../../utils/tooltip";
 import { Pressable } from "../ui/pressable";
+import { strings } from "@notesnook/intl";
 
 const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
   const { colors } = useThemeColors();
@@ -145,7 +146,7 @@ export const ColorTags = ({ item }: { item: Note }) => {
                 buttonType={{
                   text: colors.primary.accent
                 }}
-                title="Add color"
+                title={strings.addColor()}
                 type="secondary"
                 icon="plus"
                 iconPosition="right"

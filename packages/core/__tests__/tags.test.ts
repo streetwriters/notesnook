@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { databaseTest, noteTest, TEST_NOTE } from "./utils";
+import { databaseTest, noteTest, TEST_NOTE } from "./utils/index.js";
 import { test, expect } from "vitest";
 
 function tag(title: string) {

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import "./logger";
 import { database } from "@notesnook/common";
-import { logger as dbLogger } from "@notesnook/core/dist/logger";
+import { logger as dbLogger } from "@notesnook/core";
 import { Platform } from "react-native";
 import * as Gzip from "react-native-gzip";
 import EventSource from "../../utils/sse/even-source-ios";
@@ -33,11 +33,11 @@ import Storage from "./storage";
 import { RNSqliteDriver } from "./sqlite.kysely";
 import { getDatabaseKey } from "./encryption";
 import SettingsService from "../../services/settings";
+import { strings } from "@notesnook/intl";
 
 export async function setupDatabase(password) {
   const key = await getDatabaseKey(password);
-  if (!key)
-    throw new Error("Database setup failed, could not get database key");
+  if (!key) throw new Error(strings.databaseSetupFailed());
 
   console.log("Opening database with key:", !!key);
 

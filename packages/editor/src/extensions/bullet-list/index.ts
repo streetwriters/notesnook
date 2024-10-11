@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { BulletList } from "./bullet-list";
+import { BulletList } from "./bullet-list.js";
 
-export * from "./bullet-list";
+export * from "./bullet-list.js";
 
 export default BulletList;

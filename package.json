@@ -31,6 +31,8 @@
     "start:editor-mobile": "nx start @notesnook/editor-mobile",
     "start:editor": "nx start @notesnook/editor",
     "start:server:themes": "nx start @notesnook/themes-server",
+    "build:intl": "nx build @notesnook/intl",
+    "start:intl": "nx start @notesnook/intl",
     "prettier": "npx prettier . --write",
     "lint": "npx eslint ./apps/ ./packages/",
     "linc": "npx eslint ./apps/ ./packages/ --cache"
@@ -53,7 +55,8 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "husky": "^8.0.1",
     "prettier": "^2.8.8",
-    "serve": "^14.0.1"
+    "serve": "^14.0.1",
+    "tsup": "^8.3.0"
   },
   "dependencies": {
     "eslint-plugin-header": "^3.1.1",

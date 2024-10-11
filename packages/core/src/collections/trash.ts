@@ -18,17 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import dayjs from "dayjs";
-import Database from "../api";
-import { deleteItems, toChunks } from "../utils/array";
-import { GroupOptions, TrashItem } from "../types";
-import { VirtualizedGrouping } from "../utils/virtualized-grouping";
+import Database from "../api/index.js";
+import { deleteItems, toChunks } from "../utils/array.js";
+import { GroupOptions, TrashItem } from "../types.js";
+import { VirtualizedGrouping } from "../utils/virtualized-grouping.js";
 import {
   createKeySelector,
   getSortSelectors,
   groupArray
-} from "../utils/grouping";
+} from "../utils/grouping.js";
 import { sql } from "@streetwriters/kysely";
-import { MAX_SQL_PARAMETERS } from "../database/sql-collection";
+import { MAX_SQL_PARAMETERS } from "../database/sql-collection.js";
 
 export default class Trash {
   collections = ["notes", "notebooks"] as const;

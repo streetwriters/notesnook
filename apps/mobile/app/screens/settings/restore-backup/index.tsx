@@ -46,6 +46,7 @@ import SettingsService from "../../../services/settings";
 import { refreshAllStores } from "../../../stores/create-db-collection-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { SIZE } from "../../../utils/size";
+import { strings } from "@notesnook/intl";
 
 type PasswordOrKey = { password?: string; encryptionKey?: string };
 
@@ -54,17 +55,17 @@ const withPassword = () => {
     let resolved = false;
     presentDialog({
       context: "local",
-      title: "Encrypted backup",
+      title: strings.backupEncrypted(),
       input: true,
-      inputPlaceholder: "Password",
-      paragraph: "Please enter password of this backup file",
-      positiveText: "Restore",
+      inputPlaceholder: strings.password(),
+      paragraph: strings.backupEnterPassword(),
+      positiveText: strings.restore(),
       secureTextEntry: true,
       onClose: () => {
         if (resolved) return;
         resolve({});
       },
-      negativeText: "Cancel",
+      negativeText: strings.cancel(),
       positivePress: async (password, isEncryptionKey) => {
         resolve({
           encryptionKey: isEncryptionKey ? password : undefined,
@@ -74,7 +75,7 @@ const withPassword = () => {
         return true;
       },
       check: {
-        info: "Use encryption key",
+        info: strings.useEncryptionKey(),
         type: "transparent"
       }
     });
@@ -89,8 +90,8 @@ const restoreBackup = async (options: {
     const isLegacyBackup = options.uri.endsWith(".nnbackup");
 
     startProgress({
-      title: "Restoring backup",
-      paragraph: "Preparing to restore backup file...",
+      title: strings.restoring(),
+      paragraph: strings.preparingBackupRestore(),
       canHideProgress: false
     });
 
@@ -100,7 +101,7 @@ const restoreBackup = async (options: {
     if (!isLegacyBackup) {
       if (Platform.OS === "android") {
         updateProgress({
-          progress: `Copying backup file to cache...`
+          progress: strings.copyingBackupFileToCache()
         });
         const cacheFile = `file://${RNFetchBlob.fs.dirs.CacheDir}/backup.zip`;
         if (await RNFetchBlob.fs.exists(cacheFile)) {
@@ -123,7 +124,7 @@ const restoreBackup = async (options: {
         await RNFetchBlob.fs.mkdir(zipOutputFolder);
       }
       updateProgress({
-        progress: `Extracting files from backup...`
+        progress: strings.extractingFiles()
       });
       await unzip(filePath, zipOutputFolder);
 
@@ -152,7 +153,7 @@ const restoreBackup = async (options: {
           if (path === ".nnbackup" || path === "attachments") continue;
 
           updateProgress({
-            progress: `Restoring data (${count++}/${
+            progress: `${strings.restoringBackup()}... (${count++}/${
               extractedBackupFiles.length
             })`
           });
@@ -173,7 +174,7 @@ const restoreBackup = async (options: {
             !passwordOrKey?.password
           ) {
             endProgress();
-            throw new Error("Failed to decrypt backup");
+            throw new Error(strings.failedToDecryptBackup());
           }
 
           await db.backup.import(backup, {
@@ -204,7 +205,7 @@ const restoreBackup = async (options: {
         );
       }
       updateProgress({
-        progress: `Cleaning up...`
+        progress: strings.cleaningUp()
       });
       // Remove files from cache
       RNFetchBlob.fs.unlink(zipOutputFolder).catch(console.log);
@@ -213,7 +214,7 @@ const restoreBackup = async (options: {
       }
     } else {
       updateProgress({
-        progress: `Reading backup file...`
+        progress: strings.readingBackupFile()
       });
       const rawData =
         Platform.OS === "android"
@@ -226,8 +227,8 @@ const restoreBackup = async (options: {
 
       updateProgress({
         progress: isEncryptedBackup
-          ? `Backup is encrypted, decrypting...`
-          : "Preparing to restore backup file..."
+          ? strings.decryptingBackup()
+          : strings.preparingBackupRestore()
       });
 
       const { encryptionKey, password } = isEncryptedBackup
@@ -236,12 +237,12 @@ const restoreBackup = async (options: {
 
       if (isEncryptedBackup && !encryptionKey && !password) {
         endProgress();
-        throw new Error("Failed to decrypt backup");
+        throw new Error(strings.failedToDecryptBackup());
       }
 
       await db.transaction(async () => {
         updateProgress({
-          progress: "Restoring backup..."
+          progress: strings.restoringBackup() + "..."
         });
         await db.backup.import(backup, {
           encryptionKey,
@@ -252,7 +253,7 @@ const restoreBackup = async (options: {
     }
 
     ToastManager.show({
-      heading: "Backup restored successfully",
+      heading: strings.backupRestored(),
       type: "success"
     });
 
@@ -263,7 +264,7 @@ const restoreBackup = async (options: {
   } catch (e) {
     endProgress();
     DatabaseLogger.error(e as Error);
-    ToastManager.error(e as Error, `Failed to restore backup`);
+    ToastManager.error(e as Error, strings.restoreFailed());
   }
 };
 
@@ -346,7 +347,7 @@ export const RestoreBackup = () => {
               <SectionItem
                 item={{
                   id: "restore-from-files",
-                  name: "Restore from files",
+                  name: strings.restoreFromFiles(),
                   icon: "folder",
                   modifer: async () => {
                     useUserStore.setState({
@@ -370,8 +371,7 @@ export const RestoreBackup = () => {
                       deleteFile: true
                     });
                   },
-                  description:
-                    "Select a backup file from your device to restore backup"
+                  description: strings.selectBackupFileDesc()
                 }}
               />
 
@@ -379,7 +379,7 @@ export const RestoreBackup = () => {
                 <SectionItem
                   item={{
                     id: "select-backup-folder",
-                    name: "Select folder with backup files",
+                    name: strings.selectBackupFolder(),
                     icon: "folder",
                     modifer: async () => {
                       const folder = await ScopedStorage.openDocumentTree(true);
@@ -399,8 +399,7 @@ export const RestoreBackup = () => {
                       setLoading(true);
                       checkBackups();
                     },
-                    description:
-                      "Select folder where Notesnook backup files are stored to view and restore them from the app"
+                    description: strings.selectFolderForBackupFilesDesc()
                   }}
                 />
               ) : null}
@@ -414,7 +413,7 @@ export const RestoreBackup = () => {
                     }}
                   >
                     <Heading color={colors.primary.accent} size={SIZE.xs}>
-                      RECENT BACKUPS
+                      {strings.recentBackups()}
                     </Heading>
                   </View>
                 }
@@ -450,10 +449,7 @@ export const RestoreBackup = () => {
                         }}
                         color={colors.secondary.paragraph}
                       >
-                        No backups were found.{" "}
-                        {!backupDirectoryAndroid
-                          ? `Please select a folder with backup files to view them here.`
-                          : null}
+                        {strings.noBackupsFound()}.
                       </Paragraph>
                     </View>
                   )

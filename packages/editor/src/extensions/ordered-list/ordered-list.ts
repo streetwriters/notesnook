@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { wrappingInputRule } from "@tiptap/core";
 import TiptapOrderedList, { inputRegex } from "@tiptap/extension-ordered-list";
-import { getParentAttributes } from "../../utils/prosemirror";
+import { getParentAttributes } from "../../utils/prosemirror.js";
 
 export const OrderedList = TiptapOrderedList.extend({
   addAttributes() {

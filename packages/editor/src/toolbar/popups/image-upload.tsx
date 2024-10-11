@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Input } from "@theme-ui/components";
 import { useState } from "react";
 import { Flex, Text } from "@theme-ui/components";
-import { ImageAttributes } from "../../extensions/image";
-import { Popup } from "../components/popup";
-import { downloadImage, toDataURL } from "../../utils/downloader";
-import { useToolbarStore } from "../stores/toolbar-store";
+import { ImageAttributes } from "../../extensions/image/index.js";
+import { Popup } from "../components/popup.js";
+import { downloadImage, toDataURL } from "../../utils/downloader.js";
+import { useToolbarStore } from "../stores/toolbar-store.js";
+import { strings } from "@notesnook/intl";
 
 export type ImageUploadPopupProps = {
   onInsert: (image: Partial<ImageAttributes>) => void;
@@ -38,11 +39,11 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
 
   return (
     <Popup
-      title="Insert image from URL"
+      title={strings.attachImageFromURL()}
       onClose={onClose}
       action={{
         loading: isDownloading,
-        title: "Insert image",
+        title: strings.insert(),
         disabled: !url,
         onClick: async () => {
           setIsDownloading(true);
@@ -65,7 +66,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
         <Input
           type="url"
           autoFocus
-          placeholder="Paste Image URL here"
+          placeholder={strings.pasteImageURL()}
           value={url}
           onChange={(e) => {
             setUrl(e.target.value);

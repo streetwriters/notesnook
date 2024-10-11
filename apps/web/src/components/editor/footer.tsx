@@ -23,6 +23,7 @@ import { Loading, Saved, NotSaved } from "../icons";
 import { useNoteStatistics } from "./manager";
 import { getFormattedDate } from "@notesnook/common";
 import { MAX_AUTO_SAVEABLE_WORDS } from "./types";
+import { strings } from "@notesnook/intl";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -48,7 +49,7 @@ function EditorFooter() {
           variant="subBody"
           sx={{ color: "paragraph" }}
         >
-          Auto save: off
+          {strings.autoSaveOff()}
         </Text>
       ) : null}
       <Text
@@ -57,8 +58,8 @@ function EditorFooter() {
         variant="subBody"
         sx={{ color: "paragraph" }}
       >
-        {words.total + " words"}
-        {words.selected ? ` (${words.selected} selected)` : ""}
+        {words.total + " " + strings.words()}
+        {words.selected ? ` (${words.selected} ${strings.selected()})` : ""}
       </Text>
       {dateEdited > 0 ? (
         <Text

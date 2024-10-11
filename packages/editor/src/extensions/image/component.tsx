@@ -19,31 +19,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ThemeUIStyleObject } from "@theme-ui/core";
 import { Box, Flex, Image, Text } from "@theme-ui/components";
-import { ImageAttributes } from "./image";
+import { ImageAttributes } from "./image.js";
 import { useEffect, useRef, useState } from "react";
-import { ReactNodeViewProps } from "../react";
-import { DesktopOnly } from "../../components/responsive";
+import { ReactNodeViewProps } from "../react/index.js";
+import { DesktopOnly } from "../../components/responsive/index.js";
 import { Icon } from "@notesnook/ui";
-import { Icons } from "../../toolbar/icons";
-import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
+import { Icons } from "../../toolbar/icons.js";
+import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
 import {
   useIsMobile,
   useToolbarStore
-} from "../../toolbar/stores/toolbar-store";
-import { Resizer } from "../../components/resizer";
+} from "../../toolbar/stores/toolbar-store.js";
+import { Resizer } from "../../components/resizer/index.js";
 import {
   corsify,
   downloadImage,
   revokeBloburl,
   toBlobURL,
   toDataURL
-} from "../../utils/downloader";
+} from "../../utils/downloader.js";
 import { motion } from "framer-motion";
-import { useObserver } from "../../hooks/use-observer";
-import { Attachment, ImageAlignmentOptions } from "../attachment";
-import DataURL from "@notesnook/core/dist/utils/dataurl";
+import { useObserver } from "../../hooks/use-observer.js";
+import { Attachment, ImageAlignmentOptions } from "../attachment/index.js";
+import { DataURL } from "@notesnook/common";
 
-export const AnimatedImage = motion(Image);
+export const AnimatedImage = motion.create(Image);
 
 export function ImageComponent(
   props: ReactNodeViewProps<Partial<ImageAttributes>>

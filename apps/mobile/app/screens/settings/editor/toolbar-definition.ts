@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Icons } from "@notesnook/editor/dist/toolbar/icons";
-import { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/index";
+import { ToolbarGroupDefinition } from "@notesnook/editor";
 import {
   getAllTools,
   getDefaultPresets
 } from "@notesnook/editor/dist/toolbar/tool-definitions";
-import { ToolId } from "@notesnook/editor/dist/toolbar/tools";
+import { ToolId } from "@notesnook/editor";
 
 export const tools = getAllTools();
 export const presets: { [name: string]: ToolbarGroupDefinition[] } = {

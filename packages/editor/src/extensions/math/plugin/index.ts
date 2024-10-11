@@ -23,22 +23,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *--------------------------------------------------------*/
 
 // core functionality
-export { MathView, type ICursorPosObserver } from "./math-node-view";
+export { MathView, type ICursorPosObserver } from "./math-node-view.js";
 export {
   mathPlugin,
   createMathView,
   type IMathPluginState
-} from "./math-plugin";
+} from "./math-plugin.js";
 
 // recommended plugins
-export { mathBackspaceCmd } from "./plugins/math-backspace";
+export { mathBackspaceCmd } from "./plugins/math-backspace.js";
 
 // optional / experimental plugins
-export { mathSelectPlugin } from "./plugins/math-select";
+export { mathSelectPlugin } from "./plugins/math-select.js";
 
 // commands
-export { insertMathNode } from "./commands/insert-math-node";
+export { insertMathNode } from "./commands/insert-math-node.js";
 
 // utilities
-export { mathSerializer } from "./utils/text-serializer";
-export * from "./utils/types";
+export { mathSerializer } from "./utils/text-serializer.js";
+export * from "./utils/types.js";

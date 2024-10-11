@@ -16,15 +16,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { getParentAttributes } from "../../utils/prosemirror";
+import { getParentAttributes } from "../../utils/prosemirror.js";
 import {
   InputRule,
   Node,
   findParentNodeClosestToPos,
   mergeAttributes
 } from "@tiptap/core";
-import { Paragraph } from "../paragraph";
-import { Heading } from "../heading";
+import { Paragraph } from "../paragraph/index.js";
+import { Heading } from "../heading/index.js";
 import { TextSelection } from "@tiptap/pm/state";
 import { Fragment } from "@tiptap/pm/model";
 

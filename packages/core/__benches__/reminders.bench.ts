@@ -18,15 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { bench, describe } from "vitest";
-import { databaseTest } from "../__tests__/utils";
-import Database from "../src/api";
+import { databaseTest } from "../__tests__/utils/index.js";
+import Database from "../src/api/index.js";
 import MockDate from "mockdate";
 import dayjs from "dayjs";
-import { Reminder } from "../src/types";
+import { Reminder } from "../src/types.js";
 import {
   createUpcomingReminderTimeQuery,
   getUpcomingReminderTime
-} from "../src/collections/reminders";
+} from "../src/collections/reminders.js";
 
 async function addReminders(db: Database) {
   const reminders: Partial<Reminder>[] = [

@@ -16,8 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import * as browser from "../src/browser";
-import * as node from "../src/node";
+
+import { Sodium as BrowserSodium } from "../src/browser";
+import { Sodium as NodeSodium } from "../src/node";
 import benny from "benny";
 import {
   decrypt,
@@ -26,6 +27,9 @@ import {
   hash,
   streamingEncrypt
 } from "../tests/utils";
+
+const browser = new BrowserSodium();
+const node = new NodeSodium();
 
 async function main() {
   await browser.initialize();

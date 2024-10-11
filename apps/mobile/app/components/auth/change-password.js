@@ -35,6 +35,7 @@ import Seperator from "../ui/seperator";
 import { Dialog } from "../dialog";
 import BackupService from "../../services/backup";
 import { sleep } from "../../utils/time";
+import { strings } from "@notesnook/intl";
 
 export const ChangePassword = () => {
   const passwordInputRef = useRef();
@@ -49,8 +50,8 @@ export const ChangePassword = () => {
   const changePassword = async () => {
     if (!user?.isEmailConfirmed) {
       ToastManager.show({
-        heading: "Email not confirmed",
-        message: "Please confirm your email to change account password",
+        heading: strings.emailNotConfirmed(),
+        message: strings.emailNotConfirmedDesc(),
         type: "error",
         context: "local"
       });
@@ -58,8 +59,8 @@ export const ChangePassword = () => {
     }
     if (error || !oldPassword.current || !password.current) {
       ToastManager.show({
-        heading: "All fields required",
-        message: "Fill all the fields and try again.",
+        heading: strings.allFieldsRequired(),
+        message: strings.allFieldsRequiredDesc(),
         type: "error",
         context: "local"
       });
@@ -68,13 +69,13 @@ export const ChangePassword = () => {
     setLoading(true);
     try {
       const result = await BackupService.run(false, "change-password-dialog");
-      if (result.error)
-        throw new Error(`Failed to create backup: ${result.error}`);
+      if (!result.error)
+        throw new Error(strings.backupFailed() + `: ${result.error}`);
 
       await db.user.clearSessions();
       await db.user.changePassword(oldPassword.current, password.current);
       ToastManager.show({
-        heading: "Account password updated",
+        heading: strings.passwordChangedSuccessfully(),
         type: "success",
         context: "global"
       });
@@ -85,7 +86,7 @@ export const ChangePassword = () => {
     } catch (e) {
       setLoading(false);
       ToastManager.show({
-        heading: "Failed to change password",
+        heading: strings.passwordChangeFailed(),
         message: e.message,
         type: "error",
         context: "local"
@@ -102,10 +103,7 @@ export const ChangePassword = () => {
       }}
     >
       <Dialog context="change-password-dialog" />
-      <DialogHeader
-        title="Change password"
-        paragraph="Enter your old and new passwords"
-      />
+      <DialogHeader title={strings.changePassword()} />
       <Seperator />
 
       <Input
@@ -119,7 +117,7 @@ export const ChangePassword = () => {
         autoComplete="password"
         autoCapitalize="none"
         autoCorrect={false}
-        placeholder="Old Password"
+        placeholder={strings.oldPassword()}
       />
 
       <Input
@@ -128,27 +126,21 @@ export const ChangePassword = () => {
           password.current = value;
         }}
         onErrorCheck={(e) => setError(e)}
-        returnKeyLabel="Next"
+        returnKeyLabel={strings.next()}
         returnKeyType="next"
         secureTextEntry
         validationType="password"
         autoComplete="password"
         autoCapitalize="none"
         autoCorrect={false}
-        placeholder="New password"
+        placeholder={strings.newPassword()}
       />
 
-      <Notice
-        text={`Changing password is an irreversible process. You will be logged out from all your devices. Please make sure you do not close the app while your password is changing and have good internet connection.`}
-        type="alert"
-      />
+      <Notice text={strings.changePasswordNotice()} type="alert" />
 
       <View style={{ height: 10 }} />
 
-      <Notice
-        text={`Once your password is changed, please make sure to save the new account recovery key.`}
-        type="alert"
-      />
+      <Notice text={strings.changePasswordNotice2()} type="alert" />
 
       <Button
         style={{
@@ -158,7 +150,7 @@ export const ChangePassword = () => {
         loading={loading}
         onPress={changePassword}
         type="accent"
-        title={loading ? null : "I understand, change my password"}
+        title={loading ? null : strings.changePasswordConfirm()}
       />
     </View>
   );

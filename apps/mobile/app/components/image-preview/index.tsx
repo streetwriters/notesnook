@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium from "@ammarahmed/react-native-sodium";
-import dataurl from "@notesnook/core/dist/utils/dataurl";
-import type { ImageAttributes } from "@notesnook/editor/dist/extensions/image/index";
+import { DataURL } from "@notesnook/core";
+import type { ImageAttributes } from "@notesnook/editor";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
@@ -55,8 +55,8 @@ const ImagePreview = () => {
     setLoading(true);
     setTimeout(async () => {
       let hash = image.hash;
-      if (!hash && image.src && dataurl.toObject(image.src)) {
-        const data = dataurl.toObject(image.src);
+      if (!hash && image.src && DataURL.toObject(image.src)) {
+        const data = DataURL.toObject(image.src);
         if (!data) return;
         hash = await Sodium.hashFile({
           data: data.data,

@@ -49,7 +49,6 @@ import {
   Uploading
 } from "../components/icons";
 import NavigationItem from "../components/navigation-menu/navigation-item";
-import { pluralize } from "@notesnook/common";
 import { db } from "../common/db";
 import { Attachment } from "../components/attachment";
 import { ScopedThemeProvider } from "../components/theme-provider";
@@ -67,6 +66,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { ConfirmDialog } from "./confirm";
 import { showToast } from "../utils/toast";
 import { Loader } from "../components/loader";
+import { strings } from "@notesnook/intl";
 
 type ToolbarAction = {
   title: string;
@@ -76,29 +76,29 @@ type ToolbarAction = {
 
 const TOOLBAR_ACTIONS: ToolbarAction[] = [
   {
-    title: "Download",
+    title: strings.network.download(),
     icon: Download,
     onClick: async ({ selected }) => {
       await store.get().download(selected);
     }
   },
   {
-    title: "Recheck",
+    title: strings.fileCheck(),
     icon: DoubleCheckmark,
     onClick: async ({ selected }) => await store.recheck(selected)
   },
   {
-    title: "Delete",
+    title: strings.delete(),
     icon: Trash,
     onClick: ({ selected }) => Multiselect.deleteAttachments(selected)
   }
 ];
 
 const COLUMNS = [
-  { id: "filename" as const, title: "Name", width: "65%" },
+  { id: "filename" as const, title: strings.name(), width: "65%" },
   { id: "status" as const, width: "24px" },
-  { id: "size" as const, title: "Size", width: "15%" },
-  { id: "dateUploaded" as const, title: "Date uploaded", width: "20%" }
+  { id: "size" as const, title: strings.size(), width: "15%" },
+  { id: "dateUploaded" as const, title: strings.dateUploaded(), width: "20%" }
 ];
 
 type SortOptions = {
@@ -346,7 +346,7 @@ export const AttachmentsDialog = DialogManager.register(
                   renderRow={AttachmentRow}
                 />
               ) : (
-                <Loader title="Loading attachments..." />
+                <Loader title={strings.loading() + "..."} />
               )}
             </FlexScrollContainer>
           </Flex>
@@ -397,37 +397,37 @@ const routes: { id: Route; icon: Icon; title: string }[] = [
   {
     id: "all",
     icon: FileGeneral,
-    title: "All files"
+    title: strings.mediaTypes.all()
   },
   {
     id: "images",
     icon: FileImage,
-    title: "Images"
+    title: strings.mediaTypes.image()
   },
   {
     id: "documents",
     icon: FileDocument,
-    title: "Documents"
+    title: strings.mediaTypes.document()
   },
   {
     id: "videos",
     icon: FileVideo,
-    title: "Videos"
+    title: strings.mediaTypes.video()
   },
   {
     id: "audio",
     icon: FileAudio,
-    title: "Audios"
+    title: strings.mediaTypes.audio()
   },
   {
     id: "uploads",
     icon: Uploading,
-    title: "Uploads"
+    title: strings.uploads()
   },
   {
     id: "orphaned",
     icon: Unlink,
-    title: "Orphaned"
+    title: strings.orphaned()
   }
 ];
 
@@ -461,7 +461,7 @@ const Sidebar = memo(
             <Input
               id="search"
               name="search"
-              placeholder="Search"
+              placeholder={strings.search()}
               sx={{ m: 2, mb: 0, width: "auto", bg: "background", py: "7px" }}
               onChange={(e) => {
                 setRoute(e.target.value ? "none" : "all");
@@ -485,7 +485,7 @@ const Sidebar = memo(
           <Flex sx={{ flexDirection: "column" }}>
             <Flex sx={{ pl: 2, m: 2, mt: 1, justifyContent: "space-between" }}>
               <Flex sx={{ flexDirection: "column" }}>
-                <Text variant="body">{pluralize(counts.all, "file")}</Text>
+                <Text variant="body">{strings.files(counts.all)}</Text>
                 {result.status === "fulfilled" && (
                   <Text variant="subBody">
                     {formatBytes(result.value || 0)}
@@ -503,28 +503,18 @@ const Sidebar = memo(
                     height: 38
                   }}
                   disabled={!!downloadStatus}
-                  title="Clear cache"
+                  title={strings.clearCache()}
                   onClick={async () => {
                     if (
                       await ConfirmDialog.show({
-                        title: "Clear attachments cache?",
-                        message: `Clearing attachments cache will perform the following actions:
-                        
-- Downloaded images & files: **cleared**
-- Pending uploads: **cleared**
-- Uploaded images & files: _unaffected_
-
-All attachments will be downloaded & cached again on access.
-
----
-
-**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**`,
-                        negativeButtonText: "No",
-                        positiveButtonText: "Yes"
+                        title: strings.clearCacheConfirm(),
+                        message: strings.clearCacheConfirmDesc(),
+                        negativeButtonText: strings.no(),
+                        positiveButtonText: strings.yes()
                       })
                     ) {
                       await db.fs().clear();
-                      showToast("success", "Attachments cache cleared!");
+                      showToast("success", strings.cacheCleared());
                     }
                   }}
                 >
@@ -539,7 +529,7 @@ All attachments will be downloaded & cached again on access.
                     width: 38,
                     height: 38
                   }}
-                  title="Download all attachments"
+                  title={strings.downloadAllAttachments()}
                   onClick={async () => {
                     if (downloadStatus) {
                       await cancelDownload();

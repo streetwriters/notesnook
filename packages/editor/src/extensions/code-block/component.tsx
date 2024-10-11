@@ -19,16 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, Input, Text } from "@theme-ui/components";
 import { useRef, useState } from "react";
-import { Button } from "../../components/button";
-import { ResponsivePresenter } from "../../components/responsive";
-import { useTimer } from "../../hooks/use-timer";
+import { Button } from "../../components/button.js";
+import { ResponsivePresenter } from "../../components/responsive/index.js";
+import { useTimer } from "../../hooks/use-timer.js";
 import { Icon } from "@notesnook/ui";
-import { Popup } from "../../toolbar/components/popup";
-import { Icons } from "../../toolbar/icons";
-import { ReactNodeViewProps } from "../react/types";
-import { CodeBlockAttributes } from "./code-block";
+import { Popup } from "../../toolbar/components/popup.js";
+import { Icons } from "../../toolbar/icons.js";
+import { ReactNodeViewProps } from "../react/types.js";
+import { CodeBlockAttributes } from "./code-block.js";
 import Languages from "./languages.json";
 import { useThemeEngineStore } from "@notesnook/theme";
+import { strings } from "@notesnook/intl";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
@@ -108,9 +109,9 @@ export function CodeblockComponent(
         >
           {caretPosition ? (
             <Text variant={"subBody"} sx={{ mr: 1, mt: "2px" }}>
-              Line {caretPosition.line}, Column {caretPosition.column}{" "}
+              {strings.lineColumn(caretPosition.line, caretPosition.column)}{" "}
               {caretPosition.selected
-                ? `(${caretPosition.selected} selected)`
+                ? `(${strings.selectedCode(caretPosition.selected)})`
                 : ""}
             </Text>
           ) : null}
@@ -121,7 +122,7 @@ export function CodeblockComponent(
               p: 1,
               opacity: "1 !important"
             }}
-            title="Toggle indentation mode"
+            title={strings.toggleIndentationMode()}
             disabled={!editor.isEditable}
             onClick={() => {
               if (!editor.isEditable) return;
@@ -132,7 +133,8 @@ export function CodeblockComponent(
             }}
           >
             <Text variant={"subBody"}>
-              {indentType === "space" ? "Spaces" : "Tabs"}: {indentLength}
+              {indentType === "space" ? strings.spaces() : strings.tabs()}:{" "}
+              {indentLength}
             </Text>
           </Button>
 
@@ -150,7 +152,7 @@ export function CodeblockComponent(
 
               setIsOpen(true);
             }}
-            title="Change language"
+            title={strings.changeLanguage()}
           >
             <Text variant={"subBody"} spellCheck={false}>
               {languageDefinition?.title || "Plaintext"}
@@ -173,14 +175,14 @@ export function CodeblockComponent(
                 );
                 start();
               }}
-              title="Copy to clipboard"
+              title={strings.copyToClipboard()}
             >
               <Text
                 variant={"subBody"}
                 spellCheck={false}
                 sx={{ color: "codeFg" }}
               >
-                {enabled ? "Copied!" : "Copy"}
+                {enabled ? strings.copied() : strings.copy()}
               </Text>
             </Button>
           ) : null}
@@ -208,7 +210,7 @@ export function CodeblockComponent(
           location: "top",
           yOffset: 5
         }}
-        title="Select language"
+        title={strings.selectLanguage()}
       >
         <LanguageSelector
           selectedLanguage={languageDefinition?.filename || "Plaintext"}
@@ -247,7 +249,7 @@ function LanguageSelector(props: LanguageSelectorProps) {
       >
         <Input
           autoFocus
-          placeholder="Search languages"
+          placeholder={strings.searchLanguages()}
           sx={{
             width: "auto",
             bg: "background",

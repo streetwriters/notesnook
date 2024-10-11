@@ -26,6 +26,7 @@ import SettingsService from "../../services/settings";
 import { useUserStore } from "../../stores/use-user-store";
 import { eCloseSheet } from "../../utils/events";
 import TwoFactorVerification from "./two-factor";
+import { strings } from "@notesnook/intl";
 
 export const LoginSteps = {
   emailAuth: 1,
@@ -49,8 +50,8 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
       (!email.current && step === LoginSteps.emailAuth)
     ) {
       ToastManager.show({
-        heading: "All fields required",
-        message: "Fill all the fields and try again",
+        heading: strings.allFieldsRequired(),
+        message: strings.allFieldsRequiredDesc(),
         type: "error",
         context: "local"
       });
@@ -97,7 +98,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
               }
             }, mfaInfo);
           } else {
-            finishWithError(new Error("Unable to send 2FA code"));
+            finishWithError(new Error(strings.unableToSend2faCode()));
           }
           break;
         }
@@ -122,7 +123,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
     if (e.message === "invalid_grant") setStep(LoginSteps.emailAuth);
     setLoading(false);
     ToastManager.show({
-      heading: "Login failed",
+      heading: strings.loginFailed(),
       message: e.message,
       type: "error",
       context: "local"
@@ -131,13 +132,13 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
 
   const finishLogin = async () => {
     const user = await db.user.getUser();
-    if (!user) throw new Error("Email or password incorrect!");
+    if (!user) throw new Error(strings.emailOrPasswordIncorrect());
     PremiumService.setPremiumStatus();
     setUser(user);
     clearMessage();
     ToastManager.show({
-      heading: "Login successful",
-      message: `Logged in as ${user.email}`,
+      heading: strings.loginSuccess(),
+      message: strings.loginSuccessDesc(),
       type: "success",
       context: "global"
     });

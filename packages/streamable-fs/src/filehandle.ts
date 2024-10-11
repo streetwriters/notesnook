@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import FileStreamSource from "./filestreamsource";
-import { IFileStorage } from "./interfaces";
-import { File } from "./types";
-import { chunkPrefix } from "./utils";
+import FileStreamSource from "./filestreamsource.js";
+import { IFileStorage } from "./interfaces.js";
+import { File } from "./types.js";
+import { chunkPrefix } from "./utils.js";
 
 export default class FileHandle {
   constructor(

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getParentAttributes } from "../../utils/prosemirror";
+import { getParentAttributes } from "../../utils/prosemirror.js";
 import { Node, mergeAttributes, wrappingInputRule } from "@tiptap/core";
 
 export type OutlineListAttributes = {
@@ -41,7 +41,7 @@ declare module "@tiptap/core" {
   }
 }
 
-export const inputRegex = /^\s*(-o)\s$/;
+const inputRegex = /^\s*(-o)\s$/;
 const outlineListItemName = "outlineListItem";
 export const OutlineList = Node.create<OutlineListOptions>({
   name: "outlineList",

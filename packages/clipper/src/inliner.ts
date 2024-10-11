@@ -16,8 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { FetchOptions, fetchResource } from "./fetch";
-import { isDataUrl, resolveUrl, escape } from "./utils";
+import { FetchOptions, fetchResource } from "./fetch.js";
+import { isDataUrl, resolveUrl, escape } from "./utils.js";
 
 const URL_REGEX = /url\(['"]?([^'"]+?)['"]?\)/g;
 

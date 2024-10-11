@@ -18,13 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { User } from "@notesnook/core";
-import {
-  EV,
-  EVENTS,
-  SYNC_CHECK_IDS,
-  SyncStatusEvent
-} from "@notesnook/core/dist/common";
-import { EventManagerSubscription } from "@notesnook/core/dist/utils/event-manager";
+import { EV, EVENTS, SYNC_CHECK_IDS, SyncStatusEvent } from "@notesnook/core";
+import { EventManagerSubscription } from "@notesnook/core";
 import notifee from "@notifee/react-native";
 import NetInfo, { NetInfoSubscription } from "@react-native-community/netinfo";
 import React, { useCallback, useEffect, useRef } from "react";
@@ -96,6 +91,8 @@ import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NotesnookModule } from "../utils/notesnook-module";
+import { changeSystemBarColors } from "../stores/use-theme-store";
+import { strings } from "@notesnook/intl";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -270,7 +267,7 @@ const onSuccessfulSubscription = async (
 
 const onSubscriptionError = async (error: RNIap.PurchaseError) => {
   ToastManager.show({
-    heading: "Failed to subscribe",
+    heading: strings.failedToSubscribe(),
     type: "error",
     message: error.message,
     context: "local"
@@ -355,7 +352,9 @@ const IsDatabaseMigrationRequired = () => {
 const initializeDatabase = async (password?: string) => {
   if (useUserStore.getState().appLocked) return;
   if (!db.isInitialized) {
-    RNBootSplash.hide({ fade: true });
+    RNBootSplash.hide({ fade: false });
+    changeSystemBarColors();
+
     DatabaseLogger.info("Initializing database");
     try {
       await setupDatabase(password);

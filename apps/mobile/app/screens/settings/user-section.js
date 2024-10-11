@@ -35,6 +35,7 @@ import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS_STRINGS } from "../../utils/constants";
 import { SIZE } from "../../utils/size";
 import { SectionItem } from "./section-item";
+import { strings } from "@notesnook/intl";
 
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
@@ -88,7 +89,7 @@ const onChangePicture = () => {
     includeBase64: true,
     writeTempFile: false,
     cropperToolbarColor: theme.scopes.base.primary.background,
-    cropperToolbarTitle: "Edit profile picture",
+    cropperToolbarTitle: strings.editProfilePicture(),
     cropperActiveWidgetColor: theme.scopes.base.primary.accent,
     cropperToolbarWidgetColor: theme.scopes.base.primary.icon
   }).then(async (image) => {
@@ -176,19 +177,18 @@ const SettingsUserSection = ({ item }) => {
                     <Heading color={colors.primary.accent} size={SIZE.sm}>
                       {SUBSCRIPTION_STATUS_STRINGS[
                         user.subscription?.type
-                      ]?.toUpperCase() || "Basic"}
+                      ]?.toUpperCase() || strings.basic()}
                     </Heading>
                   ) : null}
 
                   <Paragraph
                     onPress={() => {
                       presentDialog({
-                        title: "Set your full name",
-                        paragraph:
-                          "Your name is end-to-end encrypted and only visible to you.",
-                        positiveText: "Save",
+                        title: strings.setFullName(),
+                        paragraph: strings.setFullNameDesc(),
+                        positiveText: strings.save(),
                         input: true,
-                        inputPlaceholder: "Enter your full name",
+                        inputPlaceholder: strings.enterFullName(),
                         defaultValue: userProfile?.fullName,
                         positivePress: async (value) => {
                           db.settings
@@ -208,7 +208,7 @@ const SettingsUserSection = ({ item }) => {
                   >
                     {userProfile?.fullName
                       ? userProfile.fullName + " "
-                      : "Set your name "}
+                      : strings.setYourName() + " "}
                     <AppIcon name="pencil" size={SIZE.lg} />
                   </Paragraph>
 
@@ -225,12 +225,12 @@ const SettingsUserSection = ({ item }) => {
                     color={colors.secondary.heading}
                   >
                     {!user ? (
-                      "Not logged in"
+                      strings.notLoggedIn()
                     ) : lastSynced && lastSynced !== "Never" ? (
                       <>
                         {lastSyncStatus === SyncStatus.Failed
-                          ? "Sync failed"
-                          : "Synced"}{" "}
+                          ? strings.syncFailed()
+                          : strings.synced()}{" "}
                         <TimeSince
                           style={{
                             fontSize: SIZE.xs,
@@ -238,10 +238,10 @@ const SettingsUserSection = ({ item }) => {
                           }}
                           time={lastSynced}
                         />
-                        {isOffline ? " (offline)" : ""}
+                        {isOffline ? ` (${strings.offline()})` : ""}
                       </>
                     ) : (
-                      "never"
+                      strings.never()
                     )}{" "}
                     <Icon
                       name="checkbox-blank-circle"

@@ -35,7 +35,9 @@ import {
   getFontById,
   TiptapOptions,
   Attachment,
-  getTableOfContents
+  getTableOfContents,
+  getChangedNodes,
+  LinkAttributes
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import {
@@ -52,15 +54,13 @@ import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { debounce } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { getChangedNodes } from "@notesnook/editor/dist/utils/prosemirror";
-import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
 import { writeToClipboard } from "../../utils/clipboard";
 import { useEditorStore } from "../../stores/editor-store";
 import { parseInternalLink } from "@notesnook/core";
 import Skeleton from "react-loading-skeleton";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
-import { TimeFormat } from "@notesnook/core/dist/utils/date";
+import { TimeFormat } from "@notesnook/core";
 import { BuyDialog } from "../../dialogs/buy-dialog";
 
 export type OnChangeHandler = (

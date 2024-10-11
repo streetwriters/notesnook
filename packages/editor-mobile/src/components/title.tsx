@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getFontById } from "@notesnook/editor";
-import { replaceDateTime } from "@notesnook/editor/dist/extensions/date-time";
+import { replaceDateTime } from "@notesnook/editor";
 import React, { RefObject, useCallback, useEffect, useRef } from "react";
 import { EditorController } from "../hooks/useEditorController";
 import { useTabContext } from "../hooks/useTabStore";

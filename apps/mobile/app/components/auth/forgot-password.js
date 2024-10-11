@@ -32,6 +32,7 @@ import Input from "../ui/input";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 export const ForgotPassword = () => {
   const { colors } = useThemeColors("sheet");
@@ -44,7 +45,7 @@ export const ForgotPassword = () => {
   const sendRecoveryEmail = async () => {
     if (!email.current || error) {
       ToastManager.show({
-        heading: "Account email is required.",
+        heading: strings.emailRequired(),
         type: "error",
         context: "local"
       });
@@ -57,15 +58,15 @@ export const ForgotPassword = () => {
         lastRecoveryEmailTime &&
         Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 3
       ) {
-        throw new Error("Please wait before requesting another email");
+        throw new Error(strings.pleaseWaitBeforeSendEmail());
       }
       await db.user.recoverAccount(email.current.toLowerCase());
       SettingsService.set({
         lastRecoveryEmailTime: Date.now()
       });
       ToastManager.show({
-        heading: "Check your email to reset password",
-        message: `Recovery email has been sent to ${email.current.toLowerCase()}`,
+        heading: strings.recoveryEmailSent(),
+        message: strings.recoveryEmailSentDesc(),
         type: "success",
         context: "local",
         duration: 7000
@@ -75,7 +76,7 @@ export const ForgotPassword = () => {
     } catch (e) {
       setLoading(false);
       ToastManager.show({
-        heading: "Recovery email not sent",
+        heading: strings.recoveryEmailFailed(),
         message: e.message,
         type: "error",
         context: "local"
@@ -121,13 +122,13 @@ export const ForgotPassword = () => {
               name="email"
               size={50}
             />
-            <Heading>Recovery email sent!</Heading>
+            <Heading>{strings.recoveryEmailSent()}</Heading>
             <Paragraph
               style={{
                 textAlign: "center"
               }}
             >
-              Please follow the link in the email to recover your account.
+              {strings.recoveryEmailSentDesc()}
             </Paragraph>
           </View>
         ) : (
@@ -140,10 +141,7 @@ export const ForgotPassword = () => {
               padding: 12
             }}
           >
-            <DialogHeader
-              title="Account recovery"
-              paragraph="We will send you an email with steps on how to reset your password."
-            />
+            <DialogHeader title={strings.accountRecovery()} />
             <Seperator />
 
             <Input
@@ -153,14 +151,14 @@ export const ForgotPassword = () => {
               }}
               defaultValue={email.current}
               onErrorCheck={(e) => setError(e)}
-              returnKeyLabel="Next"
+              returnKeyLabel={strings.next()}
               returnKeyType="next"
               autoComplete="email"
               validationType="email"
               autoCorrect={false}
               autoCapitalize="none"
-              errorMessage="Email is invalid"
-              placeholder="Email"
+              errorMessage={strings.emailInvalid()}
+              placeholder={strings.email()}
               onSubmit={() => {}}
             />
 
@@ -172,7 +170,7 @@ export const ForgotPassword = () => {
               loading={loading}
               onPress={sendRecoveryEmail}
               type="accent"
-              title={loading ? null : "Next"}
+              title={loading ? null : strings.next()}
             />
           </View>
         )}

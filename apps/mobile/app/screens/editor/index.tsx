@@ -59,6 +59,8 @@ import {
   randId
 } from "./tiptap/utils";
 import { tabBarRef } from "../../utils/global-refs";
+import { strings } from "@notesnook/intl";
+import { i18n } from "@lingui/core";
 
 const style: ViewStyle = {
   height: "100%",
@@ -145,6 +147,10 @@ const Editor = React.memo(
             nestedScrollEnabled
             onError={onError}
             injectedJavaScriptBeforeContentLoaded={`
+          globalThis.LINGUI_LOCALE = "${i18n.locale}";
+          globalThis.LINGUI_LOCALE_DATA = ${JSON.stringify({
+            [i18n.locale]: i18n.messages
+          })};
           globalThis.__DEV__ = ${__DEV__}
           globalThis.readonly=${readonly};
           globalThis.noToolbar=${noToolbar};
@@ -257,8 +263,7 @@ const useLockedNoteHandler = () => {
       if (!tabRef.current?.noteId || !tabRef.current) return;
       if (!password || password.trim().length === 0) {
         ToastManager.show({
-          heading: "Password not entered",
-          message: "Enter a password for the vault and try again.",
+          heading: strings.passwordNotEntered(),
           type: "error"
         });
         return;
@@ -269,12 +274,11 @@ const useLockedNoteHandler = () => {
         if (enrollBiometrics && note) {
           try {
             const unlocked = await db.vault.unlock(password);
-            if (!unlocked) throw new Error("Incorrect vault password");
+            if (!unlocked) throw new Error(strings.passwordIncorrect());
             await BiometricService.storeCredentials(password);
             eSendEvent("vaultUpdated");
             ToastManager.show({
-              heading: "Biometric unlocking enabled!",
-              message: "Now you can unlock notes in vault with biometrics.",
+              heading: strings.biometricUnlockEnabled(),
               type: "success",
               context: "global"
             });
@@ -288,9 +292,7 @@ const useLockedNoteHandler = () => {
             syncTabs();
           } catch (e) {
             ToastManager.show({
-              heading: "Incorrect password",
-              message:
-                "Please enter the correct vault password to enable biometrics.",
+              heading: strings.passwordIncorrect(),
               type: "error"
             });
           }
@@ -304,7 +306,7 @@ const useLockedNoteHandler = () => {
       } catch (e) {
         console.log(e);
         ToastManager.show({
-          heading: "Incorrect password",
+          heading: strings.passwordIncorrect(),
           type: "error"
         });
       }

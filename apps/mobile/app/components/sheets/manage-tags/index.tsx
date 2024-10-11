@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { VirtualizedGrouping } from "@notesnook/core";
-import { Tags } from "@notesnook/core/dist/collections/tags";
-import { Tag } from "@notesnook/core/dist/types";
+import { sanitizeTag } from "@notesnook/core";
+import { Tag } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, {
   RefObject,
@@ -48,6 +48,7 @@ import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -138,11 +139,6 @@ const ManageTagsSheet = (props: {
 
   const onSubmit = async () => {
     if (!query || query === "" || query.trimStart().length == 0) {
-      ToastManager.show({
-        heading: "Tag field is empty",
-        type: "error",
-        context: "local"
-      });
       return;
     }
 
@@ -181,12 +177,7 @@ const ManageTagsSheet = (props: {
       useTagStore.getState().refresh();
       setQuery(undefined);
     } catch (e) {
-      ToastManager.show({
-        heading: "Cannot add tag",
-        type: "error",
-        message: (e as Error).message,
-        context: "local"
-      });
+      ToastManager.error(e as Error);
     }
 
     Navigation.queueRoutesForUpdate();
@@ -268,8 +259,8 @@ const ManageTagsSheet = (props: {
         fwdRef={inputRef}
         autoCapitalize="none"
         onChangeText={(v) => {
-          setQuery(Tags.sanitize(v));
-          checkQueryExists(Tags.sanitize(v));
+          setQuery(sanitizeTag(v));
+          checkQueryExists(sanitizeTag(v));
         }}
         onFocusInput={() => {
           setFocus(true);
@@ -280,7 +271,7 @@ const ManageTagsSheet = (props: {
         onSubmit={() => {
           onSubmit();
         }}
-        placeholder="Search or add a tag"
+        placeholder={strings.searchForTags()}
       />
 
       {query && !queryExists ? (
@@ -296,7 +287,7 @@ const ManageTagsSheet = (props: {
           type="selected"
         >
           <Heading size={SIZE.sm} color={colors.selected.heading}>
-            Add {'"' + "#" + query + '"'}
+            {strings.add()} {'"' + "#" + query + '"'}
           </Heading>
           <Icon name="plus" color={colors.selected.icon} size={SIZE.lg} />
         </Pressable>
@@ -331,7 +322,7 @@ const ManageTagsSheet = (props: {
                 textBreakStrategy="balanced"
                 color={colors.secondary.paragraph}
               >
-                You do not have any tags.
+                {strings.emptyPlaceholders("tag")}
               </Paragraph>
             </View>
           }

@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { PropsWithChildren } from "react";
 import { Flex } from "@theme-ui/components";
-import { ToolButton, ToolButtonProps } from "./tool-button";
-import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
+import { ToolButton, ToolButtonProps } from "./tool-button.js";
+import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store.js";
 import React from "react";
 
 export type SplitButtonProps = ToolButtonProps & {

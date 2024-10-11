@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
-import { VAULT_ERRORS } from "@notesnook/core/dist/api/vault";
+import { VAULT_ERRORS } from "@notesnook/core";
 import {
   Color,
   ItemReference,
@@ -26,7 +26,7 @@ import {
   Reminder,
   Tag,
   TrashItem
-} from "@notesnook/core/dist/types";
+} from "@notesnook/core";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -68,6 +68,7 @@ import { sleep } from "../utils/time";
 import { ReferencesList } from "../components/sheets/references";
 import { createInternalLink } from "@notesnook/core";
 import { MoveNotebookSheet } from "../components/sheets/move-notebook";
+import { strings } from "@notesnook/intl";
 
 export const useActions = ({
   close,
@@ -194,8 +195,7 @@ export const useActions = ({
     close();
     await sleep(300);
     presentDialog({
-      title: "Rename tag",
-      paragraph: "Change the title of the tag " + item.title,
+      title: strings.renameTag(),
       positivePress: async (value: string) => {
         if (!value || value === "" || value.trimStart().length == 0) return;
         try {
@@ -218,7 +218,7 @@ export const useActions = ({
       input: true,
       defaultValue: item.title,
       inputPlaceholder: "Enter title of tag",
-      positiveText: "Save"
+      positiveText: strings.save()
     });
   }
 
@@ -227,11 +227,10 @@ export const useActions = ({
     close();
     await sleep(300);
     presentDialog({
-      title: "Rename color",
+      title: strings.renameColor(),
       input: true,
-      inputPlaceholder: "Enter name for this color",
+      inputPlaceholder: strings.name(),
       defaultValue: item.title,
-      paragraph: "You are renaming the color " + item.title,
       positivePress: async (value) => {
         if (!value || value.trim().length === 0) return;
         await db.colors.add({
@@ -242,7 +241,7 @@ export const useActions = ({
         eSendEvent(Navigation.routeNames.ColoredNotes);
         useMenuStore.getState().setColorNotes();
       },
-      positiveText: "Rename"
+      positiveText: strings.rename()
     });
   }
 
@@ -256,8 +255,8 @@ export const useActions = ({
       item.type === "color"
     ) {
       presentDialog({
-        title: `Delete ${item.type}`,
-        paragraph: `Are you sure you want to delete this ${item.type}?`,
+        title: strings.deleteItem(item.type),
+        paragraph: strings.deleteItemConfirmation(item.type),
         positivePress: async () => {
           if (item.type === "reminder") {
             await db.reminders.remove(item.id);
@@ -275,7 +274,7 @@ export const useActions = ({
             useRelationStore.getState().update();
           });
         },
-        positiveText: "Delete",
+        positiveText: strings.delete(),
         positiveType: "errorShade"
       });
       return;
@@ -287,8 +286,8 @@ export const useActions = ({
         novault: true,
         locked: true,
         item: item,
-        title: "Delete note",
-        description: "Unlock note to delete it."
+        title: strings.deleteNote(),
+        description: strings.unlockToDelete()
       });
     } else {
       try {
@@ -305,17 +304,17 @@ export const useActions = ({
     close();
     await sleep(300);
     presentDialog({
-      title: "Permanent delete",
-      paragraph: `Are you sure you want to delete this ${item.itemType} permanently from trash?`,
-      positiveText: "Delete",
-      negativeText: "Cancel",
+      title: strings.delete(),
+      paragraph: strings.deleteItemsConfirmation(item.itemType, 1),
+      positiveText: strings.delete(),
+      negativeText: strings.cancel(),
       positivePress: async () => {
         await db.trash.delete(item.id);
         setImmediate(() => {
           Navigation.queueRoutesForUpdate();
           useSelectionStore.getState().setSelectionMode(undefined);
           ToastManager.show({
-            heading: "Permanently deleted items",
+            heading: strings.itemDeleted(1, item.itemType),
             type: "success",
             context: "local"
           });
@@ -358,7 +357,7 @@ export const useActions = ({
   if (item.type === "tag") {
     actions.push({
       id: "rename-tag",
-      title: "Rename",
+      title: strings.rename(),
       icon: "square-edit-outline",
       func: renameTag
     });
@@ -367,14 +366,14 @@ export const useActions = ({
   if (item.type === "color") {
     actions.push({
       id: "rename-color",
-      title: "Rename",
+      title: strings.rename(),
       icon: "square-edit-outline",
       func: renameColor
     });
 
     actions.push({
       id: "reorder",
-      title: "Reorder",
+      title: strings.reorder(),
       icon: "sort-ascending",
       func: () => {
         useSideBarDraggingStore.setState({
@@ -389,7 +388,9 @@ export const useActions = ({
     actions.push(
       {
         id: "disable-reminder",
-        title: !item.disabled ? "Turn off reminder" : "Turn on reminder",
+        title: !item.disabled
+          ? strings.turnOffReminder()
+          : strings.turnOnReminder(),
         icon: !item.disabled ? "bell-off-outline" : "bell",
         func: async () => {
           close();
@@ -404,7 +405,7 @@ export const useActions = ({
       },
       {
         id: "edit-reminder",
-        title: "Edit reminder",
+        title: strings.editReminder(),
         icon: "pencil",
         func: async () => {
           ReminderSheet.present(item);
@@ -418,13 +419,13 @@ export const useActions = ({
     actions.push(
       {
         id: "restore",
-        title: "Restore " + item.itemType,
+        title: strings.restore(),
         icon: "delete-restore",
         func: restoreTrashItem
       },
       {
         id: "delete",
-        title: "Delete " + item.itemType,
+        title: strings.delete(),
         icon: "delete",
         func: deleteTrashItem
       }
@@ -434,7 +435,7 @@ export const useActions = ({
   if (item.type === "tag" || item.type === "notebook") {
     actions.push({
       id: "add-shortcut",
-      title: isPinnedToMenu ? "Remove Shortcut" : "Add Shortcut",
+      title: isPinnedToMenu ? strings.removeShortcut() : strings.addShortcut(),
       icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
       func: createMenuShortcut,
       close: false,
@@ -448,7 +449,7 @@ export const useActions = ({
     actions.push(
       {
         id: "add-notebook",
-        title: "Add notebook",
+        title: strings.addNotebook(),
         icon: "plus",
         func: async () => {
           AddNotebookSheet.present(undefined, item);
@@ -456,7 +457,7 @@ export const useActions = ({
       },
       {
         id: "edit-notebook",
-        title: "Edit notebook",
+        title: strings.editNotebook(),
         icon: "square-edit-outline",
         func: async () => {
           AddNotebookSheet.present(item);
@@ -465,7 +466,9 @@ export const useActions = ({
       {
         id: "default-notebook",
         title:
-          defaultNotebook === item.id ? "Remove as default" : "Set as default",
+          defaultNotebook === item.id
+            ? strings.removeAsDefault()
+            : strings.setAsDefault(),
         hidden: item.type !== "notebook",
         icon: "notebook",
         func: async () => {
@@ -485,7 +488,7 @@ export const useActions = ({
       },
       {
         id: "move-notes",
-        title: "Move notes",
+        title: strings.moveNotes(),
         hidden: item.type !== "notebook",
         icon: "text",
         func: () => {
@@ -494,7 +497,7 @@ export const useActions = ({
       },
       {
         id: "move-notebook",
-        title: "Move notebook",
+        title: strings.moveNotebookFix(),
         icon: "arrow-right-bold-box-outline",
         func: () => {
           MoveNotebookSheet.present([item]);
@@ -506,7 +509,7 @@ export const useActions = ({
   if (item.type === "notebook" || item.type === "note") {
     actions.push({
       id: "pin",
-      title: item.pinned ? "Unpin" : "Pin",
+      title: item.pinned ? strings.unpin() : strings.pin(),
       icon: item.pinned ? "pin-off-outline" : "pin-outline",
       func: pinItem,
       close: false,
@@ -593,9 +596,8 @@ export const useActions = ({
       }
       if (locked) {
         ToastManager.show({
-          heading: "Note is locked",
+          heading: strings.lockedNotesPinnedFailed(),
           type: "error",
-          message: "Locked notes cannot be pinned to notifications",
           context: "local"
         });
         return;
@@ -619,8 +621,7 @@ export const useActions = ({
       if (!checkItemSynced()) return;
       if (!user) {
         ToastManager.show({
-          heading: "Login required",
-          message: "Login to publish note",
+          heading: strings.loginRequired(),
           context: "local",
           func: () => {
             eSendEvent(eOpenLoginDialog);
@@ -632,15 +633,14 @@ export const useActions = ({
 
       if (!user?.isEmailConfirmed) {
         ToastManager.show({
-          heading: "Email is not verified",
-          message: "Please verify your email first.",
+          heading: strings.confirmEmailToPublish(),
           context: "local"
         });
         return;
       }
       if (locked) {
         ToastManager.show({
-          heading: "Locked notes cannot be published",
+          heading: strings.lockedNotesPublishFailed(),
           type: "error",
           context: "local"
         });
@@ -654,8 +654,7 @@ export const useActions = ({
 
       if (processingId.current === "shareNote") {
         ToastManager.show({
-          heading: "Please wait...",
-          message: "We are preparing your note for sharing",
+          heading: strings.pleaseWait() + "...",
           context: "local"
         });
         return;
@@ -669,15 +668,14 @@ export const useActions = ({
           novault: true,
           locked: true,
           share: true,
-          title: "Share note",
-          description: "Unlock note to share it."
+          title: strings.shareNote()
         });
       } else {
         processingId.current = "shareNote";
         const convertedText = await convertNoteToText(item);
         processingId.current = undefined;
         Share.open({
-          title: "Share note to",
+          title: strings.shareNote(),
           failOnCancel: false,
           message: convertedText || ""
         });
@@ -696,8 +694,7 @@ export const useActions = ({
           novault: true,
           locked: true,
           permanant: true,
-          title: "Unlock note",
-          description: "Remove note from the vault."
+          title: strings.unlockNote()
         });
         return;
       }
@@ -717,8 +714,7 @@ export const useActions = ({
             openVault({
               item: item,
               novault: false,
-              title: "Create vault",
-              description: "Set a password to create a vault and lock note."
+              title: strings.createVault()
             });
             break;
           case VAULT_ERRORS.vaultLocked:
@@ -726,8 +722,7 @@ export const useActions = ({
               item: item,
               novault: true,
               locked: true,
-              title: "Lock note",
-              description: "Give access to vault to lock this note."
+              title: strings.lockNote()
             });
             break;
         }
@@ -738,8 +733,7 @@ export const useActions = ({
       try {
         if (processingId.current === "copyContent") {
           ToastManager.show({
-            heading: "Please wait...",
-            message: "We are preparing your note for copy to clipboard",
+            heading: strings.pleaseWait() + "...",
             context: "local"
           });
           return;
@@ -753,8 +747,7 @@ export const useActions = ({
             novault: true,
             locked: true,
             item: item,
-            title: "Copy note",
-            description: "Unlock note to copy to clipboard."
+            title: strings.copyNote()
           });
         } else {
           processingId.current = "copyContent";
@@ -762,7 +755,7 @@ export const useActions = ({
           Clipboard.setString(text || "");
           processingId.current = undefined;
           ToastManager.show({
-            heading: "Note copied to clipboard",
+            heading: strings.noteCopied(),
             type: "success",
             context: "local"
           });
@@ -787,31 +780,31 @@ export const useActions = ({
       },
       {
         id: "remove-from-notebook",
-        title: "Remove from notebook",
+        title: strings.removeFromNotebook(),
         hidden: noteInCurrentNotebook,
         icon: "minus-circle-outline",
         func: removeNoteFromNotebook
       },
       {
         id: "attachments",
-        title: "Attachments",
+        title: strings.attachments(),
         icon: "attachment",
         func: showAttachments
       },
       {
         id: "history",
-        title: "History",
+        title: strings.history(),
         icon: "history",
         func: openHistory
       },
       {
         id: "copy-link",
-        title: "Copy link",
+        title: strings.copyLink(),
         icon: "link",
         func: () => {
           Clipboard.setString(createInternalLink("note", item.id));
           ToastManager.show({
-            heading: "Note link copied",
+            heading: strings.linkCopied(),
             message: createInternalLink("note", item.id),
             context: "local",
             type: "success"
@@ -820,17 +813,17 @@ export const useActions = ({
       },
       {
         id: "reminders",
-        title: "Reminders",
+        title: strings.dataTypesPluralCamelCase.reminder(),
         icon: "clock-outline",
         func: async () => {
           RelationsList.present({
             reference: item,
             referenceType: "reminder",
             relationType: "from",
-            title: "Reminders",
+            title: strings.dataTypesPluralCamelCase.reminder(),
             onAdd: () => ReminderSheet.present(undefined, item, true),
             button: {
-              title: "Add",
+              title: strings.add(),
               type: "accent",
               onPress: () => ReminderSheet.present(undefined, item, true),
               icon: "plus"
@@ -842,40 +835,40 @@ export const useActions = ({
 
       {
         id: "copy",
-        title: "Copy",
+        title: strings.copy(),
         icon: "content-copy",
         func: copyContent
       },
       {
         id: "share",
-        title: "Share",
+        title: strings.share(),
         icon: "share-variant",
         func: shareNote
       },
       {
         id: "read-only",
-        title: "Readonly",
+        title: strings.readOnly(),
         icon: "pencil-lock",
         func: toggleReadyOnlyMode,
         on: item.readonly
       },
       {
         id: "local-only",
-        title: "Sync off",
+        title: strings.syncOff(),
         icon: "sync-off",
         func: toggleLocalOnly,
         on: item.localOnly
       },
       {
         id: "duplicate",
-        title: "Duplicate",
+        title: strings.duplicate(),
         icon: "content-duplicate",
         func: duplicateNote
       },
 
       {
         id: "add-reminder",
-        title: "Remind me",
+        title: strings.remindMe(),
         icon: "clock-plus-outline",
         func: () => {
           ReminderSheet.present(undefined, { id: item.id, type: "note" });
@@ -884,14 +877,14 @@ export const useActions = ({
       },
       {
         id: "lock-unlock",
-        title: locked ? "Unlock" : "Lock",
+        title: locked ? strings.unlock() : strings.lock(),
         icon: locked ? "lock-open-outline" : "key-outline",
         func: addToVault,
         on: locked
       },
       {
         id: "publish",
-        title: isPublished ? "Published" : "Publish",
+        title: isPublished ? strings.published() : strings.publish(),
         icon: "cloud-upload-outline",
         on: isPublished,
         func: publishNote
@@ -899,7 +892,7 @@ export const useActions = ({
 
       {
         id: "export",
-        title: "Export",
+        title: strings.export(),
         icon: "export",
         func: exportNote
       },
@@ -907,8 +900,8 @@ export const useActions = ({
       {
         id: "pin-to-notifications",
         title: notifPinned
-          ? "Unpin from notifications"
-          : "Pin to notifications",
+          ? strings.unpinFromNotifications()
+          : strings.pinToNotifications(),
         icon: "message-badge-outline",
         on: !!notifPinned,
         func: pinToNotifications
@@ -916,19 +909,19 @@ export const useActions = ({
 
       {
         id: "notebooks",
-        title: "Link Notebooks",
+        title: strings.linkNotebooks(),
         icon: "book-outline",
         func: addTo
       },
       {
         id: "add-tag",
-        title: "Add tags",
+        title: strings.addTags(),
         icon: "pound",
         func: addTo
       },
       {
         id: "references",
-        title: "References",
+        title: strings.references(),
         icon: "vector-link",
         func: () => {
           ReferencesList.present({

@@ -19,8 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { Flex, Text } from "@theme-ui/components";
-import { ToolButton } from "./tool-button";
-import { useIsMobile } from "../stores/toolbar-store";
+import { ToolButton } from "./tool-button.js";
+import { useIsMobile } from "../stores/toolbar-store.js";
+import { strings } from "@notesnook/intl";
 
 export type CounterProps = {
   title: string;
@@ -47,11 +48,11 @@ function _Counter(props: CounterProps) {
         }
       }}
       onClick={disabled ? undefined : onReset}
-      title={disabled ? "" : `Click to reset ${title}`}
+      title={disabled ? "" : strings.clickToReset(title)}
     >
       <ToolButton
         toggled={false}
-        title={`Decrease ${title}`}
+        title={strings.decrease(title)}
         icon="minus"
         variant={"small"}
         disabled={disabled}
@@ -80,7 +81,7 @@ function _Counter(props: CounterProps) {
 
       <ToolButton
         toggled={false}
-        title={`Increase ${title}`}
+        title={strings.increase(title)}
         icon="plus"
         variant={"small"}
         disabled={disabled}

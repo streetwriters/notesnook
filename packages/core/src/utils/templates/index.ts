@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Note } from "../../types";
-import { buildHTML } from "./html";
-import { buildMarkdown, templateWithFrontmatter } from "./md";
-import { buildText } from "./text";
+import { Note } from "../../types.js";
+import { buildHTML } from "./html/index.js";
+import { buildMarkdown, templateWithFrontmatter } from "./md.js";
+import { buildText } from "./text.js";
 
 export type TemplateData = Omit<Note, "tags" | "color"> & {
   tags?: string[];

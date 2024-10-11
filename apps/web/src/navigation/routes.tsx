@@ -29,6 +29,7 @@ import { store as notestore } from "../stores/note-store";
 import Reminders from "../views/reminders";
 import { RouteResult, defineRoutes } from "./types";
 import { CREATE_BUTTON_MAP } from "../common";
+import { strings } from "@notesnook/intl";
 
 function defineRoute(route: RouteResult): RouteResult {
   return route;
@@ -39,12 +40,12 @@ const routes = defineRoutes({
     defineRoute({
       key: "home",
       type: "notes",
-      title: "Notes",
+      title: strings.routes.Notes(),
       component: AllNotes,
       buttons: {
         create: CREATE_BUTTON_MAP.notes,
         search: {
-          title: "Search notes"
+          title: strings.searchANote()
         }
       }
     }),
@@ -52,12 +53,12 @@ const routes = defineRoutes({
     defineRoute({
       key: "notebooks",
       type: "notebooks",
-      title: "Notebooks",
+      title: strings.routes.Notebooks(),
       component: Notebooks,
       buttons: {
         create: CREATE_BUTTON_MAP.notebooks,
         search: {
-          title: "Search notebooks"
+          title: strings.searchNotebooks()
         }
       }
     }),
@@ -77,11 +78,11 @@ const routes = defineRoutes({
       buttons: {
         create: CREATE_BUTTON_MAP.notes,
         back: {
-          title: "Go back to notebooks",
+          title: strings.goBackToNotebooks(),
           onClick: () => navigate("/notebooks")
         },
         search: {
-          title: `Search notes`
+          title: strings.searchANote()
         }
       }
     });
@@ -110,12 +111,12 @@ const routes = defineRoutes({
     notestore.setContext({ type: "favorite" });
     return defineRoute({
       key: "notes",
-      title: "Favorites",
+      title: strings.routes.Favorites(),
       type: "notes",
       component: Notes,
       buttons: {
         search: {
-          title: "Search favorite notes"
+          title: strings.searchANote()
         }
       }
     });
@@ -123,13 +124,13 @@ const routes = defineRoutes({
   "/reminders": () => {
     return defineRoute({
       key: "reminders",
-      title: "Reminders",
+      title: strings.routes.Reminders(),
       type: "reminders",
       component: Reminders,
       buttons: {
         create: CREATE_BUTTON_MAP.reminders,
         search: {
-          title: "Search reminders"
+          title: strings.searchInRoute("Reminders")
         }
       }
     });
@@ -138,24 +139,24 @@ const routes = defineRoutes({
     defineRoute({
       key: "trash",
       type: "trash",
-      title: "Trash",
+      title: strings.routes.Trash(),
       component: Trash,
       buttons: {
         search: {
-          title: "Search trash"
+          title: strings.searchInRoute("Trash")
         }
       }
     }),
   "/tags": () =>
     defineRoute({
       key: "tags",
-      title: "Tags",
+      title: strings.routes.Tags(),
       type: "tags",
       component: Tags,
       buttons: {
         create: CREATE_BUTTON_MAP.tags,
         search: {
-          title: "Search tags"
+          title: strings.searchInRoute("Tags")
         }
       }
     }),
@@ -173,11 +174,11 @@ const routes = defineRoutes({
       buttons: {
         create: CREATE_BUTTON_MAP.notes,
         back: {
-          title: "Go back to tags",
+          title: strings.goBackToTags(),
           onClick: () => navigate("/tags")
         },
         search: {
-          title: `Search notes`
+          title: strings.searchANote()
         }
       }
     });
@@ -196,7 +197,7 @@ const routes = defineRoutes({
       buttons: {
         create: CREATE_BUTTON_MAP.notes,
         search: {
-          title: `Search notes`
+          title: strings.searchANote()
         }
       }
     });
@@ -205,12 +206,12 @@ const routes = defineRoutes({
     notestore.setContext({ type: "monographs" });
     return defineRoute({
       key: "notes",
-      title: "Monographs",
+      title: strings.routes.Monographs(),
       type: "notes",
       component: Notes,
       buttons: {
         search: {
-          title: "Search monograph notes"
+          title: strings.searchInRoute("Monographs")
         }
       }
     });

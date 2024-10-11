@@ -28,6 +28,7 @@ import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useTrashStore } from "../../../stores/use-trash-store";
 import { presentDialog } from "../../dialog/functions";
 import SelectionWrapper, { selectItem } from "../selection-wrapper";
+import { strings } from "@notesnook/intl";
 
 export const openNotebook = (item: Notebook | BaseTrashItem<Notebook>) => {
   const isTrash = item.type === "trash";
@@ -36,16 +37,15 @@ export const openNotebook = (item: Notebook | BaseTrashItem<Notebook>) => {
 
   if (isTrash) {
     presentDialog({
-      title: `Restore notebook`,
-      paragraph: `Restore or delete notebook forever`,
-      positiveText: "Restore",
-      negativeText: "Delete",
+      title: strings.restoreNotebook(),
+      positiveText: strings.restore(),
+      negativeText: strings.delete(),
       positivePress: async () => {
         await db.trash.restore(item.id);
         Navigation.queueRoutesForUpdate();
         useSelectionStore.getState().setSelectionMode(undefined);
         ToastManager.show({
-          heading: "Restore successful",
+          heading: strings.notebookRestored(),
           type: "success"
         });
       },
@@ -54,7 +54,7 @@ export const openNotebook = (item: Notebook | BaseTrashItem<Notebook>) => {
         useTrashStore.getState().refresh();
         useSelectionStore.getState().setSelectionMode(undefined);
         ToastManager.show({
-          heading: "Permanently deleted items",
+          heading: strings.permanentlyDeletedNotebook(),
           type: "success",
           context: "local"
         });

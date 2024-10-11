@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { UnionCommands } from "@tiptap/core";
 import { useEffect } from "react";
-import { PermissionRequestEvent } from "../types";
+import { PermissionRequestEvent } from "../types.js";
 
 export type Claims = "premium";
 export type PermissionHandlerOptions = {

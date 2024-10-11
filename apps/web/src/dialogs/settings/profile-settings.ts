@@ -17,23 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useStore as useUserStore } from "../../stores/user-store";
-import { SettingsGroup } from "./types";
-import { showPasswordDialog } from "../../dialogs/password-dialog";
-import { db } from "../../common/db";
-import { showToast } from "../../utils/toast";
-import { UserProfile } from "./components/user-profile";
+import { strings } from "@notesnook/intl";
 import { createBackup, verifyAccount } from "../../common";
-import { EmailChangeDialog } from "../email-change-dialog";
+import { db } from "../../common/db";
+import { TaskManager } from "../../common/task-manager";
+import { showPasswordDialog } from "../../dialogs/password-dialog";
+import { useStore as useUserStore } from "../../stores/user-store";
+import { logger } from "../../utils/logger";
+import { showToast } from "../../utils/toast";
+import { AttachmentsDialog } from "../attachments-dialog";
 import {
   ConfirmDialog,
   showClearSessionsConfirmation,
   showLogoutConfirmation
 } from "../confirm";
-import { TaskManager } from "../../common/task-manager";
-import { AttachmentsDialog } from "../attachments-dialog";
+import { EmailChangeDialog } from "../email-change-dialog";
 import { RecoveryKeyDialog } from "../recovery-key-dialog";
-import { logger } from "../../utils/logger";
+import { UserProfile } from "./components/user-profile";
+import { SettingsGroup } from "./types";
 
 export const ProfileSettings: SettingsGroup[] = [
   {
@@ -46,14 +47,14 @@ export const ProfileSettings: SettingsGroup[] = [
     settings: [
       {
         key: "email",
-        title: "Email",
-        description: "Set a new email for your account",
-        keywords: ["change email", "new email"],
+        title: strings.changeEmail(),
+        description: strings.changeEmailDesc(),
+        keywords: [strings.changeEmail(), strings.newEmail()],
         isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
             type: "button",
-            title: "Change email",
+            title: strings.changeEmail(),
             variant: "secondary",
             action: () => EmailChangeDialog.show({})
           }
@@ -61,12 +62,12 @@ export const ProfileSettings: SettingsGroup[] = [
       },
       {
         key: "manage-attachments",
-        title: "Attachments",
-        description: "Manage all your attachments in one place.",
+        title: strings.attachments(),
+        description: strings.manageAttachments(),
         components: [
           {
             type: "button",
-            title: "Open manager",
+            title: strings.open(),
             variant: "secondary",
             action: () => AttachmentsDialog.show({})
           }
@@ -74,15 +75,14 @@ export const ProfileSettings: SettingsGroup[] = [
       },
       {
         key: "recovery-key",
-        title: "Recovery key",
-        description:
-          "In case you lose your password, this data recovery key is the only way to recovery your data.",
-        keywords: ["data recovery key", "lose your password", "backup"],
+        title: strings.saveDataRecoveryKey(),
+        description: strings.saveDataRecoveryKeyDesc(),
+        keywords: ["data recovery", "lost your password", "backup"],
         isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
             type: "button",
-            title: "Backup your recovery key",
+            title: strings.save(),
             variant: "secondary",
             action: async () => {
               if (await verifyAccount()) await RecoveryKeyDialog.show({});
@@ -92,23 +92,22 @@ export const ProfileSettings: SettingsGroup[] = [
       },
       {
         key: "account-removal",
-        title: "Account removal",
-        description:
-          "Permanently delete your account clearing all data including your notes, notebooks, and attachments.",
-        keywords: ["delete account", "clear data"],
+        title: strings.deleteAccount(),
+        description: strings.deleteAccountDesc(),
+        keywords: [strings.deleteAccount(), strings.clear()],
         isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
             type: "button",
             variant: "error",
-            title: "Delete account",
+            title: strings.deleteAccount(),
             action: () =>
               showPasswordDialog({
-                title: "Delete your account",
-                message: ` All your data will be permanently deleted with **no way of recovery**. Proceed with caution.`,
+                title: strings.deleteAccount(),
+                message: strings.deleteAccountDesc(),
                 inputs: {
                   password: {
-                    label: "Password",
+                    label: strings.password(),
                     autoComplete: "current-password"
                   }
                 },
@@ -122,10 +121,11 @@ export const ProfileSettings: SettingsGroup[] = [
       }
     ]
   },
+
   {
     key: "user-sessions",
     section: "profile",
-    header: "Sessions",
+    header: strings.sessions(),
     onStateChange(listener) {
       return useUserStore.subscribe((s) => s.isLoggedIn, listener);
     },
@@ -133,15 +133,14 @@ export const ProfileSettings: SettingsGroup[] = [
     settings: [
       {
         key: "logout",
-        title: "Logout",
-        description:
-          "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.",
+        title: strings.logout(),
+        description: strings.logoutDesc(),
         keywords: [],
         components: [
           {
             type: "button",
             variant: "errorSecondary",
-            title: "Logout",
+            title: strings.logout(),
             action: async () => {
               const result = await showLogoutConfirmation();
               if (!result) return;
@@ -153,11 +152,10 @@ export const ProfileSettings: SettingsGroup[] = [
                   logger.error(e, "Failed to take backup before logout");
                   if (
                     !(await ConfirmDialog.show({
-                      title: "Failed to take backup",
-                      message:
-                        "Failed to take backup of your data. Do you want to continue logging out?",
-                      negativeButtonText: "No",
-                      positiveButtonText: "Yes"
+                      title: strings.failedToTakeBackup(),
+                      message: strings.failedToTakeBackupMessage(),
+                      negativeButtonText: strings.no(),
+                      positiveButtonText: strings.yes()
                     }))
                   )
                     return;
@@ -166,33 +164,30 @@ export const ProfileSettings: SettingsGroup[] = [
 
               await TaskManager.startTask({
                 type: "modal",
-                title: "You are being logged out",
-                subtitle: "Please wait...",
+                title: strings.loggingOut(),
+                subtitle: strings.pleaseWait(),
                 action: () => db.user.logout(true)
               });
-              showToast("success", "You have been logged out.");
+              showToast("success", strings.loggedOut());
             }
           }
         ]
       },
       {
         key: "logout-all-sessions",
-        title: "Log out from all other devices",
-        description: "Force logout from all your other logged in devices.",
-        keywords: ["clear sessions"],
+        title: strings.logoutAllOtherDevices(),
+        description: strings.logoutAllOtherDevicesDescription(),
+        keywords: [strings.clearSessions()],
         components: [
           {
             type: "button",
             variant: "errorSecondary",
-            title: "Log out all other devices",
+            title: strings.logoutAllOtherDevices(),
             action: async () => {
               if (!(await showClearSessionsConfirmation())) return;
 
               await db.user.clearSessions();
-              showToast(
-                "success",
-                "You have been logged out from all other devices."
-              );
+              showToast("success", strings.loggedOutAllOtherDevices());
             }
           }
         ]

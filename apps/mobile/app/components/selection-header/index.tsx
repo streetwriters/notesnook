@@ -46,6 +46,7 @@ import { MoveNotebookSheet } from "../sheets/move-notebook";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
+import { strings } from "@notesnook/intl";
 
 export const SelectionHeader = React.memo(
   ({
@@ -94,21 +95,20 @@ export const SelectionHeader = React.memo(
 
       clearSelection();
       ToastManager.show({
-        heading: "Restore successful",
+        heading: strings.restored(),
         type: "success"
       });
     };
 
     const deleteItem = async () => {
       presentDialog({
-        title: `Delete ${selectedItemsList.length > 1 ? "items" : "item"}`,
-        paragraph: `Are you sure you want to delete ${
-          selectedItemsList.length > 1
-            ? "these items permanently?"
-            : "this item permanently?"
-        }`,
-        positiveText: "Delete",
-        negativeText: "Cancel",
+        title: strings.deleteItems(type as string, selectedItemsList.length),
+        paragraph: strings.deleteItemsConfirmation(
+          type as string,
+          selectedItemsList.length
+        ),
+        positiveText: strings.delete(),
+        negativeText: strings.cancel(),
         positivePress: async () => {
           if (!selectedItemsList.length) return;
           await db.trash.delete(...selectedItemsList);
@@ -236,10 +236,7 @@ export const SelectionHeader = React.memo(
             >
               {[
                 {
-                  title:
-                    selectedItemsList.length > 1
-                      ? "Move notebooks"
-                      : "Move notebook",
+                  title: strings.move(),
                   onPress: async () => {
                     const ids = selectedItemsList;
                     const notebooks = await db.notebooks.all.items(ids);
@@ -249,7 +246,7 @@ export const SelectionHeader = React.memo(
                   icon: "arrow-right-bold-box-outline"
                 },
                 {
-                  title: "Manage tags",
+                  title: strings.manageTags(),
                   onPress: async () => {
                     await sleep(100);
                     ManageTagsSheet.present(selectedItemsList);
@@ -258,7 +255,7 @@ export const SelectionHeader = React.memo(
                   icon: "pound"
                 },
                 {
-                  title: "Export",
+                  title: strings.export(),
                   onPress: async () => {
                     await sleep(100);
                     ExportNotesSheet.present(selectedItemsList);
@@ -267,7 +264,7 @@ export const SelectionHeader = React.memo(
                   icon: "export"
                 },
                 {
-                  title: "Link notebook",
+                  title: strings.linkNotebook(),
                   onPress: async () => {
                     await sleep(100);
                     MoveNoteSheet.present();
@@ -276,7 +273,7 @@ export const SelectionHeader = React.memo(
                   icon: "plus"
                 },
                 {
-                  title: "Unlink notebook",
+                  title: strings.unlinkNotebook(),
                   onPress: async () => {
                     if (!id) return;
                     await db.notes.removeFromNotebook(id, ...selectedItemsList);
@@ -288,13 +285,13 @@ export const SelectionHeader = React.memo(
                   icon: "minus"
                 },
                 {
-                  title: "Unfavorite",
+                  title: strings.unfavorite(),
                   onPress: addToFavorite,
                   visible: focusedRouteId === "Favorites",
                   icon: "star-off"
                 },
                 {
-                  title: `Move to trash`,
+                  title: strings.moveToTrash(),
                   onPress: async () => {
                     deleteItems(
                       undefined,
@@ -308,13 +305,13 @@ export const SelectionHeader = React.memo(
                   icon: "delete"
                 },
                 {
-                  title: `Restore`,
+                  title: strings.restore(),
                   onPress: restoreItem,
                   visible: type === "trash",
                   icon: "delete-restore"
                 },
                 {
-                  title: `Delete`,
+                  title: strings.delete(),
                   onPress: deleteItem,
                   visible: type === "trash",
                   icon: "delete"

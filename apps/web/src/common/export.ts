@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { TaskManager } from "./task-manager";
 import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
-import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
+import { FilteredSelector } from "@notesnook/core";
 import { Note } from "@notesnook/core";
 import { fromAsyncIterator } from "../utils/stream";
 import {
@@ -33,6 +33,10 @@ import Vault from "./vault";
 import { ExportStream } from "../utils/streams/export-stream";
 import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "../dialogs/confirm";
+import { db } from "./db";
+import { toAsyncIterator } from "@notesnook-importer/core/dist/src/utils/stream";
+import { saveAs } from "file-saver";
+import { strings } from "@notesnook/intl";
 
 export async function exportToPDF(
   title: string,
@@ -83,8 +87,8 @@ export async function exportNotes(
 ): Promise<boolean> {
   const result = await TaskManager.startTask({
     type: "modal",
-    title: "Exporting notes",
-    subtitle: "Please wait while your notes are exported.",
+    title: strings.exportingNotes(),
+    subtitle: strings.exportingNotesDesc(),
     action: async (report) => {
       const errors: Error[] = [];
       const exportStream = new ExportStream(report, (e) => errors.push(e));
@@ -104,7 +108,7 @@ export async function exportNotes(
     ConfirmDialog.show({
       title: `Export failed`,
       message: result.stack || result.message,
-      positiveButtonText: "Okay"
+      positiveButtonText: strings.okay()
     });
     return false;
   } else {
@@ -116,7 +120,7 @@ export async function exportNotes(
 
 ${result.errors.map((e, i) => `${i + 1}. ${e.message}`).join("\n")}`
           : "Export completed with 0 errors.",
-      positiveButtonText: "Okay"
+      positiveButtonText: strings.okay()
     });
     return true;
   }
@@ -148,24 +152,40 @@ export async function exportNote(
 
   return await TaskManager.startTask({
     type: "modal",
-    title: `Exporting "${note.title}"`,
-    subtitle: "Please wait while your note is exported.",
+    title: strings.exportingNote(note.title),
+    subtitle: strings.exportingNoteDesc(),
     action: async (report) => {
-      await fromAsyncIterator(
+      const hasAttachments =
+        (await db.relations.from(note, "attachment").count()) > 0;
+      const stream = fromAsyncIterator(
         _exportNote(note, {
           format: options.format,
           unlockVault: Vault.unlockVault
         })
-      )
-        .pipeThrough(
-          new ExportStream(report, (e) => showToast("error", e.message))
-        )
-        .pipeThrough(createZipStream())
-        .pipeTo(
-          await createWriteStream(
-            `${sanitizeFilename(note.title, { replacement: "-" })}.zip`
-          )
-        );
+      ).pipeThrough(
+        new ExportStream(report, (e) => {
+          console.error(e);
+          showToast("error", e.message);
+        })
+      );
+
+      if (hasAttachments) {
+        await stream
+          .pipeThrough(createZipStream())
+          .pipeTo(
+            await createWriteStream(
+              `${sanitizeFilename(note.title, { replacement: "-" })}.zip`
+            )
+          );
+      } else {
+        for await (const file of toAsyncIterator(stream)) {
+          if (typeof file.data === "string")
+            saveAs(new Blob([Buffer.from(file.data, "utf-8")]), file.path);
+          else if (file.data instanceof Uint8Array)
+            saveAs(new Blob([file.data]), file.path);
+          else await file.data.pipeTo(await createWriteStream(file.path));
+        }
+      }
       return true;
     }
   });

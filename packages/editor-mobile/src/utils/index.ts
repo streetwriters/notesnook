@@ -54,6 +54,8 @@ export type Settings = {
 
 /* eslint-disable no-var */
 declare global {
+  var LINGUI_LOCALE: string;
+  var LINGUI_LOCALE_DATA: { [name: string]: any };
   var pendingResolvers: {
     [key: string]: (value: any) => void;
   };

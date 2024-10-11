@@ -25,18 +25,18 @@ import { db } from "../../common/db";
 import Config from "../../utils/config";
 import { showToast } from "../../utils/toast";
 import { PromptDialog } from "../prompt";
+import { strings } from "@notesnook/intl";
 
 export const PrivacySettings: SettingsGroup[] = [
   {
     key: "general",
     section: "privacy",
-    header: "General",
+    header: strings.general(),
     settings: [
       {
         key: "marketing",
-        title: "Marketing emails",
-        description:
-          "We send you occasional promotional offers & product updates on your email (once every month).",
+        title: strings.marketingEmails(),
+        description: strings.marketingEmailsDesc(),
         onStateChange: (listener) =>
           useUserStore.subscribe((s) => s.user?.marketingConsent, listener),
         isHidden: () => !useUserStore.getState().isLoggedIn,
@@ -55,8 +55,8 @@ export const PrivacySettings: SettingsGroup[] = [
       },
       {
         key: "hide-note-title",
-        title: "Hide note title",
-        description: "Prevent note title from appearing in tab/window title.",
+        title: strings.hideNoteTitle(),
+        description: strings.hideNoteTitleDescription(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.hideNoteTitle, listener),
         components: [
@@ -69,9 +69,8 @@ export const PrivacySettings: SettingsGroup[] = [
       },
       {
         key: "privacy-mode",
-        title: "Privacy mode",
-        description:
-          "Prevent Notesnook app from being captured by any screen capturing software like TeamViewer & AnyDesk.",
+        title: strings.privacyMode(),
+        description: strings.privacyModeDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.privacyMode, listener),
         isHidden: () => !IS_DESKTOP_APP || getPlatform() === "linux",
@@ -88,17 +87,12 @@ export const PrivacySettings: SettingsGroup[] = [
   {
     key: "advanced",
     section: "privacy",
-    header: "Advanced",
+    header: strings.advanced(),
     settings: [
       {
         key: "custom-dns",
-        title: "Use custom DNS",
-        description: `Notesnook uses the following DNS providers:
-
-1. Cloudflare DNS
-2. Quad9
-
-This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this if you want the app to use system's DNS settings.`,
+        title: strings.useCustomDns(),
+        description: strings.customDnsDescription(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.customDns, listener),
         isHidden: () => !IS_DESKTOP_APP,
@@ -112,18 +106,16 @@ This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this
       },
       {
         key: "custom-cors",
-        title: "Custom CORS proxy",
-        description:
-          "CORS proxy is required to directly download images from within the Notesnook app. It allows Notesnook to bypass browser restrictions by using a proxy. You can set a custom self-hosted proxy URL to increase your privacy.",
+        title: strings.corsBypass(),
+        description: strings.corsBypassDesc(),
         components: [
           {
             type: "button",
-            title: "Change proxy",
+            title: strings.changeProxy(),
             action: async () => {
               const result = await PromptDialog.show({
-                title: "CORS bypass proxy",
-                description:
-                  "You can set a custom proxy URL to increase your privacy.",
+                title: strings.corsBypass(),
+                description: strings.corsBypassDesc(),
                 defaultValue: Config.get(
                   "corsProxy",
                   "https://cors.notesnook.com"
@@ -135,7 +127,7 @@ This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this
                 Config.set("corsProxy", `${url.protocol}//${url.hostname}`);
               } catch (e) {
                 console.error(e);
-                showToast("error", "Invalid CORS proxy url.");
+                showToast("error", strings.invalidCors());
               }
             },
             variant: "secondary"
@@ -144,15 +136,8 @@ This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this
       },
       {
         key: "proxy-config",
-        title: "Proxy",
-        description: `Setup an HTTP/HTTPS/SOCKS proxy.
-        
-For example:
-http://foobar:80
-socks4://proxy.example.com
-http://username:password@foobar:80
-
-To remove the proxy, simply erase everything in the input.`,
+        title: strings.proxy(),
+        description: strings.proxyDescription(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.proxyRules, listener),
         components: [

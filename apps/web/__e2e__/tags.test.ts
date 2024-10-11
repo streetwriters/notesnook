@@ -35,6 +35,21 @@ test("create a tag", async ({ page }) => {
   expect(tag).toBeDefined();
 });
 
+test("creating a tag with name of an existing tag should give an error", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const tags = await app.goToTags();
+  await tags.createItem(TAG);
+
+  await tags.createItem(TAG);
+
+  expect(
+    await app.toasts.waitForToast("Tag with this title already exists.")
+  ).toBe(true);
+});
+
 test("create a note inside a tag", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
@@ -205,4 +220,24 @@ test(`sort tags`, async ({ page }, info) => {
       }
     }
   }
+});
+
+test("creating more than 5 tags shouldn't be possible on basic plan", async ({
+  page
+}) => {
+  await page.exposeBinding("isBasic", () => true);
+  const app = new AppModel(page);
+  await app.goto();
+  const tags = await app.goToTags();
+  for (const tag of ["tag1", "tag2", "tag3", "tag4", "tag5"]) {
+    await tags.createItem({ title: tag });
+  }
+
+  const result = await Promise.race([
+    tags.createItem({ title: "tag6" }),
+    app.toasts.waitForToast(
+      "Please upgrade your account to Pro to add more tags."
+    )
+  ]);
+  expect(result).toBe(true);
 });

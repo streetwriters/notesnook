@@ -16,12 +16,21 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { SchemeColors, SchemeColorsAsCSSVariables } from "./theme-engine/types";
+import {
+  SchemeColors,
+  SchemeColorsAsCSSVariables,
+  ThemeDefinition
+} from "./theme-engine/types.js";
 
-export * from "./theme";
-export * from "./theme-engine";
-export * from "./theme-engine/types";
-export * from "./emotion";
+export * from "./theme/index.js";
+export * from "./theme-engine/index.js";
+export * from "./theme-engine/types.js";
+export * from "./emotion/index.js";
+
+declare global {
+  // eslint-disable-next-line no-var
+  var DEFAULT_THEME: ThemeDefinition | undefined;
+}
 
 declare module "csstype" {
   interface Properties {

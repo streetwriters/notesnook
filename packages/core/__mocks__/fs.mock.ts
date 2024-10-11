@@ -22,7 +22,7 @@ import {
   FileEncryptionMetadataWithOutputType,
   IFileStorage,
   RequestOptions
-} from "../src/interfaces";
+} from "../src/interfaces.js";
 import { xxhash64 } from "hash-wasm";
 import { IDataType } from "hash-wasm/dist/lib/util";
 

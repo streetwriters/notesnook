@@ -17,9 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Color, Item, Reminder, Notebook, Tag } from "@notesnook/core";
-import { database as db } from "../database";
-import { getUpcomingReminder } from "@notesnook/core/dist/collections/reminders";
+import {
+  Color,
+  Item,
+  Reminder,
+  Notebook,
+  Tag,
+  getUpcomingReminder
+} from "@notesnook/core";
+import { database as db } from "../database.js";
 
 type WithDateEdited<T> = { items: T[]; dateEdited: number };
 export type NotebooksWithDateEdited = WithDateEdited<Notebook>;

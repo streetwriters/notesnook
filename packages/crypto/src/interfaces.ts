@@ -25,7 +25,7 @@ import {
   Chunk,
   Output,
   Input
-} from "./types";
+} from "./types.js";
 
 export interface IStreamable {
   read(): Promise<Chunk | undefined>;

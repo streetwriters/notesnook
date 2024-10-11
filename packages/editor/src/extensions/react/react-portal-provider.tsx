@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FunctionComponent, PropsWithChildren } from "react";
 import { flushSync } from "react-dom";
-import { EventDispatcher } from "./event-dispatcher";
+import { EventDispatcher } from "./event-dispatcher.js";
 import { Root, createRoot } from "react-dom/client";
 
 export type BasePortalProviderProps = PropsWithChildren<unknown>;
@@ -44,9 +44,11 @@ export class PortalProviderAPI extends EventDispatcher<Portals> {
   }
 
   render(Component: FunctionComponent, container: HTMLElement) {
-    const root = this.roots.get(container) || createRoot(container);
-    flushSync(() => root.render(<Component />));
-    this.roots.set(container, root);
+    queueMicrotask(() => {
+      const root = this.roots.get(container) || createRoot(container);
+      flushSync(() => root.render(<Component />));
+      this.roots.set(container, root);
+    });
   }
 
   remove(container: HTMLElement) {

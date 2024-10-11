@@ -22,8 +22,8 @@ import {
   extractInternalLinks,
   highlightInternalLinks,
   ellipsize
-} from "../content-block";
-import { ContentBlock } from "../../types";
+} from "../content-block.js";
+import { ContentBlock } from "../../types.js";
 
 describe("ContentBlock Utils", () => {
   describe("extractInternalLinks", () => {

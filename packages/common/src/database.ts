@@ -17,6 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Database from "@notesnook/core/dist/api/index";
+import { Database } from "@notesnook/core";
 
 export const database = new Database();

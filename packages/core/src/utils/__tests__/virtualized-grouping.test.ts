@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { test } from "vitest";
-import { VirtualizedGrouping } from "../virtualized-grouping";
-import { groupArray } from "../grouping";
+import { VirtualizedGrouping } from "../virtualized-grouping.js";
+import { groupArray } from "../grouping.js";
 
 function generateItems(length: number, groupSize: number) {
   const items: { group: string; id: string }[] = [];

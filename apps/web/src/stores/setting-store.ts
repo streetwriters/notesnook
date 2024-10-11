@@ -25,7 +25,7 @@ import Config from "../utils/config";
 import BaseStore from "./index";
 import { useEditorStore } from "./editor-store";
 import { setDocumentTitle } from "../utils/dom";
-import { TimeFormat } from "@notesnook/core/dist/utils/date";
+import { TimeFormat } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 
 export const HostIds = ["API_HOST", "AUTH_HOST", "SSE_HOST"] as const;
@@ -169,10 +169,11 @@ class SettingStore extends BaseStore<SettingStore> {
   };
 
   toggleMarkdownShortcuts = (toggleState?: boolean) => {
+    const markdownShortcuts = this.get().markdownShortcuts;
     this.set((state) => {
       state.markdownShortcuts = toggleState ?? !state.markdownShortcuts;
-      Config.set("markdownShortcuts", state.markdownShortcuts);
     });
+    Config.set("markdownShortcuts", !markdownShortcuts);
   };
 
   togglePrivacyMode = async () => {

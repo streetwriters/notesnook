@@ -71,7 +71,9 @@
     "@ammarahmed/react-native-background-fetch": "^4.2.2",
     "react-native-image-crop-picker": "^0.40.2",
     "react-native-url-polyfill": "^2.0.0",
-    "react-native-screenguard": "^1.0.0"
+    "react-native-screenguard": "^1.0.0",
+    "@formatjs/intl-locale": "4.0.0",
+    "@formatjs/intl-pluralrules": "5.2.14"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
@@ -118,6 +120,7 @@
     "terser-webpack-plugin": "^5.3.5",
     "ts-jest": "^29.1.1",
     "webpack-cli": "^5.1.4",
-    "webpack": "^5.88.2"
+    "webpack": "^5.88.2",
+    "metro-react-native-babel-preset": "0.77.0"
   }
 }

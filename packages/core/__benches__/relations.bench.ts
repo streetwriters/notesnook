@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { bench, describe } from "vitest";
-import { databaseTest } from "../__tests__/utils";
+import { describe } from "vitest";
+import { databaseTest } from "../__tests__/utils/index.js";
 
 describe("relations", async () => {
   const db = await databaseTest();

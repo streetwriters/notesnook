@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EVENTS } from "@notesnook/core/dist/common";
+import { EVENTS } from "@notesnook/core";
 import { Text } from "@theme-ui/components";
 import { useCallback, useEffect, useState } from "react";
 import { createBackup } from "../common";
@@ -26,6 +26,7 @@ import { TaskManager } from "../common/task-manager";
 import Dialog from "../components/dialog";
 import { ErrorText } from "../components/error-text";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type MigrationProgressEvent = {
   collection: string;
@@ -47,14 +48,14 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
 
     await TaskManager.startTask({
       type: "modal",
-      title: `Applying changes...`,
-      subtitle: "This might take while.",
+      title: strings.applyingChanges(),
+      subtitle: strings.thisMayTakeAWhile(),
       action: async (task) => {
         db.eventManager.subscribe(
           EVENTS.migrationProgress,
           ({ collection, total, current }: MigrationProgressEvent) => {
             task({
-              text: `Processing ${collection}...`,
+              text: `${strings.processing()} ${collection}...`,
               current,
               total
             });
@@ -85,10 +86,10 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
     return (
       <Dialog
         isOpen={true}
-        title={"There was an error"}
+        title={strings.migrationFailed()}
         description={""}
         positiveButton={{
-          text: "Try again",
+          text: strings.tryAgain(),
           onClick: startMigration
         }}
       >
@@ -102,9 +103,9 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
           }}
         />
         <Text as="p" variant={"subBody"} sx={{ mt: 2 }}>
-          If this continues to happen, please reach out to us via{" "}
-          <a href="https://discord.com/invite/zQBK97EE22">Discord</a> or email
-          us at{" "}
+          {strings.migrationErrorNotice()[0]}{" "}
+          <a href="https://discord.com/invite/zQBK97EE22">Discord</a>{" "}
+          {strings.migrationErrorNotice()[1]}{" "}
           <a href="mailto:support@streetwriters.co">support@streetwriters.co</a>
         </Text>
       </Dialog>
@@ -117,17 +118,15 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
     <Dialog
       width={500}
       isOpen={true}
-      title={"Save a backup of your notes"}
+      title={strings.migrationSaveBackup()}
       description={""}
       positiveButton={{
-        text: "Save & continue",
+        text: strings.saveAndContinue(),
         onClick: startMigration
       }}
     >
       <Text as="p" variant={"body"}>
-        {
-          "Thank you for updating Notesnook! We'll be applying some minor changes for a better note taking experience."
-        }
+        {strings.migrationSaveBackupDesc()}
       </Text>
     </Dialog>
   );

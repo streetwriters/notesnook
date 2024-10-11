@@ -40,6 +40,7 @@ import { MoveNotes } from "../move-notes/movenote";
 import { eOnNotebookUpdated } from "../../../utils/events";
 import { getParentNotebookId } from "../../../utils/notebooks";
 import { useNotebookStore } from "../../../stores/use-notebook-store";
+import { strings } from "@notesnook/intl";
 
 export const AddNotebookSheet = ({
   notebook,
@@ -62,17 +63,17 @@ export const AddNotebookSheet = ({
 
   const onSaveChanges = async () => {
     if (loading) return;
-    setLoading(true);
 
     if (!title.current || title?.current.trim().length === 0) {
       ToastManager.show({
-        heading: "Notebook title is required",
+        heading: strings.enterNotebookTitle(),
         type: "error",
         context: "local"
       });
-      setLoading(false);
       return;
     }
+
+    setLoading(true);
 
     const id = await db.notebooks.add({
       title: title.current,
@@ -119,7 +120,7 @@ export const AddNotebookSheet = ({
       }}
     >
       <Heading size={SIZE.lg}>
-        {notebook ? "Edit Notebook" : "New Notebook"}
+        {notebook ? strings.editNotebook() : strings.newNotebook()}
       </Heading>
 
       <Seperator />
@@ -135,7 +136,7 @@ export const AddNotebookSheet = ({
             titleInput?.current?.focus();
           });
         }}
-        placeholder="Enter notebook title"
+        placeholder={strings.enterNotebookTitle()}
         onSubmit={() => {
           descriptionInput.current?.focus();
         }}
@@ -150,14 +151,14 @@ export const AddNotebookSheet = ({
         onChangeText={(value) => {
           description.current = value;
         }}
-        placeholder="Enter notebook description"
-        returnKeyLabel="Next"
+        placeholder={strings.enterNotebookDescription()}
+        returnKeyLabel={strings.next()}
         returnKeyType="next"
         defaultValue={notebook ? notebook.description : ""}
       />
 
       <Button
-        title={notebook ? "Save" : "Add"}
+        title={notebook ? strings.save() : strings.add()}
         type="accent"
         height={45}
         fontSize={SIZE.md}

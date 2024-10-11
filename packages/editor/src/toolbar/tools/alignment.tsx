@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolProps } from "../types";
-import { ToolButton } from "../components/tool-button";
-import { useRefValue } from "../../hooks/use-ref-value";
-import { IconNames } from "../icons";
-import { CodeBlock } from "../../extensions/code-block";
+import { ToolProps } from "../types.js";
+import { ToolButton } from "../components/tool-button.js";
+import { useRefValue } from "../../hooks/use-ref-value.js";
+import { IconNames } from "../icons.js";
+import { CodeBlock } from "../../extensions/code-block/index.js";
 
 type Alignment = "left" | "right" | "center" | "justify";
 type AlignmentToolProps = ToolProps & {

@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Node, mergeAttributes, findChildren } from "@tiptap/core";
 import { Attribute } from "@tiptap/core";
-import { createNodeView } from "../react";
-import { AttachmentComponent } from "./component";
-import { Attachment } from "./types";
+import { createNodeView } from "../react/index.js";
+import { AttachmentComponent } from "./component.js";
+import { Attachment } from "./types.js";
 
 export type AttachmentType = "image" | "file" | "camera";
 export interface AttachmentOptions {

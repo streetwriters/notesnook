@@ -30,6 +30,8 @@ import filesystem from "../../common/filesystem";
 import downloadAttachment from "../../common/filesystem/download-attachment";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import picker from "../../screens/editor/tiptap/picker";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
+import { editorController } from "../../screens/editor/tiptap/utils";
 import {
   ToastManager,
   eSendEvent,
@@ -49,14 +51,13 @@ import { Dialog } from "../dialog";
 import { presentDialog } from "../dialog/functions";
 import { openNote } from "../list-items/note/wrapper";
 import { DateMeta } from "../properties/date-meta";
+import SheetProvider from "../sheet-provider";
 import { Button } from "../ui/button";
 import { Notice } from "../ui/notice";
 import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
-import { editorController } from "../../screens/editor/tiptap/utils";
-import SheetProvider from "../sheet-provider";
+import { strings } from "@notesnook/intl";
 
 const Actions = ({
   attachment,
@@ -81,23 +82,23 @@ const Actions = ({
 
   const actions = [
     {
-      name: "Download",
+      name: strings.network.download(),
       onPress: async () => {
         if (currentProgress) {
           await db.fs().cancel(attachment.hash);
           useAttachmentStore.getState().remove(attachment.hash);
         }
         downloadAttachment(attachment.hash, false);
-        eSendEvent(eCloseSheet, contextId);
+        fwdRef.current?.hide();
       },
       icon: "download"
     },
     {
-      name: "Reupload",
+      name: strings.network.reupload(),
       onPress: async () => {
         if (!PremiumService.get()) {
           ToastManager.show({
-            heading: "Upgrade to pro",
+            heading: strings.upgradeToPro(),
             type: "error",
             context: "local"
           });
@@ -113,10 +114,10 @@ const Actions = ({
       icon: "upload"
     },
     {
-      name: "Run file check",
+      name: strings.fileCheck(),
       onPress: async () => {
         setLoading({
-          name: "Run file check"
+          name: strings.fileCheck()
         });
         const result = await filesystem.checkAttachment(attachment.hash);
         if (!result) return;
@@ -125,7 +126,7 @@ const Actions = ({
           db.attachments.markAsFailed(attachment.id, result.failed);
           setFailed(result.failed);
           ToastManager.show({
-            heading: "File check failed with error: " + result.failed,
+            heading: strings.fileCheckFailed(result.failed),
             type: "error",
             context: "local"
           });
@@ -134,7 +135,7 @@ const Actions = ({
           db.attachments.markAsFailed(attachment.id);
           eSendEvent(eDBItemUpdate, attachment.id);
           ToastManager.show({
-            heading: "File check passed",
+            heading: strings.fileCheckPassed(),
             type: "success",
             context: "local"
           });
@@ -148,13 +149,11 @@ const Actions = ({
       icon: "file-check"
     },
     {
-      name: "Rename",
+      name: strings.rename(),
       onPress: () => {
         presentDialog({
-          context: contextId as any,
           input: true,
-          title: "Rename file",
-          paragraph: "Enter a new name for the file",
+          title: strings.renameFile(),
           defaultValue: attachment.filename,
           positivePress: async (value) => {
             if (value && value.length > 0) {
@@ -167,13 +166,13 @@ const Actions = ({
               eSendEvent(eDBItemUpdate, attachment.id);
             }
           },
-          positiveText: "Rename"
+          positiveText: strings.rename()
         });
       },
       icon: "form-textbox"
     },
     {
-      name: "Delete",
+      name: strings.delete(),
       onPress: async () => {
         const relations = await db.relations.to(attachment, "note").get();
         await db.attachments.remove(attachment.hash, false);
@@ -219,6 +218,7 @@ const Actions = ({
       style={{
         maxHeight: "100%"
       }}
+      keyboardShouldPersistTaps="never"
     >
       <Dialog context={contextId} />
       <SheetProvider context={contextId} />
@@ -256,8 +256,7 @@ const Actions = ({
 
           {notes.length ? (
             <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
-              {notes.length} note
-              {notes.length > 1 ? "s" : ""}
+              {strings.notes(notes.length)}
             </Paragraph>
           ) : null}
           <Paragraph
@@ -265,7 +264,7 @@ const Actions = ({
               Clipboard.setString(attachment.hash);
               ToastManager.show({
                 type: "success",
-                heading: "Attachment hash copied",
+                heading: strings.hashCopied(),
                 context: "local"
               });
             }}
@@ -295,7 +294,7 @@ const Actions = ({
               }}
               size={SIZE.sm}
             >
-              List of notes:
+              {strings.listOf()} {strings.dataTypesPlural.note()}:
             </Heading>
 
             {notes.map((item) => (
@@ -354,7 +353,7 @@ const Actions = ({
         {failed ? (
           <Notice
             type="alert"
-            text={`File check failed: ${failed} Try reuploading the file to fix the issue.`}
+            text={strings.fileCheckFailed(failed)}
             size="small"
           />
         ) : null}

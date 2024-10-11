@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getId } from "../utils/id";
-import Database from "../api";
-import { Notebook, TrashOrItem, isTrashItem } from "../types";
-import { ICollection } from "./collection";
-import { SQLCollection } from "../database/sql-collection";
-import { isFalse } from "../database";
+import { getId } from "../utils/id.js";
+import Database from "../api/index.js";
+import { Notebook, TrashOrItem, isTrashItem } from "../types.js";
+import { ICollection } from "./collection.js";
+import { SQLCollection } from "../database/sql-collection.js";
+import { isFalse } from "../database/index.js";
 import { sql } from "@streetwriters/kysely";
-import { deleteItems } from "../utils/array";
-import { CHECK_IDS, checkIsUserPremium } from "../common";
+import { deleteItems } from "../utils/array.js";
+import { CHECK_IDS, checkIsUserPremium } from "../common.js";
 
 export class Notebooks implements ICollection {
   name = "notebooks";

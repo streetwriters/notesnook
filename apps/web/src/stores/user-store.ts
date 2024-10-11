@@ -21,7 +21,7 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 import config from "../utils/config";
-import { EV, EVENTS } from "@notesnook/core/dist/common";
+import { EV, EVENTS } from "@notesnook/core";
 import Config from "../utils/config";
 import { hashNavigate } from "../navigation";
 import { isUserPremium } from "../hooks/use-is-user-premium";
@@ -29,6 +29,7 @@ import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { AuthenticatorType, User } from "@notesnook/core";
 import { ConfirmDialog } from "../dialogs/confirm";
 import { OnboardingDialog } from "../dialogs/onboarding-dialog";
+import { strings } from "@notesnook/intl";
 
 class UserStore extends BaseStore<UserStore> {
   isLoggedIn?: boolean;
@@ -83,9 +84,9 @@ class UserStore extends BaseStore<UserStore> {
       config.clear();
       if (reason) {
         await ConfirmDialog.show({
-          title: "You were logged out",
+          title: strings.loggedOut(),
           message: reason,
-          negativeButtonText: "Okay"
+          negativeButtonText: strings.okay()
         });
       }
     });

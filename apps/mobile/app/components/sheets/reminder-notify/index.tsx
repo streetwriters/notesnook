@@ -40,6 +40,7 @@ import {
   VirtualizedGrouping,
   Note
 } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -67,19 +68,19 @@ export default function ReminderNotify({
 
   const QuickActions = [
     {
-      title: "5 min",
+      title: `5 ${strings.timeShort.minute}`,
       time: 5
     },
     {
-      title: "15 min",
+      title: `15 ${strings.timeShort.minute}`,
       time: 15
     },
     {
-      title: "30 min",
+      title: `30 ${strings.timeShort.minute}`,
       time: 30
     },
     {
-      title: "1 hour",
+      title: `1 ${strings.timeShort.hour}`,
       time: 60
     }
   ];
@@ -134,7 +135,7 @@ export default function ReminderNotify({
           marginTop: 10
         }}
       >
-        <Paragraph size={SIZE.xs}>Remind me in:</Paragraph>
+        <Paragraph size={SIZE.xs}>{strings.remindMeIn()}:</Paragraph>
         {QuickActions.map((item) => {
           return (
             <Button
@@ -171,7 +172,7 @@ export default function ReminderNotify({
               marginBottom: 10
             }}
           >
-            REFERENCED IN
+            {strings.referencedIn()}
           </Paragraph>
           <List
             data={references}

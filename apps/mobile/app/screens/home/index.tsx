@@ -29,6 +29,7 @@ import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotes } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
+import { strings } from "@notesnook/intl";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const [notes, loading] = useNotes();
@@ -51,12 +52,12 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
       <SelectionHeader id={route.name} items={notes} type="note" />
       <Header
         renderedInRoute={route.name}
-        title={route.name}
+        title={strings.routes[route.name as keyof typeof strings.routes]()}
         canGoBack={false}
         hasSearch={true}
         onSearch={() => {
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${route.name?.toLowerCase()}`,
+            placeholder: strings.searchInRoute(route.name),
             type: "note",
             title: route.name,
             route: route.name
@@ -71,17 +72,19 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
           dataType="note"
           renderedInRoute={route.name}
           loading={loading || !isFocused}
-          headerTitle={route.name}
+          headerTitle={strings.routes[
+            route.name as keyof typeof strings.routes
+          ]?.()}
           placeholder={{
             title: route.name?.toLowerCase(),
-            paragraph: `You have not added any ${route.name.toLowerCase()} yet.`,
-            button: "Add your first note",
+            paragraph: strings.notesEmpty(),
+            button: strings.newNote(),
             action: openEditor,
-            loading: "Loading your notes"
+            loading: strings.loadingNotes()
           }}
         />
         {!notes || !notes.placeholders?.length ? null : (
-          <FloatingButton title="Create a new note" onPress={openEditor} />
+          <FloatingButton onPress={openEditor} />
         )}
       </DelayLayout>
     </>

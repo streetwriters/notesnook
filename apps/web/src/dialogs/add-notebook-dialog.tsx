@@ -27,6 +27,7 @@ import { store as notebookStore } from "../stores/notebook-store";
 import { store as appStore } from "../stores/app-store";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type AddNotebookDialogProps = BaseDialogProps<boolean> & {
   parentId?: string;
@@ -42,7 +43,7 @@ export const AddNotebookDialog = DialogManager.register(
 
     const onSubmit = useCallback(async () => {
       if (!title.current.trim())
-        return showToast("error", "Notebook title cannot be empty.");
+        return showToast("error", strings.allFieldsRequired());
 
       const id = await db.notebooks.add({
         id: props.notebook?.id,
@@ -64,9 +65,7 @@ export const AddNotebookDialog = DialogManager.register(
 
       showToast(
         "success",
-        props.edit
-          ? "Notebook edited successfully!"
-          : "Notebook created successfully"
+        strings.action("notebook", 1, props.edit ? "edited" : "created")
       );
       onClose(true);
     }, [props.notebook?.id, props.edit, onClose, parentId]);
@@ -74,25 +73,28 @@ export const AddNotebookDialog = DialogManager.register(
       <Dialog
         testId="add-notebook-dialog"
         isOpen={true}
-        title={props.edit ? "Edit Notebook" : "Create a Notebook"}
+        title={props.edit ? strings.editNotebook() : strings.newNotebook()}
         description={
-          props.edit
-            ? `You are editing "${notebook?.title}".`
-            : "Notebooks are the best way to organize your notes."
+          props.edit && notebook?.title
+            ? strings.editNotebookDesc(notebook.title)
+            : strings.newNotebookDesc()
         }
         onClose={() => onClose(false)}
         positiveButton={{
-          text: props.edit ? "Save" : "Create",
+          text: props.edit ? strings.save() : strings.create(),
           onClick: onSubmit
         }}
-        negativeButton={{ text: "Cancel", onClick: () => onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => onClose(false)
+        }}
       >
         <Field
           defaultValue={title.current}
           data-test-id="title-input"
           autoFocus
           required
-          label="Title"
+          label={strings.title()}
           name="title"
           id="title"
           onChange={(e) => (title.current = e.target.value)}
@@ -104,12 +106,12 @@ export const AddNotebookDialog = DialogManager.register(
         />
         <Field
           data-test-id="description-input"
-          label="Description"
+          label={strings.description()}
           name="description"
           id="description"
           onChange={(e) => (description.current = e.target.value)}
           defaultValue={description.current}
-          helpText="Optional"
+          helpText={strings.optional()}
           sx={{ mt: 1 }}
         />
       </Dialog>

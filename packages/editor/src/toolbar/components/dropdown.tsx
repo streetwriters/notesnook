@@ -20,14 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useRef } from "react";
 import { Text } from "@theme-ui/components";
 import { Icon, MenuItem, MenuPresenter } from "@notesnook/ui";
-import { Icons } from "../icons";
+import { Icons } from "../icons.js";
 import {
   useIsMobile,
   usePopupManager,
   useToolbarLocation
-} from "../stores/toolbar-store";
-import { getToolbarElement } from "../utils/dom";
-import { Button } from "../../components/button";
+} from "../stores/toolbar-store.js";
+import { getToolbarElement } from "../utils/dom.js";
+import { Button } from "../../components/button.js";
 
 type DropdownProps = {
   id: string;

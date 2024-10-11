@@ -17,10 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { TemplateData } from "..";
-import { hasRequire } from "../../has-require";
-import { parseHTML } from "../../html-parser";
-import { template } from "./template";
+import { TemplateData } from "../index.js";
+import { parseHTML } from "../../html-parser.js";
+import { hasRequire } from "../../has-require.js";
+import { loadLanguage } from "./languages/index.js";
+import { template } from "./template.js";
 
 const replaceableAttributes = {
   'data-float="true" data-align="right"': 'align="right"',
@@ -50,6 +51,7 @@ async function preprocessHTML(templateData: TemplateData) {
   }
 
   const doc = parseHTML(html);
+  if (!doc) throw new Error("Could not parse HTML to DOM.");
 
   const images = doc.querySelectorAll("img");
   for (const image of images) {
@@ -72,16 +74,12 @@ async function preprocessHTML(templateData: TemplateData) {
   const mathInlines = doc.querySelectorAll(".math-inline.math-node");
 
   if (mathBlocks.length || mathInlines.length) {
-    const katex = hasRequire()
-      ? require("katex")
-      : (await import("katex")).default;
-    hasRequire()
-      ? require("katex/contrib/mhchem/mhchem.js")
-      : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        await import("katex/contrib/mhchem/mhchem.js");
+    const katex = (await import("katex")).default;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    await import("katex/contrib/mhchem/mhchem.js");
     for (const mathBlock of mathBlocks) {
-      const text = mathBlock.textContent;
+      const text = mathBlock.textContent || "";
       mathBlock.innerHTML = katex.renderToString(text, {
         displayMode: true,
         throwOnError: false
@@ -89,7 +87,7 @@ async function preprocessHTML(templateData: TemplateData) {
     }
 
     for (const mathInline of mathInlines) {
-      const text = mathInline.textContent;
+      const text = mathInline.textContent || "";
       mathInline.innerHTML = katex.renderToString(text, {
         throwOnError: false,
         displayMode: false
@@ -99,13 +97,9 @@ async function preprocessHTML(templateData: TemplateData) {
 
   const codeblocks = doc.querySelectorAll("pre > code");
   if (codeblocks.length) {
-    const prismjs = hasRequire()
-      ? require("prismjs")
-      : (await import("prismjs")).default;
-    const { loadLanguage } = hasRequire()
-      ? require("./languages/index.js")
-      : await import("./languages/index.js");
-    prismjs.register = (syntax: (syntax: any) => void) => {
+    const { default: prismjs } = await import("prismjs");
+    // const { loadLanguage } = await import("./languages/index.js");
+    (prismjs as any).register = (syntax: (syntax: any) => void) => {
       if (typeof syntax === "function") syntax(prismjs);
     };
     for (const codeblock of codeblocks) {
@@ -115,12 +109,14 @@ async function preprocessHTML(templateData: TemplateData) {
       )?.[1];
       if (!language) continue;
 
-      const { default: grammar } = await loadLanguage(language);
+      const { default: grammar } = (await loadLanguage(language)) || {};
+      if (!grammar) continue;
+
       grammar(prismjs);
       if (!prismjs.languages[language]) continue;
 
       codeblock.innerHTML = prismjs.highlight(
-        codeblock.textContent,
+        codeblock.textContent || "",
         prismjs.languages[language],
         language
       );

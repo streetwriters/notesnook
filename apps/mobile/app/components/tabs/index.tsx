@@ -42,6 +42,7 @@ import { eSendEvent } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eClearEditor } from "../../utils/events";
 import { useSideBarDraggingStore } from "../side-menu/dragging-store";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 
 interface TabProps extends ViewProps {
   dimensions: { width: number; height: number };
@@ -85,7 +86,9 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
   );
   const translateX = useSharedValue(
     widths
-      ? appState && !appState?.movedAway
+      ? appState &&
+        appState?.movedAway === false &&
+        useTabStore.getState().getCurrentNoteId()
         ? widths.sidebar + widths.list
         : widths.sidebar
       : 0
@@ -121,9 +124,9 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       } else {
         if (prevWidths.current?.sidebar !== widths.sidebar) {
           translateX.value =
-            !appState || (appState && appState?.movedAway)
-              ? widths.sidebar
-              : editorPosition;
+            appState && appState?.movedAway === false
+              ? editorPosition
+              : widths.sidebar;
           if (translateX.value === editorPosition) {
             onChangeTab?.({ i: 2, from: 1 });
           }

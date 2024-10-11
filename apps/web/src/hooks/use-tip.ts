@@ -21,6 +21,7 @@ import { useEffect, useRef, useState } from "react";
 import { CREATE_BUTTON_MAP } from "../common";
 import { ArrowTopRight, Icon, Plus } from "../components/icons";
 import Config from "../utils/config";
+import { strings } from "@notesnook/intl";
 
 declare global {
   interface Array<T> {
@@ -151,7 +152,7 @@ const tips: Tip[] = [
     text: "We value your feedback so join us on Discord and share your experiences and ideas.",
     contexts: ["notes", "notebooks", "tags"],
     button: {
-      title: "Join the Notesnook community",
+      title: strings.joinCommunity(),
       icon: ArrowTopRight,
       onClick: () =>
         window.open("https://discord.gg/notesnook-796015620436787241", "_blank")

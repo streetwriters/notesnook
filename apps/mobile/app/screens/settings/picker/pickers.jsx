@@ -17,17 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { DATE_FORMATS, TIME_FORMATS } from "@notesnook/core";
+import { getFontById, getFonts } from "@notesnook/editor/dist/utils/font";
+import dayjs from "dayjs";
+import { createSettingsPicker } from ".";
 import { db } from "../../../common/database";
 import { ToastManager } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { MenuItemsList } from "../../../utils/menu-items";
-import { createSettingsPicker } from ".";
-import { getFontById, getFonts } from "@notesnook/editor/dist/utils/font";
-import { DATE_FORMATS, TIME_FORMATS } from "@notesnook/core/dist/common";
-import dayjs from "dayjs";
 import { useUserStore } from "../../../stores/use-user-store";
+import { MenuItemsList } from "../../../utils/menu-items";
 import { verifyUserWithApplock } from "../functions";
+import { strings } from "@notesnook/intl";
 
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
@@ -50,13 +51,13 @@ export const HomePicker = createSettingsPicker({
   updateValue: (item) => {
     SettingsService.set({ homepage: item.name });
     ToastManager.show({
-      heading: "Homepage set to " + item.name,
-      message: "Restart the app for changes to take effect.",
+      heading: strings.homePageChangedTo(item.name),
+      message: strings.restartAppToApplyChanges(),
       type: "success"
     });
   },
   formatValue: (item) => {
-    return typeof item === "object" ? item.name : item;
+    return strings.routes[typeof item === "object" ? item.name : item]();
   },
   getItemKey: (item) => item.name,
   options: MenuItemsList.slice(0, MenuItemsList.length - 1),
@@ -70,7 +71,11 @@ export const TrashIntervalPicker = createSettingsPicker({
     db.settings.setTrashCleanupInterval(item);
   },
   formatValue: (item) => {
-    return item === -1 ? "Never" : item === 1 ? "Daily" : item + " days";
+    return item === -1
+      ? strings.never()
+      : item === 1
+      ? strings.reminderRecurringMode.day()
+      : item + " " + strings.days();
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 1, 7, 30, 365],
@@ -108,7 +113,7 @@ export const TimeFormatPicker = createSettingsPicker({
     });
   },
   formatValue: (item) => {
-    return `${item} (${dayjs().format(TimeFormats[item])})`;
+    return `${strings[item]()} (${dayjs().format(TimeFormats[item])})`;
   },
   getItemKey: (item) => item,
   options: TIME_FORMATS,
@@ -121,9 +126,7 @@ export const BackupReminderPicker = createSettingsPicker({
     SettingsService.set({ reminder: item });
   },
   formatValue: (item) => {
-    return item === "useroff" || item === "off" || item === "never"
-      ? "Off"
-      : item.slice(0, 1).toUpperCase() + item.slice(1);
+    return item === "useroff" ? strings.off() : strings[item]?.();
   },
   getItemKey: (item) => item,
   options: ["useroff", "daily", "weekly", "monthly"],
@@ -172,12 +175,12 @@ export const ApplockTimerPicker = createSettingsPicker({
   },
   formatValue: (item) => {
     return item === -1
-      ? "Never"
+      ? strings.never()
       : item === 0 || item === undefined
-      ? "Immediately"
+      ? strings.immediately()
       : item === 1
-      ? "1 minute"
-      : item + " minutes";
+      ? strings.minutes(1)
+      : strings.minutes(item);
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 0, 1, 5, 15, 30],

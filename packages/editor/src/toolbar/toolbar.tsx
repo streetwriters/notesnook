@@ -23,17 +23,17 @@ import {
   STATIC_TOOLBAR_GROUPS,
   MOBILE_STATIC_TOOLBAR_GROUPS,
   READONLY_MOBILE_STATIC_TOOLBAR_GROUPS
-} from "./tool-definitions";
+} from "./tool-definitions.js";
 import { useEffect, useMemo } from "react";
-import { Editor } from "../types";
-import { ToolbarGroup } from "./components/toolbar-group";
-import { EditorFloatingMenus } from "./floating-menus";
+import { Editor } from "../types.js";
+import { ToolbarGroup } from "./components/toolbar-group.js";
+import { EditorFloatingMenus } from "./floating-menus/index.js";
 import {
   ToolbarLocation,
   useIsMobile,
   useToolbarStore
-} from "./stores/toolbar-store";
-import { ToolbarDefinition } from "./types";
+} from "./stores/toolbar-store.js";
+import { ToolbarDefinition } from "./types.js";
 
 type ToolbarProps = FlexProps & {
   editor: Editor;

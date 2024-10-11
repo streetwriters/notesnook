@@ -19,14 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { mergeAttributes, wrappingInputRule } from "@tiptap/core";
 import { TaskList } from "@tiptap/extension-task-list";
-import { createNodeView } from "../react";
-import { TaskListComponent } from "./component";
-import {
-  Plugin,
-  PluginKey,
-  NodeSelection,
-  Transaction
-} from "prosemirror-state";
+import { createNodeView } from "../react/index.js";
+import { TaskListComponent } from "./component.js";
+import { Plugin, PluginKey, NodeSelection } from "prosemirror-state";
 import { inputRegex } from "@tiptap/extension-task-item";
 import { dropPoint } from "prosemirror-transform";
 import {
@@ -36,10 +31,10 @@ import {
   hasSameAttributes,
   findParentNodeClosestToPos,
   getExactChangedNodes
-} from "../../utils/prosemirror";
-import { countCheckedItems, findRootTaskList } from "./utils";
+} from "../../utils/prosemirror.js";
+import { countCheckedItems, findRootTaskList, toggleChildren } from "./utils.js";
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
-import { TaskItemNode } from "../task-item";
+import { TaskItemNode } from "../task-item/index.js";
 
 type TaskListStats = { checked: number; total: number };
 export type TaskListAttributes = {
@@ -395,27 +390,4 @@ function areAllChecked(node: ProsemirrorNode) {
     }
   }
   return allChecked;
-}
-
-export function toggleChildren(
-  tr: Transaction,
-  node: ProsemirrorNode,
-  toggleState: boolean,
-  parentPos: number
-) {
-  let changes = 0;
-  node.descendants((node, pos) => {
-    if (
-      node.type.name === TaskItemNode.name &&
-      toggleState !== node.attrs.checked
-    ) {
-      const actualPos = pos + parentPos + 1;
-      tr.setNodeMarkup(tr.mapping.map(actualPos), undefined, {
-        ...node.attrs,
-        checked: toggleState
-      });
-      changes++;
-    }
-  });
-  return changes;
 }

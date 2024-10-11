@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { OrderedList } from "./ordered-list";
+import { OrderedList } from "./ordered-list.js";
 
-export * from "./ordered-list";
+export * from "./ordered-list.js";
 
 export default OrderedList;

@@ -36,6 +36,7 @@ import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
 import { TimeSince } from "../ui/time-since";
 import Paragraph from "../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 export const UserStatus = () => {
   const { colors, isDark } = useThemeColors();
@@ -116,7 +117,7 @@ export const UserStatus = () => {
               color={colors.primary.heading}
             >
               {!user || !userProfile?.fullName
-                ? "Settings"
+                ? strings.settings()
                 : userProfile.fullName}
             </Paragraph>
 
@@ -128,14 +129,16 @@ export const UserStatus = () => {
               color={colors.secondary.heading}
             >
               {!user ? (
-                "Not logged in"
+                strings.notLoggedIn()
               ) : lastSynced && lastSynced !== "Never" ? (
                 <>
                   {syncing
-                    ? `Syncing ${progress ? `(${progress.current})` : ""}`
+                    ? `${strings.syncing()} ${
+                        progress ? `(${progress.current})` : ""
+                      }`
                     : lastSyncStatus === SyncStatus.Failed
-                    ? "Sync failed"
-                    : "Synced"}{" "}
+                    ? strings.syncFailed()
+                    : strings.synced()}{" "}
                   {!syncing ? (
                     <TimeSince
                       style={{
@@ -145,10 +148,10 @@ export const UserStatus = () => {
                       time={lastSynced}
                     />
                   ) : null}
-                  {isOffline ? " (offline)" : ""}
+                  {isOffline ? ` (${strings.offline()})` : ""}
                 </>
               ) : (
-                "never"
+                strings.never()
               )}{" "}
               <Icon
                 name="checkbox-blank-circle"

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Note } from "@notesnook/core";
-import { EVENTS } from "@notesnook/core/dist/common";
+import { EVENTS } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
 import { View } from "react-native";
@@ -35,6 +35,7 @@ import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 type TabItem = {
   id: number;
@@ -137,7 +138,9 @@ const TabItemComponent = (props: {
           numberOfLines={1}
           size={SIZE.md}
         >
-          {props.tab.noteId ? item?.title || "Untitled note" : "New note"}
+          {props.tab.noteId
+            ? item?.title || strings.untitledNote()
+            : strings.newNote()}
         </Paragraph>
       </View>
 
@@ -229,7 +232,7 @@ export default function EditorTabs({
           alignItems: "center"
         }}
       >
-        <Heading size={SIZE.lg}>Tabs</Heading>
+        <Heading size={SIZE.lg}>{strings.tabs()}</Heading>
         <Button
           onPress={() => {
             useTabStore.getState().newTab();
@@ -240,7 +243,7 @@ export default function EditorTabs({
             }, 500);
             close?.();
           }}
-          title="New tab"
+          title={strings.newTab()}
           icon="plus"
           style={{
             flexDirection: "row",

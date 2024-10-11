@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ResolvedPos, Slice } from "@tiptap/pm/model";
 import { encodeNonAsciiHTML } from "entities";
-import { ClipboardDOMParser } from "./clipboard-dom-parser";
+import { ClipboardDOMParser } from "./clipboard-dom-parser.js";
 import { EditorView } from "@tiptap/pm/view";
 
 export function clipboardTextParser(

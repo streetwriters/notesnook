@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { debounce } from "../utils/debounce";
 
 type ObserverType = {
   threshold: number;

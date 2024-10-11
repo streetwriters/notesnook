@@ -21,7 +21,6 @@ import { ControlledMenu, MenuItem as MenuItemInner } from "@szhsin/react-menu";
 import ArrowBackIcon from "mdi-react/ArrowBackIcon";
 import ArrowULeftTopIcon from "mdi-react/ArrowULeftTopIcon";
 import ArrowURightTopIcon from "mdi-react/ArrowURightTopIcon";
-import CrownIcon from "mdi-react/CrownIcon";
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import DotsVerticalIcon from "mdi-react/DotsVerticalIcon";
 import FullscreenIcon from "mdi-react/FullscreenIcon";
@@ -33,6 +32,7 @@ import { useSafeArea } from "../hooks/useSafeArea";
 import { useTabContext, useTabStore } from "../hooks/useTabStore";
 import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
+import { strings } from "@notesnook/intl";
 
 const menuClassName = ({ state }: any) =>
   state === "opening"
@@ -430,7 +430,7 @@ function Header({
                     color: "var(--nn_primary_paragraph)"
                   }}
                 >
-                  Search
+                  {strings.search()}
                 </span>
               </MenuItem>
 
@@ -451,7 +451,7 @@ function Header({
                     color: "var(--nn_primary_paragraph)"
                   }}
                 >
-                  Table of contents
+                  {strings.toc()}
                 </span>
               </MenuItem>
               <MenuItem
@@ -471,7 +471,7 @@ function Header({
                     color: "var(--nn_primary_paragraph)"
                   }}
                 >
-                  Properties
+                  {strings.properties()}
                 </span>
               </MenuItem>
             </ControlledMenu>

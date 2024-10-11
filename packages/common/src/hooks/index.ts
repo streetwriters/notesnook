@@ -17,6 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./use-time-ago";
-export * from "./use-promise";
-export * from "./use-resolved-item";
+export * from "./use-time-ago.js";
+export * from "./use-promise.js";
+export * from "./use-resolved-item.js";

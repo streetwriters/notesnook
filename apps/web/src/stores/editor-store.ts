@@ -23,7 +23,7 @@ import { store as appStore } from "./app-store";
 import { store as settingStore } from "./setting-store";
 import { db } from "../common/db";
 import BaseStore from ".";
-import { EV, EVENTS } from "@notesnook/core/dist/common";
+import { EV, EVENTS } from "@notesnook/core";
 import { logger } from "../utils/logger";
 import Config from "../utils/config";
 import { setDocumentTitle } from "../utils/dom";
@@ -36,15 +36,15 @@ import {
   Note,
   Tag,
   isDeleted,
-  isTrashItem
+  isTrashItem,
+  NoteContent
 } from "@notesnook/core";
-import { NoteContent } from "@notesnook/core/dist/collections/session-content";
 import { Context } from "../components/list-container/types";
 import { showToast } from "../utils/toast";
-import { getId } from "@notesnook/core/dist/utils/id";
+import { getId } from "@notesnook/core";
 import { PersistStorage } from "zustand/middleware";
 import { getFormattedHistorySessionDate } from "@notesnook/common";
-import { isCipher } from "@notesnook/core/dist/database/crypto";
+import { isCipher } from "@notesnook/core";
 import { hashNavigate } from "../navigation";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import Vault from "../common/vault";

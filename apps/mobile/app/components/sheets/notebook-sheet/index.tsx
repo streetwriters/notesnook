@@ -51,6 +51,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
 import { MoveNotebookSheet } from "../move-notebook";
 import Sort from "../sort";
+import { strings } from "@notesnook/intl";
 
 const useItemSelectionStore = createItemSelectionStore(true, false);
 
@@ -289,7 +290,7 @@ export const NotebookSheet = () => {
           }}
         >
           <Paragraph size={SIZE.xs} color={colors.primary.icon}>
-            NOTEBOOKS
+            {strings.notebooks()}
           </Paragraph>
           <View
             style={{
@@ -433,7 +434,9 @@ export const NotebookSheet = () => {
                 height: 200
               }}
             >
-              <Paragraph color={colors.primary.icon}>No notebooks</Paragraph>
+              <Paragraph color={colors.primary.icon}>
+                {strings.emptyPlaceholders("notebook")}
+              </Paragraph>
             </View>
           }
         />

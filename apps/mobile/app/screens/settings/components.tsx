@@ -18,26 +18,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { ReactElement } from "react";
+import { AttachmentDialog } from "../../components/attachments";
 import { AccentColorPicker } from "./appearance";
 import DebugLogs from "./debug";
 import { ConfigureToolbar } from "./editor/configure-toolbar";
 import { Licenses } from "./licenses";
-import SoundPicker from "./sound-picker";
-import { Subscription } from "./subscription";
-import { TitleFormat } from "./title-format";
+import { AttachmentGroupProgress } from "./attachment-group-progress";
 import {
-  HomePicker,
+  ApplockTimerPicker,
+  BackupReminderPicker,
+  BackupWithAttachmentsReminderPicker,
   DateFormatPicker,
   FontPicker,
+  HomePicker,
   TimeFormatPicker,
-  TrashIntervalPicker,
-  BackupReminderPicker,
-  ApplockTimerPicker,
-  BackupWithAttachmentsReminderPicker
+  TrashIntervalPicker
 } from "./picker/pickers";
-import ThemeSelector from "./theme-selector";
 import { RestoreBackup } from "./restore-backup";
 import { ServersConfiguration } from "./server-config";
+import SoundPicker from "./sound-picker";
+import { Subscription } from "./subscription";
+import ThemeSelector from "./theme-selector";
+import { TitleFormat } from "./title-format";
+import { View } from "react-native";
 
 export const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker />,
@@ -57,5 +60,11 @@ export const components: { [name: string]: ReactElement } = {
   "applock-timer": <ApplockTimerPicker />,
   autobackupsattachments: <BackupWithAttachmentsReminderPicker />,
   backuprestore: <RestoreBackup />,
-  "server-config": <ServersConfiguration />
+  "server-config": <ServersConfiguration />,
+  "attachments-manager": <AttachmentDialog note={undefined} isSheet={false} />,
+  "offline-mode-progress": (
+    <View style={{ paddingHorizontal: 12 }}>
+      <AttachmentGroupProgress groupId="offline-mode" />
+    </View>
+  )
 };

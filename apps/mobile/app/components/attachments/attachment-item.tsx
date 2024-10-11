@@ -22,7 +22,6 @@ import { Attachment, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { useDBItem } from "../../hooks/use-db-item";
@@ -31,6 +30,7 @@ import { IconButton } from "../ui/icon-button";
 import { ProgressCircleComponent } from "../ui/svg/lazy";
 import Paragraph from "../ui/typography/paragraph";
 import Actions from "./actions";
+import { strings } from "@notesnook/intl";
 
 function getFileExtension(filename: string) {
   const ext = /^.+\.([^.]+)$/.exec(filename);
@@ -44,7 +44,8 @@ export const AttachmentItem = ({
   setAttachments,
   pressable = true,
   hideWhenNotDownloading,
-  context
+  context,
+  errorOnly
 }: {
   id: string | number;
   attachments?: VirtualizedGrouping<Attachment>;
@@ -53,9 +54,9 @@ export const AttachmentItem = ({
   pressable?: boolean;
   hideWhenNotDownloading?: boolean;
   context?: string;
+  errorOnly?: boolean;
 }) => {
   const [attachment] = useDBItem(id, "attachment", attachments);
-
   const { colors } = useThemeColors();
   const [currentProgress, setCurrentProgress] = useAttachmentProgress(
     attachment,
@@ -67,8 +68,7 @@ export const AttachmentItem = ({
     Actions.present(attachment, setAttachments, context);
   };
 
-  return hideWhenNotDownloading &&
-    (!currentProgress || !currentProgress.value) ? null : (
+  return errorOnly && attachment && !attachment?.failed ? null : (
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={onPress}
@@ -78,8 +78,6 @@ export const AttachmentItem = ({
         justifyContent: "space-between",
         padding: 12,
         paddingVertical: 6,
-        borderRadius: 5,
-        backgroundColor: colors.secondary.background,
         minHeight: 45
       }}
     >
@@ -89,41 +87,46 @@ export const AttachmentItem = ({
             style={{
               flexShrink: 1,
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              gap: 10
             }}
           >
             <View
               style={{
                 justifyContent: "center",
                 alignItems: "center",
-                marginLeft: -5
+                marginLeft: -5,
+                borderWidth: 1,
+                borderColor: colors.secondary.border,
+                paddingHorizontal: 2,
+                width: 30,
+                height: 30,
+                borderRadius: 5
               }}
             >
-              <Icon name="file" size={SIZE.xxxl} color={colors.primary.icon} />
-
               <Paragraph
                 adjustsFontSizeToFit
-                size={6}
-                color={colors.static.white}
+                size={8}
+                color={colors.secondary.paragraph}
                 style={{
-                  position: "absolute"
+                  maxWidth: 30
                 }}
+                numberOfLines={1}
               >
-                {getFileExtension(attachment.filename).toUpperCase()}
+                {getFileExtension(attachment.filename).toUpperCase() ||
+                  attachment.mimeType.split("/")?.[1]?.toUpperCase()}
               </Paragraph>
             </View>
 
             <View
               style={{
-                flexShrink: 1,
-                marginLeft: 10
+                flexShrink: 1
               }}
             >
               <Paragraph
-                size={SIZE.sm - 1}
+                size={SIZE.sm}
                 style={{
-                  flexWrap: "wrap",
-                  marginBottom: 2.5
+                  flexWrap: "wrap"
                 }}
                 numberOfLines={1}
                 lineBreakMode="middle"
@@ -133,11 +136,8 @@ export const AttachmentItem = ({
               </Paragraph>
 
               {!hideWhenNotDownloading ? (
-                <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-                  {formatBytes(attachment.size)}{" "}
-                  {currentProgress?.type
-                    ? "(" + currentProgress.type + "ing - tap to cancel)"
-                    : ""}
+                <Paragraph color={colors.secondary.paragraph} size={SIZE.xxs}>
+                  {strings.fileSize()}: {formatBytes(attachment.size)}
                 </Paragraph>
               ) : null}
             </View>

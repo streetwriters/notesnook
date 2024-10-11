@@ -19,14 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Input } from "@theme-ui/components";
 import { Flex } from "@theme-ui/components";
-import { useRefValue } from "../../hooks/use-ref-value";
-import { Popup } from "../components/popup";
-import { isInternalLink, LinkDefinition } from "../tools/link";
-import { showPopup } from "../../components/popup-presenter";
-import Link, { LinkAttributes } from "../../extensions/link";
-import { ImageNode } from "../../extensions/image";
-import { findMark, selectionToOffset } from "../../utils/prosemirror";
+import { useRefValue } from "../../hooks/use-ref-value.js";
+import { Popup } from "../components/popup.js";
+import { isInternalLink, LinkDefinition } from "../tools/link.js";
+import { showPopup } from "../../components/popup-presenter/index.js";
+import Link, { LinkAttributes } from "../../extensions/link/index.js";
+import { ImageNode } from "../../extensions/image/index.js";
+import { findMark, selectionToOffset } from "../../utils/prosemirror.js";
 import { Editor, getMarkAttributes } from "@tiptap/core";
+import { strings } from "@notesnook/intl";
 
 export type LinkPopupProps = {
   link?: LinkDefinition;
@@ -47,10 +48,10 @@ export function LinkPopup(props: LinkPopupProps) {
 
   return (
     <Popup
-      title={isEditing ? "Edit link" : "Insert link"}
+      title={isEditing ? strings.editLink() : strings.insertLink()}
       onClose={onClose}
       action={{
-        title: isEditing ? "Save edits" : "Insert link",
+        title: isEditing ? strings.save() : strings.insert(),
         onClick: () => onDone(link.current)
       }}
     >
@@ -65,7 +66,7 @@ export function LinkPopup(props: LinkPopupProps) {
         {!isImageActive && (
           <Input
             type="text"
-            placeholder="Link text"
+            placeholder={strings.linkText()}
             defaultValue={link.current?.title}
             sx={{ mb: 1 }}
             onChange={(e) =>

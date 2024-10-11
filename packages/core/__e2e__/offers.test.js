@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import hosts from "../src/utils/constants";
-import { Offers } from "../src/api/offers";
+import hosts from "../src/utils/constants.ts";
+import { Offers } from "../src/api/offers.ts";
 import { test, expect } from "vitest";
 
 test("get offer code", async () => {

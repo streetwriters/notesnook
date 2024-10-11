@@ -36,6 +36,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { useSettingStore } from "../../stores/use-setting-store";
 import SettingsService from "../../services/settings";
+import { strings } from "@notesnook/intl";
 
 export const Signup = ({ changeMode, trial }) => {
   const { colors } = useThemeColors();
@@ -54,8 +55,8 @@ export const Signup = ({ changeMode, trial }) => {
   const validateInfo = () => {
     if (!password.current || !email.current || !confirmPassword.current) {
       ToastManager.show({
-        heading: "All fields required",
-        message: "Fill all the fields and try again",
+        heading: strings.allFieldsRequired(),
+        message: strings.allFieldsRequiredDesc(),
         type: "error",
         context: "local"
       });
@@ -88,7 +89,7 @@ export const Signup = ({ changeMode, trial }) => {
     } catch (e) {
       setLoading(false);
       ToastManager.show({
-        heading: "Signup failed",
+        heading: strings.signupFailed(),
         message: e.message,
         type: "error",
         context: "local"
@@ -156,7 +157,7 @@ export const Signup = ({ changeMode, trial }) => {
             }}
             size={SIZE.xxl}
           >
-            Create your {"\n"}account
+            {strings.createYourAccount()}
           </Heading>
         </View>
 
@@ -175,14 +176,14 @@ export const Signup = ({ changeMode, trial }) => {
             }}
             testID="input.email"
             onErrorCheck={(e) => setError(e)}
-            returnKeyLabel="Next"
+            returnKeyLabel={strings.next()}
             returnKeyType="next"
             autoComplete="email"
             validationType="email"
             autoCorrect={false}
             autoCapitalize="none"
-            errorMessage="Email is invalid"
-            placeholder="Email"
+            errorMessage={strings.email()}
+            placeholder={strings.email()}
             onSubmit={() => {
               passwordInputRef.current?.focus();
             }}
@@ -195,14 +196,14 @@ export const Signup = ({ changeMode, trial }) => {
             }}
             testID="input.password"
             onErrorCheck={(e) => setError(e)}
-            returnKeyLabel="Next"
+            returnKeyLabel={strings.next()}
             returnKeyType="next"
             secureTextEntry
             autoComplete="password"
             autoCapitalize="none"
             validationType="password"
             autoCorrect={false}
-            placeholder="Password"
+            placeholder={strings.password()}
             onSubmit={() => {
               confirmPasswordInputRef.current?.focus();
             }}
@@ -215,7 +216,7 @@ export const Signup = ({ changeMode, trial }) => {
             }}
             testID="input.confirmPassword"
             onErrorCheck={(e) => setError(e)}
-            returnKeyLabel="Signup"
+            returnKeyLabel={strings.done()}
             returnKeyType="done"
             secureTextEntry
             autoComplete="password"
@@ -223,7 +224,7 @@ export const Signup = ({ changeMode, trial }) => {
             autoCorrect={false}
             validationType="confirmPassword"
             customValidator={() => password.current}
-            placeholder="Confirm password"
+            placeholder={strings.confirmPassword()}
             marginBottom={12}
             onSubmit={signup}
           />
@@ -235,7 +236,7 @@ export const Signup = ({ changeMode, trial }) => {
             size={SIZE.xs}
             color={colors.secondary.paragraph}
           >
-            By signing up, you agree to our{" "}
+            {strings.signupAgreement[0]()}
             <Paragraph
               size={SIZE.xs}
               onPress={() => {
@@ -246,9 +247,9 @@ export const Signup = ({ changeMode, trial }) => {
               }}
               color={colors.primary.accent}
             >
-              Terms of Service{" "}
+              {strings.signupAgreement[1]()}
             </Paragraph>
-            and{" "}
+            {strings.signupAgreement[2]()}
             <Paragraph
               size={SIZE.xs}
               onPress={() => {
@@ -259,14 +260,13 @@ export const Signup = ({ changeMode, trial }) => {
               }}
               color={colors.primary.accent}
             >
-              Privacy Policy.
-            </Paragraph>{" "}
-            You also agree to recieve marketing emails from us which you can
-            opt-out of from app settings.
+              {strings.signupAgreement[3]()}
+            </Paragraph>
+            {strings.signupAgreement[4]()}
           </Paragraph>
 
           <Button
-            title={!loading ? "Continue" : null}
+            title={!loading ? strings.continue() : null}
             type="accent"
             loading={loading}
             onPress={signup}
@@ -291,12 +291,12 @@ export const Signup = ({ changeMode, trial }) => {
             }}
           >
             <Paragraph size={SIZE.xs + 1} color={colors.secondary.paragraph}>
-              Already have an account?{" "}
+              {strings.alreadyHaveAccount()}{" "}
               <Paragraph
                 size={SIZE.xs + 1}
                 style={{ color: colors.primary.accent }}
               >
-                Login
+                {strings.login()}
               </Paragraph>
             </Paragraph>
           </TouchableOpacity>

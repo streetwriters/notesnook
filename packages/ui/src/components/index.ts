@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./icon";
-export * from "./menu";
-export * from "./popup-presenter";
-export * from "./scroll-container";
+export * from "./icon/index.js";
+export * from "./menu/index.js";
+export * from "./popup-presenter/index.js";
+export * from "./scroll-container/index.js";

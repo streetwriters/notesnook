@@ -17,38 +17,38 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Notes } from "../collections/notes";
-import { Crypto, CryptoAccessor } from "../database/crypto";
-import { FileStorage, FileStorageAccessor } from "../database/fs";
-import { Notebooks } from "../collections/notebooks";
-import Trash from "../collections/trash";
-import Sync, { SyncOptions } from "./sync";
-import { Tags } from "../collections/tags";
-import { Colors } from "../collections/colors";
-import Vault from "./vault";
-import Lookup from "./lookup";
-import { Content } from "../collections/content";
-import Backup from "../database/backup";
-import Hosts from "../utils/constants";
-import { EV, EVENTS } from "../common";
-import { LegacySettings } from "../collections/legacy-settings";
-import Migrations from "./migrations";
-import UserManager from "./user-manager";
-import http from "../utils/http";
-import { Monographs } from "./monographs";
-import { Offers } from "./offers";
-import { Attachments } from "../collections/attachments";
-import { Debug } from "./debug";
+import { Notes } from "../collections/notes.js";
+import { Crypto, CryptoAccessor } from "../utils/crypto.js";
+import { FileStorage, FileStorageAccessor } from "../database/fs.js";
+import { Notebooks } from "../collections/notebooks.js";
+import Trash from "../collections/trash.js";
+import Sync, { SyncOptions } from "./sync/index.js";
+import { Tags } from "../collections/tags.js";
+import { Colors } from "../collections/colors.js";
+import Vault from "./vault.js";
+import Lookup from "./lookup.js";
+import { Content } from "../collections/content.js";
+import Backup from "../database/backup.js";
+import Hosts from "../utils/constants.js";
+import { EV, EVENTS } from "../common.js";
+import { LegacySettings } from "../collections/legacy-settings.js";
+import Migrations from "./migrations.js";
+import UserManager from "./user-manager.js";
+import http from "../utils/http.js";
+import { Monographs } from "./monographs.js";
+import { Offers } from "./offers.js";
+import { Attachments } from "../collections/attachments.js";
+import { Debug } from "./debug.js";
 import { Mutex } from "async-mutex";
-import { NoteHistory } from "../collections/note-history";
-import MFAManager from "./mfa-manager";
-import EventManager from "../utils/event-manager";
-import { Pricing } from "./pricing";
-import { logger } from "../logger";
-import { Shortcuts } from "../collections/shortcuts";
-import { Reminders } from "../collections/reminders";
-import { Relations } from "../collections/relations";
-import Subscriptions from "./subscriptions";
+import { NoteHistory } from "../collections/note-history.js";
+import MFAManager from "./mfa-manager.js";
+import EventManager from "../utils/event-manager.js";
+import { Pricing } from "./pricing.js";
+import { logger } from "../logger.js";
+import { Shortcuts } from "../collections/shortcuts.js";
+import { Reminders } from "../collections/reminders.js";
+import { Relations } from "../collections/relations.js";
+import Subscriptions from "./subscriptions.js";
 import {
   CompressorAccessor,
   ConfigStorageAccessor,
@@ -57,10 +57,10 @@ import {
   IStorage,
   KVStorageAccessor,
   StorageAccessor
-} from "../interfaces";
-import TokenManager from "./token-manager";
-import { Attachment } from "../types";
-import { Settings } from "../collections/settings";
+} from "../interfaces.js";
+import TokenManager from "./token-manager.js";
+import { Attachment } from "../types.js";
+import { Settings } from "../collections/settings.js";
 import {
   DatabaseAccessor,
   DatabaseSchema,
@@ -69,16 +69,16 @@ import {
   changeDatabasePassword,
   createDatabase,
   initializeDatabase
-} from "../database";
+} from "../database/index.js";
 import { Kysely, Transaction, sql } from "@streetwriters/kysely";
-import { CachedCollection } from "../database/cached-collection";
-import { Vaults } from "../collections/vaults";
-import { KVStorage } from "../database/kv";
-import { QueueValue } from "../utils/queue-value";
-import { Sanitizer } from "../database/sanitizer";
-import { createTriggers, dropTriggers } from "../database/triggers";
-import { NNMigrationProvider } from "../database/migrations";
-import { ConfigStorage } from "../database/config";
+import { CachedCollection } from "../database/cached-collection.js";
+import { Vaults } from "../collections/vaults.js";
+import { KVStorage } from "../database/kv.js";
+import { QueueValue } from "../utils/queue-value.js";
+import { Sanitizer } from "../database/sanitizer.js";
+import { createTriggers, dropTriggers } from "../database/triggers.js";
+import { NNMigrationProvider } from "../database/migrations.js";
+import { ConfigStorage } from "../database/config.js";
 
 type EventSourceConstructor = new (
   uri: string,

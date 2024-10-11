@@ -17,15 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
-import { Loading } from "../../../components/icons";
-import { Box, Flex, Link, Text } from "@theme-ui/components";
 import { getFormattedDate } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
+import { Box, Flex, Link, Text } from "@theme-ui/components";
+import { useEffect, useState } from "react";
 import { db } from "../../../common/db";
-import {
-  Transaction,
-  TransactionStatus
-} from "@notesnook/core/dist/api/subscriptions";
+import { TransactionStatus, Transaction } from "@notesnook/core";
+import { Loading } from "../../../components/icons";
 
 const TransactionStatusToText: Record<TransactionStatus, string> = {
   completed: "Completed",
@@ -89,11 +87,11 @@ export function BillingHistory() {
               }}
             >
               {[
-                { id: "date", title: "Date", width: "20%" },
-                { id: "orderId", title: "Order ID", width: "20%" },
-                { id: "amount", title: "Amount", width: "20%" },
-                { id: "status", title: "Status", width: "20%" },
-                { id: "receipt", title: "Receipt", width: "20%" }
+                { id: "date", title: strings.date(), width: "20%" },
+                { id: "orderId", title: strings.orderId(), width: "20%" },
+                { id: "amount", title: strings.amount(), width: "20%" },
+                { id: "status", title: strings.status(), width: "20%" },
+                { id: "receipt", title: strings.receipt(), width: "20%" }
               ].map((column) =>
                 !column.title ? (
                   <th key={column.id} />
@@ -132,7 +130,7 @@ export function BillingHistory() {
                   {transaction.amount} {transaction.currency}
                 </Text>
                 <Text as="td" variant="body">
-                  {TransactionStatusToText[transaction.status]}
+                  {strings.transactionStatusToText[transaction.status]()}
                 </Text>
                 <Text as="td" variant="body">
                   <Link
@@ -142,7 +140,7 @@ export function BillingHistory() {
                     variant="text.subBody"
                     sx={{ color: "accent" }}
                   >
-                    View receipt
+                    {strings.viewReceipt()}
                   </Link>
                 </Text>
               </Box>

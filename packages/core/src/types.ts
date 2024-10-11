@@ -18,7 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Cipher } from "@notesnook/crypto";
-import { TimeFormat } from "./utils/date";
+import { isCipher } from "./utils/index.js";
+
+export type TimeFormat = "12-hour" | "24-hour";
 
 export type SortOptions = {
   sortBy:
@@ -567,3 +569,20 @@ export type ContentBlock = {
   type: string;
   id: string;
 };
+
+export type NoteContent<TLocked extends boolean> = {
+  data: TLocked extends true ? Cipher<"base64"> : string;
+  type: ContentType;
+};
+
+export function isDecryptedContent(
+  content: NoteContent<boolean>
+): content is NoteContent<false> {
+  return !isCipher(content.data);
+}
+
+export function isEncryptedContent(
+  content: NoteContent<boolean>
+): content is NoteContent<true> {
+  return isCipher(content.data);
+}

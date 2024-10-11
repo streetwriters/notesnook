@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Note } from "@notesnook/core/dist/types";
-import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
-import type { ImageAttributes } from "@notesnook/editor/dist/extensions/image/index";
-import type { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
+import { Note } from "@notesnook/core";
+import type { Attachment } from "@notesnook/editor";
+import type { ImageAttributes } from "@notesnook/editor";
+import type { LinkAttributes } from "@notesnook/editor";
 import { createRef, RefObject } from "react";
 import { Platform } from "react-native";
 import { EdgeInsets } from "react-native-safe-area-context";

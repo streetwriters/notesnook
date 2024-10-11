@@ -20,8 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Language, useSpellChecker } from "../../../hooks/use-spell-checker";
 import { Input, Label } from "@theme-ui/components";
 import { useCallback, useEffect, useState } from "react";
-import { deleteItem } from "@notesnook/core/dist/utils/array";
+import { deleteItem } from "@notesnook/core";
 import { FlexScrollContainer } from "../../../components/scroll-container";
+import { strings } from "@notesnook/intl";
 
 export function SpellCheckerLanguages() {
   const spellChecker = useSpellChecker();
@@ -52,7 +53,7 @@ export function SpellCheckerLanguages() {
   return (
     <>
       <Input
-        placeholder="Filter languages"
+        placeholder={strings.filterLanguages()}
         sx={{ mx: "2px", my: 2, width: "auto" }}
         onChange={(e) => filter(e.currentTarget.value.toLowerCase().trim())}
       />

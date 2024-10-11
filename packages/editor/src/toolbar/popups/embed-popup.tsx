@@ -19,12 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, Text } from "@theme-ui/components";
 import { useCallback, useState } from "react";
-import { Popup } from "../components/popup";
+import { Popup } from "../components/popup.js";
 import { Input, Textarea } from "@theme-ui/components";
-import { Embed, EmbedSizeOptions } from "../../extensions/embed";
+import { Embed, EmbedSizeOptions } from "../../extensions/embed/index.js";
 import { convertUrlToEmbedUrl } from "@social-embed/lib";
-import { InlineInput } from "../../components/inline-input";
-import { Tabs, Tab } from "../../components/tabs";
+import { InlineInput } from "../../components/inline-input/index.js";
+import { Tabs, Tab } from "../../components/tabs/index.js";
+import { strings } from "@notesnook/intl";
 
 type EmbedSource = "url" | "code";
 export type EmbedPopupProps = {
@@ -71,7 +72,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
       title={title}
       onClose={() => onClose()}
       action={{
-        title: "Save",
+        title: strings.save(),
         onClick: () => {
           setError(null);
           let _src = src;
@@ -127,9 +128,9 @@ export function EmbedPopup(props: EmbedPopupProps) {
           containerProps={{ sx: { mx: 1, flexDirection: "column" } }}
           onTabChanged={(index) => setEmbedSource(index === 0 ? "url" : "code")}
         >
-          <Tab title="From URL">
+          <Tab title={strings.fromURL()}>
             <Input
-              placeholder="Enter embed source URL"
+              placeholder={strings.enterEmbedSourceURL()}
               value={src}
               autoFocus
               onChange={(e) => setSrc(e.target.value)}
@@ -141,7 +142,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 containerProps={{ sx: { mr: 1 } }}
                 label="width"
                 type="number"
-                placeholder="Width"
+                placeholder={strings.width()}
                 value={width}
                 sx={{
                   mr: 1,
@@ -152,7 +153,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
               <InlineInput
                 label="height"
                 type="number"
-                placeholder="Height"
+                placeholder={strings.height()}
                 value={height}
                 sx={{ fontSize: "body" }}
                 onChange={(e) =>
@@ -161,7 +162,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
               />
             </Flex>
           </Tab>
-          <Tab title="From code">
+          <Tab title={strings.fromCode()}>
             <Textarea
               autoFocus
               variant={"forms.input"}
@@ -171,7 +172,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 minHeight: [200, 100]
               }}
               onChange={(e) => setSrc(e.target.value)}
-              placeholder="Paste embed code here. Only iframes are supported."
+              placeholder={strings.pasteEmbedCode()}
             />
           </Tab>
         </Tabs>

@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { KVStorageAccessor } from "../../interfaces";
-import hosts from "../../utils/constants";
-import http from "../../utils/http";
-import { getId } from "../../utils/id";
-import TokenManager from "../token-manager";
+import { KVStorageAccessor } from "../../interfaces.js";
+import hosts from "../../utils/constants.js";
+import http from "../../utils/http.js";
+import { getId } from "../../utils/id.js";
+import TokenManager from "../token-manager.js";
 
 export class SyncDevices {
   constructor(

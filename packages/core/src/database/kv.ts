@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DatabaseAccessor, RawDatabaseSchema } from ".";
-import { Token } from "../api/token-manager";
-import { User } from "../types";
+import { DatabaseAccessor, RawDatabaseSchema } from "./index.js";
+import { Token } from "../api/token-manager.js";
+import { User } from "../types.js";
 
 interface KV {
   v: number;

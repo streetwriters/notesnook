@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "3.0.17",
+  "version": "3.0.18",
   "private": true,
   "license": "GPL-3.0-or-later",
   "workspaces": [
@@ -39,6 +39,7 @@
     "@notesnook/core": "file:../../packages/core",
     "@notesnook/editor": "file:../../packages/editor",
     "@notesnook/editor-mobile": "file:../../packages/editor-mobile",
+    "@notesnook/intl": "file:../../packages/intl",
     "@notesnook/logger": "file:../../packages/logger",
     "@notesnook/theme": "file:../../packages/theme",
     "@notesnook/themes-server": "file:../../servers/themes",

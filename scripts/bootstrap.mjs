@@ -31,6 +31,7 @@ const THREADS = Math.max(4, process.env.THREADS || os.cpus().length / 2);
 const scopes = {
   mobile: "apps/mobile",
   web: "apps/web",
+  monograph: "apps/monograph",
   vericrypt: "apps/vericrypt",
   desktop: "apps/desktop",
   core: "packages/core",

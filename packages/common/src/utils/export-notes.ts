@@ -17,19 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Attachment, Note, parseInternalLink } from "@notesnook/core";
-import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
-import { CHECK_IDS, checkIsUserPremium } from "@notesnook/core/dist/common";
-import { isImage, isWebClip } from "@notesnook/core/dist/utils/filename";
-import { sanitizeFilename } from "./file";
-import { database } from "../database";
+import {
+  Attachment,
+  Note,
+  parseInternalLink,
+  getContentFromData,
+  ResolveInternalLink,
+  isImage,
+  isWebClip,
+  CHECK_IDS,
+  checkIsUserPremium,
+  FilteredSelector,
+  EMPTY_CONTENT
+} from "@notesnook/core";
+import { sanitizeFilename } from "./file.js";
+import { database } from "../database.js";
 import { join, relative } from "pathe";
-import { EMPTY_CONTENT } from "@notesnook/core/dist/collections/content";
-import { getContentFromData } from "@notesnook/core/dist/content-types";
-import { PathTree } from "./path-tree";
-import { ResolveInternalLink } from "@notesnook/core/dist/content-types/tiptap";
+import { PathTree } from "./path-tree.js";
 
-const FORMAT_TO_EXT = {
+export const FORMAT_TO_EXT = {
   pdf: "pdf",
   md: "md",
   txt: "txt",
@@ -132,9 +138,12 @@ export async function* exportNotes(
         };
       }
     } catch (e) {
-      yield new Error(
-        `Failed to export note "${note.title}": ${(e as Error).message}`
-      );
+      if (e instanceof Error) {
+        e.message = `Failed to export note "${note.title || "<Untitled>"}": ${
+          e.message
+        }`;
+        yield e;
+      }
     }
   }
 
@@ -195,11 +204,12 @@ export async function* exportNote(
       };
     }
   } catch (e) {
-    yield new Error(
-      `Failed to export note "${note.title || "<Untitled>"}": ${
-        (e as Error).message
-      }`
-    );
+    if (e instanceof Error) {
+      e.message = `Failed to export note "${note.title || "<Untitled>"}": ${
+        e.message
+      }`;
+      yield e;
+    }
   }
 }
 

@@ -21,10 +21,12 @@ import { decodeHTML5 } from "entities";
 import { Parser } from "htmlparser2";
 
 export const parseHTML = (input: string) =>
-  new globalThis.DOMParser().parseFromString(
-    wrapIntoHTMLDocument(input),
-    "text/html"
-  );
+  "DOMParser" in globalThis
+    ? new globalThis.DOMParser().parseFromString(
+        wrapIntoHTMLDocument(input),
+        "text/html"
+      )
+    : null;
 
 export function getDummyDocument() {
   const doc = parseHTML("<div></div>");

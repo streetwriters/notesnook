@@ -26,7 +26,7 @@ import React, {
 } from "react";
 import { MenuItem, Icon, MenuButton, MenuSeparator } from "@notesnook/ui";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
-import { Icons } from "../../toolbar/icons";
+import { Icons } from "../../toolbar/icons.js";
 import Modal from "react-modal";
 import {
   motion,
@@ -38,7 +38,7 @@ import {
 import { useTheme } from "@emotion/react";
 import { EmotionThemeProvider, Theme } from "@notesnook/theme";
 
-const AnimatedFlex = motion(Flex);
+const AnimatedFlex = motion.create(Flex);
 
 type ActionSheetHistoryItem = {
   title?: string;

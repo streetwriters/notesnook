@@ -34,8 +34,9 @@ import { findToolById, getToolIcon } from "./toolbar-definition";
 import ToolSheet from "./tool-sheet";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { ToolId } from "@notesnook/editor/dist/toolbar/tools";
+import type { ToolId } from "@notesnook/editor";
 import PremiumService from "../../../services/premium";
+import { strings } from "@notesnook/intl";
 
 export const Tool = ({
   item,
@@ -81,10 +82,9 @@ export const Tool = ({
               }
               presentDialog({
                 context: "global",
-                title: "Delete collapsed section?",
-                positiveText: "Delete",
-                paragraph:
-                  "All tools in the collapsed section will also be removed.",
+                title: strings.deleteCollapsed(),
+                positiveText: strings.delete(),
+                paragraph: strings.deleteCollapsedDesc(),
                 positivePress: () => {
                   if (typeof groupIndex !== "number") return;
                   const _data = useDragState.getState().data.slice();
@@ -221,7 +221,7 @@ export const Tool = ({
               }
               size={isSubgroup ? SIZE.xs : SIZE.sm - 1}
             >
-              {isSubgroup ? "COLLAPSED" : tool?.title}
+              {isSubgroup ? strings.collapsed() : tool?.title}
             </Paragraph>
           </View>
 

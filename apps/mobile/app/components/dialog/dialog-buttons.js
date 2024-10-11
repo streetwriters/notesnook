@@ -26,12 +26,13 @@ import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
 import { getColorLinearShade } from "../../utils/colors";
+import { strings } from "@notesnook/intl";
 
 const DialogButtons = ({
   onPressPositive,
   onPressNegative,
   positiveTitle,
-  negativeTitle = "Cancel",
+  negativeTitle = strings.cancel(),
   loading,
   doneText,
   positiveType

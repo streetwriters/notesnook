@@ -17,12 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useStore as useAppStore } from "../../../stores/app-store";
+import { strings } from "@notesnook/intl";
+import { Button, Flex, Input, Link, Text, Box } from "@theme-ui/components";
 import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Box, Button, Flex, Input, Link, Text } from "@theme-ui/components";
 import { db } from "../../../common/db";
-import { importFiles } from "../../../utils/importer";
 import { CheckCircleOutline } from "../../../components/icons";
 import Accordion from "../../../components/accordion";
 
@@ -91,7 +90,7 @@ export function Importer() {
       {isImporting ? (
         <>
           <Text variant="title" sx={{ textAlign: "center", mb: 4, mt: 150 }}>
-            <span ref={notesCounter}>0</span> notes imported.
+            <span ref={notesCounter}>0</span> {strings.notesImported()}.
           </Text>
 
           <Flex
@@ -109,7 +108,7 @@ export function Importer() {
         <>
           <CheckCircleOutline color="accent" sx={{ mt: 150 }} />
           <Text variant="body" my={2} sx={{ textAlign: "center" }}>
-            Import completed. {errors.length} errors occured.
+            {strings.importCompleted()}. {strings.errorsOccured(errors.length)}
           </Text>
           <Button
             variant="secondary"
@@ -121,7 +120,7 @@ export function Importer() {
               setIsImporting(false);
             }}
           >
-            Start over
+            {strings.startOver()}
           </Button>
           {errors.length > 0 && (
             <Flex
@@ -232,10 +231,10 @@ export function Importer() {
             <Input {...getInputProps()} />
             <Text variant="body" sx={{ textAlign: "center" }}>
               {isDragActive
-                ? "Drop the files here"
-                : "Drag & drop files here, or click to select files"}
+                ? strings.dropFilesHere()
+                : strings.dragAndDropFiles()}
               <br />
-              <Text variant="subBody">Only .zip files are supported.</Text>
+              <Text variant="subBody">{strings.onlyZipSupported()}</Text>
             </Text>
             <Box sx={{ display: "flex", flexWrap: "wrap", mt: 2 }}>
               {files.map((file, i) => (

@@ -31,6 +31,7 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotebooks } from "../../stores/use-notebook-store";
+import { strings } from "@notesnook/intl";
 
 const onButtonPress = () => {
   AddNotebookSheet.present();
@@ -75,13 +76,13 @@ export const Notebooks = ({
       />
       <Header
         renderedInRoute={route.name}
-        title={route.name}
+        title={strings.routes[route.name]()}
         canGoBack={route.params?.canGoBack}
         hasSearch={true}
         id={route.name}
         onSearch={() => {
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${route.name?.toLowerCase()}`,
+            placeholder: strings.searchInRoute(route.name),
             type: "notebook",
             title: route.name,
             route: route.name
@@ -96,22 +97,19 @@ export const Notebooks = ({
           renderedInRoute="Notebooks"
           loading={loading}
           placeholder={{
-            title: "Your notebooks",
-            paragraph: "You have not added any notebooks yet.",
-            button: "Add your first notebook",
+            title: strings.yourNotebooks(),
+            paragraph: strings.notebooksEmpty(),
+            button: strings.addFirstNotebook(),
             action: onButtonPress,
-            loading: "Loading your notebooks"
+            loading: strings.loadingNotebooks()
           }}
-          headerTitle="Notebooks"
+          headerTitle={strings.routes[route.name]()}
         />
 
         {!notebooks ||
         notebooks.placeholders.length === 0 ||
         !isFocused ? null : (
-          <FloatingButton
-            title="Create a new notebook"
-            onPress={onButtonPress}
-          />
+          <FloatingButton onPress={onButtonPress} />
         )}
       </DelayLayout>
     </>

@@ -16,9 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { FetchOptions, fetchResource } from "./fetch";
-import { inlineAll } from "./inliner";
-import { isDataUrl } from "./utils";
+import { FetchOptions, fetchResource } from "./fetch.js";
+import { inlineAll } from "./inliner.js";
+import { isDataUrl } from "./utils.js";
 
 async function inlineAllImages(root: HTMLElement, options?: FetchOptions) {
   const imageNodes = root.querySelectorAll("img");

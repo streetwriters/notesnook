@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import "./polyfills";
 import "./app.css";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { register } from "./service-worker-registration";
@@ -24,6 +25,19 @@ import { getServiceWorkerVersion } from "./utils/version";
 import { register as registerStreamSaver } from "./utils/stream-saver/mitm";
 import { ThemeDark, ThemeLight, themeToCSS } from "@notesnook/theme";
 import Config from "./utils/config";
+import { setI18nGlobal, Messages } from "@notesnook/intl";
+import { i18n } from "@lingui/core";
+
+const locale = import.meta.env.DEV
+  ? import("@notesnook/intl/locales/$pseudo-LOCALE.json")
+  : import("@notesnook/intl/locales/$en.json");
+locale.then(({ default: locale }) => {
+  i18n.load({
+    en: locale.messages as unknown as Messages
+  });
+  i18n.activate("en");
+});
+setI18nGlobal(i18n);
 
 const colorScheme = JSON.parse(
   window.localStorage.getItem("colorScheme") || '"light"'

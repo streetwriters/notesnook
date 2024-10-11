@@ -31,21 +31,20 @@ import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrash, useTrashStore } from "../../stores/use-trash-store";
 import SelectionHeader from "../../components/selection-header";
+import { strings } from "@notesnook/intl";
 
 const onPressFloatingButton = () => {
   presentDialog({
-    title: "Clear trash",
-    paragraph: "Are you sure you want to clear the trash?",
-    positiveText: "Clear",
-    negativeText: "Cancel",
+    title: strings.clearTrash(),
+    paragraph: strings.clearTrashConfirm(),
+    positiveText: strings.clear(),
+    negativeText: strings.cancel(),
     positivePress: async () => {
       await db.trash?.clear();
       useTrashStore.getState().refresh();
       useSelectionStore.getState().clearSelection();
       ToastManager.show({
-        heading: "Trash cleared",
-        message:
-          "All notes and notebooks in the trash have been removed permanently.",
+        heading: strings.trashCleared(),
         type: "success",
         context: "local"
       });
@@ -54,16 +53,14 @@ const onPressFloatingButton = () => {
   });
 };
 const PLACEHOLDER_DATA = (trashCleanupInterval = 7) => ({
-  title: "Trash",
+  title: strings.trash(),
   paragraph:
     trashCleanupInterval === -1
-      ? "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
-      : `Trash gets automatically cleaned up ${
-          trashCleanupInterval === 1
-            ? "daily."
-            : `after ${trashCleanupInterval} days.`
-        }`,
-  loading: "Loading trash items"
+      ? strings.noTrashCleanupInterval()
+      : trashCleanupInterval === 1
+      ? strings.trashCleanupIntervalTextDaily()
+      : strings.trashCleanupIntervalTextDays(trashCleanupInterval),
+  loading: strings.loadingTrash()
 });
 
 export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
@@ -96,7 +93,7 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         hasSearch={true}
         onSearch={() => {
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${route.name}`,
+            placeholder: strings.searchInRoute(route.name),
             type: "trash",
             title: route.name,
             route: route.name
@@ -115,7 +112,6 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
 
         {trash && trash?.placeholders?.length !== 0 ? (
           <FloatingButton
-            title="Clear all trash"
             onPress={onPressFloatingButton}
             alwaysVisible={true}
           />

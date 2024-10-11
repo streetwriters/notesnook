@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./react-node-view";
-export * from "./types";
-export * from "./react-portal-provider";
-export * from "./event-dispatcher";
+export * from "./react-node-view.js";
+export * from "./types.js";
+export * from "./react-portal-provider.js";
+export * from "./event-dispatcher.js";

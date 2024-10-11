@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { resolveItems } from "@notesnook/common";
 import { VirtualizedGrouping } from "@notesnook/core";
-import { Color, Note } from "@notesnook/core/dist/types";
+import { Color, Note } from "@notesnook/core";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
@@ -40,6 +40,7 @@ import useNavigationStore, {
   RouteName
 } from "../../stores/use-navigation-store";
 import { setOnFirstSave } from "./common";
+import { strings } from "@notesnook/intl";
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
   get: (
@@ -194,7 +195,10 @@ const NotesPage = ({
       />
       <Header
         renderedInRoute={route.name}
-        title={title || route.name}
+        title={
+          title ||
+          strings.routes[route.name as unknown as keyof typeof strings.routes]()
+        }
         canGoBack={params?.current?.canGoBack}
         hasSearch={true}
         id={
@@ -207,7 +211,7 @@ const NotesPage = ({
               : db.relations.from(params.current.item, "note").selector;
 
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${title}`,
+            placeholder: strings.searchInRoute(title || route.name),
             type: "note",
             title: title,
             route: route.name,
@@ -227,7 +231,7 @@ const NotesPage = ({
           loading={!isFocused}
           renderedInRoute={route.name}
           id={params.current.item?.id}
-          headerTitle={title}
+          headerTitle={title || "Monographs"}
           customAccentColor={accentColor}
           placeholder={placeholder}
         />
@@ -235,11 +239,7 @@ const NotesPage = ({
         {!isMonograph &&
         ((notes?.placeholders && (notes?.placeholders?.length || 0) > 0) ||
           isFocused) ? (
-          <FloatingButton
-            color={accentColor}
-            title="Create a note"
-            onPress={onPressFloatingButton}
-          />
+          <FloatingButton color={accentColor} onPress={onPressFloatingButton} />
         ) : null}
       </DelayLayout>
     </>

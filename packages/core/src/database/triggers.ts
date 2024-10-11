@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Kysely, sql } from "@streetwriters/kysely";
-import { DatabaseSchema, RawDatabaseSchema } from ".";
+import { DatabaseSchema, RawDatabaseSchema } from "./index.js";
 
 export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
   // content triggers

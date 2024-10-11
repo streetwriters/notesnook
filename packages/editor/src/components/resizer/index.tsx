@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SchemeColors } from "@notesnook/theme";
 import { Resizable } from "re-resizable";
 import { PropsWithChildren } from "react";
-import { Icons } from "../../toolbar";
+import { Icons } from "../../toolbar/index.js";
 import { Icon } from "@notesnook/ui";
 import { Flex } from "@theme-ui/components";
-import { getEditorDOM } from "../../toolbar/utils/dom";
+import { getEditorDOM } from "../../toolbar/utils/dom.js";
 
 type ResizerProps = {
   enabled: boolean;

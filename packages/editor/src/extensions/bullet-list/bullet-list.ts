@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import TiptapBulletList from "@tiptap/extension-bullet-list";
 import { wrappingInputRule } from "@tiptap/core";
-import { getParentAttributes } from "../../utils/prosemirror";
+import { getParentAttributes } from "../../utils/prosemirror.js";
 
 export const inputRegex = /^\s*([-+*])\s$/;
 export const BulletList = TiptapBulletList.extend({

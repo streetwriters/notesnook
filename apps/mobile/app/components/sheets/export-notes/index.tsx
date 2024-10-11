@@ -52,6 +52,7 @@ import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 const ExportNotesSheet = ({
   ids,
@@ -118,7 +119,6 @@ const ExportNotesSheet = ({
         await exportNoteAs("pdf");
       },
       icon: "file-pdf-box",
-      desc: "View in any pdf reader app",
       id: notesnook.ids.dialogs.export.pdf,
       pro: premium
     },
@@ -128,7 +128,6 @@ const ExportNotesSheet = ({
         await exportNoteAs("md");
       },
       icon: "language-markdown",
-      desc: "View in any text or markdown editor",
       id: notesnook.ids.dialogs.export.md,
       pro: premium
     },
@@ -138,7 +137,6 @@ const ExportNotesSheet = ({
         await exportNoteAs("md-frontmatter");
       },
       icon: "language-markdown",
-      desc: "View in any text or markdown editor",
       id: notesnook.ids.dialogs.export.md,
       pro: premium
     },
@@ -148,7 +146,6 @@ const ExportNotesSheet = ({
         await exportNoteAs("txt");
       },
       icon: "card-text",
-      desc: "View in any text editor",
       id: notesnook.ids.dialogs.export.text,
       pro: true
     },
@@ -158,7 +155,6 @@ const ExportNotesSheet = ({
         await exportNoteAs("html");
       },
       icon: "language-html5",
-      desc: "View in any web browser & html reader",
       id: notesnook.ids.dialogs.export.html,
       pro: premium
     }
@@ -175,14 +171,7 @@ const ExportNotesSheet = ({
           >
             <DialogHeader
               icon="export"
-              title={
-                ids.length > 1 ? `Export ${ids.length} Notes` : "Export Note"
-              }
-              paragraph={`All exports are saved in ${
-                Platform.OS === "android"
-                  ? "the selected"
-                  : "Notesnook/exported"
-              } folder in phone storage`}
+              title={`${strings.export()} ${strings.notes(ids.length)}`}
             />
           </View>
 
@@ -238,13 +227,13 @@ const ExportNotesSheet = ({
                   <Heading style={{ marginLeft: 10 }} size={SIZE.md}>
                     {item.title}
                   </Heading>
-                  <Paragraph
+                  {/* <Paragraph
                     style={{ marginLeft: 10 }}
                     size={SIZE.sm}
                     color={colors.secondary.paragraph}
                   >
                     {item.desc}
-                  </Paragraph>
+                  </Paragraph> */}
                 </View>
               </Pressable>
             </Fragment>
@@ -264,9 +253,10 @@ const ExportNotesSheet = ({
               <>
                 <ActivityIndicator />
                 <Paragraph>
-                  {`${
-                    status ? `${status})` : `Exporting notes`
-                  }... Please wait`}
+                  {strings.exportingNotes(status) +
+                    "..." +
+                    " " +
+                    strings.pleaseWait()}
                 </Paragraph>
               </>
             ) : (
@@ -287,21 +277,20 @@ const ExportNotesSheet = ({
                   }}
                   color={colors.secondary.heading}
                 >
-                  {ids.length > 1
-                    ? `${ids.length} Notes exported`
-                    : "Note exported"}
+                  {strings.exportSuccessHeading(ids.length)}
                 </Heading>
                 <Paragraph
                   style={{
                     textAlign: "center"
                   }}
                 >
-                  Your {ids.length > 1 ? "notes are" : "note is"} exported
-                  successfully as {result?.fileName}
+                  {strings.exportSuccessDesc(result?.fileName as string)}
                 </Paragraph>
                 <Button
                   title={
-                    Platform.OS === "android" ? "Open file location" : "Open"
+                    Platform.OS === "android"
+                      ? strings.openFileLocation()
+                      : strings.open()
                   }
                   type="accent"
                   width={250}
@@ -322,8 +311,7 @@ const ExportNotesSheet = ({
                         showAppsSuggestions: true
                       }).catch((e) => {
                         ToastManager.show({
-                          heading: "Cannot open",
-                          message: `No application found to open ${result.name} file.`,
+                          heading: strings.noApplicationFound(result.name),
                           type: "success",
                           context: "local"
                         });
@@ -332,7 +320,7 @@ const ExportNotesSheet = ({
                   }}
                 />
                 <Button
-                  title="Share"
+                  title={strings.share()}
                   type="secondaryAccented"
                   width={250}
                   fontSize={SIZE.md}
@@ -356,7 +344,7 @@ const ExportNotesSheet = ({
                   }}
                 />
                 <Button
-                  title="Export in another format"
+                  title={strings.exportAgain()}
                   type="inverted"
                   width={250}
                   fontSize={SIZE.md}

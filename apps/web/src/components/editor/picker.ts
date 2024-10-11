@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SerializedKey } from "@notesnook/crypto/dist/src/types";
+import { SerializedKey } from "@notesnook/crypto";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { db } from "../../common/db";
 import { TaskManager } from "../../common/task-manager";
@@ -27,6 +27,7 @@ import { showFilePicker } from "../../utils/file-picker";
 import { Attachment } from "@notesnook/editor";
 import { ImagePickerDialog } from "../../dialogs/image-picker-dialog";
 import { BuyDialog } from "../../dialogs/buy-dialog";
+import { strings } from "@notesnook/intl";
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
@@ -104,8 +105,7 @@ async function pickFile(
 ): Promise<Attachment | undefined> {
   try {
     if (file.size > FILE_SIZE_LIMIT)
-      throw new Error("File too big. You cannot add files over 500 MB.");
-    if (!file) return;
+      throw new Error(strings.fileTooLargeDesc(500));
 
     const hash = await addAttachment(file, options);
     return {
@@ -131,7 +131,7 @@ async function pickImage(
 ): Promise<Attachment | undefined> {
   try {
     if (file.size > IMAGE_SIZE_LIMIT)
-      throw new Error("Image too big. You cannot add images over 50 MB.");
+      throw new Error(strings.imageTooLarge(50));
     if (!file) return;
 
     const hash = await addAttachment(file, options);
@@ -232,8 +232,8 @@ function withProgress<T>(
 ): Promise<T | Error> {
   return TaskManager.startTask({
     type: "modal",
-    title: "Encrypting attachment",
-    subtitle: "Please wait while we encrypt this attachment for upload.",
+    title: strings.encryptingAttachment(),
+    subtitle: strings.encryptingAttachmentDesc(),
     action: (report) => {
       const event = AppEventManager.subscribe(
         AppEvents.UPDATE_ATTACHMENT_PROGRESS,

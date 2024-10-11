@@ -23,8 +23,8 @@ import {
 } from "@tiptap/pm/model";
 import { encodeNonAsciiHTML } from "entities";
 import { Schema, Slice } from "prosemirror-model";
-import { inferLanguage } from "../code-block";
-import { hasPermission } from "../../types";
+import { inferLanguage } from "../code-block/index.js";
+import { hasPermission } from "../../types.js";
 
 export class ClipboardDOMParser extends ProsemirrorDOMParser {
   static fromSchema(schema: Schema): ClipboardDOMParser {
@@ -43,8 +43,15 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       formatCodeblocks(dom);
       convertBrToSingleSpacedParagraphs(dom);
       removeImages(dom);
+      removeBlockId(dom);
     }
     return super.parseSlice(dom, options);
+  }
+}
+
+export function removeBlockId(dom: HTMLElement | Document) {
+  for (const element of dom.querySelectorAll("[data-block-id]")) {
+    element.removeAttribute("data-block-id");
   }
 }
 

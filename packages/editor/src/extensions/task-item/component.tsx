@@ -18,15 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Flex } from "@theme-ui/components";
-import { ReactNodeViewProps } from "../react";
+import { ReactNodeViewProps } from "../react/index.js";
 import { Icon } from "@notesnook/ui";
-import { Icons } from "../../toolbar/icons";
+import { Icons } from "../../toolbar/icons.js";
 import { findChildrenInRange } from "@tiptap/core";
 import { useCallback } from "react";
-import { TaskItemNode, TaskItemAttributes } from "./task-item";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store";
-import { isiOS } from "../../utils/platform";
-import { DesktopOnly } from "../../components/responsive";
+import type { TaskItemAttributes } from "./task-item.js";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
+import { isiOS } from "../../utils/platform.js";
+import { DesktopOnly } from "../../components/responsive/index.js";
+import TaskItem from "@tiptap/extension-task-item";
+import { strings } from "@notesnook/intl";
 
 export function TaskItemComponent(
   props: ReactNodeViewProps<TaskItemAttributes>
@@ -42,7 +44,7 @@ export function TaskItemComponent(
     const selectedTaskItems = findChildrenInRange(
       editor.state.doc,
       { from, to },
-      (node) => node.type.name === TaskItemNode.name
+      (node) => node.type.name === TaskItem.name
     );
     if (!empty && selectedTaskItems.findIndex((a) => a.node === node) > -1) {
       editor.commands.command(({ tr }) => {
@@ -145,7 +147,7 @@ export function TaskItemComponent(
           {editor.isEditable && (
             <Icon
               className="deleleTaskItem"
-              title="Delete this task item"
+              title={strings.delete()}
               path={Icons.close}
               size={18}
               sx={{

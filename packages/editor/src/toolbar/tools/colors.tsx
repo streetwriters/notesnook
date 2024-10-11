@@ -19,14 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import tinycolor from "tinycolor2";
-import { PopupWrapper } from "../../components/popup-presenter";
-import { config } from "../../utils/config";
-import { SplitButton } from "../components/split-button";
-import { ColorPicker } from "../popups/color-picker";
-import { usePopupManager, useToolbarLocation } from "../stores/toolbar-store";
-import { ToolProps } from "../types";
-import { getEditorToolbarPopup } from "../utils/dom";
+import { PopupWrapper } from "../../components/popup-presenter/index.js";
+import { config } from "../../utils/config.js";
+import { SplitButton } from "../components/split-button.js";
+import { ColorPicker } from "../popups/color-picker.js";
+import {
+  usePopupManager,
+  useToolbarLocation
+} from "../stores/toolbar-store.js";
+import { ToolProps } from "../types.js";
+import { getEditorToolbarPopup } from "../utils/dom.js";
 import { PositionOptions } from "@notesnook/ui";
+import { strings } from "@notesnook/intl";
 
 type ColorType = "background" | "text" | "border";
 type ColorToolProps = ToolProps & {
@@ -193,7 +197,7 @@ export function Highlight(props: ToolProps) {
       {...props}
       cacheKey="highlight"
       activeColor={editor.getAttributes("textStyle").backgroundColor}
-      title={"Background color"}
+      title={strings.backgroundColor()}
       type="background"
       onColorChange={(color) =>
         color
@@ -211,7 +215,7 @@ export function TextColor(props: ToolProps) {
       {...props}
       cacheKey={"textColor"}
       activeColor={editor.getAttributes("textStyle").color}
-      title="Text color"
+      title={strings.textColor()}
       type="text"
       onColorChange={(color) =>
         color

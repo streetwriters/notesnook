@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { CLIENT_ID } from "../common";
-import hosts from "../utils/constants";
-import http from "../utils/http";
+import { CLIENT_ID } from "../common.js";
+import hosts from "../utils/constants.js";
+import http from "../utils/http.js";
 
 export class Offers {
   static async getCode(promo: string, platform: "ios" | "android" | "web") {

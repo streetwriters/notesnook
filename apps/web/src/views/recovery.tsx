@@ -27,10 +27,10 @@ import AuthContainer from "../components/auth-container";
 import { AuthField, SubmitButton } from "./auth";
 import { createBackup, restoreBackupFile, selectBackupFile } from "../common";
 import Config from "../utils/config";
-import { EVENTS } from "@notesnook/core/dist/common";
 import { ErrorText } from "../components/error-text";
-import { User } from "@notesnook/core";
+import { EVENTS, User } from "@notesnook/core";
 import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
+import { strings } from "@notesnook/intl";
 
 type RecoveryMethodType = "key" | "backup" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
@@ -137,7 +137,10 @@ function useAuthenticateUser({
         const user = await db.user.fetchUser();
         setUser(user);
       } catch (e) {
-        showToast("error", "Failed to authenticate. Please try again.");
+        showToast(
+          "error",
+          `${strings.biometricsAuthFailed()}. ${strings.pleaseTryAgain()}.`
+        );
         openURL("/");
       } finally {
         setIsAuthenticating(false);
@@ -174,8 +177,8 @@ function Recovery(props: RecoveryProps) {
       >
         {isAuthenticating ? (
           <Loader
-            title="Authenticating user"
-            text={"Please wait while you are authenticated."}
+            title={strings.authenticatingUser()}
+            text={strings.authWait()}
           />
         ) : (
           <>
@@ -191,7 +194,7 @@ function Recovery(props: RecoveryProps) {
                 }}
                 variant={"body"}
               >
-                Authenticated as {user?.email}
+                {strings.authenticatedAs(user?.email)}
               </Text>
               <Button
                 sx={{
@@ -204,7 +207,7 @@ function Recovery(props: RecoveryProps) {
                 variant={"secondary"}
                 onClick={() => openURL("/login")}
               >
-                Remembered your password?
+                {strings.rememberedYourPassword()}
               </Button>
             </Flex>
             {Route && (
@@ -226,39 +229,16 @@ export default Recovery;
 
 type RecoveryMethod = {
   type: RecoveryMethodType;
-  title: string;
+  title: () => string;
   testId: string;
-  description: string;
+  description: () => string;
   isDangerous?: boolean;
 };
 
-const recoveryMethods: RecoveryMethod[] = [
-  {
-    type: "key",
-    testId: "step-recovery-key",
-    title: "Use recovery key",
-    description:
-      "Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption."
-  },
-  {
-    type: "backup",
-    testId: "step-backup",
-    title: "Use a backup file",
-    description:
-      "If you don't have a recovery key, you can recover your data by restoring a Notesnook data backup file (.nnbackup)."
-  },
-  {
-    type: "reset",
-    testId: "step-reset-account",
-    title: "Clear data & reset account",
-    description:
-      "EXTREMELY DANGEROUS! This action is irreversible. All your data including notes, notebooks, attachments & settings will be deleted. This is a full account reset. Proceed with caution.",
-    isDangerous: true
-  }
-];
 function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
   const { navigate } = props;
   const [selected, setSelected] = useState(0);
+  const recoveryMethods = strings.accountRecoveryMethods as RecoveryMethod[];
 
   if (isSessionExpired()) {
     navigate("new");
@@ -269,8 +249,8 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
     <RecoveryForm
       testId="step-recovery-methods"
       type="methods"
-      title="Choose a recovery method"
-      subtitle="How do you want to recover your account?"
+      title={strings.chooseRecoveryMethod()}
+      subtitle={strings.chooseRecoveryMethodDesc()}
       onSubmit={async () => {
         const selectedMethod = recoveryMethods[selected].type;
         navigate(`method:${selectedMethod}`, {
@@ -305,7 +285,7 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
               color: method.isDangerous ? "var(--heading-error)" : "heading"
             }}
           >
-            {method.title}
+            {method.title()}
           </Text>
           <Text
             variant={"body"}
@@ -315,7 +295,7 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
                 : "var(--paragraph-secondary)"
             }}
           >
-            {method.description}
+            {method.description()}
           </Text>
         </Button>
       ))}
@@ -342,17 +322,17 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
     <RecoveryForm
       testId="step-recovery-key"
       type="method:key"
-      title="Recover your account"
-      subtitle={"Use a data recovery key to reset your account password."}
+      title={strings.accountRecovery()}
+      subtitle={strings.accountRecoveryWithKey()}
       loading={{
-        title: `Downloading your data (${progress})`,
-        subtitle: "Please wait while your data is downloaded & decrypted."
+        title: `${strings.network.downloading()} (${progress})`,
+        subtitle: strings.keyRecoveryProgressDesc()
       }}
       onSubmit={async (form) => {
         setProgress(0);
 
         const user = await db.user.getUser();
-        if (!user) throw new Error("User not authenticated");
+        if (!user) throw new Error(strings.notLoggedIn());
         await db.storage().write(`_uk_@${user.email}@_k`, form.recoveryKey);
         await db.sync({ type: "fetch", force: true });
         navigate("backup");
@@ -361,12 +341,12 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       <AuthField
         id="recoveryKey"
         type="password"
-        label="Enter your data recovery key"
-        helpText="Your data recovery key will be used to decrypt your data"
+        label={strings.enterRecoveryKey()}
+        helpText={strings.enterRecoveryKeyHelp()}
         autoComplete="none"
         autoFocus
       />
-      <SubmitButton text="Start account recovery" />
+      <SubmitButton text={strings.startAccountRecovery()} />
 
       <Button
         type="button"
@@ -375,7 +355,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         onClick={() => navigate("methods")}
         sx={{ color: "paragraph" }}
       >
-        {`Don't have your recovery key?`}
+        {strings.dontHaveRecoveryKey()}
       </Button>
     </RecoveryForm>
   );
@@ -397,11 +377,11 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
     <RecoveryForm
       testId="step-backup-file"
       type="method:backup"
-      title="Recover your account"
+      title={strings.accountRecovery()}
       subtitle={
         <ErrorText
           sx={{ fontSize: "body" }}
-          error="All the data in your account will be overwritten with the data in the backup file. There is no way to reverse this action."
+          error={strings.backupFileRecoveryError()}
         />
       }
       onSubmit={async () => {
@@ -411,19 +391,19 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
       <AuthField
         id="backupFile"
         type="text"
-        label="Select backup file"
-        helpText="Backup files have .nnbackup extension"
+        label={strings.selectBackupFile()}
+        helpText={strings.backupFileHelpText()}
         autoComplete="none"
         autoFocus
         disabled
         action={{
-          component: <Text variant={"body"}>Browse</Text>,
+          component: <Text variant={"body"}>{strings.browse()}</Text>,
           onClick: async () => {
             setBackupFile(await selectBackupFile());
           }
         }}
       />
-      <SubmitButton text="Start account recovery" />
+      <SubmitButton text={strings.startAccountRecovery()} />
 
       <Button
         type="button"
@@ -432,7 +412,7 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
         onClick={() => navigate("methods")}
         sx={{ color: "paragraph" }}
       >
-        {`Don't have a backup file?`}
+        {strings.dontHaveBackupFile()}
       </Button>
     </RecoveryForm>
   );
@@ -445,21 +425,18 @@ function BackupData(props: BaseRecoveryComponentProps<"backup">) {
     <RecoveryForm
       testId="step-backup-data"
       type="backup"
-      title="Backup your data"
-      subtitle={
-        "Please download a backup of your data as your account will be cleared before recovery."
-      }
+      title={strings.backupYourData()}
+      subtitle={strings.backupYourDataDesc()}
       loading={{
-        title: "Creating backup...",
-        subtitle:
-          "Please wait while we create a backup file for you to download."
+        title: strings.backingUpData() + "...",
+        subtitle: strings.backingUpDataWait()
       }}
       onSubmit={async () => {
         await createBackup({ rescueMode: true, mode: "full" });
         navigate("new");
       }}
     >
-      <SubmitButton text="Download backup file" />
+      <SubmitButton text={strings.downloadBackupFile()} />
     </RecoveryForm>
   );
 }
@@ -481,13 +458,11 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
     <RecoveryForm
       testId="step-new-password"
       type="new"
-      title="Reset account password"
-      subtitle={
-        "Notesnook is E2E encrypted — your password never leaves this device."
-      }
+      title={strings.resetAccountPassword()}
+      subtitle={strings.accountPassDesc()}
       loading={{
-        title: `Resetting account password (${progress})`,
-        subtitle: "Please wait while we reset your account password."
+        title: `${strings.resettingAccountPassword()} (${progress})`,
+        subtitle: strings.resetPasswordWait()
       }}
       onSubmit={async (form) => {
         setProgress(0);
@@ -515,18 +490,18 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
             id="password"
             type="password"
             autoComplete="current-password"
-            label="Set new password"
-            helpText="Your account password must be strong & unique."
+            label={strings.newPassword()}
+            helpText={strings.newPasswordHelp()}
             defaultValue={form?.password}
           />
           <AuthField
             id="confirmPassword"
             type="password"
             autoComplete="confirm-password"
-            label="Confirm new password"
+            label={strings.confirmPassword()}
             defaultValue={form?.confirmPassword}
           />
-          <SubmitButton text="Continue" />
+          <SubmitButton text={strings.continue()} />
         </>
       )}
     </RecoveryForm>
@@ -548,21 +523,21 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
   }, []);
 
   if (!isReady && !isSessionExpired)
-    return <Loader text="" title={"Finalizing. Please wait..."} />;
+    return <Loader text="" title={strings.loading() + "..."} />;
 
   return (
     <RecoveryForm
       testId="step-finished"
       type="final"
-      title="Recovery successful!"
-      subtitle={"Your account has been recovered."}
+      title={strings.recoverySuccess()}
+      subtitle={strings.recoverySuccessDesc()}
       onSubmit={async () => {
         openURL(isSessionExpired() ? "/sessionexpired" : "/login");
       }}
     >
       <SubmitButton
         text={
-          isSessionExpired() ? "Continue with login" : "Login to your account"
+          isSessionExpired() ? strings.continue() : strings.loginToYourAccount()
         }
       />
     </RecoveryForm>

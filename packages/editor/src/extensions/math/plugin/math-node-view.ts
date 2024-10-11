@@ -44,9 +44,9 @@ import {
   deleteSelection
 } from "prosemirror-commands";
 
-import { collapseMathNode } from "./commands/collapse-math-node";
-import { IMathPluginState } from "./math-plugin";
-import { MathRenderFn } from "./renderers/types";
+import { collapseMathNode } from "./commands/collapse-math-node.js";
+import { IMathPluginState } from "./math-plugin.js";
+import { MathRenderFn } from "./renderers/types.js";
 
 type FragmentWithContent = Fragment & { content: ProseNode[] };
 

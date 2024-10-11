@@ -17,9 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import EventManager, {
-  EventHandler
-} from "@notesnook/core/dist/utils/event-manager";
+import { EventHandler, EventManager } from "@notesnook/core";
 import Clipboard from "@react-native-clipboard/clipboard";
 import { RefObject } from "react";
 import { ActionSheetRef } from "react-native-actions-sheet";
@@ -32,6 +30,7 @@ import {
   eOpenVaultDialog,
   eShowToast
 } from "../utils/events";
+import { strings } from "@notesnook/intl";
 
 type Vault = {
   item: unknown;
@@ -139,6 +138,7 @@ export type ToastOptions = {
   duration?: number;
   func?: () => void;
   actionText?: string;
+  icon?: string;
 };
 
 export const ToastManager = {
@@ -173,7 +173,7 @@ export const ToastManager = {
       func: () => {
         Clipboard.setString(e?.stack || "");
         ToastManager.show({
-          heading: "Logs copied!",
+          heading: strings.logsCopied(),
           type: "success",
           context: "global",
           duration: duration

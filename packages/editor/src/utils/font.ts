@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getFontConfig } from "@notesnook/theme/dist/theme/font";
+import { getFontConfig } from "@notesnook/theme";
 
 const FONTS = [
   {

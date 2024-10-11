@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Tag } from "@notesnook/core/dist/types";
+import { Tag } from "@notesnook/core";
 import React from "react";
 import NotesPage from ".";
 import { db } from "../../common/database";

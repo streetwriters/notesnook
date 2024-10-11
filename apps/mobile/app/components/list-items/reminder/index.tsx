@@ -30,6 +30,7 @@ import { ReminderTime } from "../../ui/reminder-time";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper, { selectItem } from "../selection-wrapper";
+import { strings } from "@notesnook/intl";
 
 const ReminderItem = React.memo(
   ({
@@ -108,7 +109,7 @@ const ReminderItem = React.memo(
                   color={colors.secondary.paragraph}
                   style={{ marginLeft: 5 }}
                 >
-                  Disabled
+                  {strings.disabled()}
                 </Paragraph>
               </View>
             ) : null}
@@ -137,9 +138,7 @@ const ReminderItem = React.memo(
                   color={colors.secondary.paragraph}
                   style={{ marginLeft: 5 }}
                 >
-                  {item.recurringMode.slice(0, 1).toUpperCase() +
-                    item.recurringMode.replace("y", "i").slice(1) +
-                    "ly"}
+                  {strings.reminderRecurringMode[item.recurringMode]()}
                 </Paragraph>
               </View>
             ) : null}

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import NetInfo from "@react-native-community/netinfo";
 import RNFetchBlob from "react-native-blob-util";
 import { ToastManager } from "../../services/event-manager";
@@ -43,16 +44,17 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
       DatabaseLogger.log(`File Exists already: ${filename}`);
       return true;
     }
+
     const attachment = await db.attachments.attachment(filename);
     const size = await getUploadedFileSize(filename);
 
     if (size === -1) {
-      const error = `Uploaded file verification failed. (File hash: ${filename})`;
+      const error = `${strings.fileVerificationFailed()} (File hash: ${filename})`;
       throw new Error(error);
     }
 
     if (size === 0) {
-      const error = `File length is 0. Please upload this file again from the attachment manager. (File hash: ${filename})`;
+      const error = `${strings.fileLengthError()} (File hash: ${filename})`;
       await db.attachments.markAsFailed(attachment.id, error);
       throw new Error(error);
     }
@@ -61,7 +63,10 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
     const decryptedLength = size - totalChunks * ABYTES;
 
     if (attachment && attachment.size !== decryptedLength) {
-      const error = `File length mismatch. Expected ${attachment.size} but got ${decryptedLength} bytes. Please upload this file again from the attachment manager. (File hash: ${filename})`;
+      const error = `${strings.fileLengthMismatch(
+        attachment.size,
+        decryptedLength
+      )} (File hash: ${filename})`;
       await db.attachments.markAsFailed(attachment.id, error);
       throw new Error(error);
     }
@@ -75,7 +80,9 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
       DatabaseLogger.log(
         `Error downloading file: ${filename}, ${res.status}, ${res.statusText}, reason: Unable to resolve download url`
       );
-      throw new Error(`${res.status}: Unable to resolve download url`);
+      throw new Error(
+        `${res.status}: ${strings.failedToResolvedDownloadUrl()}`
+      );
     }
 
     const downloadUrl = await res.text();
@@ -84,13 +91,14 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
       DatabaseLogger.log(
         `Error downloading file: ${filename}, reason: Unable to resolve download url`
       );
-      throw new Error("Unable to resolve download url");
+      throw new Error(strings.failedToResolvedDownloadUrl());
     }
 
     DatabaseLogger.log(`Download starting: ${filename}`);
     let request = RNFetchBlob.config({
       path: tempFilePath,
-      IOSBackgroundTask: true
+      IOSBackgroundTask: true,
+      overwrite: true
     })
       .fetch("GET", downloadUrl, null)
       .progress(async (recieved, total) => {
@@ -122,6 +130,11 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
 
     let status = response.info().status;
     useAttachmentStore.getState().remove(filename);
+
+    if (exists(originalFilePath)) {
+      await RNFetchBlob.fs.unlink(originalFilePath).catch(console.log);
+    }
+
     await RNFetchBlob.fs.mv(tempFilePath, originalFilePath);
 
     if (!(await exists(filename))) {
@@ -131,18 +144,15 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
     return status >= 200 && status < 300;
   } catch (e) {
     if (e.message !== "canceled" && !e.message.includes("NoSuchKey")) {
-      ToastManager.show({
-        heading: "Error downloading file",
+      const toast = {
+        heading: strings.downloadError(),
         message: e.message,
         type: "error",
         context: "global"
-      });
-      ToastManager.show({
-        heading: "Error downloading file",
-        message: e.message,
-        type: "error",
-        context: "local"
-      });
+      };
+      ToastManager.show(toast);
+      toast.context = "local";
+      ToastManager.show(toast);
     }
 
     useAttachmentStore.getState().remove(filename);

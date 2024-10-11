@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { databaseTest } from "./utils";
+import { databaseTest } from "./utils/index.ts";
 import { test, expect } from "vitest";
 
 test("save group options", () =>

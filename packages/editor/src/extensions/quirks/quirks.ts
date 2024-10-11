@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Editor, Extension, findParentNode } from "@tiptap/core";
 import { EditorState, Selection } from "@tiptap/pm/state";
-import { isAndroid } from "../../utils/platform";
+import { isAndroid } from "../../utils/platform.js";
 
 export type QuirksOptions = {
   /**

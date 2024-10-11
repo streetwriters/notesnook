@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/clipper",
-  "version": "2.0.7",
+  "version": "2.1.3",
   "description": "Web clipper core used by the Notesnook Web Clipper",
   "keywords": [
     "web-clipper"

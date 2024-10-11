@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   IMG_CONTENT,
   IMG_CONTENT_WITHOUT_HASH
-} from "../../../__tests__/utils";
-import { Tiptap } from "../tiptap";
+} from "../../../__tests__/utils/index.ts";
+import { Tiptap } from "../tiptap.ts";
 import { test, expect } from "vitest";
 
 test("img src is empty after extract attachments", async () => {

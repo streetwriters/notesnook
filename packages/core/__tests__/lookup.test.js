@@ -23,7 +23,7 @@ import {
   notebookTest,
   TEST_NOTEBOOK2,
   databaseTest
-} from "./utils";
+} from "./utils/index.ts";
 import { test, expect } from "vitest";
 
 const content = {

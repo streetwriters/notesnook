@@ -30,11 +30,12 @@ import {
 import { VirtualizedList } from "../components/virtualized-list";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { ScrollContainer } from "@notesnook/ui";
-import { LinkAttributes } from "@notesnook/editor/dist/extensions/link";
+import { LinkAttributes } from "@notesnook/editor";
 import { NoteResolvedData, ResolvedItem } from "@notesnook/common";
 import { Lock } from "../components/icons";
-import { ellipsize } from "@notesnook/core/dist/utils/content-block";
+import { ellipsize } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 export type NoteLinkingDialogProps = BaseDialogProps<LinkAttributes | false> & {
   attributes?: LinkAttributes;
@@ -55,7 +56,9 @@ export const NoteLinkingDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title={attributes ? "Edit internal link" : "Link to note"}
+        title={
+          attributes ? strings.editInternalLink() : strings.newInternalLink()
+        }
         width={500}
         onClose={() => props.onClose(false)}
         onOpen={async () => {
@@ -64,7 +67,7 @@ export const NoteLinkingDialog = DialogManager.register(
           );
         }}
         positiveButton={{
-          text: "Insert link",
+          text: attributes ? strings.done() : strings.insertLink(),
           disabled: !selectedNote,
           onClick: () =>
             selectedNote
@@ -74,7 +77,10 @@ export const NoteLinkingDialog = DialogManager.register(
                 })
               : null
         }}
-        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => props.onClose(false)
+        }}
         noScroll
       >
         <Flex variant="columnFill" sx={{ mx: 3, overflow: "hidden" }}>
@@ -82,7 +88,7 @@ export const NoteLinkingDialog = DialogManager.register(
             <>
               <Field
                 autoFocus
-                placeholder="Type # to only search headings"
+                placeholder={strings.searchSectionToLinkPlaceholder()}
                 sx={{ mx: 0 }}
                 onChange={async (e) => {
                   const query = e.target.value.trim().toLowerCase();
@@ -113,15 +119,16 @@ export const NoteLinkingDialog = DialogManager.register(
                   setBlocks([]);
                 }}
               >
-                Selected note: {selectedNote.title} (click to deselect)
+                {strings.linkNoteSelectedNote()}: {selectedNote.title} (
+                {strings.clickToDeselect()})
               </Button>
               {isNoteLocked ? (
                 <Text variant="body" sx={{ mt: 1 }}>
-                  Linking to a specific block is not available for locked notes.
+                  {strings.noteLockedBlockLink()}
                 </Text>
               ) : blocks.length <= 0 ? (
                 <Text variant="body" sx={{ mt: 1 }}>
-                  There are no blocks in this note.
+                  {strings.noBlocksOnNote()}
                 </Text>
               ) : null}
               <ScrollContainer>
@@ -158,7 +165,7 @@ export const NoteLinkingDialog = DialogManager.register(
                         sx={{ fontFamily: "monospace", whiteSpace: "pre-wrap" }}
                       >
                         {ellipsize(item.content, 200, "end").trim() ||
-                          "(empty block)"}
+                          strings.linkNoteEmptyBlock()}
                       </Text>
                       <Text
                         variant="subBody"
@@ -182,7 +189,7 @@ export const NoteLinkingDialog = DialogManager.register(
             <>
               <Field
                 autoFocus
-                placeholder="Search for a note to link to..."
+                placeholder={strings.searchNoteToLinkPlaceholder()}
                 sx={{ mx: 0 }}
                 onChange={async (e) => {
                   const query = e.target.value.trim();

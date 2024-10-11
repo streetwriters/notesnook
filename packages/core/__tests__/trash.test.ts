@@ -24,7 +24,7 @@ import {
   TEST_NOTE,
   TEST_NOTEBOOK,
   databaseTest
-} from "./utils";
+} from "./utils/index.js";
 import { test, expect } from "vitest";
 
 test("trash should be empty", () =>

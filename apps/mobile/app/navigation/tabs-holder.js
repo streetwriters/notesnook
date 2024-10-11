@@ -24,7 +24,6 @@ import {
 } from "@sayem314/react-native-keep-awake";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Dimensions, Platform, StatusBar, View } from "react-native";
-import changeNavigationBarColor from "react-native-navigation-bar-color";
 import {
   addOrientationListener,
   addSpecificOrientationListener,
@@ -74,7 +73,7 @@ import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
 
 const _TabsHolder = () => {
-  const { colors, isDark } = useThemeColors();
+  const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const setFullscreen = useSettingStore((state) => state.setFullscreen);
   const fullscreen = useSettingStore((state) => state.fullscreen);
@@ -270,33 +269,29 @@ const _TabsHolder = () => {
     }
 
     const state = getAppState();
-
-    setTimeout(() => {
-      switch (current) {
-        case "tablet":
-          tabBarRef.current?.goToIndex(0, false);
-          break;
-        case "smallTablet":
-          if (!fullscreen) {
-            tabBarRef.current?.closeDrawer(false);
-          } else {
-            tabBarRef.current?.openDrawer(false);
-          }
-          break;
-        case "mobile":
-          if (
-            (state &&
-              !state?.movedAway &&
-              useTabStore.getState().getCurrentNoteId()) ||
-            editorState().movedAway === false
-          ) {
-            tabBarRef.current?.goToIndex(2, false);
-          } else {
-            tabBarRef.current?.goToIndex(1, false);
-          }
-          break;
-      }
-    }, 1000);
+    switch (current) {
+      case "tablet":
+        tabBarRef.current?.goToIndex(0, false);
+        break;
+      case "smallTablet":
+        if (!fullscreen) {
+          tabBarRef.current?.closeDrawer(false);
+        } else {
+          tabBarRef.current?.openDrawer(false);
+        }
+        break;
+      case "mobile":
+        if (
+          state &&
+          editorState().movedAway === false &&
+          useTabStore.getState().getCurrentNoteId()
+        ) {
+          tabBarRef.current?.goToIndex(2, false);
+        } else {
+          tabBarRef.current?.goToIndex(1, false);
+        }
+        break;
+    }
   }
 
   const onScroll = (scrollOffset) => {
@@ -386,18 +381,12 @@ const _TabsHolder = () => {
     };
   }, []);
 
-  useEffect(() => {
-    function updateSystemBars() {
-      changeNavigationBarColor(colors.primary.background, isDark, true);
-      StatusBar.setBackgroundColor("transparent");
-      StatusBar.setTranslucent(true);
-      StatusBar.setBarStyle(isDark ? "light-content" : "dark-content");
-    }
-    updateSystemBars();
-    setTimeout(() => {
-      updateSystemBars();
-    }, 1000);
-  }, [colors.primary.background, isDark]);
+  // useEffect(() => {
+  //   changeSystemBarColors();
+  //   setTimeout(() => {
+  //     changeSystemBarColors();
+  //   }, 1000);
+  // }, [colors.primary.background, isDark]);
 
   return (
     <View

@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { VAULT_ERRORS } from "../src/api/vault";
-import { databaseTest, delay, noteTest, TEST_NOTE } from "./utils";
+import { VAULT_ERRORS } from "../src/api/vault.ts";
+import { databaseTest, delay, noteTest, TEST_NOTE } from "./utils/index.ts";
 import { test, expect } from "vitest";
 
 test("create vault", () =>

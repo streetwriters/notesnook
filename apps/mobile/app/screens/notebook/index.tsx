@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { resolveItems } from "@notesnook/common";
 import { VirtualizedGrouping } from "@notesnook/core";
-import { Note, Notebook } from "@notesnook/core/dist/types";
+import { Note, Notebook } from "@notesnook/core";
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
@@ -41,6 +41,7 @@ import { eUpdateNotebookRoute } from "../../utils/events";
 import { findRootNotebookId } from "../../utils/notebooks";
 import { SIZE } from "../../utils/size";
 import { openEditor, setOnFirstSave } from "../notes/common";
+import { strings } from "@notesnook/intl";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
@@ -167,7 +168,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           ).selector;
 
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${params.current.item?.title}`,
+            placeholder: strings.searchInRoute(params.current.item?.title),
             type: "note",
             title: params.current.item?.title,
             route: route.name,
@@ -252,10 +253,10 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           }
           placeholder={{
             title: params.current.item?.title,
-            paragraph: "You have not added any notes yet.",
-            button: "Add your first note",
+            paragraph: strings.notesEmpty(),
+            button: strings.addFirstNote(),
             action: openEditor,
-            loading: "Loading notebook notes"
+            loading: strings.loadingNotes()
           }}
         />
       </DelayLayout>

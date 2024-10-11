@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { ItemReference } from "@notesnook/core/dist/types";
-import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
+import { ItemReference } from "@notesnook/core";
+import type { Attachment } from "@notesnook/editor";
 import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef } from "react";
@@ -76,13 +76,13 @@ import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { EditorEvents, editorState, openInternalLink } from "./utils";
+import { strings } from "@notesnook/intl";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
   if (!user) {
     ToastManager.show({
-      heading: "Login required",
-      message: "Login to publish",
+      heading: strings.loginRequired(),
       context: "global",
       func: () => {
         eSendEvent(eOpenLoginDialog);
@@ -94,8 +94,7 @@ const publishNote = async () => {
 
   if (!user?.isEmailConfirmed) {
     ToastManager.show({
-      heading: "Email not verified",
-      message: "Please verify your email first.",
+      heading: strings.emailNotConfirmed(),
       context: "global"
     });
     return;
@@ -109,7 +108,7 @@ const publishNote = async () => {
     const locked = note && (await db.vaults.itemExists(note));
     if (locked) {
       ToastManager.show({
-        heading: "Locked notes cannot be published",
+        heading: strings.lockedNotesPublishFailed(),
         type: "error",
         context: "global"
       });
@@ -135,7 +134,7 @@ const showActionsheet = async () => {
     Properties.present(note, ["Dark Mode"]);
   } else {
     ToastManager.show({
-      heading: "Start writing to create a new note",
+      heading: strings.noNoteProperties(),
       type: "success",
       context: "global"
     });
@@ -428,7 +427,7 @@ export const useEditorEvents = (
         case EventTypes.reminders:
           if (!noteId) {
             ToastManager.show({
-              heading: "Create a note first to add a reminder",
+              heading: strings.createNoteFirst(),
               type: "success"
             });
             return;
@@ -439,14 +438,14 @@ export const useEditorEvents = (
             reference: note as any,
             referenceType: "reminder",
             relationType: "from",
-            title: "Reminders",
+            title: strings.dataTypesPluralCamelCase.reminder(),
             onAdd: () => ReminderSheet.present(undefined, note, true)
           });
           break;
         case EventTypes.newtag:
           if (!noteId) {
             ToastManager.show({
-              heading: "Create a note first to add a tag",
+              heading: strings.createNoteFirst(),
               type: "success"
             });
             return;

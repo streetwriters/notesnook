@@ -27,7 +27,7 @@ const allPackages = await glob(["packages/**", "apps/**", "extensions/**"], {
   onlyDirectories: true
 });
 
-const tasks = new Listr([], { concurrent: 4, exitOnError: false });
+const tasks = new Listr([], { concurrent: 8, exitOnError: false });
 for (const pkg of allPackages) {
   for (const dirname of ["node_modules", "dist", "build", "out"]) {
     const dir = path.join(pkg, dirname);

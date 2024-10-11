@@ -30,6 +30,7 @@ import { Properties } from "../../properties";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 type NotebookItemProps = {
   item: Notebook | BaseTrashItem<Notebook>;
@@ -112,10 +113,11 @@ export const NotebookItem = ({
                     marginRight: 6
                   }}
                 >
-                  {"Deleted on " +
+                  {strings.deletedOn(
                     new Date((item as TrashItem).dateDeleted)
                       .toISOString()
-                      .slice(0, 10)}
+                      .slice(0, 10)
+                  )}
                 </Paragraph>
                 <Paragraph
                   color={colors.primary.accent}
@@ -147,11 +149,7 @@ export const NotebookItem = ({
                 marginRight: 6
               }}
             >
-              {item && totalNotes > 1
-                ? totalNotes + " notes"
-                : totalNotes === 1
-                ? totalNotes + " note"
-                : "0 notes"}
+              {strings.notes(totalNotes)}
             </Paragraph>
 
             {item.pinned ? (
@@ -183,11 +181,7 @@ export const NotebookItem = ({
                 marginRight: 6
               }}
             >
-              {item && totalNotes > 1
-                ? totalNotes + " notes"
-                : totalNotes === 1
-                ? totalNotes + " note"
-                : "0 notes"}
+              {strings.notes(totalNotes)}
             </Paragraph>
           </>
         ) : null}

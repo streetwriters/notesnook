@@ -16,8 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { NoteContent } from "@notesnook/core/dist/collections/session-content";
-import { Note } from "@notesnook/core/dist/types";
+import { NoteContent, Note } from "@notesnook/core";
 import { db } from "../common/database";
 
 export async function convertNoteToText(note: Note, disableTemplate?: boolean) {

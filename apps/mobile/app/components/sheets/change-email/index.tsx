@@ -30,6 +30,7 @@ import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { eUserLoggedIn } from "../../../utils/events";
+import { strings } from "@notesnook/intl";
 
 type ChangeEmailProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -68,7 +69,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
         const verified = await db.user?.verifyPassword(
           emailChangeData.current.password
         );
-        if (!verified) throw new Error("Password is incorrect");
+        if (!verified) throw new Error(strings.passwordIncorrect());
         await db.user?.sendVerificationEmail(emailChangeData.current.email);
         setStep(EmailChangeSteps.changeEmail);
         setLoading(false);
@@ -88,8 +89,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
         eSendEvent(eUserLoggedIn);
         close?.();
         ToastManager.show({
-          heading: `Email changed`,
-          message: `Your account email has been updated to ${emailChangeData.current.email}`,
+          heading: strings.emailUpdated(emailChangeData.current.email),
           type: "success",
           context: "global"
         });
@@ -103,8 +103,8 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
   return (
     <View style={{ paddingHorizontal: 12 }}>
       <DialogHeader
-        title="Change email"
-        paragraph="Your account email will be changed without affecting your subscription or any other settings."
+        title={strings.changeEmail()}
+        paragraph={strings.changeEmailDesc()}
       />
       <View
         style={{
@@ -115,7 +115,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
           <>
             <Input
               fwdRef={emailInputRef}
-              placeholder="Enter your new email"
+              placeholder={strings.enterNewEmail()}
               validationType="email"
               onErrorCheck={(e) => setError(e)}
               onChangeText={(email) => {
@@ -124,7 +124,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
             />
             <Input
               fwdRef={passInputRef}
-              placeholder="Enter your account password"
+              placeholder={strings.enterAccountPassword()}
               secureTextEntry
               onChangeText={(pass) => {
                 emailChangeData.current.password = pass;
@@ -135,7 +135,7 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
           <>
             <Input
               fwdRef={codeInputRef}
-              placeholder="Enter verification code sent to your new email"
+              placeholder={strings.verifyNewEmail()}
               onChangeText={(code) => {
                 emailChangeData.current.code = code;
               }}
@@ -149,8 +149,8 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
           loading
             ? undefined
             : step === EmailChangeSteps.verify
-            ? "Verify"
-            : "Change email"
+            ? strings.verify()
+            : strings.changeEmail()
         }
         type="accent"
         width={250}

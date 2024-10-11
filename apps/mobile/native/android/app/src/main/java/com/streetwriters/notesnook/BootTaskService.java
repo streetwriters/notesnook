@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -12,20 +13,22 @@ import androidx.core.app.NotificationCompat;
 import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
+
 import javax.annotation.Nullable;
 
 public class BootTaskService extends HeadlessJsTaskService {
     Notification notification;
+
     @Override
-  protected @Nullable HeadlessJsTaskConfig getTaskConfig(Intent intent) {
-      Log.d("BootTask", "Task Started");
-      return new HeadlessJsTaskConfig(
-              "com.streetwriters.notesnook.BOOT_TASK",
-              Arguments.createMap(),
-              30000, // timeout for the task
-              false // optional: defines whether or not the task is allowed in foreground. Default is false
-      );
-  }
+    protected @Nullable HeadlessJsTaskConfig getTaskConfig(Intent intent) {
+        Log.d("BootTask", "Task Started");
+        return new HeadlessJsTaskConfig(
+                "com.streetwriters.notesnook.BOOT_TASK",
+                Arguments.createMap(),
+                30000, // timeout for the task
+                false // optional: defines whether or not the task is allowed in foreground. Default is false
+        );
+    }
 
     @Override
     public void onHeadlessJsTaskFinish(int taskId) {
@@ -48,7 +51,17 @@ public class BootTaskService extends HeadlessJsTaskService {
                     .setContentText("")
                     .setSmallIcon(R.drawable.ic_stat_name)
                     .build();
-            startForeground(1, notification);
+            if (android.os.Build.VERSION.SDK_INT >= 34) {
+                this.startForeground(
+                        1,
+                        notification,
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+            } else {
+                this.startForeground(
+                        1,
+                        notification);
+            }
+
         }
 
         return super.onStartCommand(intent, flags, startId);

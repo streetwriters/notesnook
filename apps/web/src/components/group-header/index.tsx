@@ -43,7 +43,8 @@ import {
   GroupHeader as GroupHeaderType,
   GroupOptions,
   GroupingKey
-} from "@notesnook/core/dist/types";
+} from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 
 const groupByToTitleMap = {
   none: "None",
@@ -69,16 +70,16 @@ const groupByMenu: (options: GroupingMenuOptions) => MenuItem | null = (
     : {
         type: "button",
         key: "groupBy",
-        title: "Group by",
+        title: strings.groupBy(),
         icon: GroupBy.path,
         menu: {
           items: map(options, [
-            { key: "none", title: "None" },
-            { key: "default", title: "Default" },
-            { key: "year", title: "Year" },
-            { key: "month", title: "Month" },
-            { key: "week", title: "Week" },
-            { key: "abc", title: "A - Z" }
+            { key: "none", title: strings.groupByStrings.None() },
+            { key: "default", title: strings.groupByStrings.default() },
+            { key: "year", title: strings.groupByStrings.year() },
+            { key: "month", title: strings.groupByStrings.month() },
+            { key: "week", title: strings.groupByStrings.week() },
+            { key: "abc", title: strings.groupByStrings.abc() }
           ])
         }
       };
@@ -86,7 +87,7 @@ const groupByMenu: (options: GroupingMenuOptions) => MenuItem | null = (
 const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
   type: "button",
   key: "sortDirection",
-  title: "Order by",
+  title: strings.orderBy(),
   icon:
     options.groupOptions.sortDirection === "asc"
       ? options.groupOptions.sortBy === "title"
@@ -101,19 +102,19 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
         key: "asc",
         title:
           options.groupOptions.sortBy === "title"
-            ? "A - Z"
+            ? strings.aToZ()
             : options.groupOptions.sortBy === "dueDate"
-            ? "Earliest first"
-            : "Oldest - newest"
+            ? strings.earliestFirst()
+            : strings.oldestToNewest()
       },
       {
         key: "desc",
         title:
           options.groupOptions.sortBy === "title"
-            ? "Z - A"
+            ? strings.zToA()
             : options.groupOptions.sortBy === "dueDate"
-            ? "Latest first"
-            : "Newest - oldest"
+            ? strings.latestFirst()
+            : strings.newestToOldest()
       }
     ])
   }
@@ -122,39 +123,39 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
 const sortByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
   type: "button",
   key: "sortBy",
-  title: "Sort by",
+  title: strings.sortBy(),
   icon: SortBy.path,
   menu: {
     items: map(options, [
       {
         key: "dateCreated",
-        title: "Date created",
+        title: strings.sortByStrings.dateCreated(),
         isHidden: options.groupingKey === "trash"
       },
       {
         key: "dateEdited",
-        title: "Date edited",
+        title: strings.sortByStrings.dateEdited(),
         isHidden:
           options.groupingKey === "trash" || options.groupingKey === "tags"
       },
       {
         key: "dateDeleted",
-        title: "Date deleted",
+        title: strings.sortByStrings.dateDeleted(),
         isHidden: options.groupingKey !== "trash"
       },
       {
         key: "dateModified",
-        title: "Date modified",
+        title: strings.sortByStrings.dateModified(),
         isHidden: options.groupingKey !== "tags"
       },
       {
         key: "dueDate",
-        title: "Due date",
+        title: strings.sortByStrings.dueDate(),
         isHidden: options.groupingKey !== "reminders"
       },
       {
         key: "title",
-        title: "Title"
+        title: strings.sortByStrings.title()
       }
     ])
   }
@@ -176,7 +177,7 @@ export function showSortMenu(groupingKey: GroupingKey, refresh: () => void) {
       sortByMenu({ ...menuOptions, parentKey: "sortBy" })
     ],
     {
-      title: "Sort"
+      title: strings.sort()
     }
   );
 }
@@ -298,7 +299,7 @@ function GroupHeader(props: GroupHeaderProps) {
         ];
 
         openMenu(items, {
-          title: "Jump to group",
+          title: strings.jumpToGroup(),
           position: {
             target: groupHeaderRef.current,
             align: "start",

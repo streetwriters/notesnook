@@ -33,6 +33,7 @@ import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 const RateAppSheet = () => {
   const [visible, setVisible] = useState(false);
   const actionSheetRef = useRef();
@@ -85,11 +86,8 @@ const RateAppSheet = () => {
           paddingHorizontal: 12
         }}
       >
-        <Heading>Do you enjoy using Notesnook?</Heading>
-        <Paragraph size={SIZE.md}>
-          It took us a year to bring Notesnook to life. Share your experience
-          and suggestions to help us improve it.
-        </Paragraph>
+        <Heading>{strings.rateAppHeading()}</Heading>
+        <Paragraph size={SIZE.md}>{strings.rateAppDesc()}</Paragraph>
 
         <Seperator half />
         <Button
@@ -97,7 +95,7 @@ const RateAppSheet = () => {
           fontSize={SIZE.md}
           width="100%"
           type="accent"
-          title="Rate now (It takes only a second)"
+          title={strings.rateApp()}
         />
         <View
           style={{
@@ -120,14 +118,14 @@ const RateAppSheet = () => {
             fontSize={SIZE.md}
             type="error"
             width="48%"
-            title="Never"
+            title={strings.never()}
           />
           <Button
             onPress={onClose}
             fontSize={SIZE.md}
             width="48%"
             type="secondary"
-            title="Later"
+            title={strings.later()}
           />
         </View>
       </View>

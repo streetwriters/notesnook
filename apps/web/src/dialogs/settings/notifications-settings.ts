@@ -19,16 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
+import { strings } from "@notesnook/intl";
 
 export const NotificationsSettings: SettingsGroup[] = [
   {
     key: "reminders",
     section: "notifications",
-    header: "Notifications",
+    header: strings.notifications(),
     settings: [
       {
         key: "reminders",
-        title: "Show reminder notifications",
+        title: strings.reminderNotification(),
+        description: strings.reminderNotificationDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe(
             (s) => s.notificationsSettings.reminder,

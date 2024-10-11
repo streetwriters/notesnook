@@ -21,33 +21,68 @@ import * as Mjs from "@mdi/js";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import { readFile, writeFile } from "fs/promises";
+import { cp, readFile, writeFile } from "fs/promises";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(path.join(__dirname, ".."));
 const DIST_DIR = path.resolve(ROOT_DIR, "dist");
-const ICONS_FILE_PATH = path.join(DIST_DIR, "toolbar", "icons.js");
+const CJS_BUNDLE_PATH = path.resolve(ROOT_DIR, "dist", "index.js");
+const MJS_BUNDLE_PATH = path.resolve(ROOT_DIR, "dist", "index.mjs");
+const ICONS_MJS_BUNDLE_PATH = path.resolve(
+  ROOT_DIR,
+  "dist",
+  "toolbar",
+  "icons.mjs"
+);
+const ICONS_CJS_BUNDLE_PATH = path.resolve(
+  ROOT_DIR,
+  "dist",
+  "toolbar",
+  "icons.js"
+);
 
-if (!fs.existsSync(DIST_DIR) || !fs.existsSync(ICONS_FILE_PATH))
+if (
+  !fs.existsSync(DIST_DIR) ||
+  !fs.existsSync(CJS_BUNDLE_PATH) ||
+  !fs.existsSync(MJS_BUNDLE_PATH) ||
+  !fs.existsSync(ICONS_MJS_BUNDLE_PATH) ||
+  !fs.existsSync(ICONS_CJS_BUNDLE_PATH)
+)
   throw new Error("Please build the editor before running this script.");
 
-console.log("Replacing icons with their path...");
+for (const bundle of [
+  { type: "cjs", path: CJS_BUNDLE_PATH },
+  { type: "mjs", path: MJS_BUNDLE_PATH },
+  { type: "cjs", path: ICONS_CJS_BUNDLE_PATH },
+  { type: "mjs", path: ICONS_MJS_BUNDLE_PATH }
+]) {
+  console.log("Replacing icons with their path...");
 
-let ICON_FILE = await readFile(ICONS_FILE_PATH, "utf-8");
-const icons = ICON_FILE.matchAll(/: (mdi.+),/g);
-for (const icon of icons) {
-  const iconPath = Mjs[icon[1]];
-  if (!iconPath) throw new Error(`Could not find path for icon: ${icon[1]}.`);
-  ICON_FILE = ICON_FILE.replace(icon[0], `: "${iconPath}",`);
+  let ICON_FILE = await readFile(bundle.path, "utf-8");
+  const icons =
+    bundle.type === "cjs"
+      ? ICON_FILE.matchAll(/: .+\.(mdi.+),/g)
+      : ICON_FILE.matchAll(/: (mdi.+),/g);
+  for (const icon of icons) {
+    const iconPath = Mjs[icon[1]];
+    if (!iconPath) throw new Error(`Could not find path for icon: ${icon[1]}.`);
+    ICON_FILE = ICON_FILE.replace(icon[0], `: "${iconPath}",`);
+  }
+
+  console.log("Removing @mdi/js import...");
+
+  ICON_FILE = ICON_FILE.replace(/var.+=\s+require\(['"]@mdi\/js['"]\);/gm, "");
+
+  console.log("Saving file...");
+
+  await writeFile(bundle.path, ICON_FILE);
 }
 
-console.log("Removing @mdi/js import...");
+console.log("copying styles...");
 
-ICON_FILE = ICON_FILE.replace(/^import \{.+ } from "@mdi\/js";/gm, "");
-
-console.log("Saving file...");
-
-await writeFile(ICONS_FILE_PATH, ICON_FILE);
+await cp(path.resolve(ROOT_DIR, "styles"), path.resolve(DIST_DIR, "styles"), {
+  recursive: true
+});
 
 console.log("Done.");

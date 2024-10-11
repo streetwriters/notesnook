@@ -31,6 +31,7 @@ import {
 } from "../icons";
 import { getPlatform } from "../../utils/platform";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
+import { strings } from "@notesnook/intl";
 
 const DEFAULT_ZOOM_STEP = 0.3;
 const DEFAULT_LARGE_ZOOM = 4;
@@ -273,42 +274,42 @@ export class Lightbox extends React.Component<LightboxProps> {
       hideOnMobile?: boolean;
     }[] = [
       {
-        title: "Reset",
+        title: strings.reset(),
         icon: Reset,
         enabled: true,
         hidden: !allowReset,
         onClick: (e) => this.reset(e)
       },
       {
-        title: "Rotate left",
+        title: strings.rotateLeft(),
         icon: RotateACW,
         enabled: true,
         hidden: !allowRotate,
         onClick: () => this.applyRotate("acw")
       },
       {
-        title: "Rotate rigth",
+        title: strings.rotateRight(),
         icon: RotateCW,
         enabled: true,
         hidden: !allowRotate,
         onClick: () => this.applyRotate("cw")
       },
       {
-        title: "Zoom out",
+        title: strings.zoomOut(),
         icon: ZoomOut,
         enabled: zoom > 1,
         hidden: !allowZoom,
         onClick: () => this.applyZoom("out")
       },
       {
-        title: "Zoom in",
+        title: strings.zoomIn(),
         icon: ZoomIn,
         enabled: true,
         hidden: !allowZoom,
         onClick: () => this.applyZoom("in")
       },
       {
-        title: "Close",
+        title: strings.close(),
         icon: Close,
         enabled: !!onClose,
         onClick: (e) => this.exit(e)

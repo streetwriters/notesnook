@@ -18,11 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ThemeDefinition } from "@notesnook/theme";
-import { Appearance } from "react-native";
+import { Appearance, StatusBar } from "react-native";
 import create, { State } from "zustand";
 import SettingsService from "../services/settings";
 import switchTheme from "react-native-theme-switch-animation";
 
+import changeNavigationBarColor from "react-native-navigation-bar-color";
 export interface ThemeStore extends State {
   lightTheme: ThemeDefinition;
   darkTheme: ThemeDefinition;
@@ -30,6 +31,28 @@ export interface ThemeStore extends State {
   setDarkTheme: (theme: ThemeDefinition) => void;
   setLightTheme: (theme: ThemeDefinition) => void;
   setColorScheme: (colorScheme?: "dark" | "light") => void;
+}
+
+export function changeSystemBarColors() {
+  const change = () => {
+    let currTheme =
+      useThemeStore.getState().colorScheme === "dark"
+        ? SettingsService.getProperty("darkTheme")
+        : SettingsService.getProperty("lighTheme");
+
+    const isDark = useThemeStore.getState().colorScheme === "dark";
+    changeNavigationBarColor(
+      currTheme.scopes.base.primary.background,
+      isDark,
+      false
+    );
+    StatusBar.setBackgroundColor("transparent" as any);
+    StatusBar.setTranslucent(true);
+    StatusBar.setBarStyle(isDark ? "light-content" : "dark-content");
+  };
+  change();
+  setTimeout(change, 400);
+  setTimeout(change, 1000);
 }
 
 function switchThemeWithAnimation(fn: () => void) {
@@ -55,12 +78,14 @@ export const useThemeStore = create<ThemeStore>((set, get) => ({
   setDarkTheme: (darkTheme) => {
     switchThemeWithAnimation(() => {
       set({ darkTheme });
+      changeSystemBarColors();
       SettingsService.setProperty("darkTheme", darkTheme);
     });
   },
   setLightTheme: (lightTheme) => {
     switchThemeWithAnimation(() => {
       set({ lightTheme });
+      changeSystemBarColors();
       SettingsService.setProperty("lighTheme", lightTheme);
     });
   },
@@ -75,6 +100,7 @@ export const useThemeStore = create<ThemeStore>((set, get) => ({
       set({
         colorScheme: nextColorScheme
       });
+      changeSystemBarColors();
       if (!SettingsService.getProperty("useSystemTheme")) {
         SettingsService.set({
           colorScheme: nextColorScheme

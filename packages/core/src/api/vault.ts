@@ -18,12 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Cipher } from "@notesnook/crypto";
-import Database from ".";
-import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
-import { isCipher } from "../database/crypto";
-import { NoteContent } from "../collections/session-content";
-import { Note } from "../types";
-import { logger } from "../logger";
+import Database from "./index.js";
+import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common.js";
+import { isCipher } from "../utils/crypto.js";
+import { Note, NoteContent } from "../types.js";
+import { logger } from "../logger.js";
 
 export const VAULT_ERRORS = {
   noVault: "ERR_NO_VAULT",

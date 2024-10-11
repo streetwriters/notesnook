@@ -31,6 +31,7 @@ import { Authenticator, OnNextFunction } from "./types";
 import { ErrorText } from "../../components/error-text";
 import { AuthenticatorType } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type MultifactorDialogProps = BaseDialogProps<boolean> & {
   primaryMethod?: AuthenticatorType;
@@ -56,7 +57,7 @@ export const MultifactorDialog = DialogManager.register(
         positiveButton={
           step.next
             ? {
-                text: "Continue",
+                text: strings.continue(),
                 form: "2faForm"
               }
             : null
@@ -64,7 +65,7 @@ export const MultifactorDialog = DialogManager.register(
         negativeButton={
           step.cancellable
             ? {
-                text: "Cancel",
+                text: strings.cancel(),
                 onClick: () => props.onClose(false)
               }
             : null

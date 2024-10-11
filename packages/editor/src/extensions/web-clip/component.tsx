@@ -19,12 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Flex, Text } from "@theme-ui/components";
 import { useEffect, useRef, useState } from "react";
-import { ReactNodeViewProps } from "../react";
-import { Icons } from "../../toolbar";
+import { ReactNodeViewProps } from "../react/index.js";
+import { Icons } from "../../toolbar/index.js";
 import { Icon } from "@notesnook/ui";
-import { WebClipAttributes } from "./web-clip";
-import { DesktopOnly } from "../../components/responsive";
-import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
+import { WebClipAttributes } from "./web-clip.js";
+import { DesktopOnly } from "../../components/responsive/index.js";
+import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
 
 const FAILED_CONTENT = `<html><head>
 <title>Failed to load web clip</title>

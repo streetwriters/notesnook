@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import isEmail from "validator/lib/isEmail";
 
 export function validateEmail(email) {
@@ -28,7 +29,7 @@ export function validateEmail(email) {
 }
 
 export const ERRORS_LIST = {
-  SHORT_PASS: "Atleast 8 characters"
+  SHORT_PASS: strings.passTooShort()
 };
 
 export function validatePass(password) {

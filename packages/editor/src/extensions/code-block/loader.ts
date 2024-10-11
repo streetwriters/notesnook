@@ -17,16 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { loadLanguage as _loadLanguage } from "./languages/index.js";
+
 const loadedLanguages: Record<string, boolean> = {};
 export function isLanguageLoaded(name: string) {
   return !!loadedLanguages[name];
 }
 export async function loadLanguage(shortName: string) {
-  const { default: language } = await import(
-    /* webpackChunkName: 'code-lang-[request]' */
-    `../../../languages/${shortName}.js`
-  );
-
+  const { default: language } = (await _loadLanguage(shortName)) || {};
   loadedLanguages[shortName] = true;
   return language;
 }

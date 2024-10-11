@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { test } from "vitest";
-import { convertTextToHTML } from "../clipboard-text-parser";
+import { convertTextToHTML } from "../clipboard-text-parser.js";
 
 const cases = [
   `Hello\r\nworld`,

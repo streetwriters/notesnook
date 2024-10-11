@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { initialize } from "@notesnook/core/dist/logger";
+import { initialize } from "@notesnook/core";
 import {
   SqliteAdapter,
   SqliteIntrospector,

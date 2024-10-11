@@ -58,8 +58,8 @@ import {
   ValueOf,
   Vault,
   isDeleted
-} from "../types";
-import { logger } from "../logger";
+} from "../types.js";
+import { logger } from "../logger.js";
 
 // type FilteredKeys<T, U> = {
 //   [P in keyof T]: T[P] extends U ? P : never;

@@ -27,14 +27,15 @@ import {
   Selection
 } from "prosemirror-state";
 import { ResolvedPos, Node as ProsemirrorNode, Slice } from "prosemirror-model";
-import { CodeblockComponent } from "./component";
-import { HighlighterPlugin } from "./highlighter";
-import { createNodeView } from "../react";
+import { CodeblockComponent } from "./component.js";
+import { HighlighterPlugin } from "./highlighter.js";
+import { createNodeView } from "../react/index.js";
 import detectIndent from "detect-indent";
 import redent from "redent";
 import stripIndent from "strip-indent";
 import { nanoid } from "nanoid";
 import Languages from "./languages.json";
+import { CaretPosition, CodeLine } from "./utils.js";
 
 interface Indent {
   type: "tab" | "space";
@@ -242,7 +243,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             tr.replaceSelectionWith(
               this.type.create(
                 { ...attributes, id: createCodeblockId() },
-                state.schema.text(text)
+                text ? state.schema.text(text) : null
               )
             );
             return commands.setTextSelection({ from, to: tr.mapping.map(to) });
@@ -558,41 +559,6 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
   }
 });
 
-export type CaretPosition = {
-  column: number;
-  line: number;
-  selected?: number;
-  total: number;
-  from: number;
-};
-export function toCaretPosition(
-  selection: Selection,
-  lines?: CodeLine[]
-): CaretPosition | undefined {
-  const { $from, $to, $head } = selection;
-  if ($from.parent.type.name !== CodeBlock.name) return;
-  lines = lines || getLines($from.parent);
-
-  for (const line of lines) {
-    if ($head.pos >= line.from && $head.pos <= line.to) {
-      const lineLength = line.length + 1;
-      return {
-        line: line.index + 1,
-        column: lineLength - (line.to - $head.pos),
-        selected: $to.pos - $from.pos,
-        total: lines.length,
-        from: line.from
-      };
-    }
-  }
-  return;
-}
-
-export function getLines(node: ProsemirrorNode) {
-  const { lines } = node.attrs as CodeBlockAttributes;
-  return lines || [];
-}
-
 function exitOnTripleEnter(editor: Editor, $from: ResolvedPos) {
   const isAtEnd = $from.parentOffset === $from.parent.nodeSize - 2;
   const endsWithDoubleNewline = $from.parent.textContent.endsWith("\n\n");
@@ -637,46 +603,6 @@ function getNewline($from: ResolvedPos, options: Indent) {
     newline: NEWLINE,
     indentation: indent({ amount: indentLength, type: options.type })
   };
-}
-
-type CodeLine = {
-  index: number;
-  from: number;
-  to: number;
-  length: number;
-  text: (length?: number) => string;
-};
-export function toCodeLines(code: string, pos: number): CodeLine[] {
-  const positions: CodeLine[] = [];
-
-  let start = 0;
-  let from = pos + 1;
-  let index = 0;
-  while (start <= code.length) {
-    let end = code.indexOf("\n", start);
-    if (end <= -1) end = code.length;
-
-    const lineLength = end - start;
-    const to = from + lineLength;
-    const lineStart = start;
-    positions.push({
-      index,
-      length: lineLength,
-      from,
-      to,
-      text: (length) => {
-        return code.slice(
-          lineStart,
-          length ? lineStart + length : lineStart + lineLength
-        );
-      }
-    });
-
-    from = to + 1;
-    start = end + 1;
-    ++index;
-  }
-  return positions;
 }
 
 function getSelectedLines(lines: CodeLine[], selection: Selection) {

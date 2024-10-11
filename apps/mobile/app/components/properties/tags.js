@@ -27,6 +27,7 @@ import { sleep } from "../../utils/time";
 import ManageTagsSheet from "../sheets/manage-tags";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
+import { strings } from "@notesnook/intl";
 
 export const Tags = ({ item, close }) => {
   const { colors } = useThemeColors();
@@ -51,7 +52,7 @@ export const Tags = ({ item, close }) => {
         buttonType={{
           text: colors.primary.accent
         }}
-        title="Add tag"
+        title={strings.addTag()}
         type="secondary"
         icon="plus"
         iconPosition="right"

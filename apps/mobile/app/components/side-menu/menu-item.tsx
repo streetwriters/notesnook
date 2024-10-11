@@ -29,6 +29,7 @@ import { Button } from "../ui/button";
 import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 function _MenuItem({
   item,
@@ -112,10 +113,10 @@ function _MenuItem({
         />
         {isFocused ? (
           <Heading color={colors.selected.heading} size={SIZE.md}>
-            {item.name}
+            {item.title || item.name}
           </Heading>
         ) : (
-          <Paragraph size={SIZE.md}>{item.name}</Paragraph>
+          <Paragraph size={SIZE.md}>{item.title || item.name}</Paragraph>
         )}
 
         {item.isBeta ? (
@@ -129,7 +130,7 @@ function _MenuItem({
             }}
           >
             <Paragraph color={primaryColors.accentForeground} size={SIZE.xxs}>
-              BETA
+              {strings.beta()}
             </Paragraph>
           </View>
         ) : null}

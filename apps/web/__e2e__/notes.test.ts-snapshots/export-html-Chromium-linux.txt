@@ -7,7 +7,7 @@
       name="description"
       content="This is Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1Test 1"
     />
-    <title>Test 1 - Notesnook</title>
+    <title>Test 1</title>
     <meta name="created-at" content="xxx" />
     <meta name="updated-at" content="xxx" />
     

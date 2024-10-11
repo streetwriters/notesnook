@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Clipboard from "@react-native-clipboard/clipboard";
 import { LogMessage } from "@notesnook/logger";
-import { format, LogLevel, logManager } from "@notesnook/core/dist/logger";
+import { format, LogLevel, logManager } from "@notesnook/core";
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Platform, TouchableOpacity, View } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
@@ -34,6 +34,7 @@ import { ToastManager } from "../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { hexToRGBA } from "../../utils/colors";
 import { sanitizeFilename } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 export default function DebugLogs() {
   const { colors } = useThemeColors();
@@ -89,7 +90,7 @@ export default function DebugLogs() {
           onLongPress={() => {
             Clipboard.setString(format(item));
             ToastManager.show({
-              heading: "Debug log copied!",
+              heading: strings.logsCopied(),
               context: "global",
               type: "success"
             });
@@ -154,7 +155,7 @@ export default function DebugLogs() {
 
       if (path) {
         ToastManager.show({
-          heading: "Debug logs downloaded",
+          heading: strings.logsDownloaded(),
           context: "global",
           type: "success"
         });
@@ -173,7 +174,7 @@ export default function DebugLogs() {
     if (!data) return;
     Clipboard.setString(data);
     ToastManager.show({
-      heading: "Debug log copied!",
+      heading: strings.logsCopied(),
       context: "global",
       type: "success"
     });
@@ -182,10 +183,10 @@ export default function DebugLogs() {
   const clearLogs = React.useCallback(() => {
     if (!currentLog) return;
     presentDialog({
-      title: "Clear logs",
-      paragraph: `Are you sure you want to delete all logs from ${currentLog.key}?`,
-      negativeText: "Cancel",
-      positiveText: "Clear",
+      title: strings.clearLogs(),
+      paragraph: strings.clearLogsConfirmation(currentLog.key),
+      negativeText: strings.cancel(),
+      positiveText: strings.clear(),
       positivePress: () => {
         const index = logs.findIndex((l) => (l.key = currentLog.key));
         logManager?.delete(currentLog.key);
@@ -213,10 +214,7 @@ export default function DebugLogs() {
           padding: 12
         }}
       >
-        <Notice
-          text="All logs are local only and are not sent to any server. You can share the logs from here with us if you face an issue to help us find the root cause."
-          type="information"
-        />
+        <Notice text={strings.debugNotice()} type="information" />
       </View>
 
       {currentLog && (

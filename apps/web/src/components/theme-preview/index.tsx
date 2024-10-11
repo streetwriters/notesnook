@@ -21,6 +21,7 @@ import { alpha } from "@theme-ui/color";
 import { Flex, Text } from "@theme-ui/components";
 import { Circle, Notes, Notebook, StarOutline, Tag, Plus } from "../icons";
 import { ThemeMetadata } from "@notesnook/themes-server";
+import { strings } from "@notesnook/intl";
 
 export type ThemePreviewProps = {
   theme: ThemeMetadata;
@@ -124,7 +125,7 @@ export function ThemePreview(props: ThemePreviewProps) {
                 fontSize: 7
               }}
             >
-              Notes
+              {strings.dataTypesPluralCamelCase.note()}
             </Text>
             <Plus
               color={theme.previewColors.list.accentForeground}

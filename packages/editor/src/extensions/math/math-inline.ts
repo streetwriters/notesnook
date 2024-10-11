@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, mergeAttributes } from "@tiptap/core";
-import { mathPlugin } from "./plugin";
+import { mathPlugin } from "./plugin/index.js";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {

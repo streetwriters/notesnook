@@ -29,6 +29,7 @@ import { handleDrop } from "../../common/drop-handler";
 import { EditTagDialog } from "../../dialogs/item-dialog";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { Multiselect } from "../../common/multi-select";
+import { strings } from "@notesnook/intl";
 
 type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
@@ -80,7 +81,7 @@ const menuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
     {
       type: "button",
       key: "edit",
-      title: "Rename tag",
+      title: strings.renameTag(),
       icon: Edit.path,
       onClick: () => EditTagDialog.show(tag)
     },
@@ -88,8 +89,8 @@ const menuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
       type: "button",
       key: "shortcut",
       title: db.shortcuts.exists(tag.id)
-        ? "Remove shortcut"
-        : "Create shortcut",
+        ? strings.removeShortcut()
+        : strings.addShortcut(),
       icon: Shortcut.path,
       onClick: () => appStore.addToShortcuts(tag)
     },
@@ -98,7 +99,7 @@ const menuItems: (tag: TagType, ids?: string[]) => MenuItem[] = (
       type: "button",
       key: "delete",
       variant: "dangerous",
-      title: "Delete",
+      title: strings.delete(),
       icon: DeleteForver.path,
       onClick: async () => {
         await Multiselect.deleteTags(ids);

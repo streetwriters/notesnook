@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { desktop } from "../common/desktop-bridge";
-import { ICompressor } from "@notesnook/core/dist/interfaces";
+import { ICompressor } from "@notesnook/core";
 import { Foras, gzip, gunzip, Memory } from "@hazae41/foras";
 
 export class Compressor implements ICompressor {

@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EV, EVENTS } from "../common";
-import { logger } from "../logger";
-import { getServerNameFromHost } from "./constants";
-import { extractHostname } from "./hostname";
+import { EV, EVENTS } from "../common.js";
+import { logger } from "../logger.js";
+import { getServerNameFromHost } from "./constants.js";
+import { extractHostname } from "./hostname.js";
 
 type ContentType = "application/json" | "application/x-www-form-urlencoded";
 type RequestBody = Record<string, string | number | boolean | undefined> | null;

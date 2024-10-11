@@ -22,7 +22,7 @@ import {
   formatCodeblocks,
   convertBrToSingleSpacedParagraphs,
   convertGoogleDocsChecklist
-} from "../clipboard-dom-parser";
+} from "../clipboard-dom-parser.js";
 
 const cases = [
   [`<p>line 1<br>line 2</p>`],

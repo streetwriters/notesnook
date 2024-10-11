@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { HealthCheck, check } from "../healthcheck";
+import { HealthCheck, check } from "../healthcheck.js";
 import { describe } from "vitest";
 
 describe.concurrent("Health check", (test) => {

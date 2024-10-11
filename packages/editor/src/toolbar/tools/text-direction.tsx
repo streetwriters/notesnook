@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolProps } from "../types";
-import { ToolButton } from "../components/tool-button";
-import { IconNames } from "../icons";
-import { useRefValue } from "../../hooks/use-ref-value";
+import { ToolProps } from "../types.js";
+import { ToolButton } from "../components/tool-button.js";
+import { IconNames } from "../icons.js";
+import { useRefValue } from "../../hooks/use-ref-value.js";
 import {
   getTextDirection,
   TextDirections
-} from "../../extensions/text-direction";
-import { CodeBlock } from "../../extensions/code-block";
+} from "../../extensions/text-direction/index.js";
+import { CodeBlock } from "../../extensions/code-block/index.js";
 
 type TextDirectionToolProps = ToolProps & {
   direction: TextDirections;

@@ -1,0 +1,83 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# GitHub recommends pinning actions to a commit SHA.
+# To get a newer version, you will need to update the SHA.
+# You can also reference a tag or branch, but the action may change without warning.
+
+name: Publish @notesnook/monograph
+
+on: workflow_dispatch
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=monograph
+
+      - name: Generate build
+        run: npx nx build @notesnook/monograph
+
+      # Setup Buildx
+      - name: Docker Setup Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v8
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          ecr: auto
+          logout: true
+
+      # Pull previous image from docker hub to use it as cache to improve the image build time.
+      - name: docker pull cache image
+        continue-on-error: true
+        run: docker pull streetwriters/monograph:latest
+
+      # Setup QEMU
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v2
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: streetwriters/monograph
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/monograph
+          file: apps/monograph/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v8
+          tags: streetwriters/monograph:latest
+          cache-from: streetwriters/monograph:latest
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: index.docker.io/streetwriters/monograph
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true

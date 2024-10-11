@@ -17,5 +17,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./code-mark";
-export { Codemark as default } from "./code-mark";
+export * from "./code-mark.js";
+export { Codemark as default } from "./code-mark.js";

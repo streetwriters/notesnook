@@ -17,20 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ICollection } from "./collection";
-import { getId } from "../utils/id";
-import { EV, EVENTS } from "../common";
-import dataurl from "../utils/dataurl";
+import { ICollection } from "./collection.js";
+import { getId } from "../utils/id.js";
+import { EV, EVENTS } from "../common.js";
+import dataurl from "../utils/dataurl.js";
 import dayjs from "dayjs";
-import { DocumentMimeTypes, getFileNameWithExtension } from "../utils/filename";
+import {
+  DocumentMimeTypes,
+  getFileNameWithExtension
+} from "../utils/filename.js";
 import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
-import { Output } from "../interfaces";
-import { Attachment } from "../types";
-import Database from "../api";
-import { FilteredSelector, SQLCollection } from "../database/sql-collection";
-import { isFalse } from "../database";
+import { Output } from "../interfaces.js";
+import { Attachment } from "../types.js";
+import Database from "../api/index.js";
+import { FilteredSelector, SQLCollection } from "../database/sql-collection.js";
+import { isFalse } from "../database/index.js";
 import { sql } from "@streetwriters/kysely";
-import { logger } from "../logger";
+import { logger } from "../logger.js";
 
 export class Attachments implements ICollection {
   name = "attachments";

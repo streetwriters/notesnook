@@ -17,26 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor } from "../../types";
+import { Editor } from "../../types.js";
 import { Box } from "@theme-ui/components";
-import { Tab, Tabs } from "../../components/tabs";
+import { Tab, Tabs } from "../../components/tabs/index.js";
 import { Icon } from "@notesnook/ui";
 // import { MenuPresenter } from "../../components/menu/menu";
-import { Popup } from "../components/popup";
-import { Icons } from "../icons";
-import { ColorPicker } from "./color-picker";
+import { Popup } from "../components/popup.js";
+import { Icons } from "../icons.js";
+import { ColorPicker } from "./color-picker.js";
+import { strings } from "@notesnook/intl";
 
 type CellPropertiesProps = { editor: Editor; onClose: () => void };
 export function CellProperties(props: CellPropertiesProps) {
   const { editor, onClose } = props;
   const attributes = editor.getAttributes("tableCell");
   return (
-    <Popup title="Cell properties" onClose={onClose}>
+    <Popup title={strings.cellProperties()} onClose={onClose}>
       <Tabs activeIndex={0}>
         <Tab
           title={
             <Icon
-              title="Cell background color"
+              title={strings.cellBackgroundColor()}
               path={Icons.backgroundColor}
               size={16}
             />
@@ -57,7 +58,11 @@ export function CellProperties(props: CellPropertiesProps) {
         </Tab>
         <Tab
           title={
-            <Icon title="Cell text color" path={Icons.textColor} size={16} />
+            <Icon
+              title={strings.cellTextColor()}
+              path={Icons.textColor}
+              size={16}
+            />
           }
         >
           <Box mt={2} />
@@ -74,7 +79,7 @@ export function CellProperties(props: CellPropertiesProps) {
         <Tab
           title={
             <Icon
-              title="Cell border color"
+              title={strings.cellBorderColor()}
               path={Icons.cellBorderColor}
               size={16}
             />

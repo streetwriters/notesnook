@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useLayoutEffect } from "react";
-import { FloatingMenuProps } from "./types";
-import { SearchReplacePopup } from "../popups/search-replace";
-import { ResponsivePresenter } from "../../components/responsive";
-import { getToolbarElement } from "../utils/dom";
-import { useEditorSearchStore } from "../stores/search-store";
+import { FloatingMenuProps } from "./types.js";
+import { SearchReplacePopup } from "../popups/search-replace.js";
+import { ResponsivePresenter } from "../../components/responsive/index.js";
+import { getToolbarElement } from "../utils/dom.js";
+import { useEditorSearchStore } from "../stores/search-store.js";
 
 export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
   const { editor } = props;

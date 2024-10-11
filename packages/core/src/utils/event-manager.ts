@@ -28,7 +28,7 @@ export type EventProperties = {
   once?: boolean;
 };
 
-class EventManager {
+export class EventManager {
   public _registry: Map<EventHandler, EventProperties>;
   constructor() {
     this._registry = new Map();

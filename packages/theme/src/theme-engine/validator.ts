@@ -24,7 +24,7 @@ import {
   DEPRECATED_COLORS,
   ThemeDefinition,
   Variants
-} from "./types";
+} from "./types.js";
 
 const RequiredKeys = [
   "version",

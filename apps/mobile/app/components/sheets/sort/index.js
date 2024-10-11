@@ -29,6 +29,7 @@ import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
+import { strings } from "@notesnook/intl";
 const Sort = ({ type, screen }) => {
   const isTopicSheet = screen === "TopicSheet";
   const { colors } = useThemeColors();
@@ -80,7 +81,7 @@ const Sort = ({ type, screen }) => {
             alignSelf: "center"
           }}
         >
-          Sort by
+          {strings.sortBy()}
         </Heading>
 
         <Button
@@ -88,16 +89,16 @@ const Sort = ({ type, screen }) => {
             groupOptions?.sortDirection === "asc"
               ? groupOptions?.groupBy === "abc" ||
                 groupOptions?.sortBy === "title"
-                ? "A - Z"
+                ? strings.aToZ()
                 : groupOptions?.sortBy === "dueDate"
-                ? "Earliest first"
-                : "Old - New"
+                ? strings.earliestFirst()
+                : strings.oldNew()
               : groupOptions?.groupBy === "abc" ||
                 groupOptions?.sortBy === "title"
-              ? "Z - A"
+              ? strings.zToA()
               : groupOptions?.sortBy === "dueDate"
-              ? "Latest first"
-              : "New - Old"
+              ? strings.latestFirst()
+              : strings.newOld()
           }
           icon={
             groupOptions?.sortDirection === "asc"
@@ -137,7 +138,7 @@ const Sort = ({ type, screen }) => {
         {groupOptions?.groupBy === "abc" ? (
           <Button
             type="secondary"
-            title="Title"
+            title={strings.title()}
             height={40}
             iconPosition="left"
             icon={"check"}
@@ -155,7 +156,7 @@ const Sort = ({ type, screen }) => {
               <Button
                 key={item}
                 type={groupOptions?.sortBy === item ? "selected" : "plain"}
-                title={SORT[item]}
+                title={strings.sortByStrings[item]()}
                 height={40}
                 iconPosition="left"
                 icon={groupOptions?.sortBy === item ? "check" : null}
@@ -195,7 +196,7 @@ const Sort = ({ type, screen }) => {
             }}
             size={SIZE.lg}
           >
-            Group by
+            {strings.groupBy()}
           </Heading>
 
           <Seperator />
@@ -236,9 +237,7 @@ const Sort = ({ type, screen }) => {
                 }}
                 height={40}
                 icon={groupOptions?.groupBy === GROUP[item] ? "check" : null}
-                title={
-                  item.slice(0, 1).toUpperCase() + item.slice(1, item.length)
-                }
+                title={strings.groupByStrings[item]()}
                 style={{
                   paddingHorizontal: 8,
                   marginBottom: 10,

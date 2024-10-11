@@ -16,13 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import * as browser from "../src/browser";
-import * as node from "../src/node";
+// import * as browser from "../src/browser.js";
+// import * as node from "../src/node.js";
 
-export async function streamingEncrypt(
-  crypto: typeof node | typeof browser,
-  key: Uint8Array
-) {
+import { ISodium } from "../src/types";
+
+export async function streamingEncrypt(crypto: ISodium, key: Uint8Array) {
   await crypto.initialize();
   const { state, header } =
     crypto.crypto_secretstream_xchacha20poly1305_init_push(key, "base64");
@@ -56,7 +55,7 @@ export async function streamingEncrypt(
 }
 
 export async function streamingDecrypt(
-  crypto: typeof node | typeof browser,
+  crypto: ISodium,
   key: Uint8Array,
   cipher: { header: string; chunks: string[] }
 ) {
@@ -88,7 +87,7 @@ export async function streamingDecrypt(
 }
 
 export async function decrypt(
-  crypto: typeof node | typeof browser,
+  crypto: ISodium,
   cipher: Uint8Array,
   nonce: Uint8Array,
   key: Uint8Array
@@ -105,7 +104,7 @@ export async function decrypt(
 }
 
 export async function encrypt(
-  crypto: typeof node | typeof browser,
+  crypto: ISodium,
   nonce: Uint8Array,
   key: Uint8Array
 ) {
@@ -120,7 +119,7 @@ export async function encrypt(
   );
 }
 
-export async function getKey(crypto: typeof node | typeof browser) {
+export async function getKey(crypto: ISodium) {
   await crypto.initialize();
 
   const saltBytes: Uint8Array = crypto.randombytes_buf(
@@ -137,10 +136,10 @@ export async function getKey(crypto: typeof node | typeof browser) {
   return { key, salt: saltBytes };
 }
 
-export async function hash(crypto: typeof node | typeof browser) {
+export async function hash(crypto: ISodium) {
   await crypto.initialize();
   const saltBytes = crypto.crypto_generichash(
-    node.crypto_pwhash_SALTBYTES,
+    crypto.crypto_pwhash_SALTBYTES,
     "mysalt"
   );
   return crypto.crypto_pwhash(
@@ -149,7 +148,7 @@ export async function hash(crypto: typeof node | typeof browser) {
     saltBytes,
     3, // operations limit
     1024 * 1024 * 64, // memory limit (8MB)
-    browser.crypto_pwhash_ALG_ARGON2ID13,
+    crypto.crypto_pwhash_ALG_ARGON2ID13,
     "base64"
   );
 }

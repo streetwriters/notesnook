@@ -17,5 +17,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./clipboard";
-export { Clipboard as default } from "./clipboard";
+export * from "./clipboard.js";
+export { Clipboard as default } from "./clipboard.js";

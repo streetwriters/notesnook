@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EVENTS } from "../common";
+import { EVENTS } from "../common.js";
 import {
   GroupOptions,
   Item,
   MaybeDeletedItem,
   SortOptions,
   isDeleted
-} from "../types";
-import EventManager from "../utils/event-manager";
+} from "../types.js";
+import EventManager from "../utils/event-manager.js";
 import {
   DatabaseAccessor,
   DatabaseCollection,
@@ -35,7 +35,7 @@ import {
   UpdateEvent,
   UpsertEvent,
   isFalse
-} from ".";
+} from "./index.js";
 import {
   AliasedRawBuilder,
   AnyColumn,
@@ -46,14 +46,14 @@ import {
   SqlBool,
   sql
 } from "@streetwriters/kysely";
-import { VirtualizedGrouping } from "../utils/virtualized-grouping";
-import { createKeySelector, groupArray } from "../utils/grouping";
-import { toChunks } from "../utils/array";
-import { Sanitizer } from "./sanitizer";
+import { VirtualizedGrouping } from "../utils/virtualized-grouping.js";
+import { createKeySelector, groupArray } from "../utils/grouping.js";
+import { toChunks } from "../utils/array.js";
+import { Sanitizer } from "./sanitizer.js";
 import {
   createIsReminderActiveQuery,
   createUpcomingReminderTimeQuery
-} from "../collections/reminders";
+} from "../collections/reminders.js";
 
 const formats = {
   month: "%Y-%m",

@@ -96,7 +96,8 @@ export const RightMenus = ({
           animationDuration={200}
           style={{
             borderRadius: 5,
-            backgroundColor: contextMenuColors.primary.background
+            backgroundColor: contextMenuColors.primary.background,
+            marginTop: -40
           }}
           onRequestClose={() => {
             menuRef.current?.hide();

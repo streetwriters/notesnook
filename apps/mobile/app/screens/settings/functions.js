@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { db } from "../../common/database";
 import { validateAppLockPassword } from "../../common/database/encryption";
 import { presentDialog } from "../../components/dialog/functions";
@@ -35,15 +36,15 @@ export async function verifyUser(
 ) {
   presentDialog({
     context: context,
-    title: "Verify it's you",
+    title: strings.verifyItsYou(),
     input: true,
-    inputPlaceholder: "Enter account password",
-    paragraph: "Please enter your account password",
-    positiveText: "Verify",
+    inputPlaceholder: strings.enterPassword(),
+    paragraph: strings.enterPasswordDesc(),
+    positiveText: strings.verify(),
     secureTextEntry: true,
     disableBackdropClosing: disableBackdropClosing,
     onClose: onclose,
-    negativeText: closeText || "Cancel",
+    negativeText: closeText || strings.cancel(),
     positivePress: async (value) => {
       try {
         const user = await db.user.getUser();
@@ -54,8 +55,7 @@ export async function verifyUser(
           });
         } else {
           ToastManager.show({
-            heading: "Incorrect password",
-            message: "The account password you entered is incorrect",
+            heading: strings.passwordIncorrect(),
             type: "error",
             context: "global"
           });
@@ -63,7 +63,7 @@ export async function verifyUser(
         }
       } catch (e) {
         ToastManager.show({
-          heading: "Failed to verify",
+          heading: strings.verifyFailed(),
           message: e.message,
           type: "error",
           context: "global"
@@ -79,26 +79,28 @@ export async function verifyUserWithApplock() {
   return new Promise((resolve) => {
     if (SettingsService.getProperty("appLockHasPasswordSecurity")) {
       presentDialog({
-        title: "Verify it's you",
+        title: strings.verifyItsYou(),
         input: true,
-        inputPlaceholder: `Enter app lock ${
-          keyboardType === "numeric" ? "pin" : "password"
-        }`,
-        paragraph: `Please enter your app lock ${
-          keyboardType === "numeric" ? "pin" : "password"
-        }`,
-        positiveText: "Verify",
+        inputPlaceholder:
+          keyboardType == "numeric"
+            ? strings.enterApplockPin()
+            : strings.enterApplockPassword(),
+        paragraph:
+          keyboardType == "numeric"
+            ? strings.enterApplockPinDesc()
+            : strings.enterApplockPasswordDesc(),
+        positiveText: strings.verify(),
         secureTextEntry: true,
-        negativeText: "Cancel",
+        negativeText: strings.cancel(),
         keyboardType: keyboardType,
         positivePress: async (value) => {
           try {
             const verified = await validateAppLockPassword(value);
             if (!verified) {
               ToastManager.show({
-                heading: `Invalid ${
+                heading: strings.invalid(
                   keyboardType === "numeric" ? "pin" : "password"
-                }`,
+                ),
                 type: "error",
                 context: "local"
               });
@@ -115,9 +117,11 @@ export async function verifyUserWithApplock() {
     } else {
       BiometricService.isBiometryAvailable().then((available) => {
         if (available) {
-          BiometricService.validateUser("Verify it's you").then((verified) => {
-            resolve(verified);
-          });
+          BiometricService.validateUser(strings.verifyItsYou()).then(
+            (verified) => {
+              resolve(verified);
+            }
+          );
         } else if (useUserStore.getState().user) {
           let verified = false;
           verifyUser(

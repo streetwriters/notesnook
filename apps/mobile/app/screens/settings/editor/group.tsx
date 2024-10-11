@@ -32,8 +32,9 @@ import { DraggableItem, useDragState } from "./state";
 import ToolSheet from "./tool-sheet";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { ToolId } from "@notesnook/editor/dist/toolbar/tools";
+import type { ToolId } from "@notesnook/editor";
 import PremiumService from "../../../services/premium";
+import { strings } from "@notesnook/intl";
 
 export const Group = ({
   item,
@@ -131,9 +132,9 @@ export const Group = ({
         }
         presentDialog({
           context: "global",
-          title: "Delete group?",
-          positiveText: "Delete",
-          paragraph: "All tools in the collapsed section will also be removed.",
+          title: strings.deleteGroup(),
+          positiveText: strings.delete(),
+          paragraph: strings.deleteGroupDesc(),
           positivePress: () => {
             if (groupIndex === undefined) return;
             const _data = useDragState.getState().data.slice();
@@ -203,7 +204,7 @@ export const Group = ({
                 color={colors.secondary.paragraph}
                 size={SIZE.xs}
               >
-                GROUP
+                {strings.group()}
               </Paragraph>
             </View>
 

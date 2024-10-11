@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Kysely, sql } from "@streetwriters/kysely";
-import { RawDatabaseSchema } from ".";
+import { RawDatabaseSchema } from "./index.js";
 
 export async function rebuildSearchIndex(db: Kysely<RawDatabaseSchema>) {
   await db.transaction().execute(async (tx) => {

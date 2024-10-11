@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { describe, it, expect } from "vitest";
-import { initialize, logManager, logger } from "../src/logger";
+import { initialize, logManager, logger } from "../src/logger.js";
 import { SqliteDialect } from "@streetwriters/kysely";
 import BetterSQLite3 from "better-sqlite3-multiple-ciphers";
 import { NoopLogger } from "@notesnook/logger";
-import { delay } from "./utils";
+import { delay } from "./utils/index.js";
 
 async function initializeLogger() {
   await initialize(

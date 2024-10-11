@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, mergeAttributes } from "@tiptap/core";
-import { insertMathNode } from "./plugin";
+import { insertMathNode } from "./plugin/index.js";
 import { NodeSelection } from "prosemirror-state";
 
 declare module "@tiptap/core" {

@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { FontSize } from "./font-size";
+import { FontSize } from "./font-size.js";
 
-export * from "./font-size";
+export * from "./font-size.js";
 
 export default FontSize;

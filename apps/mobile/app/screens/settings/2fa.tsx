@@ -52,24 +52,25 @@ import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { sanitizeFilename } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",
-    title: "Setup using an Authenticator app",
-    body: "Use an authenticator app like Google Authenticator on your phone to get authentication codes",
+    title: strings.mfaAuthAppTitle(),
+    body: strings.mfaAuthAppDesc(),
     icon: "cellphone-key",
     recommended: true
   },
   {
     id: "sms",
-    title: "Set up using SMS",
-    body: "Notesnook will send you an SMS with a 2FA code when prompted",
+    title: strings.mfaSmsTitle(),
+    body: strings.mfaSmsDesc(),
     icon: "message-plus-outline"
   },
   {
     id: "email",
-    title: "Set up using Email",
-    body: "Notesnook will send you a 2FA code on your email when prompted",
+    title: strings.mfaEmailTitle(),
+    body: strings.mfaEmailDesc(),
     icon: "email-outline"
   }
 ];
@@ -105,8 +106,8 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
   return (
     <>
       <DialogHeader
-        title="Two-factor authentication"
-        paragraph="Protect your notes by enabling 2 factor authentication"
+        title={strings.twoFactorAuth()}
+        paragraph={strings.twoFactorAuthDesc()}
         padding={12}
       />
       <Seperator />
@@ -226,7 +227,7 @@ export const MFASetup = ({
       }
 
       ToastManager.show({
-        heading: "Code copied!",
+        heading: strings.codesCopied(),
         type: "success",
         context: "local"
       });
@@ -234,10 +235,9 @@ export const MFASetup = ({
     }
 
     try {
-      if (seconds)
-        throw new Error("Please wait a few seconds before resending code");
+      if (seconds) throw new Error(strings.resendCodeWait());
       if (method.id === "sms" && !phoneNumber.current)
-        throw new Error("Phone number not entered");
+        throw new Error(strings.phoneNumberNotEntered());
       setSending(true);
       await db.mfa.setup(method?.id, phoneNumber.current);
 
@@ -251,14 +251,14 @@ export const MFASetup = ({
       );
       setSending(false);
       ToastManager.show({
-        heading: `2FA code sent via ${method.id}.`,
+        heading: strings["2faCodeSentVia"](method.id),
         type: "success",
         context: "local"
       });
     } catch (e) {
       setSending(false);
       const error = e as Error;
-      ToastManager.error(error, "Error sending 2FA code");
+      ToastManager.error(error, strings.errorSend2fa());
     }
   };
 
@@ -291,7 +291,9 @@ export const MFASetup = ({
                 height: 50
               }}
             />
-            <Paragraph>Getting information.. please wait</Paragraph>
+            <Paragraph>
+              {strings.gettingInformation()}... {strings.pleaseWait()}
+            </Paragraph>
           </View>
         ) : (
           <>
@@ -309,15 +311,23 @@ export const MFASetup = ({
                 phoneNumber.current = value;
               }}
               placeholder={
-                method?.id === "email" ? "Enter email address" : "+1234567890"
+                method?.id === "email"
+                  ? strings.enterEmailAddress()
+                  : "+1234567890"
               }
               onSubmit={() => {
                 onSendCode();
               }}
               onErrorCheck={(e) => setError(e)}
-              validationType="phonenumber"
-              keyboardType="phone-pad"
-              errorMessage="Please enter a valid phone number with country code"
+              validationType={method?.id === "email" ? "email" : "phonenumber"}
+              keyboardType={
+                method.id == "email" ? "email-address" : "phone-pad"
+              }
+              errorMessage={
+                method?.id === "email"
+                  ? strings.enterValidEmail()
+                  : strings.enterValidPhone()
+              }
               buttons={
                 error ? null : (
                   <Button
@@ -327,11 +337,11 @@ export const MFASetup = ({
                       sending
                         ? null
                         : method.id === "app"
-                        ? "Copy"
+                        ? strings.copy()
                         : `${
                             seconds
-                              ? `Resend code in (${seconds})`
-                              : "Send code"
+                              ? strings.resendCode(seconds as number)
+                              : strings.sendCode()
                           }`
                     }
                   />
@@ -339,7 +349,7 @@ export const MFASetup = ({
               }
             />
 
-            <Heading size={SIZE.md}>Enter the 6-digit code</Heading>
+            <Heading size={SIZE.md}>{strings.enterSixDigitCode()}</Heading>
             <Paragraph>{codeHelpText[method?.id]}</Paragraph>
             <Seperator />
             <Input
@@ -364,7 +374,7 @@ export const MFASetup = ({
             />
             <Seperator />
             <Button
-              title={enabling ? null : "Next"}
+              title={enabling ? null : strings.next()}
               type="accent"
               width={250}
               onPress={onNext}
@@ -376,7 +386,7 @@ export const MFASetup = ({
             />
 
             <Button
-              title="Select a different 2FA method"
+              title={strings.change2faMethod()}
               type="plain"
               height={25}
               onPress={() => {
@@ -413,7 +423,7 @@ export const MFARecoveryCodes = ({
         setLoading(false);
       } catch (e) {
         const error = e as Error;
-        ToastManager.error(error, "Error getting codes", "local");
+        ToastManager.error(error, strings.errorGettingCodes(), "local");
         setLoading(false);
       }
     })();
@@ -423,14 +433,8 @@ export const MFARecoveryCodes = ({
     <View>
       <DialogHeader
         centered={true}
-        title="Save your recovery codes"
-        paragraph={`If you lose access to your ${
-          method?.id === "email"
-            ? "email"
-            : method?.id === "sms"
-            ? "phone"
-            : "auth app"
-        }, you can login to Notesnook using your recovery codes. Each code can only be used once.`}
+        title={strings.saveRecoveryCodes()}
+        paragraph={strings.saveRecoveryCodesDesc()}
         padding={12}
       />
       <Seperator />
@@ -450,7 +454,9 @@ export const MFARecoveryCodes = ({
               height: 50
             }}
           />
-          <Paragraph>Getting recovery codes.. please wait</Paragraph>
+          <Paragraph>
+            {strings.gettingRecoveryCodes()}... {strings.pleaseWait()}
+          </Paragraph>
         </View>
       ) : (
         <>
@@ -483,13 +489,13 @@ export const MFARecoveryCodes = ({
             }}
           >
             <Button
-              title="Copy codes"
+              title={strings.copyCodes()}
               fontSize={SIZE.md}
               onPress={() => {
                 const codeString = codes.join("\n");
                 Clipboard.setString(codeString);
                 ToastManager.show({
-                  heading: "Recovery codes copied!",
+                  heading: strings.codesCopied(),
                   type: "success",
                   context: "global"
                 });
@@ -500,7 +506,7 @@ export const MFARecoveryCodes = ({
             />
 
             <Button
-              title="Save to file"
+              title={strings.saveToFile()}
               fontSize={SIZE.md}
               onPress={async () => {
                 try {
@@ -529,7 +535,7 @@ export const MFARecoveryCodes = ({
                   }
 
                   ToastManager.show({
-                    heading: "Recovery codes saved to text file",
+                    heading: strings.codesSaved(),
                     type: "success",
                     context: "local"
                   });
@@ -542,7 +548,7 @@ export const MFARecoveryCodes = ({
           </View>
 
           <Button
-            title={isSetup ? "Next" : "Done"}
+            title={isSetup ? strings.next() : strings.done()}
             type="accent"
             width={250}
             onPress={() => {
@@ -593,16 +599,16 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
         centered={true}
         title={
           recovery
-            ? "Fallback method for 2FA enabled"
-            : "Two-factor authentication enabled!"
+            ? strings.fallbackMethodEnabled()
+            : strings.twoFactorAuthEnabled()
         }
-        paragraph="Your account is now 100% secure against unauthorized logins."
+        paragraph={strings.accountIsSecure()}
         padding={12}
       />
       <Seperator />
 
       <Button
-        title="Done"
+        title={strings.done()}
         type="accent"
         width={250}
         onPress={() => {
@@ -616,7 +622,7 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
 
       {!recovery ? (
         <Button
-          title="Setup secondary 2FA method"
+          title={strings.secondary2faMethod()}
           type="plain"
           height={25}
           onPress={() => {

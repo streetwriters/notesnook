@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { ServersConfiguration } from "./components/servers-configuration";
 import { SettingsGroup } from "./types";
 
 export const ServersSettings: SettingsGroup[] = [
   {
-    header: "Servers configuration",
+    header: strings.serversConfiguration(),
     key: "servers",
     section: "servers",
     settings: [

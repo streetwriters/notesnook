@@ -25,9 +25,10 @@ import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
 import { useEditorConfig, useEditorManager } from "./manager";
 import { getFontById } from "@notesnook/editor";
-import { replaceDateTime } from "@notesnook/editor/dist/extensions/date-time";
+import { replaceDateTime } from "@notesnook/editor";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
+import { strings } from "@notesnook/intl";
 
 type TitleBoxProps = {
   id: string;
@@ -118,7 +119,7 @@ function TitleBox(props: TitleBoxProps) {
       id="editor-title"
       data-test-id="editor-title"
       className="editorTitle"
-      placeholder={"Note title"}
+      placeholder={strings.noteTitle()}
       readOnly={readonly}
       dir="auto"
       sx={{

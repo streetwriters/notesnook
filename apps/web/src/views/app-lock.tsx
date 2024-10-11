@@ -35,6 +35,7 @@ import { onPageVisibilityChanged } from "../utils/page-visibility";
 import { WebAuthn } from "../utils/webauthn";
 import { getDocumentTitle, setDocumentTitle } from "../utils/dom";
 import { CredentialWithoutSecret, useKeyStore } from "../interfaces/key-store";
+import { strings } from "@notesnook/intl";
 
 export default function AppLock(props: PropsWithChildren<unknown>) {
   const credentials = useKeyStore((store) => store.activeCredentials());
@@ -144,7 +145,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
             mt={25}
             sx={{ fontSize: 36, textAlign: "center" }}
           >
-            Unlock your notes
+            {strings.unlockNotes()}
           </Text>
         </Flex>
         <Text
@@ -157,7 +158,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
             color: "var(--paragraph-secondary)"
           }}
         >
-          Please verify it&apos;s you.
+          {strings.verifyItsYou()}
         </Text>
 
         {isUnlocking ? (
@@ -185,7 +186,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
                         autoFocus
                         required
                         sx={{ width: ["95%", "95%", "25%"] }}
-                        placeholder="Enter password"
+                        placeholder={strings.enterPassword()}
                         type="password"
                         onKeyUp={async (e) => {
                           if (e.key === "Enter")
@@ -198,7 +199,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
                         sx={{ borderRadius: 100, px: 30 }}
                         onClick={() => unlockWithPassword(credential)}
                       >
-                        Continue
+                        {strings.continue()}
                       </Button>
                     </>
                   );
@@ -224,7 +225,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
                         }
                       }}
                     >
-                      Unlock with security key
+                      {strings.unlockWithSecurityKey()}
                     </Button>
                   );
               }

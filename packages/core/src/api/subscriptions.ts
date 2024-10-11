@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import hosts from "../utils/constants";
-import http from "../utils/http";
-import TokenManager from "./token-manager";
+import hosts from "../utils/constants.js";
+import http from "../utils/http.js";
+import TokenManager from "./token-manager.js";
 
 export type TransactionStatus =
   | "completed"

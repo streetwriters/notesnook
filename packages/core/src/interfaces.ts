@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
-import { KVStorage } from "./database/kv";
-import { ConfigStorage } from "./database/config";
+import { KVStorage } from "./database/kv.js";
+import { ConfigStorage } from "./database/config.js";
 
 export type Output<TOutputFormat extends DataFormat> =
   TOutputFormat extends "uint8array" ? Uint8Array : string;

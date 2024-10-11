@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
-import { MenuButtonItem, MenuItem } from "./types";
+import { MenuButtonItem, MenuItem } from "./types.js";
 
 export function useFocus(
   items: MenuItem[],

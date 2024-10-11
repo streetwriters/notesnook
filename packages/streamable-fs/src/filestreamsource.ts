@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { File } from "./types";
-import { IFileStorage } from "./interfaces";
+import { File } from "./types.js";
+import { IFileStorage } from "./interfaces.js";
 
 export default class FileStreamSource {
   private index = 0;

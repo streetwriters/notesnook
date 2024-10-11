@@ -8,6 +8,7 @@
     "@mdi/react": "^1.6.0",
     "@notesnook/editor": "file:../editor",
     "@notesnook/theme": "file:../theme",
+    "@notesnook/intl": "file:../intl",
     "@szhsin/react-menu": "^4.1.0",
     "buffer": "^6.0.3",
     "framer-motion": "^10.16.8",
@@ -17,18 +18,20 @@
     "react-dom": "^18.2.0",
     "react-freeze": "^1.0.3",
     "tinycolor2": "1.6.0",
-    "zustand": "^4.4.7"
+    "zustand": "^4.4.7",
+    "@lingui/core": "4.11.4",
+    "@lingui/react": "4.11.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",
     "@types/react": "^18.2.39",
     "@types/react-dom": "^18.2.17",
-    "env-cmd": "^10.1.0",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "start": "env-cmd -e all react-scripts start",
-    "build": "env-cmd -e all react-scripts build && rm -rf build.bundle && rm -rf sourcemaps && mv build build.bundle && cp -r ./build.bundle/static/js/ sourcemaps && rm -r ./build.bundle/static/js/*.map",
+    "start": "cross-env DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=true  BROWSER=none react-scripts start",
+    "build": "cross-env DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=true  BROWSER=none react-scripts build",
+    "postbuild": "node scripts/build.mjs",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "postinstall": "patch-package"

@@ -27,6 +27,7 @@ import Storage from "../common/database/storage";
 import { useSettingStore } from "../stores/use-setting-store";
 import { ToastOptions, ToastManager } from "./event-manager";
 import { useUserStore } from "../stores/use-user-store";
+import { strings } from "@notesnook/intl";
 
 const KeychainConfig = Platform.select({
   ios: {
@@ -98,22 +99,19 @@ async function getCredentials(title?: string, description?: string) {
     }, 500);
     FingerprintScanner.release();
     let message: ToastOptions = {
-      heading: "Authentication with biometrics failed.",
-      message: 'Tap "Biometric Unlock" to try again.',
+      heading: strings.biometricsAuthFailed(),
       type: "error",
       context: "local"
     };
     if (e.name === "DeviceLocked") {
       message = {
-        heading: "Biometrics authentication failed.",
-        message: "Wait 30 seconds to try again.",
+        heading: strings.biometricsAuthFailed(),
         type: "error",
         context: "local"
       };
     } else if (e.name === "UserFallback") {
       message = {
-        heading: "Authentication cancelled by user.",
-        message: 'Tap "Biometric Unlock" to try again.',
+        heading: strings.biometricsAuthCancelled(),
         type: "error",
         context: "local"
       };
@@ -162,15 +160,13 @@ async function validateUser(title: string, description?: string) {
     FingerprintScanner.release();
     if (e.name === "DeviceLocked") {
       ToastManager.show({
-        heading: "Biometrics authentication failed.",
-        message: "Wait 30 seconds to try again.",
+        heading: strings.biometricsAuthFailed(),
         type: "error",
         context: "local"
       });
     } else {
       ToastManager.show({
-        heading: "Authentication failed.",
-        message: "Tap to try again.",
+        heading: strings.biometricsAuthFailed(),
         type: "error",
         context: "local"
       });

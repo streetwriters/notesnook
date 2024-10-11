@@ -17,13 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { variants } from "./variants";
-import { FontConfig, getFontConfig } from "./font";
-import { ThemeConfig } from "./types";
-import { ThemeColor, VariantsWithStaticColors } from "../theme-engine/types";
-import { ThemeUIConfig } from "@theme-ui/css/dist/declarations/src/options";
+import { variants } from "./variants/index.js";
+import { FontConfig, getFontConfig } from "./font/index.js";
+import { ThemeConfig } from "./types.js";
+import { ThemeColor, VariantsWithStaticColors } from "../theme-engine/types.js";
+import { Theme as ThemeUITheme } from "@theme-ui/css";
 
-export { createButtonVariant } from "./variants/button";
+export { createButtonVariant } from "./variants/button.js";
+export { getFontConfig } from "./font/index.js";
 export type Theme = {
   breakpoints: string[];
   space: number[] & { small?: number | string };
@@ -41,7 +42,7 @@ export type Theme = {
     medium: number;
     big: number;
   };
-  config: ThemeUIConfig;
+  config: ThemeUITheme["config"];
 } & FontConfig &
   typeof variants;
 

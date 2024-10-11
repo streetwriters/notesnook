@@ -17,46 +17,47 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  from_base64,
-  to_base64,
-  randombytes_buf,
-  crypto_pwhash,
-  crypto_pwhash_SALTBYTES,
-  crypto_pwhash_ALG_ARGON2I13,
-  crypto_aead_xchacha20poly1305_ietf_KEYBYTES
-} from "@notesnook/sodium";
-import { EncryptionKey, SerializedKey } from "./types";
+import { ISodium } from "@notesnook/sodium";
+import { EncryptionKey, SerializedKey } from "./types.js";
 
 export default class KeyUtils {
-  static deriveKey(password: string, salt?: string): EncryptionKey {
+  static deriveKey(
+    sodium: ISodium,
+    password: string,
+    salt?: string
+  ): EncryptionKey {
     let saltBytes: Uint8Array;
-    if (!salt) saltBytes = randombytes_buf(crypto_pwhash_SALTBYTES);
+    if (!salt)
+      saltBytes = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
     else {
-      saltBytes = from_base64(salt);
+      saltBytes = sodium.from_base64(salt);
     }
 
     if (!saltBytes)
       throw new Error("Could not generate bytes from the given salt.");
 
-    const key = crypto_pwhash(
-      crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
+    const key = sodium.crypto_pwhash(
+      sodium.crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
       password,
       saltBytes,
       3, // operations limit
       1024 * 1024 * 8, // memory limit (8MB)
-      crypto_pwhash_ALG_ARGON2I13
+      sodium.crypto_pwhash_ALG_ARGON2I13
     );
 
     return {
       key,
-      salt: typeof salt === "string" ? salt : to_base64(saltBytes)
+      salt: typeof salt === "string" ? salt : sodium.to_base64(saltBytes)
     };
   }
 
-  static exportKey(password: string, salt?: string): SerializedKey {
-    const { key, salt: keySalt } = this.deriveKey(password, salt);
-    return { key: to_base64(key), salt: keySalt };
+  static exportKey(
+    sodium: ISodium,
+    password: string,
+    salt?: string
+  ): SerializedKey {
+    const { key, salt: keySalt } = this.deriveKey(sodium, password, salt);
+    return { key: sodium.to_base64(key), salt: keySalt };
   }
 
   /**
@@ -64,12 +65,12 @@ export default class KeyUtils {
    * and spits out a key that can be directly used for encryption/decryption.
    * @param input
    */
-  static transform(input: SerializedKey): EncryptionKey {
+  static transform(sodium: ISodium, input: SerializedKey): EncryptionKey {
     if ("password" in input && !!input.password) {
       const { password, salt } = input;
-      return this.deriveKey(password, salt);
+      return this.deriveKey(sodium, password, salt);
     } else if ("key" in input && !!input.salt && !!input.key) {
-      return { key: from_base64(input.key), salt: input.salt };
+      return { key: sodium.from_base64(input.key), salt: input.salt };
     }
     throw new Error("Invalid input.");
   }

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolId } from "@notesnook/editor/dist/toolbar";
+import type { ToolId } from "@notesnook/editor";
 import React, { RefObject } from "react";
 import { View } from "react-native";
 import { Pressable } from "../../../components/ui/pressable";
@@ -33,6 +33,7 @@ import {
   getUngroupedTools
 } from "./toolbar-definition";
 import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
+import { strings } from "@notesnook/intl";
 
 export default function ToolSheet({
   group,
@@ -124,7 +125,7 @@ export default function ToolSheet({
             }}
             color={colors.secondary.paragraph}
           >
-            You have grouped all the tools.
+            {strings.groupedAllTools()}
           </Paragraph>
         ) : (
           ungrouped.map(renderTool)

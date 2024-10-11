@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex } from "@theme-ui/components";
-import { ReactNodeView, ReactNodeViewProps } from "../react";
+import { ReactNodeView, ReactNodeViewProps } from "../react/index.js";
 import { Node as ProsemirrorNode } from "prosemirror-model";
-import { Editor } from "../../types";
+import { Editor } from "../../types.js";
 import { Editor as TiptapEditor } from "@tiptap/core";
 import { useEffect, useRef } from "react";
 import { updateColumnsOnResize } from "@tiptap/pm/tables";
@@ -30,15 +30,16 @@ import {
   InsertRowBelow,
   RowProperties,
   TableProperties
-} from "../../toolbar/tools/table";
-import { getToolDefinition } from "../../toolbar/tool-definitions";
+} from "../../toolbar/tools/table.js";
+import { getToolDefinition } from "../../toolbar/tool-definitions.js";
 import { getPosition } from "@notesnook/ui";
 import {
   findSelectedDOMNode,
   hasSameAttributes
-} from "../../utils/prosemirror";
-import { DesktopOnly } from "../../components/responsive";
-import { TextDirections } from "../text-direction";
+} from "../../utils/prosemirror.js";
+import { DesktopOnly } from "../../components/responsive/index.js";
+import { TextDirections } from "../text-direction/index.js";
+import { strings } from "@notesnook/intl";
 
 export function TableComponent(props: ReactNodeViewProps) {
   const { editor, node, forwardRef } = props;
@@ -262,7 +263,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
     >
       <TableProperties
         editor={editor}
-        title="Table properties"
+        title={strings.tableSettings()}
         icon="more"
         variant={"small"}
       />

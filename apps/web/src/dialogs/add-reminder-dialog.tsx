@@ -34,9 +34,10 @@ import "react-day-picker/dist/style.css";
 import { PopupPresenter } from "@notesnook/ui";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { getFormattedDate } from "@notesnook/common";
-import { MONTHS_FULL, getTimeFormat } from "@notesnook/core/dist/utils/date";
+import { MONTHS_FULL, getTimeFormat } from "@notesnook/core";
 import { Note, Reminder } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 dayjs.extend(customParseFormat);
 
@@ -152,12 +153,12 @@ export const AddReminderDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title={reminder ? "Edit reminder" : "Add a reminder"}
+        title={reminder ? strings.editReminder() : strings.newReminder()}
         testId="add-reminder-dialog"
         onClose={() => props.onClose(false)}
         sx={{ fontFamily: "body" }}
         positiveButton={{
-          text: reminder ? "Save" : "Add",
+          text: reminder ? strings.save() : strings.add(),
           disabled:
             !title ||
             (mode !== Modes.ONCE &&
@@ -166,25 +167,16 @@ export const AddReminderDialog = DialogManager.register(
               !selectedDays.length),
           onClick: async () => {
             if (!("Notification" in window))
-              showToast(
-                "warn",
-                "Reminders will not be active on this device as it does not support notifications."
-              );
+              showToast("warn", strings.remindersNotSupported());
 
             const permissionResult = await Notification.requestPermission();
             if (!IS_TESTING && permissionResult !== "granted") {
-              showToast(
-                "error",
-                "Please grant notifications permission to add new reminders."
-              );
+              showToast("error", strings.noNotificationPermission());
               return;
             }
 
             if (mode !== Modes.REPEAT && date.isBefore(dayjs())) {
-              showToast(
-                "error",
-                "Reminder time cannot be earlier than the current time."
-              );
+              showToast("error", strings.dateError());
               return;
             }
 
@@ -209,11 +201,14 @@ export const AddReminderDialog = DialogManager.register(
             props.onClose(true);
           }
         }}
-        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => props.onClose(false)
+        }}
       >
         <Field
           id="title"
-          label="Title"
+          label={strings.title()}
           required
           value={title}
           data-test-id="title-input"
@@ -224,9 +219,9 @@ export const AddReminderDialog = DialogManager.register(
         <Field
           as="textarea"
           id="description"
-          label="Description"
+          label={strings.description()}
           data-test-id="description-input"
-          helpText="Optional"
+          helpText={strings.optional()}
           value={description}
           styles={{
             input: {
@@ -263,7 +258,7 @@ export const AddReminderDialog = DialogManager.register(
                   setSelectedDays([]);
                 }}
               />
-              {m.title}
+              {strings.reminderModes(m.id)}
               {m.premium && !isUserPremium && (
                 <Pro size={18} color="accent" sx={{ ml: 1 }} />
               )}
@@ -305,7 +300,7 @@ export const AddReminderDialog = DialogManager.register(
                         : "paragraph"
                   }}
                 >
-                  {mode.title}
+                  {strings.recurringModes(mode.id)}
                 </Button>
               ))}
             </Flex>
@@ -367,7 +362,7 @@ export const AddReminderDialog = DialogManager.register(
             <>
               <Field
                 id="date"
-                label="Date"
+                label={strings.date()}
                 required
                 inputRef={dateInputRef}
                 data-test-id="date-input"
@@ -438,7 +433,7 @@ export const AddReminderDialog = DialogManager.register(
             <>
               <LabeledSelect
                 id="month"
-                label="Month"
+                label={strings.month()}
                 value={`${dayjs(date).month()}`}
                 options={MONTHS_FULL.map((month, index) => ({
                   value: `${index}`,
@@ -450,7 +445,7 @@ export const AddReminderDialog = DialogManager.register(
               />
               <LabeledSelect
                 id="day"
-                label="Day"
+                label={strings.day()}
                 value={`${dayjs(date).date()}`}
                 options={new Array(dayjs(date).daysInMonth())
                   .fill("0")
@@ -466,7 +461,7 @@ export const AddReminderDialog = DialogManager.register(
           ) : null}
           <Field
             id="time"
-            label="Time"
+            label={strings.time()}
             required
             data-test-id="time-input"
             helpText={`${
@@ -505,7 +500,9 @@ export const AddReminderDialog = DialogManager.register(
                 checked={p.id === priority}
                 onChange={() => setPriority(p.id)}
               />
-              {p.title}
+              {strings.reminderNotificationModes[
+                p.title as keyof typeof strings.reminderNotificationModes
+              ]()}
             </Label>
           ))}
         </Flex>
@@ -514,20 +511,20 @@ export const AddReminderDialog = DialogManager.register(
           <Text variant="subBody" sx={{ mt: 1 }}>
             {selectedDays.length === 0 && recurringMode !== RecurringModes.DAY
               ? recurringMode === RecurringModes.WEEK
-                ? "Select day of the week to repeat the reminder."
-                : "Select nth day(s) of the month to repeat the reminder."
+                ? strings.reminderRepeatStrings.week.selectDays()
+                : strings.reminderRepeatStrings.month.selectDays()
               : repeatsDaily
-              ? `Repeats daily at ${date.format(timeFormat())}.`
-              : `Repeats every ${recurringMode} on ${getSelectedDaysText(
-                  selectedDays,
-                  recurringMode
-                )} at ${date.format(timeFormat())}.`}
+              ? strings.reminderRepeatStrings.day(date.format(timeFormat()))
+              : strings.reminderRepeatStrings.repeats(
+                  1,
+                  recurringMode,
+                  getSelectedDaysText(selectedDays, recurringMode),
+                  date.format(timeFormat())
+                )}
           </Text>
         ) : (
           <Text variant="subBody" sx={{ mt: 1 }}>
-            {`The reminder will start on ${date} at ${date.format(
-              timeFormat()
-            )}.`}
+            {strings.reminderStarts(date.toString(), date.format(timeFormat()))}
           </Text>
         )}
       </Dialog>

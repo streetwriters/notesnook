@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Database from "../api";
-import { SQLCachedCollection } from "../database/sql-cached-collection";
-import { Notebook, Shortcut, Tag } from "../types";
-import { ICollection } from "./collection";
+import Database from "../api/index.js";
+import { SQLCachedCollection } from "../database/sql-cached-collection.js";
+import { Notebook, Shortcut, Tag } from "../types.js";
+import { ICollection } from "./collection.js";
 
 type ResolveTypeToItem<T extends "notebooks" | "tags" | "all"> =
   T extends "tags"

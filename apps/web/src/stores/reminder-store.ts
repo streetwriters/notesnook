@@ -24,9 +24,12 @@ import { TaskScheduler } from "../utils/task-scheduler";
 import dayjs from "dayjs";
 import Config from "../utils/config";
 import { desktop } from "../common/desktop-bridge";
-import { Reminder, VirtualizedGrouping } from "@notesnook/core";
+import {
+  Reminder,
+  VirtualizedGrouping,
+  FilteredSelector
+} from "@notesnook/core";
 import { store as noteStore } from "./note-store";
-import { FilteredSelector } from "@notesnook/core/dist/database/sql-collection";
 import { ReminderPreviewDialog } from "../dialogs/reminder-preview-dialog";
 
 class ReminderStore extends BaseStore<ReminderStore> {

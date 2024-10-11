@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import MDIIcon from "@mdi/react";
+import { MDIIcon } from "./mdi-icon";
 import { Theme } from "@notesnook/theme";
 import { isThemeColor, SchemeColors } from "@notesnook/theme";
 import { Flex, FlexProps } from "@theme-ui/components";

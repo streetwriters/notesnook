@@ -15,6 +15,7 @@ const SCOPES = [
   "mobile",
   "web",
   "vericrypt",
+  "monograph",
   "desktop",
   "crypto",
   "editor",
@@ -34,7 +35,8 @@ const SCOPES = [
   "common",
   "global",
   "docs",
-  "themebuilder"
+  "themebuilder",
+  "intl"
 ];
 
 module.exports = {

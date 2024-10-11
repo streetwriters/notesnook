@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { IndexedCollection } from "./indexed-collection";
+import { IndexedCollection } from "./indexed-collection.js";
 import {
   CollectionType,
   Collections,
   ItemMap,
   MaybeDeletedItem,
   isDeleted
-} from "../types";
-import { StorageAccessor } from "../interfaces";
+} from "../types.js";
+import { StorageAccessor } from "../interfaces.js";
 
 /**
  * @deprecated only kept here for migration purposes

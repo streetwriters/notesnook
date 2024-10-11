@@ -25,13 +25,16 @@ import React, {
   useState
 } from "react";
 import { Box, FlexProps, Text } from "@theme-ui/components";
-import { getPosition } from "../../utils/position";
-import { LazyMenuItemsLoader, MenuButtonItem, MenuItem } from "./types";
-import { useFocus } from "./use-focus";
-import { MenuSeparator } from "./menu-separator";
-import { MenuButton } from "./menu-button";
-import { PopupPresenter, PopupPresenterProps } from "../popup-presenter";
-import { ScrollContainer } from "../scroll-container";
+import { getPosition } from "../../utils/position.js";
+import { LazyMenuItemsLoader, MenuButtonItem, MenuItem } from "./types.js";
+import { useFocus } from "./use-focus.js";
+import { MenuSeparator } from "./menu-separator.js";
+import { MenuButton } from "./menu-button.js";
+import {
+  PopupPresenter,
+  PopupPresenterProps
+} from "../popup-presenter/index.js";
+import { ScrollContainer } from "../scroll-container/index.js";
 
 type MenuProps = MenuContainerProps & {
   items?: MenuItem[];
@@ -301,6 +304,6 @@ function LazyLoader(props: {
   );
 }
 
-export * from "./types";
-export * from "./menu-button";
-export * from "./menu-separator";
+export * from "./types.js";
+export * from "./menu-button.js";
+export * from "./menu-separator.js";

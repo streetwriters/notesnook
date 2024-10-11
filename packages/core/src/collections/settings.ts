@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { makeId } from "../utils/id";
-import Database from "../api";
+import { makeId } from "../utils/id.js";
+import Database from "../api/index.js";
 import {
   GroupOptions,
   GroupingKey,
@@ -29,11 +29,11 @@ import {
   SideBarSection,
   ToolbarConfig,
   ToolbarConfigPlatforms,
-  TrashCleanupInterval
-} from "../types";
-import { ICollection } from "./collection";
-import { TimeFormat } from "../utils/date";
-import { SQLCachedCollection } from "../database/sql-cached-collection";
+  TrashCleanupInterval,
+  TimeFormat
+} from "../types.js";
+import { ICollection } from "./collection.js";
+import { SQLCachedCollection } from "../database/sql-cached-collection.js";
 
 const DEFAULT_GROUP_OPTIONS = (key: GroupingKey) =>
   ({

@@ -18,17 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { PropsWithChildren } from "react";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
 import {
   ActionSheetPresenter,
   ActionSheetPresenterProps
-} from "../action-sheet";
+} from "../action-sheet/index.js";
 import {
   MenuPresenter,
   MenuPresenterProps,
   PopupPresenter
 } from "@notesnook/ui";
-import { getPopupContainer } from "../../toolbar/utils/dom";
+import { getPopupContainer } from "../../toolbar/utils/dom.js";
 
 type ResponsiveContainerProps = {
   mobile?: JSX.Element;

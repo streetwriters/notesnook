@@ -17,19 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Cipher } from "@notesnook/crypto";
-import { tinyToTiptap } from "../migrations";
-import { makeSessionContentId } from "../utils/id";
-import { ICollection } from "./collection";
-import { isCipher } from "../database/crypto";
-import Database from "../api";
-import { ContentType, SessionContentItem, isDeleted } from "../types";
-import { SQLCollection } from "../database/sql-collection";
-
-export type NoteContent<TLocked extends boolean> = {
-  data: TLocked extends true ? Cipher<"base64"> : string;
-  type: ContentType;
-};
+import { tinyToTiptap } from "../migrations.js";
+import { makeSessionContentId } from "../utils/id.js";
+import { ICollection } from "./collection.js";
+import { isCipher } from "../utils/crypto.js";
+import Database from "../api/index.js";
+import { NoteContent, SessionContentItem, isDeleted } from "../types.js";
+import { SQLCollection } from "../database/sql-collection.js";
 
 export class SessionContent implements ICollection {
   name = "sessioncontent";

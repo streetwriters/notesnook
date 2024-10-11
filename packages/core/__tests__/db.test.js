@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Constants from "../src/utils/constants";
+import Constants from "../src/utils/constants.ts";
 import { test, expect } from "vitest";
-import { databaseTest } from "./utils";
+import { databaseTest } from "./utils/index.ts";
 
 test("db.host should change HOST", () =>
   databaseTest().then((db) => {

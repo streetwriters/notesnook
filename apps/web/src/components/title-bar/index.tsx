@@ -28,6 +28,7 @@ import {
   WindowRestore
 } from "../icons";
 import { BaseThemeProvider } from "../theme-provider";
+import { strings } from "@notesnook/intl";
 
 export const TITLE_BAR_HEIGHT = IS_DESKTOP_APP ? 37.8 : 0;
 export function TitleBar() {
@@ -36,14 +37,14 @@ export function TitleBar() {
 
   const tools = [
     {
-      title: "Minimize",
+      title: strings.minimize(),
       icon: WindowMinimize,
       hidden: hasNativeWindowControls || isFullscreen,
       enabled: true,
       onClick: () => desktop?.window.minimze.mutate()
     },
     {
-      title: isMaximized ? "Restore" : "Maximize",
+      title: isMaximized ? strings.restore() : strings.maximize(),
       icon: isMaximized ? WindowRestore : WindowMaximize,
       enabled: true,
       hidden: hasNativeWindowControls || isFullscreen,
@@ -53,7 +54,7 @@ export function TitleBar() {
           : desktop?.window.maximize.mutate()
     },
     {
-      title: "Close",
+      title: strings.close(),
       icon: WindowClose,
       hidden: hasNativeWindowControls || isFullscreen,
       enabled: true,

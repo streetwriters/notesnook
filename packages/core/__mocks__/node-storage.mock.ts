@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Cipher, NNCrypto, SerializedKey } from "@notesnook/crypto";
-import { IStorage } from "../src/interfaces";
+import { IStorage } from "../src/interfaces.js";
 
 export class NodeStorageInterface implements IStorage {
   storage = {};

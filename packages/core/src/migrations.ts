@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { parseHTML } from "./utils/html-parser";
+import { parseHTML } from "./utils/html-parser.js";
 import { decodeHTML5 } from "entities";
-import { CURRENT_DATABASE_VERSION } from "./common";
-import Database from "./api";
-import { makeId } from "./utils/id";
+import { CURRENT_DATABASE_VERSION } from "./common.js";
+import Database from "./api/index.js";
+import { makeId } from "./utils/id.js";
 import {
   Color,
   ContentItem,
@@ -33,12 +33,12 @@ import {
   ToolbarConfigPlatforms,
   isDeleted,
   isGroupingKey
-} from "./types";
-import { isCipher } from "./database/crypto";
-import { IndexedCollection } from "./database/indexed-collection";
-import { DefaultColors } from "./collections/colors";
+} from "./types.js";
+import { isCipher } from "./utils/crypto.js";
+import { IndexedCollection } from "./database/indexed-collection.js";
+import { DefaultColors } from "./collections/colors.js";
 import { Cipher } from "@notesnook/crypto";
-import { KEYS } from "./database/kv";
+import { KEYS } from "./database/kv.js";
 
 type MigrationType = "local" | "sync" | "backup";
 type MigrationItemType = ItemType | "notehistory" | "content" | "never";

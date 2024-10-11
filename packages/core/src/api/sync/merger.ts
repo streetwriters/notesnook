@@ -17,16 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { logger } from "../../logger";
-import { isHTMLEqual } from "../../utils/html-diff";
-import Database from "..";
+import { logger } from "../../logger.js";
+import { isHTMLEqual } from "../../utils/html-diff.js";
+import Database from "../index.js";
 import {
   Attachment,
   ContentItem,
   Item,
   MaybeDeletedItem,
   isDeleted
-} from "../../types";
+} from "../../types.js";
 
 const THRESHOLD = process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
 class Merger {

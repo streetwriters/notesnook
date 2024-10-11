@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Readability } from "@mozilla/readability";
-import { injectCss } from "./utils";
+import { injectCss } from "./utils.js";
 import { app, h, text } from "hyperapp";
-import { getInlinedNode, toBlob, toJpeg, toPng } from "./domtoimage";
-import { Config, InlineOptions } from "./types";
-import { FetchOptions } from "./fetch";
+import { getInlinedNode, toBlob, toJpeg, toPng } from "./domtoimage.js";
+import { Config, InlineOptions } from "./types.js";
+import { FetchOptions } from "./fetch.js";
 
 type ReadabilityEnhanced = Readability<string> & {
   PRESENTATIONAL_ATTRIBUTES: string[];

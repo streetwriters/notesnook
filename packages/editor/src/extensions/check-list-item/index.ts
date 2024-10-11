@@ -16,8 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { CheckListItem } from "./check-list-item";
+import { CheckListItem } from "./check-list-item.js";
 
-export * from "./check-list-item";
+export * from "./check-list-item.js";
 
 export default CheckListItem;

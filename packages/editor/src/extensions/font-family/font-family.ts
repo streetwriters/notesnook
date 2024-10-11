@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import "@tiptap/extension-text-style";
 import { Extension } from "@tiptap/core";
-import { getFontById } from "../../utils/font";
+import { getFontById } from "../../utils/font.js";
 
 export type FontFamilyOptions = {
   types: string[];

@@ -21,8 +21,8 @@ import { EmotionThemeProvider } from "@notesnook/theme";
 import { Icon } from "@notesnook/ui";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { PropsWithChildren } from "react";
-import { DesktopOnly, MobileOnly } from "../../components/responsive";
-import { Icons } from "../icons";
+import { DesktopOnly, MobileOnly } from "../../components/responsive/index.js";
+import { Icons } from "../icons.js";
 
 type Action = {
   title: string;

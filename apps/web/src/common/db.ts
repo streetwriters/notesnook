@@ -25,7 +25,7 @@ import { createDialect } from "./sqlite";
 import { isFeatureSupported } from "../utils/feature-check";
 import { generatePassword } from "../utils/password-generator";
 import { deriveKey, useKeyStore } from "../interfaces/key-store";
-import { logManager } from "@notesnook/core/dist/logger";
+import { logManager } from "@notesnook/core";
 import Config from "../utils/config";
 
 const db = database;

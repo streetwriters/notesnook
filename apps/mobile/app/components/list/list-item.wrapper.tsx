@@ -36,7 +36,7 @@ import {
   TrashItem,
   VirtualizedGrouping
 } from "@notesnook/core";
-import { getSortValue } from "@notesnook/core/dist/utils/grouping";
+import { getSortValue } from "@notesnook/core";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";

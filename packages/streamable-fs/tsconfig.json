@@ -4,5 +4,5 @@
     "lib": ["DOM", "ESNext"],
     "outDir": "./dist"
   },
-  "include": ["./index.ts", "./src/"]
+  "include": ["./src/"]
 }

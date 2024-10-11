@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import TipTapTableHeader from "@tiptap/extension-table-header";
-import { addStyleAttribute } from "../table-cell/utils";
+import { addStyleAttribute } from "../table-cell/utils.js";
 
 export const TableHeader = TipTapTableHeader.extend({
   addAttributes() {

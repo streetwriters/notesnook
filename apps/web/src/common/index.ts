@@ -29,7 +29,7 @@ import { readFile, showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
 import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
-import { EVENTS } from "@notesnook/core/dist/common";
+import { EVENTS } from "@notesnook/core";
 import { createWritableStream } from "./desktop-bridge";
 import { createZipStream, ZipFile } from "../utils/streams/zip-stream";
 import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
@@ -37,7 +37,7 @@ import { ZipEntry, createUnzipIterator } from "../utils/streams/unzip-stream";
 import { User } from "@notesnook/core";
 import { LegacyBackupFile } from "@notesnook/core";
 import { useEditorStore } from "../stores/editor-store";
-import { formatDate } from "@notesnook/core/dist/utils/date";
+import { formatDate } from "@notesnook/core";
 import { showPasswordDialog } from "../dialogs/password-dialog";
 import { BackupPasswordDialog } from "../dialogs/backup-password-dialog";
 import { ReminderDialog } from "../dialogs/reminder-dialog";
@@ -45,22 +45,23 @@ import { Cipher, SerializedKey } from "@notesnook/crypto";
 import { ChunkedStream } from "../utils/streams/chunked-stream";
 import { isFeatureSupported } from "../utils/feature-check";
 import { NNCrypto } from "../interfaces/nncrypto";
+import { strings } from "@notesnook/intl";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
-    title: "Add a note",
+    title: strings.addItem("note"),
     onClick: () => useEditorStore.getState().newSession()
   },
   notebooks: {
-    title: "Create a notebook",
+    title: strings.addItem("notebook"),
     onClick: () => hashNavigate("/notebooks/create", { replace: true })
   },
   tags: {
-    title: "Create a tag",
+    title: strings.addItem("tag"),
     onClick: () => hashNavigate(`/tags/create`, { replace: true })
   },
   reminders: {
-    title: "Add a reminder",
+    title: strings.addItem("reminder"),
     onClick: () => hashNavigate(`/reminders/create`, { replace: true })
   }
 };
@@ -94,7 +95,7 @@ export async function createBackup(
   const verified =
     rescueMode || encryptBackups || noVerify || (await verifyAccount());
   if (!verified) {
-    showToast("error", "Could not create a backup: user verification failed.");
+    showToast("error", `${strings.backupFailed()}: ${strings.verifyFailed()}.`);
     return false;
   }
 
@@ -118,8 +119,8 @@ export async function createBackup(
   const error = await TaskManager.startTask<Error | void>({
     type: background ? "status" : "modal",
     id: "creating-backup",
-    title: "Creating backup",
-    subtitle: "We are creating a backup of your data. Please wait...",
+    title: strings.backingUpData(mode),
+    subtitle: strings.backingUpDataWait(),
     action: async (report) => {
       const writeStream = await createWritableStream(filePath);
       await new ReadableStream<ZipFile>({
@@ -168,11 +169,11 @@ export async function createBackup(
   if (error) {
     showToast(
       "error",
-      `Could not create a backup of your data: ${(error as Error).message}`
+      `${strings.backupFailed()}: ${(error as Error).message}`
     );
     console.error(error);
   } else {
-    showToast("success", `Backup saved at ${filePath}.`);
+    showToast("success", `${strings.backupSavedAt(filePath)}`);
     return true;
   }
   return false;
@@ -213,8 +214,8 @@ export async function restoreBackupFile(backupFile: File) {
     await db.initCollections();
   } else {
     const error = await TaskManager.startTask<Error | void>({
-      title: "Restoring backup",
-      subtitle: "Please wait while we restore your backup...",
+      title: strings.restoringBackup(),
+      subtitle: `${strings.restoringBackupDesc()}...`,
       type: "modal",
       action: async (report) => {
         let cachedPassword: string | undefined = undefined;
@@ -316,7 +317,7 @@ export async function restoreBackupFile(backupFile: File) {
     });
     if (error) {
       console.error(error);
-      showToast("error", `Failed to restore backup: ${error.message}`);
+      showToast("error", `${strings.restoreFailed()}: ${error.message}`);
     }
   }
 }
@@ -327,8 +328,8 @@ async function restoreWithProgress(
   key?: string
 ) {
   return await TaskManager.startTask<Error | void>({
-    title: "Restoring backup",
-    subtitle: "This might take a while",
+    title: strings.restoringBackup(),
+    subtitle: strings.restoringBackupDesc(),
     type: "modal",
     action: (report) => {
       db.eventManager.subscribe(
@@ -359,11 +360,11 @@ async function restoreWithProgress(
 export async function verifyAccount() {
   if (!(await db.user?.getUser())) return true;
   return await showPasswordDialog({
-    title: "Verify it's you",
-    subtitle: "Enter your account password to proceed.",
+    title: strings.verifyItsYou(),
+    subtitle: strings.enterAccountPasswordDesc(),
     inputs: {
       password: {
-        label: "Password",
+        label: strings.password(),
         autoComplete: "current-password"
       }
     },
@@ -408,12 +409,12 @@ async function restore(
 ) {
   try {
     await db.backup?.import(backup, { password, encryptionKey });
-    showToast("success", "Backup restored!");
+    showToast("success", strings.backupRestored());
   } catch (e) {
     logger.error(e as Error, "Could not restore the backup");
     showToast(
       "error",
-      `Could not restore the backup: ${(e as Error).message || e}`
+      `${strings.backupFailed()}: ${(e as Error).message || e}`
     );
   }
 }

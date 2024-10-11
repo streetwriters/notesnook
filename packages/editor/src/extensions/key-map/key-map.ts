@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Extension } from "@tiptap/core";
 import { isInTable } from "@tiptap/pm/tables";
-import { isListActive } from "../../utils/prosemirror";
-import { CodeBlock } from "../code-block";
-import { showLinkPopup } from "../../toolbar/popups/link-popup";
+import { CodeBlock } from "../code-block/index.js";
+import { showLinkPopup } from "../../toolbar/popups/link-popup.js";
+import { isListActive } from "../../utils/list.js";
 
 export const KeyMap = Extension.create({
   name: "key-map",

@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getFormattedDate } from "@notesnook/common";
-import { isEncryptedContent } from "@notesnook/core/dist/collections/content";
-import { NoteContent } from "@notesnook/core/dist/collections/session-content";
-import { EVENTS } from "@notesnook/core/dist/common";
 import {
+  EVENTS,
+  isEncryptedContent,
+  NoteContent,
   ContentItem,
   ContentType,
   DeletedItem,
@@ -31,7 +31,7 @@ import {
   UnencryptedContentItem,
   isDeleted,
   isTrashItem
-} from "@notesnook/core/dist/types";
+} from "@notesnook/core";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import WebView from "react-native-webview";
@@ -74,6 +74,7 @@ import {
   post
 } from "./utils";
 import { sleep } from "../../../utils/time";
+import { strings } from "@notesnook/intl";
 
 type NoteWithContent = Note & {
   content?: NoteContent<false>;
@@ -288,14 +289,11 @@ export const useEditor = (
 
         const saveTimer = setTimeout(() => {
           DatabaseLogger.log(`Note save timeout: ${id}...`);
-          ToastManager.error(
-            new Error(
-              "Copy your changes and restart the app to avoid data loss. If the issue persists, please report to us at support@streetwriters.co."
-            ),
-            "Saving note is taking too long",
-            "global",
-            15000
-          );
+          ToastManager.show({
+            message: strings.savingNoteTakingTooLong(),
+            type: "error",
+            duration: 10000
+          });
         }, 30 * 1000);
 
         if (!locked) {
@@ -342,14 +340,11 @@ export const useEditor = (
           if (!db.vault.unlocked) {
             if (pendingChanges) await sleep(3000);
             const unlocked = await unlockVault({
-              title: "Unlock vault to save note",
-              paragraph: `This note is locked, unlock to save ${
-                pendingChanges ? "some pending" : ""
-              } changes`,
+              title: strings.unlockNote(),
+              paragraph: strings.noteLockedSave(),
               context: "global"
             });
-            if (!unlocked)
-              throw new Error("Could not save note, vault is locked");
+            if (!unlocked) throw new Error(strings.saveFailedVaultLocked());
           }
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           if (typeof noteData.title === "string") {

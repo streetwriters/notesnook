@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { TimeFormat, formatDate } from "./date";
+import { TimeFormat } from "../types.js";
+import { formatDate } from "./date.js";
 
 export const NEWLINE_STRIP_REGEX = /[\r\n\t\v]+/gm;
 

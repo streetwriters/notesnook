@@ -37,7 +37,7 @@ import { store as notebookStore } from "../stores/notebook-store";
 import { showToast } from "../utils/toast";
 import { isMac } from "../utils/platform";
 import { create } from "zustand";
-import { Notebook } from "@notesnook/core/dist/types";
+import { Notebook } from "@notesnook/core";
 import {
   UncontrolledTreeEnvironment,
   Tree,
@@ -49,6 +49,7 @@ import { pluralize } from "@notesnook/common";
 import Field from "../components/field";
 import { AddNotebookDialog } from "./add-notebook-dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 type NotebookReference = {
@@ -128,14 +129,12 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
     <Dialog
       testId="move-note-dialog"
       isOpen={true}
-      title={"Select notebooks"}
-      description={`Use ${
-        isMac() ? "cmd" : "ctrl"
-      }+click to select multiple notebooks`}
+      title={strings.selectNotebooks()}
+      description={strings.selectNotebooksDesktopDesc(isMac() ? "Cmd" : "Ctrl")}
       onClose={() => _onClose(false)}
       width={450}
       positiveButton={{
-        text: "Done",
+        text: strings.done(),
         onClick: async () => {
           const { selected } = useSelectionStore.getState();
           for (const item of selected) {
@@ -158,7 +157,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
           if (stringified) {
             showToast(
               "success",
-              `${pluralize(noteIds.length, "note")} ${stringified}`
+              `${strings.notes(noteIds.length)} ${stringified}`
             );
           }
 
@@ -166,7 +165,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
         }
       }}
       negativeButton={{
-        text: "Cancel",
+        text: strings.cancel(),
         onClick: () => _onClose(false)
       }}
     >
@@ -176,7 +175,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
         styles={{
           input: { p: "7.5px" }
         }}
-        placeholder={"Search notebooks"}
+        placeholder={strings.searchNotebooks()}
         onChange={async (e) => {
           const query = e.target.value.trim();
           const ids = await (query
@@ -199,7 +198,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
           }}
           sx={{ textDecoration: "none", mb: 2 }}
         >
-          Reset selection
+          {strings.resetSelection()}
         </Button>
       )}
       {notebooks.length > 0 ? (
@@ -315,9 +314,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
             alignItems: "center"
           }}
         >
-          <Text variant="body">
-            Please add a notebook to start linking notes.
-          </Text>
+          <Text variant="body">{strings.notebooksEmpty()}</Text>
           <Button
             data-test-id="add-new-notebook"
             variant="secondary"
@@ -332,7 +329,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
               )
             }
           >
-            Add new notebook
+            {strings.addNotebook()}
           </Button>
         </Flex>
       )}
@@ -448,7 +445,7 @@ function NotebookItem(props: {
         >
           <Plus
             size={18}
-            title="New notebook"
+            title={strings.newNotebook()}
             onClick={async (e) => {
               e.stopPropagation();
               await AddNotebookDialog.show({ parentId: notebook.id });
@@ -576,14 +573,13 @@ function stringifySelected(suggestion: NotebookReference[]) {
   if (!added.length && !removed.length) return;
 
   const parts = [];
-  if (added.length > 0)
-    parts.push(`added to ${pluralize(added.length, "notebook")}`);
+  if (added.length > 0) parts.push(strings.addedToNotebook(added.length));
   // if (added.length >= 1) parts.push(added[0]);
   // if (added.length > 1) parts.push(`and ${added.length - 1} others`);
 
   if (removed.length >= 1) {
     if (parts.length > 0) parts.push("&");
-    parts.push(`removed from ${pluralize(added.length, "notebook")}`);
+    parts.push(`removed from ${strings.removedFromNotebook(removed.length)}`);
   }
   // if (removed.length > 1) parts.push(`and ${removed.length - 1} others`);
 

@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import dayjs from "dayjs";
-import Database from "../src/api";
-import { createKeySelector, groupArray } from "../src/utils/grouping";
+import Database from "../src/api/index.js";
+import { createKeySelector, groupArray } from "../src/utils/grouping.js";
 import {
   databaseTest,
   noteTest,
@@ -27,10 +27,9 @@ import {
   TEST_NOTEBOOK,
   IMG_CONTENT,
   loginFakeUser
-} from "./utils";
+} from "./utils/index.js";
 import { test, expect } from "vitest";
-import { MONTHS_FULL } from "../src/utils/date";
-import { GroupOptions, Note } from "../src/types";
+import { GroupOptions, Note } from "../src/types.js";
 
 async function createAndAddNoteToNotebook(
   db: Database,
@@ -120,6 +119,19 @@ test("setting note title to empty should set the default title", () =>
     await db.notes.add({ id, title: "" });
     const note = await db.notes.note(id);
     expect(note?.title.startsWith("Note ")).toBe(true);
+  }));
+
+test("changing content shouldn't reset the note title ", () =>
+  noteTest({ title: "I am a note" }).then(async ({ db, id }) => {
+    await db.notes.add({
+      id,
+      content: {
+        type: TEST_NOTE.content.type,
+        data: "<p>This is a very colorful existence.</p>"
+      }
+    });
+    const note = await db.notes.note(id);
+    expect(note?.title).toBe("I am a note");
   }));
 
 test("note should get headline from content", () =>

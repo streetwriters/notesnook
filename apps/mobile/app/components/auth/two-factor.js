@@ -38,6 +38,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { useCallback } from "react";
 import { ScrollView } from "react-native-actions-sheet";
+import { strings } from "@notesnook/intl";
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   const { colors } = useThemeColors();
@@ -50,20 +51,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   const [loading, setLoading] = useState(false);
   const inputRef = useRef();
   const [sending, setSending] = useState(false);
-
-  const codeHelpText = {
-    app: "Enter the 6 digit code from your authenticator app to continue logging in",
-    sms: "Enter the 6 digit code sent to your phone number to continue logging in",
-    email: "Enter the 6 digit code sent to your email to continue logging in",
-    recoveryCode: "Enter the recovery code to continue logging in"
-  };
-
-  const secondaryMethodsText = {
-    app: "I don't have access to authenticator app",
-    sms: "I don't have access to my phone",
-    email: "I don't have access to email",
-    recoveryCode: "I don't have recovery codes"
-  };
 
   const onNext = async () => {
     if (!code.current || code.current.length < 6) return;
@@ -94,22 +81,22 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   const methods = [
     {
       id: "sms",
-      title: "Send code via SMS",
+      title: strings.sendCodeSms(),
       icon: "message-plus-outline"
     },
     {
       id: "email",
-      title: "Send code via email",
+      title: strings.sendCodeEmail(),
       icon: "email-outline"
     },
     {
       id: "app",
-      title: "Enter code from authenticator app",
+      title: strings.authAppCode(),
       icon: "cellphone-key"
     },
     {
       id: "recoveryCode",
-      title: "I have a recovery code",
+      title: strings.recoveryCode(),
       icon: "key"
     }
   ];
@@ -168,9 +155,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
             textAlign: "center"
           }}
         >
-          {currentMethod.method
-            ? "Two factor authentication"
-            : "Select methods for two-factor authentication"}
+          {currentMethod.method ? strings["2fa"]() : strings.select2faMethod()}
         </Heading>
         <Paragraph
           style={{
@@ -178,8 +163,8 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
             textAlign: "center"
           }}
         >
-          {codeHelpText[currentMethod.method] ||
-            "Select how you would like to recieve the code"}
+          {strings["2faCodeHelpText"][currentMethod.method]() ||
+            strings.select2faCodeHelpText()}
         </Paragraph>
 
         <Seperator />
@@ -191,7 +176,11 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
             title={
               sending
                 ? ""
-                : `${seconds ? `Resend code in (${seconds})` : "Send code"}`
+                : `${
+                    seconds
+                      ? strings.resend2faCode(seconds)
+                      : strings.sendCode()
+                  }`
             }
             loading={sending}
             height={30}
@@ -240,7 +229,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
             />
             <Seperator />
             <Button
-              title={loading ? null : "Next"}
+              title={loading ? null : strings.next()}
               type="accent"
               width={250}
               loading={loading}
@@ -252,7 +241,9 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
             />
 
             <Button
-              title={secondaryMethodsText[currentMethod.method]}
+              title={strings["2faCodeSecondaryMethodText"][
+                currentMethod.method
+              ]()}
               type="plain"
               onPress={onRequestSecondaryMethod}
               height={30}
