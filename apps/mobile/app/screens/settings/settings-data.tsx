@@ -217,7 +217,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "change-password",
             name: strings.changePassword(),
-            icon: "password",
+            icon: "form-textbox-password",
             modifer: async () => {
               ChangePassword.present();
             },
@@ -1144,7 +1144,7 @@ export const settingsGroups: SettingSection[] = [
             id: "backup-now",
             name: strings.backupNow(),
             description: strings.backupNowDesc(),
-            icon: "backup",
+            icon: "content-save",
             modifer: async () => {
               const user = useUserStore.getState().user;
               if (!user || SettingsService.getProperty("encryptedBackup")) {
@@ -1159,6 +1159,7 @@ export const settingsGroups: SettingSection[] = [
             id: "backup-now",
             name: strings.backupNowWithAttachments(),
             description: strings.backupNowWithAttachmentsDesc(),
+            icon: "content-save-all",
             hidden: () => !useUserStore.getState().user,
             modifer: async () => {
               const user = useUserStore.getState().user;
