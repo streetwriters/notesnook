@@ -206,7 +206,7 @@ function AuthContainer(props) {
           >
             <Text variant={"subBody"}>
               {version.status === "fulfilled" &&
-              version.value.instance !== "default" ? (
+              version.value?.instance !== "default" ? (
                 <>
                   {strings.usingInstance(
                     version.value.instance,
