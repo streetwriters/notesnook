@@ -15,6 +15,7 @@ import { DOMParser } from './worker.js';
 global.DOMParser = DOMParser;
 import {setI18nGlobal } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
+import { ScriptManager, Script } from '@callstack/repack/client';
 import {
   messages as $en
 } from "@notesnook/intl/locales/$en.json";
@@ -25,3 +26,20 @@ i18n.load({
 setI18nGlobal(i18n);
 i18n.activate("en");
 setI18nGlobal(i18n);
+
+
+ScriptManager.shared.addResolver(async (scriptId) => {
+  // `scriptId` will be either 'student' or 'teacher'
+
+  // In dev mode, resolve script location to dev server.
+  if (__DEV__) {
+    return {
+      url: Script.getDevServerURL(scriptId),
+      cache: false,
+    };
+  }
+
+  return {
+    url: Script.getFileSystemURL(scriptId)
+  };
+});
