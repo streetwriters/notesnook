@@ -431,6 +431,7 @@ class Database {
     Hosts.SUBSCRIPTIONS_HOST =
       hosts.SUBSCRIPTIONS_HOST || Hosts.SUBSCRIPTIONS_HOST;
     Hosts.ISSUES_HOST = hosts.ISSUES_HOST || Hosts.ISSUES_HOST;
+    Hosts.MONOGRAPH_HOST = hosts.MONOGRAPH_HOST || Hosts.MONOGRAPH_HOST;
   }
 
   version() {
