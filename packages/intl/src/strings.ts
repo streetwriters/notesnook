@@ -1600,6 +1600,8 @@ For example:
   sseServer: () => t`Events server`,
   sseServerDesc: () =>
     t`Server used to receive important notifications & events.`,
+  monographServer: () => t`Monograph server`,
+  monographServerDesc: () => t`Server used to host your published notes.`,
   logoutToChangeServerUrls: () =>
     t`You must log out in order to change/reset server URLs.`,
   enterValidUrl: () => t`Please enter a valid URL`,
