@@ -37,7 +37,7 @@ const POPULAR_PROVIDERS: Provider[] = [
   },
   {
     title: "Google Keep",
-    link: "https://help.notesnook.com/importing-notes/import-notes-from-google-keep"
+    link: "https://help.notesnook.com/importing-notes/import-notes-from-googlekeep"
   },
   {
     title: "Obsidian",
