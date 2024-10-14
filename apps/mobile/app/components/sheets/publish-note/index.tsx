@@ -36,7 +36,7 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { requestInAppReview } from "../../../services/app-review";
-import { Note } from "@notesnook/core";
+import { hosts, Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 
 const PublishNoteSheet = ({
@@ -54,7 +54,7 @@ const PublishNoteSheet = ({
   const [note, setNote] = useState<Note | undefined>(item);
   const [publishing, setPublishing] = useState(false);
   const publishUrl =
-    note && `https://monogr.ph/${db.monographs.monograph(note?.id)}`;
+    note && `${hosts.MONOGRAPH_HOST}/${db.monographs.monograph(note?.id)}`;
   const isPublished = note && db.monographs.isPublished(note?.id);
   const pwdInput = useRef(null);
   const passwordValue = useRef<string>();
