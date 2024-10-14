@@ -33,7 +33,7 @@ import {
 } from "@notesnook/common";
 import { Note } from "@notesnook/core";
 import { FilteredSelector } from "@notesnook/core";
-import { basename, dirname, join } from "pathe";
+import { basename, dirname, join, extname } from "pathe";
 import downloadAttachment from "../common/filesystem/download-attachment";
 import { cacheDir } from "../common/filesystem/utils";
 import { unlockVault } from "../utils/unlock-vault";
@@ -326,10 +326,18 @@ async function createFile(
     await copyFileAsync("file://" + exportedFile, file.uri);
     filePath = file.uri;
   } else {
-    filePath = join(path, basename(noteItem.path));
+    const originalPath = join(path, basename(noteItem.path));
+    filePath = originalPath;
+    const ext = extname(originalPath);
+    let id = 1;
+    while (await RNFetchBlob.fs.exists(filePath)) {
+      filePath = originalPath.replace(`${ext}`, "") + "_" + id + ext;
+      id++;
+    }
+    console.log("path", filePath);
     await RNFetchBlob.fs.mv(exportedFile, filePath);
   }
-
+  console.log("file moved...");
   return {
     filePath: filePath,
     fileDir: path,

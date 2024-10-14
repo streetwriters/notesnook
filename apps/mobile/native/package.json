@@ -121,6 +121,7 @@
     "ts-jest": "^29.1.1",
     "webpack-cli": "^5.1.4",
     "webpack": "^5.88.2",
-    "metro-react-native-babel-preset": "0.77.0"
+    "metro-react-native-babel-preset": "0.77.0",
+    "acorn-import-attributes": "1.9.5"
   }
 }
