@@ -28,6 +28,7 @@ import {
   Notebook as NotebookItem,
   Tag,
   createInternalLink,
+  hosts,
   isReminderActive,
   isReminderToday
 } from "@notesnook/core";
@@ -436,7 +437,7 @@ const menuItems: (
                 title: strings.open(),
                 icon: OpenInNew.path,
                 onClick: async () => {
-                  const url = `https://monogr.ph/${note.id}`;
+                  const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
                   window.open(url, "_blank");
                 }
               },
@@ -446,7 +447,7 @@ const menuItems: (
                 title: strings.copyLink(),
                 icon: Copy.path,
                 onClick: async () => {
-                  const url = `https://monogr.ph/${note.id}`;
+                  const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
                   await writeToClipboard({
                     "text/plain": url,
                     "text/html": `<a href="${url}">${note.title}</a>`,

@@ -21,6 +21,7 @@ import { mdiTimerOutline } from "@mdi/js";
 import { Icon } from "@notesnook/ui";
 import { Flex, Image, Link, Text } from "@theme-ui/components";
 import { SxProp } from "@theme-ui/core";
+import { PUBLIC_URL } from "../utils/env";
 
 export function MonographChat({ sx }: SxProp) {
   return (
@@ -61,7 +62,7 @@ export function MonographChat({ sx }: SxProp) {
               borderRadius: 10,
               width: "100%"
             }}
-            src="https://monogr.ph/api/og.png?title=Open+sourcing&description=VGhpcyBtb25vZ3JhcGggaXMgZW5jcnlwdGVkLiBFbnRlciBwYXNzd29yZCB0byB2aWV3IGNvbnRlbnRzLg%3D%3D&date=Saturday%2C+February+18%2C+2023"
+            src={`${PUBLIC_URL}/api/og.png?title=Open+sourcing&description=VGhpcyBtb25vZ3JhcGggaXMgZW5jcnlwdGVkLiBFbnRlciBwYXNzd29yZCB0byB2aWV3IGNvbnRlbnRzLg%3D%3D&date=Saturday%2C+February+18%2C+2023`}
           />
           <Text
             mt="12px"
@@ -75,10 +76,10 @@ export function MonographChat({ sx }: SxProp) {
                 color: "accent",
                 overflowWrap: "anywhere"
               }}
-              href="https://monogr.ph/62db75572020209c36f9f9fb"
+              href={`${PUBLIC_URL}/62db75572020209c36f9f9fb`}
               target="_blank"
             >
-              https://monogr.ph/62db75572020209c36f9f9fb
+              {PUBLIC_URL}/62db75572020209c36f9f9fb
             </Link>
           </Text>
           <Timer time={"5m ago"} sx={{ mb: 1, mr: 1, alignSelf: "end" }} />

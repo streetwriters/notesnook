@@ -46,7 +46,8 @@ export const hosts = {
     : "http://localhost:9264",
   ISSUES_HOST: isProduction()
     ? "https://issues.streetwriters.co"
-    : "http://localhost:2624"
+    : "http://localhost:2624",
+  MONOGRAPH_HOST: isProduction() ? "https://monogr.ph" : "http://localhost:6264"
 };
 
 export default hosts;
@@ -57,7 +58,8 @@ const HOSTNAMES = {
   [extractHostname(hosts.SSE_HOST)]: "Eventing Server",
   [extractHostname(hosts.SUBSCRIPTIONS_HOST)]:
     "Subscriptions Management Server",
-  [extractHostname(hosts.ISSUES_HOST)]: "Bug Reporting Server"
+  [extractHostname(hosts.ISSUES_HOST)]: "Bug Reporting Server",
+  [extractHostname(hosts.MONOGRAPH_HOST)]: "Monograph Server"
 };
 
 export const getServerNameFromHost = (host: string) => {
