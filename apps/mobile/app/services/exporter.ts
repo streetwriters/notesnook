@@ -255,6 +255,7 @@ async function exportNote(
   }
 
   if (!hasAttachments) {
+    console.log("creating file...");
     return createFile(noteItem as ExportableNote, type, path, cacheFolder);
   } else {
     return createZip(1, cacheFolder, type, path, callback);
@@ -313,15 +314,23 @@ async function createFile(
   path: string,
   cacheFolder: string
 ) {
-  const file = await ScopedStorage.createFile(
-    path,
-    basename(noteItem?.path as string),
-    FileMime[type]
-  );
   const exportedFile = join(cacheFolder, noteItem?.path as string);
-  await copyFileAsync("file://" + exportedFile, file.uri);
+  let filePath: string;
+  if (Platform.OS === "android") {
+    const file = await ScopedStorage.createFile(
+      path,
+      basename(noteItem?.path as string),
+      FileMime[type]
+    );
+    await copyFileAsync("file://" + exportedFile, file.uri);
+    filePath = file.uri;
+  } else {
+    filePath = join(path, basename(noteItem.path));
+    await RNFetchBlob.fs.mv(exportedFile, filePath);
+  }
+
   return {
-    filePath: file.uri,
+    filePath: filePath,
     fileDir: path,
     type: FileMime[type],
     name: type,
