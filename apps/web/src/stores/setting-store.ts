@@ -28,7 +28,12 @@ import { setDocumentTitle } from "../utils/dom";
 import { TimeFormat } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 
-export const HostIds = ["API_HOST", "AUTH_HOST", "SSE_HOST"] as const;
+export const HostIds = [
+  "API_HOST",
+  "AUTH_HOST",
+  "SSE_HOST",
+  "MONOGRAPH_HOST"
+] as const;
 export type HostId = (typeof HostIds)[number];
 class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
