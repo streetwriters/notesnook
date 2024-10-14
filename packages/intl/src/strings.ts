@@ -61,11 +61,8 @@ export const strings = {
   note: () => t`Note`,
   notes: (count: number) =>
     plural(count, {
-      one: "# note",
-      other: "# notes",
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      _0: "No notes"
+      one: `note`,
+      other: `# notes`
     }),
   downloading: () => t`Downloading`,
   uploading: () => t`Uploading`,
@@ -194,18 +191,17 @@ export const strings = {
       | "dateDeleted"
   ) =>
     select(key, {
-      dateCreated: "Created at",
-      dateEdited: "Last edited at",
-      dateModifed: "Last modified at",
-      dateUploaded: "Uploaded at",
-      dateDeleted: "Deleted at",
+      dateCreated: `Created at`,
+      dateEdited: `Last edited at`,
+      dateModifed: `Last modified at`,
+      dateUploaded: `Uploaded at`,
+      dateDeleted: `Deleted at`,
       other: key
     }),
-  noNotePropertiesNotice: (i18n: I18n) =>
-    t(i18n)`Start writing to save your note.`,
-  noteSyncedNoticeHeading: (i18n: I18n) => t(i18n)`Encrypted and synced`,
-  noteSyncedNoticeDesc: (type: string, i18n: I18n) =>
-    t(i18n)`No one can view this ${type} except you.`,
+  noNotePropertiesNotice: () => t`Start writing to save your note.`,
+  noteSyncedNoticeHeading: () => t`Encrypted and synced`,
+  noteSyncedNoticeDesc: (type: string) =>
+    t`No one can view this ${type} except you.`,
   emptyPlaceholders: (type: "notebook" | "tag" | "note") =>
     select(type, {
       other: "This list is empty",

@@ -58,7 +58,7 @@
     "react-native-notification-sounds": "0.5.5",
     "react-native-orientation": "https://github.com/yamill/react-native-orientation.git",
     "react-native-pdf": "6.6.2",
-    "react-native-privacy-snapshot": "https://github.com/standardnotes/react-native-privacy-snapshot.git",
+    "react-native-privacy-snapshot": "github:standardnotes/react-native-privacy-snapshot",
     "react-native-scoped-storage": "^1.9.5",
     "react-native-securerandom": "^1.0.1",
     "react-native-share": "^7.2.0",
