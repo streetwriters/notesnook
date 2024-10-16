@@ -17,82 +17,83 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { Button, Flex, Text } from "@theme-ui/components";
-import {
-  Notebook,
-  Reminder,
-  Alert,
-  Lock,
-  Star,
-  SyncOff,
-  Attachment,
-  AttachmentError,
-  Pin,
-  PDF,
-  Markdown,
-  HTML,
-  Text as Plaintext,
-  Readonly,
-  StarOutline,
-  AddReminder,
-  Colors,
-  Tag2,
-  Print,
-  Publish,
-  Export,
-  Duplicate,
-  InternalLink,
-  Sync,
-  Trash,
-  Circle,
-  AddToNotebook,
-  RemoveShortcutLink,
-  Plus,
-  Copy,
-  Tag as TagIcon,
-  OpenInNew
-} from "../icons";
-import TimeAgo from "../time-ago";
-import ListItem from "../list-item";
-import { store } from "../../stores/note-store";
-import { store as userstore } from "../../stores/user-store";
-import { useEditorStore } from "../../stores/editor-store";
-import { store as tagStore } from "../../stores/tag-store";
-import { useStore as useMonographStore } from "../../stores/monograph-store";
-import { db } from "../../common/db";
-import { showToast } from "../../utils/toast";
-import { navigate } from "../../navigation";
-import { showPublishView } from "../publish-view";
-import IconTag from "../icon-tag";
-import { exportNote, exportNotes } from "../../common/export";
-import { Multiselect } from "../../common/multi-select";
-import { store as selectionStore } from "../../stores/selection-store";
-import { isReminderActive, isReminderToday } from "@notesnook/core";
 import {
   NoteResolvedData,
   exportContent,
-  getFormattedReminderTime,
-  pluralize
+  getFormattedReminderTime
 } from "@notesnook/common";
 import {
   Color,
   Note as NoteType,
   Notebook as NotebookItem,
   Tag,
-  createInternalLink
+  createInternalLink,
+  isReminderActive,
+  isReminderToday
 } from "@notesnook/core";
-import { MenuItem } from "@notesnook/ui";
-import { Context } from "../list-container/types";
+import { strings } from "@notesnook/intl";
 import { SchemeColors } from "@notesnook/theme";
-import { writeToClipboard } from "../../utils/clipboard";
+import { MenuItem } from "@notesnook/ui";
+import { Button, Flex, Text } from "@theme-ui/components";
+import React from "react";
+import { db } from "../../common/db";
+import { exportNote, exportNotes } from "../../common/export";
+import { Multiselect } from "../../common/multi-select";
 import Vault from "../../common/vault";
-import { isUserPremium } from "../../hooks/use-is-user-premium";
-import { AddTagsDialog } from "../../dialogs/add-tags-dialog";
-import { CreateColorDialog } from "../../dialogs/create-color-dialog";
-import { ConfirmDialog } from "../../dialogs/confirm";
-import { MoveNoteDialog } from "../../dialogs/move-note-dialog";
 import { AddReminderDialog } from "../../dialogs/add-reminder-dialog";
+import { AddTagsDialog } from "../../dialogs/add-tags-dialog";
+import { ConfirmDialog } from "../../dialogs/confirm";
+import { CreateColorDialog } from "../../dialogs/create-color-dialog";
+import { MoveNoteDialog } from "../../dialogs/move-note-dialog";
+import { isUserPremium } from "../../hooks/use-is-user-premium";
+import { navigate } from "../../navigation";
+import { useEditorStore } from "../../stores/editor-store";
+import { useStore as useMonographStore } from "../../stores/monograph-store";
+import { store } from "../../stores/note-store";
+import { store as selectionStore } from "../../stores/selection-store";
+import { store as tagStore } from "../../stores/tag-store";
+import { store as userstore } from "../../stores/user-store";
+import { writeToClipboard } from "../../utils/clipboard";
+import { showToast } from "../../utils/toast";
+import IconTag from "../icon-tag";
+import {
+  AddReminder,
+  AddToNotebook,
+  Alert,
+  Attachment,
+  AttachmentError,
+  Circle,
+  Colors,
+  Copy,
+  Duplicate,
+  Export,
+  HTML,
+  InternalLink,
+  Lock,
+  Markdown,
+  Notebook,
+  OpenInNew,
+  PDF,
+  Pin,
+  Text as Plaintext,
+  Plus,
+  Print,
+  Publish,
+  Readonly,
+  Reminder,
+  RemoveShortcutLink,
+  Star,
+  StarOutline,
+  Sync,
+  SyncOff,
+  Tag2,
+  Tag as TagIcon,
+  Trash
+} from "../icons";
+import { Context } from "../list-container/types";
+import ListItem from "../list-item";
+import { showPublishView } from "../publish-view";
+import TimeAgo from "../time-ago";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -218,7 +219,7 @@ function Note(props: NoteProps) {
               ) : null}
 
               {attachments?.failed ? (
-                <Flex title={`Errors in ${attachments.failed} attachments.`}>
+                <Flex title={strings.errorsInAttachments(attachments.failed)}>
                   <AttachmentError size={13} color="var(--icon-error)" />
                   <Text ml={"2px"}>{attachments.failed}</Text>
                 </Flex>
@@ -242,10 +243,11 @@ function Note(props: NoteProps) {
                     data-test-id={`tag-item`}
                     key={tag.id}
                     variant="anchor"
-                    title={`Go to #${tag.title}`}
+                    title={`${strings.goTo()} #${tag.title}`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (!tag.id) return showToast("error", "Tag not found.");
+                      if (!tag.id)
+                        return showToast("error", strings.tagNotFound());
                       navigate(`/tags/${tag.id}`);
                     }}
                     sx={{
@@ -293,33 +295,27 @@ const formats = [
   {
     type: "pdf",
     title: "PDF",
-    icon: PDF,
-    subtitle:
-      "Can be opened in any PDF reader like Adobe Acrobat or Foxit Reader."
+    icon: PDF
   },
   {
     type: "md",
     title: "Markdown",
-    icon: Markdown,
-    subtitle: "Can be opened in any plain-text or markdown editor."
+    icon: Markdown
   },
   {
     type: "md-frontmatter",
     title: "Markdown + Frontmatter",
-    icon: Markdown,
-    subtitle: "Can be opened in any plain-text or markdown editor."
+    icon: Markdown
   },
   {
     type: "html",
     title: "HTML",
-    icon: HTML,
-    subtitle: "Can be opened in any web browser like Google Chrome."
+    icon: HTML
   },
   {
     type: "txt",
     title: "Text",
-    icon: Plaintext,
-    subtitle: "Can be opened in any plain-text editor."
+    icon: Plaintext
   }
 ] as const;
 
@@ -337,7 +333,7 @@ const menuItems: (
     {
       type: "button",
       key: "pin",
-      title: "Pin",
+      title: strings.pin(),
       isChecked: note.pinned,
       icon: Pin.path,
       onClick: () => store.pin(!note.pinned, ...ids),
@@ -346,7 +342,7 @@ const menuItems: (
     {
       type: "button",
       key: "readonly",
-      title: "Readonly",
+      title: strings.readOnly(),
       isChecked: note.readonly,
       icon: Readonly.path,
       onClick: () => store.readonly(!note.readonly, ...ids),
@@ -355,7 +351,7 @@ const menuItems: (
     {
       type: "button",
       key: "favorite",
-      title: "Favorite",
+      title: strings.favorite(),
       isChecked: note.favorite,
       icon: StarOutline.path,
       onClick: () => store.favorite(!note.favorite, ...ids),
@@ -365,24 +361,23 @@ const menuItems: (
       type: "button",
       key: "lock",
       //isDisabled: !isSynced,
-      title: "Lock",
+      title: strings.lock(),
       isChecked: context?.locked,
       isDisabled: !isPro,
       icon: Lock.path,
       onClick: async () => {
         const { unlock, lock } = store.get();
         if (!context?.locked) {
-          if (await lock(note.id))
-            showToast("success", "Note locked successfully!");
+          if (await lock(note.id)) showToast("success", strings.noteLocked());
         } else if (await unlock(note.id)) {
-          showToast("success", "Note unlocked successfully!");
+          showToast("success", strings.noteUnlocked());
         }
       }
     },
     {
       type: "button",
       key: "remind-me",
-      title: "Remind me",
+      title: strings.remindMe(),
       icon: AddReminder.path,
       onClick: async () => {
         await AddReminderDialog.show({ note });
@@ -392,7 +387,7 @@ const menuItems: (
     {
       type: "button",
       key: "notebooks",
-      title: "Notebooks",
+      title: strings.notebooks(),
       icon: Notebook.path,
       menu: { items: notebooksMenuItems(ids) },
       multiSelect: true
@@ -400,7 +395,7 @@ const menuItems: (
     {
       type: "button",
       key: "colors",
-      title: "Assign color",
+      title: strings.assignColor(),
       icon: Colors.path,
       multiSelect: true,
       menu: { items: colorsToMenuItems(context?.color, ids) }
@@ -408,7 +403,7 @@ const menuItems: (
     {
       type: "button",
       key: "add-tags",
-      title: "Tags",
+      title: strings.dataTypesPluralCamelCase.tag(),
       icon: Tag2.path,
       multiSelect: true,
       menu: { items: tagsMenuItems(ids) }
@@ -417,7 +412,7 @@ const menuItems: (
     {
       type: "button",
       key: "print",
-      title: "Print",
+      title: strings.print(),
       //isDisabled: !isSynced,
       icon: Print.path,
       onClick: async () => {
@@ -431,14 +426,14 @@ const menuItems: (
       key: "publish",
       isDisabled: !db.monographs.isPublished(note.id) && context?.locked,
       icon: Publish.path,
-      title: "Publish",
+      title: strings.publish(),
       menu: db.monographs.isPublished(note.id)
         ? {
             items: [
               {
                 type: "button",
                 key: "open",
-                title: "Open",
+                title: strings.open(),
                 icon: OpenInNew.path,
                 onClick: async () => {
                   const url = `https://monogr.ph/${note.id}`;
@@ -448,7 +443,7 @@ const menuItems: (
               {
                 type: "button",
                 key: "copy-link",
-                title: "Copy link",
+                title: strings.copyLink(),
                 icon: Copy.path,
                 onClick: async () => {
                   const url = `https://monogr.ph/${note.id}`;
@@ -466,7 +461,7 @@ const menuItems: (
               {
                 type: "button",
                 key: "unpublish",
-                title: "Unpublish",
+                title: strings.unpublish(),
                 icon: Publish.path,
                 onClick: async () => {
                   await useMonographStore.getState().unpublish(note.id);
@@ -480,7 +475,7 @@ const menuItems: (
     {
       type: "button",
       key: "export",
-      title: "Export as",
+      title: strings.exportAs(),
       icon: Export.path,
       //isDisabled: !isSynced,
       menu: {
@@ -488,7 +483,7 @@ const menuItems: (
           type: "button",
           key: format.type,
           title: format.title,
-          tooltip: `Export as ${format.title} - ${format.subtitle}`,
+          tooltip: strings.exportAs(format.title),
           icon: format.icon.path,
           isDisabled:
             (format.type !== "txt" && !isPro) ||
@@ -515,14 +510,14 @@ const menuItems: (
     {
       type: "button",
       key: "copy",
-      title: "Copy as",
+      title: strings.copyAs(),
       icon: Copy.path,
       menu: {
         items: [
           {
             type: "button",
             key: "copy-as-text",
-            tooltip: `Copy as Text`,
+            tooltip: strings.copyAs("Text"),
             title: "Text",
             icon: Plaintext.path,
             onClick: () => copyNote(note.id, "txt")
@@ -530,7 +525,7 @@ const menuItems: (
           {
             type: "button",
             key: "copy-as-markdown",
-            tooltip: `Copy as Markdown`,
+            tooltip: strings.copyAs("Markdown"),
             title: "Markdown",
             icon: Markdown.path,
             onClick: () => copyNote(note.id, "md")
@@ -541,7 +536,7 @@ const menuItems: (
     {
       type: "button",
       key: "copy-link",
-      title: "Copy internal link",
+      title: strings.copyLink(),
       icon: InternalLink.path,
       onClick: () => {
         const link = createInternalLink("note", note.id);
@@ -555,7 +550,7 @@ const menuItems: (
     {
       type: "button",
       key: "duplicate",
-      title: "Duplicate",
+      title: strings.duplicate(),
       icon: Duplicate.path,
       onClick: () => store.get().duplicate(...ids),
       multiSelect: true
@@ -565,20 +560,17 @@ const menuItems: (
       key: "local-only",
       isHidden: !userstore.get().isLoggedIn,
       //isDisabled: !isSynced,
-      title: "Local only",
+      title: strings.syncOff(),
       isChecked: note.localOnly,
       icon: note.localOnly ? Sync.path : SyncOff.path,
       onClick: async () => {
         if (
           note.localOnly ||
           (await ConfirmDialog.show({
-            title: `Prevent ${pluralize(ids.length, "note")} from syncing?`,
-            message: `${pluralize(
-              ids.length,
-              "note"
-            )} will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?`,
-            positiveButtonText: "Yes",
-            negativeButtonText: "No"
+            title: strings.syncOffConfirm(ids.length),
+            message: strings.syncOffDesc(ids.length),
+            positiveButtonText: strings.yes(),
+            negativeButtonText: strings.no()
           }))
         )
           await store.localOnly(!note.localOnly, ...ids);
@@ -589,7 +581,7 @@ const menuItems: (
     {
       type: "button",
       key: "movetotrash",
-      title: "Move to trash",
+      title: strings.moveToTrash(),
       variant: "dangerous",
       icon: Trash.path,
       isDisabled: ids.length === 1 && db.monographs.isPublished(note.id),
@@ -607,7 +599,7 @@ function colorsToMenuItems(
     {
       key: "new-color",
       type: "button",
-      title: "Add new color",
+      title: strings.addColor(),
       icon: Plus.path,
       onClick: async () => {
         const id = await CreateColorDialog.show({});
@@ -648,7 +640,7 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
     {
       type: "button",
       key: "link-notebooks",
-      title: "Link to...",
+      title: strings.linkNotebooks(),
       icon: AddToNotebook.path,
       onClick: () => MoveNoteDialog.show({ noteIds: ids })
     },
@@ -674,7 +666,7 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
           menuItems.push({
             type: "button",
             key: "remove-from-all-notebooks",
-            title: "Unlink from all",
+            title: strings.unlinkFromAll(),
             icon: RemoveShortcutLink.path,
             onClick: async () => {
               await db.notes.removeFromAllNotebooks(...ids);
@@ -728,7 +720,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
     {
       type: "button",
       key: "assign-tags",
-      title: "Assign to...",
+      title: `${strings.assignTo()}...`,
       icon: Plus.path,
       onClick: () => AddTagsDialog.show({ noteIds: ids })
     },
@@ -755,7 +747,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
             {
               type: "button",
               key: "remove-from-all-tags",
-              title: "Remove from all",
+              title: strings.removeFromAll(),
               icon: RemoveShortcutLink.path,
               onClick: async () => {
                 for (const id of ids) {
@@ -815,19 +807,19 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
 async function copyNote(noteId: string, format: "md" | "txt") {
   try {
     const note = await db.notes?.note(noteId);
-    if (!note) throw new Error("No note with this id exists.");
+    if (!note) throw new Error(strings.noteDoesNotExist());
 
     const result = await exportContent(note, {
       format,
       disableTemplate: true,
       unlockVault: Vault.unlockVault
     });
-    if (!result) throw new Error(`Could not convert note to ${format}.`);
+    if (!result) throw new Error(`${strings.couldNotConvertNote(format)}.`);
 
     await navigator.clipboard.writeText(result);
-    showToast("success", "Copied!");
+    showToast("success", strings.noteCopied());
   } catch (e) {
     if (e instanceof Error)
-      showToast("error", `Failed to copy note: ${e.message}.`);
+      showToast("error", `${strings.failedToCopyNote()}: ${e.message}.`);
   }
 }

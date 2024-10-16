@@ -33,6 +33,7 @@ import { ContentItem, Note } from "@notesnook/core";
 import { UnlockView } from "../unlock";
 import { getFormattedDate } from "@notesnook/common";
 import { diff } from "diffblazer";
+import { strings } from "@notesnook/intl";
 
 type DiffViewerProps = { session: ConflictedEditorSession };
 function DiffViewer(props: DiffViewerProps) {
@@ -129,7 +130,7 @@ function DiffViewer(props: DiffViewerProps) {
               }}
             >
               <Restore size={18} />
-              <Text ml={1}>Restore this version</Text>
+              <Text ml={1}>{strings.restoreThisVersion()}</Text>
             </Button>
             <Button
               variant="secondary"
@@ -152,7 +153,7 @@ function DiffViewer(props: DiffViewerProps) {
               }}
             >
               <Copy size={18} />
-              <Text ml={1}>Save a copy</Text>
+              <Text ml={1}>{strings.saveACopy()}</Text>
             </Button>
           </>
         ) : null}
@@ -178,8 +179,8 @@ function DiffViewer(props: DiffViewerProps) {
             {content.locked ? (
               <UnlockView
                 title={getFormattedDate(content.dateEdited)}
-                subtitle="Please enter the password to view this version"
-                buttonTitle="Unlock"
+                subtitle={strings.enterPasswordToUnlockVersion()}
+                buttonTitle={strings.unlock()}
                 unlock={async (password) => {
                   const decryptedContent = await db.vault.decryptContent(
                     content,
@@ -196,7 +197,9 @@ function DiffViewer(props: DiffViewerProps) {
               <>
                 <ContentToggle
                   label={
-                    session.type === "diff" ? "Older version" : "Current note"
+                    session.type === "diff"
+                      ? strings.olderVersion()
+                      : strings.currentNote()
                   }
                   readonly={session.type === "diff"}
                   dateEdited={content.dateEdited}
@@ -255,8 +258,8 @@ function DiffViewer(props: DiffViewerProps) {
             {conflictedContent.locked ? (
               <UnlockView
                 title={getFormattedDate(conflictedContent.dateEdited)}
-                subtitle="Please enter the password to view this version"
-                buttonTitle="Unlock"
+                subtitle={strings.enterPasswordToUnlockVersion()}
+                buttonTitle={strings.unlock()}
                 unlock={async (password) => {
                   const decryptedContent = await db.vault.decryptContent(
                     conflictedContent,
@@ -276,8 +279,8 @@ function DiffViewer(props: DiffViewerProps) {
                   resolveConflict={onResolveContent}
                   label={
                     session.type === "diff"
-                      ? "Current version"
-                      : "Incoming note"
+                      ? strings.currentNote()
+                      : strings.incomingNote()
                   }
                   isSelected={selectedContent === 1}
                   isOtherSelected={selectedContent === 0}

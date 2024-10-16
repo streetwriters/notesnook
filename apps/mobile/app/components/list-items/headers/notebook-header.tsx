@@ -29,6 +29,7 @@ import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { getFormattedDate } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 export const NotebookHeader = ({
   notebook,
@@ -57,7 +58,7 @@ export const NotebookHeader = ({
           }
         });
         ToastManager.show({
-          heading: "Shortcut created",
+          heading: strings.shortcutCreated(),
           type: "success"
         });
       }
@@ -148,11 +149,7 @@ export const NotebookHeader = ({
         size={SIZE.xs}
         color={colors.secondary.paragraph}
       >
-        {notebook && totalNotes > 1
-          ? totalNotes + " notes"
-          : totalNotes === 1
-          ? totalNotes + " note"
-          : "0 notes"}
+        {strings.notes(totalNotes || 0)}
       </Paragraph>
     </View>
   );

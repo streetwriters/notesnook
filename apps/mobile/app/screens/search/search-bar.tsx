@@ -28,6 +28,7 @@ import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../services/device-detection";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import useNavigationStore from "../../stores/use-navigation-store";
+import { strings } from "@notesnook/intl";
 export const SearchBar = ({
   onChangeText,
   loading
@@ -87,9 +88,9 @@ export const SearchBar = ({
         }}
         autoFocus
         onChangeText={_onChangeText}
-        placeholder="Type a keyword"
+        placeholder={strings.typeAKeyword()}
         textContentType="none"
-        returnKeyLabel="Search"
+        returnKeyLabel={strings.search()}
         returnKeyType="search"
         autoCapitalize="none"
         autoCorrect={false}

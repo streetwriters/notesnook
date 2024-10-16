@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@theme-ui/components";
+import { Flex, Link, Text } from "@theme-ui/components";
 import { appVersion } from "../utils/version";
 import Field from "../components/field";
 import Dialog from "../components/dialog";
@@ -31,17 +31,11 @@ import { ErrorText } from "../components/error-text";
 import { Debug } from "@notesnook/core";
 import { ConfirmDialog } from "./confirm";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 const PLACEHOLDERS = {
-  title: "Briefly describe what happened",
-  body: `Tell us more about the issue you are facing.
-
-For example things like:
-    1. Steps to reproduce the issue
-    2. Things you have tried so far
-    3. etc.
-    
-This is all optional, of course.`
+  title: strings.issueTitlePlaceholder(),
+  body: strings.issuePlaceholder()
 };
 
 type IssueDialogProps = BaseDialogProps<boolean>;
@@ -54,15 +48,18 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
   return (
     <Dialog
       isOpen={true}
-      title={"Report an issue"}
+      title={strings.reportAnIssue()}
       onClose={() => props.onClose(false)}
       positiveButton={{
-        text: "Submit",
+        text: strings.submit(),
         form: "issueForm",
         loading: isSubmitting,
         disabled: isSubmitting
       }}
-      negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+      negativeButton={{
+        text: strings.cancel(),
+        onClick: () => props.onClose(false)
+      }}
     >
       <Flex
         id="issueForm"
@@ -99,7 +96,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
       >
         <Field
           required
-          label="Title"
+          label={strings.title()}
           id="title"
           name="title"
           placeholder={PLACEHOLDERS.title}
@@ -109,7 +106,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           as="textarea"
           required
           variant="forms.input"
-          label="Description"
+          label={strings.description()}
           id="body"
           name="body"
           placeholder={PLACEHOLDERS.body}
@@ -127,8 +124,16 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           p={1}
           sx={{ borderRadius: "default" }}
         >
-          Your bug report is public. Do NOT include sensitive information
-          (email, passwords etc) in the issue title or description.
+          {strings.issueNotice[0]()}{" "}
+          <Link
+            href="https://github.com/streetwriters/notesnook/issues"
+            title="github.com/streetwriters/notesnook/issues"
+          />{" "}
+          {strings.issueNotice[1]()}{" "}
+          <Link
+            href="https://discord.gg/zQBK97EE22"
+            title={strings.issueNotice[2]()}
+          />
         </Text>
         <Text variant="subBody" mt={1}>
           {getDeviceInfo()
@@ -148,15 +153,9 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
 
 function showIssueReportedDialog({ url }: { url: string }) {
   return ConfirmDialog.show({
-    title: "Thank you for reporting!",
-    positiveButtonText: "Copy link",
-    message: `You can track your bug report at [${url}](${url}).
-
-\
-Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**
-
-\
-If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`
+    title: strings.thankYouForReporting(),
+    positiveButtonText: strings.copyLink(),
+    message: strings.bugReportMessage(url)
   }).then((result) => {
     result && writeText(url);
   });

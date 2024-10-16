@@ -37,13 +37,13 @@ import { hashNavigate } from "../../navigation";
 import { Multiselect } from "../../common/multi-select";
 import { store } from "../../stores/reminder-store";
 import { db } from "../../common/db";
-import { pluralize } from "@notesnook/common";
 import { getFormattedReminderTime } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Reminder as ReminderType } from "@notesnook/core";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { EditReminderDialog } from "../../dialogs/add-reminder-dialog";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { strings } from "@notesnook/intl";
 
 const RECURRING_MODE_MAP = {
   week: "Weekly",
@@ -126,14 +126,14 @@ const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
     {
       type: "button",
       key: "edit",
-      title: "Edit",
+      title: strings.edit(),
       icon: Edit.path,
       onClick: () => hashNavigate(`/reminders/${reminder.id}/edit`)
     },
     {
       type: "button",
       key: "toggle",
-      title: reminder.disabled ? "Activate" : "Deactivate",
+      title: reminder.disabled ? strings.activate() : strings.deactivate(),
       icon: reminder.disabled ? Reminders.path : ReminderOff.path,
       onClick: async () => {
         await db.reminders.add({
@@ -147,15 +147,15 @@ const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
     {
       type: "button",
       key: "delete",
-      title: "Delete",
+      title: strings.delete(),
       variant: "dangerous",
       icon: Trash.path,
       onClick: async () => {
         ConfirmDialog.show({
-          title: `Delete ${pluralize(items.length, "reminder")}`,
-          message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`,
-          positiveButtonText: "Yes",
-          negativeButtonText: "No"
+          title: strings.doAction("reminder", items.length, "delete"),
+          message: strings.irreverisibleAction(),
+          positiveButtonText: strings.yes(),
+          negativeButtonText: strings.no()
         }).then((result) => {
           result && Multiselect.moveRemindersToTrash(items);
         });

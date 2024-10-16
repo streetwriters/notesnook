@@ -47,6 +47,7 @@ import { scrollIntoViewById } from "@notesnook/editor";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { useEditorManager } from "./manager";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
+import { strings } from "@notesnook/intl";
 
 type TableOfContentsProps = {
   sessionId: string;
@@ -122,7 +123,7 @@ function TableOfContents(props: TableOfContentsProps) {
       >
         <ScrollContainer>
           <Section
-            title="Table of contents"
+            title={strings.toc()}
             button={
               <ArrowLeft
                 data-test-id="toc-close"
@@ -140,7 +141,7 @@ function TableOfContents(props: TableOfContentsProps) {
                     pl: 1
                   }}
                 >
-                  No headings found.
+                  {strings.noHeadingsFound()}.
                 </Text>
               ) : (
                 tableOfContents.map((t) => (

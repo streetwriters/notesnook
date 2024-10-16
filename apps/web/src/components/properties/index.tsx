@@ -62,26 +62,27 @@ import {
 import { VirtualizedTable } from "../virtualized-table";
 import { TextSlice } from "@notesnook/core";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
+import { strings } from "@notesnook/intl";
 
 const tools = [
-  { key: "pin", property: "pinned", icon: Pin, label: "Pin" },
+  { key: "pin", property: "pinned", icon: Pin, label: strings.pin() },
   {
     key: "favorite",
     property: "favorite",
     icon: StarOutline,
-    label: "Favorite"
+    label: strings.favorite()
   },
-  { key: "lock", icon: Unlock, label: "Lock", property: "locked" },
+  { key: "lock", icon: Unlock, label: strings.lock(), property: "locked" },
   {
     key: "readonly",
     icon: Readonly,
-    label: "Readonly",
+    label: strings.readOnly(),
     property: "readonly"
   },
   {
     key: "local-only",
     icon: SyncOff,
-    label: "Disable sync",
+    label: strings.disableSync(),
     property: "localOnly"
   }
 ] as const;
@@ -95,12 +96,12 @@ type MetadataItem<T extends "dateCreated" | "dateEdited"> = {
 const metadataItems = [
   {
     key: "dateCreated",
-    label: "Created at",
+    label: strings.createdAt(),
     value: (date) => getFormattedDate(date || Date.now())
   } as MetadataItem<"dateCreated">,
   {
     key: "dateEdited",
-    label: "Last edited at",
+    label: strings.lastEditedAt(),
     value: (date) => (date ? getFormattedDate(date) : "never")
   } as MetadataItem<"dateEdited">
 ];
@@ -152,7 +153,7 @@ function EditorProperties(props: EditorPropertiesProps) {
       >
         <ScrollContainer>
           <Section
-            title="Properties"
+            title={strings.properties()}
             button={
               <ArrowLeft
                 data-test-id="properties-close"
@@ -188,16 +189,24 @@ function EditorProperties(props: EditorPropertiesProps) {
                 sx={{
                   borderBottom: "1px solid var(--separator)",
                   alignItems: "center",
-                  justifyContent: "space-between"
+                  justifyContent: "space-between",
+                  gap: 1
                 }}
               >
-                <Text variant="subBody" sx={{ fontSize: "body" }}>
+                <Text
+                  variant="subBody"
+                  sx={{
+                    fontSize: "body",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                  }}
+                >
                   {item.label}
                 </Text>
                 <Text
                   className="selectable"
                   variant="subBody"
-                  sx={{ fontSize: "body" }}
+                  sx={{ fontSize: "body", flexShrink: 0 }}
                 >
                   {item.value(session.note[item.key])}
                 </Text>
@@ -250,7 +259,7 @@ function InternalLinks({ noteId }: { noteId: string }) {
           mb: 1
         }}
       >
-        {["Linked notes", "Referenced in"].map((title, index) => (
+        {[strings.linkedNotes(), strings.referencedIn()].map((title, index) => (
           <Button
             key={title}
             variant="secondary"
@@ -277,8 +286,8 @@ function InternalLinks({ noteId }: { noteId: string }) {
         (result.value.length === 0 ? (
           <Text variant="body" mx={1}>
             {tabIndex === InternalLinksTabs.LINKED_NOTES
-              ? "This note does not link to other notes."
-              : "This note is not referenced in other notes."}
+              ? strings.notLinked()
+              : strings.notReferenced()}
           </Text>
         ) : (
           <VirtualizedList
@@ -597,7 +606,7 @@ function Notebooks({ noteId }: { noteId: string }) {
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
-    <Section title="Notebooks">
+    <Section title={strings.notebooks()}>
       <VirtualizedList
         mode="fixed"
         estimatedSize={50}
@@ -626,7 +635,7 @@ function Reminders({ noteId }: { noteId: string }) {
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
-    <Section title="Reminders">
+    <Section title={strings.dataTypesPluralCamelCase.reminder()}>
       <VirtualizedList
         mode="fixed"
         estimatedSize={54}
@@ -654,7 +663,7 @@ function Attachments({ noteId }: { noteId: string }) {
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
-    <Section title="Attachments">
+    <Section title={strings.dataTypesPluralCamelCase.attachment()}>
       <VirtualizedTable
         estimatedSize={30}
         getItemKey={(index) => result.value.key(index)}
@@ -688,8 +697,8 @@ function SessionHistory({ noteId }: { noteId: string }) {
 
   return (
     <Section
-      title="Previous Sessions"
-      subtitle={"Your session history is local only."}
+      title={strings.noteHistory()}
+      subtitle={strings.noteHistoryNotice[0]()}
     >
       <VirtualizedList
         mode="dynamic"

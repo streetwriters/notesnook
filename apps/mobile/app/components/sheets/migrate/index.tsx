@@ -41,6 +41,7 @@ import Seperator from "../../ui/seperator";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import { Issue } from "../github/issue";
+import { strings } from "@notesnook/intl";
 
 export const makeError = (stack: string, component: string) => `
 
@@ -133,11 +134,9 @@ export default function Migrate() {
     >
       {!loading && !error ? (
         <DialogHeader
-          title="Save a backup of your notes"
+          title={strings.migrationSaveBackup()}
           centered
-          paragraph={
-            "Thank you for updating Notesnook! We will be applying some minor changess for a better note taking experience."
-          }
+          paragraph={strings.migrationSaveBackupDesc()}
         />
       ) : null}
       <Seperator />
@@ -158,9 +157,7 @@ export default function Migrate() {
                 textAlign: "center"
               }}
             >
-              Migrating database{progress ? `(${progress?.collection})` : null}
-              {progress ? `(${progress.current}/${progress.total}) ` : null}
-              ... please wait
+              {strings.migrationProgress(progress)}
             </Paragraph>
 
             <View
@@ -190,9 +187,7 @@ export default function Migrate() {
               textAlign: "center"
             }}
           >
-            An error occurred while migrating your data. You can logout of your
-            account and try to relogin. However this is not recommended as it
-            may result in some data loss if your data was not synced.
+            {strings.migrationError()}
           </Paragraph>
 
           {reset ? (
@@ -202,11 +197,11 @@ export default function Migrate() {
                 textAlign: "center"
               }}
             >
-              App data has been cleared. Kindly relaunch the app to login again.
+              {strings.migrationAppReset()}
             </Paragraph>
           ) : (
             <Button
-              title="Logout & clear app data"
+              title={strings.logoutAndClearData()}
               type="error"
               width={250}
               onPress={async () => {
@@ -224,7 +219,7 @@ export default function Migrate() {
         </>
       ) : (
         <Button
-          title="Save & continue"
+          title={strings.saveAndContinue()}
           type="accent"
           width={250}
           onPress={startMigration}

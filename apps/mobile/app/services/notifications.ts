@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Reminder } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import notifee, {
   AndroidStyle,
   AuthorizationStatus,
@@ -185,7 +186,7 @@ const onEvent = async ({ type, detail }: Event) => {
         useReminderStore.getState().refresh();
         break;
       }
-      case "UNPIN": {
+      case strings.unpin(): {
         if (!notification?.id) break;
         remove(notification?.id as string);
         const reminder = await db.reminders?.reminder(
@@ -202,18 +203,18 @@ const onEvent = async ({ type, detail }: Event) => {
         break;
       }
 
-      case "Hide":
+      case strings.hide():
         unpinQuickNote();
         break;
       case "ReplyInput": {
         displayNotification({
-          title: "Quick note",
-          message: 'Tap on "Take note" to add a note.',
+          title: strings.quickNoteTitle(),
+          message: strings.quickNoteContent(),
           ongoing: true,
-          actions: ["ReplyInput", "Hide"],
+          actions: ["ReplyInput", strings.hide()],
           id: "notesnook_note_input",
-          reply_button_text: "Take note",
-          reply_placeholder_text: "Write something..."
+          reply_button_text: strings.takeNote(),
+          reply_placeholder_text: strings.quickNotePlaceholder()
         });
 
         const id = await db.notes?.add({
@@ -261,7 +262,7 @@ async function setupIOSCategories() {
               {
                 id: "REMINDER_SNOOZE",
                 foreground: false,
-                title: `Remind in ${reminderTime} min`,
+                title: strings.remindMeIn() + ` ${reminderTime} min`,
                 authenticationRequired: false
               }
             ]
@@ -272,13 +273,13 @@ async function setupIOSCategories() {
               {
                 id: "REMINDER_SNOOZE",
                 foreground: false,
-                title: `Remind in ${reminderTime} min`,
+                title: strings.remindMeIn() + ` ${reminderTime} min`,
                 authenticationRequired: false
               },
               {
                 id: "REMINDER_DISABLE",
                 foreground: false,
-                title: "Disable",
+                title: strings.disable(),
                 authenticationRequired: false
               }
             ]
@@ -316,7 +317,7 @@ async function scheduleNotification(
           message: description || "",
           ongoing: true,
           subtitle: description || "",
-          actions: ["UNPIN"]
+          actions: [strings.unpin()]
         });
       }
       return;
@@ -346,7 +347,7 @@ async function scheduleNotification(
       ];
       if (reminder.mode === "repeat") {
         androidActions.push({
-          title: "Disable",
+          title: strings.disable(),
           pressAction: {
             id: "REMINDER_DISABLE"
           }
@@ -548,10 +549,10 @@ async function displayNotification({
 function openSettingsDialog(context: string) {
   return new Promise((resolve) => {
     presentDialog({
-      title: "Notifications disabled",
-      paragraph: `Reminders cannot be set because notifications have been disabled from app settings. If you want to keep receiving reminder notifications, enable notifications for Notesnook from app settings.`,
-      positiveText: Platform.OS === "ios" ? undefined : "Open settings",
-      negativeText: Platform.OS === "ios" ? "Close" : "Cancel",
+      title: strings.notificationsDisabled(),
+      paragraph: strings.notificationsDisabledDesc(),
+      positiveText: Platform.OS === "ios" ? undefined : strings.openSettings(),
+      negativeText: Platform.OS === "ios" ? strings.close() : strings.cancel(),
       positivePress:
         Platform.OS === "ios"
           ? undefined
@@ -883,12 +884,12 @@ async function pinQuickNote(launch: boolean) {
       return;
     }
     displayNotification({
-      title: "Quick note",
-      message: 'Tap on "Take note" to add a note.',
+      title: strings.quickNoteTitle(),
+      message: strings.quickNoteContent(),
       ongoing: true,
-      actions: ["ReplyInput", "Hide"],
-      reply_button_text: "Take note",
-      reply_placeholder_text: "Write something...",
+      actions: ["ReplyInput", strings.hide()],
+      reply_button_text: strings.takeNote(),
+      reply_placeholder_text: strings.quickNotePlaceholder(),
       id: "notesnook_note_input"
     });
   });
@@ -958,7 +959,7 @@ async function pinNote(id: string) {
       subtitle: "",
       bigText: html,
       ongoing: true,
-      actions: ["UNPIN"],
+      actions: [strings.unpin()],
       id: note.id
     });
   } catch (e) {

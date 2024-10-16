@@ -20,24 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import satori from "satori";
 import { ThemeDark } from "@notesnook/theme";
 import { svg2png, initialize } from "svg2png-wasm";
-// import svg2pngWasm from "svg2png-wasm/svg2png_wasm_bg.wasm";
+import svg2pngWasm from "svg2png-wasm/svg2png_wasm_bg.wasm?arraybuffer";
 import fontRegular from "../assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.ttf?arraybuffer";
 import fontBold from "../assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.ttf?arraybuffer";
 
 export type OGMetadata = { title: string; description: string; date: string };
 
-async function initSVG2PNG() {
-  const { default: wasm } =
-    process.env.NODE_ENV === "development" || !process.env.CLOUDFLARE
-      ? await import("svg2png-wasm/svg2png_wasm_bg.wasm?arraybuffer")
-      : await import("svg2png-wasm/svg2png_wasm_bg.wasm");
-
-  await initialize(wasm as WebAssembly.Module);
-}
+await initialize(svg2pngWasm);
 
 export async function makeImage(metadata: OGMetadata) {
-  await initSVG2PNG();
-
   const theme = ThemeDark.scopes.base;
   const svg = await satori(
     <div

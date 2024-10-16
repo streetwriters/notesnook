@@ -38,6 +38,7 @@ import Field from "../field";
 import { LinkPlugin } from "./links-plugin";
 import Config from "../../utils/config";
 import { ErrorText } from "../error-text";
+import { strings } from "@notesnook/intl";
 
 export type PdfPreviewProps = {
   fileUrl: string | Uint8Array;
@@ -118,7 +119,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                     {(props) => (
                       <ToolbarButton
                         icon={Search}
-                        title="Search"
+                        title={strings.search()}
                         onClick={props.onClick}
                       />
                     )}
@@ -128,7 +129,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                       <ToolbarButton
                         icon={ChevronUp}
                         disabled={props.isDisabled}
-                        title="Go to previous page"
+                        title={strings.goToPreviousPage()}
                         onClick={props.onClick}
                       />
                     )}
@@ -146,7 +147,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                       <ToolbarButton
                         icon={ChevronDown}
                         disabled={props.isDisabled}
-                        title="Go to next page"
+                        title={strings.goToNextPage()}
                         onClick={props.onClick}
                       />
                     )}
@@ -165,7 +166,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                     {(props) => (
                       <ToolbarButton
                         icon={ZoomOut}
-                        title="Zoom out"
+                        title={strings.zoomOut()}
                         onClick={props.onClick}
                       />
                     )}
@@ -181,7 +182,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                     {(props) => (
                       <ToolbarButton
                         icon={ZoomIn}
-                        title="Zoom in"
+                        title={strings.zoomIn()}
                         onClick={props.onClick}
                       />
                     )}
@@ -200,7 +201,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                     {(props) => (
                       <ToolbarButton
                         icon={Download}
-                        title="Download"
+                        title={strings.network.download()}
                         onClick={props.onClick}
                       />
                     )}
@@ -209,7 +210,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                     {(props) => (
                       <ToolbarButton
                         icon={Fullscreen}
-                        title="Enter fullscreen"
+                        title={strings.enterFullScreen()}
                         onClick={props.onClick}
                       />
                     )}
@@ -218,7 +219,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                   {onClose && (
                     <ToolbarButton
                       icon={Close}
-                      title="Close"
+                      title={strings.close()}
                       onClick={onClose}
                     />
                   )}
@@ -269,7 +270,7 @@ export function PdfPreview(props: PdfPreviewProps) {
                 variant="heading"
                 sx={{ fontSize: 28, textAlign: "center" }}
               >
-                Unlock document
+                {strings.pdfLocked()}
               </Text>
             </Flex>
             <Text
@@ -278,13 +279,13 @@ export function PdfPreview(props: PdfPreviewProps) {
               mb={4}
               sx={{ textAlign: "center", color: "paragraph" }}
             >
-              Please enter the password to unlock this document.
+              {strings.pdfLockedDesc()}.
             </Text>
             <Field
               id="document-password"
               autoFocus
               sx={{ width: "95%", maxWidth: 400 }}
-              placeholder="Enter password"
+              placeholder={strings.enterPassword()}
               type="password"
               onKeyUp={async (e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key === "Enter") {
@@ -293,7 +294,7 @@ export function PdfPreview(props: PdfPreviewProps) {
               }}
             />
             {props.passwordStatus === PasswordStatus.WrongPassword && (
-              <ErrorText error="Wrong password" />
+              <ErrorText error={strings.passwordIncorrect()} />
             )}
             <Button
               mt={3}
@@ -302,7 +303,7 @@ export function PdfPreview(props: PdfPreviewProps) {
               sx={{ borderRadius: 100, px: 30 }}
               onClick={async () => {}}
             >
-              Unlock
+              {strings.unlock()}
             </Button>
           </Flex>
         )}

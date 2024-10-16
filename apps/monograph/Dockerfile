@@ -1,5 +1,5 @@
 
-FROM node:20-alpine
+FROM --platform=$BUILDPLATFORM node:20-alpine
 
 RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
 

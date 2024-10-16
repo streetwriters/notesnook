@@ -31,6 +31,8 @@
     "start:editor-mobile": "nx start @notesnook/editor-mobile",
     "start:editor": "nx start @notesnook/editor",
     "start:server:themes": "nx start @notesnook/themes-server",
+    "build:intl": "nx build @notesnook/intl",
+    "start:intl": "nx start @notesnook/intl",
     "prettier": "npx prettier . --write",
     "lint": "npx eslint ./apps/ ./packages/",
     "linc": "npx eslint ./apps/ ./packages/ --cache"

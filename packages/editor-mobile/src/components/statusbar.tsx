@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { RefObject, useEffect, useRef, useState } from "react";
 import { getTotalWords, Editor } from "@notesnook/editor";
 import { useTabContext } from "../hooks/useTabStore";
+import { strings } from "@notesnook/intl";
 
 function StatusBar({
   container,
@@ -37,20 +38,20 @@ function StatusBar({
   const stickyRef = useRef(false);
   const prevScroll = useRef(0);
   const lastStickyChangeTime = useRef(0);
-  const [words, setWords] = useState("0 words");
+  const [words, setWords] = useState(`0 ${strings.words()}`);
   const currentWords = useRef(words);
   const statusBar = useRef({
     set: setStatus,
     updateWords: () => {
       const editor = editors[tab.id];
       if (!editor) return;
-      const words = getTotalWords(editor as Editor) + " words";
+      const words = getTotalWords(editor as Editor) + ` ${strings.words()}`;
       if (currentWords.current === words) return;
       setWords(words);
     },
     resetWords: () => {
-      currentWords.current = `0 words`;
-      setWords(`0 words`);
+      currentWords.current = `0 ${strings.words()}`;
+      setWords(`0 ${strings.words()}`);
     }
   });
 

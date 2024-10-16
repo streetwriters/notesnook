@@ -76,6 +76,7 @@ import { ScopedThemeProvider } from "../../components/theme-provider";
 import { AppLockSettings } from "./app-lock-settings";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { ServersSettings } from "./servers-settings";
+import { strings } from "@notesnook/intl";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -84,24 +85,24 @@ type SettingsDialogProps = BaseDialogProps<false> & {
 const sectionGroups: SectionGroup[] = [
   {
     key: "account",
-    title: "User account",
+    title: strings.account(),
     sections: [
-      { key: "profile", title: "Profile", icon: Account },
+      { key: "profile", title: strings.profile(), icon: Account },
       {
         key: "subscription",
-        title: "Subscription",
+        title: strings.subDetails(),
         icon: Pro,
         isHidden: () => !useUserStore.getState().isLoggedIn
       },
       {
         key: "auth",
-        title: "Authentication",
+        title: strings.authentication(),
         icon: PasswordAndAuth,
         isHidden: () => !useUserStore.getState().isLoggedIn
       },
       {
         key: "sync",
-        title: "Sync",
+        title: strings.sync(),
         icon: Sync,
         isHidden: () => !useUserStore.getState().isLoggedIn
       }
@@ -109,45 +110,49 @@ const sectionGroups: SectionGroup[] = [
   },
   {
     key: "customization",
-    title: "Customization",
+    title: strings.customization(),
     sections: [
-      { key: "appearance", title: "Appearance", icon: Appearance },
-      { key: "behaviour", title: "Behaviour", icon: Behaviour },
-      { key: "editor", title: "Editor", icon: Editor },
+      { key: "appearance", title: strings.appearance(), icon: Appearance },
+      { key: "behaviour", title: strings.behaviour(), icon: Behaviour },
+      { key: "editor", title: strings.editor(), icon: Editor },
       {
         key: "desktop",
-        title: "Desktop integration",
+        title: strings.desktopIntegration(),
         icon: Desktop,
         isHidden: () => !IS_DESKTOP_APP
       },
-      { key: "notifications", title: "Notifications", icon: Notification },
-      { key: "servers", title: "Servers", icon: Servers }
+      {
+        key: "notifications",
+        title: strings.notifications(),
+        icon: Notification
+      },
+      { key: "servers", title: strings.servers(), icon: Servers }
     ]
   },
   {
     key: "import-export",
-    title: "Import & export",
+    title: strings.importExport(),
     sections: [
-      { key: "backup-export", title: "Backup & export", icon: Backup },
-      { key: "importer", title: "Notesnook Importer", icon: Import }
+      { key: "backup-export", title: strings.backupExport(), icon: Backup },
+      { key: "importer", title: strings.notesnookImporter(), icon: Import }
     ]
   },
   {
     key: "security",
-    title: "Security & privacy",
+    title: strings.privacyAndSecurity(),
     sections: [
-      { key: "app-lock", title: "App lock", icon: CellphoneLock },
-      { key: "vault", title: "Vault", icon: ShieldLock },
-      { key: "privacy", title: "Privacy", icon: Privacy }
+      { key: "app-lock", title: strings.appLock(), icon: CellphoneLock },
+      { key: "vault", title: strings.vault(), icon: ShieldLock },
+      { key: "privacy", title: strings.privacy(), icon: Privacy }
     ]
   },
   {
     key: "other",
-    title: "Other",
+    title: strings.other(),
     sections: [
-      { key: "legal", title: "Legal", icon: Legal },
-      { key: "support", title: "Help and support", icon: Documentation },
-      { key: "about", title: "About", icon: About }
+      { key: "legal", title: strings.legal(), icon: Legal },
+      { key: "support", title: strings.helpAndSupport(), icon: Documentation },
+      { key: "about", title: strings.about(), icon: About }
     ]
   }
 ];
@@ -269,7 +274,7 @@ function SettingsSideBar(props: SettingsSideBarProps) {
           <Input
             id="search"
             name="search"
-            placeholder="Search"
+            placeholder={strings.search()}
             data-test-id="settings-search"
             sx={{
               m: 2,
@@ -326,7 +331,10 @@ function SettingsSideBar(props: SettingsSideBarProps) {
                   fontWeight: "bold",
                   color: "paragraph",
                   mx: 3,
-                  mb: 1
+                  mb: 1,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  wordSpacing: "nowrap"
                 }}
               >
                 {group.title}
@@ -458,7 +466,7 @@ function SettingItem(props: { item: Setting }) {
           gap: 4
         }}
       >
-        <Flex sx={{ flexDirection: "column" }}>
+        <Flex sx={{ flexDirection: "column", flexShrink: 0 }}>
           <Text variant={"subtitle"}>{item.title}</Text>
           {item.description && (
             <Text
@@ -475,7 +483,6 @@ function SettingItem(props: { item: Setting }) {
         <Flex
           sx={{
             alignItems: "center",
-            flexShrink: 0,
             justifyContent: "end",
             gap: 2,
             "& > label": { width: "auto" }
@@ -587,7 +594,8 @@ function SelectComponent(
         border: "1px solid var(--border-secondary)",
         borderRadius: "5px",
         color: "var(--paragraph)",
-        padding: "5px"
+        padding: "5px",
+        overflow: "hidden"
       }}
       value={
         selectedOption.status === "fulfilled" ? selectedOption.value : undefined

@@ -35,6 +35,7 @@ import { presentDialog } from "../dialog/functions";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
 import { diff } from "diffblazer";
+import { strings } from "@notesnook/intl";
 
 /**
  *
@@ -51,7 +52,7 @@ export default function NotePreview({ session, content, note }) {
       Navigation.queueRoutesForUpdate();
       useSelectionStore.getState().setSelectionMode(false);
       ToastManager.show({
-        heading: "Restore successful",
+        heading: strings.noteRestored(),
         type: "success"
       });
       eSendEvent(eCloseSheet);
@@ -72,7 +73,7 @@ export default function NotePreview({ session, content, note }) {
     Navigation.queueRoutesForUpdate();
 
     ToastManager.show({
-      heading: "Note restored successfully",
+      heading: strings.noteRestoredFromHistory(),
       type: "success"
     });
   }
@@ -83,17 +84,17 @@ export default function NotePreview({ session, content, note }) {
 
   const deleteNote = async () => {
     presentDialog({
-      title: `Delete note permanently`,
-      paragraph: `Are you sure you want to delete this note from trash permanentaly`,
-      positiveText: "Delete",
-      negativeText: "Cancel",
+      title: strings.deleteNote(),
+      paragraph: strings.deleteNoteConfirmation(),
+      positiveText: strings.delete(),
+      negativeText: strings.cancel(),
       context: "local",
       positivePress: async () => {
         await db.trash.delete(note.id);
         useTrashStore.getState().refresh();
         useSelectionStore.getState().setSelectionMode(false);
         ToastManager.show({
-          heading: "Permanently deleted items",
+          heading: strings.noteDeleted(),
           type: "success",
           context: "local"
         });
@@ -150,7 +151,7 @@ export default function NotePreview({ session, content, note }) {
           }}
         >
           <Paragraph color={colors.secondary.paragraph}>
-            Preview not available, content is encrypted.
+            {strings.encryptedNoteHistoryNotice()}
           </Paragraph>
         </View>
       )}
@@ -160,10 +161,15 @@ export default function NotePreview({ session, content, note }) {
           paddingHorizontal: 12
         }}
       >
-        <Button onPress={restore} title="Restore" type="accent" width="100%" />
+        <Button
+          onPress={restore}
+          title={strings.restore()}
+          type="accent"
+          width="100%"
+        />
         <Button
           onPress={deleteNote}
-          title="Delete permanently"
+          title={strings.deletePermanently()}
           type="error"
           width="100%"
           style={{

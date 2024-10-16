@@ -24,6 +24,7 @@ import {
   SortOptions,
   VirtualizedGrouping
 } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -94,31 +95,31 @@ const useRechecker = create<RecheckerState>((set) => ({
 
 const attachmentTypes = [
   {
-    title: "All",
+    title: strings.mediaTypes.all(),
     filterBy: "all"
   },
   {
-    title: "Images",
+    title: strings.mediaTypes.image(),
     filterBy: "images"
   },
   {
-    title: "Docs",
-    filterBy: "documents"
-  },
-  {
-    title: "Video",
-    filterBy: "video"
-  },
-  {
-    title: "Audio",
+    title: strings.mediaTypes.audio(),
     filterBy: "audio"
   },
   {
-    title: "Orphaned",
+    title: strings.mediaTypes.video(),
+    filterBy: "video"
+  },
+  {
+    title: strings.mediaTypes.document(),
+    filterBy: "documents"
+  },
+  {
+    title: strings.mediaTypes.orphaned(),
     filterBy: "orphaned"
   },
   {
-    title: "Errors",
+    title: strings.mediaTypes.errors(),
     filterBy: "errors"
   }
 ];
@@ -358,7 +359,7 @@ export const AttachmentDialog = ({
             paddingHorizontal: 12
           }}
         >
-          <Heading>Attachments</Heading>
+          <Heading>{strings.dataTypesPluralCamelCase.attachment()}</Heading>
 
           <View
             style={{
@@ -414,7 +415,7 @@ export const AttachmentDialog = ({
       >
         <Seperator />
         <Input
-          placeholder="Filter attachments by filename, type or hash"
+          placeholder={strings.filterAttachments()}
           onChangeText={onChangeText}
           onSubmit={() => {
             onChangeText(attachmentSearchValue.current as string);
@@ -554,9 +555,7 @@ export const AttachmentDialog = ({
                     size={60}
                     color={colors.secondary.icon}
                   />
-                  <Paragraph>
-                    {note ? "No attachments on this note" : "No attachments"}
-                  </Paragraph>
+                  <Paragraph>{strings.noAttachments()}</Paragraph>
                 </>
               )}
             </View>

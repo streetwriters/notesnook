@@ -37,6 +37,7 @@ import { Pressable } from "../ui/pressable";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import NotePreview from "./preview";
+import { strings } from "@notesnook/intl";
 
 const HistoryItem = ({
   index,
@@ -141,11 +142,7 @@ export default function NoteHistory({
   return (
     <View>
       <SheetProvider context="note_history" />
-      <DialogHeader
-        title="Note history"
-        paragraph="Revert back to an older version of this note"
-        padding={12}
-      />
+      <DialogHeader title={strings.noteHistory()} padding={12} />
 
       <Seperator />
 
@@ -180,7 +177,7 @@ export default function NoteHistory({
                 <>
                   <Icon name="history" size={50} color={colors.primary.icon} />
                   <Paragraph color={colors.secondary.paragraph}>
-                    No note history found on this device.
+                    {strings.noteHistoryPlaceholder()}
                   </Paragraph>
                 </>
               )}
@@ -196,7 +193,7 @@ export default function NoteHistory({
           alignSelf: "center"
         }}
       >
-        Note version history is local only.{" "}
+        {strings.noteHistoryNotice[0]()}{" "}
         <Text
           onPress={() => {
             openLinkInBrowser(
@@ -208,7 +205,7 @@ export default function NoteHistory({
             textDecorationLine: "underline"
           }}
         >
-          Learn how this works.
+          {strings.noteHistoryNotice[1]()}
         </Text>
       </Paragraph>
     </View>

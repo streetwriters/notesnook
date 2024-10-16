@@ -55,6 +55,7 @@ import { MenuItemsList } from "../../utils/menu-items";
 import { IconButton } from "../../components/ui/icon-button";
 import { Pressable } from "../../components/ui/pressable";
 import { getColorLinearShade } from "../../utils/colors";
+import { strings } from "@notesnook/intl";
 
 const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
@@ -237,7 +238,7 @@ function ThemeSelector() {
                     color={colors.list.heading}
                     size={7}
                   >
-                    Notes
+                    {strings.dataTypesPluralCamelCase.note()}
                   </Heading>
                 </View>
 
@@ -275,7 +276,9 @@ function ThemeSelector() {
               ) : null}
 
               <Button
-                title={item.colorScheme === "dark" ? "Dark" : "Light"}
+                title={
+                  item.colorScheme === "dark" ? strings.dark() : strings.light()
+                }
                 type="secondaryAccented"
                 height={25}
                 buttonType={{
@@ -299,11 +302,8 @@ function ThemeSelector() {
           <Heading size={SIZE.sm} color={themeColors.primary.heading}>
             {item.name}
           </Heading>
-          {/* <Paragraph color={themeColors.primary?.paragraph}>
-            {item.description}
-          </Paragraph> */}
           <Paragraph size={SIZE.xs} color={themeColors.secondary?.paragraph}>
-            By {item.authors?.[0].name}
+            {strings.by()} {item.authors?.[0].name}
           </Paragraph>
         </TouchableOpacity>
       </>
@@ -348,7 +348,7 @@ function ThemeSelector() {
             paddingTop: 12
           }}
         >
-          <Input onChangeText={onSearch} placeholder="Search themes" />
+          <Input onChangeText={onSearch} placeholder={strings.searchThemes()} />
 
           <View
             style={{
@@ -368,7 +368,7 @@ function ThemeSelector() {
                 type={
                   colorScheme === "" || !colorScheme ? "accent" : "secondary"
                 }
-                title="All"
+                title={strings.all()}
                 fontSize={SIZE.xs}
                 onPress={() => {
                   setColorScheme("");
@@ -378,7 +378,7 @@ function ThemeSelector() {
                 style={{ borderRadius: 100, minWidth: 60 }}
                 height={30}
                 type={colorScheme === "dark" ? "accent" : "secondary"}
-                title="Dark"
+                title={strings.dark()}
                 fontSize={SIZE.xs}
                 onPress={() => {
                   setColorScheme("dark");
@@ -389,7 +389,7 @@ function ThemeSelector() {
                 height={30}
                 fontSize={SIZE.xs}
                 type={colorScheme === "light" ? "accent" : "secondary"}
-                title="Light"
+                title={strings.light()}
                 onPress={() => {
                   setColorScheme("light");
                 }}
@@ -397,7 +397,7 @@ function ThemeSelector() {
             </View>
 
             <Button
-              title="Load from file"
+              title={strings.loadFromFile()}
               style={{ borderRadius: 100, minWidth: 60 }}
               height={30}
               type={"secondaryAccented"}
@@ -446,10 +446,10 @@ function ThemeSelector() {
                 <ActivityIndicator color={colors.primary.accent} />
               ) : searchQuery ? (
                 <Paragraph color={colors.secondary.paragraph}>
-                  No results found for {searchQuery}
+                  {strings.noResultsForSearch(searchQuery)}
                 </Paragraph>
               ) : (
-                <Paragraph>No themes found.</Paragraph>
+                <Paragraph>{strings.noThemesFound()}.</Paragraph>
               )}
             </View>
           }
@@ -464,7 +464,7 @@ function ThemeSelector() {
                 }}
               >
                 <Paragraph color={colors.error.paragraph}>
-                  Error loading themes. {themes.error.message}.
+                  {strings.errorLoadingThemes()}. {themes.error.message}.
                 </Paragraph>
               </View>
             ) : null
@@ -682,7 +682,7 @@ const ThemeSetter = ({
                       color={colors?.list.heading}
                       size={7}
                     >
-                      Notes
+                      {strings.dataTypesPluralCamelCase.note()}
                     </Heading>
                   </View>
 
@@ -703,7 +703,7 @@ const ThemeSetter = ({
             size={SIZE.xs}
             color={themeColors.colors.secondary.paragraph}
           >
-            By {theme.authors?.[0]?.name}
+            {strings.by()} {theme.authors?.[0]?.name}
           </Paragraph>
           <View
             style={{
@@ -716,7 +716,7 @@ const ThemeSetter = ({
               size={SIZE.xs}
               color={themeColors.colors.secondary.paragraph}
             >
-              Version {theme.version}
+              ${strings.version()} {theme.version}
             </Paragraph>
 
             <Paragraph
@@ -739,7 +739,7 @@ const ThemeSetter = ({
                     Linking.openURL(theme.homepage as string);
                   }}
                 >
-                  Visit homepage
+                  {strings.visitHomePage()}
                 </Paragraph>
               </View>
             ) : null}
@@ -756,10 +756,10 @@ const ThemeSetter = ({
           >
             <Heading color={colors.accentForeground} size={SIZE.md}>
               {darkTheme.id === theme.id
-                ? "Applied as dark theme"
-                : "Applied as light theme"}
+                ? strings.appliedDark()
+                : strings.appliedLight()}
             </Heading>
-            <Paragraph size={SIZE.xs}>(Tap to apply again)</Paragraph>
+            <Paragraph size={SIZE.xs}>({strings.tapToApplyAgain()})</Paragraph>
           </Pressable>
         ) : (
           <Button
@@ -770,8 +770,8 @@ const ThemeSetter = ({
             onPress={applyTheme}
             title={
               theme.colorScheme === "dark"
-                ? "Set as dark theme"
-                : "Set as light theme"
+                ? strings.setAsDarkTheme()
+                : strings.setAsLightTheme()
             }
             type="secondaryAccented"
           />

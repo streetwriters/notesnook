@@ -23,6 +23,7 @@ import { ImageAttributes } from "../../extensions/image/index.js";
 import { Editor } from "../../types.js";
 import { InlineInput } from "../../components/inline-input/index.js";
 import { findSelectedNode } from "../../utils/prosemirror.js";
+import { strings } from "@notesnook/intl";
 
 export type ImagePropertiesProps = {
   editor: Editor;
@@ -37,7 +38,7 @@ export function ImageProperties(props: ImagePropertiesProps) {
   const { width, height, aspectRatio } = image.attrs as ImageAttributes;
 
   return (
-    <Popup title="Image properties" onClose={onClose}>
+    <Popup title={strings.imageProperties()} onClose={onClose}>
       <Flex sx={{ width: ["auto", 300], alignItems: "center", p: 1 }}>
         <InlineInput
           label="width"

@@ -22,65 +22,63 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { ConfirmDialog } from "../confirm";
 
+import { strings } from "@notesnook/intl";
+
 export const SyncSettings: SettingsGroup[] = [
   {
     key: "sync",
     section: "sync",
-    header: "Sync",
+    header: strings.sync(),
     settings: [
       {
         key: "toggle-sync",
-        title: "Enable sync",
-        description:
-          "Disable syncing to prevent all changes from syncing to & from other devices.",
+        title: strings.disableSync(),
+        description: strings.disableSyncDesc(),
         keywords: ["sync off", "toggle sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
         components: [
           {
             type: "toggle",
-            isToggled: () => useAppStore.getState().isSyncEnabled,
+            isToggled: () => !useAppStore.getState().isSyncEnabled,
             toggle: () => useAppStore.getState().toggleSync()
           }
         ]
       },
       {
         key: "toggle-auto-sync",
-        title: "Enable auto sync",
-        description:
-          "Disable auto sync to prevent changes from automatically syncing to other devices. This will require manually pressing the sync button in order to sync changes.",
+        title: strings.disableAutoSync(),
+        description: strings.disableAutoSyncDesc(),
         keywords: ["auto sync off", "automatic sync", "toggle auto sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
         components: [
           {
             type: "toggle",
-            isToggled: () => useAppStore.getState().isAutoSyncEnabled,
+            isToggled: () => !useAppStore.getState().isAutoSyncEnabled,
             toggle: () => useAppStore.getState().toggleAutoSync()
           }
         ]
       },
-
       {
         key: "toggle-realtime-sync",
-        title: "Enable realtime editor sync",
-        description:
-          "Disable realtime editor sync to prevent edits from updating in realtime on this device. This will require closing and opening the note to see new changes.",
+        title: strings.disableRealtimeSync(),
+        description: strings.disableRealtimeSyncDesc(),
         keywords: ["auto sync off", "automatic sync", "toggle auto sync"],
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isSyncEnabled, listener),
         components: [
           {
             type: "toggle",
-            isToggled: () => useAppStore.getState().isRealtimeSyncEnabled,
+            isToggled: () => !useAppStore.getState().isRealtimeSyncEnabled,
             toggle: () => useAppStore.getState().toggleRealtimeSync()
           }
         ]
       },
       {
         key: "full-offline-mode",
-        title: "Full offline mode",
-        description: "Download everything including attachments on sync",
+        title: strings.fullOfflineMode(),
+        description: strings.fullOfflineModeDesc(),
         keywords: ["offline mode"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.isFullOfflineMode, listener),
@@ -94,30 +92,23 @@ export const SyncSettings: SettingsGroup[] = [
       },
       {
         key: "force-sync",
-        title: "Having problems with sync?",
-        description: `Force push:
-Use this if changes made on this device are not appearing on other devices. This will overwrite the data on the server with the data from this device.
-
-Force pull:
-Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.
-
-**These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**`,
-        keywords: ["force sync", "sync troubleshoot"],
+        title: strings.havingProblemsWithSync(),
+        description: strings.havingProblemsWithSyncDesc(),
+        keywords: ["force sync", "sync issues", "sync error", "sync problem"],
         components: [
           {
             type: "button",
-            title: "Force push",
+            title: strings.forcePushChanges(),
             variant: "error",
             action: () =>
               ConfirmDialog.show({
-                title: "Are you sure?",
-                message:
-                  "This must only be used for troubleshooting. Using them regularly for sync is **not recommended** and will lead to **unexpected data loss** and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.",
+                title: strings.areYouSure(),
+                message: strings.forceSyncNotice(),
                 checks: {
-                  accept: { text: "I understand.", default: false }
+                  accept: { text: strings.understand(), default: false }
                 },
-                positiveButtonText: "Proceed",
-                negativeButtonText: "Cancel"
+                positiveButtonText: strings.continue(),
+                negativeButtonText: strings.cancel()
               }).then((result) => {
                 if (!result || !result.accept) return;
                 return useAppStore
@@ -127,18 +118,17 @@ Use this if changes from other devices are not appearing on this device. This wi
           },
           {
             type: "button",
-            title: "Force pull",
+            title: strings.forcePullChanges(),
             variant: "error",
             action: () =>
               ConfirmDialog.show({
-                title: "Are you sure?",
-                message:
-                  "This must only be used for troubleshooting. Using them regularly for sync is **not recommended** and will lead to **unexpected data loss** and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.",
+                title: strings.areYouSure(),
+                message: strings.forcePullChangesDesc(),
                 checks: {
-                  accept: { text: "I understand.", default: false }
+                  accept: { text: strings.understand(), default: false }
                 },
-                positiveButtonText: "Proceed",
-                negativeButtonText: "Cancel"
+                positiveButtonText: strings.continue(),
+                negativeButtonText: strings.cancel()
               }).then((result) => {
                 if (!result || !result.accept) return;
                 return useAppStore

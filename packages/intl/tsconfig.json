@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "outDir": "dist",
+    "emitDeclarationOnly": true,
+    "declaration": true
+  },
+  "include": ["src"]
+}

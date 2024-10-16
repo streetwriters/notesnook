@@ -24,6 +24,7 @@ import { Flex, Image, Label, Text } from "@theme-ui/components";
 import { formatBytes } from "@notesnook/common";
 import { compressImage } from "../utils/image-compressor";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 export type ImagePickerDialogProps = BaseDialogProps<false | File[]> & {
   images: File[];
@@ -82,10 +83,13 @@ export const ImagePickerDialog = DialogManager.register(
         isOpen={true}
         onClose={() => props.onClose(false)}
         positiveButton={{
-          text: "Insert",
+          text: strings.insert(),
           onClick: () => props.onClose(images)
         }}
-        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => props.onClose(false)
+        }}
       >
         {selectedImage && (
           <Flex sx={{ flexDirection: "column", alignItems: "center", mt: 4 }}>

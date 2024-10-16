@@ -38,6 +38,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
 import { ForgotPassword } from "./forgot-password";
 import { useLogin } from "./use-login";
+import { strings } from "@notesnook/intl";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -147,7 +148,7 @@ export const Login = ({ changeMode }) => {
             extraBold
             size={SIZE.xxl}
           >
-            Login to your {"\n"}account
+            {strings.loginToYourAccount()}
           </Heading>
         </View>
 
@@ -178,8 +179,8 @@ export const Login = ({ changeMode }) => {
             validationType="email"
             autoCorrect={false}
             autoCapitalize="none"
-            errorMessage="Email is invalid"
-            placeholder="Enter your email"
+            errorMessage={strings.emailInvalid()}
+            placeholder={strings.email()}
             defaultValue={email.current}
             editable={step === LoginSteps.emailAuth && !loading}
             onSubmit={() => {
@@ -199,20 +200,20 @@ export const Login = ({ changeMode }) => {
                   password.current = value;
                 }}
                 testID="input.password"
-                returnKeyLabel="Done"
+                returnKeyLabel={strings.done()}
                 returnKeyType="done"
                 secureTextEntry
                 autoComplete="password"
                 autoCapitalize="none"
                 autoCorrect={false}
-                placeholder="Password"
+                placeholder={strings.password()}
                 marginBottom={0}
                 editable={!loading}
                 defaultValue={password.current}
                 onSubmit={() => login()}
               />
               <Button
-                title="Forgot your password?"
+                title={strings.forgotPassword()}
                 style={{
                   alignSelf: "flex-end",
                   height: 30,
@@ -249,12 +250,12 @@ export const Login = ({ changeMode }) => {
               height={50}
               fontSize={SIZE.md}
               type="accent"
-              title={!loading ? "Continue" : null}
+              title={!loading ? strings.continue() : null}
             />
 
             {step === LoginSteps.passwordAuth && (
               <Button
-                title="Cancel logging in"
+                title={strings.cancelLogin()}
                 style={{
                   alignSelf: "center",
                   height: 30,
@@ -290,12 +291,12 @@ export const Login = ({ changeMode }) => {
                   size={SIZE.xs + 1}
                   color={colors.secondary.paragraph}
                 >
-                  Don't have an account?{" "}
+                  {strings.dontHaveAccount()}{" "}
                   <Paragraph
                     size={SIZE.xs + 1}
                     style={{ color: colors.primary.accent }}
                   >
-                    Sign up
+                    {strings.signUp()}
                   </Paragraph>
                 </Paragraph>
               </TouchableOpacity>

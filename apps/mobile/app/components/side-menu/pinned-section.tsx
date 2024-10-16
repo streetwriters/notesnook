@@ -38,6 +38,7 @@ import Seperator from "../ui/seperator";
 import SheetWrapper from "../ui/sheet";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 export const PinnedSection = React.memo(
   function PinnedSection() {
@@ -100,7 +101,7 @@ export const PinnedSection = React.memo(
             <Notice
               size="small"
               type="information"
-              text="Add shortcuts for notebooks and tags here."
+              text={strings.sideMenuNotice()}
               style={{
                 marginHorizontal: 12
               }}
@@ -152,7 +153,7 @@ export const PinItem = React.memo(
           >
             <Seperator />
             <Button
-              title="Remove Shortcut"
+              title={strings.removeShortcut()}
               type="error"
               onPress={async () => {
                 await db.shortcuts.remove(item.id);

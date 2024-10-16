@@ -28,6 +28,7 @@ import useHashLocation, {
 } from "../../hooks/use-hash-location";
 import makeMatcher from "wouter/matcher";
 import { Lock } from "../icons";
+import { strings } from "@notesnook/intl";
 
 const matcher = makeMatcher();
 const EDITOR_MARGINS = Config.get("editor:margins", true);
@@ -89,9 +90,9 @@ export const EditorLoader = memo(function EditorLoader() {
             }}
           >
             {isNoteLoading ? (
-              <TextScramble text="Loading" nextLetterSpeed={50} />
+              <TextScramble text={strings.loading()} nextLetterSpeed={50} />
             ) : (
-              "Note title"
+              strings.noteTitle()
             )}
           </Text>
           <Skeleton

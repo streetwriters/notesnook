@@ -41,7 +41,7 @@ const DEFAULT_THEME_KEY =
   process.env.NODE_ENV === "development"
     ? "DEFAULT_THEME"
     : "globalThis.DEFAULT_THEME";
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   plugins: [
     writePlugin({
       "package.json": JSON.stringify({
@@ -74,10 +74,11 @@ export default defineConfig({
     }
   },
   ssr: {
-    noExternal: true,
+    ...(process.env.NODE_ENV === "development" ? {} : { noExternal: true }),
     target: "node"
   },
   build: {
+    target: isSsrBuild ? "node20" : undefined,
     rollupOptions: {
       external: ["svg2png-wasm/svg2png_wasm_bg.wasm"]
     }
@@ -88,7 +89,7 @@ export default defineConfig({
   resolve: {
     dedupe: DEDUPE
   }
-});
+}));
 
 function writePlugin(files: Record<string, string>): Plugin {
   let config: ResolvedConfig;

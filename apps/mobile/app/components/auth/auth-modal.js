@@ -36,6 +36,7 @@ import { IconButton } from "../ui/icon-button";
 import { hideAuth, initialAuthMode } from "./common";
 import { Login } from "./login";
 import { Signup } from "./signup";
+import { strings } from "@notesnook/intl";
 
 export const AuthMode = {
   login: 0,
@@ -153,7 +154,7 @@ const AuthModal = () => {
 
           {initialAuthMode.current !== AuthMode.welcomeSignup ? null : (
             <Button
-              title="Skip"
+              title={strings.skip()}
               onPress={() => {
                 hideAuth();
               }}

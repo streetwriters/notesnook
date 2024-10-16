@@ -87,8 +87,8 @@ export const Empty = React.memo(function Empty({
             color={color}
             tip={
               screen !== "Search"
-                ? tip || ({ text: placeholder?.paragraph } as TTip)
-                : ({ text: placeholder?.paragraph } as TTip)
+                ? tip || ({ text: () => placeholder?.paragraph } as TTip)
+                : ({ text: () => placeholder?.paragraph } as TTip)
             }
             style={{
               backgroundColor: "transparent",

@@ -49,6 +49,7 @@ import { ReminderTime } from "../../ui/reminder-time";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { ItemReference, Note, Reminder } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -168,9 +169,7 @@ export default function ReminderSheet({
   async function saveReminder() {
     try {
       if (!(await Notifications.checkAndRequestPermissions(true)))
-        throw new Error(
-          "App does not have permission to schedule notifications"
-        );
+        throw new Error(strings.noNotificationPermission());
       if (!date && reminderMode !== ReminderModes.Permanent) return;
       if (
         reminderMode === ReminderModes.Repeat &&
@@ -178,12 +177,12 @@ export default function ReminderSheet({
         recurringMode !== "year" &&
         selectedDays.length === 0
       )
-        throw new Error("Please select the day to repeat the reminder on");
+        throw new Error(strings.selectDayError());
 
-      if (!title.current) throw new Error("Please set title of the reminder");
+      if (!title.current) throw new Error(strings.setTitleError());
       if (date.getTime() < Date.now() && reminderMode === "once") {
         titleRef?.current?.focus();
-        throw new Error("Reminder date must be set in future");
+        throw new Error(strings.dateError());
       }
 
       date.setSeconds(0, 0);
@@ -205,12 +204,6 @@ export default function ReminderSheet({
       if (!reminderId) return;
       const _reminder = await db.reminders?.reminder(reminderId);
 
-      if (!_reminder) {
-        ToastManager.show({
-          heading: "Failed to add a new reminder",
-          context: "local"
-        });
-      }
       if (reference && _reminder) {
         await db.relations?.add(reference, {
           id: _reminder?.id as string,
@@ -234,7 +227,7 @@ export default function ReminderSheet({
       }}
     >
       <Heading size={SIZE.lg}>
-        {reminder ? "Edit reminder" : "New reminder"}
+        {reminder ? strings.editReminder() : strings.newReminder()}
       </Heading>
 
       <Dialog context="local" />
@@ -247,7 +240,7 @@ export default function ReminderSheet({
         <Input
           fwdRef={titleRef}
           defaultValue={reminder?.title || referencedItem?.title}
-          placeholder="Remind me of..."
+          placeholder={strings.remindeMeOf()}
           onChangeText={(text) => (title.current = text)}
           wrapperStyle={{
             marginTop: 10
@@ -258,7 +251,7 @@ export default function ReminderSheet({
           defaultValue={
             reminder ? reminder?.description : referencedItem?.headline
           }
-          placeholder="Add a short note"
+          placeholder={strings.addShortNote()}
           onChangeText={(text) => (details.current = text)}
           containerStyle={{
             maxHeight: 80
@@ -286,7 +279,9 @@ export default function ReminderSheet({
           {Object.keys(ReminderModes).map((mode) => (
             <Button
               key={mode}
-              title={mode}
+              title={strings.reminderModes[
+                mode as keyof typeof strings.reminderModes
+              ]()}
               style={{
                 marginRight: 12,
                 borderRadius: 100,
@@ -342,9 +337,9 @@ export default function ReminderSheet({
               {Object.keys(RecurringModes).map((mode) => (
                 <Button
                   key={mode}
-                  title={
-                    !repeatFrequency || repeatFrequency <= 1 ? mode : mode + "s"
-                  }
+                  title={strings.recurringModes[
+                    mode as keyof typeof strings.recurringModes
+                  ]()}
                   style={{
                     marginRight: 6,
                     borderRadius: 100
@@ -376,10 +371,12 @@ export default function ReminderSheet({
                 : recurringMode === RecurringModes.Week
                 ? WeekDays.map((item, index) => (
                     <Button
-                      key={WeekDayNames[index as keyof typeof WeekDayNames]}
-                      title={WeekDayNames[
-                        index as keyof typeof WeekDayNames
-                      ].slice(0, 1)}
+                      key={strings.weekDayNamesShort[
+                        index as keyof typeof strings.weekDayNamesShort
+                      ]()}
+                      title={strings.weekDayNamesShort[
+                        index as keyof typeof strings.weekDayNamesShort
+                      ]()}
                       type={
                         selectedDays.indexOf(index) > -1 ? "selected" : "plain"
                       }
@@ -478,7 +475,7 @@ export default function ReminderSheet({
                 style={{
                   width: "100%"
                 }}
-                title={date ? date.toLocaleDateString() : "Select date"}
+                title={date ? date.toLocaleDateString() : strings.selectDate()}
                 type={date ? "secondaryAccented" : "secondary"}
                 icon="calendar"
                 fontSize={SIZE.md}
@@ -507,27 +504,28 @@ export default function ReminderSheet({
             <>
               <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
                 {recurringMode === RecurringModes.Daily
-                  ? "Repeats daily " + `at ${dayjs(date).format("hh:mm A")}.`
+                  ? strings.reminderRepeatStrings.day(
+                      dayjs(date).format("hh:mm A")
+                    )
                   : recurringMode === RecurringModes.Year
-                  ? `The reminder will repeat every year on ${dayjs(
-                      date
-                    ).format("dddd, MMMM D, h:mm A")}.`
+                  ? strings.reminderRepeatStrings.year(
+                      dayjs(date).format("dddd, MMMM D, h:mm A")
+                    )
                   : selectedDays.length === 7 &&
                     recurringMode === RecurringModes.Week
-                  ? `The reminder will repeat daily at ${dayjs(date).format(
-                      "hh:mm A"
-                    )}.`
+                  ? strings.reminderRepeatStrings.week.daily(
+                      dayjs(date).format("hh:mm A")
+                    )
                   : selectedDays.length === 0
-                  ? recurringMode === RecurringModes.Week
-                    ? "Select day of the week to repeat the reminder."
-                    : "Select nth day of the month to repeat the reminder."
-                  : `Repeats every${
-                      repeatFrequency > 1 ? " " + repeatFrequency : ""
-                    } ${
-                      repeatFrequency > 1 ? recurringMode + "s" : recurringMode
-                    } on ${getSelectedDaysText(selectedDays)} at ${dayjs(
-                      date
-                    ).format("hh:mm A")}.`}
+                  ? strings.reminderRepeatStrings[
+                      recurringMode as "week" | "month"
+                    ].selectDays()
+                  : strings.reminderRepeatStrings.repeats(
+                      repeatFrequency,
+                      recurringMode as string,
+                      getSelectedDaysText(selectedDays),
+                      dayjs(date).format("hh:mm A")
+                    )}
               </Paragraph>
             </>
           </View>
@@ -556,7 +554,9 @@ export default function ReminderSheet({
             {Object.keys(ReminderNotificationModes).map((mode) => (
               <Button
                 key={mode}
-                title={mode}
+                title={strings.reminderNotificationModes[
+                  mode as keyof typeof strings.reminderNotificationModes
+                ]()}
                 style={{
                   marginRight: 12,
                   borderRadius: 100
@@ -593,7 +593,7 @@ export default function ReminderSheet({
       </ScrollView>
 
       <Button
-        title="Save"
+        title={strings.save()}
         type="accent"
         height={45}
         fontSize={SIZE.md}

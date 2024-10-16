@@ -30,24 +30,18 @@ import { SpellCheckerLanguages } from "./components/spell-checker-languages";
 
 import { CustomizeToolbar } from "./components/customize-toolbar";
 import { DictionaryWords } from "./components/dictionary-words";
+import { strings } from "@notesnook/intl";
 
 export const EditorSettings: SettingsGroup[] = [
   {
     key: "editor",
     section: "editor",
-    header: "Editor",
+    header: strings.editor(),
     settings: [
       {
         key: "default-title",
-        title: "Default title format",
-        description: `Use the following key to format the title:
-
-$date$: Current date
-$time$: Current time
-$count$: Number of notes + 1
-$headline$: Use starting line of the note as title
-$timestamp$: Full date & time without any spaces or other
-symbols (e.g. 202305261253)`,
+        title: strings.titleFormat(),
+        description: strings.titleFormatDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.titleFormat, listener),
         components: [
@@ -62,7 +56,7 @@ symbols (e.g. 202305261253)`,
       },
       {
         key: "default-font",
-        title: "Default font family",
+        title: strings.defaultFontFamily(),
         onStateChange: (listener) =>
           onEditorConfigChange((c) => c.fontFamily, listener),
         components: [
@@ -83,9 +77,8 @@ symbols (e.g. 202305261253)`,
       },
       {
         key: "default-font-size",
-        title: "Default font size",
-        description:
-          "Change the default font size used in the editor. Minimum = 8px; Maximum = 120px.",
+        title: strings.defaultFontSize(),
+        description: strings.defaultFontSizeDesc(),
         onStateChange: (listener) =>
           onEditorConfigChange((c) => c.fontSize, listener),
         components: [
@@ -102,9 +95,8 @@ symbols (e.g. 202305261253)`,
       },
       {
         key: "double-spacing",
-        title: "Double spaced paragraphs",
-        description:
-          "Use double spacing between paragraphs when you press Enter in the editor.",
+        title: strings.doubleSpacedLines(),
+        description: strings.doubleSpacedLinesDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.doubleSpacedParagraphs, listener),
         components: [
@@ -118,15 +110,8 @@ symbols (e.g. 202305261253)`,
       },
       {
         key: "markdown-shortcuts",
-        title: "Markdown shortcuts",
-        description: `Markdown shortcuts are triggered whenever you input a specific character combination.
-        
-For example:
-
-1. Typing '/date' adds the current Date
-2. Wrapping something in '**' turns it into bold text
-3. Typing '1.' automatically creates a numbered list.
-4. etc.`,
+        title: strings.mardownShortcuts(),
+        description: strings.mardownShortcutsDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.markdownShortcuts, listener),
         components: [
@@ -142,7 +127,7 @@ For example:
   {
     key: "spell-check",
     section: "editor",
-    header: "Spell check",
+    header: strings.spellCheck(),
     isHidden: () => !IS_DESKTOP_APP,
     onRender: () => {
       useSpellChecker.getState().refresh();
@@ -150,7 +135,7 @@ For example:
     settings: [
       {
         key: "enable-spellchecker",
-        title: "Enable spell checker",
+        title: strings.enableSpellChecker(),
         onStateChange: (listener) =>
           useSpellChecker.subscribe((c) => c.enabled, listener),
         components: [
@@ -163,8 +148,8 @@ For example:
       },
       {
         key: "spell-checker-languages",
-        title: "Languages",
-        description: "Select the languages the spell checker should check in.",
+        title: strings.languages(),
+        description: strings.spellCheckerLanguagesDescription(),
         isHidden: () => !useSpellChecker.getState().enabled,
         onStateChange: (listener) =>
           useSpellChecker.subscribe((c) => c.enabled, listener),
@@ -177,7 +162,7 @@ For example:
       },
       {
         key: "custom-dictionay-words",
-        title: "Custom dictionary words",
+        title: strings.customDictionaryWords(),
         components: [
           {
             type: "custom",
@@ -190,11 +175,11 @@ For example:
   {
     key: "toolbar",
     section: "editor",
-    header: "Toolbar",
+    header: strings.toolbar(),
     settings: [
       {
         key: "customize-toolbar",
-        title: "Customize toolbar",
+        title: strings.customizeToolbar(),
         components: [
           {
             type: "custom",

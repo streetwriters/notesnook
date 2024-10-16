@@ -22,6 +22,7 @@ import { useEffect } from "react";
 import { Flex, Text } from "@theme-ui/components";
 import { useQueryParams } from "../navigation";
 import { MailCheck, Discord, Twitter, Reddit } from "../components/icons";
+import { strings } from "@notesnook/intl";
 
 function EmailConfirmed() {
   const [{ userId }] = useQueryParams();
@@ -73,7 +74,7 @@ function EmailConfirmed() {
             color: "icon"
           }}
         >
-          Your email has been confirmed.
+          {strings.emailConfirmed()}
         </Text>
         <Text
           variant="body"
@@ -85,7 +86,7 @@ function EmailConfirmed() {
             color: "var(--paragraph-secondary)"
           }}
         >
-          Thank you for choosing end-to-end encrypted note taking.
+          {strings.confirmEmailThankyou()}
         </Text>
       </Flex>
       <Flex
@@ -130,7 +131,7 @@ function BlogPromoBanner() {
       }}
     >
       <Text variant="heading" sx={{ fontSize: "1.2em", textAlign: "center" }}>
-        Share Notesnook with your friends!
+        {strings.shareWithFriends()}
       </Text>
       <Text
         variant="body"
@@ -142,7 +143,7 @@ function BlogPromoBanner() {
           color: "paragraph"
         }}
       >
-        {`Because where's the fun in nookin' alone?`}
+        {strings.shareWithFriendsDesc()}
       </Text>
       <Flex mt={5}>
         {social.map((account) => (
@@ -166,11 +167,11 @@ function BlogPromoBanner() {
           color: "paragraph"
         }}
       >
-        Use{" "}
+        {strings.tagPromoWinText()[0]}{" "}
         <Text as="span" sx={{ fontWeight: "bold", color: "accent" }}>
-          #notesnook
+          {strings.tagPromoWinText()[1]}
         </Text>{" "}
-        and get a chance to win free promo codes.
+        {strings.tagPromoWinText()[2]}
       </Text>
       {/* <p>
         Listen. We want you to buy Notesnook Pro. It's as simple as that. Since

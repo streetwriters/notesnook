@@ -28,6 +28,7 @@ import { db } from "../common/db";
 import { showToast } from "../utils/toast";
 import { useStore as useSettingStore } from "../stores/setting-store";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 export type EditProfilePictureDialogProps = BaseDialogProps<boolean> & {
   profile?: Profile;
@@ -47,13 +48,13 @@ export const EditProfilePictureDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title={"Edit profile picture"}
-        description="Your profile data is stored 100% end-to-end encrypted."
+        title={strings.editProfilePicture()}
+        description={strings.editProfilePictureDesc()}
         onClose={() => props.onClose(false)}
         positiveButton={{
           loading: isLoading,
           disabled: isLoading,
-          text: "Save",
+          text: strings.save(),
           onClick: async () => {
             setIsLoading(true);
             try {
@@ -68,7 +69,7 @@ export const EditProfilePictureDialog = DialogManager.register(
                 profilePicture: pic
               });
               await useSettingStore.getState().refresh();
-              showToast("success", "Profile updated!");
+              showToast("success", strings.profileUpdated());
               props.onClose(true);
             } catch (e) {
               console.error(e);
@@ -78,7 +79,10 @@ export const EditProfilePictureDialog = DialogManager.register(
             }
           }
         }}
-        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => props.onClose(false)
+        }}
       >
         <Flex
           sx={{
@@ -129,8 +133,8 @@ export const EditProfilePictureDialog = DialogManager.register(
               }}
             >
               {profilePicture
-                ? "Change profile picture"
-                : "Select profile picture"}
+                ? strings.changeProfilePicture()
+                : strings.selectProfilePicture()}
             </Button>
             {profilePicture ? (
               <Button
@@ -144,7 +148,9 @@ export const EditProfilePictureDialog = DialogManager.register(
                   setScale(1);
                 }}
               >
-                {typeof profilePicture === "string" ? "Clear" : "Reset"}
+                {typeof profilePicture === "string"
+                  ? strings.clear()
+                  : strings.reset()}
               </Button>
             ) : null}
           </Flex>

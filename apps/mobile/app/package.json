@@ -41,7 +41,10 @@
     "@trpc/react-query": "10.45.2",
     "@trpc/server": "10.45.2",
     "@streetwriters/kysely": "^0.27.4",
-    "pathe": "1.1.2"
+    "pathe": "1.1.2",
+    "react-native-format-currency": "0.0.5",
+    "@lingui/react": "4.11.2",
+    "@lingui/core": "4.11.2"
   },
   "sideEffects": false
 }

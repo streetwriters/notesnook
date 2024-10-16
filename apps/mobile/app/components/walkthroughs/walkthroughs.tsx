@@ -41,6 +41,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { useThemeColors } from "@notesnook/theme";
 import { getContainerBorder } from "../../utils/colors";
+import { strings } from "@notesnook/intl";
 
 export type TStep = {
   text?: string;
@@ -109,7 +110,8 @@ const NotebookWelcome = () => {
           size={SIZE.xs}
           color={colors.secondary.paragraph}
         >
-          Notebook - {data?.count} notes
+          {strings.dataTypesCamelCase.notebook()} - {data?.count}{" "}
+          {strings.dataTypesPlural.note()}
         </Paragraph>
       </View>
     </View>

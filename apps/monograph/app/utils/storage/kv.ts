@@ -39,7 +39,14 @@ export async function read<T>(key: string, fallback: T): Promise<T> {
     const response = await WorkersKV.readKey({
       key
     });
-    return JSON.parse(response.result) || fallback;
+    if (typeof response === "object" && !response.success) {
+      console.error("failed:", response.errors);
+      return fallback;
+    }
+    return (
+      JSON.parse(typeof response === "string" ? response : response.result) ||
+      fallback
+    );
   } catch (e) {
     console.error(e);
     return fallback;
@@ -52,3 +59,5 @@ export async function write<T>(key: string, data: T) {
     value: JSON.stringify(data)
   });
 }
+
+read("spam-cache", "default").then(console.log);

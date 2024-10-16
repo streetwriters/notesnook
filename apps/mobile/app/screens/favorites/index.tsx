@@ -28,6 +28,7 @@ import SettingsService from "../../services/settings";
 import { useFavorites } from "../../stores/use-favorite-store";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { db } from "../../common/database";
+import { strings } from "@notesnook/intl";
 
 export const Favorites = ({
   navigation,
@@ -52,13 +53,13 @@ export const Favorites = ({
       <SelectionHeader id={route.name} items={favorites} type="note" />
       <Header
         renderedInRoute={route.name}
-        title={route.name}
+        title={strings.routes[route.name]()}
         canGoBack={false}
         hasSearch={true}
         id={route.name}
         onSearch={() => {
           Navigation.push("Search", {
-            placeholder: `Type a keyword to search in ${route.name?.toLowerCase()}`,
+            placeholder: strings.searchInRoute(route.name),
             type: "note",
             title: route.name,
             route: route.name,
@@ -76,11 +77,11 @@ export const Favorites = ({
           renderedInRoute="Favorites"
           loading={loading}
           placeholder={{
-            title: "Your favorites",
-            paragraph: "You have not added any notes to favorites yet.",
-            loading: "Loading your favorites"
+            title: strings.yourFavorites(),
+            paragraph: strings.favoritesEmpty(),
+            loading: strings.loadingFavorites()
           }}
-          headerTitle="Favorites"
+          headerTitle={strings.routes.Favorites()}
         />
       </DelayLayout>
     </>

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useRef, useState } from "react";
 import { MMKV } from "../common/database/mmkv";
+import { strings } from "@notesnook/intl";
 
 declare global {
   interface Array<T> {
@@ -53,7 +54,7 @@ type Context =
   | "topics";
 
 export type TTip = {
-  text: string;
+  text: () => string;
   contexts: Context[];
   image?: string;
   button?: TipButton;
@@ -61,7 +62,7 @@ export type TTip = {
 
 export type Popup = {
   id: string;
-  text: string;
+  text: () => string;
 };
 
 const destructiveContexts = ["first-note"];
@@ -143,71 +144,9 @@ export const useTip = (
   return tip;
 };
 
-const tips: TTip[] = [
-  {
-    text: "You can swipe left anywhere in the app to start a new note.",
-    contexts: ["notes", "first-note"]
-  },
-  {
-    text: "Long press on any item in list to enter multi-select mode.",
-    contexts: ["notes", "notebook", "notebook", "tags", "topics"]
-  },
-  {
-    text: "Monographs enable you to share your notes in a secure and private way.",
-    contexts: ["monographs"]
-  },
-  {
-    text: "Monographs can be encrypted with a secret key and shared with anyone.",
-    contexts: ["monographs"]
-  },
-  {
-    text: "You can pin frequently used Notebooks to the Side Menu to quickly access them.",
-    contexts: ["notebook", "notebooks"]
-  },
-  {
-    text: "A notebook can have unlimited topics with unlimited notes.",
-    contexts: ["notebook", "topics"]
-  },
-  {
-    text: "You can multi-select notes and move them to a notebook at once",
-    contexts: ["notebook", "topics"]
-  },
-  {
-    text: "Mark important notes by adding them to favorites.",
-    contexts: ["notes"]
-  },
-  {
-    text: "Are you scrolling a lot to find a specific note? Pin it to the top from Note properties.",
-    contexts: ["notes"]
-  },
-  {
-    text: "You can view & restore older versions of any note by going to its properties -> History.",
-    contexts: ["notes"]
-  }
-];
+const tips: TTip[] = strings.tips as TTip[];
 
-const popups: Popup[] = [
-  {
-    id: "sortmenu",
-    text: "Tap here to change sorting"
-  },
-  {
-    id: "jumpto",
-    text: "Tap here to jump to a section"
-  },
-  {
-    id: "compactmode",
-    text: "Try compact mode to fit more items on screen"
-  },
-  {
-    id: "searchreplace",
-    text: "Switch to search/replace mode"
-  },
-  {
-    id: "notebookshortcut",
-    text: "Create shortcut of this notebook in side menu"
-  }
-];
+const popups: Popup[] = strings.popups;
 
 const placeholderTips = [
   "Want to remember something? Pin an important note in notifications.",

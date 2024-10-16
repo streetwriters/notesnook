@@ -55,8 +55,8 @@ jobs:
         run: docker pull streetwriters/monograph:latest
 
       # Setup QEMU
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v2
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -72,7 +72,7 @@ jobs:
           file: apps/monograph/Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v8
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: streetwriters/monograph:latest
           cache-from: streetwriters/monograph:latest
 
       - name: Generate artifact attestation

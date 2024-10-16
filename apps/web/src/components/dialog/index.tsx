@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
-import { Flex, Text, Button, ButtonProps } from "@theme-ui/components";
-import { Loading, Close } from "../icons";
-import ReactModal from "react-modal";
-import { FlexScrollContainer } from "../scroll-container";
+import { Button, ButtonProps, Flex, Text } from "@theme-ui/components";
 import { SxProp } from "@theme-ui/core";
+import React from "react";
+import ReactModal from "react-modal";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { Close, Loading } from "../icons";
+import { FlexScrollContainer } from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
 
 ReactModal.setAppElement("#root");
@@ -137,7 +137,9 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                 sx={{
                   fontSize: "subheading",
                   textAlign: props.textAlignment || "left",
-                  color: "paragraph"
+                  color: "paragraph",
+                  overflowWrap: "anywhere",
+                  wordSpacing: "wrap"
                 }}
               >
                 {props.title}
@@ -148,7 +150,9 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                 variant="body"
                 sx={{
                   textAlign: props.textAlignment || "left",
-                  color: "var(--paragraph-secondary)"
+                  color: "var(--paragraph-secondary)",
+                  overflowWrap: "anywhere",
+                  wordSpacing: "wrap"
                 }}
               >
                 {props.description}
@@ -205,6 +209,12 @@ export function DialogButton(props: DialogButtonProps) {
       variant="dialog"
       disabled={props.disabled}
       onClick={props.disabled ? undefined : props.onClick}
+      sx={{
+        maxWidth: "100%",
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+        whiteSpace: "nowrap"
+      }}
     >
       {props.loading ? <Loading size={16} color="accent" /> : props.text}
     </Button>

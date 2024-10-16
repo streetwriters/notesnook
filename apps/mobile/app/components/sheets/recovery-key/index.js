@@ -43,6 +43,7 @@ import { QRCode } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import RNFetchBlob from "react-native-blob-util";
 import { sanitizeFilename } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 class RecoveryKeySheet extends React.Component {
   constructor(props) {
@@ -75,8 +76,8 @@ class RecoveryKeySheet extends React.Component {
   close = () => {
     if (this.tapCount === 0) {
       ToastManager.show({
-        heading: "Did you save recovery key?",
-        message: "Tap one more time to confirm.",
+        heading: strings.recoveryKeySaved(),
+        message: strings.recoveryKeySavedDesc(),
         type: "success",
         context: "local"
       });
@@ -129,9 +130,7 @@ class RecoveryKeySheet extends React.Component {
           await RNFetchBlob.fs.writeFile(path + fileName, data, "base64");
         }
         ToastManager.show({
-          heading: "Recovery key QR-Code saved",
-          message:
-            "QR-Code image has been saved to Gallery at " + path + fileName,
+          heading: strings.recoveryKeyQRCodeSaved(),
           type: "success",
           context: "local"
         });
@@ -164,8 +163,7 @@ class RecoveryKeySheet extends React.Component {
       }
 
       ToastManager.show({
-        heading: "Recovery key text file saved",
-        message: "Recovery key saved in text file.",
+        heading: strings.recoveryKeyTextFileSaved(),
         type: "success",
         context: "local"
       });
@@ -227,9 +225,8 @@ class RecoveryKeySheet extends React.Component {
           }}
         >
           <DialogHeader
-            title="Save account recovery key"
-            paragraph="If you forget your password, you can recover your
-            data and reset your password only using this recovery key."
+            title={strings.saveRecoveryKey()}
+            paragraph={strings.saveRecoveryKeyDesc()}
           />
 
           <View
@@ -284,20 +281,20 @@ class RecoveryKeySheet extends React.Component {
             onPress={() => {
               Clipboard.setString(this.state.key);
               ToastManager.show({
-                heading: "Recovery key copied!",
+                heading: strings.recoveryKeyCopied(),
                 type: "success",
                 context: "local"
               });
             }}
             icon="content-copy"
-            title="Copy to clipboard"
+            title={strings.copyToClipboard()}
             width="100%"
             type="secondaryAccented"
             fontSize={SIZE.md}
           />
           <Seperator />
           <Button
-            title="Save QR-Code to gallery"
+            title={strings.saveQRCode()}
             onPress={this.saveQRCODE}
             width="100%"
             type="secondaryAccented"
@@ -307,7 +304,7 @@ class RecoveryKeySheet extends React.Component {
           <Seperator />
           <Button
             onPress={this.saveToTextFile}
-            title="Save to text file"
+            title={strings.saveAsText()}
             width="100%"
             type="secondaryAccented"
             icon="text"
@@ -317,7 +314,7 @@ class RecoveryKeySheet extends React.Component {
 
           <Button
             onPress={this.shareFile}
-            title="Share to Cloud"
+            title={strings.shareToCloud()}
             width="100%"
             type="secondaryAccented"
             icon="cloud"
@@ -336,10 +333,10 @@ class RecoveryKeySheet extends React.Component {
               textAlign: "center"
             }}
           >
-            Tap twice to confirm you have saved the recovery key.
+            {strings.recoveryKeySavedConfirmation()}
           </Paragraph>
           <Button
-            title="I have saved the key."
+            title={strings.done()}
             width="100%"
             type="error"
             fontSize={SIZE.md}

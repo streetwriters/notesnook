@@ -92,6 +92,7 @@ import { tabBarRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { changeSystemBarColors } from "../stores/use-theme-store";
+import { strings } from "@notesnook/intl";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -266,7 +267,7 @@ const onSuccessfulSubscription = async (
 
 const onSubscriptionError = async (error: RNIap.PurchaseError) => {
   ToastManager.show({
-    heading: "Failed to subscribe",
+    heading: strings.failedToSubscribe(),
     type: "error",
     message: error.message,
     context: "local"

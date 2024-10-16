@@ -30,6 +30,7 @@ import {
   editorState
 } from "../../../screens/editor/tiptap/utils";
 import { FlatList } from "react-native-actions-sheet";
+import { strings } from "@notesnook/intl";
 
 type TableOfContentsItem = {
   level: number;
@@ -87,7 +88,7 @@ const TableOfContentsItem: React.FC<{
           }
           size={SIZE.md}
         >
-          {item?.title || "New note"}
+          {item?.title || strings.newNote()}
         </Paragraph>
       </View>
     </Pressable>
@@ -111,7 +112,7 @@ const TableOfContents = ({ toc, close }: TableOfContentsProps) => {
           alignItems: "center"
         }}
       >
-        <Heading size={SIZE.lg}>Table of contents</Heading>
+        <Heading size={SIZE.lg}>{strings.toc()}</Heading>
       </View>
 
       <FlatList

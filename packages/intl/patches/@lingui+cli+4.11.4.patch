@@ -1,0 +1,16 @@
+diff --git a/node_modules/@lingui/cli/dist/api/pseudoLocalize.js b/node_modules/@lingui/cli/dist/api/pseudoLocalize.js
+index 34f3952..83cbc1e 100644
+--- a/node_modules/@lingui/cli/dist/api/pseudoLocalize.js
++++ b/node_modules/@lingui/cli/dist/api/pseudoLocalize.js
+@@ -48,8 +48,9 @@ function default_1(message) {
+     message = addDelimiters(message);
+     message = (0, pseudolocale_1.default)(message, {
+         delimiter,
+-        prepend: "",
+-        append: "",
++        prepend: "[!!",
++        append: "!!]",
++        extend: 0.3
+     });
+     return removeDelimiters(message);
+ }

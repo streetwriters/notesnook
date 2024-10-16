@@ -31,6 +31,7 @@ import { ImageNode } from "../../extensions/image/index.js";
 import { Link as LinkNode } from "../../extensions/link/index.js";
 import { getMarkAttributes } from "@tiptap/core";
 import { useHoverPopupContext } from "../floating-menus/hover-popup/context.js";
+import { strings } from "@notesnook/intl";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
@@ -291,7 +292,7 @@ function LinkTool(props: LinkToolProps) {
           align: "center",
           yOffset: 5
         }}
-        title={isEditing ? "Edit link" : "Insert link"}
+        title={isEditing ? strings.editLink() : strings.insertLink()}
         isOpen={isOpen}
         items={[]}
         onClose={() => {

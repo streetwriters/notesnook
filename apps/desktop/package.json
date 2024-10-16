@@ -11,6 +11,8 @@
   "repository": "https://github.com/streetwriters/notesnook",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "@lingui/core": "4.11.4",
+    "@notesnook/intl": "file:../../packages/intl",
     "@trpc/client": "10.45.2",
     "@trpc/server": "10.45.2",
     "better-sqlite3-multiple-ciphers": "11.2.1",
@@ -27,7 +29,7 @@
     "@types/yargs": "^17.0.33",
     "chokidar": "^4.0.1",
     "electron": "^30.5.1",
-    "electron-builder": "^25.0.5",
+    "electron-builder": "^25.1.7",
     "esbuild": "^0.24.0",
     "node-abi": "^3.68.0",
     "node-gyp-build": "^4.8.2",

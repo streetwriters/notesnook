@@ -23,25 +23,9 @@ import { useThemeColors } from "@notesnook/theme";
 import { SIZE } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 import { getFormattedDate } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 export const DateMeta = ({ item }) => {
   const { colors } = useThemeColors();
-
-  const getNameFromKey = (key) => {
-    switch (key) {
-      case "dateCreated":
-        return "Created at:";
-      case "dateEdited":
-        return "Last edited at:";
-      case "dateModified":
-        return "Last modified at:";
-      case "dateDeleted":
-        return "Deleted at:";
-      case "dateUploaded":
-        return "Uploaded at:";
-      default:
-        return key;
-    }
-  };
 
   function getDateMeta() {
     let keys = Object.keys(item);
@@ -64,7 +48,7 @@ export const DateMeta = ({ item }) => {
         }}
       >
         <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
-          {getNameFromKey(key)}
+          {strings.dateDescFromKey(key)}
         </Paragraph>
         <Paragraph size={SIZE.xs} color={colors.secondary.paragraph}>
           {getFormattedDate(item[key], "date-time")}

@@ -36,6 +36,7 @@ import { ConfirmDialog } from "../dialogs/confirm";
 import { db } from "./db";
 import { toAsyncIterator } from "@notesnook-importer/core/dist/src/utils/stream";
 import { saveAs } from "file-saver";
+import { strings } from "@notesnook/intl";
 
 export async function exportToPDF(
   title: string,
@@ -86,8 +87,8 @@ export async function exportNotes(
 ): Promise<boolean> {
   const result = await TaskManager.startTask({
     type: "modal",
-    title: "Exporting notes",
-    subtitle: "Please wait while your notes are exported.",
+    title: strings.exportingNotes(),
+    subtitle: strings.exportingNotesDesc(),
     action: async (report) => {
       const errors: Error[] = [];
       const exportStream = new ExportStream(report, (e) => errors.push(e));
@@ -107,7 +108,7 @@ export async function exportNotes(
     ConfirmDialog.show({
       title: `Export failed`,
       message: result.stack || result.message,
-      positiveButtonText: "Okay"
+      positiveButtonText: strings.okay()
     });
     return false;
   } else {
@@ -119,7 +120,7 @@ export async function exportNotes(
 
 ${result.errors.map((e, i) => `${i + 1}. ${e.message}`).join("\n")}`
           : "Export completed with 0 errors.",
-      positiveButtonText: "Okay"
+      positiveButtonText: strings.okay()
     });
     return true;
   }
@@ -151,8 +152,8 @@ export async function exportNote(
 
   return await TaskManager.startTask({
     type: "modal",
-    title: `Exporting "${note.title}"`,
-    subtitle: "Please wait while your note is exported.",
+    title: strings.exportingNote(note.title),
+    subtitle: strings.exportingNoteDesc(),
     action: async (report) => {
       const hasAttachments =
         (await db.relations.from(note, "attachment").count()) > 0;

@@ -39,6 +39,7 @@ import {
 } from "../../utils/prosemirror.js";
 import { DesktopOnly } from "../../components/responsive/index.js";
 import { TextDirections } from "../text-direction/index.js";
+import { strings } from "@notesnook/intl";
 
 export function TableComponent(props: ReactNodeViewProps) {
   const { editor, node, forwardRef } = props;
@@ -262,7 +263,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
     >
       <TableProperties
         editor={editor}
-        title="Table properties"
+        title={strings.tableSettings()}
         icon="more"
         variant={"small"}
       />

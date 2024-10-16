@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Button, Text } from "@theme-ui/components";
 import { FlexScrollContainer } from "../../../components/scroll-container";
 import { useSpellChecker } from "../../../hooks/use-spell-checker";
+import { strings } from "@notesnook/intl";
 
 export function DictionaryWords() {
   const words = useSpellChecker((store) => store.words);
@@ -36,10 +37,11 @@ export function DictionaryWords() {
         }}
       >
         <Text variant="body" sx={{ my: 1 }}>
-          You have {words.length} custom dictionary words.
+          {strings.customDictWords(words.length)}
         </Text>
         {words.map((word) => (
           <Button
+            key={word}
             variant="menuitem"
             sx={{ textAlign: "left", p: 1 }}
             onClick={() => deleteWord(word)}

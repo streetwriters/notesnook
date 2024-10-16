@@ -33,6 +33,7 @@ import { Toast } from "../../toast";
 import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
+import { strings } from "@notesnook/intl";
 
 const HEX_COLOR_REGEX_ALPHA =
   /^#(?:(?:[\da-fA-F]{3}){1,2}|(?:[\da-fA-F]{4}){1,2})$/;
@@ -148,31 +149,31 @@ const ColorPicker = ({
               }}
               testID="color-title-input"
               defaultValue={title.current}
-              placeholder={title.current || "Color title"}
+              placeholder={title.current || strings.colorTitle()}
             />
 
             <Button
-              title="Add color"
+              title={strings.addColor()}
               style={{
                 marginBottom: 10
               }}
               onPress={async () => {
                 if (!selectedColor)
                   return ToastManager.error(
-                    new Error("Select a color"),
+                    new Error(strings.noColorSelected()),
                     undefined,
                     "color-picker"
                   );
                 if (!title.current)
                   return ToastManager.error(
-                    new Error("Enter a title for the color")
+                    new Error(strings.allFieldsRequired())
                   );
                 const exists = await db.colors.all.find((v) =>
                   v.and([v(`colorCode`, "==", selectedColor)])
                 );
                 if (exists)
                   return ToastManager.error(
-                    new Error(`Color #${selectedColor} already exists`)
+                    new Error(strings.colorExists(selectedColor))
                   );
                 const id = await db.colors.add({
                   title: title.current,

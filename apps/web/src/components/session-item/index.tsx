@@ -23,6 +23,7 @@ import { Flex, Text } from "@theme-ui/components";
 import TimeAgo from "../time-ago";
 import { Lock } from "../icons";
 import { useEditorStore } from "../../stores/editor-store";
+import { strings } from "@notesnook/intl";
 
 type SessionItemProps = {
   session: HistorySession;
@@ -47,7 +48,7 @@ export function SessionItem(props: SessionItemProps) {
         alignItems: "center",
         justifyContent: "space-between"
       }}
-      title="Click to preview"
+      title={strings.clickToPreview()}
       onClick={() =>
         useEditorStore.getState().openDiffSession(noteId, session.id)
       }

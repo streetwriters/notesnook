@@ -29,6 +29,7 @@ import { Loading } from "../../../components/icons";
 import { Features } from "../../buy-dialog/features";
 import { ConfirmDialog } from "../../confirm";
 import { BuyDialog } from "../../buy-dialog";
+import { strings } from "@notesnook/intl";
 
 const PROVIDER_MAP = {
   0: "Streetwriters",
@@ -108,7 +109,7 @@ export function SubscriptionStatus() {
             color: "accent"
           }}
         >
-          CURRENT PLAN
+          {strings.currentPlan()}
         </Text>
         <Text
           variant="heading"
@@ -144,27 +145,24 @@ export function SubscriptionStatus() {
                       title: "Cancel subscription?",
                       message:
                         "Cancelling your subscription will automatically downgrade you to the Basic plan at the end of your billing period. You will have to resubscribe to continue using the Pro features.",
-                      negativeButtonText: "No",
-                      positiveButtonText: "Yes"
+                      negativeButtonText: strings.no(),
+                      positiveButtonText: strings.yes()
                     });
                     if (cancelSubscription) {
                       await TaskManager.startTask({
                         type: "modal",
                         title: "Cancelling your subscription",
-                        subtitle: "Please wait...",
+                        subtitle: strings.pleaseWait() + "...",
                         action: () => db.subscriptions.cancel()
                       })
                         .catch((e) => showToast("error", e.message))
                         .then(() =>
-                          showToast(
-                            "success",
-                            "Your subscription has been canceled."
-                          )
+                          showToast("success", strings.subCanceled())
                         );
                     }
                   }}
                 >
-                  Cancel subscription
+                  {strings.cancelSub()}
                 </Button>
               )}
               <Button
@@ -174,23 +172,18 @@ export function SubscriptionStatus() {
                     title: "Request refund?",
                     message:
                       "You will only be issued a refund if you are eligible as per our refund policy. Your account will be immediately downgraded to Basic and your funds will be transferred to your account within 24 hours.",
-                    negativeButtonText: "No",
-                    positiveButtonText: "Yes"
+                    negativeButtonText: strings.no(),
+                    positiveButtonText: strings.yes()
                   });
                   if (refundSubscription) {
                     await TaskManager.startTask({
                       type: "modal",
                       title: "Requesting refund for your subscription",
-                      subtitle: "Please wait...",
+                      subtitle: strings.pleaseWait() + "...",
                       action: () => db.subscriptions.refund()
                     })
                       .catch((e) => showToast("error", e.message))
-                      .then(() =>
-                        showToast(
-                          "success",
-                          "Your refund has been issued. Please wait 24 hours before reaching out to us in case you do not receive your funds."
-                        )
-                      );
+                      .then(() => showToast("success", strings.refundIssued()));
                   }
                 }}
               >
@@ -201,7 +194,7 @@ export function SubscriptionStatus() {
           {!isPro && (
             <>
               <Button variant="accent" onClick={() => BuyDialog.show({})}>
-                {isProCancelled ? "Resubscribe" : "Upgrade to Pro"}
+                {isProCancelled ? strings.resubToPro() : strings.upgradeToPro()}
               </Button>
               {isBasic && (
                 <Button
@@ -212,7 +205,7 @@ export function SubscriptionStatus() {
                   {isActivatingTrial ? (
                     <Loading size={16} />
                   ) : (
-                    "Try free for 14 days"
+                    strings.tryFreeFor14Days()
                   )}
                 </Button>
               )}

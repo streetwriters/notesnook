@@ -26,6 +26,7 @@ import { useState } from "react";
 import { useSessionState } from "../hooks/use-session-state";
 import Accordion from "../components/accordion";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 let interval = 0;
 type EmailVerificationDialogProps = BaseDialogProps<boolean>;
@@ -65,10 +66,8 @@ export const EmailVerificationDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title={"Confirm your email"}
-        description={
-          "Check your spam folder if you haven't received an email yet."
-        }
+        title={strings.confirmEmail()}
+        description={strings.confirmEmailDesc()}
         onClose={() => props.onClose(false)}
         positiveButton={{
           text: canSendAgain || isSending ? "Resend" : `Resend (${resetTimer})`,
@@ -87,7 +86,7 @@ export const EmailVerificationDialog = DialogManager.register(
           disabled: isSending || !canSendAgain
         }}
         negativeButton={{
-          text: "Cancel",
+          text: strings.cancel(),
           onClick: () => props.onClose(true),
           disabled: isSending
         }}
@@ -98,15 +97,11 @@ export const EmailVerificationDialog = DialogManager.register(
             variant="body"
             sx={{ borderRadius: "default", alignSelf: "stretch" }}
           >
-            We have sent the email confirmation link at{" "}
-            <Text as="b" sx={{ color: "accent" }}>
-              {user.email}
-            </Text>
-            .
+            {strings.emailConfirmationLinkSent()}
           </Text>
           <Accordion
             isClosed
-            title={"What do I do if I am not getting the email?"}
+            title={strings.confirmEmailTroubleshoot()}
             sx={{
               mt: 2,
               bg: "var(--background-secondary)",
@@ -114,10 +109,9 @@ export const EmailVerificationDialog = DialogManager.register(
             }}
           >
             <Text variant={"body"} px={1} pb={1}>
-              {`If you didn't get an email from us or the confirmation link isn't
-            working,`}{" "}
-              <b>please send us an email from your registered email address</b>{" "}
-              and we will manually confirm your account.
+              {strings.confirmEmailTroubleshootNotice()[0]}{" "}
+              <b>{strings.confirmEmailTroubleshootNotice()[1]}</b>{" "}
+              {strings.confirmEmailTroubleshootNotice()[2]}.
             </Text>
           </Accordion>
         </Flex>

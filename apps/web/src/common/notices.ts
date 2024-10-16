@@ -29,6 +29,7 @@ import { showToast } from "../utils/toast";
 import { TaskScheduler } from "../utils/task-scheduler";
 import { BuyDialog } from "../dialogs/buy-dialog";
 import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
+import { strings } from "@notesnook/intl";
 
 export type NoticeType = "autoBackupsOff" | "login" | "email" | "recoverykey";
 
@@ -140,30 +141,30 @@ type NoticeData = {
 export const NoticesData: Record<NoticeType, NoticeData> = {
   autoBackupsOff: {
     key: "autoBackupsOff",
-    title: "Automatic backups disabled",
-    subtitle: "Please upgrade to Pro to enable automatic backups.",
+    title: strings.automaticBackupsDisabled(),
+    subtitle: strings.automaticBackupsDisabledDesc(),
     action: () => BuyDialog.show({}),
     dismissable: true,
     icon: Backup
   },
   login: {
     key: "login",
-    title: "Login to sync your notes",
-    subtitle: "You are not logged in",
+    title: strings.loginMessageActionText(),
+    subtitle: strings.loginMessage(),
     action: () => hardNavigate("/login"),
     icon: User
   },
   email: {
     key: "email",
-    title: "Your email is not confirmed",
-    subtitle: "Please confirm your email to sync your notes",
+    title: strings.emailNotConfirmed(),
+    subtitle: strings.emailNotConfirmedDesc(),
     action: () => hashNavigate("/email/verify"),
     icon: Email
   },
   recoverykey: {
     key: "recoverykey",
-    title: "Backup your recovery key",
-    subtitle: "Keep your recovery key safe",
+    title: strings.recoveryKeyMessageActionText(),
+    subtitle: strings.recoveryKeyMessage(),
     dismissable: true,
     action: async () => {
       if (await verifyAccount()) await RecoveryKeyDialog.show({});
@@ -205,10 +206,10 @@ async function saveBackup(mode: "full" | "partial" = "partial") {
     if (openedToast !== null) return;
     openedToast = showToast(
       "success",
-      "Your backup is ready for download.",
+      strings.backupReadyToDownload(),
       [
         {
-          text: "Later",
+          text: strings.later(),
           onClick: async () => {
             await db.backup.updateBackupTime();
             openedToast?.hide();
@@ -217,7 +218,7 @@ async function saveBackup(mode: "full" | "partial" = "partial") {
           type: "paragraph"
         },
         {
-          text: "Download",
+          text: strings.network.download(),
           onClick: async () => {
             await createBackup({ mode });
             openedToast?.hide();

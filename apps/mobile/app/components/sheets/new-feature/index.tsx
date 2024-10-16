@@ -31,6 +31,7 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 export type FeatureType = {
   title: string;
   body: string;
@@ -56,7 +57,7 @@ const NewFeature = ({
       }}
     >
       <Heading color={colors.secondary.heading} size={SIZE.md}>
-        {!version ? "New version " : `v${version} `}Highlights 🎉
+        {!version ? `${strings.newVersion()} ` : `v${version} `}Highlights 🎉
       </Heading>
 
       <Seperator />
@@ -81,7 +82,7 @@ const NewFeature = ({
       <Seperator />
 
       <Button
-        title="Got it"
+        title={strings.gotIt()}
         type="accent"
         width={250}
         style={{

@@ -30,13 +30,12 @@ import { eSendEvent, presentSheet } from "./event-manager";
 import PremiumService from "./premium";
 import SettingsService from "./settings";
 import { Update } from "../components/sheets/update";
+import { strings } from "@notesnook/intl";
 
 const rateAppMessage = {
   visible: true,
-  message: "We would love to know what you think",
-  actionText:
-    "Rate Notesnook on " +
-    `${Platform.OS === "ios" ? "App store" : "Play store"}`,
+  message: strings.rateAppMessage(),
+  actionText: strings.rateAppActionText(Platform.OS),
   onPress: () => {
     eSendEvent(eOpenRateDialog);
   },
@@ -51,8 +50,8 @@ export function setRateAppMessage() {
 
 const recoveryKeyMessage = {
   visible: true,
-  message: "Keep your data safe",
-  actionText: "Save your account recovery key",
+  message: strings.recoveryKeyMessage(),
+  actionText: strings.recoveryKeyMessageActionText(),
   onPress: () => {
     verifyUser(
       null,
@@ -80,8 +79,8 @@ export function setRecoveryKeyMessage() {
 
 const loginMessage = {
   visible: true,
-  message: "You are not logged in",
-  actionText: "Login to encrypt and sync notes",
+  message: strings.loginMessage(),
+  actionText: strings.loginMessageActionText(),
   onPress: () => {
     eSendEvent(eOpenLoginDialog);
   },
@@ -96,8 +95,8 @@ export function setLoginMessage() {
 
 const emailMessage = {
   visible: true,
-  message: "Email not confirmed",
-  actionText: "Please confirm your email to sync notes.",
+  message: strings.syncDisabled(),
+  actionText: strings.syncDisabledActionText(),
   onPress: () => {
     PremiumService.showVerifyEmailDialog();
   },
@@ -125,8 +124,8 @@ export function clearMessage() {
 
 const autoBackupsOff = {
   visible: true,
-  message: "Automatic backups turned off",
-  actionText: "Get Notesnook Pro to enable automatic backups",
+  message: strings.autoBackupsOffMessage(),
+  actionText: strings.autoBackupsOffActionText(),
   onPress: () => {
     clearMessage();
   },
@@ -141,8 +140,8 @@ export function setAutobackOffMessage() {
 
 const updateAvailableMessage = (version) => ({
   visible: true,
-  message: "New update available",
-  actionText: "Tap here to update to the latest version",
+  message: strings.newUpdateMessage(),
+  actionText: strings.newUpdateActionText(),
   onPress: () => {
     presentSheet({
       component: (ref) => <Update version={version} fwdRef={ref} />

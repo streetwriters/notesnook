@@ -49,6 +49,7 @@ import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import Input from "../../ui/input";
 import Seperator from "../../ui/seperator";
+import { strings } from "@notesnook/intl";
 
 export const AppLockPassword = () => {
   const { colors } = useThemeColors();
@@ -119,22 +120,7 @@ export const AppLockPassword = () => {
         }}
       >
         <DialogHeader
-          title={
-            mode === "change"
-              ? `Change app lock ${keyboardType}`
-              : mode === "remove"
-              ? `Remove app lock ${keyboardType}`
-              : `Set up app lock ${keyboardType}`
-          }
-          paragraph={
-            mode === "change"
-              ? `Change app lock ${keyboardType}`
-              : mode === "remove"
-              ? `Enter ${
-                  accountPass ? "account password" : `app lock ${keyboardType}`
-                } to remove ${keyboardType}`
-              : `Set up a custom app lock ${keyboardType} to unlock the app`
-          }
+          title={strings.changeAppLockCredentials(mode, keyboardType)}
           icon="shield"
           padding={12}
         />
@@ -157,11 +143,15 @@ export const AppLockPassword = () => {
               }}
               defaultValue={values.current.currentPassword}
               autoComplete="password"
-              returnKeyLabel="Next"
+              returnKeyLabel={strings.next()}
               keyboardType={keyboardType === "pin" ? "number-pad" : "default"}
               returnKeyType="next"
               secureTextEntry={secureTextEntry}
-              placeholder={`Current ${keyboardType}`}
+              placeholder={
+                keyboardType === "pin"
+                  ? strings.currentPin()
+                  : strings.currentPassword()
+              }
             />
           ) : null}
 
@@ -179,7 +169,9 @@ export const AppLockPassword = () => {
               keyboardType === "pin" && !accountPass ? "number-pad" : "default"
             }
             autoComplete="password"
-            returnKeyLabel={mode !== "remove" ? "Next" : "Remove"}
+            returnKeyLabel={
+              mode !== "remove" ? strings.next() : strings.remove()
+            }
             returnKeyType={mode !== "remove" ? "next" : "done"}
             secureTextEntry={secureTextEntry}
             buttonLeft={
@@ -206,10 +198,14 @@ export const AppLockPassword = () => {
             }
             placeholder={
               accountPass
-                ? "Account password"
+                ? strings.enterAccountPassword()
                 : mode === "change"
-                ? `New ${keyboardType}`
-                : `${keyboardType === "pin" ? "Pin" : "Password"}`
+                ? keyboardType === "pin"
+                  ? strings.newPin()
+                  : strings.newPassword()
+                : `${
+                    keyboardType === "pin" ? strings.pin() : strings.password()
+                  }`
             }
           />
 
@@ -228,10 +224,14 @@ export const AppLockPassword = () => {
               customValidator={() => values.current.password || ""}
               validationType="confirmPassword"
               autoComplete="password"
-              returnKeyLabel="Done"
+              returnKeyLabel={strings.done()}
               returnKeyType="done"
               secureTextEntry={secureTextEntry}
-              placeholder={`Confirm ${keyboardType}`}
+              placeholder={
+                keyboardType === "pin"
+                  ? strings.confirmPin()
+                  : strings.confirmPassword()
+              }
             />
           ) : null}
 
@@ -253,7 +253,7 @@ export const AppLockPassword = () => {
                 iconColor={
                   accountPass ? colors.primary.accent : colors.primary.icon
                 }
-                title="Use account password instead"
+                title={strings.useAccountPassword()}
                 style={{
                   width: "100%",
                   alignSelf: "flex-start",
@@ -272,7 +272,7 @@ export const AppLockPassword = () => {
             if (mode === "create") {
               if (!values.current.password || !values.current.confirmPassword) {
                 ToastManager.error(
-                  new Error("All inputs are required"),
+                  new Error(strings.allFieldsRequired()),
                   undefined,
                   "local"
                 );
@@ -281,11 +281,7 @@ export const AppLockPassword = () => {
 
               if (values.current.password !== values.current.confirmPassword) {
                 ToastManager.error(
-                  new Error(
-                    `${
-                      keyboardType === "pin" ? "Pin" : "Password"
-                    } does not match`
-                  ),
+                  new Error(strings.mismatch(keyboardType)),
                   undefined,
                   "local"
                 );
@@ -301,7 +297,7 @@ export const AppLockPassword = () => {
                 !values.current.confirmPassword
               ) {
                 ToastManager.error(
-                  new Error("All inputs are required"),
+                  new Error(strings.allFieldsRequired()),
                   undefined,
                   "local"
                 );
@@ -310,11 +306,7 @@ export const AppLockPassword = () => {
 
               if (values.current.password !== values.current.confirmPassword) {
                 ToastManager.error(
-                  new Error(
-                    `${
-                      keyboardType === "pin" ? "Pin" : "Password"
-                    } does not match`
-                  ),
+                  new Error(strings.mismatch(keyboardType)),
                   undefined,
                   "local"
                 );
@@ -326,9 +318,7 @@ export const AppLockPassword = () => {
 
               if (!isCurrentPasswordCorrect) {
                 ToastManager.error(
-                  new Error(
-                    `${keyboardType === "pin" ? "Pin" : "Password"} incorrect`
-                  ),
+                  new Error(strings.incorrect(keyboardType)),
                   undefined,
                   "local"
                 );
@@ -342,7 +332,7 @@ export const AppLockPassword = () => {
             } else if (mode === "remove") {
               if (!values.current.password) {
                 ToastManager.error(
-                  new Error("All inputs are required"),
+                  new Error(strings.allFieldsRequired()),
                   undefined,
                   "local"
                 );
@@ -357,10 +347,8 @@ export const AppLockPassword = () => {
                 ToastManager.error(
                   new Error(
                     accountPass
-                      ? "Account password incorrect"
-                      : `${
-                          keyboardType === "pin" ? "Pin" : "Password"
-                        } incorrect`
+                      ? strings.passwordIncorrect()
+                      : strings.incorrect(keyboardType)
                   ),
                   undefined,
                   "local"
@@ -377,7 +365,7 @@ export const AppLockPassword = () => {
                 SettingsService.setProperty("appLockEnabled", false);
                 SettingsService.setPrivacyScreen(SettingsService.get());
                 ToastManager.show({
-                  message: "App lock disabled",
+                  message: strings.applockDisabled(),
                   type: "success"
                 });
               }
@@ -391,9 +379,13 @@ export const AppLockPassword = () => {
             close();
           }}
           positiveTitle={
-            mode === "remove" ? "Remove" : mode === "change" ? "Change" : "Save"
+            mode === "remove"
+              ? strings.remove()
+              : mode === "change"
+              ? strings.change()
+              : strings.save()
           }
-          negativeTitle="Cancel"
+          negativeTitle={strings.cancel()}
           positiveType="transparent"
           loading={false}
           doneText=""

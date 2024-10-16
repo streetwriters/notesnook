@@ -42,11 +42,12 @@ import { FILE_SIZE_LIMIT, IMAGE_SIZE_LIMIT } from "../../../utils/constants";
 import { eCloseSheet } from "../../../utils/events";
 import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
+import { strings } from "@notesnook/intl";
 
 const showEncryptionSheet = (file: DocumentPickerResponse) => {
   presentSheet({
-    title: "Encrypting attachment",
-    paragraph: `Please wait while we encrypt ${file.name} file for upload`,
+    title: strings.encryptingAttachment(),
+    paragraph: strings.encryptingAttachmentDesc(file.name),
     icon: "attachment"
   });
 };
@@ -92,8 +93,8 @@ const file = async (fileOptions: PickerOptions) => {
 
     if ((file.size || 0) > FILE_SIZE_LIMIT) {
       ToastManager.show({
-        heading: "File too large",
-        message: "The maximum allowed size per file is 500 MB",
+        heading: strings.fileTooLarge(),
+        message: strings.fileTooLargeDesc(500),
         type: "error"
       });
       return;
@@ -101,7 +102,7 @@ const file = async (fileOptions: PickerOptions) => {
 
     if (file.copyError) {
       ToastManager.show({
-        heading: "Failed to open file",
+        heading: strings.failToOpen(),
         message: file.copyError,
         type: "error",
         context: "global"
@@ -166,8 +167,7 @@ const file = async (fileOptions: PickerOptions) => {
   } catch (e) {
     eSendEvent(eCloseSheet);
     ToastManager.show({
-      heading: "Failed to attach file",
-      message: (e as Error).message,
+      heading: (e as Error).message,
       type: "error",
       context: "global"
     });
@@ -231,7 +231,6 @@ const gallery = async (options: PickerOptions) => {
     useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
     ToastManager.show({
       heading: (e as Error).message,
-      message: "You need internet access to attach a file",
       type: "error",
       context: "global"
     });
@@ -289,8 +288,8 @@ const handleImageResponse = async (
 
     if (image.size > IMAGE_SIZE_LIMIT) {
       ToastManager.show({
-        heading: "File too large",
-        message: "The maximum allowed size per image is 50 MB",
+        heading: strings.fileTooLarge(),
+        message: strings.fileTooLargeDesc(50),
         type: "error"
       });
       return;
@@ -361,8 +360,7 @@ export async function attachFile(
     let encryptionInfo: any;
     if (options?.hash && options.hash !== hash) {
       ToastManager.show({
-        heading: "Please select the same file for reuploading",
-        message: `Expected hash ${options.hash} but got ${hash}.`,
+        heading: strings.fileMismatch(),
         type: "error",
         context: "local"
       });

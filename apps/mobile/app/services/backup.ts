@@ -39,6 +39,7 @@ import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
+import { strings } from "@notesnook/intl";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -90,16 +91,15 @@ async function checkBackupDirExists(reset = false, context = "global") {
         return;
       }
       presentDialog({
-        title: "Select backup folder",
-        paragraph:
-          "Please select a folder where you would like to store backup files.",
+        title: strings.selectBackupDir(),
+        paragraph: strings.selectBackupDirDesc(),
         positivePress: async () => {
           resolve(await getDirectoryAndroid());
         },
         onClose: () => {
           resolve(null);
         },
-        positiveText: "Select",
+        positiveText: strings.select(),
         context: context
       });
     });
@@ -110,14 +110,10 @@ async function checkBackupDirExists(reset = false, context = "global") {
 
 async function presentBackupCompleteSheet(backupFilePath: string) {
   presentSheet({
-    title: "Backup complete",
+    title: strings.backupComplete(),
     icon: "cloud-upload",
-    paragraph: `${
-      Platform.OS === "android"
-        ? 'Backup file saved in "Notesnook backups" folder on your phone'
-        : "Backup file is saved in File Manager/Notesnook folder"
-    }. Share your backup to your cloud so you do not lose it.`,
-    actionText: "Share backup",
+    paragraph: strings.backupSaved(Platform.OS),
+    actionText: strings.shareBackup(),
     actionsArray: [
       {
         action: () => {
@@ -134,7 +130,7 @@ async function presentBackupCompleteSheet(backupFilePath: string) {
             } as any).catch(console.log);
           }
         },
-        actionText: "Share"
+        actionText: strings.share()
       },
       {
         action: async () => {
@@ -143,7 +139,7 @@ async function presentBackupCompleteSheet(backupFilePath: string) {
             showBackupCompleteSheet: false
           });
         },
-        actionText: "Never ask again",
+        actionText: strings.neverAskAgain(),
         type: "secondary"
       }
     ]
@@ -175,7 +171,7 @@ async function run(
 
   if (!androidBackupDirectory)
     return {
-      error: new Error("Backup directory not selected"),
+      error: new Error(strings.backupDirectoryNotSelected()),
       report: false
     };
 
@@ -195,10 +191,10 @@ async function run(
   );
 
   if (progress) {
-    startProgress({
-      title: `Creating ${backupType === "full" ? "a full " : ""}backup`,
-      paragraph: `Please wait while we create a backup of your data. This may take a few minutes.`,
-      progress: undefined
+    presentSheet({
+      title: strings.backingUpData(backupType),
+      paragraph: strings.backupDataDesc(),
+      progress: true
     });
   }
 
@@ -294,7 +290,7 @@ async function run(
     }
 
     ToastManager.show({
-      heading: "Backup successful",
+      heading: strings.backupSuccess(),
       type: "success",
       context: "global"
     });
@@ -303,7 +299,7 @@ async function run(
       path: path
     };
   } catch (e) {
-    ToastManager.error(e as Error, "Backup failed", context || "global");
+    ToastManager.error(e, strings.backupFailed(), context || "global");
 
     if (
       (e as Error)?.message?.includes("android.net.Uri") &&

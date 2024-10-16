@@ -25,6 +25,7 @@ import Field from "../components/field";
 import { Loading } from "../components/icons";
 import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type EmailChangeState = {
   newEmail: string;
@@ -64,18 +65,19 @@ export const EmailChangeDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title={"Change account email"}
-        description={
-          "Your account email will be changed without affecting your subscription or any other settings."
-        }
+        title={strings.changeEmail()}
+        description={strings.changeEmailDesc()}
         onClose={() => props.onClose(false)}
         positiveButton={{
-          text: "Next",
+          text: strings.next(),
           disabled: isLoading,
           loading: isLoading,
           form: "changeEmailForm"
         }}
-        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => props.onClose(false)
+        }}
       >
         <Flex
           id="changeEmailForm"
@@ -128,8 +130,8 @@ export const EmailChangeDialog = DialogManager.register(
               inputRef={codeRef}
               id="code"
               name="code"
-              label="6-digit code"
-              helpText={`Enter 6-digit code sent to ${emailChangeState.newEmail}`}
+              label={strings.sixDigitCode()}
+              helpText={strings.enterSixDigitCode()}
               type="text"
               required
               action={{
@@ -139,9 +141,9 @@ export const EmailChangeDialog = DialogManager.register(
                     {isSending ? (
                       <Loading size={18} />
                     ) : enabled ? (
-                      `Resend code`
+                      strings.resendCode()
                     ) : (
-                      `Resend in ${elapsed}`
+                      strings.resendCode(elapsed)
                     )}
                   </Text>
                 ),
@@ -156,7 +158,7 @@ export const EmailChangeDialog = DialogManager.register(
                 inputRef={emailRef}
                 id="newEmail"
                 name="newEmail"
-                label="New email"
+                label={strings.newEmail()}
                 type="email"
                 required
               />
@@ -164,12 +166,12 @@ export const EmailChangeDialog = DialogManager.register(
                 inputRef={passwordRef}
                 id="password"
                 name="password"
-                label="Your account password"
+                label={strings.accountPassword()}
                 type="password"
                 required
               />
               <Text variant="subBody" sx={{ mt: 1 }}>
-                You will be logged out from all your other devices.
+                {strings.changeEmailNotice()}
               </Text>
             </>
           )}

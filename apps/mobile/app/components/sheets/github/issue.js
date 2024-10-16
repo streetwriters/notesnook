@@ -34,6 +34,7 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { strings } from "@notesnook/intl";
 
 export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
   const { colors } = useThemeColors();
@@ -75,8 +76,7 @@ Logged in: ${user ? "yes" : "no"}`,
     } catch (e) {
       setLoading(false);
       ToastManager.show({
-        heading: "An error occured",
-        message: e.message,
+        heading: e.message,
         type: "error"
       });
     }
@@ -99,14 +99,14 @@ Logged in: ${user ? "yes" : "no"}`,
               gap: 10
             }}
           >
-            <Heading>Issue submitted</Heading>
+            <Heading>{strings.issueCreatedHeading()}</Heading>
             <Paragraph
               style={{
                 textAlign: "center"
               }}
               selectable={true}
             >
-              You can track your issue at{" "}
+              {strings.issueCreatedDesc[0]()}
               <Paragraph
                 style={{
                   textDecorationLine: "underline",
@@ -118,12 +118,11 @@ Logged in: ${user ? "yes" : "no"}`,
               >
                 {issueUrl.current}
               </Paragraph>
-              . Please note that we will respond to your issue on the given
-              link. We recommend that you save it.
+              . {strings.issueCreatedDesc[1]()}
             </Paragraph>
 
             <Button
-              title="Open issue"
+              title={strings.openIssue()}
               onPress={() => {
                 Linking.openURL(issueUrl.current);
               }}
@@ -135,18 +134,14 @@ Logged in: ${user ? "yes" : "no"}`,
       ) : (
         <>
           <DialogHeader
-            title={issueTitle || "Report issue"}
-            paragraph={
-              issueTitle
-                ? "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
-                : "Let us know if you have faced any issue/bug while using Notesnook."
-            }
+            title={issueTitle || strings.issueTitle()}
+            paragraph={issueTitle ? strings.issueDesc() : strings.issueDesc2()}
           />
 
           <Seperator half />
 
           <TextInput
-            placeholder="Title"
+            placeholder={strings.title()}
             onChangeText={(v) => (title.current = v)}
             defaultValue={title.current}
             style={{
@@ -165,13 +160,7 @@ Logged in: ${user ? "yes" : "no"}`,
           <TextInput
             ref={bodyRef}
             multiline
-            placeholder={`Tell us more about the issue you are facing. 
-
-For example:
-- What were you trying to do in the app?
-- What did you expect to happen?
-- Steps to reproduce the issue 
-- Things you have tried etc.`}
+            placeholder={strings.issuePlaceholder()}
             numberOfLines={5}
             textAlignVertical="top"
             onChangeText={(v) => (body.current = v)}
@@ -211,7 +200,7 @@ For example:
           <Seperator />
           <Button
             onPress={onPress}
-            title={loading ? null : "Submit"}
+            title={loading ? null : strings.submit()}
             loading={loading}
             width="100%"
             type="accent"
@@ -225,10 +214,10 @@ For example:
               textAlign: "center"
             }}
           >
-            The information above will be publically available at{" "}
+            {strings.issueNotice[0]()}{" "}
             <Text
               onPress={() => {
-                Linking.openURL("https://github.com/streetwriters/notesnook");
+                Linking.openURL("https://github.com/streetwriters/notesnook/issues");
               }}
               style={{
                 textDecorationLine: "underline",
@@ -237,8 +226,7 @@ For example:
             >
               github.com/streetwriters/notesnook.
             </Text>{" "}
-            If you want to ask something in general or need some assistance, we
-            would suggest that you{" "}
+            {strings.issueNotice[1]()}{" "}
             <Text
               style={{
                 textDecorationLine: "underline",
@@ -255,7 +243,7 @@ For example:
                 }
               }}
             >
-              join our community on Discord.
+              {strings.issueNotice[2]()}
             </Text>
           </Paragraph>
         </>

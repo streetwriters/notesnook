@@ -23,6 +23,7 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { NoticesData } from "../../common/notices";
 import { Dismiss } from "../icons";
 import Config from "../../utils/config";
+import { strings } from "@notesnook/intl";
 
 function Notice() {
   const notices = useAppStore((store) => store.notices);
@@ -86,7 +87,7 @@ function Notice() {
           onClick={(e) => {
             e.stopPropagation();
             const dontShowAgain = window.confirm(
-              "Don't show again on this device?"
+              strings.dontShowAgainConfirm()
             );
             dismissNotices(notice);
             if (dontShowAgain) {

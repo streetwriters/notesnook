@@ -64,6 +64,7 @@ import { Pro } from "../../../components/icons";
 
 import { Icon } from "@notesnook/ui";
 import { CURRENT_TOOLBAR_VERSION } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 export function CustomizeToolbar() {
   const sensors = useSensors(
@@ -118,7 +119,10 @@ export function CustomizeToolbar() {
             <Label
               key={preset.id}
               variant="text.body"
-              sx={{ alignItems: "center", width: "auto" }}
+              sx={{
+                alignItems: "center",
+                width: "auto"
+              }}
             >
               <input
                 id={preset.id.toString()}
@@ -134,7 +138,7 @@ export function CustomizeToolbar() {
                   if (preset.id === "custom" && !isUserPremium()) {
                     showToast(
                       "info",
-                      "You need to be Pro to use the custom preset."
+                      strings.upgradeToProToUseFeature("customPresets")
                     );
                     return;
                   }
@@ -142,7 +146,15 @@ export function CustomizeToolbar() {
                   setCurrentPreset(getPreset(value as PresetId));
                 }}
               />
-              <span style={{ marginLeft: 5 }}>{preset.title}</span>
+              <span
+                style={{
+                  marginLeft: 5,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis"
+                }}
+              >
+                {preset.title}
+              </span>
               {preset.id === "custom" && !isUserPremium() ? (
                 <Pro color="accent" size={18} sx={{ ml: 1 }} />
               ) : null}
@@ -158,10 +170,10 @@ export function CustomizeToolbar() {
               alignItems: "center",
               p: 1
             }}
-            title="Add group"
+            title={strings.createAGroup()}
             onClick={() => {
               setItems(addGroup);
-              showToast("success", "Group added successfully");
+              showToast("success", strings.groupAdded());
             }}
           >
             <Icon path={Icons.plus} color="paragraph" size={18} />
@@ -174,7 +186,10 @@ export function CustomizeToolbar() {
         collisionDetection={closestCenter}
         cancelDrop={() => {
           if (!isUserPremium()) {
-            showToast("error", "You need to be Pro to customize the toolbar.");
+            showToast(
+              "error",
+              strings.upgradeToProToUseFeature("customizeToolbar")
+            );
             return true;
           }
           return false;
@@ -232,7 +247,7 @@ export function CustomizeToolbar() {
                   canAddSubGroup
                     ? () => {
                         setItems((items) => addSubGroup(items, item.id));
-                        showToast("success", "Subgroup added successfully");
+                        showToast("success", strings.subgroupAdded());
                       }
                     : undefined
                 }
@@ -479,7 +494,7 @@ function createGroup(config: Partial<Group>): Group {
     type: "group",
     id: getId(),
     depth: 0,
-    title: "Group",
+    title: strings.group(),
     ...config
   };
 }
@@ -499,7 +514,7 @@ function createTrash() {
   return createGroup({
     id: "trash",
     depth: 0,
-    title: "Disabled items"
+    title: strings.disabled()
   });
 }
 
@@ -688,7 +703,7 @@ function addSubGroup(items: TreeNode[], groupId: string) {
   newArray.splice(
     group.index + group.items.length,
     0,
-    createGroup({ title: "Subgroup 1", depth: 1 })
+    createGroup({ title: strings.subgroupOne(), depth: 1 })
   );
   return newArray;
 }

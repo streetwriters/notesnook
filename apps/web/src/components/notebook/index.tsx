@@ -45,6 +45,7 @@ import { handleDrop } from "../../common/drop-handler";
 import { useDragHandler } from "../../hooks/use-drag-handler";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { strings } from "@notesnook/intl";
 
 type NotebookProps = {
   item: NotebookType;
@@ -95,7 +96,7 @@ function Notebook(props: NotebookProps) {
         <>
           {compact ? (
             <>
-              <Text variant="subBody">{pluralize(totalNotes, "note")}</Text>
+              <Text variant="subBody">{strings.notes(totalNotes)}</Text>
             </>
           ) : (
             <>
@@ -130,7 +131,7 @@ function Notebook(props: NotebookProps) {
                   •
                 </Text>
                 <Text sx={{ color: "inherit" }}>
-                  {pluralize(totalNotes, "note")}
+                  {strings.notes(totalNotes)}
                 </Text>
               </Flex>
             </>
@@ -164,14 +165,14 @@ export const notebookMenuItems: (
     {
       type: "button",
       key: "edit",
-      title: "Edit",
+      title: strings.edit(),
       icon: NotebookEdit.path,
       onClick: () => hashNavigate(`/notebooks/${notebook.id}/edit`)
     },
     {
       type: "button",
       key: "set-as-default",
-      title: "Set as default",
+      title: strings.setAsDefault(),
       isChecked: defaultNotebook === notebook.id,
       icon: NotebookIcon.path,
       onClick: async () => {
@@ -186,7 +187,7 @@ export const notebookMenuItems: (
       type: "button",
       key: "pin",
       icon: Pin.path,
-      title: "Pin",
+      title: strings.pin(),
       isChecked: notebook.pinned,
       onClick: () => store.pin(!notebook.pinned, ...ids),
       multiSelect: true
@@ -198,22 +199,22 @@ export const notebookMenuItems: (
         ? RemoveShortcutLink.path
         : Shortcut.path,
       title: db.shortcuts.exists(notebook.id)
-        ? "Remove shortcut"
-        : "Create shortcut",
+        ? strings.removeShortcut()
+        : strings.addShortcut(),
       onClick: () => appStore.addToShortcuts(notebook)
     },
     { key: "sep", type: "separator" },
     {
       type: "button",
       key: "movetotrash",
-      title: "Move to trash",
+      title: strings.moveToTrash(),
       variant: "dangerous",
       icon: Trash.path,
       onClick: async () => {
         const result = await ConfirmDialog.show({
           title: `Delete ${pluralize(ids.length, "notebook")}?`,
-          positiveButtonText: `Yes`,
-          negativeButtonText: "No",
+          positiveButtonText: strings.yes(),
+          negativeButtonText: strings.no(),
           checks: {
             deleteContainingNotes: {
               text: `Move all notes in ${

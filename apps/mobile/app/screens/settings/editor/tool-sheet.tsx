@@ -33,6 +33,7 @@ import {
   getUngroupedTools
 } from "./toolbar-definition";
 import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
+import { strings } from "@notesnook/intl";
 
 export default function ToolSheet({
   group,
@@ -124,7 +125,7 @@ export default function ToolSheet({
             }}
             color={colors.secondary.paragraph}
           >
-            You have grouped all the tools.
+            {strings.groupedAllTools()}
           </Paragraph>
         ) : (
           ungrouped.map(renderTool)

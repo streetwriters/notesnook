@@ -37,6 +37,8 @@ import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { PressableProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import { isStringLiteralOrJsxExpression } from "typescript";
+import { strings } from "@notesnook/intl";
 
 type RelationsListProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -114,9 +116,7 @@ export const RelationsList = ({
             size={60}
             color={colors.primary.icon}
           />
-          <Paragraph>
-            No {referenceType}s linked to this {item.type}.
-          </Paragraph>
+          <Paragraph>{strings.noLinksFound()}</Paragraph>
           <Button
             onPress={() => {
               onAdd?.();
@@ -125,7 +125,7 @@ export const RelationsList = ({
             //  width="100%"
             type="inverted"
             icon="plus"
-            title={`Add a ${referenceType}`}
+            title={strings.addItem(referenceType)}
           />
         </View>
       ) : (

@@ -36,6 +36,20 @@ import { bringToFront } from "./utils/bring-to-front";
 import { bridge } from "./api/bridge";
 import { setupDesktopIntegration } from "./utils/desktop-integration";
 import { disableCustomDns, enableCustomDns } from "./utils/custom-dns";
+import { Messages, setI18nGlobal } from "@notesnook/intl";
+import { i18n } from "@lingui/core";
+
+const locale =
+  process.env.NODE_ENV === "development"
+    ? import("@notesnook/intl/dist/locales/$pseudo-LOCALE.json")
+    : import("@notesnook/intl/dist/locales/$en.json");
+locale.then(({ default: locale }) => {
+  i18n.load({
+    en: locale.messages as unknown as Messages
+  });
+  i18n.activate("en");
+});
+setI18nGlobal(i18n);
 
 // only run a single instance
 if (!MAC_APP_STORE && !app.requestSingleInstanceLock()) {

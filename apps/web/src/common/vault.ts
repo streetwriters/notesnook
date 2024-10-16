@@ -21,19 +21,20 @@ import { db } from "./db";
 import { showPasswordDialog } from "../dialogs/password-dialog";
 import { showToast } from "../utils/toast";
 import { VAULT_ERRORS } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 
 class Vault {
   static async createVault() {
     if (await db.vault.exists()) return false;
     return showPasswordDialog({
-      title: "Create your vault",
-      subtitle: "A vault stores your notes in a password-encrypted storage.",
+      title: strings.createVault(),
+      subtitle: strings.createVaultDesc(),
       inputs: {
-        password: { label: "Password", autoComplete: "new-password" }
+        password: { label: strings.password(), autoComplete: "new-password" }
       },
       validate: async ({ password }) => {
         await db.vault.create(password);
-        showToast("success", "Vault created.");
+        showToast("success", strings.vaultCreated());
         return true;
       }
     });
@@ -43,11 +44,13 @@ class Vault {
     if (!(await db.vault.exists())) return false;
 
     return showPasswordDialog({
-      title: "Clear your vault",
-      subtitle:
-        "Enter vault password to unlock and remove all notes from the vault.",
+      title: strings.clearVault(),
+      subtitle: strings.clearVaultDesc(),
       inputs: {
-        password: { label: "Password", autoComplete: "current-password" }
+        password: {
+          label: strings.password(),
+          autoComplete: "current-password"
+        }
       },
       validate: async ({ password }) => {
         await db.vault.clear(password);
@@ -59,14 +62,17 @@ class Vault {
   static async deleteVault() {
     if (!(await db.vault.exists())) return false;
     const result = await showPasswordDialog({
-      title: "Delete your vault",
-      subtitle: "Enter your account password to delete your vault.",
+      title: strings.deleteVault(),
+      subtitle: strings.deleteVaultDesc(),
       inputs: {
-        password: { label: "Password", autoComplete: "current-password" }
+        password: {
+          label: strings.password(),
+          autoComplete: "current-password"
+        }
       },
       checks: {
         deleteAllLockedNotes: {
-          text: "Delete all locked notes?",
+          text: strings.deleteAllNotes(),
           default: false
         }
       },
@@ -83,10 +89,13 @@ class Vault {
 
   static unlockVault() {
     return showPasswordDialog({
-      title: "Unlock vault",
-      subtitle: "Please enter your vault password to continue.",
+      title: strings.unlockVault(),
+      subtitle: strings.unlockVaultDesc(),
       inputs: {
-        password: { label: "Password", autoComplete: "current-password" }
+        password: {
+          label: strings.password(),
+          autoComplete: "current-password"
+        }
       },
       validate: ({ password }) => {
         return db.vault.unlock(password).catch(() => false);
@@ -96,18 +105,21 @@ class Vault {
 
   static changeVaultPassword() {
     return showPasswordDialog({
-      title: "Change vault password",
-      subtitle: "All locked notes will be re-encrypted with the new password.",
+      title: strings.changeVaultPassword(),
+      subtitle: strings.changeVaultPasswordDesc(),
       inputs: {
         oldPassword: {
-          label: "Old password",
+          label: strings.oldPassword(),
           autoComplete: "current-password"
         },
-        newPassword: { label: "New password", autoComplete: "new-password" }
+        newPassword: {
+          label: strings.newPassword(),
+          autoComplete: "new-password"
+        }
       },
       validate: async ({ oldPassword, newPassword }) => {
         await db.vault.changePassword(oldPassword, newPassword);
-        showToast("success", "Vault password changed.");
+        showToast("success", strings.passwordChangedSuccessfully());
         return true;
       }
     });
@@ -115,10 +127,13 @@ class Vault {
 
   static unlockNote(id: string) {
     return showPasswordDialog({
-      title: "Unlock note",
-      subtitle: "Your note will be unencrypted and removed from the vault.",
+      title: strings.unlockNote(),
+      subtitle: strings.unlockNoteDesc(),
       inputs: {
-        password: { label: "Password", autoComplete: "current-password" }
+        password: {
+          label: strings.password(),
+          autoComplete: "current-password"
+        }
       },
       validate: async ({ password }) => {
         return db.vault
@@ -156,10 +171,13 @@ class Vault {
 
   static askPassword(action: (password: string) => Promise<boolean>) {
     return showPasswordDialog({
-      title: "Unlock vault",
-      subtitle: "Please enter your vault password to continue.",
+      title: strings.unlockVault(),
+      subtitle: strings.unlockVaultDesc(),
       inputs: {
-        password: { label: "Password", autoComplete: "current-password" }
+        password: {
+          label: strings.password(),
+          autoComplete: "current-password"
+        }
       },
       validate: async ({ password }) => {
         return action(password);

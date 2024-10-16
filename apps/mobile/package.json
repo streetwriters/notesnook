@@ -39,13 +39,14 @@
     "@notesnook/core": "file:../../packages/core",
     "@notesnook/editor": "file:../../packages/editor",
     "@notesnook/editor-mobile": "file:../../packages/editor-mobile",
+    "@notesnook/intl": "file:../../packages/intl",
     "@notesnook/logger": "file:../../packages/logger",
     "@notesnook/theme": "file:../../packages/theme",
     "@notesnook/themes-server": "file:../../servers/themes",
     "diffblazer": "^1.0.1",
     "react": "18.2.0",
     "react-native": "0.74.5",
-    "react-native-mmkv-storage": "^0.10.2",
-    "react-native-actions-sheet": "^0.9.7"
+    "react-native-actions-sheet": "^0.9.7",
+    "react-native-mmkv-storage": "^0.10.2"
   }
 }

@@ -27,6 +27,7 @@
     "@theme-ui/core": "^0.16.2",
     "buffer": "^6.0.3",
     "comlink": "^4.4.1",
+    "date-fns": "^4.1.0",
     "html-to-text": "^9.0.5",
     "isbot": "^5.1.17",
     "mac-scrollbar": "^0.13.6",

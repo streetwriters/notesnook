@@ -41,6 +41,7 @@ import { showToast } from "../../../utils/toast";
 import { showFilePicker, readFile } from "../../../utils/file-picker";
 import { VirtualizedGrid } from "../../../components/virtualized-grid";
 import { ThemeDetailsDialog } from "../../theme-details-dialog";
+import { strings } from "@notesnook/intl";
 
 const ThemesClient = ThemesTRPC.createClient({
   links: [
@@ -62,9 +63,9 @@ export function ThemesSelector() {
 }
 
 const COLOR_SCHEMES = [
-  { id: "all", title: "All" },
-  { id: "dark", title: "Dark" },
-  { id: "light", title: "Light" }
+  { id: "all", title: strings.all() },
+  { id: "dark", title: strings.dark() },
+  { id: "light", title: strings.light() }
 ] as const;
 
 function ThemesList() {
@@ -134,7 +135,10 @@ function ThemesList() {
       } catch (e) {
         console.error(e);
         if (e instanceof Error)
-          showToast("error", "Failed to install theme. Error: " + e.message);
+          showToast(
+            "error",
+            `${strings.failedToInstallTheme()}. Error: ` + e.message
+          );
       } finally {
         setIsApplying(false);
       }
@@ -145,7 +149,7 @@ function ThemesList() {
   return (
     <>
       <Input
-        placeholder="Search themes"
+        placeholder={strings.searchThemes()}
         sx={{ mt: 2 }}
         onChange={debounce((e) => setSearchQuery(e.target.value), 500)}
       />
@@ -202,7 +206,7 @@ function ThemesList() {
               flexShrink: 0
             }}
           >
-            Load from file
+            {strings.loadFromFile()}
           </Button>
         </Flex>
       </Flex>
@@ -213,7 +217,7 @@ function ThemesList() {
         }}
       >
         {themes.isInitialLoading ? (
-          <Loader title={"Loading themes..."} />
+          <Loader title={strings.loadingThemes()} />
         ) : (
           <VirtualizedGrid
             columns={2}
@@ -299,8 +303,10 @@ function ThemeItem(props: ThemeItemProps) {
           >
             {isApplying ? (
               <Loading color="accent" size={18} />
+            ) : theme.colorScheme === "dark" ? (
+              strings.setAsDarkTheme()
             ) : (
-              `Set as ${theme.colorScheme}`
+              strings.setAsLightTheme()
             )}
           </Button>
         )}

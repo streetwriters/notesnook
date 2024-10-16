@@ -25,6 +25,7 @@ import tinycolor from "tinycolor2";
 import { db } from "../common/db";
 import { showToast } from "../utils/toast";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { strings } from "@notesnook/intl";
 
 type CreateColorDialogProps = BaseDialogProps<string | false>;
 export const CreateColorDialog = DialogManager.register(
@@ -35,14 +36,17 @@ export const CreateColorDialog = DialogManager.register(
       <Dialog
         testId="new-color-dialog"
         isOpen={true}
-        title={"Create a new color"}
+        title={strings.newColor()}
         onClose={() => props.onClose(false)}
         positiveButton={{
           form: "colorForm",
           type: "submit",
-          text: "Create"
+          text: strings.create()
         }}
-        negativeButton={{ text: "Cancel", onClick: () => props.onClose(false) }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => props.onClose(false)
+        }}
       >
         <Box
           as="form"
@@ -53,10 +57,7 @@ export const CreateColorDialog = DialogManager.register(
               new FormData(e.target as HTMLFormElement).entries()
             ) as { color: string; title: string };
             if (!tinycolor(form.color, { format: "hex" }).isValid()) {
-              showToast(
-                "error",
-                "Please enter a valid hex color (e.g. #ffffff)"
-              );
+              showToast("error", strings.invalidHexColor());
               return;
             }
             const colorId = await db.colors.add({
@@ -68,7 +69,7 @@ export const CreateColorDialog = DialogManager.register(
         >
           <Field
             required
-            label="Title"
+            label={strings.title()}
             id="title"
             name="title"
             autoFocus
@@ -78,7 +79,7 @@ export const CreateColorDialog = DialogManager.register(
             <Field
               inputRef={colorRef}
               required
-              label="Color"
+              label={strings.color()}
               id="color"
               name="color"
               data-test-id="color-input"

@@ -39,22 +39,36 @@ function Toggle(props: ToggleProps) {
         cursor: "pointer",
         alignItems: "center",
         justifyContent: "space-between",
+        gap: 1,
 
         "& label": { width: "auto", flexShrink: 0 }
       }}
       data-test-id={props.testId}
       onClick={() => onToggle(!isOn)}
     >
-      <Text
-        variant="body"
-        sx={{ alignItems: "center", color: "paragraph", display: "flex" }}
+      <Flex
+        sx={{
+          alignItems: "center",
+
+          display: "flex"
+        }}
         data-test-id={`toggle-state-${isOn ? "on" : "off"}`}
       >
         <ToggleIcon size={13} sx={{ flexShrink: 0, mr: 1 }} />
-        {label}
-      </Text>
+        <Text
+          variant="body"
+          sx={{
+            color: "paragraph",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap"
+          }}
+        >
+          {label}
+        </Text>
+      </Flex>
       <Switch
-        sx={{ m: 0, bg: isOn ? "accent" : "icon-secondary" }}
+        sx={{ m: 0, bg: isOn ? "accent" : "icon-secondary", flexShrink: 0 }}
         checked={isOn}
         onClick={(e) => e.stopPropagation()}
       />

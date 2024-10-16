@@ -26,6 +26,7 @@ import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { ListLoader } from "../components/loaders/list-loader";
 import { ConfirmDialog } from "../dialogs/confirm";
+import { strings } from "@notesnook/intl";
 
 function Trash() {
   useNavigate("trash", store.refresh);
@@ -46,21 +47,21 @@ function Trash() {
       button={{
         onClick: function () {
           ConfirmDialog.show({
-            title: "Clear Trash",
-            subtitle: "Are you sure you want to clear all the trash?",
-            positiveButtonText: "Clear trash",
-            negativeButtonText: "Cancel",
-            message: `Are you sure you want to proceed? **This action is IRREVERSIBLE**.`
+            title: strings.clearTrash(),
+            subtitle: strings.clearTrashDesc(),
+            positiveButtonText: strings.clear(),
+            negativeButtonText: strings.cancel(),
+            message: strings.areYouSure()
           }).then(async (res) => {
             if (res) {
               try {
                 await clearTrash();
-                showToast("success", "Trash cleared successfully!");
+                showToast("success", strings.trashCleared());
               } catch (e) {
                 if (e instanceof Error)
                   showToast(
                     "error",
-                    `Could not clear trash. Error: ${e.message}`
+                    `${strings.couldNotClearTrash()}. Error: ${e.message}`
                   );
               }
             }

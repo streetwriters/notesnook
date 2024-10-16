@@ -29,6 +29,8 @@ import { SectionGroup } from "./section-group";
 import { settingsGroups } from "./settings-data";
 import { RouteParams, SettingSection } from "./types";
 import SettingsUserSection from "./user-section";
+import { strings } from "@notesnook/intl";
+
 const keyExtractor = (item: SettingSection) => item.id;
 
 const Home = ({
@@ -53,7 +55,7 @@ const Home = ({
     <>
       <Header
         renderedInRoute="Settings"
-        title="Settings"
+        title={strings.routes.Settings()}
         canGoBack={false}
         id="Settings"
       />

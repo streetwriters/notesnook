@@ -19,7 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { MetaFunction } from "@remix-run/node";
 import { generateMetaDescriptors } from "../utils/meta";
-import { Box, Button, Flex, Text } from "@theme-ui/components";
+import {
+  Box,
+  Button,
+  ButtonProps,
+  Flex,
+  LinkProps,
+  Text
+} from "@theme-ui/components";
 import {
   mdiDeleteForeverOutline,
   mdiLockOutline,
@@ -29,14 +36,26 @@ import { MonographChat } from "../components/monograph-chat";
 import { Icon } from "@notesnook/ui";
 import { Footer } from "../components/footer";
 import { Header } from "../components/header";
+import { ForwardRef } from "@theme-ui/components/dist/declarations/src/types";
+import { PUBLIC_URL } from "../utils/env";
 
 export const meta: MetaFunction = () => {
   return generateMetaDescriptors({
-    title: "Monograph",
+    titleShort: "Monograph",
+    titleFull: "Monograph",
+    type: "website",
+    url: PUBLIC_URL,
+    imageUrl: `${PUBLIC_URL}/social.png`,
     description:
       "Anonymous, secure and encrypted note sharing with password protection."
   });
 };
+
+const ButtonLink = Button as ForwardRef<
+  HTMLButtonElement,
+  ButtonProps & LinkProps
+>;
+
 const features = [
   {
     name: "Share notes",
@@ -100,16 +119,24 @@ export default function Monograph() {
           }}
           mt={6}
         >
-          <Button variant="accent">Publish a note</Button>
-          <Button
+          <ButtonLink
+            variant="accent"
+            href="https://app.notesnook.com/"
+            target="_blank"
+          >
+            Publish a note
+          </ButtonLink>
+          <ButtonLink
             variant="secondary"
             sx={{
               bg: "background-secondary",
               border: "1px solid var(--border)"
             }}
+            href="https://help.notesnook.com/publish-notes-with-monographs"
+            target="_blank"
           >
             How it works
-          </Button>
+          </ButtonLink>
         </Flex>
 
         <MonographChat
