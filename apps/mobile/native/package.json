@@ -118,6 +118,7 @@
     "terser-webpack-plugin": "^5.3.5",
     "ts-jest": "^29.1.1",
     "webpack-cli": "^5.1.4",
-    "webpack": "^5.88.2"
+    "webpack": "^5.88.2",
+    "acorn-import-attributes": "1.9.5"
   }
 }
