@@ -63,7 +63,7 @@ import { debounce, debounceWithId } from "@notesnook/common";
 import { Freeze } from "react-freeze";
 import { UnlockView } from "../unlock";
 import DiffViewer from "../diff-viewer";
-import TableOfContents from "./table-of-contents";
+import TableOfContents, { TABLE_OF_CONTENTS_WIDTH } from "./table-of-contents";
 import { scrollIntoViewById } from "@notesnook/editor";
 import { IEditor } from "./types";
 import { EditorActionBar } from "./action-bar";
@@ -568,6 +568,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
   const editorMargins = useEditorStore((store) => store.editorMargins);
   const editorContainerRef = useRef<HTMLElement>(null);
   const editorScrollRef = useRef<HTMLElement>(null);
+  const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
 
   useEffect(() => {
     if (!editorScrollRef.current) return;
@@ -624,9 +625,15 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           variant="columnFill"
           className="editor"
           sx={{
-            alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
+            alignSelf: [
+              "stretch",
+              focusMode ? "center" : "stretch",
+              !editorMargins ? (isTOCVisible ? "stretch" : "center") : "center"
+            ],
             maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
-            width: "100%"
+            width: isTOCVisible
+              ? `calc(100% - ${TABLE_OF_CONTENTS_WIDTH}px)`
+              : "100%"
           }}
           pl={[2, 2, 6]}
           pr={[2, 2, 6]}
