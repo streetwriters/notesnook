@@ -32,7 +32,7 @@ import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { InteractionManager, Platform } from "react-native";
 import Share from "react-native-share";
-import { db } from "../common/database";
+import { DatabaseLogger, db } from "../common/database";
 import { AttachmentDialog } from "../components/attachments";
 import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
@@ -650,35 +650,40 @@ export const useActions = ({
     }
 
     async function shareNote() {
-      if (item.type !== "note") return;
-
-      if (processingId.current === "shareNote") {
-        ToastManager.show({
-          heading: strings.pleaseWait() + "...",
-          context: "local"
-        });
-        return;
-      }
-      if (!checkItemSynced()) return;
-      if (locked) {
-        close();
-        await sleep(300);
-        openVault({
-          item: item,
-          novault: true,
-          locked: true,
-          share: true,
-          title: strings.shareNote()
-        });
-      } else {
-        processingId.current = "shareNote";
-        const convertedText = await convertNoteToText(item);
+      try {
+        if (item.type !== "note") return;
+        if (processingId.current === "shareNote") {
+          ToastManager.show({
+            heading: strings.pleaseWait() + "...",
+            context: "local"
+          });
+          return;
+        }
+        if (!checkItemSynced()) return;
+        if (locked) {
+          close();
+          await sleep(300);
+          openVault({
+            item: item,
+            novault: true,
+            locked: true,
+            share: true,
+            title: strings.shareNote()
+          });
+        } else {
+          processingId.current = "shareNote";
+          const convertedText = await convertNoteToText(item);
+          processingId.current = undefined;
+          Share.open({
+            title: strings.shareNote(),
+            failOnCancel: false,
+            message: convertedText || ""
+          });
+        }
+      } catch (e) {
+        ToastManager.error(e as Error);
+        DatabaseLogger.error(e);
         processingId.current = undefined;
-        Share.open({
-          title: strings.shareNote(),
-          failOnCancel: false,
-          message: convertedText || ""
-        });
       }
     }
 
@@ -761,7 +766,8 @@ export const useActions = ({
           });
         }
       } catch (e) {
-        console.error(e);
+        processingId.current = undefined;
+        DatabaseLogger.error(e);
         ToastManager.error(e as Error);
       }
     }
