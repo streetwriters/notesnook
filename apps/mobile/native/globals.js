@@ -12,10 +12,10 @@ import "./polyfills/console-time.js"
 global.Buffer = require('buffer').Buffer;
 import '../app/common/logger/index';
 import { DOMParser } from './worker.js';
+import { ScriptManager, Script } from '@callstack/repack/client';
 global.DOMParser = DOMParser;
 import {setI18nGlobal } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
-import { ScriptManager, Script } from '@callstack/repack/client';
 import {
   messages as $en
 } from "@notesnook/intl/dist/locales/$en.json";
