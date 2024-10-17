@@ -193,45 +193,49 @@ export async function deleteDCacheFiles() {
 }
 
 export async function exists(filename) {
-  let path = `${cacheDir}/${filename}`;
+  try {
+    let path = `${cacheDir}/${filename}`;
 
-  const iosAppGroup =
-    Platform.OS === "ios"
-      ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
-      : null;
-  const appGroupPath = `${iosAppGroup}/${filename}`;
+    const iosAppGroup =
+      Platform.OS === "ios"
+        ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+        : null;
+    const appGroupPath = `${iosAppGroup}/${filename}`;
 
-  let exists = await RNFetchBlob.fs.exists(path);
+    let exists = await RNFetchBlob.fs.exists(path);
 
-  // Check if file is present in app group path.
-  let existsInAppGroup = false;
-  if (!exists && Platform.OS === "ios") {
-    existsInAppGroup = await RNFetchBlob.fs.exists(appGroupPath);
-  }
-
-  if (exists || existsInAppGroup) {
-    const attachment = await db.attachments.attachment(filename);
-    const totalChunks = Math.ceil(attachment.size / attachment.chunkSize);
-    const totalAbytes = totalChunks * ABYTES;
-    const expectedFileSize = attachment.size + totalAbytes;
-
-    const stat = await RNFetchBlob.fs.stat(
-      existsInAppGroup ? appGroupPath : path
-    );
-
-    if (stat.size !== expectedFileSize) {
-      DatabaseLogger.log(
-        `File size mismatch: ${filename}, expected: ${expectedFileSize}, actual: ${stat.size}`
-      );
-      RNFetchBlob.fs
-        .unlink(existsInAppGroup ? appGroupPath : path)
-        .catch(console.log);
-      return false;
+    // Check if file is present in app group path.
+    let existsInAppGroup = false;
+    if (!exists && Platform.OS === "ios") {
+      existsInAppGroup = await RNFetchBlob.fs.exists(appGroupPath);
     }
 
-    exists = true;
+    if (exists || existsInAppGroup) {
+      const attachment = await db.attachments.attachment(filename);
+      const totalChunks = Math.ceil(attachment.size / attachment.chunkSize);
+      const totalAbytes = totalChunks * ABYTES;
+      const expectedFileSize = attachment.size + totalAbytes;
+
+      const stat = await RNFetchBlob.fs.stat(
+        existsInAppGroup ? appGroupPath : path
+      );
+
+      if (stat.size !== expectedFileSize) {
+        DatabaseLogger.log(
+          `File size mismatch: ${filename}, expected: ${expectedFileSize}, actual: ${stat.size}`
+        );
+        RNFetchBlob.fs
+          .unlink(existsInAppGroup ? appGroupPath : path)
+          .catch(console.log);
+        return false;
+      }
+
+      exists = true;
+    }
+    return exists;
+  } catch (e) {
+    return false;
   }
-  return exists;
 }
 
 export async function bulkExists(files) {
