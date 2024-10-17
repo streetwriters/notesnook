@@ -126,9 +126,13 @@ export async function clearFileStorage() {
 }
 
 export async function createCacheDir() {
-  if (!(await RNFetchBlob.fs.exists(cacheDir))) {
-    await RNFetchBlob.fs.mkdir(cacheDir);
-    DatabaseLogger.log("Cache directory created");
+  try {
+    if (!(await RNFetchBlob.fs.exists(cacheDir))) {
+      await RNFetchBlob.fs.mkdir(cacheDir);
+      DatabaseLogger.log("Cache directory created");
+    }
+  } catch (e) {
+    DatabaseLogger.error(e);
   }
 }
 
@@ -189,64 +193,76 @@ export async function deleteDCacheFiles() {
 }
 
 export async function exists(filename) {
-  let path = `${cacheDir}/${filename}`;
+  try {
+    let path = `${cacheDir}/${filename}`;
 
-  const iosAppGroup =
-    Platform.OS === "ios"
-      ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
-      : null;
-  const appGroupPath = `${iosAppGroup}/${filename}`;
-
-  let exists = await RNFetchBlob.fs.exists(path);
-
-  // Check if file is present in app group path.
-  let existsInAppGroup = false;
-  if (!exists && Platform.OS === "ios") {
-    existsInAppGroup = await RNFetchBlob.fs.exists(appGroupPath);
-  }
-
-  if (exists || existsInAppGroup) {
-    const attachment = await db.attachments.attachment(filename);
-    const totalChunks = Math.ceil(attachment.size / attachment.chunkSize);
-    const totalAbytes = totalChunks * ABYTES;
-    const expectedFileSize = attachment.size + totalAbytes;
-
-    const stat = await RNFetchBlob.fs.stat(
-      existsInAppGroup ? appGroupPath : path
-    );
-
-    if (stat.size !== expectedFileSize) {
-      DatabaseLogger.log(
-        `File size mismatch: ${filename}, expected: ${expectedFileSize}, actual: ${stat.size}`
-      );
-      RNFetchBlob.fs
-        .unlink(existsInAppGroup ? appGroupPath : path)
-        .catch(console.log);
-      return false;
-    }
-
-    exists = true;
-  }
-  return exists;
-}
-
-export async function bulkExists(files) {
-  const cacheFiles = await RNFetchBlob.fs.ls(cacheDir);
-  let missingFiles = files.filter((file) => !cacheFiles.includes(file));
-
-  if (Platform.OS === "ios") {
     const iosAppGroup =
       Platform.OS === "ios"
         ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
         : null;
-    const appGroupFiles = await RNFetchBlob.fs.ls(iosAppGroup);
-    missingFiles = missingFiles.filter((file) => !appGroupFiles.includes(file));
-  }
+    const appGroupPath = `${iosAppGroup}/${filename}`;
 
-  return missingFiles;
+    let exists = await RNFetchBlob.fs.exists(path);
+
+    // Check if file is present in app group path.
+    let existsInAppGroup = false;
+    if (!exists && Platform.OS === "ios") {
+      existsInAppGroup = await RNFetchBlob.fs.exists(appGroupPath);
+    }
+
+    if (exists || existsInAppGroup) {
+      const attachment = await db.attachments.attachment(filename);
+      const totalChunks = Math.ceil(attachment.size / attachment.chunkSize);
+      const totalAbytes = totalChunks * ABYTES;
+      const expectedFileSize = attachment.size + totalAbytes;
+
+      const stat = await RNFetchBlob.fs.stat(
+        existsInAppGroup ? appGroupPath : path
+      );
+
+      if (stat.size !== expectedFileSize) {
+        DatabaseLogger.log(
+          `File size mismatch: ${filename}, expected: ${expectedFileSize}, actual: ${stat.size}`
+        );
+        RNFetchBlob.fs
+          .unlink(existsInAppGroup ? appGroupPath : path)
+          .catch(console.log);
+        return false;
+      }
+
+      exists = true;
+    }
+    return exists;
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function bulkExists(files) {
+  try {
+    await createCacheDir();
+    const cacheFiles = await RNFetchBlob.fs.ls(cacheDir);
+    let missingFiles = files.filter((file) => !cacheFiles.includes(file));
+
+    if (Platform.OS === "ios") {
+      const iosAppGroup =
+        Platform.OS === "ios"
+          ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+          : null;
+      const appGroupFiles = await RNFetchBlob.fs.ls(iosAppGroup);
+      missingFiles = missingFiles.filter(
+        (file) => !appGroupFiles.includes(file)
+      );
+    }
+    return missingFiles;
+  } catch (e) {
+    DatabaseLogger.error(e);
+    return [];
+  }
 }
 
 export async function getCacheSize() {
+  await createCacheDir();
   const stat = await RNFetchBlob.fs.lstat(`file://` + cacheDir);
   let total = 0;
   console.log("Total files", stat.length);
