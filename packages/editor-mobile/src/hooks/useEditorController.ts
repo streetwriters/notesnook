@@ -33,6 +33,7 @@ import {
 import {
   EventTypes,
   getRoot,
+  isReactNative,
   post,
   postAsyncWithTimeout,
   saveTheme
@@ -157,6 +158,7 @@ export function useEditorController({
   const selectionChange = useCallback((_editor: Editor) => {}, []);
 
   const titleChange = useCallback(async (title: string) => {
+    if (!isReactNative()) return;
     const currentSessionId = globalThis.sessionId;
     post(
       EventTypes.contentchange,
@@ -215,6 +217,7 @@ export function useEditorController({
 
   const contentChange = useCallback(
     (editor: Editor, ignoreEdit?: boolean) => {
+      if (!isReactNative()) return;
       if (editorControllers[tabRef.current.id]?.loading) {
         logger("info", "Edit skipped, tab is in loading state");
         return;
