@@ -150,11 +150,12 @@ export function TablePopup(props: TablePopupProps) {
             display: ["flex", "none", "none"],
             mt: 1,
             alignItems: "center",
-            justifyContent: "center"
+            justifyContent: "center",
+            maxWidth: "100%"
           }}
         >
           <InlineInput
-            containerProps={{ sx: { mr: 1 } }}
+            containerProps={{ sx: { mr: 1, flexShrink: 1 } }}
             label="columns"
             placeholder={`${cellLocation.column} columns`}
             type="number"
@@ -167,6 +168,7 @@ export function TablePopup(props: TablePopupProps) {
             }}
           />
           <InlineInput
+            containerProps={{ sx: { flexShrink: 1 } }}
             label="rows"
             placeholder={`${cellLocation.row} rows`}
             type="number"
