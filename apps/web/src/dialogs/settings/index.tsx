@@ -230,7 +230,7 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
             flexDirection: "column",
             padding: 20,
             gap: 20,
-            minHeight: "min-content",
+            minHeight: "auto",
             overflow: "auto"
           }}
         >
