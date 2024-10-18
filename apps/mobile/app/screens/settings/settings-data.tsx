@@ -143,6 +143,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "remove-profile-picture",
             name: strings.removeProfilePicture(),
+            icon: "face-man",
             description: strings.removeProfilePictureDesc(),
             useHook: () =>
               useUserStore((state) => state.profile?.profilePicture),
@@ -169,6 +170,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "remove-name",
             name: strings.removeFullName(),
+            icon: "rename-box",
             description: strings.removeFullNameDesc(),
             useHook: () => useUserStore((state) => state.profile?.fullName),
             hidden: () => !useUserStore.getState().profile?.fullName,
@@ -194,6 +196,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "recovery-key",
             name: strings.saveDataRecoveryKey(),
+            icon: "account-key",
             modifer: async () => {
               verifyUser(null, async () => {
                 await sleep(300);
@@ -214,6 +217,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "change-password",
             name: strings.changePassword(),
+            icon: "form-textbox-password",
             modifer: async () => {
               ChangePassword.present();
             },
@@ -222,6 +226,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "change-email",
             name: strings.changeEmail(),
+            icon: "email",
             modifer: async () => {
               ChangeEmail.present();
             },
@@ -649,6 +654,7 @@ export const settingsGroups: SettingSection[] = [
             id: "theme-picker",
             type: "screen",
             name: strings.themes(),
+            icon: "palette",
             description: strings.themesDesc(),
             component: "theme-selector"
           },
@@ -689,6 +695,7 @@ export const settingsGroups: SettingSection[] = [
         id: "behaviour",
         type: "screen",
         name: strings.behavior(),
+        icon: "cog",
         description: strings.behaviorDesc(),
         sections: [
           {
@@ -742,12 +749,14 @@ export const settingsGroups: SettingSection[] = [
             type: "screen",
             name: strings.customizeToolbar(),
             description: strings.customizeToolbarDesc(),
+            icon: "format-text",
             component: "configuretoolbar"
           },
           {
             id: "reset-toolbar",
             name: strings.resetToolbar(),
             description: strings.resetToolbarDesc(),
+            icon: "reload",
             modifer: () => {
               useDragState.getState().setPreset("default");
             }
@@ -789,6 +798,7 @@ export const settingsGroups: SettingSection[] = [
             id: "title-format",
             name: strings.titleFormat(),
             component: "title-format",
+            icon: "format-title",
             description: strings.titleFormatDesc(),
             type: "component"
           },
@@ -797,6 +807,7 @@ export const settingsGroups: SettingSection[] = [
             name: strings.mardownShortcuts(),
             property: "markdownShortcuts",
             description: strings.mardownShortcutsDesc(),
+            icon: "language-markdown",
             type: "switch"
           }
         ]
@@ -819,6 +830,7 @@ export const settingsGroups: SettingSection[] = [
         id: "marketing-emails",
         type: "switch",
         name: strings.marketingEmails(),
+        icon: "email-fast",
         description: strings.marketingEmailsDesc(),
         modifer: async () => {
           try {
@@ -876,6 +888,7 @@ export const settingsGroups: SettingSection[] = [
             id: "change-vault-password",
             useHook: useVaultStatus,
             name: strings.changeVaultPassword(),
+            icon: "key-change",
             description: strings.changeVaultPasswordDesc(),
             hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () =>
@@ -889,6 +902,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "clear-vault",
             useHook: useVaultStatus,
+            icon: "key-remove",
             description: strings.clearVaultDesc(),
             name: strings.clearVault(),
             hidden: (current) => !(current as VaultStatusType)?.exists,
@@ -904,6 +918,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "delete-vault",
             name: strings.deleteVault(),
+            icon: "delete-forever",
             description: strings.deleteVaultDesc(),
             useHook: useVaultStatus,
             hidden: (current) => !(current as VaultStatusType)?.exists,
@@ -1019,6 +1034,7 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "app-lock-timer",
             name: strings.appLockTimeout(),
+            icon: "timer",
             description: strings.appLockTimeoutDesc(),
             type: "component",
             component: "applock-timer"
@@ -1128,6 +1144,7 @@ export const settingsGroups: SettingSection[] = [
             id: "backup-now",
             name: strings.backupNow(),
             description: strings.backupNowDesc(),
+            icon: "content-save",
             modifer: async () => {
               const user = useUserStore.getState().user;
               if (!user || SettingsService.getProperty("encryptedBackup")) {
@@ -1142,6 +1159,7 @@ export const settingsGroups: SettingSection[] = [
             id: "backup-now",
             name: strings.backupNowWithAttachments(),
             description: strings.backupNowWithAttachmentsDesc(),
+            icon: "content-save-all",
             hidden: () => !useUserStore.getState().user,
             modifer: async () => {
               const user = useUserStore.getState().user;
@@ -1159,6 +1177,7 @@ export const settingsGroups: SettingSection[] = [
             id: "auto-backups",
             type: "component",
             name: strings.automaticBackups(),
+            icon: "clock",
             description: strings.automaticBackupsDesc(),
             component: "autobackups"
           },
@@ -1168,6 +1187,7 @@ export const settingsGroups: SettingSection[] = [
             hidden: () => !useUserStore.getState().user,
             name: strings.automaticBackupsWithAttachments(),
             description: strings.automaticBackupsWithAttachmentsDesc(),
+            icon: "clock",
             component: "autobackupsattachments"
           },
           {
@@ -1324,6 +1344,7 @@ export const settingsGroups: SettingSection[] = [
             property: "defaultSnoozeTime",
             type: "input",
             name: strings.defaultSnoozeTime(),
+            icon: "alarm-snooze",
             description: strings.defaultSnoozeTimeDesc(),
             inputProperties: {
               keyboardType: "decimal-pad",
@@ -1423,6 +1444,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "join-telegram",
         name: strings.joinTelegram(),
+        icon: "message-text",
         description: strings.joinTelegramDesc(),
         modifer: () => {
           Linking.openURL("https://t.me/notesnook").catch(console.log);
@@ -1473,11 +1495,13 @@ export const settingsGroups: SettingSection[] = [
             console.error(e);
           }
         },
+        icon: "file-document",
         description: strings.tosDesc()
       },
       {
         id: "privacy-policy",
         name: strings.privacyPolicy(),
+        icon: "shield",
         modifer: async () => {
           try {
             await Linking.openURL("https://notesnook.com/privacy");
