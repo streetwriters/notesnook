@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { GroupHeader, GroupOptions, ItemType } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { TouchableOpacity, View, useWindowDimensions } from "react-native";
@@ -26,13 +27,11 @@ import { presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { RouteName } from "../../../stores/use-navigation-store";
 import { getContainerBorder } from "../../../utils/colors";
-import { GROUP } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
 import Sort from "../../sheets/sort";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
-import { strings } from "@notesnook/intl";
 
 type SectionHeaderProps = {
   item: GroupHeader;
@@ -58,16 +57,13 @@ export const SectionHeader = React.memo<
   }: SectionHeaderProps) {
     const { colors } = useThemeColors();
     const { fontScale } = useWindowDimensions();
-    let groupBy = Object.keys(GROUP).find(
-      (key) => GROUP[key as keyof typeof GROUP] === groupOptions.groupBy
-    );
+    const groupBy =
+      strings.groupByStrings[
+        groupOptions.groupBy as keyof typeof strings.groupByStrings
+      ]?.();
     const isCompactModeEnabled = useIsCompactModeEnabled(
       dataType as "note" | "notebook"
     );
-
-    groupBy = !groupBy
-      ? "Default"
-      : groupBy.slice(0, 1).toUpperCase() + groupBy.slice(1, groupBy.length);
 
     return (
       <View
@@ -118,12 +114,10 @@ export const SectionHeader = React.memo<
             <>
               <Button
                 onPress={() => {
-                  console.log("Opening Sort sheet", screen, dataType);
                   presentSheet({
                     component: <Sort screen={screen} type={dataType} />
                   });
                 }}
-                tooltipText="Change sorting of items in list"
                 title={groupBy}
                 icon={
                   groupOptions.sortDirection === "asc"
@@ -157,11 +151,6 @@ export const SectionHeader = React.memo<
                   screen !== "Notes"
                 }
                 testID="icon-compact-mode"
-                tooltipText={
-                  isCompactModeEnabled
-                    ? "Switch to normal mode"
-                    : "Switch to compact mode"
-                }
                 color={colors.secondary.icon}
                 name={isCompactModeEnabled ? "view-list" : "view-list-outline"}
                 onPress={() => {

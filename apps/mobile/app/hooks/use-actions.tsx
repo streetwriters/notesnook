@@ -775,7 +775,7 @@ export const useActions = ({
     actions.push(
       {
         id: "favorite",
-        title: item.favorite ? "Unfav" : "Fav",
+        title: item.favorite ? strings.favorite() : strings.unfavorite(),
         icon: item.favorite ? "star-off" : "star-outline",
         func: addToFavorites,
         close: false,
@@ -955,8 +955,8 @@ export const useActions = ({
     id: "trash",
     title:
       item.type !== "notebook" && item.type !== "note"
-        ? "Delete " + item.type
-        : "Move to trash",
+        ? strings.doAction(item.type, 1, "delete")
+        : strings.moveToTrash(),
     icon: "delete-outline",
     type: "error",
     func: deleteItem

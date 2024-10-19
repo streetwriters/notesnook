@@ -17,14 +17,17 @@ import {setI18nGlobal } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 import { ScriptManager, Script } from '@callstack/repack/client';
 import {
+  messages as $en
+} from "@notesnook/intl/locales/$en.json";
+import {
   messages as $pseudo
 } from "@notesnook/intl/locales/$pseudo-LOCALE.json";
 
 i18n.load({
-  "pseudo-LOCALE": $pseudo
+  en: __DEV__ ? $pseudo : $en
 });
 setI18nGlobal(i18n);
-i18n.activate("pseudo-LOCALE");
+i18n.activate("en");
 setI18nGlobal(i18n);
 
 
