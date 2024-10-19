@@ -810,6 +810,10 @@ msgstr "Cancel"
 msgid "Cancel download"
 msgstr "Cancel download"
 
+#: src/strings.ts:528
+msgid "Cancel login"
+msgstr "Cancel login"
+
 #: src/strings.ts:1801
 msgid "Cancel subscription"
 msgstr "Cancel subscription"
@@ -1328,8 +1332,12 @@ msgid "Create Vault"
 msgstr "Create Vault"
 
 #: src/strings.ts:498
-msgid "Create your {\"\\n\"}account"
-msgstr "Create your {\"\\n\"}account"
+#~ msgid "Create your {\"\\n\"}account"
+#~ msgstr "Create your {\"\\n\"}account"
+
+#: src/strings.ts:498
+msgid "Create your account"
+msgstr "Create your account"
 
 #: src/strings.ts:31
 msgid "created"
@@ -2982,8 +2990,16 @@ msgid "Login to encrypt and sync notes"
 msgstr "Login to encrypt and sync notes"
 
 #: src/strings.ts:516
-msgid "Login to your {\"\\n\"}account"
-msgstr "Login to your {\"\\n\"}account"
+#~ msgid "Login to your {\"\\n\"}account"
+#~ msgstr "Login to your {\"\\n\"}account"
+
+#: src/strings.ts:516
+#~ msgid "Login to your \\naccount"
+#~ msgstr "Login to your \\naccount"
+
+#: src/strings.ts:516
+msgid "Login to your account"
+msgstr "Login to your account"
 
 #: src/strings.ts:733
 msgid "Logout"
