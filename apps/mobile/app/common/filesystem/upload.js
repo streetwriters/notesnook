@@ -24,7 +24,7 @@ import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
 import { createCacheDir } from "./io";
-import { cacheDir, getUploadedFileSize } from "./utils";
+import { cacheDir, checkUpload, getUploadedFileSize } from "./utils";
 
 export async function uploadFile(filename, requestOptions, cancelToken) {
   if (!requestOptions) return false;
@@ -33,24 +33,42 @@ export async function uploadFile(filename, requestOptions, cancelToken) {
   DatabaseLogger.info(`Preparing to upload file: ${filename}`);
 
   try {
-    const uploadedFileSize = await getUploadedFileSize(filename);
-
-    if (uploadedFileSize === -1) {
-      const error = `Uploaded file verification failed. (File hash: ${filename})`;
-      throw new Error(error);
+    let filePath = `${cacheDir}/${filename}`;
+    let exists = await RNFetchBlob.fs.exists(filePath);
+    // Check for file in appGroupPath if it doesn't exist in cacheDir
+    if (!exists && Platform.OS === "ios") {
+      const iosAppGroup =
+        Platform.OS === "ios"
+          ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+          : null;
+      const appGroupPath = `${iosAppGroup}/${filename}`;
+      filePath = appGroupPath;
+      exists = await RNFetchBlob.fs.exists(filePath);
     }
 
-    if (uploadedFileSize !== 0) {
+    if (!exists) {
+      throw new Error(
+        `Trying to upload file at path ${filePath} that doest not exist.`
+      );
+    }
+
+    const fileSize = (await RNFetchBlob.fs.stat(filePath)).size;
+
+    let remoteFileSize = await getUploadedFileSize(filename);
+    if (remoteFileSize === -1) return false;
+    if (remoteFileSize > 0 && remoteFileSize === fileSize) {
       DatabaseLogger.log(`File ${filename} is already uploaded.`);
       return true;
     }
 
-    let res = await fetch(url, {
+    let uploadUrlResponse = await fetch(url, {
       method: "PUT",
       headers
     });
 
-    const uploadUrl = res.ok ? await res.text() : await res.json();
+    const uploadUrl = uploadUrlResponse.ok
+      ? await uploadUrlResponse.text()
+      : await uploadUrlResponse.json();
 
     if (typeof uploadUrl !== "string") {
       throw new Error(
@@ -58,28 +76,9 @@ export async function uploadFile(filename, requestOptions, cancelToken) {
       );
     }
 
-    let uploadFilePath = `${cacheDir}/${filename}`;
-
-    const iosAppGroup =
-      Platform.OS === "ios"
-        ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
-        : null;
-    const appGroupPath = `${iosAppGroup}/${filename}`;
-    let exists = await RNFetchBlob.fs.exists(uploadFilePath);
-    if (!exists && Platform.OS === "ios") {
-      uploadFilePath = appGroupPath;
-      exists = await RNFetchBlob.fs.exists(uploadFilePath);
-    }
-
-    if (!exists) {
-      throw new Error(
-        `Trying to upload file at path ${uploadFilePath} that doest not exist.`
-      );
-    }
-
     DatabaseLogger.info(`Starting upload: ${filename}`);
 
-    let request = RNFetchBlob.config({
+    let uploadRequest = RNFetchBlob.config({
       IOSBackgroundTask: !globalThis["IS_SHARE_EXTENSION"]
     })
       .fetch(
@@ -88,7 +87,7 @@ export async function uploadFile(filename, requestOptions, cancelToken) {
         {
           "content-type": ""
         },
-        RNFetchBlob.wrap(uploadFilePath)
+        RNFetchBlob.wrap(filePath)
       )
       .uploadProgress((sent, total) => {
         useAttachmentStore
@@ -101,30 +100,27 @@ export async function uploadFile(filename, requestOptions, cancelToken) {
 
     cancelToken.cancel = () => {
       useAttachmentStore.getState().remove(filename);
-      request.cancel();
+      uploadRequest.cancel();
     };
-    let response = await request;
 
-    let status = response.info().status;
-    let text = await response.text();
-    let result = status >= 200 && status < 300 && text.length === 0;
+    let uploadResponse = await uploadRequest;
+    let status = uploadResponse.info().status;
+    let uploaded = status >= 200 && status < 300;
+
     useAttachmentStore.getState().remove(filename);
-    if (result) {
-      DatabaseLogger.info(
-        `File upload status: ${filename}, ${status}, ${text}`
-      );
-      let attachment = await db.attachments.attachment(filename);
-      if (!attachment) return result;
-    } else {
-      const fileInfo = await RNFetchBlob.fs.stat(uploadFilePath);
+
+    if (!uploaded) {
+      const fileInfo = await RNFetchBlob.fs.stat(filePath);
       throw new Error(
-        `${status}, ${text}, name: ${fileInfo.filename}, length: ${
+        `${status}, name: ${fileInfo.filename}, length: ${
           fileInfo.size
-        }, info: ${JSON.stringify(response.info())}`
+        }, info: ${JSON.stringify(uploadResponse.info())}`
       );
     }
-
-    return result;
+    const attachment = await db.attachments.attachment(filename);
+    await checkUpload(filename, requestOptions.chunkSize, attachment.size);
+    DatabaseLogger.info(`File upload status: ${filename}, ${status}`);
+    return uploaded;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
     ToastManager.error(e, "File upload failed");
