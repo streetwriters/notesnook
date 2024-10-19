@@ -8,7 +8,8 @@ import { DOMParser } from './worker.js';
 import { ScriptManager, Script } from '@callstack/repack/client';
 global.DOMParser = DOMParser;
 
-ScriptManager.shared.addResolver(async (scriptId) => {
+try {
+  ScriptManager.shared.addResolver(async (scriptId) => {
     // `scriptId` will be either 'student' or 'teacher'
   
     // In dev mode, resolve script location to dev server.
@@ -23,3 +24,6 @@ ScriptManager.shared.addResolver(async (scriptId) => {
       url: Script.getFileSystemURL(scriptId)
     };
   });
+} catch(e) {
+  
+}
