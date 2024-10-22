@@ -21,45 +21,45 @@ import { expect, test } from "vitest";
 import { transformQuery } from "../query-transformer.js";
 
 const TRANSFORM_QUERY_TESTS = [
-  ["hello world", `"hello world"`],
-  ["hello world OR bar", `"hello world" OR "bar"`],
-  ["hello world OR bar NOT baz", `"hello world" OR "bar" NOT "baz"`],
-  ["hello world OR NOT AND", `"hello world"`],
-  ["hello world OR NOT AND something", `"hello world" AND "something"`],
-  ["hello world -foo", `"hello world -foo"`],
-  ["hello world phrase-with-dash", `"hello world phrase-with-dash"`],
-  ["hello world phrase-with-dash*", '"hello world phrase-with-dash*"'],
-  ["example + foo + bar", `"example + foo + bar"`],
-  ["example OR foo NOT bar", `"example" OR "foo" NOT "bar"`],
+  ["hello world", `hello AND world`],
+  ["hello world OR bar", `hello AND world OR bar`],
+  ["hello world OR bar NOT baz", `hello AND world OR bar NOT baz`],
+  ["hello world OR NOT AND", `hello AND world`],
+  ["hello world OR NOT AND something", `hello AND world AND something`],
+  ["hello world -foo", `hello AND world AND "-foo"`],
+  ["hello world phrase-with-dash", `hello AND world AND "phrase-with-dash"`],
+  ["hello world phrase-with-dash*", 'hello AND world AND "phrase-with-dash*"'],
+  ["example + foo + bar", `example AND + AND foo AND + AND bar`],
+  ["example OR foo NOT bar", `example OR foo NOT bar`],
   [
     'example "quoted phrase" "another quoted phrase"',
-    `"example ""quoted phrase"" ""another quoted phrase"""`
+    `example AND "quoted phrase" AND "another quoted phrase"`
   ],
-  ['"phrase-with-dash*"', `""phrase-with-dash*""`],
-  ['-foo + bar OR "quoted-phrase"', '"-foo + bar" OR ""quoted-phrase""'],
+  ['"phrase-with-dash*"', `"phrase-with-dash*"`],
+  ['-foo + bar OR "quoted-phrase"', '"-foo" AND + AND bar OR "quoted-phrase"'],
   [
     'phrase-with-dash* + "quoted-phrase"',
-    '"phrase-with-dash* + ""quoted-phrase"""'
+    '"phrase-with-dash*" AND + AND "quoted-phrase"'
   ],
   [
     'example -foo + bar + "quoted-dash-phrase*" OR "another-quoted-phrase"',
-    '"example -foo + bar + ""quoted-dash-phrase*""" OR ""another-quoted-phrase""'
+    'example AND "-foo" AND + AND bar AND + AND "quoted-dash-phrase*" OR "another-quoted-phrase"'
   ],
   ["", ""],
-  ["foo", `"foo"`],
-  ['"quoted"', '""quoted""'],
-  ["-foo -bar", `"-foo -bar"`],
-  ["foo + + bar", `"foo + + bar"`],
-  ["foo + OR", `"foo +"`],
-  ['"special -phrase*"', '""special -phrase*""'],
-  ["foo* + bar*", `"foo* + bar*"`],
-  ["(foo + bar) -baz", `"(foo + bar) -baz"`],
-  ['"phrase with "quotes""', '""phrase with ""quotes""""'],
-  ['foo + "bar -baz" OR "qux*"', '"foo + ""bar -baz""" OR ""qux*""'],
-  ["foo + bar + ", `"foo + bar +"`],
-  ["+foo bar", `"+foo bar"`],
+  ["foo", `foo`],
+  ['"quoted"', '"quoted"'],
+  ["-foo -bar", `"-foo" AND "-bar"`],
+  ["foo + + bar", `foo AND + AND + AND bar`],
+  ["foo + OR", `foo AND +`],
+  ['"special -phrase*"', '"special -phrase*"'],
+  ["foo* + bar*", `"foo*" AND + AND "bar*"`],
+  ["(foo + bar) -baz", `(foo AND + AND bar) AND "-baz"`],
+  ['"phrase with "quotes""', '"phrase with ""quotes"""'],
+  ['foo + "bar -baz" OR "qux*"', 'foo AND + AND "bar -baz" OR "qux*"'],
+  ["foo + bar + ", `foo AND + AND bar AND +`],
+  ["+foo bar", `+foo AND bar`],
   ["foo*bar*", `"foo*bar*"`],
-  ['"escaped "quotes""', '""escaped ""quotes""""'],
+  ['"escaped "quotes""', '"escaped ""quotes"""'],
   ["-hello-world", `"-hello-world"`],
   ["-hello-world*", '"-hello-world*"'],
   ["*helo*", `"*helo*"`]

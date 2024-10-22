@@ -334,6 +334,31 @@ export class NNMigrationProvider implements MigrationProvider {
       },
       "6": {
         async up(db) {
+          // await db.transaction().execute(async (tx) => {
+          //   await tx.schema.dropTable("content_fts").execute();
+          //   await tx.schema.dropTable("notes_fts").execute();
+          //   await createFTS5Table(
+          //     "notes_fts",
+          //     [{ name: "id" }, { name: "title" }],
+          //     {
+          //       contentTable: "notes",
+          //       tokenizer: ["porter", "trigram", "remove_diacritics 1"]
+          //     }
+          //   ).execute(tx);
+          //   await createFTS5Table(
+          //     "content_fts",
+          //     [{ name: "id" }, { name: "noteId" }, { name: "data" }],
+          //     {
+          //       contentTable: "content",
+          //       tokenizer: ["porter", "trigram", "remove_diacritics 1"]
+          //     }
+          //   ).execute(tx);
+          // });
+          // await rebuildSearchIndex(db);
+        }
+      },
+      "7": {
+        async up(db) {
           await db.transaction().execute(async (tx) => {
             await tx.schema.dropTable("content_fts").execute();
             await tx.schema.dropTable("notes_fts").execute();
@@ -343,7 +368,7 @@ export class NNMigrationProvider implements MigrationProvider {
               [{ name: "id" }, { name: "title" }],
               {
                 contentTable: "notes",
-                tokenizer: ["porter", "trigram", "remove_diacritics 1"]
+                tokenizer: ["porter", "better_trigram", "remove_diacritics 1"]
               }
             ).execute(tx);
 
@@ -352,7 +377,7 @@ export class NNMigrationProvider implements MigrationProvider {
               [{ name: "id" }, { name: "noteId" }, { name: "data" }],
               {
                 contentTable: "content",
-                tokenizer: ["porter", "trigram", "remove_diacritics 1"]
+                tokenizer: ["porter", "better_trigram", "remove_diacritics 1"]
               }
             ).execute(tx);
           });
