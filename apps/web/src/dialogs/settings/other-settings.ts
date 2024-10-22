@@ -278,6 +278,15 @@ export const SupportSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
+            action: async () => {
+              await navigator.clipboard.writeText("support@streetwriters.co");
+              showToast("info", strings.copied());
+            },
+            title: strings.copy(),
+            variant: "secondary"
+          },
+          {
+            type: "button",
             action: () => {
               window.open("mailto:support@streetwriters.co", "_blank");
             },
