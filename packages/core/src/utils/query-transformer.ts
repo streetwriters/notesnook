@@ -39,14 +39,17 @@ function escapeSQLString(str: string): string {
     return `"${innerStr}"`;
   }
 
-  // const isSubstitution = str.startsWith("-");
-  // if (isSubstitution) {
-  //   return str.replace(/^-(.+)/g, (_, rest) => {
-  //     return `-${escapeSQLString(rest)}`;
-  //   });
-  // }
+  const maybeColspec =
+    str.startsWith("-") || str.endsWith(":") || str.includes("-");
+  const isWildcard =
+    str.startsWith("*") ||
+    str.endsWith("*") ||
+    str.startsWith("%") ||
+    str.endsWith("%");
+  if (maybeColspec || isWildcard) {
+    return `"${str}"`;
+  }
 
-  // const isWildcard = str.endsWith("*");
   // if (isWildcard) {
   //   return str.replace(/(.+?)(\*?$)/gm, (_, text, end) => {
   //     return `${escapeSQLString(text)}${end}`;
@@ -118,10 +121,10 @@ function transformAST(ast: QueryNode): QueryNode {
       if (lastWasPhrase) {
         transformedAST.children.push({ type: "AND" });
       }
-      // const transformedPhrase = child.value;//.map(escapeSQLString);
+      const transformedPhrase = child.value.map(escapeSQLString);
       transformedAST.children.push({
         type: "phrase",
-        value: child.value
+        value: transformedPhrase
       });
       lastWasPhrase = true;
     } else if (
@@ -147,7 +150,7 @@ function generateSQL(ast: QueryNode): string {
   return ast.children
     .map((child) => {
       if (child.type === "phrase") {
-        return `"${escapeSQLString(child.value.join(" "))}"`;
+        return child.value.join(" AND ");
       }
       if (child.type === "AND" || child.type === "OR" || child.type === "NOT") {
         return child.type;

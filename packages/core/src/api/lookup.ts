@@ -47,53 +47,60 @@ export default class Lookup {
       const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       const excludedIds = this.db.trash.cache.notes;
 
-      if (query.length <= 2) {
-        const results = await db
-          .selectFrom((eb) =>
-            eb
-              .selectFrom("notes")
-              .$if(!!notes, (eb) =>
-                eb.where("id", "in", notes!.filter.select("id"))
-              )
-              .$if(excludedIds.length > 0, (eb) =>
-                eb.where("id", "not in", excludedIds)
-              )
-              .where("title", "like", `%${query}%`)
-              .select(["id"])
-              .unionAll((eb) =>
-                eb
-                  .selectFrom("content")
-                  .$if(!!notes, (eb) =>
-                    eb.where("id", "in", notes!.filter.select("id"))
-                  )
-                  .$if(excludedIds.length > 0, (eb) =>
-                    eb.where("id", "not in", excludedIds)
-                  )
-                  .where("locked", "!=", true)
-                  .where("data", "like", `%${query}%`)
-                  .select(["noteId as id"])
-                  .$castTo<{ id: string; dateCreated: number }>()
-              )
-              .as("results")
-          )
-          .select(["results.id"])
-          .groupBy("results.id")
-          .$if(!!limit, (eb) => eb.limit(limit!))
-          // filter out ids that have no note against them
-          .where(
-            "results.id",
-            "in",
-            (notes || this.db.notes.all).filter.select("id")
-          )
-          .execute()
-          .catch((e) => {
-            logger.error(e, `Error while searching`, { query });
-            return [];
-          });
-        return results.map((r) => r.id);
-      }
+      // if (query.length <= 2) {
+      //   const results = await db
+      //     .selectFrom((eb) =>
+      //       eb
+      //         .selectFrom("notes")
+      //         .$if(!!notes, (eb) =>
+      //           eb.where("id", "in", notes!.filter.select("id"))
+      //         )
+      //         .$if(excludedIds.length > 0, (eb) =>
+      //           eb.where("id", "not in", excludedIds)
+      //         )
+      //         .where("title", "like", `%${query}%`)
+      //         .select(["id"])
+      //         .unionAll((eb) =>
+      //           eb
+      //             .selectFrom("content")
+      //             .$if(!!notes, (eb) =>
+      //               eb.where("id", "in", notes!.filter.select("id"))
+      //             )
+      //             .$if(excludedIds.length > 0, (eb) =>
+      //               eb.where("id", "not in", excludedIds)
+      //             )
+      //             .where("locked", "!=", true)
+      //             .where("data", "like", `%${query}%`)
+      //             .select(["noteId as id"])
+      //             .$castTo<{ id: string; dateCreated: number }>()
+      //         )
+      //         .as("results")
+      //     )
+      //     .select(["results.id"])
+      //     .groupBy("results.id")
+      //     .$if(!!limit, (eb) => eb.limit(limit!))
+      //     // filter out ids that have no note against them
+      //     .where(
+      //       "results.id",
+      //       "in",
+      //       (notes || this.db.notes.all).filter.select("id")
+      //     )
+      //     .execute()
+      //     .catch((e) => {
+      //       logger.error(e, `Error while searching`, { query });
+      //       return [];
+      //     });
+      //   return results.map((r) => r.id);
+      // }
 
       query = transformQuery(query);
+      console.log(
+        "TRANSFORMED",
+        query,
+        await sql`SELECT * from content_fts where data MATCH 'awesome'`.execute(
+          db
+        )
+      );
       const results = await db
         .selectFrom((eb) =>
           eb
