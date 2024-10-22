@@ -562,6 +562,7 @@ export function Factory(Module) {
       Module._sqlite3_free(zVfs);
 
       Module.ccall("RegisterExtensionFunctions", "void", ["number"], [db]);
+      Module.ccall("sqlite3Fts5BetterTrigramInit", "void", ["number"], [db]);
       check(fname, result);
       return db;
     };
