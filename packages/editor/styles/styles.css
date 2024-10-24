@@ -3,7 +3,7 @@
 }
 
 .ProseMirror span.math-inline {
-  font-family: KaTeX_Main; 
+  font-family: KaTeX_Main, Times New Roman, serif; 
 }
 
 .ProseMirror {
