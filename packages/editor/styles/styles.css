@@ -2,6 +2,10 @@
   font-family: inherit;
 }
 
+.ProseMirror span.math-inline {
+  font-family: KaTeX_Main; 
+}
+
 .ProseMirror {
   font-family: inherit;
 }
