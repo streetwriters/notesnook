@@ -118,7 +118,17 @@ export function EditLink(props: ToolProps) {
           const { from, to } = editor.state.selection;
           if (selectedNode.current)
             editor.commands.setTextSelection(selectedNode.current);
-          editor.commands.setLink(link);
+
+          let selectedText;
+          if (selectedNode.current)
+            selectedText = editor.state.doc.textBetween(
+              selectedNode.current.from,
+              selectedNode.current.to
+            );
+          editor.commands.setLink({
+            ...link,
+            title: selectedText || link.title
+          });
           if (selectedNode.current)
             editor.commands.setTextSelection({ from, to });
         }}
