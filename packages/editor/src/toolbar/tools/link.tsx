@@ -119,9 +119,9 @@ export function EditLink(props: ToolProps) {
           if (selectedNode.current)
             editor.commands.setTextSelection(selectedNode.current);
 
-          let selectedText;
-          if (selectedNode.current)
-            selectedText = editor.state.doc.textBetween(
+          const selectedText =
+            !!selectedNode.current &&
+            editor.state.doc.textBetween(
               selectedNode.current.from,
               selectedNode.current.to
             );
