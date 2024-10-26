@@ -25,10 +25,23 @@ import {
   useThemeColors,
   useThemeEngineStore
 } from "@notesnook/theme";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { Flex } from "@theme-ui/components";
 import TipTap, { type TipTapProps } from "./tiptap";
 import { ScopedThemeProvider } from "../theme-provider";
+import { setI18nGlobal, Messages } from "@notesnook/intl";
+import { i18n } from "@lingui/core";
+
+const locale = import.meta.env.DEV
+  ? import("@notesnook/intl/locales/$pseudo-LOCALE.json")
+  : import("@notesnook/intl/locales/$en.json");
+locale.then(({ default: locale }) => {
+  i18n.load({
+    en: locale.messages as unknown as Messages
+  });
+  i18n.activate("en");
+});
+setI18nGlobal(i18n);
 
 export type EditorType = typeof Editor;
 
@@ -37,22 +50,15 @@ export function Editor(props: Omit<TipTapProps, "editorContainer" | "theme">) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { theme } = useThemeEngineStore();
   const { colors, isDark } = useThemeColors("editor");
-  const [isLoaded, setIsLoaded] = useState(false);
 
   useLayoutEffect(() => {
     if (
-      !("window" in globalThis) ||
       !containerRef.current ||
       !editorContainerRef.current ||
       editorContainerRef.current.parentElement === containerRef.current
     )
       return;
     containerRef.current.appendChild(editorContainerRef.current);
-  }, []);
-
-  useLayoutEffect(() => {
-    if (!("window" in globalThis)) return;
-    setIsLoaded(true);
   }, []);
 
   const editorTheme = useMemo(() => {
@@ -82,25 +88,23 @@ export function Editor(props: Omit<TipTapProps, "editorContainer" | "theme">) {
           }
         }}
       >
-        {isLoaded ? (
-          <TipTap
-            {...props}
-            editorContainer={() => {
-              if (editorContainerRef.current) return editorContainerRef.current;
-              const editorContainer = document.createElement("div");
-              editorContainer.classList.add("selectable", "editor-container");
-              editorContainer.style.flex = "1";
-              editorContainer.style.cursor = "text";
-              editorContainer.style.color =
-                theme.scopes.editor?.primary?.paragraph ||
-                theme.scopes.base.primary.paragraph;
-              editorContainerRef.current = editorContainer;
-              if (containerRef.current)
-                containerRef.current.appendChild(editorContainerRef.current);
-              return editorContainer;
-            }}
-          />
-        ) : null}
+        <TipTap
+          {...props}
+          editorContainer={() => {
+            if (editorContainerRef.current) return editorContainerRef.current;
+            const editorContainer = document.createElement("div");
+            editorContainer.classList.add("selectable", "editor-container");
+            editorContainer.style.flex = "1";
+            editorContainer.style.cursor = "text";
+            editorContainer.style.color =
+              theme.scopes.editor?.primary?.paragraph ||
+              theme.scopes.base.primary.paragraph;
+            editorContainerRef.current = editorContainer;
+            if (containerRef.current)
+              containerRef.current.appendChild(editorContainerRef.current);
+            return editorContainer;
+          }}
+        />
       </Flex>
     </ScopedThemeProvider>
   );
