@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export const API_HOST = process.env.API_HOST || `https://api.notesnook.com`;
+export const API_HOST =
+  import.meta.env.API_HOST ||
+  process.env.API_HOST ||
+  `https://api.notesnook.com`;
 export const PUBLIC_URL =
-  process.env.PUBLIC_URL || `http://localhost:${process.env.PORT || 5017}`;
+  import.meta.env.PUBLIC_URL ||
+  process.env.PUBLIC_URL ||
+  `http://localhost:${import.meta.env.PORT || process.env.PORT || 5017}`;
