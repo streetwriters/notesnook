@@ -39,7 +39,7 @@ const DEDUPE = [
 ];
 const DEFAULT_THEME_KEY =
   process.env.NODE_ENV === "development"
-    ? "DEFAULT_THEME"
+    ? "globalThis.DEFAULT_THEME"
     : "globalThis.DEFAULT_THEME";
 export default defineConfig(({ isSsrBuild }) => ({
   plugins: [
