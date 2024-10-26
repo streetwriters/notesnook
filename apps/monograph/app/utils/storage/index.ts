@@ -17,8 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+const cache: Record<
+  string,
+  {
+    ttl: number;
+    value: any;
+    cachedAt: number;
+  }
+> = {};
 export async function read<T>(key: string, fallback: T) {
-  return (await provider).read<T>(key, fallback);
+  const cached = cache[key];
+  if (cached && cached.ttl > Date.now() - cached.cachedAt) {
+    return cached.value;
+  }
+  const value = (await provider).read<T>(key, fallback);
+  cache[key] = {
+    ttl: 5 * 60000,
+    value,
+    cachedAt: Date.now()
+  };
+  return value;
 }
 
 export async function write<T>(key: string, data: T) {
