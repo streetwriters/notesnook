@@ -17,12 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const supportsPid =
-  "process" in globalThis &&
-  (typeof process === "undefined" || typeof process.pid !== "number");
 const MACHINE_ID = Math.floor(Math.random() * 0xffffff);
-const pid =
-  (supportsPid ? process.pid : Math.floor(Math.random() * 100000)) % 0xffff;
+const pid = Math.floor(Math.random() * 100000) % 0xffff;
 let index = Math.floor(Math.random() * 0xffffff);
 const PROCESS_UNIQUE = MACHINE_ID.toString(16) + pid.toString(16);
 export function createObjectId(date = Date.now()): string {
