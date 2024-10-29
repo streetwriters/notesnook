@@ -16,7 +16,7 @@
         "default": "./dist/index.mjs"
       }
     },
-    "./locales/*.json": "./dist/locales/*.json"
+    "./dist/locales/*.json": "./dist/locales/*.json"
   },
   "repository": {
     "type": "git",
