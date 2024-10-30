@@ -32,7 +32,12 @@ import SettingsService from "../../services/settings";
 import { HostId, HostIds } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 
-export const ServerIds = ["notesnook-sync", "auth", "sse"] as const;
+export const ServerIds = [
+  "notesnook-sync",
+  "auth",
+  "sse",
+  "monograph"
+] as const;
 export type ServerId = (typeof ServerIds)[number];
 type Server = {
   id: ServerId;
@@ -40,6 +45,7 @@ type Server = {
   title: string;
   example: string;
   description: string;
+  versionEndpoint: string;
 };
 type VersionResponse = {
   version: number;
@@ -52,21 +58,32 @@ const SERVERS: Server[] = [
     host: "API_HOST",
     title: strings.syncServer(),
     example: "http://localhost:4326",
-    description: strings.syncServerDesc()
+    description: strings.syncServerDesc(),
+    versionEndpoint: "/version"
   },
   {
     id: "auth",
     host: "AUTH_HOST",
     title: strings.authServer(),
     example: "http://localhost:5326",
-    description: strings.authServerDesc()
+    description: strings.authServerDesc(),
+    versionEndpoint: "/version"
   },
   {
     id: "sse",
     host: "SSE_HOST",
     title: strings.sseServer(),
     example: "http://localhost:7326",
-    description: strings.sseServerDesc()
+    description: strings.sseServerDesc(),
+    versionEndpoint: "/version"
+  },
+  {
+    id: "monograph",
+    host: "MONOGRAPH_HOST",
+    title: strings.monographServer(),
+    example: "http://localhost:6326",
+    description: strings.monographServerDesc(),
+    versionEndpoint: "/api/version"
   }
 ];
 export function ServersConfiguration() {
@@ -135,12 +152,14 @@ export function ServersConfiguration() {
             type="secondary"
             width="100%"
             onPress={async () => {
+              setError(undefined);
               try {
                 for (const host of HostIds) {
                   const url = urls[host];
                   const server = SERVERS.find((s) => s.host === host)!;
+                  if (!server) throw new Error(strings.serverNotFound(host));
                   if (!url) throw new Error(strings.allServerUrlsRequired());
-                  const version = await fetch(`${url}/version`)
+                  const version = await fetch(`${url}${server.versionEndpoint}`)
                     .then((r) => r.json() as Promise<VersionResponse>)
                     .catch(() => undefined);
                   if (!version)
@@ -158,7 +177,6 @@ export function ServersConfiguration() {
                   }
                 }
                 setSuccess(true);
-                setError(undefined);
               } catch (e) {
                 setError((e as Error).message);
               }
