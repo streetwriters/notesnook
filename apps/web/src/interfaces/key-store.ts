@@ -285,8 +285,7 @@ class KeyStore extends BaseStore<KeyStore> {
 
   changeCredential = async (
     oldCredential: CredentialWithSecret,
-    newCredential: CredentialWithSecret,
-    confirmNewCredntial: CredentialWithSecret
+    newCredential: CredentialWithSecret
   ) => {
     const cred = this.findCredential(oldCredential);
     if (!cred) throw new Error("Could not find a valid credential.");
