@@ -157,6 +157,20 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
         return;
       }
 
+      if (
+        event_name === PaddleEvents["Checkout.Customer.Details"] &&
+        !checkoutId.current
+      ) {
+        submitCustomerInfo(
+          checkout.id,
+          user.email,
+          callback_data.user?.country || "US"
+        ).finally(() => {
+          checkoutId.current = checkout.id;
+          reloadCheckout();
+        });
+      }
+
       if (event_name === PaddleEvents["Checkout.Complete"]) {
         onCompleted && onCompleted();
         return;
@@ -359,6 +373,36 @@ async function submitCustomerInfo(
   if (!response.ok) return false;
 
   const json = (await response.json()) as CheckoutDataResponse;
+  return json.data;
+}
+
+async function submitCustomerInfo(
+  checkoutId: string,
+  email: string,
+  country: string
+): Promise<CheckoutData | false> {
+  if (IS_TESTING) return false;
+
+  const url = ` ${CHECKOUT_SERVICE_ORIGIN}/checkout/${checkoutId}/customer-info`;
+  const body = {
+    data: {
+      email,
+      country_code: country,
+      audience_optin: false,
+      postcode: "1123212"
+    }
+  };
+  const headers = new Headers();
+  headers.set("content-type", "application/json");
+  const response = await fetch(url, {
+    body: JSON.stringify(body),
+    headers,
+    method: "POST"
+  });
+
+  if (!response.ok) return false;
+  const json = (await response.json()) as CheckoutDataResponse;
+
   return json.data;
 }
 
