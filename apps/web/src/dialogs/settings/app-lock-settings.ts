@@ -153,9 +153,7 @@ export const AppLockSettings: SettingsGroup[] = [
                   },
                   validate({ newPassword, oldPassword, confirmPassword }) {
                     if (newPassword !== confirmPassword)
-                      return new Promise((resolve) => resolve(false)).then(
-                        () => false
-                      );
+                      return Promise.resolve(false);
                     return useKeyStore
                       .getState()
                       .changeCredential(
