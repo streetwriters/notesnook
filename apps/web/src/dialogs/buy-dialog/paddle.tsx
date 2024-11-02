@@ -328,6 +328,8 @@ async function submitCustomerInfo(
   email: string,
   country: string
 ): Promise<CheckoutData | false> {
+  if (IS_TESTING) return false;
+
   const url = ` ${CHECKOUT_SERVICE_ORIGIN}/checkout/${checkoutId}/customer-info`;
   const body = {
     data: {
