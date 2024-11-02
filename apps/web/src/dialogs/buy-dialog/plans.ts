@@ -31,8 +31,9 @@ export const EDUCATION_PLAN: Plan = {
   period: "education",
   country: "US",
   currency: "USD",
-  discount: 0,
-  price: { gross: 9.99, net: 0, tax: 0 }
+  discount: { type: "regional", amount: 0, recurring: false },
+  price: { gross: 9.99, net: 0, tax: 0 },
+  originalPrice: { gross: 9.99, net: 0, tax: 0 }
 };
 
 export const DEFAULT_PLANS: Plan[] = [
@@ -40,7 +41,8 @@ export const DEFAULT_PLANS: Plan[] = [
     period: "monthly",
     country: "PK",
     currency: "USD",
-    discount: 0,
+    discount: { type: "regional", amount: 0, recurring: false },
+    originalPrice: { gross: 4.49, net: 0, tax: 0 },
     id: import.meta.env.DEV || IS_TESTING ? "9822" : "648884",
     price: { gross: 4.49, net: 0, tax: 0 }
   },
@@ -48,9 +50,10 @@ export const DEFAULT_PLANS: Plan[] = [
     period: "yearly",
     country: "PK",
     currency: "USD",
-    discount: 0,
+    discount: { type: "regional", amount: 0, recurring: false },
     id: import.meta.env.DEV || IS_TESTING ? "50305" : "658759",
-    price: { gross: 49.99, net: 0, tax: 0 }
+    price: { gross: 49.99, net: 0, tax: 0 },
+    originalPrice: { gross: 49.99, net: 0, tax: 0 }
   },
   EDUCATION_PLAN
 ];
@@ -90,7 +93,7 @@ export function usePlans() {
         const plans = await getPlans();
         if (!plans) return;
         setPlans(plans);
-        setDiscount(Math.max(...plans.map((p) => p.discount)));
+        setDiscount(Math.max(...plans.map((p) => p.discount?.amount || 0)));
         setCountry(plans[0].country);
       } catch (e) {
         console.error(e);

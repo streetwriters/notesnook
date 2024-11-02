@@ -55,7 +55,8 @@ const SUBSCRIBED_EVENTS: PaddleEvents[] = [
   PaddleEvents["Checkout.Coupon.Applied"],
   PaddleEvents["Checkout.Coupon.Remove"],
   PaddleEvents["Checkout.Location.Submit"],
-  PaddleEvents["Checkout.Complete"]
+  PaddleEvents["Checkout.Complete"],
+  PaddleEvents["Checkout.Customer.Details"]
 ];
 
 type PaddleCheckoutProps = {
@@ -68,19 +69,20 @@ type PaddleCheckoutProps = {
   coupon?: string;
 };
 export function PaddleCheckout(props: PaddleCheckoutProps) {
-  const { plan, onPriceUpdated, coupon, onCouponApplied, onCompleted } = props;
+  const { plan, onPriceUpdated, coupon, onCouponApplied, onCompleted, user } =
+    props;
   const [sourceUrl, setSourceUrl] = useState<string>();
   const [isLoading, setIsLoading] = useState(true);
-  const [checkoutId, setCheckoutId] = useState<string>();
   const appliedCouponCode = useRef<string>();
+  const checkoutId = useRef<string>();
   const checkoutRef = useRef<HTMLIFrameElement>(null);
   const isMobile = useMobile();
 
   const reloadCheckout = useCallback(() => {
     if (!checkoutRef.current) return;
     setIsLoading(true);
-    checkoutRef.current.src = `${PADDLE_ORIGIN}/checkout/?checkout_id=${checkoutId}&display_mode=inline&apple_pay_enabled=false`;
-  }, [checkoutId]);
+    checkoutRef.current.src = `${PADDLE_ORIGIN}/checkout/?checkout_id=${checkoutId.current}&display_mode=inline&apple_pay_enabled=false`;
+  }, []);
 
   const updatePrice = useCallback(
     async (checkoutId: string, isInvalidCoupon?: boolean) => {
@@ -105,39 +107,68 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
     async function onMessage(ev: MessageEvent<PaddleEvent>) {
       if (ev.origin !== PADDLE_ORIGIN) return;
       logger.debug("Paddle event received", { data: ev.data });
-      const { event_name, callback_data } = ev.data;
+      const { event, event_name, callback_data } = ev.data;
       const { checkout } = callback_data;
+
+      if (event === PaddleEvents["Checkout.RemoveSpinner"]) {
+        setIsLoading(false);
+        return;
+      }
 
       if (
         !checkout ||
         !checkout.id ||
-        SUBSCRIBED_EVENTS.indexOf(event_name) === -1
+        (SUBSCRIBED_EVENTS.indexOf(event_name) === -1 &&
+          SUBSCRIBED_EVENTS.indexOf(event) === -1)
       ) {
-        logger.debug("Ignoring paddle event", { event_name });
+        logger.debug("Ignoring paddle event", { event_name, event });
         return;
+      }
+
+      if (
+        event_name === PaddleEvents["Checkout.Customer.Details"] &&
+        !checkoutId.current
+      ) {
+        submitCustomerInfo(
+          checkout.id,
+          user.email,
+          callback_data.user?.country || "US"
+        ).finally(() => {
+          checkoutId.current = checkout.id;
+          reloadCheckout();
+        });
       }
 
       if (event_name === PaddleEvents["Checkout.Complete"]) {
         onCompleted && onCompleted();
         return;
       }
-      if (event_name === PaddleEvents["Checkout.Loaded"]) setIsLoading(false);
+      if (event_name === PaddleEvents["Checkout.Loaded"] && checkoutId.current)
+        setIsLoading(false);
 
       const pricingInfo = await updatePrice(checkout.id);
       if (!pricingInfo) return;
 
       appliedCouponCode.current = pricingInfo.coupon;
-      setCheckoutId(checkout.id);
+      checkoutId.current = checkout.id;
     }
     window.addEventListener("message", onMessage, false);
     return () => {
       window.removeEventListener("message", onMessage, false);
     };
-  }, [onPriceUpdated, updatePrice, plan, onCompleted]);
+  }, [
+    onPriceUpdated,
+    updatePrice,
+    plan,
+    onCompleted,
+    user.email,
+    reloadCheckout
+  ]);
 
   useEffect(() => {
+    const checkout_id = checkoutId.current;
     if (
-      !checkoutId ||
+      !checkout_id ||
       appliedCouponCode.current === coupon ||
       !appliedCouponCode.current === !coupon
     )
@@ -146,10 +177,10 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
 
     (async function () {
       const checkoutData = coupon
-        ? await applyCoupon(checkoutId, coupon)
-        : await removeCoupon(checkoutId);
+        ? await applyCoupon(checkout_id, coupon).catch(() => false)
+        : await removeCoupon(checkout_id).catch(() => false);
       if (!checkoutData) {
-        await updatePrice(checkoutId, true);
+        await updatePrice(checkout_id, true);
         return;
       }
       appliedCouponCode.current = coupon;
@@ -158,7 +189,6 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
   }, [
     coupon,
     onCouponApplied,
-    checkoutId,
     onPriceUpdated,
     plan,
     reloadCheckout,
@@ -250,7 +280,9 @@ function getPricingInfo(plan: Plan, checkoutData: CheckoutData): PricingInfo {
     currency: price.currency,
     discount: {
       amount: discount?.gross_discount || 0,
-      recurring: isRecurringDiscount
+      recurring: isRecurringDiscount,
+      code: discount?.code,
+      type: "promo"
     },
     period: plan.period,
     price: normalizeCheckoutPrice(price),
@@ -287,6 +319,34 @@ async function applyCoupon(
   const json = (await response.json()) as CheckoutDataResponse;
 
   await sendCheckoutEvent(checkoutId, PaddleEvents["Checkout.Coupon.Applied"]);
+
+  return json.data;
+}
+
+async function submitCustomerInfo(
+  checkoutId: string,
+  email: string,
+  country: string
+): Promise<CheckoutData | false> {
+  const url = ` ${CHECKOUT_SERVICE_ORIGIN}/checkout/${checkoutId}/customer-info`;
+  const body = {
+    data: {
+      email,
+      country_code: country,
+      audience_optin: false,
+      postcode: "1123212"
+    }
+  };
+  const headers = new Headers();
+  headers.set("content-type", "application/json");
+  const response = await fetch(url, {
+    body: JSON.stringify(body),
+    headers,
+    method: "POST"
+  });
+
+  if (!response.ok) return false;
+  const json = (await response.json()) as CheckoutDataResponse;
 
   return json.data;
 }
