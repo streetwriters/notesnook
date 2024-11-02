@@ -69,11 +69,19 @@ export enum PaddleEvents {
   /**  User has selected "Change Payment Method" when on the payment screen  **/
   "Checkout.PaymentMethodChange" = "Checkout.PaymentMethodChange",
   /**  User has selected "Change Payment Method" when on the Wire Transfer screen  **/
-  "Checkout.WireTransfer.PaymentMethodChange" = "Checkout.WireTransfer.PaymentMethodChange"
+  "Checkout.WireTransfer.PaymentMethodChange" = "Checkout.WireTransfer.PaymentMethodChange",
+
+  "Checkout.Customer.Details" = "Checkout.Customer.Details",
+  "Checkout.RemoveSpinner" = "Checkout.RemoveSpinner"
 }
 
 export interface CallbackData {
   checkout?: Checkout;
+  user?: {
+    email: string;
+    id: string;
+    country: string;
+  };
 }
 
 export interface Checkout {
@@ -82,6 +90,7 @@ export interface Checkout {
 
 export type PaddleEvent = {
   action: "event";
+  event: PaddleEvents;
   event_name: PaddleEvents;
   callback_data: CallbackData;
 };
@@ -91,8 +100,9 @@ export interface Plan {
   period: Period;
   price: Price;
   currency: string;
-  originalPrice?: Price;
-  discount: number;
+  currencySymbol?: string;
+  originalPrice: Price;
+  discount?: Discount;
   country: string;
 }
 
@@ -108,6 +118,8 @@ export type PricingInfo = {
 };
 
 export type Discount = {
+  type: "regional" | "promo";
+  code?: string;
   recurring: boolean;
   amount: number;
 };

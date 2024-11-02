@@ -117,7 +117,7 @@ function RecurringPricing(props: RecurringPricingProps) {
       sx={{ flexShrink: 0, fontSize: "subBody", textAlign: "end" }}
       variant="body"
     >
-      {plan.originalPrice && (
+      {plan.originalPrice && plan.originalPrice.gross !== plan.price.gross ? (
         <Text
           sx={{
             textDecorationLine: "line-through",
@@ -128,7 +128,7 @@ function RecurringPricing(props: RecurringPricingProps) {
           {getCurrencySymbol(plan.currency)}
           {plan.originalPrice.gross}
         </Text>
-      )}
+      ) : null}
       <Text>
         <Text as="span" sx={{ fontSize: "subtitle" }}>
           {getCurrencySymbol(plan.currency)}
