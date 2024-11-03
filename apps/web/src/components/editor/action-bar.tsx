@@ -584,7 +584,6 @@ function Tab(props: TabProps) {
           }}
           onMouseUp={(e) => {
             if (e.button == 0) {
-              e.stopPropagation();
               onClose();
             }
           }}
