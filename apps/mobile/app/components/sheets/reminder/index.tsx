@@ -279,9 +279,9 @@ export default function ReminderSheet({
           {Object.keys(ReminderModes).map((mode) => (
             <Button
               key={mode}
-              title={strings.reminderModes[
-                mode as keyof typeof strings.reminderModes
-              ]()}
+              title={strings.reminderModes(
+                ReminderModes[mode as keyof typeof ReminderModes] as string
+              )}
               style={{
                 marginRight: 12,
                 borderRadius: 100,
@@ -337,9 +337,9 @@ export default function ReminderSheet({
               {Object.keys(RecurringModes).map((mode) => (
                 <Button
                   key={mode}
-                  title={strings.recurringModes[
-                    mode as keyof typeof strings.recurringModes
-                  ]()}
+                  title={strings.recurringModes(
+                    RecurringModes[mode as keyof typeof RecurringModes]
+                  )}
                   style={{
                     marginRight: 6,
                     borderRadius: 100

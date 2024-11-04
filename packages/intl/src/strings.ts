@@ -16,38 +16,37 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { I18n } from "@lingui/core";
 import { plural, select, t } from "@lingui/macro";
 
 const actions = {
-  deleted: t`deleted`,
-  unpinned: t`unpinned`,
-  pinned: t`pinned`,
-  unpublished: t`unpublished`,
-  published: t`published`,
-  permanentlyDeleted: t`permanently deleted`,
-  restored: t`restored`,
-  edited: t`edited`,
-  created: t`created`,
-  renamed: t`renamed`
+  deleted: () => t`deleted`,
+  unpinned: () => t`unpinned`,
+  pinned: () => t`pinned`,
+  unpublished: () => t`unpublished`,
+  published: () => t`published`,
+  permanentlyDeleted: () => t`permanently deleted`,
+  restored: () => t`restored`,
+  edited: () => t`edited`,
+  created: () => t`created`,
+  renamed: () => t`renamed`
 };
 
 const doActions = {
-  delete: t`Delete`,
-  unpin: t`Unpin`,
-  pin: t`Pin`,
-  unpublish: t`Unpublish`,
-  publish: t`Publish`,
-  permanentlyDelete: t`Permanently delete`,
-  restore: t`Restore`,
-  edit: t`Edit`,
-  create: t`Created`,
-  rename: t`Rename`,
-  remove: t`Remove`
+  delete: () => t`Delete`,
+  unpin: () => t`Unpin`,
+  pin: () => t`Pin`,
+  unpublish: () => t`Unpublish`,
+  publish: () => t`Publish`,
+  permanentlyDelete: () => t`Permanently delete`,
+  restore: () => t`Restore`,
+  edit: () => t`Edit`,
+  create: () => t`Created`,
+  rename: () => t`Rename`,
+  remove: () => t`Remove`
 };
 
 const inProgressActions = {
-  deleting: t`Delete`
+  deleting: () => t`Delete`
 };
 
 type Actions = keyof typeof actions;
@@ -571,18 +570,18 @@ $headline$: Use starting line of the note as title.`,
   noLinkedNotes: () => t`No linked notes`,
   reminderModes: (mode: string) =>
     select(mode, {
-      Repeat: t`Repeat`,
-      Once: t`Once`,
-      Permanent: t`Permanent`,
-      other: t`Unknown mode`
+      repeat: "Repeat",
+      once: "Once",
+      permanent: "Permanent",
+      other: "Unknown mode"
     }),
   recurringModes: (mode: string) =>
     select(mode, {
-      Daily: t`Daily`,
-      Weekly: t`Weekly`,
-      Monthly: t`Monthly`,
-      Yearly: t`Yearly`,
-      other: t`Unknown mode`
+      day: "Daily",
+      week: "Weekly",
+      month: "Monthly",
+      year: "Yearly",
+      other: "Unknown mode"
     }),
   weekDayNames: {
     0: () => t`Sunday`,
@@ -1911,10 +1910,10 @@ All attachments will be downloaded & cached again on access.
   irreverisibleAction: () => t`This action is IRREVERSIBLE.`,
   doAction: (type: string, count: number, action: DoActions) =>
     plural(count, {
-      one: `${doActions[action]} ${strings.dataTypesCamelCase[
+      one: `${doActions[action]()} ${strings.dataTypesCamelCase[
         type as keyof typeof strings.dataTypes
       ]()}?`,
-      other: `${doActions[action]} # ${strings.dataTypesPlural[
+      other: `${doActions[action]()} # ${strings.dataTypesPlural[
         type as keyof typeof strings.dataTypesPlural
       ]()}?`
     }),
@@ -1922,17 +1921,17 @@ All attachments will be downloaded & cached again on access.
     plural(count, {
       one: `${strings.dataTypesCamelCase[
         type as keyof typeof strings.dataTypes
-      ]()} ${actions[action]}`,
+      ]()} ${actions[action]()}`,
       other: `# ${strings.dataTypesPlural[
         type as keyof typeof strings.dataTypesPlural
-      ]()} ${actions[action]}`
+      ]()} ${actions[action]()}`
     }),
   inProgressAction: (type: string, count: number, action: InProgressActions) =>
     plural(count, {
-      one: `${inProgressActions[action]} ${strings.dataTypesCamelCase[
+      one: `${inProgressActions[action]()} ${strings.dataTypesCamelCase[
         type as keyof typeof strings.dataTypes
       ]()}`,
-      other: `${inProgressActions[action]} # ${strings.dataTypesPlural[
+      other: `${inProgressActions[action]()} # ${strings.dataTypesPlural[
         type as keyof typeof strings.dataTypesPlural
       ]()}`
     }),
