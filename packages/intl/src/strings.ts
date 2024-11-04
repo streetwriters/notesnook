@@ -186,14 +186,14 @@ export const strings = {
     key:
       | "dateCreated"
       | "dateEdited"
-      | "dateModifed"
+      | "dateModified"
       | "dateUploaded"
       | "dateDeleted"
   ) =>
     select(key, {
       dateCreated: `Created at`,
       dateEdited: `Last edited at`,
-      dateModifed: `Last modified at`,
+      dateModified: `Last modified at`,
       dateUploaded: `Uploaded at`,
       dateDeleted: `Deleted at`,
       other: key
@@ -1484,7 +1484,9 @@ For example:
   remindeMeOf: () => t`Remind me of...`,
   addShortNote: () => t`Add a short note`,
   typeAKeywordToSearchIn: (route: string) =>
-    t`Type a keyword to search in ${route}`,
+    t`Type a keyword to search in ${strings.routes[
+      route as keyof typeof strings.routes
+    ]()}...`,
   searchingFor: (query: string) => t`Searching for ${query}`,
   typeAKeyword: () => t`Type a keyword`,
   search: () => t`Search`,
@@ -2419,5 +2421,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   setTableSizeNotice: () => t`Please set a table size`,
   clickToReset: (title: string) => t`Click to reset ${title}`,
   increase: (title: string) => t`Increase ${title}`,
-  decrease: (title: string) => t`Decrease ${title}`
+  decrease: (title: string) => t`Decrease ${title}`,
+  saved: () => t`Saved`,
+  saving: () => t`Saving`
 };

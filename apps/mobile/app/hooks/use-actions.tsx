@@ -775,7 +775,7 @@ export const useActions = ({
     actions.push(
       {
         id: "favorite",
-        title: item.favorite ? strings.favorite() : strings.unfavorite(),
+        title: !item.favorite ? strings.favorite() : strings.unfavorite(),
         icon: item.favorite ? "star-off" : "star-outline",
         func: addToFavorites,
         close: false,

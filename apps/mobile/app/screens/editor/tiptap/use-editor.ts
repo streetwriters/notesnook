@@ -19,19 +19,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getFormattedDate } from "@notesnook/common";
 import {
-  EVENTS,
-  isEncryptedContent,
-  NoteContent,
   ContentItem,
   ContentType,
   DeletedItem,
+  EVENTS,
   ItemReference,
   Note,
+  NoteContent,
   TrashItem,
   UnencryptedContentItem,
   isDeleted,
+  isEncryptedContent,
   isTrashItem
 } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import WebView from "react-native-webview";
@@ -57,6 +58,7 @@ import {
   eUpdateNoteInEditor
 } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
+import { sleep } from "../../../utils/time";
 import { unlockVault } from "../../../utils/unlock-vault";
 import { onNoteCreated } from "../../notes/common";
 import Commands from "./commands";
@@ -73,8 +75,6 @@ import {
   isEditorLoaded,
   post
 } from "./utils";
-import { sleep } from "../../../utils/time";
-import { strings } from "@notesnook/intl";
 
 type NoteWithContent = Note & {
   content?: NoteContent<false>;
@@ -282,7 +282,7 @@ export const useEditor = (
           if (saved) return;
           commands.setStatus(
             getFormattedDate(note ? note.dateEdited : Date.now(), "date-time"),
-            "Saving",
+            strings.saving(),
             tabId
           );
         }, 50);
@@ -365,7 +365,7 @@ export const useEditor = (
           note = (await db.notes?.note(id)) as Note;
           await commands.setStatus(
             getFormattedDate(note.dateEdited, "date-time"),
-            "Saved",
+            strings.saved(),
             tabId
           );
 
@@ -574,7 +574,7 @@ export const useEditor = (
 
         await commands.setStatus(
           getFormattedDate(item.dateEdited, "date-time"),
-          "Saved",
+          strings.saved(),
           tabId
         );
 
@@ -695,7 +695,7 @@ export const useEditor = (
             if (currentNotes.current[noteId]?.dateEdited !== note.dateEdited) {
               commands.setStatus(
                 getFormattedDate(note.dateEdited, "date-time"),
-                "Saved",
+                strings.saved(),
                 tabId as number
               );
             }
