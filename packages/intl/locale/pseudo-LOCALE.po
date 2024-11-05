@@ -5977,7 +5977,7 @@ msgstr ""
 msgid "Vault Fingerprint Unlock"
 msgstr ""
 
-#: src/strings.ts:1985
+#: src/strings.ts:1986
 msgid "Vault locked"
 msgstr ""
 
@@ -5985,7 +5985,7 @@ msgstr ""
 #~ msgid "Vault locked successfully"
 #~ msgstr ""
 
-#: src/strings.ts:1986
+#: src/strings.ts:1985
 msgid "Vault unlocked"
 msgstr ""
 
