@@ -14,31 +14,6 @@
   -webkit-app-region: no-drag;
 }
 
-.panel-resize-handle {
-  position: relative;
-}
-
-.panel-resize-handle::before {
-  content: " ";
-  position: absolute;
-  transition: background-color 300ms ease-out;
-  z-index: 999;
-}
-
-.panel-resize-handle[data-panel-group-direction="horizontal"]::before {
-  width: 5px;
-  height: 100%;
-}
-
-.panel-resize-handle[data-panel-group-direction="vertical"]::before {
-  width: 100%;
-  height: 5px;
-}
-
-.panel-resize-handle[data-resize-handle-state="hover"]::before {
-  background-color: var(--accent);
-}
-
 /* open-sans-regular - vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic */
 @font-face {
   font-family: "Open Sans";

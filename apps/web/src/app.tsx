@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState, Suspense, useRef, useEffect } from "react";
+import React, { useState, Suspense } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
@@ -29,12 +29,7 @@ import StatusBar from "./components/status-bar";
 import { FlexScrollContainer } from "./components/scroll-container";
 import CachedRouter from "./components/cached-router";
 import { WebExtensionRelay } from "./utils/web-extension-relay";
-import {
-  PanelGroup,
-  Panel,
-  PanelResizeHandle,
-  ImperativePanelHandle
-} from "react-resizable-panels";
+import { Pane, SplitPane } from "./components/split-pane";
 import GlobalMenuWrapper from "./components/global-menu-wrapper";
 import AppEffects from "./app-effects";
 import HashRouter from "./components/hash-router";
@@ -111,14 +106,14 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isTablet = useTablet();
   const [isNarrow, setIsNarrow] = useState(isTablet || false);
-  const navPane = useRef<ImperativePanelHandle>(null);
-  const middlePane = useRef<ImperativePanelHandle>(null);
+  // const navPane = useRef<ImperativePanelHandle>(null);
+  // const middlePane = useRef<ImperativePanelHandle>(null);
 
-  useEffect(() => {
-    const size = navPane.current?.getSize();
-    // Toggle `isNarrow` to true if panel size isn't set to narrow by user
-    setIsNarrow((size && size <= 5) || isTablet);
-  }, [isTablet]);
+  // useEffect(() => {
+  //   const size = navPane.current?.getSize();
+  //   // Toggle `isNarrow` to true if panel size isn't set to narrow by user
+  //   setIsNarrow((size && size <= 5) || isTablet);
+  // }, [isTablet]);
 
   // useEffect(() => {
   //   if (show) middlePane.current?.expand();
@@ -142,7 +137,14 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
           overflow: "hidden"
         }}
       >
-        <PanelGroup autoSaveId="global-panel-group" direction="horizontal">
+        <SplitPane
+          autoSaveId="global-panel-group"
+          direction="vertical"
+          initialSizes={[isTablet ? 60 : 180, isTablet ? 240 : 380]}
+          onChange={(sizes) => {
+            setIsNarrow(sizes[0] <= 70);
+          }}
+        >
           {!isFocusMode && isTablet ? (
             <Flex sx={{ width: 50 }}>
               <NavigationMenu
@@ -154,69 +156,46 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
             </Flex>
           ) : (
             !isFocusMode && (
-              <>
-                <Panel
-                  ref={navPane}
-                  order={1}
-                  className="nav-pane"
-                  defaultSize={10}
-                  minSize={3.5}
-                  // maxSize={isNarrow ? 5 : undefined}
-                  onResize={(size) => setIsNarrow(size <= 5)}
-                  collapsible
-                  collapsedSize={3.5}
-                >
-                  <NavigationMenu
-                    toggleNavigationContainer={(state) => {
-                      setShow(state || !show);
-                    }}
-                    isTablet={isNarrow}
-                  />
-                </Panel>
-                <PanelResizeHandle className="panel-resize-handle" />
-              </>
+              <Pane minSize={50}>
+                <NavigationMenu
+                  toggleNavigationContainer={(state) => {
+                    setShow(state || !show);
+                  }}
+                  isTablet={isNarrow}
+                />
+              </Pane>
             )
           )}
           {!isFocusMode && show && (
-            <>
-              <Panel
-                ref={middlePane}
-                className="middle-pane"
-                order={2}
-                collapsible
-                defaultSize={20}
+            <Pane style={{ flex: 1, display: "flex" }}>
+              <ScopedThemeProvider
+                className="listMenu"
+                scope="list"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                  bg: "background",
+                  borderRight: "1px solid var(--separator)"
+                }}
               >
-                <ScopedThemeProvider
-                  className="listMenu"
-                  scope="list"
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    flex: 1,
-                    bg: "background",
-                    borderRight: "1px solid var(--separator)"
-                  }}
-                >
-                  <CachedRouter />
-                </ScopedThemeProvider>
-              </Panel>
-              <PanelResizeHandle className="panel-resize-handle" />
-            </>
+                <CachedRouter />
+              </ScopedThemeProvider>
+            </Pane>
           )}
-          <Panel className="editor-pane" order={3} defaultSize={70}>
-            <Flex
-              sx={{
-                display: "flex",
-                overflow: "hidden",
-                flex: 1,
-                flexDirection: "column",
-                bg: "background"
-              }}
-            >
-              <HashRouter />
-            </Flex>
-          </Panel>
-        </PanelGroup>
+
+          <Pane
+            style={{
+              flex: 1,
+              display: "flex",
+              backgroundColor: "var(--background)",
+              overflow: "hidden",
+              flexDirection: "column"
+            }}
+          >
+            {<HashRouter />}
+          </Pane>
+        </SplitPane>
       </Flex>
       <StatusBar />
     </>
@@ -249,7 +228,7 @@ function MobileAppContents() {
           flexShrink: 0
         }}
       >
-        <NavigationMenu toggleNavigationContainer={() => {}} isTablet={false} />
+        <NavigationMenu toggleNavigationContainer={() => { }} isTablet={false} />
       </Flex>
       <Flex
         className="listMenu"
