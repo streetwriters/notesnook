@@ -184,5 +184,10 @@ class Vault {
       }
     });
   }
+
+  static async lockVault() {
+    await db.vault.lock();
+    showToast("success", strings.vaultLocked());
+  }
 }
 export default Vault;

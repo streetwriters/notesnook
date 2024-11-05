@@ -1982,6 +1982,8 @@ All attachments will be downloaded & cached again on access.
       ]()}`
     }),
   backupReadyToDownload: () => t`Your backup is ready to download`,
+  vaultLocked: () => t`Vault locked`,
+  vaultUnlocked: () => t`Vault unlocked`,
   unlockVault: () => t`Unlock vault`,
   unlockVaultDesc: () => t`Please enter your vault password to continue`,
   imagePreviewFailed: () => t`This image cannot be previewed`,

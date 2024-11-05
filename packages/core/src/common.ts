@@ -120,6 +120,7 @@ export const EVENTS = {
   attachmentDeleted: "attachment:deleted",
   mediaAttachmentDownloaded: "attachments:mediaDownloaded",
   vaultLocked: "vault:locked",
+  vaultUnlocked: "vault:unlocked",
   systemTimeInvalid: "system:invalidTime"
 };
 
