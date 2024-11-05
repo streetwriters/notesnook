@@ -41,8 +41,8 @@ import { i18n } from "@lingui/core";
 
 const locale =
   process.env.NODE_ENV === "development"
-    ? import("@notesnook/intl/dist/locales/$pseudo-LOCALE.json")
-    : import("@notesnook/intl/dist/locales/$en.json");
+    ? import("@notesnook/intl/locales/$pseudo-LOCALE.json")
+    : import("@notesnook/intl/locales/$en.json");
 locale.then(({ default: locale }) => {
   i18n.load({
     en: locale.messages as unknown as Messages
