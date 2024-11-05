@@ -49,8 +49,6 @@ import { useEditorManager } from "./manager";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { strings } from "@notesnook/intl";
 
-export const TABLE_OF_CONTENTS_WIDTH = 300;
-
 type TableOfContentsProps = {
   sessionId: string;
 };
@@ -102,12 +100,10 @@ function TableOfContents(props: TableOfContentsProps) {
       initial={{ x: 600 }}
       sx={{
         display: "flex",
-        position: "absolute",
-        right: 0,
-        top: 32,
+        top: TITLE_BAR_HEIGHT,
         zIndex: 999,
         height: "100%",
-        width: TABLE_OF_CONTENTS_WIDTH,
+        width: "300px",
         borderLeft: "1px solid",
         borderLeftColor: "border"
       }}

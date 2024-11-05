@@ -169,8 +169,7 @@ export function EditorActionBar() {
         activeSession.type !== "locked" &&
         activeSession.type !== "diff" &&
         activeSession.type !== "conflicted",
-      onClick: () => useEditorStore.getState().toggleTableOfContents(),
-      toc: true
+      onClick: () => useEditorStore.getState().toggleTableOfContents()
     },
     {
       title: strings.search(),
@@ -225,7 +224,7 @@ export function EditorActionBar() {
           title={tool.title}
           key={tool.title}
           sx={{
-            height: tool.toc ? 32 : "100%",
+            height: "100%",
             alignItems: "center",
             bg: "transparent",
             display: [
@@ -239,11 +238,7 @@ export function EditorActionBar() {
                 tool.title === "Close"
                   ? "var(--accentForeground-error) !important"
                   : "var(--icon)"
-            },
-            position: tool.toc ? "absolute" : "static",
-            right: tool.toc ? 10 : "auto",
-            top: tool.toc ? 32 : "auto",
-            zIndex: tool.toc ? 1999 : "auto"
+            }
           }}
           onClick={tool.onClick}
         >

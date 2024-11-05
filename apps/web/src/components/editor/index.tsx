@@ -63,7 +63,7 @@ import { debounce, debounceWithId } from "@notesnook/common";
 import { Freeze } from "react-freeze";
 import { UnlockView } from "../unlock";
 import DiffViewer from "../diff-viewer";
-import TableOfContents, { TABLE_OF_CONTENTS_WIDTH } from "./table-of-contents";
+import TableOfContents from "./table-of-contents";
 import { scrollIntoViewById } from "@notesnook/editor";
 import { IEditor } from "./types";
 import { EditorActionBar } from "./action-bar";
@@ -152,7 +152,12 @@ export default function TabsView() {
                 ) : session.type === "conflicted" || session.type === "diff" ? (
                   <DiffViewer session={session} />
                 ) : (
-                  <MemoizedEditorView session={session} />
+                  <Flex sx={{ overflow: "hidden" }}>
+                    <MemoizedEditorView session={session} />
+                    {isTOCVisible && activeSessionId && (
+                      <TableOfContents sessionId={activeSessionId} />
+                    )}
+                  </Flex>
                 )}
               </Freeze>
             ))}
@@ -208,9 +213,6 @@ export default function TabsView() {
         <DropZone overlayRef={overlayRef} />
         {arePropertiesVisible && activeSessionId && (
           <Properties sessionId={activeSessionId} />
-        )}
-        {isTOCVisible && activeSessionId && (
-          <TableOfContents sessionId={activeSessionId} />
         )}
       </ScopedThemeProvider>
     </>
@@ -568,7 +570,6 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
   const editorMargins = useEditorStore((store) => store.editorMargins);
   const editorContainerRef = useRef<HTMLElement>(null);
   const editorScrollRef = useRef<HTMLElement>(null);
-  const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
 
   useEffect(() => {
     if (!editorScrollRef.current) return;
@@ -625,15 +626,9 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           variant="columnFill"
           className="editor"
           sx={{
-            alignSelf: [
-              "stretch",
-              focusMode ? "center" : "stretch",
-              !editorMargins ? (isTOCVisible ? "stretch" : "center") : "center"
-            ],
+            alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
             maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
-            width: isTOCVisible
-              ? `calc(100% - ${TABLE_OF_CONTENTS_WIDTH}px)`
-              : "100%"
+            width: "100%"
           }}
           pl={[2, 2, 6]}
           pr={[2, 2, 6]}
