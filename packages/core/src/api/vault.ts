@@ -50,8 +50,7 @@ export default class Vault {
   private startEraser() {
     clearTimeout(this.erasureTimeout);
     this.erasureTimeout = setTimeout(() => {
-      this.password = undefined;
-      EV.publish(EVENTS.vaultLocked);
+      this.lock();
     }, this.eraseTime) as unknown as number;
   }
 
@@ -80,6 +79,12 @@ export default class Vault {
     return true;
   }
 
+  async lock() {
+    this.password = undefined;
+    EV.publish(EVENTS.vaultLocked);
+    return true;
+  }
+
   async unlock(password: string) {
     const vaultKey = await this.getKey();
     if (!vaultKey || !(await this.exists(vaultKey)))
@@ -90,6 +95,7 @@ export default class Vault {
       throw new Error(VAULT_ERRORS.wrongPassword);
     }
     this.password = password;
+    EV.publish(EVENTS.vaultUnlocked);
     return true;
   }
 

@@ -27,7 +27,9 @@ import {
   SyncError,
   Alert,
   SyncOff,
-  Icon
+  Icon,
+  Lock,
+  Unlock
 } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -40,6 +42,7 @@ import { getTimeAgo, toTitleCase } from "@notesnook/common";
 import { User } from "@notesnook/core";
 import { showUpdateAvailableNotice } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
+import { useVault } from "../../hooks/use-vault";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -47,6 +50,7 @@ function StatusBar() {
   const statuses = useStatus();
   const updateStatus = useAutoUpdater();
   const isFocusMode = useAppStore((state) => state.isFocusMode);
+  const { isVaultLocked, lockVault } = useVault();
 
   return (
     <ScopedThemeProvider
@@ -157,6 +161,22 @@ function StatusBar() {
               />
               <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
                 {statusToInfoText(updateStatus)}
+              </Text>
+            </Button>
+          )}
+          {!isVaultLocked && (
+            <Button
+              variant="statusitem"
+              onClick={lockVault}
+              sx={{
+                alignItems: "center",
+                justifyContent: "center",
+                display: "flex"
+              }}
+            >
+              <Unlock size={10} />
+              <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
+                {strings.vaultUnlocked()}
               </Text>
             </Button>
           )}
