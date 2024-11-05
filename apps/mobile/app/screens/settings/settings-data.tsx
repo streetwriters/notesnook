@@ -333,12 +333,12 @@ export const settingsGroups: SettingSection[] = [
           },
           {
             id: "clear-cache",
-            name: "Clear cache",
+            name: strings.clearCache(),
             icon: "delete",
             modifer: async () => {
               presentDialog({
-                title: "Clear cache",
-                paragraph: "Are you sure you want to clear the cache?",
+                title: strings.clearCacheConfirm(),
+                paragraph: strings.clearCacheConfirmDesc(),
                 positiveText: "Clear",
                 positivePress: async () => {
                   filesystem.clearCache();
@@ -351,7 +351,7 @@ export const settingsGroups: SettingSection[] = [
               });
             },
             description(current) {
-              return `Clear all cached attachments. Current cache size: ${
+              return `${strings.clearCacheDesc()}. Current cache size: ${
                 current as number
               }`;
             },

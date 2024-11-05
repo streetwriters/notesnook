@@ -1850,6 +1850,7 @@ For example:
   properties: () => t`Properties`,
   clickToPreview: () => t`Click to preview`,
   clearCache: () => t`Clear cache`,
+  clearCacheDesc: () => t`Clear all cached attachments`,
   clearCacheConfirm: () => t`Clear attachments cache?`,
   clearCacheConfirmDesc:
     () => t`Clearing attachments cache will perform the following actions:
