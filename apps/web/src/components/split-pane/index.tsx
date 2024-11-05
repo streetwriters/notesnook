@@ -67,10 +67,7 @@ export const SplitPane = React.forwardRef<
           "split-sash-content",
           active && "split-sash-content-active"
         )}
-        {...others}
-      >
-        {children}
-      </div>
+      />
     ),
     sashSize: resizerSize = 5,
     onChange = () => null,
@@ -116,11 +113,13 @@ export const SplitPane = React.forwardRef<
   const paneLimitSizes = useMemo(
     () =>
       childrenToArray(children).map((childNode) => {
-        const limits = [0, Infinity];
+        const limits = { min: 0, max: Infinity, snap: 0 };
         if (React.isValidElement(childNode) && childNode.type === Pane) {
-          const { minSize, maxSize } = childNode.props as IPaneConfigs;
-          limits[0] = assertsSize(minSize, wrapSize.current, 0);
-          limits[1] = assertsSize(maxSize, wrapSize.current);
+          const { minSize, maxSize, snapSize } =
+            childNode.props as IPaneConfigs;
+          limits.min = assertsSize(minSize, wrapSize.current, 0);
+          limits.max = assertsSize(maxSize, wrapSize.current);
+          limits.snap = assertsSize(snapSize, wrapSize.current, 0);
         }
         return limits;
       }) || [],
@@ -193,7 +192,7 @@ export const SplitPane = React.forwardRef<
       return {
         collapse: (index: number) => {
           const nextSizes = [...sizes.current];
-          nextSizes[index] = paneLimitSizes[index][0];
+          nextSizes[index] = paneLimitSizes[index].min;
           nextSizes[index + 1] += sizes.current[index];
           setSizes(nextSizes, wrapSize.current);
         },
@@ -242,15 +241,25 @@ export const SplitPane = React.forwardRef<
       if (currentSize + distanceX >= rightBorder)
         distanceX = rightBorder - currentSize;
 
-      if (currentSize + distanceX < currentPaneLimits[0]) return;
-      if (currentSize + distanceX > currentPaneLimits[1]) return;
+      if (currentSize + distanceX < currentPaneLimits.min) return;
+      if (currentSize + distanceX > currentPaneLimits.max) return;
 
       const nextSizes = [...sizes.current];
       nextSizes[i] += distanceX;
       nextSizes[i + 1] -= distanceX;
 
-      if (nextSizes[i + 1] < nextPaneLimits[0])
-        nextSizes[i + 1] = nextPaneLimits[0];
+      if (nextSizes[i + 1] < nextPaneLimits.min)
+        nextSizes[i + 1] = nextPaneLimits.min;
+
+      if (currentPaneLimits.snap > 0 && distanceX <= 0) {
+        if (nextSizes[i] <= currentPaneLimits.snap / 2)
+          nextSizes[i] = currentPaneLimits.min;
+        else if (nextSizes[i] < currentPaneLimits.snap) {
+          // reset axis
+          axis.current[splitAxis] += -distanceX;
+          return;
+        }
+      }
 
       setSizes(nextSizes, wrapSize.current);
     },
