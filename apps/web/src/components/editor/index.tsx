@@ -152,12 +152,7 @@ export default function TabsView() {
                 ) : session.type === "conflicted" || session.type === "diff" ? (
                   <DiffViewer session={session} />
                 ) : (
-                  <Flex sx={{ overflow: "hidden" }}>
-                    <MemoizedEditorView session={session} />
-                    {isTOCVisible && activeSessionId && (
-                      <TableOfContents sessionId={activeSessionId} />
-                    )}
-                  </Flex>
+                  <MemoizedEditorView session={session} />
                 )}
               </Freeze>
             ))}
@@ -206,6 +201,15 @@ export default function TabsView() {
                     <DownloadAttachmentProgress hash={documentPreview.hash} />
                   )}
                 </ScopedThemeProvider>
+              </Panel>
+            </>
+          )}
+
+          {isTOCVisible && activeSessionId && (
+            <>
+              <PanelResizeHandle className="panel-resize-handle" />
+              <Panel id="toc-panel" order={3} defaultSize={25} minSize={15}>
+                <TableOfContents sessionId={activeSessionId} />
               </Panel>
             </>
           )}
