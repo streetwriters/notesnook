@@ -317,7 +317,11 @@ export const SplitPane = React.forwardRef<
             onDragging={(e) => onDragging(e, index)}
             onDragEnd={dragEnd}
             onDoubleClick={() => {
-              setSizes(initialSizes, wrapSize.current);
+              sizes.current[index] = assertsSize(
+                initialSizes[index],
+                wrapSize.current
+              );
+              setSizes(sizes.current, wrapSize.current);
             }}
           />
         ))}
