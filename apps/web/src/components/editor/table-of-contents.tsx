@@ -37,9 +37,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect, useState } from "react";
-import { ArrowLeft } from "../icons";
+import { Cross } from "../icons";
 import { useEditorStore } from "../../stores/editor-store";
-import { AnimatedFlex } from "../animated";
 import ScrollContainer from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
 import { Section } from "../properties";
@@ -87,25 +86,12 @@ function TableOfContents(props: TableOfContentsProps) {
   }, [sessionId, tableOfContents]);
 
   return (
-    <AnimatedFlex
-      animate={{
-        x: 0
-      }}
-      transition={{
-        duration: 0.1,
-        bounceDamping: 1,
-        bounceStiffness: 1,
-        ease: "easeOut"
-      }}
-      initial={{ x: 600 }}
+    <Flex
       sx={{
         display: "flex",
-        position: "absolute",
-        right: 0,
         top: TITLE_BAR_HEIGHT,
         zIndex: 999,
         height: "100%",
-        width: "300px",
         borderLeft: "1px solid",
         borderLeftColor: "border"
       }}
@@ -124,8 +110,9 @@ function TableOfContents(props: TableOfContentsProps) {
         <ScrollContainer>
           <Section
             title={strings.toc()}
+            buttonPosition="right"
             button={
-              <ArrowLeft
+              <Cross
                 data-test-id="toc-close"
                 onClick={() => toggleTableOfContents(false)}
                 size={18}
@@ -150,7 +137,7 @@ function TableOfContents(props: TableOfContentsProps) {
                     key={t.id}
                     sx={{
                       textAlign: "left",
-                      paddingLeft: `${t.level * 5 + (t.level - 1) * 5}px`,
+                      paddingLeft: `${t.level * 10 + (t.level - 1) * 10}px`,
                       py: 1,
                       pr: 1,
                       borderLeft: "5px solid transparent",
@@ -171,7 +158,7 @@ function TableOfContents(props: TableOfContentsProps) {
           </Section>
         </ScrollContainer>
       </ScopedThemeProvider>
-    </AnimatedFlex>
+    </Flex>
   );
 }
 export default React.memo(TableOfContents);

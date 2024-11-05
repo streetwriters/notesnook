@@ -204,13 +204,19 @@ export default function TabsView() {
               </Panel>
             </>
           )}
+
+          {isTOCVisible && activeSessionId && (
+            <>
+              <PanelResizeHandle className="panel-resize-handle" />
+              <Panel id="toc-panel" order={3} defaultSize={25} minSize={15}>
+                <TableOfContents sessionId={activeSessionId} />
+              </Panel>
+            </>
+          )}
         </PanelGroup>
         <DropZone overlayRef={overlayRef} />
         {arePropertiesVisible && activeSessionId && (
           <Properties sessionId={activeSessionId} />
-        )}
-        {isTOCVisible && activeSessionId && (
-          <TableOfContents sessionId={activeSessionId} />
         )}
       </ScopedThemeProvider>
     </>

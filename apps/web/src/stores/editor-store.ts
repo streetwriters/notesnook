@@ -166,7 +166,7 @@ class EditorStore extends BaseStore<EditorStore> {
 
   arePropertiesVisible = false;
   documentPreview?: DocumentPreview;
-  isTOCVisible = false;
+  isTOCVisible = Config.get("editor:toc", false);
   editorMargins = Config.get("editor:margins", true);
   history: string[] = [];
 
@@ -935,11 +935,11 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   toggleTableOfContents = (toggleState?: boolean) => {
-    this.set(
-      (state) =>
-        (state.isTOCVisible =
-          toggleState !== undefined ? toggleState : !state.isTOCVisible)
-    );
+    this.set((state) => {
+      state.isTOCVisible =
+        toggleState !== undefined ? toggleState : !state.isTOCVisible;
+      Config.set("editor:toc", !state.isTOCVisible);
+    });
   };
 
   toggleEditorMargins = (toggleState?: boolean) => {

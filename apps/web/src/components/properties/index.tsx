@@ -715,11 +715,17 @@ function SessionHistory({ noteId }: { noteId: string }) {
   );
 }
 
-type SectionProps = { title: string; subtitle?: string; button?: JSX.Element };
+type SectionProps = {
+  title: string;
+  subtitle?: string;
+  button?: JSX.Element;
+  buttonPosition?: "left" | "right";
+};
 export function Section({
   title,
   subtitle,
   button,
+  buttonPosition = "left",
   children
 }: PropsWithChildren<SectionProps>) {
   return (
@@ -729,9 +735,18 @@ export function Section({
         flexDirection: "column"
       }}
     >
-      <Flex mx={1} mt={2} sx={{ alignItems: "center" }}>
-        {button}
+      <Flex
+        mx={1}
+        mt={2}
+        sx={{
+          alignItems: "center",
+          justifyContent:
+            buttonPosition === "right" ? "space-between" : "flex-start"
+        }}
+      >
+        {buttonPosition === "left" && button}
         <Text variant="subtitle">{title}</Text>
+        {buttonPosition === "right" && button}
       </Flex>
       {subtitle && (
         <Text variant="subBody" mb={1} mx={1}>
