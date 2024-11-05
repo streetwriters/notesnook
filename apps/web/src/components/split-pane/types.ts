@@ -91,4 +91,5 @@ export interface IPaneConfigs {
   paneRef?: React.LegacyRef<HTMLDivElement>;
   maxSize?: number | string;
   minSize?: number | string;
+  snapSize?: number | string;
 }

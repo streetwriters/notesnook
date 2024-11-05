@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
@@ -156,7 +156,7 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
             </Flex>
           ) : (
             !isFocusMode && (
-              <Pane minSize={50}>
+              <Pane minSize={50} snapSize={120}>
                 <NavigationMenu
                   toggleNavigationContainer={(state) => {
                     setShow(state || !show);
@@ -167,7 +167,7 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
             )
           )}
           {!isFocusMode && show && (
-            <Pane style={{ flex: 1, display: "flex" }}>
+            <Pane style={{ flex: 1, display: "flex" }} snapSize={200}>
               <ScopedThemeProvider
                 className="listMenu"
                 scope="list"
