@@ -36,7 +36,6 @@ import {
   RemoveShortcutLink,
   ShortcutLink
 } from "../components/icons";
-import { pluralize } from "@notesnook/common";
 import { Plus } from "../components/icons";
 import { useStore as useNotesStore } from "../stores/note-store";
 import { useStore as useNotebookStore } from "../stores/notebook-store";
@@ -56,14 +55,13 @@ import { FlexScrollContainer } from "../components/scroll-container";
 import { Menu } from "../hooks/use-menu";
 import Config from "../utils/config";
 import Notes from "./notes";
-import {
-  PanelGroup,
-  Panel,
-  PanelResizeHandle,
-  ImperativePanelHandle
-} from "react-resizable-panels";
 import { AddNotebookDialog } from "../dialogs/add-notebook-dialog";
 import { strings } from "@notesnook/intl";
+import {
+  Pane,
+  SplitPane,
+  SplitPaneImperativeHandle
+} from "../components/split-pane";
 
 type NotebookProps = {
   rootId: string;
@@ -73,7 +71,7 @@ function Notebook(props: NotebookProps) {
   const { rootId, notebookId } = props;
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const subNotebooksPane = useRef<ImperativePanelHandle>(null);
+  const pane = useRef<SplitPaneImperativeHandle>(null);
 
   const context = useNotesStore((store) => store.context);
   const notes = useNotesStore((store) => store.contextNotes);
@@ -103,11 +101,20 @@ function Notebook(props: NotebookProps) {
 
   if (!context || !notes || context.type !== "notebook") return null;
   return (
-    <PanelGroup
-      direction="vertical"
+    <SplitPane
+      ref={pane}
+      direction="horizontal"
+      initialSizes={[Infinity, 250]}
       autoSaveId={`notebook-panel-sizes:${rootId}`}
+      onChange={([_, subnotebooksPane]) => {
+        setIsCollapsed((isCollapsed) => {
+          if (subnotebooksPane <= 34 && !isCollapsed) return true;
+          else if (subnotebooksPane >= 35 && isCollapsed) return false;
+          return isCollapsed;
+        });
+      }}
     >
-      <Panel style={{ display: "flex" }}>
+      <Pane style={{ display: "flex" }}>
         <Notes
           header={
             <NotebookHeader
@@ -117,28 +124,20 @@ function Notebook(props: NotebookProps) {
             />
           }
         />
-      </Panel>
-      <PanelResizeHandle className="panel-resize-handle" />
-      <Panel
-        ref={subNotebooksPane}
-        defaultSize={25}
-        collapsedSize={7}
-        collapsible
-        minSize={7}
-        onResize={(size) => setIsCollapsed(size <= 7)}
-      >
+      </Pane>
+      <Pane minSize={30}>
         <SubNotebooks
           key={rootId}
           notebookId={notebookId}
           isCollapsed={isCollapsed}
           rootId={rootId}
           onClick={() => {
-            if (isCollapsed) subNotebooksPane.current?.expand();
-            else subNotebooksPane.current?.collapse();
+            if (isCollapsed) pane.current?.expand(1);
+            else pane.current?.collapse(1);
           }}
         />
-      </Panel>
-    </PanelGroup>
+      </Pane>
+    </SplitPane>
   );
 }
 export default Notebook;
