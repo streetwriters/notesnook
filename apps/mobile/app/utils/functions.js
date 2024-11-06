@@ -135,7 +135,7 @@ export const deleteItems = async (items, type, context) => {
       heading: message,
       type: "success",
       func: async () => {
-        await db.trash.restore(...deletedIds);
+        if ((await db.trash.restore(...deletedIds)) === false) return;
         Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
