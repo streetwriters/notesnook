@@ -156,7 +156,7 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
             </Flex>
           ) : (
             !isFocusMode && (
-              <Pane minSize={50} snapSize={120}>
+              <Pane minSize={50} snapSize={120} maxSize={300}>
                 <NavigationMenu
                   toggleNavigationContainer={(state) => {
                     setShow(state || !show);
@@ -167,7 +167,11 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
             )
           )}
           {!isFocusMode && show && (
-            <Pane style={{ flex: 1, display: "flex" }} snapSize={200}>
+            <Pane
+              style={{ flex: 1, display: "flex" }}
+              snapSize={200}
+              maxSize={500}
+            >
               <ScopedThemeProvider
                 className="listMenu"
                 scope="list"
