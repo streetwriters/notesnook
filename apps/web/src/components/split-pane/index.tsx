@@ -267,10 +267,10 @@ export const SplitPane = React.forwardRef<
       );
 
       // snapping logic
-      if (currentPaneLimits.snap > 0 && distanceX <= 0) {
-        if (nextSizes[i] <= currentPaneLimits.snap / 2)
+      if (currentPaneLimits.snap > 0) {
+        if (distanceX < 0 && nextSizes[i] <= currentPaneLimits.snap / 2) {
           nextSizes[i] = currentPaneLimits.min;
-        else if (nextSizes[i] < currentPaneLimits.snap) {
+        } else if (nextSizes[i] < currentPaneLimits.snap) {
           // reset axis
           axis.current[splitAxis] += -distanceX;
           return;
