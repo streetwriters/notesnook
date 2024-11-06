@@ -204,6 +204,30 @@ export const SplitPane = React.forwardRef<
 
       const [entry] = entries;
       const newSize = entry.contentRect ? entry.contentRect[sizeName] : 0;
+
+      const delta = newSize - wrapSize.current;
+      if (delta === 0) return;
+
+      // TODO: responsiveness
+      // const nextSizes = [...sizes.current];
+      // const i = sizes.current.length - 1;
+      // const currentSize = sizes.current[i];
+      // const currentPaneLimits = paneLimitSizes.current[i];
+      // const prevPaneLimits = paneLimitSizes.current[i - 1];
+
+      // if (
+      //   delta > 0 &&
+      //   prevPaneLimits &&
+      //   prevPaneLimits.max < Infinity &&
+      //   nextSizes[i - 1] + delta <= prevPaneLimits.max
+      // ) {
+      //   nextSizes[i - 1] += delta;
+      // } else if (delta < 0 && currentSize + delta <= currentPaneLimits.min) {
+      //   nextSizes[i - 1] += delta;
+      // } else {
+      //   nextSizes[i] += delta;
+      // }
+
       wrapSize.current = newSize;
       setSizes(sizes.current, wrapSize.current);
     });
