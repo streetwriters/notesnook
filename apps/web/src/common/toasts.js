@@ -40,7 +40,8 @@ function showItemDeletedToast(item) {
     toast.hide();
     let trashItem = db.trash.all.find((i) => i.id === item.id);
     if (!trashItem) return;
-    await db.trash.restore(trashItem.id);
+    const restored = await db.trash.restore(trashItem.id);
+    if (restored === false) return;
     nbstore.refresh();
     notestore.refresh();
   };
