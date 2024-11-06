@@ -98,18 +98,18 @@ function StatusBar({
 
     if (scrollState.current.isMovingUp) {
       if (currentOffset < scrollState.current.startingOffset - 50) {
-        stickyRef.current = true;
-        setSticky(true);
-        lastStickyChangeTime.current = Date.now();
-        prevScroll.current = currentOffset;
+        if (!stickyRef.current) {
+          stickyRef.current = true;
+          setSticky(true);
+        }
         scrollState.current.startingOffset = 0;
       }
     } else {
       if (currentOffset > scrollState.current.startingOffset + 50) {
-        stickyRef.current = false;
-        setSticky(false);
-        lastStickyChangeTime.current = Date.now();
-        prevScroll.current = currentOffset;
+        if (stickyRef.current) {
+          stickyRef.current = false;
+          setSticky(false);
+        }
         scrollState.current.startingOffset = 0;
       }
     }
