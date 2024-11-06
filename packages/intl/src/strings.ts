@@ -1900,12 +1900,12 @@ All attachments will be downloaded & cached again on access.
   backupSavedAt: (path: string) => t`Backup saved at ${path}`,
   movedToTrash: (type: string, count: number) =>
     plural(count, {
-      one: `1 ${
-        strings.dataTypes[type as keyof typeof strings.dataTypes]
-      } moved to trash`,
-      other: `# ${
-        strings.dataTypesPlural[type as keyof typeof strings.dataTypesPlural]
-      } moved to trash`
+      one: `1 ${strings.dataTypes[
+        type as keyof typeof strings.dataTypes
+      ]()} moved to trash`,
+      other: `# ${strings.dataTypesPlural[
+        type as keyof typeof strings.dataTypesPlural
+      ]()} moved to trash`
     }),
   irreverisibleAction: () => t`This action is IRREVERSIBLE.`,
   doAction: (type: string, count: number, action: DoActions) =>
@@ -1991,11 +1991,11 @@ All attachments will be downloaded & cached again on access.
     const features = {
       color: t`Upgrade to Notesnook Pro to add colors.`,
       tags: t`Upgrade to Notesnook Pro to create more tags.`,
-      notebook: t` Upgrade to Notesnook Proto add more notebooks.`,
-      vault: t` Upgrade to Notesnook Proto use the notes vault.`,
+      notebook: t` Upgrade to Notesnook Pro to add more notebooks.`,
+      vault: t` Upgrade to Notesnook Pro to use the notes vault.`,
       customPresets: t` Upgrade to Notesnook Pro to use custom toolbar presets.`,
       customizeToolbar: t` Upgrade to Notesnook Pro to customize the toolbar.`,
-      default: t` Upgrade to Notesnook Proto use this feature.`
+      default: t` Upgrade to Notesnook Pro to use this feature.`
     };
     return features[feature as keyof typeof features];
   },

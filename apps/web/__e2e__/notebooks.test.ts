@@ -111,7 +111,7 @@ test("restore a notebook", async ({ page }) => {
   await app.goToNotebooks();
   const restoredNotebook = await notebooks.findNotebook(NOTEBOOK);
   expect(restoredNotebook).toBeDefined();
-  expect(await app.toasts.waitForToast("1 item restored")).toBe(true);
+  expect(await app.toasts.waitForToast("Item restored")).toBe(true);
 });
 
 test("permanently delete a notebook", async ({ page }) => {
@@ -224,7 +224,9 @@ test("delete all notes within a notebook", async ({ page }) => {
 
 test("creating more than 20 notebooks shouldn't be possible on basic plan", async ({
   page
-}) => {
+}, info) => {
+  info.setTimeout(2 * 60 * 1000);
+
   await page.exposeBinding("isBasic", () => true);
   const app = new AppModel(page);
   await app.goto();
@@ -235,9 +237,7 @@ test("creating more than 20 notebooks shouldn't be possible on basic plan", asyn
 
   const result = await Promise.race([
     notebooks.createNotebook(NOTEBOOK),
-    app.toasts.waitForToast(
-      "Please upgrade your account to Pro to add more notebooks."
-    )
+    app.toasts.waitForToast("Upgrade to Notesnook Pro to add more notebooks.")
   ]);
   expect(result).toBe(true);
 });

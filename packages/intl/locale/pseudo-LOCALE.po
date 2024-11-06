@@ -5826,6 +5826,10 @@ msgstr ""
 msgid "Upgrade to Notesnook Pro to add colors."
 msgstr ""
 
+#: src/strings.ts:1994
+msgid "Upgrade to Notesnook Pro to add more notebooks."
+msgstr ""
+
 #: src/strings.ts:1993
 msgid "Upgrade to Notesnook Pro to create more tags."
 msgstr ""
@@ -5838,17 +5842,25 @@ msgstr ""
 msgid "Upgrade to Notesnook Pro to use custom toolbar presets."
 msgstr ""
 
-#: src/strings.ts:1994
-msgid "Upgrade to Notesnook Proto add more notebooks."
-msgstr ""
-
 #: src/strings.ts:1995
-msgid "Upgrade to Notesnook Proto use the notes vault."
+msgid "Upgrade to Notesnook Pro to use the notes vault."
 msgstr ""
 
 #: src/strings.ts:1998
-msgid "Upgrade to Notesnook Proto use this feature."
+msgid "Upgrade to Notesnook Pro to use this feature."
 msgstr ""
+
+#: src/strings.ts:1994
+#~ msgid "Upgrade to Notesnook Proto add more notebooks."
+#~ msgstr ""
+
+#: src/strings.ts:1995
+#~ msgid "Upgrade to Notesnook Proto use the notes vault."
+#~ msgstr ""
+
+#: src/strings.ts:1998
+#~ msgid "Upgrade to Notesnook Proto use this feature."
+#~ msgstr ""
 
 #: src/strings.ts:705
 msgid "Upgrade to Pro"
