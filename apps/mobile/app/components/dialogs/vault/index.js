@@ -540,6 +540,7 @@ export class VaultDialog extends Component {
         this.close();
       })
       .catch((e) => {
+        console.log("Error", e);
         this._takeErrorAction(e);
       });
   }
@@ -580,24 +581,17 @@ export class VaultDialog extends Component {
   }
 
   _takeErrorAction(e) {
-    if (
-      e.message === db.vault.ERRORS.wrongPassword ||
-      e.message === "FAILURE"
-    ) {
-      this.setState({
-        wrongPassword: true,
-        visible: true
+    this.setState({
+      wrongPassword: true,
+      visible: true
+    });
+    setTimeout(() => {
+      ToastManager.show({
+        heading: strings.passwordIncorrect(),
+        type: "error",
+        context: "local"
       });
-      setTimeout(() => {
-        ToastManager.show({
-          heading: strings.passwordIncorrect(),
-          type: "error",
-          context: "local"
-        });
-      }, 500);
-
-      return;
-    }
+    }, 500);
   }
 
   _revokeFingerprintAccess = async () => {
@@ -876,9 +870,9 @@ export class VaultDialog extends Component {
             }
             positiveTitle={
               deleteVault
-                ? strings.deleteVault()
+                ? strings.delete()
                 : clearVault
-                ? strings.clearVault()
+                ? strings.clear()
                 : fingerprintAccess
                 ? strings.enable()
                 : this.state.revokeFingerprintAccess
