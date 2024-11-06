@@ -228,7 +228,10 @@ export const SplitPane = React.forwardRef<
   );
 
   const onDragging = useCallback(
-    function (e: React.MouseEvent<HTMLDivElement, MouseEvent>, i: number) {
+    function onDragging(
+      e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+      i: number
+    ) {
       const curAxis = { x: e.pageX, y: e.pageY };
       let distanceX = curAxis[splitAxis] - axis.current[splitAxis];
       axis.current = { x: e.pageX, y: e.pageY };
@@ -241,16 +244,29 @@ export const SplitPane = React.forwardRef<
       if (currentSize + distanceX >= rightBorder)
         distanceX = rightBorder - currentSize;
 
-      if (currentSize + distanceX < currentPaneLimits.min) return;
-      if (currentSize + distanceX > currentPaneLimits.max) return;
-
       const nextSizes = [...sizes.current];
+
+      // if current pane size is out of limit, adjust the previous pane
+      if (
+        currentSize + distanceX > currentPaneLimits.max ||
+        currentSize + distanceX < currentPaneLimits.min
+      ) {
+        if (i - 1 >= 0) {
+          // reset axis
+          axis.current[splitAxis] += -distanceX;
+          onDragging(e, i - 1);
+        }
+        return;
+      }
+
       nextSizes[i] += distanceX;
-      nextSizes[i + 1] -= distanceX;
+      // keep the next pane size in the min-max range
+      nextSizes[i + 1] = Math.min(
+        nextPaneLimits.max,
+        Math.max(nextPaneLimits.min, nextSizes[i + 1] - distanceX)
+      );
 
-      if (nextSizes[i + 1] < nextPaneLimits.min)
-        nextSizes[i + 1] = nextPaneLimits.min;
-
+      // snapping logic
       if (currentPaneLimits.snap > 0 && distanceX <= 0) {
         if (nextSizes[i] <= currentPaneLimits.snap / 2)
           nextSizes[i] = currentPaneLimits.min;
