@@ -897,7 +897,7 @@ export const settingsGroups: SettingSection[] = [
                 item: {},
                 clearVault: true,
                 novault: true,
-                title: strings.clearVault()
+                title: strings.clearVault() + "?"
               });
             }
           },
@@ -912,7 +912,7 @@ export const settingsGroups: SettingSection[] = [
                 item: {},
                 deleteVault: true,
                 novault: true,
-                title: strings.deleteVault()
+                title: strings.deleteVault() + "?"
               });
             }
           },
