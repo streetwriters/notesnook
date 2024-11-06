@@ -1,8 +1,6 @@
 name: Bug Report
 description: Are you facing a bug or a crash in Notesnook?
-labels: ["Type: Bug", "Status: Pending"]
-assignees:
-  - thecodrr
+type: Bug
 body:
   - type: markdown
     attributes:
