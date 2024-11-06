@@ -1,6 +1,6 @@
 name: Feature request
 description: Suggest a feature you are missing in Notesnook
-labels: ["Type: Feature Request", "Status: Pending"]
+type: Feature
 body:
   - type: markdown
     attributes:
