@@ -62,9 +62,12 @@ function StatusBar({
     };
   }, [tab.id, statusBar]);
 
+  const scrollState = useRef({
+    isMovingUp: false,
+    startingOffset: 0
+  });
   const onScroll = React.useCallback((event: Event) => {
     const currentOffset = (event.target as HTMLElement)?.scrollTop;
-    post("editor-event:scroll", currentOffset);
     if (currentOffset < 200) {
       if (stickyRef.current) {
         stickyRef.current = false;
@@ -76,11 +79,39 @@ function StatusBar({
     }
     if (Date.now() - lastStickyChangeTime.current < 300) return;
     if (currentOffset > prevScroll.current) {
-      setSticky(false);
-      stickyRef.current = false;
+      if (
+        !scrollState.current.startingOffset ||
+        scrollState.current.isMovingUp
+      ) {
+        scrollState.current.startingOffset = currentOffset;
+      }
+      scrollState.current.isMovingUp = false;
     } else {
-      setSticky(true);
-      stickyRef.current = true;
+      if (
+        !scrollState.current.startingOffset ||
+        !scrollState.current.isMovingUp
+      ) {
+        scrollState.current.startingOffset = currentOffset;
+      }
+      scrollState.current.isMovingUp = true;
+    }
+
+    if (scrollState.current.isMovingUp) {
+      if (currentOffset < scrollState.current.startingOffset - 50) {
+        if (!stickyRef.current) {
+          stickyRef.current = true;
+          setSticky(true);
+        }
+        scrollState.current.startingOffset = 0;
+      }
+    } else {
+      if (currentOffset > scrollState.current.startingOffset + 50) {
+        if (stickyRef.current) {
+          stickyRef.current = false;
+          setSticky(false);
+        }
+        scrollState.current.startingOffset = 0;
+      }
     }
     lastStickyChangeTime.current = Date.now();
     prevScroll.current = currentOffset;
