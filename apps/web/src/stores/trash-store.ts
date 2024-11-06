@@ -24,6 +24,8 @@ import { store as appStore } from "./app-store";
 import { store as noteStore } from "./note-store";
 import { store as notebookStore } from "./notebook-store";
 import { TrashItem, VirtualizedGrouping } from "@notesnook/core";
+import { showToast } from "../utils/toast";
+import { strings } from "@notesnook/intl";
 
 class TrashStore extends BaseStore<TrashStore> {
   trash: VirtualizedGrouping<TrashItem> | undefined = undefined;
@@ -41,7 +43,9 @@ class TrashStore extends BaseStore<TrashStore> {
   };
 
   restore = async (...ids: string[]) => {
-    await db.trash.restore(...ids);
+    const restored = await db.trash.restore(...ids);
+    if (restored === false) return;
+    showToast("success", strings.action("item", ids.length, "restored"));
     await this.get().refresh();
     await appStore.refreshNavItems();
     await noteStore.refresh();

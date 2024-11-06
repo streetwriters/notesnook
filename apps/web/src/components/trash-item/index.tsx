@@ -83,7 +83,6 @@ const menuItems: (item: TrashItemType, ids?: string[]) => MenuItem[] = (
       icon: Restore.path,
       onClick: async () => {
         await store.restore(...ids);
-        showToast("success", strings.action("item", ids.length, "restored"));
       },
       multiSelect: true
     },

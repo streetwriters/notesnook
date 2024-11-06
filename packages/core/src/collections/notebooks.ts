@@ -25,7 +25,11 @@ import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { sql } from "@streetwriters/kysely";
 import { deleteItems } from "../utils/array.js";
-import { CHECK_IDS, checkIsUserPremium } from "../common.js";
+import {
+  CHECK_IDS,
+  checkIsUserPremium,
+  FREE_NOTEBOOKS_LIMIT
+} from "../common.js";
 
 export class Notebooks implements ICollection {
   name = "notebooks";
@@ -62,7 +66,7 @@ export class Notebooks implements ICollection {
 
     if (
       !oldNotebook &&
-      (await this.all.count()) >= 20 &&
+      (await this.all.count()) >= FREE_NOTEBOOKS_LIMIT &&
       !(await checkIsUserPremium(CHECK_IDS.notebookAdd))
     )
       return;
