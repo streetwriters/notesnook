@@ -6,7 +6,20 @@
   "appAppleId": "1544027013",
   "private": true,
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
   "homepage": "https://notesnook.com/",
   "repository": "https://github.com/streetwriters/notesnook",
   "license": "GPL-3.0-or-later",
@@ -44,7 +57,7 @@
     "start": "node scripts/dev.mjs",
     "staging": "node scripts/build.mjs --run",
     "release": "node scripts/build.mjs",
-    "build": "tsc",
+    "build": "tsup-node src/index.ts",
     "bundle": "esbuild electron=./src/main.ts ./src/preload.ts --external:electron --external:fsevents --external:better-sqlite3-multiple-ciphers --external:sodium-native --minify --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false --define:RELEASE=true",
     "bundle:mas": "esbuild electron=./src/main.ts ./src/preload.ts --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=true --define:RELEASE=true",
     "postinstall": "patch-package"
