@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState, Suspense, useEffect } from "react";
+import React, { useState, Suspense, useEffect, useRef } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
@@ -29,7 +29,11 @@ import StatusBar from "./components/status-bar";
 import { FlexScrollContainer } from "./components/scroll-container";
 import CachedRouter from "./components/cached-router";
 import { WebExtensionRelay } from "./utils/web-extension-relay";
-import { Pane, SplitPane } from "./components/split-pane";
+import {
+  Pane,
+  SplitPane,
+  SplitPaneImperativeHandle
+} from "./components/split-pane";
 import GlobalMenuWrapper from "./components/global-menu-wrapper";
 import AppEffects from "./app-effects";
 import HashRouter from "./components/hash-router";
@@ -106,14 +110,12 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isTablet = useTablet();
   const [isNarrow, setIsNarrow] = useState(isTablet || false);
-  // const navPane = useRef<ImperativePanelHandle>(null);
-  // const middlePane = useRef<ImperativePanelHandle>(null);
+  const navPane = useRef<SplitPaneImperativeHandle>(null);
 
-  // useEffect(() => {
-  //   const size = navPane.current?.getSize();
-  //   // Toggle `isNarrow` to true if panel size isn't set to narrow by user
-  //   setIsNarrow((size && size <= 5) || isTablet);
-  // }, [isTablet]);
+  useEffect(() => {
+    if (isTablet) navPane.current?.collapse(0);
+    else navPane.current?.expand(0);
+  }, [isTablet]);
 
   // useEffect(() => {
   //   if (show) middlePane.current?.expand();
@@ -138,34 +140,24 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
         }}
       >
         <SplitPane
+          ref={navPane}
           autoSaveId="global-panel-group"
           direction="vertical"
-          initialSizes={[isTablet ? 60 : 180, isTablet ? 240 : 380]}
+          initialSizes={[180, 380]}
           onChange={(sizes) => {
             setIsNarrow(sizes[0] <= 70);
           }}
         >
-          {!isFocusMode && isTablet ? (
-            <Flex sx={{ width: 50 }}>
+          {!isFocusMode ? (
+            <Pane minSize={50} snapSize={120} maxSize={300}>
               <NavigationMenu
                 toggleNavigationContainer={(state) => {
                   setShow(state || !show);
                 }}
                 isTablet={isNarrow}
               />
-            </Flex>
-          ) : (
-            !isFocusMode && (
-              <Pane minSize={50} snapSize={120} maxSize={300}>
-                <NavigationMenu
-                  toggleNavigationContainer={(state) => {
-                    setShow(state || !show);
-                  }}
-                  isTablet={isNarrow}
-                />
-              </Pane>
-            )
-          )}
+            </Pane>
+          ) : null}
           {!isFocusMode && show && (
             <Pane
               style={{ flex: 1, display: "flex" }}
