@@ -40,7 +40,7 @@ import { useCallback } from "react";
 import { ScrollView } from "react-native-actions-sheet";
 import { strings } from "@notesnook/intl";
 
-const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
+const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
   const { colors } = useThemeColors();
   const code = useRef();
   const [currentMethod, setCurrentMethod] = useState({
@@ -138,7 +138,8 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
       <View
         style={{
           alignItems: "center",
-          paddingHorizontal: currentMethod.method ? 12 : 0
+          paddingHorizontal: currentMethod.method ? 12 : 0,
+          gap: 12
         }}
       >
         <IconButton
@@ -167,8 +168,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
             strings.select2faCodeHelpText()}
         </Paragraph>
 
-        <Seperator />
-
         {currentMethod.method === "sms" || currentMethod.method === "email" ? (
           <Button
             onPress={onSendCode}
@@ -186,8 +185,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
             height={30}
           />
         ) : null}
-
-        <Seperator />
 
         {currentMethod.method ? (
           <>
@@ -227,7 +224,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                 minWidth: "50%"
               }}
             />
-            <Seperator />
+
             <Button
               title={loading ? null : strings.next()}
               type="accent"
@@ -235,8 +232,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
               loading={loading}
               onPress={onNext}
               style={{
-                borderRadius: 100,
-                marginBottom: 10
+                borderRadius: 100
               }}
             />
 
@@ -246,6 +242,13 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
               ]()}
               type="plain"
               onPress={onRequestSecondaryMethod}
+              height={30}
+            />
+
+            <Button
+              title={strings.cancel()}
+              type="plain"
+              onPress={onCancel}
               height={30}
             />
           </>
@@ -298,15 +301,16 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   );
 };
 
-TwoFactorVerification.present = (onMfaLogin, data, context) => {
+TwoFactorVerification.present = (onMfaLogin, data, onCancel, context) => {
   presentSheet({
     component: () => (
-      <TwoFactorVerification onMfaLogin={onMfaLogin} mfaInfo={data} />
+      <TwoFactorVerification
+        onMfaLogin={onMfaLogin}
+        mfaInfo={data}
+        onCancel={onCancel}
+      />
     ),
     context: context || "two_factor_verify",
-    onClose: () => {
-      onMfaLogin();
-    },
     disableClosing: true
   });
 };
