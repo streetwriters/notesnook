@@ -57,7 +57,7 @@ async function onChange(first) {
   }
 
   await exec(`yarn run bundle`);
-  execAsync(`yarn`, [`tsc`]);
+  await exec(`yarn run build`);
 
   if (await isBundleSame()) {
     console.log("Bundle is same. Doing nothing.");

@@ -63,7 +63,7 @@ if (args.variant === "mas") {
   await exec(`yarn run bundle`);
 }
 
-await exec(`yarn tsc`);
+await exec(`yarn run build`);
 
 if (args.run) {
   await exec(`yarn electron-builder --dir --x64`);
