@@ -24,6 +24,8 @@ import { useDropzone } from "react-dropzone";
 import { db } from "../../../common/db";
 import { CheckCircleOutline } from "../../../components/icons";
 import Accordion from "../../../components/accordion";
+import { importFiles } from "../../../utils/importer";
+import { useStore as useAppStore } from "../../../stores/app-store";
 
 type Provider = { title: string; link: string };
 const POPULAR_PROVIDERS: Provider[] = [
