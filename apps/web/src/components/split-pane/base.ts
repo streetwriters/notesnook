@@ -28,7 +28,10 @@ function getBEMElement(block: string, element: string) {
  * @param blockOrElement
  * @param modifier
  */
-function getBEMModifier(blockOrElement: string, modifier: string) {
+function getBEMModifier<TBlock extends string, TModifier extends string>(
+  blockOrElement: TBlock,
+  modifier: TModifier
+): `${TBlock}--${TModifier}` {
   return `${blockOrElement}--${modifier}`;
 }
 

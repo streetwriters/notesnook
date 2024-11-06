@@ -23,7 +23,6 @@ import React, {
   useMemo,
   useCallback,
   useRef,
-  useState,
   PropsWithChildren,
   useLayoutEffect,
   useImperativeHandle
@@ -80,12 +79,18 @@ export const SplitPane = React.forwardRef<
 ) {
   const axis = useRef<IAxis>({ x: 0, y: 0 });
   const wrapper = useRef<HTMLDivElement>(null);
-  const [wrapperRect, setWrapperRect] = useState<DOMRect | null>();
   const sizes = useRef<number[]>([]);
+  const collapsed = useRef<boolean[]>(
+    Config.get(`csp:${autoSaveId}:collapsed`, [])
+  );
   const sashPosSizes = useRef<number[]>([]);
   const panes = useRef<(HTMLDivElement | null)[]>([]);
   const sashes = useRef<(HTMLDivElement | null)[]>([]);
+  const paneLimitSizes = useRef<{ min: number; max: number; snap: number }[]>(
+    []
+  );
   const wrapSize = useRef(0);
+  const childrenLength = childrenToArray(children).length;
 
   const { sizeName, splitPos, splitAxis } = useMemo(
     () =>
@@ -97,21 +102,8 @@ export const SplitPane = React.forwardRef<
     [direction]
   );
 
-  useEffect(() => {
-    const resizeObserver = new ResizeObserver(() => {
-      const rect = wrapper?.current?.getBoundingClientRect() ?? null;
-      wrapSize.current = rect ? rect[sizeName] : 0;
-      setWrapperRect(rect);
-    });
-    resizeObserver.observe(wrapper.current!);
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [sizeName]);
-
-  // Get limit sizes via children
-  const paneLimitSizes = useMemo(
-    () =>
+  const updatePaneLimitSizes = useCallback((children: React.ReactNode) => {
+    paneLimitSizes.current =
       childrenToArray(children).map((childNode) => {
         const limits = { min: 0, max: Infinity, snap: 0 };
         if (React.isValidElement(childNode) && childNode.type === Pane) {
@@ -122,21 +114,26 @@ export const SplitPane = React.forwardRef<
           limits.snap = assertsSize(snapSize, wrapSize.current, 0);
         }
         return limits;
-      }) || [],
-    [children, wrapSize]
-  );
+      }) || [];
+  }, []);
 
   useLayoutEffect(() => {
+    if (wrapSize.current === 0) {
+      wrapSize.current =
+        wrapper.current?.getBoundingClientRect()[sizeName] || 0;
+    }
+
     if (wrapSize.current === 0) return;
 
+    updatePaneLimitSizes(children);
     setSizes(
-      sizes.current.length === childrenToArray(children).length
+      sizes.current.length === childrenLength
         ? sizes.current
         : Config.get(`csp:${autoSaveId}`, initialSizes),
       wrapSize.current,
       false
     );
-  }, [wrapperRect, initialSizes, children]);
+  }, [initialSizes, children, childrenLength]);
 
   const setSizes = useCallback(
     function setSizes(
@@ -144,20 +141,23 @@ export const SplitPane = React.forwardRef<
       wrapSize: number,
       notify = true
     ) {
-      sizes.current = normalizeSizes(
+      const normalized = normalizeSizes(
         children,
-        paneSizes,
+        paneSizes.map((size, i) =>
+          collapsed.current[i] ? paneLimitSizes.current[i].min : size
+        ),
         initialSizes,
         wrapSize
       );
-      sashPosSizes.current = sizes.current.reduce(
+
+      sashPosSizes.current = normalized.reduce(
         (a, b) => [...a, a[a.length - 1] + b],
         [0]
       );
 
       for (let i = 0; i < panes.current.length; ++i) {
         const pane = panes.current[i];
-        const size = sizes.current[i];
+        const size = normalized[i];
         const sashPos = sashPosSizes.current[i];
         if (!pane) continue;
         pane.style[sizeName] = `${size}px`;
@@ -172,8 +172,18 @@ export const SplitPane = React.forwardRef<
         }
       }
 
-      if (autoSaveId) Config.set(`csp:${autoSaveId}`, sizes.current);
-      if (notify) onChange(sizes.current);
+      sizes.current = normalizeSizes(
+        children,
+        paneSizes,
+        initialSizes,
+        wrapSize
+      );
+
+      if (autoSaveId) {
+        Config.set(`csp:${autoSaveId}`, sizes.current);
+        Config.set(`csp:${autoSaveId}:collapsed`, collapsed.current);
+      }
+      if (notify) onChange(normalized);
     },
     [
       children,
@@ -186,25 +196,38 @@ export const SplitPane = React.forwardRef<
     ]
   );
 
+  useEffect(() => {
+    if (!wrapper.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (!sizes.current.length) return;
+
+      const [entry] = entries;
+      const newSize = entry.contentRect ? entry.contentRect[sizeName] : 0;
+      wrapSize.current = newSize;
+      setSizes(sizes.current, wrapSize.current);
+    });
+    resizeObserver.observe(wrapper.current);
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [sizeName, setSizes]);
+
   useImperativeHandle(
     ref,
     () => {
       return {
         collapse: (index: number) => {
-          const nextSizes = [...sizes.current];
-          nextSizes[index] = paneLimitSizes[index].min;
-          nextSizes[index + 1] += sizes.current[index];
-          setSizes(nextSizes, wrapSize.current);
+          collapsed.current[index] = true;
+          setSizes(sizes.current, wrapSize.current);
         },
         expand: (index: number) => {
-          const nextSizes = [...sizes.current];
-          nextSizes[index] = assertsSize(initialSizes[index], wrapSize.current);
-          nextSizes[index + 1] += sizes.current[index];
-          setSizes(nextSizes, wrapSize.current);
+          collapsed.current[index] = false;
+          setSizes(sizes.current, wrapSize.current);
         }
       };
     },
-    [initialSizes, paneLimitSizes, setSizes]
+    [setSizes]
   );
 
   const dragStart = useCallback(
@@ -220,7 +243,6 @@ export const SplitPane = React.forwardRef<
   const dragEnd = useCallback(
     function (e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
       document?.body?.classList?.remove(bodyDisableUserSelect);
-      axis.current = { x: e.pageX, y: e.pageY };
       wrapper.current?.classList.toggle(splitDragClassName);
       onDragEnd(e);
     },
@@ -237,8 +259,8 @@ export const SplitPane = React.forwardRef<
       axis.current = { x: e.pageX, y: e.pageY };
 
       const currentSize = sizes.current[i];
-      const currentPaneLimits = paneLimitSizes[i];
-      const nextPaneLimits = paneLimitSizes[i + 1];
+      const currentPaneLimits = paneLimitSizes.current[i];
+      const nextPaneLimits = paneLimitSizes.current[i + 1];
       const rightBorder = sashPosSizes.current[i + 2];
 
       if (currentSize + distanceX >= rightBorder)
@@ -248,10 +270,10 @@ export const SplitPane = React.forwardRef<
 
       // if current pane size is out of limit, adjust the previous pane
       if (
-        currentSize + distanceX > currentPaneLimits.max ||
-        currentSize + distanceX < currentPaneLimits.min
+        currentSize + distanceX >= currentPaneLimits.max ||
+        currentSize + distanceX <= currentPaneLimits.min
       ) {
-        if (i - 1 >= 0) {
+        if (i > 0) {
           // reset axis
           axis.current[splitAxis] += -distanceX;
           onDragging(e, i - 1);
@@ -313,34 +335,32 @@ export const SplitPane = React.forwardRef<
           </Pane>
         );
       })}
-      {new Array(childrenToArray(children).length - 1)
-        .fill(0)
-        .map((_, index) => (
-          <Sash
-            key={index}
-            sashRef={(e) => (sashes.current[index] = e)}
-            className={classNames(
-              !allowResize && sashDisabledClassName,
-              direction === "vertical"
-                ? sashVerticalClassName
-                : sashHorizontalClassName
-            )}
-            style={{
-              [sizeName]: resizerSize
-            }}
-            render={sashRender.bind(null, index)}
-            onDragStart={dragStart}
-            onDragging={(e) => onDragging(e, index)}
-            onDragEnd={dragEnd}
-            onDoubleClick={() => {
-              sizes.current[index] = assertsSize(
-                initialSizes[index],
-                wrapSize.current
-              );
-              setSizes(sizes.current, wrapSize.current);
-            }}
-          />
-        ))}
+      {new Array(childrenLength - 1).fill(0).map((_, index) => (
+        <Sash
+          key={index}
+          sashRef={(e) => (sashes.current[index] = e)}
+          className={classNames(
+            !allowResize && sashDisabledClassName,
+            direction === "vertical"
+              ? sashVerticalClassName
+              : sashHorizontalClassName
+          )}
+          style={{
+            [sizeName]: resizerSize
+          }}
+          render={sashRender.bind(null, index)}
+          onDragStart={dragStart}
+          onDragging={(e) => onDragging(e, index)}
+          onDragEnd={dragEnd}
+          onDoubleClick={() => {
+            sizes.current[index] = assertsSize(
+              initialSizes[index],
+              wrapSize.current
+            );
+            setSizes(sizes.current, wrapSize.current);
+          }}
+        />
+      ))}
     </div>
   );
 });
@@ -363,8 +383,6 @@ function normalizeSizes(
     initialSize === Infinity ? count++ : (curSum += size);
     return size;
   });
-
-  if (!res) return [];
 
   if (count > 0 || curSum > wrapSize) {
     const average = (wrapSize - curSum) / count;
