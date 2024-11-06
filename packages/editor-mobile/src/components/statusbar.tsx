@@ -79,13 +79,13 @@ function StatusBar({
     }
     if (Date.now() - lastStickyChangeTime.current < 300) return;
     if (currentOffset > prevScroll.current) {
-      scrollState.current.isMovingUp = false;
       if (
         !scrollState.current.startingOffset ||
         scrollState.current.isMovingUp
       ) {
         scrollState.current.startingOffset = currentOffset;
       }
+      scrollState.current.isMovingUp = false;
     } else {
       if (
         !scrollState.current.startingOffset ||
