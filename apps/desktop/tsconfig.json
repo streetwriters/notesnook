@@ -2,7 +2,9 @@
   "extends": "../../tsconfig",
   "compilerOptions": {
     "outDir": "./dist/",
-    "lib": ["ESNext"]
+    "lib": ["ESNext"],
+    "moduleResolution": "nodenext",
+    "module": "nodenext"
   },
   "include": ["src", "global.d.ts"]
 }
