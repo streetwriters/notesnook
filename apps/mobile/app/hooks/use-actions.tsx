@@ -141,7 +141,7 @@ export const useActions = ({
   async function restoreTrashItem() {
     if (!checkItemSynced()) return;
     close();
-    await db.trash.restore(item.id);
+    if ((await db.trash.restore(item.id)) === false) return;
     Navigation.queueRoutesForUpdate();
     const type = item.type === "trash" ? item.itemType : item.type;
     ToastManager.show({

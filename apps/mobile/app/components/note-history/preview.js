@@ -48,7 +48,7 @@ export default function NotePreview({ session, content, note }) {
 
   async function restore() {
     if (note && note.type === "trash") {
-      await db.trash.restore(note.id);
+      if ((await db.trash.restore(note.id)) === false) return;
       Navigation.queueRoutesForUpdate();
       useSelectionStore.getState().setSelectionMode(false);
       ToastManager.show({
