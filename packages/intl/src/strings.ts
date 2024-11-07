@@ -1986,6 +1986,7 @@ All attachments will be downloaded & cached again on access.
   unlockVault: () => t`Unlock vault`,
   unlockVaultDesc: () => t`Please enter your vault password to continue`,
   imagePreviewFailed: () => t`This image cannot be previewed`,
+  attachmentPreviewFailed: () => t`Attachment preview failed`,
   failedToCopyNote: () => t`Failed to copy note`,
   upgradeToProToUseFeature: (feature = "default") => {
     const features = {

@@ -481,9 +481,9 @@ export function Editor(props: EditorProps) {
         onChange={onSave}
         onDownloadAttachment={(attachment) => saveAttachment(attachment.hash)}
         onPreviewAttachment={async (data) => {
-          const { hash } = data;
+          const { hash, type } = data;
           const attachment = await db.attachments.attachment(hash);
-          if (attachment && attachment.mimeType.startsWith("image/")) {
+          if (attachment && type === "image") {
             const container = document.getElementById("dialogContainer");
             if (!(container instanceof HTMLElement)) return;
 
@@ -502,7 +502,12 @@ export function Editor(props: EditorProps) {
               </ScopedThemeProvider>,
               container
             );
-          } else if (attachment && onPreviewDocument) {
+          } else if (
+            attachment &&
+            onPreviewDocument &&
+            type === "file" &&
+            attachment.mimeType.startsWith("application/pdf")
+          ) {
             onPreviewDocument({ hash });
             const blob = await downloadAttachment(hash, "blob", id);
             if (!blob) {
@@ -510,6 +515,8 @@ export function Editor(props: EditorProps) {
               return;
             }
             onPreviewDocument({ url: URL.createObjectURL(blob), hash });
+          } else {
+            showToast("error", strings.attachmentPreviewFailed());
           }
         }}
         onInsertAttachment={async (type) => {
