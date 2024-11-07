@@ -339,21 +339,21 @@ export const settingsGroups: SettingSection[] = [
               presentDialog({
                 title: strings.clearCacheConfirm(),
                 paragraph: strings.clearCacheConfirmDesc(),
-                positiveText: "Clear",
+                positiveText: strings.clear(),
                 positivePress: async () => {
                   filesystem.clearCache();
                   ToastManager.show({
-                    heading: "Cache cleared",
-                    message: "All cached attachments have been removed",
+                    heading: strings.cacheCleared(),
+                    message: strings.cacheClearedDesc(),
                     type: "success"
                   });
                 }
               });
             },
             description(current) {
-              return `${strings.clearCacheDesc()}. Current cache size: ${
-                current as number
-              }`;
+              return `${strings.clearCacheDesc()}. ${strings.currentCacheSize(
+                `${current}`
+              )}`;
             },
             useHook: () => {
               const [cacheSize, setCacheSize] = React.useState(0);
@@ -380,7 +380,7 @@ export const settingsGroups: SettingSection[] = [
               presentDialog({
                 title: strings.logout(),
                 paragraph: strings.logoutConfirmation(),
-                positiveText: "Logout",
+                positiveText: strings.logout(),
                 check: {
                   info: strings.backupDataBeforeLogout(),
                   defaultValue: true
@@ -804,8 +804,8 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "servers",
         type: "screen",
-        name: "Servers",
-        description: "Configure server URLs for Notesnook",
+        name: strings.servers(),
+        description: strings.serversConfigurationDesc(),
         icon: "server",
         component: "server-config"
       }

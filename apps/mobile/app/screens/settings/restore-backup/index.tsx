@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { formatBytes, getFormattedDate } from "@notesnook/common";
 import { LegacyBackupFile } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Platform, View } from "react-native";
@@ -46,7 +47,6 @@ import SettingsService from "../../../services/settings";
 import { refreshAllStores } from "../../../stores/create-db-collection-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { SIZE } from "../../../utils/size";
-import { strings } from "@notesnook/intl";
 
 type PasswordOrKey = { password?: string; encryptionKey?: string };
 
@@ -533,12 +533,11 @@ const BackupItem = ({
         }}
         onPress={() => {
           presentDialog({
-            title: `Restore ${itemName}`,
-            paragraph: `Are you sure you want to restore this backup?`,
-            positiveText: "Restore",
-            negativeText: "Cancel",
+            title: `${strings.restore()} ${itemName}`,
+            paragraph: strings.restoreBackupConfirm(),
+            positiveText: strings.restore(),
+            negativeText: strings.cancel(),
             positivePress: async () => {
-              console.log("file path", (item as ScopedStorage.FileType).uri);
               restoreBackup({
                 uri:
                   Platform.OS === "android"

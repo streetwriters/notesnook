@@ -59,6 +59,7 @@ declare global {
   var pendingResolvers: {
     [key: string]: (value: any) => void;
   };
+
   var readonlyEditor: boolean;
   var statusBars: Record<
     number,
@@ -141,6 +142,8 @@ declare global {
 
   function logger(type: "info" | "warn" | "error", ...logs: unknown[]): void;
   function dbLogger(type: "log" | "error", ...logs: unknown[]): void;
+
+  function loadApp(): void;
   /**
    * Function to post message to react native
    * @param type

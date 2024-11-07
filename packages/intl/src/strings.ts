@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { plural, select, t } from "@lingui/macro";
+import { fail } from "assert";
 
 const actions = {
   deleted: () => t`deleted`,
@@ -42,7 +43,8 @@ const doActions = {
   edit: () => t`Edit`,
   create: () => t`Created`,
   rename: () => t`Rename`,
-  remove: () => t`Remove`
+  remove: () => t`Remove`,
+  download: () => t`Download`
 };
 
 const inProgressActions = {
@@ -999,6 +1001,8 @@ $headline$: Use starting line of the note as title.`,
   account: () => t`account`,
   subscribeToPro: () => t`Subscribe to Pro`,
   trialStarted: () => t`Your free trial has started`,
+  trialStartedDesc: () =>
+    t`You can use all premium features for free for the next 14 days`,
   subDetails: () => t`Subscription details`,
   signedUpOn: (date: string) => t`Signed up on ${date}`,
   trialEndsOn: (date: string) => t`Your free trial ends on ${date}`,
@@ -2425,5 +2429,34 @@ Use this if changes from other devices are not appearing on this device. This wi
   increase: (title: string) => t`Increase ${title}`,
   decrease: (title: string) => t`Decrease ${title}`,
   saved: () => t`Saved`,
-  saving: () => t`Saving`
+  saving: () => t`Saving`,
+  attachmentRecheckCancelled: () => t`Attachment recheck cancelled`,
+  recheckAll: () => t`Recheck all`,
+  attachmentRecheckComplete: () => t`Attachments recheck complete`,
+  checkingNoteAttachments: () => t`Checking note attachments`,
+  checkingAllAttachments: () => t`Checking all attachments`,
+  passed: () => t`Passed`,
+  failed: () => t`Failed`,
+  cacheClearedDesc: () => t`All cached attachments have been cleared.`,
+  currentCacheSize: (size: string) => t`Current cache size: ${size}`,
+  restoreBackupConfirm: () => t`Restore backup?`,
+  serversConfigurationDesc: () => t`Configure server URLs for Notesnook`,
+  prioritySupport: () => t`Get Priority support`,
+  boostProductivityNotebook: () =>
+    t`Boost your productivity with Notebooks and organize your notes.`,
+  notebookNotes: () => t` "Notebook > Notes"`,
+  notebookNotesDesc: () => t`Every Notebook can have notes and sub notebooks.`,
+  workAndOffice: () => t`Work & Office`,
+  workAndOfficeDesc: () => t`Everything related to my job in one place.`,
+  tasks: () => t`Tasks`,
+  taskAValue: () => t`February 2022 Week 2`,
+  taskBValue: () => t`February 2022 Week 3`,
+  meetings: () => t`Meetings`,
+  easyAccess: () => t`Easy access`,
+  easyAccessDesc: () =>
+    t`You can create shortcuts of frequently accessed notebooks in the side menu`,
+  schoolWork: () => t`School work`,
+  schoolWorkDesc: () => t`Everything related to my school in one place.`,
+  recipes: () => t`Recipes`,
+  recipesDesc: () => t`I love cooking and collecting recipes.`
 };

@@ -235,7 +235,7 @@ export const AttachmentDialog = ({
     for (let i = 0; i < filteredAttachments.placeholders.length; i++) {
       if (!getState().isWorking) {
         ToastManager.show({
-          message: "Attachment recheck cancelled",
+          message: strings.attachmentRecheckCancelled(),
           type: "info",
           context: isSheet ? "local" : "global"
         });
@@ -322,7 +322,7 @@ export const AttachmentDialog = ({
       ) : null}
       {!isSheet ? (
         <Header
-          title="Manage attachments"
+          title={strings.manageAttachments()}
           renderedInRoute="SettingsGroup"
           canGoBack
           headerRightButtons={[
@@ -330,23 +330,25 @@ export const AttachmentDialog = ({
               onPress() {
                 onCheck();
               },
-              title: "Recheck all"
+              title: strings.recheckAll()
             },
             {
               onPress() {
                 if (!attachments) return;
                 presentDialog({
-                  title: `Download ${attachments.placeholders.length} attachments`,
-                  paragraph:
-                    "Are you sure you want to download all attachments?",
-                  positiveText: "Download",
+                  title: strings.doAction(
+                    "attachment",
+                    attachments.placeholders.length,
+                    "download"
+                  ),
+                  positiveText: strings.network.download(),
                   positivePress: async () => {
                     downloadAttachments(await attachments.ids());
                   },
-                  negativeText: "Cancel"
+                  negativeText: strings.cancel()
                 });
               },
-              title: "Download all"
+              title: strings.downloadAllAttachments()
             }
           ]}
         />
@@ -388,15 +390,16 @@ export const AttachmentDialog = ({
               onPress={() => {
                 if (!attachments) return;
                 presentDialog({
-                  title: `Download ${attachments.placeholders.length} attachments`,
-                  paragraph:
-                    "Are you sure you want to download all attachments?",
-                  context: "local",
-                  positiveText: "Download",
+                  title: strings.doAction(
+                    "attachment",
+                    attachments.placeholders.length,
+                    "download"
+                  ),
+                  positiveText: strings.network.download(),
                   positivePress: async () => {
                     downloadAttachments(await attachments.ids());
                   },
-                  negativeText: "Cancel"
+                  negativeText: strings.cancel()
                 });
               }}
               size={SIZE.lg}
@@ -457,14 +460,16 @@ export const AttachmentDialog = ({
                 <Paragraph>
                   {rechecker.isWorking
                     ? note
-                      ? `Checking ${rechecker.filter.toLowerCase()} note attachments`
-                      : `Checking ${rechecker.filter.toLowerCase()} attachments`
-                    : "Attachments recheck complete"}
+                      ? strings.checkingNoteAttachments()
+                      : strings.checkingAllAttachments()
+                    : strings.attachmentRecheckComplete()}
                 </Paragraph>
                 <Paragraph>
-                  {`${rechecker.isWorking ? "Please wait... " : ""}Passed: ${
+                  {`${
+                    rechecker.isWorking ? `${strings.pleaseWait()} ` : ""
+                  }${strings.passed()}: ${
                     rechecker.passed
-                  }, Failed: ${rechecker.failed}`}
+                  }, ${strings.failed()}: ${rechecker.failed}`}
                 </Paragraph>
               </View>
             </View>

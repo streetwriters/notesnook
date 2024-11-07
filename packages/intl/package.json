@@ -27,7 +27,7 @@
     "compile": "lingui compile --typescript",
     "build-locale": "npm run extract && npm run compile",
     "build": "npm run build-locale && npx vite build && node scripts/postbuild.mjs",
-    "watch": "nodemon --watch ./src/*.ts --exec \"npx vite build\"",
+    "watch": "npx vite build --watch",
     "postinstall": "patch-package"
   },
   "devDependencies": {

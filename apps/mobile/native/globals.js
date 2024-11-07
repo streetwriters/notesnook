@@ -30,6 +30,17 @@ setI18nGlobal(i18n);
 i18n.activate("en");
 setI18nGlobal(i18n);
 
+if (global.__DEV__) {
+  const err = console.error;
+  console.error = function (message) {
+    if (typeof message === 'string' && message.includes('VirtualizedLists should never be')) {
+      err.apply(console, ["VirtualizedLists should never be nested inside plain ScrollViews"]);
+      return;
+    }
+    err.apply(console, arguments);
+  };
+}
+
 
 try {
   ScriptManager.shared.addResolver(async (scriptId) => {

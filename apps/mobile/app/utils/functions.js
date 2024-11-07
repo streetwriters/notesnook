@@ -33,11 +33,9 @@ import { strings } from "@notesnook/intl";
 function confirmDeleteAllNotes(items, type, context) {
   return new Promise((resolve) => {
     presentDialog({
-      title: `Delete ${
-        items.length > 1 ? `${items.length} ${type}s` : `${type}`
-      }?`,
-      positiveText: "Delete",
-      negativeText: "Cancel",
+      title: strings.doAction("type", items.length, "delete"),
+      positiveText: strings.delete(),
+      negativeText: strings.cancel(),
       positivePress: (_inputValue, value) => {
         setTimeout(() => {
           resolve({ delete: true, deleteNotes: value });

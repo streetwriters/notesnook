@@ -146,15 +146,16 @@ const Editor = React.memo(
             onRenderProcessGone={onError}
             nestedScrollEnabled
             onError={onError}
-            injectedJavaScriptBeforeContentLoaded={`
-          globalThis.LINGUI_LOCALE = "${i18n.locale}";
-          globalThis.LINGUI_LOCALE_DATA = ${JSON.stringify({
-            [i18n.locale]: i18n.messages
-          })};
-          globalThis.__DEV__ = ${__DEV__}
-          globalThis.readonly=${readonly};
-          globalThis.noToolbar=${noToolbar};
-          globalThis.noHeader=${noHeader};
+            injectedJavaScript={`
+              globalThis.__DEV__ = ${__DEV__}
+              globalThis.readonly=${readonly};
+              globalThis.noToolbar=${noToolbar};
+              globalThis.noHeader=${noHeader};
+              globalThis.LINGUI_LOCALE = "${i18n.locale}";
+              globalThis.LINGUI_LOCALE_DATA = ${JSON.stringify({
+                [i18n.locale]: i18n.messages
+              })};
+              globalThis.loadApp();
           `}
             useSharedProcessPool={false}
             javaScriptEnabled={true}
