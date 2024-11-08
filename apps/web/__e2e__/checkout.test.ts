@@ -123,6 +123,7 @@ test("applying coupon should change discount & total price", async () => {
     const pricing = await plan.open();
     const title = await pricing.getTitle();
     if (!title) continue;
+    await pricing.waitForPaddleFrame();
     await pricing.applyCoupon("INTRO50");
 
     planPrices[title.toLowerCase()] = roundOffPrices(await pricing.getPrices());
@@ -141,6 +142,7 @@ test("apply coupon through url", async () => {
   for (const plan of ["monthly", "yearly"] as const) {
     await app.checkout.goto(plan, "INTRO50");
     const pricing = await app.checkout.getPricing();
+    await pricing.waitForPaddleFrame();
     await pricing.waitForCoupon();
 
     planPrices[plan] = roundOffPrices(await pricing.getPrices());
@@ -164,6 +166,7 @@ test("apply coupon after changing country", async () => {
     const pricing = await plan.open();
     const title = await pricing.getTitle();
     if (!title) continue;
+    await pricing.waitForPaddleFrame();
     await pricing.changeCountry("IN", 110001);
     await pricing.applyCoupon("INTRO50");
 

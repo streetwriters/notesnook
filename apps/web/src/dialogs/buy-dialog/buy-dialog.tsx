@@ -481,10 +481,16 @@ function SelectedPlan(props: SelectedPlanProps) {
       )}
       {pricingInfo ? (
         <>
-          <Text data-test-id={`checkout-plan-country-${pricingInfo.country}`} />
-          {pricingInfo.coupon && (
-            <Text data-test-id={`checkout-plan-coupon-applied`} />
-          )}
+          {IS_TESTING ? (
+            <>
+              <span
+                data-test-id={`checkout-plan-country-${pricingInfo.country}`}
+              />
+              {pricingInfo.coupon && (
+                <span data-test-id={`checkout-plan-coupon-applied`} />
+              )}
+            </>
+          ) : null}
 
           <Field
             inputRef={couponInputRef}

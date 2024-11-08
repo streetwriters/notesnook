@@ -68,7 +68,6 @@ function Field(props: FieldProps) {
         m: "2px",
         mr: "2px",
         opacity: disabled ? 0.7 : 1,
-        pointerEvents: disabled ? "none" : "all",
         ...sx,
         flexDirection: "column"
       }}
@@ -109,6 +108,7 @@ function Field(props: FieldProps) {
           sx={{
             flex: 1,
             ...styles?.input,
+            pointerEvents: disabled ? "none" : "all",
             ":disabled": {
               bg: "background-disabled"
             },
