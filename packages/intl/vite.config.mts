@@ -17,10 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { resolve } from "path";
+import path, { resolve } from "path";
 import { defineConfig } from "vite";
 import swc from "vite-plugin-swc-transform";
 import dts from "vite-plugin-dts";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [
@@ -32,7 +36,7 @@ export default defineConfig({
             syntax: "typescript",
             tsx: true
           },
-          baseUrl: "./",
+          baseUrl: __dirname,
           paths: {
             "$src/*": ["src/*"]
           },
