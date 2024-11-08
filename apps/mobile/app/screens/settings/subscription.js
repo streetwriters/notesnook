@@ -17,8 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import React from "react";
 import { Linking, Platform, View } from "react-native";
+import Config from "react-native-config";
 import { Button } from "../../components/ui/button";
 import { usePricing } from "../../hooks/use-pricing";
 import {
@@ -28,14 +30,9 @@ import {
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
 import { useUserStore } from "../../stores/use-user-store";
-import {
-  SUBSCRIPTION_PROVIDER,
-  SUBSCRIPTION_STATUS
-} from "../../utils/constants";
+import { SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
-import Config from "react-native-config";
-import { strings } from "@notesnook/intl";
 export const Subscription = () => {
   const user = useUserStore((state) => state.user);
   const monthlyPlan = usePricing("monthly");

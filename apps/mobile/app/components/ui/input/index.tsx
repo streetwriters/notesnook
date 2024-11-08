@@ -70,7 +70,6 @@ interface InputProps extends TextInputProps {
   };
   buttons?: React.ReactNode;
   onBlurInput?: () => void;
-  onPress?: () => void;
   height?: number;
   fontSize?: number;
   onFocusInput?: () => void;

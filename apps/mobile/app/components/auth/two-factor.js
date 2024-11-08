@@ -17,8 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
+import { ScrollView } from "react-native-actions-sheet";
 import { db } from "../../common/database/index";
 import useTimer from "../../hooks/use-timer";
 import {
@@ -26,19 +29,14 @@ import {
   presentSheet,
   ToastManager
 } from "../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
 import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Input from "../ui/input";
 import { Pressable } from "../ui/pressable";
-import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useCallback } from "react";
-import { ScrollView } from "react-native-actions-sheet";
-import { strings } from "@notesnook/intl";
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
   const { colors } = useThemeColors();

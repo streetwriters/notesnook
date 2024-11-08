@@ -24,18 +24,18 @@ import { actionErrors } from "../generated/action-errors";
 import { actionConfirmations } from "../generated/action-confirmations";
 
 const SEARCH_IN_ROUTE_STRINGS = {
-  Notes: () => t`Type a keyword to search in Notes`,
-  Notebooks: () => t`Type a keyword to search in Notebooks`,
-  Notebook: () => t`Type a keyword to search in Notebook`,
-  Favorites: () => t`Type a keyword to search in Favorites`,
-  Reminders: () => t`Type a keyword to search in Reminders`,
-  Trash: () => t`Type a keyword to search in Trash`,
-  Settings: () => t`Type a keyword to search in Settings`,
-  Tags: () => t`Type a keyword to search in Tags`,
-  Editor: () => t`Type a keyword to search in Editor`,
-  Home: () => t`Type a keyword to search in Home`,
-  Search: () => t`Type a keyword to search in Search`,
-  Monographs: () => t`Type a keyword to search in Monographs`
+  Notes: () => t`Search in in Notes`,
+  Notebooks: () => t`Search in in Notebooks`,
+  Notebook: () => t`Search in in Notebook`,
+  Favorites: () => t`Search in in Favorites`,
+  Reminders: () => t`Search in in Reminders`,
+  Trash: () => t`Search in in Trash`,
+  Settings: () => t`Search in in Settings`,
+  Tags: () => t`Search in in Tags`,
+  Editor: () => t`Search in in Editor`,
+  Home: () => t`Search in in Home`,
+  Search: () => t`Search in in Search`,
+  Monographs: () => t`Search in in Monographs`
 };
 
 export const strings = {
@@ -1474,8 +1474,14 @@ For example:
     Search: () => t`Search`,
     Monographs: () => t`Monographs`
   },
-  searchInRoute: (routeName: keyof typeof SEARCH_IN_ROUTE_STRINGS) => {
-    return SEARCH_IN_ROUTE_STRINGS[routeName]();
+  searchInRoute: (
+    routeName: keyof typeof SEARCH_IN_ROUTE_STRINGS | ({} & string)
+  ) => {
+    return (
+      SEARCH_IN_ROUTE_STRINGS[
+        routeName as keyof typeof SEARCH_IN_ROUTE_STRINGS
+      ]() || t`Search in ${routeName}`
+    );
   },
   logoutConfirmation: () =>
     t`Are you sure you want to logout and clear all data stored on THIS DEVICE?`,

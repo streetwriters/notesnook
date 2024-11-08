@@ -16,8 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { VirtualizedGrouping } from "@notesnook/core";
-import { Item, ItemReference } from "@notesnook/core";
+import { Item, ItemReference, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useEffect, useState } from "react";
 import { View } from "react-native";
@@ -37,8 +37,6 @@ import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { PressableProps } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
-import { isStringLiteralOrJsxExpression } from "typescript";
-import { strings } from "@notesnook/intl";
 
 type RelationsListProps = {
   actionSheetRef: RefObject<ActionSheetRef>;
@@ -125,7 +123,9 @@ export const RelationsList = ({
             //  width="100%"
             type="inverted"
             icon="plus"
-            title={strings.addItem(referenceType)}
+            title={strings.addItem(
+              referenceType as "notebook" | "tag" | "reminder" | "note"
+            )}
           />
         </View>
       ) : (
