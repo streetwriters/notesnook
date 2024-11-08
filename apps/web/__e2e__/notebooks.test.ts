@@ -92,7 +92,7 @@ test("delete a notebook", async ({ page }) => {
   await notebook?.moveToTrash();
 
   expect(await notebook?.isPresent()).toBe(false);
-  expect(await app.toasts.waitForToast("1 notebook moved to trash")).toBe(true);
+  expect(await app.toasts.waitForToast("Notebook moved to trash")).toBe(true);
   const trash = await app.goToTrash();
   expect(await trash.findItem(NOTEBOOK.title)).toBeDefined();
 });

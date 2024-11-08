@@ -45,7 +45,7 @@ test("delete a note", async ({ page }) => {
 
   await note?.contextMenu.moveToTrash();
 
-  expect(await app.toasts.waitForToast("1 note moved to trash")).toBe(true);
+  expect(await app.toasts.waitForToast("Note moved to trash")).toBe(true);
   expect(await note?.isPresent()).toBe(false);
 });
 
@@ -78,9 +78,7 @@ test("permanently delete a note", async ({ page }) => {
   const trashItem = await trash.findItem(NOTE.title);
   await trashItem?.delete();
 
-  expect(await app.toasts.waitForToast("1 item permanently deleted")).toBe(
-    true
-  );
+  expect(await app.toasts.waitForToast("Item permanently deleted")).toBe(true);
   expect(await trash.findItem(NOTE.title)).toBeUndefined();
 });
 
