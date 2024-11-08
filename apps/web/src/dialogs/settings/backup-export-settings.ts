@@ -58,8 +58,8 @@ export const BackupExportSettings: SettingsGroup[] = [
       },
       {
         key: "restore-backup",
-        title: "Restore backup",
-        description: "Restore a backup file from your disk drive.",
+        title: strings.restoreBackup(),
+        description: strings.restoreBackupDesc(),
         components: [
           {
             type: "button",
@@ -75,10 +75,8 @@ export const BackupExportSettings: SettingsGroup[] = [
       },
       {
         key: "auto-backup",
-        title: "Automatic backup",
-        description: `Set the interval to automatically create a backup.
-        
-Note: these backups do not contain your attachments.`,
+        title: strings.automaticBackups(),
+        description: strings.automaticBackupsDesc(),
         // isHidden: () => !isUserPremium(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.backupReminderOffset, listener),
@@ -86,10 +84,10 @@ Note: these backups do not contain your attachments.`,
           {
             type: "dropdown",
             options: [
-              { value: "0", title: "Never", premium: true },
-              { value: "1", title: "Daily", premium: true },
-              { value: "2", title: "Weekly", premium: true },
-              { value: "3", title: "Monthly", premium: true }
+              { value: "0", title: strings.never(), premium: true },
+              { value: "1", title: strings.daily(), premium: true },
+              { value: "2", title: strings.weekly(), premium: true },
+              { value: "3", title: strings.monthly(), premium: true }
             ],
             selectedOption: () =>
               useSettingStore.getState().backupReminderOffset.toString(),
@@ -107,11 +105,8 @@ Note: these backups do not contain your attachments.`,
       },
       {
         key: "auto-backup-with-attachments",
-        title: "Automatic backup with attachments",
-        description: `Set the interval to automatically create a full backup with attachments.
-
-NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`,
-        // isHidden: () => !isUserPremium(),
+        title: strings.automaticBackupsWithAttachments(),
+        description: strings.automaticBackupsWithAttachmentsDesc().join("\n\n"),
         onStateChange: (listener) =>
           useSettingStore.subscribe(
             (s) => s.fullBackupReminderOffset,
@@ -121,9 +116,9 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
           {
             type: "dropdown",
             options: [
-              { value: "0", title: "Never", premium: true },
-              { value: "1", title: "Weekly", premium: true },
-              { value: "2", title: "Monthly", premium: true }
+              { value: "0", title: strings.never(), premium: true },
+              { value: "1", title: strings.weekly(), premium: true },
+              { value: "2", title: strings.monthly(), premium: true }
             ],
             selectedOption: () =>
               useSettingStore.getState().fullBackupReminderOffset.toString(),
@@ -141,8 +136,8 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
       },
       {
         key: "encrypt-backups",
-        title: "Backup encryption",
-        description: "Encrypt all backup files using your master key.",
+        title: strings.backupEncryption(),
+        description: strings.backupEncryptionDesc(),
         isHidden: () => !useUserStore.getState().isLoggedIn,
         onStateChange: (listener) => {
           const subscriptions = [
@@ -168,13 +163,13 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
       },
       {
         key: "backup-directory",
-        title: "Backups directory",
-        description: "Select directory to store all backup files.",
+        title: strings.selectBackupDir(),
+        description: strings.selectBackupDirDesc(),
         isHidden: () => !IS_DESKTOP_APP,
         components: [
           {
             type: "button",
-            title: "Select directory",
+            title: strings.select(),
             action: async () => {
               const verified =
                 useSettingStore.getState().encryptBackups ||
@@ -186,7 +181,7 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
                 PATHS.backupsDirectory;
               const location = await desktop?.integration.selectDirectory.query(
                 {
-                  title: "Select where Notesnook should save backups",
+                  title: strings.selectBackupDir(),
                   defaultPath: backupStorageLocation
                 }
               );

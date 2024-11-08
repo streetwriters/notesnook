@@ -1172,10 +1172,10 @@ $headline$: Use starting line of the note as title.`,
   automaticBackupsDesc: () =>
     t`Set the interval to create a partial backup (without attachments) automatically.`,
   automaticBackupsWithAttachments: () => t`Automatic backups with attachments`,
-  automaticBackupsWithAttachmentsDesc: () =>
-    t`Set the interval to create a backup (with attachments) automatically.
-
-NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`,
+  automaticBackupsWithAttachmentsDesc: () => [
+    t`Set the interval to create a backup (with attachments) automatically.`,
+    t`NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`
+  ],
   selectBackupDir: () => t`Select backup directory`,
   selectBackupDirDesc: () => t`Choose where to save your backups`,
   noDirectorySelected: () => t`No directory selected`,

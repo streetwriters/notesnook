@@ -3434,6 +3434,10 @@ msgstr ""
 msgid "Note version history is local only."
 msgstr ""
 
+#: src/strings.ts:1177
+msgid "NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions."
+msgstr ""
+
 #: src/strings.ts:273
 msgid "notebook"
 msgstr ""
@@ -4870,9 +4874,7 @@ msgid "Set the default time to snooze a reminder to when you press the snooze bu
 msgstr ""
 
 #: src/strings.ts:1176
-msgid ""
-"Set the interval to create a backup (with attachments) automatically.\n"
-"NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions."
+msgid "Set the interval to create a backup (with attachments) automatically."
 msgstr ""
 
 #: src/strings.ts:1173
