@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
-import { VAULT_ERRORS } from "@notesnook/core";
 import {
   Color,
   ItemReference,
@@ -25,8 +24,11 @@ import {
   Notebook,
   Reminder,
   Tag,
-  TrashItem
+  TrashItem,
+  VAULT_ERRORS,
+  createInternalLink
 } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -39,8 +41,10 @@ import NoteHistory from "../components/note-history";
 import { AddNotebookSheet } from "../components/sheets/add-notebook";
 import MoveNoteSheet from "../components/sheets/add-to";
 import ExportNotesSheet from "../components/sheets/export-notes";
+import { MoveNotebookSheet } from "../components/sheets/move-notebook";
 import { MoveNotes } from "../components/sheets/move-notes/movenote";
 import PublishNoteSheet from "../components/sheets/publish-note";
+import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
 import ReminderSheet from "../components/sheets/reminder";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
@@ -60,15 +64,10 @@ import { useRelationStore } from "../stores/use-relation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useUserStore } from "../stores/use-user-store";
-import Errors from "../utils/errors";
 import { eOpenLoginDialog, eUpdateNoteInEditor } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
-import { ReferencesList } from "../components/sheets/references";
-import { createInternalLink } from "@notesnook/core";
-import { MoveNotebookSheet } from "../components/sheets/move-notebook";
-import { strings } from "@notesnook/intl";
 
 export const useActions = ({
   close,
@@ -314,7 +313,10 @@ export const useActions = ({
           Navigation.queueRoutesForUpdate();
           useSelectionStore.getState().setSelectionMode(undefined);
           ToastManager.show({
-            heading: strings.actions.deleted[item.itemType](1),
+            heading:
+              strings.actions.deleted[
+                item.itemType as keyof typeof strings.actions.deleted
+              ](1),
             type: "success",
             context: "local"
           });
@@ -955,7 +957,9 @@ export const useActions = ({
     id: "trash",
     title:
       item.type !== "notebook" && item.type !== "note"
-        ? strings.doActions.delete[item.type](1)
+        ? strings.doActions.delete[
+            item.type as keyof typeof strings.doActions.delete
+          ](1)
         : strings.moveToTrash(),
     icon: "delete-outline",
     type: "error",

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, {
   RefObject,
@@ -49,13 +50,11 @@ import DialogHeader from "../../dialog/dialog-header";
 import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
+import Input from "../../ui/input";
 import Paragraph from "../../ui/typography/paragraph";
+import { AddNotebookSheet } from "../add-notebook";
 import { NotebookItem } from "./notebook-item";
 import { useNotebookItemSelectionStore } from "./store";
-import { AddNotebookSheet } from "../add-notebook";
-import Input from "../../ui/input";
-import { presentDialog } from "../../dialog/functions";
-import { strings } from "@notesnook/intl";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations

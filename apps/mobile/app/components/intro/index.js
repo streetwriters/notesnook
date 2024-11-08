@@ -17,30 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import {
-  Linking,
-  ScrollView,
-  TouchableOpacity,
-  useWindowDimensions,
-  View
-} from "react-native";
+import { Linking, ScrollView, useWindowDimensions, View } from "react-native";
 import { SwiperFlatList } from "react-native-swiper-flatlist";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { getElevationStyle } from "../../utils/elevation";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
+import { eSendEvent } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
+import { getElevationStyle } from "../../utils/elevation";
+import { eOpenLoginDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
+import { AuthMode } from "../auth";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import Navigation from "../../services/navigation";
-import { eOpenLoginDialog } from "../../utils/events";
-import { AuthMode } from "../auth";
-import { eSendEvent } from "../../services/event-manager";
-import { strings } from "@notesnook/intl";
 
 const Intro = ({ navigation }) => {
   const { colors } = useThemeColors();
