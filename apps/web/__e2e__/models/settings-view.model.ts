@@ -82,7 +82,7 @@ export class SettingsViewModel {
   }
 
   async isLoggedIn() {
-    const item = await this.navigation.findItem("Subscription");
+    const item = await this.navigation.findItem("Subscription details");
     return !!(await item?.getTitle());
   }
 
