@@ -250,12 +250,7 @@ export function CopyLink(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() => {
-        editor.storage.copyToClipboard?.(
-          href,
-          `<a href="${href}">${
-            selectedNode.current?.node?.textContent || link?.attrs.title
-          }</a>`
-        );
+        editor.storage.copyToClipboard?.(href);
         hide();
       }}
     />
