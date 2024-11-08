@@ -203,12 +203,12 @@ function PublishView(props: PublishViewProps) {
                 password
               });
               setPublishId(publishId);
-              showToast("success", strings.action("note", 1, "published"));
+              showToast("success", strings.actions.published.note(1));
             } catch (e) {
               console.error(e);
               showToast(
                 "error",
-                `${strings.actionError("note", 1, "published")}: ${
+                `${strings.actionErrors.published.note(1)}: ${
                   (e as Error).message
                 }`
               );
@@ -228,12 +228,12 @@ function PublishView(props: PublishViewProps) {
                 await unpublishNote(note.id);
                 setPublishId(undefined);
                 onClose(true);
-                showToast("success", strings.action("note", 1, "unpublished"));
+                showToast("success", strings.actions.unpublished.note(1));
               } catch (e) {
                 console.error(e);
                 showToast(
                   "error",
-                  `${strings.actionError("note", 1, "unpublished")}: ` +
+                  `${strings.actionErrors.unpublished.note(1)}: ` +
                     (e as Error).message
                 );
               } finally {

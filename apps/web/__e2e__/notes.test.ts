@@ -60,7 +60,7 @@ test("restore a note", async ({ page }) => {
   const trashItem = await trash.findItem(NOTE.title);
   await trashItem?.restore();
 
-  expect(await app.toasts.waitForToast("1 item restored")).toBe(true);
+  expect(await app.toasts.waitForToast("Item restored")).toBe(true);
   await app.goToNotes();
   await notes.waitForItem(NOTE.title);
   const restoredNote = await notes.findNote(NOTE);

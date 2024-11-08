@@ -368,12 +368,12 @@ function NavigationMenu(props: NavigationMenuProps) {
                     {
                       type: "button",
                       key: "rename-color",
-                      title: strings.doAction("color", 1, "rename"),
+                      title: strings.renameColor(),
                       onClick: () => RenameColorDialog.show(color)
                     },
                     {
                       type: "button",
-                      key: strings.doAction("color", 1, "remove"),
+                      key: "remove-color",
                       title: strings.removeColor(),
                       onClick: async () => {
                         await db.colors.remove(color.id);
@@ -432,7 +432,7 @@ function NavigationMenu(props: NavigationMenuProps) {
                     {
                       type: "button",
                       key: "removeshortcut",
-                      title: strings.doAction("shortcut", 1, "remove"),
+                      title: strings.doActions.remove.shortcut(1),
                       onClick: async () => {
                         await db.shortcuts.remove(item.id);
                         refreshNavItems();

@@ -244,7 +244,7 @@ function Note(props: NoteProps) {
                     data-test-id={`tag-item`}
                     key={tag.id}
                     variant="anchor"
-                    title={`${strings.goTo()} #${tag.title}`}
+                    title={strings.goToTag(tag.title)}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (!tag.id)
@@ -721,7 +721,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
     {
       type: "button",
       key: "assign-tags",
-      title: `${strings.assignTo()}...`,
+      title: strings.assignTo(),
       icon: Plus.path,
       onClick: () => AddTagsDialog.show({ noteIds: ids })
     },
@@ -815,7 +815,7 @@ async function copyNote(noteId: string, format: "md" | "txt") {
       disableTemplate: true,
       unlockVault: Vault.unlockVault
     });
-    if (!result) throw new Error(`${strings.couldNotConvertNote(format)}.`);
+    if (!result) throw new Error(strings.couldNotConvertNote(format));
 
     await navigator.clipboard.writeText(result);
     showToast("success", strings.noteCopied());

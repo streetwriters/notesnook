@@ -17,12 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createBackup, verifyAccount } from "../../common";
+import { createBackup, verifyAccount, importBackup } from "../../common";
 import { db } from "../../common/db";
 import { exportNotes } from "../../common/export";
 import { SettingsGroup } from "./types";
-
 import { strings } from "@notesnook/intl";
+import { useStore as useSettingStore } from "../../stores/setting-store";
+import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useUserStore } from "../../stores/user-store";
+import { desktop } from "../../common/desktop-bridge";
+import { PATHS } from "@notesnook/desktop";
 
 export const BackupExportSettings: SettingsGroup[] = [
   {
@@ -49,6 +53,147 @@ export const BackupExportSettings: SettingsGroup[] = [
                 mode: value === "partial" ? "partial" : "full"
               });
             }
+          }
+        ]
+      },
+      {
+        key: "restore-backup",
+        title: "Restore backup",
+        description: "Restore a backup file from your disk drive.",
+        components: [
+          {
+            type: "button",
+            title: "Restore",
+            action: async () => {
+              if (await importBackup()) {
+                await useAppStore.getState().refresh();
+              }
+            },
+            variant: "secondary"
+          }
+        ]
+      },
+      {
+        key: "auto-backup",
+        title: "Automatic backup",
+        description: `Set the interval to automatically create a backup.
+        
+Note: these backups do not contain your attachments.`,
+        // isHidden: () => !isUserPremium(),
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.backupReminderOffset, listener),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { value: "0", title: "Never", premium: true },
+              { value: "1", title: "Daily", premium: true },
+              { value: "2", title: "Weekly", premium: true },
+              { value: "3", title: "Monthly", premium: true }
+            ],
+            selectedOption: () =>
+              useSettingStore.getState().backupReminderOffset.toString(),
+            onSelectionChanged: async (value) => {
+              const verified =
+                useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (verified)
+                useSettingStore
+                  .getState()
+                  .setBackupReminderOffset(parseInt(value));
+            }
+          }
+        ]
+      },
+      {
+        key: "auto-backup-with-attachments",
+        title: "Automatic backup with attachments",
+        description: `Set the interval to automatically create a full backup with attachments.
+
+NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`,
+        // isHidden: () => !isUserPremium(),
+        onStateChange: (listener) =>
+          useSettingStore.subscribe(
+            (s) => s.fullBackupReminderOffset,
+            listener
+          ),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { value: "0", title: "Never", premium: true },
+              { value: "1", title: "Weekly", premium: true },
+              { value: "2", title: "Monthly", premium: true }
+            ],
+            selectedOption: () =>
+              useSettingStore.getState().fullBackupReminderOffset.toString(),
+            onSelectionChanged: async (value) => {
+              const verified =
+                useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (verified)
+                useSettingStore
+                  .getState()
+                  .setFullBackupReminderOffset(parseInt(value));
+            }
+          }
+        ]
+      },
+      {
+        key: "encrypt-backups",
+        title: "Backup encryption",
+        description: "Encrypt all backup files using your master key.",
+        isHidden: () => !useUserStore.getState().isLoggedIn,
+        onStateChange: (listener) => {
+          const subscriptions = [
+            useUserStore.subscribe((s) => s.isLoggedIn, listener),
+            useSettingStore.subscribe((s) => s.encryptBackups, listener)
+          ];
+          return () => subscriptions.forEach((s) => s());
+        },
+        components: [
+          {
+            type: "toggle",
+            isToggled: () =>
+              !!useUserStore.getState().isLoggedIn &&
+              useSettingStore.getState().encryptBackups,
+            toggle: async () => {
+              const verified =
+                !useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (verified) useSettingStore.getState().toggleEncryptBackups();
+            }
+          }
+        ]
+      },
+      {
+        key: "backup-directory",
+        title: "Backups directory",
+        description: "Select directory to store all backup files.",
+        isHidden: () => !IS_DESKTOP_APP,
+        components: [
+          {
+            type: "button",
+            title: "Select directory",
+            action: async () => {
+              const verified =
+                useSettingStore.getState().encryptBackups ||
+                (await verifyAccount());
+              if (!verified) return;
+
+              const backupStorageLocation =
+                useSettingStore.getState().backupStorageLocation ||
+                PATHS.backupsDirectory;
+              const location = await desktop?.integration.selectDirectory.query(
+                {
+                  title: "Select where Notesnook should save backups",
+                  defaultPath: backupStorageLocation
+                }
+              );
+              if (!location) return;
+              useSettingStore.getState().setBackupStorageLocation(location);
+            },
+            variant: "secondary"
           }
         ]
       }

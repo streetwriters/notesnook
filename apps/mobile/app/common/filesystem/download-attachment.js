@@ -140,7 +140,7 @@ export async function downloadAttachments(attachments) {
     useAttachmentStore.getState().setDownloading({
       current: 0,
       total: 1,
-      message: `${strings.savingZipFile()}... ${strings.pleaseWait()}`,
+      message: strings.savingZipFile(),
       groupId
     });
     // If all goes well, zip the notesnook-attachments folder in cache.
@@ -150,9 +150,7 @@ export async function downloadAttachments(attachments) {
         groupId,
         current: progress,
         total: 1,
-        message: `${strings.savingZipFile()} (${(progress * 100).toFixed(
-          1
-        )}%)... ${strings.pleaseWait()}`
+        message: strings.savingZipFile((progress * 100).toFixed(1))
       });
     });
     await zip(zipSourceFolder, zipOutputFile);

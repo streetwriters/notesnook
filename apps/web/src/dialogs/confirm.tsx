@@ -26,7 +26,6 @@ import { db } from "../common/db";
 import { getChangelog } from "../utils/version";
 import { downloadUpdate } from "../utils/updater";
 import { ErrorText } from "../components/error-text";
-import { pluralize } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 
 type Check = { text: string; default?: boolean };
@@ -145,7 +144,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog<
 
 export function showMultiDeleteConfirmation(length: number) {
   return ConfirmDialog.show({
-    title: strings.doAction("item", length, "delete"),
+    title: strings.doActions.delete.item(length),
     message: strings.moveToTrashDesc(
       db.settings.getTrashCleanupInterval() || 7
     ),
@@ -156,7 +155,7 @@ export function showMultiDeleteConfirmation(length: number) {
 
 export function showMultiPermanentDeleteConfirmation(length: number) {
   return ConfirmDialog.show({
-    title: strings.doAction("item", length, "permanentlyDelete"),
+    title: strings.doActions.permanentlyDelete.item(length),
     message: strings.irreverisibleAction(),
     positiveButtonText: strings.yes(),
     negativeButtonText: strings.no()

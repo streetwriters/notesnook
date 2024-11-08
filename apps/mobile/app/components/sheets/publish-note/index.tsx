@@ -121,8 +121,8 @@ const PublishNoteSheet = ({
       }}
     >
       <DialogHeader
-        title={`${strings.publish()} ${strings.note()}`}
-        paragraph={strings.publishDesc()}
+        title={strings.publishNote()}
+        paragraph={strings.publishNoteDesc()}
       />
 
       {publishing ? (

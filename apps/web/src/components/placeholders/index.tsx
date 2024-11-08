@@ -21,7 +21,6 @@ import { Button, Flex, Text } from "@theme-ui/components";
 import { TipContext, useTip } from "../../hooks/use-tip";
 import { Info, Sync } from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { toTitleCase } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 
 type PlaceholderProps = { context: TipContext; text?: string };
@@ -54,13 +53,13 @@ function Placeholder(props: PlaceholderProps) {
         >
           <Sync color="accent" size={12} sx={{ mr: "small" }} />
           <Text variant="subBody" sx={{ fontSize: 10 }} color="accent">
-            {strings.syncingYour(context)}
+            {strings.syncingYourNotes()}
           </Text>
         </Flex>
 
         <Text variant="subBody" sx={{ fontSize: "body", mt: 1 }}>
-          {toTitleCase(syncStatus.type || "sync")}ing {syncStatus.progress}{" "}
-          {strings.items()}
+          {strings.networkProgress(syncStatus.type || "sync")}{" "}
+          {syncStatus.progress} {strings.items()}
         </Text>
       </Flex>
     );

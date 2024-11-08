@@ -255,8 +255,8 @@ export const useActions = ({
       item.type === "color"
     ) {
       presentDialog({
-        title: strings.deleteItem(item.type),
-        paragraph: strings.deleteItemConfirmation(item.type),
+        title: strings.doActions.delete[item.type](1),
+        paragraph: strings.actionConfirmations.delete[item.type](1),
         positivePress: async () => {
           if (item.type === "reminder") {
             await db.reminders.remove(item.id);
@@ -304,8 +304,8 @@ export const useActions = ({
     close();
     await sleep(300);
     presentDialog({
-      title: strings.delete(),
-      paragraph: strings.deleteItemsConfirmation(item.itemType, 1),
+      title: strings.doActions.delete[item.itemType](1),
+      paragraph: strings.actionConfirmations.delete[item.itemType](1),
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
       positivePress: async () => {
@@ -314,7 +314,7 @@ export const useActions = ({
           Navigation.queueRoutesForUpdate();
           useSelectionStore.getState().setSelectionMode(undefined);
           ToastManager.show({
-            heading: strings.itemDeleted(1, item.itemType),
+            heading: strings.actions.deleted[item.itemType](1),
             type: "success",
             context: "local"
           });
@@ -955,7 +955,7 @@ export const useActions = ({
     id: "trash",
     title:
       item.type !== "notebook" && item.type !== "note"
-        ? strings.doAction(item.type, 1, "delete")
+        ? strings.doActions.delete[item.type](1)
         : strings.moveToTrash(),
     icon: "delete-outline",
     type: "error",

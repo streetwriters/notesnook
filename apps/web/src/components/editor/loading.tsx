@@ -33,7 +33,7 @@ function EditorLoading({ text }: { text?: string }) {
     >
       <Loading color="accent" sx={{ mt: 2 }} />
       <Text variant="body" mt={2} sx={{ textAlign: "center" }}>
-        {text || `${strings.loadingEditor()}. ${strings.pleaseWait()}...`}
+        {text || strings.loadingEditor()}
       </Text>
     </Flex>
   );

@@ -152,7 +152,7 @@ const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
       icon: Trash.path,
       onClick: async () => {
         ConfirmDialog.show({
-          title: strings.doAction("reminder", items.length, "delete"),
+          title: strings.doActions.delete.reminder(items.length),
           message: strings.irreverisibleAction(),
           positiveButtonText: strings.yes(),
           negativeButtonText: strings.no()
