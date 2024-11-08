@@ -77,7 +77,7 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
                 sentence = strings.upgradeToProToUseFeature("color");
                 break;
               case CHECK_IDS.noteTag:
-                sentence = strings.upgradeToProToUseFeature("tag");
+                sentence = strings.upgradeToProToUseFeature("tags");
                 break;
               case CHECK_IDS.notebookAdd:
                 sentence = strings.upgradeToProToUseFeature("notebook");
