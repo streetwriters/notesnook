@@ -33,7 +33,6 @@ import { eScrollEvent } from "../../utils/events";
 import { LeftMenus } from "./left-menus";
 import { RightMenus } from "./right-menus";
 import { Title } from "./title";
-import { useNavigation } from "@react-navigation/native";
 
 type HeaderRightButton = {
   title: string;

@@ -34,12 +34,13 @@ import {
   Reminder,
   Tag,
   TrashItem,
-  VirtualizedGrouping
+  VirtualizedGrouping,
+  getSortValue
 } from "@notesnook/core";
-import { getSortValue } from "@notesnook/core";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
+import { useIsCompactModeEnabled } from "../../hooks/use-is-compact-mode-enabled";
 import { eSendEvent } from "../../services/event-manager";
 import { RouteName } from "../../stores/use-navigation-store";
 import { eOpenJumpToDialog } from "../../utils/events";
@@ -48,7 +49,6 @@ import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import ReminderItem from "../list-items/reminder";
 import TagItem from "../list-items/tag";
-import { useIsCompactModeEnabled } from "../../hooks/use-is-compact-mode-enabled";
 
 type ListItemWrapperProps<TItem = Item> = {
   group?: GroupingKey;

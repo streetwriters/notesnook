@@ -43,7 +43,7 @@ const NewFeature = ({
   version
 }: {
   features: FeatureType[];
-  version?: string | null;
+  version?: string;
 }) => {
   const { colors } = useThemeColors();
 
@@ -122,7 +122,7 @@ NewFeature.present = () => {
     component: (
       <NewFeature
         features={features}
-        version={SettingsService.getProperty("version")}
+        version={SettingsService.getProperty("version") || undefined}
       />
     ),
     disableClosing: true

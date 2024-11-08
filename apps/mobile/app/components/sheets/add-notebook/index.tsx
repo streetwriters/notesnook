@@ -81,7 +81,7 @@ export const AddNotebookSheet = ({
       id: notebook?.id
     });
 
-    if (parentNotebook) {
+    if (parentNotebook && id) {
       await db.relations.add(parentNotebook, {
         type: "notebook",
         id: id
@@ -94,7 +94,8 @@ export const AddNotebookSheet = ({
     useNotebookStore.getState().refresh();
 
     const parent =
-      parentNotebook?.id || (await getParentNotebookId(notebook?.id || id));
+      parentNotebook?.id ||
+      (await getParentNotebookId(notebook?.id || (id as string)));
 
     eSendEvent(eOnNotebookUpdated, parent);
     if (notebook) {
@@ -104,7 +105,7 @@ export const AddNotebookSheet = ({
       });
     }
 
-    if (!notebook && showMoveNotesOnComplete) {
+    if (!notebook && showMoveNotesOnComplete && id) {
       MoveNotes.present(await db.notebooks.notebook(id));
     } else {
       close?.(true);
