@@ -63,9 +63,28 @@ async function moveNotesToTrash(ids: string[], confirm = true) {
 async function moveNotebooksToTrash(ids: string[]) {
   if (!ids.length) return;
 
-  const isMultiselect = ids.length > 1;
-  if (isMultiselect) {
-    if (!(await showMultiDeleteConfirmation(ids.length))) return;
+  const result = await ConfirmDialog.show({
+    title: strings.doActions.delete.notebook(ids.length),
+    positiveButtonText: strings.yes(),
+    negativeButtonText: strings.no(),
+    checks: {
+      deleteContainingNotes: {
+        text: strings.deleteContainingNotes(ids.length)
+      }
+    }
+  });
+
+  if (!result) return;
+
+  if (result.deleteContainingNotes) {
+    await Multiselect.moveNotesToTrash(
+      Array.from(
+        new Set(
+          (await Promise.all(ids.map((id) => db.notebooks.notes(id)))).flat()
+        )
+      ),
+      false
+    );
   }
 
   await TaskManager.startTask({
