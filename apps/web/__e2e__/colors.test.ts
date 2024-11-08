@@ -73,8 +73,6 @@ test("creating a color shouldn't be possible on basic plan", async ({
   await note?.contextMenu.newColor({ title: "red", color: "#ff0000" });
 
   expect(
-    await app.toasts.waitForToast(
-      "Please upgrade your account to Pro to add colors."
-    )
+    await app.toasts.waitForToast("Upgrade to Notesnook Pro to add colors.")
   ).toBe(true);
 });

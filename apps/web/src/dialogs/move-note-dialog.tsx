@@ -45,7 +45,6 @@ import {
   TreeEnvironmentRef
 } from "react-complex-tree";
 import { FlexScrollContainer } from "../components/scroll-container";
-import { pluralize } from "@notesnook/common";
 import Field from "../components/field";
 import { AddNotebookDialog } from "./add-notebook-dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
@@ -153,11 +152,13 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
           await noteStore.refresh();
           await notebookStore.refresh();
 
-          const stringified = stringifySelected(selected);
-          if (stringified) {
+          const added = selected.filter((a) => a.new && a.op === "add").length;
+          const removed = selected.filter((a) => a.op === "remove").length;
+
+          if (added > 0 || removed > 0) {
             showToast(
               "success",
-              `${strings.notes(noteIds.length)} ${stringified}`
+              strings.assignedToNotebookMessage(noteIds.length, added, removed)
             );
           }
 
@@ -562,37 +563,3 @@ function selectSingle(topic: Notebook, array: NotebookReference[]) {
 
   return selected;
 }
-
-function stringifySelected(suggestion: NotebookReference[]) {
-  const added = suggestion.filter((a) => a.new && a.op === "add");
-  // .map(resolveReference)
-  // .filter(Boolean);
-  const removed = suggestion.filter((a) => a.op === "remove");
-  // .map(resolveReference)
-  // .filter(Boolean);
-  if (!added.length && !removed.length) return;
-
-  const parts = [];
-  if (added.length > 0) parts.push(strings.addedToNotebook(added.length));
-  // if (added.length >= 1) parts.push(added[0]);
-  // if (added.length > 1) parts.push(`and ${added.length - 1} others`);
-
-  if (removed.length >= 1) {
-    if (parts.length > 0) parts.push("&");
-    parts.push(`removed from ${strings.removedFromNotebook(removed.length)}`);
-  }
-  // if (removed.length > 1) parts.push(`and ${removed.length - 1} others`);
-
-  return parts.join(" ") + ".";
-}
-
-// function resolveReference(ref: NotebookReference): string | undefined {
-//   const notebook = db.notebooks.notebook(ref.id);
-//   if (!notebook) return undefined;
-
-//   // if (ref.topic) {
-//   //   return notebook.topics.topic(ref.topic)?._topic?.title;
-//   // } else {
-//   return notebook.title;
-//   // }
-// }

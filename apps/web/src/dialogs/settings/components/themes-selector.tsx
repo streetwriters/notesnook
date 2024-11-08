@@ -137,7 +137,7 @@ function ThemesList() {
         if (e instanceof Error)
           showToast(
             "error",
-            `${strings.failedToInstallTheme()}. Error: ` + e.message
+            `${strings.failedToInstallTheme()} ${strings.error()}: ` + e.message
           );
       } finally {
         setIsApplying(false);

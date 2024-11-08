@@ -171,7 +171,7 @@ const ExportNotesSheet = ({
           >
             <DialogHeader
               icon="export"
-              title={`${strings.export()} ${strings.notes(ids.length)}`}
+              title={strings.exportNotes(ids.length)}
             />
           </View>
 

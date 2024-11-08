@@ -23,11 +23,11 @@
     "url": "git://github.com/streetwriters/notesnook.git"
   },
   "scripts": {
-    "extract": "lingui extract",
+    "extract": "lingui extract --clean --overwrite",
     "compile": "lingui compile --typescript",
-    "build-locale": "npm run extract && npm run compile",
+    "build-locale": "node scripts/generate-strings.mjs && npm run extract && npm run compile",
     "build": "npm run build-locale && npx vite build && node scripts/postbuild.mjs",
-    "watch": "npx vite build --watch",
+    "watch": "nodemon --watch scripts/ --watch src --ext ts,mjs --exec \"npm run build\"",
     "postinstall": "patch-package"
   },
   "devDependencies": {
@@ -36,6 +36,7 @@
     "@lingui/swc-plugin": "^4.0.10",
     "@types/react": "^18.2.39",
     "babel-plugin-macros": "^3.1.0",
+    "nodemon": "^3.1.7",
     "react": "18.2.0",
     "typescript": "5.5.3",
     "vite": "^5.4.8",

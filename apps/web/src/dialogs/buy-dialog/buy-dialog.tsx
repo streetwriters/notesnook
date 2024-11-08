@@ -191,7 +191,7 @@ export function CheckoutSideBar(props: SideBarProps) {
           if (e instanceof Error)
             showToast(
               "error",
-              `${strings.couldNotActivateTrial()}. ${strings.pleaseTryAgain()} Error: ${
+              `${strings.couldNotActivateTrial()} ${strings.error()}: ${
                 e.message
               }`
             );

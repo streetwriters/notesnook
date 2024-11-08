@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import { SaveState, useEditorStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
 import { useEditorConfig, useNoteStatistics } from "./manager";
@@ -98,8 +98,8 @@ function EditorFooter() {
         variant="subBody"
         sx={{ color: "paragraph" }}
       >
-        {words.total + " " + strings.words()}
-        {words.selected ? ` (${words.selected} ${strings.selected()})` : ""}
+        {strings.totalWords(words.total)}
+        {words.selected ? ` (${strings.selectedWords(words.selected)})` : ""}
       </Text>
       {dateEdited > 0 ? (
         <Text

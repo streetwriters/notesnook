@@ -32,13 +32,17 @@ export default defineConfig({
             syntax: "typescript",
             tsx: true
           },
+          baseUrl: "./",
+          paths: {
+            "$src/*": ["src/*"]
+          },
           experimental: {
             plugins: [
               [
                 "@lingui/swc-plugin",
                 {
                   runtimeModules: {
-                    i18n: ["./setup", "i18n"]
+                    i18n: ["$src/setup", "i18n"]
                   }
                 }
               ]

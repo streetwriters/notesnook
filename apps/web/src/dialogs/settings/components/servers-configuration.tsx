@@ -171,12 +171,10 @@ export function ServersConfiguration() {
                     .then((r) => r.json() as Promise<VersionResponse>)
                     .catch(() => undefined);
                   if (!version)
-                    throw new Error(
-                      `${strings.couldNotConnectTo(server.title)} .`
-                    );
+                    throw new Error(strings.couldNotConnectTo(server.title));
                   if (version.id !== server.id)
                     throw new Error(
-                      `${strings.incorrectServerUrl(url, server.title)}.`
+                      strings.incorrectServerUrl(url, server.title)
                     );
                   if (!isServerCompatible(version.version))
                     throw new Error(

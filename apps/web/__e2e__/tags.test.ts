@@ -86,7 +86,7 @@ test("delete a tag", async ({ page }) => {
 
   await tag?.delete();
 
-  expect(await app.toasts.waitForToast("1 tag deleted")).toBe(true);
+  expect(await app.toasts.waitForToast("Tag deleted")).toBe(true);
   expect(await tags?.findItem(TAG)).toBeUndefined();
 });
 
@@ -235,9 +235,7 @@ test("creating more than 5 tags shouldn't be possible on basic plan", async ({
 
   const result = await Promise.race([
     tags.createItem({ title: "tag6" }),
-    app.toasts.waitForToast(
-      "Please upgrade your account to Pro to add more tags."
-    )
+    app.toasts.waitForToast("Upgrade to Notesnook Pro to create more tags.")
   ]);
   expect(result).toBe(true);
 });

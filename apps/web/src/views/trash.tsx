@@ -61,7 +61,9 @@ function Trash() {
                 if (e instanceof Error)
                   showToast(
                     "error",
-                    `${strings.couldNotClearTrash()}. Error: ${e.message}`
+                    `${strings.couldNotClearTrash()} ${strings.error()}: ${
+                      e.message
+                    }`
                   );
               }
             }

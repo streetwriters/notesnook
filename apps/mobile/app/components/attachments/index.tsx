@@ -336,10 +336,8 @@ export const AttachmentDialog = ({
               onPress() {
                 if (!attachments) return;
                 presentDialog({
-                  title: strings.doAction(
-                    "attachment",
-                    attachments.placeholders.length,
-                    "download"
+                  title: strings.doActions.download.attachment(
+                    attachments.placeholders.length
                   ),
                   positiveText: strings.network.download(),
                   positivePress: async () => {
@@ -390,10 +388,8 @@ export const AttachmentDialog = ({
               onPress={() => {
                 if (!attachments) return;
                 presentDialog({
-                  title: strings.doAction(
-                    "attachment",
-                    attachments.placeholders.length,
-                    "download"
+                  title: strings.doActions.download.attachment(
+                    attachments.placeholders.length
                   ),
                   positiveText: strings.network.download(),
                   positivePress: async () => {
