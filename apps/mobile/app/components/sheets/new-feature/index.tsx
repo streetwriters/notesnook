@@ -57,7 +57,7 @@ const NewFeature = ({
       }}
     >
       <Heading color={colors.secondary.heading} size={SIZE.md}>
-        {!version ? `${strings.newVersion()} ` : `v${version} `}Highlights 🎉
+        {strings.newVersionHighlights(version)}
       </Heading>
 
       <Seperator />

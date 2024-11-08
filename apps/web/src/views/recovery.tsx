@@ -137,10 +137,7 @@ function useAuthenticateUser({
         const user = await db.user.fetchUser();
         setUser(user);
       } catch (e) {
-        showToast(
-          "error",
-          `${strings.biometricsAuthFailed()}. ${strings.pleaseTryAgain()}.`
-        );
+        showToast("error", strings.biometricsAuthFailed());
         openURL("/");
       } finally {
         setIsAuthenticating(false);
@@ -325,7 +322,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       title={strings.accountRecovery()}
       subtitle={strings.accountRecoveryWithKey()}
       loading={{
-        title: `${strings.network.downloading()} (${progress})`,
+        title: strings.network.downloading(progress),
         subtitle: strings.keyRecoveryProgressDesc()
       }}
       onSubmit={async (form) => {
@@ -461,7 +458,7 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
       title={strings.resetAccountPassword()}
       subtitle={strings.accountPassDesc()}
       loading={{
-        title: `${strings.resettingAccountPassword()} (${progress})`,
+        title: strings.resettingAccountPassword(progress),
         subtitle: strings.resetPasswordWait()
       }}
       onSubmit={async (form) => {

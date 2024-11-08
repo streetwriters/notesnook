@@ -55,13 +55,13 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
           EVENTS.migrationProgress,
           ({ collection, total, current }: MigrationProgressEvent) => {
             task({
-              text: `${strings.processing()} ${collection}...`,
+              text: strings.processingCollection(collection),
               current,
               total
             });
           }
         );
-        task({ text: `Processing...` });
+        task({ text: strings.processing() });
         try {
           await db.migrations.migrate();
 

@@ -44,7 +44,6 @@ import { ReminderDialog } from "../dialogs/reminder-dialog";
 import { Cipher, SerializedKey } from "@notesnook/crypto";
 import { ChunkedStream } from "../utils/streams/chunked-stream";
 import { isFeatureSupported } from "../utils/feature-check";
-import { NNCrypto } from "../interfaces/nncrypto";
 import { strings } from "@notesnook/intl";
 
 export const CREATE_BUTTON_MAP = {
@@ -215,7 +214,7 @@ export async function restoreBackupFile(backupFile: File) {
   } else {
     const error = await TaskManager.startTask<Error | void>({
       title: strings.restoringBackup(),
-      subtitle: `${strings.restoringBackupDesc()}...`,
+      subtitle: strings.restoringBackupDesc(),
       type: "modal",
       action: async (report) => {
         let cachedPassword: string | undefined = undefined;
@@ -344,14 +343,14 @@ async function restoreWithProgress(
           current: number;
         }) => {
           report({
-            text: `Restoring ${collection}...`,
+            text: strings.restoringCollection(collection),
             current,
             total
           });
         }
       );
 
-      report({ text: `Restoring...` });
+      report({ text: strings.restoring() });
       return restore(backup, password, key);
     }
   });

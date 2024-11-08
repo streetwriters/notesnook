@@ -33,7 +33,7 @@ import { strings } from "@notesnook/intl";
 function confirmDeleteAllNotes(items, type, context) {
   return new Promise((resolve) => {
     presentDialog({
-      title: strings.doAction("type", items.length, "delete"),
+      title: strings.doActions.delete[type](items.length),
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
       positivePress: (_inputValue, value) => {
@@ -112,10 +112,10 @@ export const deleteItems = async (items, type, context) => {
     }
   } else if (type === "tag") {
     presentDialog({
-      title: strings.deleteTags(ids.length),
+      title: strings.doActions.delete.tag(ids.length),
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
-      paragraph: strings.deleteTagsConfirm(),
+      paragraph: strings.actionConfirmations.delete.tag(2),
       positivePress: async () => {
         await db.tags.remove(...ids);
         useTagStore.getState().refresh();
@@ -128,7 +128,7 @@ export const deleteItems = async (items, type, context) => {
 
   let deletedIds = [...ids];
   if (type === "notebook" || type === "note") {
-    let message = strings.movedToTrash(type, ids.length);
+    let message = strings.actions.movedToTrash[type](ids.length);
     ToastManager.show({
       heading: message,
       type: "success",

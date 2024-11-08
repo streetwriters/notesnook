@@ -351,9 +351,7 @@ export const settingsGroups: SettingSection[] = [
               });
             },
             description(current) {
-              return `${strings.clearCacheDesc()}. ${strings.currentCacheSize(
-                `${current}`
-              )}`;
+              return strings.clearCacheDesc(current as number);
             },
             useHook: () => {
               const [cacheSize, setCacheSize] = React.useState(0);
@@ -444,7 +442,7 @@ export const settingsGroups: SettingSection[] = [
                       }
 
                       updateProgress({
-                        progress: `${strings.loggingOut()}... ${strings.pleaseWait()}`
+                        progress: strings.loggingOut()
                       });
 
                       await db.user?.logout();

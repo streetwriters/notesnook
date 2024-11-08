@@ -45,7 +45,7 @@ class TrashStore extends BaseStore<TrashStore> {
   restore = async (...ids: string[]) => {
     const restored = await db.trash.restore(...ids);
     if (restored === false) return;
-    showToast("success", strings.action("item", ids.length, "restored"));
+    showToast("success", strings.actions.restored.item(ids.length));
     await this.get().refresh();
     await appStore.refreshNavItems();
     await noteStore.refresh();

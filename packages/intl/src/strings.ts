@@ -17,43 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { plural, select, t } from "@lingui/macro";
-import { fail } from "assert";
+import { doActions } from "../generated/do-actions";
+import { actions } from "../generated/actions";
+import { inProgressActions } from "../generated/in-progress-actions";
+import { actionErrors } from "../generated/action-errors";
+import { actionConfirmations } from "../generated/action-confirmations";
 
-const actions = {
-  deleted: () => t`deleted`,
-  unpinned: () => t`unpinned`,
-  pinned: () => t`pinned`,
-  unpublished: () => t`unpublished`,
-  published: () => t`published`,
-  permanentlyDeleted: () => t`permanently deleted`,
-  restored: () => t`restored`,
-  edited: () => t`edited`,
-  created: () => t`created`,
-  renamed: () => t`renamed`
+const SEARCH_IN_ROUTE_STRINGS = {
+  Notes: () => t`Type a keyword to search in Notes`,
+  Notebooks: () => t`Type a keyword to search in Notebooks`,
+  Notebook: () => t`Type a keyword to search in Notebook`,
+  Favorites: () => t`Type a keyword to search in Favorites`,
+  Reminders: () => t`Type a keyword to search in Reminders`,
+  Trash: () => t`Type a keyword to search in Trash`,
+  Settings: () => t`Type a keyword to search in Settings`,
+  Tags: () => t`Type a keyword to search in Tags`,
+  Editor: () => t`Type a keyword to search in Editor`,
+  Home: () => t`Type a keyword to search in Home`,
+  Search: () => t`Type a keyword to search in Search`,
+  Monographs: () => t`Type a keyword to search in Monographs`
 };
-
-const doActions = {
-  delete: () => t`Delete`,
-  unpin: () => t`Unpin`,
-  pin: () => t`Pin`,
-  unpublish: () => t`Unpublish`,
-  publish: () => t`Publish`,
-  permanentlyDelete: () => t`Permanently delete`,
-  restore: () => t`Restore`,
-  edit: () => t`Edit`,
-  create: () => t`Created`,
-  rename: () => t`Rename`,
-  remove: () => t`Remove`,
-  download: () => t`Download`
-};
-
-const inProgressActions = {
-  deleting: () => t`Delete`
-};
-
-type Actions = keyof typeof actions;
-type DoActions = keyof typeof doActions;
-type InProgressActions = keyof typeof inProgressActions;
 
 export const strings = {
   done: () => t`Done`,
@@ -67,10 +50,11 @@ export const strings = {
     }),
   downloading: () => t`Downloading`,
   uploading: () => t`Uploading`,
-  networkProgress: (type: "upload" | "download") =>
+  networkProgress: (type: "upload" | "download" | "sync") =>
     select(type, {
       upload: "Uploading",
       download: "Downloading",
+      sync: "Syncing",
       other: "Loading"
     }),
   tapToCancel: () => t`Tap to cancel`,
@@ -326,10 +310,14 @@ export const strings = {
     item: () => t`Items`,
     shortcut: () => t`Shortcuts`
   },
-  addItem: (referenceType: string) =>
-    t`Add a ${strings.dataTypes[
-      referenceType as keyof typeof strings.dataTypes
-    ]()}`,
+  addItem: (itemType: "tag" | "notebook" | "reminder" | "note") =>
+    select(itemType, {
+      tag: `Add a tag`,
+      notebook: `Add a notebook`,
+      reminder: `Add a reminder`,
+      note: `Add a note`,
+      other: `Add an item`
+    }),
   reminderRepeatStrings: {
     day: (date: string) => t`Repeats daily at ${date}`,
     week: {
@@ -340,21 +328,32 @@ export const strings = {
     month: {
       selectDays: () => t`Select nth day of the month to repeat the reminder.`
     },
-    repeats: (freq: number, mode: string, selectedDays: string, date: string) =>
-      plural(freq, {
-        one: `Repeats every ${strings.reminderRepeatMode[
-          mode as keyof typeof strings.reminderRepeatMode
-        ]()} on ${selectedDays} at ${date}`,
-        other: `Repeats every ${freq} ${strings.reminderRepeatMode[
-          mode as keyof typeof strings.reminderRepeatMode
-        ]()} every ${selectedDays} at ${date}`
-      })
-  },
-  reminderRepeatMode: {
-    day: () => t`day`,
-    week: () => t`week`,
-    month: () => t`month`,
-    year: () => t`year`
+    repeats: (
+      freq: number,
+      mode: string,
+      selectedDays: string,
+      date: string
+    ) => {
+      const strings = {
+        day: plural(freq, {
+          one: `Repeats every day on ${selectedDays} at ${date}`,
+          other: `Repeats every # day every ${selectedDays} at ${date}`
+        }),
+        week: plural(freq, {
+          one: `Repeats every week on ${selectedDays} at ${date}`,
+          other: `Repeats every # week every ${selectedDays} at ${date}`
+        }),
+        month: plural(freq, {
+          one: `Repeats every month on ${selectedDays} at ${date}`,
+          other: `Repeats every # month every ${selectedDays} at ${date}`
+        }),
+        year: plural(freq, {
+          one: `Repeats every year on ${selectedDays} at ${date}`,
+          other: `Repeats every # year every ${selectedDays} at ${date}`
+        })
+      };
+      return strings[mode as keyof typeof strings];
+    }
   },
   remindMeIn: () => t`Remind me in`,
   referencedIn: () => t`REFERENCED IN`,
@@ -362,13 +361,13 @@ export const strings = {
     t`Select the folder that includes your backup files to list them here.`,
   noBackupsFound: () => t`No backups found`,
   restoring: () => t`Restoring`,
+  restoringCollection: (collection: string) => t`Restoring ${collection}...`,
   checkNewVersion: () => t`Checking for new version`,
   noUpdates: () => t`No updates available`,
   updateAvailable: () => t`Update available`,
   versionReleased: (version: string, type: "github" | "store") =>
     select(type, {
       github: `v${version} has been released on GitHub`,
-      store: `v${version} has been released`,
       other: `v${version} has been released`
     }),
   readReleaseNotes: () => t`Read full release notes on Github`,
@@ -387,7 +386,7 @@ export const strings = {
   gettingRecoveryCodes: () => t`Getting recovery codes`,
   protectNotes: () => t`Protect your notes`,
   protectNotesDesc: () => t`Choose how you want to secure your notes locally.`,
-  loggingOut: () => t`Logging out`,
+  loggingOut: () => t`Logging out. Please wait...`,
   loggingOutDesc: () => t`Please wait while we log you out.`,
   by: () => t`By`,
   noResultsForSearch: (query: string) => t`No results found for "${query}"`,
@@ -431,7 +430,7 @@ $headline$: Use starting line of the note as title.`,
   vaultFingerprintUnlock: () => t`Vault Fingerprint Unlock`,
   revokeVaultFingerprintUnlock: () => t`Revoke Vault Fingerprint Unlock`,
   changeVaultPassword: () => t`Change Vault Password`,
-  deleteNote: () => t`Delete note`,
+  deleteNote: () => doActions.delete.note(1),
   shareNote: () => t`Share note`,
   copyNote: () => t`Copy note`,
   goToEditor: () => t`Unlock note`,
@@ -448,6 +447,8 @@ $headline$: Use starting line of the note as title.`,
     t`Your account email will be changed without affecting your subscription or any other settings.`,
   changeEmailNotice: () => t`You will be logged out from all your devices`,
   export: () => t`Export`,
+  exportNotes: (notes: number) =>
+    plural(notes, { one: "Export note", other: "Export # notes" }),
   issueTitle: () => t`Report issue`,
   issueDesc: () =>
     t`We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap.`,
@@ -463,7 +464,8 @@ $headline$: Use starting line of the note as title.`,
     }),
   addNotesToNotebook: (title: string) => t`Add notes to ${title}`,
   publish: () => t`Publish`,
-  publishDesc: () =>
+  publishNote: () => t`Publish note`,
+  publishNoteDesc: () =>
     t`Publish your note to share it with others. You can set a password to protect it.`,
   saveRecoveryKey: () => t`Save account recovery key`,
   saveRecoveryKeyDesc: () =>
@@ -481,7 +483,8 @@ $headline$: Use starting line of the note as title.`,
   twoFactorAuthEnabled: () => t`Two-factor authentication enabled`,
   listOf: () => t`List of`,
   network: {
-    downloading: () => t`Downloading`,
+    downloading: (progress?: string | number) =>
+      progress ? t`Downloading (${progress})` : t`Downloading`,
     downloaded: () => t`Downloaded`,
     download: () => t`Download`,
     upload: () => t`Upload`,
@@ -498,7 +501,7 @@ $headline$: Use starting line of the note as title.`,
   redo: () => t`Redo`,
   createYourAccount: () => t`Create your account`,
   pinned: () => t`Pinned`,
-  editNotebook: () => t`Edit notebook`,
+  editNotebook: () => doActions.edit.notebook(1),
   newNotebook: () => t`New notebook`,
   newInternalLink: () => t`Link to note`,
   editInternalLink: () => t`Edit internal link`,
@@ -506,7 +509,9 @@ $headline$: Use starting line of the note as title.`,
   tabs: () => t`Tabs`,
   add: () => t`Add`,
   newVersion: () => t`New version`,
-  editReminder: () => t`Edit reminder`,
+  newVersionHighlights: (version?: string) =>
+    t`${version ? `v${version} ` : "New version"} Highlights 🎉`,
+  editReminder: () => doActions.edit.reminder(1),
   newReminder: () => t`New reminder`,
   sortBy: () => t`Sort by`,
   groupBy: () => t`Group by`,
@@ -542,7 +547,6 @@ $headline$: Use starting line of the note as title.`,
   keep: () => t`Keep`,
   restore: () => t`Restore`,
   deletePermanently: () => t`Delete permanently`,
-  deletedPermanently: () => t`deleted permanently`,
   viewAllLinkedNotebooks: () => t`View all linked notebooks`,
   learnMore: () => t`Learn more`,
   addTag: () => t`Add tag`,
@@ -635,7 +639,7 @@ $headline$: Use starting line of the note as title.`,
   },
   downloadUpdate: () => t`Download update`,
   stopReordering: () => t`Tap to stop reordering`,
-  removeShortcut: () => t`Remove shortcut`,
+  removeShortcut: () => doActions.remove.shortcut(1),
   createShortcut: () => t`Create a shortcut`,
   tip: () => t`TIP`,
   neverShowAgain: () => t`Never show again`,
@@ -749,7 +753,10 @@ $headline$: Use starting line of the note as title.`,
   enterPassword: () => t`Enter password`,
   failedToDownloadFile: () => t`Failed to download file`,
   zipping: () => t`Zipping`,
-  savingZipFile: () => t`Saving zip file`,
+  savingZipFile: (progress?: string) =>
+    progress
+      ? t`Saving zip file (${progress}%). Please wait...`
+      : t`Saving zip file. Please wait...`,
   failedToZipFiles: () => t`Failed to zip files`,
   fileVerificationFailed: () => t`Uploaded file verification failed.`,
   fileLengthError: () =>
@@ -793,34 +800,15 @@ $headline$: Use starting line of the note as title.`,
       user: "@andrewsayer on Twitter"
     }
   ],
-  shortcutCreated: () => t`Shortcut created`,
-  notebookRestored: () => t`Notebook restored`,
-  restoreNotebook: () => t`Restore notebook`,
-  permanentlyDeletedNotebook: () => t`Permanently deleted notebook`,
+  shortcutCreated: () => actions.created.shortcut(1),
+  notebookRestored: () => actions.restored.notebook(1),
+  restoreNotebook: () => doActions.restore.notebook(1),
+  permanentlyDeletedNotebook: () => actions.permanentlyDeleted.notebook(1),
   noteRestoredFromHistory: () => t`Note restored from history`,
-  noteRestored: () => t`Note restored`,
-  deleteNoteConfirmation: () =>
-    t`Are you sure you want to delete this note permanently?`,
-  noteDeleted: () => t`Note deleted`,
+  noteRestored: () => actions.restored.note(1),
+  deleteNoteConfirmation: () => actionConfirmations.permanentlyDelete.note(1),
+  noteDeleted: () => actions.deleted.note(1),
   restored: () => t`Restored successfully`,
-  deleteItems: (type: string, count: number) =>
-    plural(count, {
-      one: `Delete ${strings.dataTypes[
-        type as keyof typeof strings.dataTypes
-      ]()}`,
-      other: `Delete ${strings.dataTypesPlural[
-        type as keyof typeof strings.dataTypes
-      ]()}`
-    }),
-  deleteItemsConfirmation: (type: string, count: number) =>
-    plural(count, {
-      one: `Are you sure you want to delete this ${strings.dataTypes[
-        type as keyof typeof strings.dataTypes
-      ]()} permanently?`,
-      other: `Are you sure you want to delete these ${strings.dataTypesPlural[
-        type as keyof typeof strings.dataTypes
-      ]()} permanently?`
-    }),
   manageTags: () => t`Manage tags`,
   linkNotebook: () => t`Link to notebook`,
   move: () => t`Move`,
@@ -840,7 +828,7 @@ $headline$: Use starting line of the note as title.`,
     }),
   failedToPublish: () => t`Failed to publish note`,
   failedToUnpublish: () => t`Failed to unpublish note`,
-  notePublished: () => t`Note published`,
+  notePublished: () => actions.published.note(1),
   monographUrlCopied: () => t`Monograph URL copied`,
   recoveryKeySaved: () => t`Did you save recovery key?`,
   recoveryKeySavedDesc: () =>
@@ -855,22 +843,13 @@ $headline$: Use starting line of the note as title.`,
   },
   backupEncrypted: () => t`Backup is encrypted`,
   password: () => t`Password`,
-  renameTag: () => t`Rename tag`,
-  renameColor: () => t`Rename color`,
+  renameTag: () => doActions.rename.tag(1),
+  renameColor: () => doActions.rename.color(1),
   renameColorDesc: (color: string) => t`You are renaming color ${color}`,
   name: () => t`Name`,
   unlockToDelete: () => t`Unlock note to delete it`,
   backupRestored: () => t`Backup restored`,
   restoreFailed: () => t`Restore failed`,
-  itemDeleted: (count: number, type: string) =>
-    plural(count, {
-      one: `1 ${strings.dataTypesCamelCase[
-        type as keyof typeof strings.dataTypesCamelCase
-      ]()} deleted`,
-      other: `# ${strings.dataTypes[
-        type as keyof typeof strings.dataTypes
-      ]()} deleted`
-    }),
   reorder: () => t`Reorder`,
   turnOffReminder: () => t`Turn off reminder`,
   turnOnReminder: () => t`Turn on reminder`,
@@ -894,12 +873,15 @@ $headline$: Use starting line of the note as title.`,
   readOnly: () => t`Read only`,
   syncOff: () => t`Sync off`,
   syncOffConfirm: (count: number) =>
-    t`Prevent ${strings.itemsPlural("note", count)} from syncing`,
+    plural(count, {
+      one: `Prevent note from syncing`,
+      other: `Prevent # notes from syncing`
+    }),
   syncOffDesc: (count: number) =>
-    `${strings.itemsPlural(
-      "note",
-      count
-    )} will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?`,
+    plural(count, {
+      one: `Note will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?`,
+      other: `# notes will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?`
+    }),
   duplicate: () => t`Duplicate`,
   remindMe: () => t`Remind me`,
   published: () => t`Published`,
@@ -908,7 +890,7 @@ $headline$: Use starting line of the note as title.`,
   linkNotebooks: () => t`Link notebooks`,
   unlinkFromAll: () => t`Unlink from all`,
   removeFromAll: () => t`Remove from all`,
-  assignTo: () => t`Assign to`,
+  assignTo: () => t`Assign to...`,
   addTags: () => t`Add tags`,
   addTagsDesc: () => t`Add tags to multiple notes at once`,
   references: () => t`References`,
@@ -1310,18 +1292,17 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
   backupDataDesc: () =>
     t`All your backups are stored in 'Phone Storage/Notesnook/backups/' folder`,
   backupSuccess: () => t`Backup successful`,
-  biometricsAuthFailed: () => t`Biometrics authentication failed`,
+  biometricsAuthFailed: () =>
+    t`Biometrics authentication failed. Please try again.`,
   biometricsAuthFailedDesc: () => t`Wait 30 seconds to try again`,
   biometricsAuthCancelled: () => t`Authentication cancelled by user`,
   biometricsAuthError: () => t`Authentication failed`,
   tryAgain: () => t`Tap to try again`,
   rateAppMessage: () => t`We would love to know what you think!`,
   rateAppActionText: (platform: string) =>
-    t`Rate Notesnook on ${
-      platform === "ios" ? strings.appStore() : strings.playStore()
-    }`,
-  appStore: () => t`App Store`,
-  playStore: () => t`Play Store`,
+    platform === "ios"
+      ? t`Rate Notesnook on App Store`
+      : t`Rate Notesnook on Play Store`,
   recoveryKeyMessage: () => t`Keep your data safe`,
   recoveryKeyMessageActionText: () => t`Save your account recovery key`,
   loginMessage: () => t`You are not logged in`,
@@ -1441,20 +1422,6 @@ NOTE: Creating a backup with attachments can take a while, and also fail complet
   ],
   someNotesPublished: () => t`Some notes are published`,
   unpublishToDelete: () => t`Unpublish notes to delete them`,
-  deleteTags: (count: number) =>
-    plural(count, {
-      one: "Delete tag",
-      other: "Delete # tags"
-    }),
-  deleteTagsConfirm: () => t`Are you sure you want to delete these tags?`,
-  deleteItemConfirmation: (itemType: string) =>
-    t`Are you sure you want to delete this ${strings.dataTypes[
-      itemType as keyof typeof strings.dataTypes
-    ]()}?`,
-  deleteItem: (itemType: string) =>
-    t`Delete ${strings.dataTypes[
-      itemType as keyof typeof strings.dataTypes
-    ]()}`,
   filterAttachments: () => t`Filter attachments by filename, type or hash`,
   oldPassword: () => t`Old password`,
   newPassword: () => t`New password`,
@@ -1485,11 +1452,7 @@ For example:
   searchANote: () => t`Search a note`,
   remindeMeOf: () => t`Remind me of...`,
   addShortNote: () => t`Add a short note`,
-  typeAKeywordToSearchIn: (route: string) =>
-    t`Type a keyword to search in ${strings.routes[
-      route as keyof typeof strings.routes
-    ]()}...`,
-  searchingFor: (query: string) => t`Searching for ${query}`,
+  searchingFor: (query: string) => t`Searching for ${query}...`,
   typeAKeyword: () => t`Type a keyword`,
   search: () => t`Search`,
   enterEmailAddress: () => t`Enter email address`,
@@ -1511,10 +1474,9 @@ For example:
     Search: () => t`Search`,
     Monographs: () => t`Monographs`
   },
-  searchInRoute: (routeName: string) =>
-    t`Type a keyword to search in ${
-      strings.routes[routeName as keyof typeof strings.routes]?.() || routeName
-    }`,
+  searchInRoute: (routeName: keyof typeof SEARCH_IN_ROUTE_STRINGS) => {
+    return SEARCH_IN_ROUTE_STRINGS[routeName]();
+  },
   logoutConfirmation: () =>
     t`Are you sure you want to logout and clear all data stored on THIS DEVICE?`,
   backupDataBeforeLogout: () => t`Take a backup before logging out`,
@@ -1533,11 +1495,15 @@ For example:
     t`Please grant notifications permission to add new reminders.`,
   selectDayError: () => t`Please select the day to repeat the reminder on`,
   setTitleError: () => t`Please set title of the reminder`,
-  dateError: () => t`Reminder date must be set in future`,
+  dateError: () => t`Reminder time cannot be earlier than the current time.`,
   failedToDecryptBackup: () => t`Failed to decrypt backup`,
   backupDirectoryNotSelected: () => t`Backup directory not selected`,
   legal: () => t`legal`,
-  days: () => t`days`,
+  days: (days: number) =>
+    plural(days, {
+      one: `1 day`,
+      other: `# days`
+    }),
   daily: () => t`Daily`,
   weekly: () => t`Weekly`,
   monthly: () => t`Monthly`,
@@ -1568,7 +1534,8 @@ For example:
   noteLockedBlockLink: () =>
     t`Linking to a specific block is not available for locked notes.`,
   dismiss: () => t`Dismiss`,
-  words: () => t`words`,
+  totalWords: (words: number) =>
+    plural(words, { one: "# word", other: "# words" }),
   addATag: () => t`Add a tag`,
   startWritingNote: () => t`Start writing your note...`,
   off: () => t`Off`,
@@ -1582,7 +1549,7 @@ For example:
   restoreFromFiles: () => t`Restore from files`,
   recentBackups: () => t`RECENT BACKUPS`,
   restoringBackup: () => t`Restoring backup...`,
-  restoringBackupDesc: () => t`Please wait while we restore your backup`,
+  restoringBackupDesc: () => t`Please wait while we restore your backup...`,
   decryptingBackup: () => t`Backup is encrypted, decrypting...`,
   preparingBackupRestore: () => t`Preparing to restore backup file...`,
   readingBackupFile: () => t`Reading backup file...`,
@@ -1608,9 +1575,9 @@ For example:
   connectedToServer: () => t`Connected to all servers sucessfully.`,
   allServerUrlsRequired: () => t`All server urls are required.`,
   serverNotFound: (host: string) => t`Server with host ${host} not found.`,
-  couldNotConnectTo: (server: string) => t`Could not connect to ${server}`,
+  couldNotConnectTo: (server: string) => t`Could not connect to ${server}.`,
   incorrectServerUrl: (url: string, server: string) =>
-    t`The URL you have given (${url}) does not point to the ${server}`,
+    t`The URL you have given (${url}) does not point to the ${server}.`,
   serverVersionMismatch: (title: string, url: string) =>
     t`The ${title} at ${url} is not compatible with this client.`,
   testConnectionBeforeSave: () =>
@@ -1631,9 +1598,9 @@ For example:
   ],
   restoreThisVersion: () => t`Restore this version`,
   autoSaveOff: () => t`Auto save: off`,
-  selected: () => t`selected`,
+  selectedWords: (words: number) => plural(words, { other: "# selected" }),
   dropFilesToAttach: () => t`Drop your files here to attach`,
-  loadingEditor: () => t`Loading editor`,
+  loadingEditor: () => t`Loading editor. Please wait...`,
   noHeadingsFound: () => t`No headings found`,
   somethingWentWrong: () => t`Something went wrong`,
   whatWentWrong: () => t`What went wrong?`,
@@ -1671,22 +1638,14 @@ For example:
   zoomOut: () => t`Zoom out`,
   zoomIn: () => t`Zoom in`,
   enterFullScreen: () => t`Enter fullscreen`,
-  syncingYour: (context: string) =>
-    t`Syncing your ${strings.routes[
-      (context.slice(0, 1).toUpperCase() +
-        context.slice(1)) as keyof typeof strings.routes
-    ]()}`,
+  syncingYourNotes: () => t`Syncing your notes`,
   items: () => t`items`,
   downloadingImages: () => t`Downloading images`,
   checkingForUpdates: () => t`Checking for updates`,
-  updating: () => t`updating`,
-  restartRequired: () => t`restart required`,
-  available: () => t`available`,
-  itemsRestored: (count: number) =>
-    plural(count, {
-      one: `# item restored`,
-      other: `# items restored`
-    }),
+  updating: (percentage: number) => t`${percentage}% updating...`,
+  updateCompleted: (version: string) =>
+    `v${version} downloaded (click to install)`,
+  updateNewVersionAvailable: (version: string) => t`v${version} available`,
   unlocking: () => t`Unlocking`,
   reminderStarts: (date: string, time: string) =>
     t`The reminder will start on ${date} at ${time}.`,
@@ -1801,6 +1760,7 @@ For example:
   dontShowAgainConfirm: () => t`Don't show again on this device?`,
   toggleDarkLightMode: () => t`Toggle dark/light mode`,
   goTo: () => t`Go to`,
+  goToTag: (tag: string) => t`Go to #${tag}`,
   tagNotFound: () => `Tag not found`,
   downloadAllAttachments: () => t`Download all attachments`,
   selectProfilePicture: () => t`Select profile picture`,
@@ -1855,7 +1815,8 @@ For example:
   properties: () => t`Properties`,
   clickToPreview: () => t`Click to preview`,
   clearCache: () => t`Clear cache`,
-  clearCacheDesc: () => t`Clear all cached attachments`,
+  clearCacheDesc: (cacheSize: number) =>
+    t`Clear all cached attachments. Current cache size: ${cacheSize}`,
   clearCacheConfirm: () => t`Clear attachments cache?`,
   clearCacheConfirmDesc:
     () => t`Clearing attachments cache will perform the following actions:
@@ -1898,94 +1859,22 @@ All attachments will be downloaded & cached again on access.
   backingUpDataWait: () =>
     t`We are creating a backup of your data. Please wait...`,
   resetAccountPassword: () => t`Reset account password`,
-  resettingAccountPassword: () => t`Resetting account password`,
+  resettingAccountPassword: (progress: number) =>
+    t`Resetting account password (${progress})`,
   resetPasswordWait: () => t`Please wait while we reset your account password.`,
   recoverySuccess: () => t`Recovery successful!`,
   recoverySuccessDesc: () => t`Your account has been recovered.`,
   upgradeNow: () => t`Upgrade now`,
   backupSavedAt: (path: string) => t`Backup saved at ${path}`,
-  movedToTrash: (type: string, count: number) =>
-    plural(count, {
-      one: `1 ${strings.dataTypes[
-        type as keyof typeof strings.dataTypes
-      ]()} moved to trash`,
-      other: `# ${strings.dataTypesPlural[
-        type as keyof typeof strings.dataTypesPlural
-      ]()} moved to trash`
-    }),
   irreverisibleAction: () => t`This action is IRREVERSIBLE.`,
-  doAction: (type: string, count: number, action: DoActions) =>
-    plural(count, {
-      one: `${doActions[action]()} ${strings.dataTypesCamelCase[
-        type as keyof typeof strings.dataTypes
-      ]()}?`,
-      other: `${doActions[action]()} # ${strings.dataTypesPlural[
-        type as keyof typeof strings.dataTypesPlural
-      ]()}?`
-    }),
-  action: (type: string, count: number, action: Actions) =>
-    plural(count, {
-      one: `${strings.dataTypesCamelCase[
-        type as keyof typeof strings.dataTypes
-      ]()} ${actions[action]()}`,
-      other: `# ${strings.dataTypesPlural[
-        type as keyof typeof strings.dataTypesPlural
-      ]()} ${actions[action]()}`
-    }),
-  inProgressAction: (type: string, count: number, action: InProgressActions) =>
-    plural(count, {
-      one: `${inProgressActions[action]()} ${strings.dataTypesCamelCase[
-        type as keyof typeof strings.dataTypes
-      ]()}`,
-      other: `${inProgressActions[action]()} # ${strings.dataTypesPlural[
-        type as keyof typeof strings.dataTypesPlural
-      ]()}`
-    }),
-  actionError: (type: string, count: number, action: Actions) =>
-    plural(count, {
-      one: `${strings.dataTypesCamelCase[
-        type as keyof typeof strings.dataTypes
-      ]()} could not be ${actions[action]}`,
-      other: `# ${strings.dataTypesPlural[
-        type as keyof typeof strings.dataTypesPlural
-      ]()} could not be ${actions[action]}`
-    }),
-  deleted: (type: string, count: number) =>
-    plural(count, {
-      one: `${strings.dataTypesCamelCase[
-        type as keyof typeof strings.dataTypes
-      ]()} deleted`,
-      other: `# ${strings.dataTypesPlural[
-        type as keyof typeof strings.dataTypesPlural
-      ]()} deleted`
-    }),
-  unpinned: (type: string, count: number) =>
-    plural(count, {
-      one: `${strings.dataTypesCamelCase[
-        type as keyof typeof strings.dataTypes
-      ]()} unpinned`,
-      other: `# ${strings.dataTypesPlural[
-        type as keyof typeof strings.dataTypesPlural
-      ]()} unpinned`
-    }),
-  deleting: () => t`Deleting`,
-  deletingItems: (type: string, count: number) =>
-    plural(count, {
-      one: `Deleting ${strings.dataTypes[
-        type as keyof typeof strings.dataTypes
-      ]()}`,
-      other: `Deleting ${strings.dataTypesPlural[
-        type as keyof typeof strings.dataTypesPlural
-      ]()}`
-    }),
 
-  itemsPlural: (type: string, count: number) =>
-    plural(count, {
-      one: `${strings.dataTypes[type as keyof typeof strings.dataTypes]()}`,
-      other: `# ${strings.dataTypesPlural[
-        type as keyof typeof strings.dataTypesPlural
-      ]()}`
-    }),
+  doActions,
+  actions,
+  inProgressActions,
+  actionErrors,
+  actionConfirmations,
+
+  deleting: () => t`Deleting`,
   backupReadyToDownload: () => t`Your backup is ready to download`,
   vaultUnlocked: () => t`Vault unlocked`,
   vaultLocked: () => t`Vault locked`,
@@ -2008,23 +1897,42 @@ All attachments will be downloaded & cached again on access.
   },
   noteDoesNotExist: () => t`Note does not exist`,
   couldNotConvertNote: (format: string) =>
-    t`Could not convert note to ${format}`,
+    t`Could not convert note to ${format}.`,
   remindersNotSupported: () =>
     t`Reminders will not be active on this device as it does not support notifications.`,
   invalidHexColor: () => t`Please enter a valid hex color (e.g. #ffffff)`,
   profileUpdated: () => t`Profile updated`,
-  addedToNotebook: (count: number) =>
-    plural(count, {
-      one: `added to 1 notebook`,
-      other: `added to # notebooks`
-    }),
-  removedFromNotebook: (count: number) =>
-    plural(count, {
-      one: `removed from 1 notebook`,
-      other: `removed from # notebooks`
-    }),
+  assignedToNotebookMessage: (
+    notes: number,
+    added: number,
+    removed: number
+  ) => {
+    const n = plural(notes, {
+      one: `1 note`,
+      other: `# notes`
+    });
+    if (added === 0 && removed > 0)
+      return t`${n} ${plural(removed, {
+        one: `removed from 1 notebook`,
+        other: `removed from # notebooks`
+      })}.`;
+    else if (added > 0 && removed === 0)
+      return t`${n} ${plural(added, {
+        one: `added to 1 notebook`,
+        other: `added to # notebooks`
+      })}.`;
+    else
+      return t`${n} ${plural(added, {
+        one: `added to 1 notebook`,
+        other: `added to # notebooks`
+      })} and ${plural(removed, {
+        one: `removed from 1 notebook`,
+        other: `removed from # notebooks`
+      })}.`;
+  },
   noEncryptionKeyFound: () => t`No encryption key found`,
-  couldNotActivateTrial: () => t`Could not activate trial`,
+  couldNotActivateTrial: () =>
+    t`Could not activate trial. Please try again later.`,
   pleaseTryAgain: () => t`Please try again`,
   securityKeyRegistered: () => t`Security key successfully registered.`,
   restartNow: () => t`Restart now`,
@@ -2036,13 +1944,13 @@ All attachments will be downloaded & cached again on access.
   subCanceled: () => t`Your subscription has been canceled.`,
   refundIssued: () =>
     t`Your refund has been issued. Please wait 24 hours before reaching out to us in case you do not receive your funds.`,
-  failedToInstallTheme: () => t`Failed to install theme`,
+  failedToInstallTheme: () => t`Failed to install theme.`,
   fullNameUpdated: () => t`Full name updated`,
   shortcutRemoved: () => t`Shortcut removed`,
   recheckFailed: () => t`Rechecking failed`,
   failedToDelete: () => t`Failed to delete`,
   failedToRegisterTask: () => t`Failed to register task`,
-  couldNotClearTrash: () => t`Could not clear trash`,
+  couldNotClearTrash: () => t`Could not clear trash.`,
   automaticBackupsDisabled: () => t`Automatic backups disabled`,
   automaticBackupsDisabledDesc: () =>
     t`Please upgrade to Pro to enable automatic backups.`,
@@ -2069,7 +1977,7 @@ All attachments will be downloaded & cached again on access.
   rotateRight: () => t`Rotate right`,
   website: () => t`Website`,
   resetSidebar: () => t`Reset sidebar`,
-  removeColor: () => t`Remove color`,
+  removeColor: () => doActions.remove.color(1),
   favorite: () => t`Favorite`,
   assignColor: () => t`Assign color`,
   print: () => t`Print`,
@@ -2084,7 +1992,8 @@ All attachments will be downloaded & cached again on access.
   editingTagDesc: (tag: string) => t`You are editing #${tag}`,
   applyingChanges: () => t`Applying changes`,
   thisMayTakeAWhile: () => t`This may take a while`,
-  processing: () => t`Processing`,
+  processing: () => t`Processing...`,
+  processingCollection: (collection: string) => t`Processing ${collection}...`,
   root: () => t`Root`,
   credientials: () => t`Credentials`,
   thankYouForReporting: () => t`Thank you for reporting!`,
@@ -2440,7 +2349,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   passed: () => t`Passed`,
   failed: () => t`Failed`,
   cacheClearedDesc: () => t`All cached attachments have been cleared.`,
-  currentCacheSize: (size: string) => t`Current cache size: ${size}`,
   restoreBackupConfirm: () => t`Restore backup?`,
   serversConfigurationDesc: () => t`Configure server URLs for Notesnook`,
   prioritySupport: () => t`Get Priority support`,
@@ -2460,5 +2368,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   schoolWork: () => t`School work`,
   schoolWorkDesc: () => t`Everything related to my school in one place.`,
   recipes: () => t`Recipes`,
-  recipesDesc: () => t`I love cooking and collecting recipes.`
+  recipesDesc: () => t`I love cooking and collecting recipes.`,
+  error: () => t`Error`
 };

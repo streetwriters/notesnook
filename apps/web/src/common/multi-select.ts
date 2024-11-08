@@ -48,16 +48,16 @@ async function moveNotesToTrash(ids: string[], confirm = true) {
   await TaskManager.startTask({
     type: "status",
     id: "deleteNotes",
-    title: strings.deletingItems("note", items.length),
+    title: strings.inProgressActions.deleting.note(items.length),
     action: async (report) => {
       report({
-        text: `${strings.inProgressAction("note", items.length, "deleting")}...`
+        text: strings.inProgressActions.deleting.note(items.length)
       });
       await noteStore.delete(...items);
     }
   });
 
-  showToast("success", strings.movedToTrash("note", items.length));
+  showToast("success", strings.actions.movedToTrash.note(items.length));
 }
 
 async function moveNotebooksToTrash(ids: string[]) {
@@ -71,26 +71,22 @@ async function moveNotebooksToTrash(ids: string[]) {
   await TaskManager.startTask({
     type: "status",
     id: "deleteNotebooks",
-    title: strings.deletingItems("notebook", ids.length),
+    title: strings.inProgressActions.deleting.notebook(ids.length),
     action: async (report) => {
       report({
-        text: `${strings.inProgressAction(
-          "notebook",
-          ids.length,
-          "deleting"
-        )}...`
+        text: strings.inProgressActions.deleting.notebook(ids.length)
       });
       await notebookStore.delete(...ids);
     }
   });
 
-  showToast("success", strings.movedToTrash("notebook", ids.length));
+  showToast("success", strings.actions.movedToTrash.notebook(ids.length));
 }
 
 async function deleteAttachments(ids: string[]) {
   if (
     !(await ConfirmDialog.show({
-      title: strings.doAction("attachment", ids.length, "permanentlyDelete"),
+      title: strings.doActions.permanentlyDelete.attachment(ids.length),
       message: strings.irreverisibleAction(),
       negativeButtonText: strings.no(),
       positiveButtonText: strings.yes()
@@ -101,7 +97,7 @@ async function deleteAttachments(ids: string[]) {
   await TaskManager.startTask({
     type: "status",
     id: "deleteAttachments",
-    title: strings.deletingItems("attachment", ids.length),
+    title: strings.inProgressActions.deleting.attachment(ids.length),
     action: async (report) => {
       for (let i = 0; i < ids.length; ++i) {
         const id = ids[i];
@@ -109,11 +105,7 @@ async function deleteAttachments(ids: string[]) {
         if (!attachment) continue;
 
         report({
-          text: `${strings.inProgressAction(
-            "attachment",
-            ids.length,
-            "deleting"
-          )}...`,
+          text: strings.inProgressActions.deleting.attachment(ids.length),
           current: i,
           total: ids.length
         });
@@ -121,7 +113,7 @@ async function deleteAttachments(ids: string[]) {
       }
     }
   });
-  showToast("success", strings.deleted("attachment", ids.length));
+  showToast("success", strings.actions.deleted.attachment(ids.length));
 }
 
 async function moveRemindersToTrash(ids: string[]) {
@@ -133,20 +125,16 @@ async function moveRemindersToTrash(ids: string[]) {
   await TaskManager.startTask({
     type: "status",
     id: "deleteReminders",
-    title: strings.deletingItems("reminder", ids.length),
+    title: strings.inProgressActions.deleting.reminder(ids.length),
     action: async (report) => {
       report({
-        text: `${strings.inProgressAction(
-          "reminder",
-          ids.length,
-          "deleting"
-        )}...`
+        text: strings.inProgressActions.deleting.reminder(ids.length)
       });
       await reminderStore.delete(...ids);
     }
   });
 
-  showToast("success", strings.deleted("reminder", ids.length));
+  showToast("success", strings.actions.deleted.reminder(ids.length));
 }
 
 async function deleteTags(ids: string[]) {
@@ -161,7 +149,7 @@ async function deleteTags(ids: string[]) {
     title: "Deleting tags",
     action: async (report) => {
       report({
-        text: `${strings.inProgressAction("tag", ids.length, "deleting")}...`
+        text: strings.inProgressActions.deleting.tag(ids.length)
       });
       for (const id of ids) {
         await db.tags.remove(id);
@@ -172,7 +160,7 @@ async function deleteTags(ids: string[]) {
     }
   });
 
-  showToast("success", strings.deleted("tag", ids.length));
+  showToast("success", strings.actions.deleted.tag(ids.length));
 }
 
 export const Multiselect = {

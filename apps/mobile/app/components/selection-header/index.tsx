@@ -102,9 +102,8 @@ export const SelectionHeader = React.memo(
 
     const deleteItem = async () => {
       presentDialog({
-        title: strings.deleteItems(type as string, selectedItemsList.length),
-        paragraph: strings.deleteItemsConfirmation(
-          type as string,
+        title: strings.doActions.delete[type](selectedItemsList.length),
+        paragraph: strings.actionConfirmations.delete[type](
           selectedItemsList.length
         ),
         positiveText: strings.delete(),

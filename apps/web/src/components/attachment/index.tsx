@@ -303,7 +303,7 @@ const AttachmentMenuItems: (
       icon: Rename.path,
       onClick: async () => {
         const newName = await PromptDialog.show({
-          title: strings.doAction("attachment", 1, "rename"),
+          title: strings.doActions.rename.attachment(1),
           description: attachment.filename,
           defaultValue: attachment.filename
         });

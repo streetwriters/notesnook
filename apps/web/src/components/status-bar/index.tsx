@@ -194,13 +194,11 @@ function statusToInfoText(status: UpdateStatus) {
   return type === "checking"
     ? strings.checkingForUpdates()
     : type === "downloading"
-    ? `${Math.round(status.progress)}% ${strings.updating()}...`
+    ? strings.updating(Math.round(status.progress))
     : type === "completed"
-    ? `v${
-        status.version
-      } ${strings.network.downloaded()} (${strings.restartRequired()})`
+    ? strings.updateCompleted(status.version)
     : type === "available"
-    ? `v${status.version} ${strings.available()}`
+    ? strings.updateNewVersionAvailable(status.version)
     : "";
 }
 
