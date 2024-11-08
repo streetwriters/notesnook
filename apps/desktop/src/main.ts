@@ -101,7 +101,7 @@ async function createWindow() {
     ...(config.desktopSettings.nativeTitlebar
       ? {}
       : {
-          titleBarStyle: process.platform === "linux" ? "default" : "hidden",
+          titleBarStyle: process.platform === "win32" || process.platform === "darwin" ? "hidden" : "default",
           frame: process.platform === "win32" || process.platform === "darwin",
           titleBarOverlay: {
             height: 37,
