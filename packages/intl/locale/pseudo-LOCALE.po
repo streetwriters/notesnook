@@ -61,6 +61,34 @@ msgstr ""
 msgid "{count, plural, one {1 minute} other {# minutes}}"
 msgstr ""
 
+#: generated/action-confirmations.ts:32
+msgid "{count, plural, one {Are you sure you want to delete this attachment?} other {Are you sure you to delete these attachments?}}"
+msgstr ""
+
+#: generated/action-confirmations.ts:28
+msgid "{count, plural, one {Are you sure you want to delete this color?} other {Are you sure you to delete these colors?}}"
+msgstr ""
+
+#: generated/action-confirmations.ts:12
+msgid "{count, plural, one {Are you sure you want to delete this item?} other {Are you sure you to delete these items?}}"
+msgstr ""
+
+#: generated/action-confirmations.ts:8
+msgid "{count, plural, one {Are you sure you want to delete this note?} other {Are you sure you to delete these notes?}}"
+msgstr ""
+
+#: generated/action-confirmations.ts:20
+msgid "{count, plural, one {Are you sure you want to delete this notebook?} other {Are you sure you to delete these notebooks?}}"
+msgstr ""
+
+#: generated/action-confirmations.ts:16
+msgid "{count, plural, one {Are you sure you want to delete this reminder?} other {Are you sure you to delete these reminders?}}"
+msgstr ""
+
+#: generated/action-confirmations.ts:24
+msgid "{count, plural, one {Are you sure you want to delete this tag?} other {Are you sure you to delete these tags?}}"
+msgstr ""
+
 #: src/strings.ts:72
 msgid "{count, plural, one {Are you sure you want to download all attachments of this note?} other {Are you sure you want to download all attachments?}}"
 msgstr ""
@@ -69,16 +97,104 @@ msgstr ""
 msgid "{count, plural, one {Are you sure you want to move this notebook to {selectedNotebookTitle}?} other {Are you sure you want to move these # notebooks {selectedNotebookTitle}?}}"
 msgstr ""
 
+#: generated/action-confirmations.ts:38
+msgid "{count, plural, one {Are you sure you want to permanently delete this note?} other {Are you sure you to permanently delete these notes?}}"
+msgstr ""
+
+#: generated/action-confirmations.ts:42
+msgid "{count, plural, one {Are you sure you want to permanently delete this notebook?} other {Are you sure you to permanently delete these notebooks?}}"
+msgstr ""
+
 #: src/strings.ts:122
 msgid "{count, plural, one {Attach image} other {Attach # images}}"
+msgstr ""
+
+#: generated/actions.ts:8
+msgid "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
 msgstr ""
 
 #: src/strings.ts:67
 msgid "{count, plural, one {Attachment downloaded at {path}} other {#/{total} attachments downloaded as a zip file at {path}}}"
 msgstr ""
 
+#: generated/actions.ts:90
+msgid "{count, plural, one {Color renamed} other {# colors renamed}}"
+msgstr ""
+
+#: generated/do-actions.ts:32
+msgid "{count, plural, one {Delete attachment} other {Delete # attachments}}"
+msgstr ""
+
+#: generated/do-actions.ts:28
+msgid "{count, plural, one {Delete color} other {Delete # colors}}"
+msgstr ""
+
+#: generated/do-actions.ts:12
+msgid "{count, plural, one {Delete item} other {Delete # items}}"
+msgstr ""
+
+#: generated/do-actions.ts:8
+msgid "{count, plural, one {Delete note} other {Delete # notes}}"
+msgstr ""
+
+#: generated/do-actions.ts:20
+msgid "{count, plural, one {Delete notebook} other {Delete # notebooks}}"
+msgstr ""
+
+#: generated/do-actions.ts:16
+msgid "{count, plural, one {Delete reminder} other {Delete # reminders}}"
+msgstr ""
+
+#: generated/do-actions.ts:24
+msgid "{count, plural, one {Delete tag} other {Delete # tags}}"
+msgstr ""
+
+#: generated/in-progress-actions.ts:16
+msgid "{count, plural, one {Deleting attachment...} other {Deleting # attachments...}}"
+msgstr ""
+
+#: generated/in-progress-actions.ts:8
+msgid "{count, plural, one {Deleting note...} other {Deleting # notes...}}"
+msgstr ""
+
+#: generated/in-progress-actions.ts:12
+msgid "{count, plural, one {Deleting notebook...} other {Deleting # notebooks...}}"
+msgstr ""
+
+#: generated/in-progress-actions.ts:24
+msgid "{count, plural, one {Deleting reminder...} other {Deleting # reminders...}}"
+msgstr ""
+
+#: generated/in-progress-actions.ts:20
+msgid "{count, plural, one {Deleting tag...} other {Deleting # tags...}}"
+msgstr ""
+
+#: generated/do-actions.ts:132
+msgid "{count, plural, one {Download attachment} other {Download # attachments}}"
+msgstr ""
+
+#: generated/do-actions.ts:94
+msgid "{count, plural, one {Edit notebook} other {Edit # notebooks}}"
+msgstr ""
+
+#: generated/do-actions.ts:98
+msgid "{count, plural, one {Edit reminder} other {Edit # reminders}}"
+msgstr ""
+
+#: generated/do-actions.ts:90
+msgid "{count, plural, one {Edit tag} other {Edit # tags}}"
+msgstr ""
+
 #: src/strings.ts:62
 msgid "{count, plural, one {Failed to download attachment} other {Failed to download # attachments}}"
+msgstr ""
+
+#: generated/actions.ts:60
+msgid "{count, plural, one {Item restored} other {# items restored}}"
+msgstr ""
+
+#: src/strings.ts:2372
+msgid "{count, plural, one {Move all notes in this notebook to trash} other {Move all notes in these notebooks to trash}}"
 msgstr ""
 
 #: src/strings.ts:823
@@ -89,8 +205,36 @@ msgstr ""
 msgid "{count, plural, one {Moving {title}} other {Moving # notebooks}}"
 msgstr ""
 
+#: generated/action-errors.ts:14
+msgid "{count, plural, one {Note could not be published} other {# notes could not be published}}"
+msgstr ""
+
+#: generated/action-errors.ts:8
+msgid "{count, plural, one {Note could not be unpublished} other {# notes could not be unpublished}}"
+msgstr ""
+
+#: generated/actions.ts:20
+msgid "{count, plural, one {Note deleted} other {# notes deleted}}"
+msgstr ""
+
 #: src/strings.ts:205
 msgid "{count, plural, one {Note exported} other {# notes exported}}"
+msgstr ""
+
+#: generated/actions.ts:26
+msgid "{count, plural, one {Note moved to trash} other {# notes moved to trash}}"
+msgstr ""
+
+#: generated/actions.ts:36
+msgid "{count, plural, one {Note permanently deleted} other {# notes permanently deleted}}"
+msgstr ""
+
+#: generated/actions.ts:46
+msgid "{count, plural, one {Note published} other {# notes published}}"
+msgstr ""
+
+#: generated/actions.ts:52
+msgid "{count, plural, one {Note restored} other {# notes restored}}"
 msgstr ""
 
 #: src/strings.ts:881
@@ -101,8 +245,112 @@ msgstr ""
 msgid "{count, plural, one {note} other {# notes}}"
 msgstr ""
 
+#: generated/actions.ts:76
+msgid "{count, plural, one {Notebook created} other {# notebooks created}}"
+msgstr ""
+
+#: generated/actions.ts:70
+msgid "{count, plural, one {Notebook edited} other {# notebooks edited}}"
+msgstr ""
+
+#: generated/actions.ts:30
+msgid "{count, plural, one {Notebook moved to trash} other {# notebooks moved to trash}}"
+msgstr ""
+
+#: generated/actions.ts:40
+msgid "{count, plural, one {Notebook permanently deleted} other {# notebooks permanently deleted}}"
+msgstr ""
+
+#: generated/actions.ts:56
+msgid "{count, plural, one {Notebook restored} other {# notebooks restored}}"
+msgstr ""
+
+#: generated/do-actions.ts:70
+msgid "{count, plural, one {Permanently delete attachment} other {Permanently delete # attachments}}"
+msgstr ""
+
+#: generated/do-actions.ts:74
+msgid "{count, plural, one {Permanently delete item} other {Permanently delete # items}}"
+msgstr ""
+
+#: generated/do-actions.ts:48
+msgid "{count, plural, one {Pin note} other {Pin # notes}}"
+msgstr ""
+
+#: generated/do-actions.ts:52
+msgid "{count, plural, one {Pin notebook} other {Pin # notebooks}}"
+msgstr ""
+
 #: src/strings.ts:876
 msgid "{count, plural, one {Prevent note from syncing} other {Prevent # notes from syncing}}"
+msgstr ""
+
+#: generated/do-actions.ts:64
+msgid "{count, plural, one {Publish note} other {Publish # notes}}"
+msgstr ""
+
+#: generated/actions.ts:12
+msgid "{count, plural, one {Reminder deleted} other {# reminders deleted}}"
+msgstr ""
+
+#: generated/do-actions.ts:126
+msgid "{count, plural, one {Remove attachment} other {Remove # attachments}}"
+msgstr ""
+
+#: generated/do-actions.ts:122
+msgid "{count, plural, one {Remove color} other {Remove # colors}}"
+msgstr ""
+
+#: generated/do-actions.ts:118
+msgid "{count, plural, one {Remove shortcut} other {Remove # shortcuts}}"
+msgstr ""
+
+#: generated/do-actions.ts:104
+msgid "{count, plural, one {Rename attachment} other {Rename # attachments}}"
+msgstr ""
+
+#: generated/do-actions.ts:108
+msgid "{count, plural, one {Rename color} other {Rename # colors}}"
+msgstr ""
+
+#: generated/do-actions.ts:112
+msgid "{count, plural, one {Rename tag} other {Rename # tags}}"
+msgstr ""
+
+#: generated/do-actions.ts:80
+msgid "{count, plural, one {Restore note} other {Restore # notes}}"
+msgstr ""
+
+#: generated/do-actions.ts:84
+msgid "{count, plural, one {Restore notebook} other {Restore # notebooks}}"
+msgstr ""
+
+#: generated/actions.ts:84
+msgid "{count, plural, one {Shortcut created} other {# shortcuts created}}"
+msgstr ""
+
+#: generated/actions.ts:80
+msgid "{count, plural, one {Tag created} other {# tags created}}"
+msgstr ""
+
+#: generated/actions.ts:16
+msgid "{count, plural, one {Tag deleted} other {# tags deleted}}"
+msgstr ""
+
+#: generated/actions.ts:66
+msgid "{count, plural, one {Tag edited} other {# tags edited}}"
+msgstr ""
+
+#: generated/do-actions.ts:38
+msgid "{count, plural, one {Unpin note} other {Unpin # notes}}"
+msgstr ""
+
+#: generated/do-actions.ts:42
+msgid "{count, plural, one {Unpin notebook} other {Unpin # notebooks}}"
+msgstr ""
+
+#: generated/do-actions.ts:58
+msgid "{count, plural, one {Unpublish note} other {Unpublish # notes}}"
 msgstr ""
 
 #: src/strings.ts:1503

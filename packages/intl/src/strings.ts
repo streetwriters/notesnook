@@ -2375,5 +2375,10 @@ Use this if changes from other devices are not appearing on this device. This wi
   schoolWorkDesc: () => t`Everything related to my school in one place.`,
   recipes: () => t`Recipes`,
   recipesDesc: () => t`I love cooking and collecting recipes.`,
-  error: () => t`Error`
+  error: () => t`Error`,
+  deleteContainingNotes: (count: number) =>
+    plural(count, {
+      one: `Move all notes in this notebook to trash`,
+      other: `Move all notes in these notebooks to trash`
+    })
 };

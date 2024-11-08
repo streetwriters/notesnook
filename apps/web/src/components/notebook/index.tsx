@@ -37,13 +37,11 @@ import {
 import { hashNavigate, navigate } from "../../navigation";
 import IconTag from "../icon-tag";
 import { Multiselect } from "../../common/multi-select";
-import { pluralize } from "@notesnook/common";
 import { getFormattedDate } from "@notesnook/common";
 import { MenuItem } from "@notesnook/ui";
 import { Notebook as NotebookType } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { useDragHandler } from "../../hooks/use-drag-handler";
-import { ConfirmDialog } from "../../dialogs/confirm";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { strings } from "@notesnook/intl";
 
@@ -210,30 +208,7 @@ export const notebookMenuItems: (
       title: strings.moveToTrash(),
       variant: "dangerous",
       icon: Trash.path,
-      onClick: async () => {
-        const result = await ConfirmDialog.show({
-          title: `Delete ${pluralize(ids.length, "notebook")}?`,
-          positiveButtonText: strings.yes(),
-          negativeButtonText: strings.no(),
-          checks: {
-            deleteContainingNotes: {
-              text: `Move all notes in ${
-                ids.length > 1 ? "these notebooks" : "this notebook"
-              } to trash`
-            }
-          }
-        });
-
-        if (result) {
-          if (result.deleteContainingNotes) {
-            await Multiselect.moveNotesToTrash(
-              await db.notebooks.notes(notebook.id),
-              false
-            );
-          }
-          await Multiselect.moveNotebooksToTrash(ids);
-        }
-      },
+      onClick: () => Multiselect.moveNotebooksToTrash(ids),
       multiSelect: true
     }
   ];
