@@ -62,6 +62,7 @@ import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
 import { TimeFormat } from "@notesnook/core";
 import { BuyDialog } from "../../dialogs/buy-dialog";
+import { EDITOR_ZOOM } from "./common";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -413,7 +414,7 @@ function TiptapWrapper(
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>();
-  const { editorConfig } = useEditorConfig();
+  const { editorConfig, setEditorConfig } = useEditorConfig();
   const isMobile = useMobile();
   const isTablet = useTablet();
 
@@ -443,6 +444,27 @@ function TiptapWrapper(
     }
   }, [isHydrating]);
 
+  useEffect(() => {
+    if (!editorContainerRef.current) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        const delta =
+          Math.ceil(-e.deltaY / 10 / EDITOR_ZOOM.STEP) * EDITOR_ZOOM.STEP;
+        const zoom = Math.min(
+          EDITOR_ZOOM.MAX,
+          Math.max(EDITOR_ZOOM.MIN, editorConfig.zoom + delta)
+        );
+        setEditorConfig({ zoom });
+      }
+    };
+    editorContainerRef.current.addEventListener("wheel", handleWheel);
+    return () => {
+      editorContainerRef.current?.removeEventListener("wheel", handleWheel);
+    };
+  }, [editorConfig.zoom]);
+
   return (
     <Flex
       ref={containerRef}
@@ -450,7 +472,10 @@ function TiptapWrapper(
         flex: 1,
         flexDirection: "column",
         ".tiptap.ProseMirror": { pb: 150 },
-        ".editor-container": { opacity: isHydrating ? 0 : 1 },
+        ".editor-container": {
+          opacity: isHydrating ? 0 : 1,
+          zoom: editorConfig.zoom + "%"
+        },
         ".editor-loading-container.hidden": { display: "none" }
       }}
     >

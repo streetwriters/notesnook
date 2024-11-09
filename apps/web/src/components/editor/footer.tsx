@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Button, Flex, Text } from "@theme-ui/components";
 import { SaveState, useEditorStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
-import { useNoteStatistics } from "./manager";
+import { useEditorConfig, useNoteStatistics } from "./manager";
 import { getFormattedDate } from "@notesnook/common";
 import { MAX_AUTO_SAVEABLE_WORDS } from "./types";
 import { strings } from "@notesnook/intl";
+import { EDITOR_ZOOM } from "./common";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -34,6 +35,7 @@ const SAVE_STATE_ICON_MAP = {
 function EditorFooter() {
   const { words } = useNoteStatistics();
   const session = useEditorStore((store) => store.getActiveSession());
+  const { editorConfig, setEditorConfig } = useEditorConfig();
   if (!session) return null;
 
   const saveState =
@@ -43,6 +45,44 @@ function EditorFooter() {
 
   return (
     <Flex sx={{ alignItems: "center", justifyContent: "center", gap: 2 }}>
+      <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
+        <Button
+          variant="icon"
+          onClick={() =>
+            setEditorConfig({
+              zoom: Math.max(
+                EDITOR_ZOOM.MIN,
+                editorConfig.zoom - EDITOR_ZOOM.STEP
+              )
+            })
+          }
+          disabled={editorConfig.zoom <= EDITOR_ZOOM.MIN}
+        >
+          <b>-</b>
+        </Button>
+        <Text
+          className="selectable"
+          data-test-id="editor-word-count"
+          variant="subBody"
+          sx={{ color: "paragraph" }}
+        >
+          {editorConfig.zoom}%
+        </Text>
+        <Button
+          variant="icon"
+          onClick={() =>
+            setEditorConfig({
+              zoom: Math.min(
+                EDITOR_ZOOM.MAX,
+                editorConfig.zoom + EDITOR_ZOOM.STEP
+              )
+            })
+          }
+          disabled={editorConfig.zoom >= EDITOR_ZOOM.MAX}
+        >
+          <b>+</b>
+        </Button>
+      </Flex>
       {words.total > MAX_AUTO_SAVEABLE_WORDS ? (
         <Text
           className="selectable"
