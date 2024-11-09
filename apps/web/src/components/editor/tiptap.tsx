@@ -450,10 +450,11 @@ function TiptapWrapper(
     const handleWheel = (e: WheelEvent) => {
       if (e.ctrlKey) {
         e.preventDefault();
-        const delta = e.deltaY;
+        const delta =
+          Math.ceil(-e.deltaY / 10 / EDITOR_ZOOM.STEP) * EDITOR_ZOOM.STEP;
         const zoom = Math.min(
           EDITOR_ZOOM.MAX,
-          Math.max(EDITOR_ZOOM.MIN, editorConfig.zoom + Math.round(delta))
+          Math.max(EDITOR_ZOOM.MIN, editorConfig.zoom + delta)
         );
         setEditorConfig({ zoom });
       }
