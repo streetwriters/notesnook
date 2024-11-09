@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export const EDITOR_ZOOM = {
   DEFAULT: 100,
-  MAX: 200,
-  MIN: 50,
+  MAX: 500,
+  MIN: 30,
   STEP: 10
 };
