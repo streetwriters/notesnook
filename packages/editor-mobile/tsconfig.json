@@ -5,7 +5,9 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "jsx": "react-jsx",
     "noEmit": true,
-    "allowJs": true
+    "allowJs": true,
+    "moduleResolution": "nodenext",
+    "module": "nodenext"
   },
   "include": ["src/"]
 }
