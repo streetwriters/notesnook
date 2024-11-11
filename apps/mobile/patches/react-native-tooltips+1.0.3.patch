@@ -39,7 +39,7 @@ index 0ccfd23..7771e6f 100644
    s.preserve_paths         = 'LICENSE', 'package.json'
    s.source_files           = '**/*.{h,m}'
 diff --git a/node_modules/react-native-tooltips/android/build.gradle b/node_modules/react-native-tooltips/android/build.gradle
-index 978045f..401b458 100644
+index 978045f..59c64f1 100644
 --- a/node_modules/react-native-tooltips/android/build.gradle
 +++ b/node_modules/react-native-tooltips/android/build.gradle
 @@ -3,8 +3,9 @@ buildscript {
@@ -53,24 +53,36 @@ index 978045f..401b458 100644
      }
  
      dependencies {
-@@ -15,12 +16,12 @@ buildscript {
+@@ -14,18 +15,19 @@ buildscript {
+ 
  apply plugin: 'com.android.library'
  
- android {
+-android {
 -    compileSdkVersion 29
 -    buildToolsVersion '29.0.2'
-+    compileSdkVersion 31
-+    buildToolsVersion '31.0.0'
  
++def safeExtGet(prop, fallback) {
++    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
++}
++
++android {
++    compileSdkVersion safeExtGet('compileSdkVersion', 29)
++    buildToolsVersion safeExtGet('buildToolsVersion', '29.0.2')
      defaultConfig {
 -        minSdkVersion 16
 -        targetSdkVersion 29
-+        minSdkVersion 21
-+        targetSdkVersion 31
++        minSdkVersion safeExtGet('minSdkVersion', 21)
++        targetSdkVersion safeExtGet('targetSdkVersion', 29)
          versionCode 1
-         versionName "1.0"
+-        versionName "1.0"
+-    }
+-    lintOptions {
+-        abortOnError false
++        versionName "0.1"
      }
-@@ -36,5 +37,5 @@ repositories {
+ }
+ 
+@@ -36,5 +38,5 @@ repositories {
  
  dependencies {
      implementation 'com.facebook.react:react-native:+'
@@ -104,7 +116,7 @@ index fb96466..75a6fdb 100644
  
  @interface TooltipDelegate : NSObject <SexyTooltipDelegate>
  
-@@ -7,9 +9,15 @@ @interface TooltipDelegate : NSObject <SexyTooltipDelegate>
+@@ -7,9 +9,15 @@
  @end
  
  @implementation TooltipDelegate
@@ -120,7 +132,7 @@ index fb96466..75a6fdb 100644
  }
  
  @end
-@@ -17,77 +25,120 @@ - (void)tooltipDidDismiss:(SexyTooltip *)tooltip {
+@@ -17,77 +25,120 @@
  
  @implementation RNTooltips
  
