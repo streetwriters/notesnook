@@ -1,0 +1,11 @@
+
+name: e2e-android
+on: workflow_dispatch
+
+jobs:
+  e2e-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
