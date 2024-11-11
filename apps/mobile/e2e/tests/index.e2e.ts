@@ -17,23 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { navigate, tapByText, prepare, sleep } from "./utils";
+import { Tests } from "./utils";
 
 describe("APP LAUNCH AND NAVIGATION", () => {
   it("App should launch successfully & hide welcome screen", async () => {
-    await prepare();
+    await Tests.prepare();
   });
 
   it("Basic navigation should work", async () => {
-    await prepare();
-    await navigate("Notebooks");
-    await sleep(500);
-    await navigate("Favorites");
-    await navigate("Trash");
-    await navigate("Tags");
-    await navigate("Settings");
-    await navigate("Monographs");
-    await navigate("Reminders");
-    await navigate("Notes");
+    await Tests.prepare();
+    await Tests.navigate("Notebooks");
+    await Tests.navigate("Favorites");
+    await Tests.navigate("Trash");
+    await Tests.navigate("Tags");
+    await Tests.navigate("Settings");
+    await Tests.navigate("Monographs");
+    await Tests.navigate("Reminders");
+    await Tests.navigate("Notes");
   });
 });

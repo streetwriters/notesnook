@@ -206,7 +206,7 @@ export const NotebookSheet = () => {
       backgroundInteractionEnabled
       gestureEnabled
     >
-      <View
+      {/* <View
         style={{
           position: "absolute",
           right: 24 + normalize(50),
@@ -214,17 +214,11 @@ export const NotebookSheet = () => {
         }}
       >
         <Pressable
-          testID={notesnook.buttons.add}
+          testID="add-notebook-button"
           type="secondary"
           onPress={() => {
             if (!notebook) return;
-            AddNotebookSheet.present(
-              undefined,
-              notebook,
-              undefined,
-              undefined,
-              false
-            );
+            
           }}
           style={{
             borderRadius: 100
@@ -245,7 +239,7 @@ export const NotebookSheet = () => {
             />
           </View>
         </Pressable>
-      </View>
+      </View> */}
 
       <View
         style={{
@@ -396,6 +390,27 @@ export const NotebookSheet = () => {
                       setCollapsed(false);
                       ref.current?.snapToIndex(1);
                     }
+                  }}
+                  color={colors.primary.icon}
+                  size={22}
+                  style={{
+                    width: 40 * fontScale,
+                    height: 40 * fontScale
+                  }}
+                />
+
+                <IconButton
+                  testID="add-notebook-button"
+                  name="notebook-plus"
+                  onPress={() => {
+                    if (!notebook) return;
+                    AddNotebookSheet.present(
+                      undefined,
+                      notebook,
+                      undefined,
+                      undefined,
+                      false
+                    );
                   }}
                   color={colors.primary.icon}
                   size={22}

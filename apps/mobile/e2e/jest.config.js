@@ -1,20 +1,21 @@
 /** @type {import('@jest/types').Config.InitialOptions} */
 module.exports = {
   rootDir: "..",
-  testMatch: ["<rootDir>/e2e/**/*.e2e.js"],
-  testTimeout: 120000,
   maxWorkers: 1,
-  setupFilesAfterEnv: ["./e2e/setup.js"],
-  globalSetup: "detox/runners/jest/globalSetup",
+  testTimeout: 120000,
+  globalSetup: "./e2e/globalSetup.ts",
   globalTeardown: "detox/runners/jest/globalTeardown",
-  reporters: ["detox/runners/jest/reporter"],
+  setupFilesAfterEnv: ["./e2e/setup.ts"],
   testEnvironment: "detox/runners/jest/testEnvironment",
-  verbose: true,
+  reporters: ["detox/runners/jest/reporter"],
+  testRunner: "jest-circus/runner",
+  testMatch: ["<rootDir>/e2e/**/*.e2e.(js|ts)"],
   transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": [
+    "\\.tsx?$": "ts-jest",
+    "^.+\\.(js|jsx)$": [
       "babel-jest",
       { configFile: "../native/babel.config.js" }
     ]
   },
-  transformIgnorePatterns: ["<rootDir>/../node_modules/"]
+  verbose: true
 };

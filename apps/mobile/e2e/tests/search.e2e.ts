@@ -17,29 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { notesnook } from "../test.ids";
-import {
-  tapById,
-  visibleByText,
-  createNote,
-  prepare,
-  elementById,
-  sleep,
-  tapByText
-} from "./utils";
+import { Tests } from "./utils";
 
 describe("Search", () => {
   it("Search for a note", async () => {
-    await prepare();
-    let note = await createNote();
-    await tapById("icon-search");
-    await sleep(300);
-    await elementById("search-input").typeText("Test");
-    await sleep(1000);
-    await tapByText(note.body);
-    await sleep(1000);
+    await Tests.prepare();
+    let note = await Tests.createNote();
+    await Tests.fromId("icon-search").waitAndTap();
+    await Tests.fromId("search-input").element.typeText("Test");
+    await Tests.fromText(note.body).waitAndTap();
     await device.pressBack();
     await device.pressBack();
-    await visibleByText(note.body);
+    await Tests.fromText(note.body).isVisible();
   });
 });
