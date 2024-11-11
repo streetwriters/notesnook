@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useCallback, useEffect } from "react";
+import { db } from "../common/database";
 import BiometricService from "../services/biometrics";
 import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
-import { db } from "../common/database";
 
-const VaultStatusCache = {
+const VaultStatusDefaults = {
   exists: false,
   biometryEnrolled: false,
   isBiometryAvailable: false
@@ -35,18 +35,12 @@ export type VaultStatusType = {
 };
 
 export const useVaultStatus = () => {
-  const [vaultStatus, setVaultStatus] = React.useState(VaultStatusCache);
+  const [vaultStatus, setVaultStatus] = React.useState(VaultStatusDefaults);
 
   const checkVaultStatus = useCallback(() => {
     db.vault?.exists().then(async (exists) => {
       const available = await BiometricService.isBiometryAvailable();
       const fingerprint = await BiometricService.hasInternetCredentials();
-      if (
-        VaultStatusCache.exists === exists &&
-        VaultStatusCache.biometryEnrolled === fingerprint &&
-        VaultStatusCache.isBiometryAvailable === available
-      )
-        return;
       setVaultStatus({
         exists: exists,
         biometryEnrolled: fingerprint,

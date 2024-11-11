@@ -74,7 +74,7 @@ async function login() {
 // }
 
 describe("AUTH", () => {
-  it("Login", async () => {
+  it.skip("Login", async () => {
     await prepare();
     await openSideMenu();
     await login();

@@ -958,7 +958,9 @@ export const useActions = ({
     title:
       item.type !== "notebook" && item.type !== "note"
         ? strings.doActions.delete[
-            item.type as keyof typeof strings.doActions.delete
+            item.type === "trash"
+              ? item.itemType
+              : (item.type as keyof typeof strings.doActions.delete)
           ](1)
         : strings.moveToTrash(),
     icon: "delete-outline",

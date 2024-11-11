@@ -311,8 +311,10 @@ export class VaultDialog extends Component {
       loading: true
     });
     try {
-      let verified = await db.user.verifyPassword(this.password);
-      if (!(await db.user.getUser())) verified = true;
+      let verified = true;
+      if (await db.user.getUser()) {
+        verified = await db.user.verifyPassword(this.password);
+      }
       if (verified) {
         let noteIds = [];
         if (this.state.deleteAll) {
@@ -320,20 +322,21 @@ export class VaultDialog extends Component {
           const relations = await db.relations.from(vault, "note").get();
           noteIds = relations.map((item) => item.toId);
         }
-
         await db.vault.delete(this.state.deleteAll);
 
-        noteIds.forEach((id) => {
-          eSendEvent(
-            eUpdateNoteInEditor,
-            {
-              id: id,
-              deleted: true
-            },
-            true
-          );
-        });
-
+        if (this.state.deleteAll) {
+          noteIds.forEach((id) => {
+            eSendEvent(
+              eUpdateNoteInEditor,
+              {
+                id: id,
+                deleted: true
+              },
+              true
+            );
+          });
+        }
+        console.log("VAULT UPDATED EVENT");
         eSendEvent("vaultUpdated");
         this.setState({
           loading: false
@@ -517,7 +520,6 @@ export class VaultDialog extends Component {
       });
       this.close();
     } else {
-      eSendEvent("vaultUpdated");
       ToastManager.show({
         heading: strings.vaultCreated(),
         type: "success",
@@ -525,6 +527,7 @@ export class VaultDialog extends Component {
       });
       this.close();
     }
+    eSendEvent("vaultUpdated");
   }
 
   _permanantUnlock() {

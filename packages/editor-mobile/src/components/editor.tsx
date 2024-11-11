@@ -646,6 +646,7 @@ const Tiptap = ({
                     />
 
                     <button
+                      className="unlock-note"
                       style={{
                         backgroundColor: colors.primary.accent,
                         borderRadius: 5,

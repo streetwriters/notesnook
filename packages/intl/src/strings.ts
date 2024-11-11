@@ -424,12 +424,11 @@ $headline$: Use starting line of the note as title.`,
       other: ""
     }),
 
-  createVault: () => t`Create Vault`,
-  createVaultDesc: () =>
-    t`A vault stores your notes in a password-encrypted storage.`,
-  vaultFingerprintUnlock: () => t`Vault Fingerprint Unlock`,
-  revokeVaultFingerprintUnlock: () => t`Revoke Vault Fingerprint Unlock`,
-  changeVaultPassword: () => t`Change Vault Password`,
+  createVault: () => t`Create vault`,
+  createVaultDesc: () => t`A vault stores your notes in a encrypted storage.`,
+  vaultFingerprintUnlock: () => t`Vault fingerprint unlock`,
+  revokeVaultFingerprintUnlock: () => t`Revoke vault fingerprint unlock`,
+  changeVaultPassword: () => t`Change vault password`,
   deleteNote: () => doActions.delete.note(1),
   shareNote: () => t`Share note`,
   copyNote: () => t`Copy note`,
