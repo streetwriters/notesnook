@@ -31,8 +31,11 @@ import "./index.css";
 if (globalThis.__DEV__) {
   const logFn = global.console.log;
   global.console.log = function () {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
+    // eslint-disable-next-line prefer-rest-params
     logFn.apply(console, arguments);
+    // eslint-disable-next-line prefer-rest-params
     globalThis.logger("info", ...arguments);
   };
 }
@@ -52,7 +55,7 @@ function loadApp() {
         })
       );
 
-  locale.then((locale) => {
+  locale.then((locale: { [name: string]: any }) => {
     i18n.load(locale);
     i18n.activate(globalThis.LINGUI_LOCALE || "en");
     setI18nGlobal(i18n);
