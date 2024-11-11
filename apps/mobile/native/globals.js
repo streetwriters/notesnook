@@ -18,10 +18,10 @@ import { i18n } from "@lingui/core";
 import { ScriptManager, Script } from '@callstack/repack/client';
 import {
   messages as $en
-} from "@notesnook/intl/locales/$en.json";
+} from "@notesnook/intl/dist/locales/$en.json";
 import {
   messages as $pseudo
-} from "@notesnook/intl/locales/$pseudo-LOCALE.json";
+} from "@notesnook/intl/dist/locales/$pseudo-LOCALE.json";
 
 i18n.load({
   en: __DEV__ ? $pseudo : $en
