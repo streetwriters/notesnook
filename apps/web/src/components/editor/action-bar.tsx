@@ -535,13 +535,15 @@ function Tab(props: TabProps) {
       onAuxClick={(e) => {
         if (e.button == 1) onClose();
       }}
-      onMouseUp={(e) => {
-        if (e.button == 0) onFocus();
-      }}
       {...listeners}
       {...attributes}
     >
-      <Flex mr={1}>
+      <Flex
+        mr={1}
+        onMouseUp={(e) => {
+          if (e.button == 0) onFocus();
+        }}
+      >
         <Icon size={16} color={isActive ? "accent-selected" : "icon"} />
         <Text
           variant="body"
