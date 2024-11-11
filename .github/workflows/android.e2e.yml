@@ -33,8 +33,13 @@ jobs:
           java-version: "17"
           architecture: "x64"
 
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v3
+      - name: Cache gradle
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
       - name: AVD cache
         uses: actions/cache@v4
@@ -56,14 +61,6 @@ jobs:
           force-avd-creation: false
           script: echo 'Generated AVD snapshot for caching.'
 
-      - name: Cache Detox build
-        id: cache-detox-build
-        uses: actions/cache@v4
-        with:
-          path: android/app/build
-          key: ${{ runner.os }}-detox-build
-          restore-keys: |
-            ${{ runner.os }}-detox-build
 
       - name: Detox build
         run: yarn build:android
