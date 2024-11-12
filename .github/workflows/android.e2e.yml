@@ -80,6 +80,9 @@ jobs:
         run: |
           AVD_NAME=$(node -p "require('./apps/mobile/native/.detoxrc.js').devices.emulator.device.avdName")
           echo "AVD_NAME=$AVD_NAME" >> $GITHUB_OUTPUT
+      
+      - name: Install Detox CLI
+        run:  npm install detox-cli --global 
 
       - name: Detox test
         uses: reactivecircus/android-emulator-runner@v2
@@ -91,9 +94,9 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           force-avd-creation: false
           working-directory: apps/mobile/native
-          script: >
-            npm install detox-cli --global
-            detox test --configuration android.emu.release
+          script: detox test --configuration android.emu.release
+            
+            
 
       - name: Upload artifacts
         if: failure()
