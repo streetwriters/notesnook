@@ -17,21 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import db from "mime-db";
-
-export function getFileNameWithExtension(
+export async function getFileNameWithExtension(
   filename: string,
   mime: string | undefined
-): string {
+): Promise<string> {
   if (!mime || mime === "application/octet-stream") return filename;
-  const mimeData = db[mime];
-  if (!mimeData || !mimeData.extensions || mimeData.extensions.length === 0)
-    return filename;
-  const extension = mimeData.extensions[0];
 
-  if (mimeData.extensions.some((extension) => filename.endsWith(extension)))
-    return filename;
+  const { default: mimeDB } = await import("mime");
 
+  const extensions = mimeDB.getAllExtensions(mime);
+
+  if (!extensions || extensions.size === 0) return filename;
+
+  for (const ext of extensions) {
+    if (filename.endsWith(ext)) return filename;
+  }
+
+  const extension = extensions.values().next().value;
   return `${filename}.${extension}`;
 }
 
