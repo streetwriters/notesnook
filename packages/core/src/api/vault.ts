@@ -352,7 +352,7 @@ export default class Vault {
     }
     const decryptedContent = await this.decryptContent(content, password);
 
-    if (this.db.content.preProcess(decryptedContent)) {
+    if (await this.db.content.preProcess(decryptedContent)) {
       if (!password) password = await this.getVaultPassword();
       await this.encryptContent(
         decryptedContent,
