@@ -92,8 +92,7 @@ jobs:
           disable-animations: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           force-avd-creation: false
-          working-directory: apps/mobile
-          script: cd native && detox test --configuration android.emu.release
+          script: yarn test:android
             
       - name: Upload artifacts
         if: failure()
