@@ -19,19 +19,11 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Free Disk Space Before Build
-        run: |
-          echo "Disk space before cleanup:"
-          df -h
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          sudo rm -rf /usr/local/lib/android/sdk/ndk
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
-          sudo apt-get clean
-          echo "Disk space after cleanup:"
-          df -h
+      - name: Free Disk Space 
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: false
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
@@ -62,16 +54,18 @@ jobs:
       - name: Detox build
         run: yarn build:android
 
+
+      - name: Free Disk Space 
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: false
+          
       - name: Free Disk Space After Build
         run: |
           echo "Disk space before cleanup:"
           df -h
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
           sudo rm -rf /usr/local/lib/android/sdk/ndk
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /usr/local/share/boost
           sudo apt-get clean
           echo "Disk space after cleanup:"
           df -h
@@ -94,7 +88,7 @@ jobs:
           avd-name: ${{ steps.device.outputs.AVD_NAME }}
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
+          disable-animations: true
           script: echo "Generated AVD snapshot for caching."
 
       - name: Detox test
@@ -103,7 +97,7 @@ jobs:
           api-level: ${{ env.API_LEVEL }}
           arch: ${{ env.ARCH }}
           avd-name: ${{ steps.device.outputs.AVD_NAME }}
-          disable-animations: false
+          disable-animations: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           force-avd-creation: false
           script: yarn test:android --headless --record-logs failing --record-videos failing --take-screenshots failing
