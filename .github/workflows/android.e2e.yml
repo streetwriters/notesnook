@@ -27,11 +27,18 @@ jobs:
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
+        
 
       - name: Install node modules
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=mobile
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
 
       - name: Use specific Java version for the builds
         uses: joschi/setup-jdk@v2
@@ -39,27 +46,14 @@ jobs:
           java-version: "17"
           architecture: "x64"
 
-
-      - name: Detox build
-        run: yarn build:android
-
-      - name: Free Disk Space 
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: false
-          
-      - name: Free Disk Space After Build
-        run: |
-          echo "Disk space before cleanup:"
-          df -h
-          sudo rm -rf /usr/local/lib/android/sdk/ndk
-          sudo apt-get clean
-          echo "Disk space after cleanup:"
-          df -h
-      
       - name: Install Detox CLI
         run:  npm install detox-cli --global 
+
+      - name: Detox build
+        run: |
+          yarn build:android
+          ls apps/mobile/native/android/app/build/outputs/apk
+          ls apps/mobile/native/android/app/build/outputs/apk/release
 
       - name: Get device name
         id: device
