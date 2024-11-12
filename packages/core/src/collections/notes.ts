@@ -88,7 +88,7 @@ export class Notes implements ICollection {
         logger.debug("saving content", { id });
         const { type, data } = item.content;
 
-        const content = getContentFromData(type, data);
+        const content = await getContentFromData(type, data);
         if (!content) throw new Error("Invalid content type.");
 
         headline = getNoteHeadline(content);
@@ -293,7 +293,7 @@ export class Notes implements ICollection {
                 false
               )
             : contentItem;
-        const content = getContentFromData(type, data);
+        const content = await getContentFromData(type, data);
         return format === "html"
           ? content.toHTML()
           : format === "md"
@@ -420,15 +420,16 @@ export class Notes implements ICollection {
     const content = await this.db.content.findByNoteId(id);
     if (!content || content.locked) return [];
 
-    return getContentFromData(content.type, content.data).extract("blocks")
-      .blocks;
+    return (await getContentFromData(content.type, content.data)).extract(
+      "blocks"
+    ).blocks;
   }
 
   async contentBlocksWithLinks(id: string) {
     const content = await this.db.content.findByNoteId(id);
     if (!content || content.locked) return [];
 
-    return getContentFromData(content.type, content.data).extract(
+    return (await getContentFromData(content.type, content.data)).extract(
       "blocksWithLink"
     ).blocks;
   }
@@ -437,7 +438,7 @@ export class Notes implements ICollection {
     const content = await this.db.content.findByNoteId(id);
     if (!content || content.locked) return [];
 
-    return getContentFromData(content.type, content.data).extract(
+    return (await getContentFromData(content.type, content.data)).extract(
       "internalLinks"
     ).internalLinks;
   }

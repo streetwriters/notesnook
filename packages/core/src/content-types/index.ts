@@ -18,17 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ContentType } from "../types.js";
-import { Tiptap } from "./tiptap.js";
 
-export function getContentFromData(type: ContentType, data: string) {
+export async function getContentFromData(type: ContentType, data: string) {
   switch (type) {
-    case "tiptap":
+    case "tiptap": {
+      const { Tiptap } = await import("./tiptap.js");
       return new Tiptap(data);
+    }
     default:
       throw new Error(
         `Unknown content type: "${type}". Please report this error at support@streetwriters.co.`
       );
   }
 }
-
-export * from "./tiptap.js";
