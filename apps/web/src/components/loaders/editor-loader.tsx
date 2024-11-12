@@ -22,10 +22,7 @@ import Skeleton from "react-loading-skeleton";
 import { Box, Flex, Text } from "@theme-ui/components";
 import "react-loading-skeleton/dist/skeleton.css";
 import Config from "../../utils/config";
-import { TextScramble } from "../text-scramble";
-import useHashLocation, {
-  getHashLocation
-} from "../../hooks/use-hash-location";
+import { getHashLocation } from "../../hooks/use-hash-location";
 import makeMatcher from "wouter/matcher";
 import { Lock } from "../icons";
 import { strings } from "@notesnook/intl";
@@ -89,11 +86,7 @@ export const EditorLoader = memo(function EditorLoader() {
               opacity: 0.8
             }}
           >
-            {isNoteLoading ? (
-              <TextScramble text={strings.loading()} nextLetterSpeed={50} />
-            ) : (
-              strings.noteTitle()
-            )}
+            {isNoteLoading ? "Loading..." : strings.noteTitle()}
           </Text>
           <Skeleton
             enableAnimation={false}
