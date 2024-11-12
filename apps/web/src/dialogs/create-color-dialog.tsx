@@ -21,7 +21,6 @@ import { Box, Flex } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
 import { useRef } from "react";
-import tinycolor from "tinycolor2";
 import { db } from "../common/db";
 import { showToast } from "../utils/toast";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
@@ -56,7 +55,7 @@ export const CreateColorDialog = DialogManager.register(
             const form = Object.fromEntries(
               new FormData(e.target as HTMLFormElement).entries()
             ) as { color: string; title: string };
-            if (!tinycolor(form.color, { format: "hex" }).isValid()) {
+            if (!validateHexColor(form.color)) {
               showToast("error", strings.invalidHexColor());
               return;
             }
@@ -85,9 +84,9 @@ export const CreateColorDialog = DialogManager.register(
               data-test-id="color-input"
               sx={{ flex: 1 }}
               onChange={(e) => {
-                const color = tinycolor(e.target.value);
-                if (colorPickerRef.current && color.isValid())
-                  colorPickerRef.current.value = color.toHexString();
+                const color = e.target.value;
+                if (colorPickerRef.current && validateHexColor(color))
+                  colorPickerRef.current.value = color;
               }}
             />
             <input
@@ -109,3 +108,8 @@ export const CreateColorDialog = DialogManager.register(
     );
   }
 );
+
+const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
+function validateHexColor(color: string) {
+  return HEX_COLOR_REGEX.test(color);
+}
