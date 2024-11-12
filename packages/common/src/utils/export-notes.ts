@@ -266,7 +266,7 @@ export async function exportContent(
         )
       : contentItem || EMPTY_CONTENT(note.id);
 
-  const content = getContentFromData(type, data);
+  const content = await getContentFromData(type, data);
   if (resolveInternalLink) content.resolveInternalLinks(resolveInternalLink);
 
   if (
