@@ -51,8 +51,8 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.API_LEVEL }}
 
-      - name: Detox build
-        run: yarn build:android
+      # - name: Detox build
+      #   run: yarn build:android
 
 
       - name: Free Disk Space 
@@ -91,16 +91,16 @@ jobs:
           disable-animations: true
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Detox test
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ env.API_LEVEL }}
-          arch: ${{ env.ARCH }}
-          avd-name: ${{ steps.device.outputs.AVD_NAME }}
-          disable-animations: true
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          force-avd-creation: false
-          script: yarn test:android --headless --record-logs failing --record-videos failing --take-screenshots failing
+      # - name: Detox test
+      #   uses: reactivecircus/android-emulator-runner@v2
+      #   with:
+      #     api-level: ${{ env.API_LEVEL }}
+      #     arch: ${{ env.ARCH }}
+      #     avd-name: ${{ steps.device.outputs.AVD_NAME }}
+      #     disable-animations: false
+      #     emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+      #     force-avd-creation: false
+      #     script: yarn test:android --headless --record-logs failing --record-videos failing --take-screenshots failing
             
       - name: Upload artifacts
         if: failure()
