@@ -28,10 +28,10 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
-      # - name: Install node modules
-      #   run: |
-      #     npm ci --ignore-scripts --prefer-offline --no-audit
-      #     npm run bootstrap -- --scope=mobile
+      - name: Install node modules
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=mobile
 
       - name: Use specific Java version for the builds
         uses: joschi/setup-jdk@v2
@@ -40,9 +40,8 @@ jobs:
           architecture: "x64"
 
 
-      # - name: Detox build
-      #   run: yarn build:android
-
+      - name: Detox build
+        run: yarn build:android
 
       - name: Free Disk Space 
         uses: jlumbroso/free-disk-space@main
@@ -67,7 +66,6 @@ jobs:
         run: |
           AVD_NAME=$(node -p "require('./apps/mobile/native/.detoxrc.js').devices.emulator.device.avdName")
           echo "AVD_NAME=$AVD_NAME" >> $GITHUB_OUTPUT
-
       
       - name: AVD cache
         uses: actions/cache@v4
@@ -90,16 +88,16 @@ jobs:
           disable-animations: true
           script: echo "Generated AVD snapshot for caching."
 
-      # - name: Detox test
-      #   uses: reactivecircus/android-emulator-runner@v2
-      #   with:
-      #     api-level: ${{ env.API_LEVEL }}
-      #     arch: ${{ env.ARCH }}
-      #     avd-name: ${{ steps.device.outputs.AVD_NAME }}
-      #     disable-animations: false
-      #     emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-      #     force-avd-creation: false
-      #     script: yarn test:android --headless --record-logs failing --record-videos failing --take-screenshots failing
+      - name: Detox test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.API_LEVEL }}
+          arch: ${{ env.ARCH }}
+          avd-name: ${{ steps.device.outputs.AVD_NAME }}
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          force-avd-creation: false
+          script: yarn test:android --headless --record-logs failing --record-videos failing --take-screenshots failing
             
       - name: Upload artifacts
         if: failure()
