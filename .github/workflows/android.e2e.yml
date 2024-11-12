@@ -22,16 +22,16 @@ jobs:
       - name: Free Disk Space 
         uses: jlumbroso/free-disk-space@main
         with:
-          tool-cache: true
+          tool-cache: false
           android: false
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
-      - name: Install node modules
-        run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=mobile
+      # - name: Install node modules
+      #   run: |
+      #     npm ci --ignore-scripts --prefer-offline --no-audit
+      #     npm run bootstrap -- --scope=mobile
 
       - name: Use specific Java version for the builds
         uses: joschi/setup-jdk@v2
@@ -39,17 +39,6 @@ jobs:
           java-version: "17"
           architecture: "x64"
 
-      - name: Gradle cache
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: AVD cache
-        uses: actions/cache@v4
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ env.API_LEVEL }}
 
       # - name: Detox build
       #   run: yarn build:android
@@ -58,7 +47,7 @@ jobs:
       - name: Free Disk Space 
         uses: jlumbroso/free-disk-space@main
         with:
-          tool-cache: true
+          tool-cache: false
           android: false
           
       - name: Free Disk Space After Build
@@ -78,6 +67,16 @@ jobs:
         run: |
           AVD_NAME=$(node -p "require('./apps/mobile/native/.detoxrc.js').devices.emulator.device.avdName")
           echo "AVD_NAME=$AVD_NAME" >> $GITHUB_OUTPUT
+
+      
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: ${{ steps.device.outputs.AVD_NAME }}
 
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
