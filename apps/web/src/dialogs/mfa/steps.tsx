@@ -26,7 +26,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import { Text, Flex, Button, Box } from "@theme-ui/components";
+import { Text, Flex, Button, Box, Image } from "@theme-ui/components";
 import { useSessionState } from "../../hooks/use-session-state";
 import {
   Loading,
@@ -46,8 +46,8 @@ import { phone } from "phone";
 import { db } from "../../common/db";
 import FileSaver from "file-saver";
 import { writeText } from "clipboard-polyfill";
-import MFA from "../../assets/mfa.svg?react";
-import Fallback2FA from "../../assets/fallback2fa.svg?react";
+import MFA from "../../assets/mfa.svg?url";
+import Fallback2FA from "../../assets/fallback2fa.svg?url";
 import {
   Authenticator,
   StepComponent,
@@ -687,7 +687,7 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
         justifyContent: "center"
       }}
     >
-      <MFA style={{ flexShrink: 0, width: 120, height: 120 }} />
+      <Image src={MFA} style={{ flexShrink: 0, width: 120, height: 120 }} />
       <Text
         variant={"heading"}
         mt={2}
@@ -743,7 +743,10 @@ function Fallback2FAEnabled(props: Fallback2FAEnabledProps) {
         justifyContent: "center"
       }}
     >
-      <Fallback2FA style={{ flexShrink: 0, width: 200, height: 200 }} />
+      <Image
+        src={Fallback2FA}
+        style={{ flexShrink: 0, width: 200, height: 200 }}
+      />
       <Text
         variant={"heading"}
         mt={2}

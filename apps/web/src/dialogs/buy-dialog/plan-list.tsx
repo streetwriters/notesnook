@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text, Flex, Button } from "@theme-ui/components";
+import { Text, Flex, Button, Image } from "@theme-ui/components";
 import { Loading } from "../../components/icons";
-import Nomad from "../../assets/nomad.svg?react";
+import Nomad from "../../assets/nomad.svg?url";
 import { Period, Plan } from "./types";
 import { PLAN_METADATA, usePlans } from "./plans";
 import { useEffect } from "react";
@@ -40,7 +40,7 @@ export function PlansList(props: PlansListProps) {
 
   return (
     <>
-      <Nomad style={{ flexShrink: 0, width: 200, height: 200 }} />
+      <Image src={Nomad} style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Choose a plan
       </Text>

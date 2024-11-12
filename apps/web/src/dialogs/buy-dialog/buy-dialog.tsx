@@ -18,13 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Text, Flex, Button, Link, Box } from "@theme-ui/components";
+import { Text, Flex, Button, Link, Box, Image } from "@theme-ui/components";
 import { Cross, Check, Loading } from "../../components/icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import Rocket from "../../assets/rocket.svg?react";
-import WorkAnywhere from "../../assets/workanywhere.svg?react";
-import WorkLate from "../../assets/worklate.svg?react";
+import Rocket from "../../assets/rocket.svg?url";
+import WorkAnywhere from "../../assets/workanywhere.svg?url";
+import WorkLate from "../../assets/worklate.svg?url";
 import Field from "../../components/field";
 import { hardNavigate } from "../../navigation";
 import { Features } from "./features";
@@ -258,7 +258,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
 
   return (
     <>
-      <Rocket style={{ flexShrink: 0, width: 200, height: 200 }} />
+      <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook Pro
       </Text>
@@ -345,7 +345,7 @@ function AlreadyPremium(props: AlreadyPremiumProps) {
   const { isCanceled, onShowPlans } = props;
   return (
     <>
-      <Rocket style={{ flexShrink: 0, width: 200, height: 200 }} />
+      <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook Pro
       </Text>
@@ -382,7 +382,7 @@ export function CheckoutCompleted(props: {
 
   return (
     <>
-      <Rocket style={{ flexShrink: 0, width: 200, height: 200 }} />
+      <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         You are awesome!
       </Text>
@@ -449,9 +449,15 @@ function SelectedPlan(props: SelectedPlanProps) {
   return (
     <>
       {plan.period === "monthly" ? (
-        <WorkAnywhere style={{ flexShrink: 0, width: 180, height: 180 }} />
+        <Image
+          src={WorkAnywhere}
+          style={{ flexShrink: 0, width: 180, height: 180 }}
+        />
       ) : (
-        <WorkLate style={{ flexShrink: 0, width: 180, height: 180 }} />
+        <Image
+          src={WorkLate}
+          style={{ flexShrink: 0, width: 180, height: 180 }}
+        />
       )}
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook Pro
