@@ -171,10 +171,10 @@ export class Attachments implements ICollection {
 
       filename:
         filename ||
-        getFileNameWithExtension(
+        (await getFileNameWithExtension(
           filename || hash,
           mimeType || "application/octet-stream"
-        ),
+        )),
       hash,
       hashType,
       mimeType: mimeType || "application/octet-stream",
