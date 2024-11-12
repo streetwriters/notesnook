@@ -29,8 +29,7 @@ import { showToast } from "../utils/toast";
 import { useIsUserPremium } from "../hooks/use-is-user-premium";
 import { Calendar, Pro } from "../components/icons";
 import { usePersistentState } from "../hooks/use-persistent-state";
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/dist/style.css";
+import { DayPicker } from "../components/day-picker";
 import { PopupPresenter } from "@notesnook/ui";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { getFormattedDate } from "@notesnook/common";
@@ -387,44 +386,25 @@ export const AddReminderDialog = DialogManager.register(
                   target: dateInputRef.current,
                   location: "top"
                 }}
-                sx={{
-                  ".rdp": {
+              >
+                <DayPicker
+                  sx={{
                     bg: "background",
-                    p: 1,
+                    p: 2,
                     boxShadow: `0px 0px 25px 5px ${
                       theme === "dark" ? "#000000aa" : "#0000004e"
                     }`,
                     borderRadius: "dialog",
-                    fontFamily: "body",
-                    "--rdp-accent-color": "var(--accent)",
-                    "--rdp-background-color": "var(--background)",
-                    "--rdp-background-color-dark": "var(--background)",
-                    "--rdp-selected-color": "var(--paragraph-selected)",
-                    color: "paragraph"
-                  },
-                  ".rdp-caption_label": { fontWeight: "heading" }
-                }}
-              >
-                <DayPicker
-                  mode="single"
-                  captionLayout="dropdown-buttons"
-                  fromYear={new Date().getFullYear()}
-                  toYear={new Date().getFullYear() + 99}
-                  modifiers={{
-                    disabled: { before: new Date() }
+                    width: 300
                   }}
                   selected={dayjs(date).toDate()}
+                  minDate={new Date()}
+                  maxDate={new Date(new Date().getFullYear() + 99, 11, 31)}
                   onSelect={(day) => {
                     if (!day) return;
                     const date = getFormattedDate(day, "date");
                     setDate((d) => setDateOnly(date, d));
                     if (dateInputRef.current) dateInputRef.current.value = date;
-                  }}
-                  styles={{
-                    day: {
-                      fontFamily: "inherit",
-                      fontSize: 14
-                    }
                   }}
                 />
               </PopupPresenter>
