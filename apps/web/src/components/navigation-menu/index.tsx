@@ -38,7 +38,6 @@ import {
   Reminders,
   User
 } from "../icons";
-import { AnimatedFlex } from "../animated";
 import NavigationItem, { SortableNavigationItem } from "./navigation-item";
 import { hardNavigate, hashNavigate, navigate } from "../../navigation";
 import { db } from "../../common/db";
@@ -227,18 +226,11 @@ function NavigationMenu(props: NavigationMenuProps) {
         borderRight: "1px solid var(--separator)"
       }}
     >
-      <AnimatedFlex
+      <Flex
         id="navigation-menu"
         data-test-id="navigation-menu"
-        initial={{
-          opacity: 0
-        }}
-        animate={{
-          opacity: isFocusMode ? 0 : 1,
-          visibility: isFocusMode ? "collapse" : "visible"
-        }}
-        transition={{ duration: 0.2, ease: "easeInOut" }}
         sx={{
+          display: isFocusMode ? "none" : "flex",
           flex: 1,
           overflow: "hidden",
           flexDirection: "column",
@@ -522,7 +514,7 @@ function NavigationMenu(props: NavigationMenuProps) {
             )}
           </NavigationItem>
         </Flex>
-      </AnimatedFlex>
+      </Flex>
     </ScopedThemeProvider>
   );
 }
