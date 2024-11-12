@@ -29,6 +29,9 @@ import {
 import { useKeyStore } from "../../interfaces/key-store";
 import { isFeatureSupported } from "../../utils/feature-check";
 import { strings } from "@notesnook/intl";
+import { db } from "../../common/db";
+import { createDialect } from "../../common/sqlite";
+import { getDeviceInfo } from "../../utils/platform";
 
 export function GlobalErrorHandler(props: PropsWithChildren) {
   const { showBoundary } = useErrorBoundary();
@@ -164,9 +167,6 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
                 variant="secondary"
                 sx={{ alignSelf: "start", px: 30, mt: 1 }}
                 onClick={async () => {
-                  const { getDeviceInfo } = await import(
-                    "../../dialogs/issue-dialog"
-                  );
                   const mailto = new URL("mailto:support@streetwriters.co");
                   mailto.searchParams.set(
                     "body",
@@ -223,7 +223,6 @@ function getErrorHelp(props: FallbackProps) {
       explanation: strings.searchIndexCorrupt(),
       action: strings.searchIndexCorruptFix(),
       fix: async () => {
-        const { db } = await import("../../common/db");
         await db.lookup.rebuild();
         resetErrorBoundary();
       }
@@ -240,7 +239,6 @@ function errorToString(error: unknown) {
 }
 
 async function resetDatabase() {
-  const { createDialect } = await import("../../common/sqlite");
   const multiTab = !!globalThis.SharedWorker && isFeatureSupported("opfs");
   await useKeyStore.getState().clear();
   const dialect = createDialect({

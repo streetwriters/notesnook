@@ -92,7 +92,10 @@ export default defineConfig({
       "@mdi/js",
       "@mdi/react",
       "@emotion/react",
-      "katex"
+      "katex",
+      "react-modal",
+      "dayjs",
+      "@streetwriters/kysely"
     ],
 
     alias: [
