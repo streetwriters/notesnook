@@ -32,7 +32,6 @@ import { FileStorage } from "../interfaces/fs";
 const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
   logger.measure("Database initialization");
-  const { Compressor } = await import("../utils/compressor");
 
   let databaseKey = await useKeyStore.getState().getValue("databaseKey");
   if (!databaseKey) {
@@ -45,6 +44,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     AUTH_HOST: "https://auth.streetwriters.co",
     SSE_HOST: "https://events.streetwriters.co",
     ISSUES_HOST: "https://issues.streetwriters.co",
+    MONOGRAPH_HOST: "https://monogr.ph",
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
     ...Config.get("serverUrls", {})
   });
@@ -83,7 +83,8 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     storage: storage,
     eventsource: EventSource,
     fs: FileStorage,
-    compressor: new Compressor(),
+    compressor: () =>
+      import("../utils/compressor").then(({ Compressor }) => new Compressor()),
     batchSize: 100
   });
 
