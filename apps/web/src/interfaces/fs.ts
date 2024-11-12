@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import "web-streams-polyfill/dist/ponyfill";
 import { xxhash64, createXXHash64 } from "hash-wasm";
 import axios from "axios";
 import { AppEventManager, AppEvents } from "../common/app-events";
