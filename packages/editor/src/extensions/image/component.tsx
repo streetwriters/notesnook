@@ -38,12 +38,9 @@ import {
   toBlobURL,
   toDataURL
 } from "../../utils/downloader.js";
-import { motion } from "framer-motion";
 import { useObserver } from "../../hooks/use-observer.js";
 import { Attachment, ImageAlignmentOptions } from "../attachment/index.js";
 import { DataURL } from "@notesnook/common";
-
-export const AnimatedImage = motion.create(Image);
 
 export function ImageComponent(
   props: ReactNodeViewProps<Partial<ImageAttributes>>
@@ -252,11 +249,8 @@ export function ImageComponent(
               />
             </Flex>
           )}
-          <AnimatedImage
+          <Image
             as={isSVG ? "object" : "img"}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: bloburl || src ? 1 : 0 }}
-            transition={{ duration: 0.2, ease: "easeIn" }}
             data-drag-image
             ref={imageRef}
             alt={alt}
@@ -271,6 +265,8 @@ export function ImageComponent(
                 })}
             title={title}
             sx={{
+              animation: bloburl || src ? "0.2s ease-in 0s 1 fadeIn" : "none",
+              opacity: 0,
               objectFit: "contain",
               width: editor.isEditable ? "100%" : size.width,
               height: editor.isEditable ? "100%" : size.height,
