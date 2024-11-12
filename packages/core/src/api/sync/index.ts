@@ -28,7 +28,7 @@ import {
 import Constants from "../../utils/constants.js";
 import TokenManager from "../token-manager.js";
 import Collector from "./collector.js";
-import * as signalr from "@microsoft/signalr";
+import { type HubConnection } from "@microsoft/signalr";
 import Merger from "./merger.js";
 import { AutoSync } from "./auto-sync.js";
 import { logger } from "../../logger.js";
@@ -53,6 +53,36 @@ import {
 import { DownloadableFile } from "../../database/fs.js";
 import { SyncDevices } from "./devices.js";
 import { DefaultColors } from "../../collections/colors.js";
+
+enum LogLevel {
+  /** Log level for very low severity diagnostic messages. */
+  Trace = 0,
+  /** Log level for low severity diagnostic messages. */
+  Debug = 1,
+  /** Log level for informational diagnostic messages. */
+  Information = 2,
+  /** Log level for diagnostic messages that indicate a non-fatal problem. */
+  Warning = 3,
+  /** Log level for diagnostic messages that indicate a failure in the current operation. */
+  Error = 4,
+  /** Log level for diagnostic messages that indicate a failure that will terminate the entire application. */
+  Critical = 5,
+  /** The highest possible log level. Used when configuring logging to indicate that no log messages should be emitted. */
+  None = 6
+}
+
+enum HubConnectionState {
+  /** The hub connection is disconnected. */
+  Disconnected = "Disconnected",
+  /** The hub connection is connecting. */
+  Connecting = "Connecting",
+  /** The hub connection is connected. */
+  Connected = "Connected",
+  /** The hub connection is disconnecting. */
+  Disconnecting = "Disconnecting",
+  /** The hub connection is reconnecting. */
+  Reconnecting = "Reconnecting"
+}
 
 export type SyncOptions = {
   type: "full" | "fetch" | "send";
@@ -122,7 +152,7 @@ class Sync {
   autoSync;
   logger = logger.scope("Sync");
   syncConnectionMutex = new Mutex();
-  connection?: signalr.HubConnection;
+  connection?: HubConnection;
   devices;
   private conflictedNoteIds: string[] = [];
   private uncachedAttachments: DownloadableFile[] = [];
@@ -362,11 +392,14 @@ class Sync {
     return (await this.connection?.invoke("PushItems", deviceId, item)) === 1;
   }
 
-  private createConnection(options: SyncOptions) {
+  private async createConnection(options: SyncOptions) {
     if (this.connection) return;
 
+    const { HubConnectionBuilder, HttpTransportType, JsonHubProtocol } =
+      await import("@microsoft/signalr");
+
     const tokenManager = new TokenManager(this.db.kv);
-    this.connection = new signalr.HubConnectionBuilder()
+    this.connection = new HubConnectionBuilder()
       .withUrl(`${Constants.API_HOST}/hubs/sync/v2`, {
         accessTokenFactory: async () => {
           const token = await tokenManager.getAccessToken();
@@ -374,30 +407,29 @@ class Sync {
           return token;
         },
         skipNegotiation: true,
-        transport: signalr.HttpTransportType.WebSockets,
+        transport: HttpTransportType.WebSockets,
         logger: {
           log: (level, message) => {
             const scopedLogger = logger.scope("SignalR::SyncHub");
             switch (level) {
-              case signalr.LogLevel.Critical:
+              case LogLevel.Critical:
                 return scopedLogger.fatal(new Error(message));
-              case signalr.LogLevel.Error: {
+              case LogLevel.Error: {
                 this.db.eventManager.publish(EVENTS.syncAborted, message);
                 return scopedLogger.error(new Error(message));
               }
-              case signalr.LogLevel.Warning:
+              case LogLevel.Warning:
                 return scopedLogger.warn(message);
             }
           }
         }
       })
-      .withHubProtocol(new signalr.JsonHubProtocol())
+      .withHubProtocol(new JsonHubProtocol())
       .build();
     this.connection.serverTimeoutInMilliseconds = 60 * 1000 * 5;
     this.connection.on("PushCompleted", () => this.onPushCompleted());
     this.connection.on("SendVaultKey", async (vaultKey) => {
-      if (this.connection?.state !== signalr.HubConnectionState.Connected)
-        return false;
+      if (this.connection?.state !== HubConnectionState.Connected) return false;
 
       if (
         vaultKey &&
@@ -420,8 +452,7 @@ class Sync {
     });
 
     this.connection.on("SendItems", async (chunk) => {
-      if (this.connection?.state !== signalr.HubConnectionState.Connected)
-        return false;
+      if (this.connection?.state !== HubConnectionState.Connected) return false;
 
       const key = await this.getKey();
       if (!key) return false;
@@ -451,11 +482,9 @@ class Sync {
       try {
         if (
           this.connection &&
-          this.connection.state !== signalr.HubConnectionState.Connected
+          this.connection.state !== HubConnectionState.Connected
         ) {
-          if (
-            this.connection.state !== signalr.HubConnectionState.Disconnected
-          ) {
+          if (this.connection.state !== HubConnectionState.Disconnected) {
             await this.connection.stop();
           }
 
