@@ -19,10 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";
 import Config from "./utils/config";
-
-// import { initializeLogger, logger } from "./utils/logger";
 import type { AuthProps } from "./views/auth";
 import { initializeFeatureChecks } from "./utils/feature-check";
+import { initializeLogger } from "./utils/logger";
 
 type Route<TProps = null> = {
   component: () => Promise<{
@@ -146,12 +145,14 @@ function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
 export async function init() {
   await initializeFeatureChecks();
 
-  await import("./utils/logger").then(({ initializeLogger }) =>
-    initializeLogger()
-  );
-
   const { path, route } = getRoute();
-  return { ...route, path };
+
+  const [{ default: Component }] = await Promise.all([
+    route.component(),
+    initializeLogger()
+  ]);
+
+  return { Component, path, props: route.props };
 }
 
 function shouldSkipInitiation() {

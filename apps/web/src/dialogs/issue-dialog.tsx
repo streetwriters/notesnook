@@ -18,12 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, Link, Text } from "@theme-ui/components";
-import { appVersion } from "../utils/version";
 import Field from "../components/field";
 import Dialog from "../components/dialog";
-import platform from "platform";
 import { useState } from "react";
-import { isUserPremium } from "../hooks/use-is-user-premium";
 import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
 
@@ -32,6 +29,8 @@ import { Debug } from "@notesnook/core";
 import { ConfirmDialog } from "./confirm";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { getDeviceInfo } from "../utils/platform";
+import { isUserPremium } from "../hooks/use-is-user-premium";
 
 const PLACEHOLDERS = {
   title: strings.issueTitlePlaceholder(),
@@ -136,7 +135,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           />
         </Text>
         <Text variant="subBody" mt={1}>
-          {getDeviceInfo()
+          {getDeviceInfo([`Pro: ${isUserPremium()}`])
             .split("\n")
             .map((t) => (
               <>
@@ -161,19 +160,10 @@ function showIssueReportedDialog({ url }: { url: string }) {
   });
 }
 
-export function getDeviceInfo() {
-  const version = appVersion.formatted;
-  const os = platform.os;
-  const browser = `${platform.name} ${platform.version}`;
-
-  return `App version: ${version}
-OS: ${os}
-Browser: ${browser}
-Pro: ${isUserPremium()}`;
-}
-
 const BODY_TEMPLATE = (body: string) => {
-  const info = `**Device information:**\n${getDeviceInfo()}`;
+  const info = `**Device information:**\n${getDeviceInfo([
+    `Pro: ${isUserPremium()}`
+  ])}`;
   if (!body) return info;
   return `${body}\n\n${info}`;
 };

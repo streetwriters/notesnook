@@ -37,13 +37,14 @@ import {
   ImperativePanelHandle
 } from "react-resizable-panels";
 import GlobalMenuWrapper from "./components/global-menu-wrapper";
+import AppEffects from "./app-effects";
 
 new WebExtensionRelay();
 
 // const GlobalMenuWrapper = React.lazy(
 //   () => import("./components/global-menu-wrapper")
 // );
-const AppEffects = React.lazy(() => import("./app-effects"));
+// const AppEffects = React.lazy(() => import("./app-effects"));
 const MobileAppEffects = React.lazy(() => import("./app-effects.mobile"));
 const HashRouter = React.lazy(() => import("./components/hash-router"));
 
@@ -51,6 +52,7 @@ function App() {
   const isMobile = useMobile();
   const [show, setShow] = useState(true);
   const isFocusMode = useStore((store) => store.isFocusMode);
+  console.timeEnd("loading app");
 
   return (
     <>
@@ -58,7 +60,6 @@ function App() {
         <div id="menu-wrapper">
           <GlobalMenuWrapper />
         </div>
-        <AppEffects setShow={setShow} />
         {isMobile && (
           <MobileAppEffects
             sliderId="slider"
@@ -67,6 +68,7 @@ function App() {
           />
         )}
       </Suspense>
+      <AppEffects setShow={setShow} />
 
       <Flex
         id="app"
@@ -126,7 +128,7 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
 
   useEffect(() => {
     const size = navPane.current?.getSize();
-    // Toggle `isNarrow` to true if panel size isn't set to narrow by user 
+    // Toggle `isNarrow` to true if panel size isn't set to narrow by user
     setIsNarrow((size && size <= 5) || isTablet);
   }, [isTablet]);
 
@@ -224,7 +226,9 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
                 bg: "background"
               }}
             >
-              {<HashRouter />}
+              <Suspense fallback={<EditorLoader />}>
+                <HashRouter />
+              </Suspense>
             </Flex>
           </Panel>
         </PanelGroup>

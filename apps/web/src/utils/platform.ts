@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import platform from "platform";
+import { appVersion } from "../utils/version";
+
 export function getPlatform() {
   if (window.os) return window.os();
 
@@ -130,4 +133,15 @@ export function isMac() {
 
 export function isMacStoreApp() {
   return window.os ? window.os() === "mas" : false;
+}
+
+export function getDeviceInfo(extras: string[] = []) {
+  const version = appVersion.formatted;
+  const os = platform.os;
+  const browser = `${platform.name} ${platform.version}`;
+
+  return `App version: ${version}
+OS: ${os}
+Browser: ${browser}
+${extras.join("\n")}`;
 }

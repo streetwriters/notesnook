@@ -28,17 +28,6 @@ import Config from "./utils/config";
 import { setI18nGlobal, Messages } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 
-const locale = import.meta.env.DEV
-  ? import("@notesnook/intl/locales/$pseudo-LOCALE.json")
-  : import("@notesnook/intl/locales/$en.json");
-locale.then(({ default: locale }) => {
-  i18n.load({
-    en: locale.messages as unknown as Messages
-  });
-  i18n.activate("en");
-});
-setI18nGlobal(i18n);
-
 const colorScheme = JSON.parse(
   window.localStorage.getItem("colorScheme") || '"light"'
 );
@@ -54,6 +43,21 @@ if (theme) {
   const css = themeToCSS(theme);
   if (stylesheet) stylesheet.innerHTML = css;
 } else stylesheet?.remove();
+
+const locale = import.meta.env.DEV
+  ? import("@notesnook/intl/locales/$pseudo-LOCALE.json")
+  : import("@notesnook/intl/locales/$en.json");
+locale.then(({ default: locale }) => {
+  i18n.load({
+    en: locale.messages as unknown as Messages
+  });
+  i18n.activate("en");
+
+  import("./root").then(({ startApp }) => {
+    startApp();
+  });
+});
+setI18nGlobal(i18n);
 
 if (!IS_DESKTOP_APP && !IS_TESTING) {
   //   logger.info("Initializing service worker...");
@@ -76,7 +80,3 @@ if (!IS_DESKTOP_APP && !IS_TESTING) {
 
   // window.addEventListener("beforeinstallprompt", () => showInstallNotice());
 }
-
-import("./root").then(({ startApp }) => {
-  startApp();
-});
