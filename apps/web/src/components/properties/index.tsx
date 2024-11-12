@@ -39,7 +39,6 @@ import {
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { store as noteStore } from "../../stores/note-store";
-import { AnimatedFlex } from "../animated";
 import Toggle from "./toggle";
 import ScrollContainer from "../scroll-container";
 import {
@@ -117,18 +116,17 @@ function EditorProperties(props: EditorPropertiesProps) {
   );
   if (isFocusMode || !session) return null;
   return (
-    <AnimatedFlex
-      animate={{
-        x: 0
-      }}
-      transition={{
-        duration: 0.1,
-        bounceDamping: 1,
-        bounceStiffness: 1,
-        ease: "easeOut"
-      }}
-      initial={{ x: 600 }}
+    <Flex
+      css={`@keyframes slideIn {
+      from {
+        transform: translateX(600px);
+      }
+      to {
+        transform: translateX(0);
+      }`}
       sx={{
+        transform: "translateX(600)",
+        animation: "0.1s ease-out 0s 1 slideIn",
         display: "flex",
         position: "absolute",
         top: TITLE_BAR_HEIGHT,
@@ -227,7 +225,7 @@ function EditorProperties(props: EditorPropertiesProps) {
           )}
         </ScrollContainer>
       </ScopedThemeProvider>
-    </AnimatedFlex>
+    </Flex>
   );
 }
 export default React.memo(EditorProperties);
