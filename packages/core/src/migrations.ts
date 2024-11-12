@@ -624,6 +624,7 @@ function replaceDateEditedWithDateModified(removeDateEditedProperty = false) {
 
 function wrapTablesWithDiv(html: string) {
   const document = parseHTML(html);
+  if (!document) return html;
   const tables = document.getElementsByTagName("table");
   for (const table of tables) {
     table.setAttribute("contenteditable", "true");
@@ -640,6 +641,7 @@ function wrapTablesWithDiv(html: string) {
 
 function removeToxClassFromChecklist(html: string): string {
   const document = parseHTML(html);
+  if (!document) return html;
   const checklists = document.querySelectorAll(
     ".tox-checklist,.tox-checklist--checked"
   );
@@ -686,6 +688,7 @@ export function tinyToTiptap(html: string) {
     );
 
   const document = parseHTML(html);
+  if (!document) return html;
 
   const tables = document.querySelectorAll("table");
   for (const table of tables) {
