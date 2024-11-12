@@ -71,17 +71,16 @@ export class SessionContent implements ICollection {
     const session = await this.collection.get(sessionContentId);
     if (!session || isDeleted(session)) return;
 
+    const compressor = await this.db.compressor();
     if (
       session.contentType === "tiny" &&
       session.compressed &&
       !session.locked &&
       !isCipher(session.data)
     ) {
-      session.data = await this.db
-        .compressor()
-        .compress(
-          tinyToTiptap(await this.db.compressor().decompress(session.data))
-        );
+      session.data = await compressor.compress(
+        tinyToTiptap(await compressor.decompress(session.data))
+      );
       session.contentType = "tiptap";
       await this.collection.upsert(session);
     }
@@ -89,7 +88,7 @@ export class SessionContent implements ICollection {
     return {
       data:
         session.compressed && !isCipher(session.data)
-          ? await this.db.compressor().decompress(session.data)
+          ? await compressor.decompress(session.data)
           : session.data,
       type: session.contentType
     };

@@ -504,7 +504,7 @@ async function initializeDevice(id, capabilities = []) {
     storage: new NodeStorageInterface(),
     eventsource: EventSource,
     fs: FS,
-    compressor: Compressor,
+    compressor: async () => Compressor,
     sqliteOptions: {
       dialect: (name) =>
         new SqliteDialect({

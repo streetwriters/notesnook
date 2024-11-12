@@ -244,7 +244,7 @@ export default class Backup {
         buffer = [];
         bufferLength = 0;
 
-        itemsJSON = await this.db.compressor().compress(itemsJSON);
+        itemsJSON = await (await this.db.compressor()).compress(itemsJSON);
 
         const hash = SparkMD5.hash(itemsJSON);
 
@@ -405,7 +405,7 @@ export default class Backup {
     state.buffer = [];
     state.bufferLength = 0;
 
-    itemsJSON = await this.db.compressor().compress(itemsJSON);
+    itemsJSON = await (await this.db.compressor()).compress(itemsJSON);
 
     const hash = SparkMD5.hash(itemsJSON);
 
@@ -493,7 +493,9 @@ export default class Backup {
       throw new Error("Backup file has been tempered, aborting...");
 
     if ("compressed" in backup && typeof decryptedData === "string")
-      decryptedData = await this.db.compressor().decompress(decryptedData);
+      decryptedData = await (
+        await this.db.compressor()
+      ).decompress(decryptedData);
 
     const data =
       typeof decryptedData === "string"

@@ -117,4 +117,4 @@ export interface IFileStorage {
 export type StorageAccessor = () => IStorage;
 export type KVStorageAccessor = () => KVStorage;
 export type ConfigStorageAccessor = () => ConfigStorage;
-export type CompressorAccessor = () => ICompressor;
+export type CompressorAccessor = () => Promise<ICompressor>;

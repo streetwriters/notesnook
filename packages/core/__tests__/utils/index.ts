@@ -50,7 +50,7 @@ function databaseTest(type: "memory" | "persistent" = "memory") {
     storage: new NodeStorageInterface(),
     eventsource: EventSource,
     fs: FS,
-    compressor: Compressor,
+    compressor: async () => Compressor,
     sqliteOptions: {
       dialect: (name) =>
         new SqliteDialect({
