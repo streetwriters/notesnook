@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { xxhash64, createXXHash64 } from "hash-wasm";
 import axios from "axios";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import { StreamableFS } from "@notesnook/streamable-fs";
@@ -164,6 +163,7 @@ function hashBase64(data: string) {
 }
 
 export async function hashBuffer(data: IDataType) {
+  const { xxhash64 } = await import("hash-wasm");
   return {
     hash: await xxhash64(data),
     type: "xxh64"
@@ -173,6 +173,7 @@ export async function hashBuffer(data: IDataType) {
 export async function hashStream(
   reader: ReadableStreamDefaultReader<Uint8Array>
 ) {
+  const { createXXHash64 } = await import("hash-wasm");
   const hasher = await createXXHash64();
   hasher.init();
 
@@ -647,7 +648,7 @@ export async function saveFile(filename: string, fileMetadata: FileMetadata) {
 
   const decrypted = await decryptFile(filename, fileMetadata);
   logger.debug("Decrypting file", { filename, result: !!decrypted });
-  if (decrypted) saveAs(decrypted, getFileNameWithExtension(name, type));
+  if (decrypted) saveAs(decrypted, await getFileNameWithExtension(name, type));
 }
 
 async function deleteFile(
