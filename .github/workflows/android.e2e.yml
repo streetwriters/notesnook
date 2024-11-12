@@ -91,7 +91,9 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           force-avd-creation: false
           working-directory: apps/mobile/native
-          script: detox test --configuration android.emu.release
+          script: >
+          npm install detox-cli --global
+          detox test --configuration android.emu.release
 
       - name: Upload artifacts
         if: failure()
