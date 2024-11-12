@@ -81,7 +81,6 @@
     "react-virtuoso": "^4.6.2",
     "snarkdown": "^2.0.0",
     "timeago.js": "4.0.2",
-    "tinycolor2": "^1.6.0",
     "w3c-keyname": "^2.2.6",
     "web-streams-polyfill": "^3.1.1",
     "wouter": "2.12.1",
