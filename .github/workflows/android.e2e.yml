@@ -45,19 +45,6 @@ jobs:
             ~/.android/adb*
           key: avd-${{ env.API_LEVEL }}
 
-      - name: create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ env.API_LEVEL }}
-          arch: ${{ env.ARCH }}
-          avd-name: ${{ steps.device.outputs.AVD_NAME }}
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-
-
       - name: Detox build
         run: yarn build:android
 
@@ -74,15 +61,27 @@ jobs:
           sudo apt-get clean
           echo "Disk space after cleanup:"
           df -h
+      
+      - name: Install Detox CLI
+        run:  npm install detox-cli --global 
 
       - name: Get device name
         id: device
         run: |
           AVD_NAME=$(node -p "require('./apps/mobile/native/.detoxrc.js').devices.emulator.device.avdName")
           echo "AVD_NAME=$AVD_NAME" >> $GITHUB_OUTPUT
-      
-      - name: Install Detox CLI
-        run:  npm install detox-cli --global 
+
+      - name: create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.API_LEVEL }}
+          arch: ${{ env.ARCH }}
+          avd-name: ${{ steps.device.outputs.AVD_NAME }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
 
       - name: Detox test
         uses: reactivecircus/android-emulator-runner@v2
