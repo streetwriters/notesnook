@@ -73,7 +73,7 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
             if (file) {
               const filePath: string =
                 attachment.filename === attachment.hash
-                  ? getFileNameWithExtension(
+                  ? await getFileNameWithExtension(
                       attachment.hash,
                       attachment.mimeType
                     )
