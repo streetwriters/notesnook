@@ -92,8 +92,8 @@ jobs:
           force-avd-creation: false
           working-directory: apps/mobile/native
           script: >
-          npm install detox-cli --global
-          detox test --configuration android.emu.release
+            npm install detox-cli --global
+            detox test --configuration android.emu.release
 
       - name: Upload artifacts
         if: failure()
