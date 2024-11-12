@@ -27,15 +27,15 @@ import {
   Github,
   Loading
 } from "../components/icons";
-import E2E from "../assets/e2e.svg?react";
-import Note from "../assets/note2.svg?react";
-import Nomad from "../assets/nomad.svg?react";
-import WorkAnywhere from "../assets/workanywhere.svg?react";
-import Friends from "../assets/cause.svg?react";
-import LightUI from "../assets/light1.png";
-import DarkUI from "../assets/dark1.png";
-import GooglePlay from "../assets/play.png";
-import AppleStore from "../assets/apple.png";
+import E2E from "../assets/e2e.svg?url";
+import Note from "../assets/note2.svg?url";
+import Nomad from "../assets/nomad.svg?url";
+import WorkAnywhere from "../assets/workanywhere.svg?url";
+import Friends from "../assets/cause.svg?url";
+import LightUI from "../assets/light1.png?url";
+import DarkUI from "../assets/dark1.png?url";
+import GooglePlay from "../assets/play.png?url";
+import AppleStore from "../assets/apple.png?url";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { Features } from "../components/announcements/body";
 import { TaskManager } from "../common/task-manager";
@@ -65,7 +65,9 @@ const newUserSteps: Step[] = [
     title: strings.safeEncryptedNotes(),
     subtitle: strings.writeWithFreedom(),
     buttonText: strings.getStarted(),
-    image: <Note style={{ flexShrink: 0, width: 120, height: 120 }} />
+    image: (
+      <Image src={Note} style={{ flexShrink: 0, width: 120, height: 120 }} />
+    )
   },
   {
     title: strings.chooseYourStyle(),
@@ -74,7 +76,9 @@ const newUserSteps: Step[] = [
     component: ThemeSelector
   },
   {
-    image: <E2E style={{ flexShrink: 0, width: 180, height: 180 }} />,
+    image: (
+      <Image src={E2E} style={{ flexShrink: 0, width: 180, height: 180 }} />
+    ),
     title: strings.crossPlatformEncrypted(),
     subtitle: strings.encryptsEverything(),
     component: CrossPlatform,
@@ -84,7 +88,9 @@ const newUserSteps: Step[] = [
     title: strings.joinTheCause(),
     subtitle: strings.meetPrivacyMinded(),
     component: JoinCause,
-    image: <Friends style={{ flexShrink: 0, width: 140, height: 140 }} />
+    image: (
+      <Image src={Friends} style={{ flexShrink: 0, width: 140, height: 140 }} />
+    )
   },
   {
     image: <Pro size={60} color="accent" />,
@@ -99,7 +105,9 @@ const proUserSteps: Step[] = [
     title: strings.welcomeToNotesnookPro(),
     subtitle: strings.thankYouPrivacy(),
     buttonText: strings.next(),
-    image: <Nomad style={{ flexShrink: 0, width: 120, height: 120 }} />
+    image: (
+      <Image src={Nomad} style={{ flexShrink: 0, width: 120, height: 120 }} />
+    )
   },
   {
     title: strings.weAreAlwaysListening(),
@@ -119,7 +127,12 @@ const trialUserSteps: Step[] = [
     title: strings.congratulations(),
     subtitle: strings.trialStarted(),
     buttonText: strings.continue(),
-    image: <WorkAnywhere style={{ flexShrink: 0, width: 160, height: 160 }} />
+    image: (
+      <Image
+        src={WorkAnywhere}
+        style={{ flexShrink: 0, width: 160, height: 160 }}
+      />
+    )
   }
 ];
 
