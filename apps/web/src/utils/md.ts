@@ -17,38 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { marked } from "marked";
-
-const emoji: marked.TokenizerExtension & marked.RendererExtension = {
-  name: "emoji",
-  level: "inline",
-  start(src) {
-    return src.indexOf(":");
-  },
-  tokenizer(src, _tokens) {
-    const rule = /^:(\w+):/;
-    const match = rule.exec(src);
-    if (match) {
-      return {
-        type: "emoji",
-        raw: match[0],
-        emoji: match[1]
-      };
-    }
-  },
-  renderer(token) {
-    return `<span className="emoji ${token}" />`;
-  }
-};
-
-const renderer = new marked.Renderer();
-renderer.link = function (href, title, text) {
-  return `<a target="_blank" rel="noopener noreferrer" href="${href}" ${
-    title ? `title=${title}` : ""
-  }>${text}</a>`;
-};
-marked.use({ extensions: [emoji] });
+import snarkdown from "snarkdown";
 
 export function mdToHtml(markdown: string) {
-  return marked.parse(markdown, { async: false, renderer, gfm: true });
+  return snarkdown(markdown);
 }
