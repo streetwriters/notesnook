@@ -68,3 +68,7 @@ function loadApp() {
   });
 }
 globalThis.loadApp = loadApp;
+
+if (process.env.NODE_ENV === "development") {
+  loadApp();
+}
