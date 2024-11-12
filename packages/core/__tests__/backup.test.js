@@ -45,7 +45,7 @@ test("export backup", () =>
     expect(backup.compressed).toBe(true);
     expect(backup.encrypted).toBe(false);
     expect(
-      JSON.parse(await db.compressor().decompress(backup.data)).find(
+      JSON.parse(await (await db.compressor()).decompress(backup.data)).find(
         (i) => i.id === id
       )
     ).toBeDefined();
