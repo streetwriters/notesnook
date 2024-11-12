@@ -29,7 +29,7 @@ import {
   NOTE_DATA_FILENAME
 } from "@notesnook-importer/core/dist/src/utils/note-stream";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
-import { ZipEntry, createUnzipIterator } from "./streams/unzip-stream";
+import { hashBuffer, writeEncryptedFile } from "../interfaces/fs";
 
 export async function* importFiles(zipFiles: File[]) {
   for (const zip of zipFiles) {
@@ -73,8 +73,6 @@ async function processAttachment(
   const name = path.basename(entry.name);
   if (!name || attachments[name] || (await db.attachments?.exists(name)))
     return;
-
-  const { hashBuffer, writeEncryptedFile } = await import("../interfaces/fs");
 
   const data = await entry.arrayBuffer();
   const { hash } = await hashBuffer(new Uint8Array(data));
