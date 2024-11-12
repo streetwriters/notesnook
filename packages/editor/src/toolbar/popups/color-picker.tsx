@@ -22,7 +22,7 @@ import { Input } from "@theme-ui/components";
 import { Icon } from "@notesnook/ui";
 import { Icons } from "../icons.js";
 import { useCallback, useEffect, useRef, useState } from "react";
-import tinycolor from "tinycolor2";
+import { colord } from "colord";
 import { HexColorPicker } from "react-colorful";
 import { Button } from "../../components/button.js";
 import { debounce } from "../../utils/debounce.js";
@@ -68,10 +68,10 @@ export function ColorPicker(props: ColorPickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isPickerOpen, setIsPickerOpen] = useState(expanded || false);
   const [currentColor, setCurrentColor] = useState<string>(
-    tinycolor(color || colors?.[0]).toHexString()
+    colord(color || colors?.[0]).toHex()
   );
   const [deleteMode, setDeleteMode] = useState(false);
-  const tColor = tinycolor(currentColor);
+  const tColor = colord(currentColor);
   const allColors = deleteMode ? colors : [...defaultColors, ...colors];
 
   useEffect(() => {
@@ -148,7 +148,7 @@ export function ColorPicker(props: ColorPickerProps) {
                 onChange={(e) => {
                   const { value } = e.target;
                   if (!value) return;
-                  if (tinycolor(value, { format: "hex" }).isValid()) {
+                  if (colord(value).isValid()) {
                     setCurrentColor(value);
                     onChange(value);
                   }
@@ -284,9 +284,7 @@ function PaletteButton(props: PaletteButtonProps) {
         ml: [2, 2, 1],
         bg,
         ":hover:not(:disabled):not(:active)": {
-          bg: bg?.startsWith("#")
-            ? tinycolor(bg).darken(5).toRgbString()
-            : "hover"
+          bg: bg?.startsWith("#") ? colord(bg).darken(5).toRgbString() : "hover"
         },
         ...sx
       }}
