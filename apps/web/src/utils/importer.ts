@@ -29,9 +29,12 @@ import {
   NOTE_DATA_FILENAME
 } from "@notesnook-importer/core/dist/src/utils/note-stream";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
+import { type ZipEntry } from "./streams/unzip-stream";
 import { hashBuffer, writeEncryptedFile } from "../interfaces/fs";
 
 export async function* importFiles(zipFiles: File[]) {
+  const { createUnzipIterator } = await import("./streams/unzip-stream");
+
   for (const zip of zipFiles) {
     let count = 0;
     let filesRead = 0;

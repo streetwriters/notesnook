@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { initialize, logger as _logger, logManager } from "@notesnook/core";
 import { LogMessage, NoopLogger, format } from "@notesnook/logger";
-import { ZipFile, createZipStream } from "./streams/zip-stream";
+import { ZipFile } from "./streams/zip-stream";
 import { createWriteStream } from "./stream-saver";
 import { sanitizeFilename } from "@notesnook/common";
 import { createDialect } from "../common/sqlite";
@@ -57,6 +57,7 @@ async function initializeLogger() {
 
 async function downloadLogs() {
   if (!logManager) return;
+  const { createZipStream } = await import("./streams/zip-stream");
   const allLogs = await logManager.get();
   let i = 0;
   const textEncoder = new TextEncoder();
