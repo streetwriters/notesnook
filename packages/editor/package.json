@@ -1,49 +1,30 @@
 {
   "name": "@notesnook/editor",
   "version": "2.1.3",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
       },
       "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
       }
     },
     "./styles/*.css": "./dist/styles/*.css",
-    "./toolbar/tool-definitions": {
+    "./*": {
       "require": {
-        "types": "./dist/toolbar/tool-definitions.d.ts",
-        "default": "./dist/toolbar/tool-definitions.js"
+        "types": "./dist/types/*",
+        "default": "./dist/cjs/*"
       },
       "import": {
-        "types": "./dist/toolbar/tool-definitions.d.mts",
-        "default": "./dist/toolbar/tool-definitions.mjs"
-      }
-    },
-    "./utils/font": {
-      "require": {
-        "types": "./dist/utils/font.d.ts",
-        "default": "./dist/utils/font.js"
-      },
-      "import": {
-        "types": "./dist/utils/font.d.mts",
-        "default": "./dist/utils/font.mjs"
-      }
-    },
-    "./toolbar/icons": {
-      "require": {
-        "types": "./dist/toolbar/icons.d.ts",
-        "default": "./dist/toolbar/icons.js"
-      },
-      "import": {
-        "types": "./dist/toolbar/icons.d.mts",
-        "default": "./dist/toolbar/icons.mjs"
+        "types": "./dist/types/*",
+        "default": "./dist/esm/*"
       }
     }
   },
@@ -114,6 +95,7 @@
     "framer-motion": "^11.5.4",
     "happy-dom": "^15.7.4",
     "isomorphic-fetch": "^3.0.0",
+    "nodemon": "^3.1.7",
     "prosemirror-test-builder": "^1.1.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -139,12 +121,11 @@
     "test": "vitest run",
     "prebuild": "node ./scripts/build.mjs",
     "postbuild": "node ./scripts/postbuild.mjs",
-    "prewatch": "node ./scripts/build.mjs",
     "start": "npm run watch",
     "prepublishOnly": "npm run build && npm run test",
     "postinstall": "patch-package",
-    "build": "tsup-node src/index.ts src/utils/font.ts src/toolbar/tool-definitions.ts src/toolbar/icons.ts",
-    "watch": "npm run build -- --onSuccess \"npm run postbuild\" --watch"
+    "build": "node ../../scripts/build.mjs",
+    "watch": "nodemon -V --watch src --watch styles/styles.css -i src/extensions/code-block/languages/index.ts --ext ts,tsx,css --exec npm run build"
   },
   "repository": {
     "type": "git",
