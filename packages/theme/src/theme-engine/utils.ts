@@ -28,7 +28,6 @@ import {
   VariantsWithStaticColors
 } from "./types.js";
 import _ThemeLight from "./themes/default-light.json";
-import tc from "tinycolor2";
 import _ThemeDark from "./themes/default-dark.json";
 
 const ThemeLight = _ThemeLight as ThemeDefinition;
@@ -41,7 +40,7 @@ export function getPreviewColors(theme: ThemeDefinition): PreviewColors {
   return {
     navigationMenu: {
       shade: deriveShadeColor(
-        tc(navigationMenu?.primary?.accent || primary.accent)
+        navigationMenu?.primary?.accent || primary.accent
       ),
       accent: navigationMenu?.primary?.accent || primary.accent,
       background: navigationMenu?.primary?.background || primary.background,
@@ -103,11 +102,11 @@ export function buildVariants(
   const defaultThemeScope = defaultTheme.scopes[scope] || {};
 
   function getColor(variant: keyof Variants, color: keyof Colors) {
-    return tc(
+    return (
       themeScope[variant]?.[color] ||
-        theme.scopes.base[variant]?.[color] ||
-        defaultThemeScope[variant]?.[color] ||
-        defaultThemeBase[variant]?.[color]
+      theme.scopes.base[variant]?.[color] ||
+      defaultThemeScope[variant]?.[color] ||
+      defaultThemeBase[variant]?.[color]
     );
   }
 
@@ -172,6 +171,20 @@ export function colorsToCSSVariables(colors: Colors, variantKey?: string) {
   return root;
 }
 
-function deriveShadeColor(color: tc.Instance) {
-  return color.setAlpha(0.1).toHex8String();
+function deriveShadeColor(color: string) {
+  return changeColorAlpha(color, 0.1);
+}
+
+function changeColorAlpha(color: string, opacity: number) {
+  //if it has an alpha, remove it
+  if (color.length > 7) color = color.substring(0, color.length - 2);
+
+  // coerce values so ti is between 0 and 1.
+  const _opacity = Math.round(Math.min(Math.max(opacity, 0), 1) * 255);
+  let opacityHex = _opacity.toString(16).toUpperCase();
+
+  // opacities near 0 need a trailing 0
+  if (opacityHex.length == 1) opacityHex = "0" + opacityHex;
+
+  return color + opacityHex;
 }
