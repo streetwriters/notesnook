@@ -25,7 +25,6 @@ import { useStore as useNoteStore } from "./note-store";
 import { checkAttachment } from "../common/attachments";
 import { showToast } from "../utils/toast";
 import { AttachmentStream } from "../utils/streams/attachment-stream";
-import { createZipStream } from "../utils/streams/zip-stream";
 import { createWriteStream } from "../utils/stream-saver";
 import { Attachment } from "@notesnook/core";
 import { TaskManager } from "../common/task-manager";
@@ -63,6 +62,8 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
         this.set({ status: { current, total: ids.length } });
       }
     );
+
+    const { createZipStream } = await import("../utils/streams/zip-stream");
     await attachmentStream
       .pipeThrough(createZipStream(abortController.signal))
       .pipeTo(
