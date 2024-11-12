@@ -89,7 +89,7 @@ type Options = {
   storage: IStorage;
   eventsource?: EventSourceConstructor;
   fs: IFileStorage;
-  compressor: ICompressor;
+  compressor: () => Promise<ICompressor>;
   batchSize: number;
 };
 
@@ -100,6 +100,7 @@ class Database {
   eventManager = new EventManager();
   sseMutex = new Mutex();
   _fs?: FileStorage;
+  _compressor?: Promise<ICompressor>;
 
   storage: StorageAccessor = () => {
     if (!this.options?.storage)
@@ -133,7 +134,7 @@ class Database {
       throw new Error(
         "Database not initialized. Did you forget to call db.setup()?"
       );
-    return this.options.compressor;
+    return this._compressor || (this._compressor = this.options.compressor());
   };
 
   private _sql?: Kysely<DatabaseSchema>;
