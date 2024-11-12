@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "mac-scrollbar": "^0.10.3",
-    "framer-motion": "^10.6.8",
     "@mdi/js": "^7.2.96",
     "@types/react": "^18.2.39",
     "@types/react-dom": "^18.2.17",
@@ -38,7 +37,6 @@
   },
   "peerDependencies": {
     "mac-scrollbar": ">=0.10",
-    "framer-motion": ">=10",
     "react-modal": ">=3",
     "@mdi/js": ">=7",
     "@emotion/react": ">=11",
