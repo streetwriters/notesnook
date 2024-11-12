@@ -413,7 +413,7 @@ function ListHeader({ context }: { context?: ListContext }) {
  * attempts have been made. Each attempt is separated by a
  * 50ms interval.
  */
-function waitForElement(
+export function waitForElement(
   list: VirtuosoHandle,
   index: number,
   elementId: string,

@@ -40,7 +40,6 @@ type SubNotebookProps = {
   isExpanded: boolean;
   expand: () => void;
   collapse: () => void;
-  focus: () => void;
   refresh?: () => void;
   depth: number;
   rootId: string;
@@ -53,7 +52,6 @@ function SubNotebook(props: SubNotebookProps) {
     isExpanded,
     expand,
     collapse,
-    focus,
     refresh,
     depth,
     rootId
@@ -104,6 +102,7 @@ function SubNotebook(props: SubNotebookProps) {
       }}
       onKeyPress={async (e) => {
         if (e.code === "Space") {
+          e.stopPropagation();
           if (isExpandable) isExpanded ? collapse() : expand();
           else if (!isOpened) {
             focus();
@@ -116,7 +115,7 @@ function SubNotebook(props: SubNotebookProps) {
             navigate(`/notebooks/${rootId}/${item.id}`);
           }
         } else if (e.code === "Delete") {
-          console.log("Delete", useSelectionStore.getState().selectedItems);
+          e.stopPropagation();
           await Multiselect.moveNotebooksToTrash(
             useSelectionStore.getState().selectedItems
           );

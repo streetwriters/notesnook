@@ -38,17 +38,15 @@ import { showToast } from "../utils/toast";
 import { isMac } from "../utils/platform";
 import { create } from "zustand";
 import { Notebook } from "@notesnook/core";
-import {
-  UncontrolledTreeEnvironment,
-  Tree,
-  TreeItemIndex,
-  TreeEnvironmentRef
-} from "react-complex-tree";
-import { FlexScrollContainer } from "../components/scroll-container";
 import Field from "../components/field";
 import { AddNotebookDialog } from "./add-notebook-dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import {
+  TreeNode,
+  VirtualizedTree,
+  VirtualizedTreeHandle
+} from "../components/virtualized-tree";
 
 type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 type NotebookReference = {
@@ -78,8 +76,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
   const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
   const isMultiselect = useSelectionStore((store) => store.isMultiselect);
   const refreshNotebooks = useStore((store) => store.refresh);
-  const reloadItem = useRef<(changedItemIds: TreeItemIndex[]) => void>();
-  const treeRef = useRef<TreeEnvironmentRef>(null);
+  const treeRef = useRef<VirtualizedTreeHandle<Notebook>>(null);
   const [notebooks, setNotebooks] = useState<string[]>([]);
 
   useEffect(() => {
@@ -115,6 +112,10 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
     })();
   }, [noteIds, refreshNotebooks, setSelected, setIsMultiselect]);
 
+  useEffect(() => {
+    treeRef.current?.refresh();
+  }, [notebooks]);
+
   const _onClose = useCallback(
     (result: boolean) => {
       setSelected([]);
@@ -131,7 +132,8 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
       title={strings.selectNotebooks()}
       description={strings.selectNotebooksDesktopDesc(isMac() ? "Cmd" : "Ctrl")}
       onClose={() => _onClose(false)}
-      width={450}
+      width={500}
+      noScroll
       positiveButton={{
         text: strings.done(),
         onClick: async () => {
@@ -170,170 +172,134 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
         onClick: () => _onClose(false)
       }}
     >
-      <Field
-        autoFocus
-        sx={{ m: 0, mb: 2 }}
-        styles={{
-          input: { p: "7.5px" }
+      <Flex
+        id="subnotebooks"
+        variant="columnFill"
+        sx={{
+          height: "80vh",
+          px: 4
         }}
-        placeholder={strings.searchNotebooks()}
-        onChange={async (e) => {
-          const query = e.target.value.trim();
-          const ids = await (query
-            ? db.lookup.notebooks(query).ids()
-            : db.notebooks.roots.ids(db.settings.getGroupOptions("notebooks")));
-          setNotebooks(ids);
-          reloadItem.current?.(["root"]);
-        }}
-      />
-      {isMultiselect && (
-        <Button
-          variant="anchor"
-          onClick={() => {
-            const originalSelection: NotebookReference[] = useSelectionStore
-              .getState()
-              .selected.filter((a) => !a.new)
-              .map((s) => ({ ...s, op: "add" }));
-            setSelected(originalSelection);
-            setIsMultiselect(originalSelection.length > 1);
+      >
+        <Field
+          autoFocus
+          sx={{ m: 0, mb: 2 }}
+          styles={{
+            input: { p: "7.5px" }
           }}
-          sx={{ textDecoration: "none", mb: 2 }}
-        >
-          {strings.resetSelection()}
-        </Button>
-      )}
-      {notebooks.length > 0 ? (
-        <FlexScrollContainer>
-          <UncontrolledTreeEnvironment
-            ref={treeRef}
-            dataProvider={{
-              onDidChangeTreeData(listener) {
-                reloadItem.current = listener;
-                return {
-                  dispose() {
-                    reloadItem.current = undefined;
+          placeholder={strings.searchNotebooks()}
+          onChange={async (e) => {
+            const query = e.target.value.trim();
+            const ids = await (query
+              ? db.lookup.notebooks(query).ids()
+              : db.notebooks.roots.ids(
+                  db.settings.getGroupOptions("notebooks")
+                ));
+            setNotebooks(ids);
+          }}
+        />
+        {isMultiselect && (
+          <Button
+            variant="anchor"
+            onClick={() => {
+              const originalSelection: NotebookReference[] = useSelectionStore
+                .getState()
+                .selected.filter((a) => !a.new)
+                .map((s) => ({ ...s, op: "add" }));
+              setSelected(originalSelection);
+              setIsMultiselect(originalSelection.length > 1);
+            }}
+            sx={{ textDecoration: "none", mb: 2 }}
+          >
+            {strings.resetSelection()}
+          </Button>
+        )}
+        {notebooks.length > 0 ? (
+          <>
+            <VirtualizedTree
+              rootId={"root"}
+              itemHeight={30}
+              treeRef={treeRef}
+              getChildNodes={async (id, depth) => {
+                const nodes: TreeNode<Notebook>[] = [];
+                if (id === "root") {
+                  for (const id of notebooks) {
+                    const notebook = (await db.notebooks.notebook(id))!;
+                    const children = await db.relations
+                      .from(notebook, "notebook")
+                      .count();
+                    nodes.push({
+                      data: notebook,
+                      depth: depth + 1,
+                      hasChildren: children > 0,
+                      id,
+                      parentId: id
+                    });
                   }
-                };
-              },
-              async getTreeItem(itemId) {
-                if (itemId === "root") {
-                  return {
-                    data: { title: "Root" },
-                    index: itemId,
-                    isFolder: true,
-                    canMove: false,
-                    canRename: false,
-                    children: notebooks
-                  };
+                  return nodes;
                 }
 
-                const notebook = (await db.notebooks.notebook(
-                  itemId as string
-                ))!;
-                const children = await db.relations
-                  .from({ type: "notebook", id: itemId as string }, "notebook")
-                  .get();
-                return {
-                  index: itemId,
-                  data: notebook,
-                  children: children.map((i) => i.toId),
-                  isFolder: children.length > 0
-                };
-              },
-              async getTreeItems(itemIds) {
-                const records = await db.notebooks.all.records(
-                  itemIds as string[],
-                  db.settings.getGroupOptions("notebooks")
-                );
-                const children = await db.relations
-                  .from(
-                    { type: "notebook", ids: itemIds as string[] },
-                    "notebook"
-                  )
-                  .get();
-                return itemIds.filter(Boolean).map((id) => {
-                  if (id === "root") {
-                    return {
-                      data: { title: "Root" },
-                      index: id,
-                      isFolder: true,
-                      canMove: false,
-                      canRename: false,
-                      children: notebooks
-                    };
-                  }
+                const subNotebooks = await db.relations
+                  .from({ type: "notebook", id }, "notebook")
+                  .resolve();
 
-                  const notebook = records[id];
-                  const subNotebooks = children
-                    .filter((r) => r.fromId === id)
-                    .map((r) => r.toId);
-                  // const totalNotes = allChildren.filter(
-                  //   (r) => r.fromId === id && r.toType === "note"
-                  // ).length;
-                  return {
-                    index: id,
+                for (const notebook of subNotebooks) {
+                  const hasChildren =
+                    (await db.relations.from(notebook, "notebook").count()) > 0;
+                  nodes.push({
+                    parentId: id,
+                    id: notebook.id,
                     data: notebook,
-                    children: subNotebooks,
-                    isFolder: subNotebooks.length > 0
-                  };
-                });
-              }
-            }}
-            renderItem={(props) => (
-              <>
+                    depth: depth + 1,
+                    hasChildren
+                  });
+                }
+
+                return nodes;
+              }}
+              renderItem={({ item, expanded, index, collapse, expand }) => (
                 <NotebookItem
-                  notebook={props.item.data as any}
-                  depth={props.depth}
-                  isExpandable={props.item.isFolder || false}
-                  isExpanded={props.context.isExpanded || false}
-                  toggle={props.context.toggleExpandedState}
+                  notebook={item.data}
+                  depth={item.depth}
+                  isExpandable={item.hasChildren}
+                  isExpanded={expanded}
+                  toggle={expanded ? collapse : expand}
                   onCreateItem={() => {
-                    console.log([props.item.index]);
-                    reloadItem.current?.([props.item.index]);
-                    treeRef.current?.expandItem(
-                      props.item.index,
-                      props.info.treeId
-                    );
+                    treeRef.current?.refreshItem(index, item.data);
+                    expand();
                   }}
                 />
-
-                {props.children}
-              </>
-            )}
-            getItemTitle={(item) => item.data.title}
-            viewState={{}}
+              )}
+            />
+          </>
+        ) : (
+          <Flex
+            sx={{
+              my: 2,
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center"
+            }}
           >
-            <Tree treeId={"root"} rootItem="root" treeLabel="Tree Example" />
-          </UncontrolledTreeEnvironment>
-        </FlexScrollContainer>
-      ) : (
-        <Flex
-          sx={{
-            my: 2,
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center"
-          }}
-        >
-          <Text variant="body">{strings.notebooksEmpty()}</Text>
-          <Button
-            data-test-id="add-new-notebook"
-            variant="secondary"
-            sx={{ mt: 2 }}
-            onClick={() =>
-              AddNotebookDialog.show({}).then((res) =>
-                res
-                  ? db.notebooks.roots
-                      .ids(db.settings.getGroupOptions("notebooks"))
-                      .then((ids) => setNotebooks(ids))
-                  : null
-              )
-            }
-          >
-            {strings.addNotebook()}
-          </Button>
-        </Flex>
-      )}
+            <Text variant="body">{strings.notebooksEmpty()}</Text>
+            <Button
+              data-test-id="add-new-notebook"
+              variant="secondary"
+              sx={{ mt: 2 }}
+              onClick={() =>
+                AddNotebookDialog.show({}).then((res) =>
+                  res
+                    ? db.notebooks.roots
+                        .ids(db.settings.getGroupOptions("notebooks"))
+                        .then((ids) => setNotebooks(ids))
+                    : null
+                )
+              }
+            >
+              {strings.addNotebook()}
+            </Button>
+          </Flex>
+        )}
+      </Flex>
     </Dialog>
   );
 });
