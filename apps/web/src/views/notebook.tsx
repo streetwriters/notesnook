@@ -17,13 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState
-} from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useStore as useAppStore } from "../stores/app-store";
 import { hashNavigate, navigate } from "../navigation";
 import { Button, Flex, Text } from "@theme-ui/components";
@@ -36,25 +30,14 @@ import {
   RemoveShortcutLink,
   ShortcutLink
 } from "../components/icons";
-import { pluralize } from "@notesnook/common";
 import { Plus } from "../components/icons";
 import { useStore as useNotesStore } from "../stores/note-store";
 import { useStore as useNotebookStore } from "../stores/notebook-store";
 import { db } from "../common/db";
 import { getFormattedDate } from "@notesnook/common";
-import {
-  UncontrolledTreeEnvironment,
-  Tree,
-  TreeItemIndex,
-  TreeEnvironmentRef,
-  TreeItem
-} from "react-complex-tree";
-// import "react-complex-tree/lib/style-modern.css";
 import SubNotebook from "../components/sub-notebook";
 import { NotebookContext } from "../components/list-container/types";
-import { FlexScrollContainer } from "../components/scroll-container";
 import { Menu } from "../hooks/use-menu";
-import Config from "../utils/config";
 import Notes from "./notes";
 import {
   PanelGroup,
@@ -64,6 +47,13 @@ import {
 } from "react-resizable-panels";
 import { AddNotebookDialog } from "../dialogs/add-notebook-dialog";
 import { strings } from "@notesnook/intl";
+import { Notebook as NotebookType } from "@notesnook/core";
+import { useStore as useSelectionStore } from "../stores/selection-store";
+import {
+  TreeNode,
+  VirtualizedTree,
+  VirtualizedTreeHandle
+} from "../components/virtualized-tree";
 
 type NotebookProps = {
   rootId: string;
@@ -128,8 +118,6 @@ function Notebook(props: NotebookProps) {
         onResize={(size) => setIsCollapsed(size <= 7)}
       >
         <SubNotebooks
-          key={rootId}
-          notebookId={notebookId}
           isCollapsed={isCollapsed}
           rootId={rootId}
           onClick={() => {
@@ -144,60 +132,23 @@ function Notebook(props: NotebookProps) {
 export default Notebook;
 
 type SubNotebooksProps = {
-  notebookId?: string;
   rootId: string;
   isCollapsed: boolean;
   onClick: () => void;
 };
-function SubNotebooks({
-  notebookId,
-  rootId,
-  isCollapsed,
-  onClick
-}: SubNotebooksProps) {
+function SubNotebooks({ rootId, isCollapsed, onClick }: SubNotebooksProps) {
   // sometimes the onClick event is triggered on dragEnd
   // which shouldn't happen. To prevent that we make sure
   // that onMouseDown & onMouseUp events got called.
   const mouseEventCounter = useRef(0);
-  const treeRef = useRef<TreeEnvironmentRef>(null);
-  const reloadItem = useRef<(changedItemIds: TreeItemIndex[]) => void>();
-  const notebooks = useNotebookStore((store) => store.notebooks);
-  const contextNotes = useNotesStore((store) => store.contextNotes);
-  const context = useNotesStore((store) => store.context);
-
-  const saveViewState = useCallback((id: string) => {
-    if (!treeRef.current?.viewState) return;
-    Config.set(`${id}:viewState`, treeRef.current.viewState[id]);
-  }, []);
-
-  useEffect(() => {
-    const items: TreeItemIndex[] = [];
-    for (const item in treeRef.current?.items) {
-      if (item === "root") continue;
-      items.push(item);
-    }
-    reloadItem.current?.(items);
-  }, [notebooks, notebookId]);
-
-  useEffect(() => {
-    if (
-      !context ||
-      context?.type !== "notebook" ||
-      !context.id ||
-      !treeRef.current?.items[context.id]
-    )
-      return;
-    db.notebooks.exists(context.id).then((exists) => {
-      if (!exists) {
-        return navigate(
-          rootId && rootId !== context.id
-            ? `/notebooks/${rootId}`
-            : `/notebooks/`
-        );
-      }
-      reloadItem.current?.([context.id]);
-    });
-  }, [contextNotes, context]);
+  const treeRef = useRef<VirtualizedTreeHandle<SubNotebookTreeItem>>(null);
+  const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
+  const isSelected = useSelectionStore((store) => store.isSelected);
+  const selectItem = useSelectionStore((store) => store.selectItem);
+  const deselectItem = useSelectionStore((store) => store.deselectItem);
+  const toggleSelection = useSelectionStore(
+    (store) => store.toggleSelectionMode
+  );
 
   if (!rootId) return null;
 
@@ -261,6 +212,7 @@ function SubNotebooks({
             }}
             onClick={async (e) => {
               e.stopPropagation();
+              const context = useNotesStore.getState().context;
               await AddNotebookDialog.show({
                 parentId: context?.type === "notebook" ? context.id : rootId
               });
@@ -271,142 +223,40 @@ function SubNotebooks({
         </Flex>
       </Flex>
 
-      <FlexScrollContainer>
-        <UncontrolledTreeEnvironment
-          ref={treeRef}
-          onFocusItem={(item) => {
-            const element = document.getElementById(`id_${item.index}`);
-            if (!element) return;
-            setTimeout(() => {
-              element.focus();
-              element.scrollIntoView();
-            });
-          }}
-          onPrimaryAction={(item) => {
-            const element = document.getElementById(`id_${item.index}`);
-            if (!element) return;
-            element.click();
-          }}
-          dataProvider={{
-            onDidChangeTreeData(listener) {
-              reloadItem.current = listener;
-              return {
-                dispose() {
-                  reloadItem.current = undefined;
-                }
-              };
-            },
-            async getTreeItem(itemId) {
-              if (itemId === "root") {
-                return {
-                  data: { notebook: { title: "Root" } },
-                  index: itemId,
-                  isFolder: true,
-                  canMove: false,
-                  canRename: false,
-                  children: [rootId]
-                };
-              }
-
-              const notebook = (await db.notebooks.notebook(itemId as string))!;
-              const children = await db.relations
-                .from({ type: "notebook", id: itemId as string }, "notebook")
-                .get();
-              return {
-                index: itemId,
-                data: { notebook },
-                children: children.map((i) => i.toId),
-                isFolder: children.length > 0
-              };
-            },
-            async getTreeItems(itemIds) {
-              const notebooks = await db.notebooks.all.records(
-                itemIds as string[],
-                db.settings.getGroupOptions("notebooks")
+      <VirtualizedTree
+        itemHeight={28}
+        getChildNodes={fetchChildren}
+        rootId={rootId}
+        deselectAll={() => toggleSelection(false)}
+        bulkSelect={setSelectedItems}
+        isSelected={isSelected}
+        onDeselect={deselectItem}
+        onSelect={selectItem}
+        treeRef={treeRef}
+        saveKey={`${rootId}-subnotebooks`}
+        renderItem={({ collapse, expand, expanded, index, item: node }) => (
+          <SubNotebook
+            depth={node.depth}
+            isExpandable={node.hasChildren}
+            item={node.data.notebook}
+            isExpanded={expanded}
+            rootId={rootId}
+            totalNotes={node.data.totalNotes}
+            refresh={async () => {
+              const notebook = await db.notebooks.notebook(node.id);
+              const totalNotes = await db.relations
+                .from(node.data.notebook, "note")
+                .count();
+              treeRef.current?.refreshItem(
+                index,
+                notebook ? { notebook, totalNotes } : undefined
               );
-              const allChildren = await db.relations
-                .from({ type: "notebook", ids: itemIds as string[] }, [
-                  "notebook",
-                  "note"
-                ])
-                .get();
-
-              return itemIds.reduce((prev, id) => {
-                if (id === "root") {
-                  prev.push({
-                    data: { notebook: { title: "Root" } },
-                    index: id,
-                    isFolder: true,
-                    canMove: false,
-                    canRename: false,
-                    children: [rootId]
-                  });
-                  return prev;
-                }
-
-                const notebook = notebooks[id];
-                if (!notebook) return prev;
-
-                const children = allChildren
-                  .filter((r) => r.fromId === id && r.toType === "notebook")
-                  .map((r) => r.toId);
-                const totalNotes = allChildren.filter(
-                  (r) => r.fromId === id && r.toType === "note"
-                ).length;
-
-                prev.push({
-                  index: id,
-                  data: { notebook, totalNotes },
-                  children: children,
-                  isFolder: children.length > 0
-                });
-
-                return prev;
-              }, [] as TreeItem[]);
-            }
-          }}
-          renderItem={(props) => (
-            <>
-              <SubNotebook
-                item={props.item.data.notebook}
-                totalNotes={props.item.data.totalNotes}
-                depth={props.depth}
-                isExpandable={props.item.isFolder || false}
-                isExpanded={props.context.isExpanded || false}
-                collapse={props.context.collapseItem}
-                expand={props.context.expandItem}
-                focus={props.context.focusItem}
-                rootId={rootId}
-                refresh={() => {
-                  reloadItem.current && reloadItem.current([props.item.index]);
-                  setTimeout(() => props.context.expandItem());
-                }}
-              />
-              {props.children}
-            </>
-          )}
-          getItemTitle={(item) => item.data.notebook.title}
-          viewState={{
-            [rootId]: Config.get(`${rootId}:viewState`, {
-              expandedItems: [notebookId || rootId],
-              focusedItem: notebookId || rootId
-            })
-          }}
-          onExpandItem={(_, id) => saveViewState(id)}
-          onCollapseItem={(_, id) => saveViewState(id)}
-        >
-          <Tree
-            treeId={rootId}
-            renderTreeContainer={({ children, containerProps }) => (
-              <div data-test-id="subnotebooks-list" {...containerProps}>
-                {children}
-              </div>
-            )}
-            rootItem="root"
-            treeLabel="Tree Example"
+            }}
+            collapse={collapse}
+            expand={expand}
           />
-        </UncontrolledTreeEnvironment>
-      </FlexScrollContainer>
+        )}
+      />
     </Flex>
   );
 }
@@ -607,4 +457,33 @@ function navigateCrumb(notebookId: string, rootId?: string) {
   } else if (rootId && notebookId) {
     navigate(`/notebooks/${rootId}/${notebookId}`);
   }
+}
+
+type SubNotebookTreeItem = {
+  notebook: NotebookType;
+  totalNotes: number;
+};
+async function fetchChildren(
+  id: string,
+  depth: number
+): Promise<TreeNode<SubNotebookTreeItem>[]> {
+  const subNotebooks = await db.relations
+    .from({ type: "notebook", id }, "notebook")
+    .resolve();
+
+  const nodes: TreeNode<SubNotebookTreeItem>[] = [];
+  for (const notebook of subNotebooks) {
+    const hasChildren =
+      (await db.relations.from(notebook, "notebook").count()) > 0;
+    const totalNotes = await db.relations.from(notebook, "note").count();
+    nodes.push({
+      parentId: id,
+      id: notebook.id,
+      data: { notebook, totalNotes },
+      depth: depth + 1,
+      hasChildren
+    });
+  }
+
+  return nodes;
 }
