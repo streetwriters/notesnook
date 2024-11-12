@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getFileNameWithExtension, Attachment } from "@notesnook/core";
 import { db } from "../../common/db";
-import { lazify } from "../lazify";
 import { showToast } from "../toast";
 import { makeUniqueFilename } from "./utils";
 import { ZipFile } from "./zip-stream";
 import { logger } from "../logger";
+import { decryptFile } from "../../interfaces/fs";
 
 export const METADATA_FILENAME = "metadata.json";
 const GROUP_ID = "all-attachments";
@@ -62,17 +62,13 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
             const key = await db.attachments.decryptKey(attachment.key);
             if (!key) return;
 
-            const file = await lazify(
-              import("../../interfaces/fs"),
-              ({ decryptFile }) =>
-                decryptFile(attachment.hash, {
-                  key,
-                  iv: attachment.iv,
-                  name: attachment.filename,
-                  type: attachment.mimeType,
-                  isUploaded: !!attachment.dateUploaded
-                })
-            );
+            const file = await decryptFile(attachment.hash, {
+              key,
+              iv: attachment.iv,
+              name: attachment.filename,
+              type: attachment.mimeType,
+              isUploaded: !!attachment.dateUploaded
+            });
 
             if (file) {
               const filePath: string =

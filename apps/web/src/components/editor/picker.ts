@@ -28,6 +28,11 @@ import { Attachment } from "@notesnook/editor";
 import { ImagePickerDialog } from "../../dialogs/image-picker-dialog";
 import { BuyDialog } from "../../dialogs/buy-dialog";
 import { strings } from "@notesnook/intl";
+import {
+  getUploadedFileSize,
+  hashStream,
+  writeEncryptedFile
+} from "../../interfaces/fs";
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
@@ -172,9 +177,6 @@ async function addAttachment(
   file: File,
   options: AddAttachmentOptions = {}
 ): Promise<string> {
-  const { getUploadedFileSize, hashStream, writeEncryptedFile } = await import(
-    "../../interfaces/fs"
-  );
   const { expectedFileHash, showProgress = true } = options;
   let forceWrite = options.forceWrite;
 

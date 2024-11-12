@@ -27,12 +27,11 @@ import { generatePassword } from "../utils/password-generator";
 import { deriveKey, useKeyStore } from "../interfaces/key-store";
 import { logManager } from "@notesnook/core";
 import Config from "../utils/config";
+import { FileStorage } from "../interfaces/fs";
 
 const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
   logger.measure("Database initialization");
-
-  const { FileStorage } = await import("../interfaces/fs");
   const { Compressor } = await import("../utils/compressor");
 
   let databaseKey = await useKeyStore.getState().getValue("databaseKey");
