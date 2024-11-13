@@ -555,7 +555,7 @@ async function getWrappingKey(credential?: Credential): Promise<CryptoKey> {
       {
         name: "PBKDF2",
         salt: credential.salt,
-        iterations: 650000,
+        iterations: 100000,
         hash: "SHA-512"
       },
       await window.crypto.subtle.importKey(
@@ -639,7 +639,7 @@ export async function deriveKey(password: string) {
       name: "PBKDF2",
       hash: "SHA-512",
       salt,
-      iterations: 650000
+      iterations: 100000
     },
     importedKey,
     32 * 8
