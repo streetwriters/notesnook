@@ -54,6 +54,7 @@ export async function startApp() {
 
     await useKeyStore.getState().init();
 
+    performance.mark("load:database");
     loadDatabase(
       path !== "/sessionexpired" || Config.get("sessionExpired", false)
         ? "db"
@@ -145,6 +146,7 @@ function RouteWrapper(props: {
         </Text>
       </div>
     );
+  performance.mark("render:app");
   return <Component route={routeProps?.route || "login:email"} />;
 }
 

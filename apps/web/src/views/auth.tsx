@@ -198,6 +198,7 @@ export function HeadlessAuth(props: AuthProps) {
     db.user.getUser().then((user) => {
       if (user && authorizedRoutes.includes(route) && !isSessionExpired())
         return openURL("/", { authenticated: true });
+      performance.mark("load:auth");
       setIsReady(true);
     });
   }, [route, openURL]);
