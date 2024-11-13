@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { PluginOption, defineConfig } from "vite";
+import { Plugin, PluginOption, ResolvedConfig, defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import svgrPlugin from "vite-plugin-svgr";
 import envCompatible from "vite-plugin-env-compatible";
@@ -183,7 +183,16 @@ export default defineConfig({
         namedExport: "ReactComponent"
         // ...svgr options (https://react-svgr.com/docs/options/)
       }
-    })
+    }),
+    ...(isDesktop
+      ? []
+      : [
+          prefetchPlugin({
+            excludeFn: (assetName) =>
+              assetName.includes("wa-sqlite-async") ||
+              !assetName.includes("wa-sqlite")
+          })
+        ])
   ]
 });
 
@@ -208,6 +217,61 @@ function emitEditorStyles(): OutputPlugin {
           });
         }
       }
+    }
+  };
+}
+
+function prefetchPlugin(options?: {
+  excludeFn?: (assetName: string) => boolean;
+}): Plugin {
+  let config: ResolvedConfig;
+  return {
+    name: "vite-plugin-bundle-prefetch",
+    apply: "build",
+    configResolved(resolvedConfig: ResolvedConfig) {
+      // store the resolved config
+      config = resolvedConfig;
+    },
+    transformIndexHtml(
+      html: string,
+      ctx: {
+        path: string;
+        filename: string;
+        bundle?: import("rollup").OutputBundle;
+        chunk?: import("rollup").OutputChunk;
+      }
+    ) {
+      const bundles = Object.keys(ctx.bundle ?? {});
+      const isLegacy = bundles.some((bundle) => bundle.includes("legacy"));
+      if (isLegacy) {
+        //legacy build won't add prefetch
+        return html;
+      }
+      // remove map files
+      let modernBundles = bundles.filter(
+        (bundle) => bundle.endsWith(".map") === false
+      );
+      const excludeFn = options?.excludeFn;
+      if (excludeFn) {
+        modernBundles = modernBundles.filter((bundle) => !excludeFn(bundle));
+      }
+      // Remove existing files and concatenate them into link tags
+      const prefechBundlesString = modernBundles
+        .filter((bundle) => html.includes(bundle) === false)
+        .map((bundle) => `<link rel="prefetch" href="${config.base}${bundle}">`)
+        .join("\n");
+
+      // Use regular expression to get the content within <head> </head>
+      const headContent = html.match(/<head>([\s\S]*)<\/head>/)?.[1] ?? "";
+      // Insert the content of prefetch into the head
+      const newHeadContent = `${headContent}${prefechBundlesString}`;
+      // Replace the original head
+      html = html.replace(
+        /<head>([\s\S]*)<\/head>/,
+        `<head>${newHeadContent}</head>`
+      );
+
+      return html;
     }
   };
 }
