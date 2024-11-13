@@ -28,7 +28,6 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
         
-
       - name: Install node modules
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
@@ -49,11 +48,29 @@ jobs:
       - name: Install Detox CLI
         run:  npm install detox-cli --global 
 
+      - name: Generate debug.keystore
+        working-directory: apps/mobile/native/android/app
+        run: |
+          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "C=US, O=Android, CN=Android Debug"
+
       - name: Detox build
         run: |
           yarn build:android
-          ls apps/mobile/native/android/app/build/outputs/apk
-          ls apps/mobile/native/android/app/build/outputs/apk/release
+
+      - name: Free Disk Space 
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: false
+          
+      - name: Free Disk Space After Build
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+          sudo apt-get clean
+          echo "Disk space after cleanup:"
+          df -h
 
       - name: Get device name
         id: device
