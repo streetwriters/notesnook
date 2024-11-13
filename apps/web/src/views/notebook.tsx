@@ -34,7 +34,7 @@ import { Plus } from "../components/icons";
 import { useStore as useNotesStore } from "../stores/note-store";
 import { useStore as useNotebookStore } from "../stores/notebook-store";
 import { db } from "../common/db";
-import { getFormattedDate } from "@notesnook/common";
+import { getFormattedDate, usePromise } from "@notesnook/common";
 import SubNotebook from "../components/sub-notebook";
 import { NotebookContext } from "../components/list-container/types";
 import { Menu } from "../hooks/use-menu";
@@ -149,6 +149,12 @@ function SubNotebooks({ rootId, isCollapsed, onClick }: SubNotebooksProps) {
   const toggleSelection = useSelectionStore(
     (store) => store.toggleSelectionMode
   );
+  const rootNotebook = usePromise(() => db.notebooks.notebook(rootId));
+  const notebooks = useNotebookStore((store) => store.notebooks);
+
+  useEffect(() => {
+    treeRef.current?.refresh();
+  }, [notebooks]);
 
   if (!rootId) return null;
 
@@ -183,7 +189,9 @@ function SubNotebooks({ rootId, isCollapsed, onClick }: SubNotebooksProps) {
         <Flex sx={{ alignItems: "center" }}>
           {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
           <Text variant="subBody" sx={{ fontSize: 11 }}>
-            {strings.notebooksAllCaps()}
+            {rootNotebook.status === "fulfilled" && rootNotebook.value
+              ? rootNotebook.value.title
+              : ""}
           </Text>
         </Flex>
         <Flex sx={{ alignItems: "center" }}>
@@ -233,7 +241,13 @@ function SubNotebooks({ rootId, isCollapsed, onClick }: SubNotebooksProps) {
         onDeselect={deselectItem}
         onSelect={selectItem}
         treeRef={treeRef}
+        placeholder={() => (
+          <Text variant="subBody" sx={{ mx: 2 }}>
+            {strings.emptyPlaceholders("notebook")}
+          </Text>
+        )}
         saveKey={`${rootId}-subnotebooks`}
+        testId="subnotebooks-list"
         renderItem={({ collapse, expand, expanded, index, item: node }) => (
           <SubNotebook
             depth={node.depth}

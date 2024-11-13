@@ -49,6 +49,8 @@ type TreeViewProps<T> = {
   }) => React.ReactNode;
   saveKey?: string;
 
+  testId?: string;
+  placeholder?: () => React.ReactNode;
   onSelect?: (id: string) => void;
   onDeselect?: (id: string) => void;
   bulkSelect?: (ids: string[]) => void;
@@ -64,11 +66,13 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     treeRef,
     saveKey,
 
+    placeholder: Placeholder,
     isSelected,
     onDeselect,
     onSelect,
     deselectAll,
-    bulkSelect
+    bulkSelect,
+    testId
   } = props;
   const [nodes, setNodes] = useState<TreeNode<T>[]>([]);
   const [expandedIds, setExpandedIds] = usePersistentState<ExpandedIds>(
@@ -169,6 +173,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
 
   return (
     <Virtuoso
+      data-test-id={testId}
       ref={list}
       data={nodes}
       computeItemKey={(i, item) => item.id}
@@ -179,7 +184,8 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
       }}
       components={{
         Scroller: CustomScrollbarsVirtualList,
-        Item: VirtuosoItem
+        Item: VirtuosoItem,
+        EmptyPlaceholder: Placeholder
       }}
       itemContent={(index, node) => (
         <Node

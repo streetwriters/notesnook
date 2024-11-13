@@ -60,7 +60,8 @@ function StatusBar() {
         borderTop: "1px solid",
         borderTopColor: "separator",
         justifyContent: "space-between",
-        display: ["none", "none", "flex"]
+        display: ["none", "none", "flex"],
+        height: 24
       }}
       px={2}
     >
