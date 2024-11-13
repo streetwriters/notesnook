@@ -1,6 +1,6 @@
 name: Publish Notesnook Help
 
-on: 
+on:
   workflow_dispatch:
   push:
     branches:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
