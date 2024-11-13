@@ -86,6 +86,7 @@ const ACTIONS = [
     dataTypes: ["note", "notebook"]
   },
   { action: "published", label: "published", dataTypes: ["note"] },
+  { action: "unpublished", label: "unpublished", dataTypes: ["note"] },
   {
     action: "restored",
     label: "restored",

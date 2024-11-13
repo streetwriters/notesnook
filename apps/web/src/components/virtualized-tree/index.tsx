@@ -170,7 +170,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
   useEffect(() => {
     fetchChildren(rootId, -1, expandedIds, getChildNodes).then(setNodes);
   }, [rootId]);
-
+  console.log(expandedIds);
   return (
     <Virtuoso
       data-test-id={testId}

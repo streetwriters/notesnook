@@ -232,7 +232,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
                       depth: depth + 1,
                       hasChildren: children > 0,
                       id,
-                      parentId: id
+                      parentId: "root"
                     });
                   }
                   return nodes;
@@ -265,7 +265,6 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
                   toggle={expanded ? collapse : expand}
                   onCreateItem={() => {
                     treeRef.current?.refreshItem(index, item.data);
-                    expand();
                   }}
                 />
               )}
