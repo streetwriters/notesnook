@@ -45,7 +45,13 @@ function EditorFooter() {
 
   return (
     <Flex sx={{ alignItems: "center", justifyContent: "center", gap: 2 }}>
-      <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "center",
+          flex: 1
+        }}
+      >
         <Button
           variant="icon"
           onClick={() =>
@@ -57,12 +63,12 @@ function EditorFooter() {
             })
           }
           disabled={editorConfig.zoom <= EDITOR_ZOOM.MIN}
+          sx={{ py: 0, height: "100%" }}
         >
           <b>-</b>
         </Button>
         <Text
           className="selectable"
-          data-test-id="editor-word-count"
           variant="subBody"
           sx={{ color: "paragraph" }}
         >
@@ -79,6 +85,7 @@ function EditorFooter() {
             })
           }
           disabled={editorConfig.zoom >= EDITOR_ZOOM.MAX}
+          sx={{ py: 0, height: "100%" }}
         >
           <b>+</b>
         </Button>
