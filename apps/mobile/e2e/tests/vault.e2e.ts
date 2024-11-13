@@ -134,7 +134,7 @@ describe("VAULT", () => {
     await openLockedNote();
   });
 
-  it.only("Remove note from vault", async () => {
+  it("Remove note from vault", async () => {
     await Tests.prepare();
     await Tests.createNote();
     await lockNote();

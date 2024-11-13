@@ -100,7 +100,7 @@ describe("NOTE TESTS", () => {
     await Tests.fromText(note.body).isVisible();
   });
 
-  it.only("Delete & restore a note", async () => {
+  it("Delete & restore a note", async () => {
     await Tests.prepare();
     await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
