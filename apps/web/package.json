@@ -86,7 +86,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
-    "@codspeed/tinybench-plugin": "^3.1.1",
     "@playwright/test": "^1.48.2",
     "@swc/core": "^1.5.24",
     "@swc/plugin-react-remove-properties": "^2.0.4",
@@ -114,6 +113,7 @@
     "happy-dom": "^8.9.0",
     "ip": "^1.1.8",
     "lorem-ipsum": "^2.0.4",
+    "mitata": "^1.0.10",
     "otplib": "^12.0.1",
     "rollup": "^4.18.0",
     "rollup-plugin-visualizer": "^5.12.0",

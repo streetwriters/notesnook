@@ -18,8 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { chromium } from "playwright";
-import { Bench } from "tinybench";
-import { withCodSpeed } from "@codspeed/tinybench-plugin";
+import { bench, run, summary } from "mitata";
 import { spawn } from "child_process";
 
 const TESTS = [
@@ -72,65 +71,49 @@ const server = await startServer();
 const browser = await chromium.launch();
 
 for (const testCase of TESTS) {
-  /**
-   * @type {import("playwright").BrowserContext}
-   */
-  let context;
-  /**
-   * @type {import("playwright").Page}
-   */
-  let page;
+  summary(() => {
+    bench(testCase.name, async function* () {
+      const context = await browser.newContext({
+        baseURL: "http://localhost:3000"
+      });
+      await context.addInitScript({
+        content: `window.localStorage.setItem("skipInitiation", "true");
 
-  const bench = withCodSpeed(
-    new Bench({
-      time: 5000,
-      async setup() {
-        context = await browser.newContext({
-          baseURL: "http://localhost:3000"
+      const observer = new PerformanceObserver((list, observer) => {
+        list.getEntries().forEach((entry) => {
+          if (entry.entryType === "mark" && entry.name === "${testCase.end}") {
+            observer.disconnect();
+            console.log(
+              "ended: ${testCase.name}",
+              performance.measure(
+                "${testCase.end}",
+                "${testCase.start}",
+                "${testCase.end}"
+              ).duration
+            );
+            window.close();
+          }
         });
-        await context.addInitScript({
-          content: `window.localStorage.setItem("skipInitiation", "true");
+      });
+      observer.observe({ entryTypes: ["mark"] });`
+      });
+      const page = await context.newPage();
 
-        const observer = new PerformanceObserver((list, observer) => {
-          list.getEntries().forEach((entry) => {
-            if (entry.entryType === "mark" && entry.name === "${testCase.end}") {
-              observer.disconnect();
-              console.log(
-                "ended: ${testCase.name}",
-                performance.measure(
-                  "${testCase.end}",
-                  "${testCase.start}",
-                  "${testCase.end}"
-                ).duration
-              );
-              window.close();
-            }
-          });
+      yield async () => {
+        await page.goto(testCase.route || "/");
+        await page.waitForEvent("console", {
+          predicate(consoleMessage) {
+            return consoleMessage.text().startsWith(`ended: ${testCase.name}`);
+          }
         });
-        observer.observe({ entryTypes: ["mark"] });`
-        });
-        page = await context.newPage();
-      },
-      async teardown() {
-        await context.close();
-      }
-    })
-  );
+      };
 
-  bench.add(testCase.name, async () => {
-    await page.goto(testCase.route || "/");
-    await page.waitForEvent("console", {
-      predicate(consoleMessage) {
-        return consoleMessage.text().startsWith(`ended: ${testCase.name}`);
-      }
+      await context.close();
     });
   });
-
-  await bench.warmup();
-  await bench.run();
-
-  console.table(bench.table());
 }
+
+await run();
 
 await browser.close();
 
