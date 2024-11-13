@@ -53,7 +53,9 @@ locale.then(({ default: locale }) => {
   });
   i18n.activate("en");
 
+  performance.mark("import:root");
   import("./root").then(({ startApp }) => {
+    performance.mark("start:app");
     startApp();
   });
 });
