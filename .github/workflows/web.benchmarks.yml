@@ -34,6 +34,10 @@ jobs:
       - name: Build
         run: npm run build:web
 
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+        working-directory: apps/web
+
       - name: Run benchmarks
         uses: CodSpeedHQ/action@v3
         with:
