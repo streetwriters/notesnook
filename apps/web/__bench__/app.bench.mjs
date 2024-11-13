@@ -67,7 +67,7 @@ async function startServer() {
   });
 }
 
-await startServer();
+const server = await startServer();
 
 const browser = await chromium.launch();
 
@@ -83,13 +83,14 @@ for (const testCase of TESTS) {
 
   const bench = withCodSpeed(
     new Bench({
+      time: 5000,
       async setup() {
         context = await browser.newContext({
           baseURL: "http://localhost:3000"
         });
         await context.addInitScript({
           content: `window.localStorage.setItem("skipInitiation", "true");
-  
+
         const observer = new PerformanceObserver((list, observer) => {
           list.getEntries().forEach((entry) => {
             if (entry.entryType === "mark" && entry.name === "${testCase.end}") {
@@ -132,3 +133,7 @@ for (const testCase of TESTS) {
 }
 
 await browser.close();
+
+server.stdout.destroy();
+server.stderr.destroy();
+server.kill();
