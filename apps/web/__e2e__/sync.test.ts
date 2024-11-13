@@ -49,7 +49,7 @@ async function actAndSync<T>(
 }
 
 const NOTE = {
-  title: "Real-time sync test note 1"
+  title: `Note ${makeid(20)}`
 };
 
 test(`edits in a note opened on 2 devices should sync in real-time`, async ({
@@ -66,9 +66,9 @@ test(`edits in a note opened on 2 devices should sync in real-time`, async ({
   const [notesA, notesB] = await Promise.all(
     [deviceA, deviceB].map((d) => d.goToNotes())
   );
-  const noteB =
-    (await notesB.findNote(NOTE)) ||
-    (await actAndSync([deviceA, deviceB], notesB.createNote(NOTE)))[0];
+  const noteB = (
+    await actAndSync([deviceA, deviceB], notesB.createNote(NOTE))
+  )[0];
   const noteA = await notesA.findNote(NOTE);
   await Promise.all([noteA, noteB].map((note) => note?.openNote()));
 
