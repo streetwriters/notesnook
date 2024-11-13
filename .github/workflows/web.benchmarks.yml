@@ -39,8 +39,6 @@ jobs:
         working-directory: apps/web
 
       - name: Run benchmarks
-        uses: CodSpeedHQ/action@v3
-        with:
-          run: node __bench__/app.bench.mjs
-          working-directory: apps/web
-          token: ${{ secrets.CODSPEED_TOKEN }}
+        id: benchmark
+        run: node __bench__/app.bench.mjs
+        working-directory: apps/web
