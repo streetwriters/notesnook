@@ -31,7 +31,7 @@ import { FileStorage } from "../interfaces/fs";
 
 const db = database;
 async function initializeDatabase(persistence: DatabasePersistence) {
-  logger.measure("Database initialization");
+  performance.mark("start:initializeDatabase");
 
   let databaseKey = await useKeyStore.getState().getValue("databaseKey");
   if (!databaseKey) {
@@ -106,9 +106,9 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   // });
   // }
 
-  console.log("loading db");
+  performance.mark("start:initdb");
   await db.init();
-  console.log("db loaded");
+  performance.mark("end:initdb");
 
   window.addEventListener("beforeunload", async () => {
     if (IS_DESKTOP_APP) {
@@ -117,14 +117,13 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     }
   });
 
-  logger.measure("Database initialization");
-
   if (db.migrations?.required()) {
     await import("../dialogs/migration-dialog").then(({ MigrationDialog }) =>
       MigrationDialog.show({})
     );
   }
 
+  performance.mark("end:initializeDatabase");
   return db;
 }
 
