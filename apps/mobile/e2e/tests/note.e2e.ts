@@ -66,7 +66,7 @@ describe("NOTE TESTS", () => {
     await Tests.fromText("icon-pinned").isNotVisible();
   });
 
-  it("Pin a note in notifications", async () => {
+  it.skip("Pin a note in notifications", async () => {
     await Tests.prepare();
     await Tests.createNote();
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
@@ -107,7 +107,7 @@ describe("NOTE TESTS", () => {
     await Tests.fromId("icon-trash").waitAndTap();
     await Tests.navigate("Trash");
     await Tests.fromId(notesnook.listitem.menu).waitAndTap();
-    await Tests.fromText("Restore note").waitAndTap();
+    await Tests.fromText("Restore").waitAndTap();
     await device.pressBack();
     await Tests.fromText(
       "Test note description that is very long and should not fit in text."

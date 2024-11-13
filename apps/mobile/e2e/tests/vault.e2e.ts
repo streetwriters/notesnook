@@ -57,6 +57,7 @@ async function openLockedNote(pwd?: string) {
 
 async function goToPrivacySecuritySettings() {
   await Tests.navigate("Settings");
+  await Tests.sleep(300);
   await Tests.fromText("Vault").waitAndTap();
 }
 
@@ -104,6 +105,7 @@ describe("VAULT", () => {
       "1234"
     );
     await Tests.fromText("Delete").waitAndTap();
+    await Tests.sleep(300);
     await Tests.fromText("Create vault").isVisible();
     await device.pressBack();
     await device.pressBack();
@@ -121,6 +123,7 @@ describe("VAULT", () => {
     );
     await Tests.fromText("Delete notes in this vault").waitAndTap();
     await Tests.fromText("Delete").waitAndTap();
+    await Tests.sleep(300);
     await Tests.fromText("Create vault").isVisible();
     await device.pressBack();
     await device.pressBack();
