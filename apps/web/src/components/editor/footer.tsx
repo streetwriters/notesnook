@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@theme-ui/components";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { SaveState, useEditorStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
 import { useEditorConfig, useNoteStatistics } from "./manager";
