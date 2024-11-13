@@ -108,12 +108,13 @@ jobs:
           disable-animations: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           force-avd-creation: false
-          script: yarn test:android --headless --record-logs failing --record-videos failing --take-screenshots failing
+          script: |
+              yarn test:android --headless --record-logs failing --record-videos failing --take-screenshots failing --artifacts-location apps/mobile/native/artifacts
             
       - name: Upload artifacts
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: detox-artifacts
-          path: artifacts
+          path: apps/mobile/native/artifacts
           retention-days: 14
