@@ -170,7 +170,7 @@ class Sync {
   }
 
   async start(options: SyncOptions) {
-    this.createConnection(options);
+    await this.createConnection(options);
     if (!this.connection) return;
 
     if (!(await checkSyncStatus(SYNC_CHECK_IDS.sync))) {
