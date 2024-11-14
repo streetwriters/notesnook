@@ -1,0 +1,490 @@
+diff --git a/node_modules/@tiptap/core/dist/Editor.d.ts b/node_modules/@tiptap/core/dist/Editor.d.ts
+index aa38ab5..df409c6 100644
+--- a/node_modules/@tiptap/core/dist/Editor.d.ts
++++ b/node_modules/@tiptap/core/dist/Editor.d.ts
+@@ -6,6 +6,8 @@ import { ExtensionManager } from './ExtensionManager.js';
+ import { NodePos } from './NodePos.js';
+ import { CanCommands, ChainedCommands, EditorEvents, EditorOptions, JSONContent, SingleCommands, TextSerializer } from './types.js';
+ export * as extensions from './extensions/index.js';
++export interface EditorStorage extends Record<string, any> {
++}
+ export interface TiptapEditorHTMLElement extends HTMLElement {
+     editor?: Editor;
+ }
+@@ -26,7 +28,7 @@ export declare class Editor extends EventEmitter<EditorEvents> {
+     /**
+      * Returns the editor storage.
+      */
+-    get storage(): Record<string, any>;
++    get storage(): EditorStorage;
+     /**
+      * An object of all registered commands.
+      */
+diff --git a/node_modules/@tiptap/core/dist/index.cjs b/node_modules/@tiptap/core/dist/index.cjs
+index e890c3d..83aa5cb 100644
+--- a/node_modules/@tiptap/core/dist/index.cjs
++++ b/node_modules/@tiptap/core/dist/index.cjs
+@@ -405,7 +405,7 @@ function fromString(value) {
+  * @param extensionAttributes List of attributes to inject
+  */
+ function injectExtensionAttributesToParseRule(parseRule, extensionAttributes) {
+-    if ('style' in parseRule) {
++    if ('style' in parseRule || (!parseRule.attrs && !parseRule.getAttrs && extensionAttributes.length === 0)) {
+         return parseRule;
+     }
+     return {
+@@ -422,12 +422,11 @@ function injectExtensionAttributesToParseRule(parseRule, extensionAttributes) {
+                 if (value === null || value === undefined) {
+                     return items;
+                 }
+-                return {
+-                    ...items,
+-                    [item.name]: value,
+-                };
+-            }, {});
+-            return { ...oldAttributes, ...newAttributes };
++                // @ts-expect-error for perf reasons
++                items[item.name] = value;
++                return items;
++            }, oldAttributes || {});
++            return newAttributes;
+         },
+     };
+ }
+@@ -1573,7 +1572,7 @@ const cut = (originRange, targetPos) => ({ editor, tr }) => {
+     tr.deleteRange(originRange.from, originRange.to);
+     const newPos = tr.mapping.map(targetPos);
+     tr.insert(newPos, contentSlice.content);
+-    tr.setSelection(new state.TextSelection(tr.doc.resolve(newPos - 1)));
++    tr.setSelection(new state.TextSelection(tr.doc.resolve(Math.max(0, newPos - 1))));
+     return true;
+ };
+ 
+@@ -1837,24 +1836,11 @@ const insertContent = (value, options) => ({ tr, commands }) => {
+     return commands.insertContentAt({ from: tr.selection.from, to: tr.selection.to }, value, options);
+ };
+ 
+-const removeWhitespaces = (node) => {
+-    const children = node.childNodes;
+-    for (let i = children.length - 1; i >= 0; i -= 1) {
+-        const child = children[i];
+-        if (child.nodeType === 3 && child.nodeValue && /^(\n\s\s|\n)$/.test(child.nodeValue)) {
+-            node.removeChild(child);
+-        }
+-        else if (child.nodeType === 1) {
+-            removeWhitespaces(child);
+-        }
+-    }
+-    return node;
+-};
+ function elementFromString(value) {
+     // add a wrapper to preserve leading and trailing whitespace
+     const wrappedValue = `<body>${value}</body>`;
+     const html = new window.DOMParser().parseFromString(wrappedValue, 'text/html').body;
+-    return removeWhitespaces(html);
++    return html;
+ }
+ 
+ /**
+@@ -2233,8 +2219,21 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
+     return commands$1.lift(state, dispatch);
+ };
+ 
+-const liftEmptyBlock = () => ({ state, dispatch }) => {
+-    return commands$1.liftEmptyBlock(state, dispatch);
++const liftEmptyBlock = () => ({ state, dispatch, editor }) => {
++    return commands$1.liftEmptyBlock(state, tr => {
++        if (!dispatch) {
++            return true;
++        }
++        const { selection, storedMarks } = state;
++        const marks = storedMarks || (selection.$to.parentOffset && selection.$from.marks());
++        if (!marks) {
++            return dispatch(tr);
++        }
++        const { splittableMarks } = editor.extensionManager;
++        const filteredMarks = marks.filter(mark => splittableMarks.includes(mark.type.name));
++        tr.ensureMarks(filteredMarks);
++        return dispatch(tr);
++    });
+ };
+ 
+ const liftListItem = typeOrName => ({ state, dispatch }) => {
+@@ -3794,17 +3793,20 @@ const Keymap = Extension.create({
+             new state.Plugin({
+                 key: new state.PluginKey('clearDocument'),
+                 appendTransaction: (transactions, oldState, newState) => {
++                    const { empty, from, to } = oldState.selection;
++                    if (empty) {
++                        return;
++                    }
+                     const docChanges = transactions.some(transaction => transaction.docChanged)
+-                        && !oldState.doc.eq(newState.doc);
++                        && oldState.doc.nodeSize !== newState.doc.nodeSize;
+                     const ignoreTr = transactions.some(transaction => transaction.getMeta('preventClearDocument'));
+                     if (!docChanges || ignoreTr) {
+                         return;
+                     }
+-                    const { empty, from, to } = oldState.selection;
+                     const allFrom = state.Selection.atStart(oldState.doc).from;
+                     const allEnd = state.Selection.atEnd(oldState.doc).to;
+                     const allWasSelected = from === allFrom && to === allEnd;
+-                    if (empty || !allWasSelected) {
++                    if (!allWasSelected) {
+                         return;
+                     }
+                     const isEmpty = isNodeEmpty(newState.doc);
+@@ -4375,6 +4377,13 @@ class Editor extends EventEmitter {
+      * Creates a ProseMirror view.
+      */
+     createView() {
++        this.view = new view.EditorView(this.options.element, {
++            ...this.options.editorProps,
++            dispatchTransaction: this.dispatchTransaction.bind(this),
++            state: state.EditorState.create({
++                doc: this.schema.topNodeType.create(),
++            }),
++        });
+         let doc;
+         try {
+             doc = createDocument(this.options.content, this.schema, this.options.parseOptions, { errorOnInvalidContent: this.options.enableContentCheck });
+@@ -4400,7 +4409,7 @@ class Editor extends EventEmitter {
+             // Content is invalid, but attempt to create it anyway, stripping out the invalid parts
+             doc = createDocument(this.options.content, this.schema, this.options.parseOptions, { errorOnInvalidContent: false });
+         }
+-        const selection = resolveFocusPosition(doc, this.options.autofocus);
++        const selection = resolveFocusPosition(doc, this.options.autofocus) || undefined;
+         this.view = new view.EditorView(this.options.element, {
+             ...this.options.editorProps,
+             dispatchTransaction: this.dispatchTransaction.bind(this),
+@@ -4417,11 +4426,15 @@ class Editor extends EventEmitter {
+         }
+         // `editor.view` is not yet available at this time.
+         // Therefore we will add all plugins and node views directly afterwards.
+-        const newState = this.state.reconfigure({
++        const newState = state.EditorState.create({
+             plugins: this.extensionManager.plugins,
++            doc,
++            selection,
++        });
++        this.view.setProps({
++            state: newState,
++            nodeViews: this.extensionManager.nodeViews,
+         });
+-        this.view.updateState(newState);
+-        this.createNodeViews();
+         this.prependClass();
+         // Let’s store the editor instance in the DOM element.
+         // So we’ll have access to it for tests.
+diff --git a/node_modules/@tiptap/core/dist/index.js b/node_modules/@tiptap/core/dist/index.js
+index 0025c11..e3d4bb3 100644
+--- a/node_modules/@tiptap/core/dist/index.js
++++ b/node_modules/@tiptap/core/dist/index.js
+@@ -403,7 +403,7 @@ function fromString(value) {
+  * @param extensionAttributes List of attributes to inject
+  */
+ function injectExtensionAttributesToParseRule(parseRule, extensionAttributes) {
+-    if ('style' in parseRule) {
++    if ('style' in parseRule || (!parseRule.attrs && !parseRule.getAttrs && extensionAttributes.length === 0)) {
+         return parseRule;
+     }
+     return {
+@@ -420,12 +420,11 @@ function injectExtensionAttributesToParseRule(parseRule, extensionAttributes) {
+                 if (value === null || value === undefined) {
+                     return items;
+                 }
+-                return {
+-                    ...items,
+-                    [item.name]: value,
+-                };
+-            }, {});
+-            return { ...oldAttributes, ...newAttributes };
++                // @ts-expect-error for perf reasons
++                items[item.name] = value;
++                return items;
++            }, oldAttributes || {});
++            return newAttributes;
+         },
+     };
+ }
+@@ -1571,7 +1570,7 @@ const cut = (originRange, targetPos) => ({ editor, tr }) => {
+     tr.deleteRange(originRange.from, originRange.to);
+     const newPos = tr.mapping.map(targetPos);
+     tr.insert(newPos, contentSlice.content);
+-    tr.setSelection(new TextSelection(tr.doc.resolve(newPos - 1)));
++    tr.setSelection(new TextSelection(tr.doc.resolve(Math.max(0, newPos - 1))));
+     return true;
+ };
+ 
+@@ -1835,24 +1834,11 @@ const insertContent = (value, options) => ({ tr, commands }) => {
+     return commands.insertContentAt({ from: tr.selection.from, to: tr.selection.to }, value, options);
+ };
+ 
+-const removeWhitespaces = (node) => {
+-    const children = node.childNodes;
+-    for (let i = children.length - 1; i >= 0; i -= 1) {
+-        const child = children[i];
+-        if (child.nodeType === 3 && child.nodeValue && /^(\n\s\s|\n)$/.test(child.nodeValue)) {
+-            node.removeChild(child);
+-        }
+-        else if (child.nodeType === 1) {
+-            removeWhitespaces(child);
+-        }
+-    }
+-    return node;
+-};
+ function elementFromString(value) {
+     // add a wrapper to preserve leading and trailing whitespace
+     const wrappedValue = `<body>${value}</body>`;
+     const html = new window.DOMParser().parseFromString(wrappedValue, 'text/html').body;
+-    return removeWhitespaces(html);
++    return html;
+ }
+ 
+ /**
+@@ -2231,8 +2217,21 @@ const lift = (typeOrName, attributes = {}) => ({ state, dispatch }) => {
+     return lift$1(state, dispatch);
+ };
+ 
+-const liftEmptyBlock = () => ({ state, dispatch }) => {
+-    return liftEmptyBlock$1(state, dispatch);
++const liftEmptyBlock = () => ({ state, dispatch, editor }) => {
++    return liftEmptyBlock$1(state, tr => {
++        if (!dispatch) {
++            return true;
++        }
++        const { selection, storedMarks } = state;
++        const marks = storedMarks || (selection.$to.parentOffset && selection.$from.marks());
++        if (!marks) {
++            return dispatch(tr);
++        }
++        const { splittableMarks } = editor.extensionManager;
++        const filteredMarks = marks.filter(mark => splittableMarks.includes(mark.type.name));
++        tr.ensureMarks(filteredMarks);
++        return dispatch(tr);
++    });
+ };
+ 
+ const liftListItem = typeOrName => ({ state, dispatch }) => {
+@@ -3792,17 +3791,20 @@ const Keymap = Extension.create({
+             new Plugin({
+                 key: new PluginKey('clearDocument'),
+                 appendTransaction: (transactions, oldState, newState) => {
++                    const { empty, from, to } = oldState.selection;
++                    if (empty) {
++                        return;
++                    }
+                     const docChanges = transactions.some(transaction => transaction.docChanged)
+-                        && !oldState.doc.eq(newState.doc);
++                        && oldState.doc.nodeSize !== newState.doc.nodeSize;
+                     const ignoreTr = transactions.some(transaction => transaction.getMeta('preventClearDocument'));
+                     if (!docChanges || ignoreTr) {
+                         return;
+                     }
+-                    const { empty, from, to } = oldState.selection;
+                     const allFrom = Selection.atStart(oldState.doc).from;
+                     const allEnd = Selection.atEnd(oldState.doc).to;
+                     const allWasSelected = from === allFrom && to === allEnd;
+-                    if (empty || !allWasSelected) {
++                    if (!allWasSelected) {
+                         return;
+                     }
+                     const isEmpty = isNodeEmpty(newState.doc);
+@@ -4373,6 +4375,13 @@ class Editor extends EventEmitter {
+      * Creates a ProseMirror view.
+      */
+     createView() {
++        this.view = new EditorView(this.options.element, {
++            ...this.options.editorProps,
++            dispatchTransaction: this.dispatchTransaction.bind(this),
++            state: EditorState.create({
++                doc: this.schema.topNodeType.create(),
++            }),
++        });
+         let doc;
+         try {
+             doc = createDocument(this.options.content, this.schema, this.options.parseOptions, { errorOnInvalidContent: this.options.enableContentCheck });
+@@ -4398,7 +4407,7 @@ class Editor extends EventEmitter {
+             // Content is invalid, but attempt to create it anyway, stripping out the invalid parts
+             doc = createDocument(this.options.content, this.schema, this.options.parseOptions, { errorOnInvalidContent: false });
+         }
+-        const selection = resolveFocusPosition(doc, this.options.autofocus);
++        const selection = resolveFocusPosition(doc, this.options.autofocus) || undefined;
+         this.view = new EditorView(this.options.element, {
+             ...this.options.editorProps,
+             dispatchTransaction: this.dispatchTransaction.bind(this),
+@@ -4415,11 +4424,15 @@ class Editor extends EventEmitter {
+         }
+         // `editor.view` is not yet available at this time.
+         // Therefore we will add all plugins and node views directly afterwards.
+-        const newState = this.state.reconfigure({
++        const newState = EditorState.create({
+             plugins: this.extensionManager.plugins,
++            doc,
++            selection,
++        });
++        this.view.setProps({
++            state: newState,
++            nodeViews: this.extensionManager.nodeViews,
+         });
+-        this.view.updateState(newState);
+-        this.createNodeViews();
+         this.prependClass();
+         // Let’s store the editor instance in the DOM element.
+         // So we’ll have access to it for tests.
+diff --git a/node_modules/@tiptap/core/dist/index.umd.js b/node_modules/@tiptap/core/dist/index.umd.js
+index cb84282..5d9ddff 100644
+--- a/node_modules/@tiptap/core/dist/index.umd.js
++++ b/node_modules/@tiptap/core/dist/index.umd.js
+@@ -401,7 +401,7 @@
+    * @param extensionAttributes List of attributes to inject
+    */
+   function injectExtensionAttributesToParseRule(parseRule, extensionAttributes) {
+-      if ('style' in parseRule) {
++      if ('style' in parseRule || (!parseRule.attrs && !parseRule.getAttrs && extensionAttributes.length === 0)) {
+           return parseRule;
+       }
+       return {
+@@ -418,12 +418,11 @@
+                   if (value === null || value === undefined) {
+                       return items;
+                   }
+-                  return {
+-                      ...items,
+-                      [item.name]: value,
+-                  };
+-              }, {});
+-              return { ...oldAttributes, ...newAttributes };
++                  // @ts-expect-error for perf reasons
++                  items[item.name] = value;
++                  return items;
++              }, oldAttributes || {});
++              return newAttributes;
+           },
+       };
+   }
+@@ -1569,7 +1568,7 @@
+       tr.deleteRange(originRange.from, originRange.to);
+       const newPos = tr.mapping.map(targetPos);
+       tr.insert(newPos, contentSlice.content);
+-      tr.setSelection(new state.TextSelection(tr.doc.resolve(newPos - 1)));
++      tr.setSelection(new state.TextSelection(tr.doc.resolve(Math.max(0, newPos - 1))));
+       return true;
+   };
+ 
+@@ -1833,24 +1832,11 @@
+       return commands.insertContentAt({ from: tr.selection.from, to: tr.selection.to }, value, options);
+   };
+ 
+-  const removeWhitespaces = (node) => {
+-      const children = node.childNodes;
+-      for (let i = children.length - 1; i >= 0; i -= 1) {
+-          const child = children[i];
+-          if (child.nodeType === 3 && child.nodeValue && /^(\n\s\s|\n)$/.test(child.nodeValue)) {
+-              node.removeChild(child);
+-          }
+-          else if (child.nodeType === 1) {
+-              removeWhitespaces(child);
+-          }
+-      }
+-      return node;
+-  };
+   function elementFromString(value) {
+       // add a wrapper to preserve leading and trailing whitespace
+       const wrappedValue = `<body>${value}</body>`;
+       const html = new window.DOMParser().parseFromString(wrappedValue, 'text/html').body;
+-      return removeWhitespaces(html);
++      return html;
+   }
+ 
+   /**
+@@ -2229,8 +2215,21 @@
+       return commands$1.lift(state, dispatch);
+   };
+ 
+-  const liftEmptyBlock = () => ({ state, dispatch }) => {
+-      return commands$1.liftEmptyBlock(state, dispatch);
++  const liftEmptyBlock = () => ({ state, dispatch, editor }) => {
++      return commands$1.liftEmptyBlock(state, tr => {
++          if (!dispatch) {
++              return true;
++          }
++          const { selection, storedMarks } = state;
++          const marks = storedMarks || (selection.$to.parentOffset && selection.$from.marks());
++          if (!marks) {
++              return dispatch(tr);
++          }
++          const { splittableMarks } = editor.extensionManager;
++          const filteredMarks = marks.filter(mark => splittableMarks.includes(mark.type.name));
++          tr.ensureMarks(filteredMarks);
++          return dispatch(tr);
++      });
+   };
+ 
+   const liftListItem = typeOrName => ({ state, dispatch }) => {
+@@ -3790,17 +3789,20 @@
+               new state.Plugin({
+                   key: new state.PluginKey('clearDocument'),
+                   appendTransaction: (transactions, oldState, newState) => {
++                      const { empty, from, to } = oldState.selection;
++                      if (empty) {
++                          return;
++                      }
+                       const docChanges = transactions.some(transaction => transaction.docChanged)
+-                          && !oldState.doc.eq(newState.doc);
++                          && oldState.doc.nodeSize !== newState.doc.nodeSize;
+                       const ignoreTr = transactions.some(transaction => transaction.getMeta('preventClearDocument'));
+                       if (!docChanges || ignoreTr) {
+                           return;
+                       }
+-                      const { empty, from, to } = oldState.selection;
+                       const allFrom = state.Selection.atStart(oldState.doc).from;
+                       const allEnd = state.Selection.atEnd(oldState.doc).to;
+                       const allWasSelected = from === allFrom && to === allEnd;
+-                      if (empty || !allWasSelected) {
++                      if (!allWasSelected) {
+                           return;
+                       }
+                       const isEmpty = isNodeEmpty(newState.doc);
+@@ -4371,6 +4373,13 @@ img.ProseMirror-separator {
+        * Creates a ProseMirror view.
+        */
+       createView() {
++          this.view = new view.EditorView(this.options.element, {
++              ...this.options.editorProps,
++              dispatchTransaction: this.dispatchTransaction.bind(this),
++              state: state.EditorState.create({
++                  doc: this.schema.topNodeType.create(),
++              }),
++          });
+           let doc;
+           try {
+               doc = createDocument(this.options.content, this.schema, this.options.parseOptions, { errorOnInvalidContent: this.options.enableContentCheck });
+@@ -4396,7 +4405,7 @@ img.ProseMirror-separator {
+               // Content is invalid, but attempt to create it anyway, stripping out the invalid parts
+               doc = createDocument(this.options.content, this.schema, this.options.parseOptions, { errorOnInvalidContent: false });
+           }
+-          const selection = resolveFocusPosition(doc, this.options.autofocus);
++          const selection = resolveFocusPosition(doc, this.options.autofocus) || undefined;
+           this.view = new view.EditorView(this.options.element, {
+               ...this.options.editorProps,
+               dispatchTransaction: this.dispatchTransaction.bind(this),
+@@ -4413,11 +4422,15 @@ img.ProseMirror-separator {
+           }
+           // `editor.view` is not yet available at this time.
+           // Therefore we will add all plugins and node views directly afterwards.
+-          const newState = this.state.reconfigure({
++          const newState = state.EditorState.create({
+               plugins: this.extensionManager.plugins,
++              doc,
++              selection,
++          });
++          this.view.setProps({
++              state: newState,
++              nodeViews: this.extensionManager.nodeViews,
+           });
+-          this.view.updateState(newState);
+-          this.createNodeViews();
+           this.prependClass();
+           // Let’s store the editor instance in the DOM element.
+           // So we’ll have access to it for tests.
