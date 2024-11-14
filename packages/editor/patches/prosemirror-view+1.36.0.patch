@@ -1,8 +1,8 @@
 diff --git a/node_modules/prosemirror-view/dist/index.cjs b/node_modules/prosemirror-view/dist/index.cjs
-index 8ea57c7..aeda01d 100644
+index 5903e89..6a85c3d 100644
 --- a/node_modules/prosemirror-view/dist/index.cjs
 +++ b/node_modules/prosemirror-view/dist/index.cjs
-@@ -3456,7 +3456,7 @@ editHandlers.drop = function (view, _event) {
+@@ -3482,7 +3482,7 @@ editHandlers.drop = function (view, _event) {
      });
      tr.setSelection(selectionBetween(view, $pos, tr.doc.resolve(end)));
    }
@@ -12,10 +12,10 @@ index 8ea57c7..aeda01d 100644
  };
  handlers.focus = function (view) {
 diff --git a/node_modules/prosemirror-view/dist/index.js b/node_modules/prosemirror-view/dist/index.js
-index 9583dc3..991bf0a 100644
+index d0c1f9d..f5b3f53 100644
 --- a/node_modules/prosemirror-view/dist/index.js
 +++ b/node_modules/prosemirror-view/dist/index.js
-@@ -3731,7 +3731,7 @@ editHandlers.drop = (view, _event) => {
+@@ -3754,7 +3754,7 @@ editHandlers.drop = (view, _event) => {
          tr.mapping.maps[tr.mapping.maps.length - 1].forEach((_from, _to, _newFrom, newTo) => end = newTo);
          tr.setSelection(selectionBetween(view, $pos, tr.doc.resolve(end)));
      }
