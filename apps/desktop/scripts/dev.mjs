@@ -55,6 +55,8 @@ async function onChange(first) {
   if (first) {
     await fs.rm("./build/", { force: true, recursive: true });
 
+    await exec("npm rebuild electron --verbose --foreground-scripts");
+
     await exec("yarn electron-builder install-app-deps");
   }
 
