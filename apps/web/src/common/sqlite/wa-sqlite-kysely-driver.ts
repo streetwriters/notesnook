@@ -118,7 +118,9 @@ export class WaSqliteWorkerMultipleTabDriver implements Driver {
     // we have to wait until a provider becomes available, otherwise
     // a race condition is created where the client starts executing
     // queries before it is initialized.
+    console.time("waiting for provider port");
     await service.getProviderPort();
+    console.timeEnd("waiting for provider port");
 
     this.connection = new WaSqliteWorkerConnection(service.proxy);
 

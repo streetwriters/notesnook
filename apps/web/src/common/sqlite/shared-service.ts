@@ -19,8 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import SharedWorker from "./shared-service.worker.ts?sharedworker";
 
-const PROVIDER_REQUEST_TIMEOUT = 1000;
-const sharedWorker = globalThis.SharedWorker ? new SharedWorker() : null;
+const sharedWorker = globalThis.SharedWorker
+  ? new SharedWorker({
+      name: "SharedService"
+    })
+  : null;
 
 export class SharedService<T extends object> extends EventTarget {
   #clientId: Promise<string>;
@@ -35,7 +38,7 @@ export class SharedService<T extends object> extends EventTarget {
 
   // This is client state to track the provider. The provider state is
   // mostly managed within activate().
-  #providerPort: Promise<MessagePort | null>;
+  #providerPort?: Promise<MessagePort | null>;
   providerCallbacks: Map<
     string,
     {
@@ -48,6 +51,7 @@ export class SharedService<T extends object> extends EventTarget {
   > = new Map();
   #providerCounter = 0;
   #providerChangeCleanup: (() => void)[] = [];
+  #providerId?: string;
 
   proxy: T;
 
@@ -57,23 +61,28 @@ export class SharedService<T extends object> extends EventTarget {
     this.#clientId = this.#getClientId();
 
     // Connect to the current provider and future providers.
-    this.#providerPort = this.#providerChange();
     this.#clientChannel.addEventListener(
       "message",
       async ({ data }) => {
         if (
           data?.type === "provider" &&
-          data?.sharedService === this.serviceName
+          data?.sharedService === this.serviceName &&
+          data?.providerId !== this.#providerId
         ) {
+          this.#providerId = data.providerId;
           // A context (possibly this one) announced itself as the new provider.
           // Discard any old provider and connect to the new one.
-          this.#providerPort.then((port) => port?.close());
+          this.#providerPort?.then((port) => port?.close());
           this.#providerPort = this.#providerChange();
           await this.#resendPendingCallbacks();
         }
       },
       { signal: this.#onClose.signal }
     );
+    this.#clientChannel.postMessage({
+      type: "client",
+      sharedService: this.serviceName
+    });
 
     window.addEventListener("beforeunload", () => {
       this.close();
@@ -87,7 +96,6 @@ export class SharedService<T extends object> extends EventTarget {
     onClientConnected: () => Promise<void>
   ) {
     if (this.#onDeactivate) return;
-
     // When acquire a lock on the service name then we become the service
     // provider. Only one instance at a time will get the lock; the rest
     // will wait their turn.
@@ -112,6 +120,17 @@ export class SharedService<T extends object> extends EventTarget {
           "message",
           async function onMessage(event) {
             const { data } = event;
+            if (
+              data?.type === "client" &&
+              data?.sharedService === thisArg.serviceName
+            ) {
+              broadcastChannel.postMessage({
+                type: "provider",
+                sharedService: data?.sharedService,
+                providerId
+              });
+            }
+
             if (
               data?.type === "request" &&
               data?.sharedService === thisArg.serviceName
@@ -255,18 +274,7 @@ export class SharedService<T extends object> extends EventTarget {
         this.#providerChangeCleanup.push(() => abortController.abort());
       });
 
-      let timeout = 0;
-      providerPort = await Promise.race([
-        providerPortReady,
-        new Promise<null>(
-          (resolve) =>
-            (timeout = setTimeout(() => {
-              console.error("Provider request timed out", nonce);
-              resolve(null);
-            }, PROVIDER_REQUEST_TIMEOUT) as unknown as number)
-        )
-      ]);
-      clearTimeout(timeout);
+      providerPort = await providerPortReady;
 
       if (!providerPort) {
         // The provider request timed out. If it does eventually arrive
