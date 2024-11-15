@@ -290,9 +290,10 @@ export function ActionSheetPresenter(
             position: "fixed",
             backgroundColor: undefined,
             padding: 0,
-            zIndex: 0,
+            zIndex: 1001,
             outline: 0,
-            isolation: "isolate"
+            isolation: "isolate",
+            userSelect: "none"
           }}
         >
           {children}
@@ -331,7 +332,7 @@ export function ActionSheetPresenter(
               id="pill"
               sx={{
                 bg: "background-secondary",
-                width: 60,
+                width: 100,
                 height: 8,
                 borderRadius: 100
               }}
