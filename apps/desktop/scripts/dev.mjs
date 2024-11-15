@@ -36,6 +36,8 @@ const ENV = {
   FORCE_COLOR: "false",
   COLOR: "0"
 };
+process.chdir(path.join(__dirname, ".."));
+
 await onChange(true);
 
 console.log("Watching...");
