@@ -78,7 +78,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
           placeholder={{
             title: route.name?.toLowerCase(),
             paragraph: strings.notesEmpty(),
-            button: strings.newNote(),
+            button: strings.createNewNote(),
             action: openEditor,
             loading: strings.loadingNotes()
           }}

@@ -1503,8 +1503,8 @@ msgid "Copy image"
 msgstr "Copy image"
 
 #: src/strings.ts:870
-msgid "Copy internal link"
-msgstr "Copy internal link"
+msgid "Copy link"
+msgstr "Copy link"
 
 #: src/strings.ts:2200
 msgid "Copy link text"

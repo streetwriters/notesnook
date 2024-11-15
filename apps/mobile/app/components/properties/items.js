@@ -137,14 +137,13 @@ export const Items = ({ item, buttons, close }) => {
         style={{
           alignSelf: "flex-start",
           paddingHorizontal: 0,
-          width: topBarItemWidth
+          flex: 1
         }}
       >
         <View
           onPress={item.func}
           style={{
             height: topBarItemWidth,
-            width: topBarItemWidth,
             justifyContent: "center",
             alignItems: "center",
             textAlign: "center",
@@ -169,7 +168,7 @@ export const Items = ({ item, buttons, close }) => {
 
         <Paragraph
           textBreakStrategy="simple"
-          size={SIZE.xxs + 1}
+          size={SIZE.xxs}
           style={{ textAlign: "center" }}
         >
           {item.title}
@@ -242,7 +241,7 @@ export const Items = ({ item, buttons, close }) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
           paddingRight: 25,
-          gap: 5
+          gap: 15
         }}
       >
         {topBarItems.map(renderTopBarItem)}
