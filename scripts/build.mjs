@@ -42,6 +42,8 @@ await Promise.all([
     "false",
     "--module",
     "commonjs",
+    "--moduleResolution",
+    "node",
     "--outDir",
     "dist/cjs",
     IS_WATCH ? "--watch" : ""
@@ -53,6 +55,8 @@ await Promise.all([
     "false",
     "--module",
     "esnext",
+    "--moduleResolution",
+    "Bundler",
     "--outDir",
     "dist/esm",
     IS_WATCH ? "--watch" : ""
