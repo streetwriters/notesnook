@@ -459,7 +459,8 @@ class EditorStore extends BaseStore<EditorStore> {
       openDiffSession,
       activateSession,
       activeSessionId,
-      getSession
+      getSession,
+      newSession
     } = this.get();
     if (activeSessionId) {
       const session = getSession(activeSessionId);
@@ -469,7 +470,7 @@ class EditorStore extends BaseStore<EditorStore> {
         openDiffSession(session.note.id, session.id);
       else if (session.type === "new") activateSession(session.id);
       else openSession(activeSessionId);
-    }
+    } else newSession();
   };
 
   updateSession = <T extends SessionType[] = SessionType[]>(

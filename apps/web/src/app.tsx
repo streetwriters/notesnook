@@ -26,7 +26,6 @@ import { useStore } from "./stores/app-store";
 import { Toaster } from "react-hot-toast";
 import NavigationMenu from "./components/navigation-menu";
 import StatusBar from "./components/status-bar";
-import { EditorLoader } from "./components/loaders/editor-loader";
 import { FlexScrollContainer } from "./components/scroll-container";
 import CachedRouter from "./components/cached-router";
 import { WebExtensionRelay } from "./utils/web-extension-relay";
@@ -38,15 +37,11 @@ import {
 } from "react-resizable-panels";
 import GlobalMenuWrapper from "./components/global-menu-wrapper";
 import AppEffects from "./app-effects";
+import HashRouter from "./components/hash-router";
 
 new WebExtensionRelay();
 
-// const GlobalMenuWrapper = React.lazy(
-//   () => import("./components/global-menu-wrapper")
-// );
-// const AppEffects = React.lazy(() => import("./app-effects"));
 const MobileAppEffects = React.lazy(() => import("./app-effects.mobile"));
-const HashRouter = React.lazy(() => import("./components/hash-router"));
 
 function App() {
   const isMobile = useMobile();
@@ -89,32 +84,6 @@ function App() {
 
 export default App;
 
-type SuspenseLoaderProps<TComponent extends React.JSXElementConstructor<any>> =
-  {
-    condition: boolean;
-    props?: React.ComponentProps<TComponent>;
-    component: TComponent;
-    fallback: JSX.Element;
-  };
-
-function SuspenseLoader<TComponent extends React.JSXElementConstructor<any>>({
-  condition,
-  props,
-  component,
-  fallback
-}: SuspenseLoaderProps<TComponent>) {
-  if (!condition) return fallback;
-
-  const Component = component as (
-    props: any
-  ) => React.ReactComponentElement<any, any>;
-  return (
-    <Suspense fallback={IS_DESKTOP_APP ? null : fallback}>
-      <Component {...props} />
-    </Suspense>
-  );
-}
-
 type DesktopAppContentsProps = {
   show: boolean;
   setShow: (show: boolean) => void;
@@ -146,7 +115,6 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
   //     middlePane.current?.resize(middlePaneSize);
   //   } else navPane.current?.expand();
   // }, [isFocusMode]);
-
   return (
     <>
       <Flex
@@ -226,9 +194,7 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
                 bg: "background"
               }}
             >
-              <Suspense fallback={<EditorLoader />}>
-                <HashRouter />
-              </Suspense>
+              <HashRouter />
             </Flex>
           </Panel>
         </PanelGroup>
@@ -303,11 +269,7 @@ function MobileAppContents() {
           width: "100vw"
         }}
       >
-        <SuspenseLoader
-          fallback={<EditorLoader />}
-          component={HashRouter}
-          condition={true}
-        />
+        <HashRouter />
       </Flex>
     </FlexScrollContainer>
   );

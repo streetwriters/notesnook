@@ -36,9 +36,7 @@ import { CreateTagDialog } from "../dialogs/item-dialog";
 import { OnboardingDialog } from "../dialogs/onboarding-dialog";
 
 const hashroutes = defineRoutes({
-  "/": () => {
-    // return <Editor nonce={"-1"} />;
-  },
+  "/": () => {},
   "/email/verify": () => {
     EmailVerificationDialog.show({}).then(afterAction);
   },

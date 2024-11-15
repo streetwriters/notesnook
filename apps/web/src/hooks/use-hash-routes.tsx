@@ -20,20 +20,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import makeMatcher from "wouter/matcher";
 import useHashLocation from "./use-hash-location";
 import { Params, Routes } from "../navigation/types";
+import { useEffect } from "react";
 
-let lastRoute: unknown | null = null;
 export default function useHashRoutes<T extends string>(routes: Routes<T>) {
   const [{ location, update }] = useHashLocation();
-  if (!update) return lastRoute;
 
-  const matcher = makeMatcher();
-  for (const key in routes) {
-    const [match, params] = matcher(key, location);
-    if (match) {
-      const route = routes[key]((params as Params<typeof key>) || {});
-      if (!route) return lastRoute;
-      lastRoute = route;
-      return route;
+  useEffect(() => {
+    if (!update) return;
+
+    const matcher = makeMatcher();
+    for (const key in routes) {
+      const [match, params] = matcher(key, location);
+      if (match) {
+        const route = routes[key]((params as Params<typeof key>) || {});
+        if (!route) return;
+      }
     }
-  }
+  }, [update, location, routes]);
 }
