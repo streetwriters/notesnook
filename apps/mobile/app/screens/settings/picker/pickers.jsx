@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { DATE_FORMATS, TIME_FORMATS } from "@notesnook/core";
-import { getFontById, getFonts } from "@notesnook/editor/dist/utils/font";
+import { getFontById, getFonts } from "@notesnook/editor/dist/esm/utils/font";
 import dayjs from "dayjs";
 import { createSettingsPicker } from ".";
 import { db } from "../../../common/database";

@@ -25,7 +25,7 @@ import {
   View
 } from "react-native";
 import { Image as ImageType } from "react-native-image-crop-picker";
-import { useThemeColors } from "../../../../../../packages/theme/dist";
+import { useThemeColors } from "@notesnook/theme";
 import { presentSheet } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
