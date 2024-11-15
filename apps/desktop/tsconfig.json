@@ -3,8 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "lib": ["ESNext"],
-    "moduleResolution": "nodenext",
-    "module": "nodenext"
+    "moduleResolution": "Bundler"
   },
   "include": ["src", "global.d.ts"]
 }

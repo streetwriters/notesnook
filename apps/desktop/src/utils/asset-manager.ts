@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { NativeImage, nativeImage } from "electron";
 import path from "path";
 import { isDevelopment } from "./index";
-// @ts-expect-error stupid icojs
 import { ParsedImage, parseICO } from "icojs";
 import { getSystemTheme } from "./theme";
 import { readFile } from "fs/promises";
