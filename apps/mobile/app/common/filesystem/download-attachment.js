@@ -244,7 +244,7 @@ export default async function downloadAttachment(
       );
     }
 
-    let filename = getFileNameWithExtension(
+    let filename = await getFileNameWithExtension(
       attachment.filename,
       attachment.mimeType
     );

@@ -54,10 +54,10 @@ export async function setupDatabase(password) {
     storage: Storage,
     eventsource: Platform.OS === "ios" ? EventSource : AndroidEventSource,
     fs: filesystem,
-    compressor: {
+    compressor: () => ({
       compress: Gzip.deflate,
       decompress: Gzip.inflate
-    },
+    }),
     batchSize: 100,
     sqliteOptions: {
       dialect: (name) => ({
