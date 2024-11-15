@@ -83,7 +83,7 @@ const Intro = ({ navigation }) => {
         >
           {item.headings?.map((heading) => (
             <Heading
-              key={heading}
+              key={heading()}
               style={{
                 marginBottom: 5
               }}
