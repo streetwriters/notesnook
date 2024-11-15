@@ -478,7 +478,9 @@ export default class Backup {
             e.message.includes("ciphertext cannot be decrypted") ||
             e.message === "FAILURE"
           )
-            throw new Error("Incorrect password.");
+            throw new Error(
+              encryptionKey ? "Invalid encryption key." : "Incorrect password."
+            );
           throw new Error(`Could not decrypt backup: ${e.message}`);
         }
       }
