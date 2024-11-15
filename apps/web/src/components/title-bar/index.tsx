@@ -68,7 +68,10 @@ export function TitleBar() {
       sx={{
         background: "background",
         height: TITLE_BAR_HEIGHT,
+        minHeight: TITLE_BAR_HEIGHT,
+        maxHeight: TITLE_BAR_HEIGHT,
         display: "flex",
+        flexShrink: 0,
         borderBottom: "1px solid var(--border)",
         ...(!isFullscreen && hasNativeWindowControls
           ? getPlatform() === "darwin"
