@@ -1,0 +1,5 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`paste text > with markdown link 1`] = `"<div><div contenteditable="true" translate="no" class="tiptap ProseMirror" tabindex="0"><p><a target="_blank" rel="noopener noreferrer nofollow" href="example.com">test</a></p></div></div>"`;
+
+exports[`paste text > with multiple markdown links 1`] = `"<div><div contenteditable="true" translate="no" class="tiptap ProseMirror" tabindex="0"><p><a target="_blank" rel="noopener noreferrer nofollow" href="example.com">test</a> some text <a target="_blank" rel="noopener noreferrer nofollow" href="example2.com">test2</a></p></div></div>"`;

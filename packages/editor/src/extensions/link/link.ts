@@ -95,7 +95,7 @@ declare module "@tiptap/core" {
   }
 }
 
-const linkRegex = /(?:__|[*#])|\[(.*?)\]\(.*?\)/gm;
+export const linkRegex = /(?:__|[*#])|\[([^\]]+)\]\(.*?\)/gm;
 const regExp = /(?:__|[*#])|\[.*?\]\((.*?)\)/gm;
 export const Link = Mark.create<LinkOptions>({
   name: "link",
@@ -221,6 +221,8 @@ export const Link = Mark.create<LinkOptions>({
         find: linkRegex,
         type: this.type,
         getAttributes(match) {
+          // reset in case of multiple matches
+          regExp.lastIndex = 0;
           return {
             href: regExp.exec(match[0])?.[1]
           };
