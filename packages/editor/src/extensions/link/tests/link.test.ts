@@ -52,7 +52,7 @@ const input = [
 ];
 
 input.forEach(({ text, expected }, i) => {
-  test(`link regex ${i + 1}`, () => {
+  test(`link regex ${text}`, () => {
     const result = text.match(linkRegex);
     expect(result).toEqual(expected);
   });
