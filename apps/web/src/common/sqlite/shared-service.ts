@@ -375,9 +375,7 @@ export class SharedService<T extends object> extends EventTarget {
   })();
 
   async getProviderPort() {
-    console.log("waiting for port provider to become available");
     await this.#providerPortMutex.waitForUnlock();
-    console.log("port provider ready.");
 
     let tries = 0;
     let providerPort = await this.#providerPort;
