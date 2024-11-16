@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import SharedWorker from "./shared-service.worker.ts?sharedworker";
+import { Mutex } from "async-mutex";
 
 const sharedWorker = globalThis.SharedWorker
   ? new SharedWorker({
@@ -39,6 +40,7 @@ export class SharedService<T extends object> extends EventTarget {
   // This is client state to track the provider. The provider state is
   // mostly managed within activate().
   #providerPort?: Promise<MessagePort | null>;
+  #providerPortMutex = new Mutex();
   providerCallbacks: Map<
     string,
     {
@@ -64,6 +66,7 @@ export class SharedService<T extends object> extends EventTarget {
     this.#clientChannel.addEventListener(
       "message",
       async ({ data }) => {
+        console.log("got message from provider", data);
         if (
           data?.type === "provider" &&
           data?.sharedService === this.serviceName &&
@@ -74,6 +77,7 @@ export class SharedService<T extends object> extends EventTarget {
           // Discard any old provider and connect to the new one.
           this.#providerPort?.then((port) => port?.close());
           this.#providerPort = this.#providerChange();
+          this.#providerPortMutex.release();
           await this.#resendPendingCallbacks();
         }
       },
@@ -83,6 +87,7 @@ export class SharedService<T extends object> extends EventTarget {
       type: "client",
       sharedService: this.serviceName
     });
+    this.#providerPortMutex.acquire();
 
     window.addEventListener("beforeunload", () => {
       this.close();
@@ -104,9 +109,11 @@ export class SharedService<T extends object> extends EventTarget {
     const LOCK_NAME = `SharedService-${this.serviceName}`;
     navigator.locks
       .request(LOCK_NAME, { signal: this.#onDeactivate.signal }, async () => {
+        console.time("getting provider port");
         // Get the port to request client ports.
         const { port, onclose } = await portProviderFunc();
         port.start();
+        console.timeEnd("getting provider port");
 
         // Listen for client requests. A separate BroadcastChannel
         // instance is necessary because we may be serving our own
@@ -168,6 +175,7 @@ export class SharedService<T extends object> extends EventTarget {
           { signal: this.#onDeactivate?.signal }
         );
 
+        console.log("sending message to clients", providerId, this.serviceName);
         // Tell everyone that we are the new provider.
         broadcastChannel.postMessage({
           type: "provider",
@@ -207,9 +215,11 @@ export class SharedService<T extends object> extends EventTarget {
   }
 
   async #getClientId() {
+    console.time("getting client id");
     // Use a Web Lock to determine our clientId.
     const nonce = Math.random().toString();
     const clientId = await navigator.locks.request(nonce, async () => {
+      console.log("got clientid lock");
       const { held } = await navigator.locks.query();
       return held?.find((lock) => lock.name === nonce)?.clientId;
     });
@@ -231,6 +241,7 @@ export class SharedService<T extends object> extends EventTarget {
     sharedWorker?.port.start();
     sharedWorker?.port.postMessage({ clientId });
 
+    console.timeEnd("getting client id");
     return clientId;
   }
 
@@ -364,6 +375,10 @@ export class SharedService<T extends object> extends EventTarget {
   })();
 
   async getProviderPort() {
+    console.log("waiting for port provider to become available");
+    await this.#providerPortMutex.waitForUnlock();
+    console.log("port provider ready.");
+
     let tries = 0;
     let providerPort = await this.#providerPort;
     while (!providerPort) {
@@ -371,7 +386,10 @@ export class SharedService<T extends object> extends EventTarget {
         throw new Error("Could not find a provider port to communicate with.");
 
       providerPort = await this.#providerPort;
-      console.warn("Provider port not found. Retrying in 50ms...");
+      console.warn(
+        "Provider port not found. Retrying in 50ms...",
+        this.#providerPort
+      );
       await new Promise((resolve) => setTimeout(resolve, 50));
     }
     return providerPort;
