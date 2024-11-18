@@ -93,6 +93,7 @@ import { sleep } from "../utils/time";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { changeSystemBarColors } from "../stores/use-theme-store";
 import { strings } from "@notesnook/intl";
+import { endProgress, startProgress } from "../components/dialogs/progress";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -576,6 +577,17 @@ export const useAppEvents = () => {
       }),
       EV.subscribe(EVENTS.uploadCanceled, (data) => {
         useAttachmentStore.getState().setUploading(data);
+      }),
+      EV.subscribe(EVENTS.migrationStarted, () => {
+        startProgress({
+          title: "Migrating Data",
+          paragraph: "Please wait while we migrate your data",
+          canHideProgress: false,
+          fillBackground: true
+        });
+      }),
+      EV.subscribe(EVENTS.migrationFinished, () => {
+        endProgress();
       }),
       EV.subscribe(EVENTS.vaultLocked, async () => {
         // Lock all notes in all tabs...
