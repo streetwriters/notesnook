@@ -37,7 +37,7 @@ export default function TipTap(props: TipTapProps) {
         if (onLoad) onLoad();
       },
       copyToClipboard(text, html) {
-        writeToClipboard({"text/plain": text, "text/html": html}).then(_ => {});
+        writeToClipboard({"text/plain": text, "text/html": html});
       },
     },
     []
