@@ -36,6 +36,7 @@ import { WebAuthn } from "../utils/webauthn";
 import { getDocumentTitle, setDocumentTitle } from "../utils/dom";
 import { CredentialWithoutSecret, useKeyStore } from "../interfaces/key-store";
 import { strings } from "@notesnook/intl";
+import { DialogManager } from "../common/dialog-manager";
 
 export default function AppLock(props: PropsWithChildren<unknown>) {
   const credentials = useKeyStore((store) => store.activeCredentials());
@@ -118,6 +119,12 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
       return () => stop();
     }
   }, [lockAfter, credentials]);
+
+  useEffect(() => {
+    if (isLocked) {
+      DialogManager.closeAll();
+    }
+  }, [isLocked]);
 
   if (isLocked)
     return (
