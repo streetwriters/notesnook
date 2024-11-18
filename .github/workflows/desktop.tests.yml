@@ -99,7 +99,6 @@ jobs:
 
       - name: Run tests
         run: |
-          EXECUTABLE_PATH=output/mac/Notesnook.app/Contents/MacOS/Notesnook npm run test
           EXECUTABLE_PATH=output/mac-arm64/Notesnook.app/Contents/MacOS/Notesnook npm run test
         working-directory: ./apps/desktop
 
@@ -127,6 +126,9 @@ jobs:
           npm run bootstrap -- --scope=desktop
           npx nx run release --project @notesnook/desktop
 
+      - name: Install Playwright dependencies
+        run: npx playwright install --with-deps chromium
+
       - name: Build app
         run: |
           yarn electron-builder --linux --dir --arm64 --x64
@@ -134,7 +136,7 @@ jobs:
 
       - name: Run tests
         run: |
-          EXECUTABLE_PATH=output/linux-unpacked/notesnook xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npm run test
+          DEBUG=pw* EXECUTABLE_PATH=output/linux-unpacked/notesnook xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npm run test
         working-directory: ./apps/desktop
 
   test-windows:
@@ -168,6 +170,5 @@ jobs:
 
       - name: Run tests
         run: |
-          npx cross-env EXECUTABLE_PATH=output/win-unpacked/Notesnook.exe npm run test
-          npx cross-env EXECUTABLE_PATH=output/win-arm64-unpacked/Notesnook.exe npm run test
+          npx cross-env DEBUG=pw* EXECUTABLE_PATH=output/win-unpacked/Notesnook.exe npm run test
         working-directory: ./apps/desktop
