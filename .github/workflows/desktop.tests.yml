@@ -134,7 +134,6 @@ jobs:
 
       - name: Run tests
         run: |
-
           EXECUTABLE_PATH=output/linux-unpacked/notesnook npm run test
           EXECUTABLE_PATH=output/linux-arm64-unpacked/notesnook npm run test
         working-directory: ./apps/desktop
@@ -170,6 +169,6 @@ jobs:
 
       - name: Run tests
         run: |
-          EXECUTABLE_PATH=output/win-unpacked/Notesnook.exe npm run test
-          EXECUTABLE_PATH=output/win-arm64-unpacked/Notesnook.exe npm run test
+          npx cross-env EXECUTABLE_PATH=output/win-unpacked/Notesnook.exe npm run test
+          npx cross-env EXECUTABLE_PATH=output/win-arm64-unpacked/Notesnook.exe npm run test
         working-directory: ./apps/desktop
