@@ -60,6 +60,7 @@ import {
   isDeleted
 } from "../types.js";
 import { logger } from "../logger.js";
+import { EV, EVENTS } from "../common.js";
 
 // type FilteredKeys<T, U> = {
 //   [P in keyof T]: T[P] extends U ? P : never;
@@ -308,7 +309,14 @@ export async function initializeDatabase<Schema>(
       db,
       provider: migrationProvider
     });
+    const needsMigration = await migrator
+      .getMigrations()
+      .then((m) => m.some((m) => !m.executedAt));
+    if (!needsMigration) return db;
+
+    EV.publish(EVENTS.migrationStarted);
     const { error, results } = await migrator.migrateToLatest();
+    EV.publish(EVENTS.migrationFinished);
 
     if (error)
       throw error instanceof Error ? error : new Error(JSON.stringify(error));
