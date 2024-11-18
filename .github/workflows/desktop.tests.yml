@@ -79,7 +79,7 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=desktop
-          npx nx run release @notesnook/desktop
+          npx nx run release --project @notesnook/desktop
 
       - name: Install provisioning profile
         run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
@@ -125,7 +125,7 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=desktop
-          npx nx run release @notesnook/desktop
+          npx nx run release --project @notesnook/desktop
 
       - name: Build app
         run: |
