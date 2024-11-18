@@ -199,7 +199,10 @@ function getErrorHelp(props: FallbackProps) {
     errorText.includes("null function or function signature mismatch") ||
     errorText.includes("malformed database schema") ||
     /table ".+?" already exists/.test(errorText) ||
-    errorText.includes("corrupted migrations:")
+    errorText.includes("corrupted migrations:") ||
+    errorText.includes(
+      "Error while decrypting the ciphertext provided to safeStorage.decryptString"
+    )
   ) {
     return {
       explanation: strings.databaseCorruptExplain(),
