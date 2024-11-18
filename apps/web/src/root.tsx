@@ -33,6 +33,8 @@ import { AuthProps } from "./views/auth";
 import { loadDatabase } from "./hooks/use-database";
 import AppLock from "./views/app-lock";
 import { Text } from "@theme-ui/components";
+import { EV, EVENTS } from "@notesnook/core";
+import { useState } from "react";
 
 export async function startApp() {
   const rootElement = document.getElementById("root");
@@ -53,14 +55,6 @@ export async function startApp() {
     const { Component, props, path } = await init();
 
     await useKeyStore.getState().init();
-
-    performance.mark("load:database");
-    if (!useKeyStore.getState().isLocked)
-      loadDatabase(
-        path !== "/sessionexpired" || Config.get("sessionExpired", false)
-          ? "db"
-          : "memory"
-      );
 
     root.render(
       <>
@@ -102,8 +96,13 @@ function RouteWrapper(props: {
   path: Routes;
   routeProps: AuthProps | null;
 }) {
+  const [isMigrating, setIsMigrating] = useState(false);
   const { Component, path, routeProps } = props;
   const result = usePromise(async () => {
+    EV.subscribe(EVENTS.migrationStarted, () => setIsMigrating(true), true);
+    EV.subscribe(EVENTS.migrationFinished, () => setIsMigrating(false), true);
+
+    performance.mark("load:database");
     await loadDatabase(
       path !== "/sessionexpired" || Config.get("sessionExpired", false)
         ? "db"
@@ -116,7 +115,7 @@ function RouteWrapper(props: {
       ? result.reason
       : new Error(result.reason);
   }
-  if (result.status === "pending")
+  if (result.status === "pending" || isMigrating)
     return (
       <div
         style={{
@@ -143,7 +142,9 @@ function RouteWrapper(props: {
           <use href="#themed-logo" />
         </svg>
         <Text variant="body" sx={{ fontFamily: "monospace" }}>
-          Decrypting your notes
+          {isMigrating
+            ? "Migrating database. This might take a while."
+            : "Decrypting your notes"}
         </Text>
       </div>
     );
