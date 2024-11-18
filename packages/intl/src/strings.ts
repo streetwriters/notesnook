@@ -2379,5 +2379,6 @@ Use this if changes from other devices are not appearing on this device. This wi
     plural(count, {
       one: `Move all notes in this notebook to trash`,
       other: `Move all notes in these notebooks to trash`
-    })
+    }),
+  emailCopied: () => t`Email copied`
 };
