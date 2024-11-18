@@ -55,7 +55,7 @@ import { debounce } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { writeToClipboard } from "../../utils/clipboard";
-import { useEditorStore } from "../../stores/editor-store";
+import { SaveState, useEditorStore } from "../../stores/editor-store";
 import { parseInternalLink } from "@notesnook/core";
 import Skeleton from "react-loading-skeleton";
 import useMobile from "../../hooks/use-mobile";
@@ -63,6 +63,7 @@ import useTablet from "../../hooks/use-tablet";
 import { TimeFormat } from "@notesnook/core";
 import { BuyDialog } from "../../dialogs/buy-dialog";
 import { EDITOR_ZOOM } from "./common";
+import { showToast } from "../../utils/toast";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -89,6 +90,7 @@ type TipTapProps = {
   ) => Promise<LinkAttributes | undefined>;
   onAttachFile?: (file: File) => void;
   onFocus?: () => void;
+  onAutoSaveDisabled: () => void;
   content?: () => string | undefined;
   readonly?: boolean;
   nonce?: number;
@@ -132,6 +134,7 @@ function TipTap(props: TipTapProps) {
     onInsertInternalLink,
     onContentChange,
     onFocus = () => {},
+    onAutoSaveDisabled,
     content,
     editorContainer,
     readonly,
@@ -148,6 +151,7 @@ function TipTap(props: TipTapProps) {
   } = props;
 
   const isUserPremium = useIsUserPremium();
+  const setEditorSaveState = useEditorStore((store) => store.setSaveState);
   const autoSave = useRef(true);
   const { toolbarConfig } = useToolbarConfig();
 
@@ -242,7 +246,10 @@ function TipTap(props: TipTapProps) {
         const ignoreEdit = transaction.getMeta("ignoreEdit") as boolean;
         if (preventSave || !editor.isEditable || !onChange) return;
 
-        if (!autoSave.current) return;
+        if (!autoSave.current) {
+          onAutoSaveDisabled();
+          return;
+        }
 
         onChange(
           () => getHTMLFromFragment(editor.state.doc.content, editor.schema),
@@ -576,7 +583,9 @@ function toIEditor(editor: Editor): IEditor {
         },
         { query: (a) => a.hash === hash, preventUpdate: true }
       ),
-    startSearch: () => editor.commands.startSearch()
+    startSearch: () => editor.commands.startSearch(),
+    getContent: () =>
+      getHTMLFromFragment(editor.state.doc.content, editor.schema)
   };
 }
 

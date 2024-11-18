@@ -439,6 +439,7 @@ export function Editor(props: EditorProps) {
     readonly: false,
     focusMode: false
   };
+  const setEditorSaveState = useEditorStore((store) => store.setSaveState);
   useScrollToBlock(session);
 
   useEffect(() => {
@@ -558,6 +559,23 @@ export function Editor(props: EditorProps) {
         onInsertInternalLink={async (attributes) => {
           const link = await NoteLinkingDialog.show({ attributes });
           return link || undefined;
+        }}
+        onAutoSaveDisabled={() => {
+          setEditorSaveState(id, SaveState.NotSaved);
+          const { hide } = showToast(
+            "error",
+            "Auto-save is disabled for large notes. Press Ctrl + S to save.",
+            [
+              {
+                text: "Dismiss",
+                onClick: () => {
+                  hide();
+                }
+              }
+            ],
+            Infinity
+          );
+          return;
         }}
       >
         {headless ? null : (
