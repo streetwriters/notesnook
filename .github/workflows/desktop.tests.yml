@@ -1,0 +1,171 @@
+name: Test @notesnook/desktop
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+    paths:
+      - "app/desktop/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/desktop.tests.yml"
+  pull_request:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=web
+
+      - name: Setup environment
+        run: |
+          echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Generate desktop build
+        run: npx nx build:desktop @notesnook/web
+
+      - name: Archive build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: apps/web/build/**/*
+
+  test-macos:
+    name: Test macOS
+    needs: build
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install setuptools
+        run: brew install python-setuptools
+
+      - name: Setup notarization
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+
+      - name: Collect app metadata
+        id: app_metadata
+        working-directory: ./apps/desktop
+        run: |
+          echo ::set-output name=apple_app_id::$(cat package.json | jq -r .appAppleId)
+          echo ::set-output name=app_bundle_id::$(cat package.json | jq -r .build.appId)
+          echo ::set-output name=app_version::$(cat package.json | jq -r .version)
+          echo ::set-output name=bundle_version::$(cat package.json | jq -r .build.mac.bundleVersion)
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+          npx nx run release --project @notesnook/desktop
+
+      - name: Install provisioning profile
+        run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
+        working-directory: ./apps/desktop
+
+      - name: Build app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.mac_certs }}
+          CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
+          APPLE_API_KEY: ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+          APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
+          APPLE_API_ISSUER: ${{ secrets.api_key_issuer_id }}
+        run: |
+          yarn electron-builder --mac --dir --arm64 --x64
+        working-directory: ./apps/desktop
+
+      - name: Run tests
+        run: |
+          EXECUTABLE_PATH=output/mac-arm64/Notesnook.app/Contents/MacOS/Notesnook npm run test
+        working-directory: ./apps/desktop
+
+  test-linux:
+    name: Test for Linux
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+          npx nx run release --project @notesnook/desktop
+
+      - name: Build app
+        run: |
+          yarn electron-builder --linux --dir --arm64 --x64
+        working-directory: ./apps/desktop
+
+      - name: Run tests
+        run: |
+          EXECUTABLE_PATH=output/linux-unpacked/notesnook xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npm run test
+        working-directory: ./apps/desktop
+
+  test-windows:
+    name: Test for Windows
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+          npx nx run release --project @notesnook/desktop
+
+      - name: Build app
+        run: |
+          npx cross-env NOTESNOOK_STAGING=true yarn electron-builder --win --dir --arm64 --x64
+        working-directory: ./apps/desktop
+
+      - name: Run tests
+        run: |
+          npx cross-env EXECUTABLE_PATH=output/win-unpacked/Notesnook.exe npm run test
+        working-directory: ./apps/desktop
