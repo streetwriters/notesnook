@@ -164,7 +164,7 @@ jobs:
 
       - name: Build app
         run: |
-          yarn electron-builder --win --dir --arm64 --x64
+          npx cross-env NOTESNOOK_STAGING=true yarn electron-builder --win --dir --arm64 --x64
         working-directory: ./apps/desktop
 
       - name: Run tests
