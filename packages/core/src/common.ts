@@ -108,6 +108,8 @@ export const EVENTS = {
   databaseCollectionInitiated: "db:collectionInitiated",
   appRefreshRequested: "app:refreshRequested",
   migrationProgress: "migration:progress",
+  migrationStarted: "migration:start",
+  migrationFinished: "migration:finished",
   noteRemoved: "note:removed",
   tokenRefreshed: "token:refreshed",
   userUnauthorized: "user:unauthorized",
