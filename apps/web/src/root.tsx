@@ -55,11 +55,12 @@ export async function startApp() {
     await useKeyStore.getState().init();
 
     performance.mark("load:database");
-    loadDatabase(
-      path !== "/sessionexpired" || Config.get("sessionExpired", false)
-        ? "db"
-        : "memory"
-    );
+    if (!useKeyStore.getState().isLocked)
+      loadDatabase(
+        path !== "/sessionexpired" || Config.get("sessionExpired", false)
+          ? "db"
+          : "memory"
+      );
 
     root.render(
       <>
