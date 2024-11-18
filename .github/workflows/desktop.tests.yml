@@ -126,9 +126,6 @@ jobs:
           npm run bootstrap -- --scope=desktop
           npx nx run release --project @notesnook/desktop
 
-      - name: Install Playwright dependencies
-        run: npx playwright install --with-deps chromium
-
       - name: Build app
         run: |
           yarn electron-builder --linux --dir --arm64 --x64
