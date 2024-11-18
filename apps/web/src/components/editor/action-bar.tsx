@@ -30,6 +30,7 @@ import {
   Lock,
   NormalMode,
   Note,
+  NoteRemove,
   Pin,
   Properties,
   Publish,
@@ -312,10 +313,10 @@ function TabStrip() {
                 id={session.id}
                 key={session.id}
                 title={
-                  (isUnsaved ? "* " : "") +
-                  (session.title ||
-                    ("note" in session ? session.note.title : "Untitled"))
+                  session.title ||
+                  ("note" in session ? session.note.title : "Untitled")
                 }
+                isUnsaved={isUnsaved}
                 isTemporary={!!session.preview}
                 isActive={session.id === activeSessionId}
                 isPinned={!!session.pinned}
@@ -405,6 +406,7 @@ type TabProps = {
   isTemporary: boolean;
   isPinned: boolean;
   isLocked: boolean;
+  isUnsaved: boolean;
   type: SessionType;
   onKeepOpen: () => void;
   onFocus: () => void;
@@ -424,6 +426,7 @@ function Tab(props: TabProps) {
     isTemporary,
     isPinned,
     isLocked,
+    isUnsaved,
     type,
     onKeepOpen,
     onFocus,
@@ -443,6 +446,8 @@ function Tab(props: TabProps) {
     ? Readonly
     : type === "deleted"
     ? Trash
+    : isUnsaved
+    ? NoteRemove
     : Note;
   const { attributes, listeners, setNodeRef, transform, transition, active } =
     useSortable({ id });
@@ -551,7 +556,12 @@ function Tab(props: TabProps) {
           if (e.button == 0) onFocus();
         }}
       >
-        <Icon size={16} color={isActive ? "accent-selected" : "icon"} />
+        <Icon
+          size={16}
+          color={
+            isActive ? (isUnsaved ? "accent-error" : "accent-selected") : "icon"
+          }
+        />
         <Text
           variant="body"
           sx={{

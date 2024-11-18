@@ -439,6 +439,10 @@ export function Editor(props: EditorProps) {
     readonly: false,
     focusMode: false
   };
+  const autoSaveToast = useRef(true);
+  const saveSessionContentIfNotSaved = useEditorStore(
+    (store) => store.saveSessionContentIfNotSaved
+  );
   const setEditorSaveState = useEditorStore((store) => store.setSaveState);
   useScrollToBlock(session);
 
@@ -458,6 +462,20 @@ export function Editor(props: EditorProps) {
       event.unsubscribe();
     };
   }, [id]);
+
+  useEffect(() => {
+    function handle(e: Event) {
+      if (document.hidden) {
+        saveSessionContentIfNotSaved(id);
+      }
+    }
+
+    window.addEventListener("visibilitychange", handle);
+
+    return () => {
+      window.removeEventListener("visibilitychange", handle);
+    };
+  }, []);
 
   return (
     <EditorChrome {...props}>
@@ -562,6 +580,8 @@ export function Editor(props: EditorProps) {
         }}
         onAutoSaveDisabled={() => {
           setEditorSaveState(id, SaveState.NotSaved);
+          if (autoSaveToast.current === false) return;
+          autoSaveToast.current = false;
           const { hide } = showToast(
             "error",
             "Auto-save is disabled for large notes. Press Ctrl + S to save.",
@@ -575,7 +595,6 @@ export function Editor(props: EditorProps) {
             ],
             Infinity
           );
-          return;
         }}
       >
         {headless ? null : (
