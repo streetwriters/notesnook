@@ -154,7 +154,9 @@ export const Toast = ({ context = "global" }) => {
         >
           <Icon
             name={
-              toastOptions.type === "success"
+              toastOptions.icon
+                ? toastOptions.icon
+                : toastOptions.type === "success"
                 ? "check"
                 : toastOptions.type === "info"
                 ? "information"

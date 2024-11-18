@@ -2075,6 +2075,10 @@ msgstr "Editor"
 msgid "Email"
 msgstr "Email"
 
+#: src/strings.ts:2383
+msgid "Email copied"
+msgstr "Email copied"
+
 #: src/strings.ts:733
 msgid "Email is required"
 msgstr "Email is required"

@@ -77,6 +77,7 @@ import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import Clipboard from "@react-native-clipboard/clipboard";
 
 type User = any;
 
@@ -1383,7 +1384,15 @@ export const settingsGroups: SettingSection[] = [
         name: strings.emailSupport(),
         icon: "mail",
         modifer: () => {
-          Linking.openURL("mailto:support@streetwriters.co");
+          Clipboard.setString("support@streetwriters.co");
+          ToastManager.show({
+            heading: strings.emailCopied(),
+            type: "success",
+            icon: "content-copy"
+          });
+          setTimeout(() => {
+            Linking.openURL("mailto:support@streetwriters.co");
+          }, 1000);
         },
         description: strings.emailSupportDesc()
       },
