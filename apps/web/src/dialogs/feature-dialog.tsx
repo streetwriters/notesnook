@@ -93,19 +93,29 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "Full offline mode",
+            title: "5x faster startup",
             subtitle:
-              "You can now download all your attachments upfront so they are always available on your device even without an Internet connection. To enable just go to Settings > Sync and toggle Full Offline Mode."
+              "We have optimized the app startup time by 5x (3000ms to 600ms). This means you can now start taking notes faster than ever."
           },
           {
-            title: "Backup with attachments",
+            title: "Improved ToC UX",
             subtitle:
-              "You can now backup your notes alongwith all your attachments - kind of like a full account snapshot."
+              "We have made a bunch of improvements to the ToC (Table of Contents): it no longer covers the note content, and its open/closed state is preserved between app restarts."
           },
           {
-            title: "Self hosting",
+            title: "Faster checkout",
             subtitle:
-              "This release also adds initial support for changing server URLs i.e. to connect your own instance of Notesnook. Please note that this is still experimental and may not work as expected."
+              "Checkout is now 1-step. You can now directly enter your payment details and complete the purchase without any intermediate steps."
+          },
+          {
+            title: "Zoom in Editor",
+            subtitle:
+              "You can now zoom in/out of the editor using the Ctrl/Cmd + mouse wheel. This is separate from the default font size."
+          },
+          {
+            title: "Improved search",
+            subtitle:
+              "Search now defaults to AND mode instead of OR mode which better matches the expected behavior. You can still use OR if you prefer the old behavior."
           }
         ],
     cta: {
