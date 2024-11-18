@@ -46,6 +46,8 @@ export class SQLite {
     this.sqlite = require("better-sqlite3-multiple-ciphers")(
       filePath
     ).unsafeMode(true);
+    const betterTrigram = require("sqlite-better-trigram");
+    betterTrigram.load(this.sqlite);
   }
 
   /**
