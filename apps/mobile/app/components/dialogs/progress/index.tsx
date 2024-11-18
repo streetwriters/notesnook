@@ -164,7 +164,7 @@ export default function Progress() {
             />
           </View>
 
-          {data?.canHideProgress ? null : (
+          {!data?.canHideProgress ? null : (
             <Button
               title={cancelCallback.current ? "Cancel" : "Hide"}
               type="secondaryAccented"
