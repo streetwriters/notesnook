@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { useTiptap } from "@notesnook/editor";
+import { writeToClipboard } from "./clipboard";
 
 export type TipTapProps = {
   editorContainer: () => HTMLElement;
@@ -34,7 +35,10 @@ export default function TipTap(props: TipTapProps) {
       content,
       onCreate: () => {
         if (onLoad) onLoad();
-      }
+      },
+      copyToClipboard(text, html) {
+        writeToClipboard({"text/plain": text, "text/html": html});
+      },
     },
     []
   );
