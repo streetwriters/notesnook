@@ -19,9 +19,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import test from "node:test";
 import { launchApp } from "./utils.mjs";
+import assert from "assert";
 
 test("make sure app loads", async () => {
   const { app, page } = await launchApp();
+
+  await page.waitForSelector("#authForm");
+
+  assert.ok(
+    await page.getByRole("button", { name: "Create account" }).isVisible()
+  );
+
+  await page
+    .getByRole("button", { name: "Skip & go directly to the app" })
+    .click();
 
   await page.waitForSelector(".ProseMirror");
 
