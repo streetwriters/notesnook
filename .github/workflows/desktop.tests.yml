@@ -79,6 +79,14 @@ jobs:
           EXECUTABLE_PATH=output/mac/Notesnook.app/Contents/MacOS/Notesnook npm run test
         working-directory: ./apps/desktop
 
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results-macos
+          path: apps/desktop/test-results
+          retention-days: 5
+
   test-linux:
     name: Test for Linux
     needs: build

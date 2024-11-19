@@ -20,21 +20,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import test from "node:test";
 import { launchApp } from "./utils.mjs";
 import assert from "assert";
+import slugify from "slugify";
+import path from "path";
+import { mkdir } from "fs/promises";
 
-test("make sure app loads", async () => {
+test("make sure app loads", async (t) => {
   const { app, page } = await launchApp();
+  try {
+    await page.waitForSelector("#authForm");
 
-  await page.waitForSelector("#authForm");
+    assert.ok(
+      await page.getByRole("button", { name: "Create account" }).isVisible()
+    );
 
-  assert.ok(
-    await page.getByRole("button", { name: "Create account" }).isVisible()
-  );
+    await page
+      .getByRole("button", { name: "Skip & go directly to the app" })
+      .click();
 
-  await page
-    .getByRole("button", { name: "Skip & go directly to the app" })
-    .click();
-
-  await page.waitForSelector(".ProseMirror");
-
-  await app.close();
+    await page.waitForSelector(".ProseMirror");
+  } catch (e) {
+    await mkdir("test-results", { recursive: true });
+    await page.screenshot({
+      path: path.join(
+        "test-results",
+        `${slugify(t.name)}-${process.platform}-${process.arch}-error.png`
+      )
+    });
+    throw e;
+  } finally {
+    await app.close();
+  }
 });
