@@ -302,7 +302,8 @@ async function setupDatabase<Schema>(
 
 export async function initializeDatabase<Schema>(
   db: Kysely<Schema>,
-  migrationProvider: MigrationProvider
+  migrationProvider: MigrationProvider,
+  name: string
 ) {
   try {
     const migrator = new Migrator({
@@ -314,9 +315,9 @@ export async function initializeDatabase<Schema>(
       .then((m) => m.some((m) => !m.executedAt));
     if (!needsMigration) return db;
 
-    EV.publish(EVENTS.migrationStarted);
+    EV.publish(EVENTS.migrationStarted, name);
     const { error, results } = await migrator.migrateToLatest();
-    EV.publish(EVENTS.migrationFinished);
+    EV.publish(EVENTS.migrationFinished, name);
 
     if (error)
       throw error instanceof Error ? error : new Error(JSON.stringify(error));
@@ -364,7 +365,7 @@ export async function createDatabase<Schema>(
     dialect: options.dialect(name, async () => {
       await db.connection().execute(async (db) => {
         await setupDatabase(db, options);
-        await initializeDatabase(db, options.migrationProvider);
+        await initializeDatabase(db, options.migrationProvider, name);
         if (options.onInit) await options.onInit(db);
       });
     }),
@@ -373,7 +374,7 @@ export async function createDatabase<Schema>(
   if (!options.skipInitialization)
     await db.connection().execute(async (db) => {
       await setupDatabase(db, options);
-      await initializeDatabase(db, options.migrationProvider);
+      await initializeDatabase(db, options.migrationProvider, name);
       if (options.onInit) await options.onInit(db);
     });
 

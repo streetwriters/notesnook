@@ -253,7 +253,8 @@ class Database {
 
     await initializeDatabase(
       this.sql().withTables(),
-      new NNMigrationProvider()
+      new NNMigrationProvider(),
+      "notesnook"
     );
     await this.onInit(this.sql() as unknown as Kysely<RawDatabaseSchema>);
     await this.initCollections();
