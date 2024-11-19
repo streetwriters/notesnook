@@ -40,7 +40,10 @@ function escapeSQLString(str: string): string {
   }
 
   const maybeColspec =
-    str.startsWith("-") || str.endsWith(":") || str.includes("-");
+    str.includes(":") ||
+    str.includes(">") ||
+    str.includes("<") ||
+    str.includes("-");
   const isWildcard =
     str.startsWith("*") ||
     str.endsWith("*") ||
@@ -150,7 +153,20 @@ function generateSQL(ast: QueryNode): string {
   return ast.children
     .map((child) => {
       if (child.type === "phrase") {
-        return child.value.join(" AND ");
+        const result: string[] = [];
+        for (const value of child.value) {
+          if (value.length === 1 || value.length === 2) {
+            result.push(`(">${value}"`, "OR", value, "OR", `"${value}<")`);
+            result.push("AND");
+            continue;
+          }
+
+          result.push(value);
+          result.push("AND");
+        }
+        result.pop();
+        return result.join(" ");
+        // return child.value.join(" AND ");
       }
       if (child.type === "AND" || child.type === "OR" || child.type === "NOT") {
         return child.type;

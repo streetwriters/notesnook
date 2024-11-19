@@ -35,7 +35,7 @@
     "@types/ws": "^8.5.5",
     "@vitest/coverage-v8": "^1.0.1",
     "abortcontroller-polyfill": "^1.7.3",
-    "better-sqlite3-multiple-ciphers": "^9.4.0",
+    "better-sqlite3-multiple-ciphers": "^11.5.0",
     "bson-objectid": "^2.0.4",
     "dotenv": "^16.0.1",
     "event-source-polyfill": "^1.0.31",

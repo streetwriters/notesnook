@@ -37,8 +37,13 @@ test("search notes", () =>
     content: content
   }).then(async ({ db }) => {
     await db.notes.add(TEST_NOTE);
-    let filtered = await db.lookup.notes("note of the world").ids();
-    expect(filtered).toHaveLength(1);
+    await db.notes.add({
+      content: { data: "<p>hb <b>kb</b> ch</p>", type: "tiptap" },
+      title: "hello"
+    });
+
+    expect(await db.lookup.notes("note of the world").ids()).toHaveLength(1);
+    expect(await db.lookup.notes("hb kb ch").ids()).toHaveLength(1);
   }));
 
 test("search notes (remove diacritics)", () =>
