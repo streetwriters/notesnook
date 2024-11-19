@@ -63,12 +63,6 @@ if (args.variant === "mas") {
   await exec(`yarn run bundle`);
 }
 
-if (process.arch === "arm64") {
-  await exec(`npm i sqlite-better-trigram-${process.platform}-x64 --force`);
-} else if (process.arch === "x64") {
-  await exec(`npm i sqlite-better-trigram-${process.platform}-arm64 --force`);
-}
-
 await exec(`yarn run build`);
 
 if (args.run) {
