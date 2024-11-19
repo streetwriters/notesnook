@@ -579,7 +579,11 @@ export const useAppEvents = () => {
         useAttachmentStore.getState().setUploading(data);
       }),
       EV.subscribe(EVENTS.migrationStarted, (name) => {
-        if (name !== "notesnook") return;
+        if (
+          name !== "notesnook" ||
+          !SettingsService.getProperty("introCompleted")
+        )
+          return;
         startProgress({
           title: "Migrating Data",
           paragraph: "Please wait while we migrate your data",
@@ -588,7 +592,11 @@ export const useAppEvents = () => {
         });
       }),
       EV.subscribe(EVENTS.migrationFinished, (name) => {
-        if (name !== "notesnook") return;
+        if (
+          name !== "notesnook" ||
+          !SettingsService.getProperty("introCompleted")
+        )
+          return;
         endProgress();
       }),
       EV.subscribe(EVENTS.vaultLocked, async () => {
