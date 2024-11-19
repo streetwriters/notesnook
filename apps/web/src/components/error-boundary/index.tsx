@@ -33,6 +33,7 @@ import { db } from "../../common/db";
 import { createDialect } from "../../common/sqlite";
 import { getDeviceInfo } from "../../utils/platform";
 
+const IGNORED_ERRORS = ["Error in input stream", "network error"];
 export function GlobalErrorHandler(props: PropsWithChildren) {
   const { showBoundary } = useErrorBoundary();
 
@@ -45,7 +46,7 @@ export function GlobalErrorHandler(props: PropsWithChildren) {
     function handleUnhandledRejection(e: PromiseRejectionEvent) {
       if (
         e.reason instanceof TypeError &&
-        e.reason.message === "Error in input stream"
+        IGNORED_ERRORS.includes(e.reason.message)
       )
         return;
       showBoundary(e.reason);
