@@ -100,7 +100,9 @@ function RouteWrapper(props: {
   const { Component, path, routeProps } = props;
 
   useEffect(() => {
-    EV.subscribe(EVENTS.migrationStarted, () => setIsMigrating(true));
+    EV.subscribe(EVENTS.migrationStarted, (name) =>
+      setIsMigrating(name === "notesnook")
+    );
     EV.subscribe(EVENTS.migrationFinished, () => setIsMigrating(false));
     return () => {
       EV.unsubscribeAll();
