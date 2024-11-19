@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`hitting backspace at the start of first list item 1`] = `"<div><div contenteditable="true" translate="no" class="tiptap ProseMirror" tabindex="0"><p>item1</p><ul><li><p>item2</p></li></ul></div></div>"`;
+
+exports[`hitting backspace at the start of the second (or next) list item 1`] = `"<div><div contenteditable="true" translate="no" class="tiptap ProseMirror" tabindex="0"><ul><li><p>item1item2</p></li></ul></div></div>"`;
+
+exports[`hitting backspace at the start of the second (or next) paragraph inside the list item 1`] = `"<div><div contenteditable="true" translate="no" class="tiptap ProseMirror" tabindex="0"><ul><li><p>item 1item 2</p></li></ul></div></div>"`;
