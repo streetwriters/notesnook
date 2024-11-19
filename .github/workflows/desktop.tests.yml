@@ -62,12 +62,15 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=desktop
-          npx nx run release --project @notesnook/desktop
 
       - name: Install sqlite-better-trigram for all arch
         run: |
           npm i --cpu arm64 sqlite-better-trigram
           npm i --cpu x64 sqlite-better-trigram
+        working-directory: ./apps/desktop
+
+      - name: Build Electron wrapper
+        run: npx nx run release --project @notesnook/desktop
         working-directory: ./apps/desktop
 
       - name: Build app
@@ -115,12 +118,15 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=desktop
-          npx nx run release --project @notesnook/desktop
 
       - name: Install sqlite-better-trigram for all arch
         run: |
           npm i --cpu arm64 sqlite-better-trigram
           npm i --cpu x64 sqlite-better-trigram
+        working-directory: ./apps/desktop
+
+      - name: Build Electron wrapper
+        run: npx nx run release --project @notesnook/desktop
         working-directory: ./apps/desktop
 
       - name: Build app
@@ -155,12 +161,15 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=desktop
-          npx nx run release --project @notesnook/desktop
 
       - name: Install sqlite-better-trigram for all arch
         run: |
           npm i --cpu arm64 sqlite-better-trigram
           npm i --cpu x64 sqlite-better-trigram
+        working-directory: ./apps/desktop
+
+      - name: Build Electron wrapper
+        run: npx nx run release --project @notesnook/desktop
         working-directory: ./apps/desktop
 
       - name: Build app
