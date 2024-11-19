@@ -217,6 +217,7 @@ module.exports = (env) => {
             /node_modules(.*[/\\])+@tanstack[/\\]react-query/,
             /node_modules(.*[/\\])+@trpc[/\\]react-query/,
             /node_modules(.*[/\\])+katex/,
+            /node_modules(.*[/\\])+mime/,
             /node_modules(.*[/\\])+@notesnook[/\\]core/,
             /node_modules(.*[/\\])+whatwg-url-without-unicode/,
             /node_modules(.*[/\\])+whatwg-url/,

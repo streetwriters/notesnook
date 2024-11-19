@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Icons } from "@notesnook/editor/dist/esm/toolbar/icons";
+import { Icons } from "@notesnook/editor/dist/cjs/toolbar/icons";
 import { ToolbarGroupDefinition } from "@notesnook/editor";
 import {
   getAllTools,
   getDefaultPresets
-} from "@notesnook/editor/dist/esm/toolbar/tool-definitions";
+} from "@notesnook/editor/dist/cjs/toolbar/tool-definitions";
 import { ToolId } from "@notesnook/editor";
 
 export const tools = getAllTools() as any;

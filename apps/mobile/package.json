@@ -46,7 +46,6 @@
     "diffblazer": "^1.0.1",
     "react": "18.2.0",
     "react-native": "0.74.5",
-    "react-native-actions-sheet": "^0.9.7",
-    "react-native-mmkv-storage": "^0.10.2"
+    "react-native-actions-sheet": "^0.9.7"
   }
 }
