@@ -66,7 +66,7 @@
     "bundle": "esbuild electron=./src/main.ts ./src/preload.ts --external:electron --external:fsevents --external:better-sqlite3-multiple-ciphers --external:sodium-native --minify --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false --define:RELEASE=true",
     "bundle:mas": "esbuild electron=./src/main.ts ./src/preload.ts --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=true --define:RELEASE=true",
     "postinstall": "patch-package",
-    "test": "node --test"
+    "test": "node --test --test-timeout 30000 --test-force-exit"
   },
   "author": {
     "name": "Streetwriters (Private) Limited",
