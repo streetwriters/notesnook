@@ -40,6 +40,51 @@ jobs:
           name: build
           path: apps/web/build/**/*
 
+  test-macos-x64:
+    name: Test macOS x64
+    needs: build
+    runs-on: macos-13
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
+      - name: Build Electron wrapper
+        run: npx nx run release --project @notesnook/desktop
+        working-directory: ./apps/desktop
+
+      - name: Build app
+        run: |
+          yarn electron-builder --mac --dir --x64
+        working-directory: ./apps/desktop
+
+      - name: Run tests x64
+        run: |
+          EXECUTABLE_PATH=output/mac/Notesnook.app/Contents/MacOS/Notesnook npm run test
+        working-directory: ./apps/desktop
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results-macos-x64
+          path: apps/desktop/test-results
+          retention-days: 5
+
   test-macos:
     name: Test macOS
     needs: build
@@ -63,29 +108,18 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=desktop
 
-      - name: Install sqlite-better-trigram for all arch
-        run: |
-          npm i --cpu arm64 sqlite-better-trigram
-          npm i --cpu x64 sqlite-better-trigram
-        working-directory: ./apps/desktop
-
       - name: Build Electron wrapper
         run: npx nx run release --project @notesnook/desktop
         working-directory: ./apps/desktop
 
       - name: Build app
         run: |
-          yarn electron-builder --mac --dir --arm64 --x64
+          yarn electron-builder --mac --dir --arm64
         working-directory: ./apps/desktop
 
       - name: Run tests arm64
         run: |
           EXECUTABLE_PATH=output/mac-arm64/Notesnook.app/Contents/MacOS/Notesnook npm run test
-        working-directory: ./apps/desktop
-
-      - name: Run tests x64
-        run: |
-          EXECUTABLE_PATH=output/mac/Notesnook.app/Contents/MacOS/Notesnook npm run test
         working-directory: ./apps/desktop
 
       - name: Upload test results
@@ -139,6 +173,14 @@ jobs:
           EXECUTABLE_PATH=output/linux-unpacked/notesnook xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npm run test
         working-directory: ./apps/desktop
 
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results-linux
+          path: apps/desktop/test-results
+          retention-days: 5
+
   test-windows:
     name: Test for Windows
     needs: build
@@ -181,3 +223,11 @@ jobs:
         run: |
           npx cross-env EXECUTABLE_PATH=output/win-unpacked/Notesnook.exe npm run test
         working-directory: ./apps/desktop
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results-win
+          path: apps/desktop/test-results
+          retention-days: 5
