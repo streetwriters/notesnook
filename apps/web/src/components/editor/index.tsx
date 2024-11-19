@@ -71,6 +71,7 @@ import { logger } from "../../utils/logger";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
 import { strings } from "@notesnook/intl";
+import { onPageVisibilityChanged } from "../../utils/page-visibility";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
@@ -469,17 +470,12 @@ export function Editor(props: EditorProps) {
   }, [id]);
 
   useEffect(() => {
-    function handle(e: Event) {
-      if (document.hidden) {
+    const unsub = onPageVisibilityChanged((_, hidden) => {
+      if (hidden) {
         saveSessionContentIfNotSaved(id);
       }
-    }
-
-    window.addEventListener("visibilitychange", handle);
-
-    return () => {
-      window.removeEventListener("visibilitychange", handle);
-    };
+    });
+    return () => unsub();
   }, []);
 
   return (
