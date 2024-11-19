@@ -34,7 +34,7 @@ import { loadDatabase } from "./hooks/use-database";
 import AppLock from "./views/app-lock";
 import { Text } from "@theme-ui/components";
 import { EV, EVENTS } from "@notesnook/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export async function startApp() {
   const rootElement = document.getElementById("root");
@@ -98,10 +98,16 @@ function RouteWrapper(props: {
 }) {
   const [isMigrating, setIsMigrating] = useState(false);
   const { Component, path, routeProps } = props;
-  const result = usePromise(async () => {
-    EV.subscribe(EVENTS.migrationStarted, () => setIsMigrating(true), true);
-    EV.subscribe(EVENTS.migrationFinished, () => setIsMigrating(false), true);
 
+  useEffect(() => {
+    EV.subscribe(EVENTS.migrationStarted, () => setIsMigrating(true));
+    EV.subscribe(EVENTS.migrationFinished, () => setIsMigrating(false));
+    return () => {
+      EV.unsubscribeAll();
+    };
+  }, []);
+
+  const result = usePromise(async () => {
     performance.mark("load:database");
     await loadDatabase(
       path !== "/sessionexpired" || Config.get("sessionExpired", false)

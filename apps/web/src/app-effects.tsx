@@ -240,9 +240,6 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
 
   useEffect(() => {
     introduceFeatures();
-    return () => {
-      EV.unsubscribeAll();
-    };
   }, []);
 
   useEffect(() => {
