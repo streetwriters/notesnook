@@ -578,7 +578,8 @@ export const useAppEvents = () => {
       EV.subscribe(EVENTS.uploadCanceled, (data) => {
         useAttachmentStore.getState().setUploading(data);
       }),
-      EV.subscribe(EVENTS.migrationStarted, () => {
+      EV.subscribe(EVENTS.migrationStarted, (name) => {
+        if (name !== "notesnook") return;
         startProgress({
           title: "Migrating Data",
           paragraph: "Please wait while we migrate your data",
@@ -586,7 +587,8 @@ export const useAppEvents = () => {
           fillBackground: true
         });
       }),
-      EV.subscribe(EVENTS.migrationFinished, () => {
+      EV.subscribe(EVENTS.migrationFinished, (name) => {
+        if (name !== "notesnook") return;
         endProgress();
       }),
       EV.subscribe(EVENTS.vaultLocked, async () => {
