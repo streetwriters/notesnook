@@ -69,9 +69,14 @@ jobs:
           yarn electron-builder --mac --dir --arm64 --x64
         working-directory: ./apps/desktop
 
-      - name: Run tests
+      - name: Run tests arm64
         run: |
           EXECUTABLE_PATH=output/mac-arm64/Notesnook.app/Contents/MacOS/Notesnook npm run test
+        working-directory: ./apps/desktop
+
+      - name: Run tests x64
+        run: |
+          EXECUTABLE_PATH=output/mac/Notesnook.app/Contents/MacOS/Notesnook npm run test
         working-directory: ./apps/desktop
 
   test-linux:
