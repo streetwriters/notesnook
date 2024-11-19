@@ -74,7 +74,7 @@ import { strings } from "@notesnook/intl";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
-const autoSaveToast = { show: true };
+const autoSaveToast = { show: true, hide: () => {} };
 
 async function saveContent(
   noteId: string,
@@ -448,6 +448,10 @@ export function Editor(props: EditorProps) {
   useScrollToBlock(session);
 
   useEffect(() => {
+    if (!autoSaveToast.show) {
+      autoSaveToast.hide();
+    }
+
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ hash, loaded, total }: AttachmentProgress) => {
@@ -582,7 +586,6 @@ export function Editor(props: EditorProps) {
         onAutoSaveDisabled={() => {
           setEditorSaveState(id, SaveState.NotSaved);
           if (autoSaveToast.show === false) return;
-          autoSaveToast.show = false;
           const { hide } = showToast(
             "error",
             "Auto-save is disabled for large notes. Press Ctrl + S to save.",
@@ -596,6 +599,8 @@ export function Editor(props: EditorProps) {
             ],
             Infinity
           );
+          autoSaveToast.show = false;
+          autoSaveToast.hide = hide;
         }}
       >
         {headless ? null : (
