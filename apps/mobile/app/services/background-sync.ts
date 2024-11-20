@@ -30,24 +30,12 @@ import SettingsService from "./settings";
 
 async function doInBackground(callback: () => Promise<void>) {
   if (Platform.OS === "ios") {
-    try {
-      const bgTaskId = await beginBackgroundTask();
-      const result = await callback();
-      await endBackgroundTask(bgTaskId);
-      return result;
-    } catch (e) {
-      return (e as Error).message;
-    }
+    const bgTaskId = await beginBackgroundTask();
+    const result = await callback();
+    await endBackgroundTask(bgTaskId);
+    return result;
   } else {
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve) => {
-      try {
-        const result = await callback();
-        resolve(result);
-      } catch (e) {
-        resolve((e as Error).message);
-      }
-    });
+    return await callback();
   }
 }
 
