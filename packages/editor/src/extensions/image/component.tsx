@@ -266,7 +266,6 @@ export function ImageComponent(
             title={title}
             sx={{
               animation: bloburl || src ? "0.2s ease-in 0s 1 fadeIn" : "none",
-              opacity: 0,
               objectFit: "contain",
               width: editor.isEditable ? "100%" : size.width,
               height: editor.isEditable ? "100%" : size.height,
