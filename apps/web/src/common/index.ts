@@ -50,7 +50,15 @@ import { ZipFile } from "../utils/streams/zip-stream";
 export const CREATE_BUTTON_MAP = {
   notes: {
     title: strings.addItem("note"),
-    onClick: () => useEditorStore.getState().newSession()
+    onClick: () => {
+      const { sessions, newSession } = useEditorStore.getState();
+      if (sessions.some((session) => "note" in session === false)) {
+        const invalidSession = sessions.find((session) => !("note" in session));
+        useEditorStore.getState().activateSession(invalidSession?.id);
+      } else {
+        newSession();
+      }
+    }
   },
   notebooks: {
     title: strings.addItem("notebook"),
