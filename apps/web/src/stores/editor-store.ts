@@ -936,19 +936,19 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   toggleTableOfContents = (toggleState?: boolean) => {
-    this.set((state) => {
-      state.isTOCVisible =
-        toggleState !== undefined ? toggleState : !state.isTOCVisible;
-      Config.set("editor:toc", !state.isTOCVisible);
-    });
+    const { isTOCVisible } = this.get();
+    const isTOCVisibleState =
+      toggleState !== undefined ? toggleState : !isTOCVisible;
+    this.set({ isTOCVisible: isTOCVisibleState });
+    Config.set("editor:toc", isTOCVisibleState);
   };
 
   toggleEditorMargins = (toggleState?: boolean) => {
-    this.set((state) => {
-      state.editorMargins =
-        toggleState !== undefined ? toggleState : !state.editorMargins;
-      Config.set("editor:margins", state.editorMargins);
-    });
+    const { editorMargins } = this.get();
+    const editorMarginsState =
+      toggleState !== undefined ? toggleState : !editorMargins;
+    this.set({ editorMargins: editorMarginsState });
+    Config.set("editor:margins", editorMarginsState);
   };
 }
 
