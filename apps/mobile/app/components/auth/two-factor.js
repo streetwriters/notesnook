@@ -162,7 +162,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo, onCancel }) => {
             textAlign: "center"
           }}
         >
-          {strings["2faCodeHelpText"][currentMethod.method]() ||
+          {strings["2faCodeHelpText"][currentMethod.method]?.() ||
             strings.select2faCodeHelpText()}
         </Paragraph>
 
