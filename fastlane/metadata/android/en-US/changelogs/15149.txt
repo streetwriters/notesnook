@@ -1,0 +1,9 @@
+- Added full support for localization in Notesnook
+- Improved search experience
+- Allow user to cancel logging in
+- Fixed scrolling focused line into view
+- Support self hosted monograph server
+- Fixed markdown link pasting in editor
+- Many other bug fixes and improvements
+
+Thank you for using Notesnook!
