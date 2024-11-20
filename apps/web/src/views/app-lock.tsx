@@ -75,7 +75,8 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
             typeof e === "string"
               ? e
               : "message" in e && typeof e.message === "string"
-              ? e.message === "ciphertext cannot be decrypted using that key"
+              ? e.message === "ciphertext cannot be decrypted using that key" ||
+                e.message === "Could not unwrap key."
                 ? "Wrong password."
                 : e.message || "Wrong password."
               : JSON.stringify(e)

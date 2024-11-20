@@ -25,6 +25,7 @@ import {
   CredentialType,
   CredentialWithSecret,
   CredentialWithoutSecret,
+  DEFAULT_ITERATIONS,
   useKeyStore,
   wrongCredentialError
 } from "../../interfaces/key-store";
@@ -53,17 +54,16 @@ export const AppLockSettings: SettingsGroup[] = [
             type: "toggle",
             toggle: async () => {
               const { credentials } = useKeyStore.getState();
-              if (credentials.length <= 0) {
+              const defaultCredential = credentials
+                .filter((c) => c.active)
+                .at(0);
+
+              if (!defaultCredential) {
                 const verified = await verifyAccount();
                 if (!verified) return;
 
                 await registerCredential("password");
               } else {
-                const { credentials } = useKeyStore.getState();
-                const defaultCredential = credentials
-                  .filter((c) => c.active)
-                  .at(0);
-                if (!defaultCredential) return;
                 await unlockAppLock(defaultCredential);
               }
             },
@@ -309,7 +309,8 @@ async function registerCredential(type: CredentialType) {
         await register({
           type,
           id: "password",
-          salt: window.crypto.getRandomValues(new Uint8Array(16))
+          salt: window.crypto.getRandomValues(new Uint8Array(16)),
+          iterations: DEFAULT_ITERATIONS
         }).then(() =>
           activate({
             type,
