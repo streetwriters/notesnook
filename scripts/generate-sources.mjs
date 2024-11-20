@@ -52,6 +52,10 @@ const directoryTree = {
       "package.json": ["packages", "sodium", "package.json"],
       "package-lock.json": ["packages", "sodium", "package-lock.json"]
     },
+    intl: {
+      "package.json": ["packages", "intl", "package.json"],
+      "package-lock.json": ["packages", "intl", "package-lock.json"]
+    },
     crypto: {
       "package.json": ["packages", "crypto", "package.json"],
       "package-lock.json": ["packages", "crypto", "package-lock.json"]

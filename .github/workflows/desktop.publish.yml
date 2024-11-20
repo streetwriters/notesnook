@@ -84,6 +84,26 @@ jobs:
           files: ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip
           prerelease: ${{ endsWith(steps.app_metadata.outputs.app_version, '-beta') }}
 
+      - name: Generate flatpak sources
+        if: inputs.publish-github && inputs.build-linux
+        run: |
+          sudo apt-get install -y flatpak flatpak-builder pipx
+          git clone https://github.com/flatpak/flatpak-builder-tools.git /tmp/flatpak-builder-tools
+          cd /tmp/flatpak-builder-tools/node
+          pipx install .
+          cd -
+          node scripts/generate-sources.mjs
+
+      - name: Upload flatpak sources
+        uses: softprops/action-gh-release@v1
+        if: inputs.publish-github && inputs.build-linux
+        with:
+          draft: true
+          name: Notesnook Desktop v${{ steps.app_metadata.outputs.app_version }}
+          tag_name: v${{ steps.app_metadata.outputs.app_version }}
+          files: ./generated-sources.json
+          prerelease: ${{ endsWith(steps.app_metadata.outputs.app_version, '-beta') }}
+
   build-macos:
     name: Build for macOS
     needs: build
