@@ -37,6 +37,24 @@ test("create a note", async ({ page }) => {
   expect(note).toBeDefined();
 });
 
+test("note crosses MAX_AUTO_SAVEABLE_WORDS", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note = await notes.createNote({
+    title: "many words",
+    content
+  });
+
+  expect(
+    await app.toasts.waitForToast(
+      "Auto-save is disabled for large notes. Press Ctrl + S to save."
+    )
+  ).toBe(true);
+  expect(note).toBeDefined();
+});
+
 test("delete a note", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();

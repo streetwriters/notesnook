@@ -121,6 +121,13 @@ function EditorFooter() {
       ) : null}
       {SaveStateIcon && (
         <SaveStateIcon
+          data-test-id={`editor-save-state-${
+            saveState === SaveState.Saved
+              ? "saved"
+              : saveState === SaveState.NotSaved
+              ? "notsaved"
+              : "loading"
+          }`}
           size={13}
           color={
             saveState === SaveState.Saved

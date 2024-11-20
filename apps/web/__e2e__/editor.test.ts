@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { NOTE, TITLE_ONLY_NOTE } from "./utils";
+import { getTestId, NOTE, TITLE_ONLY_NOTE } from "./utils";
 
 test("focus mode", async ({ page }) => {
   const app = new AppModel(page);
@@ -82,6 +82,64 @@ test("creating a new note should clear the editor contents & title", async ({
   expect(await notes.editor.isUnloaded()).toBeTruthy();
   expect(await notes.editor.getTitle()).toBe("");
   expect(await notes.editor.getContent("text")).toBe("");
+});
+
+test("when autosave is disabled, pressing ctrl+s should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  expect(page.locator(getTestId("editor-save-state-notsaved"))).toBeVisible();
+  expect(page.locator(getTestId("editor-save-state-saved"))).not.toBeVisible();
+
+  page.keyboard.press("Control+s");
+
+  expect(
+    page.locator(getTestId("editor-save-state-notsaved"))
+  ).not.toBeVisible();
+  expect(page.locator(getTestId("editor-save-state-saved"))).toBeVisible();
+});
+
+test("when autosave is disabled, switching to another note should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note1 = await notes.createNote({
+    title: "Test note 1",
+    content
+  });
+  const note1UnsavedTestId = getTestId(
+    "note-icon-unsaved-" + (await note1?.getTitle())
+  );
+  const note1SavedTestId = getTestId(
+    "note-icon-saved-" + (await note1?.getTitle())
+  );
+
+  expect(page.locator(note1UnsavedTestId)).toBeVisible();
+  expect(page.locator(note1SavedTestId)).not.toBeVisible();
+
+  const note2 = await notes.createNote({
+    title: "Test note 2",
+    content: "f054d19e9a2f46eff7b9bb25"
+  });
+  note2?.openNote();
+  const note2SavedTestId = getTestId(
+    "note-icon-saved-" + (await note2?.getTitle())
+  );
+
+  expect(page.locator(note1UnsavedTestId)).not.toBeVisible();
+  expect(page.locator(note1SavedTestId)).toBeVisible();
+  expect(page.locator(note2SavedTestId)).toBeVisible();
 });
 
 test("creating a new title-only note should add it to the list", async ({

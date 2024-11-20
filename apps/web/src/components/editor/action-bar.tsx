@@ -557,6 +557,11 @@ function Tab(props: TabProps) {
         }}
       >
         <Icon
+          data-test-id={
+            isUnsaved
+              ? "note-icon-unsaved-" + title
+              : "note-icon-saved-" + title
+          }
           size={16}
           color={
             isActive ? (isUnsaved ? "accent-error" : "accent-selected") : "icon"
