@@ -247,7 +247,6 @@ function TipTap(props: TipTapProps) {
         if (preventSave || !editor.isEditable || !onChange) return;
 
         if (!autoSave.current) {
-          onAutoSaveDisabled();
           return;
         }
 
@@ -354,6 +353,9 @@ function TipTap(props: TipTapProps) {
       (s) => s.editors[id]?.statistics?.words.total,
       (totalWords) => {
         autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
+        if (!autoSave.current) {
+          onAutoSaveDisabled();
+        }
       }
     );
     return () => {
