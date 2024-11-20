@@ -34,6 +34,7 @@ import { EditorEvents } from "./tiptap/utils";
 import { useThemeColors } from "@notesnook/theme";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { db } from "../../common/database";
+import { i18n } from "@lingui/core";
 
 const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
   if (request.url.includes("https")) {
@@ -143,10 +144,17 @@ export function ReadonlyEditor(props: {
         ref={editorRef}
         key={"readonly-editor:" + props.editorId}
         nestedScrollEnabled
-        injectedJavaScriptBeforeContentLoaded={`globalThis.readonlyEditor=true;`}
-        injectedJavaScript="globalThis.readonlyEditor=true;"
+        injectedJavaScript={`
+        globalThis.__DEV__ = ${__DEV__}
+        globalThis.readonlyEditor=true;
+        globalThis.LINGUI_LOCALE = "${i18n.locale}";
+        globalThis.LINGUI_LOCALE_DATA = ${JSON.stringify({
+          [i18n.locale]: i18n.messages
+        })};
+        globalThis.loadApp();`}
         useSharedProcessPool={false}
         javaScriptEnabled={true}
+        webviewDebuggingEnabled={__DEV__}
         focusable={true}
         setSupportMultipleWindows={false}
         overScrollMode="never"
