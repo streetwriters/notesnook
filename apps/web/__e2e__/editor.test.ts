@@ -96,15 +96,17 @@ test("when autosave is disabled, pressing ctrl+s should save the note", async ({
     content
   });
 
-  expect(page.locator(getTestId("editor-save-state-notsaved"))).toBeVisible();
-  expect(page.locator(getTestId("editor-save-state-saved"))).not.toBeVisible();
+  await page.locator(getTestId("editor-save-state-notsaved")).waitFor();
+  await page.locator(getTestId("editor-save-state-saved")).waitFor({
+    state: "hidden"
+  });
 
   page.keyboard.press("Control+s");
 
-  expect(
-    page.locator(getTestId("editor-save-state-notsaved"))
-  ).not.toBeVisible();
-  expect(page.locator(getTestId("editor-save-state-saved"))).toBeVisible();
+  await page.locator(getTestId("editor-save-state-notsaved")).waitFor({
+    state: "hidden"
+  });
+  await page.locator(getTestId("editor-save-state-saved")).waitFor();
 });
 
 test("when autosave is disabled, switching to another note should save the note", async ({
@@ -125,21 +127,42 @@ test("when autosave is disabled, switching to another note should save the note"
     "note-icon-saved-" + (await note1?.getTitle())
   );
 
-  expect(page.locator(note1UnsavedTestId)).toBeVisible();
-  expect(page.locator(note1SavedTestId)).not.toBeVisible();
+  await page.locator(note1UnsavedTestId).waitFor();
+  await page.locator(note1SavedTestId).waitFor({ state: "hidden" });
 
   const note2 = await notes.createNote({
     title: "Test note 2",
-    content: "f054d19e9a2f46eff7b9bb25"
+    content: "Test note 2 content"
   });
   note2?.openNote();
   const note2SavedTestId = getTestId(
     "note-icon-saved-" + (await note2?.getTitle())
   );
 
-  expect(page.locator(note1UnsavedTestId)).not.toBeVisible();
-  expect(page.locator(note1SavedTestId)).toBeVisible();
-  expect(page.locator(note2SavedTestId)).toBeVisible();
+  await page.locator(note1UnsavedTestId).waitFor({ state: "hidden" });
+  await page.locator(note1SavedTestId).waitFor();
+  await page.locator(note2SavedTestId).waitFor();
+});
+
+test("when autosave is disabled, creating a new note should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  const testId = getTestId("note-icon-unsaved-" + NOTE.title);
+
+  await page.locator(testId).waitFor();
+
+  await notes.newNote();
+
+  await page.locator(testId).waitFor({ state: "hidden" });
 });
 
 test("creating a new title-only note should add it to the list", async ({
