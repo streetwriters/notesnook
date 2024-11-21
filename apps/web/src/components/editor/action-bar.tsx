@@ -612,6 +612,7 @@ function Tab(props: TabProps) {
             }
           }}
           className="closeTabButton"
+          data-test-id={"note-close-button-" + title}
           size={16}
         />
       )}
