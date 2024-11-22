@@ -1176,7 +1176,10 @@ $headline$: Use starting line of the note as title.`,
     t`NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`
   ],
   selectBackupDir: () => t`Select backup directory`,
-  selectBackupDirDesc: () => t`Choose where to save your backups`,
+  selectBackupDirDesc: (path: string) => [
+    t`Choose where to save your backups`,
+    t`Current path: ${path}`
+  ],
   noDirectorySelected: () => t`No directory selected`,
   changeBackupDir: () => t`Change backup directory`,
   backupEncryption: () => t`Backup encryption`,
