@@ -19,9 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
-//@ts-ignore
 import { useThemeColors } from "@notesnook/theme";
-import Menu from "react-native-reanimated-material-menu";
+import { Menu } from "react-native-material-menu";
 import { notesnook } from "../../../e2e/test.ids";
 import {
   HeaderRightButton,
@@ -97,14 +96,16 @@ export const RightMenus = ({
           style={{
             borderRadius: 5,
             backgroundColor: contextMenuColors.primary.background,
-            marginTop: -40
+            marginTop: 35
           }}
           onRequestClose={() => {
+            //@ts-ignore
             menuRef.current?.hide();
           }}
           anchor={
             <IconButton
               onPress={() => {
+                //@ts-ignore
                 menuRef.current?.show();
               }}
               name="dots-vertical"
@@ -116,9 +117,10 @@ export const RightMenus = ({
           {headerRightButtons.map((item) => (
             <Button
               style={{
-                width: 150,
                 justifyContent: "flex-start",
-                borderRadius: 0
+                borderRadius: 0,
+                alignSelf: "flex-start",
+                width: "100%"
               }}
               type="plain"
               buttonType={{
@@ -127,6 +129,7 @@ export const RightMenus = ({
               key={item.title}
               title={item.title}
               onPress={async () => {
+                //@ts-ignore
                 menuRef.current?.hide();
                 if (Platform.OS === "ios") await sleep(300);
                 item.onPress();

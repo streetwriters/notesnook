@@ -224,6 +224,13 @@ export default async function downloadAttachment(
   }
 
   try {
+    useAttachmentStore.getState().setDownloading({
+      groupId: options.groupId || attachment.hash,
+      current: 0,
+      total: 1,
+      filename: attachment.filename
+    });
+
     await db
       .fs()
       .downloadFile(
@@ -231,6 +238,15 @@ export default async function downloadAttachment(
         attachment.hash,
         attachment.chunkSize
       );
+
+    useAttachmentStore.getState().setDownloading({
+      groupId: options.groupId || attachment.hash,
+      current: 1,
+      total: 1,
+      filename: attachment.filename,
+      success: true
+    });
+
     if (!(await exists(attachment.hash))) {
       DatabaseLogger.log("Attachment does not exist after download.");
       return;
@@ -301,6 +317,14 @@ export default async function downloadAttachment(
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}_dcache`)
         .catch(console.log);
     }
+
+    useAttachmentStore.getState().setDownloading({
+      groupId: options.groupId || attachment.hash,
+      current: 0,
+      total: 0,
+      filename: attachment.filename,
+      success: false
+    });
     DatabaseLogger.error(e);
     useAttachmentStore.getState().remove(attachment.hash);
     if (options.throwError) {

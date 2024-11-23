@@ -26,7 +26,7 @@ import {
   Platform,
   View
 } from "react-native";
-import Menu from "react-native-reanimated-material-menu/src/Menu";
+import { Menu } from "react-native-material-menu";
 import { db } from "../../common/database";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { ToastManager } from "../../services/event-manager";
@@ -101,11 +101,14 @@ export const SelectionHeader = React.memo(
     };
 
     const deleteItem = async () => {
+      if (!type) return;
       presentDialog({
-        title: strings.doActions.delete[type](selectedItemsList.length),
-        paragraph: strings.actionConfirmations.delete[type](
-          selectedItemsList.length
-        ),
+        title: strings.doActions.delete[
+          type as keyof typeof strings.doActions.delete
+        ](selectedItemsList.length),
+        paragraph: strings.actionConfirmations.delete[
+          type as keyof typeof strings.doActions.delete
+        ](selectedItemsList.length),
         positiveText: strings.delete(),
         negativeText: strings.cancel(),
         positivePress: async () => {
@@ -218,14 +221,16 @@ export const SelectionHeader = React.memo(
               style={{
                 borderRadius: 5,
                 backgroundColor: contextMenuColors.primary.background,
-                marginTop: -20
+                marginTop: 35
               }}
               onRequestClose={() => {
+                //@ts-ignore
                 menuRef.current?.hide();
               }}
               anchor={
                 <IconButton
                   onPress={() => {
+                    //@ts-ignore
                     menuRef.current?.show();
                   }}
                   name="dots-vertical"
@@ -319,9 +324,10 @@ export const SelectionHeader = React.memo(
                 !item.visible ? null : (
                   <Button
                     style={{
-                      width: 150,
                       justifyContent: "flex-start",
-                      borderRadius: 0
+                      borderRadius: 0,
+                      alignSelf: "flex-start",
+                      width: "100%"
                     }}
                     type="plain"
                     buttonType={{
@@ -331,6 +337,7 @@ export const SelectionHeader = React.memo(
                     key={item.title}
                     title={item.title}
                     onPress={async () => {
+                      //@ts-ignore
                       menuRef.current?.hide();
                       if (Platform.OS === "ios") await sleep(300);
                       item.onPress();

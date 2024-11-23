@@ -63,9 +63,11 @@ const Actions = ({
   attachment,
   close,
   setAttachments,
-  fwdRef
+  fwdRef,
+  context
 }: {
   attachment: Attachment;
+  context: string;
   setAttachments: (attachments?: VirtualizedGrouping<Attachment>) => void;
   close?: () => void;
   fwdRef: RefObject<ActionSheetRef>;
@@ -79,7 +81,6 @@ const Actions = ({
   const [loading, setLoading] = useState<{
     name?: string;
   }>({});
-
   const actions = [
     {
       name: strings.network.download(),
@@ -88,7 +89,7 @@ const Actions = ({
           await db.fs().cancel(attachment.hash);
           useAttachmentStore.getState().remove(attachment.hash);
         }
-        downloadAttachment(attachment.hash, false);
+        downloadAttachment(attachment.hash, context === "global");
         fwdRef.current?.hide();
       },
       icon: "download"
@@ -375,6 +376,7 @@ Actions.present = (
         setAttachments={set}
         close={close}
         attachment={attachment}
+        context={context || "global"}
       />
     )
   });
