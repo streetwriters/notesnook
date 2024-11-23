@@ -13,6 +13,8 @@ RUN mv build/package.json .
 
 RUN npm install
 
+RUN npm install --include=optional sharp
+
 RUN ls
 
 CMD [ "npm", "run", "start" ]
