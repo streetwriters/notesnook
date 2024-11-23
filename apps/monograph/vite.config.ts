@@ -21,7 +21,7 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import arraybuffer from "vite-plugin-arraybuffer";
 import wasm from "vite-plugin-wasm";
-import { ThemeDark } from "@notesnook/theme";
+import ThemeDark from "@notesnook/theme/theme-engine/themes/default-dark.json" with { type: "json" };
 import type { Plugin, ResolvedConfig } from "vite";
 import { writeFile } from "fs/promises";
 import path from "path";
@@ -50,7 +50,8 @@ export default defineConfig(({ isSsrBuild }) => ({
         type: "module",
         scripts: { start: pkg.scripts.start },
         dependencies: {
-          "@remix-run/serve": pkg.devDependencies["@remix-run/serve"]
+          "@remix-run/serve": pkg.devDependencies["@remix-run/serve"],
+          "sharp": pkg.dependencies.sharp
         }
       })
     }),
@@ -79,9 +80,6 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   build: {
     target: isSsrBuild ? "node20" : undefined,
-    rollupOptions: {
-      external: ["svg2png-wasm/svg2png_wasm_bg.wasm"]
-    }
   },
   define: {
     [DEFAULT_THEME_KEY]: JSON.stringify(ThemeDark)

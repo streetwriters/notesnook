@@ -46,12 +46,12 @@ type Monograph = {
 type MonographResponse = Omit<Monograph, "content"> & { content: string };
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (!data) return [];
   const imageUrl = `${PUBLIC_URL}/api/og.png?${new URLSearchParams({
     title: data?.metadata?.title || "",
-    description: Buffer.from(
-      data?.metadata?.fullDescription || "",
-      "utf-8"
-    ).toString("base64"),
+    description: data?.metadata?.fullDescription
+      ? Buffer.from(data.metadata.fullDescription, "utf-8").toString("base64")
+      : "",
     date: data?.metadata?.datePublished || ""
   }).toString()}`;
 

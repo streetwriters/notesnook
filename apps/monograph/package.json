@@ -14,9 +14,9 @@
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
     "@emotion/server": "11.11.0",
-    "@mdi/js": "^7.4.47",
     "@lingui/core": "4.11.4",
     "@lingui/react": "4.11.4",
+    "@mdi/js": "^7.4.47",
     "@notesnook/core": "file:../../packages/core",
     "@notesnook/crypto": "file:../../packages/crypto",
     "@notesnook/editor": "file:../../packages/editor",
@@ -42,6 +42,7 @@
     "refractor": "^4.8.1",
     "remix-utils": "^7.7.0",
     "satori": "^0.11.1",
+    "sharp": "^0.33.5",
     "slugify": "^1.6.6",
     "svg2png-wasm": "^1.4.1",
     "zustand": "^4.5.5"

@@ -7,13 +7,25 @@
   "license": "GPL-3.0-or-later",
   "sideEffects": false,
   "exports": {
-    "require": {
-      "types": "./dist/types/index.d.ts",
-      "default": "./dist/cjs/index.js"
+    ".": {
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      },
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      }
     },
-    "import": {
-      "types": "./dist/types/index.d.ts",
-      "default": "./dist/esm/index.js"
+    "./*": {
+      "require": {
+        "types": "./dist/types/*",
+        "default": "./dist/cjs/*"
+      },
+      "import": {
+        "types": "./dist/types/*",
+        "default": "./dist/esm/*"
+      }
     }
   },
   "repository": {

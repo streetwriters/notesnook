@@ -19,14 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import satori from "satori";
 import { ThemeDark } from "@notesnook/theme";
-import { svg2png, initialize } from "svg2png-wasm";
-import svg2pngWasm from "svg2png-wasm/svg2png_wasm_bg.wasm?arraybuffer";
+import sharp from "sharp";
 import fontRegular from "../assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.ttf?arraybuffer";
 import fontBold from "../assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.ttf?arraybuffer";
+import { Readable } from "node:stream";
 
 export type OGMetadata = { title: string; description: string; date: string };
-
-await initialize(svg2pngWasm);
 
 export async function makeImage(metadata: OGMetadata) {
   const theme = ThemeDark.scopes.base;
@@ -38,6 +36,7 @@ export async function makeImage(metadata: OGMetadata) {
         justifyContent: "space-between",
         height: "100%",
         borderBottom: "10px solid #008837",
+        backgroundColor: theme.primary.background,
         width: "100%",
         padding: 50,
         margin: 0
@@ -141,8 +140,5 @@ export async function makeImage(metadata: OGMetadata) {
       ]
     }
   );
-
-  return await svg2png(svg, {
-    backgroundColor: "black"
-  });
+  return Readable.toWeb(sharp(Buffer.from(svg)).png()) as ReadableStream;
 }
