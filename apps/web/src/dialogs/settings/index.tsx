@@ -466,7 +466,7 @@ function SettingItem(props: { item: Setting }) {
           gap: 4
         }}
       >
-        <Flex sx={{ flexDirection: "column", flexShrink: 0 }}>
+        <Flex sx={{ flexDirection: "column", flex: 1 }}>
           <Text variant={"subtitle"}>{item.title}</Text>
           {item.description && (
             <Text
@@ -485,7 +485,8 @@ function SettingItem(props: { item: Setting }) {
             alignItems: "center",
             justifyContent: "end",
             gap: 2,
-            "& > label": { width: "auto" }
+            "& > label": { width: "auto" },
+            "& > *": { flexShrink: 0 }
           }}
         >
           {components.map((component, index) => {
