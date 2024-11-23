@@ -162,5 +162,5 @@ export async function makeImage(metadata: OGMetadata, cacheKey: string) {
   }
   console.timeEnd("satori");
 
-  return Readable.toWeb(sharp(Buffer.from(svg)).png()) as ReadableStream;
+  return sharp(Buffer.from(svg)).png().toBuffer();
 }
