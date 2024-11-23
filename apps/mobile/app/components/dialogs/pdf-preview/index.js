@@ -188,7 +188,7 @@ const PDFPreview = () => {
                 }}
                 color={colors.static.white}
               >
-                {strings.loadingWithProgress(progress.percent)}
+                {strings.loadingWithProgress(progress?.percent)}
               </Paragraph>
             </Animated.View>
           ) : (

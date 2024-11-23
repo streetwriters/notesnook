@@ -29,6 +29,7 @@ import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { useDBItem } from "../../hooks/use-db-item";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { SIZE } from "../../utils/size";
+import { strings } from "@notesnook/intl";
 
 export const AttachmentGroupProgress = (props: { groupId?: string }) => {
   const { colors } = useThemeColors();
@@ -90,11 +91,12 @@ export const AttachmentGroupProgress = (props: { groupId?: string }) => {
           }}
           numberOfLines={1}
         >
-          Downloading {file?.filename} {formatBytes(file?.size || 0)}{" "}
+          {strings.downloading()} {file?.filename}{" "}
+          {formatBytes(file?.size || 0)}{" "}
           {fileProgress?.percent ? `(${fileProgress.percent})` : ""}
         </Paragraph>
         <Paragraph size={10} color={colors.secondary.paragraph}>
-          Group: {props.groupId}
+          {strings.group()}: {props.groupId}
         </Paragraph>
       </View>
       {props.groupId === "offline-mode" ? null : (

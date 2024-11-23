@@ -1166,7 +1166,9 @@ export const settingsGroups: SettingSection[] = [
             type: "component",
             hidden: () => !useUserStore.getState().user,
             name: strings.automaticBackupsWithAttachments(),
-            description: strings.automaticBackupsWithAttachmentsDesc(),
+            description: [
+              ...strings.automaticBackupsWithAttachmentsDesc()
+            ].join("\n"),
             component: "autobackupsattachments"
           },
           {
