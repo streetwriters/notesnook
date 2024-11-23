@@ -861,9 +861,13 @@ export const useEditor = (
     state.current.currentlyEditing = true;
     state.current.movedAway = false;
 
-    if (!DDS.isTab) {
-      tabBarRef.current?.goToPage(1, false);
+    if (!state.current.editorStateRestored) {
+      state.current.isRestoringState = true;
+      if (!DDS.isTab) {
+        tabBarRef.current?.goToPage(1, false);
+      }
     }
+
     clearAppState();
     state.current.isRestoringState = false;
   }, []);
