@@ -17,13 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  forwardRef,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState
-} from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { Flex, Button } from "@theme-ui/components";
 import { Plus } from "../icons";
 import {
@@ -50,7 +44,6 @@ import {
 } from "react-virtuoso";
 import { getRandom, useResolvedItem } from "@notesnook/common";
 import { Context } from "./types";
-import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
@@ -96,49 +89,13 @@ function ListContainer(props: ListContainerProps) {
 
   const listRef = useRef<VirtuosoHandle>(null);
   const listContainerRef = useRef(null);
-  const activeItem = useRef<{ focus: boolean; id: string }>();
+  // const activeItem = useRef<{ focus: boolean; id: string }>();
 
   useEffect(() => {
     return () => {
       selectionStore.toggleSelectionMode(false);
     };
   }, []);
-
-  useLayoutEffect(() => {
-    if (activeItem.current) {
-      items
-        .ids()
-        .then(
-          (ids) =>
-            listRef.current &&
-            activeItem.current &&
-            revealItemInList(
-              listRef.current,
-              activeItem.current.id,
-              ids,
-              activeItem.current.focus
-            )
-        );
-    }
-
-    const event = AppEventManager.subscribe(
-      AppEvents.revealItemInList,
-      (id, focus) => {
-        if (activeItem.current?.id === id) return;
-        activeItem.current = { id, focus };
-        items
-          .ids()
-          .then(
-            (ids) =>
-              listRef.current &&
-              revealItemInList(listRef.current, id, ids, focus)
-          );
-      }
-    );
-    return () => {
-      event.unsubscribe();
-    };
-  }, [items]);
 
   const { onMouseUp, onKeyDown } = useKeyboardListNavigation({
     length: items.length,
@@ -441,21 +398,4 @@ export function waitForElement(
       callback(element);
     }
   });
-}
-
-function revealItemInList(
-  list: VirtuosoHandle,
-  itemId: string,
-  ids: string[],
-  focus: boolean
-) {
-  const index = ids.indexOf(itemId);
-  if (index === -1) return;
-  waitForElement(
-    list,
-    index,
-    `id_${itemId}`,
-    (element) => focus && element.focus(),
-    { align: "center" }
-  );
 }
