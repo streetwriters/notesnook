@@ -37,6 +37,7 @@ export type EditorState = {
   scrollPosition: number;
   overlay?: boolean;
   initialLoadCalled?: boolean;
+  editorStateRestored?: boolean;
 };
 
 export type Settings = {
