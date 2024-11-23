@@ -1,0 +1,19 @@
+diff --git a/node_modules/react-native-material-menu/dist/Menu.js b/node_modules/react-native-material-menu/dist/Menu.js
+index 64fbf13..c7fcee0 100644
+--- a/node_modules/react-native-material-menu/dist/Menu.js
++++ b/node_modules/react-native-material-menu/dist/Menu.js
+@@ -132,10 +132,13 @@ class Menu extends react_1.default.Component {
+         else if (left < SCREEN_INDENT) {
+             left = SCREEN_INDENT;
+         }
++        console.log(top, windowHeight - menuHeight - SCREEN_INDENT);
+         // Flip by Y axis if menu hits bottom screen border
+         if (top > windowHeight - menuHeight - SCREEN_INDENT) {
++            const diff = top - (windowHeight - menuHeight - SCREEN_INDENT);
++            const fraction = (diff / menuHeight);
+             transforms.push({
+-                translateY: react_native_1.Animated.multiply(menuSizeAnimation.y, -1),
++                translateY: react_native_1.Animated.multiply(menuSizeAnimation.y, -(fraction + 1)),
+             });
+             top = windowHeight - SCREEN_INDENT;
+             top = Math.min(windowHeight - SCREEN_INDENT, top + buttonHeight);

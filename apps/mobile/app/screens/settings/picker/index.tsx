@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
-import Menu, { MenuItem } from "react-native-reanimated-material-menu";
+import { Menu, MenuItem } from "react-native-material-menu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Dialog } from "../../../components/dialog";
 import { Pressable } from "../../../components/ui/pressable";
@@ -146,7 +146,7 @@ export function SettingsPicker<T>({
                 onChange(item);
               }
             }}
-            underlayColor={colors.primary.hover}
+            pressColor={colors.primary.hover}
             style={{
               backgroundColor: compareValue(currentValue, item)
                 ? colors.selected.background

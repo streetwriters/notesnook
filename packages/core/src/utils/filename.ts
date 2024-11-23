@@ -23,11 +23,11 @@ export async function getFileNameWithExtension(
 ): Promise<string> {
   if (!mime || mime === "application/octet-stream") return filename;
 
-  const { default: mimeDB } = await import("mime");
+  const { default: mimeDB } = await import("mime-db");
 
-  const extensions = mimeDB.getAllExtensions(mime);
+  const { extensions } = mimeDB[mime] || {};
 
-  if (!extensions || extensions.size === 0) return filename;
+  if (!extensions || extensions.length === 0) return filename;
 
   for (const ext of extensions) {
     if (filename.endsWith(ext)) return filename;

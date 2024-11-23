@@ -206,7 +206,7 @@ export const AttachmentDialog = ({
       errorOnly={currentFilter === "errors"}
       attachments={attachments}
       id={index}
-      context="global"
+      context={!isSheet ? "global" : "attachments-list"}
     />
   );
 
