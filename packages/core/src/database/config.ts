@@ -17,41 +17,47 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DatabaseAccessor, RawDatabaseSchema } from "./index.js";
+import { LazyDatabaseAccessor, RawDatabaseSchema } from "./index.js";
 
 export class ConfigStorage {
-  private readonly db: DatabaseAccessor<RawDatabaseSchema>;
-  constructor(db: DatabaseAccessor) {
-    this.db = db as unknown as DatabaseAccessor<RawDatabaseSchema>;
+  private readonly db: LazyDatabaseAccessor<RawDatabaseSchema>;
+  constructor(db: LazyDatabaseAccessor) {
+    this.db = db as unknown as LazyDatabaseAccessor<RawDatabaseSchema>;
   }
 
   async getItem(name: string): Promise<unknown | undefined> {
-    const result = await this.db()
-      .selectFrom("config")
-      .where("name", "==", name)
-      .select("value")
-      .limit(1)
-      .executeTakeFirst();
+    const result = await this.db.then((db) =>
+      db
+        .selectFrom("config")
+        .where("name", "==", name)
+        .select("value")
+        .limit(1)
+        .executeTakeFirst()
+    );
     if (!result?.value) return;
     return JSON.parse(result.value);
   }
 
   async setItem(name: string, value: unknown) {
-    await this.db()
-      .replaceInto("config")
-      .values({
-        name,
-        value: JSON.stringify(value),
-        dateModified: Date.now()
-      })
-      .execute();
+    await this.db.then((db) =>
+      db
+        .replaceInto("config")
+        .values({
+          name,
+          value: JSON.stringify(value),
+          dateModified: Date.now()
+        })
+        .execute()
+    );
   }
 
   async removeItem(name: string) {
-    await this.db().deleteFrom("config").where("name", "==", name).execute();
+    await this.db.then((db) =>
+      db.deleteFrom("config").where("name", "==", name).execute()
+    );
   }
 
   async clear() {
-    await this.db().deleteFrom("config").execute();
+    await this.db.then((db) => db.deleteFrom("config").execute());
   }
 }

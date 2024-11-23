@@ -198,6 +198,10 @@ export type DatabaseAccessor<TSchema = DatabaseSchema> = () =>
   | Kysely<TSchema>
   | Transaction<TSchema>;
 
+export type LazyDatabaseAccessor<TSchema = DatabaseSchema> = Promise<
+  Kysely<TSchema> | Transaction<TSchema>
+>;
+
 type FilterBooleanProperties<T, Type> = keyof {
   [K in keyof T as T[K] extends Type ? K : never]: T[K];
 };

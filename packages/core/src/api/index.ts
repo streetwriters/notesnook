@@ -79,6 +79,7 @@ import { Sanitizer } from "../database/sanitizer.js";
 import { createTriggers, dropTriggers } from "../database/triggers.js";
 import { NNMigrationProvider } from "../database/migrations.js";
 import { ConfigStorage } from "../database/config.js";
+import { LazyPromise } from "../utils/lazy-promise.js";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -101,6 +102,9 @@ class Database {
   sseMutex = new Mutex();
   _fs?: FileStorage;
   _compressor?: Promise<ICompressor>;
+  private databaseReady = new LazyPromise<
+    Kysely<DatabaseSchema> | Transaction<DatabaseSchema>
+  >();
 
   storage: StorageAccessor = () => {
     if (!this.options?.storage)
@@ -148,11 +152,12 @@ class Database {
     return this._sql;
   };
 
-  private _kv?: KVStorage;
-  kv: KVStorageAccessor = () => this._kv || new KVStorage(this.sql);
-  private _config?: ConfigStorage;
-  config: ConfigStorageAccessor = () =>
-    this._config || new ConfigStorage(this.sql);
+  private _kv = new KVStorage(this.databaseReady.promise);
+  kv: KVStorageAccessor = () => this._kv;
+  private _config: ConfigStorage = new ConfigStorage(
+    this.databaseReady.promise
+  );
+  config: ConfigStorageAccessor = () => this._config;
 
   private _transaction?: QueueValue<Transaction<DatabaseSchema>>;
   transaction = async (
@@ -291,6 +296,7 @@ class Database {
       migrationProvider: new NNMigrationProvider(),
       onInit: (db) => this.onInit(db)
     })) as unknown as Kysely<DatabaseSchema>;
+    this.databaseReady.resolve(this._sql);
 
     await this.sanitizer.init();
 
