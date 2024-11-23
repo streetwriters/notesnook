@@ -75,7 +75,7 @@ export default defineConfig(({ isSsrBuild }) => ({
     }
   },
   ssr: {
-    ...(process.env.NODE_ENV === "development" ? {} : { noExternal: true }),
+    ...(process.env.NODE_ENV === "development" ? {} : { noExternal: true, external: ["sharp"] }),
     target: "node"
   },
   build: {
