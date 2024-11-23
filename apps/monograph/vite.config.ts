@@ -80,6 +80,11 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   build: {
     target: isSsrBuild ? "node20" : undefined,
+    rollupOptions: {
+      external: [
+        "sharp"
+      ]
+    }
   },
   define: {
     [DEFAULT_THEME_KEY]: JSON.stringify(ThemeDark)
