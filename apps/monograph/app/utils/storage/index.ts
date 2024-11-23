@@ -32,7 +32,7 @@ export async function read<T>(key: string, fallback: T) {
   }
   const value = (await provider).read<T>(key, fallback);
   cache[key] = {
-    ttl: 5 * 60000,
+    ttl: 5 * 60 * 1000,
     value,
     cachedAt: Date.now()
   };
@@ -40,6 +40,10 @@ export async function read<T>(key: string, fallback: T) {
 }
 
 export async function write<T>(key: string, data: T) {
+  if (cache[key]) {
+    cache[key].value = data;
+    cache[key].cachedAt = Date.now();
+  }
   return (await provider).write<T>(key, data);
 }
 

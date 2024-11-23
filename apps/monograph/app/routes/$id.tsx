@@ -46,7 +46,8 @@ type Monograph = {
 type MonographResponse = Omit<Monograph, "content"> & { content: string };
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  if (!data) return [];
+  if (!data || !data.metadata || !data.monograph) return [];
+
   const imageUrl = `${PUBLIC_URL}/api/og.png?${new URLSearchParams({
     title: data?.metadata?.title || "",
     description: data?.metadata?.fullDescription

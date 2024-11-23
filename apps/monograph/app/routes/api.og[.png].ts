@@ -34,11 +34,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
   return new Response(
-    await makeImage({
-      date,
-      description,
-      title
-    }),
+    await makeImage(
+      {
+        date,
+        description,
+        title
+      },
+      url.search
+    ),
     {
       status: 200,
       headers: {
