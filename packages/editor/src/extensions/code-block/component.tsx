@@ -286,6 +286,7 @@ function LanguageSelector(props: LanguageSelectorProps) {
               key={lang.title}
               variant={"menuitem"}
               sx={{
+                flexShrink: 0,
                 textAlign: "left",
                 py: 1,
                 display: "flex",
