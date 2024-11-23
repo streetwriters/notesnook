@@ -124,9 +124,11 @@ export default function ReminderSheet({
   const referencedItem = reference ? (reference as Note) : null;
 
   const title = useRef<string | undefined>(
-    reminder?.title || referencedItem?.title
+    !reminder ? referencedItem?.title : reminder?.title
   );
-  const details = useRef<string | undefined>(reminder?.description);
+  const details = useRef<string | undefined>(
+    !reminder ? referencedItem?.headline : reminder?.description
+  );
   const titleRef = useRef<TextInput>(null);
   const timer = useRef<NodeJS.Timeout>();
 
@@ -543,7 +545,7 @@ export default function ReminderSheet({
         />
 
         {reminderMode === ReminderModes.Permanent ? null : (
-          <ScrollView
+          <RNScrollView
             style={{
               flexDirection: "row",
               marginTop: 12,
@@ -588,7 +590,7 @@ export default function ReminderSheet({
                 }}
               />
             ))}
-          </ScrollView>
+          </RNScrollView>
         )}
       </ScrollView>
 

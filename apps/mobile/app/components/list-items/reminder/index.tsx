@@ -81,7 +81,8 @@ const ReminderItem = React.memo(
           <View
             style={{
               flexDirection: "row",
-              flexWrap: "wrap"
+              flexWrap: "wrap",
+              marginTop: 5
             }}
           >
             {item.disabled ? (
@@ -149,10 +150,8 @@ const ReminderItem = React.memo(
               fontSize={SIZE.xs}
               style={{
                 justifyContent: "flex-start",
-                borderWidth: 0,
-                height: 30,
-                alignSelf: "flex-start",
-                marginTop: 5
+                height: 25,
+                alignSelf: "flex-start"
               }}
             />
           </View>

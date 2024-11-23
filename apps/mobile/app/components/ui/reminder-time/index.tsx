@@ -51,7 +51,6 @@ export const ReminderTime = ({
     <Button
       title={time}
       key={reminder.id}
-      height={20}
       icon="bell"
       fontSize={SIZE.xs}
       iconSize={SIZE.sm}
@@ -67,12 +66,10 @@ export const ReminderTime = ({
         marginRight: 0
       }}
       style={{
+        height: "auto",
         borderRadius: 5,
-        marginRight: 5,
-        borderWidth: 0.5,
         borderColor: colors.primary.border,
         paddingHorizontal: 6,
-        marginBottom: 5,
         ...(style as ViewStyle)
       }}
       {...props}
