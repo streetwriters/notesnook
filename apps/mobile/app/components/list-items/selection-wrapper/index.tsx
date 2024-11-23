@@ -70,6 +70,7 @@ const SelectionWrapper = ({
   }
 
   const onLongPress = () => {
+    if (isSheet) return;
     if (useSelectionStore.getState().selectionMode !== item.type) {
       useSelectionStore.getState().setSelectionMode(item.type);
     }
@@ -78,7 +79,7 @@ const SelectionWrapper = ({
 
   return (
     <Pressable
-      customColor={isSheet ? colors.primary.hover : "transparent"}
+      customColor={isSheet ? colors.secondary.background : "transparent"}
       testID={testID}
       onLongPress={onLongPress}
       onPress={onPress}

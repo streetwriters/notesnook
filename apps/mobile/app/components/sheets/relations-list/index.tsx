@@ -88,14 +88,14 @@ export const RelationsList = ({
         sortDirection: "desc"
       })
       .then((grouped) => {
-        setItems(grouped);
+        setTimeout(() => {
+          setItems(grouped);
+        }, 300);
       });
-  }, [relationType, referenceType, item?.id, item?.type]);
+  }, [relationType, referenceType, item?.id, item?.type, updater]);
 
   return (
-    <View
-      style={{ paddingHorizontal: 12, height: hasNoRelations ? 300 : "100%" }}
-    >
+    <View style={{ paddingHorizontal: 12, height: "100%" }}>
       <SheetProvider context="local" />
       <DialogHeader
         title={title}
