@@ -31,6 +31,7 @@ import { ProgressCircleComponent } from "../ui/svg/lazy";
 import Paragraph from "../ui/typography/paragraph";
 import Actions from "./actions";
 import { strings } from "@notesnook/intl";
+import { Pressable } from "../ui/pressable";
 
 function getFileExtension(filename: string) {
   const ext = /^.+\.([^.]+)$/.exec(filename);
@@ -69,8 +70,7 @@ export const AttachmentItem = ({
   };
 
   return errorOnly && attachment && !attachment?.failed ? null : (
-    <TouchableOpacity
-      activeOpacity={0.9}
+    <Pressable
       onPress={onPress}
       style={{
         flexDirection: "row",
@@ -186,6 +186,6 @@ export const AttachmentItem = ({
           )}
         </>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
