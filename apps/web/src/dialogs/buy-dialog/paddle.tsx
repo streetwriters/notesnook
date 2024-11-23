@@ -172,7 +172,9 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
         items: [
           {
             prices: checkout.prices.customer.items,
-            recurring: { prices: checkout.recurring_prices.customer.items }
+            recurring: {
+              prices: [checkout.recurring_prices.customer.items[0].recurring]
+            }
           }
         ]
       });

@@ -202,6 +202,8 @@ export interface CheckoutPrices {
   unit_price: CheckoutPrice;
   // line_price: CheckoutPrice;
   discounts: CheckoutDiscount[];
+
+  recurring: CheckoutPrices;
   // tax_rate: number;
 }
 

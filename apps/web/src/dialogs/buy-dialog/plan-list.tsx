@@ -74,6 +74,7 @@ export function PlansList(props: PlansListProps) {
               // }
               onClick={() => onPlanSelected(plan)}
               sx={{
+                flexShrink: 0,
                 flex: 1,
                 textAlign: "start",
                 alignItems: "center",
