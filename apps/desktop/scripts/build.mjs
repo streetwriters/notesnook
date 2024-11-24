@@ -18,19 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import path from "path";
-import fs, { readFile, writeFile } from "fs/promises";
-import { existsSync, readFileSync } from "fs";
+import fs from "fs/promises";
+import { existsSync } from "fs";
 import yargs from "yargs-parser";
 import os from "os";
 import * as childProcess from "child_process";
 import { fileURLToPath } from "url";
+import { patchBetterSQLite3 } from "./patch-better-sqlite3.mjs";
 
 const args = yargs(process.argv);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const packageJson = JSON.parse(
-  readFileSync(path.join(__dirname, "..", "package.json"), "utf-8")
-);
 
 const webAppPath = path.resolve(path.join(__dirname, "..", "..", "web"));
 
@@ -45,12 +43,6 @@ if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
 
 // temporary until there's support for prebuilt binaries for linux ARM
 if (os.platform() === "linux") await patchBetterSQLite3();
-
-// if (os.platform() === "win32")
-//   await exec(
-//     `npx prebuildify --arch=arm64 --strip -t electron@${packageJson.devDependencies.electron}`,
-//     path.join(__dirname, "..", "node_modules", "sodium-native")
-//   );
 
 await fs.cp(path.join(webAppPath, "build"), "build", {
   recursive: true,
@@ -82,22 +74,4 @@ async function exec(cmd, cwd) {
     stdio: "inherit",
     cwd: cwd || process.cwd()
   });
-}
-
-async function patchBetterSQLite3() {
-  const jsonPath = path.join(
-    __dirname,
-    "..",
-    "node_modules",
-    "better-sqlite3-multiple-ciphers",
-    "package.json"
-  );
-  const json = JSON.parse(await readFile(jsonPath, "utf-8"));
-
-  json.version = "11.5.1";
-  json.homepage = "https://github.com/thecodrr/better-sqlite3-multiple-ciphers";
-  json.repository.url =
-    "git://github.com/thecodrr/better-sqlite3-multiple-ciphers.git";
-
-  await writeFile(jsonPath, JSON.stringify(json));
 }
