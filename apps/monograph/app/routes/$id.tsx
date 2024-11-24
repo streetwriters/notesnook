@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Cipher } from "@notesnook/crypto";
-import { convert } from "html-to-text";
 import { Flex, Text } from "@theme-ui/components";
 import { useLoaderData } from "@remix-run/react";
 import { MonographPage } from "../components/monographpost";
@@ -89,7 +88,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
       metadata
     };
   } catch (e) {
-    console.error(e);
+    // console.error(e);
     return {
       monograph: null,
       metadata: {
@@ -135,21 +134,27 @@ export default function MonographPost() {
   );
 }
 
-const extractParagraph = (html: string) => {
-  if (!html) return "";
-  return convert(html, {
-    wordwrap: false,
-    preserveNewlines: false,
-    decodeEntities: true
-  });
-};
-
 type Metadata = {
   title: string;
   fullDescription: string;
   shortDescription: string;
   datePublished: string;
 };
+
+function extractFirstWords(html: string, numWords = 30): string {
+  // Strip HTML tags and normalize whitespace
+  const plainText = html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // Split into words and take first N
+  const words = plainText.split(" ").slice(0, numWords);
+
+  // Add ellipsis if text was truncated
+  const excerpt = words.join(" ");
+  return words.length < plainText.split(" ").length ? excerpt + "..." : excerpt;
+}
 
 function trimDescription(
   str: string,
@@ -175,12 +180,12 @@ function addPeriod(str: string) {
   return str + "...";
 }
 
-function getMonographMetadata(monograph?: Monograph): Metadata {
+function getMonographMetadata(monograph: Monograph): Metadata {
   const title = monograph?.title || "Not found";
   const text = monograph?.encryptedContent
     ? "This monograph is encrypted. Enter password to view contents."
     : monograph?.content
-    ? extractParagraph(monograph?.content.data)
+    ? extractFirstWords(monograph?.content.data, 100)
     : "";
   const shortDescription = trimDescription(text, 150, true);
   const fullDescription = trimDescription(text, 300, true);

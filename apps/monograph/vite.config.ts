@@ -20,11 +20,11 @@ import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import arraybuffer from "vite-plugin-arraybuffer";
-import wasm from "vite-plugin-wasm";
-import ThemeDark from "@notesnook/theme/theme-engine/themes/default-dark.json" with { type: "json" };
+import ThemeDark from "@notesnook/theme/theme-engine/themes/default-dark.json" with {type:"json"};
 import type { Plugin, ResolvedConfig } from "vite";
 import { writeFile } from "fs/promises";
 import path from "path";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 import * as pkg from "./package.json";
 
 const DEDUPE = [
@@ -44,18 +44,18 @@ const DEFAULT_THEME_KEY =
 export default defineConfig(({ isSsrBuild }) => ({
   plugins: [
     writePlugin({
-      "package.json": JSON.stringify({
+      "../package.json": JSON.stringify({
         name: pkg.name,
         version: pkg.version,
         type: "module",
         scripts: { start: pkg.scripts.start },
         dependencies: {
-          "@remix-run/serve": pkg.devDependencies["@remix-run/serve"],
-          "sharp": pkg.dependencies.sharp
-        }
+          "@napi-rs/canvas": pkg.dependencies["@napi-rs/canvas"]
+        },
       })
     }),
     remix({
+      buildDirectory: "output/build",
       future: {
         v3_fetcherPersist: true,
         v3_relativeSplatPath: true,
@@ -64,7 +64,12 @@ export default defineConfig(({ isSsrBuild }) => ({
     }),
     tsconfigPaths(),
     arraybuffer(),
-    wasm()
+    isSsrBuild ?  viteStaticCopy({
+      targets: [
+        { src: "./server.ts", dest: "../../" },
+        { src: "./app/assets", dest: "../" }
+      ]
+    }) : undefined
   ],
   worker: {
     format: "es",
@@ -75,15 +80,15 @@ export default defineConfig(({ isSsrBuild }) => ({
     }
   },
   ssr: {
-    ...(process.env.NODE_ENV === "development" ? {} : { noExternal: true, external: ["sharp"] }),
+    ...(process.env.NODE_ENV === "development"
+      ? {}
+      : { noExternal: true, external: ["@napi-rs/canvas"] }),
     target: "node"
   },
   build: {
     target: isSsrBuild ? "node20" : undefined,
     rollupOptions: {
-      external: [
-        "sharp"
-      ]
+      external: ["@napi-rs/canvas"]
     }
   },
   define: {

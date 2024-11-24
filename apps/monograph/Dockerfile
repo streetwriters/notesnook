@@ -1,20 +1,14 @@
 
-FROM --platform=$BUILDPLATFORM node:20-alpine
+FROM --platform=$BUILDPLATFORM oven/bun:1.1.36-alpine
 
-RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
+RUN mkdir -p /home/bun/app && chown -R bun:bun /home/bun/app
 
-WORKDIR /home/node/app
+WORKDIR /home/bun/app
 
-USER node
+USER bun
 
-COPY --chown=node:node build ./build
+COPY --chown=bun:bun output .
 
-RUN mv build/package.json .
+RUN bun install
 
-RUN npm install
-
-RUN npm install --include=optional sharp
-
-RUN ls
-
-CMD [ "npm", "run", "start" ]
+CMD [ "bun", "run", "start" ]

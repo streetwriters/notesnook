@@ -28,11 +28,11 @@ const cache: Record<
 export async function read<T>(key: string, fallback: T) {
   const cached = cache[key];
   if (cached && cached.ttl > Date.now() - cached.cachedAt) {
-    return cached.value;
+    return cached.value as T;
   }
   const value = (await provider).read<T>(key, fallback);
   cache[key] = {
-    ttl: 5 * 60 * 1000,
+    ttl: 60 * 60 * 1000,
     value,
     cachedAt: Date.now()
   };

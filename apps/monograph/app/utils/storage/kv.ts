@@ -40,7 +40,7 @@ export async function read<T>(key: string, fallback: T): Promise<T> {
       key
     });
     if (typeof response === "object" && !response.success) {
-      console.error("failed:", response.errors);
+      // console.error("failed:", response.errors);
       return fallback;
     }
     return (
@@ -48,7 +48,7 @@ export async function read<T>(key: string, fallback: T): Promise<T> {
       fallback
     );
   } catch (e) {
-    console.error(e);
+    // console.error(e);
     return fallback;
   }
 }

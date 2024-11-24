@@ -74,7 +74,7 @@ export async function isSpam(monograph: Monograph) {
     }
     return isSpam;
   } catch (e) {
-    console.error(e);
+    // console.error(e);
     return false;
   }
 }
