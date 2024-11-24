@@ -60,7 +60,7 @@ export default function handleRequest(
   const styles = constructStyleTagsFromChunks(extractCriticalToChunks(body));
   const html = `<!DOCTYPE html><html><head><!--start head-->${head}${styles}<!--end head--></head><body><div id="root">${body}</div></body></html>`;
 
-  responseHeaders.set("Content-Type", "text/html");
+  responseHeaders.set("Content-Type", "text/html; charset=utf-8");
 
   return new Response(html, {
     status: responseStatusCode,
