@@ -49,6 +49,7 @@
   "devDependencies": {
     "@remix-run/dev": "^2.12.1",
     "@remix-run/serve": "^2.12.1",
+    "@remix-run/server-runtime": "^2.15.0",
     "@types/bun": "^1.1.13",
     "@types/html-to-text": "^9.0.4",
     "@types/react": "^18.3.9",

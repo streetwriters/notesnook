@@ -50,7 +50,8 @@ export default defineConfig(({ isSsrBuild }) => ({
         type: "module",
         scripts: { start: pkg.scripts.start },
         dependencies: {
-          "@napi-rs/canvas": pkg.dependencies["@napi-rs/canvas"]
+          "@napi-rs/canvas": pkg.dependencies["@napi-rs/canvas"],
+          "@remix-run/server-runtime": pkg.devDependencies["@remix-run/server-runtime"],
         },
       })
     }),
