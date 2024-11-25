@@ -76,7 +76,10 @@ export class WaSqliteWorkerMultipleTabDriver implements Driver {
           activated: true,
           closed: false
         });
-        this.connection = new WaSqliteWorkerConnection(service.proxy);
+        this.connection = new WaSqliteWorkerConnection(
+          service.proxy,
+          this.config.async
+        );
       }
       return;
     }
@@ -122,7 +125,10 @@ export class WaSqliteWorkerMultipleTabDriver implements Driver {
     await service.getProviderPort();
     console.timeEnd("waiting for provider port");
 
-    this.connection = new WaSqliteWorkerConnection(service.proxy);
+    this.connection = new WaSqliteWorkerConnection(
+      service.proxy,
+      this.config.async
+    );
 
     servicePool.set(this.serviceName, {
       service,
@@ -202,12 +208,22 @@ export class WaSqliteWorkerMultipleTabDriver implements Driver {
   async delete() {
     const service = servicePool.get(this.serviceName);
     if (!service || !service.service) return;
-    await service.service?.proxy?.delete();
+    await service.service?.proxy?.delete(this.config.dbName, {
+      async: this.config.async,
+      encrypted: this.config.encrypted,
+      url: this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
+    });
     service.closed = true;
   }
 
   async export() {
-    return servicePool.get(this.serviceName)?.service?.proxy?.export();
+    return servicePool
+      .get(this.serviceName)
+      ?.service?.proxy?.export(this.config.dbName, {
+        async: this.config.async,
+        encrypted: this.config.encrypted,
+        url: this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
+      });
   }
 }
 
@@ -228,7 +244,10 @@ export class WaSqliteWorkerSingleTabDriver implements Driver {
       encrypted: this.config.encrypted,
       url: this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
     });
-    this.connection = new WaSqliteWorkerConnection(this.worker);
+    this.connection = new WaSqliteWorkerConnection(
+      this.worker,
+      this.config.async
+    );
   }
 
   async acquireConnection(): Promise<DatabaseConnection> {
@@ -262,22 +281,45 @@ export class WaSqliteWorkerSingleTabDriver implements Driver {
   }
 
   async delete() {
-    await this.worker.delete();
+    await this.worker.delete(this.config.dbName, {
+      async: this.config.async,
+      encrypted: this.config.encrypted,
+      url: this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
+    });
   }
 
   async export() {
-    return await this.worker.export();
+    return await this.worker.export(this.config.dbName, {
+      async: this.config.async,
+      encrypted: this.config.encrypted,
+      url: this.config.async ? SQLiteAsyncURI : SQLiteSyncURI
+    });
   }
 }
 
 class WaSqliteWorkerConnection implements DatabaseConnection {
-  constructor(private readonly worker: SQLiteWorker | Remote<SQLiteWorker>) {}
+  #queryMutex = new Mutex();
+  constructor(
+    private readonly worker: SQLiteWorker | Remote<SQLiteWorker>,
+    private readonly sequential = false
+  ) {}
 
   streamQuery<R>(): AsyncIterableIterator<QueryResult<R>> {
     throw new Error("wasqlite driver doesn't support streaming");
   }
 
   async executeQuery<R>(
+    compiledQuery: CompiledQuery<unknown>
+  ): Promise<QueryResult<R>> {
+    if (this.sequential) {
+      return this.#queryMutex.runExclusive(async () =>
+        this.#_executeQuery(compiledQuery)
+      );
+    }
+    return this.#_executeQuery(compiledQuery);
+  }
+
+  #_executeQuery<R>(
     compiledQuery: CompiledQuery<unknown>
   ): Promise<QueryResult<R>> {
     const { parameters, sql, query } = compiledQuery;

@@ -118,7 +118,7 @@ class _SQLiteWorker {
       } else this.retryCounter[sql] = 0;
 
       if (ex instanceof Error || ex instanceof SQLiteError)
-        ex.message += ` (query: ${sql})`;
+        ex.message += ` (error preparing query: ${sql})`;
       throw ex;
     }
   }
@@ -146,7 +146,7 @@ class _SQLiteWorker {
       return rows;
     } catch (e) {
       if (e instanceof Error || e instanceof SQLiteError)
-        e.message += ` (query: ${sql})`;
+        e.message += ` (error exec query: ${sql})`;
       throw e;
     } finally {
       await this.sqlite
@@ -201,16 +201,16 @@ class _SQLiteWorker {
     this.initialized = false;
   }
 
-  async export() {
-    const vfs = await this.getVFS(this.name, this.async);
-    const stream = new ReadableStream(new DatabaseSource(vfs, this.name));
+  async export(name: string, options: SQLiteOptions) {
+    const vfs = await this.getVFS(name, options.async);
+    const stream = new ReadableStream(new DatabaseSource(vfs, name));
     return transfer(stream, [stream]);
   }
 
-  async delete() {
+  async delete(name: string, options: SQLiteOptions) {
     await this.close();
     if (this.vfs) await this.vfs.delete();
-    else await (await this.getVFS(this.name, this.async)).delete();
+    else await (await this.getVFS(name, options.async)).delete();
   }
 
   async getVFS(dbName: string, async: boolean) {
