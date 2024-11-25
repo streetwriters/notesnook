@@ -28,6 +28,9 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { desktop } from "../../common/desktop-bridge";
 import { PATHS } from "@notesnook/desktop";
 
+const getDesktopBackupsDirectoryPath = () =>
+  useSettingStore.getState().backupStorageLocation || PATHS.backupsDirectory;
+
 export const BackupExportSettings: SettingsGroup[] = [
   {
     key: "backup",
@@ -164,7 +167,10 @@ export const BackupExportSettings: SettingsGroup[] = [
       {
         key: "backup-directory",
         title: strings.selectBackupDir(),
-        description: strings.selectBackupDirDesc(),
+        description: () =>
+          strings
+            .selectBackupDirDesc(getDesktopBackupsDirectoryPath())
+            .join("\n\n"),
         isHidden: () => !IS_DESKTOP_APP,
         components: [
           {
@@ -176,9 +182,7 @@ export const BackupExportSettings: SettingsGroup[] = [
                 (await verifyAccount());
               if (!verified) return;
 
-              const backupStorageLocation =
-                useSettingStore.getState().backupStorageLocation ||
-                PATHS.backupsDirectory;
+              const backupStorageLocation = getDesktopBackupsDirectoryPath();
               const location = await desktop?.integration.selectDirectory.query(
                 {
                   title: strings.selectBackupDir(),
