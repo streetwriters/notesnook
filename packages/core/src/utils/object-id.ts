@@ -19,8 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const MACHINE_ID = Math.floor(Math.random() * 0xffffff);
 const pid = Math.floor(Math.random() * 100000) % 0xffff;
+
+let machineIdStr = MACHINE_ID.toString(16);
+if (machineIdStr.length !== 6) machineIdStr = machineIdStr.padStart(6, "0");
+let pidStr =  pid.toString(16);
+if (pidStr.length !== 4) pidStr = pidStr.padStart(4, "0");
+
+const PROCESS_UNIQUE = machineIdStr + pidStr;
+
 let index = Math.floor(Math.random() * 0xffffff);
-const PROCESS_UNIQUE = MACHINE_ID.toString(16) + pid.toString(16);
+
 export function createObjectId(date = Date.now()): string {
   index++;
   const time = Math.floor(date / 1000);
