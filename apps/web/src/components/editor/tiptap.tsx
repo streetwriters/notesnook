@@ -449,6 +449,8 @@ function TiptapWrapper(
 
     const handleWheel = (e: WheelEvent) => {
       if (e.ctrlKey) {
+        if (e.deltaY === 0) return;
+
         e.preventDefault();
         const delta =
           (e.deltaY > 0 && e.deltaY < 10) || (e.deltaY > -10 && e.deltaY < 0)
