@@ -453,7 +453,9 @@ function TiptapWrapper(
         const delta =
           (e.deltaY > 0 && e.deltaY < 10) || (e.deltaY > -10 && e.deltaY < 0)
             ? -e.deltaY
-            : Math.ceil(-e.deltaY / 10 / EDITOR_ZOOM.STEP) * EDITOR_ZOOM.STEP;
+            : e.deltaY > 0
+            ? -EDITOR_ZOOM.STEP
+            : EDITOR_ZOOM.STEP;
         const zoom = Math.min(
           EDITOR_ZOOM.MAX,
           Math.max(EDITOR_ZOOM.MIN, editorConfig.zoom + delta)
