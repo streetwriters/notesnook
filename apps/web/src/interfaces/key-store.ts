@@ -371,8 +371,8 @@ class KeyStore extends BaseStore<KeyStore> {
   };
 
   clear = async () => {
-    await this.#metadataStore.clear();
-    await this.#secretStore.clear();
+    await this.#metadataStore?.clear();
+    await this.#secretStore?.clear();
     this.#key = undefined;
     this.set({ credentials: [], secrets: {}, isLocked: false });
   };
