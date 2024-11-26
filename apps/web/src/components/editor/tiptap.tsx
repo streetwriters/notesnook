@@ -246,9 +246,7 @@ function TipTap(props: TipTapProps) {
         const ignoreEdit = transaction.getMeta("ignoreEdit") as boolean;
         if (preventSave || !editor.isEditable || !onChange) return;
 
-        if (!autoSave.current) {
-          return;
-        }
+        if (!autoSave.current) return;
 
         onChange(
           () => getHTMLFromFragment(editor.state.doc.content, editor.schema),

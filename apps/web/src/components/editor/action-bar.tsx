@@ -558,9 +558,7 @@ function Tab(props: TabProps) {
       >
         <Icon
           data-test-id={
-            isUnsaved
-              ? "note-icon-unsaved-" + title
-              : "note-icon-saved-" + title
+            isUnsaved ? "tab-icon-unsaved-" + id : "tab-icon-saved-" + id
           }
           size={16}
           color={
@@ -612,7 +610,7 @@ function Tab(props: TabProps) {
             }
           }}
           className="closeTabButton"
-          data-test-id={"note-close-button-" + title}
+          data-test-id={"tab-close-button-" + id}
           size={16}
         />
       )}
