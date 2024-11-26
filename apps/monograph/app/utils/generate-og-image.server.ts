@@ -23,31 +23,55 @@ import { ThemeDark } from "@notesnook/theme";
 import path from "path";
 import { fileURLToPath } from "url";
 import { split } from "canvas-hypertxt";
+import { readFile } from "fs/promises";
 
 export type OGMetadata = { title: string; description: string; date: string };
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const ROOT = path.join(__dirname, "../../");
+
+const fontMap = JSON.parse(
+  await readFile(path.join(ROOT, "fonts", "fonts.json"), "utf-8")
+);
 
 // Register fonts
 const OpenSans = path.join(
   __dirname,
-  import.meta.env.DEV
-    ? "../assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.ttf"
-    : "../../assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.ttf"
+  import.meta.env.DEV ? "../assets/fonts/" : "../../assets/fonts/",
+  "open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-regular.ttf"
 );
 const OpenSansBold = path.join(
   __dirname,
-  import.meta.env.DEV
-    ? "../assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.ttf"
-    : "../../assets/fonts/open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.ttf"
+  import.meta.env.DEV ? "../assets/fonts/" : "../../assets/fonts/",
+  "open-sans-v34-vietnamese_latin-ext_latin_hebrew_greek-ext_greek_cyrillic-ext_cyrillic-600.ttf"
 );
 
 console.log("OpenSans", GlobalFonts.registerFromPath(OpenSans, "OpenSans"));
 console.log(
+  "registering",
   "OpenSansBold",
   GlobalFonts.registerFromPath(OpenSansBold, "OpenSansBold")
 );
+
+const fontFamilies = {
+  regular: ["OpenSans"],
+  bold: ["OpenSansBold"]
+};
+for (const font of fontMap) {
+  const id = (font.name + font.weight).replace(/ /g, "");
+  const result = GlobalFonts.registerFromPath(
+    path.resolve(ROOT, font.path),
+    id
+  );
+  if (!result)
+    throw new Error(
+      `Failed to register font: ${id} at ${path.resolve(ROOT, font.path)}`
+    );
+  if (font.weight === "600") fontFamilies.bold.push(id);
+  else fontFamilies.regular.push(id);
+  console.log("registering", id, result);
+}
 
 const cache = new LRUCache<string, Buffer>({
   ttl: 1000 * 60 * 60 * 24,
@@ -63,6 +87,9 @@ const logo = loadImage(
     ? path.resolve(__dirname, "../../public/logo.svg")
     : path.resolve(__dirname, "../../client/logo.svg")
 );
+
+const boldFontFamily = fontFamilies.bold.join(",");
+const regularFontFamily = fontFamilies.regular.join(",");
 
 export async function makeImage(metadata: OGMetadata, cacheKey: string) {
   if (cache.has(cacheKey)) {
@@ -106,12 +133,12 @@ export async function makeImage(metadata: OGMetadata, cacheKey: string) {
 
   // Draw title
   ctx.fillStyle = theme.primary.heading;
-  ctx.font = "600 64px OpenSansBold";
+  ctx.font = `600 64px ${boldFontFamily}`;
   let y = PADDING + 105;
   const titleLines = split(
     ctx as any,
     metadata.title,
-    "600 64px OpenSansBold",
+    `600 64px ${boldFontFamily}`,
     WIDTH - PADDING * 2,
     true
   );
@@ -122,7 +149,7 @@ export async function makeImage(metadata: OGMetadata, cacheKey: string) {
 
   // Draw description
   ctx.fillStyle = theme.primary.paragraph;
-  ctx.font = "30px OpenSans";
+  ctx.font = `30px ${regularFontFamily}`;
   const description = Buffer.from(
     metadata.description || "",
     "base64"
@@ -130,7 +157,7 @@ export async function makeImage(metadata: OGMetadata, cacheKey: string) {
   const descLines = split(
     ctx as any,
     description,
-    "30px OpenSans",
+    `30px ${regularFontFamily}`,
     WIDTH - PADDING * 2,
     true
   ).slice(0, 4);

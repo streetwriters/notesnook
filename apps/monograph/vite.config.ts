@@ -68,7 +68,8 @@ export default defineConfig(({ isSsrBuild }) => ({
     isSsrBuild ?  viteStaticCopy({
       targets: [
         { src: "./server.ts", dest: "../../" },
-        { src: "./app/assets", dest: "../" }
+        { src: "./app/assets", dest: "../" },
+        { src: "./fonts", dest: "../" }
       ]
     }) : undefined
   ],
