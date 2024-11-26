@@ -875,6 +875,7 @@ class EditorStore extends BaseStore<EditorStore> {
     const session = state.sessions.find((session) => session.type === "new");
     if (session) {
       this.activateSession(session?.id);
+      session.context = useNoteStore.getState().context;
     } else {
       this.addSession({
         type: "new",
