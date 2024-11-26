@@ -73,6 +73,11 @@ function generateTableOfContents() {
   let currentHeading = 0;
 
   for (const heading of headings) {
+    const isCalloutHeading = heading.closest(".callout");
+    if (isCalloutHeading) {
+      continue;
+    }
+
     const text = heading.textContent || "<empty>";
     const nodeName = heading.nodeName;
     const headingLevel = levelsMap[nodeName];
