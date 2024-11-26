@@ -33,6 +33,8 @@ export class EditorModel {
   private readonly wordCountText: Locator;
   private readonly dateEditedText: Locator;
   private readonly searchButton: Locator;
+  private readonly editorSavedIcon: Locator;
+  private readonly editorNotSavedIcon: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -51,6 +53,10 @@ export class EditorModel {
     this.wordCountText = page.locator(getTestId("editor-word-count"));
     this.dateEditedText = page.locator(getTestId("editor-date-edited"));
     this.searchButton = page.locator(getTestId("Search"));
+    this.editorSavedIcon = page.locator(getTestId("editor-save-state-saved"));
+    this.editorNotSavedIcon = page.locator(
+      getTestId("editor-save-state-notsaved")
+    );
   }
 
   async waitForLoading(title?: string, content?: string) {
@@ -226,5 +232,15 @@ export class EditorModel {
         .toString()
         .replace(" words", "")
     );
+  }
+
+  async isEditorSaved() {
+    await this.editorNotSavedIcon.waitFor({ state: "hidden" });
+    await this.editorSavedIcon.waitFor();
+  }
+
+  async isEditorUnsaved() {
+    await this.editorNotSavedIcon.waitFor();
+    await this.editorSavedIcon.waitFor({ state: "hidden" });
   }
 }

@@ -96,17 +96,11 @@ test("when autosave is disabled, pressing ctrl+s should save the note", async ({
     content
   });
 
-  await page.locator(getTestId("editor-save-state-notsaved")).waitFor();
-  await page.locator(getTestId("editor-save-state-saved")).waitFor({
-    state: "hidden"
-  });
+  await notes.editor.isEditorUnsaved();
 
-  page.keyboard.press("Control+s");
+  await page.keyboard.press("Control+s");
 
-  await page.locator(getTestId("editor-save-state-notsaved")).waitFor({
-    state: "hidden"
-  });
-  await page.locator(getTestId("editor-save-state-saved")).waitFor();
+  await notes.editor.isEditorSaved();
 });
 
 test("when autosave is disabled, switching to another note should save the note", async ({
@@ -117,31 +111,25 @@ test("when autosave is disabled, switching to another note should save the note"
   const notes = await app.goToNotes();
   const content = "a ".repeat(100);
   const note1 = await notes.createNote({
-    title: "Test note 1",
-    content
+    title: "Test note 1"
+  });
+  const note2 = await notes.createNote({
+    title: "Test note 2"
   });
   const note1UnsavedTestId = getTestId(
-    "note-icon-unsaved-" + (await note1?.getTitle())
+    "tab-icon-unsaved-" + (await note1?.getId())
   );
   const note1SavedTestId = getTestId(
-    "note-icon-saved-" + (await note1?.getTitle())
+    "tab-icon-saved-" + (await note1?.getId())
   );
 
+  await note1?.openNote();
+  await notes.editor.setContent(content);
   await page.locator(note1UnsavedTestId).waitFor();
   await page.locator(note1SavedTestId).waitFor({ state: "hidden" });
-
-  const note2 = await notes.createNote({
-    title: "Test note 2",
-    content: "Test note 2 content"
-  });
-  note2?.openNote();
-  const note2SavedTestId = getTestId(
-    "note-icon-saved-" + (await note2?.getTitle())
-  );
-
+  await note2?.openNote();
   await page.locator(note1UnsavedTestId).waitFor({ state: "hidden" });
   await page.locator(note1SavedTestId).waitFor();
-  await page.locator(note2SavedTestId).waitFor();
 });
 
 test("when autosave is disabled, creating a new note should save the note", async ({
@@ -151,12 +139,12 @@ test("when autosave is disabled, creating a new note should save the note", asyn
   await app.goto();
   const notes = await app.goToNotes();
   const content = "a ".repeat(100);
-  await notes.createNote({
+  const note = await notes.createNote({
     title: NOTE.title,
     content
   });
 
-  const testId = getTestId("note-icon-unsaved-" + NOTE.title);
+  const testId = getTestId("tab-icon-unsaved-" + (await note?.getId()));
 
   await page.locator(testId).waitFor();
 

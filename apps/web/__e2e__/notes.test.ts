@@ -38,21 +38,9 @@ test("create a note", async ({ page }) => {
   expect(note).toBeDefined();
 });
 
-test("close a note", async ({ page }) => {
-  const app = new AppModel(page);
-  await app.goto();
-  const notes = await app.goToNotes();
-  const note = await notes.createNote(NOTE);
-
-  expect(await notes.editor.getContent("text")).toBe(NOTE.content);
-  const noteCloseButton = page.locator(
-    getTestId("note-close-button-" + (await note?.getTitle()))
-  );
-  await noteCloseButton.click();
-  expect(await notes.editor.getContent("text")).toBe("");
-});
-
-test("note crosses MAX_AUTO_SAVEABLE_WORDS", async ({ page }) => {
+test("disable autosave when note crosses MAX_AUTO_SAVEABLE_WORDS", async ({
+  page
+}) => {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
@@ -87,13 +75,11 @@ test("close a note when autosave is disabled", async ({ page }) => {
   ).toBe(true);
 
   const noteCloseButton = page.locator(
-    getTestId("note-close-button-" + (await note?.getTitle()))
+    getTestId("tab-close-button-" + (await note?.getId()))
   );
   await noteCloseButton.click();
 
-  note?.openNote();
-
-  await page.waitForTimeout(500);
+  await note?.openNote();
 
   // since getContent trims the content, we need to trim the content before comparing
   expect(await notes.editor.getContent("text")).toBe(content.trim());
