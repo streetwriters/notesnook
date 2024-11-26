@@ -38,6 +38,7 @@ import { Footer } from "../components/footer";
 import { Header } from "../components/header";
 import { ForwardRef } from "@theme-ui/components/dist/declarations/src/types";
 import { PUBLIC_URL } from "../utils/env";
+import { useLoaderData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return generateMetaDescriptors({
@@ -50,6 +51,10 @@ export const meta: MetaFunction = () => {
       "Anonymous, secure and encrypted note sharing with password protection."
   });
 };
+
+export async function loader() {
+  return { publicUrl: PUBLIC_URL };
+}
 
 const ButtonLink = Button as ForwardRef<
   HTMLButtonElement,
@@ -74,6 +79,8 @@ const features = [
   }
 ];
 export default function Monograph() {
+  const { publicUrl } = useLoaderData<typeof loader>();
+
   return (
     <Flex
       sx={{
@@ -146,6 +153,7 @@ export default function Monograph() {
             border: "1px solid var(--border)",
             boxShadow: "0px -5px 15px 0px rgba(0,0,0,0.05)"
           }}
+          publicUrl={publicUrl}
         />
       </Flex>
       <Box
