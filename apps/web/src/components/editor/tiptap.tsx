@@ -460,7 +460,7 @@ function TiptapWrapper(
             : EDITOR_ZOOM.STEP;
         const zoom = Math.min(
           EDITOR_ZOOM.MAX,
-          Math.max(EDITOR_ZOOM.MIN, editorConfig.zoom + delta)
+          Math.max(EDITOR_ZOOM.MIN, Math.round(editorConfig.zoom + delta))
         );
         setEditorConfig({ zoom });
       }
