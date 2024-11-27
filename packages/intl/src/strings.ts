@@ -38,6 +38,19 @@ const SEARCH_IN_ROUTE_STRINGS = {
   Monographs: () => t`Search in in Monographs`
 };
 
+const TRANSACTION_STATUS = {
+  completed: () => t`Completed`,
+  refunded: () => t`"Refunded`,
+  partially_refunded: () => t`Partially refunded`,
+  disputed: () => t`Disputed`
+};
+
+const REMINDER_NOTIFICATION_MODES = {
+  Silent: () => t`Silent`,
+  Vibrate: () => t`Vibrate`,
+  Urgent: () => t`Urgent`
+};
+
 export const strings = {
   done: () => t`Done`,
   verifyItsYou: () => t`Please verify it's you`,
@@ -607,10 +620,14 @@ $headline$: Use starting line of the note as title.`,
     6: () => t`Sat`
   },
   selectDate: () => t`Select date`,
-  reminderNotificationModes: {
-    Silent: () => t`Silent`,
-    Vibrate: () => t`Vibrate`,
-    Urgent: () => t`Urgent`
+  reminderNotificationModes: (
+    mode: keyof typeof REMINDER_NOTIFICATION_MODES | ({} & string)
+  ) => {
+    return mode in REMINDER_NOTIFICATION_MODES
+      ? REMINDER_NOTIFICATION_MODES[
+          mode as keyof typeof REMINDER_NOTIFICATION_MODES
+        ]()
+      : mode;
   },
   selectBackupsFolder: () => t`Select backups folder`,
   oldNew: () => t`Old - new`,
@@ -1681,11 +1698,12 @@ For example:
     } in case you lose access to your ${
       strings[primary as keyof typeof strings]
     }.`,
-  transactionStatusToText: {
-    completed: () => t`Completed`,
-    refunded: () => t`"Refunded`,
-    partially_refunded: () => t`Partially refunded`,
-    disputed: () => t`Disputed`
+  transactionStatusToText: (
+    key: keyof typeof TRANSACTION_STATUS | ({} & string)
+  ) => {
+    return key in TRANSACTION_STATUS
+      ? TRANSACTION_STATUS[key as keyof typeof TRANSACTION_STATUS]()
+      : key;
   },
   viewReceipt: () => t`View receipt`,
   customDictWords: (count: number) =>
@@ -1737,32 +1755,18 @@ For example:
   notebooksAllCaps: () => t`NOTEBOOKS`,
   authenticatedAs: (email?: string) => t`Authenticated as ${email}`,
   rememberedYourPassword: () => t`Remembered your password?`,
-  accountRecoveryMethods: [
-    {
-      type: "key",
-      testId: "step-recovery-key",
-      title: () => `Use recovery key`,
-      description: () =>
-        `Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption.`
-    },
-    {
-      type: "backup",
-      testId: "step-backup",
-      title: () => `Use a backup file`,
-      description: () =>
-        `If you don't have a recovery key, you can recover your data by restoring a Notesnook data backup file (.nnbackup).`
-    },
-    {
-      type: "reset",
-      testId: "step-reset-account",
-      title: () => `Clear data & reset account`,
-      description: () =>
-        `EXTREMELY DANGEROUS! This action is irreversible. All your data including notes, notebooks, attachments & settings will be deleted. This is a full account reset. Proceed with caution.`,
-      isDangerous: true
-    }
-  ],
   chooseRecoveryMethod: () => t`Choose a recovery method`,
   chooseRecoveryMethodDesc: () => t`How do you want to recover your account?`,
+  recoveryKeyMethod: () => t`Use recovery key`,
+  recoveryKeyMethodDesc: () =>
+    t`Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption.`,
+  backupFileMethod: () => t`Use a backup file`,
+  backupFileMethodDesc: () =>
+    t`If you don't have a recovery key, you can recover your data by restoring a Notesnook data backup file (.nnbackup).`,
+  clearDataAndResetMethod: () => t`Clear data & reset account`,
+  clearDataAndResetMethodDesc: () =>
+    t`EXTREMELY DANGEROUS! This action is irreversible. All your data including notes, notebooks, attachments & settings will be deleted. This is a full account reset. Proceed with caution.`,
+
   browse: () => t`Browse`,
   dontShowAgain: () => t`Don't show again`,
   dontShowAgainConfirm: () => t`Don't show again on this device?`,
