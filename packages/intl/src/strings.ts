@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { plural, select, t } from "@lingui/macro";
-import { doActions } from "../generated/do-actions";
-import { actions } from "../generated/actions";
-import { inProgressActions } from "../generated/in-progress-actions";
-import { actionErrors } from "../generated/action-errors";
 import { actionConfirmations } from "../generated/action-confirmations";
+import { actionErrors } from "../generated/action-errors";
+import { actions } from "../generated/actions";
+import { doActions } from "../generated/do-actions";
+import { inProgressActions } from "../generated/in-progress-actions";
 
 const SEARCH_IN_ROUTE_STRINGS = {
   Notes: () => t`Search in in Notes`,
@@ -1482,7 +1482,7 @@ For example:
     return (
       SEARCH_IN_ROUTE_STRINGS[
         routeName as keyof typeof SEARCH_IN_ROUTE_STRINGS
-      ]() || t`Search in ${routeName}`
+      ]?.() || t`Search in ${routeName}`
     );
   },
   logoutConfirmation: () =>
