@@ -196,8 +196,7 @@ const NotesPage = ({
       <Header
         renderedInRoute={route.name}
         title={
-          title ||
-          strings.routes[route.name as unknown as keyof typeof strings.routes]()
+          route.name === "Monographs" ? strings.routes[route.name]() : title
         }
         canGoBack={params?.current?.canGoBack}
         hasSearch={true}

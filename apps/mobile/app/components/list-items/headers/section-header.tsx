@@ -57,10 +57,7 @@ export const SectionHeader = React.memo<
   }: SectionHeaderProps) {
     const { colors } = useThemeColors();
     const { fontScale } = useWindowDimensions();
-    const groupBy =
-      strings.groupByStrings[
-        groupOptions.groupBy as keyof typeof strings.groupByStrings
-      ]?.();
+    const groupBy = strings.groupByStrings[groupOptions.groupBy]();
     const isCompactModeEnabled = useIsCompactModeEnabled(
       dataType as "note" | "notebook"
     );

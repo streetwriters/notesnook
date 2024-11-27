@@ -647,7 +647,7 @@ $headline$: Use starting line of the note as title.`,
   },
   groupByStrings: {
     default: () => t`Default`,
-    None: () => t`None`,
+    none: () => t`None`,
     abc: () => t`Abc`,
     year: () => t`Year`,
     week: () => t`Week`,

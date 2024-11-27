@@ -73,7 +73,7 @@ const ACTIONS = [
   {
     action: "deleted",
     label: "deleted",
-    dataTypes: ["attachment", "reminder", "tag", "note"]
+    dataTypes: ["attachment", "reminder", "tag", "note", "notebook"]
   },
   {
     action: "movedToTrash",

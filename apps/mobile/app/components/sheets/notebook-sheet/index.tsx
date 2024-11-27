@@ -301,8 +301,8 @@ export const NotebookSheet = () => {
                   }}
                   onPress={async () => {
                     await deleteItems(
-                      useItemSelectionStore.getState().getSelectedItemIds(),
-                      "notebook"
+                      "notebook",
+                      useItemSelectionStore.getState().getSelectedItemIds()
                     );
                     useSelectionStore.getState().clearSelection();
                     useItemSelectionStore.setState({
