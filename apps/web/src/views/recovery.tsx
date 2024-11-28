@@ -232,10 +232,31 @@ type RecoveryMethod = {
   isDangerous?: boolean;
 };
 
+const recoveryMethods: RecoveryMethod[] = [
+  {
+    type: "key",
+    testId: "step-recovery-key",
+    title: () => strings.recoveryKeyMethod(),
+    description: () => strings.recoveryKeyMethodDesc()
+  },
+  {
+    type: "backup",
+    testId: "step-backup",
+    title: () => strings.backupFileMethod(),
+    description: () => strings.backupFileMethodDesc()
+  },
+  {
+    type: "reset",
+    testId: "step-reset-account",
+    title: () => strings.clearDataAndResetMethod(),
+    description: () => strings.clearDataAndResetMethodDesc(),
+    isDangerous: true
+  }
+];
+
 function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
   const { navigate } = props;
   const [selected, setSelected] = useState(0);
-  const recoveryMethods = strings.accountRecoveryMethods as RecoveryMethod[];
 
   if (isSessionExpired()) {
     navigate("new");

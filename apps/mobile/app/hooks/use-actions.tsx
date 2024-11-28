@@ -254,8 +254,8 @@ export const useActions = ({
       item.type === "color"
     ) {
       presentDialog({
-        title: strings.doActions.delete[item.type](1),
-        paragraph: strings.actionConfirmations.delete[item.type](1),
+        title: strings.doActions.delete.unknown(item.type, 1),
+        paragraph: strings.actionConfirmations.delete.unknown(item.type, 1),
         positivePress: async () => {
           if (item.type === "reminder") {
             await db.reminders.remove(item.id);
@@ -290,7 +290,7 @@ export const useActions = ({
       });
     } else {
       try {
-        await deleteItems([item.id], item.type);
+        await deleteItems(item.type, [item.id]);
       } catch (e) {
         console.error(e);
       }
@@ -303,8 +303,8 @@ export const useActions = ({
     close();
     await sleep(300);
     presentDialog({
-      title: strings.doActions.delete[item.itemType](1),
-      paragraph: strings.actionConfirmations.delete[item.itemType](1),
+      title: strings.doActions.delete.unknown(item.itemType, 1),
+      paragraph: strings.actionConfirmations.delete.unknown(item.itemType, 1),
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
       positivePress: async () => {
@@ -313,10 +313,7 @@ export const useActions = ({
           Navigation.queueRoutesForUpdate();
           useSelectionStore.getState().setSelectionMode(undefined);
           ToastManager.show({
-            heading:
-              strings.actions.deleted[
-                item.itemType as keyof typeof strings.actions.deleted
-              ](1),
+            heading: strings.actions.deleted.unknown(item.itemType, 1),
             type: "success",
             context: "local"
           });
@@ -957,11 +954,10 @@ export const useActions = ({
     id: "trash",
     title:
       item.type !== "notebook" && item.type !== "note"
-        ? strings.doActions.delete[
-            item.type === "trash"
-              ? item.itemType
-              : (item.type as keyof typeof strings.doActions.delete)
-          ](1)
+        ? strings.doActions.delete.unknown(
+            item.type === "trash" ? item.itemType : item.type,
+            1
+          )
         : strings.moveToTrash(),
     icon: "delete-outline",
     type: "error",

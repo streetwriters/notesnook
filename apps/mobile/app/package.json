@@ -39,11 +39,7 @@
     "@lingui/react": "4.11.2",
     "@lingui/core": "4.11.2",
     "react-native-check-version": "^1.3.0",
-    "react-native-material-menu": "^2.0.0",
-    "@trpc/client": "^10.45.2",
-    "@trpc/react-query": "^10.45.2",
-    "@trpc/server": "^10.45.2",
-    "@tanstack/react-query": "^4.36.1"
+    "react-native-material-menu": "^2.0.0"
   },
   "sideEffects": false
 }
