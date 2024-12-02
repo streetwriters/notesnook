@@ -92,13 +92,18 @@ async function generateThemesMetadata() {
         "utf-8"
       );
 
-      themeDefinitions.push({
-        ...theme,
-        sourceURL: `https://github.com/streetwriters/notesnook-themes/tree/main/themes/${themeId}/v${version}/`,
-        codeBlockCSS,
-        totalInstalls: counts[theme.id]?.length || 0,
-        previewColors: getPreviewColors(theme)
-      });
+      /**
+       * 
+       *       themeDefinitions.push({
+              ...theme,
+              sourceURL: `https://github.com/streetwriters/notesnook-themes/tree/main/themes/${themeId}/v${version}/`,
+              codeBlockCSS,
+              totalInstalls: counts[theme.id]?.length || 0,
+              previewColors: getPreviewColors(theme)
+            });
+       * 
+       * 
+       */
     }
   }
   await insertMultiple(db, themeDefinitions);
