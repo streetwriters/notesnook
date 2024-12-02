@@ -23,7 +23,6 @@ import {
   getHTMLFromFragment
 } from "@tiptap/core";
 import CharacterCount from "@tiptap/extension-character-count";
-import { Code } from "@tiptap/extension-code";
 import Color from "@tiptap/extension-color";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import { Link, LinkAttributes } from "./extensions/link/index.js";
@@ -85,6 +84,7 @@ import { useEditorSearchStore } from "./toolbar/stores/search-store.js";
 import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
 import { getChangedNodes } from "./utils/prosemirror.js";
 import { strings } from "@notesnook/intl";
+import { InlineCode } from "./extensions/inline-code/inline-code.js";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
@@ -302,7 +302,7 @@ const useTiptap = (
         OutlineListItem,
         OutlineList.configure({ keepAttributes: true, keepMarks: true }),
         ListItem,
-        Code.extend({ excludes: "link" }),
+        InlineCode,
         Codemark,
         MathInline,
         MathBlock,
