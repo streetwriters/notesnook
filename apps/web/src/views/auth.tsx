@@ -985,7 +985,14 @@ export function AuthField(props: FieldProps) {
           p: "12px",
           borderRadius: "default",
           bg: "background",
-          boxShadow: "0px 0px 5px 0px #00000019"
+          boxShadow: "0px 0px 5px 0px #00000019",
+          "::-moz-appearance": "textfield",
+          "::-webkit-inner-spin-button": {
+            "-webkit-appearance": "none"
+          },
+          "::-webkit-outer-spin-button": {
+            "-webkit-appearance": "none"
+          }
         }
       }}
     />
