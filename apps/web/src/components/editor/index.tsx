@@ -71,8 +71,11 @@ import { logger } from "../../utils/logger";
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
 import { strings } from "@notesnook/intl";
+import { onPageVisibilityChanged } from "../../utils/page-visibility";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
+
+const autoSaveToast = { show: true, hide: () => {} };
 
 async function saveContent(
   noteId: string,
@@ -439,9 +442,17 @@ export function Editor(props: EditorProps) {
     readonly: false,
     focusMode: false
   };
+  const saveSessionContentIfNotSaved = useEditorStore(
+    (store) => store.saveSessionContentIfNotSaved
+  );
+  const setEditorSaveState = useEditorStore((store) => store.setSaveState);
   useScrollToBlock(session);
 
   useEffect(() => {
+    if (!autoSaveToast.show) {
+      autoSaveToast.hide();
+    }
+
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ hash, loaded, total }: AttachmentProgress) => {
@@ -457,6 +468,15 @@ export function Editor(props: EditorProps) {
       event.unsubscribe();
     };
   }, [id]);
+
+  useEffect(() => {
+    const unsub = onPageVisibilityChanged((_, hidden) => {
+      if (hidden) {
+        saveSessionContentIfNotSaved(id);
+      }
+    });
+    return () => unsub();
+  }, []);
 
   return (
     <EditorChrome {...props}>
@@ -558,6 +578,25 @@ export function Editor(props: EditorProps) {
         onInsertInternalLink={async (attributes) => {
           const link = await NoteLinkingDialog.show({ attributes });
           return link || undefined;
+        }}
+        onAutoSaveDisabled={() => {
+          setEditorSaveState(id, SaveState.NotSaved);
+          if (autoSaveToast.show === false) return;
+          const { hide } = showToast(
+            "error",
+            "Auto-save is disabled for large notes. Press Ctrl + S to save.",
+            [
+              {
+                text: "Dismiss",
+                onClick: () => {
+                  hide();
+                }
+              }
+            ],
+            Infinity
+          );
+          autoSaveToast.show = false;
+          autoSaveToast.hide = hide;
         }}
       >
         {headless ? null : (
