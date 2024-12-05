@@ -26,7 +26,12 @@ import Config from "../../utils/config";
 import { getCurrentPreset } from "../../common/toolbar-config";
 import { EDITOR_ZOOM } from "./common";
 
-type EditorConfig = { fontFamily: string; fontSize: number; zoom: number };
+type EditorConfig = {
+  fontFamily: string;
+  fontSize: number;
+  zoom: number;
+  textDirection: string;
+};
 type EditorContext = {
   editor?: IEditor;
   canUndo?: boolean;
@@ -41,7 +46,8 @@ class EditorManager extends BaseStore<EditorManager> {
   editorConfig: EditorConfig = Config.get("editorConfig", {
     fontFamily: "sans-serif",
     fontSize: 16,
-    zoom: EDITOR_ZOOM.DEFAULT
+    zoom: EDITOR_ZOOM.DEFAULT,
+    textDirection: "ltr"
   });
   editors: Record<string, EditorContext> = {};
 

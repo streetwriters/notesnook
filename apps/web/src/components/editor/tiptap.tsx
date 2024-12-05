@@ -514,6 +514,7 @@ function TiptapWrapper(
           editorContainer.style.fontSize = `${editorConfig.fontSize}px`;
           editorContainer.style.fontFamily =
             getFontById(editorConfig.fontFamily)?.font || "sans-serif";
+          editorContainer.style.direction = editorConfig.textDirection || "ltr";
           editorContainer.tabIndex = -1;
           editorContainerRef.current = editorContainer;
           return editorContainer;

@@ -121,6 +121,28 @@ export const EditorSettings: SettingsGroup[] = [
             toggle: () => useSettingStore.getState().toggleMarkdownShortcuts()
           }
         ]
+      },
+      {
+        key: "text-direction",
+        title: strings.textDirection(),
+        description: strings.textDirectionDesc(),
+        onStateChange: (listener) =>
+          onEditorConfigChange((c) => c.textDirection, listener),
+        components: [
+          {
+            type: "dropdown",
+            options: [
+              { value: "ltr", title: "ltr" },
+              { value: "rtl", title: "rtl" }
+            ],
+            selectedOption: () => editorConfig().textDirection,
+            onSelectionChanged: (value) => {
+              useEditorManager
+                .getState()
+                .setEditorConfig({ textDirection: value });
+            }
+          }
+        ]
       }
     ]
   },
