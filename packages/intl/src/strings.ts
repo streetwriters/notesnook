@@ -1110,6 +1110,9 @@ $headline$: Use starting line of the note as title.`,
   titleFormatDesc: () => t`Choose how the new note titles are formatted`,
   mardownShortcuts: () => t`Markdown shortcuts`,
   mardownShortcutsDesc: () => t`Use markdown shortcuts in the editor`,
+  textDirection: () => t`Text direction`,
+  textDirectionDesc: () =>
+    t`Change default text direction to "left-to-right" or "right-to-left"`,
   privacyAndSecurity: () => t`Privacy & security`,
   telemetry: () => t`Telemetry`,
   telemetryDesc: () =>
