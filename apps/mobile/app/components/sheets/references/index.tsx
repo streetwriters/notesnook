@@ -34,7 +34,7 @@ import { useDBItem, useNoteLocked } from "../../../hooks/use-db-item";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { eOnLoadNote } from "../../../utils/events";
-import { tabBarRef } from "../../../utils/global-refs";
+import { fluidTabsRef } from "../../../utils/global-refs";
 import { SIZE } from "../../../utils/size";
 import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
@@ -423,7 +423,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
             item: note,
             blockId: blockId
           });
-          tabBarRef.current?.goToPage(1);
+          fluidTabsRef.current?.goToPage(1);
           close?.();
         }}
         reference={item as Note}

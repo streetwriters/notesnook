@@ -25,6 +25,7 @@ import { presentDialog } from "../components/dialog/functions";
 import { eSendEvent, ToastManager } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import { useMenuStore } from "../stores/use-menu-store";
+import { useNotebookStore } from "../stores/use-notebook-store";
 import { useRelationStore } from "../stores/use-relation-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { eOnNotebookUpdated, eUpdateNoteInEditor } from "./events";
@@ -72,8 +73,10 @@ async function deleteNotebook(id: string, deleteNotes: boolean) {
     }
   }
   await db.notebooks.moveToTrash(id);
-  if (parentId) {
-    eSendEvent(eOnNotebookUpdated, parentId);
+
+  eSendEvent(eOnNotebookUpdated, parentId);
+  if (!parentId) {
+    useNotebookStore.getState().refresh();
   }
 }
 
@@ -113,7 +116,6 @@ export const deleteItems = async (
     if (!result.delete) return;
     for (const id of itemIds) {
       await deleteNotebook(id, result.deleteNotes);
-      eSendEvent(eOnNotebookUpdated, await getParentNotebookId(id));
     }
   } else if (type === "tag") {
     presentDialog({

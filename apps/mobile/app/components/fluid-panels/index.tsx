@@ -37,12 +37,12 @@ import Animated, {
   WithSpringConfig,
   withTiming
 } from "react-native-reanimated";
+import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 import { getAppState } from "../../screens/editor/tiptap/utils";
 import { eSendEvent } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eClearEditor } from "../../utils/events";
 import { useSideBarDraggingStore } from "../side-menu/dragging-store";
-import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 
 interface TabProps extends ViewProps {
   dimensions: { width: number; height: number };
@@ -66,7 +66,7 @@ export interface TabsRef {
   node: RefObject<Animated.View>;
 }
 
-export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
+export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
   {
     children,
     dimensions,
@@ -81,9 +81,6 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
   const appState = useMemo(() => getAppState(), []);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
-  const introCompleted = useSettingStore(
-    (state) => state.settings.introCompleted
-  );
   const translateX = useSharedValue(
     widths
       ? appState &&
@@ -118,26 +115,34 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
   const isIPhone = Platform.OS === "ios";
 
   useEffect(() => {
-    if (introCompleted) {
-      if (deviceMode === "tablet" || fullscreen) {
-        translateX.value = 0;
-      } else {
-        if (prevWidths.current?.sidebar !== widths.sidebar) {
-          translateX.value =
-            appState && appState?.movedAway === false
-              ? editorPosition
-              : widths.sidebar;
-          if (translateX.value === editorPosition) {
-            onChangeTab?.({ i: 2, from: 1 });
-          }
+    if (deviceMode === "tablet" || fullscreen) {
+      translateX.value = 0;
+    } else {
+      if (prevWidths.current?.sidebar !== widths.sidebar) {
+        translateX.value =
+          appState && appState?.movedAway === false
+            ? editorPosition
+            : widths.sidebar;
+        if (translateX.value === editorPosition) {
+          onChangeTab?.({ i: 2, from: 1 });
         }
       }
-      isLoaded.current = true;
-      prevWidths.current = widths;
     }
+    isLoaded.current = true;
+    prevWidths.current = widths;
+  }, [
+    deviceMode,
+    widths,
+    fullscreen,
+    translateX,
+    editorPosition,
+    appState,
+    onChangeTab
+  ]);
 
+  useEffect(() => {
     const sub = BackHandler.addEventListener("hardwareBackPress", () => {
-      if (isDrawerOpen.value) {
+      if (isDrawerOpen.value && !forcedLock.value) {
         translateX.value = withTiming(homePosition);
         onDrawerStateChange(false);
         isDrawerOpen.value = false;
@@ -149,16 +154,11 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       sub && sub.remove();
     };
   }, [
-    introCompleted,
-    deviceMode,
-    widths,
-    fullscreen,
-    translateX,
-    isDrawerOpen,
+    forcedLock.value,
     homePosition,
+    isDrawerOpen,
     onDrawerStateChange,
-    editorPosition,
-    appState
+    translateX
   ]);
 
   useImperativeHandle(
@@ -294,8 +294,8 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
   const gesture = Gesture.Pan()
     .maxPointers(1)
     .enabled(enabled && !disabled)
-    .activeOffsetX([-5, 5])
-    .failOffsetY([-15, 15])
+    .activeOffsetX([-20, 20])
+    .failOffsetY([-10, 10])
     .onBegin((event) => {
       locked.value = false;
       gestureStartValue.value = {

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Notebook, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -45,7 +46,6 @@ import { Pressable } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 import { AddNotebookSheet } from "../add-notebook";
-import { strings } from "@notesnook/intl";
 
 const useNotebookExpandedStore = create<{
   expanded: {
@@ -119,14 +119,19 @@ export const MoveNotebookSheet = ({
                       },
                       notebook
                     );
+                  }
+                  await db.relations.add(selectedNotebook, notebook);
+                  if (parent) {
                     eSendEvent(eOnNotebookUpdated, parent);
                   }
-
-                  await db.relations.add(selectedNotebook, notebook);
-                  eSendEvent(eOnNotebookUpdated, selectedNotebook.id);
-                  eSendEvent(eOnNotebookUpdated, notebook.id);
                 }
-                useNotebookStore.getState().refresh();
+
+                if (!parent) {
+                  useNotebookStore.getState().refresh();
+                } else {
+                  eSendEvent(eOnNotebookUpdated, selectedNotebook.id);
+                }
+
                 close?.();
               }
             });

@@ -2443,5 +2443,13 @@ Use this if changes from other devices are not appearing on this device. This wi
   fontLigatures: () => t`Font ligatures`,
   fontLigaturesDesc: () =>
     t`Enable ligatures for common symbols like →, ←, etc`,
-  expandSidebar: () => t`Expand sidebar`
+  expandSidebar: () => t`Expand sidebar`,
+  viewAllLimits: () => `View all limits`,
+  freePlan: () => t`Free plan`,
+  proPlan: () => t`Pro plan`,
+  essentialPlan: () => t`Essential plan`,
+  believerPlan: () => t`Believer plan`,
+  storage: () => t`Storage`,
+  used: () => t`used`,
+  editProfile: () => t`Edit profile`
 };

@@ -61,7 +61,7 @@ import {
   eShowMergeDialog,
   eUpdateNoteInEditor
 } from "../../../utils/events";
-import { tabBarRef } from "../../../utils/global-refs";
+import { fluidTabsRef } from "../../../utils/global-refs";
 import { sleep } from "../../../utils/time";
 import { unlockVault } from "../../../utils/unlock-vault";
 import { onNoteCreated } from "../../notes/common";
@@ -995,14 +995,14 @@ export const useEditor = (
     if (!appState) return;
     state.current.isRestoringState = true;
     state.current.currentlyEditing = true;
-    if (tabBarRef.current?.page() === 2) {
+    if (fluidTabsRef.current?.page() === 2) {
       state.current.movedAway = false;
     }
 
     if (!state.current.editorStateRestored) {
       state.current.isRestoringState = true;
       if (!DDS.isTab) {
-        tabBarRef.current?.goToPage(1, false);
+        fluidTabsRef.current?.goToPage(1, false);
       }
     }
 
@@ -1081,12 +1081,12 @@ export const useEditor = (
             item: note
           });
         }
-        tabBarRef.current?.goToPage(1);
+        fluidTabsRef.current?.goToPage(1);
       } else {
         noteId = useTabStore.getState().getCurrentNoteId() || null;
         if (!noteId) {
           loadNote({ newNote: true });
-          if (tabBarRef.current?.page() === 1) {
+          if (fluidTabsRef.current?.page() === 1) {
             state.current.currentlyEditing = false;
           }
         } else {
