@@ -21,8 +21,7 @@ const MACHINE_ID = Math.floor(Math.random() * 0xffffff);
 const pid = Math.floor(Math.random() * 100000) % 0xffff;
 
 let machineIdStr = MACHINE_ID.toString(16).padStart(6, "0");
-let pidStr =  pid.toString(16);
-if (pidStr.length !== 4) pidStr = pidStr.padStart(4, "0");
+let pidStr =  pid.toString(16).padStart(4, "0");
 
 const PROCESS_UNIQUE = machineIdStr + pidStr;
 
