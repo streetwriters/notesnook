@@ -114,7 +114,7 @@ export interface SettingStore extends State {
   dimensions: DimensionsType;
   setSettings: (settings: Settings) => void;
   setFullscreen: (fullscreen: boolean) => void;
-  setDeviceMode: (mode: string) => void;
+  setDeviceMode: (mode: string | null) => void;
   setDimensions: (dimensions: DimensionsType) => void;
   isAppLoading: boolean;
   setAppLoading: (isAppLoading: boolean) => void;

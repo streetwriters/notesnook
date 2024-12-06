@@ -17,60 +17,52 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
+import { View } from "react-native";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import useNavigationStore, {
-  RouteName
-} from "../../stores/use-navigation-store";
+import { RouteName } from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { eScrollEvent } from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
+import { IconButtonProps } from "../ui/icon-button";
+import { Pressable } from "../ui/pressable";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 import { LeftMenus } from "./left-menus";
 import { RightMenus } from "./right-menus";
-import { Title } from "./title";
-
-type HeaderRightButton = {
-  title: string;
-  onPress: () => void;
-};
 
 export const Header = ({
   renderedInRoute,
   onLeftMenuButtonPress,
   title,
-  titleHiddenOnRender,
-  headerRightButtons,
   id,
-  accentColor,
-  isBeta,
   canGoBack,
-  onPressDefaultRightButton,
   hasSearch,
-  onSearch
+  onSearch,
+  rightButton
 }: {
   onLeftMenuButtonPress?: () => void;
   renderedInRoute?: RouteName;
   id?: string;
   title: string;
-  headerRightButtons?: HeaderRightButton[];
-  titleHiddenOnRender?: boolean;
-  accentColor?: string;
-  isBeta?: boolean;
   canGoBack?: boolean;
   onPressDefaultRightButton?: () => void;
   hasSearch?: boolean;
   onSearch?: () => void;
+  rightButton?: IconButtonProps;
 }) => {
   const { colors } = useThemeColors();
-  const insets = useGlobalSafeAreaInsets();
   const [borderHidden, setBorderHidden] = useState(true);
-  const selectionMode = useSelectionStore((state) => state.selectionMode);
-  const isFocused = useNavigationStore((state) => state.focusedRouteId === id);
+  const [selectedItemsList, selectionMode] = useSelectionStore((state) => [
+    state.selectedItemsList,
+    state.selectionMode
+  ]);
 
   const onScroll = useCallback(
     (data: { x: number; y: number; id?: string; route: string }) => {
@@ -93,88 +85,47 @@ export const Header = ({
     };
   }, [borderHidden, onScroll]);
 
-  return selectionMode && isFocused ? null : (
-    <>
-      <View
-        style={[
-          styles.container,
-          {
-            marginTop: Platform.OS === "android" ? insets.top : null,
-            backgroundColor: colors.primary.background,
-            overflow: "hidden",
-            borderBottomWidth: 1,
-            borderBottomColor: borderHidden
-              ? "transparent"
-              : colors.secondary.background,
-            justifyContent: "space-between"
-          }
-        ]}
-      >
-        <>
-          <View style={styles.leftBtnContainer}>
-            <LeftMenus
-              canGoBack={canGoBack}
-              onLeftButtonPress={onLeftMenuButtonPress}
-            />
+  const HeaderWrapper = hasSearch ? Pressable : View;
 
-            <Title
-              isHiddenOnRender={titleHiddenOnRender}
-              renderedInRoute={renderedInRoute}
-              id={id}
-              accentColor={accentColor}
-              title={title}
-              isBeta={isBeta}
-            />
-          </View>
-          <RightMenus
-            renderedInRoute={renderedInRoute}
-            id={id}
-            headerRightButtons={headerRightButtons}
-            onPressDefaultRightButton={onPressDefaultRightButton}
-            search={hasSearch}
-            onSearch={onSearch}
-          />
-        </>
-      </View>
-    </>
+  return (
+    <View
+      style={{
+        paddingHorizontal: DefaultAppStyles.GAP
+      }}
+    >
+      <HeaderWrapper
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: DefaultAppStyles.GAP_SMALL,
+          borderRadius: 10,
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+          borderWidth: hasSearch ? 1 : 0,
+          borderColor: colors.secondary.border,
+          paddingHorizontal: !hasSearch ? 0 : DefaultAppStyles.GAP_SMALL,
+          alignItems: "center"
+        }}
+        onPress={() => {
+          onSearch?.();
+        }}
+      >
+        <LeftMenus
+          canGoBack={canGoBack}
+          onLeftButtonPress={onLeftMenuButtonPress}
+        />
+
+        {hasSearch ? (
+          <Paragraph>
+            {selectionMode
+              ? `${selectedItemsList.length} selected`
+              : strings.searchInRoute(title)}
+          </Paragraph>
+        ) : (
+          <Heading size={SIZE.lg}>{title}</Heading>
+        )}
+
+        <RightMenus rightButton={rightButton} />
+      </HeaderWrapper>
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    zIndex: 11,
-    height: 50,
-    maxHeight: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    width: "100%"
-  },
-  leftBtnContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    flexShrink: 1
-  },
-  leftBtn: {
-    justifyContent: "center",
-    alignItems: "center",
-    height: 40,
-    width: 40,
-    borderRadius: 100,
-    marginLeft: -5,
-    marginRight: 25
-  },
-  rightBtnContainer: {
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  rightBtn: {
-    justifyContent: "center",
-    alignItems: "flex-end",
-    height: 40,
-    width: 40,
-    paddingRight: 0
-  }
-});

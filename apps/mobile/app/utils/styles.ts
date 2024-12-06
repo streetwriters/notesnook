@@ -16,21 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-import React from "react";
-import DialogProvider from "../components/dialog-provider";
-import { Toast } from "../components/toast";
-import { TabHolder } from "./tabs-holder";
-import { ScopedThemeProvider } from "@notesnook/theme";
-const _ApplicationHolder = () => {
-  return (
-    <>
-      <TabHolder />
-      <ScopedThemeProvider value="dialog">
-        <Toast />
-      </ScopedThemeProvider>
-      <DialogProvider />
-    </>
-  );
+export const DefaultAppStyles = {
+  GAP: 16,
+  GAP_SMALL: 8,
+  GAP_VERTICAL: 6,
+  GAP_VERTICAL_SMALL: 4
 };
-export const ApplicationHolder = React.memo(_ApplicationHolder, () => true);

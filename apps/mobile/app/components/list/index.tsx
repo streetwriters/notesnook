@@ -34,8 +34,7 @@ import Sync from "../../services/sync";
 import { RouteName } from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eScrollEvent } from "../../utils/events";
-import { tabBarRef } from "../../utils/global-refs";
-import { Footer } from "../list-items/footer";
+import { fluidTabsRef } from "../../utils/global-refs";
 import { Header } from "../list-items/headers/header";
 import { Empty, PlaceholderData } from "./empty";
 import { ListItemWrapper } from "./list-item.wrapper";
@@ -43,6 +42,7 @@ import { ListItemWrapper } from "./list-item.wrapper";
 type ListProps = {
   data: VirtualizedGrouping<Item> | undefined;
   dataType: Item["type"];
+  mode?: "drawer" | "sheet";
   onRefresh?: () => void;
   loading?: boolean;
   headerTitle?: string;
@@ -160,7 +160,7 @@ export default function List(props: ListProps) {
           onScroll={onListScroll}
           nestedScrollEnabled={true}
           onMomentumScrollEnd={() => {
-            tabBarRef.current?.unlock();
+            fluidTabsRef.current?.unlock();
           }}
           getItemType={(item: number, index: number) => {
             return props.data?.type(index);
@@ -191,9 +191,6 @@ export default function List(props: ListProps) {
                 screen={props.renderedInRoute}
               />
             ) : null
-          }
-          ListFooterComponent={
-            <Footer height={props.renderedInRoute === "Notebook" ? 300 : 150} />
           }
           ListHeaderComponent={
             <>

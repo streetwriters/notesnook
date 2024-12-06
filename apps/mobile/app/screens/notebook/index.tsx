@@ -17,15 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { resolveItems } from "@notesnook/common";
-import { VirtualizedGrouping } from "@notesnook/core";
-import { Note, Notebook } from "@notesnook/core";
+import { Note, Notebook, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
+import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import List from "../../components/list";
 import { NotebookHeader } from "../../components/list-items/headers/notebook-header";
+import { Properties } from "../../components/properties";
 import SelectionHeader from "../../components/selection-header";
 import { AddNotebookSheet } from "../../components/sheets/add-notebook";
 import { IconButton } from "../../components/ui/icon-button";
@@ -40,8 +42,8 @@ import useNavigationStore, {
 import { eUpdateNotebookRoute } from "../../utils/events";
 import { findRootNotebookId } from "../../utils/notebooks";
 import { SIZE } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { openEditor, setOnFirstSave } from "../notes/common";
-import { strings } from "@notesnook/intl";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
@@ -125,6 +127,8 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           setNotes(notes);
           await notes.item(0, resolveItems);
           syncWithNavigation();
+        } else {
+          Navigation.goBack();
         }
         setLoading(false);
       } catch (e) {
@@ -160,13 +164,18 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
         renderedInRoute={route.name}
         title={params.current.item?.title}
         canGoBack={params?.current?.canGoBack}
+        rightButton={{
+          name: "dots-vertical",
+          onPress: () => {
+            Properties.present(params.current.item);
+          }
+        }}
         hasSearch={true}
         onSearch={() => {
           const selector = db.relations.from(
             params.current.item,
             "note"
           ).selector;
-
           Navigation.push("Search", {
             placeholder: strings.searchInRoute(params.current.item?.title),
             type: "note",
@@ -175,19 +184,18 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
             items: selector
           });
         }}
-        titleHiddenOnRender
         id={params.current.item?.id}
-        onPressDefaultRightButton={openEditor}
       />
 
       {breadcrumbs && breadcrumbs.length > 0 ? (
         <View
           style={{
             width: "100%",
-            paddingHorizontal: 12,
+            paddingHorizontal: DefaultAppStyles.GAP,
             flexDirection: "row",
             alignItems: "center",
-            flexWrap: "wrap"
+            flexWrap: "wrap",
+            marginTop: DefaultAppStyles.GAP_VERTICAL
           }}
         >
           <IconButton
@@ -260,6 +268,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           }}
         />
       </DelayLayout>
+      <FloatingButton onPress={openEditor} />
     </>
   );
 };

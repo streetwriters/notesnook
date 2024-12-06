@@ -82,7 +82,7 @@ const verifyUserPassword = async (password: string) => {
   }
 };
 
-const AppLockedOverlay = () => {
+const AppLockedScreen = () => {
   const initialLaunchBiometricRequest = useRef(true);
   const { colors } = useThemeColors();
   const user = getUser();
@@ -203,14 +203,12 @@ const AppLockedOverlay = () => {
     }
   }, [appState, onUnlockAppRequested, appLocked]);
 
-  return appLocked ? (
+  return (
     <KeyboardAwareScrollView
       style={{
         backgroundColor: colors.primary.background,
         width: "100%",
-        height: "100%",
-        position: "absolute",
-        zIndex: 999
+        height: "100%"
       }}
       contentContainerStyle={{
         justifyContent: "center",
@@ -333,7 +331,7 @@ const AppLockedOverlay = () => {
         </View>
       </View>
     </KeyboardAwareScrollView>
-  ) : null;
+  );
 };
 
-export default AppLockedOverlay;
+export default AppLockedScreen;

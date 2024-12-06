@@ -59,8 +59,7 @@ import {
 import {
   clearAppState,
   editorController,
-  editorState,
-  setAppState
+  editorState
 } from "../screens/editor/tiptap/utils";
 import { useDragState } from "../screens/settings/editor/state";
 import BackupService from "../services/backup";
@@ -103,7 +102,7 @@ import {
   refreshNotesPage
 } from "../utils/events";
 import { getGithubVersion } from "../utils/github-version";
-import { tabBarRef } from "../utils/global-refs";
+import { fluidTabsRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
 
@@ -168,7 +167,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
       clearAppState();
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
-      tabBarRef.current?.goToPage(1, false);
+      fluidTabsRef.current?.goToPage(1, false);
       return;
     } else if (url.startsWith("https://notesnook.com/open_note")) {
       const id = new URL(url).searchParams.get("id");
@@ -178,7 +177,7 @@ const onAppOpenedFromURL = async (event: { url: string }) => {
           eSendEvent(eOnLoadNote, {
             item: note
           });
-          tabBarRef.current?.goToPage(1, false);
+          fluidTabsRef.current?.goToPage(1, false);
         }
       }
     } else if (url.startsWith("https://notesnook.com/open_reminder")) {

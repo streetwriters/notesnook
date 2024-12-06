@@ -27,7 +27,7 @@ import { useRelationStore } from "../../stores/use-relation-store";
 import { useTagStore } from "../../stores/use-tag-store";
 import { eOnLoadNote, eOnNotebookUpdated } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
-import { tabBarRef } from "../../utils/global-refs";
+import { fluidTabsRef } from "../../utils/global-refs";
 import { editorState } from "../editor/tiptap/utils";
 
 export const PLACEHOLDER_DATA = {
@@ -58,7 +58,7 @@ export function openEditor() {
     eSendEvent(eOnLoadNote, { newNote: true });
     editorState().currentlyEditing = true;
     editorState().movedAway = false;
-    tabBarRef.current?.goToPage(1);
+    fluidTabsRef.current?.goToPage(1);
   } else {
     eSendEvent(eOnLoadNote, { newNote: true });
   }

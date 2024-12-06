@@ -56,7 +56,8 @@ const Home = ({
       <Header
         renderedInRoute="Settings"
         title={strings.routes.Settings()}
-        canGoBack={false}
+        canGoBack={true}
+        hasSearch={false}
         id="Settings"
       />
       <DelayLayout delay={300} type="settings">

@@ -73,7 +73,9 @@
     "react-native-begin-background-task": "github:blockfirm/react-native-begin-background-task",
     "react-native-privacy-snapshot": "github:standardnotes/react-native-privacy-snapshot",
     "@ammarahmed/react-native-fingerprint-scanner": "^5.0.0",
-    "@ammarahmed/react-native-share-extension": "^2.9.0"
+    "@ammarahmed/react-native-share-extension": "^2.9.0",
+    "react-native-pager-view": "^6.5.1",
+    "react-native-tab-view": "^4.0.2"
   },
   "devDependencies": {
     "detox": "^20.27.6",
@@ -88,6 +90,7 @@
     "@tsconfig/react-native": "^3.0.2",
     "@types/html-to-text": "^8.0.1",
     "@types/metro-config": "^0.76.3",
+    "@types/react": "^18.2.39",
     "@types/react-native": "^0.69.1",
     "@types/react-native-vector-icons": "^6.4.10",
     "@types/react-test-renderer": "^18.0.0",

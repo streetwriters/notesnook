@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { i18n } from "@lingui/core";
-import { strings } from "@notesnook/intl";
 import React, {
   forwardRef,
   useCallback,
@@ -48,7 +46,6 @@ import {
   eUnlockWithPassword
 } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
-import { tabBarRef } from "../../utils/global-refs";
 import EditorOverlay from "./loading";
 import { EDITOR_URI } from "./source";
 import { EditorProps, useEditorType } from "./tiptap/types";
@@ -61,6 +58,9 @@ import {
   openInternalLink,
   randId
 } from "./tiptap/utils";
+import { fluidTabsRef } from "../../utils/global-refs";
+import { strings } from "@notesnook/intl";
+import { i18n } from "@lingui/core";
 
 const style: ViewStyle = {
   height: "100%",
@@ -348,7 +348,7 @@ const useLockedNoteHandler = () => {
       }),
       eSubscribeEvent(eUnlockWithPassword, onSubmit)
     ];
-    if (tabRef.current?.session?.locked && tabBarRef.current?.page() === 2) {
+    if (tabRef.current?.session?.locked && fluidTabsRef.current?.page() === 2) {
       unlock();
     }
     return () => {

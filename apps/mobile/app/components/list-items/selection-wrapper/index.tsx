@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Item, TrashItem } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { PropsWithChildren, useRef } from "react";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
+import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
+import { DefaultAppStyles } from "../../../utils/styles";
 import { Pressable } from "../../ui/pressable";
-import { Filler } from "./back-fill";
-import { SelectionIcon } from "./selection";
-import { Item, TrashItem } from "@notesnook/core";
 
 export function selectItem(item: Item) {
   if (useSelectionStore.getState().selectionMode === item.type) {
@@ -49,6 +49,7 @@ type SelectionWrapperProps = PropsWithChildren<{
   testID?: string;
   isSheet?: boolean;
   color?: string;
+  index?: number;
 }>;
 
 const SelectionWrapper = ({
@@ -57,10 +58,16 @@ const SelectionWrapper = ({
   testID,
   isSheet,
   children,
-  color
+  color,
+  index = 0
 }: SelectionWrapperProps) => {
   const itemId = useRef(item.id);
   const { colors, isDark } = useThemeColors();
+  const isEditingNote = useTabStore(
+    (state) =>
+      state.tabs.find((t) => t.id === state.currentTab)?.session?.noteId ===
+      item.id
+  );
   const compactMode = useIsCompactModeEnabled(
     (item as TrashItem).itemType || item.type
   );
@@ -79,7 +86,13 @@ const SelectionWrapper = ({
 
   return (
     <Pressable
-      customColor={isSheet ? colors.secondary.background : "transparent"}
+      customColor={
+        isEditingNote
+          ? colors.selected.background
+          : isSheet
+          ? colors.primary.hover
+          : "transparent"
+      }
       testID={testID}
       onLongPress={onLongPress}
       onPress={onPress}
@@ -91,15 +104,14 @@ const SelectionWrapper = ({
         justifyContent: "space-between",
         alignItems: "center",
         width: "100%",
+        alignSelf: "center",
         overflow: "hidden",
-        paddingHorizontal: 12,
-        paddingVertical: compactMode ? 4 : 12,
+        paddingHorizontal: DefaultAppStyles.GAP,
+        paddingVertical: compactMode ? 4 : DefaultAppStyles.GAP_VERTICAL,
         borderRadius: isSheet ? 10 : 0,
         marginBottom: isSheet ? 12 : undefined
       }}
     >
-      {item.type === "note" ? <Filler item={item} color={color} /> : null}
-      <SelectionIcon item={item} />
       {children}
     </Pressable>
   );

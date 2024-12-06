@@ -25,7 +25,7 @@ import { RGB_Linear_Shade, hexToRGBA } from "../../../utils/colors";
 import { SIZE } from "../../../utils/size";
 import NativeTooltip from "../../../utils/tooltip";
 import { Pressable, PressableProps } from "../pressable";
-interface IconButtonProps extends PressableProps {
+export interface IconButtonProps extends PressableProps {
   name: string;
   color?: ColorValue;
   size?: number;
