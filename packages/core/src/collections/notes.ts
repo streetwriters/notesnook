@@ -176,6 +176,15 @@ export class Notes implements ICollection {
     return note;
   }
 
+  async tags(id: string) {
+    return this.db.relations
+      .to({ id, type: "note" }, "tag")
+      .selector.items(undefined, {
+        sortBy: "dateCreated",
+        sortDirection: "asc"
+      });
+  }
+
   // note(idOrNote: string | Note) {
   //   if (!idOrNote) return;
   //   const note =

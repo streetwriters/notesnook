@@ -197,6 +197,15 @@ test("update note", () =>
     expect(note?.favorite).toBe(true);
   }));
 
+test("get note tags", () =>
+  noteTest({
+    ...TEST_NOTE
+  }).then(async ({ db, id }) => {
+    const tag = await db.tags.add({ title: "hello" });
+    await db.relations.add({ type: "tag", id: tag }, { type: "note", id });
+    expect(await db.notes.tags(id)).toEqual([await db.tags.tag(tag)]);
+  }));
+
 test("get favorite notes", () =>
   noteTest({
     ...TEST_NOTE,
