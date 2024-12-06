@@ -834,6 +834,7 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
           if (!note || !note.content)
             throw new Error("note with this id does not exist.");
 
+          const tags = await db.notes.tags(note.id);
           useEditorStore.getState().addSession({
             type: session.note.readonly ? "readonly" : "default",
             locked: true,
@@ -841,6 +842,7 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
             note: session.note,
             saveState: SaveState.Saved,
             sessionId: `${Date.now()}`,
+            tags,
             pinned: session.pinned,
             preview: session.preview,
             content: note.content

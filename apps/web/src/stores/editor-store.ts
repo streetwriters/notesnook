@@ -421,7 +421,7 @@ class EditorStore extends BaseStore<EditorStore> {
                 continue;
 
               updateSession(session.id, undefined, {
-                tags: await getTags(session.note.id)
+                tags: await db.notes.tags(session.note.id)
               });
             }
           } else if (
@@ -432,7 +432,7 @@ class EditorStore extends BaseStore<EditorStore> {
             event.item.toType === "note"
           ) {
             updateSession(event.item.toId, undefined, {
-              tags: await getTags(event.item.toId)
+              tags: await db.notes.tags(event.item.toId)
             });
           }
         } else if (event.collection === "tags") {
@@ -445,7 +445,7 @@ class EditorStore extends BaseStore<EditorStore> {
                 continue;
               console.log("UDPATE");
               updateSession(session.id, undefined, {
-                tags: await getTags(session.note.id)
+                tags: await db.notes.tags(session.note.id)
               });
             }
           }
@@ -671,7 +671,7 @@ class EditorStore extends BaseStore<EditorStore> {
         const attachmentsLength = await db.attachments
           .ofNote(note.id, "all")
           .count();
-        const tags = await getTags(note.id);
+        const tags = await db.notes.tags(note.id);
         const colors = await db.relations.to(note, "color").get();
         if (note.readonly) {
           this.addSession(
@@ -1019,13 +1019,4 @@ async function waitForSync() {
   return new Promise((resolve) => {
     db.eventManager.subscribe(EVENTS.syncCompleted, resolve, true);
   });
-}
-
-async function getTags(noteId: string) {
-  return await db.relations
-    .to({ id: noteId, type: "note" }, "tag")
-    .selector.items(undefined, {
-      sortBy: "dateCreated",
-      sortDirection: "asc"
-    });
 }
