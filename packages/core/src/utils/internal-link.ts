@@ -52,7 +52,12 @@ export function createInternalLink<T extends InternalLinkType>(
 }
 
 export function parseInternalLink(link: string): InternalLink | undefined {
-  const url = new URL(link);
+  let url;
+  try {
+    url = new URL(link);
+  } catch (e) {
+    return;
+  }
 
   if (url.protocol !== "nn:") return;
   const [type, id] = url.href.split("?")[0].split("/").slice(2);
