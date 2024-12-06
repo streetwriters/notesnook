@@ -29,6 +29,7 @@ import {
   TrashItem
 } from "@notesnook/core";
 import create, { State } from "zustand";
+import { ParamListBase } from "@react-navigation/core";
 
 export type GenericRouteParam = undefined;
 
@@ -55,7 +56,7 @@ export type AuthParams = {
   canGoBack?: boolean;
 };
 
-export type RouteParams = {
+export interface RouteParams extends ParamListBase {
   Notes: GenericRouteParam;
   Notebooks: {
     canGoBack?: boolean;
@@ -80,7 +81,7 @@ export type RouteParams = {
   AppLock: AppLockRouteParams;
   Reminders: GenericRouteParam;
   SettingsGroup: GenericRouteParam;
-};
+}
 
 export type RouteName = keyof RouteParams;
 

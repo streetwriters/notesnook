@@ -35,18 +35,17 @@ import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { deleteItems } from "../../utils/functions";
-import { tabBarRef } from "../../utils/global-refs";
+import { fluidTabsRef } from "../../utils/global-refs";
 import { updateNotebook } from "../../utils/notebooks";
 import { SIZE } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { presentDialog } from "../dialog/functions";
 import MoveNoteSheet from "../sheets/add-to";
 import ExportNotesSheet from "../sheets/export-notes";
 import ManageTagsSheet from "../sheets/manage-tags";
 import { MoveNotebookSheet } from "../sheets/move-notebook";
-import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
-import Heading from "../ui/typography/heading";
 
 export const SelectionHeader = React.memo(
   ({
@@ -75,9 +74,9 @@ export const SelectionHeader = React.memo(
 
     useEffect(() => {
       if (selectionMode) {
-        tabBarRef.current?.lock();
+        fluidTabsRef.current?.lock();
       } else {
-        tabBarRef.current?.unlock();
+        fluidTabsRef.current?.unlock();
       }
     }, [selectionMode]);
 
@@ -139,61 +138,24 @@ export const SelectionHeader = React.memo(
       <View
         style={{
           width: "100%",
-          height: Platform.OS === "android" ? 50 + insets.top : 50,
-          paddingTop: Platform.OS === "android" ? insets.top : null,
           backgroundColor: colors.primary.background,
-          justifyContent: "space-between",
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL,
           alignItems: "center",
           flexDirection: "row",
           zIndex: 999,
-          paddingHorizontal: 12
+          paddingHorizontal: DefaultAppStyles.GAP,
+          position: "absolute",
+          bottom: 0,
+          borderTopWidth: 1,
+          borderColor: colors.primary.border,
+          justifyContent: "space-between"
         }}
       >
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "flex-start",
             alignItems: "center",
-            borderRadius: 100
-          }}
-        >
-          <IconButton
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              height: 40,
-              width: 40,
-              borderRadius: 100,
-              marginRight: 10
-            }}
-            onPress={() => {
-              clearSelection();
-            }}
-            color={colors.primary.icon}
-            name="close"
-          />
-
-          <View
-            style={{
-              height: 40,
-              borderRadius: 100,
-              paddingHorizontal: 16,
-              justifyContent: "center",
-              flexDirection: "row",
-              alignItems: "center"
-            }}
-          >
-            <Heading size={SIZE.lg} color={colors.primary.paragraph}>
-              {selectedItemsList.length}
-            </Heading>
-          </View>
-        </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            alignItems: "center"
+            gap: DefaultAppStyles.GAP_SMALL
           }}
         >
           <IconButton
@@ -202,42 +164,14 @@ export const SelectionHeader = React.memo(
                 .getState()
                 .setAll(allSelected ? [] : [...((await items?.ids()) || [])]);
             }}
-            tooltipText="Select all"
-            tooltipPosition={4}
-            style={{
-              marginLeft: 10
-            }}
-            color={
-              allSelected ? colors.primary.accent : colors.primary.paragraph
-            }
+            size={SIZE.lg}
+            color={allSelected ? colors.primary.accent : colors.primary.icon}
             name="select-all"
           />
 
-          {selectedItemsList.length ? (
-            <Menu
-              ref={menuRef}
-              animationDuration={200}
-              style={{
-                borderRadius: 5,
-                backgroundColor: contextMenuColors.primary.background,
-                marginTop: 35
-              }}
-              onRequestClose={() => {
-                //@ts-ignore
-                menuRef.current?.hide();
-              }}
-              anchor={
-                <IconButton
-                  onPress={() => {
-                    //@ts-ignore
-                    menuRef.current?.show();
-                  }}
-                  name="dots-vertical"
-                  color={colors.primary.paragraph}
-                />
-              }
-            >
-              {[
+          {!selectedItemsList.length
+            ? null
+            : [
                 {
                   title: strings.move(),
                   onPress: async () => {
@@ -341,20 +275,12 @@ export const SelectionHeader = React.memo(
                 }
               ].map((item) =>
                 !item.visible ? null : (
-                  <Button
-                    style={{
-                      justifyContent: "flex-start",
-                      borderRadius: 0,
-                      alignSelf: "flex-start",
-                      width: "100%"
-                    }}
+                  <IconButton
+                    size={SIZE.lg}
                     type="plain"
-                    buttonType={{
-                      text: contextMenuColors.primary.paragraph
-                    }}
-                    icon={item.icon}
+                    name={item.icon}
                     key={item.title}
-                    title={item.title}
+                    color={colors.primary.icon}
                     onPress={async () => {
                       //@ts-ignore
                       menuRef.current?.hide();
@@ -364,9 +290,16 @@ export const SelectionHeader = React.memo(
                   />
                 )
               )}
-            </Menu>
-          ) : null}
         </View>
+
+        <IconButton
+          size={SIZE.lg}
+          onPress={() => {
+            clearSelection();
+          }}
+          color={colors.primary.icon}
+          name="close"
+        />
       </View>
     );
   }

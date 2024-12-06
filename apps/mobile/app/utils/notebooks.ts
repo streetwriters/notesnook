@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { db } from "../common/database";
 import { eSendEvent } from "../services/event-manager";
+import { useNotebookStore } from "../stores/use-notebook-store";
 import { eOnNotebookUpdated } from "./events";
 
 export async function findRootNotebookId(id: string) {
@@ -51,9 +52,14 @@ export async function getParentNotebookId(id: string) {
   return relation?.[0]?.fromId;
 }
 
-export async function updateNotebook(id?: string) {
+export async function updateNotebook(id?: string, updateParent?: boolean) {
   eSendEvent(eOnNotebookUpdated, id);
-  if (id) {
-    eSendEvent(eOnNotebookUpdated, await getParentNotebookId(id));
+  if (updateParent && id) {
+    const parent = await getParentNotebookId(id);
+    if (parent) {
+      eSendEvent(eOnNotebookUpdated, parent);
+    } else {
+      useNotebookStore.getState().refresh();
+    }
   }
 }

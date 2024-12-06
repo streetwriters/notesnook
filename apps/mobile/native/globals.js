@@ -24,7 +24,7 @@ import {
 } from "@notesnook/intl/dist/locales/$pseudo-LOCALE.json";
 
 i18n.load({
-  en: __DEV__ ? $pseudo : $en
+  en: !__DEV__ ? $pseudo : $en
 });
 setI18nGlobal(i18n);
 i18n.activate("en");

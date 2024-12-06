@@ -81,31 +81,33 @@ export const normalize = (size) => {
     return correction(size, 1);
   }
 };
-export const SIZE = {
-  xxs: normalize(11) * scale.fontScale,
-  xs: normalize(12.5) * scale.fontScale,
-  sm: normalize(15) * scale.fontScale,
-  md: normalize(16.5) * scale.fontScale,
-  lg: normalize(22) * scale.fontScale,
-  xl: normalize(24) * scale.fontScale,
-  xxl: normalize(28) * scale.fontScale,
-  xxxl: normalize(32) * scale.fontScale
-};
+
+function getSize() {
+  return {
+    xxxs: normalize(11) * scale.fontScale,
+    xxs: normalize(12.5) * scale.fontScale,
+    xs: normalize(14) * scale.fontScale,
+    sm: normalize(15) * scale.fontScale,
+    md: normalize(16.5) * scale.fontScale,
+    lg: normalize(22) * scale.fontScale,
+    xl: normalize(24) * scale.fontScale,
+    xxl: normalize(28) * scale.fontScale,
+    xxxl: normalize(32) * scale.fontScale
+  };
+}
+
+export const SIZE = getSize();
 
 export function updateSize() {
-  SIZE.xxs = normalize(11) * scale.fontScale;
-  SIZE.xs = normalize(12.5) * scale.fontScale;
-  SIZE.sm = normalize(15) * scale.fontScale;
-  SIZE.md = normalize(16.5) * scale.fontScale;
-  SIZE.lg = normalize(22) * scale.fontScale;
-  SIZE.xl = normalize(24) * scale.fontScale;
-  SIZE.xxl = normalize(28) * scale.fontScale;
-  SIZE.xxxl = normalize(32) * scale.fontScale;
+  const newSize = getSize();
+  for (const key in SIZE) {
+    SIZE[key] = newSize[key];
+  }
   ph = normalize(10) * scale.fontScale;
   pv = normalize(10) * scale.fontScale;
 }
 
-export const br = 5; // border radius
+export const br = 8; // border radius
 export var ph = normalize(10); // padding horizontal
 export var pv = normalize(10); // padding vertical
 export const opacity = 0.5; // active opacity

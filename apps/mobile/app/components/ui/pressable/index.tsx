@@ -273,13 +273,12 @@ export const Pressable = ({
         justifyContent: "center",
         alignItems: "center",
         marginBottom: 0,
-        borderColor:
-          pressed && !disabled
-            ? customSelectedColor
-              ? getColorLinearShade(customSelectedColor, 0.3, false)
-              : borderSelectedColor || borderColor
-            : borderColor || "transparent",
-        borderWidth: borderWidth
+        borderColor: pressed
+          ? customSelectedColor
+            ? getColorLinearShade(customSelectedColor, 0.3, false)
+            : borderSelectedColor || borderColor
+          : borderColor || "transparent",
+        borderWidth: noborder ? 0 : borderWidth
       },
       style,
       {

@@ -26,7 +26,7 @@ import {
   DraxListRenderItemContent
 } from "react-native-drax";
 
-import { tabBarRef } from "../../utils/global-refs";
+import { fluidTabsRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
 import { useSideBarDraggingStore } from "../side-menu/dragging-store";
 import { IconButton } from "../ui/icon-button";
@@ -61,9 +61,9 @@ function ReorderableList<T extends { id: string }>({
   const listRef = useRef<FlatList | null>(null);
 
   if (dragging) {
-    tabBarRef.current?.lock();
+    fluidTabsRef.current?.lock();
   } else {
-    tabBarRef.current?.unlock();
+    fluidTabsRef.current?.unlock();
   }
 
   useEffect(() => {
@@ -78,8 +78,7 @@ function ReorderableList<T extends { id: string }>({
       return isHidden && !dragging ? null : (
         <View
           style={{
-            flexDirection: "row",
-            paddingHorizontal: 12
+            flexDirection: "row"
           }}
         >
           <View

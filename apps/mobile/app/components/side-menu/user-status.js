@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React from "react";
@@ -30,13 +31,12 @@ import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { eOpenLoginDialog } from "../../utils/events";
-import { tabBarRef } from "../../utils/global-refs";
+import { fluidTabsRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
 import { IconButton } from "../ui/icon-button";
 import { Pressable } from "../ui/pressable";
 import { TimeSince } from "../ui/time-since";
 import Paragraph from "../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
 
 export const UserStatus = () => {
   const { colors, isDark } = useThemeColors();
@@ -71,7 +71,7 @@ export const UserStatus = () => {
         <Pressable
           onPress={() => {
             Navigation.navigate("Settings");
-            tabBarRef.current.closeDrawer();
+            fluidTabsRef.current.closeDrawer();
           }}
           type="plain"
           style={{
@@ -206,7 +206,7 @@ export const UserStatus = () => {
                 if (user) {
                   Sync.run();
                 } else {
-                  tabBarRef.current?.closeDrawer();
+                  fluidTabsRef.current?.closeDrawer();
                   eSendEvent(eOpenLoginDialog);
                 }
               }}

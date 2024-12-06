@@ -44,7 +44,7 @@ export const useShortcutManager = ({
   shortcuts = defaultShortcuts
 }: {
   onShortcutPressed: (shortcut: ShortcutItem | null) => void;
-  shortcuts: ShortcutItem[];
+  shortcuts?: ShortcutItem[];
 }) => {
   const initialShortcutRecieved = useRef(false);
 

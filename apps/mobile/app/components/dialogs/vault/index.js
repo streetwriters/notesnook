@@ -41,7 +41,7 @@ import {
   eUpdateNoteInEditor
 } from "../../../utils/events";
 import { deleteItems } from "../../../utils/functions";
-import { tabBarRef } from "../../../utils/global-refs";
+import { fluidTabsRef } from "../../../utils/global-refs";
 import { convertNoteToText } from "../../../utils/note-to-text";
 import { sleep } from "../../../utils/time";
 import BaseDialog from "../../dialog/base-dialog";
@@ -553,7 +553,7 @@ export class VaultDialog extends Component {
         item: note
       });
       if (!DDS.isTab) {
-        tabBarRef.current?.goToPage(1);
+        fluidTabsRef.current?.goToPage(1);
       }
     });
   }
