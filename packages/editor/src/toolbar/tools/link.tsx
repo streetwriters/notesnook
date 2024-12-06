@@ -107,6 +107,7 @@ export function EditLink(props: ToolProps) {
   const link = node ? findMark(node, LinkNode.name) : null;
   const attrs = link?.attrs || getMarkAttributes(editor.state, LinkNode.name);
 
+  if (!editor.isEditable) return null;
   if (attrs && isInternalLink(attrs.href))
     return (
       <ToolButton
