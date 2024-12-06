@@ -17,18 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createNavigationContainerRef } from "@react-navigation/native";
-import { createRef } from "react";
-import { TextInput, View } from "react-native";
-import { TabsRef } from "../components/fluid-panels";
-import { RouteParams } from "../stores/use-navigation-store";
+import { createNotebookTreeStores } from "../../stores/create-notebook-tree-stores";
+import { createItemSelectionStore } from "../../stores/item-selection-store";
 
-export const inputRef = createRef<TextInput>();
-export const rootNavigatorRef = createNavigationContainerRef<{
-  FluidPanelsView: undefined;
-  AppLock: undefined;
-  Settings: undefined;
-}>();
-export const appNavigatorRef = createNavigationContainerRef<RouteParams>();
-export const fluidTabsRef = createRef<TabsRef>();
-export const editorRef = createRef<View>();
+export const {
+  useSideMenuNotebookExpandedStore,
+  useSideMenuNotebookSelectionStore,
+  useSideMenuNotebookTreeStore
+} = createNotebookTreeStores(true, false);
+
+export const useSideMenuTagsSelectionStore = createItemSelectionStore(
+  true,
+  false
+);

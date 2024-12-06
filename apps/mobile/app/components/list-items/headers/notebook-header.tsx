@@ -17,140 +17,65 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { getFormattedDate } from "@notesnook/common";
 import { Notebook } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useState } from "react";
+import React from "react";
 import { View } from "react-native";
-import { db } from "../../../common/database";
-import { ToastManager } from "../../../services/event-manager";
-import { useMenuStore } from "../../../stores/use-menu-store";
 import { SIZE } from "../../../utils/size";
-import { IconButton } from "../../ui/icon-button";
+import { DefaultAppStyles } from "../../../utils/styles";
+import AppIcon from "../../ui/AppIcon";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { getFormattedDate } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
 
 export const NotebookHeader = ({
   notebook,
-  onEditNotebook,
   totalNotes = 0
 }: {
   notebook: Notebook;
-  onEditNotebook: () => void;
   totalNotes: number;
 }) => {
   const { colors } = useThemeColors();
-  const [isPinnedToMenu, setIsPinnedToMenu] = useState(
-    db.shortcuts.exists(notebook.id)
-  );
-  const setMenuPins = useMenuStore((state) => state.setMenuPins);
-
-  const onPinNotebook = async () => {
-    try {
-      if (isPinnedToMenu) {
-        await db.shortcuts.remove(notebook.id);
-      } else {
-        await db.shortcuts.add({
-          item: {
-            id: notebook.id,
-            type: "notebook"
-          }
-        });
-        ToastManager.show({
-          heading: strings.shortcutCreated(),
-          type: "success"
-        });
-      }
-      setIsPinnedToMenu(db.shortcuts.exists(notebook.id));
-      setMenuPins();
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   return (
     <View
       style={{
-        marginBottom: 5,
-        padding: 0,
-        width: "100%",
-        paddingVertical: 15,
-        paddingHorizontal: 12,
-        alignSelf: "center",
-        borderRadius: 10,
-        paddingTop: 25
+        paddingHorizontal: DefaultAppStyles.GAP,
+        marginVertical: DefaultAppStyles.GAP,
+        backgroundColor: colors.secondary.background
       }}
     >
-      <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-        {getFormattedDate(notebook.dateModified, "date-time")}
-      </Paragraph>
       <View
         style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center"
+          width: "100%",
+          gap: DefaultAppStyles.GAP_VERTICAL,
+          paddingVertical: 25
         }}
       >
-        <Heading
-          style={{
-            flexShrink: 1
-          }}
-          size={SIZE.lg}
-        >
-          {notebook.title}
-        </Heading>
+        <AppIcon name="notebook" size={SIZE.xxl} />
+        <Heading size={SIZE.lg}>{notebook.title}</Heading>
+
+        {notebook.description ? (
+          <Paragraph size={SIZE.sm} color={colors.primary.paragraph}>
+            {notebook.description}
+          </Paragraph>
+        ) : null}
 
         <View
           style={{
-            flexDirection: "row"
+            flexDirection: "row",
+            gap: DefaultAppStyles.GAP_SMALL
           }}
         >
-          <IconButton
-            name={isPinnedToMenu ? "link-variant-off" : "link-variant"}
-            onPress={onPinNotebook}
-            tooltipText={"Create shortcut in side menu"}
-            style={{
-              marginRight: 15,
-              width: 40,
-              height: 40
-            }}
-            type="transparent"
-            color={isPinnedToMenu ? colors.primary.accent : colors.primary.icon}
-            size={SIZE.lg}
-          />
-          <IconButton
-            size={SIZE.lg}
-            onPress={onEditNotebook}
-            tooltipText="Edit this notebook"
-            name="pencil"
-            type="transparent"
-            color={colors.primary.icon}
-            style={{
-              width: 40,
-              height: 40
-            }}
-          />
+          <Paragraph size={SIZE.xxs} color={colors.secondary.paragraph}>
+            {strings.notes(totalNotes || 0)}
+          </Paragraph>
+
+          <Paragraph color={colors.secondary.paragraph} size={SIZE.xxs}>
+            {getFormattedDate(notebook.dateModified, "date-time")}
+          </Paragraph>
         </View>
       </View>
-
-      {notebook.description ? (
-        <Paragraph size={SIZE.sm} color={colors.primary.paragraph}>
-          {notebook.description}
-        </Paragraph>
-      ) : null}
-
-      <Paragraph
-        style={{
-          marginTop: 10,
-          fontStyle: "italic",
-          fontFamily: undefined
-        }}
-        size={SIZE.xs}
-        color={colors.secondary.paragraph}
-      >
-        {strings.notes(totalNotes || 0)}
-      </Paragraph>
     </View>
   );
 };

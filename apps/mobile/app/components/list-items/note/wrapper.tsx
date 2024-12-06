@@ -29,7 +29,7 @@ import {
   presentSheet
 } from "../../../services/event-manager";
 import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
-import { tabBarRef } from "../../../utils/global-refs";
+import { fluidTabsRef } from "../../../utils/global-refs";
 
 import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
 import NotePreview from "../../note-history/preview";
@@ -66,7 +66,7 @@ export const openNote = async (
       item: note
     });
     if (!DDS.isTab) {
-      tabBarRef.current?.goToPage(1);
+      fluidTabsRef.current?.goToPage(1);
     }
   }
 };
@@ -101,6 +101,7 @@ export const NoteWrapper = React.memo<
         onPress={() => openNote(item as Note, isTrash, isRenderedInActionSheet)}
         isSheet={isRenderedInActionSheet}
         item={item}
+        index={index}
         color={restProps.color?.colorCode}
       >
         <NoteItem {...restProps} item={item} index={index} isTrash={isTrash} />

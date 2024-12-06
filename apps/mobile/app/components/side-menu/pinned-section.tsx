@@ -18,30 +18,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Notebook, Tag } from "@notesnook/core";
-import { useThemeColors } from "@notesnook/theme";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { View } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import NotebookScreen from "../../screens/notebook";
 import { TaggedNotes } from "../../screens/notes/tagged";
 import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
-import useNavigationStore from "../../stores/use-navigation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { SIZE, normalize } from "../../utils/size";
+import { SideMenuItem } from "../../utils/menu-items";
 import ReorderableList from "../list/reorderable-list";
-import { Button } from "../ui/button";
-import { Notice } from "../ui/notice";
-import { Pressable } from "../ui/pressable";
-import Seperator from "../ui/seperator";
-import SheetWrapper from "../ui/sheet";
-import Heading from "../ui/typography/heading";
-import Paragraph from "../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
+import { MenuItem } from "./menu-item";
+import { useThemeColors } from "@notesnook/theme";
+import { DefaultAppStyles } from "../../utils/styles";
 
 export const PinnedSection = React.memo(
   function PinnedSection() {
+    const { colors } = useThemeColors();
     const menuPins = useMenuStore((state) => state.menuPins);
     const loading = useSettingStore((state) => state.isAppLoading);
     const setMenuPins = useMenuStore((state) => state.setMenuPins);
@@ -52,42 +45,55 @@ export const PinnedSection = React.memo(
       }
     }, [loading, setMenuPins]);
 
-    const onPress = (item: Notebook | Tag) => {
-      if (item.type === "notebook") {
-        NotebookScreen.navigate(item);
-      } else if (item.type === "tag") {
-        TaggedNotes.navigate(item);
+    const onPress = React.useCallback((item: SideMenuItem) => {
+      const data = item.data as Notebook | Tag;
+      if (data.type === "notebook") {
+        NotebookScreen.navigate(data);
+      } else if (data.type === "tag") {
+        TaggedNotes.navigate(data);
       }
       setImmediate(() => {
         Navigation.closeDrawer();
       });
-    };
-    const renderItem = ({
-      item,
-      index
-    }: {
-      item: Notebook | Tag;
-      index: number;
-    }) => {
-      return <PinItem item={item} onPress={onPress} />;
-    };
+    }, []);
+
+    const menuItems = useMemo(
+      () =>
+        menuPins.map((item) => ({
+          id: item.id,
+          title: item.title,
+          icon: item.type === "notebook" ? "notebook-outline" : "pound",
+          dataType: item.type,
+          data: item,
+          onPress: onPress
+        })) as SideMenuItem[],
+      [menuPins, onPress]
+    );
+
+    const renderItem = React.useCallback(({ item }: { item: SideMenuItem }) => {
+      return <MenuItem item={item} />;
+    }, []);
 
     return (
       <View
         style={{
-          flexGrow: 1
+          flexGrow: 1,
+          borderTopWidth: 1,
+          borderTopColor: colors.primary.border,
+          marginTop: DefaultAppStyles.GAP_SMALL,
+          paddingTop: DefaultAppStyles.GAP_SMALL
         }}
       >
         <ReorderableList
           onListOrderChanged={(data) => {
             db.settings.setSideBarOrder("shortcuts", data);
           }}
-          onHiddenItemsChanged={(data) => {}}
+          onHiddenItemsChanged={() => {}}
           canHideItems={false}
           itemOrder={order}
           hiddenItems={[]}
           alwaysBounceVertical={false}
-          data={menuPins}
+          data={menuItems}
           style={{
             flexGrow: 1,
             width: "100%"
@@ -97,161 +103,9 @@ export const PinnedSection = React.memo(
           }}
           showsVerticalScrollIndicator={false}
           renderDraggableItem={renderItem}
-          ListEmptyComponent={
-            <Notice
-              size="small"
-              type="information"
-              text={strings.sideMenuNotice()}
-              style={{
-                marginHorizontal: 12
-              }}
-            />
-          }
         />
       </View>
     );
   },
   () => true
-);
-
-export const PinItem = React.memo(
-  function PinItem({
-    item,
-    onPress,
-    isPlaceholder
-  }: {
-    item: Notebook | Tag;
-    onPress: (item: Notebook | Tag) => void;
-    isPlaceholder?: boolean;
-  }) {
-    const { colors } = useThemeColors();
-    const setMenuPins = useMenuStore((state) => state.setMenuPins);
-
-    const [visible, setVisible] = useState(false);
-    const isFocused = useNavigationStore(
-      (state) => state.focusedRouteId === item.id
-    );
-    const primaryColors = isFocused ? colors.selected : colors.primary;
-    const color = isFocused ? colors.selected.accent : colors.primary.icon;
-    const fwdRef = useRef();
-
-    const icons = {
-      topic: "bookmark",
-      notebook: "book-outline",
-      tag: "pound"
-    };
-
-    return (
-      <>
-        {visible && (
-          <SheetWrapper
-            onClose={() => {
-              setVisible(false);
-            }}
-            gestureEnabled={false}
-            fwdRef={fwdRef}
-          >
-            <Seperator />
-            <Button
-              title={strings.removeShortcut()}
-              type="error"
-              onPress={async () => {
-                await db.shortcuts.remove(item.id);
-                setVisible(false);
-                setMenuPins();
-              }}
-              fontSize={SIZE.md}
-              width="95%"
-              style={{
-                marginBottom: 30
-              }}
-            />
-          </SheetWrapper>
-        )}
-        <Pressable
-          type={isFocused ? "selected" : "plain"}
-          onPress={() => onPress(item)}
-          style={{
-            width: "100%",
-            alignSelf: "center",
-            borderRadius: 5,
-            flexDirection: "row",
-            paddingHorizontal: 8,
-            justifyContent: "space-between",
-            alignItems: "center",
-            height: normalize(50),
-            marginBottom: 5
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              flexGrow: 1,
-              flex: 1
-            }}
-          >
-            <View
-              style={{
-                width: 30,
-                justifyContent: "center"
-              }}
-            >
-              <Icon
-                allowFontScaling
-                color={color}
-                size={SIZE.lg - 2}
-                name={icons[item.type]}
-              />
-              <Icon
-                style={{
-                  position: "absolute",
-                  bottom: -6,
-                  left: -6
-                }}
-                allowFontScaling
-                color={color}
-                size={SIZE.xs}
-                name="arrow-top-right-thick"
-              />
-            </View>
-            <View
-              style={{
-                alignItems: "flex-start",
-                flexGrow: 1,
-                flex: 1
-              }}
-            >
-              {isFocused ? (
-                <Heading
-                  style={{
-                    flexWrap: "wrap"
-                  }}
-                  color={primaryColors.heading}
-                  size={SIZE.md}
-                >
-                  {item.title}
-                </Heading>
-              ) : (
-                <Paragraph
-                  numberOfLines={1}
-                  color={primaryColors.paragraph}
-                  size={SIZE.md}
-                >
-                  {item.title}
-                </Paragraph>
-              )}
-            </View>
-          </View>
-        </Pressable>
-      </>
-    );
-  },
-  (prev, next) => {
-    if (!next.item) return false;
-    if (prev.item.title !== next.item.title) return false;
-    if (prev.item?.dateModified !== next.item?.dateModified) return false;
-    if (prev.item?.id !== next.item?.id) return false;
-    return true;
-  }
 );

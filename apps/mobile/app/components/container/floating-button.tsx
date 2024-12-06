@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import { useRoute } from "@react-navigation/native";
 import React, { useCallback, useEffect } from "react";
-import { Keyboard, View } from "react-native";
+import { Keyboard, TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -34,7 +34,7 @@ import { useSelectionStore } from "../../stores/use-selection-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { getElevationStyle } from "../../utils/elevation";
 import { SIZE, normalize } from "../../utils/size";
-import { Pressable } from "../ui/pressable";
+import { DefaultAppStyles } from "../../utils/styles";
 
 interface FloatingButtonProps {
   onPress: () => void;
@@ -108,20 +108,24 @@ const FloatingButton = ({
       style={[
         {
           position: "absolute",
-          right: 12,
+          right: DefaultAppStyles.GAP,
           bottom: 20,
           zIndex: 10
         },
         animatedStyle
       ]}
     >
-      <Pressable
+      <TouchableOpacity
         testID={notesnook.buttons.add}
-        type="accent"
-        accentColor={color}
+        activeOpacity={0.95}
         style={{
-          ...getElevationStyle(5),
-          borderRadius: 100
+          ...getElevationStyle(10),
+          borderRadius: 20,
+          borderTopWidth: 0,
+          borderBottomWidth: 0,
+          borderLeftWidth: 0,
+          borderRightWidth: 0,
+          backgroundColor: colors.primary.background
         }}
         onPress={onPress}
       >
@@ -130,7 +134,9 @@ const FloatingButton = ({
             alignItems: "center",
             justifyContent: "center",
             height: normalize(60),
-            width: normalize(60)
+            width: normalize(60),
+            backgroundColor: colors.primary.shade,
+            borderRadius: 20
           }}
         >
           <Icon
@@ -141,11 +147,11 @@ const FloatingButton = ({
                 ? "delete"
                 : "plus"
             }
-            color={colors.primary.accentForeground}
-            size={SIZE.xxl}
+            color={colors.primary.accent}
+            size={SIZE.xxxl}
           />
         </View>
-      </Pressable>
+      </TouchableOpacity>
     </Animated.View>
   );
 };

@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Dimensions, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useMessageStore } from "../../stores/use-message-store";
-import { useThemeColors } from "@notesnook/theme";
-import { getContainerBorder, hexToRGBA } from "../../utils/colors";
 import { SIZE } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 
@@ -38,19 +38,24 @@ export const Card = ({ color }: { color?: string }) => {
     (announcements && announcements.length) ? null : (
     <View
       style={{
-        width: "95%"
+        width: "100%",
+        paddingHorizontal: DefaultAppStyles.GAP,
+        marginTop: DefaultAppStyles.GAP
       }}
     >
       <Pressable
         onPress={messageBoardState.onPress}
         type="plain"
         style={{
-          paddingVertical: 12,
+          paddingVertical: DefaultAppStyles.GAP_VERTICAL,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingHorizontal: 0,
-          width: "100%"
+          paddingHorizontal: DefaultAppStyles.GAP_SMALL,
+          width: "100%",
+          backgroundColor: colors.secondary.background,
+          borderWidth: 1,
+          borderColor: colors.primary.border
         }}
       >
         <View
@@ -63,24 +68,14 @@ export const Card = ({ color }: { color?: string }) => {
           <View
             style={{
               width: 40 * fontScale,
-              backgroundColor:
-                messageBoardState.type === "error"
-                  ? hexToRGBA(colors.error.accent, 0.15)
-                  : hexToRGBA(color, 0.15),
               height: 40 * fontScale,
               borderRadius: 100,
               alignItems: "center",
-              justifyContent: "center",
-              ...getContainerBorder(
-                messageBoardState.type === "error"
-                  ? colors.error.accent
-                  : color || colors.primary.accent,
-                0.4
-              )
+              justifyContent: "center"
             }}
           >
             <Icon
-              size={SIZE.lg}
+              size={SIZE.xxxl}
               color={
                 messageBoardState.type === "error" ? colors.error.icon : color
               }
@@ -95,9 +90,6 @@ export const Card = ({ color }: { color?: string }) => {
               marginRight: 10
             }}
           >
-            <Paragraph color={colors.secondary.paragraph} size={SIZE.xs}>
-              {messageBoardState.message}
-            </Paragraph>
             <Paragraph
               style={{
                 flexWrap: "nowrap",
@@ -106,6 +98,9 @@ export const Card = ({ color }: { color?: string }) => {
               color={colors.primary.heading}
             >
               {messageBoardState.actionText}
+            </Paragraph>
+            <Paragraph color={colors.secondary.paragraph} size={SIZE.xxs}>
+              {messageBoardState.message}
             </Paragraph>
           </View>
         </View>

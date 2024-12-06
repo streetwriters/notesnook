@@ -18,20 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
 import {
-  Color,
-  createInternalLink,
+  Item,
   ItemReference,
   Note,
-  Notebook,
-  Reminder,
-  Tag,
-  TrashItem,
-  VAULT_ERRORS
+  VAULT_ERRORS,
+  createInternalLink
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { InteractionManager, Platform } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
@@ -48,6 +45,11 @@ import { ReferencesList } from "../components/sheets/references";
 import { RelationsList } from "../components/sheets/relations-list/index";
 import ReminderSheet from "../components/sheets/reminder";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
+import {
+  useSideMenuNotebookSelectionStore,
+  useSideMenuTagsSelectionStore
+} from "../components/side-menu/stores";
+import { ButtonProps } from "../components/ui/button";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import {
   eSendEvent,
@@ -69,13 +71,83 @@ import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { sleep } from "../utils/time";
 
+export type ActionId =
+  | "select"
+  | "restore"
+  | "delete"
+  | "reorder"
+  | "rename-tag"
+  | "rename-color"
+  | "pin"
+  | "add-shortcut"
+  | "rename-notebook"
+  | "add-notebook"
+  | "edit-notebook"
+  | "default-notebook"
+  | "move-notes"
+  | "move-notebook"
+  | "disable-reminder"
+  | "edit-reminder"
+  | "delete-reminder"
+  | "delete"
+  | "delete-trash"
+  | "add-reminder"
+  | "copy"
+  | "share"
+  | "read-only"
+  | "local-only"
+  | "duplicate"
+  | "add-note"
+  | "attachments"
+  | "history"
+  | "copy-link"
+  | "reminders"
+  | "lock-unlock"
+  | "publish"
+  | "export"
+  | "notebooks"
+  | "add-tag"
+  | "references"
+  | "pin-to-notifications"
+  | "favorite"
+  | "remove-from-notebook"
+  | "trash";
+
+export type Action = {
+  id: ActionId;
+  title: string;
+  icon: string;
+  onPress: () => void;
+  isToggle?: boolean;
+  checked?: boolean;
+  pro?: boolean;
+  hidden?: boolean;
+  activeColor?: string;
+  type?: ButtonProps["type"];
+};
+
+function isNotePinnedInNotifications(item: Item) {
+  const pinned = Notifications.getPinnedNotes();
+  if (!pinned || pinned.length === 0) {
+    return undefined;
+  }
+  const index = pinned.findIndex((notif) => notif.id === item.id);
+  if (index !== -1) {
+    return pinned[index];
+  }
+  return undefined;
+}
+
 export const useActions = ({
   close,
-  item
+  item,
+  customActionHandlers
 }: {
-  item: Note | Notebook | Reminder | Tag | Color | TrashItem;
+  item: Item;
   close: () => void;
+  customActionHandlers?: Record<ActionId, () => void>;
 }) => {
+  const { colors } = useThemeColors();
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.shortcuts.exists(item.id)
@@ -83,15 +155,14 @@ export const useActions = ({
   const processingId = useRef<"shareNote" | "copyContent">();
   const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState<DisplayedNotification>();
-
   const [defaultNotebook, setDefaultNotebook] = useState(
     db.settings.getDefaultNotebook()
   );
   const [noteInCurrentNotebook, setNoteInCurrentNotebook] = useState(false);
+  const [locked, setLocked] = useState(false);
 
   const isPublished =
     item.type === "note" && db.monographs.isPublished(item.id);
-  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     if (item.type === "note") {
@@ -99,46 +170,41 @@ export const useActions = ({
     }
   }, [item]);
 
-  const checkNotifPinned = useCallback(() => {
-    const pinned = Notifications.getPinnedNotes();
-
-    if (!pinned || pinned.length === 0) {
-      setNotifPinned(undefined);
-      return;
-    }
-    const index = pinned.findIndex((notif) => notif.id === item.id);
-    if (index !== -1) {
-      setNotifPinned(pinned[index]);
-    } else {
-      setNotifPinned(undefined);
-    }
-  }, [item.id]);
-
   useEffect(() => {
     if (item.type !== "note") return;
-    checkNotifPinned();
+    setNotifPinned(isNotePinnedInNotifications(item));
     setIsPinnedToMenu(db.shortcuts.exists(item.id));
-  }, [checkNotifPinned, item]);
-
-  const onUpdate = useCallback(
-    async (type: string) => {
-      if (type === "unpin") {
-        await Notifications.get();
-        checkNotifPinned();
-      }
-    },
-    [checkNotifPinned]
-  );
+  }, [item]);
 
   useEffect(() => {
-    const sub = eSubscribeEvent(Notifications.Events.onUpdate, onUpdate);
+    const { currentRoute, focusedRouteId } = useNavigationStore.getState();
+    if (item.type !== "note" || currentRoute !== "Notebook" || !focusedRouteId)
+      return;
+
+    !!db.relations
+      .to(item, "notebook")
+      .selector.find((v) => v("id", "==", focusedRouteId))
+      .then((notebook) => {
+        setNoteInCurrentNotebook(!!notebook);
+      });
+  }, [item]);
+
+  useEffect(() => {
+    const sub = eSubscribeEvent(
+      Notifications.Events.onUpdate,
+      async (type: string) => {
+        if (type === "unpin") {
+          await Notifications.get();
+          setNotifPinned(isNotePinnedInNotifications(item));
+        }
+      }
+    );
     return () => {
       sub?.unsubscribe();
     };
-  }, [item, onUpdate]);
+  }, [item]);
 
   async function restoreTrashItem() {
-    if (!checkItemSynced()) return;
     close();
     if ((await db.trash.restore(item.id)) === false) return;
     Navigation.queueRoutesForUpdate();
@@ -154,19 +220,15 @@ export const useActions = ({
 
   async function pinItem() {
     if (!item.id) return;
-    close();
     if (item.type === "note") {
       await db.notes.pin(!item?.pinned, item.id);
     } else if (item.type === "notebook") {
       await db.notebooks.pin(!item?.pinned, item.id);
     }
 
+    close();
     Navigation.queueRoutesForUpdate();
   }
-
-  const checkItemSynced = () => {
-    return true;
-  };
 
   async function createMenuShortcut() {
     if (item.type !== "notebook" && item.type !== "tag") return;
@@ -299,7 +361,6 @@ export const useActions = ({
 
   async function deleteTrashItem() {
     if (item.type !== "trash") return;
-    if (!checkItemSynced()) return;
     close();
     await sleep(300);
     presentDialog({
@@ -323,42 +384,14 @@ export const useActions = ({
     });
   }
 
-  const actions: {
-    id: string;
-    title: string;
-    icon: string;
-    func: () => void;
-    close?: boolean;
-    check?: boolean;
-    on?: boolean;
-    pro?: boolean;
-    switch?: boolean;
-    hidden?: boolean;
-    type?: string;
-    color?: string;
-  }[] = [
-    // {
-    //   id: "ReferencedIn",
-    //   title: "References",
-    //   icon: "link",
-    //   func: async () => {
-    //     close();
-    //     RelationsList.present({
-    //       reference: item,
-    //       referenceType: "note",
-    //       title: "Referenced in",
-    //       relationType: "to",
-    //     });
-    //   }
-    // }
-  ];
+  const actions: Action[] = [];
 
   if (item.type === "tag") {
     actions.push({
       id: "rename-tag",
       title: strings.rename(),
       icon: "square-edit-outline",
-      func: renameTag
+      onPress: renameTag
     });
   }
 
@@ -367,14 +400,14 @@ export const useActions = ({
       id: "rename-color",
       title: strings.rename(),
       icon: "square-edit-outline",
-      func: renameColor
+      onPress: renameColor
     });
 
     actions.push({
       id: "reorder",
       title: strings.reorder(),
       icon: "sort-ascending",
-      func: () => {
+      onPress: () => {
         useSideBarDraggingStore.setState({
           dragging: true
         });
@@ -391,7 +424,7 @@ export const useActions = ({
           ? strings.turnOffReminder()
           : strings.turnOnReminder(),
         icon: !item.disabled ? "bell-off-outline" : "bell",
-        func: async () => {
+        onPress: async () => {
           close();
           await db.reminders.add({
             ...item,
@@ -406,10 +439,9 @@ export const useActions = ({
         id: "edit-reminder",
         title: strings.editReminder(),
         icon: "pencil",
-        func: async () => {
+        onPress: async () => {
           ReminderSheet.present(item);
-        },
-        close: false
+        }
       }
     );
   }
@@ -420,13 +452,13 @@ export const useActions = ({
         id: "restore",
         title: strings.restore(),
         icon: "delete-restore",
-        func: restoreTrashItem
+        onPress: restoreTrashItem
       },
       {
         id: "delete",
         title: strings.delete(),
         icon: "delete",
-        func: deleteTrashItem
+        onPress: deleteTrashItem
       }
     );
   }
@@ -436,11 +468,27 @@ export const useActions = ({
       id: "add-shortcut",
       title: isPinnedToMenu ? strings.removeShortcut() : strings.addShortcut(),
       icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
-      func: createMenuShortcut,
-      close: false,
-      check: true,
-      on: isPinnedToMenu,
-      pro: true
+      onPress: createMenuShortcut,
+      isToggle: true,
+      checked: isPinnedToMenu,
+      activeColor: colors.error.paragraph
+    });
+    actions.push({
+      id: "select",
+      title: strings.select() + " " + strings.dataTypes[item.type](),
+      icon: "checkbox-outline",
+      onPress: () => {
+        const store =
+          item.type === "tag"
+            ? useSideMenuTagsSelectionStore
+            : useSideMenuNotebookSelectionStore;
+        store.setState({
+          enabled: true,
+          selection: {}
+        });
+        store.getState().markAs(item, "selected");
+        close();
+      }
     });
   }
 
@@ -450,7 +498,7 @@ export const useActions = ({
         id: "add-notebook",
         title: strings.addNotebook(),
         icon: "plus",
-        func: async () => {
+        onPress: async () => {
           AddNotebookSheet.present(undefined, item);
         }
       },
@@ -458,7 +506,7 @@ export const useActions = ({
         id: "edit-notebook",
         title: strings.editNotebook(),
         icon: "square-edit-outline",
-        func: async () => {
+        onPress: async () => {
           AddNotebookSheet.present(item);
         }
       },
@@ -470,7 +518,7 @@ export const useActions = ({
             : strings.setAsDefault(),
         hidden: item.type !== "notebook",
         icon: "notebook",
-        func: async () => {
+        onPress: async () => {
           if (defaultNotebook === item.id) {
             await db.settings.setDefaultNotebook(undefined);
             setDefaultNotebook(undefined);
@@ -483,14 +531,14 @@ export const useActions = ({
           }
           close();
         },
-        on: defaultNotebook === item.id
+        checked: defaultNotebook === item.id
       },
       {
         id: "move-notes",
         title: strings.moveNotes(),
         hidden: item.type !== "notebook",
         icon: "text",
-        func: () => {
+        onPress: () => {
           MoveNotes.present(item);
         }
       },
@@ -498,7 +546,7 @@ export const useActions = ({
         id: "move-notebook",
         title: strings.moveNotebookFix(),
         icon: "arrow-right-bold-box-outline",
-        func: () => {
+        onPress: () => {
           MoveNotebookSheet.present([item]);
         }
       }
@@ -510,10 +558,9 @@ export const useActions = ({
       id: "pin",
       title: item.pinned ? strings.unpin() : strings.pin(),
       icon: item.pinned ? "pin-off-outline" : "pin-outline",
-      func: pinItem,
-      close: false,
-      check: true,
-      on: item.pinned,
+      onPress: pinItem,
+      isToggle: true,
+      checked: item.pinned,
       pro: true
     });
   }
@@ -535,7 +582,7 @@ export const useActions = ({
     }
 
     async function toggleLocalOnly() {
-      if (!checkItemSynced() || !user) return;
+      if (!user) return;
       await db.notes.localOnly(!(item as Note).localOnly, item?.id);
       Navigation.queueRoutesForUpdate();
       close();
@@ -556,7 +603,6 @@ export const useActions = ({
     };
 
     const duplicateNote = async () => {
-      if (!checkItemSynced()) return;
       await db.notes.duplicate(item.id);
       Navigation.queueRoutesForUpdate();
       close();
@@ -577,19 +623,16 @@ export const useActions = ({
 
     async function addToFavorites() {
       if (!item.id || item.type !== "note") return;
-      close();
       await db.notes.favorite(!item.favorite, item.id);
       Navigation.queueRoutesForUpdate();
+      close();
     }
 
     async function pinToNotifications() {
-      if (!checkItemSynced()) return;
-      if (Platform.OS === "ios") return;
-
       if (notifPinned) {
         Notifications.remove(item.id);
         await Notifications.get();
-        checkNotifPinned();
+        setNotifPinned(isNotePinnedInNotifications(item));
         return;
       }
       if (locked) {
@@ -603,7 +646,7 @@ export const useActions = ({
       const text = await convertNoteToText(item as Note, true);
       const html = (text || "").replace(/\n/g, "<br />");
       await Notifications.displayNotification({
-        title: item.title,
+        title: (item as Note).title,
         message: (item as Note).headline || text || "",
         subtitle: "",
         bigText: html,
@@ -612,11 +655,10 @@ export const useActions = ({
         id: item.id
       });
       await Notifications.get();
-      checkNotifPinned();
+      setNotifPinned(isNotePinnedInNotifications(item));
     }
 
     async function publishNote() {
-      if (!checkItemSynced()) return;
       if (!user) {
         ToastManager.show({
           heading: strings.loginRequired(),
@@ -657,7 +699,6 @@ export const useActions = ({
           });
           return;
         }
-        if (!checkItemSynced()) return;
         if (locked) {
           close();
           await sleep(300);
@@ -687,8 +728,6 @@ export const useActions = ({
 
     async function addToVault() {
       if (item.type !== "note") return;
-
-      if (!checkItemSynced()) return;
       if (locked) {
         close();
         await sleep(300);
@@ -709,10 +748,10 @@ export const useActions = ({
           Navigation.queueRoutesForUpdate();
           eSendEvent(eUpdateNoteInEditor, item, true);
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         close();
         await sleep(300);
-        switch (e.message) {
+        switch ((e as Error).message) {
           case VAULT_ERRORS.noVault:
             openVault({
               item: item,
@@ -775,37 +814,36 @@ export const useActions = ({
         id: "favorite",
         title: !item.favorite ? strings.favorite() : strings.unfavorite(),
         icon: item.favorite ? "star-off" : "star-outline",
-        func: addToFavorites,
-        close: false,
-        check: true,
-        on: item.favorite,
+        onPress: addToFavorites,
+        isToggle: true,
+        checked: item.favorite,
         pro: true,
-        color: "orange"
+        activeColor: "orange"
       },
       {
         id: "remove-from-notebook",
         title: strings.removeFromNotebook(),
         hidden: noteInCurrentNotebook,
         icon: "minus-circle-outline",
-        func: removeNoteFromNotebook
+        onPress: removeNoteFromNotebook
       },
       {
         id: "attachments",
         title: strings.attachments(),
         icon: "attachment",
-        func: showAttachments
+        onPress: showAttachments
       },
       {
         id: "history",
         title: strings.history(),
         icon: "history",
-        func: openHistory
+        onPress: openHistory
       },
       {
         id: "copy-link",
         title: strings.copyLink(),
         icon: "link",
-        func: () => {
+        onPress: () => {
           Clipboard.setString(createInternalLink("note", item.id));
           ToastManager.show({
             heading: strings.linkCopied(),
@@ -819,7 +857,7 @@ export const useActions = ({
         id: "reminders",
         title: strings.dataTypesPluralCamelCase.reminder(),
         icon: "clock-outline",
-        func: async () => {
+        onPress: async () => {
           RelationsList.present({
             reference: item,
             referenceType: "reminder",
@@ -833,121 +871,108 @@ export const useActions = ({
               icon: "plus"
             }
           });
-        },
-        close: false
+        }
       },
 
       {
         id: "copy",
         title: strings.copy(),
         icon: "content-copy",
-        func: copyContent
+        onPress: copyContent
       },
       {
         id: "share",
         title: strings.share(),
         icon: "share-variant",
-        func: shareNote
+        onPress: shareNote
       },
       {
         id: "read-only",
         title: strings.readOnly(),
         icon: "pencil-lock",
-        func: toggleReadyOnlyMode,
-        on: item.readonly
+        onPress: toggleReadyOnlyMode,
+        checked: item.readonly
       },
       {
         id: "local-only",
         title: strings.syncOff(),
         icon: "sync-off",
-        func: toggleLocalOnly,
-        on: item.localOnly
+        onPress: toggleLocalOnly,
+        checked: item.localOnly
       },
       {
         id: "duplicate",
         title: strings.duplicate(),
         icon: "content-duplicate",
-        func: duplicateNote
+        onPress: duplicateNote
       },
 
       {
         id: "add-reminder",
         title: strings.remindMe(),
         icon: "clock-plus-outline",
-        func: () => {
+        onPress: () => {
           ReminderSheet.present(undefined, { id: item.id, type: "note" });
-        },
-        close: true
+        }
       },
       {
         id: "lock-unlock",
         title: locked ? strings.unlock() : strings.lock(),
         icon: locked ? "lock-open-outline" : "key-outline",
-        func: addToVault,
-        on: locked
+        onPress: addToVault,
+        checked: locked
       },
       {
         id: "publish",
         title: isPublished ? strings.published() : strings.publish(),
         icon: "cloud-upload-outline",
-        on: isPublished,
-        func: publishNote
+        checked: isPublished,
+        onPress: publishNote
       },
 
       {
         id: "export",
         title: strings.export(),
         icon: "export",
-        func: exportNote
-      },
-
-      {
-        id: "pin-to-notifications",
-        title: notifPinned
-          ? strings.unpinFromNotifications()
-          : strings.pinToNotifications(),
-        icon: "message-badge-outline",
-        on: !!notifPinned,
-        func: pinToNotifications
+        onPress: exportNote
       },
 
       {
         id: "notebooks",
         title: strings.linkNotebooks(),
         icon: "book-outline",
-        func: addTo
+        onPress: addTo
       },
       {
         id: "add-tag",
         title: strings.addTags(),
         icon: "pound",
-        func: addTo
+        onPress: addTo
       },
       {
         id: "references",
         title: strings.references(),
         icon: "vector-link",
-        func: () => {
+        onPress: () => {
           ReferencesList.present({
             reference: item as ItemReference
           });
         }
       }
     );
-  }
 
-  useEffect(() => {
-    const { currentRoute, focusedRouteId } = useNavigationStore.getState();
-    if (item.type !== "note" || currentRoute !== "Notebook" || !focusedRouteId)
-      return;
-
-    !!db.relations
-      .to(item, "notebook")
-      .selector.find((v) => v("id", "==", focusedRouteId))
-      .then((notebook) => {
-        setNoteInCurrentNotebook(!!notebook);
+    if (Platform.OS === "android") {
+      actions.push({
+        id: "pin-to-notifications",
+        title: notifPinned
+          ? strings.unpinFromNotifications()
+          : strings.pinToNotifications(),
+        icon: "message-badge-outline",
+        checked: !!notifPinned,
+        onPress: pinToNotifications
       });
-  }, [item]);
+    }
+  }
 
   actions.push({
     id: "trash",
@@ -960,7 +985,7 @@ export const useActions = ({
         : strings.moveToTrash(),
     icon: "delete-outline",
     type: "error",
-    func: deleteItem
+    onPress: deleteItem
   });
 
   return actions;

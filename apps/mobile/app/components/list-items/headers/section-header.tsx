@@ -21,16 +21,16 @@ import { GroupHeader, GroupOptions, ItemType } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 import { presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { RouteName } from "../../../stores/use-navigation-store";
-import { getContainerBorder } from "../../../utils/colors";
 import { SIZE } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import Sort from "../../sheets/sort";
-import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
+import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 
 type SectionHeaderProps = {
@@ -65,104 +65,111 @@ export const SectionHeader = React.memo<
     return (
       <View
         style={{
-          flexDirection: "row",
-          alignItems: "center",
-          width: "95%",
-          justifyContent: "space-between",
-          paddingHorizontal: 12,
-          height: 35 * fontScale,
-          backgroundColor: colors.secondary.background,
-          alignSelf: "center",
-          borderRadius: 5,
-          marginVertical: 5,
-          ...getContainerBorder(colors.secondary.background, 0.8)
+          width: "100%",
+          paddingHorizontal: DefaultAppStyles.GAP,
+          marginVertical: DefaultAppStyles.GAP
         }}
       >
-        <TouchableOpacity
-          onPress={() => {
-            onOpenJumpToDialog();
-          }}
-          activeOpacity={0.9}
-          hitSlop={{ top: 10, left: 10, right: 30, bottom: 15 }}
-          style={{
-            height: "100%",
-            justifyContent: "center"
-          }}
-        >
-          <Heading
-            color={color || colors.primary.accent}
-            size={SIZE.sm}
-            style={{
-              alignSelf: "center",
-              textAlignVertical: "center"
-            }}
-          >
-            {!item.title || item.title === "" ? strings.pinned() : item.title}
-          </Heading>
-        </TouchableOpacity>
-
         <View
           style={{
             flexDirection: "row",
-            alignItems: "center"
+            alignItems: "center",
+            width: "100%",
+            alignSelf: "center",
+            justifyContent: "space-between",
+            borderBottomWidth: 1,
+            borderColor: colors.primary.border,
+            paddingBottom: DefaultAppStyles.GAP_VERTICAL
           }}
         >
-          {index === 0 ? (
-            <>
-              <Button
-                onPress={() => {
-                  presentSheet({
-                    component: <Sort screen={screen} type={dataType} />
-                  });
-                }}
-                title={groupBy}
-                icon={
-                  groupOptions.sortDirection === "asc"
-                    ? "sort-ascending"
-                    : "sort-descending"
-                }
-                height={25}
-                style={{
-                  borderRadius: 100,
-                  paddingHorizontal: 0,
-                  backgroundColor: "transparent",
-                  marginRight:
-                    dataType === "note" ||
-                    screen === "Notes" ||
-                    dataType === "notebook"
-                      ? 10
-                      : 0
-                }}
-                type="plain"
-                iconPosition="right"
-              />
+          <Pressable
+            onPress={() => {
+              onOpenJumpToDialog();
+            }}
+            hitSlop={{ top: 10, left: 10, right: 30, bottom: 15 }}
+            style={{
+              justifyContent: "flex-start",
+              flexDirection: "row",
+              width: "auto"
+            }}
+          >
+            <Heading
+              size={SIZE.sm}
+              style={{
+                alignSelf: "center",
+                textAlignVertical: "center"
+              }}
+              color={colors.primary.accent}
+            >
+              {!item.title || item.title === "" ? strings.pinned() : item.title}
+            </Heading>
+          </Pressable>
 
-              <IconButton
-                style={{
-                  width: 25,
-                  height: 25
-                }}
-                hidden={
-                  dataType !== "note" &&
-                  dataType !== "notebook" &&
-                  screen !== "Notes"
-                }
-                testID="icon-compact-mode"
-                color={colors.secondary.icon}
-                name={isCompactModeEnabled ? "view-list" : "view-list-outline"}
-                onPress={() => {
-                  SettingsService.set({
-                    [dataType !== "notebook"
-                      ? "notesListMode"
-                      : "notebooksListMode"]: !isCompactModeEnabled
-                      ? "compact"
-                      : "normal"
-                  });
-                }}
-                size={SIZE.lg - 2}
-              />
-            </>
-          ) : null}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: DefaultAppStyles.GAP_SMALL
+            }}
+          >
+            {index === 0 ? (
+              <>
+                <IconButton
+                  name={
+                    groupOptions.sortDirection === "asc"
+                      ? "sort-ascending"
+                      : "sort-descending"
+                  }
+                  onPress={() => {
+                    if (!screen) return;
+                    presentSheet({
+                      component: <Sort screen={screen} type={dataType} />
+                    });
+                  }}
+                  style={{
+                    width: 25,
+                    height: 25
+                  }}
+                  size={SIZE.lg - 2}
+                />
+                <IconButton
+                  hidden={
+                    dataType !== "note" &&
+                    dataType !== "notebook" &&
+                    screen !== "Notes"
+                  }
+                  style={{
+                    width: 25,
+                    height: 25
+                  }}
+                  testID="icon-compact-mode"
+                  color={colors.secondary.icon}
+                  name={
+                    isCompactModeEnabled ? "view-list" : "view-list-outline"
+                  }
+                  onPress={() => {
+                    SettingsService.set({
+                      [dataType !== "notebook"
+                        ? "notesListMode"
+                        : "notebooksListMode"]: !isCompactModeEnabled
+                        ? "compact"
+                        : "normal"
+                    });
+                  }}
+                  size={SIZE.lg - 2}
+                />
+              </>
+            ) : null}
+
+            <IconButton
+              style={{
+                width: 25,
+                height: 25
+              }}
+              name={"chevron-down"}
+              size={SIZE.lg - 2}
+            />
+          </View>
         </View>
       </View>
     );
