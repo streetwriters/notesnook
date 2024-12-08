@@ -127,12 +127,19 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           <Link
             href="https://github.com/streetwriters/notesnook/issues"
             title="github.com/streetwriters/notesnook/issues"
-          />{" "}
+            target="_blank"
+          >
+            github.com/streetwriters/notesnook/issues
+          </Link>
           {strings.issueNotice[1]()}{" "}
           <Link
             href="https://discord.gg/zQBK97EE22"
             title={strings.issueNotice[2]()}
-          />
+            target="_blank"
+          >
+            {strings.issueNotice[2]()}
+          </Link>
+          /
         </Text>
         <Text variant="subBody" mt={1}>
           {getDeviceInfo([`Pro: ${isUserPremium()}`])
