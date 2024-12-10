@@ -68,19 +68,19 @@ export default function ReminderNotify({
 
   const QuickActions = [
     {
-      title: `5 ${strings.timeShort.minute}`,
+      title: `5 ${strings.timeShort.minute()}`,
       time: 5
     },
     {
-      title: `15 ${strings.timeShort.minute}`,
+      title: `15 ${strings.timeShort.minute()}`,
       time: 15
     },
     {
-      title: `30 ${strings.timeShort.minute}`,
+      title: `30 ${strings.timeShort.minute()}`,
       time: 30
     },
     {
-      title: `1 ${strings.timeShort.hour}`,
+      title: `1 ${strings.timeShort.hour()}`,
       time: 60
     }
   ];
