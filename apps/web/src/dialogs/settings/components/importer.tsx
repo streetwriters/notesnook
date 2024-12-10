@@ -169,7 +169,7 @@ export function Importer() {
                 <Link
                   href="https://importer.notesnook.com/"
                   target="_blank"
-                  sx={{ color: "paragraph-secondary" }}
+                  sx={{ color: "accent" }}
                 >
                   https://importer.notesnook.com/
                 </Link>
