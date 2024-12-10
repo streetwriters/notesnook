@@ -26,6 +26,8 @@ import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import DotsVerticalIcon from "mdi-react/DotsVerticalIcon";
 import FullscreenIcon from "mdi-react/FullscreenIcon";
 import MagnifyIcon from "mdi-react/MagnifyIcon";
+import PlusIcon from "mdi-react/PlusIcon";
+
 import PencilLockIcon from "mdi-react/PencilLockIcon";
 import TableOfContentsIcon from "mdi-react/TableOfContentsIcon";
 import React, { useRef, useState } from "react";
@@ -137,7 +139,7 @@ function Header({
           ) : (
             <Button
               onPress={() => {
-                post(EditorEvents.back, undefined, tab.id, tab.noteId);
+                post(EditorEvents.back, undefined, tab.id, tab.session?.noteId);
               }}
               preventDefault={false}
               style={{
@@ -174,7 +176,12 @@ function Header({
             {settings.deviceMode !== "mobile" && !settings.fullscreen ? (
               <Button
                 onPress={() => {
-                  post(EditorEvents.fullscreen, undefined, tab.id, tab.noteId);
+                  post(
+                    EditorEvents.fullscreen,
+                    undefined,
+                    tab.id,
+                    tab.session?.noteId
+                  );
                 }}
                 preventDefault={false}
                 style={{
@@ -200,14 +207,12 @@ function Header({
               </Button>
             ) : null}
 
-            {tab.readonly ? (
+            {tab.session?.readonly ? (
               <Button
                 onPress={() => {
                   post(
                     "editor-events:disable-readonly-mode",
-                    useTabStore
-                      .getState()
-                      .getNoteIdForTab(useTabStore.getState().currentTab)
+                    tab.session?.noteId
                   );
                 }}
                 fwdRef={btnRef}
@@ -297,7 +302,12 @@ function Header({
 
             <Button
               onPress={() => {
-                post(EditorEvents.showTabs, undefined, tab.id, tab.noteId);
+                post(
+                  EditorEvents.showTabs,
+                  undefined,
+                  tab.id,
+                  tab.session?.noteId
+                );
               }}
               preventDefault={false}
               style={{
@@ -341,8 +351,13 @@ function Header({
             <Button
               fwdRef={btnRef}
               onPress={() => {
-                if (tab.locked) {
-                  post(EditorEvents.properties, undefined, tab.id, tab.noteId);
+                if (tab.session?.locked) {
+                  post(
+                    EditorEvents.properties,
+                    undefined,
+                    tab.id,
+                    tab.session?.noteId
+                  );
                 } else {
                   setOpen(!isOpen);
                 }
@@ -361,7 +376,7 @@ function Header({
                 position: "relative"
               }}
             >
-              {tab.locked ? (
+              {tab.session?.locked ? (
                 <DotsHorizontalIcon
                   size={25 * settings.fontScale}
                   style={{
@@ -399,18 +414,26 @@ function Header({
                       EditorEvents.toc,
                       editorControllers[tab.id]?.getTableOfContents(),
                       tab.id,
-                      tab.noteId
+                      tab.session?.noteId
                     );
                     break;
                   case "search":
                     editor?.commands.startSearch();
+                    break;
+                  case "newNote":
+                    post(
+                      EditorEvents.newNote,
+                      undefined,
+                      tab.id,
+                      tab.session?.noteId
+                    );
                     break;
                   case "properties":
                     post(
                       EditorEvents.properties,
                       undefined,
                       tab.id,
-                      tab.noteId
+                      tab.session?.noteId
                     );
                     break;
                   default:
@@ -425,13 +448,18 @@ function Header({
                   alignItems: "center",
                   flexDirection: "row",
                   justifyContent: "center",
-                  width: "100%",
+                  flex: 1,
                   paddingTop: 5
                 }}
               >
                 <Button
                   onPress={() => {
-                    post(EditorEvents.goBack, undefined, tab.id, tab.noteId);
+                    post(
+                      EditorEvents.goBack,
+                      undefined,
+                      tab.id,
+                      tab.session?.noteId
+                    );
                     setOpen(false);
                   }}
                   style={{
@@ -461,7 +489,12 @@ function Header({
 
                 <Button
                   onPress={() => {
-                    post(EditorEvents.goForward, undefined, tab.id, tab.noteId);
+                    post(
+                      EditorEvents.goForward,
+                      undefined,
+                      tab.id,
+                      tab.session?.noteId
+                    );
                     setOpen(false);
                   }}
                   style={{
@@ -515,6 +548,27 @@ function Header({
                   />
                 </Button>
               </div>
+
+              <MenuItem
+                value="newNote"
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  alignItems: "center"
+                }}
+              >
+                <PlusIcon
+                  size={22 * settings.fontScale}
+                  color="var(--nn_primary_icon)"
+                />
+                <span
+                  style={{
+                    color: "var(--nn_primary_paragraph)"
+                  }}
+                >
+                  New note
+                </span>
+              </MenuItem>
 
               <MenuItem
                 value="toc"

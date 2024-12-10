@@ -27,5 +27,4 @@ export * from "./resolve-items.js";
 export * from "./migrate-toolbar.js";
 export * from "./export-notes.js";
 export * from "./dataurl.js";
-export * from "./tab-history.js";
-export * from "./editor-sessions.js";
+export * from "./tab-session-history.js";

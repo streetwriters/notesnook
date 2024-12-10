@@ -21,7 +21,7 @@ import { Editor, ToolbarGroupDefinition } from "@notesnook/editor";
 import { ThemeDefinition } from "@notesnook/theme";
 import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import { EditorController } from "../hooks/useEditorController";
-import { EditorSessions } from "@notesnook/common";
+
 import { EditorEvents } from "./editor-events";
 
 globalThis.sessionId = "notesnook-editor";
@@ -63,7 +63,6 @@ declare global {
   };
 
   var readonlyEditor: boolean;
-  var sessions: EditorSessions;
   var statusBars: Record<
     number,
     | React.MutableRefObject<{
@@ -300,10 +299,3 @@ export function getTheme() {
   }
   return undefined;
 }
-
-const editorSessions = new EditorSessions({
-  getGlobalNoteState: () => {
-    return globalThis.tabStore.getState().noteState;
-  }
-});
-globalThis.sessions = editorSessions;

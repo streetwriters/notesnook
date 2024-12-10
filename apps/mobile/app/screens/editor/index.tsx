@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 
+import { i18n } from "@lingui/core";
+import { strings } from "@notesnook/intl";
 import React, {
   forwardRef,
   useCallback,
@@ -46,6 +48,7 @@ import {
   eUnlockWithPassword
 } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
+import { tabBarRef } from "../../utils/global-refs";
 import EditorOverlay from "./loading";
 import { EDITOR_URI } from "./source";
 import { EditorProps, useEditorType } from "./tiptap/types";
@@ -58,9 +61,6 @@ import {
   openInternalLink,
   randId
 } from "./tiptap/utils";
-import { tabBarRef } from "../../utils/global-refs";
-import { strings } from "@notesnook/intl";
-import { i18n } from "@lingui/core";
 
 const style: ViewStyle = {
   height: "100%",
@@ -203,11 +203,13 @@ const useLockedNoteHandler = () => {
 
   useEffect(() => {
     for (const tab of useTabStore.getState().tabs) {
-      const noteId = useTabStore.getState().getTab(tab.id)?.noteId;
+      const noteId = useTabStore.getState().getTab(tab.id)?.session?.noteId;
       if (!noteId) continue;
-      if (tabRef.current && tabRef.current.noteLocked) {
+      if (tabRef.current && tabRef.current.session?.noteLocked) {
         useTabStore.getState().updateTab(tabRef.current.id, {
-          locked: true
+          session: {
+            locked: true
+          }
         });
       }
     }
@@ -228,16 +230,20 @@ const useLockedNoteHandler = () => {
   useEffect(() => {
     const unlockWithBiometrics = async () => {
       try {
-        if (!tabRef.current?.noteLocked || !tabRef.current) return;
-
+        if (!tabRef.current?.session?.noteLocked || !tabRef.current) return;
+        console.log("Trying to unlock with biometrics...");
         const credentials = await BiometricService.getCredentials(
           "Unlock note",
           "Unlock note to open it in editor."
         );
 
-        if (credentials && credentials?.password && tabRef.current.noteId) {
+        if (
+          credentials &&
+          credentials?.password &&
+          tabRef.current.session?.noteId
+        ) {
           const note = await db.vault.open(
-            tabRef.current.noteId,
+            tabRef.current.session?.noteId,
             credentials?.password
           );
 
@@ -246,7 +252,9 @@ const useLockedNoteHandler = () => {
           });
 
           useTabStore.getState().updateTab(tabRef.current.id, {
-            locked: false
+            session: {
+              locked: false
+            }
           });
         }
       } catch (e) {
@@ -261,7 +269,7 @@ const useLockedNoteHandler = () => {
       password: string;
       biometrics?: boolean;
     }) => {
-      if (!tabRef.current?.noteId || !tabRef.current) return;
+      if (!tabRef.current?.session?.noteId || !tabRef.current) return;
       if (!password || password.trim().length === 0) {
         ToastManager.show({
           heading: strings.passwordNotEntered(),
@@ -271,7 +279,10 @@ const useLockedNoteHandler = () => {
       }
 
       try {
-        const note = await db.vault.open(tabRef.current?.noteId, password);
+        const note = await db.vault.open(
+          tabRef.current?.session?.noteId,
+          password
+        );
         if (enrollBiometrics && note) {
           try {
             const unlocked = await db.vault.unlock(password);
@@ -302,7 +313,9 @@ const useLockedNoteHandler = () => {
           item: note
         });
         useTabStore.getState().updateTab(tabRef.current.id, {
-          locked: false
+          session: {
+            locked: false
+          }
         });
       } catch (e) {
         ToastManager.show({
@@ -314,7 +327,7 @@ const useLockedNoteHandler = () => {
 
     const unlock = () => {
       if (
-        (tabRef.current?.locked,
+        (tabRef.current?.session?.locked,
         useTabStore.getState().biometryAvailable &&
           useTabStore.getState().biometryEnrolled &&
           !editorState().movedAway)
@@ -325,7 +338,7 @@ const useLockedNoteHandler = () => {
       } else {
         if (!editorState().movedAway) {
           setTimeout(() => {
-            if (tabRef.current && tabRef.current?.locked) {
+            if (tabRef.current && tabRef.current?.session?.locked) {
               editorController.current?.commands.focus(tabRef.current?.id);
             }
           }, 100);
@@ -340,13 +353,13 @@ const useLockedNoteHandler = () => {
       }),
       eSubscribeEvent(eUnlockWithPassword, onSubmit)
     ];
-    if (tabRef.current?.locked && tabBarRef.current?.page() === 2) {
+    if (tabRef.current?.session?.locked && tabBarRef.current?.page() === 2) {
       unlock();
     }
     return () => {
       subs.map((s) => s?.unsubscribe());
     };
-  }, [tab?.id, tab?.locked]);
+  }, [tab?.id, tab?.session?.locked]);
 
   return null;
 };

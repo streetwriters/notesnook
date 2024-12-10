@@ -16,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { TabSessionHistory } from "@notesnook/common";
+import { MMKVLoader } from "react-native-mmkv-storage";
 import create from "zustand";
 import { persist, StateStorage } from "zustand/middleware";
 import { db } from "../../../common/database";
@@ -23,9 +25,8 @@ import { MMKV } from "../../../common/database/mmkv";
 import { eSendEvent } from "../../../services/event-manager";
 import { eOnLoadNote } from "../../../utils/events";
 import { editorController } from "./utils";
-import { TabHistory } from "@notesnook/common";
 
-class History {
+class TabHistory {
   history: number[];
   constructor() {
     this.history = [0];
@@ -73,47 +74,46 @@ class History {
   }
 }
 
-export type TabItem = {
-  id: number;
+export type TabSessionItem = {
+  id: string;
   noteId?: string;
-  previewTab?: boolean;
-  readonly?: boolean;
-  locked?: boolean;
+  scrollTop?: number;
+  selection?: { to: number; from: number };
   noteLocked?: boolean;
-  pinned?: boolean;
-  needsRefresh?: boolean;
+  locked?: boolean;
+  readonly?: boolean;
 };
 
-const history = new History();
+const TabSessionStorageKV = new MMKVLoader()
+  .withInstanceID("tab-session-storage")
+  .disableIndexing()
+  .initialize();
 
-export type TabStore = {
-  tabs: TabItem[];
-  currentTab: number;
-  updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => void;
-  focusPreviewTab: (
-    noteId: string,
-    options: Omit<Partial<TabItem>, "id">
-  ) => void;
-  removeTab: (index: number) => void;
-  moveTab: (index: number, toIndex: number) => void;
-  newTab: (options?: Omit<Partial<TabItem>, "id">) => number;
-  focusTab: (id: number) => void;
-  getNoteIdForTab: (id: number) => string | undefined;
-  getTabForNote: (noteId: string) => number | undefined;
-  getTabsForNote: (noteId: string) => TabItem[];
-  forEachNoteTab: (noteId: string, cb: (tab: TabItem) => void) => void;
-  hasTabForNote: (noteId: string) => boolean;
-  focusEmptyTab: () => void;
-  getCurrentNoteId: () => string | undefined;
-  getTab: (tabId: number) => TabItem | undefined;
-  history: number[];
-  biometryAvailable?: boolean;
-  biometryEnrolled?: boolean;
-  tabHistory: Record<number, { back_stack: string[]; forward_stack: string[] }>;
-  canGoBack?: boolean;
-  canGoForward?: boolean;
-  sessionId?: string;
-};
+class TabSessionStorage {
+  static storage: typeof TabSessionStorageKV = TabSessionStorageKV;
+
+  static get(id: string): TabSessionItem | null {
+    return TabSessionStorage.storage.getMap(id);
+  }
+
+  static set(id: string, session: TabSessionItem): void {
+    TabSessionStorage.storage.setMap(id, session);
+  }
+
+  static update(id: string, session: Partial<TabSessionItem>) {
+    const currentSession = TabSessionStorage.get(id);
+    const newSession = {
+      ...currentSession,
+      ...session
+    };
+    TabSessionStorage.set(id, newSession as TabSessionItem);
+    return newSession;
+  }
+
+  static remove(id: string) {
+    TabSessionStorageKV.removeItem(id);
+  }
+}
 
 function getId(id: number, tabs: TabItem[]): number {
   const exists = tabs.find((t) => t.id === id);
@@ -147,7 +147,7 @@ export function syncTabs(
     globalThis.tabStore?.setState(${JSON.stringify(data)});
 `);
 }
-export const tabHistory = new TabHistory({
+export const tabSessionHistory = new TabSessionHistory({
   get() {
     return useTabStore.getState();
   },
@@ -156,74 +156,182 @@ export const tabHistory = new TabHistory({
       ...state
     });
   },
-  getCurrentTab: () => useTabStore.getState().currentTab,
-  loadSession: async (sessionId: string) => {
-    const session = await editorController?.current?.commands.getSession(
-      sessionId
-    );
-    if (session && session.noteId) {
-      const note = await db.notes.note(session.noteId);
-      if (note) {
-        eSendEvent(eOnLoadNote, {
-          item: note,
-          tabId: useTabStore.getState().currentTab
-        });
-        return true;
-      }
-      return false;
-    }
-    return false;
-  },
-  newSession: (sessionId, tabId, noteId) => {
-    editorController?.current?.commands?.newSession(sessionId, tabId, noteId);
-  },
-  clearSessionsForTabId: (tabId: number) => {
-    editorController?.current?.commands?.deleteSessionsForTabId(tabId);
-  },
-  getSession: async (sessionId: string) => {
-    return (
-      (await editorController?.current?.commands.getSession(sessionId)) ||
-      undefined
-    );
-  },
-  commit: () => syncTabs("history")
+  getCurrentTab: () => useTabStore.getState().currentTab
 });
+
+export type TabItem = {
+  id: number;
+  pinned?: boolean;
+  needsRefresh?: boolean;
+  session?: Partial<TabSessionItem>;
+};
+
+const history = new TabHistory();
+
+export type TabStore = {
+  tabs: TabItem[];
+  currentTab: number;
+  updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => void;
+  focusPreviewTab: (
+    noteId: string,
+    options: Omit<Partial<TabItem>, "id">
+  ) => void;
+  removeTab: (index: number) => void;
+  moveTab: (index: number, toIndex: number) => void;
+  newTab: (options?: Omit<Partial<TabItem>, "id">) => number;
+  focusTab: (id: number) => void;
+  getNoteIdForTab: (id: number) => string | undefined;
+  getTabForNote: (noteId: string) => number | undefined;
+  getTabsForNote: (noteId: string) => TabItem[];
+  forEachNoteTab: (noteId: string, cb: (tab: TabItem) => void) => void;
+  hasTabForNote: (noteId: string) => boolean;
+  focusEmptyTab: () => void;
+  getCurrentNoteId: () => string | undefined;
+  getTab: (tabId: number) => TabItem | undefined;
+  newTabSession: (
+    id: number,
+    options: Omit<Partial<TabSessionItem>, "id">
+  ) => void;
+  history: number[];
+  biometryAvailable?: boolean;
+  biometryEnrolled?: boolean;
+  tabSessionHistory: Record<
+    number,
+    { back_stack: string[]; forward_stack: string[] }
+  >;
+  goBack(): void;
+  goForward(): void;
+  loadSession: (id: string) => Promise<boolean>;
+  canGoBack?: boolean;
+  canGoForward?: boolean;
+  sessionId?: string;
+};
 
 export const useTabStore = create<TabStore>(
   persist(
     (set, get) => ({
-      tabs: [
-        {
-          id: 0
-        }
-      ],
-      tabHistory: {},
+      tabs: [],
+      tabSessionHistory: {},
       history: [0],
       currentTab: 0,
+      newTabSession: (
+        id: number,
+        options: Omit<Partial<TabSessionItem>, "id">
+      ) => {
+        const sessionId = tabSessionHistory.add();
+        const session = {
+          id: sessionId,
+          ...options
+        };
+        TabSessionStorage.set(sessionId, session);
+        const index = get().tabs.findIndex((t) => t.id === id);
+        if (index == -1) return;
+        const tabs = [...get().tabs];
+        tabs[index] = {
+          ...tabs[index],
+          ...options,
+          session: session
+        } as TabItem;
+
+        set({
+          tabs: tabs
+        });
+        syncTabs();
+      },
       updateTab: (id: number, options: Omit<Partial<TabItem>, "id">) => {
         if (!options) return;
         const index = get().tabs.findIndex((t) => t.id === id);
         if (index == -1) return;
         const tabs = [...get().tabs];
 
-        if (options.noteId) {
-          tabHistory.add(options.noteId);
-        }
+        const sessionId =
+          options.session?.id || (tabs[index].session?.id as string);
+        const updatedSession = !options.session
+          ? tabs[index].session
+          : TabSessionStorage.update(sessionId, options.session);
 
         tabs[index] = {
           ...tabs[index],
-          ...options
-        };
+          ...options,
+          session: updatedSession
+        } as TabItem;
 
         set({
           tabs: tabs
         });
-        syncTabs("tabs");
+        syncTabs();
+      },
+      goBack: async () => {
+        if (!tabSessionHistory.canGoBack()) return;
+        const id = tabSessionHistory.back() as string;
+        const sessionLoaded = await get().loadSession(id);
+        if (!sessionLoaded) {
+          tabSessionHistory.remove(id);
+          TabSessionStorage.remove(id);
+          if (!tabSessionHistory.canGoBack()) {
+            tabSessionHistory.forward();
+            syncTabs();
+          } else {
+            return get().goBack();
+          }
+        } else {
+          syncTabs();
+        }
+      },
+      goForward: async () => {
+        if (!tabSessionHistory.canGoForward()) return;
+        const id = tabSessionHistory.forward() as string;
+        if (!(await get().loadSession(id))) {
+          tabSessionHistory.remove(id);
+          TabSessionStorage.remove(id);
+          if (!tabSessionHistory.canGoForward()) {
+            tabSessionHistory.back();
+            syncTabs();
+          } else {
+            return get().goForward();
+          }
+        } else {
+          syncTabs();
+        }
+      },
+      loadSession: async (id: string) => {
+        const session = TabSessionStorage.get(id);
+        if (!session) return false;
+
+        const note = session?.noteId
+          ? await db.notes.note(session?.noteId)
+          : undefined;
+
+        if (note) {
+          const isLocked = await db.vaults.itemExists(note);
+          if (isLocked && !session?.noteLocked) {
+            session.locked = true;
+            session.noteLocked = true;
+          }
+          session.readonly = note.readonly;
+        } else if (session.noteId) {
+          console.log("Failed to load session...");
+          return false;
+        }
+
+        get().updateTab(get().currentTab, {
+          session: session
+        });
+        console.log("Loading session", session);
+        eSendEvent(eOnLoadNote, {
+          item: note,
+          newNote: !note,
+          tabId: get().currentTab,
+          session: session
+        });
+
+        return true;
       },
       focusPreviewTab: (
         noteId: string,
         options: Omit<Partial<TabItem>, "id" | "noteId">
       ) => {},
+
       removeTab: (id: number) => {
         const index = get().tabs.findIndex((t) => t.id === id);
         if (index > -1) {
@@ -231,47 +339,46 @@ export const useTabStore = create<TabStore>(
           const nextTabs = get().tabs.slice();
           nextTabs.splice(index, 1);
           history.remove(id);
-          tabHistory.clearStackForTab(id);
-          set({
-            tabs: nextTabs
-          });
-          syncTabs("tabs");
-          setTimeout(() => {
-            if (nextTabs.length === 0) {
-              set({
-                tabs: [{ id: 0 }]
-              });
-              get().focusTab(0);
-            } else {
-              get().focusTab(
-                isFocused ? history.restoreLast() || 0 : get().currentTab
-              );
+
+          const tabSessions = tabSessionHistory.getHistory();
+          tabSessions.back.forEach((id) => TabSessionStorage.remove(id));
+          tabSessions.forward.forEach((id) => TabSessionStorage.remove(id));
+          tabSessionHistory.clearStackForTab(id);
+
+          if (nextTabs.length === 0) {
+            set({
+              tabs: [{ id: 0 }]
+            });
+            get().newTabSession(0, {});
+            get().focusTab(0);
+          } else {
+            set({
+              tabs: nextTabs
+            });
+            if (isFocused) {
+              get().focusTab(history.restoreLast() || 0);
             }
-          });
+          }
+          syncTabs();
         }
       },
       newTab: (options) => {
         const id = getId(get().tabs.length, get().tabs);
-        const nextTabs = [
-          ...get().tabs,
-          {
-            id: id,
-            ...options
-          }
-        ];
-
-        if (options?.noteId) {
-          tabHistory.add(options.noteId);
-        }
-
         set({
-          tabs: nextTabs
+          tabs: [
+            ...get().tabs,
+            {
+              id: id,
+              ...options
+            }
+          ]
         });
+        get().newTabSession(id, options?.session || {});
         get().focusTab(id);
         return id;
       },
       focusEmptyTab: () => {
-        const index = get().tabs.findIndex((t) => !t.noteId);
+        const index = get().tabs.findIndex((t) => !t.session?.noteId);
         if (index === -1) return get().newTab();
 
         get().focusTab(get().tabs[index].id);
@@ -282,7 +389,7 @@ export const useTabStore = create<TabStore>(
         set({
           tabs: tabs
         });
-        syncTabs("tabs");
+        syncTabs();
       },
 
       focusTab: (id: number) => {
@@ -291,37 +398,34 @@ export const useTabStore = create<TabStore>(
           currentTab: id
         });
         set({
-          canGoBack: tabHistory.canGoBack(),
-          canGoForward: tabHistory.canGoForward(),
-          sessionId: tabHistory.getCurrentSession()
+          canGoBack: tabSessionHistory.canGoBack(),
+          canGoForward: tabSessionHistory.canGoForward(),
+          sessionId: tabSessionHistory.currentSessionId()
         });
-        console.log(
-          tabHistory.canGoBack(),
-          tabHistory.canGoForward(),
-          tabHistory.getCurrentSession()
-        );
         syncTabs();
       },
       getNoteIdForTab: (id: number) => {
-        return get().tabs.find((t) => t.id === id)?.noteId;
+        return get().tabs.find((t) => t.id === id)?.session?.noteId;
       },
       hasTabForNote: (noteId: string) => {
         return (
-          typeof get().tabs.find((t) => t.noteId === noteId)?.id === "number"
+          typeof get().tabs.find((t) => t.session?.noteId === noteId)?.id ===
+          "number"
         );
       },
       getTabForNote: (noteId: string) => {
-        return get().tabs.find((t) => t.noteId === noteId)?.id;
+        return get().tabs.find((t) => t.session?.noteId === noteId)?.id;
       },
       getTabsForNote(noteId: string) {
-        return get().tabs.filter((t) => t.noteId === noteId);
+        return get().tabs.filter((t) => t.session?.noteId === noteId);
       },
       forEachNoteTab: (noteId: string, cb: (tab: TabItem) => void) => {
-        const tabs = get().tabs.filter((t) => t.noteId === noteId);
+        const tabs = get().tabs.filter((t) => t.session?.noteId === noteId);
         tabs.forEach(cb);
       },
       getCurrentNoteId: () => {
-        return get().tabs.find((t) => t.id === get().currentTab)?.noteId;
+        return get().tabs.find((t) => t.id === get().currentTab)?.session
+          ?.noteId;
       },
       getTab: (tabId) => {
         return get().tabs.find((t) => t.id === tabId);

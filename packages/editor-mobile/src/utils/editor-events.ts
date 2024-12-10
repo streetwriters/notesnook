@@ -52,5 +52,7 @@ export const EditorEvents = {
   error: "editorError",
   dbLogger: "editor-events:dbLogger",
   goBack: "editor-events:go-back",
-  goForward: "editor-events:go-forward"
+  goForward: "editor-events:go-forward",
+  saveScroll: "editor-events:save-scroll",
+  newNote: "editor-events:new-note"
 } as const;

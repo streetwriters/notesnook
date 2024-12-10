@@ -78,13 +78,13 @@ class Commands {
 
   focus = async (tabId: number) => {
     if (!this.ref.current) return;
+
+    const locked = useTabStore.getState().getTab(tabId)?.session?.locked;
     if (Platform.OS === "android") {
       //this.ref.current?.requestFocus();
       setTimeout(async () => {
         if (!this.ref) return;
         textInput.current?.focus();
-
-        const locked = useTabStore.getState().getTab(tabId)?.locked;
         await this.doAsync(
           locked
             ? `editorControllers[${tabId}]?.focusPassInput();`
@@ -96,7 +96,12 @@ class Commands {
       }, 1);
     } else {
       await sleep(400);
-      await this.doAsync(`editors[${tabId}]?.commands.focus()`, "focus");
+      await this.doAsync(
+        locked
+          ? `editorControllers[${tabId}]?.focusPassInput();`
+          : `editors[${tabId}]?.commands.focus()`,
+        "focus"
+      );
     }
   };
 
