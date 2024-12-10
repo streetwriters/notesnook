@@ -75,6 +75,8 @@ function attachMessagePort() {
           height: document.body.clientHeight,
           width: document.body.clientWidth
         };
+      default:
+        return false;
     }
   });
 }
