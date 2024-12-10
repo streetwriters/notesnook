@@ -73,6 +73,10 @@ function SubNotebook(props: SubNotebookProps) {
       item,
       totalNotes
     });
+    if (rootId === "root") {
+      navigate(`/notebooks/${item.id}`);
+      return;
+    }
     navigate(`/notebooks/${rootId}/${item.id}`);
   }, [expand, focus, isOpened, item, rootId, totalNotes]);
 

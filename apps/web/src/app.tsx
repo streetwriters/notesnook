@@ -24,7 +24,7 @@ import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
 import { useStore } from "./stores/app-store";
 import { Toaster } from "react-hot-toast";
-import NavigationMenu from "./components/navigation-menu";
+import NavigationMenu from "./components/navigation-menu/new-navigation-menu";
 import StatusBar from "./components/status-bar";
 import { FlexScrollContainer } from "./components/scroll-container";
 import CachedRouter from "./components/cached-router";
@@ -140,7 +140,7 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
                   ref={navPane}
                   order={1}
                   className="nav-pane"
-                  defaultSize={10}
+                  defaultSize={20}
                   minSize={3.5}
                   // maxSize={isNarrow ? 5 : undefined}
                   onResize={(size) => setIsNarrow(size <= 5)}

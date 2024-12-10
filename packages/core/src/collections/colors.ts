@@ -112,6 +112,12 @@ export class Colors implements ICollection {
     );
   }
 
+  async count(id: string) {
+    const color = await this.color(id);
+    if (!color) return;
+    return this.db.relations.from(color, "note").count();
+  }
+
   async remove(...ids: string[]) {
     await this.db.transaction(async () => {
       await this.db.relations.unlinkOfType("color", ids);
