@@ -436,11 +436,9 @@ export const useEditor = (
   const loadNote = useCallback(
     (event: {
       item?: Note;
-      forced?: boolean;
       newNote?: boolean;
       tabId?: number;
       blockId?: string;
-      presistTab?: boolean;
       session?: TabSessionItem;
     }) => {
       loadNoteMutex.runExclusive(async () => {
