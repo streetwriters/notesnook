@@ -871,12 +871,19 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   newSession = () => {
-    this.addSession({
-      type: "new",
-      id: getId(),
-      context: useNoteStore.getState().context,
-      saveState: SaveState.NotSaved
-    });
+    const state = useEditorStore.getState();
+    const session = state.sessions.find((session) => session.type === "new");
+    if (session) {
+      session.context = useNoteStore.getState().context;
+      this.activateSession(session.id);
+    } else {
+      this.addSession({
+        type: "new",
+        id: getId(),
+        context: useNoteStore.getState().context,
+        saveState: SaveState.NotSaved
+      });
+    }
   };
 
   closeSessions = (...ids: string[]) => {
