@@ -546,7 +546,9 @@ export const useActions = ({
       await db.notes.readonly(!currentReadOnly, item?.id);
       useTabStore.getState().forEachNoteTab(item.id, (tab) => {
         useTabStore.getState().updateTab(tab.id, {
-          readonly: !currentReadOnly
+          session: {
+            readonly: !currentReadOnly
+          }
         });
       });
       Navigation.queueRoutesForUpdate();

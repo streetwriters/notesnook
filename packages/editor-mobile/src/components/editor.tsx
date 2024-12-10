@@ -22,9 +22,9 @@ import {
   getFontById,
   getTableOfContents,
   TiptapOptions,
+  toBlobURL,
   usePermissionHandler
 } from "@notesnook/editor";
-import { toBlobURL } from "@notesnook/editor";
 import { useThemeColors } from "@notesnook/theme";
 import FingerprintIcon from "mdi-react/FingerprintIcon";
 import {
@@ -38,13 +38,7 @@ import {
 import { useEditorController } from "../hooks/useEditorController";
 import { useSafeArea } from "../hooks/useSafeArea";
 import { useSettings } from "../hooks/useSettings";
-import {
-  NoteState,
-  TabItem,
-  TabStore,
-  useTabContext,
-  useTabStore
-} from "../hooks/useTabStore";
+import { TabItem, useTabContext, useTabStore } from "../hooks/useTabStore";
 import { postAsyncWithTimeout, Settings } from "../utils";
 import { EditorEvents } from "../utils/editor-events";
 import { pendingSaveRequests } from "../utils/pending-saves";
@@ -91,43 +85,36 @@ const Tiptap = ({
     redo
   };
 
-  function restoreNoteSelection(state?: NoteState) {
-    try {
-      if (!tabRef.current.noteId) return;
-      const noteState =
-        state || useTabStore.getState().getNoteState(tabRef.current.noteId);
+  logger("info", tabRef.current.id, "rendering");
 
-      if (noteState && (noteState.to || noteState.from)) {
+  const restoreNoteSelection = useCallback(
+    (scrollTop?: number, selection?: { to: number; from: number }) => {
+      if (!tabRef.current.session?.noteId) return;
+      const sel = selection || tabRef.current.session?.selection;
+      if (sel && sel.to && sel.from) {
         const size = editors[tabRef.current.id]?.state.doc.content.size || 0;
-        if (
-          noteState.to > 0 &&
-          noteState.to <= size &&
-          noteState.from > 0 &&
-          noteState.from <= size
-        ) {
+        if (sel.to > 0 && sel.to <= size && sel.from > 0 && sel.from <= size) {
           editors[tabRef.current.id]?.chain().setTextSelection({
-            to: noteState.to,
-            from: noteState.from
+            to: sel.to,
+            from: sel.from
           });
         }
       }
-
       containerRef.current?.scrollTo({
         left: 0,
-        top: noteState?.top || 0,
+        top: scrollTop || tabRef.current.session?.scrollTop || 0,
         behavior: "auto"
       });
-    } catch (e) {
-      logger("error", (e as Error).message, (e as Error).stack);
-    }
-  }
+    },
+    []
+  );
 
   usePermissionHandler({
     claims: {
       premium: settings.premium
     },
     onPermissionDenied: () => {
-      post(EditorEvents.pro, undefined, tabRef.current.id, tab.noteId);
+      post(EditorEvents.pro, undefined, tabRef.current.id, tab.session?.noteId);
     }
   });
 
@@ -169,9 +156,9 @@ const Tiptap = ({
         });
       },
       element: getContentDiv(),
-      editable: !tab.readonly,
+      editable: !tab.session?.readonly,
       editorProps: {
-        editable: () => !tab.readonly,
+        editable: () => !tab.session?.readonly,
         handlePaste: (view, event) => {
           const hasFiles = event.clipboardData?.types?.some((type) =>
             type.startsWith("Files")
@@ -214,19 +201,12 @@ const Tiptap = ({
       copyToClipboard: (text) => {
         globalThis.editorControllers[tab.id]?.copyToClipboard(text);
       },
-      placeholder: strings.startWritingNote(),
       onSelectionUpdate: () => {
-        if (tabRef.current.noteId) {
-          const noteId = tabRef.current.noteId;
+        if (tabRef.current.session?.noteId) {
           clearTimeout(noteStateUpdateTimer.current);
           noteStateUpdateTimer.current = setTimeout(() => {
-            if (tabRef.current.noteId !== noteId) return;
             const { to, from } =
               editors[tabRef.current?.id]?.state.selection || {};
-            useTabStore.getState().setNoteState(noteId, {
-              to,
-              from
-            });
           }, 500);
         }
       },
@@ -245,7 +225,7 @@ const Tiptap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     getContentDiv,
-    tab.readonly,
+    tab.session?.readonly,
     settings.doubleSpacedLines,
     settings.corsProxy,
     settings.dateFormat,
@@ -255,15 +235,19 @@ const Tiptap = ({
     tick
   ]);
 
-  const update = useCallback(() => {
-    setTick((tick) => tick + 1);
-    globalThis.editorControllers[tabRef.current.id]?.setTitlePlaceholder(
-      strings.noteTitle()
-    );
-    setTimeout(() => {
-      editorControllers[tabRef.current.id]?.setLoading(false);
-    }, 300);
-  }, []);
+  const update = useCallback(
+    (scrollTop?: number, selection?: { to: number; from: number }) => {
+      setTick((tick) => tick + 1);
+      globalThis.editorControllers[tabRef.current.id]?.setTitlePlaceholder(
+        strings.noteTitle()
+      );
+      setTimeout(() => {
+        editorControllers[tabRef.current.id]?.setLoading(false);
+        restoreNoteSelection(scrollTop, selection);
+      }, 300);
+    },
+    [restoreNoteSelection]
+  );
 
   const controller = useEditorController({
     update,
@@ -304,65 +288,39 @@ const Tiptap = ({
         });
     }
 
-    const updateScrollPosition = (state: TabStore) => {
+    const updateFocusedTab = () => {
       if (isFocusedRef.current) return;
-      if (state.currentTab === tabRef.current.id) {
-        isFocusedRef.current = true;
-        const noteState = tabRef.current?.noteId
-          ? state.getNoteState(tabRef.current.noteId)
-          : undefined;
+      isFocusedRef.current = true;
+      const noteId =
+        useTabStore.getState().tabs[useTabStore.getState().currentTab]?.session
+          ?.noteId;
+      post(
+        EditorEvents.tabFocused,
+        undefined,
+        useTabStore.getState().currentTab,
+        noteId
+      );
+      editorControllers[tabRef.current.id]?.updateTab();
 
-        post(
-          EditorEvents.tabFocused,
-          {
-            hasContent:
-              !!globalThis.editorControllers[tabRef.current.id]?.content
-                .current,
-            isLoading: editorControllers[tabRef.current.id]?.loading,
-            needsRefresh: tabRef.current?.needsRefresh
-          },
-          tabRef.current.id,
-          state.getCurrentNoteId()
-        );
-        editorControllers[tabRef.current.id]?.updateTab();
+      restoreNoteSelection();
 
-        if (noteState) {
-          if (
-            containerRef.current &&
-            containerRef.current?.scrollHeight < noteState.top
-          ) {
-            console.log("Container too small to scroll.");
-            return;
-          }
-
-          restoreNoteSelection(noteState);
-        } else {
-          containerRef.current?.scrollTo({
-            left: 0,
-            top: 0,
-            behavior: "auto"
-          });
-        }
-
-        if (
-          !globalThis.editorControllers[tabRef.current.id]?.content.current &&
-          tabRef.current.noteId
-        ) {
-          editorControllers[tabRef.current.id]?.setLoading(true);
-        }
-      } else {
-        isFocusedRef.current = false;
+      if (
+        !globalThis.editorControllers[tabRef.current.id]?.content.current &&
+        tabRef.current.session?.noteId
+      ) {
+        editorControllers[tabRef.current.id]?.setLoading(true);
       }
     };
 
-    updateScrollPosition(useTabStore.getState());
+    updateFocusedTab();
 
     const unsub = useTabStore.subscribe((state, prevState) => {
       if (state.currentTab !== tabRef.current.id) {
         isFocusedRef.current = false;
       }
-      if (state.currentTab === prevState.currentTab) return;
-      updateScrollPosition(state);
+      if (state.currentTab === prevState.currentTab && isFocusedRef.current)
+        return;
+      updateFocusedTab();
       logger("info", "updating scroll position");
     });
     logger("info", tabRef.current.id, "active");
@@ -371,7 +329,7 @@ const Tiptap = ({
       logger("info", tabRef.current.id, "inactive");
       unsub();
     };
-  }, [getContentDiv]);
+  }, [getContentDiv, restoreNoteSelection]);
 
   const onClickEmptyArea: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (event) => {
@@ -446,9 +404,7 @@ const Tiptap = ({
           display: isFocused ? "flex" : "none",
           flex: 1,
           flexDirection: "column",
-          maxWidth: "100vw",
-          position: "relative",
-          overflow: "hidden"
+          maxWidth: "100vw"
         }}
         ref={editorRoot}
         onDoubleClick={onClickEmptyArea}
@@ -557,83 +513,58 @@ const Tiptap = ({
           </button>
         </div>
 
-        {controller.loading || tab.locked ? (
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              position: "absolute",
-              zIndex: 800,
-              backgroundColor: colors.primary.background,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: tab.locked ? "center" : "flex-start",
-              justifyContent: tab.locked ? "center" : "flex-start",
-              boxSizing: "border-box",
-              rowGap: 10,
-              marginTop: `${50 + insets.top}px`
-            }}
-          >
-            {tab.locked ? (
-              <div
-                style={{
-                  flexDirection: "column",
-                  paddingLeft: 12,
-                  paddingRight: 12,
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: 10
-                }}
-              >
-                <p
-                  style={{
-                    color: colors.primary.paragraph,
-                    fontSize: 20,
-                    fontWeight: "600",
-                    textAlign: "center",
-                    padding: "0px 20px",
-                    marginBottom: 0,
-                    userSelect: "none"
-                  }}
-                >
-                  {controller.title}
-                </p>
-                <p
-                  style={{
-                    color: colors.primary.paragraph,
-                    marginTop: 0,
-                    marginBottom: 0,
-                    userSelect: "none"
-                  }}
-                >
-                  This note is locked.
-                </p>
+        <div
+          onScroll={controller.scroll}
+          ref={containerRef}
+          style={{
+            overflowY: controller.loading ? "hidden" : "scroll",
+            height: "100%",
+            display: "block",
+            position: "relative"
+          }}
+        >
+          {settings.noHeader || tab.session?.locked ? null : (
+            <>
+              <Tags settings={settings} loading={controller.loading} />
+              <Title
+                titlePlaceholder={controller.titlePlaceholder}
+                readonly={settings.readonly}
+                controller={controllerRef}
+                title={controller.title}
+                fontFamily={settings.fontFamily}
+                dateFormat={settings.dateFormat}
+                timeFormat={settings.timeFormat}
+                loading={controller.loading}
+              />
 
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const data = new FormData(e.currentTarget);
-                    const password = data.get("password");
-                    const biometrics = data.get("enrollBiometrics");
-                    post("editor-events:unlock", {
-                      password,
-                      biometrics: biometrics === "on" ? true : false
-                    });
-                  }}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    rowGap: 10
-                  }}
-                >
-                  <input
-                    placeholder="Enter password"
-                    ref={controller.passwordInputRef}
-                    name="password"
-                    type="password"
-                    required
+              <StatusBar
+                container={containerRef}
+                loading={controller.loading}
+              />
+            </>
+          )}
+
+          {controller.loading || tab.session?.locked ? (
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                position: "absolute",
+                zIndex: 999,
+                backgroundColor: colors.primary.background,
+                paddingRight: 12,
+                paddingLeft: 12,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: tab.session?.locked ? "center" : "flex-start",
+                justifyContent: tab.session?.locked ? "center" : "flex-start",
+                boxSizing: "border-box",
+                rowGap: 10
+              }}
+            >
+              {tab.session?.locked ? (
+                <>
+                  <p
                     style={{
                       color: colors.primary.paragraph,
                       fontSize: 20,
@@ -806,139 +737,10 @@ const Tiptap = ({
                       width: "94%",
                       backgroundColor: colors.secondary.background,
                       borderRadius: 5,
-                      border: `1px solid ${colors.primary.border}`,
-                      paddingLeft: 12,
-                      paddingRight: 12,
-                      fontSize: "1em",
-                      backgroundColor: "transparent",
-                      caretColor: colors.primary.accent,
-                      color: colors.primary.paragraph
+                      marginTop: 10
                     }}
                   />
 
-                  <button
-                    style={{
-                      backgroundColor: colors.primary.accent,
-                      borderRadius: 5,
-                      boxSizing: "border-box",
-                      border: "none",
-                      color: colors.static.white,
-                      width: 300,
-                      fontSize: "0.9em",
-                      height: 45,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center"
-                    }}
-                    onMouseDown={(e) => {
-                      if (globalThis.keyboardShown) {
-                        e.preventDefault();
-                      }
-                    }}
-                  >
-                    <p
-                      style={{
-                        userSelect: "none"
-                      }}
-                    >
-                      Unlock note
-                    </p>
-                  </button>
-
-                  {biometryAvailable && !biometryEnrolled ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: 5
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        name="enrollBiometrics"
-                        style={{
-                          accentColor: colors.primary.accent
-                        }}
-                        onMouseDown={(e) => {
-                          if (globalThis.keyboardShown) {
-                            e.preventDefault();
-                          }
-                        }}
-                      />
-
-                      <p
-                        style={{
-                          color: colors.primary.paragraph,
-                          marginTop: 0,
-                          marginBottom: 0,
-                          userSelect: "none"
-                        }}
-                      >
-                        Enable biometric unlocking
-                      </p>
-                    </div>
-                  ) : null}
-                </form>
-
-                {biometryEnrolled && biometryAvailable ? (
-                  <button
-                    style={{
-                      backgroundColor: "transparent",
-                      borderRadius: 5,
-                      boxSizing: "border-box",
-                      border: "none",
-                      color: colors.primary.accent,
-                      width: 300,
-                      fontSize: "0.9em",
-                      height: 45,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      columnGap: 5,
-                      userSelect: "none"
-                    }}
-                    onMouseDown={(e) => {
-                      if (globalThis.keyboardShown) {
-                        e.preventDefault();
-                      }
-                    }}
-                    onClick={() => {
-                      post("editor-events:unlock-biometrics");
-                    }}
-                  >
-                    <FingerprintIcon />
-                    <p
-                      style={{
-                        userSelect: "none"
-                      }}
-                    >
-                      Unlock with biometrics
-                    </p>
-                  </button>
-                ) : null}
-              </div>
-            ) : (
-              <>
-                <Tags settings={settings} loading={controller.loading} />
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    paddingLeft: 12,
-                    paddingRight: 12,
-                    width: "100%",
-                    gap: 10
-                  }}
-                >
-                  <div
-                    style={{
-                      height: 25,
-                      width: "100%",
-                      backgroundColor: colors.secondary.background,
-                      borderRadius: 5
-                    }}
-                  />
                   <div
                     style={{
                       flexDirection: "row",
@@ -1006,46 +808,14 @@ const Tiptap = ({
                       marginTop: 10
                     }}
                   />
-                </div>
-              </>
-            )}
-          </div>
-        ) : null}
-
-        <div
-          onScroll={controller.scroll}
-          ref={containerRef}
-          style={{
-            overflowY: controller.loading ? "hidden" : "scroll",
-            height: "100%",
-            display: "block",
-            position: "relative"
-          }}
-        >
-          {settings.noHeader || tab.locked ? null : (
-            <>
-              <Tags settings={settings} loading={controller.loading} />
-              <Title
-                titlePlaceholder={controller.titlePlaceholder}
-                readonly={settings.readonly}
-                controller={controllerRef}
-                title={controller.title}
-                fontFamily={settings.fontFamily}
-                dateFormat={settings.dateFormat}
-                timeFormat={settings.timeFormat}
-                loading={controller.loading}
-              />
-
-              <StatusBar
-                container={containerRef}
-                loading={controller.loading}
-              />
-            </>
-          )}
+                </>
+              )}
+            </div>
+          ) : null}
 
           <div
             style={{
-              display: tab.locked ? "none" : "block"
+              display: tab.session?.locked ? "none" : "block"
             }}
             ref={contentPlaceholderRef}
             className="theme-scope-editor"
@@ -1053,11 +823,11 @@ const Tiptap = ({
 
           <div
             onClick={(e) => {
-              if (tab.locked) return;
+              if (tab.session?.locked) return;
               onClickBottomArea();
             }}
             onMouseDown={(e) => {
-              if (tab.locked) return;
+              if (tab.session?.locked) return;
               if (globalThis.keyboardShown) {
                 e.preventDefault();
               }

@@ -43,6 +43,7 @@ import { useRelationStore } from "../stores/use-relation-store";
 import { useReminderStore } from "../stores/use-reminder-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useUserStore } from "../stores/use-user-store";
+import { eOnLoadNote } from "../utils/events";
 import { tabBarRef } from "../utils/global-refs";
 import { convertNoteToText } from "../utils/note-to-text";
 import { NotesnookModule } from "../utils/notesnook-module";
@@ -449,19 +450,10 @@ async function loadNote(id: string, jump: boolean) {
     })
   );
 
-  const isLocked = await db.vaults.itemExists({
-    type: "note",
-    id: id
-  });
-
   const tab = useTabStore.getState().getTabForNote(id);
-  if (tab !== undefined) {
-    useTabStore.getState().focusTab(tab);
-  } else {
-    useTabStore.getState().updateTab(useTabStore.getState().currentTab, {
-      noteId: id,
-      readonly: note.readonly,
-      noteLocked: isLocked
+  if (useTabStore.getState().currentTab !== tab) {
+    eSendEvent(eOnLoadNote, {
+      note: note
     });
   }
 }

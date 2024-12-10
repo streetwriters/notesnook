@@ -76,7 +76,7 @@ import { openLinkInBrowser } from "../../../utils/functions";
 import { tabBarRef } from "../../../utils/global-refs";
 import { useDragState } from "../../settings/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
-import { tabHistory, useTabStore } from "./use-tab-store";
+import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
 
 const publishNote = async () => {
@@ -569,6 +569,21 @@ export const useEditorEvents = (
           Clipboard.setString(editorMessage.value as string);
           break;
         }
+        case EditorEvents.saveScroll: {
+          useTabStore.getState().updateTab(editorMessage.tabId, {
+            session: {
+              ...editorMessage.value
+            }
+          });
+          break;
+        }
+        case EditorEvents.newNote: {
+          eSendEvent(eOnLoadNote, {
+            tabId: editorMessage.tabId,
+            newNote: true
+          });
+          break;
+        }
         case EditorEvents.tabsChanged: {
           // useTabStore.setState({
           //   tabs: (editorMessage.value as any)?.tabs,
@@ -605,28 +620,15 @@ export const useEditorEvents = (
             editorMessage.value
           );
 
-          const { hasContent, isLoading, needsRefresh } = editorMessage.value;
-
           eSendEvent(eEditorTabFocused, editorMessage.tabId);
 
-          if (needsRefresh) {
-            useTabStore.getState().updateTab(editorMessage.tabId, {
-              needsRefresh: false
-            });
-          }
-
-          if (
-            (isLoading || !hasContent || needsRefresh) &&
-            editorMessage.noteId
-          ) {
+          if (editorMessage.noteId) {
             if (!useSettingStore.getState().isAppLoading) {
               const note = await db.notes.note(editorMessage.noteId);
               if (note) {
                 eSendEvent(eOnLoadNote, {
                   item: note,
-                  forced: true,
-                  tabId: editorMessage.tabId,
-                  refresh: hasContent && needsRefresh ? needsRefresh : false
+                  tabId: editorMessage.tabId
                 });
               }
             } else {
@@ -637,7 +639,6 @@ export const useEditorEvents = (
                   if (note) {
                     eSendEvent(eOnLoadNote, {
                       item: note,
-                      forced: true,
                       tabId: editorMessage.tabId
                     });
                   }
@@ -662,12 +663,12 @@ export const useEditorEvents = (
         }
 
         case EditorEvents.goBack: {
-          tabHistory.back();
+          useTabStore.getState().goBack();
           break;
         }
 
         case EditorEvents.goForward: {
-          tabHistory.forward();
+          useTabStore.getState().goForward();
           break;
         }
 
@@ -684,7 +685,9 @@ export const useEditorEvents = (
             useTabStore
               .getState()
               .updateTab(useTabStore.getState().currentTab, {
-                readonly: false
+                session: {
+                  readonly: false
+                }
               });
             setTimeout(() => {
               Navigation.queueRoutesForUpdate();

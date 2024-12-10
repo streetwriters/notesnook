@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getFontById } from "@notesnook/editor";
-import { replaceDateTime } from "@notesnook/editor";
+import { getFontById, replaceDateTime } from "@notesnook/editor";
 import React, { RefObject, useCallback, useEffect, useRef } from "react";
 import { EditorController } from "../hooks/useEditorController";
 import { useTabContext } from "../hooks/useTabStore";

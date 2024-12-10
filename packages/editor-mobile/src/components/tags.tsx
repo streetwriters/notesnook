@@ -46,7 +46,7 @@ function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
       editor.commands.blur();
       editorTitles[tab.id]?.current?.blur();
     }
-    post(EditorEvents.newtag, undefined, tab.id, tab.noteId);
+    post(EditorEvents.newtag, undefined, tab.id, tab.session?.noteId);
   };
   const fontScale = props.settings?.fontScale || 1;
 
@@ -127,7 +127,7 @@ function Tags(props: { settings: Settings; loading?: boolean }): JSX.Element {
           }}
           onClick={(e) => {
             e.preventDefault();
-            post(EditorEvents.tag, tag, tab.id, tab.noteId);
+            post(EditorEvents.tag, tag, tab.id, tab.session?.noteId);
           }}
         >
           #{tag.alias}
