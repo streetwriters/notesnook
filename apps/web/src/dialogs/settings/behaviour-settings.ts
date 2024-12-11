@@ -55,6 +55,31 @@ export const BehaviourSettings: SettingsGroup[] = [
             ]
           }
         ]
+      },
+      {
+        key: "image-compression",
+        title: strings.imageCompression(),
+        description: strings.imageCompressionDesc(),
+        keywords: ["compress images", "image quality"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.imageCompression, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setImageCompression(parseInt(value)),
+            selectedOption: () =>
+              useSettingStore.getState().imageCompression.toString(),
+            options: [
+              { value: "0", title: strings.askEveryTime() },
+              {
+                value: "1",
+                title: `${strings.enable()} (${strings.recommended()})`
+              },
+              { value: "2", title: strings.disable() }
+            ]
+          }
+        ]
       }
     ]
   },

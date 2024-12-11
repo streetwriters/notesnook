@@ -60,6 +60,7 @@ class SettingStore extends BaseStore<SettingStore> {
 
   trashCleanupInterval: TrashCleanupInterval = 7;
   homepage = Config.get("homepage", 0);
+  imageCompression = Config.get("imageCompression", 0);
   desktopIntegrationSettings?: DesktopIntegration;
   autoUpdates = true;
   isFlatpak = false;
@@ -123,6 +124,11 @@ class SettingStore extends BaseStore<SettingStore> {
   setHomepage = (homepage: number) => {
     this.set({ homepage });
     Config.set("homepage", homepage);
+  };
+
+  setImageCompression = (imageCompression: number) => {
+    this.set({ imageCompression });
+    Config.set("imageCompression", imageCompression);
   };
 
   setDesktopIntegration = async (settings: DesktopIntegration) => {
