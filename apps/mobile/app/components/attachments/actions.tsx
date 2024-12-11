@@ -182,18 +182,17 @@ const Actions = ({
         relations
           .map((relation) => relation.fromId)
           .forEach(async (id) => {
-            const tab = useTabStore.getState().getTabForNote(id);
-            if (tab !== undefined) {
-              const isFocused = useTabStore.getState().currentTab === tab;
+            useTabStore.getState().forEachNoteTab(id, async (tab) => {
+              const isFocused = useTabStore.getState().currentTab === tab.id;
               if (isFocused) {
                 eSendEvent(eOnLoadNote, {
                   item: await db.notes.note(id),
                   forced: true
                 });
               } else {
-                editorController.current.commands.setLoading(true, tab);
+                editorController.current.commands.setLoading(true, tab.id);
               }
-            }
+            });
           });
         close?.();
       },
