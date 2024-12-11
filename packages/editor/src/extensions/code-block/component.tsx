@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, Input, Text } from "@theme-ui/components";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "../../components/button.js";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
 import { useTimer } from "../../hooks/use-timer.js";
@@ -30,6 +30,7 @@ import { CodeBlockAttributes } from "./code-block.js";
 import Languages from "./languages.json";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { strings } from "@notesnook/intl";
+import { config } from "../../utils/config.js";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
@@ -48,6 +49,23 @@ export function CodeblockComponent(
   const languageDefinition = Languages.find(
     (l) => l.filename === language || l.alias?.some((a) => a === language)
   );
+
+  const cachedLanguage =
+    config.get<(typeof Languages)[number]>("codeBlockLanguage");
+
+  useEffect(() => {
+    if (languageDefinition) {
+      config.set("codeBlockLanguage", languageDefinition);
+      return;
+    }
+
+    if (!languageDefinition && cachedLanguage && cachedLanguage.filename) {
+      updateAttributes(
+        { language: cachedLanguage.filename },
+        { addToHistory: false, preventUpdate: false }
+      );
+    }
+  }, []);
 
   return (
     <>
@@ -155,7 +173,9 @@ export function CodeblockComponent(
             title={strings.changeLanguage()}
           >
             <Text variant={"subBody"} spellCheck={false}>
-              {languageDefinition?.title || "Plaintext"}
+              {languageDefinition?.title ||
+                cachedLanguage?.title ||
+                "Plaintext"}
             </Text>
           </Button>
 
@@ -213,8 +233,16 @@ export function CodeblockComponent(
         title={strings.selectLanguage()}
       >
         <LanguageSelector
-          selectedLanguage={languageDefinition?.filename || "Plaintext"}
+          selectedLanguage={
+            languageDefinition?.filename ||
+            cachedLanguage?.filename ||
+            "Plaintext"
+          }
           onLanguageSelected={(language) => {
+            config.set(
+              "codeBlockLanguage",
+              Languages.find((l) => l.filename === language)
+            );
             updateAttributes(
               { language },
               { addToHistory: true, preventUpdate: false }
@@ -287,7 +315,6 @@ function LanguageSelector(props: LanguageSelectorProps) {
               variant={"menuitem"}
               sx={{
                 textAlign: "left",
-                py: 1,
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center"
