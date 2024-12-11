@@ -66,7 +66,7 @@ class Vault {
       subtitle: strings.deleteVaultDesc(),
       inputs: {
         password: {
-          label: strings.password(),
+          label: strings.accountPassword(),
           autoComplete: "current-password"
         }
       },
