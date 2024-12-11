@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import {
+  getTestId,
   groupByOptions,
   NOTE,
   orderByOptions,
@@ -35,6 +36,53 @@ test("create a note", async ({ page }) => {
   const note = await notes.createNote(NOTE);
 
   expect(note).toBeDefined();
+});
+
+test("disable autosave when note crosses MAX_AUTO_SAVEABLE_WORDS", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note = await notes.createNote({
+    title: "many words",
+    content
+  });
+
+  expect(
+    await app.toasts.waitForToast(
+      "Auto-save is disabled for large notes. Press Ctrl + S to save."
+    )
+  ).toBe(true);
+  expect(note).toBeDefined();
+});
+
+test("close a note when autosave is disabled", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note = await notes.createNote({
+    title: "Title",
+    content
+  });
+
+  expect(
+    await app.toasts.waitForToast(
+      "Auto-save is disabled for large notes. Press Ctrl + S to save."
+    )
+  ).toBe(true);
+
+  const noteCloseButton = page.locator(
+    getTestId("tab-close-button-" + (await note?.getId()))
+  );
+  await noteCloseButton.click();
+
+  await note?.openNote();
+
+  // since getContent trims the content, we need to trim the content before comparing
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
 });
 
 test("delete a note", async ({ page }) => {

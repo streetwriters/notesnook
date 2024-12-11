@@ -218,7 +218,8 @@ import {
   mdiServerSecurity,
   mdiOpenInNew,
   mdiTagOutline,
-  mdiChatQuestionOutline
+  mdiChatQuestionOutline,
+  mdiNoteRemoveOutline
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -313,6 +314,7 @@ function createIcon(path: string, rotate = false) {
 
 export const Plus = createIcon(mdiPlus);
 export const Note = createIcon(mdiNoteOutline);
+export const NoteRemove = createIcon(mdiNoteRemoveOutline);
 export const Notes = createIcon(mdiNoteMultipleOutline);
 export const Minus = createIcon(mdiMinus);
 export const Notebook = createIcon(mdiBookOutline);

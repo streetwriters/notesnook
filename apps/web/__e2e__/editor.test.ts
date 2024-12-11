@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { NOTE, TITLE_ONLY_NOTE } from "./utils";
+import { getTestId, NOTE, TITLE_ONLY_NOTE } from "./utils";
 
 test("focus mode", async ({ page }) => {
   const app = new AppModel(page);
@@ -82,6 +82,75 @@ test("creating a new note should clear the editor contents & title", async ({
   expect(await notes.editor.isUnloaded()).toBeTruthy();
   expect(await notes.editor.getTitle()).toBe("");
   expect(await notes.editor.getContent("text")).toBe("");
+});
+
+test("when autosave is disabled, pressing ctrl+s should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  await notes.editor.isEditorUnsaved();
+
+  await page.keyboard.press("Control+s");
+
+  await notes.editor.isEditorSaved();
+});
+
+test("when autosave is disabled, switching to another note should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note1 = await notes.createNote({
+    title: "Test note 1"
+  });
+  const note2 = await notes.createNote({
+    title: "Test note 2"
+  });
+  const note1UnsavedTestId = getTestId(
+    "tab-icon-unsaved-" + (await note1?.getId())
+  );
+  const note1SavedTestId = getTestId(
+    "tab-icon-saved-" + (await note1?.getId())
+  );
+
+  await note1?.openNote();
+  await notes.editor.setContent(content);
+  await page.locator(note1UnsavedTestId).waitFor();
+  await page.locator(note1SavedTestId).waitFor({ state: "hidden" });
+  await note2?.openNote();
+  await page.locator(note1UnsavedTestId).waitFor({ state: "hidden" });
+  await page.locator(note1SavedTestId).waitFor();
+});
+
+test("when autosave is disabled, creating a new note should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note = await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  const testId = getTestId("tab-icon-unsaved-" + (await note?.getId()));
+
+  await page.locator(testId).waitFor();
+
+  await notes.newNote();
+
+  await page.locator(testId).waitFor({ state: "hidden" });
 });
 
 test("creating a new title-only note should add it to the list", async ({

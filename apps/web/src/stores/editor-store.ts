@@ -49,6 +49,7 @@ import { hashNavigate } from "../navigation";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import Vault from "../common/vault";
 import { Mutex } from "async-mutex";
+import { useEditorManager } from "../components/editor/manager";
 
 export enum SaveState {
   NotSaved = -1,
@@ -501,6 +502,12 @@ class EditorStore extends BaseStore<EditorStore> {
     const session = this.get().sessions.find((s) => s.id === id);
     if (!session) id = undefined;
 
+    const activeSession = this.getActiveSession();
+
+    if (activeSession) {
+      this.saveSessionContentIfNotSaved(activeSession.id);
+    }
+
     if (
       id &&
       !settingStore.get().hideNoteTitle &&
@@ -848,7 +855,6 @@ class EditorStore extends BaseStore<EditorStore> {
             sessionId
           });
         }
-
         setDocumentTitle(
           settingStore.get().hideNoteTitle ? undefined : note.title
         );
@@ -868,6 +874,25 @@ class EditorStore extends BaseStore<EditorStore> {
         }
       }
     });
+  };
+
+  saveSessionContentIfNotSaved = (sessionId: string) => {
+    const sessionSaveState = this.getSession(sessionId, ["default"])?.saveState;
+    if (sessionSaveState === SaveState.NotSaved) {
+      const editor = useEditorManager.getState().getEditor(sessionId);
+      const content = editor?.editor?.getContent();
+      this.saveSession(
+        sessionId,
+        content
+          ? {
+              content: {
+                data: content,
+                type: "tiptap"
+              }
+            }
+          : {}
+      );
+    }
   };
 
   newSession = () => {
@@ -895,6 +920,8 @@ class EditorStore extends BaseStore<EditorStore> {
           sessions.push(session);
           continue;
         }
+
+        this.saveSessionContentIfNotSaved(session.id);
 
         db.fs().cancel(session.id).catch(console.error);
         if (state.history.includes(session.id))
