@@ -460,7 +460,7 @@ export class VaultDialog extends Component {
   async _deleteNote() {
     try {
       await db.vault.remove(this.state.note.id, this.password);
-      await deleteItems([this.state.note.id], "note");
+      await deleteItems("note", [this.state.note.id]);
       this.close();
     } catch (e) {
       this._takeErrorAction(e);

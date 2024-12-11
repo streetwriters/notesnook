@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Item, ItemType, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef } from "react";
 import {
@@ -46,7 +47,6 @@ import { MoveNotebookSheet } from "../sheets/move-notebook";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
-import { strings } from "@notesnook/intl";
 
 export const SelectionHeader = React.memo(
   ({
@@ -103,12 +103,11 @@ export const SelectionHeader = React.memo(
     const deleteItem = async () => {
       if (!type) return;
       presentDialog({
-        title: strings.doActions.delete[
-          type as keyof typeof strings.doActions.delete
-        ](selectedItemsList.length),
-        paragraph: strings.actionConfirmations.delete[
-          type as keyof typeof strings.doActions.delete
-        ](selectedItemsList.length),
+        title: strings.doActions.delete.unknown(type, selectedItemsList.length),
+        paragraph: strings.actionConfirmations.delete.unknown(
+          type,
+          selectedItemsList.length
+        ),
         positiveText: strings.delete(),
         negativeText: strings.cancel(),
         positivePress: async () => {
@@ -297,15 +296,35 @@ export const SelectionHeader = React.memo(
                 {
                   title: strings.moveToTrash(),
                   onPress: async () => {
-                    deleteItems(
-                      undefined,
-                      useSelectionStore.getState().selectionMode
-                    ).then(() => {
-                      useSelectionStore.getState().clearSelection();
-                      useSelectionStore.getState().setSelectionMode(undefined);
-                    });
+                    const selection = useSelectionStore.getState();
+                    if (!selection.selectionMode) return;
+                    await deleteItems(
+                      selection.selectionMode as ItemType,
+                      selection.selectedItemsList
+                    );
+                    selection.clearSelection();
+                    selection.setSelectionMode(undefined);
                   },
-                  visible: type !== "trash",
+                  visible: type === "note" || type === "notebook",
+                  icon: "delete"
+                },
+                {
+                  title: strings.doActions.delete.unknown(
+                    type!,
+                    selectedItemsList.length
+                  ),
+                  onPress: async () => {
+                    const selection = useSelectionStore.getState();
+                    if (!selection.selectionMode) return;
+                    await deleteItems(
+                      selection.selectionMode as ItemType,
+                      selection.selectedItemsList
+                    );
+                    selection.clearSelection();
+                    selection.setSelectionMode(undefined);
+                  },
+                  visible:
+                    type !== "trash" && type !== "note" && type !== "notebook",
                   icon: "delete"
                 },
                 {

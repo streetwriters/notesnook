@@ -73,7 +73,7 @@ const ACTIONS = [
   {
     action: "deleted",
     label: "deleted",
-    dataTypes: ["attachment", "reminder", "tag", "note"]
+    dataTypes: ["attachment", "reminder", "tag", "note", "notebook"]
   },
   {
     action: "movedToTrash",
@@ -206,6 +206,28 @@ const DO_ACTIONS_TEMPLATE = (action, dataTypes) => `${action}: {
     ${dataTypes}
 }`;
 
+const UNKNOWN_DATA_TYPE_TEMPLATE = (
+  exportName,
+  action,
+  types,
+  fallbackSingularTemplate,
+  fallbackPluralTemplate
+) => `unknown: (type: string, count: number) => {
+  switch (type) {
+    ${types
+      .map(
+        (type) => `case "${type}":
+        return ${exportName}.${action}.${type}(count);`
+      )
+      .join("\n")}
+    default:
+      return plural(count, {
+        one: \`${fallbackSingularTemplate}\`,
+        other: \`${fallbackPluralTemplate}\`
+      });
+  }  
+}`;
+
 const DATA_TYPES_TEMPLATE = (
   type,
   singularTemplate,
@@ -219,7 +241,7 @@ const MODULE_TEMPLATE = (exportName, strings) =>
   `/* eslint-disable header/header */
 // THIS FILE IS GENERATED. DO NOT EDIT MANUALLY.
 
-import { t, plural } from "@lingui/macro";
+import { plural } from "@lingui/macro";
 
 export const ${exportName} = {
     ${strings}
@@ -227,54 +249,80 @@ export const ${exportName} = {
 `;
 
 function generateDoActionsStrings() {
-  return generateStrings(
-    DO_ACTIONS,
-    (action, type) => `${action} ${DATA_TYPES[type].singular}`,
-    (action, type) => `${action} # ${DATA_TYPES[type].plural}`
+  const exportName = "doActions";
+
+  return MODULE_TEMPLATE(
+    exportName,
+    generateStrings(
+      exportName,
+      DO_ACTIONS,
+      (action, type) => `${action} ${DATA_TYPES[type].singular}`,
+      (action, type) => `${action} # ${DATA_TYPES[type].plural}`
+    )
   );
 }
 
 function generateActionsStrings() {
-  return generateStrings(
-    ACTIONS,
-    (action, type) => `${DATA_TYPES[type].singularCamelCase} ${action}`,
-    (action, type) => `# ${DATA_TYPES[type].plural} ${action}`
+  const exportName = "actions";
+  return MODULE_TEMPLATE(
+    exportName,
+    generateStrings(
+      exportName,
+      ACTIONS,
+      (action, type) => `${DATA_TYPES[type].singularCamelCase} ${action}`,
+      (action, type) => `# ${DATA_TYPES[type].plural} ${action}`
+    )
   );
 }
 
 function generateActionConfirmationStrings() {
-  return generateStrings(
-    ACTION_CONFIRMATIONS,
-    (action, type) =>
-      `Are you sure you want to ${action} this ${DATA_TYPES[type].singular}?`,
-    (action, type) =>
-      `Are you sure you to ${action} these ${DATA_TYPES[type].plural}?`
+  const exportName = "actionConfirmations";
+  return MODULE_TEMPLATE(
+    exportName,
+    generateStrings(
+      exportName,
+      ACTION_CONFIRMATIONS,
+      (action, type) =>
+        `Are you sure you want to ${action} this ${DATA_TYPES[type].singular}?`,
+      (action, type) =>
+        `Are you sure you to ${action} these ${DATA_TYPES[type].plural}?`
+    )
   );
 }
 
 function generateActionErrorStrings() {
-  return generateStrings(
-    ACTION_ERRORS,
-    (action, type) =>
-      `${DATA_TYPES[type].singularCamelCase} could not be ${action}`,
-    (action, type) => `# ${DATA_TYPES[type].plural} could not be ${action}`
+  const exportName = "actionErrors";
+  return MODULE_TEMPLATE(
+    exportName,
+    generateStrings(
+      exportName,
+      ACTION_ERRORS,
+      (action, type) =>
+        `${DATA_TYPES[type].singularCamelCase} could not be ${action}`,
+      (action, type) => `# ${DATA_TYPES[type].plural} could not be ${action}`
+    )
   );
 }
 
 function generateInProgressActionsStrings() {
-  return generateStrings(
-    IN_PROGRESS_ACTIONS,
-    (action, type) => `${action} ${DATA_TYPES[type].singular}...`,
-    (action, type) => `${action} # ${DATA_TYPES[type].plural}...`
+  const exportName = "inProgressActions";
+  return MODULE_TEMPLATE(
+    exportName,
+    generateStrings(
+      exportName,
+      IN_PROGRESS_ACTIONS,
+      (action, type) => `${action} ${DATA_TYPES[type].singular}...`,
+      (action, type) => `${action} # ${DATA_TYPES[type].plural}...`
+    )
   );
 }
 
-function generateStrings(actions, singular, plural) {
+function generateStrings(exportName, actions, singular, plural) {
   let result = [];
   for (const action of actions) {
     const subResults = [];
+    const actionName = action.label;
     for (const type of action.dataTypes) {
-      const actionName = action.label;
       subResults.push(
         DATA_TYPES_TEMPLATE(
           type,
@@ -283,6 +331,15 @@ function generateStrings(actions, singular, plural) {
         )
       );
     }
+    subResults.push(
+      UNKNOWN_DATA_TYPE_TEMPLATE(
+        exportName,
+        action.action,
+        action.dataTypes,
+        singular(actionName, "item"),
+        plural(actionName, "item")
+      )
+    );
     result.push(DO_ACTIONS_TEMPLATE(action.action, subResults.join(",\n")));
   }
   return result.join(",\n");
@@ -290,27 +347,18 @@ function generateStrings(actions, singular, plural) {
 
 mkdirSync("./generated/", { recursive: true });
 
-writeFileSync(
-  "./generated/do-actions.ts",
-  MODULE_TEMPLATE("doActions", generateDoActionsStrings())
-);
+writeFileSync("./generated/do-actions.ts", generateDoActionsStrings());
 
-writeFileSync(
-  "./generated/actions.ts",
-  MODULE_TEMPLATE("actions", generateActionsStrings())
-);
+writeFileSync("./generated/actions.ts", generateActionsStrings());
 
 writeFileSync(
   "./generated/in-progress-actions.ts",
-  MODULE_TEMPLATE("inProgressActions", generateInProgressActionsStrings())
+  generateInProgressActionsStrings()
 );
 
-writeFileSync(
-  "./generated/action-errors.ts",
-  MODULE_TEMPLATE("actionErrors", generateActionErrorStrings())
-);
+writeFileSync("./generated/action-errors.ts", generateActionErrorStrings());
 
 writeFileSync(
   "./generated/action-confirmations.ts",
-  MODULE_TEMPLATE("actionConfirmations", generateActionConfirmationStrings())
+  generateActionConfirmationStrings()
 );

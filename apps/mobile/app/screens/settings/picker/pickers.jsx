@@ -57,7 +57,7 @@ export const HomePicker = createSettingsPicker({
     });
   },
   formatValue: (item) => {
-    return strings.routes[typeof item === "object" ? item.name : item]();
+    return strings.routes[typeof item === "object" ? item.name : item]?.();
   },
   getItemKey: (item) => item.name,
   options: MenuItemsList.slice(0, MenuItemsList.length - 1),
