@@ -33,9 +33,15 @@ import {
   hashStream,
   writeEncryptedFile
 } from "../../interfaces/fs";
+import Config from "../../utils/config";
+import { compressImage, FileWithURI } from "../../utils/image-compressor";
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
+
+function getImageCompressionConfig() {
+  return Config.get("imageCompression", 0);
+}
 
 export async function insertAttachments(type = "*/*") {
   if (!isUserPremium()) {
@@ -58,12 +64,38 @@ export async function attachFiles(files: File[]) {
   }
 
   let images = files.filter((f) => f.type.startsWith("image/"));
-  images =
-    images.length > 0
-      ? (await ImagePickerDialog.show({
-          images
-        })) || []
-      : [];
+
+  switch (getImageCompressionConfig()) {
+    case 1:
+      let compressedImages: FileWithURI[] = [];
+      for (const image of images) {
+        const compressed = await compressImage(image, {
+          maxWidth: (naturalWidth) => Math.min(1920, naturalWidth * 0.7),
+          width: (naturalWidth) => naturalWidth,
+          height: (_, naturalHeight) => naturalHeight,
+          resize: "contain",
+          quality: 0.7
+        });
+        compressedImages.push(
+          new FileWithURI([compressed], image.name, {
+            lastModified: image.lastModified,
+            type: image.type
+          })
+        );
+      }
+      images = compressedImages;
+      break;
+    case 2:
+      break;
+    default:
+      images =
+        images.length > 0
+          ? (await ImagePickerDialog.show({
+              images
+            })) || []
+          : [];
+  }
+
   const documents = files.filter((f) => !f.type.startsWith("image/"));
   const attachments: Attachment[] = [];
   for (const file of [...images, ...documents]) {

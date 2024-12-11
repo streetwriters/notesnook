@@ -227,4 +227,23 @@ export class EditorModel {
         .replace(" words", "")
     );
   }
+
+  async attachImage() {
+    await this.page
+      .context()
+      .grantPermissions(["clipboard-read", "clipboard-write"]);
+    await this.page.evaluate(async () => {
+      const resp = await fetch("https://dummyjson.com/image/150");
+      const blob = await resp.blob();
+      window.navigator.clipboard.write([
+        new ClipboardItem({
+          "image/png": new Blob([blob], { type: "image/png" })
+        })
+      ]);
+    });
+
+    await this.page.keyboard.down("Control");
+    await this.page.keyboard.press("KeyV");
+    await this.page.keyboard.up("Control");
+  }
 }
