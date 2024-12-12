@@ -49,6 +49,7 @@ import { hashNavigate } from "../navigation";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import Vault from "../common/vault";
 import { Mutex } from "async-mutex";
+import { editorConfig } from "../components/editor/manager";
 
 export enum SaveState {
   NotSaved = -1,
@@ -73,6 +74,7 @@ export type BaseEditorSession = {
   pinned?: boolean;
   preview?: boolean;
   title?: string;
+  textDirection?: string;
 
   /**
    * The id of block to scroll to after opening the session successfully.
@@ -881,7 +883,8 @@ class EditorStore extends BaseStore<EditorStore> {
         type: "new",
         id: getId(),
         context: useNoteStore.getState().context,
-        saveState: SaveState.NotSaved
+        saveState: SaveState.NotSaved,
+        textDirection: editorConfig().textDirection || "ltr"
       });
     }
   };

@@ -1116,7 +1116,7 @@ msgid "Change backup directory"
 msgstr ""
 
 #: src/strings.ts:1115
-msgid "Change default text direction to \"left-to-right\" or \"right-to-left\""
+msgid "Change default text direction to LTR or RTL"
 msgstr ""
 
 #: src/strings.ts:444
