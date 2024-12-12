@@ -231,6 +231,23 @@ test("add tags to note", async ({ page }) => {
   expect(noteTags.every((t, i) => t === tags[i])).toBe(true);
 });
 
+test("add tags to locked note", async ({ page }) => {
+  const tags = ["incognito", "secret-stuff"];
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+  await note?.contextMenu.lock(PASSWORD);
+  await note?.openLockedNote(PASSWORD);
+
+  await notes.editor.setTags(tags);
+  await page.waitForTimeout(200);
+
+  const noteTags = await notes.editor.getTags();
+  expect(noteTags).toHaveLength(tags.length);
+  expect(noteTags.every((t, i) => t === tags[i])).toBe(true);
+});
+
 for (const format of ["html", "txt", "md"] as const) {
   test(`export note as ${format}`, async ({ page }) => {
     const app = new AppModel(page);
