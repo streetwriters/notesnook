@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Fragment } from "@tiptap/pm/model";
 import { getParentAttributes } from "../../utils/prosemirror.js";
 import { Node, mergeAttributes, wrappingInputRule } from "@tiptap/core";
 
@@ -56,7 +57,7 @@ export const OutlineList = Node.create<OutlineListOptions>({
 
   group: "block list",
 
-  content: `${outlineListItemName}+`,
+  content: `(${outlineListItemName}|listItem)+`,
 
   parseHTML() {
     return [
@@ -123,12 +124,41 @@ export const OutlineList = Node.create<OutlineListOptions>({
     ];
   },
   addNodeView() {
-    return ({ node, HTMLAttributes }) => {
+    return ({ editor, node, getPos, HTMLAttributes }) => {
       const ul = document.createElement("ul");
       ul.classList.add("outline-list");
       if (node.attrs.textDirection) ul.dir = node.attrs.textDirection;
       for (const key in HTMLAttributes)
         ul.setAttribute(key, HTMLAttributes[key]);
+
+      const processNestedNodes = (parentNode: Fragment, parentPos: number) => {
+        parentNode.forEach((child, offset) => {
+          const childPos = parentPos + offset + 1;
+          if (
+            child.type.name === "bulletList" ||
+            child.type.name === "orderedList"
+          ) {
+            editor.commands.command(({ tr }) => {
+              tr.setNodeMarkup(childPos, editor.schema.nodes.outlineList);
+              return true;
+            });
+          }
+          if (child.type.name === "listItem") {
+            editor.commands.command(({ tr }) => {
+              tr.setNodeMarkup(childPos, editor.schema.nodes.outlineListItem);
+              return true;
+            });
+          }
+          processNestedNodes(child.content, childPos);
+        });
+      };
+
+      if (typeof getPos === "function") {
+        processNestedNodes(node.content, getPos());
+      } else {
+        processNestedNodes(node.content, Number(getPos));
+      }
+
       return {
         dom: ul,
         contentDOM: ul
