@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { RequestOptions } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import NetInfo from "@react-native-community/netinfo";
 import RNFetchBlob from "react-native-blob-util";
@@ -26,7 +27,13 @@ import { DatabaseLogger, db } from "../database";
 import { createCacheDir, exists } from "./io";
 import { ABYTES, cacheDir, getUploadedFileSize, parseS3Error } from "./utils";
 
-export async function downloadFile(filename, requestOptions, cancelToken) {
+export async function downloadFile(
+  filename: string,
+  requestOptions: RequestOptions,
+  cancelToken: {
+    cancel: (reason?: string) => Promise<void>;
+  }
+) {
   if (!requestOptions) {
     DatabaseLogger.log(
       `Error downloading file: ${filename}, reason: No requestOptions`
@@ -36,9 +43,11 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
 
   DatabaseLogger.log(`Downloading ${filename}`);
   await createCacheDir();
-  let { url, headers, chunkSize } = requestOptions;
-  let tempFilePath = `${cacheDir}/${filename}_temp`;
-  let originalFilePath = `${cacheDir}/${filename}`;
+
+  const { url, headers, chunkSize } = requestOptions;
+  const tempFilePath = `${cacheDir}/${filename}_temp`;
+  const originalFilePath = `${cacheDir}/${filename}`;
+
   try {
     if (await exists(filename)) {
       DatabaseLogger.log(`File Exists already: ${filename}`);
@@ -46,6 +55,8 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
     }
 
     const attachment = await db.attachments.attachment(filename);
+    if (!attachment) return false;
+
     const size = await getUploadedFileSize(filename);
 
     if (size === -1) {
@@ -71,21 +82,21 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
       throw new Error(error);
     }
 
-    let res = await fetch(url, {
+    const resolveUrlResponse = await fetch(url, {
       method: "GET",
       headers
     });
 
-    if (!res.ok) {
+    if (!resolveUrlResponse.ok) {
       DatabaseLogger.log(
-        `Error downloading file: ${filename}, ${res.status}, ${res.statusText}, reason: Unable to resolve download url`
+        `Error downloading file: ${filename}, ${resolveUrlResponse.status}, ${resolveUrlResponse.statusText}, reason: Unable to resolve download url`
       );
       throw new Error(
-        `${res.status}: ${strings.failedToResolvedDownloadUrl()}`
+        `${resolveUrlResponse.status}: ${strings.failedToResolvedDownloadUrl()}`
       );
     }
 
-    const downloadUrl = await res.text();
+    const downloadUrl = await resolveUrlResponse.text();
 
     if (!downloadUrl) {
       DatabaseLogger.log(
@@ -95,12 +106,12 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
     }
 
     DatabaseLogger.log(`Download starting: ${filename}`);
-    let request = RNFetchBlob.config({
+    const request = RNFetchBlob.config({
       path: tempFilePath,
       IOSBackgroundTask: true,
       overwrite: true
     })
-      .fetch("GET", downloadUrl, null)
+      .fetch("GET", downloadUrl)
       .progress(async (recieved, total) => {
         useAttachmentStore
           .getState()
@@ -109,15 +120,14 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
         DatabaseLogger.log(`Downloading: ${filename}, ${recieved}/${total}`);
       });
 
-    cancelToken.cancel = () => {
+    cancelToken.cancel = async (reason) => {
       useAttachmentStore.getState().remove(filename);
       request.cancel();
       RNFetchBlob.fs.unlink(tempFilePath).catch(console.log);
-      DatabaseLogger.log(`Download cancelled: ${filename}`);
+      DatabaseLogger.log(`Download cancelled: ${reason} ${filename}`);
     };
 
-    let response = await request;
-    console.log(response.info().headers);
+    const response = await request;
 
     const contentType =
       response.info().headers?.["content-type"] ||
@@ -128,10 +138,10 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
       throw new Error(`[${error.Code}] ${error.Message}`);
     }
 
-    let status = response.info().status;
+    const status = response.info().status;
     useAttachmentStore.getState().remove(filename);
 
-    if (exists(originalFilePath)) {
+    if (await exists(originalFilePath)) {
       await RNFetchBlob.fs.unlink(originalFilePath).catch(console.log);
     }
 
@@ -143,11 +153,14 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
 
     return status >= 200 && status < 300;
   } catch (e) {
-    if (e.message !== "canceled" && !e.message.includes("NoSuchKey")) {
+    if (
+      (e as Error).message !== "canceled" &&
+      !(e as Error).message.includes("NoSuchKey")
+    ) {
       const toast = {
-        heading: strings.downloadError(),
-        message: e.message,
-        type: "error",
+        heading: strings.downloadError((e as Error).message),
+        message: (e as Error).message,
+        type: "error" as const,
         context: "global"
       };
       ToastManager.show(toast);
@@ -158,15 +171,14 @@ export async function downloadFile(filename, requestOptions, cancelToken) {
     useAttachmentStore.getState().remove(filename);
     RNFetchBlob.fs.unlink(tempFilePath).catch(console.log);
     RNFetchBlob.fs.unlink(originalFilePath).catch(console.log);
-    DatabaseLogger.error(e, {
-      url,
-      headers
+    DatabaseLogger.error(e, "Download failed: ", {
+      url
     });
     return false;
   }
 }
 
-export async function checkAttachment(hash) {
+export async function checkAttachment(hash: string) {
   const internetState = await NetInfo.fetch();
   const isInternetReachable =
     internetState.isConnected && internetState.isInternetReachable;
@@ -184,7 +196,7 @@ export async function checkAttachment(hash) {
         failed: `File length is 0. Please upload this file again from the attachment manager. (File hash: ${hash})`
       };
   } catch (e) {
-    return { failed: e?.message };
+    return { failed: (e as Error)?.message };
   }
   return { success: true };
 }

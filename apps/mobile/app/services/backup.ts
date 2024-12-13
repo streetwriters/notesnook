@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { sanitizeFilename } from "@notesnook/common";
 import { formatDate } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import FileViewer from "react-native-file-viewer";
@@ -26,20 +27,14 @@ import * as ScopedStorage from "react-native-scoped-storage";
 import Share from "react-native-share";
 import { zip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../common/database";
-import storage from "../common/database/storage";
-import filesystem from "../common/filesystem";
+import filesystem, { FileStorage } from "../common/filesystem";
 import { cacheDir, copyFileAsync } from "../common/filesystem/utils";
 import { presentDialog } from "../components/dialog/functions";
-import {
-  endProgress,
-  startProgress,
-  updateProgress
-} from "../components/dialogs/progress";
+import { endProgress, updateProgress } from "../components/dialogs/progress";
 import { eCloseSheet } from "../utils/events";
 import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
-import { strings } from "@notesnook/intl";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -178,7 +173,7 @@ async function run(
   let path;
 
   if (Platform.OS === "ios") {
-    path = await storage.checkAndCreateDir("/backups");
+    path = await filesystem.checkAndCreateDir("/backups");
   }
 
   const backupFileName = sanitizeFilename(
@@ -232,7 +227,7 @@ async function run(
         updateProgress({
           progress: `Saving attachments in backup... ${file.hash}`
         });
-        if (await filesystem.exists(file.hash)) {
+        if (await FileStorage.exists(file.hash)) {
           await RNFetchBlob.fs.cp(
             `${cacheDir}/${file.hash}`,
             `${attachmentsDir}/${file.hash}`
@@ -299,7 +294,7 @@ async function run(
       path: path
     };
   } catch (e) {
-    ToastManager.error(e, strings.backupFailed(), context || "global");
+    ToastManager.error(e as Error, strings.backupFailed(), context || "global");
 
     if (
       (e as Error)?.message?.includes("android.net.Uri") &&

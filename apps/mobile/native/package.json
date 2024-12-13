@@ -65,7 +65,7 @@
     "react-native-screenguard": "^1.0.0",
     "@formatjs/intl-locale": "4.0.0",
     "@formatjs/intl-pluralrules": "5.2.14",
-    "@ammarahmed/react-native-sodium": "1.5.6",
+    "@ammarahmed/react-native-sodium": "^1.6.1",
     "react-native-mmkv-storage": "^0.10.2",
     "@react-native-community/datetimepicker": "^8.2.0",
     "react-native-exit-app": "github:ammarahm-ed/react-native-exit-app",

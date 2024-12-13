@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { hosts, RequestOptions } from "@notesnook/core";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { DatabaseLogger, db } from "../database";
-import { hosts } from "@notesnook/core";
 
 export const ABYTES = 17;
 export const cacheDirOld = RNFetchBlob.fs.dirs.CacheDir;
@@ -31,18 +31,13 @@ export const cacheDir =
     ? RNFetchBlob.fs.dirs.LibraryDir + "/.cache"
     : RNFetchBlob.fs.dirs.DocumentDir + "/.cache";
 
-export function getRandomId(prefix) {
+export function getRandomId(prefix: string) {
   return Math.random()
     .toString(36)
     .replace("0.", prefix || "");
 }
 
-/**
- *
- * @param {string | undefined} data
- * @returns
- */
-export function parseS3Error(data) {
+export function parseS3Error(data?: string) {
   const xml = typeof data === "string" ? data : null;
 
   const error = {
@@ -70,11 +65,19 @@ export function parseS3Error(data) {
   }
 }
 
-export function cancelable(operation) {
+export function cancelable(
+  operation: (
+    filename: string,
+    requestOptions: RequestOptions,
+    cancelToken: {
+      cancel: (reason?: string) => Promise<void>;
+    }
+  ) => Promise<boolean>
+) {
   const cancelToken = {
-    cancel: () => {}
+    cancel: async (reason?: string) => {}
   };
-  return (filename, requestOptions) => {
+  return (filename: string, requestOptions: RequestOptions) => {
     return {
       execute: () => operation(filename, requestOptions, cancelToken),
       cancel: async () => {
@@ -84,29 +87,35 @@ export function cancelable(operation) {
   };
 }
 
-export function copyFileAsync(source, dest) {
+export function copyFileAsync(source: string, dest: string) {
   return new Promise((resolve, reject) => {
-    ScopedStorage.copyFile(source, dest, (e, r) => {
+    //@ts-ignore
+    ScopedStorage.copyFile(source, dest, (e: any, r: any) => {
       if (e) {
         reject(e);
         return;
       }
-      resolve();
+      resolve(true);
     });
   });
 }
 
-export async function releasePermissions(path) {
+export async function releasePermissions(path: string) {
   if (Platform.OS === "ios") return;
   const uris = await ScopedStorage.getPersistedUriPermissions();
-  for (let uri of uris) {
+  for (const uri of uris) {
     if (path.startsWith(uri)) {
       await ScopedStorage.releasePersistableUriPermission(uri);
     }
   }
 }
 
-export async function getUploadedFileSize(hash) {
+export const FileSizeResult = {
+  Empty: 0,
+  Error: -1
+};
+
+export async function getUploadedFileSize(hash: string) {
   try {
     const url = `${hosts.API_HOST}/s3?name=${hash}`;
     const token = await db.tokenManager.getAccessToken();
@@ -115,16 +124,20 @@ export async function getUploadedFileSize(hash) {
       headers: { Authorization: `Bearer ${token}` }
     });
     const contentLength = parseInt(
-      attachmentInfo.headers?.get("content-length")
+      attachmentInfo.headers?.get("content-length") || "0"
     );
-    return isNaN(contentLength) ? 0 : contentLength;
+    return isNaN(contentLength) ? FileSizeResult.Empty : contentLength;
   } catch (e) {
     DatabaseLogger.error(e);
-    return -1;
+    return FileSizeResult.Error;
   }
 }
 
-export async function checkUpload(filename, chunkSize, expectedSize) {
+export async function checkUpload(
+  filename: string,
+  chunkSize: number,
+  expectedSize: number
+) {
   const size = await getUploadedFileSize(filename);
   const totalChunks = Math.ceil(size / chunkSize);
   const decryptedLength = size - totalChunks * ABYTES;
@@ -137,4 +150,26 @@ export async function checkUpload(filename, chunkSize, expectedSize) {
       ? `File size mismatch. Expected ${size} bytes but got ${decryptedLength} bytes.`
       : undefined;
   if (error) throw new Error(error);
+}
+
+export async function requestPermission() {
+  if (Platform.OS === "ios") return true;
+  return true;
+}
+export async function checkAndCreateDir(path: string) {
+  const dir =
+    Platform.OS === "ios"
+      ? RNFetchBlob.fs.dirs.DocumentDir + path
+      : RNFetchBlob.fs.dirs.SDCardDir + "/Notesnook/" + path;
+
+  try {
+    const exists = await RNFetchBlob.fs.exists(dir);
+    const isDir = await RNFetchBlob.fs.isDir(dir);
+    if (!exists || !isDir) {
+      await RNFetchBlob.fs.mkdir(dir);
+    }
+  } catch (e) {
+    await RNFetchBlob.fs.mkdir(dir);
+  }
+  return dir;
 }
