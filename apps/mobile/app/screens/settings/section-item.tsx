@@ -203,19 +203,15 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             <Input
               {...item.inputProperties}
               onSubmit={(e) => {
-                if (e.nativeEvent.text) {
-                  SettingsService.set({
-                    [item.property as string]: e.nativeEvent.text
-                  });
-                }
+                SettingsService.set({
+                  [item.property as string]: e.nativeEvent.text
+                });
                 item.inputProperties?.onSubmitEditing?.(e);
               }}
               onChangeText={(text) => {
-                if (text) {
-                  SettingsService.set({
-                    [item.property as string]: text
-                  });
-                }
+                SettingsService.set({
+                  [item.property as string]: text
+                });
                 item.inputProperties?.onSubmitEditing?.(text as any);
               }}
               containerStyle={{ marginTop: 12 }}
