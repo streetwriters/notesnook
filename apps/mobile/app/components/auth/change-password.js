@@ -68,9 +68,14 @@ export const ChangePassword = () => {
     }
     setLoading(true);
     try {
-      const result = await BackupService.run(false, "change-password-dialog");
-      if (!result.error)
+      const result = await BackupService.run(
+        false,
+        "change-password-dialog",
+        "partial"
+      );
+      if (result.error) {
         throw new Error(strings.backupFailed() + `: ${result.error}`);
+      }
 
       await db.user.clearSessions();
       await db.user.changePassword(oldPassword.current, password.current);

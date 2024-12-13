@@ -17,15 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Sodium from "@ammarahmed/react-native-sodium";
+import Sodium, { Cipher, Password } from "@ammarahmed/react-native-sodium";
+import { SerializedKey } from "@notesnook/crypto";
 import { Platform } from "react-native";
 import "react-native-get-random-values";
 import * as Keychain from "react-native-keychain";
 import { MMKVLoader, ProcessingModes } from "react-native-mmkv-storage";
 import { generateSecureRandom } from "react-native-securerandom";
 import { DatabaseLogger } from ".";
-import { MMKV } from "./mmkv";
 import { ToastManager } from "../../services/event-manager";
+import { MMKV } from "./mmkv";
 
 // Database key cipher is persisted across different user sessions hence it has
 // it's independent storage which we will never clear. This is only used when application has
@@ -62,6 +63,7 @@ const KEYSTORE_CONFIG = Platform.select({
 
 function generatePassword() {
   const length = 80;
+  //@ts-ignore
   const crypto = window.crypto || window.msCrypto;
   if (typeof crypto === "undefined") {
     throw new Error(
@@ -78,27 +80,27 @@ function generatePassword() {
   return secret;
 }
 
-export async function encryptDatabaseKeyWithPassword(appLockPassword) {
-  const key = getDatabaseKey();
+export async function encryptDatabaseKeyWithPassword(appLockPassword: string) {
+  const key = (await getDatabaseKey()) as string;
   const appLockCredentials = await Sodium.deriveKey(
     appLockPassword,
     NOTESNOOK_APPLOCK_KEY_SALT
   );
-  const databaseKeyCipher = await encrypt(appLockCredentials, key);
+  const databaseKeyCipher = (await encrypt(appLockCredentials, key)) as Cipher;
   MMKV.setMap(DB_KEY_CIPHER, databaseKeyCipher);
   // We reset the database key from keychain once app lock password is set.
   await Keychain.resetInternetCredentials(KEYCHAIN_SERVER_DBKEY);
   return true;
 }
 
-export async function restoreDatabaseKeyToKeyChain(appLockPassword) {
-  const databaseKeyCipher = CipherStorage.getMap(DB_KEY_CIPHER);
-  const databaseKey = await decrypt(
+export async function restoreDatabaseKeyToKeyChain(appLockPassword: string) {
+  const databaseKeyCipher: Cipher = CipherStorage.getMap(DB_KEY_CIPHER);
+  const databaseKey = (await decrypt(
     {
       password: appLockPassword
     },
     databaseKeyCipher
-  );
+  )) as string;
 
   await Keychain.setInternetCredentials(
     KEYCHAIN_SERVER_DBKEY,
@@ -110,13 +112,16 @@ export async function restoreDatabaseKeyToKeyChain(appLockPassword) {
   return true;
 }
 
-export async function setAppLockVerificationCipher(appLockPassword) {
+export async function setAppLockVerificationCipher(appLockPassword: string) {
   try {
     const appLockCredentials = await Sodium.deriveKey(
       appLockPassword,
       NOTESNOOK_APPLOCK_KEY_SALT
     );
-    const encrypted = await encrypt(appLockCredentials, generatePassword());
+    const encrypted = (await encrypt(
+      appLockCredentials,
+      generatePassword()
+    )) as Cipher;
     CipherStorage.setMap(APPLOCK_CIPHER, encrypted);
     DatabaseLogger.info("setAppLockVerificationCipher");
   } catch (e) {
@@ -129,9 +134,9 @@ export async function clearAppLockVerificationCipher() {
   CipherStorage.removeItem(APPLOCK_CIPHER);
 }
 
-export async function validateAppLockPassword(appLockPassword) {
+export async function validateAppLockPassword(appLockPassword: string) {
   try {
-    const appLockCipher = CipherStorage.getMap(APPLOCK_CIPHER);
+    const appLockCipher: Cipher = CipherStorage.getMap(APPLOCK_CIPHER);
     if (!appLockCipher) return true;
     const key = await Sodium.deriveKey(appLockPassword, appLockCipher.salt);
     const decrypted = await decrypt(key, appLockCipher);
@@ -146,17 +151,18 @@ export async function validateAppLockPassword(appLockPassword) {
   }
 }
 
-let DB_KEY;
+let DB_KEY: string | undefined;
 export function clearDatabaseKey() {
   DB_KEY = undefined;
   DatabaseLogger.info("Cleared database key");
 }
 
-export async function getDatabaseKey(appLockPassword) {
+export async function getDatabaseKey(appLockPassword?: string) {
   if (DB_KEY) return DB_KEY;
   try {
     if (appLockPassword) {
-      const databaseKeyCipher = CipherStorage.getMap("databaseKeyCipher");
+      const databaseKeyCipher: Cipher =
+        CipherStorage.getMap("databaseKeyCipher");
       const databaseKey = await decrypt(
         {
           password: appLockPassword
@@ -172,13 +178,12 @@ export async function getDatabaseKey(appLockPassword) {
         KEYCHAIN_SERVER_DBKEY
       );
       if (hasKey) {
-        let credentials = await Keychain.getInternetCredentials(
-          KEYCHAIN_SERVER_DBKEY,
-          KEYSTORE_CONFIG
+        const credentials = await Keychain.getInternetCredentials(
+          KEYCHAIN_SERVER_DBKEY
         );
 
         DatabaseLogger.info("Getting database key from Keychain");
-        DB_KEY = credentials.password;
+        DB_KEY = (credentials as Keychain.UserCredentials).password;
       }
     }
 
@@ -190,7 +195,7 @@ export async function getDatabaseKey(appLockPassword) {
         NOTESNOOK_DB_KEY_SALT
       );
 
-      DB_KEY = derivedDatabaseKey.key;
+      DB_KEY = derivedDatabaseKey.key as string;
 
       await Keychain.setInternetCredentials(
         KEYCHAIN_SERVER_DBKEY,
@@ -202,18 +207,17 @@ export async function getDatabaseKey(appLockPassword) {
 
     if (await Keychain.hasInternetCredentials("notesnook")) {
       const userKeyCredentials = await Keychain.getInternetCredentials(
-        "notesnook",
-        KEYSTORE_CONFIG
+        "notesnook"
       );
 
       if (userKeyCredentials) {
-        const userKeyCipher = await encrypt(
+        const userKeyCipher: Cipher = (await encrypt(
           {
             key: DB_KEY,
             salt: NOTESNOOK_DB_KEY_SALT
           },
           userKeyCredentials.password
-        );
+        )) as Cipher;
         // Store encrypted user key in MMKV
         MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
         await Keychain.resetInternetCredentials("notesnook");
@@ -223,45 +227,84 @@ export async function getDatabaseKey(appLockPassword) {
 
     return DB_KEY;
   } catch (e) {
-    ToastManager.error(e, "Error getting database key");
+    ToastManager.error(e as Error, "Error getting database key");
     console.log(e, "error");
     DatabaseLogger.error(e);
     return null;
   }
 }
 
-export async function deriveCryptoKey(data) {
+export async function deriveCryptoKeyFallback(data: SerializedKey) {
+  if (Platform.OS !== "ios") return;
   try {
-    let credentials = await Sodium.deriveKey(data.password, data.salt);
-    const userKeyCipher = await encrypt(
+    if (!data.password || !data.salt)
+      throw new Error(
+        "Invalid password and salt provided to deriveCryptoKeyFallback"
+      );
+
+    const credentials = await Sodium.deriveKeyFallback?.(
+      data.password,
+      data.salt
+    );
+
+    if (!credentials) return;
+
+    const userKeyCipher = (await encrypt(
       {
-        key: await getDatabaseKey(),
+        key: (await getDatabaseKey()) as string,
         salt: NOTESNOOK_DB_KEY_SALT
       },
-      credentials.key
-    );
-    DatabaseLogger.info("User key stored: ", !!userKeyCipher);
+      credentials.key as string
+    )) as Cipher<"base64">;
+    DatabaseLogger.info("User key fallback stored: ", {
+      userKeyCipher: !!userKeyCipher
+    });
 
     // Store encrypted user key in MMKV
     MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
-    return credentials.key;
   } catch (e) {
     DatabaseLogger.error(e);
   }
 }
 
-export async function getCryptoKey(_name) {
+export async function deriveCryptoKey(data: SerializedKey) {
   try {
-    const keyCipher = MMKV.getMap(USER_KEY_CIPHER);
+    if (!data.password || !data.salt)
+      throw new Error("Invalid password and salt provided to deriveCryptoKey");
 
+    const credentials = (await Sodium.deriveKey(
+      data.password,
+      data.salt
+    )) as Password;
+    const userKeyCipher = (await encrypt(
+      {
+        key: (await getDatabaseKey()) as string,
+        salt: NOTESNOOK_DB_KEY_SALT
+      },
+      credentials.key as string
+    )) as Cipher<"base64">;
+    DatabaseLogger.info("User key stored: ", {
+      userKeyCipher: !!userKeyCipher
+    });
+
+    // Store encrypted user key in MMKV
+    MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
+  } catch (e) {
+    DatabaseLogger.error(e);
+  }
+}
+
+export async function getCryptoKey() {
+  try {
+    const keyCipher: Cipher = MMKV.getMap(USER_KEY_CIPHER);
     if (!keyCipher) {
       DatabaseLogger.info("User key cipher is null");
-      return null;
+      return undefined;
     }
 
     const key = await decrypt(
       {
-        key: await getDatabaseKey(),
+        key: (await getDatabaseKey()) as string,
         salt: keyCipher.salt
       },
       keyCipher
@@ -274,7 +317,7 @@ export async function getCryptoKey(_name) {
   }
 }
 
-export async function removeCryptoKey(_name) {
+export async function removeCryptoKey() {
   try {
     MMKV.removeItem(USER_KEY_CIPHER);
     await Keychain.resetInternetCredentials("notesnook");
@@ -284,44 +327,69 @@ export async function removeCryptoKey(_name) {
   }
 }
 
-export async function getRandomBytes(length) {
+export async function getRandomBytes(length: number) {
   return await generateSecureRandom(length);
 }
 
-export async function hash(password, email) {
-  let result = await Sodium.hashPassword(password, email);
-  return result;
-}
+export async function hash(
+  password: string,
+  email: string,
+  options?: { usesFallback?: boolean }
+) {
+  DatabaseLogger.log(`Hashing password: fallback: ${options?.usesFallback}`);
 
-export async function generateCryptoKey(password, salt) {
-  try {
-    let credentials = await Sodium.deriveKey(password, salt || null);
-    return credentials;
-  } catch (e) {
-    DatabaseLogger.error(e);
+  if (options?.usesFallback && Platform.OS !== "ios") {
+    return null;
   }
+
+  return (
+    options?.usesFallback
+      ? await Sodium.hashPasswordFallback?.(password, email)
+      : await Sodium.hashPassword(password, email)
+  ) as string;
 }
 
-export function getAlgorithm(base64Variant) {
+export async function generateCryptoKey(password: string, salt?: string) {
+  return (await Sodium.deriveKey(password, salt)) as Promise<SerializedKey>;
+}
+
+export function getAlgorithm(base64Variant: number) {
   return `xcha-argon2i13-${base64Variant}`;
 }
 
-export async function decrypt(password, data) {
-  if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === "" && !password.key)
-    return undefined;
-  let _data = { ...data };
+export async function decrypt(password: SerializedKey, data: Cipher<"base64">) {
+  const _data = { ...data };
   _data.output = "plain";
 
   if (!password.salt) password.salt = data.salt;
+
+  if (Platform.OS === "ios" && !password.key && password.password) {
+    const key = await Sodium.deriveKey(password.password, password.salt);
+    try {
+      return await Sodium.decrypt(key, _data);
+    } catch (e) {
+      const fallbackKey = await Sodium.deriveKeyFallback?.(
+        password.password,
+        password.salt
+      );
+      if (Platform.OS === "ios" && fallbackKey) {
+        DatabaseLogger.info("Using fallback key for decryption");
+      }
+      if (fallbackKey) {
+        return await Sodium.decrypt(fallbackKey, _data);
+      } else {
+        throw e;
+      }
+    }
+  }
+
   return await Sodium.decrypt(password, _data);
 }
 
-export async function decryptMulti(password, data) {
-  if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === "" && !password.key)
-    return undefined;
-
+export async function decryptMulti(
+  password: Password,
+  data: Cipher<"base64">[]
+) {
   data = data.map((d) => {
     d.output = "plain";
     return d;
@@ -331,10 +399,30 @@ export async function decryptMulti(password, data) {
     password.salt = data[0].salt;
   }
 
+  if (Platform.OS === "ios" && !password.key && password.password) {
+    const key = await Sodium.deriveKey(password.password, password.salt);
+    try {
+      return await Sodium.decryptMulti(key, data);
+    } catch (e) {
+      const fallbackKey = await Sodium.deriveKeyFallback?.(
+        password.password,
+        password.salt as string
+      );
+      if (Platform.OS === "ios" && fallbackKey) {
+        DatabaseLogger.info("Using fallback key for decryption");
+      }
+      if (fallbackKey) {
+        return await Sodium.decryptMulti(fallbackKey, data);
+      } else {
+        throw e;
+      }
+    }
+  }
+
   return await Sodium.decryptMulti(password, data);
 }
 
-export function parseAlgorithm(alg) {
+export function parseAlgorithm(alg: string) {
   if (!alg) return {};
   const [enc, kdf, compressed, compressionAlg, base64variant] = alg.split("-");
   return {
@@ -346,16 +434,11 @@ export function parseAlgorithm(alg) {
   };
 }
 
-export async function encrypt(password, data) {
-  if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === "" && !password.key)
-    return undefined;
-
-  let message = {
+export async function encrypt(password: SerializedKey, plainText: string) {
+  const result = await Sodium.encrypt<"base64">(password, {
     type: "plain",
-    data: data
-  };
-  let result = await Sodium.encrypt(password, message);
+    data: plainText
+  });
 
   return {
     ...result,
@@ -363,14 +446,13 @@ export async function encrypt(password, data) {
   };
 }
 
-export async function encryptMulti(password, data) {
-  if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === "" && !password.key)
-    return undefined;
-
-  let results = await Sodium.encryptMulti(
+export async function encryptMulti(
+  password: SerializedKey,
+  plainText: string[]
+) {
+  const results = await Sodium.encryptMulti<"base64">(
     password,
-    data.map((item) => ({
+    plainText.map((item) => ({
       type: "plain",
       data: item
     }))

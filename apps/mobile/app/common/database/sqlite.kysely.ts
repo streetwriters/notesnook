@@ -26,7 +26,7 @@ import { CompiledQuery } from "@streetwriters/kysely";
 import { QuickSQLiteConnection, open } from "react-native-quick-sqlite";
 import { strings } from "@notesnook/intl";
 
-type Config = { dbName: string; async: boolean; location: string };
+type Config = { dbName: string; async: boolean; location?: string };
 
 export class RNSqliteDriver implements Driver {
   private connection?: DatabaseConnection;

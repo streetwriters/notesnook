@@ -17,24 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Clipboard from "@react-native-clipboard/clipboard";
-import { LogMessage } from "@notesnook/logger";
+import { sanitizeFilename } from "@notesnook/common";
 import { format, LogLevel, logManager } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { LogMessage } from "@notesnook/logger";
+import { useThemeColors } from "@notesnook/theme";
+import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Platform, TouchableOpacity, View } from "react-native";
-import * as ScopedStorage from "react-native-scoped-storage";
 import RNFetchBlob from "react-native-blob-util";
-import Storage from "../../common/database/storage";
+import * as ScopedStorage from "react-native-scoped-storage";
+import filesystem from "../../common/filesystem";
 import { presentDialog } from "../../components/dialog/functions";
 import { IconButton } from "../../components/ui/icon-button";
 import { Notice } from "../../components/ui/notice";
 import Paragraph from "../../components/ui/typography/paragraph";
 import useTimer from "../../hooks/use-timer";
 import { ToastManager } from "../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
 import { hexToRGBA } from "../../utils/colors";
-import { sanitizeFilename } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
 
 export default function DebugLogs() {
   const { colors } = useThemeColors();
@@ -148,7 +148,7 @@ export default function DebugLogs() {
         if (!file) return;
         path = file.uri;
       } else {
-        path = await Storage.checkAndCreateDir("/");
+        path = await filesystem.checkAndCreateDir("/");
         await RNFetchBlob.fs.writeFile(path + fileName + ".txt", data, "utf8");
         path = path + fileName;
       }
