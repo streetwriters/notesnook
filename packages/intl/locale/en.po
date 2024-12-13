@@ -17,7 +17,7 @@ msgstr ""
 msgid "— not just the"
 msgstr "— not just the"
 
-#: src/strings.ts:2365
+#: src/strings.ts:2366
 msgid "\"Notebook > Notes\""
 msgstr "\"Notebook > Notes\""
 
@@ -193,7 +193,7 @@ msgstr "{count, plural, one {Failed to download attachment} other {Failed to dow
 msgid "{count, plural, one {Item restored} other {# items restored}}"
 msgstr "{count, plural, one {Item restored} other {# items restored}}"
 
-#: src/strings.ts:2382
+#: src/strings.ts:2383
 msgid "{count, plural, one {Move all notes in this notebook to trash} other {Move all notes in these notebooks to trash}}"
 msgstr "{count, plural, one {Move all notes in this notebook to trash} other {Move all notes in these notebooks to trash}}"
 
@@ -605,7 +605,7 @@ msgstr "All"
 msgid "All attachments are end-to-end encrypted."
 msgstr "All attachments are end-to-end encrypted."
 
-#: src/strings.ts:2359
+#: src/strings.ts:2360
 msgid "All cached attachments have been cleared."
 msgstr "All cached attachments have been cleared."
 
@@ -788,7 +788,7 @@ msgstr "Attachment"
 msgid "Attachment preview failed"
 msgstr "Attachment preview failed"
 
-#: src/strings.ts:2352
+#: src/strings.ts:2353
 msgid "Attachment recheck cancelled"
 msgstr "Attachment recheck cancelled"
 
@@ -809,7 +809,7 @@ msgstr "Attachments"
 msgid "Attachments cache cleared!"
 msgstr "Attachments cache cleared!"
 
-#: src/strings.ts:2354
+#: src/strings.ts:2355
 msgid "Attachments recheck complete"
 msgstr "Attachments recheck complete"
 
@@ -1026,7 +1026,7 @@ msgstr "Biometrics not enrolled"
 msgid "Bold"
 msgstr "Bold"
 
-#: src/strings.ts:2364
+#: src/strings.ts:2365
 msgid "Boost your productivity with Notebooks and organize your notes."
 msgstr "Boost your productivity with Notebooks and organize your notes."
 
@@ -1187,7 +1187,7 @@ msgstr "Check roadmap"
 msgid "Check your spam folder if you haven't received an email yet."
 msgstr "Check your spam folder if you haven't received an email yet."
 
-#: src/strings.ts:2356
+#: src/strings.ts:2357
 msgid "Checking all attachments"
 msgstr "Checking all attachments"
 
@@ -1199,7 +1199,7 @@ msgstr "Checking for new version"
 msgid "Checking for updates"
 msgstr "Checking for updates"
 
-#: src/strings.ts:2355
+#: src/strings.ts:2356
 msgid "Checking note attachments"
 msgstr "Checking note attachments"
 
@@ -1333,7 +1333,7 @@ msgstr "Click to preview"
 msgid "Click to remove"
 msgstr "Click to remove"
 
-#: src/strings.ts:2347
+#: src/strings.ts:2348
 msgid "Click to reset {title}"
 msgstr "Click to reset {title}"
 
@@ -1430,7 +1430,7 @@ msgstr "Compressed images are uploaded in Full HD resolution and usually are goo
 msgid "Configure"
 msgstr "Configure"
 
-#: src/strings.ts:2361
+#: src/strings.ts:2362
 msgid "Configure server URLs for Notesnook"
 msgstr "Configure server URLs for Notesnook"
 
@@ -1751,7 +1751,7 @@ msgstr "Debug logs downloaded"
 msgid "Debugging"
 msgstr "Debugging"
 
-#: src/strings.ts:2349
+#: src/strings.ts:2350
 msgid "Decrease {title}"
 msgstr "Decrease {title}"
 
@@ -2045,7 +2045,7 @@ msgstr "Duplicate"
 msgid "Earliest first"
 msgstr "Earliest first"
 
-#: src/strings.ts:2373
+#: src/strings.ts:2374
 msgid "Easy access"
 msgstr "Easy access"
 
@@ -2079,7 +2079,7 @@ msgstr "Editor"
 msgid "Email"
 msgstr "Email"
 
-#: src/strings.ts:2386
+#: src/strings.ts:2387
 msgid "Email copied"
 msgstr "Email copied"
 
@@ -2259,7 +2259,7 @@ msgstr "Enter your new email"
 msgid "Enter your username"
 msgstr "Enter your username"
 
-#: src/strings.ts:2380
+#: src/strings.ts:2381
 msgid "Error"
 msgstr "Error"
 
@@ -2299,15 +2299,15 @@ msgstr "Errors in {count} attachments"
 msgid "Events server"
 msgstr "Events server"
 
-#: src/strings.ts:2366
+#: src/strings.ts:2367
 msgid "Every Notebook can have notes and sub notebooks."
 msgstr "Every Notebook can have notes and sub notebooks."
 
-#: src/strings.ts:2368
+#: src/strings.ts:2369
 msgid "Everything related to my job in one place."
 msgstr "Everything related to my job in one place."
 
-#: src/strings.ts:2377
+#: src/strings.ts:2378
 msgid "Everything related to my school in one place."
 msgstr "Everything related to my school in one place."
 
@@ -2359,7 +2359,7 @@ msgstr "Extracting files..."
 msgid "Faced an issue or have a suggestion? Click here to create a bug report"
 msgstr "Faced an issue or have a suggestion? Click here to create a bug report"
 
-#: src/strings.ts:2358
+#: src/strings.ts:2359
 msgid "Failed"
 msgstr "Failed"
 
@@ -2444,11 +2444,11 @@ msgstr "Favorite"
 msgid "Favorites"
 msgstr "Favorites"
 
-#: src/strings.ts:2370
+#: src/strings.ts:2371
 msgid "February 2022 Week 2"
 msgstr "February 2022 Week 2"
 
-#: src/strings.ts:2371
+#: src/strings.ts:2372
 msgid "February 2022 Week 3"
 msgstr "February 2022 Week 3"
 
@@ -2622,7 +2622,7 @@ msgstr "Get Notesnook Pro"
 msgid "Get Notesnook Pro to enable automatic backups"
 msgstr "Get Notesnook Pro to enable automatic backups"
 
-#: src/strings.ts:2362
+#: src/strings.ts:2363
 msgid "Get Priority support"
 msgstr "Get Priority support"
 
@@ -2794,7 +2794,7 @@ msgstr "I have a recovery code"
 msgid "I have saved my key"
 msgstr "I have saved my key"
 
-#: src/strings.ts:2379
+#: src/strings.ts:2380
 msgid "I love cooking and collecting recipes."
 msgstr "I love cooking and collecting recipes."
 
@@ -2894,7 +2894,7 @@ msgstr "Incoming note"
 msgid "Incorrect {type}"
 msgstr "Incorrect {type}"
 
-#: src/strings.ts:2348
+#: src/strings.ts:2349
 msgid "Increase {title}"
 msgstr "Increase {title}"
 
@@ -2902,7 +2902,7 @@ msgstr "Increase {title}"
 msgid "Insert"
 msgstr "Insert"
 
-#: src/strings.ts:2345
+#: src/strings.ts:2346
 msgid "Insert a {rows}x{columns} table"
 msgstr "Insert a {rows}x{columns} table"
 
@@ -3356,7 +3356,7 @@ msgstr "Maximize"
 msgid "Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions."
 msgstr "Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions."
 
-#: src/strings.ts:2372
+#: src/strings.ts:2373
 msgid "Meetings"
 msgstr "Meetings"
 
@@ -3937,7 +3937,7 @@ msgstr "Partial backups contain all your data except attachments. They are creat
 msgid "Partially refunded"
 msgstr "Partially refunded"
 
-#: src/strings.ts:2357
+#: src/strings.ts:2358
 msgid "Passed"
 msgstr "Passed"
 
@@ -4130,7 +4130,7 @@ msgstr "Please select the day to repeat the reminder on"
 msgid "please send us an email from your registered email address"
 msgstr "please send us an email from your registered email address"
 
-#: src/strings.ts:2346
+#: src/strings.ts:2347
 msgid "Please set a table size"
 msgstr "Please set a table size"
 
@@ -4424,7 +4424,7 @@ msgstr "Receipt"
 msgid "RECENT BACKUPS"
 msgstr "RECENT BACKUPS"
 
-#: src/strings.ts:2353
+#: src/strings.ts:2354
 msgid "Recheck all"
 msgstr "Recheck all"
 
@@ -4432,7 +4432,7 @@ msgstr "Recheck all"
 msgid "Rechecking failed"
 msgstr "Rechecking failed"
 
-#: src/strings.ts:2378
+#: src/strings.ts:2379
 msgid "Recipes"
 msgstr "Recipes"
 
@@ -4722,7 +4722,7 @@ msgstr "Restore"
 msgid "Restore backup"
 msgstr "Restore backup"
 
-#: src/strings.ts:2360
+#: src/strings.ts:2361
 msgid "Restore backup?"
 msgstr "Restore backup?"
 
@@ -4882,11 +4882,11 @@ msgstr "Save your data recovery key in a safe place. You will need it to recover
 msgid "Save your recovery codes in a safe place. You will need them to recover your account in case you lose access to your two-factor authentication methods."
 msgstr "Save your recovery codes in a safe place. You will need them to recover your account in case you lose access to your two-factor authentication methods."
 
-#: src/strings.ts:2350
+#: src/strings.ts:2351
 msgid "Saved"
 msgstr "Saved"
 
-#: src/strings.ts:2351
+#: src/strings.ts:2352
 msgid "Saving"
 msgstr "Saving"
 
@@ -4906,7 +4906,7 @@ msgstr "Saving zip file. Please wait..."
 msgid "Scan the QR code with your authenticator app"
 msgstr "Scan the QR code with your authenticator app"
 
-#: src/strings.ts:2376
+#: src/strings.ts:2377
 msgid "School work"
 msgstr "School work"
 
@@ -5654,7 +5654,7 @@ msgstr "Tap twice to confirm you have saved the recovery key."
 msgid "Task list"
 msgstr "Task list"
 
-#: src/strings.ts:2369
+#: src/strings.ts:2370
 msgid "Tasks"
 msgstr "Tasks"
 
@@ -6137,6 +6137,10 @@ msgstr "Uploads"
 msgid "Urgent"
 msgstr "Urgent"
 
+#: src/strings.ts:2343
+msgid "URL"
+msgstr "URL"
+
 #: src/strings.ts:1732
 msgid "Use"
 msgstr "Use"
@@ -6400,7 +6404,7 @@ msgstr "What went wrong?"
 msgid "Width"
 msgstr "Width"
 
-#: src/strings.ts:2367
+#: src/strings.ts:2368
 msgid "Work & Office"
 msgstr "Work & Office"
 
@@ -6465,7 +6469,7 @@ msgstr "You can add as many tags as you want."
 msgid "You can change the theme at any time from Settings or the side menu."
 msgstr "You can change the theme at any time from Settings or the side menu."
 
-#: src/strings.ts:2375
+#: src/strings.ts:2376
 msgid "You can create shortcuts of frequently accessed notebooks in the side menu"
 msgstr "You can create shortcuts of frequently accessed notebooks in the side menu"
 
