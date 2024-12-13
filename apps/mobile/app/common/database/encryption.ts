@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium, { Cipher, Password } from "@ammarahmed/react-native-sodium";
+import { SerializedKey } from "@notesnook/crypto";
 import { Platform } from "react-native";
 import "react-native-get-random-values";
 import * as Keychain from "react-native-keychain";
@@ -233,7 +234,40 @@ export async function getDatabaseKey(appLockPassword?: string) {
   }
 }
 
-export async function deriveCryptoKey(data: Required<Password>) {
+export async function deriveCryptoKeyFallback(data: SerializedKey) {
+  if (Platform.OS !== "ios") return;
+  try {
+    if (!data.password || !data.salt)
+      throw new Error(
+        "Invalid password and salt provided to deriveCryptoKeyFallback"
+      );
+
+    const credentials = await Sodium.deriveKeyFallback?.(
+      data.password,
+      data.salt
+    );
+
+    if (!credentials) return;
+
+    const userKeyCipher = (await encrypt(
+      {
+        key: (await getDatabaseKey()) as string,
+        salt: NOTESNOOK_DB_KEY_SALT
+      },
+      credentials.key as string
+    )) as Cipher<"base64">;
+    DatabaseLogger.info("User key fallback stored: ", {
+      userKeyCipher: !!userKeyCipher
+    });
+
+    // Store encrypted user key in MMKV
+    MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
+  } catch (e) {
+    DatabaseLogger.error(e);
+  }
+}
+
+export async function deriveCryptoKey(data: SerializedKey) {
   try {
     if (!data.password || !data.salt)
       throw new Error("Invalid password and salt provided to deriveCryptoKey");
@@ -248,14 +282,13 @@ export async function deriveCryptoKey(data: Required<Password>) {
         salt: NOTESNOOK_DB_KEY_SALT
       },
       credentials.key as string
-    )) as Cipher;
+    )) as Cipher<"base64">;
     DatabaseLogger.info("User key stored: ", {
       userKeyCipher: !!userKeyCipher
     });
 
     // Store encrypted user key in MMKV
     MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
-    return credentials.key;
   } catch (e) {
     DatabaseLogger.error(e);
   }
@@ -266,7 +299,7 @@ export async function getCryptoKey() {
     const keyCipher: Cipher = MMKV.getMap(USER_KEY_CIPHER);
     if (!keyCipher) {
       DatabaseLogger.info("User key cipher is null");
-      return null;
+      return undefined;
     }
 
     const key = await decrypt(
@@ -298,41 +331,65 @@ export async function getRandomBytes(length: number) {
   return await generateSecureRandom(length);
 }
 
-export async function hash(password: string, email: string) {
-  //@ts-ignore
-  return await Sodium.hashPassword(password, email);
+export async function hash(
+  password: string,
+  email: string,
+  options?: { usesFallback?: boolean }
+) {
+  DatabaseLogger.log(`Hashing password: fallback: ${options?.usesFallback}`);
+
+  if (options?.usesFallback && Platform.OS !== "ios") {
+    return null;
+  }
+
+  return (
+    options?.usesFallback
+      ? await Sodium.hashPasswordFallback?.(password, email)
+      : await Sodium.hashPassword(password, email)
+  ) as string;
 }
 
 export async function generateCryptoKey(password: string, salt?: string) {
-  try {
-    //@ts-ignore
-    const credentials = await Sodium.deriveKey(password, salt || null);
-    return credentials;
-  } catch (e) {
-    DatabaseLogger.error(e);
-  }
+  return (await Sodium.deriveKey(password, salt)) as Promise<SerializedKey>;
 }
 
 export function getAlgorithm(base64Variant: number) {
   return `xcha-argon2i13-${base64Variant}`;
 }
 
-export async function decrypt(password: Password, data: Cipher) {
-  if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === "" && !password.key)
-    return undefined;
+export async function decrypt(password: SerializedKey, data: Cipher<"base64">) {
   const _data = { ...data };
   _data.output = "plain";
 
   if (!password.salt) password.salt = data.salt;
+
+  if (Platform.OS === "ios" && !password.key && password.password) {
+    const key = await Sodium.deriveKey(password.password, password.salt);
+    try {
+      return await Sodium.decrypt(key, _data);
+    } catch (e) {
+      const fallbackKey = await Sodium.deriveKeyFallback?.(
+        password.password,
+        password.salt
+      );
+      if (Platform.OS === "ios" && fallbackKey) {
+        DatabaseLogger.info("Using fallback key for decryption");
+      }
+      if (fallbackKey) {
+        return await Sodium.decrypt(fallbackKey, _data);
+      } else {
+        throw e;
+      }
+    }
+  }
+
   return await Sodium.decrypt(password, _data);
 }
 
-export async function decryptMulti(password: Password, data: Cipher[]) {
-  if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === "" && !password.key)
-    return undefined;
-
+export async function decryptMulti(
+  password: Password,
+  data: Cipher<"base64">[]
+) {
   data = data.map((d) => {
     d.output = "plain";
     return d;
@@ -340,6 +397,26 @@ export async function decryptMulti(password: Password, data: Cipher[]) {
 
   if (data.length && !password.salt) {
     password.salt = data[0].salt;
+  }
+
+  if (Platform.OS === "ios" && !password.key && password.password) {
+    const key = await Sodium.deriveKey(password.password, password.salt);
+    try {
+      return await Sodium.decryptMulti(key, data);
+    } catch (e) {
+      const fallbackKey = await Sodium.deriveKeyFallback?.(
+        password.password,
+        password.salt as string
+      );
+      if (Platform.OS === "ios" && fallbackKey) {
+        DatabaseLogger.info("Using fallback key for decryption");
+      }
+      if (fallbackKey) {
+        return await Sodium.decryptMulti(fallbackKey, data);
+      } else {
+        throw e;
+      }
+    }
   }
 
   return await Sodium.decryptMulti(password, data);
@@ -357,14 +434,10 @@ export function parseAlgorithm(alg: string) {
   };
 }
 
-export async function encrypt(password: Password, data: string) {
-  if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === "" && !password.key)
-    return undefined;
-
-  const result = await Sodium.encrypt(password, {
+export async function encrypt(password: SerializedKey, plainText: string) {
+  const result = await Sodium.encrypt<"base64">(password, {
     type: "plain",
-    data: data
+    data: plainText
   });
 
   return {
@@ -373,14 +446,13 @@ export async function encrypt(password: Password, data: string) {
   };
 }
 
-export async function encryptMulti(password: Password, data: string[]) {
-  if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === "" && !password.key)
-    return undefined;
-
-  const results = await Sodium.encryptMulti(
+export async function encryptMulti(
+  password: SerializedKey,
+  plainText: string[]
+) {
+  const results = await Sodium.encryptMulti<"base64">(
     password,
-    data.map((item) => ({
+    plainText.map((item) => ({
       type: "plain",
       data: item
     }))

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { RequestOptions } from "@notesnook/core";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { ToastManager } from "../../services/event-manager";
@@ -24,11 +25,22 @@ import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
 import { createCacheDir } from "./io";
-import { cacheDir, checkUpload, getUploadedFileSize } from "./utils";
+import {
+  cacheDir,
+  checkUpload,
+  FileSizeResult,
+  getUploadedFileSize
+} from "./utils";
 
-export async function uploadFile(filename, requestOptions, cancelToken) {
+export async function uploadFile(
+  filename: string,
+  requestOptions: RequestOptions,
+  cancelToken: {
+    cancel: (reason?: string) => Promise<void>;
+  }
+) {
   if (!requestOptions) return false;
-  let { url, headers } = requestOptions;
+  const { url, headers } = requestOptions;
   await createCacheDir();
   DatabaseLogger.info(`Preparing to upload file: ${filename}`);
 
@@ -39,7 +51,7 @@ export async function uploadFile(filename, requestOptions, cancelToken) {
     if (!exists && Platform.OS === "ios") {
       const iosAppGroup =
         Platform.OS === "ios"
-          ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+          ? await (RNFetchBlob.fs as any).pathForAppGroup(IOS_APPGROUPID)
           : null;
       const appGroupPath = `${iosAppGroup}/${filename}`;
       filePath = appGroupPath;
@@ -54,14 +66,15 @@ export async function uploadFile(filename, requestOptions, cancelToken) {
 
     const fileSize = (await RNFetchBlob.fs.stat(filePath)).size;
 
-    let remoteFileSize = await getUploadedFileSize(filename);
-    if (remoteFileSize === -1) return false;
-    if (remoteFileSize > 0 && remoteFileSize === fileSize) {
+    const remoteFileSize = await getUploadedFileSize(filename);
+    if (remoteFileSize === FileSizeResult.Error) return false;
+
+    if (remoteFileSize > FileSizeResult.Empty && remoteFileSize === fileSize) {
       DatabaseLogger.log(`File ${filename} is already uploaded.`);
       return true;
     }
 
-    let uploadUrlResponse = await fetch(url, {
+    const uploadUrlResponse = await fetch(url, {
       method: "PUT",
       headers
     });
@@ -78,7 +91,8 @@ export async function uploadFile(filename, requestOptions, cancelToken) {
 
     DatabaseLogger.info(`Starting upload: ${filename}`);
 
-    let uploadRequest = RNFetchBlob.config({
+    const uploadRequest = RNFetchBlob.config({
+      //@ts-ignore
       IOSBackgroundTask: !globalThis["IS_SHARE_EXTENSION"]
     })
       .fetch(
@@ -98,14 +112,14 @@ export async function uploadFile(filename, requestOptions, cancelToken) {
         );
       });
 
-    cancelToken.cancel = () => {
+    cancelToken.cancel = async () => {
       useAttachmentStore.getState().remove(filename);
       uploadRequest.cancel();
     };
 
-    let uploadResponse = await uploadRequest;
-    let status = uploadResponse.info().status;
-    let uploaded = status >= 200 && status < 300;
+    const uploadResponse = await uploadRequest;
+    const status = uploadResponse.info().status;
+    const uploaded = status >= 200 && status < 300;
 
     useAttachmentStore.getState().remove(filename);
 
@@ -118,12 +132,13 @@ export async function uploadFile(filename, requestOptions, cancelToken) {
       );
     }
     const attachment = await db.attachments.attachment(filename);
+    if (!attachment) return false;
     await checkUpload(filename, requestOptions.chunkSize, attachment.size);
     DatabaseLogger.info(`File upload status: ${filename}, ${status}`);
     return uploaded;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
-    ToastManager.error(e, "File upload failed");
+    ToastManager.error(e as Error, "File upload failed");
     DatabaseLogger.error(e, "File upload failed", {
       filename
     });

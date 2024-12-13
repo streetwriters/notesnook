@@ -16,58 +16,51 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-import { Platform } from "react-native";
-import RNFetchBlob from "react-native-blob-util";
+import { IStorage } from "@notesnook/core";
+import { MMKVInstance } from "react-native-mmkv-storage";
 import {
   decrypt,
   decryptMulti,
   deriveCryptoKey,
+  deriveCryptoKeyFallback,
   encrypt,
   encryptMulti,
   generateCryptoKey,
   getCryptoKey,
-  getRandomBytes,
-  hash,
-  removeCryptoKey
+  hash
 } from "./encryption";
 import { MMKV } from "./mmkv";
 
 export class KV {
-  /**
-   * @type {typeof MMKV}
-   */
-  storage = null;
-  constructor(storage) {
+  storage: MMKVInstance;
+  constructor(storage: MMKVInstance) {
     this.storage = storage;
   }
-  async read(key) {
-    if (!key) return null;
-    let data = this.storage.getString(key);
-    if (!data) return null;
+
+  async read<T>(key: string, isArray?: boolean) {
+    if (!key) return undefined;
+    const data = this.storage.getString(key);
+    if (!data) return undefined;
     try {
-      let parse = JSON.parse(data);
-      return parse;
+      return JSON.parse(data) as T;
     } catch (e) {
-      return data;
+      return data as T;
     }
   }
 
-  async write(key, data) {
+  async write<T>(key: string, data: T) {
     this.storage.setString(
       key,
       typeof data === "string" ? data : JSON.stringify(data)
     );
-
-    return true;
   }
 
-  async readMulti(keys) {
+  async readMulti<T>(keys: string[]) {
     if (keys.length <= 0) {
       return [];
     } else {
       try {
-        let data = await this.storage.getMultipleItemsAsync(
+        const data = await this.storage.getMultipleItemsAsync<any>(
           keys.slice(),
           "string"
         );
@@ -79,24 +72,24 @@ export class KV {
             obj = value;
           }
           return [key, obj];
-        });
+        }) as [string, T][];
       } catch (e) {
-        console.log(e);
+        return [];
       }
     }
   }
 
-  async remove(key) {
-    return this.storage.removeItem(key);
+  async remove(key: string) {
+    this.storage.removeItem(key);
   }
 
-  async removeMulti(keys) {
-    if (!keys) return true;
-    return this.storage.removeItems(keys);
+  async removeMulti(keys: string[]) {
+    if (!keys) return;
+    this.storage.removeItems(keys);
   }
 
   async clear() {
-    return this.storage.clearStore();
+    this.storage.clearStore();
   }
 
   async getAllKeys() {
@@ -113,54 +106,45 @@ export class KV {
     return keys;
   }
 
-  async writeMulti(items) {
-    return this.storage.setMultipleItemsAsync(items, "object");
+  async writeMulti(items: [string, any][]) {
+    await this.storage.setMultipleItemsAsync(items, "object");
   }
 }
 
 const DefaultStorage = new KV(MMKV);
 
-async function requestPermission() {
-  if (Platform.OS === "ios") return true;
-  return true;
-}
-async function checkAndCreateDir(path) {
-  let dir =
-    Platform.OS === "ios"
-      ? RNFetchBlob.fs.dirs.DocumentDir + path
-      : RNFetchBlob.fs.dirs.SDCardDir + "/Notesnook/" + path;
-
-  try {
-    let exists = await RNFetchBlob.fs.exists(dir);
-    let isDir = await RNFetchBlob.fs.isDir(dir);
-    if (!exists || !isDir) {
-      await RNFetchBlob.fs.mkdir(dir);
-    }
-  } catch (e) {
-    await RNFetchBlob.fs.mkdir(dir);
-  }
-  return dir;
-}
-
-export default {
-  read: (key) => DefaultStorage.read(key),
-  write: (key, value) => DefaultStorage.write(key, value),
-  readMulti: (keys) => DefaultStorage.readMulti(keys),
-  remove: (key) => DefaultStorage.remove(key),
-  clear: () => DefaultStorage.clear(),
-  getAllKeys: () => DefaultStorage.getAllKeys(),
-  writeMulti: (items) => DefaultStorage.writeMulti(items),
-  removeMulti: (keys) => DefaultStorage.removeMulti(keys),
+export const Storage: IStorage = {
+  write<T>(key: string, data: T): Promise<void> {
+    return DefaultStorage.write(key, data);
+  },
+  writeMulti<T>(entries: [string, T][]): Promise<void> {
+    return DefaultStorage.writeMulti(entries);
+  },
+  readMulti<T>(keys: string[]): Promise<[string, T][]> {
+    return DefaultStorage.readMulti(keys);
+  },
+  read<T>(key: string, isArray?: boolean): Promise<T | undefined> {
+    return DefaultStorage.read(key, isArray);
+  },
+  remove(key: string): Promise<void> {
+    return DefaultStorage.remove(key);
+  },
+  removeMulti(keys: string[]): Promise<void> {
+    return DefaultStorage.removeMulti(keys);
+  },
+  clear(): Promise<void> {
+    return DefaultStorage.clear();
+  },
+  getAllKeys(): Promise<string[]> {
+    return DefaultStorage.getAllKeys();
+  },
+  hash,
+  getCryptoKey,
   encrypt,
+  encryptMulti,
   decrypt,
   decryptMulti,
-  getRandomBytes,
-  checkAndCreateDir,
-  requestPermission,
   deriveCryptoKey,
-  getCryptoKey,
-  removeCryptoKey,
-  hash,
   generateCryptoKey,
-  encryptMulti
+  deriveCryptoKeyFallback
 };

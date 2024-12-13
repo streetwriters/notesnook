@@ -23,7 +23,6 @@ import RNHTMLtoPDF from "react-native-html-to-pdf-lite";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { zip } from "react-native-zip-archive";
 import { DatabaseLogger } from "../common/database/index";
-import Storage from "../common/database/storage";
 
 import {
   exportNote as _exportNote,
@@ -31,13 +30,13 @@ import {
   ExportableNote,
   exportNotes
 } from "@notesnook/common";
-import { Note } from "@notesnook/core";
-import { FilteredSelector } from "@notesnook/core";
-import { basename, dirname, join, extname } from "pathe";
+import { FilteredSelector, Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { basename, dirname, extname, join } from "pathe";
+import filesystem from "../common/filesystem";
 import downloadAttachment from "../common/filesystem/download-attachment";
 import { cacheDir } from "../common/filesystem/utils";
 import { unlockVault } from "../utils/unlock-vault";
-import { strings } from "@notesnook/intl";
 
 const FolderNames: { [name: string]: string } = {
   txt: "Text",
@@ -49,7 +48,7 @@ const FolderNames: { [name: string]: string } = {
 async function getPath(type: string) {
   let path =
     Platform.OS === "ios" &&
-    (await Storage.checkAndCreateDir(`/exported/${type}/`));
+    (await filesystem.checkAndCreateDir(`/exported/${type}/`));
 
   if (Platform.OS === "android") {
     const file = await ScopedStorage.openDocumentTree(true);
