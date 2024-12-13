@@ -28,7 +28,7 @@ import DocumentPicker from "react-native-document-picker";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { unzip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../../../common/database";
-import storage from "../../../common/database/storage";
+import filesystem from "../../../common/filesystem";
 import { deleteCacheFileByName } from "../../../common/filesystem/io";
 import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
 import { presentDialog } from "../../../components/dialog/functions";
@@ -300,7 +300,7 @@ export const RestoreBackup = () => {
           return;
         }
       } else {
-        const path = await storage.checkAndCreateDir("/backups/");
+        const path = await filesystem.checkAndCreateDir("/backups/");
         files = await RNFetchBlob.fs.lstat(path);
       }
       files = files

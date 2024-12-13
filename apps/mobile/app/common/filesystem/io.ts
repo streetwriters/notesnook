@@ -18,6 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium from "@ammarahmed/react-native-sodium";
+import {
+  FileEncryptionMetadataWithHash,
+  FileEncryptionMetadataWithOutputType,
+  Output,
+  RequestOptions
+} from "@notesnook/core";
+import { DataFormat, SerializedKey } from "@notesnook/crypto";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { eSendEvent } from "../../services/event-manager";
@@ -25,17 +32,21 @@ import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
 import { ABYTES, cacheDir, cacheDirOld, getRandomId } from "./utils";
 
-export async function readEncrypted(filename, key, cipherData) {
+export async function readEncrypted<TOutputFormat extends DataFormat>(
+  filename: string,
+  key: SerializedKey,
+  cipherData: FileEncryptionMetadataWithOutputType<TOutputFormat>
+) {
   await migrateFilesFromCache();
   DatabaseLogger.log("Read encrypted file...");
-  let path = `${cacheDir}/${filename}`;
+  const path = `${cacheDir}/${filename}`;
 
   try {
     if (!(await exists(filename))) {
-      return false;
+      return;
     }
 
-    let output = await Sodium.decryptFile(
+    const output = await Sodium.decryptFile(
       key,
       {
         ...cipherData,
@@ -47,15 +58,14 @@ export async function readEncrypted(filename, key, cipherData) {
 
     DatabaseLogger.log("File decrypted...");
 
-    return output;
+    return output as Output<TOutputFormat>;
   } catch (e) {
     RNFetchBlob.fs.unlink(path).catch(console.log);
     DatabaseLogger.error(e);
-    return false;
   }
 }
 
-export async function hashBase64(data) {
+export async function hashBase64(data: string) {
   const hash = await Sodium.hashFile({
     type: "base64",
     data,
@@ -67,61 +77,70 @@ export async function hashBase64(data) {
   };
 }
 
-export async function writeEncryptedBase64(data, key) {
+export async function writeEncryptedBase64(
+  data: string,
+  encryptionKey: SerializedKey,
+  mimeType: string
+): Promise<FileEncryptionMetadataWithHash> {
   await createCacheDir();
-  let filepath = cacheDir + `/${getRandomId("imagecache_")}`;
+  const filepath = cacheDir + `/${getRandomId("imagecache_")}`;
   await RNFetchBlob.fs.writeFile(filepath, data, "base64");
-  let output = await Sodium.encryptFile(key, {
+  const output = await Sodium.encryptFile(encryptionKey, {
     uri: Platform.OS === "ios" ? filepath : "file://" + filepath,
     type: "url"
   });
+
   RNFetchBlob.fs.unlink(filepath).catch(console.log);
   console.log("encrypted file output: ", output);
-  output.size = output.length;
-  delete output.length;
+
   return {
     ...output,
     alg: "xcha-stream"
   };
 }
 
-export async function deleteFile(filename, data) {
+export async function deleteFile(
+  filename: string,
+  requestOptions?: RequestOptions
+): Promise<boolean> {
   await createCacheDir();
-  let delFilePath = cacheDir + `/${filename}`;
-  if (!data) {
-    if (!filename) return;
-    RNFetchBlob.fs.unlink(delFilePath).catch(console.log);
+  const localFilePath = cacheDir + `/${filename}`;
+  if (!requestOptions) {
+    RNFetchBlob.fs.unlink(localFilePath).catch(console.log);
     return true;
   }
 
-  let { url, headers } = data;
+  const { url, headers } = requestOptions;
+
   try {
-    let response = await RNFetchBlob.fetch("DELETE", url, headers);
-    let status = response.info().status;
-    let ok = status >= 200 && status < 300;
+    const response = await RNFetchBlob.fetch("DELETE", url, headers);
+    const status = response.info().status;
+    const ok = status >= 200 && status < 300;
     if (ok) {
-      RNFetchBlob.fs.unlink(delFilePath).catch(console.log);
+      RNFetchBlob.fs.unlink(localFilePath).catch(console.log);
     }
     return ok;
   } catch (e) {
-    console.log("delete file: ", e, url, headers);
+    DatabaseLogger.error(e, "Delete file", {
+      url: url
+    });
     return false;
   }
 }
 
 export async function clearFileStorage() {
   try {
-    let files = await RNFetchBlob.fs.ls(cacheDir);
-    let oldCache = await RNFetchBlob.fs.ls(cacheDirOld);
+    const files = await RNFetchBlob.fs.ls(cacheDir);
+    const oldCache = await RNFetchBlob.fs.ls(cacheDirOld);
 
-    for (let file of files) {
+    for (const file of files) {
       await RNFetchBlob.fs.unlink(cacheDir + `/${file}`).catch(console.log);
     }
-    for (let file of oldCache) {
+    for (const file of oldCache) {
       await RNFetchBlob.fs.unlink(cacheDirOld + `/${file}`).catch(console.log);
     }
   } catch (e) {
-    console.log("clearFileStorage", e);
+    DatabaseLogger.error(e, "clearFileStorage");
   }
 }
 
@@ -146,11 +165,11 @@ export async function migrateFilesFromCache() {
       return;
     }
 
-    let files = await RNFetchBlob.fs.ls(cacheDir);
+    const files = await RNFetchBlob.fs.ls(cacheDir);
     console.log("Files to migrate:", files.join(","));
 
-    let oldCache = await RNFetchBlob.fs.ls(cacheDirOld);
-    for (let file of oldCache) {
+    const oldCache = await RNFetchBlob.fs.ls(cacheDirOld);
+    for (const file of oldCache) {
       if (file.startsWith("org.") || file.startsWith("com.")) continue;
       RNFetchBlob.fs
         .mv(cacheDirOld + `/${file}`, cacheDir + `/${file}`)
@@ -159,7 +178,7 @@ export async function migrateFilesFromCache() {
     }
     await RNFetchBlob.fs.createFile(migratedFilesPath, "1", "utf8");
   } catch (e) {
-    console.log("migrateFilesFromCache", e);
+    DatabaseLogger.error(e, "migrateFilesFromCache");
   }
 }
 
@@ -169,14 +188,14 @@ export async function clearCache() {
   eSendEvent("cache-cleared");
 }
 
-export async function deleteCacheFileByPath(path) {
+export async function deleteCacheFileByPath(path: string) {
   await RNFetchBlob.fs.unlink(path).catch(console.log);
 }
 
-export async function deleteCacheFileByName(name) {
+export async function deleteCacheFileByName(name: string) {
   const iosAppGroup =
     Platform.OS === "ios"
-      ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+      ? await (RNFetchBlob.fs as any).pathForAppGroup(IOS_APPGROUPID)
       : null;
   const appGroupPath = `${iosAppGroup}/${name}`;
   await RNFetchBlob.fs.unlink(appGroupPath).catch(console.log);
@@ -192,12 +211,12 @@ export async function deleteDCacheFiles() {
   }
 }
 
-export async function exists(filename) {
-  let path = `${cacheDir}/${filename}`;
+export async function exists(filename: string) {
+  const path = `${cacheDir}/${filename}`;
 
   const iosAppGroup =
     Platform.OS === "ios"
-      ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+      ? await (RNFetchBlob.fs as any).pathForAppGroup(IOS_APPGROUPID)
       : null;
   const appGroupPath = `${iosAppGroup}/${filename}`;
 
@@ -211,6 +230,7 @@ export async function exists(filename) {
 
   if (exists || existsInAppGroup) {
     const attachment = await db.attachments.attachment(filename);
+    if (!attachment) return false;
     const totalChunks = Math.ceil(attachment.size / attachment.chunkSize);
     const totalAbytes = totalChunks * ABYTES;
     const expectedFileSize = attachment.size + totalAbytes;
@@ -234,7 +254,7 @@ export async function exists(filename) {
   return exists;
 }
 
-export async function bulkExists(files) {
+export async function bulkExists(files: string[]) {
   try {
     await createCacheDir();
     const cacheFiles = await RNFetchBlob.fs.ls(cacheDir);
@@ -243,7 +263,7 @@ export async function bulkExists(files) {
     if (Platform.OS === "ios") {
       const iosAppGroup =
         Platform.OS === "ios"
-          ? await RNFetchBlob.fs.pathForAppGroup(IOS_APPGROUPID)
+          ? await (RNFetchBlob.fs as any).pathForAppGroup(IOS_APPGROUPID)
           : null;
       const appGroupFiles = await RNFetchBlob.fs.ls(iosAppGroup);
       missingFiles = missingFiles.filter(
@@ -262,8 +282,8 @@ export async function getCacheSize() {
   const stat = await RNFetchBlob.fs.lstat(`file://` + cacheDir);
   let total = 0;
   console.log("Total files", stat.length);
-  stat.forEach((s) => {
-    total += parseInt(s.size);
+  stat.forEach((file) => {
+    total += parseInt(file.size as unknown as string);
   });
   return total;
 }

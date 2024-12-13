@@ -17,24 +17,40 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { IFileStorage } from "@notesnook/core";
 import { checkAttachment, downloadFile } from "./download";
 import {
+  bulkExists,
+  clearCache,
   clearFileStorage,
+  deleteCacheFileByName,
+  deleteCacheFileByPath,
   deleteFile,
   exists,
-  readEncrypted,
-  writeEncryptedBase64,
+  getCacheSize,
   hashBase64,
+  readEncrypted,
+  writeEncryptedBase64
+} from "./io";
+import { uploadFile } from "./upload";
+import {
+  cancelable,
+  checkAndCreateDir,
+  getUploadedFileSize,
+  requestPermission
+} from "./utils";
+
+export default {
+  checkAttachment,
   clearCache,
   deleteCacheFileByName,
   deleteCacheFileByPath,
-  bulkExists,
-  getCacheSize
-} from "./io";
-import { uploadFile } from "./upload";
-import { cancelable, getUploadedFileSize } from "./utils";
+  getCacheSize,
+  requestPermission,
+  checkAndCreateDir
+};
 
-export default {
+export const FileStorage: IFileStorage = {
   readEncrypted,
   writeEncryptedBase64,
   hashBase64,
@@ -44,10 +60,5 @@ export default {
   exists,
   clearFileStorage,
   getUploadedFileSize,
-  checkAttachment,
-  clearCache,
-  deleteCacheFileByName,
-  deleteCacheFileByPath,
-  bulkExists,
-  getCacheSize
+  bulkExists
 };

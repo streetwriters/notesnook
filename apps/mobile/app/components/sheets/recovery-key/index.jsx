@@ -17,12 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { sanitizeFilename } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { createRef } from "react";
 import { Platform, View } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 import FileViewer from "react-native-file-viewer";
 import * as ScopedStorage from "react-native-scoped-storage";
 import Share from "react-native-share";
+import { db } from "../../../common/database";
+import filesystem from "../../../common/filesystem";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -30,8 +35,6 @@ import {
 } from "../../../services/event-manager";
 import { clearMessage } from "../../../services/message";
 import SettingsService from "../../../services/settings";
-import { db } from "../../../common/database";
-import Storage from "../../../common/database/storage";
 import { eOpenRecoveryKeyDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
@@ -41,9 +44,6 @@ import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import { QRCode } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
-import RNFetchBlob from "react-native-blob-util";
-import { sanitizeFilename } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
 
 class RecoveryKeySheet extends React.Component {
   constructor(props) {
@@ -126,7 +126,7 @@ class RecoveryKeySheet extends React.Component {
             "base64"
           );
         } else {
-          path = await Storage.checkAndCreateDir("/");
+          path = await filesystem.checkAndCreateDir("/");
           await RNFetchBlob.fs.writeFile(path + fileName, data, "base64");
         }
         ToastManager.show({
@@ -157,7 +157,7 @@ class RecoveryKeySheet extends React.Component {
         if (!file) return;
         path = file.uri;
       } else {
-        path = await Storage.checkAndCreateDir("/");
+        path = await filesystem.checkAndCreateDir("/");
         await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, "utf8");
         path = path + fileName;
       }

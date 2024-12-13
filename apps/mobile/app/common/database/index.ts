@@ -16,26 +16,26 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import "./logger";
 import { database } from "@notesnook/common";
-import { logger as dbLogger } from "@notesnook/core";
-import { Platform } from "react-native";
-import * as Gzip from "react-native-gzip";
-import EventSource from "../../utils/sse/even-source-ios";
-import AndroidEventSource from "../../utils/sse/event-source";
+import { logger as dbLogger, ICompressor } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import {
   SqliteAdapter,
   SqliteIntrospector,
   SqliteQueryCompiler
 } from "@streetwriters/kysely";
-import filesystem from "../filesystem";
-import Storage from "./storage";
-import { RNSqliteDriver } from "./sqlite.kysely";
-import { getDatabaseKey } from "./encryption";
+import { Platform } from "react-native";
+import * as Gzip from "react-native-gzip";
 import SettingsService from "../../services/settings";
-import { strings } from "@notesnook/intl";
+import EventSource from "../../utils/sse/even-source-ios";
+import AndroidEventSource from "../../utils/sse/event-source";
+import { FileStorage } from "../filesystem";
+import { getDatabaseKey } from "./encryption";
+import "./logger";
+import { RNSqliteDriver } from "./sqlite.kysely";
+import { Storage } from "./storage";
 
-export async function setupDatabase(password) {
+export async function setupDatabase(password?: string) {
   const key = await getDatabaseKey(password);
   if (!key) throw new Error(strings.databaseSetupFailed());
 
@@ -47,17 +47,21 @@ export async function setupDatabase(password) {
     SSE_HOST: "https://events.streetwriters.co",
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
     ISSUES_HOST: "https://issues.streetwriters.co",
+    MONOGRAPH_HOST: "https://monogr.ph",
     ...(SettingsService.getProperty("serverUrls") || {})
   });
 
   database.setup({
     storage: Storage,
-    eventsource: Platform.OS === "ios" ? EventSource : AndroidEventSource,
-    fs: filesystem,
-    compressor: () => ({
-      compress: Gzip.deflate,
-      decompress: Gzip.inflate
-    }),
+    eventsource: (Platform.OS === "ios"
+      ? EventSource
+      : AndroidEventSource) as any,
+    fs: FileStorage,
+    compressor: async () =>
+      ({
+        compress: Gzip.deflate,
+        decompress: Gzip.inflate
+      } as ICompressor),
     batchSize: 100,
     sqliteOptions: {
       dialect: (name) => ({
