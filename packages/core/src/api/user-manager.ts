@@ -150,7 +150,7 @@ class UserManager {
             token.access_token
           )
           .catch(async (e) => {
-            if (e instanceof Error && e.message === "invalid_grant") {
+            if (e instanceof Error && e.message === "Password is incorrect.") {
               hashedPassword = await this.db
                 .storage()
                 .hash(password, email, { usesFallback: true });
@@ -580,6 +580,7 @@ class UserManager {
       },
       token
     );
+    await this.db.kv().write("usesFallbackPWHash", false);
 
     return true;
   }
