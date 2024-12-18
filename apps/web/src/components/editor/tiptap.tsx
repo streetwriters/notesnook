@@ -165,7 +165,15 @@ function TipTap(props: TipTapProps) {
   const tiptapOptions = useMemo<Partial<TiptapOptions>>(() => {
     return {
       editorProps: {
-        handleKeyDown(view, event) {
+        handleKeyDown(_, event) {
+          if (event.ctrlKey && event.key === "ArrowRight") {
+            event.preventDefault();
+            useEditorStore.getState().openNextSession("right");
+          }
+          if (event.ctrlKey && event.key === "ArrowLeft") {
+            event.preventDefault();
+            useEditorStore.getState().openNextSession("left");
+          }
           if ((event.ctrlKey || event.metaKey) && event.key === "s") {
             event.preventDefault();
             onChange?.(
