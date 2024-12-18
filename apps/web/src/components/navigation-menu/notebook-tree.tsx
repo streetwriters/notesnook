@@ -165,15 +165,11 @@ export function SubNotebooks() {
 
   useEffect(() => {
     notebooks?.ids().then((ids) => setNotebookIds(ids));
-    // treeRef.current?.refresh();
+    treeRef.current?.refresh();
     // db.notebooks.roots
     // .ids(db.settings.getGroupOptions("notebooks"))
     // .then((ids) => setNotebookIds(ids));
   }, [notebooks]);
-
-  useEffect(() => {
-    treeRef.current?.refresh();
-  }, [notebookIds]);
 
   return (
     <Flex
@@ -184,95 +180,99 @@ export function SubNotebooks() {
         borderTop: "1px solid var(--border)"
       }}
     >
-      <VirtualizedTree
-        rootId={"root"}
-        itemHeight={30}
-        treeRef={treeRef}
-        deselectAll={() => toggleSelection(false)}
-        bulkSelect={setSelectedItems}
-        isSelected={isSelected}
-        onDeselect={deselectItem}
-        onSelect={selectItem}
-        saveKey="notebook-tree"
-        getChildNodes={async (id, depth) => {
-          const nodes: TreeNode<{ notebook: Notebook; totalNotes: number }>[] =
-            [];
-          if (id === "root") {
-            for (const id of notebookIds) {
-              const notebook = (await db.notebooks.notebook(id))!;
+      {notebookIds.length > 0 && (
+        <VirtualizedTree
+          rootId={"root"}
+          itemHeight={30}
+          treeRef={treeRef}
+          deselectAll={() => toggleSelection(false)}
+          bulkSelect={setSelectedItems}
+          isSelected={isSelected}
+          onDeselect={deselectItem}
+          onSelect={selectItem}
+          saveKey="notebook-tree"
+          getChildNodes={async (id, depth) => {
+            const nodes: TreeNode<{
+              notebook: Notebook;
+              totalNotes: number;
+            }>[] = [];
+            if (id === "root") {
+              for (const id of notebookIds) {
+                const notebook = (await db.notebooks.notebook(id))!;
+                const totalNotes = await db.relations
+                  .from(notebook, "note")
+                  .count();
+                const children = await db.relations
+                  .from(notebook, "notebook")
+                  .count();
+                nodes.push({
+                  data: { notebook, totalNotes },
+                  depth: depth + 1,
+                  hasChildren: children > 0,
+                  id,
+                  parentId: "root"
+                });
+              }
+              return nodes;
+            }
+
+            const subNotebooks = await db.relations
+              .from({ type: "notebook", id }, "notebook")
+              .resolve();
+
+            for (const notebook of subNotebooks) {
+              const hasChildren =
+                (await db.relations.from(notebook, "notebook").count()) > 0;
               const totalNotes = await db.relations
                 .from(notebook, "note")
                 .count();
-              const children = await db.relations
-                .from(notebook, "notebook")
-                .count();
               nodes.push({
+                parentId: id,
+                id: notebook.id,
                 data: { notebook, totalNotes },
                 depth: depth + 1,
-                hasChildren: children > 0,
-                id,
-                parentId: "root"
+                hasChildren
               });
             }
+
             return nodes;
-          }
-
-          const subNotebooks = await db.relations
-            .from({ type: "notebook", id }, "notebook")
-            .resolve();
-
-          for (const notebook of subNotebooks) {
-            const hasChildren =
-              (await db.relations.from(notebook, "notebook").count()) > 0;
-            const totalNotes = await db.relations
-              .from(notebook, "note")
-              .count();
-            nodes.push({
-              parentId: id,
-              id: notebook.id,
-              data: { notebook, totalNotes },
-              depth: depth + 1,
-              hasChildren
-            });
-          }
-
-          return nodes;
-        }}
-        renderItem={({ collapse, expand, expanded, index, item: node }) => (
-          <SubNotebook
-            depth={node.depth}
-            isExpandable={node.hasChildren}
-            item={node.data.notebook}
-            isExpanded={expanded}
-            rootId={node.parentId}
-            totalNotes={node.data.totalNotes}
-            refresh={async () => {
-              const notebook = await db.notebooks.notebook(node.id);
-              const totalNotes = await db.relations
-                .from(node.data.notebook, "note")
-                .count();
-              treeRef.current?.refreshItem(
-                index,
-                notebook ? { notebook, totalNotes } : undefined
-              );
-            }}
-            collapse={collapse}
-            expand={expand}
-          />
-        )}
-        // renderItem={({ item, expanded, index, collapse, expand }) => (
-        //   <NotebookItem
-        //     notebook={item.data}
-        //     depth={item.depth}
-        //     isExpandable={item.hasChildren}
-        //     isExpanded={expanded}
-        //     toggle={expanded ? collapse : expand}
-        //     onCreateItem={() => {
-        //       treeRef.current?.refreshItem(index, item.data);
-        //     }}
-        //   />
-        // )}
-      />
+          }}
+          renderItem={({ collapse, expand, expanded, index, item: node }) => (
+            <SubNotebook
+              depth={node.depth}
+              isExpandable={node.hasChildren}
+              item={node.data.notebook}
+              isExpanded={expanded}
+              rootId={node.parentId}
+              totalNotes={node.data.totalNotes}
+              refresh={async () => {
+                const notebook = await db.notebooks.notebook(node.id);
+                const totalNotes = await db.relations
+                  .from(node.data.notebook, "note")
+                  .count();
+                treeRef.current?.refreshItem(
+                  index,
+                  notebook ? { notebook, totalNotes } : undefined
+                );
+              }}
+              collapse={collapse}
+              expand={expand}
+            />
+          )}
+          // renderItem={({ item, expanded, index, collapse, expand }) => (
+          //   <NotebookItem
+          //     notebook={item.data}
+          //     depth={item.depth}
+          //     isExpandable={item.hasChildren}
+          //     isExpanded={expanded}
+          //     toggle={expanded ? collapse : expand}
+          //     onCreateItem={() => {
+          //       treeRef.current?.refreshItem(index, item.data);
+          //     }}
+          //   />
+          // )}
+        />
+      )}
       {/* <VirtualizedTree
         itemHeight={28}
         getChildNodes={fetchChildren}
