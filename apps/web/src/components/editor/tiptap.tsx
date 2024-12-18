@@ -369,11 +369,7 @@ function TipTap(props: TipTapProps) {
         <Toolbar
           editor={editor}
           location={"top"}
-          sx={
-            isTablet || isMobile
-              ? { overflowX: "scroll", flexWrap: "nowrap" }
-              : {}
-          }
+          sx={isTablet || isMobile ? { flexWrap: "nowrap" } : {}}
           tools={toolbarConfig}
           defaultFontFamily={fontFamily}
           defaultFontSize={fontSize}
