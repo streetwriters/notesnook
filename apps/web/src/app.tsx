@@ -91,6 +91,8 @@ type DesktopAppContentsProps = {
 function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isTablet = useTablet();
+  const isSideMenuOpen = useStore((store) => store.isSideMenuOpen);
+  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const [isNarrow, setIsNarrow] = useState(isTablet || false);
   const navPane = useRef<ImperativePanelHandle>(null);
   const middlePane = useRef<ImperativePanelHandle>(null);
@@ -124,14 +126,36 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
         }}
       >
         <PanelGroup autoSaveId="global-panel-group" direction="horizontal">
-          {!isFocusMode && isTablet ? (
-            <Flex sx={{ width: 50 }}>
-              <NavigationMenu
-                toggleNavigationContainer={(state) => {
-                  setShow(state || !show);
+          {isTablet ? (
+            <Flex
+              sx={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                zIndex: 1000,
+                width: isSideMenuOpen ? "100%" : 0,
+                height: "100%",
+                background: "transparent",
+                transition: "0.2s width ease-out"
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                  top: 0,
+                  left: 0,
+                  background: "rgba(0,0,0,0.5)"
                 }}
-                isTablet={isNarrow}
+                onClick={() => toggleSideMenu(false)}
               />
+              <Flex sx={{ width: 300 }}>
+                <NavigationMenu
+                  toggleNavigationContainer={() => {}}
+                  isTablet={false}
+                />
+              </Flex>
             </Flex>
           ) : (
             !isFocusMode && (
@@ -141,17 +165,18 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
                   order={1}
                   className="nav-pane"
                   defaultSize={20}
-                  minSize={3.5}
+                  minSize={18}
+                  maxSize={22}
                   // maxSize={isNarrow ? 5 : undefined}
-                  onResize={(size) => setIsNarrow(size <= 5)}
+                  // onResize={(size) => setIsNarrow(size <= 5)}
                   collapsible
-                  collapsedSize={3.5}
+                  collapsedSize={0}
                 >
                   <NavigationMenu
                     toggleNavigationContainer={(state) => {
                       setShow(state || !show);
                     }}
-                    isTablet={isNarrow}
+                    isTablet={false}
                   />
                 </Panel>
                 <PanelResizeHandle className="panel-resize-handle" />

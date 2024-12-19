@@ -135,13 +135,15 @@ function Header(props: RouteContainerProps) {
           />
         ) : (
           <Menu
-            onClick={() => toggleSideMenu(true)}
+            onClick={() => {
+              toggleSideMenu(true);
+            }}
             sx={{
               flexShrink: 0,
               ml: 0,
               mr: 4,
               mt: 1,
-              display: ["block", "none", "none"]
+              display: ["block", "block", "none"]
             }}
             size={30}
           />
