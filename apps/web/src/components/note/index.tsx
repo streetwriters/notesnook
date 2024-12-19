@@ -117,6 +117,7 @@ function Note(props: NoteProps) {
     context
   } = props;
   const note = item;
+  console.log("context", context);
 
   const isOpened = useEditorStore((store) => store.activeSessionId === item.id);
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";

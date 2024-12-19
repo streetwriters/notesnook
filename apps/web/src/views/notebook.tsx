@@ -108,7 +108,7 @@ function Notebook(props: NotebookProps) {
           }
         />
       </Panel>
-      <PanelResizeHandle className="panel-resize-handle" />
+      {/* <PanelResizeHandle className="panel-resize-handle" />
       <Panel
         ref={subNotebooksPane}
         defaultSize={25}
@@ -125,7 +125,7 @@ function Notebook(props: NotebookProps) {
             else subNotebooksPane.current?.collapse();
           }}
         />
-      </Panel>
+      </Panel> */}
     </PanelGroup>
   );
 }
@@ -334,7 +334,7 @@ function NotebookHeader({
           ref={moreCrumbsRef}
           variant="icon"
           sx={{ p: 0, flexShrink: 0 }}
-          onClick={() => navigateCrumb("notebooks")}
+          // onClick={() => navigateCrumb("notebooks")}
           title={strings.notebooks()}
         >
           <Notebook2 size={14} />

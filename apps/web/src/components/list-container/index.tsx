@@ -97,6 +97,17 @@ function ListContainer(props: ListContainerProps) {
     };
   }, []);
 
+  // useEffect(() => {
+  //   (async () => {
+  //     const ids = await items.ids();
+  //     for (const id of ids) {
+  //       if (window.location.toString().includes(id)) {
+  //         selectItem(id);
+  //       }
+  //     }
+  //   })();
+  // }, []);
+
   const { onMouseUp, onKeyDown } = useKeyboardListNavigation({
     length: items.length,
     reset: () => toggleSelection(false),
