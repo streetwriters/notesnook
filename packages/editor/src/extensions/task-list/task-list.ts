@@ -32,7 +32,11 @@ import {
   findParentNodeClosestToPos,
   getExactChangedNodes
 } from "../../utils/prosemirror.js";
-import { countCheckedItems, findRootTaskList, toggleChildren } from "./utils.js";
+import {
+  countCheckedItems,
+  findRootTaskList,
+  toggleChildren
+} from "./utils.js";
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { TaskItemNode } from "../task-item/index.js";
 
@@ -49,7 +53,15 @@ export const TaskListNode = TaskList.extend({
     return {
       stats: {
         default: { checked: 0, total: 0 },
-        rendered: false
+        rendered: false,
+        parseHTML: (element) => {
+          if (!element.dataset.title) return { checked: 0, total: 0 };
+          const items = element.querySelectorAll("li.checklist--item");
+          const checked = Array.from(items).filter((item) =>
+            item.classList.contains("checked")
+          ).length;
+          return { checked, total: items.length };
+        }
       },
       title: {
         default: null,
