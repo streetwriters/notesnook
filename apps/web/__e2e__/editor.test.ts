@@ -270,3 +270,55 @@ test("#1468 count words separated by newlines", async ({ page }) => {
 
   expect((await notes.editor.getWordCount()) === 10).toBeTruthy();
 });
+
+test("control + right arrow should go to next note", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note1 = await notes.createNote({
+    title: "Note 1",
+    content: "Note 1 content"
+  });
+  const note2 = await notes.createNote({
+    title: "Note 2",
+    content: "Note 2 content"
+  });
+
+  await note1?.openNote();
+  await note2?.openNote();
+  await page.keyboard.press("Control+ArrowRight");
+
+  expect(await notes.editor.getTitle()).toBe("Note 1");
+  expect(await notes.editor.getContent("text")).toBe("Note 1 content");
+
+  await page.keyboard.press("Control+ArrowRight");
+
+  expect(await notes.editor.getTitle()).toBe("Note 2");
+  expect(await notes.editor.getContent("text")).toBe("Note 2 content");
+});
+
+test("control + left arrow should go to previous note", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note1 = await notes.createNote({
+    title: "Note 1",
+    content: "Note 1 content"
+  });
+  const note2 = await notes.createNote({
+    title: "Note 2",
+    content: "Note 2 content"
+  });
+
+  await note1?.openNote();
+  await note2?.openNote();
+  await page.keyboard.press("Control+ArrowLeft");
+
+  expect(await notes.editor.getTitle()).toBe("Note 1");
+  expect(await notes.editor.getContent("text")).toBe("Note 1 content");
+
+  await page.keyboard.press("Control+ArrowLeft");
+
+  expect(await notes.editor.getTitle()).toBe("Note 2");
+  expect(await notes.editor.getContent("text")).toBe("Note 2 content");
+});
