@@ -1482,7 +1482,7 @@ For example:
     return (
       SEARCH_IN_ROUTE_STRINGS[
         routeName as keyof typeof SEARCH_IN_ROUTE_STRINGS
-      ]() || t`Search in ${routeName}`
+      ]?.() || t`Search in ${routeName}`
     );
   },
   logoutConfirmation: () =>
