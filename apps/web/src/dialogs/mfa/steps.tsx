@@ -258,7 +258,7 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
             justifyContent: "start",
             alignItems: "start",
             textAlign: "left",
-            bg: "transparent",
+            bg: selected === index ? "shade" : "transparent",
             px: 0
           }}
           onClick={() => setSelected(index)}
