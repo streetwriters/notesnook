@@ -78,7 +78,15 @@ const Tiptap = ({
   const isFocusedRef = useRef<boolean>(false);
   const [undo, setUndo] = useState(false);
   const [redo, setRedo] = useState(false);
+  const valueRef = useRef({
+    undo,
+    redo
+  });
   tabRef.current = tab;
+  valueRef.current = {
+    undo,
+    redo
+  };
 
   function restoreNoteSelection(state?: NoteState) {
     try {
@@ -127,8 +135,14 @@ const Tiptap = ({
           editor as Editor,
           transaction.getMeta("ignoreEdit")
         );
-      },
 
+        if (valueRef.current.undo !== editor.can().undo()) {
+          setUndo(editor.can().undo());
+        }
+        if (valueRef.current.redo !== editor.can().redo()) {
+          setRedo(editor.can().redo());
+        }
+      },
       openAttachmentPicker: (type) => {
         globalThis.editorControllers[tab.id]?.openFilePicker(type);
         return true;
