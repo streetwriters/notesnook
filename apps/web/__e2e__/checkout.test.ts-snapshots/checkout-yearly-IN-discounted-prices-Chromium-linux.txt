@@ -1,4 +1,4 @@
 Subtotal: ₹400
 Sales tax: ₹300
 Discount: -₹400
-Total: ₹400/yr
+Total: ₹400
