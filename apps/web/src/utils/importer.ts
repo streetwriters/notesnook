@@ -31,6 +31,7 @@ import {
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
 import { type ZipEntry } from "./streams/unzip-stream";
 import { hashBuffer, writeEncryptedFile } from "../interfaces/fs";
+import { Notebook as NotebookType } from "@notesnook/core";
 
 export async function* importFiles(zipFiles: File[]) {
   const { createUnzipIterator } = await import("./streams/unzip-stream");
@@ -219,26 +220,29 @@ async function importLegacyNotebook(
 
 async function importNotebook(
   notebook: Notebook,
-  parentId?: string
+  parent?: NotebookType
 ): Promise<string[]> {
   if (!notebook) return [];
 
-  const id =
-    (await db.notebooks.find(notebook.title))?.id ||
-    (await db.notebooks.add({
+  const selector = parent
+    ? db.relations.from(parent, "notebook").selector
+    : db.notebooks.roots;
+  let nb = await selector.find((eb) =>
+    eb("notebooks.title", "==", notebook.title)
+  );
+  if (!nb) {
+    const id = await db.notebooks.add({
       title: notebook.title
-    }));
-  if (!id) throw new Error(`Failed to import notebook: ${notebook.title}`);
-
-  if (parentId)
-    await db.relations.add(
-      { type: "notebook", id: parentId },
-      { type: "notebook", id: id }
-    );
-
-  const assignedNotebooks: string[] = notebook.children.length > 0 ? [] : [id];
-  for (const child of notebook.children || []) {
-    assignedNotebooks.push(...(await importNotebook(child, id)));
+    });
+    if (!id) return [];
+    nb = await db.notebooks.notebook(id);
+    if (parent && nb) await db.relations.add(parent, nb);
   }
+  if (!nb) return [];
+  if (notebook.children.length === 0) return [nb.id];
+
+  const assignedNotebooks: string[] = [];
+  for (const child of notebook.children || [])
+    assignedNotebooks.push(...(await importNotebook(child, nb)));
   return assignedNotebooks;
 }
