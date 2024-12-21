@@ -74,7 +74,7 @@ const groupByMenu: (options: GroupingMenuOptions) => MenuItem | null = (
         icon: GroupBy.path,
         menu: {
           items: map(options, [
-            { key: "none", title: strings.groupByStrings.None() },
+            { key: "none", title: strings.groupByStrings.none() },
             { key: "default", title: strings.groupByStrings.default() },
             { key: "year", title: strings.groupByStrings.year() },
             { key: "month", title: strings.groupByStrings.month() },
