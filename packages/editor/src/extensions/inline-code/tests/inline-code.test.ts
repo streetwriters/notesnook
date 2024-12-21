@@ -17,24 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import snarkdown from "snarkdown";
+import { expect, test } from "vitest";
+import { createEditor, h } from "../../../../test-utils/index.js";
+import { Link } from "../../link/link.js";
+import { InlineCode } from "../inline-code";
 
-function addAttributes(
-  html: string,
-  tag: keyof HTMLElementTagNameMap,
-  attributes: Record<string, string>
-) {
-  const temp = document.createElement("div");
-  temp.innerHTML = html;
-  const elements = temp.querySelectorAll(tag);
-  elements.forEach((element) => {
-    Object.entries(attributes).forEach(([key, value]) => {
-      element.setAttribute(key, value);
-    });
+test("inline code has spellcheck disabled", async () => {
+  const el = h("code", ["blazingly fast javascript"]);
+  const editor = createEditor({
+    initialContent: el.outerHTML,
+    extensions: {
+      link: Link,
+      code: InlineCode
+    }
   });
-  return temp.innerHTML;
-}
-
-export function mdToHtml(markdown: string) {
-  return addAttributes(snarkdown(markdown), "a", { target: "_blank" });
-}
+  expect(
+    editor.editor.view.dom.querySelector("code")?.getAttribute("spellcheck")
+  ).toBe("false");
+});

@@ -34,6 +34,7 @@ import {
   useToolbarStore
 } from "./stores/toolbar-store.js";
 import { ToolbarDefinition } from "./types.js";
+import { ScrollContainer } from "@notesnook/ui";
 
 type ToolbarProps = FlexProps & {
   editor: Editor;
@@ -89,34 +90,44 @@ export function Toolbar(props: ToolbarProps) {
 
   return (
     <>
-      <Flex
-        className={["editor-toolbar", className].join(" ")}
-        sx={{
-          flexWrap: isMobile ? "nowrap" : "wrap",
-          overflowX: isMobile ? "auto" : "hidden",
-          bg: "background",
-          borderRadius: isMobile ? "0px" : "default",
-          ...sx
-        }}
-        {...flexProps}
-      >
-        {toolbarTools.map((tools) => {
-          return (
-            <ToolbarGroup
-              key={tools.join("")}
-              tools={tools}
-              editor={editor}
-              groupId={tools.join("")}
-              sx={{
-                borderRight: "1px solid var(--separator)",
-                ":last-of-type": { borderRight: "none" },
-                alignItems: "center"
-              }}
-            />
-          );
+      <ScrollContainer
+        className="tabsScroll"
+        suppressScrollY
+        style={{ flex: 1 }}
+        trackStyle={() => ({
+          backgroundColor: "transparent",
+          pointerEvents: "none"
         })}
-      </Flex>
-      <EditorFloatingMenus editor={editor} />
+        thumbStyle={() => ({ height: 3 })}
+      >
+        <Flex
+          className={["editor-toolbar", className].join(" ")}
+          sx={{
+            flexWrap: isMobile ? "nowrap" : "wrap",
+            bg: "background",
+            borderRadius: isMobile ? "0px" : "default",
+            ...sx
+          }}
+          {...flexProps}
+        >
+          {toolbarTools.map((tools) => {
+            return (
+              <ToolbarGroup
+                key={tools.join("")}
+                tools={tools}
+                editor={editor}
+                groupId={tools.join("")}
+                sx={{
+                  borderRight: "1px solid var(--separator)",
+                  ":last-of-type": { borderRight: "none" },
+                  alignItems: "center"
+                }}
+              />
+            );
+          })}
+        </Flex>
+        <EditorFloatingMenus editor={editor} />
+      </ScrollContainer>
     </>
   );
 }

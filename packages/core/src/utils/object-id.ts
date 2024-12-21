@@ -19,8 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const MACHINE_ID = Math.floor(Math.random() * 0xffffff);
 const pid = Math.floor(Math.random() * 100000) % 0xffff;
+const PROCESS_UNIQUE = MACHINE_ID.toString(16).padStart(6, "0") + pid.toString(16).padStart(4, "0");
 let index = Math.floor(Math.random() * 0xffffff);
-const PROCESS_UNIQUE = MACHINE_ID.toString(16) + pid.toString(16);
+
 export function createObjectId(date = Date.now()): string {
   index++;
   const time = Math.floor(date / 1000);

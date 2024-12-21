@@ -166,7 +166,11 @@ export function Importer() {
             <Box as="ol" sx={{ my: 1 }}>
               <Text as="li" variant="body">
                 Go to{" "}
-                <Link href="https://importer.notesnook.com/" target="_blank">
+                <Link
+                  href="https://importer.notesnook.com/"
+                  target="_blank"
+                  sx={{ color: "accent" }}
+                >
                   https://importer.notesnook.com/
                 </Link>
               </Text>

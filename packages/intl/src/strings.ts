@@ -1692,18 +1692,20 @@ For example:
     t`Your account is now 100% secure against unauthorized logins.`,
   sms: () => t`phone number`,
   app: () => t`authentication app`,
-  mfaFallbackMethodText: (fallback: string, primary: string) =>
-    `You will now receive your 2FA codes on your ${
-      strings[fallback as keyof typeof strings]
-    } in case you lose access to your ${
-      strings[primary as keyof typeof strings]
-    }.`,
-  transactionStatusToText: (
-    key: keyof typeof TRANSACTION_STATUS | ({} & string)
-  ) => {
-    return key in TRANSACTION_STATUS
-      ? TRANSACTION_STATUS[key as keyof typeof TRANSACTION_STATUS]()
-      : key;
+  mfaFallbackMethodText: (
+    fallback: "app" | "sms" | "email",
+    primary: "app" | "sms" | "email"
+  ) =>
+    `You will now receive your 2FA codes on your ${strings[
+      fallback
+    ]().toLocaleLowerCase()} in case you lose access to your ${strings[
+      primary
+    ]().toLocaleLowerCase()}.`,
+  transactionStatusToText: {
+    completed: () => t`Completed`,
+    refunded: () => t`"Refunded`,
+    partially_refunded: () => t`Partially refunded`,
+    disputed: () => t`Disputed`
   },
   viewReceipt: () => t`View receipt`,
   customDictWords: (count: number) =>
