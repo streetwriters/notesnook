@@ -661,6 +661,12 @@ $headline$: Use starting line of the note as title.`,
   monthShort: () => t`mo`,
   yearShort: () => t`yr`,
   subscriptionProviderInfo: {
+    0: {
+      type: "Streetwriters",
+      title: () => t`Subscription awarded from Streetwriters`,
+      desc: () =>
+        t`You were awarded a subscription to Notesnook Pro by Streetwriters.`
+    },
     1: {
       type: "iOS",
       title: () => t`Subscribed on iOS`,
@@ -680,6 +686,11 @@ $headline$: Use starting line of the note as title.`,
       title: () => t`Subscribed on Web`,
       desc: () => t`You subscribed to Notesnook Pro on the Web/Desktop App.`,
       icon: "web"
+    },
+    4: {
+      type: "Gift card",
+      title: () => t`Subscribed using gift card`,
+      desc: () => t`You subscribed to Notesnook Pro using a gift card.`
     }
   },
   dark: () => t`Dark`,
