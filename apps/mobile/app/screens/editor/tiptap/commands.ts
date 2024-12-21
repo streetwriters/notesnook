@@ -30,6 +30,7 @@ import { sleep } from "../../../utils/time";
 import { Settings } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { getResponse, randId, textInput } from "./utils";
+import { EditorSessionItem } from "@notesnook/common";
 
 type Action = { job: string; id: string };
 
@@ -77,13 +78,13 @@ class Commands {
 
   focus = async (tabId: number) => {
     if (!this.ref.current) return;
+
+    const locked = useTabStore.getState().getTab(tabId)?.session?.locked;
     if (Platform.OS === "android") {
       //this.ref.current?.requestFocus();
       setTimeout(async () => {
         if (!this.ref) return;
         textInput.current?.focus();
-
-        const locked = useTabStore.getState().getTab(tabId)?.locked;
         await this.doAsync(
           locked
             ? `editorControllers[${tabId}]?.focusPassInput();`
@@ -95,7 +96,12 @@ class Commands {
       }, 1);
     } else {
       await sleep(400);
-      await this.doAsync(`editors[${tabId}]?.commands.focus()`, "focus");
+      await this.doAsync(
+        locked
+          ? `editorControllers[${tabId}]?.focusPassInput();`
+          : `editors[${tabId}]?.commands.focus()`,
+        "focus"
+      );
     }
   };
 
@@ -167,9 +173,10 @@ if (typeof statusBar !== "undefined") {
   setLoading = async (loading?: boolean, tabId?: number) => {
     await this.doAsync(`
     const editorController = editorControllers[${
-      tabId || useTabStore.getState().currentTab
+      tabId === undefined ? useTabStore.getState().currentTab : tabId
     }];
     editorController.setLoading(${loading})
+    logger("info", editorController.setLoading);
     `);
   };
 
@@ -215,11 +222,11 @@ if (typeof statusBar !== "undefined") {
 
   setTags = async (note: Note | null | undefined) => {
     if (!note) return;
-    const tabId = useTabStore.getState().getTabForNote(note.id);
-
-    const tags = await db.relations.to(note, "tag").resolve();
-    await this.doAsync(
-      `
+    useTabStore.getState().forEachNoteTab(note.id, async (tab) => {
+      const tabId = tab.id;
+      const tags = await db.relations.to(note, "tag").resolve();
+      await this.doAsync(
+        `
     const tags = editorTags[${tabId}];
     if (tags && tags.current) {
       tags.current.setTags(${JSON.stringify(
@@ -232,8 +239,9 @@ if (typeof statusBar !== "undefined") {
       )});
     }
   `,
-      "setTags"
-    );
+        "setTags"
+      );
+    });
   };
 
   clearTags = async (tabId: number) => {
@@ -353,7 +361,46 @@ editor && editor.commands.insertImage({
       response = editorControllers[${tabId}]?.scrollIntoView("${id}") || [];
     `);
   };
-  //todo add replace image function
+
+  newSession = async (sessionId: string, tabId: number, noteId: string) => {
+    return this.doAsync(`
+      globalThis.sessions.newSession("${sessionId}", ${tabId}, "${noteId}");
+    `);
+  };
+
+  getSession = async (id: string): Promise<EditorSessionItem | false> => {
+    return this.doAsync(`
+      response = globalThis.sessions.get("${id}");
+    `);
+  };
+
+  deleteSession = async (id: string) => {
+    return this.doAsync(`
+      globalThis.sessions.delete("${id}");
+    `);
+  };
+
+  deleteSessionsForTabId = async (tabId: number) => {
+    return this.doAsync(`
+      globalThis.sessions.deleteForTabId(${tabId});
+    `);
+  };
+
+  updateSession = async (
+    id: string,
+    session: {
+      tabId: number;
+      noteId: string;
+      scrollTop: number;
+      from: number;
+      to: number;
+      sessionId: string;
+    }
+  ) => {
+    return this.doAsync(`
+      globalThis.sessions.updateSession("${id}", ${JSON.stringify(session)});
+    `);
+  };
 }
 
 export default Commands;

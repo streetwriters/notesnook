@@ -36,7 +36,7 @@ export default function TiptapEditorWrapper(props: {
 
   return (
     <>
-      {tab.locked ? null : (
+      {tab.session?.locked ? null : (
         <EmotionEditorToolbarTheme>
           <Toolbar
             className="theme-scope-editorToolbar"

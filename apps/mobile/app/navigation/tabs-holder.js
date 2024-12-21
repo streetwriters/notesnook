@@ -529,7 +529,9 @@ const onChangeTab = async (event) => {
         const locked = note && (await db.vaults.itemExists(note));
         if (locked) {
           useTabStore.getState().updateTab(tab.id, {
-            locked: true
+            session: {
+              locked: true
+            }
           });
         }
       }

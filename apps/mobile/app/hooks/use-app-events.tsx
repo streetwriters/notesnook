@@ -602,13 +602,15 @@ export const useAppEvents = () => {
       EV.subscribe(EVENTS.vaultLocked, async () => {
         // Lock all notes in all tabs...
         for (const tab of useTabStore.getState().tabs) {
-          const noteId = useTabStore.getState().getTab(tab.id)?.noteId;
+          const noteId = useTabStore.getState().getTab(tab.id)?.session?.noteId;
           if (!noteId) continue;
           const note = await db.notes.note(noteId);
           const locked = note && (await db.vaults.itemExists(note));
           if (locked) {
             useTabStore.getState().updateTab(tab.id, {
-              locked: true
+              session: {
+                locked: true
+              }
             });
             if (
               tab.id === useTabStore.getState().currentTab &&

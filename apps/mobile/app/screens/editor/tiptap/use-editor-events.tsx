@@ -21,7 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { ItemReference } from "@notesnook/core";
 import type { Attachment } from "@notesnook/editor";
+import { EditorEvents } from "@notesnook/editor-mobile/src/utils/editor-events";
+import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
 import { getDefaultPresets } from "@notesnook/editor/dist/cjs/toolbar/tool-definitions";
+import { strings } from "@notesnook/intl";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef } from "react";
 import {
@@ -72,11 +75,9 @@ import {
 import { openLinkInBrowser } from "../../../utils/functions";
 import { tabBarRef } from "../../../utils/global-refs";
 import { useDragState } from "../../settings/editor/state";
-import { EventTypes } from "./editor-events";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
-import { EditorEvents, editorState, openInternalLink } from "./utils";
-import { strings } from "@notesnook/intl";
+import { editorState, openInternalLink } from "./utils";
 
 const publishNote = async () => {
   const user = useUserStore.getState().user;
@@ -177,7 +178,7 @@ export const useEditorEvents = (
   useEffect(() => {
     const handleKeyboardDidShow: KeyboardEventListener = () => {
       editor.commands.keyboardShown(true);
-      editor.postMessage(EditorEvents.keyboardShown, undefined);
+      editor.postMessage(NativeEvents.keyboardShown, undefined);
     };
     const handleKeyboardDidHide: KeyboardEventListener = () => {
       editor.commands.keyboardShown(false);
@@ -353,25 +354,25 @@ export const useEditorEvents = (
       const editorMessage = JSON.parse(data) as EditorMessage<any>;
 
       if (editorMessage.hasTimeout && editorMessage.resolverId) {
-        editor.postMessage(EditorEvents.resolve, {
+        editor.postMessage(NativeEvents.resolve, {
           data: true,
           resolverId: editorMessage.resolverId
         });
       }
 
-      if (editorMessage.type === EventTypes.load) {
+      if (editorMessage.type === EditorEvents.load) {
         DatabaseLogger.log("Editor is ready");
         editor.onLoad();
         return;
       }
 
-      if (editorMessage.type === EventTypes.back) {
+      if (editorMessage.type === EditorEvents.back) {
         return onBackPress();
       }
 
       if (
         editorMessage.sessionId !== editor.sessionId.current &&
-        editorMessage.type !== EditorEvents.status
+        editorMessage.type !== NativeEvents.status
       ) {
         return;
       }
@@ -381,8 +382,8 @@ export const useEditorEvents = (
         .getNoteIdForTab(editorMessage.tabId);
 
       switch (editorMessage.type) {
-        case EventTypes.content:
-          DatabaseLogger.log("EventTypes.content");
+        case EditorEvents.content:
+          DatabaseLogger.log("EditorEvents.content");
           editor.saveContent({
             type: editorMessage.type,
             content: editorMessage.value.html as string,
@@ -392,8 +393,8 @@ export const useEditorEvents = (
             pendingChanges: editorMessage.value?.pendingChanges
           });
           break;
-        case EventTypes.title:
-          DatabaseLogger.log("EventTypes.title");
+        case EditorEvents.title:
+          DatabaseLogger.log("EditorEvents.title");
           editor.saveContent({
             type: editorMessage.type,
             title: editorMessage.value?.title as string,
@@ -403,10 +404,10 @@ export const useEditorEvents = (
             pendingChanges: editorMessage.value?.pendingChanges
           });
           break;
-        case EventTypes.logger:
+        case EditorEvents.logger:
           logger.info("[EDITOR LOG]", editorMessage.value);
           break;
-        case EventTypes.dbLogger:
+        case EditorEvents.dbLogger:
           if (editorMessage.value.error) {
             DatabaseLogger.error(
               editorMessage.value.error,
@@ -419,12 +420,12 @@ export const useEditorEvents = (
             DatabaseLogger.info("[EDITOR_LOG]" + editorMessage.value.message);
           }
           break;
-        case EventTypes.contentchange:
+        case EditorEvents.contentchange:
           editor.onContentChanged(editorMessage.noteId);
           break;
-        case EventTypes.selection:
+        case EditorEvents.selection:
           break;
-        case EventTypes.reminders:
+        case EditorEvents.reminders:
           if (!noteId) {
             ToastManager.show({
               heading: strings.createNoteFirst(),
@@ -442,7 +443,7 @@ export const useEditorEvents = (
             onAdd: () => ReminderSheet.present(undefined, note, true)
           });
           break;
-        case EventTypes.newtag:
+        case EditorEvents.newtag:
           if (!noteId) {
             ToastManager.show({
               heading: strings.createNoteFirst(),
@@ -452,7 +453,7 @@ export const useEditorEvents = (
           }
           ManageTagsSheet.present([noteId]);
           break;
-        case EventTypes.tag:
+        case EditorEvents.tag:
           if (editorMessage.value) {
             if (!noteId) return;
             const note = await db.notes.note(noteId);
@@ -468,7 +469,7 @@ export const useEditorEvents = (
               });
           }
           break;
-        case EventTypes.filepicker:
+        case EditorEvents.filepicker:
           editorState().isAwaitingResult = true;
           const { pick } = require("./picker").default;
           pick({
@@ -480,14 +481,14 @@ export const useEditorEvents = (
             editorState().isAwaitingResult = false;
           }, 1000);
           break;
-        case EventTypes.download: {
+        case EditorEvents.download: {
           const downloadAttachment =
             require("../../../common/filesystem/download-attachment").default;
           downloadAttachment((editorMessage.value as Attachment)?.hash, true);
           break;
         }
 
-        case EventTypes.getAttachmentData: {
+        case EditorEvents.getAttachmentData: {
           const attachment = (editorMessage.value as any)
             ?.attachment as Attachment;
 
@@ -507,14 +508,14 @@ export const useEditorEvents = (
                 !!data,
                 editorMessage.resolverId
               );
-              editor.postMessage(EditorEvents.resolve, {
+              editor.postMessage(NativeEvents.resolve, {
                 resolverId: editorMessage.resolverId,
                 data
               });
             })
             .catch((e) => {
               DatabaseLogger.error(e);
-              editor.postMessage(EditorEvents.resolve, {
+              editor.postMessage(NativeEvents.resolve, {
                 resolverId: editorMessage.resolverId,
                 data: undefined
               });
@@ -523,26 +524,26 @@ export const useEditorEvents = (
           break;
         }
 
-        case EventTypes.pro:
+        case EditorEvents.pro:
           if (editor.state.current?.isFocused) {
             editor.state.current.isFocused = true;
           }
           eSendEvent(eOpenPremiumDialog);
           break;
-        case EventTypes.monograph:
+        case EditorEvents.monograph:
           publishNote();
           break;
-        case EventTypes.properties:
+        case EditorEvents.properties:
           showActionsheet();
           break;
-        case EventTypes.scroll:
+        case EditorEvents.scroll:
           editorState().scrollPosition = editorMessage.value;
           break;
-        case EventTypes.fullscreen:
+        case EditorEvents.fullscreen:
           editorState().isFullscreen = true;
           eSendEvent(eOpenFullscreenEditor);
           break;
-        case EventTypes.link:
+        case EditorEvents.link:
           if (editorMessage.value.startsWith("nn://")) {
             openInternalLink(editorMessage.value);
             console.log(
@@ -554,7 +555,7 @@ export const useEditorEvents = (
           }
           break;
 
-        case EventTypes.previewAttachment: {
+        case EditorEvents.previewAttachment: {
           const hash = (editorMessage.value as Attachment)?.hash;
           const attachment = await db.attachments?.attachment(hash);
           if (!attachment) return;
@@ -565,11 +566,26 @@ export const useEditorEvents = (
           }
           break;
         }
-        case EventTypes.copyToClipboard: {
+        case EditorEvents.copyToClipboard: {
           Clipboard.setString(editorMessage.value as string);
           break;
         }
-        case EventTypes.tabsChanged: {
+        case EditorEvents.saveScroll: {
+          useTabStore.getState().updateTab(editorMessage.tabId, {
+            session: {
+              ...editorMessage.value
+            }
+          });
+          break;
+        }
+        case EditorEvents.newNote: {
+          eSendEvent(eOnLoadNote, {
+            tabId: editorMessage.tabId,
+            newNote: true
+          });
+          break;
+        }
+        case EditorEvents.tabsChanged: {
           // useTabStore.setState({
           //   tabs: (editorMessage.value as any)?.tabs,
           //   currentTab: (editorMessage.value as any)?.currentTab
@@ -577,14 +593,14 @@ export const useEditorEvents = (
           // console.log("Tabs updated");
           break;
         }
-        case EventTypes.toc:
+        case EditorEvents.toc:
           TableOfContents.present(editorMessage.value);
           break;
-        case EventTypes.showTabs: {
+        case EditorEvents.showTabs: {
           EditorTabs.present();
           break;
         }
-        case EventTypes.error: {
+        case EditorEvents.error: {
           presentSheet({
             component: (
               <Issue
@@ -596,7 +612,7 @@ export const useEditorEvents = (
           });
           break;
         }
-        case EventTypes.tabFocused: {
+        case EditorEvents.tabFocused: {
           console.log(
             "Focused tab",
             editorMessage.tabId,
@@ -607,16 +623,12 @@ export const useEditorEvents = (
 
           eSendEvent(eEditorTabFocused, editorMessage.tabId);
 
-          if (
-            (!editorMessage.value || editor.currentLoadingNoteId.current) &&
-            editorMessage.noteId
-          ) {
+          if (editorMessage.noteId) {
             if (!useSettingStore.getState().isAppLoading) {
               const note = await db.notes.note(editorMessage.noteId);
               if (note) {
                 eSendEvent(eOnLoadNote, {
                   item: note,
-                  forced: true,
                   tabId: editorMessage.tabId
                 });
               }
@@ -628,7 +640,6 @@ export const useEditorEvents = (
                   if (note) {
                     eSendEvent(eOnLoadNote, {
                       item: note,
-                      forced: true,
                       tabId: editorMessage.tabId
                     });
                   }
@@ -639,7 +650,7 @@ export const useEditorEvents = (
 
           break;
         }
-        case EventTypes.createInternalLink: {
+        case EditorEvents.createInternalLink: {
           LinkNote.present(
             editorMessage.value.attributes,
             editorMessage.resolverId as string
@@ -647,17 +658,27 @@ export const useEditorEvents = (
           break;
         }
 
-        case EventTypes.unlock: {
+        case EditorEvents.unlock: {
           eSendEvent(eUnlockWithPassword, editorMessage.value);
           break;
         }
 
-        case EventTypes.unlockWithBiometrics: {
+        case EditorEvents.goBack: {
+          useTabStore.getState().goBack();
+          break;
+        }
+
+        case EditorEvents.goForward: {
+          useTabStore.getState().goForward();
+          break;
+        }
+
+        case EditorEvents.unlockWithBiometrics: {
           eSendEvent(eUnlockWithBiometrics);
           break;
         }
 
-        case EventTypes.disableReadonlyMode: {
+        case EditorEvents.disableReadonlyMode: {
           const noteId = editorMessage.value;
           if (noteId) {
             await db.notes.readonly(false, noteId);
@@ -665,7 +686,9 @@ export const useEditorEvents = (
             useTabStore
               .getState()
               .updateTab(useTabStore.getState().currentTab, {
-                readonly: false
+                session: {
+                  readonly: false
+                }
               });
             setTimeout(() => {
               Navigation.queueRoutesForUpdate();
