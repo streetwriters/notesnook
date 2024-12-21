@@ -36,6 +36,7 @@ import stripIndent from "strip-indent";
 import { nanoid } from "nanoid";
 import Languages from "./languages.json";
 import { CaretPosition, CodeLine } from "./utils.js";
+import { config } from "../../utils/config.js";
 
 interface Indent {
   type: "tab" | "space";
@@ -462,6 +463,17 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             const { isCode, language, isBlock } = detectCodeBlock(
               event.clipboardData
             );
+
+            if (language) {
+              const languageDefinition = Languages.find(
+                (l) =>
+                  l.filename === language ||
+                  l.alias?.some((a) => a === language)
+              );
+              if (languageDefinition) {
+                config.set("codeBlockLanguage", languageDefinition);
+              }
+            }
 
             const isInsideCodeBlock = this.editor.isActive(this.type.name);
             if (!isInsideCodeBlock && !isCode) {
