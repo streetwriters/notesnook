@@ -85,8 +85,15 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     treeRef,
     () => ({
       async refresh() {
-        const children = await getChildNodes(rootId, -1);
-        setNodes(children);
+        // const children = await getChildNodes(rootId, -1);
+        // setNodes(children);
+        const nodes = await fetchChildren(
+          rootId,
+          -1,
+          expandedIds,
+          getChildNodes
+        );
+        setNodes(nodes);
       },
       async refreshItem(index, item) {
         const node = nodes[index];

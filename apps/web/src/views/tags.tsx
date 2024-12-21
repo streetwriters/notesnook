@@ -36,7 +36,7 @@ function Tags() {
   if (!tags) return <ListLoader />;
   return (
     <ListContainer
-      group="tags"
+      // group="tags"
       refresh={refresh}
       items={filteredItems || tags}
       placeholder={<Placeholder context="tags" />}
