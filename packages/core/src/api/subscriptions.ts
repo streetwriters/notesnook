@@ -90,4 +90,16 @@ export default class Subscriptions {
       token
     );
   }
+
+  async redeemCode(code: string) {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+    return http.post.json(
+      `${hosts.SUBSCRIPTIONS_HOST}/subscriptions/redeem`,
+      {
+        code
+      },
+      token
+    );
+  }
 }

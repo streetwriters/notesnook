@@ -536,7 +536,7 @@ export type User = {
     cancelURL: string | null;
     expiry: number;
     productId: string;
-    provider: 0 | 1 | 2 | 3;
+    provider: 0 | 1 | 2 | 3 | 4;
     start: number;
     type: 0 | 1 | 2 | 5 | 6 | 7;
     updateURL: string | null;
