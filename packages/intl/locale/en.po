@@ -2339,6 +2339,10 @@ msgstr "Enter the 6 digit code sent to your email to continue logging in"
 msgid "Enter the 6 digit code sent to your phone number to continue logging in"
 msgstr "Enter the 6 digit code sent to your phone number to continue logging in"
 
+#: src/strings.ts:2395
+msgid "Enter the gift code to redeem your subscription."
+msgstr "Enter the gift code to redeem your subscription."
+
 #: src/strings.ts:120
 msgid "Enter the recovery code to continue logging in"
 msgstr "Enter the recovery code to continue logging in"
@@ -4579,6 +4583,14 @@ msgstr "Recovery key text file saved"
 #: src/strings.ts:1880
 msgid "Recovery successful!"
 msgstr "Recovery successful!"
+
+#: src/strings.ts:2394
+msgid "Redeem gift code"
+msgstr "Redeem gift code"
+
+#: src/strings.ts:2396
+msgid "Redeeming gift code"
+msgstr "Redeeming gift code"
 
 #: src/strings.ts:513
 msgid "Redo"

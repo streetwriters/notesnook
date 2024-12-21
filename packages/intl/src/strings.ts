@@ -2390,5 +2390,8 @@ Use this if changes from other devices are not appearing on this device. This wi
       one: `Move all notes in this notebook to trash`,
       other: `Move all notes in these notebooks to trash`
     }),
-  emailCopied: () => t`Email copied`
+  emailCopied: () => t`Email copied`,
+  redeemGiftCode: () => t`Redeem gift code`,
+  redeemGiftCodeDesc: () => t`Enter the gift code to redeem your subscription.`,
+  redeemingGiftCode: () => t`Redeeming gift code`
 };
