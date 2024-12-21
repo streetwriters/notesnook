@@ -81,7 +81,8 @@ const EXTRA_ICON_NAMES = [
   "notebook-plus",
   "arrow-right-bold-box-outline",
   "arrow-up-bold",
-  "login"
+  "login",
+  "gift"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

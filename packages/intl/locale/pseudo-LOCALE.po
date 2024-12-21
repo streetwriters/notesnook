@@ -4462,6 +4462,10 @@ msgstr ""
 msgid "Recovery successful!"
 msgstr ""
 
+#: src/strings.ts:2404
+msgid "Redeem"
+msgstr ""
+
 #: src/strings.ts:2401
 msgid "Redeem gift code"
 msgstr ""
