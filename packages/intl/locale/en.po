@@ -4584,6 +4584,10 @@ msgstr "Recovery key text file saved"
 msgid "Recovery successful!"
 msgstr "Recovery successful!"
 
+#: src/strings.ts:2408
+msgid "Redeem"
+msgstr "Redeem"
+
 #: src/strings.ts:2405
 msgid "Redeem gift code"
 msgstr "Redeem gift code"

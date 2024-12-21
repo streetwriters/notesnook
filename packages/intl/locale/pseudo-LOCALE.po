@@ -4564,6 +4564,10 @@ msgstr "<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:1891
 msgid "Recovery successful!"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2408
+msgid "Redeem"
 msgstr ""
 
 #: src/strings.ts:2405

@@ -126,18 +126,19 @@ export const Subscription = () => {
       user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM_EXPIRED &&
       user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC ? (
         <Button
-          title={subscriptionProviderInfo?.title}
+          title={subscriptionProviderInfo?.title()}
           onPress={() => {
             presentSheet({
-              title: subscriptionProviderInfo.title,
-              paragraph: subscriptionProviderInfo.desc
+              title: subscriptionProviderInfo.title(),
+              paragraph: subscriptionProviderInfo.desc()
             });
           }}
           style={{
             alignSelf: "flex-start",
-            borderRadius: 100
+            width: "100%",
+            paddingHorizontal: 0
           }}
-          fontSize={SIZE.sm}
+          fontSize={SIZE.xs}
           height={30}
           type="secondaryAccented"
         />
