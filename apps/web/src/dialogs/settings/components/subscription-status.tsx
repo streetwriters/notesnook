@@ -30,12 +30,14 @@ import { Features } from "../../buy-dialog/features";
 import { ConfirmDialog } from "../../confirm";
 import { BuyDialog } from "../../buy-dialog";
 import { strings } from "@notesnook/intl";
+import { PromptDialog } from "../../prompt";
 
 const PROVIDER_MAP = {
   0: "Streetwriters",
   1: "iOS",
   2: "Android",
-  3: "Web"
+  3: "Web",
+  4: "Gift card"
 } as const;
 export function SubscriptionStatus() {
   const user = useUserStore((store) => store.user);
@@ -72,7 +74,7 @@ export function SubscriptionStatus() {
     const expiryDate = dayjs(user?.subscription?.expiry).format("MMMM D, YYYY");
     const startDate = dayjs(user?.subscription?.start).format("MMMM D, YYYY");
     return isPro
-      ? provider === "Streetwriters"
+      ? provider === "Streetwriters" || provider === "Gift card"
         ? `Ending on ${expiryDate}`
         : `Next payment on ${expiryDate}.`
       : isProCancelled
@@ -209,6 +211,26 @@ export function SubscriptionStatus() {
                   )}
                 </Button>
               )}
+              <Button
+                variant="secondary"
+                onClick={async () => {
+                  const giftCode = await PromptDialog.show({
+                    title: strings.redeemGiftCode(),
+                    description: strings.redeemGiftCodeDesc()
+                  });
+                  if (giftCode) {
+                    await TaskManager.startTask({
+                      type: "modal",
+                      title: strings.redeemingGiftCode(),
+                      subtitle: strings.pleaseWait() + "...",
+                      action: () => db.subscriptions.redeemCode(giftCode)
+                    }).catch((e) => showToast("error", e.message));
+                  }
+                }}
+                sx={{ bg: "background" }}
+              >
+                {strings.redeemGiftCode()}
+              </Button>
             </>
           )}
         </Flex>
