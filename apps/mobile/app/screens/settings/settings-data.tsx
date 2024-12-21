@@ -78,8 +78,7 @@ import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
 import Clipboard from "@react-native-clipboard/clipboard";
-
-type User = any;
+import { User } from "@notesnook/core";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -119,6 +118,10 @@ export const settingsGroups: SettingSection[] = [
             "MMMM D, YYYY"
           );
 
+          if (user.subscription.provider === 4) {
+            return strings.subEndsOn(expiryDate);
+          }
+
           return user.subscription?.type === 2
             ? strings.signedUpOn(startDate)
             : user.subscription?.type === 1
@@ -132,6 +135,39 @@ export const settingsGroups: SettingSection[] = [
             : user.subscription?.type === 5
             ? strings.subRenewOn(expiryDate)
             : strings.neverHesitate();
+        }
+      },
+      {
+        id: "redeem-gift-code",
+        name: strings.redeemGiftCode(),
+        description: strings.redeemGiftCodeDesc(),
+        hidden: (current) => {
+          return !current as boolean;
+        },
+        useHook: () =>
+          useUserStore(
+            (state) =>
+              state.user?.subscription.type == SUBSCRIPTION_STATUS.TRIAL ||
+              state.user?.subscription.type == SUBSCRIPTION_STATUS.BASIC
+          ),
+        icon: "gift",
+        modifer: () => {
+          presentDialog({
+            title: strings.redeemGiftCode(),
+            paragraph: strings.redeemGiftCodeDesc(),
+            input: true,
+            inputPlaceholder: strings.code(),
+            positiveText: strings.redeem(),
+            positivePress: async (value) => {
+              db.subscriptions.redeemCode(value).catch((e) => {
+                ToastManager.show({
+                  heading: "Error redeeming code",
+                  message: (e as Error).message,
+                  type: "error"
+                });
+              });
+            }
+          });
         }
       },
       {

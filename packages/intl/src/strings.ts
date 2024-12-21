@@ -2404,5 +2404,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   emailCopied: () => t`Email copied`,
   redeemGiftCode: () => t`Redeem gift code`,
   redeemGiftCodeDesc: () => t`Enter the gift code to redeem your subscription.`,
-  redeemingGiftCode: () => t`Redeeming gift code`
+  redeemingGiftCode: () => t`Redeeming gift code`,
+  redeem: () => t`Redeem`
 };
