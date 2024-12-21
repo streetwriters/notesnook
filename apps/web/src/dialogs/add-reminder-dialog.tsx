@@ -480,9 +480,7 @@ export const AddReminderDialog = DialogManager.register(
                 checked={p.id === priority}
                 onChange={() => setPriority(p.id)}
               />
-              {strings.reminderNotificationModes[
-                p.title as keyof typeof strings.reminderNotificationModes
-              ]()}
+              {strings.reminderNotificationModes(p.title)}
             </Label>
           ))}
         </Flex>

@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { plural, select, t } from "@lingui/macro";
-import { doActions } from "../generated/do-actions";
-import { actions } from "../generated/actions";
-import { inProgressActions } from "../generated/in-progress-actions";
-import { actionErrors } from "../generated/action-errors";
 import { actionConfirmations } from "../generated/action-confirmations";
+import { actionErrors } from "../generated/action-errors";
+import { actions } from "../generated/actions";
+import { doActions } from "../generated/do-actions";
+import { inProgressActions } from "../generated/in-progress-actions";
 
 const SEARCH_IN_ROUTE_STRINGS = {
   Notes: () => t`Search in in Notes`,
@@ -36,6 +36,19 @@ const SEARCH_IN_ROUTE_STRINGS = {
   Home: () => t`Search in in Home`,
   Search: () => t`Search in in Search`,
   Monographs: () => t`Search in in Monographs`
+};
+
+const TRANSACTION_STATUS = {
+  completed: () => t`Completed`,
+  refunded: () => t`"Refunded`,
+  partially_refunded: () => t`Partially refunded`,
+  disputed: () => t`Disputed`
+};
+
+const REMINDER_NOTIFICATION_MODES = {
+  Silent: () => t`Silent`,
+  Vibrate: () => t`Vibrate`,
+  Urgent: () => t`Urgent`
 };
 
 export const strings = {
@@ -607,10 +620,14 @@ $headline$: Use starting line of the note as title.`,
     6: () => t`Sat`
   },
   selectDate: () => t`Select date`,
-  reminderNotificationModes: {
-    Silent: () => t`Silent`,
-    Vibrate: () => t`Vibrate`,
-    Urgent: () => t`Urgent`
+  reminderNotificationModes: (
+    mode: keyof typeof REMINDER_NOTIFICATION_MODES | ({} & string)
+  ) => {
+    return mode in REMINDER_NOTIFICATION_MODES
+      ? REMINDER_NOTIFICATION_MODES[
+          mode as keyof typeof REMINDER_NOTIFICATION_MODES
+        ]()
+      : mode;
   },
   selectBackupsFolder: () => t`Select backups folder`,
   oldNew: () => t`Old - new`,
@@ -630,7 +647,7 @@ $headline$: Use starting line of the note as title.`,
   },
   groupByStrings: {
     default: () => t`Default`,
-    None: () => t`None`,
+    none: () => t`None`,
     abc: () => t`Abc`,
     year: () => t`Year`,
     week: () => t`Week`,
@@ -1482,7 +1499,7 @@ For example:
     return (
       SEARCH_IN_ROUTE_STRINGS[
         routeName as keyof typeof SEARCH_IN_ROUTE_STRINGS
-      ]() || t`Search in ${routeName}`
+      ]?.() || t`Search in ${routeName}`
     );
   },
   logoutConfirmation: () =>
@@ -1740,32 +1757,18 @@ For example:
   notebooksAllCaps: () => t`NOTEBOOKS`,
   authenticatedAs: (email?: string) => t`Authenticated as ${email}`,
   rememberedYourPassword: () => t`Remembered your password?`,
-  accountRecoveryMethods: [
-    {
-      type: "key",
-      testId: "step-recovery-key",
-      title: () => `Use recovery key`,
-      description: () =>
-        `Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption.`
-    },
-    {
-      type: "backup",
-      testId: "step-backup",
-      title: () => `Use a backup file`,
-      description: () =>
-        `If you don't have a recovery key, you can recover your data by restoring a Notesnook data backup file (.nnbackup).`
-    },
-    {
-      type: "reset",
-      testId: "step-reset-account",
-      title: () => `Clear data & reset account`,
-      description: () =>
-        `EXTREMELY DANGEROUS! This action is irreversible. All your data including notes, notebooks, attachments & settings will be deleted. This is a full account reset. Proceed with caution.`,
-      isDangerous: true
-    }
-  ],
   chooseRecoveryMethod: () => t`Choose a recovery method`,
   chooseRecoveryMethodDesc: () => t`How do you want to recover your account?`,
+  recoveryKeyMethod: () => t`Use recovery key`,
+  recoveryKeyMethodDesc: () =>
+    t`Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption.`,
+  backupFileMethod: () => t`Use a backup file`,
+  backupFileMethodDesc: () =>
+    t`If you don't have a recovery key, you can recover your data by restoring a Notesnook data backup file (.nnbackup).`,
+  clearDataAndResetMethod: () => t`Clear data & reset account`,
+  clearDataAndResetMethodDesc: () =>
+    t`EXTREMELY DANGEROUS! This action is irreversible. All your data including notes, notebooks, attachments & settings will be deleted. This is a full account reset. Proceed with caution.`,
+
   browse: () => t`Browse`,
   dontShowAgain: () => t`Don't show again`,
   dontShowAgainConfirm: () => t`Don't show again on this device?`,
