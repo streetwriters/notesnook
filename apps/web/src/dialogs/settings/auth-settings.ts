@@ -45,7 +45,6 @@ export const AuthenticationSettings: SettingsGroup[] = [
             title: strings.changePassword(),
             variant: "secondary",
             action: async () => {
-              if (!(await createBackup())) return;
               const result = await showPasswordDialog({
                 title: strings.changePassword(),
                 message: strings.changePasswordDesc(),
@@ -60,6 +59,7 @@ export const AuthenticationSettings: SettingsGroup[] = [
                   }
                 },
                 validate: async ({ oldPassword, newPassword }) => {
+                  if (!(await createBackup())) return false;
                   await db.user.clearSessions();
                   return (
                     (await db.user.changePassword(oldPassword, newPassword)) ||
