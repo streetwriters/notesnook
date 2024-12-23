@@ -45,7 +45,7 @@ const Home = ({
   });
 
   const renderItem = ({ item }: { item: SettingSection; index: number }) =>
-    item.name === "account" ? (
+    item.id === "account" ? (
       <SettingsUserSection item={item} />
     ) : (
       <SectionGroup item={item} />
