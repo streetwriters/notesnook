@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { NOTE, TITLE_ONLY_NOTE } from "./utils";
+import { getTestId, NOTE, TITLE_ONLY_NOTE } from "./utils";
 
 test("focus mode", async ({ page }) => {
   const app = new AppModel(page);
@@ -269,4 +269,104 @@ test("#1468 count words separated by newlines", async ({ page }) => {
   });
 
   expect((await notes.editor.getWordCount()) === 10).toBeTruthy();
+});
+
+test("disable autosave when note crosses MAX_AUTO_SAVEABLE_WORDS", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+
+  await notes.createNote({
+    title: "many words",
+    content
+  });
+
+  expect(
+    await app.toasts.waitForToast(
+      "Auto-save is disabled for large notes. Press Ctrl + S to save."
+    )
+  ).toBe(true);
+  await expect(notes.editor.notSavedIcon).toBeVisible();
+});
+
+test("when autosave is disabled, pressing ctrl+s should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  await page.keyboard.press("Control+s");
+
+  await expect(notes.editor.savedIcon).toBeVisible();
+});
+
+test("when autosave is disabled, switching to another note should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note1 = await notes.createNote({
+    title: "Test note 1"
+  });
+  const note2 = await notes.createNote({
+    title: "Test note 2"
+  });
+  await note1?.openNote();
+  await notes.editor.setContent(content);
+
+  await note2?.openNote();
+
+  await note1?.openNote();
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
+});
+
+test("when autosave is disabled, creating a new note should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note = await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  await notes.newNote();
+
+  await note?.openNote();
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
+});
+
+test("when autosave is disabled, closing the note should save it", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note = await notes.createNote({
+    title: "Title",
+    content
+  });
+
+  const noteTab = await notes.editor.findTab((await note!.getId())!);
+  await noteTab?.close();
+
+  await note?.openNote();
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
 });

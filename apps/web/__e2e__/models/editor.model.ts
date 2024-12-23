@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
+import { TabItemModel } from "./tab-item.model";
+import { iterateList } from "./utils";
 
 export class EditorModel {
   private readonly page: Page;
@@ -33,6 +35,9 @@ export class EditorModel {
   private readonly wordCountText: Locator;
   private readonly dateEditedText: Locator;
   private readonly searchButton: Locator;
+  private readonly tabsList: Locator;
+  readonly savedIcon: Locator;
+  readonly notSavedIcon: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -51,6 +56,9 @@ export class EditorModel {
     this.wordCountText = page.locator(getTestId("editor-word-count"));
     this.dateEditedText = page.locator(getTestId("editor-date-edited"));
     this.searchButton = page.locator(getTestId("Search"));
+    this.savedIcon = page.locator(getTestId("editor-save-state-saved"));
+    this.notSavedIcon = page.locator(getTestId("editor-save-state-notsaved"));
+    this.tabsList = page.locator(getTestId("tabs"));
   }
 
   async waitForLoading(title?: string, content?: string) {
@@ -226,5 +234,12 @@ export class EditorModel {
         .toString()
         .replace(" words", "")
     );
+  }
+
+  async findTab(id: string) {
+    for await (const item of iterateList(this.tabsList.locator(".tab"))) {
+      const tabModel = new TabItemModel(item, this.page);
+      if ((await tabModel.getId()) === id) return tabModel;
+    }
   }
 }

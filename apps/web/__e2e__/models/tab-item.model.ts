@@ -17,27 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Attachment } from "@notesnook/editor";
+import { Locator, Page } from "@playwright/test";
+import { getTestId } from "../utils";
 
-export const MAX_AUTO_SAVEABLE_WORDS = IS_TESTING ? 100 : 100_000;
+export class TabItemModel {
+  private readonly closeButton: Locator;
+  constructor(private readonly locator: Locator, page: Page) {
+    this.closeButton = locator.locator(getTestId("tab-close-button"));
+  }
 
-export type NoteStatistics = {
-  words: {
-    total: number;
-    selected?: number;
-  };
-};
-
-export interface IEditor {
-  focus: (options?: {
-    position?: "start" | "end" | { from: number; to: number };
-    scrollIntoView?: boolean;
-  }) => void;
-  undo: () => void;
-  redo: () => void;
-  updateContent: (content: string) => void;
-  attachFile: (file: Attachment) => void;
-  sendAttachmentProgress: (hash: string, progress: number) => void;
-  startSearch: () => void;
-  getContent: () => string;
+  async getId() {
+    const testId = await this.locator.getAttribute("data-test-id");
+    return testId?.replace("tab-", "");
+  }
+  close() {
+    return this.closeButton.click();
+  }
 }

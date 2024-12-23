@@ -30,6 +30,7 @@ import {
   Lock,
   NormalMode,
   Note,
+  NoteRemove,
   Pin,
   Properties,
   Publish,
@@ -44,6 +45,7 @@ import {
 } from "../icons";
 import { ScrollContainer } from "@notesnook/ui";
 import {
+  SaveState,
   SessionType,
   isLockedSession,
   useEditorStore
@@ -281,6 +283,7 @@ function TabStrip() {
           e.stopPropagation();
           useEditorStore.getState().newSession();
         }}
+        data-test-id="tabs"
       >
         <ReorderableList
           items={sessions}
@@ -302,89 +305,95 @@ function TabStrip() {
             sessions.splice(to, 0, fromTab);
             useEditorStore.setState({ sessions });
           }}
-          renderItem={({ item: session, index: i }) => (
-            <Tab
-              id={session.id}
-              key={session.id}
-              title={
-                session.title ||
-                ("note" in session ? session.note.title : "Untitled")
-              }
-              isTemporary={!!session.preview}
-              isActive={session.id === activeSessionId}
-              isPinned={!!session.pinned}
-              isLocked={isLockedSession(session)}
-              type={session.type}
-              onKeepOpen={() =>
-                useEditorStore
-                  .getState()
-                  .updateSession(
-                    session.id,
-                    [session.type],
-                    (s) => (s.preview = false)
-                  )
-              }
-              onFocus={() => {
-                if (session.id !== activeSessionId) {
-                  useEditorStore.getState().openSession(session.id);
+          renderItem={({ item: session, index: i }) => {
+            const isUnsaved =
+              session.type === "default" &&
+              session.saveState === SaveState.NotSaved;
+            return (
+              <Tab
+                id={session.id}
+                key={session.id}
+                title={
+                  session.title ||
+                  ("note" in session ? session.note.title : "Untitled")
                 }
-              }}
-              onClose={() =>
-                useEditorStore.getState().closeSessions(session.id)
-              }
-              onCloseAll={() =>
-                useEditorStore
-                  .getState()
-                  .closeSessions(
-                    ...sessions.filter((s) => !s.pinned).map((s) => s.id)
+                isUnsaved={isUnsaved}
+                isTemporary={!!session.preview}
+                isActive={session.id === activeSessionId}
+                isPinned={!!session.pinned}
+                isLocked={isLockedSession(session)}
+                type={session.type}
+                onKeepOpen={() =>
+                  useEditorStore
+                    .getState()
+                    .updateSession(
+                      session.id,
+                      [session.type],
+                      (s) => (s.preview = false)
+                    )
+                }
+                onFocus={() => {
+                  if (session.id !== activeSessionId) {
+                    useEditorStore.getState().openSession(session.id);
+                  }
+                }}
+                onClose={() =>
+                  useEditorStore.getState().closeSessions(session.id)
+                }
+                onCloseAll={() =>
+                  useEditorStore
+                    .getState()
+                    .closeSessions(
+                      ...sessions.filter((s) => !s.pinned).map((s) => s.id)
+                    )
+                }
+                onCloseOthers={() =>
+                  useEditorStore
+                    .getState()
+                    .closeSessions(
+                      ...sessions
+                        .filter((s) => s.id !== session.id && !s.pinned)
+                        .map((s) => s.id)
+                    )
+                }
+                onCloseToTheRight={() =>
+                  useEditorStore
+                    .getState()
+                    .closeSessions(
+                      ...sessions
+                        .filter((s, index) => index > i && !s.pinned)
+                        .map((s) => s.id)
+                    )
+                }
+                onCloseToTheLeft={() =>
+                  useEditorStore
+                    .getState()
+                    .closeSessions(
+                      ...sessions
+                        .filter((s, index) => index < i && !s.pinned)
+                        .map((s) => s.id)
+                    )
+                }
+                onRevealInList={() =>
+                  AppEventManager.publish(
+                    AppEvents.revealItemInList,
+                    "note" in session ? session.note.id : session.id,
+                    true
                   )
-              }
-              onCloseOthers={() =>
-                useEditorStore
-                  .getState()
-                  .closeSessions(
-                    ...sessions
-                      .filter((s) => s.id !== session.id && !s.pinned)
-                      .map((s) => s.id)
-                  )
-              }
-              onCloseToTheRight={() =>
-                useEditorStore
-                  .getState()
-                  .closeSessions(
-                    ...sessions
-                      .filter((s, index) => index > i && !s.pinned)
-                      .map((s) => s.id)
-                  )
-              }
-              onCloseToTheLeft={() =>
-                useEditorStore
-                  .getState()
-                  .closeSessions(
-                    ...sessions
-                      .filter((s, index) => index < i && !s.pinned)
-                      .map((s) => s.id)
-                  )
-              }
-              onRevealInList={() =>
-                AppEventManager.publish(
-                  AppEvents.revealItemInList,
-                  "note" in session ? session.note.id : session.id,
-                  true
-                )
-              }
-              onPin={() => {
-                useEditorStore.setState((state) => {
-                  // preview tabs can never be pinned.
-                  if (!session.pinned) state.sessions[i].preview = false;
-                  state.sessions[i].pinned = !session.pinned;
-                  state.sessions.sort((a, b) =>
-                    a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
-                  );
-                });
-              }}
-            />
-          )}
+                }
+                onPin={() => {
+                  useEditorStore.setState((state) => {
+                    // preview tabs can never be pinned.
+                    if (!session.pinned) state.sessions[i].preview = false;
+                    state.sessions[i].pinned = !session.pinned;
+                    state.sessions.sort((a, b) =>
+                      a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
+                    );
+                  });
+                }}
+              />
+            );
+          }}
         />
       </Flex>
     </ScrollContainer>
@@ -398,6 +407,7 @@ type TabProps = {
   isTemporary: boolean;
   isPinned: boolean;
   isLocked: boolean;
+  isUnsaved: boolean;
   type: SessionType;
   onKeepOpen: () => void;
   onFocus: () => void;
@@ -417,6 +427,7 @@ function Tab(props: TabProps) {
     isTemporary,
     isPinned,
     isLocked,
+    isUnsaved,
     type,
     onKeepOpen,
     onFocus,
@@ -436,6 +447,8 @@ function Tab(props: TabProps) {
     ? Readonly
     : type === "deleted"
     ? Trash
+    : isUnsaved
+    ? NoteRemove
     : Note;
   const { attributes, listeners, setNodeRef, transform, transition, active } =
     useSortable({ id });
@@ -444,6 +457,7 @@ function Tab(props: TabProps) {
     <Flex
       ref={setNodeRef}
       className="tab"
+      data-test-id={`tab-${id}`}
       sx={{
         borderRadius: "default",
         cursor: "pointer",
@@ -544,7 +558,13 @@ function Tab(props: TabProps) {
           if (e.button == 0) onFocus();
         }}
       >
-        <Icon size={16} color={isActive ? "accent-selected" : "icon"} />
+        <Icon
+          data-test-id={`tab-icon${isUnsaved ? "-unsaved" : ""}`}
+          size={16}
+          color={
+            isUnsaved ? "accent-error" : isActive ? "accent-selected" : "icon"
+          }
+        />
         <Text
           variant="body"
           sx={{
@@ -590,6 +610,7 @@ function Tab(props: TabProps) {
             }
           }}
           className="closeTabButton"
+          data-test-id={"tab-close-button"}
           size={16}
         />
       )}

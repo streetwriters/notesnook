@@ -46,7 +46,7 @@ export class BaseItemModel {
   }
 
   async getId() {
-    return await this.locator.getAttribute("id");
+    return (await this.locator.getAttribute("id"))?.replace("id_", "");
   }
 
   async getTitle() {
