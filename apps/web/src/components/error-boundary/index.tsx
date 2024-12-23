@@ -33,7 +33,11 @@ import { db } from "../../common/db";
 import { createDialect } from "../../common/sqlite";
 import { getDeviceInfo } from "../../utils/platform";
 
-const IGNORED_ERRORS = ["Error in input stream", "network error"];
+const IGNORED_ERRORS = [
+  "Error in input stream",
+  "network error",
+  "NetworkError when attempting to fetch resource."
+];
 export function GlobalErrorHandler(props: PropsWithChildren) {
   const { showBoundary } = useErrorBoundary();
 
