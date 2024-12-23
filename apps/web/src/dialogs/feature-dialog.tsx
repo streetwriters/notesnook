@@ -95,7 +95,7 @@ const features: Record<FeatureKeys, Feature> = {
           {
             title: "Notesnook Gift Cards",
             subtitle:
-              "You can now gift Notesnook Pro to your friends and family. Gift cards are available in 1, 3, and 5-year plans at https://notesnook.com/gift-cards."
+              "You can now gift Notesnook Pro to your friends and family. Gift cards are available in 1, 3, and 5-year plans at https://notesnook.com/giftcards."
           },
           {
             title: "Sorted search results",
