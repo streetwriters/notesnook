@@ -283,6 +283,7 @@ function TabStrip() {
           e.stopPropagation();
           useEditorStore.getState().newSession();
         }}
+        data-test-id="tabs"
       >
         <ReorderableList
           items={sessions}
@@ -456,6 +457,7 @@ function Tab(props: TabProps) {
     <Flex
       ref={setNodeRef}
       className="tab"
+      data-test-id={`tab-${id}`}
       sx={{
         borderRadius: "default",
         cursor: "pointer",
@@ -557,12 +559,10 @@ function Tab(props: TabProps) {
         }}
       >
         <Icon
-          data-test-id={
-            isUnsaved ? "tab-icon-unsaved-" + id : "tab-icon-saved-" + id
-          }
+          data-test-id={`tab-icon${isUnsaved ? "-unsaved" : ""}`}
           size={16}
           color={
-            isActive ? (isUnsaved ? "accent-error" : "accent-selected") : "icon"
+            isUnsaved ? "accent-error" : isActive ? "accent-selected" : "icon"
           }
         />
         <Text
@@ -610,7 +610,7 @@ function Tab(props: TabProps) {
             }
           }}
           className="closeTabButton"
-          data-test-id={"tab-close-button-" + id}
+          data-test-id={"tab-close-button"}
           size={16}
         />
       )}

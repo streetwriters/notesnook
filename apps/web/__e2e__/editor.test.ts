@@ -84,75 +84,6 @@ test("creating a new note should clear the editor contents & title", async ({
   expect(await notes.editor.getContent("text")).toBe("");
 });
 
-test("when autosave is disabled, pressing ctrl+s should save the note", async ({
-  page
-}) => {
-  const app = new AppModel(page);
-  await app.goto();
-  const notes = await app.goToNotes();
-  const content = "a ".repeat(100);
-  await notes.createNote({
-    title: NOTE.title,
-    content
-  });
-
-  await notes.editor.isEditorUnsaved();
-
-  await page.keyboard.press("Control+s");
-
-  await notes.editor.isEditorSaved();
-});
-
-test("when autosave is disabled, switching to another note should save the note", async ({
-  page
-}) => {
-  const app = new AppModel(page);
-  await app.goto();
-  const notes = await app.goToNotes();
-  const content = "a ".repeat(100);
-  const note1 = await notes.createNote({
-    title: "Test note 1"
-  });
-  const note2 = await notes.createNote({
-    title: "Test note 2"
-  });
-  const note1UnsavedTestId = getTestId(
-    "tab-icon-unsaved-" + (await note1?.getId())
-  );
-  const note1SavedTestId = getTestId(
-    "tab-icon-saved-" + (await note1?.getId())
-  );
-
-  await note1?.openNote();
-  await notes.editor.setContent(content);
-  await page.locator(note1UnsavedTestId).waitFor();
-  await page.locator(note1SavedTestId).waitFor({ state: "hidden" });
-  await note2?.openNote();
-  await page.locator(note1UnsavedTestId).waitFor({ state: "hidden" });
-  await page.locator(note1SavedTestId).waitFor();
-});
-
-test("when autosave is disabled, creating a new note should save the note", async ({
-  page
-}) => {
-  const app = new AppModel(page);
-  await app.goto();
-  const notes = await app.goToNotes();
-  const content = "a ".repeat(100);
-  const note = await notes.createNote({
-    title: NOTE.title,
-    content
-  });
-
-  const testId = getTestId("tab-icon-unsaved-" + (await note?.getId()));
-
-  await page.locator(testId).waitFor();
-
-  await notes.newNote();
-
-  await page.locator(testId).waitFor({ state: "hidden" });
-});
-
 test("creating a new title-only note should add it to the list", async ({
   page
 }) => {
@@ -338,4 +269,104 @@ test("#1468 count words separated by newlines", async ({ page }) => {
   });
 
   expect((await notes.editor.getWordCount()) === 10).toBeTruthy();
+});
+
+test("disable autosave when note crosses MAX_AUTO_SAVEABLE_WORDS", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+
+  await notes.createNote({
+    title: "many words",
+    content
+  });
+
+  expect(
+    await app.toasts.waitForToast(
+      "Auto-save is disabled for large notes. Press Ctrl + S to save."
+    )
+  ).toBe(true);
+  await expect(notes.editor.notSavedIcon).toBeVisible();
+});
+
+test("when autosave is disabled, pressing ctrl+s should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  await page.keyboard.press("Control+s");
+
+  await expect(notes.editor.savedIcon).toBeVisible();
+});
+
+test("when autosave is disabled, switching to another note should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note1 = await notes.createNote({
+    title: "Test note 1"
+  });
+  const note2 = await notes.createNote({
+    title: "Test note 2"
+  });
+  await note1?.openNote();
+  await notes.editor.setContent(content);
+
+  await note2?.openNote();
+
+  await note1?.openNote();
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
+});
+
+test("when autosave is disabled, creating a new note should save the note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note = await notes.createNote({
+    title: NOTE.title,
+    content
+  });
+
+  await notes.newNote();
+
+  await note?.openNote();
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
+});
+
+test("when autosave is disabled, closing the note should save it", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const content = "a ".repeat(100);
+  const note = await notes.createNote({
+    title: "Title",
+    content
+  });
+
+  const noteTab = await notes.editor.findTab((await note!.getId())!);
+  await noteTab?.close();
+
+  await note?.openNote();
+  await expect(notes.editor.savedIcon).toBeVisible();
+  expect(await notes.editor.getContent("text")).toBe(content.trim());
 });
