@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { match } from "fuzzyjs";
 import Database from "./index.js";
-import { Item, Note, TrashItem } from "../types.js";
+import { Item, Note, SortOptions, TrashItem } from "../types.js";
 import { DatabaseSchema, RawDatabaseSchema } from "../database/index.js";
 import { AnyColumnWithTable, Kysely, sql } from "@streetwriters/kysely";
 import { FilteredSelector } from "../database/sql-collection.js";
@@ -27,6 +27,7 @@ import { VirtualizedGrouping } from "../utils/virtualized-grouping.js";
 import { logger } from "../logger.js";
 import { rebuildSearchIndex } from "../database/fts.js";
 import { transformQuery } from "../utils/query-transformer.js";
+import { getSortSelectors } from "../utils/grouping.js";
 
 type SearchResults<T> = {
   sorted: (limit?: number) => Promise<VirtualizedGrouping<T>>;
@@ -43,7 +44,7 @@ export default class Lookup {
   constructor(private readonly db: Database) {}
 
   notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
-    return this.toSearchResults(async (limit) => {
+    return this.toSearchResults(async (limit, sortOptions) => {
       const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
       const excludedIds = this.db.trash.cache.notes;
 
@@ -71,13 +72,16 @@ export default class Lookup {
                 )
                 .where("data", "match", query)
                 .select(["noteId as id", "rank"])
-                .$castTo<{ id: string; rank: number }>()
+                .$castTo<{
+                  id: string;
+                  rank: number;
+                }>()
             )
             .as("results")
         )
         .select(["results.id"])
         .groupBy("results.id")
-        .orderBy(sql`SUM(results.rank)`, "desc")
+        .orderBy(sql`SUM(results.rank)`, sortOptions?.sortDirection || "desc")
         .$if(!!limit, (eb) => eb.limit(limit!))
 
         // filter out ids that have no note against them
@@ -119,9 +123,17 @@ export default class Lookup {
   }
 
   trash(query: string): SearchResults<TrashItem> {
+    const sortOptions: SortOptions = {
+      sortBy: "dateDeleted",
+      sortDirection: "desc"
+    };
     return {
       sorted: async (limit?: number) => {
-        const { ids, items } = await this.filterTrash(query, limit);
+        const { ids, items } = await this.filterTrash(
+          query,
+          limit,
+          sortOptions
+        );
         return new VirtualizedGrouping<TrashItem>(
           ids.length,
           this.db.options.batchSize,
@@ -135,7 +147,7 @@ export default class Lookup {
         );
       },
       items: async (limit?: number) => {
-        const { items } = await this.filterTrash(query, limit);
+        const { items } = await this.filterTrash(query, limit, sortOptions);
         return items;
       },
       ids: () => this.filterTrash(query).then(({ ids }) => ids)
@@ -157,7 +169,8 @@ export default class Lookup {
     fields: FuzzySearchField<T>[]
   ) {
     return this.toSearchResults(
-      (limit) => this.filter(selector, query, fields, limit),
+      (limit, sortOptions) =>
+        this.filter(selector, query, fields, limit, sortOptions),
       selector
     );
   }
@@ -166,7 +179,8 @@ export default class Lookup {
     selector: FilteredSelector<T>,
     query: string,
     fields: FuzzySearchField<T>[],
-    limit?: number
+    limit?: number,
+    sortOptions?: SortOptions
   ) {
     const results: Map<string, number> = new Map();
     const columns = fields.map((f) => f.column);
@@ -183,24 +197,46 @@ export default class Lookup {
     }
     selector.fields([]);
 
-    return Array.from(results.entries())
-      .sort((a, b) => a[1] - b[1])
-      .map((a) => a[0]);
+    const sorted = Array.from(results.entries());
+
+    if (!sortOptions)
+      // || sortOptions.sortBy === "relevance")
+      sorted.sort(
+        // sortOptions?.sortDirection === "desc"
+        // ? (a, b) => a[1] - b[1]
+        // :
+        (a, b) => b[1] - a[1]
+      );
+
+    return sorted.map((a) => a[0]);
   }
 
   private toSearchResults<T extends Item>(
-    ids: (limit?: number) => Promise<string[]>,
+    ids: (limit?: number, sortOptions?: SortOptions) => Promise<string[]>,
     selector: FilteredSelector<T>
   ): SearchResults<T> {
+    const sortOptions: SortOptions = {
+      sortBy: "dateCreated",
+      sortDirection: "desc"
+    };
     return {
       sorted: async (limit?: number) =>
-        this.toVirtualizedGrouping(await ids(limit), selector),
-      items: async (limit?: number) => this.toItems(await ids(limit), selector),
+        this.toVirtualizedGrouping(
+          await ids(limit, sortOptions),
+          selector,
+          sortOptions
+        ),
+      items: async (limit?: number) =>
+        this.toItems(await ids(limit, sortOptions), selector, sortOptions),
       ids
     };
   }
 
-  private async filterTrash(query: string, limit?: number) {
+  private async filterTrash(
+    query: string,
+    limit?: number,
+    sortOptions?: SortOptions
+  ) {
     const items = await this.db.trash.all();
 
     const results: Map<string, { rank: number; item: TrashItem }> = new Map();
@@ -212,10 +248,20 @@ export default class Lookup {
         results.set(item.id, { rank: result.score, item });
       }
     }
+    const sorted = Array.from(results.entries());
 
-    const sorted = Array.from(results.entries()).sort(
-      (a, b) => a[1].rank - b[1].rank
-    );
+    if (!sortOptions)
+      // || sortOptions.sortBy === "relevance")
+      sorted.sort(
+        // sortOptions?.sortDirection === "desc"
+        //   ? (a, b) => a[1].rank - b[1].rank
+        // :
+        (a, b) => b[1].rank - a[1].rank
+      );
+    else {
+      const selector = getSortSelectors(sortOptions)[sortOptions.sortDirection];
+      sorted.sort((a, b) => selector(a[1].item, b[1].item));
+    }
     return {
       ids: sorted.map((a) => a[0]),
       items: sorted.map((a) => a[1].item)
@@ -224,28 +270,33 @@ export default class Lookup {
 
   private toVirtualizedGrouping<T extends Item>(
     ids: string[],
-    selector: FilteredSelector<T>
+    selector: FilteredSelector<T>,
+    sortOptions?: SortOptions
   ) {
+    // if (sortOptions?.sortBy === "relevance") sortOptions = undefined;
     return new VirtualizedGrouping<T>(
       ids.length,
       this.db.options.batchSize,
       () => Promise.resolve(ids),
       async (start, end) => {
-        const items = await selector.records(ids);
+        const items = await selector.items(ids.slice(start, end), sortOptions);
         return {
           ids: ids.slice(start, end),
-          items: Object.values(items).slice(start, end)
+          items
         };
       }
+      // (items) => groupArray(items, () => `${items.length} results`)
     );
   }
 
   private toItems<T extends Item>(
     ids: string[],
-    selector: FilteredSelector<T>
+    selector: FilteredSelector<T>,
+    sortOptions?: SortOptions
   ) {
     if (!ids.length) return [];
-    return selector.items(ids);
+    // if (sortOptions?.sortBy === "relevance") sortOptions = undefined;
+    return selector.items(ids, sortOptions);
   }
 
   async rebuild() {

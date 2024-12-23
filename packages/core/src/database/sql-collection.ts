@@ -402,7 +402,9 @@ export class FilteredSelector<T extends Item> {
     return (
       await this.filter
         .$if(!!sortOptions, (eb) =>
-          eb.$call(this.buildSortExpression(sortOptions!))
+          eb.$call(
+            this.buildSortExpression({ ...sortOptions!, groupBy: "none" })
+          )
         )
         .select("id")
         .execute()
@@ -414,7 +416,7 @@ export class FilteredSelector<T extends Item> {
     return (await this.filter
       .$if(!!ids && ids.length > 0, (eb) => eb.where("id", "in", ids!))
       .$if(!!sortOptions, (eb) =>
-        eb.$call(this.buildSortExpression(sortOptions!))
+        eb.$call(this.buildSortExpression({ ...sortOptions!, groupBy: "none" }))
       )
       .$if(this._fields.length === 0, (eb) => eb.selectAll())
       .$if(this._fields.length > 0, (eb) => eb.select(this._fields))
@@ -528,7 +530,9 @@ export class FilteredSelector<T extends Item> {
     if (options.groupBy === "abc") fields.push("title");
     else if (options.sortBy === "title" && options.groupBy !== "none")
       fields.push("dateCreated");
-    else if (options.sortBy !== "dueDate") fields.push(options.sortBy);
+    else if (options.sortBy !== "dueDate")
+      // && options.sortBy !== "relevance")
+      fields.push(options.sortBy);
 
     return Array.from(
       groupArray(
@@ -550,7 +554,7 @@ export class FilteredSelector<T extends Item> {
       () => this.ids(options),
       async (start, end) => {
         const items = (await this.filter
-          .$call(this.buildSortExpression(options))
+          .$call(this.buildSortExpression({ ...options, groupBy: "none" }))
           .offset(start)
           .limit(end - start)
           .selectAll()
@@ -596,18 +600,13 @@ export class FilteredSelector<T extends Item> {
     }
   }
 
-  private buildSortExpression(
-    options: GroupOptions | SortOptions,
-    hasDueDate?: boolean
-  ) {
+  private buildSortExpression(options: GroupOptions, hasDueDate?: boolean) {
     sanitizeSortOptions(this.type, options);
 
     const sortBy: Set<SortOptions["sortBy"]> = new Set();
-    if (isGroupOptions(options)) {
-      if (options.groupBy === "abc") sortBy.add("title");
-      else if (options.sortBy === "title" && options.groupBy !== "none")
-        sortBy.add("dateCreated");
-    }
+    if (options.groupBy === "abc") sortBy.add("title");
+    else if (options.sortBy === "title" && options.groupBy !== "none")
+      sortBy.add("dateCreated");
     sortBy.add(options.sortBy);
 
     return <T>(
@@ -644,7 +643,8 @@ export class FilteredSelector<T extends Item> {
                   (qb) => qb.parens(createUpcomingReminderTimeQuery()),
                   options.sortDirection
                 );
-            } else qb = qb.orderBy(item, options.sortDirection);
+            } // if (item !== "relevance")
+            else qb = qb.orderBy(item, options.sortDirection);
             continue;
           }
 
