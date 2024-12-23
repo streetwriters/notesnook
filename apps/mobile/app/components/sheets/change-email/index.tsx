@@ -134,8 +134,10 @@ export const ChangeEmail = ({ close }: ChangeEmailProps) => {
         ) : (
           <>
             <Input
+              key="code-input"
               fwdRef={codeInputRef}
-              placeholder={strings.verifyNewEmail()}
+              placeholder={strings.code()}
+              defaultValue=""
               onChangeText={(code) => {
                 emailChangeData.current.code = code;
               }}
