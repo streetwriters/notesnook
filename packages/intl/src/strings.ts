@@ -1701,11 +1701,12 @@ For example:
     ]().toLocaleLowerCase()} in case you lose access to your ${strings[
       primary
     ]().toLocaleLowerCase()}.`,
-  transactionStatusToText: {
-    completed: () => t`Completed`,
-    refunded: () => t`"Refunded`,
-    partially_refunded: () => t`Partially refunded`,
-    disputed: () => t`Disputed`
+  transactionStatusToText: (
+    key: keyof typeof TRANSACTION_STATUS | ({} & string)
+  ) => {
+    return key in TRANSACTION_STATUS
+      ? TRANSACTION_STATUS[key as keyof typeof TRANSACTION_STATUS]()
+      : key;
   },
   viewReceipt: () => t`View receipt`,
   customDictWords: (count: number) =>
