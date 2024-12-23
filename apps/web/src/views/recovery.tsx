@@ -310,7 +310,8 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
             sx={{
               color: method.isDangerous
                 ? "var(--paragraph-error)"
-                : "var(--paragraph-secondary)"
+                : "var(--paragraph-secondary)",
+              whiteSpace: "pre-wrap"
             }}
           >
             {method.description()}
