@@ -585,6 +585,7 @@ class UserManager {
     const fallbackCryptoKey = await this.db
       .storage()
       .generateCryptoKeyFallback(password, user.salt);
+    if (!fallbackCryptoKey) return false;
     const cryptoKey = await this.db
       .storage()
       .generateCryptoKey(password, user.salt);
