@@ -27,7 +27,8 @@ import {
   encryptMulti,
   generateCryptoKey,
   getCryptoKey,
-  hash
+  hash,
+  generateCryptoKeyFallback
 } from "./encryption";
 import { MMKV } from "./mmkv";
 
@@ -146,5 +147,6 @@ export const Storage: IStorage = {
   decryptMulti,
   deriveCryptoKey,
   generateCryptoKey,
+  generateCryptoKeyFallback,
   deriveCryptoKeyFallback
 };
