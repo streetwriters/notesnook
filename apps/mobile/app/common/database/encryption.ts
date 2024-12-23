@@ -339,7 +339,7 @@ export async function hash(
   DatabaseLogger.log(`Hashing password: fallback: ${options?.usesFallback}`);
 
   if (options?.usesFallback && Platform.OS !== "ios") {
-    return null;
+    return "";
   }
 
   return (
@@ -350,7 +350,17 @@ export async function hash(
 }
 
 export async function generateCryptoKey(password: string, salt?: string) {
-  return (await Sodium.deriveKey(password, salt)) as Promise<SerializedKey>;
+  return Sodium.deriveKey(password, salt) as Promise<SerializedKey>;
+}
+
+export async function generateCryptoKeyFallback(
+  password: string,
+  salt?: string
+): Promise<SerializedKey> {
+  return Sodium.deriveKeyFallback?.(
+    password,
+    salt as string
+  ) as Promise<SerializedKey>;
 }
 
 export function getAlgorithm(base64Variant: number) {
