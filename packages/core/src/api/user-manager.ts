@@ -540,6 +540,11 @@ class UserManager {
 
     if (data.encryptionKey) await this.db.sync({ type: "fetch", force: true });
 
+    if (old_password)
+      old_password = await this.db.storage().hash(old_password, email, {
+        usesFallback: await this.usesFallbackPWHash(old_password)
+      });
+
     await this.db.storage().deriveCryptoKey({
       password: new_password,
       salt
@@ -558,10 +563,6 @@ class UserManager {
       await this.updateUser({ attachmentsKey: user.attachmentsKey });
     }
 
-    if (old_password)
-      old_password = await this.db.storage().hash(old_password, email, {
-        usesFallback: await this.usesFallbackPWHash(old_password)
-      });
     if (new_password)
       new_password = await this.db.storage().hash(new_password, email);
 
