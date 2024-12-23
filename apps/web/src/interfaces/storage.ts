@@ -172,6 +172,17 @@ export class NNStorage implements IStorage {
       return key;
     }
   }
+
+  // noop
+  generateCryptoKeyFallback(
+    password: string,
+    salt?: string
+  ): Promise<SerializedKey> {
+    return this.generateCryptoKey(password, salt);
+  }
+
+  // noop
+  async deriveCryptoKeyFallback(): Promise<void> {}
 }
 
 const dec = new TextDecoder();
