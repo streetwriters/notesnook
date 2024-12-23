@@ -17,9 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User } from "@notesnook/core";
-import { EV, EVENTS, SYNC_CHECK_IDS, SyncStatusEvent } from "@notesnook/core";
-import { EventManagerSubscription } from "@notesnook/core";
+import {
+  EV,
+  EVENTS,
+  EventManagerSubscription,
+  SYNC_CHECK_IDS,
+  SyncStatusEvent,
+  User
+} from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
 import NetInfo, { NetInfoSubscription } from "@react-native-community/netinfo";
 import React, { useCallback, useEffect, useRef } from "react";
@@ -41,6 +47,7 @@ import * as RNIap from "react-native-iap";
 import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { initializeLogger } from "../common/database/logger";
 import { MMKV } from "../common/database/mmkv";
+import { endProgress, startProgress } from "../components/dialogs/progress";
 import Migrate from "../components/sheets/migrate";
 import NewFeature from "../components/sheets/new-feature";
 import { Walkthrough } from "../components/walkthroughs";
@@ -52,6 +59,7 @@ import {
 } from "../screens/editor/tiptap/utils";
 import { useDragState } from "../screens/settings/editor/state";
 import BackupService from "../services/backup";
+import BiometricService from "../services/biometrics";
 import {
   ToastManager,
   eSendEvent,
@@ -66,14 +74,17 @@ import {
   setRecoveryKeyMessage,
   setUpdateAvailableMessage
 } from "../services/message";
+import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
 import Sync from "../services/sync";
-import { initAfterSync } from "../stores";
+import { clearAllStores, initAfterSync } from "../stores";
+import { refreshAllStores } from "../stores/create-db-collection-store";
 import { useAttachmentStore } from "../stores/use-attachment-store";
 import { useMessageStore } from "../stores/use-message-store";
 import { useSettingStore } from "../stores/use-setting-store";
+import { changeSystemBarColors } from "../stores/use-theme-store";
 import { SyncStatus, useUserStore } from "../stores/use-user-store";
 import { updateStatusBarColor } from "../utils/colors";
 import { BETA } from "../utils/constants";
@@ -89,11 +100,8 @@ import {
 } from "../utils/events";
 import { getGithubVersion } from "../utils/github-version";
 import { tabBarRef } from "../utils/global-refs";
-import { sleep } from "../utils/time";
 import { NotesnookModule } from "../utils/notesnook-module";
-import { changeSystemBarColors } from "../stores/use-theme-store";
-import { strings } from "@notesnook/intl";
-import { endProgress, startProgress } from "../components/dialogs/progress";
+import { sleep } from "../utils/time";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
   const { disableSync, disableAutoSync } = SettingsService.get();
@@ -140,6 +148,7 @@ const onUploadedAttachmentProgress = (data: any) => {
 };
 
 const onUserSessionExpired = async () => {
+  console.log("LOGGED OUT USER....");
   SettingsService.set({
     sessionExpired: true
   });
@@ -208,11 +217,19 @@ const onRequestPartialSync = async (
 };
 
 const onLogout = async (reason: string) => {
-  DatabaseLogger.log("User Logged Out" + reason);
-  Notifications.setupReminders(true);
-  SettingsService.set({
-    introCompleted: true
+  DatabaseLogger.log("User Logged Out " + reason);
+  setLoginMessage();
+  await PremiumService.setPremiumStatus();
+  await BiometricService.resetCredentials();
+  MMKV.clearStore();
+  clearAllStores();
+  setImmediate(() => {
+    refreshAllStores();
   });
+  Navigation.queueRoutesForUpdate();
+  SettingsService.resetSettings();
+  useUserStore.getState().setUser(null);
+  useUserStore.getState().setSyncing(false);
 };
 
 async function checkForShareExtensionLaunchedInBackground() {

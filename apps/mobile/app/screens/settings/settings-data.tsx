@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { formatBytes } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
+import Clipboard from "@react-native-clipboard/clipboard";
 import dayjs from "dayjs";
 import React from "react";
 import { Appearance, Linking, Platform } from "react-native";
@@ -28,7 +29,6 @@ import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import ScreenGuardModule from "react-native-screenguard";
 import { DatabaseLogger, db } from "../../common/database";
-import { MMKV } from "../../common/database/mmkv";
 import filesystem from "../../common/filesystem";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
@@ -54,14 +54,11 @@ import {
   openVault,
   presentSheet
 } from "../../services/event-manager";
-import { setLoginMessage } from "../../services/message";
 import Navigation from "../../services/navigation";
 import Notifications from "../../services/notifications";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
-import { clearAllStores } from "../../stores";
-import { refreshAllStores } from "../../stores/create-db-collection-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
@@ -77,7 +74,6 @@ import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import Clipboard from "@react-native-clipboard/clipboard";
 import { User } from "@notesnook/core";
 
 export const settingsGroups: SettingSection[] = [
@@ -483,18 +479,6 @@ export const settingsGroups: SettingSection[] = [
                       });
 
                       await db.user?.logout();
-                      setLoginMessage();
-                      await PremiumService.setPremiumStatus();
-                      await BiometricService.resetCredentials();
-                      MMKV.clearStore();
-                      clearAllStores();
-                      setImmediate(() => {
-                        refreshAllStores();
-                      });
-                      Navigation.queueRoutesForUpdate();
-                      SettingsService.resetSettings();
-                      useUserStore.getState().setUser(null);
-                      useUserStore.getState().setSyncing(false);
                       endProgress();
                     } catch (e) {
                       DatabaseLogger.error(e);
