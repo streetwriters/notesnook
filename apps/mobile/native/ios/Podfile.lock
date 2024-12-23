@@ -1019,7 +1019,7 @@ PODS:
   - react-native-screenguard (1.0.0):
     - React-Core
     - SDWebImage (~> 5.11.1)
-  - react-native-share-extension (2.6.0):
+  - react-native-share-extension (2.7.0):
     - React
   - react-native-sodium (1.6.1):
     - React
@@ -1858,7 +1858,7 @@ SPEC CHECKSUMS:
   react-native-quick-sqlite: 18e1367c34faac90e37f6eb3e78c196e9b674b5d
   react-native-safe-area-context: b7daa1a8df36095a032dff095a1ea8963cb48371
   react-native-screenguard: 8b36a3df84c76cd2b82c477f71c26fa1c8cc14a0
-  react-native-share-extension: 25437eb1039f7409be6e80a7edf8d02b42e1dc99
+  react-native-share-extension: 17e42444d0d9fbfeb0a7392899def70f9534c9c4
   react-native-sodium: 4cb76086943a7f60c42b40ebca866695b360a196
   react-native-theme-switch-animation: d3eb50365a3829ce5572628888fa514752703f61
   react-native-webview: 553abd09f58e340fdc7746c9e2ae096839e99911

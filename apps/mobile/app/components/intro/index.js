@@ -128,7 +128,6 @@ const Intro = ({ navigation }) => {
         style={{
           width: deviceMode !== "mobile" ? width / 2 : "100%",
           backgroundColor: colors.secondary.background,
-          marginBottom: 20,
           borderBottomWidth: 1,
           borderBottomColor: colors.primary.border,
           alignSelf: deviceMode !== "mobile" ? "center" : undefined,
@@ -138,7 +137,7 @@ const Intro = ({ navigation }) => {
           marginTop: deviceMode !== "mobile" ? 50 : null,
           paddingTop: insets.top + 10,
           paddingBottom: insets.top + 10,
-          minHeight: height * 0.7
+          minHeight: height * 0.7 - (insets.top + insets.bottom)
         }}
       >
         <SwiperFlatList
