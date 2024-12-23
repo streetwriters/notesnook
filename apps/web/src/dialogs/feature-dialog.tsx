@@ -93,29 +93,14 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            title: "5x faster startup",
+            title: "Notesnook Gift Cards",
             subtitle:
-              "We have optimized the app startup time by 5x (3000ms to 600ms). This means you can now start taking notes faster than ever."
+              "You can now gift Notesnook Pro to your friends and family. Gift cards are available in 1, 3, and 5-year plans at https://notesnook.com/gift-cards."
           },
           {
-            title: "Improved ToC UX",
+            title: "Sorted search results",
             subtitle:
-              "We have made a bunch of improvements to the ToC (Table of Contents): it no longer covers the note content, and its open/closed state is preserved between app restarts."
-          },
-          {
-            title: "Faster checkout",
-            subtitle:
-              "Checkout is now 1-step. You can now directly enter your payment details and complete the purchase without any intermediate steps."
-          },
-          {
-            title: "Zoom in Editor",
-            subtitle:
-              "You can now zoom in/out of the editor using the Ctrl/Cmd + mouse wheel. This is separate from the default font size."
-          },
-          {
-            title: "Improved search",
-            subtitle:
-              "Search now defaults to AND mode instead of OR mode which better matches the expected behavior. You can still use OR if you prefer the old behavior."
+              "Search results are now sorted by date created by default."
           }
         ],
     cta: {
