@@ -230,6 +230,9 @@ export function TaskListComponent(
         ref={forwardRef}
         dir={textDirection}
         contentEditable={editor.isEditable && !readonly}
+        onPaste={(e) => {
+          if (readonly) e.preventDefault();
+        }}
         sx={{
           ul: {
             display: "block",
