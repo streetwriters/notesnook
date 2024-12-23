@@ -663,7 +663,7 @@ $headline$: Use starting line of the note as title.`,
   reloadEditor: () => t`Taking too long? Reload editor`,
   copy: () => t`Copy`,
   resendCode: (seconds?: number) =>
-    t`Resend code${seconds ? `in ${seconds}` : ""}`,
+    t`Resend code${seconds ? ` in ${seconds}` : ""}`,
   change2faMethod: () => t`Change 2FA method`,
   copyCodes: () => t`Copy codes`,
   saveToFile: () => t`Save to file`,
