@@ -190,7 +190,6 @@ class UserManager {
           salt: user.salt
         });
       }
-      await this.db.kv().write("usesFallbackPWHash", usesFallback);
       EV.publish(EVENTS.userLoggedIn, user);
     } catch (e) {
       await this.tokenManager.saveToken(token);
@@ -333,7 +332,7 @@ class UserManager {
       `${constants.API_HOST}${ENDPOINTS.deleteUser}`,
       {
         password: await this.db.storage().hash(password, user.email, {
-          usesFallback: await this.db.kv().read("usesFallbackPWHash")
+          usesFallback: await this.usesFallbackPWHash(password)
         })
       },
       token
@@ -485,17 +484,12 @@ class UserManager {
         type: "change_email",
         new_email: newEmail,
         password: await this.db.storage().hash(password, email, {
-          usesFallback: await this.db.kv().read("usesFallbackPWHash")
+          usesFallback: await this.usesFallbackPWHash(password)
         }),
         verification_code: code
       },
       token
     );
-
-    await this.db.storage().deriveCryptoKey({
-      password,
-      salt: user.salt
-    });
   }
 
   recoverAccount(email: string) {
@@ -566,7 +560,7 @@ class UserManager {
 
     if (old_password)
       old_password = await this.db.storage().hash(old_password, email, {
-        usesFallback: await this.db.kv().read("usesFallbackPWHash")
+        usesFallback: await this.usesFallbackPWHash(old_password)
       });
     if (new_password)
       new_password = await this.db.storage().hash(new_password, email);
@@ -580,9 +574,31 @@ class UserManager {
       },
       token
     );
-    await this.db.kv().write("usesFallbackPWHash", false);
 
     return true;
+  }
+
+  private async usesFallbackPWHash(password: string) {
+    const user = await this.getUser();
+    const encryptionKey = await this.getEncryptionKey();
+    if (!user || !encryptionKey) return false;
+    const fallbackCryptoKey = await this.db
+      .storage()
+      .generateCryptoKeyFallback(password, user.salt);
+    const cryptoKey = await this.db
+      .storage()
+      .generateCryptoKey(password, user.salt);
+
+    if (!encryptionKey.key || !fallbackCryptoKey.key || !cryptoKey.key)
+      throw new Error("Failed to generate crypto keys.");
+
+    if (
+      fallbackCryptoKey.key !== encryptionKey.key &&
+      cryptoKey.key !== encryptionKey.key
+    )
+      throw new Error("Wrong password.");
+
+    return fallbackCryptoKey.key === encryptionKey.key;
   }
 }
 

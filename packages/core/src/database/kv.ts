@@ -30,7 +30,6 @@ interface KV {
   deviceId: string;
   lastBackupTime: number;
   fullOfflineMode: boolean;
-  usesFallbackPWHash: boolean;
 }
 
 export const KEYS: (keyof KV)[] = [
@@ -41,8 +40,7 @@ export const KEYS: (keyof KV)[] = [
   "monographs",
   "deviceId",
   "lastBackupTime",
-  "fullOfflineMode",
-  "usesFallbackPWHash"
+  "fullOfflineMode"
 ];
 
 export class KVStorage {

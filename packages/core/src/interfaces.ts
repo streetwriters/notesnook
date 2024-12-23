@@ -66,6 +66,10 @@ export interface IStorage {
   getCryptoKey(): Promise<string | undefined>;
   generateCryptoKey(password: string, salt?: string): Promise<SerializedKey>;
 
+  generateCryptoKeyFallback(
+    password: string,
+    salt?: string
+  ): Promise<SerializedKey>;
   deriveCryptoKeyFallback(credentials: SerializedKey): Promise<void>;
 
   //   async generateRandomKey() {
