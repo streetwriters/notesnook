@@ -97,7 +97,7 @@ const _TabsHolder = () => {
         tabBarRef.current?.goToPage(1, false);
         return;
       }
-      if (item.type === "notesnook.action.newnote") {
+      if (item && item.type === "notesnook.action.newnote") {
         clearAppState();
         if (!tabBarRef.current) {
           await sleep(3000);
