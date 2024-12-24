@@ -5,11 +5,11 @@
 	<key>provisioningProfiles</key>
 	<dict>
 		<key>org.streetwriters.notesnook</key>
-		<string>Notesnook App Distribution 2024</string>
+		<string>Notesnook App Distribution 2025</string>
         <key>org.streetwriters.notesnook.notewidget</key>
-		<string>Notesnook Widget Distribution 2024</string>
+		<string>Notesnook Widget Distribution 2025</string>
         <key>org.streetwriters.notesnook.share</key>
-		<string>Notesnook Share Distribution 2024</string>
+		<string>Notesnook Share Distribution 2025</string>
 	</dict>
 </dict>
 </plist>
