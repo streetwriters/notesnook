@@ -55,9 +55,13 @@ You can purchase a gift card from [https://notesnook.com/giftcards](https://note
 
 Anyone who doesn't have a Notesnook Pro subscription can redeem a gift code and upgrade their account. One user can only redeem a single gift code at a time.
 
+### Can I use a gift card to extend my subscription?
+
+No.
+
 ### Is there an expiry date to a gift code?
 
-No. Each gift code is valid for an infinite amount of time until it is claimed by a user.
+Yes, these gift codes will expire after 1 year from the time of purchase.
 
 ### What can I do with a gift code?
 
