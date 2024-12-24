@@ -24,12 +24,12 @@ import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { subscribe, zip } from "react-native-zip-archive";
+import filesystem from ".";
 import { ShareComponent } from "../../components/sheets/export-notes/share";
 import { presentSheet, ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
-import filesystem from "../filesystem";
 import { createCacheDir, exists } from "./io";
 import { cacheDir, copyFileAsync, releasePermissions } from "./utils";
 

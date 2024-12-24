@@ -85,9 +85,13 @@ async function checkBackupDirExists(reset = false, context = "global") {
         resolve(await getDirectoryAndroid());
         return;
       }
+      const desc = strings.selectBackupDirDesc(
+        SettingsService.get().backupDirectoryAndroid?.path || ""
+      );
+
       presentDialog({
         title: strings.selectBackupDir(),
-        paragraph: strings.selectBackupDirDesc(),
+        paragraph: desc[0] + " " + desc,
         positivePress: async () => {
           resolve(await getDirectoryAndroid());
         },

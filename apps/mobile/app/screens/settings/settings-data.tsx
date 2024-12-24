@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { formatBytes } from "@notesnook/common";
+import { User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -74,7 +75,6 @@ import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import { User } from "@notesnook/core";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -1194,7 +1194,12 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "select-backup-dir",
             name: strings.selectBackupDir(),
-            description: strings.selectBackupDirDesc(),
+            description: () => {
+              const desc = strings.selectBackupDirDesc(
+                SettingsService.get().backupDirectoryAndroid?.path || ""
+              );
+              return desc[0] + " " + desc[1];
+            },
             icon: "folder",
             hidden: () =>
               !!SettingsService.get().backupDirectoryAndroid ||
