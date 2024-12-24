@@ -173,7 +173,7 @@ function Header(props: RouteContainerProps) {
           >
             <Menu
               sx={{
-                display: ["block", "none", "none"],
+                display: ["block", "block", "none"],
                 size: 23
               }}
               size={24}

@@ -120,167 +120,10 @@ function Notebook(props: NotebookProps) {
           }
         />
       </Pane>
-      <Pane id="subnotebooks-pane" initialSize={250} minSize={30}>
-        <SubNotebooks
-          isCollapsed={isCollapsed}
-          rootId={rootId}
-          onClick={() => {
-            if (isCollapsed) pane.current?.expand(1);
-            else pane.current?.collapse(1);
-          }}
-        />
-      </Pane>
     </SplitPane>
   );
 }
 export default Notebook;
-
-type SubNotebooksProps = {
-  rootId: string;
-  isCollapsed: boolean;
-  onClick: () => void;
-};
-function SubNotebooks({ rootId, isCollapsed, onClick }: SubNotebooksProps) {
-  // sometimes the onClick event is triggered on dragEnd
-  // which shouldn't happen. To prevent that we make sure
-  // that onMouseDown & onMouseUp events got called.
-  const mouseEventCounter = useRef(0);
-  const treeRef = useRef<VirtualizedTreeHandle<SubNotebookTreeItem>>(null);
-  const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
-  const isSelected = useSelectionStore((store) => store.isSelected);
-  const selectItem = useSelectionStore((store) => store.selectItem);
-  const deselectItem = useSelectionStore((store) => store.deselectItem);
-  const toggleSelection = useSelectionStore(
-    (store) => store.toggleSelectionMode
-  );
-  const rootNotebook = usePromise(
-    () => db.notebooks.notebook(rootId),
-    [rootId]
-  );
-  const notebooks = useNotebookStore((store) => store.notebooks);
-
-  useEffect(() => {
-    treeRef.current?.refresh();
-  }, [notebooks]);
-
-  if (!rootId) return null;
-
-  return (
-    <Flex
-      id="subnotebooks"
-      variant="columnFill"
-      sx={{
-        height: "100%",
-        borderTop: "1px solid var(--border)"
-      }}
-    >
-      <Flex
-        sx={{
-          m: 1,
-          ml: 1,
-          alignItems: "center",
-          justifyContent: "space-between",
-          cursor: "pointer"
-        }}
-        onMouseDown={() => {
-          mouseEventCounter.current = 1;
-        }}
-        onMouseUp={() => {
-          mouseEventCounter.current++;
-        }}
-        onClick={() => {
-          if (mouseEventCounter.current === 2) onClick();
-          mouseEventCounter.current = 0;
-        }}
-      >
-        <Flex sx={{ alignItems: "center" }}>
-          {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
-          <Text variant="subBody" sx={{ fontSize: 11 }}>
-            {rootNotebook.status === "fulfilled" && rootNotebook.value
-              ? rootNotebook.value.title
-              : ""}
-          </Text>
-        </Flex>
-        <Flex sx={{ alignItems: "center" }}>
-          {/* <Button
-            variant="secondary"
-            data-test-id="subnotebooks-sort-button"
-            sx={{
-              p: "small",
-              bg: "transparent",
-              visibility: isCollapsed ? "collapse" : "visible"
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              // showSortMenu("notebooks", () => refresh(selectedNotebook.id));
-            }}
-          >
-            <SortAsc size={15} />
-          </Button> */}
-          <Button
-            variant="secondary"
-            data-test-id="subnotebooks-action-button"
-            sx={{
-              p: "1px",
-              bg: "transparent",
-              visibility: isCollapsed ? "collapse" : "visible"
-            }}
-            onClick={async (e) => {
-              e.stopPropagation();
-              const context = useNotesStore.getState().context;
-              await AddNotebookDialog.show({
-                parentId: context?.type === "notebook" ? context.id : rootId
-              });
-            }}
-          >
-            <Plus size={20} />
-          </Button>
-        </Flex>
-      </Flex>
-
-      <VirtualizedTree
-        itemHeight={28}
-        getChildNodes={fetchChildren}
-        rootId={rootId}
-        deselectAll={() => toggleSelection(false)}
-        bulkSelect={setSelectedItems}
-        isSelected={isSelected}
-        onDeselect={deselectItem}
-        onSelect={selectItem}
-        treeRef={treeRef}
-        placeholder={() => (
-          <Text variant="subBody" sx={{ mx: 2 }}>
-            {strings.emptyPlaceholders("notebook")}
-          </Text>
-        )}
-        saveKey={`${rootId}-subnotebooks`}
-        testId="subnotebooks-list"
-        renderItem={({ collapse, expand, expanded, index, item: node }) => (
-          <SubNotebook
-            depth={node.depth}
-            isExpandable={node.hasChildren}
-            item={node.data.notebook}
-            isExpanded={expanded}
-            rootId={rootId}
-            totalNotes={node.data.totalNotes}
-            refresh={async () => {
-              const notebook = await db.notebooks.notebook(node.id);
-              const totalNotes = await db.relations
-                .from(node.data.notebook, "note")
-                .count();
-              treeRef.current?.refreshItem(
-                index,
-                notebook ? { notebook, totalNotes } : undefined
-              );
-            }}
-            collapse={collapse}
-            expand={expand}
-          />
-        )}
-      />
-    </Flex>
-  );
-}
 
 function NotebookHeader({
   rootId,
@@ -341,7 +184,6 @@ function NotebookHeader({
           ref={moreCrumbsRef}
           variant="icon"
           sx={{ p: 0, flexShrink: 0 }}
-          onClick={() => navigateCrumb("notebooks")}
           title={strings.notebooks()}
         >
           <Notebook2 size={14} />
