@@ -91,7 +91,6 @@ export const Reminders = ({
         />
 
         <FloatingButton
-          title={strings.setReminder()}
           onPress={() => {
             ReminderSheet.present();
           }}

@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { sanitizeFilename } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
+import { useThemeColors, VariantsWithStaticColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, {
   Dispatch,
@@ -26,11 +29,11 @@ import React, {
   useState
 } from "react";
 import { ActivityIndicator, Linking, Platform, View } from "react-native";
+import RNFetchBlob from "react-native-blob-util";
 import { FlatList } from "react-native-gesture-handler";
 import * as ScopedStorage from "react-native-scoped-storage";
-import RNFetchBlob from "react-native-blob-util";
 import { db } from "../../common/database";
-import Storage from "../../common/database/storage";
+import filesystem from "../../common/filesystem";
 import DialogHeader from "../../components/dialog/dialog-header";
 import { Button } from "../../components/ui/button";
 import { IconButton } from "../../components/ui/icon-button";
@@ -46,13 +49,10 @@ import {
   presentSheet,
   ToastManager
 } from "../../services/event-manager";
-import { useThemeColors, VariantsWithStaticColors } from "@notesnook/theme";
 import { useUserStore } from "../../stores/use-user-store";
 import { eCloseSheet } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import { sanitizeFilename } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",
@@ -525,7 +525,7 @@ export const MFARecoveryCodes = ({
                     if (!file) return;
                     path = file.uri;
                   } else {
-                    path = await Storage.checkAndCreateDir("/");
+                    path = await filesystem.checkAndCreateDir("/");
                     await RNFetchBlob.fs.writeFile(
                       path + fileName,
                       codeString,

@@ -23,7 +23,7 @@ import FingerprintScanner, {
 } from "@ammarahmed/react-native-fingerprint-scanner";
 import * as Keychain from "react-native-keychain";
 import { MMKV } from "../common/database/mmkv";
-import Storage from "../common/database/storage";
+import { Storage } from "../common/database/storage";
 import { useSettingStore } from "../stores/use-setting-store";
 import { ToastOptions, ToastManager } from "./event-manager";
 import { useUserStore } from "../stores/use-user-store";
