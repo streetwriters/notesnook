@@ -598,7 +598,8 @@ export const useAppEvents = () => {
       EV.subscribe(EVENTS.migrationStarted, (name) => {
         if (
           name !== "notesnook" ||
-          !SettingsService.getProperty("introCompleted")
+          !SettingsService.getProperty("introCompleted") ||
+          Config.isTesting === "true"
         )
           return;
         startProgress({
@@ -611,7 +612,8 @@ export const useAppEvents = () => {
       EV.subscribe(EVENTS.migrationFinished, (name) => {
         if (
           name !== "notesnook" ||
-          !SettingsService.getProperty("introCompleted")
+          !SettingsService.getProperty("introCompleted") ||
+          Config.isTesting === "true"
         )
           return;
         endProgress();
