@@ -32,7 +32,11 @@ import {
   findParentNodeClosestToPos,
   getExactChangedNodes
 } from "../../utils/prosemirror.js";
-import { countCheckedItems, findRootTaskList, toggleChildren } from "./utils.js";
+import {
+  countCheckedItems,
+  findRootTaskList,
+  toggleChildren
+} from "./utils.js";
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { TaskItemNode } from "../task-item/index.js";
 
@@ -49,7 +53,16 @@ export const TaskListNode = TaskList.extend({
     return {
       stats: {
         default: { checked: 0, total: 0 },
-        rendered: false
+        rendered: false,
+        parseHTML: (element) => {
+          // do not update stats for nested task lists
+          if (!!element.closest("ul")) return { checked: 0, total: 0 };
+          const total = element.querySelectorAll("li.checklist--item").length;
+          const checked = element.querySelectorAll(
+            "li.checklist--item.checked"
+          ).length;
+          return { checked, total };
+        }
       },
       title: {
         default: null,
@@ -222,26 +235,6 @@ export const TaskListNode = TaskList.extend({
       //    the task list.
       new Plugin({
         key: new PluginKey("task-list-state-management"),
-        view(view) {
-          const { tr } = view.state;
-          tr.doc.descendants((node, pos) => {
-            if (node.type.name === TaskList.name) {
-              tr.setNodeMarkup(pos, undefined, {
-                ...node.attrs,
-                stats: countCheckedItems(node)
-              });
-              return false;
-            }
-          });
-          tr.setMeta("preventUpdate", true);
-          tr.setMeta("addToHistory", false);
-          try {
-            view.dispatch(tr);
-          } catch (e) {
-            // ignore
-          }
-          return {};
-        },
         appendTransaction(transactions, oldState, newState) {
           if (!transactions[0].docChanged) return;
 
