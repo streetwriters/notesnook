@@ -25,6 +25,10 @@ You can purchase a gift card from [https://notesnook.com/giftcards](https://note
 
 ## Redeem a gift code
 
+> info
+>
+> You won't be able to redeem a gift code if you already have a Notesnook subscription (even if its cancelled).
+
 # [Desktop/Web](#/tab/web)
 
 1. Go to `Settings`
