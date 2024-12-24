@@ -74,7 +74,7 @@ class AppStore extends BaseStore<AppStore> {
     progress: null,
     type: undefined
   };
-  colors: Color[] = [];
+  colors: (Color & { count: number })[] = [];
   notices: Notice[] = [];
   shortcuts: (Notebook | Tag)[] = [];
   lastSynced = 0;
@@ -166,9 +166,16 @@ class AppStore extends BaseStore<AppStore> {
   refreshNavItems = async () => {
     const shortcuts = await db.shortcuts.resolved();
     const colors = await db.colors.all.items();
+
+    let newColors: (Color & { count: number })[] = [];
+    for (const color of colors) {
+      const count = await db.colors.count(color.id);
+      newColors.push({ ...color, count: count ?? 0 });
+    }
+
     this.set((state) => {
       state.shortcuts = shortcuts;
-      state.colors = colors;
+      state.colors = newColors;
     });
   };
 
