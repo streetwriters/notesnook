@@ -77,10 +77,6 @@ const routes = defineRoutes({
       // ),
       buttons: {
         create: CREATE_BUTTON_MAP.notes,
-        back: {
-          title: strings.goBackToNotebooks(),
-          onClick: () => navigate("/notebooks")
-        },
         search: {
           title: strings.searchANote()
         }
@@ -153,6 +149,9 @@ const routes = defineRoutes({
       title: strings.routes.Tags(),
       type: "tags",
       component: Tags,
+      props: {
+        location: "middle-pane"
+      },
       buttons: {
         create: CREATE_BUTTON_MAP.tags,
         search: {
@@ -178,10 +177,6 @@ const routes = defineRoutes({
       component: Notes,
       buttons: {
         create: CREATE_BUTTON_MAP.notes,
-        back: {
-          title: strings.goBackToTags(),
-          onClick: () => navigate("/tags")
-        },
         search: {
           title: strings.searchANote()
         }
