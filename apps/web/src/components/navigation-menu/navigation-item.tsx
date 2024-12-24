@@ -32,7 +32,7 @@ type NavigationItemProps = {
   icon?: Icon;
   image?: string;
   color?: SchemeColors;
-  title: string;
+  title?: string;
   isTablet?: boolean;
   isLoading?: boolean;
   isShortcut?: boolean;
@@ -41,6 +41,7 @@ type NavigationItemProps = {
   onClick?: () => void;
   count?: number;
   menuItems?: MenuItem[];
+  showTitle?: boolean;
 };
 
 function NavigationItem(
@@ -64,6 +65,7 @@ function NavigationItem(
     count,
     sx,
     containerRef,
+    showTitle = true,
     ...restProps
   } = props;
   const isMobile = useMobile();
@@ -130,7 +132,7 @@ function NavigationItem(
           />
         ) : Icon ? (
           <Icon
-            size={isTablet ? 16 : 15}
+            size={isTablet ? 16 : 20}
             color={color || (selected ? "icon-selected" : "icon")}
             rotate={isLoading}
           />
@@ -144,22 +146,22 @@ function NavigationItem(
           />
         )}
 
-        <Text
-          variant="body"
-          sx={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            fontWeight: selected ? "bold" : "normal",
-            color: selected ? "paragraph-selected" : "paragraph",
-            fontSize: "subtitle",
-            display: isTablet ? "none" : "block"
-          }}
-          ml={1}
-          data-test-id="title"
-        >
-          {title}
-          {/* {tag && (
+        {showTitle && (
+          <Text
+            variant="body"
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontWeight: selected ? "bold" : "normal",
+              color: selected ? "paragraph-selected" : "paragraph",
+              display: isTablet ? "none" : "block"
+            }}
+            ml={1}
+            data-test-id="title"
+          >
+            {title}
+            {/* {tag && (
             <Text
               variant="subBody"
               as="span"
@@ -174,7 +176,8 @@ function NavigationItem(
               {tag}
             </Text>
           )} */}
-        </Text>
+          </Text>
+        )}
       </Button>
       {children ? (
         children
