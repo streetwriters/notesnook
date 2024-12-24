@@ -32,7 +32,11 @@ import { EditProfilePictureDialog } from "../../edit-profile-picture-dialog";
 import { PromptDialog } from "../../prompt";
 import { strings } from "@notesnook/intl";
 
-export function UserProfile() {
+type Props = {
+  minimal?: boolean;
+};
+
+export function UserProfile({ minimal }: Props) {
   const user = useUserStore((store) => store.user);
   const profile = useSettingStore((store) => store.profile);
 
@@ -67,7 +71,7 @@ export function UserProfile() {
           alignItems: "center",
           bg: "var(--background-secondary)",
           p: 2,
-          mb: 4
+          mb: minimal ? 0 : 4
         }}
       >
         <Flex
@@ -96,7 +100,7 @@ export function UserProfile() {
         justifyContent: "space-between",
         bg: "var(--background-secondary)",
         p: 2,
-        mb: 4
+        mb: minimal ? 0 : 4
       }}
     >
       <Flex sx={{ alignItems: "center" }}>
@@ -110,7 +114,7 @@ export function UserProfile() {
             overflow: "hidden",
             position: "relative",
             ":hover #profile-picture-edit": {
-              visibility: "visible"
+              visibility: minimal ? "hidden" : "visible"
             }
           }}
         >
@@ -165,35 +169,43 @@ export function UserProfile() {
 
           <Text variant={"title"}>
             {profile?.fullName || strings.yourFullName()}{" "}
-            <Edit
-              sx={{ display: "inline-block", cursor: "pointer" }}
-              size={12}
-              title={strings.editFullName()}
-              onClick={async () => {
-                const fullName = await PromptDialog.show({
-                  title: strings.editFullName(),
-                  description: strings.setFullNameDesc(),
-                  defaultValue: profile?.fullName
-                });
-
-                if (fullName === profile?.fullName) return;
-
-                try {
-                  await db.settings.setProfile({
-                    fullName: fullName || undefined
+            {minimal ? null : (
+              <Edit
+                sx={{ display: "inline-block", cursor: "pointer" }}
+                size={12}
+                title={strings.editFullName()}
+                onClick={async () => {
+                  const fullName = await PromptDialog.show({
+                    title: strings.editFullName(),
+                    description: strings.setFullNameDesc(),
+                    defaultValue: profile?.fullName
                   });
-                  await useSettingStore.getState().refresh();
-                  showToast("success", strings.fullNameUpdated());
-                } catch (e) {
-                  showToast("error", (e as Error).message);
-                }
-              }}
-            />
+
+                  if (fullName === profile?.fullName) return;
+
+                  try {
+                    await db.settings.setProfile({
+                      fullName: fullName || undefined
+                    });
+                    await useSettingStore.getState().refresh();
+                    showToast("success", strings.fullNameUpdated());
+                  } catch (e) {
+                    showToast("error", (e as Error).message);
+                  }
+                }}
+              />
+            )}
           </Text>
           <Text variant={"subBody"}>
-            {user.email} •{" "}
-            {strings.memberSince(
-              getFormattedDate(getObjectIdTimestamp(user.id), "date")
+            {user.email}
+            {minimal ? null : (
+              <>
+                {" "}
+                •{" "}
+                {strings.memberSince(
+                  getFormattedDate(getObjectIdTimestamp(user.id), "date")
+                )}
+              </>
             )}
           </Text>
         </Flex>
