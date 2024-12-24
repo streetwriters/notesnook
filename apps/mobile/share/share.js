@@ -43,7 +43,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import isURL from "validator/lib/isURL";
 import { DatabaseLogger, db } from "../app/common/database";
-import Storage from "../app/common/database/storage";
+import { Storage } from "../app/common/database/storage";
 import { Button } from "../app/components/ui/button";
 import Heading from "../app/components/ui/typography/heading";
 import Paragraph from "../app/components/ui/typography/paragraph";
@@ -620,41 +620,45 @@ const ShareView = () => {
                     >
                       Tap to remove an attachment.
                     </Paragraph>
-                    <TouchableOpacity
-                      activeOpacity={1}
-                      style={{
-                        flexDirection: "row",
-                        alignSelf: "center",
-                        alignItems: "center",
-                        width: "100%",
-                        marginTop: 6
-                      }}
-                      onPress={() => {
-                        setCompress(!compress);
-                      }}
-                    >
-                      <Icon
-                        size={20}
-                        name={
-                          compress
-                            ? "checkbox-marked"
-                            : "checkbox-blank-outline"
-                        }
-                        color={
-                          compress ? colors.primary.accent : colors.primary.icon
-                        }
-                      />
-
-                      <Text
+                    {rawFiles.some((item) => isImage(item.type)) ? (
+                      <TouchableOpacity
+                        activeOpacity={1}
                         style={{
-                          flexShrink: 1,
-                          marginLeft: 3,
-                          fontSize: 12
+                          flexDirection: "row",
+                          alignSelf: "center",
+                          alignItems: "center",
+                          width: "100%",
+                          marginTop: 6
+                        }}
+                        onPress={() => {
+                          setCompress(!compress);
                         }}
                       >
-                        Compress image (recommended)
-                      </Text>
-                    </TouchableOpacity>
+                        <Icon
+                          size={20}
+                          name={
+                            compress
+                              ? "checkbox-marked"
+                              : "checkbox-blank-outline"
+                          }
+                          color={
+                            compress
+                              ? colors.primary.accent
+                              : colors.primary.icon
+                          }
+                        />
+
+                        <Text
+                          style={{
+                            flexShrink: 1,
+                            marginLeft: 3,
+                            fontSize: 12
+                          }}
+                        >
+                          Compress image(s) (recommended)
+                        </Text>
+                      </TouchableOpacity>
+                    ) : null}
                   </View>
                 ) : null}
                 <View
