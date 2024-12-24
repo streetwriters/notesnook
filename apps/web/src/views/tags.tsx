@@ -24,8 +24,14 @@ import Placeholder from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { ListLoader } from "../components/loaders/list-loader";
+import { useEffect } from "react";
+import { navigate } from "../navigation";
 
-function Tags() {
+type Props = {
+  location: "middle-pane" | "sidebar";
+};
+
+function Tags({ location }: Props) {
   useNavigate("tags", () => store.refresh());
   const tags = useStore((store) => store.tags);
   const refresh = useStore((store) => store.refresh);
@@ -33,10 +39,18 @@ function Tags() {
     db.lookup.tags(query).sorted()
   );
 
+  useEffect(() => {
+    if (location === "sidebar") return;
+    tags?.item(0).then((item) => {
+      if (item && item?.item) {
+        navigate(`/tags/${item.item.id}`);
+      }
+    });
+  }, [tags, location]);
+
   if (!tags) return <ListLoader />;
   return (
     <ListContainer
-      group="tags"
       refresh={refresh}
       items={filteredItems || tags}
       placeholder={<Placeholder context="tags" />}

@@ -17,42 +17,41 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
-import { hashNavigate } from "../navigation";
+import { navigate } from "../navigation";
 import Placeholder from "../components/placeholders";
 import { useEffect } from "react";
-import { db } from "../common/db";
-import { useSearch } from "../hooks/use-search";
 import { ListLoader } from "../components/loaders/list-loader";
+import { Flex } from "@theme-ui/components";
 
 function Notebooks() {
   const notebooks = useStore((state) => state.notebooks);
-  const refresh = useStore((state) => state.refresh);
-  const filteredItems = useSearch("notebooks", (query) =>
-    db.lookup.notebooks(query).sorted()
-  );
-  const isCompact = useStore((store) => store.viewMode === "compact");
 
   useEffect(() => {
     store.get().refresh();
-  }, []);
+
+    if (notebooks && notebooks.length > 0) {
+      notebooks.item(0).then((item) => {
+        if (item && item?.item) {
+          navigate(`/notebooks/${item.item.id}`);
+        }
+      });
+    }
+  }, [notebooks]);
 
   if (!notebooks) return <ListLoader />;
-  return (
-    <>
-      <ListContainer
-        group="notebooks"
-        refresh={refresh}
-        items={filteredItems || notebooks}
-        placeholder={<Placeholder context="notebooks" />}
-        compact={isCompact}
-        button={{
-          onClick: () => hashNavigate("/notebooks/create")
-        }}
-      />
-    </>
-  );
+
+  if (notebooks.length === 0) {
+    return (
+      <Flex variant="columnFill" sx={{ overflow: "hidden" }}>
+        <Flex variant="columnCenterFill">
+          <Placeholder context="notebooks" />
+        </Flex>
+      </Flex>
+    );
+  }
+
+  return null;
 }
 
 export default Notebooks;

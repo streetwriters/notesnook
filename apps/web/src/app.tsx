@@ -151,6 +151,11 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
   const isTablet = useTablet();
   const [isNarrow, setIsNarrow] = useState(isTablet || false);
   const navPane = useRef<SplitPaneImperativeHandle>(null);
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+
+  useEffect(() => {
+    AppEventManager.subscribe(AppEvents.toggleSideMenu, setIsSideMenuOpen);
+  });
 
   useEffect(() => {
     if (isTablet) navPane.current?.collapse(0);
@@ -165,6 +170,40 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
           overflow: "hidden"
         }}
       >
+        {isTablet && (
+          <Flex
+            sx={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              zIndex: 1000,
+              width: isSideMenuOpen ? "100%" : 0,
+              height: "100%",
+              background: "transparent",
+              transition: "0.15s width ease-out"
+            }}
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                top: 0,
+                left: 0,
+                background: "rgba(0,0,0,0.5)"
+              }}
+              onClick={() => {
+                AppEventManager.publish(AppEvents.toggleSideMenu);
+              }}
+            />
+            <Flex sx={{ width: 300 }}>
+              <NavigationMenu
+                toggleNavigationContainer={() => {}}
+                isTablet={false}
+              />
+            </Flex>
+          </Flex>
+        )}
         <SplitPane
           className="global-split-pane"
           ref={navPane}
@@ -177,17 +216,17 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
           {isFocusMode ? null : (
             <Pane
               id="nav-pane"
-              initialSize={180}
+              initialSize={isTablet ? 0 : 250}
               className={`nav-pane`}
-              minSize={50}
-              snapSize={120}
-              maxSize={300}
+              minSize={isTablet ? 0 : 200}
+              // snapSize={200}
+              maxSize={isTablet ? 0 : 300}
             >
               <NavigationMenu
                 toggleNavigationContainer={(state) => {
                   setShow(state || !show);
                 }}
-                isTablet={isNarrow}
+                isTablet={false}
               />
             </Pane>
           )}
