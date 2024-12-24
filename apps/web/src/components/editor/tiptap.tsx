@@ -55,7 +55,7 @@ import { debounce } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { writeToClipboard } from "../../utils/clipboard";
-import { SaveState, useEditorStore } from "../../stores/editor-store";
+import { useEditorStore } from "../../stores/editor-store";
 import { parseInternalLink } from "@notesnook/core";
 import Skeleton from "react-loading-skeleton";
 import useMobile from "../../hooks/use-mobile";
@@ -63,7 +63,7 @@ import useTablet from "../../hooks/use-tablet";
 import { TimeFormat } from "@notesnook/core";
 import { BuyDialog } from "../../dialogs/buy-dialog";
 import { EDITOR_ZOOM } from "./common";
-import { showToast } from "../../utils/toast";
+import { ScrollContainer } from "@notesnook/ui";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -139,8 +139,6 @@ function TipTap(props: TipTapProps) {
     editorContainer,
     readonly,
     nonce,
-    isMobile,
-    isTablet,
     downloadOptions,
     fontSize,
     fontFamily,
@@ -151,7 +149,6 @@ function TipTap(props: TipTapProps) {
   } = props;
 
   const isUserPremium = useIsUserPremium();
-  const setEditorSaveState = useEditorStore((store) => store.setSaveState);
   const autoSave = useRef(true);
   const { toolbarConfig } = useToolbarConfig();
 
@@ -373,18 +370,36 @@ function TipTap(props: TipTapProps) {
           zIndex: 2
         }}
       >
-        <Toolbar
-          editor={editor}
-          location={"top"}
-          sx={
-            isTablet || isMobile
-              ? { overflowX: "scroll", flexWrap: "nowrap" }
-              : {}
-          }
-          tools={toolbarConfig}
-          defaultFontFamily={fontFamily}
-          defaultFontSize={fontSize}
-        />
+        <ScrollContainer
+          className="toolbarScroll"
+          suppressScrollY
+          style={{ display: "flex" }}
+          trackStyle={() => ({
+            backgroundColor: "transparent",
+            "--ms-track-size": "6px"
+          })}
+          thumbStyle={() => ({ height: 3 })}
+          onWheel={(e) => {
+            const scrollcontainer = document.querySelector(
+              ".active .toolbarScroll"
+            );
+            if (!scrollcontainer) return;
+            if (e.deltaY > 0) scrollcontainer.scrollLeft += 100;
+            else if (e.deltaY < 0) scrollcontainer.scrollLeft -= 100;
+          }}
+        >
+          <Toolbar
+            editor={editor}
+            location={"top"}
+            sx={{
+              flexWrap: "unset",
+              overflowX: "unset"
+            }}
+            tools={toolbarConfig}
+            defaultFontFamily={fontFamily}
+            defaultFontSize={fontSize}
+          />
+        </ScrollContainer>
       </ScopedThemeProvider>
     </>
   );

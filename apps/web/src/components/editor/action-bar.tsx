@@ -262,7 +262,7 @@ function TabStrip() {
       style={{ flex: 1 }}
       trackStyle={() => ({
         backgroundColor: "transparent",
-        pointerEvents: "none"
+        "--ms-track-size": "6px"
       })}
       thumbStyle={() => ({ height: 3 })}
       onWheel={(e) => {
