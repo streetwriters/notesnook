@@ -6,6 +6,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #: src/strings.ts:817
 msgid "— not just the"
@@ -3179,8 +3185,8 @@ msgid "Learn more about Notesnook Monograph"
 msgstr "Learn more about Notesnook Monograph"
 
 #: src/strings.ts:1537
-msgid "legal"
-msgstr "legal"
+msgid "Legal"
+msgstr "Legal"
 
 #: src/strings.ts:468
 msgid "Let us know if you have faced any issue/bug while using Notesnook. We will try to fix it as soon as possible."
@@ -3827,12 +3833,12 @@ msgstr "Notebook"
 msgid "notebooks"
 msgstr "notebooks"
 
+#: src/strings.ts:258
 #: src/strings.ts:316
 #: src/strings.ts:1495
 msgid "Notebooks"
 msgstr "Notebooks"
 
-#: src/strings.ts:258
 #: src/strings.ts:1769
 msgid "NOTEBOOKS"
 msgstr "NOTEBOOKS"
