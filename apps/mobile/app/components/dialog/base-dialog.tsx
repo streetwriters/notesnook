@@ -38,7 +38,7 @@ import { useAppState } from "../../hooks/use-app-state";
 
 export interface BaseDialogProps extends PropsWithChildren {
   animation?: "fade" | "none" | "slide" | undefined;
-  visible: boolean;
+  visible?: boolean;
   onRequestClose?: () => void;
   onShow?: () => void;
   premium?: boolean;

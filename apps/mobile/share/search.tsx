@@ -496,6 +496,7 @@ export const Search = ({
               const tagId = await db.tags.add({
                 title: searchKeyword
               });
+              if (!tagId) return;
               SearchSetters.selectTags(tagId);
               onSearch();
               checkQueryExists(searchKeyword);

@@ -47,7 +47,8 @@ export default {
   deleteCacheFileByPath,
   getCacheSize,
   requestPermission,
-  checkAndCreateDir
+  checkAndCreateDir,
+  getUploadedFileSize
 };
 
 export const FileStorage: IFileStorage = {

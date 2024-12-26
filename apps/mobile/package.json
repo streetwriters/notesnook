@@ -24,6 +24,7 @@
     "release-android-bundle": "cd native/android && ./gradlew bundleRelease --no-daemon"
   },
   "devDependencies": {
+    "@types/react": "^18.2.39",
     "fonteditor-core": "^2.1.11",
     "listr": "^0.14.3",
     "otplib": "12.0.1",
@@ -37,19 +38,20 @@
   "dependencies": {
     "@notesnook/common": "file:../../packages/common",
     "@notesnook/core": "file:../../packages/core",
+    "@notesnook/crypto": "file:../../packages/crypto",
     "@notesnook/editor": "file:../../packages/editor",
     "@notesnook/editor-mobile": "file:../../packages/editor-mobile",
     "@notesnook/intl": "file:../../packages/intl",
     "@notesnook/logger": "file:../../packages/logger",
     "@notesnook/theme": "file:../../packages/theme",
     "@notesnook/themes-server": "file:../../servers/themes",
-    "@notesnook/crypto": "file:../../packages/crypto",
-    "diffblazer": "^1.0.1",
-    "react": "18.2.0",
-    "react-native": "0.74.5",
+    "@tanstack/react-query": "^4.36.1",
     "@trpc/client": "^10.45.2",
     "@trpc/react-query": "^10.45.2",
     "@trpc/server": "^10.45.2",
-    "@tanstack/react-query": "^4.36.1"
+    "@types/validator": "^13.12.2",
+    "diffblazer": "^1.0.1",
+    "react": "18.2.0",
+    "react-native": "0.74.5"
   }
 }

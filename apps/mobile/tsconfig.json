@@ -20,5 +20,5 @@
     "maxNodeModuleJsDepth": 5,
     "downlevelIteration": true
   },
-  "exclude": ["native"]
+  "exclude": ["native", "e2e"]
 }

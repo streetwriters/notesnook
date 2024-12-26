@@ -88,7 +88,6 @@
     "@tsconfig/react-native": "^3.0.2",
     "@types/html-to-text": "^8.0.1",
     "@types/metro-config": "^0.76.3",
-    "@types/react": "^18.2.6",
     "@types/react-native": "^0.69.1",
     "@types/react-native-vector-icons": "^6.4.10",
     "@types/react-test-renderer": "^18.0.0",
