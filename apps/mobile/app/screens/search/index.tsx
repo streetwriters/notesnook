@@ -59,15 +59,38 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
       }
       try {
         setLoading(true);
-        const type =
-          route.params.type === "trash"
-            ? "trash"
-            : ((route.params?.type + "s") as keyof typeof db.lookup);
-        console.log(`Searching in ${type} for ${query}`);
-        const results = await db.lookup[type](
-          query,
-          route.params.items as FilteredSelector<Note>
-        ).sorted();
+        let results: VirtualizedGrouping<Item> | undefined;
+
+        switch (route.params.type) {
+          case "note":
+            results = await db.lookup
+              .notes(query, route.params.items as FilteredSelector<Note>)
+              .sorted();
+            break;
+          case "notebook":
+            results = await db.lookup.notebooks(query).sorted();
+            break;
+          case "tag":
+            results = await db.lookup.tags(query).sorted();
+            break;
+          case "reminder":
+            results = await db.lookup.reminders(query).sorted();
+            break;
+          case "trash":
+            results = await db.lookup.trash(query).sorted();
+            break;
+          case "attachment":
+            results = await db.lookup.attachments(query).sorted();
+            break;
+          default:
+            results = undefined;
+        }
+
+        if (!results) {
+          setSearchStatus(strings.noResultsFound(query));
+          setLoading(false);
+          return;
+        }
 
         console.log(
           `Found ${results.placeholders?.length} results for ${query}`

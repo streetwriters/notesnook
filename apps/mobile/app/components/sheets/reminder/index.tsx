@@ -556,9 +556,9 @@ export default function ReminderSheet({
             {Object.keys(ReminderNotificationModes).map((mode) => (
               <Button
                 key={mode}
-                title={strings.reminderNotificationModes[
+                title={strings.reminderNotificationModes(
                   mode as keyof typeof ReminderNotificationModes
-                ]()}
+                )}
                 style={{
                   marginRight: 12,
                   borderRadius: 100

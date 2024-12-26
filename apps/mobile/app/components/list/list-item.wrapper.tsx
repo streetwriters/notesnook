@@ -297,7 +297,6 @@ function getDate(item: Item, groupType?: GroupingKey): number {
       groupType
         ? db.settings.getGroupOptions(groupType)
         : {
-            groupBy: "default",
             sortBy: "dateEdited",
             sortDirection: "desc"
           },

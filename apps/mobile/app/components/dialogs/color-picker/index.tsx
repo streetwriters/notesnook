@@ -179,6 +179,7 @@ const ColorPicker = ({
                   title: title.current,
                   colorCode: selectedColor
                 });
+                if (!id) return;
                 useRelationStore.getState().update();
                 useMenuStore.getState().setColorNotes();
                 setVisible(false);

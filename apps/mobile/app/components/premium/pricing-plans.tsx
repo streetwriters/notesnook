@@ -129,7 +129,10 @@ export const PricingPlans = ({
       if (code.startsWith("com.streetwriters.notesnook")) {
         skuId = code;
       } else {
-        skuId = await db.offers?.getCode(code.split(":")[0], Platform.OS);
+        skuId = await db.offers?.getCode(
+          code.split(":")[0],
+          Platform.OS as "ios" | "android"
+        );
       }
 
       const products = await PremiumService.getProducts();

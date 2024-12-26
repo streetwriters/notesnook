@@ -18,15 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { View } from "react-native";
+import { DimensionValue, View } from "react-native";
 import { SvgXml } from "./lazy";
 export const SvgView = ({
   width = 250,
   height = 250,
   src
 }: {
-  width?: number | string;
-  height?: number | number;
+  width?: DimensionValue;
+  height?: DimensionValue;
   src?: string;
 }) => {
   if (!src) return null;

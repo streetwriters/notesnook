@@ -150,7 +150,7 @@ const PublishNoteSheet = ({
         </View>
       ) : (
         <>
-          {isPublished && (
+          {isPublished && publishUrl ? (
             <View
               style={{
                 flexDirection: "row",
@@ -204,7 +204,7 @@ const PublishNoteSheet = ({
                 name="content-copy"
               />
             </View>
-          )}
+          ) : null}
 
           <TouchableOpacity
             onPress={() => {
