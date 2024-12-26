@@ -497,7 +497,7 @@ export const useAppEvents = () => {
         }
 
         if (fullBackup) {
-          await BackupService.run(true, undefined, "full");
+          await BackupService.run(false, undefined, "full");
         }
       }
 
