@@ -255,7 +255,7 @@ export const strings = {
     t`or email us at`
   ],
   migrationFailed: () => t`Migration failed`,
-  notebooks: () => t`NOTEBOOKS`,
+  notebooks: () => t`Notebooks`,
   syncingHeading: () => t`Syncing your data`,
   syncingDesc: () => t`Please wait while we sync all your data.`,
   downloadingAttachments: () => t`Downloading attachments`,
@@ -1534,7 +1534,7 @@ For example:
   dateError: () => t`Reminder time cannot be earlier than the current time.`,
   failedToDecryptBackup: () => t`Failed to decrypt backup`,
   backupDirectoryNotSelected: () => t`Backup directory not selected`,
-  legal: () => t`legal`,
+  legal: () => t`Legal`,
   days: (days: number) =>
     plural(days, {
       one: `1 day`,
