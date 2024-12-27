@@ -70,7 +70,7 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/note_widget_info" />
+                android:resource="@xml/new_note_widget_info" />
         </receiver>
 
         <activity
