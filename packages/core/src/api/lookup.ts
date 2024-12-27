@@ -65,7 +65,7 @@ export default class Lookup {
               eb
                 .selectFrom("content_fts")
                 .$if(!!notes, (eb) =>
-                  eb.where("id", "in", notes!.filter.select("id"))
+                  eb.where("noteId", "in", notes!.filter.select("id"))
                 )
                 .$if(excludedIds.length > 0, (eb) =>
                   eb.where("id", "not in", excludedIds)
