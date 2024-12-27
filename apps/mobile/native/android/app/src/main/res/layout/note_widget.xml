@@ -6,7 +6,6 @@
     android:padding="@dimen/widget_margin"
     android:theme="@style/ThemeOverlay.Notesnook.AppWidgetContainer">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/widget_button"
@@ -18,21 +17,21 @@
         android:elevation="5dp"
         android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerVertical="true">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/add_note"
+            android:contentDescription="New note icon" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="8dp"
-                android:textSize="16sp"
-                android:text="Take a quick note." />
-        </LinearLayout>
-
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
+            android:textColor="@color/text"
+            android:textSize="16sp"
+            android:text="@string/take_a_quick_note" />
     </LinearLayout>
 
 </RelativeLayout>
