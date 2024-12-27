@@ -99,8 +99,8 @@ test("delete note", () =>
     await db.notes.moveToTrash(id);
 
     expect(await db.notes.note(id)).toBeUndefined();
-    expect(await db.notebooks.totalNotes(notebookId)).toBe(0);
-    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(0);
+    expect(await db.notebooks.totalNotes(notebookId)).toStrictEqual([0]);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toStrictEqual([0]);
   }));
 
 test("get all notes", () =>
@@ -323,8 +323,8 @@ test("add note to subnotebook", () =>
         .from({ type: "notebook", id: notebookId }, "notebook")
         .count()
     ).toBe(1);
-    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(1);
-    expect(await db.notebooks.totalNotes(notebookId)).toBe(1);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toStrictEqual([1]);
+    expect(await db.notebooks.totalNotes(notebookId)).toStrictEqual([1]);
   }));
 
 test("duplicate note to topic should not be added", () =>
@@ -333,7 +333,7 @@ test("duplicate note to topic should not be added", () =>
       notebookTitle: "Hello",
       subNotebookTitle: "Home"
     });
-    expect(await db.notebooks.totalNotes(subNotebookId)).toBe(1);
+    expect(await db.notebooks.totalNotes(subNotebookId)).toStrictEqual([1]);
   }));
 
 test("add the same note to 2 notebooks", () =>
