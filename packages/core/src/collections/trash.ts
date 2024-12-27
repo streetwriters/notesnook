@@ -34,6 +34,7 @@ import {
   checkIsUserPremium,
   FREE_NOTEBOOKS_LIMIT
 } from "../common.js";
+import { withSubNotebooks } from "./notebooks.js";
 
 export default class Trash {
   collections = ["notes", "notebooks"] as const;
@@ -324,27 +325,11 @@ export default class Trash {
   }
 
   private async subNotebooks(notebookIds: string[]) {
-    const ids = await this.db
-      .sql()
-      .withRecursive(`subNotebooks(id)`, (eb) =>
-        eb
-          .selectFrom((eb) =>
-            sql<{ id: string }>`(VALUES ${sql.join(
-              notebookIds.map((id) => eb.parens(sql`${id}`))
-            )})`.as("notebookIds")
-          )
-          .selectAll()
-          .unionAll((eb) =>
-            eb
-              .selectFrom(["relations", "subNotebooks"])
-              .select("relations.toId as id")
-              .where("toType", "==", "notebook")
-              .where("fromType", "==", "notebook")
-              .whereRef("fromId", "==", "subNotebooks.id")
-              .where("toId", "not in", this.userDeletedCache.notebooks)
-              .$narrowType<{ id: string }>()
-          )
-      )
+    const ids = await withSubNotebooks(
+      this.db.sql(),
+      notebookIds,
+      this.userDeletedCache.notebooks
+    )
       .selectFrom("subNotebooks")
       .select("id")
       .where("id", "not in", notebookIds)

@@ -22,8 +22,8 @@ import Database from "../api/index.js";
 import { Notebook, TrashOrItem, isTrashItem } from "../types.js";
 import { ICollection } from "./collection.js";
 import { SQLCollection } from "../database/sql-collection.js";
-import { isFalse } from "../database/index.js";
-import { sql } from "@streetwriters/kysely";
+import { DatabaseSchema, isFalse } from "../database/index.js";
+import { Kysely, sql, Transaction } from "@streetwriters/kysely";
 import { deleteItems } from "../utils/array.js";
 import {
   CHECK_IDS,
@@ -125,65 +125,45 @@ export class Notebooks implements ICollection {
     await this.collection.update(ids, { pinned: state });
   }
 
-  async totalNotes(id: string) {
-    const result = await this.db
-      .sql()
-      .withRecursive(`subNotebooks(id)`, (eb) =>
-        eb
-          .selectNoFrom((eb) => eb.val(id).as("id"))
-          .unionAll((eb) =>
-            eb
-              .selectFrom(["relations", "subNotebooks"])
-              .select("relations.toId as id")
-              .where("toType", "==", "notebook")
-              .where("fromType", "==", "notebook")
-              .whereRef("fromId", "==", "subNotebooks.id")
-              .where("toId", "not in", this.db.trash.cache.notebooks)
-              .$narrowType<{ id: string }>()
-          )
-      )
+  async totalNotes(...ids: string[]) {
+    const result = await withSubNotebooks(
+      this.db.sql(),
+      ids,
+      this.db.trash.cache.notebooks
+    )
       .selectFrom("relations")
+      .innerJoin("subNotebooks", "subNotebooks.id", "relations.fromId")
       .where("toType", "==", "note")
       .where("fromType", "==", "notebook")
-      .where("fromId", "in", (eb) =>
-        eb.selectFrom("subNotebooks").select("subNotebooks.id")
-      )
       .where("toId", "not in", this.db.trash.cache.notes)
-      .select((eb) => eb.fn.count<number>("relations.toId").as("totalNotes"))
-      .executeTakeFirst();
-
-    if (!result) return 0;
-    return result.totalNotes;
-  }
-
-  async notes(id: string) {
-    const result = await this.db
-      .sql()
-      .withRecursive(`subNotebooks(id)`, (eb) =>
-        eb
-          .selectNoFrom((eb) => eb.val(id).as("id"))
-          .unionAll((eb) =>
-            eb
-              .selectFrom(["relations", "subNotebooks"])
-              .select("relations.toId as id")
-              .where("toType", "==", "notebook")
-              .where("fromType", "==", "notebook")
-              .whereRef("fromId", "==", "subNotebooks.id")
-              .where("toId", "not in", this.db.trash.cache.notebooks)
-              .$narrowType<{ id: string }>()
-          )
-      )
-      .selectFrom("relations")
-      .where("toType", "==", "note")
-      .where("fromType", "==", "notebook")
-      .where("fromId", "in", (eb) =>
-        eb.selectFrom("subNotebooks").select("subNotebooks.id")
-      )
-      .where("toId", "not in", this.db.trash.cache.notes)
-      .select("relations.toId as id")
-      .$narrowType<{ id: string }>()
+      .select((eb) => [
+        "subNotebooks.rootId as id",
+        eb.fn.count<number>("relations.toId").distinct().as("totalNotes")
+      ])
+      .groupBy("subNotebooks.rootId")
       .execute();
 
+    return ids.map((id) => {
+      const item = result.find((i) => i.id === id);
+      return item ? item.totalNotes : 0;
+    });
+  }
+
+  async notes(...ids: string[]) {
+    const result = await withSubNotebooks(
+      this.db.sql(),
+      ids,
+      this.db.trash.cache.notebooks
+    )
+      .selectFrom("relations")
+      .innerJoin("subNotebooks", "subNotebooks.id", "relations.fromId")
+      .where("toType", "==", "note")
+      .where("fromType", "==", "notebook")
+      .where("toId", "not in", this.db.trash.cache.notes)
+      .select("relations.toId as id")
+      .distinct()
+      .$narrowType<{ id: string }>()
+      .execute();
     return result.map((i) => i.id);
   }
 
@@ -254,26 +234,7 @@ export class Notebooks implements ICollection {
 
   async moveToTrash(...ids: string[]) {
     await this.db.transaction(async (tr) => {
-      const query = tr
-        .withRecursive(`subNotebooks(id)`, (eb) =>
-          eb
-            .selectFrom(() =>
-              sql<{ id: string }>`(VALUES ${sql.join(
-                ids.map((id) => sql.raw(`('${id}')`))
-              )})`.as("roots")
-            )
-            .selectAll()
-            .unionAll((eb) =>
-              eb
-                .selectFrom(["relations", "subNotebooks"])
-                .select("relations.toId as id")
-                .where("toType", "==", "notebook")
-                .where("fromType", "==", "notebook")
-                .whereRef("fromId", "==", "subNotebooks.id")
-                .where("toId", "not in", this.db.trash.cache.notebooks)
-                .$narrowType<{ id: string }>()
-            )
-        )
+      const query = withSubNotebooks(tr, ids, this.db.trash.cache.notebooks)
         .selectFrom("subNotebooks")
         .select("id");
 
@@ -304,4 +265,46 @@ export class Notebooks implements ICollection {
       .get();
     return relation[0]?.fromId;
   }
+}
+
+export function withSubNotebooks(
+  db: Kysely<DatabaseSchema> | Transaction<DatabaseSchema>,
+  ids: string[],
+  excluded: string[]
+) {
+  return db.withRecursive(`subNotebooks(id, path, rootId)`, (eb) =>
+    eb
+      .selectFrom(() =>
+        sql<{
+          id: string;
+          path: string;
+          rootId: string;
+        }>`(VALUES ${sql.join(
+          ids.map((id) => sql.raw(`('${id}', '${id}', '${id}')`))
+        )})`.as("roots")
+      )
+      .selectAll()
+      .unionAll((eb) =>
+        eb
+          .selectFrom(["relations", "subNotebooks"])
+          .select([
+            "relations.toId as id",
+            // Concatenate parent path with current id
+            sql<string>`subNotebooks.path || '/' || relations.toId`.as("path"),
+            // Preserve original root
+            "subNotebooks.rootId as rootId"
+          ])
+          .where("toType", "==", "notebook")
+          .where("fromType", "==", "notebook")
+          .whereRef("fromId", "==", "subNotebooks.id")
+          .where("toId", "not in", excluded)
+          // Use path to prevent cycles
+          .where(
+            "subNotebooks.path",
+            "not like",
+            sql`'%' || relations.toId || '%'`
+          )
+          .$narrowType<{ id: string; path: string; rootId: string }>()
+      )
+  );
 }
