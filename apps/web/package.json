@@ -108,6 +108,7 @@
     "buffer": "^6.0.3",
     "chalk": "^4.1.0",
     "dotenv": "^10.0.0",
+    "esbuild": "^0.24.2",
     "file-loader": "^6.2.0",
     "find-process": "^1.4.4",
     "happy-dom": "^8.9.0",
