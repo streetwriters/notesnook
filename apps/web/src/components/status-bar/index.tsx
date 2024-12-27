@@ -61,6 +61,7 @@ function StatusBar() {
         borderTopColor: "separator",
         justifyContent: "space-between",
         display: ["none", "none", "flex"],
+        flexShrink: 0,
         height: 24
       }}
       px={2}
