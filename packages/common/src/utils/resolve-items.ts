@@ -48,11 +48,12 @@ export async function resolveItems(ids: string[], items: Item[]) {
   const { type } = items[0];
   if (type === "note") return resolveNotes(ids);
   else if (type === "notebook") {
-    return Promise.all(ids.map((id) => db.notebooks.totalNotes(id)));
+    return await db.notebooks.totalNotes(...ids);
   } else if (type === "tag") {
-    return Promise.all(
-      ids.map((id) => db.relations.from({ id, type: "tag" }, "note").count())
-    );
+    const relations = await db.relations
+      .from({ type: "tag", ids }, "note")
+      .get();
+    return ids.map((id) => relations.filter((r) => r.fromId === id).length);
   }
   return [];
 }
