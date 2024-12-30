@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { mergeAttributes, Node, wrappingInputRule } from "@tiptap/core";
 import { inputRegex } from "@tiptap/extension-task-item";
-import { getParentAttributes } from "../../utils/prosemirror";
-import { ListItem } from "../list-item";
+import { getParentAttributes } from "../../utils/prosemirror.js";
+import { ListItem } from "../list-item/index.js";
 
 export interface CheckListOptions {
   itemTypeName: string;
