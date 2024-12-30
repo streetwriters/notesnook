@@ -38,6 +38,8 @@ import {
 import GlobalMenuWrapper from "./components/global-menu-wrapper";
 import AppEffects from "./app-effects";
 import HashRouter from "./components/hash-router";
+import { useWindowFocus } from "./hooks/use-window-focus";
+import { Global } from "@emotion/react";
 
 new WebExtensionRelay();
 
@@ -47,10 +49,23 @@ function App() {
   const isMobile = useMobile();
   const [show, setShow] = useState(true);
   const isFocusMode = useStore((store) => store.isFocusMode);
+  const { isFocused } = useWindowFocus();
   console.timeEnd("loading app");
 
   return (
     <>
+      {isFocused ? null : (
+        <Global
+          styles={`
+          body {
+            filter:  brightness(0.95) grayscale(1);
+          }
+          .titlebar {
+            background: var(--background-secondary) !important;
+          }
+        `}
+        />
+      )}
       <Suspense fallback={<div style={{ display: "none" }} />}>
         <div id="menu-wrapper">
           <GlobalMenuWrapper />
@@ -69,7 +84,11 @@ function App() {
         id="app"
         bg="background"
         className={isFocusMode ? "app-focus-mode" : ""}
-        sx={{ overflow: "hidden", flexDirection: "column", height: "100%" }}
+        sx={{
+          overflow: "hidden",
+          flexDirection: "column",
+          height: "100%"
+        }}
       >
         {isMobile ? (
           <MobileAppContents />

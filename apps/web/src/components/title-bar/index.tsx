@@ -65,6 +65,7 @@ export function TitleBar() {
   return (
     <BaseThemeProvider
       scope="titleBar"
+      className="titlebar"
       sx={{
         background: "background",
         height: TITLE_BAR_HEIGHT,
