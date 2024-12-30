@@ -175,6 +175,7 @@ function StatusBar() {
                 justifyContent: "center",
                 display: "flex"
               }}
+              data-test-id="vault-unlocked"
             >
               <Unlock size={10} />
               <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
