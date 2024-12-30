@@ -48,6 +48,7 @@ export default class Vault {
   }
 
   private startEraser() {
+    EV.publish(EVENTS.vaultUnlocked);
     clearTimeout(this.erasureTimeout);
     this.erasureTimeout = setTimeout(() => {
       this.lock();
@@ -95,7 +96,6 @@ export default class Vault {
       throw new Error(VAULT_ERRORS.wrongPassword);
     }
     this.password = password;
-    EV.publish(EVENTS.vaultUnlocked);
     return true;
   }
 
