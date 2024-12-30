@@ -388,7 +388,6 @@ export async function attachFile(
       encryptionInfo.mimeType = type;
       encryptionInfo.filename = filename;
       encryptionInfo.alg = "xcha-stream";
-      encryptionInfo.size = encryptionInfo.length;
       encryptionInfo.key = key;
       if (options?.reupload && exists) {
         const attachment = await db.attachments.attachment(hash);
@@ -397,6 +396,7 @@ export async function attachFile(
     } else {
       encryptionInfo = { hash: hash };
     }
+    console.log("FILE ENCRYPTED....", encryptionInfo);
     await db.attachments.add(encryptionInfo);
     return true;
   } catch (e) {

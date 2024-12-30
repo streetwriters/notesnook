@@ -48,7 +48,6 @@ export async function attachFile(uri, hash, type, filename, options) {
       encryptionInfo.mimeType = type;
       encryptionInfo.filename = filename;
       encryptionInfo.alg = "xcha-stream";
-      encryptionInfo.size = encryptionInfo.length;
       encryptionInfo.key = key;
       console.log(encryptionInfo);
       if (options?.reupload && exists) await db.attachments.reset(hash);
