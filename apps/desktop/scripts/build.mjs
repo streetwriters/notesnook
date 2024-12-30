@@ -36,7 +36,7 @@ await fs.rm("./build/", { force: true, recursive: true });
 
 if (args.rebuild || !existsSync(path.join(webAppPath, "build"))) {
   await exec(
-    "yarn nx build:desktop @notesnook/web",
+    "npx nx build:desktop @notesnook/web",
     path.join(__dirname, "..", "..", "..")
   );
 }
@@ -58,11 +58,13 @@ if (args.variant === "mas") {
 await exec(`yarn run build`);
 
 if (args.run) {
-  await exec(`yarn electron-builder --dir --x64`);
+  await exec(`yarn electron-builder --dir --${process.arch}`);
   if (process.platform === "win32") {
     await exec(`.\\output\\win-unpacked\\Notesnook.exe`);
   } else if (process.platform === "darwin") {
-    await exec(`./output/mac/Notesnook.app/Contents/MacOS/Notesnook`);
+    if (process.arch === "arm64")
+      await exec(`./output/mac-arm64/Notesnook.app/Contents/MacOS/Notesnook`);
+    else await exec(`./output/mac/Notesnook.app/Contents/MacOS/Notesnook`);
   } else {
     await exec(`./output/linux-unpacked/Notesnook`);
   }

@@ -70,8 +70,8 @@ async function onChange(first) {
 
   if (first) {
     await spawnAndWaitUntil(
-      ["yarn", "nx", "start:desktop", "@notesnook/web"],
-      path.join(__dirname, "..", "..", ".."),
+      ["npm", "run", "start:desktop"],
+      path.join(__dirname, "..", "..", "web"),
       (data) => data.includes("Network: use --host to expose")
     );
   }
