@@ -269,6 +269,7 @@ const Tiptap = ({
         ? []
         : getTableOfContents(containerRef.current);
     },
+    scrollTop: () => containerRef.current?.scrollTop || 0,
     scrollTo: (top) => {
       containerRef.current?.scrollTo({ top, behavior: "auto" });
     }
