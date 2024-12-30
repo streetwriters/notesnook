@@ -1019,7 +1019,7 @@ PODS:
   - react-native-screenguard (1.0.0):
     - React-Core
     - SDWebImage (~> 5.11.1)
-  - react-native-share-extension (2.7.0):
+  - react-native-share-extension (2.8.0):
     - React
   - react-native-sodium (1.6.1):
     - React
@@ -1858,7 +1858,7 @@ SPEC CHECKSUMS:
   react-native-quick-sqlite: 18e1367c34faac90e37f6eb3e78c196e9b674b5d
   react-native-safe-area-context: b7daa1a8df36095a032dff095a1ea8963cb48371
   react-native-screenguard: 8b36a3df84c76cd2b82c477f71c26fa1c8cc14a0
-  react-native-share-extension: 17e42444d0d9fbfeb0a7392899def70f9534c9c4
+  react-native-share-extension: 01b25fc15faf2510cc2529e98ca444f64e46238d
   react-native-sodium: 4cb76086943a7f60c42b40ebca866695b360a196
   react-native-theme-switch-animation: d3eb50365a3829ce5572628888fa514752703f61
   react-native-webview: 553abd09f58e340fdc7746c9e2ae096839e99911
@@ -1915,8 +1915,8 @@ SPEC CHECKSUMS:
   SwiftyRSA: 8c6dd1ea7db1b8dc4fb517a202f88bb1354bc2c6
   TOCropViewController: 80b8985ad794298fb69d3341de183f33d1853654
   toolbar-android: 2a73856e98b750d7e71ce4644d3f41cc98211719
-  Yoga: 2246eea72aaf1b816a68a35e6e4b74563653ae09
+  Yoga: 950bbfd7e6f04790fdb51149ed51df41f329fcc8
 
 PODFILE CHECKSUM: aa07aca16c1d92394d8ce12f2c5fcaa8a3ae4997
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
