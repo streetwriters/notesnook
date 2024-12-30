@@ -370,3 +370,57 @@ test("when autosave is disabled, closing the note should save it", async ({
   await expect(notes.editor.savedIcon).toBeVisible();
   expect(await notes.editor.getContent("text")).toBe(content.trim());
 });
+
+test("control + alt + right arrow should go to next note", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note1 = await notes.createNote({
+    title: "Note 1",
+    content: "Note 1 content"
+  });
+  const note2 = await notes.createNote({
+    title: "Note 2",
+    content: "Note 2 content"
+  });
+
+  await note1?.openNote();
+  await note2?.openNote();
+  await page.keyboard.press("Control+Alt+ArrowRight");
+
+  expect(await notes.editor.getTitle()).toBe("Note 1");
+  expect(await notes.editor.getContent("text")).toBe("Note 1 content");
+
+  await page.keyboard.press("Control+Alt+ArrowRight");
+
+  expect(await notes.editor.getTitle()).toBe("Note 2");
+  expect(await notes.editor.getContent("text")).toBe("Note 2 content");
+});
+
+test("control + alt + left arrow should go to previous note", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note1 = await notes.createNote({
+    title: "Note 1",
+    content: "Note 1 content"
+  });
+  const note2 = await notes.createNote({
+    title: "Note 2",
+    content: "Note 2 content"
+  });
+
+  await note1?.openNote();
+  await note2?.openNote();
+  await page.keyboard.press("Control+Alt+ArrowLeft");
+
+  expect(await notes.editor.getTitle()).toBe("Note 1");
+  expect(await notes.editor.getContent("text")).toBe("Note 1 content");
+
+  await page.keyboard.press("Control+Alt+ArrowLeft");
+
+  expect(await notes.editor.getTitle()).toBe("Note 2");
+  expect(await notes.editor.getContent("text")).toBe("Note 2 content");
+});
