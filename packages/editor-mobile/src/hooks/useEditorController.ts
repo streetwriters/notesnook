@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor, scrollIntoViewById } from "@notesnook/editor";
+import { strings } from "@notesnook/intl";
 import {
   ThemeDefinition,
   useThemeColors,
@@ -41,7 +42,6 @@ import {
 import { injectCss, transform } from "../utils/css";
 import { pendingSaveRequests } from "../utils/pending-saves";
 import { useTabContext, useTabStore } from "./useTabStore";
-import { strings } from "@notesnook/intl";
 
 type Attachment = {
   hash: string;
@@ -126,11 +126,13 @@ export type EditorController = {
 export function useEditorController({
   update,
   getTableOfContents,
-  scrollTo
+  scrollTo,
+  scrollTop
 }: {
   update: () => void;
   getTableOfContents: () => any[];
   scrollTo: (top: number) => void;
+  scrollTop: () => number;
 }): EditorController {
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const tab = useTabContext();
@@ -342,23 +344,22 @@ export function useEditorController({
             updateTabOnFocus.current = true;
           } else {
             if (!editor) break;
-
             const noteState = tabRef.current?.noteId
               ? useTabStore.getState().noteState[tabRef.current?.noteId]
               : null;
-
+            const top = scrollTop() || noteState?.top || 0;
             editor?.commands.setContent(htmlContentRef.current, false, {
               preserveWhitespace: true
             });
 
-            if (noteState) {
+            if (noteState && editor.isFocused) {
               editor.commands.setTextSelection({
                 from: noteState.from,
                 to: noteState.to
               });
             }
 
-            scrollTo?.(noteState?.top || 0);
+            scrollTo?.(top || 0);
             countWords(0);
           }
 
