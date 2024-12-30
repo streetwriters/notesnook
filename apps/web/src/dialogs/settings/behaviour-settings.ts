@@ -19,7 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { DATE_FORMATS } from "@notesnook/core";
 import { SettingsGroup } from "./types";
-import { useStore as useSettingStore } from "../../stores/setting-store";
+import {
+  ImageCompressionOptions,
+  useStore as useSettingStore
+} from "../../stores/setting-store";
 import dayjs from "dayjs";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { TimeFormat } from "@notesnook/core";
@@ -52,6 +55,37 @@ export const BehaviourSettings: SettingsGroup[] = [
               { value: "1", title: strings.routes.Notebooks() },
               { value: "2", title: strings.routes.Favorites() },
               { value: "3", title: strings.routes.Tags() }
+            ]
+          }
+        ]
+      },
+      {
+        key: "image-compression",
+        title: strings.imageCompression(),
+        description: strings.imageCompressionDesc(),
+        keywords: ["compress images", "image quality"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.imageCompression, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setImageCompression(parseInt(value)),
+            selectedOption: () =>
+              useSettingStore.getState().imageCompression.toString(),
+            options: [
+              {
+                value: ImageCompressionOptions.ASK_EVERY_TIME.toString(),
+                title: strings.askEveryTime()
+              },
+              {
+                value: ImageCompressionOptions.ENABLE.toString(),
+                title: strings.enableRecommended()
+              },
+              {
+                value: ImageCompressionOptions.DISABLE.toString(),
+                title: strings.disable()
+              }
             ]
           }
         ]

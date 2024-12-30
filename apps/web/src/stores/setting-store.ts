@@ -35,6 +35,13 @@ export const HostIds = [
   "MONOGRAPH_HOST"
 ] as const;
 export type HostId = (typeof HostIds)[number];
+
+export enum ImageCompressionOptions {
+  ASK_EVERY_TIME,
+  ENABLE,
+  DISABLE
+}
+
 class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
   backupReminderOffset = Config.get("backupReminderOffset", 0);
@@ -60,6 +67,10 @@ class SettingStore extends BaseStore<SettingStore> {
 
   trashCleanupInterval: TrashCleanupInterval = 7;
   homepage = Config.get("homepage", 0);
+  imageCompression = Config.get(
+    "imageCompression",
+    ImageCompressionOptions.ASK_EVERY_TIME
+  );
   desktopIntegrationSettings?: DesktopIntegration;
   autoUpdates = true;
   isFlatpak = false;
@@ -123,6 +134,11 @@ class SettingStore extends BaseStore<SettingStore> {
   setHomepage = (homepage: number) => {
     this.set({ homepage });
     Config.set("homepage", homepage);
+  };
+
+  setImageCompression = (imageCompression: ImageCompressionOptions) => {
+    this.set({ imageCompression });
+    Config.set("imageCompression", imageCompression);
   };
 
   setDesktopIntegration = async (settings: DesktopIntegration) => {
