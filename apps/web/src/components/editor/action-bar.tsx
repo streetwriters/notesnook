@@ -460,9 +460,11 @@ function Tab(props: TabProps) {
         height: "100%",
         cursor: "pointer",
         px: 2,
-        ":first-of-type": {
-          borderLeft: "1px solid var(--border)"
-        },
+        ":first-of-type": window.hasNativeTitlebar
+          ? {}
+          : {
+              borderLeft: "1px solid var(--border)"
+            },
         borderRight: "1px solid var(--border)",
 
         transform: CSS.Transform.toString(transform),

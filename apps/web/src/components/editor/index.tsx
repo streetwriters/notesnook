@@ -75,7 +75,7 @@ import { Pane, SplitPane } from "../split-pane";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
-const autoSaveToast = { show: true, hide: () => { } };
+const autoSaveToast = { show: true, hide: () => {} };
 
 async function saveContent(
   noteId: string,
@@ -129,7 +129,7 @@ export default function TabsView() {
       {!hasNativeTitlebar ? (
         <EditorActionBarPortal />
       ) : (
-        <Flex sx={{ px: 1 }}>
+        <Flex sx={{ px: 1, borderBottom: "1px solid var(--border)" }}>
           <EditorActionBar />
         </Flex>
       )}
@@ -228,10 +228,10 @@ function EditorView({
   session
 }: {
   session:
-  | DefaultEditorSession
-  | NewEditorSession
-  | ReadonlyEditorSession
-  | DeletedEditorSession;
+    | DefaultEditorSession
+    | NewEditorSession
+    | ReadonlyEditorSession
+    | DeletedEditorSession;
 }) {
   const lastChangedTime = useRef<number>(0);
   const root = useRef<HTMLDivElement>(null);
