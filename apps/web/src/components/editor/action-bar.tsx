@@ -275,9 +275,7 @@ function TabStrip() {
       <Flex
         sx={{
           flex: 1,
-          my: "2.5px",
-          gap: 1,
-          height: 32
+          height: "100%"
         }}
         onDoubleClick={async (e) => {
           e.stopPropagation();
@@ -459,21 +457,19 @@ function Tab(props: TabProps) {
       className="tab"
       data-test-id={`tab-${id}`}
       sx={{
-        borderRadius: "default",
+        height: "100%",
         cursor: "pointer",
         px: 2,
-        py: "7px",
+        ":first-of-type": {
+          borderLeft: "1px solid var(--border)"
+        },
+        borderRight: "1px solid var(--border)",
 
         transform: CSS.Transform.toString(transform),
         transition,
         visibility: active?.id === id ? "hidden" : "visible",
 
-        bg: isActive ? "background-selected" : "background-secondary",
-        // borderTopLeftRadius: "default",
-        // borderTopRightRadius: "default",
-        // borderBottom: isActive ? "none" : "1px solid var(--border)",
-        border: "1px solid",
-        borderColor: isActive ? "border-selected" : "transparent",
+        bg: isActive ? "background-selected" : "transparent",
         justifyContent: "space-between",
         alignItems: "center",
         flexShrink: 0,
