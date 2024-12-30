@@ -39,6 +39,7 @@ import {
 } from "./utils.js";
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { TaskItemNode } from "../task-item/index.js";
+import { ListItem } from "../list-item/list-item.js";
 
 type TaskListStats = { checked: number; total: number };
 export type TaskListAttributes = {
@@ -335,6 +336,12 @@ export const TaskListNode = TaskList.extend({
     });
     const oldHandler = inputRule.handler;
     inputRule.handler = ({ state, range, match, chain, can, commands }) => {
+      const $from = state.selection.$from;
+      const parentNode = $from.node($from.depth - 1);
+      if (parentNode.type.name === ListItem.name) {
+        return;
+      }
+
       const tr = state.tr;
       // reset nodes before converting them to a task list.
       commands.clearNodes();
