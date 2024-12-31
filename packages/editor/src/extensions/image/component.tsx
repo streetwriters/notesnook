@@ -60,6 +60,7 @@ export function ImageComponent(
   });
 
   const dom = editor.view.dom.parentElement || editor.view.dom;
+
   const size =
     editor.view.dom.clientWidth === 0
       ? node.attrs
@@ -266,7 +267,7 @@ export function ImageComponent(
             title={title}
             sx={{
               animation: bloburl || src ? "0.2s ease-in 0s 1 fadeIn" : "none",
-              objectFit: "contain",
+              objectFit: "scale-down",
               width: editor.isEditable ? "100%" : size.width,
               height: editor.isEditable ? "100%" : size.height,
               border: selected
