@@ -46,6 +46,16 @@ import { IAxis, ISplitProps, IPaneConfigs } from "./types";
 import Config from "../../utils/config";
 export { Pane };
 
+type PaneOptions = {
+  min: number;
+  max: number;
+  snap: number;
+  size: number;
+  nextSize?: number;
+  initialSize: number;
+  collapsed: boolean;
+};
+
 export type SplitPaneImperativeHandle = {
   collapse: (index: number) => void;
   expand: (index: number) => void;
@@ -56,10 +66,10 @@ export const SplitPane = React.forwardRef<
 >(function SplitPane(
   {
     children,
-    initialSizes,
     allowResize = true,
     direction = "vertical",
     className: wrapClassName,
+    sashStyle,
     sashRender = (_, active) => (
       <div
         className={classNames(
@@ -79,43 +89,72 @@ export const SplitPane = React.forwardRef<
 ) {
   const axis = useRef<IAxis>({ x: 0, y: 0 });
   const wrapper = useRef<HTMLDivElement>(null);
-  const sizes = useRef<number[]>([]);
-  const collapsed = useRef<boolean[]>(
-    Config.get(`csp:${autoSaveId}:collapsed`, [])
-  );
   const sashPosSizes = useRef<number[]>([]);
   const panes = useRef<(HTMLDivElement | null)[]>([]);
   const sashes = useRef<(HTMLDivElement | null)[]>([]);
-  const paneLimitSizes = useRef<{ min: number; max: number; snap: number }[]>(
-    []
-  );
+  const paneSizes = useRef<PaneOptions[]>([]);
   const wrapSize = useRef(0);
   const childrenLength = childrenToArray(children).length;
+  const autoSaveKey = autoSaveId ? `csp:${autoSaveId}` : undefined;
 
   const { sizeName, splitPos, splitAxis } = useMemo(
     () =>
-      ({
-        sizeName: direction === "vertical" ? "width" : "height",
-        splitPos: direction === "vertical" ? "left" : "top",
-        splitAxis: direction === "vertical" ? "x" : "y"
-      } as const),
+    ({
+      sizeName: direction === "vertical" ? "width" : "height",
+      splitPos: direction === "vertical" ? "left" : "top",
+      splitAxis: direction === "vertical" ? "x" : "y"
+    } as const),
     [direction]
   );
 
-  const updatePaneLimitSizes = useCallback((children: React.ReactNode) => {
-    paneLimitSizes.current =
-      childrenToArray(children).map((childNode) => {
-        const limits = { min: 0, max: Infinity, snap: 0 };
-        if (React.isValidElement(childNode) && childNode.type === Pane) {
-          const { minSize, maxSize, snapSize } =
-            childNode.props as IPaneConfigs;
-          limits.min = assertsSize(minSize, wrapSize.current, 0);
-          limits.max = assertsSize(maxSize, wrapSize.current);
-          limits.snap = assertsSize(snapSize, wrapSize.current, 0);
-        }
-        return limits;
-      }) || [];
-  }, []);
+  const updatePaneLimitSizes = useCallback(
+    (children: React.ReactNode) => {
+      paneSizes.current =
+        childrenToArray(children).map((childNode) => {
+          const limits: PaneOptions = {
+            min: 0,
+            max: Infinity,
+            snap: 0,
+            size: Infinity,
+            initialSize: Infinity,
+            collapsed: false
+          };
+          if (React.isValidElement(childNode) && childNode.type === Pane) {
+            const { minSize, maxSize, snapSize, initialSize, id, collapsed } =
+              childNode.props as IPaneConfigs;
+            limits.min = assertsSize(minSize, wrapSize.current, 0);
+            limits.max = assertsSize(maxSize, wrapSize.current);
+            limits.snap = assertsSize(snapSize, wrapSize.current, 0);
+            limits.initialSize = assertsSize(initialSize, wrapSize.current);
+
+            Object.defineProperty(limits, "collapsed", {
+              get() {
+                return Config.get(`${autoSaveKey}-${id}:collapsed`, collapsed);
+              },
+              set(v) {
+                if (v == null) Config.remove(`${autoSaveKey}-${id}:collapsed`);
+                else Config.set(`${autoSaveKey}-${id}:collapsed`, v);
+              }
+            });
+            Object.defineProperty(limits, "size", {
+              get() {
+                return Config.get(
+                  `${autoSaveKey}-${id}`,
+                  assertsSize(initialSize, wrapSize.current)
+                );
+              },
+              set(v) {
+                if (v === null || v === undefined || v === Infinity)
+                  Config.remove(`${autoSaveKey}-${id}`);
+                else Config.set(`${autoSaveKey}-${id}`, v);
+              }
+            });
+          }
+          return limits;
+        }) || [];
+    },
+    [autoSaveKey]
+  );
 
   useLayoutEffect(() => {
     if (wrapSize.current === 0) {
@@ -124,32 +163,17 @@ export const SplitPane = React.forwardRef<
     }
 
     if (wrapSize.current === 0) return;
-
     updatePaneLimitSizes(children);
-    setSizes(
-      sizes.current.length === childrenLength
-        ? sizes.current
-        : Config.get(`csp:${autoSaveId}`, initialSizes),
-      wrapSize.current,
-      false
-    );
-  }, [initialSizes, children, childrenLength]);
+    setSizes(paneSizes.current, wrapSize.current, false);
+  }, [children, childrenLength]);
 
   const setSizes = useCallback(
     function setSizes(
-      paneSizes: (number | string)[],
+      paneLimits: PaneOptions[],
       wrapSize: number,
       notify = true
     ) {
-      const normalized = normalizeSizes(
-        children,
-        paneSizes.map((size, i) =>
-          collapsed.current[i] ? paneLimitSizes.current[i].min : size
-        ),
-        initialSizes,
-        wrapSize
-      );
-
+      const normalized = normalizeSizes(children, paneLimits, wrapSize);
       sashPosSizes.current = normalized.reduce(
         (a, b) => [...a, a[a.length - 1] + b],
         [0]
@@ -157,11 +181,15 @@ export const SplitPane = React.forwardRef<
 
       for (let i = 0; i < panes.current.length; ++i) {
         const pane = panes.current[i];
+        if (!pane) continue;
         const size = normalized[i];
         const sashPos = sashPosSizes.current[i];
-        if (!pane) continue;
+        const limits = paneSizes.current[i];
         pane.style[sizeName] = `${size}px`;
         pane.style[splitPos] = `${sashPos}px`;
+        if (limits.collapsed || size === limits.min)
+          pane.classList.add("collapsed");
+        else pane.classList.remove("collapsed");
       }
 
       for (let i = 0; i < sashes.current.length; ++i) {
@@ -172,35 +200,20 @@ export const SplitPane = React.forwardRef<
         }
       }
 
-      sizes.current = normalizeSizes(
-        children,
-        paneSizes,
-        initialSizes,
-        wrapSize
-      );
+      paneSizes.current.forEach((limits, index) => {
+        limits.size = normalized[index];
+      });
 
-      if (autoSaveId) {
-        Config.set(`csp:${autoSaveId}`, sizes.current);
-        Config.set(`csp:${autoSaveId}:collapsed`, collapsed.current);
-      }
       if (notify) onChange(normalized);
     },
-    [
-      children,
-      initialSizes,
-      onChange,
-      autoSaveId,
-      sizeName,
-      splitPos,
-      resizerSize
-    ]
+    [children, onChange, sizeName, splitPos, resizerSize]
   );
 
   useEffect(() => {
     if (!wrapper.current) return;
 
     const resizeObserver = new ResizeObserver((entries) => {
-      if (!sizes.current.length) return;
+      if (!paneSizes.current.length) return;
 
       const [entry] = entries;
       const newSize = entry.contentRect ? entry.contentRect[sizeName] : 0;
@@ -229,7 +242,7 @@ export const SplitPane = React.forwardRef<
       // }
 
       wrapSize.current = newSize;
-      setSizes(sizes.current, wrapSize.current);
+      setSizes(paneSizes.current, wrapSize.current);
     });
     resizeObserver.observe(wrapper.current);
     return () => {
@@ -242,12 +255,12 @@ export const SplitPane = React.forwardRef<
     () => {
       return {
         collapse: (index: number) => {
-          collapsed.current[index] = true;
-          setSizes(sizes.current, wrapSize.current);
+          paneSizes.current[index].collapsed = true;
+          setSizes(paneSizes.current, wrapSize.current);
         },
         expand: (index: number) => {
-          collapsed.current[index] = false;
-          setSizes(sizes.current, wrapSize.current);
+          paneSizes.current[index].collapsed = false;
+          setSizes(paneSizes.current, wrapSize.current);
         }
       };
     },
@@ -282,20 +295,17 @@ export const SplitPane = React.forwardRef<
       let distanceX = curAxis[splitAxis] - axis.current[splitAxis];
       axis.current = { x: e.pageX, y: e.pageY };
 
-      const currentSize = sizes.current[i];
-      const currentPaneLimits = paneLimitSizes.current[i];
-      const nextPaneLimits = paneLimitSizes.current[i + 1];
+      const currentPane = paneSizes.current[i];
+      const nextPane = paneSizes.current[i + 1];
       const rightBorder = sashPosSizes.current[i + 2];
 
-      if (currentSize + distanceX >= rightBorder)
-        distanceX = rightBorder - currentSize;
-
-      const nextSizes = [...sizes.current];
+      if (currentPane.size + distanceX >= rightBorder)
+        distanceX = rightBorder - currentPane.size;
 
       // if current pane size is out of limit, adjust the previous pane
       if (
-        currentSize + distanceX >= currentPaneLimits.max ||
-        currentSize + distanceX <= currentPaneLimits.min
+        currentPane.size + distanceX >= currentPane.max ||
+        currentPane.size + distanceX <= currentPane.min
       ) {
         if (i > 0) {
           // reset axis
@@ -305,27 +315,32 @@ export const SplitPane = React.forwardRef<
         return;
       }
 
-      nextSizes[i] += distanceX;
+      currentPane.nextSize =
+        (currentPane.nextSize || currentPane.size) + distanceX;
       // keep the next pane size in the min-max range
-      nextSizes[i + 1] = Math.min(
-        nextPaneLimits.max,
-        Math.max(nextPaneLimits.min, nextSizes[i + 1] - distanceX)
+      nextPane.nextSize = Math.min(
+        nextPane.max,
+        Math.max(nextPane.min, (nextPane.nextSize || nextPane.size) - distanceX)
       );
 
       // snapping logic
-      if (currentPaneLimits.snap > 0) {
-        if (distanceX < 0 && nextSizes[i] <= currentPaneLimits.snap / 2) {
-          nextSizes[i] = currentPaneLimits.min;
-        } else if (nextSizes[i] < currentPaneLimits.snap) {
+      if (currentPane.snap > 0) {
+        if (distanceX < 0 && currentPane.nextSize <= currentPane.snap / 2) {
+          currentPane.nextSize = currentPane.min;
+        } else if (currentPane.nextSize < currentPane.snap) {
           // reset axis
           axis.current[splitAxis] += -distanceX;
           return;
         }
       }
+      nextPane.size = nextPane.nextSize;
+      currentPane.size = currentPane.nextSize;
+      nextPane.nextSize = undefined;
+      currentPane.nextSize = undefined;
 
-      setSizes(nextSizes, wrapSize.current);
+      setSizes(paneSizes.current, wrapSize.current);
     },
-    [paneLimitSizes, setSizes, splitAxis]
+    [paneSizes, setSizes, splitAxis]
   );
 
   return (
@@ -339,9 +354,7 @@ export const SplitPane = React.forwardRef<
       ref={wrapper}
       {...others}
     >
-      {React.Children.map(children, (childNode, childIndex) => {
-        if (!childNode) return null;
-
+      {childrenToArray(children).map((childNode, childIndex) => {
         const isPane = React.isValidElement(childNode)
           ? childNode.type === Pane
           : false;
@@ -350,6 +363,7 @@ export const SplitPane = React.forwardRef<
 
         return (
           <Pane
+            id={paneProps.id}
             key={childIndex}
             paneRef={(e) => (panes.current[childIndex] = e)}
             className={classNames(paneClassName, paneProps.className)}
@@ -370,18 +384,17 @@ export const SplitPane = React.forwardRef<
               : sashHorizontalClassName
           )}
           style={{
-            [sizeName]: resizerSize
+            [sizeName]: resizerSize,
+            ...sashStyle
           }}
           render={sashRender.bind(null, index)}
           onDragStart={dragStart}
           onDragging={(e) => onDragging(e, index)}
           onDragEnd={dragEnd}
           onDoubleClick={() => {
-            sizes.current[index] = assertsSize(
-              initialSizes[index],
-              wrapSize.current
-            );
-            setSizes(sizes.current, wrapSize.current);
+            paneSizes.current[index].size =
+              paneSizes.current[index].initialSize;
+            setSizes(paneSizes.current, wrapSize.current);
           }}
         />
       ))}
@@ -390,20 +403,19 @@ export const SplitPane = React.forwardRef<
 });
 
 function childrenToArray(children: React.ReactNode) {
-  return React.Children.toArray(children).filter(Boolean);
+  return React.Children.toArray(children);
 }
 
 function normalizeSizes(
   children: React.ReactNode,
-  currentSizes: (string | number)[],
-  initialSizes: (string | number)[],
+  panes: PaneOptions[],
   wrapSize: number
 ): number[] {
   let count = 0;
   let curSum = 0;
   const res = childrenToArray(children).map((_, index) => {
-    const initialSize = assertsSize(initialSizes[index], wrapSize);
-    const size = assertsSize(currentSizes[index], wrapSize);
+    const initialSize = panes[index].initialSize;
+    const size = panes[index].collapsed ? panes[index].min : panes[index].size;
     initialSize === Infinity ? count++ : (curSum += size);
     return size;
   });
@@ -411,7 +423,7 @@ function normalizeSizes(
   if (count > 0 || curSum > wrapSize) {
     const average = (wrapSize - curSum) / count;
     return res.map((size, index) => {
-      const initialSize = assertsSize(initialSizes[index], wrapSize);
+      const initialSize = panes[index].initialSize;
       return initialSize === Infinity ? average : size;
     });
   }

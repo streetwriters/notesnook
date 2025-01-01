@@ -38,34 +38,15 @@ export interface ICacheSizes {
 
 export interface ISplitProps extends HTMLElementProps {
   autoSaveId?: string;
-  /**
-   * Should allowed to resized
-   *
-   * default is true
-   */
   allowResize?: boolean;
-  /**
-   * How to split the space
-   *
-   * default is vertical
-   */
   direction: "vertical" | "horizontal";
-  /**
-   * Only support controlled mode, so it's required
-   */
-  initialSizes: (string | number)[];
   sashRender?: (index: number, active: boolean) => React.ReactNode;
   onChange?: (sizes: number[]) => void;
   onDragStart?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   onDragEnd?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   className?: string;
   sashClassName?: string;
-  // performanceMode?: boolean;
-  /**
-   * Specify the size fo resizer
-   *
-   * defualt size is 4px
-   */
+  sashStyle?: React.CSSProperties;
   sashSize?: number;
 }
 
@@ -87,9 +68,11 @@ export interface ISashContentProps {
 }
 
 export interface IPaneConfigs {
-  id?: string;
+  id: string;
   paneRef?: React.LegacyRef<HTMLDivElement>;
   maxSize?: number | string;
   minSize?: number | string;
   snapSize?: number | string;
+  initialSize?: number | string;
+  collapsed?: boolean;
 }

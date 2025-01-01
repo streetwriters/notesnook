@@ -14,7 +14,7 @@
 .react-split__sash {
   height: 100%;
   position: absolute;
-  top: 0;
+  bottom: 0;
   transition: background-color 0.1s;
   width: 100%;
   z-index: 2;

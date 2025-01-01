@@ -146,11 +146,7 @@ export default function TabsView() {
           flexDirection: "column"
         }}
       >
-        <SplitPane
-          direction="vertical"
-          initialSizes={documentPreview ? [Infinity, 435] : [Infinity]}
-          autoSaveId={"editor-panels"}
-        >
+        <SplitPane direction="vertical" autoSaveId={"editor-panels"}>
           <Pane id="editor-panel" className="editor-pane">
             {sessions.map((session) => (
               <Freeze key={session.id} freeze={session.id !== activeSessionId}>
@@ -166,7 +162,7 @@ export default function TabsView() {
           </Pane>
 
           {documentPreview ? (
-            <Pane id="pdf-preview-panel" minSize={435}>
+            <Pane id="pdf-preview-panel" initialSize={435} minSize={435}>
               <ScopedThemeProvider
                 scope="editorSidebar"
                 id="editorSidebar"
@@ -203,7 +199,7 @@ export default function TabsView() {
           ) : null}
 
           {isTOCVisible && activeSessionId ? (
-            <Pane minSize={300}>
+            <Pane id="table-of-contents-pane" initialSize={300} minSize={300}>
               <TableOfContents sessionId={activeSessionId} />
             </Pane>
           ) : null}

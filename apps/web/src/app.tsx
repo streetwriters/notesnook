@@ -143,13 +143,19 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
           ref={navPane}
           autoSaveId="global-panel-group"
           direction="vertical"
-          initialSizes={[180, 380]}
           onChange={(sizes) => {
             setIsNarrow(sizes[0] <= 70);
           }}
         >
-          {!isFocusMode ? (
-            <Pane minSize={50} snapSize={120} maxSize={300}>
+          {isFocusMode ? null : (
+            <Pane
+              id="nav-pane"
+              initialSize={180}
+              className={`nav-pane`}
+              minSize={50}
+              snapSize={120}
+              maxSize={300}
+            >
               <NavigationMenu
                 toggleNavigationContainer={(state) => {
                   setShow(state || !show);
@@ -157,12 +163,15 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
                 isTablet={isNarrow}
               />
             </Pane>
-          ) : null}
-          {!isFocusMode && show && (
+          )}
+          {!isFocusMode && show ? (
             <Pane
+              id="list-pane"
+              initialSize={380}
               style={{ flex: 1, display: "flex" }}
               snapSize={200}
               maxSize={500}
+              className="list-pane"
             >
               <ScopedThemeProvider
                 className="listMenu"
@@ -178,9 +187,11 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
                 <CachedRouter />
               </ScopedThemeProvider>
             </Pane>
-          )}
+          ) : null}
 
           <Pane
+            id="editor-pane"
+            className="editor-pane"
             style={{
               flex: 1,
               display: "flex",
