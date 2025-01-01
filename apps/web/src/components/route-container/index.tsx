@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { PropsWithChildren } from "react";
-import { Flex, Text } from "@theme-ui/components";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { ArrowLeft, Menu, Search, Plus, Close } from "../icons";
 import { useStore } from "../../stores/app-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
@@ -26,6 +26,7 @@ import useMobile from "../../hooks/use-mobile";
 import { debounce, usePromise } from "@notesnook/common";
 import Field from "../field";
 import { strings } from "@notesnook/intl";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export type RouteContainerButtons = {
   search?: {
@@ -64,7 +65,6 @@ function Header(props: RouteContainerProps) {
     () => (typeof props.title === "string" ? props.title : props.title?.()),
     [props.title]
   );
-  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
   const isSearching = useSearchStore((store) => store.isSearching);
   const query = useSearchStore((store) => store.query);
@@ -134,17 +134,20 @@ function Header(props: RouteContainerProps) {
             data-test-id="go-back"
           />
         ) : (
+          <Button
+            onClick={() =>
+              AppEventManager.publish(AppEvents.toggleSideMenu, true)
+            }
+            sx={{ p: 0, flexShrink: 0 }}
+          >
           <Menu
-            onClick={() => toggleSideMenu(true)}
             sx={{
-              flexShrink: 0,
-              ml: 0,
-              mr: 4,
-              mt: 1,
-              display: ["block", "none", "none"]
+                display: ["block", "none", "none"],
+                size: 23
             }}
-            size={30}
+              size={24}
           />
+          </Button>
         )}
         {titlePromise.status === "fulfilled" && titlePromise.value && (
           <Text variant="heading" data-test-id="routeHeader" color="heading">

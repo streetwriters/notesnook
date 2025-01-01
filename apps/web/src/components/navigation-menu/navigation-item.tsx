@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, FlexProps, Image, Text } from "@theme-ui/components";
-import { useStore as useAppStore } from "../../stores/app-store";
 import { Menu } from "../../hooks/use-menu";
 import useMobile from "../../hooks/use-mobile";
 import { PropsWithChildren } from "react";
@@ -27,6 +26,7 @@ import { SchemeColors, createButtonVariant } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 type NavigationItemProps = {
   icon?: Icon;
@@ -66,7 +66,6 @@ function NavigationItem(
     containerRef,
     ...restProps
   } = props;
-  const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
 
   return (
@@ -120,7 +119,7 @@ function NavigationItem(
           Menu.openMenu(menuItems);
         }}
         onClick={() => {
-          if (isMobile) toggleSideMenu(false);
+          AppEventManager.publish(AppEvents.toggleSideMenu, false);
           if (onClick) onClick();
         }}
       >

@@ -42,8 +42,6 @@ import { Global } from "@emotion/react";
 
 new WebExtensionRelay();
 
-const MobileAppEffects = React.lazy(() => import("./app-effects.mobile"));
-
 function App() {
   const isMobile = useMobile();
   const [show, setShow] = useState(true);
@@ -69,13 +67,6 @@ function App() {
         <div id="menu-wrapper">
           <GlobalMenuWrapper />
         </div>
-        {isMobile && (
-          <MobileAppEffects
-            sliderId="slider"
-            overlayId="overlay"
-            setShow={setShow}
-          />
-        )}
       </Suspense>
       <AppEffects setShow={setShow} />
 
@@ -210,8 +201,46 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
 }
 
 function MobileAppContents() {
+  const { ref, slideToIndex } = useSlider({
+    onSliding: (_e, { position }) => {
+      const offset = 70;
+      const width = 300;
+
+      const percent = offset - (position / width) * offset;
+      const overlay = document.getElementById("overlay");
+      if (!overlay) return;
+      if (percent > 0) {
+        overlay.style.opacity = `${percent}%`;
+        overlay.style.pointerEvents = "all";
+      } else {
+        overlay.style.opacity = "0%";
+        overlay.style.pointerEvents = "none";
+      }
+    },
+    onChange: (e, { slide, lastSlide }) => {
+      slide.node.classList.add("pane-active");
+      lastSlide?.node.classList.remove("pane-active");
+    }
+  });
+
+  useEffect(() => {
+    const toggleSideMenuEvent = AppEventManager.subscribe(
+      AppEvents.toggleSideMenu,
+      (state) => slideToIndex(state ? 0 : 1)
+    );
+    const toggleEditorEvent = AppEventManager.subscribe(
+      AppEvents.toggleEditor,
+      (state) => slideToIndex(state ? 2 : 1)
+    );
+    return () => {
+      toggleSideMenuEvent.unsubscribe();
+      toggleEditorEvent.unsubscribe();
+    };
+  }, [slideToIndex]);
+
   return (
     <FlexScrollContainer
+      scrollRef={ref}
       id="slider"
       suppressScrollX
       style={{
@@ -228,17 +257,18 @@ function MobileAppContents() {
       }}
     >
       <Flex
+        className="mobile-nav-pane"
         sx={{
           scrollSnapAlign: "start",
           scrollSnapStop: "always",
-          width: [300, 60],
+          width: 300,
           flexShrink: 0
         }}
       >
         <NavigationMenu toggleNavigationContainer={() => { }} isTablet={false} />
       </Flex>
       <Flex
-        className="listMenu"
+        className="mobile-list-pane"
         variant="columnFill"
         sx={{
           position: "relative",
@@ -251,6 +281,7 @@ function MobileAppContents() {
         <CachedRouter />
         <Box
           id="overlay"
+          onClick={() => slideToIndex(1)}
           sx={{
             position: "absolute",
             width: "100%",
@@ -266,6 +297,7 @@ function MobileAppContents() {
         />
       </Flex>
       <Flex
+        className="mobile-editor-pane"
         sx={{
           scrollSnapAlign: "start",
           scrollSnapStop: "always",

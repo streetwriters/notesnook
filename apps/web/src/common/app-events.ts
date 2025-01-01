@@ -38,5 +38,8 @@ export const AppEvents = {
 
   changeNoteTitle: "changeNoteTitle",
 
-  revealItemInList: "list:revealItem"
+  revealItemInList: "list:revealItem",
+
+  toggleSideMenu: "app:openSideMenu",
+  toggleEditor: "app:toggleEditor"
 };

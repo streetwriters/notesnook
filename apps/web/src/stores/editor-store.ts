@@ -518,7 +518,7 @@ class EditorStore extends BaseStore<EditorStore> {
     } else setDocumentTitle();
 
     this.set({ activeSessionId: id });
-    appStore.setIsEditorOpen(!!id);
+    AppEventManager.publish(AppEvents.toggleEditor, true);
 
     if (id) {
       const { history } = this.get();
