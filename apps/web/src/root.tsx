@@ -81,7 +81,7 @@ export async function startApp() {
     console.error(e);
     root.render(
       <>
-        <TitleBar />
+        <TitleBar isUnderlay={false} />
         <ErrorComponent
           error={e}
           resetErrorBoundary={() => window.location.reload()}

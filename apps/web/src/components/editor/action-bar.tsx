@@ -41,11 +41,7 @@ import {
   TableOfContents,
   Trash,
   Undo,
-  Unlock,
-  WindowClose,
-  WindowMaximize,
-  WindowMinimize,
-  WindowRestore
+  Unlock
 } from "../icons";
 import { ScrollContainer } from "@notesnook/ui";
 import {
@@ -83,8 +79,8 @@ import { showPublishView } from "../publish-view";
 import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 import useMobile from "../../hooks/use-mobile";
 import { strings } from "@notesnook/intl";
-import { TITLE_BAR_HEIGHT } from "../title-bar";
-import { desktop } from "../../common/desktop-bridge";
+import { TITLE_BAR_HEIGHT, getWindowControls } from "../title-bar";
+import useTablet from "../../hooks/use-tablet";
 
 export function EditorActionBar() {
   const { isMaximized, isFullscreen, hasNativeWindowControls } =
@@ -102,6 +98,7 @@ export function EditorActionBar() {
   const isNotePublished =
     activeSession && db.monographs.isPublished(activeSession.id);
   const isMobile = useMobile();
+  const isTablet = useTablet();
 
   const tools = [
     {
@@ -202,31 +199,13 @@ export function EditorActionBar() {
         !isFocusMode,
       onClick: () => useEditorStore.getState().toggleProperties()
     },
-
-    {
-      title: strings.minimize(),
-      icon: WindowMinimize,
-      hidden: hasNativeWindowControls || isFullscreen,
-      enabled: true,
-      onClick: () => desktop?.window.minimze.mutate()
-    },
-    {
-      title: isMaximized ? strings.restore() : strings.maximize(),
-      icon: isMaximized ? WindowRestore : WindowMaximize,
-      enabled: true,
-      hidden: hasNativeWindowControls || isFullscreen,
-      onClick: () =>
-        isMaximized
-          ? desktop?.window.restore.mutate()
-          : desktop?.window.maximize.mutate()
-    },
-    {
-      title: strings.close(),
-      icon: WindowClose,
-      hidden: hasNativeWindowControls || isFullscreen,
-      enabled: true,
-      onClick: () => window.close()
-    }
+    ...getWindowControls(
+      hasNativeWindowControls,
+      isFullscreen,
+      isMaximized,
+      isTablet,
+      isMobile
+    )
   ];
 
   return (
@@ -263,7 +242,7 @@ export function EditorActionBar() {
             alignItems: "center",
             bg: "transparent",
             display: [
-              tool.hideOnMobile ? "none" : "flex",
+              "hideOnMobile" in tool && tool.hideOnMobile ? "none" : "flex",
               tool.hidden ? "none" : "flex"
             ],
             borderRadius: 0,
@@ -475,12 +454,12 @@ function Tab(props: TabProps) {
       ? Lock
       : Unlock
     : type === "readonly"
-      ? Readonly
-      : type === "deleted"
-        ? Trash
-        : isUnsaved
-          ? NoteRemove
-          : Note;
+    ? Readonly
+    : type === "deleted"
+    ? Trash
+    : isUnsaved
+    ? NoteRemove
+    : Note;
   const { attributes, listeners, setNodeRef, transform, transition, active } =
     useSortable({ id });
 

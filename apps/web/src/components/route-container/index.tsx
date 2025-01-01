@@ -77,7 +77,8 @@ function Header(props: RouteContainerProps) {
           alignItems: "center",
           justifyContent: "center",
           height: TITLE_BAR_HEIGHT,
-          zIndex: 2
+          zIndex: 2,
+          px: 1
         }}
         className="route-container-header search-container"
       >
