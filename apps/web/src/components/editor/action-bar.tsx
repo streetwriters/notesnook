@@ -41,7 +41,11 @@ import {
   TableOfContents,
   Trash,
   Undo,
-  Unlock
+  Unlock,
+  WindowClose,
+  WindowMaximize,
+  WindowMinimize,
+  WindowRestore
 } from "../icons";
 import { ScrollContainer } from "@notesnook/ui";
 import {
@@ -79,11 +83,14 @@ import { showPublishView } from "../publish-view";
 import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 import useMobile from "../../hooks/use-mobile";
 import { strings } from "@notesnook/intl";
+import { TITLE_BAR_HEIGHT } from "../title-bar";
+import { desktop } from "../../common/desktop-bridge";
 
 export function EditorActionBar() {
+  const { isMaximized, isFullscreen, hasNativeWindowControls } =
+    useWindowControls();
   const editorMargins = useEditorStore((store) => store.editorMargins);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const { isFullscreen } = useWindowControls();
   const activeSession = useEditorStore((store) =>
     store.activeSessionId ? store.getSession(store.activeSessionId) : undefined
   );
@@ -194,6 +201,31 @@ export function EditorActionBar() {
         activeSession.type !== "conflicted" &&
         !isFocusMode,
       onClick: () => useEditorStore.getState().toggleProperties()
+    },
+
+    {
+      title: strings.minimize(),
+      icon: WindowMinimize,
+      hidden: hasNativeWindowControls || isFullscreen,
+      enabled: true,
+      onClick: () => desktop?.window.minimze.mutate()
+    },
+    {
+      title: isMaximized ? strings.restore() : strings.maximize(),
+      icon: isMaximized ? WindowRestore : WindowMaximize,
+      enabled: true,
+      hidden: hasNativeWindowControls || isFullscreen,
+      onClick: () =>
+        isMaximized
+          ? desktop?.window.restore.mutate()
+          : desktop?.window.maximize.mutate()
+    },
+    {
+      title: strings.close(),
+      icon: WindowClose,
+      hidden: hasNativeWindowControls || isFullscreen,
+      enabled: true,
+      onClick: () => window.close()
     }
   ];
 
@@ -260,7 +292,7 @@ function TabStrip() {
     <ScrollContainer
       className="tabsScroll"
       suppressScrollY
-      style={{ flex: 1 }}
+      style={{ flex: 1, height: TITLE_BAR_HEIGHT }}
       trackStyle={() => ({
         backgroundColor: "transparent",
         "--ms-track-size": "6px"
@@ -443,12 +475,12 @@ function Tab(props: TabProps) {
       ? Lock
       : Unlock
     : type === "readonly"
-    ? Readonly
-    : type === "deleted"
-    ? Trash
-    : isUnsaved
-    ? NoteRemove
-    : Note;
+      ? Readonly
+      : type === "deleted"
+        ? Trash
+        : isUnsaved
+          ? NoteRemove
+          : Note;
   const { attributes, listeners, setNodeRef, transform, transition, active } =
     useSortable({ id });
 
@@ -461,11 +493,6 @@ function Tab(props: TabProps) {
         height: "100%",
         cursor: "pointer",
         px: 2,
-        ":first-of-type": window.hasNativeTitlebar
-          ? {}
-          : {
-              borderLeft: "1px solid var(--border)"
-            },
         borderRight: "1px solid var(--border)",
 
         transform: CSS.Transform.toString(transform),

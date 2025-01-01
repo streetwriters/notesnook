@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState, Suspense, useEffect, useRef } from "react";
+import { useState, Suspense, useEffect, useRef } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
@@ -39,6 +39,12 @@ import AppEffects from "./app-effects";
 import HashRouter from "./components/hash-router";
 import { useWindowFocus } from "./hooks/use-window-focus";
 import { Global } from "@emotion/react";
+import { isMac } from "./utils/platform";
+import useSlider from "./hooks/use-slider";
+import { AppEventManager, AppEvents } from "./common/app-events";
+import { TITLE_BAR_HEIGHT } from "./components/title-bar";
+import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
+import { useWindowControls } from "./hooks/use-window-controls";
 
 new WebExtensionRelay();
 
@@ -47,6 +53,7 @@ function App() {
   const [show, setShow] = useState(true);
   const isFocusMode = useStore((store) => store.isFocusMode);
   const { isFocused } = useWindowFocus();
+  const { isFullscreen } = useWindowControls();
   console.timeEnd("loading app");
 
   return (
@@ -63,6 +70,40 @@ function App() {
         `}
         />
       )}
+      {IS_DESKTOP_APP && isMac() && !isFullscreen ? (
+        <Global
+          // These styles to make sure the app content doesn't overlap with the traffic lights.
+          styles={`
+            .nav-pane,
+            .mobile-nav-pane {
+              margin-top: env(titlebar-area-height) !important;
+            }
+            .nav-pane.collapsed + .list-pane .route-container-header,
+            .nav-pane.collapsed + .list-pane.collapsed + .editor-pane .editor-action-bar,
+            .nav-pane.collapsed + .editor-pane .editor-action-bar {
+                padding-left: 25px;
+            }
+            .editor-pane:first-of-type .editor-action-bar,
+            .mobile-editor-pane.pane-active .editor-action-bar,
+            .mobile-list-pane.pane-active .route-container-header {
+                padding-left: 80px;
+            }
+            .route-container-header, .editor-action-bar {
+                transition: padding-left 0.4s ease-out;
+            }
+            .editor-action-bar {
+              border-bottom: none;
+            }
+            .route-container-header .routeHeader {
+              font-size: ${getFontSizes().title};
+            }
+            .global-split-pane .react-split__sash {
+              height: calc(100% - ${TITLE_BAR_HEIGHT}px);
+            }
+          `}
+        />
+      ) : null}
+
       <Suspense fallback={<div style={{ display: "none" }} />}>
         <div id="menu-wrapper">
           <GlobalMenuWrapper />
@@ -131,6 +172,7 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
         }}
       >
         <SplitPane
+          className="global-split-pane"
           ref={navPane}
           autoSaveId="global-panel-group"
           direction="vertical"
