@@ -72,10 +72,11 @@ import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
 import { strings } from "@notesnook/intl";
 import { onPageVisibilityChanged } from "../../utils/page-visibility";
 import { Pane, SplitPane } from "../split-pane";
+import { TITLE_BAR_HEIGHT } from "../title-bar";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
-const autoSaveToast = { show: true, hide: () => {} };
+const autoSaveToast = { show: true, hide: () => { } };
 
 async function saveContent(
   noteId: string,
@@ -126,20 +127,22 @@ export default function TabsView() {
 
   return (
     <>
-      {!hasNativeTitlebar ? (
-        <EditorActionBarPortal />
-      ) : (
-        <Flex sx={{ px: 1, borderBottom: "1px solid var(--border)" }}>
-          <EditorActionBar />
-        </Flex>
-      )}
+      <Flex
+        className="editor-action-bar"
+        sx={{
+          zIndex: 2,
+          height: TITLE_BAR_HEIGHT,
+          borderBottom: "1px solid var(--border)"
+        }}
+      >
+        <EditorActionBar />
+      </Flex>
 
       <ScopedThemeProvider
         scope="editor"
         ref={dropRef}
         sx={{
           bg: "background",
-          pt: 1,
           flex: 1,
           overflow: "hidden",
           display: "flex",
@@ -224,10 +227,10 @@ function EditorView({
   session
 }: {
   session:
-    | DefaultEditorSession
-    | NewEditorSession
-    | ReadonlyEditorSession
-    | DeletedEditorSession;
+  | DefaultEditorSession
+  | NewEditorSession
+  | ReadonlyEditorSession
+  | DeletedEditorSession;
 }) {
   const lastChangedTime = useRef<number>(0);
   const root = useRef<HTMLDivElement>(null);
@@ -877,10 +880,4 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
       />
     </div>
   );
-}
-
-function EditorActionBarPortal() {
-  const container = document.getElementById("titlebar-portal-container");
-  if (!container) return null;
-  return ReactDOM.createPortal(<EditorActionBar />, container);
 }

@@ -10,7 +10,10 @@
 }
 
 .theme-scope-titleBar button,
-.tabsScroll .tab {
+.tabsScroll .tab,
+.editor-action-bar button,
+.route-container-header button,
+.search-container {
   -webkit-app-region: no-drag;
 }
 
