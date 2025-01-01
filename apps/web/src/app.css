@@ -5,7 +5,8 @@
 
 .tabsScroll,
 .titlebarLogo,
-.theme-scope-titleBar {
+.theme-scope-titleBar,
+.route-container-header {
   -webkit-app-region: drag;
 }
 
