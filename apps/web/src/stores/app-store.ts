@@ -61,10 +61,7 @@ let syncTimeout = 0;
 let pendingSync: SyncOptions | undefined = undefined;
 
 class AppStore extends BaseStore<AppStore> {
-  // default state
-  isSideMenuOpen = false;
   isFocusMode = false;
-  isEditorOpen = false;
   isVaultCreated = false;
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
@@ -197,17 +194,6 @@ class AppStore extends BaseStore<AppStore> {
     this.set(
       (state) => (state.isRealtimeSyncEnabled = !state.isRealtimeSyncEnabled)
     );
-  };
-
-  toggleSideMenu = (toggleState: boolean) => {
-    console.log("toggling side menu");
-    this.set(
-      (state) => (state.isSideMenuOpen = toggleState ?? !state.isSideMenuOpen)
-    );
-  };
-
-  setIsEditorOpen = (toggleState: boolean) => {
-    this.set((state) => (state.isEditorOpen = toggleState));
   };
 
   setIsVaultCreated = (toggleState: boolean) => {

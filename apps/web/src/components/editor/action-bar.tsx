@@ -95,7 +95,6 @@ export function EditorActionBar() {
   const isNotePublished =
     activeSession && db.monographs.isPublished(activeSession.id);
   const isMobile = useMobile();
-  const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
 
   const tools = [
     {
@@ -210,7 +209,9 @@ export function EditorActionBar() {
               borderRadius: 0,
               flexShrink: 0
             }}
-            onClick={() => setIsEditorOpen(false)}
+            onClick={() =>
+              AppEventManager.publish(AppEvents.toggleEditor, false)
+            }
           >
             <ArrowLeft size={18} />
           </Button>
