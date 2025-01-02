@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@theme-ui/components";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   Cross,
@@ -474,10 +474,25 @@ function Tab(props: TabProps) {
     : Note;
   const { attributes, listeners, setNodeRef, transform, transition, active } =
     useSortable({ id });
+  const activeTabRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (activeTabRef.current && isActive) {
+      const tab = activeTabRef.current;
+      tab.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest"
+      });
+    }
+  }, [isActive]);
 
   return (
     <Flex
-      ref={setNodeRef}
+      ref={(el) => {
+        setNodeRef(el);
+        activeTabRef.current = el;
+      }}
       className="tab"
       data-test-id={`tab-${id}`}
       sx={{

@@ -717,6 +717,32 @@ class EditorStore extends BaseStore<EditorStore> {
     }
   };
 
+  openNextSession = () => {
+    const { sessions, activeSessionId } = this.get();
+    if (sessions.length === 0 || sessions.length === 1) return;
+
+    const index = sessions.findIndex((s) => s.id === activeSessionId);
+    if (index === -1) return;
+
+    if (index === sessions.length - 1) {
+      return this.openSession(sessions[0].id);
+    }
+    return this.openSession(sessions[index + 1].id);
+  };
+
+  openPreviousSession = () => {
+    const { sessions, activeSessionId } = this.get();
+    if (sessions.length === 0 || sessions.length === 1) return;
+
+    const index = sessions.findIndex((s) => s.id === activeSessionId);
+    if (index === -1) return;
+
+    if (index === 0) {
+      return this.openSession(sessions[sessions.length - 1].id);
+    }
+    return this.openSession(sessions[index - 1].id);
+  };
+
   addSession = (session: EditorSession, activate = true) => {
     let oldSessionId: string | null = null;
 
