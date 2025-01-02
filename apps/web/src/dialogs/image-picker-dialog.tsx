@@ -22,24 +22,13 @@ import Dialog from "../components/dialog";
 import { ScrollContainer } from "@notesnook/ui";
 import { Flex, Image, Label, Text } from "@theme-ui/components";
 import { formatBytes } from "@notesnook/common";
-import { compressImage } from "../utils/image-compressor";
+import { compressImage, FileWithURI } from "../utils/image-compressor";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 
 export type ImagePickerDialogProps = BaseDialogProps<false | File[]> & {
   images: File[];
 };
-class FileWithURI extends File {
-  uri: string;
-  constructor(
-    fileBits: BlobPart[],
-    fileName: string,
-    options?: FilePropertyBag
-  ) {
-    super(fileBits, fileName, options);
-    this.uri = URL.createObjectURL(this);
-  }
-}
 
 export const ImagePickerDialog = DialogManager.register(
   function ImagePickerDialog(props: ImagePickerDialogProps) {

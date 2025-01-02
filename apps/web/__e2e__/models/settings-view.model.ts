@@ -139,4 +139,15 @@ export class SettingsViewModel {
 
     await waitForDialog(this.page, "Restoring backup");
   }
+
+  async selectImageCompression(option: { value: string; label: string }) {
+    const item = await this.navigation.findItem("Behaviour");
+    await item?.click();
+
+    const imageCompressionDropdown = this.page
+      .locator(getTestId("setting-image-compression"))
+      .locator("select");
+
+    await imageCompressionDropdown.selectOption(option);
+  }
 }
