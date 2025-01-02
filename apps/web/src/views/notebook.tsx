@@ -314,6 +314,13 @@ function NotebookHeader({
 
   useEffect(() => {
     (async function () {
+      if ((await db.notebooks.totalNotes(context.id)) !== totalNotes)
+        setTotalNotes(await db.notebooks.totalNotes(context.id));
+    })();
+  });
+
+  useEffect(() => {
+    (async function () {
       setCrumbs(await db.notebooks.breadcrumbs(context.id));
     })();
   }, [context.id]);
