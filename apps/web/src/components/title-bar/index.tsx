@@ -73,7 +73,8 @@ export function TitleBar({ isUnderlay = isMac() }: { isUnderlay?: boolean }) {
     useWindowControls();
   const isTablet = useTablet();
   const isMobile = useMobile();
-  if ((!isMobile && !isTablet) || (isFullscreen && isMac())) return null;
+  if ((!isMac() && !isMobile && !isTablet) || (isFullscreen && isMac()))
+    return null;
 
   const tools = getWindowControls(
     hasNativeWindowControls,
@@ -104,7 +105,7 @@ export function TitleBar({ isUnderlay = isMac() }: { isUnderlay?: boolean }) {
       }}
       injectCssVars
     >
-      {tools.length > 0 ? (
+      {tools.filter((t) => !t.hidden).length > 0 ? (
         <svg
           className="titlebarLogo"
           style={{
