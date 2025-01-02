@@ -73,12 +73,7 @@ export function TitleBar({ isUnderlay = isMac() }: { isUnderlay?: boolean }) {
     useWindowControls();
   const isTablet = useTablet();
   const isMobile = useMobile();
-  if (
-    (!isMobile && !isTablet) ||
-    hasNativeWindowControls ||
-    (isFullscreen && isMac())
-  )
-    return null;
+  if ((!isMobile && !isTablet) || (isFullscreen && isMac())) return null;
 
   const tools = getWindowControls(
     hasNativeWindowControls,

@@ -81,6 +81,7 @@ import useMobile from "../../hooks/use-mobile";
 import { strings } from "@notesnook/intl";
 import { TITLE_BAR_HEIGHT, getWindowControls } from "../title-bar";
 import useTablet from "../../hooks/use-tablet";
+import { isMac } from "../../utils/platform";
 
 export function EditorActionBar() {
   const { isMaximized, isFullscreen, hasNativeWindowControls } =
@@ -230,35 +231,46 @@ export function EditorActionBar() {
       ) : (
         <TabStrip />
       )}
-      {tools.map((tool) => (
-        <Button
-          data-test-id={tool.title}
-          disabled={!tool.enabled}
-          variant={tool.title === "Close" ? "error" : "secondary"}
-          title={tool.title}
-          key={tool.title}
-          sx={{
-            height: "100%",
-            alignItems: "center",
-            bg: "transparent",
-            display: [
-              "hideOnMobile" in tool && tool.hideOnMobile ? "none" : "flex",
-              tool.hidden ? "none" : "flex"
-            ],
-            borderRadius: 0,
-            flexShrink: 0,
-            "&:hover svg path": {
-              fill:
-                tool.title === "Close"
-                  ? "var(--accentForeground-error) !important"
-                  : "var(--icon)"
-            }
-          }}
-          onClick={tool.onClick}
-        >
-          <tool.icon size={18} />
-        </Button>
-      ))}
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "center",
+          mr:
+            hasNativeWindowControls && !isMac() && !isMobile && !isTablet
+              ? `calc(100vw - env(titlebar-area-width))`
+              : 0
+        }}
+      >
+        {tools.map((tool) => (
+          <Button
+            data-test-id={tool.title}
+            disabled={!tool.enabled}
+            variant={tool.title === "Close" ? "error" : "secondary"}
+            title={tool.title}
+            key={tool.title}
+            sx={{
+              height: "100%",
+              alignItems: "center",
+              bg: "transparent",
+              display: [
+                "hideOnMobile" in tool && tool.hideOnMobile ? "none" : "flex",
+                tool.hidden ? "none" : "flex"
+              ],
+              borderRadius: 0,
+              flexShrink: 0,
+              "&:hover svg path": {
+                fill:
+                  tool.title === "Close"
+                    ? "var(--accentForeground-error) !important"
+                    : "var(--icon)"
+              }
+            }}
+            onClick={tool.onClick}
+          >
+            <tool.icon size={18} />
+          </Button>
+        ))}
+      </Flex>
     </>
   );
 }
