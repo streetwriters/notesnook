@@ -69,7 +69,7 @@ function getDecorations({
   defaultLanguage
 }: {
   block: NodeWithPos;
-  defaultLanguage: string | null | undefined;
+  defaultLanguage: () => string | null | undefined;
 }) {
   const decorations: Decoration[] = [];
   const languages = refractor.listLanguages();
@@ -77,7 +77,7 @@ function getDecorations({
   const { node, pos } = block;
   const code = node.textContent;
 
-  const language = node.attrs.language || defaultLanguage;
+  const language = node.attrs.language || defaultLanguage();
   const nodes = languages.includes(language)
     ? getHighlightNodes(refractor.highlight(code, language))
     : null;
@@ -107,7 +107,7 @@ export function HighlighterPlugin({
   defaultLanguage
 }: {
   name: string;
-  defaultLanguage: string | null | undefined;
+  defaultLanguage: () => string | null | undefined;
 }) {
   const HIGHLIGHTER_PLUGIN_KEY = new PluginKey<HighlighterState>("highlighter");
   const HIGHLIGHTED_BLOCKS: Set<string> = new Set();
@@ -270,7 +270,13 @@ export function HighlighterPlugin({
     },
     appendTransaction(transactions, oldState, newState) {
       const isDocChanged = transactions.some((tr) => tr.docChanged);
-      return updateSelection(name, oldState, newState, isDocChanged);
+      return updateSelection(
+        name,
+        oldState,
+        newState,
+        isDocChanged,
+        defaultLanguage
+      );
     }
   });
 }
@@ -279,7 +285,8 @@ function updateSelection(
   name: string,
   oldState: EditorState,
   newState: EditorState,
-  isDocChanged: boolean
+  isDocChanged: boolean,
+  defaultLanguage: () => string | null | undefined
 ) {
   const oldNodeName = oldState.selection.$head.parent.type.name;
   const newNodeName = newState.selection.$head.parent.type.name;
@@ -307,6 +314,11 @@ function updateSelection(
       isDocChanged ? toCodeLines(node.textContent, pos) : undefined
     );
     attributes.caretPosition = position;
+    console.log({
+      attrs: node.attrs,
+      defaultLanguage: defaultLanguage()
+    });
+    attributes.language = node.attrs.language ?? defaultLanguage();
 
     const { tr } = newState;
     tr.setMeta("preventUpdate", true);
