@@ -29,6 +29,7 @@ Notesnook supports the following (Markdown) shortcuts in the editor:
 | Current Date        | `/date`                                                               |
 | Date Time           | `/time`                                                               |
 | Current Date & Time | `/now`                                                                |
+| Current Date & Time with timezone | `/nowz`                                                 |
 
 ## FAQs
 
