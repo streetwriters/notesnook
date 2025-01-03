@@ -41,6 +41,11 @@ declare module "@tiptap/core" {
        * Insert date & time at current position
        */
       insertDateTime: () => ReturnType;
+
+      /**
+       * Insert date & time with time zone at current position
+       */
+      insertDateTimeWithTimeZone: () => ReturnType;
     };
   }
 }
@@ -64,7 +69,8 @@ export const DateTime = Extension.create<DateTimeOptions>({
     return {
       "Alt-t": ({ editor }) => editor.commands.insertTime(),
       "Alt-d": ({ editor }) => editor.commands.insertDate(),
-      "Mod-Alt-d": ({ editor }) => editor.commands.insertDateTime()
+      "Mod-Alt-d": ({ editor }) => editor.commands.insertDateTime(),
+      "Mod-Alt-z": ({ editor }) => editor.commands.insertDateTimeWithTimeZone()
     };
   },
 
@@ -97,6 +103,16 @@ export const DateTime = Extension.create<DateTimeOptions>({
               timeFormat: this.options.timeFormat,
               type: "date-time"
             })
+          ),
+      insertDateTimeWithTimeZone:
+        () =>
+        ({ commands }) =>
+          commands.insertContent(
+            formatDate(Date.now(), {
+              dateFormat: this.options.dateFormat,
+              timeFormat: this.options.timeFormat,
+              type: "date-time-timezone"
+            })
           )
     };
   },
@@ -128,6 +144,16 @@ export const DateTime = Extension.create<DateTimeOptions>({
             dateFormat: this.options.dateFormat,
             timeFormat: this.options.timeFormat,
             type: "date-time"
+          });
+        }
+      }),
+      shortcutInputRule({
+        shortcut: "/nowz",
+        replace: () => {
+          return formatDate(Date.now(), {
+            dateFormat: this.options.dateFormat,
+            timeFormat: this.options.timeFormat,
+            type: "date-time-timezone"
           });
         }
       })
@@ -200,6 +226,15 @@ export function replaceDateTime(
       dateFormat,
       timeFormat,
       type: "date-time"
+    }) + " "
+  );
+
+  value = value.replaceAll(
+    "/nowz ",
+    formatDate(Date.now(), {
+      dateFormat,
+      timeFormat,
+      type: "date-time-timezone"
     }) + " "
   );
 

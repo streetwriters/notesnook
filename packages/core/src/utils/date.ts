@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+import timezone from "dayjs/plugin/timezone";
 import { TimeFormat } from "../types.js";
+
+dayjs.extend(advancedFormat);
+dayjs.extend(timezone);
 
 export function getWeekGroupFromTimestamp(timestamp: number) {
   const date = new Date(timestamp);
@@ -63,6 +68,9 @@ export function getTimeFormat(format: TimeFormat) {
   return format === "12-hour" ? "hh:mm A" : "HH:mm";
 }
 
+export type TimeZoneOptions = {
+  type: "timezone";
+};
 export type TimeOptions = {
   type: "time";
   timeFormat: TimeFormat;
@@ -76,7 +84,17 @@ export type DateTimeOptions = {
   dateFormat: string;
   timeFormat: TimeFormat;
 };
-export type FormatDateOptions = TimeOptions | DateOptions | DateTimeOptions;
+export type DateTimeWithTimeZoneOptions = {
+  type: "date-time-timezone";
+  dateFormat: string;
+  timeFormat: TimeFormat;
+};
+export type FormatDateOptions =
+  | TimeZoneOptions
+  | TimeOptions
+  | DateOptions
+  | DateTimeOptions
+  | DateTimeWithTimeZoneOptions;
 
 export function formatDate(
   date: string | number | Date | null | undefined,
@@ -87,6 +105,10 @@ export function formatDate(
   }
 ) {
   switch (options.type) {
+    case "date-time-timezone":
+      return dayjs(date).format(
+        `${options.dateFormat} ${getTimeFormat(options.timeFormat)} z`
+      );
     case "date-time":
       return dayjs(date).format(
         `${options.dateFormat} ${getTimeFormat(options.timeFormat)}`
@@ -95,6 +117,8 @@ export function formatDate(
       return dayjs(date).format(getTimeFormat(options.timeFormat));
     case "date":
       return dayjs(date).format(options.dateFormat);
+    case "timezone":
+      return dayjs(date).format("ZZ");
   }
 }
 
