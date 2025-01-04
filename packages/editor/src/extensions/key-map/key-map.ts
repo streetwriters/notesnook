@@ -31,6 +31,7 @@ import {
   moveParentUp,
   moveParentDown
 } from "./move-node.js";
+import { Node } from "@tiptap/pm/model";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -116,6 +117,15 @@ export const KeyMap = Extension.create({
           console.error("Error moving node down:", e);
           return false;
         }
+      },
+      [tiptapKeys.clearCurrentLine.keys]: ({ editor }) => {
+        let currentNode: Node;
+        if (isListActive(editor)) {
+          currentNode = editor.state.selection.$from.node(-1);
+        } else {
+          currentNode = editor.state.selection.$from.node();
+        }
+        return editor.commands.deleteNode(currentNode.type);
       }
     };
   }

@@ -83,3 +83,4 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Move line down | Alt ↓ | Alt ↓ | ⌥ ↓ |
 | Move parent node up | Alt ⇧ ↑ | Alt ⇧ ↑ | ⌥ ⇧ ↑ |
 | Move parent node down | Alt ⇧ ↓ | Alt ⇧ ↓ | ⌥ ⇧ ↓ |
+| Clear current line | Ctrl L | Ctrl L | ⌘ L |
