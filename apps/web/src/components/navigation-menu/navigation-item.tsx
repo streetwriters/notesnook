@@ -41,7 +41,6 @@ type NavigationItemProps = {
   onClick?: () => void;
   count?: number;
   menuItems?: MenuItem[];
-  showTitle?: boolean;
 };
 
 function NavigationItem(
@@ -65,7 +64,6 @@ function NavigationItem(
     count,
     sx,
     containerRef,
-    showTitle = true,
     ...restProps
   } = props;
   const isMobile = useMobile();
@@ -146,22 +144,21 @@ function NavigationItem(
           />
         )}
 
-        {showTitle && (
-          <Text
-            variant="body"
-            sx={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              fontWeight: selected ? "bold" : "normal",
-              color: selected ? "paragraph-selected" : "paragraph",
-              display: isTablet ? "none" : "block"
-            }}
-            ml={1}
-            data-test-id="title"
-          >
-            {title}
-            {/* {tag && (
+        <Text
+          variant="body"
+          sx={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            fontWeight: selected ? "bold" : "normal",
+            color: selected ? "paragraph-selected" : "paragraph",
+            display: isTablet ? "none" : "block"
+          }}
+          ml={1}
+          data-test-id="title"
+        >
+          {title}
+          {/* {tag && (
             <Text
               variant="subBody"
               as="span"
@@ -176,8 +173,7 @@ function NavigationItem(
               {tag}
             </Text>
           )} */}
-          </Text>
-        )}
+        </Text>
       </Button>
       {children ? (
         children
