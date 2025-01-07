@@ -28,10 +28,10 @@ import { useEffect } from "react";
 import { navigate } from "../navigation";
 
 type Props = {
-  location: "middle-pane" | "sidebar";
+  isSidebar?: boolean;
 };
 
-function Tags({ location }: Props) {
+function Tags({ isSidebar }: Props) {
   useNavigate("tags", () => store.refresh());
   const tags = useStore((store) => store.tags);
   const refresh = useStore((store) => store.refresh);
@@ -40,7 +40,7 @@ function Tags({ location }: Props) {
   );
 
   useEffect(() => {
-    if (location === "sidebar") return;
+    if (isSidebar) return;
     tags?.item(0).then((item) => {
       if (item && item?.item) {
         navigate(`/tags/${item.item.id}`);
