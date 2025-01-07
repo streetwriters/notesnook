@@ -85,6 +85,7 @@ import { CREATE_BUTTON_MAP, createBackup } from "../../common";
 import { TaskManager } from "../../common/task-manager";
 import { showToast } from "../../utils/toast";
 import { useStore } from "../../stores/note-store";
+import { TabItem } from "./tab-item";
 
 type Route = {
   id: string;
@@ -310,15 +311,13 @@ function NavigationMenu(props: NavigationMenuProps) {
         }}
       >
         {tabs.map((tab) => (
-          <NavigationItem
+          <TabItem
             key={tab.id}
             id={tab.id}
-            isTablet={isTablet}
             title={tab.title}
             icon={tab.icon}
             selected={currentTab === tab.id}
             onClick={() => setCurrentTab(tab.id)}
-            showTitle={false}
           />
         ))}
       </Flex>
