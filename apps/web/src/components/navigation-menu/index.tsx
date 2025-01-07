@@ -358,7 +358,7 @@ function NavigationMenu(props: NavigationMenuProps) {
             >
               {CREATE_BUTTON_MAP.tags.title}
             </Button>
-            <Tags location="sidebar" />
+            <Tags isSidebar />
           </Flex>
         ) : (
           <FlexScrollContainer
