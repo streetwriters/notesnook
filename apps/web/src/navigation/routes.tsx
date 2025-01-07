@@ -149,9 +149,6 @@ const routes = defineRoutes({
       title: strings.routes.Tags(),
       type: "tags",
       component: Tags,
-      props: {
-        location: "middle-pane"
-      },
       buttons: {
         create: CREATE_BUTTON_MAP.tags,
         search: {
