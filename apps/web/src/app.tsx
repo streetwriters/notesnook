@@ -154,8 +154,16 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
 
   useEffect(() => {
-    AppEventManager.subscribe(AppEvents.toggleSideMenu, setIsSideMenuOpen);
-  });
+    const { unsubscribe } = AppEventManager.subscribe(
+      AppEvents.toggleSideMenu,
+      (state) => {
+        setIsSideMenuOpen(Boolean(state));
+      }
+    );
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (isTablet) navPane.current?.collapse(0);
@@ -193,7 +201,10 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
                 background: "rgba(0,0,0,0.5)"
               }}
               onClick={() => {
-                AppEventManager.publish(AppEvents.toggleSideMenu);
+                AppEventManager.publish(
+                  AppEvents.toggleSideMenu,
+                  !isSideMenuOpen
+                );
               }}
             />
             <Flex sx={{ width: 300 }}>
