@@ -49,7 +49,7 @@ export class EditorModel {
     this.tags = page
       .locator(".active")
       .locator(`${getTestId("tags")} >> ${getTestId("tag")}`);
-    this.focusModeButton = page.locator(getTestId("Focus mode"));
+    this.focusModeButton = page.locator(getTestId("Hide sidebar"));
     this.normalModeButton = page.locator(getTestId("Normal mode"));
     this.enterFullscreenButton = page.locator(getTestId("Enter fullscreen"));
     this.exitFullscreenButton = page.locator(getTestId("Exit fullscreen"));

@@ -21,7 +21,7 @@ import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
 import { getTestId, NOTE, TITLE_ONLY_NOTE } from "./utils";
 
-test("focus mode", async ({ page }) => {
+test("hide sidebar", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
@@ -35,7 +35,7 @@ test("focus mode", async ({ page }) => {
   ).toMatchSnapshot("focus-mode.jpg", { maxDiffPixelRatio: 0.01 });
 });
 
-test("full screen in focus mode", async ({ page, headless }) => {
+test("full screen with sidebar hidden", async ({ page, headless }) => {
   // fullscreen doesn't work in headless mode
   if (headless) return;
 
@@ -52,7 +52,7 @@ test("full screen in focus mode", async ({ page, headless }) => {
   expect(await notes.editor.isFullscreen()).toBeFalsy();
 });
 
-test("normal mode from focus mode", async ({ page }) => {
+test("normal mode with sidebar", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();

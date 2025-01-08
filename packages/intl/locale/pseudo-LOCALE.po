@@ -2606,7 +2606,7 @@ msgid "Float image"
 msgstr ""
 
 #: src/strings.ts:1994
-msgid "Focus mode"
+msgid "Hide sidebar"
 msgstr ""
 
 #: src/strings.ts:2142

@@ -243,9 +243,8 @@ export const strings = {
     collection: string;
     current: number;
   }) =>
-    t`Migrating ${progress ? `${progress?.collection}` : null} ${
-      progress ? `(${progress.current}/${progress.total}) ` : null
-    }... please wait`,
+    t`Migrating ${progress ? `${progress?.collection}` : null} ${progress ? `(${progress.current}/${progress.total}) ` : null
+      }... please wait`,
   migrationError: () =>
     t`An error occurred while migrating your data. You can logout of your account and try to relogin. However this is not recommended as it may result in some data loss if your data was not synced.`,
   migrationAppReset: () =>
@@ -625,8 +624,8 @@ $headline$: Use starting line of the note as title.`,
   ) => {
     return mode in REMINDER_NOTIFICATION_MODES
       ? REMINDER_NOTIFICATION_MODES[
-          mode as keyof typeof REMINDER_NOTIFICATION_MODES
-        ]()
+        mode as keyof typeof REMINDER_NOTIFICATION_MODES
+      ]()
       : mode;
   },
   selectBackupsFolder: () => t`Select backups folder`,
@@ -979,9 +978,8 @@ $headline$: Use starting line of the note as title.`,
   mfaSmsDesc: () =>
     t`Notesnook will send you an SMS with a 2FA code when prompted`,
   mfaSmsSubtitle: (phoneNumber?: string) =>
-    t`Please confirm your identity by entering the authentication code sent to ${
-      phoneNumber ? phoneNumber : "your registered phone number."
-    }.`,
+    t`Please confirm your identity by entering the authentication code sent to ${phoneNumber ? phoneNumber : "your registered phone number."
+      }.`,
   mfaSmsInstructions: () => t`It may take a minute to receive your code.`,
   mfaSmsSelector: () => t`Don't have access to your phone number?`,
   mfaRecoveryCodeSubtitle: () =>
@@ -1991,7 +1989,7 @@ All attachments will be downloaded & cached again on access.
   enableEditorMargins: () => t`Enable editor margins`,
   exitFullScreen: () => t`Exit fullscreen`,
   normalMode: () => t`Normal mode`,
-  focusMode: () => t`Focus mode`,
+  focusMode: () => t`Hide sidebar`,
   closeOthers: () => t`Close others`,
   closeToRight: () => t`Close to the right`,
   closeToLeft: () => t`Close to the left`,

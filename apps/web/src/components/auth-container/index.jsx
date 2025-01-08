@@ -48,7 +48,7 @@ const testimonials = [
     image: Jason,
     name: "Jason Berek-Lewis",
     link: "https://twitter.com/jasonbereklewis/status/1438635808727044098",
-    text: "I work in content writing and communications. My day starts and ends in Notesnook. My Chrome app is always open; it's where I take all my notes. The clean design, focus mode, the tagging and color coding are all features that help keep my work organised every day."
+    text: "I work in content writing and communications. My day starts and ends in Notesnook. My Chrome app is always open; it's where I take all my notes. The clean design, and option to hide sidebar, the tagging and color coding are all features that help keep my work organised every day."
   },
   {
     username: "camflint",
