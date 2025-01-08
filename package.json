@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^17.1.1",
+    "@swc/core": "^1.10.6",
     "@types/node": "^18.19.70",
     "@typescript-eslint/eslint-plugin": "^5.59.9",
     "@typescript-eslint/parser": "^5.59.9",
