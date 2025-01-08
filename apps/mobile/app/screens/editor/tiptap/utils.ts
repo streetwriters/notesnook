@@ -158,6 +158,9 @@ const canRestoreAppState = (appState: AppState) => {
 };
 
 let appState: AppState | undefined;
+export function setAppState(state: AppState) {
+  appState = state;
+}
 export function getAppState() {
   if (appState && canRestoreAppState(appState)) return appState as AppState;
   const json = NotesnookModule.getAppState();

@@ -41,7 +41,7 @@ export const RightMenus = ({
   onSearch
 }: {
   headerRightButtons?: HeaderRightButton[];
-  renderedInRoute: RouteName;
+  renderedInRoute?: RouteName;
   id?: string;
   onPressDefaultRightButton?: () => void;
   search?: boolean;

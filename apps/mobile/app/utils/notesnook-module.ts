@@ -25,6 +25,18 @@ interface NotesnookModuleInterface {
   setSecureMode: (enabled: boolean) => void;
   setAppState: (appState: string) => void;
   getAppState: () => string;
+  saveAndFinish: () => void;
+  setString: (storeName: string, key: string, value: string) => void;
+  getString: (storeName: string, key: string) => Promise<string>;
+  removeString: (key: string) => void;
+  cancelAndFinish: () => void;
+  getWidgetId: () => void;
+  getIntent: () => {
+    "com.streetwriters.notesnook.OpenNoteId"?: string;
+  };
+  getWidgetNotes: () => Promise<string[]>;
+  hasWidgetNote: (noteId: string) => Promise<boolean>;
+  updateWidgetNote: (noteId: string, data: string) => void;
 }
 
 export const NotesnookModule: NotesnookModuleInterface = Platform.select({
@@ -33,7 +45,8 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     setBackgroundColor: () => {},
     setSecureMode: () => {},
     setAppState: () => {},
-    getAppState: () => {}
+    getAppState: () => {},
+    saveAndFinish: () => {}
   },
   android: NativeModules.NNativeModule
 });

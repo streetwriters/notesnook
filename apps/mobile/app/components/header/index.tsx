@@ -54,7 +54,7 @@ export const Header = ({
   onSearch
 }: {
   onLeftMenuButtonPress?: () => void;
-  renderedInRoute: RouteName;
+  renderedInRoute?: RouteName;
   id?: string;
   title: string;
   headerRightButtons?: HeaderRightButton[];

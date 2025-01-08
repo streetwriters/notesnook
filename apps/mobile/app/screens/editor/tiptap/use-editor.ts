@@ -46,6 +46,7 @@ import {
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
+import { NotePreviewWidget } from "../../../services/note-preview-widget";
 import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
 import { useSettingStore } from "../../../stores/use-setting-store";
@@ -392,6 +393,13 @@ export const useEditor = (
         }
 
         saveCount.current++;
+
+        clearTimeout(timers.current.onsave);
+        timers.current.onsave = setTimeout(async () => {
+          if (!id || !note) return;
+          NotePreviewWidget.updateNote(id, note);
+        }, 500);
+
         return id;
       } catch (e) {
         console.error(e);
@@ -915,24 +923,34 @@ export const useEditor = (
       state.current.ready = true;
     }
 
-    const noteId = useTabStore.getState().getCurrentNoteId();
-    if (!noteId) {
-      loadNote({ newNote: true });
-      if (tabBarRef.current?.page() === 1) {
-        state.current.currentlyEditing = false;
-      }
-    } else if (state.current?.initialLoadCalled) {
-      const note = currentNotes.current[noteId];
+    const appState = getAppState();
+    if (appState?.noteId) {
+      const note = await db.notes?.note(appState.noteId);
       if (note) {
         loadNote({
           item: note
         });
       }
+    } else {
+      const noteId = useTabStore.getState().getCurrentNoteId();
+      if (!noteId) {
+        loadNote({ newNote: true });
+        if (tabBarRef.current?.page() === 1) {
+          state.current.currentlyEditing = false;
+        }
+      } else if (state.current?.initialLoadCalled) {
+        const note = currentNotes.current[noteId];
+        if (note) {
+          loadNote({
+            item: note
+          });
+        }
+      }
+      if (!state.current?.initialLoadCalled) {
+        state.current.initialLoadCalled = true;
+      }
+      overlay(false);
     }
-    if (!state.current?.initialLoadCalled) {
-      state.current.initialLoadCalled = true;
-    }
-    overlay(false);
   }, [
     postMessage,
     theme,

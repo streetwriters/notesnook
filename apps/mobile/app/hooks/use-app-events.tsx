@@ -645,6 +645,7 @@ export const useAppEvents = () => {
 
     const emitterSubscriptions = [
       Linking.addEventListener("url", onAppOpenedFromURL),
+
       SodiumEventEmitter.addListener(
         "onSodiumProgress",
         onFileEncryptionProgress
@@ -695,6 +696,21 @@ export const useAppEvents = () => {
           // Reset the editor if the app has been in background for more than 10 minutes.
           eSendEvent(eEditorReset);
         }
+
+        setTimeout(async () => {
+          const intent = NotesnookModule.getIntent();
+          if (intent["com.streetwriters.notesnook.OpenNoteId"]) {
+            const note = await db.notes.note(
+              intent["com.streetwriters.notesnook.OpenNoteId"]
+            );
+            if (note) {
+              eSendEvent(eOnLoadNote, {
+                item: note
+              });
+              tabBarRef.current?.goToPage(1, false);
+            }
+          }
+        }, 50);
       } else {
         await saveEditorState();
         if (

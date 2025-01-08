@@ -1,21 +1,33 @@
 package com.streetwriters.notesnook;
 
-
+import android.app.Activity;
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
+import com.google.gson.Gson;
+import com.streetwriters.notesnook.datatypes.Note;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 public class RCTNNativeModule extends ReactContextBaseJavaModule {
-
+    Intent lastIntent;
     ReactContext mContext;
 
     public RCTNNativeModule(ReactApplicationContext reactContext) {
@@ -31,7 +43,6 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void setBackgroundColor(final String color) {
-
         try {
            getCurrentActivity().getWindow().getDecorView().setBackgroundColor(Color.parseColor(color));
         } catch (Exception e) {
@@ -47,8 +58,6 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
             promise.resolve(null);
         }
     }
-
-
 
     @ReactMethod
     public void setSecureMode(final boolean mode) {
@@ -85,6 +94,103 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         return appStateValue.isEmpty() ? null : appStateValue;
     }
 
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public int getWidgetId() {
+        return NotePreviewConfigureActivity.appWidgetId;
+    }
 
+    @ReactMethod
+    public void setString(final String storeName, final String key, final String value) {
+        SharedPreferences details = getReactApplicationContext().getSharedPreferences(storeName, Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = details.edit();
+        edit.putString(key, value);
+        edit.apply();
+    }
 
+    @ReactMethod
+    public void removeString(final String storeName, final String key) {
+        SharedPreferences details = getReactApplicationContext().getSharedPreferences(storeName, Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = details.edit();
+        edit.remove(key);
+        edit.apply();
+    }
+
+    @ReactMethod
+    public void getString(final String storeName, final String key, Promise promise) {
+        SharedPreferences details = getReactApplicationContext().getSharedPreferences(storeName, Context.MODE_PRIVATE);
+        String value = details.getString(key, "");
+        promise.resolve(value.isEmpty() ? null : value);
+    }
+
+    @ReactMethod
+    public void saveAndFinish() {
+        NotePreviewConfigureActivity.saveAndFinish(mContext);
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public WritableMap getIntent() {
+        WritableMap map = Arguments.createMap();
+        if (getCurrentActivity() != null) {
+            Intent intent = getCurrentActivity().getIntent();
+            Bundle extras = getCurrentActivity().getIntent().getExtras();
+            if (extras != null && intent != lastIntent) {
+                lastIntent = intent;
+                map.putString(NotePreviewWidget.OpenNoteId, extras.getString(NotePreviewWidget.OpenNoteId));
+            }
+        }
+        return map;
+    }
+
+    @ReactMethod
+    public void cancelAndFinish() {
+        NotePreviewConfigureActivity.activity.setResult(Activity.RESULT_CANCELED);
+        NotePreviewConfigureActivity.activity.finish();
+    }
+
+    @ReactMethod
+    public void getWidgetNotes(Promise promise) {
+        SharedPreferences pref = getReactApplicationContext().getSharedPreferences("appPreview", Context.MODE_PRIVATE);
+        Map<String, ?> map = pref.getAll();
+        WritableArray arr = Arguments.createArray();
+        for(Map.Entry<String,?> entry : map.entrySet()){
+            String value = (String) entry.getValue();
+            Gson gson = new Gson();
+            Note note = gson.fromJson(value, Note.class);
+            arr.pushString(note.getId());
+        }
+        promise.resolve(arr);
+    }
+
+    @ReactMethod
+    public void hasWidgetNote(final String noteId, Promise promise) {
+        SharedPreferences pref = getReactApplicationContext().getSharedPreferences("appPreview", Context.MODE_PRIVATE);
+        Map<String, ?> map = pref.getAll();
+        boolean found = false;
+        for(Map.Entry<String,?> entry : map.entrySet()){
+            String value = (String) entry.getValue();
+            if (value.contains(noteId)) {
+                found = true;
+            }
+        }
+        promise.resolve(found);
+    }
+    @ReactMethod
+    public void updateWidgetNote(final String noteId, final String data) {
+
+        SharedPreferences pref = getReactApplicationContext().getSharedPreferences("appPreview", Context.MODE_PRIVATE);
+        Map<String, ?> map = pref.getAll();
+        SharedPreferences.Editor edit = pref.edit();
+        ArrayList<String> ids = new ArrayList<>();
+        for(Map.Entry<String,?> entry : map.entrySet()) {
+            String value = (String) entry.getValue();
+            if (value.contains(noteId)) {
+                edit.putString(entry.getKey(), data);
+                ids.add(entry.getKey());
+            }
+        }
+        edit.apply();
+        for (String id: ids) {
+            NotePreviewWidget.updateAppWidget(mContext, AppWidgetManager.getInstance(mContext), Integer.parseInt(id));
+        }
+    }
 }

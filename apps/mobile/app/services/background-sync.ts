@@ -25,6 +25,7 @@ import {
 import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { deleteDCacheFiles } from "../common/filesystem/io";
 import { useUserStore } from "../stores/use-user-store";
+import { NotePreviewWidget } from "./note-preview-widget";
 import Notifications from "./notifications";
 import SettingsService from "./settings";
 
@@ -112,6 +113,8 @@ async function onBackgroundSyncStarted() {
       useUserStore.getState().setSyncing(false);
     }
     await Notifications.setupReminders();
+
+    NotePreviewWidget.updateNotes();
     deleteDCacheFiles();
     DatabaseLogger.info("BACKGROUND SYNC COMPLETE");
   } catch (e) {

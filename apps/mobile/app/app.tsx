@@ -32,12 +32,15 @@ import { withErrorBoundry } from "./components/exception-handler";
 import GlobalSafeAreaProvider from "./components/globalsafearea";
 import { useAppEvents } from "./hooks/use-app-events";
 import { ApplicationHolder } from "./navigation";
+import { NotePreviewConfigure } from "./screens/note-preview-configure";
 import { themeTrpcClient } from "./screens/settings/theme-selector";
 import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
 import { useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
+import { NotesnookModule } from "./utils/notesnook-module";
+import { setAppState } from "./screens/editor/tiptap/utils";
 
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
@@ -46,8 +49,17 @@ const { appLockEnabled, appLockMode } = SettingsService.get();
 if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
+const launchIntent = NotesnookModule.getIntent();
+if (launchIntent["com.streetwriters.notesnook.OpenNoteId"]) {
+  setAppState({
+    movedAway: false,
+    editing: true,
+    timestamp: Date.now(),
+    noteId: launchIntent["com.streetwriters.notesnook.OpenNoteId"]
+  });
+}
 
-const App = () => {
+const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore
   globalThis["IS_MAIN_APP_RUNNING"] = true;
@@ -61,6 +73,7 @@ const App = () => {
       TipManager.init();
     }, 100);
   }, []);
+
   return (
     <View
       style={{
@@ -90,7 +103,11 @@ const App = () => {
           width: "100%"
         }}
       >
-        <ApplicationHolder />
+        {props.configureMode === "note-preview" ? (
+          <NotePreviewConfigure />
+        ) : (
+          <ApplicationHolder />
+        )}
       </GestureHandlerRootView>
       <AppLockedOverlay />
     </View>
@@ -103,8 +120,8 @@ let currTheme =
     : SettingsService.getProperty("lighTheme");
 useThemeEngineStore.getState().setTheme(currTheme);
 
-export const withTheme = (Element: () => JSX.Element) => {
-  return function AppWithThemeProvider() {
+export const withTheme = (Element: (props: any) => JSX.Element) => {
+  return function AppWithThemeProvider(props: any) {
     const [colorScheme, darkTheme, lightTheme] = useThemeStore((state) => [
       state.colorScheme,
       state.darkTheme,
@@ -144,7 +161,7 @@ export const withTheme = (Element: () => JSX.Element) => {
 
     return (
       <I18nProvider i18n={i18n}>
-        <Element />
+        <Element {...props} />
       </I18nProvider>
     );
   };

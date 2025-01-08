@@ -60,7 +60,6 @@
         android:theme="@style/BootTheme"
         android:largeHeap="true"
         android:supportsRtl="false"
-        android:networkSecurityConfig="@xml/network_security_config"
         tools:replace="android:supportsRtl">
     
         <receiver android:exported="false" android:name=".NoteWidget">
@@ -72,6 +71,27 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/new_note_widget_info" />
         </receiver>
+
+        <receiver android:exported="false" android:name=".NotePreviewWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/note_widget_info" />
+        </receiver>
+
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:label="NotePreviewConfigure"
+            android:launchMode="singleTask"
+            android:exported="true"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize" android:name=".NotePreviewConfigureActivity">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".MainActivity"
@@ -192,9 +212,6 @@
                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
            </intent-filter>
       </receiver>
-
-
-        
 
     </application>
 

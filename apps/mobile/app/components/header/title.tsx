@@ -41,7 +41,7 @@ export const Title = ({
   isHiddenOnRender?: boolean;
   accentColor?: string;
   isBeta?: boolean;
-  renderedInRoute: string;
+  renderedInRoute?: string;
   id?: string;
 }) => {
   const { colors } = useThemeColors();
