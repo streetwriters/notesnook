@@ -83,7 +83,7 @@ export default class FileHandle {
     for (let i = from; i < from + length; ++i) {
       const array = await this.readChunk(i);
       if (!array) throw new Error(`No data found for chunk at offset ${i}.`);
-      blobParts.push(array.buffer);
+      blobParts.push(new Uint8Array(array.buffer));
     }
     return new Blob(blobParts, { type: this.file.type });
   }
@@ -93,7 +93,7 @@ export default class FileHandle {
     for (const chunk of this.chunks) {
       const array = await this.storage.readChunk(chunk);
       if (!array) continue;
-      blobParts.push(array.buffer);
+      blobParts.push(new Uint8Array(array.buffer));
     }
     return new Blob(blobParts, { type: this.file.type });
   }
