@@ -34,6 +34,6 @@ export const compressionRouter = t.router({
       return (await gzipAsync(data, { level })).toString("base64");
     }),
   gunzip: t.procedure.input(z.string()).query(async ({ input }) => {
-    return (await gunzipAsync(Buffer.from(input, "base64"))).toString("utf-8");
+    return (await gunzipAsync(new Uint8Array(Buffer.from(input, "base64")))).toString("utf-8");
   })
 });
