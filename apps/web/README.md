@@ -1,12 +1,8 @@
-<p align="center">
-<img style="align:center;" src="/resources/screenshots/web.jpg" alt="Notesnook web screenshot" width="600" />
-</p>
+# Notesnook
 
-<h1 align="center">Notesnook Web</h1>
-<h3 align="center">The web app is built using React, Typescript & Javascript.</h3>
-<p align="center">
-<a href="https://app.notesnook.com/">Try it out!</a> | <a href="#developer-guide">Developer guide</a> | <a href="#build-instructions">How to build?</a> | <a href="../desktop/">Desktop app</a>
-</p>
+> An end-to-end encrypted note taking alternative to Evernote.
+
+Web app | <a href="#developer-guide">Developer guide</a> | <a href="#build-instructions">How to build?</a> | <a href="../desktop/">Desktop app</a>
 
 ## Getting started
 

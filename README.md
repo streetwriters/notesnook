@@ -1,12 +1,6 @@
-<p align="center">
-<img style="align:center;" src="./resources/icon.png" alt="Notesnook Logo" width="100" />
-</p>
+# Notesnook
 
-<h1 align="center">Notesnook</h1>
-<h3 align="center">An end-to-end encrypted note taking alternative to Evernote.</h3>
-<p align="center">
-<a href="https://notesnook.com/">Website</a> | <a href="https://notesnook.com/about">About us</a> | <a href="https://notesnook.com/roadmap">Roadmap</a> | <a href="https://notesnook.com/downloads">Downloads</a> | <a href="https://twitter.com/@notesnook">Twitter</a> | <a href="https://discord.gg/5davZnhw3V">Discord</a>
-</p>
+> An end-to-end encrypted note taking alternative to Evernote.
 
 ## Overview
 
