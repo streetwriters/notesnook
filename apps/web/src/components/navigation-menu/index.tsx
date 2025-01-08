@@ -131,7 +131,7 @@ type NavigationMenuProps = {
 function NavigationMenu(props: NavigationMenuProps) {
   const { toggleNavigationContainer, isTablet } = props;
   const [location, previousLocation, state] = useLocation();
-  const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const isHideSidebar = useAppStore((store) => store.isHideSidebar);
   const colors = useAppStore((store) => store.colors);
   const shortcuts = useAppStore((store) => store.shortcuts);
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
@@ -230,7 +230,7 @@ function NavigationMenu(props: NavigationMenuProps) {
         id="navigation-menu"
         data-test-id="navigation-menu"
         sx={{
-          display: isFocusMode ? "none" : "flex",
+          display: isHideSidebar ? "none" : "flex",
           flex: 1,
           overflow: "hidden",
           flexDirection: "column",

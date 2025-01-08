@@ -54,7 +54,7 @@ type AppEffectsProps = {
 export default function AppEffects({ setShow }: AppEffectsProps) {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
   const updateLastSynced = useStore((store) => store.updateLastSynced);
-  const isFocusMode = useStore((store) => store.isFocusMode);
+  const isHideSidebar = useStore((store) => store.isHideSidebar);
   const initUser = useUserStore((store) => store.init);
   const initStore = useStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
@@ -234,9 +234,9 @@ export default function AppEffects({ setShow }: AppEffectsProps) {
   }, []);
 
   useEffect(() => {
-    setShow(!isFocusMode);
+    setShow(!isHideSidebar);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocusMode]);
+  }, [isHideSidebar]);
 
   useEffect(() => {
     introduceFeatures();

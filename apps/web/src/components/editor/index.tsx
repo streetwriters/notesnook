@@ -261,7 +261,7 @@ function EditorView({
   const root = useRef<HTMLDivElement>(null);
 
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
-  const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const isHideSidebar = useAppStore((store) => store.isHideSidebar);
   const editor = useEditorManager((store) => store.editors[session.id]?.editor);
 
   useEffect(() => {
@@ -364,7 +364,7 @@ function EditorView({
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
           onRequestFocus: () => toggleProperties(false),
-          focusMode: isFocusMode
+          HideSidebar: isHideSidebar
         }}
       />
     </Flex>
@@ -428,7 +428,7 @@ function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
 type EditorOptions = {
   headless?: boolean;
   readonly?: boolean;
-  focusMode?: boolean;
+  HideSidebar?: boolean;
   onRequestFocus?: () => void;
 };
 type EditorProps = {
@@ -455,7 +455,7 @@ export function Editor(props: EditorProps) {
   const { readonly, headless } = options || {
     headless: false,
     readonly: false,
-    focusMode: false
+    HideSidebar: false
   };
   const saveSessionContentIfNotSaved = useEditorStore(
     (store) => store.saveSessionContentIfNotSaved
@@ -627,10 +627,10 @@ export function Editor(props: EditorProps) {
 
 function EditorChrome(props: PropsWithChildren<EditorProps>) {
   const { id, options, children } = props;
-  const { focusMode, headless, onRequestFocus } = options || {
+  const { HideSidebar, headless, onRequestFocus } = options || {
     headless: false,
     readonly: false,
-    focusMode: false
+    HideSidebar: false
   };
   const editorMargins = useEditorStore((store) => store.editorMargins);
   const editorContainerRef = useRef<HTMLElement>(null);
@@ -691,7 +691,11 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           variant="columnFill"
           className="editor"
           sx={{
-            alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
+            alignSelf: [
+              "stretch",
+              HideSidebar ? "center" : "stretch",
+              "center"
+            ],
             maxWidth: editorMargins ? "min(100%, 850px)" : "auto",
             width: "100%"
           }}

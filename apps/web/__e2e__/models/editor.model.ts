@@ -28,7 +28,7 @@ export class EditorModel {
   readonly content: Locator;
   private readonly tags: Locator;
   private readonly tagInput: Locator;
-  private readonly focusModeButton: Locator;
+  private readonly hideSidebarButton: Locator;
   private readonly normalModeButton: Locator;
   private readonly enterFullscreenButton: Locator;
   private readonly exitFullscreenButton: Locator;
@@ -49,7 +49,7 @@ export class EditorModel {
     this.tags = page
       .locator(".active")
       .locator(`${getTestId("tags")} >> ${getTestId("tag")}`);
-    this.focusModeButton = page.locator(getTestId("Hide sidebar"));
+    this.hideSidebarButton = page.locator(getTestId("Hide sidebar"));
     this.normalModeButton = page.locator(getTestId("Normal mode"));
     this.enterFullscreenButton = page.locator(getTestId("Enter fullscreen"));
     this.exitFullscreenButton = page.locator(getTestId("Exit fullscreen"));
@@ -200,17 +200,17 @@ export class EditorModel {
       : (await this.content.innerText()).trim().replace(/\n+/gm, "\n");
   }
 
-  async enterFocusMode() {
-    await this.focusModeButton.click();
+  async enterHideSidebar() {
+    await this.hideSidebarButton.click();
     await this.normalModeButton.waitFor();
   }
 
-  async exitFocusMode() {
+  async exitHideSidebar() {
     await this.normalModeButton.click();
-    await this.focusModeButton.waitFor();
+    await this.hideSidebarButton.waitFor();
   }
 
-  async isFocusMode() {
+  async isHideSidebar() {
     return await this.normalModeButton.isVisible();
   }
 

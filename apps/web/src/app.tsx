@@ -51,7 +51,7 @@ new WebExtensionRelay();
 function App() {
   const isMobile = useMobile();
   const [show, setShow] = useState(true);
-  const isFocusMode = useStore((store) => store.isFocusMode);
+  const isHideSidebar = useStore((store) => store.isHideSidebar);
   const { isFocused } = useWindowFocus();
   const { isFullscreen } = useWindowControls();
   console.timeEnd("loading app");
@@ -114,7 +114,7 @@ function App() {
       <Flex
         id="app"
         bg="background"
-        className={isFocusMode ? "app-focus-mode" : ""}
+        className={isHideSidebar ? "app-focus-mode" : ""}
         sx={{
           overflow: "hidden",
           flexDirection: "column",
@@ -139,7 +139,7 @@ type DesktopAppContentsProps = {
   setShow: (show: boolean) => void;
 };
 function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
-  const isFocusMode = useStore((store) => store.isFocusMode);
+  const isHideSidebar = useStore((store) => store.isHideSidebar);
   const isTablet = useTablet();
   const [isNarrow, setIsNarrow] = useState(isTablet || false);
   const navPane = useRef<SplitPaneImperativeHandle>(null);
@@ -155,14 +155,14 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
   // }, [show]);
 
   // useEffect(() => {
-  //   if (isFocusMode) {
+  //   if (isHideSidebar) {
   //     const middlePaneSize = middlePane.current?.getSize() || 20;
   //     navPane.current?.collapse();
   //     // the middle pane has to be resized because collapsing the nav
   //     // pane increases the middle pane's size every time.
   //     middlePane.current?.resize(middlePaneSize);
   //   } else navPane.current?.expand();
-  // }, [isFocusMode]);
+  // }, [isHideSidebar]);
   return (
     <>
       <Flex
@@ -180,7 +180,7 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
             setIsNarrow(sizes[0] <= 70);
           }}
         >
-          {isFocusMode ? null : (
+          {isHideSidebar ? null : (
             <Pane
               id="nav-pane"
               initialSize={180}
@@ -197,7 +197,7 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
               />
             </Pane>
           )}
-          {!isFocusMode && show ? (
+          {!isHideSidebar && show ? (
             <Pane
               id="list-pane"
               initialSize={380}

@@ -27,9 +27,9 @@ test("hide sidebar", async ({ page }) => {
   const notes = await app.goToNotes();
   await notes.createNote(NOTE);
 
-  await notes.editor.enterFocusMode();
+  await notes.editor.enterHideSidebar();
 
-  expect(await notes.editor.isFocusMode()).toBeTruthy();
+  expect(await notes.editor.isHideSidebar()).toBeTruthy();
   expect(
     await page.screenshot({ fullPage: true, quality: 100, type: "jpeg" })
   ).toMatchSnapshot("focus-mode.jpg", { maxDiffPixelRatio: 0.01 });
@@ -43,7 +43,7 @@ test("full screen with sidebar hidden", async ({ page, headless }) => {
   await app.goto();
   const notes = await app.goToNotes();
   await notes.createNote(NOTE);
-  await notes.editor.enterFocusMode();
+  await notes.editor.enterHideSidebar();
 
   await notes.editor.enterFullscreen();
   expect(await notes.editor.isFullscreen()).toBeTruthy();
@@ -57,11 +57,11 @@ test("normal mode with sidebar", async ({ page }) => {
   await app.goto();
   const notes = await app.goToNotes();
   await notes.createNote(NOTE);
-  await notes.editor.enterFocusMode();
+  await notes.editor.enterHideSidebar();
 
-  await notes.editor.exitFocusMode();
+  await notes.editor.exitHideSidebar();
 
-  expect(await notes.editor.isFocusMode()).toBeFalsy();
+  expect(await notes.editor.isHideSidebar()).toBeFalsy();
   expect(
     await page.screenshot({ fullPage: true, quality: 100, type: "jpeg" })
   ).toMatchSnapshot("normal-mode-from-focus-mode.jpg", {

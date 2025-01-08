@@ -25,7 +25,7 @@ import {
   EditorFullWidth,
   EditorNormalWidth,
   ExitFullscreen,
-  FocusMode,
+  HideSidebar,
   Fullscreen,
   Lock,
   NormalMode,
@@ -87,7 +87,7 @@ export function EditorActionBar() {
   const { isMaximized, isFullscreen, hasNativeWindowControls } =
     useWindowControls();
   const editorMargins = useEditorStore((store) => store.editorMargins);
-  const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const isHideSidebar = useAppStore((store) => store.isHideSidebar);
   const activeSession = useEditorStore((store) =>
     store.activeSessionId ? store.getSession(store.activeSessionId) : undefined
   );
@@ -143,7 +143,7 @@ export function EditorActionBar() {
         : strings.enterFullScreen(),
       icon: isFullscreen ? ExitFullscreen : Fullscreen,
       enabled: true,
-      hidden: !isFocusMode,
+      hidden: !isHideSidebar,
       hideOnMobile: true,
       onClick: () => {
         if (isFullscreen) {
@@ -154,12 +154,12 @@ export function EditorActionBar() {
       }
     },
     {
-      title: isFocusMode ? strings.normalMode() : strings.focusMode(),
-      icon: isFocusMode ? FocusMode : NormalMode,
+      title: isHideSidebar ? strings.normalMode() : strings.HideSidebar(),
+      icon: isHideSidebar ? HideSidebar : NormalMode,
       enabled: true,
       hideOnMobile: true,
       onClick: () => {
-        useAppStore.getState().toggleFocusMode();
+        useAppStore.getState().toggleHideSidebar();
         if (document.fullscreenElement) exitFullscreen();
         const id = useEditorStore.getState().activeSessionId;
         const editor = id && useEditorManager.getState().getEditor(id);
@@ -197,7 +197,7 @@ export function EditorActionBar() {
         activeSession.type !== "locked" &&
         activeSession.type !== "diff" &&
         activeSession.type !== "conflicted" &&
-        !isFocusMode,
+        !isHideSidebar,
       onClick: () => useEditorStore.getState().toggleProperties()
     },
     ...getWindowControls(

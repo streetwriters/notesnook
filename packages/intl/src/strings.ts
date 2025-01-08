@@ -1989,7 +1989,7 @@ All attachments will be downloaded & cached again on access.
   enableEditorMargins: () => t`Enable editor margins`,
   exitFullScreen: () => t`Exit fullscreen`,
   normalMode: () => t`Normal mode`,
-  focusMode: () => t`Hide sidebar`,
+  hideSidebar: () => t`Hide sidebar`,
   closeOthers: () => t`Close others`,
   closeToRight: () => t`Close to the right`,
   closeToLeft: () => t`Close to the left`,

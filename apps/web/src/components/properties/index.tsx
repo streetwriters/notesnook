@@ -110,11 +110,11 @@ type EditorPropertiesProps = {
 };
 function EditorProperties(props: EditorPropertiesProps) {
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
-  const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const isHideSidebar = useAppStore((store) => store.isHideSidebar);
   const session = useEditorStore((store) =>
     store.getSession(props.sessionId, ["default", "readonly", "deleted"])
   );
-  if (isFocusMode || !session) return null;
+  if (isHideSidebar || !session) return null;
   return (
     <Flex
       css={`@keyframes slideIn {

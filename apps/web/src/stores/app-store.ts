@@ -61,7 +61,7 @@ let syncTimeout = 0;
 let pendingSync: SyncOptions | undefined = undefined;
 
 class AppStore extends BaseStore<AppStore> {
-  isFocusMode = false;
+  isHideSidebar = false;
   isVaultCreated = false;
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
@@ -169,8 +169,8 @@ class AppStore extends BaseStore<AppStore> {
     });
   };
 
-  toggleFocusMode = () => {
-    this.set((state) => (state.isFocusMode = !state.isFocusMode));
+  toggleHideSidebar = () => {
+    this.set((state) => (state.isHideSidebar = !state.isHideSidebar));
   };
 
   toggleAutoSync = () => {

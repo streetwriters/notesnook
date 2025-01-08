@@ -49,7 +49,7 @@ function StatusBar() {
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
   const statuses = useStatus();
   const updateStatus = useAutoUpdater();
-  const isFocusMode = useAppStore((state) => state.isFocusMode);
+  const isHideSidebar = useAppStore((state) => state.isHideSidebar);
   const { isVaultLocked, lockVault } = useVault();
 
   return (
@@ -66,7 +66,7 @@ function StatusBar() {
       }}
       px={2}
     >
-      {isFocusMode ? (
+      {isHideSidebar ? (
         <Flex />
       ) : (
         <Flex sx={{ gap: "small" }}>
