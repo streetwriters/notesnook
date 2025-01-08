@@ -34,7 +34,10 @@ import {
   useToolbarStore
 } from "../../toolbar/stores/toolbar-store.js";
 import React from "react";
-import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive/index.js";
+import {
+  ResponsivePresenter,
+  ResponsivePresenterProps
+} from "../responsive/index.js";
 
 export type PopupWrapperProps = UsePopupHandlerOptions & {
   autoCloseOnUnmount?: boolean;

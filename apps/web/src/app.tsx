@@ -307,7 +307,7 @@ function MobileAppContents() {
           flexShrink: 0
         }}
       >
-        <NavigationMenu toggleNavigationContainer={() => { }} isTablet={false} />
+        <NavigationMenu toggleNavigationContainer={() => {}} isTablet={false} />
       </Flex>
       <Flex
         className="mobile-list-pane"

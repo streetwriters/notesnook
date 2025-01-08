@@ -20,7 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useRef } from "react";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { ToolButton } from "../components/tool-button.js";
-import { usePopupManager, useToolbarLocation } from "../stores/toolbar-store.js";
+import {
+  usePopupManager,
+  useToolbarLocation
+} from "../stores/toolbar-store.js";
 import { ToolProps } from "../types.js";
 import { getToolbarElement } from "../utils/dom.js";
 import { ToolId } from "../tools/index.js";

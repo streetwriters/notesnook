@@ -99,11 +99,11 @@ export const SplitPane = React.forwardRef<
 
   const { sizeName, splitPos, splitAxis } = useMemo(
     () =>
-    ({
-      sizeName: direction === "vertical" ? "width" : "height",
-      splitPos: direction === "vertical" ? "left" : "top",
-      splitAxis: direction === "vertical" ? "x" : "y"
-    } as const),
+      ({
+        sizeName: direction === "vertical" ? "width" : "height",
+        splitPos: direction === "vertical" ? "left" : "top",
+        splitAxis: direction === "vertical" ? "x" : "y"
+      } as const),
     [direction]
   );
 

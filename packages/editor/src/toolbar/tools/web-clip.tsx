@@ -21,7 +21,10 @@ import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { MoreTools } from "../components/more-tools.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
-import { findSelectedNode, selectionToOffset } from "../../utils/prosemirror.js";
+import {
+  findSelectedNode,
+  selectionToOffset
+} from "../../utils/prosemirror.js";
 
 export function WebClipSettings(props: ToolProps) {
   const { editor } = props;

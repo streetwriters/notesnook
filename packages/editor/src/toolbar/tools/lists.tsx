@@ -22,7 +22,10 @@ import { Box, Button, Flex } from "@theme-ui/components";
 import { IconNames } from "../icons.js";
 import { useCallback, useRef } from "react";
 import { SplitButton } from "../components/split-button.js";
-import { usePopupManager, useToolbarLocation } from "../stores/toolbar-store.js";
+import {
+  usePopupManager,
+  useToolbarLocation
+} from "../stores/toolbar-store.js";
 import { getToolbarElement } from "../utils/dom.js";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { ToolButton } from "../components/tool-button.js";

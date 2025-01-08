@@ -217,7 +217,9 @@ Logged in: ${user ? "yes" : "no"}`,
             {strings.issueNotice[0]()}{" "}
             <Text
               onPress={() => {
-                Linking.openURL("https://github.com/streetwriters/notesnook/issues");
+                Linking.openURL(
+                  "https://github.com/streetwriters/notesnook/issues"
+                );
               }}
               style={{
                 textDecorationLine: "underline",

@@ -76,7 +76,7 @@ import { TITLE_BAR_HEIGHT } from "../title-bar";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
-const autoSaveToast = { show: true, hide: () => { } };
+const autoSaveToast = { show: true, hide: () => {} };
 
 async function saveContent(
   noteId: string,
@@ -252,10 +252,10 @@ function EditorView({
   session
 }: {
   session:
-  | DefaultEditorSession
-  | NewEditorSession
-  | ReadonlyEditorSession
-  | DeletedEditorSession;
+    | DefaultEditorSession
+    | NewEditorSession
+    | ReadonlyEditorSession
+    | DeletedEditorSession;
 }) {
   const lastChangedTime = useRef<number>(0);
   const root = useRef<HTMLDivElement>(null);
