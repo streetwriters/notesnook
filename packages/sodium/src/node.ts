@@ -386,7 +386,7 @@ function from_hex(input: string): Uint8Array {
 }
 
 function to_string(input: Uint8Array): string {
-  return Buffer.from(input, input.byteOffset, input.byteLength).toString(
+  return Buffer.from(input.buffer, input.byteOffset, input.byteLength).toString(
     "utf-8"
   );
 }
