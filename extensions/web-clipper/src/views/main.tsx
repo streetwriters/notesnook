@@ -69,6 +69,11 @@ const clipAreas: { name: string; id: ClipArea; icon: string }[] = [
 const clipModes: { name: string; id: ClipMode; icon: string; pro?: boolean }[] =
   [
     {
+      name: "Bookmark",
+      id: "bookmark",
+      icon: Icons.bookmark
+    },
+    {
       name: "Simplified",
       id: "simplified",
       icon: Icons.simplified
@@ -166,7 +171,7 @@ export function Main() {
   }, [settings]);
 
   async function startClip() {
-    if (!clipArea || !clipMode) return;
+    if (!clipArea || !clipMode || clipMode === "bookmark") return;
 
     try {
       setError(undefined);
@@ -268,7 +273,11 @@ export function Main() {
               setClipperState(ClipperState.Idle);
               setClipArea(item.id);
             }}
-            disabled={isClipping || clipperState === ClipperState.Clipped}
+            disabled={
+              isClipping ||
+              clipperState === ClipperState.Clipped ||
+              clipMode === "bookmark"
+            }
             sx={{
               display: "flex",
               borderRadius: "default",
@@ -342,55 +351,58 @@ export function Main() {
           </Button>
         ))}
 
-        {clipData && clipData.data && !isClipping && (
-          <Flex sx={{ gap: 1, justifyContent: "space-between" }}>
-            <Text
-              variant="body"
-              sx={{
-                flex: 1,
-                mt: 1,
-                bg: "shade",
-                color: "accent",
-                p: 1,
-                border: "1px solid var(--accent)",
-                borderRadius: "default",
-                cursor: "pointer",
-                ":hover": {
-                  filter: "brightness(80%)"
-                }
-              }}
-              onClick={async () => {
-                const winUrl = URL.createObjectURL(
-                  new Blob(["\ufeff", clipData.data], { type: "text/html" })
-                );
-                await browser.windows.create({
-                  url: winUrl
-                });
-              }}
-            >
-              Clip done. Click here to preview.
-            </Text>
-            <Text
-              variant="body"
-              sx={{
-                mt: 1,
-                bg: "background-secondary",
-                p: 1,
-                borderRadius: "default",
-                cursor: "pointer",
-                ":hover": {
-                  filter: "brightness(80%)"
-                }
-              }}
-              onClick={async () => {
-                setClipData(undefined);
-                setClipperState(ClipperState.Idle);
-              }}
-            >
-              Discard
-            </Text>
-          </Flex>
-        )}
+        {clipMode !== "bookmark" &&
+          clipData &&
+          clipData.data &&
+          !isClipping && (
+            <Flex sx={{ gap: 1, justifyContent: "space-between" }}>
+              <Text
+                variant="body"
+                sx={{
+                  flex: 1,
+                  mt: 1,
+                  bg: "shade",
+                  color: "accent",
+                  p: 1,
+                  border: "1px solid var(--accent)",
+                  borderRadius: "default",
+                  cursor: "pointer",
+                  ":hover": {
+                    filter: "brightness(80%)"
+                  }
+                }}
+                onClick={async () => {
+                  const winUrl = URL.createObjectURL(
+                    new Blob(["\ufeff", clipData.data], { type: "text/html" })
+                  );
+                  await browser.windows.create({
+                    url: winUrl
+                  });
+                }}
+              >
+                Clip done. Click here to preview.
+              </Text>
+              <Text
+                variant="body"
+                sx={{
+                  mt: 1,
+                  bg: "background-secondary",
+                  p: 1,
+                  borderRadius: "default",
+                  cursor: "pointer",
+                  ":hover": {
+                    filter: "brightness(80%)"
+                  }
+                }}
+                onClick={async () => {
+                  setClipData(undefined);
+                  setClipperState(ClipperState.Idle);
+                }}
+              >
+                Discard
+              </Text>
+            </Flex>
+          )}
 
         {error && (
           <Text
@@ -461,7 +473,15 @@ export function Main() {
               return;
             }
 
-            if (!clipData || !title || !clipArea || !clipMode || !url) return;
+            const isBookmark = clipMode === "bookmark";
+            const data = isBookmark
+              ? {
+                  data: `<a href="${url}">${title}</a>`
+                }
+              : clipData;
+
+            if (!data || !clipData || !title || !clipArea || !clipMode || !url)
+              return;
 
             const notesnook = await connectApi(false);
             if (!notesnook) {
@@ -476,7 +496,7 @@ export function Main() {
               note,
               refs,
               pageTitle: pageTitle.current,
-              ...clipData
+              ...data
             });
 
             setClipData(undefined);
@@ -492,7 +512,9 @@ export function Main() {
             window.close();
           }}
         >
-          {clipperButtonLabelMap[clipperState]}
+          {clipMode === "bookmark"
+            ? "Save bookmark"
+            : clipperButtonLabelMap[clipperState]}
         </Button>
 
         <Flex
