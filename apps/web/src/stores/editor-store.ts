@@ -533,12 +533,6 @@ class EditorStore extends BaseStore<EditorStore> {
       this.updateSession(session.id, [session.type], {
         activeBlockId
       });
-
-    if (session)
-      AppEventManager.publish(
-        AppEvents.revealItemInList,
-        "note" in session ? session.note.id : session.id
-      );
   };
 
   openDiffSession = async (noteId: string, sessionId: string) => {
