@@ -27,10 +27,12 @@ import {
   fillColorDialog,
   fillNotebookDialog,
   fillPasswordDialog,
+  fillReminderDialog,
   iterateList
 } from "./utils";
 import { SessionHistoryItemModel } from "./session-history-item-model";
 import dayjs from "dayjs";
+import { Reminder } from "@notesnook/core";
 
 abstract class BaseProperties {
   protected readonly page: Page;
@@ -386,6 +388,12 @@ export class NoteContextMenuModel extends BaseProperties {
     await addSubNotebooks(this.page, dialog, notebookItem, notebook);
 
     await confirmDialog(dialog);
+  }
+
+  async addReminder(reminder: Partial<Reminder>) {
+    await this.open();
+    await this.menu.clickOnItem("remind-me");
+    await fillReminderDialog(this.page, reminder);
   }
 
   async open() {
