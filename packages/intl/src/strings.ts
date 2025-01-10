@@ -24,18 +24,18 @@ import { doActions } from "../generated/do-actions";
 import { inProgressActions } from "../generated/in-progress-actions";
 
 const SEARCH_IN_ROUTE_STRINGS = {
-  Notes: () => t`Search in in Notes`,
-  Notebooks: () => t`Search in in Notebooks`,
-  Notebook: () => t`Search in in Notebook`,
-  Favorites: () => t`Search in in Favorites`,
-  Reminders: () => t`Search in in Reminders`,
-  Trash: () => t`Search in in Trash`,
-  Settings: () => t`Search in in Settings`,
-  Tags: () => t`Search in in Tags`,
-  Editor: () => t`Search in in Editor`,
-  Home: () => t`Search in in Home`,
-  Search: () => t`Search in in Search`,
-  Monographs: () => t`Search in in Monographs`
+  Notes: () => t`Search in Notes`,
+  Notebooks: () => t`Search in Notebooks`,
+  Notebook: () => t`Search in Notebook`,
+  Favorites: () => t`Search in Favorites`,
+  Reminders: () => t`Search in Reminders`,
+  Trash: () => t`Search in Trash`,
+  Settings: () => t`Search in Settings`,
+  Tags: () => t`Search in Tags`,
+  Editor: () => t`Search in Editor`,
+  Home: () => t`Search in Home`,
+  Search: () => t`Search in Search`,
+  Monographs: () => t`Search in Monographs`
 };
 
 const TRANSACTION_STATUS = {

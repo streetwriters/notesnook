@@ -5046,51 +5046,51 @@ msgid "Search in {routeName}"
 msgstr ""
 
 #: src/strings.ts:35
-msgid "Search in in Editor"
+msgid "Search in Editor"
 msgstr ""
 
 #: src/strings.ts:30
-msgid "Search in in Favorites"
+msgid "Search in Favorites"
 msgstr ""
 
 #: src/strings.ts:36
-msgid "Search in in Home"
+msgid "Search in Home"
 msgstr ""
 
 #: src/strings.ts:38
-msgid "Search in in Monographs"
+msgid "Search in Monographs"
 msgstr ""
 
 #: src/strings.ts:29
-msgid "Search in in Notebook"
+msgid "Search in Notebook"
 msgstr ""
 
 #: src/strings.ts:28
-msgid "Search in in Notebooks"
+msgid "Search in Notebooks"
 msgstr ""
 
 #: src/strings.ts:27
-msgid "Search in in Notes"
+msgid "Search in Notes"
 msgstr ""
 
 #: src/strings.ts:31
-msgid "Search in in Reminders"
+msgid "Search in Reminders"
 msgstr ""
 
 #: src/strings.ts:37
-msgid "Search in in Search"
+msgid "Search in Search"
 msgstr ""
 
 #: src/strings.ts:33
-msgid "Search in in Settings"
+msgid "Search in Settings"
 msgstr ""
 
 #: src/strings.ts:34
-msgid "Search in in Tags"
+msgid "Search in Tags"
 msgstr ""
 
 #: src/strings.ts:32
-msgid "Search in in Trash"
+msgid "Search in Trash"
 msgstr ""
 
 #: src/strings.ts:2336
