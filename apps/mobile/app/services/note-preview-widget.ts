@@ -19,10 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Note } from "@notesnook/core";
 import { db } from "../common/database";
 import { NotesnookModule } from "../utils/notesnook-module";
+import { Platform } from "react-native";
 
 let timer: NodeJS.Timeout;
 export const NotePreviewWidget = {
   updateNotes: () => {
+    if (Platform.OS !== "android") return;
     clearTimeout(timer);
     timer = setTimeout(async () => {
       const noteIds = await NotesnookModule.getWidgetNotes();
@@ -35,6 +37,7 @@ export const NotePreviewWidget = {
     }, 500);
   },
   updateNote: async (id: string, note: Note) => {
+    if (Platform.OS !== "android") return;
     if (id && (await NotesnookModule.hasWidgetNote(id))) {
       NotesnookModule.updateWidgetNote(id, JSON.stringify(note));
     }

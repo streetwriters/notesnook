@@ -62,7 +62,7 @@
         android:supportsRtl="false"
         tools:replace="android:supportsRtl">
     
-        <receiver android:exported="false" android:name=".NoteWidget">
+        <receiver android:exported="false" android:label="@string/quick_note" android:name=".NoteWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -72,8 +72,8 @@
                 android:resource="@xml/new_note_widget_info" />
         </receiver>
 
-        <receiver android:exported="false" android:name=".NotePreviewWidget">
-            <intent-filter>
+        <receiver android:exported="false" android:label="@string/note" android:name=".NotePreviewWidget">
+            <intent-filter>"
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 

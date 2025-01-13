@@ -46,7 +46,16 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     setSecureMode: () => {},
     setAppState: () => {},
     getAppState: () => {},
-    saveAndFinish: () => {}
+    saveAndFinish: () => {},
+    getString: () => {},
+    setString: () => {},
+    removeString: () => {},
+    cancelAndFinish: () => {},
+    getWidgetId: () => {},
+    getIntent: () => {},
+    getWidgetNotes: () => {},
+    hasWidgetNote: () => {},
+    updateWidgetNote: () => {}
   },
   android: NativeModules.NNativeModule
 });

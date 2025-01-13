@@ -6,6 +6,7 @@
     android:minHeight="50dp"
     android:minResizeWidth="50dp"
     android:minResizeHeight="50dp"
+    android:description="@string/take_a_quick_note"
     android:targetCellWidth="5"
     android:targetCellHeight="1"
     android:previewImage="@drawable/widget_preview"
