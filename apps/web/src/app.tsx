@@ -46,6 +46,7 @@ import { AppEventManager, AppEvents } from "./common/app-events";
 import { TITLE_BAR_HEIGHT } from "./components/title-bar";
 import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
 import { useWindowControls } from "./hooks/use-window-controls";
+import { CommandPaletteDialog } from "./dialogs/command-palette-dialog";
 
 new WebExtensionRelay();
 
@@ -58,6 +59,19 @@ function App() {
   const hasNativeTitlebar =
     useSettingStore.getState().desktopIntegrationSettings?.nativeTitlebar;
   console.timeEnd("loading app");
+
+  useEffect(() => {
+    function onCtrlK(e: KeyboardEvent) {
+      if (e.ctrlKey && e.key === "k") {
+        e.preventDefault();
+        CommandPaletteDialog.show(true);
+      }
+    }
+    window.addEventListener("keydown", onCtrlK);
+    return () => {
+      window.removeEventListener("keydown", onCtrlK);
+    };
+  }, []);
 
   return (
     <>
