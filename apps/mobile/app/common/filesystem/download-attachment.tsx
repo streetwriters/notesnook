@@ -295,6 +295,8 @@ export default async function downloadAttachment(
       options?.cache ? "cache" : "file"
     );
 
+    console.log("file URI", fileUri, options?.cache);
+
     if (!options?.silent) {
       ToastManager.show({
         heading: strings.network.downloadSuccess(),

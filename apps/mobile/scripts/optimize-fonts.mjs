@@ -82,7 +82,8 @@ const EXTRA_ICON_NAMES = [
   "arrow-right-bold-box-outline",
   "arrow-up-bold",
   "login",
-  "gift"
+  "gift",
+  "share"
 ];
 
 const __filename = fileURLToPath(import.meta.url);
