@@ -75,7 +75,7 @@ export const TrashIntervalPicker = createSettingsPicker({
       ? strings.never()
       : item === 1
       ? strings.reminderRecurringMode.day()
-      : item + " " + strings.days();
+      : strings.days(item);
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 1, 7, 30, 365],
