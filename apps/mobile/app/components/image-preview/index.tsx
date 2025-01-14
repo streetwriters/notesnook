@@ -34,6 +34,11 @@ import {
 import BaseDialog from "../dialog/base-dialog";
 import { IconButton } from "../ui/icon-button";
 import { ProgressBarComponent } from "../ui/svg/lazy";
+import RNFetchBlob from "react-native-blob-util";
+import Share from "react-native-share";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
+import { useSettingStore } from "../../stores/use-setting-store";
+
 const ImagePreview = () => {
   const { colors } = useThemeColors("dialog");
 
@@ -41,6 +46,8 @@ const ImagePreview = () => {
   const [image, setImage] = useState<string>();
   const [loading, setLoading] = useState(false);
   const imageRef = useRef<ImageAttributes>();
+  const insets = useGlobalSafeAreaInsets();
+  const [showHeader, setShowHeader] = useState(true);
 
   useEffect(() => {
     eSubscribeEvent("ImagePreview", open);
@@ -73,16 +80,75 @@ const ImagePreview = () => {
         silent: true,
         cache: true
       });
-      const path = `${cacheDir}/${uri}`;
+
+      if (!uri) {
+        setLoading(false);
+        return;
+      }
+      const attachment = await db.attachments.attachment(hash);
+      const path = `${cacheDir}/${"NN_" + attachment?.filename}`;
+      await RNFetchBlob.fs.mv(`${cacheDir}/${uri}`, path).catch(console.log);
       setImage("file://" + path);
       setLoading(false);
     }, 100);
   };
 
-  const close = () => {
+  const close = React.useCallback(() => {
+    image &&
+      RNFetchBlob.fs.unlink(image.replace("file://", "")).catch(console.log);
     setImage(undefined);
     setVisible(false);
-  };
+  }, [image]);
+
+  const renderHeader = React.useCallback(
+    () => (
+      <View
+        style={{
+          paddingTop: insets.top,
+          backgroundColor: "rgba(0,0,0,0.3)",
+          position: "absolute",
+          zIndex: 999,
+          display: showHeader ? "flex" : "none"
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            height: 50,
+            paddingHorizontal: 12,
+            gap: 10
+          }}
+        >
+          <IconButton
+            name="share"
+            color="white"
+            onPress={async () => {
+              useSettingStore
+                .getState()
+                .setAppDidEnterBackgroundForAction(true);
+              await Share.open({
+                url: image
+              }).catch(console.log);
+              useSettingStore
+                .getState()
+                .setAppDidEnterBackgroundForAction(false);
+            }}
+          />
+          <IconButton
+            name="close"
+            color="white"
+            onPress={() => {
+              close();
+            }}
+          />
+        </View>
+      </View>
+    ),
+    [close, image, showHeader]
+  );
 
   return (
     visible && (
@@ -90,6 +156,7 @@ const ImagePreview = () => {
         background="black"
         animation="slide"
         visible={true}
+        useSafeArea={false}
         onRequestClose={close}
         transparent
       >
@@ -130,43 +197,25 @@ const ImagePreview = () => {
               />
             </View>
           ) : (
-            <ImageViewer
-              enableImageZoom={true}
-              renderIndicator={() => <></>}
-              enableSwipeDown
-              useNativeDriver
-              onSwipeDown={close}
-              saveToLocalByLongPress={false}
-              renderHeader={() => (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    width: "100%",
-                    justifyContent: "flex-end",
-                    alignItems: "center",
-                    height: 50,
-                    paddingHorizontal: 24,
-                    position: "absolute",
-                    zIndex: 999,
-                    backgroundColor: "rgba(0,0,0,0.3)",
-                    marginTop: Platform.OS === "android" ? 30 : 0
-                  }}
-                >
-                  <IconButton
-                    name="close"
-                    color="white"
-                    onPress={() => {
-                      close();
-                    }}
-                  />
-                </View>
-              )}
-              imageUrls={[
-                {
-                  url: image as string
-                }
-              ]}
-            />
+            <>
+              <ImageViewer
+                enableImageZoom={true}
+                renderIndicator={() => <></>}
+                enableSwipeDown
+                useNativeDriver
+                onSwipeDown={close}
+                saveToLocalByLongPress={false}
+                onClick={() => {
+                  setShowHeader(!showHeader);
+                }}
+                renderHeader={renderHeader}
+                imageUrls={[
+                  {
+                    url: image as string
+                  }
+                ]}
+              />
+            </>
           )}
         </View>
       </BaseDialog>

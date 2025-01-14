@@ -28,17 +28,19 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
-if (globalThis.__DEV__) {
-  const logFn = global.console.log;
-  global.console.log = function () {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    // eslint-disable-next-line prefer-rest-params
-    logFn.apply(console, arguments);
-    // eslint-disable-next-line prefer-rest-params
-    globalThis.logger("info", ...arguments);
-  };
-}
+setTimeout(() => {
+  if (globalThis.__DEV__) {
+    const logFn = global.console.log;
+    global.console.log = function () {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      // eslint-disable-next-line prefer-rest-params
+      logFn.apply(console, arguments);
+      // eslint-disable-next-line prefer-rest-params
+      globalThis.logger("info", ...arguments);
+    };
+  }
+}, 100);
 let appLoaded = false;
 function loadApp() {
   if (appLoaded) return;

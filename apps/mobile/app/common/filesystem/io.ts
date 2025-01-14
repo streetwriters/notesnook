@@ -205,7 +205,7 @@ export async function deleteCacheFileByName(name: string) {
 export async function deleteDCacheFiles() {
   const files = await RNFetchBlob.fs.ls(cacheDir);
   for (const file of files) {
-    if (file.includes("_dcache")) {
+    if (file.includes("_dcache") || file.startsWith("NN_")) {
       await RNFetchBlob.fs.unlink(file).catch(console.log);
     }
   }
