@@ -366,7 +366,6 @@ export function useEditorController({
           break;
         }
         case "native:html":
-          if (htmlContentRef.current === value) break;
           htmlContentRef.current = value;
           logger("info", "LOADING NOTE HTML");
           if (!editor) break;
