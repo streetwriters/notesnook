@@ -57,11 +57,16 @@ export const TaskListNode = TaskList.extend({
         rendered: false,
         parseHTML: (element) => {
           // do not update stats for nested task lists
-          if (!!element.closest("ul")) return { checked: 0, total: 0 };
-          const total = element.querySelectorAll("li.checklist--item").length;
-          const checked = element.querySelectorAll(
-            "li.checklist--item.checked"
+          if (!!element.closest("ul.tasklist-content-wrapper ul"))
+            return { checked: 0, total: 0 };
+
+          const total = element.querySelectorAll(
+            ":scope > li.checklist--item"
           ).length;
+          const checked = element.querySelectorAll(
+            ":scope > li.checklist--item.checked"
+          ).length;
+
           return { checked, total };
         }
       },
