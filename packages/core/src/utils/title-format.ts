@@ -27,7 +27,7 @@ const COUNT_REGEX = /\$count\$/g;
 const TIME_REGEX = /\$time\$/g;
 const HEADLINE_REGEX = /\$headline\$/g;
 const TIMESTAMP_REGEX = /\$timestamp\$/g;
-const DATE_TIME_STRIP_REGEX = /[\\\-: ]/g;
+const DATE_TIME_STRIP_REGEX = /[\\\-:./, ]/g;
 
 export function formatTitle(
   titleFormat: string,
