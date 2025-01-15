@@ -75,9 +75,9 @@ const BaseDialog = ({
   background
 }: BaseDialogProps) => {
   const floating = useIsFloatingKeyboard();
-  const appState = useAppState();
   const lockEvents = useRef(false);
   const [internalVisible, setIntervalVisible] = useState(true);
+  const locked = useUserStore((state) => state.appLocked);
 
   useEffect(() => {
     return () => {
@@ -86,26 +86,20 @@ const BaseDialog = ({
   }, []);
 
   useEffect(() => {
-    if (useUserStore.getState().disableAppLockRequests) return;
-
-    if (SettingsService.canLockAppInBackground()) {
-      if (appState === "background") {
-        setIntervalVisible(false);
-        if (useUserStore.getState().appLocked) {
-          lockEvents.current = true;
-          const unsub = useUserStore.subscribe((state) => {
-            if (!state.appLocked) {
-              setIntervalVisible(true);
-              unsub();
-              setTimeout(() => {
-                lockEvents.current = false;
-              });
-            }
+    if (locked) {
+      setIntervalVisible(false);
+      lockEvents.current = true;
+      const unsub = useUserStore.subscribe((state) => {
+        if (!state.appLocked) {
+          setIntervalVisible(true);
+          unsub();
+          setTimeout(() => {
+            lockEvents.current = false;
           });
         }
-      }
+      });
     }
-  }, [appState]);
+  }, [locked]);
 
   const Wrapper = useSafeArea ? SafeAreaView : View;
 
