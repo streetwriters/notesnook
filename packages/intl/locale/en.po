@@ -4617,8 +4617,8 @@ msgid "Redo"
 msgstr "Redo"
 
 #: src/strings.ts:372
-msgid "REFERENCED IN"
-msgstr "REFERENCED IN"
+msgid "Referenced in"
+msgstr "Referenced in"
 
 #: src/strings.ts:923
 msgid "References"
