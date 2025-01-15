@@ -43,6 +43,8 @@ import { eCloseSheet } from "../../../utils/events";
 import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
 import { strings } from "@notesnook/intl";
+import { useUserStore } from "../../../stores/use-user-store";
+import { sleep } from "../../../utils/time";
 
 const showEncryptionSheet = (file: DocumentPickerResponse) => {
   presentSheet({
@@ -241,6 +243,13 @@ const gallery = async (options: PickerOptions) => {
 const pick = async (options: PickerOptions) => {
   if (!PremiumService.get()) {
     const user = await db.user.getUser();
+    if (!user) {
+      ToastManager.show({
+        heading: strings.loginRequired(),
+        type: "error"
+      });
+      return;
+    }
     if (editorState().isFocused) {
       editorState().isFocused = true;
     }
@@ -251,6 +260,7 @@ const pick = async (options: PickerOptions) => {
     }
     return;
   }
+  useUserStore.getState().setDisableAppLockRequests(true);
   if (options?.type.startsWith("image") || options?.type === "camera") {
     if (options.type.startsWith("image")) {
       gallery(options);
@@ -267,6 +277,7 @@ const handleImageResponse = async (
   options: PickerOptions
 ) => {
   const result = await AttachImage.present(response, options.context);
+
   if (!result) return;
   const compress = result.compress;
 
