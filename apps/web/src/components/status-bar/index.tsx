@@ -28,8 +28,8 @@ import {
   Alert,
   SyncOff,
   Icon,
-  Lock,
-  Unlock
+  Unlock,
+  CellphoneLock
 } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -43,6 +43,7 @@ import { User } from "@notesnook/core";
 import { showUpdateAvailableNotice } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
 import { useVault } from "../../hooks/use-vault";
+import { useKeyStore } from "../../interfaces/key-store";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -51,6 +52,7 @@ function StatusBar() {
   const updateStatus = useAutoUpdater();
   const isFocusMode = useAppStore((state) => state.isFocusMode);
   const { isVaultLocked, lockVault } = useVault();
+  const { activeCredentials, relock } = useKeyStore();
 
   return (
     <ScopedThemeProvider
@@ -115,6 +117,23 @@ function StatusBar() {
               </Text>
             </Button>
           ) : null}
+          {activeCredentials().length > 0 && (
+            <Button
+              variant="statusitem"
+              onClick={relock}
+              sx={{
+                alignItems: "center",
+                justifyContent: "center",
+                display: "flex",
+                color: "paragraph",
+                height: "100%"
+              }}
+              title={"Lock app"}
+              data-test-id="lock-app"
+            >
+              <CellphoneLock size={12} />
+            </Button>
+          )}
           {statuses?.map((status) => {
             const { key, icon: Icon } = status;
             return (

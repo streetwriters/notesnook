@@ -21,6 +21,7 @@ import { Page } from "@playwright/test";
 import { downloadAndReadFile, getTestId, uploadFile } from "../utils";
 import {
   confirmDialog,
+  fillConfirmPasswordDialog,
   fillPasswordDialog,
   waitForDialog,
   waitToHaveText
@@ -149,5 +150,33 @@ export class SettingsViewModel {
       .locator("select");
 
     await imageCompressionDropdown.selectOption(option);
+  }
+
+  async enableAppLock(userPassword: string, appLockPassword: string) {
+    const item = await this.navigation.findItem("App lock");
+    await item?.click();
+
+    const appLockSwitch = this.page
+      .locator(getTestId("setting-enable-app-lock"))
+      .locator("label");
+
+    await appLockSwitch.click();
+    await fillPasswordDialog(this.page, userPassword);
+    await this.page.waitForTimeout(100);
+    await fillConfirmPasswordDialog(this.page, appLockPassword);
+    await this.page.waitForTimeout(100);
+  }
+
+  async disableAppLock(appLockPassword: string) {
+    const item = await this.navigation.findItem("App lock");
+    await item?.click();
+
+    const appLockSwitch = this.page
+      .locator(getTestId("setting-enable-app-lock"))
+      .locator("label");
+
+    await appLockSwitch.click();
+    await fillPasswordDialog(this.page, appLockPassword);
+    await this.page.waitForTimeout(100);
   }
 }
