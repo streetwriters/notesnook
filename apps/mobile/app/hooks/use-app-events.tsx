@@ -66,6 +66,7 @@ import {
   eSubscribeEvent,
   presentSheet
 } from "../services/event-manager";
+import { IntentService } from "../services/intent";
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -698,19 +699,8 @@ export const useAppEvents = () => {
         }
 
         setTimeout(async () => {
-          const intent = NotesnookModule.getIntent();
-          if (intent["com.streetwriters.notesnook.OpenNoteId"]) {
-            const note = await db.notes.note(
-              intent["com.streetwriters.notesnook.OpenNoteId"]
-            );
-            if (note) {
-              eSendEvent(eOnLoadNote, {
-                item: note
-              });
-              tabBarRef.current?.goToPage(1, false);
-            }
-          }
-        }, 50);
+          IntentService.onAppStateChanged();
+        }, 100);
       } else {
         await saveEditorState();
         if (

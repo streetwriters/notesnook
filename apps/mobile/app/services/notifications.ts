@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Reminder } from "@notesnook/core";
+import { isReminderActive, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee, {
   AndroidStyle,
@@ -51,6 +51,7 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import Navigation from "./navigation";
 import SettingsService from "./settings";
+import { getFormattedReminderTime } from "@notesnook/common";
 
 let pinned: DisplayedNotification[] = [];
 
@@ -104,6 +105,7 @@ async function initDatabase() {
 }
 
 const onEvent = async ({ type, detail }: Event) => {
+  console.log("EVENT RECIEVED....");
   await initDatabase();
   const { notification, pressAction, input } = detail;
   if (type === EventType.DELIVERED && Platform.OS === "android") {
@@ -120,7 +122,7 @@ const onEvent = async ({ type, detail }: Event) => {
         await scheduleNotification(reminder);
       }
     }
-
+    updateRemindersForWidget();
     return;
   }
   if (type === EventType.PRESS) {
@@ -167,6 +169,7 @@ const onEvent = async ({ type, detail }: Event) => {
         );
         useRelationStore.getState().update();
         useReminderStore.getState().refresh();
+        updateRemindersForWidget();
         break;
       }
       case "REMINDER_DISABLE": {
@@ -184,6 +187,7 @@ const onEvent = async ({ type, detail }: Event) => {
         );
         useRelationStore.getState().update();
         useReminderStore.getState().refresh();
+        updateRemindersForWidget();
         break;
       }
       case strings.unpin(): {
@@ -248,6 +252,34 @@ const onEvent = async ({ type, detail }: Event) => {
     }
   }
 };
+
+type ReminderWithFormattedTime = Reminder & {
+  formattedTime?: string;
+};
+
+async function updateRemindersForWidget() {
+  const reminders: ReminderWithFormattedTime[] = await db.reminders?.all.items(
+    undefined,
+    {
+      sortBy: "dueDate",
+      sortDirection: "desc"
+    }
+  );
+  const activeReminders = [];
+  if (!reminders) return;
+  for (const reminder of reminders) {
+    if (isReminderActive(reminder)) {
+      reminder.formattedTime = getFormattedReminderTime(reminder);
+      activeReminders.push(reminder);
+    }
+  }
+  NotesnookModule.setString(
+    "appPreview",
+    "remindersList",
+    JSON.stringify(activeReminders)
+  );
+  NotesnookModule.updateReminderWidget();
+}
 
 async function setupIOSCategories() {
   try {
@@ -398,6 +430,7 @@ async function scheduleNotification(
         trigger
       );
     }
+    updateRemindersForWidget();
   } catch (e) {
     console.log("Schedule notification", e);
   }
@@ -943,6 +976,7 @@ async function setupReminders(checkNeedsScheduling = false) {
       trigger.notification.id &&
       notifee.cancelTriggerNotification(trigger.notification.id as string)
   );
+  updateRemindersForWidget();
 }
 
 async function pinNote(id: string) {
@@ -988,7 +1022,8 @@ const Notifications = {
   getChannelId,
   isNotePinned,
   pinNote,
-  Events
+  Events,
+  updateRemindersForWidget
 };
 
 export default Notifications;

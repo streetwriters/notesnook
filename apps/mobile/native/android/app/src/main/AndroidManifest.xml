@@ -61,6 +61,15 @@
         android:largeHeap="true"
         android:supportsRtl="false"
         tools:replace="android:supportsRtl">
+
+        <receiver android:exported="false" android:label="@string/reminders_title" android:name=".ReminderWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_reminders_info" />
+        </receiver>
     
         <receiver android:exported="false" android:label="@string/quick_note" android:name=".NoteWidget">
             <intent-filter>
@@ -185,6 +194,11 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE"/>
             </intent-filter>
         </service>
+
+        <service 
+        android:name=".ReminderViewsService"
+        android:exported="true"
+        android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <provider
         android:name="androidx.core.content.FileProvider"

@@ -2,6 +2,7 @@ package com.streetwriters.notesnook;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +10,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.RemoteViews;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -133,9 +135,12 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         if (getCurrentActivity() != null) {
             Intent intent = getCurrentActivity().getIntent();
             Bundle extras = getCurrentActivity().getIntent().getExtras();
+
             if (extras != null && intent != lastIntent) {
                 lastIntent = intent;
                 map.putString(NotePreviewWidget.OpenNoteId, extras.getString(NotePreviewWidget.OpenNoteId));
+                map.putString(ReminderViewsService.OpenReminderId, extras.getString(ReminderViewsService.OpenReminderId));
+                map.putString(ReminderWidgetProvider.NewReminder, extras.getString(ReminderWidgetProvider.NewReminder));
             }
         }
         return map;
@@ -153,6 +158,7 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         Map<String, ?> map = pref.getAll();
         WritableArray arr = Arguments.createArray();
         for(Map.Entry<String,?> entry : map.entrySet()){
+            if (entry.getKey().equals("remindersList")) continue;
             String value = (String) entry.getValue();
             Gson gson = new Gson();
             Note note = gson.fromJson(value, Note.class);
@@ -176,7 +182,6 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
     }
     @ReactMethod
     public void updateWidgetNote(final String noteId, final String data) {
-
         SharedPreferences pref = getReactApplicationContext().getSharedPreferences("appPreview", Context.MODE_PRIVATE);
         Map<String, ?> map = pref.getAll();
         SharedPreferences.Editor edit = pref.edit();
@@ -191,6 +196,18 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         edit.apply();
         for (String id: ids) {
             NotePreviewWidget.updateAppWidget(mContext, AppWidgetManager.getInstance(mContext), Integer.parseInt(id));
+        }
+    }
+
+    @ReactMethod
+    public void updateReminderWidget() {
+        AppWidgetManager wm = AppWidgetManager.getInstance(mContext);
+        int[] ids = wm.getAppWidgetIds(ComponentName.createRelative(mContext.getPackageName(), ReminderWidgetProvider.class.getName()));
+        for (int id: ids) {
+            Log.d("Reminders", "Updating" + id);
+            RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.widget_reminders);
+            ReminderWidgetProvider.updateAppWidget(mContext, wm, id, views);
+            wm.notifyAppWidgetViewDataChanged(id, R.id.widget_list_view);
         }
     }
 }
