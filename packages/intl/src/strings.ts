@@ -369,7 +369,7 @@ export const strings = {
     }
   },
   remindMeIn: () => t`Remind me in`,
-  referencedIn: () => t`REFERENCED IN`,
+  referencedIn: () => t`Referenced in`,
   restoreSelectFolder: () =>
     t`Select the folder that includes your backup files to list them here.`,
   noBackupsFound: () => t`No backups found`,

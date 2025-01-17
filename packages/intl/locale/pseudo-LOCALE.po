@@ -4599,7 +4599,7 @@ msgid "Redo"
 msgstr ""
 
 #: src/strings.ts:372
-msgid "REFERENCED IN"
+msgid "Referenced in"
 msgstr ""
 
 #: src/strings.ts:923
