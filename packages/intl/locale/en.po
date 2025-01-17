@@ -2617,8 +2617,8 @@ msgid "Focus mode"
 msgstr "Focus mode"
 
 #: src/strings.ts:2142
-msgid "follow"
-msgstr "follow"
+msgid "Follow"
+msgstr "Follow"
 
 #: src/strings.ts:1259
 msgid "Follow us on Mastodon"
