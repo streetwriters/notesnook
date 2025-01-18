@@ -2610,7 +2610,7 @@ msgid "Focus mode"
 msgstr ""
 
 #: src/strings.ts:2142
-msgid "follow"
+msgid "Follow"
 msgstr ""
 
 #: src/strings.ts:1259

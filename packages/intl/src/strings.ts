@@ -2139,7 +2139,7 @@ If your issue is critical (e.g. notes not syncing, crashes etc.), please [join o
   joinCommunity: () => t`Join community`,
   license: () => t`License`,
   licenseDescription: () => t`GNU GENERAL PUBLIC LICENSE Version 3`,
-  follow: () => t`follow`,
+  follow: () => t`Follow`,
   report: () => t`Report`,
   send: () => t`Send`,
   marketingEmailsDescription: () =>
