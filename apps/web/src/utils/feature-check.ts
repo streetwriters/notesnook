@@ -22,8 +22,17 @@ const FEATURE_CHECKS = {
   cache: false,
   indexedDB: false,
   clonableCryptoKey: false,
-  applePaySupported: !!window.ApplePaySession?.canMakePayments()
+  applePaySupported: false
 };
+
+async function isApplePaySupported() {
+  try {
+    FEATURE_CHECKS.applePaySupported =
+      !!(await window.ApplePaySession?.canMakePayments());
+  } catch {
+    FEATURE_CHECKS.applePaySupported = false;
+  }
+}
 
 async function isOPFSSupported() {
   const hasGetDirectory =
@@ -93,7 +102,8 @@ export async function initializeFeatureChecks() {
     isOPFSSupported(),
     isCacheSupported(),
     isIndexedDBSupported(),
-    isCryptoKeyClonable()
+    isCryptoKeyClonable(),
+    isApplePaySupported()
   ]);
 }
 
