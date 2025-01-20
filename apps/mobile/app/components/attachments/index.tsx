@@ -528,7 +528,9 @@ export const AttachmentDialog = ({
                         setAttachments(results);
                         setLoading(false);
                       })
-                      .catch(console.log);
+                      .catch(() => {
+                        /* empty */
+                      });
                   }}
                 />
               )

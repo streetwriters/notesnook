@@ -60,7 +60,6 @@ TaggedNotes.navigate = (item: Tag, canGoBack?: boolean) => {
   const { focusedRouteId } = useNavigationStore.getState();
 
   if (focusedRouteId === item.id) {
-    console.log("TaggedNotes.navigate: route already focused for tag");
     return;
   }
 

@@ -106,7 +106,6 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
     set({
       focusedRouteId: id
     });
-    console.log("CurrentRoute ID", id);
   },
   currentRoute: "Notes",
   canGoBack: false,
@@ -114,7 +113,6 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
     set({
       currentRoute: currentScreen
     });
-    console.log("CurrentRoute", currentScreen);
   },
   headerRightButtons: [],
   buttonAction: () => null,

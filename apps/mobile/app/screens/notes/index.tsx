@@ -171,7 +171,6 @@ const NotesPage = ({
           setLoadingNotes(false);
         })
         .catch((e) => {
-          console.log("Error loading notes", params.current?.title, e, e.stack);
           setLoadingNotes(false);
         });
     }

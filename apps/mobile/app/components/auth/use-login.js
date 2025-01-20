@@ -70,7 +70,7 @@ export const useLogin = (onFinishLogin, sessionExpired = false) => {
       switch (step) {
         case LoginSteps.emailAuth: {
           const mfaInfo = await db.user.authenticateEmail(email.current);
-          console.log("email auth", mfaInfo);
+
           if (mfaInfo) {
             TwoFactorVerification.present(
               async (mfa, callback) => {

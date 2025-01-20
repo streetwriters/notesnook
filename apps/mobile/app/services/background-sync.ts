@@ -86,7 +86,6 @@ const task = async (event: { taskId: string; timeout: boolean }) => {
   const taskId = event.taskId;
   const isTimeout = event.timeout; // <-- true when your background-time has expired.
   if (isTimeout) {
-    console.log(`BACKGROUND FETCH TIMEOUT: ${taskId}`);
     BackgroundFetch.finish(taskId);
     return;
   }
@@ -120,7 +119,6 @@ async function onBackgroundSyncStarted() {
   } catch (e) {
     useUserStore.getState().setSyncing(false);
     DatabaseLogger.error(e as Error);
-    console.log("BACKGROUND SYNC ERROR", (e as Error).message);
   }
 }
 
@@ -145,7 +143,6 @@ const onBoot = async () => {
     DatabaseLogger.info("BOOT TASK COMPLETE");
   } catch (e) {
     DatabaseLogger.error(e as Error);
-    console.log(e);
   }
 };
 

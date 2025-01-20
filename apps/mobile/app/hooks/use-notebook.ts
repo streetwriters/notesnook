@@ -74,10 +74,8 @@ export const useNotebook = (
     };
 
     const onUpdate = (type: string) => {
-      console.log("event", type);
       if (type !== "notebooks") return;
       onRequestUpdate();
-      console.log("useNotebook.onUpdate", item?.id, Date.now());
     };
 
     eSubscribeEvent(eGroupOptionsUpdated, onUpdate);

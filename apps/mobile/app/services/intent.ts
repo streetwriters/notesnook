@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Platform } from "react-native";
 import { db } from "../common/database";
 import ReminderSheet from "../components/sheets/reminder";
 import { setAppState } from "../screens/editor/tiptap/utils";
@@ -24,17 +25,17 @@ import { tabBarRef } from "../utils/global-refs";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { eSendEvent } from "./event-manager";
 
-const launchIntent = NotesnookModule.getIntent();
+const launchIntent = Platform.OS === "ios" ? {} : NotesnookModule.getIntent();
 let used = false;
 let launched = false;
 export const IntentService = {
   getLaunchIntent() {
-    if (used) return null;
+    if (used || Platform.OS === "ios") return null;
     used = true;
     return launchIntent;
   },
   onLaunch() {
-    if (launched) return;
+    if (launched || Platform.OS === "ios") return;
     launched = true;
     if (launchIntent["com.streetwriters.notesnook.OpenNoteId"]) {
       setAppState({
@@ -46,7 +47,10 @@ export const IntentService = {
     }
   },
   async onAppStateChanged() {
+    if (Platform.OS === "ios") return;
+
     const intent = NotesnookModule.getIntent();
+
     if (intent["com.streetwriters.notesnook.OpenNoteId"]) {
       const note = await db.notes.note(
         intent["com.streetwriters.notesnook.OpenNoteId"]

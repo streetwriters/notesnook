@@ -62,7 +62,9 @@ export const ShareComponent = ({ uri, name, padding }) => {
             showOpenWithDialog: true,
             showAppsSuggestions: true,
             shareFile: true
-          }).catch(console.log);
+          }).catch(() => {
+            /* empty */
+          });
         }}
       />
     </View>

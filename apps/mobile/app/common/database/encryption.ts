@@ -126,7 +126,6 @@ export async function setAppLockVerificationCipher(appLockPassword: string) {
     DatabaseLogger.info("setAppLockVerificationCipher");
   } catch (e) {
     DatabaseLogger.error(e);
-    console.log(e);
   }
 }
 
@@ -310,7 +309,6 @@ export async function getCryptoKey() {
 
     return key;
   } catch (e) {
-    console.log("getCryptoKey", e);
     DatabaseLogger.error(e);
   }
 }

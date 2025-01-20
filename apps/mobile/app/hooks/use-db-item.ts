@@ -196,7 +196,6 @@ export const useTotalNotes = (type: "notebook" | "tag" | "color") => {
           }
           setTotalNotesById(totalNotesById);
         });
-      console.log("useTotalNotes.getTotalNotes");
     },
     [type]
   );

@@ -142,7 +142,7 @@ const onEvent = async ({ type, detail }: Event) => {
     }
     editorState().movedAway = false;
     const noteId = notification?.id;
-    console.log("NOTE ID", noteId);
+
     loadNote(noteId as string, true);
   }
 
@@ -238,11 +238,9 @@ const onEvent = async ({ type, detail }: Event) => {
           try {
             if (!globalThis["IS_MAIN_APP_RUNNING" as never]) {
               await db.sync({ type: "send", force: false });
-            } else {
-              console.log("main app running, skipping sync");
             }
           } catch (e) {
-            console.log(e, (e as Error).stack);
+            /* empty */
           }
         }
         Navigation.queueRoutesForUpdate();
@@ -257,6 +255,7 @@ type ReminderWithFormattedTime = Reminder & {
 };
 
 async function updateRemindersForWidget() {
+  if (Platform.OS === "ios") return;
   const reminders: ReminderWithFormattedTime[] = await db.reminders?.all.items(
     undefined,
     {
@@ -319,7 +318,7 @@ async function setupIOSCategories() {
       }
     }
   } catch (e) {
-    console.log("ERROR in setupIOSCategories", e);
+    /* empty */
   }
 }
 
@@ -431,7 +430,7 @@ async function scheduleNotification(
     }
     updateRemindersForWidget();
   } catch (e) {
-    console.log("Schedule notification", e);
+    /* empty */
   }
 }
 
@@ -574,7 +573,7 @@ async function displayNotification({
       }
     });
   } catch (e) {
-    console.log(e);
+    /* empty */
   }
 }
 
@@ -996,7 +995,7 @@ async function pinNote(id: string) {
       id: note.id
     });
   } catch (e) {
-    console.log(e);
+    /* empty */
   }
 }
 const Events = {

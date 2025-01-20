@@ -135,7 +135,6 @@ export const waitForEvent = async (
     };
     eSubscribeEvent(type, callback);
     setTimeout(() => {
-      console.log("return..");
       eUnSubscribeEvent(type, callback);
       resolve(false);
     }, waitFor);

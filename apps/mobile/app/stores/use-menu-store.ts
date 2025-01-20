@@ -80,7 +80,6 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
       JSON.stringify(get().hiddenItems || {}) !==
         JSON.stringify(hiddenItems || {})
     ) {
-      console.log(order, hiddenItems);
       set({
         order: order,
         hiddenItems: hiddenItems

@@ -149,7 +149,6 @@ const onUploadedAttachmentProgress = (data: any) => {
 };
 
 const onUserSessionExpired = async () => {
-  console.log("LOGGED OUT USER....");
   SettingsService.set({
     sessionExpired: true
   });
@@ -255,9 +254,7 @@ async function checkForShareExtensionLaunchedInBackground() {
       if (note) setTimeout(() => eSendEvent("loadingNote", note), 1);
       MMKV.removeItem("shareExtensionOpened");
     }
-  } catch (e) {
-    console.log(e);
-  }
+  } catch (e) {}
 }
 
 async function saveEditorState() {
@@ -503,7 +500,9 @@ export const useAppEvents = () => {
       }
 
       if (SettingsService.getProperty("offlineMode")) {
-        db.attachments.cacheAttachments().catch(console.log);
+        db.attachments.cacheAttachments().catch(() => {
+          /* empty */
+        });
       }
     }
   }, []);
@@ -551,7 +550,6 @@ export const useAppEvents = () => {
           });
         }
       } catch (e) {
-        console.log(e);
         ToastManager.error(e as Error, "Error updating user", "global");
       }
 
@@ -785,9 +783,7 @@ export const useAppEvents = () => {
   useEffect(() => {
     if (!appLocked && isAppLoading) {
       initializeLogger()
-        .catch((e) => {
-          console.log(e);
-        })
+        .catch((e) => {})
         .finally(() => {
           //@ts-ignore
           initializeDatabase();

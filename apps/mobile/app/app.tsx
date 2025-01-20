@@ -131,13 +131,14 @@ export const withTheme = (Element: (props: any) => JSX.Element) => {
           })
           .then((theme) => {
             if (theme) {
-              console.log(theme.version, "theme updated");
               theme.colorScheme === "dark"
                 ? useThemeStore.getState().setDarkTheme(theme)
                 : useThemeStore.getState().setLightTheme(theme);
             }
           })
-          .catch(console.log);
+          .catch(() => {
+            /* empty */
+          });
       }, 1000);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

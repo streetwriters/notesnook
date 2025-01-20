@@ -74,7 +74,6 @@ export function ReadonlyEditor(props: {
     }
 
     if (editorMessage.type === EventTypes.readonlyEditorLoaded) {
-      console.log("Readonly editor loaded.");
       props.onLoad?.((content: { data: string; id: string }) => {
         setTimeout(() => {
           noteId.current = content.id;
@@ -90,7 +89,6 @@ export function ReadonlyEditor(props: {
     } else if (editorMessage.type === EventTypes.getAttachmentData) {
       const attachment = (editorMessage.value as any).attachment as Attachment;
 
-      console.log("Getting attachment data:", attachment.hash, attachment.type);
       downloadAttachment(attachment.hash, true, {
         base64: attachment.type === "image",
         text: attachment.type === "web-clip",
@@ -115,7 +113,6 @@ export function ReadonlyEditor(props: {
           );
         })
         .catch(() => {
-          console.log("Error downloading attachment data");
           editorRef.current?.postMessage(
             JSON.stringify({
               type: EditorEvents.attachmentData,

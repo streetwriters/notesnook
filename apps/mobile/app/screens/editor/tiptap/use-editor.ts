@@ -153,7 +153,6 @@ export const useEditor = (
 
   useEffect(() => {
     const event = eSubscribeEvent(eEditorTabFocused, (tabId) => {
-      console.log("Editot tab focus changed", lastTabFocused.current, tabId);
       if (lastTabFocused.current !== tabId) lock.current = false;
       lastTabFocused.current = tabId as number;
     });
@@ -190,7 +189,6 @@ export const useEditor = (
 
   const reset = useCallback(
     async (tabId: number, resetState = true, resetContent = true) => {
-      console.log("Resetting tab:", tabId);
       const noteId = useTabStore.getState().getNoteIdForTab(tabId);
       if (noteId) {
         currentNotes.current?.id && db.fs().cancel(noteId);
@@ -446,7 +444,6 @@ export const useEditor = (
       presistTab?: boolean;
     }) => {
       if (!event) return;
-      console.log(event.item?.id, event?.item?.title, "loading note...");
 
       if (event.blockId) {
         blockIdRef.current = event.blockId;
@@ -477,7 +474,7 @@ export const useEditor = (
           overlay(false);
           return;
         }
-        console.log("LOADING NOTE", event.item.id);
+
         const item = event.item;
 
         const currentTab = useTabStore
@@ -510,7 +507,6 @@ export const useEditor = (
                 }
               }, 150);
             }
-            console.log("Note already loaded, focusing the tab");
           } else {
             if (event.presistTab) {
               // Open note in new tab.
@@ -521,9 +517,7 @@ export const useEditor = (
                 noteId: event.item.id,
                 previewTab: false
               });
-              console.log("Opening note in new tab");
             } else {
-              console.log("Opening note in preview tab");
               // Otherwise we focus the preview tab or create one to open the note in.
               useTabStore.getState().focusPreviewTab(event.item.id, {
                 readonly: event.item.readonly || readonly,
@@ -541,11 +535,11 @@ export const useEditor = (
         const tabId = event.tabId || useTabStore.getState().currentTab;
         if (lastTabFocused.current !== tabId) {
           // if ((await waitForEvent(eEditorTabFocused, 1000)) !== tabId) {
-          //   console.log("tab id did not match after focus in 1000ms");
+          //
           //   return;
           // }
           currentLoadingNoteId.current = item.id;
-          console.log("Waiting for tab to focus");
+
           return;
         }
 
@@ -563,7 +557,7 @@ export const useEditor = (
           loadingState.current === currentContents.current[item.id]?.data
         ) {
           // If note is already loading, return.
-          console.log("Note is already loading...");
+
           return;
         }
 
@@ -640,7 +634,6 @@ export const useEditor = (
           if (isDeleted(data) || isTrashItem(data)) {
             const tabId = useTabStore.getState().getTabForNote(data.id);
             if (tabId !== undefined) {
-              console.log("Removing tab");
               await commands.clearContent(tabId);
               useTabStore.getState().removeTab(tabId);
             }

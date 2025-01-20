@@ -83,7 +83,9 @@ export async function downloadAttachments(attachmentIds: string[]) {
 
   const isCancelled = () => {
     if (useAttachmentStore.getState().downloading?.[groupId]?.canceled) {
-      RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
+      RNFetchBlob.fs.unlink(zipSourceFolder).catch(() => {
+        /* empty */
+      });
       useAttachmentStore.getState().setDownloading({
         groupId,
         current: 0,
@@ -188,9 +190,13 @@ export async function downloadAttachments(attachmentIds: string[]) {
     ToastManager.error(e as Error, "Error zipping attachments");
   }
   // Remove source & zip file from cache.
-  RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
+  RNFetchBlob.fs.unlink(zipSourceFolder).catch(() => {
+    /* empty */
+  });
   if (Platform.OS === "android") {
-    RNFetchBlob.fs.unlink(zipOutputFile).catch(console.log);
+    RNFetchBlob.fs.unlink(zipOutputFile).catch(() => {
+      /* empty */
+    });
   }
 }
 
@@ -295,8 +301,6 @@ export default async function downloadAttachment(
       options?.cache ? "cache" : "file"
     );
 
-    console.log("file URI", fileUri, options?.cache);
-
     if (!options?.silent) {
       ToastManager.show({
         heading: strings.network.downloadSuccess(),
@@ -323,10 +327,14 @@ export default async function downloadAttachment(
     if (attachment.dateUploaded) {
       RNFetchBlob.fs
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}`)
-        .catch(console.log);
+        .catch(() => {
+          /* empty */
+        });
       RNFetchBlob.fs
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.hash}_dcache`)
-        .catch(console.log);
+        .catch(() => {
+          /* empty */
+        });
     }
 
     useAttachmentStore.getState().setDownloading({

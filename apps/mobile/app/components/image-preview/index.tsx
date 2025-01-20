@@ -87,7 +87,9 @@ const ImagePreview = () => {
       }
       const attachment = await db.attachments.attachment(hash);
       const path = `${cacheDir}/${"NN_" + attachment?.filename}`;
-      await RNFetchBlob.fs.mv(`${cacheDir}/${uri}`, path).catch(console.log);
+      await RNFetchBlob.fs.mv(`${cacheDir}/${uri}`, path).catch(() => {
+        /* empty */
+      });
       setImage("file://" + path);
       setLoading(false);
     }, 100);
@@ -95,7 +97,9 @@ const ImagePreview = () => {
 
   const close = React.useCallback(() => {
     image &&
-      RNFetchBlob.fs.unlink(image.replace("file://", "")).catch(console.log);
+      RNFetchBlob.fs.unlink(image.replace("file://", "")).catch(() => {
+        /* empty */
+      });
     setImage(undefined);
     setVisible(false);
   }, [image]);
@@ -131,7 +135,9 @@ const ImagePreview = () => {
                 .setAppDidEnterBackgroundForAction(true);
               await Share.open({
                 url: image
-              }).catch(console.log);
+              }).catch(() => {
+                /* empty */
+              });
               useSettingStore
                 .getState()
                 .setAppDidEnterBackgroundForAction(false);

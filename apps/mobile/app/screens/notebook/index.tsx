@@ -284,14 +284,13 @@ NotebookScreen.navigate = async (item: Notebook, canGoBack?: boolean) => {
       focusedRouteId == item?.id
     ) {
       // Update the route in place instead
-      console.log("Updating existing route in place");
+
       eSendEvent(eUpdateNotebookRoute, {
         item: item,
         title: item.title,
         canGoBack: canGoBack
       });
     } else {
-      console.log("Pushing new notebook route");
       // Push a new route
       Navigation.push("Notebook", {
         title: item.title,

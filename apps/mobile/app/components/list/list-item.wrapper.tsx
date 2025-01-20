@@ -153,9 +153,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
           },
           items?.cacheItem(index) ? 100 : 0
         );
-      } catch (e) {
-        console.log("Error", e);
-      }
+      } catch (e) {}
     })();
   }, [index, items, refreshItem]);
 

@@ -273,7 +273,7 @@ const ListNoteItem = ({
     listType,
     noteInternalLinks.length
   ]);
-  console.log(noteInternalLinks);
+
   const renderBlock = React.useCallback(
     (block: ContentBlock) => (
       <ListBlockItem
@@ -419,7 +419,6 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
         id={index}
         items={items}
         onSelect={(note, blockId) => {
-          console.log(note.id, blockId);
           eSendEvent(eOnLoadNote, {
             item: note,
             blockId: blockId

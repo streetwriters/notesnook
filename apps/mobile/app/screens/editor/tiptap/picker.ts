@@ -196,9 +196,7 @@ const camera = async (options: PickerOptions) => {
           options
         );
       })
-      .catch((e) => {
-        console.log("camera error: ", e);
-      });
+      .catch((e) => {});
   } catch (e) {
     ToastManager.show({
       heading: (e as Error).message,
@@ -226,9 +224,7 @@ const gallery = async (options: PickerOptions) => {
           options
         )
       )
-      .catch((e) => {
-        console.log("gallery error: ", e);
-      });
+      .catch((e) => {});
   } catch (e) {
     useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
     ToastManager.show({
@@ -236,7 +232,6 @@ const gallery = async (options: PickerOptions) => {
       type: "error",
       context: "global"
     });
-    console.log("attachment error:", e);
   }
 };
 
@@ -321,18 +316,14 @@ const handleImageResponse = async (
         ? fileName.replace(/HEIC|HEIF/, "jpeg")
         : fileName;
 
-    console.log("attaching image...", fileName);
-
-    console.log("attaching file...");
     if (!(await attachFile(uri, hash, image.mime, fileName, options))) return;
 
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
-    console.log("attaching image to note...");
+
     if (
       options.tabId !== undefined &&
       useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
     ) {
-      console.log("attaching image to note...");
       editorController.current?.commands.insertImage(
         {
           hash: hash,
@@ -407,7 +398,7 @@ export async function attachFile(
     } else {
       encryptionInfo = { hash: hash };
     }
-    console.log("FILE ENCRYPTED....", encryptionInfo);
+
     await db.attachments.add(encryptionInfo);
     return true;
   } catch (e) {
