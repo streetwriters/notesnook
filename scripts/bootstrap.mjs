@@ -164,6 +164,7 @@ async function bootstrapPackage(cwd, outputs) {
     let retries = 3;
     while (--retries > 0) {
       try {
+        console.log("Running postinstall command:", cmd);
         await execute(cmd, cwd, outputs);
         break;
       } catch (e) {
