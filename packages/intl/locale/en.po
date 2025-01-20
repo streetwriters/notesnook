@@ -5064,52 +5064,52 @@ msgid "Search in {routeName}"
 msgstr "Search in {routeName}"
 
 #: src/strings.ts:35
-msgid "Search in in Editor"
-msgstr "Search in in Editor"
+msgid "Search in Editor"
+msgstr "Search in Editor"
 
 #: src/strings.ts:30
-msgid "Search in in Favorites"
-msgstr "Search in in Favorites"
+msgid "Search in Favorites"
+msgstr "Search in Favorites"
 
 #: src/strings.ts:36
-msgid "Search in in Home"
-msgstr "Search in in Home"
+msgid "Search in Home"
+msgstr "Search in Home"
 
 #: src/strings.ts:38
-msgid "Search in in Monographs"
-msgstr "Search in in Monographs"
+msgid "Search in Monographs"
+msgstr "Search in Monographs"
 
 #: src/strings.ts:29
-msgid "Search in in Notebook"
-msgstr "Search in in Notebook"
+msgid "Search in Notebook"
+msgstr "Search in Notebook"
 
 #: src/strings.ts:28
-msgid "Search in in Notebooks"
-msgstr "Search in in Notebooks"
+msgid "Search in Notebooks"
+msgstr "Search in Notebooks"
 
 #: src/strings.ts:27
-msgid "Search in in Notes"
-msgstr "Search in in Notes"
+msgid "Search in Notes"
+msgstr "Search in Notes"
 
 #: src/strings.ts:31
-msgid "Search in in Reminders"
-msgstr "Search in in Reminders"
+msgid "Search in Reminders"
+msgstr "Search in Reminders"
 
 #: src/strings.ts:37
-msgid "Search in in Search"
-msgstr "Search in in Search"
+msgid "Search in Search"
+msgstr "Search in Search"
 
 #: src/strings.ts:33
-msgid "Search in in Settings"
-msgstr "Search in in Settings"
+msgid "Search in Settings"
+msgstr "Search in Settings"
 
 #: src/strings.ts:34
-msgid "Search in in Tags"
-msgstr "Search in in Tags"
+msgid "Search in Tags"
+msgstr "Search in Tags"
 
 #: src/strings.ts:32
-msgid "Search in in Trash"
-msgstr "Search in in Trash"
+msgid "Search in Trash"
+msgstr "Search in Trash"
 
 #: src/strings.ts:2336
 msgid "Search languages"
