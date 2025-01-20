@@ -160,7 +160,7 @@ const ImagePreview = () => {
         </View>
       </View>
     ),
-    [close, image, showHeader]
+    [close, image, insets.top, showHeader]
   );
 
   return (
