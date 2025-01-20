@@ -164,7 +164,7 @@ export class EditorModel {
 
   async selectAll() {
     await this.content.focus();
-    await this.page.keyboard.press("Control+a");
+    await this.page.keyboard.press("ControlOrMeta+a");
     await this.page.waitForTimeout(500);
   }
 
@@ -257,8 +257,8 @@ export class EditorModel {
       ]);
     });
 
-    await this.page.keyboard.down("Control");
+    await this.page.keyboard.down("ControlOrMeta");
     await this.page.keyboard.press("KeyV");
-    await this.page.keyboard.up("Control");
+    await this.page.keyboard.up("ControlOrMeta");
   }
 }

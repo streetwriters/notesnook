@@ -43,7 +43,7 @@ test("ctrl+a should select all notes", async ({ page }) => {
   const { notesList, notes } = await populateList(page);
   await notes.focus();
 
-  await notes.press("Control+a");
+  await notes.press("ControlOrMeta+a");
 
   for (const note of notesList) {
     expect(await note.isSelected()).toBeTruthy();
@@ -55,7 +55,7 @@ test("right clicking on selected notes should open multi-selection menu", async 
 }) => {
   const { notesList, notes } = await populateList(page);
   await notes.focus();
-  await notes.press("Control+a");
+  await notes.press("ControlOrMeta+a");
 
   await notesList[1].contextMenu.open();
 
@@ -67,7 +67,7 @@ test("right clicking on selected notes should open multi-selection menu", async 
 test("pressing Escape should deselect all items", async ({ page }) => {
   const { notesList, notes } = await populateList(page);
   await notes.focus();
-  await notes.press("Control+a");
+  await notes.press("ControlOrMeta+a");
 
   await notes.press("Escape");
 
@@ -209,11 +209,11 @@ test("select notes using Control+Click", async ({ page }, info) => {
   const { notesList, notes } = await populateList(page, 10);
   await notes.focus();
 
-  await page.keyboard.down("Control");
+  await page.keyboard.down("ControlOrMeta");
   for (let i = 2; i < 10; i += 2) {
     await notesList[i].click();
   }
-  await page.keyboard.up("Control");
+  await page.keyboard.up("ControlOrMeta");
 
   for (let i = 2; i < 10; i += 2) {
     expect(await notesList[i].isSelected()).toBeTruthy();
@@ -278,11 +278,11 @@ test("Ctrl+Click to select/unselect notes", async ({ page }, info) => {
   const { notesList, notes } = await populateList(page, 10);
   await notes.focus();
 
-  await page.keyboard.down("Control");
+  await page.keyboard.down("ControlOrMeta");
   for (let i = 2; i < 10; i += 2) {
     await notesList[i].click();
   }
-  await page.keyboard.up("Control");
+  await page.keyboard.up("ControlOrMeta");
 
   for (let i = 2; i < 10; i += 2) {
     expect(await notesList[i].isSelected()).toBeTruthy();
@@ -295,11 +295,11 @@ test("Ctrl+Click to select/unselect notes", async ({ page }, info) => {
   ).toBeTruthy();
   await selectedNote.contextMenu.close();
 
-  await page.keyboard.down("Control");
+  await page.keyboard.down("ControlOrMeta");
   for (let i = 2; i < 10; i += 2) {
     await notesList[i].click();
   }
-  await page.keyboard.up("Control");
+  await page.keyboard.up("ControlOrMeta");
 
   for (let i = 2; i < 10; i += 2) {
     expect(await notesList[i].isSelected()).toBeFalsy();

@@ -230,12 +230,13 @@ export class WaSqliteWorkerMultipleTabDriver implements Driver {
 export class WaSqliteWorkerSingleTabDriver implements Driver {
   private connection?: DatabaseConnection;
   private connectionMutex = new Mutex();
-  private readonly worker = wrap<SQLiteWorker>(
-    new Worker({ name: this.config.dbName })
-  );
+  private readonly worker;
 
   constructor(private readonly config: Config) {
     console.log("single tab driver", config.dbName);
+    this.worker = wrap<SQLiteWorker>(
+      new Worker({ name: config.dbName })
+    ) 
   }
 
   async init(): Promise<void> {
