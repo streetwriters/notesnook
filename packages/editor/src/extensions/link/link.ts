@@ -227,35 +227,6 @@ export const Link = Mark.create<LinkOptions>({
             href: regExp.exec(match[0])?.[1]
           };
         }
-      }),
-      markPasteRule({
-        find: (text) => {
-          const foundLinks: PasteRuleMatch[] = [];
-
-          if (text) {
-            const links = find(text).filter((item) => item.isLink);
-
-            if (links.length) {
-              links.forEach((link) =>
-                foundLinks.push({
-                  text: link.value,
-                  data: {
-                    href: link.href
-                  },
-                  index: link.start
-                })
-              );
-            }
-          }
-
-          return foundLinks;
-        },
-        type: this.type,
-        getAttributes: (match) => {
-          return {
-            href: match.data?.href
-          };
-        }
       })
     ];
   },
@@ -281,14 +252,13 @@ export const Link = Mark.create<LinkOptions>({
       );
     }
 
-    if (this.options.linkOnPaste) {
-      plugins.push(
-        pasteHandler({
-          editor: this.editor,
-          type: this.type
-        })
-      );
-    }
+    plugins.push(
+      pasteHandler({
+        editor: this.editor,
+        type: this.type,
+        linkOnPaste: this.options.linkOnPaste
+      })
+    );
 
     return plugins;
   },
