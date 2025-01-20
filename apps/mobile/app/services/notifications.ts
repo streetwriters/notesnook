@@ -105,7 +105,6 @@ async function initDatabase() {
 }
 
 const onEvent = async ({ type, detail }: Event) => {
-  console.log("EVENT RECIEVED....");
   await initDatabase();
   const { notification, pressAction, input } = detail;
   if (type === EventType.DELIVERED && Platform.OS === "android") {
