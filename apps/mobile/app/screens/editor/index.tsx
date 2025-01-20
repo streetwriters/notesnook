@@ -229,7 +229,7 @@ const useLockedNoteHandler = () => {
     const unlockWithBiometrics = async () => {
       try {
         if (!tabRef.current?.noteLocked || !tabRef.current) return;
-        console.log("Trying to unlock with biometrics...");
+
         const credentials = await BiometricService.getCredentials(
           "Unlock note",
           "Unlock note to open it in editor."
@@ -305,7 +305,6 @@ const useLockedNoteHandler = () => {
           locked: false
         });
       } catch (e) {
-        console.log(e);
         ToastManager.show({
           heading: strings.passwordIncorrect(),
           type: "error"
@@ -324,7 +323,6 @@ const useLockedNoteHandler = () => {
           unlockWithBiometrics();
         }, 150);
       } else {
-        console.log("Biometrics unavailable.", editorState().movedAway);
         if (!editorState().movedAway) {
           setTimeout(() => {
             if (tabRef.current && tabRef.current?.locked) {

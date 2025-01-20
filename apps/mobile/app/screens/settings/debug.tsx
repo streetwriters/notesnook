@@ -160,9 +160,7 @@ export default function DebugLogs() {
           type: "success"
         });
       }
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   }, [currentLog?.logs]);
 
   const copyLogs = React.useCallback(() => {

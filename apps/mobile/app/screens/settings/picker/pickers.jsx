@@ -33,7 +33,6 @@ import { strings } from "@notesnook/intl";
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
   updateValue: (item) => {
-    console.log(item.id);
     SettingsService.set({
       defaultFontFamily: item.id
     });

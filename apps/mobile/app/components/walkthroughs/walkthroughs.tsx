@@ -315,7 +315,9 @@ const trialstarted: { id: string; steps: TStep[] } = {
       actionButton: {
         text: strings.joinDiscord(),
         action: () => {
-          Linking.openURL("https://discord.gg/zQBK97EE22").catch(console.log);
+          Linking.openURL("https://discord.gg/zQBK97EE22").catch(() => {
+            /* empty */
+          });
         }
       }
     }
@@ -366,7 +368,9 @@ const Support = () => {
           width: "90%"
         }}
         onPress={() => {
-          Linking.openURL("https://discord.gg/zQBK97EE22").catch(console.log);
+          Linking.openURL("https://discord.gg/zQBK97EE22").catch(() => {
+            /* empty */
+          });
         }}
         icon="discord"
         type="secondary"
@@ -380,7 +384,9 @@ const Support = () => {
           width: "90%"
         }}
         onPress={() => {
-          Linking.openURL("https://t.me/notesnook").catch(console.log);
+          Linking.openURL("https://t.me/notesnook").catch(() => {
+            /* empty */
+          });
         }}
         icon="telegram"
         type="secondary"

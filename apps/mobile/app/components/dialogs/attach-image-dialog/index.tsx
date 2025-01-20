@@ -180,7 +180,7 @@ AttachImage.present = (response: ImageType[], context?: string) => {
           close={close}
           onAttach={(result) => {
             resolved = true;
-            console.log("closing");
+
             resolve(result);
             close?.();
           }}

@@ -41,7 +41,9 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
       await sleep(500);
     }
     if (item.type === "link") {
-      Linking.openURL(item.data).catch(console.log);
+      Linking.openURL(item.data).catch(() => {
+        /* empty */
+      });
     } else if (item.type === "promo") {
       presentSheet({
         component: (

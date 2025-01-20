@@ -76,9 +76,7 @@ async function setPremiumStatus() {
     products = await RNIap.getSubscriptions({
       skus: itemSkus
     });
-  } catch (e) {
-    console.log("subscriptions: ", e);
-  }
+  } catch (e) {}
   if (premiumStatus === 0 && !__DEV__) {
     SettingsService.reset();
   }
@@ -299,7 +297,6 @@ const subscriptions = {
           }
         };
 
-        console.log("Subscription.verify", requestData);
         try {
           let result = await fetch(
             __DEV__
@@ -307,7 +304,7 @@ const subscriptions = {
               : "https://payments.streetwriters.co/apple/verify",
             requestData
           );
-          console.log("Subscribed", result);
+
           let text = await result.text();
 
           if (!result.ok) {
@@ -318,9 +315,7 @@ const subscriptions = {
           } else {
             await subscriptions.clear(subscription);
           }
-        } catch (e) {
-          console.log("subscription error", e);
-        }
+        } catch (e) {}
       }
     }
   },

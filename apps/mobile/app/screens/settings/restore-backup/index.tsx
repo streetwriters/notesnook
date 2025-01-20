@@ -197,7 +197,6 @@ const restoreBackup = async (options: {
         const attachment = await db.attachments.attachment(hash as string);
         if (!attachment) continue;
 
-        console.log("Saving attachment file", hash);
         await deleteCacheFileByName(hash);
         await RNFetchBlob.fs.cp(
           `${zipOutputFolder}/attachments/${hash}`,
@@ -208,9 +207,13 @@ const restoreBackup = async (options: {
         progress: strings.cleaningUp()
       });
       // Remove files from cache
-      RNFetchBlob.fs.unlink(zipOutputFolder).catch(console.log);
+      RNFetchBlob.fs.unlink(zipOutputFolder).catch(() => {
+        /* empty */
+      });
       if (Platform.OS === "android" || deleteBackupFile) {
-        RNFetchBlob.fs.unlink(filePath).catch(console.log);
+        RNFetchBlob.fs.unlink(filePath).catch(() => {
+          /* empty */
+        });
       }
     } else {
       updateProgress({

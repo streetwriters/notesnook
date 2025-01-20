@@ -268,7 +268,6 @@ export const useEditorEvents = (
   }, [editor, deviceMode, fullscreen]);
 
   const onHardwareBackPress = useCallback(() => {
-    console.log(tabBarRef.current?.page());
     if (tabBarRef.current?.page() === 2) {
       onBackPress();
       return true;
@@ -574,7 +573,7 @@ export const useEditorEvents = (
           //   tabs: (editorMessage.value as any)?.tabs,
           //   currentTab: (editorMessage.value as any)?.currentTab
           // });
-          // console.log("Tabs updated");
+          //
           break;
         }
         case EventTypes.toc:
@@ -597,14 +596,6 @@ export const useEditorEvents = (
           break;
         }
         case EventTypes.tabFocused: {
-          console.log(
-            "Focused tab",
-            editorMessage.tabId,
-            editorMessage.noteId,
-            "Content:",
-            editorMessage.value
-          );
-
           eSendEvent(eEditorTabFocused, editorMessage.tabId);
 
           if (

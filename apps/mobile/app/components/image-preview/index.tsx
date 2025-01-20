@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium from "@ammarahmed/react-native-sodium";
-import { DataURL } from "@notesnook/core";
+import { DataURL, getFileNameWithExtension } from "@notesnook/core";
 import type { ImageAttributes } from "@notesnook/editor";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
@@ -86,8 +86,12 @@ const ImagePreview = () => {
         return;
       }
       const attachment = await db.attachments.attachment(hash);
-      const path = `${cacheDir}/${"NN_" + attachment?.filename}`;
-      await RNFetchBlob.fs.mv(`${cacheDir}/${uri}`, path).catch(console.log);
+      const path = `${cacheDir}/${
+        "NN_" + (await getFileNameWithExtension(hash, attachment?.mimeType))
+      }`;
+      await RNFetchBlob.fs.mv(`${cacheDir}/${uri}`, path).catch(() => {
+        /* empty */
+      });
       setImage("file://" + path);
       setLoading(false);
     }, 100);
@@ -95,10 +99,14 @@ const ImagePreview = () => {
 
   const close = React.useCallback(() => {
     image &&
-      RNFetchBlob.fs.unlink(image.replace("file://", "")).catch(console.log);
+      RNFetchBlob.fs.unlink(image.replace("file://", "")).catch(() => {
+        /* empty */
+      });
     setImage(undefined);
     setVisible(false);
   }, [image]);
+
+  console.log("image", image);
 
   const renderHeader = React.useCallback(
     () => (
@@ -125,13 +133,18 @@ const ImagePreview = () => {
           <IconButton
             name="share"
             color="white"
+            style={{
+              borderWidth: 0
+            }}
             onPress={async () => {
               useSettingStore
                 .getState()
                 .setAppDidEnterBackgroundForAction(true);
               await Share.open({
                 url: image
-              }).catch(console.log);
+              }).catch(() => {
+                /* empty */
+              });
               useSettingStore
                 .getState()
                 .setAppDidEnterBackgroundForAction(false);
@@ -147,7 +160,7 @@ const ImagePreview = () => {
         </View>
       </View>
     ),
-    [close, image, showHeader]
+    [close, image, insets.top, showHeader]
   );
 
   return (

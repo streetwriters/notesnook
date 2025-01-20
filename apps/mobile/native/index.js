@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import './globals.js';
-import 'react-native-get-random-values';
+import NetInfo from "@react-native-community/netinfo";
 import React from 'react';
 import { AppRegistry, LogBox, Platform, UIManager } from 'react-native';
 import Config from 'react-native-config';
+import 'react-native-get-random-values';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import appJson from './app.json';
-import Notifications from "../app/services/notifications";
-import NetInfo from "@react-native-community/netinfo";
 import { enableFreeze } from "react-native-screens";
-import {BackgroundSync} from '../app/services/background-sync';
+import { BackgroundSync } from '../app/services/background-sync';
+import Notifications from "../app/services/notifications";
+import appJson from './app.json';
+import './globals.js';
 
 BackgroundSync.registerHeadlessTask();
 BackgroundSync.start();
@@ -43,6 +43,14 @@ const AppProvider = () => {
 };
 
 AppRegistry.registerComponent(appName, () => AppProvider);
+
+const NotePreviewConfigureProvider = () => {
+  const App = require('../app/app').default;
+  return <App configureMode="note-preview" />;
+};
+
+AppRegistry.registerComponent("NotePreviewConfigure", () => NotePreviewConfigureProvider);
+
 
 const ShareProvider = () => {
   let NotesnookShare = require('../share/index').default;

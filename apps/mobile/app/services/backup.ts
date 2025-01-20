@@ -120,13 +120,17 @@ async function presentBackupCompleteSheet(backupFilePath: string) {
             Share.open({
               url: backupFilePath,
               failOnCancel: false
-            }).catch(console.log);
+            }).catch(() => {
+              /* empty */
+            });
           } else {
             FileViewer.open(backupFilePath, {
               showOpenWithDialog: true,
               showAppsSuggestions: true,
               shareFile: true
-            } as any).catch(console.log);
+            } as any).catch(() => {
+              /* empty */
+            });
           }
         },
         actionText: strings.share()
@@ -161,8 +165,6 @@ async function run(
   context?: string,
   backupType: "full" | "partial" = "partial"
 ) {
-  console.log("Creating backup:", backupType, progress, context);
-
   const androidBackupDirectory = (await checkBackupDirExists(
     false,
     context
@@ -203,7 +205,9 @@ async function run(
       ? `${path}/${backupFileName}.nnbackupz`
       : `${cacheDir}/${backupFileName}.nnbackupz`;
 
-  await RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
+  await RNFetchBlob.fs.unlink(zipSourceFolder).catch(() => {
+    /* empty */
+  });
   await RNFetchBlob.fs.mkdir(zipSourceFolder);
 
   const attachmentsDir = zipSourceFolder + "/attachments";
@@ -253,18 +257,21 @@ async function run(
         `${backupFileName}.nnbackupz`,
         "application/nnbackupz"
       );
-      console.log("Copying zip file...");
+
       await copyFileAsync(`file://${zipOutputFile}`, file.uri);
 
-      console.log("Copied zip file...");
       path = file.uri;
     } else {
       path = zipOutputFile;
     }
 
-    RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
+    RNFetchBlob.fs.unlink(zipSourceFolder).catch(() => {
+      /* empty */
+    });
     if (Platform.OS === "android") {
-      RNFetchBlob.fs.unlink(zipOutputFile).catch(console.log);
+      RNFetchBlob.fs.unlink(zipOutputFile).catch(() => {
+        /* empty */
+      });
     }
 
     updateNextBackupTime(backupType || "partial");
@@ -308,9 +315,13 @@ async function run(
       return run(progress, context, backupType);
     }
 
-    RNFetchBlob.fs.unlink(zipSourceFolder).catch(console.log);
+    RNFetchBlob.fs.unlink(zipSourceFolder).catch(() => {
+      /* empty */
+    });
     if (Platform.OS === "android") {
-      RNFetchBlob.fs.unlink(zipOutputFile).catch(console.log);
+      RNFetchBlob.fs.unlink(zipOutputFile).catch(() => {
+        /* empty */
+      });
     }
 
     DatabaseLogger.error(e);
@@ -329,7 +340,6 @@ async function checkBackupRequired(
   type: "daily" | "off" | "useroff" | "weekly" | "monthly" | "never",
   lastBackupDateType: "lastBackupDate" | "lastFullBackupDate" = "lastBackupDate"
 ) {
-  console.log(lastBackupDateType, type);
   if (type === "off" || type === "useroff" || type === "never" || !type) return;
   const now = Date.now();
   const lastBackupDate = SettingsService.getProperty(lastBackupDateType) as
@@ -362,9 +372,7 @@ const checkAndRun = async () => {
   if (await checkBackupRequired(settings?.reminder)) {
     try {
       await run();
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   }
 };
 

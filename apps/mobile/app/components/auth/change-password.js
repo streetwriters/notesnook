@@ -88,7 +88,6 @@ export const ChangePassword = () => {
       await sleep(300);
       eSendEvent(eOpenRecoveryKeyDialog);
     } catch (e) {
-      console.log(e.stack);
       setLoading(false);
       ToastManager.show({
         heading: strings.passwordChangeFailed(),

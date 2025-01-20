@@ -85,7 +85,7 @@ async function resolveFileFunctions(
     `/export_${Date.now()}`
   );
 
-  await RNFetchBlob.fs.mkdir(exportCacheFolder).catch((e) => console.log(e));
+  await RNFetchBlob.fs.mkdir(exportCacheFolder).catch((e) => {});
 
   const mkdir = async (dir: string) => {
     const folder = join(exportCacheFolder, dir);
@@ -96,7 +96,7 @@ async function resolveFileFunctions(
 
   const writeFile = async (path: string, result: string) => {
     const cacheFilePath = join(exportCacheFolder, path);
-    console.log(cacheFilePath, result.length);
+
     await RNFetchBlob.fs.writeFile(
       cacheFilePath,
       result,
@@ -194,7 +194,7 @@ async function bulkExport(
       try {
         await exportNoteToFile(item, type, mkdir, writeFile);
       } catch (e) {
-        console.log(item.type, e);
+        /* empty */
       }
     } else if (item.type === "attachment") {
       currentAttachmentProgress += 1;
@@ -202,11 +202,11 @@ async function bulkExport(
       try {
         await exportAttachmentToFile(item, mkdir, cacheFolder);
       } catch (e) {
-        console.log(item.path, e);
+        /* empty */
       }
     }
   }
-  console.log(cacheFolder);
+
   return createZip(totalNotes, cacheFolder, type, path, callback);
 }
 
@@ -240,7 +240,7 @@ async function exportNote(
         noteItem = item;
         await exportNoteToFile(item, type, mkdir, writeFile);
       } catch (e) {
-        console.log("exportNoteToFile", item.type, e);
+        /* empty */
       }
     } else if (item.type === "attachment") {
       currentAttachmentProgress += 1;
@@ -249,13 +249,12 @@ async function exportNote(
         hasAttachments = true;
         await exportAttachmentToFile(item, mkdir, cacheFolder);
       } catch (e) {
-        console.log("exportAttachmentToFile", item.path, e);
+        /* empty */
       }
     }
   }
 
   if (!hasAttachments) {
-    console.log("creating file...");
     return createFile(noteItem as ExportableNote, type, path, cacheFolder);
   } else {
     return createZip(1, cacheFolder, type, path, callback);
@@ -333,10 +332,10 @@ async function createFile(
       filePath = originalPath.replace(`${ext}`, "") + "_" + id + ext;
       id++;
     }
-    console.log("path", filePath);
+
     await RNFetchBlob.fs.mv(exportedFile, filePath);
   }
-  console.log("file moved...");
+
   return {
     filePath: filePath,
     fileDir: path,

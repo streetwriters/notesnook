@@ -215,7 +215,9 @@ export const Update = ({ version: appVersion, fwdRef }) => {
               marginTop: 10
             }}
             onPress={() => {
-              Linking.openURL(GITHUB_PAGE_URL).catch(console.log);
+              Linking.openURL(GITHUB_PAGE_URL).catch(() => {
+                /* empty */
+              });
             }}
           >
             {strings.readReleaseNotes()}

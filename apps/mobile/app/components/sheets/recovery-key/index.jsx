@@ -191,13 +191,17 @@ class RecoveryKeySheet extends React.Component {
         Share.open({
           url: path,
           failOnCancel: false
-        }).catch(console.log);
+        }).catch(() => {
+          /* empty */
+        });
       } else {
         FileViewer.open(path, {
           showOpenWithDialog: true,
           showAppsSuggestions: true,
           shareFile: true
-        }).catch(console.log);
+        }).catch(() => {
+          /* empty */
+        });
       }
     } catch (e) {
       console.error(e);

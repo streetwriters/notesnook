@@ -25,6 +25,21 @@ interface NotesnookModuleInterface {
   setSecureMode: (enabled: boolean) => void;
   setAppState: (appState: string) => void;
   getAppState: () => string;
+  saveAndFinish: () => void;
+  setString: (storeName: string, key: string, value: string) => void;
+  getString: (storeName: string, key: string) => Promise<string>;
+  removeString: (key: string) => void;
+  cancelAndFinish: () => void;
+  getWidgetId: () => void;
+  getIntent: () => {
+    "com.streetwriters.notesnook.OpenNoteId"?: string;
+    "com.streetwriters.notesnook.OpenReminderId"?: string;
+    "com.streetwriters.notesnook.NewReminder"?: string;
+  };
+  getWidgetNotes: () => Promise<string[]>;
+  hasWidgetNote: (noteId: string) => Promise<boolean>;
+  updateWidgetNote: (noteId: string, data: string) => void;
+  updateReminderWidget: () => void;
 }
 
 export const NotesnookModule: NotesnookModuleInterface = Platform.select({
@@ -33,7 +48,18 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     setBackgroundColor: () => {},
     setSecureMode: () => {},
     setAppState: () => {},
-    getAppState: () => {}
+    getAppState: () => {},
+    saveAndFinish: () => {},
+    getString: () => {},
+    setString: () => {},
+    removeString: () => {},
+    cancelAndFinish: () => {},
+    getWidgetId: () => {},
+    getIntent: () => {},
+    getWidgetNotes: () => {},
+    hasWidgetNote: () => {},
+    updateWidgetNote: () => {},
+    updateReminderWidget: () => {}
   },
   android: NativeModules.NNativeModule
 });

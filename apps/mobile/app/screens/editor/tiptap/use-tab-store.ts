@@ -167,7 +167,7 @@ export const useTabStore = create<TabStore>(
           previewTab: true,
           noteId: noteId
         };
-        console.log("focus preview", noteId);
+
         set({
           tabs: tabs
         });
@@ -211,7 +211,6 @@ export const useTabStore = create<TabStore>(
       focusEmptyTab: () => {
         const index = get().tabs.findIndex((t) => !t.noteId);
         if (index === -1) return get().newTab();
-        console.log("focus empty tab", get().tabs[index]);
 
         get().focusTab(get().tabs[index].id);
       },
@@ -225,7 +224,6 @@ export const useTabStore = create<TabStore>(
       },
 
       focusTab: (id: number) => {
-        console.log(history.getHistory(), id);
         history.add(id);
         set({
           currentTab: id

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { db } from "../common/database";
 import Navigation from "../services/navigation";
+import { NotePreviewWidget } from "../services/note-preview-widget";
 import Notifications from "../services/notifications";
 import { useFavoriteStore } from "./use-favorite-store";
 import { useMenuStore } from "./use-menu-store";
@@ -41,6 +42,8 @@ export function initAfterSync() {
   useUserStore.setState({
     profile: db.settings.getProfile()
   });
+
+  NotePreviewWidget.updateNotes();
 }
 
 export async function initialize() {}

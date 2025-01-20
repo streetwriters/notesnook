@@ -123,7 +123,9 @@ export async function downloadFile(
     cancelToken.cancel = async (reason) => {
       useAttachmentStore.getState().remove(filename);
       request.cancel();
-      RNFetchBlob.fs.unlink(tempFilePath).catch(console.log);
+      RNFetchBlob.fs.unlink(tempFilePath).catch(() => {
+        /* empty */
+      });
       DatabaseLogger.log(`Download cancelled: ${reason} ${filename}`);
     };
 
@@ -142,7 +144,9 @@ export async function downloadFile(
     useAttachmentStore.getState().remove(filename);
 
     if (await exists(originalFilePath)) {
-      await RNFetchBlob.fs.unlink(originalFilePath).catch(console.log);
+      await RNFetchBlob.fs.unlink(originalFilePath).catch(() => {
+        /* empty */
+      });
     }
 
     await RNFetchBlob.fs.mv(tempFilePath, originalFilePath);
@@ -169,8 +173,12 @@ export async function downloadFile(
     }
 
     useAttachmentStore.getState().remove(filename);
-    RNFetchBlob.fs.unlink(tempFilePath).catch(console.log);
-    RNFetchBlob.fs.unlink(originalFilePath).catch(console.log);
+    RNFetchBlob.fs.unlink(tempFilePath).catch(() => {
+      /* empty */
+    });
+    RNFetchBlob.fs.unlink(originalFilePath).catch(() => {
+      /* empty */
+    });
     DatabaseLogger.error(e, "Download failed: ", {
       url
     });
@@ -188,7 +196,7 @@ export async function checkAttachment(hash: string) {
 
   try {
     const size = await getUploadedFileSize(hash);
-    console.log("File Size", size);
+
     if (size === -1) return { success: true };
 
     if (size === 0)

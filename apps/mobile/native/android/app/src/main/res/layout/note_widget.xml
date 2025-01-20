@@ -3,35 +3,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
-    android:padding="@dimen/widget_margin"
+    android:padding="10dp"
     android:theme="@style/ThemeOverlay.Notesnook.AppWidgetContainer">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/widget_button"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:background="@drawable/layout_bg"
         android:paddingHorizontal="10dp"
+        android:paddingVertical="10dp"
         android:elevation="5dp"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/add_note"
-            android:contentDescription="New note icon" />
-
+        android:orientation="vertical">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="8dp"
+            android:id="@+id/widget_title"
             android:textColor="@color/text"
             android:textSize="16sp"
-            android:text="@string/take_a_quick_note" />
+            android:textStyle="bold"
+            android:text="Widget unconfigured" />
+        <TextView
+            android:id="@+id/widget_body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
+            android:textColor="@color/text"
+            android:textSize="14sp"
+            android:text="Configure this widget to show a note here." />
     </LinearLayout>
 
 </RelativeLayout>

@@ -119,7 +119,6 @@ export const PricingPlans = ({
       setLoading(false);
     } catch (e) {
       setLoading(false);
-      console.log("error getting sku", e);
     }
   }, [promo?.promoCode]);
 
@@ -171,7 +170,6 @@ export const PricingPlans = ({
       });
       return true;
     } catch (e) {
-      console.log("PROMOCODE ERROR:", code, e);
       return false;
     }
   };
@@ -231,7 +229,6 @@ export const PricingPlans = ({
       });
     } catch (e) {
       setBuying(false);
-      console.log(e);
     }
   };
 

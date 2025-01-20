@@ -21,6 +21,7 @@ class MainApplication : Application(), ReactApplication {
               // add(MyReactNativePackage())
               add(NNativeModulePackage());
             }
+
  
         override fun getJSMainModuleName(): String = "index"
  

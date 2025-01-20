@@ -336,7 +336,7 @@ export class VaultDialog extends Component {
             );
           });
         }
-        console.log("VAULT UPDATED EVENT");
+
         eSendEvent("vaultUpdated");
         this.setState({
           loading: false
@@ -406,7 +406,6 @@ export class VaultDialog extends Component {
     } else {
       await db.vault.add(this.state.note.id);
 
-      console.log("update note event...");
       eSendEvent(eUpdateNoteInEditor, this.state.note, true);
 
       this.close();
@@ -543,7 +542,6 @@ export class VaultDialog extends Component {
         this.close();
       })
       .catch((e) => {
-        console.log("Error", e);
         this._takeErrorAction(e);
       });
   }

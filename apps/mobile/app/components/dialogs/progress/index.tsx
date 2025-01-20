@@ -62,7 +62,7 @@ export default function Progress() {
       eSubscribeEvent(PROGRESS_EVENTS.start, (options: ProgressOptions) => {
         setProgress(options.progress);
         cancelCallback.current = options.cancelCallback;
-        console.log("options", options.fillBackground);
+
         setData({
           title: options.title,
           paragraph: options.paragraph,
