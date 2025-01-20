@@ -44,6 +44,7 @@ import {
 } from "react-virtuoso";
 import { getRandom, useResolvedItem } from "@notesnook/common";
 import { Context } from "./types";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export const CustomScrollbarsVirtualList = forwardRef<
   HTMLDivElement,
@@ -90,6 +91,42 @@ function ListContainer(props: ListContainerProps) {
   const listRef = useRef<VirtuosoHandle>(null);
   const listContainerRef = useRef(null);
   // const activeItem = useRef<{ focus: boolean; id: string }>();
+
+  useEffect(() => {
+    let flashStartTimeout: NodeJS.Timeout;
+    let flashEndTimeout: NodeJS.Timeout;
+
+    AppEventManager.subscribe(
+      AppEvents.revealItemInList,
+      async (id?: string) => {
+        if (!id || !listRef.current) return;
+
+        const ids = await items.ids();
+        const index = ids.findIndex((i) => i === id);
+        if (index === -1) return;
+
+        listRef.current.scrollToIndex({
+          index,
+          align: "center",
+          behavior: "auto"
+        });
+
+        flashStartTimeout = setTimeout(() => {
+          const noteItem = document.querySelector(`#id_${id}`);
+          if (!noteItem) return;
+          noteItem.classList.add("flash");
+          flashEndTimeout = setTimeout(() => {
+            noteItem.classList.remove("flash");
+          }, 1000);
+        }, 500);
+      }
+    );
+
+    return () => {
+      clearTimeout(flashStartTimeout);
+      clearTimeout(flashEndTimeout);
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
