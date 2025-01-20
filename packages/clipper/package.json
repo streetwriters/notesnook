@@ -10,10 +10,10 @@
   "license": "GPL-3.0-or-later",
   "main": "dist/index.js",
   "devDependencies": {
-    "@playwright/test": "^1.27.1",
-    "slugify": "^1.6.5",
-    "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4"
+    "@playwright/test": "1.48.2",
+    "slugify": "1.6.6",
+    "webpack": "5.88.2",
+    "webpack-cli": "5.1.4"
   },
   "publishConfig": {
     "access": "public"

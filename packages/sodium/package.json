@@ -53,7 +53,7 @@
     "sodium-native": "^4.1.1",
     "benny": "^3.7.1",
     "ts-node": "^10.9.1",
-    "vitest": "^0.32.2"
+    "vitest": "2.1.8"
   },
   "dependencies": {
     "libsodium-wrappers-sumo": "^0.7.15"

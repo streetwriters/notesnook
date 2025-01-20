@@ -13,12 +13,36 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/strings.ts:817
-msgid "— not just the"
+#: src/strings.ts:2387
+msgid " \"Notebook > Notes\""
 msgstr ""
 
-#: src/strings.ts:2387
-msgid "\"Notebook > Notes\""
+#: src/strings.ts:148
+msgid " Unlock with password once to enable biometric access."
+msgstr ""
+
+#: src/strings.ts:1920
+msgid " Upgrade to Notesnook Pro to add more notebooks."
+msgstr ""
+
+#: src/strings.ts:1923
+msgid " Upgrade to Notesnook Pro to customize the toolbar."
+msgstr ""
+
+#: src/strings.ts:1922
+msgid " Upgrade to Notesnook Pro to use custom toolbar presets."
+msgstr ""
+
+#: src/strings.ts:1921
+msgid " Upgrade to Notesnook Pro to use the notes vault."
+msgstr ""
+
+#: src/strings.ts:1924
+msgid " Upgrade to Notesnook Pro to use this feature."
+msgstr ""
+
+#: src/strings.ts:817
+msgid "— not just the"
 msgstr ""
 
 #: src/strings.ts:43
@@ -29,14 +53,17 @@ msgstr ""
 msgid "(empty block)"
 msgstr ""
 
+#. placeholder {0}: status ? status : "Exporting notes"
 #: src/strings.ts:213
 msgid "{0}"
 msgstr ""
 
+#. placeholder {0}: name || "File"
 #: src/strings.ts:507
 msgid "{0} downloaded"
 msgstr ""
 
+#. placeholder {0}: version ? `v${version} ` : "New version"
 #: src/strings.ts:525
 msgid "{0} Highlights 🎉"
 msgstr ""
@@ -762,7 +789,7 @@ msgid "An error occurred while migrating your data. You can logout of your accou
 msgstr ""
 
 #: src/strings.ts:103
-msgid "and"
+msgid "and "
 msgstr ""
 
 #: src/strings.ts:1770
@@ -1139,7 +1166,7 @@ msgid "By"
 msgstr ""
 
 #: src/strings.ts:101
-msgid "By signing up, you agree to our"
+msgid "By signing up, you agree to our "
 msgstr ""
 
 #: src/strings.ts:2312
@@ -1406,11 +1433,15 @@ msgstr ""
 #: src/strings.ts:1852
 msgid ""
 "Clearing attachments cache will perform the following actions:\n"
+"\n"
 "- Downloaded images & files: **cleared**\n"
 "- Pending uploads: **cleared**\n"
 "- Uploaded images & files: _unaffected_\n"
+"\n"
 "All attachments will be downloaded & cached again on access.\n"
+"\n"
 "---\n"
+"\n"
 "**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**"
 msgstr ""
 
@@ -1587,6 +1618,7 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
+#. placeholder {0}: format ? " " + format : ""
 #: src/strings.ts:2015
 msgid "Copy as{0}"
 msgstr ""
@@ -1703,6 +1735,7 @@ msgstr ""
 msgid "Created at"
 msgstr ""
 
+#. placeholder {0}: type === "full" ? " full" : ""
 #: src/strings.ts:1325
 msgid "Creating a{0} backup"
 msgstr ""
@@ -2444,6 +2477,7 @@ msgstr ""
 msgid "Export all notes as pdf, markdown, html or text in a single zip file"
 msgstr ""
 
+#. placeholder {0}: format ? " " + format : ""
 #: src/strings.ts:2014
 msgid "Export as{0}"
 msgstr ""
@@ -2661,8 +2695,10 @@ msgstr ""
 msgid ""
 "Force push:\n"
 "Use this if changes made on this device are not appearing on other devices. This will overwrite the data on the server with the data from this device.\n"
+"\n"
 "Force pull:\n"
 "Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.\n"
+"\n"
 "**These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**"
 msgstr ""
 
@@ -2933,7 +2969,7 @@ msgstr ""
 #: src/strings.ts:1375
 msgid ""
 "If you didn't get an email from us or the confirmation link isn't\n"
-"working,"
+"            working,"
 msgstr ""
 
 #: src/strings.ts:1783
@@ -3270,6 +3306,7 @@ msgstr ""
 msgid "Loading"
 msgstr ""
 
+#. placeholder {0}: progress ? `(${progress})` : ""
 #: src/strings.ts:146
 msgid "Loading {0}, please wait..."
 msgstr ""
@@ -3478,6 +3515,8 @@ msgstr ""
 msgid "Merge cells"
 msgstr ""
 
+#. placeholder {0}: progress ? `${progress?.collection}` : null
+#. placeholder {1}: progress ? `(${progress.current}/${progress.total}) ` : null
 #: src/strings.ts:246
 msgid "Migrating {0} {1}... please wait"
 msgstr ""
@@ -3881,8 +3920,10 @@ msgstr ""
 #: src/strings.ts:2153
 msgid ""
 "Notesnook uses the following DNS providers:\n"
+"\n"
 "1. Cloudflare DNS\n"
 "2. Quad9\n"
+"\n"
 "This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this if you want the app to use system's DNS settings."
 msgstr ""
 
@@ -4144,6 +4185,7 @@ msgstr ""
 msgid "Please confirm your identity by entering the authentication code from your authenticator app."
 msgstr ""
 
+#. placeholder {0}: phoneNumber ? phoneNumber : "your registered phone number."
 #: src/strings.ts:982
 msgid "Please confirm your identity by entering the authentication code sent to {0}."
 msgstr ""
@@ -4387,7 +4429,7 @@ msgid "Privacy policy"
 msgstr ""
 
 #: src/strings.ts:104
-msgid "Privacy Policy."
+msgid "Privacy Policy. "
 msgstr ""
 
 #: src/strings.ts:162
@@ -4776,6 +4818,7 @@ msgstr ""
 msgid "Resend code in ({seconds})"
 msgstr ""
 
+#. placeholder {0}: seconds ? ` in ${seconds}` : ""
 #: src/strings.ts:666
 msgid "Resend code{0}"
 msgstr ""
@@ -5354,10 +5397,12 @@ msgstr ""
 #: src/strings.ts:2162
 msgid ""
 "Setup an HTTP/HTTPS/SOCKS proxy.\n"
+"\n"
 "For example:\n"
 "http://foobar:80\n"
 "socks4://proxy.example.com\n"
 "http://username:password@foobar:80\n"
+"\n"
 "To remove the proxy, simply erase everything in the input."
 msgstr ""
 
@@ -5784,11 +5829,12 @@ msgstr ""
 
 #: src/strings.ts:1476
 msgid ""
-"Tell us more about the issue you are facing. \n"
+"Tell us more about the issue you are facing.\n"
+"\n"
 "For example:\n"
 "- What were you trying to do in the app?\n"
 "- What did you expect to happen?\n"
-"- Steps to reproduce the issue \n"
+"- Steps to reproduce the issue\n"
 "- Things you have tried etc."
 msgstr ""
 
@@ -5801,7 +5847,7 @@ msgid "Terms of service"
 msgstr ""
 
 #: src/strings.ts:102
-msgid "Terms of Service"
+msgid "Terms of Service "
 msgstr ""
 
 #: src/strings.ts:1601
@@ -6128,10 +6174,6 @@ msgstr ""
 msgid "Unlock with biometrics"
 msgstr ""
 
-#: src/strings.ts:148
-msgid "Unlock with password once to enable biometric access."
-msgstr ""
-
 #: src/strings.ts:1806
 msgid "Unlock with security key"
 msgstr ""
@@ -6193,28 +6235,8 @@ msgstr ""
 msgid "Upgrade to Notesnook Pro to add colors."
 msgstr ""
 
-#: src/strings.ts:1920
-msgid "Upgrade to Notesnook Pro to add more notebooks."
-msgstr ""
-
 #: src/strings.ts:1919
 msgid "Upgrade to Notesnook Pro to create more tags."
-msgstr ""
-
-#: src/strings.ts:1923
-msgid "Upgrade to Notesnook Pro to customize the toolbar."
-msgstr ""
-
-#: src/strings.ts:1922
-msgid "Upgrade to Notesnook Pro to use custom toolbar presets."
-msgstr ""
-
-#: src/strings.ts:1921
-msgid "Upgrade to Notesnook Pro to use the notes vault."
-msgstr ""
-
-#: src/strings.ts:1924
-msgid "Upgrade to Notesnook Pro to use this feature."
 msgstr ""
 
 #: src/strings.ts:738
@@ -6310,6 +6332,7 @@ msgstr ""
 #: src/strings.ts:412
 msgid ""
 "Use the following key to format the title:\n"
+"\n"
 "$date$: Current date.\n"
 "$time$: Current time.\n"
 "$timestamp$: Full date and time without any spaces or other symbols.\n"
@@ -6607,12 +6630,14 @@ msgstr ""
 #: src/strings.ts:2032
 msgid ""
 "You can track your bug report at [{url}]({url}).\n"
+"\n"
 "Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**\n"
+"\n"
 "If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support."
 msgstr ""
 
 #: src/strings.ts:226
-msgid "You can track your issue at"
+msgid "You can track your issue at "
 msgstr ""
 
 #: src/strings.ts:1014

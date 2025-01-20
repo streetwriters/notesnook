@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { plural, select, t } from "@lingui/macro";
+import { plural, select, t } from "@lingui/core/macro";
 import { actionConfirmations } from "../generated/action-confirmations";
 import { actionErrors } from "../generated/action-errors";
 import { actions } from "../generated/actions";
@@ -1473,12 +1473,12 @@ $headline$: Use starting line of the note as title.`,
   enterNewEmail: () => t`Enter your new email`,
   verifyNewEmail: () => t`Enter verification code sent to your new email`,
   issueTitlePlaceholder: () => t`Tell us what happened`,
-  issuePlaceholder: () => t`Tell us more about the issue you are facing. 
+  issuePlaceholder: () => t`Tell us more about the issue you are facing.
 
 For example:
 - What were you trying to do in the app?
 - What did you expect to happen?
-- Steps to reproduce the issue 
+- Steps to reproduce the issue
 - Things you have tried etc.`,
   searchSectionToLinkPlaceholder: () => t`Type # to search for headings`,
   searchNoteToLinkPlaceholder: () => t`Search a note to link to`,
@@ -1850,7 +1850,7 @@ For example:
   clearCacheConfirm: () => t`Clear attachments cache?`,
   clearCacheConfirmDesc:
     () => t`Clearing attachments cache will perform the following actions:
-                        
+
 - Downloaded images & files: **cleared**
 - Pending uploads: **cleared**
 - Uploaded images & files: _unaffected_
@@ -2030,9 +2030,9 @@ All attachments will be downloaded & cached again on access.
   bugReportMessage: (
     url: string
   ) => t`You can track your bug report at [${url}](${url}).
-  
+
 Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**
-  
+
 If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`,
 
   safeEncryptedNotes: () => t`Safe & encrypted notes`,
@@ -2160,7 +2160,7 @@ This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this
   proxy: () => t`Proxy`,
   proxyDescription: () =>
     t`Setup an HTTP/HTTPS/SOCKS proxy.
-        
+
 For example:
 http://foobar:80
 socks4://proxy.example.com
