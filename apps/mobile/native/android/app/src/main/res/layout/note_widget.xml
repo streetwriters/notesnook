@@ -25,6 +25,7 @@
             android:id="@+id/widget_title"
             android:textColor="@color/text"
             android:textSize="16sp"
+            android:textStyle="bold"
             android:text="Widget unconfigured" />
         <TextView
             android:id="@+id/widget_body"

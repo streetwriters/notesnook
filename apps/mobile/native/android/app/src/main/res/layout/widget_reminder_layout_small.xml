@@ -2,8 +2,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/reminder_item_btn"
-    android:padding="8dp">
+    android:id="@+id/reminder_item_btn">
 
     <TextView
         android:id="@+id/reminder_title"
