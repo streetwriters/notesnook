@@ -154,7 +154,9 @@ async function bootstrapPackage(cwd, outputs) {
 
   const packages = await needsRebuild(cwd);
   if (packages.length > 0) {
-    postInstallCommands.push(`npm rebuild ${packages.join(" ")}`);
+    postInstallCommands.push(
+      `npm rebuild --foreground-scripts ${packages.join(" ")}`
+    );
   }
 
   if (await hasScript(cwd, "postinstall"))
@@ -164,7 +166,7 @@ async function bootstrapPackage(cwd, outputs) {
     let retries = 3;
     while (--retries > 0) {
       try {
-        console.log("Running postinstall command:", cmd);
+        console.log("Running postinstall command:", cmd, "in", cwd);
         await execute(cmd, cwd, outputs);
         break;
       } catch (e) {
