@@ -90,13 +90,12 @@ export const NotebookItem = ({
       for (const key in keys) {
         nextState[key] = !state.initialState[key] ? undefined : "deselected";
       }
-      console.log("Single item selection");
+
       state.setSelection({
         [item.id]: "selected",
         ...nextState
       });
     } else {
-      console.log("Multi item selection");
       state.markAs(item, "selected");
     }
   };

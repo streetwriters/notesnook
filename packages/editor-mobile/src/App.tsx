@@ -38,6 +38,13 @@ if (currentTheme) {
   useThemeEngineStore.getState().setTheme(currentTheme);
 }
 
+window.addEventListener("error", (event) => {
+  post("editorError", {
+    message: event.error.message,
+    stack: event.error?.stack || ""
+  });
+});
+
 class ExceptionHandler extends React.Component<{
   children: React.ReactNode;
   component: string;

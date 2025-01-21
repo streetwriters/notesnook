@@ -54,7 +54,9 @@ export const Licenses = () => {
         }}
         onPress={() => {
           if (!item.link) return;
-          Linking.openURL(item.link).catch(console.log);
+          Linking.openURL(item.link).catch(() => {
+            /* empty */
+          });
         }}
       >
         <Heading size={SIZE.sm}>{item.name}</Heading>

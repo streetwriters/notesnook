@@ -126,6 +126,7 @@ export async function shouldAddLoginNotice() {
 
 export async function shouldAddConfirmEmailNotice() {
   const user = await db.user.getUser();
+  if (!user) return false;
   return !user?.isEmailConfirmed;
 }
 

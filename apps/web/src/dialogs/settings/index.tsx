@@ -77,6 +77,7 @@ import { AppLockSettings } from "./app-lock-settings";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { ServersSettings } from "./servers-settings";
 import { strings } from "@notesnook/intl";
+import { mdToHtml } from "../../utils/md";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -470,13 +471,17 @@ function SettingItem(props: { item: Setting }) {
           <Text variant={"subtitle"}>{item.title}</Text>
           {item.description && (
             <Text
+              as={"div"}
               variant={"body"}
               sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
-            >
-              {typeof item.description === "function"
-                ? item.description(state)
-                : item.description}
-            </Text>
+              dangerouslySetInnerHTML={{
+                __html: mdToHtml(
+                  typeof item.description === "function"
+                    ? item.description(state)
+                    : item.description
+                )
+              }}
+            />
           )}
         </Flex>
 

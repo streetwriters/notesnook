@@ -126,7 +126,6 @@ export async function setAppLockVerificationCipher(appLockPassword: string) {
     DatabaseLogger.info("setAppLockVerificationCipher");
   } catch (e) {
     DatabaseLogger.error(e);
-    console.log(e);
   }
 }
 
@@ -159,79 +158,77 @@ export function clearDatabaseKey() {
 
 export async function getDatabaseKey(appLockPassword?: string) {
   if (DB_KEY) return DB_KEY;
-  try {
-    if (appLockPassword) {
-      const databaseKeyCipher: Cipher =
-        CipherStorage.getMap("databaseKeyCipher");
-      const databaseKey = await decrypt(
-        {
-          password: appLockPassword
-        },
-        databaseKeyCipher
-      );
-      DatabaseLogger.info("Getting database key from cipher");
-      DB_KEY = databaseKey;
-    }
+  if (appLockPassword) {
+    const databaseKeyCipher: Cipher = CipherStorage.getMap("databaseKeyCipher");
+    const databaseKey = await decrypt(
+      {
+        password: appLockPassword
+      },
+      databaseKeyCipher
+    );
+    DatabaseLogger.info("Getting database key from cipher");
+    DB_KEY = databaseKey;
+  }
 
-    if (!DB_KEY) {
-      const hasKey = await Keychain.hasInternetCredentials(
+  if (!DB_KEY) {
+    const hasKey = await Keychain.hasInternetCredentials(KEYCHAIN_SERVER_DBKEY);
+    if (hasKey) {
+      const credentials = await Keychain.getInternetCredentials(
         KEYCHAIN_SERVER_DBKEY
       );
-      if (hasKey) {
-        const credentials = await Keychain.getInternetCredentials(
-          KEYCHAIN_SERVER_DBKEY
-        );
 
-        DatabaseLogger.info("Getting database key from Keychain");
-        DB_KEY = (credentials as Keychain.UserCredentials).password;
-      }
+      DatabaseLogger.info("Getting database key from Keychain");
+      DB_KEY = (credentials as Keychain.UserCredentials).password;
     }
-
-    if (!DB_KEY) {
-      DatabaseLogger.info("Generating new database key");
-      const password = generatePassword();
-      const derivedDatabaseKey = await Sodium.deriveKey(
-        password,
-        NOTESNOOK_DB_KEY_SALT
-      );
-
-      DB_KEY = derivedDatabaseKey.key as string;
-
-      await Keychain.setInternetCredentials(
-        KEYCHAIN_SERVER_DBKEY,
-        "notesnook",
-        DB_KEY,
-        KEYSTORE_CONFIG
-      );
-    }
-
-    if (await Keychain.hasInternetCredentials("notesnook")) {
-      const userKeyCredentials = await Keychain.getInternetCredentials(
-        "notesnook"
-      );
-
-      if (userKeyCredentials) {
-        const userKeyCipher: Cipher = (await encrypt(
-          {
-            key: DB_KEY,
-            salt: NOTESNOOK_DB_KEY_SALT
-          },
-          userKeyCredentials.password
-        )) as Cipher;
-        // Store encrypted user key in MMKV
-        MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
-        await Keychain.resetInternetCredentials("notesnook");
-      }
-      DatabaseLogger.info("Migrated user credentials to cipher storage");
-    }
-
-    return DB_KEY;
-  } catch (e) {
-    ToastManager.error(e as Error, "Error getting database key");
-    console.log(e, "error");
-    DatabaseLogger.error(e);
-    return null;
   }
+
+  if (!DB_KEY) {
+    DatabaseLogger.info("Generating new database key");
+    const password = generatePassword();
+    const derivedDatabaseKey = await Sodium.deriveKey(
+      password,
+      NOTESNOOK_DB_KEY_SALT
+    );
+
+    DB_KEY = derivedDatabaseKey.key as string;
+
+    await Keychain.setInternetCredentials(
+      KEYCHAIN_SERVER_DBKEY,
+      "notesnook",
+      DB_KEY,
+      KEYSTORE_CONFIG
+    );
+  }
+
+  if (await Keychain.hasInternetCredentials("notesnook")) {
+    const userKeyCredentials = await Keychain.getInternetCredentials(
+      "notesnook"
+    );
+
+    if (userKeyCredentials) {
+      const userKeyCipher: Cipher = (await encrypt(
+        {
+          key: DB_KEY,
+          salt: NOTESNOOK_DB_KEY_SALT
+        },
+        userKeyCredentials.password
+      )) as Cipher;
+      // Store encrypted user key in MMKV
+      MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
+      await Keychain.resetInternetCredentials("notesnook");
+    }
+    DatabaseLogger.info("Migrated user credentials to cipher storage");
+  }
+
+  if (!DB_KEY) {
+    throw new Error(
+      `Failed to get database key, ${await Keychain.hasInternetCredentials(
+        KEYCHAIN_SERVER_DBKEY
+      )}`
+    );
+  }
+
+  return DB_KEY;
 }
 
 export async function deriveCryptoKeyFallback(data: SerializedKey) {
@@ -312,7 +309,6 @@ export async function getCryptoKey() {
 
     return key;
   } catch (e) {
-    console.log("getCryptoKey", e);
     DatabaseLogger.error(e);
   }
 }

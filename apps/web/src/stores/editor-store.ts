@@ -518,7 +518,7 @@ class EditorStore extends BaseStore<EditorStore> {
     } else setDocumentTitle();
 
     this.set({ activeSessionId: id });
-    appStore.setIsEditorOpen(!!id);
+    AppEventManager.publish(AppEvents.toggleEditor, true);
 
     if (id) {
       const { history } = this.get();
@@ -533,12 +533,6 @@ class EditorStore extends BaseStore<EditorStore> {
       this.updateSession(session.id, [session.type], {
         activeBlockId
       });
-
-    if (session)
-      AppEventManager.publish(
-        AppEvents.revealItemInList,
-        "note" in session ? session.note.id : session.id
-      );
   };
 
   openDiffSession = async (noteId: string, sessionId: string) => {
@@ -715,6 +709,32 @@ class EditorStore extends BaseStore<EditorStore> {
         }
       }
     }
+  };
+
+  openNextSession = () => {
+    const { sessions, activeSessionId } = this.get();
+    if (sessions.length === 0 || sessions.length === 1) return;
+
+    const index = sessions.findIndex((s) => s.id === activeSessionId);
+    if (index === -1) return;
+
+    if (index === sessions.length - 1) {
+      return this.openSession(sessions[0].id);
+    }
+    return this.openSession(sessions[index + 1].id);
+  };
+
+  openPreviousSession = () => {
+    const { sessions, activeSessionId } = this.get();
+    if (sessions.length === 0 || sessions.length === 1) return;
+
+    const index = sessions.findIndex((s) => s.id === activeSessionId);
+    if (index === -1) return;
+
+    if (index === 0) {
+      return this.openSession(sessions[sessions.length - 1].id);
+    }
+    return this.openSession(sessions[index - 1].id);
   };
 
   addSession = (session: EditorSession, activate = true) => {

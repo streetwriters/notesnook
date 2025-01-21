@@ -164,7 +164,7 @@ export class EditorModel {
 
   async selectAll() {
     await this.content.focus();
-    await this.page.keyboard.press("Control+a");
+    await this.page.keyboard.press("ControlOrMeta+a");
     await this.page.waitForTimeout(500);
   }
 
@@ -241,5 +241,24 @@ export class EditorModel {
       const tabModel = new TabItemModel(item, this.page);
       if ((await tabModel.getId()) === id) return tabModel;
     }
+  }
+
+  async attachImage() {
+    await this.page
+      .context()
+      .grantPermissions(["clipboard-read", "clipboard-write"]);
+    await this.page.evaluate(async () => {
+      const resp = await fetch("https://dummyjson.com/image/150");
+      const blob = await resp.blob();
+      window.navigator.clipboard.write([
+        new ClipboardItem({
+          "image/png": new Blob([blob], { type: "image/png" })
+        })
+      ]);
+    });
+
+    await this.page.keyboard.down("ControlOrMeta");
+    await this.page.keyboard.press("KeyV");
+    await this.page.keyboard.up("ControlOrMeta");
   }
 }

@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState, Suspense, useEffect, useRef } from "react";
+import { useState, Suspense, useEffect, useRef } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
 import { useStore } from "./stores/app-store";
+import { useStore as useSettingStore } from "./stores/setting-store";
 import { Toaster } from "react-hot-toast";
 import NavigationMenu from "./components/navigation-menu";
 import StatusBar from "./components/status-bar";
@@ -39,16 +40,23 @@ import AppEffects from "./app-effects";
 import HashRouter from "./components/hash-router";
 import { useWindowFocus } from "./hooks/use-window-focus";
 import { Global } from "@emotion/react";
+import { isMac } from "./utils/platform";
+import useSlider from "./hooks/use-slider";
+import { AppEventManager, AppEvents } from "./common/app-events";
+import { TITLE_BAR_HEIGHT } from "./components/title-bar";
+import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
+import { useWindowControls } from "./hooks/use-window-controls";
 
 new WebExtensionRelay();
-
-const MobileAppEffects = React.lazy(() => import("./app-effects.mobile"));
 
 function App() {
   const isMobile = useMobile();
   const [show, setShow] = useState(true);
   const isFocusMode = useStore((store) => store.isFocusMode);
   const { isFocused } = useWindowFocus();
+  const { isFullscreen } = useWindowControls();
+  const hasNativeTitlebar =
+    useSettingStore.getState().desktopIntegrationSettings?.nativeTitlebar;
   console.timeEnd("loading app");
 
   return (
@@ -65,17 +73,45 @@ function App() {
         `}
         />
       )}
+      {IS_DESKTOP_APP && isMac() && !isFullscreen && !hasNativeTitlebar ? (
+        <Global
+          // These styles to make sure the app content doesn't overlap with the traffic lights.
+          styles={`
+            .nav-pane,
+            .mobile-nav-pane {
+              margin-top: env(titlebar-area-height) !important;
+              height: calc(100% - env(titlebar-area-height)) !important;
+            }
+            .nav-pane.collapsed + .list-pane .route-container-header,
+            .nav-pane.collapsed + .list-pane.collapsed + .editor-pane .editor-action-bar,
+            .nav-pane.collapsed + .editor-pane .editor-action-bar {
+                padding-left: 25px;
+            }
+            .editor-pane:first-of-type .editor-action-bar,
+            .mobile-editor-pane.pane-active .editor-action-bar,
+            .mobile-list-pane.pane-active .route-container-header {
+                padding-left: 80px;
+            }
+            .route-container-header, .editor-action-bar {
+                transition: padding-left 0.4s ease-out;
+            }
+            .editor-action-bar {
+              border-bottom: none;
+            }
+            .route-container-header .routeHeader {
+              font-size: ${getFontSizes().title};
+            }
+            .global-split-pane .react-split__sash {
+              height: calc(100% - ${TITLE_BAR_HEIGHT}px);
+            }
+          `}
+        />
+      ) : null}
+
       <Suspense fallback={<div style={{ display: "none" }} />}>
         <div id="menu-wrapper">
           <GlobalMenuWrapper />
         </div>
-        {isMobile && (
-          <MobileAppEffects
-            sliderId="slider"
-            overlayId="overlay"
-            setShow={setShow}
-          />
-        )}
       </Suspense>
       <AppEffects setShow={setShow} />
 
@@ -140,16 +176,23 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
         }}
       >
         <SplitPane
+          className="global-split-pane"
           ref={navPane}
           autoSaveId="global-panel-group"
           direction="vertical"
-          initialSizes={[180, 380]}
           onChange={(sizes) => {
             setIsNarrow(sizes[0] <= 70);
           }}
         >
-          {!isFocusMode ? (
-            <Pane minSize={50} snapSize={120} maxSize={300}>
+          {isFocusMode ? null : (
+            <Pane
+              id="nav-pane"
+              initialSize={180}
+              className={`nav-pane`}
+              minSize={50}
+              snapSize={120}
+              maxSize={300}
+            >
               <NavigationMenu
                 toggleNavigationContainer={(state) => {
                   setShow(state || !show);
@@ -157,12 +200,15 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
                 isTablet={isNarrow}
               />
             </Pane>
-          ) : null}
-          {!isFocusMode && show && (
+          )}
+          {!isFocusMode && show ? (
             <Pane
+              id="list-pane"
+              initialSize={380}
               style={{ flex: 1, display: "flex" }}
               snapSize={200}
               maxSize={500}
+              className="list-pane"
             >
               <ScopedThemeProvider
                 className="listMenu"
@@ -178,9 +224,11 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
                 <CachedRouter />
               </ScopedThemeProvider>
             </Pane>
-          )}
+          ) : null}
 
           <Pane
+            id="editor-pane"
+            className="editor-pane"
             style={{
               flex: 1,
               display: "flex",
@@ -199,8 +247,46 @@ function DesktopAppContents({ show, setShow }: DesktopAppContentsProps) {
 }
 
 function MobileAppContents() {
+  const { ref, slideToIndex } = useSlider({
+    onSliding: (_e, { position }) => {
+      const offset = 70;
+      const width = 300;
+
+      const percent = offset - (position / width) * offset;
+      const overlay = document.getElementById("overlay");
+      if (!overlay) return;
+      if (percent > 0) {
+        overlay.style.opacity = `${percent}%`;
+        overlay.style.pointerEvents = "all";
+      } else {
+        overlay.style.opacity = "0%";
+        overlay.style.pointerEvents = "none";
+      }
+    },
+    onChange: (e, { slide, lastSlide }) => {
+      slide.node.classList.add("pane-active");
+      lastSlide?.node.classList.remove("pane-active");
+    }
+  });
+
+  useEffect(() => {
+    const toggleSideMenuEvent = AppEventManager.subscribe(
+      AppEvents.toggleSideMenu,
+      (state) => slideToIndex(state ? 0 : 1)
+    );
+    const toggleEditorEvent = AppEventManager.subscribe(
+      AppEvents.toggleEditor,
+      (state) => slideToIndex(state ? 2 : 1)
+    );
+    return () => {
+      toggleSideMenuEvent.unsubscribe();
+      toggleEditorEvent.unsubscribe();
+    };
+  }, [slideToIndex]);
+
   return (
     <FlexScrollContainer
+      scrollRef={ref}
       id="slider"
       suppressScrollX
       style={{
@@ -217,17 +303,18 @@ function MobileAppContents() {
       }}
     >
       <Flex
+        className="mobile-nav-pane"
         sx={{
           scrollSnapAlign: "start",
           scrollSnapStop: "always",
-          width: [300, 60],
+          width: 300,
           flexShrink: 0
         }}
       >
-        <NavigationMenu toggleNavigationContainer={() => { }} isTablet={false} />
+        <NavigationMenu toggleNavigationContainer={() => {}} isTablet={false} />
       </Flex>
       <Flex
-        className="listMenu"
+        className="mobile-list-pane"
         variant="columnFill"
         sx={{
           position: "relative",
@@ -240,6 +327,7 @@ function MobileAppContents() {
         <CachedRouter />
         <Box
           id="overlay"
+          onClick={() => slideToIndex(1)}
           sx={{
             position: "absolute",
             width: "100%",
@@ -255,6 +343,7 @@ function MobileAppContents() {
         />
       </Flex>
       <Flex
+        className="mobile-editor-pane"
         sx={{
           scrollSnapAlign: "start",
           scrollSnapStop: "always",

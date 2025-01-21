@@ -333,13 +333,17 @@ const ExportNotesSheet = ({
                     if (Platform.OS === "ios") {
                       Share.open({
                         url: result?.fileDir + result.fileName
-                      }).catch(console.log);
+                      }).catch(() => {
+                        /* empty */
+                      });
                     } else {
                       FileViewer.open(result.filePath, {
                         showOpenWithDialog: true,
                         showAppsSuggestions: true,
                         shareFile: true
-                      } as any).catch(console.log);
+                      } as any).catch(() => {
+                        /* empty */
+                      });
                     }
                   }}
                 />

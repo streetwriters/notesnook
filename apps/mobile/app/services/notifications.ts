@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Reminder } from "@notesnook/core";
+import { isReminderActive, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee, {
   AndroidStyle,
@@ -51,6 +51,7 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import Navigation from "./navigation";
 import SettingsService from "./settings";
+import { getFormattedReminderTime } from "@notesnook/common";
 
 let pinned: DisplayedNotification[] = [];
 
@@ -120,7 +121,7 @@ const onEvent = async ({ type, detail }: Event) => {
         await scheduleNotification(reminder);
       }
     }
-
+    updateRemindersForWidget();
     return;
   }
   if (type === EventType.PRESS) {
@@ -141,7 +142,7 @@ const onEvent = async ({ type, detail }: Event) => {
     }
     editorState().movedAway = false;
     const noteId = notification?.id;
-    console.log("NOTE ID", noteId);
+
     loadNote(noteId as string, true);
   }
 
@@ -167,6 +168,7 @@ const onEvent = async ({ type, detail }: Event) => {
         );
         useRelationStore.getState().update();
         useReminderStore.getState().refresh();
+        updateRemindersForWidget();
         break;
       }
       case "REMINDER_DISABLE": {
@@ -184,6 +186,7 @@ const onEvent = async ({ type, detail }: Event) => {
         );
         useRelationStore.getState().update();
         useReminderStore.getState().refresh();
+        updateRemindersForWidget();
         break;
       }
       case strings.unpin(): {
@@ -235,11 +238,9 @@ const onEvent = async ({ type, detail }: Event) => {
           try {
             if (!globalThis["IS_MAIN_APP_RUNNING" as never]) {
               await db.sync({ type: "send", force: false });
-            } else {
-              console.log("main app running, skipping sync");
             }
           } catch (e) {
-            console.log(e, (e as Error).stack);
+            /* empty */
           }
         }
         Navigation.queueRoutesForUpdate();
@@ -248,6 +249,35 @@ const onEvent = async ({ type, detail }: Event) => {
     }
   }
 };
+
+type ReminderWithFormattedTime = Reminder & {
+  formattedTime?: string;
+};
+
+async function updateRemindersForWidget() {
+  if (Platform.OS === "ios") return;
+  const reminders: ReminderWithFormattedTime[] = await db.reminders?.all.items(
+    undefined,
+    {
+      sortBy: "dueDate",
+      sortDirection: "asc"
+    }
+  );
+  const activeReminders = [];
+  if (!reminders) return;
+  for (const reminder of reminders) {
+    if (isReminderActive(reminder)) {
+      reminder.formattedTime = getFormattedReminderTime(reminder);
+      activeReminders.push(reminder);
+    }
+  }
+  NotesnookModule.setString(
+    "appPreview",
+    "remindersList",
+    JSON.stringify(activeReminders)
+  );
+  NotesnookModule.updateReminderWidget();
+}
 
 async function setupIOSCategories() {
   try {
@@ -288,7 +318,7 @@ async function setupIOSCategories() {
       }
     }
   } catch (e) {
-    console.log("ERROR in setupIOSCategories", e);
+    /* empty */
   }
 }
 
@@ -398,8 +428,9 @@ async function scheduleNotification(
         trigger
       );
     }
+    updateRemindersForWidget();
   } catch (e) {
-    console.log("Schedule notification", e);
+    /* empty */
   }
 }
 
@@ -542,7 +573,7 @@ async function displayNotification({
       }
     });
   } catch (e) {
-    console.log(e);
+    /* empty */
   }
 }
 
@@ -943,6 +974,7 @@ async function setupReminders(checkNeedsScheduling = false) {
       trigger.notification.id &&
       notifee.cancelTriggerNotification(trigger.notification.id as string)
   );
+  updateRemindersForWidget();
 }
 
 async function pinNote(id: string) {
@@ -963,7 +995,7 @@ async function pinNote(id: string) {
       id: note.id
     });
   } catch (e) {
-    console.log(e);
+    /* empty */
   }
 }
 const Events = {
@@ -988,7 +1020,8 @@ const Notifications = {
   getChannelId,
   isNotePinned,
   pinNote,
-  Events
+  Events,
+  updateRemindersForWidget
 };
 
 export default Notifications;

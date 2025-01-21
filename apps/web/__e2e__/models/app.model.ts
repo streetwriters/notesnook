@@ -129,6 +129,10 @@ export class AppModel {
       .waitFor({ state: "visible" });
   }
 
+  async lockAppButton() {
+    return this.page.locator(getTestId("lock-app"));
+  }
+
   async search(query: string, type: string) {
     const searchinput = this.page.locator(getTestId("search-input"));
     const searchButton = this.page.locator(getTestId("search-button"));

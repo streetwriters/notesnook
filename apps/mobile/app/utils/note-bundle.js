@@ -49,7 +49,7 @@ export async function attachFile(uri, hash, type, filename, options) {
       encryptionInfo.filename = filename;
       encryptionInfo.alg = "xcha-stream";
       encryptionInfo.key = key;
-      console.log(encryptionInfo);
+
       if (options?.reupload && exists) await db.attachments.reset(hash);
     } else {
       encryptionInfo = { hash: hash };
@@ -57,9 +57,12 @@ export async function attachFile(uri, hash, type, filename, options) {
     await db.attachments.add(encryptionInfo, options?.id);
     return true;
   } catch (e) {
-    if (Platform.OS === "ios") RNFetchBlob.fs.unlink(uri).catch(console.log);
+    if (Platform.OS === "ios")
+      RNFetchBlob.fs.unlink(uri).catch(() => {
+        /* empty */
+      });
     DatabaseLogger.error(e, "Attach file error");
-    console.log("attach file error: ", e);
+
     return false;
   }
 }
@@ -102,12 +105,10 @@ async function createNotes(bundle) {
     const isJpeg = /(jpeg|jpg)/g.test(file.type);
 
     if ((isPng || isJpeg) && compress) {
-      console.log(uri, "before compressed");
       uri = await compressToFile("file://" + uri, isPng ? "PNG" : "JPEG");
 
       uri = `${uri.replace("file://", "")}`;
     }
-    console.log(uri, "after compressed");
 
     const hash = await Sodium.hashFile({
       uri: uri,

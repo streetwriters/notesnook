@@ -1,0 +1,5 @@
+- You can now share multiple files to Notesnook
+- Fix file and image sharing not working
+- Many other bug fixes and small improvements
+
+Thank you for using Notesnook!

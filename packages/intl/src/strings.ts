@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { plural, select, t } from "@lingui/macro";
+import { plural, select, t } from "@lingui/core/macro";
 import { actionConfirmations } from "../generated/action-confirmations";
 import { actionErrors } from "../generated/action-errors";
 import { actions } from "../generated/actions";
@@ -24,18 +24,18 @@ import { doActions } from "../generated/do-actions";
 import { inProgressActions } from "../generated/in-progress-actions";
 
 const SEARCH_IN_ROUTE_STRINGS = {
-  Notes: () => t`Search in in Notes`,
-  Notebooks: () => t`Search in in Notebooks`,
-  Notebook: () => t`Search in in Notebook`,
-  Favorites: () => t`Search in in Favorites`,
-  Reminders: () => t`Search in in Reminders`,
-  Trash: () => t`Search in in Trash`,
-  Settings: () => t`Search in in Settings`,
-  Tags: () => t`Search in in Tags`,
-  Editor: () => t`Search in in Editor`,
-  Home: () => t`Search in in Home`,
-  Search: () => t`Search in in Search`,
-  Monographs: () => t`Search in in Monographs`
+  Notes: () => t`Search in Notes`,
+  Notebooks: () => t`Search in Notebooks`,
+  Notebook: () => t`Search in Notebook`,
+  Favorites: () => t`Search in Favorites`,
+  Reminders: () => t`Search in Reminders`,
+  Trash: () => t`Search in Trash`,
+  Settings: () => t`Search in Settings`,
+  Tags: () => t`Search in Tags`,
+  Editor: () => t`Search in Editor`,
+  Home: () => t`Search in Home`,
+  Search: () => t`Search in Search`,
+  Monographs: () => t`Search in Monographs`
 };
 
 const TRANSACTION_STATUS = {
@@ -369,7 +369,7 @@ export const strings = {
     }
   },
   remindMeIn: () => t`Remind me in`,
-  referencedIn: () => t`REFERENCED IN`,
+  referencedIn: () => t`Referenced in`,
   restoreSelectFolder: () =>
     t`Select the folder that includes your backup files to list them here.`,
   noBackupsFound: () => t`No backups found`,
@@ -1111,6 +1111,10 @@ $headline$: Use starting line of the note as title.`,
   behaviorDesc: () => t`Change how the app behaves in different situations`,
   homepage: () => t`Homepage`,
   homepageDesc: () => t`Default screen to open on app launch`,
+  imageCompression: () => t`Image Compression`,
+  imageCompressionDesc: () => t`Compress images before uploading`,
+  askEveryTime: () => t`Ask every time`,
+  enableRecommended: () => t`Enable (Recommended)`,
   dateFormat: () => t`Date format`,
   dateFormatDesc: () => t`Choose how dates are displayed in the app`,
   timeFormat: () => t`Time format`,
@@ -1469,12 +1473,12 @@ $headline$: Use starting line of the note as title.`,
   enterNewEmail: () => t`Enter your new email`,
   verifyNewEmail: () => t`Enter verification code sent to your new email`,
   issueTitlePlaceholder: () => t`Tell us what happened`,
-  issuePlaceholder: () => t`Tell us more about the issue you are facing. 
+  issuePlaceholder: () => t`Tell us more about the issue you are facing.
 
 For example:
 - What were you trying to do in the app?
 - What did you expect to happen?
-- Steps to reproduce the issue 
+- Steps to reproduce the issue
 - Things you have tried etc.`,
   searchSectionToLinkPlaceholder: () => t`Type # to search for headings`,
   searchNoteToLinkPlaceholder: () => t`Search a note to link to`,
@@ -1846,7 +1850,7 @@ For example:
   clearCacheConfirm: () => t`Clear attachments cache?`,
   clearCacheConfirmDesc:
     () => t`Clearing attachments cache will perform the following actions:
-                        
+
 - Downloaded images & files: **cleared**
 - Pending uploads: **cleared**
 - Uploaded images & files: _unaffected_
@@ -2026,9 +2030,9 @@ All attachments will be downloaded & cached again on access.
   bugReportMessage: (
     url: string
   ) => t`You can track your bug report at [${url}](${url}).
-  
+
 Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**
-  
+
 If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`,
 
   safeEncryptedNotes: () => t`Safe & encrypted notes`,
@@ -2135,7 +2139,7 @@ If your issue is critical (e.g. notes not syncing, crashes etc.), please [join o
   joinCommunity: () => t`Join community`,
   license: () => t`License`,
   licenseDescription: () => t`GNU GENERAL PUBLIC LICENSE Version 3`,
-  follow: () => t`follow`,
+  follow: () => t`Follow`,
   report: () => t`Report`,
   send: () => t`Send`,
   marketingEmailsDescription: () =>
@@ -2156,7 +2160,7 @@ This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this
   proxy: () => t`Proxy`,
   proxyDescription: () =>
     t`Setup an HTTP/HTTPS/SOCKS proxy.
-        
+
 For example:
 http://foobar:80
 socks4://proxy.example.com

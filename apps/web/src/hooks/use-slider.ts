@@ -26,27 +26,24 @@ type Slide = {
   width: number;
 };
 
-export default function useSlider(
-  sliderId: string,
-  {
-    onSliding,
-    onChange
-  }: {
-    onSliding?: (
-      e: Event,
-      options: {
-        lastSlide: Slide | null;
-        lastPosition: number;
-        position: number;
-      }
-    ) => void;
-    onChange?: (
-      e: Event,
-      options: { position: number; slide: Slide; lastSlide: Slide | null }
-    ) => void;
-  } = {}
-) {
-  const ref = useRef(document.getElementById(sliderId));
+export default function useSlider({
+  onSliding,
+  onChange
+}: {
+  onSliding?: (
+    e: Event,
+    options: {
+      lastSlide: Slide | null;
+      lastPosition: number;
+      position: number;
+    }
+  ) => void;
+  onChange?: (
+    e: Event,
+    options: { position: number; slide: Slide; lastSlide: Slide | null }
+  ) => void;
+} = {}) {
+  const ref = useRef<HTMLDivElement>(null);
   const slides: Slide[] = useMemo(() => [], []);
 
   useEffect(() => {
@@ -57,7 +54,11 @@ export default function useSlider(
     let last = 0;
     if (!slides.length) {
       for (const node of slider.childNodes) {
-        if (!(node instanceof HTMLElement)) continue;
+        if (
+          !(node instanceof HTMLElement) ||
+          node.classList.contains("ms-track-box")
+        )
+          continue;
         slides.push({
           index: slides.length,
           node,
@@ -102,5 +103,5 @@ export default function useSlider(
     [ref, slides]
   );
 
-  return [slideToIndex];
+  return { ref, slideToIndex };
 }

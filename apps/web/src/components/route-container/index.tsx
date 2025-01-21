@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { PropsWithChildren } from "react";
-import { Flex, Text } from "@theme-ui/components";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { ArrowLeft, Menu, Search, Plus, Close } from "../icons";
 import { useStore } from "../../stores/app-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
@@ -26,6 +26,8 @@ import useMobile from "../../hooks/use-mobile";
 import { debounce, usePromise } from "@notesnook/common";
 import Field from "../field";
 import { strings } from "@notesnook/intl";
+import { TITLE_BAR_HEIGHT } from "../title-bar";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export type RouteContainerButtons = {
   search?: {
@@ -64,7 +66,6 @@ function Header(props: RouteContainerProps) {
     () => (typeof props.title === "string" ? props.title : props.title?.()),
     [props.title]
   );
-  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
   const isSearching = useSearchStore((store) => store.isSearching);
   const query = useSearchStore((store) => store.query);
@@ -72,16 +73,24 @@ function Header(props: RouteContainerProps) {
   if (isSearching)
     return (
       <Flex
-        sx={{ alignItems: "center", justifyContent: "center", mx: 1, my: 1 }}
+        sx={{
+          alignItems: "center",
+          justifyContent: "center",
+          height: TITLE_BAR_HEIGHT,
+          zIndex: 2,
+          px: 1
+        }}
+        className="route-container-header search-container"
       >
         <Field
           data-test-id="search-input"
           autoFocus
           id="search"
           name="search"
+          variant="borderless"
           type="text"
-          sx={{ m: 0, flex: 1 }}
-          styles={{ input: { p: "7px" } }}
+          sx={{ m: 0, flex: 1, gap: 0 }}
+          styles={{ input: { p: "5px", m: 0 } }}
           defaultValue={query}
           placeholder={strings.typeAKeyword()}
           onChange={debounce(
@@ -111,11 +120,12 @@ function Header(props: RouteContainerProps) {
   return (
     <Flex
       className="route-container-header"
-      mx={2}
       sx={{
+        px: 1,
         alignItems: "center",
         justifyContent: "space-between",
-        height: 42.8
+        height: TITLE_BAR_HEIGHT,
+        zIndex: 2
       }}
     >
       <Flex
@@ -123,65 +133,80 @@ function Header(props: RouteContainerProps) {
         sx={{
           alignItems: "center",
           justifyContent: "center",
-          overflow: "hidden"
+          overflow: "hidden",
+          gap: 1
         }}
       >
         {buttons?.back ? (
-          <ArrowLeft
-            size={24}
+          <Button
             {...buttons.back}
-            sx={{ flexShrink: 0, mr: 2, cursor: "pointer" }}
             data-test-id="go-back"
-          />
+            sx={{ p: 0, flexShrink: 0 }}
+          >
+            <ArrowLeft size={20} />
+          </Button>
         ) : (
-          <Menu
-            onClick={() => toggleSideMenu(true)}
-            sx={{
-              flexShrink: 0,
-              ml: 0,
-              mr: 4,
-              mt: 1,
-              display: ["block", "none", "none"]
-            }}
-            size={30}
-          />
+          <Button
+            onClick={() =>
+              AppEventManager.publish(AppEvents.toggleSideMenu, true)
+            }
+            sx={{ p: 0, flexShrink: 0 }}
+          >
+            <Menu
+              sx={{
+                display: ["block", "none", "none"],
+                size: 23
+              }}
+              size={24}
+            />
+          </Button>
         )}
         {titlePromise.status === "fulfilled" && titlePromise.value && (
-          <Text variant="heading" data-test-id="routeHeader" color="heading">
+          <Text
+            className="routeHeader"
+            variant="heading"
+            data-test-id="routeHeader"
+            color="heading"
+          >
             {titlePromise.value}
           </Text>
         )}
       </Flex>
-      <Flex sx={{ flexShrink: 0 }}>
+      <Flex sx={{ flexShrink: 0, gap: 2 }}>
         {buttons?.search && (
-          <Search
-            data-test-id={"open-search"}
-            size={24}
+          <Button
             title={buttons.search.title}
             onClick={() =>
               useSearchStore.setState({ isSearching: true, searchType: type })
             }
-            sx={{
-              size: 24,
-              cursor: "pointer"
-            }}
-          />
+            data-test-id={"open-search"}
+            sx={{ p: 0 }}
+          >
+            <Search
+              size={24}
+              sx={{
+                size: 24
+              }}
+            />
+          </Button>
         )}
         {!isMobile && buttons?.create && (
-          <Plus
-            data-test-id={`${type}-action-button`}
-            color="accentForeground"
-            size={18}
-            sx={{
-              bg: "accent",
-              ml: 2,
-              borderRadius: 100,
-              size: 28,
-              cursor: "pointer",
-              ":hover": { boxShadow: "0px 0px 5px 0px var(--accent)" }
-            }}
+          <Button
             {...buttons.create}
-          />
+            data-test-id={`${type}-action-button`}
+            sx={{ p: 0 }}
+          >
+            <Plus
+              color="accentForeground"
+              size={18}
+              sx={{
+                height: 24,
+                width: 24,
+                bg: "accent",
+                borderRadius: 100
+              }}
+            />
+          </Button>
         )}
       </Flex>
     </Flex>

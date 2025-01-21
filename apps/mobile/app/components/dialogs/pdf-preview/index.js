@@ -307,9 +307,7 @@ const PDFPreview = () => {
                     password={password}
                     maxScale={6}
                     onError={onError}
-                    onPressLink={(uri) => {
-                      console.log(`Link pressed: ${uri}`);
-                    }}
+                    onPressLink={(uri) => {}}
                     style={{
                       flex: 1,
                       width: width,

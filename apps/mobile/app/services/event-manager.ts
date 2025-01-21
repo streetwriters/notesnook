@@ -123,7 +123,6 @@ export type PresentSheetOptions = {
 };
 
 export function presentSheet(data: Partial<PresentSheetOptions>) {
-  console.log("PRESENTING...");
   eSendEvent(eOpenSheet, data);
 }
 

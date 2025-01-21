@@ -60,7 +60,9 @@ export async function readEncrypted<TOutputFormat extends DataFormat>(
 
     return output as Output<TOutputFormat>;
   } catch (e) {
-    RNFetchBlob.fs.unlink(path).catch(console.log);
+    RNFetchBlob.fs.unlink(path).catch(() => {
+      /* empty */
+    });
     DatabaseLogger.error(e);
   }
 }
@@ -90,8 +92,9 @@ export async function writeEncryptedBase64(
     type: "url"
   });
 
-  RNFetchBlob.fs.unlink(filepath).catch(console.log);
-  console.log("encrypted file output: ", output);
+  RNFetchBlob.fs.unlink(filepath).catch(() => {
+    /* empty */
+  });
 
   return {
     ...output,
@@ -106,7 +109,9 @@ export async function deleteFile(
   await createCacheDir();
   const localFilePath = cacheDir + `/${filename}`;
   if (!requestOptions) {
-    RNFetchBlob.fs.unlink(localFilePath).catch(console.log);
+    RNFetchBlob.fs.unlink(localFilePath).catch(() => {
+      /* empty */
+    });
     return true;
   }
 
@@ -117,7 +122,9 @@ export async function deleteFile(
     const status = response.info().status;
     const ok = status >= 200 && status < 300;
     if (ok) {
-      RNFetchBlob.fs.unlink(localFilePath).catch(console.log);
+      RNFetchBlob.fs.unlink(localFilePath).catch(() => {
+        /* empty */
+      });
     }
     return ok;
   } catch (e) {
@@ -134,10 +141,14 @@ export async function clearFileStorage() {
     const oldCache = await RNFetchBlob.fs.ls(cacheDirOld);
 
     for (const file of files) {
-      await RNFetchBlob.fs.unlink(cacheDir + `/${file}`).catch(console.log);
+      await RNFetchBlob.fs.unlink(cacheDir + `/${file}`).catch(() => {
+        /* empty */
+      });
     }
     for (const file of oldCache) {
-      await RNFetchBlob.fs.unlink(cacheDirOld + `/${file}`).catch(console.log);
+      await RNFetchBlob.fs.unlink(cacheDirOld + `/${file}`).catch(() => {
+        /* empty */
+      });
     }
   } catch (e) {
     DatabaseLogger.error(e, "clearFileStorage");
@@ -161,20 +172,19 @@ export async function migrateFilesFromCache() {
     const migratedFilesPath = cacheDir + "/.migrated_1";
     const migrated = await RNFetchBlob.fs.exists(migratedFilesPath);
     if (migrated) {
-      console.log("Files migrated already");
       return;
     }
 
     const files = await RNFetchBlob.fs.ls(cacheDir);
-    console.log("Files to migrate:", files.join(","));
 
     const oldCache = await RNFetchBlob.fs.ls(cacheDirOld);
     for (const file of oldCache) {
       if (file.startsWith("org.") || file.startsWith("com.")) continue;
       RNFetchBlob.fs
         .mv(cacheDirOld + `/${file}`, cacheDir + `/${file}`)
-        .catch(console.log);
-      console.log("Moved", file);
+        .catch(() => {
+          /* empty */
+        });
     }
     await RNFetchBlob.fs.createFile(migratedFilesPath, "1", "utf8");
   } catch (e) {
@@ -183,13 +193,17 @@ export async function migrateFilesFromCache() {
 }
 
 export async function clearCache() {
-  await RNFetchBlob.fs.unlink(cacheDir).catch(console.log);
+  await RNFetchBlob.fs.unlink(cacheDir).catch(() => {
+    /* empty */
+  });
   await createCacheDir();
   eSendEvent("cache-cleared");
 }
 
 export async function deleteCacheFileByPath(path: string) {
-  await RNFetchBlob.fs.unlink(path).catch(console.log);
+  await RNFetchBlob.fs.unlink(path).catch(() => {
+    /* empty */
+  });
 }
 
 export async function deleteCacheFileByName(name: string) {
@@ -198,15 +212,21 @@ export async function deleteCacheFileByName(name: string) {
       ? await (RNFetchBlob.fs as any).pathForAppGroup(IOS_APPGROUPID)
       : null;
   const appGroupPath = `${iosAppGroup}/${name}`;
-  await RNFetchBlob.fs.unlink(appGroupPath).catch(console.log);
-  await RNFetchBlob.fs.unlink(`${cacheDir}/${name}`).catch(console.log);
+  await RNFetchBlob.fs.unlink(appGroupPath).catch(() => {
+    /* empty */
+  });
+  await RNFetchBlob.fs.unlink(`${cacheDir}/${name}`).catch(() => {
+    /* empty */
+  });
 }
 
 export async function deleteDCacheFiles() {
   const files = await RNFetchBlob.fs.ls(cacheDir);
   for (const file of files) {
-    if (file.includes("_dcache")) {
-      await RNFetchBlob.fs.unlink(file).catch(console.log);
+    if (file.includes("_dcache") || file.startsWith("NN_")) {
+      await RNFetchBlob.fs.unlink(file).catch(() => {
+        /* empty */
+      });
     }
   }
 }
@@ -245,7 +265,9 @@ export async function exists(filename: string) {
       );
       RNFetchBlob.fs
         .unlink(existsInAppGroup ? appGroupPath : path)
-        .catch(console.log);
+        .catch(() => {
+          /* empty */
+        });
       return false;
     }
 
@@ -281,7 +303,7 @@ export async function getCacheSize() {
   await createCacheDir();
   const stat = await RNFetchBlob.fs.lstat(`file://` + cacheDir);
   let total = 0;
-  console.log("Total files", stat.length);
+
   stat.forEach((file) => {
     total += parseInt(file.size as unknown as string);
   });

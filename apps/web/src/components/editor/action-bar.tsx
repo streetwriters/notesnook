@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@theme-ui/components";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   Cross,
@@ -79,11 +79,15 @@ import { showPublishView } from "../publish-view";
 import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 import useMobile from "../../hooks/use-mobile";
 import { strings } from "@notesnook/intl";
+import { TITLE_BAR_HEIGHT, getWindowControls } from "../title-bar";
+import useTablet from "../../hooks/use-tablet";
+import { isMac } from "../../utils/platform";
 
 export function EditorActionBar() {
+  const { isMaximized, isFullscreen, hasNativeWindowControls } =
+    useWindowControls();
   const editorMargins = useEditorStore((store) => store.editorMargins);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const { isFullscreen } = useWindowControls();
   const activeSession = useEditorStore((store) =>
     store.activeSessionId ? store.getSession(store.activeSessionId) : undefined
   );
@@ -95,7 +99,7 @@ export function EditorActionBar() {
   const isNotePublished =
     activeSession && db.monographs.isPublished(activeSession.id);
   const isMobile = useMobile();
-  const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
+  const isTablet = useTablet();
 
   const tools = [
     {
@@ -195,7 +199,14 @@ export function EditorActionBar() {
         activeSession.type !== "conflicted" &&
         !isFocusMode,
       onClick: () => useEditorStore.getState().toggleProperties()
-    }
+    },
+    ...getWindowControls(
+      hasNativeWindowControls,
+      isFullscreen,
+      isMaximized,
+      isTablet,
+      isMobile
+    )
   ];
 
   return (
@@ -210,7 +221,9 @@ export function EditorActionBar() {
               borderRadius: 0,
               flexShrink: 0
             }}
-            onClick={() => setIsEditorOpen(false)}
+            onClick={() =>
+              AppEventManager.publish(AppEvents.toggleEditor, false)
+            }
           >
             <ArrowLeft size={18} />
           </Button>
@@ -218,35 +231,46 @@ export function EditorActionBar() {
       ) : (
         <TabStrip />
       )}
-      {tools.map((tool) => (
-        <Button
-          data-test-id={tool.title}
-          disabled={!tool.enabled}
-          variant={tool.title === "Close" ? "error" : "secondary"}
-          title={tool.title}
-          key={tool.title}
-          sx={{
-            height: "100%",
-            alignItems: "center",
-            bg: "transparent",
-            display: [
-              tool.hideOnMobile ? "none" : "flex",
-              tool.hidden ? "none" : "flex"
-            ],
-            borderRadius: 0,
-            flexShrink: 0,
-            "&:hover svg path": {
-              fill:
-                tool.title === "Close"
-                  ? "var(--accentForeground-error) !important"
-                  : "var(--icon)"
-            }
-          }}
-          onClick={tool.onClick}
-        >
-          <tool.icon size={18} />
-        </Button>
-      ))}
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "center",
+          mr:
+            hasNativeWindowControls && !isMac() && !isMobile && !isTablet
+              ? `calc(100vw - env(titlebar-area-width))`
+              : 0
+        }}
+      >
+        {tools.map((tool) => (
+          <Button
+            data-test-id={tool.title}
+            disabled={!tool.enabled}
+            variant={tool.title === "Close" ? "error" : "secondary"}
+            title={tool.title}
+            key={tool.title}
+            sx={{
+              height: "100%",
+              alignItems: "center",
+              bg: "transparent",
+              display: [
+                "hideOnMobile" in tool && tool.hideOnMobile ? "none" : "flex",
+                tool.hidden ? "none" : "flex"
+              ],
+              borderRadius: 0,
+              flexShrink: 0,
+              "&:hover svg path": {
+                fill:
+                  tool.title === "Close"
+                    ? "var(--accentForeground-error) !important"
+                    : "var(--icon)"
+              }
+            }}
+            onClick={tool.onClick}
+          >
+            <tool.icon size={18} />
+          </Button>
+        ))}
+      </Flex>
     </>
   );
 }
@@ -259,7 +283,7 @@ function TabStrip() {
     <ScrollContainer
       className="tabsScroll"
       suppressScrollY
-      style={{ flex: 1 }}
+      style={{ flex: 1, height: TITLE_BAR_HEIGHT }}
       trackStyle={() => ({
         backgroundColor: "transparent",
         "--ms-track-size": "6px"
@@ -450,21 +474,31 @@ function Tab(props: TabProps) {
     : Note;
   const { attributes, listeners, setNodeRef, transform, transition, active } =
     useSortable({ id });
+  const activeTabRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (activeTabRef.current && isActive) {
+      const tab = activeTabRef.current;
+      tab.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest"
+      });
+    }
+  }, [isActive]);
 
   return (
     <Flex
-      ref={setNodeRef}
+      ref={(el) => {
+        setNodeRef(el);
+        activeTabRef.current = el;
+      }}
       className="tab"
       data-test-id={`tab-${id}`}
       sx={{
         height: "100%",
         cursor: "pointer",
         px: 2,
-        ":first-of-type": window.hasNativeTitlebar
-          ? {}
-          : {
-              borderLeft: "1px solid var(--border)"
-            },
         borderRight: "1px solid var(--border)",
 
         transform: CSS.Transform.toString(transform),

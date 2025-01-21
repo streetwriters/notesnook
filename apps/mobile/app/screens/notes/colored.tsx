@@ -59,7 +59,6 @@ ColoredNotes.navigate = (item: Color, canGoBack: boolean) => {
   const { focusedRouteId } = useNavigationStore.getState();
 
   if (focusedRouteId === item.id) {
-    console.log("ColoredNotes.navigate: route already focused for color");
     return;
   }
 

@@ -94,4 +94,5 @@ export type AppState = {
   editing: boolean;
   movedAway: boolean;
   timestamp: number;
+  noteId?: string;
 };

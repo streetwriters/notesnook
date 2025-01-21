@@ -126,7 +126,6 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
         announcements = [];
       }
     } catch (e) {
-      console.log(e);
       set({ announcements: [] });
     } finally {
       const all = await getFiltered(announcements);

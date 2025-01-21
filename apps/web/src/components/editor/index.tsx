@@ -72,10 +72,11 @@ import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
 import { strings } from "@notesnook/intl";
 import { onPageVisibilityChanged } from "../../utils/page-visibility";
 import { Pane, SplitPane } from "../split-pane";
+import { TITLE_BAR_HEIGHT } from "../title-bar";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
-const autoSaveToast = { show: true, hide: () => {} };
+const autoSaveToast = { show: true, hide: () => { } };
 
 async function saveContent(
   noteId: string,
@@ -124,33 +125,56 @@ export default function TabsView() {
   const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
   const [dropRef, overlayRef] = useDragOverlay();
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.altKey &&
+        event.key === "ArrowRight"
+      ) {
+        event.preventDefault();
+        useEditorStore.getState().openNextSession();
+      }
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.altKey &&
+        event.key === "ArrowLeft"
+      ) {
+        event.preventDefault();
+        useEditorStore.getState().openPreviousSession();
+      }
+    };
+    document.body.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
+
   return (
     <>
-      {!hasNativeTitlebar ? (
-        <EditorActionBarPortal />
-      ) : (
-        <Flex sx={{ px: 1, borderBottom: "1px solid var(--border)" }}>
-          <EditorActionBar />
-        </Flex>
-      )}
+      <Flex
+        className="editor-action-bar"
+        sx={{
+          zIndex: 2,
+          height: TITLE_BAR_HEIGHT,
+          borderBottom: "1px solid var(--border)"
+        }}
+      >
+        <EditorActionBar />
+      </Flex>
 
       <ScopedThemeProvider
         scope="editor"
         ref={dropRef}
         sx={{
           bg: "background",
-          pt: 1,
           flex: 1,
           overflow: "hidden",
           display: "flex",
           flexDirection: "column"
         }}
       >
-        <SplitPane
-          direction="vertical"
-          initialSizes={documentPreview ? [Infinity, 435] : [Infinity]}
-          autoSaveId={"editor-panels"}
-        >
+        <SplitPane direction="vertical" autoSaveId={"editor-panels"}>
           <Pane id="editor-panel" className="editor-pane">
             {sessions.map((session) => (
               <Freeze key={session.id} freeze={session.id !== activeSessionId}>
@@ -166,7 +190,7 @@ export default function TabsView() {
           </Pane>
 
           {documentPreview ? (
-            <Pane id="pdf-preview-panel" minSize={435}>
+            <Pane id="pdf-preview-panel" initialSize={435} minSize={435}>
               <ScopedThemeProvider
                 scope="editorSidebar"
                 id="editorSidebar"
@@ -203,7 +227,7 @@ export default function TabsView() {
           ) : null}
 
           {isTOCVisible && activeSessionId ? (
-            <Pane minSize={300}>
+            <Pane id="table-of-contents-pane" initialSize={300} minSize={300}>
               <TableOfContents sessionId={activeSessionId} />
             </Pane>
           ) : null}
@@ -228,10 +252,10 @@ function EditorView({
   session
 }: {
   session:
-    | DefaultEditorSession
-    | NewEditorSession
-    | ReadonlyEditorSession
-    | DeletedEditorSession;
+  | DefaultEditorSession
+  | NewEditorSession
+  | ReadonlyEditorSession
+  | DeletedEditorSession;
 }) {
   const lastChangedTime = useRef<number>(0);
   const root = useRef<HTMLDivElement>(null);
@@ -881,10 +905,4 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
       />
     </div>
   );
-}
-
-function EditorActionBarPortal() {
-  const container = document.getElementById("titlebar-portal-container");
-  if (!container) return null;
-  return ReactDOM.createPortal(<EditorActionBar />, container);
 }

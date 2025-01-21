@@ -17,8 +17,8 @@
     "react-dom": "^18.2.0",
     "react-freeze": "^1.0.3",
     "zustand": "^4.4.7",
-    "@lingui/core": "4.11.4",
-    "@lingui/react": "4.11.4"
+    "@lingui/core": "5.1.2",
+    "@lingui/react": "5.1.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",

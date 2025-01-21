@@ -1,6 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="50dp"
+    android:id="@+id/new_note"
     android:background="@drawable/layout_bg"
     android:padding="@dimen/widget_margin">
 

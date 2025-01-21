@@ -1,0 +1,54 @@
+diff --git a/node_modules/@tiptap/extension-list-keymap/dist/index.cjs b/node_modules/@tiptap/extension-list-keymap/dist/index.cjs
+index 0f8ae36..adeee92 100644
+--- a/node_modules/@tiptap/extension-list-keymap/dist/index.cjs
++++ b/node_modules/@tiptap/extension-list-keymap/dist/index.cjs
+@@ -82,7 +82,9 @@ const handleBackspace = (editor, name, parentListTypes) => {
+     // the previous item is a list (orderedList or bulletList)
+     // move the cursor into the list and delete the current item
+     if (!core.isNodeActive(editor.state, name) && hasListBefore(editor.state, name, parentListTypes)) {
+-        const { $anchor } = editor.state.selection;
++        const { $anchor, empty } = editor.state.selection;
++        if (!empty) return false;
++
+         const $listPos = editor.state.doc.resolve($anchor.before() - 1);
+         const listDescendants = [];
+         $listPos.node().descendants((node, pos) => {
+@@ -111,6 +113,11 @@ const handleBackspace = (editor, name, parentListTypes) => {
+     if (!listItemPos) {
+         return false;
+     }
++    // if the current position is not at the start of the list item 
++    // then join backward i.e. join within the list item
++    if (listItemPos.$pos.parentOffset !== 0) {
++        return editor.commands.joinBackward();
++    }
+     const $prev = editor.state.doc.resolve(listItemPos.$pos.pos - 2);
+     const prevNode = $prev.node(listItemPos.depth);
+     const previousListItemHasSubList = listItemHasSubList(name, editor.state, prevNode);
+diff --git a/node_modules/@tiptap/extension-list-keymap/dist/index.js b/node_modules/@tiptap/extension-list-keymap/dist/index.js
+index f7ab1e4..6ea03d5 100644
+--- a/node_modules/@tiptap/extension-list-keymap/dist/index.js
++++ b/node_modules/@tiptap/extension-list-keymap/dist/index.js
+@@ -78,7 +78,9 @@ const handleBackspace = (editor, name, parentListTypes) => {
+     // the previous item is a list (orderedList or bulletList)
+     // move the cursor into the list and delete the current item
+     if (!isNodeActive(editor.state, name) && hasListBefore(editor.state, name, parentListTypes)) {
+-        const { $anchor } = editor.state.selection;
++        const { $anchor, empty } = editor.state.selection;
++        if (!empty) return false;
++        
+         const $listPos = editor.state.doc.resolve($anchor.before() - 1);
+         const listDescendants = [];
+         $listPos.node().descendants((node, pos) => {
+@@ -107,6 +109,11 @@ const handleBackspace = (editor, name, parentListTypes) => {
+     if (!listItemPos) {
+         return false;
+     }
++    // if the current position is not at the start of the list item 
++    // then join backward i.e. join within the list item
++    if (listItemPos.$pos.parentOffset !== 0) {
++        return editor.commands.joinBackward();
++    }
+     const $prev = editor.state.doc.resolve(listItemPos.$pos.pos - 2);
+     const prevNode = $prev.node(listItemPos.depth);
+     const previousListItemHasSubList = listItemHasSubList(name, editor.state, prevNode);

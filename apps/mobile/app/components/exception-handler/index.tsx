@@ -78,10 +78,10 @@ class ExceptionHandler extends React.Component<{
 }
 
 export const withErrorBoundry = (Element: React.ElementType, name: string) => {
-  return function ErrorBoundary() {
+  return function ErrorBoundary(props: any) {
     return (
       <ExceptionHandler component={name}>
-        <Element />
+        <Element {...props} />
       </ExceptionHandler>
     );
   };

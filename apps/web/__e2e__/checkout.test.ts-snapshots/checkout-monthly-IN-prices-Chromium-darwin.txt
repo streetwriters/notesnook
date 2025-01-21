@@ -1,0 +1,4 @@
+Subtotal: ₹300
+Sales tax: ₹200
+Discount: ₹0
+Total: ₹300/mo

@@ -291,9 +291,9 @@ export class NoteContextMenuModel extends BaseProperties {
           });
           await subNotebookItem.waitFor();
 
-          await page.keyboard.down("Control");
+          await page.keyboard.down("ControlOrMeta");
           await subNotebookItem.click();
-          await page.keyboard.up("Control");
+          await page.keyboard.up("ControlOrMeta");
 
           await addSubNotebooks(page, dialog, subNotebookItem, subNotebook);
         }
@@ -317,9 +317,9 @@ export class NoteContextMenuModel extends BaseProperties {
 
     await notebookItem.waitFor({ state: "visible" });
 
-    await this.page.keyboard.down("Control");
+    await this.page.keyboard.down("ControlOrMeta");
     await notebookItem.click();
-    await this.page.keyboard.up("Control");
+    await this.page.keyboard.up("ControlOrMeta");
 
     await addSubNotebooks(this.page, dialog, notebookItem, notebook);
 

@@ -33,7 +33,6 @@ import { strings } from "@notesnook/intl";
 export const FontPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultFontFamily,
   updateValue: (item) => {
-    console.log(item.id);
     SettingsService.set({
       defaultFontFamily: item.id
     });
@@ -75,7 +74,7 @@ export const TrashIntervalPicker = createSettingsPicker({
       ? strings.never()
       : item === 1
       ? strings.reminderRecurringMode.day()
-      : item + " " + strings.days();
+      : strings.days(item);
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 1, 7, 30, 365],

@@ -5,12 +5,16 @@
 
 .tabsScroll,
 .titlebarLogo,
-.theme-scope-titleBar {
+.theme-scope-titleBar,
+.route-container-header {
   -webkit-app-region: drag;
 }
 
 .theme-scope-titleBar button,
-.tabsScroll .tab {
+.tabsScroll .tab,
+.editor-action-bar button,
+.route-container-header button,
+.search-container {
   -webkit-app-region: no-drag;
 }
 
@@ -228,4 +232,20 @@ textarea,
 
 #app.app-focus-mode .toasts-container {
   display: none;
+}
+
+.flash {
+  animation: flash 0.5s;
+}
+
+@keyframes flash {
+  0% {
+    background-color: color-mix(in srgb, var(--accent) 5%, transparent);
+  }
+  50% {
+    background-color: initial;
+  }
+  100% {
+    background-color: color-mix(in srgb, var(--accent) 5%, transparent);
+  }
 }

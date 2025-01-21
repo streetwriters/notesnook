@@ -25,6 +25,7 @@ import {
 import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { deleteDCacheFiles } from "../common/filesystem/io";
 import { useUserStore } from "../stores/use-user-store";
+import { NotePreviewWidget } from "./note-preview-widget";
 import Notifications from "./notifications";
 import SettingsService from "./settings";
 
@@ -85,7 +86,6 @@ const task = async (event: { taskId: string; timeout: boolean }) => {
   const taskId = event.taskId;
   const isTimeout = event.timeout; // <-- true when your background-time has expired.
   if (isTimeout) {
-    console.log(`BACKGROUND FETCH TIMEOUT: ${taskId}`);
     BackgroundFetch.finish(taskId);
     return;
   }
@@ -112,12 +112,13 @@ async function onBackgroundSyncStarted() {
       useUserStore.getState().setSyncing(false);
     }
     await Notifications.setupReminders();
+
+    NotePreviewWidget.updateNotes();
     deleteDCacheFiles();
     DatabaseLogger.info("BACKGROUND SYNC COMPLETE");
   } catch (e) {
     useUserStore.getState().setSyncing(false);
     DatabaseLogger.error(e as Error);
-    console.log("BACKGROUND SYNC ERROR", (e as Error).message);
   }
 }
 
@@ -142,7 +143,6 @@ const onBoot = async () => {
     DatabaseLogger.info("BOOT TASK COMPLETE");
   } catch (e) {
     DatabaseLogger.error(e as Error);
-    console.log(e);
   }
 };
 

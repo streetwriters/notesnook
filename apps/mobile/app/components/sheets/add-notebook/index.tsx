@@ -100,7 +100,6 @@ export const AddNotebookSheet = ({
     eSendEvent(eOnNotebookUpdated, parent);
     if (notebook) {
       setImmediate(() => {
-        console.log(parent, notebook.id);
         eSendEvent(eOnNotebookUpdated, notebook.id);
       });
     }

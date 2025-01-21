@@ -95,7 +95,6 @@ function Notebook(props: NotebookProps) {
     <SplitPane
       ref={pane}
       direction="horizontal"
-      initialSizes={[Infinity, 250]}
       autoSaveId={`notebook-panel-sizes:${rootId}`}
       onChange={([_, subnotebooksPane]) => {
         setIsCollapsed((isCollapsed) => {
@@ -105,7 +104,7 @@ function Notebook(props: NotebookProps) {
         });
       }}
     >
-      <Pane style={{ display: "flex" }}>
+      <Pane id="notes-pane" style={{ display: "flex" }}>
         <Notes
           header={
             <NotebookHeader
@@ -116,7 +115,7 @@ function Notebook(props: NotebookProps) {
           }
         />
       </Pane>
-      <Pane minSize={30}>
+      <Pane id="subnotebooks-pane" initialSize={250} minSize={30}>
         <SubNotebooks
           isCollapsed={isCollapsed}
           rootId={rootId}

@@ -122,7 +122,6 @@ function queueRoutesForUpdate(...routesToUpdate: RouteName[]) {
 }
 
 function navigate<T extends RouteName>(screen: T, params?: RouteParams[T]) {
-  console.log(`Navigation.navigate ${screen} route`);
   rootNavigatorRef.current?.navigate(screen as any, params);
 }
 
@@ -131,17 +130,14 @@ function goBack() {
 }
 
 function push<T extends RouteName>(screen: T, params: RouteParams[T]) {
-  console.log(`Navigation.push ${screen} route`);
   rootNavigatorRef.current?.dispatch(StackActions.push(screen as any, params));
 }
 
 function replace<T extends RouteName>(screen: T, params: RouteParams[T]) {
-  console.log(`Navigation.replace ${screen} route`);
   rootNavigatorRef.current?.dispatch(StackActions.replace(screen, params));
 }
 
 function popToTop() {
-  console.log(`Navigation.popToTop`);
   rootNavigatorRef.current?.dispatch(StackActions.popToTop());
 }
 

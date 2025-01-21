@@ -43,6 +43,8 @@ import { eCloseSheet } from "../../../utils/events";
 import { useTabStore } from "./use-tab-store";
 import { editorController, editorState } from "./utils";
 import { strings } from "@notesnook/intl";
+import { useUserStore } from "../../../stores/use-user-store";
+import { sleep } from "../../../utils/time";
 
 const showEncryptionSheet = (file: DocumentPickerResponse) => {
   presentSheet({
@@ -194,9 +196,7 @@ const camera = async (options: PickerOptions) => {
           options
         );
       })
-      .catch((e) => {
-        console.log("camera error: ", e);
-      });
+      .catch((e) => {});
   } catch (e) {
     ToastManager.show({
       heading: (e as Error).message,
@@ -224,9 +224,7 @@ const gallery = async (options: PickerOptions) => {
           options
         )
       )
-      .catch((e) => {
-        console.log("gallery error: ", e);
-      });
+      .catch((e) => {});
   } catch (e) {
     useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
     ToastManager.show({
@@ -234,13 +232,19 @@ const gallery = async (options: PickerOptions) => {
       type: "error",
       context: "global"
     });
-    console.log("attachment error:", e);
   }
 };
 
 const pick = async (options: PickerOptions) => {
   if (!PremiumService.get()) {
     const user = await db.user.getUser();
+    if (!user) {
+      ToastManager.show({
+        heading: strings.loginRequired(),
+        type: "error"
+      });
+      return;
+    }
     if (editorState().isFocused) {
       editorState().isFocused = true;
     }
@@ -251,6 +255,7 @@ const pick = async (options: PickerOptions) => {
     }
     return;
   }
+  useUserStore.getState().setDisableAppLockRequests(true);
   if (options?.type.startsWith("image") || options?.type === "camera") {
     if (options.type.startsWith("image")) {
       gallery(options);
@@ -267,6 +272,7 @@ const handleImageResponse = async (
   options: PickerOptions
 ) => {
   const result = await AttachImage.present(response, options.context);
+
   if (!result) return;
   const compress = result.compress;
 
@@ -310,18 +316,14 @@ const handleImageResponse = async (
         ? fileName.replace(/HEIC|HEIF/, "jpeg")
         : fileName;
 
-    console.log("attaching image...", fileName);
-
-    console.log("attaching file...");
     if (!(await attachFile(uri, hash, image.mime, fileName, options))) return;
 
     if (Platform.OS === "ios") await RNFetchBlob.fs.unlink(uri);
-    console.log("attaching image to note...");
+
     if (
       options.tabId !== undefined &&
       useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
     ) {
-      console.log("attaching image to note...");
       editorController.current?.commands.insertImage(
         {
           hash: hash,
@@ -396,7 +398,7 @@ export async function attachFile(
     } else {
       encryptionInfo = { hash: hash };
     }
-    console.log("FILE ENCRYPTED....", encryptionInfo);
+
     await db.attachments.add(encryptionInfo);
     return true;
   } catch (e) {

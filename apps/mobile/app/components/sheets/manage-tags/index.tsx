@@ -113,11 +113,9 @@ const ManageTagsSheet = (props: {
         .sorted()
         .then((items) => {
           setTags(items);
-          console.log("searched tags");
         });
     } else {
       db.tags.all.sorted(db.settings.getGroupOptions("tags")).then((items) => {
-        console.log("items loaded tags", items.placeholders.length);
         setTags(items);
       });
     }

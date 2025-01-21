@@ -101,7 +101,7 @@ exports[`properly format codeblocks 1`] = `
   // example usage
   const text = "สวัสดีค่ะยินดีต้อนรับเข้าสู่โลกของฉัน";
   const wordCount = countThaiWords(text);
-  console.log(\`Word count: \${wordCount}\`);
+  console.log(\`Word count: &amp;dollar;{wordCount}\`);
   // output: Word count: 9
   </code></pre><p>This implementation defines a regular expression to match Thai syllables, which are composed of one or more Thai characters. It then uses the <code>match</code> function of the <code>String</code> object to count the number of matches of the Thai syllable regex in the input text.</p><p>Note that this implementation assumes that each syllable consisting of a consonant sound followed by a vowel sound is considered a word in Thai. This may not always be accurate, as some words in Thai may consist of multiple syllables, and some syllables may be used as prefixes or suffixes to modify other words. However, this approach should work well for many cases where each syllable is considered a separate word.</p><!--EndFragment-->
   

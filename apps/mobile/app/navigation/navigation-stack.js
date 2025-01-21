@@ -45,6 +45,9 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { rootNavigatorRef } from "../utils/global-refs";
 import { strings } from "@notesnook/intl";
+import { IntentService } from "../services/intent";
+import ReminderSheet from "../components/sheets/reminder";
+import { db } from "../common/database";
 
 const NativeStack = createNativeStackNavigator();
 const IntroStack = createNativeStackNavigator();
@@ -76,12 +79,24 @@ const _Tabs = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
+
   const height = useSettingStore((state) => state.dimensions.height);
   const insets = useGlobalSafeAreaInsets();
   const screenHeight = height - (50 + insets.top + insets.bottom);
   React.useEffect(() => {
-    setTimeout(() => {
+    setTimeout(async () => {
       useNavigationStore.getState().update(homepage);
+      const intent = IntentService.getLaunchIntent();
+      if (intent && intent["com.streetwriters.notesnook.OpenReminderId"]) {
+        const reminder = await db.reminders.reminder(
+          intent["com.streetwriters.notesnook.OpenReminderId"]
+        );
+        if (reminder) {
+          ReminderSheet.present(reminder);
+        }
+      } else if (intent["com.streetwriters.notesnook.NewReminder"]) {
+        ReminderSheet.present();
+      }
     }, 1000);
   }, [homepage]);
 

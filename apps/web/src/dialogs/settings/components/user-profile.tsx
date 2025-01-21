@@ -175,6 +175,9 @@ export function UserProfile() {
                   description: strings.setFullNameDesc(),
                   defaultValue: profile?.fullName
                 });
+
+                if (fullName === profile?.fullName) return;
+
                 try {
                   await db.settings.setProfile({
                     fullName: fullName || undefined

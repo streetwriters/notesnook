@@ -389,7 +389,12 @@ export const settingsGroups: SettingSection[] = [
             useHook: () => {
               const [cacheSize, setCacheSize] = React.useState(0);
               React.useEffect(() => {
-                filesystem.getCacheSize().then(setCacheSize).catch(console.log);
+                filesystem
+                  .getCacheSize()
+                  .then(setCacheSize)
+                  .catch(() => {
+                    /* empty */
+                  });
                 const sub = eSubscribeEvent("cache-cleared", () => {
                   setCacheSize(0);
                 });
@@ -532,7 +537,7 @@ export const settingsGroups: SettingSection[] = [
                     endProgress();
                   } catch (e) {
                     endProgress();
-                    console.log(e);
+
                     ToastManager.error(
                       e as Error,
                       strings.failedToDeleteAccount(),
@@ -568,7 +573,9 @@ export const settingsGroups: SettingSection[] = [
               }
               PremiumService.verify(() => {
                 SettingsService.setProperty("offlineMode", true);
-                db.attachments.cacheAttachments().catch(console.log);
+                db.attachments.cacheAttachments().catch(() => {
+                  /* empty */
+                });
               });
             }
           },
@@ -1459,7 +1466,9 @@ export const settingsGroups: SettingSection[] = [
         name: strings.joinTelegram(),
         description: strings.joinTelegramDesc(),
         modifer: () => {
-          Linking.openURL("https://t.me/notesnook").catch(console.log);
+          Linking.openURL("https://t.me/notesnook").catch(() => {
+            /* empty */
+          });
         }
       },
       {
@@ -1479,7 +1488,9 @@ export const settingsGroups: SettingSection[] = [
         description: strings.followOnXDesc(),
         icon: "twitter",
         modifer: () => {
-          Linking.openURL("https://twitter.com/notesnook").catch(console.log);
+          Linking.openURL("https://twitter.com/notesnook").catch(() => {
+            /* empty */
+          });
         }
       },
       {
@@ -1487,7 +1498,9 @@ export const settingsGroups: SettingSection[] = [
         name: strings.joinDiscord(),
         icon: "discord",
         modifer: async () => {
-          Linking.openURL("https://discord.gg/zQBK97EE22").catch(console.log);
+          Linking.openURL("https://discord.gg/zQBK97EE22").catch(() => {
+            /* empty */
+          });
         },
         description: strings.joinDiscordDesc()
       }

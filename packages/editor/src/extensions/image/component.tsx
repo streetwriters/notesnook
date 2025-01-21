@@ -59,7 +59,8 @@ export function ImageComponent(
     once: true
   });
 
-  const dom = editor.view.dom.parentElement || editor.view.dom;
+  const dom = editor.view.dom;
+
   const size =
     editor.view.dom.clientWidth === 0
       ? node.attrs
