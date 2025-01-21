@@ -36,6 +36,8 @@ Go to `Settings` > `Editor` > `Title format` to customize the title formatting.
 
 **$timestamp$**: Full date & time without any spaces or symbols (e.g. 202305261253)
 
+**$timestampz$**: UTC offset added to _timestamp_
+
 You can use a combination of these templates in the note title. For example `$headline$ - $date$` will become `Your note headline - 06-22-2023`.
 
 ## Paragraph spacing
