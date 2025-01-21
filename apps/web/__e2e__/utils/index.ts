@@ -74,8 +74,8 @@ const PASSWORD = "123abc123abc";
 
 const APP_LOCK_PASSWORD = "lockapporelse🔪";
 
-function getTestId<TId extends string>(id: TId): `[data-test-id="${TId}"]` {
-  return `[data-test-id="${id}"]`;
+function getTestId(id: string, variant: "data-test-id" | "data-testid" = "data-test-id") {
+  return `[${variant}="${id}"]`;
 }
 
 async function createNote(page: Page, note: Note) {
