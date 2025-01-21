@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import dayjs from "dayjs";
-import advancedFormat from "dayjs/plugin/advancedFormat";
-import timezone from "dayjs/plugin/timezone";
+import advancedFormat from "dayjs/plugin/advancedFormat.js";
+import timezone from "dayjs/plugin/timezone.js";
 import { TimeFormat } from "../types.js";
 
 dayjs.extend(advancedFormat);
