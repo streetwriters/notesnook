@@ -225,7 +225,7 @@ const UNKNOWN_DATA_TYPE_TEMPLATE = (
         one: \`${fallbackSingularTemplate}\`,
         other: \`${fallbackPluralTemplate}\`
       });
-  }  
+  }
 }`;
 
 const DATA_TYPES_TEMPLATE = (
@@ -241,7 +241,7 @@ const MODULE_TEMPLATE = (exportName, strings) =>
   `/* eslint-disable header/header */
 // THIS FILE IS GENERATED. DO NOT EDIT MANUALLY.
 
-import { plural } from "@lingui/macro";
+import { plural } from "@lingui/core/macro";
 
 export const ${exportName} = {
     ${strings}

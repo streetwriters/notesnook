@@ -18,12 +18,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
 
-export default defineConfig({
-  plugins: [
-    react({
-      jsxRuntime: "classic"
-    })
-  ]
-});
+export default defineConfig({});

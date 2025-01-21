@@ -31,16 +31,14 @@
     "postinstall": "patch-package"
   },
   "devDependencies": {
-    "@lingui/cli": "^4.11.4",
-    "@lingui/macro": "^4.11.4 ",
-    "@lingui/swc-plugin": "^4.0.10",
-    "@types/react": "^18.2.39",
+    "@lingui/cli": "5.1.2",
+    "@lingui/swc-plugin": "5.0.2",
+    "@types/react": "18.3.5",
     "babel-plugin-macros": "^3.1.0",
     "nodemon": "^3.1.7",
-    "react": "18.2.0",
+    "react": "18.3.1",
     "rollup": "^4.24.4",
-    "typescript": "5.5.3",
-    "vite": "^5.4.8",
+    "vite": "5.4.11",
     "vite-plugin-dts": "^4.2.3",
     "vite-plugin-static-copy": "^2.0.0",
     "vite-plugin-swc-transform": "^1.0.1"
