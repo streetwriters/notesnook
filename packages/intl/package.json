@@ -33,6 +33,7 @@
   "devDependencies": {
     "@lingui/cli": "5.1.2",
     "@lingui/swc-plugin": "5.0.2",
+    "@lingui/core": "5.1.2",
     "@types/react": "18.3.5",
     "babel-plugin-macros": "^3.1.0",
     "nodemon": "^3.1.7",

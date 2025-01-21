@@ -60,6 +60,7 @@ function loadApp() {
   locale.then((locale: { [name: string]: any }) => {
     i18n.load(locale);
     i18n.activate(globalThis.LINGUI_LOCALE || "en");
+    //@ts-ignore
     setI18nGlobal(i18n);
 
     const rootElement = document.getElementById("root");
