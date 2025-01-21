@@ -1,5 +1,8 @@
 package com.streetwriters.notesnook.datatypes;
 
+import androidx.annotation.Keep;
+
+@Keep
 public class Note extends BaseItem {
 private String title;
 private String headline;

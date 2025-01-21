@@ -26,11 +26,13 @@ import com.streetwriters.notesnook.datatypes.Note;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class RCTNNativeModule extends ReactContextBaseJavaModule {
     Intent lastIntent;
     ReactContext mContext;
+    static String IntentType = "com.streetwriters.notesnook.IntentType";
 
     public RCTNNativeModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -138,9 +140,14 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
             if (extras != null && intent != lastIntent) {
                 lastIntent = intent;
-                map.putString(NotePreviewWidget.OpenNoteId, extras.getString(NotePreviewWidget.OpenNoteId));
-                map.putString(ReminderViewsService.OpenReminderId, extras.getString(ReminderViewsService.OpenReminderId));
-                map.putString(ReminderWidgetProvider.NewReminder, extras.getString(ReminderWidgetProvider.NewReminder));
+                if (Objects.equals(extras.getString(IntentType), "NewReminder")) {
+                    map.putString(ReminderWidgetProvider.NewReminder, extras.getString(ReminderWidgetProvider.NewReminder));
+                } else if (Objects.equals(extras.getString(IntentType), "OpenReminder")) {
+                    map.putString(ReminderViewsService.OpenReminderId, extras.getString(ReminderViewsService.OpenReminderId));
+                } else if (Objects.equals(extras.getString(IntentType), "OpenNote")) {
+                    map.putString(NotePreviewWidget.OpenNoteId, extras.getString(NotePreviewWidget.OpenNoteId));
+                }
+
             }
         }
         return map;

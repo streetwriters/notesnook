@@ -25,7 +25,7 @@ public class NoteWidget extends AppWidgetProvider {
     static void setClickIntent(Context context, RemoteViews views) {
         Intent intent = new Intent(context, ShareActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE, getActivityOptionsBundle());
-        views.setOnClickPendingIntent(R.id.widget_button, pendingIntent);
+        views.setOnClickPendingIntent(R.id.new_note, pendingIntent);
     }
 
     private static Bundle getActivityOptionsBundle() {

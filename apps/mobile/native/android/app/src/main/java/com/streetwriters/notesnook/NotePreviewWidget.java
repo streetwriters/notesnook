@@ -7,6 +7,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.RemoteViews;
@@ -24,13 +25,17 @@ public class NotePreviewWidget extends AppWidgetProvider {
         }
         Gson gson = new Gson();
         Note note = gson.fromJson(data, Note.class);
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.putExtra(OpenNoteId, note.getId());
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE, getActivityOptionsBundle());
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.note_widget);
         views.setTextViewText(R.id.widget_title, note.getTitle());
         views.setTextViewText(R.id.widget_body, note.getHeadline());
-        views.setOnClickPendingIntent(R.id.widget_button, pendingIntent);
+
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra(OpenNoteId, note.getId());
+        intent.putExtra(RCTNNativeModule.IntentType, "OpenNote");
+        intent.setData(Uri.parse("https://notesnook.com/open_note"));
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE, getActivityOptionsBundle());
+        views.setOnClickPendingIntent(R.id.open_note, pendingIntent);
+
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 

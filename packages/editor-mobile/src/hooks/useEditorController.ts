@@ -79,19 +79,23 @@ function isInViewport(element: any) {
 
 function scrollIntoView(editor: Editor) {
   setTimeout(() => {
-    const node = editor?.state.selection.$from;
-    const dom = node ? editor?.view?.domAtPos(node.pos) : null;
-    let domNode = dom?.node;
+    try {
+      const node = editor?.state.selection.$from;
+      const dom = node ? editor?.view?.domAtPos?.(node.pos) : null;
+      let domNode = dom?.node;
 
-    if (domNode) {
-      if (domNode.nodeType === Node.TEXT_NODE && domNode.parentNode) {
-        domNode = domNode.parentNode;
+      if (domNode) {
+        if (domNode.nodeType === Node.TEXT_NODE && domNode.parentNode) {
+          domNode = domNode.parentNode;
+        }
+        if (isInViewport(domNode)) return;
+        (domNode as HTMLElement).scrollIntoView({
+          behavior: "smooth",
+          block: "end"
+        });
       }
-      if (isInViewport(domNode)) return;
-      (domNode as HTMLElement).scrollIntoView({
-        behavior: "smooth",
-        block: "end"
-      });
+    } catch (e) {
+      /* empty */
     }
   }, 100);
 }

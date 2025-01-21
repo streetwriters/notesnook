@@ -106,8 +106,6 @@ const ImagePreview = () => {
     setVisible(false);
   }, [image]);
 
-  console.log("image", image);
-
   const renderHeader = React.useCallback(
     () => (
       <View

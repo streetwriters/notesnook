@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.RemoteViews;
@@ -32,18 +33,21 @@ public class ReminderWidgetProvider extends AppWidgetProvider {
     }
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, RemoteViews views) {
-        Intent intent = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE, getActivityOptionsBundle());
+        Intent listview_intent_template = new Intent(context, MainActivity.class);
+        listview_intent_template.setData(Uri.parse("https://notesnook.com/open_reminder"));
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, listview_intent_template, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_MUTABLE, getActivityOptionsBundle());
         views.setPendingIntentTemplate(R.id.widget_list_view, pendingIntent);
 
-        Intent intent2 = new Intent(context, MainActivity.class);
-        intent2.putExtra(NewReminder, NewReminder);
-        PendingIntent pendingIntent2 = PendingIntent.getActivity(context, 0, intent2, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE, getActivityOptionsBundle());
+        Intent new_reminder_intent = new Intent(context, MainActivity.class);
+        new_reminder_intent.putExtra(NewReminder, NewReminder);
+        new_reminder_intent.putExtra(RCTNNativeModule.IntentType, "NewReminder");
+        new_reminder_intent.setData(Uri.parse("https://notesnook.com/new_reminder"));
+        PendingIntent pendingIntent2 = PendingIntent.getActivity(context, appWidgetId, new_reminder_intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE, getActivityOptionsBundle());
         views.setOnClickPendingIntent(R.id.add_button, pendingIntent2);
 
-        Intent intent3 = new Intent(context, ReminderViewsService.class);
-        intent3.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        views.setRemoteAdapter(R.id.widget_list_view, intent3);
+        Intent list_remote_adapter_intent = new Intent(context, ReminderViewsService.class);
+        list_remote_adapter_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        views.setRemoteAdapter(R.id.widget_list_view, list_remote_adapter_intent);
         views.setEmptyView(R.id.widget_list_view, R.id.empty_view);
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }

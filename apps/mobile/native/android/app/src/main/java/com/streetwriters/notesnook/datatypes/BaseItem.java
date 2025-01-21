@@ -1,5 +1,8 @@
 package com.streetwriters.notesnook.datatypes;
 
+import androidx.annotation.Keep;
+
+@Keep
 public class BaseItem {
     private String id;
     private String type;

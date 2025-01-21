@@ -3,12 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
-    android:padding="10dp"
     android:theme="@style/ThemeOverlay.Notesnook.AppWidgetContainer">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:id="@+id/widget_button"
+        android:id="@+id/open_note"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"

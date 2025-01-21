@@ -48,26 +48,29 @@ export const IntentService = {
   },
   async onAppStateChanged() {
     if (Platform.OS === "ios") return;
+    try {
+      const intent = NotesnookModule.getIntent();
 
-    const intent = NotesnookModule.getIntent();
-
-    if (intent["com.streetwriters.notesnook.OpenNoteId"]) {
-      const note = await db.notes.note(
-        intent["com.streetwriters.notesnook.OpenNoteId"]
-      );
-      if (note) {
-        eSendEvent(eOnLoadNote, {
-          item: note
-        });
-        tabBarRef.current?.goToPage(1, false);
+      if (intent["com.streetwriters.notesnook.OpenNoteId"]) {
+        const note = await db.notes.note(
+          intent["com.streetwriters.notesnook.OpenNoteId"]
+        );
+        if (note) {
+          eSendEvent(eOnLoadNote, {
+            item: note
+          });
+          tabBarRef.current?.goToPage(1, false);
+        }
+      } else if (intent["com.streetwriters.notesnook.OpenReminderId"]) {
+        const reminder = await db.reminders.reminder(
+          intent["com.streetwriters.notesnook.OpenReminderId"]
+        );
+        if (reminder) ReminderSheet.present(reminder);
+      } else if (intent["com.streetwriters.notesnook.NewReminder"]) {
+        ReminderSheet.present();
       }
-    } else if (intent["com.streetwriters.notesnook.OpenReminderId"]) {
-      const reminder = await db.reminders.reminder(
-        intent["com.streetwriters.notesnook.OpenReminderId"]
-      );
-      if (reminder) ReminderSheet.present(reminder);
-    } else if (intent["com.streetwriters.notesnook.NewReminder"]) {
-      ReminderSheet.present();
+    } catch (e) {
+      /* empty */
     }
   }
 };

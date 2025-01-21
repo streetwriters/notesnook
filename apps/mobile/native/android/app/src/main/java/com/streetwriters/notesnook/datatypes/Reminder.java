@@ -1,7 +1,10 @@
 package com.streetwriters.notesnook.datatypes;
 
+import androidx.annotation.Keep;
+
 import java.util.concurrent.TimeUnit;
 
+@Keep
 public class Reminder extends BaseItem {
     private String title;
     private String description;

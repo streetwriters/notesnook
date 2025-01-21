@@ -260,7 +260,7 @@ async function updateRemindersForWidget() {
     undefined,
     {
       sortBy: "dueDate",
-      sortDirection: "desc"
+      sortDirection: "asc"
     }
   );
   const activeReminders = [];
