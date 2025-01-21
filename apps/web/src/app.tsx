@@ -23,6 +23,7 @@ import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
 import { useStore } from "./stores/app-store";
+import { useStore as useSettingStore } from "./stores/setting-store";
 import { Toaster } from "react-hot-toast";
 import NavigationMenu from "./components/navigation-menu";
 import StatusBar from "./components/status-bar";
@@ -54,6 +55,8 @@ function App() {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const { isFocused } = useWindowFocus();
   const { isFullscreen } = useWindowControls();
+  const hasNativeTitlebar =
+    useSettingStore.getState().desktopIntegrationSettings?.nativeTitlebar;
   console.timeEnd("loading app");
 
   return (
@@ -70,13 +73,14 @@ function App() {
         `}
         />
       )}
-      {IS_DESKTOP_APP && isMac() && !isFullscreen ? (
+      {IS_DESKTOP_APP && isMac() && !isFullscreen && !hasNativeTitlebar ? (
         <Global
           // These styles to make sure the app content doesn't overlap with the traffic lights.
           styles={`
             .nav-pane,
             .mobile-nav-pane {
               margin-top: env(titlebar-area-height) !important;
+              height: calc(100% - env(titlebar-area-height)) !important;
             }
             .nav-pane.collapsed + .list-pane .route-container-header,
             .nav-pane.collapsed + .list-pane.collapsed + .editor-pane .editor-action-bar,
@@ -307,7 +311,7 @@ function MobileAppContents() {
           flexShrink: 0
         }}
       >
-        <NavigationMenu toggleNavigationContainer={() => { }} isTablet={false} />
+        <NavigationMenu toggleNavigationContainer={() => {}} isTablet={false} />
       </Flex>
       <Flex
         className="mobile-list-pane"
