@@ -263,20 +263,22 @@ export const Pressable = ({
   const getStyle = useCallback(
     ({ pressed }: PressableStateCallbackType): ViewStyle | ViewStyle[] => [
       {
-        backgroundColor: pressed
-          ? RGB_Linear_Shade(alpha, hexToRGBA(selectedColor, opacity || 1))
-          : hexToRGBA(primaryColor, opacity || 1),
+        backgroundColor:
+          pressed && !disabled
+            ? RGB_Linear_Shade(alpha, hexToRGBA(selectedColor, opacity || 1))
+            : hexToRGBA(primaryColor, opacity || 1),
         width: "100%",
         alignSelf: "center",
         borderRadius: noborder ? 0 : br,
         justifyContent: "center",
         alignItems: "center",
         marginBottom: 0,
-        borderColor: pressed
-          ? customSelectedColor
-            ? getColorLinearShade(customSelectedColor, 0.3, false)
-            : borderSelectedColor || borderColor
-          : borderColor || "transparent",
+        borderColor:
+          pressed && !disabled
+            ? customSelectedColor
+              ? getColorLinearShade(customSelectedColor, 0.3, false)
+              : borderSelectedColor || borderColor
+            : borderColor || "transparent",
         borderWidth: borderWidth
       },
       style,
@@ -298,7 +300,8 @@ export const Pressable = ({
       borderColor,
       borderWidth,
       style,
-      growFactor
+      growFactor,
+      disabled
     ]
   );
 
