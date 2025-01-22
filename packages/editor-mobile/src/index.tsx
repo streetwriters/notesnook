@@ -25,7 +25,6 @@ import "@notesnook/editor/styles/katex.min.css";
 import "@notesnook/editor/styles/styles.css";
 import { setI18nGlobal } from "@notesnook/intl";
 import { createRoot } from "react-dom/client";
-import App from "./App";
 import "./index.css";
 
 setTimeout(() => {
@@ -57,7 +56,7 @@ function loadApp() {
         })
       );
 
-  locale.then((locale: { [name: string]: any }) => {
+  locale.then(async (locale: { [name: string]: any }) => {
     i18n.load(locale);
     i18n.activate(globalThis.LINGUI_LOCALE || "en");
     //@ts-ignore
@@ -66,6 +65,7 @@ function loadApp() {
     const rootElement = document.getElementById("root");
     if (rootElement) {
       const root = createRoot(rootElement);
+      const App = require("./App").default;
       root.render(<App />);
     }
   });
