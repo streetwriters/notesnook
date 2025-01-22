@@ -44,7 +44,12 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   const settings = useSettingStore((state) => state.settings);
   const navigation = useNavigation<NavigationProp<RouteParams>>();
   const current = item.useHook && item.useHook(item);
-  const isHidden = item.hidden && item.hidden(item.property || current);
+  const [isHidden, setIsHidden] = useState(
+    item.hidden && item.hidden(item.property || current)
+  );
+  const [isDisabled, setIsDisabled] = useState(
+    item.disabled && item.disabled(item.property || current)
+  );
   const inputRef = useRef<TextInput>(null);
   const [loading, setLoading] = useState(false);
 
@@ -62,7 +67,13 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
     SettingsService.set({
       [item.property]: nextValue
     });
-    setImmediate(() => item.onChange?.(nextValue));
+    setImmediate(() => {
+      item.onChange?.(nextValue);
+      item.hidden &&
+        setIsHidden(item.hidden && item.hidden(item.property || current));
+      item.disabled &&
+        setIsDisabled(item.disabled && item.disabled(item.property || current));
+    });
   };
 
   const styles =
@@ -94,7 +105,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
 
   return isHidden ? null : (
     <Pressable
-      disabled={item.type === "component"}
+      disabled={item.type === "component" || isDisabled}
       style={{
         width: "100%",
         alignItems: "center",
@@ -102,10 +113,12 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         paddingVertical: 20,
+        opacity: isDisabled ? 0.5 : 1,
         borderRadius: 0,
         ...styles
       }}
       onPress={async () => {
+        if (isDisabled) return;
         switch (item.type) {
           case "screen":
             {
@@ -208,6 +221,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 });
                 item.inputProperties?.onSubmitEditing?.(e);
               }}
+              editable={!isDisabled}
               onChangeText={(text) => {
                 SettingsService.set({
                   [item.property as string]: text
@@ -240,6 +254,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 name="minus"
                 color={colors.primary.icon}
                 onPress={() => {
+                  if (isDisabled) return;
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
                   ] as string;
@@ -262,6 +277,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   onChangeInputSelectorValue(e.nativeEvent.text);
                   item.inputProperties?.onSubmitEditing?.(e);
                 }}
+                editable={!isDisabled}
                 onChangeText={(text) => {
                   onChangeInputSelectorValue(text);
                   item.inputProperties?.onSubmitEditing?.(text as any);
@@ -287,6 +303,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 name="plus"
                 color={colors.primary.icon}
                 onPress={() => {
+                  if (isDisabled) return;
                   const rawValue = SettingsService.get()[
                     item.property as keyof SettingStore["settings"]
                   ] as string;

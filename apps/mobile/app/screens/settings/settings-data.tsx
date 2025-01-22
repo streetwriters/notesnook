@@ -751,8 +751,12 @@ export const settingsGroups: SettingSection[] = [
             description: strings.clearDefaultNotebookDesc(),
             modifer: () => {
               db.settings.setDefaultNotebook(undefined);
+              ToastManager.show({
+                heading: strings.defaultNotebookCleared(),
+                type: "success"
+              });
             },
-            hidden: () => !db.settings.getDefaultNotebook()
+            disabled: () => !db.settings.getDefaultNotebook()
           }
         ]
       },
@@ -776,6 +780,10 @@ export const settingsGroups: SettingSection[] = [
             description: strings.resetToolbarDesc(),
             modifer: () => {
               useDragState.getState().setPreset("default");
+              ToastManager.show({
+                heading: strings.toolbarReset(),
+                type: "success"
+              });
             }
           },
           {
