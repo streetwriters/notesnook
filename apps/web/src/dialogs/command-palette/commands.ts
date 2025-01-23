@@ -25,103 +25,131 @@ import { CreateColorDialog } from "../create-color-dialog";
 
 export const commands = [
   {
-    title: "Go to next tab",
+    id: "next-tab",
+    title: "Next tab",
     icon: ArrowTopRight,
     action: () => useEditorStore.getState().openNextSession(),
     group: "Navigate"
   },
   {
-    title: "Go to previous tab",
+    id: "previous-tab",
+    title: "Previous tab",
     icon: ArrowTopRight,
     action: () => useEditorStore.getState().openPreviousSession(),
     group: "Navigate"
   },
   {
-    title: "Go to notes",
+    id: "notes",
+    title: "Notes",
     icon: ArrowTopRight,
     action: () => navigate("/"),
     group: "Navigate"
   },
   {
-    title: "Go to notebooks",
+    id: "notebooks",
+    title: "Notebooks",
     icon: ArrowTopRight,
     action: () => navigate("/notebooks"),
     group: "Navigate"
   },
   {
-    title: "Go to tags",
+    id: "tags",
+    title: "Tags",
     icon: ArrowTopRight,
     action: () => navigate("/tags"),
     group: "Navigate"
   },
   {
-    title: "Go to favorites",
+    id: "favorites",
+    title: "Favorites",
     icon: ArrowTopRight,
     action: () => navigate("/favorites"),
     group: "Navigate"
   },
   {
-    title: "Go to reminders",
+    id: "reminders",
+    title: "Reminders",
     icon: ArrowTopRight,
     action: () => navigate("/reminders"),
     group: "Navigate"
   },
   {
-    title: "Go to monographs",
+    id: "monographs",
+    title: "Monographs",
     icon: ArrowTopRight,
     action: () => navigate("/monographs"),
     group: "Navigate"
   },
   {
-    title: "Go to trash",
+    id: "trash",
+    title: "Trash",
     icon: ArrowTopRight,
     action: () => navigate("/trash"),
     group: "Navigate"
   },
   {
-    title: "Go to settings",
+    id: "settings",
+    title: "Settings",
     icon: ArrowTopRight,
     action: () => hashNavigate("/settings", { replace: true }),
-
     group: "Navigate"
   },
   {
-    title: "Go to help",
+    id: "help",
+    title: "Help",
     icon: ArrowTopRight,
     action: () => (window.location.href = "https://help.notesnook.com"),
     group: "Navigate"
   },
   {
+    id: "new-note",
     title: "New note",
     icon: Plus,
     action: () => useEditorStore.getState().newSession(),
     group: "Create"
   },
   {
+    id: "new-notebook",
     title: "New notebook",
     icon: Plus,
     action: () => hashNavigate("/notebooks/create", { replace: true }),
     group: "Create"
   },
   {
+    id: "new-tag",
     title: "New tag",
     icon: Plus,
     action: () => hashNavigate("/tags/create", { replace: true }),
     group: "Create"
   },
   {
+    id: "new-reminder",
     title: "New reminder",
     icon: Plus,
     action: () => hashNavigate(`/reminders/create`, { replace: true }),
     group: "Create"
   },
   {
+    id: "new-color",
     title: "New color",
     icon: Plus,
     action: () => CreateColorDialog.show(true),
     group: "Create"
   },
   {
+    id: "close-tab",
+    title: "Close current tab",
+    icon: Radar,
+    action: () =>
+      useEditorStore.getState().activeSessionId
+        ? useEditorStore
+            .getState()
+            .closeSessions(useEditorStore.getState().activeSessionId!)
+        : () => {},
+    group: "General"
+  },
+  {
+    id: "toggle-theme",
     title: "Toggle theme",
     icon: Radar,
     action: () => useThemeStore.getState().toggleColorScheme(),

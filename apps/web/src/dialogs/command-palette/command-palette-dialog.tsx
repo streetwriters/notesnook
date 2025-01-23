@@ -19,47 +19,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ScrollContainer } from "@notesnook/ui";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { Fragment, useEffect, useRef, useState } from "react";
-import { db } from "../../common/db";
+import { Fragment, useEffect, useRef } from "react";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
 import Field from "../../components/field";
-import {
-  Icon,
-  Note as NoteIcon,
-  Notebook as NotebookIcon,
-  Reminder as ReminderIcon,
-  Tag as TagIcon
-} from "../../components/icons";
-import { hashNavigate, navigate } from "../../navigation";
-import { useEditorStore } from "../../stores/editor-store";
-import { commands } from "./commands";
-import Config from "../../utils/config";
-
-enum Mode {
-  COMMAND,
-  SEARCH
-}
-
-type Command = {
-  title: string;
-  icon: Icon;
-  action: () => void;
-  group: string;
-  renderAsChip?: boolean;
-};
-
-const searchMap = new Map<string, Command[]>();
+import { useCommandPaletteStore } from "../../stores/command-palette-store";
 
 export const CommandPaletteDialog = DialogManager.register(
   function CommandPaletteDialog(props: BaseDialogProps<boolean>) {
-    const [filteredCommands, setFilteredCommands] =
-      useState<Command[]>(commands);
-    const [mode, setMode] = useState(Mode.COMMAND);
-    const [value, setValue] = useState(">");
-    const [selected, setSelected] = useState<number>(0);
+    const {
+      selected,
+      setSelected,
+      query,
+      setQuery,
+      commands,
+      getCommandIcon,
+      getCommandAction,
+      search,
+      setCommands,
+      reset
+    } = useCommandPaletteStore();
+    console.log("commands", commands);
     const selectedRef = useRef<HTMLButtonElement>(null);
-    const { sessions } = useEditorStore();
 
     useEffect(() => {
       selectedRef.current?.scrollIntoView({
@@ -68,97 +49,50 @@ export const CommandPaletteDialog = DialogManager.register(
     }, [selected]);
 
     useEffect(() => {
-      if (mode === Mode.COMMAND || value === "") return;
-
-      let isLatest = true;
-
-      (async () => {
-        if (searchMap.has(value)) {
-          setFilteredCommands(searchMap.get(value) ?? []);
-          return;
+      const searchWithoutDebounce =
+        query.startsWith(">") || query.trim().length < 1;
+      if (searchWithoutDebounce) {
+        const res = search(query);
+        if (res instanceof Promise) {
+        } else {
+          setCommands(res ?? []);
         }
-        const results = await search(value);
-        if (!isLatest) return;
-        setFilteredCommands(results ?? []);
-      })();
-      return () => {
-        isLatest = false;
-      };
-    }, [value]);
+      }
 
-    const grouped = filteredCommands.reduce((acc, command, index) => {
+      const timeoutId = setTimeout(async () => {
+        const res = search(query);
+        if (res instanceof Promise) {
+          const commands = await res;
+          setCommands(commands ?? []);
+          return;
+        } else {
+          setCommands(res ?? []);
+        }
+      }, 500);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }, [query]);
+
+    const grouped = commands.reduce((acc, command, index) => {
       if (!acc[command.group]) {
         acc[command.group] = [];
       }
       acc[command.group].push({
         ...command,
+        icon: getCommandIcon(command),
         index
       });
       return acc;
-    }, {} as Record<string, (Command & { index: number })[]>);
-
-    async function search(query: string) {
-      const notes = db.lookup.noteTitles(query);
-      const notebooks = db.lookup.notebooks(query, {
-        titleOnly: true
-      });
-      const tags = db.lookup.tags(query);
-      const reminders = db.lookup.reminders(query, {
-        titleOnly: true
-      });
-
-      const list = (
-        await Promise.all([
-          notes.items(),
-          notebooks.items(),
-          tags.items(),
-          reminders.items()
-        ])
-      ).flat();
-
-      const commands = list.map((item) => ({
-        title: item.title,
-        renderAsChip: true,
-        icon:
-          item.type === "note"
-            ? NoteIcon
-            : item.type === "notebook"
-            ? NotebookIcon
-            : item.type === "tag"
-            ? TagIcon
-            : ReminderIcon,
-        action: () => {
-          if (item.type === "note") {
-            useEditorStore.getState().openSession(item.id);
-            return;
-          }
-          if (item.type === "notebook") {
-            navigate(`/notebooks/${item.id}`);
-            return;
-          }
-          if (item.type === "tag") {
-            navigate(`/tags/${item.id}`);
-            return;
-          }
-          if (item.type === "reminder") {
-            hashNavigate(`/reminders/${item.id}/edit`);
-            return;
-          }
-        },
-        group:
-          item.type.substring(0, 1).toUpperCase() + item.type.substring(1) + "s"
-      }));
-
-      searchMap.set(query, commands);
-      return commands;
-    }
+    }, {} as Record<string, ((typeof commands)[number] & { index: number; icon: any })[]>);
 
     return (
       <Dialog
         isOpen={true}
         width={650}
         onClose={() => {
-          searchMap.clear();
+          reset();
           props.onClose(false);
         }}
         noScroll
@@ -172,28 +106,24 @@ export const CommandPaletteDialog = DialogManager.register(
           onKeyDown={(e) => {
             if (e.key == "Enter") {
               e.preventDefault();
-              if (filteredCommands[selected]) {
-                filteredCommands[selected].action();
-                setFilteredCommands(commands);
-                setSelected(0);
+              const command = commands[selected];
+              const action = getCommandAction({
+                id: command.id,
+                type: command.type
+              });
+              if (action) {
+                action(command.id);
                 props.onClose(true);
-              } else {
-                setSelected(0);
               }
+              setSelected(0);
             }
             if (e.key === "ArrowDown") {
               e.preventDefault();
-              setSelected(
-                (selected) => (selected + 1) % filteredCommands.length
-              );
+              setSelected((selected + 1) % commands.length);
             }
             if (e.key === "ArrowUp") {
               e.preventDefault();
-              setSelected(
-                (selected) =>
-                  (selected - 1 + filteredCommands.length) %
-                  filteredCommands.length
-              );
+              setSelected((selected - 1 + commands.length) % commands.length);
             }
           }}
         >
@@ -202,55 +132,10 @@ export const CommandPaletteDialog = DialogManager.register(
               autoFocus
               placeholder={"Search in notes, notebooks, and tags"}
               sx={{ mx: 0, my: 2 }}
-              value={value}
-              onChange={async (e) => {
+              value={query}
+              onChange={(e) => {
                 setSelected(0);
-                setValue(e.target.value);
-                if (e.target.value.startsWith(">")) {
-                  setMode(Mode.COMMAND);
-                  setFilteredCommands(commands);
-                } else {
-                  setMode(Mode.SEARCH);
-                  // setFilteredCommands([]);
-                }
-
-                const query = e.target.value.trim().toLowerCase();
-
-                if (!query || query.length === 0) {
-                  setFilteredCommands(
-                    e.target.value.startsWith(">")
-                      ? commands
-                      : sessions
-                          .filter((s) => s.type !== "new")
-                          .map((s) => ({
-                            title: s.note.title,
-                            renderAsChip: true,
-                            icon: NoteIcon,
-                            action: () => {
-                              useEditorStore.getState().openSession(s.id);
-                            },
-                            group: "Notes"
-                          }))
-                  );
-                  return;
-                }
-
-                if (
-                  e.target.value.startsWith(">") &&
-                  e.target.value.length >= 1
-                ) {
-                  const matches = db.lookup.fuzzy(
-                    query.substring(1),
-                    commands.map((c) => c.title)
-                  );
-                  const matchedCommands = matches
-                    .map((match) => {
-                      return commands.find((c) => c.title === match);
-                    })
-                    .filter((c) => c !== undefined);
-                  setFilteredCommands(matchedCommands);
-                  return;
-                }
+                setQuery(e.target.value);
               }}
             />
             <ScrollContainer>
@@ -264,7 +149,9 @@ export const CommandPaletteDialog = DialogManager.register(
               >
                 {Object.entries(grouped).map(([group, commands]) => (
                   <Flex sx={{ flexDirection: "column", gap: 1, mx: 1 }}>
-                    <Text variant="subBody">{group}</Text>
+                    <Text variant="subBody">
+                      {group[0]?.toLocaleUpperCase() + group.substring(1)}
+                    </Text>
                     <Flex
                       sx={{
                         flexDirection: "column",
@@ -276,7 +163,10 @@ export const CommandPaletteDialog = DialogManager.register(
                           ref={command.index === selected ? selectedRef : null}
                           key={index}
                           onClick={() => {
-                            command.action();
+                            getCommandAction({
+                              id: command.id,
+                              type: command.type
+                            })?.(command.id);
                             props.onClose(true);
                           }}
                           sx={{
@@ -308,7 +198,9 @@ export const CommandPaletteDialog = DialogManager.register(
                                 : "icon"
                             }
                           />
-                          {command.renderAsChip ? (
+                          {["note", "notebook", "reminder", "tag"].includes(
+                            command.type
+                          ) ? (
                             <Text
                               className="chip"
                               sx={{
@@ -318,10 +210,10 @@ export const CommandPaletteDialog = DialogManager.register(
                                 borderColor: "border"
                               }}
                             >
-                              <Highlighter text={command.title} query={value} />
+                              <Highlighter text={command.title} query={query} />
                             </Text>
                           ) : (
-                            <Highlighter text={command.title} query={value} />
+                            <Highlighter text={command.title} query={query} />
                           )}
                         </Button>
                       ))}
