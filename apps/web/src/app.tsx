@@ -46,7 +46,7 @@ import { AppEventManager, AppEvents } from "./common/app-events";
 import { TITLE_BAR_HEIGHT } from "./components/title-bar";
 import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
 import { useWindowControls } from "./hooks/use-window-controls";
-import { CommandPaletteDialog } from "./dialogs/command-palette-dialog";
+import { CommandPaletteDialog } from "./dialogs/command-palette";
 
 new WebExtensionRelay();
 
@@ -62,7 +62,7 @@ function App() {
 
   useEffect(() => {
     function onCtrlK(e: KeyboardEvent) {
-      if (e.ctrlKey && e.key === "k") {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
         CommandPaletteDialog.show(true);
       }

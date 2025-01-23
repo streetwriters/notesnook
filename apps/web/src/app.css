@@ -249,3 +249,9 @@ textarea,
     background-color: color-mix(in srgb, var(--accent) 5%, transparent);
   }
 }
+
+kbd {
+  background: var(--background);
+  border-radius: 3px;
+  color: var(--paragraph-secondary);
+}

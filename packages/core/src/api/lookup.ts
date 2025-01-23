@@ -99,11 +99,22 @@ export default class Lookup {
     }, notes || this.db.notes.all);
   }
 
-  notebooks(query: string) {
+  noteTitles(query: string) {
+    return this.search(this.db.notes.all, query, [
+      { name: "id", column: "notes.id", weight: -100 },
+      { name: "title", column: "notes.title", weight: 10 }
+    ]);
+  }
+
+  notebooks(query: string, opts: { titleOnly?: boolean } = {}) {
     return this.search(this.db.notebooks.all, query, [
       { name: "id", column: "notebooks.id", weight: -100 },
       { name: "title", column: "notebooks.title", weight: 10 },
-      { name: "description", column: "notebooks.description" }
+      {
+        name: "description",
+        column: "notebooks.description",
+        weight: opts?.titleOnly ? -100 : undefined
+      }
     ]);
   }
 
@@ -114,11 +125,15 @@ export default class Lookup {
     ]);
   }
 
-  reminders(query: string) {
+  reminders(query: string, opts: { titleOnly?: boolean } = {}) {
     return this.search(this.db.reminders.all, query, [
       { name: "id", column: "reminders.id", weight: -100 },
       { name: "title", column: "reminders.title", weight: 10 },
-      { name: "description", column: "reminders.description" }
+      {
+        name: "description",
+        column: "reminders.description",
+        weight: opts?.titleOnly ? -100 : undefined
+      }
     ]);
   }
 
@@ -161,6 +176,15 @@ export default class Lookup {
       { name: "mimeType", column: "attachments.mimeType" },
       { name: "hash", column: "attachments.hash" }
     ]);
+  }
+
+  fuzzy(query: string, items: string[]) {
+    const matches = [];
+    for (const item of items) {
+      const result = match(query, item);
+      if (result.match) matches.push(item);
+    }
+    return matches;
   }
 
   private search<T extends Item>(
