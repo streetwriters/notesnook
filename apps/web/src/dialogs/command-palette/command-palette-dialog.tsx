@@ -114,6 +114,7 @@ export const CommandPaletteDialog = DialogManager.register(
               });
               if (action) {
                 action(command.id);
+                reset();
                 props.onClose(true);
               }
               setSelected(0);
@@ -170,6 +171,7 @@ export const CommandPaletteDialog = DialogManager.register(
                             });
                             if (action) {
                               action(command.id);
+                              reset();
                               props.onClose(true);
                             }
                           }}
