@@ -24,6 +24,7 @@ import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
 import Field from "../../components/field";
 import { useCommandPaletteStore } from "../../stores/command-palette-store";
+import { Icon } from "../../components/icons";
 
 export const CommandPaletteDialog = DialogManager.register(
   function CommandPaletteDialog(props: BaseDialogProps<boolean>) {
@@ -39,7 +40,6 @@ export const CommandPaletteDialog = DialogManager.register(
       setCommands,
       reset
     } = useCommandPaletteStore();
-    console.log("commands", commands);
     const selectedRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
@@ -85,7 +85,7 @@ export const CommandPaletteDialog = DialogManager.register(
         index
       });
       return acc;
-    }, {} as Record<string, ((typeof commands)[number] & { index: number; icon: any })[]>);
+    }, {} as Record<string, ((typeof commands)[number] & { index: number; icon: Icon | undefined })[]>);
 
     return (
       <Dialog
@@ -107,6 +107,7 @@ export const CommandPaletteDialog = DialogManager.register(
             if (e.key == "Enter") {
               e.preventDefault();
               const command = commands[selected];
+              if (!command) return;
               const action = getCommandAction({
                 id: command.id,
                 type: command.type
@@ -163,11 +164,14 @@ export const CommandPaletteDialog = DialogManager.register(
                           ref={command.index === selected ? selectedRef : null}
                           key={index}
                           onClick={() => {
-                            getCommandAction({
+                            const action = getCommandAction({
                               id: command.id,
                               type: command.type
-                            })?.(command.id);
-                            props.onClose(true);
+                            });
+                            if (action) {
+                              action(command.id);
+                              props.onClose(true);
+                            }
                           }}
                           sx={{
                             display: "flex",
@@ -190,14 +194,16 @@ export const CommandPaletteDialog = DialogManager.register(
                             }
                           }}
                         >
-                          <command.icon
-                            size={18}
-                            color={
-                              command.index === selected
-                                ? "icon-selected"
-                                : "icon"
-                            }
-                          />
+                          {command.icon && (
+                            <command.icon
+                              size={18}
+                              color={
+                                command.index === selected
+                                  ? "icon-selected"
+                                  : "icon"
+                              }
+                            />
+                          )}
                           {["note", "notebook", "reminder", "tag"].includes(
                             command.type
                           ) ? (

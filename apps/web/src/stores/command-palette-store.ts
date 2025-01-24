@@ -27,54 +27,40 @@ import {
   Reminder as ReminderIcon,
   Tag as TagIcon
 } from "../components/icons";
-import { commands } from "../dialogs/command-palette/commands";
+import { commands as COMMANDS } from "../dialogs/command-palette/commands";
 import { hashNavigate, navigate } from "../navigation";
 import { useEditorStore } from "./editor-store";
-import Config from "../utils/config";
-import { receiveMessageOnPort } from "worker_threads";
 
 interface Command {
   id: string;
   title: string;
-  icon: Icon;
   type: "command" | "note" | "notebook" | "tag" | "reminder";
   group: string;
-  action: (arg?: string) => void;
 }
 
-interface RecentCommand extends Omit<Command, "action" | "icon"> {}
-
-const CommandIconMap = commands.reduce((acc, command) => {
+const CommandIconMap = COMMANDS.reduce((acc, command) => {
   acc.set(command.id, command.icon);
   return acc;
-}, new Map<string, Command["icon"]>());
+}, new Map<string, Icon>());
 
-const CommandActionMap = commands.reduce((acc, command) => {
+const CommandActionMap = COMMANDS.reduce((acc, command) => {
   acc.set(command.id, command.action);
   return acc;
-}, new Map<string, Command["action"]>());
+}, new Map<string, (arg?: any) => void>());
 
-const cache = new Map<string, Omit<Command, "action" | "icon">[]>();
-
-console.log("commands here", Config.get("commandPalette:recent"), commands);
+const cache = new Map<string, Command[]>();
 
 class CommandPaletteStore extends BaseStore<CommandPaletteStore> {
-  recent = Config.get<RecentCommand[]>("commandPalette:recent", []);
-  all = this.recent.concat(
-    commands.map((c) => {
-      return {
-        id: c.id,
-        title: c.title,
-        group: c.group,
-        type: "command"
-      };
-    })
-  );
-  commands: Omit<Command, "action" | "icon">[] = this.all;
+  commands: Command[] = COMMANDS.map((c) => ({
+    id: c.id,
+    title: c.title,
+    group: c.group,
+    type: "command"
+  }));
   selected = 0;
   query = ">";
 
-  setCommands = (commands: Omit<Command, "action" | "icon">[]) => {
+  setCommands = (commands: Command[]) => {
     this.set((state) => {
       state.commands = commands;
     });
@@ -125,30 +111,6 @@ class CommandPaletteStore extends BaseStore<CommandPaletteStore> {
     id: Command["id"];
     type: Command["type"];
   }) => {
-    this.set((state) => {
-      let recent = this.get().recent.slice();
-      const found = recent.find((c) => c.id === id);
-      console.log("here", recent, found);
-      if (found) {
-        recent = recent.filter((c) => c.id !== id);
-        recent.unshift(found);
-        recent = recent.slice(0, 3);
-        this.set({ recent });
-        Config.set("commandPalette:recent", recent);
-      } else {
-        const command = this.all.find((c) => c.id === id);
-        if (command) {
-          recent.unshift(command);
-          recent = recent.slice(0, 3);
-          recent = recent.map((r) => ({
-            ...r,
-            group: "recent"
-          }));
-          this.set({ recent });
-          Config.set("commandPalette:recent", recent);
-        }
-      }
-    });
     switch (type) {
       case "command":
         return CommandActionMap.get(id);
@@ -191,42 +153,32 @@ class CommandPaletteStore extends BaseStore<CommandPaletteStore> {
   };
 
   reset = () => {
-    this.set((state) => {
-      state.query = ">";
-      state.selected = 0;
-      state.commands = commands.map((c) => {
+    this.set({
+      query: ">",
+      selected: 0,
+      commands: COMMANDS.map((c) => {
         return {
           id: c.id,
           title: c.title,
           group: c.group,
           type: "command"
         };
-      });
+      })
     });
     cache.clear();
   };
 
   private commandSearch(query: string) {
-    console.log("store command search", query, this.all);
+    console.log("store command search", query, this.commands);
     const str = query.substring(1).trim();
-    if (str === "") return this.all;
+    if (str === "") return this.commands;
     const matches = db.lookup.fuzzy(
-      query.substring(1).trim(),
-      this.all.map((c) => c.title)
+      str,
+      this.commands.map((c) => c.title)
     );
-    // const matchedCommands = matches
-    // .map((match) => {
-    // return this.all.find((c) => c.title === match);
-    // })
-    // .filter((c) => c !== undefined);
-    const matchedCommands = this.all.filter((c) => matches.includes(c.title));
-    // const filtered = matchedCommands.map((c) => ({
-    // id: c.id,
-    // title: c.title,
-    // group: c.group,
-    // type: "command" as const
-    // }));
-    // return filtered;
+    const matchedCommands = this.commands.filter((c) =>
+      matches.includes(c.title)
+    );
     return matchedCommands;
   }
 
@@ -240,7 +192,6 @@ class CommandPaletteStore extends BaseStore<CommandPaletteStore> {
     const reminders = db.lookup.reminders(query, {
       titleOnly: true
     });
-
     const list = (
       await Promise.all([
         notes.items(),
@@ -249,7 +200,6 @@ class CommandPaletteStore extends BaseStore<CommandPaletteStore> {
         reminders.items()
       ])
     ).flat();
-
     const commands = list.map((item) => {
       return {
         id: item.id,
@@ -258,9 +208,7 @@ class CommandPaletteStore extends BaseStore<CommandPaletteStore> {
         type: item.type
       };
     });
-
     cache.set(query, commands);
-
     return commands;
   }
 
