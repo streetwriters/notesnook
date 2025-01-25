@@ -21,6 +21,7 @@ import { Button, Flex, Text } from "@theme-ui/components";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
+  ArrowRight,
   Cross,
   EditorFullWidth,
   EditorNormalWidth,
@@ -32,6 +33,7 @@ import {
   Note,
   NoteRemove,
   Pin,
+  Plus,
   Properties,
   Publish,
   Published,
@@ -88,8 +90,9 @@ export function EditorActionBar() {
     useWindowControls();
   const editorMargins = useEditorStore((store) => store.editorMargins);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const activeTab = useEditorStore((store) => store.getActiveTab());
   const activeSession = useEditorStore((store) =>
-    store.activeSessionId ? store.getSession(store.activeSessionId) : undefined
+    activeTab ? store.getSession(activeTab.sessionId) : undefined
   );
   const editorManager = useEditorManager((store) =>
     activeSession?.id ? store.editors[activeSession?.id] : undefined
@@ -161,8 +164,9 @@ export function EditorActionBar() {
       onClick: () => {
         useAppStore.getState().toggleFocusMode();
         if (document.fullscreenElement) exitFullscreen();
-        const id = useEditorStore.getState().activeSessionId;
-        const editor = id && useEditorManager.getState().getEditor(id);
+        const editor =
+          activeSession &&
+          useEditorManager.getState().getEditor(activeSession.id);
         if (editor) editor.editor?.focus();
       }
     },
@@ -276,8 +280,10 @@ export function EditorActionBar() {
 }
 
 function TabStrip() {
-  const sessions = useEditorStore((store) => store.sessions);
-  const activeSessionId = useEditorStore((store) => store.activeSessionId);
+  const tabs = useEditorStore((store) => store.tabs);
+  const currentTab = useEditorStore((store) => store.activeTabId);
+  const canGoBack = useEditorStore((store) => store.canGoBack);
+  const canGoForward = useEditorStore((store) => store.canGoForward);
 
   return (
     <ScrollContainer
@@ -303,86 +309,101 @@ function TabStrip() {
         }}
         onDoubleClick={async (e) => {
           e.stopPropagation();
-          useEditorStore.getState().newSession();
+          useEditorStore.getState().addTab();
         }}
         data-test-id="tabs"
       >
+        <Flex
+          sx={{
+            px: 1,
+            borderRight: "1px solid var(--border)",
+            alignItems: "center"
+          }}
+        >
+          <Button
+            disabled={!canGoBack}
+            onClick={() => useEditorStore.getState().goBack()}
+            variant="secondary"
+            sx={{ p: 1, bg: "transparent" }}
+          >
+            <ArrowLeft size={15} />
+          </Button>
+          <Button
+            disabled={!canGoForward}
+            onClick={() => useEditorStore.getState().goForward()}
+            variant="secondary"
+            sx={{ p: 1, bg: "transparent" }}
+          >
+            <ArrowRight size={15} />
+          </Button>
+        </Flex>
         <ReorderableList
-          items={sessions}
+          items={tabs}
           moveItem={(from, to) => {
             if (from === to) return;
-            const sessions = useEditorStore.getState().sessions.slice();
-            const isToPinned = sessions[to].pinned;
-            const [fromTab] = sessions.splice(from, 1);
+            const tabs = useEditorStore.getState().tabs.slice();
+            const isToPinned = tabs[to].pinned;
+            const [fromTab] = tabs.splice(from, 1);
 
             // if the tab where this tab is being dropped is pinned,
             // let's pin our tab too.
             if (isToPinned) {
               fromTab.pinned = true;
-              fromTab.preview = false;
             }
             // unpin the tab if it is moved.
             else if (fromTab.pinned) fromTab.pinned = false;
 
-            sessions.splice(to, 0, fromTab);
-            useEditorStore.setState({ sessions });
+            tabs.splice(to, 0, fromTab);
+            useEditorStore.setState({ tabs });
           }}
-          renderItem={({ item: session, index: i }) => {
+          renderItem={({ item: tab, index: i }) => {
+            const session = useEditorStore.getState().getSession(tab.sessionId);
+            if (!session) return null;
+
             const isUnsaved =
               session.type === "default" &&
               session.saveState === SaveState.NotSaved;
+
             return (
               <Tab
-                id={session.id}
-                key={session.id}
+                id={tab.sessionId}
+                key={tab.sessionId}
                 title={
                   session.title ||
                   ("note" in session ? session.note.title : "Untitled")
                 }
                 isUnsaved={isUnsaved}
-                isTemporary={!!session.preview}
-                isActive={session.id === activeSessionId}
-                isPinned={!!session.pinned}
+                isActive={tab.id === currentTab}
+                isPinned={!!tab.pinned}
                 isLocked={isLockedSession(session)}
                 type={session.type}
-                onKeepOpen={() =>
-                  useEditorStore
-                    .getState()
-                    .updateSession(
-                      session.id,
-                      [session.type],
-                      (s) => (s.preview = false)
-                    )
-                }
                 onFocus={() => {
-                  if (session.id !== activeSessionId) {
-                    useEditorStore.getState().openSession(session.id);
+                  if (tab.id !== currentTab) {
+                    useEditorStore.getState().focusTab(tab.id);
                   }
                 }}
-                onClose={() =>
-                  useEditorStore.getState().closeSessions(session.id)
-                }
+                onClose={() => useEditorStore.getState().closeTabs(tab.id)}
                 onCloseAll={() =>
                   useEditorStore
                     .getState()
-                    .closeSessions(
-                      ...sessions.filter((s) => !s.pinned).map((s) => s.id)
+                    .closeTabs(
+                      ...tabs.filter((s) => !s.pinned).map((s) => s.id)
                     )
                 }
                 onCloseOthers={() =>
                   useEditorStore
                     .getState()
-                    .closeSessions(
-                      ...sessions
-                        .filter((s) => s.id !== session.id && !s.pinned)
+                    .closeTabs(
+                      ...tabs
+                        .filter((s) => s.id !== tab.id && !s.pinned)
                         .map((s) => s.id)
                     )
                 }
                 onCloseToTheRight={() =>
                   useEditorStore
                     .getState()
-                    .closeSessions(
-                      ...sessions
+                    .closeTabs(
+                      ...tabs
                         .filter((s, index) => index > i && !s.pinned)
                         .map((s) => s.id)
                     )
@@ -390,8 +411,8 @@ function TabStrip() {
                 onCloseToTheLeft={() =>
                   useEditorStore
                     .getState()
-                    .closeSessions(
-                      ...sessions
+                    .closeTabs(
+                      ...tabs
                         .filter((s, index) => index < i && !s.pinned)
                         .map((s) => s.id)
                     )
@@ -406,9 +427,8 @@ function TabStrip() {
                 onPin={() => {
                   useEditorStore.setState((state) => {
                     // preview tabs can never be pinned.
-                    if (!session.pinned) state.sessions[i].preview = false;
-                    state.sessions[i].pinned = !session.pinned;
-                    state.sessions.sort((a, b) =>
+                    state.tabs[i].pinned = !tab.pinned;
+                    state.tabs.sort((a, b) =>
                       a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
                     );
                   });
@@ -417,6 +437,13 @@ function TabStrip() {
             );
           }}
         />
+        <Button
+          variant="secondary"
+          sx={{ p: 1, bg: "transparent", alignSelf: "center", ml: 1 }}
+          onClick={() => useEditorStore.getState().addTab()}
+        >
+          <Plus size={18} />
+        </Button>
       </Flex>
     </ScrollContainer>
   );
@@ -426,12 +453,10 @@ type TabProps = {
   id: string;
   title: string;
   isActive: boolean;
-  isTemporary: boolean;
   isPinned: boolean;
   isLocked: boolean;
   isUnsaved: boolean;
   type: SessionType;
-  onKeepOpen: () => void;
   onFocus: () => void;
   onClose: () => void;
   onCloseOthers: () => void;
@@ -446,12 +471,10 @@ function Tab(props: TabProps) {
     id,
     title,
     isActive,
-    isTemporary,
     isPinned,
     isLocked,
     isUnsaved,
     type,
-    onKeepOpen,
     onFocus,
     onClose,
     onCloseAll,
@@ -559,13 +582,6 @@ function Tab(props: TabProps) {
           { type: "separator", key: "sep" },
           {
             type: "button",
-            key: "keep-open",
-            title: strings.keepOpen(),
-            onClick: onKeepOpen,
-            isDisabled: !isTemporary
-          },
-          {
-            type: "button",
             key: "pin",
             title: strings.pin(),
             onClick: onPin,
@@ -573,10 +589,6 @@ function Tab(props: TabProps) {
             icon: Pin.path
           }
         ]);
-      }}
-      onDoubleClick={(e) => {
-        e.stopPropagation();
-        if (isTemporary) onKeepOpen();
       }}
       onAuxClick={(e) => {
         if (e.button == 1) onClose();
@@ -604,7 +616,6 @@ function Tab(props: TabProps) {
             textOverflow: "ellipsis",
             overflowX: "hidden",
             pointerEvents: "none",
-            fontStyle: isTemporary ? "italic" : "normal",
             maxWidth: 120,
             color: isActive ? "paragraph-selected" : "paragraph"
           }}
@@ -652,7 +663,7 @@ function Tab(props: TabProps) {
 
 type ReorderableListProps<T> = {
   items: T[];
-  renderItem: (props: { item: T; index: number }) => JSX.Element;
+  renderItem: (props: { item: T; index: number }) => JSX.Element | null;
   moveItem: (from: number, to: number) => void;
 };
 

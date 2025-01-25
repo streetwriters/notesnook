@@ -76,7 +76,7 @@ import { TITLE_BAR_HEIGHT } from "../title-bar";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
-const autoSaveToast = { show: true, hide: () => { } };
+const autoSaveToast = { show: true, hide: () => {} };
 
 async function saveContent(
   noteId: string,
@@ -116,9 +116,9 @@ async function saveContent(
 const deferredSave = debounceWithId(saveContent, 100);
 
 export default function TabsView() {
-  const sessions = useEditorStore((store) => store.sessions);
+  const tabs = useEditorStore((store) => store.tabs);
   const documentPreview = useEditorStore((store) => store.documentPreview);
-  const activeSessionId = useEditorStore((store) => store.activeSessionId);
+  const activeTab = useEditorStore((store) => store.getActiveTab());
   const arePropertiesVisible = useEditorStore(
     (store) => store.arePropertiesVisible
   );
@@ -176,17 +176,24 @@ export default function TabsView() {
       >
         <SplitPane direction="vertical" autoSaveId={"editor-panels"}>
           <Pane id="editor-panel" className="editor-pane">
-            {sessions.map((session) => (
-              <Freeze key={session.id} freeze={session.id !== activeSessionId}>
-                {session.type === "locked" ? (
-                  <UnlockNoteView session={session} />
-                ) : session.type === "conflicted" || session.type === "diff" ? (
-                  <DiffViewer session={session} />
-                ) : (
-                  <MemoizedEditorView session={session} />
-                )}
-              </Freeze>
-            ))}
+            {tabs.map((tab) => {
+              const session = useEditorStore
+                .getState()
+                .getSession(tab.sessionId);
+              if (!session) return null;
+              return (
+                <Freeze key={session.id} freeze={tab.id !== activeTab?.id}>
+                  {session.type === "locked" ? (
+                    <UnlockNoteView session={session} />
+                  ) : session.type === "conflicted" ||
+                    session.type === "diff" ? (
+                    <DiffViewer session={session} />
+                  ) : (
+                    <MemoizedEditorView session={session} />
+                  )}
+                </Freeze>
+              );
+            })}
           </Pane>
 
           {documentPreview ? (
@@ -226,15 +233,15 @@ export default function TabsView() {
             </Pane>
           ) : null}
 
-          {isTOCVisible && activeSessionId ? (
+          {isTOCVisible && activeTab ? (
             <Pane id="table-of-contents-pane" initialSize={300} minSize={300}>
-              <TableOfContents sessionId={activeSessionId} />
+              <TableOfContents sessionId={activeTab.sessionId} />
             </Pane>
           ) : null}
         </SplitPane>
         <DropZone overlayRef={overlayRef} />
-        {arePropertiesVisible && activeSessionId && (
-          <Properties sessionId={activeSessionId} />
+        {arePropertiesVisible && activeTab && (
+          <Properties sessionId={activeTab.sessionId} />
         )}
       </ScopedThemeProvider>
     </>
@@ -252,10 +259,10 @@ function EditorView({
   session
 }: {
   session:
-  | DefaultEditorSession
-  | NewEditorSession
-  | ReadonlyEditorSession
-  | DeletedEditorSession;
+    | DefaultEditorSession
+    | NewEditorSession
+    | ReadonlyEditorSession
+    | DeletedEditorSession;
 }) {
   const lastChangedTime = useRef<number>(0);
   const root = useRef<HTMLDivElement>(null);
@@ -319,7 +326,7 @@ function EditorView({
     if (!session.needsHydration && session.content) {
       editor?.updateContent(session.content.data);
     }
-  }, [editor, session.needsHydration]);
+  }, [editor, session]);
 
   return (
     <Flex
@@ -345,21 +352,35 @@ function EditorView({
         }
         onContentChange={() => (lastChangedTime.current = Date.now())}
         onSave={(content, ignoreEdit) => {
-          const currentSession = useEditorStore
-            .getState()
-            .getSession(session.id, ["default", "readonly", "new"]);
-          if (!currentSession) return;
+          const noteId = "note" in session ? session.note.id : null;
+          const sessions = noteId
+            ? useEditorStore.getState().getSessionsForNote(noteId)
+            : [session];
 
+          const currentSessionId = session.id;
           const data = content();
-          if (!currentSession.content)
-            currentSession.content = { type: "tiptap", data };
-          else currentSession.content.data = data;
+          for (const session of sessions) {
+            if (
+              session?.type !== "default" &&
+              session?.type !== "readonly" &&
+              session?.type !== "new"
+            )
+              continue;
+            if (!session.content) session.content = { type: "tiptap", data };
+            else session.content.data = data;
+
+            // update content in other tabs
+            if (session.id !== currentSessionId) {
+              const editor = useEditorManager.getState().getEditor(session.id);
+              editor?.editor?.updateContent(data);
+            }
+          }
 
           logger.debug("scheduling save", {
             id: session.id,
             length: data.length
           });
-          deferredSave(currentSession.id, currentSession.id, ignoreEdit, data);
+          deferredSave(session.id, session.id, ignoreEdit, data);
         }}
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
@@ -414,9 +435,9 @@ function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
         variant="secondary"
         mt={2}
         onClick={() => {
-          const id = useEditorStore.getState().activeSessionId;
+          const note = useEditorStore.getState().getActiveNote();
           useEditorStore.setState({ documentPreview: undefined });
-          if (id) db.fs().cancel(id).catch(console.error);
+          if (note) db.fs().cancel(note.id).catch(console.error);
         }}
       >
         {strings.cancel()}
@@ -897,8 +918,7 @@ function UnlockNoteView(props: UnlockNoteViewProps) {
             saveState: SaveState.Saved,
             sessionId: `${Date.now()}`,
             tags,
-            pinned: session.pinned,
-            preview: session.preview,
+            tabId: session.tabId,
             content: note.content
           });
         }}

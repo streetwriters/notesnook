@@ -94,12 +94,13 @@ function TitleBox(props: TitleBoxProps) {
         );
         updateFontSize(title.length);
         if (!preventSave) {
-          const { activeSessionId } = useEditorStore.getState();
-          if (!activeSessionId) return;
+          const { getActiveTab } = useEditorStore.getState();
+          const activeTab = getActiveTab();
+          if (!activeTab) return;
           pendingChanges.current = true;
           debouncedOnTitleChange(
-            activeSessionId,
-            activeSessionId,
+            activeTab.sessionId,
+            activeTab.sessionId,
             title,
             pendingChanges
           );
