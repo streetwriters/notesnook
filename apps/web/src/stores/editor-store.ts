@@ -43,7 +43,11 @@ import { Context } from "../components/list-container/types";
 import { showToast } from "../utils/toast";
 import { getId } from "@notesnook/core";
 import { PersistStorage } from "zustand/middleware";
-import { getFormattedHistorySessionDate } from "@notesnook/common";
+import {
+  getFormattedHistorySessionDate,
+  TabHistory,
+  TabSessionHistory
+} from "@notesnook/common";
 import { isCipher } from "@notesnook/core";
 import { hashNavigate } from "../navigation";
 import { AppEventManager, AppEvents } from "../common/app-events";
@@ -64,15 +68,17 @@ enum SESSION_STATES {
   conflicted
 }
 
-// type ConflictedContentItem = Omit<ContentItem, "conflicted"> & {
-//   conflicted: ContentItem;
-// };
+type TabItem = {
+  id: string;
+  sessionId: string;
+  pinned?: boolean;
+};
 
 export type BaseEditorSession = {
+  tabId: string;
+
   id: string;
   needsHydration?: boolean;
-  pinned?: boolean;
-  preview?: boolean;
   title?: string;
 
   /**
@@ -160,10 +166,33 @@ export function isLockedSession(session: EditorSession): boolean {
       session.content.locked)
   );
 }
+
+const tabSessionHistory = new TabSessionHistory({
+  get() {
+    return {
+      tabSessionHistory: useEditorStore.getState().tabHistory,
+      canGoBack: useEditorStore.getState().canGoBack,
+      canGoForward: useEditorStore.getState().canGoForward
+    };
+  },
+  set(state) {
+    useEditorStore.setState({
+      tabHistory: state.tabSessionHistory,
+      canGoBack: state.canGoBack,
+      canGoForward: state.canGoForward
+    });
+  }
+});
+
 const saveMutex = new Mutex();
+
 class EditorStore extends BaseStore<EditorStore> {
+  tabs: TabItem[] = [];
+  tabHistory: TabHistory = {};
+  activeTabId: string | undefined;
+  canGoBack = false;
+  canGoForward = false;
   sessions: EditorSession[] = [];
-  activeSessionId?: string;
 
   arePropertiesVisible = false;
   documentPreview?: DocumentPreview;
@@ -178,18 +207,16 @@ class EditorStore extends BaseStore<EditorStore> {
     );
   };
 
-  getActiveSession = <T extends SessionType[]>(types?: T) => {
-    const { activeSessionId, sessions } = this.get();
-    return sessions.find(
-      (s): s is SessionTypeMap[T[number]] =>
-        s.id === activeSessionId && (!types || types.includes(s.type))
+  getSessionsForNote = (noteId: string) => {
+    return this.get().sessions.filter(
+      (s) => "note" in s && s.note.id === noteId
     );
   };
 
   init = () => {
     EV.subscribe(EVENTS.userLoggedOut, () => {
-      const { closeSessions, sessions } = this.get();
-      closeSessions(...sessions.map((s) => s.id));
+      const { closeTabs, tabs } = this.get();
+      closeTabs(...tabs.map((s) => s.id));
     });
 
     EV.subscribe(EVENTS.vaultLocked, () => {
@@ -208,8 +235,7 @@ class EditorStore extends BaseStore<EditorStore> {
               type: "locked",
               id: session.id,
               note: session.note,
-              pinned: session.pinned,
-              preview: session.preview
+              tabId: session.tabId
             };
           }
           return session;
@@ -221,8 +247,7 @@ class EditorStore extends BaseStore<EditorStore> {
       EVENTS.syncItemMerged,
       (item?: MaybeDeletedItem<Item>) => {
         if (!item) return;
-        const { sessions, closeSessions, updateSession, openSession } =
-          this.get();
+        const { sessions, closeTabs, updateSession, openSession } = this.get();
         const clearIds: string[] = [];
         for (const session of sessions) {
           if (session.type === "new") continue;
@@ -235,7 +260,8 @@ class EditorStore extends BaseStore<EditorStore> {
             : null;
           if (noteId && session.id !== noteId && session.note.id !== noteId)
             continue;
-          if (isDeleted(item) || isTrashItem(item)) clearIds.push(session.id);
+          if (isDeleted(item) || isTrashItem(item))
+            clearIds.push(session.tabId);
           // if a note becomes conflicted, reopen the session
           else if (
             session.type !== "conflicted" &&
@@ -287,26 +313,26 @@ class EditorStore extends BaseStore<EditorStore> {
             );
           }
         }
-        if (clearIds.length > 0) closeSessions(...clearIds);
+        if (clearIds.length > 0) closeTabs(...clearIds);
       }
     );
 
     db.eventManager.subscribe(
       EVENTS.databaseUpdated,
       async (event: DatabaseUpdatedEvent) => {
-        const { sessions, openSession, closeSessions, updateSession } =
-          this.get();
+        const { sessions, openSession, closeTabs, updateSession } = this.get();
         const clearIds: string[] = [];
         if (event.collection === "notes") {
           // when a note is permanently deleted from trash
           if (event.type === "softDelete" || event.type === "delete") {
             clearIds.push(
-              ...event.ids.filter(
-                (id) =>
-                  sessions.findIndex(
-                    (s) => s.id === id || ("note" in s && s.note.id === id)
-                  ) > -1
-              )
+              ...sessions
+                .filter(
+                  (session) =>
+                    event.ids.includes(session.id) ||
+                    ("note" in session && event.ids.includes(session.note.id))
+                )
+                .map((s) => s.tabId)
             );
           } else if (event.type === "update") {
             for (const session of sessions) {
@@ -330,7 +356,7 @@ class EditorStore extends BaseStore<EditorStore> {
                 session.type !== "deleted" &&
                 event.item.type === "trash"
               ) {
-                clearIds.push(session.id);
+                clearIds.push(session.tabId);
               } else {
                 updateSession(session.id, [session.type], (session) => {
                   session.note.pinned =
@@ -451,7 +477,7 @@ class EditorStore extends BaseStore<EditorStore> {
             }
           }
         }
-        if (clearIds.length > 0) closeSessions(...clearIds);
+        if (clearIds.length > 0) closeTabs(...clearIds);
       }
     );
 
@@ -459,18 +485,20 @@ class EditorStore extends BaseStore<EditorStore> {
       openSession,
       openDiffSession,
       activateSession,
-      activeSessionId,
+      activeTabId,
       getSession,
       newSession
     } = this.get();
-    if (activeSessionId) {
-      const session = getSession(activeSessionId);
+    if (activeTabId) {
+      const tab = this.get().tabs.find((t) => t.id === activeTabId);
+      if (!tab) return;
+      const session = getSession(tab.sessionId);
       if (!session) return;
 
       if (session.type === "diff" || session.type === "conflicted")
         openDiffSession(session.note.id, session.id);
       else if (session.type === "new") activateSession(session.id);
-      else openSession(activeSessionId);
+      else openSession(session.note);
     } else newSession();
   };
 
@@ -503,7 +531,6 @@ class EditorStore extends BaseStore<EditorStore> {
     if (!session) id = undefined;
 
     const activeSession = this.getActiveSession();
-
     if (activeSession) {
       this.saveSessionContentIfNotSaved(activeSession.id);
     }
@@ -517,13 +544,9 @@ class EditorStore extends BaseStore<EditorStore> {
       setDocumentTitle(session.note.title);
     } else setDocumentTitle();
 
-    this.set({ activeSessionId: id });
     AppEventManager.publish(AppEvents.toggleEditor, true);
 
     if (id) {
-      const { history } = this.get();
-      if (history.includes(id)) history.splice(history.indexOf(id), 1);
-      history.push(id);
       if (session?.type === "new")
         hashNavigate(`/notes/${id}/create`, { replace: true, notify: false });
       else hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
@@ -533,6 +556,15 @@ class EditorStore extends BaseStore<EditorStore> {
       this.updateSession(session.id, [session.type], {
         activeBlockId
       });
+
+    if (session?.tabId) {
+      this.focusTab(session.tabId);
+      this.set((state) => {
+        const index = state.tabs.findIndex((t) => t.id === session.tabId);
+        if (index === -1) return;
+        state.tabs[index].sessionId = session.id;
+      });
+    }
   };
 
   openDiffSession = async (noteId: string, sessionId: string) => {
@@ -546,10 +578,13 @@ class EditorStore extends BaseStore<EditorStore> {
     if (!oldContent || !currentContent) return;
 
     const label = getFormattedHistorySessionDate(session);
+    const tabId = this.get().activeTabId ?? this.addTab();
+    const tabSessionId = tabSessionHistory.add(tabId);
     this.get().addSession({
       type: "diff",
-      id: session.id,
+      id: tabSessionId,
       note,
+      tabId,
       title: label,
       content: {
         type: oldContent.type,
@@ -573,18 +608,22 @@ class EditorStore extends BaseStore<EditorStore> {
       force?: boolean;
       activeBlockId?: string;
       silent?: boolean;
-      newSession?: boolean;
     } = {}
   ): Promise<void> => {
+    const tabId = this.get().activeTabId ?? this.addTab();
     const { getSession, openDiffSession } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
-    const session = getSession(noteId);
 
-    if (session && !options.force) {
-      if (!session.needsHydration) {
+    const tab = this.get().tabs.find((t) => t.id === tabId);
+    const session = tab && getSession(tab.sessionId);
+    if (
+      session &&
+      "note" in session &&
+      session.note.id === noteId &&
+      !options.force
+    ) {
+      if (!session.needsHydration)
         return this.activateSession(noteId, options.activeBlockId);
-      }
-
       if (session.type === "diff" || session.type === "conflicted") {
         return openDiffSession(session.note.id, session.id);
       }
@@ -593,11 +632,16 @@ class EditorStore extends BaseStore<EditorStore> {
     if (session && session.id) await db.fs().cancel(session.id);
 
     const note =
-      typeof noteOrId === "object"
+      typeof noteOrId === "object" && !session?.needsHydration
         ? noteOrId
         : (await db.notes.note(noteId)) || (await db.notes.trashed(noteId));
     if (!note) return;
-    const isPreview = session ? session.preview : !options?.newSession;
+
+    const sessionId =
+      session?.needsHydration || session?.type === "new"
+        ? session.id
+        : tabSessionHistory.add(tabId);
+    console.log("opening session", session);
     const isLocked = await db.vaults.itemExists(note);
 
     if (note.conflicted) {
@@ -626,11 +670,10 @@ class EditorStore extends BaseStore<EditorStore> {
         {
           type: "conflicted",
           content: content,
-          id: note.id,
-          pinned: session?.pinned,
+          id: sessionId,
           note,
-          preview: isPreview,
-          activeBlockId: options.activeBlockId
+          activeBlockId: options.activeBlockId,
+          tabId
         },
         !options.silent
       );
@@ -638,11 +681,10 @@ class EditorStore extends BaseStore<EditorStore> {
       this.addSession(
         {
           type: "locked",
-          id: note.id,
-          pinned: session?.pinned,
+          id: sessionId,
           note,
-          preview: isPreview,
-          activeBlockId: options.activeBlockId
+          activeBlockId: options.activeBlockId,
+          tabId
         },
         !options.silent
       );
@@ -661,10 +703,10 @@ class EditorStore extends BaseStore<EditorStore> {
           {
             type: "deleted",
             note,
-            id: note.id,
-            pinned: session?.pinned,
+            id: sessionId,
             content,
-            activeBlockId: options.activeBlockId
+            activeBlockId: options.activeBlockId,
+            tabId
           },
           !options.silent
         );
@@ -679,12 +721,12 @@ class EditorStore extends BaseStore<EditorStore> {
             {
               type: "readonly",
               note,
-              id: note.id,
-              pinned: session?.pinned,
+              id: sessionId,
               content,
               color: colors[0]?.fromId,
               tags,
-              activeBlockId: options.activeBlockId
+              activeBlockId: options.activeBlockId,
+              tabId
             },
             !options.silent
           );
@@ -692,17 +734,16 @@ class EditorStore extends BaseStore<EditorStore> {
           this.addSession(
             {
               type: "default",
-              id: note.id,
+              id: sessionId,
               note,
               saveState: SaveState.Saved,
               sessionId: `${Date.now()}`,
               attachmentsLength,
-              pinned: session?.pinned,
               tags,
               color: colors[0]?.fromId,
               content,
-              preview: isPreview,
-              activeBlockId: options.activeBlockId
+              activeBlockId: options.activeBlockId,
+              tabId
             },
             !options.silent
           );
@@ -712,59 +753,96 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   openNextSession = () => {
-    const { sessions, activeSessionId } = this.get();
-    if (sessions.length === 0 || sessions.length === 1) return;
+    const { tabs, activeTabId } = this.get();
+    if (tabs.length <= 1) return;
 
-    const index = sessions.findIndex((s) => s.id === activeSessionId);
+    const index = tabs.findIndex((s) => s.id === activeTabId);
     if (index === -1) return;
 
-    if (index === sessions.length - 1) {
-      return this.openSession(sessions[0].id);
+    if (index === tabs.length - 1) {
+      return this.focusTab(tabs[0].id);
     }
-    return this.openSession(sessions[index + 1].id);
+    return this.focusTab(tabs[index + 1].id);
   };
 
   openPreviousSession = () => {
-    const { sessions, activeSessionId } = this.get();
-    if (sessions.length === 0 || sessions.length === 1) return;
+    const { tabs, activeTabId } = this.get();
+    if (tabs.length <= 1) return;
 
-    const index = sessions.findIndex((s) => s.id === activeSessionId);
+    const index = tabs.findIndex((s) => s.id === activeTabId);
     if (index === -1) return;
 
     if (index === 0) {
-      return this.openSession(sessions[sessions.length - 1].id);
+      return this.openSession(tabs[tabs.length - 1].id);
     }
-    return this.openSession(sessions[index - 1].id);
+    return this.openSession(tabs[index - 1].id);
+  };
+
+  goBack = async () => {
+    console.log("GO BACK!");
+    const activeTabId = this.get().activeTabId;
+    if (!activeTabId || !tabSessionHistory.canGoBack(activeTabId)) return;
+    const sessionId = tabSessionHistory.back(activeTabId);
+    if (!sessionId) return;
+    const session = this.get().getSession(sessionId);
+    if (!session) {
+      tabSessionHistory.remove(activeTabId, sessionId);
+      await this.goBack();
+      return;
+    }
+    // we must rehydrate the session as the note's content can be stale
+    this.updateSession(sessionId, undefined, {
+      needsHydration: true
+    });
+    this.activateSession(sessionId);
+    if ("note" in session) {
+      const note = await db.notes.note(session.note.id);
+      if (!note) {
+        tabSessionHistory.remove(activeTabId, sessionId);
+        this.set((state) => {
+          const index = state.sessions.findIndex((s) => s.id === session.id);
+          state.sessions.splice(index, 1);
+        });
+        await this.goBack();
+        return;
+      }
+      await this.openSession(note);
+    }
+  };
+
+  goForward = async () => {
+    const activeTabId = this.get().activeTabId;
+    if (!activeTabId || !tabSessionHistory.canGoForward(activeTabId)) return;
+    const sessionId = tabSessionHistory.forward(activeTabId);
+    if (!sessionId) return;
+    const session = this.get().getSession(sessionId);
+    if (!session) {
+      tabSessionHistory.remove(activeTabId, sessionId);
+      await this.goForward();
+      return;
+    }
+    this.activateSession(sessionId);
+    if ("note" in session) {
+      const note = await db.notes.note(session.note.id);
+      if (!note) {
+        tabSessionHistory.remove(activeTabId, sessionId);
+        this.set((state) => {
+          const index = state.sessions.findIndex((s) => s.id === session.id);
+          state.sessions.splice(index, 1);
+        });
+        await this.goForward();
+        return;
+      }
+      await this.openSession(note);
+    }
   };
 
   addSession = (session: EditorSession, activate = true) => {
-    let oldSessionId: string | null = null;
-
     this.set((state) => {
-      const { activeSessionIndex, duplicateSessionIndex, previewSessionIndex } =
-        findSessionIndices(state.sessions, session, state.activeSessionId);
-
-      if (duplicateSessionIndex > -1) {
-        oldSessionId = state.sessions[duplicateSessionIndex].id;
-        state.sessions[duplicateSessionIndex] = session;
-      } else if (previewSessionIndex > -1) {
-        oldSessionId = state.sessions[previewSessionIndex].id;
-        state.sessions[previewSessionIndex] = session;
-      } else if (activeSessionIndex > -1)
-        state.sessions.splice(activeSessionIndex + 1, 0, session);
+      const index = state.sessions.findIndex((s) => s.id === session.id);
+      if (index > -1) state.sessions[index] = session;
       else state.sessions.push(session);
-      state.sessions.sort((a, b) =>
-        a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
-      );
     });
-
-    const { history } = this.get();
-    if (
-      oldSessionId &&
-      oldSessionId !== session.id &&
-      history.includes(oldSessionId)
-    )
-      history.splice(history.indexOf(oldSessionId), 1);
 
     if (activate) this.activateSession(session.id);
   };
@@ -786,6 +864,10 @@ class EditorStore extends BaseStore<EditorStore> {
       this.setSaveState(id, 0);
       try {
         const sessionId = getSessionId(currentSession);
+        const noteId =
+          ("note" in currentSession
+            ? currentSession.note.id
+            : partial.note?.id) || id;
 
         if (isLockedSession(currentSession) && partial.content) {
           logger.debug("Saving locked content", { id });
@@ -793,7 +875,7 @@ class EditorStore extends BaseStore<EditorStore> {
           await db.vault.save({
             content: partial.content,
             sessionId,
-            id
+            id: noteId
           });
         } else {
           if (partial.content)
@@ -813,18 +895,18 @@ class EditorStore extends BaseStore<EditorStore> {
                 : undefined,
             content: partial.content,
             sessionId,
-            id
+            id: noteId
           });
         }
 
-        const note = await db.notes.note(id);
+        const note = await db.notes.note(noteId);
         if (!note) throw new Error("Note not saved.");
 
         if (currentSession.type === "new") {
           if (currentSession.context) {
             const { type } = currentSession.context;
             if (type === "notebook")
-              await db.notes.addToNotebook(currentSession.context.id, id);
+              await db.notes.addToNotebook(currentSession.context.id, noteId);
             else if (type === "color" || type === "tag")
               await db.relations.add(
                 { type, id: currentSession.context.id },
@@ -833,16 +915,15 @@ class EditorStore extends BaseStore<EditorStore> {
           } else {
             const defaultNotebook = db.settings.getDefaultNotebook();
             if (defaultNotebook)
-              await db.notes.addToNotebook(defaultNotebook, id);
+              await db.notes.addToNotebook(defaultNotebook, noteId);
           }
         }
 
         const attachmentsLength = await db.attachments
-          .ofNote(id, "all")
+          .ofNote(note.id, "all")
           .count();
         const shouldRefreshNotes =
           currentSession.type === "new" ||
-          !id ||
           note.title !== currentSession.note?.title ||
           note.headline !== currentSession.note?.headline ||
           attachmentsLength !== currentSession.attachmentsLength;
@@ -869,7 +950,6 @@ class EditorStore extends BaseStore<EditorStore> {
           }
 
           this.updateSession(id, ["default"], {
-            preview: false,
             attachmentsLength: attachmentsLength,
             note,
             sessionId
@@ -889,8 +969,8 @@ class EditorStore extends BaseStore<EditorStore> {
         this.setSaveState(id, SaveState.NotSaved);
         console.error(err);
         if (err instanceof Error) logger.error(err);
-        if (isLockedSession(currentSession)) {
-          this.get().openSession(id, { force: true });
+        if (isLockedSession(currentSession) && "note" in currentSession) {
+          this.get().openSession(currentSession.note, { force: true });
         }
       }
     });
@@ -916,43 +996,56 @@ class EditorStore extends BaseStore<EditorStore> {
   };
 
   newSession = () => {
-    const state = useEditorStore.getState();
-    const session = state.sessions.find((session) => session.type === "new");
-    if (session) {
-      session.context = useNoteStore.getState().context;
-      this.activateSession(session.id);
-    } else {
-      this.addSession({
-        type: "new",
-        id: getId(),
-        context: useNoteStore.getState().context,
-        saveState: SaveState.NotSaved
-      });
+    const { activeTabId } = this.get();
+    if (!activeTabId) {
+      this.addTab();
+      return;
     }
+
+    const session = this.getActiveSession();
+    if (session?.type === "new") return;
+
+    const sessionId = tabSessionHistory.add(activeTabId);
+    this.addSession({
+      type: "new",
+      id: sessionId,
+      tabId: activeTabId,
+      context: useNoteStore.getState().context,
+      saveState: SaveState.NotSaved
+    });
   };
 
-  closeSessions = (...ids: string[]) => {
+  closeTabs = (...ids: string[]) => {
     this.set((state) => {
-      const sessions: EditorSession[] = [];
-      for (let i = 0; i < state.sessions.length; ++i) {
-        const session = state.sessions[i];
-        if (!ids.includes(session.id)) {
-          sessions.push(session);
+      const tabs: TabItem[] = [];
+      for (let i = 0; i < state.tabs.length; ++i) {
+        const tab = state.tabs[i];
+        if (!ids.includes(tab.id)) {
+          tabs.push(tab);
           continue;
         }
 
-        this.saveSessionContentIfNotSaved(session.id);
+        this.saveSessionContentIfNotSaved(tab.sessionId);
 
-        db.fs().cancel(session.id).catch(console.error);
-        if (state.history.includes(session.id))
-          state.history.splice(state.history.indexOf(session.id), 1);
+        db.fs().cancel(tab.sessionId).catch(console.error);
+        if (state.history.includes(tab.id))
+          state.history.splice(state.history.indexOf(tab.id), 1);
+
+        const tabHistory = tabSessionHistory.getTabHistory(tab.id);
+        state.sessions = state.sessions.filter((session) => {
+          return (
+            !tabHistory.back.includes(session.id) &&
+            !tabHistory.forward.includes(session.id)
+          );
+        });
+        tabSessionHistory.clearStackForTab(tab.id);
       }
-      state.sessions = sessions;
+      state.tabs = tabs;
     });
 
-    const { history, sessions } = this.get();
-    this.activateSession(history.pop());
-    if (sessions.length === 0) this.newSession();
+    const { history, tabs } = this.get();
+    this.focusTab(history.pop());
+    if (tabs.length === 0) this.addTab();
   };
 
   setTitle = (id: string, title: string) => {
@@ -1004,22 +1097,82 @@ class EditorStore extends BaseStore<EditorStore> {
     this.set({ editorMargins: editorMarginsState });
     Config.set("editor:margins", editorMarginsState);
   };
+
+  getActiveTab = () => {
+    const activeTabId = this.get().activeTabId;
+    return this.get().tabs.find((t) => t.id === activeTabId);
+  };
+
+  getActiveNote = () => {
+    const session = this.getActiveSession();
+    return session && "note" in session ? session.note : undefined;
+  };
+
+  isNoteOpen = (noteId: string) => {
+    return this.getActiveNote()?.id === noteId;
+  };
+
+  getActiveSession = <T extends SessionType[]>(
+    types?: T
+  ): SessionTypeMap[T[number]] | undefined => {
+    const activeTab = this.getActiveTab();
+    if (!activeTab) return;
+    const session = this.getSession(activeTab.sessionId);
+    if (session && (!types || types.includes(session.type)))
+      return session as SessionTypeMap[T[number]];
+  };
+
+  addTab = (tab?: Omit<Partial<TabItem>, "id">) => {
+    const id = getId();
+    const sessionId = tabSessionHistory.add(id);
+    this.set((state) => {
+      state.tabs.push({
+        ...tab,
+        id,
+        sessionId
+      });
+    });
+    this.addSession({
+      type: "new",
+      tabId: id,
+      id: sessionId,
+      saveState: SaveState.NotSaved
+    });
+    this.focusTab(id);
+    return id;
+  };
+
+  focusTab = (id: string | undefined) => {
+    if (id === undefined) return;
+
+    const { history } = this.get();
+    if (history.includes(id)) history.splice(history.indexOf(id), 1);
+    history.push(id);
+
+    this.set({
+      activeTabId: id,
+      canGoBack: tabSessionHistory.canGoBack(id),
+      canGoForward: tabSessionHistory.canGoForward(id)
+    });
+  };
 }
 
 const useEditorStore = createPersistedStore(EditorStore, {
   name: "editor-sessions",
   partialize: (state) => ({
     history: state.history,
-    activeSessionId: state.activeSessionId,
     arePropertiesVisible: state.arePropertiesVisible,
     editorMargins: state.editorMargins,
+    tabs: state.tabs,
+    activeTabId: state.activeTabId,
+    tabHistory: state.tabHistory,
+    canGoBack: state.canGoBack,
+    canGoForward: state.canGoForward,
     sessions: state.sessions.reduce((sessions, session) => {
       sessions.push({
         id: session.id,
         type: isLockedSession(session) ? "locked" : session.type,
         needsHydration: session.type === "new" ? false : true,
-        preview: session.preview,
-        pinned: session.pinned,
         title: session.title,
         note:
           "note" in session
@@ -1036,28 +1189,6 @@ const useEditorStore = createPersistedStore(EditorStore, {
   storage: db.config() as PersistStorage<Partial<EditorStore>>
 });
 export { useEditorStore, SESSION_STATES };
-
-function findSessionIndices(
-  sessions: EditorSession[],
-  session: EditorSession,
-  activeSessionId?: string
-) {
-  let activeSessionIndex = -1;
-  let previewSessionIndex = -1;
-  let duplicateSessionIndex = -1;
-  for (let i = 0; i < sessions.length; ++i) {
-    const { id, preview } = sessions[i];
-    if (id === session.id) duplicateSessionIndex = i;
-    else if (preview && session.preview) previewSessionIndex = i;
-    else if (id === activeSessionId) activeSessionIndex = i;
-  }
-
-  return {
-    activeSessionIndex,
-    previewSessionIndex,
-    duplicateSessionIndex
-  };
-}
 
 const MILLISECONDS_IN_A_MINUTE = 60 * 1000;
 const SESSION_DURATION = MILLISECONDS_IN_A_MINUTE * 5;

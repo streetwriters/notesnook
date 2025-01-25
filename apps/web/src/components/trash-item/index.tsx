@@ -34,7 +34,7 @@ import { strings } from "@notesnook/intl";
 type TrashItemProps = { item: TrashItemType; date: number };
 function TrashItem(props: TrashItemProps) {
   const { item, date } = props;
-  const isOpened = useEditorStore((store) => store.activeSessionId === item.id);
+  const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
 
   return (
     <ListItem
