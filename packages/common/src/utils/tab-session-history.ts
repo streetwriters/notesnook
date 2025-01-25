@@ -19,14 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getId } from "@notesnook/core";
 
+export type TabHistory = Record<
+  string,
+  { backStack: string[]; forwardStack: string[] }
+>;
 export type TabState = {
-  tabSessionHistory: Record<
-    number,
-    { back_stack: string[]; forward_stack: string[] }
-  >;
+  tabSessionHistory: TabHistory;
   canGoBack?: boolean;
   canGoForward?: boolean;
-  sessionId?: string;
 };
 
 export class TabSessionHistory {
@@ -34,146 +34,142 @@ export class TabSessionHistory {
     public options: {
       set: (state: TabState) => void;
       get: () => TabState;
-      getCurrentTab: () => number;
     }
   ) {}
 
-  get back_stack() {
-    return (
-      this.options
-        .get()
-        .tabSessionHistory[this.options.getCurrentTab()]?.back_stack.slice() ||
-      []
-    );
+  getBackStack(id: string) {
+    const tabHistory = this.options.get().tabSessionHistory[id];
+    if (!tabHistory) return [];
+    return tabHistory.backStack.slice();
   }
 
-  set back_stack(value: string[]) {
-    const currentTab = this.options.getCurrentTab();
+  getForwardStack(id: string) {
+    const tabHistory = this.options.get().tabSessionHistory[id];
+    if (!tabHistory) return [];
+    return tabHistory.forwardStack.slice();
+  }
+
+  setBackStack(id: string, value: string[]) {
     const tabHistory = this.options.get().tabSessionHistory;
-    console.log("back_stack", value);
     this.options.set({
       canGoBack: value.length > 1,
-      sessionId: this.currentSessionId(),
       tabSessionHistory: {
         ...tabHistory,
-        [currentTab]: {
-          ...(tabHistory[currentTab] || {}),
-          back_stack: value
+        [id]: {
+          ...(tabHistory[id] || {}),
+          backStack: value
         }
       }
     });
   }
 
-  get forward_stack() {
-    return (
-      this.options
-        .get()
-        .tabSessionHistory[
-          this.options.getCurrentTab()
-        ]?.forward_stack.slice() || []
-    );
-  }
-
-  set forward_stack(value: string[]) {
-    const currentTab = this.options.getCurrentTab();
+  setForwardStack(id: string, value: string[]) {
     const tabHistory = this.options.get().tabSessionHistory;
-    console.log("forward_stack", value);
     this.options.set({
       canGoForward: value.length > 0,
-      sessionId: this.currentSessionId(),
       tabSessionHistory: {
         ...tabHistory,
-        [currentTab]: {
-          ...(tabHistory[currentTab] || {}),
-          forward_stack: value
+        [id]: {
+          ...(tabHistory[id] || {}),
+          forwardStack: value
         }
       }
     });
   }
 
-  add() {
+  add(id: string) {
     const sessionId = getId();
-    const back_stack = this.back_stack;
+    const back_stack = this.getBackStack(id);
     back_stack.push(sessionId);
-    this.back_stack = back_stack;
-    this.forward_stack = [];
+    this.setBackStack(id, back_stack);
+    this.setForwardStack(id, []);
     return sessionId;
   }
 
-  clearStackForTab(tabId: number) {
+  clearStackForTab(tabId: string) {
     this.options.set({
       tabSessionHistory: {
         ...this.options.get().tabSessionHistory,
         [tabId]: {
-          back_stack: [],
-          forward_stack: []
+          backStack: [],
+          forwardStack: []
         }
       }
     });
   }
 
-  back(): string | null {
-    if (!this.canGoBack()) return null;
+  back(id: string): string | null {
+    if (!this.canGoBack(id)) return null;
 
-    const back_stack = this.back_stack;
-    const forward_stack = this.forward_stack;
+    const backStack = this.getBackStack(id);
+    const forwardStack = this.getForwardStack(id);
 
-    const current_item = back_stack.pop();
-    const next_item = back_stack[back_stack.length - 1];
+    const currentItem = backStack.pop();
+    const nextItem = backStack[backStack.length - 1];
 
-    current_item && forward_stack.push(current_item);
+    currentItem && forwardStack.push(currentItem);
 
-    this.forward_stack = forward_stack;
-    this.back_stack = back_stack;
+    this.setForwardStack(id, forwardStack);
+    this.setBackStack(id, backStack);
 
-    console.log("back", this.forward_stack, this.back_stack);
-
-    return next_item;
+    return nextItem;
   }
 
-  remove(id: string) {
-    const back_stack = this.back_stack;
-    let index = back_stack.findIndex((item) => item === id);
+  remove(tabId: string, sessionId: string) {
+    const backStack = this.getBackStack(tabId);
+    let index = backStack.findIndex((item) => item === sessionId);
     if (index === -1) {
-      const forward_stack = this.forward_stack;
-      index = forward_stack.findIndex((item) => item === id);
-      forward_stack.splice(index, 1);
-      this.forward_stack = forward_stack;
+      const forwardStack = this.getForwardStack(tabId);
+      index = forwardStack.findIndex((item) => item === sessionId);
+      forwardStack.splice(index, 1);
+      this.setForwardStack(tabId, forwardStack);
     } else {
-      back_stack.splice(index, 1);
-      this.back_stack = back_stack;
+      backStack.splice(index, 1);
+      this.setBackStack(tabId, backStack);
     }
   }
 
-  forward(): string | null {
-    if (!this.canGoForward()) return null;
+  forward(id: string): string | null {
+    if (!this.canGoForward(id)) return null;
 
-    const back_stack = this.back_stack;
-    const forward_stack = this.forward_stack;
+    const backStack = this.getBackStack(id);
+    const forwardStack = this.getForwardStack(id);
 
-    const item = forward_stack.pop() as string;
-    this.forward_stack = forward_stack;
-    back_stack.push(item);
-    this.back_stack = back_stack;
+    const item = forwardStack.pop() as string;
+    this.setForwardStack(id, forwardStack);
+    backStack.push(item);
+    this.setBackStack(id, backStack);
     return item;
   }
 
-  currentSessionId() {
-    return this.back_stack[this.back_stack.length - 1];
+  currentSessionId(id: string) {
+    const { back } = this.getTabHistory(id);
+    return back[back.length - 1];
   }
 
-  getHistory() {
+  getTabHistory(id: string) {
+    const tabHistory = this.options.get().tabSessionHistory[id];
+    if (!tabHistory)
+      return {
+        back: [],
+        forward: []
+      };
+
     return {
-      back: this.back_stack,
-      forward: this.forward_stack
+      back: tabHistory.backStack?.slice() || [],
+      forward: tabHistory.forwardStack?.slice() || []
     };
   }
 
-  canGoBack() {
-    return this.back_stack.length > 1;
+  canGoBack(id: string) {
+    const tabHistory = this.options.get().tabSessionHistory[id];
+    if (!tabHistory) return false;
+    return tabHistory.backStack.length > 1;
   }
 
-  canGoForward() {
-    return this.forward_stack.length > 0;
+  canGoForward(id: string) {
+    const tabHistory = this.options.get().tabSessionHistory[id];
+    if (!tabHistory) return false;
+    return tabHistory.forwardStack.length >= 1;
   }
 }
