@@ -31,6 +31,7 @@ import {
 } from "../../stores/command-palette-store";
 import { Icon } from "../../components/icons";
 import { toTitleCase } from "@notesnook/common";
+import { match, surround } from "fuzzyjs";
 
 type GroupedCommands = Record<
   string,
@@ -254,35 +255,23 @@ export const CommandPaletteDialog = DialogManager.register(
 );
 
 function Highlighter({ text, query }: { text: string; query: string }) {
-  const indices = getMatchingIndices(text, query);
-
-  if (indices.length === 0) {
-    return <>{text}</>;
-  }
+  const queryClean = query.startsWith(">")
+    ? query.slice(1).trim()
+    : query.trim();
+  const result = queryClean.length > 0 ? match(queryClean, text) : false;
 
   return (
-    <span>
-      {indices.map((index, i) => (
-        <Fragment key={i}>
-          {text.substring(i === 0 ? 0 : indices[i - 1] + 1, index)}
-          <b style={{ color: "var(--accent-foreground)" }}>{text[index]}</b>
-        </Fragment>
-      ))}
-      {text.substring(indices[indices.length - 1] + 1)}
-    </span>
+    <span
+      dangerouslySetInnerHTML={{
+        __html:
+          result && result.match
+            ? surround(text, {
+                result: result,
+                prefix: "<b style='color: var(--accent-foreground)'>",
+                suffix: "</b>"
+              })
+            : text
+      }}
+    ></span>
   );
-}
-
-function getMatchingIndices(text: string, query: string) {
-  const indices: number[] = [];
-  const set = new Set(query.toLowerCase());
-  const lowerText = text.toLowerCase();
-
-  for (let i = 0; i < lowerText.length; i++) {
-    if (set.has(lowerText[i])) {
-      indices.push(i);
-    }
-  }
-
-  return indices;
 }
