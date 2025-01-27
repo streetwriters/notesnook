@@ -124,3 +124,43 @@ test("new tab button should open a new tab", async ({ page }) => {
   expect(await tabs[0].title()).toBe("Note 1");
   expect(await tabs[1].title()).toBe("Untitled");
 });
+
+test("changes in a note opened in multiple tabs should sync", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote({ title: "Note 1" });
+  await note?.contextMenu.openInNewTab();
+
+  await notes.editor.editAndWait(async () => {
+    await notes.editor.setContent("This change should sync.");
+  });
+
+  const tabs = await notes.editor.getTabs();
+  await tabs[0].click();
+  expect(await notes.editor.getContent("text")).toBe(
+    "This change should sync."
+  );
+});
+
+test("open same note in 2 tabs and refresh page", async ({ page }) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote({
+    title: "Note 1",
+    content: "Some edits."
+  });
+  await note?.contextMenu.openInNewTab();
+  await notes.editor.waitForLoading();
+
+  await page.reload();
+  await notes.waitForList();
+
+  const tabs = await notes.editor.getTabs();
+  await tabs[0].click();
+  await notes.editor.waitForLoading();
+  expect(await notes.editor.getContent("text")).toBe("Some edits.");
+});

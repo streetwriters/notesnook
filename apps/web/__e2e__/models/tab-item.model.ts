@@ -30,9 +30,15 @@ export class TabItemModel {
     const testId = await this.locator.getAttribute("data-test-id");
     return testId?.replace("tab-", "");
   }
+
+  async click() {
+    return this.locator.click();
+  }
+
   async title() {
     return this.locator.locator(getTestId("tab-title")).textContent();
   }
+
   close() {
     return this.closeButton.click();
   }

@@ -352,10 +352,16 @@ function EditorView({
         }
         onContentChange={() => (lastChangedTime.current = Date.now())}
         onSave={(content, ignoreEdit) => {
-          const noteId = "note" in session ? session.note.id : null;
+          const currentSession = useEditorStore
+            .getState()
+            .getSession(session.id);
+          const noteId =
+            currentSession && "note" in currentSession
+              ? currentSession.note.id
+              : null;
           const sessions = noteId
             ? useEditorStore.getState().getSessionsForNote(noteId)
-            : [session];
+            : [currentSession];
 
           const currentSessionId = session.id;
           const data = content();
