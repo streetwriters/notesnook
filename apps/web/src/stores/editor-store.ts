@@ -608,9 +608,12 @@ class EditorStore extends BaseStore<EditorStore> {
       force?: boolean;
       activeBlockId?: string;
       silent?: boolean;
+      openInNewTab?: boolean;
     } = {}
   ): Promise<void> => {
-    const tabId = this.get().activeTabId ?? this.addTab();
+    const tabId = options.openInNewTab
+      ? this.addTab()
+      : this.get().activeTabId ?? this.addTab();
     const { getSession, openDiffSession } = this.get();
     const noteId = typeof noteOrId === "string" ? noteOrId : noteOrId.id;
 
@@ -1122,12 +1125,11 @@ class EditorStore extends BaseStore<EditorStore> {
       return session as SessionTypeMap[T[number]];
   };
 
-  addTab = (tab?: Omit<Partial<TabItem>, "id">) => {
+  addTab = () => {
     const id = getId();
     const sessionId = tabSessionHistory.add(id);
     this.set((state) => {
       state.tabs.push({
-        ...tab,
         id,
         sessionId
       });

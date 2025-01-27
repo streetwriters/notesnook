@@ -146,7 +146,7 @@ function Note(props: NoteProps) {
       menuItems={menuItems}
       onClick={() => useEditorStore.getState().openSession(note)}
       onMiddleClick={() =>
-        useEditorStore.getState().openSession(note, { newSession: true })
+        useEditorStore.getState().openSession(note, { openInNewTab: true })
       }
       header={
         <Flex
@@ -331,6 +331,14 @@ const menuItems: (
   // const isSynced = db.notes.note(note.id)?.synced();
 
   return [
+    {
+      type: "button",
+      key: "openinnewtab",
+      title: strings.openInNewTab(),
+      icon: OpenInNew.path,
+      onClick: () =>
+        useEditorStore.getState().openSession(note.id, { openInNewTab: true })
+    },
     {
       type: "button",
       key: "pin",
