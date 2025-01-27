@@ -38,6 +38,7 @@ export class EditorModel {
   private readonly tabsList: Locator;
   private readonly goBackButton: Locator;
   private readonly goForwardButton: Locator;
+  private readonly newTabButton: Locator;
   readonly savedIcon: Locator;
   readonly notSavedIcon: Locator;
 
@@ -63,6 +64,7 @@ export class EditorModel {
     this.tabsList = page.locator(getTestId("tabs"));
     this.goBackButton = page.locator(getTestId("go-back"));
     this.goForwardButton = page.locator(getTestId("go-forward"));
+    this.newTabButton = page.locator(getTestId("new-tab"));
   }
 
   async waitForLoading(title?: string, content?: string) {
@@ -261,6 +263,10 @@ export class EditorModel {
 
   async goForward() {
     await this.goForwardButton.click();
+  }
+
+  async newTab() {
+    await this.newTabButton.click();
   }
 
   async attachImage() {
