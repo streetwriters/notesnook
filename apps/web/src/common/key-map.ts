@@ -21,6 +21,7 @@ import hotkeys from "hotkeys-js";
 import { useEditorStore } from "../stores/editor-store";
 import { useStore as useSearchStore } from "../stores/search-store";
 import { useEditorManager } from "../components/editor/manager";
+import { CommandPaletteDialog } from "../dialogs/command-palette";
 
 function isInEditor(e: KeyboardEvent) {
   return (
@@ -123,7 +124,7 @@ const KEYMAP = [
 
       useSearchStore.setState({ isSearching: true, searchType: "notes" });
     }
-  }
+  },
   // {
   //   keys: ["alt+n"],
   //   description: "Go to Notes",
@@ -187,6 +188,15 @@ const KEYMAP = [
   //     themestore.get().toggleNightMode();
   //   },
   // },
+  {
+    keys: ["ctrl+k"],
+    description: "Open command palette",
+    global: false,
+    action: (e: KeyboardEvent) => {
+      e.preventDefault();
+      CommandPaletteDialog.show(true);
+    }
+  }
 ];
 
 export function registerKeyMap() {

@@ -23,9 +23,19 @@ import { Fragment, useEffect, useRef } from "react";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
 import Field from "../../components/field";
-import { useCommandPaletteStore } from "../../stores/command-palette-store";
+import {
+  type Command,
+  useCommandPaletteStore,
+  getCommandAction,
+  getCommandIcon
+} from "../../stores/command-palette-store";
 import { Icon } from "../../components/icons";
 import { toTitleCase } from "@notesnook/common";
+
+type GroupedCommands = Record<
+  string,
+  (Command & { index: number; icon: Icon | undefined })[]
+>;
 
 export const CommandPaletteDialog = DialogManager.register(
   function CommandPaletteDialog(props: BaseDialogProps<boolean>) {
@@ -35,8 +45,6 @@ export const CommandPaletteDialog = DialogManager.register(
       query,
       setQuery,
       commands,
-      getCommandIcon,
-      getCommandAction,
       search,
       setCommands,
       reset
@@ -86,7 +94,7 @@ export const CommandPaletteDialog = DialogManager.register(
         index
       });
       return acc;
-    }, {} as Record<string, ((typeof commands)[number] & { index: number; icon: Icon | undefined })[]>);
+    }, {} as GroupedCommands);
 
     return (
       <Dialog
@@ -152,9 +160,7 @@ export const CommandPaletteDialog = DialogManager.register(
               >
                 {Object.entries(grouped).map(([group, commands]) => (
                   <Flex sx={{ flexDirection: "column", gap: 1, mx: 1 }}>
-                    <Text variant="subBody">
-                      {toTitleCase(group)}
-                    </Text>
+                    <Text variant="subBody">{toTitleCase(group)}</Text>
                     <Flex
                       sx={{
                         flexDirection: "column",

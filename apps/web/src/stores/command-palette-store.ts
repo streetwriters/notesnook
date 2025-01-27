@@ -31,7 +31,7 @@ import { commands as COMMANDS } from "../dialogs/command-palette/commands";
 import { hashNavigate, navigate } from "../navigation";
 import { useEditorStore } from "./editor-store";
 
-interface Command {
+export interface Command {
   id: string;
   title: string;
   type: "command" | "note" | "notebook" | "tag" | "reminder";
@@ -48,15 +48,15 @@ const CommandActionMap = COMMANDS.reduce((acc, command) => {
   return acc;
 }, new Map<string, (arg?: any) => void>());
 
-const cache = new Map<string, Command[]>();
+const CommandTypeItems = COMMANDS.map((c) => ({
+  id: c.id,
+  title: c.title,
+  group: c.group,
+  type: "command" as const
+}));
 
 class CommandPaletteStore extends BaseStore<CommandPaletteStore> {
-  commands: Command[] = COMMANDS.map((c) => ({
-    id: c.id,
-    title: c.title,
-    group: c.group,
-    type: "command"
-  }));
+  commands: Command[] = CommandTypeItems;
   selected = 0;
   query = ">";
 
@@ -79,11 +79,6 @@ class CommandPaletteStore extends BaseStore<CommandPaletteStore> {
   };
 
   search = (query: string) => {
-    console.log("store cache", cache);
-    if (cache.has(query)) {
-      console.log("store cache hit", query, cache);
-      return cache.get(query);
-    }
     if (this.isCommandMode(query)) {
       return this.commandSearch(query);
     } else {
@@ -104,72 +99,15 @@ class CommandPaletteStore extends BaseStore<CommandPaletteStore> {
     }
   };
 
-  getCommandAction = ({
-    id,
-    type
-  }: {
-    id: Command["id"];
-    type: Command["type"];
-  }) => {
-    switch (type) {
-      case "command":
-        return CommandActionMap.get(id);
-      case "note":
-        return (noteId: string) =>
-          useEditorStore.getState().openSession(noteId);
-      case "notebook":
-        return (notebookId: string) => navigate(`/notebooks/${notebookId}`);
-      case "tag":
-        return (tagId: string) => navigate(`/tags/${tagId}`);
-      case "reminder":
-        return (reminderId: string) =>
-          hashNavigate(`/reminders/${reminderId}/edit`);
-      default:
-        return undefined;
-    }
-  };
-
-  getCommandIcon = ({
-    id,
-    type
-  }: {
-    id: Command["id"];
-    type: Command["type"];
-  }) => {
-    switch (type) {
-      case "command":
-        return CommandIconMap.get(id);
-      case "note":
-        return NoteIcon;
-      case "notebook":
-        return NotebookIcon;
-      case "tag":
-        return TagIcon;
-      case "reminder":
-        return ReminderIcon;
-      default:
-        return undefined;
-    }
-  };
-
   reset = () => {
     this.set({
       query: ">",
       selected: 0,
-      commands: COMMANDS.map((c) => {
-        return {
-          id: c.id,
-          title: c.title,
-          group: c.group,
-          type: "command"
-        };
-      })
+      commands: CommandTypeItems
     });
-    cache.clear();
   };
 
   private commandSearch(query: string) {
-    console.log("store command search", query, this.commands);
     const str = query.substring(1).trim();
     if (str === "") return this.commands;
     const matches = db.lookup.fuzzy(
@@ -183,7 +121,6 @@ class CommandPaletteStore extends BaseStore<CommandPaletteStore> {
   }
 
   private async dbSearch(query: string) {
-    console.log("store db search", query);
     const notes = db.lookup.noteTitles(query);
     const notebooks = db.lookup.notebooks(query, {
       titleOnly: true
@@ -208,7 +145,6 @@ class CommandPaletteStore extends BaseStore<CommandPaletteStore> {
         type: item.type
       };
     });
-    cache.set(query, commands);
     return commands;
   }
 
@@ -222,3 +158,50 @@ const [useCommandPaletteStore] = createStore<CommandPaletteStore>(
 );
 
 export { useCommandPaletteStore };
+
+export function getCommandAction({
+  id,
+  type
+}: {
+  id: Command["id"];
+  type: Command["type"];
+}) {
+  switch (type) {
+    case "command":
+      return CommandActionMap.get(id);
+    case "note":
+      return (noteId: string) => useEditorStore.getState().openSession(noteId);
+    case "notebook":
+      return (notebookId: string) => navigate(`/notebooks/${notebookId}`);
+    case "tag":
+      return (tagId: string) => navigate(`/tags/${tagId}`);
+    case "reminder":
+      return (reminderId: string) =>
+        hashNavigate(`/reminders/${reminderId}/edit`);
+    default:
+      return undefined;
+  }
+}
+
+export function getCommandIcon({
+  id,
+  type
+}: {
+  id: Command["id"];
+  type: Command["type"];
+}) {
+  switch (type) {
+    case "command":
+      return CommandIconMap.get(id);
+    case "note":
+      return NoteIcon;
+    case "notebook":
+      return NotebookIcon;
+    case "tag":
+      return TagIcon;
+    case "reminder":
+      return ReminderIcon;
+    default:
+      return undefined;
+  }
+}
