@@ -25,6 +25,7 @@ import Dialog from "../../components/dialog";
 import Field from "../../components/field";
 import { useCommandPaletteStore } from "../../stores/command-palette-store";
 import { Icon } from "../../components/icons";
+import { toTitleCase } from "@notesnook/common";
 
 export const CommandPaletteDialog = DialogManager.register(
   function CommandPaletteDialog(props: BaseDialogProps<boolean>) {
@@ -152,7 +153,7 @@ export const CommandPaletteDialog = DialogManager.register(
                 {Object.entries(grouped).map(([group, commands]) => (
                   <Flex sx={{ flexDirection: "column", gap: 1, mx: 1 }}>
                     <Text variant="subBody">
-                      {group[0]?.toLocaleUpperCase() + group.substring(1)}
+                      {toTitleCase(group)}
                     </Text>
                     <Flex
                       sx={{
